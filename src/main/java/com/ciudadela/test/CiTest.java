@@ -33,6 +33,7 @@ public final class CiTest {
             ServerLevel lvl = server.overworld();
             long seed = lvl.getSeed();
             log.println("Altura del mundo: " + lvl.getMinBuildHeight() + " .. " + lvl.getMaxBuildHeight());
+            dumpModBlocks(new File(out, "bloques_mods.txt"));
             int[] s = CastleSites.nearest(seed, 0, 0, 3);
             if (s == null) {
                 log.println("No se encontro ninguna ciudadela");
@@ -79,6 +80,42 @@ public final class CiTest {
             CiudadelaMod.LOGGER.error("[CI] fallo en la prueba", t);
         } finally {
             server.halt(false);
+        }
+    }
+
+    /** Lista todos los bloques de los mods de decoracion con sus propiedades. */
+    private static void dumpModBlocks(File f) throws Exception {
+        java.util.Set<String> skip = java.util.Set.of("minecraft", "forge", "ciudadela");
+        Map<String, java.util.List<String>> byMod = new TreeMap<>();
+        for (var e : net.minecraftforge.registries.ForgeRegistries.BLOCKS.getEntries()) {
+            var id = e.getKey().location();
+            if (skip.contains(id.getNamespace())) continue;
+            StringBuilder sb = new StringBuilder(id.getPath());
+            var props = e.getValue().getStateDefinition().getProperties();
+            if (!props.isEmpty()) {
+                sb.append(" {");
+                boolean first = true;
+                for (var p : props) {
+                    if (!first) sb.append("; ");
+                    first = false;
+                    sb.append(p.getName()).append("=");
+                    StringBuilder vals = new StringBuilder();
+                    for (Object v : p.getPossibleValues()) {
+                        if (vals.length() > 0) vals.append("|");
+                        vals.append(v.toString().toLowerCase());
+                    }
+                    sb.append(vals);
+                }
+                sb.append("}");
+            }
+            byMod.computeIfAbsent(id.getNamespace(), k -> new java.util.ArrayList<>()).add(sb.toString());
+        }
+        try (PrintWriter w = new PrintWriter(f)) {
+            for (var en : byMod.entrySet()) {
+                java.util.Collections.sort(en.getValue());
+                w.println("### " + en.getKey() + " (" + en.getValue().size() + " bloques)");
+                for (String l : en.getValue()) w.println(l);
+            }
         }
     }
 

@@ -8,10 +8,17 @@ on:
 permissions:
   contents: write
 
+env:
+  FORGE: 1.20.1-47.3.0
+  MODS: >-
+    macaws-furniture macaws-roofs macaws-windows macaws-lights-and-lamps macaws-paths-and-pavings
+    macaws-bridges macaws-fences-and-walls macaws-doors macaws-trapdoors macaws-stairs
+    handcrafted supplementaries another-furniture biomes-o-plenty
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
@@ -27,16 +34,33 @@ jobs:
       - name: Compilar el mod
         run: gradle build --no-daemon --stacktrace 2>&1 | tee build.log
 
-      - name: Prueba de generacion en un servidor
-        if: success()
+      - name: Preparar servidor Forge real
         run: |
-          mkdir -p run/ci-out
-          echo "eula=true" > run/eula.txt
-          printf "level-seed=ciudadela\nonline-mode=false\nspawn-protection=0\nmax-tick-time=-1\nview-distance=4\nsimulation-distance=4\n" > run/server.properties
-          CIUDADELA_CI=1 timeout 50m gradle runServer --no-daemon 2>&1 | tee server.log || true
-          grep -nE "Error construyendo|Exception|\[CI\]|ERROR" server.log | head -300 > run/ci-out/errores.txt || true
+          mkdir -p srv out
+          curl -sL -o installer.jar "https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE}/forge-${FORGE}-installer.jar"
+          (cd srv && java -jar ../installer.jar --installServer > ../out/installer.log 2>&1)
+          echo "eula=true" > srv/eula.txt
+          printf "level-seed=ciudadela\nonline-mode=false\nspawn-protection=0\nmax-tick-time=-1\nview-distance=4\nsimulation-distance=4\n" > srv/server.properties
+
+      - name: Prueba con mods de decoracion
+        run: |
+          python3 ci/download_mods.py srv/mods $MODS || true
+          cp out/../srv/mods_descargados.txt out/ 2>/dev/null || cp srv/mods_descargados.txt out/ || true
+          cp build/libs/ciudadela-*.jar srv/mods/
+          echo "-Xmx6G -Dciudadela.ciTest=true" > srv/user_jvm_args.txt
+          (cd srv && timeout 50m ./run.sh nogui 2>&1 | tee ../out/server_mods.log) || true
+          mkdir -p out/mods && cp -r srv/ci-out/* out/mods/ 2>/dev/null || true
+          grep -nE "Error construyendo|Exception|\[CI\]" out/server_mods.log | head -300 > out/mods/errores.txt || true
 
       - name: Publicar resultados
+        if: always()
+        run: |
+          cd out
+          for f in mods/*; do [ -f "$f" ] && mv "$f" "mods_$(basename "$f")"; done
+          ls -la
+        continue-on-error: true
+
+      - name: Subir release
         if: always()
         uses: softprops/action-gh-release@v2
         with:
@@ -46,5 +70,6 @@ jobs:
           files: |
             build/libs/*.jar
             build.log
-            server.log
-            run/ci-out/*
+            out/*.txt
+            out/*.log
+            out/*.png
