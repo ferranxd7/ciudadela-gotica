@@ -34,6 +34,9 @@ public final class CiTest {
             long seed = lvl.getSeed();
             log.println("Altura del mundo: " + lvl.getMinBuildHeight() + " .. " + lvl.getMaxBuildHeight());
             dumpModBlocks(new File(out, "bloques_mods.txt"));
+            try (PrintWriter o = new PrintWriter(new File(out, "orientacion.txt"))) {
+                o.print(com.ciudadela.gen.ModDeco.report());
+            }
             int[] s = CastleSites.nearest(seed, 0, 0, 3);
             if (s == null) {
                 log.println("No se encontro ninguna ciudadela");

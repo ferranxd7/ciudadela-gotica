@@ -58,6 +58,8 @@ public class Building extends Element {
     protected final int roofSlope;
     protected boolean timber = true;
     protected boolean mossy = false;
+    /** 0 pizarra, 1 roble oscuro, 2 abeto, 3 ladrillo del nether (rojo oscuro), 4 piedra negra. */
+    protected int roofStyle = 0;
     protected int turretCorner = 0; // 0..3, -1 sin torreta
     protected final List<Direction> entrances = new ArrayList<>();
     private int ridgeTop;
@@ -98,6 +100,41 @@ public class Building extends Element {
     public Building noTimber() {
         this.timber = false;
         return this;
+    }
+
+    public Building roofStyle(int st) {
+        this.roofStyle = st;
+        return this;
+    }
+
+    private BlockState roofBlock(int x, int y, int z) {
+        return switch (roofStyle) {
+            case 1 -> Pal.DO_PLANKS;
+            case 2 -> Pal.SP_PLANKS;
+            case 3 -> Hash.pct(x, y, z, 3) < 70 ? Pal.NETHER_BRICKS : Pal.RED_NETHER_BRICKS;
+            case 4 -> Pal.PB_BRICKS;
+            default -> Pal.roof(x, y, z);
+        };
+    }
+
+    private Block roofStairs() {
+        return switch (roofStyle) {
+            case 1 -> Blocks.DARK_OAK_STAIRS;
+            case 2 -> Blocks.SPRUCE_STAIRS;
+            case 3 -> Blocks.NETHER_BRICK_STAIRS;
+            case 4 -> Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS;
+            default -> Blocks.DEEPSLATE_TILE_STAIRS;
+        };
+    }
+
+    private Block roofSlab() {
+        return switch (roofStyle) {
+            case 1 -> Blocks.DARK_OAK_SLAB;
+            case 2 -> Blocks.SPRUCE_SLAB;
+            case 3 -> Blocks.NETHER_BRICK_SLAB;
+            case 4 -> Blocks.POLISHED_BLACKSTONE_BRICK_SLAB;
+            default -> Blocks.DEEPSLATE_TILE_SLAB;
+        };
     }
 
     public Building mossy() {
@@ -404,7 +441,10 @@ public class Building extends Element {
                         for (int y = sill; y <= top; y++) {
                             BlockState g;
                             if (f.index == 0 && !wide) g = Pal.connected(Blocks.IRON_BARS, side % 2 == 0 ? Direction.Axis.X : Direction.Axis.Z);
-                            else g = Pal.glass(wx, f.y + (y - sill) / 3, wz);
+                            else {
+                                BlockState mos = ModDeco.mosaic(wx, wz, y, sill, top);
+                                g = mos != null ? mos : Pal.glass(wx, f.y + (y - sill) / 3, wz);
+                            }
                             c.set(px, y, pz, g);
                         }
                     }
@@ -462,6 +502,20 @@ public class Building extends Element {
                 // escalon exterior y farolas
                 c.set(px + d.getStepX(), baseY, pz + d.getStepZ(), Pal.AIR);
             }
+            if (w == 1) {
+                // puerta de verdad en las casas pequenas
+                Direction facing = d.getOpposite();
+                BlockState lo = ModDeco.door(facing, false, (int) (seed & 7)), up = ModDeco.door(facing, true, (int) (seed & 7));
+                if (lo == null || up == null) {
+                    lo = Blocks.DARK_OAK_DOOR.defaultBlockState().setValue(net.minecraft.world.level.block.DoorBlock.FACING, facing)
+                            .setValue(net.minecraft.world.level.block.DoorBlock.HALF, net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER);
+                    up = lo.setValue(net.minecraft.world.level.block.DoorBlock.HALF, net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER);
+                }
+                c.set(e[0], baseY, e[1], lo);
+                c.set(e[0], baseY + 1, e[1], up);
+                BlockState mat = Mods.state("supplementaries:doormat", "facing=" + facing.getName());
+                if (mat != null) c.set(e[0] + d.getStepX(), baseY, e[1] + d.getStepZ(), mat);
+            }
             int lx = e[0] + d.getStepX() + side.getStepX() * (w + 1), lz = e[1] + d.getStepZ() + side.getStepZ() * (w + 1);
             int rx = e[0] + d.getStepX() - side.getStepX() * (w + 1), rz = e[1] + d.getStepZ() - side.getStepZ() * (w + 1);
             c.set(lx, baseY, lz, Pal.PB_BRICKS);
@@ -500,9 +554,9 @@ public class Building extends Element {
                     else up = null;
                 }
                 int h = topY + 1 + e * s;
-                for (int y = Math.max(topY + 1, h - 2 * s); y < h; y++) c.set(x, y, z, Pal.roof(x, y, z));
-                if (up == null) c.set(x, h, z, Pal.slab(Blocks.DEEPSLATE_TILE_SLAB, false));
-                else c.set(x, h, z, Pal.stairs(Blocks.DEEPSLATE_TILE_STAIRS, up, false));
+                for (int y = Math.max(topY + 1, h - 2 * s); y < h; y++) c.set(x, y, z, roofBlock(x, y, z));
+                if (up == null) c.set(x, h, z, Pal.slab(roofSlab(), false));
+                else c.set(x, h, z, Pal.stairs(roofStairs(), up, false));
                 // hastiales
                 if (roof == Roof.GABLE) {
                     boolean gableEnd = ridgeX ? (x == fp.x0 || x == fp.x1) : (z == fp.z0 || z == fp.z1);

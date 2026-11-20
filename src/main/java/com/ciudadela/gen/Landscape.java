@@ -111,8 +111,9 @@ public final class Landscape {
                             c.set(x, y + 2, z, Pal.b(Blocks.POLISHED_BLACKSTONE_WALL));
                         } else {
                             Direction.Axis ax = (x == r.x0 || x == r.x1) ? Direction.Axis.Z : Direction.Axis.X;
-                            c.set(x, y, z, Pal.connected(Blocks.IRON_BARS, ax));
-                            c.set(x, y + 1, z, Pal.connected(Blocks.IRON_BARS, ax));
+                            BlockState gb = ModDeco.gothicFence(ax, false), gt = ModDeco.gothicFence(ax, true);
+                            c.set(x, y, z, gb != null ? gb : Pal.connected(Blocks.IRON_BARS, ax));
+                            c.set(x, y + 1, z, gt != null ? gt : Pal.connected(Blocks.IRON_BARS, ax));
                         }
                         continue;
                     }
@@ -303,7 +304,8 @@ public final class Landscape {
             c.column(x, z, y + 1, y + 3, Pal.b(Blocks.POLISHED_BLACKSTONE_WALL));
             c.set(x, y + 4, z, Pal.PB_CHISELED);
             boolean soul = Hash.pct(x, y, z, 2) < 60;
-            c.set(x, y + 5, z, soul ? Pal.SOUL_LANTERN : Pal.LANTERN);
+            BlockState mod = ModDeco.standingLantern(Hash.h(x, y, z, 5));
+            c.set(x, y + 5, z, mod != null ? mod : (soul ? Pal.SOUL_LANTERN : Pal.LANTERN));
         }
     }
 
@@ -447,9 +449,24 @@ public final class Landscape {
         }
     }
 
+    /** Calles de tierra del pueblo. */
+    public static BlockState lane(int x, int y, int z) {
+        BlockState mod = Mods.state("mcwpaths:cobbled_deepslate_basket_weave_paving");
+        int p = Hash.pct(x, y, z, 334);
+        if (mod != null && p < 25) return mod;
+        if (p < 45) return Pal.b(Blocks.DIRT_PATH);
+        if (p < 65) return Pal.COARSE_DIRT;
+        if (p < 82) return Pal.GRAVEL;
+        return Pal.DS_COBBLED;
+    }
+
     /** Bloque de superficie de piedra (para caminos). */
     public static BlockState road(int x, int y, int z) {
         int p = Hash.pct(x, y, z, 333);
+        if (p < 55) {
+            BlockState mod = ModDeco.paving(x, y, z);
+            if (mod != null) return mod;
+        }
         if (p < 35) return Pal.PB_BRICKS;
         if (p < 55) return Pal.DS_TILES;
         if (p < 70) return Pal.DS_BRICKS;

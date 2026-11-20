@@ -85,6 +85,14 @@ public final class Decor {
     private void chandelier(int x, int z, boolean large) {
         int len = Math.max(1, Math.min(room.height / 3, large ? 6 : 2));
         int y0 = T - len;
+        BlockState mod = large ? ModDeco.chandelier(Hash.pct(x, T, z, 3) < 35, room.height < 8)
+                : ModDeco.hangingLantern(Hash.h(x, T, z, 4));
+        if (mod != null) {
+            int yy = Math.max(F + 3, y0);
+            for (int y = T; y > yy; y--) c.set(x, y, z, Pal.CHAIN);
+            c.set(x, yy, z, mod);
+            return;
+        }
         if (y0 < F + 3) {
             c.set(x, T, z, Pal.SOUL_LANTERN_HANG);
             return;
@@ -132,7 +140,8 @@ public final class Decor {
         for (WallCell w : wallCells()) {
             if (i++ % every != every / 2) continue;
             if (room.clear(w.x, w.z)) continue;
-            c.setIfAir(w.x, F + 2, w.z, Blocks.SOUL_WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, w.in));
+            BlockState mod = ModDeco.wallLight(w.in.getOpposite(), i / every);
+            c.setIfAir(w.x, F + 2, w.z, mod != null ? mod : Blocks.SOUL_WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, w.in));
         }
     }
 
@@ -146,17 +155,86 @@ public final class Decor {
     }
 
     private void table(int x0, int z0, int x1, int z1, Block slab) {
-        for (int x = Math.min(x0, x1); x <= Math.max(x0, x1); x++)
-            for (int z = Math.min(z0, z1); z <= Math.max(z0, z1); z++) {
-                c.set(x, F, z, Pal.slab(slab, true));
+        int ax0 = Math.min(x0, x1), ax1 = Math.max(x0, x1), az0 = Math.min(z0, z1), az1 = Math.max(z0, z1);
+        boolean single = ax0 == ax1 && az0 == az1;
+        boolean line = ax0 == ax1 || az0 == az1;
+        for (int x = ax0; x <= ax1; x++)
+            for (int z = az0; z <= az1; z++) {
+                BlockState m = null;
+                if (single) m = ModDeco.tableSingle();
+                else if (line) {
+                    boolean alongX = az0 == az1;
+                    m = ModDeco.tableLong(alongX ? Direction.Axis.X : Direction.Axis.Z,
+                            alongX ? x == ax0 : z == az0, alongX ? x == ax1 : z == az1);
+                }
+                c.set(x, F, z, m != null ? m : Pal.slab(slab, true));
                 use(x, z);
             }
+    }
+
+    /** Pone cosas encima de una mesa (platos, copas, velas, libros...). */
+    private void onTable(int x, int z, boolean study) {
+        BlockState m = study ? ModDeco.studyItem(Hash.h(x, F, z, 61)) : ModDeco.tableware(Hash.h(x, F, z, 62));
+        if (m != null) c.set(x, F + 1, z, m);
+        else if (Hash.pct(x, F, z, 63) < 40) c.set(x, F + 1, z, Pal.candles(Blocks.WHITE_CANDLE, 1 + Hash.pct(x, 0, z, 2) % 3));
+    }
+
+    /** Apliques, trofeos y estantes en las paredes a media altura. */
+    private void wallDecor(int every, boolean trophies) {
+        if (room.height < 5) return;
+        int i = 0;
+        for (WallCell w : wallCells()) {
+            i++;
+            if (i % every != 0 || room.clear(w.x, w.z)) continue;
+            int y = F + 2 + (room.height >= 8 ? 1 : 0);
+            if (!c.isAir(w.x, y, w.z)) continue;
+            BlockState m;
+            int k = (i / every) % 3;
+            if (trophies && k == 0) m = ModDeco.trophy(w.in.getOpposite(), i);
+            else if (k == 1) m = ModDeco.wallShelf(w.in.getOpposite());
+            else m = ModDeco.wallLight(w.in.getOpposite(), i);
+            if (m != null) c.set(w.x, y, w.z, m);
+        }
+    }
+
+    /** Rellena huecos libres junto a las paredes con muebles pequenos para que nada quede vacio. */
+    private void fillWalls(double p, boolean crypt) {
+        int i = 0;
+        for (WallCell w : wallCells()) {
+            i++;
+            if (!free(w.x, w.z) || !c.isAir(w.x, F, w.z) || Hash.f(w.x, F, w.z, 64) > p) continue;
+            int k = Hash.h(w.x, F, w.z, 65) % 7;
+            BlockState m = switch (k) {
+                case 0 -> ModDeco.nightstand(w.in);
+                case 1 -> ModDeco.drawer(w.in, i);
+                case 2 -> ModDeco.pot(i);
+                case 3 -> ModDeco.lamp(i);
+                case 4 -> ModDeco.cupboard(w.in);
+                default -> ModDeco.clutter(i, crypt);
+            };
+            if (m == null) m = Town.clutter(w.x, F, w.z);
+            c.set(w.x, F, w.z, m);
+            use(w.x, w.z);
+        }
+    }
+
+    /** Un par de sofas mirandose (o mirando al centro). */
+    private void sofas(int x, int z, Direction look, int n, boolean black) {
+        Direction side = look.getClockWise();
+        for (int k = 0; k < n; k++) {
+            int px = x + side.getStepX() * k, pz = z + side.getStepZ() * k;
+            if (!free(px, pz)) continue;
+            BlockState m = ModDeco.sofa(look, black);
+            c.set(px, F, pz, m != null ? m : Pal.stairs(Blocks.CRIMSON_STAIRS, look.getOpposite(), false));
+            use(px, pz);
+        }
     }
 
     /** Silla mirando hacia "look" (el respaldo queda al lado contrario). */
     private void chair(int x, int z, Direction look, Block stairs) {
         if (!free(x, z)) return;
-        c.set(x, F, z, Pal.stairs(stairs, look.getOpposite(), false));
+        BlockState m = stairs == Blocks.DARK_OAK_STAIRS ? ModDeco.chair(look, Hash.h(x, F, z, 7)) : null;
+        c.set(x, F, z, m != null ? m : Pal.stairs(stairs, look.getOpposite(), false));
         use(x, z);
     }
 
@@ -164,8 +242,15 @@ public final class Decor {
         int fx = hx + in.getStepX(), fz = hz + in.getStepZ();
         if (!free(hx, hz) || !free(fx, fz)) return;
         Direction facing = in.getOpposite();
-        c.set(hx, F, hz, bed.defaultBlockState().setValue(BedBlock.FACING, facing).setValue(BedBlock.PART, BedPart.HEAD));
-        c.set(fx, F, fz, bed.defaultBlockState().setValue(BedBlock.FACING, facing).setValue(BedBlock.PART, BedPart.FOOT));
+        String col = bed == Blocks.BLACK_BED ? "black" : bed == Blocks.GRAY_BED ? "gray" : bed == Blocks.PURPLE_BED ? "purple" : bed == Blocks.BROWN_BED ? "brown" : "red";
+        BlockState mh = ModDeco.bed(facing, true, col), mf = ModDeco.bed(facing, false, col);
+        if (mh != null && mf != null && bed != Blocks.BROWN_BED) {
+            c.set(hx, F, hz, mh);
+            c.set(fx, F, fz, mf);
+        } else {
+            c.set(hx, F, hz, bed.defaultBlockState().setValue(BedBlock.FACING, facing).setValue(BedBlock.PART, BedPart.HEAD));
+            c.set(fx, F, fz, bed.defaultBlockState().setValue(BedBlock.FACING, facing).setValue(BedBlock.PART, BedPart.FOOT));
+        }
         use(hx, hz);
         use(fx, fz);
     }
@@ -268,6 +353,19 @@ public final class Decor {
             default -> {
             }
         }
+        if (room.type == Room.Type.EMPTY) return;
+        // relleno general: que no quede ningun hueco vacio
+        Room.Type t = room.type;
+        boolean crypt = t == Room.Type.CRYPT || t == Room.Type.TREASURY || t == Room.Type.PRISON;
+        boolean troph = t == Room.Type.GREAT_HALL || t == Room.Type.THRONE || t == Room.Type.ARMORY || t == Room.Type.GALLERY || t == Room.Type.BARRACKS;
+        wallDecor(troph ? 4 : 6, troph);
+        double p = switch (t) {
+            case STORAGE, CELLAR, WINE_CELLAR -> 0.7;
+            case GREAT_HALL, THRONE, BALLROOM, CHAPEL -> 0.22;
+            case LIBRARY, LIBRARY_GRAND, PRISON -> 0.1;
+            default -> 0.45;
+        };
+        fillWalls(p, crypt);
     }
 
     private void greatHall() {
@@ -293,7 +391,7 @@ public final class Decor {
                 for (int x = r.x0 + 4; x <= r.x1 - 4; x++) {
                     chair(x, tz - 1, Direction.SOUTH, Blocks.DARK_OAK_STAIRS);
                     chair(x, tz + 1, Direction.NORTH, Blocks.DARK_OAK_STAIRS);
-                    if ((x - r.x0) % 3 == 0) c.set(x, F + 1, tz, Pal.candles(Blocks.RED_CANDLE, 1 + Hash.h(x, F, tz, 3) % 3));
+                    onTable(x, tz, false);
                 }
             }
         } else {
@@ -305,9 +403,16 @@ public final class Decor {
             for (int z = r.z0; z <= r.z1; z++)
                 for (int x = xc - 1; x <= xc + 1; x++) c.set(x, F, z, (x == xc ? Blocks.RED_CARPET : Blocks.BLACK_CARPET).defaultBlockState());
         }
-        // chimeneas en los extremos
+        // chimeneas en los extremos con sofas delante
         fireplace(alongX ? r.x0 : r.cx(), alongX ? r.cz() : r.z0, alongX ? Direction.EAST : Direction.SOUTH);
         fireplace(alongX ? r.x1 : r.cx(), alongX ? r.cz() : r.z1, alongX ? Direction.WEST : Direction.NORTH);
+        if (alongX) {
+            sofas(r.x0 + 4, r.cz() - 1, Direction.WEST, 3, false);
+            sofas(r.x1 - 4, r.cz() + 1, Direction.EAST, 3, false);
+        } else {
+            sofas(r.cx() + 1, r.z0 + 4, Direction.NORTH, 3, false);
+            sofas(r.cx() - 1, r.z1 - 4, Direction.SOUTH, 3, false);
+        }
         chandeliers(true);
         torches(5);
     }
@@ -350,8 +455,9 @@ public final class Decor {
             c.set(xc, ty, tz, Pal.stairs(Blocks.POLISHED_BLACKSTONE_STAIRS, Direction.NORTH, false));
             c.set(xc - 1, ty, tz, Pal.PB_CHISELED);
             c.set(xc + 1, ty, tz, Pal.PB_CHISELED);
-            c.set(xc - 1, ty + 1, tz, Pal.candles(Blocks.RED_CANDLE, 3));
-            c.set(xc + 1, ty + 1, tz, Pal.candles(Blocks.RED_CANDLE, 3));
+            BlockState ch1 = ModDeco.candleHolder(Direction.SOUTH, 0);
+            c.set(xc - 1, ty + 1, tz, ch1 != null ? ch1 : Pal.candles(Blocks.RED_CANDLE, 3));
+            c.set(xc + 1, ty + 1, tz, ch1 != null ? ch1 : Pal.candles(Blocks.RED_CANDLE, 3));
             for (int y = ty; y <= ty + 5; y++) c.set(xc, y, r.z0, y == ty + 5 ? Pal.GILDED : Pal.PB_CHISELED);
             c.set(xc, ty + 6, r.z0, Pal.b(Blocks.WITHER_SKELETON_SKULL));
             // braseros
@@ -394,7 +500,7 @@ public final class Decor {
             for (int a = a0; a <= a1; a++) {
                 int x = alongX ? a : mid, z = alongX ? mid : a;
                 table(x, z, x, z, Blocks.DARK_OAK_SLAB);
-                if ((a - a0) % 3 == 1) c.set(x, F + 1, z, Pal.candles(Blocks.WHITE_CANDLE, 1 + Hash.h(x, 0, z, 4) % 4));
+                onTable(x, z, false);
                 if (alongX) {
                     chair(x, z - 1, Direction.SOUTH, Blocks.DARK_OAK_STAIRS);
                     chair(x, z + 1, Direction.NORTH, Blocks.DARK_OAK_STAIRS);
@@ -422,7 +528,21 @@ public final class Decor {
                 Pal.slab(Blocks.POLISHED_BLACKSTONE_SLAB, true), Pal.b(Blocks.WATER_CAULDRON).setValue(LayeredCauldronBlock.LEVEL, 3),
                 Pal.b(Blocks.COMPOSTER)
         };
-        alongWalls(0.7, counter);
+        int ci = 0;
+        for (WallCell w : wallCells()) {
+            if (!free(w.x, w.z) || Hash.pct(w.x, F, w.z, 66) > 70) continue;
+            BlockState m = ModDeco.counter(w.in, ci++);
+            if (m == null) {
+                m = counter[Hash.h(w.x, F, w.z, 67) % counter.length];
+                if (m.hasProperty(HorizontalDirectionalBlock.FACING)) m = m.setValue(HorizontalDirectionalBlock.FACING, w.in);
+            }
+            c.set(w.x, F, w.z, m);
+            use(w.x, w.z);
+            if (Hash.pct(w.x, F, w.z, 68) < 40) {
+                BlockState top = ModDeco.tableware(ci);
+                if (top != null) c.set(w.x, F + 1, w.z, top);
+            }
+        }
         if (r.w() >= 7 && r.d() >= 7) {
             table(r.cx() - 1, r.cz(), r.cx() + 1, r.cz() + 1, Blocks.SPRUCE_SLAB);
             c.set(r.cx(), F + 1, r.cz(), Pal.b(Blocks.CAKE));
@@ -470,9 +590,13 @@ public final class Decor {
                 }
             c.set(cx + 3, F, cz, Pal.facing(Blocks.LECTERN, Direction.WEST));
             c.set(cx - 3, F, cz, Pal.facing(Blocks.LECTERN, Direction.EAST));
+            sofas(cx - 2, cz + 5, Direction.SOUTH, 5, true);
+            sofas(cx + 2, cz - 5, Direction.NORTH, 5, true);
         } else if (free(cx, cz)) {
             table(cx, cz, cx + (alongX ? 1 : 0), cz + (alongX ? 0 : 1), Blocks.DARK_OAK_SLAB);
-            c.set(cx, F + 1, cz, Pal.candles(Blocks.WHITE_CANDLE, 3));
+            onTable(cx, cz, true);
+            onTable(cx + (alongX ? 1 : 0), cz + (alongX ? 0 : 1), true);
+            chair(cx, cz + (alongX ? 1 : 0) + (alongX ? 0 : 2), alongX ? Direction.NORTH : Direction.NORTH, Blocks.DARK_OAK_STAIRS);
         }
         chestAt(r.x0 + 1, r.z0 + 1, Direction.SOUTH, "biblioteca");
         if (grand) chestAt(r.x1 - 1, r.z1 - 1, Direction.NORTH, "biblioteca");
@@ -492,21 +616,35 @@ public final class Decor {
         for (int s = -1; s <= 1; s += 2) {
             int nx = hx + s * (s > 0 && r.w() >= 11 ? 4 : 1);
             if (free(nx, hz)) {
-                c.set(nx, F, hz, Pal.b(Blocks.SPRUCE_PLANKS));
-                c.set(nx, F + 1, hz, Pal.candles(Blocks.BLACK_CANDLE, 1 + rng.nextInt(3)));
+                BlockState ns = ModDeco.nightstand(Direction.SOUTH);
+                c.set(nx, F, hz, ns != null ? ns : Pal.b(Blocks.SPRUCE_PLANKS));
+                BlockState cand = ModDeco.candleHolder(Direction.SOUTH, nx);
+                c.set(nx, F + 1, hz, cand != null ? cand : Pal.candles(Blocks.BLACK_CANDLE, 1 + rng.nextInt(3)));
                 use(nx, hz);
             }
         }
         // armario
         if (free(r.x0, r.z1) && free(r.x0 + 1, r.z1)) {
             for (int x = r.x0; x <= r.x0 + 1; x++) {
-                for (int y = F; y <= F + 2 && y <= T; y++) c.set(x, y, r.z1, Pal.DO_STRIPPED);
+                BlockState cup = ModDeco.cupboard(Direction.NORTH);
+                for (int y = F; y <= F + 2 && y <= T; y++) c.set(x, y, r.z1, cup != null && y == F ? cup : Pal.DO_STRIPPED);
                 c.set(x, F + 1, r.z1 - 1, Blocks.SPRUCE_TRAPDOOR.defaultBlockState().setValue(TrapDoorBlock.FACING, Direction.NORTH)
                         .setValue(TrapDoorBlock.OPEN, true));
                 use(x, r.z1);
             }
         }
         chestAt(hx, hz + 2, Direction.SOUTH, "dormitorio");
+        chestAt(r.x1, r.z1, Direction.NORTH, "dormitorio");
+        // escritorio con silla y un par de sofas si cabe
+        BlockState desk = ModDeco.desk(Direction.WEST);
+        if (desk != null && free(r.x1, r.cz())) {
+            c.set(r.x1, F, r.cz(), desk);
+            use(r.x1, r.cz());
+            BlockState it = ModDeco.studyItem(Hash.h(r.x1, F, r.cz(), 2));
+            if (it != null) c.set(r.x1, F + 1, r.cz(), it);
+            chair(r.x1 - 1, r.cz(), Direction.EAST, Blocks.DARK_OAK_STAIRS);
+        }
+        if (r.w() >= 8 && r.d() >= 8) sofas(r.x0 + 1, r.z1 - 1, Direction.NORTH, 2, false);
         alongWalls(0.12, Pal.BOOKSHELF, Pal.b(Blocks.BARREL), Pal.b(Blocks.POTTED_WITHER_ROSE));
         chandelier(r.cx(), r.cz(), false);
     }
@@ -646,8 +784,10 @@ public final class Decor {
         }
         int cx = r.cx(), cz = r.cz();
         table(cx - 1, cz, cx + 1, cz, Blocks.DARK_OAK_SLAB);
-        c.set(cx - 1, F + 1, cz, Pal.candles(Blocks.WHITE_CANDLE, 2));
-        c.set(cx + 1, F + 1, cz, Pal.b(Blocks.POTTED_DEAD_BUSH));
+        onTable(cx - 1, cz, true);
+        onTable(cx, cz, true);
+        onTable(cx + 1, cz, true);
+        sofas(r.x0 + 1, r.z1, Direction.NORTH, 2, true);
         chair(cx, cz + 1, Direction.NORTH, Blocks.DARK_OAK_STAIRS);
         standing(r.x1, r.z1, Pal.b(Blocks.CARTOGRAPHY_TABLE));
         standing(r.x0, r.z1, Pal.facing(Blocks.LECTERN, Direction.EAST));
@@ -691,6 +831,7 @@ public final class Decor {
                 armorStand(r.x1, z, Direction.WEST, false);
             }
         }
+        if (r.w() >= 10 && r.d() >= 6) sofas(r.cx() - 1, r.cz() + (r.d() >= r.w() ? 0 : 1), Direction.NORTH, 3, false);
         banners(4);
         chandeliers(false);
     }
@@ -708,6 +849,8 @@ public final class Decor {
                 n++;
             }
         for (int x = r.x0; x <= r.x1; x++) c.setIfAir(x, T, r.z0, Pal.COBWEB);
+        BlockState safe = ModDeco.safe(Direction.SOUTH);
+        if (safe != null) standing(r.x0 + 1, r.z0, safe);
         chandelier(r.cx(), r.cz(), false);
     }
 
@@ -799,6 +942,7 @@ public final class Decor {
         c.set(r.cx(), F, r.z0 + 4, Pal.b(Blocks.JUKEBOX));
         c.set(r.cx() - 2, F, r.z0 + 4, Pal.b(Blocks.NOTE_BLOCK));
         c.set(r.cx() + 2, F, r.z0 + 4, Pal.b(Blocks.NOTE_BLOCK));
+        sofas(r.x0 + 2, r.z1 - 2, Direction.NORTH, Math.max(1, r.w() - 4), true);
         chandeliers(true);
         banners(5);
     }

@@ -117,7 +117,10 @@ public final class CastlePlan {
         // ------------------------------------------------ isla principal
         main = new Island(rng.fork(), cx, cz, Y - 1, 305, 0.06, 28, 6, 112);
         double[] falls = {10, 125, 200, 290};
-        for (double a : falls) main.waterfall(Math.toRadians(a), 2.5);
+        for (double a : falls) {
+            main.waterfall(Math.toRadians(a), 2.5);
+            avoidAngles.add(Math.toRadians(a));
+        }
         main.surface((x, z, top) -> {
             int lx = x - cx, lz = z - cz;
             if (top != Y - 1) return null;
@@ -129,11 +132,12 @@ public final class CastlePlan {
                 return Pal.paving(x, top, z);
             }
             if (onRoad(lx, lz)) return Landscape.road(x, top, z);
+            if (lane(lx, lz)) return Landscape.lane(x, top, z);
             return null;
         }).plants((x, z) -> {
             int lx = x - cx, lz = z - cz;
             if (cheb(lx, lz) <= INNER - 4 && !gardenBed(lx, lz)) return false;
-            return !onRoad(lx, lz);
+            return !onRoad(lx, lz) && !lane(lx, lz);
         });
         add(main);
 
@@ -141,6 +145,7 @@ public final class CastlePlan {
         double[] satAngles = {35, 65, 150, 175, 230, 260, 315, 345};
         for (int i = 0; i < satAngles.length; i++) {
             double a = Math.toRadians(satAngles[i]);
+            avoidAngles.add(a);
             int rs = rng.range(19, 25);
             double Rm = main.radiusAt(a);
             double dist = Math.min(Rm + 26 + rs, FOOTPRINT - rs - 6);
@@ -320,7 +325,7 @@ public final class CastlePlan {
             t.doorToward(X(0), Z(-15), keep.topY + 1);
             add(t);
         }
-        add(new GreatTower(rng.fork(), X(0), Z(-15), keep.topY + 1, 13, Y + 200, 92, false).door(Direction.SOUTH, keep.topY + 1));
+        add(new TreeTower(rng.fork(), X(0), Z(-15), keep.topY + 1, 13, Y + 200, keep.fp, Y));
         occupied.add(R(-62, -67, 62, 37));
 
         // ------------------------------------------------ catedral
@@ -356,20 +361,17 @@ public final class CastlePlan {
         occupied.add(R(-104, -114, -76, -86));
         occupied.add(R(18, -112, 42, -88));
 
-        // ------------------------------------------------ arboles muertos
-        int trees = 0;
-        for (int tries = 0; tries < 4000 && trees < 320; tries++) {
-            double a = rng.nextDouble() * Math.PI * 2;
-            double rr = Math.sqrt(rng.nextDouble()) * 300;
-            int lx = (int) Math.round(Math.cos(a) * rr), lz = (int) Math.round(Math.sin(a) * rr);
-            if (!treeSpot(lx, lz)) continue;
-            int top = main.topAt(X(lx), Z(lz));
-            if (top == Integer.MIN_VALUE) continue;
-            boolean thick = rng.chance(0.25);
-            add(new Landscape.DeadTree(rng.fork(), X(lx), top + 1, Z(lz), thick));
-            occupied.add(R(lx - 3, lz - 3, lx + 3, lz + 3));
-            trees++;
-        }
+        // zonas reservadas del patio interior
+        occupied.add(R(-13, 28, 13, 128));
+        occupied.add(R(-58, 38, -14, 114));
+        occupied.add(R(14, 38, 58, 114));
+        occupied.add(R(-32, -106, 8, -86));
+
+        // ------------------------------------------------ pueblo: parcelas entre calles
+        town(rng);
+
+        // ------------------------------------------------ arboles: bosque por fuera, jardines por dentro
+        forest(rng);
 
         // ------------------------------------------------ torre de ascenso desde el suelo
         double asc = Math.toRadians(90);
@@ -383,6 +385,150 @@ public final class CastlePlan {
             int ex = cx + (int) Math.round(Math.cos(asc) * (Ra - 34)), ez = cz + (int) Math.round(Math.sin(asc) * (Ra - 34));
             add(new Landscape.Bridge(rng.fork(), ax, Y - 1, az - 4, ex, Y - 1, ez, 0, 3));
         }
+    }
+
+    private static final int LOT = 14, STEP = 17, OFF = 3;
+
+    /** Calles del pueblo (cuadricula) en el recinto exterior. */
+    private boolean lane(int lx, int lz) {
+        int ch = cheb(lx, lz);
+        if (ch < 144 || !insideOct(lx, lz, 9)) return false;
+        return Math.floorMod(lx - OFF, STEP) >= LOT || Math.floorMod(lz - OFF, STEP) >= LOT;
+    }
+
+    private boolean lotFree(Rect r, boolean inner) {
+        for (int x = r.x0; x <= r.x1; x += 2)
+            for (int z = r.z0; z <= r.z1; z += 2) {
+                int lx = x - cx, lz = z - cz;
+                if (inner) {
+                    if (cheb(lx, lz) > INNER - 12) return false;
+                } else {
+                    if (cheb(lx, lz) < 146 || !insideOct(lx, lz, 15)) return false;
+                }
+                if (onRoad(lx, lz)) return false;
+            }
+        for (Rect o : occupied) if (o.intersects(r)) return false;
+        return true;
+    }
+
+    private void town(Rng rng) {
+        final int Y = Y0;
+        Room.Type[][][] professions = {
+                {{Room.Type.KITCHEN, Room.Type.DINING, Room.Type.STORAGE}, {Room.Type.BEDROOM, Room.Type.BEDROOM, Room.Type.BATH}, {Room.Type.BEDROOM, Room.Type.STORAGE}},
+                {{Room.Type.DINING, Room.Type.KITCHEN, Room.Type.DINING}, {Room.Type.BEDROOM, Room.Type.BEDROOM, Room.Type.BEDROOM}, {Room.Type.SERVANTS, Room.Type.STORAGE}},
+                {{Room.Type.SMITHY, Room.Type.STORAGE}, {Room.Type.BEDROOM, Room.Type.KITCHEN}, {Room.Type.STORAGE}},
+                {{Room.Type.ALCHEMY, Room.Type.STUDY}, {Room.Type.BEDROOM, Room.Type.LIBRARY}, {Room.Type.ALCHEMY}},
+                {{Room.Type.LIBRARY, Room.Type.STUDY}, {Room.Type.LIBRARY, Room.Type.BEDROOM}, {Room.Type.STUDY}},
+                {{Room.Type.STORAGE, Room.Type.ARMORY}, {Room.Type.BEDROOM, Room.Type.STORAGE}, {Room.Type.BARRACKS}},
+                {{Room.Type.KITCHEN, Room.Type.STORAGE, Room.Type.KITCHEN}, {Room.Type.BEDROOM, Room.Type.SERVANTS}, {Room.Type.STORAGE}},
+                {{Room.Type.CHAPEL}, {Room.Type.STUDY, Room.Type.BEDROOM}, {Room.Type.LIBRARY}}
+        };
+        Room.Type[] cellars = {Room.Type.CELLAR, Room.Type.WINE_CELLAR, Room.Type.STORAGE};
+        occupied.add(R(-32, 110, 32, 146));   // puerta interior
+        occupied.add(R(-34, 198, 34, 238));   // puerta exterior
+        for (int gx = -230; gx <= 230; gx += STEP)
+            for (int gz = -230; gz <= 230; gz += STEP) {
+                int lx0 = gx - Math.floorMod(gx - OFF, STEP), lz0 = gz - Math.floorMod(gz - OFF, STEP);
+                Rect lot = R(lx0, lz0, lx0 + LOT - 1, lz0 + LOT - 1);
+                boolean inner = cheb(lx0 + LOT / 2, lz0 + LOT / 2) < INNER;
+                if (!lotFree(lot, inner)) continue;
+                occupied.add(lot);
+                int roll = rng.nextInt(100);
+                Direction face = Pal.dirOf(-(lx0 + LOT / 2), -(lz0 + LOT / 2));
+                int houseChance = inner ? 55 : 58;
+                if (roll < houseChance) {
+                    int w = rng.range(9, inner ? 14 : 13), d = rng.range(9, inner ? 14 : 13);
+                    int ox = lot.x0 + rng.nextInt(LOT - w + 1), oz = lot.z0 + rng.nextInt(LOT - d + 1);
+                    int floors = inner ? rng.range(2, 3) : rng.range(1, 3);
+                    int[] hs = new int[floors];
+                    for (int k = 0; k < floors; k++) hs[k] = inner ? 8 : 7;
+                    int basements = rng.chance(0.35) ? 1 : 0;
+                    Room.Type[][] prof = professions[rng.nextInt(professions.length)];
+                    Building b = new Building(rng.fork(), new Rect(ox, oz, ox + w - 1, oz + d - 1), Y, hs, basements, 6,
+                            rng.chance(0.15) ? Building.Roof.HIP : Building.Roof.GABLE, inner ? 1 : rng.range(1, 2),
+                            Building.simple(4, 9, cellars, prof[0], prof[1], prof[2]), face);
+                    b.turret(inner && rng.chance(0.4) ? rng.nextInt(4) : -1);
+                    b.roofStyle(inner ? (rng.chance(0.5) ? 0 : 4) : rng.pick(new Integer[]{0, 0, 1, 2, 3}));
+                    if (inner) b.noTimber();
+                    add(b);
+                    // un detalle en el hueco libre de la parcela
+                    int fx = ox == lot.x0 ? lot.x1 - 1 : lot.x0 + 1, fz = oz == lot.z0 ? lot.z1 - 1 : lot.z0 + 1;
+                    if (rng.chance(0.5)) add(new Tree(rng.fork(), rng.chance(0.5) ? Tree.Kind.BUSH : Tree.Kind.AZALEA, fx, Y, fz));
+                    else add(new Landscape.LampPost(rng.fork(), fx, Y, fz));
+                } else if (!inner && roll < 68) {
+                    Direction f = Direction.from2DDataValue(rng.nextInt(4));
+                    add(new Town.Stall(rng.fork(), lot.cx() - 3, Y, lot.cz() - 3, f));
+                    add(new Town.Stall(rng.fork(), lot.cx() + 3, Y, lot.cz() + 3, f.getOpposite()));
+                    add(new Town.Cart(rng.fork(), lot.x0 + 3, Y, lot.z1 - 3, f.getClockWise()));
+                    add(new Town.Well(rng.fork(), lot.x1 - 3, Y, lot.z0 + 3));
+                } else if (!inner && roll < 79) {
+                    add(new Town.Garden(rng.fork(), lot.grow(-1), Y));
+                } else if (roll < 90) {
+                    // arboleda
+                    for (int k = 0; k < 4; k++) {
+                        int tx = lot.x0 + 3 + (k % 2) * 7 + rng.range(-1, 1), tz = lot.z0 + 3 + (k / 2) * 7 + rng.range(-1, 1);
+                        add(new Tree(rng.fork(), pickTree(rng, true), tx, Y, tz));
+                    }
+                    add(new Tree(rng.fork(), Tree.Kind.AZALEA, lot.cx(), Y, lot.cz()));
+                } else {
+                    add(new Town.Plaza(rng.fork(), lot, Y));
+                }
+            }
+    }
+
+    private Tree.Kind pickTree(Rng rng, boolean town) {
+        int p = rng.nextInt(100);
+        if (p < 22) return Tree.Kind.BIG_DARK;
+        if (p < 44) return Tree.Kind.OAK;
+        if (p < 62) return Tree.Kind.SPRUCE;
+        if (p < 70) return Tree.Kind.WILLOW;
+        if (p < 75) return Tree.Kind.MANGROVE;
+        if (p < (town ? 85 : 80)) return Tree.Kind.CHERRY;
+        if (p < 86) return Tree.Kind.MAGIC;
+        if (p < 93) return Tree.Kind.BUSH;
+        return Tree.Kind.AZALEA;
+    }
+
+    private final java.util.List<Double> avoidAngles = new java.util.ArrayList<>();
+
+    private void forest(Rng rng) {
+        final int Y = Y0;
+        // bosque denso entre la muralla exterior y el borde de la isla
+        for (int lx = -305; lx <= 305; lx += 6)
+            for (int lz = -305; lz <= 305; lz += 6) {
+                int px = lx + rng.range(-2, 2), pz = lz + rng.range(-2, 2);
+                double r = Math.sqrt(px * px + pz * pz);
+                if (insideOct(px, pz, -20)) continue;
+                double ang = Math.atan2(pz, px);
+                double R = main.radiusAt(ang);
+                if (r > R - 5) continue;
+                if (Math.abs(px) <= 8 && pz > 0) continue;
+                boolean blocked = false;
+                for (double a : avoidAngles) if (Island.angleNear(ang, a, 6.0 / Math.max(r, 1))) blocked = true;
+                if (blocked || !rng.chance(0.85)) continue;
+                int top = main.topAt(X(px), Z(pz));
+                if (top == Integer.MIN_VALUE) continue;
+                if (rng.chance(0.06)) add(new Landscape.DeadTree(rng.fork(), X(px), top + 1, Z(pz), rng.chance(0.4)));
+                else add(new Tree(rng.fork(), pickTree(rng, false), X(px), top + 1, Z(pz)));
+            }
+        // huecos que quedan en el recinto exterior
+        for (int lx = -220; lx <= 220; lx += 7)
+            for (int lz = -220; lz <= 220; lz += 7) {
+                int px = lx + rng.range(-2, 2), pz = lz + rng.range(-2, 2);
+                if (!treeSpot(px, pz) || lane(px, pz) || cheb(px, pz) <= INNER + 14) continue;
+                if (!rng.chance(0.7)) continue;
+                add(new Tree(rng.fork(), pickTree(rng, true), X(px), Y, Z(pz)));
+            }
+        // parterres del patio interior
+        for (int lx = -56; lx <= 56; lx += 6)
+            for (int lz = 42; lz <= 112; lz += 6) {
+                if (!gardenBed(lx, lz) || Math.abs(lx) < 19) continue;
+                Tree.Kind k = rng.chance(0.3) ? Tree.Kind.CHERRY : (rng.chance(0.5) ? Tree.Kind.AZALEA : Tree.Kind.OAK);
+                add(new Tree(rng.fork(), k, X(lx + rng.range(-1, 1)), Y, Z(lz + rng.range(-1, 1))));
+            }
+        // jardin privado
+        for (int k = 0; k < 8; k++)
+            add(new Tree(rng.fork(), rng.chance(0.5) ? Tree.Kind.CHERRY : Tree.Kind.WILLOW, X(-30 + k * 5), Y, Z(k % 2 == 0 ? -104 : -88)));
     }
 
     private boolean treeSpot(int lx, int lz) {
@@ -437,15 +583,19 @@ public final class CastlePlan {
                 add(new Landscape.LampPost(rng.fork(), sx, gy, sz - 8));
             }
         }
-        // unos arboles en el borde del islote
-        int n = 2 + rng.nextInt(3);
+        // bosquecillo alrededor de la estructura del islote
+        int n = 9 + rng.nextInt(7);
         for (int k = 0; k < n; k++) {
-            double a = rng.nextDouble() * Math.PI * 2;
-            double d = sat.rimAngleRadius(a) - 5;
+            double a = k * Math.PI * 2 / n + rng.nextDouble() * 0.4;
+            double R = sat.rimAngleRadius(a);
+            double d = 14 + rng.nextDouble() * Math.max(1, R - 18);
             int tx = sx + (int) Math.round(Math.cos(a) * d), tz = sz + (int) Math.round(Math.sin(a) * d);
+            double toMainAng = Math.atan2(cz - sz, cx - sx);
+            if (Island.angleNear(a, toMainAng, 0.35)) continue; // no tapar el puente
             int top = sat.topAt(tx, tz);
             if (top == Integer.MIN_VALUE) continue;
-            add(new Landscape.DeadTree(rng.fork(), tx, top + 1, tz, rng.chance(0.3)));
+            if (rng.chance(0.15)) add(new Landscape.DeadTree(rng.fork(), tx, top + 1, tz, rng.chance(0.3)));
+            else add(new Tree(rng.fork(), pickTree(rng, false), tx, top + 1, tz));
         }
     }
 

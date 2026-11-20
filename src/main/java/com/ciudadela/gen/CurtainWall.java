@@ -3,6 +3,7 @@ package com.ciudadela.gen;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.WallBannerBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Lienzo de muralla entre dos puntos: almenas, camino de ronda, galeria interior con troneras,
@@ -82,6 +83,13 @@ public class CurtainWall extends Element {
                             c.set(x, walk, z, Pal.PB_BRICKS);
                             c.set(x, walk + 1, z, Pal.SOUL_LANTERN);
                         }
+                    }
+                    // canones en el camino de ronda
+                    if (s > half - 2.3 && s <= half - 1.3 && Math.floorMod((int) Math.floor(t), 24) == 12) {
+                        BlockState cannon = ModDeco.cannon(Pal.dirOf((int) Math.round(nx * 10), (int) Math.round(nz * 10)));
+                        if (cannon != null) c.set(x, walk, z, cannon);
+                        BlockState balls = Mods.state("supplementaries:cannonball", "balls=4");
+                        if (balls != null) c.set(x - (int) Math.round(ux), walk, z - (int) Math.round(uz), balls);
                     }
                     // estandartes en la cara interior
                     if (axisAligned && s < -half + 0.9 && s >= -half && Math.floorMod((int) Math.floor(t), 16) == 8) {

@@ -52,11 +52,22 @@ jobs:
           mkdir -p out/mods && cp -r srv/ci-out/* out/mods/ 2>/dev/null || true
           grep -nE "Error construyendo|Exception|\[CI\]" out/server_mods.log | head -300 > out/mods/errores.txt || true
 
+      - name: Prueba sin mods (solo vanilla)
+        run: |
+          mkdir -p srv2
+          cp -r srv/libraries srv/run.sh srv/user_jvm_args.txt srv/eula.txt srv/server.properties srv2/ 2>/dev/null || true
+          cp srv/*.jar srv2/ 2>/dev/null || true
+          mkdir -p srv2/mods && cp build/libs/ciudadela-*.jar srv2/mods/
+          (cd srv2 && timeout 40m ./run.sh nogui 2>&1 | tee ../out/server_vanilla.log) || true
+          mkdir -p out/vanilla && cp -r srv2/ci-out/* out/vanilla/ 2>/dev/null || true
+          grep -nE "Error construyendo|Exception" out/server_vanilla.log | head -100 > out/vanilla/errores.txt || true
+
       - name: Publicar resultados
         if: always()
         run: |
           cd out
           for f in mods/*; do [ -f "$f" ] && mv "$f" "mods_$(basename "$f")"; done
+          for f in vanilla/*; do [ -f "$f" ] && mv "$f" "vanilla_$(basename "$f")"; done
           ls -la
         continue-on-error: true
 

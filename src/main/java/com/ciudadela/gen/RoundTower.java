@@ -136,7 +136,13 @@ public class RoundTower extends Element {
         if (top == Top.PLATFORM) {
             for (int dx = -1; dx <= 1; dx++)
                 for (int dz = -1; dz <= 1; dz++) c.set(cx + dx, topY + 4, cz + dz, Pal.AIR);
-            c.set(cx, topY + 4, cz, Pal.SOUL_CAMPFIRE);
+            BlockState pit = ModDeco.firePit();
+            c.set(cx, topY + 4, cz, pit != null ? pit : Pal.SOUL_CAMPFIRE);
+            BlockState flag = ModDeco.flag(Direction.SOUTH, (seed & 1) == 0);
+            if (flag != null) {
+                c.set(cx + radius - 1, topY + 3, cz, Pal.PB_BRICKS);
+                c.set(cx + radius - 1, topY + 4, cz, flag);
+            }
             for (int dx = -1; dx <= 1; dx++)
                 for (int dz = -1; dz <= 1; dz++) c.set(cx + dx, topY + 3, cz + dz, Pal.PB_BRICKS);
         } else {
@@ -173,8 +179,8 @@ public class RoundTower extends Element {
         Rng rng = new Rng(seed ^ 0xF00D);
         double inner = radius - 1.5;
         if (inner < 4) return;
-        boolean chestDone = false;
         for (int fy : floorYs) {
+            boolean chestDone = rng.chance(0.4);
             int fh = 1;
             // farol colgante
             c.set(cx + 3, fy + 6, cz, Pal.CHAIN);
@@ -193,6 +199,9 @@ public class RoundTower extends Element {
                 if (!chestDone && roll == 0) {
                     c.chest(x, fy, z, in, Decor.loot(roomType == Room.Type.ARMORY ? "armeria" : "comun"));
                     chestDone = true;
+                } else if (roll < 2) {
+                    BlockState m = ModDeco.clutter(i + fy, false);
+                    c.set(x, fy, z, m != null ? m : Pal.b(Blocks.BARREL));
                 } else if (roll < 4) c.set(x, fy, z, Pal.b(Blocks.BARREL));
                 else if (roll < 6) c.set(x, fy, z, Pal.log(Blocks.HAY_BLOCK, Direction.Axis.Y));
                 else if (roll < 7) c.set(x, fy, z, Pal.candles(Blocks.BLACK_CANDLE, 3));
