@@ -12,6 +12,7 @@ def get(url):
 
 done = set()
 log = []
+files = []
 
 def fetch(pid):
     if pid in done:
@@ -31,6 +32,8 @@ def fetch(pid):
     path = os.path.join(OUT, f["filename"])
     urllib.request.urlretrieve(f["url"], path)
     log.append(f"OK {pid} -> {f['filename']}")
+    files.append({"path": "mods/" + f["filename"], "hashes": {"sha1": f["hashes"]["sha1"], "sha512": f["hashes"]["sha512"]},
+                  "env": {"client": "required", "server": "required"}, "downloads": [f["url"]], "fileSize": f["size"]})
     for d in v.get("dependencies", []):
         if d.get("dependency_type") == "required" and d.get("project_id"):
             fetch(d["project_id"])
@@ -39,3 +42,5 @@ for s in SLUGS:
     fetch(s)
 print("\n".join(log))
 open(os.path.join(OUT, "..", "mods_descargados.txt"), "w").write("\n".join(log))
+
+json.dump(files, open(os.path.join(OUT, "..", "mrpack_files.json"), "w"), indent=1)

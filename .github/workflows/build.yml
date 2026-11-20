@@ -47,6 +47,7 @@ jobs:
           python3 ci/download_mods.py srv/mods $MODS || true
           cp out/../srv/mods_descargados.txt out/ 2>/dev/null || cp srv/mods_descargados.txt out/ || true
           cp build/libs/ciudadela-*.jar srv/mods/
+          python3 ci/make_mrpack.py srv/mrpack_files.json build/libs/ciudadela-0.1.0.jar out/Ciudadela-Gotica-modpack.mrpack "${FORGE#1.20.1-}" 
           echo "-Xmx6G -Dciudadela.ciTest=true" > srv/user_jvm_args.txt
           (cd srv && timeout 50m ./run.sh nogui 2>&1 | tee ../out/server_mods.log) || true
           mkdir -p out/mods && cp -r srv/ci-out/* out/mods/ 2>/dev/null || true
@@ -85,3 +86,4 @@ jobs:
             out/*.txt
             out/*.log
             out/*.png
+            out/*.mrpack
