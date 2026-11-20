@@ -373,6 +373,9 @@ public final class CastlePlan {
         // ------------------------------------------------ arboles: bosque por fuera, jardines por dentro
         forest(rng);
 
+        // ------------------------------------------------ relleno final: que no quede ningun hueco
+        filler(rng);
+
         // ------------------------------------------------ torre de ascenso desde el suelo
         double asc = Math.toRadians(90);
         double Ra = main.radiusAt(asc);
@@ -529,6 +532,62 @@ public final class CastlePlan {
         // jardin privado
         for (int k = 0; k < 8; k++)
             add(new Tree(rng.fork(), rng.chance(0.5) ? Tree.Kind.CHERRY : Tree.Kind.WILLOW, X(-30 + k * 5), Y, Z(k % 2 == 0 ? -104 : -88)));
+    }
+
+    /** Rellena los espacios libres que queden con jardineras, bancos, farolas, estatuas, carros... */
+    private void filler(Rng rng) {
+        final int Y = Y0, N = 2 * FOOTPRINT + 1;
+        boolean[] busy = new boolean[N * N];
+        for (Element e : elements) {
+            if (e instanceof Island || e instanceof CurtainWall || e instanceof Landscape.Bridge) continue;
+            int ax = e.x0, az = e.z0, bx = e.x1, bz = e.z1;
+            if (e instanceof TreeTower) {
+                ax = X(-64); az = Z(-69); bx = X(64); bz = Z(39);
+            }
+            if (e instanceof Tree) {
+                // solo el tronco ocupa el suelo
+                int mx = (e.x0 + e.x1) / 2, mz = (e.z0 + e.z1) / 2;
+                ax = mx - 2; bx = mx + 2; az = mz - 2; bz = mz + 2;
+            }
+            for (int x = Math.max(ax - cx, -FOOTPRINT); x <= Math.min(bx - cx, FOOTPRINT); x++)
+                for (int z = Math.max(az - cz, -FOOTPRINT); z <= Math.min(bz - cz, FOOTPRINT); z++)
+                    busy[(x + FOOTPRINT) * N + (z + FOOTPRINT)] = true;
+        }
+        int placed = 0;
+        for (int lx = -210; lx <= 210; lx += 5)
+            for (int lz = -210; lz <= 210; lz += 5) {
+                int ch = cheb(lx, lz);
+                boolean inner = ch <= INNER - 10;
+                boolean outer = ch >= 146 && insideOct(lx, lz, 14);
+                if (!inner && !outer) continue;
+                boolean ok = true;
+                for (int dx = -2; dx <= 2 && ok; dx++)
+                    for (int dz = -2; dz <= 2 && ok; dz++) {
+                        int x = lx + dx, z = lz + dz;
+                        if (busy[(x + FOOTPRINT) * N + (z + FOOTPRINT)] || onRoad(x, z) || lane(x, z)) ok = false;
+                    }
+                if (!ok) continue;
+                for (int dx = -2; dx <= 2; dx++)
+                    for (int dz = -2; dz <= 2; dz++) busy[(lx + dx + FOOTPRINT) * N + (lz + dz + FOOTPRINT)] = true;
+                int roll = rng.nextInt(100);
+                int x = X(lx), z = Z(lz);
+                if (inner) {
+                    if (roll < 40) add(new Town.Planter(rng.fork(), x, Y, z, pickTree(rng, true)));
+                    else if (roll < 60) {
+                        add(new Landscape.LampPost(rng.fork(), x, Y, z));
+                        add(new Town.BenchElement(rng.fork(), x + 2, Y, z, Direction.WEST));
+                    } else if (roll < 75) add(new Landscape.Statue(rng.fork(), x, Y, z, Direction.from2DDataValue(rng.nextInt(4))));
+                    else if (roll < 85) add(new Landscape.Fountain(rng.fork(), x, Y, z, 2));
+                    else add(new Town.Planter(rng.fork(), x, Y, z, Tree.Kind.AZALEA));
+                } else {
+                    if (roll < 50) add(new Tree(rng.fork(), pickTree(rng, true), x, Y, z));
+                    else if (roll < 65) add(new Town.Crates(rng.fork(), x, Y, z));
+                    else if (roll < 75) add(new Town.Cart(rng.fork(), x, Y, z, Direction.from2DDataValue(rng.nextInt(4))));
+                    else if (roll < 85) add(new Landscape.LampPost(rng.fork(), x, Y, z));
+                    else add(new Town.Planter(rng.fork(), x, Y, z, Tree.Kind.BUSH));
+                }
+                placed++;
+            }
     }
 
     private boolean treeSpot(int lx, int lz) {

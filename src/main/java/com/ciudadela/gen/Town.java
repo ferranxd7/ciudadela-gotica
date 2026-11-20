@@ -230,6 +230,96 @@ public final class Town {
         }
     }
 
+    // ------------------------------------------------------------ jardinera con arbol
+    public static final class Planter extends Element {
+        private final int x, y, z;
+        private final Tree tree;
+
+        public Planter(long seed, int x, int y, int z, Tree.Kind kind) {
+            super(seed);
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.tree = new Tree(seed + 1, kind, x, y + 1, z);
+            bounds(Math.min(x - 2, tree.x0), y - 1, Math.min(z - 2, tree.z0), Math.max(x + 2, tree.x1), Math.max(y + 2, tree.y1), Math.max(z + 2, tree.z1));
+        }
+
+        @Override
+        public void build(Canvas c) {
+            for (int dx = -2; dx <= 2; dx++)
+                for (int dz = -2; dz <= 2; dz++) {
+                    boolean rim = Math.abs(dx) == 2 || Math.abs(dz) == 2;
+                    int px = x + dx, pz = z + dz;
+                    if (rim) {
+                        boolean corner = Math.abs(dx) == 2 && Math.abs(dz) == 2;
+                        c.set(px, y, pz, corner ? Pal.PB_CHISELED : Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, Pal.dirOf(-dx, -dz), true));
+                        if (corner) {
+                            BlockState l = ModDeco.standingLantern(dx * 3 + dz);
+                            c.set(px, y + 1, pz, l != null ? l : Pal.SOUL_LANTERN);
+                        }
+                    } else {
+                        c.set(px, y - 1, pz, Pal.DIRT);
+                        c.set(px, y, pz, (dx == 0 && dz == 0) ? Pal.ROOTED_DIRT : Pal.MOSS);
+                        if (dx != 0 || dz != 0) {
+                            int p = Hash.pct(px, y, pz, seed);
+                            if (p < 30) c.set(px, y + 1, pz, Pal.b(Blocks.WITHER_ROSE));
+                            else if (p < 55) c.set(px, y + 1, pz, Pal.b(Blocks.FERN));
+                            else if (p < 70) c.set(px, y + 1, pz, Pal.b(Blocks.LILY_OF_THE_VALLEY));
+                            else if (p < 80) c.set(px, y + 1, pz, Pal.b(Blocks.MOSS_CARPET));
+                        }
+                    }
+                }
+            tree.build(c);
+        }
+    }
+
+    // ------------------------------------------------------------ banco suelto
+    public static final class BenchElement extends Element {
+        private final int x, y, z;
+        private final Direction look;
+
+        public BenchElement(long seed, int x, int y, int z, Direction look) {
+            super(seed);
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.look = look;
+            bounds(x - 2, y, z - 2, x + 2, y + 1, z + 2);
+        }
+
+        @Override
+        public void build(Canvas c) {
+            bench(c, x, y, z, look);
+        }
+    }
+
+    // ------------------------------------------------------------ monton de cajas y barriles
+    public static final class Crates extends Element {
+        private final int x, y, z;
+
+        public Crates(long seed, int x, int y, int z) {
+            super(seed);
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            bounds(x - 2, y, z - 2, x + 2, y + 3, z + 2);
+        }
+
+        @Override
+        public void build(Canvas c) {
+            Rng r = new Rng(seed);
+            for (int dx = -1; dx <= 1; dx++)
+                for (int dz = -1; dz <= 1; dz++) {
+                    if (!r.chance(0.7)) continue;
+                    int px = x + dx, pz = z + dz;
+                    BlockState m = ModDeco.clutter(r.nextInt(100), false);
+                    c.set(px, y, pz, m != null && r.chance(0.5) ? m : clutter(px, y, pz));
+                    if (r.chance(0.35)) c.set(px, y + 1, pz, Pal.b(Blocks.BARREL));
+                }
+            if (r.chance(0.5)) c.barrel(x, y, z, Direction.UP, Decor.loot("mercado"));
+        }
+    }
+
     /** Bloque decorativo suelto para rellenar (cajas, barriles, sacos de heno...). */
     public static BlockState clutter(int x, int y, int z) {
         int p = Hash.pct(x, y, z, 555);
