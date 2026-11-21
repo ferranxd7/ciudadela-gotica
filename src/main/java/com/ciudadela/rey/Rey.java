@@ -320,10 +320,28 @@ public class Rey extends Monster {
         if (level().isClientSide) clientTick();
     }
 
+    private boolean muestra;
+
+    /** Para la prueba de la CI: quieto en una pose/animacion concreta, sin pelear. */
+    public void muestra(int fase, int pose, int anim, boolean habla) {
+        muestra = true;
+        setNoGravity(true);
+        this.entityData.set(FASE, fase);
+        setPose(pose);
+        setFlag(F_HABLA, habla);
+        setFlag(F_LUCHA, false);
+        if (anim >= 0) anim(anim);
+    }
+
     @Override
     protected void customServerAiStep() {
         if (!(level() instanceof ServerLevel sl)) return;
         t++;
+        if (muestra) {
+            getNavigation().stop();
+            setDeltaMovement(Vec3.ZERO);
+            return;
+        }
         if (home == null) home = position();
         tickPuertas(sl);
         tickZonas(sl);

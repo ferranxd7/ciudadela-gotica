@@ -26,6 +26,11 @@ public final class ArmasCliente {
         energia = v;
     }
 
+    /** La energia que sabe el cliente (para la prueba de la CI). */
+    public static int energiaCliente() {
+        return energia;
+    }
+
     @SubscribeEvent
     public static void onAttack(InputEvent.InteractionKeyMappingTriggered e) {
         if (!e.isAttack()) return;

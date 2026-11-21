@@ -171,18 +171,316 @@ public final class ClientCiTest {
         }
     }
 
+    private static int base;
+
     private static void at(int sec, String what, Consumer<Minecraft> r) {
-        steps.add(new Step(Math.round(sec * 20f), what, r));
+        steps.add(new Step(base + Math.round(sec * 20f), what, r));
     }
 
     private static void atTicks(int t, String what, Consumer<Minecraft> r) {
-        steps.add(new Step(t, what, r));
+        steps.add(new Step(base + t, what, r));
+    }
+
+    // ------------------------------------------------------------------ escaparate: el rey quieto en cada animacion
+
+    private static com.ciudadela.rey.Rey modelo;
+    /** Donde se monta el escaparate: lejos de cualquier ciudadela (alli siempre es de noche). */
+    private static double ex, ey = 241, ez;
+
+    private static int escaparate() {
+        base = 0;
+        at(2, "Escaparate: plataforma a mediodia lejos de la isla y el rey", m -> server(m, sp -> {
+            sp.setGameMode(GameType.CREATIVE);
+            ServerLevel lvl = sp.serverLevel();
+            long seed = lvl.getSeed();
+            int[] s = CastleSites.nearest(seed, 0, 0, 3);
+            int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {-1, -1}};
+            int fx = s[0] + 1300, fz = s[1];
+            for (int[] d : dirs) {
+                int cx = s[0] + d[0] * 1300, cz = s[1] + d[1] * 1300;
+                int[] o = CastleSites.nearest(seed, cx, cz, 1);
+                if (o == null || Math.hypot(o[0] - cx, o[1] - cz) > 900) {
+                    fx = cx;
+                    fz = cz;
+                    break;
+                }
+            }
+            ex = fx + 0.5;
+            ez = fz + 0.5;
+            log("escaparate en " + fx + "," + fz + " (ciudadela en " + s[0] + "," + s[1] + ")");
+            lvl.setDayTime(6000);
+            lvl.setWeatherParameters(6000, 0, false, false);
+            int y = (int) ey - 1;
+            for (int x = -4; x <= 4; x++)
+                for (int z = -4; z <= 4; z++)
+                    lvl.setBlockAndUpdate(new BlockPos(fx + x, y, fz + z), net.minecraft.world.level.block.Blocks.WHITE_CONCRETE.defaultBlockState());
+            sp.setInvisible(true);
+            sp.teleportTo(lvl, ex, ey, ez - 3.0, 0f, 0f);
+            modelo = CiudadelaMod.REY.get().create(lvl);
+            modelo.moveTo(ex, ey, ez, 0f, 0f);
+            modelo.setYBodyRot(0f);
+            modelo.setYHeadRot(0f);
+            lvl.addFreshEntity(modelo);
+            modelo.muestra(1, com.ciudadela.rey.Rey.POSE_SENTADO, 0, false);
+        }));
+        Object[][] lista = {
+                {1, com.ciudadela.rey.Rey.POSE_SENTADO, 0, false, "sentado", 1.5f},
+                {1, com.ciudadela.rey.Rey.POSE_SENTADO, 0, true, "habla", 1.5f},
+                {1, com.ciudadela.rey.Rey.POSE_PIE, 0, false, "quieto", 1.0f},
+                {1, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.LEVANTARSE, false, "levantarse", 0f},
+                {1, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.COMBO3, false, "combo3", 0f},
+                {1, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.SALTO, false, "salto", 0f},
+                {1, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.GIRO, false, "giro", 0f},
+                {1, com.ciudadela.rey.Rey.POSE_GUARDIA, 0, false, "guardia", 1.2f},
+                {1, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.TAJO_LEJOS, false, "tajo", 0f},
+                {2, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.GRITO, false, "grito", 0f},
+                {2, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.COMBO5, false, "combo5", 0f},
+                {2, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.PILARES, false, "pilares", 0f},
+                {2, com.ciudadela.rey.Rey.POSE_CARGA, 0, false, "embestida", 1.2f},
+                {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.COMBO8, false, "combo8", 0f},
+                {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.GOLPE_FINAL, false, "golpe_final", 0f},
+                {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.ATURDIDO, false, "aturdido", 0f},
+                {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.MUERTE, false, "muerte", 0f},
+        };
+        int t = 260;
+        int n = 0;
+        for (Object[] e : lista) {
+            final int fase = (Integer) e[0], pose = (Integer) e[1], anim = (Integer) e[2];
+            final boolean habla = (Boolean) e[3];
+            final String name = (String) e[4];
+            float len = anim > 0 ? com.ciudadela.rey.ReyAnims.TICKS[anim] / 20f : (Float) e[5];
+            atTicks(t, "Escaparate: " + name, m -> {
+                m.options.hideGui = true;
+                verDesde(m, new Vec3(ex + 2.6, ey + 1.9, ez + 4.4), new Vec3(ex, ey + 1.5, ez));
+                server(m, sp -> {
+                    if (modelo != null) {
+                        modelo.muestra(fase, pose, anim > 0 ? anim : 0, habla);
+                        modelo.moveTo(ex, ey, ez, 0f, 0f);
+                        modelo.setYBodyRot(0f);
+                        modelo.setYHeadRot(0f);
+                    }
+                });
+            });
+            float[] fr = anim > 0 ? new float[]{0.2f, 0.45f, 0.7f} : new float[]{1.0f};
+            for (float f : fr) {
+                final int k = n++;
+                atTicks(t + 4 + Math.round((anim > 0 ? len * f : len) * 20), "captura " + name,
+                        m -> shot(m, String.format("esc_%02d_%s_%d", k, name, Math.round(f * 100))));
+            }
+            t += 8 + Math.round(len * 20) + 6;
+        }
+        final int fin = t;
+        atTicks(fin, "Fin del escaparate", m -> {
+            m.setCameraEntity(m.player);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                if (modelo != null) modelo.discard();
+                modelo = null;
+                sp.setInvisible(false);
+            });
+        });
+        return fin + 20;
+    }
+
+    // ------------------------------------------------------------------ armas del rey: golpes, combos y cubrirse
+
+    private static final java.util.List<net.minecraft.world.entity.LivingEntity> dianas = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+    private static String estadoArmas(ServerPlayer sp) {
+        StringBuilder b = new StringBuilder("energia=" + com.ciudadela.armas.Combos.energia(sp)
+                + " (cliente " + com.ciudadela.client.armas.ArmasCliente.energiaCliente() + ")"
+                + " forma=" + com.ciudadela.armas.EspadaRey.forma(sp.getMainHandItem())
+                + "/" + com.ciudadela.armas.EspadaRey.forma(sp.getOffhandItem())
+                + " jugador=" + String.format("%.1f", sp.getHealth())
+                + " en " + String.format("%.1f,%.1f,%.1f", sp.getX() - ex, sp.getY() - ey, sp.getZ() - ez) + " | dianas:");
+        for (net.minecraft.world.entity.LivingEntity d : dianas)
+            b.append(' ').append(Math.round(d.getHealth())).append(d.isOnFire() ? "(arde)" : "");
+        return b.toString();
+    }
+
+    private static void golpe(Minecraft m, int i) {
+        if (dianas.isEmpty()) return;
+        net.minecraft.world.entity.Entity c = m.level.getEntity(dianas.get(i % dianas.size()).getId());
+        if (c == null) {
+            log("  la diana " + i + " no esta en el cliente");
+            return;
+        }
+        m.gameMode.attack(m.player, c);
+        m.player.swing(InteractionHand.MAIN_HAND);
+    }
+
+    /** Shift (o Ctrl) + clic izquierdo, por el mismo evento que usa el juego al pulsar el raton. */
+    private static void combo(Minecraft m, boolean ctrl) {
+        net.minecraft.client.KeyMapping k = ctrl ? m.options.keySprint : m.options.keyShift;
+        k.setDown(true);
+        try {
+            var ev = new net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered(0, m.options.keyAttack, InteractionHand.MAIN_HAND);
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(ev);
+            log("  evento de ataque: cancelado=" + ev.isCanceled() + " (cancelado = el combo se pidio al servidor)");
+        } finally {
+            k.setDown(false);
+        }
+    }
+
+    private static void desdeElLado(Minecraft m) {
+        m.options.hideGui = true;
+        verDesde(m, new Vec3(ex + 6.2, ey + 2.4, ez - 2.4), new Vec3(ex, ey + 1.0, ez - 1.9));
+    }
+
+    private static void enPrimeraPersona(Minecraft m) {
+        m.setCameraEntity(m.player);
+        m.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+        m.options.hideGui = false;
+    }
+
+    private static void logArmas(Minecraft m, String what) {
+        server(m, sp -> log("  armas " + what + ": " + estadoArmas(sp)));
+    }
+
+    private static int armas(int t0) {
+        base = 0;
+        atTicks(t0, "Armas: supervivencia con las dos espadas del Rey y tres dianas", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                int y = (int) ey - 1, cx = (int) Math.floor(ex), cz = (int) Math.floor(ez);
+                for (int x = -9; x <= 9; x++)
+                    for (int z = -9; z <= 9; z++)
+                        lvl.setBlockAndUpdate(new BlockPos(cx + x, y, cz + z), net.minecraft.world.level.block.Blocks.WHITE_CONCRETE.defaultBlockState());
+                sp.setInvisible(false);
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.getInventory().clearContent();
+                sp.getInventory().selected = 0;
+                sp.getInventory().items.set(0, new ItemStack(CiudadelaMod.ESPADA_DIESTRA.get()));
+                sp.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(CiudadelaMod.ESPADA_SINIESTRA.get()));
+                sp.setHealth(sp.getMaxHealth());
+                sp.getFoodData().setFoodLevel(20);
+                sp.teleportTo(lvl, ex, ey, ez - 3.5, 0f, 10f);
+                dianas.clear();
+                for (int i = 0; i < 3; i++) {
+                    net.minecraft.world.entity.monster.Husk h = net.minecraft.world.entity.EntityType.HUSK.create(lvl);
+                    if (h == null) continue;
+                    h.moveTo(ex + (i - 1) * 1.5, ey, ez - 0.6 + (i == 1 ? 0.5 : 0), 180f, 0f);
+                    h.setYHeadRot(180f);
+                    h.setYBodyRot(180f);
+                    h.setNoAi(true);
+                    h.setPersistenceRequired();
+                    h.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(600);
+                    h.setHealth(600);
+                    h.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+                    lvl.addFreshEntity(h);
+                    dianas.add(h);
+                }
+                log("  armas al empezar: " + estadoArmas(sp));
+            });
+        });
+        int t = t0 + 50;
+        for (int i = 0; i < 5; i++) {
+            final int k = i;
+            atTicks(t, "golpe normal " + (i + 1), m -> golpe(m, k));
+            t += 15;
+        }
+        atTicks(t, "capturas: primera persona con la barra de energia", m -> shot(m, "cliente_81_espadas"));
+        logArmasAt(t + 1, "tras 5 golpes (deberia haber 40)");
+        t += 6;
+        atTicks(t, "Ctrl + clic sin energia suficiente (no debe salir)", m -> combo(m, true));
+        atTicks(t + 3, "captura del aviso de energia", m -> shot(m, "cliente_82_sin_energia"));
+        logArmasAt(t + 10, "tras pedir el Juicio sin energia");
+        t += 16;
+        atTicks(t, "Shift + clic izquierdo: Tajo Real", m -> {
+            desdeElLado(m);
+            combo(m, false);
+        });
+        int[] tr = {4, 10, 16, 22, 27};
+        for (int i = 0; i < tr.length; i++) {
+            final int k = i;
+            atTicks(t + tr[i], "captura del Tajo Real", m -> shot(m, String.format("cliente_%02d_tajo_real_%d", 83 + k, tr[k])));
+        }
+        logArmasAt(t + 12, "en mitad del Tajo Real");
+        logArmasAt(t + 40, "tras el Tajo Real");
+        t += 46;
+        atTicks(t, "de vuelta a su sitio", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> sp.teleportTo(sp.serverLevel(), ex, ey, ez - 3.5, 0f, 10f));
+        });
+        t += 6;
+        for (int i = 0; i < 10; i++) {
+            final int k = i;
+            atTicks(t, "golpe normal " + (i + 6), m -> golpe(m, k));
+            t += 15;
+        }
+        atTicks(t, "captura: energia para el Juicio", m -> shot(m, "cliente_88_energia_llena"));
+        logArmasAt(t + 1, "tras 10 golpes mas");
+        t += 6;
+        atTicks(t, "Ctrl + clic izquierdo: Juicio del Rey", m -> {
+            desdeElLado(m);
+            combo(m, true);
+        });
+        int[] ju = {8, 16, 26, 36, 45, 49};
+        for (int i = 0; i < ju.length; i++) {
+            final int k = i;
+            atTicks(t + ju[i], "captura del Juicio", m -> shot(m, String.format("cliente_%02d_juicio_%d", 89 + k, ju[k])));
+        }
+        logArmasAt(t + 30, "en mitad del Juicio");
+        logArmasAt(t + 62, "tras el Juicio");
+        t += 70;
+        atTicks(t, "Cubrirse: clic derecho mantenido", m -> {
+            server(m, sp -> {
+                sp.teleportTo(sp.serverLevel(), ex, ey, ez - 3.5, 0f, 10f);
+                sp.setHealth(sp.getMaxHealth());
+            });
+            enPrimeraPersona(m);
+            m.options.keyUse.setDown(true);
+            m.gameMode.useItem(m.player, InteractionHand.MAIN_HAND);
+        });
+        atTicks(t + 12, "captura cubriendose (primera persona)", m -> shot(m, "cliente_95_bloqueo"));
+        atTicks(t + 14, "golpe de frente mientras se cubre", m -> server(m, sp -> {
+            sp.invulnerableTime = 0;
+            float h0 = sp.getHealth();
+            boolean usando = sp.isUsingItem() && com.ciudadela.armas.EspadaRey.es(sp.getUseItem());
+            if (!dianas.isEmpty()) sp.hurt(sp.damageSources().mobAttack(dianas.get(1 % dianas.size())), 10f);
+            log("  cubriendose=" + usando + " (cliente " + (Minecraft.getInstance().player != null && Minecraft.getInstance().player.isUsingItem())
+                    + "): golpe de 10 de frente -> quita " + String.format("%.1f", h0 - sp.getHealth()));
+        }));
+        atTicks(t + 18, "captura cubriendose (desde delante)", m -> {
+            m.options.hideGui = true;
+            verDesde(m, new Vec3(ex + 1.3, ey + 1.7, ez - 1.5), new Vec3(ex, ey + 1.1, ez - 3.5));
+        });
+        atTicks(t + 21, "captura", m -> shot(m, "cliente_96_bloqueo_fuera"));
+        atTicks(t + 26, "dejar de cubrirse", m -> {
+            m.options.keyUse.setDown(false);
+            enPrimeraPersona(m);
+        });
+        atTicks(t + 50, "golpe de frente sin cubrirse", m -> server(m, sp -> {
+            sp.invulnerableTime = 0;
+            float h0 = sp.getHealth();
+            boolean usando = sp.isUsingItem();
+            if (!dianas.isEmpty()) sp.hurt(sp.damageSources().mobAttack(dianas.get(1 % dianas.size())), 10f);
+            log("  cubriendose=" + usando + ": golpe de 10 de frente -> quita " + String.format("%.1f", h0 - sp.getHealth()));
+        }));
+        t += 60;
+        atTicks(t, "Fin de las armas: se quitan las dianas", m -> server(m, sp -> {
+            log("  armas al final: " + estadoArmas(sp));
+            for (net.minecraft.world.entity.LivingEntity d : dianas) d.discard();
+            dianas.clear();
+            sp.getInventory().clearContent();
+            sp.setHealth(sp.getMaxHealth());
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        return t + 20;
+    }
+
+    private static void logArmasAt(int t, String what) {
+        atTicks(t, "estado de las armas " + what, m -> logArmas(m, what));
     }
 
     /** El guion de la prueba (en segundos desde que se entra al mundo). */
     private static void plan(Minecraft mc) {
         steps.clear();
         next = 0;
+        int fin = escaparate();
+        fin = armas(fin);
+        base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);
             ServerLevel lvl = sp.serverLevel();
@@ -216,6 +514,8 @@ public final class ClientCiTest {
         int after = Math.round((42 + total + 4) * 20);
         atTicks(after, "Captura del cofre abierto (libro y mapa)", m -> shot(m, "cliente_08_cofre"));
         rey(after + 40);
+        // por orden de tiempo (cada parte apunta sus pasos a su manera); el orden de los empates se conserva
+        steps.sort(java.util.Comparator.comparingInt(Step::at));
     }
 
     // ------------------------------------------------------------------ el Rey
