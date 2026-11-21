@@ -152,8 +152,8 @@ public final class CiTest {
                 }
                 BlockPos cp = new BlockPos(sp[0], sp[1], sp[2]);
                 var st = lvl.getBlockState(cp);
-                var be = lvl.getBlockEntity(cp);
-                int tag = be == null ? 0 : be.getPersistentData().getInt(com.ciudadela.gen.Canvas.STORY_TAG);
+                var cbe = lvl.getBlockEntity(cp);
+                int tag = cbe == null ? 0 : cbe.getPersistentData().getInt(com.ciudadela.gen.Canvas.STORY_TAG);
                 String sign = "sin cartel";
                 for (int dx = -1; dx <= 1; dx++)
                     for (int dz = -1; dz <= 1; dz++) {
@@ -175,13 +175,13 @@ public final class CiTest {
             try (PrintWriter pw = new PrintWriter(new File(out, "camara.txt"))) {
                 BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
                 var shots = com.ciudadela.cine.Cinematics.preview(plan);
-                int hits = 0, n = 0;
+                int hits = 0, pts = 0;
                 for (int i = 0; i < shots.size(); i++) {
                     var sh = shots.get(i);
                     int sHits = 0;
                     for (float tt = sh.t0; tt <= sh.t1; tt += 0.25f) {
                         double[] a = sh.at(tt);
-                        n++;
+                        pts++;
                         int bx = (int) Math.floor(a[0]), by = (int) Math.floor(a[1]), bz = (int) Math.floor(a[2]);
                         String hit = null;
                         for (int dx = -1; dx <= 1 && hit == null; dx++)
@@ -198,8 +198,8 @@ public final class CiTest {
                     hits += sHits;
                     pw.println("plano " + (i + 1) + ": " + sHits + " choques");
                 }
-                pw.println("TOTAL: " + hits + " de " + n + " puntos chocan");
-                log.println("Camara del capitulo 1: " + hits + " de " + n + " puntos chocan con algo");
+                pw.println("TOTAL: " + hits + " de " + pts + " puntos chocan");
+                log.println("Camara del capitulo 1: " + hits + " de " + pts + " puntos chocan con algo");
             }
             // ---- fotos de las salas nuevas
             plan(lvl, s[0] + 40, s[1] - 30, 30, Y0 + 1, new File(out, "18_sala_de_estar.png"), 5);
