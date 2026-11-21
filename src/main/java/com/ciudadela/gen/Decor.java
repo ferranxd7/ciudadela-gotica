@@ -181,6 +181,10 @@ public final class Decor {
 
     /** Apliques, trofeos y estantes en las paredes a media altura. */
     private void wallDecor(int every, boolean trophies) {
+        wallDecor(every, trophies, false);
+    }
+
+    private void wallDecor(int every, boolean trophies, boolean lightsOnly) {
         if (room.height < 5) return;
         int i = 0;
         for (WallCell w : wallCells()) {
@@ -189,7 +193,7 @@ public final class Decor {
             int y = F + 2 + (room.height >= 8 ? 1 : 0);
             if (!c.isAir(w.x, y, w.z)) continue;
             BlockState m;
-            int k = (i / every) % 3;
+            int k = lightsOnly ? 2 : (i / every) % 3;
             if (trophies && k == 0) m = ModDeco.trophy(w.in.getOpposite(), i);
             else if (k == 1) m = ModDeco.wallShelf(w.in.getOpposite());
             else m = ModDeco.wallLight(w.in.getOpposite(), i);
@@ -197,22 +201,46 @@ public final class Decor {
         }
     }
 
-    /** Rellena huecos libres junto a las paredes con muebles pequenos para que nada quede vacio. */
-    private void fillWalls(double p, boolean crypt) {
+    private enum Fill { FURNITURE, PLANTS, SIDEBOARD, CLUTTER, CRYPT, ARMORY, ALCHEMY, STABLE }
+
+    private BlockState plant(int v) {
+        BlockState m = ModDeco.pot(v);
+        if (m != null && v % 3 != 0) return m;
+        Block[] potted = {Blocks.POTTED_FERN, Blocks.POTTED_AZALEA, Blocks.POTTED_FLOWERING_AZALEA, Blocks.POTTED_WITHER_ROSE, Blocks.POTTED_DEAD_BUSH};
+        return Pal.b(potted[Math.floorMod(v, potted.length)]);
+    }
+
+    /** Rellena huecos libres junto a las paredes con cosas que pegan con el tipo de sala. */
+    private void fillWalls(double p, Fill kind) {
         int i = 0;
         for (WallCell w : wallCells()) {
             i++;
             if (!free(w.x, w.z) || !c.isAir(w.x, F, w.z) || Hash.f(w.x, F, w.z, 64) > p) continue;
-            int k = Hash.h(w.x, F, w.z, 65) % 7;
-            BlockState m = switch (k) {
-                case 0 -> ModDeco.nightstand(w.in);
-                case 1 -> ModDeco.drawer(w.in, i);
-                case 2 -> ModDeco.pot(i);
-                case 3 -> ModDeco.lamp(i);
-                case 4 -> ModDeco.cupboard(w.in);
-                default -> ModDeco.clutter(i, crypt);
+            int k = Hash.h(w.x, F, w.z, 65);
+            BlockState m = switch (kind) {
+                case FURNITURE -> switch (k % 5) {
+                    case 0 -> ModDeco.nightstand(w.in);
+                    case 1 -> ModDeco.drawer(w.in, i);
+                    case 2 -> ModDeco.cupboard(w.in);
+                    case 3 -> ModDeco.lamp(i);
+                    default -> plant(i);
+                };
+                case PLANTS -> k % 4 == 0 ? ModDeco.candleHolder(w.in, i) : plant(i);
+                case SIDEBOARD -> k % 3 == 0 ? plant(i) : (k % 3 == 1 ? ModDeco.cupboard(w.in) : ModDeco.drawer(w.in, i));
+                case CLUTTER -> ModDeco.clutter(i, false);
+                case CRYPT -> ModDeco.clutter(i, true);
+                case ARMORY -> k % 3 == 0 ? Mods.state("supplementaries:cannonball", "balls=" + (1 + i % 4)) : (k % 3 == 1 ? Pal.b(Blocks.BARREL) : Blocks.GRINDSTONE.defaultBlockState().setValue(GrindstoneBlock.FACE, net.minecraft.world.level.block.state.properties.AttachFace.FLOOR));
+                case ALCHEMY -> k % 3 == 0 ? Mods.state("supplementaries:jar") : (k % 3 == 1 ? plant(i) : ModDeco.candleHolder(w.in, i));
+                case STABLE -> k % 2 == 0 ? Pal.log(Blocks.HAY_BLOCK, Direction.Axis.Y) : Pal.b(Blocks.BARREL);
             };
-            if (m == null) m = Town.clutter(w.x, F, w.z);
+            if (m == null) {
+                m = switch (kind) {
+                    case PLANTS, SIDEBOARD, FURNITURE -> plant(i);
+                    case CRYPT -> k % 2 == 0 ? Pal.candles(Blocks.BLACK_CANDLE, 3) : Pal.b(Blocks.SKELETON_SKULL);
+                    case ALCHEMY -> Pal.b(Blocks.BREWING_STAND);
+                    default -> Town.clutter(w.x, F, w.z);
+                };
+            }
             c.set(w.x, F, w.z, m);
             use(w.x, w.z);
         }
@@ -355,18 +383,51 @@ public final class Decor {
             }
         }
         if (room.type == Room.Type.EMPTY) return;
-        // relleno general: que no quede ningun hueco vacio
-        Room.Type t = room.type;
-        boolean crypt = t == Room.Type.CRYPT || t == Room.Type.TREASURY || t == Room.Type.PRISON;
-        boolean troph = t == Room.Type.GREAT_HALL || t == Room.Type.THRONE || t == Room.Type.ARMORY || t == Room.Type.GALLERY || t == Room.Type.BARRACKS;
-        wallDecor(troph ? 5 : 7, troph);
-        double p = switch (t) {
-            case STORAGE, CELLAR, WINE_CELLAR -> 0.7;
-            case GREAT_HALL, THRONE, BALLROOM, CHAPEL -> 0.22;
-            case LIBRARY, LIBRARY_GRAND, PRISON -> 0.1;
-            default -> 0.3;
-        };
-        fillWalls(p, crypt);
+        // relleno final: cada tipo de sala solo con cosas que le pegan
+        switch (room.type) {
+            case THRONE, KITCHEN, LIBRARY, LIBRARY_GRAND, OBSERVATORY -> {
+                // la sala del trono queda limpia; cocina y bibliotecas ya van completas
+            }
+            case GREAT_HALL -> {
+                wallDecor(6, true, false);
+                fillWalls(0.15, Fill.PLANTS);
+            }
+            case BALLROOM, CHAPEL, GALLERY -> {
+                wallDecor(6, false, true);
+                fillWalls(0.15, Fill.PLANTS);
+            }
+            case DINING -> {
+                wallDecor(6, false, true);
+                fillWalls(0.3, Fill.SIDEBOARD);
+            }
+            case BEDROOM, STUDY, SERVANTS, BARRACKS -> {
+                wallDecor(7, false, false);
+                fillWalls(0.3, Fill.FURNITURE);
+            }
+            case STORAGE, CELLAR, WINE_CELLAR -> {
+                wallDecor(9, false, true);
+                fillWalls(0.7, Fill.CLUTTER);
+            }
+            case CRYPT, TREASURY, PRISON -> {
+                wallDecor(7, false, true);
+                fillWalls(0.35, Fill.CRYPT);
+            }
+            case ARMORY, SMITHY -> {
+                wallDecor(5, true, false);
+                fillWalls(0.35, Fill.ARMORY);
+            }
+            case ALCHEMY -> {
+                wallDecor(7, false, false);
+                fillWalls(0.4, Fill.ALCHEMY);
+            }
+            case BATH -> {
+                wallDecor(6, false, true);
+                fillWalls(0.3, Fill.PLANTS);
+            }
+            case STABLE -> fillWalls(0.4, Fill.STABLE);
+            default -> {
+            }
+        }
     }
 
     private void greatHall() {
@@ -520,37 +581,236 @@ public final class Decor {
         torches(6);
     }
 
+    // ================================================================== COCINA
     private void kitchen() {
-        floor((x, y, z) -> Hash.pct(x, y, z, 5) < 60 ? Pal.DS_POLISHED : Pal.STONE_BRICKS);
-        fireplace(r.cx(), r.z0, Direction.SOUTH);
-        BlockState[] counter = {
-                Pal.facing(Blocks.FURNACE, Direction.NORTH), Pal.facing(Blocks.SMOKER, Direction.NORTH),
-                Pal.b(Blocks.CRAFTING_TABLE), Pal.b(Blocks.BARREL), Pal.slab(Blocks.POLISHED_BLACKSTONE_SLAB, true),
-                Pal.slab(Blocks.POLISHED_BLACKSTONE_SLAB, true), Pal.b(Blocks.WATER_CAULDRON).setValue(LayeredCauldronBlock.LEVEL, 3),
-                Pal.b(Blocks.COMPOSTER)
-        };
-        int ci = 0;
-        for (WallCell w : wallCells()) {
-            if (!free(w.x, w.z) || Hash.pct(w.x, F, w.z, 66) > 70) continue;
-            BlockState m = ModDeco.counter(w.in, ci++);
+        checker(Pal.DS_POLISHED, Pal.DS_TILES, 2);
+        // 1) gran hogar en la pared norte (o en la sur si en la norte hay una puerta)
+        boolean north = hearthFits(r.z0, Direction.SOUTH);
+        boolean south = !north && hearthFits(r.z1, Direction.NORTH);
+        if (north) hearth(r.z0, Direction.SOUTH);
+        else if (south) hearth(r.z1, Direction.NORTH);
+        // 2) vigas en el techo con hierbas secandose
+        beams();
+        // 3) despensa en una esquina
+        pantry(north ? r.z1 : r.z0, north ? Direction.NORTH : Direction.SOUTH);
+        // 4) encimeras por todas las paredes: fregadero, hornos con campana, armarios altos
+        counters();
+        // 5) isla central para preparar la comida
+        island();
+        // 6) luz
+        chandeliers(false);
+        chestAt(r.x0, north ? r.z1 : r.z0, north ? Direction.NORTH : Direction.SOUTH, "cocina");
+    }
+
+    private int hearthHalf() {
+        return r.w() >= 11 ? 3 : (r.w() >= 7 ? 2 : 1);
+    }
+
+    private boolean hearthFits(int zWall, Direction in) {
+        if (r.d() < 5 || r.w() < 5) return false;
+        int half = hearthHalf();
+        for (int k = -half; k <= half; k++)
+            for (int dz = 0; dz <= 1; dz++)
+                if (!free(r.cx() + k, zWall + in.getStepZ() * dz)) return false;
+        return true;
+    }
+
+    /** Chimenea de cocina: hogar con fuego y ahumadores, campana de ladrillo hasta el techo. */
+    private void hearth(int zWall, Direction in) {
+        int half = hearthHalf();
+        int zf = zWall + in.getStepZ();
+        int cx = r.cx();
+        BlockState brick = Pal.b(Blocks.BRICKS);
+        for (int k = -half; k <= half; k++) {
+            int x = cx + k;
+            boolean jamb = Math.abs(k) == half;
+            // fondo
+            c.column(x, zWall, F, T, jamb ? Pal.PB_BRICKS : brick);
+            // frente
+            if (jamb) {
+                c.column(x, zf, F, F + 3, Pal.PB_BRICKS);
+            } else {
+                c.set(x, F - 1, zf, Pal.NETHER_BRICKS);
+                c.set(x, F - 1, zWall, Pal.NETHER_BRICKS);
+                c.column(x, zf, F, F + 2, Pal.AIR);
+                c.set(x, F + 3, zf, Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, in.getOpposite(), true));
+                // fuego en el centro, ahumadores encendidos a los lados
+                BlockState inside;
+                if (k == 0) inside = Pal.CAMPFIRE.setValue(CampfireBlock.FACING, in);
+                else if (Math.abs(k) == 1) inside = Pal.facing(Blocks.SMOKER, in).setValue(AbstractFurnaceBlock.LIT, true);
+                else inside = Pal.b(Blocks.WATER_CAULDRON).setValue(LayeredCauldronBlock.LEVEL, 3);
+                c.set(x, F, zWall, inside);
+            }
+            // pecho de la chimenea hasta el techo
+            if (T >= F + 4) c.column(x, zf, F + 4, T, jamb ? Pal.PB_BRICKS : brick);
+            use(x, zWall);
+            use(x, zf);
+        }
+        // apliques en la pared a los lados del hogar
+        if (T >= F + 4) {
+            for (int s = -1; s <= 1; s += 2) {
+                int x = cx + s * (half + 1);
+                if (!r.contains(x, zWall) || room.clear(x, zWall)) continue;
+                BlockState l = ModDeco.wallLight(in.getOpposite(), s + 2);
+                c.set(x, F + 3, zWall, l != null ? l : Blocks.WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, in));
+            }
+        }
+    }
+
+    private void beams() {
+        if (room.height < 6) return;
+        boolean alongX = r.w() >= r.d();
+        for (int a = 2; a < (alongX ? r.w() : r.d()) - 1; a += 4) {
+            for (int b = 0; b < (alongX ? r.d() : r.w()); b++) {
+                int x = alongX ? r.x0 + a : r.x0 + b, z = alongX ? r.z0 + b : r.z0 + a;
+                if (!c.isAir(x, T, z)) continue;
+                c.set(x, T, z, Pal.log(Blocks.STRIPPED_DARK_OAK_LOG, alongX ? Direction.Axis.Z : Direction.Axis.X));
+                // manojos de hierbas secandose
+                if (Hash.pct(x, T, z, 81) < 30 && c.isAir(x, T - 1, z)) c.set(x, T - 1, z, Pal.b(Blocks.HANGING_ROOTS));
+            }
+        }
+    }
+
+    /** Despensa en las dos esquinas de la pared contraria al hogar. */
+    private void pantry(int zWall, Direction in) {
+        int[] xs = {r.x0, r.x1};
+        for (int xc : xs) {
+            int dirx = xc == r.x0 ? 1 : -1;
+            for (int a = 0; a < 3; a++)
+                for (int b = 0; b < 2; b++) {
+                    int x = xc + dirx * a, z = zWall + in.getStepZ() * b;
+                    if (!free(x, z) || (a == 2 && b == 1)) continue;
+                    int roll = Hash.pct(x, F, z, 82);
+                    BlockState m;
+                    if (roll < 30) {
+                        m = Pal.b(Blocks.BARREL);
+                        if (room.height >= 4) c.set(x, F + 1, z, roll < 15 ? Pal.b(Blocks.BARREL) : Pal.b(Blocks.PUMPKIN));
+                    } else if (roll < 45) m = Pal.log(Blocks.HAY_BLOCK, Direction.Axis.Y);
+                    else if (roll < 55) m = Pal.b(Blocks.MELON);
+                    else {
+                        m = ModDeco.clutter(roll, false);
+                        if (m == null) m = Pal.b(Blocks.BARREL);
+                    }
+                    c.set(x, F, z, m);
+                    use(x, z);
+                }
+        }
+    }
+
+    /** Encimeras por las paredes libres, con fregadero, hornos y armarios altos. */
+    private void counters() {
+        List<WallCell> cells = new ArrayList<>();
+        for (WallCell w : wallCells()) if (free(w.x, w.z) && c.isAir(w.x, F, w.z)) cells.add(w);
+        int i = 0;
+        boolean sinkDone = false;
+        for (WallCell w : cells) {
+            i++;
+            int kind;
+            if (!sinkDone && i % 7 == 3) {
+                kind = 1;
+                sinkDone = true;
+            } else if (i % 5 == 0) kind = 2;
+            else kind = 0;
+            Direction out = w.in.getOpposite();
+            BlockState m = ModDeco.kitchenCounter(w.in, kind, i);
             if (m == null) {
-                m = counter[Hash.h(w.x, F, w.z, 67) % counter.length];
-                if (m.hasProperty(HorizontalDirectionalBlock.FACING)) m = m.setValue(HorizontalDirectionalBlock.FACING, w.in);
+                m = switch (kind) {
+                    case 1 -> Pal.b(Blocks.WATER_CAULDRON).setValue(LayeredCauldronBlock.LEVEL, 3);
+                    case 2 -> Pal.facing(i % 2 == 0 ? Blocks.FURNACE : Blocks.SMOKER, w.in).setValue(AbstractFurnaceBlock.LIT, true);
+                    default -> i % 4 == 1 ? Pal.b(Blocks.BARREL) : Pal.slab(Blocks.POLISHED_BLACKSTONE_SLAB, true);
+                };
             }
             c.set(w.x, F, w.z, m);
             use(w.x, w.z);
-            if (Hash.pct(w.x, F, w.z, 68) < 40) {
-                BlockState top = ModDeco.tableware(ci);
-                if (top != null) c.set(w.x, F + 1, w.z, top);
+            // encima de la encimera
+            if (kind == 0 && Hash.pct(w.x, F, w.z, 83) < 60) {
+                BlockState top = ModDeco.kitchenItem(Hash.h(w.x, F, w.z, 84));
+                if (top == null) top = vanillaKitchenItem(Hash.h(w.x, F, w.z, 85));
+                c.set(w.x, F + 1, w.z, top);
+            }
+            if (room.height < 5) continue;
+            if (kind == 1) {
+                BlockState tap = ModDeco.faucet(out);
+                if (tap != null) c.set(w.x, F + 1, w.z, tap);
+            } else if (kind == 2) {
+                BlockState hood = ModDeco.kitchenHood(w.in);
+                if (hood != null) {
+                    c.set(w.x, F + 2, w.z, hood);
+                    BlockState pipe = ModDeco.kitchenHoodPipe(w.in);
+                    if (pipe != null) for (int y = F + 3; y <= T; y++) c.set(w.x, y, w.z, pipe);
+                }
+            } else if (Hash.pct(w.x, F, w.z, 86) < 70) {
+                BlockState cab = ModDeco.upperCabinet(w.in, i);
+                if (cab != null) c.set(w.x, F + 2, w.z, cab);
+                else {
+                    // balda de madera con tarros y macetas
+                    c.set(w.x, F + 2, w.z, Pal.slab(Blocks.DARK_OAK_SLAB, true));
+                    if (room.height >= 5) c.set(w.x, F + 3, w.z, vanillaKitchenItem(Hash.h(w.x, F + 3, w.z, 87)));
+                }
             }
         }
-        if (r.w() >= 7 && r.d() >= 7) {
-            table(r.cx() - 1, r.cz(), r.cx() + 1, r.cz() + 1, Blocks.SPRUCE_SLAB);
-            c.set(r.cx(), F + 1, r.cz(), Pal.b(Blocks.CAKE));
+    }
+
+    private BlockState vanillaKitchenItem(int v) {
+        Block[] b = {Blocks.POTTED_FERN, Blocks.DECORATED_POT, Blocks.FLOWER_POT, Blocks.POTTED_RED_MUSHROOM, Blocks.POTTED_BROWN_MUSHROOM};
+        int k = Math.floorMod(v, 7);
+        if (k == 5) return Pal.candles(Blocks.CANDLE, 1 + Math.floorMod(v, 3));
+        if (k == 6) return Pal.b(Blocks.CAKE);
+        return Pal.b(b[k % b.length]);
+    }
+
+    /** Isla de trabajo en el centro con taburetes y comida encima. */
+    private void island() {
+        if (r.w() < 9 || r.d() < 9) {
+            if (r.w() >= 5 && r.d() >= 5 && free(r.cx(), r.cz())) {
+                table(r.cx(), r.cz(), r.cx(), r.cz(), Blocks.SPRUCE_SLAB);
+                c.set(r.cx(), F + 1, r.cz(), vanillaKitchenItem(r.cx() * 7 + r.cz()));
+                chair(r.cx(), r.cz() + 1, Direction.NORTH, Blocks.SPRUCE_STAIRS);
+            }
+            return;
         }
-        chestAt(r.x1, r.z1, Direction.NORTH, "cocina");
-        for (int x = r.x0 + 1; x < r.x1; x += 3) c.setIfAir(x, T, r.cz(), Pal.b(Blocks.HAY_BLOCK));
-        chandeliers(false);
+        boolean alongX = r.w() >= r.d();
+        int len = Math.max(3, Math.min(12, (alongX ? r.w() : r.d()) - 8));
+        int wide = (alongX ? r.d() : r.w()) >= 13 ? 2 : 1;
+        int a0 = (alongX ? r.cx() : r.cz()) - len / 2;
+        int b0 = (alongX ? r.cz() : r.cx()) - (wide - 1) / 2;
+        for (int b = 0; b < wide; b++) {
+            int bb = b0 + b;
+            for (int a = 0; a < len; a++) {
+                int x = alongX ? a0 + a : bb, z = alongX ? bb : a0 + a;
+                if (!free(x, z)) continue;
+                BlockState t = ModDeco.tableLong(alongX ? Direction.Axis.X : Direction.Axis.Z, a == 0, a == len - 1, true);
+                c.set(x, F, z, t != null ? t : Pal.slab(Blocks.SPRUCE_SLAB, true));
+                use(x, z);
+                BlockState top = ModDeco.kitchenItem(Hash.h(x, F, z, 88));
+                if (top == null || Hash.pct(x, F, z, 89) < 25) top = (a % 4 == 1) ? Pal.b(Blocks.MELON) : vanillaKitchenItem(Hash.h(x, F, z, 90));
+                if (Hash.pct(x, F, z, 91) < 80) c.set(x, F + 1, z, top);
+            }
+        }
+        // taburetes a los lados largos
+        for (int a = 1; a < len; a += 2) {
+            for (int side = -1; side <= 1; side += 2) {
+                int bb = side < 0 ? b0 - 1 : b0 + wide;
+                int x = alongX ? a0 + a : bb, z = alongX ? bb : a0 + a;
+                if (!free(x, z)) continue;
+                BlockState st = ModDeco.stool(a + side);
+                if (st != null) {
+                    c.set(x, F, z, st);
+                    use(x, z);
+                } else {
+                    Direction look = alongX ? (side < 0 ? Direction.SOUTH : Direction.NORTH) : (side < 0 ? Direction.EAST : Direction.WEST);
+                    chair(x, z, look, Blocks.SPRUCE_STAIRS);
+                }
+            }
+        }
+        // faroles y cestas colgando sobre la isla
+        for (int a = 0; a < len; a += 3) {
+            int x = alongX ? a0 + a : b0, z = alongX ? b0 : a0 + a;
+            int bottom = Math.max(F + 3, T - 3);
+            for (int y = T; y > bottom; y--) c.setIfAir(x, y, z, Pal.CHAIN);
+            BlockState basket = Mods.state("supplementaries:lunch_basket", "hanging=true");
+            c.setIfAir(x, bottom, z, (a % 6 == 3 && basket != null) ? basket : Pal.LANTERN_HANG);
+        }
     }
 
     private void library(boolean grand) {

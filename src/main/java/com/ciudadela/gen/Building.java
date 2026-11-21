@@ -154,6 +154,15 @@ public class Building extends Element {
         return this;
     }
 
+    /** {x, z, nivel mas bajo, nivel mas alto} de la torreta de escalera, o null si no tiene. */
+    public int[] turretInfo() {
+        if (turretCorner < 0) return null;
+        int[] t = turretCenter();
+        int lowest = floors.get(0).y;
+        int lastY = roof == Roof.TERRACE ? topY + 1 : floors.get(floors.size() - 1).y;
+        return new int[]{t[0], t[1], lowest, lastY};
+    }
+
     public List<Integer> floorLevels() {
         List<Integer> l = new ArrayList<>();
         for (Floor f : floors) if (f.index >= 0) l.add(f.y);

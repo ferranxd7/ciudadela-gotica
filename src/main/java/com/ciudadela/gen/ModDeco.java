@@ -224,10 +224,76 @@ public final class ModDeco {
 
     /** Mesa larga: cada casilla copia la pieza (extremo/centro) calibrada. */
     public static BlockState tableLong(Direction.Axis axis, boolean startEnd, boolean endEnd) {
-        int part = startEnd ? 1 : (endEnd ? 3 : 2);
-        BlockState s = cal(Calib.row("handcrafted:dark_oak_table", axis, part));
-        if (s != null) return color(s, "red");
-        return cal(Calib.row("mcwfurnitures:dark_oak_table", axis, part));
+        return tableLong(axis, startEnd, endEnd, false);
+    }
+
+    /** plain = sin mantel (mesas de trabajo). */
+    public static BlockState tableLong(Direction.Axis axis, boolean startEnd, boolean endEnd, boolean plain) {
+        int part = startEnd && endEnd ? 0 : (startEnd ? 1 : (endEnd ? 3 : 2));
+        Direction.Axis ax = part == 0 ? Direction.Axis.X : axis;
+        if (plain) {
+            BlockState m = cal(Calib.row("mcwfurnitures:dark_oak_table", ax, part));
+            if (m != null) return m;
+        }
+        BlockState s = cal(Calib.row("handcrafted:dark_oak_table", ax, part));
+        if (s != null) return color(s, plain ? "none" : "red");
+        return cal(Calib.row("mcwfurnitures:dark_oak_table", ax, part));
+    }
+
+    // ------------------------------------------------------------------ cocina
+
+    /** kind: 0 encimera normal, 1 fregadero, 2 horno. */
+    public static BlockState kitchenCounter(Direction front, int kind, int v) {
+        if (kind == 1) return Mods.prop(frontOf(front, "mcwfurnitures:dark_oak_kitchen_sink"), "water", "true");
+        if (kind == 2) return Mods.prop(frontOf(front, "handcrafted:oven"), "lit", "true");
+        BlockState s = switch (Math.floorMod(v, 4)) {
+            case 0 -> Mods.prop(frontOf(front, "handcrafted:dark_oak_counter"), "counter", "blackstone");
+            case 1 -> frontOf(front, "mcwfurnitures:dark_oak_cupboard_counter");
+            case 2 -> frontOf(front, "mcwfurnitures:dark_oak_drawer_counter");
+            default -> frontOf(front, "mcwfurnitures:dark_oak_double_drawer_counter");
+        };
+        if (s == null) s = Mods.prop(frontOf(front, "handcrafted:dark_oak_counter", "mcwfurnitures:dark_oak_counter"), "counter", "blackstone");
+        return s;
+    }
+
+    public static BlockState upperCabinet(Direction front, int v) {
+        return switch (Math.floorMod(v, 3)) {
+            case 0 -> frontOf(front, "mcwfurnitures:dark_oak_kitchen_cabinet", "mcwfurnitures:dark_oak_double_kitchen_cabinet");
+            case 1 -> frontOf(front, "mcwfurnitures:dark_oak_glass_kitchen_cabinet", "mcwfurnitures:dark_oak_kitchen_cabinet");
+            default -> frontOf(front, "mcwfurnitures:dark_oak_double_kitchen_cabinet", "mcwfurnitures:dark_oak_kitchen_cabinet");
+        };
+    }
+
+    public static BlockState kitchenHood(Direction front) {
+        return frontOf(front, "handcrafted:kitchen_hood");
+    }
+
+    public static BlockState kitchenHoodPipe(Direction front) {
+        return frontOf(front, "handcrafted:kitchen_hood_pipe");
+    }
+
+    /** Grifo en la pared que queda en la direccion "wall". */
+    public static BlockState faucet(Direction wall) {
+        return wallOf(wall, "supplementaries:faucet");
+    }
+
+    /** Cosas de cocina para poner encima de encimeras y mesas. */
+    public static BlockState kitchenItem(int v) {
+        int k = Math.floorMod(v, 12);
+        return switch (k) {
+            case 0 -> Mods.state("handcrafted:wood_crockery_combo");
+            case 1 -> Mods.state("handcrafted:terracotta_crockery_combo");
+            case 2 -> Mods.state("supplementaries:jar");
+            case 3 -> Mods.state("supplementaries:pancake", "pancakes=" + (2 + Math.floorMod(v, 5)), "topping=" + (v % 2 == 0 ? "honey" : "jam"));
+            case 4 -> Mods.state("supplementaries:lunch_basket");
+            case 5 -> Mods.state("handcrafted:berry_jam_jar", "jars=" + (1 + Math.floorMod(v, 3)));
+            case 6 -> Mods.state("handcrafted:wood_bowl", "pieces=" + (1 + Math.floorMod(v, 2)));
+            case 7 -> Mods.state("handcrafted:wood_plate", "pieces=" + (1 + Math.floorMod(v, 3)));
+            case 8 -> Mods.state("supplementaries:sack");
+            case 9 -> Mods.state("handcrafted:white_crockery_combo");
+            case 10 -> Mods.state("handcrafted:terracotta_wide_pot");
+            default -> Mods.state("handcrafted:wood_cup", "pieces=" + (1 + Math.floorMod(v, 3)));
+        };
     }
 
     public static BlockState counter(Direction front, int v) {
@@ -369,6 +435,10 @@ public final class ModDeco {
     }
 
     public static BlockState stool(int v) {
+        if (Math.floorMod(v, 2) == 0) {
+            BlockState m = cal(Calib.seat("mcwfurnitures:dark_oak_stool_chair", Direction.NORTH, 0));
+            if (m != null) return m;
+        }
         String[] c = {"red", "black", "purple", "brown"};
         return Mods.state("another_furniture:" + c[Math.floorMod(v, c.length)] + "_stool");
     }

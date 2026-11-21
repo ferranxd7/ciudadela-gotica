@@ -1,0 +1,50 @@
+{
+  "has_precipitation": true,
+  "temperature": 1.0,
+  "downfall": 1.0,
+  "effects": {
+    "sky_color": 5924976,
+    "fog_color": 4870999,
+    "water_color": 3030351,
+    "water_fog_color": 1317924,
+    "grass_color": 4873530,
+    "foliage_color": 4083502,
+    "mood_sound": {
+      "sound": "minecraft:ambient.cave",
+      "tick_delay": 6000,
+      "block_search_extent": 8,
+      "offset": 2.0
+    },
+    "music": {
+      "sound": "minecraft:music.overworld.deep_dark",
+      "min_delay": 12000,
+      "max_delay": 24000,
+      "replace_current_music": false
+    }
+  },
+  "spawners": {
+    "monster": [
+      {"type": "minecraft:zombie", "weight": 95, "minCount": 4, "maxCount": 4},
+      {"type": "minecraft:zombie_villager", "weight": 5, "minCount": 1, "maxCount": 1},
+      {"type": "minecraft:skeleton", "weight": 100, "minCount": 4, "maxCount": 4},
+      {"type": "minecraft:spider", "weight": 80, "minCount": 4, "maxCount": 4},
+      {"type": "minecraft:witch", "weight": 8, "minCount": 1, "maxCount": 1},
+      {"type": "minecraft:enderman", "weight": 10, "minCount": 1, "maxCount": 4}
+    ],
+    "creature": [],
+    "ambient": [
+      {"type": "minecraft:bat", "weight": 10, "minCount": 8, "maxCount": 8}
+    ],
+    "axolotls": [],
+    "underground_water_creature": [],
+    "water_creature": [],
+    "water_ambient": [],
+    "misc": []
+  },
+  "spawn_costs": {},
+  "carvers": {
+    "air": [],
+    "liquid": []
+  },
+  "features": []
+}

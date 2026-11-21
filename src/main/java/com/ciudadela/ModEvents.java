@@ -62,6 +62,18 @@ public final class ModEvents {
     }
 
     @SubscribeEvent
+    public static void onPlayerTick(net.minecraftforge.event.TickEvent.PlayerTickEvent event) {
+        if (event.phase != net.minecraftforge.event.TickEvent.Phase.END || event.side != net.minecraftforge.fml.LogicalSide.SERVER) return;
+        if (!(event.player instanceof ServerPlayer sp) || sp.tickCount % 20 != 0) return;
+        com.ciudadela.world.Storm.tick(sp);
+    }
+
+    @SubscribeEvent
+    public static void onLogout(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent event) {
+        com.ciudadela.world.Storm.forget(event.getEntity().getUUID());
+    }
+
+    @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
         if (Boolean.getBoolean("ciudadela.ciTest")) CiTest.run(event.getServer());
     }

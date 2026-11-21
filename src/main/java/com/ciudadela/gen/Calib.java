@@ -266,12 +266,16 @@ public final class Calib {
     // ------------------------------------------------------------------ catalogo a calibrar
 
     public static final String[] SEATS = {"handcrafted:dark_oak_chair", "mcwfurnitures:dark_oak_chair", "another_furniture:dark_oak_chair"};
+    public static final String[] STOOLS = {"mcwfurnitures:dark_oak_stool_chair"};
     public static final String[] SOFAS = {"handcrafted:dark_oak_couch", "another_furniture:red_sofa", "another_furniture:black_sofa", "handcrafted:dark_oak_dining_bench"};
     public static final String[] BEDS = {"handcrafted:dark_oak_fancy_bed"};
     public static final String[] FRONTS = {"handcrafted:dark_oak_nightstand", "handcrafted:dark_oak_desk", "handcrafted:dark_oak_cupboard",
             "handcrafted:dark_oak_drawer", "handcrafted:dark_oak_counter", "handcrafted:oven", "mcwfurnitures:dark_oak_triple_drawer",
             "mcwfurnitures:dark_oak_drawer", "mcwfurnitures:dark_oak_double_drawer", "mcwfurnitures:dark_oak_kitchen_sink",
-            "mcwfurnitures:dark_oak_counter", "another_furniture:dark_oak_drawer", "supplementaries:safe", "supplementaries:globe", "supplementaries:cannon"};
+            "mcwfurnitures:dark_oak_counter", "another_furniture:dark_oak_drawer", "supplementaries:safe", "supplementaries:globe", "supplementaries:cannon",
+            "mcwfurnitures:dark_oak_cupboard_counter", "mcwfurnitures:dark_oak_drawer_counter", "mcwfurnitures:dark_oak_double_drawer_counter",
+            "mcwfurnitures:dark_oak_kitchen_cabinet", "mcwfurnitures:dark_oak_glass_kitchen_cabinet", "mcwfurnitures:dark_oak_double_kitchen_cabinet",
+            "handcrafted:kitchen_hood", "handcrafted:kitchen_hood_pipe"};
     public static final String[][] WALLS = {
             {"supplementaries:sconce_wall_soul", "supplementaries:sconce_soul"},
             {"supplementaries:sconce_wall", "supplementaries:sconce"},
@@ -284,6 +288,7 @@ public final class Calib {
             {"handcrafted:wolf_trophy", "handcrafted:wolf_trophy"},
             {"supplementaries:item_shelf", "supplementaries:item_shelf"},
             {"another_furniture:dark_oak_shelf", "another_furniture:dark_oak_shelf"},
+            {"supplementaries:faucet", "supplementaries:faucet"},
     };
     public static final String[] ROWS = {"handcrafted:dark_oak_table", "mcwfurnitures:dark_oak_table", "mcwfences:gothic_metal_fence"};
     public static final String[] COLUMNS = {"mcwwindows:red_mosaic_glass", "mcwwindows:purple_mosaic_glass", "mcwwindows:black_mosaic_glass",
@@ -301,6 +306,7 @@ public final class Calib {
             level.getChunkAt(origin);
             player = FakePlayerFactory.getMinecraft(level);
             for (String id : SEATS) testSeat(id);
+            for (String id : STOOLS) testSeat(id);
             for (String id : SOFAS) testSeatRow(id);
             for (String id : BEDS) testBed(id);
             for (String id : FRONTS) testFront(id);

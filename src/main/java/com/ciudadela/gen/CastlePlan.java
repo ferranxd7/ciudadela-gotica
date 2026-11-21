@@ -39,7 +39,13 @@ public final class CastlePlan {
         return e;
     }
 
+    public List<Element> elements() {
+        return java.util.Collections.unmodifiableList(elements);
+    }
+
     private void finish() {
+        // todas las torres redondas se convierten en torres-arbol, como la gran torre central
+        for (Element e : elements) if (e instanceof RoundTower rt) rt.tree();
         elements.sort(java.util.Comparator.comparingInt(e -> e.layer));
         for (Element e : elements) {
             for (int x = e.x0 >> 4; x <= e.x1 >> 4; x++)
@@ -384,7 +390,7 @@ public final class CastlePlan {
         int ground = groundHeight.applyAsInt(ax, az);
         if (ground < Y - 60) {
             RoundTower t = new RoundTower(rng.fork(), ax, az, ground, 7, (Y - 1) - ground, RoundTower.Top.PLATFORM);
-            t.doorToward(ax, az + 50, ground);
+            t.doorToward(ax, az + 50, ground).avoidToward(cx, cz);
             add(t);
             int ex = cx + (int) Math.round(Math.cos(asc) * (Ra - 34)), ez = cz + (int) Math.round(Math.sin(asc) * (Ra - 34));
             add(new Landscape.Bridge(rng.fork(), ax, Y - 1, az - 4, ex, Y - 1, ez, 0, 3));

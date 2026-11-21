@@ -142,7 +142,7 @@
     },
     {
      "type": "minecraft:item",
-     "name": "minecraft:enchanted_book",
+     "name": "minecraft:book",
      "weight": 4,
      "functions": [
       {
@@ -219,6 +219,41 @@
      "type": "minecraft:item",
      "name": "minecraft:silence_armor_trim_smithing_template",
      "weight": 1
+    }
+   ]
+  },
+  {
+   "rolls": {
+    "type": "minecraft:uniform",
+    "min": 1,
+    "max": 2
+   },
+   "entries": [
+    {
+     "type": "minecraft:item",
+     "name": "minecraft:book",
+     "weight": 2,
+     "functions": [
+      {
+       "function": "minecraft:enchant_with_levels",
+       "levels": {
+        "type": "minecraft:uniform",
+        "min": 25,
+        "max": 39
+       },
+       "treasure": true
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "minecraft:book",
+     "weight": 1,
+     "functions": [
+      {
+       "function": "minecraft:enchant_randomly"
+      }
+     ]
     }
    ]
   }

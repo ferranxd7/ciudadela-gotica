@@ -197,6 +197,35 @@
      ]
     }
    ]
+  },
+  {
+   "rolls": {
+    "type": "minecraft:uniform",
+    "min": 0,
+    "max": 1
+   },
+   "entries": [
+    {
+     "type": "minecraft:item",
+     "name": "minecraft:book",
+     "weight": 1,
+     "functions": [
+      {
+       "function": "minecraft:enchant_with_levels",
+       "levels": {
+        "type": "minecraft:uniform",
+        "min": 20,
+        "max": 30
+       },
+       "treasure": false
+      }
+     ]
+    },
+    {
+     "type": "minecraft:empty",
+     "weight": 2
+    }
+   ]
   }
  ]
 }

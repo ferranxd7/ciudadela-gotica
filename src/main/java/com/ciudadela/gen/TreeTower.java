@@ -4,6 +4,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CaveVines;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.WallBannerBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
@@ -11,17 +12,24 @@ import java.util.List;
 
 /**
  * La gran torre central convertida en "torre-arbol": un torreon de piedra envuelto por un arbol
- * gigantesco. La madera sube en espiral por la torre, cada vez ocupa mas, le salen ramas con hojas,
- * raices que bajan por el torreon hasta el suelo y, arriba, una copa enorme atravesada por la aguja.
+ * gigantesco. La madera sube en espiral por la torre, le salen ramas con hojas, raices que bajan por
+ * el torreon y, arriba del todo, la SALA DEL JEFE: una gran sala circular con cupula, sostenida por
+ * el arbol, con el trono del caballero no-muerto. Encima, la copa del arbol atravesada por la aguja.
  */
 public class TreeTower extends Element {
-    private final int cx, cz, baseY, half, towerTop, crownBase, groundY;
+    private final int cx, cz, baseY, half, towerTop, groundY;
     private final Rect keep;
+    /** Sala del jefe. */
+    public final int hallFloor;          // nivel que se pisa en la sala
+    public static final int HALL_R = 21;  // radio exterior del muro
+    public static final int HALL_H = 17;  // altura de los muros por dentro
+    private static final int DOME = 9;    // altura extra de la cupula
+    private final int domeTop, crownBase;
     private final List<double[]> blobs = new ArrayList<>();   // x,y,z,r,aplastado
     private final List<int[]> limbs = new ArrayList<>();      // x0,y0,z0,x1,y1,z1,grosor
     private final List<int[]> hangs = new ArrayList<>();      // x,y,z,largo,tipo
     private final Noise noise;
-    private static final int SPIRE_R = 6, SPIRE_H = 96;
+    private static final int SPIRE_R = 5, SPIRE_H = 62;
 
     public TreeTower(long seed, int cx, int cz, int baseY, int half, int towerTop, Rect keep, int groundY) {
         super(seed);
@@ -30,15 +38,17 @@ public class TreeTower extends Element {
         this.baseY = baseY;
         this.half = half;
         this.towerTop = towerTop;
-        this.crownBase = towerTop + 28;
         this.keep = keep;
         this.groundY = groundY;
+        this.hallFloor = towerTop + 1;
+        this.domeTop = hallFloor + HALL_H + DOME;
+        this.crownBase = domeTop;
         this.noise = new Noise(seed);
         Rng r = new Rng(seed);
         // ramas a media altura por el lado de madera
-        for (int y = towerTop - 90; y <= towerTop - 6; y += 13) {
+        for (int y = towerTop - 95; y <= towerTop - 28; y += 13) {
             double a = woodAngle(y) + (r.nextDouble() - 0.5) * 0.6;
-            int len = r.range(12, 20);
+            int len = r.range(11, 18);
             int sx = cx + (int) Math.round(Math.cos(a) * (half + 1)), sz = cz + (int) Math.round(Math.sin(a) * (half + 1));
             int ex = cx + (int) Math.round(Math.cos(a) * (half + len)), ez = cz + (int) Math.round(Math.sin(a) * (half + len));
             int ey = y + r.range(5, 10);
@@ -46,28 +56,50 @@ public class TreeTower extends Element {
             blobs.add(new double[]{ex, ey + 2, ez, 5 + r.nextDouble() * 2, 0.6});
             for (int k = 0; k < 4; k++) hangs.add(new int[]{ex + r.range(-4, 4), ey, ez + r.range(-4, 4), r.range(3, 8), k % 2});
         }
-        // grandes ramas de la copa
+        // ramas que salen del borde de la sala hacia la copa
         int nb = 8;
         for (int i = 0; i < nb; i++) {
-            double a = i * Math.PI * 2 / nb + r.nextDouble() * 0.5;
-            int len = r.range(24, 36);
-            int ey = crownBase + r.range(10, 22);
+            double a = i * Math.PI * 2 / nb + r.nextDouble() * 0.45;
+            int len = r.range(30, 38);
+            int sy = hallFloor + r.range(8, 14);
+            int sx = cx + (int) Math.round(Math.cos(a) * (HALL_R + 1)), sz = cz + (int) Math.round(Math.sin(a) * (HALL_R + 1));
             int ex = cx + (int) Math.round(Math.cos(a) * len), ez = cz + (int) Math.round(Math.sin(a) * len);
-            int mx = cx + (int) Math.round(Math.cos(a) * len * 0.45), mz = cz + (int) Math.round(Math.sin(a) * len * 0.45);
-            limbs.add(new int[]{cx + (int) Math.round(Math.cos(a) * 6), crownBase - 4, cz + (int) Math.round(Math.sin(a) * 6), mx, crownBase + 6, mz, 3});
-            limbs.add(new int[]{mx, crownBase + 6, mz, ex, ey, ez, 2});
-            blobs.add(new double[]{ex, ey + 3, ez, 10 + r.nextDouble() * 4, 0.55});
-            blobs.add(new double[]{mx, crownBase + 12, mz, 9 + r.nextDouble() * 3, 0.55});
-            for (int k = 0; k < 10; k++) {
-                double aa = r.nextDouble() * Math.PI * 2, dd = r.nextDouble() * 11;
-                hangs.add(new int[]{ex + (int) Math.round(Math.cos(aa) * dd), ey - 2, ez + (int) Math.round(Math.sin(aa) * dd), r.range(4, 12), k % 3});
+            int ey = domeTop + r.range(4, 12);
+            limbs.add(new int[]{sx, sy, sz, ex, ey, ez, 2});
+            blobs.add(new double[]{ex, ey + 3, ez, 9 + r.nextDouble() * 3, 0.55});
+            for (int k = 0; k < 8; k++) {
+                double aa = r.nextDouble() * Math.PI * 2, dd = r.nextDouble() * 9;
+                hangs.add(new int[]{ex + (int) Math.round(Math.cos(aa) * dd), ey - 1, ez + (int) Math.round(Math.sin(aa) * dd), r.range(4, 11), k % 3});
             }
         }
-        blobs.add(new double[]{cx, crownBase + 26, cz, 20, 0.5});
-        blobs.add(new double[]{cx, crownBase + 38, cz, 13, 0.55});
-        int reach = 48;
+        // ramas que suben desde la cupula hacia el centro de la copa
+        for (int i = 0; i < 4; i++) {
+            double a = i * Math.PI / 2 + Math.PI / 4;
+            int ex = cx + (int) Math.round(Math.cos(a) * 14), ez = cz + (int) Math.round(Math.sin(a) * 14);
+            limbs.add(new int[]{cx + (int) Math.round(Math.cos(a) * 8), domeTop - 2, cz + (int) Math.round(Math.sin(a) * 8), ex, domeTop + 12, ez, 2});
+        }
+        blobs.add(new double[]{cx, domeTop + 14, cz, 21, 0.42});
+        blobs.add(new double[]{cx, domeTop + 24, cz, 12, 0.55});
+        int reach = 50;
         bounds(Math.min(cx - reach, keep.x0 - 9), groundY - 2, Math.min(cz - reach, keep.z0 - 9),
-                Math.max(cx + reach, keep.x1 + 9), towerTop + 1 + SPIRE_H + 8, Math.max(cz + reach, keep.z1 + 9));
+                Math.max(cx + reach, keep.x1 + 9), domeTop + SPIRE_H + 12, Math.max(cz + reach, keep.z1 + 9));
+    }
+
+    /** Donde aparecera el jefe (fase 3): en la tarima, delante del trono. */
+    public int[] bossSpot() {
+        return new int[]{cx, hallFloor + 2, cz - HALL_R + 7};
+    }
+
+    public int centerX() {
+        return cx;
+    }
+
+    public int centerZ() {
+        return cz;
+    }
+
+    public int base() {
+        return baseY;
     }
 
     /** Angulo donde la madera es mas abundante a la altura y (gira en espiral). */
@@ -111,7 +143,8 @@ public class TreeTower extends Element {
     public void build(Canvas c) {
         canopy(c);
         tower(c);
-        upperTrunk(c);
+        bowl(c);
+        hall(c);
         for (int[] l : limbs) limb(c, l);
         roots(c);
         spire(c);
@@ -150,18 +183,12 @@ public class TreeTower extends Element {
                         }
                         c.set(x, y, z, s);
                     }
-                    // almenas solo en la parte de piedra
-                    if (woodiness(x, towerTop, z) <= 0.5) {
-                        c.set(x, towerTop + 1, z, Pal.wall(x, towerTop + 1, z));
-                        if (((ax + az) & 2) == 0) c.set(x, towerTop + 2, z, Pal.wall(x, towerTop + 2, z));
-                    }
                 } else {
                     c.column(x, z, baseY, towerTop - 1, Pal.AIR);
                     boolean well = Spiral.inWell(dx, dz);
-                    for (int y = baseY + 12; y < towerTop; y += 12)
+                    for (int y = baseY + 12; y < towerTop - 4; y += 12)
                         if (!well) c.set(x, y - 1, z, Pal.woodFloor(x, y, z));
                     c.set(x, baseY - 1, z, Pal.DS_TILES);
-                    c.set(x, towerTop, z, well ? Pal.AIR : Pal.DS_TILES);
                 }
             }
         // puerta sur
@@ -171,9 +198,9 @@ public class TreeTower extends Element {
                 for (int y = baseY; y <= baseY + 3; y++) c.set(x, y, z, Pal.AIR);
                 c.set(x, baseY - 1, z, Pal.DS_TILES);
             }
+        // la escalera sube hasta el suelo de la sala del jefe (el ultimo escalon queda a ras del suelo)
         Spiral.build(c, cx, cz, baseY, towerTop, (int) (seed & 15), Blocks.DEEPSLATE_TILE_STAIRS, Pal::wall);
-        // farolillos en las plantas
-        for (int y = baseY + 12; y < towerTop; y += 12) {
+        for (int y = baseY + 12; y < towerTop - 4; y += 12) {
             for (int[] p : new int[][]{{6, 6}, {-6, 6}, {6, -6}, {-6, -6}}) {
                 c.set(cx + p[0], y + 9, cz + p[1], Pal.CHAIN);
                 c.set(cx + p[0], y + 8, cz + p[1], Pal.SOUL_LANTERN_HANG);
@@ -181,24 +208,208 @@ public class TreeTower extends Element {
         }
     }
 
-    // ------------------------------------------------------------ tronco sobre la torre
-    private void upperTrunk(Canvas c) {
-        int H = half;
-        for (int x = Math.max(cx - H - 2, c.minX); x <= Math.min(cx + H + 2, c.maxX); x++)
-            for (int z = Math.max(cz - H - 2, c.minZ); z <= Math.min(cz + H + 2, c.maxZ); z++) {
+    // ------------------------------------------------------------ cuenco de madera que sostiene la sala
+    private void bowl(Canvas c) {
+        int depth = 16;
+        int y0 = towerTop - depth;
+        for (int x = Math.max(cx - HALL_R - 2, c.minX); x <= Math.min(cx + HALL_R + 2, c.maxX); x++)
+            for (int z = Math.max(cz - HALL_R - 2, c.minZ); z <= Math.min(cz + HALL_R + 2, c.maxZ); z++) {
                 int dx = x - cx, dz = z - cz;
+                if (Math.max(Math.abs(dx), Math.abs(dz)) <= half) continue; // la torre ya esta
                 double d = Math.sqrt(dx * dx + dz * dz);
-                for (int y = towerTop + 1; y <= crownBase + 4; y++) {
-                    double k = (y - towerTop) / (double) (crownBase + 4 - towerTop);
-                    double rt = (H + 1.5) * (1 - k) + 7.5 * k + noise.value(x * 0.2, y * 0.15, z * 0.2) * 1.2;
-                    double ang = Math.atan2(dz, dx);
-                    // el tronco se retuerce: huecos en espiral que dejan ver la aguja
-                    boolean gap = Math.sin(ang * 3 + y * 0.12) > 0.82 && d > rt - 2.5 && k < 0.7;
-                    if (d <= rt && d > SPIRE_R + 0.5 && !gap) c.set(x, y, z, bark(x, y, z, Direction.Axis.Y));
+                double ang = Math.atan2(dz, dx);
+                for (int y = y0; y < towerTop; y++) {
+                    double k = (y - y0) / (double) depth;
+                    double rr = half * 1.05 + Math.pow(k, 0.8) * (HALL_R + 0.6 - half * 1.05) + noise.value(x * 0.2, y * 0.2, z * 0.2) * 1.2;
+                    if (d > rr) continue;
+                    // costillas de piedra cada 45 grados, el resto madera viva
+                    boolean rib = Math.abs(Math.sin(ang * 4)) < 0.08 + 0.02 * k;
+                    c.set(x, y, z, rib ? Pal.PB_BRICKS : bark(x, y, z, Direction.Axis.Y));
                 }
             }
     }
 
+    // ------------------------------------------------------------ SALA DEL JEFE
+    private int ceiling(double d) {
+        double k = Math.min(1, d / (HALL_R - 1.0));
+        return hallFloor + HALL_H - 1 + (int) Math.round(DOME * Math.sqrt(Math.max(0, 1 - k * k)));
+    }
+
+    private void hall(Canvas c) {
+        int F = hallFloor;
+        double R = HALL_R + 0.5;
+        int[] dais = {cx, cz - HALL_R + 3};
+        for (int x = Math.max(cx - HALL_R - 3, c.minX); x <= Math.min(cx + HALL_R + 3, c.maxX); x++)
+            for (int z = Math.max(cz - HALL_R - 3, c.minZ); z <= Math.min(cz + HALL_R + 3, c.maxZ); z++) {
+                int dx = x - cx, dz = z - cz;
+                double d = Math.sqrt(dx * dx + dz * dz);
+                double ang = Math.atan2(dz, dx);
+                if (d > R + 1.6) continue;
+                if (d > R) {
+                    // costillas de madera que trepan por fuera del muro
+                    for (int y = F - 1; y <= F + HALL_H + 2; y++)
+                        if (Math.sin(ang * 5 + (y - F) * 0.16 + noise.value(x * 0.2, y * 0.1, z * 0.2)) > 0.86)
+                            c.set(x, y, z, bark(x, y, z, Direction.Axis.Y));
+                    continue;
+                }
+                int well = Math.max(Math.abs(dx), Math.abs(dz));
+                // suelo (con el hueco de la escalera de 5x5 en el centro)
+                if (well > 2) c.set(x, F - 1, z, hallFloorBlock(x, z, d, dx, dz));
+                if (d > R - 2) {
+                    // muro: pilastras cada 30 grados, ventanales goticos entre ellas
+                    double sector = Math.PI / 6;
+                    double rel = ang / sector;
+                    double fracToPil = Math.abs(rel - Math.round(rel)) * sector * d; // distancia en bloques a la pilastra
+                    double fracToWin = Math.abs((rel - Math.floor(rel)) - 0.5) * sector * d;
+                    boolean outer = d > R - 1;
+                    for (int y = F - 1; y <= F + HALL_H; y++) {
+                        int ry = y - F;
+                        BlockState s;
+                        if (fracToPil < 1.6) {
+                            s = (ry == 0 || ry == HALL_H - 1) ? Pal.PB_CHISELED : Pal.BASALT;
+                        } else {
+                            boolean win = ry >= 3 && ry <= 12 && fracToWin < 2.6 && fracToWin > 0.5;
+                            boolean arch = (ry == 13 && fracToWin < 1.6 && fracToWin > 0.5) || (ry == 14 && fracToWin < 0.9);
+                            if ((win || arch) && outer) {
+                                BlockState mos = ModDeco.mosaic(x, z, y, F + 3, F + 13);
+                                s = mos != null ? mos : (Hash.pct(x, y / 3, z, 7) < 55 ? Pal.GLASS_RED : Pal.GLASS_PURPLE);
+                            } else if (win || arch) {
+                                s = Pal.AIR;
+                            } else {
+                                double w = 0.5 + 0.38 * Math.sin(ang * 3 + y * 0.21) + noise.value(x * 0.25, y * 0.12, z * 0.25) * 0.3;
+                                s = w > 0.8 ? bark(x, y, z, Direction.Axis.Y) : (ry % 8 == 7 ? Pal.trim(x, y, z) : Pal.wall(x, y, z));
+                            }
+                        }
+                        c.set(x, y, z, s);
+                    }
+                    // muro de la cupula hasta el arranque
+                    for (int y = F + HALL_H + 1; y <= ceiling(d) + 1; y++) c.set(x, y, z, Pal.wall(x, y, z));
+                    continue;
+                }
+                // interior: aire hasta la cupula
+                int ceil = ceiling(d);
+                if (well > 2) c.column(x, z, F, ceil - 1, Pal.AIR);
+                else c.column(x, z, F + 3, ceil - 1, Pal.AIR);
+                // cupula de dos bloques con nervios de madera
+                double sector = Math.PI / 6;
+                double rel = ang / sector;
+                boolean rib = Math.abs(rel - Math.round(rel)) * sector * Math.max(d, 1) < 0.9;
+                for (int y = ceil; y <= ceil + 1; y++)
+                    c.set(x, y, z, rib ? Pal.log(Blocks.STRIPPED_DARK_OAK_LOG, Direction.Axis.Y) : Pal.roof(x, y, z));
+            }
+        hallFurniture(c, F, dais);
+    }
+
+    private BlockState hallFloorBlock(int x, int z, double d, int dx, int dz) {
+        if (d >= 8.5 && d < 9.5) return Pal.GILDED;
+        if (d >= 15.5 && d < 16.5) return Pal.DS_TILES;
+        if (Math.abs(dx) <= 1 && dz < -3 && dz > -HALL_R + 9) return Pal.b(Blocks.RED_NETHER_BRICKS);
+        return ((Math.floorDiv(x, 2) + Math.floorDiv(z, 2)) & 1) == 0 ? Pal.DS_POLISHED : Pal.PB;
+    }
+
+    private void hallFurniture(Canvas c, int F, int[] dais) {
+        // recinto de la escalera: barandilla de 9x9 con una abertura al sur
+        for (int dx = -4; dx <= 4; dx++)
+            for (int dz = -4; dz <= 4; dz++) {
+                if (Math.max(Math.abs(dx), Math.abs(dz)) != 4) continue;
+                int x = cx + dx, z = cz + dz;
+                if (dz == 4 && Math.abs(dx) <= 1) continue; // salida
+                boolean corner = Math.abs(dx) == 4 && Math.abs(dz) == 4;
+                Direction.Axis ax = Math.abs(dz) == 4 ? Direction.Axis.X : Direction.Axis.Z;
+                BlockState low = ModDeco.gothicFence(ax, false), high = ModDeco.gothicFence(ax, true);
+                c.set(x, F, z, corner ? Pal.PB_BRICKS : (low != null ? low : Pal.connected(Blocks.IRON_BARS, ax)));
+                c.set(x, F + 1, z, corner ? Pal.PB_CHISELED : (high != null ? high : Pal.connected(Blocks.IRON_BARS, ax)));
+                if (corner) c.set(x, F + 2, z, Pal.SOUL_LANTERN);
+            }
+        // el pilar central de la escalera termina en un farol
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dz = -1; dz <= 1; dz++) c.set(cx + dx, F + 2, cz + dz, Pal.PB_CHISELED);
+        c.set(cx, F + 3, cz, Pal.SOUL_LANTERN);
+
+        // tarima semicircular con el trono al norte
+        int tx = dais[0], tz = dais[1];
+        for (int x = cx - 11; x <= cx + 11; x++)
+            for (int z = cz - HALL_R + 1; z <= tz + 8; z++) {
+                double dd = Math.sqrt((x - tx) * (x - tx) + (z - tz) * (z - tz));
+                double dHall = Math.sqrt((x - cx) * (x - cx) + (z - cz) * (z - cz));
+                if (dHall > HALL_R - 2.5 || dd > 9) continue;
+                if (dd > 6.5) {
+                    c.set(x, F, z, Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, Pal.dirOf(tx - x, tz - z), false));
+                } else {
+                    c.set(x, F, z, Pal.PB_BRICKS);
+                    c.set(x, F + 1, z, dd > 4.5 ? Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, Pal.dirOf(tx - x, tz - z), false)
+                            : (dd < 1.6 ? Pal.GILDED : Pal.PB_BRICKS));
+                }
+            }
+        // trono gigante del caballero no-muerto
+        int ty = F + 2;
+        c.set(tx, ty, tz, Pal.stairs(Blocks.POLISHED_BLACKSTONE_STAIRS, Direction.NORTH, false));
+        c.set(tx - 1, ty, tz, Pal.PB_CHISELED);
+        c.set(tx + 1, ty, tz, Pal.PB_CHISELED);
+        c.set(tx - 1, ty + 1, tz, Pal.b(Blocks.POLISHED_BLACKSTONE_WALL));
+        c.set(tx + 1, ty + 1, tz, Pal.b(Blocks.POLISHED_BLACKSTONE_WALL));
+        for (int y = ty; y <= ty + 8; y++) {
+            c.set(tx, y, tz - 1, y == ty + 8 ? Pal.GILDED : Pal.PB_CHISELED);
+            if (y >= ty + 2) {
+                c.set(tx - 1, y, tz - 1, y >= ty + 6 ? Pal.GILDED : Pal.PB_BRICKS);
+                c.set(tx + 1, y, tz - 1, y >= ty + 6 ? Pal.GILDED : Pal.PB_BRICKS);
+            }
+        }
+        c.set(tx, ty + 9, tz - 1, Pal.b(Blocks.WITHER_SKELETON_SKULL));
+        c.set(tx - 1, ty + 7, tz - 1, Pal.b(Blocks.WITHER_SKELETON_SKULL));
+        c.set(tx + 1, ty + 7, tz - 1, Pal.b(Blocks.WITHER_SKELETON_SKULL));
+        // marca de aparicion del jefe (se usara en la fase 3)
+        int[] b = bossSpot();
+        c.set(b[0], b[1] - 1, b[2], Pal.CRYING_OBSIDIAN);
+        // grandes braseros
+        BlockState pit = ModDeco.firePit();
+        for (int k = 0; k < 8; k++) {
+            double a = Math.PI / 8 + k * Math.PI / 4;
+            int x = cx + (int) Math.round(Math.cos(a) * (HALL_R - 4.5)), z = cz + (int) Math.round(Math.sin(a) * (HALL_R - 4.5));
+            c.set(x, F, z, Pal.PB_CHISELED);
+            c.set(x, F + 1, z, Pal.PB_BRICKS);
+            c.set(x, F + 2, z, pit != null ? pit : Pal.SOUL_CAMPFIRE);
+        }
+        // estandartes y apliques en las pilastras de los puntos cardinales
+        Direction[] dirs = {Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.NORTH};
+        for (Direction out : dirs) {
+            int px = cx + out.getStepX() * (HALL_R - 2), pz = cz + out.getStepZ() * (HALL_R - 2);
+            Direction in = out.getOpposite();
+            c.set(px, F + 9, pz, (out == Direction.NORTH ? Blocks.RED_WALL_BANNER : Blocks.BLACK_WALL_BANNER).defaultBlockState()
+                    .setValue(WallBannerBlock.FACING, in));
+            Direction side = out.getClockWise();
+            for (int s = -1; s <= 1; s += 2) {
+                int lx = px + side.getStepX() * 2 * s, lz = pz + side.getStepZ() * 2 * s;
+                BlockState l = ModDeco.wallLight(out, s + 4);
+                // solo si detras hay muro de verdad
+                c.set(lx + out.getStepX(), F + 4, lz + out.getStepZ(), Pal.BASALT);
+                c.set(lx, F + 4, lz, l != null ? l : Blocks.SOUL_WALL_TORCH.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.WallTorchBlock.FACING, in));
+            }
+        }
+        // lamparas de arana colgando de la cupula
+        for (int k = 0; k < 5; k++) {
+            int x = k == 4 ? cx : cx + (int) Math.round(Math.cos(k * Math.PI / 2 + Math.PI / 4) * 10);
+            int z = k == 4 ? cz : cz + (int) Math.round(Math.sin(k * Math.PI / 2 + Math.PI / 4) * 10);
+            int ceil = ceiling(Math.sqrt((x - cx) * (x - cx) + (z - cz) * (z - cz)));
+            int bottom = F + 10;
+            for (int y = ceil - 1; y > bottom; y--) c.set(x, y, z, Pal.CHAIN);
+            BlockState ch = ModDeco.chandelier(true, false);
+            if (ch != null) c.set(x, bottom, z, ch);
+            else {
+                c.set(x, bottom, z, Pal.SOUL_LANTERN_HANG);
+                for (Direction d : dirs) {
+                    c.set(x + d.getStepX(), bottom + 1, z + d.getStepZ(), Pal.CHAIN);
+                    c.set(x + d.getStepX(), bottom, z + d.getStepZ(), Pal.LANTERN_HANG);
+                }
+            }
+        }
+        // cofre del tesoro del jefe detras del trono
+        c.chest(tx + 3, F + 2, tz - 1, Direction.SOUTH, Decor.loot("tesoro"));
+        c.chest(tx - 3, F + 2, tz - 1, Direction.SOUTH, Decor.loot("tesoro"));
+    }
+
+    // ------------------------------------------------------------ ramas, copa y colgantes
     private void limb(Canvas c, int[] l) {
         int dx = l[3] - l[0], dy = l[4] - l[1], dz = l[5] - l[2];
         int n = Math.max(Math.abs(dx), Math.max(Math.abs(dy), Math.abs(dz)));
@@ -214,9 +425,16 @@ public class TreeTower extends Element {
                     for (int oz = -rr; oz <= rr; oz++) {
                         if (ox * ox + oy * oy + oz * oz > rad * rad + 0.3) continue;
                         int x = (int) Math.round(px) + ox, y = (int) Math.round(py) + oy, z = (int) Math.round(pz) + oz;
-                        if (c.inXZ(x, z)) c.set(x, y, z, bark(x, y, z, axis));
+                        if (!c.inXZ(x, z) || insideHall(x, y, z)) continue;
+                        c.set(x, y, z, bark(x, y, z, axis));
                     }
         }
+    }
+
+    /** True si el bloque esta dentro del espacio interior de la sala del jefe (no se toca). */
+    private boolean insideHall(int x, int y, int z) {
+        double d = Math.sqrt((x - cx) * (x - cx) + (z - cz) * (z - cz));
+        return d <= HALL_R - 1.5 && y >= hallFloor - 1 && y <= ceiling(d) + 1;
     }
 
     private void canopy(Canvas c) {
@@ -241,17 +459,17 @@ public class TreeTower extends Element {
     private void hanging(Canvas c) {
         for (int[] h : hangs) {
             if (!c.inXZ(h[0], h[2])) continue;
-            int start = h[1];
-            // bajar desde la primera hoja
+            int start = Integer.MIN_VALUE;
             for (int y = h[1] + 12; y >= h[1] - 4; y--) {
                 if (!c.isAir(h[0], y, h[2])) {
                     start = y - 1;
                     break;
                 }
             }
+            if (start == Integer.MIN_VALUE) continue;
             for (int k = 0; k < h[3]; k++) {
                 int y = start - k;
-                if (!c.isAir(h[0], y, h[2])) break;
+                if (!c.isAir(h[0], y, h[2]) || insideHall(h[0], y, h[2])) break;
                 boolean tip = k == h[3] - 1;
                 BlockState s;
                 if (h[4] == 0) s = tip ? Pal.SOUL_LANTERN_HANG : Pal.CHAIN;
@@ -276,12 +494,9 @@ public class TreeTower extends Element {
             int ex = cx + a[0] + a[2], ez = cz + a[1] + a[3];
             double ang = Math.atan2(ez - cz, ex - cx);
             int sx = cx + (int) Math.round(Math.cos(ang) * (half + 1)), sz = cz + (int) Math.round(Math.sin(ang) * (half + 1));
-            // sobre la azotea
             rootSeg(c, sx, top + 7, sz, ex, top + 1, ez, 2.2);
-            // bajando por la fachada
             rootSeg(c, ex, top + 1, ez, ex + a[2], (top + groundY) / 2, ez + a[3], 1.7);
             rootSeg(c, ex + a[2], (top + groundY) / 2, ez + a[3], ex + a[2] * 3, groundY + 1, ez + a[3] * 3, 1.5);
-            // se abre en el suelo
             rootSeg(c, ex + a[2] * 3, groundY, ez + a[3] * 3, ex + a[2] * 9 + a[3] * 3, groundY - 1, ez + a[3] * 9 + a[2] * 3, 1.2);
             rootSeg(c, ex + a[2] * 3, groundY, ez + a[3] * 3, ex + a[2] * 9 - a[3] * 3, groundY - 1, ez + a[3] * 9 - a[2] * 3, 1.2);
         }
@@ -301,7 +516,6 @@ public class TreeTower extends Element {
                         if (ox * ox + oy * oy + oz * oz > rad * rad) continue;
                         int x = px + ox, y = py + oy, z = pz + oz;
                         if (!c.inXZ(x, z)) continue;
-                        // no tapar puertas ni ventanas del torreon: solo por fuera o sobre la azotea
                         boolean insideKeep = x > keep.x0 && x < keep.x1 && z > keep.z0 && z < keep.z1 && y < baseY - 1;
                         if (insideKeep) continue;
                         c.set(x, y, z, bark(x, y, z, Direction.Axis.Y));
@@ -311,20 +525,17 @@ public class TreeTower extends Element {
 
     // ------------------------------------------------------------ aguja que atraviesa la copa
     private void spire(Canvas c) {
-        int sb = towerTop + 1;
+        int sb = domeTop - 1;
         for (int x = Math.max(cx - SPIRE_R - 1, c.minX); x <= Math.min(cx + SPIRE_R + 1, c.maxX); x++)
             for (int z = Math.max(cz - SPIRE_R - 1, c.minZ); z <= Math.min(cz + SPIRE_R + 1, c.maxZ); z++) {
                 int m = GreatTower.oct(x - cx, z - cz);
                 for (int y = sb; y <= sb + SPIRE_H; y++) {
-                    double rad = y < crownBase + 30 ? SPIRE_R : SPIRE_R * (1 - (y - crownBase - 30) / (double) (sb + SPIRE_H - crownBase - 30));
+                    double rad = SPIRE_R * (1 - (y - sb) / (double) SPIRE_H);
                     if (m <= rad + 0.5 && m > rad - 1.6) {
                         int rel = y - sb;
                         BlockState s = rel % 10 == 9 ? Pal.trim(x, y, z) : Pal.roof(x, y, z);
                         if (rel % 10 == 4 && Math.abs(Math.abs(x - cx) - Math.abs(z - cz)) == 0) s = Pal.GILDED;
-                        if (y < crownBase + 30 && rel % 10 >= 3 && rel % 10 <= 6 && (x == cx || z == cz)) s = Pal.GLASS_PURPLE;
                         c.set(x, y, z, s);
-                    } else if (m < rad - 1.6 && y < crownBase + 30) {
-                        c.set(x, y, z, Pal.AIR);
                     }
                 }
             }
@@ -332,11 +543,5 @@ public class TreeTower extends Element {
         c.column(cx, cz, apex - 2, apex + 1, Pal.GILDED);
         c.column(cx, cz, apex + 2, apex + 4, Pal.b(Blocks.POLISHED_BLACKSTONE_WALL));
         c.set(cx, apex + 5, cz, Pal.b(Blocks.LIGHTNING_ROD));
-        // mirador dentro de la copa
-        for (int y = sb; y < crownBase + 30; y += 10) {
-            c.fill(cx - SPIRE_R + 2, y - 1, cz - SPIRE_R + 2, cx + SPIRE_R - 2, y - 1, cz + SPIRE_R - 2, Pal.DO_PLANKS);
-            c.set(cx, y + 6, cz, Pal.CHAIN);
-            c.set(cx, y + 5, cz, Pal.LANTERN_HANG);
-        }
     }
 }

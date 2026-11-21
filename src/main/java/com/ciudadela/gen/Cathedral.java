@@ -24,7 +24,10 @@ public class Cathedral extends Element {
         east = new GreatTower(seed + 2, cx + 17, tz, Y, 7, Y + 92, 42, true);
         west.door(Direction.EAST, Y);
         east.door(Direction.WEST, Y);
-        bounds(cx - AISLE - 4, Y - 2, zN - NAVE - 3, cx + AISLE + 4, Y + 92 + 42 + 10, zS + 3);
+        // campanarios convertidos en torres-arbol (la madera empieza por encima del tejado de la nave)
+        west.tree(Y + HN + 4);
+        east.tree(Y + HN + 4);
+        bounds(Math.min(cx - AISLE - 4, west.x0), Y - 2, zN - NAVE - 3, Math.max(cx + AISLE + 4, east.x1), Y + 92 + 42 + 10, Math.max(zS + 3, west.z1));
     }
 
     private int vault(int adx) {

@@ -77,6 +77,55 @@ public final class CiTest {
             plan(lvl, s[0], s[1], 150, Y0 - 6, new File(out, "9_sotano_1.png"));
             plan(lvl, s[0], s[1], 150, Y0 - 13, new File(out, "10_sotano_2.png"));
             plan(lvl, s[0], s[1], 240, Y0 + 27, new File(out, "11_murallas_ronda.png"));
+            // ---- comprobaciones automaticas
+            CastlePlan plan = com.ciudadela.world.PlanCache.get(seed, s[0], s[1], (x, z) -> 64);
+            try (PrintWriter acc = new PrintWriter(new File(out, "accesos.txt"))) {
+                int ok = 0, bad = 0;
+                for (com.ciudadela.gen.Element e : plan.elements()) {
+                    String res = null;
+                    if (e instanceof com.ciudadela.gen.RoundTower rt) {
+                        int target = rt.top == com.ciudadela.gen.RoundTower.Top.PLATFORM ? rt.topY + 1 : rt.lastFloor();
+                        res = reach(lvl, rt.cx, rt.cz, rt.radius - 1, rt.groundY, target);
+                        res = "Torre " + rt.cx + "," + rt.cz + " (radio " + rt.radius + ", " + rt.top + ", plantas " + rt.floors() + "): " + res;
+                    } else if (e instanceof com.ciudadela.gen.Building b && b.turretInfo() != null) {
+                        int[] t = b.turretInfo();
+                        res = "Escalera de edificio " + b.fp + ": " + reach(lvl, t[0], t[1], 3, t[2], t[3]);
+                    } else if (e instanceof com.ciudadela.gen.TreeTower tt) {
+                        res = reach(lvl, tt.centerX(), tt.centerZ(), com.ciudadela.gen.TreeTower.HALL_R - 2, tt.base(), tt.hallFloor);
+                        res = "TORRE-ARBOL -> SALA DEL JEFE (y=" + tt.hallFloor + "): " + res;
+                        plan(lvl, tt.centerX(), tt.centerZ(), 26, tt.hallFloor + 1, new File(out, "12_sala_del_jefe.png"));
+                        plan(lvl, tt.centerX(), tt.centerZ(), 26, tt.hallFloor + 6, new File(out, "13_sala_del_jefe_ventanas.png"));
+                    }
+                    if (res == null) continue;
+                    if (res.contains("OK")) ok++;
+                    else bad++;
+                    acc.println(res);
+                }
+                acc.println("TOTAL: " + ok + " accesibles, " + bad + " con problemas");
+                log.println("Accesos (subir a lo alto de cada torre): " + ok + " bien, " + bad + " mal");
+            }
+            // ---- bioma de tormenta
+            log.println("Bioma en el centro de la isla: " + lvl.getBiome(new net.minecraft.core.BlockPos(s[0], Y0, s[1])).unwrapKey().map(k -> k.location().toString()).orElse("?"));
+            log.println("Bioma en el suelo bajo la isla: " + lvl.getBiome(new net.minecraft.core.BlockPos(s[0] + 100, 70, s[1] + 100)).unwrapKey().map(k -> k.location().toString()).orElse("?"));
+            log.println("Bioma lejos (800 bloques): " + lvl.getBiome(new net.minecraft.core.BlockPos(s[0] + 800, 70, s[1])).unwrapKey().map(k -> k.location().toString()).orElse("?"));
+            // ---- libros encantados del botin
+            for (String name : new String[]{"biblioteca", "tesoro", "cripta", "dormitorio", "armeria", "alquimia"}) {
+                var table = server.getLootData().getLootTable(new net.minecraft.resources.ResourceLocation("ciudadela", "chests/" + name));
+                int books = 0, ench = 0;
+                for (int i = 0; i < 200; i++) {
+                    var params = new net.minecraft.world.level.storage.loot.LootParams.Builder(lvl)
+                            .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN, net.minecraft.world.phys.Vec3.ZERO)
+                            .create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CHEST);
+                    for (var st : table.getRandomItems(params)) {
+                        if (st.is(net.minecraft.world.item.Items.ENCHANTED_BOOK)) {
+                            books++;
+                            if (!net.minecraft.world.item.EnchantedBookItem.getEnchantments(st).isEmpty()) ench++;
+                        }
+                    }
+                }
+                log.println("Botin " + name + ": " + books + " libros encantados en 200 cofres, " + ench + " con encantamientos");
+            }
+            log.println("Calibracion de muebles: " + (com.ciudadela.gen.Calib.done ? "hecha" : "NO"));
             log.println("Tiempo total: " + (System.currentTimeMillis() - t0) / 1000 + " s");
             log.println("OK");
         } catch (Throwable t) {
@@ -84,6 +133,70 @@ public final class CiTest {
         } finally {
             server.halt(false);
         }
+    }
+
+    // ------------------------------------------------------------ prueba de "se puede subir andando"
+
+    private static boolean passable(ServerLevel lvl, BlockPos.MutableBlockPos m, int x, int y, int z) {
+        BlockState st = lvl.getBlockState(m.set(x, y, z));
+        var shape = st.getCollisionShape(lvl, m);
+        return shape.isEmpty() || shape.max(net.minecraft.core.Direction.Axis.Y) <= 0.2;
+    }
+
+    private static boolean solid(ServerLevel lvl, BlockPos.MutableBlockPos m, int x, int y, int z) {
+        BlockState st = lvl.getBlockState(m.set(x, y, z));
+        var shape = st.getCollisionShape(lvl, m);
+        return !shape.isEmpty() && shape.max(net.minecraft.core.Direction.Axis.Y) >= 0.45;
+    }
+
+    private static boolean stand(ServerLevel lvl, BlockPos.MutableBlockPos m, int x, int y, int z) {
+        return passable(lvl, m, x, y, z) && passable(lvl, m, x, y + 1, z) && solid(lvl, m, x, y - 1, z);
+    }
+
+    /** Busqueda en anchura: ¿se puede llegar andando (saltando 1 bloque) desde abajo hasta targetY? */
+    private static String reach(ServerLevel lvl, int cx, int cz, int r, int y0, int targetY) {
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        int H = targetY - y0 + 6;
+        int W = 2 * r + 1;
+        boolean[] seen = new boolean[W * W * (H + 1)];
+        java.util.ArrayDeque<int[]> q = new java.util.ArrayDeque<>();
+        for (int x = cx - r; x <= cx + r; x++)
+            for (int z = cz - r; z <= cz + r; z++)
+                for (int y = y0; y <= y0 + 1; y++) {
+                    if ((x - cx) * (x - cx) + (z - cz) * (z - cz) > r * r) continue;
+                    if (stand(lvl, m, x, y, z)) {
+                        seen[((x - cx + r) * W + (z - cz + r)) * (H + 1) + (y - y0)] = true;
+                        q.add(new int[]{x, y, z});
+                    }
+                }
+        if (q.isEmpty()) return "FALLA: no hay donde pisar abajo";
+        int best = y0;
+        int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        while (!q.isEmpty()) {
+            int[] p = q.poll();
+            best = Math.max(best, p[1]);
+            if (p[1] >= targetY) return "OK";
+            for (int[] d : dirs) {
+                int nx = p[0] + d[0], nz = p[2] + d[1];
+                if ((nx - cx) * (nx - cx) + (nz - cz) * (nz - cz) > r * r) continue;
+                for (int dy = 1; dy >= -3; dy--) {
+                    int ny = p[1] + dy;
+                    if (ny < y0 || ny > y0 + H) continue;
+                    if (dy == 1 && !passable(lvl, m, p[0], p[1] + 2, p[2])) continue;
+                    if (!stand(lvl, m, nx, ny, nz)) continue;
+                    if (dy < 0) {
+                        boolean clear = true;
+                        for (int yy = ny + 2; yy <= p[1] + 1 && clear; yy++) if (!passable(lvl, m, nx, yy, nz)) clear = false;
+                        if (!clear) continue;
+                    }
+                    int idx = ((nx - cx + r) * W + (nz - cz + r)) * (H + 1) + (ny - y0);
+                    if (seen[idx]) continue;
+                    seen[idx] = true;
+                    q.add(new int[]{nx, ny, nz});
+                }
+            }
+        }
+        return "FALLA: solo se llega hasta y=" + best + " (faltan " + (targetY - best) + ")";
     }
 
     /** Lista todos los bloques de los mods de decoracion con sus propiedades. */
