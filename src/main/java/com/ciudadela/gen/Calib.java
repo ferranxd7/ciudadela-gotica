@@ -105,7 +105,7 @@ public final class Calib {
             player.setPos(target.getX() + 0.5 - look.getStepX() * 2.0, target.getY(), target.getZ() + 0.5 - look.getStepZ() * 2.0);
             player.setYRot(look.toYRot());
             player.setYHeadRot(look.toYRot());
-            player.setXRot(25);
+            player.setXRot(0);
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(it, 16));
             Vec3 hit = Vec3.atCenterOf(support).add(face.getStepX() * 0.5, face.getStepY() * 0.5, face.getStepZ() * 0.5);
             player.getMainHandItem().useOn(new UseOnContext(player, InteractionHand.MAIN_HAND, new BlockHitResult(hit, face, support, false)));
@@ -193,6 +193,10 @@ public final class Calib {
     }
 
     /** Objeto de pared: se pulsa la cara de un bloque de piedra que hace de pared. */
+    private static boolean exact(BlockState s, String id) {
+        return s != null && idOf(s).equals(id);
+    }
+
     private static void testWall(String id, String itemId) {
         Item it = item(itemId);
         if (it == null) return;
@@ -202,7 +206,7 @@ public final class Calib {
             lvl.setBlock(w, Blocks.STONE.defaultBlockState(), 2 | 16);
             use(it, w, wall.getOpposite(), wall);
             BlockState s = lvl.getBlockState(origin);
-            if (family(s, id)) M.put(wall(id, wall), s);
+            if (exact(s, id)) M.put(wall(id, wall), s);
         }
         log(id, wall(id, Direction.NORTH));
     }
@@ -285,7 +289,7 @@ public final class Calib {
     public static final String[] COLUMNS = {"mcwwindows:red_mosaic_glass", "mcwwindows:purple_mosaic_glass", "mcwwindows:black_mosaic_glass",
             "mcwwindows:blue_mosaic_glass", "mcwwindows:orange_mosaic_glass", "mcwwindows:gray_mosaic_glass", "mcwfences:gothic_metal_fence"};
     public static final String[] DOORS = {"mcwdoors:dark_oak_classic_door", "mcwdoors:dark_oak_mystic_door", "mcwdoors:dark_oak_nether_door",
-            "mcwdoors:spruce_cottage_door", "mcwdoors:dark_oak_whispering_door"};
+            "mcwdoors:dark_oak_cottage_door", "mcwdoors:dark_oak_whispering_door"};
 
     public static synchronized void run(ServerLevel level) {
         if (done) return;

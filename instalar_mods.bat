@@ -54,7 +54,7 @@ powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.Ser
 echo [18/19] GlitchCore-forge-1.20.1-0.0.1.1.jar
 powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol='Tls12'; Invoke-WebRequest -UseBasicParsing -Uri 'https://cdn.modrinth.com/data/s3dmwKy5/versions/pYPZ5MNI/GlitchCore-forge-1.20.1-0.0.1.1.jar' -OutFile '%MODS%\GlitchCore-forge-1.20.1-0.0.1.1.jar'"
 echo [19/19] ciudadela-0.1.0.jar
-powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol='Tls12'; Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/ferranxd7/ciudadela-gotica/releases/download/build-5/ciudadela-0.1.0.jar' -OutFile '%MODS%\ciudadela-0.1.0.jar'"
+powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol='Tls12'; Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/ferranxd7/ciudadela-gotica/releases/latest/download/ciudadela-0.1.0.jar' -OutFile '%MODS%\ciudadela-0.1.0.jar'"
 echo.
 echo ==========================================================
 echo   LISTO. Abre TLauncher, elige "Forge 1.20.1" y juega.

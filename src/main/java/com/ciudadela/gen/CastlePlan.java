@@ -569,6 +569,9 @@ public final class CastlePlan {
                 boolean inner = ch <= INNER - 10;
                 boolean outer = ch >= 146 && insideOct(lx, lz, 14);
                 if (!inner && !outer) continue;
+                // el patio de la fuente y los jardines se quedan despejados para pasear
+                if (Math.abs(lx) <= 62 && lz >= 26 && lz <= 128) continue;
+                if (lx >= -36 && lx <= 12 && lz >= -110 && lz <= -82) continue;
                 boolean ok = true;
                 for (int dx = -2; dx <= 2 && ok; dx++)
                     for (int dz = -2; dz <= 2 && ok; dz++) {
