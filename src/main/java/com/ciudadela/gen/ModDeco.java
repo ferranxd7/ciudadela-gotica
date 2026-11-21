@@ -305,10 +305,6 @@ public final class ModDeco {
         };
     }
 
-    public static BlockState kitchenHood(Direction wall) {
-        return null;
-    }
-
     private static BlockState wallOf(Direction wall, String... ids) {
         for (String id : ids) {
             BlockState s = cal(Calib.wall(id, wall));

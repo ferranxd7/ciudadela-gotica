@@ -80,4 +80,8 @@ jobs:
           shopt -s nullglob
           files=()
           for f in build/libs/*.jar build.log out/*.txt out/*.log out/*.png out/*.mrpack; do [ -s "$f" ] && files+=("$f"); done
-          gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }}" --notes "Version automatica ${{ github.run_number }}" --latest
+          if ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null; then
+            gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }}" --notes "Version automatica ${{ github.run_number }}" --latest
+          else
+            gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }} (fallida)" --notes "Compilacion o prueba fallida" --prerelease --latest=false
+          fi
