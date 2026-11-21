@@ -4,6 +4,19 @@ import com.ciudadela.cine.Cinematics;
 import com.ciudadela.net.Net;
 import com.ciudadela.story.MapaItem;
 import com.ciudadela.story.StoryEvents;
+import com.ciudadela.rey.RastrilloBlock;
+import com.ciudadela.rey.Rey;
+import com.ciudadela.rey.ReyEventos;
+import com.ciudadela.rey.ReyProyectil;
+import com.ciudadela.rey.Victoria;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import com.ciudadela.world.CastleFeature;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -44,6 +57,25 @@ public class CiudadelaMod {
     public static final RegistryObject<SoundEvent> MUSICA_REY_2 = sound("musica.rey2");
     public static final RegistryObject<SoundEvent> MUSICA_REY_3 = sound("musica.rey3");
 
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] REY_VOZ = new RegistryObject[10];
+
+    static {
+        for (int i = 1; i < REY_VOZ.length; i++) REY_VOZ[i] = sound("rey.voz." + i);
+    }
+
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
+    public static final RegistryObject<Block> RASTRILLO = BLOCKS.register("rastrillo", () -> new RastrilloBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(-1.0F, 3600000.0F).noLootTable()
+                    .noOcclusion().sound(SoundType.CHAIN).pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false)));
+
+    public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MODID);
+    public static final RegistryObject<EntityType<Rey>> REY = ENTITIES.register("rey", () -> EntityType.Builder.<Rey>of(Rey::new, MobCategory.MONSTER)
+            .sized(1.4f, 3.1f).fireImmune().clientTrackingRange(10).updateInterval(1).build(MODID + ":rey"));
+    public static final RegistryObject<EntityType<ReyProyectil>> REY_PROYECTIL = ENTITIES.register("rey_proyectil",
+            () -> EntityType.Builder.<ReyProyectil>of(ReyProyectil::new, MobCategory.MISC).sized(0.8f, 0.8f).fireImmune().noSave()
+                    .clientTrackingRange(8).updateInterval(1).build(MODID + ":rey_proyectil"));
+
     private static RegistryObject<SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(MODID, name)));
     }
@@ -53,11 +85,20 @@ public class CiudadelaMod {
         FEATURES.register(modBus);
         ITEMS.register(modBus);
         SOUNDS.register(modBus);
+        BLOCKS.register(modBus);
+        ENTITIES.register(modBus);
+        modBus.addListener(this::attributes);
         modBus.addListener(this::setup);
         modBus.addListener(this::tabs);
         MinecraftForge.EVENT_BUS.register(ModEvents.class);
         MinecraftForge.EVENT_BUS.register(StoryEvents.class);
         MinecraftForge.EVENT_BUS.register(Cinematics.class);
+        MinecraftForge.EVENT_BUS.register(ReyEventos.class);
+        MinecraftForge.EVENT_BUS.register(Victoria.class);
+    }
+
+    private void attributes(EntityAttributeCreationEvent e) {
+        e.put(REY.get(), Rey.attributes().build());
     }
 
     private void setup(FMLCommonSetupEvent e) {

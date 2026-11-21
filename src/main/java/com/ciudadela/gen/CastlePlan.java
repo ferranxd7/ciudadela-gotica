@@ -363,6 +363,7 @@ public final class CastlePlan {
         int[][] kc = {{50, -55}, {50, 25}, {-50, 25}};
         for (int[] k : kc) keep.reserve(X(k[0]), Z(k[1]), 12.5).noDoorsNear(X(k[0]), Z(k[1]), 12.5);
         building(keep);
+        this.keep = keep;
         for (int[] k : kc) {
             RoundTower t = new RoundTower(rng.fork(), X(k[0]), Z(k[1]), Y, 9, 82, RoundTower.Top.CONE).slope(2.6);
             for (int fy : keep.floorLevels()) t.doorToward(X(-15), Z(-15), fy);
@@ -456,7 +457,33 @@ public final class CastlePlan {
     // ===================================================================== historia y cinematicas
 
     private TreeTower tree;
+    private Building keep;
     private int ascX = Integer.MIN_VALUE, ascZ;
+
+    /**
+     * El salon del trono: sala, asiento del trono, puertas y sitio del cofre del capitulo 3.
+     * rect = {x0, z0, x1, z1}, y = suelo que se pisa, h = alto del aire; doors = {x, z, alto, muroEnZ}.
+     */
+    public record Throne(int x0, int z0, int x1, int z1, int y, int h, int seatX, int seatY, int seatZ,
+                         java.util.List<int[]> doors, int chestX, int chestZ) {
+        public boolean inside(double x, double yy, double z, double margin) {
+            return x >= x0 + margin && x <= x1 + 1 - margin && z >= z0 + margin && z <= z1 + 1 - margin && yy >= y - 1 && yy <= y + h;
+        }
+    }
+
+    public Throne throne() {
+        if (keep == null) return null;
+        int[] r = keep.roomRect(Room.Type.THRONE, 0);
+        if (r == null) return null;
+        int xc = (r[0] + r[2]) / 2;
+        return new Throne(r[0], r[1], r[2], r[3], r[4], r[5], xc, r[4] + 3, r[1] + 1, keep.roomDoors(Room.Type.THRONE, 0),
+                story[3][0], story[3][2]);
+    }
+
+    /** La sala del arbol (sala del segundo jefe): {centroX, centroZ, suelo, radio}. */
+    public int[] treeHall() {
+        return tree == null ? null : new int[]{tree.centerX(), tree.centerZ(), tree.hallFloor, TreeTower.HALL_R};
+    }
     private final int[][] story = new int[6][];
 
     /** {x, y, z} de la pagina de la cronica del capitulo ch (1..5). */

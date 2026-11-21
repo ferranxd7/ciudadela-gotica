@@ -570,15 +570,24 @@ public final class Decor {
                     c.set(x, F + step, zEdge, Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, Direction.NORTH, false));
                 }
             }
+            // trono a la medida del Rey (unos 3 bloques de alto): asiento de 3, brazos y respaldo alto
             int ty = F + 3, tz = r.z0 + 1;
-            c.set(xc, ty, tz, Pal.stairs(Blocks.POLISHED_BLACKSTONE_STAIRS, Direction.NORTH, false));
-            c.set(xc - 1, ty, tz, Pal.PB_CHISELED);
-            c.set(xc + 1, ty, tz, Pal.PB_CHISELED);
-            BlockState ch1 = ModDeco.candleHolder(Direction.SOUTH, 0);
-            c.set(xc - 1, ty + 1, tz, ch1 != null ? ch1 : Pal.candles(Blocks.RED_CANDLE, 3));
-            c.set(xc + 1, ty + 1, tz, ch1 != null ? ch1 : Pal.candles(Blocks.RED_CANDLE, 3));
-            for (int y = ty; y <= ty + 5; y++) c.set(xc, y, r.z0, y == ty + 5 ? Pal.GILDED : Pal.PB_CHISELED);
-            c.set(xc, ty + 6, r.z0, Pal.b(Blocks.WITHER_SKELETON_SKULL));
+            for (int dx = -1; dx <= 1; dx++) c.set(xc + dx, ty, tz, Pal.stairs(Blocks.POLISHED_BLACKSTONE_STAIRS, Direction.NORTH, false));
+            for (int s = -1; s <= 1; s += 2) {
+                c.set(xc + 2 * s, ty, tz, Pal.PB_CHISELED);
+                c.set(xc + 2 * s, ty + 1, tz, Pal.slab(Blocks.POLISHED_BLACKSTONE_SLAB, false));
+                // velas a los lados, encima de un pedestal
+                c.set(xc + 3 * s, ty, tz, Pal.PB_CHISELED);
+                BlockState ch1 = ModDeco.candleHolder(Direction.SOUTH, 0);
+                c.set(xc + 3 * s, ty + 1, tz, ch1 != null ? ch1 : Pal.candles(Blocks.RED_CANDLE, 3));
+            }
+            for (int dx = -2; dx <= 2; dx++)
+                for (int y = ty; y <= ty + 7; y++) {
+                    boolean side = Math.abs(dx) == 2;
+                    if (side && y > ty + 5) continue;
+                    c.set(xc + dx, y, r.z0, y == ty + 7 || (side && y == ty + 5) ? Pal.GILDED : (side ? Pal.PB_CHISELED : Pal.PB_BRICKS));
+                }
+            c.set(xc, ty + 8, r.z0, Pal.b(Blocks.WITHER_SKELETON_SKULL));
             // braseros
             for (int s = -1; s <= 1; s += 2) {
                 int bx = xc + s * 6;

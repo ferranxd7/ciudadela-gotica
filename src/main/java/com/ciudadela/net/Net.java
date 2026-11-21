@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "1";
+    private static final String V = "2";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(CiudadelaMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -36,6 +36,100 @@ public final class Net {
                 .encoder((m, b) -> {}).decoder(b -> new CineSkip()).consumerMainThread(CineSkip::handle).add();
         CH.messageBuilder(MapOpen.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(MapOpen::write).decoder(MapOpen::read).consumerMainThread(MapOpen::handle).add();
+        CH.messageBuilder(Aviso.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Aviso::write).decoder(Aviso::read).consumerMainThread(Aviso::handle).add();
+        CH.messageBuilder(ReyHabla.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ReyHabla::write).decoder(ReyHabla::read).consumerMainThread(ReyHabla::handle).add();
+        CH.messageBuilder(ReyFoco.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ReyFoco::write).decoder(ReyFoco::read).consumerMainThread(ReyFoco::handle).add();
+        CH.messageBuilder(Cofre.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Cofre::write).decoder(Cofre::read).consumerMainThread(Cofre::handle).add();
+    }
+
+    // ------------------------------------------------------------------ jefe
+
+    /**
+     * Aviso en el suelo de donde va a caer un golpe: forma, centro, medidas (a = radio o largo,
+     * b = radio interior o ancho, ang = hacia donde mira en grados), cuanto falta (ticks) y color.
+     */
+    public record Aviso(int forma, double x, double y, double z, float a, float b, float ang, int dur, int color) {
+        public static final int CIRCULO = 0, ANILLO = 1, LINEA = 2, SECTOR = 3;
+        public static final int ROJO = 0, ORO = 1, NARANJA = 2;
+
+        void write(FriendlyByteBuf buf) {
+            buf.writeByte(forma);
+            buf.writeDouble(x);
+            buf.writeDouble(y);
+            buf.writeDouble(z);
+            buf.writeFloat(a);
+            buf.writeFloat(b);
+            buf.writeFloat(ang);
+            buf.writeVarInt(dur);
+            buf.writeByte(color);
+        }
+
+        static Aviso read(FriendlyByteBuf buf) {
+            return new Aviso(buf.readByte(), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readFloat(), buf.readFloat(),
+                    buf.readFloat(), Math.min(buf.readVarInt(), 400), buf.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.ciudadela.client.rey.ReyCliente.aviso(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El Rey dice una frase (voz y subtitulo). */
+    public record ReyHabla(int entity, int linea) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entity);
+            b.writeByte(linea);
+        }
+
+        static ReyHabla read(FriendlyByteBuf b) {
+            return new ReyHabla(b.readVarInt(), b.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.ciudadela.client.rey.ReyCliente.habla(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** La camara mira al Rey (intro): bandas de cine y el jugador quieto durante ticks. */
+    public record ReyFoco(int entity, int ticks) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entity);
+            b.writeVarInt(ticks);
+        }
+
+        static ReyFoco read(FriendlyByteBuf b) {
+            return new ReyFoco(b.readVarInt(), Math.min(b.readVarInt(), 2400));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.ciudadela.client.rey.ReyCliente.foco(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El cofre del premio sube del suelo con un haz de luz (durante ticks). */
+    public record Cofre(int x, int y, int z, int ticks) {
+        void write(FriendlyByteBuf b) {
+            b.writeInt(x);
+            b.writeInt(y);
+            b.writeInt(z);
+            b.writeVarInt(ticks);
+        }
+
+        static Cofre read(FriendlyByteBuf b) {
+            return new Cofre(b.readInt(), b.readInt(), b.readInt(), Math.min(b.readVarInt(), 2400));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.ciudadela.client.rey.ReyCliente.cofre(this));
+            ctx.get().setPacketHandled(true);
+        }
     }
 
     public static void to(ServerPlayer p, Object msg) {

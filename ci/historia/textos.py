@@ -154,6 +154,52 @@ NARRACION = [
  ("Slay them both... and perhaps, at last, the storm will end.",
   "Mátalos a los dos... y quizá, por fin, la tormenta termine."),
 ]
+# --------------------------------------------------------------- lo que dice el Rey (voz en ingles, subtitulos)
+REY = [
+ ("At last... a visitor. I have waited so long upon this throne.",
+  "Por fin... una visita. He esperado tanto tiempo en este trono."),
+ ("The Shadow promised me a kingdom without end. And you have come to take it from me?",
+  "La Sombra me prometió un reino sin fin. ¿Y tú vienes a quitármelo?"),
+ ("Then kneel before your king... or die standing!",
+  "Entonces arrodíllate ante tu rey... ¡o muere de pie!"),
+ ("Enough! Burn... burn with my kingdom!",
+  "¡Basta! Arde... ¡arde con mi reino!"),
+ ("If my kingdom must fall, you will fall with me... into the fire!",
+  "Si mi reino ha de caer, caerás conmigo... ¡al fuego!"),
+ ("The crown... was never mine to keep...",
+  "La corona... nunca fue mía..."),
+ ("Another fool for my court.",
+  "Otro necio más para mi corte."),
+ ("Is that all? My guards fought better than you.",
+  "¿Eso es todo? Mis guardias peleaban mejor."),
+ ("Feel the fire that devoured my city!",
+  "¡Siente el fuego que devoró mi ciudad!"),
+]
+REY_UI = {
+ "es": {
+  "entity.ciudadela.rey": "Corvin, el Rey que Espera",
+  "entity.ciudadela.rey_proyectil": "Tajo del Rey",
+  "ciudadela.rey.nombre_corto": "Corvin",
+  "block.ciudadela.rastrillo": "Rastrillo de hierro negro",
+  "death.attack.ciudadela.rey": "%1$s fue ejecutado por %2$s",
+  "death.attack.ciudadela.rey.player": "%1$s fue ejecutado por %2$s",
+  "death.attack.ciudadela.rey_area": "%1$s ardió ante %2$s",
+  "death.attack.ciudadela.rey_area.player": "%1$s ardió ante %2$s",
+  "subtitles.ciudadela.rey.voz": "Corvin habla",
+ },
+ "en": {
+  "entity.ciudadela.rey": "Corvin, the King Who Waits",
+  "entity.ciudadela.rey_proyectil": "King's Slash",
+  "ciudadela.rey.nombre_corto": "Corvin",
+  "block.ciudadela.rastrillo": "Black Iron Portcullis",
+  "death.attack.ciudadela.rey": "%1$s was executed by %2$s",
+  "death.attack.ciudadela.rey.player": "%1$s was executed by %2$s",
+  "death.attack.ciudadela.rey_area": "%1$s burned before %2$s",
+  "death.attack.ciudadela.rey_area.player": "%1$s burned before %2$s",
+  "subtitles.ciudadela.rey.voz": "Corvin speaks",
+ },
+}
+
 # pausa (s) despues de cada linea: las largas son los cortes de plano
 PAUSAS = [0.8, 1.6, 0.8, 0.7, 1.6, 1.6, 0.8, 1.6, 0.9, 0.0]
 
@@ -288,6 +334,9 @@ def build():
             d[f"ciudadela.pista.{k}"] = v
         for i, (en, es) in enumerate(NARRACION):
             d[f"ciudadela.narracion.1.{i+1}"] = es if lang == "es" else en
+        for i, (en, es) in enumerate(REY):
+            d[f"ciudadela.rey.voz.{i+1}"] = es if lang == "es" else en
+        d.update(REY_UI[lang])
         out[lang] = d
     return out
 
@@ -304,5 +353,11 @@ if __name__ == "__main__":
     with open(nar, "w", encoding="utf-8") as f:
         for (en, es), p in zip(NARRACION, PAUSAS):
             f.write(f"{en}|{p}\n")
+    # frases del Rey (las usa ci/rey/voces.py)
+    rv = os.path.join(os.path.dirname(__file__), "..", "rey", "frases.txt")
+    os.makedirs(os.path.dirname(rv), exist_ok=True)
+    with open(rv, "w", encoding="utf-8") as f:
+        for en, es in REY:
+            f.write(en + "\n")
     print("Paginas OK" if good else "HAY PAGINAS DEMASIADO LARGAS")
     sys.exit(0 if good else 1)

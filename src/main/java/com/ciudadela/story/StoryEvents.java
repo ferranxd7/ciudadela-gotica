@@ -76,6 +76,7 @@ public final class StoryEvents {
                 int[] site = CastleSites.nearest(((ServerLevel) lvl).getSeed(), pos.getX(), pos.getZ(), 1);
                 if (site != null) items.set(11, Story.map(site[0], site[1]));
             }
+            if (ch == 3) com.ciudadela.rey.Recompensa.llenar(sp, (ServerLevel) lvl, pos, items);
             data.setItems(pos, sp.getUUID(), ContainerHelper.saveAllItems(new CompoundTag(), items));
             Story.markRead(sp, ch);
         }

@@ -640,6 +640,31 @@ public class Building extends Element {
         return l;
     }
 
+    /** {x0, z0, x1, z1, y (suelo que se pisa), alto del aire} de la primera sala de ese tipo en esa planta. */
+    public int[] roomRect(Room.Type t, int floorIndex) {
+        Floor f = floorByIndex(floorIndex);
+        if (f == null) return null;
+        for (Room r : f.rooms)
+            if (r.type == t) return new int[]{r.r.x0, r.r.z0, r.r.x1, r.r.z1, f.y, f.h - 1};
+        return null;
+    }
+
+    /** Casillas de puerta de esa sala: {x, z, alto, 1 si el muro va a lo largo de Z (puerta mirando a X)}. */
+    public List<int[]> roomDoors(Room.Type t, int floorIndex) {
+        List<int[]> l = new ArrayList<>();
+        Floor f = floorByIndex(floorIndex);
+        if (f == null) return l;
+        Room room = null;
+        for (Room r : f.rooms) if (r.type == t) room = r;
+        if (room == null) return l;
+        for (int[] d : f.doors) {
+            boolean xs = room.r.contains(d[0] + 1, d[1]) || room.r.contains(d[0] - 1, d[1]);
+            boolean zs = room.r.contains(d[0], d[1] + 1) || room.r.contains(d[0], d[1] - 1);
+            if (xs || zs) l.add(new int[]{d[0], d[1], d[2], xs ? 1 : 0});
+        }
+        return l;
+    }
+
     /** Para las pruebas: {x, y, z, nx, nz} de cada puerta interior (n = normal del muro). */
     public List<int[]> innerDoors() {
         List<int[]> l = new ArrayList<>();

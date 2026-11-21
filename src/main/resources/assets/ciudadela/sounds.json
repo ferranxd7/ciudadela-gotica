@@ -50,5 +50,86 @@
         "stream": true
       }
     ]
+  },
+  "rey.voz.1": {
+    "subtitle": "subtitles.ciudadela.rey.voz",
+    "sounds": [
+      {
+        "name": "ciudadela:rey/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.2": {
+    "subtitle": "subtitles.ciudadela.rey.voz",
+    "sounds": [
+      {
+        "name": "ciudadela:rey/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.3": {
+    "subtitle": "subtitles.ciudadela.rey.voz",
+    "sounds": [
+      {
+        "name": "ciudadela:rey/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.4": {
+    "subtitle": "subtitles.ciudadela.rey.voz",
+    "sounds": [
+      {
+        "name": "ciudadela:rey/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.5": {
+    "subtitle": "subtitles.ciudadela.rey.voz",
+    "sounds": [
+      {
+        "name": "ciudadela:rey/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.6": {
+    "subtitle": "subtitles.ciudadela.rey.voz",
+    "sounds": [
+      {
+        "name": "ciudadela:rey/voz_6",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.7": {
+    "subtitle": "subtitles.ciudadela.rey.voz",
+    "sounds": [
+      {
+        "name": "ciudadela:rey/voz_7",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.8": {
+    "subtitle": "subtitles.ciudadela.rey.voz",
+    "sounds": [
+      {
+        "name": "ciudadela:rey/voz_8",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.9": {
+    "subtitle": "subtitles.ciudadela.rey.voz",
+    "sounds": [
+      {
+        "name": "ciudadela:rey/voz_9",
+        "stream": false
+      }
+    ]
   }
 }
