@@ -174,7 +174,7 @@ public class Building extends Element {
             double dx = x - c[0], dz = z - c[1];
             if (dx * dx + dz * dz <= c[2] * c[2]) return true;
         }
-        return nearTurret(x, z, 5.8);
+        return nearTurret(x, z, 7.2);
     }
 
     /** Vuelve a colocar las puertas (al cambiar la torreta o los circulos sin puertas). */

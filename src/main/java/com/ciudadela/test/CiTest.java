@@ -159,7 +159,10 @@ public final class CiTest {
                     for (int dz = -1; dz <= 1; dz++) {
                         var sb = lvl.getBlockEntity(cp.offset(dx, 0, dz));
                         if (sb instanceof net.minecraft.world.level.block.entity.SignBlockEntity sg)
-                            sign = "cartel [" + sg.getFrontText().getMessage(0, false).getString() + " | " + sg.getFrontText().getMessage(1, false).getString() + "]";
+                            sign = "cartel [" + sg.getFrontText().getMessage(0, false).getString() + " | " + sg.getFrontText().getMessage(1, false).getString()
+                                    + " | " + sg.getFrontText().getMessage(2, false).getString() + "] encerado=" + sg.isWaxed()
+                                    + " brilla=" + sg.getFrontText().hasGlowingText()
+                                    + " protegido=" + (sg.getPersistentData().getInt(com.ciudadela.gen.Canvas.STORY_TAG) == c);
                     }
                 String what = st.getBlock() == net.minecraft.world.level.block.Blocks.CHEST ? "cofre marca=" + tag : st.toString();
                 log.println("Capitulo " + c + " en " + sp[0] + "," + sp[1] + "," + sp[2] + ": " + what + ", " + sign
@@ -179,7 +182,8 @@ public final class CiTest {
                 for (int i = 0; i < shots.size(); i++) {
                     var sh = shots.get(i);
                     int sHits = 0;
-                    for (float tt = sh.t0; tt <= sh.t1; tt += 0.25f) {
+                    // el principio del primer plano sale de los ojos del jugador, al lado del cofre: no cuenta
+                    for (float tt = sh.t0 + (i == 0 ? 1.5f : 0f); tt <= sh.t1; tt += 0.25f) {
                         double[] a = sh.at(tt);
                         pts++;
                         int bx = (int) Math.floor(a[0]), by = (int) Math.floor(a[1]), bz = (int) Math.floor(a[2]);
