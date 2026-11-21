@@ -5,6 +5,9 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -27,6 +30,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * 1) La zona usa un bioma propio ("tormenta") con cielo gris, niebla oscura y lluvia asegurada.
  * 2) A cada jugador que esta dentro se le envia lluvia y truenos aunque en el resto del mundo haga
  *    sol, y caen relampagos solo visuales (no queman nada). Al salir recupera el tiempo real.
+ * 3) Ahi arriba siempre es de noche: cada tick se le manda medianoche (despues de la hora real que
+ *    el servidor reparte cada segundo, asi nunca llega a verse el dia).
  */
 public final class Storm {
     private Storm() {}
@@ -90,11 +95,29 @@ public final class Storm {
         }
     }
 
+    /** Medianoche. */
+    private static final long NIGHT = 18000L;
+
+    /** Cada tick del servidor (al final): los que estan en la isla ven siempre la noche. */
+    public static void night(MinecraftServer server) {
+        if (INSIDE.isEmpty()) return;
+        for (UUID id : INSIDE) {
+            ServerPlayer p = server.getPlayerList().getPlayer(id);
+            if (p == null || p.serverLevel().dimension() != Level.OVERWORLD) continue;
+            p.connection.send(new ClientboundSetTimePacket(p.serverLevel().getGameTime(), NIGHT, false));
+        }
+    }
+
+    public static boolean inside(ServerPlayer p) {
+        return INSIDE.contains(p.getUUID());
+    }
+
     public static void forget(UUID id) {
         INSIDE.remove(id);
     }
 
     private static void restore(ServerPlayer p, ServerLevel lvl) {
+        p.connection.send(new ClientboundSetTimePacket(lvl.getGameTime(), lvl.getDayTime(), lvl.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)));
         if (lvl.isRaining()) {
             p.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0));
             p.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, lvl.getRainLevel(1.0F)));

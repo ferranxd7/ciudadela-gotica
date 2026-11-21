@@ -55,6 +55,9 @@ jobs:
           set -o pipefail
           gradle build --no-daemon --stacktrace 2>&1 | tee build.log
 
+      - name: Firmas de la API (para programar)
+        run: bash ci/firmas.sh > out/firmas.txt 2>&1 || true
+
       - name: Preparar servidor Forge real
         run: |
           mkdir -p srv out

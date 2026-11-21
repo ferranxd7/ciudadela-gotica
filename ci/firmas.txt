@@ -1,0 +1,2 @@
+net.minecraft.client.sounds.SoundManager
+net.minecraft.client.resources.sounds.SimpleSoundInstance

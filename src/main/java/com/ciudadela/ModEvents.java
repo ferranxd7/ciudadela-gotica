@@ -69,6 +69,11 @@ public final class ModEvents {
     }
 
     @SubscribeEvent
+    public static void onServerTick(net.minecraftforge.event.TickEvent.ServerTickEvent event) {
+        if (event.phase == net.minecraftforge.event.TickEvent.Phase.END) com.ciudadela.world.Storm.night(event.getServer());
+    }
+
+    @SubscribeEvent
     public static void onLogout(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent event) {
         com.ciudadela.world.Storm.forget(event.getEntity().getUUID());
     }

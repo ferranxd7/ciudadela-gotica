@@ -159,11 +159,14 @@ public final class ClientCine {
         // la voz del narrador (capitulo 1)
         if (chapter == 1 && !narrStarted && t >= Timeline.NARR_START) {
             narrStarted = true;
-            if (Timeline.hasAudio()) {
-                narr = new SimpleSoundInstance(CiudadelaMod.NARRACION_1.get().getLocation(), SoundSource.VOICE, 1.0f, 1.0f,
-                        SoundInstance.createUnseededRandom(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true);
-                mc.getSoundManager().play(narr);
-            }
+            // en la categoria general (MASTER): suena aunque la barra de "Voz" este bajada
+            ResourceLocation loc = CiudadelaMod.NARRACION_1.get().getLocation();
+            narr = new SimpleSoundInstance(loc, SoundSource.MASTER, 1.0f, 1.0f,
+                    SoundInstance.createUnseededRandom(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true);
+            mc.getSoundManager().play(narr);
+            CiudadelaMod.LOGGER.info("[Ciudadela] Narracion del capitulo 1: {} (audio en el mod: {}, volumen general {})",
+                    mc.getSoundManager().getSoundEvent(loc) != null ? "reproduciendo" : "NO ENCONTRADA", Timeline.hasAudio(),
+                    mc.options.getSoundSourceVolume(SoundSource.MASTER));
         }
         // rayos programados por el servidor
         for (int k = 0; k < boltDone.length; k++) {
