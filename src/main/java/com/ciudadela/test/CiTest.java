@@ -77,6 +77,10 @@ public final class CiTest {
             plan(lvl, s[0], s[1], 150, Y0 - 6, new File(out, "9_sotano_1.png"));
             plan(lvl, s[0], s[1], 150, Y0 - 13, new File(out, "10_sotano_2.png"));
             plan(lvl, s[0], s[1], 240, Y0 + 27, new File(out, "11_murallas_ronda.png"));
+            plan(lvl, s[0] - 41, s[1] + 7, 20, Y0, new File(out, "14_cocina_torreon_suelo.png"));
+            plan(lvl, s[0] - 41, s[1] + 7, 20, Y0 + 1, new File(out, "15_cocina_torreon_encimeras.png"));
+            plan(lvl, s[0] - 41, s[1] + 7, 20, Y0 + 2, new File(out, "16_cocina_torreon_armarios.png"));
+            plan(lvl, s[0], s[1] - 38, 34, Y0 + 1, new File(out, "17_sala_del_trono.png"));
             // ---- comprobaciones automaticas
             CastlePlan plan = com.ciudadela.world.PlanCache.get(seed, s[0], s[1], (x, z) -> 64);
             try (PrintWriter acc = new PrintWriter(new File(out, "accesos.txt"))) {
@@ -86,6 +90,14 @@ public final class CiTest {
                     if (e instanceof com.ciudadela.gen.RoundTower rt) {
                         int target = rt.top == com.ciudadela.gen.RoundTower.Top.PLATFORM ? rt.topY + 1 : rt.lastFloor();
                         res = reach(lvl, rt.cx, rt.cz, rt.radius - 1, rt.groundY, target);
+                        StringBuilder doorsRes = new StringBuilder();
+                        for (double[] d : rt.doorList()) {
+                            int dy = (int) d[1];
+                            int tx = rt.cx + (int) Math.round(Math.cos(d[0]) * (rt.radius - 2.5)), tz = rt.cz + (int) Math.round(Math.sin(d[0]) * (rt.radius - 2.5));
+                            String rr = reachSpot(lvl, rt.cx, rt.cz, rt.radius - 1, rt.groundY, tx, dy, tz);
+                            if (!rr.equals("OK")) doorsRes.append(" | puerta y=").append(dy).append(": ").append(rr);
+                        }
+                        if (doorsRes.length() > 0) res = res.replace("OK", "FALLA puertas") + doorsRes;
                         res = "Torre " + rt.cx + "," + rt.cz + " (radio " + rt.radius + ", " + rt.top + ", plantas " + rt.floors() + "): " + res;
                     } else if (e instanceof com.ciudadela.gen.Building b && b.turretInfo() != null) {
                         int[] t = b.turretInfo();
@@ -197,6 +209,49 @@ public final class CiTest {
             }
         }
         return "FALLA: solo se llega hasta y=" + best + " (faltan " + (targetY - best) + ")";
+    }
+
+    /** ¿Se llega andando desde abajo a pisar en (tx, ty, tz) o a 2 bloques de ahi a esa misma altura? */
+    private static String reachSpot(ServerLevel lvl, int cx, int cz, int r, int y0, int tx, int ty, int tz) {
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        int H = ty - y0 + 6;
+        int W = 2 * r + 1;
+        boolean[] seen = new boolean[W * W * (H + 1)];
+        java.util.ArrayDeque<int[]> q = new java.util.ArrayDeque<>();
+        for (int x = cx - r; x <= cx + r; x++)
+            for (int z = cz - r; z <= cz + r; z++)
+                for (int y = y0; y <= y0 + 1; y++) {
+                    if ((x - cx) * (x - cx) + (z - cz) * (z - cz) > r * r) continue;
+                    if (stand(lvl, m, x, y, z)) {
+                        seen[((x - cx + r) * W + (z - cz + r)) * (H + 1) + (y - y0)] = true;
+                        q.add(new int[]{x, y, z});
+                    }
+                }
+        int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        while (!q.isEmpty()) {
+            int[] p = q.poll();
+            if (p[1] == ty && Math.abs(p[0] - tx) <= 2 && Math.abs(p[2] - tz) <= 2) return "OK";
+            for (int[] d : dirs) {
+                int nx = p[0] + d[0], nz = p[2] + d[1];
+                if ((nx - cx) * (nx - cx) + (nz - cz) * (nz - cz) > r * r) continue;
+                for (int dy = 1; dy >= -3; dy--) {
+                    int ny = p[1] + dy;
+                    if (ny < y0 || ny > y0 + H) continue;
+                    if (dy == 1 && !passable(lvl, m, p[0], p[1] + 2, p[2])) continue;
+                    if (!stand(lvl, m, nx, ny, nz)) continue;
+                    if (dy < 0) {
+                        boolean clear = true;
+                        for (int yy = ny + 2; yy <= p[1] + 1 && clear; yy++) if (!passable(lvl, m, nx, yy, nz)) clear = false;
+                        if (!clear) continue;
+                    }
+                    int idx = ((nx - cx + r) * W + (nz - cz + r)) * (H + 1) + (ny - y0);
+                    if (seen[idx]) continue;
+                    seen[idx] = true;
+                    q.add(new int[]{nx, ny, nz});
+                }
+            }
+        }
+        return "no se llega";
     }
 
     /** Lista todos los bloques de los mods de decoracion con sus propiedades. */

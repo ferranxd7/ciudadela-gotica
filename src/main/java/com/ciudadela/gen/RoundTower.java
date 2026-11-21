@@ -100,12 +100,32 @@ public class RoundTower extends Element {
      * quedan a menos de 5 bloques de otra. Asi nunca hay un suelo a la altura de la cabeza.
      */
     public List<Integer> floors() {
-        TreeSet<Integer> all = new TreeSet<>(doorFloors);
+        TreeSet<Integer> all = new TreeSet<>();
+        // dos puertas muy juntas en altura: la de arriba no lleva planta entera, solo pasarela
+        for (int y : doorFloors) {
+            Integer lo = all.floor(y);
+            if (lo == null || y - lo >= 5) all.add(y);
+        }
         for (int y : regular) {
             Integer lo = all.floor(y), hi = all.ceiling(y);
             if ((lo == null || y - lo >= 5) && (hi == null || hi - y >= 5)) all.add(y);
         }
         return new ArrayList<>(all);
+    }
+
+    /** Alturas de puerta que no tienen planta entera (llevan descansillo y pasarela). */
+    private List<Integer> catwalks() {
+        List<Integer> f = floors();
+        List<Integer> out = new ArrayList<>();
+        for (int y : doorFloors) if (!f.contains(y)) out.add(y);
+        return out;
+    }
+
+    /** Puertas: {angulo, altura} (para las pruebas automaticas). */
+    public List<double[]> doorList() {
+        List<double[]> l = new ArrayList<>();
+        for (double[] d : doors) l.add(new double[]{d[0], d[1]});
+        return l;
     }
 
     public int lastFloor() {
@@ -233,6 +253,24 @@ public class RoundTower extends Element {
                     }
                 }
             }
+        // descansillos y pasarelas hasta las puertas que no tienen planta propia
+        for (int cy : catwalks()) {
+            for (int x = Math.max(cx - radius, c.minX); x <= Math.min(cx + radius, c.maxX); x++)
+                for (int z = Math.max(cz - radius, c.minZ); z <= Math.min(cz + radius, c.maxZ); z++) {
+                    int dx = x - cx, dz = z - cz;
+                    double d = Math.sqrt(dx * dx + dz * dz);
+                    if (d > inner || Spiral.inWell(dx, dz)) continue;
+                    boolean landing = Math.max(Math.abs(dx), Math.abs(dz)) == 3;
+                    boolean path = false;
+                    for (double[] door : doors) {
+                        if ((int) door[1] != cy) continue;
+                        double t = dx * Math.cos(door[0]) + dz * Math.sin(door[0]);
+                        double perp = Math.abs(-dx * Math.sin(door[0]) + dz * Math.cos(door[0]));
+                        if (t >= 2.5 && perp <= 1.3) path = true;
+                    }
+                    if (landing || path) c.set(x, cy - 1, z, Pal.DS_TILES);
+                }
+        }
         // escalera
         int yEnd = top == Top.PLATFORM ? topY : lastFloor;
         Spiral.build(c, cx, cz, groundY, yEnd, (int) (seed & 15), Blocks.DEEPSLATE_BRICK_STAIRS, Pal::wall);
