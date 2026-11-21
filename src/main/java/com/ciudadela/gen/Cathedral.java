@@ -30,6 +30,11 @@ public class Cathedral extends Element {
         bounds(Math.min(cx - AISLE - 4, west.x0), Y - 2, zN - NAVE - 3, Math.max(cx + AISLE + 4, east.x1), Y + 92 + 42 + 10, Math.max(zS + 3, west.z1));
     }
 
+    /** {cx, zN, zS} para el mapa. */
+    public int[] axis() {
+        return new int[]{cx, zN, zS};
+    }
+
     private int vault(int adx) {
         double k = adx / 10.5;
         return Y + 30 + (int) Math.round(8 * (1 - k * k));
@@ -273,7 +278,8 @@ public class Cathedral extends Element {
                 c.set(x, Y, z + 1, Pal.PB_BRICKS);
                 c.set(x, Y + 1, z, Pal.b(Blocks.SKELETON_SKULL));
                 c.set(x, Y + 1, z + 1, Pal.slab(Blocks.POLISHED_BLACKSTONE_SLAB, false));
-                c.set(x + s * 3, Y, z + 3, Pal.candles(Blocks.BLACK_CANDLE, 3));
+                c.set(x + s * 3, Y, z + 3, Pal.b(Blocks.POLISHED_BLACKSTONE_WALL));
+                c.set(x + s * 3, Y + 1, z + 3, Pal.candles(Blocks.BLACK_CANDLE, 3));
                 c.set(cx + s * 17, Y + HA - 3, z + 2, Pal.SOUL_LANTERN_HANG);
             }
         }

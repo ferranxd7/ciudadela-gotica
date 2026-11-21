@@ -6,3 +6,7 @@ out/
 .idea/
 eclipse/
 bin/
+piper/
+narr_tmp/
+piper.tgz
+voces_out/

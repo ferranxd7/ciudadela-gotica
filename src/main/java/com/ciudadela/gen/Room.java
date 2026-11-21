@@ -8,7 +8,7 @@ public final class Room {
     public enum Type {
         GREAT_HALL, THRONE, DINING, KITCHEN, LIBRARY, LIBRARY_GRAND, BEDROOM, BATH, CELLAR, WINE_CELLAR,
         ARMORY, CHAPEL, STUDY, STORAGE, GALLERY, TREASURY, PRISON, CRYPT, ALCHEMY, BALLROOM, SERVANTS,
-        BARRACKS, SMITHY, STABLE, OBSERVATORY, EMPTY
+        BARRACKS, SMITHY, STABLE, OBSERVATORY, LIVING, EMPTY
     }
 
     public final Rect r;
@@ -19,6 +19,11 @@ public final class Room {
     public int height;   // altura libre: aire de floorY a floorY+height-1
     /** Celdas de paso (puertas) que no se deben tapar con muebles. Clave = Room.key(x,z). */
     public final Set<Long> keepClear = new HashSet<>();
+    /** Celdas pegadas a una ventana (ahi no van muebles altos ni cuadros). */
+    public final Set<Long> windows = new HashSet<>();
+    /** Hueco abierto encima de la sala (atrio de la biblioteca): ahi el techo de verdad esta en atriumTop. */
+    public Rect atrium;
+    public int atriumTop;
 
     public Room(Rect r, Type type) {
         this.r = r;
@@ -40,7 +45,24 @@ public final class Room {
                 keepClear.add(key(x + dx, z + dz));
     }
 
+    /**
+     * Pasillo libre delante de una puerta: 'depth' casillas hacia dentro (nx, nz) y 'half' a cada lado.
+     * Asi ningun mueble, pilar o sofa tapa la entrada.
+     */
+    public void markApproach(int x, int z, int nx, int nz, int depth, int half) {
+        int px = -nz, pz = nx;
+        for (int k = 0; k < depth; k++)
+            for (int s = -half; s <= half; s++) {
+                int cx = x + nx * k + px * s, cz = z + nz * k + pz * s;
+                if (r.contains(cx, cz)) keepClear.add(key(cx, cz));
+            }
+    }
+
     public boolean clear(int x, int z) {
         return keepClear.contains(key(x, z));
+    }
+
+    public boolean window(int x, int z) {
+        return windows.contains(key(x, z));
     }
 }

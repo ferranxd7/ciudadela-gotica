@@ -1,7 +1,15 @@
 package com.ciudadela.gen;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.StandingSignBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.block.state.properties.RotationSegment;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -118,6 +126,40 @@ public final class Canvas {
         BlockPos p = new BlockPos(x, y, z);
         level.setBlock(p, Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, facing), 2);
         if (loot != null) RandomizableContainerBlockEntity.setLootTable(level, random, p, loot);
+    }
+
+    /** Marca de los cofres y carteles de la historia (en los datos del bloque). */
+    public static final String STORY_TAG = "ciudadela_cap";
+
+    /** Cofre de un capitulo de la cronica: cada jugador ve su propio contenido (ver StoryEvents). */
+    public void storyChest(int x, int y, int z, Direction facing, int chapter) {
+        if (!in(x, y, z)) return;
+        BlockPos p = new BlockPos(x, y, z);
+        level.setBlock(p, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, facing), 2);
+        BlockEntity be = level.getBlockEntity(p);
+        if (be != null) be.getPersistentData().putInt(STORY_TAG, chapter);
+    }
+
+    /** Cartel junto al cofre: CAPITULO N y el titulo, en el idioma de cada jugador. */
+    public void storySign(int x, int y, int z, Direction front, int chapter) {
+        if (!in(x, y, z)) return;
+        BlockPos p = new BlockPos(x, y, z);
+        level.setBlock(p, Blocks.DARK_OAK_SIGN.defaultBlockState().setValue(StandingSignBlock.ROTATION, RotationSegment.convertToSegment(front)), 2);
+        if (level.getBlockEntity(p) instanceof SignBlockEntity sign) writeSign(sign, chapter);
+    }
+
+    /** Texto del cartel de un capitulo (traducido en el cliente de cada jugador). */
+    public static void writeSign(SignBlockEntity sign, int chapter) {
+        SignText t = new SignText()
+                .setMessage(0, Component.translatable("ciudadela.capitulo", chapter).withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD))
+                .setMessage(1, Component.translatable("ciudadela.cap." + chapter + ".cartel1").withStyle(ChatFormatting.GOLD))
+                .setMessage(2, Component.translatable("ciudadela.cap." + chapter + ".cartel2").withStyle(ChatFormatting.GOLD))
+                .setMessage(3, Component.literal("- + -").withStyle(ChatFormatting.DARK_GRAY))
+                .setColor(DyeColor.RED).setHasGlowingText(true);
+        sign.setText(t, true);
+        sign.setText(t, false);
+        sign.setWaxed(true);
+        sign.getPersistentData().putInt(STORY_TAG, chapter);
     }
 
     public void addEntity(Entity e) {

@@ -95,6 +95,16 @@ public class Building extends Element {
         computeDoors();
         int[] t = turretCenter();
         reserve(t[0], t[1], 6.5);
+        prepareRooms();
+    }
+
+    /** Ventanas y atrios de cada sala (se calcula al hacer el plano: durante la construccion no se toca nada compartido). */
+    private void prepareRooms() {
+        for (Floor f : floors) {
+            for (Room r : f.rooms) r.windows.clear();
+            markWindows(f);
+            markAtrium(f);
+        }
     }
 
     public Building noTimber() {
@@ -175,6 +185,7 @@ public class Building extends Element {
             int[] t = turretCenter();
             reserve(t[0], t[1], 6.5);
         }
+        prepareRooms();
         return this;
     }
 
@@ -253,6 +264,7 @@ public class Building extends Element {
                     r.markDoor(e[2], e[3]);
                     r.markDoor(e[2] + d.getClockWise().getStepX(), e[3] + d.getClockWise().getStepZ());
                     r.markDoor(e[2] - d.getClockWise().getStepX(), e[3] - d.getClockWise().getStepZ());
+                    r.markApproach(e[2], e[3], -d.getStepX(), -d.getStepZ(), 4, entranceHalf() + 1);
                 }
             }
         }
@@ -269,6 +281,10 @@ public class Building extends Element {
                 if (r.r.contains(px + 1, pz) || r.r.contains(px - 1, pz) || r.r.contains(px, pz + 1) || r.r.contains(px, pz - 1)) {
                     r.markDoor(px, pz);
                 }
+                if (r.r.contains(px + 1, pz)) r.markApproach(px + 1, pz, 1, 0, 3, 1);
+                if (r.r.contains(px - 1, pz)) r.markApproach(px - 1, pz, -1, 0, 3, 1);
+                if (r.r.contains(px, pz + 1)) r.markApproach(px, pz + 1, 0, 1, 3, 1);
+                if (r.r.contains(px, pz - 1)) r.markApproach(px, pz - 1, 0, -1, 3, 1);
             }
         }
     }
@@ -390,6 +406,52 @@ public class Building extends Element {
         }
     }
 
+    /** Apunta en cada sala las casillas que quedan delante de una ventana (misma cuenta que buildWindows). */
+    private void markWindows(Floor f) {
+        if (f.index < 0 || f.h - 3 < 2) return;
+        boolean wide = f.h >= 8;
+        for (int side = 0; side < 4; side++) {
+            int len = (side % 2 == 0) ? fp.w() : fp.d();
+            for (int a = 4; a <= len - 5; a += 8) {
+                int wx, wz, ix, iz;
+                if (side == 0) { wx = fp.x0 + a; wz = fp.z0; ix = wx; iz = wz + 1; }
+                else if (side == 2) { wx = fp.x0 + a; wz = fp.z1; ix = wx; iz = wz - 1; }
+                else if (side == 1) { wx = fp.x1; wz = fp.z0 + a; ix = wx - 1; iz = wz; }
+                else { wx = fp.x0; wz = fp.z0 + a; ix = wx + 1; iz = wz; }
+                if (nearTurret(wx, wz, 6.5)) continue;
+                int halfW = wide ? 1 : 0;
+                for (int k = -halfW - 1; k <= halfW + 1; k++) {
+                    int px = side % 2 == 0 ? ix + k : ix, pz = side % 2 == 0 ? iz : iz + k;
+                    Room r = f.roomAt(px, pz);
+                    if (r != null) r.windows.add(Room.key(px, pz));
+                }
+            }
+        }
+    }
+
+    /** Si encima de esta planta hay un atrio abierto, el techo de verdad es el de arriba del todo. */
+    private void markAtrium(Floor f) {
+        Rect hole = null;
+        int ceil = topY;
+        boolean found = false;
+        for (Floor g : floors) {
+            if (g.index <= f.index) continue;
+            if (g.voidRect != null) {
+                if (hole == null) hole = g.voidRect;
+                found = true;
+            } else if (found) {
+                ceil = Math.min(ceil, g.y - 1);
+                break;
+            }
+        }
+        if (!found) return;
+        for (Room r : f.rooms) {
+            if (!r.r.intersects(hole)) continue;
+            r.atrium = hole;
+            r.atriumTop = ceil;
+        }
+    }
+
     private void buildWalls(Canvas c) {
         int low = floors.get(0).y - 1;
         for (int x = fp.x0; x <= fp.x1; x++)
@@ -479,16 +541,54 @@ public class Building extends Element {
         }
     }
 
+    /** True si el contrafuerte en (x, z) del lado "out" taparia una entrada o sus farolas. */
+    private boolean nearEntrance(int x, int z, Direction out) {
+        for (int[] e : entranceCells()) {
+            if (e[2] != out.getStepX() || e[3] != out.getStepZ()) continue;
+            int along = out.getAxis() == Direction.Axis.Z ? Math.abs(x - e[0]) : Math.abs(z - e[1]);
+            if (along <= e[4] + 3) return true;
+        }
+        return false;
+    }
+
     private void buildButtresses(Canvas c) {
         if (mossy) return;
         for (int a = 8; a <= fp.w() - 8; a += 8) {
-            if (!nearTurret(fp.x0 + a, fp.z0, 6.5)) buttress(c, fp.x0 + a, fp.z0, Direction.NORTH);
-            if (!nearTurret(fp.x0 + a, fp.z1, 6.5)) buttress(c, fp.x0 + a, fp.z1, Direction.SOUTH);
+            if (!nearTurret(fp.x0 + a, fp.z0, 6.5) && !nearEntrance(fp.x0 + a, fp.z0, Direction.NORTH)) buttress(c, fp.x0 + a, fp.z0, Direction.NORTH);
+            if (!nearTurret(fp.x0 + a, fp.z1, 6.5) && !nearEntrance(fp.x0 + a, fp.z1, Direction.SOUTH)) buttress(c, fp.x0 + a, fp.z1, Direction.SOUTH);
         }
         for (int a = 8; a <= fp.d() - 8; a += 8) {
-            if (!nearTurret(fp.x0, fp.z0 + a, 6.5)) buttress(c, fp.x0, fp.z0 + a, Direction.WEST);
-            if (!nearTurret(fp.x1, fp.z0 + a, 6.5)) buttress(c, fp.x1, fp.z0 + a, Direction.EAST);
+            if (!nearTurret(fp.x0, fp.z0 + a, 6.5) && !nearEntrance(fp.x0, fp.z0 + a, Direction.WEST)) buttress(c, fp.x0, fp.z0 + a, Direction.WEST);
+            if (!nearTurret(fp.x1, fp.z0 + a, 6.5) && !nearEntrance(fp.x1, fp.z0 + a, Direction.EAST)) buttress(c, fp.x1, fp.z0 + a, Direction.EAST);
         }
+    }
+
+    /** Medio ancho del hueco de la entrada (1 = puerta de casa, 2 = portalon). */
+    private int entranceHalf() {
+        return Math.min(fp.w(), fp.d()) >= 20 ? 2 : 1;
+    }
+
+    /** {xMuro, zMuro, dx hacia fuera, dz hacia fuera, medio ancho} de cada entrada exterior. */
+    public List<int[]> entranceCells() {
+        List<int[]> l = new ArrayList<>();
+        Floor g = floorByIndex(0);
+        if (g == null) return l;
+        for (Direction d : entrances) {
+            int[] e = entrance(g, d);
+            if (e != null) l.add(new int[]{e[0], e[1], d.getStepX(), d.getStepZ(), entranceHalf()});
+        }
+        return l;
+    }
+
+    /** Para las pruebas: {x, y, z, nx, nz} de cada puerta interior (n = normal del muro). */
+    public List<int[]> innerDoors() {
+        List<int[]> l = new ArrayList<>();
+        for (Floor f : floors)
+            for (int[] d : f.doors) {
+                boolean wallAlongZ = f.roomAt(d[0] + 1, d[1]) != null || f.roomAt(d[0] - 1, d[1]) != null;
+                l.add(new int[]{d[0], f.y, d[1], wallAlongZ ? 1 : 0, wallAlongZ ? 0 : 1});
+            }
+        return l;
     }
 
     private void buildEntrances(Canvas c) {
@@ -498,7 +598,7 @@ public class Building extends Element {
             int[] e = entrance(g, d);
             if (e == null) continue;
             Direction side = d.getClockWise();
-            int w = Math.min(fp.w(), fp.d()) >= 20 ? 2 : 1;
+            int w = entranceHalf();
             int hgt = Math.min(g.h - 2, w == 2 ? 5 : 3);
             for (int k = -w; k <= w; k++) {
                 int px = e[0] + side.getStepX() * k, pz = e[1] + side.getStepZ() * k;

@@ -116,6 +116,102 @@ public final class CiTest {
                 acc.println("TOTAL: " + ok + " accesibles, " + bad + " con problemas");
                 log.println("Accesos (subir a lo alto de cada torre): " + ok + " bien, " + bad + " mal");
             }
+            // ---- puertas: que no las tape nada (contrafuertes, pilares, muebles, farolas...)
+            try (PrintWriter pw = new PrintWriter(new File(out, "puertas.txt"))) {
+                int ok = 0, bad = 0;
+                BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+                for (com.ciudadela.gen.Element e : plan.elements()) {
+                    if (!(e instanceof com.ciudadela.gen.Building b)) continue;
+                    for (int[] en : b.entranceCells()) {
+                        String why = blocked(lvl, m, en[0], b.baseY, en[1], en[2], en[3], 3);
+                        if (why == null) ok++;
+                        else {
+                            bad++;
+                            pw.println("ENTRADA " + b.fp + " en " + en[0] + "," + b.baseY + "," + en[1] + ": " + why);
+                        }
+                    }
+                    for (int[] dr : b.innerDoors()) {
+                        String w1 = blocked(lvl, m, dr[0], dr[1], dr[2], dr[3], dr[4], 2);
+                        String w2 = blocked(lvl, m, dr[0], dr[1], dr[2], -dr[3], -dr[4], 2);
+                        if (w1 == null && w2 == null) ok++;
+                        else {
+                            bad++;
+                            pw.println("PUERTA " + b.fp + " en " + dr[0] + "," + dr[1] + "," + dr[2] + ": " + (w1 != null ? w1 : w2));
+                        }
+                    }
+                }
+                pw.println("TOTAL: " + ok + " despejadas, " + bad + " tapadas");
+                log.println("Puertas: " + ok + " despejadas, " + bad + " tapadas");
+            }
+            // ---- cofres de la cronica con su cartel
+            for (int c = 1; c <= 5; c++) {
+                int[] sp = plan.storySpot(c);
+                if (sp == null) {
+                    log.println("Capitulo " + c + ": sin sitio");
+                    continue;
+                }
+                BlockPos cp = new BlockPos(sp[0], sp[1], sp[2]);
+                var st = lvl.getBlockState(cp);
+                var be = lvl.getBlockEntity(cp);
+                int tag = be == null ? 0 : be.getPersistentData().getInt(com.ciudadela.gen.Canvas.STORY_TAG);
+                String sign = "sin cartel";
+                for (int dx = -1; dx <= 1; dx++)
+                    for (int dz = -1; dz <= 1; dz++) {
+                        var sb = lvl.getBlockEntity(cp.offset(dx, 0, dz));
+                        if (sb instanceof net.minecraft.world.level.block.entity.SignBlockEntity sg)
+                            sign = "cartel [" + sg.getFrontText().getMessage(0, false).getString() + " | " + sg.getFrontText().getMessage(1, false).getString() + "]";
+                    }
+                String what = st.getBlock() == net.minecraft.world.level.block.Blocks.CHEST ? "cofre marca=" + tag : st.toString();
+                log.println("Capitulo " + c + " en " + sp[0] + "," + sp[1] + "," + sp[2] + ": " + what + ", " + sign
+                        + ((c == 3 || c == 5) ? " (aparece al morir el jefe)" : ""));
+            }
+            for (int c = 1; c <= 5; c++) {
+                var book = com.ciudadela.story.Story.book(c);
+                log.println("Libro " + c + ": " + book.getTag().getList("pages", 8).size() + " paginas");
+            }
+            var md = com.ciudadela.gen.MapShapes.build(plan);
+            log.println("Mapa: " + md.shapes().length + " numeros de dibujo, " + md.labels().length + " nombres");
+            // ---- camara de la cinematica del capitulo 1: que no atraviese nada
+            try (PrintWriter pw = new PrintWriter(new File(out, "camara.txt"))) {
+                BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+                var shots = com.ciudadela.cine.Cinematics.preview(plan);
+                int hits = 0, n = 0;
+                for (int i = 0; i < shots.size(); i++) {
+                    var sh = shots.get(i);
+                    int sHits = 0;
+                    for (float tt = sh.t0; tt <= sh.t1; tt += 0.25f) {
+                        double[] a = sh.at(tt);
+                        n++;
+                        int bx = (int) Math.floor(a[0]), by = (int) Math.floor(a[1]), bz = (int) Math.floor(a[2]);
+                        String hit = null;
+                        for (int dx = -1; dx <= 1 && hit == null; dx++)
+                            for (int dy = -1; dy <= 1 && hit == null; dy++)
+                                for (int dz = -1; dz <= 1 && hit == null; dz++) {
+                                    var st = lvl.getBlockState(m.set(bx + dx, by + dy, bz + dz));
+                                    if (!st.isAir() && !st.is(net.minecraft.world.level.block.Blocks.WATER)) hit = st.getBlock().getDescriptionId();
+                                }
+                        if (hit != null) {
+                            sHits++;
+                            if (sHits <= 6) pw.println("plano " + (i + 1) + " t=" + String.format("%.2f", tt) + " en " + bx + "," + by + "," + bz + ": " + hit);
+                        }
+                    }
+                    hits += sHits;
+                    pw.println("plano " + (i + 1) + ": " + sHits + " choques");
+                }
+                pw.println("TOTAL: " + hits + " de " + n + " puntos chocan");
+                log.println("Camara del capitulo 1: " + hits + " de " + n + " puntos chocan con algo");
+            }
+            // ---- fotos de las salas nuevas
+            plan(lvl, s[0] + 40, s[1] - 30, 30, Y0 + 1, new File(out, "18_sala_de_estar.png"), 5);
+            plan(lvl, s[0] + 40, s[1] - 30, 30, Y0 + 6, new File(out, "19_sala_de_estar_campana.png"), 5);
+            sectionZoomX(lvl, s[0] - 93, s[1] - 70, s[1] + 10, Y0 - 2, Y0 + 40, 5, new File(out, "20_biblioteca_corte.png"));
+            var ci = plan.cine();
+            plan(lvl, ci.ascX(), ci.ascZ(), 12, Y0, new File(out, "21_torre_ascenso_arriba.png"), 8);
+            plan(lvl, s[0], s[1] + 85, 14, Y0, new File(out, "22_fuente_cofre.png"), 8);
+            plan(lvl, s[0] + 92, s[1] - 76, 14, Y0 + 1, new File(out, "23_catedral_altar.png"), 8);
+            int paintings = lvl.getEntitiesOfClass(net.minecraft.world.entity.decoration.Painting.class,
+                    new net.minecraft.world.phys.AABB(s[0] - 60, Y0 - 20, s[1] - 60, s[0] + 60, Y0 + 60, s[1] + 30)).size();
+            log.println("Cuadros en el torreon: " + paintings);
             // ---- bioma de tormenta
             log.println("Bioma en el centro de la isla: " + lvl.getBiome(new net.minecraft.core.BlockPos(s[0], Y0, s[1])).unwrapKey().map(k -> k.location().toString()).orElse("?"));
             log.println("Bioma en el suelo bajo la isla: " + lvl.getBiome(new net.minecraft.core.BlockPos(s[0] + 100, 70, s[1] + 100)).unwrapKey().map(k -> k.location().toString()).orElse("?"));
@@ -349,9 +445,41 @@ public final class CiTest {
         ImageIO.write(img, "png", f);
     }
 
-    /** Planta (corte horizontal) a escala 3 px por bloque. */
+    /** ¿Algo con colision delante de una puerta? (nx, nz) hacia donde se mira, depth casillas. */
+    private static String blocked(ServerLevel lvl, BlockPos.MutableBlockPos m, int x, int y, int z, int nx, int nz, int depth) {
+        for (int k = 1; k <= depth; k++)
+            for (int dy = 0; dy <= 1; dy++) {
+                int px = x + nx * k, pz = z + nz * k, py = y + dy;
+                BlockState st = lvl.getBlockState(m.set(px, py, pz));
+                var shape = st.getCollisionShape(lvl, m);
+                if (shape.isEmpty()) continue;
+                double top = shape.max(net.minecraft.core.Direction.Axis.Y);
+                if (dy == 0 && top <= 0.55) continue; // alfombras, losas y escalones se pisan
+                return st.getBlock().getDescriptionId() + " a " + k + " de la puerta (altura +" + dy + ")";
+            }
+        return null;
+    }
+
+    /** Corte vertical (plano x = cte) ampliado. */
+    private static void sectionZoomX(ServerLevel lvl, int x, int z0, int z1, int y0, int y1, int S, File f) throws Exception {
+        BufferedImage img = new BufferedImage((z1 - z0 + 1) * S, (y1 - y0 + 1) * S, BufferedImage.TYPE_INT_RGB);
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        for (int z = z0; z <= z1; z++)
+            for (int y = y0; y <= y1; y++) {
+                BlockState st = lvl.getBlockState(m.set(x, y, z));
+                int rgb = st.isAir() ? 0xDDE6F0 : color(lvl, m, st);
+                if (st.is(net.minecraft.world.level.block.Blocks.CHAIN)) rgb = 0xFF00FF;
+                for (int a = 0; a < S; a++) for (int b = 0; b < S; b++) img.setRGB((z - z0) * S + a, (y1 - y) * S + b, rgb);
+            }
+        ImageIO.write(img, "png", f);
+    }
+
     private static void plan(ServerLevel lvl, int cx, int cz, int R, int y, File f) throws Exception {
-        int S = 3;
+        plan(lvl, cx, cz, R, y, f, 3);
+    }
+
+    /** Planta (corte horizontal) a escala S px por bloque. */
+    private static void plan(ServerLevel lvl, int cx, int cz, int R, int y, File f, int S) throws Exception {
         BufferedImage img = new BufferedImage((2 * R + 1) * S, (2 * R + 1) * S, BufferedImage.TYPE_INT_RGB);
         BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
         for (int dx = -R; dx <= R; dx++)

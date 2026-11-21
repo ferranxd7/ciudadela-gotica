@@ -1,0 +1,10 @@
+{
+  "campana": {
+    "subtitle": "subtitles.ciudadela.campana",
+    "sounds": [{"name": "ciudadela:campana", "stream": false}]
+  },
+  "narracion.cap1": {
+    "subtitle": "subtitles.ciudadela.narracion",
+    "sounds": [{"name": "ciudadela:narracion/cap1", "stream": true}]
+  }
+}

@@ -85,19 +85,22 @@ public final class Decor {
     private void chandelier(int x, int z, boolean large) {
         int len = Math.max(1, Math.min(room.height / 3, large ? 6 : 2));
         int y0 = T - len;
+        // debajo de un atrio no hay techo en T: la cadena sube hasta el techo de verdad
+        int top = (room.atrium != null && room.atrium.contains(x, z)) ? room.atriumTop - 1 : T;
         BlockState mod = large ? ModDeco.chandelier(Hash.pct(x, T, z, 3) < 35, room.height < 8)
                 : ModDeco.hangingLantern(Hash.h(x, T, z, 4));
         if (mod != null) {
             int yy = Math.max(F + 3, y0);
-            for (int y = T; y > yy; y--) c.set(x, y, z, Pal.CHAIN);
+            for (int y = top; y > yy; y--) c.set(x, y, z, Pal.CHAIN);
             c.set(x, yy, z, mod);
             return;
         }
         if (y0 < F + 3) {
+            for (int y = top; y > T; y--) c.set(x, y, z, Pal.CHAIN);
             c.set(x, T, z, Pal.SOUL_LANTERN_HANG);
             return;
         }
-        for (int y = T; y > y0; y--) c.set(x, y, z, Pal.CHAIN);
+        for (int y = top; y > y0; y--) c.set(x, y, z, Pal.CHAIN);
         if (!large) {
             c.set(x, y0, z, rng.chance(0.5) ? Pal.LANTERN_HANG : Pal.SOUL_LANTERN_HANG);
             return;
@@ -241,9 +244,54 @@ public final class Decor {
                     default -> Town.clutter(w.x, F, w.z);
                 };
             }
+            if (isLight(m)) {
+                // las lamparas y las velas nunca van en el suelo: siempre encima de un mueble
+                if (room.window(w.x, w.z) || room.height < 3) m = plant(i);
+                else {
+                    c.set(w.x, F, w.z, support(kind, w.in, i));
+                    c.set(w.x, F + 1, w.z, m);
+                    use(w.x, w.z);
+                    continue;
+                }
+            }
             c.set(w.x, F, w.z, m);
             use(w.x, w.z);
         }
+    }
+
+    /** Velas, faroles, candelabros y lamparas (de vanilla o de mods). */
+    static boolean isLight(BlockState s) {
+        if (s == null) return false;
+        Block b = s.getBlock();
+        if (b instanceof CandleBlock || b instanceof LanternBlock) return true;
+        var k = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(b);
+        if (k == null || k.getNamespace().equals("minecraft")) return false;
+        String p = k.getPath();
+        return p.contains("candle") || p.contains("lamp") || p.contains("lantern") || p.contains("sconce");
+    }
+
+    /** Mueble bajo donde apoyar una lampara o unas velas, segun el tipo de sala. */
+    private BlockState support(Fill kind, Direction in, int v) {
+        BlockState m = switch (kind) {
+            case FURNITURE, PLANTS, SIDEBOARD -> v % 2 == 0 ? ModDeco.nightstand(in) : ModDeco.drawer(in, v);
+            case CRYPT -> Pal.PB_CHISELED;
+            case ALCHEMY -> Pal.slab(Blocks.POLISHED_BLACKSTONE_SLAB, true);
+            default -> Pal.b(Blocks.BARREL);
+        };
+        return m != null ? m : Pal.slab(Blocks.DARK_OAK_SLAB, true);
+    }
+
+    /** Mesita con una lampara encima (o velas si no hay mods). */
+    private void lampTable(int x, int z, Direction front, int v) {
+        if (!free(x, z)) return;
+        BlockState t = v % 2 == 0 ? ModDeco.nightstand(front) : ModDeco.drawer(front, v);
+        c.set(x, F, z, t != null ? t : Pal.slab(Blocks.DARK_OAK_SLAB, true));
+        use(x, z);
+        if (room.height < 3) return;
+        BlockState l = ModDeco.lamp(v);
+        if (l == null) l = ModDeco.candleHolder(front, v);
+        if (l == null) l = v % 3 == 0 ? Pal.LANTERN : Pal.candles(v % 2 == 0 ? Blocks.RED_CANDLE : Blocks.WHITE_CANDLE, 3);
+        c.set(x, F + 1, z, l);
     }
 
     /** Un par de sofas mirandose (o mirando al centro). */
@@ -373,7 +421,7 @@ public final class Decor {
             case PRISON -> prison();
             case CRYPT -> crypt();
             case ALCHEMY -> alchemy();
-            case BALLROOM -> ballroom();
+            case BALLROOM, LIVING -> living();
             case SERVANTS -> servants();
             case BARRACKS -> barracks();
             case SMITHY -> smithy();
@@ -388,11 +436,12 @@ public final class Decor {
             case THRONE, KITCHEN, LIBRARY, LIBRARY_GRAND, OBSERVATORY -> {
                 // la sala del trono queda limpia; cocina y bibliotecas ya van completas
             }
+            case BALLROOM, LIVING -> fillWalls(0.6, Fill.PLANTS);
             case GREAT_HALL -> {
                 wallDecor(6, true, false);
                 fillWalls(0.15, Fill.PLANTS);
             }
-            case BALLROOM, CHAPEL, GALLERY -> {
+            case CHAPEL, GALLERY -> {
                 wallDecor(6, false, true);
                 fillWalls(0.15, Fill.PLANTS);
             }
@@ -532,8 +581,11 @@ public final class Decor {
             for (int z = r.z0 + 8; z <= r.z1 - 3; z += 6) {
                 pillar(xc - 8, z, (a, b, cc) -> Pal.BASALT);
                 pillar(xc + 8, z, (a, b, cc) -> Pal.BASALT);
-                c.set(xc - 8, F + 1, z + 1, Pal.SOUL_CAMPFIRE);
-                c.set(xc + 8, F + 1, z + 1, Pal.SOUL_CAMPFIRE);
+                for (int sx = -1; sx <= 1; sx += 2) {
+                    if (room.clear(xc + sx * 8, z + 1)) continue;
+                    c.set(xc + sx * 8, F, z + 1, Pal.PB_CHISELED);
+                    c.set(xc + sx * 8, F + 1, z + 1, Pal.SOUL_CAMPFIRE);
+                }
             }
         } else {
             for (int x = r.x0 + 6; x <= r.x1; x++)
@@ -1189,24 +1241,230 @@ public final class Decor {
         chandelier(r.cx() + 1, r.cz() + 1, false);
     }
 
-    private void ballroom() {
-        checker(Pal.CALCITE, Pal.PB, 1);
-        for (int x = r.x0 + 2; x <= r.x1 - 2; x += 5) {
-            pillar(x, r.z0 + 1, (a, b, cc) -> Pal.BASALT);
-            pillar(x, r.z1 - 1, (a, b, cc) -> Pal.BASALT);
+    // ================================================================== SALA DE ESTAR
+    /**
+     * Sala de estar: tarima con alfombras, un gran hogar abierto por los cuatro lados en el centro con
+     * su campana de piedra hasta el techo, sofas alrededor, estanterias bajas por las paredes con
+     * cuadros encima y rincones de lectura y de te a los lados.
+     */
+    private void living() {
+        boolean alongZ = r.d() >= r.w();
+        int L = alongZ ? r.d() : r.w(), S = alongZ ? r.w() : r.d();
+        // tarima de roble oscuro con franjas de abeto y cenefa
+        floor((x, y, z) -> {
+            boolean border = x == r.x0 || x == r.x1 || z == r.z0 || z == r.z1;
+            if (border) return Pal.log(Blocks.STRIPPED_SPRUCE_LOG, (x == r.x0 || x == r.x1) ? Direction.Axis.Z : Direction.Axis.X);
+            int band = alongZ ? Math.floorMod(z - r.z0, 7) : Math.floorMod(x - r.x0, 7);
+            return band == 0 ? Pal.SP_PLANKS : Pal.DO_PLANKS;
+        });
+        int hx = r.cx(), hz = r.cz();
+        boolean hearth = S >= 13 && L >= 13 && room.height >= 9;
+        // 1) alfombra grande bajo los sofas y hogar con campana
+        if (hearth) {
+            rug(hx - 6, hz - 6, hx + 6, hz + 6, Blocks.RED_CARPET, Blocks.BLACK_CARPET);
+            centralHearth(hx, hz);
+            // sofas mirando al fuego, con una mesita y su lampara en cada punta
+            sofas(hx + 1, hz - 5, Direction.SOUTH, 3, false);
+            sofas(hx - 1, hz + 5, Direction.NORTH, 3, false);
+            sofas(hx - 5, hz - 1, Direction.EAST, 3, false);
+            sofas(hx + 5, hz + 1, Direction.WEST, 3, false);
+            int v = 0;
+            for (int s2 = -2; s2 <= 2; s2 += 4) {
+                lampTable(hx + s2, hz - 5, Direction.SOUTH, v++);
+                lampTable(hx + s2, hz + 5, Direction.NORTH, v++);
+                lampTable(hx - 5, hz + s2, Direction.EAST, v++);
+                lampTable(hx + 5, hz + s2, Direction.WEST, v++);
+            }
+        } else {
+            rug(r.x0 + 1, r.z0 + 1, r.x1 - 1, r.z1 - 1, Blocks.RED_CARPET, Blocks.BLACK_CARPET);
+            fireplace(alongZ ? r.cx() : r.x0, alongZ ? r.z0 : r.cz(), alongZ ? Direction.SOUTH : Direction.EAST);
+            if (alongZ) sofas(hx + 1, r.z0 + 4, Direction.NORTH, 3, false);
+            else sofas(r.x0 + 4, hz - 1, Direction.WEST, 3, false);
         }
-        // escenario de musicos
-        for (int x = r.cx() - 3; x <= r.cx() + 3; x++)
-            for (int z = r.z0 + 3; z <= r.z0 + 5; z++) {
-                c.set(x, F, z, Pal.slab(Blocks.DARK_OAK_SLAB, false));
+        chestAt(r.x1, r.z1, Direction.NORTH, "dormitorio");
+        // 2) estanterias bajas por las paredes, con velas y libros encima
+        int shelfH = Math.max(1, Math.min(3, room.height - 4));
+        int k = 0;
+        for (WallCell w : wallCells()) {
+            k++;
+            if (!free(w.x, w.z) || room.window(w.x, w.z)) continue;
+            for (int y = F; y < F + shelfH; y++) {
+                boolean chis = Hash.pct(w.x, y, w.z, 19) < 15;
+                c.set(w.x, y, w.z, chis ? Pal.facing(Blocks.CHISELED_BOOKSHELF, w.in) : Pal.BOOKSHELF);
+            }
+            int top = F + shelfH;
+            int roll = Hash.pct(w.x, top, w.z, 23);
+            if (roll < 14) c.set(w.x, top, w.z, Pal.candles(roll < 7 ? Blocks.RED_CANDLE : Blocks.WHITE_CANDLE, 1 + roll % 3));
+            else if (roll < 30) {
+                BlockState it = ModDeco.studyItem(Hash.h(w.x, top, w.z, 24));
+                if (it != null && !isLight(it)) c.set(w.x, top, w.z, it);
+            } else if (roll < 36) c.set(w.x, top, w.z, plant(k));
+            use(w.x, w.z);
+        }
+        // 3) cuadros encima de las estanterias
+        paintings(F + shelfH + 1);
+        // 4) rincones a los lados del hogar: lectura en un extremo y mesa de te en el otro
+        if (hearth) {
+            int gap = (L - 13) / 2; // casillas libres a cada lado de la zona del hogar
+            if (gap >= 7) {
+                int off = 6 + (gap + 1) / 2 + 1;
+                for (int side = -1; side <= 1; side += 2) {
+                    int u = (alongZ ? hz : hx) + side * off;
+                    for (int q = -1; q <= 1; q += 2) {
+                        int vq = (alongZ ? hx : hz) + q * Math.max(3, S / 4);
+                        int gx = alongZ ? vq : u, gz = alongZ ? u : vq;
+                        corner(gx, gz, side < 0, q * 7 + side);
+                        chandelier(gx, gz, false);
+                    }
+                    chandelier(alongZ ? hx : u, alongZ ? u : hz, true);
+                }
+            }
+        }
+    }
+
+    /** Hogar abierto por los cuatro lados: pilares en las esquinas, fuego en medio y campana hasta el techo. */
+    private void centralHearth(int hx, int hz) {
+        for (int dx = -2; dx <= 2; dx++)
+            for (int dz = -2; dz <= 2; dz++) {
+                int x = hx + dx, z = hz + dz;
+                boolean corner = Math.abs(dx) == 2 && Math.abs(dz) == 2;
+                boolean ring = Math.max(Math.abs(dx), Math.abs(dz)) == 2;
+                c.set(x, F - 1, z, Pal.PB_BRICKS);
+                if (corner) {
+                    c.column(x, z, F, F + 3, Pal.PB_BRICKS);
+                    c.set(x, F, z, Pal.PB_CHISELED);
+                    c.set(x, F + 3, z, Pal.PB_CHISELED);
+                } else if (ring) {
+                    c.set(x, F, z, Pal.slab(Blocks.POLISHED_BLACKSTONE_BRICK_SLAB, false));
+                    c.column(x, z, F + 1, F + 3, Pal.AIR);
+                } else {
+                    c.set(x, F - 1, z, Pal.NETHER_BRICKS);
+                    Direction face = Direction.from2DDataValue(Math.floorMod(dx * 3 + dz, 4));
+                    c.set(x, F, z, Pal.CAMPFIRE.setValue(CampfireBlock.FACING, face));
+                    c.column(x, z, F + 1, F + 3, Pal.AIR);
+                }
                 use(x, z);
             }
-        c.set(r.cx(), F, r.z0 + 4, Pal.b(Blocks.JUKEBOX));
-        c.set(r.cx() - 2, F, r.z0 + 4, Pal.b(Blocks.NOTE_BLOCK));
-        c.set(r.cx() + 2, F, r.z0 + 4, Pal.b(Blocks.NOTE_BLOCK));
-        sofas(r.x0 + 2, r.z1 - 2, Direction.NORTH, Math.max(1, r.w() - 4), true);
-        chandeliers(true);
-        banners(5);
+        // la campana: un borde de piedra que se estrecha hasta la chimenea
+        for (int dx = -2; dx <= 2; dx++)
+            for (int dz = -2; dz <= 2; dz++) {
+                int x = hx + dx, z = hz + dz;
+                int ad = Math.max(Math.abs(dx), Math.abs(dz));
+                boolean corner = Math.abs(dx) == 2 && Math.abs(dz) == 2;
+                if (ad == 2) {
+                    c.set(x, F + 4, z, Pal.PB_BRICKS);
+                    if (corner) c.set(x, F + 5, z, Pal.slab(Blocks.POLISHED_BLACKSTONE_BRICK_SLAB, false));
+                    else c.set(x, F + 5, z, Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, Pal.dirOf(-dx, -dz), false));
+                } else if (ad == 1) {
+                    c.set(x, F + 4, z, Pal.AIR);
+                    c.set(x, F + 5, z, Pal.PB_BRICKS);
+                }
+            }
+        // chimenea hasta el techo, con una franja tallada cada 3 bloques
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dz = -1; dz <= 1; dz++) {
+                if (dx == 0 && dz == 0) continue;
+                final int ddx = dx, ddz = dz;
+                c.column(hx + dx, hz + dz, F + 6, T, (x, y, z) -> (y - F) % 3 == 0 ? Pal.PB_CHISELED
+                        : ((ddx == 0 || ddz == 0) ? Pal.PB_BRICKS : Pal.BASALT));
+            }
+        // faroles colgando del borde de la campana y escudos con calaveras en la chimenea
+        Direction[] dirs = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
+        for (Direction d : dirs) {
+            c.set(hx + d.getStepX() * 2, F + 3, hz + d.getStepZ() * 2, Pal.LANTERN_HANG);
+            int fx = hx + d.getStepX() * 2, fz = hz + d.getStepZ() * 2;
+            if (T >= F + 9) {
+                c.set(fx, F + 7, fz, Blocks.WITHER_SKELETON_WALL_SKULL.defaultBlockState().setValue(WallSkullBlock.FACING, d));
+                c.set(fx, F + 9, fz, (d.getAxis() == Direction.Axis.X ? Blocks.RED_WALL_BANNER : Blocks.BLACK_WALL_BANNER)
+                        .defaultBlockState().setValue(WallBannerBlock.FACING, d));
+            }
+        }
+    }
+
+    /** Rincon de la sala: alfombrita, mesa con lampara o libros y dos butacas mirandose. */
+    private void corner(int x, int z, boolean reading, int v) {
+        if (!free(x, z) || !free(x - 1, z) || !free(x + 1, z)) return;
+        rug(x - 2, z - 2, x + 2, z + 2, reading ? Blocks.PURPLE_CARPET : Blocks.RED_CARPET, Blocks.BLACK_CARPET);
+        table(x, z, x, z, Blocks.DARK_OAK_SLAB);
+        BlockState top = reading ? ModDeco.studyItem(Math.floorMod(v, 6) == 5 ? 0 : v) : ModDeco.tableware(v);
+        if (top == null || isLight(top)) {
+            BlockState l = ModDeco.lamp(v);
+            top = l != null ? l : Pal.candles(reading ? Blocks.WHITE_CANDLE : Blocks.RED_CANDLE, 3);
+        }
+        c.set(x, F + 1, z, top);
+        BlockState a = ModDeco.sofa(Direction.EAST, false, 0), b = ModDeco.sofa(Direction.WEST, false, 0);
+        c.set(x - 1, F, z, a != null ? a : Pal.stairs(Blocks.CRIMSON_STAIRS, Direction.WEST, false));
+        c.set(x + 1, F, z, b != null ? b : Pal.stairs(Blocks.CRIMSON_STAIRS, Direction.EAST, false));
+        use(x - 1, z);
+        use(x + 1, z);
+        if (!reading) {
+            chair(x, z - 1, Direction.SOUTH, Blocks.DARK_OAK_STAIRS);
+            chair(x, z + 1, Direction.NORTH, Blocks.DARK_OAK_STAIRS);
+        } else {
+            lampTable(x, z - 2, Direction.SOUTH, v + 1);
+        }
+    }
+
+    /** Cuadros colgados en las paredes libres (solo donde la pared de detras es maciza y cabe entero). */
+    private void paintings(int yBottom) {
+        if (yBottom + 1 > T - 1) return;
+        var reg = net.minecraft.core.registries.BuiltInRegistries.PAINTING_VARIANT;
+        String[][] bySize = {
+                {"skeleton", "donkey_kong"},                            // 4x3
+                {"burning_skull", "pigscene", "pointer"},               // 4x4
+                {"skull_and_roses", "wither", "void", "bust", "match"}, // 2x2
+                {"wanderer", "graham"}                                  // 1x2
+        };
+        int[][] sizes = {{4, 3}, {4, 4}, {2, 2}, {1, 2}};
+        Direction[] sides = {Direction.SOUTH, Direction.NORTH, Direction.EAST, Direction.WEST};
+        int step = 0;
+        for (Direction in : sides) {
+            List<WallCell> cells = new ArrayList<>();
+            for (WallCell w : wallCells()) if (w.in == in) cells.add(w);
+            int lastPlaced = -100;
+            for (int idx = 0; idx < cells.size(); idx++) {
+                WallCell w = cells.get(idx);
+                if (idx - lastPlaced < 7 || !c.inXZ(w.x, w.z)) continue;
+                for (int si = 0; si < sizes.length; si++) {
+                    int pw = sizes[si][0], ph = sizes[si][1];
+                    if (yBottom + ph > T) continue;
+                    int y0 = yBottom + (ph <= 2 ? 1 : 0);
+                    if (!paintingFits(w.x, y0, w.z, w.in, pw, ph)) continue;
+                    String[] names = bySize[si];
+                    String name = names[Math.floorMod(Hash.h(w.x, y0, w.z, 31) + step, names.length)];
+                    var key = net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.PAINTING_VARIANT,
+                            new ResourceLocation("minecraft", name));
+                    var holder = reg.getHolder(key);
+                    if (holder.isEmpty()) continue;
+                    // la posicion del cuadro es su casilla "base"; el resto queda a su izquierda y hacia arriba
+                    int i1 = (pw - 1) / -2, j1 = (ph - 1) / -2;
+                    Direction ccw = w.in.getCounterClockWise();
+                    int bx = w.x - ccw.getStepX() * i1, by = y0 - j1, bz = w.z - ccw.getStepZ() * i1;
+                    c.addEntity(new net.minecraft.world.entity.decoration.Painting(c.level.getLevel(),
+                            new net.minecraft.core.BlockPos(bx, by, bz), w.in, holder.get()));
+                    lastPlaced = idx;
+                    step++;
+                    break;
+                }
+            }
+        }
+    }
+
+    /** ¿Cabe un cuadro de pw x ph con su esquina inferior "izquierda" en (x, y, z), mirando hacia "in"? */
+    private boolean paintingFits(int x, int y, int z, Direction in, int pw, int ph) {
+        Direction ccw = in.getCounterClockWise();
+        for (int a = 0; a < pw; a++)
+            for (int b = 0; b < ph; b++) {
+                int fx = x + ccw.getStepX() * a, fz = z + ccw.getStepZ() * a, fy = y + b;
+                if (!r.contains(fx, fz) || !c.isAir(fx, fy, fz) || room.window(fx, fz)) return false;
+                int wx = fx - in.getStepX(), wz = fz - in.getStepZ();
+                if (!c.in(wx, fy, wz)) return false;
+                BlockState wall = c.get(wx, fy, wz);
+                if (wall.isAir() || !wall.isSolidRender(c.level, new net.minecraft.core.BlockPos(wx, fy, wz))) return false;
+            }
+        // que el cuadro quede del todo en la pared de esta sala (no en una esquina)
+        int ex = x + ccw.getStepX() * (pw - 1), ez = z + ccw.getStepZ() * (pw - 1);
+        return r.contains(ex, ez);
     }
 
     private void servants() {

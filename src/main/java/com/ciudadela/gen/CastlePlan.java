@@ -43,7 +43,44 @@ public final class CastlePlan {
         return java.util.Collections.unmodifiableList(elements);
     }
 
+    /** Farolas, arboles, estatuas, carros... (cosas pequenas que se pueden quitar si estorban). */
+    private static boolean smallDecor(Element e) {
+        return e instanceof Tree || e instanceof Landscape.LampPost || e instanceof Landscape.Statue || e instanceof Landscape.DeadTree
+                || e instanceof Town.Planter || e instanceof Town.BenchElement || e instanceof Town.Crates || e instanceof Town.Cart
+                || e instanceof Town.Well || e instanceof Town.Stall;
+    }
+
+    /** Lo que ocupa en el suelo: el tronco en los arboles, la caja entera en lo demas. */
+    private static Rect base(Element e) {
+        if (e instanceof Tree || e instanceof Landscape.DeadTree) {
+            int mx = (e.x0 + e.x1) / 2, mz = (e.z0 + e.z1) / 2;
+            return new Rect(mx - 1, mz - 1, mx + 1, mz + 1);
+        }
+        return new Rect(e.x0, e.z0, e.x1, e.z1);
+    }
+
+    /** Quita cualquier detalle que quede delante de la puerta de un edificio. */
+    private void clearDoorways() {
+        List<Rect> doorways = new ArrayList<>();
+        for (Element e : elements) {
+            if (!(e instanceof Building b)) continue;
+            for (int[] en : b.entranceCells()) {
+                int hw = en[4] + 1;
+                int ax = en[0] + en[2], az = en[1] + en[3], bx = en[0] + en[2] * 5, bz = en[1] + en[3] * 5;
+                if (en[2] == 0) { ax -= hw; bx += hw; } else { az -= hw; bz += hw; }
+                doorways.add(new Rect(ax, az, bx, bz));
+            }
+        }
+        elements.removeIf(e -> {
+            if (!smallDecor(e)) return false;
+            Rect b = base(e);
+            for (Rect d : doorways) if (d.intersects(b)) return true;
+            return false;
+        });
+    }
+
     private void finish() {
+        clearDoorways();
         // todas las torres redondas se convierten en torres-arbol, como la gran torre central
         for (Element e : elements) if (e instanceof RoundTower rt) rt.tree();
         elements.sort(java.util.Comparator.comparingInt(e -> e.layer));
@@ -307,7 +344,7 @@ public final class CastlePlan {
                 f.add(new Rect(cx - 30, cz - 19, cx + 30, in.z1), Room.Type.GREAT_HALL);
                 f.add(new Rect(in.x0, in.z0, cx - 32, cz - 12), Room.Type.DINING);
                 f.add(new Rect(in.x0, cz - 10, cx - 32, in.z1), Room.Type.KITCHEN);
-                f.add(new Rect(cx + 32, in.z0, in.x1, cz - 5), Room.Type.BALLROOM);
+                f.add(new Rect(cx + 32, in.z0, in.x1, cz - 5), Room.Type.LIVING);
                 f.add(new Rect(cx + 32, cz - 3, in.x1, in.z1), Room.Type.ARMORY);
                 return;
             }
@@ -332,7 +369,7 @@ public final class CastlePlan {
             t.doorToward(X(0), Z(-15), keep.topY + 1);
             add(t);
         }
-        add(new TreeTower(rng.fork(), X(0), Z(-15), keep.topY + 1, 13, Y + 200, keep.fp, Y));
+        tree = add(new TreeTower(rng.fork(), X(0), Z(-15), keep.topY + 1, 13, Y + 200, keep.fp, Y));
         occupied.add(R(-62, -67, 62, 37));
 
         // ------------------------------------------------ catedral
@@ -389,12 +426,57 @@ public final class CastlePlan {
         int ax = cx + (int) Math.round(Math.cos(asc) * (Ra + 13)), az = cz + (int) Math.round(Math.sin(asc) * (Ra + 13));
         int ground = groundHeight.applyAsInt(ax, az);
         if (ground < Y - 60) {
+            ascX = ax;
+            ascZ = az;
             RoundTower t = new RoundTower(rng.fork(), ax, az, ground, 7, (Y - 1) - ground, RoundTower.Top.PLATFORM);
             t.doorToward(ax, az + 50, ground).avoidToward(cx, cz);
             add(t);
             int ex = cx + (int) Math.round(Math.cos(asc) * (Ra - 34)), ez = cz + (int) Math.round(Math.sin(asc) * (Ra - 34));
             add(new Landscape.Bridge(rng.fork(), ax, Y - 1, az - 4, ex, Y - 1, ez, 0, 3));
         }
+
+        // ------------------------------------------------ cronica: cofres con su cartel al lado
+        if (ascX != Integer.MIN_VALUE) {
+            // arriba del todo de la torre de ascenso, al lado de la escalera y del puente
+            story[1] = new int[]{ascX + 5, Y, ascZ};
+            add(new StoryChest(rng.fork(), 1, ascX + 5, Y, ascZ, Direction.WEST, ascX + 5, ascZ + 1, Direction.WEST));
+        } else {
+            story[1] = new int[]{X(8), Y, Z(OCT + 22)};
+            add(new StoryChest(rng.fork(), 1, X(8), Y, Z(OCT + 22), Direction.WEST, X(8), Z(OCT + 23), Direction.WEST));
+        }
+        story[2] = new int[]{X(0), Y, Z(89)};
+        add(new StoryChest(rng.fork(), 2, X(0), Y, Z(89), Direction.SOUTH, X(1), Z(89), Direction.SOUTH));
+        story[3] = new int[]{X(0), Y, Z(-42)};                 // al morir el Rey, en el salon del trono
+        story[4] = new int[]{X(92) - 5, Y + 1, Z(-80) + 2};    // a los pies del altar de la catedral
+        add(new StoryChest(rng.fork(), 4, X(87), Y + 1, Z(-78), Direction.EAST, X(87), Z(-77), Direction.EAST));
+        int[] boss = tree.bossSpot();
+        story[5] = new int[]{boss[0], tree.hallFloor, boss[2] + 3}; // al morir Ser Gavran, en la sala del jefe
+    }
+
+    // ===================================================================== historia y cinematicas
+
+    private TreeTower tree;
+    private int ascX = Integer.MIN_VALUE, ascZ;
+    private final int[][] story = new int[6][];
+
+    /** {x, y, z} de la pagina de la cronica del capitulo ch (1..5). */
+    public int[] storySpot(int ch) {
+        return ch >= 1 && ch <= 5 ? story[ch] : null;
+    }
+
+    public Island island() {
+        return main;
+    }
+
+    /** Puntos de referencia para los planos de camara de la cinematica del capitulo 1. */
+    public record Cine(int cx, int cz, int y0, boolean asc, int ascX, int ascZ, double fallAng, double fallR,
+                       int cathX, int cathZS, int treeX, int treeZ, int hallY) {}
+
+    public Cine cine() {
+        double fa = Math.toRadians(125);
+        boolean asc = ascX != Integer.MIN_VALUE;
+        return new Cine(cx, cz, Y0, asc, asc ? ascX : X(8), asc ? ascZ : Z(OCT + 22), fa, main.radiusAt(fa),
+                X(92), Z(80), tree.centerX(), tree.centerZ(), tree.hallFloor);
     }
 
     private static final int LOT = 14, STEP = 17, OFF = 3;

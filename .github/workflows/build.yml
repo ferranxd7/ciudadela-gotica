@@ -32,6 +32,24 @@ jobs:
         with:
           gradle-version: '8.8'
 
+      - name: Instalar ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            piper
+            narr_tmp/*.onnx
+            narr_tmp/*.onnx.json
+          key: piper-${{ hashFiles('ci/narracion/voz.txt') }}
+
+      - name: Textos de la historia y narracion del capitulo 1
+        run: |
+          mkdir -p out
+          python3 ci/historia/textos.py > out/textos.log 2>&1 || echo "AVISO: revisar textos" >> out/textos.log
+          bash ci/narracion/generar.sh 2>&1 | tee out/narracion.log || true
+          cp src/main/resources/assets/ciudadela/sounds/narracion/cap1.ogg out/narracion_capitulo1.ogg 2>/dev/null || true
+
       - name: Compilar el mod
         run: gradle build --no-daemon --stacktrace 2>&1 | tee build.log
 
@@ -80,7 +98,7 @@ jobs:
         run: |
           shopt -s nullglob
           files=()
-          for f in build/libs/*.jar build.log out/*.txt out/*.log out/*.png out/*.mrpack; do [ -s "$f" ] && files+=("$f"); done
+          for f in build/libs/*.jar build.log out/*.txt out/*.log out/*.png out/*.mrpack out/*.ogg; do [ -s "$f" ] && files+=("$f"); done
           if ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null; then
             gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }}" --notes "Version automatica ${{ github.run_number }}" --latest
           else

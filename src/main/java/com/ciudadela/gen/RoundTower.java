@@ -360,7 +360,11 @@ public class RoundTower extends Element {
                     c.set(x, fy, z, m != null ? m : Pal.b(Blocks.BARREL));
                 } else if (roll < 4) c.set(x, fy, z, Pal.b(Blocks.BARREL));
                 else if (roll < 6) c.set(x, fy, z, Pal.log(Blocks.HAY_BLOCK, Direction.Axis.Y));
-                else if (roll < 7) c.set(x, fy, z, Pal.candles(Blocks.BLACK_CANDLE, 3));
+                else if (roll < 7) {
+                    // velas siempre encima de algo: un barril
+                    c.set(x, fy, z, Pal.b(Blocks.BARREL));
+                    if (c.isAir(x, fy + 1, z)) c.set(x, fy + 1, z, Pal.candles(Blocks.BLACK_CANDLE, 3));
+                }
                 else if (roll < 8) c.set(x, fy, z, Pal.facing(Blocks.ANVIL, in.getClockWise()));
                 else if (roll < 9) c.set(x, fy, z, Pal.COBWEB);
                 else c.set(x, fy, z, Pal.BOOKSHELF);

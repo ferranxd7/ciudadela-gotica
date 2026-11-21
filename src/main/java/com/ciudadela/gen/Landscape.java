@@ -429,6 +429,11 @@ public final class Landscape {
                     Math.max(ax, bx) + pad, Math.max(ay, by) + 6, Math.max(az, bz) + pad);
         }
 
+        /** {ax, az, bx, bz} extremos del puente (para el mapa). */
+        public int[] ends() {
+            return new int[]{(int) ax, (int) az, (int) bx, (int) bz};
+        }
+
         private int deckY(double t) {
             double k = Math.max(0, Math.min(1, t / len));
             return (int) Math.round(ay + (by - ay) * k - sag * Math.sin(Math.PI * k));
