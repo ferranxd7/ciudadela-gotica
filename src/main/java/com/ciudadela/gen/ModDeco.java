@@ -354,7 +354,10 @@ public final class ModDeco {
     }
 
     public static BlockState cannon(Direction out) {
-        return frontOf(out, "supplementaries:cannon");
+        BlockState s = frontOf(out, "supplementaries:cannon");
+        if (s == null) return null;
+        // si la calibracion lo deja apuntando al cielo, lo orientamos a mano hacia fuera
+        return Mods.prop(s, "facing", out.getName());
     }
 
     public static BlockState awning(Direction f, boolean red) {
