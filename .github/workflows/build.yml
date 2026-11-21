@@ -74,17 +74,9 @@ jobs:
 
       - name: Subir release
         if: always()
-        continue-on-error: true
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: build-${{ github.run_number }}
-          name: Build ${{ github.run_number }}
-          prerelease: false
-          make_latest: true
-          files: |
-            build/libs/*.jar
-            build.log
-            out/*.txt
-            out/*.log
-            out/*.png
-            out/*.mrpack
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          files=(build/libs/*.jar build.log out/*.txt out/*.log out/*.png out/*.mrpack)
+          gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }}" --notes "Version automatica ${{ github.run_number }}" --latest
