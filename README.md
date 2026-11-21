@@ -21,3 +21,13 @@ con una escalera de caracol, y un puente que entra en la isla.
 2. Mobs propios por salas
 3. Jefe (caballero no-muerto gigante) + botín + armas y armadura
 4. Calavera, fortalezas del cielo y nueva dimensión con hogueras
+
+## Créditos de la música
+Toda la música tiene licencia libre y se descarga de OpenGameArt al compilar (los detalles completos
+van dentro del mod, en `assets/ciudadela/creditos.txt`):
+- "Solemn (Opening)" de İlker Yalçıner (onemansymphony), CC-BY 4.0 — fondo de los cofres de la crónica.
+- "Darkness March" de Alexandr Zhelanov, CC-BY 4.0 — Corvin, fase 1.
+- "Dark souls type boss theme" de Philémon Weber (Helmet), CC-BY 4.0 — Corvin, fase 2.
+- "Colossal Boss Battle Theme" de Matthew Pablo (www.matthewpablo.com), CC-BY 3.0 — Corvin, fase 3.
+
+Se han pasado a OGG, sin silencio al principio y al final y con el volumen igualado.

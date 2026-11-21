@@ -1,10 +1,54 @@
 {
   "campana": {
     "subtitle": "subtitles.ciudadela.campana",
-    "sounds": [{"name": "ciudadela:campana", "stream": false, "preload": true}]
+    "sounds": [
+      {
+        "name": "ciudadela:campana",
+        "stream": false,
+        "preload": true
+      }
+    ]
   },
   "narracion.cap1": {
     "subtitle": "subtitles.ciudadela.narracion",
-    "sounds": [{"name": "ciudadela:narracion/cap1", "stream": false, "preload": true}]
+    "sounds": [
+      {
+        "name": "ciudadela:narracion/cap1",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "musica.cofre": {
+    "sounds": [
+      {
+        "name": "ciudadela:musica/cofre",
+        "stream": true
+      }
+    ]
+  },
+  "musica.rey1": {
+    "sounds": [
+      {
+        "name": "ciudadela:musica/rey1",
+        "stream": true
+      }
+    ]
+  },
+  "musica.rey2": {
+    "sounds": [
+      {
+        "name": "ciudadela:musica/rey2",
+        "stream": true
+      }
+    ]
+  },
+  "musica.rey3": {
+    "sounds": [
+      {
+        "name": "ciudadela:musica/rey3",
+        "stream": true
+      }
+    ]
   }
 }

@@ -39,6 +39,10 @@ public class CiudadelaMod {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, MODID);
     public static final RegistryObject<SoundEvent> CAMPANA = sound("campana");
     public static final RegistryObject<SoundEvent> NARRACION_1 = sound("narracion.cap1");
+    public static final RegistryObject<SoundEvent> MUSICA_COFRE = sound("musica.cofre");
+    public static final RegistryObject<SoundEvent> MUSICA_REY_1 = sound("musica.rey1");
+    public static final RegistryObject<SoundEvent> MUSICA_REY_2 = sound("musica.rey2");
+    public static final RegistryObject<SoundEvent> MUSICA_REY_3 = sound("musica.rey3");
 
     private static RegistryObject<SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(MODID, name)));

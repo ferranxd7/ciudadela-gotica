@@ -43,6 +43,18 @@ jobs:
             narr_tmp/*.onnx.json
           key: piper-${{ hashFiles('ci/narracion/voz.txt') }}
 
+      - uses: actions/cache@v4
+        with:
+          path: musica_dl
+          key: musica-${{ hashFiles('ci/musica/pistas.json') }}
+
+      - name: Musica (licencias libres, con creditos)
+        run: |
+          mkdir -p out
+          python3 ci/musica/bajar.py musica_dl src/main/resources/assets/ciudadela/sounds out || echo "AVISO: musica" >> out/musica.log
+          for f in src/main/resources/assets/ciudadela/sounds/musica/*.ogg; do [ -f "$f" ] && cp "$f" "out/musica_$(basename "$f")"; done
+          cat out/musica.log || true
+
       - name: Textos de la historia y narracion del capitulo 1
         run: |
           mkdir -p out
@@ -56,6 +68,7 @@ jobs:
           gradle build --no-daemon --stacktrace 2>&1 | tee build.log
 
       - name: Firmas de la API (para programar)
+        if: always()
         run: bash ci/firmas.sh > out/firmas.txt 2>&1 || true
 
       - name: Preparar servidor Forge real
@@ -87,6 +100,25 @@ jobs:
           mkdir -p out/vanilla && cp -r srv2/ci-out/* out/vanilla/ 2>/dev/null || true
           grep -nE "Error construyendo|Exception" out/server_vanilla.log | head -100 > out/vanilla/errores.txt || true
 
+      - name: Prueba del cliente (capturas y sonido grabado)
+        timeout-minutes: 35
+        run: |
+          sudo apt-get install -y -qq xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils python3-numpy > /dev/null 2>&1 || true
+          rm -rf run && mkdir -p run/saves run/config run/screenshots
+          if [ -d srv2/world ]; then cp -r srv2/world run/saves/ciudadela; else echo "sin mundo de la prueba del servidor"; fi
+          cp ci/cliente/options.txt run/options.txt
+          printf 'earlyWindowControl = false\n' > run/config/fml.toml
+          sed "s#@WAV@#$PWD/out/audio_cliente.wav#" ci/cliente/alsoft.conf > "$RUNNER_TEMP/alsoft.conf"
+          export ALSOFT_CONF="$RUNNER_TEMP/alsoft.conf" LIBGL_ALWAYS_SOFTWARE=1 CIUDADELA_CLIENTE=1
+          xvfb-run -a -s "-screen 0 1280x720x24" glxinfo -B > out/cliente_gl.txt 2>&1 || true
+          timeout 28m xvfb-run -a -s "-screen 0 1280x720x24" gradle runClient --no-daemon > out/cliente.log 2>&1 || echo "cliente terminado con error $?" >> out/cliente.log
+          cp run/ci-cliente/* out/ 2>/dev/null || true
+          for f in run/screenshots/*.png; do [ -f "$f" ] && cp "$f" out/; done
+          python3 ci/cliente/audio.py out/audio_cliente.wav src/main/resources/assets/ciudadela/sounds out > out/audio_cliente.txt 2>&1 || true
+          rm -f out/audio_cliente.wav
+          grep -nE "\[CI cliente\]|Exception|ERROR|OpenAL|Sound" out/cliente.log | head -200 > out/cliente_resumen.txt || true
+          tail -50 out/audio_cliente.txt || true
+
       - name: Publicar resultados
         if: always()
         run: |
@@ -100,12 +132,15 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
+          PUBLICAR: ${{ contains(github.event.head_commit.message, '[publicar]') && 'si' || 'no' }}
         run: |
           shopt -s nullglob
           files=()
           for f in build/libs/*.jar build.log out/*.txt out/*.log out/*.png out/*.mrpack out/*.ogg; do [ -s "$f" ] && files+=("$f"); done
-          if ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null; then
+          if ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null && [ "$PUBLICAR" = "si" ]; then
             gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }}" --notes "Version automatica ${{ github.run_number }}" --latest
+          elif ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null; then
+            gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }} (en desarrollo)" --notes "Version de pruebas: no es la que se instala" --prerelease --latest=false
           else
             gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }} (fallida)" --notes "Compilacion o prueba fallida" --prerelease --latest=false
           fi

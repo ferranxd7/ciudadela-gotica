@@ -73,6 +73,16 @@ public final class ClientCine {
         return active;
     }
 
+    /** Segundos desde que empezo la cinematica (0 si no hay). */
+    public static float time() {
+        return active ? ticks / 20f : 0f;
+    }
+
+    /** Si la voz del narrador esta sonando ahora mismo (para la prueba de la CI). */
+    public static boolean narrationPlaying() {
+        return narr != null && Minecraft.getInstance().getSoundManager().isActive(narr);
+    }
+
     // ------------------------------------------------------------------ empezar y acabar
 
     public static void start(Net.CineStart m) {
@@ -98,6 +108,7 @@ public final class ClientCine {
         mc.options.setCameraType(CameraType.FIRST_PERSON);
         mc.getMusicManager().stopPlaying();
         if (mc.screen != null) mc.setScreen(null);
+        ClientMusic.storyStart(chapter);
     }
 
     /** Termina la cinematica (al acabar, al saltarla o porque lo dice el servidor). */
@@ -112,6 +123,7 @@ public final class ClientCine {
         cam = null;
         if (savedCam != null) mc.options.setCameraType(savedCam);
         savedCam = null;
+        ClientMusic.storyCineEnd();
         if (skipped) Net.CH.sendToServer(new Net.CineSkip());
     }
 

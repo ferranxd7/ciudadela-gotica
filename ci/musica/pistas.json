@@ -1,0 +1,47 @@
+[
+  {
+    "id": "cofre",
+    "pagina": "https://opengameart.org/content/solemn-opening",
+    "busca": "solemn",
+    "titulo": "Solemn (Opening)",
+    "autor": "İlker Yalçıner (onemansymphony)",
+    "licencia": "CC-BY 4.0",
+    "aviso": "Composer: İlker Yalçıner (ilkeryalciner.com)",
+    "uso": "Fondo de los cofres de la crónica",
+    "lufs": -20
+  },
+  {
+    "id": "rey1",
+    "pagina": "https://opengameart.org/content/darkness-march",
+    "pagina2": "https://opengameart.org/node/83150",
+    "busca": "darkness",
+    "titulo": "Darkness March",
+    "autor": "Alexandr Zhelanov",
+    "licencia": "CC-BY 4.0",
+    "aviso": "Alexandr Zhelanov https://soundcloud.com/alexandr-zhelanov",
+    "uso": "Corvin, fase 1",
+    "lufs": -17
+  },
+  {
+    "id": "rey2",
+    "pagina": "https://opengameart.org/node/155832",
+    "busca": "boss",
+    "titulo": "Dark souls type boss theme (Arcanos, Sorcerer of the Old Banished Woods)",
+    "autor": "Philémon Weber (Helmet)",
+    "licencia": "CC-BY 4.0",
+    "aviso": "Philémon Weber (Helmet)",
+    "uso": "Corvin, fase 2",
+    "lufs": -16
+  },
+  {
+    "id": "rey3",
+    "pagina": "https://opengameart.org/content/colossal-boss-battle-theme",
+    "busca": "colossal",
+    "titulo": "Colossal Boss Battle Theme",
+    "autor": "Matthew Pablo",
+    "licencia": "CC-BY 3.0",
+    "aviso": "Music by Matthew Pablo, http://www.matthewpablo.com",
+    "uso": "Corvin, fase 3 (los volcanes)",
+    "lufs": -15
+  }
+]
