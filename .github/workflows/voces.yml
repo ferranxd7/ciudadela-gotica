@@ -1,0 +1,27 @@
+name: Muestras de voz
+
+on:
+  push:
+    branches: [main]
+    paths: ['ci/voces/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  voces:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generar muestras
+        run: |
+          mkdir -p voces_out
+          bash ci/voces/generar.sh voces_out 2>&1 | tee voces_out/informe.txt || true
+      - name: Publicar muestras
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p voces_out
+          gh release create "voces-${{ github.run_number }}" voces_out/* --title "Muestras de voz ${{ github.run_number }}" --notes "Muestras de voz para la narracion" --prerelease --latest=false

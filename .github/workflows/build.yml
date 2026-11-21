@@ -3,6 +3,7 @@ name: Compilar y probar
 on:
   push:
     branches: [main]
+    paths-ignore: ['ci/voces/**', '.github/workflows/voces.yml']
   workflow_dispatch:
 
 permissions:
