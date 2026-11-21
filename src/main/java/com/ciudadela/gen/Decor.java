@@ -498,7 +498,8 @@ public final class Decor {
 
     private void throne() {
         checker(Pal.PB, Pal.DS_TILES, 3);
-        boolean northEnd = r.d() >= r.w();
+        // el trono siempre al fondo (pared norte), mirando a la puerta del gran salon
+        boolean northEnd = r.d() >= 12 || r.d() >= r.w();
         int xc = r.cx(), zc = r.cz();
         // alfombra roja hasta el trono
         if (northEnd) {
