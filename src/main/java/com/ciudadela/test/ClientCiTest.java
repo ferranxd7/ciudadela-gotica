@@ -226,11 +226,12 @@ public final class ClientCiTest {
     private static int ataques;
 
     private static void rey(int B) {
-        atTicks(B, "Rey: al gran salon con armadura de netherite y espada afilada", m -> {
+        atTicks(B, "Rey: al gran salon con armadura de netherite y espada afilada (dificultad normal)", m -> {
             m.setScreen(null);
             server(m, sp -> {
                 sp.closeContainer();
                 sp.setGameMode(GameType.SURVIVAL);
+                sp.getServer().setDifficulty(net.minecraft.world.Difficulty.NORMAL, true);
                 ServerLevel lvl = sp.serverLevel();
                 sala = com.ciudadela.rey.Sala.near(lvl, castle[0], castle[1]);
                 if (sala == null) {
@@ -263,11 +264,17 @@ public final class ClientCiTest {
                 sp.teleportTo(lvl, t.seatX() + 0.5, t.y(), t.z1() + 4.5, 180f, 0f);
             });
         });
-        atTicks(B + 140, "Captura: el salon del trono desde la puerta", m -> {
+        atTicks(B + 130, "Captura: el salon del trono desde la puerta", m -> {
             m.options.hideGui = true;
-            shot(m, "cliente_20_salon");
+            shot(m, "cliente_19_salon");
         });
-        atTicks(B + 150, "Entrar en el salon del trono", m -> {
+        atTicks(B + 134, "Camara delante del trono", m -> {
+            var t = sala.t;
+            verDesde(m, new Vec3(t.seatX() + 0.5, t.y() + 4.6, t.seatZ() + 5.5), new Vec3(t.seatX() + 0.5, t.y() + 4.6, t.seatZ() + 0.5));
+        });
+        atTicks(B + 150, "Captura: el rey sentado en su trono", m -> shot(m, "cliente_20_rey_trono"));
+        atTicks(B + 152, "Entrar en el salon del trono", m -> {
+            m.setCameraEntity(m.player);
             m.options.hideGui = false;
             server(m, sp -> {
                 var t = sala.t;
@@ -277,54 +284,130 @@ public final class ClientCiTest {
             });
             reyStart = ticks;
         });
-        int E = B + 150;
-        int[] intro = {30, 90, 170, 250, 320, 370};
+        int E = B + 152;
+        int[] intro = {50, 110, 170, 240, 300, 330};
         for (int i = 0; i < intro.length; i++) {
             final int k = i;
             atTicks(E + intro[i], "Captura de la intro", m -> shot(m, String.format("cliente_%02d_intro_%d", 21 + k, k)));
         }
-        int F = E + 380;
-        atTicks(F, "Empieza la pelea: camara detras del jugador", m -> {
-            m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+        int F = E + 400;
+        atTicks(F, "Empieza la pelea: camara de observador", m -> {
+            m.options.hideGui = true;
             seguir = true;
         });
         for (int i = 0; i < 6; i++) {
             final int k = i;
-            atTicks(F + 20 + i * 60, "Captura fase 1", m -> shot(m, String.format("cliente_%02d_fase1_%d", 30 + k, k)));
+            atTicks(F + 20 + i * 55, "Captura fase 1", m -> {
+                m.options.hideGui = k != 2;
+                shot(m, String.format("cliente_%02d_fase1_%d", 30 + k, k));
+            });
         }
-        int F2 = F + 400;
+        int F2 = F + 360;
         atTicks(F2, "Forzar fase 2", m -> server(m, sp -> reyCerca(sp).ifPresent(r -> r.forzarFase(2))));
         for (int i = 0; i < 6; i++) {
             final int k = i;
-            atTicks(F2 + 15 + i * 50, "Captura fase 2", m -> shot(m, String.format("cliente_%02d_fase2_%d", 40 + k, k)));
+            atTicks(F2 + 15 + i * 50, "Captura fase 2", m -> {
+                m.options.hideGui = k != 1;
+                shot(m, String.format("cliente_%02d_fase2_%d", 40 + k, k));
+            });
         }
-        int F3 = F2 + 340;
-        atTicks(F3, "Forzar fase 3", m -> server(m, sp -> reyCerca(sp).ifPresent(r -> r.forzarFase(3))));
-        for (int i = 0; i < 6; i++) {
+        int F3 = F2 + 330;
+        atTicks(F3, "Forzar fase 3 (a los volcanes)", m -> server(m, sp -> reyCerca(sp).ifPresent(r -> r.forzarFase(3))));
+        int[] v = {40, 100, 170, 220, 280, 360, 420, 480};
+        for (int i = 0; i < v.length; i++) {
             final int k = i;
-            atTicks(F3 + 15 + i * 50, "Captura fase 3", m -> shot(m, String.format("cliente_%02d_fase3_%d", 50 + k, k)));
+            atTicks(F3 + v[i], "Captura fase 3", m -> {
+                m.options.hideGui = k < 5 ? false : k != 6;
+                shot(m, String.format("cliente_%02d_fase3_%d", 50 + k, k));
+            });
         }
-        int D = F3 + 340;
+        int D = F3 + 540;
         atTicks(D, "Forzar la muerte del Rey", m -> server(m, sp -> reyCerca(sp).ifPresent(com.ciudadela.rey.Rey::forzarMuerte)));
-        int[] muerte = {20, 50, 75, 100, 125, 160, 200};
+        int[] muerte = {20, 70, 100, 125, 133, 142, 175, 230};
         for (int i = 0; i < muerte.length; i++) {
             final int k = i;
-            atTicks(D + muerte[i], "Captura de la muerte", m -> shot(m, String.format("cliente_%02d_muerte_%d", 60 + k, k)));
+            atTicks(D + muerte[i], "Captura de la muerte", m -> {
+                m.options.hideGui = false;
+                shot(m, String.format("cliente_%02d_muerte_%d", 60 + k, k));
+            });
         }
-        atTicks(D + 230, "Abrir el cofre del premio (capitulo 3)", m -> {
+        atTicks(D + 260, "Abrir el cofre del premio (capitulo 3)", m -> {
             seguir = false;
+            m.setCameraEntity(m.player);
             m.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
             server(m, sp -> {
                 BlockPos p = sala.chest();
-                log("cofre del premio: " + sp.serverLevel().getBlockState(p));
-                sp.teleportTo(sp.serverLevel(), p.getX() + 0.5, p.getY(), p.getZ() + 2.5, 180f, 30f);
+                log("cofre del premio: " + sp.serverLevel().getBlockState(p) + " | jugador en " + sp.level().dimension().location());
+                sp.teleportTo(sp.getServer().overworld(), p.getX() + 0.5, p.getY(), p.getZ() + 2.5, 180f, 30f);
                 sp.gameMode.useItemOn(sp, sp.serverLevel(), ItemStack.EMPTY, InteractionHand.MAIN_HAND,
                         new BlockHitResult(Vec3.atCenterOf(p), Direction.SOUTH, p, false));
             });
             cineStart = ticks;
         });
-        atTicks(D + 230 + 200, "Captura del cofre del premio", m -> shot(m, "cliente_70_premio"));
-        atTicks(D + 230 + 240, "Fin de la prueba", ClientCiTest::finish);
+        atTicks(D + 260 + 210, "Captura del cofre del premio", m -> shot(m, "cliente_70_premio"));
+        sello(D + 260 + 230);
+    }
+
+    // ------------------------------------------------------------------ el sello de la sala del arbol
+
+    private static int[] hall;
+
+    private static void sello(int S) {
+        atTicks(S, "Sello: a la sala del arbol", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                sp.closeContainer();
+                ServerLevel lvl = sp.getServer().overworld();
+                CastlePlan plan = PlanCache.get(lvl.getSeed(), castle[0], castle[1], (x, z) -> 64);
+                hall = plan.treeHall();
+                log("sala del arbol en " + hall[0] + "," + hall[2] + "," + hall[1] + " radio " + hall[3]);
+                sp.teleportTo(lvl, hall[0] + 0.5, hall[2], hall[1] + 7.5, 180f, 10f);
+            });
+        });
+        atTicks(S + 100, "Captura: el sello desde fuera", m -> {
+            m.options.hideGui = true;
+            shot(m, "cliente_75_sello");
+            server(m, sp -> {
+                sp.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(CiudadelaMod.LLAVE_ARBOL.get()));
+                BlockPos sb = new BlockPos(hall[0], hall[2] + 1, hall[1] + 4);
+                log("bloque del sello: " + sp.serverLevel().getBlockState(sb));
+                sp.teleportTo(sp.serverLevel(), hall[0] + 0.5, hall[2], hall[1] + 3.5, 0f, 10f);
+            });
+        });
+        atTicks(S + 130, "Usar la llave en el sello", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                BlockPos sb = new BlockPos(hall[0], hall[2] + 1, hall[1] + 4);
+                sp.gameMode.useItemOn(sp, sp.serverLevel(), sp.getMainHandItem(), InteractionHand.MAIN_HAND,
+                        new BlockHitResult(Vec3.atCenterOf(sb), Direction.NORTH, sb, false));
+            });
+        });
+        int[] w = {20, 50, 80, 110};
+        for (int i = 0; i < w.length; i++) {
+            final int k = i;
+            atTicks(S + 130 + w[i], "Captura del sello", m -> shot(m, String.format("cliente_%02d_sello_%d", 76 + k, k)));
+        }
+        atTicks(S + 130 + 150, "Captura: la sala del arbol abierta", m -> {
+            server(m, sp -> log("sello despues: " + sp.serverLevel().getBlockState(new BlockPos(hall[0], hall[2] + 1, hall[1] + 4))));
+            shot(m, "cliente_80_sala_arbol");
+        });
+        atTicks(S + 130 + 170, "Fin de la prueba", ClientCiTest::finish);
+    }
+
+    // ------------------------------------------------------------------ camara de observador
+
+    private static com.ciudadela.client.CineCamera obs;
+    private static Vec3 obsPos;
+
+    private static void verDesde(Minecraft mc, Vec3 pos, Vec3 look) {
+        if (obs == null || obs.level() != mc.level) obs = new com.ciudadela.client.CineCamera(mc.level);
+        Vec3 d = look.subtract(pos);
+        float yaw = (float) (Math.atan2(d.z, d.x) * 180 / Math.PI) - 90f;
+        float pitch = (float) -(Math.atan2(d.y, Math.sqrt(d.x * d.x + d.z * d.z)) * 180 / Math.PI);
+        obs.moveTo(pos.x, pos.y - com.ciudadela.client.CineCamera.EYE, pos.z, yaw, pitch);
+        obs.setOldPosAndRot();
+        mc.setCameraEntity(obs);
+        mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
     }
 
     private static int reyStart = -1;
@@ -340,14 +423,22 @@ public final class ClientCiTest {
         com.ciudadela.rey.Rey cr = null;
         for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering())
             if (e instanceof com.ciudadela.rey.Rey r) cr = r;
-        if (seguir && cr != null) {
-            Vec3 d = cr.position().add(0, 1.6, 0).subtract(mc.player.getEyePosition());
-            float yaw = (float) (Math.atan2(d.z, d.x) * 180 / Math.PI) - 90f;
-            float pitch = (float) -(Math.atan2(d.y, Math.sqrt(d.x * d.x + d.z * d.z)) * 180 / Math.PI);
-            mc.player.setYRot(yaw);
-            mc.player.setXRot(pitch);
-            mc.player.yRotO = yaw;
-            mc.player.xRotO = pitch;
+        if (obs != null && obs.level() != mc.level && mc.getCameraEntity() == obs) mc.setCameraEntity(mc.player);
+        if (seguir && cr != null && !ClientCine.active()) {
+            Vec3 b = cr.position(), pp = mc.player.position();
+            Vec3 d = new Vec3(b.x - pp.x, 0, b.z - pp.z);
+            if (d.lengthSqr() < 0.01) d = new Vec3(0, 0, 1);
+            d = d.normalize();
+            Vec3 side = new Vec3(-d.z, 0, d.x);
+            Vec3 mid = b.add(pp).scale(0.5);
+            Vec3 want = mid.add(side.scale(8.5)).subtract(d.scale(2.5)).add(0, 3.6, 0);
+            if (sala != null && mc.level.dimension() == net.minecraft.world.level.Level.OVERWORLD) {
+                var tt = sala.t;
+                want = new Vec3(Math.max(tt.x0() + 1.5, Math.min(tt.x1() - 0.5, want.x)), Math.min(tt.y() + tt.h() - 2, want.y),
+                        Math.max(tt.z0() + 1.5, Math.min(tt.z1() - 0.5, want.z)));
+            }
+            obsPos = obsPos == null || obsPos.distanceToSqr(want) > 400 ? want : obsPos.add(want.subtract(obsPos).scale(0.12));
+            verDesde(mc, obsPos, mid.add(0, 1.4, 0));
         }
         if (t % 20 == 0)
             server(mc, sp -> reyCerca(sp).ifPresentOrElse(r -> log("  rey: " + r.debug() + " | jugador vida " + Math.round(sp.getHealth())

@@ -1,0 +1,8 @@
+{
+  "parent": "item/handheld",
+  "textures": {"layer0": "ciudadela:item/espada_siniestra"},
+  "overrides": [
+    {"predicate": {"ciudadela:forma": 0.4}, "model": "ciudadela:item/espada_siniestra_fuego"},
+    {"predicate": {"ciudadela:forma": 0.9}, "model": "ciudadela:item/espada_siniestra_lava"}
+  ]
+}

@@ -40,7 +40,25 @@ public final class Victoria {
         st.set(s.key(), ReyEstado.MUERTO);
         st.ganadores(s.key(), todos);
         CiudadelaMod.LOGGER.info("[Ciudadela] El Rey ha caido ({} jugadores)", todos.size());
-        if (Volcan.es(sl)) Volcan.devolverTodos(sl);
+        if (Volcan.es(sl)) {
+            // la dimension se rompe como un cristal y se vuelve al salon del trono
+            for (ServerPlayer p : sl.players()) Net.to(p, new Net.Romper(30));
+            sl.playSound(null, Volcan.CENTRO.x, Volcan.CENTRO.y, Volcan.CENTRO.z, SoundEvents.GLASS_BREAK, SoundSource.MASTER, 4f, 0.5f);
+            ServerLevel vol = sl;
+            despues(26, () -> Volcan.devolverTodos(vol, s));
+            despues(40, () -> premio(ow, s));
+        } else premio(ow, s);
+    }
+
+    private record Luego(int at, Runnable r) {}
+
+    private static final List<Luego> LUEGO = new ArrayList<>();
+
+    private static void despues(int ticks, Runnable r) {
+        LUEGO.add(new Luego(tick + ticks, r));
+    }
+
+    private static void premio(ServerLevel ow, Sala s) {
         Rey.abrirPuertas(ow, s);
         BlockPos chest = s.chest();
         // que no quede nada encima (alfombra)
@@ -56,6 +74,17 @@ public final class Victoria {
     public static void onTick(TickEvent.ServerTickEvent e) {
         if (e.phase != TickEvent.Phase.END) return;
         tick++;
+        if (!LUEGO.isEmpty()) {
+            List<Luego> now = new ArrayList<>();
+            LUEGO.removeIf(l -> {
+                if (l.at() <= tick) {
+                    now.add(l);
+                    return true;
+                }
+                return false;
+            });
+            for (Luego l : now) l.r().run();
+        }
         if (TAREAS.isEmpty()) return;
         ServerLevel ow = e.getServer().overworld();
         Iterator<Tarea> it = TAREAS.iterator();

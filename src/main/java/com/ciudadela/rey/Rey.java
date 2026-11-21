@@ -75,7 +75,7 @@ public class Rey extends Monster {
     public int lastFx = -1, ashStart = -1;
 
     // ------------------------------------------------------------------ servidor
-    public enum Estado { DORMIDO, INTRO, LEVANTA, LUCHA, CAMBIO, ATURDIDO, MUERTE }
+    public enum Estado { DORMIDO, INTRO, LEVANTA, LUCHA, CAMBIO, ATURDIDO, MUERTE, CINE3 }
 
     private Estado estado = Estado.DORMIDO;
     private int t;                       // ticks en el estado actual
@@ -335,6 +335,19 @@ public class Rey extends Monster {
             case CAMBIO -> cambio(sl);
             case ATURDIDO -> aturdido(sl);
             case MUERTE -> muerte(sl);
+            case CINE3 -> cine3(sl);
+        }
+        if (Volcan.es(sl) && estado != Estado.CINE3) {
+            // que no se caiga de la plataforma
+            double dx = getX() - Volcan.CENTRO.x, dz = getZ() - Volcan.CENTRO.z;
+            if (getY() < Volcan.MAR + 1 || dx * dx + dz * dz > (Volcan.R + 2) * (Volcan.R + 2)) {
+                sl.sendParticles(ParticleTypes.LARGE_SMOKE, getX(), getY() + 1, getZ(), 30, 0.6, 1, 0.6, 0.02);
+                moveTo(Volcan.CENTRO.x, Volcan.CENTRO.y, Volcan.CENTRO.z, getYRot(), 0);
+                setDeltaMovement(Vec3.ZERO);
+                atq = null;
+                sl.sendParticles(ParticleTypes.LARGE_SMOKE, getX(), getY() + 1, getZ(), 30, 0.6, 1, 0.6, 0.02);
+            }
+            if (t % 400 == 0) Volcan.mantener(sl);
         }
         barra.setProgress(Mth.clamp(getHealth() / getMaxHealth(), 0f, 1f));
     }
@@ -376,10 +389,12 @@ public class Rey extends Monster {
             if (in != null) p.teleportTo(sl, in.x, in.y, in.z, p.getYRot(), p.getXRot());
         }
         ReyEstado.get(sl.getServer()).set(s.key(), ReyEstado.LUCHA);
+        Volcan.preparar(sl.getServer());
         cerrando = true;
         puerta = 0;
         cambiar(Estado.INTRO);
-        for (ServerPlayer p : jugadoresVivos(sl)) Net.to(p, new Net.ReyFoco(getId(), INTRO_TICKS));
+        for (ServerPlayer p : jugadoresVivos(sl))
+            com.ciudadela.cine.Cinematics.playShots(p, com.ciudadela.cine.Cinematics.REY_INTRO, introPlanos(s, p.getEyePosition()), INTRO_TICKS / 20f);
         CiudadelaMod.LOGGER.info("[Ciudadela] El Rey despierta ({} jugadores)", jugadores.size());
     }
 
@@ -414,6 +429,31 @@ public class Rey extends Monster {
             setFlag(F_HABLA, false);
             levantarse(sl);
         }
+    }
+
+    private static double[] p(double... v) {
+        return v;
+    }
+
+    /** Planos de la intro: avanzar por la alfombra, su cara mientras habla, contrapicado y se levanta. */
+    public static List<com.ciudadela.cine.Shot> introPlanos(Sala s, Vec3 eye) {
+        double sx = s.t.seatX() + 0.5, sz = s.t.seatZ() + 0.5, F = s.t.y();
+        double headY = F + 4.9;
+        List<com.ciudadela.cine.Shot> l = new ArrayList<>();
+        double ax = sx, ay = F + 3.0, az = sz + 15;
+        l.add(new com.ciudadela.cine.Shot(0f, 4.6f, 70, 0, 1,
+                p(eye.x, eye.y, eye.z, (eye.x + ax) / 2, F + 3.4, (eye.z + az) / 2, ax, ay, az),
+                p(sx, headY, sz, sx, headY, sz)));
+        l.add(new com.ciudadela.cine.Shot(4.6f, 10.6f, 55, 0, 1,
+                p(sx + 2.4, F + 4.6, sz + 4.6, sx + 1.5, F + 4.8, sz + 3.7),
+                p(sx, headY, sz + 0.2, sx, headY, sz + 0.2)));
+        l.add(new com.ciudadela.cine.Shot(10.6f, 14.0f, 62, -2, 0,
+                p(sx - 4.5, F + 3.2, sz + 6.0, sx - 3.6, F + 3.0, sz + 5.4),
+                p(sx, headY - 0.3, sz, sx, headY - 0.2, sz)));
+        l.add(new com.ciudadela.cine.Shot(14.0f, INTRO_TICKS / 20f - 0.6f, 68, 0, 2,
+                p(sx + 6.5, F + 2.4, sz + 12.5, sx + 5.5, F + 2.8, sz + 11.0),
+                p(sx, F + 3.4, sz + 4, sx, F + 3.6, sz + 5)));
+        return l;
     }
 
     private void levantarse(ServerLevel sl) {
@@ -581,7 +621,7 @@ public class Rey extends Monster {
             if ((a.fases & (1 << (f - 1))) == 0) continue;
             if (d < a.min || d > a.max) continue;
             if (cds.getOrDefault(a, 0) > tGlobal) continue;
-            if (a == Atq.GOLPE_FINAL && getHealth() > VIDA / 3f * 0.85f && tGlobal < 600) continue;
+            if (a == Atq.GOLPE_FINAL && tGlobal - faseIni < 300) continue;
             c.add(a);
             total += a.peso;
         }
@@ -595,7 +635,7 @@ public class Rey extends Monster {
         return c.get(c.size() - 1);
     }
 
-    private int tGlobal;
+    private int tGlobal, faseIni;
 
     @Override
     public void aiStep() {
@@ -1153,6 +1193,7 @@ public class Rey extends Monster {
         if (t == 18) {
             int nf = fase() + 1;
             this.entityData.set(FASE, nf);
+            faseIni = tGlobal;
             sonido(sl, SoundEvents.RAVAGER_ROAR, 2.0f, 0.5f);
             sonido(sl, SoundEvents.ENDER_DRAGON_GROWL, 1.0f, 0.7f);
             sonido(sl, nf == 2 ? SoundEvents.BLAZE_SHOOT : SoundEvents.BUCKET_EMPTY_LAVA, 1.5f, 0.5f);
@@ -1173,8 +1214,7 @@ public class Rey extends Monster {
         if (t >= ReyAnims.TICKS[ReyAnims.GRITO]) {
             if (fase() == 3 && level().dimension() == Level.OVERWORLD && Volcan.disponible(sl)) {
                 // a los volcanes
-                Volcan.llevar(sl, this, jugadoresVivos(sl));
-                return;
+                if (Volcan.llevar(sl, this, jugadoresVivos(sl))) return;
             }
             recup = 6;
             cambiar(Estado.LUCHA);
@@ -1204,6 +1244,76 @@ public class Rey extends Monster {
 
     public void setVida(float hp) {
         setHealth(hp);
+    }
+
+    // ------------------------------------------------------------------ los volcanes
+
+    /** El rey nuevo (en los volcanes) sigue la pelea del de la sala. */
+    public void copiarDe(Rey o) {
+        this.home = o.home;
+        this.sala = o.sala;
+        this.setHealth(o.getHealth());
+        this.entityData.set(FASE, 3);
+        this.tGlobal = o.tGlobal;
+        this.faseIni = o.tGlobal;
+        this.cds.putAll(o.cds);
+    }
+
+    /** Empieza la cinematica de los volcanes: cae del cielo como un meteorito y ruge. */
+    public void enVolcanCine(ServerLevel sl, Collection<UUID> quienes) {
+        jugadores.clear();
+        jugadores.addAll(quienes);
+        this.entityData.set(FASE, 3);
+        setPose(POSE_PIE);
+        setNoGravity(true);
+        this.noPhysics = true;
+        alturaInicio = getY();
+        cambiar(Estado.CINE3);
+    }
+
+    private void cine3(ServerLevel sl) {
+        Vec3 c = Volcan.CENTRO;
+        setDeltaMovement(Vec3.ZERO);
+        if (t < 120) {
+            setPos(c.x, alturaInicio, c.z);
+            if (t == 1) anim(ReyAnims.SALTO);
+        } else if (t < 152) {
+            double q = (t - 120) / 32.0;
+            setPos(c.x, Mth.lerp(q * q, alturaInicio, c.y), c.z);
+            sl.sendParticles(ParticleTypes.FLAME, getX(), getY() + 1.5, getZ(), 12, 0.5, 1.2, 0.5, 0.05);
+            sl.sendParticles(ParticleTypes.LAVA, getX(), getY() + 1.5, getZ(), 3, 0.4, 0.8, 0.4, 0.02);
+            sl.sendParticles(ParticleTypes.LARGE_SMOKE, getX(), getY() + 3, getZ(), 6, 0.4, 1.0, 0.4, 0.02);
+            if (t == 121) {
+                anim(ReyAnims.SALTO);
+                sonido(sl, SoundEvents.FIRECHARGE_USE, 3f, 0.4f);
+            }
+        } else if (t == 152) {
+            setPos(c.x, c.y, c.z);
+            setNoGravity(false);
+            this.noPhysics = false;
+            setFlag(F_LUCHA, true);
+            golpeSuelo(sl, c, 9f);
+            sl.sendParticles(ParticleTypes.EXPLOSION_EMITTER, c.x, c.y + 0.5, c.z, 3, 2, 0.3, 2, 0);
+            for (int r = 1; r <= 8; r++) anillo(sl, ParticleTypes.LAVA, r * 2.2, c.y + 0.3, 12 + r * 6);
+            sonido(sl, SoundEvents.GENERIC_EXPLODE, 4f, 0.4f);
+            sonido(sl, SoundEvents.DRAGON_FIREBALL_EXPLODE, 3f, 0.5f);
+        } else if (t == 200) {
+            anim(ReyAnims.GRITO);
+            sonido(sl, SoundEvents.RAVAGER_ROAR, 3f, 0.45f);
+            habla(sl, 9);
+        }
+        if (t >= (int) (Volcan.CINE * 20) + 4) {
+            barra.setVisible(true);
+            for (ServerPlayer p : jugadoresVivos(sl)) barra.addPlayer(p);
+            recup = 20;
+            cambiar(Estado.LUCHA);
+        }
+    }
+
+    /** Desaparece sin volver al trono (el rey sigue en los volcanes). */
+    public void discardSinReinicio() {
+        barra.removeAllPlayers();
+        discard();
     }
 
     // ------------------------------------------------------------------ muerte
@@ -1236,7 +1346,7 @@ public class Rey extends Monster {
             if (t % 10 == 0) sonido(sl, SoundEvents.SAND_BREAK, 1.0f, 0.5f);
         }
         if (t == 125) {
-            barra.removeAllPlayers();
+            quitarBarra();
             barra.setVisible(false);
             Victoria.ganar(sl, this, jugadoresVivos(sl), new ArrayList<>(jugadores));
             discard();
@@ -1248,7 +1358,7 @@ public class Rey extends Monster {
     /** Todos han caido (o /kill): el rey vuelve a su trono con toda la vida y se abren las puertas. */
     public void reiniciar(ServerLevel sl, String why) {
         CiudadelaMod.LOGGER.info("[Ciudadela] El Rey vuelve a su trono ({})", why);
-        barra.removeAllPlayers();
+        quitarBarra();
         barra.setVisible(false);
         atq = null;
         zonas.clear();
@@ -1262,7 +1372,7 @@ public class Rey extends Monster {
             if (level().dimension() != Level.OVERWORLD) {
                 // en los volcanes: este rey desaparece y aparece otro en el trono
                 s.openAll(ow);
-                Volcan.devolverTodos(sl);
+                Volcan.devolverTodos(sl, s);
                 discard();
                 ReyEventos.asegurarRey(ow, s);
                 return;
@@ -1301,8 +1411,16 @@ public class Rey extends Monster {
 
     @Override
     public void remove(RemovalReason reason) {
-        barra.removeAllPlayers();
+        quitarBarra();
         super.remove(reason);
+    }
+
+    /** Quita la barra de vida a todos (tambien a quien se hubiera quedado con ella). */
+    private void quitarBarra() {
+        barra.removeAllPlayers();
+        if (level() instanceof ServerLevel sl)
+            for (ServerPlayer p : sl.getServer().getPlayerList().getPlayers())
+                p.connection.send(net.minecraft.network.protocol.game.ClientboundBossEventPacket.createRemovePacket(barra.getId()));
     }
 
     /** Para la prueba de la CI: que esta haciendo. */

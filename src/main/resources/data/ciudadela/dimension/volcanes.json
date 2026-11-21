@@ -1,0 +1,18 @@
+{
+  "type": "ciudadela:volcanes",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "ciudadela:volcanes",
+      "lakes": false,
+      "features": false,
+      "layers": [
+        {"block": "minecraft:bedrock", "height": 1},
+        {"block": "minecraft:basalt", "height": 57},
+        {"block": "minecraft:magma_block", "height": 1},
+        {"block": "minecraft:lava", "height": 2}
+      ],
+      "structure_overrides": []
+    }
+  }
+}

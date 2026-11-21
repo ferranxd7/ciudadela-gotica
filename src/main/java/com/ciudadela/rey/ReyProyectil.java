@@ -107,6 +107,19 @@ public class ReyProyectil extends Projectile {
         setPos(next);
         double r = tipo() == TAJO ? 1.6 : (tipo() == OLA ? 1.1 : 0.8);
         AABB box = new AABB(getX() - r, getY() - (tipo() == TAJO ? 1.2 : 0.6), getZ() - r, getX() + r, getY() + (tipo() == OLA ? 1.6 : 1.2), getZ() + r);
+        if (getOwner() instanceof net.minecraft.world.entity.player.Player pl) {
+            // tajos de las espadas del Rey en manos de un jugador: dan a los monstruos
+            for (net.minecraft.world.entity.LivingEntity le : sl.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, box,
+                    x -> com.ciudadela.armas.Combos.valido(pl, x))) {
+                if (!tocados.add(le.getUUID())) continue;
+                le.invulnerableTime = 0;
+                if (le.hurt(sl.damageSources().playerAttack(pl), dano)) {
+                    if (!le.fireImmune()) le.setSecondsOnFire(4);
+                    le.knockback(0.5, -v.x, -v.z);
+                }
+            }
+            return;
+        }
         for (ServerPlayer p : sl.getEntitiesOfClass(ServerPlayer.class, box)) {
             if (!Rey.valido(p) || !tocados.add(p.getUUID())) continue;
             Entity owner = getOwner();

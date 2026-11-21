@@ -12,8 +12,24 @@ public final class ClientSetup {
 
     @SubscribeEvent
     public static void overlays(RegisterGuiOverlaysEvent e) {
+        e.registerAboveAll("energia", com.ciudadela.client.armas.ArmasCliente::render);
         e.registerAboveAll("rey", com.ciudadela.client.rey.ReyCliente::renderOverlay);
         e.registerAboveAll("cinematica", ClientCine::renderOverlay);
+    }
+
+    @SubscribeEvent
+    public static void setup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent e) {
+        e.enqueueWork(() -> {
+            net.minecraft.resources.ResourceLocation forma = new net.minecraft.resources.ResourceLocation(CiudadelaMod.MODID, "forma");
+            for (var it : java.util.List.of(CiudadelaMod.ESPADA_DIESTRA.get(), CiudadelaMod.ESPADA_SINIESTRA.get()))
+                net.minecraft.client.renderer.item.ItemProperties.register(it, forma,
+                        (stack, level, ent, seed) -> com.ciudadela.armas.EspadaRey.forma(stack) / 2f);
+        });
+    }
+
+    @SubscribeEvent
+    public static void dimensiones(net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent e) {
+        e.register(com.ciudadela.client.rey.VolcanCliente.EFECTOS, new com.ciudadela.client.rey.VolcanCliente.Efectos());
     }
 
     @SubscribeEvent

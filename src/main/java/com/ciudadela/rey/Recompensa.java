@@ -15,6 +15,9 @@ public final class Recompensa {
     public static void llenar(ServerPlayer sp, ServerLevel lvl, BlockPos pos, NonNullList<ItemStack> items) {
         Sala s = Sala.near(lvl, pos.getX(), pos.getZ());
         if (s == null || !ReyEstado.get(lvl.getServer()).gano(s.key(), sp.getUUID())) return;
+        items.set(3, new ItemStack(com.ciudadela.CiudadelaMod.ESPADA_DIESTRA.get()));
+        items.set(5, new ItemStack(com.ciudadela.CiudadelaMod.ESPADA_SINIESTRA.get()));
+        items.set(4, new ItemStack(com.ciudadela.CiudadelaMod.LLAVE_ARBOL.get()));
         items.set(10, new ItemStack(Items.NETHERITE_INGOT, 4));
         items.set(16, new ItemStack(Items.ENCHANTED_GOLDEN_APPLE, 2));
         items.set(19, new ItemStack(Items.EXPERIENCE_BOTTLE, 32));

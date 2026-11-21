@@ -84,6 +84,7 @@ public final class Storm {
         }
         if (inside) {
             if (!was) INSIDE.add(id);
+            if (com.ciudadela.cine.Cinematics.active(p)) return;
             if (!was || p.tickCount % 40 == 0) p.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0));
             p.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, 1.0F));
             float thunder = 0.6F + 0.4F * (float) Math.sin(lvl.getGameTime() / 1200.0);

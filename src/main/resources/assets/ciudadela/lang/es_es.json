@@ -122,5 +122,21 @@
   "death.attack.ciudadela.rey.player": "%1$s fue ejecutado por %2$s",
   "death.attack.ciudadela.rey_area": "%1$s ardió ante %2$s",
   "death.attack.ciudadela.rey_area.player": "%1$s ardió ante %2$s",
-  "subtitles.ciudadela.rey.voz": "Corvin habla"
+  "subtitles.ciudadela.rey.voz": "Corvin habla",
+  "ciudadela.rey.titulo.30": "CORVIN",
+  "ciudadela.rey.subtitulo.30": "El Rey que Arde",
+  "ciudadela.rey.titulo.32": "CORVIN",
+  "ciudadela.rey.subtitulo.32": "El Rey que Espera",
+  "item.ciudadela.espada_diestra": "Diestra del Rey",
+  "item.ciudadela.espada_siniestra": "Siniestra del Rey",
+  "item.ciudadela.espada.lore": "Las espadas de Corvin, templadas en el fuego que devoró Valdrenn",
+  "item.ciudadela.espada.combo1": "Shift + clic izquierdo: Tajo Real (35 de energía)",
+  "item.ciudadela.espada.combo2": "Ctrl + clic izquierdo: Juicio del Rey (80 de energía)",
+  "item.ciudadela.espada.bloqueo": "Clic derecho: cubrirse con las espadas cruzadas",
+  "item.ciudadela.espada.dos": "Con una en cada mano los combos golpean más fuerte",
+  "ciudadela.espada.sin_energia": "Te falta energía (necesitas %s): golpea con las espadas para llenarla",
+  "item.ciudadela.llave_arbol": "Llave del Árbol",
+  "item.ciudadela.llave_arbol.lore": "Abre el sello de la Sala del Árbol",
+  "item.ciudadela.llave_arbol.aqui_no": "Esta llave abre el sello rojo de la Sala del Árbol",
+  "block.ciudadela.sello_runico": "Sello rúnico"
 }

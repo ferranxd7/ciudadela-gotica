@@ -47,6 +47,20 @@ public final class Cinematics {
         boolean flying, mayfly, invisible;
     }
 
+    /** Cinematicas de jefes (no son capitulos): los planos los manda quien la empieza. */
+    public static final int REY_VOLCAN = 30, SELLO = 31, REY_INTRO = 32;
+
+    /** Cinematica con planos dados, sin mover al jugador (los planos estan cerca de donde esta). */
+    public static void playShots(ServerPlayer p, int id, List<Shot> shots, float total) {
+        Session s = new Session();
+        s.chapter = id;
+        s.startTick = p.getServer().getTickCount();
+        s.total = total;
+        s.shots = shots;
+        ACTIVE.put(p.getUUID(), s);
+        Net.to(p, new Net.CineStart(id, shots, new double[0]));
+    }
+
     public static boolean active(Player p) {
         return ACTIVE.containsKey(p.getUUID());
     }
@@ -157,6 +171,7 @@ public final class Cinematics {
 
     private static void finish(ServerPlayer p, Session s) {
         if (s.moved && !s.back) restore(p, s);
+        if (s.chapter >= REY_VOLCAN) return;
         Story.markSeen(p, s.chapter);
         if (s.chest != null) StoryEvents.openChest(p, s.chest, s.chapter);
     }

@@ -68,9 +68,41 @@ public final class ClientCine {
     private static CameraType savedCam;
     private static float lockYaw, lockPitch;
     private static SoundInstance narr;
+    private static Double savedGamma;
+    private static float savedRain = -1, savedThunder = -1;
+
+    /** Durante los planos de camara: algo mas de brillo y sin lluvia, para que se vea la isla. */
+    private static void verMejor(Minecraft mc, boolean on) {
+        if (on) {
+            if (savedGamma == null) {
+                savedGamma = mc.options.gamma().get();
+                mc.options.gamma().set(Math.max(savedGamma, 1.0));
+            }
+            if (mc.level != null) {
+                if (savedRain < 0) {
+                    savedRain = mc.level.getRainLevel(1f);
+                    savedThunder = mc.level.getThunderLevel(1f);
+                }
+                mc.level.setRainLevel(0f);
+                mc.level.setThunderLevel(0f);
+            }
+        } else {
+            if (savedGamma != null) mc.options.gamma().set(savedGamma);
+            savedGamma = null;
+            if (savedRain >= 0 && mc.level != null) {
+                mc.level.setRainLevel(savedRain);
+                mc.level.setThunderLevel(savedThunder);
+            }
+            savedRain = savedThunder = -1;
+        }
+    }
 
     public static boolean active() {
         return active;
+    }
+
+    public static int chapter() {
+        return active ? chapter : 0;
     }
 
     /** Segundos desde que empezo la cinematica (0 si no hay). */
@@ -98,7 +130,7 @@ public final class ClientCine {
         ticks = 0;
         skipHold = 0;
         camShot = -1;
-        total = Timeline.total(chapter);
+        total = chapter >= 30 && !shots.isEmpty() ? shots.get(shots.size() - 1).t1 + 0.6f : Timeline.total(chapter);
         flashT = shakeT = -99;
         titleBolt = narrStarted = camOn = false;
         narr = null;
@@ -108,7 +140,7 @@ public final class ClientCine {
         mc.options.setCameraType(CameraType.FIRST_PERSON);
         mc.getMusicManager().stopPlaying();
         if (mc.screen != null) mc.setScreen(null);
-        ClientMusic.storyStart(chapter);
+        if (chapter < 30) ClientMusic.storyStart(chapter);
     }
 
     /** Termina la cinematica (al acabar, al saltarla o porque lo dice el servidor). */
@@ -121,9 +153,10 @@ public final class ClientCine {
         if (camOn && mc.player != null) mc.setCameraEntity(mc.player);
         camOn = false;
         cam = null;
+        verMejor(mc, false);
         if (savedCam != null) mc.options.setCameraType(savedCam);
         savedCam = null;
-        ClientMusic.storyCineEnd();
+        if (chapter < 30) ClientMusic.storyCineEnd();
         if (skipped) Net.CH.sendToServer(new Net.CineSkip());
     }
 
@@ -152,6 +185,7 @@ public final class ClientCine {
             }
         } else skipHold = Math.max(0, skipHold - 2);
         // el rayo del titulo, delante del jugador
+        if (chapter >= 30) titleBolt = true;
         if (!titleBolt && t >= Timeline.BOLT) {
             titleBolt = true;
             Vec3 eye = mc.player.getEyePosition();
@@ -163,7 +197,7 @@ public final class ClientCine {
             bolt(mc, p.x, y, p.z, 1.0f);
         }
         // campana funebre
-        for (int i = 0; i < Timeline.BELLS.length; i++) {
+        for (int i = 0; i < Timeline.BELLS.length && chapter < 30; i++) {
             if (bellDone[i] || t < Timeline.BELLS[i]) continue;
             bellDone[i] = true;
             mc.getSoundManager().play(SimpleSoundInstance.forUI(CiudadelaMod.CAMPANA.get(), 1.0f, 1.0f - i * 0.15f));
@@ -188,6 +222,7 @@ public final class ClientCine {
         }
         // camara de cine
         if (!shots.isEmpty()) updateCamera(mc, t);
+        verMejor(mc, camOn);
         if (camOn) mc.options.setCameraType(CameraType.FIRST_PERSON);
         else {
             mc.player.setYRot(lockYaw);
@@ -213,8 +248,12 @@ public final class ClientCine {
         shakeK = flash;
     }
 
+    private static float backT() {
+        return chapter >= 30 ? total - 0.45f : Timeline.back(chapter);
+    }
+
     private static int shotIndex(float t) {
-        if (t >= Timeline.back(chapter)) return -1;
+        if (t >= backT()) return -1;
         for (int i = shots.size() - 1; i >= 0; i--) if (t >= shots.get(i).t0) return t < shots.get(i).t1 + 0.5f ? i : -1;
         return -1;
     }
@@ -295,6 +334,9 @@ public final class ClientCine {
 
     @SubscribeEvent
     public static void onLeave(ClientPlayerNetworkEvent.LoggingOut e) {
+        if (savedGamma != null) Minecraft.getInstance().options.gamma().set(savedGamma);
+        savedGamma = null;
+        savedRain = savedThunder = -1;
         active = false;
         camOn = false;
         cam = null;
@@ -378,7 +420,8 @@ public final class ClientCine {
         float emb = Math.min(smooth((t - 0.6f) / 1.0f), 1 - smooth((t - Timeline.OUT) / 1.2f));
         if (visible(emb)) embers(g, w, h, t, emb);
         // el titulo
-        drawTitle(g, font, w, h, t);
+        if (chapter < 30) drawTitle(g, font, w, h, t);
+        else if (chapter == 30 || chapter == 32) bossTitle(g, font, w, h, t);
         // fundidos a negro (cortes de plano y vuelta al jugador)
         float black = black(t);
         if (visible(black)) g.fill(0, 0, w, h, argb(black, 0, 0, 0));
@@ -536,7 +579,40 @@ public final class ClientCine {
     }
 
     /** Negro en los cortes entre planos y para volver al jugador al final del capitulo 1. */
+    /** Nombre del jefe en grande en el ultimo plano de su cinematica. */
+    private static void bossTitle(GuiGraphics g, Font font, int w, int h, float t) {
+        if (shots.isEmpty()) return;
+        float t0 = shots.get(shots.size() - 1).t0 + 0.4f;
+        float a = Math.min(smooth((t - t0) / 0.8f), 1 - smooth((t - (total - 1.2f)) / 0.6f));
+        if (!visible(a)) return;
+        PoseStack pose = g.pose();
+        Component name = Component.translatable("ciudadela.rey.titulo." + chapter).withStyle(ChatFormatting.BOLD);
+        Component sub = Component.translatable("ciudadela.rey.subtitulo." + chapter);
+        float S = Mth.clamp(w / 150f, 2.2f, 4.5f);
+        pose.pushPose();
+        pose.translate(w / 2f, h * 0.68f, 0);
+        pose.scale(S, S, 1);
+        int al = Math.round(a * 255);
+        g.drawCenteredString(font, name, 1, 1, (al << 24) | 0x200000);
+        g.drawCenteredString(font, name, 0, 0, (al << 24) | 0xE0401A);
+        pose.popPose();
+        g.drawCenteredString(font, sub, w / 2, Math.round(h * 0.68f + 11 * S), (al << 24) | 0xE8C080);
+    }
+
     private static float black(float t) {
+        if (chapter >= 30 && !shots.isEmpty()) {
+            float a = 0;
+            for (int i = 1; i < shots.size(); i++) {
+                float tc = shots.get(i).t0;
+                if (t >= tc - 0.3f && t < tc) a = Math.max(a, smooth(1 - (tc - t) / 0.3f));
+                else if (t >= tc && t < tc + 0.5f) a = Math.max(a, 1 - smooth((t - tc) / 0.5f));
+            }
+            if (t < 0.6f) a = Math.max(a, 1 - smooth(t / 0.6f));
+            float back = backT();
+            if (t >= back - 0.4f && t < back) a = Math.max(a, smooth(1 - (back - t) / 0.4f));
+            else if (t >= back) a = Math.max(a, 1 - smooth((t - back) / 0.45f));
+            return a;
+        }
         if (chapter != 1 || shots.isEmpty()) return 0;
         float a = 0;
         for (int i = 1; i < shots.size(); i++) {

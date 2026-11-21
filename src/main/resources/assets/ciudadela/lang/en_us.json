@@ -122,5 +122,21 @@
   "death.attack.ciudadela.rey.player": "%1$s was executed by %2$s",
   "death.attack.ciudadela.rey_area": "%1$s burned before %2$s",
   "death.attack.ciudadela.rey_area.player": "%1$s burned before %2$s",
-  "subtitles.ciudadela.rey.voz": "Corvin speaks"
+  "subtitles.ciudadela.rey.voz": "Corvin speaks",
+  "ciudadela.rey.titulo.30": "CORVIN",
+  "ciudadela.rey.subtitulo.30": "The Burning King",
+  "ciudadela.rey.titulo.32": "CORVIN",
+  "ciudadela.rey.subtitulo.32": "The King Who Waits",
+  "item.ciudadela.espada_diestra": "The King's Right Hand",
+  "item.ciudadela.espada_siniestra": "The King's Left Hand",
+  "item.ciudadela.espada.lore": "Corvin's swords, tempered in the fire that devoured Valdrenn",
+  "item.ciudadela.espada.combo1": "Shift + left click: Royal Slash (35 energy)",
+  "item.ciudadela.espada.combo2": "Ctrl + left click: King's Judgement (80 energy)",
+  "item.ciudadela.espada.bloqueo": "Right click: guard with crossed swords",
+  "item.ciudadela.espada.dos": "With one in each hand, combos hit harder",
+  "ciudadela.espada.sin_energia": "Not enough energy (you need %s): strike with the swords to fill it",
+  "item.ciudadela.llave_arbol": "Key of the Tree",
+  "item.ciudadela.llave_arbol.lore": "Opens the seal of the Tree Hall",
+  "item.ciudadela.llave_arbol.aqui_no": "This key opens the red seal of the Tree Hall",
+  "block.ciudadela.sello_runico": "Runic Seal"
 }

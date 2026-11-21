@@ -44,6 +44,14 @@ public final class Net {
                 .encoder(ReyFoco::write).decoder(ReyFoco::read).consumerMainThread(ReyFoco::handle).add();
         CH.messageBuilder(Cofre.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(Cofre::write).decoder(Cofre::read).consumerMainThread(Cofre::handle).add();
+        CH.messageBuilder(Romper.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Romper::write).decoder(Romper::read).consumerMainThread(Romper::handle).add();
+        CH.messageBuilder(Combo.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Combo::write).decoder(Combo::read).consumerMainThread(Combo::handle).add();
+        CH.messageBuilder(Energia.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Energia::write).decoder(Energia::read).consumerMainThread(Energia::handle).add();
+        CH.messageBuilder(Llave.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Llave::write).decoder(Llave::read).consumerMainThread(Llave::handle).add();
     }
 
     // ------------------------------------------------------------------ jefe
@@ -109,6 +117,74 @@ public final class Net {
 
         void handle(Supplier<NetworkEvent.Context> ctx) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.ciudadela.client.rey.ReyCliente.foco(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El jugador pide un combo de las espadas del Rey (1 Tajo Real, 2 Juicio del Rey). */
+    public record Combo(int tipo) {
+        void write(FriendlyByteBuf b) {
+            b.writeByte(tipo);
+        }
+
+        static Combo read(FriendlyByteBuf b) {
+            return new Combo(b.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer sp = ctx.get().getSender();
+            if (sp != null) com.ciudadela.armas.Combos.pedir(sp, tipo);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Energia de los combos (0-100) para la barra. */
+    public record Energia(int valor) {
+        void write(FriendlyByteBuf b) {
+            b.writeByte(valor);
+        }
+
+        static Energia read(FriendlyByteBuf b) {
+            return new Energia(b.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.ciudadela.client.armas.ArmasCliente.energia(valor));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** La llave del arbol gira en el sello (para la mini cinematica). */
+    public record Llave(double x, double y, double z, int ticks) {
+        void write(FriendlyByteBuf b) {
+            b.writeDouble(x);
+            b.writeDouble(y);
+            b.writeDouble(z);
+            b.writeVarInt(ticks);
+        }
+
+        static Llave read(FriendlyByteBuf b) {
+            return new Llave(b.readDouble(), b.readDouble(), b.readDouble(), Math.min(b.readVarInt(), 400));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.ciudadela.client.rey.ReyCliente.llave(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** La dimension de los volcanes se rompe como un cristal (grietas en la pantalla y destello). */
+    public record Romper(int ticks) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(ticks);
+        }
+
+        static Romper read(FriendlyByteBuf b) {
+            return new Romper(Math.min(b.readVarInt(), 200));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.ciudadela.client.rey.ReyCliente.romper(this));
             ctx.get().setPacketHandled(true);
         }
     }

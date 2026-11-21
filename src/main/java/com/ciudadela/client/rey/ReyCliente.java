@@ -22,6 +22,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
@@ -92,6 +93,7 @@ public final class ReyCliente {
             ps.popPose();
         }
         if (cofre != null) dibujarCofre(mc, ps, buf, cam, pt);
+        if (llave != null) dibujarLlave(mc, ps, buf, cam, pt);
     }
 
     private static float[] color(int c) {
@@ -173,8 +175,23 @@ public final class ReyCliente {
 
     private static int subLinea, subFin;
     private static SoundInstance voz;
-    /** Duracion aproximada de cada frase (ticks). */
-    private static final int[] DUR = {0, 95, 115, 110, 80, 110, 90, 60, 70, 70};
+    /** Duracion de cada frase (ticks): la del audio (rey_voces.json) mas un poco. */
+    private static final int[] DUR = duraciones();
+
+    private static int[] duraciones() {
+        int[] d = {0, 110, 120, 70, 70, 80, 65, 60, 85, 65};
+        try (var in = ReyCliente.class.getResourceAsStream("/assets/ciudadela/rey_voces.json")) {
+            if (in == null) return d;
+            var o = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8))
+                    .getAsJsonObject().getAsJsonObject("duraciones");
+            for (String k : o.keySet()) {
+                int i = Integer.parseInt(k);
+                if (i > 0 && i < d.length) d[i] = Math.round(o.get(k).getAsFloat() * 20) + 25;
+            }
+        } catch (Exception ignored) {
+        }
+        return d;
+    }
 
     public static void habla(Net.ReyHabla m) {
         Minecraft mc = Minecraft.getInstance();
@@ -252,6 +269,7 @@ public final class ReyCliente {
     /** Bandas de cine durante la intro y subtitulos del rey. */
     public static void renderOverlay(ForgeGui gui, GuiGraphics g, float pt, int w, int h) {
         Minecraft mc = Minecraft.getInstance();
+        dibujarRomper(g, w, h, pt);
         if (mc.options.hideGui && !enFoco()) return;
         Font font = mc.font;
         int bh = 0;
@@ -265,14 +283,15 @@ public final class ReyCliente {
                 g.fill(0, h - bh - 1, w, h - bh, 0x60800000);
             }
         }
-        if (subLinea > 0 && ticks < subFin + 10 && !ClientCine.active()) {
+        if (subLinea > 0 && ticks < subFin + 10 && (!ClientCine.active() || ClientCine.chapter() >= 30)) {
             float a = Mth.clamp((subFin + 10 - ticks - pt) / 10f, 0f, 1f);
             int alpha = Math.round(a * 255);
             if (alpha > 8) {
                 Component name = Component.translatable("ciudadela.rey.nombre_corto");
                 Component line = Component.translatable("ciudadela.rey.voz." + subLinea);
                 List<FormattedCharSequence> lines = font.split(line, Math.min(w - 40, 360));
-                int y = bh > 0 ? h - bh / 2 - lines.size() * 5 - 4 : h - 68 - lines.size() * 10;
+                int cbh = ClientCine.active() ? Math.round(h * 0.12f) : bh;
+                int y = cbh > 0 ? h - cbh / 2 - lines.size() * 5 - 2 : h - 68 - lines.size() * 10;
                 int lw = 0;
                 for (FormattedCharSequence l : lines) lw = Math.max(lw, font.width(l));
                 g.fill(w / 2 - lw / 2 - 6, y - 12, w / 2 + lw / 2 + 6, y + lines.size() * 10 + 2, (Math.round(a * 140) << 24));
@@ -311,6 +330,105 @@ public final class ReyCliente {
             g.fill(xs - 1, y0 - 3, xs + 1, y0 + 9, 0xFFC8A040);
         }
         e.setIncrement(26);
+    }
+
+    // ------------------------------------------------------------------ la llave gira en el sello
+
+    private static Net.Llave llave;
+    private static int llaveIni;
+
+    public static void llave(Net.Llave m) {
+        llave = m;
+        llaveIni = ticks;
+    }
+
+    private static void dibujarLlave(Minecraft mc, PoseStack ps, MultiBufferSource.BufferSource buf, Vec3 cam, float pt) {
+        Net.Llave k = llave;
+        float t = (ticks - llaveIni + pt) / 20f;
+        if (t > 3.4f || mc.player == null) {
+            if (t > 3.4f) llave = null;
+            return;
+        }
+        Vec3 lock = new Vec3(k.x(), k.y(), k.z());
+        Vec3 dir = lock.subtract(mc.player.getEyePosition(pt));
+        double yaw = Math.atan2(dir.z, dir.x);
+        float in = Mth.clamp(t / 1.2f, 0f, 1f);
+        in = in * in * (3 - 2 * in);
+        float turn = Mth.clamp((t - 1.3f) / 0.8f, 0f, 1f);
+        ps.pushPose();
+        ps.translate(k.x() - cam.x - Math.cos(yaw) * (0.7 - 0.62 * in), k.y() - cam.y, k.z() - cam.z - Math.sin(yaw) * (0.7 - 0.62 * in));
+        ps.mulPose(com.mojang.math.Axis.YP.rotation((float) (-yaw)));
+        ps.mulPose(com.mojang.math.Axis.XP.rotationDegrees(turn * 90f));
+        ps.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(-45f));
+        ps.scale(0.7f, 0.7f, 0.7f);
+        mc.getItemRenderer().renderStatic(new net.minecraft.world.item.ItemStack(CiudadelaMod.LLAVE_ARBOL.get()),
+                net.minecraft.world.item.ItemDisplayContext.FIXED, 0xF000F0, OverlayTexture.NO_OVERLAY, ps, buf, mc.level, 0);
+        ps.popPose();
+        buf.endBatch();
+        if (turn > 0 && turn < 1 && ticks % 2 == 0)
+            mc.level.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD, k.x(), k.y(), k.z(), 0, 0.02, 0);
+    }
+
+    // ------------------------------------------------------------------ la dimension se rompe
+
+    private static int romperIni = -10000, romperDur = 30;
+
+    public static void romper(Net.Romper m) {
+        romperIni = ticks;
+        romperDur = m.ticks();
+        Minecraft mc = Minecraft.getInstance();
+        mc.getSoundManager().play(SimpleSoundInstance.forUI(net.minecraft.sounds.SoundEvents.GLASS_BREAK, 0.5f, 1.0f));
+        mc.getSoundManager().play(SimpleSoundInstance.forUI(net.minecraft.sounds.SoundEvents.AMETHYST_BLOCK_BREAK, 0.6f, 1.0f));
+    }
+
+    private static void dibujarRomper(GuiGraphics g, int w, int h, float pt) {
+        float t = (ticks - romperIni + pt) / 20f;
+        float dur = romperDur / 20f;
+        if (t < 0 || t > dur + 1.2f) return;
+        // grietas que salen del centro
+        float grow = Mth.clamp(t / (dur * 0.8f), 0f, 1f);
+        int cx = w / 2, cy = h / 2;
+        RandomSource r = RandomSource.create(1234);
+        int alpha = Math.round(255 * Mth.clamp(1 - (t - dur) / 0.4f, 0f, 1f));
+        if (alpha > 4)
+            for (int ray = 0; ray < 16; ray++) {
+                double a = ray * Math.PI * 2 / 16 + r.nextDouble() * 0.3;
+                double x = cx, y = cy;
+                double len = (Math.max(w, h) * 0.75) * grow;
+                int steps = 14;
+                for (int i = 0; i < steps; i++) {
+                    a += (r.nextDouble() - 0.5) * 0.7;
+                    double seg = len / steps;
+                    double nx = x + Math.cos(a) * seg, ny = y + Math.sin(a) * seg;
+                    int n = (int) Math.max(1, seg / 2);
+                    for (int k = 0; k <= n; k++) {
+                        int px = (int) (x + (nx - x) * k / n), py = (int) (y + (ny - y) * k / n);
+                        g.fill(px - 1, py - 1, px + 1, py + 1, (alpha << 24) | 0xFFF4E8);
+                    }
+                    if (i == 6 && r.nextInt(2) == 0) {
+                        // rama
+                        double ba = a + (r.nextBoolean() ? 0.9 : -0.9), bx = nx, by = ny;
+                        for (int b = 0; b < 5; b++) {
+                            double ex = bx + Math.cos(ba) * seg * 0.6, ey = by + Math.sin(ba) * seg * 0.6;
+                            int m = (int) Math.max(1, seg * 0.3);
+                            for (int k = 0; k <= m; k++) g.fill((int) (bx + (ex - bx) * k / m), (int) (by + (ey - by) * k / m),
+                                    (int) (bx + (ex - bx) * k / m) + 1, (int) (by + (ey - by) * k / m) + 1, (alpha << 24) | 0xE8DCCC);
+                            bx = ex;
+                            by = ey;
+                            ba += (r.nextDouble() - 0.5) * 0.6;
+                        }
+                    }
+                    x = nx;
+                    y = ny;
+                }
+            }
+        // destello blanco al romperse
+        if (t > dur * 0.8f) {
+            float f = Mth.clamp(1 - (t - dur * 0.85f) / 1.0f, 0f, 1f);
+            if (t < dur * 0.85f) f = (t - dur * 0.8f) / (dur * 0.05f);
+            int a2 = Math.round(Mth.clamp(f, 0f, 1f) * 255);
+            if (a2 > 3) g.fill(0, 0, w, h, (a2 << 24) | 0xFFFFFF);
+        }
     }
 
     // ------------------------------------------------------------------ cofre que sube
@@ -382,6 +500,7 @@ public final class ReyCliente {
     @SubscribeEvent
     public static void onLeave(ClientPlayerNetworkEvent.LoggingOut e) {
         AVISOS.clear();
+        llave = null;
         focoId = -1;
         subLinea = 0;
         cofre = null;

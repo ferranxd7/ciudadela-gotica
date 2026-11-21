@@ -39,8 +39,18 @@ public final class ReyEventos {
             // nada de volar con elitros durante la pelea
             if (p.isFallFlying()) p.stopFallFlying();
         }
+        if (Volcan.es(p.level()) && !p.isCreative() && !p.isSpectator() && p.tickCount % 2 == 0) {
+            double dx = p.getX() - Volcan.CENTRO.x, dz = p.getZ() - Volcan.CENTRO.z;
+            boolean fuera = dx * dx + dz * dz > (Volcan.R + 1.5) * (Volcan.R + 1.5);
+            if (p.getY() < Volcan.MAR + 1.5 || (fuera && p.getY() < Volcan.Y - 1)) Volcan.caer(p);
+        }
         if (p.tickCount % 40 != 7 || p.level().dimension() != Level.OVERWORLD) return;
         ServerLevel ow = p.serverLevel();
+        var plan = com.ciudadela.story.Story.planNear(ow, p.getBlockX(), p.getBlockZ());
+        if (plan != null) {
+            int[] th = plan.treeHall();
+            if (th != null && Math.abs(p.getY() - th[2]) < 60 && p.distanceToSqr(th[0], th[2], th[1]) < 70 * 70) Sello.asegurar(ow, plan);
+        }
         Sala s = Sala.near(ow, p.getBlockX(), p.getBlockZ());
         if (s == null || p.position().distanceToSqr(s.seat()) > 80 * 80) return;
         asegurarRey(ow, s);
@@ -130,7 +140,7 @@ public final class ReyEventos {
 
     @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent e) {
-        if (e.getEntity() instanceof ServerPlayer p && Volcan.es(p.serverLevel()) && luchaDe(p) == null) Volcan.devolver(p);
+        if (e.getEntity() instanceof ServerPlayer p && Volcan.es(p.level()) && luchaDe(p) == null) Volcan.devolver(p);
     }
 
     // ------------------------------------------------------------------ comandos de prueba

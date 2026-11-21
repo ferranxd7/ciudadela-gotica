@@ -69,6 +69,19 @@ public class CiudadelaMod {
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(-1.0F, 3600000.0F).noLootTable()
                     .noOcclusion().sound(SoundType.CHAIN).pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false)));
 
+    public static final RegistryObject<Block> SELLO = BLOCKS.register("sello_runico", () -> new net.minecraft.world.level.block.HalfTransparentBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(-1.0F, 3600000.0F).noLootTable().noOcclusion()
+                    .lightLevel(st -> 11).sound(SoundType.GLASS).pushReaction(PushReaction.BLOCK)
+                    .isValidSpawn((st, l, p, t) -> false).isRedstoneConductor((st, l, p) -> false)
+                    .isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false)));
+
+    public static final RegistryObject<Item> ESPADA_DIESTRA = ITEMS.register("espada_diestra",
+            () -> new com.ciudadela.armas.EspadaRey(true, new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
+    public static final RegistryObject<Item> ESPADA_SINIESTRA = ITEMS.register("espada_siniestra",
+            () -> new com.ciudadela.armas.EspadaRey(false, new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
+    public static final RegistryObject<Item> LLAVE_ARBOL = ITEMS.register("llave_arbol",
+            () -> new com.ciudadela.armas.LlaveArbol(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MODID);
     public static final RegistryObject<EntityType<Rey>> REY = ENTITIES.register("rey", () -> EntityType.Builder.<Rey>of(Rey::new, MobCategory.MONSTER)
             .sized(1.4f, 3.1f).fireImmune().clientTrackingRange(10).updateInterval(1).build(MODID + ":rey"));
@@ -95,6 +108,9 @@ public class CiudadelaMod {
         MinecraftForge.EVENT_BUS.register(Cinematics.class);
         MinecraftForge.EVENT_BUS.register(ReyEventos.class);
         MinecraftForge.EVENT_BUS.register(Victoria.class);
+        MinecraftForge.EVENT_BUS.register(com.ciudadela.rey.Volcan.class);
+        MinecraftForge.EVENT_BUS.register(com.ciudadela.rey.Sello.class);
+        MinecraftForge.EVENT_BUS.register(com.ciudadela.armas.Combos.class);
     }
 
     private void attributes(EntityAttributeCreationEvent e) {
@@ -106,6 +122,13 @@ public class CiudadelaMod {
     }
 
     private void tabs(BuildCreativeModeTabContentsEvent e) {
-        if (e.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) e.accept(MAPA);
+        if (e.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+            e.accept(MAPA);
+            e.accept(LLAVE_ARBOL);
+        }
+        if (e.getTabKey() == CreativeModeTabs.COMBAT) {
+            e.accept(ESPADA_DIESTRA);
+            e.accept(ESPADA_SINIESTRA);
+        }
     }
 }
