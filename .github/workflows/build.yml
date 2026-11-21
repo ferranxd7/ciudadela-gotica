@@ -78,5 +78,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           shopt -s nullglob
-          files=(build/libs/*.jar build.log out/*.txt out/*.log out/*.png out/*.mrpack)
+          files=()
+          for f in build/libs/*.jar build.log out/*.txt out/*.log out/*.png out/*.mrpack; do [ -s "$f" ] && files+=("$f"); done
           gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }}" --notes "Version automatica ${{ github.run_number }}" --latest
