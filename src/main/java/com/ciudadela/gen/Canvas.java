@@ -148,7 +148,10 @@ public final class Canvas {
         if (level.getBlockEntity(p) instanceof SignBlockEntity sign) writeSign(sign, chapter);
     }
 
-    /** Texto del cartel de un capitulo (traducido en el cliente de cada jugador). */
+    /**
+     * Texto del cartel de un capitulo (traducido en el cliente de cada jugador). Se escribe cargando los
+     * datos del cartel, porque durante la generacion el cartel todavia no tiene mundo y setText fallaria.
+     */
     public static void writeSign(SignBlockEntity sign, int chapter) {
         SignText t = new SignText()
                 .setMessage(0, Component.translatable("ciudadela.capitulo", chapter).withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD))
@@ -156,9 +159,13 @@ public final class Canvas {
                 .setMessage(2, Component.translatable("ciudadela.cap." + chapter + ".cartel2").withStyle(ChatFormatting.GOLD))
                 .setMessage(3, Component.literal("- + -").withStyle(ChatFormatting.DARK_GRAY))
                 .setColor(DyeColor.RED).setHasGlowingText(true);
-        sign.setText(t, true);
-        sign.setText(t, false);
-        sign.setWaxed(true);
+        net.minecraft.nbt.CompoundTag tag = sign.saveWithoutMetadata();
+        SignText.DIRECT_CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, t).result().ifPresent(n -> {
+            tag.put("front_text", n);
+            tag.put("back_text", n.copy());
+        });
+        tag.putBoolean("is_waxed", true);
+        sign.load(tag);
         sign.getPersistentData().putInt(STORY_TAG, chapter);
     }
 

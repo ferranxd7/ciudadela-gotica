@@ -152,8 +152,43 @@ public class Building extends Element {
         return this;
     }
 
+    private final List<double[]> reserves = new ArrayList<>();
+    private final List<double[]> noDoors = new ArrayList<>();
+
     /** Reserva un circulo libre de muebles (p.ej. donde se cruza con una torre). */
     public Building reserve(int x, int z, double rad) {
+        reserves.add(new double[]{x, z, rad});
+        applyReserve(x, z, rad);
+        return this;
+    }
+
+    /** Ninguna puerta dentro de este circulo (una torre que atraviesa el edificio). */
+    public Building noDoorsNear(int x, int z, double rad) {
+        noDoors.add(new double[]{x, z, rad});
+        redoDoors();
+        return this;
+    }
+
+    private boolean doorBlocked(int x, int z) {
+        for (double[] c : noDoors) {
+            double dx = x - c[0], dz = z - c[1];
+            if (dx * dx + dz * dz <= c[2] * c[2]) return true;
+        }
+        return nearTurret(x, z, 5.8);
+    }
+
+    /** Vuelve a colocar las puertas (al cambiar la torreta o los circulos sin puertas). */
+    private void redoDoors() {
+        for (Floor f : floors) {
+            f.doors.clear();
+            for (Room r : f.rooms) r.keepClear.clear();
+        }
+        computeDoors();
+        for (double[] rs : reserves) applyReserve((int) rs[0], (int) rs[1], rs[2]);
+        prepareRooms();
+    }
+
+    private void applyReserve(int x, int z, double rad) {
         for (Floor f : floors)
             for (Room r : f.rooms)
                 for (int px = r.r.x0; px <= r.r.x1; px++)
@@ -161,7 +196,6 @@ public class Building extends Element {
                         double dx = px - x, dz = pz - z;
                         if (dx * dx + dz * dz <= rad * rad) r.keepClear.add(Room.key(px, pz));
                     }
-        return this;
     }
 
     /** {x, z, nivel mas bajo, nivel mas alto} de la torreta de escalera, o null si no tiene. */
@@ -183,9 +217,9 @@ public class Building extends Element {
         this.turretCorner = corner;
         if (corner >= 0) {
             int[] t = turretCenter();
-            reserve(t[0], t[1], 6.5);
+            reserves.add(new double[]{t[0], t[1], 6.5});
         }
-        prepareRooms();
+        redoDoors();
         return this;
     }
 
@@ -245,11 +279,11 @@ public class Building extends Element {
                     Rect a = f.rooms.get(i).r, b = f.rooms.get(j).r;
                     if (a.x1 + 2 == b.x0) {
                         int lo = Math.max(a.z0, b.z0), hi = Math.min(a.z1, b.z1);
-                        if (hi - lo >= 1) addDoor(f, a.x1 + 1, (lo + hi) / 2, true, hi - lo + 1);
+                        if (hi - lo >= 1) doorAlong(f, a.x1 + 1, lo, hi, true);
                     }
                     if (a.z1 + 2 == b.z0) {
                         int lo = Math.max(a.x0, b.x0), hi = Math.min(a.x1, b.x1);
-                        if (hi - lo >= 1) addDoor(f, (lo + hi) / 2, a.z1 + 1, false, hi - lo + 1);
+                        if (hi - lo >= 1) doorAlong(f, a.z1 + 1, lo, hi, false);
                     }
                 }
         }
@@ -268,6 +302,29 @@ public class Building extends Element {
                 }
             }
         }
+    }
+
+    /** Puerta en el muro compartido [lo, hi]: lo mas centrada posible, pero nunca dentro de una torre. */
+    private void doorAlong(Floor f, int fixed, int lo, int hi, boolean wallAlongZ) {
+        int overlap = hi - lo + 1;
+        int w = overlap >= 9 ? 3 : (overlap >= 4 ? 2 : 1);
+        int mid = (lo + hi) / 2;
+        for (int off = 0; off <= overlap; off++)
+            for (int sgn = -1; sgn <= 1; sgn += 2) {
+                int c = mid + off * sgn;
+                boolean ok = true;
+                for (int k = 0; k < w && ok; k++) {
+                    int p = c + k - w / 2;
+                    // un bloque de margen con las esquinas de las salas
+                    if (p < lo || p > hi || (overlap >= 4 && (p == lo || p == hi))) ok = false;
+                    else if (doorBlocked(wallAlongZ ? fixed : p, wallAlongZ ? p : fixed)) ok = false;
+                }
+                if (ok) {
+                    addDoor(f, wallAlongZ ? fixed : c, wallAlongZ ? c : fixed, wallAlongZ, overlap);
+                    return;
+                }
+                if (off == 0) break;
+            }
     }
 
     private void addDoor(Floor f, int x, int z, boolean wallAlongZ, int overlap) {
@@ -306,6 +363,9 @@ public class Building extends Element {
                 else if (d == Direction.WEST) { wx = fp.x0; wz = cz + o; }
                 else { wx = fp.x1; wz = cz + o; }
                 int ix = wx - d.getStepX(), iz = wz - d.getStepZ();
+                Direction sd = d.getClockWise();
+                int hw = Math.min(fp.w(), fp.d()) >= 20 ? 2 : 1;
+                if (doorBlocked(wx + sd.getStepX() * hw, wz + sd.getStepZ() * hw) || doorBlocked(wx - sd.getStepX() * hw, wz - sd.getStepZ() * hw)) continue;
                 if (f.roomAt(ix, iz) != null) return new int[]{wx, wz, ix, iz};
             }
         }

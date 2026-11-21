@@ -361,7 +361,7 @@ public final class CastlePlan {
         Building keep = new Building(rng.fork(), R(-50, -55, 50, 25), Y, new int[]{14, 8, 8, 8, 8}, 2, 7, Building.Roof.TERRACE, 1,
                 keepPlanner, Direction.SOUTH).turret(0).noTimber();
         int[][] kc = {{50, -55}, {50, 25}, {-50, 25}};
-        for (int[] k : kc) keep.reserve(X(k[0]), Z(k[1]), 11.5);
+        for (int[] k : kc) keep.reserve(X(k[0]), Z(k[1]), 11.5).noDoorsNear(X(k[0]), Z(k[1]), 10.5);
         building(keep);
         for (int[] k : kc) {
             RoundTower t = new RoundTower(rng.fork(), X(k[0]), Z(k[1]), Y, 9, 82, RoundTower.Top.CONE).slope(2.6);
