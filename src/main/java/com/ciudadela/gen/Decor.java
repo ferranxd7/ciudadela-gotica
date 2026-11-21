@@ -163,6 +163,7 @@ public final class Decor {
         boolean line = ax0 == ax1 || az0 == az1;
         for (int x = ax0; x <= ax1; x++)
             for (int z = az0; z <= az1; z++) {
+                if (room.clear(x, z) || !r.contains(x, z)) continue;
                 BlockState m = null;
                 if (single) m = ModDeco.tableSingle();
                 else if (line) {
@@ -177,6 +178,7 @@ public final class Decor {
 
     /** Pone cosas encima de una mesa (platos, copas, velas, libros...). */
     private void onTable(int x, int z, boolean study) {
+        if (!used.contains(Room.key(x, z))) return;
         BlockState m = study ? ModDeco.studyItem(Hash.h(x, F, z, 61)) : ModDeco.tableware(Hash.h(x, F, z, 62));
         if (m != null) c.set(x, F + 1, z, m);
         else if (Hash.pct(x, F, z, 63) < 40) c.set(x, F + 1, z, Pal.candles(Blocks.WHITE_CANDLE, 1 + Hash.pct(x, 0, z, 2) % 3));
@@ -530,6 +532,11 @@ public final class Decor {
 
     private void fireplace(int x, int z, Direction in) {
         Direction side = in.getClockWise();
+        for (int k = -2; k <= 2; k++)
+            for (int d = 0; d <= 1; d++) {
+                int px = x + side.getStepX() * k + in.getStepX() * d, pz = z + side.getStepZ() * k + in.getStepZ() * d;
+                if (room.clear(px, pz)) return;
+            }
         for (int k = -2; k <= 2; k++) {
             int px = x + side.getStepX() * k, pz = z + side.getStepZ() * k;
             boolean edge = Math.abs(k) == 2;
@@ -902,8 +909,8 @@ public final class Decor {
                     c.set(cx + dx, F + 1, cz + dz, Pal.BOOKSHELF);
                     c.set(cx + dx, F + 2, cz + dz, Pal.candles(Blocks.PURPLE_CANDLE, 2));
                 }
-            c.set(cx + 3, F, cz, Pal.facing(Blocks.LECTERN, Direction.WEST));
-            c.set(cx - 3, F, cz, Pal.facing(Blocks.LECTERN, Direction.EAST));
+            standing(cx + 3, cz, Pal.facing(Blocks.LECTERN, Direction.WEST));
+            standing(cx - 3, cz, Pal.facing(Blocks.LECTERN, Direction.EAST));
             sofas(cx - 2, cz + 5, Direction.SOUTH, 5, true);
             sofas(cx + 2, cz - 5, Direction.NORTH, 5, true);
         } else if (free(cx, cz)) {
@@ -965,7 +972,10 @@ public final class Decor {
 
     private void bath() {
         floor((x, y, z) -> ((x + z) & 1) == 0 ? Pal.DS_POLISHED : Pal.SMOOTH_BASALT);
-        if (r.w() >= 7 && r.d() >= 7) {
+        boolean poolOk = r.w() >= 7 && r.d() >= 7;
+        for (int x = r.x0 + 2; poolOk && x <= r.x1 - 2; x++)
+            for (int z = r.z0 + 2; z <= r.z1 - 2; z++) if (room.clear(x, z)) poolOk = false;
+        if (poolOk) {
             int px0 = r.x0 + 2, px1 = r.x1 - 2, pz0 = r.z0 + 2, pz1 = r.z1 - 2;
             for (int x = px0; x <= px1; x++)
                 for (int z = pz0; z <= pz1; z++) {
@@ -1055,37 +1065,58 @@ public final class Decor {
         boolean alongZ = r.d() >= r.w();
         int cx = r.cx(), cz = r.cz();
         if (alongZ) {
-            // altar al norte
-            for (int x = cx - 2; x <= cx + 2; x++) {
-                c.set(x, F, r.z0 + 1, Pal.PB_CHISELED);
-                c.set(x, F + 1, r.z0 + 1, Pal.candles(x == cx ? Blocks.RED_CANDLE : Blocks.WHITE_CANDLE, 2 + (x & 1)));
-                use(x, r.z0 + 1);
+            // altar al norte, o al sur si en el norte hay una puerta
+            boolean north = altarFree(cx, r.z0 + 1, true) && free(cx, r.z0 + 3);
+            boolean south = !north && altarFree(cx, r.z1 - 1, true) && free(cx, r.z1 - 3);
+            int az = north ? r.z0 + 1 : r.z1 - 1, dz = north ? 1 : -1;
+            Direction toAltar = north ? Direction.NORTH : Direction.SOUTH;
+            if (north || south) {
+                for (int x = cx - 2; x <= cx + 2; x++) {
+                    c.set(x, F, az, Pal.PB_CHISELED);
+                    c.set(x, F + 1, az, Pal.candles(x == cx ? Blocks.RED_CANDLE : Blocks.WHITE_CANDLE, 2 + (x & 1)));
+                    use(x, az);
+                }
+                c.set(cx, F, az + 2 * dz, Pal.facing(Blocks.LECTERN, toAltar.getOpposite()));
+                use(cx, az + 2 * dz);
             }
-            c.set(cx, F, r.z0 + 3, Pal.facing(Blocks.LECTERN, Direction.SOUTH));
-            for (int z = r.z0 + 5; z <= r.z1 - 2; z += 2) {
+            for (int k = 5; k <= r.d() - 3; k += 2) {
+                int z = (north || !south) ? r.z0 + k : r.z1 - k;
                 for (int x = r.x0 + 1; x <= r.x1 - 1; x++) {
                     if (Math.abs(x - cx) <= 1) {
-                        c.set(x, F, z, Pal.b(Blocks.RED_CARPET));
-                        c.set(x, F, z + 1, Pal.b(Blocks.RED_CARPET));
+                        for (int zz = z; zz != z + 2 * dz; zz += dz) if (r.contains(x, zz) && c.isAir(x, F, zz)) c.set(x, F, zz, Pal.b(Blocks.RED_CARPET));
                         continue;
                     }
-                    chair(x, z, Direction.NORTH, Blocks.DARK_OAK_STAIRS);
+                    chair(x, z, toAltar, Blocks.DARK_OAK_STAIRS);
                 }
             }
         } else {
-            for (int z = cz - 2; z <= cz + 2; z++) {
-                c.set(r.x0 + 1, F, z, Pal.PB_CHISELED);
-                c.set(r.x0 + 1, F + 1, z, Pal.candles(Blocks.WHITE_CANDLE, 3));
-                use(r.x0 + 1, z);
+            boolean west = altarFree(r.x0 + 1, cz, false);
+            boolean east = !west && altarFree(r.x1 - 1, cz, false);
+            int ax = west ? r.x0 + 1 : r.x1 - 1;
+            if (west || east) {
+                for (int z = cz - 2; z <= cz + 2; z++) {
+                    c.set(ax, F, z, Pal.PB_CHISELED);
+                    c.set(ax, F + 1, z, Pal.candles(Blocks.WHITE_CANDLE, 3));
+                    use(ax, z);
+                }
             }
-            for (int x = r.x0 + 4; x <= r.x1 - 2; x += 2)
+            Direction toAltar = (west || !east) ? Direction.WEST : Direction.EAST;
+            for (int k = 4; k <= r.w() - 3; k += 2) {
+                int x = toAltar == Direction.WEST ? r.x0 + k : r.x1 - k;
                 for (int z = r.z0 + 1; z <= r.z1 - 1; z++) {
                     if (Math.abs(z - cz) <= 1) continue;
-                    chair(x, z, Direction.WEST, Blocks.DARK_OAK_STAIRS);
+                    chair(x, z, toAltar, Blocks.DARK_OAK_STAIRS);
                 }
+            }
         }
         chandeliers(big());
         torches(4);
+    }
+
+    /** ¿Caben las 5 casillas del altar (en fila) sin tapar ninguna puerta? */
+    private boolean altarFree(int x, int z, boolean alongX) {
+        for (int k = -2; k <= 2; k++) if (!free(alongX ? x + k : x, alongX ? z : z + k)) return false;
+        return true;
     }
 
     private void study() {
@@ -1174,6 +1205,9 @@ public final class Decor {
         if (alongX && r.d() >= 7) {
             int barZ = r.z0 + 3;
             for (int x = r.x0; x <= r.x1; x++) {
+                boolean door = false;
+                for (int z = r.z0; z <= barZ + 1; z++) if (room.clear(x, z)) door = true;
+                if (door) continue;
                 boolean divider = (x - r.x0) % 4 == 0;
                 for (int y = F; y <= T; y++) {
                     if (divider) for (int z = r.z0; z < barZ; z++) c.set(x, y, z, Pal.DS_BRICKS);
@@ -1507,11 +1541,13 @@ public final class Decor {
             for (int x = r.x0; x <= r.x1; x++) {
                 boolean div = (x - r.x0) % 4 == 0;
                 for (int z = r.z0; z <= r.z0 + 3 && z <= r.z1; z++) {
+                    if (!free(x, z)) continue;
                     if (div) c.set(x, F, z, Pal.connected(Blocks.DARK_OAK_FENCE, Direction.Axis.Z));
                     else if (z == r.z0) c.set(x, F, z, Pal.log(Blocks.HAY_BLOCK, Direction.Axis.X));
                     use(x, z);
                 }
-                if (!div && (x - r.x0) % 4 == 2) c.set(x, F, r.z0 + 1, Pal.b(Blocks.WATER_CAULDRON).setValue(LayeredCauldronBlock.LEVEL, 3));
+                if (!div && (x - r.x0) % 4 == 2 && !room.clear(x, r.z0 + 1))
+                    c.set(x, F, r.z0 + 1, Pal.b(Blocks.WATER_CAULDRON).setValue(LayeredCauldronBlock.LEVEL, 3));
             }
         }
         chandeliers(false);

@@ -51,7 +51,7 @@ if ok:
     fx = (f"asetrate={sr}*{RATE},aresample=44100,equalizer=f=110:t=q:w=1:g=5,"
           "aecho=0.8:0.5:90|180|320:0.3|0.18|0.1,lowpass=f=7500,loudnorm=I=-15:TP=-1.5")
     os.makedirs(os.path.dirname(OGG), exist_ok=True)
-    r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", "narr_tmp/todo.wav", "-af", fx, "-ac", "1",
+    r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", "narr_tmp/todo.wav", "-af", fx, "-ac", "1", "-ar", "44100",
                         "-c:a", "libvorbis", "-q:a", "5", OGG], capture_output=True)
     if r.returncode != 0:
         print("FALLO ffmpeg", r.stderr.decode()[-300:])
