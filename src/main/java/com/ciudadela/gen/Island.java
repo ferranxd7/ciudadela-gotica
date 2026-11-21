@@ -31,6 +31,7 @@ public class Island extends Element {
 
     public Island(long seed, int cx, int cz, int y0, double baseR, double amp, int rim, int drop, int maxDepth) {
         super(seed);
+        this.layer = 0;
         this.cx = cx;
         this.cz = cz;
         this.y0 = y0;

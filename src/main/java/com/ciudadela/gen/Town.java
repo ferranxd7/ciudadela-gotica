@@ -15,6 +15,7 @@ public final class Town {
 
         public Stall(long seed, int x, int y, int z, Direction face) {
             super(seed);
+        this.layer = 4;
             this.x = x;
             this.y = y;
             this.z = z;
@@ -67,6 +68,7 @@ public final class Town {
 
         public Well(long seed, int x, int y, int z) {
             super(seed);
+        this.layer = 4;
             this.x = x;
             this.y = y;
             this.z = z;
@@ -103,6 +105,7 @@ public final class Town {
 
         public Garden(long seed, Rect r, int y) {
             super(seed);
+        this.layer = 1;
             this.r = r;
             this.y = y;
             bounds(r.x0, y - 2, r.z0, r.x1, y + 2, r.z1);
@@ -156,6 +159,7 @@ public final class Town {
 
         public Cart(long seed, int x, int y, int z, Direction face) {
             super(seed);
+        this.layer = 4;
             this.x = x;
             this.y = y;
             this.z = z;
@@ -201,6 +205,7 @@ public final class Town {
 
         public Plaza(long seed, Rect r, int y) {
             super(seed);
+        this.layer = 4;
             this.r = r;
             this.y = y;
             bounds(r.x0, y - 8, r.z0, r.x1, y + 8, r.z1);
@@ -237,6 +242,7 @@ public final class Town {
 
         public Planter(long seed, int x, int y, int z, Tree.Kind kind) {
             super(seed);
+        this.layer = 4;
             this.x = x;
             this.y = y;
             this.z = z;
@@ -280,6 +286,7 @@ public final class Town {
 
         public BenchElement(long seed, int x, int y, int z, Direction look) {
             super(seed);
+        this.layer = 4;
             this.x = x;
             this.y = y;
             this.z = z;
@@ -299,6 +306,7 @@ public final class Town {
 
         public Crates(long seed, int x, int y, int z) {
             super(seed);
+        this.layer = 4;
             this.x = x;
             this.y = y;
             this.z = z;

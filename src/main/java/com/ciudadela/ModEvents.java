@@ -57,6 +57,11 @@ public final class ModEvents {
     }
 
     @SubscribeEvent
+    public static void onServerStarting(net.minecraftforge.event.server.ServerStartingEvent event) {
+        com.ciudadela.gen.Calib.run(event.getServer().overworld());
+    }
+
+    @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
         if (Boolean.getBoolean("ciudadela.ciTest")) CiTest.run(event.getServer());
     }

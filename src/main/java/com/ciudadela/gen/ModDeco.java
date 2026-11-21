@@ -126,6 +126,7 @@ public final class ModDeco {
 
     public static String report() {
         StringBuilder sb = new StringBuilder();
+        if (Calib.done) return Calib.report();
         String[] seats = {"handcrafted:dark_oak_chair", "handcrafted:dark_oak_couch", "another_furniture:red_sofa", "mcwfurnitures:dark_oak_chair",
                 "another_furniture:dark_oak_chair", "handcrafted:dark_oak_bench", "handcrafted:dark_oak_dining_bench"};
         String[] walls = {"supplementaries:sconce_wall_soul", "mcwlights:iron_wall_candle_holder", "mcwlights:tavern_wall_lantern",
@@ -144,106 +145,128 @@ public final class ModDeco {
 
     // ------------------------------------------------------------------ catalogo
 
+    private static BlockState cal(String key) {
+        return Calib.done ? Calib.get(key) : null;
+    }
+
+    private static BlockState color(BlockState s, String col) {
+        return s == null ? null : Mods.prop(s, "color", col);
+    }
+
     public static BlockState chair(Direction look, int variant) {
-        BlockState s = switch (variant % 3) {
-            case 0 -> Mods.state("handcrafted:dark_oak_chair", "color=red");
-            case 1 -> Mods.state("mcwfurnitures:dark_oak_chair");
-            default -> Mods.state("another_furniture:dark_oak_chair");
-        };
-        if (s == null) s = first("handcrafted:dark_oak_chair", "mcwfurnitures:dark_oak_chair", "another_furniture:dark_oak_chair");
-        return seat(s, look);
+        for (int k = 0; k < Calib.SEATS.length; k++) {
+            String id = Calib.SEATS[Math.floorMod(variant + k, Calib.SEATS.length)];
+            BlockState s = cal(Calib.seat(id, look, 0));
+            if (s != null) return color(s, "red");
+        }
+        return null;
+    }
+
+    /** Sofa: part 0 = suelto, 1..3 = izquierda/centro/derecha de una fila. */
+    public static BlockState sofa(Direction look, boolean black, int part) {
+        String[] ids = black ? new String[]{"another_furniture:black_sofa", "handcrafted:dark_oak_couch"}
+                : new String[]{"handcrafted:dark_oak_couch", "another_furniture:red_sofa"};
+        for (String id : ids) {
+            BlockState s = cal(Calib.seat(id, look, part));
+            if (s == null && part != 0) s = cal(Calib.seat(id, look, 0));
+            if (s != null) return color(s, black ? "black" : "red");
+        }
+        return null;
     }
 
     public static BlockState sofa(Direction look, boolean black) {
-        BlockState s = Mods.state("handcrafted:dark_oak_couch", "color=" + (black ? "black" : "red"), "shape=single");
-        if (s == null) s = Mods.state("another_furniture:" + (black ? "black" : "red") + "_sofa", "type=single");
-        return seat(s, look);
+        return sofa(look, black, 0);
     }
 
     public static BlockState bench(Direction look) {
-        BlockState s = Mods.state("handcrafted:dark_oak_dining_bench", "shape=single");
-        return seat(s, look);
+        return cal(Calib.seat("handcrafted:dark_oak_dining_bench", look, 0));
     }
 
-    public static BlockState bed(Direction facing, boolean head, String color) {
-        BlockState s = Mods.state("handcrafted:dark_oak_fancy_bed", "color=" + color, "part=" + (head ? "head" : "foot"), "shape=single");
-        return s == null ? null : Mods.prop(s, "facing", facing.getName());
+    /** facing = hacia donde queda el cabecero. */
+    public static BlockState bed(Direction facing, boolean head, String col) {
+        return color(cal(Calib.bed("handcrafted:dark_oak_fancy_bed", facing, head)), col);
+    }
+
+    private static BlockState frontOf(Direction front, String... ids) {
+        for (String id : ids) {
+            BlockState s = cal(Calib.front(id, front));
+            if (s != null) return s;
+        }
+        return null;
     }
 
     public static BlockState nightstand(Direction front) {
-        return front(first("handcrafted:dark_oak_nightstand", "mcwfurnitures:dark_oak_drawer", "another_furniture:dark_oak_drawer"), front);
+        return color(frontOf(front, "handcrafted:dark_oak_nightstand", "mcwfurnitures:dark_oak_drawer", "another_furniture:dark_oak_drawer"), "red");
     }
 
     public static BlockState desk(Direction front) {
-        return front(first("handcrafted:dark_oak_desk"), front);
+        return color(frontOf(front, "handcrafted:dark_oak_desk", "mcwfurnitures:dark_oak_double_drawer"), "red");
     }
 
     public static BlockState cupboard(Direction front) {
-        return front(first("handcrafted:dark_oak_cupboard", "mcwfurnitures:dark_oak_double_drawer"), front);
+        return frontOf(front, "handcrafted:dark_oak_cupboard", "mcwfurnitures:dark_oak_double_drawer");
     }
 
     public static BlockState drawer(Direction front, int v) {
-        BlockState s = v % 2 == 0 ? Mods.state("mcwfurnitures:dark_oak_triple_drawer") : Mods.state("handcrafted:dark_oak_drawer", "type=" + (1 + v % 4));
-        if (s == null) s = first("mcwfurnitures:dark_oak_drawer", "another_furniture:dark_oak_drawer");
-        return front(s, front);
+        return v % 2 == 0 ? frontOf(front, "mcwfurnitures:dark_oak_triple_drawer", "handcrafted:dark_oak_drawer")
+                : frontOf(front, "handcrafted:dark_oak_drawer", "another_furniture:dark_oak_drawer", "mcwfurnitures:dark_oak_drawer");
     }
 
     public static BlockState sideTable() {
-        return first("handcrafted:dark_oak_side_table", "mcwfurnitures:dark_oak_end_table");
+        return null;
     }
 
     public static BlockState tableSingle() {
-        BlockState s = Mods.state("handcrafted:dark_oak_table", "color=red", "shape=single");
-        return s != null ? s : first("mcwfurnitures:dark_oak_table", "another_furniture:dark_oak_table");
+        BlockState s = cal(Calib.row("handcrafted:dark_oak_table", Direction.Axis.X, 0));
+        if (s != null) return color(s, "red");
+        return cal(Calib.row("mcwfurnitures:dark_oak_table", Direction.Axis.X, 0));
     }
 
-    /** Mesa larga de Macaw's: conectada con sus vecinas en el eje dado. */
+    /** Mesa larga: cada casilla copia la pieza (extremo/centro) calibrada. */
     public static BlockState tableLong(Direction.Axis axis, boolean startEnd, boolean endEnd) {
-        BlockState s = Mods.state("mcwfurnitures:dark_oak_table");
-        if (s == null) return null;
-        if (axis == Direction.Axis.X) {
-            s = Mods.prop(s, "west", String.valueOf(!startEnd));
-            s = Mods.prop(s, "east", String.valueOf(!endEnd));
-        } else {
-            s = Mods.prop(s, "north", String.valueOf(!startEnd));
-            s = Mods.prop(s, "south", String.valueOf(!endEnd));
-        }
-        return s;
+        int part = startEnd ? 1 : (endEnd ? 3 : 2);
+        BlockState s = cal(Calib.row("handcrafted:dark_oak_table", axis, part));
+        if (s != null) return color(s, "red");
+        return cal(Calib.row("mcwfurnitures:dark_oak_table", axis, part));
     }
 
     public static BlockState counter(Direction front, int v) {
-        BlockState s = switch (v % 4) {
-            case 0 -> Mods.state("handcrafted:dark_oak_counter", "counter=blackstone");
-            case 1 -> Mods.state("mcwfurnitures:dark_oak_kitchen_sink", "water=true");
-            case 2 -> Mods.state("handcrafted:oven", "lit=true");
-            default -> Mods.state("mcwfurnitures:dark_oak_counter");
+        return switch (v % 4) {
+            case 0 -> Mods.prop(frontOf(front, "handcrafted:dark_oak_counter", "mcwfurnitures:dark_oak_counter"), "counter", "blackstone");
+            case 1 -> Mods.prop(frontOf(front, "mcwfurnitures:dark_oak_kitchen_sink", "mcwfurnitures:dark_oak_counter"), "water", "true");
+            case 2 -> Mods.prop(frontOf(front, "handcrafted:oven", "mcwfurnitures:dark_oak_counter"), "lit", "true");
+            default -> frontOf(front, "mcwfurnitures:dark_oak_counter", "handcrafted:dark_oak_counter");
         };
-        if (s == null) s = first("mcwfurnitures:dark_oak_counter", "handcrafted:dark_oak_counter");
-        return front(s, front);
     }
 
     public static BlockState kitchenHood(Direction wall) {
-        return onWall(Mods.state("handcrafted:kitchen_hood"), wall);
+        return null;
+    }
+
+    private static BlockState wallOf(Direction wall, String... ids) {
+        for (String id : ids) {
+            BlockState s = cal(Calib.wall(id, wall));
+            if (s != null) return s;
+        }
+        return null;
     }
 
     public static BlockState wallLight(Direction wall, int v) {
-        BlockState s = switch (v % 3) {
-            case 0 -> Mods.state("supplementaries:sconce_wall_soul", "lit=true");
-            case 1 -> Mods.state("mcwlights:iron_wall_candle_holder", "lit=true");
-            default -> Mods.state("mcwlights:tavern_wall_lantern");
+        BlockState s = switch (Math.floorMod(v, 3)) {
+            case 0 -> wallOf(wall, "supplementaries:sconce_wall_soul", "mcwlights:iron_wall_candle_holder", "supplementaries:sconce_wall");
+            case 1 -> wallOf(wall, "mcwlights:iron_wall_candle_holder", "supplementaries:sconce_wall", "mcwlights:wall_lantern");
+            default -> wallOf(wall, "mcwlights:tavern_wall_lantern", "mcwlights:wall_lantern", "supplementaries:sconce_wall_soul");
         };
-        if (s == null) s = first("supplementaries:sconce_wall", "mcwlights:wall_lantern");
-        if (s != null) s = Mods.prop(s, "lit", "true");
-        return onWall(s, wall);
+        return Mods.prop(s, "lit", "true");
     }
 
     public static BlockState trophy(Direction wall, int v) {
         String[] t = {"handcrafted:wither_skeleton_trophy", "handcrafted:spider_trophy", "handcrafted:skeleton_horse_trophy", "handcrafted:wolf_trophy"};
-        return onWall(Mods.state(t[Math.floorMod(v, t.length)]), wall);
+        return wallOf(wall, t[Math.floorMod(v, t.length)]);
     }
 
     public static BlockState wallShelf(Direction wall) {
-        return onWall(first("supplementaries:item_shelf", "another_furniture:dark_oak_shelf"), wall);
+        return wallOf(wall, "supplementaries:item_shelf", "another_furniture:dark_oak_shelf");
     }
 
     public static BlockState chandelier(boolean gold, boolean small) {
@@ -327,15 +350,15 @@ public final class ModDeco {
     }
 
     public static BlockState safe(Direction front) {
-        return front(Mods.state("supplementaries:safe"), front);
+        return frontOf(front, "supplementaries:safe");
     }
 
     public static BlockState cannon(Direction out) {
-        return Mods.prop(Mods.state("supplementaries:cannon"), "facing", out.getName());
+        return frontOf(out, "supplementaries:cannon");
     }
 
     public static BlockState awning(Direction f, boolean red) {
-        return Mods.prop(Mods.state("supplementaries:awning_" + (red ? "red" : "black")), "facing", f.getName());
+        return null;
     }
 
     public static BlockState flag(Direction f, boolean red) {
@@ -362,22 +385,24 @@ public final class ModDeco {
     public static BlockState mosaic(int x, int z, int y, int yBottom, int yTop) {
         String[] colors = {"red", "purple", "black", "blue", "red", "orange", "gray"};
         String col = colors[Hash.h(x / 3, 0, z / 3, 404) % colors.length];
-        String part = yBottom == yTop ? "base" : (y == yBottom ? "bottom" : (y == yTop ? "top" : "middle"));
-        return Mods.state("mcwwindows:" + col + "_mosaic_glass", "part=" + part);
+        int total = yTop - yBottom + 1, n, i;
+        if (total <= 8) {
+            n = total;
+            i = y - yBottom;
+        } else {
+            n = 8;
+            i = y == yBottom ? 0 : (y == yTop ? 7 : 3);
+        }
+        return cal(Calib.column("mcwwindows:" + col + "_mosaic_glass", n, i));
     }
 
     /** Puerta de Macaw's (o null). */
     public static BlockState door(Direction facing, boolean upper, int v) {
-        String[] ids = {"mcwdoors:dark_oak_classic_door", "mcwdoors:dark_oak_mystic_door", "mcwdoors:dark_oak_nether_door",
-                "mcwdoors:spruce_cottage_door", "mcwdoors:dark_oak_whispering_door"};
-        BlockState s = Mods.state(ids[Math.floorMod(v, ids.length)]);
-        if (s == null) return null;
-        s = Mods.prop(s, "facing", facing.getName());
-        return Mods.prop(s, "half", upper ? "upper" : "lower");
+        return cal(Calib.door(Calib.DOORS[Math.floorMod(v, Calib.DOORS.length)], facing, upper));
     }
 
     public static BlockState gothicFence(Direction.Axis axis, boolean top) {
-        BlockState s = Mods.state("mcwfences:gothic_metal_fence", "fencepart=" + (top ? "top" : "bottom"));
+        BlockState s = cal(Calib.column("mcwfences:gothic_metal_fence", 2, top ? 1 : 0));
         if (s == null) return null;
         if (axis == Direction.Axis.X) return Mods.prop(Mods.prop(s, "east", "true"), "west", "true");
         return Mods.prop(Mods.prop(s, "north", "true"), "south", "true");

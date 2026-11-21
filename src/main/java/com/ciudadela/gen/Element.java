@@ -4,6 +4,8 @@ package com.ciudadela.gen;
 public abstract class Element {
     public int x0, y0, z0, x1, y1, z1;
     protected final long seed;
+    /** Orden de construccion: 0 isla, 1 suelos especiales, 2 arboles, 3 edificios, 4 detalles, 5 puentes. */
+    public int layer = 3;
 
     protected Element(long seed) {
         this.seed = seed;
@@ -16,6 +18,11 @@ public abstract class Element {
         y1 = Math.max(ay, by);
         z0 = Math.min(az, bz);
         z1 = Math.max(az, bz);
+    }
+
+    public Element layer(int l) {
+        this.layer = l;
+        return this;
     }
 
     public boolean touchesChunk(int cx, int cz) {

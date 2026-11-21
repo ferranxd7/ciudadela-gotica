@@ -40,6 +40,7 @@ public final class CastlePlan {
     }
 
     private void finish() {
+        elements.sort(java.util.Comparator.comparingInt(e -> e.layer));
         for (Element e : elements) {
             for (int x = e.x0 >> 4; x <= e.x1 >> 4; x++)
                 for (int z = e.z0 >> 4; z <= e.z1 >> 4; z++)
@@ -481,6 +482,14 @@ public final class CastlePlan {
 
     private Tree.Kind pickTree(Rng rng, boolean town) {
         int p = rng.nextInt(100);
+        if (town) {
+            // dentro de las murallas solo arboles medianos que dejan pasar
+            if (p < 35) return Tree.Kind.OAK;
+            if (p < 55) return Tree.Kind.SPRUCE;
+            if (p < 70) return Tree.Kind.CHERRY;
+            if (p < 85) return Tree.Kind.BUSH;
+            return Tree.Kind.AZALEA;
+        }
         if (p < 22) return Tree.Kind.BIG_DARK;
         if (p < 44) return Tree.Kind.OAK;
         if (p < 62) return Tree.Kind.SPRUCE;
@@ -515,19 +524,19 @@ public final class CastlePlan {
                 else add(new Tree(rng.fork(), pickTree(rng, false), X(px), top + 1, Z(pz)));
             }
         // huecos que quedan en el recinto exterior
-        for (int lx = -220; lx <= 220; lx += 7)
-            for (int lz = -220; lz <= 220; lz += 7) {
+        for (int lx = -220; lx <= 220; lx += 10)
+            for (int lz = -220; lz <= 220; lz += 10) {
                 int px = lx + rng.range(-2, 2), pz = lz + rng.range(-2, 2);
                 if (!treeSpot(px, pz) || lane(px, pz) || cheb(px, pz) <= INNER + 14) continue;
-                if (!rng.chance(0.7)) continue;
+                if (!rng.chance(0.5)) continue;
                 add(new Tree(rng.fork(), pickTree(rng, true), X(px), Y, Z(pz)));
             }
         // parterres del patio interior
-        for (int lx = -56; lx <= 56; lx += 6)
-            for (int lz = 42; lz <= 112; lz += 6) {
-                if (!gardenBed(lx, lz) || Math.abs(lx) < 19) continue;
-                Tree.Kind k = rng.chance(0.3) ? Tree.Kind.CHERRY : (rng.chance(0.5) ? Tree.Kind.AZALEA : Tree.Kind.OAK);
-                add(new Tree(rng.fork(), k, X(lx + rng.range(-1, 1)), Y, Z(lz + rng.range(-1, 1))));
+        // parterres del patio: pocos arboles, en las esquinas, para poder pasear
+        for (int sx = -1; sx <= 1; sx += 2)
+            for (int lz : new int[]{46, 64, 92, 108}) {
+                add(new Tree(rng.fork(), Tree.Kind.CHERRY, X(sx * 22), Y, Z(lz)));
+                add(new Tree(rng.fork(), Tree.Kind.AZALEA, X(sx * 50), Y, Z(lz)));
             }
         // jardin privado
         for (int k = 0; k < 8; k++)
@@ -554,8 +563,8 @@ public final class CastlePlan {
                     busy[(x + FOOTPRINT) * N + (z + FOOTPRINT)] = true;
         }
         int placed = 0;
-        for (int lx = -210; lx <= 210; lx += 5)
-            for (int lz = -210; lz <= 210; lz += 5) {
+        for (int lx = -210; lx <= 210; lx += 7)
+            for (int lz = -210; lz <= 210; lz += 7) {
                 int ch = cheb(lx, lz);
                 boolean inner = ch <= INNER - 10;
                 boolean outer = ch >= 146 && insideOct(lx, lz, 14);
@@ -572,7 +581,7 @@ public final class CastlePlan {
                 int roll = rng.nextInt(100);
                 int x = X(lx), z = Z(lz);
                 if (inner) {
-                    if (roll < 40) add(new Town.Planter(rng.fork(), x, Y, z, pickTree(rng, true)));
+                    if (roll < 25) add(new Town.Planter(rng.fork(), x, Y, z, rng.chance(0.5) ? Tree.Kind.CHERRY : Tree.Kind.BUSH));
                     else if (roll < 60) {
                         add(new Landscape.LampPost(rng.fork(), x, Y, z));
                         add(new Town.BenchElement(rng.fork(), x + 2, Y, z, Direction.WEST));

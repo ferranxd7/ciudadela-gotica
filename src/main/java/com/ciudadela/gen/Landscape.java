@@ -20,6 +20,7 @@ public final class Landscape {
 
         public DeadTree(long seed, int x, int y, int z, boolean thick) {
             super(seed);
+        this.layer = 2;
             Rng r = new Rng(seed);
             this.x = x;
             this.y = y;
@@ -88,6 +89,7 @@ public final class Landscape {
 
         public Cemetery(long seed, Rect r, int y) {
             super(seed);
+        this.layer = 1;
             this.r = r;
             this.y = y;
             bounds(r.x0 - 1, y - 3, r.z0 - 1, r.x1 + 1, y + 6, r.z1 + 1);
@@ -162,6 +164,7 @@ public final class Landscape {
 
         public HedgeMaze(long seed, Rect area, int y) {
             super(seed);
+        this.layer = 1;
             this.y = y;
             this.cells = (area.w() - 1) / (CELL + 1);
             this.cellsZ = (area.d() - 1) / (CELL + 1);
@@ -247,6 +250,7 @@ public final class Landscape {
 
         public Fountain(long seed, int x, int y, int z, int rad) {
             super(seed);
+        this.layer = 4;
             this.x = x;
             this.y = y;
             this.z = z;
@@ -277,12 +281,21 @@ public final class Landscape {
                     if (dx == 0 && dz == 0) continue;
                     c.set(x + dx, y + 3, z + dz, Pal.slab(Blocks.POLISHED_BLACKSTONE_SLAB, true));
                 }
+            // cuenco superior cerrado: el agua no se puede salir
+            for (int dx = -2; dx <= 2; dx++)
+                for (int dz = -2; dz <= 2; dz++) {
+                    int ad = Math.max(Math.abs(dx), Math.abs(dz));
+                    if (ad == 2) c.set(x + dx, y + 4, z + dz, Pal.slab(Blocks.POLISHED_BLACKSTONE_BRICK_SLAB, false));
+                    else if (ad == 1) {
+                        c.set(x + dx, y + 3, z + dz, Pal.PB_BRICKS);
+                        c.set(x + dx, y + 4, z + dz, Pal.WATER);
+                    }
+                }
+            for (int dx = -2; dx <= 2; dx++)
+                for (int dz = -2; dz <= 2; dz++)
+                    if (Math.max(Math.abs(dx), Math.abs(dz)) == 2) c.set(x + dx, y + 3, z + dz, Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, Pal.dirOf(dx, dz), true));
             c.set(x, y + 5, z, Pal.PB_CHISELED);
-            c.flowingWater(x, y + 6, z);
-            c.set(x + 1, y + 4, z, Pal.WATER);
-            c.set(x - 1, y + 4, z, Pal.WATER);
-            c.set(x, y + 4, z + 1, Pal.WATER);
-            c.set(x, y + 4, z - 1, Pal.WATER);
+            c.set(x, y + 6, z, Pal.SOUL_LANTERN);
         }
     }
 
@@ -292,6 +305,7 @@ public final class Landscape {
 
         public LampPost(long seed, int x, int y, int z) {
             super(seed);
+        this.layer = 4;
             this.x = x;
             this.y = y;
             this.z = z;
@@ -316,6 +330,7 @@ public final class Landscape {
 
         public Statue(long seed, int x, int y, int z, Direction face) {
             super(seed);
+        this.layer = 4;
             this.x = x;
             this.y = y;
             this.z = z;
@@ -359,6 +374,7 @@ public final class Landscape {
 
         public TrainingYard(long seed, Rect r, int y) {
             super(seed);
+        this.layer = 1;
             this.r = r;
             this.y = y;
             bounds(r.x0, y - 1, r.z0, r.x1, y + 4, r.z1);
@@ -395,6 +411,7 @@ public final class Landscape {
 
         public Bridge(long seed, int ax, int ay, int az, int bx, int by, int bz, double sag, int width) {
             super(seed);
+        this.layer = 5;
             this.ax = ax;
             this.ay = ay;
             this.az = az;

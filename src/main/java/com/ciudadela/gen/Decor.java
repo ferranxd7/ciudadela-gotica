@@ -224,7 +224,8 @@ public final class Decor {
         for (int k = 0; k < n; k++) {
             int px = x + side.getStepX() * k, pz = z + side.getStepZ() * k;
             if (!free(px, pz)) continue;
-            BlockState m = ModDeco.sofa(look, black);
+            int part = n == 1 ? 0 : (k == 0 ? 1 : (k == n - 1 ? 3 : 2));
+            BlockState m = ModDeco.sofa(look, black, part);
             c.set(px, F, pz, m != null ? m : Pal.stairs(Blocks.CRIMSON_STAIRS, look.getOpposite(), false));
             use(px, pz);
         }
@@ -358,12 +359,12 @@ public final class Decor {
         Room.Type t = room.type;
         boolean crypt = t == Room.Type.CRYPT || t == Room.Type.TREASURY || t == Room.Type.PRISON;
         boolean troph = t == Room.Type.GREAT_HALL || t == Room.Type.THRONE || t == Room.Type.ARMORY || t == Room.Type.GALLERY || t == Room.Type.BARRACKS;
-        wallDecor(troph ? 4 : 6, troph);
+        wallDecor(troph ? 5 : 7, troph);
         double p = switch (t) {
             case STORAGE, CELLAR, WINE_CELLAR -> 0.7;
             case GREAT_HALL, THRONE, BALLROOM, CHAPEL -> 0.22;
             case LIBRARY, LIBRARY_GRAND, PRISON -> 0.1;
-            default -> 0.45;
+            default -> 0.3;
         };
         fillWalls(p, crypt);
     }

@@ -19,6 +19,7 @@ public class Tree extends Element {
 
     public Tree(long seed, Kind kind, int x, int y, int z) {
         super(seed);
+        this.layer = 2;
         this.kind = kind;
         Rng r = new Rng(seed);
         Woods.Wood w = Woods.forTree(kind, r);
@@ -71,9 +72,9 @@ public class Tree extends Element {
     }
 
     private void oak(Rng r, int x, int y, int z) {
-        int h = r.range(5, 9);
+        int h = r.range(6, 9);
         trunk(x, y, z, h, 1);
-        blobs.add(new double[]{x, y + h, z, r.range(3, 4) + 0.5, 0.8});
+        blobs.add(new double[]{x, y + h, z, r.range(3, 4) + 0.5, 0.6});
         int nb = r.range(2, 4);
         for (int i = 0; i < nb; i++) {
             double a = r.nextDouble() * Math.PI * 2;
