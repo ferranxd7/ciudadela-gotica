@@ -759,7 +759,7 @@ public final class ClientCiTest {
             });
         }
         // golpe final: los dos circulos dorados, el aviso grande y la cuenta atras
-        int G = F3 + 318;
+        int G = F3 + 385;   // cuando ya ha acabado la cinematica de la fase 3 (lucha otra vez)
         atTicks(G, "Forzar el golpe final", m -> server(m, sp -> reyCerca(sp).ifPresent(r -> log("  golpe final forzado: " + r.forzarGolpeFinal()))));
         atTicks(G + 24, "Captura golpe final (circulos)", m -> {
             m.options.hideGui = false;
