@@ -27,13 +27,21 @@ import java.util.UUID;
 
 /**
  * Lo que lanza el Rey: el tajo a distancia (media luna de luz), las bolas de fuego y la ola de fuego
- * que va por el suelo. No rompe ni quema bloques.
+ * que va por el suelo. Tambien los tajos de sus espadas en manos de un jugador (fase 0: dorados).
+ * No rompe ni quema bloques. El tajo, al acabar o chocar, se deshace en chispas en unos pocos ticks.
  */
 public class ReyProyectil extends Projectile {
     public static final int TAJO = 0, BOLA = 1, OLA = 2;
 
     private static final EntityDataAccessor<Integer> TIPO = SynchedEntityData.defineId(ReyProyectil.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> FASE = SynchedEntityData.defineId(ReyProyectil.class, EntityDataSerializers.INT);
+    /** Inclinacion de la media luna (grados). */
+    private static final EntityDataAccessor<Float> GIRO = SynchedEntityData.defineId(ReyProyectil.class, EntityDataSerializers.FLOAT);
+    /** Se esta deshaciendo (fin del vuelo o choque). */
+    private static final EntityDataAccessor<Boolean> DISUELVE = SynchedEntityData.defineId(ReyProyectil.class, EntityDataSerializers.BOOLEAN);
+    public static final int DISUELVE_TICKS = 7;
+    public static final float RADIO = 1.7f, ARCO = 75f;
+    private int disIni = -1;
 
     private float dano = 20;
     private int vida;
@@ -49,6 +57,26 @@ public class ReyProyectil extends Projectile {
     protected void defineSynchedData() {
         this.entityData.define(TIPO, TAJO);
         this.entityData.define(FASE, 1);
+        this.entityData.define(GIRO, 20f);
+        this.entityData.define(DISUELVE, false);
+    }
+
+    public float giro() {
+        return this.entityData.get(GIRO);
+    }
+
+    /** 0 mientras vuela; de 0 a 1 mientras se deshace. */
+    public float disolviendo(float pt) {
+        return disIni < 0 ? 0f : Mth.clamp((tickCount + pt - disIni) / DISUELVE_TICKS, 0f, 1f);
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (DISUELVE.equals(key) && this.entityData.get(DISUELVE) && disIni < 0) {
+            disIni = tickCount;
+            if (level().isClientSide) for (int i = 0; i < 26; i++) chispa(i / 25f * 2 - 1, 0.12);
+        }
     }
 
     public int tipo() {
@@ -62,6 +90,7 @@ public class ReyProyectil extends Projectile {
     public void preparar(int tipo, Vec3 v, float dano, int fase) {
         this.entityData.set(TIPO, tipo);
         this.entityData.set(FASE, fase);
+        this.entityData.set(GIRO, 20f + (random.nextFloat() - 0.5f) * (fase == 0 ? 70f : 30f));
         this.dano = dano;
         setDeltaMovement(v);
         float yaw = (float) (Mth.atan2(v.z, v.x) * Mth.RAD_TO_DEG) - 90f;
@@ -83,13 +112,19 @@ public class ReyProyectil extends Projectile {
         Vec3 v = getDeltaMovement();
         Vec3 next = position().add(v);
         if (level().isClientSide) {
-            particulas();
+            if (disIni < 0) particulas();
             setPos(next);
             return;
         }
         ServerLevel sl = (ServerLevel) level();
+        if (this.entityData.get(DISUELVE)) {
+            setDeltaMovement(Vec3.ZERO);
+            if (++vida > DISUELVE_TICKS) discard();
+            return;
+        }
         if (++vida > maxVida()) {
-            discard();
+            if (tipo() == TAJO) disolver();
+            else discard();
             return;
         }
         // choca con paredes
@@ -142,10 +177,44 @@ public class ReyProyectil extends Projectile {
             sl.sendParticles(ParticleTypes.EXPLOSION, getX(), getY(), getZ(), 1, 0, 0, 0, 0);
             sl.sendParticles(ParticleTypes.FLAME, getX(), getY(), getZ(), 20, 0.4, 0.4, 0.4, 0.06);
             sl.playSound(null, getX(), getY(), getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.HOSTILE, 1.0f, 0.8f);
+            sl.sendParticles(ParticleTypes.LARGE_SMOKE, getX(), getY(), getZ(), 8, 0.3, 0.3, 0.3, 0.03);
+        } else if (tipo() == TAJO) {
+            disolver();
+            return;
         } else {
-            sl.sendParticles(tipo() == TAJO ? ParticleTypes.SWEEP_ATTACK : ParticleTypes.FLAME, getX(), getY(), getZ(), 6, 0.4, 0.4, 0.4, 0.05);
+            sl.sendParticles(ParticleTypes.FLAME, getX(), getY(), getZ(), 6, 0.4, 0.4, 0.4, 0.05);
         }
         discard();
+    }
+
+    /** El tajo se para y se deshace en chispas (lo dibuja el cliente). */
+    private void disolver() {
+        this.entityData.set(DISUELVE, true);
+        setDeltaMovement(Vec3.ZERO);
+        vida = 0;
+    }
+
+    /** Punto del arco de la media luna en el mundo: u de -1 a 1 (de punta a punta), r de 0 a 1 hacia dentro. */
+    public Vec3 puntoArco(double u, double r) {
+        double a = Math.toRadians(u * ARCO), rad = RADIO * (1 - 0.25 * r);
+        double lx = rad * Math.sin(a), lz = rad * Math.cos(a) - 0.55 * RADIO;
+        double roll = Math.toRadians(giro());
+        double x = lx * Math.cos(roll), y = lx * Math.sin(roll), z = lz;
+        double th = Math.toRadians(-getYRot());
+        double wx = x * Math.cos(th) + z * Math.sin(th), wz = -x * Math.sin(th) + z * Math.cos(th);
+        return new Vec3(getX() + wx, getY() + y, getZ() + wz);
+    }
+
+    private void chispa(double u, double vel) {
+        Vec3 p = puntoArco(u, random.nextDouble() * 0.6);
+        double vx = (random.nextDouble() - 0.5) * vel, vy = (random.nextDouble() - 0.3) * vel, vz = (random.nextDouble() - 0.5) * vel;
+        Level l = level();
+        switch (fase()) {
+            case 0 -> l.addParticle(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(1f, 0.78f, 0.25f), 1.1f), p.x, p.y, p.z, vx, vy, vz);
+            case 1 -> l.addParticle(ParticleTypes.END_ROD, p.x, p.y, p.z, vx * 0.4, vy * 0.4, vz * 0.4);
+            case 2 -> l.addParticle(ParticleTypes.FLAME, p.x, p.y, p.z, vx * 0.5, vy * 0.5, vz * 0.5);
+            default -> l.addParticle(random.nextInt(3) == 0 ? ParticleTypes.SMALL_FLAME : ParticleTypes.FLAME, p.x, p.y, p.z, vx * 0.5, vy * 0.5, vz * 0.5);
+        }
     }
 
     private void particulas() {
@@ -153,16 +222,21 @@ public class ReyProyectil extends Projectile {
         int f = fase();
         switch (tipo()) {
             case TAJO -> {
-                if (f >= 2)
-                    for (int i = 0; i < 3; i++)
-                        l.addParticle(f == 3 ? ParticleTypes.LAVA : ParticleTypes.FLAME, getX() + (random.nextDouble() - 0.5) * 2, getY() + (random.nextDouble() - 0.5),
-                                getZ() + (random.nextDouble() - 0.5) * 2, 0, 0.02, 0);
-                else l.addParticle(ParticleTypes.ENCHANTED_HIT, getX(), getY(), getZ(), 0, 0, 0);
+                // estela de chispas a lo largo del arco
+                for (int i = 0; i < 3; i++) chispa(random.nextDouble() * 2 - 1, 0.03);
+                if (f == 3 && random.nextInt(3) == 0) {
+                    Vec3 p = puntoArco(random.nextDouble() * 2 - 1, 0.3);
+                    l.addParticle(ParticleTypes.DRIPPING_LAVA, p.x, p.y, p.z, 0, 0, 0);
+                }
             }
             case BOLA -> {
-                l.addParticle(ParticleTypes.FLAME, getX(), getY(), getZ(), 0, 0, 0);
-                l.addParticle(ParticleTypes.SMOKE, getX(), getY(), getZ(), 0, 0.02, 0);
-                if (random.nextInt(3) == 0) l.addParticle(ParticleTypes.LAVA, getX(), getY(), getZ(), 0, 0, 0);
+                // llamas que se quedan atras y una estela de humo
+                Vec3 v = getDeltaMovement();
+                for (int i = 0; i < 2; i++)
+                    l.addParticle(ParticleTypes.FLAME, getX() + (random.nextDouble() - 0.5) * 0.5, getY() + (random.nextDouble() - 0.5) * 0.5,
+                            getZ() + (random.nextDouble() - 0.5) * 0.5, -v.x * 0.2, 0.01, -v.z * 0.2);
+                l.addParticle(ParticleTypes.SMOKE, getX() - v.x * 0.5, getY(), getZ() - v.z * 0.5, 0, 0.02, 0);
+                if (tickCount % 2 == 0) l.addParticle(ParticleTypes.LARGE_SMOKE, getX() - v.x, getY() + 0.1, getZ() - v.z, 0, 0.03, 0);
             }
             default -> {
                 for (int i = 0; i < 5; i++)

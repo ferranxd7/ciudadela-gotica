@@ -54,6 +54,9 @@ public final class ArmasCliente {
     }
 
     /** Barra de energia (solo con una espada del Rey en la mano). */
+    private static final net.minecraft.resources.ResourceLocation TEX = new net.minecraft.resources.ResourceLocation(com.ciudadela.CiudadelaMod.MODID, "textures/gui/energia.png");
+    private static final int CANAL_INI = 31, CANAL_FIN = 86;
+
     public static void render(ForgeGui gui, GuiGraphics g, float pt, int w, int h) {
         Minecraft mc = Minecraft.getInstance();
         if (aviso > 0 && mc.player != null && mc.player.tickCount % 2 == 0) aviso--;
@@ -61,15 +64,31 @@ public final class ArmasCliente {
         boolean lleva = EspadaRey.es(mc.player.getMainHandItem()) || EspadaRey.es(mc.player.getOffhandItem());
         if (!lleva) return;
         vista += Mth.clamp(energia - vista, -2, 2);
-        int bw = 100, x0 = w / 2 - bw / 2, y0 = h - 32 - (mc.player.isCreative() ? 0 : 8) - 9;
-        g.fill(x0 - 1, y0 - 1, x0 + bw + 1, y0 + 4, 0xC0100404);
-        int fill = Math.round(bw * vista / (float) Combos.MAX);
-        int col = vista >= Combos.COSTE_2 ? 0xFFFF7A10 : (vista >= Combos.COSTE_1 ? 0xFFE04018 : 0xFF902010);
-        g.fill(x0, y0, x0 + fill, y0 + 3, col);
-        g.fill(x0, y0, x0 + fill, y0 + 1, 0x50FFFFFF);
+        // una espada en pixeles a la derecha de la barra de objetos: su canal se llena de fuego con la energia
+        boolean zurdo = mc.player.getMainArm() == net.minecraft.world.entity.HumanoidArm.LEFT;
+        int x0 = zurdo ? w / 2 - 91 - 8 - 96 : w / 2 + 91 + 8, y0 = h - 19;
+        if (x0 < 2 || x0 + 96 > w - 2) {
+            x0 = w / 2 - 48;
+            y0 = h - 32 - (mc.player.isCreative() ? 0 : 8) - 24;
+        }
+        g.blit(TEX, x0, y0, 0, 0, 96, 16, 128, 128);
+        int largo = CANAL_FIN - CANAL_INI + 1;
+        int lleno = Math.round(largo * Mth.clamp(vista / (float) Combos.MAX, 0f, 1f));
+        int cuadro = (mc.player.tickCount / 3) & 3;
+        if (lleno > 0) g.blit(TEX, x0 + CANAL_INI, y0, CANAL_INI, 16 + 16 * cuadro, lleno, 16, 128, 128);
+        // runas: se encienden cuando hay energia para cada combo
         for (int c : new int[]{Combos.COSTE_1, Combos.COSTE_2}) {
-            int xs = x0 + bw * c / Combos.MAX;
-            g.fill(xs, y0 - 2, xs + 1, y0 + 5, 0xFFC8A040);
+            if (vista < c) continue;
+            int rx = CANAL_INI + Math.round((CANAL_FIN - CANAL_INI) * c / (float) Combos.MAX);
+            g.blit(TEX, x0 + rx - 1, y0, rx - 1, 80, 3, 16, 128, 128);
+        }
+        // con la energia del Juicio, la hoja brilla y late
+        if (vista >= Combos.COSTE_2) {
+            float a = 0.55f + 0.45f * Mth.sin((mc.player.tickCount + pt) * 0.25f);
+            com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+            g.setColor(1f, 1f, 1f, a);
+            g.blit(TEX, x0, y0, 0, 96, 96, 16, 128, 128);
+            g.setColor(1f, 1f, 1f, 1f);
         }
     }
 }

@@ -339,24 +339,37 @@ public final class ReyCliente {
         e.setCanceled(true);
         GuiGraphics g = e.getGuiGraphics();
         Minecraft mc = Minecraft.getInstance();
-        int w = mc.getWindow().getGuiScaledWidth();
-        int bw = Math.min(300, w - 40), x0 = w / 2 - bw / 2, y0 = e.getY() + 10;
-        float p = e.getBossEvent().getProgress();
-        Component title = Component.translatable("entity.ciudadela.rey");
-        g.drawCenteredString(mc.font, title, w / 2, y0 - 11, 0xFFB8202A);
-        g.fill(x0 - 2, y0 - 2, x0 + bw + 2, y0 + 8, 0xFF0A0606);
-        g.fill(x0 - 1, y0 - 1, x0 + bw + 1, y0 + 7, 0xFF4A3A20);
-        g.fill(x0, y0, x0 + bw, y0 + 6, 0xFF1A0808);
-        int fill = Math.round(bw * p);
-        int col = p > 2f / 3f ? 0xFFA01818 : (p > 1f / 3f ? 0xFFD05010 : 0xFFF09020);
-        g.fill(x0, y0, x0 + fill, y0 + 6, col);
-        g.fill(x0, y0, x0 + fill, y0 + 2, 0x40FFFFFF);
-        for (int k = 1; k <= 2; k++) {
-            int xs = x0 + bw * k / 3;
-            g.fill(xs - 1, y0 - 3, xs + 1, y0 + 9, 0xFFC8A040);
-        }
-        e.setIncrement(26);
+        int sw = mc.getWindow().getGuiScaledWidth();
+        float p = Mth.clamp(e.getBossEvent().getProgress(), 0f, 1f);
+        if (p < barraP - 0.0001f) barraGolpe = ticks;
+        if (p > barraRastro) barraRastro = p;
+        barraP = p;
+        int fase = barraFase > 0 ? barraFase : (p > 0.667f ? 1 : (p > 0.334f ? 2 : 3));
+        float sc = Math.min(1f, (sw - 12) / 256f);
+        int y0 = e.getY() + 6;
+        g.pose().pushPose();
+        g.pose().translate(sw / 2f, y0, 0);
+        g.pose().scale(sc, sc, 1f);
+        g.pose().translate(-128, 0, 0);
+        // nombre encima de la corona: el Rey que Espera, y desde la fase 2 el Rey que Arde
+        Component title = Component.translatable(fase >= 2 ? "ciudadela.rey.barra_arde" : "entity.ciudadela.rey");
+        g.drawCenteredString(mc.font, title, 128, -8, fase >= 2 ? 0xFFF0A040 : 0xFFE6C068);
+        // hueco vacio, rastro del ultimo dano (dorado palido) y relleno de la fase
+        g.blit(BARRA, 8, 19, 0, 104, 240, 7, 256, 128);
+        int wf = Math.round(240 * p), wr = Math.round(240 * Math.max(p, barraRastro));
+        if (wr > wf) g.blit(BARRA, 8 + wf, 19, wf, 112, wr - wf, 7, 256, 128);
+        int cuadro = (ticks / 3) & 3;
+        int v = fase == 1 ? 32 : (fase == 2 ? 40 + 8 * cuadro : 72 + 8 * cuadro);
+        if (wf > 0) g.blit(BARRA, 8, 19, 0, v, wf, 7, 256, 128);
+        // el marco (hierro, oro, corona y gemas) por encima
+        g.blit(BARRA, 0, 0, 0, 0, 256, 32, 256, 128);
+        g.pose().popPose();
+        e.setIncrement(Math.round(42 * sc) + 4);
     }
+
+    private static final net.minecraft.resources.ResourceLocation BARRA = new net.minecraft.resources.ResourceLocation(CiudadelaMod.MODID, "textures/gui/rey_barra.png");
+    private static float barraP = 1f, barraRastro = 1f;
+    private static int barraGolpe, barraFase;
 
     // ------------------------------------------------------------------ la llave gira en el sello
 
@@ -503,6 +516,8 @@ public final class ReyCliente {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.isPaused()) return;
         ticks++;
+        // el rastro de la barra de vida baja despues de un momento
+        if (barraRastro > barraP && ticks - barraGolpe > 14) barraRastro = Math.max(barraP, barraRastro - 0.01f);
         // la musica del combate: la del rey luchando mas cercano
         if (ticks % 10 == 0) {
             int fase = 0;
@@ -516,6 +531,7 @@ public final class ReyCliente {
                 }
             }
             ClientMusic.boss(fase, suave);
+            barraFase = fase;
         }
         // chispas doradas del cofre
         if (cofre != null && ticks % 2 == 0) {

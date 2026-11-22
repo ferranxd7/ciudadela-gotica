@@ -191,7 +191,7 @@ public final class Combos {
             pr.setOwner(sp);
             pr.setPos(sp.getX() + Math.cos(yaw) * 0.8, sp.getEyeY() - 0.4, sp.getZ() + Math.sin(yaw) * 0.8);
             Vec3 v = new Vec3(Math.cos(yaw), -0.02, Math.sin(yaw)).scale(1.1);
-            pr.preparar(ReyProyectil.TAJO, v, 10 * mul(e), 2);
+            pr.preparar(ReyProyectil.TAJO, v, 10 * mul(e), 0);
             sl.addFreshEntity(pr);
             sl.playSound(null, sp.getX(), sp.getY(), sp.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.0f, 1.1f);
         }
