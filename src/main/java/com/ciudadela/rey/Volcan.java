@@ -281,10 +281,13 @@ public final class Volcan {
         l.add(new Shot(0f, 4.2f, 70, -2, 1,
                 p(-70, y + 26, 58, -52, y + 22, 46, -38, y + 18, 34),
                 p(0, y + 4, 0, 0, y + 5, 0, 0, y + 6, 0)));
-        // 2) desde el borde, mirando al cielo: el rey cae como un meteorito
+        // 2) desde el otro lado de la plataforma, mirando arriba: el rey en llamas sobre el volcan mas alto, y cae
+        int[] vb = VOLCANES[0];
+        for (int[] v : VOLCANES) if (v[3] > vb[3]) vb = v;
+        double dl = Math.max(1, Math.hypot(vb[0], vb[1])), ux = vb[0] / dl, uz = vb[1] / dl;
         l.add(new Shot(4.2f, 7.6f, 74, 1.5f, 0,
-                p(-14, y + 2.5, 14, -13, y + 2.2, 13),
-                p(0, y + 30, 0, 0, y + 6, 0)));
+                p(-ux * 30 + 0.5, y + 3.5, -uz * 30 + 0.5, -ux * 25 + 0.5, y + 3.0, -uz * 25 + 0.5),
+                p(0.5, y + 28, 0.5, 0.5, y + 26.5, 0.5, 0.5, y + 6, 0.5)));
         // 3) el golpe contra la plataforma
         l.add(new Shot(7.6f, 10.2f, 72, 0, 2,
                 p(9, y + 4, 10, 7, y + 3.4, 8),

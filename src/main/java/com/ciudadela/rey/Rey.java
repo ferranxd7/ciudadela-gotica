@@ -52,7 +52,11 @@ public class Rey extends Monster {
     // ------------------------------------------------------------------ datos que ve el cliente
     private static final EntityDataAccessor<Integer> FASE = SynchedEntityData.defineId(Rey.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> POSE = SynchedEntityData.defineId(Rey.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Integer> ANIM = SynchedEntityData.defineId(Rey.class, EntityDataSerializers.INT);
+    /**
+     * Animacion de accion: (contador << 5) | id, en un solo valor. Con dos valores separados (id y contador) el
+     * cliente a veces recibe el contador antes que el id (el paquete no los manda en orden) y ponia la animacion
+     * anterior.
+     */
     private static final EntityDataAccessor<Integer> ANIM_N = SynchedEntityData.defineId(Rey.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> FLAGS = SynchedEntityData.defineId(Rey.class, EntityDataSerializers.INT);
 
@@ -124,7 +128,6 @@ public class Rey extends Monster {
         super.defineSynchedData();
         this.entityData.define(FASE, 1);
         this.entityData.define(POSE, POSE_SENTADO);
-        this.entityData.define(ANIM, 0);
         this.entityData.define(ANIM_N, 0);
         this.entityData.define(FLAGS, 0);
     }
@@ -172,8 +175,8 @@ public class Rey extends Monster {
     }
 
     private void anim(int id) {
-        this.entityData.set(ANIM, id);
-        this.entityData.set(ANIM_N, this.entityData.get(ANIM_N) + 1);
+        int n = ((this.entityData.get(ANIM_N) >>> 5) + 1) & 0x3FFFFFF;
+        this.entityData.set(ANIM_N, (n << 5) | (id & 31));
     }
 
     private void setPose(int p) {
@@ -186,7 +189,7 @@ public class Rey extends Monster {
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         super.onSyncedDataUpdated(key);
         if (level().isClientSide && ANIM_N.equals(key)) {
-            int id = this.entityData.get(ANIM);
+            int id = this.entityData.get(ANIM_N) & 31;
             for (AnimationState a : actions) a.stop();
             actionId = 0;
             if (id > 0 && id < actions.length) {
@@ -1295,12 +1298,18 @@ public class Rey extends Monster {
         if (t < 120) {
             setPos(c.x, alturaInicio, c.z);
             if (t == 1) anim(ReyAnims.SALTO);
+            // suspendido en el cielo envuelto en fuego, como un meteorito a punto de caer (se ve desde lejos)
+            if (t % 2 == 0) {
+                lejos(sl, ParticleTypes.FLAME, getX(), getY() + 1.5, getZ(), 10, 0.7, 1.3, 0.7, 0.03);
+                lejos(sl, ParticleTypes.LAVA, getX(), getY() + 1.2, getZ(), 2, 0.5, 0.8, 0.5, 0.02);
+            }
+            if (t % 5 == 0) lejos(sl, ParticleTypes.LARGE_SMOKE, getX(), getY() + 3.2, getZ(), 3, 0.5, 0.6, 0.5, 0.02);
         } else if (t < 152) {
             double q = (t - 120) / 32.0;
             setPos(c.x, Mth.lerp(q * q, alturaInicio, c.y), c.z);
-            sl.sendParticles(ParticleTypes.FLAME, getX(), getY() + 1.5, getZ(), 12, 0.5, 1.2, 0.5, 0.05);
-            sl.sendParticles(ParticleTypes.LAVA, getX(), getY() + 1.5, getZ(), 3, 0.4, 0.8, 0.4, 0.02);
-            sl.sendParticles(ParticleTypes.LARGE_SMOKE, getX(), getY() + 3, getZ(), 6, 0.4, 1.0, 0.4, 0.02);
+            lejos(sl, ParticleTypes.FLAME, getX(), getY() + 1.5, getZ(), 14, 0.5, 1.4, 0.5, 0.05);
+            lejos(sl, ParticleTypes.LAVA, getX(), getY() + 1.5, getZ(), 3, 0.4, 0.8, 0.4, 0.02);
+            lejos(sl, ParticleTypes.LARGE_SMOKE, getX(), getY() + 3, getZ(), 6, 0.4, 1.0, 0.4, 0.02);
             if (t == 121) {
                 anim(ReyAnims.SALTO);
                 sonido(sl, SoundEvents.FIRECHARGE_USE, 3f, 0.4f);
@@ -1326,6 +1335,12 @@ public class Rey extends Monster {
             recup = 20;
             cambiar(Estado.LUCHA);
         }
+    }
+
+    /** Particulas que se ven aunque la camara (de una cinematica) este lejos. */
+    private static void lejos(ServerLevel sl, net.minecraft.core.particles.ParticleOptions o, double x, double y, double z, int n,
+                              double dx, double dy, double dz, double sp) {
+        for (ServerPlayer p : sl.players()) sl.sendParticles(p, o, true, x, y, z, n, dx, dy, dz, sp);
     }
 
     /** Desaparece sin volver al trono (el rey sigue en los volcanes). */
