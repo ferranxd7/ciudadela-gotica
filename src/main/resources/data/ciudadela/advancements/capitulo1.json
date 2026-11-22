@@ -1,0 +1,26 @@
+{
+  "parent": "ciudadela:encontrar",
+  "display": {
+    "icon": {
+      "item": "minecraft:written_book"
+    },
+    "title": {
+      "translate": "advancements.ciudadela.capitulo1.title"
+    },
+    "description": {
+      "translate": "advancements.ciudadela.capitulo1.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}

@@ -138,6 +138,32 @@ public final class ReyEventos {
         }
     }
 
+    /** Si mueres en los volcanes, tus cosas no se quedan alli: aparecen tiradas en el centro del salon del trono. */
+    @SubscribeEvent
+    public static void onDrops(net.minecraftforge.event.entity.living.LivingDropsEvent e) {
+        if (!(e.getEntity() instanceof ServerPlayer p) || !Volcan.es(p.level()) || e.getDrops().isEmpty()) return;
+        ServerLevel ow = p.getServer().overworld();
+        Rey r = luchaDe(p);
+        Sala s = r != null ? r.sala() : null;
+        if (s == null) {
+            BlockPos sp = ow.getSharedSpawnPos();
+            s = Sala.near(ow, sp.getX(), sp.getZ());
+        }
+        if (s == null) return;
+        net.minecraft.world.phys.Vec3 c = s.center();
+        ow.getChunk((int) Math.floor(c.x) >> 4, (int) Math.floor(c.z) >> 4);
+        for (net.minecraft.world.entity.item.ItemEntity it : e.getDrops()) {
+            double a = p.getRandom().nextDouble() * Math.PI * 2, d = p.getRandom().nextDouble() * 1.6;
+            var ie = new net.minecraft.world.entity.item.ItemEntity(ow, c.x + Math.cos(a) * d, s.t.y() + 0.3, c.z + Math.sin(a) * d, it.getItem().copy());
+            ie.setDeltaMovement(0, 0.1, 0);
+            ie.setDefaultPickUpDelay();
+            ie.setUnlimitedLifetime();
+            ow.addFreshEntity(ie);
+        }
+        e.setCanceled(true);
+        CiudadelaMod.LOGGER.info("[Ciudadela] {} muere en los volcanes: {} objetos al centro del salon del trono", p.getName().getString(), e.getDrops().size());
+    }
+
     @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent e) {
         if (e.getEntity() instanceof ServerPlayer p && Volcan.es(p.level()) && luchaDe(p) == null) Volcan.devolver(p);

@@ -743,7 +743,25 @@ public final class ClientCiTest {
             server(m, sp -> log("sello despues: " + sp.serverLevel().getBlockState(new BlockPos(hall[0], hall[2] + 1, hall[1] + 4))));
             shot(m, "cliente_80_sala_arbol");
         });
-        atTicks(S + 130 + 170, "Fin de la prueba", ClientCiTest::finish);
+        atTicks(S + 130 + 150, "Logros conseguidos", m -> server(m, sp -> {
+            StringBuilder b = new StringBuilder("  logros:");
+            for (String id : new String[]{com.ciudadela.story.Logros.ENCONTRAR, com.ciudadela.story.Logros.CAPITULO1,
+                    com.ciudadela.story.Logros.REY, com.ciudadela.story.Logros.ARBOL})
+                b.append(' ').append(id).append('=').append(com.ciudadela.story.Logros.tiene(sp, id) ? "SI" : "no");
+            log(b.toString());
+        }));
+        atTicks(S + 130 + 160, "Pantalla de logros", m -> {
+            m.setCameraEntity(m.player);
+            m.options.hideGui = false;
+            var ca = m.player.connection.getAdvancements();
+            m.setScreen(new net.minecraft.client.gui.screens.advancements.AdvancementsScreen(ca));
+            var raiz = ca.getAdvancements().get(new net.minecraft.resources.ResourceLocation("ciudadela", "raiz"));
+            log("  pestana de logros: " + (raiz != null ? "esta" : "NO ESTA"));
+            if (raiz != null) ca.setSelectedTab(raiz, true);
+        });
+        atTicks(S + 130 + 166, "captura de los logros", m -> shot(m, "cliente_99_logros"));
+        atTicks(S + 130 + 170, "cerrar", m -> m.setScreen(null));
+        atTicks(S + 130 + 175, "Fin de la prueba", ClientCiTest::finish);
     }
 
     // ------------------------------------------------------------------ camara de observador

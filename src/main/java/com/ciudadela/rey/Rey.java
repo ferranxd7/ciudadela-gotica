@@ -62,6 +62,8 @@ public class Rey extends Monster {
 
     public static final int POSE_PIE = 0, POSE_SENTADO = 1, POSE_GUARDIA = 2, POSE_CARGA = 3;
     public static final int F_LUCHA = 1, F_SIN_CORONA = 2, F_CENIZA = 4, F_HABLA = 8;
+    /** Las puertas se han cerrado y el Rey habla desde el trono (para la musica, que entra flojita). */
+    public static final int F_INTRO = 16;
 
     public static final ResourceKey<DamageType> GOLPE = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(CiudadelaMod.MODID, "rey"));
     public static final ResourceKey<DamageType> AREA = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(CiudadelaMod.MODID, "rey_area"));
@@ -69,7 +71,9 @@ public class Rey extends Monster {
     /** Vida "real" del jefe (el maximo de Minecraft es 1024): el dano que recibe se escala. */
     public static final float VIDA = 1000f;
     /** Vida efectiva de cada fase para un jugador solo (con espada de netherite afilada V: unos 5 minutos). */
-    public static final float VIDA_FASE = 2400f;
+    public static final float VIDA_FASE = 1200f;
+    /** Todo el dano del Rey (menos el golpe final, que tiene que matar fuera de la zona dorada). */
+    private static final float DANO = 0.75f;
 
     // ------------------------------------------------------------------ cliente
     public final AnimationState sitAnim = new AnimationState(), idleAnim = new AnimationState(),
@@ -333,6 +337,7 @@ public class Rey extends Monster {
         setPose(pose);
         setFlag(F_HABLA, habla);
         setFlag(F_LUCHA, false);
+        setFlag(F_INTRO, false);
         if (anim >= 0) anim(anim);
     }
 
@@ -383,6 +388,7 @@ public class Rey extends Monster {
     private void dormido(ServerLevel sl) {
         setPose(POSE_SENTADO);
         setFlag(F_LUCHA, false);
+        setFlag(F_INTRO, false);
         setFlag(F_HABLA, false);
         this.entityData.set(FASE, 1);
         setNoGravity(true);
@@ -413,6 +419,7 @@ public class Rey extends Monster {
         Volcan.preparar(sl.getServer());
         cerrando = true;
         puerta = 0;
+        setFlag(F_INTRO, true);
         cambiar(Estado.INTRO);
         for (ServerPlayer p : jugadoresVivos(sl))
             com.ciudadela.cine.Cinematics.playShots(p, com.ciudadela.cine.Cinematics.REY_INTRO, introPlanos(s, p.getEyePosition()), INTRO_TICKS / 20f);
@@ -502,6 +509,7 @@ public class Rey extends Monster {
             setNoGravity(false);
             this.noPhysics = false;
             setFlag(F_LUCHA, true);
+            setFlag(F_INTRO, false);
             barra.setVisible(true);
             for (ServerPlayer p : jugadoresVivos(sl)) barra.addPlayer(p);
             recup = 10;
@@ -674,6 +682,7 @@ public class Rey extends Monster {
         cds.put(a, tGlobal + a.cd);
         getNavigation().stop();
         if (a.anim > 0) anim(a.anim);
+        if (a == Atq.GOLPE_FINAL) habla(sl, 11);
         destino = o.position();
         dir = adelante();
         alturaInicio = getY();
@@ -685,6 +694,7 @@ public class Rey extends Monster {
             atq = null;
             anim(ReyAnims.ATURDIDO);
             cambiar(Estado.ATURDIDO);
+            if (level() instanceof ServerLevel sl) habla(sl, 12);
             return;
         }
         atq = null;
@@ -1017,11 +1027,21 @@ public class Rey extends Monster {
         return 1f + 0.15f * Math.max(0, jugadores.size() - 1);
     }
 
+    /** Vida segun la dificultad del mundo (el dano ya lo escala el propio juego). */
+    private float mulDificultad() {
+        return switch (level().getDifficulty()) {
+            case PEACEFUL, EASY -> 0.7f;
+            case HARD -> 1.35f;
+            default -> 1f;
+        };
+    }
+
     /** Dano bruto (antes de armadura: 38 = unos 3,5 corazones con netherite y proteccion IV). */
     boolean golpear(ServerLevel sl, ServerPlayer p, float bruto, boolean fuego, double kb, double up, boolean area) {
         if (!valido(p)) return false;
         p.invulnerableTime = 0;
-        boolean ok = p.hurt(fuente(area), bruto * mulFase() * mulJugadores());
+        float d = bruto * mulFase() * mulJugadores() * (atq == Atq.GOLPE_FINAL ? 1f : DANO);
+        boolean ok = p.hurt(fuente(area), d);
         if (ok) {
             if (fuego) p.setSecondsOnFire(fase() >= 3 ? 6 : 4);
             if (!area && p.isBlocking() && random.nextFloat() < 0.35f) p.disableShield(true);
@@ -1086,7 +1106,7 @@ public class Rey extends Monster {
         double h = Math.sqrt(aim.x * aim.x + aim.z * aim.z);
         double py = tipo == ReyProyectil.OLA ? 0 : Mth.clamp(aim.y / Math.max(1, h), -0.4, 0.4);
         Vec3 v = new Vec3(Math.cos(yaw), py, Math.sin(yaw)).normalize().scale(vel);
-        pr.preparar(tipo, v, bruto * mulFase() * mulJugadores(), fase());
+        pr.preparar(tipo, v, bruto * mulFase() * mulJugadores() * DANO, fase());
         sl.addFreshEntity(pr);
     }
 
@@ -1115,7 +1135,7 @@ public class Rey extends Monster {
                     double d = Math.hypot(p.getX() - z[0], p.getZ() - z[2]);
                     if (d >= z[3] && d <= z[4] && Math.abs(p.getY() - z[1]) < 2) {
                         p.invulnerableTime = 0;
-                        p.hurt(fuente(true), 6 * mulFase());
+                        p.hurt(fuente(true), 6 * mulFase() * DANO);
                         p.setSecondsOnFire(3);
                     }
                 }
@@ -1150,7 +1170,7 @@ public class Rey extends Monster {
             }
             return false;
         }
-        float mul = (VIDA / 3f) / (VIDA_FASE * (1f + 0.6f * Math.max(0, jugadores.size() - 1)));
+        float mul = (VIDA / 3f) / (VIDA_FASE * mulDificultad() * (1f + 0.6f * Math.max(0, jugadores.size() - 1)));
         if (src.is(DamageTypeTags.IS_PROJECTILE)) mul *= 0.25f;
         if (src.is(DamageTypeTags.IS_EXPLOSION)) mul *= 0.3f;
         if (att == null) mul *= 0.5f;
@@ -1327,7 +1347,7 @@ public class Rey extends Monster {
         } else if (t == 200) {
             anim(ReyAnims.GRITO);
             sonido(sl, SoundEvents.RAVAGER_ROAR, 3f, 0.45f);
-            habla(sl, 9);
+            habla(sl, 10);
         }
         if (t >= (int) (Volcan.CINE * 20) + 4) {
             barra.setVisible(true);
@@ -1413,6 +1433,7 @@ public class Rey extends Monster {
         }
         this.entityData.set(FASE, 1);
         setFlag(F_LUCHA, false);
+        setFlag(F_INTRO, false);
         setFlag(F_HABLA, false);
         setFlag(F_SIN_CORONA, false);
         setFlag(F_CENIZA, false);

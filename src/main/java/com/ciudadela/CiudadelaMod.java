@@ -58,7 +58,7 @@ public class CiudadelaMod {
     public static final RegistryObject<SoundEvent> MUSICA_REY_3 = sound("musica.rey3");
 
     @SuppressWarnings("unchecked")
-    public static final RegistryObject<SoundEvent>[] REY_VOZ = new RegistryObject[10];
+    public static final RegistryObject<SoundEvent>[] REY_VOZ = new RegistryObject[13];
 
     static {
         for (int i = 1; i < REY_VOZ.length; i++) REY_VOZ[i] = sound("rey.voz." + i);

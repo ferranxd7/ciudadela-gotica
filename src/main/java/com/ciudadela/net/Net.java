@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "2";
+    private static final String V = "3";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(CiudadelaMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -52,6 +52,8 @@ public final class Net {
                 .encoder(Energia::write).decoder(Energia::read).consumerMainThread(Energia::handle).add();
         CH.messageBuilder(Llave.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(Llave::write).decoder(Llave::read).consumerMainThread(Llave::handle).add();
+        CH.messageBuilder(Isla.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Isla::write).decoder(Isla::read).consumerMainThread(Isla::handle).add();
     }
 
     // ------------------------------------------------------------------ jefe
@@ -169,6 +171,22 @@ public final class Net {
 
         void handle(Supplier<NetworkEvent.Context> ctx) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.ciudadela.client.rey.ReyCliente.llave(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El jugador entra en la tormenta de la isla (o sale): rayos sin destello y truenos lejanos. */
+    public record Isla(boolean dentro) {
+        void write(FriendlyByteBuf b) {
+            b.writeBoolean(dentro);
+        }
+
+        static Isla read(FriendlyByteBuf b) {
+            return new Isla(b.readBoolean());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.ciudadela.client.ClientIsla.dentro(dentro));
             ctx.get().setPacketHandled(true);
         }
     }

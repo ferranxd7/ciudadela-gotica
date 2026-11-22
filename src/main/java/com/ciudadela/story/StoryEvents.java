@@ -88,6 +88,8 @@ public final class StoryEvents {
     public static void openChest(ServerPlayer sp, BlockPos pos, int ch) {
         ServerLevel lvl = sp.serverLevel();
         if (!(lvl.getBlockEntity(pos) instanceof ChestBlockEntity)) return;
+        // despues de la cinematica (o al saltarla): el logro del capitulo 1
+        if (ch == 1) Logros.dar(sp, Logros.CAPITULO1);
         StoryData data = StoryData.get(lvl);
         NonNullList<ItemStack> items = NonNullList.withSize(27, ItemStack.EMPTY);
         CompoundTag tag = data.items(pos, sp.getUUID());

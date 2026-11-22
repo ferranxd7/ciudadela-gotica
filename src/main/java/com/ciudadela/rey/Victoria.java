@@ -40,6 +40,14 @@ public final class Victoria {
         st.set(s.key(), ReyEstado.MUERTO);
         st.ganadores(s.key(), todos);
         CiudadelaMod.LOGGER.info("[Ciudadela] El Rey ha caido ({} jugadores)", todos.size());
+        // el logro (con su fanfarria) cuando ya se esta de vuelta en el salon del trono
+        Runnable logro = () -> {
+            for (UUID u : todos) {
+                ServerPlayer p = server.getPlayerList().getPlayer(u);
+                if (p != null) com.ciudadela.story.Logros.dar(p, com.ciudadela.story.Logros.REY);
+            }
+        };
+        despues(Volcan.es(sl) ? 70 : 30, logro);
         if (Volcan.es(sl)) {
             // la dimension se rompe como un cristal y se vuelve al salon del trono
             for (ServerPlayer p : sl.players()) Net.to(p, new Net.Romper(30));
@@ -54,7 +62,7 @@ public final class Victoria {
 
     private static final List<Luego> LUEGO = new ArrayList<>();
 
-    private static void despues(int ticks, Runnable r) {
+    public static void despues(int ticks, Runnable r) {
         LUEGO.add(new Luego(tick + ticks, r));
     }
 

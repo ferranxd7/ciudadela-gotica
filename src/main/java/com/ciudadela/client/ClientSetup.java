@@ -15,6 +15,7 @@ public final class ClientSetup {
         e.registerAboveAll("energia", com.ciudadela.client.armas.ArmasCliente::render);
         e.registerAboveAll("rey", com.ciudadela.client.rey.ReyCliente::renderOverlay);
         e.registerAboveAll("cinematica", ClientCine::renderOverlay);
+        e.registerAboveAll("rey_subtitulos", com.ciudadela.client.rey.ReyCliente::renderSubtitulos);
     }
 
     @SubscribeEvent

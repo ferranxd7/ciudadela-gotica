@@ -83,7 +83,14 @@ public final class Storm {
             }
         }
         if (inside) {
-            if (!was) INSIDE.add(id);
+            if (!was) {
+                INSIDE.add(id);
+                com.ciudadela.net.Net.to(p, new com.ciudadela.net.Net.Isla(true));
+            }
+            // logro: pisar la isla
+            if (site != null && p.onGround() && p.getY() > com.ciudadela.gen.CastlePlan.Y0 - 45
+                    && Math.hypot(site[0] - p.getX(), site[1] - p.getZ()) < com.ciudadela.gen.CastlePlan.FOOTPRINT + 10)
+                com.ciudadela.story.Logros.dar(p, com.ciudadela.story.Logros.ENCONTRAR);
             if (com.ciudadela.cine.Cinematics.active(p)) return;
             if (!was || p.tickCount % 40 == 0) p.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0));
             p.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, 1.0F));
@@ -92,6 +99,7 @@ public final class Storm {
             if (lvl.random.nextInt(14) == 0) lightning(lvl, p);
         } else if (was) {
             INSIDE.remove(id);
+            com.ciudadela.net.Net.to(p, new com.ciudadela.net.Net.Isla(false));
             restore(p, lvl);
         }
     }
@@ -135,7 +143,7 @@ public final class Storm {
         BlockPos best = null;
         for (int i = 0; i < 6; i++) {
             double a = lvl.random.nextDouble() * Math.PI * 2;
-            double dist = 30 + lvl.random.nextDouble() * 110;
+            double dist = 70 + lvl.random.nextDouble() * 130;
             int x = (int) Math.floor(p.getX() + Math.cos(a) * dist), z = (int) Math.floor(p.getZ() + Math.sin(a) * dist);
             if (!lvl.hasChunk(x >> 4, z >> 4)) continue;
             int y = lvl.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);

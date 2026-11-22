@@ -14,8 +14,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 /**
- * Musica propia: el fondo de los cofres de la cronica (entra poco a poco y baja cuando habla el
- * narrador) y los temas del jefe por fase (con fundido entre fases). Va en la barra de "Musica".
+ * Musica propia: el fondo de los cofres de la cronica (entra poco a poco y baja un poco cuando habla el
+ * narrador) y los temas del jefe por fase (con fundido entre fases). Va con el volumen General, para que se
+ * oiga aunque la barra de "Musica" de Minecraft este bajada.
  */
 @Mod.EventBusSubscriber(modid = CiudadelaMod.MODID, value = Dist.CLIENT)
 public final class ClientMusic {
@@ -28,7 +29,7 @@ public final class ClientMusic {
         final String name;
 
         Track(SoundEvent ev, String name, boolean loop) {
-            super(ev, SoundSource.MUSIC, SoundInstance.createUnseededRandom());
+            super(ev, SoundSource.MASTER, SoundInstance.createUnseededRandom());
             this.name = name;
             this.looping = loop;
             this.delay = 0;
@@ -90,25 +91,33 @@ public final class ClientMusic {
         storyNarrated = chapter == 1;
         storyCine = true;
         mc.getSoundManager().play(story);
-        story.fadeTo(storyNarrated ? 0.30f : 0.55f, 7.0f);
+        story.fadeTo(storyNarrated ? 0.75f : 0.9f, 6.0f);
     }
 
     /** La cinematica ha terminado: la musica sigue mientras el cofre o el libro esten abiertos. */
     public static void storyCineEnd() {
         storyCine = false;
         idleTicks = 0;
-        if (story != null && !story.dying()) story.fadeTo(0.5f, 2.5f);
+        if (story != null && !story.dying()) story.fadeTo(0.85f, 2.5f);
     }
 
     // ------------------------------------------------------------------ jefe
 
     private static Track boss;
     private static int bossPhase;
+    private static boolean bossSoft;
 
-    /** Musica del combate: 0 la apaga; 1..3 pone (o cambia a) el tema de esa fase. */
-    public static void boss(int phase) {
-        if (phase == bossPhase && (phase == 0 || (boss != null && !boss.dying()))) return;
+    /** Musica del combate: 0 la apaga; 1..3 pone (o cambia a) el tema de esa fase. Suave mientras habla en el trono. */
+    public static void boss(int phase, boolean soft) {
+        if (phase == bossPhase && (phase == 0 || (boss != null && !boss.dying()))) {
+            if (boss != null && soft != bossSoft) {
+                bossSoft = soft;
+                boss.fadeTo(soft ? 0.3f : 0.85f, soft ? 1.0f : 2.5f);
+            }
+            return;
+        }
         bossPhase = phase;
+        bossSoft = soft;
         if (boss != null) boss.kill(phase == 0 ? 3.5f : 1.8f);
         boss = null;
         if (phase <= 0) return;
@@ -119,7 +128,7 @@ public final class ClientMusic {
         };
         boss = new Track(ev, "rey" + phase, true);
         Minecraft.getInstance().getSoundManager().play(boss);
-        boss.fadeTo(0.85f, phase == 1 ? 3.0f : 2.2f);
+        boss.fadeTo(soft ? 0.3f : 0.85f, phase == 1 ? 3.0f : 2.2f);
         if (story != null) story.kill(1.5f);
     }
 
@@ -145,7 +154,7 @@ public final class ClientMusic {
                         float n = ClientCine.time() - Timeline.NARR_START;
                         boolean speaking = false;
                         for (float[] l : Timeline.lines()) if (n >= l[0] - 0.4f && n <= l[1] + 0.2f) speaking = true;
-                        float want = n < -1.5f ? 0.40f : (speaking ? 0.20f : 0.34f);
+                        float want = n < -1.5f ? 0.8f : (speaking ? 0.5f : 0.75f);
                         if (Math.abs(want - story.target) > 0.01f && storyTicks > 140) story.fadeTo(want, 0.8f);
                     }
                     if (!storyCine) {

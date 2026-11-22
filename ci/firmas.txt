@@ -109,3 +109,7 @@ net.minecraftforge.client.event.ScreenEvent$Init
 net.minecraft.client.gui.components.Button
 net.minecraft.client.renderer.block.model.ItemTransform
 net.minecraft.client.renderer.block.model.ItemTransforms
+net.minecraftforge.client.event.sound.PlaySoundEvent
+net.minecraft.client.multiplayer.ClientLevel
+net.minecraft.server.PlayerAdvancements
+net.minecraft.client.gui.screens.advancements.AdvancementsScreen

@@ -114,6 +114,9 @@
   "ciudadela.rey.voz.7": "Otro necio más para mi corte.",
   "ciudadela.rey.voz.8": "¿Eso es todo? Mis guardias peleaban mejor.",
   "ciudadela.rey.voz.9": "¡Siente el fuego que devoró mi ciudad!",
+  "ciudadela.rey.voz.10": "Se acabaron las ropas. Se acabó la corte. ¡Mira en qué me convirtió el fuego!",
+  "ciudadela.rey.voz.11": "¡Arrodíllate... ante las llamas!",
+  "ciudadela.rey.voz.12": "Imposible... ¿el fuego... te obedece?",
   "entity.ciudadela.rey": "Corvin, el Rey que Espera",
   "entity.ciudadela.rey_proyectil": "Tajo del Rey",
   "ciudadela.rey.nombre_corto": "Corvin",
@@ -138,5 +141,15 @@
   "item.ciudadela.llave_arbol": "Llave del Árbol",
   "item.ciudadela.llave_arbol.lore": "Abre el sello de la Sala del Árbol",
   "item.ciudadela.llave_arbol.aqui_no": "Esta llave abre el sello rojo de la Sala del Árbol",
-  "block.ciudadela.sello_runico": "Sello rúnico"
+  "block.ciudadela.sello_runico": "Sello rúnico",
+  "advancements.ciudadela.raiz.title": "Ciudadela Gótica",
+  "advancements.ciudadela.raiz.description": "Dicen que en el cielo flota una ciudad maldita",
+  "advancements.ciudadela.encontrar.title": "Una isla entre las nubes",
+  "advancements.ciudadela.encontrar.description": "Pisa la isla flotante de la Ciudadela",
+  "advancements.ciudadela.capitulo1.title": "La crónica comienza",
+  "advancements.ciudadela.capitulo1.description": "Abre el cofre del capítulo 1 y escucha su historia",
+  "advancements.ciudadela.rey.title": "El Rey ha caído",
+  "advancements.ciudadela.rey.description": "Vence a Corvin, el Rey que Espera",
+  "advancements.ciudadela.arbol.title": "Las puertas del Árbol",
+  "advancements.ciudadela.arbol.description": "Abre la puerta de la Sala del Árbol con la llave del Rey"
 }

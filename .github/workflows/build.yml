@@ -47,6 +47,8 @@ jobs:
         with:
           path: musica_dl
           key: musica-${{ hashFiles('ci/musica/pistas.json') }}
+          restore-keys: |
+            musica-
 
       - name: Musica (licencias libres, con creditos)
         run: |

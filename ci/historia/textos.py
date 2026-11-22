@@ -174,6 +174,12 @@ REY = [
   "¿Eso es todo? Mis guardias peleaban mejor."),
  ("Feel the fire that devoured my city!",
   "¡Siente el fuego que devoró mi ciudad!"),
+ ("No more robes. No more court. Look upon what the fire made of me!",
+  "Se acabaron las ropas. Se acabó la corte. ¡Mira en qué me convirtió el fuego!"),
+ ("Kneel... before the flames!",
+  "¡Arrodíllate... ante las llamas!"),
+ ("Impossible... the fire... obeys you?",
+  "Imposible... ¿el fuego... te obedece?"),
 ]
 REY_UI = {
  "es": {
@@ -351,6 +357,33 @@ def check():
                     print("  CARTEL LARGO:", lang, line, width(line)); ok = False
     return ok
 
+LOGROS_UI = {
+ "es": {
+  "advancements.ciudadela.raiz.title": "Ciudadela Gótica",
+  "advancements.ciudadela.raiz.description": "Dicen que en el cielo flota una ciudad maldita",
+  "advancements.ciudadela.encontrar.title": "Una isla entre las nubes",
+  "advancements.ciudadela.encontrar.description": "Pisa la isla flotante de la Ciudadela",
+  "advancements.ciudadela.capitulo1.title": "La crónica comienza",
+  "advancements.ciudadela.capitulo1.description": "Abre el cofre del capítulo 1 y escucha su historia",
+  "advancements.ciudadela.rey.title": "El Rey ha caído",
+  "advancements.ciudadela.rey.description": "Vence a Corvin, el Rey que Espera",
+  "advancements.ciudadela.arbol.title": "Las puertas del Árbol",
+  "advancements.ciudadela.arbol.description": "Abre la puerta de la Sala del Árbol con la llave del Rey",
+ },
+ "en": {
+  "advancements.ciudadela.raiz.title": "Gothic Citadel",
+  "advancements.ciudadela.raiz.description": "They say a cursed city floats in the sky",
+  "advancements.ciudadela.encontrar.title": "An Island Among the Clouds",
+  "advancements.ciudadela.encontrar.description": "Set foot on the Citadel's floating island",
+  "advancements.ciudadela.capitulo1.title": "The Chronicle Begins",
+  "advancements.ciudadela.capitulo1.description": "Open the chest of chapter 1 and hear its story",
+  "advancements.ciudadela.rey.title": "The King Has Fallen",
+  "advancements.ciudadela.rey.description": "Defeat Corvin, the King Who Waits",
+  "advancements.ciudadela.arbol.title": "The Gates of the Tree",
+  "advancements.ciudadela.arbol.description": "Open the door of the Tree Hall with the King's key",
+ },
+}
+
 def build():
     out = {}
     for lang in ("es", "en"):
@@ -369,6 +402,7 @@ def build():
         for i, (en, es) in enumerate(REY):
             d[f"ciudadela.rey.voz.{i+1}"] = es if lang == "es" else en
         d.update(REY_UI[lang])
+        d.update(LOGROS_UI[lang])
         out[lang] = d
     return out
 

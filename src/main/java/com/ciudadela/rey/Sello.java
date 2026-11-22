@@ -116,6 +116,11 @@ public final class Sello {
                 new double[]{lock.x, lock.y, lock.z, lock.x - face.x * 4, lock.y + 0.8, lock.z - face.z * 4}));
         Cinematics.playShots(sp, Cinematics.SELLO, shots, 6.2f);
         sl.playSound(null, lock.x, lock.y, lock.z, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 1.0f, 0.5f);
+        // el logro al terminar la cinematica, para todos los que estan delante
+        Victoria.despues(130, () -> {
+            for (ServerPlayer p : sl.players())
+                if (p.distanceToSqr(lock) < 40 * 40) com.ciudadela.story.Logros.dar(p, com.ciudadela.story.Logros.ARBOL);
+        });
         ROTURAS.add(new Rotura(sl, h[0], h[1], h[2], tick));
         return true;
     }

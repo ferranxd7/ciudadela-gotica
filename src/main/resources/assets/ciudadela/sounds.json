@@ -131,5 +131,32 @@
         "stream": false
       }
     ]
+  },
+  "rey.voz.10": {
+    "subtitle": "subtitles.ciudadela.rey.voz",
+    "sounds": [
+      {
+        "name": "ciudadela:rey/voz_10",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.11": {
+    "subtitle": "subtitles.ciudadela.rey.voz",
+    "sounds": [
+      {
+        "name": "ciudadela:rey/voz_11",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.12": {
+    "subtitle": "subtitles.ciudadela.rey.voz",
+    "sounds": [
+      {
+        "name": "ciudadela:rey/voz_12",
+        "stream": false
+      }
+    ]
   }
 }

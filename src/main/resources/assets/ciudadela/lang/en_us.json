@@ -114,6 +114,9 @@
   "ciudadela.rey.voz.7": "Another fool for my court.",
   "ciudadela.rey.voz.8": "Is that all? My guards fought better than you.",
   "ciudadela.rey.voz.9": "Feel the fire that devoured my city!",
+  "ciudadela.rey.voz.10": "No more robes. No more court. Look upon what the fire made of me!",
+  "ciudadela.rey.voz.11": "Kneel... before the flames!",
+  "ciudadela.rey.voz.12": "Impossible... the fire... obeys you?",
   "entity.ciudadela.rey": "Corvin, the King Who Waits",
   "entity.ciudadela.rey_proyectil": "King's Slash",
   "ciudadela.rey.nombre_corto": "Corvin",
@@ -138,5 +141,15 @@
   "item.ciudadela.llave_arbol": "Key of the Tree",
   "item.ciudadela.llave_arbol.lore": "Opens the seal of the Tree Hall",
   "item.ciudadela.llave_arbol.aqui_no": "This key opens the red seal of the Tree Hall",
-  "block.ciudadela.sello_runico": "Runic Seal"
+  "block.ciudadela.sello_runico": "Runic Seal",
+  "advancements.ciudadela.raiz.title": "Gothic Citadel",
+  "advancements.ciudadela.raiz.description": "They say a cursed city floats in the sky",
+  "advancements.ciudadela.encontrar.title": "An Island Among the Clouds",
+  "advancements.ciudadela.encontrar.description": "Set foot on the Citadel's floating island",
+  "advancements.ciudadela.capitulo1.title": "The Chronicle Begins",
+  "advancements.ciudadela.capitulo1.description": "Open the chest of chapter 1 and hear its story",
+  "advancements.ciudadela.rey.title": "The King Has Fallen",
+  "advancements.ciudadela.rey.description": "Defeat Corvin, the King Who Waits",
+  "advancements.ciudadela.arbol.title": "The Gates of the Tree",
+  "advancements.ciudadela.arbol.description": "Open the door of the Tree Hall with the King's key"
 }

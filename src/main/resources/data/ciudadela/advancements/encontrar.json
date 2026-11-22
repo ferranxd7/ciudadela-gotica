@@ -1,0 +1,26 @@
+{
+  "parent": "ciudadela:raiz",
+  "display": {
+    "icon": {
+      "item": "minecraft:feather"
+    },
+    "title": {
+      "translate": "advancements.ciudadela.encontrar.title"
+    },
+    "description": {
+      "translate": "advancements.ciudadela.encontrar.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 50
+  }
+}

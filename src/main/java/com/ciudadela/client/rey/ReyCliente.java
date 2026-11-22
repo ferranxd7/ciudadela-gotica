@@ -179,7 +179,7 @@ public final class ReyCliente {
     private static final int[] DUR = duraciones();
 
     private static int[] duraciones() {
-        int[] d = {0, 110, 120, 70, 70, 80, 65, 60, 85, 65};
+        int[] d = {0, 110, 120, 70, 70, 80, 65, 60, 85, 65, 120, 60, 75};
         try (var in = ReyCliente.class.getResourceAsStream("/assets/ciudadela/rey_voces.json")) {
             if (in == null) return d;
             var o = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8))
@@ -271,7 +271,6 @@ public final class ReyCliente {
         Minecraft mc = Minecraft.getInstance();
         dibujarRomper(g, w, h, pt);
         if (mc.options.hideGui && !enFoco()) return;
-        Font font = mc.font;
         int bh = 0;
         if (enFoco()) {
             float in = Mth.clamp((ticks - focoIni + pt) / 15f, 0f, 1f), out = Mth.clamp((focoFin - ticks - pt) / 15f, 0f, 1f);
@@ -283,23 +282,50 @@ public final class ReyCliente {
                 g.fill(0, h - bh - 1, w, h - bh, 0x60800000);
             }
         }
-        if (subLinea > 0 && ticks < subFin + 10 && (!ClientCine.active() || ClientCine.chapter() >= 30)) {
-            float a = Mth.clamp((subFin + 10 - ticks - pt) / 10f, 0f, 1f);
-            int alpha = Math.round(a * 255);
-            if (alpha > 8) {
-                Component name = Component.translatable("ciudadela.rey.nombre_corto");
-                Component line = Component.translatable("ciudadela.rey.voz." + subLinea);
-                List<FormattedCharSequence> lines = font.split(line, Math.min(w - 40, 360));
-                int cbh = ClientCine.active() ? Math.round(h * 0.12f) : bh;
-                int y = cbh > 0 ? h - cbh / 2 - lines.size() * 5 - 2 : h - 68 - lines.size() * 10;
-                int lw = 0;
-                for (FormattedCharSequence l : lines) lw = Math.max(lw, font.width(l));
-                g.fill(w / 2 - lw / 2 - 6, y - 12, w / 2 + lw / 2 + 6, y + lines.size() * 10 + 2, (Math.round(a * 140) << 24));
-                g.drawCenteredString(font, name, w / 2, y - 10, (alpha << 24) | 0xC8A040);
-                for (int i = 0; i < lines.size(); i++)
-                    g.drawCenteredString(font, lines.get(i), w / 2, y + i * 10, (alpha << 24) | 0xF0E6D8);
-            }
+    }
+
+    /**
+     * Subtitulos del Rey: grandes y dentro de la franja negra de abajo (en la intro y en las cinematicas), o abajo con
+     * fondo oscuro en plena pelea. Va en su propia capa, por encima de las bandas de cine, y se ve aunque la
+     * cinematica esconda el resto de la interfaz.
+     */
+    public static void renderSubtitulos(ForgeGui gui, GuiGraphics g, float pt, int w, int h) {
+        Minecraft mc = Minecraft.getInstance();
+        boolean cine = ClientCine.active();
+        if (subLinea <= 0 || ticks >= subFin + 10 || (cine && ClientCine.chapter() < 30)) return;
+        if (mc.options.hideGui && !cine && !enFoco()) return;
+        float a = Mth.clamp((subFin + 10 - ticks - pt) / 10f, 0f, 1f) * Mth.clamp((ticks - (subFin - DUR[subLinea]) + pt) / 6f, 0f, 1f);
+        int alpha = Math.round(a * 255);
+        if (alpha <= 8) return;
+        Font font = mc.font;
+        Component name = Component.translatable("ciudadela.rey.nombre_corto");
+        Component line = Component.translatable("ciudadela.rey.voz." + subLinea);
+        int band = cine ? Math.round(h * 0.12f) : (enFoco() ? Math.round(h * 0.11f) : 0);
+        // tamano: grande, pero que quepa en la franja (o en la parte de abajo de la pantalla)
+        float sc = 1.6f;
+        List<FormattedCharSequence> lines;
+        while (true) {
+            lines = font.split(line, Math.round((w - 30) / sc));
+            float alto = (lines.size() * 10 + 9) * sc;
+            if (band <= 0 || alto <= band - 2 || sc <= 1.0f) break;
+            sc -= 0.1f;
         }
+        int lw = 0;
+        for (FormattedCharSequence l : lines) lw = Math.max(lw, font.width(l));
+        float alto = (lines.size() * 10 + 9) * sc;
+        float y0 = band > 0 ? h - band / 2f - alto / 2f : h - 64 - alto;
+        g.pose().pushPose();
+        g.pose().translate(w / 2f, y0, 0);
+        g.pose().scale(sc, sc, 1f);
+        if (band <= 0)
+            g.fill(-lw / 2 - 6, -2, lw / 2 + 6, lines.size() * 10 + 10, (Math.round(a * 150) << 24));
+        g.pose().pushPose();
+        g.pose().scale(0.75f, 0.75f, 1f);
+        g.drawCenteredString(font, name, 0, 0, (alpha << 24) | 0xC8A040);
+        g.pose().popPose();
+        for (int i = 0; i < lines.size(); i++)
+            g.drawCenteredString(font, lines.get(i), 0, 9 + i * 10, (alpha << 24) | 0xF0E6D8);
+        g.pose().popPose();
     }
 
     // ------------------------------------------------------------------ barra de vida propia
@@ -439,7 +465,7 @@ public final class ReyCliente {
     public static void cofre(Net.Cofre m) {
         cofre = m;
         cofreIni = ticks;
-        ClientMusic.boss(0);
+        ClientMusic.boss(0, false);
     }
 
     private static void dibujarCofre(Minecraft mc, PoseStack ps, MultiBufferSource.BufferSource buf, Vec3 cam, float pt) {
@@ -480,10 +506,16 @@ public final class ReyCliente {
         // la musica del combate: la del rey luchando mas cercano
         if (ticks % 10 == 0) {
             int fase = 0;
+            boolean suave = false;
             for (Entity en : mc.level.entitiesForRendering()) {
-                if (en instanceof Rey r && r.luchando() && r.distanceToSqr(mc.player) < 90 * 90) fase = Math.max(fase, r.fase());
+                boolean intro = en instanceof Rey r0 && r0.flag(Rey.F_INTRO) && !r0.luchando();
+                if (en instanceof Rey r && (r.luchando() || intro) && r.distanceToSqr(mc.player) < 90 * 90 && r.fase() >= fase) {
+                    // en la intro (puertas cerradas, hablando desde el trono) suena flojita
+                    suave = intro;
+                    fase = r.fase();
+                }
             }
-            ClientMusic.boss(fase);
+            ClientMusic.boss(fase, suave);
         }
         // chispas doradas del cofre
         if (cofre != null && ticks % 2 == 0) {
