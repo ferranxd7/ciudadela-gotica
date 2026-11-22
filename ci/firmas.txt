@@ -102,3 +102,8 @@ net.minecraft.world.item.Item$Properties
 net.minecraft.world.level.block.Block
 net.minecraft.world.level.block.state.BlockBehaviour$Properties
 net.minecraft.world.level.block.state.BlockBehaviour
+
+# --- aviso de ajustes experimentales
+net.minecraft.client.gui.screens.ConfirmScreen
+net.minecraftforge.client.event.ScreenEvent$Init
+net.minecraft.client.gui.components.Button
