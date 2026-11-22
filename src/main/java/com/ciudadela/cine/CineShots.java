@@ -76,7 +76,7 @@ public final class CineShots {
         // el pacto: un rayo en la aguja de un campanario de la catedral
         add(o, Timeline.NARR_START + lines[3][0] + 1.4, c.cathX() - 17, Y + 134, c.cathZS() - 7);
         // el caballero en la cima: rayo en la aguja del arbol
-        add(o, Timeline.NARR_START + lines[7][0] + 2.0, c.treeX(), c.hallY() + 88, c.treeZ());
+        add(o, Timeline.NARR_START + lines[7][0] + 2.0, c.treeX(), c.hallY() + com.ciudadela.gen.TreeTower.PUNTA, c.treeZ());
         // la tormenta: rayos por toda la isla
         float s = Timeline.cut(3);
         for (int i = 0; i < 7; i++) {

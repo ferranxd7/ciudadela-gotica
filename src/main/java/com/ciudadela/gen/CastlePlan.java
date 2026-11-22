@@ -480,9 +480,9 @@ public final class CastlePlan {
                 story[3][0], story[3][2]);
     }
 
-    /** La sala del arbol (sala del segundo jefe): {centroX, centroZ, suelo, radio}. */
+    /** La sala del arbol (sala del segundo jefe): {centroX, centroZ, suelo, radio, suelo de abajo de la torre}. */
     public int[] treeHall() {
-        return tree == null ? null : new int[]{tree.centerX(), tree.centerZ(), tree.hallFloor, TreeTower.HALL_R};
+        return tree == null ? null : new int[]{tree.centerX(), tree.centerZ(), tree.hallFloor, TreeTower.HALL_R, tree.base()};
     }
     private final int[][] story = new int[6][];
 

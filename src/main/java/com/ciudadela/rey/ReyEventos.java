@@ -49,7 +49,11 @@ public final class ReyEventos {
         var plan = com.ciudadela.story.Story.planNear(ow, p.getBlockX(), p.getBlockZ());
         if (plan != null) {
             int[] th = plan.treeHall();
-            if (th != null && Math.abs(p.getY() - th[2]) < 60 && p.distanceToSqr(th[0], th[2], th[1]) < 70 * 70) Sello.asegurar(ow, plan);
+            if (th != null) {
+                double hx = p.getX() - th[0], hz = p.getZ() - th[1];
+                if (p.getY() > th[4] - 16 && p.getY() < th[2] + 70 && hx * hx + hz * hz < 80 * 80)
+                    com.ciudadela.arbol.TorreArbol.asegurar(ow, plan, p);
+            }
         }
         Sala s = Sala.near(ow, p.getBlockX(), p.getBlockZ());
         if (s == null || p.position().distanceToSqr(s.seat()) > 80 * 80) return;

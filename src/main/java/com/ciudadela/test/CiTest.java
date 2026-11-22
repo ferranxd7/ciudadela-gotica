@@ -103,10 +103,13 @@ public final class CiTest {
                         int[] t = b.turretInfo();
                         res = "Escalera de edificio " + b.fp + ": " + reach(lvl, t[0], t[1], 3, t[2], t[3]);
                     } else if (e instanceof com.ciudadela.gen.TreeTower tt) {
-                        res = reach(lvl, tt.centerX(), tt.centerZ(), com.ciudadela.gen.TreeTower.HALL_R - 2, tt.base(), tt.hallFloor);
-                        res = "TORRE-ARBOL -> SALA DEL JEFE (y=" + tt.hallFloor + "): " + res;
-                        plan(lvl, tt.centerX(), tt.centerZ(), 26, tt.hallFloor + 1, new File(out, "12_sala_del_jefe.png"));
-                        plan(lvl, tt.centerX(), tt.centerZ(), 26, tt.hallFloor + 6, new File(out, "13_sala_del_jefe_ventanas.png"));
+                        // la escalera segura de la torre: desde abajo hasta el suelo de la recepcion del arbol
+                        res = reach(lvl, tt.centerX(), tt.centerZ(), 16, tt.base(), tt.hallFloor);
+                        res = "TORRE-ARBOL -> RECEPCION DEL ARBOL (y=" + tt.hallFloor + ", " + (tt.hallFloor - tt.base()) + " de subida): " + res;
+                        plan(lvl, tt.centerX(), tt.centerZ(), 44, tt.hallFloor + 1, new File(out, "12_sala_del_arbol.png"));
+                        plan(lvl, tt.centerX(), tt.centerZ(), 44, tt.hallFloor + com.ciudadela.gen.TreeTower.BALCON + 1, new File(out, "13_sala_del_arbol_balcon.png"));
+                        plan(lvl, tt.centerX(), tt.centerZ(), 16, tt.base() + 40, new File(out, "24_torre_arbol_escalera.png"));
+                        plan(lvl, tt.centerX(), tt.centerZ(), 16, tt.hallFloor, new File(out, "25_recepcion_del_arbol.png"));
                     }
                     if (res == null) continue;
                     if (res.contains("OK")) ok++;

@@ -89,6 +89,13 @@ public class CiudadelaMod {
             () -> EntityType.Builder.<ReyProyectil>of(ReyProyectil::new, MobCategory.MISC).sized(0.8f, 0.8f).fireImmune().noSave()
                     .clientTrackingRange(8).updateInterval(1).build(MODID + ":rey_proyectil"));
 
+    public static final RegistryObject<EntityType<com.ciudadela.arbol.Ascensor>> ASCENSOR = ENTITIES.register("ascensor",
+            () -> EntityType.Builder.<com.ciudadela.arbol.Ascensor>of(com.ciudadela.arbol.Ascensor::new, MobCategory.MISC).sized(5f, 0.3f)
+                    .fireImmune().noSave().noSummon().clientTrackingRange(12).updateInterval(20).build(MODID + ":ascensor"));
+    public static final RegistryObject<EntityType<com.ciudadela.arbol.PuertaArbol>> PUERTA_ARBOL = ENTITIES.register("puerta_arbol",
+            () -> EntityType.Builder.<com.ciudadela.arbol.PuertaArbol>of(com.ciudadela.arbol.PuertaArbol::new, MobCategory.MISC).sized(7f, 10f)
+                    .fireImmune().noSave().noSummon().clientTrackingRange(12).updateInterval(40).build(MODID + ":puerta_arbol"));
+
     private static RegistryObject<SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(MODID, name)));
     }
@@ -109,7 +116,7 @@ public class CiudadelaMod {
         MinecraftForge.EVENT_BUS.register(ReyEventos.class);
         MinecraftForge.EVENT_BUS.register(Victoria.class);
         MinecraftForge.EVENT_BUS.register(com.ciudadela.rey.Volcan.class);
-        MinecraftForge.EVENT_BUS.register(com.ciudadela.rey.Sello.class);
+        MinecraftForge.EVENT_BUS.register(com.ciudadela.arbol.TorreArbol.class);
         MinecraftForge.EVENT_BUS.register(com.ciudadela.armas.Combos.class);
     }
 

@@ -422,7 +422,7 @@ public final class ClientCine {
         if (visible(emb)) embers(g, w, h, t, emb);
         // el titulo
         if (chapter < 30) drawTitle(g, font, w, h, t);
-        else if (chapter == 30 || chapter == 32) bossTitle(g, font, w, h, t);
+        else if (chapter == 30 || chapter == 31 || chapter == 32) bossTitle(g, font, w, h, t);
         // fundidos a negro (cortes de plano y vuelta al jugador)
         float black = black(t);
         if (visible(black)) g.fill(0, 0, w, h, argb(black, 0, 0, 0));

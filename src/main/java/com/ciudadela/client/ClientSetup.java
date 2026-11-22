@@ -37,6 +37,8 @@ public final class ClientSetup {
     public static void renderers(net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers e) {
         e.registerEntityRenderer(com.ciudadela.CiudadelaMod.REY.get(), com.ciudadela.client.rey.ReyRenderer::new);
         e.registerEntityRenderer(com.ciudadela.CiudadelaMod.REY_PROYECTIL.get(), com.ciudadela.client.rey.ProyectilRenderer::new);
+        e.registerEntityRenderer(com.ciudadela.CiudadelaMod.ASCENSOR.get(), com.ciudadela.client.arbol.AscensorRenderer::new);
+        e.registerEntityRenderer(com.ciudadela.CiudadelaMod.PUERTA_ARBOL.get(), com.ciudadela.client.arbol.PuertaArbolRenderer::new);
     }
 
     @SubscribeEvent

@@ -773,44 +773,90 @@ public final class ClientCiTest {
     private static int[] hall;
 
     private static void sello(int S) {
-        atTicks(S, "Sello: a la sala del arbol", m -> {
+        atTicks(S, "Torre del arbol: abajo del todo, mirando al tubo del ascensor y la escalera", m -> {
             m.setScreen(null);
+            m.setCameraEntity(m.player);
+            m.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            m.options.hideGui = true;
             server(m, sp -> {
                 sp.closeContainer();
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
                 ServerLevel lvl = sp.getServer().overworld();
                 CastlePlan plan = PlanCache.get(lvl.getSeed(), castle[0], castle[1], (x, z) -> 64);
                 hall = plan.treeHall();
-                log("sala del arbol en " + hall[0] + "," + hall[2] + "," + hall[1] + " radio " + hall[3]);
-                sp.teleportTo(lvl, hall[0] + 0.5, hall[2], hall[1] + 7.5, 180f, 10f);
+                log("sala del arbol en " + hall[0] + "," + hall[2] + "," + hall[1] + " radio " + hall[3] + "; la torre empieza en y=" + hall[4]);
+                sp.teleportTo(lvl, hall[0] + 0.5, hall[4], hall[1] + 10.5, 180f, -32f);
             });
         });
-        atTicks(S + 100, "Captura: el sello desde fuera", m -> {
-            m.options.hideGui = true;
-            shot(m, "cliente_75_sello");
+        atTicks(S + 70, "Captura: abajo de la torre; al disco", m -> {
+            shot(m, "cliente_71_torre_abajo");
             server(m, sp -> {
-                sp.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(CiudadelaMod.LLAVE_ARBOL.get()));
-                BlockPos sb = new BlockPos(hall[0], hall[2] + 1, hall[1] + 4);
-                log("bloque del sello: " + sp.serverLevel().getBlockState(sb));
-                sp.teleportTo(sp.serverLevel(), hall[0] + 0.5, hall[2], hall[1] + 3.5, 0f, 10f);
+                var a = com.ciudadela.arbol.TorreArbol.ascensor(sp.serverLevel(), hall);
+                var d = com.ciudadela.arbol.TorreArbol.puerta(sp.serverLevel(), hall);
+                log("  ascensor: " + (a == null ? "NO ESTA" : "estado " + a.estado() + " y=" + a.getY()) + " | puerta: " + (d == null ? "NO ESTA" : "estado " + d.estado()));
+                sp.teleportTo(sp.serverLevel(), hall[0] + 0.5, hall[4] + 0.1, hall[1] + com.ciudadela.gen.TreeTower.SHAFT_Z + 0.5, 180f, 0f);
             });
         });
-        atTicks(S + 130, "Usar la llave en el sello", m -> {
+        atTicks(S + 135, "Captura: el disco arranca", m -> {
+            server(m, sp -> log("  jugador montado: " + (sp.getVehicle() != null ? sp.getVehicle().getClass().getSimpleName() : "no") + " y=" + String.format("%.1f", sp.getY())));
+            m.player.setXRot(35f);
+            shot(m, "cliente_72_ascensor_0");
+        });
+        atTicks(S + 260, "Captura: a media altura del tubo", m -> {
+            m.player.setYRot(110f);
+            m.player.setXRot(-5f);
+            server(m, sp -> log("  subiendo: y=" + String.format("%.1f", sp.getY()) + " montado=" + (sp.getVehicle() != null)));
+            shot(m, "cliente_73_ascensor_1");
+        });
+        atTicks(S + 440, "Llegada a la recepcion", m -> {
+            m.player.setYRot(180f);
+            m.player.setXRot(4f);
+            server(m, sp -> log("  arriba: y=" + String.format("%.2f", sp.getY()) + " (suelo " + hall[2] + ") montado=" + (sp.getVehicle() != null)
+                    + " en el suelo=" + sp.onGround()));
+        });
+        atTicks(S + 450, "Captura: la recepcion", m -> shot(m, "cliente_74_recepcion"));
+        atTicks(S + 460, "A la puerta con la llave", m -> server(m, sp -> {
+            sp.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(CiudadelaMod.LLAVE_ARBOL.get()));
+            sp.teleportTo(sp.serverLevel(), hall[0] + 0.5, hall[2], hall[1] - 10.5, 180f, -6f);
+        }));
+        atTicks(S + 490, "Usar la llave en la puerta", m -> {
             m.options.hideGui = false;
             server(m, sp -> {
-                BlockPos sb = new BlockPos(hall[0], hall[2] + 1, hall[1] + 4);
-                sp.gameMode.useItemOn(sp, sp.serverLevel(), sp.getMainHandItem(), InteractionHand.MAIN_HAND,
-                        new BlockHitResult(Vec3.atCenterOf(sb), Direction.NORTH, sb, false));
+                var d = com.ciudadela.arbol.TorreArbol.puerta(sp.serverLevel(), hall);
+                log("  puerta antes: " + (d == null ? "NO ESTA" : "estado " + d.estado()) + " barrera: "
+                        + sp.serverLevel().getBlockState(new BlockPos(hall[0], hall[2] + 2, hall[1] - 15)));
+                if (d != null) log("  usar la llave: " + d.interact(sp, InteractionHand.MAIN_HAND));
             });
         });
-        int[] w = {20, 50, 80, 110};
+        int[] w = {15, 45, 75, 105, 140};
         for (int i = 0; i < w.length; i++) {
             final int k = i;
-            atTicks(S + 130 + w[i], "Captura del sello", m -> shot(m, String.format("cliente_%02d_sello_%d", 76 + k, k)));
+            atTicks(S + 490 + w[i], "Captura de la puerta", m -> shot(m, String.format("cliente_%02d_puerta_%d", 75 + k, k)));
         }
-        atTicks(S + 130 + 150, "Captura: la sala del arbol abierta", m -> {
-            server(m, sp -> log("sello despues: " + sp.serverLevel().getBlockState(new BlockPos(hall[0], hall[2] + 1, hall[1] + 4))));
-            shot(m, "cliente_80_sala_arbol");
+        atTicks(S + 490 + 190, "Captura: la sala del arbol abierta", m -> {
+            server(m, sp -> {
+                var d = com.ciudadela.arbol.TorreArbol.puerta(sp.serverLevel(), hall);
+                log("  puerta despues: " + (d == null ? "NO ESTA" : "estado " + d.estado()) + " barrera: "
+                        + sp.serverLevel().getBlockState(new BlockPos(hall[0], hall[2] + 2, hall[1] - 15)));
+            });
+            m.options.hideGui = true;
+            verDesde(m, new Vec3(hall[0] + 0.5, hall[2] + 3.2, hall[1] - 9.0), new Vec3(hall[0] + 0.5, hall[2] + 6, hall[1] - 38));
         });
+        atTicks(S + 490 + 196, "captura", m -> shot(m, "cliente_80_sala_arbol"));
+        atTicks(S + 490 + 200, "Desde el balcon", m -> verDesde(m, new Vec3(hall[0] + 35.5, hall[2] + 15.2, hall[1] + 14.5),
+                new Vec3(hall[0], hall[2] + 14, hall[1] - 4)));
+        atTicks(S + 490 + 206, "captura", m -> shot(m, "cliente_97_balcon"));
+        atTicks(S + 490 + 210, "Hacia el trono", m -> verDesde(m, new Vec3(hall[0] + 9.5, hall[2] + 5, hall[1] - 19),
+                new Vec3(hall[0] + 0.5, hall[2] + 10, hall[1] - 40)));
+        atTicks(S + 490 + 216, "captura", m -> shot(m, "cliente_98_trono"));
+        atTicks(S + 490 + 220, "La puerta desde la sala", m -> verDesde(m, new Vec3(hall[0] + 7.5, hall[2] + 4, hall[1] - 30),
+                new Vec3(hall[0] + 0.5, hall[2] + 8, hall[1] - 14)));
+        atTicks(S + 490 + 226, "captura", m -> {
+            shot(m, "cliente_96_puerta_desde_sala");
+            m.setCameraEntity(m.player);
+        });
+        S = S + 490 + 230 - 280;
         atTicks(S + 130 + 150, "Logros conseguidos", m -> server(m, sp -> {
             StringBuilder b = new StringBuilder("  logros:");
             for (String id : new String[]{com.ciudadela.story.Logros.ENCONTRAR, com.ciudadela.story.Logros.CAPITULO1,
