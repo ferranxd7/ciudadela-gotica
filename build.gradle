@@ -93,3 +93,8 @@ tasks.named('jar', Jar).configure {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
+
+// Para compilar en local con las mismas clases (la CI sube estos jars si el commit lleva [cp])
+tasks.register('rutaClases') {
+    doLast { println "CP=" + sourceSets.main.compileClasspath.asPath }
+}

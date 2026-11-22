@@ -75,6 +75,21 @@ jobs:
         if: always()
         run: bash ci/firmas.sh > out/firmas.txt 2>&1 || true
 
+      - name: Classpath para compilar en local
+        if: always() && contains(github.event.head_commit.message, '[cp]')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CP=$(gradle -q rutaClases --no-daemon 2>/dev/null | grep '^CP=' | cut -c4-)
+          mkdir -p cpjars
+          IFS=':' read -ra J <<< "$CP"
+          for j in "${J[@]}"; do [ -f "$j" ] && cp -n "$j" cpjars/; done
+          tar czf classpath.tgz cpjars
+          ls -la classpath.tgz
+          gh release view classpath >/dev/null 2>&1 || gh release create classpath --title "classpath" --notes "jars para compilar" --prerelease --latest=false
+          gh release upload classpath classpath.tgz --clobber
+        continue-on-error: true
+
       - name: Preparar servidor Forge real
         run: |
           mkdir -p srv out
