@@ -1,0 +1,244 @@
+{
+ "rey": {
+  "flow": "d3PMnb7mExuoP3W5fBx9",
+  "voz": "BNgbHR0DNeZixGQVzloa",
+  "modelo": "eleven_v4",
+  "lineas": {
+   "1": [
+    "RFYzWifdkkxelpjUBoux",
+    "l82ecYvwRA2fkCkDHyPo"
+   ],
+   "2": [
+    "sEKMysySrIkWj9nQETQy",
+    "rz8T7G05BadEaDShdhgN"
+   ],
+   "3": [
+    "tZ7jnSbnBik9wP8mGViU",
+    "zRxUwOKaRRz9Kx2d3X3y"
+   ],
+   "4": [
+    "H9pWAQSGVPYvUCDlC99W",
+    "X4gl4tnLsWXJmNkeoHPX"
+   ],
+   "5": [
+    "KD7k8SRQjtb8Lg43wYLK",
+    "RNOPtlea37tgRSWYFstn"
+   ],
+   "6": [
+    "Nwry2PcnDkqYlr4DvT8G",
+    "AI61qxm9MeazeXGyRV0R"
+   ],
+   "7": [
+    "1pQI0Vk8Bi8Qsn9F5WqV",
+    "j4HRQRMoUQaDqkWdrYet"
+   ],
+   "8": [
+    "1ZCrfJ4dAmRV8gI5ZveM",
+    "ueOuO7NTS6zwpFb4ZHHN"
+   ],
+   "9": [
+    "iC2t0tTvlX15KHRwHqzZ",
+    "7kFfuzXsvCK42mVBTUn7"
+   ],
+   "10": [
+    "Amss5a0YGZSkw2a8Wyif",
+    "uJK3ID2zp0HTyH8uG9Ed"
+   ],
+   "11": [
+    "KnhjZZZhwBvWG9VY6wWI",
+    "sP4S9laZnyKtri6c8hZE"
+   ],
+   "12": [
+    "CbXlxtNZLzADrUwmJMej",
+    "QQCNAIhupAY7sG6JD4a4"
+   ],
+   "13": [
+    "UNvkK2CLxqzf24JFF6bc",
+    "uJkPu6zCwlSnPb6OQF6I"
+   ]
+  }
+ },
+ "gavran_muestras": {
+  "flow": "UwyoAHy95Tq7BNgNPPy2",
+  "5AYcH1Cr8nW0XgDTtRI4 Silent Systemus": [
+   "8vHepENFShSLhsBsxFe7",
+   "wGjufbDiUH956iphJe6u"
+  ],
+  "d3qrd1ge6zWDvUxIeXiH Final Boss": [
+   "hvARjCikdcaLexqWNFSj",
+   "O2kxkLRvrQgOWnZ4iqcK"
+  ],
+  "Tj9l48J9AJbry5yCP5eW Nosferatu": [
+   "XJt3AfZDbkEkQAf4BZNI",
+   "akmNmXeCWbq57uWFm2Gk"
+  ]
+ },
+ "sfx": {
+  "flow": "qPyROhCV8tJUMnSORV80",
+  "modelo": "eleven_text_to_sound_v3",
+  "sonidos": {
+   "rey_tajo": {
+    "prompt": "Massive greatsword swing, heavy blade whooshing through air, deep and fast, close",
+    "sesiones": [
+     "WYmoo6JLzr3gWoeEUBuZ",
+     "qmtiBgomNYVWpHlH4uIM",
+     "WxE8RVKz1iXndMgfq10H",
+     "1O5NgQ7y3zElePJpl2HH"
+    ]
+   },
+   "rey_tajo_fuego": {
+    "prompt": "Blade of fire launched forward, roaring flame whoosh with crackling trail",
+    "sesiones": [
+     "AejaYnZdycdkAYZfzjVW",
+     "ewjuniMz7zdFlpFRxLYN",
+     "RGqJRBmnJNKC1364mkma",
+     "amYA93vlKepsE3sPGjRu"
+    ]
+   },
+   "rey_bola_fuego": {
+    "prompt": "Fireball launched, deep rushing whoosh of flame",
+    "sesiones": [
+     "aDQbQEp5JPzf48G4AWHC",
+     "E9zuOZLP9Pz6kDdvwQAW",
+     "wH9RwCVVflM754Dh5Ij2",
+     "9TD3cRZ0ZFAebadIATLI"
+    ]
+   },
+   "rey_explosion": {
+    "prompt": "Huge fiery explosion, deep boom, rumbling debris falling",
+    "sesiones": [
+     "7IPeC9a7PBf3ZXhePNuZ",
+     "6Ju0jDEZp5jjvPNfJSGA",
+     "QBMdx1kpib9qgnomfsk4",
+     "swHELtfPfgCtX0l1ZqN9"
+    ]
+   },
+   "rey_golpe_suelo": {
+    "prompt": "Giant armored body slamming onto stone floor, deep heavy impact, rock cracking",
+    "sesiones": [
+     "WH4tr1bGhEWnHRaEkCLy",
+     "tzePadNFGj4Fef9NrDZF",
+     "zZxpuvOC8nHhJy0MldFC",
+     "tApv17bZSacytVtl2Ubo"
+    ]
+   },
+   "rey_golpe_final": {
+    "prompt": "Colossal ground impact, massive deep boom, shockwave rumble, stone shattering",
+    "sesiones": [
+     "gRkgueuOhFuuNdzjfHhh",
+     "PnwRGcWGwmVbRbds7cRm",
+     "OQ70YEX8FXEJuY4f8TWl",
+     "X6GgXRrYtVEXNRjFHUVi"
+    ]
+   },
+   "rey_rugido": {
+    "prompt": "Monstrous deep roar of a giant, guttural growl echoing in a stone hall",
+    "sesiones": [
+     "8TbkB1AdnBByYg0rti2a",
+     "2oTfPTmvxNUAEvD5NvbX",
+     "LmMSgGn207jLKZADzLZD",
+     "Q0DgCg0ITyI2t170GQc5"
+    ]
+   },
+   "rey_geiser": {
+    "prompt": "Lava geyser erupting from the ground, violent hiss and bubbling roar",
+    "sesiones": [
+     "OlbQc2r5QeUdP2UdF5LZ",
+     "2ke1SFMXzXHUL4CzQI7r",
+     "K26bJWitoWB0DcR3mgX8",
+     "oACFzIXktIXw8nLsKFSo"
+    ]
+   },
+   "rey_pilares": {
+    "prompt": "Pillars of fire bursting up from the ground, rushing flames",
+    "sesiones": [
+     "1PJNzgulUW0ZdftmdnUJ",
+     "Z4ffVxhPXaGK8lrFTW7E",
+     "7oo5epA1VS1fIZrA5RfT",
+     "yfycmTMer5ulZcLLzLTY"
+    ]
+   },
+   "rey_carga": {
+    "prompt": "Rising ominous drone of magical fire charging up, deep rumble building",
+    "sesiones": [
+     "9IxW1k9AwX9FUk4tqORV",
+     "mVNSiqmmyMldsFxZTMAZ",
+     "p2FdW6VuyoIA5oQ5D6QD",
+     "GJwIsqA5CSNeqWYLVAsC"
+    ]
+   },
+   "cuenta_atras": {
+    "prompt": "Single deep war drum hit with a low metallic ring",
+    "sesiones": [
+     "D41OI5CszKM1kyMZcI2f",
+     "mIazkKP9gokzWD8Kleqo",
+     "TOuFRhHDlEzZbqoKPgVc",
+     "1D5cUR7v7xIXwJmhZ5oT"
+    ]
+   },
+   "circulo_dorado": {
+    "prompt": "Bright holy chime swelling, shimmering magical sparkle, warm and sacred",
+    "sesiones": [
+     "cGDm8uylBhOJ5Qmpv2cH",
+     "JGTv69Xr1TyFnQMdJlxe",
+     "dkZYf4LNVm8DuFd55EtF",
+     "BAauy28a2BbjzUGuOftc"
+    ]
+   },
+   "puerta_runas": {
+    "prompt": "Ancient magical runes awakening, resonant stone hum with glowing shimmer",
+    "sesiones": [
+     "CZBBdXjOyZ1FF8t2Slq7",
+     "Rqo6Iiplvi0U8HLlN2Sg",
+     "tRvEf25nxgFcFZpUMTS2",
+     "erqPewg1O8Jnc2UPxaoN"
+    ]
+   },
+   "puerta_abre": {
+    "prompt": "Enormous ancient wooden doors slowly grinding open, deep rumble and heavy creaking",
+    "sesiones": [
+     "fwul6yV264hJ96tF73FI",
+     "yzbImftK6UcrmMNDijyC",
+     "CYaBfLgTwd6MR3vffiyx",
+     "n4WRmVC08KONDcTVRXrl"
+    ]
+   },
+   "puerta_cierra": {
+    "prompt": "Enormous wooden castle doors slamming shut, deep boom echoing in a large hall",
+    "sesiones": [
+     "BAlJKkJqdfaksvIZLUzO",
+     "QPBg0ENm78z0Dgx8D0g7",
+     "yZRHLiPb7gONryzU4YPy",
+     "7pgKkm1bp1NMRBiLRGfy"
+    ]
+   },
+   "ascensor_mueve": {
+    "prompt": "Stone platform moving steadily, low magical humming drone with soft grinding rumble",
+    "sesiones": [
+     "5tS4fXaMRTt3qFqXeusC",
+     "2scNDBIR064H8e4jasU7",
+     "oedKnlNwEGcmDLBSFbil",
+     "RY0LSWsyDmCYjjFGhmyA"
+    ]
+   },
+   "ascensor_llega": {
+    "prompt": "Heavy stone platform stopping with a solid thud and a soft magical chime",
+    "sesiones": [
+     "9QtunEC0XKFECtduILAo",
+     "juNTdQ7rtBJ1xhQrEZz9",
+     "8RjUsBHOMvtti69rbg7p",
+     "fBbwDIxxG0ox7GVJ4Ciz"
+    ]
+   },
+   "fuego_crepitar": {
+    "prompt": "Roaring fire crackling, close-mic, intense flames and popping embers",
+    "sesiones": [
+     "PUkAdwpwnYK92gkwMYLW",
+     "aSndxytowQOA2KkwiQw7",
+     "k2dx2vLLLguleq3Z68iH",
+     "UroClWlh11VxPyRhOHyL"
+    ]
+   }
+  }
+ }
+}

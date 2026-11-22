@@ -3,7 +3,7 @@ name: Compilar y probar
 on:
   push:
     branches: [main]
-    paths-ignore: ['ci/voces/**', '.github/workflows/voces.yml']
+    paths-ignore: ['ci/voces/**', '.github/workflows/voces.yml', 'ci/eleven/descargas.json', 'ci/eleven/sesiones.json', '.github/workflows/eleven.yml']
   workflow_dispatch:
 
 permissions:
