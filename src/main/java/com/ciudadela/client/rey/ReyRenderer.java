@@ -119,15 +119,15 @@ public class ReyRenderer extends MobRenderer<Rey, ReyModel> {
                     lvl.addParticle(e.getRandom().nextInt(3) == 0 ? ParticleTypes.SMALL_FLAME : ParticleTypes.FLAME, v.x(), v.y(), v.z(),
                             0, 0.02 + e.getRandom().nextFloat() * 0.02, 0);
                 } else {
-                    // hojas de lava: gotas que caen, chispas y alguna llama; poco humo (de dia se ve como manchas negras)
+                    // hojas de lava: gotas que caen y llamitas. Las chispas de lava (LAVA) dejan un rastro de humo
+                    // negro, asi que solo alguna al golpear
                     if (e.getRandom().nextInt(swing ? 2 : 3) == 0) lvl.addParticle(ParticleTypes.DRIPPING_LAVA, v.x(), v.y(), v.z(), 0, 0, 0);
-                    if (e.getRandom().nextInt(swing ? 4 : 12) == 0) lvl.addParticle(ParticleTypes.LAVA, v.x(), v.y(), v.z(), 0, 0, 0);
+                    if (swing && e.getRandom().nextInt(16) == 0) lvl.addParticle(ParticleTypes.LAVA, v.x(), v.y(), v.z(), 0, 0, 0);
                     if (e.getRandom().nextInt(2) == 0) lvl.addParticle(ParticleTypes.SMALL_FLAME, v.x(), v.y(), v.z(), 0, 0.01, 0);
-                    if (e.getRandom().nextInt(swing ? 6 : 10) == 0) lvl.addParticle(ParticleTypes.SMOKE, v.x(), v.y(), v.z(), 0, 0.01, 0);
                 }
             }
         }
-        if (f == 3 && e.getRandom().nextInt(8) == 0) {
+        if (f == 3 && e.getRandom().nextInt(14) == 0) {
             // grietas que echan humo
             lvl.addParticle(ParticleTypes.SMOKE, e.getX() + (e.getRandom().nextDouble() - 0.5), e.getY() + 1 + e.getRandom().nextDouble() * 1.5,
                     e.getZ() + (e.getRandom().nextDouble() - 0.5), 0, 0.03, 0);

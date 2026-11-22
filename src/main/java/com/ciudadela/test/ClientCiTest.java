@@ -307,7 +307,7 @@ public final class ClientCiTest {
                 com.ciudadela.rey.Rey cr = null;
                 if (modelo != null && mc.level.getEntity(modelo.getId()) instanceof com.ciudadela.rey.Rey r) cr = r;
                 boolean ok = cr != null && cr.fase() == fase && cr.pose() == pose && cr.flag(com.ciudadela.rey.Rey.F_HABLA) == habla
-                        && cr.actionId() == anim;
+                        && cr.actionId() == anim && (escI > 0 || ticks - escDesde > 100);
                 if (ok) {
                     escEstado = 2;
                     escDesde = ticks;
