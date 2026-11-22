@@ -20,8 +20,8 @@ import vista  # noqa: E402
 
 REPO = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 and not sys.argv[1].startswith("--") else \
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-TEX_DIR = os.path.join(REPO, "src/main/resources/assets/ciudadela/textures/entity/rey")
-JAVA_DIR = os.path.join(REPO, "src/main/java/com/ciudadela/client/rey")
+TEX_DIR = os.path.join(REPO, "src/main/resources/assets/darkcraft/textures/entity/rey")
+JAVA_DIR = os.path.join(REPO, "src/main/java/com/darkcraft/client/rey")
 
 
 def fmt(v):
@@ -37,7 +37,7 @@ def java_model(tex_h):
         if not p.parent:
             continue
     out = []
-    out.append("package com.ciudadela.client.rey;\n")
+    out.append("package com.darkcraft.client.rey;\n")
     out.append("import net.minecraft.client.model.geom.PartPose;")
     out.append("import net.minecraft.client.model.geom.builders.*;\n")
     out.append("/** GENERADO por tools/rey/generar.py: no tocar a mano. Piezas y cajas del modelo del rey. */")
@@ -94,7 +94,7 @@ def main():
     with open(os.path.join(JAVA_DIR, "ReyGeometria.java"), "w") as f:
         f.write(java_model(tex_h))
     import animaciones
-    common = os.path.join(REPO, "src/main/java/com/ciudadela/rey")
+    common = os.path.join(REPO, "src/main/java/com/darkcraft/rey")
     os.makedirs(common, exist_ok=True)
     animaciones.write_java(os.path.join(JAVA_DIR, "ReyAnimaciones.java"), os.path.join(common, "ReyAnims.java"))
     # vistas previas

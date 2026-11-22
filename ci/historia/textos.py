@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Textos de la historia de la Ciudadela (es_es y en_us). Genera los ficheros de idioma del mod y
+Textos de Dark Craft: la historia del Reino de Valdrenn en todos los idiomas del mod. Genera los ficheros de idioma del mod y
 comprueba que cada pagina de libro cabe en la pantalla del libro de Minecraft (114 px x 14 lineas).
-Uso: python3 ci/historia/textos.py   (escribe src/main/resources/assets/ciudadela/lang/*.json)
+Uso: python3 ci/historia/textos.py   (escribe src/main/resources/assets/darkcraft/lang/*.json)
 """
 import json, os, sys
 
@@ -15,7 +15,7 @@ CAP = {
    "Me llamo Aldous y fui el cronista del rey. Escribo para que alguien recuerde lo que fue Valdrenn: la joya del reino, con torres que rozaban las nubes y ríos que cantaban por cada calle.",
    "Nuestro rey, Corvin, amaba a la reina Isolde más que a su propia corona. Cuando la fiebre gris empezó a llevársela, no hubo sanador, ni rezo, ni ofrenda que pudiera salvarla.",
    "Una noche sin luna, el rey bajó solo bajo la tormenta y habló con la Sombra sin Nombre. Le ofreció un trato: la vida de la reina... a cambio de todo lo demás.",
-   "La Sombra aceptó. Esa misma noche la ciudadela fue arrancada de la tierra y alzada al cielo. Desde entonces sus ríos caen al vacío y la tormenta no ha cesado ni un solo día.",
+   "La Sombra aceptó. Esa misma noche el reino entero fue arrancado de la tierra y alzado al cielo. Desde entonces sus ríos caen al vacío y la tormenta no ha cesado ni un solo día.",
    "Nadie murió. Fue peor. Soldados, criados y nobles se quedaron huecos, sin alma, y todavía recorren estos salones. No esperes piedad de ellos: ya no recuerdan su nombre.",
    "Dos guardianes mantienen viva la maldición: el Rey, que aún espera sentado en su Salón del Trono, y Ser Gavran, su caballero jurado, que vela en lo más alto del Árbol de la Corona.",
    "Mátalos a los dos y quizá la tormenta termine. No te diré cómo; yo solo escribo. Mi siguiente página te espera donde el agua aún canta, junto a la Fuente Mayor.\n\n- A.",
@@ -25,7 +25,7 @@ CAP = {
    "My name is Aldous, and I was the king's chronicler. I write so that someone remembers what Valdrenn was: the jewel of the kingdom, its towers touching the clouds, its rivers singing through every street.",
    "Our king, Corvin, loved Queen Isolde more than his own crown. When the grey fever began to take her, no healer, no prayer and no offering could save her.",
    "On a moonless night the king went down alone beneath the storm and spoke with the Nameless Shadow. He offered a bargain: the queen's life... in exchange for everything else.",
-   "The Shadow agreed. That very night the citadel was torn from the earth and raised into the sky. Since then its rivers fall into the void, and the storm has not ceased for a single day.",
+   "The Shadow agreed. That very night the whole kingdom was torn from the earth and raised into the sky. Since then its rivers fall into the void, and the storm has not ceased for a single day.",
    "No one died. It was worse. Soldiers, servants and nobles were left hollow, without souls, and they still walk these halls. Expect no mercy from them: they no longer remember their names.",
    "Two guardians keep the curse alive: the King, who still waits in his Throne Hall, and Sir Gavran, his sworn knight, who keeps watch at the very top of the Crown Tree.",
    "Slay them both and perhaps the storm will end. I will not tell you how; I only write. My next page awaits you where the water still sings, beside the Great Fountain.\n\n- A.",
@@ -99,7 +99,7 @@ CAP = {
   es=[
    "Ser Gavran ha caído. Su juramento se rompe, y con él se rompe lo que ataba a la Sombra a estas piedras.",
    "Gracias. Hacía cien años que nadie me leía. Siento cómo se me escapa la tinta de los dedos; creo que por fin podré descansar.",
-   "Pero escucha bien: la Sombra no vive aquí. Esta ciudadela solo era su puerta. Ella espera mucho más lejos, allí donde nace la tormenta.",
+   "Pero escucha bien: la Sombra no vive aquí. Este reino solo era su puerta. Ella espera mucho más lejos, allí donde nace la tormenta.",
    "Gavran guardaba una llave que no es de hierro, sino de hueso. Úsala y te mostrará el camino hacia fortalezas que flotan más allá de las nubes.",
    "Dicen que tras ellas se alza una montaña que toca las estrellas, y un castillo donde arden las hogueras de los caídos. Allí se descansa... y desde allí se vuelve.",
    "Yo ya no puedo acompañarte. Lo que venga ahora es cosa tuya. Busca, lucha, cae y vuelve a levantarte. Nadie más va a escribir tu historia.",
@@ -108,7 +108,7 @@ CAP = {
   en=[
    "Sir Gavran has fallen. His oath is broken, and with it breaks whatever bound the Shadow to these stones.",
    "Thank you. For a hundred years no one has read me. I can feel the ink slipping from my fingers; I think at last I will be able to rest.",
-   "But listen well: the Shadow does not live here. This citadel was only its door. It waits much further away, where the storm is born.",
+   "But listen well: the Shadow does not live here. This kingdom was only its door. It waits much further away, where the storm is born.",
    "Gavran kept a key that is not made of iron, but of bone. Use it, and it will show you the way to fortresses that float beyond the clouds.",
    "They say that behind them rises a mountain that touches the stars, and a castle where the bonfires of the fallen burn. There one rests... and from there one returns.",
    "I can no longer go with you. Whatever comes now is yours alone. Seek, fight, fall and rise again. No one else will write your story.",
@@ -143,8 +143,8 @@ NARRACION = [
   "Así que el rey Corvin bajó bajo la tormenta... e hizo un pacto con la Sombra sin Nombre."),
  ("Her life... for everything else.",
   "La vida de ella... a cambio de todo lo demás."),
- ("That night, the citadel was torn from the earth, and its rivers began to fall into the void.",
-  "Esa noche la ciudadela fue arrancada de la tierra, y sus ríos empezaron a caer al vacío."),
+ ("That night, the kingdom was torn from the earth, and its rivers began to fall into the void.",
+  "Esa noche el reino fue arrancado de la tierra, y sus ríos empezaron a caer al vacío."),
  ("The people of Valdrenn did not die. They were hollowed... and they still walk these halls.",
   "La gente de Valdrenn no murió. Quedó hueca... y todavía recorre estos salones."),
  ("From the heart of the keep grew the Crown Tree, and at its peak, a sworn knight keeps his watch.",
@@ -180,79 +180,119 @@ REY = [
   "¡Arrodíllate... ante las llamas!"),
  ("Impossible... the fire... obeys you?",
   "Imposible... ¿el fuego... te obedece?"),
+ ("Another fool... for my court.",
+  "Otro necio... para mi corte."),
 ]
 REY_UI = {
  "es": {
-  "entity.ciudadela.rey": "Corvin, el Rey que Espera",
-  "entity.ciudadela.rey_proyectil": "Tajo del Rey",
-  "ciudadela.rey.nombre_corto": "Corvin",
-  "ciudadela.rey.barra_arde": "Corvin, el Rey que Arde",
-  "block.ciudadela.rastrillo": "Rastrillo de hierro negro",
-  "death.attack.ciudadela.rey": "%1$s fue ejecutado por %2$s",
-  "death.attack.ciudadela.rey.player": "%1$s fue ejecutado por %2$s",
-  "death.attack.ciudadela.rey_area": "%1$s ardió ante %2$s",
-  "death.attack.ciudadela.rey_area.player": "%1$s ardió ante %2$s",
-  "subtitles.ciudadela.rey.voz": "Corvin habla",
-  "ciudadela.rey.titulo.30": "CORVIN",
-  "ciudadela.rey.subtitulo.30": "El Rey que Arde",
-  "ciudadela.rey.titulo.32": "CORVIN",
-  "ciudadela.rey.subtitulo.32": "El Rey que Espera",
-  "item.ciudadela.espada_diestra": "Diestra del Rey",
-  "item.ciudadela.espada_siniestra": "Siniestra del Rey",
-  "item.ciudadela.espada.lore": "Las espadas de Corvin, templadas en el fuego que devoró Valdrenn",
-  "item.ciudadela.espada.combo1": "Shift + clic izquierdo: Tajo Real (35 de energía)",
-  "item.ciudadela.espada.combo2": "Ctrl + clic izquierdo: Juicio del Rey (80 de energía)",
-  "item.ciudadela.espada.bloqueo": "Clic derecho: cubrirse con las espadas cruzadas",
-  "item.ciudadela.espada.dos": "Con una en cada mano los combos golpean más fuerte",
-  "ciudadela.espada.sin_energia": "Te falta energía (necesitas %s): golpea con las espadas para llenarla",
-  "item.ciudadela.llave_arbol": "Llave del Árbol",
-  "item.ciudadela.llave_arbol.lore": "Abre la gran puerta de la Sala del Árbol",
-  "item.ciudadela.llave_arbol.aqui_no": "Esta llave abre la gran puerta de la Sala del Árbol, en lo alto de la torre del árbol",
-  "block.ciudadela.sello_runico": "Sello rúnico",
-  "entity.ciudadela.ascensor": "Disco de runas",
-  "entity.ciudadela.puerta_arbol": "Puerta de la Sala del Árbol",
-  "ciudadela.ascensor.sube": "El disco de runas despierta para subir  %s",
-  "ciudadela.ascensor.baja": "El disco de runas despierta para bajar  %s",
-  "ciudadela.ascensor.llama": "Llamando al disco de runas  %s",
-  "ciudadela.puerta.cerrada": "La puerta está cerrada con runas y cerrojos: hace falta la Llave del Árbol",
-  "ciudadela.rey.titulo.31": "LA SALA DEL ÁRBOL",
-  "ciudadela.rey.subtitulo.31": "Donde aguarda Ser Gavran",
+  "entity.darkcraft.rey": "Corvin, el Rey que Espera",
+  "entity.darkcraft.rey_proyectil": "Tajo del Rey",
+  "darkcraft.rey.nombre_corto": "Corvin",
+  "darkcraft.rey.barra_arde": "Corvin, el Rey que Arde",
+  "block.darkcraft.rastrillo": "Rastrillo de hierro negro",
+  "death.attack.darkcraft.rey": "%1$s fue ejecutado por %2$s",
+  "death.attack.darkcraft.rey.player": "%1$s fue ejecutado por %2$s",
+  "death.attack.darkcraft.rey_area": "%1$s ardió ante %2$s",
+  "death.attack.darkcraft.rey_area.player": "%1$s ardió ante %2$s",
+  "subtitles.darkcraft.rey.voz": "Corvin habla",
+  "darkcraft.rey.titulo.30": "CORVIN",
+  "darkcraft.rey.subtitulo.30": "El Rey que Arde",
+  "darkcraft.rey.titulo.32": "CORVIN",
+  "darkcraft.rey.subtitulo.32": "El Rey que Espera",
+  "item.darkcraft.espada_diestra": "Diestra del Rey",
+  "item.darkcraft.espada_siniestra": "Siniestra del Rey",
+  "item.darkcraft.espada.lore": "Las espadas de Corvin, templadas en el fuego que devoró Valdrenn",
+  "item.darkcraft.espada.combo1": "Shift + clic izquierdo: Tajo Real (35 de energía)",
+  "item.darkcraft.espada.combo2": "Ctrl + clic izquierdo: Juicio del Rey (80 de energía)",
+  "item.darkcraft.espada.bloqueo": "Clic derecho: cubrirse con las espadas cruzadas",
+  "item.darkcraft.espada.dos": "Con una en cada mano los combos golpean más fuerte",
+  "darkcraft.espada.sin_energia": "Te falta energía (necesitas %s): golpea con las espadas para llenarla",
+  "item.darkcraft.llave_arbol": "Llave del Árbol",
+  "item.darkcraft.llave_arbol.lore": "Abre la gran puerta de la Sala del Árbol",
+  "item.darkcraft.llave_arbol.aqui_no": "Esta llave abre la gran puerta de la Sala del Árbol, en lo alto de la torre del árbol",
+  "block.darkcraft.sello_runico": "Sello rúnico",
+  "entity.darkcraft.ascensor": "Disco de runas",
+  "entity.darkcraft.puerta_arbol": "Puerta de la Sala del Árbol",
+  "darkcraft.ascensor.sube": "El disco de runas despierta para subir  %s",
+  "darkcraft.ascensor.baja": "El disco de runas despierta para bajar  %s",
+  "darkcraft.ascensor.llama": "Llamando al disco de runas  %s",
+  "darkcraft.puerta.cerrada": "La puerta está cerrada con runas y cerrojos: hace falta la Llave del Árbol",
+  "darkcraft.rey.titulo.31": "LA SALA DEL ÁRBOL",
+  "darkcraft.rey.subtitulo.31": "Donde aguarda Ser Gavran",
+  "darkcraft.rey.circulos": "¡A LOS CÍRCULOS DORADOS!",
+  "darkcraft.rey.cuenta": "— %s —",
+  "subtitles.darkcraft.sfx.rey_tajo": "Espadazo del Rey",
+  "subtitles.darkcraft.sfx.rey_tajo_fuego": "Tajo de fuego",
+  "subtitles.darkcraft.sfx.rey_bola_fuego": "Bola de fuego",
+  "subtitles.darkcraft.sfx.rey_explosion": "Explosión",
+  "subtitles.darkcraft.sfx.rey_golpe_suelo": "Golpe contra el suelo",
+  "subtitles.darkcraft.sfx.rey_golpe_final": "Golpe final",
+  "subtitles.darkcraft.sfx.rey_rugido": "Rugido del Rey",
+  "subtitles.darkcraft.sfx.rey_geiser": "Géiser de lava",
+  "subtitles.darkcraft.sfx.rey_pilares": "Pilares de fuego",
+  "subtitles.darkcraft.sfx.rey_carga": "El fuego se acumula",
+  "subtitles.darkcraft.sfx.cuenta_atras": "Tambor de guerra",
+  "subtitles.darkcraft.sfx.circulo_dorado": "Brilla un círculo dorado",
+  "subtitles.darkcraft.sfx.puerta_runas": "Las runas despiertan",
+  "subtitles.darkcraft.sfx.puerta_abre": "La gran puerta se abre",
+  "subtitles.darkcraft.sfx.puerta_cierra": "La gran puerta retumba",
+  "subtitles.darkcraft.sfx.ascensor_mueve": "El disco de runas se mueve",
+  "subtitles.darkcraft.sfx.ascensor_llega": "El disco de runas se detiene",
  },
  "en": {
-  "entity.ciudadela.rey": "Corvin, the King Who Waits",
-  "entity.ciudadela.rey_proyectil": "King's Slash",
-  "ciudadela.rey.nombre_corto": "Corvin",
-  "ciudadela.rey.barra_arde": "Corvin, the Burning King",
-  "block.ciudadela.rastrillo": "Black Iron Portcullis",
-  "death.attack.ciudadela.rey": "%1$s was executed by %2$s",
-  "death.attack.ciudadela.rey.player": "%1$s was executed by %2$s",
-  "death.attack.ciudadela.rey_area": "%1$s burned before %2$s",
-  "death.attack.ciudadela.rey_area.player": "%1$s burned before %2$s",
-  "subtitles.ciudadela.rey.voz": "Corvin speaks",
-  "ciudadela.rey.titulo.30": "CORVIN",
-  "ciudadela.rey.subtitulo.30": "The Burning King",
-  "ciudadela.rey.titulo.32": "CORVIN",
-  "ciudadela.rey.subtitulo.32": "The King Who Waits",
-  "item.ciudadela.espada_diestra": "The King's Right Hand",
-  "item.ciudadela.espada_siniestra": "The King's Left Hand",
-  "item.ciudadela.espada.lore": "Corvin's swords, tempered in the fire that devoured Valdrenn",
-  "item.ciudadela.espada.combo1": "Shift + left click: Royal Slash (35 energy)",
-  "item.ciudadela.espada.combo2": "Ctrl + left click: King's Judgement (80 energy)",
-  "item.ciudadela.espada.bloqueo": "Right click: guard with crossed swords",
-  "item.ciudadela.espada.dos": "With one in each hand, combos hit harder",
-  "ciudadela.espada.sin_energia": "Not enough energy (you need %s): strike with the swords to fill it",
-  "item.ciudadela.llave_arbol": "Key of the Tree",
-  "item.ciudadela.llave_arbol.lore": "Opens the great door of the Tree Hall",
-  "item.ciudadela.llave_arbol.aqui_no": "This key opens the great door of the Tree Hall, at the top of the tree tower",
-  "block.ciudadela.sello_runico": "Runic Seal",
-  "entity.ciudadela.ascensor": "Rune Disc",
-  "entity.ciudadela.puerta_arbol": "Door of the Tree Hall",
-  "ciudadela.ascensor.sube": "The rune disc awakens to rise  %s",
-  "ciudadela.ascensor.baja": "The rune disc awakens to descend  %s",
-  "ciudadela.ascensor.llama": "Calling the rune disc  %s",
-  "ciudadela.puerta.cerrada": "The door is sealed with runes and bolts: you need the Key of the Tree",
-  "ciudadela.rey.titulo.31": "THE TREE HALL",
-  "ciudadela.rey.subtitulo.31": "Where Ser Gavran awaits",
+  "entity.darkcraft.rey": "Corvin, the King Who Waits",
+  "entity.darkcraft.rey_proyectil": "King's Slash",
+  "darkcraft.rey.nombre_corto": "Corvin",
+  "darkcraft.rey.barra_arde": "Corvin, the Burning King",
+  "block.darkcraft.rastrillo": "Black Iron Portcullis",
+  "death.attack.darkcraft.rey": "%1$s was executed by %2$s",
+  "death.attack.darkcraft.rey.player": "%1$s was executed by %2$s",
+  "death.attack.darkcraft.rey_area": "%1$s burned before %2$s",
+  "death.attack.darkcraft.rey_area.player": "%1$s burned before %2$s",
+  "subtitles.darkcraft.rey.voz": "Corvin speaks",
+  "darkcraft.rey.titulo.30": "CORVIN",
+  "darkcraft.rey.subtitulo.30": "The Burning King",
+  "darkcraft.rey.titulo.32": "CORVIN",
+  "darkcraft.rey.subtitulo.32": "The King Who Waits",
+  "item.darkcraft.espada_diestra": "The King's Right Hand",
+  "item.darkcraft.espada_siniestra": "The King's Left Hand",
+  "item.darkcraft.espada.lore": "Corvin's swords, tempered in the fire that devoured Valdrenn",
+  "item.darkcraft.espada.combo1": "Shift + left click: Royal Slash (35 energy)",
+  "item.darkcraft.espada.combo2": "Ctrl + left click: King's Judgement (80 energy)",
+  "item.darkcraft.espada.bloqueo": "Right click: guard with crossed swords",
+  "item.darkcraft.espada.dos": "With one in each hand, combos hit harder",
+  "darkcraft.espada.sin_energia": "Not enough energy (you need %s): strike with the swords to fill it",
+  "item.darkcraft.llave_arbol": "Key of the Tree",
+  "item.darkcraft.llave_arbol.lore": "Opens the great door of the Tree Hall",
+  "item.darkcraft.llave_arbol.aqui_no": "This key opens the great door of the Tree Hall, at the top of the tree tower",
+  "block.darkcraft.sello_runico": "Runic Seal",
+  "entity.darkcraft.ascensor": "Rune Disc",
+  "entity.darkcraft.puerta_arbol": "Door of the Tree Hall",
+  "darkcraft.ascensor.sube": "The rune disc awakens to rise  %s",
+  "darkcraft.ascensor.baja": "The rune disc awakens to descend  %s",
+  "darkcraft.ascensor.llama": "Calling the rune disc  %s",
+  "darkcraft.puerta.cerrada": "The door is sealed with runes and bolts: you need the Key of the Tree",
+  "darkcraft.rey.titulo.31": "THE TREE HALL",
+  "darkcraft.rey.subtitulo.31": "Where Sir Gavran awaits",
+  "darkcraft.rey.circulos": "TO THE GOLDEN CIRCLES!",
+  "darkcraft.rey.cuenta": "— %s —",
+  "subtitles.darkcraft.sfx.rey_tajo": "King's sword swings",
+  "subtitles.darkcraft.sfx.rey_tajo_fuego": "Fire slash",
+  "subtitles.darkcraft.sfx.rey_bola_fuego": "Fireball",
+  "subtitles.darkcraft.sfx.rey_explosion": "Explosion",
+  "subtitles.darkcraft.sfx.rey_golpe_suelo": "Ground slam",
+  "subtitles.darkcraft.sfx.rey_golpe_final": "Final blow",
+  "subtitles.darkcraft.sfx.rey_rugido": "King roars",
+  "subtitles.darkcraft.sfx.rey_geiser": "Lava geyser",
+  "subtitles.darkcraft.sfx.rey_pilares": "Pillars of fire",
+  "subtitles.darkcraft.sfx.rey_carga": "Fire gathers",
+  "subtitles.darkcraft.sfx.cuenta_atras": "War drum",
+  "subtitles.darkcraft.sfx.circulo_dorado": "A golden circle shines",
+  "subtitles.darkcraft.sfx.puerta_runas": "Runes awaken",
+  "subtitles.darkcraft.sfx.puerta_abre": "Great door opens",
+  "subtitles.darkcraft.sfx.puerta_cierra": "Great door booms",
+  "subtitles.darkcraft.sfx.ascensor_mueve": "Rune disc moves",
+  "subtitles.darkcraft.sfx.ascensor_llega": "Rune disc stops",
  },
 }
 
@@ -261,76 +301,84 @@ PAUSAS = [0.8, 1.6, 0.8, 0.7, 1.6, 1.6, 0.8, 1.6, 0.9, 0.0]
 
 UI = {
  "es": {
-  "itemGroup.ciudadela": "Ciudadela Gótica",
-  "item.ciudadela.mapa_ciudadela": "Mapa de la Ciudadela",
-  "ciudadela.mapa.lore": "Clic derecho para desplegarlo",
-  "ciudadela.mapa.sin_castillo": "Este mapa no pertenece a ninguna ciudadela cercana.",
-  "ciudadela.mapa.titulo": "Ciudadela de Valdrenn",
-  "ciudadela.mapa.cronica": "Crónica",
-  "ciudadela.mapa.siguiente": "Siguiente página",
-  "ciudadela.mapa.tu": "Tú",
-  "ciudadela.mapa.cerrar": "Pulsa ESC para enrollar el mapa",
-  "ciudadela.mapa.lugar.torre_ascenso": "Torre de Ascenso",
-  "ciudadela.mapa.lugar.puerta_exterior": "Puerta Exterior",
-  "ciudadela.mapa.lugar.puerta_interior": "Puerta Interior",
-  "ciudadela.mapa.lugar.fuente": "Fuente Mayor",
-  "ciudadela.mapa.lugar.torreon": "Torreón",
-  "ciudadela.mapa.lugar.trono": "Salón del Trono",
-  "ciudadela.mapa.lugar.arbol": "Árbol de la Corona",
-  "ciudadela.mapa.lugar.catedral": "Catedral",
-  "ciudadela.mapa.lugar.biblioteca": "Biblioteca",
-  "ciudadela.mapa.lugar.cementerio": "Cementerio",
-  "ciudadela.mapa.lugar.laberinto": "Laberinto",
-  "ciudadela.mapa.lugar.patio_armas": "Patio de Armas",
-  "ciudadela.mapa.lugar.alquimista": "Torre del Alquimista",
-  "ciudadela.mapa.lugar.observatorio": "Observatorio",
-  "ciudadela.mapa.lugar.pueblo": "Pueblo",
-  "ciudadela.mapa.lugar.jardin": "Jardín Privado",
-  "ciudadela.capitulo": "CAPÍTULO %s",
-  "ciudadela.cofre": "Crónica · Capítulo %s",
-  "ciudadela.libro": "Crónica de Valdrenn · Capítulo %s",
-  "ciudadela.libro.lore": "Escrita por Aldous, cronista del rey",
-  "ciudadela.cine.saltar": "Mantén ESPACIO para saltar",
-  "ciudadela.historia.reiniciada": "Tu historia de la ciudadela empieza de nuevo.",
-  "ciudadela.historia.no_cofre": "Este cofre guarda una página que todavía no te corresponde leer.",
-  "subtitles.ciudadela.campana": "Campana fúnebre",
-  "subtitles.ciudadela.narracion": "Narrador",
+  "itemGroup.darkcraft": "Dark Craft",
+  "item.darkcraft.mapa_valdrenn": "Mapa de Valdrenn",
+  "darkcraft.mapa.lore": "Clic derecho para desplegarlo",
+  "darkcraft.mapa.sin_castillo": "Este mapa no pertenece a ningún reino cercano.",
+  "darkcraft.mapa.titulo": "Reino de Valdrenn",
+  "darkcraft.mapa.cronica": "Crónica",
+  "darkcraft.mapa.siguiente": "Siguiente página",
+  "darkcraft.mapa.tu": "Tú",
+  "darkcraft.mapa.cerrar": "Pulsa ESC para enrollar el mapa",
+  "darkcraft.mapa.lugar.torre_ascenso": "Torre de Ascenso",
+  "darkcraft.mapa.lugar.puerta_exterior": "Puerta Exterior",
+  "darkcraft.mapa.lugar.puerta_interior": "Puerta Interior",
+  "darkcraft.mapa.lugar.fuente": "Fuente Mayor",
+  "darkcraft.mapa.lugar.torreon": "Torreón",
+  "darkcraft.mapa.lugar.trono": "Salón del Trono",
+  "darkcraft.mapa.lugar.arbol": "Árbol de la Corona",
+  "darkcraft.mapa.lugar.catedral": "Catedral",
+  "darkcraft.mapa.lugar.biblioteca": "Biblioteca",
+  "darkcraft.mapa.lugar.cementerio": "Cementerio",
+  "darkcraft.mapa.lugar.laberinto": "Laberinto",
+  "darkcraft.mapa.lugar.patio_armas": "Patio de Armas",
+  "darkcraft.mapa.lugar.alquimista": "Torre del Alquimista",
+  "darkcraft.mapa.lugar.observatorio": "Observatorio",
+  "darkcraft.mapa.lugar.pueblo": "Pueblo",
+  "darkcraft.mapa.lugar.jardin": "Jardín Privado",
+  "darkcraft.capitulo": "CAPÍTULO %s",
+  "darkcraft.cofre": "Crónica · Capítulo %s",
+  "darkcraft.libro": "Crónica de Valdrenn · Capítulo %s",
+  "darkcraft.libro.lore": "Escrita por Aldous, cronista del rey",
+  "darkcraft.cine.saltar": "Mantén ESPACIO para saltar",
+  "darkcraft.historia.reiniciada": "Tu historia en el Reino de Valdrenn empieza de nuevo.",
+  "darkcraft.historia.no_cofre": "Este cofre guarda una página que todavía no te corresponde leer.",
+  "subtitles.darkcraft.campana": "Campana fúnebre",
+  "subtitles.darkcraft.narracion": "Narrador",
+  "darkcraft.cmd.no_reino": "No hay ningún Reino de Valdrenn cerca.",
+  "darkcraft.cmd.localizar": "Reino de Valdrenn en X=%s Z=%s (a %s bloques).",
+  "darkcraft.cmd.tp": "[Teletransportarme]",
+  "darkcraft.cmd.bienvenido": "Bienvenido al Reino de Valdrenn.",
  },
  "en": {
-  "itemGroup.ciudadela": "Gothic Citadel",
-  "item.ciudadela.mapa_ciudadela": "Map of the Citadel",
-  "ciudadela.mapa.lore": "Right-click to unroll it",
-  "ciudadela.mapa.sin_castillo": "This map does not belong to any nearby citadel.",
-  "ciudadela.mapa.titulo": "Citadel of Valdrenn",
-  "ciudadela.mapa.cronica": "Chronicle",
-  "ciudadela.mapa.siguiente": "Next page",
-  "ciudadela.mapa.tu": "You",
-  "ciudadela.mapa.cerrar": "Press ESC to roll up the map",
-  "ciudadela.mapa.lugar.torre_ascenso": "Ascent Tower",
-  "ciudadela.mapa.lugar.puerta_exterior": "Outer Gate",
-  "ciudadela.mapa.lugar.puerta_interior": "Inner Gate",
-  "ciudadela.mapa.lugar.fuente": "Great Fountain",
-  "ciudadela.mapa.lugar.torreon": "The Keep",
-  "ciudadela.mapa.lugar.trono": "Throne Hall",
-  "ciudadela.mapa.lugar.arbol": "The Crown Tree",
-  "ciudadela.mapa.lugar.catedral": "Cathedral",
-  "ciudadela.mapa.lugar.biblioteca": "Library",
-  "ciudadela.mapa.lugar.cementerio": "Cemetery",
-  "ciudadela.mapa.lugar.laberinto": "Hedge Maze",
-  "ciudadela.mapa.lugar.patio_armas": "Training Yard",
-  "ciudadela.mapa.lugar.alquimista": "Alchemist's Tower",
-  "ciudadela.mapa.lugar.observatorio": "Observatory",
-  "ciudadela.mapa.lugar.pueblo": "Town",
-  "ciudadela.mapa.lugar.jardin": "Private Garden",
-  "ciudadela.capitulo": "CHAPTER %s",
-  "ciudadela.cofre": "Chronicle · Chapter %s",
-  "ciudadela.libro": "Chronicle of Valdrenn · Chapter %s",
-  "ciudadela.libro.lore": "Written by Aldous, the king's chronicler",
-  "ciudadela.cine.saltar": "Hold SPACE to skip",
-  "ciudadela.historia.reiniciada": "Your story in the citadel begins anew.",
-  "ciudadela.historia.no_cofre": "This chest keeps a page you are not meant to read yet.",
-  "subtitles.ciudadela.campana": "Funeral bell",
-  "subtitles.ciudadela.narracion": "Narrator",
+  "itemGroup.darkcraft": "Dark Craft",
+  "item.darkcraft.mapa_valdrenn": "Map of Valdrenn",
+  "darkcraft.mapa.lore": "Right-click to unroll it",
+  "darkcraft.mapa.sin_castillo": "This map does not belong to any nearby kingdom.",
+  "darkcraft.mapa.titulo": "Kingdom of Valdrenn",
+  "darkcraft.mapa.cronica": "Chronicle",
+  "darkcraft.mapa.siguiente": "Next page",
+  "darkcraft.mapa.tu": "You",
+  "darkcraft.mapa.cerrar": "Press ESC to roll up the map",
+  "darkcraft.mapa.lugar.torre_ascenso": "Ascent Tower",
+  "darkcraft.mapa.lugar.puerta_exterior": "Outer Gate",
+  "darkcraft.mapa.lugar.puerta_interior": "Inner Gate",
+  "darkcraft.mapa.lugar.fuente": "Great Fountain",
+  "darkcraft.mapa.lugar.torreon": "The Keep",
+  "darkcraft.mapa.lugar.trono": "Throne Hall",
+  "darkcraft.mapa.lugar.arbol": "The Crown Tree",
+  "darkcraft.mapa.lugar.catedral": "Cathedral",
+  "darkcraft.mapa.lugar.biblioteca": "Library",
+  "darkcraft.mapa.lugar.cementerio": "Cemetery",
+  "darkcraft.mapa.lugar.laberinto": "Hedge Maze",
+  "darkcraft.mapa.lugar.patio_armas": "Training Yard",
+  "darkcraft.mapa.lugar.alquimista": "Alchemist's Tower",
+  "darkcraft.mapa.lugar.observatorio": "Observatory",
+  "darkcraft.mapa.lugar.pueblo": "Town",
+  "darkcraft.mapa.lugar.jardin": "Private Garden",
+  "darkcraft.capitulo": "CHAPTER %s",
+  "darkcraft.cofre": "Chronicle · Chapter %s",
+  "darkcraft.libro": "Chronicle of Valdrenn · Chapter %s",
+  "darkcraft.libro.lore": "Written by Aldous, the king's chronicler",
+  "darkcraft.cine.saltar": "Hold SPACE to skip",
+  "darkcraft.historia.reiniciada": "Your story in the Kingdom of Valdrenn begins anew.",
+  "darkcraft.historia.no_cofre": "This chest keeps a page you are not meant to read yet.",
+  "subtitles.darkcraft.campana": "Funeral bell",
+  "subtitles.darkcraft.narracion": "Narrator",
+  "darkcraft.cmd.no_reino": "There is no Kingdom of Valdrenn nearby.",
+  "darkcraft.cmd.localizar": "Kingdom of Valdrenn at X=%s Z=%s (%s blocks away).",
+  "darkcraft.cmd.tp": "[Teleport me]",
+  "darkcraft.cmd.bienvenido": "Welcome to the Kingdom of Valdrenn.",
  },
 }
 
@@ -339,12 +387,32 @@ W = {' ': 4, '!': 2, '"': 4, "'": 2, '(': 4, ')': 4, '*': 4, ',': 2, '.': 2, ':'
      '@': 7, 'I': 4, '[': 4, ']': 4, '`': 3, 'f': 5, 'i': 2, 'k': 5, 'l': 3, 't': 4, '{': 4, '|': 2, '}': 4,
      '~': 7, 'í': 3, 'Í': 4, '¡': 2, '·': 2}
 
-def width(s, bold=False):
-    return sum(W.get(ch, 6) + (1 if bold else 0) for ch in s)
+def ancho_letra(ch):
+    o = ord(ch)
+    # japones (kana, kanji, signos de ancho completo): en Minecraft salen de la fuente unifont, unos 9 px
+    if 0x2E80 <= o <= 0x9FFF or 0xF900 <= o <= 0xFAFF or 0xFF00 <= o <= 0xFFEF or 0x3000 <= o <= 0x303F:
+        return 9
+    return W.get(ch, 6)
 
-def wrap(text, maxw=114):
+
+def width(s, bold=False):
+    return sum(ancho_letra(ch) + (1 if bold else 0) for ch in s)
+
+
+def wrap(text, maxw=114, sin_espacios=False):
+    """Parte el texto en lineas como el libro de Minecraft (por espacios; en japones, por letras)."""
     lines = []
     for para in text.split("\n"):
+        if sin_espacios:
+            cur = ""
+            for ch in para:
+                if width(cur + ch) <= maxw:
+                    cur += ch
+                else:
+                    lines.append(cur)
+                    cur = ch
+            lines.append(cur)
+            continue
         cur = ""
         for word in para.split(" "):
             cand = word if not cur else cur + " " + word
@@ -357,48 +425,97 @@ def wrap(text, maxw=114):
         lines.append(cur)
     return lines
 
+
+PAGINAS = {1: 8, 2: 7, 3: 7, 4: 7, 5: 7}   # las mismas que Story.PAGES
+
+
+def check_cap(nombre, caps, sin_espacios=False):
+    """caps: {n: (titulo, (cartel1, cartel2), [paginas])}. Cada pagina tiene que caber en el libro."""
+    ok = True
+    for n, (titulo, carteles, paginas) in caps.items():
+        if len(paginas) != PAGINAS[n]:
+            print(f"cap {n} {nombre}: {len(paginas)} paginas y tienen que ser {PAGINAS[n]}")
+            ok = False
+        for i, page in enumerate(paginas):
+            extra = 3 if i == 0 else 0   # pagina 1: CAPITULO N + titulo + linea en blanco
+            tl = len(wrap(titulo, sin_espacios=sin_espacios)) if i == 0 else 0
+            lines = len(wrap(page, sin_espacios=sin_espacios)) + extra + max(0, tl - 1)
+            if lines > 13:
+                ok = False
+            print(f"cap {n} {nombre} p{i+1}: {lines:2d} lineas {'OK ' if lines <= 13 else 'LARGA'}")
+        for line in carteles:
+            if width(line) > 88:
+                print("  CARTEL LARGO:", nombre, line, width(line))
+                ok = False
+    return ok
+
+
 def check():
     ok = True
-    for n, c in CAP.items():
-        for lang in ("es", "en"):
-            for i, page in enumerate(c[lang]):
-                extra = 3 if i == 0 else 0   # pagina 1: CAPITULO N + titulo + linea en blanco
-                title = c[lang + "_t"]
-                tl = len(wrap(title)) if i == 0 else 0
-                lines = len(wrap(page)) + extra + max(0, tl - 1)
-                flag = "OK " if lines <= 13 else "LARGA"
-                if lines > 13:
-                    ok = False
-                print(f"cap {n} {lang} p{i+1}: {lines:2d} lineas {flag}")
-            for line in c[lang + "_s"]:
-                if width(line) > 88:
-                    print("  CARTEL LARGO:", lang, line, width(line)); ok = False
+    for lang in ("es", "en"):
+        ok &= check_cap(lang, {n: (c[lang + "_t"], c[lang + "_s"], c[lang]) for n, c in CAP.items()})
+    for code, mod in otros_idiomas().items():
+        ok &= check_cap(code, mod.T["cap"], mod.T.get("sin_espacios", False))
     return ok
+
+
+def otros_idiomas():
+    """Los idiomas traducidos aparte (ci/historia/idiomas/*.py), cada uno con su diccionario T."""
+    import importlib.util
+    out = {}
+    carpeta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "idiomas")
+    if not os.path.isdir(carpeta):
+        return out
+    for f in sorted(os.listdir(carpeta)):
+        if not f.endswith(".py"):
+            continue
+        spec = importlib.util.spec_from_file_location("idioma_" + f[:-3], os.path.join(carpeta, f))
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        out[f[:-3]] = m
+    return out
+
 
 LOGROS_UI = {
  "es": {
-  "advancements.ciudadela.raiz.title": "Ciudadela Gótica",
-  "advancements.ciudadela.raiz.description": "Dicen que en el cielo flota una ciudad maldita",
-  "advancements.ciudadela.encontrar.title": "Una isla entre las nubes",
-  "advancements.ciudadela.encontrar.description": "Pisa la isla flotante de la Ciudadela",
-  "advancements.ciudadela.capitulo1.title": "La crónica comienza",
-  "advancements.ciudadela.capitulo1.description": "Abre el cofre del capítulo 1 y escucha su historia",
-  "advancements.ciudadela.rey.title": "El Rey ha caído",
-  "advancements.ciudadela.rey.description": "Vence a Corvin, el Rey que Espera",
-  "advancements.ciudadela.arbol.title": "Las puertas del Árbol",
-  "advancements.ciudadela.arbol.description": "Abre la puerta de la Sala del Árbol con la llave del Rey",
+  "advancements.darkcraft.raiz.title": "Dark Craft",
+  "advancements.darkcraft.raiz.description": "Dicen que en el cielo flota un reino maldito",
+  "advancements.darkcraft.encontrar.title": "Una isla entre las nubes",
+  "advancements.darkcraft.encontrar.description": "Pisa la isla flotante del Reino de Valdrenn",
+  "advancements.darkcraft.capitulo1.title": "La crónica comienza",
+  "advancements.darkcraft.capitulo1.description": "Abre el cofre del capítulo 1 y escucha su historia",
+  "advancements.darkcraft.rey.title": "El Rey ha caído",
+  "advancements.darkcraft.rey.description": "Vence a Corvin, el Rey que Espera",
+  "advancements.darkcraft.arbol.title": "Las puertas del Árbol",
+  "advancements.darkcraft.arbol.description": "Abre la puerta de la Sala del Árbol con la llave del Rey",
+  "advancements.darkcraft.capitulo2.title": "Donde el agua aún canta",
+  "advancements.darkcraft.capitulo2.description": "Encuentra la segunda página de la crónica junto a la Fuente Mayor",
+  "advancements.darkcraft.capitulo3.title": "La verdad del Rey",
+  "advancements.darkcraft.capitulo3.description": "Lee la tercera página junto al Rey caído",
+  "advancements.darkcraft.capitulo4.title": "La Reina bajo el Altar",
+  "advancements.darkcraft.capitulo4.description": "Encuentra la cuarta página a los pies del altar de la catedral",
+  "advancements.darkcraft.golpe_final.title": "Bajo la luz dorada",
+  "advancements.darkcraft.golpe_final.description": "Sobrevive al golpe final del Rey dentro de un círculo dorado",
  },
  "en": {
-  "advancements.ciudadela.raiz.title": "Gothic Citadel",
-  "advancements.ciudadela.raiz.description": "They say a cursed city floats in the sky",
-  "advancements.ciudadela.encontrar.title": "An Island Among the Clouds",
-  "advancements.ciudadela.encontrar.description": "Set foot on the Citadel's floating island",
-  "advancements.ciudadela.capitulo1.title": "The Chronicle Begins",
-  "advancements.ciudadela.capitulo1.description": "Open the chest of chapter 1 and hear its story",
-  "advancements.ciudadela.rey.title": "The King Has Fallen",
-  "advancements.ciudadela.rey.description": "Defeat Corvin, the King Who Waits",
-  "advancements.ciudadela.arbol.title": "The Gates of the Tree",
-  "advancements.ciudadela.arbol.description": "Open the door of the Tree Hall with the King's key",
+  "advancements.darkcraft.raiz.title": "Dark Craft",
+  "advancements.darkcraft.raiz.description": "They say a cursed kingdom floats in the sky",
+  "advancements.darkcraft.encontrar.title": "An Island Among the Clouds",
+  "advancements.darkcraft.encontrar.description": "Set foot on the floating island of Valdrenn",
+  "advancements.darkcraft.capitulo1.title": "The Chronicle Begins",
+  "advancements.darkcraft.capitulo1.description": "Open the chest of chapter 1 and hear its story",
+  "advancements.darkcraft.rey.title": "The King Has Fallen",
+  "advancements.darkcraft.rey.description": "Defeat Corvin, the King Who Waits",
+  "advancements.darkcraft.arbol.title": "The Gates of the Tree",
+  "advancements.darkcraft.arbol.description": "Open the door of the Tree Hall with the King's key",
+  "advancements.darkcraft.capitulo2.title": "Where the Water Still Sings",
+  "advancements.darkcraft.capitulo2.description": "Find the chronicle's second page by the Great Fountain",
+  "advancements.darkcraft.capitulo3.title": "The King's Truth",
+  "advancements.darkcraft.capitulo3.description": "Read the third page beside the fallen King",
+  "advancements.darkcraft.capitulo4.title": "The Queen Under the Altar",
+  "advancements.darkcraft.capitulo4.description": "Find the fourth page at the foot of the cathedral altar",
+  "advancements.darkcraft.golpe_final.title": "Beneath the Golden Light",
+  "advancements.darkcraft.golpe_final.description": "Survive the King's final blow inside a golden circle",
  },
 }
 
@@ -407,41 +524,68 @@ def build():
     for lang in ("es", "en"):
         d = dict(UI[lang])
         for n, c in CAP.items():
-            d[f"ciudadela.cap.{n}.titulo"] = c[lang + "_t"]
-            d[f"ciudadela.cap.{n}.cartel1"] = c[lang + "_s"][0]
-            d[f"ciudadela.cap.{n}.cartel2"] = c[lang + "_s"][1]
-            d[f"ciudadela.cap.{n}.paginas"] = str(len(c[lang]))
+            d[f"darkcraft.cap.{n}.titulo"] = c[lang + "_t"]
+            d[f"darkcraft.cap.{n}.cartel1"] = c[lang + "_s"][0]
+            d[f"darkcraft.cap.{n}.cartel2"] = c[lang + "_s"][1]
+            d[f"darkcraft.cap.{n}.paginas"] = str(len(c[lang]))
             for i, page in enumerate(c[lang]):
-                d[f"ciudadela.cap.{n}.p{i+1}"] = page
+                d[f"darkcraft.cap.{n}.p{i+1}"] = page
         for k, v in PISTA[lang].items():
-            d[f"ciudadela.pista.{k}"] = v
+            d[f"darkcraft.pista.{k}"] = v
         for i, (en, es) in enumerate(NARRACION):
-            d[f"ciudadela.narracion.1.{i+1}"] = es if lang == "es" else en
+            d[f"darkcraft.narracion.1.{i+1}"] = es if lang == "es" else en
         for i, (en, es) in enumerate(REY):
-            d[f"ciudadela.rey.voz.{i+1}"] = es if lang == "es" else en
+            d[f"darkcraft.rey.voz.{i+1}"] = es if lang == "es" else en
         d.update(REY_UI[lang])
         d.update(LOGROS_UI[lang])
         out[lang] = d
+    # el resto de idiomas: lo que falte se queda en ingles (y se avisa)
+    for code, mod in otros_idiomas().items():
+        t = mod.T
+        d = dict(out["en"])
+        for n, (titulo, carteles, paginas) in t["cap"].items():
+            d[f"darkcraft.cap.{n}.titulo"] = titulo
+            d[f"darkcraft.cap.{n}.cartel1"] = carteles[0]
+            d[f"darkcraft.cap.{n}.cartel2"] = carteles[1]
+            d[f"darkcraft.cap.{n}.paginas"] = str(len(paginas))
+            for i, page in enumerate(paginas):
+                d[f"darkcraft.cap.{n}.p{i+1}"] = page
+        for k, v in t["pista"].items():
+            d[f"darkcraft.pista.{k}"] = v
+        for i, v in enumerate(t["narracion"]):
+            d[f"darkcraft.narracion.1.{i+1}"] = v
+        for i, v in enumerate(t["rey"]):
+            d[f"darkcraft.rey.voz.{i+1}"] = v
+        sobra = [k for k in t["ui"] if k not in out["en"]]
+        if sobra:
+            print(f"{code}: claves que no existen en ingles: {sobra}")
+        d.update(t["ui"])
+        faltan = [k for k in out["en"] if d[k] == out["en"][k] and k not in t["ui"] and not k.endswith(".paginas")
+                  and not k.startswith("darkcraft.cap.") and not k.startswith("darkcraft.pista.")
+                  and not k.startswith("darkcraft.narracion.") and not k.startswith("darkcraft.rey.voz.")]
+        if faltan:
+            print(f"{code}: {len(faltan)} textos sin traducir (salen en ingles): {faltan[:8]}")
+        out[code] = d
     return out
+
+
+# fichero de idioma de Minecraft de cada idioma
+FICHEROS = {"es": ["es_es.json"], "en": ["en_us.json"], "ja": ["ja_jp.json"], "fr": ["fr_fr.json"],
+            "de": ["de_de.json"], "pt": ["pt_br.json", "pt_pt.json"]}
 
 if __name__ == "__main__":
     good = check()
-    root = os.path.join(os.path.dirname(__file__), "..", "..", "src", "main", "resources", "assets", "ciudadela", "lang")
+    root = os.path.join(os.path.dirname(__file__), "..", "..", "src", "main", "resources", "assets", "darkcraft", "lang")
     data = build()
-    for lang, fname in (("es", "es_es.json"), ("en", "en_us.json")):
-        with open(os.path.join(root, fname), "w", encoding="utf-8") as f:
-            json.dump(data[lang], f, ensure_ascii=False, indent=2)
+    for lang, d in data.items():
+        for fname in FICHEROS.get(lang, [lang + ".json"]):
+            with open(os.path.join(root, fname), "w", encoding="utf-8") as f:
+                json.dump(d, f, ensure_ascii=False, indent=2)
     # texto para el narrador (lo usa ci/narracion/generar.sh)
     nar = os.path.join(os.path.dirname(__file__), "..", "narracion", "cap1.txt")
     os.makedirs(os.path.dirname(nar), exist_ok=True)
     with open(nar, "w", encoding="utf-8") as f:
         for (en, es), p in zip(NARRACION, PAUSAS):
             f.write(f"{en}|{p}\n")
-    # frases del Rey (las usa ci/rey/voces.py)
-    rv = os.path.join(os.path.dirname(__file__), "..", "rey", "frases.txt")
-    os.makedirs(os.path.dirname(rv), exist_ok=True)
-    with open(rv, "w", encoding="utf-8") as f:
-        for en, es in REY:
-            f.write(en + "\n")
     print("Paginas OK" if good else "HAY PAGINAS DEMASIADO LARGAS")
     sys.exit(0 if good else 1)

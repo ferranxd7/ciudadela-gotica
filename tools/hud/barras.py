@@ -10,7 +10,7 @@ import math, os, random, sys
 from PIL import Image
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-GUI = os.path.join(AQUI, "..", "..", "src", "main", "resources", "assets", "ciudadela", "textures", "gui")
+GUI = os.path.join(AQUI, "..", "..", "src", "main", "resources", "assets", "darkcraft", "textures", "gui")
 
 def hexc(s, a=255):
     s = s.lstrip("#")

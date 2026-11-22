@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:rey",
+  "display": {
+    "icon": {
+      "item": "minecraft:totem_of_undying"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.golpe_final.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.golpe_final.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 200
+  }
+}

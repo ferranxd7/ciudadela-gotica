@@ -1,16 +1,17 @@
-# Ciudadela Gótica (Forge 1.20.1)
+# Dark Craft (Forge 1.20.1)
 
-Una ciudadela gótica colosal sobre una isla flotante de 800 × 800 bloques que aparece de forma
+El Reino de Valdrenn: un reino maldito, con su gran castillo gótico, sobre una isla flotante de 800 × 800 bloques que aparece de forma
 natural (y rara) en el Overworld.
 
 ## Instalación
 1. Instala Forge 1.20.1 (47.x).
-2. Copia `ciudadela-x.y.z.jar` en la carpeta `mods`.
+2. Copia `darkcraft-x.y.z.jar` en la carpeta `mods`.
 3. **Crea un mundo nuevo**: el mod sube el límite de altura del Overworld hasta Y=703.
 
 ## Comandos (requieren trucos / operador)
-- `/ciudadela localizar` – te dice dónde está la ciudadela más cercana (con botón para teletransportarte).
-- `/ciudadela ir` – te lleva directamente a la ciudadela más cercana.
+- `/darkcraft localizar` – te dice dónde está el Reino de Valdrenn más cercano (con botón para teletransportarte).
+- `/darkcraft ir` – te lleva directamente al Reino de Valdrenn más cercano.
+- `/locate structure darkcraft:valdrenn` – también lo encuentra el comando normal del juego.
 
 ## Cómo llegar sin trucos
 Junto al borde sur de la isla hay una **torre de ascenso** que sube desde el suelo hasta la isla
@@ -27,8 +28,8 @@ con una escalera de caracol, y un puente que entra en la isla.
 - Espadas: los golpes llenan la barra de energía. **Shift + clic izquierdo**: Tajo Real.
   **Ctrl + clic izquierdo**: Juicio del Rey. **Clic derecho**: cubrirse con las espadas cruzadas.
 
-Comandos para probarlo (con trucos): `/ciudadela rey ir` (te lleva al salón del trono),
-`/ciudadela rey estado`, `/ciudadela rey reiniciar`, `/ciudadela rey fase 2` (o `3`), `/ciudadela rey matar`.
+Comandos para probarlo (con trucos): `/darkcraft rey ir` (te lleva al salón del trono),
+`/darkcraft rey estado`, `/darkcraft rey reiniciar`, `/darkcraft rey fase 2` (o `3`), `/darkcraft rey matar`.
 
 ## Fases
 1. ✅ Isla + castillo + generación en el mundo
@@ -38,7 +39,7 @@ Comandos para probarlo (con trucos): `/ciudadela rey ir` (te lleva al salón del
 
 ## Créditos de la música
 Toda la música tiene licencia libre y se descarga de OpenGameArt al compilar (los detalles completos
-van dentro del mod, en `assets/ciudadela/creditos.txt`):
+van dentro del mod, en `assets/darkcraft/creditos.txt`):
 - "Solemn (Opening)" de İlker Yalçıner (onemansymphony), CC-BY 4.0 — fondo de los cofres de la crónica.
 - "Darkness March" de Alexandr Zhelanov, CC-BY 4.0 — Corvin, fase 1.
 - "Dark souls type boss theme" de Philémon Weber (Helmet), CC-BY 4.0 — Corvin, fase 2.

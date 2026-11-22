@@ -41,7 +41,7 @@ jobs:
             piper
             narr_tmp/*.onnx
             narr_tmp/*.onnx.json
-          key: piper-${{ hashFiles('ci/narracion/voz.txt', 'ci/rey/voz.txt') }}
+          key: piper-${{ hashFiles('ci/narracion/voz.txt') }}
 
       - uses: actions/cache@v4
         with:
@@ -53,18 +53,19 @@ jobs:
       - name: Musica (licencias libres, con creditos)
         run: |
           mkdir -p out
-          python3 ci/musica/bajar.py musica_dl src/main/resources/assets/ciudadela/sounds out || echo "AVISO: musica" >> out/musica.log
-          for f in src/main/resources/assets/ciudadela/sounds/musica/*.ogg; do [ -f "$f" ] && cp "$f" "out/musica_$(basename "$f")"; done
+          python3 ci/musica/bajar.py musica_dl src/main/resources/assets/darkcraft/sounds out || echo "AVISO: musica" >> out/musica.log
+          for f in src/main/resources/assets/darkcraft/sounds/musica/*.ogg; do [ -f "$f" ] && cp "$f" "out/musica_$(basename "$f")"; done
           cat out/musica.log || true
 
-      - name: Textos de la historia y narracion del capitulo 1
+      - name: Textos, narracion del capitulo 1 y audios de ElevenLabs
         run: |
           mkdir -p out
           python3 ci/historia/textos.py > out/textos.log 2>&1 || echo "AVISO: revisar textos" >> out/textos.log
           bash ci/narracion/generar.sh 2>&1 | tee out/narracion.log || true
-          python3 ci/rey/voces.py 2>&1 | tee out/rey_voces.log || true
-          for f in src/main/resources/assets/ciudadela/sounds/rey/voz_*.ogg; do [ -f "$f" ] && cp "$f" "out/rey_$(basename "$f")"; done
-          cp src/main/resources/assets/ciudadela/sounds/narracion/cap1.ogg out/narracion_capitulo1.ogg 2>/dev/null || true
+          python3 ci/eleven/procesar.py 2>&1 | tee out/eleven_audios.log || true
+          for f in src/main/resources/assets/darkcraft/sounds/rey/voz_*.ogg; do [ -f "$f" ] && cp "$f" "out/rey_$(basename "$f")"; done
+          for f in src/main/resources/assets/darkcraft/sounds/sfx/*_1.ogg; do [ -f "$f" ] && cp "$f" "out/sfx_$(basename "$f")"; done
+          cp src/main/resources/assets/darkcraft/sounds/narracion/cap1.ogg out/narracion_capitulo1.ogg 2>/dev/null || true
 
       - name: Compilar el mod
         run: |
@@ -102,9 +103,9 @@ jobs:
         run: |
           python3 ci/download_mods.py srv/mods $MODS || true
           cp out/../srv/mods_descargados.txt out/ 2>/dev/null || cp srv/mods_descargados.txt out/ || true
-          cp build/libs/ciudadela-*.jar srv/mods/
-          python3 ci/make_mrpack.py srv/mrpack_files.json build/libs/ciudadela-0.1.0.jar out/Ciudadela-Gotica-modpack.mrpack "${FORGE#1.20.1-}" 
-          echo "-Xmx6G -Dciudadela.ciTest=true" > srv/user_jvm_args.txt
+          cp build/libs/darkcraft-*.jar srv/mods/
+          python3 ci/make_mrpack.py srv/mrpack_files.json build/libs/darkcraft-0.1.0.jar out/DarkCraft-modpack.mrpack "${FORGE#1.20.1-}" 
+          echo "-Xmx6G -Ddarkcraft.ciTest=true" > srv/user_jvm_args.txt
           (cd srv && timeout 50m ./run.sh nogui 2>&1 | tee ../out/server_mods.log) || true
           mkdir -p out/mods && cp -r srv/ci-out/* out/mods/ 2>/dev/null || true
           grep -nE "Error construyendo|Exception|\[CI\]" out/server_mods.log | head -300 > out/mods/errores.txt || true
@@ -114,7 +115,7 @@ jobs:
           mkdir -p srv2
           cp -r srv/libraries srv/run.sh srv/user_jvm_args.txt srv/eula.txt srv/server.properties srv2/ 2>/dev/null || true
           cp srv/*.jar srv2/ 2>/dev/null || true
-          mkdir -p srv2/mods && cp build/libs/ciudadela-*.jar srv2/mods/
+          mkdir -p srv2/mods && cp build/libs/darkcraft-*.jar srv2/mods/
           (cd srv2 && timeout 40m ./run.sh nogui 2>&1 | tee ../out/server_vanilla.log) || true
           mkdir -p out/vanilla && cp -r srv2/ci-out/* out/vanilla/ 2>/dev/null || true
           grep -nE "Error construyendo|Exception" out/server_vanilla.log | head -100 > out/vanilla/errores.txt || true
@@ -124,17 +125,17 @@ jobs:
         run: |
           sudo apt-get install -y -qq xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils python3-numpy python3-pil > /dev/null 2>&1 || true
           rm -rf run && mkdir -p run/saves run/config run/screenshots
-          if [ -d srv2/world ]; then cp -r srv2/world run/saves/ciudadela; else echo "sin mundo de la prueba del servidor"; fi
+          if [ -d srv2/world ]; then cp -r srv2/world run/saves/darkcraft; else echo "sin mundo de la prueba del servidor"; fi
           cp ci/cliente/options.txt run/options.txt
           printf 'earlyWindowControl = false\n' > run/config/fml.toml
           sed "s#@WAV@#$PWD/out/audio_cliente.wav#" ci/cliente/alsoft.conf > "$RUNNER_TEMP/alsoft.conf"
-          export ALSOFT_CONF="$RUNNER_TEMP/alsoft.conf" LIBGL_ALWAYS_SOFTWARE=1 CIUDADELA_CLIENTE=1
+          export ALSOFT_CONF="$RUNNER_TEMP/alsoft.conf" LIBGL_ALWAYS_SOFTWARE=1 DARKCRAFT_CLIENTE=1
           xvfb-run -a -s "-screen 0 1280x720x24" glxinfo -B > out/cliente_gl.txt 2>&1 || true
           timeout 28m xvfb-run -a -s "-screen 0 1280x720x24" gradle runClient --no-daemon > out/cliente.log 2>&1 || echo "cliente terminado con error $?" >> out/cliente.log
           cp run/ci-cliente/* out/ 2>/dev/null || true
           python3 ci/cliente/hoja.py run/screenshots out || true
           for f in run/screenshots/cliente_*.png; do [ -f "$f" ] && cp "$f" out/; done
-          python3 ci/cliente/audio.py out/audio_cliente.wav src/main/resources/assets/ciudadela/sounds out > out/audio_cliente.txt 2>&1 || true
+          python3 ci/cliente/audio.py out/audio_cliente.wav src/main/resources/assets/darkcraft/sounds out > out/audio_cliente.txt 2>&1 || true
           rm -f out/audio_cliente.wav
           grep -nE "\[CI cliente\]|Exception|ERROR|OpenAL|Sound" out/cliente.log | head -200 > out/cliente_resumen.txt || true
           tail -50 out/audio_cliente.txt || true
@@ -155,10 +156,12 @@ jobs:
           PUBLICAR: ${{ contains(github.event.head_commit.message, '[publicar]') && 'si' || 'no' }}
         run: |
           shopt -s nullglob
+          # el instalador antiguo baja ciudadela-0.1.0.jar: se sube tambien con ese nombre (es el mismo mod)
+          [ -f build/libs/darkcraft-0.1.0.jar ] && cp build/libs/darkcraft-0.1.0.jar out/ciudadela-0.1.0.jar
           files=()
-          for f in build/libs/*.jar build.log out/*.txt out/*.log out/*.png out/*.mrpack out/*.ogg; do [ -s "$f" ] && files+=("$f"); done
+          for f in build/libs/*.jar out/*.jar build.log out/*.txt out/*.log out/*.png out/*.mrpack out/*.ogg; do [ -s "$f" ] && files+=("$f"); done
           if ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null && [ "$PUBLICAR" = "si" ]; then
-            gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }}" --notes "Version automatica ${{ github.run_number }}" --latest
+            gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Dark Craft - Build ${{ github.run_number }}" --notes "Version automatica ${{ github.run_number }}" --latest
           elif ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null; then
             gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }} (en desarrollo)" --notes "Version de pruebas: no es la que se instala" --prerelease --latest=false
           else

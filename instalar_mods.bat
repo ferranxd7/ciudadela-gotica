@@ -1,8 +1,8 @@
 @echo off
 chcp 65001 >nul
-title Instalador de mods - Ciudadela Gotica
+title Instalador de mods - Dark Craft
 echo ==========================================================
-echo   Instalador de mods para la Ciudadela Gotica (Forge 1.20.1)
+echo   Instalador de mods para Dark Craft (Forge 1.20.1)
 echo ==========================================================
 echo.
 echo ANTES: en TLauncher instala y abre una vez la version "Forge 1.20.1".
@@ -53,11 +53,11 @@ echo [17/19] TerraBlender-forge-1.20.1-3.0.1.11.jar
 powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol='Tls12'; Invoke-WebRequest -UseBasicParsing -Uri 'https://cdn.modrinth.com/data/kkmrDlKT/versions/IfcgopfA/TerraBlender-forge-1.20.1-3.0.1.11.jar' -OutFile '%MODS%\TerraBlender-forge-1.20.1-3.0.1.11.jar'"
 echo [18/19] GlitchCore-forge-1.20.1-0.0.1.1.jar
 powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol='Tls12'; Invoke-WebRequest -UseBasicParsing -Uri 'https://cdn.modrinth.com/data/s3dmwKy5/versions/pYPZ5MNI/GlitchCore-forge-1.20.1-0.0.1.1.jar' -OutFile '%MODS%\GlitchCore-forge-1.20.1-0.0.1.1.jar'"
-echo [19/19] ciudadela-0.1.0.jar
-powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol='Tls12'; Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/ferranxd7/ciudadela-gotica/releases/latest/download/ciudadela-0.1.0.jar' -OutFile '%MODS%\ciudadela-0.1.0.jar'"
+echo [19/19] darkcraft-0.1.0.jar
+powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol='Tls12'; Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/ferranxd7/ciudadela-gotica/releases/latest/download/darkcraft-0.1.0.jar' -OutFile '%MODS%\darkcraft-0.1.0.jar'"
 echo.
 echo ==========================================================
 echo   LISTO. Abre TLauncher, elige "Forge 1.20.1" y juega.
-echo   Crea un MUNDO NUEVO y escribe /ciudadela ir
+echo   Crea un MUNDO NUEVO y escribe /darkcraft ir
 echo ==========================================================
 pause

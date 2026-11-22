@@ -7,7 +7,7 @@ import random
 
 from PIL import Image
 
-OUT = os.path.join(os.path.dirname(__file__), "..", "..", "src", "main", "resources", "assets", "ciudadela", "textures", "entity")
+OUT = os.path.join(os.path.dirname(__file__), "..", "..", "src", "main", "resources", "assets", "darkcraft", "textures", "entity")
 
 
 def clamp(v, a=0, b=255):

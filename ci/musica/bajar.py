@@ -96,7 +96,7 @@ def main():
     os.makedirs(salida, exist_ok=True)
     pistas = json.load(open(os.path.join(AQUI, "pistas.json"), encoding="utf-8"))
     info = {}
-    creditos = ["MÚSICA DE CIUDADELA GÓTICA", "",
+    creditos = ["MÚSICA DE DARK CRAFT", "",
                 "Todas las pistas tienen licencia libre. Se han pasado a OGG, se ha quitado el silencio",
                 "del principio y del final y se ha igualado el volumen (sin otros cambios).", ""]
     with open(os.path.join(salida, "musica.log"), "w", encoding="utf-8") as log:

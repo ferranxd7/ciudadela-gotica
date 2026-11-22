@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "axis=x": {"model": "darkcraft:block/rastrillo"},
+    "axis=z": {"model": "darkcraft:block/rastrillo", "y": 90}
+  }
+}

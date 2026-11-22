@@ -5,8 +5,8 @@ import array
 modelo, nombre = sys.argv[1], sys.argv[2]
 RATE = 0.92          # mas grave y mas lento (asetrate)
 LEAD = 0.3           # silencio inicial
-OGG = "src/main/resources/assets/ciudadela/sounds/narracion/cap1.ogg"
-JSN = "src/main/resources/assets/ciudadela/cinematica/cap1.json"
+OGG = "src/main/resources/assets/darkcraft/sounds/narracion/cap1.ogg"
+JSN = "src/main/resources/assets/darkcraft/cinematica/cap1.json"
 lineas = []
 with open("ci/narracion/cap1.txt", encoding="utf-8") as f:
     for l in f:

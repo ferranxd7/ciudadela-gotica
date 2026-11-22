@@ -1,6 +1,0 @@
-{
-  "variants": {
-    "axis=x": {"model": "ciudadela:block/rastrillo"},
-    "axis=z": {"model": "ciudadela:block/rastrillo", "y": 90}
-  }
-}

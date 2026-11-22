@@ -32,8 +32,8 @@ minecraft {
         client {
             property 'forge.enabledGameTestNamespaces', mod_id
             // Prueba automatica del cliente (solo en GitHub Actions): capturas y sonido grabado
-            if (System.getenv('CIUDADELA_CLIENTE') != null) {
-                property 'ciudadela.ciClient', 'true'
+            if (System.getenv('DARKCRAFT_CLIENTE') != null) {
+                property 'darkcraft.ciClient', 'true'
                 jvmArgs '-Xmx4G'
                 args '--width', '1280', '--height', '720'
             }
@@ -43,8 +43,8 @@ minecraft {
             args '--nogui'
             jvmArgs '-Xmx6G'
             // Modo de prueba automatica (solo se usa en GitHub Actions)
-            if (System.getenv('CIUDADELA_CI') != null) {
-                property 'ciudadela.ciTest', 'true'
+            if (System.getenv('DARKCRAFT_CI') != null) {
+                property 'darkcraft.ciTest', 'true'
             }
         }
     }

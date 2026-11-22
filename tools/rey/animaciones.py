@@ -641,7 +641,7 @@ def _java_anim(a):
 
 
 def write_java(path_client, path_common=None):
-    out = ["package com.ciudadela.client.rey;\n",
+    out = ["package com.darkcraft.client.rey;\n",
            "import net.minecraft.client.animation.AnimationChannel;",
            "import net.minecraft.client.animation.AnimationDefinition;",
            "import net.minecraft.client.animation.Keyframe;",
@@ -657,7 +657,7 @@ def write_java(path_client, path_common=None):
     with open(path_client, "w") as f:
         f.write("\n".join(out) + "\n")
     if path_common:
-        c = ["package com.ciudadela.rey;\n",
+        c = ["package com.darkcraft.rey;\n",
              "/** GENERADO por tools/rey/generar.py: numeros y duraciones (en ticks) de las animaciones del rey. */",
              "public final class ReyAnims {",
              "    private ReyAnims() {}\n"]

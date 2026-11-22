@@ -1,0 +1,11 @@
+{
+  "structures": [
+    {
+      "structure": "darkcraft:valdrenn",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "darkcraft:valdrenn_sitios"
+  }
+}

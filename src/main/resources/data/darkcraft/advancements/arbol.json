@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:capitulo4",
+  "display": {
+    "icon": {
+      "item": "darkcraft:llave_arbol"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.arbol.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.arbol.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 300
+  }
+}

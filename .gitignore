@@ -12,3 +12,9 @@ piper.tgz
 voces_out/
 musica_dl/
 javac.*.args
+# audios que se montan en la CI (ci/eleven/procesar.py, ci/narracion, ci/musica)
+src/main/resources/assets/darkcraft/sounds/rey/
+src/main/resources/assets/darkcraft/sounds/sfx/
+src/main/resources/assets/darkcraft/sounds/narracion/
+src/main/resources/assets/darkcraft/sounds/musica/
+src/main/resources/assets/darkcraft/rey_voces.json

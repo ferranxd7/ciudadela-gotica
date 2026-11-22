@@ -1,0 +1,358 @@
+{
+  "campana": {
+    "subtitle": "subtitles.darkcraft.campana",
+    "sounds": [
+      {
+        "name": "darkcraft:campana",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "narracion.cap1": {
+    "subtitle": "subtitles.darkcraft.narracion",
+    "sounds": [
+      {
+        "name": "darkcraft:narracion/cap1",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "musica.cofre": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/cofre",
+        "stream": true
+      }
+    ]
+  },
+  "musica.rey1": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/rey1",
+        "stream": true
+      }
+    ]
+  },
+  "musica.rey2": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/rey2",
+        "stream": true
+      }
+    ]
+  },
+  "musica.rey3": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/rey3",
+        "stream": true
+      }
+    ]
+  },
+  "rey.voz.1": {
+    "subtitle": "subtitles.darkcraft.rey.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rey/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.2": {
+    "subtitle": "subtitles.darkcraft.rey.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rey/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.3": {
+    "subtitle": "subtitles.darkcraft.rey.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rey/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.4": {
+    "subtitle": "subtitles.darkcraft.rey.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rey/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.5": {
+    "subtitle": "subtitles.darkcraft.rey.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rey/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.6": {
+    "subtitle": "subtitles.darkcraft.rey.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rey/voz_6",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.7": {
+    "subtitle": "subtitles.darkcraft.rey.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rey/voz_7",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.8": {
+    "subtitle": "subtitles.darkcraft.rey.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rey/voz_8",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.9": {
+    "subtitle": "subtitles.darkcraft.rey.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rey/voz_9",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.10": {
+    "subtitle": "subtitles.darkcraft.rey.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rey/voz_10",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.11": {
+    "subtitle": "subtitles.darkcraft.rey.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rey/voz_11",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.12": {
+    "subtitle": "subtitles.darkcraft.rey.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rey/voz_12",
+        "stream": false
+      }
+    ]
+  },
+  "rey.voz.13": {
+    "subtitle": "subtitles.darkcraft.rey.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rey/voz_13",
+        "stream": false
+      }
+    ]
+  },
+  "sfx.rey_tajo": {
+    "subtitle": "subtitles.darkcraft.sfx.rey_tajo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rey_tajo_1"
+      },
+      {
+        "name": "darkcraft:sfx/rey_tajo_2"
+      }
+    ]
+  },
+  "sfx.rey_tajo_fuego": {
+    "subtitle": "subtitles.darkcraft.sfx.rey_tajo_fuego",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rey_tajo_fuego_1"
+      },
+      {
+        "name": "darkcraft:sfx/rey_tajo_fuego_2"
+      }
+    ]
+  },
+  "sfx.rey_bola_fuego": {
+    "subtitle": "subtitles.darkcraft.sfx.rey_bola_fuego",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rey_bola_fuego_1"
+      },
+      {
+        "name": "darkcraft:sfx/rey_bola_fuego_2"
+      }
+    ]
+  },
+  "sfx.rey_explosion": {
+    "subtitle": "subtitles.darkcraft.sfx.rey_explosion",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rey_explosion_1"
+      },
+      {
+        "name": "darkcraft:sfx/rey_explosion_2"
+      }
+    ]
+  },
+  "sfx.rey_golpe_suelo": {
+    "subtitle": "subtitles.darkcraft.sfx.rey_golpe_suelo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rey_golpe_suelo_1"
+      },
+      {
+        "name": "darkcraft:sfx/rey_golpe_suelo_2"
+      }
+    ]
+  },
+  "sfx.rey_golpe_final": {
+    "subtitle": "subtitles.darkcraft.sfx.rey_golpe_final",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rey_golpe_final_1"
+      },
+      {
+        "name": "darkcraft:sfx/rey_golpe_final_2"
+      }
+    ]
+  },
+  "sfx.rey_rugido": {
+    "subtitle": "subtitles.darkcraft.sfx.rey_rugido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rey_rugido_1"
+      },
+      {
+        "name": "darkcraft:sfx/rey_rugido_2"
+      }
+    ]
+  },
+  "sfx.rey_geiser": {
+    "subtitle": "subtitles.darkcraft.sfx.rey_geiser",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rey_geiser_1"
+      },
+      {
+        "name": "darkcraft:sfx/rey_geiser_2"
+      }
+    ]
+  },
+  "sfx.rey_pilares": {
+    "subtitle": "subtitles.darkcraft.sfx.rey_pilares",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rey_pilares_1"
+      },
+      {
+        "name": "darkcraft:sfx/rey_pilares_2"
+      }
+    ]
+  },
+  "sfx.rey_carga": {
+    "subtitle": "subtitles.darkcraft.sfx.rey_carga",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rey_carga_1"
+      },
+      {
+        "name": "darkcraft:sfx/rey_carga_2"
+      }
+    ]
+  },
+  "sfx.cuenta_atras": {
+    "subtitle": "subtitles.darkcraft.sfx.cuenta_atras",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/cuenta_atras_1"
+      },
+      {
+        "name": "darkcraft:sfx/cuenta_atras_2"
+      }
+    ]
+  },
+  "sfx.circulo_dorado": {
+    "subtitle": "subtitles.darkcraft.sfx.circulo_dorado",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/circulo_dorado_1"
+      },
+      {
+        "name": "darkcraft:sfx/circulo_dorado_2"
+      }
+    ]
+  },
+  "sfx.puerta_runas": {
+    "subtitle": "subtitles.darkcraft.sfx.puerta_runas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/puerta_runas_1"
+      },
+      {
+        "name": "darkcraft:sfx/puerta_runas_2"
+      }
+    ]
+  },
+  "sfx.puerta_abre": {
+    "subtitle": "subtitles.darkcraft.sfx.puerta_abre",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/puerta_abre_1"
+      },
+      {
+        "name": "darkcraft:sfx/puerta_abre_2"
+      }
+    ]
+  },
+  "sfx.puerta_cierra": {
+    "subtitle": "subtitles.darkcraft.sfx.puerta_cierra",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/puerta_cierra_1"
+      },
+      {
+        "name": "darkcraft:sfx/puerta_cierra_2"
+      }
+    ]
+  },
+  "sfx.ascensor_mueve": {
+    "subtitle": "subtitles.darkcraft.sfx.ascensor_mueve",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ascensor_mueve_1"
+      },
+      {
+        "name": "darkcraft:sfx/ascensor_mueve_2"
+      }
+    ]
+  },
+  "sfx.ascensor_llega": {
+    "subtitle": "subtitles.darkcraft.sfx.ascensor_llega",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ascensor_llega_1"
+      },
+      {
+        "name": "darkcraft:sfx/ascensor_llega_2"
+      }
+    ]
+  }
+}

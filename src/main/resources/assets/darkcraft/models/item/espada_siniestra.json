@@ -1,0 +1,8 @@
+{
+  "parent": "item/handheld",
+  "textures": {"layer0": "darkcraft:item/espada_siniestra"},
+  "overrides": [
+    {"predicate": {"darkcraft:forma": 0.4}, "model": "darkcraft:item/espada_siniestra_fuego"},
+    {"predicate": {"darkcraft:forma": 0.9}, "model": "darkcraft:item/espada_siniestra_lava"}
+  ]
+}

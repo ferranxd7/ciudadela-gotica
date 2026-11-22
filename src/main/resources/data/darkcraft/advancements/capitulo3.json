@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:rey",
+  "display": {
+    "icon": {
+      "item": "minecraft:golden_helmet"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.capitulo3.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.capitulo3.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}
