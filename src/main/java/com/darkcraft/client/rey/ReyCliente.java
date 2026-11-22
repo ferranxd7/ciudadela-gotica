@@ -124,8 +124,8 @@ public final class ReyCliente {
                     disco(vc, m, a.x(), yy, a.z(), 0, a.a(), c, (0.38f + 0.12f * pulse) * after * sube);
                     disco(vc, m, a.x(), yy + 0.01f, a.z(), Math.max(0, a.a() - 0.45f), a.a() + 0.05f, c, (0.85f + 0.15f * pulse) * after * sube);
                     disco(vc, m, a.x(), yy + 0.01f, a.z(), a.a() * 0.55f, a.a() * 0.55f + 0.2f, c, 0.55f * after * sube);
-                    columna(vc, m, a.x(), yy, a.z(), a.a(), 16f * sube, c, (0.55f + 0.2f * pulse) * after);
-                    columna(vc, m, a.x(), yy, a.z(), a.a() * 0.35f, 22f * sube, new float[]{1f, 0.95f, 0.7f}, 0.35f * after);
+                    columna(vc, m, a.x(), yy, a.z(), a.a(), 12f * sube, c, (0.36f + 0.14f * pulse) * after);
+                    columna(vc, m, a.x(), yy, a.z(), a.a() * 0.35f, 18f * sube, new float[]{1f, 0.95f, 0.7f}, 0.22f * after);
                     break;
                 }
                 disco(vc, m, a.x(), y, a.z(), 0, a.a(), c, base);

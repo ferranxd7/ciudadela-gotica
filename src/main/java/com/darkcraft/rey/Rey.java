@@ -1037,7 +1037,7 @@ public class Rey extends Monster {
         List<Vec3> out = new ArrayList<>();
         LivingEntity a = o != null ? o : (vivos.isEmpty() ? null : vivos.get(0));
         Vec3 base = a != null ? a.position() : c;
-        out.add(cercaDe(base, c, null));
+        out.add(cercaDe(base, c, null, base));
         ServerPlayer otro = null;
         double lejos = 0;
         for (ServerPlayer p : vivos) {
@@ -1047,19 +1047,23 @@ public class Rey extends Monster {
                 otro = p;
             }
         }
-        if (otro != null) out.add(cercaDe(otro.position(), c, out.get(0)));
+        if (otro != null) out.add(cercaDe(otro.position(), c, out.get(0), otro.position()));
         else {
             Vec3 op = new Vec3(c.x - (out.get(0).x - c.x), 0, c.z - (out.get(0).z - c.z));
-            out.add(cercaDe(op, c, out.get(0)));
+            out.add(cercaDe(op, c, out.get(0), null));
         }
         return out;
     }
 
-    private Vec3 cercaDe(Vec3 p, Vec3 c, Vec3 evitar) {
+    /**
+     * Un sitio para un circulo cerca de p, dentro de la arena. Si hay jugador, el circulo no le pilla ya dentro: tiene
+     * que andar unos pasos (el centro a 7-10 bloques, el borde a 2-5), y llega de sobra en los 3 segundos.
+     */
+    private Vec3 cercaDe(Vec3 p, Vec3 c, Vec3 evitar, Vec3 jugador) {
         double maxR = (Volcan.es((ServerLevel) level()) ? Volcan.R : 20) - CIRCULO_R - 1.0;
         Vec3 best = null;
-        for (int i = 0; i < 24; i++) {
-            double ang = random.nextDouble() * Math.PI * 2, d = i < 16 ? 5 + random.nextDouble() * 3 : random.nextDouble() * 4;
+        for (int i = 0; i < 32; i++) {
+            double ang = random.nextDouble() * Math.PI * 2, d = i < 24 ? 7 + random.nextDouble() * 3 : random.nextDouble() * 4;
             double x = p.x + Math.cos(ang) * d, z = p.z + Math.sin(ang) * d;
             double dx = x - c.x, dz = z - c.z, r = Math.hypot(dx, dz);
             if (r > maxR) {
@@ -1069,6 +1073,10 @@ public class Rey extends Monster {
             // que no caiga justo debajo del Rey ni encima del otro circulo
             if (Math.hypot(x - getX(), z - getZ()) < CIRCULO_R + 2.5) continue;
             if (evitar != null && Math.hypot(x - evitar.x, z - evitar.z) < CIRCULO_R * 2.2) continue;
+            if (jugador != null && i < 24) {
+                double dj = Math.hypot(x - jugador.x, z - jugador.z);
+                if (dj < CIRCULO_R + 1.5 || dj > CIRCULO_R + 6) continue;
+            }
             best = new Vec3(x, 0, z);
             break;
         }
