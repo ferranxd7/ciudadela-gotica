@@ -169,6 +169,16 @@ public class PuertaArbol extends Entity {
         if (t > T_RUNAS && t < T_HOJAS && t % 2 == 0)
             sl.sendParticles(ParticleTypes.ENCHANT, x, y + 5, z + 2.5, 6, 2.2, 3.5, 0.6, 0.6);
         if (t == T_BARRERA) quitarBarrera(sl);
+        if (t == TOTAL - 4) {
+            // al acabar la cinematica: logro (con su fanfarria) para todos los que estan delante
+            int n = 0;
+            for (ServerPlayer p : sl.players())
+                if (p.distanceToSqr(this) < 48 * 48) {
+                    com.ciudadela.story.Logros.dar(p, com.ciudadela.story.Logros.ARBOL);
+                    n++;
+                }
+            CiudadelaMod.LOGGER.info("[Ciudadela] La puerta de la Sala del Arbol se ha abierto ({} jugadores delante)", n);
+        }
         if (t >= TOTAL) this.entityData.set(ESTADO, ABIERTA);
     }
 

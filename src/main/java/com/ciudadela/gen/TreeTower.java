@@ -263,7 +263,7 @@ public class TreeTower extends Element {
                     int k = (y - baseY) % 12;
                     BlockState st;
                     if (k == 11) st = Pal.GILDED;
-                    else if (esquina) st = k == 5 ? Pal.b(Blocks.SHROOMLIGHT) : Pal.PB_BRICKS;
+                    else if (esquina) st = (k == 5 || k == 2 || k == 8) ? Pal.b(Blocks.SHROOMLIGHT) : Pal.PB_BRICKS;
                     else st = Pal.b(Blocks.GLASS);
                     // entrada abajo, por el sur (mirando a la puerta de la torre)
                     if (y < baseY + 3 && dz - SHAFT_Z == 3 && Math.abs(dx) <= 1) st = Pal.AIR;
@@ -272,7 +272,7 @@ public class TreeTower extends Element {
                 }
                 // arriba: anillo de oro en el suelo de la recepcion y postes con farol en las esquinas
                 c.set(cx + dx, F - 1, cz + dz, Pal.GILDED);
-                if (esquina) {
+                if (esquina && dz - SHAFT_Z == 3) {
                     c.set(cx + dx, F, cz + dz, Pal.PB_CHISELED);
                     c.set(cx + dx, F + 1, cz + dz, Pal.b(Blocks.POLISHED_BLACKSTONE_WALL));
                     c.set(cx + dx, F + 2, cz + dz, Pal.SOUL_LANTERN);
@@ -337,6 +337,11 @@ public class TreeTower extends Element {
             int wx = cx + px + ox, wz = cz + pz + oz;
             Direction mira = Pal.dirOf(-ox, -oz);
             if (sup + 4 < F - 1) {
+                if (Math.abs(o) == 3) {
+                    BlockState l = ModDeco.wallLight(mira.getOpposite(), n);
+                    c.set(wx, sup + 2, wz, l != null ? l : Blocks.WALL_TORCH.defaultBlockState()
+                            .setValue(net.minecraft.world.level.block.WallTorchBlock.FACING, mira));
+                }
                 if (o == 0) cuadro(c, wx, sup + 2, wz, mira, n);
                 else if (Math.abs(o) == 5 && ((n / 15) & 1) == 0)
                     c.set(wx, sup + 3, wz, ((n / 30) % 2 == 0 ? Blocks.BLACK_WALL_BANNER : Blocks.RED_WALL_BANNER).defaultBlockState()
@@ -481,7 +486,12 @@ public class TreeTower extends Element {
         // barandilla del balcon (muro de piedra conectado, sin huecos en diagonal)
         for (int x = Math.max(cx - HALL_R, c.minX); x <= Math.min(cx + HALL_R, c.maxX); x++)
             for (int z = Math.max(cz - HALL_R, c.minZ); z <= Math.min(cz + HALL_R, c.maxZ); z++)
-                if (baranda(x - cx, z - cz)) c.set(x, F + BALCON + 1, z, barandaState(x - cx, z - cz));
+                if (baranda(x - cx, z - cz)) {
+                    BlockState st = barandaState(x - cx, z - cz);
+                    c.set(x, F + BALCON + 1, z, st);
+                    if (st.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.UP) && Hash.pct(x, 0, z, seed + 55) < 45)
+                        c.set(x, F + BALCON + 2, z, Pal.LANTERN);
+                }
         escalerasBalcon(c);
     }
 
@@ -606,7 +616,7 @@ public class TreeTower extends Element {
     // ------------------------------------------------------------ el arbol gigante de la sala y la recepcion en su tronco
 
     /** Centro de la fuente de la recepcion (relativo al centro). */
-    public static final int FUENTE_Z = -5;
+    public static final int FUENTE_Z = -6;
 
     /** Radio del tronco a la altura y: ancho hasta el techo de la recepcion, luego se estrecha hasta la copa. */
     private double trunkR(int x, int y, int z, double ang) {
@@ -648,7 +658,7 @@ public class TreeTower extends Element {
                         if (ry == 0 || ry == RECEP_H - 1) s = Pal.GILDED;
                         else if (aPil * d < 1.1) s = ry % 4 == 2 ? Pal.PB_CHISELED : Pal.BASALT;
                         else s = ry % 5 == 3 ? Pal.PB_BRICKS_CRACKED : Pal.PB_BRICKS;
-                    } else if (ry >= 1 && ry <= 37 && d > trunkR(x, y, z, ang) - 1.0 && Hash.pct(x, y, z, seed + 21) < 3) {
+                    } else if (ry >= 1 && ry <= 37 && d > trunkR(x, y, z, ang) - 1.0 && Hash.f(x, y, z, seed + 21) < 0.015) {
                         s = Pal.b(Blocks.SHROOMLIGHT);
                     } else {
                         s = bark(x, y, z, Direction.Axis.Y);
@@ -710,10 +720,10 @@ public class TreeTower extends Element {
                     c.set(x, F - 1, z, Pal.PB_BRICKS);
                 }
             }
+        // surtidor bajo (que no tape la puerta desde el ascensor): pedestal con taza de oro y el agua cayendo
         c.set(fx, F, fz, Pal.PB_CHISELED);
-        c.set(fx, F + 1, fz, Pal.PB_CHISELED);
-        c.set(fx, F + 2, fz, Pal.GILDED);
-        c.flowingWater(fx, F + 3, fz);
+        c.set(fx, F + 1, fz, Pal.GILDED);
+        c.flowingWater(fx, F + 2, fz);
         // lampara de arana encima de la fuente
         int techo = F + RECEP_H + vault(Math.abs(FUENTE_Z));
         for (int y = techo - 1; y > F + 8; y--) c.set(fx, y, fz, Pal.CHAIN);
@@ -731,11 +741,11 @@ public class TreeTower extends Element {
         for (int dx = -5; dx <= 5; dx++)
             for (int dz = -14; dz <= 0; dz++) {
                 int ax = Math.abs(dx);
-                boolean on = (ax <= 1 && dz >= -1) || ((ax == 4 || ax == 5) && dz <= -1 && dz >= -9) || (dz == -1 || dz == -9) || (ax <= 2 && dz <= -10);
+                boolean on = (ax <= 1 && dz >= -2) || ((ax == 4 || ax == 5) && dz <= -2 && dz >= -10) || (dz == -2 || dz == -10) || (ax <= 2 && dz <= -11);
                 if (!on) continue;
                 double df = Math.sqrt(dx * dx + (dz - FUENTE_Z) * (dz - FUENTE_Z));
                 if (df < 3.3) continue;
-                boolean borde = (dz <= -10 && ax == 2) || ((ax == 5) && dz <= -1 && dz >= -9);
+                boolean borde = (dz <= -11 && ax == 2) || ((ax == 5) && dz <= -2 && dz >= -10);
                 c.set(cx + dx, F, cz + dz, borde ? negra : roja);
             }
         // farolas a los lados de la alfombra
@@ -904,7 +914,7 @@ public class TreeTower extends Element {
                     double nx = (x - bx) / rad, ny = (y - by) / (rad * 0.6), nz = (z - bz) / rad;
                     double d = nx * nx + ny * ny + nz * nz + noise.value(x * 0.2, y * 0.2, z * 0.2) * 0.25;
                     if (d > 1 || !dentroSala(x, y, z) || !c.isAir(x, y, z)) continue;
-                    c.set(x, y, z, Hash.pct(x, y, z, seed + 33) < 4 ? Pal.b(Blocks.SHROOMLIGHT) : leaf(x, y, z));
+                    c.set(x, y, z, Hash.pct(x, y, z, seed + 33) < 7 ? Pal.b(Blocks.SHROOMLIGHT) : leaf(x, y, z));
                     low = Math.min(low, y);
                 }
                 if (low != Integer.MAX_VALUE && Hash.pct(x, 0, z, seed + 34) < 22) fondo.add(new int[]{x, low, z});
@@ -1006,6 +1016,45 @@ public class TreeTower extends Element {
                     c.set(x + d.getStepX(), bottom, z + d.getStepZ(), Pal.LANTERN_HANG);
                 }
             }
+        }
+        // farolas por el suelo de la sala (entre las raices y los braseros)
+        for (int k = 0; k < 12; k++) {
+            double a = Math.toRadians(15 + 30 * k);
+            if (alNorte(a) < 0.3) continue;
+            int x = cx + (int) Math.round(Math.cos(a) * 25.5), z = cz + (int) Math.round(Math.sin(a) * 25.5);
+            c.set(x, F, z, Pal.PB_CHISELED);
+            c.set(x, F + 1, z, Pal.b(Blocks.POLISHED_BLACKSTONE_WALL));
+            c.set(x, F + 2, z, Pal.b(Blocks.POLISHED_BLACKSTONE_WALL));
+            c.set(x, F + 3, z, Pal.LANTERN);
+        }
+        // apliques en todas las pilastras, debajo y encima del balcon
+        for (int k = 0; k < 20; k++) {
+            double a = k * Math.PI / 10;
+            for (double rr = HALL_R - 3.5; rr <= HALL_R - 1; rr += 0.25) {
+                int x = cx + (int) Math.round(Math.cos(a) * rr), z = cz + (int) Math.round(Math.sin(a) * rr);
+                Direction mira = Pal.dirOf(cx - x, cz - z);
+                int bx = x - mira.getStepX(), bz = z - mira.getStepZ();
+                double db = Math.sqrt((bx - cx) * (bx - cx) + (bz - cz) * (bz - cz));
+                if (db <= HALL_R + 0.5 - 2) continue;
+                for (int alto : new int[]{5, 17}) {
+                    if (alto == 17 && !sectorBalcon(a)) continue;
+                    if (!c.isAir(x, F + alto, z)) continue;
+                    BlockState l = ModDeco.wallLight(mira.getOpposite(), k + alto);
+                    c.set(x, F + alto, z, l != null ? l : Blocks.WALL_TORCH.defaultBlockState()
+                            .setValue(net.minecraft.world.level.block.WallTorchBlock.FACING, mira));
+                }
+                break;
+            }
+        }
+        // faroles colgando de la cupula por encima del balcon
+        for (int k = 0; k < 16; k++) {
+            double a = Math.toRadians(11.25 + 22.5 * k);
+            if (!sectorBalcon(a)) continue;
+            int x = cx + (int) Math.round(Math.cos(a) * 33), z = cz + (int) Math.round(Math.sin(a) * 33);
+            int ceil = ceiling(Math.sqrt((x - cx) * (x - cx) + (z - cz) * (z - cz)));
+            int bottom = F + BALCON + 7;
+            for (int y = ceil - 1; y > bottom; y--) c.set(x, y, z, Pal.CHAIN);
+            c.set(x, bottom, z, Pal.LANTERN_HANG);
         }
         // raices del arbol por el suelo (en relieve cerca del tronco, a ras mas lejos)
         Rng r = new Rng(seed + 81);

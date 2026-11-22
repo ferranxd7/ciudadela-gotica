@@ -8,8 +8,6 @@ import com.ciudadela.gen.TreeTower;
 import com.ciudadela.net.Net;
 import com.ciudadela.rey.ReyEstado;
 import com.ciudadela.rey.Sello;
-import com.ciudadela.rey.Victoria;
-import com.ciudadela.story.Logros;
 import com.ciudadela.story.Story;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -109,10 +107,7 @@ public final class TorreArbol {
         Net.Llave m = new Net.Llave(k[0], k[1], k[2], 70);
         for (ServerPlayer p : sl.players()) if (p.distanceToSqr(k[0], k[1], k[2]) < 60 * 60) Net.to(p, m);
         Cinematics.playShots(sp, Cinematics.SELLO, planos(d), 8.4f);
-        Victoria.despues(PuertaArbol.TOTAL - 4, () -> {
-            for (ServerPlayer p : sl.players())
-                if (p.distanceToSqr(d.getX(), d.getY(), d.getZ()) < 48 * 48) Logros.dar(p, Logros.ARBOL);
-        });
+        // el logro lo da la propia puerta al terminar de abrirse (PuertaArbol.tick)
         CiudadelaMod.LOGGER.info("[Ciudadela] {} abre la puerta de la Sala del Arbol en {}", sp.getGameProfile().getName(), d.blockPosition());
     }
 
@@ -130,6 +125,72 @@ public final class TorreArbol {
                 new double[]{x, y + 2.4, z + 11.5, x, y + 2.8, z + 7.0, x, y + 3.3, z + 2.5},
                 new double[]{x, y + 4.6, z - 8, x, y + 4.6, z - 16, x, y + 4.2, z - 22});
         return List.of(a, b, c);
+    }
+
+    // ------------------------------------------------------------------ comandos de prueba: /ciudadela arbol ...
+
+    @SubscribeEvent
+    public static void onCommands(net.minecraftforge.event.RegisterCommandsEvent event) {
+        event.getDispatcher().register(net.minecraft.commands.Commands.literal("ciudadela").requires(s -> s.hasPermission(2))
+                .then(net.minecraft.commands.Commands.literal("arbol")
+                        .then(net.minecraft.commands.Commands.literal("ir").executes(c -> ir(c.getSource(), false)))
+                        .then(net.minecraft.commands.Commands.literal("arriba").executes(c -> ir(c.getSource(), true)))
+                        .then(net.minecraft.commands.Commands.literal("llave").executes(c -> llave(c.getSource())))
+                        .then(net.minecraft.commands.Commands.literal("cerrar").executes(c -> cerrar(c.getSource())))));
+    }
+
+    private static int[] torreDe(net.minecraft.commands.CommandSourceStack src) {
+        ServerLevel ow = src.getServer().overworld();
+        var p = src.getPosition();
+        CastlePlan plan = Story.planNear(ow, (int) p.x, (int) p.z);
+        if (plan == null) {
+            int[] s = com.ciudadela.world.CastleSites.nearest(ow.getSeed(), (int) p.x, (int) p.z, 3);
+            if (s == null) return null;
+            plan = com.ciudadela.world.PlanCache.get(ow.getSeed(), s[0], s[1], (x, z) -> 64);
+        }
+        return plan == null ? null : plan.treeHall();
+    }
+
+    /** Abajo de la torre (delante del disco) o arriba, en la recepcion mirando a la puerta. */
+    private static int ir(net.minecraft.commands.CommandSourceStack src, boolean arriba) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        ServerPlayer p = src.getPlayerOrException();
+        int[] h = torreDe(src);
+        if (h == null) {
+            src.sendFailure(Component.literal("No hay ninguna ciudadela cerca"));
+            return 0;
+        }
+        ServerLevel ow = src.getServer().overworld();
+        if (arriba) p.teleportTo(ow, h[0] + 0.5, h[2], h[1] - 2.5, 180f, 0f);
+        else p.teleportTo(ow, h[0] + 0.5, h[4], h[1] + 10.5, 180f, 0f);
+        return 1;
+    }
+
+    private static int llave(net.minecraft.commands.CommandSourceStack src) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        ServerPlayer p = src.getPlayerOrException();
+        p.getInventory().add(new ItemStack(CiudadelaMod.LLAVE_ARBOL.get()));
+        return 1;
+    }
+
+    /** Vuelve a cerrar la puerta (para probar otra vez la llave). */
+    private static int cerrar(net.minecraft.commands.CommandSourceStack src) {
+        ServerLevel ow = src.getServer().overworld();
+        var pos = src.getPosition();
+        CastlePlan plan = Story.planNear(ow, (int) pos.x, (int) pos.z);
+        if (plan == null || plan.treeHall() == null) {
+            src.sendFailure(Component.literal("No hay ninguna ciudadela cerca"));
+            return 0;
+        }
+        int[] h = plan.treeHall();
+        ReyEstado.get(src.getServer()).cerrarSello(Sello.key(plan));
+        PuertaArbol d = puerta(ow, h);
+        if (d != null) d.discard();
+        for (int dx = -3; dx <= 3; dx++)
+            for (int dy = 0; dy < 10; dy++) {
+                BlockPos b = new BlockPos(h[0] + dx, h[2] + dy, h[1] - 15);
+                if (ow.getBlockState(b).isAir()) ow.setBlock(b, net.minecraft.world.level.block.Blocks.BARRIER.defaultBlockState(), 3);
+            }
+        src.sendSuccess(() -> Component.literal("La puerta de la Sala del Arbol vuelve a estar cerrada"), true);
+        return 1;
     }
 
     // ------------------------------------------------------------------ no bajarse a medio viaje

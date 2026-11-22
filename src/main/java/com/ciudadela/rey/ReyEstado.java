@@ -91,6 +91,12 @@ public final class ReyEstado extends SavedData {
         setDirty();
     }
 
+    /** Para el comando de pruebas: la puerta de la Sala del Arbol vuelve a estar cerrada. */
+    public void cerrarSello(String key) {
+        sellosAbiertos.remove(key);
+        setDirty();
+    }
+
     /** Para el comando de pruebas: todo como nuevo. */
     public void olvidar(String key) {
         estado.remove(key);

@@ -90,7 +90,9 @@ public class ReyProyectil extends Projectile {
     public void preparar(int tipo, Vec3 v, float dano, int fase) {
         this.entityData.set(TIPO, tipo);
         this.entityData.set(FASE, fase);
-        this.entityData.set(GIRO, 20f + (random.nextFloat() - 0.5f) * (fase == 0 ? 70f : 30f));
+        // tajo en diagonal, a un lado o al otro
+        float g = 18f + random.nextFloat() * (fase == 0 ? 40f : 32f);
+        this.entityData.set(GIRO, random.nextBoolean() ? g : -g);
         this.dano = dano;
         setDeltaMovement(v);
         float yaw = (float) (Mth.atan2(v.z, v.x) * Mth.RAD_TO_DEG) - 90f;
@@ -194,12 +196,21 @@ public class ReyProyectil extends Projectile {
         vida = 0;
     }
 
+    /**
+     * Punto del arco en coordenadas de la media luna (x a un lado, y arriba, z hacia donde va), antes de girarla:
+     * el arco esta de cara al viaje (curvado hacia arriba) y su centro va un poco por delante de las puntas.
+     */
+    public static double[] arcoLocal(double u, double rad) {
+        double a = Math.toRadians(u * ARCO);
+        double ly = rad * Math.cos(a) - 0.55 * RADIO;
+        return new double[]{rad * Math.sin(a), ly - 0.15, ly * 0.4};
+    }
+
     /** Punto del arco de la media luna en el mundo: u de -1 a 1 (de punta a punta), r de 0 a 1 hacia dentro. */
     public Vec3 puntoArco(double u, double r) {
-        double a = Math.toRadians(u * ARCO), rad = RADIO * (1 - 0.25 * r);
-        double lx = rad * Math.sin(a), lz = rad * Math.cos(a) - 0.55 * RADIO;
+        double[] q = arcoLocal(u, RADIO * (1 - 0.25 * r));
         double roll = Math.toRadians(giro());
-        double x = lx * Math.cos(roll), y = lx * Math.sin(roll), z = lz;
+        double x = q[0] * Math.cos(roll) - q[1] * Math.sin(roll), y = q[0] * Math.sin(roll) + q[1] * Math.cos(roll), z = q[2];
         double th = Math.toRadians(-getYRot());
         double wx = x * Math.cos(th) + z * Math.sin(th), wz = -x * Math.sin(th) + z * Math.cos(th);
         return new Vec3(getX() + wx, getY() + y, getZ() + wz);

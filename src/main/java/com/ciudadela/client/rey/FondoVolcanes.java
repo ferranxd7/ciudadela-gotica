@@ -177,15 +177,28 @@ public final class FondoVolcanes {
         bb.vertex(m, p[0], p[1], p[2]).color(p[3], p[4], p[5], a).endVertex();
     }
 
-    /** Cuadrado mirando hacia el centro (la camara), con su lado "derecho" perpendicular a la direccion del volcan. */
+    /**
+     * Mancha redonda y suave mirando hacia el centro (la camara): opaca en el centro y transparente en el borde,
+     * con el color de arriba (cr..) y el de abajo (cr2..) mezclados por la altura.
+     */
     private static void bill(BufferBuilder bb, Matrix4f m, double ang, double x, double y, double z, double r,
                              float cr, float cg, float cb, float ca, float cr2, float cg2, float cb2, float ca2) {
-        float rx = (float) (-Math.sin(ang) * r), rz = (float) (Math.cos(ang) * r), up = (float) r;
+        float rx = (float) (-Math.sin(ang)), rz = (float) (Math.cos(ang));
         float fx = (float) x, fy = (float) y, fz = (float) z;
-        bb.vertex(m, fx - rx, fy - up, fz - rz).color(cr2, cg2, cb2, ca2).endVertex();
-        bb.vertex(m, fx + rx, fy - up, fz + rz).color(cr2, cg2, cb2, ca2).endVertex();
-        bb.vertex(m, fx + rx, fy + up, fz + rz).color(cr, cg, cb, ca).endVertex();
-        bb.vertex(m, fx - rx, fy + up, fz - rz).color(cr, cg, cb, ca).endVertex();
+        float a0 = Math.max(ca, ca2);
+        if (a0 <= 0.003f) return;
+        float mr = (cr + cr2) / 2, mg = (cg + cg2) / 2, mb = (cb + cb2) / 2;
+        int n = r > 2 ? 14 : 8;
+        for (int i = 0; i < n; i++) {
+            double t0 = i * Math.PI * 2 / n, t1 = (i + 1) * Math.PI * 2 / n;
+            float s0 = (float) Math.sin(t0), s1 = (float) Math.sin(t1);
+            float h0 = (float) (Math.cos(t0) * r), h1 = (float) (Math.cos(t1) * r), v0 = (float) (s0 * r), v1 = (float) (s1 * r);
+            float k0 = (s0 + 1) / 2, k1 = (s1 + 1) / 2;
+            bb.vertex(m, fx, fy, fz).color(mr, mg, mb, a0).endVertex();
+            bb.vertex(m, fx, fy, fz).color(mr, mg, mb, a0).endVertex();
+            bb.vertex(m, fx + rx * h1, fy + v1, fz + rz * h1).color(cr2 + (cr - cr2) * k1, cg2 + (cg - cg2) * k1, cb2 + (cb - cb2) * k1, 0f).endVertex();
+            bb.vertex(m, fx + rx * h0, fy + v0, fz + rz * h0).color(cr2 + (cr - cr2) * k0, cg2 + (cg - cg2) * k0, cb2 + (cb - cb2) * k0, 0f).endVertex();
+        }
     }
 
     private static double[] crater(float[] L) {
@@ -203,8 +216,8 @@ public final class FondoVolcanes {
             double y = c[2] + f * L[2] * S * 0.9;
             double deriva = f * f * L[3] * S * 0.5;
             double x = c[1] + Math.cos(c[0] + 1.3) * deriva, z = c[3] + Math.sin(c[0] + 1.3) * deriva;
-            double r = L[3] * S * (0.12 + f * 0.45);
-            float a = (float) (Math.sin(f * Math.PI) * 0.6);
+            double r = L[3] * S * (0.17 + f * 0.62);
+            float a = (float) (Math.sin(f * Math.PI) * 0.72);
             float lit = (float) Math.max(0, 1 - f * 3);
             bill(bb, m, c[0], x, y, z, r, 0.1f + 0.25f * lit, 0.08f + 0.06f * lit, 0.08f, a,
                     0.14f + 0.5f * lit, 0.09f + 0.12f * lit, 0.07f, a);

@@ -258,6 +258,7 @@ public final class ClientCiTest {
                 {1, -1, com.ciudadela.rey.ReyProyectil.TAJO, false, "proy_tajo_plata", 0f},
                 {2, -1, com.ciudadela.rey.ReyProyectil.TAJO, false, "proy_tajo_fuego", 0f},
                 {3, -1, com.ciudadela.rey.ReyProyectil.TAJO, false, "proy_tajo_lava", 0f},
+                {2, -1, com.ciudadela.rey.ReyProyectil.TAJO, false, "proy_tajo_lado", 0f},
                 {2, -1, com.ciudadela.rey.ReyProyectil.BOLA, false, "proy_bola", 0f},
                 {3, -1, com.ciudadela.rey.ReyProyectil.BOLA, false, "proy_bola_lava", 0f},
         };
@@ -342,7 +343,7 @@ public final class ClientCiTest {
                 if (escK < fr.length) {
                     int when = Math.round((anim > 0 ? len * fr[escK] : len) * 20);
                     if (ticks - escDesde >= when) {
-                        shot(mc, String.format("esc_%02d_%s_%d", escN++, name, Math.round(fr[escK] * 100)));
+                        shot(mc, String.format("esc_%03d_%s_%d", escN++, name, Math.round(fr[escK] * 100)));
                         escK++;
                     }
                 } else {
@@ -361,15 +362,19 @@ public final class ClientCiTest {
         switch (escEstado) {
             case 0 -> {
                 mc.options.hideGui = true;
-                verDesde(mc, new Vec3(ex + 0.5, ey + 4.6, ez + 6.2), new Vec3(ex, ey + 1.1, ez));
+                // los tajos vienen de frente (como los ve quien los recibe); las bolas y "lado" cruzan de lado
+                boolean frente = tipo == com.ciudadela.rey.ReyProyectil.TAJO && !name.contains("lado");
+                if (frente) verDesde(mc, new Vec3(ex + 1.3, ey + 2.3, ez + 4.6), new Vec3(ex, ey + 1.3, ez - 2.5));
+                else verDesde(mc, new Vec3(ex + 0.5, ey + 4.6, ez + 6.2), new Vec3(ex, ey + 1.1, ez));
                 proyId = -1;
                 server(mc, sp -> {
                     if (modelo != null) modelo.moveTo(ex, ey - 40, ez, 0f, 0f);
                     ServerLevel lvl = sp.serverLevel();
                     com.ciudadela.rey.ReyProyectil pr = new com.ciudadela.rey.ReyProyectil(CiudadelaMod.REY_PROYECTIL.get(), lvl);
-                    double v = tipo == com.ciudadela.rey.ReyProyectil.TAJO ? 0.26 : 0.16;
-                    pr.moveTo(ex - 4.2, ey + 1.2, ez);
-                    pr.preparar(tipo, new Vec3(v, 0, 0), 0f, fase);
+                    double v = tipo == com.ciudadela.rey.ReyProyectil.TAJO ? (frente ? 0.22 : 0.26) : 0.16;
+                    if (frente) pr.moveTo(ex, ey + 1.3, ez - 6.5);
+                    else pr.moveTo(ex - 4.2, ey + 1.2, ez);
+                    pr.preparar(tipo, frente ? new Vec3(0, 0, v) : new Vec3(v, 0, 0), 0f, fase);
                     lvl.addFreshEntity(pr);
                     proyId = pr.getId();
                 });
@@ -391,7 +396,7 @@ public final class ClientCiTest {
             default -> {
                 if (escK < when.length) {
                     if (ticks - escDesde >= when[escK]) {
-                        shot(mc, String.format("esc_%02d_%s_%d", escN++, name, when[escK]));
+                        shot(mc, String.format("esc_%03d_%s_%d", escN++, name, when[escK]));
                         escK++;
                     }
                 } else if (ticks - escDesde > when[when.length - 1] + 30) {
@@ -818,7 +823,7 @@ public final class ClientCiTest {
         atTicks(S + 450, "Captura: la recepcion", m -> shot(m, "cliente_74_recepcion"));
         atTicks(S + 460, "A la puerta con la llave", m -> server(m, sp -> {
             sp.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(CiudadelaMod.LLAVE_ARBOL.get()));
-            sp.teleportTo(sp.serverLevel(), hall[0] + 0.5, hall[2], hall[1] - 10.5, 180f, -6f);
+            sp.teleportTo(sp.serverLevel(), hall[0] + 0.5, hall[2] + 0.1, hall[1] - 10.5, 180f, -6f);
         }));
         atTicks(S + 490, "Usar la llave en la puerta", m -> {
             m.options.hideGui = false;
@@ -844,8 +849,8 @@ public final class ClientCiTest {
             verDesde(m, new Vec3(hall[0] + 0.5, hall[2] + 3.2, hall[1] - 9.0), new Vec3(hall[0] + 0.5, hall[2] + 6, hall[1] - 38));
         });
         atTicks(S + 490 + 196, "captura", m -> shot(m, "cliente_80_sala_arbol"));
-        atTicks(S + 490 + 200, "Desde el balcon", m -> verDesde(m, new Vec3(hall[0] + 35.5, hall[2] + 15.2, hall[1] + 14.5),
-                new Vec3(hall[0], hall[2] + 14, hall[1] - 4)));
+        atTicks(S + 490 + 200, "Desde el balcon", m -> verDesde(m, new Vec3(hall[0] + 32.0, hall[2] + 15.4, hall[1] + 13.0),
+                new Vec3(hall[0] - 6, hall[2] + 12, hall[1] - 8)));
         atTicks(S + 490 + 206, "captura", m -> shot(m, "cliente_97_balcon"));
         atTicks(S + 490 + 210, "Hacia el trono", m -> verDesde(m, new Vec3(hall[0] + 9.5, hall[2] + 5, hall[1] - 19),
                 new Vec3(hall[0] + 0.5, hall[2] + 10, hall[1] - 40)));

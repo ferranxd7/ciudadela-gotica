@@ -77,10 +77,14 @@ public class ProyectilRenderer extends EntityRenderer<ReyProyectil> {
         return 0.42f * (float) Math.pow(Math.max(0f, k), 0.7);
     }
 
-    /** Punto del arco (plano horizontal local) a la distancia rad del centro, en la posicion u (-1..1). */
-    private static float[] p(float u, float rad, float y) {
-        double a = Math.toRadians(u * ReyProyectil.ARCO);
-        return new float[]{(float) (rad * Math.sin(a)), y, (float) (rad * Math.cos(a) - 0.55 * ReyProyectil.RADIO)};
+    /**
+     * Punto del arco a la distancia rad del centro, en la posicion u (-1..1). La media luna mira hacia donde va
+     * (quien la recibe ve el arco entero) y el centro del arco va un poco por delante de las puntas; h la
+     * engorda en la direccion del viaje (para que de lado tambien se vea).
+     */
+    private static float[] p(float u, float rad, float h) {
+        double[] q = ReyProyectil.arcoLocal(u, rad);
+        return new float[]{(float) q[0], (float) q[1], (float) (q[2] + h)};
     }
 
     private static void v(VertexConsumer vc, Matrix4f m, float[] p, float r, float g, float b, float a) {
@@ -114,7 +118,7 @@ public class ProyectilRenderer extends EntityRenderer<ReyProyectil> {
             v(vc, m, b1, c[0], c[1], c[2], ab[k + 1] * a);
             v(vc, m, a1, c[0], c[1], c[2], ab[k] * a);
         }
-        // cinta vertical (se ve aunque la media luna quede de canto)
+        // cinta a lo largo del viaje (se ve aunque la media luna quede de canto)
         float[][] hv = {{-h0 * 1.6f, 0f, h0 * 1.6f}, {-h1 * 1.6f, 0f, h1 * 1.6f}};
         float[] av = {0f, 0.75f, 0f};
         for (int k = 0; k < 2; k++) {

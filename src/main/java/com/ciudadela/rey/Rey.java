@@ -1383,7 +1383,8 @@ public class Rey extends Monster {
             sonido(sl, SoundEvents.RAVAGER_ROAR, 3f, 0.35f);
             sonido(sl, SoundEvents.GENERIC_EXPLODE, 3f, 0.4f);
             golpeSuelo(sl, c, 5f);
-            for (int r = 1; r <= 6; r++) anillo(sl, ParticleTypes.LAVA, r * 2.0, c.y + 0.3, 10 + r * 6);
+            // anillos cortos: la camara esta a 7 bloques y una gota de lava pegada a ella se ve como un cuadrado
+            for (int r = 1; r <= 3; r++) anillo(sl, ParticleTypes.LAVA, r * 1.7, c.y + 0.3, 10 + r * 6);
         } else if (t > 214 && t < 244 && t % 3 == 0) {
             lejos(sl, ParticleTypes.LAVA, getX(), getY() + 3, getZ(), 4, 1.2, 2.0, 1.2, 0.05);
             lejos(sl, ParticleTypes.FLAME, getX(), getY() + 3, getZ(), 8, 1.4, 2.4, 1.4, 0.04);

@@ -660,7 +660,8 @@ public final class ClientCine {
         float sc = 0.75f;
         int tw = font.width(s);
         pose.pushPose();
-        pose.translate(w - 8 - tw * sc, h - bh / 2f - 5, 0);
+        // arriba a la derecha, en la franja negra de arriba (la de abajo es para los subtitulos)
+        pose.translate(w - 8 - tw * sc, bh / 2f - 5, 0);
         pose.scale(sc, sc, 1);
         g.drawString(font, s, 0, 0, argb(a, 200, 190, 180), false);
         if (skipHold > 0) {

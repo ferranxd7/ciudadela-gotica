@@ -41,23 +41,29 @@ public class PuertaArbolRenderer extends EntityRenderer<PuertaArbol> {
         int light = LevelRenderer.getLightColor(e.level(), delante);
         float ang = e.abertura(pt) * 88f;
         float br = e.brillo(pt);
+        // primero toda la madera y el hierro, luego el brillo: cada getBuffer de otro tipo cierra el anterior
         VertexConsumer vc = buf.getBuffer(RenderType.entityCutoutNoCull(TEX));
-        VertexConsumer gl = br > 0.01f ? buf.getBuffer(RenderType.eyes(GLOW)) : null;
+        dosHojas(e, pt, ps, vc, null, 0f, ang, light);
+        if (br > 0.01f) dosHojas(e, pt, ps, null, buf.getBuffer(RenderType.eyes(GLOW)), br, ang, light);
+        super.render(e, yaw, pt, ps, buf, light0);
+    }
+
+    /** Las dos hojas (con vc la madera y los cerrojos; con gl solo el brillo de la cara de la recepcion). */
+    private static void dosHojas(PuertaArbol e, float pt, PoseStack ps, VertexConsumer vc, VertexConsumer gl, float br, float ang, int light) {
         // hoja izquierda (oeste): bisagra en x = -3,5 + B; se extiende hacia +x
         ps.pushPose();
         ps.translate(-L + B, 0, 0);
         ps.mulPose(Axis.YP.rotationDegrees(ang));
         hoja(ps, vc, gl, br, -B, L - B, 0f, 56f, 224f, 168f, light);
-        for (int i = 0; i < 3; i++) cerrojo(ps, vc, i, e.cerrojo(i, pt), L - B, light);
+        if (vc != null) for (int i = 0; i < 3; i++) cerrojo(ps, vc, i, e.cerrojo(i, pt), L - B, light);
         ps.popPose();
         // hoja derecha (este): bisagra en x = +3,5 - B; se extiende hacia -x
         ps.pushPose();
         ps.translate(L - B, 0, 0);
         ps.mulPose(Axis.YP.rotationDegrees(-ang));
         hoja(ps, vc, gl, br, -(L - B), B, 56f, 112f, 168f, 112f, light);
-        for (int i = 0; i < 3; i++) pestillo(ps, vc, i, -(L - B), light);
+        if (vc != null) for (int i = 0; i < 3; i++) pestillo(ps, vc, i, -(L - B), light);
         ps.popPose();
-        super.render(e, yaw, pt, ps, buf, light0);
     }
 
     /**
@@ -68,11 +74,13 @@ public class PuertaArbolRenderer extends EntityRenderer<PuertaArbol> {
                              float uf0, float uf1, float ub0, float ub1, int light) {
         Matrix4f m = ps.last().pose();
         Matrix3f n = ps.last().normal();
-        // delante (recepcion)
-        quad(vc, m, n, x0, 0, G, x1, 0, G, x1, H, G, x0, H, G, uf0, 160, uf1, 160, uf1, 0, uf0, 0, light, 1f, 0, 0, 1);
-        if (gl != null)
+        if (gl != null) {
             quad(gl, m, n, x0, 0, G + 0.004f, x1, 0, G + 0.004f, x1, H, G + 0.004f, x0, H, G + 0.004f,
                     uf0, 160, uf1, 160, uf1, 0, uf0, 0, LightTexture.FULL_BRIGHT, br, 0, 0, 1);
+            return;
+        }
+        // delante (recepcion)
+        quad(vc, m, n, x0, 0, G, x1, 0, G, x1, H, G, x0, H, G, uf0, 160, uf1, 160, uf1, 0, uf0, 0, light, 1f, 0, 0, 1);
         // detras (sala)
         quad(vc, m, n, x1, 0, -G, x0, 0, -G, x0, H, -G, x1, H, -G, ub1, 160, ub0, 160, ub0, 0, ub1, 0, light, 0.9f, 0, 0, -1);
         // cantos
