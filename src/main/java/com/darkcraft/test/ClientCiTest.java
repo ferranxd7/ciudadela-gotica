@@ -766,6 +766,11 @@ public final class ClientCiTest {
             shot(m, "cliente_57_golpe_final_circulos");
             log("  titulo en pantalla: " + campoGui(m, "title") + " | " + campoGui(m, "subtitle"));
         });
+        atTicks(G + 34, "Meterse en un circulo dorado", m -> server(m, sp -> reyCerca(sp).ifPresent(r -> {
+            var cs = r.circulos();
+            log("  circulos dorados: " + cs.size() + (cs.isEmpty() ? "" : " | el primero a " + Math.round(Math.hypot(cs.get(0).x - sp.getX(), cs.get(0).z - sp.getZ())) + " bloques"));
+            if (!cs.isEmpty()) sp.teleportTo(sp.serverLevel(), cs.get(0).x, cs.get(0).y + 0.1, cs.get(0).z, sp.getYRot(), sp.getXRot());
+        })));
         atTicks(G + 50, "Captura golpe final (cuenta atras)", m -> shot(m, "cliente_58_golpe_final_cuenta"));
         atTicks(G + 78, "Vida tras el golpe final", m -> server(m, sp -> log("  tras el golpe final: vida del jugador " + Math.round(sp.getHealth())
                 + (sp.isDeadOrDying() ? " (muerto)" : "") + " | logro golpe_final=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GOLPE_FINAL))));

@@ -1627,6 +1627,11 @@ public class Rey extends Monster {
         }
     }
 
+    /** Para la prueba de la CI: los circulos dorados del golpe final que esta haciendo ahora (vacio si no). */
+    public List<Vec3> circulos() {
+        return atq == Atq.GOLPE_FINAL ? new ArrayList<>(puntos) : List.of();
+    }
+
     /** Para la prueba de la CI y el comando: el golpe final ya mismo (deja la vida por debajo de la mitad de la fase 3). */
     public boolean forzarGolpeFinal() {
         if (!(level() instanceof ServerLevel sl) || fase() != 3 || estado != Estado.LUCHA) return false;
