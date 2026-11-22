@@ -31,7 +31,12 @@ public class ReyModel extends HierarchicalModel<Rey> {
         this.brazoI = torso.getChild("brazo_i");
         this.antebrazoI = brazoI.getChild("antebrazo_i");
         this.espadaI = antebrazoI.getChild("espada_i");
+        this.faldas = new ModelPart[]{cadera.getChild("falda_d"), cadera.getChild("falda_i"), cadera.getChild("falda_t"),
+                cadera.getChild("falda_ld"), cadera.getChild("falda_li")};
     }
+
+    /** Los faldones de la chaqueta (fuera cuando el Rey se la arranca en los volcanes). */
+    final ModelPart[] faldas;
 
     @Override
     public ModelPart root() {
@@ -41,6 +46,8 @@ public class ReyModel extends HierarchicalModel<Rey> {
     @Override
     public void setupAnim(Rey e, float limbSwing, float limbSwingAmount, float age, float headYaw, float headPitch) {
         root.getAllParts().forEach(ModelPart::resetPose);
+        boolean conChaqueta = !e.flag(Rey.F_SIN_CHAQUETA);
+        for (ModelPart f : faldas) f.visible = conChaqueta;
         int pose = e.pose();
         boolean acting = e.acting();
         if (pose == Rey.POSE_SENTADO) {

@@ -20,11 +20,11 @@ import org.joml.Vector4f;
 
 /** Dibuja al Rey: textura segun la fase, capa que brilla (ojos, brasas, grietas de lava) y llamas en las espadas. */
 public class ReyRenderer extends MobRenderer<Rey, ReyModel> {
-    private static final ResourceLocation[] TEX = new ResourceLocation[3];
-    private static final ResourceLocation[] GLOW = new ResourceLocation[3];
+    private static final ResourceLocation[] TEX = new ResourceLocation[4];
+    private static final ResourceLocation[] GLOW = new ResourceLocation[4];
 
     static {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             TEX[i] = new ResourceLocation(CiudadelaMod.MODID, "textures/entity/rey/rey_" + (i + 1) + ".png");
             GLOW[i] = new ResourceLocation(CiudadelaMod.MODID, "textures/entity/rey/brillo_" + (i + 1) + ".png");
         }
@@ -36,7 +36,16 @@ public class ReyRenderer extends MobRenderer<Rey, ReyModel> {
     }
 
     private static int idx(Rey e) {
+        if (e.flag(Rey.F_SIN_CHAQUETA)) return 3;
         return Mth.clamp(e.fase(), 1, 3) - 1;
+    }
+
+    /** En los volcanes crece al doble (poco a poco, lo lleva ReyCliente). */
+    @Override
+    protected void scale(Rey e, PoseStack ps, float pt) {
+        float k = ReyCliente.escala(e, pt);
+        ps.scale(k, k, k);
+        this.shadowRadius = k;
     }
 
     @Override
@@ -106,6 +115,8 @@ public class ReyRenderer extends MobRenderer<Rey, ReyModel> {
             m.translate(Mth.lerp(pt, e.xo, e.getX()), Mth.lerp(pt, e.yo, e.getY()), Mth.lerp(pt, e.zo, e.getZ()));
             m.mulPose(Axis.YP.rotationDegrees(180f - Mth.rotLerp(pt, e.yBodyRotO, e.yBodyRot)));
             m.scale(-1f, -1f, 1f);
+            float k = ReyCliente.escala(e, pt);
+            m.scale(k, k, k);
             m.translate(0f, -1.501f, 0f);
             ModelPart[] chain = side == 0
                     ? new ModelPart[]{model.raiz, model.cadera, model.torso, model.brazoD, model.antebrazoD, model.espadaD}

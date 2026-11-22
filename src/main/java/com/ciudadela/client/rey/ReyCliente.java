@@ -92,6 +92,7 @@ public final class ReyCliente {
             buf.endBatch(Tipos.BRILLO);
             ps.popPose();
         }
+        if (!CAPAS.isEmpty()) dibujarCapas(mc, ps, buf, cam, pt);
         if (cofre != null) dibujarCofre(mc, ps, buf, cam, pt);
         if (llave != null) dibujarLlave(mc, ps, buf, cam, pt);
     }
@@ -470,6 +471,144 @@ public final class ReyCliente {
         }
     }
 
+    // ------------------------------------------------------------------ fase 3: crece y se arranca la chaqueta
+
+    /** Tick (de ReyCliente) en que cada Rey empezo a crecer; y las banderas vistas la ultima vez. */
+    private static final java.util.Map<Integer, Integer> CRECE = new java.util.HashMap<>();
+    private static final java.util.Map<Integer, Integer> VISTOS = new java.util.HashMap<>();
+
+    /** Tamano del Rey: 1, o de 1 a 2 en un segundo y medio (con un pequeno rebote) cuando crece. */
+    public static float escala(Rey e, float pt) {
+        if (!e.flag(Rey.F_GRANDE)) return 1f;
+        Integer t0 = CRECE.get(e.getId());
+        if (t0 == null) return 2f;
+        float k = Mth.clamp((ticks - t0 + pt) / 30f, 0f, 1f);
+        float c1 = 1.70158f, c3 = c1 + 1f;
+        float back = 1f + c3 * (float) Math.pow(k - 1, 3) + c1 * (float) Math.pow(k - 1, 2);
+        return 1f + back;
+    }
+
+    private static void vigilar(Minecraft mc) {
+        java.util.Set<Integer> vivos = new java.util.HashSet<>();
+        for (Entity en : mc.level.entitiesForRendering()) {
+            if (!(en instanceof Rey r)) continue;
+            int id = r.getId();
+            vivos.add(id);
+            int f = (r.flag(Rey.F_SIN_CHAQUETA) ? 1 : 0) | (r.flag(Rey.F_GRANDE) ? 2 : 0);
+            Integer antes = VISTOS.put(id, f);
+            if (antes == null) {
+                // recien aparecido: si ya es grande, ya lo es del todo
+                if ((f & 2) != 0) CRECE.put(id, ticks - 100);
+                continue;
+            }
+            if ((f & 1) != 0 && (antes & 1) == 0) arrancar(r);
+            if ((f & 2) != 0 && (antes & 2) == 0) CRECE.put(id, ticks);
+        }
+        VISTOS.keySet().retainAll(vivos);
+        CRECE.keySet().retainAll(vivos);
+    }
+
+    private static final class Capa {
+        double x, y, z, vx, vy, vz, suelo;
+        float yaw, giro, vgiro;
+        int edad;
+        boolean posada;
+    }
+
+    private static final List<Capa> CAPAS = new ArrayList<>();
+    private static net.minecraft.client.model.geom.ModelPart capaModelo;
+    private static final net.minecraft.resources.ResourceLocation CAPA_TEX = new net.minecraft.resources.ResourceLocation(CiudadelaMod.MODID, "textures/entity/rey/rey_3.png");
+
+    /** La chaqueta sale volando hacia un lado, dando vueltas. */
+    private static void arrancar(Rey r) {
+        Capa c = new Capa();
+        float yaw = r.yBodyRot;
+        double lado = r.getRandom().nextBoolean() ? 1 : -1;
+        double rad = Math.toRadians(yaw);
+        double fx = -Math.sin(rad), fz = Math.cos(rad), sx = -fz * lado, sz = fx * lado;
+        c.x = r.getX();
+        c.y = r.getY() + 1.15;
+        c.z = r.getZ();
+        c.vx = sx * 0.32 + fx * 0.08;
+        c.vz = sz * 0.32 + fz * 0.08;
+        c.vy = 0.42;
+        c.yaw = yaw;
+        c.vgiro = (float) (lado * 16);
+        c.suelo = r.getY();
+        CAPAS.add(c);
+    }
+
+    private static void moverCapas(Minecraft mc) {
+        Iterator<Capa> it = CAPAS.iterator();
+        RandomSource rnd = mc.level.random;
+        while (it.hasNext()) {
+            Capa c = it.next();
+            c.edad++;
+            if (!c.posada) {
+                c.x += c.vx;
+                c.y += c.vy;
+                c.z += c.vz;
+                c.vy -= 0.04;
+                c.vx *= 0.97;
+                c.vz *= 0.97;
+                c.giro += c.vgiro;
+                if (rnd.nextInt(2) == 0) mc.level.addParticle(ParticleTypes.FLAME, c.x, c.y + 0.5, c.z, 0, 0.02, 0);
+                if (c.y <= c.suelo + 0.05 && c.vy < 0) {
+                    c.posada = true;
+                    c.y = c.suelo + 0.02;
+                    c.giro = 90f;
+                    mc.level.playLocalSound(c.x, c.y, c.z, net.minecraft.sounds.SoundEvents.FIRECHARGE_USE, SoundSource.HOSTILE, 1f, 0.7f, false);
+                }
+            } else {
+                // arde en el suelo y se va haciendo ceniza
+                if (c.edad < 260) {
+                    for (int i = 0; i < 2; i++)
+                        mc.level.addParticle(ParticleTypes.FLAME, c.x + (rnd.nextDouble() - 0.5) * 1.6, c.y + 0.1, c.z + (rnd.nextDouble() - 0.5) * 1.6, 0, 0.03, 0);
+                    if (rnd.nextInt(3) == 0) mc.level.addParticle(ParticleTypes.SMOKE, c.x + (rnd.nextDouble() - 0.5), c.y + 0.3, c.z + (rnd.nextDouble() - 0.5), 0, 0.04, 0);
+                }
+                if (c.edad > 200 && rnd.nextInt(2) == 0)
+                    mc.level.addParticle(ParticleTypes.WHITE_ASH, c.x + (rnd.nextDouble() - 0.5) * 1.5, c.y + 0.2, c.z + (rnd.nextDouble() - 0.5) * 1.5, 0, 0.02, 0);
+            }
+            if (c.edad > 320) it.remove();
+        }
+    }
+
+    private static void dibujarCapas(Minecraft mc, PoseStack ps, MultiBufferSource.BufferSource buf, Vec3 cam, float pt) {
+        if (capaModelo == null) {
+            var root = ReyGeometria.crear().bakeRoot();
+            var cadera = root.getChild("raiz").getChild("cadera");
+            cadera.skipDraw = true;
+            cadera.getChild("muslo_d").visible = false;
+            cadera.getChild("muslo_i").visible = false;
+            var torso = cadera.getChild("torso");
+            torso.getChild("cabeza").visible = false;
+            torso.getChild("brazo_d").visible = false;
+            torso.getChild("brazo_i").visible = false;
+            capaModelo = cadera;
+        }
+        VertexConsumer vc = buf.getBuffer(net.minecraft.client.renderer.RenderType.entityCutoutNoCull(CAPA_TEX));
+        for (Capa c : CAPAS) {
+            double x = c.x + (c.posada ? 0 : c.vx * pt), y = c.y + (c.posada ? 0 : c.vy * pt), z = c.z + (c.posada ? 0 : c.vz * pt);
+            float quema = Mth.clamp((c.edad - 120) / 140f, 0f, 1f);
+            float col = 1f - 0.75f * quema;
+            float hund = c.posada ? Mth.clamp((c.edad - 220) / 100f, 0f, 1f) : 0f;
+            ps.pushPose();
+            ps.translate(x - cam.x, y - cam.y - hund * 0.3, z - cam.z);
+            ps.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180f - c.yaw));
+            if (c.posada) {
+                ps.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-90f));
+                ps.translate(0, -0.25, 0);
+            } else ps.mulPose(com.mojang.math.Axis.XP.rotationDegrees(c.giro + (c.vgiro * pt)));
+            ps.scale(-1f, -1f, 1f);
+            ps.scale(1f, 1f - 0.6f * hund, 1f);
+            ps.translate(0f, 18f / 16f - 0.55f, 0f);
+            int luz = c.posada ? 0xF000B0 : 0xF000F0;
+            capaModelo.render(ps, vc, luz, OverlayTexture.NO_OVERLAY, col, col * (1f - 0.3f * quema), col * (1f - 0.4f * quema), 1f);
+            ps.popPose();
+        }
+        buf.endBatch();
+    }
+
     // ------------------------------------------------------------------ cofre que sube
 
     private static Net.Cofre cofre;
@@ -516,6 +655,8 @@ public final class ReyCliente {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.isPaused()) return;
         ticks++;
+        vigilar(mc);
+        if (!CAPAS.isEmpty()) moverCapas(mc);
         // el rastro de la barra de vida baja despues de un momento
         if (barraRastro > barraP && ticks - barraGolpe > 14) barraRastro = Math.max(barraP, barraRastro - 0.01f);
         // la musica del combate: la del rey luchando mas cercano

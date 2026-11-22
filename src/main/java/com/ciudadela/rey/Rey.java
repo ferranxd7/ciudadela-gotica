@@ -64,6 +64,8 @@ public class Rey extends Monster {
     public static final int F_LUCHA = 1, F_SIN_CORONA = 2, F_CENIZA = 4, F_HABLA = 8;
     /** Las puertas se han cerrado y el Rey habla desde el trono (para la musica, que entra flojita). */
     public static final int F_INTRO = 16;
+    /** Fase 3 en los volcanes: se ha arrancado la chaqueta (piel con grietas de lava) y despues crece al doble. */
+    public static final int F_SIN_CHAQUETA = 32, F_GRANDE = 64;
 
     public static final ResourceKey<DamageType> GOLPE = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(CiudadelaMod.MODID, "rey"));
     public static final ResourceKey<DamageType> AREA = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(CiudadelaMod.MODID, "rey_area"));
@@ -192,6 +194,7 @@ public class Rey extends Monster {
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         super.onSyncedDataUpdated(key);
+        if (FLAGS.equals(key)) refreshDimensions();
         if (level().isClientSide && ANIM_N.equals(key)) {
             int id = this.entityData.get(ANIM_N) & 31;
             for (AnimationState a : actions) a.stop();
@@ -330,6 +333,12 @@ public class Rey extends Monster {
     private boolean muestra;
 
     /** Para la prueba de la CI: quieto en una pose/animacion concreta, sin pelear. */
+    /** Para el escaparate de la prueba: el Rey sin chaqueta y gigante (o normal). */
+    public void muestraTransformado(boolean v) {
+        setFlag(F_SIN_CHAQUETA, v);
+        setFlag(F_GRANDE, v);
+    }
+
     public void muestra(int fase, int pose, int anim, boolean habla) {
         muestra = true;
         setNoGravity(true);
@@ -563,10 +572,10 @@ public class Rey extends Monster {
         if (recup > 0) {
             recup--;
             // se acerca despacio
-            if (distanceTo(o) > 4.0 && t % 10 == 0) getNavigation().moveTo(o, 0.8 * velocidad());
+            if (distanceTo(o) > 4.0 * E() && t % 10 == 0) getNavigation().moveTo(o, 0.8 * velocidad());
             return;
         }
-        double d = distanceTo(o);
+        double d = distanceTo(o) / E();
         Atq next = elegir(d);
         if (next != null) {
             empezar(sl, next, o);
@@ -577,6 +586,17 @@ public class Rey extends Monster {
             burla = 0;
             habla(sl, fase() == 3 ? 9 : 8);
         }
+    }
+
+    /** Alcance de los golpes: mas grande cuando el Rey ha crecido. */
+    private double E() {
+        return flag(F_GRANDE) ? 1.7 : 1.0;
+    }
+
+    @Override
+    public net.minecraft.world.entity.EntityDimensions getDimensions(net.minecraft.world.entity.Pose pose) {
+        var d = super.getDimensions(pose);
+        return this.entityData != null && flag(F_GRANDE) ? d.scale(2f) : d;
     }
 
     private double velocidad() {
@@ -718,7 +738,7 @@ public class Rey extends Monster {
                 if (k == 10 || k == 20) tajo(sl, vivos, 4.8, 150, 34, fuego, 0.6, 0);
                 if (k == 31) {
                     tajo(sl, vivos, 5.3, 95, 42, fuego, 0.9, 0.25);
-                    golpeSuelo(sl, position().add(adelante().scale(2.6)), 1.6f);
+                    golpeSuelo(sl, position().add(adelante().scale(2.6 * E())), 1.6f);
                 }
             }
             case COMBO5 -> {
@@ -728,7 +748,7 @@ public class Rey extends Monster {
                     if (k == hits[i] - 3) empujar(i == 4 ? 0.5 : 0.32);
                     if (k == hits[i]) {
                         tajo(sl, vivos, 4.8, i == 4 ? 100 : 140, i == 4 ? 40 : 26, true, 0.6, i == 4 ? 0.3 : 0);
-                        if (i == 4) golpeSuelo(sl, position().add(adelante().scale(2.6)), 1.8f);
+                        if (i == 4) golpeSuelo(sl, position().add(adelante().scale(2.6 * E())), 1.8f);
                     }
                 }
             }
@@ -739,14 +759,14 @@ public class Rey extends Monster {
                     if (k == hits[i] - 2) empujar(0.28);
                     if (k == hits[i]) tajo(sl, vivos, 4.8, 150, i == 7 ? 32 : 20, true, i == 7 ? 1.0 : 0.3, i == 7 ? 0.35 : 0);
                 }
-                if (k == 42) golpeSuelo(sl, position().add(adelante().scale(2.5)), 2f);
+                if (k == 42) golpeSuelo(sl, position().add(adelante().scale(2.5 * E())), 2f);
             }
             case SALTO -> salto(sl, o, vivos, k, fuego);
             case GIRO -> {
                 if (k == 4) sonido(sl, SoundEvents.TRIDENT_RIPTIDE_2, 1.2f, 0.7f);
                 if (k >= 6 && k <= 26 && k % 5 == 1) {
                     for (ServerPlayer p : vivos) {
-                        if (p.distanceTo(this) > 4.4) continue;
+                        if (p.distanceTo(this) > 4.4 * E()) continue;
                         int n = golpesGiro.getOrDefault(p.getUUID(), 0);
                         if (n >= 3) continue;
                         if (golpear(sl, p, 18, fuego, 0.5, 0.1, false)) golpesGiro.put(p.getUUID(), n + 1);
@@ -854,7 +874,7 @@ public class Rey extends Monster {
             setPos(destino.x, destino.y, destino.z);
             for (ServerPlayer p : vivos) {
                 double d = p.position().distanceTo(destino);
-                if (d < 4.6) golpear(sl, p, d < 2.0 ? 52 : 40, fuego, 1.3, 0.6, true);
+                if (d < 4.6 * E()) golpear(sl, p, d < 2.0 * E() ? 52 : 40, fuego, 1.3, 0.6, true);
             }
             golpeSuelo(sl, destino, 4.6f);
         }
@@ -924,7 +944,7 @@ public class Rey extends Monster {
         }
         if (k < 12) mirar(o, 20f);
         if (k == 15) {
-            golpeSuelo(sl, position().add(adelante().scale(1.5)), 1.5f);
+            golpeSuelo(sl, position().add(adelante().scale(1.5 * E())), 1.5f);
             sonido(sl, SoundEvents.BLAZE_SHOOT, 1.0f, 0.5f);
         }
         if (k == impacto) {
@@ -1053,11 +1073,12 @@ public class Rey extends Monster {
     }
 
     private void tajo(ServerLevel sl, List<ServerPlayer> vivos, double reach, double arco, float bruto, boolean fuego, double kb, double up) {
+        reach *= E();
         Vec3 f = adelante();
         for (ServerPlayer p : vivos) {
             Vec3 d = p.position().subtract(position());
             double dist = Math.sqrt(d.x * d.x + d.z * d.z);
-            if (dist > reach + p.getBbWidth() / 2 || d.y < -2 || d.y > 4) continue;
+            if (dist > reach + p.getBbWidth() / 2 || d.y < -2 || d.y > 4 * E()) continue;
             double ang = Math.toDegrees(Math.acos(Mth.clamp((d.x * f.x + d.z * f.z) / Math.max(1e-4, dist), -1, 1)));
             if (dist > 1.2 && ang > arco / 2) continue;
             golpear(sl, p, bruto, fuego, kb, up, false);
@@ -1075,6 +1096,7 @@ public class Rey extends Monster {
     }
 
     private void golpeSuelo(ServerLevel sl, Vec3 c, float r) {
+        r *= (float) E();
         BlockState st = sl.getBlockState(BlockPos.containing(c.x, c.y - 0.5, c.z));
         if (st.isAir()) st = net.minecraft.world.level.block.Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState();
         ParticleOptions crack = new BlockParticleOption(ParticleTypes.BLOCK, st);
@@ -1099,7 +1121,7 @@ public class Rey extends Monster {
     private void lanzar(ServerLevel sl, int tipo, LivingEntity o, float offDeg, double vel, float bruto) {
         ReyProyectil pr = new ReyProyectil(CiudadelaMod.REY_PROYECTIL.get(), sl);
         pr.setOwner(this);
-        double y = tipo == ReyProyectil.OLA ? getY() + 0.3 : getY() + 1.8;
+        double y = tipo == ReyProyectil.OLA ? getY() + 0.3 : getY() + 1.8 * E();
         pr.setPos(getX(), y, getZ());
         Vec3 aim = o.position().add(0, tipo == ReyProyectil.OLA ? 0.3 : o.getBbHeight() * 0.5, 0).subtract(pr.position());
         double yaw = Math.atan2(aim.z, aim.x) + Math.toRadians(offDeg);
@@ -1344,10 +1366,31 @@ public class Rey extends Monster {
             for (int r = 1; r <= 8; r++) anillo(sl, ParticleTypes.LAVA, r * 2.2, c.y + 0.3, 12 + r * 6);
             sonido(sl, SoundEvents.GENERIC_EXPLODE, 4f, 0.4f);
             sonido(sl, SoundEvents.DRAGON_FIREBALL_EXPLODE, 3f, 0.5f);
-        } else if (t == 200) {
-            anim(ReyAnims.GRITO);
-            sonido(sl, SoundEvents.RAVAGER_ROAR, 3f, 0.45f);
+        } else if (t == 184) {
+            // se arranca la chaqueta...
+            anim(ReyAnims.ARRANCAR);
+            sonido(sl, SoundEvents.RAVAGER_STUNNED, 2f, 0.5f);
+        } else if (t == 199) {
+            setFlag(F_SIN_CHAQUETA, true);
+            sonido(sl, SoundEvents.ARMOR_EQUIP_LEATHER, 3f, 0.5f);
+            sonido(sl, SoundEvents.FIRECHARGE_USE, 2f, 0.6f);
+            lejos(sl, ParticleTypes.FLAME, getX(), getY() + 2.2, getZ(), 40, 0.6, 0.6, 0.6, 0.12);
+        } else if (t == 205) {
             habla(sl, 10);
+        } else if (t == 214) {
+            // ...y crece al doble entre lava
+            setFlag(F_GRANDE, true);
+            sonido(sl, SoundEvents.RAVAGER_ROAR, 3f, 0.35f);
+            sonido(sl, SoundEvents.GENERIC_EXPLODE, 3f, 0.4f);
+            golpeSuelo(sl, c, 5f);
+            for (int r = 1; r <= 6; r++) anillo(sl, ParticleTypes.LAVA, r * 2.0, c.y + 0.3, 10 + r * 6);
+        } else if (t > 214 && t < 244 && t % 3 == 0) {
+            lejos(sl, ParticleTypes.LAVA, getX(), getY() + 3, getZ(), 4, 1.2, 2.0, 1.2, 0.05);
+            lejos(sl, ParticleTypes.FLAME, getX(), getY() + 3, getZ(), 8, 1.4, 2.4, 1.4, 0.04);
+        } else if (t == 246) {
+            anim(ReyAnims.GRITO);
+            sonido(sl, SoundEvents.RAVAGER_ROAR, 3f, 0.4f);
+            sonido(sl, SoundEvents.ENDER_DRAGON_GROWL, 2f, 0.5f);
         }
         if (t >= (int) (Volcan.CINE * 20) + 4) {
             barra.setVisible(true);

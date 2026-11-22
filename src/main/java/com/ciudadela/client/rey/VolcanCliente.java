@@ -51,6 +51,14 @@ public final class VolcanCliente {
         public boolean isFoggyAt(int x, int z) {
             return false;
         }
+
+        /** El cielo: el anillo de volcanes gigantes del horizonte, con humo, erupciones y meteoritos. */
+        @Override
+        public boolean renderSky(ClientLevel level, int ticks, float partialTick, PoseStack poseStack, net.minecraft.client.Camera camera,
+                                 org.joml.Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog) {
+            FondoVolcanes.dibujar(poseStack, ticks + partialTick);
+            return true;
+        }
     }
 
     // ------------------------------------------------------------------ meteoritos
@@ -84,16 +92,6 @@ public final class VolcanCliente {
         }
         ClientLevel l = mc.level;
         RandomSource r = l.random;
-        // humo de los crateres
-        for (int[] v : Volcan.VOLCANES) {
-            if (r.nextInt(3) != 0) continue;
-            double y = Volcan.MAR + v[3] - 2;
-            l.addAlwaysVisibleParticle(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, true, v[0] + (r.nextDouble() - 0.5) * 3, y, v[1] + (r.nextDouble() - 0.5) * 3,
-                    0, 0.09 + r.nextDouble() * 0.05, 0);
-            if (r.nextInt(18) == 0)
-                for (int i = 0; i < 6; i++)
-                    l.addAlwaysVisibleParticle(ParticleTypes.LAVA, true, v[0] + (r.nextDouble() - 0.5) * 3, y, v[1] + (r.nextDouble() - 0.5) * 3, 0, 0, 0);
-        }
         // meteoritos nuevos
         if (--siguiente <= 0) {
             siguiente = 12 + r.nextInt(30);

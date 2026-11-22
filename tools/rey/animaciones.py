@@ -590,8 +590,29 @@ Anim("muerte", 6.0).poses([
 # ============================================================================ codigo Java
 
 # acciones (se sincronizan con un numero); el orden fija el numero (1, 2, ...)
+# arrancarse la chaqueta (fase 3, al aterrizar en los volcanes): cruza los brazos al pecho, agarra la chaqueta y
+# la arranca abriendo los brazos de golpe (a los 0,75 s la chaqueta sale volando), y se queda rugiendo
+_agarra = dict(torso=(22, 0, 0), cabeza=(18, 0, 0), barba=(-6, 0, 0),
+               brazo_d=(-95, 0, -55), antebrazo_d=(-75, 0, 0), espada_d=(-60, 0, 0),
+               brazo_i=(-95, 0, 55), antebrazo_i=(-75, 0, 0), espada_i=(-60, 0, 0),
+               muslo_d=(-25, 0, 6), pierna_d=(30, 0, 0), muslo_i=(-25, 0, -6), pierna_i=(30, 0, 0),
+               raiz={"pos": (0, -2.5, 0)})
+_arranca = dict(torso=(-24, 0, 0), cabeza=(-30, 0, 0), barba=(18, 0, 0),
+                brazo_d=(-40, 0, 95), antebrazo_d=(-10, 0, 0), espada_d=(10, 0, 35),
+                brazo_i=(-40, 0, -95), antebrazo_i=(-10, 0, 0), espada_i=(10, 0, -35),
+                muslo_d=(-12, 0, 14), muslo_i=(-12, 0, -14), raiz={"pos": (0, -0.5, 0)})
+Anim("arrancar", 2.6).poses([
+    (0.0, P()),
+    (0.3, P(**with_(_agarra, torso=(12, 0, 0), raiz={"pos": (0, -1, 0)}))),
+    (0.6, P(**_agarra)),
+    (0.75, P(**_arranca)),
+    (1.3, P(**with_(_arranca, cabeza=(-36, 5, 0)))),
+    (1.8, P(**with_(_arranca, cabeza=(-34, -5, 0)))),
+    (2.6, P()),
+])
+
 ACTIONS = ["levantarse", "combo3", "salto", "giro", "contraataque", "tajo_lejos", "grito", "combo5", "pilares",
-           "bolas", "abanico", "combo8", "geiser", "golpe_final", "aturdido", "bloqueo", "muerte"]
+           "bolas", "abanico", "combo8", "geiser", "golpe_final", "aturdido", "bloqueo", "muerte", "arrancar"]
 # estados que se repiten mientras duran
 LOOPS = ["sentado", "quieto", "andar", "hablar", "guardia", "embestida"]
 

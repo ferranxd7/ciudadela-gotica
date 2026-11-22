@@ -80,7 +80,7 @@ def main():
     os.makedirs(TEX_DIR, exist_ok=True)
     os.makedirs(JAVA_DIR, exist_ok=True)
     texs = {}
-    for ph in (1, 2, 3):
+    for ph in (1, 2, 3, 4):
         base, glow = pintar.build(ph, used)
         base = base[: tex_h * SCALE]
         glow = glow[: tex_h * SCALE]
@@ -103,11 +103,11 @@ def main():
         vdir = sys.argv[sys.argv.index("--vistas") + 1]
         os.makedirs(vdir, exist_ok=True)
         tiles = []
-        for ph in (1, 2, 3):
+        for ph in (1, 2, 3, 4):
             base, glow = texs[ph]
             for yaw in (25, 145, 250):
-                tiles.append(vista.render(base, glow if ph > 1 else None, yaw=yaw, pitch=-8))
-        rows = [np.concatenate(tiles[i * 3:(i + 1) * 3], axis=1) for i in range(3)]
+                tiles.append(vista.render(base, glow if ph > 1 else None, yaw=yaw, pitch=-8, hidden=("falda_d", "falda_i", "falda_t", "falda_ld", "falda_li") if ph == 4 else ()))
+        rows = [np.concatenate(tiles[i * 3:(i + 1) * 3], axis=1) for i in range(4)]
         Image.fromarray(np.concatenate(rows, axis=0)).save(os.path.join(vdir, "rey_fases.png"))
         Image.fromarray((texs[1][0] * 255).astype(np.uint8)).resize((TEX_W * 4, tex_h * 4), Image.NEAREST).save(
             os.path.join(vdir, "textura_1.png"))

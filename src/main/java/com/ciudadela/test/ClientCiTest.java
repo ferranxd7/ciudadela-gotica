@@ -247,7 +247,12 @@ public final class ClientCiTest {
                 {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.GEISER, false, "geiser", 0f},
                 {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.GOLPE_FINAL, false, "golpe_final", 0f},
                 {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.ATURDIDO, false, "aturdido", 0f},
-                {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.MUERTE, false, "muerte", 0f},
+                {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.ARRANCAR, false, "arrancar", 0f},
+                {3, com.ciudadela.rey.Rey.POSE_PIE, 0, false, "gigante", 2.2f, true},
+                {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.COMBO8, false, "gigante_combo8", 0f, true},
+                {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.GEISER, false, "gigante_geiser", 0f, true},
+                {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.GOLPE_FINAL, false, "gigante_golpe_final", 0f, true},
+                {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.MUERTE, false, "muerte", 0f, true},
         };
         // el servidor integrado puede ir con retraso (genera terreno nuevo): cada pose se pide y se espera a que el
         // cliente la tenga antes de contar el tiempo de las capturas (lo lleva escTick, tick a tick)
@@ -271,7 +276,7 @@ public final class ClientCiTest {
         return fin + 20;
     }
 
-    private static final int ESC_TICKS = 20 * 95;
+    private static final int ESC_TICKS = 20 * 115;
     private static Object[][] escLista;
     private static int escI = -1, escEstado, escDesde, escK, escN;
 
@@ -287,13 +292,16 @@ public final class ClientCiTest {
         final boolean habla = (Boolean) e[3];
         final String name = (String) e[4];
         float len = anim > 0 ? com.ciudadela.rey.ReyAnims.TICKS[anim] / 20f : (Float) e[5];
+        final boolean grande = e.length > 6 && (Boolean) e[6];
         float[] fr = anim > 0 ? new float[]{0.15f, 0.35f, 0.55f, 0.8f} : new float[]{1.0f};
         switch (escEstado) {
             case 0 -> {
                 mc.options.hideGui = true;
-                verDesde(mc, new Vec3(ex + 2.6, ey + 1.9, ez + 4.4), new Vec3(ex, ey + 1.5, ez));
+                if (grande) verDesde(mc, new Vec3(ex + 5.2, ey + 3.4, ez + 8.8), new Vec3(ex, ey + 3.0, ez));
+                else verDesde(mc, new Vec3(ex + 2.6, ey + 1.9, ez + 4.4), new Vec3(ex, ey + 1.5, ez));
                 server(mc, sp -> {
                     if (modelo != null) {
+                        modelo.muestraTransformado(grande);
                         modelo.muestra(fase, pose, anim, habla);
                         modelo.moveTo(ex, ey, ez, 0f, 0f);
                         modelo.setYBodyRot(0f);
@@ -665,7 +673,7 @@ public final class ClientCiTest {
         }
         int F3 = F2 + 330;
         atTicks(F3, "Forzar fase 3 (a los volcanes)", m -> server(m, sp -> reyCerca(sp).ifPresent(r -> r.forzarFase(3))));
-        int[] v = {40, 100, 170, 220, 280, 360, 420, 480};
+        int[] v = {40, 110, 175, 222, 262, 292, 400, 480};
         for (int i = 0; i < v.length; i++) {
             final int k = i;
             atTicks(F3 + v[i], "Captura fase 3", m -> {

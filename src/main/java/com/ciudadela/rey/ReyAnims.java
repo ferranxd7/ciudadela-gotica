@@ -21,7 +21,8 @@ public final class ReyAnims {
     public static final int ATURDIDO = 15;
     public static final int BLOQUEO = 16;
     public static final int MUERTE = 17;
+    public static final int ARRANCAR = 18;
 
     /** Duracion de cada accion en ticks (por numero). */
-    public static final int[] TICKS = {0, 60, 44, 40, 36, 20, 28, 64, 50, 34, 26, 30, 58, 32, 92, 64, 11, 120};
+    public static final int[] TICKS = {0, 60, 44, 40, 36, 20, 28, 64, 50, 34, 26, 30, 58, 32, 92, 64, 11, 120, 52};
 }

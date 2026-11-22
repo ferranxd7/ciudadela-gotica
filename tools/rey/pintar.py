@@ -250,7 +250,72 @@ def burn_cloth(img, gl, rng, phase, amount=1.0, low_bias=0.5):
 # ------------------------------------------------------------------ pintores por material
 
 
+# fase 4: el Rey transformado (sin chaqueta): torso y brazos de piel con musculos y grietas de lava
+TORSO4 = ("chaqueta_pecho", "chaqueta_bajo", "armino", "manga", "manga_baja")
+
+
+def ellipse_mask(W, H, cx, cy, rx, ry):
+    ys, xs = np.mgrid[0:H, 0:W]
+    return np.clip(1 - np.hypot((xs + 0.5 - cx) / max(rx, 1e-3), (ys + 0.5 - cy) / max(ry, 1e-3)), 0, 1)
+
+
+def muscle(mat, face, W, H, key):
+    rng = rng_for(mat, face, key, 4)
+    gl = np.zeros((H, W, 4))
+    img = skin(W, H, rng, 3, shade_bottom=0.15)
+    img[:] = mix(img, col(84, 84, 86), 0.45)
+    light, dark = col(170, 172, 168), col(26, 24, 26)
+    if mat == "chaqueta_pecho" and face == "front":
+        for cx in (0.29, 0.71):
+            m = ellipse_mask(W, H, cx * W, 0.36 * H, 0.23 * W, 0.3 * H)
+            img[:] = mix(img, light, np.clip(m * 1.4, 0, 1) * 0.5)
+            edge = np.clip(ellipse_mask(W, H, cx * W, 0.38 * H, 0.25 * W, 0.33 * H) * 3, 0, 1) - np.clip(m * 3, 0, 1)
+            img[:] = mix(img, dark, np.clip(edge, 0, 1) * 0.8)
+        img[:, int(W * 0.49):int(W * 0.51) + 1] = mix(img[:, int(W * 0.49):int(W * 0.51) + 1], dark, 0.6)
+        rect(img, 0.08 * W, 0.66 * H, 0.92 * W, 0.7 * H, dark, 0.45)
+    elif mat == "chaqueta_bajo" and face == "front":
+        # tableta: dos columnas y tres filas
+        for cx in (0.3, 0.7):
+            for cy in (0.2, 0.52, 0.84):
+                m = ellipse_mask(W, H, cx * W, cy * H, 0.18 * W, 0.16 * H)
+                img[:] = mix(img, light, np.clip(m * 2, 0, 1) * 0.45)
+        img[:, int(W * 0.49):int(W * 0.51) + 1] = mix(img[:, int(W * 0.49):int(W * 0.51) + 1], dark, 0.65)
+        for cy in (0.36, 0.68):
+            rect(img, 0.12 * W, cy * H, 0.88 * W, cy * H + 1, dark, 0.5)
+    elif face == "back" and mat in ("chaqueta_pecho", "chaqueta_bajo"):
+        img[:, int(W * 0.49):int(W * 0.51) + 1] = mix(img[:, int(W * 0.49):int(W * 0.51) + 1], dark, 0.5)
+        if mat == "chaqueta_pecho":
+            for cx in (0.27, 0.73):
+                m = ellipse_mask(W, H, cx * W, 0.35 * H, 0.2 * W, 0.28 * H)
+                img[:] = mix(img, light, np.clip(m * 1.6, 0, 1) * 0.28)
+    elif mat in ("manga", "manga_baja"):
+        # biceps / antebrazo: luz en el centro de cada cara y sombra abajo, venas
+        m = ellipse_mask(W, H, 0.5 * W, (0.4 if mat == "manga" else 0.5) * H, 0.45 * W, 0.42 * H)
+        img[:] = mix(img, light, np.clip(m * 1.5, 0, 1) * 0.3)
+        if mat == "manga_baja":
+            for k in range(2):
+                x = int(rng.uniform(0.2, 0.8) * W)
+                for y in range(H):
+                    xx = min(W - 1, max(0, x + int(np.sin(y * 0.7 + k) * 1.2)))
+                    img[y, xx] = mix(img[y, xx], col(70, 78, 84), 0.5)
+    elif mat == "armino":
+        img[:] = mix(img, light, 0.12)
+    # grietas de lava (mas en el pecho: el corazon del Rey arde)
+    dens = 4 if mat in ("chaqueta_pecho", "chaqueta_bajo") else 5
+    apply_phase_skin(img, gl, rng, 3, density=dens)
+    if mat == "chaqueta_pecho" and face == "front":
+        c = ellipse_mask(W, H, 0.69 * W, 0.4 * H, 0.1 * W, 0.12 * H)
+        img[:] = mix(img, LAVA_HOT, np.clip(c * 2.5, 0, 1))
+        gl[..., :3] = np.maximum(gl[..., :3], LAVA_HOT * np.clip(c * 2.5, 0, 1)[..., None])
+        gl[..., 3] = np.maximum(gl[..., 3], (c > 0.02).astype(float))
+    return img, gl
+
+
 def paint(mat, face, W, H, phase, key):
+    if phase == 4:
+        if mat in TORSO4:
+            return muscle(mat, face, W, H, key)
+        phase = 3
     rng = rng_for(mat, face, key, phase if phase >= 2 else 1)
     rngs = rng_for(mat, face, key)  # igual en todas las fases (formas)
     gl = np.zeros((H, W, 4))
