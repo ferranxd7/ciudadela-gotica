@@ -296,7 +296,8 @@ public final class ClientCine {
 
     @SubscribeEvent
     public static void onOverlay(RenderGuiOverlayEvent.Pre e) {
-        if (active && !e.getOverlay().id().equals(OVERLAY)) e.setCanceled(true);
+        // durante la cinematica solo se dibuja la propia cinematica... y los subtitulos del Rey
+        if (active && !e.getOverlay().id().equals(OVERLAY) && !e.getOverlay().id().getPath().equals("rey_subtitulos")) e.setCanceled(true);
     }
 
     @SubscribeEvent

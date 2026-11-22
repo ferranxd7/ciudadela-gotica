@@ -253,6 +253,13 @@ public final class ClientCiTest {
                 {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.GEISER, false, "gigante_geiser", 0f, true},
                 {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.GOLPE_FINAL, false, "gigante_golpe_final", 0f, true},
                 {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.MUERTE, false, "muerte", 0f, true},
+                // proyectiles sueltos, vistos desde arriba: {fase, -1, tipo, ...}
+                {0, -1, com.ciudadela.rey.ReyProyectil.TAJO, false, "proy_tajo_dorado", 0f},
+                {1, -1, com.ciudadela.rey.ReyProyectil.TAJO, false, "proy_tajo_plata", 0f},
+                {2, -1, com.ciudadela.rey.ReyProyectil.TAJO, false, "proy_tajo_fuego", 0f},
+                {3, -1, com.ciudadela.rey.ReyProyectil.TAJO, false, "proy_tajo_lava", 0f},
+                {2, -1, com.ciudadela.rey.ReyProyectil.BOLA, false, "proy_bola", 0f},
+                {3, -1, com.ciudadela.rey.ReyProyectil.BOLA, false, "proy_bola_lava", 0f},
         };
         // el servidor integrado puede ir con retraso (genera terreno nuevo): cada pose se pide y se espera a que el
         // cliente la tenga antes de contar el tiempo de las capturas (lo lleva escTick, tick a tick)
@@ -293,6 +300,10 @@ public final class ClientCiTest {
         final String name = (String) e[4];
         float len = anim > 0 ? com.ciudadela.rey.ReyAnims.TICKS[anim] / 20f : (Float) e[5];
         final boolean grande = e.length > 6 && (Boolean) e[6];
+        if (pose == -1) {
+            proyTick(mc, fase, anim, name);
+            return;
+        }
         float[] fr = anim > 0 ? new float[]{0.15f, 0.35f, 0.55f, 0.8f} : new float[]{1.0f};
         switch (escEstado) {
             case 0 -> {
@@ -335,6 +346,55 @@ public final class ClientCiTest {
                         escK++;
                     }
                 } else {
+                    escI++;
+                    escEstado = 0;
+                }
+            }
+        }
+    }
+
+    private static int proyId = -1;
+
+    /** Un proyectil del Rey cruzando por delante de la camara (desde arriba, para ver la media luna). */
+    private static void proyTick(Minecraft mc, int fase, int tipo, String name) {
+        int[] when = tipo == com.ciudadela.rey.ReyProyectil.TAJO ? new int[]{5, 13, 22, 33} : new int[]{8, 20, 34, 50};
+        switch (escEstado) {
+            case 0 -> {
+                mc.options.hideGui = true;
+                verDesde(mc, new Vec3(ex + 0.5, ey + 4.6, ez + 6.2), new Vec3(ex, ey + 1.1, ez));
+                proyId = -1;
+                server(mc, sp -> {
+                    if (modelo != null) modelo.moveTo(ex, ey - 40, ez, 0f, 0f);
+                    ServerLevel lvl = sp.serverLevel();
+                    com.ciudadela.rey.ReyProyectil pr = new com.ciudadela.rey.ReyProyectil(CiudadelaMod.REY_PROYECTIL.get(), lvl);
+                    double v = tipo == com.ciudadela.rey.ReyProyectil.TAJO ? 0.26 : 0.16;
+                    pr.moveTo(ex - 4.2, ey + 1.2, ez);
+                    pr.preparar(tipo, new Vec3(v, 0, 0), 0f, fase);
+                    lvl.addFreshEntity(pr);
+                    proyId = pr.getId();
+                });
+                escEstado = 1;
+                escDesde = ticks;
+            }
+            case 1 -> {
+                if (proyId >= 0 && mc.level.getEntity(proyId) != null) {
+                    escEstado = 2;
+                    escDesde = ticks;
+                    escK = 0;
+                    log("  escaparate: " + name + " en el cliente");
+                } else if (ticks - escDesde > 200) {
+                    log("  escaparate: " + name + " no llega al cliente");
+                    escI++;
+                    escEstado = 0;
+                }
+            }
+            default -> {
+                if (escK < when.length) {
+                    if (ticks - escDesde >= when[escK]) {
+                        shot(mc, String.format("esc_%02d_%s_%d", escN++, name, when[escK]));
+                        escK++;
+                    }
+                } else if (ticks - escDesde > when[when.length - 1] + 30) {
                     escI++;
                     escEstado = 0;
                 }
