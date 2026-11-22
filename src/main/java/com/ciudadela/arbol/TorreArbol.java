@@ -201,6 +201,13 @@ public final class TorreArbol {
         if (e.getEntityBeingMounted() instanceof Ascensor a && !a.dejaBajar()) e.setCanceled(true);
     }
 
+    /** Al pasar por la tapa invisible de arriba del tubo, la cabeza atraviesa la barrera: sin ahogarse. */
+    @SubscribeEvent
+    public static void onAttack(net.minecraftforge.event.entity.living.LivingAttackEvent e) {
+        if (e.getEntity().getVehicle() instanceof Ascensor && e.getSource().is(net.minecraft.world.damagesource.DamageTypes.IN_WALL))
+            e.setCanceled(true);
+    }
+
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent e) {
         if (e.getEntity() instanceof ServerPlayer sp && sp.getVehicle() instanceof Ascensor a) a.rescatar(sp);
