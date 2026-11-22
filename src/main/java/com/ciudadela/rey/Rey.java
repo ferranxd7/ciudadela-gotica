@@ -702,7 +702,7 @@ public class Rey extends Monster {
                 if (k < 8 || (k > 13 && k < 18) || (k > 23 && k < 28)) mirar(o, 18f);
                 if (k == 6 || k == 16) empujar(0.35);
                 if (k == 27) empujar(0.45);
-                if (k == 10 || k == 20) tajo(sl, vivos, 4.8, 150, 30, fuego, 0.6, 0);
+                if (k == 10 || k == 20) tajo(sl, vivos, 4.8, 150, 34, fuego, 0.6, 0);
                 if (k == 31) {
                     tajo(sl, vivos, 5.3, 95, 42, fuego, 0.9, 0.25);
                     golpeSuelo(sl, position().add(adelante().scale(2.6)), 1.6f);

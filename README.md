@@ -16,10 +16,24 @@ natural (y rara) en el Overworld.
 Junto al borde sur de la isla hay una **torre de ascenso** que sube desde el suelo hasta la isla
 con una escalera de caracol, y un puente que entra en la isla.
 
+## El Rey Corvin (jefe del salón del trono)
+- Está sentado en su trono. Al entrar en la sala se cierran todos los rastrillos, se levanta y te habla.
+- Tres fases (la barra de vida está partida en tres): espadas normales, espadas de fuego y espadas de lava.
+  En la tercera te lleva a la dimensión de los volcanes: mira el suelo (rojo = peligro, dorado = a salvo).
+- Hace falta ir con netherite encantada. No se pueden poner bloques, ni volar con élitros, ni usar perlas.
+- Si mueren todos, el Rey vuelve a su trono con la vida entera. Solo se puede vencer una vez por mundo.
+- Al morir aparece un cofre con sus dos espadas (Diestra y Siniestra del Rey), la Llave del Árbol y el
+  capítulo 3 de la crónica. La llave rompe el sello rojo de la Sala del Árbol.
+- Espadas: los golpes llenan la barra de energía. **Shift + clic izquierdo**: Tajo Real.
+  **Ctrl + clic izquierdo**: Juicio del Rey. **Clic derecho**: cubrirse con las espadas cruzadas.
+
+Comandos para probarlo (con trucos): `/ciudadela rey ir` (te lleva al salón del trono),
+`/ciudadela rey estado`, `/ciudadela rey reiniciar`, `/ciudadela rey fase 2` (o `3`), `/ciudadela rey matar`.
+
 ## Fases
 1. ✅ Isla + castillo + generación en el mundo
 2. Mobs propios por salas
-3. Jefe (caballero no-muerto gigante) + botín + armas y armadura
+3. ✅ Jefe: el Rey Corvin + botín + armas
 4. Calavera, fortalezas del cielo y nueva dimensión con hogueras
 
 ## Créditos de la música

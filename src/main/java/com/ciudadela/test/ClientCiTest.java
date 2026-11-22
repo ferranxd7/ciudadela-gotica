@@ -126,6 +126,7 @@ public final class ClientCiTest {
                 s.run.accept(mc);
             }
             reyTick(mc);
+            escTick(mc);
             if (cineStart >= 0 && (ticks - cineStart) % 40 == 0 && ticks - cineStart < 20 * 90) {
                 log("  cinematica t=" + (ticks - cineStart) / 20 + " s: activa=" + ClientCine.active() + " voz=" + ClientCine.narrationPlaying()
                         + " musica=" + ClientMusic.debug());
@@ -215,7 +216,9 @@ public final class ClientCiTest {
                 for (int z = -4; z <= 4; z++)
                     lvl.setBlockAndUpdate(new BlockPos(fx + x, y, fz + z), net.minecraft.world.level.block.Blocks.WHITE_CONCRETE.defaultBlockState());
             sp.setInvisible(true);
-            sp.teleportTo(lvl, ex, ey, ez - 3.0, 0f, 0f);
+            sp.teleportTo(lvl, ex, ey - 5.0, ez, 0f, 0f);
+            sp.getAbilities().flying = true;
+            sp.onUpdateAbilities();
             modelo = CiudadelaMod.REY.get().create(lvl);
             modelo.moveTo(ex, ey, ez, 0f, 0f);
             modelo.setYBodyRot(0f);
@@ -223,7 +226,7 @@ public final class ClientCiTest {
             lvl.addFreshEntity(modelo);
             modelo.muestra(1, com.ciudadela.rey.Rey.POSE_SENTADO, 0, false);
         }));
-        Object[][] lista = {
+        escLista = new Object[][]{
                 {1, com.ciudadela.rey.Rey.POSE_SENTADO, 0, false, "sentado", 1.5f},
                 {1, com.ciudadela.rey.Rey.POSE_SENTADO, 0, true, "habla", 1.5f},
                 {1, com.ciudadela.rey.Rey.POSE_PIE, 0, false, "quieto", 1.0f},
@@ -232,45 +235,31 @@ public final class ClientCiTest {
                 {1, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.SALTO, false, "salto", 0f},
                 {1, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.GIRO, false, "giro", 0f},
                 {1, com.ciudadela.rey.Rey.POSE_GUARDIA, 0, false, "guardia", 1.2f},
+                {1, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.CONTRAATAQUE, false, "contraataque", 0f},
                 {1, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.TAJO_LEJOS, false, "tajo", 0f},
                 {2, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.GRITO, false, "grito", 0f},
                 {2, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.COMBO5, false, "combo5", 0f},
+                {2, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.ABANICO, false, "abanico", 0f},
                 {2, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.PILARES, false, "pilares", 0f},
+                {2, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.BOLAS, false, "bolas", 0f},
                 {2, com.ciudadela.rey.Rey.POSE_CARGA, 0, false, "embestida", 1.2f},
                 {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.COMBO8, false, "combo8", 0f},
+                {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.GEISER, false, "geiser", 0f},
                 {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.GOLPE_FINAL, false, "golpe_final", 0f},
                 {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.ATURDIDO, false, "aturdido", 0f},
                 {3, com.ciudadela.rey.Rey.POSE_PIE, com.ciudadela.rey.ReyAnims.MUERTE, false, "muerte", 0f},
         };
-        int t = 260;
-        int n = 0;
-        for (Object[] e : lista) {
-            final int fase = (Integer) e[0], pose = (Integer) e[1], anim = (Integer) e[2];
-            final boolean habla = (Boolean) e[3];
-            final String name = (String) e[4];
-            float len = anim > 0 ? com.ciudadela.rey.ReyAnims.TICKS[anim] / 20f : (Float) e[5];
-            atTicks(t, "Escaparate: " + name, m -> {
-                m.options.hideGui = true;
-                verDesde(m, new Vec3(ex + 2.6, ey + 1.9, ez + 4.4), new Vec3(ex, ey + 1.5, ez));
-                server(m, sp -> {
-                    if (modelo != null) {
-                        modelo.muestra(fase, pose, anim > 0 ? anim : 0, habla);
-                        modelo.moveTo(ex, ey, ez, 0f, 0f);
-                        modelo.setYBodyRot(0f);
-                        modelo.setYHeadRot(0f);
-                    }
-                });
-            });
-            float[] fr = anim > 0 ? new float[]{0.2f, 0.45f, 0.7f} : new float[]{1.0f};
-            for (float f : fr) {
-                final int k = n++;
-                atTicks(t + 4 + Math.round((anim > 0 ? len * f : len) * 20), "captura " + name,
-                        m -> shot(m, String.format("esc_%02d_%s_%d", k, name, Math.round(f * 100))));
-            }
-            t += 8 + Math.round(len * 20) + 6;
-        }
-        final int fin = t;
+        // el servidor integrado puede ir con retraso (genera terreno nuevo): cada pose se pide y se espera a que el
+        // cliente la tenga antes de contar el tiempo de las capturas (lo lleva escTick, tick a tick)
+        at(13, "Escaparate: empieza", m -> {
+            escI = 0;
+            escEstado = 0;
+            escN = 0;
+        });
+        int fin = 13 * 20 + ESC_TICKS;
         atTicks(fin, "Fin del escaparate", m -> {
+            if (escI >= 0) log("  escaparate sin terminar: se queda en " + escI + " de " + escLista.length);
+            escI = -1;
             m.setCameraEntity(m.player);
             m.options.hideGui = false;
             server(m, sp -> {
@@ -280,6 +269,69 @@ public final class ClientCiTest {
             });
         });
         return fin + 20;
+    }
+
+    private static final int ESC_TICKS = 20 * 95;
+    private static Object[][] escLista;
+    private static int escI = -1, escEstado, escDesde, escK, escN;
+
+    private static void escTick(Minecraft mc) {
+        if (escI < 0 || escLista == null || mc.level == null) return;
+        if (escI >= escLista.length) {
+            log("  escaparate terminado");
+            escI = -1;
+            return;
+        }
+        Object[] e = escLista[escI];
+        final int fase = (Integer) e[0], pose = (Integer) e[1], anim = (Integer) e[2];
+        final boolean habla = (Boolean) e[3];
+        final String name = (String) e[4];
+        float len = anim > 0 ? com.ciudadela.rey.ReyAnims.TICKS[anim] / 20f : (Float) e[5];
+        float[] fr = anim > 0 ? new float[]{0.15f, 0.35f, 0.55f, 0.8f} : new float[]{1.0f};
+        switch (escEstado) {
+            case 0 -> {
+                mc.options.hideGui = true;
+                verDesde(mc, new Vec3(ex + 2.6, ey + 1.9, ez + 4.4), new Vec3(ex, ey + 1.5, ez));
+                server(mc, sp -> {
+                    if (modelo != null) {
+                        modelo.muestra(fase, pose, anim, habla);
+                        modelo.moveTo(ex, ey, ez, 0f, 0f);
+                        modelo.setYBodyRot(0f);
+                        modelo.setYHeadRot(0f);
+                    }
+                });
+                escEstado = 1;
+                escDesde = ticks;
+            }
+            case 1 -> {
+                com.ciudadela.rey.Rey cr = null;
+                if (modelo != null && mc.level.getEntity(modelo.getId()) instanceof com.ciudadela.rey.Rey r) cr = r;
+                boolean ok = cr != null && cr.fase() == fase && cr.pose() == pose && cr.flag(com.ciudadela.rey.Rey.F_HABLA) == habla
+                        && cr.actionId() == anim;
+                if (ok) {
+                    escEstado = 2;
+                    escDesde = ticks;
+                    escK = 0;
+                    log("  escaparate: " + name + " en el cliente");
+                } else if (ticks - escDesde > 200) {
+                    log("  escaparate: " + name + " no llega al cliente (" + (cr == null ? "sin rey" : "fase " + cr.fase() + " pose " + cr.pose() + " accion " + cr.actionId()) + ")");
+                    escI++;
+                    escEstado = 0;
+                }
+            }
+            default -> {
+                if (escK < fr.length) {
+                    int when = Math.round((anim > 0 ? len * fr[escK] : len) * 20);
+                    if (ticks - escDesde >= when) {
+                        shot(mc, String.format("esc_%02d_%s_%d", escN++, name, Math.round(fr[escK] * 100)));
+                        escK++;
+                    }
+                } else {
+                    escI++;
+                    escEstado = 0;
+                }
+            }
+        }
     }
 
     // ------------------------------------------------------------------ armas del rey: golpes, combos y cubrirse

@@ -107,3 +107,5 @@ net.minecraft.world.level.block.state.BlockBehaviour
 net.minecraft.client.gui.screens.ConfirmScreen
 net.minecraftforge.client.event.ScreenEvent$Init
 net.minecraft.client.gui.components.Button
+net.minecraft.client.renderer.block.model.ItemTransform
+net.minecraft.client.renderer.block.model.ItemTransforms

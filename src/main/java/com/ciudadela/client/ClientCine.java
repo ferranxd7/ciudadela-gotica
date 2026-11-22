@@ -607,7 +607,11 @@ public final class ClientCine {
                 if (t >= tc - 0.3f && t < tc) a = Math.max(a, smooth(1 - (tc - t) / 0.3f));
                 else if (t >= tc && t < tc + 0.5f) a = Math.max(a, 1 - smooth((t - tc) / 0.5f));
             }
-            if (t < 0.6f) a = Math.max(a, 1 - smooth(t / 0.6f));
+            if (chapter == 30) {
+                // la dimension de los volcanes acaba de cargarse: un segundo en negro mientras llegan los chunks
+                if (t < 1.0f) a = 1;
+                else if (t < 1.8f) a = Math.max(a, 1 - smooth((t - 1.0f) / 0.8f));
+            } else if (t < 0.6f) a = Math.max(a, 1 - smooth(t / 0.6f));
             float back = backT();
             if (t >= back - 0.4f && t < back) a = Math.max(a, smooth(1 - (back - t) / 0.4f));
             else if (t >= back) a = Math.max(a, 1 - smooth((t - back) / 0.45f));
