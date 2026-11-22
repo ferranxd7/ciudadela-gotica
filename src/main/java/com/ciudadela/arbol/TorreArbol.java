@@ -102,7 +102,7 @@ public final class TorreArbol {
         CastlePlan plan = Story.planNear(sl, d.getBlockX(), d.getBlockZ());
         if (plan != null) ReyEstado.get(sl.getServer()).abrirSello(Sello.key(plan));
         if (!sp.isCreative()) llave.shrink(1);
-        d.empezar(sl);
+        d.empezar(sl, sp);
         double[] k = d.cerradura();
         Net.Llave m = new Net.Llave(k[0], k[1], k[2], 70);
         for (ServerPlayer p : sl.players()) if (p.distanceToSqr(k[0], k[1], k[2]) < 60 * 60) Net.to(p, m);

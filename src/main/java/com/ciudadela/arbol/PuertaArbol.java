@@ -119,8 +119,12 @@ public class PuertaArbol extends Entity {
         return InteractionResult.CONSUME;
     }
 
+    /** Quien metio la llave (se lleva el logro aunque se haya ido). */
+    private java.util.UUID abridor;
+
     /** Empieza la secuencia (la llama TorreArbol). */
-    void empezar(ServerLevel sl) {
+    void empezar(ServerLevel sl, ServerPlayer quien) {
+        this.abridor = quien.getUUID();
         this.entityData.set(INICIO, sl.getGameTime());
         this.entityData.set(ESTADO, ABRIENDO);
     }
@@ -170,14 +174,16 @@ public class PuertaArbol extends Entity {
             sl.sendParticles(ParticleTypes.ENCHANT, x, y + 5, z + 2.5, 6, 2.2, 3.5, 0.6, 0.6);
         if (t == T_BARRERA) quitarBarrera(sl);
         if (t == TOTAL - 4) {
-            // al acabar la cinematica: logro (con su fanfarria) para todos los que estan delante
-            int n = 0;
-            for (ServerPlayer p : sl.players())
-                if (p.distanceToSqr(this) < 48 * 48) {
-                    com.ciudadela.story.Logros.dar(p, com.ciudadela.story.Logros.ARBOL);
-                    n++;
-                }
-            CiudadelaMod.LOGGER.info("[Ciudadela] La puerta de la Sala del Arbol se ha abierto ({} jugadores delante)", n);
+            // al acabar la cinematica: logro (con su fanfarria) para quien la abrio y para todos los que estan delante
+            StringBuilder b = new StringBuilder();
+            for (ServerPlayer p : sl.getServer().getPlayerList().getPlayers()) {
+                double d = p.level() == sl ? Math.sqrt(p.distanceToSqr(this)) : -1;
+                boolean es = p.getUUID().equals(abridor);
+                b.append(' ').append(p.getGameProfile().getName()).append(es ? "(la abrio)" : "").append(" a ")
+                        .append(d < 0 ? "otra dimension" : String.format("%.1f", d));
+                if (es || (d >= 0 && d < 48)) com.ciudadela.story.Logros.dar(p, com.ciudadela.story.Logros.ARBOL);
+            }
+            CiudadelaMod.LOGGER.info("[Ciudadela] La puerta de la Sala del Arbol se ha abierto:{}", b);
         }
         if (t >= TOTAL) this.entityData.set(ESTADO, ABIERTA);
     }

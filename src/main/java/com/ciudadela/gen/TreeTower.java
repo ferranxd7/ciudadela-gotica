@@ -193,6 +193,9 @@ public class TreeTower extends Element {
                             int aa = Math.abs(ax >= az ? dz : dx);
                             int fr = rel % 12;
                             if (!cornerZone && (aa % 6 == 3 || aa % 6 == 4) && fr >= 3 && fr <= 8 && rel > 4 && w < 0.35) s = Pal.glass(x, y / 4, z);
+                            // luz en la cara de dentro, entre ventana y ventana (el hueco de la escalera es muy alto)
+                            if (m == H - 1 && !cornerZone && aa % 6 == 0 && (fr == 6 || fr == 0) && rel > 2 && y < towerTop - 2)
+                                s = Pal.b(Blocks.SHROOMLIGHT);
                         }
                         c.set(x, y, z, s);
                     }
@@ -337,7 +340,7 @@ public class TreeTower extends Element {
             int wx = cx + px + ox, wz = cz + pz + oz;
             Direction mira = Pal.dirOf(-ox, -oz);
             if (sup + 4 < F - 1) {
-                if (Math.abs(o) == 3) {
+                if (Math.abs(o) == 2) {
                     BlockState l = ModDeco.wallLight(mira.getOpposite(), n);
                     c.set(wx, sup + 2, wz, l != null ? l : Blocks.WALL_TORCH.defaultBlockState()
                             .setValue(net.minecraft.world.level.block.WallTorchBlock.FACING, mira));

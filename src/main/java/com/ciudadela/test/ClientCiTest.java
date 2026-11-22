@@ -829,6 +829,9 @@ public final class ClientCiTest {
             m.options.hideGui = false;
             server(m, sp -> {
                 var d = com.ciudadela.arbol.TorreArbol.puerta(sp.serverLevel(), hall);
+                BlockPos pp = sp.blockPosition();
+                log("  jugador en " + String.format("%.1f,%.1f,%.1f", sp.getX(), sp.getY(), sp.getZ()) + " pies " + sp.serverLevel().getBlockState(pp)
+                        + " cabeza " + sp.serverLevel().getBlockState(pp.above()) + " | " + (d == null ? "" : String.format("a %.1f de la puerta", Math.sqrt(sp.distanceToSqr(d)))));
                 log("  puerta antes: " + (d == null ? "NO ESTA" : "estado " + d.estado()) + " barrera: "
                         + sp.serverLevel().getBlockState(new BlockPos(hall[0], hall[2] + 2, hall[1] - 15)));
                 if (d != null) log("  usar la llave: " + d.interact(sp, InteractionHand.MAIN_HAND));
@@ -842,6 +845,7 @@ public final class ClientCiTest {
         atTicks(S + 490 + 190, "Captura: la sala del arbol abierta", m -> {
             server(m, sp -> {
                 var d = com.ciudadela.arbol.TorreArbol.puerta(sp.serverLevel(), hall);
+                log("  jugador en " + String.format("%.1f,%.1f,%.1f", sp.getX(), sp.getY(), sp.getZ()) + " (" + sp.level().dimension().location() + ")");
                 log("  puerta despues: " + (d == null ? "NO ESTA" : "estado " + d.estado()) + " barrera: "
                         + sp.serverLevel().getBlockState(new BlockPos(hall[0], hall[2] + 2, hall[1] - 15)));
             });
