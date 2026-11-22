@@ -136,7 +136,12 @@ public class Ascensor extends Entity {
         boolean abajo = estado() == ABAJO;
         double aqui = abajo ? y0() : y1(), alli = abajo ? y1() : y0();
         List<ServerPlayer> encima = encima(sl, aqui);
-        recien.removeIf(u -> encima.stream().noneMatch(p -> p.getUUID().equals(u)));
+        // quien acaba de llegar no vuelve a viajar hasta que se baje del disco (solo por la posicion: justo al
+        // bajarse no esta "en el suelo" un tick y no hay que olvidarle por eso)
+        recien.removeIf(u -> {
+            ServerPlayer p = sl.getServer().getPlayerList().getPlayer(u);
+            return p == null || p.level() != sl || !sobreDisco(p, aqui, 0.6);
+        });
         encima.removeIf(p -> recien.contains(p.getUUID()));
         if (!encima.isEmpty()) {
             int c = this.entityData.get(CARGA) + 1;
@@ -171,6 +176,11 @@ public class Ascensor extends Entity {
     private static String barra(int c) {
         int n = Mth.clamp(Math.round(c * 8f / ESPERA), 0, 8);
         return "◆".repeat(n) + "◇".repeat(8 - n);
+    }
+
+    /** ¿Esta este jugador encima del disco (o de la runa del otro extremo) a la altura y? (solo la posicion) */
+    private boolean sobreDisco(ServerPlayer p, double y, double margen) {
+        return Math.abs(p.getX() - getX()) < RADIO + margen && Math.abs(p.getZ() - getZ()) < RADIO + margen && Math.abs(p.getY() - y) < 1.5;
     }
 
     /** Jugadores de pie sobre el disco (o sobre la runa del otro extremo) a la altura y. */
