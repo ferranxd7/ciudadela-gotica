@@ -46,6 +46,35 @@ public final class EspejoHud {
         return new ResourceLocation(DarkCraftMod.MODID, p);
     }
 
+    /**
+     * Mezcla normal encendida. Hace falta antes de cada blit con transparencia: {@code g.fill}, {@code drawString} y
+     * {@code PlayerFaceRenderer} la dejan apagada al acabar, y sin ella lo transparente sale opaco.
+     */
+    static void mezcla() {
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+    }
+
+    /** Mezcla aditiva (brillos). */
+    static void suma() {
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+    }
+
+    /** Un cuadro con toda la textura y esquinas en coma flotante (dos cuadros que comparten borde no dejan rendija). */
+    static void cuadro(GuiGraphics g, ResourceLocation tex, float x0, float y0, float x1, float y1) {
+        RenderSystem.setShaderTexture(0, tex);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        Matrix4f m = g.pose().last().pose();
+        BufferBuilder bb = Tesselator.getInstance().getBuilder();
+        bb.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        bb.vertex(m, x0, y0, 0).uv(0, 0).endVertex();
+        bb.vertex(m, x0, y1, 0).uv(0, 1).endVertex();
+        bb.vertex(m, x1, y1, 0).uv(1, 1).endVertex();
+        bb.vertex(m, x1, y0, 0).uv(1, 0).endVertex();
+        BufferUploader.drawWithShader(bb.end());
+    }
+
     static final ResourceLocation MARCO = rl("textures/gui/espejo_marco.png"), CRISTAL = rl("textures/gui/espejo_cristal.png"),
             HUMO = rl("textures/gui/humo.png"), ICONOS = rl("textures/gui/espejo_iconos.png"), BRILLO = rl("textures/gui/brillo.png");
     /** Medidas de la textura del marco (las mismas que tools/espejo/texturas.py). */
@@ -181,7 +210,7 @@ public final class EspejoHud {
                 if (nueva) java.util.Arrays.fill(col, 0);
             }
             BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
-            for (int n = 0; n < 14; n++) {
+            for (int n = 0; n < 10; n++) {
                 int j = fila;
                 fila = (fila + 1) % P;
                 int z = cz - RP + j;
@@ -193,26 +222,41 @@ public final class EspejoHud {
             }
         }
 
+        private static boolean solido(ClientLevel lvl, int x, int y, int z, BlockPos.MutableBlockPos m) {
+            BlockState st = lvl.getBlockState(m.set(x, y, z));
+            return !st.isAir() && st.blocksMotion();
+        }
+
+        /** Se puede estar de pie: ni los pies ni la cabeza dan con algo solido. */
+        private static boolean hueco(ClientLevel lvl, int x, int y, int z, BlockPos.MutableBlockPos m) {
+            return !solido(lvl, x, y, z, m) && !solido(lvl, x, y + 1, z, m);
+        }
+
         private static int columna(ClientLevel lvl, int x, int z, int y, BlockPos.MutableBlockPos m) {
             if (!lvl.hasChunk(x >> 4, z >> 4)) return 0;
             // muro: algo solido a la altura de los pies o de la cabeza
             for (int dy = 1; dy >= 0; dy--) {
                 BlockState st = lvl.getBlockState(m.set(x, y + dy, z));
                 if (!st.isAir() && st.blocksMotion()) {
+                    // solo la cara que da a un hueco es muro; lo de dentro es roca maciza (rayada, como en un plano)
+                    if (!hueco(lvl, x + 1, y, z, m) && !hueco(lvl, x - 1, y, z, m) && !hueco(lvl, x, y, z + 1, m) && !hueco(lvl, x, y, z - 1, m))
+                        return Math.floorMod(x + z, 4) == 0 ? 0xff1c1418 : 0xff0b0809;
+                    m.set(x, y + dy, z);
                     MapColor mc = st.getMapColor(lvl, m);
                     int base = mc == MapColor.NONE ? 0x808080 : mc.col;
-                    int r = (((base >> 16) & 255) + 2 * 196) / 3, g = (((base >> 8) & 255) + 2 * 190) / 3, b = ((base & 255) + 2 * 204) / 3;
+                    int r = (((base >> 16) & 255) + 3 * 206) / 4, g = (((base >> 8) & 255) + 3 * 198) / 4, b = ((base & 255) + 3 * 204) / 4;
                     return 0xff000000 | (r << 16) | (g << 8) | b;
                 }
             }
-            // suelo: lo primero que haya por debajo de los pies
+            // suelo: lo primero que haya por debajo de los pies (apagado, para que los muros se lean bien)
             for (int d = 0; d < 9; d++) {
                 BlockState st = lvl.getBlockState(m.set(x, y - 1 - d, z));
                 if (st.isAir()) continue;
                 MapColor mc = st.getMapColor(lvl, m);
                 if (mc == MapColor.NONE) continue;
                 int e = estilo(0xff000000 | mc.col, x, z);
-                return 0xff000000 | Exploracion.escala(e & 0xffffff, Math.max(0.35f, 0.95f - d * 0.08f));
+                int r = (((e >> 16) & 255) * 2 + 0x46) / 3, g = (((e >> 8) & 255) * 2 + 0x30) / 3, b = ((e & 255) * 2 + 0x36) / 3;
+                return 0xff000000 | Exploracion.escala((r << 16) | (g << 8) | b, Math.max(0.4f, 0.92f - d * 0.07f));
             }
             return 0xff060406;
         }
@@ -252,13 +296,12 @@ public final class EspejoHud {
         float yaw = Mth.rotLerp(pt, mc.player.yRotO, mc.player.getYRot()) * Mth.DEG_TO_RAD;
         float fx = -Mth.sin(yaw), fz = Mth.cos(yaw), rx = -Mth.cos(yaw), rz = -Mth.sin(yaw);
         float bloques = EspejoCliente.ZOOM[EspejoCliente.zoom];
-        if (EspejoCliente.dentro) bloques = Math.min(bloques, Planta.RP - 4);
         float esc = (BI * s) / bloques;
 
         g.flush();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        mezcla();
         humo(g, cxs, cys, s, t, a, false);
+        mezcla();
 
         // el mapa: un abanico de triangulos con la forma del cristal
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
@@ -279,6 +322,7 @@ public final class EspejoHud {
         BufferUploader.drawWithShader(bb.end());
 
         marcadores(mc, g, pt, cxs, cys, s, esc, px, pz, fx, fz, rx, rz, t, a);
+        mezcla();
 
         // el jugador: la flecha en el centro (el mapa gira, la flecha siempre mira arriba)
         RenderSystem.setShaderColor(1, 1, 1, a);
@@ -293,16 +337,16 @@ public final class EspejoHud {
         // el ojo de la cresta late
         float latido = 0.55f + 0.45f * (float) Math.pow(Math.max(0, Math.sin(t * 2.3)), 3);
         if (EspejoCliente.aparecer < 120) latido = Math.max(latido, 1.2f - (EspejoCliente.aparecer + pt) / 120f);
-        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+        suma();
         RenderSystem.setShaderColor(1f, 0.15f, 0.12f, Math.min(1f, latido * 0.85f) * a);
         float ojoX = x0 + CX * s, ojoY = y0 + (CY - BO - 8) * s, rOjo = 26 * s;
         g.blit(BRILLO, Math.round(ojoX - rOjo), Math.round(ojoY - rOjo), Math.round(rOjo * 2), Math.round(rOjo * 2), 0, 0, 64, 64, 64, 64);
-        RenderSystem.defaultBlendFunc();
+        mezcla();
         RenderSystem.setShaderColor(1, 1, 1, 1);
         humo(g, cxs, cys, s, t, a, true);
         norte(mc, g, cxs, cys, s, yaw, a);
-        texto(mc, g, cxs, y0 + H, s, a);
-        RenderSystem.disableBlend();
+        texto(mc, g, cxs, y0 + H, s, a, sw);
+        mezcla();
     }
 
     /** Cuanto bajar el espejo para no tapar los iconos de los efectos (arriba a la derecha). */
@@ -317,6 +361,7 @@ public final class EspejoHud {
     }
 
     static void dibujar(GuiGraphics g, ResourceLocation r, float x, float y, float s) {
+        RenderSystem.enableBlend();
         g.pose().pushPose();
         g.pose().translate(x, y, 0);
         g.pose().scale(s, s, 1);
@@ -326,6 +371,7 @@ public final class EspejoHud {
 
     /** Un icono del atlas centrado en (x, y) con lado l (en px de la gui). */
     static void icono(GuiGraphics g, int i, float x, float y, float l) {
+        RenderSystem.enableBlend();
         g.pose().pushPose();
         g.pose().translate(x - l / 2, y - l / 2, 0);
         g.pose().scale(l / 16f, l / 16f, 1);
@@ -335,6 +381,7 @@ public final class EspejoHud {
 
     /** Humo de la Sombra: bocanadas negras y rojas que salen del marco y se deshacen. */
     private static void humo(GuiGraphics g, float cx, float cy, float s, float t, float a, boolean delante) {
+        mezcla();
         int n = delante ? 7 : 18;
         for (int i = 0; i < n; i++) {
             float fase = (i * 0.618f + (delante ? 0.31f : 0f)) % 1f;
@@ -373,7 +420,7 @@ public final class EspejoHud {
     }
 
     /** Debajo del espejo: el nombre del sitio y las coordenadas. */
-    private static void texto(Minecraft mc, GuiGraphics g, float cx, float yBottom, float s, float a) {
+    private static void texto(Minecraft mc, GuiGraphics g, float cx, float yBottom, float s, float a, int sw) {
         Component nombre;
         String l = EspejoCliente.lugar;
         if (l != null && !l.isEmpty()) nombre = Component.translatable(l);
@@ -383,10 +430,12 @@ public final class EspejoHud {
                     : Component.translatable("darkcraft.espejo.desconocido");
         }
         BlockPos p = mc.player.blockPosition();
-        String coords = "X " + p.getX() + "   Y " + p.getY() + "   Z " + p.getZ();
+        String coords = "X " + p.getX() + "  Y " + p.getY() + "  Z " + p.getZ();
         float ts = Mth.clamp(s / 0.34f, 0.7f, 1.0f);
         int w1 = mc.font.width(nombre), w2 = mc.font.width(coords);
         float w = Math.max(w1, w2 * 0.85f) * ts + 10;
+        // centrado debajo del espejo, pero sin salirse por la derecha
+        cx = Math.min(cx, sw - 2 - w / 2);
         float y = yBottom + 1;
         int fondo = ((int) (0x9a * a) << 24) | 0x0a0406;
         g.fill(Math.round(cx - w / 2), Math.round(y), Math.round(cx + w / 2), Math.round(y + 21 * ts), fondo);
@@ -420,11 +469,11 @@ public final class EspejoHud {
                 if (lu.tipo() == Espejo.COFRE && lu.estado() == Espejo.HECHO) ic = I_COFRE_LEIDO;
                 if (objetivo) {
                     float lat = 0.6f + 0.4f * (float) Math.sin(t * 4);
-                    RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+                    suma();
                     RenderSystem.setShaderColor(1f, 0.2f, 0.1f, 0.75f * lat * a);
                     float r = l * 1.4f;
                     g.blit(BRILLO, Math.round(x - r), Math.round(y - r), Math.round(r * 2), Math.round(r * 2), 0, 0, 64, 64, 64, 64);
-                    RenderSystem.defaultBlendFunc();
+                    mezcla();
                 }
                 float al = (dentroE ? 1f : 0.75f) * a;
                 RenderSystem.setShaderColor(1, 1, 1, al);
@@ -463,9 +512,11 @@ public final class EspejoHud {
             float x = cx + d[0], y = cy + d[1];
             g.fill(Math.round(x - lado / 2f) - 1, Math.round(y - lado / 2f) - 1, Math.round(x - lado / 2f) + lado + 1,
                     Math.round(y - lado / 2f) + lado + 1, ((int) (a * 230) << 24) | 0x8A1016);
+            mezcla();
             RenderSystem.setShaderColor(1, 1, 1, a);
             PlayerFaceRenderer.draw(g, piel(mc, am), Math.round(x - lado / 2f), Math.round(y - lado / 2f), lado);
             RenderSystem.setShaderColor(1, 1, 1, 1);
+            mezcla(); // la cara (el sombrero de la piel) apaga la mezcla al acabar
         }
     }
 

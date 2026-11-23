@@ -788,7 +788,7 @@ public final class ClientCiTest {
         });
         atTicks(t + 124, "zoom de cerca", m -> com.darkcraft.client.espejo.EspejoCliente.probar(0, 1));
         atTicks(t + 128, "captura", m -> shot(m, "cliente_e02_espejo_cerca"));
-        atTicks(t + 130, "zoom de lejos", m -> com.darkcraft.client.espejo.EspejoCliente.probar(5, 1));
+        atTicks(t + 130, "zoom de lejos", m -> com.darkcraft.client.espejo.EspejoCliente.probar(4, 1));
         atTicks(t + 134, "captura", m -> shot(m, "cliente_e03_espejo_lejos"));
         atTicks(t + 136, "espejo grande y un amigo de mentira", m -> {
             com.darkcraft.client.espejo.EspejoCliente.probar(2, 2);
@@ -797,50 +797,67 @@ public final class ClientCiTest {
         atTicks(t + 140, "captura", m -> shot(m, "cliente_e04_espejo_grande_amigo"));
         atTicks(t + 142, "espejo pequeno", m -> com.darkcraft.client.espejo.EspejoCliente.probar(2, 0));
         atTicks(t + 146, "captura", m -> shot(m, "cliente_e05_espejo_pequeno"));
-        atTicks(t + 148, "Libro de la Sombra: historia", m -> {
+        // el espejo fuera, a cielo abierto: el reflejo oscuro de la isla (no la planta)
+        atTicks(t + 148, "Espejo fuera: en la avenida de la fuente", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            CastlePlan plan = PlanCache.get(lvl.getSeed(), castle[0], castle[1], (x, z) -> 64);
+            int fx = plan.cx + 1, fz = plan.cz + 116;
+            int y = lvl.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, fx, fz);
+            log("  fuera en " + fx + "," + y + "," + fz);
+            sp.teleportTo(lvl, fx + 0.5, y, fz + 0.5, 180f, 25f);
+        }));
+        atTicks(t + 226, "Captura del espejo fuera", m -> {
+            log("  espejo fuera: " + com.darkcraft.client.espejo.EspejoCliente.resumen());
+            shot(m, "cliente_e07_fuera");
+        });
+        atTicks(t + 228, "zoom de lejos fuera", m -> com.darkcraft.client.espejo.EspejoCliente.probar(4, 1));
+        atTicks(t + 232, "captura", m -> shot(m, "cliente_e08_fuera_lejos"));
+        final int L = t + 236;
+        atTicks(L + 0, "Libro de la Sombra: historia", m -> {
             com.darkcraft.client.espejo.EspejoCliente.probar(2, 1);
-            libro = new com.darkcraft.client.espejo.LibroScreen();
-            m.setScreen(libro);
+            // como con la tecla M (da el logro libro_sombra)
+            com.darkcraft.client.espejo.LibroScreen.abrir();
+            libro = (com.darkcraft.client.espejo.LibroScreen) m.screen;
             libro.probar(0, 0, -1);
         });
-        atTicks(t + 156, "captura", m -> shot(m, "cliente_e10_historia"));
-        atTicks(t + 158, "la cronica, capitulo 1", m -> libro.probar(0, 0, 1));
-        atTicks(t + 162, "captura", m -> shot(m, "cliente_e11_cronica"));
-        atTicks(t + 164, "el diario", m -> libro.probar(0, 0, 10));
-        atTicks(t + 168, "captura", m -> shot(m, "cliente_e12_diario"));
-        atTicks(t + 170, "el mapa", m -> libro.probarZoom(1.5f));
-        atTicks(t + 180, "captura", m -> shot(m, "cliente_e13_mapa"));
-        atTicks(t + 182, "el mapa de lejos", m -> libro.probarZoom(0.3f));
-        atTicks(t + 192, "captura", m -> shot(m, "cliente_e14_mapa_lejos"));
-        atTicks(t + 194, "una marca nueva: el dialogo", m -> {
+        atTicks(L + 8, "captura", m -> shot(m, "cliente_e10_historia"));
+        atTicks(L + 10, "la cronica, capitulo 1", m -> libro.probar(0, 0, 1));
+        atTicks(L + 14, "captura", m -> shot(m, "cliente_e11_cronica"));
+        atTicks(L + 16, "el diario", m -> libro.probar(0, 0, 10));
+        atTicks(L + 20, "captura", m -> shot(m, "cliente_e12_diario"));
+        atTicks(L + 22, "el mapa", m -> libro.probarZoom(1.5f));
+        atTicks(L + 32, "captura", m -> shot(m, "cliente_e13_mapa"));
+        atTicks(L + 34, "el mapa de lejos", m -> libro.probarZoom(0.3f));
+        atTicks(L + 44, "captura", m -> shot(m, "cliente_e14_mapa_lejos"));
+        atTicks(L + 46, "una marca nueva: el dialogo", m -> {
             libro.probarZoom(1.5f);
             libro.probarMarca("Torre del cronista", 1, 0, false);
         });
-        atTicks(t + 200, "captura", m -> shot(m, "cliente_e15_marca_dialogo"));
-        atTicks(t + 202, "escribir la marca (la pluma)", m -> libro.probarMarca("Torre del cronista", 1, 0, true));
+        atTicks(L + 52, "captura", m -> shot(m, "cliente_e15_marca_dialogo"));
+        atTicks(L + 54, "escribir la marca (la pluma)", m -> libro.probarMarca("Torre del cronista", 1, 0, true));
         int[] esc = {6, 18, 30, 44};
         for (int i = 0; i < esc.length; i++) {
             final int k = i;
-            atTicks(t + 202 + esc[i], "captura de la escena", m -> shot(m, "cliente_e16_escribe_" + k));
+            atTicks(L + 54 + esc[i], "captura de la escena", m -> shot(m, "cliente_e16_escribe_" + k));
         }
-        atTicks(t + 262, "captura del mapa con la marca", m -> {
+        atTicks(L + 114, "captura del mapa con la marca", m -> {
             log("  espejo con la marca: " + com.darkcraft.client.espejo.EspejoCliente.resumen());
             shot(m, "cliente_e17_mapa_marca");
         });
-        atTicks(t + 264, "logros", m -> libro.probar(2, 0, 0));
-        atTicks(t + 270, "captura", m -> shot(m, "cliente_e18_logros"));
-        atTicks(t + 272, "coleccion", m -> libro.probar(2, 1, 0));
-        atTicks(t + 278, "captura", m -> shot(m, "cliente_e19_coleccion"));
-        atTicks(t + 280, "bestiario", m -> libro.probar(2, 2, 1));
-        atTicks(t + 290, "captura", m -> shot(m, "cliente_e20_bestiario"));
-        atTicks(t + 292, "cerrar el libro", m -> {
+        atTicks(L + 116, "logros", m -> libro.probar(2, 0, 0));
+        atTicks(L + 122, "captura", m -> shot(m, "cliente_e18_logros"));
+        atTicks(L + 124, "coleccion", m -> libro.probar(2, 1, 0));
+        atTicks(L + 130, "captura", m -> shot(m, "cliente_e19_coleccion"));
+        atTicks(L + 132, "bestiario", m -> libro.probar(2, 2, 1));
+        atTicks(L + 142, "captura", m -> shot(m, "cliente_e20_bestiario"));
+        atTicks(L + 144, "cerrar el libro", m -> {
             m.setScreen(null);
             com.darkcraft.client.espejo.EspejoCliente.probarAmigo(false);
             log("  logros del espejo: libro_sombra/primera_marca (los da el servidor)");
             server(m, sp -> log("  libro_sombra=" + com.darkcraft.story.Logros.tiene(sp, "libro_sombra")
                     + " primera_marca=" + com.darkcraft.story.Logros.tiene(sp, "primera_marca")));
         });
-        return t + 300;
+        return L + 152;
     }
 
     // ------------------------------------------------------------------ el Rey

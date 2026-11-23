@@ -81,7 +81,8 @@ public final class LibroScreen extends Screen {
 
     @Override
     protected void init() {
-        int maxW = Math.min(width - 70, 560), maxH = height - 22;
+        // el libro mas las cintas (que asoman por la derecha: 68 px de la textura + 34) caben en la pantalla
+        int maxW = Math.min(Math.round((width - 12 - 34) / (1f + 68f / LW)), 560), maxH = height - 22;
         bw = maxW;
         bh = Math.round(bw * LH / (float) LW);
         if (bh > maxH) {
@@ -89,7 +90,8 @@ public final class LibroScreen extends Screen {
             bw = Math.round(bh * LW / (float) LH);
         }
         k = bw / (float) LW;
-        bx = (width - bw - 46) / 2;
+        int total = bw + Math.round(68 * k) + 34;
+        bx = (width - total) / 2;
         by = (height - bh) / 2;
         if (marca != null) marca.colocar();
         if (vista == null) vista = new Vista();
@@ -211,7 +213,7 @@ public final class LibroScreen extends Screen {
     public void renderBackground(GuiGraphics g) {
         float t = (net.minecraft.Util.getMillis() - abierto) / 1000f;
         g.fill(0, 0, width, height, 0xB8070306);
-        RenderSystem.enableBlend();
+        EspejoHud.mezcla();
         RenderSystem.setShaderColor(0.45f, 0.02f, 0.04f, 0.85f);
         g.blit(VINIETA, 0, 0, width, height, 0, 0, 256, 256, 256, 256);
         RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -241,6 +243,7 @@ public final class LibroScreen extends Screen {
             cacheLogros = null;
         }
         renderBackground(g);
+        EspejoHud.mezcla();
         float p = Mth.clamp((net.minecraft.Util.getMillis() - abierto) / 220f, 0, 1);
         float e = 0.94f + 0.06f * (1 - (1 - p) * (1 - p));
         g.pose().pushPose();
@@ -287,6 +290,7 @@ public final class LibroScreen extends Screen {
             int[] r = cinta(i);
             boolean sel = seccion == i, sobre = mx >= r[0] && mx < r[2] && my >= r[1] && my < r[3];
             int extra = sel ? 8 : sobre ? 4 : 0;
+            EspejoHud.mezcla();
             g.blit(PESTANAS, r[0], r[1], r[2] - r[0] + extra, r[3] - r[1], 0, sel ? 22 : 0, 72, 22, 72, 44);
             EspejoHud.icono(g, iconos[i], r[0] + 12 + extra / 2f, (r[1] + r[3]) / 2f, 12);
             g.drawString(font, Component.translatable(claves[i]), r[0] + 21 + extra / 2, (r[1] + r[3]) / 2 - 4, sel ? 0xFFFFF0D8 : 0xFFE0C8A8, true);
@@ -698,11 +702,11 @@ public final class LibroScreen extends Screen {
                 le.yHeadRot = le.getYRot();
                 le.yHeadRotO = le.yHeadRot;
                 le.setXRot(0);
-                int esc = Math.max(8, Math.round(caja / Math.max(1f, le.getBbHeight())));
+                int esc = Math.max(8, Math.round(caja * 0.7f / Math.max(1f, Math.max(le.getBbHeight(), le.getBbWidth() * 1.3f))));
                 if (visto) RenderSystem.setShaderColor(0.92f, 0.84f, 0.72f, 1f);
                 else RenderSystem.setShaderColor(0, 0, 0, 1);
                 try {
-                    InventoryScreen.renderEntityInInventory(g, rcx, ry + 10 + caja, esc, new Quaternionf().rotateZ((float) Math.PI), null, le);
+                    InventoryScreen.renderEntityInInventory(g, rcx, ry + 8 + Math.round(caja * 0.8f), esc, new Quaternionf().rotateZ((float) Math.PI), null, le);
                 } catch (RuntimeException ex) {
                     DarkCraftMod.LOGGER.debug("Bestiario: no se pudo dibujar {}: {}", c, ex.toString());
                 }
@@ -970,11 +974,16 @@ public final class LibroScreen extends Screen {
             selector[0] = selX;
             selector[1] = selX + 16 + font.width(nd);
             selector[2] = selY;
+            Component tam = Component.translatable("darkcraft.sombra.mapa.tamano",
+                    Component.translatable("darkcraft.sombra.mapa.tam." + EspejoCliente.tamano));
+            int tamX = X(478) - font.width(tam);
+            botones[2] = boton(g, tamX, selY, tam, mx, my);
             Component tit = Component.translatable("darkcraft.sombra.mapa").withStyle(ChatFormatting.BOLD);
-            centro(g, tit, (X(272) + X(478)) / 2, selY, ROJO);
+            centro(g, tit, (X(272) + tamX - 8) / 2, selY, ROJO);
             // el mapa
             g.enableScissor(x0, y0, x1, y1);
             g.fill(x0, y0, x1, y1, 0x5a140608);
+            EspejoHud.mezcla();
             float t = (net.minecraft.Util.getMillis() - abierto) / 1000f;
             for (int i = 0; i < 14; i++) {
                 float hx = x0 + ((i * 97 + t * 3) % (x1 - x0 + 80)) - 40, hy = y0 + ((i * 61) % (y1 - y0 + 60)) - 30;
@@ -991,11 +1000,9 @@ public final class LibroScreen extends Screen {
                     for (int rz = rz0; rz <= rz1; rz++) {
                         Tex tx = textura(rx, rz);
                         if (tx == null || tx.id == null) continue;
-                        g.pose().pushPose();
-                        g.pose().translate(sx(rx * (double) Exploracion.R), sy(rz * (double) Exploracion.R), 0);
-                        g.pose().scale(ppb, ppb, 1);
-                        g.blit(tx.id, 0, 0, 0, 0, Exploracion.R, Exploracion.R, Exploracion.R, Exploracion.R);
-                        g.pose().popPose();
+                        // las esquinas salen de la misma cuenta que las de la region de al lado: sin rendijas entre regiones
+                        EspejoHud.cuadro(g, tx.id, sx(rx * (double) Exploracion.R), sy(rz * (double) Exploracion.R),
+                                sx((rx + 1) * (double) Exploracion.R), sy((rz + 1) * (double) Exploracion.R));
                     }
             }
             // sombra del lomo del libro por encima del mapa
@@ -1012,9 +1019,6 @@ public final class LibroScreen extends Screen {
             int by2 = Y(290);
             botones[0] = boton(g, X(34), by2, Component.translatable("darkcraft.sombra.mapa.centrar"), mx, my);
             botones[1] = boton(g, botones[0][2] + 10, by2, Component.translatable("darkcraft.sombra.mapa.nueva"), mx, my);
-            Component tam = Component.translatable("darkcraft.sombra.mapa.tamano",
-                    Component.translatable("darkcraft.sombra.mapa.tam." + EspejoCliente.tamano));
-            botones[2] = boton(g, X(272), by2, tam, mx, my);
             g.pose().pushPose();
             g.pose().translate(X(478), by2 + 1, 0);
             g.pose().scale(0.75f, 0.75f, 1);
@@ -1056,11 +1060,11 @@ public final class LibroScreen extends Screen {
                     boolean objetivo = lu.tipo() == Espejo.COFRE && lu.cap() == siguiente && lu.estado() != Espejo.HECHO;
                     if (objetivo) {
                         float lat = 0.6f + 0.4f * (float) Math.sin(t * 4);
-                        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+                        EspejoHud.suma();
                         RenderSystem.setShaderColor(1f, 0.2f, 0.1f, 0.8f * lat);
                         float r = l * 1.5f;
                         g.blit(EspejoHud.BRILLO, Math.round(x - r), Math.round(y - r), Math.round(r * 2), Math.round(r * 2), 0, 0, 64, 64, 64, 64);
-                        RenderSystem.defaultBlendFunc();
+                        EspejoHud.mezcla();
                         RenderSystem.setShaderColor(1, 1, 1, 1);
                     }
                     EspejoHud.icono(g, ic, x, y, l);
@@ -1121,7 +1125,9 @@ public final class LibroScreen extends Screen {
                 float x = sx(ax), y = sy(az);
                 int lado = Math.round(l);
                 g.fill(Math.round(x - lado / 2f) - 1, Math.round(y - lado / 2f) - 1, Math.round(x - lado / 2f) + lado + 1, Math.round(y - lado / 2f) + lado + 1, 0xE08A1016);
+                EspejoHud.mezcla();
                 PlayerFaceRenderer.draw(g, EspejoHud.piel(mc, a), Math.round(x - lado / 2f), Math.round(y - lado / 2f), lado);
+                EspejoHud.mezcla(); // la cara (el sombrero de la piel) apaga la mezcla al acabar
                 if (Math.abs(mx - x) <= l / 2 && Math.abs(my - y) <= l / 2) {
                     hover.add(Component.literal(a.nombre()).withStyle(ChatFormatting.WHITE));
                     hover.add(Component.literal("X " + a.x() + "  Y " + a.y() + "  Z " + a.z()).withStyle(ChatFormatting.DARK_GRAY));

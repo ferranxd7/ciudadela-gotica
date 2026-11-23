@@ -432,7 +432,8 @@ public final class Espejo {
             if (p.getY() < CastlePlan.Y0 - 60) return "";
             // salas de los jefes primero
             Lugar arbol = buscar(p.server, s, "gavran");
-            if (arbol != null) {
+            if (arbol != null && p.getY() > arbol.y() - 8) {
+                // la sala del arbol esta muy por encima del castillo: solo cuenta a su altura
                 double da = Math.hypot(arbol.x() + 0.5 - p.getX(), (arbol.z() + TreeTower.HALL_R - 3) + 0.5 - p.getZ());
                 if (da < TreeTower.HALL_R + 2) return "darkcraft.mapa.lugar.arbol";
             }
