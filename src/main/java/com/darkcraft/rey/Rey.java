@@ -72,8 +72,11 @@ public class Rey extends Monster {
 
     /** Vida "real" del jefe (el maximo de Minecraft es 1024): el dano que recibe se escala. */
     public static final float VIDA = 1000f;
-    /** Vida efectiva de cada fase para un jugador solo (con espada de netherite afilada V: unos 5 minutos). */
-    public static final float VIDA_FASE = 1200f;
+    /**
+     * Vida efectiva de cada fase para un jugador solo (con espada de netherite afilada V: unos 3 minutos y cuarto). Antes
+     * era 1200; el usuario la pidio un 35 % mas baja.
+     */
+    public static final float VIDA_FASE = 780f;
     /** Todo el dano del Rey (menos el golpe final, que tiene que matar fuera de la zona dorada). */
     private static final float DANO = 0.75f;
 
@@ -450,19 +453,26 @@ public class Rey extends Monster {
 
     // ------------------------------------------------------------------ intro: habla sentado
 
-    public static final int INTRO_TICKS = 20 * 17;
-    private static final int[][] INTRO_LINES = {{30, 1}, {30 + 95, 2}, {30 + 95 + 115, 3}};
+    /**
+     * Cuando dice sentado cada frase de la entrada (la 1, la 2 y la 3): salen de lo que dura cada una (Voces), con una
+     * pausa entre ellas, y no se levanta hasta un segundo despues de acabar la ultima.
+     */
+    private static final int[] INTRO_LINES = {30, 30 + Voces.ticks(1) + Voces.PAUSA,
+            30 + Voces.ticks(1) + Voces.PAUSA + Voces.ticks(2) + Voces.PAUSA};
+    private static final int INTRO_LEVANTA = INTRO_LINES[2] + Voces.ticks(3) + 20;
+    /** Duracion de la entrada (ticks): la cinematica sigue mientras se levanta. */
+    public static final int INTRO_TICKS = INTRO_LEVANTA + 60;
 
     private void intro(ServerLevel sl) {
         setPose(POSE_SENTADO);
-        for (int[] l : INTRO_LINES)
-            if (t == l[0]) {
+        for (int i = 0; i < INTRO_LINES.length; i++) {
+            if (t == INTRO_LINES[i]) {
                 setFlag(F_HABLA, true);
-                habla(sl, l[1]);
+                habla(sl, i + 1);
             }
-        if (t == INTRO_LINES[2][0] + 70) setFlag(F_HABLA, false);
-        if (t == 30 + 85 || t == 30 + 95 + 105) setFlag(F_HABLA, false);
-        if (t >= INTRO_TICKS - 60) {
+            if (t == INTRO_LINES[i] + Voces.ticks(i + 1)) setFlag(F_HABLA, false);
+        }
+        if (t >= INTRO_LEVANTA) {
             setFlag(F_HABLA, false);
             levantarse(sl);
         }
@@ -472,22 +482,29 @@ public class Rey extends Monster {
         return v;
     }
 
+    /** Segundos en que cambia de plano la entrada (a mitad de la frase 1, al final de la 2 y de la 3) y en que acaba. */
+    public static float[] cortesEntrada() {
+        return new float[]{(INTRO_LINES[0] + Voces.ticks(1) * 0.5f) / 20f, (INTRO_LINES[1] + Voces.ticks(2) * 0.6f) / 20f,
+                (INTRO_LINES[2] + Voces.ticks(3)) / 20f, INTRO_TICKS / 20f - 0.6f};
+    }
+
     /** Planos de la intro: avanzar por la alfombra, su cara mientras habla, contrapicado y se levanta. */
     public static List<com.darkcraft.cine.Shot> introPlanos(Sala s, Vec3 eye) {
         double sx = s.t.seatX() + 0.5, sz = s.t.seatZ() + 0.5, F = s.t.y();
         double headY = F + 4.9;
         List<com.darkcraft.cine.Shot> l = new ArrayList<>();
         double ax = sx, ay = F + 3.0, az = sz + 15;
-        l.add(new com.darkcraft.cine.Shot(0f, 4.6f, 70, 0, 1,
+        float[] c = cortesEntrada();
+        l.add(new com.darkcraft.cine.Shot(0f, c[0], 70, 0, 1,
                 p(eye.x, eye.y, eye.z, (eye.x + ax) / 2, F + 3.4, (eye.z + az) / 2, ax, ay, az),
                 p(sx, headY, sz, sx, headY, sz)));
-        l.add(new com.darkcraft.cine.Shot(4.6f, 10.6f, 55, 0, 1,
+        l.add(new com.darkcraft.cine.Shot(c[0], c[1], 55, 0, 1,
                 p(sx + 2.4, F + 4.6, sz + 4.6, sx + 1.5, F + 4.8, sz + 3.7),
                 p(sx, headY, sz + 0.2, sx, headY, sz + 0.2)));
-        l.add(new com.darkcraft.cine.Shot(10.6f, 14.0f, 62, -2, 0,
+        l.add(new com.darkcraft.cine.Shot(c[1], c[2], 62, -2, 0,
                 p(sx - 4.5, F + 3.2, sz + 6.0, sx - 3.6, F + 3.0, sz + 5.4),
                 p(sx, headY - 0.3, sz, sx, headY - 0.2, sz)));
-        l.add(new com.darkcraft.cine.Shot(14.0f, INTRO_TICKS / 20f - 0.6f, 68, 0, 2,
+        l.add(new com.darkcraft.cine.Shot(c[2], c[3], 68, 0, 2,
                 p(sx + 6.5, F + 2.4, sz + 12.5, sx + 5.5, F + 2.8, sz + 11.0),
                 p(sx, F + 3.4, sz + 4, sx, F + 3.6, sz + 5)));
         return l;
@@ -529,6 +546,12 @@ public class Rey extends Monster {
     private void habla(ServerLevel sl, int linea) {
         for (ServerPlayer p : sl.players())
             if (p.distanceToSqr(this) < 80 * 80) Net.to(p, new Net.ReyHabla(getId(), linea));
+        hablaHasta = tGlobal + Voces.ticks(linea);
+    }
+
+    /** Frase de pelea (burlas): solo si no esta hablando ya, y con una pausa despues de la anterior. */
+    public void hablaSiCalla(ServerLevel sl, int linea) {
+        if (tGlobal >= hablaHasta + Voces.PAUSA) habla(sl, linea);
     }
 
     // ------------------------------------------------------------------ pelea
@@ -584,7 +607,7 @@ public class Rey extends Monster {
         if (t % 8 == 0) getNavigation().moveTo(o, velocidad());
         if (--burla < -600 && random.nextInt(400) == 0) {
             burla = 0;
-            habla(sl, fase() == 3 ? 9 : 8);
+            hablaSiCalla(sl, fase() == 3 ? 9 : 8);
         }
     }
 
@@ -684,7 +707,7 @@ public class Rey extends Monster {
         return c.get(c.size() - 1);
     }
 
-    private int tGlobal, faseIni;
+    private int tGlobal, faseIni, hablaHasta = -1000;
 
     @Override
     public void aiStep() {
@@ -1368,7 +1391,7 @@ public class Rey extends Monster {
             for (int r = 1; r <= 6; r++) anillo(sl, nf == 2 ? ParticleTypes.FLAME : ParticleTypes.LAVA, r * 1.6, getY() + 0.3, 12 + r * 6);
             sl.sendParticles(ParticleTypes.EXPLOSION_EMITTER, getX(), getY() + 1, getZ(), 1, 0, 0, 0, 0);
         }
-        if (t >= ReyAnims.TICKS[ReyAnims.GRITO]) {
+        if (t >= Math.max(ReyAnims.TICKS[ReyAnims.GRITO], Voces.ticks(fase() >= 3 ? 5 : 4) + 16)) {
             if (fase() == 3 && level().dimension() == Level.OVERWORLD && Volcan.disponible(sl)) {
                 // a los volcanes
                 if (Volcan.llevar(sl, this, jugadoresVivos(sl))) return;
@@ -1460,7 +1483,9 @@ public class Rey extends Monster {
             for (int r = 1; r <= 8; r++) anillo(sl, ParticleTypes.LAVA, r * 2.2, c.y + 0.3, 12 + r * 6);
             sonido(sl, DarkCraftMod.SFX_EXPLOSION.get(), 4f, 0.8f);
             sonido(sl, DarkCraftMod.SFX_GOLPE_FINAL.get(), 3f, 0.9f);
-        } else if (t == 184) {
+        }
+        if (t == FRASE_VOLCAN) habla(sl, 10);
+        if (t == 184) {
             // se arranca la chaqueta...
             anim(ReyAnims.ARRANCAR);
             sonido(sl, SoundEvents.RAVAGER_STUNNED, 2f, 0.5f);
@@ -1469,8 +1494,6 @@ public class Rey extends Monster {
             sonido(sl, SoundEvents.ARMOR_EQUIP_LEATHER, 3f, 0.5f);
             sonido(sl, SoundEvents.FIRECHARGE_USE, 2f, 0.6f);
             lejos(sl, ParticleTypes.FLAME, getX(), getY() + 2.2, getZ(), 40, 0.6, 0.6, 0.6, 0.12);
-        } else if (t == 205) {
-            habla(sl, 10);
         } else if (t == 214) {
             // ...y crece al doble entre lava
             setFlag(F_GRANDE, true);
@@ -1487,12 +1510,19 @@ public class Rey extends Monster {
             sonido(sl, DarkCraftMod.SFX_RUGIDO.get(), 4f, 0.8f);
             sonido(sl, SoundEvents.ENDER_DRAGON_GROWL, 0.6f, 0.5f);
         }
-        if (t >= (int) (Volcan.CINE * 20) + 4) {
+        if (t >= finCine3()) {
             barra.setVisible(true);
             for (ServerPlayer p : jugadoresVivos(sl)) barra.addPlayer(p);
             recup = 20;
             cambiar(Estado.LUCHA);
         }
+    }
+
+    /** En los volcanes dice la frase 10 al arrancarse la chaqueta, y la pelea sigue cuando acaba de decirla. */
+    private static final int FRASE_VOLCAN = 186;
+
+    public static int finCine3() {
+        return Math.max((int) (Volcan.CINE * 20) + 4, FRASE_VOLCAN + Voces.ticks(10) + 16);
     }
 
     /** Particulas que se ven aunque la camara (de una cinematica) este lejos. */

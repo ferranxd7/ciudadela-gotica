@@ -129,16 +129,15 @@ public final class TorreArbol {
         return List.of(a, b, c);
     }
 
-    // ------------------------------------------------------------------ comandos de prueba: /darkcraft arbol ...
+    // ------------------------------------------------------------------ comandos de prueba: /darkcraft valdrenn arbol ...
 
-    @SubscribeEvent
-    public static void onCommands(net.minecraftforge.event.RegisterCommandsEvent event) {
-        event.getDispatcher().register(net.minecraft.commands.Commands.literal("darkcraft").requires(s -> s.hasPermission(2))
-                .then(net.minecraft.commands.Commands.literal("arbol")
-                        .then(net.minecraft.commands.Commands.literal("ir").executes(c -> ir(c.getSource(), false)))
-                        .then(net.minecraft.commands.Commands.literal("arriba").executes(c -> ir(c.getSource(), true)))
-                        .then(net.minecraft.commands.Commands.literal("llave").executes(c -> llave(c.getSource())))
-                        .then(net.minecraft.commands.Commands.literal("cerrar").executes(c -> cerrar(c.getSource())))));
+    /** /darkcraft valdrenn arbol ... (lo registra Comandos). */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comando() {
+        return net.minecraft.commands.Commands.literal("arbol")
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> ir(c.getSource(), false)))
+                .then(net.minecraft.commands.Commands.literal("arriba").executes(c -> ir(c.getSource(), true)))
+                .then(net.minecraft.commands.Commands.literal("llave").executes(c -> llave(c.getSource())))
+                .then(net.minecraft.commands.Commands.literal("cerrar").executes(c -> cerrar(c.getSource())));
     }
 
     private static int[] torreDe(net.minecraft.commands.CommandSourceStack src) {

@@ -212,66 +212,63 @@ public final class ReyCliente {
 
     private static int subLinea, subFin;
     private static SoundInstance voz;
-    /** Duracion de cada frase (ticks): la del audio (rey_voces.json) mas un poco. */
-    private static final int[] DUR = duraciones();
+    /** Tick (de este reloj) en que acaba la frase que esta sonando. */
+    private static int vozHasta;
 
-    private static int[] duraciones() {
-        int[] d = {0, 110, 120, 70, 70, 80, 65, 60, 85, 65, 120, 60, 75, 70};
-        try (var in = ReyCliente.class.getResourceAsStream("/assets/darkcraft/rey_voces.json")) {
-            if (in == null) return d;
-            var o = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8))
-                    .getAsJsonObject().getAsJsonObject("duraciones");
-            for (String k : o.keySet()) {
-                int i = Integer.parseInt(k);
-                if (i > 0 && i < d.length) d[i] = Math.round(o.get(k).getAsFloat() * 20) + 25;
-            }
-        } catch (Exception ignored) {
+    /** Una frase que espera su turno: no se corta la que suena. */
+    private record Espera(int linea, int llego) {}
+
+    private static final java.util.ArrayDeque<Espera> COLA = new java.util.ArrayDeque<>();
+
+    /**
+     * Una frase de un jefe (las de Gavran van de 101 a 118). Si todavia esta sonando otra, espera a que acabe (con una
+     * pausa); las de pelea, si ya no pegan cuando les toca, no se dicen.
+     */
+    public static void habla(Net.ReyHabla m) {
+        if (!com.darkcraft.rey.Voces.valida(m.linea())) return;
+        if (hablando()) {
+            if (COLA.size() < 4) COLA.add(new Espera(m.linea(), ticks));
+            return;
         }
-        return d;
+        sonar(m.linea());
     }
 
-    public static void habla(Net.ReyHabla m) {
+    private static boolean hablando() {
+        return voz != null && ticks < vozHasta + com.darkcraft.rey.Voces.PAUSA
+                && (ticks < vozHasta || Minecraft.getInstance().getSoundManager().isActive(voz));
+    }
+
+    /** Cada tick: si ya ha acabado la frase, la siguiente de la cola. */
+    private static void cola() {
+        while (!COLA.isEmpty() && !hablando()) {
+            Espera e = COLA.poll();
+            int espera = ticks - e.llego();
+            // las de pelea pierden su momento en 2 s; las de las cinematicas se dicen siempre (si no es muy tarde)
+            if (espera <= (com.darkcraft.rey.Voces.deRelleno(e.linea()) ? 40 : 200)) {
+                sonar(e.linea());
+                return;
+            }
+        }
+    }
+
+    private static void sonar(int linea) {
         Minecraft mc = Minecraft.getInstance();
-        boolean gavran = m.linea() > com.darkcraft.gavran.Gavran.VOZ_BASE;
-        int n = gavran ? m.linea() - com.darkcraft.gavran.Gavran.VOZ_BASE : m.linea();
+        boolean gavran = com.darkcraft.rey.Voces.esGavran(linea);
+        int n = gavran ? linea - com.darkcraft.rey.Voces.BASE_GAVRAN : linea;
         var tabla = gavran ? DarkCraftMod.GAVRAN_VOZ : DarkCraftMod.REY_VOZ;
         if (n < 1 || n >= tabla.length) return;
         if (voz != null) mc.getSoundManager().stop(voz);
         voz = new SimpleSoundInstance(tabla[n].get().getLocation(), SoundSource.MASTER, 1.0f, 1.0f,
                 SoundInstance.createUnseededRandom(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true);
         mc.getSoundManager().play(voz);
-        subLinea = m.linea();
-        subFin = ticks + dur(m.linea());
+        vozHasta = ticks + com.darkcraft.rey.Voces.ticks(linea);
+        subLinea = linea;
+        subFin = ticks + dur(linea);
     }
 
-    /** Duracion del subtitulo de la linea (las de Gavran van de 101 a 118). */
+    /** Lo que se ve el subtitulo de la linea: lo que dura la frase y un rato mas para leerlo. */
     private static int dur(int linea) {
-        if (linea > com.darkcraft.gavran.Gavran.VOZ_BASE) {
-            int n = linea - com.darkcraft.gavran.Gavran.VOZ_BASE;
-            return n < DUR_GAVRAN.length ? DUR_GAVRAN[n] : 80;
-        }
-        return linea < DUR.length ? DUR[linea] : 80;
-    }
-
-    private static final int[] DUR_GAVRAN = duracionesGavran();
-
-    private static int[] duracionesGavran() {
-        int[] d = new int[19];
-        float[] s = {0, 6.8f, 7.52f, 6.0f, 4.88f, 1.68f, 1.12f, 4.32f, 3.04f, 3.28f, 2.96f, 4.72f, 2.24f, 3.28f, 4.72f, 4.72f, 3.44f, 4.64f, 6.64f};
-        for (int i = 1; i < d.length; i++) d[i] = Math.round(s[i] * 20) + 25;
-        try (var in = ReyCliente.class.getResourceAsStream("/assets/darkcraft/rey_voces.json")) {
-            if (in == null) return d;
-            var root = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8))
-                    .getAsJsonObject();
-            if (!root.has("gavran")) return d;
-            var o = root.getAsJsonObject("gavran");
-            for (String k : o.keySet()) {
-                int i = Integer.parseInt(k);
-                if (i > 0 && i < d.length) d[i] = Math.round(o.get(k).getAsFloat() * 20) + 25;
-            }
-        } catch (Exception ignored) {
-        }
-        return d;
+        return com.darkcraft.rey.Voces.ticks(linea) + com.darkcraft.rey.Voces.SUBTITULO_EXTRA;
     }
 
     // ------------------------------------------------------------------ la camara mira al rey
@@ -731,6 +728,7 @@ public final class ReyCliente {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.isPaused()) return;
         ticks++;
+        cola();
         vigilar(mc);
         if (!CAPAS.isEmpty()) moverCapas(mc);
         // el rastro de la barra de vida baja despues de un momento
@@ -784,6 +782,9 @@ public final class ReyCliente {
         AVISOS.clear();
         llave = null;
         focoId = -1;
+        COLA.clear();
+        voz = null;
+        vozHasta = 0;
         subLinea = 0;
         cofre = null;
     }

@@ -27,7 +27,8 @@ Mod de Forge 1.20.1 (Java 17, mappings oficiales). El usuario habla español, ju
      a los del juego donde encajan (`sfx.*` en sounds.json, `DarkCraftMod.SFX_*`).
    - La música no se puede hacer con este conector: música con licencia libre (`ci/musica/pistas.json`, con créditos).
 5. **Nombres**: el mod es **Dark Craft** (id `darkcraft`, paquete `com.darkcraft`); el sitio de los jefes es el
-   **Reino de Valdrenn**; comandos `/darkcraft ...`; estructura `darkcraft:valdrenn` (`/locate structure`). El
+   **Reino de Valdrenn**; comandos por sitio: `/darkcraft valdrenn ...` (cada sitio nuevo, su nombre) y
+   `/darkcraft ayuda` (todos registrados en `Comandos.java`); estructura `darkcraft:valdrenn` (`/locate structure`). El
    repositorio de GitHub sigue llamándose `ferranxd7/ciudadela-gotica` (no tocar esa URL en el instalador).
 6. El usuario quiere las cosas **por partes y publicadas** (cada parte con `[publicar]`).
 
@@ -65,7 +66,7 @@ dificultad, marcas en el suelo como el Rey.
   (relleno verde que brilla, hojas que caen), ataques de la fase 1 (combos de 3-5 tajos, contraataque si le pegas
   cuando se cubre, embestida con el hombro, raíces en línea, onda al clavar la espada, 2-3 escuderos esqueleto),
   aturdido tras romperle la guardia, morir = como el Rey, música de la fase 1, comandos
-  `/darkcraft gavran ir|estado|reiniciar|fase 2|matar`.
+  `/darkcraft valdrenn gavran ir|estado|reiniciar|fase 2|matar`.
 - **B2 (fase 2)**: cinemática larga (~20 s, las raíces le envuelven, crece, corteza y espinas), "el árbol
   despierta" (raíces rompen el suelo, ramas, hojas), raíces que atrapan 1-2 s, lluvia de hojas cortantes, salto a
   los balcones, raíces por todo el suelo (subir a los balcones), definitivo "Juicio de las espinas" (solo te salvas
@@ -152,3 +153,23 @@ dificultad, marcas en el suelo como el Rey.
   se mueve al jugador; los de fuera giran solos si la cámara chocaría con ramas u hojas). Durante la cinemática la
   llave de hueso flota sobre el cofre, siempre de cara a la cámara (`VictoriaGavran.llaveFlotante`), y en el
   capítulo 5 sí se ve a los jugadores (el último plano es el suyo); con la cámara de cine no se dibujan los nombres.
+
+## Tanda «mapa y Fortaleza de Hueso» (pedida el 23-11-2026, en tres partes)
+
+Respuestas del usuario (las 60 preguntas): primero los arreglos, luego el mapa y el menú de la M, al final la
+fortaleza; cada parte publicada. Juega solo y con amigos.
+
+### Parte 1: arreglos
+
+- Voces de los jefes (`rey/Voces.java`: lo que dura cada frase, de `rey_voces.json`; pausa de 1,2 s): la entrada
+  del Rey y la de Gavran se cuentan con lo que duran sus frases y la pelea no empieza hasta que acaban de hablar;
+  el cambio de fase del Rey y la pelea en los volcanes esperan a la frase; las burlas (`hablaSiCalla`) solo si
+  callan. En el cliente (`ReyCliente.habla`) una frase nunca corta a otra: espera en cola; las de relleno
+  (`Voces.deRelleno`) se descartan si llevan más de 2 s esperando. Subtítulos: lo que dura la frase + 2,75 s.
+- Comandos por sitio en `Comandos.java`: `/darkcraft valdrenn localizar|ir|historia ...|rey ...|arbol ...|gavran ...`
+  y `/darkcraft ayuda` (clic para escribirlos; textos `darkcraft.ayuda.*`). Cada sitio nuevo tendrá su nombre.
+- Torre-árbol limpia: `SalaArbol.quitarFollaje` quita follaje sin avisar a los vecinos y con lo que colgaba debajo
+  (antes caían bayas y lianas al suelo); `SalaArbol.limpiar` (desde `GavranEventos.asegurar`) recoge las lianas que
+  bajaban de F+8 (una vez por sesión) y quita las bayas, lianas y hojas caídas en toda la torre (no lo que haya
+  tirado un jugador). Las lianas nuevas nunca bajan de F+8 (`MIN_LIANA`).
+- Rey: `VIDA_FASE` 780 (antes 1200). `/locate structure darkcraft:valdrenn` ya da el más cercano (celdas de 16 chunks).

@@ -58,6 +58,6 @@ powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.Ser
 echo.
 echo ==========================================================
 echo   LISTO. Abre TLauncher, elige "Forge 1.20.1" y juega.
-echo   Crea un MUNDO NUEVO y escribe /darkcraft ir
+echo   Crea un MUNDO NUEVO y escribe /darkcraft valdrenn ir
 echo ==========================================================
 pause

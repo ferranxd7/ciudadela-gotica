@@ -22,7 +22,6 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -35,7 +34,7 @@ import java.util.List;
 /**
  * Lo que rodea a Ser Gavran: que este en su rama cuando alguien se acerca a la Sala del Arbol, la sala cerrada
  * durante la pelea (puerta y ascensor), que no se pueda hacer trampa, que las cosas de quien muere se queden en
- * la sala y los comandos /darkcraft gavran ...
+ * la sala y los comandos /darkcraft valdrenn gavran ...
  */
 public final class GavranEventos {
     private GavranEventos() {}
@@ -54,6 +53,7 @@ public final class GavranEventos {
         if (st == ReyEstado.MUERTO) {
             // ya cayo: que no quede ninguno (guardado a mitad de su muerte) y que la puerta no se quede sellada
             if (!ow.isPositionEntityTicking(centro)) return;
+            s.limpiar(ow);
             boolean muriendo = false;
             for (Gavran g : ow.getEntitiesOfClass(Gavran.class, s.caja()))
                 if (g.estado() != Gavran.Estado.MUERTE) g.discard();
@@ -68,6 +68,7 @@ public final class GavranEventos {
             return;
         }
         if (!ow.isPositionEntityTicking(centro)) return;
+        s.limpiar(ow);
         List<Gavran> gs = ow.getEntitiesOfClass(Gavran.class, s.caja());
         for (int i = 1; i < gs.size(); i++) gs.get(i).discard();
         if (gs.isEmpty()) {
@@ -176,21 +177,20 @@ public final class GavranEventos {
         DarkCraftMod.LOGGER.info("[DarkCraft] {} cae ante Ser Gavran: {} objetos se quedan en la sala", p.getName().getString(), e.getDrops().size());
     }
 
-    // ------------------------------------------------------------------ comandos: /darkcraft gavran ...
+    // ------------------------------------------------------------------ comandos: /darkcraft valdrenn gavran ...
 
-    @SubscribeEvent
-    public static void onCommands(RegisterCommandsEvent event) {
-        event.getDispatcher().register(Commands.literal("darkcraft").requires(s -> s.hasPermission(2))
-                .then(Commands.literal("gavran")
-                        .then(Commands.literal("ir").executes(c -> ir(c.getSource())))
-                        .then(Commands.literal("estado").executes(c -> estado(c.getSource())))
-                        .then(Commands.literal("reiniciar").executes(c -> reiniciar(c.getSource())))
-                        .then(Commands.literal("fase").then(Commands.argument("n", IntegerArgumentType.integer(1, 2))
-                                .executes(c -> fase(c.getSource(), IntegerArgumentType.getInteger(c, "n")))))
-                        .then(Commands.literal("matar").executes(c -> matar(c.getSource())))
-                        .then(Commands.literal("ataque").then(Commands.argument("nombre", StringArgumentType.word())
-                                .executes(c -> ataque(c.getSource(), StringArgumentType.getString(c, "nombre")))))
-                        .then(Commands.literal("guardia").executes(c -> guardia(c.getSource())))));
+    /** /darkcraft valdrenn gavran ... (lo registra Comandos). */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> comando() {
+        return Commands.literal("gavran")
+                .then(Commands.literal("ir").executes(c -> ir(c.getSource())))
+                .then(Commands.literal("estado").executes(c -> estado(c.getSource())))
+                .then(Commands.literal("reiniciar").executes(c -> reiniciar(c.getSource())))
+                .then(Commands.literal("fase").then(Commands.argument("n", IntegerArgumentType.integer(1, 2))
+                        .executes(c -> fase(c.getSource(), IntegerArgumentType.getInteger(c, "n")))))
+                .then(Commands.literal("matar").executes(c -> matar(c.getSource())))
+                .then(Commands.literal("ataque").then(Commands.argument("nombre", StringArgumentType.word())
+                        .executes(c -> ataque(c.getSource(), StringArgumentType.getString(c, "nombre")))))
+                .then(Commands.literal("guardia").executes(c -> guardia(c.getSource())));
     }
 
     private static SalaArbol salaDe(CommandSourceStack src) {
@@ -283,11 +283,6 @@ public final class GavranEventos {
         Gavran g = gavranDe(src);
         if (g == null || !g.forzarGuardiaRota()) return 0;
         return 1;
-    }
-
-    static void decir(ServerLevel sl, Gavran g, int n) {
-        for (ServerPlayer p : sl.players())
-            if (p.distanceToSqr(g) < 96 * 96) Net.to(p, new Net.ReyHabla(g.getId(), Gavran.VOZ_BASE + n));
     }
 
     static boolean enSala(Level lvl, BlockPos pos) {

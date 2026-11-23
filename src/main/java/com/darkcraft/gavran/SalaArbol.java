@@ -115,15 +115,84 @@ public record SalaArbol(int cx, int cz, int F, int base) {
                 || s.is(Blocks.SPORE_BLOSSOM) || s.is(Blocks.MOSS_CARPET);
     }
 
+    /** Lo que cuelga de otra cosa (lianas con bayas, lianas lloronas, enredaderas, raices colgantes, flor de esporas). */
+    private static boolean colgante(BlockState s) {
+        return s.is(Blocks.CAVE_VINES) || s.is(Blocks.CAVE_VINES_PLANT) || s.is(Blocks.WEEPING_VINES) || s.is(Blocks.WEEPING_VINES_PLANT)
+                || s.is(Blocks.VINE) || s.is(Blocks.HANGING_ROOTS) || s.is(Blocks.SPORE_BLOSSOM) || s.is(Blocks.GLOW_LICHEN);
+    }
+
+    /** Sin avisar a los vecinos: asi no se rompe nada de alrededor ni suelta bayas ni lianas al suelo. */
+    private static final int SIN_VECINOS = net.minecraft.world.level.block.Block.UPDATE_CLIENTS
+            | net.minecraft.world.level.block.Block.UPDATE_KNOWN_SHAPE;
+
+    /**
+     * Quita un bloque de follaje sin que caiga nada al suelo: tambien lo que colgaba de el (si no, las lianas de debajo
+     * se quedarian en el aire y, al romperse, soltarian sus bayas).
+     */
+    public static void quitarFollaje(ServerLevel sl, BlockPos pos) {
+        BlockPos.MutableBlockPos m = pos.mutable();
+        sl.setBlock(m, Blocks.AIR.defaultBlockState(), SIN_VECINOS);
+        for (int i = 0; i < 48; i++) {
+            m.move(net.minecraft.core.Direction.DOWN);
+            if (!colgante(sl.getBlockState(m))) break;
+            sl.setBlock(m, Blocks.AIR.defaultBlockState(), SIN_VECINOS);
+        }
+    }
+
     /** Despeja las hojas y lianas alrededor de la rama y delante de el (para que se le vea entero desde la sala). */
     public void despejarRama(ServerLevel sl, Vec3 r) {
         BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
         for (int dx = -5; dx <= 5; dx++)
             for (int dz = -11; dz <= 3; dz++)
-                for (int dy = -7; dy <= 7; dy++) {
+                for (int dy = 7; dy >= -7; dy--) {
                     m.set(Mth.floor(r.x) + dx, Mth.floor(r.y) + dy, Mth.floor(r.z) + dz);
-                    if (follaje(sl.getBlockState(m))) sl.setBlock(m, Blocks.AIR.defaultBlockState(), 2);
+                    if (follaje(sl.getBlockState(m))) quitarFollaje(sl, m);
                 }
+    }
+
+    /** Las salas que ya se han limpiado desde que se abrio el mundo (lo de los bloques se hace una vez). */
+    private static final java.util.Set<String> LIMPIAS = new java.util.HashSet<>();
+
+    /**
+     * La torre-arbol limpia: las enredaderas y lianas que bajaban hasta cerca del suelo de la sala se recogen (quedan
+     * arriba, colgando) y se quitan las bayas, lianas y hojas que hubieran caido al suelo en toda la torre (solo lo que
+     * se cayo solo: lo que ha tirado un jugador no se toca).
+     */
+    public void limpiar(ServerLevel sl) {
+        if (LIMPIAS.add(key() + "@" + sl.getServer().getWorldData().getLevelName())) {
+            BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+            int R = TreeTower.HALL_R;
+            for (int x = cx - R; x <= cx + R; x++)
+                for (int z = cz - R; z <= cz + R; z++) {
+                    if (dist(x + 0.5, z + 0.5) > R || !sl.isLoaded(m.set(x, F, z))) continue;
+                    // de abajo arriba: lo que cuelga por debajo de F + 8 se quita (y lo de debajo con ello)
+                    for (int y = F; y < F + MIN_LIANA; y++) {
+                        m.set(x, y, z);
+                        if (colgante(sl.getBlockState(m))) quitarFollaje(sl, m);
+                    }
+                }
+        }
+        AABB torre = new AABB(ccx() - TreeTower.HALL_R - 4, base - 2, ccz() - TreeTower.HALL_R - 4,
+                ccx() + TreeTower.HALL_R + 4, F + TreeTower.HALL_H + 16, ccz() + TreeTower.HALL_R + 4);
+        for (net.minecraft.world.entity.item.ItemEntity it : sl.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, torre)) {
+            if (!caido(it.getItem())) continue;
+            net.minecraft.nbt.CompoundTag t = it.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            if (!t.hasUUID("Thrower")) it.discard();
+        }
+    }
+
+    /** Lo mas bajo que llega lo que cuelga en la sala (por encima de la cabeza; nunca toca el suelo). */
+    public static final int MIN_LIANA = 8;
+
+    /** Lo que suelta el follaje al romperse (bayas, lianas, hojas, retonos, palos, hongos que brillan). */
+    private static boolean caido(net.minecraft.world.item.ItemStack st) {
+        net.minecraft.world.item.Item i = st.getItem();
+        return i == net.minecraft.world.item.Items.GLOW_BERRIES || i == net.minecraft.world.item.Items.VINE
+                || i == net.minecraft.world.item.Items.WEEPING_VINES || i == net.minecraft.world.item.Items.TWISTING_VINES
+                || i == net.minecraft.world.item.Items.HANGING_ROOTS || i == net.minecraft.world.item.Items.GLOW_LICHEN
+                || i == net.minecraft.world.item.Items.SPORE_BLOSSOM || i == net.minecraft.world.item.Items.MOSS_CARPET
+                || i == net.minecraft.world.item.Items.STICK || i == net.minecraft.world.item.Items.SHROOMLIGHT
+                || st.is(net.minecraft.tags.ItemTags.LEAVES) || st.is(net.minecraft.tags.ItemTags.SAPLINGS);
     }
 
     /**
@@ -146,7 +215,7 @@ public record SalaArbol(int cx, int cz, int F, int base) {
                         for (int dz = -1; dz <= 1; dz++) {
                             m.set(Mth.floor(q.x) + dx, Mth.floor(q.y) + dy, Mth.floor(q.z) + dz);
                             if (dist(m.getX() + 0.5, m.getZ() + 0.5) < TreeTower.TRUNK_R + 0.5) continue;
-                            if (follaje(sl.getBlockState(m))) sl.setBlock(m, Blocks.AIR.defaultBlockState(), 2);
+                            if (follaje(sl.getBlockState(m))) quitarFollaje(sl, m);
                         }
             }
         }

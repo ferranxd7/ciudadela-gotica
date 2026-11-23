@@ -31,7 +31,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.properties.RotationSegment;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.ExplosionEvent;
@@ -159,38 +158,37 @@ public final class StoryEvents {
 
     // ------------------------------------------------------------------ comandos (para probar)
 
-    @SubscribeEvent
-    public static void onCommands(RegisterCommandsEvent event) {
-        event.getDispatcher().register(Commands.literal("darkcraft").requires(s -> s.hasPermission(2))
+    /** /darkcraft valdrenn historia ... (lo registra Comandos). */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> comandoHistoria() {
+        return Commands.literal("historia")
                 .then(Commands.literal("capitulo").then(Commands.argument("n", IntegerArgumentType.integer(1, Story.CHAPTERS))
                         .executes(ctx -> {
                             ServerPlayer p = ctx.getSource().getPlayerOrException();
                             if (!Cinematics.active(p)) Cinematics.play(p, IntegerArgumentType.getInteger(ctx, "n"), null, false);
                             return 1;
                         })))
-                .then(Commands.literal("historia")
-                        .then(Commands.literal("reiniciar").executes(ctx -> {
+                .then(Commands.literal("reiniciar").executes(ctx -> {
+                    ServerPlayer p = ctx.getSource().getPlayerOrException();
+                    Story.reset(p);
+                    StoryData.get(p.serverLevel()).forgetPlayer(p.getUUID());
+                    ctx.getSource().sendSuccess(() -> Component.translatable("darkcraft.historia.reiniciada"), false);
+                    return 1;
+                }))
+                .then(Commands.literal("libro").then(Commands.argument("n", IntegerArgumentType.integer(1, Story.CHAPTERS))
+                        .executes(ctx -> give(ctx.getSource(), Story.book(IntegerArgumentType.getInteger(ctx, "n"))))))
+                .then(Commands.literal("mapa").executes(ctx -> {
+                    ServerPlayer p = ctx.getSource().getPlayerOrException();
+                    int[] s = CastleSites.nearest(p.serverLevel().getSeed(), p.getBlockX(), p.getBlockZ(), 4);
+                    if (s == null) return 0;
+                    return give(ctx.getSource(), Story.map(s[0], s[1]));
+                }))
+                .then(Commands.literal("cofre").then(Commands.argument("n", IntegerArgumentType.integer(1, Story.CHAPTERS))
+                        .executes(ctx -> {
                             ServerPlayer p = ctx.getSource().getPlayerOrException();
-                            Story.reset(p);
-                            StoryData.get(p.serverLevel()).forgetPlayer(p.getUUID());
-                            ctx.getSource().sendSuccess(() -> Component.translatable("darkcraft.historia.reiniciada"), false);
+                            Direction f = p.getDirection();
+                            placeChapter(p.serverLevel(), IntegerArgumentType.getInteger(ctx, "n"), p.blockPosition().relative(f, 2), f.getOpposite());
                             return 1;
-                        }))
-                        .then(Commands.literal("libro").then(Commands.argument("n", IntegerArgumentType.integer(1, Story.CHAPTERS))
-                                .executes(ctx -> give(ctx.getSource(), Story.book(IntegerArgumentType.getInteger(ctx, "n"))))))
-                        .then(Commands.literal("mapa").executes(ctx -> {
-                            ServerPlayer p = ctx.getSource().getPlayerOrException();
-                            int[] s = CastleSites.nearest(p.serverLevel().getSeed(), p.getBlockX(), p.getBlockZ(), 4);
-                            if (s == null) return 0;
-                            return give(ctx.getSource(), Story.map(s[0], s[1]));
-                        }))
-                        .then(Commands.literal("cofre").then(Commands.argument("n", IntegerArgumentType.integer(1, Story.CHAPTERS))
-                                .executes(ctx -> {
-                                    ServerPlayer p = ctx.getSource().getPlayerOrException();
-                                    Direction f = p.getDirection();
-                                    placeChapter(p.serverLevel(), IntegerArgumentType.getInteger(ctx, "n"), p.blockPosition().relative(f, 2), f.getOpposite());
-                                    return 1;
-                                })))));
+                        })));
     }
 
     private static int give(CommandSourceStack src, ItemStack st) throws com.mojang.brigadier.exceptions.CommandSyntaxException {

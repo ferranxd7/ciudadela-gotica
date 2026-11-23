@@ -2,58 +2,53 @@ package com.darkcraft;
 
 import com.darkcraft.test.CiTest;
 import com.darkcraft.world.CastleSites;
-import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public final class ModEvents {
     private ModEvents() {}
 
-    @SubscribeEvent
-    public static void onCommands(RegisterCommandsEvent event) {
-        CommandDispatcher<CommandSourceStack> d = event.getDispatcher();
-        d.register(Commands.literal("darkcraft").requires(s -> s.hasPermission(2))
-                .then(Commands.literal("localizar").executes(ctx -> {
-                    CommandSourceStack src = ctx.getSource();
-                    Vec3 p = src.getPosition();
-                    long seed = src.getServer().overworld().getSeed();
-                    int[] s = CastleSites.nearest(seed, (int) p.x, (int) p.z, 4);
-                    if (s == null) {
-                        src.sendFailure(Component.translatable("darkcraft.cmd.no_reino"));
-                        return 0;
-                    }
-                    int dist = (int) Math.sqrt((s[0] - p.x) * (s[0] - p.x) + (s[1] - p.z) * (s[1] - p.z));
-                    String tp = "/tp @s " + s[0] + " 400 " + (s[1] + 60);
-                    Component msg = Component.translatable("darkcraft.cmd.localizar", s[0], s[1], dist).append(" ")
-                            .append(Component.translatable("darkcraft.cmd.tp").withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)
-                                    .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, tp))
-                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(tp)))));
-                    src.sendSuccess(() -> msg, false);
-                    return 1;
-                }))
-                .then(Commands.literal("ir").executes(ctx -> {
-                    CommandSourceStack src = ctx.getSource();
-                    ServerPlayer pl = src.getPlayerOrException();
-                    long seed = src.getServer().overworld().getSeed();
-                    int[] s = CastleSites.nearest(seed, (int) pl.getX(), (int) pl.getZ(), 4);
-                    if (s == null) {
-                        src.sendFailure(Component.translatable("darkcraft.cmd.no_reino"));
-                        return 0;
-                    }
-                    pl.teleportTo(src.getServer().overworld(), s[0] + 0.5, 400, s[1] + 60.5, pl.getYRot(), pl.getXRot());
-                    src.sendSuccess(() -> Component.translatable("darkcraft.cmd.bienvenido"), false);
-                    return 1;
-                })));
+    // ------------------------------------------------------------------ /darkcraft valdrenn localizar | ir (los registra Comandos)
+
+    /** Donde esta el Reino de Valdrenn mas cercano, con un boton para ir. */
+    static int localizar(CommandSourceStack src) {
+        Vec3 p = src.getPosition();
+        long seed = src.getServer().overworld().getSeed();
+        int[] s = CastleSites.nearest(seed, (int) p.x, (int) p.z, 4);
+        if (s == null) {
+            src.sendFailure(Component.translatable("darkcraft.cmd.no_reino"));
+            return 0;
+        }
+        int dist = (int) Math.sqrt((s[0] - p.x) * (s[0] - p.x) + (s[1] - p.z) * (s[1] - p.z));
+        String tp = "/tp @s " + s[0] + " 400 " + (s[1] + 60);
+        Component msg = Component.translatable("darkcraft.cmd.localizar", s[0], s[1], dist).append(" ")
+                .append(Component.translatable("darkcraft.cmd.tp").withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, tp))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(tp)))));
+        src.sendSuccess(() -> msg, false);
+        return 1;
+    }
+
+    /** Te lleva al Reino de Valdrenn mas cercano. */
+    static int ir(CommandSourceStack src) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        ServerPlayer pl = src.getPlayerOrException();
+        long seed = src.getServer().overworld().getSeed();
+        int[] s = CastleSites.nearest(seed, (int) pl.getX(), (int) pl.getZ(), 4);
+        if (s == null) {
+            src.sendFailure(Component.translatable("darkcraft.cmd.no_reino"));
+            return 0;
+        }
+        pl.teleportTo(src.getServer().overworld(), s[0] + 0.5, 400, s[1] + 60.5, pl.getYRot(), pl.getXRot());
+        src.sendSuccess(() -> Component.translatable("darkcraft.cmd.bienvenido"), false);
+        return 1;
     }
 
     @SubscribeEvent

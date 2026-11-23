@@ -91,10 +91,8 @@ public class Gavran extends Monster {
     public static final float VIDA_FASE = 520f;
     private static final float DANO = 0.75f;
     /** Lo que dura cada frase (segundos, con el eco): para no pisarlas. */
-    private static final float[] VOZ_S = {0, 7.1f, 7.8f, 6.3f, 5.2f, 1.94f, 1.38f, 4.6f, 3.3f, 3.54f, 3.22f, 5.4f, 2.69f,
-            3.54f, 5.4f, 5.4f, 4.0f, 4.9f, 6.9f};
     /** Linea de voz de Gavran en el paquete de voz (las del rey van de 1 a 13). */
-    public static final int VOZ_BASE = 100;
+    public static final int VOZ_BASE = com.darkcraft.rey.Voces.BASE_GAVRAN;
 
     // ------------------------------------------------------------------ cliente
     public final AnimationState posadoAnim = new AnimationState(), idleAnim = new AnimationState(),
@@ -526,12 +524,31 @@ public class Gavran extends Monster {
 
     // ------------------------------------------------------------------ la entrada: la puerta se cierra, habla y salta
 
-    /** Duracion de la entrada (ticks) y cuando dice cada frase. */
-    public static final int INTRO_TICKS = 700;
+    /**
+     * Cuando dice cada frase de la entrada, salta, saluda y empieza la pelea (ticks): salen de lo que dura cada frase
+     * (Voces), con una pausa entre una y otra, y la pelea no empieza hasta que acaba de hablar.
+     */
+    private static final int P = com.darkcraft.rey.Voces.PAUSA;
+    private static final int T_FRASE1 = 66;
+    private static final int T_FRASE2 = T_FRASE1 + voz(1) + P;
+    private static final int T_SALTA = T_FRASE2 + voz(2) + 16;
+    private static final int T_FRASE3 = T_SALTA + 70;
+    private static final int T_SALUDO = T_FRASE3 + 110;
+    private static final int T_FRASE4 = Math.max(T_FRASE3 + voz(3) + P, T_SALUDO + 20);
+    public static final int T_LUCHA = T_FRASE4 + voz(4) + 30;
+    /** Duracion de la entrada (ticks). */
+    public static final int INTRO_TICKS = T_LUCHA + 10;
     /** Lo que sube de mas al saltar de la rama (el plano del salto lo sigue con la misma cuenta). */
     private static final double SALTO_ALTO = 2.5;
-    private static final int T_FRASE1 = 66, T_FRASE2 = 218, T_SALTA = 380, T_FRASE3 = 450, T_SALUDO = 560, T_FRASE4 = 580,
-            T_LUCHA = 690;
+
+    private static int voz(int n) {
+        return com.darkcraft.rey.Voces.ticks(com.darkcraft.rey.Voces.BASE_GAVRAN + n);
+    }
+
+    /** Segundos de la entrada en que cambia de plano (para la prueba de la CI): rama, de cerca, salto, contrapicado, saludo. */
+    public static float[] cortesEntrada() {
+        return new float[]{3.2f, T_FRASE2 / 20f, T_SALTA / 20f, T_FRASE3 / 20f, T_SALUDO / 20f, INTRO_TICKS / 20f - 0.6f};
+    }
 
     private void empezarIntro(ServerLevel sl, SalaArbol s, List<ServerPlayer> dentro) {
         jugadores.clear();
@@ -663,17 +680,17 @@ public class Gavran extends Monster {
                 p(cx + 7.5, F + 3.4, cz - 27.5, cx + 5.8, F + 3.1, cz - 25.5),
                 p(cx, F + 5.2, cz - 15.4, cx, F + 5.0, cz - 15.4)));
         // arriba, en la rama, de rodillas: "el Rey ha muerto" (desde un lado y casi a su altura: desde abajo le tapa la rama)
-        l.add(new Shot(3.2f, 10.9f, 58, 0, 1,
+        l.add(new Shot(3.2f, T_FRASE2 / 20f, 58, 0, 1,
                 p(cx + 10, F + 27, cz - 28.5, cx + 7, F + 29, cz - 26),
                 p(hx, hy, hz, hx, hy + 0.2, hz)));
         // de cerca, a su altura
-        l.add(new Shot(10.9f, 19.0f, 52, 0, 1,
+        l.add(new Shot(T_FRASE2 / 20f, T_SALTA / 20f, 52, 0, 1,
                 p(hx + 3.4, hy - 0.3, hz - 6.8, hx + 2.3, hy - 0.1, hz - 5.6),
                 p(hx, hy + 0.1, hz, hx, hy + 0.2, hz)));
         // el salto: la camara le sigue desde un lado (quieta mientras se levanta en la rama, cae con el y se para
         // cuando aterriza); los puntos salen del mismo salto que hace el servidor, cada cuarto de segundo
         int salta = T_SALTA + GavranAnims.GOLPES_DESCENDER[0], cae = T_SALTA + GavranAnims.GOLPES_DESCENDER[1];
-        float s0 = T_SALTA / 20f, s1 = 22.5f;
+        float s0 = T_SALTA / 20f, s1 = T_FRASE3 / 20f;
         int n = 15;
         double[] pos = new double[n * 3], look = new double[n * 3];
         for (int i = 0; i < n; i++) {
@@ -689,11 +706,11 @@ public class Gavran extends Monster {
         }
         l.add(new Shot(s0, s1, 70, 0, 0, pos, look));
         // contrapicado mientras se levanta y les mira: "pero hice un juramento"
-        l.add(new Shot(22.5f, 28.0f, 60, 0, 1,
+        l.add(new Shot(T_FRASE3 / 20f, T_SALUDO / 20f, 60, 0, 1,
                 p(c.x + 2.8, F + 2.6, c.z + 7.5, c.x + 1.6, F + 2.3, c.z + 6.0),
                 p(c.x, c.y + 4.6, c.z, c.x, c.y + 4.9, c.z)));
         // el saludo de caballero y el titulo
-        l.add(new Shot(28.0f, INTRO_TICKS / 20f - 0.6f, 66, 0, 2,
+        l.add(new Shot(T_SALUDO / 20f, INTRO_TICKS / 20f - 0.6f, 66, 0, 2,
                 p(c.x - 3.6, F + 4.2, c.z + 10.5, c.x - 2.4, F + 3.8, c.z + 8.8),
                 p(c.x, c.y + 3.8, c.z, c.x, c.y + 3.6, c.z)));
         return l;
@@ -705,13 +722,13 @@ public class Gavran extends Monster {
     void habla(ServerLevel sl, int n) {
         for (ServerPlayer p : sl.players())
             if (p.distanceToSqr(this) < 96 * 96) Net.to(p, new Net.ReyHabla(getId(), VOZ_BASE + n));
-        hablaHasta = tGlobal + Math.round(VOZ_S[n] * 20) + 6;
+        hablaHasta = tGlobal + com.darkcraft.rey.Voces.ticks(VOZ_BASE + n) + 6;
         setFlag(F_HABLA, true);
     }
 
-    /** Frase que solo dice si no esta hablando ya. */
+    /** Frase que solo dice si no esta hablando ya (y con una pausa despues de la anterior). */
     private void hablaSiCalla(ServerLevel sl, int n) {
-        if (tGlobal >= hablaHasta) habla(sl, n);
+        if (tGlobal >= hablaHasta + com.darkcraft.rey.Voces.PAUSA) habla(sl, n);
     }
 
     // ------------------------------------------------------------------ pelea
@@ -1144,7 +1161,7 @@ public class Gavran extends Monster {
             case SUELO -> {
                 int h = GavranAnims.GOLPES_CLAVAR[0];
                 if (k < h - 4) mirar(o, 18f);
-                if (k == 2) habla(sl, 15);
+                if (k == 2) hablaSiCalla(sl, 15);
                 if (k == h) {
                     golpeSuelo(sl, position().add(adelante().scale(1.4)), 3.0f);
                     sonido(sl, DarkCraftMod.SFX_GAVRAN_CLAVAR.get(), 2.2f, 0.85f);
@@ -1179,7 +1196,7 @@ public class Gavran extends Monster {
                         acabar();
                         return;
                     }
-                    habla(sl, 14);
+                    hablaSiCalla(sl, 14);
                     aviso(sl, Net.Aviso.CIRCULO, destino.x, destino.y, destino.z, 2.8f, 0, 0, h[1] + 2, Net.Aviso.ROJO);
                 }
                 if (destino == null) {
@@ -1890,7 +1907,7 @@ public class Gavran extends Monster {
 
     /** Lo que dura la cinematica de su muerte (ticks) y cuando pasa cada cosa. */
     public static final int MUERTE_TICKS = 560;
-    private static final int M_FRASE17 = 24, M_FRASE18 = 132, M_HOJAS = 278, M_FLORECE = 300, M_COFRE = 410, M_FIN = 560;
+    private static final int M_FRASE17 = 24, M_FRASE18 = 140, M_HOJAS = 278, M_FLORECE = 300, M_COFRE = 410, M_FIN = 560;
 
     private void empezarMuerte(ServerLevel sl) {
         if (estado == Estado.MUERTE) return;

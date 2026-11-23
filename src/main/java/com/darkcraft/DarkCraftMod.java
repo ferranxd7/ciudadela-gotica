@@ -172,6 +172,7 @@ public class DarkCraftMod {
         modBus.addListener(this::setup);
         modBus.addListener(this::tabs);
         MinecraftForge.EVENT_BUS.register(ModEvents.class);
+        MinecraftForge.EVENT_BUS.register(Comandos.class);
         MinecraftForge.EVENT_BUS.register(StoryEvents.class);
         MinecraftForge.EVENT_BUS.register(Cinematics.class);
         MinecraftForge.EVENT_BUS.register(ReyEventos.class);

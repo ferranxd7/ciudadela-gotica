@@ -29,7 +29,7 @@ import java.util.Optional;
 /**
  * La estructura "darkcraft:valdrenn": no construye nada (el reino lo levanta CastleFeature), solo deja una marca
  * en el centro de cada Reino de Valdrenn para que funcione {@code /locate structure darkcraft:valdrenn}. Usa la
- * misma rejilla que {@link CastleSites} (regiones de 2400 bloques = 150 chunks).
+ * misma rejilla que {@link CastleSites} (regiones de 2400 bloques = 150 chunks), buscada en celdas de 16 chunks.
  */
 public final class Valdrenn {
     private Valdrenn() {}
@@ -48,25 +48,38 @@ public final class Valdrenn {
         PIEZAS.register(bus);
     }
 
+    /** Chunks de una region de CastleSites (en cada una hay como mucho un reino). */
+    static final int REGION_CHUNKS = CastleSites.REGION / 16;
+
     /** Centro del reino de la region donde cae el chunk, o null si esa region no tiene reino. */
     static int[] sitio(long seed, int chunkX, int chunkZ) {
-        return CastleSites.site(seed, Math.floorDiv(chunkX, Sitios.CELDA), Math.floorDiv(chunkZ, Sitios.CELDA));
+        return CastleSites.site(seed, Math.floorDiv(chunkX, REGION_CHUNKS), Math.floorDiv(chunkZ, REGION_CHUNKS));
     }
 
-    /** Colocacion: un posible sitio por region, justo el chunk del centro del reino. */
+    /**
+     * Colocacion: el chunk del centro de cada reino. Se busca en celdas pequenas (16 chunks) y no en las regiones de
+     * 150: el /locate del juego mira celda a celda en anillos desde donde estas y se queda con la primera que tiene
+     * algo; con celdas tan grandes como las regiones daba un reino lejano en vez del mas cercano.
+     */
     public static final class Sitios extends RandomSpreadStructurePlacement {
         public static final Codec<Sitios> CODEC = Codec.unit(Sitios::new);
-        static final int CELDA = CastleSites.REGION / 16;
+        static final int CELDA = 16;
 
         public Sitios() {
             super(CELDA, CELDA - 1, RandomSpreadType.LINEAR, 1571286);
         }
 
+        /** El centro del reino si cae en la celda de (chunkX, chunkZ) (la celda puede tocar hasta cuatro regiones). */
         @Override
         public ChunkPos getPotentialStructureChunk(long seed, int chunkX, int chunkZ) {
-            int[] s = sitio(seed, chunkX, chunkZ);
-            if (s == null) return new ChunkPos(Math.floorDiv(chunkX, CELDA) * CELDA, Math.floorDiv(chunkZ, CELDA) * CELDA);
-            return new ChunkPos(s[0] >> 4, s[1] >> 4);
+            int c0x = Math.floorDiv(chunkX, CELDA) * CELDA, c0z = Math.floorDiv(chunkZ, CELDA) * CELDA;
+            for (int i = 0; i < 4; i++) {
+                int[] s = sitio(seed, c0x + (i & 1) * (CELDA - 1), c0z + (i >> 1) * (CELDA - 1));
+                if (s == null) continue;
+                int sx = s[0] >> 4, sz = s[1] >> 4;
+                if (sx >= c0x && sx < c0x + CELDA && sz >= c0z && sz < c0z + CELDA) return new ChunkPos(sx, sz);
+            }
+            return new ChunkPos(c0x, c0z);
         }
 
         @Override

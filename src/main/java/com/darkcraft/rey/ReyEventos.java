@@ -11,7 +11,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -136,9 +135,8 @@ public final class ReyEventos {
     public static void onDeath(LivingDeathEvent e) {
         if (e.getEntity() instanceof ServerPlayer p) {
             Rey r = luchaDe(p);
-            if (r != null && p.level() instanceof ServerLevel sl)
-                for (ServerPlayer o : sl.players())
-                    if (o.distanceToSqr(r) < 80 * 80) com.darkcraft.net.Net.to(o, new com.darkcraft.net.Net.ReyHabla(r.getId(), r.fase() == 3 ? 13 : 7));
+            // se burla (si no esta diciendo ya otra cosa)
+            if (r != null && r.level() instanceof ServerLevel sl) r.hablaSiCalla(sl, r.fase() == 3 ? 13 : 7);
         }
     }
 
@@ -175,24 +173,23 @@ public final class ReyEventos {
 
     // ------------------------------------------------------------------ comandos de prueba
 
-    @SubscribeEvent
-    public static void onCommands(RegisterCommandsEvent event) {
-        event.getDispatcher().register(Commands.literal("darkcraft").requires(s -> s.hasPermission(2))
-                .then(Commands.literal("rey")
-                        .then(Commands.literal("estado").executes(c -> estado(c.getSource())))
-                        .then(Commands.literal("reiniciar").executes(c -> reiniciar(c.getSource())))
-                        .then(Commands.literal("fase").then(Commands.argument("n", IntegerArgumentType.integer(1, 3))
-                                .executes(c -> fase(c.getSource(), IntegerArgumentType.getInteger(c, "n")))))
-                        .then(Commands.literal("matar").executes(c -> matar(c.getSource())))
-                        .then(Commands.literal("golpefinal").executes(c -> golpeFinal(c.getSource())))
-                        .then(Commands.literal("ir").executes(c -> ir(c.getSource())))));
+    /** /darkcraft valdrenn rey ... (lo registra Comandos). */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> comando() {
+        return Commands.literal("rey")
+                .then(Commands.literal("estado").executes(c -> estado(c.getSource())))
+                .then(Commands.literal("reiniciar").executes(c -> reiniciar(c.getSource())))
+                .then(Commands.literal("fase").then(Commands.argument("n", IntegerArgumentType.integer(1, 3))
+                        .executes(c -> fase(c.getSource(), IntegerArgumentType.getInteger(c, "n")))))
+                .then(Commands.literal("matar").executes(c -> matar(c.getSource())))
+                .then(Commands.literal("golpefinal").executes(c -> golpeFinal(c.getSource())))
+                .then(Commands.literal("ir").executes(c -> ir(c.getSource())));
     }
 
-    /** /darkcraft rey golpefinal: el golpe final ya (solo en la fase 3, luchando). */
+    /** /darkcraft valdrenn rey golpefinal: el golpe final ya (solo en la fase 3, luchando). */
     private static int golpeFinal(CommandSourceStack src) {
         Rey r = reyDe(src);
         if (r == null || !r.forzarGolpeFinal()) {
-            src.sendFailure(Component.literal("El Rey tiene que estar luchando en la fase 3 (/darkcraft rey fase 3)"));
+            src.sendFailure(Component.literal("El Rey tiene que estar luchando en la fase 3 (/darkcraft valdrenn rey fase 3)"));
             return 0;
         }
         src.sendSuccess(() -> Component.literal("Golpe final: corre a un circulo dorado"), true);

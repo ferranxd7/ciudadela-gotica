@@ -850,7 +850,8 @@ public class TreeTower extends Element {
             int y0 = F + 20 + r.range(0, 14), len = r.range(6, 20);
             for (int k = 0; k < len; k++) {
                 int y = y0 - k;
-                if (y < F + 2) break;
+                // por encima de la cabeza: nunca llegan al suelo de la sala
+                if (y < F + com.darkcraft.gavran.SalaArbol.MIN_LIANA) break;
                 // la primera casilla de aire fuera del tronco en esa direccion
                 for (double rr = 11; rr <= 21; rr += 0.5) {
                     int x = cx + (int) Math.round(Math.cos(a) * rr), z = cz + (int) Math.round(Math.sin(a) * rr);
@@ -1090,6 +1091,7 @@ public class TreeTower extends Element {
             for (int top : new int[]{F + HALL_H - 1, F + BALCON - 2}) {
                 for (int i = 0; i < len; i++) {
                     int y = top - i;
+                    if (y < F + com.darkcraft.gavran.SalaArbol.MIN_LIANA) break;
                     if (!c.isAir(x, y, z) || c.isAir(x + to.getStepX(), y, z + to.getStepZ())) break;
                     c.set(x, y, z, Blocks.VINE.defaultBlockState().setValue(net.minecraft.world.level.block.VineBlock.getPropertyForFace(to), true));
                 }

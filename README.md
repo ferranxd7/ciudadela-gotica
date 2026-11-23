@@ -9,8 +9,9 @@ natural (y rara) en el Overworld.
 3. **Crea un mundo nuevo**: el mod sube el límite de altura del Overworld hasta Y=703.
 
 ## Comandos (requieren trucos / operador)
-- `/darkcraft localizar` – te dice dónde está el Reino de Valdrenn más cercano (con botón para teletransportarte).
-- `/darkcraft ir` – te lleva directamente al Reino de Valdrenn más cercano.
+- `/darkcraft valdrenn localizar` – te dice dónde está el Reino de Valdrenn más cercano (con botón para teletransportarte).
+- `/darkcraft valdrenn ir` – te lleva directamente al Reino de Valdrenn más cercano.
+- `/darkcraft ayuda` – la lista de todos los comandos (haz clic en uno para escribirlo).
 - `/locate structure darkcraft:valdrenn` – también lo encuentra el comando normal del juego.
 
 ## Cómo llegar sin trucos
@@ -28,8 +29,9 @@ con una escalera de caracol, y un puente que entra en la isla.
 - Espadas: los golpes llenan la barra de energía. **Shift + clic izquierdo**: Tajo Real.
   **Ctrl + clic izquierdo**: Juicio del Rey. **Clic derecho**: cubrirse con las espadas cruzadas.
 
-Comandos para probarlo (con trucos): `/darkcraft rey ir` (te lleva al salón del trono),
-`/darkcraft rey estado`, `/darkcraft rey reiniciar`, `/darkcraft rey fase 2` (o `3`), `/darkcraft rey matar`.
+Comandos para probarlo (con trucos): `/darkcraft valdrenn rey ir` (te lleva al salón del trono),
+`/darkcraft valdrenn rey estado`, `/darkcraft valdrenn rey reiniciar`, `/darkcraft valdrenn rey fase 2` (o `3`),
+`/darkcraft valdrenn rey matar`.
 
 ## Ser Gavran (jefe de la Sala del Árbol)
 - Espera en una rama del Árbol de la Corona, en lo alto de la torre-árbol. La Llave del Árbol abre la puerta de su
@@ -42,8 +44,8 @@ Comandos para probarlo (con trucos): `/darkcraft rey ir` (te lleva al salón del
 - Mandoble del Juramento: a dos manos (con la otra mano libre). **Shift + clic izquierdo**: Raíces del Juramento.
   **Ctrl + clic izquierdo**: Juicio de Espinas. Usa la misma energía que las espadas del Rey.
 
-Comandos para probarlo (con trucos): `/darkcraft gavran ir`, `/darkcraft gavran estado`, `/darkcraft gavran reiniciar`,
-`/darkcraft gavran fase 2`, `/darkcraft gavran matar`.
+Comandos para probarlo (con trucos): `/darkcraft valdrenn gavran ir`, `/darkcraft valdrenn gavran estado`,
+`/darkcraft valdrenn gavran reiniciar`, `/darkcraft valdrenn gavran fase 2`, `/darkcraft valdrenn gavran matar`.
 
 ## Fases
 1. ✅ Isla + castillo + generación en el mundo

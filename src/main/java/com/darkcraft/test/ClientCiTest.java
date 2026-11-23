@@ -716,6 +716,20 @@ public final class ClientCiTest {
             log("darkcraft en " + s[0] + "," + s[1] + "; cofre 1 en " + chest1[0] + "," + chest1[1] + "," + chest1[2]);
             sp.teleportTo(lvl, chest1[0] - 2.5, chest1[1], chest1[2] + 0.5, -90f, 12f);
         }));
+        // los comandos nuevos (por sitio) y la ayuda; el viejo ya no existe
+        at(5, "Comandos: /darkcraft ayuda, /darkcraft valdrenn localizar y el viejo /darkcraft localizar", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft ayuda");
+                comando(sp, "darkcraft valdrenn localizar");
+                comando(sp, "darkcraft localizar");
+            });
+        });
+        at(7, "Abrir el chat", m -> m.setScreen(new net.minecraft.client.gui.screens.ChatScreen("")));
+        at(8, "Captura del chat con la ayuda", m -> {
+            shot(m, "cliente_00_ayuda");
+            m.setScreen(null);
+        });
         at(40, "Captura de la torre", m -> {
             m.options.hideGui = true;
             shot(m, "cliente_01_torre");
@@ -796,6 +810,23 @@ public final class ClientCiTest {
             var t = sala.t;
             verDesde(m, new Vec3(t.seatX() + 0.5, t.y() + 4.6, t.seatZ() + 5.5), new Vec3(t.seatX() + 0.5, t.y() + 4.6, t.seatZ() + 0.5));
         });
+        // el trono del Rey por detras y de lado (para ver que no queden huecos)
+        atTicks(B + 136, "Cortes del trono del Rey", m -> {
+            var t = sala.t;
+            server(m, sp -> volcar(sp.serverLevel(), "trono del Rey", t.seatX() - 8, t.seatX() + 8, t.y() - 1, t.y() + 12,
+                    t.seatZ() - 3, t.seatZ() + 1));
+            verDesde(m, new Vec3(t.seatX() + 5.5, t.y() + 4.2, t.seatZ() + 0.5), new Vec3(t.seatX() - 0.5, t.y() + 3.8, t.seatZ() - 1.2));
+        });
+        atTicks(B + 139, "captura", m -> shot(m, "cliente_19b_trono_lado_d"));
+        atTicks(B + 141, "el otro lado", m -> {
+            var t = sala.t;
+            verDesde(m, new Vec3(t.seatX() - 4.5, t.y() + 4.2, t.seatZ() + 0.5), new Vec3(t.seatX() + 1.5, t.y() + 3.8, t.seatZ() - 1.2));
+        });
+        atTicks(B + 144, "captura", m -> shot(m, "cliente_19c_trono_lado_i"));
+        atTicks(B + 146, "Camara delante del trono", m -> {
+            var t = sala.t;
+            verDesde(m, new Vec3(t.seatX() + 0.5, t.y() + 4.6, t.seatZ() + 5.5), new Vec3(t.seatX() + 0.5, t.y() + 4.6, t.seatZ() + 0.5));
+        });
         atTicks(B + 150, "Captura: el rey sentado en su trono", m -> shot(m, "cliente_20_rey_trono"));
         atTicks(B + 152, "Entrar en el salon del trono", m -> {
             m.setCameraEntity(m.player);
@@ -809,12 +840,14 @@ public final class ClientCiTest {
             reyStart = ticks;
         });
         int E = B + 152;
-        int[] intro = {50, 110, 170, 240, 300, 330};
+        // la entrada dura lo que duran sus frases (con pausas): capturas en cada plano
+        float[] ce = com.darkcraft.rey.Rey.cortesEntrada();
+        float[] intro = {2.5f, (ce[0] + ce[1]) / 2, ce[1] + 1.5f, (ce[1] + ce[2]) / 2 + 1f, ce[2] + 1.0f, ce[3] - 0.3f};
         for (int i = 0; i < intro.length; i++) {
             final int k = i;
-            atTicks(E + intro[i], "Captura de la intro", m -> shot(m, String.format("cliente_%02d_intro_%d", 21 + k, k)));
+            atTicks(E + Math.round(intro[i] * 20), "Captura de la intro", m -> shot(m, String.format("cliente_%02d_intro_%d", 21 + k, k)));
         }
-        int F = E + 400;
+        int F = E + com.darkcraft.rey.Rey.INTRO_TICKS + 60;
         atTicks(F, "Empieza la pelea: camara de observador", m -> {
             m.options.hideGui = true;
             seguir = true;
@@ -837,7 +870,8 @@ public final class ClientCiTest {
         }
         int F3 = F2 + 330;
         atTicks(F3, "Forzar fase 3 (a los volcanes)", m -> server(m, sp -> reyCerca(sp).ifPresent(r -> r.forzarFase(3))));
-        int[] v = {40, 110, 175, 222, 262, 292, 400, 480};
+        // el cambio a la fase 3 espera a que acabe la frase 5 (+76 ticks) y la pelea en los volcanes a la 10 (+38)
+        int[] v = {40, 186, 251, 298, 338, 368, 514, 594};
         for (int i = 0; i < v.length; i++) {
             final int k = i;
             atTicks(F3 + v[i], "Captura fase 3", m -> {
@@ -846,7 +880,7 @@ public final class ClientCiTest {
             });
         }
         // golpe final: los dos circulos dorados, el aviso grande y la cuenta atras
-        int G = F3 + 385;   // cuando ya ha acabado la cinematica de la fase 3 (lucha otra vez)
+        int G = F3 + 500;   // cuando ya ha acabado la cinematica de la fase 3 (lucha otra vez)
         atTicks(G, "Forzar el golpe final", m -> server(m, sp -> reyCerca(sp).ifPresent(r -> log("  golpe final forzado: " + r.forzarGolpeFinal()))));
         atTicks(G + 24, "Captura golpe final (circulos)", m -> {
             m.options.hideGui = false;
@@ -861,7 +895,7 @@ public final class ClientCiTest {
         atTicks(G + 50, "Captura golpe final (cuenta atras)", m -> shot(m, "cliente_58_golpe_final_cuenta"));
         atTicks(G + 78, "Vida tras el golpe final", m -> server(m, sp -> log("  tras el golpe final: vida del jugador " + Math.round(sp.getHealth())
                 + (sp.isDeadOrDying() ? " (muerto)" : "") + " | logro golpe_final=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GOLPE_FINAL))));
-        int D = F3 + 540;
+        int D = F3 + 654;
         atTicks(D, "Forzar la muerte del Rey", m -> server(m, sp -> reyCerca(sp).ifPresent(com.darkcraft.rey.Rey::forzarMuerte)));
         int[] muerte = {20, 70, 100, 125, 133, 142, 175, 230};
         for (int i = 0; i < muerte.length; i++) {
@@ -1053,11 +1087,14 @@ public final class ClientCiTest {
             server(m, sp -> sp.teleportTo(sp.serverLevel(), hall[0] + 0.5, hall[2], hall[1] - 21.5, 180f, 0f));
             gavranStart = ticks;
         });
-        // la entrada dura 35 s: capturas en los momentos clave
+        // la entrada dura lo que duran sus frases (con pausas): capturas en los momentos clave de cada plano (los de
+        // cuando duraba 35 s, llevados a los planos de ahora)
+        float[] viejos = {0f, 3.2f, 10.9f, 19.0f, 22.5f, 28.0f, 34.4f}, cg = com.darkcraft.gavran.Gavran.cortesEntrada();
+        float[] nuevos = {0f, cg[0], cg[1], cg[2], cg[3], cg[4], cg[5]};
         float[] intro = {1.6f, 2.9f, 6.5f, 14.5f, 20.0f, 21.0f, 21.6f, 23.5f, 25.5f, 29.0f, 31.5f, 33.6f};
         for (int i = 0; i < intro.length; i++) {
             final int k = i;
-            atTicks(G + 18 + Math.round(intro[i] * 20), "Captura de la entrada de Gavran", m -> {
+            atTicks(G + 18 + Math.round(llevar(intro[i], viejos, nuevos) * 20), "Captura de la entrada de Gavran", m -> {
                 if (k == 1) server(m, sp -> {
                     var d = com.darkcraft.arbol.TorreArbol.puerta(sp.serverLevel(), hall);
                     log("  puerta: " + (d == null ? "NO ESTA" : "estado " + d.estado()) + " | barrera: "
@@ -1066,7 +1103,7 @@ public final class ClientCiTest {
                 shot(m, String.format("cliente_g%02d_entrada_%d", 2 + k, k));
             });
         }
-        int L = G + 18 + 712;
+        int L = G + 18 + com.darkcraft.gavran.Gavran.INTRO_TICKS + 12;
         atTicks(L, "Gavran: empieza la pelea (camara de observador)", m -> {
             m.options.hideGui = true;
             seguirG = true;
@@ -1240,8 +1277,25 @@ public final class ClientCiTest {
                         + " | luces en la sala " + luces + ", en la copa " + lucesCopa);
             });
         });
+        // el trono de Gavran por detras y de lado (para ver que no queden huecos)
+        atTicks(M + 602, "Cortes del trono de Gavran", m -> {
+            m.options.hideGui = true;
+            int tx = hall[0], tz = hall[1] - com.darkcraft.gen.TreeTower.HALL_R + 3, F = hall[2];
+            server(m, sp -> volcar(sp.serverLevel(), "trono de Gavran", tx - 8, tx + 8, F - 1, F + 14, tz - 4, tz + 1));
+            verDesde(m, new Vec3(tx + 5.5, F + 6.0, tz + 2.5), new Vec3(tx - 0.5, F + 5.0, tz - 1.5));
+        });
+        atTicks(M + 605, "captura", m -> shot(m, "cliente_g58_trono_lado_d"));
+        atTicks(M + 607, "el otro lado", m -> {
+            int tx = hall[0], tz = hall[1] - com.darkcraft.gen.TreeTower.HALL_R + 3, F = hall[2];
+            verDesde(m, new Vec3(tx - 4.5, F + 6.0, tz + 2.5), new Vec3(tx + 1.5, F + 5.0, tz - 1.5));
+        });
+        atTicks(M + 610, "captura", m -> shot(m, "cliente_g59_trono_lado_i"));
         // ---------------------------------------------------------------- capitulo 5: el cofre, la cinematica con el narrador y el libro
-        atTicks(M + 610, "Al cofre del capitulo 5", m -> server(m, sp -> {
+        atTicks(M + 612, "vuelta al jugador", m -> {
+            m.setCameraEntity(m.player);
+            m.options.hideGui = false;
+        });
+        atTicks(M + 630, "Al cofre del capitulo 5", m -> server(m, sp -> {
             var s5 = com.darkcraft.gavran.SalaArbol.cerca(sp.serverLevel(), hall[0], hall[1]);
             BlockPos cofre = BlockPos.containing(s5.aterrizaje());
             sp.setGameMode(GameType.SURVIVAL);
@@ -1249,7 +1303,7 @@ public final class ClientCiTest {
             sp.getInventory().items.set(0, ItemStack.EMPTY);
             sp.teleportTo(sp.serverLevel(), cofre.getX() + 0.5, s5.suelo(sp.serverLevel(), cofre.getX() + 0.5, cofre.getZ() + 2.5), cofre.getZ() + 2.5, 180f, 25f);
         }));
-        atTicks(M + 618, "Clic derecho en el cofre del capitulo 5", m -> {
+        atTicks(M + 638, "Clic derecho en el cofre del capitulo 5", m -> {
             m.options.hideGui = false;
             // el cofre sube delante del trono, donde se arrodillo (SalaArbol.aterrizaje)
             BlockPos cofre = new BlockPos(hall[0], hall[2] + 2, hall[1] - com.darkcraft.gen.TreeTower.HALL_R + 7);
@@ -1257,7 +1311,7 @@ public final class ClientCiTest {
                     new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(cofre), net.minecraft.core.Direction.SOUTH, cofre, false));
             log("  clic en el cofre: " + r);
         });
-        int C5 = M + 618;
+        int C5 = M + 638;
         float t5 = com.darkcraft.cine.Timeline.NARR_START - 0.6f, b5 = com.darkcraft.cine.Timeline.back(5);
         float[] cortes = new float[7];
         cortes[0] = t5;
@@ -1404,6 +1458,53 @@ public final class ClientCiTest {
             });
         });
         return t + 20;
+    }
+
+    /** Lanza un comando como el jugador (con permiso de trucos) y apunta si ha funcionado (1) o no (0). */
+    private static void comando(ServerPlayer sp, String cmd) {
+        int r = sp.getServer().getCommands().performPrefixedCommand(sp.createCommandSourceStack().withPermission(4), cmd);
+        log("  /" + cmd + " -> " + r);
+    }
+
+    /**
+     * Escribe en el informe los bloques de una caja, en cortes verticales (uno por cada z, de atras hacia delante): una
+     * letra por bloque, con su leyenda ('.' es aire). Para buscar huecos sin tener que verlo.
+     */
+    private static void volcar(ServerLevel lvl, String que, int x0, int x1, int y0, int y1, int z0, int z1) {
+        java.util.Map<String, Character> letras = new java.util.LinkedHashMap<>();
+        String abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder b = new StringBuilder("  bloques de " + que + " (x de " + x0 + " a " + x1 + ", y de " + y1 + " a " + y0 + "):\n");
+        for (int z = z0; z <= z1; z++) {
+            b.append("   z=").append(z).append('\n');
+            for (int y = y1; y >= y0; y--) {
+                b.append(String.format("   %4d ", y));
+                for (int x = x0; x <= x1; x++) {
+                    var st = lvl.getBlockState(new BlockPos(x, y, z));
+                    if (st.isAir()) {
+                        b.append('.');
+                        continue;
+                    }
+                    String n = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(st.getBlock()).getPath();
+                    Character c = letras.get(n);
+                    if (c == null) {
+                        c = letras.size() < abc.length() ? abc.charAt(letras.size()) : '?';
+                        letras.put(n, c);
+                    }
+                    b.append(c);
+                }
+                b.append('\n');
+            }
+        }
+        b.append("   leyenda:");
+        letras.forEach((n, c) -> b.append(' ').append(c).append('=').append(n));
+        log(b.toString());
+    }
+
+    /** Lleva el instante t de unos cortes de plano (viejos) a otros (nuevos), en linea recta entre cada dos. */
+    private static float llevar(float t, float[] viejos, float[] nuevos) {
+        for (int i = 0; i < viejos.length - 1; i++)
+            if (t <= viejos[i + 1]) return nuevos[i] + (nuevos[i + 1] - nuevos[i]) * (t - viejos[i]) / (viejos[i + 1] - viejos[i]);
+        return nuevos[nuevos.length - 1];
     }
 
     /** Instante a la fraccion f del plano g (cortes: el principio de cada plano y el final del ultimo). */
