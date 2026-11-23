@@ -85,11 +85,20 @@ dificultad, marcas en el suelo como el Rey.
   `GavranAnimaciones.java` (fotogramas en cadenas que se leen al cargar: la mano izquierda lleva uno por tick),
   `gavran/GavranAnims.java` (números, duraciones y ticks de cada golpe) y `textures/entity/gavran/*.png`.
 - Barra de vida: `tools/hud/barra_gavran.py` → `textures/gui/gavran_barra.png`; la dibuja `client/gavran/GavranCliente`.
+- Estacas de raíz: bloque `darkcraft:raiz_gavran` (sin objeto; solo lo muestran las `block_display`), texturas de
+  `tools/gavran/raiz_bloque.py` (corteza casi negra con venas de savia verde).
+- Balance (con netherite y protección IV en normal): tajos ~1,9 corazones, remates ~3, contraataque ~3,4 (como el
+  Rey). Postura: +8 por golpe justo después de un ataque suyo, +2,5 si no, +7 al pegarle en guardia; baja sola si
+  pasan 2,5 s sin golpes. En la sala y su torre no salen monstruos solos (`GavranEventos.onSpawn`) y los que se
+  hubieran colado se van al empezar la entrada.
+- Cinemática de entrada: el plano de la rama es de lado y casi a su altura (desde abajo le tapa la rama) y el del
+  salto sigue el mismo salto que hace el servidor (`Gavran.enSalto`); `SalaArbol.despejarVista` quita las hojas y
+  lianas que le taparían en esos planos.
 - Servidor: `gavran/Gavran.java` (estados DORMIDO, INTRO, LUCHA, ATURDIDO, FIN1, MUERTE), `SalaArbol` (geometría
   de la sala: anillo entre el tronco y el muro, rama del norte sobre la puerta, aterrizaje delante del trono),
   `Raices` (estacas de raíz con entidades `block_display` que crecen y se recogen solas; onda del mandoble),
   `GavranEventos` (aparece en su rama, sala cerrada, trampas, objetos de quien cae, comandos).
 - Voz: el paquete `Net.ReyHabla` con línea 100+N es Gavran (subtítulos `darkcraft.gavran.voz.N`).
 - Música fase 1: "Dark Descent" de Matthew Pablo (CC-BY 3.0), id `gavran1` (tema 11 de `ClientMusic.boss`).
-- Fin de la fase 1 en B1: se retira a su rama, sale "Continuará" y vuelve a empezar (hay que salir de la sala y
-  volver a entrar). En B2 eso se cambia por el cambio de fase de verdad.
+- Fin de la fase 1 en B1: se retira a su rama, sale "Continuará" (subtítulo corto; la explicación va al chat) y
+  vuelve a empezar (hay que salir de la sala y volver a entrar). En B2 eso se cambia por el cambio de fase de verdad.

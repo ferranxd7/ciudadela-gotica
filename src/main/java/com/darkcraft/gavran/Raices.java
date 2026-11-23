@@ -211,8 +211,8 @@ public final class Raices {
     private void estaca(ServerLevel sl, double x, double y, double z, RandomSource r, double alto, double grueso, int dura, int fin) {
         Display.BlockDisplay d = EntityType.BLOCK_DISPLAY.create(sl);
         if (d == null) return;
-        BlockState st = r.nextInt(3) == 0 ? Blocks.MANGROVE_ROOTS.defaultBlockState() : (r.nextBoolean() ? Blocks.DARK_OAK_LOG.defaultBlockState()
-                : Blocks.MANGROVE_LOG.defaultBlockState());
+        // corteza casi negra con venas de savia verde (darkcraft:raiz_gavran); alguna, maraña de raices
+        BlockState st = r.nextInt(5) == 0 ? Blocks.MANGROVE_ROOTS.defaultBlockState() : DarkCraftMod.RAIZ_GAVRAN.get().defaultBlockState();
         float yaw = r.nextFloat() * Mth.TWO_PI, tilt = (0.12f + r.nextFloat() * 0.38f);
         float h = (float) (alto * (0.8 + r.nextDouble() * 0.4)), w = (float) grueso;
         Matrix4f lleno = new Matrix4f().rotateY(yaw).rotateX(tilt).scale(w, h, w).translate(-0.5f, 0f, -0.5f);
@@ -222,7 +222,7 @@ public final class Raices {
         tag.putInt("interpolation_duration", 0);
         CompoundTag luz = new CompoundTag();
         luz.putInt("sky", 0);
-        luz.putInt("block", 11);
+        luz.putInt("block", 9);
         tag.put("brightness", luz);
         tag.putFloat("view_range", 1.5f);
         d.load(tag);

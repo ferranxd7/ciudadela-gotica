@@ -36,6 +36,9 @@ import org.joml.Vector3f;
  * cerrado lo tapan bloques de barrera.
  */
 public class PuertaArbol extends Entity {
+    /** Polvo gris pardo (golpes contra el suelo y el portazo). */
+    public static final DustParticleOptions POLVO = new DustParticleOptions(new Vector3f(0.42f, 0.37f, 0.32f), 2.6f);
+
     private static final EntityDataAccessor<Integer> ESTADO = SynchedEntityData.defineId(PuertaArbol.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> INICIO = SynchedEntityData.defineId(PuertaArbol.class, EntityDataSerializers.LONG);
 
@@ -188,7 +191,8 @@ public class PuertaArbol extends Entity {
         if (e == CERRANDO) {
             if (t == T_CIERRE - 4) {
                 sl.playSound(null, getX(), getY() + 5, getZ(), com.darkcraft.DarkCraftMod.SFX_PUERTA_CIERRA.get(), SoundSource.BLOCKS, 3.5f, 0.9f);
-                sl.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, getX(), getY() + 1, getZ() - 0.6, 14, 2.6, 0.3, 0.3, 0.02);
+                // polvo que levanta el portazo (se queda abajo y se va enseguida, no sube en columna como el humo)
+                sl.sendParticles(POLVO, getX(), getY() + 0.8, getZ() - 0.6, 40, 2.6, 0.5, 0.4, 0.02);
                 ponerBarrera(sl);
             }
             for (int i = 0; i < 3; i++)

@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -106,6 +107,14 @@ public record SalaArbol(int cx, int cz, int F, int base) {
         return new Vec3(x + 0.5, F + 31, z + 0.5);
     }
 
+    /** Hojas, lianas y luces de hongo que cuelgan en la sala (lo unico que se quita para que se le vea). */
+    private static boolean follaje(BlockState s) {
+        return s.is(BlockTags.LEAVES) || s.is(Blocks.CAVE_VINES) || s.is(Blocks.CAVE_VINES_PLANT) || s.is(Blocks.WEEPING_VINES)
+                || s.is(Blocks.WEEPING_VINES_PLANT) || s.is(Blocks.TWISTING_VINES) || s.is(Blocks.TWISTING_VINES_PLANT)
+                || s.is(Blocks.VINE) || s.is(Blocks.GLOW_LICHEN) || s.is(Blocks.SHROOMLIGHT) || s.is(Blocks.HANGING_ROOTS)
+                || s.is(Blocks.SPORE_BLOSSOM) || s.is(Blocks.MOSS_CARPET);
+    }
+
     /** Despeja las hojas y lianas alrededor de la rama y delante de el (para que se le vea entero desde la sala). */
     public void despejarRama(ServerLevel sl, Vec3 r) {
         BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
@@ -113,14 +122,42 @@ public record SalaArbol(int cx, int cz, int F, int base) {
             for (int dz = -11; dz <= 3; dz++)
                 for (int dy = -7; dy <= 7; dy++) {
                     m.set(Mth.floor(r.x) + dx, Mth.floor(r.y) + dy, Mth.floor(r.z) + dz);
-                    BlockState s = sl.getBlockState(m);
-                    if (s.is(BlockTags.LEAVES) || s.is(net.minecraft.world.level.block.Blocks.CAVE_VINES)
-                            || s.is(net.minecraft.world.level.block.Blocks.CAVE_VINES_PLANT)
-                            || s.is(net.minecraft.world.level.block.Blocks.WEEPING_VINES)
-                            || s.is(net.minecraft.world.level.block.Blocks.WEEPING_VINES_PLANT)
-                            || s.is(net.minecraft.world.level.block.Blocks.SHROOMLIGHT))
-                        sl.setBlock(m, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+                    if (follaje(sl.getBlockState(m))) sl.setBlock(m, Blocks.AIR.defaultBlockState(), 2);
                 }
+    }
+
+    /**
+     * Despeja el follaje entre la camara de un plano y lo que mira (pos y look: x,y,z por punto, como en Shot): un
+     * tubo de tres bloques de ancho por cada par de puntos y por los de en medio.
+     */
+    public void despejarVista(ServerLevel sl, double[] pos, double[] look) {
+        int np = pos.length / 3, nl = look.length / 3, n = Math.max(np, nl);
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        for (int k = 0; k < (n - 1) * 4 + 1; k++) {
+            double f = k / 4.0;
+            Vec3 a = punto(pos, f * (np - 1) / Math.max(1, n - 1)), b = punto(look, f * (nl - 1) / Math.max(1, n - 1));
+            Vec3 d = b.subtract(a);
+            double len = d.length();
+            // hasta un poco antes de el (no se toca la rama en la que esta)
+            for (double u = 0; u <= len - 1.5; u += 0.6) {
+                Vec3 q = a.add(d.scale(u / len));
+                for (int dx = -1; dx <= 1; dx++)
+                    for (int dy = -1; dy <= 1; dy++)
+                        for (int dz = -1; dz <= 1; dz++) {
+                            m.set(Mth.floor(q.x) + dx, Mth.floor(q.y) + dy, Mth.floor(q.z) + dz);
+                            if (dist(m.getX() + 0.5, m.getZ() + 0.5) < TreeTower.TRUNK_R + 0.5) continue;
+                            if (follaje(sl.getBlockState(m))) sl.setBlock(m, Blocks.AIR.defaultBlockState(), 2);
+                        }
+            }
+        }
+    }
+
+    /** Punto de una lista x,y,z (i puede tener decimales: se interpola en linea recta entre dos puntos). */
+    private static Vec3 punto(double[] v, double i) {
+        int n = v.length / 3;
+        int a = Mth.clamp((int) Math.floor(i), 0, n - 1), b = Math.min(n - 1, a + 1);
+        double t = Mth.clamp(i - a, 0, 1);
+        return new Vec3(Mth.lerp(t, v[a * 3], v[b * 3]), Mth.lerp(t, v[a * 3 + 1], v[b * 3 + 1]), Mth.lerp(t, v[a * 3 + 2], v[b * 3 + 2]));
     }
 
     /** Puerta de la sala (en el tronco, al norte): centro del umbral. */

@@ -120,6 +120,11 @@ public class DarkCraftMod {
                     .isValidSpawn((st, l, p, t) -> false).isRedstoneConductor((st, l, p) -> false)
                     .isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false)));
 
+    /** Raiz de Gavran: solo se ve en las estacas de sus ataques (entidades block_display); no se coloca ni tiene objeto. */
+    public static final RegistryObject<Block> RAIZ_GAVRAN = BLOCKS.register("raiz_gavran", () -> new Block(
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BROWN).strength(-1.0F, 3600000.0F).noLootTable()
+                    .sound(SoundType.WOOD).pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false)));
+
     public static final RegistryObject<Item> ESPADA_DIESTRA = ITEMS.register("espada_diestra",
             () -> new com.darkcraft.armas.EspadaRey(true, new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> ESPADA_SINIESTRA = ITEMS.register("espada_siniestra",

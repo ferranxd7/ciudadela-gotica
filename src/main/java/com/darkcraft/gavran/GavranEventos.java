@@ -16,7 +16,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -24,6 +26,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -58,7 +61,7 @@ public final class GavranEventos {
             Vec3 r = s.rama(ow);
             g.setSala(s, r);
             g.moveTo(r.x, r.y, r.z, 180f, 0f);
-            s.despejarRama(ow, r);
+            Gavran.despejar(ow, s, r);
             // si ya hay alguien dentro de la sala (vuelve a aparecer tras caer), no empieza hasta que salgan
             for (ServerPlayer p : ow.players())
                 if (Gavran.valido(p) && s.dentro(p.position())) g.desarmar();
@@ -103,6 +106,16 @@ public final class GavranEventos {
                     && g.jugadores().contains(p.getUUID())) return g;
         }
         return null;
+    }
+
+    // ------------------------------------------------------------------ sin monstruos sueltos en la sala
+
+    /** En la Sala del Arbol y en su torre no salen monstruos solos: alli solo estan Gavran y sus escuderos. */
+    @SubscribeEvent
+    public static void onSpawn(MobSpawnEvent.FinalizeSpawn e) {
+        if (e.getSpawnType() != MobSpawnType.NATURAL || !(e.getEntity() instanceof Enemy)) return;
+        if (!(e.getLevel() instanceof ServerLevel sl) || sl.dimension() != Level.OVERWORLD) return;
+        if (Sello.enSalaArbol(sl, BlockPos.containing(e.getX(), e.getY(), e.getZ()))) e.setSpawnCancelled(true);
     }
 
     // ------------------------------------------------------------------ nada de trampas durante la pelea
@@ -228,7 +241,7 @@ public final class GavranEventos {
                 src.sendFailure(Component.literal("Ser Gavran tiene que estar luchando"));
                 return 0;
             }
-            src.sendSuccess(() -> Component.translatable("darkcraft.gavran.continuara"), true);
+            src.sendSuccess(() -> Component.translatable("darkcraft.gavran.continuara.aviso"), true);
         }
         return 1;
     }

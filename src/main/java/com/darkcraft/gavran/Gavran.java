@@ -6,6 +6,7 @@ import com.darkcraft.cine.Shot;
 import com.darkcraft.net.Net;
 import com.darkcraft.rey.ReyEstado;
 import com.darkcraft.story.Logros;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
@@ -417,7 +418,7 @@ public class Gavran extends Monster {
         }
         if (hablaHasta < tGlobal && flag(F_HABLA)) setFlag(F_HABLA, false);
         barra.setProgress(Mth.clamp(getHealth() / getMaxHealth(), 0f, 1f));
-        if (postura > 0 && tGlobal - ultimoGolpeRecibido > 60) postura = Math.max(0, postura - 0.35f);
+        if (postura > 0 && tGlobal - ultimoGolpeRecibido > 50) postura = Math.max(0, postura - 0.45f);
         int pv = Math.round(postura);
         if (pv != postura()) this.entityData.set(POSTURA, pv);
     }
@@ -490,6 +491,8 @@ public class Gavran extends Monster {
 
     /** Duracion de la entrada (ticks) y cuando dice cada frase. */
     public static final int INTRO_TICKS = 700;
+    /** Lo que sube de mas al saltar de la rama (el plano del salto lo sigue con la misma cuenta). */
+    private static final double SALTO_ALTO = 2.5;
     private static final int T_FRASE1 = 66, T_FRASE2 = 218, T_SALTA = 380, T_FRASE3 = 450, T_SALUDO = 560, T_FRASE4 = 580,
             T_LUCHA = 690;
 
@@ -506,12 +509,17 @@ public class Gavran extends Monster {
         ReyEstado.get(sl.getServer()).set(s.key(), ReyEstado.LUCHA);
         GavranEventos.cerrarSala(sl, s);
         Raices.limpiarSueltas(sl, s);
-        s.despejarRama(sl, rama);
+        // los monstruos que se hubieran colado en la sala se van (no los escuderos ni los que tengan nombre)
+        for (Monster m : sl.getEntitiesOfClass(Monster.class, s.caja(), m -> !(m instanceof Gavran) && !m.isPersistenceRequired()
+                && !m.getTags().contains(GavranEventos.TAG_ESCUDERO))) {
+            sl.sendParticles(ParticleTypes.POOF, m.getX(), m.getY() + 0.8, m.getZ(), 8, 0.3, 0.5, 0.3, 0.02);
+            m.discard();
+        }
+        List<Shot> planos = despejar(sl, s, rama);
         setFlag(F_INTRO, true);
         setFlag(F_ALERTA, true);
         cambiar(Estado.INTRO);
-        for (ServerPlayer p : vivos(sl))
-            Cinematics.playShots(p, Cinematics.GAVRAN_INTRO, introPlanos(s, rama, p.getEyePosition()), INTRO_TICKS / 20f);
+        for (ServerPlayer p : vivos(sl)) Cinematics.playShots(p, Cinematics.GAVRAN_INTRO, planos, INTRO_TICKS / 20f);
         DarkCraftMod.LOGGER.info("[DarkCraft] Ser Gavran despierta ({} jugadores)", jugadores.size());
     }
 
@@ -535,7 +543,7 @@ public class Gavran extends Monster {
         if (t == salta - 6) sonido(sl, DarkCraftMod.SFX_MADERA_CRUJE.get(), 1.6f, 0.9f);
         if (t == salta && s != null) {
             sonido(sl, DarkCraftMod.SFX_GAVRAN_SALTO.get(), 2.0f, 1.0f);
-            saltar(rama, s.aterrizaje(), cae - salta, 2.5);
+            saltar(rama, s.aterrizaje(), cae - salta, SALTO_ALTO);
             hojasCayendo(sl, rama, 40);
         }
         if (t == cae && s != null) {
@@ -577,8 +585,30 @@ public class Gavran extends Monster {
         return v;
     }
 
+    /**
+     * Despeja la rama y las hojas o lianas que taparian a Gavran en los planos de la entrada (en la rama, de cerca y
+     * el salto). Devuelve los planos.
+     */
+    static List<Shot> despejar(ServerLevel sl, SalaArbol s, Vec3 rama) {
+        s.despejarRama(sl, rama);
+        List<Shot> planos = introPlanos(s, rama);
+        for (int i = 1; i <= 3; i++) s.despejarVista(sl, planos.get(i).pos, planos.get(i).look);
+        return planos;
+    }
+
+    /** Donde va Gavran en un salto de 'de' a 'a' (q de 0 a 1, alto: lo que sube de mas en el arco). */
+    static Vec3 enSalto(Vec3 de, Vec3 a, double alto, double q) {
+        q = Mth.clamp(q, 0, 1);
+        double x = Mth.lerp(q, de.x, a.x), z = Mth.lerp(q, de.z, a.z);
+        // sube un poco y cae acelerando (o sube frenando si el destino esta mas alto)
+        double dy = a.y - de.y;
+        double y = dy < 0 ? de.y + dy * q * q + alto * 4 * q * (1 - q) * 0.5
+                : de.y + dy * (1 - (1 - q) * (1 - q)) + alto * 4 * q * (1 - q) * 0.5;
+        return new Vec3(x, y, z);
+    }
+
     /** Planos de la entrada: la puerta que se cierra, Gavran en la rama, el salto, su cara y el saludo. */
-    public static List<Shot> introPlanos(SalaArbol s, Vec3 rama, Vec3 eye) {
+    public static List<Shot> introPlanos(SalaArbol s, Vec3 rama) {
         double cx = s.ccx(), F = s.F(), cz = s.ccz();
         double hx = rama.x, hy = rama.y + 3.5, hz = rama.z;
         Vec3 c = s.aterrizaje();
@@ -587,18 +617,32 @@ public class Gavran extends Monster {
         l.add(new Shot(0f, 3.2f, 64, 0, 1,
                 p(cx + 7.5, F + 3.4, cz - 27.5, cx + 5.8, F + 3.1, cz - 25.5),
                 p(cx, F + 5.2, cz - 15.4, cx, F + 5.0, cz - 15.4)));
-        // arriba, en la rama, de rodillas: "el Rey ha muerto"
+        // arriba, en la rama, de rodillas: "el Rey ha muerto" (desde un lado y casi a su altura: desde abajo le tapa la rama)
         l.add(new Shot(3.2f, 10.9f, 58, 0, 1,
-                p(cx + 6.5, F + 3.5, hz - 11.5, cx + 4.8, F + 6.5, hz - 9.5),
+                p(cx + 13, F + 25, cz - 31, cx + 9.5, F + 28, cz - 28),
                 p(hx, hy, hz, hx, hy + 0.2, hz)));
         // de cerca, a su altura
         l.add(new Shot(10.9f, 19.0f, 52, 0, 1,
                 p(hx + 3.4, hy - 0.3, hz - 6.8, hx + 2.3, hy - 0.1, hz - 5.6),
                 p(hx, hy + 0.1, hz, hx, hy + 0.2, hz)));
-        // el salto: desde un lado de la sala
-        l.add(new Shot(19.0f, 22.5f, 72, 0, 2,
-                p(cx - 16, F + 9, cz - 22, cx - 15, F + 6, cz - 26),
-                p(hx, hy - 1, hz, (hx + c.x) / 2, (hy + c.y) / 2, (hz + c.z) / 2, c.x, c.y + 2.5, c.z)));
+        // el salto: la camara le sigue desde un lado (quieta mientras se levanta en la rama, cae con el y se para
+        // cuando aterriza); los puntos salen del mismo salto que hace el servidor, cada cuarto de segundo
+        int salta = T_SALTA + GavranAnims.GOLPES_DESCENDER[0], cae = T_SALTA + GavranAnims.GOLPES_DESCENDER[1];
+        float s0 = T_SALTA / 20f, s1 = 22.5f;
+        int n = 15;
+        double[] pos = new double[n * 3], look = new double[n * 3];
+        for (int i = 0; i < n; i++) {
+            double tick = (s0 + (s1 - s0) * i / (n - 1.0)) * 20;
+            Vec3 g = enSalto(rama, c, SALTO_ALTO, (tick - salta) / (cae - salta));
+            double ly = g.y + 3.0;
+            look[i * 3] = g.x;
+            look[i * 3 + 1] = ly;
+            look[i * 3 + 2] = g.z;
+            pos[i * 3] = cx - 14;
+            pos[i * 3 + 1] = Mth.clamp(ly - 4.5, F + 6.5, F + 29);
+            pos[i * 3 + 2] = cz - 26;
+        }
+        l.add(new Shot(s0, s1, 70, 0, 0, pos, look));
         // contrapicado mientras se levanta y les mira: "pero hice un juramento"
         l.add(new Shot(22.5f, 28.0f, 60, 0, 1,
                 p(c.x + 2.8, F + 2.6, c.z + 7.5, c.x + 1.6, F + 2.3, c.z + 6.0),
@@ -772,12 +816,8 @@ public class Gavran extends Monster {
     private void tickSalto(ServerLevel sl) {
         if (saltoIni < 0) return;
         double q = Mth.clamp((t - saltoIni) / (double) saltoDur, 0, 1);
-        double x = Mth.lerp(q, saltoDe.x, saltoA.x), z = Mth.lerp(q, saltoDe.z, saltoA.z);
-        // sube un poco y cae acelerando (o sube frenando si el destino esta mas alto)
-        double dy = saltoA.y - saltoDe.y;
-        double y = dy < 0 ? saltoDe.y + dy * q * q + saltoAlto * 4 * q * (1 - q) * 0.5
-                : saltoDe.y + dy * (1 - (1 - q) * (1 - q)) + saltoAlto * 4 * q * (1 - q) * 0.5;
-        setPos(x, y, z);
+        Vec3 v = enSalto(saltoDe, saltoA, saltoAlto, q);
+        setPos(v.x, v.y, v.z);
         setDeltaMovement(Vec3.ZERO);
         if (q >= 1) {
             saltoIni = -1;
@@ -879,10 +919,10 @@ public class Gavran extends Monster {
                 for (int i = 0; i < h.length; i++) {
                     if (k == h[i] - 3) empujar(i == 2 ? 0.42 : 0.3);
                     if (k == h[i]) {
-                        if (i == 0) tajo(sl, vivos, 6.4, 150, 30, 0.6, 0.05);
-                        if (i == 1) tajo(sl, vivos, 6.6, 175, 30, 0.7, 0.05);
+                        if (i == 0) tajo(sl, vivos, 6.4, 150, 34, 0.6, 0.05);
+                        if (i == 1) tajo(sl, vivos, 6.6, 175, 34, 0.7, 0.05);
                         if (i == 2) {
-                            tajo(sl, vivos, 6.8, 70, 40, 1.0, 0.35);
+                            tajo(sl, vivos, 6.8, 70, 46, 1.0, 0.35);
                             golpeSuelo(sl, position().add(adelante().scale(5.2)), 2.4f);
                         }
                     }
@@ -897,12 +937,12 @@ public class Gavran extends Monster {
                     if (k == h[i] - 3) empujar(i == 4 ? 0.45 : 0.28);
                     if (k == h[i]) {
                         switch (i) {
-                            case 0 -> tajo(sl, vivos, 6.4, 150, 28, 0.6, 0.05);
-                            case 1 -> tajo(sl, vivos, 6.6, 175, 28, 0.7, 0.05);
-                            case 2 -> tajo(sl, vivos, 6.2, 120, 30, 0.4, 0.55);
-                            case 3 -> tajo(sl, vivos, 6.4, 360, 32, 1.1, 0.15);
+                            case 0 -> tajo(sl, vivos, 6.4, 150, 32, 0.6, 0.05);
+                            case 1 -> tajo(sl, vivos, 6.6, 175, 32, 0.7, 0.05);
+                            case 2 -> tajo(sl, vivos, 6.2, 120, 34, 0.4, 0.55);
+                            case 3 -> tajo(sl, vivos, 6.4, 360, 36, 1.1, 0.15);
                             default -> {
-                                tajo(sl, vivos, 6.8, 70, 42, 1.1, 0.4);
+                                tajo(sl, vivos, 6.8, 70, 48, 1.1, 0.4);
                                 golpeSuelo(sl, position().add(adelante().scale(5.2)), 2.6f);
                             }
                         }
@@ -916,7 +956,7 @@ public class Gavran extends Monster {
                 if (contra) {
                     if (contraT < 4) mirar(o, 30f);
                     if (contraT == GavranAnims.GOLPES_CONTRAATAQUE[0] - 3) empujar(0.6);
-                    if (contraT == GavranAnims.GOLPES_CONTRAATAQUE[0]) tajo(sl, vivos, 7.6, 40, 44, 1.4, 0.2);
+                    if (contraT == GavranAnims.GOLPES_CONTRAATAQUE[0]) tajo(sl, vivos, 7.6, 40, 50, 1.4, 0.2);
                     contraT++;
                     if (contraT >= GavranAnims.TICKS[GavranAnims.CONTRAATAQUE]) acabar();
                     return;
@@ -941,8 +981,8 @@ public class Gavran extends Monster {
                 }
                 if (k == h) {
                     golpeSuelo(sl, position().add(adelante().scale(1.8)), 1.8f);
-                    if (arriba) raices.bajo(sl, new Vec3(o.getX(), o.getY(), o.getZ()), 4, 32);
-                    else raices.linea(sl, position(), dir, 24, 1, 32);
+                    if (arriba) raices.bajo(sl, new Vec3(o.getX(), o.getY(), o.getZ()), 4, 36);
+                    else raices.linea(sl, position(), dir, 24, 1, 36);
                 }
                 if (k >= a.dur) acabar();
             }
@@ -958,8 +998,8 @@ public class Gavran extends Monster {
                     sonido(sl, DarkCraftMod.SFX_GAVRAN_CLAVAR.get(), 2.2f, 1.0f);
                     for (ServerPlayer p : vivos)
                         if (Math.hypot(p.getX() - punta.x, p.getZ() - punta.z) < 3.2 && tocados.add(p.getUUID()))
-                            golpear(sl, p, 34, 1.2, 0.5, true);
-                    raices.onda(new Vec3(punta.x, y, punta.z), 0.75, 25, 30);
+                            golpear(sl, p, 38, 1.2, 0.5, true);
+                    raices.onda(new Vec3(punta.x, y, punta.z), 0.75, 25, 34);
                     aviso(sl, Net.Aviso.ONDA, punta.x, y, punta.z, 25f, 0.75f, 0, 34, Net.Aviso.VERDE);
                 }
                 if (k >= a.dur) acabar();
@@ -1021,7 +1061,7 @@ public class Gavran extends Monster {
                 sl.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.ROOTED_DIRT.defaultBlockState()),
                         getX(), getY() + 0.2, getZ(), 8, 0.7, 0.1, 0.7, 0.1);
             for (ServerPlayer p : vivos)
-                if (p.distanceTo(this) < 2.7 && tocados.add(p.getUUID())) golpear(sl, p, 38, 1.8, 0.45, false);
+                if (p.distanceTo(this) < 2.7 && tocados.add(p.getUUID())) golpear(sl, p, 42, 1.8, 0.45, false);
             return;
         }
         if (k == 40) {
@@ -1110,7 +1150,10 @@ public class Gavran extends Monster {
         };
     }
 
-    /** Dano bruto (antes de armadura: 30 = unos 2,5 corazones con netherite y proteccion IV). */
+    /**
+     * Dano bruto (antes de armadura). Con netherite y proteccion IV en normal: 34 = unos 1,9 corazones, 46 = unos 3
+     * y 50 = unos 3,4 (como los golpes del Rey: 1,9 / 2,6 / 3,2).
+     */
     boolean golpear(ServerLevel sl, ServerPlayer p, float bruto, double kb, double up, boolean area) {
         if (!valido(p)) return false;
         p.invulnerableTime = 0;
@@ -1154,7 +1197,7 @@ public class Gavran extends Monster {
             double a = random.nextDouble() * Math.PI * 2, d = random.nextDouble() * r;
             sl.sendParticles(crack, c.x + Math.cos(a) * d, c.y + 0.1, c.z + Math.sin(a) * d, 2, 0.1, 0.1, 0.1, 0.15);
         }
-        sl.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, c.x, c.y + 0.2, c.z, (int) (r * 2), r * 0.4, 0.1, r * 0.4, 0.02);
+        sl.sendParticles(com.darkcraft.arbol.PuertaArbol.POLVO, c.x, c.y + 0.4, c.z, (int) (r * 6), r * 0.45, 0.25, r * 0.45, 0.02);
         sl.sendParticles(Raices.VERDE, c.x, c.y + 0.3, c.z, (int) (r * 3), r * 0.4, 0.2, r * 0.4, 0);
         sl.playSound(null, c.x, c.y, c.z, DarkCraftMod.SFX_GOLPE_SUELO.get(), SoundSource.HOSTILE,
                 Math.min(2.5f, 0.8f + r * 0.12f), 0.85f + random.nextFloat() * 0.16f);
@@ -1211,7 +1254,7 @@ public class Gavran extends Monster {
                 contraT = 0;
                 anim(GavranAnims.CONTRAATAQUE);
                 setPose(POSE_PIE);
-                romper(sl, 10);
+                romper(sl, 7);
                 if (tGlobal - frase5 > 300 && random.nextBoolean()) {
                     frase5 = tGlobal;
                     hablaSiCalla(sl, 5);
@@ -1219,7 +1262,7 @@ public class Gavran extends Monster {
             }
         } else if (cuerpo) {
             // postura: cada golpe la llena un poco, y mucho mas si es justo despues de que el acabe un ataque
-            romper(sl, tGlobal <= ventanaHasta ? 13f : 4.5f);
+            romper(sl, tGlobal <= ventanaHasta ? 8f : 2.5f);
         }
         ultimoGolpeRecibido = tGlobal;
         float dmg = amount * mul;
@@ -1311,6 +1354,7 @@ public class Gavran extends Monster {
                 p.connection.send(new ClientboundSetTitlesAnimationPacket(10, 90, 20));
                 p.connection.send(new ClientboundSetTitleTextPacket(Component.translatable("darkcraft.gavran.continuara.titulo")));
                 p.connection.send(new ClientboundSetSubtitleTextPacket(Component.translatable("darkcraft.gavran.continuara")));
+                p.sendSystemMessage(Component.translatable("darkcraft.gavran.continuara.aviso").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
             }
         }
         if (t >= despega + 140) reiniciar(sl, "fin de la fase 1 (la fase 2 llega en la parte B2)");

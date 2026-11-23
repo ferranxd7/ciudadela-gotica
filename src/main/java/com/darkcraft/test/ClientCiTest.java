@@ -1033,7 +1033,8 @@ public final class ClientCiTest {
         });
         atTicks(G + 6, "Mirar a la rama desde la sala", m -> {
             m.options.hideGui = true;
-            verDesde(m, new Vec3(hall[0] + 7.5, hall[2] + 9, hall[1] - 34), new Vec3(hall[0] + 0.5, hall[2] + 33, hall[1] - 19.5));
+            // desde donde empieza el plano de la rama en la entrada (a un lado y casi a su altura)
+            verDesde(m, new Vec3(hall[0] + 13.5, hall[2] + 25, hall[1] - 30.5), new Vec3(hall[0] + 0.5, hall[2] + 34.5, hall[1] - 19.5));
         });
         atTicks(G + 14, "captura", m -> shot(m, "cliente_g01_rama"));
         atTicks(G + 18, "Entrar en la Sala del Arbol", m -> {
@@ -1043,7 +1044,7 @@ public final class ClientCiTest {
             gavranStart = ticks;
         });
         // la entrada dura 35 s: capturas en los momentos clave
-        float[] intro = {1.6f, 2.9f, 6.5f, 14.5f, 20.6f, 21.6f, 23.5f, 25.5f, 29.0f, 31.5f, 33.6f};
+        float[] intro = {1.6f, 2.9f, 6.5f, 14.5f, 20.0f, 21.0f, 21.6f, 23.5f, 25.5f, 29.0f, 31.5f, 33.6f};
         for (int i = 0; i < intro.length; i++) {
             final int k = i;
             atTicks(G + 18 + Math.round(intro[i] * 20), "Captura de la entrada de Gavran", m -> {
