@@ -20,9 +20,9 @@ Mod de Forge 1.20.1 (Java 17, mappings oficiales). El usuario habla español, ju
    - Rey Corvin: **"David - British Storyteller"** `BNgbHR0DNeZixGQVzloa`, modelo `eleven_v4` (etiquetas como
      `[deep voice]`, `[angry]`, `[shouting]`). Eco suave de sala de piedra; en la fase 3 la misma voz con efecto de
      monstruo (más grave, voz de octava baja, eco largo y fuego crepitando): lo monta `ci/eleven/procesar.py`.
-   - Ser Gavran (voz "fría y despiadada"): el usuario elige entre 3 muestras (flow `UwyoAHy95Tq7BNgNPPy2`):
-     Silent Systemus `5AYcH1Cr8nW0XgDTtRI4`, Final Boss `d3qrd1ge6zWDvUxIeXiH`, Matthew Schmitz Nosferatu
-     `Tj9l48J9AJbry5yCP5eW`. Apuntar aquí la elegida.
+   - Ser Gavran (voz "fría y despiadada"): **"Final Boss - Evil All Powerful Villain"** `d3qrd1ge6zWDvUxIeXiH`
+     (elegida por el usuario), modelo `eleven_v4`. Eco de sala; en la fase 2 la misma voz más grave con madera
+     crujiendo debajo (como el fuego del Rey).
    - Efectos de sonido: ElevenLabs (`eleven_text_to_sound_v3`), estilo "épico de cine" (tipo Dark Souls); sustituyen
      a los del juego donde encajan (`sfx.*` en sounds.json, `DarkCraftMod.SFX_*`).
    - La música no se puede hacer con este conector: música con licencia libre (`ci/musica/pistas.json`, con créditos).
@@ -51,3 +51,26 @@ Mod de Forge 1.20.1 (Java 17, mappings oficiales). El usuario habla español, ju
   (`sounds/rey/voz_N.ogg`, `sounds/sfx/NOMBRE_K.ogg`, `rey_voces.json`). Si un enlace caducó, se vuelve a pedir el
   estado de la generación (da enlaces nuevos) y se repite.
 - `ci/eleven/sesiones.json` guarda los flows y sesiones de cada audio.
+
+## Ser Gavran (Parte B, por partes)
+
+El segundo jefe, en la Sala del Árbol (TreeTower). Todo lo que pidió el usuario está en el resumen de la Parte B:
+caballero gigante (~5.5 bloques) de armadura negra fundida con corteza y raíces, ojos VERDES, mandoble; poder de
+raíces y espinas. Dificultad como el Rey, ~2 min por fase, 2-3 corazones por golpe, escala con jugadores y
+dificultad, marcas en el suelo como el Rey.
+
+- **B1 (fase 1)**: modelo (`tools/gavran/`), entidad, cinemática de entrada con diálogo (las puertas se cierran,
+  baja del árbol y habla), sala cerrada (puerta y ascensor) durante la pelea, barra de vida de corteza y espinas
+  (relleno verde que brilla, hojas que caen), ataques de la fase 1 (combos de 3-5 tajos, contraataque si le pegas
+  cuando se cubre, embestida con el hombro, raíces en línea, onda al clavar la espada, 2-3 escuderos esqueleto),
+  aturdido tras romperle la guardia, morir = como el Rey, música de la fase 1, comandos
+  `/darkcraft gavran ir|estado|reiniciar|fase 2|matar`.
+- **B2 (fase 2)**: cinemática larga (~20 s, las raíces le envuelven, crece, corteza y espinas), "el árbol
+  despierta" (raíces rompen el suelo, ramas, hojas), raíces que atrapan 1-2 s, lluvia de hojas cortantes, salto a
+  los balcones, raíces por todo el suelo (subir a los balcones), definitivo "Juicio de las espinas" (solo te salvas
+  detrás de muros de corteza), punto débil: el corazón del árbol que brilla en su pecho. Música de la fase 2.
+- **B3 (final)**: muerte con honor (se arrodilla, últimas palabras, se deshace en hojas, el árbol florece y se
+  ilumina), llave de hueso + "Mandoble del Juramento" (dos manos, raíces y espinas, energía como las espadas del
+  Rey), logro "Derrotar a Ser Gavran" (fanfarria), capítulo 5 (cofre, libro y narración con la voz de los libros).
+- Lore: era el campeón y mejor amigo del Rey; lealtad con dudas (sabe que el pacto fue un error pero cumple su
+  juramento); sabe que mataste al Rey y se lo toma con frialdad (su primera frase va de eso).

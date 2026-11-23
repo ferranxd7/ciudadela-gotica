@@ -240,5 +240,252 @@
     ]
    }
   }
+ },
+ "gavran": {
+  "flow": "CcERsNGkAUZYFDFoRiGT",
+  "voz": "d3qrd1ge6zWDvUxIeXiH (Final Boss - Evil All Powerful Villain)",
+  "modelo": "eleven_v4",
+  "lineas": {
+   "1": [
+    "pCSqqjPwI16sVYHdv1uJ",
+    "1FSKslGX4Evqu5DyZ8v5"
+   ],
+   "2": [
+    "Gdpt6OvWtaTHDqwv1ck9",
+    "oXLcPiUp7geUAOB03fOj"
+   ],
+   "3": [
+    "VO6S1QR7ymd5ht5QWfwI",
+    "pdoYvZCPm8TNUTzaJzWE"
+   ],
+   "4": [
+    "yqlyrIKmRkpUqB5xeUff",
+    "HbIXfEKmasKactQGTYJu"
+   ],
+   "5": [
+    "lwU60mCv6jn0pDhMgZzE",
+    "As9g1MFt2PQbXbyDp4je"
+   ],
+   "6": [
+    "iTbyfWzJmhTZ4lecuE2n",
+    "zntrV7n2AC9Y3d2SUfjU"
+   ],
+   "7": [
+    "VI2MlksFDprlFUnfYzI1",
+    "N5PeKtenkHWotUIgRAhJ"
+   ],
+   "8": [
+    "UmQzTfoQfgGOAfGGAdr6",
+    "7hK9EIoMQzwhtn31jFm8"
+   ],
+   "9": [
+    "43SJJ9QeZjgGqabBTjap",
+    "B570IblA343CU4AZh7zr"
+   ],
+   "10": [
+    "rNcJGW22wNueTlBTJIXU",
+    "CUEWKOeKf6w8rFl20Zrj"
+   ],
+   "11": [
+    "2lQMweFe26udXSIgMev9",
+    "z4wi3OtZHHNamJoSpfD7"
+   ],
+   "12": [
+    "VpQdpjOEfUtz2IPMqXrA",
+    "1kmjhC08Knna6QyFXq1D"
+   ],
+   "13": [
+    "2Tx87xPiQK5UnKy56sun",
+    "PmCXgzcaPBBt79JdgqOM"
+   ],
+   "14": [
+    "GjAAGhGEHZHTUVeeh1IE",
+    "Pg5Q0zCETkUvcHTzWmmK"
+   ],
+   "15": [
+    "AEp5n2cQogfqXZM1nEG1",
+    "fksEvKzJj6T7IG2VD9qd"
+   ],
+   "16": [
+    "6Ap1YKHRwQnDIYQedNdj",
+    "HyrSQHLx7eqapgYf6eS7"
+   ],
+   "17": [
+    "OO7hqkKrJiNetSJxzBPc",
+    "021yNtl6qETqRAWT6O6O"
+   ],
+   "18": [
+    "PwsJRNYbtvZ6d0nukHTE",
+    "6rY0IXjG16PhdJ1GffFd"
+   ]
+  }
+ },
+ "sfx_gavran": {
+  "flow": "ZVZh5ccuMol4OVQChqxA",
+  "modelo": "eleven_text_to_sound_v3",
+  "sonidos": {
+   "gavran_tajo": {
+    "prompt": "Huge two-handed greatsword swing, heavy deep whoosh, steel ringing",
+    "sesiones": [
+     "rY1xZGLTIVk0lxcVliUp",
+     "AOhktZVcxMmKrsLM9P3F",
+     "iGwQTotMyGHGuiTOcAFc",
+     "5hVKYT4mbGVDx8BqL8I0"
+    ]
+   },
+   "gavran_choque": {
+    "prompt": "Greatsword blocking a sword blow, loud metallic clang, sparks",
+    "sesiones": [
+     "TXE1h9YJKwI9XS0XH2dJ",
+     "LXd6xeOOqjHX7hIxxjlf",
+     "F5gzyRUzdlndNqaZ1oYZ",
+     "uinN7vMhxcJZNt8CqaWM"
+    ]
+   },
+   "gavran_embestida": {
+    "prompt": "Armored giant shoulder charge, pounding heavy footsteps then a crushing metal impact",
+    "sesiones": [
+     "zBnxXxfb7mrXc87VymgN",
+     "o9MW8tLX1lXWErXWybMT",
+     "nBPMUEgPBAxhqU5qiEbR",
+     "kThkwUEOQ7m8LsrfXk6D"
+    ]
+   },
+   "gavran_raices": {
+    "prompt": "Thick roots bursting up through a stone floor, cracking stone and snapping wood",
+    "sesiones": [
+     "99I8dM7YB3z3UinqzIMI",
+     "AUAnvI4OUHUgJossCfH8",
+     "466srqFV1BYwItsqXuM1",
+     "lG9yGtoU3PcZxsczoRWq"
+    ]
+   },
+   "gavran_clavar": {
+    "prompt": "Giant sword stabbed into stone ground, deep impact and rolling shockwave rumble",
+    "sesiones": [
+     "k9vCGeodz6ZNYO2UTBqm",
+     "i8jADt9Q6i9jwd8w4Cry",
+     "KqJqqWBqlZCDseQ75VQY",
+     "MI2lz7BuQuqUU6g24EeX"
+    ]
+   },
+   "gavran_invocar": {
+    "prompt": "Skeletons rising from the ground, rattling bones and an eerie low whisper",
+    "sesiones": [
+     "nKPjH9uexQzZGxdkUyRP",
+     "cVI42EmIcgAChV0bNXcl",
+     "QA0oHZlSTMVsOmMTw772",
+     "MT3AOGyH0jGOZXMFT933"
+    ]
+   },
+   "gavran_paso": {
+    "prompt": "Single heavy armored giant footstep on stone, deep thud with metal clank",
+    "sesiones": [
+     "b96sBnYcaSwrKNHEUbfc",
+     "k5ihpRAkinCkYsZlRVuI",
+     "c3GGZ7gPjuPTP6Y2SW9h",
+     "YdxTJtbttCQ5isy1zGeo"
+    ]
+   },
+   "gavran_guardia_rota": {
+    "prompt": "Guard broken, heavy steel cracking and an armored giant staggering back",
+    "sesiones": [
+     "0ayoRMglCAwpBulxPL5Q",
+     "4HVaBg8G8NO9dZvZUnML",
+     "la82s1TriaqZWOiE9Rq5",
+     "H8x0f6y8Qbgx2DbHfhM9"
+    ]
+   },
+   "arbol_despierta": {
+    "prompt": "Ancient giant tree awakening, deep groaning wood, roots cracking stone, leaves rustling",
+    "sesiones": [
+     "W5SGTBWwB1Nu2I5EQ6iR",
+     "Pd2hlKSJGKbzdAsDVKoQ",
+     "V6WT4nBzaztYJ2qkyPxi",
+     "uno8H66XfpqHfo9qjtPF"
+    ]
+   },
+   "hojas_cortantes": {
+    "prompt": "Swarm of razor sharp leaves slicing through the air, fast whooshes and rustling",
+    "sesiones": [
+     "YLhdkStRkaWofvv3UZCg",
+     "8agoS6AIYJtBzcWKCZ3c",
+     "k9rkHkehuwVAQolTLy7B",
+     "bC93opw66SQXCyIMVikG"
+    ]
+   },
+   "raices_atrapan": {
+    "prompt": "Roots wrapping tightly around a body, creaking wood squeezing",
+    "sesiones": [
+     "d7Nke66j8sVTt7yQidCJ",
+     "ZSP52nUujC0z1UZpJGzN",
+     "4DMAeBCrwI1VF3hmqVl7",
+     "784blJA80be2kqXfzam6"
+    ]
+   },
+   "gavran_salto": {
+    "prompt": "Giant armored knight leaping into the air and landing hard, stone cracking",
+    "sesiones": [
+     "rI0z6f5fY2VvUhjAURg6",
+     "nrX26LD7yaDyczcsFCJ4",
+     "0y0Sz0lJZuISoZkL4XF8",
+     "FdYulCzEJbiY9CiSMg5n"
+    ]
+   },
+   "espinas": {
+    "prompt": "Sea of thorns erupting from the ground, violent wood tearing and cracking",
+    "sesiones": [
+     "CZUypN8guSFfR3LIF4xw",
+     "TfTu5ysCg0MatLyrfghP",
+     "QdmX30LF0QeTCvMsnp3s",
+     "E30MRuSlzVE8HiA6vsxJ"
+    ]
+   },
+   "corteza_muro": {
+    "prompt": "Bark wall growing fast out of the floor, creaking and grinding wood",
+    "sesiones": [
+     "cww7E4tNdDsyN3cyFf49",
+     "XrRcSW3Xr166HQvxEzzf",
+     "6lspjB2chsQaSKIFa6U5",
+     "cFkRQkI0MMuKWt20nuGr"
+    ]
+   },
+   "florecer": {
+    "prompt": "Magical blooming of a giant tree, soft shimmering chimes and rustling leaves",
+    "sesiones": [
+     "W9WgOGurcihfL56BwEMl",
+     "8hPT09OKjJbUVP75IsBe",
+     "WBlvIWZ5HQebbsDz4Gsy",
+     "A2oUNthds730QhPUpUWR"
+    ]
+   },
+   "madera_cruje": {
+    "prompt": "Deep creaking old wood, groaning tree trunk, close",
+    "sesiones": [
+     "Uoc7vsKxZXHZklb86lzR",
+     "ZUjACk0ODeTLbHpQkJSa",
+     "kYW3DjZHiq5ZADbAuIOP",
+     "hRoXD6WXh5i0xBxWoJjI"
+    ]
+   },
+   "corazon_latido": {
+    "prompt": "Single deep heartbeat inside hollow wood, resonant thump",
+    "sesiones": [
+     "28l5M5sco8JFPmQ2IMSM",
+     "IxaSZYMbwI9bPU23MU7d",
+     "YmD9Mjvt2KsU7PGqBN2D",
+     "7LnviR0zoimQ7ZEmhRcd"
+    ]
+   },
+   "hojas_disolver": {
+    "prompt": "Body dissolving into a swirl of leaves, soft rustling and a magical whisper",
+    "sesiones": [
+     "FtgPYYt6EVsXJpUO1hwj",
+     "5LpocHDCCKHnJBSMAfPF",
+     "I6Bz57JpRw0XYxXdkHBj",
+     "0ySRLzX4IxOmJqnkZFP8"
+    ]
+   }
+  }
  }
 }
