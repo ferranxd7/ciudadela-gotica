@@ -203,6 +203,7 @@ public final class Raices {
         sl.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, suelo), e.x(), e.y() + 0.2, e.z(), 18, 0.5, 0.1, 0.5, 0.15);
         sl.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.DARK_OAK_LOG.defaultBlockState()), e.x(), e.y() + 1.0, e.z(), 10, 0.3, 0.6, 0.3, 0.1);
         sl.sendParticles(VERDE, e.x(), e.y() + 0.8, e.z(), 6, 0.4, 0.6, 0.4, 0);
+        sl.sendParticles(ParticleTypes.GLOW, e.x(), e.y() + 0.6, e.z(), e.bruto() <= 0 ? 6 : 3, 0.5, 0.5, 0.5, 0.02);
         if (e.bruto() <= 0) return;
         for (ServerPlayer p : g.vivos(sl)) {
             if (dadosLinea.contains(p.getUUID())) continue;
@@ -477,15 +478,18 @@ public final class Raices {
                 }
                 double y = s != null ? s.suelo(sl, x, z) : m.c.y;
                 if (s != null && y > s.F() + 0.5) continue;
-                estaca(sl, x, y, z, r, 1.0 + r.nextDouble() * 0.9, 0.22, 10 + r.nextInt(8), 18 + r.nextInt(8));
+                BlockState st = r.nextInt(4) == 0 ? Blocks.MANGROVE_ROOTS.defaultBlockState() : DarkCraftMod.RAIZ_GAVRAN.get().defaultBlockState();
+                float yaw = r.nextFloat() * Mth.TWO_PI, tilt = 0.15f + r.nextFloat() * 0.45f;
+                estaca(sl, st, x, y, z, yaw, tilt, (float) (1.4 + r.nextDouble() * 1.3), 0.3f, 1, 12 + r.nextInt(10), 20 + r.nextInt(10));
             }
         }
         if (t % 2 == 0)
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 14; i++) {
                 double a = r.nextDouble() * Mth.TWO_PI, d = Math.sqrt(r.nextDouble()) * m.r;
                 double x = m.c.x + Math.cos(a) * d, z = m.c.z + Math.sin(a) * d;
                 if (s != null && (s.dist(x, z) < SalaArbol.R_TRONCO - 0.5 || s.dist(x, z) > SalaArbol.R_MURO + 0.8)) continue;
-                sl.sendParticles(VERDE, x, (s != null ? s.F() : m.c.y) + 0.15, z, 1, 0.2, 0.02, 0.2, 0);
+                double y = (s != null ? s.F() : m.c.y) + 0.2;
+                sl.sendParticles(i % 2 == 0 ? ParticleTypes.GLOW : VERDE, x, y, z, 1, 0.25, 0.05, 0.25, 0.01);
             }
         // dano cada segundo a quien este en el suelo de la sala dentro de la marea (no en la tarima, la escalera ni el balcon)
         if (t % 20 == 0)
@@ -645,8 +649,9 @@ public final class Raices {
         // ramas que bajan de la cupula y se mecen mientras el arbol despierta (luego se quedan quietas)
         BlockState madera = Blocks.DARK_OAK_WOOD.defaultBlockState();
         for (int i = 0; i < 7; i++) {
-            double a = i * Mth.TWO_PI / 7 + r.nextDouble() * 0.4;
-            double rr = 21 + r.nextDouble() * 9;
+            // la primera, al norte, encima del trono (la ve el plano de la cinematica)
+            double a = -Math.PI / 2 + (i == 0 ? 0.25 : i * Mth.TWO_PI / 7 + r.nextDouble() * 0.4);
+            double rr = i == 0 ? 26 : 21 + r.nextDouble() * 9;
             Vec3 p = s.enAnillo(a, rr, 0);
             double techo = s.F() + 25 + Math.round(14 * Math.sqrt(Math.max(0, 1 - (rr / 39) * (rr / 39)))) - 0.3;
             // colgando hacia abajo e inclinada hacia el tronco

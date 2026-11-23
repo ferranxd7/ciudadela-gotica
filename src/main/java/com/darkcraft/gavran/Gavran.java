@@ -1153,6 +1153,11 @@ public class Gavran extends Monster {
                     raices.marea(new Vec3(c.x, y, c.z), 0.5, 85, 170, 16);
                     aviso(sl, Net.Aviso.ONDA, c.x, y, c.z, 85f, 0.5f, 0, 170, Net.Aviso.VERDE);
                 }
+                // el suelo cubierto se ve: un disco verde que crece con la marea
+                if (k >= h + 12 && k < h + 12 + 170 && (k - h - 12) % 8 == 0) {
+                    double r = Math.min(85, 2 + 0.5 * (k - h - 12) + 4);
+                    aviso(sl, Net.Aviso.CIRCULO, getX(), suelo(sl), getZ(), (float) r, 0, 0, 10, Net.Aviso.VERDE);
+                }
                 if (k == h + 12 + 172) {
                     setPose(POSE_PIE);
                     anim(GavranAnims.LEVANTARSE);
@@ -1324,6 +1329,7 @@ public class Gavran extends Monster {
         if (t % 8 == 0) {
             Vec3 h = corazonPos();
             sl.sendParticles(Raices.VERDE, h.x, h.y, h.z, 3, 0.12, 0.12, 0.12, 0);
+            sl.sendParticles(ParticleTypes.GLOW, h.x, h.y, h.z, 1, 0.08, 0.08, 0.08, 0.01);
         }
         if (t % 60 == 0) {
             Vec3 h = corazonPos();
@@ -1819,7 +1825,7 @@ public class Gavran extends Monster {
                         x + r * Math.sin(a2), y + 3.8, z + r * Math.cos(a2)),
                 p(x, y + 3.0, z, x, y + 3.4, z)));
         // el arbol despierta: desde arriba, raices rompiendo el suelo de la sala
-        l.add(new Shot(9.0f, 12.5f, 70, 0, 1, p(x + 16, F + 16, z + 14, x + 13, F + 18, z + 11), p(x, y + 1, z + 2, x - 2, y + 2, z + 4)));
+        l.add(new Shot(9.0f, 12.5f, 70, 0, 1, p(x + 12, y + 3, z + 12, x + 9, y + 14, z + 9), p(x, y + 2, z + 2, x + 1, y + 13, z - 1)));
         // revienta el capullo y se alza, mas grande
         l.add(new Shot(12.5f, 16.0f, 62, 0, 1, p(x + 0.8, y + 3.2, z + 9.5, x + 0.5, y + 3.6, z + 8.0), p(x, y + 3.6, z, x, y + 4.2, z)));
         // contrapicado y el titulo
@@ -2040,6 +2046,7 @@ public class Gavran extends Monster {
         List<ServerPlayer> v = vivos(sl);
         if (v.isEmpty()) return false;
         if (atq != null) acabar();
+        postura = 0;
         objetivo = v.get(0);
         empezar(sl, a, objetivo);
         return true;

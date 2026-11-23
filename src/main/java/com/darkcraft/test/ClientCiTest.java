@@ -1203,7 +1203,7 @@ public final class ClientCiTest {
                 if (k == 2) log("  titulo en pantalla: " + campoGui(m, "title") + " | " + campoGui(m, "subtitle"));
             });
         }
-        atTicks(F2 + 860 + 260, "Despues de la pelea", m -> {
+        atTicks(F2 + 860 + 330, "Despues de la pelea", m -> {
             seguirG = false;
             m.setCameraEntity(m.player);
             server(m, sp -> {
@@ -1226,7 +1226,7 @@ public final class ClientCiTest {
                 log("  raices que quedan: " + raices + " | bloques de muro que quedan: " + muro);
             });
         });
-        return F2 + 860 + 280;
+        return F2 + 860 + 350;
     }
 
     private static void mirarA(net.minecraft.server.level.ServerPlayer sp, Vec3 p) {
