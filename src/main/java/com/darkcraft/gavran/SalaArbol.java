@@ -178,7 +178,7 @@ public record SalaArbol(int cx, int cz, int F, int base) {
     private void florecerFranja(ServerLevel sl, int x0, int x1, int R) {
         BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
         net.minecraft.util.RandomSource r = sl.random;
-        BlockState luz = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 12);
+        int[] alturas = {3, 10, 17, 24}, niveles = {14, 13, 12, 12};
         BlockState luzCopa = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 13);
         int arriba = F + TreeTower.HALL_H + 70, cupula = F + TreeTower.HALL_H + 14;
         for (int x = x0; x <= x1; x++)
@@ -193,11 +193,12 @@ public record SalaArbol(int cx, int cz, int F, int base) {
                             .defaultBlockState().setValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true);
                     sl.setBlock(m, nuevo, 2);
                 }
-                // luces invisibles por la sala (en una rejilla, solo en el aire y dentro del anillo)
-                if (d > R_TRONCO + 1 && d < R_MURO && Math.floorMod(x, 7) == 0 && Math.floorMod(z, 7) == 0)
-                    for (int y : new int[]{F + 7, F + 17}) {
-                        m.set(x, y, z);
-                        if (sl.getBlockState(m).isAir()) sl.setBlock(m, luz, 2);
+                // luces invisibles por toda la sala (en una rejilla a cuatro alturas, solo en el aire y dentro del anillo)
+                if (d > R_TRONCO + 1 && d < R_MURO && Math.floorMod(x, 6) == 0 && Math.floorMod(z, 6) == 0)
+                    for (int i = 0; i < alturas.length; i++) {
+                        m.set(x, F + alturas[i], z);
+                        if (sl.getBlockState(m).isAir())
+                            sl.setBlock(m, Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, niveles[i]), 2);
                     }
                 // y entre las hojas de la copa, por encima de la cupula (en el aire pegado a alguna hoja)
                 if (Math.floorMod(x, 5) == 0 && Math.floorMod(z, 5) == 0)

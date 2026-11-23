@@ -1201,7 +1201,7 @@ public final class ClientCiTest {
             m.options.hideGui = false;
             server(m, sp -> gavranCerca(sp).ifPresent(g -> log("  fin de la fase 2: " + g.forzarFinFase() + " | " + g.debug())));
         });
-        int[] muerte = {60, 200, 296, 330, 390, 440, 520};
+        int[] muerte = {60, 200, 296, 345, 400, 440, 520};
         for (int i = 0; i < muerte.length; i++) {
             final int k = i;
             atTicks(M + muerte[i], "Captura de la muerte de Gavran", m -> {

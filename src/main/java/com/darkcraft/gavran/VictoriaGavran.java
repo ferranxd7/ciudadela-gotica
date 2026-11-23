@@ -88,7 +88,8 @@ public final class VictoriaGavran {
         CompoundTag tag = new CompoundTag();
         tag.put("item", new ItemStack(DarkCraftMod.LLAVE_HUESO.get()).save(new CompoundTag()));
         tag.putString("item_display", "fixed");
-        tag.put("transformation", matriz(new Matrix4f().scale(1.4f)));
+        tag.putString("billboard", "vertical");
+        tag.put("transformation", matriz(new Matrix4f().scale(1.2f)));
         CompoundTag luz = new CompoundTag();
         luz.putInt("sky", 15);
         luz.putInt("block", 15);
@@ -102,11 +103,11 @@ public final class VictoriaGavran {
         llave = d;
         llaveHasta = now + ticks;
         sl.playSound(null, BlockPos.containing(k), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 1.2f, 0.5f);
-        girar(sl, d, 1);
+        flotar(sl, d, 1);
     }
 
-    /** Media vuelta cada 3 segundos, con chispas; al acabar el tiempo se va. */
-    private static void girar(ServerLevel sl, Display.ItemDisplay d, int paso) {
+    /** Siempre de cara a quien la mira: sube y baja despacio, meciendose un poco, con chispas; al acabar el tiempo se va. */
+    private static void flotar(ServerLevel sl, Display.ItemDisplay d, int paso) {
         if (!d.isAlive()) return;
         if (sl.getGameTime() >= llaveHasta) {
             Vec3 k = d.position();
@@ -116,14 +117,15 @@ public final class VictoriaGavran {
             return;
         }
         CompoundTag t = d.saveWithoutId(new CompoundTag());
-        t.put("transformation", matriz(new Matrix4f().rotateY((float) Math.toRadians(paso * 60.0)).scale(1.4f)));
-        t.putInt("interpolation_duration", 10);
+        float arriba = paso % 2 == 0 ? 0.09f : -0.09f, mece = (float) Math.toRadians(paso % 4 < 2 ? 7 : -7);
+        t.put("transformation", matriz(new Matrix4f().translate(0, arriba, 0).rotateZ(mece).scale(1.2f)));
+        t.putInt("interpolation_duration", 20);
         t.putInt("start_interpolation", 0);
         d.load(t);
         Vec3 k = d.position();
-        sl.sendParticles(ParticleTypes.END_ROD, k.x, k.y - 0.2, k.z, 1, 0.3, 0.35, 0.3, 0.01);
-        if (paso % 2 == 0) sl.sendParticles(Raices.VERDE, k.x, k.y - 0.9, k.z, 3, 0.25, 0.6, 0.25, 0);
-        Victoria.despues(10, () -> girar(sl, d, paso + 1));
+        sl.sendParticles(ParticleTypes.END_ROD, k.x, k.y - 0.2, k.z, 2, 0.35, 0.4, 0.35, 0.01);
+        sl.sendParticles(Raices.VERDE, k.x, k.y - 0.9, k.z, 3, 0.25, 0.6, 0.25, 0);
+        Victoria.despues(20, () -> flotar(sl, d, paso + 1));
     }
 
     private static ListTag matriz(Matrix4f m) {

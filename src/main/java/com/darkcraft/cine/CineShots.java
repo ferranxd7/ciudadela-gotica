@@ -109,16 +109,17 @@ public final class CineShots {
                 cat(en(s, 200, 14, F + 25), en(s, 207, 14, F + 24), en(s, 214, 14, F + 23))));
         // 3) "La Sombra no vive aqui": fuera, la camara se aleja de la sala y descubre la copa encendida en la tormenta
         l.add(libre(sl, 60, 24, a -> new Shot(c2, c3, 66, 0, 1,
-                cat(en(s, a, 47, F + 20), en(s, a + 6, 60, F + 28), en(s, a + 12, 72, F + 36)),
-                p(cx, F + 30, cz, cx, F + 40, cz, cx, F + 48, cz))));
+                cat(en(s, a, 56, F + 24), en(s, a + 6, 67, F + 32), en(s, a + 12, 78, F + 40)),
+                p(cx, F + 36, cz, cx, F + 46, cz, cx, F + 54, cz))));
         // 4) "una llave de hueso": la llave flota y gira sobre el cofre
         Vec3 k = VictoriaGavran.llavePos(s);
-        l.add(new Shot(c3, c4, 45, 0, 1,
-                p(k.x + 2.1, k.y + 0.1, k.z - 1.2, k.x + 1.7, k.y + 0.2, k.z - 1.8, k.x + 1.0, k.y + 0.25, k.z - 2.2),
-                p(k.x, k.y - 0.05, k.z, k.x, k.y - 0.05, k.z, k.x, k.y, k.z)));
+        l.add(new Shot(c3, c4, 50, 0, 1,
+                p(k.x + 2.9, k.y - 0.35, k.z + 1.5, k.x + 2.6, k.y - 0.2, k.z + 2.1, k.x + 2.2, k.y - 0.1, k.z + 2.6),
+                p(k.x, k.y - 0.1, k.z, k.x, k.y - 0.1, k.z, k.x, k.y - 0.05, k.z)));
         // 5) "fortalezas mas alla de las nubes": sube por fuera de la copa hasta mas alto que la aguja y mira al cielo
         l.add(libre(sl, 235, 22, a -> {
-            Vec3 lejos = s.enAnillo(Math.toRadians(a + 20 + 180), 90, F + 150);
+            // al final, casi horizontal: la punta de la aguja y la copa abajo, las estrellas arriba
+            Vec3 lejos = s.enAnillo(Math.toRadians(a + 20 + 180), 90, F + 128);
             return new Shot(c4, c5, 68, 0, 1,
                     cat(en(s, a, 58, F + 66), en(s, a + 10, 48, F + 92), en(s, a + 20, 38, F + 120)),
                     p(cx, F + 64, cz, cx, F + 92, cz, lejos.x, lejos.y, lejos.z));
@@ -180,7 +181,7 @@ public final class CineShots {
         for (double esc : new double[]{1.0, 0.7, 0.45})
             for (int v : new int[]{1, -1}) {
                 double[] pos = p(
-                        eye.x - lx * 2.3 * esc + rx * 0.9 * v, eye.y + 0.35, eye.z - lz * 2.3 * esc + rz * 0.9 * v,
+                        eye.x - lx * 2.8 * esc + rx * 1.0 * v, eye.y + 0.45, eye.z - lz * 2.8 * esc + rz * 1.0 * v,
                         eye.x - lx * 5.5 * esc + rx * 2.2 * v, eye.y + 3.0 * esc, eye.z - lz * 5.5 * esc + rz * 2.2 * v,
                         eye.x - lx * 8.5 * esc + rx * 3.0 * v, eye.y + 6.5 * esc, eye.z - lz * 8.5 * esc + rz * 3.0 * v);
                 double[] look = p(eye.x + lx * 6, eye.y - 0.4, eye.z + lz * 6, eye.x + lx * 4, eye.y - 0.8, eye.z + lz * 4,

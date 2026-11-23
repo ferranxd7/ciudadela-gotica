@@ -329,6 +329,12 @@ public final class ClientCine {
         if (active && camOn && chapter != 5) e.setCanceled(true);
     }
 
+    /** Sin nombres flotando encima de los jugadores mientras la camara de cine esta puesta. */
+    @SubscribeEvent
+    public static void onNameTag(net.minecraftforge.client.event.RenderNameTagEvent e) {
+        if (active && camOn) e.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
+    }
+
     @SubscribeEvent
     public static void onInput(MovementInputUpdateEvent e) {
         if (!active) return;

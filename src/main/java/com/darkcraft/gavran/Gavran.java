@@ -2003,9 +2003,9 @@ public class Gavran extends Monster {
         l.add(new Shot(6.4f, 13.9f, 46, 0, 1, p(x - 2.6, y + 3.2, z + 5.2, x - 2.0, y + 3.0, z + 4.4), p(x, y + 3.0, z, x, y + 2.9, z)));
         // se deshace en hojas
         l.add(new Shot(13.9f, 16.6f, 60, 0, 1, p(x + 1.0, y + 2.6, z + 8.8, x + 0.6, y + 3.6, z + 8.0), p(x, y + 2.8, z, x, y + 4.8, z)));
-        // el arbol florece y se ilumina: la camara sube desde el suelo hasta la copa
-        l.add(new Shot(16.6f, 21.6f, 72, 0, 0, p(x + 12, y + 3, z + 12, x + 10, y + 10, z + 10, x + 8, y + 17, z + 8),
-                p(x, y + 3, z + 1, x + 1, y + 11, z - 1, x + 2, y + 19, z - 3)));
+        // el arbol florece y se ilumina: la camara sube por el lado este mirando a la rama del norte, que se llena de flores
+        l.add(new Shot(16.6f, 21.6f, 70, 0, 1, p(x + 19.5, y + 7, z + 10.5, x + 17.5, y + 11, z + 7.5, x + 15.5, y + 14, z + 5.5),
+                p(x, y + 22, z + 7.5, x, y + 24, z + 6.5, x, y + 26, z + 5)));
         // a sus pies, el cofre sube en un haz de luz
         l.add(new Shot(21.6f, MUERTE_TICKS / 20f - 0.6f, 58, 0, 2, p(x + 3.2, y + 2.4, z + 6.4, x + 2.2, y + 1.9, z + 4.8), p(x, y + 0.8, z, x, y + 0.6, z)));
         return l;
