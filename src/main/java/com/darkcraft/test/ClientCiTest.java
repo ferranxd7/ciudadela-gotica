@@ -751,9 +751,96 @@ public final class ClientCiTest {
         }
         int after = Math.round((42 + total + 4) * 20);
         atTicks(after, "Captura del cofre abierto (libro y mapa)", m -> shot(m, "cliente_08_cofre"));
-        rey(after + 40);
+        int finEspejo = espejo(after + 40);
+        rey(finEspejo + 20);
         // por orden de tiempo (cada parte apunta sus pasos a su manera); el orden de los empates se conserva
         steps.sort(java.util.Comparator.comparingInt(Step::at));
+    }
+
+    // ------------------------------------------------------------------ el Espejo de la Sombra y el libro de la M
+
+    private static com.darkcraft.client.espejo.LibroScreen libro;
+
+    private static void mirarAlCastillo(Minecraft m) {
+        server(m, sp -> {
+            double dx = castle[0] - sp.getX(), dz = castle[1] - sp.getZ();
+            float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
+            sp.teleportTo(sp.serverLevel(), sp.getX(), sp.getY(), sp.getZ(), yaw, 8f);
+        });
+    }
+
+    private static int espejo(int t) {
+        atTicks(t, "Espejo: se vuelve a despertar (aviso y sonido) mirando al castillo", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            log("  espejo antes: " + com.darkcraft.client.espejo.EspejoCliente.resumen());
+            server(m, sp -> {
+                sp.closeContainer();
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft valdrenn espejo despertar");
+            });
+            mirarAlCastillo(m);
+        });
+        atTicks(t + 34, "Captura del aviso del espejo", m -> shot(m, "cliente_e00_despierta"));
+        atTicks(t + 120, "Captura del espejo", m -> {
+            log("  espejo: " + com.darkcraft.client.espejo.EspejoCliente.resumen());
+            shot(m, "cliente_e01_espejo");
+        });
+        atTicks(t + 124, "zoom de cerca", m -> com.darkcraft.client.espejo.EspejoCliente.probar(0, 1));
+        atTicks(t + 128, "captura", m -> shot(m, "cliente_e02_espejo_cerca"));
+        atTicks(t + 130, "zoom de lejos", m -> com.darkcraft.client.espejo.EspejoCliente.probar(5, 1));
+        atTicks(t + 134, "captura", m -> shot(m, "cliente_e03_espejo_lejos"));
+        atTicks(t + 136, "espejo grande y un amigo de mentira", m -> {
+            com.darkcraft.client.espejo.EspejoCliente.probar(2, 2);
+            com.darkcraft.client.espejo.EspejoCliente.probarAmigo(true);
+        });
+        atTicks(t + 140, "captura", m -> shot(m, "cliente_e04_espejo_grande_amigo"));
+        atTicks(t + 142, "espejo pequeno", m -> com.darkcraft.client.espejo.EspejoCliente.probar(2, 0));
+        atTicks(t + 146, "captura", m -> shot(m, "cliente_e05_espejo_pequeno"));
+        atTicks(t + 148, "Libro de la Sombra: historia", m -> {
+            com.darkcraft.client.espejo.EspejoCliente.probar(2, 1);
+            libro = new com.darkcraft.client.espejo.LibroScreen();
+            m.setScreen(libro);
+            libro.probar(0, 0, -1);
+        });
+        atTicks(t + 156, "captura", m -> shot(m, "cliente_e10_historia"));
+        atTicks(t + 158, "la cronica, capitulo 1", m -> libro.probar(0, 0, 1));
+        atTicks(t + 162, "captura", m -> shot(m, "cliente_e11_cronica"));
+        atTicks(t + 164, "el diario", m -> libro.probar(0, 0, 10));
+        atTicks(t + 168, "captura", m -> shot(m, "cliente_e12_diario"));
+        atTicks(t + 170, "el mapa", m -> libro.probarZoom(1.5f));
+        atTicks(t + 180, "captura", m -> shot(m, "cliente_e13_mapa"));
+        atTicks(t + 182, "el mapa de lejos", m -> libro.probarZoom(0.3f));
+        atTicks(t + 192, "captura", m -> shot(m, "cliente_e14_mapa_lejos"));
+        atTicks(t + 194, "una marca nueva: el dialogo", m -> {
+            libro.probarZoom(1.5f);
+            libro.probarMarca("Torre del cronista", 1, 0, false);
+        });
+        atTicks(t + 200, "captura", m -> shot(m, "cliente_e15_marca_dialogo"));
+        atTicks(t + 202, "escribir la marca (la pluma)", m -> libro.probarMarca("Torre del cronista", 1, 0, true));
+        int[] esc = {6, 18, 30, 44};
+        for (int i = 0; i < esc.length; i++) {
+            final int k = i;
+            atTicks(t + 202 + esc[i], "captura de la escena", m -> shot(m, "cliente_e16_escribe_" + k));
+        }
+        atTicks(t + 262, "captura del mapa con la marca", m -> {
+            log("  espejo con la marca: " + com.darkcraft.client.espejo.EspejoCliente.resumen());
+            shot(m, "cliente_e17_mapa_marca");
+        });
+        atTicks(t + 264, "logros", m -> libro.probar(2, 0, 0));
+        atTicks(t + 270, "captura", m -> shot(m, "cliente_e18_logros"));
+        atTicks(t + 272, "coleccion", m -> libro.probar(2, 1, 0));
+        atTicks(t + 278, "captura", m -> shot(m, "cliente_e19_coleccion"));
+        atTicks(t + 280, "bestiario", m -> libro.probar(2, 2, 1));
+        atTicks(t + 290, "captura", m -> shot(m, "cliente_e20_bestiario"));
+        atTicks(t + 292, "cerrar el libro", m -> {
+            m.setScreen(null);
+            com.darkcraft.client.espejo.EspejoCliente.probarAmigo(false);
+            log("  logros del espejo: libro_sombra/primera_marca (los da el servidor)");
+            server(m, sp -> log("  libro_sombra=" + com.darkcraft.story.Logros.tiene(sp, "libro_sombra")
+                    + " primera_marca=" + com.darkcraft.story.Logros.tiene(sp, "primera_marca")));
+        });
+        return t + 300;
     }
 
     // ------------------------------------------------------------------ el Rey
@@ -801,6 +888,11 @@ public final class ClientCiTest {
                 sp.setHealth(400);
                 sp.teleportTo(lvl, t.seatX() + 0.5, t.y(), t.z1() + 4.5, 180f, 0f);
             });
+        });
+        atTicks(B + 100, "Captura del espejo dentro del torreon (la planta)", m -> {
+            m.options.hideGui = false;
+            log("  espejo en el torreon: " + com.darkcraft.client.espejo.EspejoCliente.resumen());
+            shot(m, "cliente_e06_planta");
         });
         atTicks(B + 130, "Captura: el salon del trono desde la puerta", m -> {
             m.options.hideGui = true;

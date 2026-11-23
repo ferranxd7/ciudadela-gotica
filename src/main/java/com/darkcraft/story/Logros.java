@@ -36,6 +36,7 @@ public final class Logros {
         List<String> faltan = new ArrayList<>();
         for (String c : pr.getRemainingCriteria()) faltan.add(c);
         for (String c : faltan) p.getAdvancements().award(a, c);
+        com.darkcraft.espejo.Espejo.logro(p, id);
     }
 
     public static boolean tiene(ServerPlayer p, String id) {

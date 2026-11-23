@@ -15,6 +15,7 @@ public final class ClientSetup {
         e.registerAboveAll("energia", com.darkcraft.client.armas.ArmasCliente::render);
         e.registerAboveAll("rey", com.darkcraft.client.rey.ReyCliente::renderOverlay);
         e.registerAboveAll("cinematica", ClientCine::renderOverlay);
+        e.registerAboveAll("espejo", com.darkcraft.client.espejo.EspejoHud::render);
         e.registerAboveAll("rey_subtitulos", com.darkcraft.client.rey.ReyCliente::renderSubtitulos);
     }
 

@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "3";
+    private static final String V = "4";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -54,6 +54,122 @@ public final class Net {
                 .encoder(Llave::write).decoder(Llave::read).consumerMainThread(Llave::handle).add();
         CH.messageBuilder(Isla.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(Isla::write).decoder(Isla::read).consumerMainThread(Isla::handle).add();
+        CH.messageBuilder(EspejoEstado.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(EspejoEstado::write).decoder(EspejoEstado::read).consumerMainThread(EspejoEstado::handle).add();
+        CH.messageBuilder(EspejoPos.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(EspejoPos::write).decoder(EspejoPos::read).consumerMainThread(EspejoPos::handle).add();
+        CH.messageBuilder(EspejoAccion.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(EspejoAccion::write).decoder(EspejoAccion::read).consumerMainThread(EspejoAccion::handle).add();
+    }
+
+    // ------------------------------------------------------------------ Espejo de la Sombra
+
+    /** Un lugar conocido del mapa (estado 1 conocido, 2 hecho: cofre leido o jefe vencido). */
+    public record LugarE(String id, int tipo, int icono, int x, int y, int z, String nombre, int cap, int estado) {}
+
+    /** Un logro del mod: id, icono (objeto), marco (0 task, 1 challenge, 2 goal), secreto, hecho, claves del texto. */
+    public record LogroE(String id, String icono, int marco, boolean secreto, boolean hecho, String titulo, String desc) {}
+
+    /** Una entrada del diario: dia del mundo y clave (darkcraft.diario.CLAVE). */
+    public record DiarioE(int dia, String clave) {}
+
+    /** Otro jugador en la misma dimension. */
+    public record Amigo(java.util.UUID id, String nombre, int x, int y, int z) {}
+
+    /** Todo lo que sabe el espejo de este jugador (aviso: se acaba de despertar). */
+    public record EspejoEstado(boolean activo, boolean aviso, int leidos, List<String> coleccion, List<String> bestiario,
+                               List<LugarE> lugares, List<LogroE> logros, List<DiarioE> diario) {
+        void write(FriendlyByteBuf b) {
+            b.writeBoolean(activo);
+            b.writeBoolean(aviso);
+            b.writeVarInt(leidos);
+            b.writeCollection(coleccion, (bb, s) -> bb.writeUtf(s, 64));
+            b.writeCollection(bestiario, (bb, s) -> bb.writeUtf(s, 64));
+            b.writeCollection(lugares, (bb, l) -> {
+                bb.writeUtf(l.id(), 96);
+                bb.writeVarInt(l.tipo());
+                bb.writeVarInt(l.icono());
+                bb.writeInt(l.x());
+                bb.writeInt(l.y());
+                bb.writeInt(l.z());
+                bb.writeUtf(l.nombre(), 96);
+                bb.writeVarInt(l.cap());
+                bb.writeVarInt(l.estado());
+            });
+            b.writeCollection(logros, (bb, l) -> {
+                bb.writeUtf(l.id(), 64);
+                bb.writeUtf(l.icono(), 96);
+                bb.writeVarInt(l.marco());
+                bb.writeBoolean(l.secreto());
+                bb.writeBoolean(l.hecho());
+                bb.writeUtf(l.titulo(), 128);
+                bb.writeUtf(l.desc(), 128);
+            });
+            b.writeCollection(diario, (bb, e) -> {
+                bb.writeVarInt(e.dia());
+                bb.writeUtf(e.clave(), 64);
+            });
+        }
+
+        static EspejoEstado read(FriendlyByteBuf b) {
+            boolean activo = b.readBoolean(), aviso = b.readBoolean();
+            int leidos = b.readVarInt();
+            List<String> col = b.readList(bb -> bb.readUtf(64));
+            List<String> bes = b.readList(bb -> bb.readUtf(64));
+            List<LugarE> ls = b.readList(bb -> new LugarE(bb.readUtf(96), bb.readVarInt(), bb.readVarInt(), bb.readInt(), bb.readInt(),
+                    bb.readInt(), bb.readUtf(96), bb.readVarInt(), bb.readVarInt()));
+            List<LogroE> lg = b.readList(bb -> new LogroE(bb.readUtf(64), bb.readUtf(96), bb.readVarInt(), bb.readBoolean(),
+                    bb.readBoolean(), bb.readUtf(128), bb.readUtf(128)));
+            List<DiarioE> di = b.readList(bb -> new DiarioE(bb.readVarInt(), bb.readUtf(64)));
+            return new EspejoEstado(activo, aviso, leidos, col, bes, ls, lg, di);
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.espejo.EspejoCliente.estado(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Cada segundo: el sitio donde esta el jugador (clave de idioma o "") y los demas jugadores de su dimension. */
+    public record EspejoPos(String lugar, List<Amigo> amigos) {
+        void write(FriendlyByteBuf b) {
+            b.writeUtf(lugar, 96);
+            b.writeCollection(amigos, (bb, a) -> {
+                bb.writeUUID(a.id());
+                bb.writeUtf(a.nombre(), 32);
+                bb.writeInt(a.x());
+                bb.writeInt(a.y());
+                bb.writeInt(a.z());
+            });
+        }
+
+        static EspejoPos read(FriendlyByteBuf b) {
+            String l = b.readUtf(96);
+            List<Amigo> a = b.readList(bb -> new Amigo(bb.readUUID(), bb.readUtf(32), bb.readInt(), bb.readInt(), bb.readInt()));
+            return new EspejoPos(l, a);
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.espejo.EspejoCliente.pos(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Del cliente: ha abierto el libro (0) o ha escrito una marca (1). */
+    public record EspejoAccion(int tipo) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(tipo);
+        }
+
+        static EspejoAccion read(FriendlyByteBuf b) {
+            return new EspejoAccion(b.readVarInt());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.espejo.Espejo.accion(p, tipo);
+            ctx.get().setPacketHandled(true);
+        }
     }
 
     // ------------------------------------------------------------------ jefe

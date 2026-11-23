@@ -79,6 +79,7 @@ public final class StoryEvents {
             if (ch == 5) com.darkcraft.gavran.VictoriaGavran.llenar(sp, (ServerLevel) lvl, pos, items);
             data.setItems(pos, sp.getUUID(), ContainerHelper.saveAllItems(new CompoundTag(), items));
             Story.markRead(sp, ch);
+            com.darkcraft.espejo.Espejo.leido(sp, ch);
         }
         if (!Story.seenCine(sp, ch)) Cinematics.play(sp, ch, pos.immutable(), true);
         else openChest(sp, pos, ch);

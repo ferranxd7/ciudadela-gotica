@@ -34,7 +34,8 @@ public final class Comandos {
                         .then(StoryEvents.comandoHistoria())
                         .then(ReyEventos.comando())
                         .then(TorreArbol.comando())
-                        .then(GavranEventos.comando())));
+                        .then(GavranEventos.comando())
+                        .then(com.darkcraft.espejo.Espejo.comando())));
     }
 
     /** Cada linea de la ayuda: lo que se escribe al hacer clic, lo que se ve y la clave de su explicacion. */
@@ -53,6 +54,7 @@ public final class Comandos {
             new Linea(V + "rey ", V + "rey ir / estado / reiniciar / fase <1-3> / matar / golpefinal", "rey"),
             new Linea(V + "arbol ", V + "arbol ir / arriba / llave / cerrar", "arbol"),
             new Linea(V + "gavran ", V + "gavran ir / estado / reiniciar / fase <1-2> / matar / guardia / ataque <nombre>", "gavran"),
+            new Linea(V + "espejo ", V + "espejo despertar / dormir / revelar", "espejo"),
     };
 
     private static int ayuda(CommandSourceStack src) {

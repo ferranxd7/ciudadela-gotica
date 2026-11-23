@@ -90,8 +90,10 @@ public final class Storm {
             }
             // logro: pisar la isla
             if (site != null && p.onGround() && p.getY() > com.darkcraft.gen.CastlePlan.Y0 - 45
-                    && Math.hypot(site[0] - p.getX(), site[1] - p.getZ()) < com.darkcraft.gen.CastlePlan.FOOTPRINT + 10)
+                    && Math.hypot(site[0] - p.getX(), site[1] - p.getZ()) < com.darkcraft.gen.CastlePlan.FOOTPRINT + 10) {
                 com.darkcraft.story.Logros.dar(p, com.darkcraft.story.Logros.ENCONTRAR);
+                com.darkcraft.espejo.Espejo.enIsla(p, site[0], site[1]);
+            }
             if (com.darkcraft.cine.Cinematics.active(p)) return;
             if (!was || p.tickCount % 40 == 0) p.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0));
             p.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, 1.0F));

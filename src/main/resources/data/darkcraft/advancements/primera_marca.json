@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:libro_sombra",
+  "display": {
+    "icon": {
+      "item": "minecraft:feather"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.primera_marca.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.primera_marca.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 20
+  }
+}

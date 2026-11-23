@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:encontrar",
+  "display": {
+    "icon": {
+      "item": "darkcraft:mapa_valdrenn"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.cartografo.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.cartografo.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 150
+  }
+}

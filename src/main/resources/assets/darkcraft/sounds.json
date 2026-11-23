@@ -686,5 +686,32 @@
         "stream": true
       }
     ]
+  },
+  "sfx.espejo_despierta": {
+    "subtitle": "subtitles.darkcraft.sfx.espejo_despierta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/espejo_despierta_1"
+      }
+    ]
+  },
+  "sfx.pluma_escribe": {
+    "subtitle": "subtitles.darkcraft.sfx.pluma_escribe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pluma_escribe_1"
+      },
+      {
+        "name": "darkcraft:sfx/pluma_escribe_2"
+      }
+    ]
+  },
+  "sfx.libro_abre": {
+    "subtitle": "subtitles.darkcraft.sfx.libro_abre",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/libro_abre_1"
+      }
+    ]
   }
 }

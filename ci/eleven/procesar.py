@@ -52,6 +52,14 @@ SFX = {
     "arbol_despierta": (15.0, 3.0, -14), "hojas_cortantes": (3.2, 0.8, -16), "raices_atrapan": (2.8, 0.7, -15),
     "espinas": (3.8, 0.9, -14), "corteza_muro": (2.8, 0.7, -15), "florecer": (7.0, 2.0, -16),
     "madera_cruje": (3.2, 0.8, -16), "corazon_latido": (3.0, 0.8, -15), "hojas_disolver": (5.0, 1.5, -16),
+    # Espejo de la Sombra y libro de la M
+    "espejo_despierta": (3.0, 0.7, -14), "pluma_escribe": (2.0, 0.3, -20), "libro_abre": (2.6, 0.8, -17),
+}
+# de estos se bajaron 4 tomas (NOMBRE_1..4.mp3): las elegidas salen como NOMBRE_1.ogg, NOMBRE_2.ogg...
+TOMAS_SFX = {
+    "espejo_despierta": (3,),   # empieza grave y se aclara (el zumbido que sube y la campanilla)
+    "pluma_escribe": (2, 4),    # las dos de volumen mas parejo
+    "libro_abre": (3,),         # la del golpe de la tapa al principio
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -171,16 +179,17 @@ def main():
     with open(os.path.join(ASSETS, "rey_voces.json"), "w") as fh:
         json.dump({"duraciones": dur, "gavran": dur_g}, fh)
     for nombre, (maxs, fade, lufs) in SFX.items():
-        for k in ((1,) if nombre in UNA_TOMA else (1, 2)):
+        tomas = TOMAS_SFX.get(nombre) or ((1,) if nombre in UNA_TOMA else (1, 2))
+        for i, k in enumerate(tomas, 1):
             src = os.path.join(MASTER, "sfx", f"{nombre}_{k}.mp3")
             if not os.path.exists(src):
                 print("falta", src)
                 fallos += 1
                 continue
-            dst = os.path.join(sfx, f"{nombre}_{k}.ogg")
+            dst = os.path.join(sfx, f"{nombre}_{i}.ogg")
             try:
                 efecto(src, dst, maxs, fade, lufs)
-                print(f"efecto {nombre}_{k}: {duracion(dst):.2f} s")
+                print(f"efecto {nombre}_{i} (toma {k}): {duracion(dst):.2f} s")
             except Exception as e:  # noqa: BLE001
                 fallos += 1
                 print(f"FALLO efecto {nombre}_{k}: {e}")

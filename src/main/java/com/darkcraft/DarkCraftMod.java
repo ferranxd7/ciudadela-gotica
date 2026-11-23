@@ -97,6 +97,10 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_MADERA_CRUJE = sound("sfx.madera_cruje");
     public static final RegistryObject<SoundEvent> SFX_CORAZON_LATIDO = sound("sfx.corazon_latido");
     public static final RegistryObject<SoundEvent> SFX_HOJAS_DISOLVER = sound("sfx.hojas_disolver");
+    // Espejo de la Sombra y libro de la M
+    public static final RegistryObject<SoundEvent> SFX_ESPEJO_DESPIERTA = sound("sfx.espejo_despierta");
+    public static final RegistryObject<SoundEvent> SFX_PLUMA = sound("sfx.pluma_escribe");
+    public static final RegistryObject<SoundEvent> SFX_LIBRO_ABRE = sound("sfx.libro_abre");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")
