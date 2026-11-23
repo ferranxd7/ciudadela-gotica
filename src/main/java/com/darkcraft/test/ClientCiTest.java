@@ -802,7 +802,9 @@ public final class ClientCiTest {
             ServerLevel lvl = sp.serverLevel();
             CastlePlan plan = PlanCache.get(lvl.getSeed(), castle[0], castle[1], (x, z) -> 64);
             int fx = plan.cx + 1, fz = plan.cz + 116;
+            lvl.getChunk(fx >> 4, fz >> 4); // cargado (si no, la altura es la del fondo del mundo y se cae al vacio)
             int y = lvl.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, fx, fz);
+            if (y < CastlePlan.Y0 - 60) y = CastlePlan.Y0 + 2;
             log("  fuera en " + fx + "," + y + "," + fz);
             sp.teleportTo(lvl, fx + 0.5, y, fz + 0.5, 180f, 25f);
         }));

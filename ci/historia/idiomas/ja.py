@@ -184,6 +184,8 @@ T = {
   "darkcraft.espejo.despierta": "影の鏡が目覚める…",
   "darkcraft.espejo.despierta.teclas": "%s：影の書   ·   %s：鏡を隠す",
   "darkcraft.espejo.desconocido": "未知の地",
+  "biome.darkcraft.tormenta": "ヴァルドレンの嵐",
+  "biome.darkcraft.volcanes": "王の火山",
   "darkcraft.espejo.cofre": "年代記 第%s章",
   "darkcraft.sombra.titulo": "影の書",
   "darkcraft.sombra.historia": "物語",

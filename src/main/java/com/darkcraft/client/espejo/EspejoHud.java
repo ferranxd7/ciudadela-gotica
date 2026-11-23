@@ -426,7 +426,9 @@ public final class EspejoHud {
         if (l != null && !l.isEmpty()) nombre = Component.translatable(l);
         else {
             var b = mc.level.getBiome(mc.player.blockPosition()).unwrapKey();
-            nombre = b.isPresent() ? Component.translatable("biome." + b.get().location().getNamespace() + "." + b.get().location().getPath())
+            String k = b.isPresent() ? "biome." + b.get().location().getNamespace() + "." + b.get().location().getPath() : null;
+            // biomas de otros mods sin nombre: "tierras desconocidas" (y no la clave en crudo)
+            nombre = k != null && net.minecraft.client.resources.language.I18n.exists(k) ? Component.translatable(k)
                     : Component.translatable("darkcraft.espejo.desconocido");
         }
         BlockPos p = mc.player.blockPosition();

@@ -437,6 +437,11 @@ public final class Espejo {
                 double da = Math.hypot(arbol.x() + 0.5 - p.getX(), (arbol.z() + TreeTower.HALL_R - 3) + 0.5 - p.getZ());
                 if (da < TreeTower.HALL_R + 2) return "darkcraft.mapa.lugar.arbol";
             }
+            // el salon del trono (en la base de la torre-arbol)
+            CastlePlan.Throne t = Story.planAt(p.serverLevel(), sx, sz).throne();
+            if (t != null && p.getX() >= t.x0() - 1 && p.getX() <= t.x1() + 2 && p.getZ() >= t.z0() - 1 && p.getZ() <= t.z1() + 6
+                    && p.getY() >= t.y() - 2 && p.getY() <= t.y() + t.h() + 2)
+                return "darkcraft.mapa.lugar.trono";
             String mejor = null;
             double md = 46;
             for (Lugar l : lugares(p.server, sx, sz)) {

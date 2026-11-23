@@ -183,6 +183,8 @@ T = {
   "darkcraft.espejo.despierta": "O Espelho da Sombra desperta…",
   "darkcraft.espejo.despierta.teclas": "%s: o Livro da Sombra   ·   %s: ocultar o espelho",
   "darkcraft.espejo.desconocido": "Terras desconhecidas",
+  "biome.darkcraft.tormenta": "A tempestade de Valdrenn",
+  "biome.darkcraft.volcanes": "Os vulcões do Rei",
   "darkcraft.espejo.cofre": "Crônica, capítulo %s",
   "darkcraft.sombra.titulo": "Livro da Sombra",
   "darkcraft.sombra.historia": "História",

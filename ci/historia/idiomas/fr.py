@@ -183,6 +183,8 @@ T = {
   "darkcraft.espejo.despierta": "Le Miroir de l'Ombre s'éveille…",
   "darkcraft.espejo.despierta.teclas": "%s : le Livre de l'Ombre   ·   %s : masquer le miroir",
   "darkcraft.espejo.desconocido": "Terres inconnues",
+  "biome.darkcraft.tormenta": "La tempête de Valdrenn",
+  "biome.darkcraft.volcanes": "Les volcans du Roi",
   "darkcraft.espejo.cofre": "Chronique, chapitre %s",
   "darkcraft.sombra.titulo": "Livre de l'Ombre",
   "darkcraft.sombra.historia": "Histoire",

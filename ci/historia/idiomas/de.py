@@ -183,6 +183,8 @@ T = {
   "darkcraft.espejo.despierta": "Der Spiegel des Schattens erwacht …",
   "darkcraft.espejo.despierta.teclas": "%s: das Buch des Schattens   ·   %s: Spiegel ausblenden",
   "darkcraft.espejo.desconocido": "Unbekannte Lande",
+  "biome.darkcraft.tormenta": "Valdrenns Sturm",
+  "biome.darkcraft.volcanes": "Die Vulkane des Königs",
   "darkcraft.espejo.cofre": "Chronik, Kapitel %s",
   "darkcraft.sombra.titulo": "Buch des Schattens",
   "darkcraft.sombra.historia": "Geschichte",
