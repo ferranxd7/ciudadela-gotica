@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:gavran_fase1",
+  "display": {
+    "icon": {
+      "item": "minecraft:flowering_azalea"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.gavran_fase2.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.gavran_fase2.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 250
+  }
+}

@@ -55,5 +55,16 @@
     "aviso": "Music by Matthew Pablo, http://www.matthewpablo.com",
     "uso": "Ser Gavran, fase 1",
     "lufs": -16
+  },
+  {
+    "id": "gavran2",
+    "pagina": "https://opengameart.org/node/97104",
+    "busca": "slave",
+    "titulo": "A Slave To No One (RPG Orchestral Essentials)",
+    "autor": "Jonathan Shaw (InspectorJ)",
+    "licencia": "CC-BY 3.0",
+    "aviso": "\"A Slave To No One\" Composed by Jonathan Shaw (www.jshaw.co.uk)",
+    "uso": "Ser Gavran, fase 2",
+    "lufs": -16
   }
 ]

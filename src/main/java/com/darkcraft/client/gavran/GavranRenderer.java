@@ -46,8 +46,15 @@ public class GavranRenderer extends MobRenderer<Gavran, GavranModel> {
         return TEX[idx(e)];
     }
 
+    /** En la fase 2 el arbol le ha hecho crecer. */
+    @Override
+    protected void scale(Gavran e, PoseStack ps, float pt) {
+        if (e.fase() >= 2) ps.scale(Gavran.ESCALA_F2, Gavran.ESCALA_F2, Gavran.ESCALA_F2);
+    }
+
     @Override
     public void render(Gavran e, float yaw, float pt, PoseStack ps, MultiBufferSource buf, int light) {
+        this.shadowRadius = e.fase() >= 2 ? 1.6f * Gavran.ESCALA_F2 : 1.6f;
         this.model.alpha = e.alpha(pt);
         if (this.model.alpha <= 0.01f) return;
         super.render(e, yaw, pt, ps, buf, light);

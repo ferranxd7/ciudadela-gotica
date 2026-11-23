@@ -48,7 +48,7 @@ public final class Cinematics {
     }
 
     /** Cinematicas de jefes (no son capitulos): los planos los manda quien la empieza. */
-    public static final int REY_VOLCAN = 30, SELLO = 31, REY_INTRO = 32, GAVRAN_INTRO = 33;
+    public static final int REY_VOLCAN = 30, SELLO = 31, REY_INTRO = 32, GAVRAN_INTRO = 33, GAVRAN_CAMBIO = 34;
 
     /** Cinematica con planos dados, sin mover al jugador (los planos estan cerca de donde esta). */
     public static void playShots(ServerPlayer p, int id, List<Shot> shots, float total) {

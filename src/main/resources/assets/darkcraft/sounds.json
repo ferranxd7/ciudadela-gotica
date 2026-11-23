@@ -668,5 +668,13 @@
         "stream": true
       }
     ]
+  },
+  "musica.gavran2": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/gavran2",
+        "stream": true
+      }
+    ]
   }
 }

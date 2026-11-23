@@ -284,6 +284,18 @@ public final class ClientCine {
         }
     }
 
+    /**
+     * Cambio de fase de Ser Gavran: la sala tiembla mientras el arbol despierta (de 6 a 12,5 s), un golpe cuando
+     * revienta el capullo (12,5 s) y otro cuando ruge (14,2 s).
+     */
+    private static float temblorArbol(float t) {
+        float k = 0;
+        if (t > 6f && t < 12.5f) k = (0.3f + 0.2f * Mth.sin(t * 3.1f)) * Math.min(1f, (t - 6f) / 1.2f);
+        if (t >= 12.5f) k = Math.max(k, 1.5f * (float) Math.exp(-(t - 12.5f) * 3.0));
+        if (t >= 14.2f) k = Math.max(k, 1.1f * (float) Math.exp(-(t - 14.2f) * 3.5));
+        return k;
+    }
+
     /** Si el plano sigue a una entidad, mira a donde esta ahora (y la camara va a su altura). */
     private static double[] seguir(Shot s, double[] a, float pt) {
         if (s.seguir < 0) return a;
@@ -370,6 +382,7 @@ public final class ClientCine {
             roll = -1.5f * smooth(t / 3f) * (1 - smooth((t - (total - 1.2f)) / 1.2f));
         }
         float k = shakeK * (float) Math.exp(-Math.max(0, t - shakeT) * 5.0) * (t >= shakeT ? 1 : 0);
+        if (chapter == 34) k = Math.max(k, temblorArbol(t));
         if (k > 0.002f) {
             e.setYaw(e.getYaw() + 1.1f * k * Mth.sin(t * 53f));
             e.setPitch(e.getPitch() + 0.8f * k * Mth.cos(t * 61f));
@@ -421,7 +434,7 @@ public final class ClientCine {
         float frame = Math.min(in, out);
         // mundo mas oscuro y vineta
         // (en las de Ser Gavran, menos: armadura negra en una sala oscura)
-        if (!ch1) g.fill(0, 0, w, h, argb((chapter == 33 ? 0.1f : 0.32f) * frame, 8, 0, 0));
+        if (!ch1) g.fill(0, 0, w, h, argb((chapter == 33 || chapter == 34 ? 0.1f : 0.32f) * frame, 8, 0, 0));
         else if (t < Timeline.NARR_START + 0.5f) g.fill(0, 0, w, h, argb(0.3f * Math.min(in, 1 - smooth((t - Timeline.OUT) / 1.0f)), 8, 0, 0));
         vignette(g, w, h, (ch1 ? 0.7f : 0.9f) * frame);
         // brasas que suben
@@ -429,7 +442,7 @@ public final class ClientCine {
         if (visible(emb)) embers(g, w, h, t, emb);
         // el titulo
         if (chapter < 30) drawTitle(g, font, w, h, t);
-        else if (chapter >= 30 && chapter <= 33) bossTitle(g, font, w, h, t);
+        else if (chapter >= 30 && chapter <= 34) bossTitle(g, font, w, h, t);
         // fundidos a negro (cortes de plano y vuelta al jugador)
         float black = black(t);
         if (visible(black)) g.fill(0, 0, w, h, argb(black, 0, 0, 0));
@@ -601,7 +614,7 @@ public final class ClientCine {
         pose.translate(w / 2f, h * 0.68f, 0);
         pose.scale(S, S, 1);
         int al = Math.round(a * 255);
-        boolean verde = chapter == 33;
+        boolean verde = chapter == 33 || chapter == 34;
         g.drawCenteredString(font, name, 1, 1, (al << 24) | (verde ? 0x002010 : 0x200000));
         g.drawCenteredString(font, name, 0, 0, (al << 24) | (verde ? 0x5FE07A : 0xE0401A));
         pose.popPose();

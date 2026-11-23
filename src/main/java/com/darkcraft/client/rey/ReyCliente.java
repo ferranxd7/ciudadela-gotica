@@ -751,11 +751,19 @@ public final class ReyCliente {
             // Ser Gavran (temas 11 y 12) si no hay un rey luchando cerca
             if (fase == 0)
                 for (Entity en : mc.level.entitiesForRendering())
-                    if (en instanceof com.darkcraft.gavran.Gavran g && (g.luchando() || g.flag(com.darkcraft.gavran.Gavran.F_INTRO))
-                            && g.distanceToSqr(mc.player) < 96 * 96) {
-                        suave = !g.luchando();
-                        fase = 10 + g.fase();
-                        break;
+                    if (en instanceof com.darkcraft.gavran.Gavran g && g.distanceToSqr(mc.player) < 96 * 96) {
+                        if (g.flag(com.darkcraft.gavran.Gavran.F_CAMBIO)) {
+                            // el cambio de fase: silencio mientras le envuelven las raices; la musica de la fase 2
+                            // empieza cuando revienta el capullo
+                            fase = g.fase() >= 2 ? 12 : 0;
+                            suave = false;
+                            break;
+                        }
+                        if (g.luchando() || g.flag(com.darkcraft.gavran.Gavran.F_INTRO)) {
+                            suave = !g.luchando();
+                            fase = 10 + g.fase();
+                            break;
+                        }
                     }
             ClientMusic.boss(fase, suave);
         }

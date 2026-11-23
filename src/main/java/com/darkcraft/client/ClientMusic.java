@@ -125,6 +125,7 @@ public final class ClientMusic {
             case 1 -> DarkCraftMod.MUSICA_REY_1.get();
             case 2 -> DarkCraftMod.MUSICA_REY_2.get();
             case 11 -> DarkCraftMod.MUSICA_GAVRAN_1.get();
+            case 12 -> DarkCraftMod.MUSICA_GAVRAN_2.get();
             default -> DarkCraftMod.MUSICA_REY_3.get();
         };
         boss = new Track(ev, phase >= 11 ? "gavran" + (phase - 10) : "rey" + phase, true);

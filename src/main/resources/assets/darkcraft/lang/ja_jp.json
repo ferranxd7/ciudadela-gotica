@@ -198,6 +198,10 @@
   "subtitles.darkcraft.gavran.voz": "サー・ガヴランが話す",
   "darkcraft.rey.titulo.33": "サー・ガヴラン",
   "darkcraft.rey.subtitulo.33": "誓いの騎士",
+  "darkcraft.rey.titulo.34": "サー・ガヴラン",
+  "darkcraft.rey.subtitulo.34": "樹の心臓",
+  "darkcraft.gavran.continuara2": "サー・ガヴランは枝で持ちこたえた",
+  "darkcraft.gavran.continuara2.aviso": "誇り高き最期は次のパートで描かれます。広間を出てもう一度入ると、決闘に再挑戦できます。",
   "darkcraft.gavran.escudero": "誓いの従者",
   "darkcraft.gavran.continuara.titulo": "つづく",
   "darkcraft.gavran.continuara": "サー・ガヴランは枝へ戻った",
@@ -247,5 +251,11 @@
   "advancements.darkcraft.gavran_guardia.title": "破られた誓い",
   "advancements.darkcraft.gavran_guardia.description": "サー・ガヴランの構えを崩す",
   "advancements.darkcraft.gavran_fase1.title": "最初の枝",
-  "advancements.darkcraft.gavran_fase1.description": "サー・ガヴランとの決闘の第一形態を耐え抜く"
+  "advancements.darkcraft.gavran_fase1.description": "サー・ガヴランとの決闘の第一形態を耐え抜く",
+  "advancements.darkcraft.gavran_fase2.title": "二本目の枝",
+  "advancements.darkcraft.gavran_fase2.description": "サー・ガヴランとの決闘の第二形態を耐え抜く",
+  "advancements.darkcraft.gavran_corazon.title": "樹の心臓",
+  "advancements.darkcraft.gavran_corazon.description": "サー・ガヴランの胸で光る心臓を打つ",
+  "advancements.darkcraft.gavran_juicio.title": "樹皮の壁の陰で",
+  "advancements.darkcraft.gavran_juicio.description": "壁の陰に隠れて「茨の審判」を生き延びる"
 }

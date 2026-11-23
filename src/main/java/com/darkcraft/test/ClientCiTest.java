@@ -283,6 +283,13 @@ public final class ClientCiTest {
                 {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.ATURDIDO, false, "g_aturdido", 0f},
                 {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.SUBIR, false, "g_subir", 0f},
                 {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.MUERTE, false, "g_muerte", 0f},
+                // fase 2 (11 = Gavran en su fase 2: mas grande y con la textura del arbol)
+                {11, com.darkcraft.gavran.Gavran.POSE_PIE, 0, false, "g2_quieto", 1.0f},
+                {11, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.ALZARSE, false, "g2_alzarse", 0f},
+                {11, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.JUICIO, false, "g2_juicio", 0f},
+                {11, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.CAER, false, "g2_caer", 0f},
+                {11, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.SUBIR_BALCON, false, "g2_subir_balcon", 0f},
+                {11, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.LEVANTARSE, false, "g2_levantarse", 0f},
         };
         // el servidor integrado puede ir con retraso (genera terreno nuevo): cada pose se pide y se espera a que el
         // cliente la tenga antes de contar el tiempo de las capturas (lo lleva escTick, tick a tick)
@@ -331,7 +338,7 @@ public final class ClientCiTest {
             return;
         }
         if (fase >= 10) {
-            gavranEsc(mc, pose, anim, habla, name, anim > 0 ? com.darkcraft.gavran.GavranAnims.TICKS[anim] / 20f : (Float) e[5]);
+            gavranEsc(mc, fase - 9, pose, anim, habla, name, anim > 0 ? com.darkcraft.gavran.GavranAnims.TICKS[anim] / 20f : (Float) e[5]);
             return;
         }
         float[] fr = anim > 0 ? new float[]{0.15f, 0.35f, 0.55f, 0.8f} : new float[]{1.0f};
@@ -384,7 +391,7 @@ public final class ClientCiTest {
     }
 
     /** Ser Gavran en el escaparate: como el rey, pero mas lejos (mide 5,5 bloques). */
-    private static void gavranEsc(Minecraft mc, int pose, int anim, boolean habla, String name, float len) {
+    private static void gavranEsc(Minecraft mc, int faseG, int pose, int anim, boolean habla, String name, float len) {
         float[] fr = anim > 0 ? new float[]{0.15f, 0.35f, 0.55f, 0.8f} : new float[]{1.0f};
         switch (escEstado) {
             case 0 -> {
@@ -393,6 +400,7 @@ public final class ClientCiTest {
                 server(mc, sp -> {
                     if (modelo != null) modelo.moveTo(ex, ey - 40, ez, 0f, 0f);
                     if (modeloG != null) {
+                        modeloG.faseMuestra(faseG);
                         modeloG.muestra(pose, anim, habla);
                         modeloG.moveTo(ex, ey, ez, 0f, 0f);
                         modeloG.setYBodyRot(0f);
@@ -1089,34 +1097,135 @@ public final class ClientCiTest {
             shot(m, "cliente_g29_aturdido");
         });
         atTicks(L + 700, "Captura: aturdido", m -> shot(m, "cliente_g30_aturdido"));
-        atTicks(L + 760, "Fin de la fase 1", m -> server(m, sp -> gavranCerca(sp).ifPresent(g -> log("  fin de la fase 1: " + g.forzarFin1()))));
-        int[] fin = {20, 60, 100, 112, 124, 150};
-        for (int i = 0; i < fin.length; i++) {
+        // ---------------------------------------------------------------- el arbol despierta (fase 2)
+        atTicks(L + 760, "Fin de la fase 1: el arbol despierta", m -> server(m, sp -> gavranCerca(sp).ifPresent(g ->
+                log("  cambio de fase: " + g.forzarFinFase() + " | " + g.debug()))));
+        int[] cambio = {30, 110, 190, 262, 292, 345};
+        for (int i = 0; i < cambio.length; i++) {
             final int k = i;
-            atTicks(L + 760 + fin[i], "Captura del fin de la fase 1", m -> {
+            atTicks(L + 760 + cambio[i], "Captura del cambio de fase", m -> {
                 m.options.hideGui = false;
-                shot(m, String.format("cliente_g%02d_fin_%d", 31 + k, k));
-                if (k == 4) log("  titulo en pantalla: " + campoGui(m, "title") + " | " + campoGui(m, "subtitle"));
+                shot(m, "cliente_g40_cambio_" + k);
+                if (k == 5) server(m, sp -> gavranCerca(sp).ifPresent(g -> log("  en el cambio: " + g.debug())));
             });
         }
-        atTicks(L + 760 + 260, "Despues de la pelea", m -> {
+        int F2 = L + 760 + 420;
+        atTicks(F2, "Fase 2: empieza", m -> {
+            m.options.hideGui = true;
+            seguirG = true;
+            server(m, sp -> gavranCerca(sp).ifPresent(g -> log("  fase 2: " + g.debug() + " | logro fase 1: "
+                    + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_FASE1))));
+        });
+        ataqueG(F2 + 20, "atrapar", new int[]{10, 20, 30}, "cliente_g41_atrapar");
+        atTicks(F2 + 40, "Atrapado?", m -> server(m, sp -> log("  jugador atrapado: lentitud "
+                + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) + " | " + gavranCerca(sp).map(g -> g.debug()).orElse("-"))));
+        ataqueG(F2 + 110, "hojas", new int[]{14, 31, 34, 60}, "cliente_g42_hojas");
+        ataqueG(F2 + 200, "suelo", new int[]{20, 45, 90, 150}, "cliente_g43_suelo");
+        ataqueG(F2 + 440, "juicio", new int[]{10, 40, 80, 86, 100}, "cliente_g44_juicio");
+        // detras de un muro: las espinas no le alcanzan
+        atTicks(F2 + 440 + 45, "Esconderse detras de un muro", m -> server(m, sp -> gavranCerca(sp).ifPresent(g -> {
+            var muros = g.murosJuicio();
+            if (muros.isEmpty()) {
+                log("  muros del juicio: NINGUNO");
+                return;
+            }
+            Vec3 c = muros.get(0)[0], n = muros.get(0)[1];
+            Vec3 tras = c.add(n.scale(2.3));
+            sp.teleportTo(sp.serverLevel(), tras.x, c.y, tras.z, sp.getYRot(), 0f);
+            log("  muros del juicio: " + muros.size() + " | detras del primero en " + Math.round(tras.x) + "," + Math.round(tras.z)
+                    + " bloque: " + sp.serverLevel().getBlockState(BlockPos.containing(c.x, c.y + 1, c.z)));
+        })));
+        atTicks(F2 + 440 + 90, "Despues de las espinas", m -> server(m, sp -> log("  tras el juicio: logro gavran_juicio="
+                + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_JUICIO) + " vida " + Math.round(sp.getHealth()))));
+        // al balcon: salta a por el
+        atTicks(F2 + 610, "Subir al balcon", m -> server(m, sp -> gavranCerca(sp).ifPresent(g -> {
+            var s = com.darkcraft.gavran.SalaArbol.cerca(sp.serverLevel(), g.getX(), g.getZ());
+            if (s == null) return;
+            double a = s.ang(g.getX(), g.getZ()) + 0.55;
+            // al norte (detras del trono) no hay balcon
+            if (Math.abs(net.minecraft.util.Mth.wrapDegrees(Math.toDegrees(a) + 90)) < 32) a -= 1.1;
+            Vec3 p = s.enAnillo(a, 35.6, s.F() + 13);
+            sp.teleportTo(sp.serverLevel(), p.x, p.y, p.z, sp.getYRot(), 0f);
+            log("  en el balcon: " + sp.serverLevel().getBlockState(BlockPos.containing(p.x, p.y - 1, p.z)) + " a " + Math.round(p.x) + ","
+                    + Math.round(p.y) + "," + Math.round(p.z));
+        })));
+        ataqueG(F2 + 625, "balcon", new int[]{8, 20, 30, 44}, "cliente_g45_balcon");
+        atTicks(F2 + 700, "Volver al suelo", m -> server(m, sp -> gavranCerca(sp).ifPresent(g -> {
+            var s = com.darkcraft.gavran.SalaArbol.cerca(sp.serverLevel(), g.getX(), g.getZ());
+            if (s == null) return;
+            Vec3 p = s.enAnillo(s.ang(g.getX(), g.getZ()) - 0.3, 26, s.F());
+            sp.teleportTo(sp.serverLevel(), p.x, s.suelo(sp.serverLevel(), p.x, p.z), p.z, sp.getYRot(), 0f);
+            log("  de vuelta al suelo | " + g.debug());
+        })));
+        ataqueG(F2 + 712, "bajar", new int[]{12, 30, 40}, "cliente_g46_bajar");
+        // el corazon: mirar a la luz verde de su pecho y pegar
+        atTicks(F2 + 790, "Golpe normal y golpe al corazon", m -> server(m, sp -> gavranCerca(sp).ifPresent(g -> {
+            Vec3 f = new Vec3(g.adelanteX(), 0, g.adelanteZ());
+            Vec3 pos = g.position().add(f.scale(3.2));
+            sp.teleportTo(sp.serverLevel(), pos.x, g.getY(), pos.z, sp.getYRot(), 0f);
+            // primero al cuerpo (mirando a la cadera)
+            mirarA(sp, g.position().add(0, 1.6, 0));
+            sp.resetAttackStrengthTicker();
+            float h0 = g.getHealth();
+            sp.attack(g);
+            float d1 = h0 - g.getHealth();
+            g.invulnerableTime = 0;
+            mirarA(sp, g.corazonPos());
+            sp.resetAttackStrengthTicker();
+            float h1 = g.getHealth();
+            sp.attack(g);
+            float d2 = h1 - g.getHealth();
+            log(String.format(java.util.Locale.ROOT, "  golpe al cuerpo %.1f | golpe al corazon %.1f | logro gavran_corazon=%s | %s", d1, d2,
+                    com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_CORAZON), g.debug()));
+        })));
+        atTicks(F2 + 798, "Captura del corazon", m -> {
+            m.options.hideGui = false;
+            shot(m, "cliente_g47_corazon");
+        });
+        atTicks(F2 + 860, "Fin de la fase 2 (parte B2)", m -> server(m, sp -> gavranCerca(sp).ifPresent(g ->
+                log("  fin de la fase 2: " + g.forzarFinFase() + " | " + g.debug()))));
+        int[] fin = {20, 100, 124, 150};
+        for (int i = 0; i < fin.length; i++) {
+            final int k = i;
+            atTicks(F2 + 860 + fin[i], "Captura del fin de la fase 2", m -> {
+                m.options.hideGui = false;
+                shot(m, "cliente_g48_fin2_" + k);
+                if (k == 2) log("  titulo en pantalla: " + campoGui(m, "title") + " | " + campoGui(m, "subtitle"));
+            });
+        }
+        atTicks(F2 + 860 + 260, "Despues de la pelea", m -> {
             seguirG = false;
             m.setCameraEntity(m.player);
             server(m, sp -> {
                 var d = com.darkcraft.arbol.TorreArbol.puerta(sp.serverLevel(), hall);
-                var est = com.darkcraft.rey.ReyEstado.get(sp.getServer());
                 log("  tras la pelea: puerta " + (d == null ? "NO ESTA" : "estado " + d.estado()) + " | barrera: "
                         + sp.serverLevel().getBlockState(new BlockPos(hall[0], hall[2] + 2, hall[1] - 15)) + " | sala cerrada: "
                         + com.darkcraft.gavran.GavranEventos.salaCerrada(sp.serverLevel(), hall[0], hall[1])
                         + gavranCerca(sp).map(g -> " | " + g.debug()).orElse(" | gavran no esta"));
                 log("  logros: gavran_guardia=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_GUARDIA)
-                        + " gavran_fase1=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_FASE1));
+                        + " gavran_fase1=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_FASE1)
+                        + " gavran_fase2=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_FASE2)
+                        + " gavran_corazon=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_CORAZON)
+                        + " gavran_juicio=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_JUICIO));
                 long raices = sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Display.BlockDisplay.class,
-                        sp.getBoundingBox().inflate(60), e -> e.getTags().contains(com.darkcraft.gavran.Raices.TAG)).size();
-                log("  raices que quedan: " + raices);
+                        sp.getBoundingBox().inflate(80), e -> e.getTags().contains(com.darkcraft.gavran.Raices.TAG)).size();
+                long muro = 0;
+                BlockPos c0 = BlockPos.containing(sp.getX(), sp.getY(), sp.getZ());
+                for (BlockPos q : BlockPos.betweenClosed(c0.offset(-45, -3, -45), c0.offset(45, 8, 45)))
+                    if (sp.serverLevel().getBlockState(q).is(com.darkcraft.DarkCraftMod.RAIZ_GAVRAN.get())) muro++;
+                log("  raices que quedan: " + raices + " | bloques de muro que quedan: " + muro);
             });
         });
-        return L + 760 + 280;
+        return F2 + 860 + 280;
+    }
+
+    private static void mirarA(net.minecraft.server.level.ServerPlayer sp, Vec3 p) {
+        Vec3 d = p.subtract(sp.getEyePosition());
+        float yaw = (float) (Math.atan2(d.z, d.x) * 180 / Math.PI) - 90f;
+        float pitch = (float) -(Math.atan2(d.y, Math.sqrt(d.x * d.x + d.z * d.z)) * 180 / Math.PI);
+        sp.setYRot(yaw);
+        sp.setYHeadRot(yaw);
+        sp.setXRot(pitch);
     }
 
     /** Cada tick de la pelea con Gavran: camara de lado (dentro del anillo de la sala), golpes del jugador y registro. */
@@ -1142,7 +1251,7 @@ public final class ClientCiTest {
             obsPos = obsPos == null || obsPos.distanceToSqr(want) > 400 ? want : obsPos.add(want.subtract(obsPos).scale(0.12));
             verDesde(mc, obsPos, mid.add(0, 2.2, 0));
         }
-        if (t % 20 == 0 && t < 20 * 160)
+        if (t % 20 == 0 && t < 20 * 280)
             server(mc, sp -> gavranCerca(sp).ifPresent(g -> log("  gavran: " + g.debug() + " | jugador vida " + Math.round(sp.getHealth())
                     + " en " + Math.round(sp.getX()) + "," + Math.round(sp.getY()) + "," + Math.round(sp.getZ()))));
         if (seguirG && t % 13 == 0)

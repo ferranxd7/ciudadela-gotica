@@ -57,6 +57,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_REY_2 = sound("musica.rey2");
     public static final RegistryObject<SoundEvent> MUSICA_REY_3 = sound("musica.rey3");
     public static final RegistryObject<SoundEvent> MUSICA_GAVRAN_1 = sound("musica.gavran1");
+    public static final RegistryObject<SoundEvent> MUSICA_GAVRAN_2 = sound("musica.gavran2");
 
     // efectos de sonido de ElevenLabs (ci/eleven): sustituyen a los del juego donde encajan
     public static final RegistryObject<SoundEvent> SFX_TAJO = sound("sfx.rey_tajo");
@@ -120,8 +121,8 @@ public class DarkCraftMod {
                     .isValidSpawn((st, l, p, t) -> false).isRedstoneConductor((st, l, p) -> false)
                     .isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false)));
 
-    /** Raiz de Gavran: solo se ve en las estacas de sus ataques (entidades block_display); no se coloca ni tiene objeto. */
-    public static final RegistryObject<Block> RAIZ_GAVRAN = BLOCKS.register("raiz_gavran", () -> new Block(
+    /** Raiz de Gavran: las estacas de sus ataques (entidades block_display) y los muros de corteza del Juicio (se deshacen solos). */
+    public static final RegistryObject<Block> RAIZ_GAVRAN = BLOCKS.register("raiz_gavran", () -> new com.darkcraft.gavran.RaizBlock(
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BROWN).strength(-1.0F, 3600000.0F).noLootTable()
                     .sound(SoundType.WOOD).pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false)));
 

@@ -102,7 +102,8 @@ public final class GavranEventos {
         if (!(p.level() instanceof ServerLevel sl)) return null;
         for (Gavran g : sl.getEntitiesOfClass(Gavran.class, p.getBoundingBox().inflate(100))) {
             Gavran.Estado e = g.estado();
-            if ((e == Gavran.Estado.INTRO || e == Gavran.Estado.LUCHA || e == Gavran.Estado.ATURDIDO || e == Gavran.Estado.FIN1)
+            if ((e == Gavran.Estado.INTRO || e == Gavran.Estado.LUCHA || e == Gavran.Estado.ATURDIDO || e == Gavran.Estado.CAMBIO
+                    || e == Gavran.Estado.FIN1)
                     && g.jugadores().contains(p.getUUID())) return g;
         }
         return null;
@@ -237,11 +238,12 @@ public final class GavranEventos {
         Gavran g = gavranDe(src);
         if (g == null) return 0;
         if (n == 2) {
-            if (!g.forzarFin1()) {
-                src.sendFailure(Component.literal("Ser Gavran tiene que estar luchando"));
+            // en la fase 1: el arbol despierta (cinematica y fase 2)
+            if (g.fase() >= 2 || !g.forzarFinFase()) {
+                src.sendFailure(Component.literal("Ser Gavran tiene que estar luchando en la fase 1"));
                 return 0;
             }
-            src.sendSuccess(() -> Component.translatable("darkcraft.gavran.continuara.aviso"), true);
+            src.sendSuccess(() -> Component.literal("Ser Gavran: fase 2"), true);
         }
         return 1;
     }
@@ -256,7 +258,7 @@ public final class GavranEventos {
     private static int ataque(CommandSourceStack src, String nombre) {
         Gavran g = gavranDe(src);
         if (g == null || !g.forzarAtaque(nombre)) {
-            src.sendFailure(Component.literal("No (tiene que estar luchando; ataques: combo3 combo5 guardia embestida raices clavar invocar)"));
+            src.sendFailure(Component.literal("No (tiene que estar luchando; ataques: combo3 combo5 guardia embestida raices clavar invocar; fase 2: atrapar hojas suelo juicio balcon bajar salto)"));
             return 0;
         }
         return 1;

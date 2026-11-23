@@ -422,6 +422,73 @@ Anim("muerte", 6.0).poses([
     (6.0, con(_de_rodillas, cabeza=(40, 0, 0), torso=(15, 0, 0))),
 ])
 
+# ============================================================================ fase 2 (parte B2)
+
+# --- alzarse del capullo de raices (cambio de fase): se levanta arrancando la espada y ruge con los brazos abiertos
+_tenso = con(VIGILIA, torso=(16, 0, 0), cabeza=(32, 0, 0), raiz=raiz(-16))
+_se_alza = dict(PIERNAS, raiz=raiz(-3), torso=(-4, 8, 0), cabeza=(-12, -6, 0), capa=(14, 0, 0),
+                _mano_d=(-12, 74, 8), _hoja=(-0.15, 1, 0.25), _filo=(0, 0, 1), _dos_manos=True)
+_rugido = dict(raiz=raiz(-2.5), muslo_d=(12, 0, 14), pierna_d=(14, 0, 0), muslo_i=(-20, 0, -14), pierna_i=(20, 0, 0),
+               torso=(-18, 0, 0), cabeza=(-34, 0, 0), capa=(42, 0, 0), capa2=(26, 0, 0),
+               _mano_d=(-24, 88, 4), _hoja=(-0.4, 1, 0.12), _filo=(0, 0, 1), _mano_i=(32, 64, 2))
+Anim("alzarse", 4.0, golpes=(1.7,)).poses([
+    (0.0, VIGILIA),
+    (0.6, _tenso),
+    (1.25, _se_alza),
+    (1.7, _rugido),
+    (2.8, con(_rugido, cabeza=(-30, 4, 0), torso=(-16, 0, 0), capa=(30, 0, 0))),
+    (3.4, con(READY, raiz=raiz(-2))),
+    (4.0, READY),
+])
+
+# --- el Juicio de las espinas: la espada en alto a dos manos (carga), y la clava con todo (las espinas salen)
+_juicio_alto = dict(raiz=raiz(-2.5), muslo_d=(10, 0, 10), pierna_d=(14, 0, 0), muslo_i=(-22, 0, -10), pierna_i=(22, 0, 0),
+                    torso=(-14, 0, 0), cabeza=(-30, 0, 0), capa=(-6, 0, 0),
+                    _mano_d=(0, 90, 8), _hoja=(0, 1, 0.08), _filo=(-1, 0, 0), _dos_manos=True)
+Anim("juicio", 5.6, golpes=(4.1,)).poses([
+    (0.0, READY),
+    (0.6, _juicio_alto),
+    (1.6, con(_juicio_alto, torso=(-16, 0, 0), cabeza=(-33, 0, 0), raiz=raiz(-2.8))),
+    (2.6, con(_juicio_alto, torso=(-13, 0, 0), cabeza=(-29, 0, 0))),
+    (3.6, con(_juicio_alto, torso=(-20, 0, 0), cabeza=(-34, 0, 0), raiz=raiz(-1.5), _mano_d=(0, 93, 4))),
+    (4.1, _clavada),
+    (4.9, con(_clavada, torso=(28, 0, 0))),
+    (5.6, READY),
+])
+
+# --- saltar hacia abajo (del balcon al suelo, o salto con golpe hacia alguien atrapado): cae clavando la espada
+Anim("caer", 2.4, golpes=(0.5, 1.45)).poses([
+    (0.0, READY),
+    (0.3, con(_impulso, raiz=raiz(-10))),
+    (0.5, con(_aire, raiz=raiz(4), muslo_d=(-10, 0, 8), pierna_d=(10, 0, 0), muslo_i=(-5, 0, -8), pierna_i=(8, 0, 0))),
+    (0.95, _aire),
+    (1.3, con(_aire, torso=(10, 0, 0), capa=(70, 0, 0), _mano_d=(0, 60, 22), _hoja=(0, -0.3, 1))),
+    (1.45, _aterriza),
+    (1.9, _aterriza),
+    (2.4, READY),
+])
+
+# --- subir de un salto al balcon (y quedarse de pie arriba)
+_aterriza_pie = dict(AGACHADO, raiz=raiz(-8), torso=(22, 0, 0), cabeza=(-16, 0, 0), capa=(24, 0, 0), capa2=(14, 0, 0),
+                     _mano_d=(-6, 40, 18), _hoja=(-0.1, -0.5, 1), _filo=(0, -1, 0), _dos_manos=True)
+Anim("subir_balcon", 2.2, golpes=(0.55, 1.4)).poses([
+    (0.0, READY),
+    (0.4, con(_impulso, raiz=raiz(-10))),
+    (0.6, con(_salto_arriba, raiz=raiz(1), muslo_d=(0, 0, 6), pierna_d=(6, 0, 0), muslo_i=(-4, 0, -6), pierna_i=(6, 0, 0))),
+    (1.0, _salto_arriba),
+    (1.35, con(_salto_arriba, muslo_d=(-40, 0, 6), pierna_d=(40, 0, 0), muslo_i=(-30, 0, -6), pierna_i=(30, 0, 0))),
+    (1.45, _aterriza_pie),
+    (1.8, _aterriza_pie),
+    (2.2, READY),
+])
+
+# --- levantarse despues de estar de rodilla con la espada clavada (la marea de raices)
+Anim("levantarse", 1.1).poses([
+    (0.0, VIGILIA),
+    (0.55, _de_pie_rama),
+    (1.1, READY),
+])
+
 # ============================================================================ mano izquierda pegada a la empunadura
 
 DT = 0.05   # un tick
@@ -518,7 +585,7 @@ def densificar_todo():
 # ============================================================================ codigo Java
 
 ACTIONS = ["descender", "saludo", "combo3", "combo5", "contraataque", "raices", "clavar", "invocar", "bloqueo",
-           "aturdido", "subir", "muerte"]
+           "aturdido", "subir", "muerte", "alzarse", "juicio", "caer", "subir_balcon", "levantarse"]
 LOOPS = ["posado", "quieto", "andar", "hablar", "guardia", "carga"]
 
 

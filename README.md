@@ -45,5 +45,6 @@ van dentro del mod, en `assets/darkcraft/creditos.txt`):
 - "Dark souls type boss theme" de Philémon Weber (Helmet), CC-BY 4.0 — Corvin, fase 2.
 - "Colossal Boss Battle Theme" de Matthew Pablo (www.matthewpablo.com), CC-BY 3.0 — Corvin, fase 3.
 - "Dark Descent" de Matthew Pablo (www.matthewpablo.com), CC-BY 3.0 — Ser Gavran, fase 1.
+- "A Slave To No One" de Jonathan Shaw (www.jshaw.co.uk), CC-BY 3.0 — Ser Gavran, fase 2.
 
 Se han pasado a OGG, sin silencio al principio y al final y con el volumen igualado.

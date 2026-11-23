@@ -198,6 +198,10 @@
   "subtitles.darkcraft.gavran.voz": "Ser Gavran habla",
   "darkcraft.rey.titulo.33": "SER GAVRAN",
   "darkcraft.rey.subtitulo.33": "El Caballero Jurado",
+  "darkcraft.rey.titulo.34": "SER GAVRAN",
+  "darkcraft.rey.subtitulo.34": "Corazón del Árbol",
+  "darkcraft.gavran.continuara2": "Ser Gavran resiste en su rama",
+  "darkcraft.gavran.continuara2.aviso": "Su muerte con honor llegará en la próxima parte del mod. Sal de la sala y vuelve a entrar para repetir el duelo.",
   "darkcraft.gavran.escudero": "Escudero del Juramento",
   "darkcraft.gavran.continuara.titulo": "Continuará",
   "darkcraft.gavran.continuara": "Ser Gavran vuelve a su rama",
@@ -247,5 +251,11 @@
   "advancements.darkcraft.gavran_guardia.title": "Juramento quebrado",
   "advancements.darkcraft.gavran_guardia.description": "Rompe la guardia de Ser Gavran",
   "advancements.darkcraft.gavran_fase1.title": "La primera rama",
-  "advancements.darkcraft.gavran_fase1.description": "Aguanta la primera fase del duelo con Ser Gavran"
+  "advancements.darkcraft.gavran_fase1.description": "Aguanta la primera fase del duelo con Ser Gavran",
+  "advancements.darkcraft.gavran_fase2.title": "La segunda rama",
+  "advancements.darkcraft.gavran_fase2.description": "Aguanta la segunda fase del duelo con Ser Gavran",
+  "advancements.darkcraft.gavran_corazon.title": "El corazón del árbol",
+  "advancements.darkcraft.gavran_corazon.description": "Golpea el corazón que brilla en el pecho de Ser Gavran",
+  "advancements.darkcraft.gavran_juicio.title": "Tras el muro de corteza",
+  "advancements.darkcraft.gavran_juicio.description": "Sobrevive al Juicio de las espinas escondido tras un muro"
 }

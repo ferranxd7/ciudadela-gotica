@@ -16,9 +16,14 @@ public final class GavranAnims {
     public static final int ATURDIDO = 10;
     public static final int SUBIR = 11;
     public static final int MUERTE = 12;
+    public static final int ALZARSE = 13;
+    public static final int JUICIO = 14;
+    public static final int CAER = 15;
+    public static final int SUBIR_BALCON = 16;
+    public static final int LEVANTARSE = 17;
 
     /** Duracion de cada accion en ticks (por numero). */
-    public static final int[] TICKS = {0, 80, 60, 58, 80, 26, 46, 62, 54, 12, 84, 38, 120};
+    public static final int[] TICKS = {0, 80, 60, 58, 80, 26, 46, 62, 54, 12, 84, 38, 120, 80, 112, 48, 44, 22};
 
     /** Ticks (desde que empieza la animacion) en los que la espada llega: ahi pega el servidor. */
     public static final int[] GOLPES_DESCENDER = {29, 55};
@@ -29,4 +34,8 @@ public final class GavranAnims {
     public static final int[] GOLPES_CLAVAR = {17};
     public static final int[] GOLPES_INVOCAR = {26};
     public static final int[] GOLPES_SUBIR = {11};
+    public static final int[] GOLPES_ALZARSE = {34};
+    public static final int[] GOLPES_JUICIO = {82};
+    public static final int[] GOLPES_CAER = {10, 29};
+    public static final int[] GOLPES_SUBIR_BALCON = {11, 28};
 }

@@ -198,6 +198,10 @@
   "subtitles.darkcraft.gavran.voz": "Ser Gavran fala",
   "darkcraft.rey.titulo.33": "SER GAVRAN",
   "darkcraft.rey.subtitulo.33": "O Cavaleiro Juramentado",
+  "darkcraft.rey.titulo.34": "SER GAVRAN",
+  "darkcraft.rey.subtitulo.34": "Coração da Árvore",
+  "darkcraft.gavran.continuara2": "Ser Gavran resiste no seu galho",
+  "darkcraft.gavran.continuara2.aviso": "A sua morte honrosa chega na próxima parte do mod. Saia da sala e volte a entrar para repetir o duelo.",
   "darkcraft.gavran.escudero": "Escudeiro do Juramento",
   "darkcraft.gavran.continuara.titulo": "Continua",
   "darkcraft.gavran.continuara": "Ser Gavran volta ao seu galho",
@@ -247,5 +251,11 @@
   "advancements.darkcraft.gavran_guardia.title": "Juramento quebrado",
   "advancements.darkcraft.gavran_guardia.description": "Quebre a guarda de Ser Gavran",
   "advancements.darkcraft.gavran_fase1.title": "O primeiro galho",
-  "advancements.darkcraft.gavran_fase1.description": "Resista à primeira fase do duelo com Ser Gavran"
+  "advancements.darkcraft.gavran_fase1.description": "Resista à primeira fase do duelo com Ser Gavran",
+  "advancements.darkcraft.gavran_fase2.title": "O segundo galho",
+  "advancements.darkcraft.gavran_fase2.description": "Resista à segunda fase do duelo com Ser Gavran",
+  "advancements.darkcraft.gavran_corazon.title": "O coração da árvore",
+  "advancements.darkcraft.gavran_corazon.description": "Acerte o coração que brilha no peito de Ser Gavran",
+  "advancements.darkcraft.gavran_juicio.title": "Atrás do muro de casca",
+  "advancements.darkcraft.gavran_juicio.description": "Sobreviva ao Julgamento dos espinhos escondido atrás de um muro"
 }
