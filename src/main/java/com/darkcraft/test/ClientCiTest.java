@@ -1508,16 +1508,17 @@ public final class ClientCiTest {
             });
         }
         int E = F + 640;
-        Object[][] fuera = {
-                {"cliente_f01_fortaleza", fv(78, 26, 72), fv(0, 14, -4)},
-                {"cliente_f02_fortaleza_lado", fv(-66, 12, 40), fv(0, 10, -2)},
-                {"cliente_f03_desde_arriba", fv(12, 64, 44), fv(0, 0, 0)},
-                {"cliente_f04_desde_abajo", fv(70, -26, 58), fv(0, -12, 0)},
-        };
-        for (int k = 0; k < fuera.length; k++) {
-            final Object[] o = fuera[k];
-            atTicks(E + k * 6, "Fortaleza desde fuera", m -> verDesde(m, (Vec3) o[1], (Vec3) o[2]));
-            atTicks(E + k * 6 + 4, "captura", m -> shot(m, (String) o[0]));
+        // (las posiciones se calculan al llegar el paso: el plano de la fortaleza aun no existe al preparar la prueba)
+        String[] nombres = {"cliente_f01_fortaleza", "cliente_f02_fortaleza_lado", "cliente_f03_desde_arriba", "cliente_f04_desde_abajo"};
+        double[][] desde = {{78, 26, 72, 0, 14, -4}, {-66, 12, 40, 0, 10, -2}, {12, 64, 44, 0, 0, 0}, {70, -26, 58, 0, -12, 0}};
+        for (int k = 0; k < nombres.length; k++) {
+            final int kk = k;
+            atTicks(E + k * 6, "Fortaleza desde fuera", m -> {
+                if (fplan == null) return;
+                double[] d = desde[kk];
+                verDesde(m, fv(d[0], d[1], d[2]), fv(d[3], d[4], d[5]));
+            });
+            atTicks(E + k * 6 + 4, "captura", m -> shot(m, nombres[kk]));
         }
         // el puente de hueso y nubes: con la llave, al pie de la escalera
         int P = E + 40;
