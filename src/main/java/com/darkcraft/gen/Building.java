@@ -478,7 +478,7 @@ public class Building extends Element {
                 else if (side == 2) { wx = fp.x0 + a; wz = fp.z1; ix = wx; iz = wz - 1; }
                 else if (side == 1) { wx = fp.x1; wz = fp.z0 + a; ix = wx - 1; iz = wz; }
                 else { wx = fp.x0; wz = fp.z0 + a; ix = wx + 1; iz = wz; }
-                if (nearTurret(wx, wz, 6.5)) continue;
+                if (nearTurret(wx, wz, 6.5) || detrasDelTrono(f, side, wx, ix, iz)) continue;
                 int halfW = wide ? 1 : 0;
                 for (int k = -halfW - 1; k <= halfW + 1; k++) {
                     int px = side % 2 == 0 ? ix + k : ix, pz = side % 2 == 0 ? iz : iz + k;
@@ -541,7 +541,14 @@ public class Building extends Element {
         return best;
     }
 
-    private boolean nearTurret(int x, int z, double r) {
+    /** El muro de detras del trono va entero (sin ventanas que se vean como huecos a los lados del respaldo). */
+    private static boolean detrasDelTrono(Floor f, int side, int wx, int ix, int iz) {
+        if (side != 0) return false;
+        Room r = f.roomAt(ix, iz);
+        return r != null && r.type == Room.Type.THRONE && Math.abs(wx - r.r.cx()) <= 9;
+    }
+
+        private boolean nearTurret(int x, int z, double r) {
         if (turretCorner < 0) return false;
         int[] t = turretCenter();
         double dx = x - t[0], dz = z - t[1];
@@ -563,7 +570,7 @@ public class Building extends Element {
                     else if (side == 2) { wx = fp.x0 + a; wz = fp.z1; ix = wx; iz = wz - 1; }
                     else if (side == 1) { wx = fp.x1; wz = fp.z0 + a; ix = wx - 1; iz = wz; }
                     else { wx = fp.x0; wz = fp.z0 + a; ix = wx + 1; iz = wz; }
-                    if (nearTurret(wx, wz, 6.5)) continue;
+                    if (nearTurret(wx, wz, 6.5) || detrasDelTrono(f, side, wx, ix, iz)) continue;
                     if (f.roomAt(ix, iz) == null && (f.voidRect == null || !f.voidRect.contains(ix, iz))) continue;
                     int halfW = wide ? 1 : 0;
                     for (int k = -halfW; k <= halfW; k++) {

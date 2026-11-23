@@ -158,4 +158,41 @@ public final class Sala {
         }
         return null;
     }
+
+    // ------------------------------------------------------------------ mundos de antes: el muro de detras del trono
+
+    private static final java.util.Set<String> TAPADOS = new java.util.HashSet<>();
+
+    /**
+     * En los mundos generados antes, el muro de detras del trono tenia ventanas que asomaban a los lados del respaldo
+     * (se veian como huecos). Se tapan con la piedra del muro y se ponen las calaveras y los estandartes de ahora.
+     */
+    public void taparTrono(ServerLevel lvl) {
+        String k = lvl.getServer().getWorldData().getLevelName() + "|" + key();
+        if (TAPADOS.contains(k)) return;
+        BlockPos seat = new BlockPos(t.seatX(), t.seatY(), t.seatZ());
+        if (!lvl.isPositionEntityTicking(seat)) return;
+        TAPADOS.add(k);
+        int F = t.y(), zw = t.z0() - 1, xc = t.seatX(), ty = t.seatY();
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        int n = 0;
+        for (int x = xc - 9; x <= xc + 9; x++)
+            for (int y = F; y <= F + t.h(); y++) {
+                m.set(x, y, zw);
+                BlockState st = lvl.getBlockState(m);
+                if (!st.isAir() && st.canOcclude()) continue;
+                lvl.setBlock(m, com.darkcraft.gen.Pal.wall(x, y, zw), 2);
+                n++;
+            }
+        for (int s = -1; s <= 1; s += 2) {
+            BlockPos cal = new BlockPos(xc + 2 * s, ty + 6, t.z0());
+            if (lvl.getBlockState(cal).isAir() && !lvl.getBlockState(cal.below()).isAir())
+                lvl.setBlock(cal, Blocks.WITHER_SKELETON_SKULL.defaultBlockState(), 2);
+            BlockPos est = new BlockPos(xc + 3 * s, ty + 5, t.z0());
+            if (lvl.getBlockState(est).isAir())
+                lvl.setBlock(est, Blocks.RED_WALL_BANNER.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.WallBannerBlock.FACING, net.minecraft.core.Direction.SOUTH), 2);
+        }
+        if (n > 0) com.darkcraft.DarkCraftMod.LOGGER.info("[DarkCraft] Trono del Rey: tapados {} bloques del muro de detras", n);
+    }
 }

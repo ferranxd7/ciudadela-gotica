@@ -171,6 +171,7 @@ public record SalaArbol(int cx, int cz, int F, int base) {
                         if (colgante(sl.getBlockState(m))) quitarFollaje(sl, m);
                     }
                 }
+            taparTrono(sl);
         }
         AABB torre = new AABB(ccx() - TreeTower.HALL_R - 4, base - 2, ccz() - TreeTower.HALL_R - 4,
                 ccx() + TreeTower.HALL_R + 4, F + TreeTower.HALL_H + 16, ccz() + TreeTower.HALL_R + 4);
@@ -179,6 +180,34 @@ public record SalaArbol(int cx, int cz, int F, int base) {
             net.minecraft.nbt.CompoundTag t = it.saveWithoutId(new net.minecraft.nbt.CompoundTag());
             if (!t.hasUUID("Thrower")) it.discard();
         }
+    }
+
+    /**
+     * Mundos de antes: entre la tarima del trono y el muro quedaba una zanja de dos bloques (con los cofres del tesoro
+     * flotando encima) y el estandarte del norte ocupaba un bloque del respaldo. Se tapa igual que la tarima nueva.
+     */
+    private void taparTrono(ServerLevel sl) {
+        int R = TreeTower.HALL_R, tx = cx, tz = cz - R + 3;
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        int n = 0;
+        for (int x = cx - 9; x <= cx + 9; x++)
+            for (int z = cz - R + 1; z < tz; z++) {
+                double dHall = Math.hypot(x - cx, z - cz), dd = Math.hypot(x - tx, z - tz);
+                if (dHall > R - 1.5 || dd > 9 || !sl.isLoaded(m.set(x, F, z))) continue;
+                for (int y = F; y <= F + 1; y++) {
+                    m.set(x, y, z);
+                    net.minecraft.world.level.block.state.BlockState st = sl.getBlockState(m);
+                    if (!st.isAir() && !st.canBeReplaced()) continue;
+                    sl.setBlock(m, dd < 1.6 && y == F + 1 ? com.darkcraft.gen.Pal.GILDED : com.darkcraft.gen.Pal.PB_BRICKS, SIN_VECINOS);
+                    n++;
+                }
+            }
+        m.set(cx, F + 9, cz - R + 2);
+        if (sl.getBlockState(m).getBlock() instanceof net.minecraft.world.level.block.WallBannerBlock) {
+            sl.setBlock(m, com.darkcraft.gen.Pal.PB_CHISELED, SIN_VECINOS);
+            n++;
+        }
+        if (n > 0) com.darkcraft.DarkCraftMod.LOGGER.info("[DarkCraft] Trono de Gavran: tapados {} bloques detras de la tarima", n);
     }
 
     /** Lo mas bajo que llega lo que cuelga en la sala (por encima de la cabeza; nunca toca el suelo). */

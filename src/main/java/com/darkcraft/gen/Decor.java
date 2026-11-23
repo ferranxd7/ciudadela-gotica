@@ -588,6 +588,11 @@ public final class Decor {
                     c.set(xc + dx, y, r.z0, y == ty + 7 || (side && y == ty + 5) ? Pal.GILDED : (side ? Pal.PB_CHISELED : Pal.PB_BRICKS));
                 }
             c.set(xc, ty + 8, r.z0, Pal.b(Blocks.WITHER_SKELETON_SKULL));
+            // calaveras encima de los lados del respaldo y estandartes rojos a los lados, contra el muro (sin ventanas)
+            for (int s = -1; s <= 1; s += 2) {
+                c.set(xc + 2 * s, ty + 6, r.z0, Pal.b(Blocks.WITHER_SKELETON_SKULL));
+                c.set(xc + 3 * s, ty + 5, r.z0, Blocks.RED_WALL_BANNER.defaultBlockState().setValue(WallBannerBlock.FACING, Direction.SOUTH));
+            }
             // braseros
             for (int s = -1; s <= 1; s += 2) {
                 int bx = xc + s * 6;

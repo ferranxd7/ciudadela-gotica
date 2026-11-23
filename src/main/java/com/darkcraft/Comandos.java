@@ -50,9 +50,9 @@ public final class Comandos {
             new Linea(V + "historia mapa", V + "historia mapa", "mapa"),
             new Linea(V + "historia cofre ", V + "historia cofre <1-5>", "cofre"),
             new Linea(V + "historia reiniciar", V + "historia reiniciar", "reiniciar"),
-            new Linea(V + "rey ", V + "rey ir|estado|reiniciar|fase <1-3>|matar|golpefinal", "rey"),
-            new Linea(V + "arbol ", V + "arbol ir|arriba|llave|cerrar", "arbol"),
-            new Linea(V + "gavran ", V + "gavran ir|estado|reiniciar|fase <1-2>|matar|guardia|ataque <nombre>", "gavran"),
+            new Linea(V + "rey ", V + "rey ir / estado / reiniciar / fase <1-3> / matar / golpefinal", "rey"),
+            new Linea(V + "arbol ", V + "arbol ir / arriba / llave / cerrar", "arbol"),
+            new Linea(V + "gavran ", V + "gavran ir / estado / reiniciar / fase <1-2> / matar / guardia / ataque <nombre>", "gavran"),
     };
 
     private static int ayuda(CommandSourceStack src) {

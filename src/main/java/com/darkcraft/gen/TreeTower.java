@@ -949,7 +949,8 @@ public class TreeTower extends Element {
             for (int z = cz - HALL_R + 1; z <= tz + 8; z++) {
                 double dd = Math.sqrt((x - tx) * (x - tx) + (z - tz) * (z - tz));
                 double dHall = Math.sqrt((x - cx) * (x - cx) + (z - cz) * (z - cz));
-                if (dHall > HALL_R - 2.5 || dd > 9) continue;
+                // hasta la cara de dentro del muro: sin zanja entre la tarima y el muro (detras del trono)
+                if (dHall > HALL_R - 1.5 || dd > 9) continue;
                 if (dd > 6.5) {
                     c.set(x, F, z, Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, Pal.dirOf(tx - x, tz - z), false));
                 } else {
@@ -991,7 +992,7 @@ public class TreeTower extends Element {
             int px = cx + out.getStepX() * (HALL_R - 2), pz = cz + out.getStepZ() * (HALL_R - 2);
             Direction in = out.getOpposite();
             for (int alto : new int[]{9, 22}) {
-                if (out == Direction.NORTH && alto == 22) continue; // el roseton
+                if (out == Direction.NORTH) continue; // el roseton (arriba) y el respaldo del trono (abajo)
                 c.set(px, F + alto, pz, (out == Direction.NORTH ? Blocks.RED_WALL_BANNER : Blocks.BLACK_WALL_BANNER).defaultBlockState()
                         .setValue(WallBannerBlock.FACING, in));
             }

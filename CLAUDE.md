@@ -173,3 +173,8 @@ fortaleza; cada parte publicada. Juega solo y con amigos.
   bajaban de F+8 (una vez por sesión) y quita las bayas, lianas y hojas caídas en toda la torre (no lo que haya
   tirado un jugador). Las lianas nuevas nunca bajan de F+8 (`MIN_LIANA`).
 - Rey: `VIDA_FASE` 780 (antes 1200). `/locate structure darkcraft:valdrenn` ya da el más cercano (celdas de 16 chunks).
+- Tronos sin huecos detrás: en la sala del árbol la tarima llega hasta el muro (antes quedaba una zanja de dos bloques
+  con los cofres del tesoro flotando) y el estandarte del norte ya no se come un bloque del respaldo; en el salón del
+  trono el muro de detrás va sin ventanas (`Building.detrasDelTrono`; asomaban a los lados del respaldo), con
+  calaveras encima de los lados del respaldo y estandartes rojos a los lados. En mundos de antes lo arreglan
+  `SalaArbol.taparTrono` (desde `limpiar`) y `Sala.taparTrono` (desde `ReyEventos`, una vez por sesión).

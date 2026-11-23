@@ -56,6 +56,7 @@ public final class ReyEventos {
         }
         Sala s = Sala.near(ow, p.getBlockX(), p.getBlockZ());
         if (s == null || p.position().distanceToSqr(s.seat()) > 80 * 80) return;
+        s.taparTrono(ow);
         asegurarRey(ow, s);
     }
 
