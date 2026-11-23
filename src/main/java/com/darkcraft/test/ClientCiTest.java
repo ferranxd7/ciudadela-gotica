@@ -1074,6 +1074,11 @@ public final class ClientCiTest {
             m.options.hideGui = false;
             shot(m, "cliente_g20_barra");
         });
+        // la vida no baja de la mitad antes de tiempo (el cambio de fase se fuerza mas abajo)
+        for (int tv : new int[]{L + 300, L + 520, L + 700})
+            atTicks(tv, "Vida de Gavran (prueba)", m -> server(m, sp -> gavranCerca(sp).ifPresent(g -> {
+                if (g.fase() == 1) g.ponerVida(860);
+            })));
         ataqueG(L + 60, "combo3", new int[]{8, 13, 24, 34}, "cliente_g21_combo3");
         ataqueG(L + 140, "raices", new int[]{8, 16, 22, 30}, "cliente_g22_raices");
         ataqueG(L + 220, "clavar", new int[]{10, 19, 28, 40}, "cliente_g23_clavar");
@@ -1116,8 +1121,37 @@ public final class ClientCiTest {
             server(m, sp -> gavranCerca(sp).ifPresent(g -> log("  fase 2: " + g.debug() + " | logro fase 1: "
                     + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_FASE1))));
         });
-        ataqueG(F2 + 20, "atrapar", new int[]{10, 20, 30}, "cliente_g41_atrapar");
-        atTicks(F2 + 40, "Atrapado?", m -> server(m, sp -> log("  jugador atrapado: lentitud "
+        for (int tv : new int[]{F2 + 2, F2 + 100, F2 + 190, F2 + 430, F2 + 600, F2 + 700, F2 + 780})
+            atTicks(tv, "Vida de Gavran (prueba)", m -> server(m, sp -> gavranCerca(sp).ifPresent(g -> {
+                if (g.fase() >= 2) g.ponerVida(480);
+            })));
+        // el corazon: mirar a la luz verde de su pecho y pegar
+        atTicks(F2 + 6, "Golpe normal y golpe al corazon", m -> server(m, sp -> gavranCerca(sp).ifPresent(g -> {
+            Vec3 f = new Vec3(g.adelanteX(), 0, g.adelanteZ());
+            Vec3 pos = g.position().add(f.scale(3.4));
+            sp.teleportTo(sp.serverLevel(), pos.x, g.getY(), pos.z, sp.getYRot(), 0f);
+            // primero al cuerpo (mirando a la cadera)
+            mirarA(sp, g.position().add(0, 1.6, 0));
+            sp.resetAttackStrengthTicker();
+            g.invulnerableTime = 0;
+            float h0 = g.getHealth();
+            sp.attack(g);
+            float d1 = h0 - g.getHealth();
+            g.invulnerableTime = 0;
+            mirarA(sp, g.corazonPos());
+            sp.resetAttackStrengthTicker();
+            float h1 = g.getHealth();
+            sp.attack(g);
+            float d2 = h1 - g.getHealth();
+            log(String.format(java.util.Locale.ROOT, "  golpe al cuerpo %.1f | golpe al corazon %.1f | logro gavran_corazon=%s | %s", d1, d2,
+                    com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_CORAZON), g.debug()));
+        })));
+        atTicks(F2 + 12, "Captura del corazon", m -> {
+            m.options.hideGui = false;
+            shot(m, "cliente_g47_corazon");
+        });
+        ataqueG(F2 + 30, "atrapar", new int[]{10, 20, 30}, "cliente_g41_atrapar");
+        atTicks(F2 + 50, "Atrapado?", m -> server(m, sp -> log("  jugador atrapado: lentitud "
                 + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) + " | " + gavranCerca(sp).map(g -> g.debug()).orElse("-"))));
         ataqueG(F2 + 110, "hojas", new int[]{14, 31, 34, 60}, "cliente_g42_hojas");
         ataqueG(F2 + 200, "suelo", new int[]{20, 45, 90, 150}, "cliente_g43_suelo");
@@ -1158,30 +1192,6 @@ public final class ClientCiTest {
             log("  de vuelta al suelo | " + g.debug());
         })));
         ataqueG(F2 + 712, "bajar", new int[]{12, 30, 40}, "cliente_g46_bajar");
-        // el corazon: mirar a la luz verde de su pecho y pegar
-        atTicks(F2 + 790, "Golpe normal y golpe al corazon", m -> server(m, sp -> gavranCerca(sp).ifPresent(g -> {
-            Vec3 f = new Vec3(g.adelanteX(), 0, g.adelanteZ());
-            Vec3 pos = g.position().add(f.scale(3.2));
-            sp.teleportTo(sp.serverLevel(), pos.x, g.getY(), pos.z, sp.getYRot(), 0f);
-            // primero al cuerpo (mirando a la cadera)
-            mirarA(sp, g.position().add(0, 1.6, 0));
-            sp.resetAttackStrengthTicker();
-            float h0 = g.getHealth();
-            sp.attack(g);
-            float d1 = h0 - g.getHealth();
-            g.invulnerableTime = 0;
-            mirarA(sp, g.corazonPos());
-            sp.resetAttackStrengthTicker();
-            float h1 = g.getHealth();
-            sp.attack(g);
-            float d2 = h1 - g.getHealth();
-            log(String.format(java.util.Locale.ROOT, "  golpe al cuerpo %.1f | golpe al corazon %.1f | logro gavran_corazon=%s | %s", d1, d2,
-                    com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_CORAZON), g.debug()));
-        })));
-        atTicks(F2 + 798, "Captura del corazon", m -> {
-            m.options.hideGui = false;
-            shot(m, "cliente_g47_corazon");
-        });
         atTicks(F2 + 860, "Fin de la fase 2 (parte B2)", m -> server(m, sp -> gavranCerca(sp).ifPresent(g ->
                 log("  fin de la fase 2: " + g.forzarFinFase() + " | " + g.debug()))));
         int[] fin = {20, 100, 124, 150};
@@ -1236,20 +1246,13 @@ public final class ClientCiTest {
         for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering())
             if (e instanceof com.darkcraft.gavran.Gavran g) cg = g;
         if (seguirG && cg != null && !ClientCine.active()) {
-            Vec3 b = cg.position(), pp = mc.player.position();
-            Vec3 d = new Vec3(b.x - pp.x, 0, b.z - pp.z);
-            if (d.lengthSqr() < 0.01) d = new Vec3(0, 0, 1);
-            d = d.normalize();
-            Vec3 side = new Vec3(-d.z, 0, d.x);
-            Vec3 mid = b.add(pp).scale(0.5);
-            Vec3 want = mid.add(side.scale(11)).subtract(d.scale(3)).add(0, 5.5, 0);
-            // dentro del anillo de la sala (ni dentro del tronco ni fuera del muro)
+            // camara fija en el anillo, a un lado de Gavran (el tronco no se mete en medio) y a media altura
+            Vec3 b = cg.position();
             double cx = hall[0] + 0.5, cz = hall[1] + 0.5;
-            double r = Math.hypot(want.x - cx, want.z - cz), a = Math.atan2(want.z - cz, want.x - cx);
-            r = Math.max(20.5, Math.min(36.5, r));
-            want = new Vec3(cx + Math.cos(a) * r, Math.min(hall[2] + 14, want.y), cz + Math.sin(a) * r);
-            obsPos = obsPos == null || obsPos.distanceToSqr(want) > 400 ? want : obsPos.add(want.subtract(obsPos).scale(0.12));
-            verDesde(mc, obsPos, mid.add(0, 2.2, 0));
+            double ag = Math.atan2(b.z - cz, b.x - cx) + 0.62;
+            Vec3 want = new Vec3(cx + Math.cos(ag) * 31, hall[2] + 9.5, cz + Math.sin(ag) * 31);
+            obsPos = obsPos == null || obsPos.distanceToSqr(want) > 400 ? want : obsPos.add(want.subtract(obsPos).scale(0.1));
+            verDesde(mc, obsPos, b.add(0, 3.0, 0));
         }
         if (t % 20 == 0 && t < 20 * 280)
             server(mc, sp -> gavranCerca(sp).ifPresent(g -> log("  gavran: " + g.debug() + " | jugador vida " + Math.round(sp.getHealth())

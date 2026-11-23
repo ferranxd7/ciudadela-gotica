@@ -234,6 +234,30 @@ for s, n in ((-1, "d"), (1, "i")):
                 Box(-4.5, -0.75, -4.75, 9, 1.5, 9.5, "raiz_banda"),
             ]))
 
+# ------------------------------------------------------------------ espinas de la fase 2 (solo se ven cuando el arbol le ha cambiado)
+# piezas "espina2_*": el modelo las esconde en la fase 1 (GavranGeometria.ESPINAS2)
+for s, n in ((-1, "d"), (1, "i")):
+    # tres en la hombrera, hacia arriba y hacia fuera
+    for k, (x, z, rx, rz, largo) in enumerate(((3.0, -4.0, -18, 28, 6.5), (6.0, 1.5, 10, 40, 5.5), (0.5, 5.0, 30, 18, 5.0))):
+        PARTS.append(Part(f"espina2_h{n}{k}", f"hombrera_{n}", (M(s, x), -6.4, z), rot=(rx, 0, M(s, rz)), boxes=[
+            Box(-1.0, -largo, -1.0, 2.0, largo, 2.0, "espina2"),
+        ]))
+    # dos en el avambrazo, hacia fuera
+    for k, (yy, rx, largo) in enumerate(((3.5, -20, 4.0), (8.5, 15, 3.5))):
+        PARTS.append(Part(f"espina2_a{n}{k}", f"antebrazo_{n}", (M(s, 3.7), yy, 0), rot=(rx, 0, M(s, 72)), boxes=[
+            Box(-0.75, -largo, -0.75, 1.5, largo, 1.5, "espina2"),
+        ]))
+    # una en la rodilla, hacia delante
+    PARTS.append(Part(f"espina2_r{n}", f"pierna_{n}", (M(s, 1.5), -1.5, -6.2), rot=(75, 0, M(s, 12)), boxes=[
+        Box(-0.75, -4.0, -0.75, 1.5, 4.0, 1.5, "espina2"),
+    ]))
+# cuatro por la espalda, saliendo entre las placas (por encima de la capa)
+for k, (x, y, rx, rz, largo) in enumerate(((-4.5, -29.5, -62, 12, 6.0), (4.5, -28.5, -58, -14, 6.5), (-2.0, -23.0, -70, 6, 5.0),
+                                         (2.5, -19.0, -74, -8, 4.5))):
+    PARTS.append(Part(f"espina2_e{k}", "torso", (x, y, 9.5), rot=(rx, 0, rz), boxes=[
+        Box(-1.0, -largo, -1.0, 2.0, largo, 2.0, "espina2"),
+    ]))
+
 # ------------------------------------------------------------------ el mandoble (en la mano derecha; la izquierda lo agarra mas abajo)
 PARTS += [
     Part("espada", "antebrazo_d", (0, 16.6, -0.4), rot=(62, 0, 0), boxes=[

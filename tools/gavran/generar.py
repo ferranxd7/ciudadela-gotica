@@ -67,7 +67,19 @@ def java_model(tex_h):
             pose = f"PartPose.offsetAndRotation({fmt(px)}, {fmt(py)}, {fmt(pz)}, {fmt(rx)}, {fmt(ry)}, {fmt(rz)})"
         out.append(f"        PartDefinition {v} = {parent}.addOrReplaceChild(\"{p.name}\", {cb}, {pose});")
     out.append("        return LayerDefinition.create(mesh, TEX_W, TEX_H);")
-    out.append("    }")
+    out.append("    }\n")
+    # caminos (de la raiz a la pieza) de las espinas de la fase 2: el modelo las esconde en la fase 1
+    madre = {p.name: p.parent for p in PARTS}
+
+    def camino(n):
+        c = []
+        while n:
+            c.append(n)
+            n = madre[n]
+        return list(reversed(c))
+    esp = [camino(p.name) for p in PARTS if p.name.startswith("espina2_")]
+    out.append("    /** Espinas que solo se ven en la fase 2 (camino de piezas desde la raiz). */")
+    out.append("    public static final String[][] ESPINAS2 = {" + ", ".join("{" + ", ".join(f'\"{x}\"' for x in c) + "}" for c in esp) + "};")
     out.append("}")
     return "\n".join(out) + "\n"
 

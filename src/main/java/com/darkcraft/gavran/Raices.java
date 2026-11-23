@@ -581,14 +581,17 @@ public final class Raices {
     void capullo(ServerLevel sl, Vec3 c, int dura) {
         BlockState st = DarkCraftMod.RAIZ_GAVRAN.get().defaultBlockState();
         RandomSource r = sl.random;
-        int n = 18;
+        // tres raices que suben enroscadas (desfasadas un tercio de vuelta), en trozos cortos pegados al cuerpo
+        int n = 30;
         for (int i = 0; i < n; i++) {
-            double a = i * 0.95, y = c.y + i * 0.34;
-            double x = c.x + Math.cos(a) * 1.75, z = c.z + Math.sin(a) * 1.75;
-            // tumbada a lo largo de la espiral y un poco hacia dentro
-            float yaw = (float) Math.atan2(-Math.sin(a) - Math.cos(a) * 0.35, Math.cos(a) - Math.sin(a) * 0.35);
-            Estaca e = estaca(sl, st, x, y, z, yaw, 1.1f + r.nextFloat() * 0.25f, 2.4f + r.nextFloat() * 0.6f, 0.42f,
-                    1 + i * dura / n, 100000, 100000);
+            int hebra = i % 3, k = i / 3;
+            double a = k * 0.78 + hebra * Mth.TWO_PI / 3, y = c.y + 0.15 + k * 0.56 + hebra * 0.18;
+            double rr = 1.45 + (k > 6 ? -0.25 : 0) + r.nextDouble() * 0.12;
+            double x = c.x + Math.cos(a) * rr, z = c.z + Math.sin(a) * rr;
+            // tumbada a lo largo de la espiral, subiendo un poco
+            float yaw = (float) Math.atan2(-Math.sin(a) - Math.cos(a) * 0.18, Math.cos(a) - Math.sin(a) * 0.18);
+            Estaca e = estaca(sl, st, x, y, z, yaw, 1.3f + r.nextFloat() * 0.08f, 1.35f + r.nextFloat() * 0.3f, 0.34f,
+                    1 + k * dura / (n / 3) + hebra * 2, 100000, 100000);
             if (e != null) capullo.add(e);
         }
     }
@@ -639,6 +642,30 @@ public final class Raices {
             grandes.add(d);
             pasos.add(new Paso(d, t + 10 + i * 4, lleno, 18, false));
         }
+        // ramas que bajan de la cupula y se mecen mientras el arbol despierta (luego se quedan quietas)
+        BlockState madera = Blocks.DARK_OAK_WOOD.defaultBlockState();
+        for (int i = 0; i < 7; i++) {
+            double a = i * Mth.TWO_PI / 7 + r.nextDouble() * 0.4;
+            double rr = 21 + r.nextDouble() * 9;
+            Vec3 p = s.enAnillo(a, rr, 0);
+            double techo = s.F() + 25 + Math.round(14 * Math.sqrt(Math.max(0, 1 - (rr / 39) * (rr / 39)))) - 0.3;
+            // colgando hacia abajo e inclinada hacia el tronco
+            float yaw = (float) Math.atan2(-Math.cos(a), -Math.sin(a));
+            float largo = 7.5f + r.nextFloat() * 3.5f, w = 0.9f + r.nextFloat() * 0.4f;
+            Display.BlockDisplay d = display(sl, i % 2 == 0 ? madera : st, p.x, techo, p.z, rama(yaw, 0.4f, 0.02f, w), 7);
+            if (d == null) continue;
+            grandes.add(d);
+            int t0 = t + 15 + i * 3;
+            pasos.add(new Paso(d, t0, rama(yaw, 0.4f, largo, w), 16, false));
+            for (int k = 0; k < 6; k++)
+                pasos.add(new Paso(d, t0 + 18 + k * 16, rama(yaw + (k % 2 == 0 ? 0.12f : -0.12f), k % 2 == 0 ? 0.55f : 0.28f, largo, w), 16, false));
+            pasos.add(new Paso(d, t0 + 18 + 6 * 16, rama(yaw, 0.4f, largo, w), 20, false));
+        }
+    }
+
+    /** Rama que cuelga desde su punto de anclaje: hacia abajo, inclinada 'tilt' hacia (sin yaw, cos yaw). */
+    private static Matrix4f rama(float yaw, float tilt, float largo, float w) {
+        return new Matrix4f().rotateY(yaw).rotateX((float) Math.PI - tilt).scale(w, largo, w).translate(-0.5f, 0f, -0.5f);
     }
 
     static BlockPos bp(Vec3 v) {

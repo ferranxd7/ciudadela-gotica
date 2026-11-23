@@ -17,6 +17,8 @@ public class GavranModel extends HierarchicalModel<Gavran> {
 
     private final ModelPart root;
     final ModelPart raiz, cadera, torso, cabeza, capa, capa2, brazoD, antebrazoD, espada;
+    /** Las espinas que le salen en la fase 2 (escondidas en la fase 1). */
+    private final java.util.List<ModelPart> espinas2 = new java.util.ArrayList<>();
     public float alpha = 1f;
 
     public GavranModel(ModelPart root) {
@@ -30,6 +32,11 @@ public class GavranModel extends HierarchicalModel<Gavran> {
         this.brazoD = torso.getChild("brazo_d");
         this.antebrazoD = brazoD.getChild("antebrazo_d");
         this.espada = antebrazoD.getChild("espada");
+        for (String[] c : GavranGeometria.ESPINAS2) {
+            ModelPart p = root;
+            for (String n : c) p = p.getChild(n);
+            espinas2.add(p);
+        }
     }
 
     @Override
@@ -40,6 +47,8 @@ public class GavranModel extends HierarchicalModel<Gavran> {
     @Override
     public void setupAnim(Gavran e, float limbSwing, float limbSwingAmount, float age, float headYaw, float headPitch) {
         root.getAllParts().forEach(ModelPart::resetPose);
+        boolean f2 = e.fase() >= 2;
+        for (ModelPart p : espinas2) p.visible = f2;
         int pose = e.pose();
         boolean acting = e.acting();
         if (pose == Gavran.POSE_POSADO && !acting) {
@@ -49,7 +58,8 @@ public class GavranModel extends HierarchicalModel<Gavran> {
             else if (pose == Gavran.POSE_GUARDIA && !acting) animate(e.guardAnim, GavranAnimaciones.GUARDIA, age);
             else if (!acting) animate(e.idleAnim, GavranAnimaciones.QUIETO, age);
             int id = e.actionId();
-            if (pose != Gavran.POSE_CARGA && id != GavranAnims.MUERTE && id != GavranAnims.DESCENDER && id != GavranAnims.SUBIR)
+            if (pose != Gavran.POSE_CARGA && id != GavranAnims.MUERTE && id != GavranAnims.DESCENDER && id != GavranAnims.SUBIR
+                    && id != GavranAnims.CAER && id != GavranAnims.SUBIR_BALCON && id != GavranAnims.ALZARSE)
                 animateWalk(GavranAnimaciones.ANDAR, limbSwing, limbSwingAmount, 1.25f, 2.0f);
         }
         animate(e.talkAnim, GavranAnimaciones.HABLAR, age);

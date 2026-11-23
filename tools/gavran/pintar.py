@@ -581,6 +581,18 @@ def paint(mat, face, W, H, phase, key):
             img = img * 1.2
         return img, gl, alpha
 
+    if mat == "espina2":
+        # espinas de la fase 2: corteza casi negra que se aclara hacia la punta, y la punta verde que brilla
+        ys = np.linspace(0, 1, H)[:, None] * np.ones((1, W))
+        img = mix(col(18, 13, 10), col(58, 42, 28), 1 - ys)
+        img = mix(img, corteza(W, H, rngs, vertical=True), 0.25)
+        punta = np.clip((0.3 - ys) / 0.3, 0, 1) if face != "bottom" else np.zeros_like(ys)
+        if face == "top":
+            punta = np.ones_like(ys)
+        img = mix(img, col(90, 200, 110), punta * 0.6)
+        glow_at(gl, punta, GREEN_GLOW, 0.75 if phase >= 2 else 0.0)
+        return img, gl, alpha
+
     # ---------------------------------------------------------------- tela
     if mat in ("capa", "capa_bajo", "tabardo", "tabardo_tras", "capa_cuello"):
         img = tela(W, H, rngs, oscura=face in ("front",) and mat.startswith("capa"))
