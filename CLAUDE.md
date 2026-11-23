@@ -92,8 +92,9 @@ dificultad, marcas en el suelo como el Rey.
   pasan 2,5 s sin golpes. En la sala y su torre no salen monstruos solos (`GavranEventos.onSpawn`) y los que se
   hubieran colado se van al empezar la entrada.
 - Cinemática de entrada: el plano de la rama es de lado y casi a su altura (desde abajo le tapa la rama) y el del
-  salto sigue el mismo salto que hace el servidor (`Gavran.enSalto`); `SalaArbol.despejarVista` quita las hojas y
-  lianas que le taparían en esos planos.
+  salto sigue a Gavran de verdad (`Shot.siguiendo(id, ...)`: el cliente mira a la entidad, aunque el servidor vaya
+  con retraso; los puntos de `Gavran.enSalto` quedan de reserva). `SalaArbol.despejarVista` quita las hojas y
+  lianas que le taparían, hay bloques de luz invisibles en la rama y en la entrada se dibuja con más luz propia.
 - Servidor: `gavran/Gavran.java` (estados DORMIDO, INTRO, LUCHA, ATURDIDO, FIN1, MUERTE), `SalaArbol` (geometría
   de la sala: anillo entre el tronco y el muro, rama del norte sobre la puerta, aterrizaje delante del trono),
   `Raices` (estacas de raíz con entidades `block_display` que crecen y se recogen solas; onda del mandoble),

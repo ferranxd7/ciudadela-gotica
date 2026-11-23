@@ -1034,7 +1034,7 @@ public final class ClientCiTest {
         atTicks(G + 6, "Mirar a la rama desde la sala", m -> {
             m.options.hideGui = true;
             // desde donde empieza el plano de la rama en la entrada (a un lado y casi a su altura)
-            verDesde(m, new Vec3(hall[0] + 13.5, hall[2] + 25, hall[1] - 30.5), new Vec3(hall[0] + 0.5, hall[2] + 34.5, hall[1] - 19.5));
+            verDesde(m, new Vec3(hall[0] + 10.5, hall[2] + 27, hall[1] - 28), new Vec3(hall[0] + 0.5, hall[2] + 34.5, hall[1] - 19.5));
         });
         atTicks(G + 14, "captura", m -> shot(m, "cliente_g01_rama"));
         atTicks(G + 18, "Entrar en la Sala del Arbol", m -> {

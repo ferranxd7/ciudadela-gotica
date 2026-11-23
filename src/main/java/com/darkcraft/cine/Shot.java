@@ -11,6 +11,13 @@ public final class Shot {
     public final int ease;          // 0 lineal, 1 suave al entrar y salir, 2 suave al salir
     public final double[] pos;      // x,y,z por punto
     public final double[] look;     // x,y,z por punto
+    /**
+     * Plano que sigue a una entidad (su id en el cliente; -1 = no): mira a donde esta de verdad (mas seguirDy) y la
+     * camara va a su altura (mas camDy, entre camMin y camMax). Los puntos de look quedan por si no se encuentra.
+     */
+    public int seguir = -1;
+    public float seguirDy, camDy;
+    public double camMin, camMax;
 
     public Shot(float t0, float t1, float fov, float roll, int ease, double[] pos, double[] look) {
         this.t0 = t0;
@@ -20,6 +27,15 @@ public final class Shot {
         this.ease = ease;
         this.pos = pos;
         this.look = look;
+    }
+
+    public Shot siguiendo(int id, float lookDy, float camDy, double camMin, double camMax) {
+        this.seguir = id;
+        this.seguirDy = lookDy;
+        this.camDy = camDy;
+        this.camMin = camMin;
+        this.camMax = camMax;
+        return this;
     }
 
     private static double easeOf(int e, double u) {
@@ -79,6 +95,13 @@ public final class Shot {
         for (double d : pos) b.writeDouble(d);
         b.writeVarInt(look.length);
         for (double d : look) b.writeDouble(d);
+        b.writeVarInt(seguir + 1);
+        if (seguir >= 0) {
+            b.writeFloat(seguirDy);
+            b.writeFloat(camDy);
+            b.writeDouble(camMin);
+            b.writeDouble(camMax);
+        }
     }
 
     public static Shot read(FriendlyByteBuf b) {
@@ -88,6 +111,9 @@ public final class Shot {
         for (int i = 0; i < pos.length; i++) pos[i] = b.readDouble();
         double[] look = new double[Math.min(b.readVarInt(), 300)];
         for (int i = 0; i < look.length; i++) look[i] = b.readDouble();
-        return new Shot(t0, t1, fov, roll, ease, pos, look);
+        Shot s = new Shot(t0, t1, fov, roll, ease, pos, look);
+        int seg = b.readVarInt() - 1;
+        if (seg >= 0) s.siguiendo(seg, b.readFloat(), b.readFloat(), b.readDouble(), b.readDouble());
+        return s;
     }
 }

@@ -516,6 +516,8 @@ public class Gavran extends Monster {
             m.discard();
         }
         List<Shot> planos = despejar(sl, s, rama);
+        // el plano del salto mira a donde esta Gavran de verdad (aunque el servidor vaya con retraso)
+        planos.get(3).siguiendo(getId(), 3.0f, -4.5f, s.F() + 6.5, s.F() + 29);
         setFlag(F_INTRO, true);
         setFlag(F_ALERTA, true);
         cambiar(Estado.INTRO);
@@ -591,6 +593,12 @@ public class Gavran extends Monster {
      */
     static List<Shot> despejar(ServerLevel sl, SalaArbol s, Vec3 rama) {
         s.despejarRama(sl, rama);
+        // luz invisible en la rama (bloques de luz: ni se ven ni se tocan) para que se le vea desde la sala
+        for (int[] o : new int[][]{{0, 2, -2}, {2, 1, 0}, {-2, 1, 0}, {0, 4, 1}}) {
+            BlockPos lp = BlockPos.containing(rama.x + o[0], rama.y + o[1], rama.z + o[2]);
+            if (sl.getBlockState(lp).isAir())
+                sl.setBlock(lp, Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 11), 2);
+        }
         List<Shot> planos = introPlanos(s, rama);
         for (int i = 1; i <= 3; i++) s.despejarVista(sl, planos.get(i).pos, planos.get(i).look);
         return planos;
@@ -619,7 +627,7 @@ public class Gavran extends Monster {
                 p(cx, F + 5.2, cz - 15.4, cx, F + 5.0, cz - 15.4)));
         // arriba, en la rama, de rodillas: "el Rey ha muerto" (desde un lado y casi a su altura: desde abajo le tapa la rama)
         l.add(new Shot(3.2f, 10.9f, 58, 0, 1,
-                p(cx + 13, F + 25, cz - 31, cx + 9.5, F + 28, cz - 28),
+                p(cx + 10, F + 27, cz - 28.5, cx + 7, F + 29, cz - 26),
                 p(hx, hy, hz, hx, hy + 0.2, hz)));
         // de cerca, a su altura
         l.add(new Shot(10.9f, 19.0f, 52, 0, 1,

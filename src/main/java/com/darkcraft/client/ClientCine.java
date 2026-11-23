@@ -260,7 +260,7 @@ public final class ClientCine {
             return;
         }
         Shot s = shots.get(idx);
-        double[] a = s.at(t);
+        double[] a = seguir(s, s.at(t), 1f);
         float[] ang = Shot.angles(a);
         if (!camOn || cam == null) {
             cam = new CineCamera(mc.level);
@@ -282,6 +282,20 @@ public final class ClientCine {
             mc.setCameraEntity(cam);
             camOn = true;
         }
+    }
+
+    /** Si el plano sigue a una entidad, mira a donde esta ahora (y la camara va a su altura). */
+    private static double[] seguir(Shot s, double[] a, float pt) {
+        if (s.seguir < 0) return a;
+        Minecraft mc = Minecraft.getInstance();
+        net.minecraft.world.entity.Entity e = mc.level == null ? null : mc.level.getEntity(s.seguir);
+        if (e == null) return a;
+        net.minecraft.world.phys.Vec3 p = e.getPosition(pt);
+        a[3] = p.x;
+        a[4] = p.y + s.seguirDy;
+        a[5] = p.z;
+        a[1] = Mth.clamp(a[4] + s.camDy, s.camMin, s.camMax);
+        return a;
     }
 
     // ------------------------------------------------------------------ que no se mueva nada
@@ -345,7 +359,7 @@ public final class ClientCine {
         float roll = 0;
         if (camOn && camShot >= 0 && camShot < shots.size()) {
             Shot s = shots.get(camShot);
-            double[] a = s.at(t - 0.05f);
+            double[] a = seguir(s, s.at(t - 0.05f), (float) e.getPartialTick());
             float[] ang = Shot.angles(a);
             e.setYaw(ang[0]);
             e.setPitch(ang[1]);
@@ -406,7 +420,8 @@ public final class ClientCine {
         float in = smooth(t / 0.8f), out = 1 - smooth((t - (total - 0.8f)) / 0.8f);
         float frame = Math.min(in, out);
         // mundo mas oscuro y vineta
-        if (!ch1) g.fill(0, 0, w, h, argb(0.32f * frame, 8, 0, 0));
+        // (en las de Ser Gavran, menos: armadura negra en una sala oscura)
+        if (!ch1) g.fill(0, 0, w, h, argb((chapter == 33 ? 0.1f : 0.32f) * frame, 8, 0, 0));
         else if (t < Timeline.NARR_START + 0.5f) g.fill(0, 0, w, h, argb(0.3f * Math.min(in, 1 - smooth((t - Timeline.OUT) / 1.0f)), 8, 0, 0));
         vignette(g, w, h, (ch1 ? 0.7f : 0.9f) * frame);
         // brasas que suben

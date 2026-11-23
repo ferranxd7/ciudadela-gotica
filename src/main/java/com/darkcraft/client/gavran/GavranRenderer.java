@@ -63,7 +63,8 @@ public class GavranRenderer extends MobRenderer<Gavran, GavranModel> {
     /** Armadura negra en una sala oscura: un poco de luz propia para que se le vea la silueta. */
     @Override
     protected int getBlockLightLevel(Gavran e, net.minecraft.core.BlockPos pos) {
-        return Math.max(super.getBlockLightLevel(e, pos), e.fase() >= 2 ? 9 : 6);
+        // en la entrada (cinematica, de lejos y en la rama) un poco mas
+        return Math.max(super.getBlockLightLevel(e, pos), e.flag(Gavran.F_INTRO) ? 10 : e.fase() >= 2 ? 9 : 6);
     }
 
     @Override
