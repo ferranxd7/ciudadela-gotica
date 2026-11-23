@@ -981,12 +981,14 @@ public final class ClientCiTest {
             m.setCameraEntity(m.player);
         });
         int finG = gavran(S + 490 + 232);
+        finG = mandoble(finG);
         S = finG - 280;
         atTicks(S + 130 + 150, "Logros conseguidos", m -> server(m, sp -> {
             StringBuilder b = new StringBuilder("  logros:");
             for (String id : new String[]{com.darkcraft.story.Logros.ENCONTRAR, com.darkcraft.story.Logros.CAPITULO1,
                     com.darkcraft.story.Logros.REY, com.darkcraft.story.Logros.ARBOL, com.darkcraft.story.Logros.GAVRAN_GUARDIA,
-                    com.darkcraft.story.Logros.GAVRAN_FASE1})
+                    com.darkcraft.story.Logros.GAVRAN_FASE1, com.darkcraft.story.Logros.GAVRAN_FASE2, com.darkcraft.story.Logros.GAVRAN,
+                    com.darkcraft.story.Logros.capitulo(5)})
                 b.append(' ').append(id).append('=').append(com.darkcraft.story.Logros.tiene(sp, id) ? "SI" : "no");
             log(b.toString());
         }));
@@ -1192,41 +1194,221 @@ public final class ClientCiTest {
             log("  de vuelta al suelo | " + g.debug());
         })));
         ataqueG(F2 + 712, "bajar", new int[]{12, 30, 40}, "cliente_g46_bajar");
-        atTicks(F2 + 860, "Fin de la fase 2 (parte B2)", m -> server(m, sp -> gavranCerca(sp).ifPresent(g ->
-                log("  fin de la fase 2: " + g.forzarFinFase() + " | " + g.debug()))));
-        int[] fin = {20, 100, 124, 150};
-        for (int i = 0; i < fin.length; i++) {
+        // ---------------------------------------------------------------- muerte con honor (parte B3)
+        int M = F2 + 860;
+        atTicks(M, "Fin de la fase 2: muere con honor", m -> {
+            seguirG = false;
+            m.options.hideGui = false;
+            server(m, sp -> gavranCerca(sp).ifPresent(g -> log("  fin de la fase 2: " + g.forzarFinFase() + " | " + g.debug())));
+        });
+        int[] muerte = {60, 200, 296, 330, 390, 440, 520};
+        for (int i = 0; i < muerte.length; i++) {
             final int k = i;
-            atTicks(F2 + 860 + fin[i], "Captura del fin de la fase 2", m -> {
+            atTicks(M + muerte[i], "Captura de la muerte de Gavran", m -> {
                 m.options.hideGui = false;
-                shot(m, "cliente_g48_fin2_" + k);
-                if (k == 2) log("  titulo en pantalla: " + campoGui(m, "title") + " | " + campoGui(m, "subtitle"));
+                shot(m, "cliente_g50_muerte_" + k);
+                if (k == 0 || k == 3) server(m, sp -> gavranCerca(sp).ifPresent(g -> log("  muriendo: " + g.debug())));
             });
         }
-        atTicks(F2 + 860 + 330, "Despues de la pelea", m -> {
-            seguirG = false;
+        atTicks(M + 600, "Despues de su muerte", m -> {
             m.setCameraEntity(m.player);
             server(m, sp -> {
-                var d = com.darkcraft.arbol.TorreArbol.puerta(sp.serverLevel(), hall);
-                log("  tras la pelea: puerta " + (d == null ? "NO ESTA" : "estado " + d.estado()) + " | barrera: "
-                        + sp.serverLevel().getBlockState(new BlockPos(hall[0], hall[2] + 2, hall[1] - 15)) + " | sala cerrada: "
-                        + com.darkcraft.gavran.GavranEventos.salaCerrada(sp.serverLevel(), hall[0], hall[1])
-                        + gavranCerca(sp).map(g -> " | " + g.debug()).orElse(" | gavran no esta"));
-                log("  logros: gavran_guardia=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_GUARDIA)
-                        + " gavran_fase1=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_FASE1)
-                        + " gavran_fase2=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_FASE2)
-                        + " gavran_corazon=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_CORAZON)
-                        + " gavran_juicio=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_JUICIO));
-                long raices = sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Display.BlockDisplay.class,
-                        sp.getBoundingBox().inflate(80), e -> e.getTags().contains(com.darkcraft.gavran.Raices.TAG)).size();
-                long muro = 0;
-                BlockPos c0 = BlockPos.containing(sp.getX(), sp.getY(), sp.getZ());
-                for (BlockPos q : BlockPos.betweenClosed(c0.offset(-45, -3, -45), c0.offset(45, 8, 45)))
-                    if (sp.serverLevel().getBlockState(q).is(com.darkcraft.DarkCraftMod.RAIZ_GAVRAN.get())) muro++;
-                log("  raices que quedan: " + raices + " | bloques de muro que quedan: " + muro);
+                ServerLevel lvl = sp.serverLevel();
+                var s5 = com.darkcraft.gavran.SalaArbol.cerca(lvl, hall[0], hall[1]);
+                BlockPos cofre = BlockPos.containing(s5.aterrizaje());
+                var d = com.darkcraft.arbol.TorreArbol.puerta(lvl, hall);
+                log("  tras la muerte: gavran " + gavranCerca(sp).map(g -> "SIGUE: " + g.debug()).orElse("ya no esta")
+                        + " | estado guardado " + com.darkcraft.rey.ReyEstado.get(lvl.getServer()).get(s5.key())
+                        + " | gano=" + com.darkcraft.rey.ReyEstado.get(lvl.getServer()).gano(s5.key(), sp.getUUID())
+                        + " | puerta " + (d == null ? "NO ESTA" : "estado " + d.estado())
+                        + " | cofre: " + lvl.getBlockState(cofre) + " capitulo " + com.darkcraft.story.StoryEvents.chapterAt(lvl, cofre));
+                log("  logros: gavran_fase2=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_FASE2)
+                        + " gavran=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN));
+                int flores = 0, cerezo = 0, hojas = 0, luces = 0, lucesCopa = 0;
+                int F = hall[2], top = F + com.darkcraft.gen.TreeTower.HALL_H + 14;
+                for (BlockPos q : BlockPos.betweenClosed(new BlockPos(hall[0] - 72, F - 1, hall[1] - 72), new BlockPos(hall[0] + 72, F + 96, hall[1] + 72))) {
+                    var st = lvl.getBlockState(q);
+                    if (st.is(net.minecraft.world.level.block.Blocks.FLOWERING_AZALEA_LEAVES)) flores++;
+                    else if (st.is(net.minecraft.world.level.block.Blocks.CHERRY_LEAVES)) cerezo++;
+                    else if (st.is(net.minecraft.tags.BlockTags.LEAVES)) hojas++;
+                    else if (st.is(net.minecraft.world.level.block.Blocks.LIGHT)) {
+                        if (q.getY() > top) lucesCopa++;
+                        else luces++;
+                    }
+                }
+                log("  el arbol florece: azalea florida " + flores + ", cerezo " + cerezo + ", hojas sin flor " + hojas
+                        + " | luces en la sala " + luces + ", en la copa " + lucesCopa);
             });
         });
-        return F2 + 860 + 350;
+        // ---------------------------------------------------------------- capitulo 5: el cofre, la cinematica con el narrador y el libro
+        atTicks(M + 610, "Al cofre del capitulo 5", m -> server(m, sp -> {
+            var s5 = com.darkcraft.gavran.SalaArbol.cerca(sp.serverLevel(), hall[0], hall[1]);
+            BlockPos cofre = BlockPos.containing(s5.aterrizaje());
+            sp.setGameMode(GameType.SURVIVAL);
+            sp.getInventory().selected = 0;
+            sp.getInventory().items.set(0, ItemStack.EMPTY);
+            sp.teleportTo(sp.serverLevel(), cofre.getX() + 0.5, s5.suelo(sp.serverLevel(), cofre.getX() + 0.5, cofre.getZ() + 2.5), cofre.getZ() + 2.5, 180f, 25f);
+        }));
+        atTicks(M + 618, "Clic derecho en el cofre del capitulo 5", m -> {
+            m.options.hideGui = false;
+            // el cofre sube delante del trono, donde se arrodillo (SalaArbol.aterrizaje)
+            BlockPos cofre = new BlockPos(hall[0], hall[2] + 2, hall[1] - com.darkcraft.gen.TreeTower.HALL_R + 7);
+            var r = m.gameMode.useItemOn(m.player, InteractionHand.MAIN_HAND,
+                    new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(cofre), net.minecraft.core.Direction.SOUTH, cofre, false));
+            log("  clic en el cofre: " + r);
+        });
+        int C5 = M + 618;
+        float t5 = com.darkcraft.cine.Timeline.NARR_START - 0.6f, b5 = com.darkcraft.cine.Timeline.back(5);
+        float[] cortes = new float[7];
+        cortes[0] = t5;
+        for (int g = 0; g < 5; g++) cortes[g + 1] = com.darkcraft.cine.Timeline.cut(5, g);
+        cortes[6] = b5;
+        // titulo, y cada plano (algunos a principio y a final)
+        float[] cap5 = {4.0f, mitad(cortes, 0, 0.5f), mitad(cortes, 1, 0.5f), mitad(cortes, 2, 0.25f), mitad(cortes, 2, 0.85f),
+                mitad(cortes, 3, 0.5f), mitad(cortes, 4, 0.2f), mitad(cortes, 4, 0.9f), mitad(cortes, 5, 0.12f), mitad(cortes, 5, 0.55f),
+                mitad(cortes, 5, 0.95f)};
+        for (int i = 0; i < cap5.length; i++) {
+            final int k = i;
+            atTicks(C5 + Math.round(cap5[i] * 20) + 3, "Captura de la cinematica del capitulo 5", m -> {
+                m.options.hideGui = false;
+                shot(m, String.format("cliente_g%02d_capitulo5_%d", 60 + k, k));
+                log(String.format(java.util.Locale.ROOT, "  capitulo 5 t=%.1f s: activa=%s capitulo=%d voz=%s (audio en el mod %s)", ClientCine.time(),
+                        ClientCine.active(), ClientCine.chapter(), ClientCine.narrationPlaying(), com.darkcraft.cine.Timeline.hasAudio(5)));
+            });
+        }
+        int finCine = C5 + Math.round(com.darkcraft.cine.Timeline.total(5) * 20) + 30;
+        atTicks(finCine, "Captura: el cofre del capitulo 5", m -> {
+            m.options.hideGui = false;
+            shot(m, "cliente_g72_cofre5");
+            StringBuilder b = new StringBuilder("  cofre abierto: " + (m.screen == null ? "NO" : m.screen.getClass().getSimpleName()) + " |");
+            if (m.player.containerMenu instanceof net.minecraft.world.inventory.ChestMenu cm)
+                for (int i = 0; i < 27; i++) {
+                    ItemStack it = cm.getContainer().getItem(i);
+                    if (!it.isEmpty()) b.append(' ').append(i).append('=').append(it.getCount()).append('x')
+                            .append(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(it.getItem()).getPath());
+                }
+            log(b.toString());
+            server(m, sp -> log("  logro capitulo5=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.capitulo(5))
+                    + " | cinematica vista=" + com.darkcraft.story.Story.seenCine(sp, 5)));
+        });
+        atTicks(finCine + 8, "Cerrar el cofre", m -> {
+            m.player.closeContainer();
+            m.setScreen(null);
+        });
+        return finCine + 20;
+    }
+
+    // ------------------------------------------------------------------ el Mandoble del Juramento (parte B3)
+
+    /** El Mandoble del Juramento en la Sala del Arbol ya en flor: a dos manos, energia, Raices del Juramento y Juicio de Espinas. */
+    private static int mandoble(int t0) {
+        final double[] o = new double[3];
+        atTicks(t0, "Mandoble: en la sala, con tres dianas", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                o[0] = hall[0] - 7.5;
+                o[1] = hall[2];
+                o[2] = hall[1] + 28.5;
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.getInventory().clearContent();
+                sp.getInventory().selected = 0;
+                sp.getInventory().items.set(0, new ItemStack(DarkCraftMod.MANDOBLE_JURAMENTO.get()));
+                sp.setHealth(sp.getMaxHealth());
+                sp.getFoodData().setFoodLevel(20);
+                com.darkcraft.armas.Combos.sumar(sp, -com.darkcraft.armas.Combos.MAX);
+                sp.teleportTo(lvl, o[0], o[1], o[2], -90f, 12f);
+                dianas.clear();
+                for (int i = 0; i < 3; i++) {
+                    net.minecraft.world.entity.monster.Husk h = net.minecraft.world.entity.EntityType.HUSK.create(lvl);
+                    if (h == null) continue;
+                    h.moveTo(o[0] + 3.0 + (i == 1 ? 0.7 : 0), o[1], o[2] + (i - 1) * 1.5, 90f, 0f);
+                    h.setYHeadRot(90f);
+                    h.setYBodyRot(90f);
+                    h.setNoAi(true);
+                    h.setPersistenceRequired();
+                    h.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(600);
+                    h.setHealth(600);
+                    h.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+                    lvl.addFreshEntity(h);
+                    dianas.add(h);
+                }
+                log("  mandoble al empezar: " + estadoArmas(sp) + " | suelo " + lvl.getBlockState(BlockPos.containing(o[0], o[1] - 0.5, o[2])));
+            });
+        });
+        atTicks(t0 + 30, "captura: el mandoble en primera persona", m -> shot(m, "cliente_m01_mandoble"));
+        atTicks(t0 + 33, "el mandoble a dos manos, de lado", m -> {
+            m.options.hideGui = true;
+            verDesde(m, new Vec3(o[0] + 2.2, o[1] + 1.9, o[2] - 3.6), new Vec3(o[0] + 0.2, o[1] + 1.1, o[2]));
+        });
+        atTicks(t0 + 38, "captura", m -> shot(m, "cliente_m02_dos_manos"));
+        int t = t0 + 42;
+        atTicks(t, "de vuelta a primera persona", ClientCiTest::enPrimeraPersona);
+        t += 4;
+        for (int i = 0; i < 7; i++) {
+            final int k = i;
+            atTicks(t, "golpe con el mandoble " + (i + 1), m -> golpe(m, k));
+            t += 15;
+        }
+        logArmasAt(t, "tras 7 golpes con el mandoble (deberia haber 77)");
+        atTicks(t + 2, "Con una antorcha en la otra mano: Shift + clic (no debe salir)", m -> {
+            server(m, sp -> sp.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(net.minecraft.world.item.Items.TORCH)));
+        });
+        atTicks(t + 6, "Shift + clic con la otra mano ocupada", m -> combo(m, false));
+        atTicks(t + 10, "captura del aviso de dos manos", m -> shot(m, "cliente_m03_dos_manos_aviso"));
+        logArmasAt(t + 12, "tras pedir las Raices con la otra mano ocupada (sigue en 77)");
+        atTicks(t + 14, "quitar la antorcha", m -> server(m, sp -> sp.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY)));
+        t += 20;
+        atTicks(t, "Shift + clic: Raices del Juramento", m -> {
+            m.options.hideGui = true;
+            verDesde(m, new Vec3(o[0] + 5.0, o[1] + 3.2, o[2] - 8.5), new Vec3(o[0] + 6.5, o[1] + 0.8, o[2]));
+            combo(m, false);
+        });
+        int[] ra = {4, 10, 16, 22};
+        for (int i = 0; i < ra.length; i++) {
+            final int k = i;
+            atTicks(t + ra[i], "captura de las Raices del Juramento", m -> shot(m, "cliente_m04_raices_" + k));
+        }
+        logArmasAt(t + 30, "tras las Raices del Juramento");
+        t += 36;
+        atTicks(t, "de vuelta a primera persona", ClientCiTest::enPrimeraPersona);
+        t += 4;
+        for (int i = 0; i < 6; i++) {
+            final int k = i;
+            atTicks(t, "golpe con el mandoble " + (i + 8), m -> golpe(m, k));
+            t += 15;
+        }
+        logArmasAt(t, "tras 6 golpes mas (deberia haber 100)");
+        t += 4;
+        atTicks(t, "Ctrl + clic: Juicio de Espinas", m -> {
+            m.options.hideGui = true;
+            verDesde(m, new Vec3(o[0] + 3.0, o[1] + 3.6, o[2] - 9.0), new Vec3(o[0] + 1.0, o[1] + 0.9, o[2]));
+            combo(m, true);
+        });
+        int[] es = {6, 12, 16, 22, 30};
+        for (int i = 0; i < es.length; i++) {
+            final int k = i;
+            atTicks(t + es[i], "captura del Juicio de Espinas", m -> shot(m, "cliente_m05_espinas_" + k));
+        }
+        logArmasAt(t + 40, "tras el Juicio de Espinas");
+        t += 46;
+        atTicks(t, "Fin del mandoble: se quitan las dianas", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                log("  mandoble al final: " + estadoArmas(sp));
+                for (net.minecraft.world.entity.LivingEntity d : dianas) d.discard();
+                dianas.clear();
+                sp.getInventory().clearContent();
+                sp.setHealth(sp.getMaxHealth());
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 20;
+    }
+
+    /** Instante a la fraccion f del plano g (cortes: el principio de cada plano y el final del ultimo). */
+    private static float mitad(float[] cortes, int g, float f) {
+        return cortes[g] + (cortes[g + 1] - cortes[g]) * f;
     }
 
     private static void mirarA(net.minecraft.server.level.ServerPlayer sp, Vec3 p) {

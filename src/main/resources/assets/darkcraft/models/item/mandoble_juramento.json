@@ -1,0 +1,15 @@
+{
+  "parent": "item/handheld",
+  "loader": "forge:item_layers",
+  "textures": {
+    "layer0": "darkcraft:item/mandoble_juramento",
+    "layer1": "darkcraft:item/mandoble_juramento_brillo"
+  },
+  "forge_data": {"layers": {"1": {"block_light": 15, "sky_light": 15}}},
+  "display": {
+    "thirdperson_righthand": {"rotation": [0, -90, 55], "translation": [0, 6.5, 0.5], "scale": [1.25, 1.25, 1.25]},
+    "thirdperson_lefthand": {"rotation": [0, 90, -55], "translation": [0, 6.5, 0.5], "scale": [1.25, 1.25, 1.25]},
+    "firstperson_righthand": {"rotation": [0, -90, 25], "translation": [1.13, 4.2, 1.13], "scale": [0.95, 0.95, 0.95]},
+    "firstperson_lefthand": {"rotation": [0, 90, -25], "translation": [1.13, 4.2, 1.13], "scale": [0.95, 0.95, 0.95]}
+  }
+}

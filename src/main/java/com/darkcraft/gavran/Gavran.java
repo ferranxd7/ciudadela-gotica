@@ -490,6 +490,12 @@ public class Gavran extends Monster {
         if (s == null) return;
         // si se quedo marcada una pelea (el mundo se cerro o se descargo a mitad), se arregla: puerta abierta
         ReyEstado est = ReyEstado.get(sl.getServer());
+        // ya cayo (se guardo a mitad de su muerte): no vuelve
+        if (est.get(s.key()) == ReyEstado.MUERTO) {
+            GavranEventos.abrirSala(sl, s);
+            discard();
+            return;
+        }
         if (t % 40 == 0 && est.get(s.key()) == ReyEstado.LUCHA) {
             est.set(s.key(), ReyEstado.DORMIDO);
             GavranEventos.abrirSala(sl, s);
@@ -1639,12 +1645,9 @@ public class Gavran extends Monster {
         if (hp - dmg <= suelo + 0.01f) {
             boolean ok = super.hurt(src, Math.max(0f, hp - suelo - 0.5f));
             setHealth(Math.max(1f, suelo));
-            // fase 1: el arbol despierta; fase 2 (parte B2): se retira a su rama (la muerte con honor llega en B3)
+            // fase 1: el arbol despierta; fase 2: muerte con honor
             if (fase() == 1) empezarCambio(sl);
-            else {
-                finFase2 = true;
-                empezarFin1(sl);
-            }
+            else empezarMuerte(sl);
             return ok;
         }
         boolean ok = super.hurt(src, dmg);
@@ -1696,10 +1699,7 @@ public class Gavran extends Monster {
         if (level() instanceof ServerLevel sl && estado != Estado.MUERTE && estado != Estado.FIN1 && estado != Estado.CAMBIO) {
             setHealth(1f);
             if (fase() == 1) empezarCambio(sl);
-            else {
-                finFase2 = true;
-                empezarFin1(sl);
-            }
+            else empezarMuerte(sl);
         }
     }
 
@@ -1886,46 +1886,129 @@ public class Gavran extends Monster {
         }
     }
 
-    // ------------------------------------------------------------------ muerte con honor (el final completo llega en B3)
+    // ------------------------------------------------------------------ muerte con honor (parte B3)
+
+    /** Lo que dura la cinematica de su muerte (ticks) y cuando pasa cada cosa. */
+    public static final int MUERTE_TICKS = 560;
+    private static final int M_FRASE17 = 24, M_FRASE18 = 132, M_HOJAS = 278, M_FLORECE = 300, M_COFRE = 410, M_FIN = 560;
 
     private void empezarMuerte(ServerLevel sl) {
+        if (estado == Estado.MUERTE) return;
+        SalaArbol s = sala();
         atq = null;
+        contra = false;
+        saltoIni = -1;
+        atrapado = null;
         raices.limpiar();
         quitarEscuderos(sl);
         setNoGravity(false);
         this.noPhysics = false;
         getNavigation().stop();
+        // delante del trono, de cara a la sala (donde se arrodilla y donde aparecera el cofre)
+        Vec3 c = s != null ? s.aterrizaje() : position();
+        moveTo(c.x, c.y, c.z, 0f, 0f);
+        setYRot(0f);
+        setYBodyRot(0f);
+        setYHeadRot(0f);
+        setDeltaMovement(Vec3.ZERO);
         setPose(POSE_PIE);
         anim(GavranAnims.MUERTE);
+        setFlag(F_LUCHA, false);
+        setFlag(F_CAMBIO, false);
         cambiar(Estado.MUERTE);
         barra.setVisible(false);
         quitarBarra();
+        List<ServerPlayer> v = vivos(sl);
+        List<UUID> todos = new ArrayList<>(jugadores);
+        // ha aguantado la segunda fase (el logro de la pelea entera llega cuando sube el cofre)
+        for (ServerPlayer p : v) Logros.dar(p, Logros.GAVRAN_FASE2);
+        if (s != null) {
+            ReyEstado.get(sl.getServer()).ganadores(s.key(), todos);
+            List<Shot> planos = muertePlanos(s);
+            for (Shot sh : planos) s.despejarVista(sl, sh.pos, sh.look);
+            for (ServerPlayer p : v) {
+                if (p.position().distanceTo(c) < 6) {
+                    Vec3 q = c.add(0, 0, 9);
+                    p.teleportTo(sl, q.x, s.suelo(sl, q.x, q.z), q.z, 180f, 0f);
+                }
+                Cinematics.playShots(p, Cinematics.GAVRAN_MUERTE, planos, MUERTE_TICKS / 20f);
+            }
+        }
+        DarkCraftMod.LOGGER.info("[DarkCraft] Ser Gavran cae con honor ({} jugadores)", todos.size());
     }
 
     private void muerte(ServerLevel sl) {
+        SalaArbol s = sala();
+        getNavigation().stop();
         getMoveControl().setWantedPosition(getX(), getY(), getZ(), 0);
-        if (t == 30) habla(sl, 17);
-        if (t == 136) habla(sl, 18);
-        if (t == 250) {
+        setDeltaMovement(0, getDeltaMovement().y, 0);
+        if (t == M_FRASE17) habla(sl, 17);
+        if (t == M_FRASE18) habla(sl, 18);
+        // se deshace en hojas que suben en remolino
+        if (t == M_HOJAS) {
             setFlag(F_HOJAS, true);
-            sonido(sl, DarkCraftMod.SFX_HOJAS_DISOLVER.get(), 2.0f, 1.0f);
+            sonido(sl, DarkCraftMod.SFX_HOJAS_DISOLVER.get(), 2.2f, 1.0f);
         }
-        if (t >= 250 && t <= 300 && t % 2 == 0) {
-            sl.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.AZALEA_LEAVES.defaultBlockState()),
-                    getX(), getY() + 2.5, getZ(), 30, 1.0, 1.6, 1.0, 0.05);
-            sl.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.FLOWERING_AZALEA_LEAVES.defaultBlockState()),
-                    getX(), getY() + 2.5, getZ(), 12, 1.0, 1.6, 1.0, 0.05);
-            sl.sendParticles(Raices.VERDE, getX(), getY() + 2.5, getZ(), 10, 1.0, 1.6, 1.0, 0);
+        if (t >= M_HOJAS && t <= M_HOJAS + 56 && t % 2 == 0) {
+            double k = (t - M_HOJAS) / 56.0;
+            for (int i = 0; i < 3; i++) {
+                double a = t * 0.35 + i * 2.1, r = 1.2 + k * 2.0;
+                sl.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, (i == 0 ? Blocks.FLOWERING_AZALEA_LEAVES : Blocks.AZALEA_LEAVES).defaultBlockState()),
+                        getX() + Math.cos(a) * r, getY() + 0.8 + k * 6, getZ() + Math.sin(a) * r, 8, 0.4, 0.6, 0.4, 0.04);
+            }
+            sl.sendParticles(ParticleTypes.CHERRY_LEAVES, getX(), getY() + 3, getZ(), 6, 1.2, 1.8, 1.2, 0.02);
+            sl.sendParticles(ParticleTypes.GLOW, getX(), getY() + 3, getZ(), 4, 1.0, 1.8, 1.0, 0.02);
         }
-        if (t == 305) {
-            SalaArbol s = sala();
-            DarkCraftMod.LOGGER.info("[DarkCraft] Ser Gavran cae (parte B1: sin recompensas todavia)");
+        // el arbol florece y se ilumina
+        if (t == M_FLORECE && s != null) {
+            sonido(sl, DarkCraftMod.SFX_FLORECER.get(), 3.0f, 1.0f);
+            s.florecer(sl);
+        }
+        if (s != null && t >= M_FLORECE && t < M_FIN && t % 3 == 0)
+            for (int i = 0; i < 5; i++) {
+                double r = SalaArbol.R_TRONCO + random.nextDouble() * (SalaArbol.R_MURO - SalaArbol.R_TRONCO);
+                Vec3 p = s.enAnillo(random.nextDouble() * Math.PI * 2, r, s.F() + 16 + random.nextDouble() * 8);
+                sl.sendParticles(ParticleTypes.CHERRY_LEAVES, p.x, p.y, p.z, 3, 2.0, 1.0, 2.0, 0.01);
+                if (i == 0) sl.sendParticles(ParticleTypes.END_ROD, p.x, p.y, p.z, 1, 1.5, 1.0, 1.5, 0.01);
+            }
+        // a sus pies, el cofre del capitulo 5 sube en un haz de luz
+        if (t == M_COFRE && s != null) {
+            VictoriaGavran.cofre(sl, s, BlockPos.containing(s.aterrizaje()));
+            // desde aqui ya no hay vuelta atras: si el mundo se cierra ahora, sigue muerto (y la puerta se abre)
+            ReyEstado.get(sl.getServer()).set(s.key(), ReyEstado.MUERTO);
+        }
+        if (t == M_COFRE + 30)
+            for (UUID u : jugadores) {
+                ServerPlayer p = sl.getServer().getPlayerList().getPlayer(u);
+                if (p != null) Logros.dar(p, Logros.GAVRAN);
+            }
+        if (t >= M_FIN) {
             if (s != null) {
-                ReyEstado.get(sl.getServer()).set(s.key(), ReyEstado.DORMIDO);
+                ReyEstado.get(sl.getServer()).set(s.key(), ReyEstado.MUERTO);
                 GavranEventos.abrirSala(sl, s);
             }
+            DarkCraftMod.LOGGER.info("[DarkCraft] Ser Gavran ya descansa: el arbol ha florecido");
             discard();
         }
+    }
+
+    /** Planos de su muerte, alrededor del sitio delante del trono (donde se arrodilla). */
+    public static List<Shot> muertePlanos(SalaArbol s) {
+        Vec3 g = s.aterrizaje();
+        double x = g.x, y = g.y, z = g.z;
+        List<Shot> l = new ArrayList<>();
+        // cae de rodillas y clava el mandoble: "Bien luchado... el juramento se ha roto... por fin"
+        l.add(new Shot(0f, 6.4f, 56, 0, 1, p(x + 5.0, y + 2.2, z + 7.5, x + 3.6, y + 1.8, z + 6.0), p(x, y + 2.4, z, x, y + 2.0, z)));
+        // de cerca, la cabeza gacha: "Corvin, amigo mio..."
+        l.add(new Shot(6.4f, 13.9f, 46, 0, 1, p(x - 2.6, y + 3.2, z + 5.2, x - 2.0, y + 3.0, z + 4.4), p(x, y + 3.0, z, x, y + 2.9, z)));
+        // se deshace en hojas
+        l.add(new Shot(13.9f, 16.6f, 60, 0, 1, p(x + 1.0, y + 2.6, z + 8.8, x + 0.6, y + 3.6, z + 8.0), p(x, y + 2.8, z, x, y + 4.8, z)));
+        // el arbol florece y se ilumina: la camara sube desde el suelo hasta la copa
+        l.add(new Shot(16.6f, 21.6f, 72, 0, 0, p(x + 12, y + 3, z + 12, x + 10, y + 10, z + 10, x + 8, y + 17, z + 8),
+                p(x, y + 3, z + 1, x + 1, y + 11, z - 1, x + 2, y + 19, z - 3)));
+        // a sus pies, el cofre sube en un haz de luz
+        l.add(new Shot(21.6f, MUERTE_TICKS / 20f - 0.6f, 58, 0, 2, p(x + 3.2, y + 2.4, z + 6.4, x + 2.2, y + 1.9, z + 4.8), p(x, y + 0.8, z, x, y + 0.6, z)));
+        return l;
     }
 
     // ------------------------------------------------------------------ volver a empezar
@@ -2008,8 +2091,7 @@ public class Gavran extends Monster {
             empezarCambio(sl);
         } else {
             setHealth(1f);
-            finFase2 = true;
-            empezarFin1(sl);
+            empezarMuerte(sl);
         }
         return true;
     }

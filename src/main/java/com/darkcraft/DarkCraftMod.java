@@ -52,6 +52,7 @@ public class DarkCraftMod {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, MODID);
     public static final RegistryObject<SoundEvent> CAMPANA = sound("campana");
     public static final RegistryObject<SoundEvent> NARRACION_1 = sound("narracion.cap1");
+    public static final RegistryObject<SoundEvent> NARRACION_5 = sound("narracion.cap5");
     public static final RegistryObject<SoundEvent> MUSICA_COFRE = sound("musica.cofre");
     public static final RegistryObject<SoundEvent> MUSICA_REY_1 = sound("musica.rey1");
     public static final RegistryObject<SoundEvent> MUSICA_REY_2 = sound("musica.rey2");
@@ -130,6 +131,10 @@ public class DarkCraftMod {
             () -> new com.darkcraft.armas.EspadaRey(true, new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> ESPADA_SINIESTRA = ITEMS.register("espada_siniestra",
             () -> new com.darkcraft.armas.EspadaRey(false, new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
+    public static final RegistryObject<Item> MANDOBLE_JURAMENTO = ITEMS.register("mandoble_juramento",
+            () -> new com.darkcraft.armas.MandobleJuramento(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
+    public static final RegistryObject<Item> LLAVE_HUESO = ITEMS.register("llave_hueso",
+            () -> new com.darkcraft.armas.LlaveHueso(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> LLAVE_ARBOL = ITEMS.register("llave_arbol",
             () -> new com.darkcraft.armas.LlaveArbol(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
 
@@ -174,6 +179,7 @@ public class DarkCraftMod {
         MinecraftForge.EVENT_BUS.register(com.darkcraft.rey.Volcan.class);
         MinecraftForge.EVENT_BUS.register(com.darkcraft.arbol.TorreArbol.class);
         MinecraftForge.EVENT_BUS.register(com.darkcraft.armas.Combos.class);
+        MinecraftForge.EVENT_BUS.register(com.darkcraft.armas.EfectosRaiz.class);
         MinecraftForge.EVENT_BUS.register(com.darkcraft.gavran.GavranEventos.class);
     }
 
@@ -190,8 +196,10 @@ public class DarkCraftMod {
         if (e.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             e.accept(MAPA);
             e.accept(LLAVE_ARBOL);
+            e.accept(LLAVE_HUESO);
         }
         if (e.getTabKey() == CreativeModeTabs.COMBAT) {
+            e.accept(MANDOBLE_JURAMENTO);
             e.accept(ESPADA_DIESTRA);
             e.accept(ESPADA_SINIESTRA);
         }

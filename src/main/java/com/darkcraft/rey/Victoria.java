@@ -62,6 +62,11 @@ public final class Victoria {
 
     private static final List<Luego> LUEGO = new ArrayList<>();
 
+    /** Ticks que lleva contados (para saber si algo programado ya ha pasado). */
+    public static int ahora() {
+        return tick;
+    }
+
     public static void despues(int ticks, Runnable r) {
         LUEGO.add(new Luego(tick + ticks, r));
     }

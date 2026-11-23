@@ -50,8 +50,23 @@ public final class GavranEventos {
         if (s == null) return;
         ReyEstado est = ReyEstado.get(ow.getServer());
         int st = est.get(s.key());
-        if (st == ReyEstado.MUERTO) return;
         BlockPos centro = new BlockPos(s.cx(), s.F(), s.cz() - 20);
+        if (st == ReyEstado.MUERTO) {
+            // ya cayo: que no quede ninguno (guardado a mitad de su muerte) y que la puerta no se quede sellada
+            if (!ow.isPositionEntityTicking(centro)) return;
+            boolean muriendo = false;
+            for (Gavran g : ow.getEntitiesOfClass(Gavran.class, s.caja()))
+                if (g.estado() != Gavran.Estado.MUERTE) g.discard();
+                else muriendo = true;
+            abrirSala(ow, s);
+            // y que este el cofre del capitulo 5 (por si el mundo se cerro mientras subia)
+            BlockPos cofre = BlockPos.containing(s.aterrizaje());
+            if (!muriendo && !VictoriaGavran.subiendo() && ow.isLoaded(cofre) && com.darkcraft.story.StoryEvents.chapterAt(ow, cofre) != 5) {
+                com.darkcraft.story.StoryEvents.placeChapter(ow, 5, cofre, net.minecraft.core.Direction.SOUTH);
+                DarkCraftMod.LOGGER.info("[DarkCraft] Faltaba el cofre del capitulo 5: puesto en {}", cofre);
+            }
+            return;
+        }
         if (!ow.isPositionEntityTicking(centro)) return;
         List<Gavran> gs = ow.getEntitiesOfClass(Gavran.class, s.caja());
         for (int i = 1; i < gs.size(); i++) gs.get(i).discard();

@@ -1,6 +1,8 @@
 package com.darkcraft.cine;
 
 import com.darkcraft.DarkCraftMod;
+import com.darkcraft.gavran.SalaArbol;
+import com.darkcraft.gavran.VictoriaGavran;
 import com.darkcraft.gen.CastlePlan;
 import com.darkcraft.net.Net;
 import com.darkcraft.story.Story;
@@ -27,7 +29,8 @@ import java.util.*;
 /**
  * Lado servidor de las cinematicas: congela al jugador (no puede moverse ni recibir dano), lo lleva
  * de un plano a otro en el capitulo 1 (para que le lleguen los chunks de cada sitio) y al acabar lo
- * devuelve donde estaba y le abre el cofre.
+ * devuelve donde estaba y le abre el cofre. Los planos del capitulo 5 estan todos en la Sala del Arbol y
+ * sus alrededores: ahi no se le mueve.
  */
 public final class Cinematics {
     private Cinematics() {}
@@ -48,7 +51,7 @@ public final class Cinematics {
     }
 
     /** Cinematicas de jefes (no son capitulos): los planos los manda quien la empieza. */
-    public static final int REY_VOLCAN = 30, SELLO = 31, REY_INTRO = 32, GAVRAN_INTRO = 33, GAVRAN_CAMBIO = 34;
+    public static final int REY_VOLCAN = 30, SELLO = 31, REY_INTRO = 32, GAVRAN_INTRO = 33, GAVRAN_CAMBIO = 34, GAVRAN_MUERTE = 35;
 
     /** Cinematica con planos dados, sin mover al jugador (los planos estan cerca de donde esta). */
     public static void playShots(ServerPlayer p, int id, List<Shot> shots, float total) {
@@ -78,7 +81,11 @@ public final class Cinematics {
                 if (p != opener && !active(p) && !p.isSpectator() && p.distanceToSqr(opener) <= 100 * 100) who.add(p);
         CastlePlan plan = chapter == 1 ? Story.planNear(lvl, opener.getBlockX(), opener.getBlockZ()) : null;
         double[] bolts = plan != null ? CineShots.bolts1(plan.cine(), lvl.getGameTime()) : new double[0];
-        boolean preloaded = false;
+        // capitulo 5: en la Sala del Arbol (si se esta en ella), con la llave de hueso flotando sobre el cofre
+        SalaArbol sala = chapter == 5 ? SalaArbol.cerca(lvl, opener.getX(), opener.getZ()) : null;
+        if (sala != null && (sala.dist(opener.getX(), opener.getZ()) > 80 || Math.abs(opener.getY() - sala.F()) > 40)) sala = null;
+        if (sala != null) VictoriaGavran.llaveFlotante(lvl, sala, Math.round(Timeline.total(5) * 20) + 20);
+        boolean preloaded = false, despejado = false;
         for (ServerPlayer p : who) {
             Session s = new Session();
             s.chapter = chapter;
@@ -118,6 +125,13 @@ public final class Cinematics {
                 p.onUpdateAbilities();
                 p.setInvisible(true);
                 s.moved = true;
+            } else if (sala != null) {
+                s.shots = CineShots.chapter5(sala, lvl, p.getEyePosition(), p.getYRot());
+                if (!despejado) {
+                    // que no tapen las lianas en los planos de dentro de la sala
+                    for (int k = 0; k < 2; k++) sala.despejarVista(lvl, s.shots.get(k).pos, s.shots.get(k).look);
+                    despejado = true;
+                }
             }
             ACTIVE.put(p.getUUID(), s);
             Net.to(p, new Net.CineStart(chapter, s.shots, bolts));

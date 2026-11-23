@@ -202,16 +202,16 @@ public final class ClientCine {
             bellDone[i] = true;
             mc.getSoundManager().play(SimpleSoundInstance.forUI(DarkCraftMod.CAMPANA.get(), 1.0f, 1.0f - i * 0.15f));
         }
-        // la voz del narrador (capitulo 1)
-        if (chapter == 1 && !narrStarted && t >= Timeline.NARR_START) {
+        // la voz del narrador (capitulos 1 y 5)
+        if (Timeline.narrated(chapter) && !narrStarted && t >= Timeline.NARR_START) {
             narrStarted = true;
             // en la categoria general (MASTER): suena aunque la barra de "Voz" este bajada
-            ResourceLocation loc = DarkCraftMod.NARRACION_1.get().getLocation();
+            ResourceLocation loc = (chapter == 5 ? DarkCraftMod.NARRACION_5 : DarkCraftMod.NARRACION_1).get().getLocation();
             narr = new SimpleSoundInstance(loc, SoundSource.MASTER, 1.0f, 1.0f,
                     SoundInstance.createUnseededRandom(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true);
             mc.getSoundManager().play(narr);
-            DarkCraftMod.LOGGER.info("[DarkCraft] Narracion del capitulo 1: {} (audio en el mod: {}, volumen general {})",
-                    mc.getSoundManager().getSoundEvent(loc) != null ? "reproduciendo" : "NO ENCONTRADA", Timeline.hasAudio(),
+            DarkCraftMod.LOGGER.info("[DarkCraft] Narracion del capitulo {}: {} (audio en el mod: {}, volumen general {})", chapter,
+                    mc.getSoundManager().getSoundEvent(loc) != null ? "reproduciendo" : "NO ENCONTRADA", Timeline.hasAudio(chapter),
                     mc.options.getSoundSourceVolume(SoundSource.MASTER));
         }
         // rayos programados por el servidor
@@ -325,7 +325,8 @@ public final class ClientCine {
 
     @SubscribeEvent
     public static void onPlayerRender(RenderPlayerEvent.Pre e) {
-        if (active && camOn) e.setCanceled(true);
+        // en el capitulo 5 si se ve a los jugadores: el ultimo plano es el suyo
+        if (active && camOn && chapter != 5) e.setCanceled(true);
     }
 
     @SubscribeEvent
@@ -396,7 +397,7 @@ public final class ClientCine {
         if (!active || !e.usedConfiguredFov()) return;
         float t = time((float) e.getPartialTick());
         if (camOn && camShot >= 0 && camShot < shots.size()) e.setFOV(shots.get(camShot).fov);
-        else if (chapter != 1) e.setFOV(e.getFOV() * (1.0 - 0.12 * smooth(t / total)));
+        else if (!Timeline.narrated(chapter)) e.setFOV(e.getFOV() * (1.0 - 0.12 * smooth(t / total)));
     }
 
     // ------------------------------------------------------------------ dibujo
@@ -429,12 +430,12 @@ public final class ClientCine {
         Minecraft mc = Minecraft.getInstance();
         Font font = mc.font;
         float t = time(pt);
-        boolean ch1 = chapter == 1;
+        boolean ch1 = Timeline.narrated(chapter);
         float in = smooth(t / 0.8f), out = 1 - smooth((t - (total - 0.8f)) / 0.8f);
         float frame = Math.min(in, out);
         // mundo mas oscuro y vineta
         // (en las de Ser Gavran, menos: armadura negra en una sala oscura)
-        if (!ch1) g.fill(0, 0, w, h, argb((chapter == 33 || chapter == 34 ? 0.1f : 0.32f) * frame, 8, 0, 0));
+        if (!ch1) g.fill(0, 0, w, h, argb((chapter >= 33 && chapter <= 35 ? 0.1f : 0.32f) * frame, 8, 0, 0));
         else if (t < Timeline.NARR_START + 0.5f) g.fill(0, 0, w, h, argb(0.3f * Math.min(in, 1 - smooth((t - Timeline.OUT) / 1.0f)), 8, 0, 0));
         vignette(g, w, h, (ch1 ? 0.7f : 0.9f) * frame);
         // brasas que suben
@@ -442,7 +443,7 @@ public final class ClientCine {
         if (visible(emb)) embers(g, w, h, t, emb);
         // el titulo
         if (chapter < 30) drawTitle(g, font, w, h, t);
-        else if (chapter >= 30 && chapter <= 34) bossTitle(g, font, w, h, t);
+        else if (chapter >= 30 && chapter <= 35) bossTitle(g, font, w, h, t);
         // fundidos a negro (cortes de plano y vuelta al jugador)
         float black = black(t);
         if (visible(black)) g.fill(0, 0, w, h, argb(black, 0, 0, 0));
@@ -614,7 +615,7 @@ public final class ClientCine {
         pose.translate(w / 2f, h * 0.68f, 0);
         pose.scale(S, S, 1);
         int al = Math.round(a * 255);
-        boolean verde = chapter == 33 || chapter == 34;
+        boolean verde = chapter >= 33 && chapter <= 35;
         g.drawCenteredString(font, name, 1, 1, (al << 24) | (verde ? 0x002010 : 0x200000));
         g.drawCenteredString(font, name, 0, 0, (al << 24) | (verde ? 0x5FE07A : 0xE0401A));
         pose.popPose();
@@ -639,14 +640,14 @@ public final class ClientCine {
             else if (t >= back) a = Math.max(a, 1 - smooth((t - back) / 0.45f));
             return a;
         }
-        if (chapter != 1 || shots.isEmpty()) return 0;
+        if (!Timeline.narrated(chapter) || shots.isEmpty()) return 0;
         float a = 0;
         for (int i = 1; i < shots.size(); i++) {
             float tc = shots.get(i).t0;
             if (t >= tc - 0.5f && t < tc) a = Math.max(a, smooth(1 - (tc - t) / 0.5f));
             else if (t >= tc && t < tc + 1.0f) a = Math.max(a, 1 - smooth((t - tc) / 1.0f));
         }
-        float back = Timeline.back(1);
+        float back = Timeline.back(chapter);
         if (t >= back - 0.8f && t < back) a = Math.max(a, smooth(1 - (back - t) / 0.8f));
         else if (t >= back && t < total - 0.8f) a = 1;
         else if (t >= total - 0.8f) a = Math.max(a, 1 - smooth((t - (total - 0.8f)) / 0.8f));
@@ -654,14 +655,14 @@ public final class ClientCine {
     }
 
     private static void subtitles(GuiGraphics g, Font font, int w, int h, float t, int bh) {
-        float[][] lines = Timeline.lines();
+        float[][] lines = Timeline.lines(chapter);
         float n = t - Timeline.NARR_START;
         for (int i = 0; i < lines.length; i++) {
             float s = lines[i][0] - 0.15f, e = lines[i][1] + 0.5f;
             if (n < s || n > e) continue;
             float a = Math.min(clamp((n - s) / 0.25f), clamp((e - n) / 0.3f));
             if (!visible(a)) continue;
-            Component line = Component.translatable("darkcraft.narracion.1." + (i + 1));
+            Component line = Component.translatable("darkcraft.narracion." + chapter + "." + (i + 1));
             List<FormattedCharSequence> parts = font.split(line, (int) (w * 0.8f));
             int lh = 10, y0 = h - Math.max(bh, 24) / 2 - parts.size() * lh / 2 + 1;
             for (int k = 0; k < parts.size(); k++) {

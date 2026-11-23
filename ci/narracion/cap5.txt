@@ -1,0 +1,11 @@
+Sir Gavran has fallen. His oath is broken... and with it, the chain that bound the Shadow to these stones.|1.2
+Thank you. For a hundred years, no one has read my words.|0.8
+I can feel the ink slipping from my fingers. I think, at last, I may rest.|1.6
+But listen well. The Shadow does not live here. This kingdom was only its door.|0.8
+It waits much farther away... where the storm is born.|1.6
+Gavran kept a key that is not made of iron, but of bone.|0.7
+Use it, and it will show you the way to fortresses that float beyond the clouds.|1.2
+Beyond them, they say, rises a mountain that touches the stars... where the bonfires of the fallen burn.|1.6
+I cannot walk with you any longer. What comes next is yours.|0.8
+Search. Fight. Fall... and rise again. No one else will write your story.|1.6
+Here ends the chronicle of Valdrenn. May your steel never dull... and your fire never fade.|0.0

@@ -76,19 +76,22 @@ public final class ClientMusic {
     private static Track story;
     private static int storyTicks, idleTicks;
     private static boolean storyNarrated, storyCine;
+    private static int storyChapter = 1;
 
     /** Al abrir un cofre de la cronica (empieza la cinematica). */
     public static void storyStart(int chapter) {
         Minecraft mc = Minecraft.getInstance();
         if (story != null && !story.dying() && mc.getSoundManager().isActive(story)) {
             storyCine = true;
-            storyNarrated = chapter == 1;
+            storyNarrated = Timeline.narrated(chapter);
+            storyChapter = chapter;
             return;
         }
         story = new Track(DarkCraftMod.MUSICA_COFRE.get(), "cofre", false);
         storyTicks = 0;
         idleTicks = 0;
-        storyNarrated = chapter == 1;
+        storyNarrated = Timeline.narrated(chapter);
+        storyChapter = chapter;
         storyCine = true;
         mc.getSoundManager().play(story);
         story.fadeTo(storyNarrated ? 0.75f : 0.9f, 6.0f);
@@ -156,7 +159,7 @@ public final class ClientMusic {
                         // mas baja mientras habla el narrador
                         float n = ClientCine.time() - Timeline.NARR_START;
                         boolean speaking = false;
-                        for (float[] l : Timeline.lines()) if (n >= l[0] - 0.4f && n <= l[1] + 0.2f) speaking = true;
+                        for (float[] l : Timeline.lines(storyChapter)) if (n >= l[0] - 0.4f && n <= l[1] + 0.2f) speaking = true;
                         float want = n < -1.5f ? 0.8f : (speaking ? 0.5f : 0.75f);
                         if (Math.abs(want - story.target) > 0.01f && storyTicks > 140) story.fadeTo(want, 0.8f);
                     }

@@ -19,6 +19,16 @@
       }
     ]
   },
+  "narracion.cap5": {
+    "subtitle": "subtitles.darkcraft.narracion",
+    "sounds": [
+      {
+        "name": "darkcraft:narracion/cap5",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
   "musica.cofre": {
     "sounds": [
       {

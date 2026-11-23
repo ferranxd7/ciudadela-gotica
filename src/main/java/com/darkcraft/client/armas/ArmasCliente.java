@@ -35,7 +35,7 @@ public final class ArmasCliente {
     public static void onAttack(InputEvent.InteractionKeyMappingTriggered e) {
         if (!e.isAttack()) return;
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || !EspadaRey.es(mc.player.getMainHandItem())) return;
+        if (mc.player == null || !(EspadaRey.es(mc.player.getMainHandItem()) || com.darkcraft.armas.MandobleJuramento.es(mc.player.getMainHandItem()))) return;
         boolean shift = mc.options.keyShift.isDown();
         boolean ctrl = mc.options.keySprint.isDown() || Screen.hasControlDown();
         if (!shift && !ctrl) return;
@@ -61,7 +61,8 @@ public final class ArmasCliente {
         Minecraft mc = Minecraft.getInstance();
         if (aviso > 0 && mc.player != null && mc.player.tickCount % 2 == 0) aviso--;
         if (mc.player == null || mc.options.hideGui || mc.player.isSpectator()) return;
-        boolean lleva = EspadaRey.es(mc.player.getMainHandItem()) || EspadaRey.es(mc.player.getOffhandItem());
+        boolean lleva = EspadaRey.es(mc.player.getMainHandItem()) || EspadaRey.es(mc.player.getOffhandItem())
+                || com.darkcraft.armas.MandobleJuramento.es(mc.player.getMainHandItem());
         if (!lleva) return;
         vista += Mth.clamp(energia - vista, -2, 2);
         // una espada en pixeles a la derecha de la barra de objetos: su canal se llena de fuego con la energia

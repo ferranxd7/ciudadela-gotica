@@ -31,11 +31,26 @@ con una escalera de caracol, y un puente que entra en la isla.
 Comandos para probarlo (con trucos): `/darkcraft rey ir` (te lleva al salón del trono),
 `/darkcraft rey estado`, `/darkcraft rey reiniciar`, `/darkcraft rey fase 2` (o `3`), `/darkcraft rey matar`.
 
+## Ser Gavran (jefe de la Sala del Árbol)
+- Espera en una rama del Árbol de la Corona, en lo alto de la torre-árbol. La Llave del Árbol abre la puerta de su
+  sala; al entrar se cierra, baja de un salto y te habla.
+- Dos fases: en la segunda el árbol despierta (raíces que atrapan, hojas cortantes, raíces por todo el suelo: sube a
+  la tarima o a los balcones). En el **Juicio de las espinas** solo te salvas escondido detrás de un muro de corteza.
+  Su punto débil es el **corazón del árbol** que le brilla en el pecho.
+- Al caer se arrodilla, se deshace en hojas, el árbol florece y sube el cofre del capítulo 5 (el final de la
+  crónica), con el **Mandoble del Juramento** y la **Llave de Hueso**.
+- Mandoble del Juramento: a dos manos (con la otra mano libre). **Shift + clic izquierdo**: Raíces del Juramento.
+  **Ctrl + clic izquierdo**: Juicio de Espinas. Usa la misma energía que las espadas del Rey.
+
+Comandos para probarlo (con trucos): `/darkcraft gavran ir`, `/darkcraft gavran estado`, `/darkcraft gavran reiniciar`,
+`/darkcraft gavran fase 2`, `/darkcraft gavran matar`.
+
 ## Fases
 1. ✅ Isla + castillo + generación en el mundo
 2. Mobs propios por salas
 3. ✅ Jefe: el Rey Corvin + botín + armas
-4. Calavera, fortalezas del cielo y nueva dimensión con hogueras
+4. ✅ Jefe: Ser Gavran + Mandoble del Juramento + final de la crónica (capítulo 5)
+5. Calavera, fortalezas del cielo y nueva dimensión con hogueras
 
 ## Créditos de la música
 Toda la música tiene licencia libre y se descarga de OpenGameArt al compilar (los detalles completos

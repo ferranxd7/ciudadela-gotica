@@ -77,6 +77,7 @@ public final class StoryEvents {
                 if (site != null) items.set(11, Story.map(site[0], site[1]));
             }
             if (ch == 3) com.darkcraft.rey.Recompensa.llenar(sp, (ServerLevel) lvl, pos, items);
+            if (ch == 5) com.darkcraft.gavran.VictoriaGavran.llenar(sp, (ServerLevel) lvl, pos, items);
             data.setItems(pos, sp.getUUID(), ContainerHelper.saveAllItems(new CompoundTag(), items));
             Story.markRead(sp, ch);
         }

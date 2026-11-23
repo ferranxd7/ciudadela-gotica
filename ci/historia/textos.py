@@ -231,6 +231,17 @@ GAVRAN_UI = {
   "darkcraft.rey.subtitulo.33": "El Caballero Jurado",
   "darkcraft.rey.titulo.34": "SER GAVRAN",
   "darkcraft.rey.subtitulo.34": "Corazón del Árbol",
+  "item.darkcraft.mandoble_juramento": "Mandoble del Juramento",
+  "item.darkcraft.mandoble_juramento.lore": "La espada de Ser Gavran: raíces y espinas que aún recuerdan su juramento",
+  "item.darkcraft.mandoble_juramento.combo1": "Shift + clic izquierdo: Raíces del Juramento (35 de energía)",
+  "item.darkcraft.mandoble_juramento.combo2": "Ctrl + clic izquierdo: Juicio de Espinas (80 de energía)",
+  "item.darkcraft.mandoble_juramento.dos": "A dos manos: con algo en la otra mano pega mucho menos",
+  "darkcraft.mandoble.dos_manos": "El Mandoble del Juramento se empuña con las dos manos (vacía la otra mano)",
+  "item.darkcraft.llave_hueso": "Llave de Hueso",
+  "item.darkcraft.llave_hueso.lore": "Te mostrará el camino a las fortalezas que flotan más allá de las nubes",
+  "item.darkcraft.llave_hueso.aun_no": "La llave tiembla en tu mano... pero su camino aún no se ha abierto (llegará en una próxima parte)",
+  "darkcraft.rey.titulo.35": "JURAMENTO CUMPLIDO",
+  "darkcraft.rey.subtitulo.35": "Ser Gavran descansa en el Árbol de la Corona",
   "darkcraft.gavran.continuara2": "Ser Gavran resiste en su rama",
   "darkcraft.gavran.continuara2.aviso": "Su muerte con honor llegará en la próxima parte del mod. Sal de la sala y vuelve a entrar para repetir el duelo.",
   "darkcraft.gavran.escudero": "Escudero del Juramento",
@@ -270,6 +281,17 @@ GAVRAN_UI = {
   "darkcraft.rey.subtitulo.33": "The Sworn Knight",
   "darkcraft.rey.titulo.34": "SER GAVRAN",
   "darkcraft.rey.subtitulo.34": "Heart of the Tree",
+  "item.darkcraft.mandoble_juramento": "Greatsword of the Oath",
+  "item.darkcraft.mandoble_juramento.lore": "Ser Gavran's blade: roots and thorns that still remember his oath",
+  "item.darkcraft.mandoble_juramento.combo1": "Shift + left click: Roots of the Oath (35 energy)",
+  "item.darkcraft.mandoble_juramento.combo2": "Ctrl + left click: Judgment of Thorns (80 energy)",
+  "item.darkcraft.mandoble_juramento.dos": "Two-handed: with something in your other hand it hits much weaker",
+  "darkcraft.mandoble.dos_manos": "The Greatsword of the Oath needs both hands (empty your other hand)",
+  "item.darkcraft.llave_hueso": "Bone Key",
+  "item.darkcraft.llave_hueso.lore": "It will show you the way to the fortresses that float beyond the clouds",
+  "item.darkcraft.llave_hueso.aun_no": "The key trembles in your hand... but its path has not opened yet (coming in a future part)",
+  "darkcraft.rey.titulo.35": "OATH FULFILLED",
+  "darkcraft.rey.subtitulo.35": "Ser Gavran rests in the Crown Tree",
   "darkcraft.gavran.continuara2": "Ser Gavran holds on to his branch",
   "darkcraft.gavran.continuara2.aviso": "His honourable death arrives in the next part of the mod. Leave the hall and come back in to fight the duel again.",
   "darkcraft.gavran.escudero": "Squire of the Oath",
@@ -417,6 +439,33 @@ REY_UI = {
 
 # pausa (s) despues de cada linea: las largas son los cortes de plano
 PAUSAS = [0.8, 1.6, 0.8, 0.7, 1.6, 1.6, 0.8, 1.6, 0.9, 0.0]
+
+# Narracion del capitulo 5 (el cronista Aldous se despide; misma voz que la del capitulo 1)
+NARRACION5 = [
+ ("Sir Gavran has fallen. His oath is broken... and with it, the chain that bound the Shadow to these stones.",
+  "Ser Gavran ha caído. Su juramento se ha roto... y con él, la cadena que ataba a la Sombra a estas piedras."),
+ ("Thank you. For a hundred years, no one has read my words.",
+  "Gracias. En cien años, nadie había leído mis palabras."),
+ ("I can feel the ink slipping from my fingers. I think, at last, I may rest.",
+  "Siento cómo se me escapa la tinta de los dedos. Creo que, por fin, podré descansar."),
+ ("But listen well. The Shadow does not live here. This kingdom was only its door.",
+  "Pero escucha bien. La Sombra no vive aquí. Este reino solo era su puerta."),
+ ("It waits much farther away... where the storm is born.",
+  "Espera mucho más lejos... allí donde nace la tormenta."),
+ ("Gavran kept a key that is not made of iron, but of bone.",
+  "Gavran guardaba una llave que no es de hierro, sino de hueso."),
+ ("Use it, and it will show you the way to fortresses that float beyond the clouds.",
+  "Úsala, y te mostrará el camino hacia fortalezas que flotan más allá de las nubes."),
+ ("Beyond them, they say, rises a mountain that touches the stars... where the bonfires of the fallen burn.",
+  "Dicen que tras ellas se alza una montaña que toca las estrellas... donde arden las hogueras de los caídos."),
+ ("I cannot walk with you any longer. What comes next is yours.",
+  "Ya no puedo acompañarte. Lo que venga ahora es cosa tuya."),
+ ("Search. Fight. Fall... and rise again. No one else will write your story.",
+  "Busca. Lucha. Cae... y vuelve a levantarte. Nadie más va a escribir tu historia."),
+ ("Here ends the chronicle of Valdrenn. May your steel never dull... and your fire never fade.",
+  "Aquí termina la crónica de Valdrenn. Que tu acero no se melle... y tu fuego nunca se apague."),
+]
+PAUSAS5 = [1.2, 0.8, 1.6, 0.8, 1.6, 0.7, 1.2, 1.6, 0.8, 1.6, 0.0]
 
 UI = {
  "es": {
@@ -625,6 +674,10 @@ LOGROS_UI = {
   "advancements.darkcraft.gavran_corazon.description": "Golpea el corazón que brilla en el pecho de Ser Gavran",
   "advancements.darkcraft.gavran_juicio.title": "Tras el muro de corteza",
   "advancements.darkcraft.gavran_juicio.description": "Sobrevive al Juicio de las espinas escondido tras un muro",
+  "advancements.darkcraft.gavran.title": "Ser Gavran ha caído",
+  "advancements.darkcraft.gavran.description": "Vence a Ser Gavran, el Caballero Jurado",
+  "advancements.darkcraft.capitulo5.title": "El Último Juramento",
+  "advancements.darkcraft.capitulo5.description": "Lee la última página de la crónica a los pies de Ser Gavran",
  },
  "en": {
   "advancements.darkcraft.raiz.title": "Dark Craft",
@@ -655,6 +708,10 @@ LOGROS_UI = {
   "advancements.darkcraft.gavran_corazon.description": "Strike the heart glowing in Ser Gavran's chest",
   "advancements.darkcraft.gavran_juicio.title": "Behind the Bark Wall",
   "advancements.darkcraft.gavran_juicio.description": "Survive the Judgment of the Thorns hidden behind a wall",
+  "advancements.darkcraft.gavran.title": "Ser Gavran Has Fallen",
+  "advancements.darkcraft.gavran.description": "Defeat Ser Gavran, the Sworn Knight",
+  "advancements.darkcraft.capitulo5.title": "The Last Oath",
+  "advancements.darkcraft.capitulo5.description": "Read the last page of the chronicle at Ser Gavran's feet",
  },
 }
 
@@ -673,6 +730,8 @@ def build():
             d[f"darkcraft.pista.{k}"] = v
         for i, (en, es) in enumerate(NARRACION):
             d[f"darkcraft.narracion.1.{i+1}"] = es if lang == "es" else en
+        for i, (en, es) in enumerate(NARRACION5):
+            d[f"darkcraft.narracion.5.{i+1}"] = es if lang == "es" else en
         for i, (en, es) in enumerate(REY):
             d[f"darkcraft.rey.voz.{i+1}"] = es if lang == "es" else en
         for i, (en, es) in enumerate(GAVRAN):
@@ -696,6 +755,10 @@ def build():
             d[f"darkcraft.pista.{k}"] = v
         for i, v in enumerate(t["narracion"]):
             d[f"darkcraft.narracion.1.{i+1}"] = v
+        for i, v in enumerate(t.get("narracion5", [])):
+            d[f"darkcraft.narracion.5.{i+1}"] = v
+        if len(t.get("narracion5", [])) != len(NARRACION5):
+            print(f"{code}: faltan frases de la narracion del capitulo 5 ({len(t.get('narracion5', []))} de {len(NARRACION5)})")
         for i, v in enumerate(t["rey"]):
             d[f"darkcraft.rey.voz.{i+1}"] = v
         for i, v in enumerate(t.get("gavran", [])):
@@ -728,11 +791,13 @@ if __name__ == "__main__":
         for fname in FICHEROS.get(lang, [lang + ".json"]):
             with open(os.path.join(root, fname), "w", encoding="utf-8") as f:
                 json.dump(d, f, ensure_ascii=False, indent=2)
-    # texto para el narrador (lo usa ci/narracion/generar.sh)
-    nar = os.path.join(os.path.dirname(__file__), "..", "narracion", "cap1.txt")
-    os.makedirs(os.path.dirname(nar), exist_ok=True)
-    with open(nar, "w", encoding="utf-8") as f:
-        for (en, es), p in zip(NARRACION, PAUSAS):
-            f.write(f"{en}|{p}\n")
+    # texto para el narrador, un fichero por capitulo narrado (lo usa ci/narracion/generar.sh)
+    for cap, lineas, pausas in ((1, NARRACION, PAUSAS), (5, NARRACION5, PAUSAS5)):
+        assert len(lineas) == len(pausas), f"capitulo {cap}: {len(lineas)} frases y {len(pausas)} pausas"
+        nar = os.path.join(os.path.dirname(__file__), "..", "narracion", f"cap{cap}.txt")
+        os.makedirs(os.path.dirname(nar), exist_ok=True)
+        with open(nar, "w", encoding="utf-8") as f:
+            for (en, es), p in zip(lineas, pausas):
+                f.write(f"{en}|{p}\n")
     print("Paginas OK" if good else "HAY PAGINAS DEMASIADO LARGAS")
     sys.exit(0 if good else 1)

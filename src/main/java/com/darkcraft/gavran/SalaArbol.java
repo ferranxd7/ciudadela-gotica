@@ -160,6 +160,59 @@ public record SalaArbol(int cx, int cz, int F, int base) {
         return new Vec3(Mth.lerp(t, v[a * 3], v[b * 3]), Mth.lerp(t, v[a * 3 + 1], v[b * 3 + 1]), Mth.lerp(t, v[a * 3 + 2], v[b * 3 + 2]));
     }
 
+    /**
+     * El arbol florece y se ilumina (al morir Gavran, para siempre): las hojas de la sala y de toda la copa se llenan
+     * de flores (azalea florida y, alguna, de cerezo, que suelta petalos) y se encienden luces invisibles por la sala
+     * y entre las hojas de la copa (de noche, en la tormenta, se ve brillar desde lejos). Se hace por franjas de
+     * columnas, un poco cada dos ticks; lo que no este cargado se queda como estaba.
+     */
+    public void florecer(ServerLevel sl) {
+        int R = TreeTower.HALL_R + 32;
+        int franjas = 36, ancho = (2 * R + 1 + franjas - 1) / franjas;
+        for (int f = 0; f < franjas; f++) {
+            final int x0 = cx - R + f * ancho, x1 = Math.min(cx + R, x0 + ancho - 1);
+            com.darkcraft.rey.Victoria.despues(f * 2, () -> florecerFranja(sl, x0, x1, R));
+        }
+    }
+
+    private void florecerFranja(ServerLevel sl, int x0, int x1, int R) {
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        net.minecraft.util.RandomSource r = sl.random;
+        BlockState luz = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 12);
+        BlockState luzCopa = Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 13);
+        int arriba = F + TreeTower.HALL_H + 70, cupula = F + TreeTower.HALL_H + 14;
+        for (int x = x0; x <= x1; x++)
+            for (int z = cz - R; z <= cz + R; z++) {
+                double d = Math.hypot(x + 0.5 - ccx(), z + 0.5 - ccz());
+                if (d > R || !sl.isLoaded(m.set(x, F, z))) continue;
+                for (int y = F - 1; y <= arriba; y++) {
+                    m.set(x, y, z);
+                    BlockState st = sl.getBlockState(m);
+                    if (!st.is(BlockTags.LEAVES) || st.is(Blocks.FLOWERING_AZALEA_LEAVES) || st.is(Blocks.CHERRY_LEAVES)) continue;
+                    BlockState nuevo = (!st.is(Blocks.AZALEA_LEAVES) && r.nextInt(3) == 0 ? Blocks.CHERRY_LEAVES : Blocks.FLOWERING_AZALEA_LEAVES)
+                            .defaultBlockState().setValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true);
+                    sl.setBlock(m, nuevo, 2);
+                }
+                // luces invisibles por la sala (en una rejilla, solo en el aire y dentro del anillo)
+                if (d > R_TRONCO + 1 && d < R_MURO && Math.floorMod(x, 7) == 0 && Math.floorMod(z, 7) == 0)
+                    for (int y : new int[]{F + 7, F + 17}) {
+                        m.set(x, y, z);
+                        if (sl.getBlockState(m).isAir()) sl.setBlock(m, luz, 2);
+                    }
+                // y entre las hojas de la copa, por encima de la cupula (en el aire pegado a alguna hoja)
+                if (Math.floorMod(x, 5) == 0 && Math.floorMod(z, 5) == 0)
+                    for (int y = cupula + 2; y <= arriba; y += 5) {
+                        m.set(x, y, z);
+                        if (!sl.getBlockState(m).isAir()) continue;
+                        for (net.minecraft.core.Direction dir : net.minecraft.core.Direction.values())
+                            if (sl.getBlockState(m.relative(dir)).is(BlockTags.LEAVES)) {
+                                sl.setBlock(m, luzCopa, 2);
+                                break;
+                            }
+                    }
+            }
+    }
+
     /** Puerta de la sala (en el tronco, al norte): centro del umbral. */
     public Vec3 puerta() {
         return new Vec3(ccx(), F, cz - 14.8);

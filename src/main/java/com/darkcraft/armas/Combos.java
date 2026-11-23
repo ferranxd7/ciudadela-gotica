@@ -39,6 +39,8 @@ public final class Combos {
     private Combos() {}
 
     public static final int TAJO_REAL = 1, JUICIO = 2;
+    /** Los del Mandoble del Juramento (el cliente pide 1 o 2 y el servidor mira que arma lleva). */
+    public static final int RAICES_M = 3, ESPINAS_M = 4;
     public static final int MAX = 100, COSTE_1 = 35, COSTE_2 = 80;
     private static final String KEY = "darkcraft_energia";
 
@@ -79,8 +81,14 @@ public final class Combos {
     public static void pedir(ServerPlayer sp, int tipo) {
         if (ACTIVOS.containsKey(sp.getUUID()) || !sp.isAlive() || sp.isSpectator()) return;
         ItemStack main = sp.getMainHandItem();
-        if (!EspadaRey.es(main)) return;
-        int coste = tipo == JUICIO ? COSTE_2 : COSTE_1;
+        if (MandobleJuramento.es(main)) {
+            if (!MandobleJuramento.dosManos(sp)) {
+                sp.displayClientMessage(net.minecraft.network.chat.Component.translatable("darkcraft.mandoble.dos_manos"), true);
+                return;
+            }
+            tipo = tipo == JUICIO ? ESPINAS_M : RAICES_M;
+        } else if (!EspadaRey.es(main)) return;
+        int coste = tipo == JUICIO || tipo == ESPINAS_M ? COSTE_2 : COSTE_1;
         if (energia(sp) < coste && !sp.isCreative()) return;
         if (!sp.isCreative()) setEnergia(sp, energia(sp) - coste);
         Estado e = new Estado();
@@ -116,7 +124,12 @@ public final class Combos {
                 it.remove();
                 continue;
             }
-            boolean fin = e.tipo == TAJO_REAL ? tajoReal(sp, e) : juicio(sp, e);
+            boolean fin = switch (e.tipo) {
+                case TAJO_REAL -> tajoReal(sp, e);
+                case RAICES_M -> raicesMandoble(sp, e);
+                case ESPINAS_M -> espinasMandoble(sp, e);
+                default -> juicio(sp, e);
+            };
             e.t++;
             if (fin) {
                 formas(sp, 0);
@@ -214,6 +227,96 @@ public final class Combos {
         return t >= 52;
     }
 
+    // ------------------------------------------------------------------ el Mandoble del Juramento
+
+    /** Raices del Juramento: clava el mandoble y una linea de raices sale del suelo hacia delante. */
+    private static boolean raicesMandoble(ServerPlayer sp, Estado e) {
+        ServerLevel sl = sp.serverLevel();
+        int t = e.t;
+        if (t == 0) {
+            sp.swing(InteractionHand.MAIN_HAND, true);
+            sl.playSound(null, sp.getX(), sp.getY(), sp.getZ(), DarkCraftMod.SFX_GAVRAN_RAICES.get(), SoundSource.PLAYERS, 1.2f, 1.1f);
+            sl.sendParticles(new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK, net.minecraft.world.level.block.Blocks.ROOTED_DIRT.defaultBlockState()),
+                    sp.getX() + e.dir.x * 1.5, sp.getY() + 0.1, sp.getZ() + e.dir.z * 1.5, 20, 0.4, 0.1, 0.4, 0.15);
+        }
+        if (t >= 2 && t <= 22 && t % 2 == 0) {
+            int k = (t - 2) / 2;
+            Vec3 c = sp.position().add(e.dir.scale(2.4 + k * 1.5));
+            double y = suelo(sl, c, sp.getY());
+            net.minecraft.util.RandomSource r = sl.random;
+            for (int i = 0; i < 3; i++) {
+                double a = r.nextDouble() * Math.PI * 2, d = i == 0 ? 0 : 0.3 + r.nextDouble() * 0.6;
+                EfectosRaiz.estaca(sl, c.x + Math.cos(a) * d, y, c.z + Math.sin(a) * d, EfectosRaiz.ang(r), 0.15f + r.nextFloat() * 0.35f,
+                        i == 0 ? 2.4f : 1.5f, i == 0 ? 0.4f : 0.28f, 0, 16);
+            }
+            sl.sendParticles(com.darkcraft.gavran.Raices.VERDE, c.x, y + 0.8, c.z, 6, 0.4, 0.5, 0.4, 0);
+            sl.sendParticles(ParticleTypes.GLOW, c.x, y + 0.6, c.z, 3, 0.4, 0.4, 0.4, 0.02);
+            if (k % 3 == 0) sl.playSound(null, c.x, y, c.z, DarkCraftMod.SFX_GAVRAN_RAICES.get(), SoundSource.PLAYERS, 0.6f, 1.2f);
+            AABB box = new AABB(c.x - 1.8, y - 1, c.z - 1.8, c.x + 1.8, y + 3, c.z + 1.8);
+            for (LivingEntity le : sl.getEntitiesOfClass(LivingEntity.class, box, x -> valido(sp, x))) {
+                if (!e.tocados.add(le.getId())) continue;
+                dano(sp, le, 14, 0, 0.1);
+                le.setDeltaMovement(le.getDeltaMovement().add(0, 0.45, 0));
+                le.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN, 50, 3));
+            }
+        }
+        return t >= 26;
+    }
+
+    /** Juicio de Espinas: salta, clava el mandoble al caer y salen espinas y raices alrededor. */
+    private static boolean espinasMandoble(ServerPlayer sp, Estado e) {
+        ServerLevel sl = sp.serverLevel();
+        int t = e.t;
+        if (t == 0) {
+            sp.setDeltaMovement(sp.getDeltaMovement().add(0, 0.62, 0));
+            sp.hurtMarked = true;
+            sl.playSound(null, sp.getX(), sp.getY(), sp.getZ(), DarkCraftMod.SFX_GAVRAN_SALTO.get(), SoundSource.PLAYERS, 0.9f, 1.25f);
+        }
+        if (t == 9) {
+            sp.setDeltaMovement(sp.getDeltaMovement().x * 0.3, -1.3, sp.getDeltaMovement().z * 0.3);
+            sp.hurtMarked = true;
+            sp.fallDistance = 0;
+        }
+        if (t >= 10 && e.dir != null && (sp.onGround() || t >= 22)) {
+            sp.fallDistance = 0;
+            sp.swing(InteractionHand.MAIN_HAND, true);
+            double y = sp.getY();
+            sl.playSound(null, sp.getX(), y, sp.getZ(), DarkCraftMod.SFX_ESPINAS.get(), SoundSource.PLAYERS, 1.6f, 1.05f);
+            sl.playSound(null, sp.getX(), y, sp.getZ(), DarkCraftMod.SFX_GAVRAN_CLAVAR.get(), SoundSource.PLAYERS, 1.3f, 1.15f);
+            net.minecraft.util.RandomSource r = sl.random;
+            for (int i = 0; i < 26; i++) {
+                double a = i * Math.PI * 2 / 26 + r.nextDouble() * 0.1;
+                EfectosRaiz.espina(sl, sp.getX(), y + 0.5 + r.nextDouble() * 0.6, sp.getZ(), EfectosRaiz.yaw(Math.cos(a), Math.sin(a)),
+                        5.5f + r.nextFloat() * 2f, 14);
+            }
+            for (int i = 0; i < 10; i++) {
+                double a = i * Math.PI * 2 / 10 + r.nextDouble() * 0.3, d = 2.2 + r.nextDouble() * 2.5;
+                double x = sp.getX() + Math.cos(a) * d, z = sp.getZ() + Math.sin(a) * d;
+                EfectosRaiz.estaca(sl, x, suelo(sl, new Vec3(x, y, z), y), z, EfectosRaiz.ang(r), 0.2f + r.nextFloat() * 0.4f,
+                        1.6f + r.nextFloat(), 0.32f, i % 3, 18);
+            }
+            sl.sendParticles(new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK, net.minecraft.world.level.block.Blocks.ROOTED_DIRT.defaultBlockState()),
+                    sp.getX(), y + 0.1, sp.getZ(), 50, 2.5, 0.1, 2.5, 0.2);
+            sl.sendParticles(ParticleTypes.GLOW, sp.getX(), y + 0.8, sp.getZ(), 30, 3, 0.6, 3, 0.05);
+            for (LivingEntity le : objetivos(sl, sp, 7.0)) dano(sp, le, 22, 0, 1.3);
+            e.dir = null;
+            return false;
+        }
+        return t >= 34 || (e.dir == null && t >= 24);
+    }
+
+    /** Altura del suelo bajo c (busca hacia abajo desde un poco por encima de y0). */
+    private static double suelo(ServerLevel sl, Vec3 c, double y0) {
+        net.minecraft.core.BlockPos.MutableBlockPos m = new net.minecraft.core.BlockPos.MutableBlockPos();
+        int x = Mth.floor(c.x), z = Mth.floor(c.z);
+        for (int y = Mth.floor(y0) + 2; y >= Mth.floor(y0) - 4; y--) {
+            m.set(x, y, z);
+            if (sl.getBlockState(m).isFaceSturdy(sl, m, net.minecraft.core.Direction.UP) && sl.getBlockState(m.above()).getCollisionShape(sl, m.above()).isEmpty())
+                return y + 1;
+        }
+        return Math.floor(y0);
+    }
+
     private static void mano(ServerPlayer sp, Estado e, int i) {
         sp.swing(e.doble && i % 2 == 1 ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND, true);
     }
@@ -253,6 +356,23 @@ public final class Combos {
         if (le.hurt(sp.damageSources().playerAttack(sp), dmg)) {
             if (fuego > 0 && !le.fireImmune()) le.setSecondsOnFire(fuego);
             le.knockback(kb, sp.getX() - le.getX(), sp.getZ() - le.getZ());
+        }
+    }
+
+    // ------------------------------------------------------------------ el mandoble a una mano
+
+    private static final Map<UUID, Integer> AVISO_MANOS = new HashMap<>();
+
+    /** Con algo en la otra mano, el Mandoble del Juramento pega mucho menos (se empuna a dos manos). */
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGH)
+    public static void onGolpeMandoble(LivingHurtEvent e) {
+        if (!(e.getSource().getEntity() instanceof ServerPlayer sp) || e.getSource().getDirectEntity() != sp) return;
+        if (!MandobleJuramento.es(sp.getMainHandItem()) || sp.getOffhandItem().isEmpty()) return;
+        e.setAmount(e.getAmount() * 0.55f);
+        int now = sp.tickCount;
+        if (now - AVISO_MANOS.getOrDefault(sp.getUUID(), -1000) > 200) {
+            AVISO_MANOS.put(sp.getUUID(), now);
+            sp.displayClientMessage(net.minecraft.network.chat.Component.translatable("darkcraft.mandoble.dos_manos"), true);
         }
     }
 

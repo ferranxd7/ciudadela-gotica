@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:gavran_fase2",
+  "display": {
+    "icon": {
+      "item": "darkcraft:mandoble_juramento"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.gavran.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.gavran.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 500
+  }
+}
