@@ -487,5 +487,138 @@
     ]
    }
   }
+ },
+ "sfx_mapa_fortaleza": {
+  "flow": "k7WnlpZuqqA6KPhZdTlN",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "las 4 tomas de cada efecto se bajan como NOMBRE_1..4 (procesar.py elige cuales se usan)",
+  "sonidos": {
+   "espejo_despierta": {
+    "prompt": "Dark magical mirror awakening: deep resonant glass hum rising, shimmering crystalline chime, faint ghostly whispers, ominous epic dark fantasy, 3 seconds",
+    "sesiones": [
+     "KkBQfM2KJv5qUjh81oFs",
+     "sCA3eDI3y2yARTsaSwe2",
+     "NY3epglgQo0xjUfvT1xf",
+     "C2GRi3lwK5rSZQCj4tBH"
+    ]
+   },
+   "pluma_escribe": {
+    "prompt": "Quill pen scratching quickly on old dry parchment, writing a few words and a final flourish, close, 2 seconds",
+    "sesiones": [
+     "NXNepuO88EhG5skOopBQ",
+     "DKU5f2G9xhfEpXgfxtYQ",
+     "zFIX7QJh1vpCi0LEqI3c",
+     "2suH59aZWByF9GlkPcYC"
+    ]
+   },
+   "libro_abre": {
+    "prompt": "Opening an old heavy leather-bound tome: thick cover thud, creaking spine and pages rustling, close, dark fantasy",
+    "sesiones": [
+     "a9lcLoAWjqCHV2alBfDZ",
+     "dqc1TbUjcug1HEmbWW3V",
+     "ovfFLE4ONROtjgGjVeZ2",
+     "OgfKru8OP957shIBKqnF"
+    ]
+   },
+   "llave_rastro": {
+    "prompt": "Magical bone key resonating: eerie hollow chime, soft rattling of bones and a whooshing trail of spectral green light flying away, 2 seconds",
+    "sesiones": [
+     "Qr9GgljSxKwIkkGElaSR",
+     "DEGlr93cq3SBL1YVS0I4",
+     "JJ7L4QdANyHIGIusb4uS",
+     "LWtXXtvdKgXRepHFB6AU"
+    ]
+   },
+   "puente_hueso": {
+    "prompt": "Giant bones assembling into a bridge up to the sky: cracking and grinding bones clicking into place, clattering, deep rumble and howling wind, epic dark fantasy, 6 seconds",
+    "sesiones": [
+     "f9Wx8oWVr8gf0XedJ5UC",
+     "W1xL4Llx8aimbcEWRDAO",
+     "5HzSr1qGiyD1ahbNm5y9",
+     "NPhFsNuCAWV8A2WIJjOA"
+    ]
+   },
+   "puerta_hueso": {
+    "prompt": "Massive ancient gate of bone and dark stone slowly opening: a key turning in a huge lock, creaking bones, heavy stone grinding, chains rattling, deep boom at the end, epic dark fantasy, 8 seconds",
+    "sesiones": [
+     "bcPGja1bVLMRblZZLH95",
+     "Ch4YvkoCfVRR5o6JPoUF",
+     "9SamWGtTn1MTfAX1nAkF",
+     "koGUwRy9h4Ntg8z3QMRw"
+    ]
+   },
+   "amuleto_forja": {
+    "prompt": "Magical amulet being forged from netherite, diamonds and bone: metallic ringing hammer strikes, rising mystical hum, crackling energy and a bright chime burst at the end, epic, 5 seconds",
+    "sesiones": [
+     "tXflorwbhAKdZAEILqPO",
+     "ulNMfxM4Ih0qpEFQnbFy",
+     "EYMmFEXO4SXnINTL6eq1",
+     "eUKvSYQbI6ZVk2PFdZTt"
+    ]
+   },
+   "portal_abre": {
+    "prompt": "Ancient dimensional portal awakening: deep rumbling stone, swirling void energy, rising roar of wind and a powerful bass pulse, epic dark fantasy, 7 seconds",
+    "sesiones": [
+     "INN4yPiamIdukIRQdFR5",
+     "07imjfaDcN7NrfIrYhzK",
+     "aTXAMtw0BW15IzZTuGXJ",
+     "gXzvNXENiPVCEx52u9Cv"
+    ]
+   },
+   "zombi_caballero_grunido": {
+    "prompt": "Undead zombie knight growling: raspy guttural groan echoing inside a rusty metal helmet, menacing, 2 seconds",
+    "sesiones": [
+     "Hrq9c6NhNcjc6TBEWM0e",
+     "HhcYe3wUoTFjjEYmF21g",
+     "AnqtLGJmgiwn92XtPg5W",
+     "98mAhFcvygxxSKzOuAro"
+    ]
+   },
+   "zombi_caballero_dolor": {
+    "prompt": "Undead zombie knight hurt: short pained guttural grunt inside a metal helmet with an armor clank, 1 second",
+    "sesiones": [
+     "l9iRxOhHsFM9HU1MUvrk",
+     "n9NgQJVucIWyFDvM4xOy",
+     "P4s9BDjs8tx82zLcj6xm",
+     "fn6lIDFyusyR0vOyT6He"
+    ]
+   },
+   "zombi_caballero_muerte": {
+    "prompt": "Undead armored zombie knight dying: long guttural death rattle, then rusty armor collapsing onto a stone floor, 3 seconds",
+    "sesiones": [
+     "pPNEXaifGkqMhzDcfu86",
+     "iRoUO1c9JaT1XqsYemIB",
+     "LLRJHPglWEYlleKeZFbo",
+     "J5pUvR8RrgcsfWuLlFZL"
+    ]
+   },
+   "armadura_paso": {
+    "prompt": "Heavy rusty plate armor footsteps on stone, metal plates clanking and scraping, two slow steps, close",
+    "sesiones": [
+     "5ny318WFMJmNvMfJgWhK",
+     "vIWylLOkDWDwzA2JqfGW",
+     "P2E2IBYhKjkOi7wURuzs",
+     "S1ENBdZ2W3Taxbnh6QnO"
+    ]
+   },
+   "escudo_golpe": {
+    "prompt": "Sword blow blocked by an iron-reinforced wooden shield: heavy thud and loud metal clang, close",
+    "sesiones": [
+     "DDBxLBp7G9BGkwdQHAv9",
+     "TfuXyK9oWe8sWOCOW6HS",
+     "2KbjAY00PRyzST5o2d53",
+     "axyAmt12YTwCpCH6Gxwi"
+    ]
+   },
+   "alabarda_tajo": {
+    "prompt": "Heavy halberd swing: long iron polearm whooshing through the air, deep and fast, close",
+    "sesiones": [
+     "FLWk3eXKNSzzM95mNRsd",
+     "vsbHFLKm5EpfvCXYpNNJ",
+     "5gaCUevl34xTLKqk3Cin",
+     "9HJD2HnB7pIkh2ohu4SA"
+    ]
+   }
+  }
  }
 }
