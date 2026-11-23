@@ -53,6 +53,8 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> CAMPANA = sound("campana");
     public static final RegistryObject<SoundEvent> NARRACION_1 = sound("narracion.cap1");
     public static final RegistryObject<SoundEvent> NARRACION_5 = sound("narracion.cap5");
+    public static final RegistryObject<SoundEvent> NARRACION_6 = sound("narracion.cap6");
+    public static final RegistryObject<SoundEvent> MUSICA_FORTALEZA = sound("musica.fortaleza");
     public static final RegistryObject<SoundEvent> MUSICA_COFRE = sound("musica.cofre");
     public static final RegistryObject<SoundEvent> MUSICA_REY_1 = sound("musica.rey1");
     public static final RegistryObject<SoundEvent> MUSICA_REY_2 = sound("musica.rey2");
@@ -101,6 +103,19 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_ESPEJO_DESPIERTA = sound("sfx.espejo_despierta");
     public static final RegistryObject<SoundEvent> SFX_PLUMA = sound("sfx.pluma_escribe");
     public static final RegistryObject<SoundEvent> SFX_LIBRO_ABRE = sound("sfx.libro_abre");
+    // caballeros zombi
+    public static final RegistryObject<SoundEvent> SFX_CABALLERO_GRUNIDO = sound("sfx.zombi_caballero_grunido");
+    public static final RegistryObject<SoundEvent> SFX_CABALLERO_DOLOR = sound("sfx.zombi_caballero_dolor");
+    public static final RegistryObject<SoundEvent> SFX_CABALLERO_MUERTE = sound("sfx.zombi_caballero_muerte");
+    public static final RegistryObject<SoundEvent> SFX_ARMADURA_PASO = sound("sfx.armadura_paso");
+    public static final RegistryObject<SoundEvent> SFX_ESCUDO_GOLPE = sound("sfx.escudo_golpe");
+    public static final RegistryObject<SoundEvent> SFX_ALABARDA_TAJO = sound("sfx.alabarda_tajo");
+    // Parte 3: la Fortaleza de Hueso
+    public static final RegistryObject<SoundEvent> SFX_LLAVE_RASTRO = sound("sfx.llave_rastro");
+    public static final RegistryObject<SoundEvent> SFX_PUENTE_HUESO = sound("sfx.puente_hueso");
+    public static final RegistryObject<SoundEvent> SFX_PUERTA_HUESO = sound("sfx.puerta_hueso");
+    public static final RegistryObject<SoundEvent> SFX_AMULETO_FORJA = sound("sfx.amuleto_forja");
+    public static final RegistryObject<SoundEvent> SFX_PORTAL_ABRE = sound("sfx.portal_abre");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")
@@ -131,6 +146,23 @@ public class DarkCraftMod {
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BROWN).strength(-1.0F, 3600000.0F).noLootTable()
                     .sound(SoundType.WOOD).pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false)));
 
+    /** La reja de hueso de la puerta de la Fortaleza de Hueso (irrompible; sube con la llave). */
+    public static final RegistryObject<Block> REJA_HUESO = BLOCKS.register("reja_hueso", () -> new RastrilloBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.SAND).strength(-1.0F, 3600000.0F).noLootTable()
+                    .noOcclusion().sound(SoundType.BONE_BLOCK).pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false)));
+
+    /** El portal de la Sombra en lo alto de la fortaleza (todavia no se puede cruzar). */
+    public static final RegistryObject<Block> PORTAL_SOMBRA = BLOCKS.register("portal_sombra", () -> new com.darkcraft.fortaleza.PortalSombraBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(-1.0F, 3600000.0F).noLootTable().noCollission()
+                    .noOcclusion().lightLevel(st -> 12).sound(SoundType.GLASS).pushReaction(PushReaction.BLOCK)
+                    .isValidSpawn((st, l, p, t) -> false).isRedstoneConductor((st, l, p) -> false)
+                    .isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false)));
+
+    public static final RegistryObject<Item> AMULETO_HUESO = ITEMS.register("amuleto_hueso",
+            () -> new com.darkcraft.fortaleza.AmuletoHueso(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+    public static final RegistryObject<Item> LIBRO_ACERTIJO = ITEMS.register("libro_acertijo",
+            () -> new com.darkcraft.fortaleza.LibroAcertijo(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+
     public static final RegistryObject<Item> ESPADA_DIESTRA = ITEMS.register("espada_diestra",
             () -> new com.darkcraft.armas.EspadaRey(true, new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> ESPADA_SINIESTRA = ITEMS.register("espada_siniestra",
@@ -139,6 +171,8 @@ public class DarkCraftMod {
             () -> new com.darkcraft.armas.MandobleJuramento(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> LLAVE_HUESO = ITEMS.register("llave_hueso",
             () -> new com.darkcraft.armas.LlaveHueso(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+    public static final RegistryObject<Item> ALABARDA = ITEMS.register("alabarda",
+            () -> new net.minecraft.world.item.SwordItem(net.minecraft.world.item.Tiers.IRON, 5, -3.0f, new Item.Properties()));
     public static final RegistryObject<Item> LLAVE_ARBOL = ITEMS.register("llave_arbol",
             () -> new com.darkcraft.armas.LlaveArbol(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
 
@@ -152,6 +186,22 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.gavran.Gavran>> GAVRAN = ENTITIES.register("gavran",
             () -> EntityType.Builder.<com.darkcraft.gavran.Gavran>of(com.darkcraft.gavran.Gavran::new, MobCategory.MONSTER)
                     .sized(2.4f, 5.6f).fireImmune().clientTrackingRange(10).updateInterval(1).build(MODID + ":gavran"));
+
+    public static final RegistryObject<EntityType<com.darkcraft.caballeros.CaballeroZombi.Espada>> CABALLERO_ESPADA = ENTITIES.register("caballero_espada",
+            () -> EntityType.Builder.<com.darkcraft.caballeros.CaballeroZombi.Espada>of(com.darkcraft.caballeros.CaballeroZombi.Espada::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.95f).clientTrackingRange(8).build(MODID + ":caballero_espada"));
+    public static final RegistryObject<EntityType<com.darkcraft.caballeros.CaballeroZombi.Alabarda>> CABALLERO_ALABARDA = ENTITIES.register("caballero_alabarda",
+            () -> EntityType.Builder.<com.darkcraft.caballeros.CaballeroZombi.Alabarda>of(com.darkcraft.caballeros.CaballeroZombi.Alabarda::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.95f).clientTrackingRange(8).build(MODID + ":caballero_alabarda"));
+    public static final RegistryObject<EntityType<com.darkcraft.caballeros.CaballeroZombi.Ballesta>> CABALLERO_BALLESTA = ENTITIES.register("caballero_ballesta",
+            () -> EntityType.Builder.<com.darkcraft.caballeros.CaballeroZombi.Ballesta>of(com.darkcraft.caballeros.CaballeroZombi.Ballesta::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.95f).clientTrackingRange(8).build(MODID + ":caballero_ballesta"));
+    public static final RegistryObject<Item> HUEVO_ESPADA = ITEMS.register("caballero_espada_spawn_egg",
+            () -> new net.minecraftforge.common.ForgeSpawnEggItem(CABALLERO_ESPADA, 0x4A6342, 0x8E1418, new Item.Properties()));
+    public static final RegistryObject<Item> HUEVO_ALABARDA = ITEMS.register("caballero_alabarda_spawn_egg",
+            () -> new net.minecraftforge.common.ForgeSpawnEggItem(CABALLERO_ALABARDA, 0x4A6342, 0x4A1C5C, new Item.Properties()));
+    public static final RegistryObject<Item> HUEVO_BALLESTA = ITEMS.register("caballero_ballesta_spawn_egg",
+            () -> new net.minecraftforge.common.ForgeSpawnEggItem(CABALLERO_BALLESTA, 0x4A6342, 0x2E4A2C, new Item.Properties()));
 
     public static final RegistryObject<EntityType<com.darkcraft.arbol.Ascensor>> ASCENSOR = ENTITIES.register("ascensor",
             () -> EntityType.Builder.<com.darkcraft.arbol.Ascensor>of(com.darkcraft.arbol.Ascensor::new, MobCategory.MISC).sized(5f, 0.3f)
@@ -172,6 +222,7 @@ public class DarkCraftMod {
         BLOCKS.register(modBus);
         ENTITIES.register(modBus);
         com.darkcraft.world.Valdrenn.registrar(modBus);
+        com.darkcraft.fortaleza.Localizar.registrar(modBus);
         modBus.addListener(this::attributes);
         modBus.addListener(this::setup);
         modBus.addListener(this::tabs);
@@ -191,6 +242,9 @@ public class DarkCraftMod {
     private void attributes(EntityAttributeCreationEvent e) {
         e.put(REY.get(), Rey.attributes().build());
         e.put(GAVRAN.get(), com.darkcraft.gavran.Gavran.attributes().build());
+        e.put(CABALLERO_ESPADA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
+        e.put(CABALLERO_ALABARDA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
+        e.put(CABALLERO_BALLESTA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
     }
 
     private void setup(FMLCommonSetupEvent e) {
@@ -202,11 +256,19 @@ public class DarkCraftMod {
             e.accept(MAPA);
             e.accept(LLAVE_ARBOL);
             e.accept(LLAVE_HUESO);
+            e.accept(AMULETO_HUESO);
+            e.accept(LIBRO_ACERTIJO);
         }
         if (e.getTabKey() == CreativeModeTabs.COMBAT) {
             e.accept(MANDOBLE_JURAMENTO);
             e.accept(ESPADA_DIESTRA);
             e.accept(ESPADA_SINIESTRA);
+            e.accept(ALABARDA);
+        }
+        if (e.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
+            e.accept(HUEVO_ESPADA);
+            e.accept(HUEVO_ALABARDA);
+            e.accept(HUEVO_BALLESTA);
         }
     }
 }

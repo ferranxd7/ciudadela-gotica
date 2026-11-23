@@ -121,6 +121,15 @@ public final class Canvas {
         RandomizableContainerBlockEntity.setLootTable(level, random, p, loot);
     }
 
+    /** Atril con un libro (los libros perdidos de la Fortaleza de Hueso). */
+    public void lectern(int x, int y, int z, Direction facing, net.minecraft.world.item.ItemStack book) {
+        if (!in(x, y, z)) return;
+        BlockPos p = new BlockPos(x, y, z);
+        level.setBlock(p, Blocks.LECTERN.defaultBlockState().setValue(net.minecraft.world.level.block.LecternBlock.FACING, facing)
+                .setValue(net.minecraft.world.level.block.LecternBlock.HAS_BOOK, true), 2);
+        if (level.getBlockEntity(p) instanceof net.minecraft.world.level.block.entity.LecternBlockEntity le) le.setBook(book.copy());
+    }
+
     public void barrel(int x, int y, int z, Direction facing, ResourceLocation loot) {
         if (!in(x, y, z)) return;
         BlockPos p = new BlockPos(x, y, z);

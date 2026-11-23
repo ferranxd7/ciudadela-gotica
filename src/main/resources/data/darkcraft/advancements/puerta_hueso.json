@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:puente",
+  "display": {
+    "icon": {
+      "item": "minecraft:skeleton_skull"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.puerta_hueso.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.puerta_hueso.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 60
+  }
+}

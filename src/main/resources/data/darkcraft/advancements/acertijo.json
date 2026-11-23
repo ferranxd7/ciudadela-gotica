@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:puerta_hueso",
+  "display": {
+    "icon": {
+      "item": "darkcraft:libro_acertijo"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.acertijo.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.acertijo.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 30
+  }
+}

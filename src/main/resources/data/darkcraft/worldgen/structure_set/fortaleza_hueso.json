@@ -1,0 +1,11 @@
+{
+  "structures": [
+    {
+      "structure": "darkcraft:fortaleza_hueso",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "darkcraft:fortaleza_sitios"
+  }
+}

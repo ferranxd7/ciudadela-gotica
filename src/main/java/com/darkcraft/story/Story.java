@@ -24,9 +24,9 @@ import net.minecraft.world.level.levelgen.Heightmap;
 public final class Story {
     private Story() {}
 
-    public static final int CHAPTERS = 5;
-    /** Paginas de cada libro (capitulos 1..5). */
-    private static final int[] PAGES = {0, 8, 7, 7, 7, 7};
+    public static final int CHAPTERS = 6;
+    /** Paginas de cada libro (capitulos 1..6; el 6 lo escribe la Sombra: son las frases de su narracion). */
+    private static final int[] PAGES = {0, 8, 7, 7, 7, 7, 4};
     private static final String KEY = "darkcraft";
 
     // ------------------------------------------------------------------ libros
@@ -35,7 +35,7 @@ public final class Story {
         ItemStack b = new ItemStack(Items.WRITTEN_BOOK);
         CompoundTag t = b.getOrCreateTag();
         t.putString("title", "Cronica de Valdrenn " + ch);
-        t.putString("author", "Aldous");
+        t.putString("author", ch == 6 ? "?" : "Aldous");
         t.putInt("generation", 0);
         ListTag pages = new ListTag();
         for (int p = 1; p <= PAGES[ch]; p++) {

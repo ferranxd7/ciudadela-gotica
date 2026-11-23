@@ -50,13 +50,13 @@ public final class EspejoHud {
      * Mezcla normal encendida. Hace falta antes de cada blit con transparencia: {@code g.fill}, {@code drawString} y
      * {@code PlayerFaceRenderer} la dejan apagada al acabar, y sin ella lo transparente sale opaco.
      */
-    static void mezcla() {
+    public static void mezcla() {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
     }
 
     /** Mezcla aditiva (brillos). */
-    static void suma() {
+    public static void suma() {
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
     }
@@ -370,7 +370,7 @@ public final class EspejoHud {
     }
 
     /** Un icono del atlas centrado en (x, y) con lado l (en px de la gui). */
-    static void icono(GuiGraphics g, int i, float x, float y, float l) {
+    public static void icono(GuiGraphics g, int i, float x, float y, float l) {
         RenderSystem.enableBlend();
         g.pose().pushPose();
         g.pose().translate(x - l / 2, y - l / 2, 0);

@@ -1,0 +1,17 @@
+{
+  "parent": "block/block",
+  "render_type": "minecraft:cutout",
+  "ambientocclusion": false,
+  "textures": {"particle": "darkcraft:block/reja_hueso", "rejas": "darkcraft:block/reja_hueso", "borde": "darkcraft:block/reja_hueso_borde"},
+  "elements": [
+    {"from": [0, 0, 6.5], "to": [16, 16, 9.5],
+     "faces": {
+       "north": {"uv": [0, 0, 16, 16], "texture": "#rejas"},
+       "south": {"uv": [16, 0, 0, 16], "texture": "#rejas"},
+       "east": {"uv": [6.5, 0, 9.5, 16], "texture": "#borde", "cullface": "east"},
+       "west": {"uv": [6.5, 0, 9.5, 16], "texture": "#borde", "cullface": "west"},
+       "up": {"uv": [0, 6.5, 16, 9.5], "texture": "#borde", "cullface": "up"},
+       "down": {"uv": [0, 6.5, 16, 9.5], "texture": "#borde", "cullface": "down"}
+     }}
+  ]
+}

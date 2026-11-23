@@ -1,0 +1,7 @@
+{
+  "type": "darkcraft:fortaleza_hueso",
+  "biomes": "#darkcraft:has_structure/valdrenn",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none"
+}

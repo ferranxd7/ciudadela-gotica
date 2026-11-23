@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "4";
+    private static final String V = "5";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -60,6 +60,24 @@ public final class Net {
                 .encoder(EspejoPos::write).decoder(EspejoPos::read).consumerMainThread(EspejoPos::handle).add();
         CH.messageBuilder(EspejoAccion.class, id++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(EspejoAccion::write).decoder(EspejoAccion::read).consumerMainThread(EspejoAccion::handle).add();
+        CH.messageBuilder(Fortaleza.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Fortaleza::write).decoder(Fortaleza::read).consumerMainThread(Fortaleza::handle).add();
+    }
+
+    /** Si el jugador esta en la zona de una Fortaleza de Hueso (su musica). */
+    public record Fortaleza(boolean dentro) {
+        void write(FriendlyByteBuf b) {
+            b.writeBoolean(dentro);
+        }
+
+        static Fortaleza read(FriendlyByteBuf b) {
+            return new Fortaleza(b.readBoolean());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ClientMusic.fortaleza(dentro));
+            ctx.get().setPacketHandled(true);
+        }
     }
 
     // ------------------------------------------------------------------ Espejo de la Sombra
@@ -78,11 +96,12 @@ public final class Net {
 
     /** Todo lo que sabe el espejo de este jugador (aviso: se acaba de despertar). */
     public record EspejoEstado(boolean activo, boolean aviso, int leidos, List<String> coleccion, List<String> bestiario,
-                               List<LugarE> lugares, List<LogroE> logros, List<DiarioE> diario) {
+                               List<LugarE> lugares, List<LogroE> logros, List<DiarioE> diario, int perdidos) {
         void write(FriendlyByteBuf b) {
             b.writeBoolean(activo);
             b.writeBoolean(aviso);
             b.writeVarInt(leidos);
+            b.writeVarInt(perdidos);
             b.writeCollection(coleccion, (bb, s) -> bb.writeUtf(s, 64));
             b.writeCollection(bestiario, (bb, s) -> bb.writeUtf(s, 64));
             b.writeCollection(lugares, (bb, l) -> {
@@ -113,7 +132,7 @@ public final class Net {
 
         static EspejoEstado read(FriendlyByteBuf b) {
             boolean activo = b.readBoolean(), aviso = b.readBoolean();
-            int leidos = b.readVarInt();
+            int leidos = b.readVarInt(), perdidos = b.readVarInt();
             List<String> col = b.readList(bb -> bb.readUtf(64));
             List<String> bes = b.readList(bb -> bb.readUtf(64));
             List<LugarE> ls = b.readList(bb -> new LugarE(bb.readUtf(96), bb.readVarInt(), bb.readVarInt(), bb.readInt(), bb.readInt(),
@@ -121,7 +140,7 @@ public final class Net {
             List<LogroE> lg = b.readList(bb -> new LogroE(bb.readUtf(64), bb.readUtf(96), bb.readVarInt(), bb.readBoolean(),
                     bb.readBoolean(), bb.readUtf(128), bb.readUtf(128)));
             List<DiarioE> di = b.readList(bb -> new DiarioE(bb.readVarInt(), bb.readUtf(64)));
-            return new EspejoEstado(activo, aviso, leidos, col, bes, ls, lg, di);
+            return new EspejoEstado(activo, aviso, leidos, col, bes, ls, lg, di, perdidos);
         }
 
         void handle(Supplier<NetworkEvent.Context> ctx) {

@@ -206,7 +206,8 @@ public final class ClientCine {
         if (Timeline.narrated(chapter) && !narrStarted && t >= Timeline.NARR_START) {
             narrStarted = true;
             // en la categoria general (MASTER): suena aunque la barra de "Voz" este bajada
-            ResourceLocation loc = (chapter == 5 ? DarkCraftMod.NARRACION_5 : DarkCraftMod.NARRACION_1).get().getLocation();
+            ResourceLocation loc = (chapter == 5 ? DarkCraftMod.NARRACION_5 : chapter == 6 ? DarkCraftMod.NARRACION_6
+                    : DarkCraftMod.NARRACION_1).get().getLocation();
             narr = new SimpleSoundInstance(loc, SoundSource.MASTER, 1.0f, 1.0f,
                     SoundInstance.createUnseededRandom(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true);
             mc.getSoundManager().play(narr);
@@ -441,7 +442,7 @@ public final class ClientCine {
         float frame = Math.min(in, out);
         // mundo mas oscuro y vineta
         // (en las de Ser Gavran, menos: armadura negra en una sala oscura)
-        if (!ch1) g.fill(0, 0, w, h, argb((chapter >= 33 && chapter <= 35 ? 0.1f : 0.32f) * frame, 8, 0, 0));
+        if (!ch1) g.fill(0, 0, w, h, argb((chapter >= 33 && chapter <= 37 ? 0.1f : 0.32f) * frame, 8, 0, 0));
         else if (t < Timeline.NARR_START + 0.5f) g.fill(0, 0, w, h, argb(0.3f * Math.min(in, 1 - smooth((t - Timeline.OUT) / 1.0f)), 8, 0, 0));
         vignette(g, w, h, (ch1 ? 0.7f : 0.9f) * frame);
         // brasas que suben
@@ -449,7 +450,7 @@ public final class ClientCine {
         if (visible(emb)) embers(g, w, h, t, emb);
         // el titulo
         if (chapter < 30) drawTitle(g, font, w, h, t);
-        else if (chapter >= 30 && chapter <= 35) bossTitle(g, font, w, h, t);
+        else if (chapter >= 30 && chapter <= 37) bossTitle(g, font, w, h, t);
         // fundidos a negro (cortes de plano y vuelta al jugador)
         float black = black(t);
         if (visible(black)) g.fill(0, 0, w, h, argb(black, 0, 0, 0));
@@ -621,11 +622,11 @@ public final class ClientCine {
         pose.translate(w / 2f, h * 0.68f, 0);
         pose.scale(S, S, 1);
         int al = Math.round(a * 255);
-        boolean verde = chapter >= 33 && chapter <= 35;
-        g.drawCenteredString(font, name, 1, 1, (al << 24) | (verde ? 0x002010 : 0x200000));
-        g.drawCenteredString(font, name, 0, 0, (al << 24) | (verde ? 0x5FE07A : 0xE0401A));
+        boolean verde = chapter >= 33 && chapter <= 35, hueso = chapter == 36 || chapter == 37;
+        g.drawCenteredString(font, name, 1, 1, (al << 24) | (verde ? 0x002010 : hueso ? 0x1A1410 : 0x200000));
+        g.drawCenteredString(font, name, 0, 0, (al << 24) | (verde ? 0x5FE07A : hueso ? 0xEDE4CC : 0xE0401A));
         pose.popPose();
-        g.drawCenteredString(font, sub, w / 2, Math.round(h * 0.68f + 11 * S), (al << 24) | (verde ? 0xC8E0B0 : 0xE8C080));
+        g.drawCenteredString(font, sub, w / 2, Math.round(h * 0.68f + 11 * S), (al << 24) | (verde ? 0xC8E0B0 : hueso ? 0xD04030 : 0xE8C080));
     }
 
     private static float black(float t) {

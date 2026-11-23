@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:encontrar",
+  "display": {
+    "icon": {
+      "item": "minecraft:written_book"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.libro_perdido.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.libro_perdido.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 20
+  }
+}

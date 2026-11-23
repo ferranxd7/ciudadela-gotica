@@ -35,7 +35,9 @@ public final class Comandos {
                         .then(ReyEventos.comando())
                         .then(TorreArbol.comando())
                         .then(GavranEventos.comando())
-                        .then(com.darkcraft.espejo.Espejo.comando())));
+                        .then(com.darkcraft.espejo.Espejo.comando())
+                        .then(com.darkcraft.caballeros.Caballeros.comando()))
+                .then(com.darkcraft.fortaleza.ComandosFortaleza.comando()));
     }
 
     /** Cada linea de la ayuda: lo que se escribe al hacer clic, lo que se ve y la clave de su explicacion. */
@@ -46,8 +48,8 @@ public final class Comandos {
     private static final Linea[] VALDRENN = {
             new Linea(V + "localizar", V + "localizar", "localizar"),
             new Linea(V + "ir", V + "ir", "ir"),
-            new Linea(V + "historia capitulo ", V + "historia capitulo <1-5>", "capitulo"),
-            new Linea(V + "historia libro ", V + "historia libro <1-5>", "libro"),
+            new Linea(V + "historia capitulo ", V + "historia capitulo <1-6>", "capitulo"),
+            new Linea(V + "historia libro ", V + "historia libro <1-6>", "libro"),
             new Linea(V + "historia mapa", V + "historia mapa", "mapa"),
             new Linea(V + "historia cofre ", V + "historia cofre <1-5>", "cofre"),
             new Linea(V + "historia reiniciar", V + "historia reiniciar", "reiniciar"),
@@ -55,12 +57,25 @@ public final class Comandos {
             new Linea(V + "arbol ", V + "arbol ir / arriba / llave / cerrar", "arbol"),
             new Linea(V + "gavran ", V + "gavran ir / estado / reiniciar / fase <1-2> / matar / guardia / ataque <nombre>", "gavran"),
             new Linea(V + "espejo ", V + "espejo despertar / dormir / revelar", "espejo"),
+            new Linea(V + "caballeros ", V + "caballeros grupo / quitar", "caballeros"),
+    };
+
+    private static final String F = "/darkcraft fortaleza ";
+
+    private static final Linea[] FORTALEZA = {
+            new Linea(F + "localizar", F + "localizar", "f_localizar"),
+            new Linea(F + "ir", F + "ir / escalera", "f_ir"),
+            new Linea(F + "puente", F + "puente / abrir / portal", "f_puente"),
+            new Linea(F + "amuleto", F + "amuleto / acertijo / libros", "f_objetos"),
+            new Linea(F + "construir", F + "construir / reiniciar", "f_reiniciar"),
     };
 
     private static int ayuda(CommandSourceStack src) {
         src.sendSuccess(() -> Component.translatable("darkcraft.ayuda.titulo").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD), false);
         src.sendSuccess(() -> Component.translatable("darkcraft.ayuda.valdrenn").withStyle(ChatFormatting.GOLD), false);
         for (Linea l : VALDRENN) src.sendSuccess(() -> linea(l), false);
+        src.sendSuccess(() -> Component.translatable("darkcraft.ayuda.fortaleza").withStyle(ChatFormatting.GOLD), false);
+        for (Linea l : FORTALEZA) src.sendSuccess(() -> linea(l), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ayuda", "/darkcraft ayuda", "ayuda")), false);
         return 1;
     }

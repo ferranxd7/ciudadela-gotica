@@ -66,5 +66,16 @@
     "aviso": "\"A Slave To No One\" Composed by Jonathan Shaw (www.jshaw.co.uk)",
     "uso": "Ser Gavran, fase 2",
     "lufs": -16
+  },
+  {
+    "id": "fortaleza",
+    "pagina": "https://opengameart.org/content/the-dark-amulet-dark-mage-theme",
+    "busca": "amulet",
+    "titulo": "The Dark Amulet - Dark Mage Theme",
+    "autor": "Matthew Pablo",
+    "licencia": "CC-BY 3.0",
+    "aviso": "Music by Matthew Pablo, http://www.matthewpablo.com",
+    "uso": "La Fortaleza de Hueso",
+    "lufs": -18
   }
 ]

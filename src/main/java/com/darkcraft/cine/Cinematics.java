@@ -51,7 +51,8 @@ public final class Cinematics {
     }
 
     /** Cinematicas de jefes (no son capitulos): los planos los manda quien la empieza. */
-    public static final int REY_VOLCAN = 30, SELLO = 31, REY_INTRO = 32, GAVRAN_INTRO = 33, GAVRAN_CAMBIO = 34, GAVRAN_MUERTE = 35;
+    public static final int REY_VOLCAN = 30, SELLO = 31, REY_INTRO = 32, GAVRAN_INTRO = 33, GAVRAN_CAMBIO = 34, GAVRAN_MUERTE = 35,
+            PUERTA_HUESO = 36, AMULETO = 37;
 
     /** Cinematica con planos dados, sin mover al jugador (los planos estan cerca de donde esta). */
     public static void playShots(ServerPlayer p, int id, List<Shot> shots, float total) {
@@ -66,6 +67,27 @@ public final class Cinematics {
 
     public static boolean active(Player p) {
         return ACTIVE.containsKey(p.getUUID());
+    }
+
+    /**
+     * Capitulo 6 (habla la Sombra) en lo alto de la Fortaleza de Hueso: para quien abre el portal y los que esten a menos
+     * de 100 bloques. Sin cofre: al acabar, el libro del capitulo (FortalezaEventos.finCapitulo6).
+     */
+    public static void playCapitulo6(ServerPlayer opener, com.darkcraft.gen.FortalezaPlan f) {
+        ServerLevel lvl = opener.serverLevel();
+        List<ServerPlayer> who = new ArrayList<>();
+        who.add(opener);
+        for (ServerPlayer p : lvl.players())
+            if (p != opener && !active(p) && !p.isSpectator() && p.distanceToSqr(opener) <= 100 * 100) who.add(p);
+        for (ServerPlayer p : who) {
+            Session s = new Session();
+            s.chapter = 6;
+            s.startTick = lvl.getServer().getTickCount();
+            s.total = Timeline.total(6);
+            s.shots = CineShots.chapter6(f, lvl, p.getEyePosition(), p.getYRot());
+            ACTIVE.put(p.getUUID(), s);
+            Net.to(p, new Net.CineStart(6, s.shots, new double[0]));
+        }
     }
 
     /**
@@ -187,6 +209,7 @@ public final class Cinematics {
         if (s.moved && !s.back) restore(p, s);
         if (s.chapter >= REY_VOLCAN) return;
         Story.markSeen(p, s.chapter);
+        if (s.chapter == 6) com.darkcraft.fortaleza.FortalezaEventos.finCapitulo6(p);
         if (s.chest != null) StoryEvents.openChest(p, s.chest, s.chapter);
     }
 

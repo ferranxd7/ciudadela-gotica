@@ -142,6 +142,35 @@ public final class ClientMusic {
         return boss != null && !boss.dying();
     }
 
+    // ------------------------------------------------------------------ la Fortaleza de Hueso
+
+    private static Track zona;
+    private static boolean enFortaleza;
+    private static int zonaTicks;
+
+    /** El servidor avisa al entrar y salir de la zona de una Fortaleza de Hueso: su musica, en bucle y suave. */
+    public static void fortaleza(boolean dentro) {
+        enFortaleza = dentro;
+    }
+
+    private static void tickZona(Minecraft mc) {
+        boolean quiere = enFortaleza && mc.player != null && (boss == null || boss.dying()) && (story == null || story.dying())
+                && !ClientCine.active();
+        if (quiere) {
+            if (zona == null || zona.dying() || !mc.getSoundManager().isActive(zona) && zonaTicks > 40) {
+                if (zona != null && !zona.dying()) mc.getSoundManager().stop(zona);
+                zona = new Track(DarkCraftMod.MUSICA_FORTALEZA.get(), "fortaleza", true);
+                zonaTicks = 0;
+                mc.getSoundManager().play(zona);
+                zona.fadeTo(0.55f, 6.0f);
+            }
+        } else if (zona != null && !zona.dying()) zona.kill(enFortaleza ? 1.5f : 4.0f);
+        if (zona != null) {
+            zonaTicks++;
+            if (zona.dying() && !mc.getSoundManager().isActive(zona) && zonaTicks > 40) zona = null;
+        }
+    }
+
     // ------------------------------------------------------------------ cada tick
 
     @SubscribeEvent
@@ -183,6 +212,8 @@ public final class ClientMusic {
                 }
             } else any = true;
         }
+        tickZona(mc);
+        if (zona != null && !zona.dying()) any = true;
         // que no se mezcle con la musica normal del juego
         if (any) mc.getMusicManager().stopPlaying();
     }
@@ -192,7 +223,9 @@ public final class ClientMusic {
         Minecraft mc = Minecraft.getInstance();
         if (story != null) mc.getSoundManager().stop(story);
         if (boss != null) mc.getSoundManager().stop(boss);
-        story = boss = null;
+        if (zona != null) mc.getSoundManager().stop(zona);
+        story = boss = zona = null;
+        enFortaleza = false;
         bossPhase = 0;
     }
 
@@ -201,6 +234,7 @@ public final class ClientMusic {
         Minecraft mc = Minecraft.getInstance();
         String s = story == null ? "-" : String.format("cofre %.2f%s", story.level(), mc.getSoundManager().isActive(story) ? "" : " (parada)");
         String b = boss == null ? "-" : String.format("%s %.2f", boss.name, boss.level());
-        return s + " / " + b;
+        String z = zona == null ? "" : String.format(" / fortaleza %.2f", zona.level());
+        return s + " / " + b + z;
     }
 }

@@ -1127,6 +1127,7 @@ public final class ClientCiTest {
         });
         int finG = gavran(S + 490 + 232);
         finG = mandoble(finG);
+        finG = fortaleza(finG);
         S = finG - 280;
         atTicks(S + 130 + 150, "Logros conseguidos", m -> server(m, sp -> {
             StringBuilder b = new StringBuilder("  logros:");
@@ -1461,6 +1462,318 @@ public final class ClientCiTest {
             m.setScreen(null);
         });
         return finCine + 20;
+    }
+
+    // ------------------------------------------------------------------ la Fortaleza de Hueso (parte 3)
+
+    private static com.darkcraft.fortaleza.Fortalezas.Sitio fsit;
+    private static com.darkcraft.gen.FortalezaPlan fplan;
+    private static int fbase;
+
+    private static String fpos(ServerPlayer sp) {
+        return String.format(java.util.Locale.ROOT, "%.1f %.1f %.1f", sp.getX(), sp.getY(), sp.getZ());
+    }
+
+    private static Vec3 fv(double dx, double dy, double dz) {
+        return new Vec3(fplan.cx + 0.5 + dx, fplan.Y + dy, fplan.cz + 0.5 + dz);
+    }
+
+    /** La Fortaleza de Hueso: se levanta sola al llegar, el puente de la llave, la corriente, la puerta, el acertijo, la forja y el capitulo 6. */
+    private static int fortaleza(int F) {
+        final int PZ = com.darkcraft.gen.FortalezaHueso.PZ;
+        atTicks(F, "Fortaleza: a la Fortaleza de Hueso del reino (volando, en creativo)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                fsit = com.darkcraft.fortaleza.Fortalezas.delReino(lvl.getSeed(), castle[0], castle[1]);
+                fplan = com.darkcraft.fortaleza.Fortalezas.plan(lvl.getSeed(), fsit);
+                log("fortaleza en " + fsit.x() + "," + fsit.z() + " (reino " + fsit.reinoX() + "," + fsit.reinoZ() + ") Y " + fplan.Y
+                        + " borde de la isla z " + fplan.bordeZ + ", " + fplan.chunks().size() + " chunks en el plano");
+                sp.setGameMode(GameType.CREATIVE);
+                sp.getAbilities().flying = true;
+                sp.onUpdateAbilities();
+                sp.teleportTo(lvl, fplan.cx + 0.5, fplan.Y + 34, fplan.cz + 0.5, 180f, 40f);
+            });
+        });
+        for (int k = 1; k <= 6; k++) {
+            final int kk = k;
+            atTicks(F + k * 100, "Fortaleza: se va levantando", m -> {
+                log("  musica: " + ClientMusic.debug());
+                server(m, sp -> {
+                    var est = com.darkcraft.fortaleza.FortalezaDatos.get(sp.server).de(fsit);
+                    log("  fortaleza a los " + kk * 5 + " s: " + est.hechos.size() + " de " + fplan.chunks().size() + " chunks; zona="
+                            + (com.darkcraft.fortaleza.FortalezaEventos.zona(sp) != null) + " lluvia=" + sp.serverLevel().isRaining());
+                });
+            });
+        }
+        int E = F + 640;
+        Object[][] fuera = {
+                {"cliente_f01_fortaleza", fv(78, 26, 72), fv(0, 14, -4)},
+                {"cliente_f02_fortaleza_lado", fv(-66, 12, 40), fv(0, 10, -2)},
+                {"cliente_f03_desde_arriba", fv(12, 64, 44), fv(0, 0, 0)},
+                {"cliente_f04_desde_abajo", fv(70, -26, 58), fv(0, -12, 0)},
+        };
+        for (int k = 0; k < fuera.length; k++) {
+            final Object[] o = fuera[k];
+            atTicks(E + k * 6, "Fortaleza desde fuera", m -> verDesde(m, (Vec3) o[1], (Vec3) o[2]));
+            atTicks(E + k * 6 + 4, "captura", m -> shot(m, (String) o[0]));
+        }
+        // el puente de hueso y nubes: con la llave, al pie de la escalera
+        int P = E + 40;
+        atTicks(P, "Puente: con la llave al pie de la escalera", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                int[] ce = com.darkcraft.fortaleza.Puente.centro(fplan);
+                fbase = com.darkcraft.fortaleza.Puente.base(lvl, fplan);
+                log("  escalera en " + ce[0] + "," + ce[1] + ", suelo a " + fbase + " (sube " + (fplan.Y - fbase) + " bloques)");
+                sp.teleportTo(lvl, ce[0] + 10.5, fbase + 1, ce[1] + 10.5, 135f, -10f);
+                sp.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(DarkCraftMod.LLAVE_HUESO.get()));
+                sp.gameMode.useItem(sp, lvl, sp.getMainHandItem(), InteractionHand.MAIN_HAND);
+                var est = com.darkcraft.fortaleza.FortalezaDatos.get(sp.server).de(fsit);
+                log("  puente: " + est.puente + " base " + est.baseEscalera + " logro puente=" + com.darkcraft.story.Logros.tiene(sp, "puente"));
+            });
+        });
+        int[][] vistas = {{20, 0}, {90, 1}, {180, 2}};
+        for (int[] v : vistas) {
+            final int vk = v[1];
+            atTicks(P + v[0], "Puente: se levanta", m -> {
+                int[] ce = com.darkcraft.fortaleza.Puente.centro(fplan);
+                double alto = fbase + (fplan.Y - fbase) * (0.3 + 0.35 * vk);
+                verDesde(m, new Vec3(ce[0] + 38 + vk * 6, alto + 14, ce[1] + 44 + vk * 6), new Vec3(ce[0] + 0.5, alto - 6, ce[1] + 0.5));
+            });
+            atTicks(P + v[0] + 4, "captura", m -> shot(m, "cliente_f05_puente_" + vk));
+        }
+        atTicks(P + 190, "Puente: desde arriba", m -> {
+            int[] ce = com.darkcraft.fortaleza.Puente.centro(fplan);
+            verDesde(m, new Vec3(ce[0] + 14, fplan.Y + 9, ce[1] - 16), new Vec3(ce[0] + 0.5, fplan.Y - 4, ce[1] + 3));
+        });
+        atTicks(P + 194, "captura", m -> shot(m, "cliente_f06_puente_arriba"));
+        // la corriente de nubes: en supervivencia, en el hueco de la escalera
+        atTicks(P + 200, "Corriente de nubes: al hueco de la escalera", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                int[] ce = com.darkcraft.fortaleza.Puente.centro(fplan);
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE, 400, 4));
+                sp.teleportTo(sp.serverLevel(), ce[0] + 0.5, fbase + 0.2, ce[1] + 0.5, 180f, -35f);
+                log("  corriente: empieza en " + fpos(sp));
+            });
+        });
+        atTicks(P + 230, "captura", m -> shot(m, "cliente_f07_corriente"));
+        atTicks(P + 260, "Corriente: altura", m -> server(m, sp -> log("  corriente a los 3 s: " + fpos(sp) + " levitacion="
+                + sp.hasEffect(net.minecraft.world.effect.MobEffects.LEVITATION))));
+        atTicks(P + 300, "Corriente: altura", m -> server(m, sp -> log("  corriente a los 5 s: " + fpos(sp))));
+        // la puerta: con la llave delante de la reja (cinematica)
+        int D = P + 310;
+        atTicks(D, "Puerta: con la llave delante de la reja", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                sp.setGameMode(GameType.CREATIVE);
+                sp.removeEffect(net.minecraft.world.effect.MobEffects.LEVITATION);
+                sp.teleportTo(lvl, fplan.cx + 0.5, fplan.Y, fplan.cz + PZ + 8.5, 180f, 0f);
+                sp.getCooldowns().removeCooldown(DarkCraftMod.LLAVE_HUESO.get());
+                sp.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(DarkCraftMod.LLAVE_HUESO.get()));
+                sp.gameMode.useItem(sp, lvl, sp.getMainHandItem(), InteractionHand.MAIN_HAND);
+                log("  puerta abierta=" + com.darkcraft.fortaleza.FortalezaDatos.get(sp.server).de(fsit).puerta + " cine=" + Cinematics.active(sp));
+            });
+        });
+        int[] tp = {30, 110, 160, 210, 270};
+        for (int k = 0; k < tp.length; k++) {
+            final int kk = k;
+            atTicks(D + tp[k], "captura de la puerta", m -> {
+                shot(m, "cliente_f10_puerta_" + kk);
+                log(String.format(java.util.Locale.ROOT, "  puerta t=%.1f s: cine %s (%d)", ClientCine.time(), ClientCine.active(), ClientCine.chapter()));
+            });
+        }
+        atTicks(D + 330, "Puerta: la reja arriba", m -> server(m, sp -> {
+            int[] r = fplan.f.reja();
+            ServerLevel lvl = sp.serverLevel();
+            log("  reja: abajo " + lvl.getBlockState(new BlockPos(fplan.cx, r[1], r[2])).getBlock() + ", arriba "
+                    + lvl.getBlockState(new BlockPos(fplan.cx, r[4] + 3, r[2])).getBlock() + "; logro puerta_hueso="
+                    + com.darkcraft.story.Logros.tiene(sp, "puerta_hueso"));
+        }));
+        // el patio, los caballeros y la torre del homenaje
+        int H = D + 340;
+        atTicks(H, "Patio: dentro de las murallas, con caballeros zombi", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                sp.teleportTo(sp.serverLevel(), fplan.cx + 0.5, fplan.Y, fplan.cz + 22.5, 180f, -12f);
+                int n = com.darkcraft.caballeros.Caballeros.grupo(sp.serverLevel(), sp, 3);
+                log("  caballeros en el patio: " + n);
+            });
+        });
+        atTicks(H + 30, "captura", m -> shot(m, "cliente_f11_patio"));
+        atTicks(H + 34, "Caballeros de cerca", m -> {
+            var l = m.level.getEntitiesOfClass(com.darkcraft.caballeros.CaballeroZombi.class, m.player.getBoundingBox().inflate(60));
+            if (!l.isEmpty()) {
+                var c = l.get(0);
+                verDesde(m, c.position().add(3.2, 2.2, 3.2), c.position().add(0, 1.2, 0));
+            }
+            log("  caballeros que ve el cliente: " + l.size());
+        });
+        atTicks(H + 40, "captura", m -> shot(m, "cliente_f12_caballeros"));
+        atTicks(H + 44, "Torre del homenaje: la planta baja", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                sp.serverLevel().getEntitiesOfClass(com.darkcraft.caballeros.CaballeroZombi.class, sp.getBoundingBox().inflate(80))
+                        .forEach(net.minecraft.world.entity.Entity::discard);
+                sp.teleportTo(sp.serverLevel(), fplan.cx + 0.5, fplan.Y, fplan.cz - 8.5, 180f, 8f);
+            });
+        });
+        atTicks(H + 70, "captura", m -> shot(m, "cliente_f13_homenaje"));
+        atTicks(H + 72, "El cofre del acertijo", m -> server(m, sp -> {
+            int[] c = fplan.f.cofre();
+            BlockPos b = new BlockPos(c[0], c[1], c[2]);
+            sp.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            sp.gameMode.useItemOn(sp, sp.serverLevel(), ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+                    new BlockHitResult(Vec3.atCenterOf(b), Direction.SOUTH, b, false));
+        }));
+        atTicks(H + 84, "captura del cofre", m -> {
+            shot(m, "cliente_f14_cofre");
+            StringBuilder b = new StringBuilder("  cofre del acertijo: " + (m.screen == null ? "NO" : m.screen.getClass().getSimpleName()) + " |");
+            if (m.player.containerMenu instanceof net.minecraft.world.inventory.ChestMenu cm)
+                for (int i = 0; i < cm.getContainer().getContainerSize(); i++) {
+                    ItemStack it = cm.getContainer().getItem(i);
+                    if (!it.isEmpty()) b.append(' ').append(it.getCount()).append('x')
+                            .append(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(it.getItem()).getPath());
+                }
+            log(b.toString());
+        });
+        atTicks(H + 88, "El libro del acertijo", m -> {
+            m.player.closeContainer();
+            m.setScreen(null);
+            server(m, sp -> sp.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(DarkCraftMod.LIBRO_ACERTIJO.get())));
+        });
+        atTicks(H + 94, "leer el acertijo", m -> m.gameMode.useItem(m.player, InteractionHand.MAIN_HAND));
+        for (int k = 0; k < 4; k++) {
+            final int kk = k;
+            atTicks(H + 100 + k * 8, "pagina del acertijo", m -> {
+                if (m.screen instanceof com.darkcraft.client.fortaleza.AcertijoScreen a) a.probar(Math.min(kk, 2), kk == 3);
+                else log("  el acertijo no esta abierto: " + (m.screen == null ? "nada" : m.screen.getClass().getSimpleName()));
+            });
+            atTicks(H + 106 + k * 8, "captura", m -> shot(m, kk < 3 ? "cliente_f15_acertijo_" + (kk + 1) : "cliente_f16_forja"));
+        }
+        atTicks(H + 136, "El atril de la planta baja (libro perdido)", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                log("  logro acertijo=" + com.darkcraft.story.Logros.tiene(sp, "acertijo") + " receta conocida="
+                        + sp.getRecipeBook().contains(new net.minecraft.resources.ResourceLocation("darkcraft", "amuleto_hueso")));
+                int[] a = fplan.f.atriles()[1];
+                BlockPos b = new BlockPos(a[0], a[1], a[2]);
+                log("  atril: " + sp.serverLevel().getBlockState(b));
+                sp.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+                sp.gameMode.useItemOn(sp, sp.serverLevel(), ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+                        new BlockHitResult(Vec3.atCenterOf(b), Direction.UP, b, false));
+            });
+        });
+        atTicks(H + 150, "captura", m -> {
+            shot(m, "cliente_f17_atril");
+            server(m, sp -> log("  libros perdidos: " + Integer.toBinaryString(com.darkcraft.espejo.Espejo.perdidos(sp))
+                    + " logro libro_perdido=" + com.darkcraft.story.Logros.tiene(sp, "libro_perdido")));
+        });
+        // la forja del amuleto (como si se acabara de craftear en la mesa)
+        int A = H + 156;
+        atTicks(A, "Forja del amuleto: la cinematica", m -> {
+            m.setScreen(null);
+            m.player.closeContainer();
+            server(m, sp -> {
+                BlockPos mesa = sp.blockPosition().relative(Direction.NORTH, 2);
+                sp.serverLevel().setBlock(mesa, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE.defaultBlockState(), 3);
+                ItemStack am = new ItemStack(DarkCraftMod.AMULETO_HUESO.get());
+                sp.getInventory().add(am.copy());
+                net.minecraftforge.event.ForgeEventFactory.firePlayerCraftingEvent(sp, am, new net.minecraft.world.SimpleContainer(9));
+                log("  forja: cine=" + Cinematics.active(sp) + " logro amuleto=" + com.darkcraft.story.Logros.tiene(sp, "amuleto"));
+            });
+        });
+        int[] ta = {20, 60, 110, 150};
+        for (int k = 0; k < ta.length; k++) {
+            final int kk = k;
+            atTicks(A + ta[k], "captura de la forja", m -> shot(m, "cliente_f20_forja_" + kk));
+        }
+        // lo alto de la torre: el altar, el amuleto y el capitulo 6 (se abre el portal)
+        int T = A + 190;
+        int top = com.darkcraft.gen.FortalezaHueso.NPISOS * com.darkcraft.gen.FortalezaHueso.PISO;
+        atTicks(T, "Azotea: junto al altar", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                int[] al = fplan.f.altar();
+                sp.teleportTo(sp.serverLevel(), al[0] + 0.5, al[1], al[2] + 2.5, 180f, -8f);
+                log("  altar: " + sp.serverLevel().getBlockState(new BlockPos(al[0], al[1] + 1, al[2])).getBlock());
+            });
+        });
+        atTicks(T + 30, "captura", m -> shot(m, "cliente_f30_azotea"));
+        atTicks(T + 34, "El amuleto en el altar: capitulo 6", m -> server(m, sp -> {
+            sp.getCooldowns().removeCooldown(DarkCraftMod.AMULETO_HUESO.get());
+            ItemStack am = new ItemStack(DarkCraftMod.AMULETO_HUESO.get());
+            sp.setItemInHand(InteractionHand.MAIN_HAND, am);
+            sp.gameMode.useItem(sp, sp.serverLevel(), am, InteractionHand.MAIN_HAND);
+            log("  amuleto usado: portal=" + com.darkcraft.fortaleza.FortalezaDatos.get(sp.server).de(fsit).portal + " cine=" + Cinematics.active(sp)
+                    + " logro portal=" + com.darkcraft.story.Logros.tiene(sp, "portal"));
+        }));
+        float tot6 = Timeline.total(6);
+        float[] t6 = {1.6f, 9f, Timeline.cut(6, 0) + 2f, Timeline.cut(6, 1) + 2f, Timeline.cut(6, 2) + 3.5f, Timeline.cut(6, 3) + 2f,
+                Timeline.cut(6, 4) + 2f, tot6 - 1.5f};
+        int C6 = T + 34;
+        for (int k = 0; k < t6.length; k++) {
+            final int kk = k;
+            atTicks(C6 + Math.round(t6[k] * 20), "captura del capitulo 6", m -> {
+                shot(m, "cliente_f3" + (kk + 1) + "_capitulo6_" + kk);
+                log(String.format(java.util.Locale.ROOT, "  capitulo 6 t=%.1f s: activa=%s capitulo=%d voz=%s (audio en el mod %s)", ClientCine.time(),
+                        ClientCine.active(), ClientCine.chapter(), ClientCine.narrationPlaying(), Timeline.hasAudio(6)));
+            });
+        }
+        int Q = C6 + Math.round(tot6 * 20) + 30;
+        atTicks(Q, "El portal abierto", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                int[] q = fplan.f.portal();
+                log("  portal: " + sp.serverLevel().getBlockState(new BlockPos(fplan.cx, q[1] + 3, q[2])).getBlock() + "; libro 6 en el inventario="
+                        + sp.getInventory().items.stream().anyMatch(st -> st.hasTag() && st.getTag().getInt("darkcraft_libro") == 6)
+                        + "; logros capitulo6=" + com.darkcraft.story.Logros.tiene(sp, "capitulo6"));
+            });
+        });
+        atTicks(Q + 10, "captura", m -> shot(m, "cliente_f40_portal"));
+        atTicks(Q + 12, "Tocar el portal", m -> server(m, sp -> {
+            int[] q = fplan.f.portal();
+            sp.teleportTo(sp.serverLevel(), fplan.cx + 0.5, q[1] + 1, q[2] + 0.5, 180f, 0f);
+        }));
+        atTicks(Q + 30, "El portal empuja", m -> server(m, sp -> log("  despues de tocar el portal: " + fpos(sp) + " (el portal esta en z "
+                + fplan.f.portal()[2] + ")")));
+        atTicks(Q + 34, "El libro de la M: capitulo 6 y un libro perdido", m -> {
+            com.darkcraft.client.espejo.LibroScreen.abrir();
+            if (m.screen instanceof com.darkcraft.client.espejo.LibroScreen l) l.probar(0, 0, 6);
+        });
+        atTicks(Q + 42, "captura", m -> shot(m, "cliente_f41_libro_cap6"));
+        atTicks(Q + 44, "libro perdido", m -> {
+            if (m.screen instanceof com.darkcraft.client.espejo.LibroScreen l) l.probar(0, 0, 111);
+        });
+        atTicks(Q + 52, "captura", m -> shot(m, "cliente_f42_libro_perdido"));
+        atTicks(Q + 54, "coleccion", m -> {
+            if (m.screen instanceof com.darkcraft.client.espejo.LibroScreen l) l.probar(2, 1, 0);
+        });
+        atTicks(Q + 62, "captura", m -> shot(m, "cliente_f43_coleccion"));
+        atTicks(Q + 64, "El espejo en la fortaleza", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            log("  espejo en la fortaleza: " + com.darkcraft.client.espejo.EspejoCliente.resumen());
+        });
+        atTicks(Q + 80, "captura", m -> {
+            shot(m, "cliente_f44_espejo_fortaleza");
+            server(m, sp -> {
+                StringBuilder b = new StringBuilder("  logros de la fortaleza:");
+                for (String id : new String[]{"fortaleza", "puente", "puerta_hueso", "acertijo", "amuleto", "portal", "capitulo6", "libro_perdido"})
+                    b.append(' ').append(id).append('=').append(com.darkcraft.story.Logros.tiene(sp, id) ? "SI" : "no");
+                log(b.toString());
+            });
+        });
+        return Q + 90;
     }
 
     // ------------------------------------------------------------------ el Mandoble del Juramento (parte B3)

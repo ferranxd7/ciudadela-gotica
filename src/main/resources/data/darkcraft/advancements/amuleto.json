@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:acertijo",
+  "display": {
+    "icon": {
+      "item": "darkcraft:amuleto_hueso"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.amuleto.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.amuleto.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}

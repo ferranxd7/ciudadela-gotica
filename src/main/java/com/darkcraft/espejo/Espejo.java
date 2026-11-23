@@ -63,7 +63,8 @@ public final class Espejo {
     /** Logros del mod en el orden de la historia (los que no esten aqui van al final). */
     public static final String[] ORDEN_LOGROS = {"encontrar", "libro_sombra", "primera_marca", "capitulo1", "capitulo2",
             "rey", "golpe_final", "capitulo3", "capitulo4", "arbol", "gavran_guardia", "gavran_fase1", "gavran_corazon",
-            "gavran_juicio", "gavran_fase2", "gavran", "capitulo5", "cartografo"};
+            "gavran_juicio", "gavran_fase2", "gavran", "capitulo5", "cartografo", "caballero", "caballeros_50", "fortaleza", "puente",
+            "puerta_hueso", "acertijo", "amuleto", "portal", "capitulo6", "libro_perdido", "libros_perdidos"};
 
     /** Un sitio del mapa: id unico ("x,z:nombre"), tipo, icono, posicion, clave del nombre, radio para descubrirlo. */
     public record Lugar(String id, int tipo, int icono, int x, int y, int z, String nombre, int radio, int cap) {}
@@ -121,6 +122,16 @@ public final class Espejo {
 
     public static boolean activo(Player p) {
         return datos(p).getBoolean("activo");
+    }
+
+    /** Libros perdidos encontrados (bit n = libro n). */
+    public static int perdidos(Player p) {
+        return datos(p).getInt("perdidos");
+    }
+
+    public static void ponerPerdidos(ServerPlayer p, int v) {
+        datos(p).putInt("perdidos", v);
+        SUCIOS.add(p.getUUID());
     }
 
     private static Set<String> conjunto(CompoundTag d, String clave) {
@@ -202,6 +213,17 @@ public final class Espejo {
             int[] h = plan.treeHall();
             if (h != null) out.add(new Lugar(k + ":gavran", JEFE, I_ESPADA, h[0], h[2], h[1] - TreeTower.HALL_R + 3,
                     "entity.darkcraft.gavran", 36, 0));
+            // su Fortaleza de Hueso, a 2500 bloques (no cuenta para el cartografo del reino)
+            int[] fo = com.darkcraft.fortaleza.Fortalezas.de(srv.overworld().getSeed(), sx, sz);
+            com.darkcraft.gen.FortalezaPlan fp = com.darkcraft.fortaleza.Fortalezas.plan(srv.overworld().getSeed(), fo[0], fo[1]);
+            int fy = fp.Y;
+            out.add(new Lugar(k + ":fortaleza", LUGAR, I_CALAVERA, fp.cx, fy, fp.cz, "darkcraft.mapa.lugar.fortaleza", 150, 0));
+            out.add(new Lugar(k + ":fortaleza_puerta", LUGAR, I_PUERTA, fp.cx, fy, fp.cz + com.darkcraft.gen.FortalezaHueso.PZ + 1,
+                    "darkcraft.mapa.lugar.fortaleza_puerta", 28, 0));
+            int[] al = fp.f.altar();
+            out.add(new Lugar(k + ":fortaleza_portal", LUGAR, I_PREGUNTA, al[0], al[1], al[2], "darkcraft.mapa.lugar.fortaleza_portal", 22, 0));
+            int[] ce = com.darkcraft.fortaleza.Puente.centro(fp);
+            out.add(new Lugar(k + ":fortaleza_escalera", LUGAR, I_TORRE, ce[0], fy, ce[1], "darkcraft.mapa.lugar.fortaleza_escalera", 60, 0));
         } catch (RuntimeException e) {
             DarkCraftMod.LOGGER.warn("Espejo: no se pudieron sacar los lugares de {}: {}", k, e.toString());
         }
@@ -259,6 +281,11 @@ public final class Espejo {
         if (!id.equals(Logros.ENCONTRAR) && !id.equals("libro_sombra") && !id.equals("primera_marca")) diario(p, id);
         if (id.equals(Logros.REY)) anadir(datos(p), "bestiario", "rey");
         if (id.equals(Logros.GAVRAN)) anadir(datos(p), "bestiario", "gavran");
+    }
+
+    /** Una criatura vencida para el bestiario (los caballeros zombi lo llaman al morir). */
+    public static void bestia(ServerPlayer p, String clave) {
+        if (anadir(datos(p), "bestiario", clave)) SUCIOS.add(p.getUUID());
     }
 
     /** Desde StoryEvents: el jugador ha leido el capitulo ch (los libros desvelan lo siguiente). */
@@ -375,11 +402,15 @@ public final class Espejo {
         for (String s : m.sitios) {
             String[] q = s.split(",");
             int sx = Integer.parseInt(q[0]), sz = Integer.parseInt(q[1]);
-            if (Math.hypot(sx - p.getX(), sz - p.getZ()) > 700) continue;
+            boolean cercaReino = Math.hypot(sx - p.getX(), sz - p.getZ()) <= 700;
+            int[] fo = com.darkcraft.fortaleza.Fortalezas.de(p.serverLevel().getSeed(), sx, sz);
+            boolean cercaFortaleza = Math.hypot(fo[0] - p.getX(), fo[1] - p.getZ()) <= 320;
+            if (!cercaReino && !cercaFortaleza) continue;
             List<Lugar> ls = lugares(p.server, sx, sz);
             int lugaresTotal = 0, lugaresVistos = 0;
             for (Lugar l : ls) {
-                if (l.tipo() == LUGAR) lugaresTotal++;
+                boolean deFortaleza = l.id().contains(":fortaleza");
+                if (l.tipo() == LUGAR && !deFortaleza) lugaresTotal++;
                 boolean ya = m.descubiertos.contains(l.id());
                 if (!ya) {
                     double dh = Math.hypot(l.x() + 0.5 - p.getX(), l.z() + 0.5 - p.getZ());
@@ -390,9 +421,9 @@ public final class Espejo {
                         ya = true;
                     }
                 }
-                if (ya && l.tipo() == LUGAR) lugaresVistos++;
+                if (ya && l.tipo() == LUGAR && !deFortaleza) lugaresVistos++;
             }
-            if (lugaresTotal > 0 && lugaresVistos >= lugaresTotal) Logros.dar(p, "cartografo");
+            if (cercaReino && lugaresTotal > 0 && lugaresVistos >= lugaresTotal) Logros.dar(p, "cartografo");
         }
         if (cambio) todosSucios(p.server);
     }
@@ -405,6 +436,8 @@ public final class Espejo {
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack st = inv.getItem(i);
             if (st.isEmpty()) continue;
+            int perdido = com.darkcraft.fortaleza.Perdidos.de(st);
+            if (perdido > 0) com.darkcraft.fortaleza.Perdidos.encontrado(p, perdido);
             String k = claveColeccion(st);
             if (k != null && anadir(d, "coleccion", k)) cambio = true;
         }
@@ -423,6 +456,8 @@ public final class Espejo {
     /** Nombre del sitio donde esta el jugador (clave de idioma) o "" (el cliente pone el bioma). */
     private static String lugarActual(ServerPlayer p) {
         if (p.level().dimension() != Level.OVERWORLD) return "";
+        String f = com.darkcraft.fortaleza.FortalezaEventos.lugar(p);
+        if (f != null) return f;
         Mundo m = Mundo.get(p.server);
         for (String s : m.sitios) {
             String[] q = s.split(",");
@@ -505,7 +540,7 @@ public final class Espejo {
             di.add(new Net.DiarioE(c.getInt("d"), c.getString("k")));
         }
         Net.to(p, new Net.EspejoEstado(true, aviso, leidos, new ArrayList<>(conjunto(d, "coleccion")),
-                new ArrayList<>(conjunto(d, "bestiario")), ls, lg, di));
+                new ArrayList<>(conjunto(d, "bestiario")), ls, lg, di, d.getInt("perdidos")));
     }
 
     private static String clave(net.minecraft.network.chat.Component c) {
@@ -534,7 +569,7 @@ public final class Espejo {
                     ServerPlayer p = c.getSource().getPlayerOrException();
                     CompoundTag d = datos(p);
                     for (String k : List.copyOf(d.getAllKeys())) d.remove(k);
-                    Net.to(p, new Net.EspejoEstado(false, false, 0, List.of(), List.of(), List.of(), List.of(), List.of()));
+                    Net.to(p, new Net.EspejoEstado(false, false, 0, List.of(), List.of(), List.of(), List.of(), List.of(), 0));
                     return 1;
                 }))
                 .then(net.minecraft.commands.Commands.literal("revelar").executes(c -> {

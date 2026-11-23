@@ -334,12 +334,24 @@ public final class LibroScreen extends Screen {
             int col = !ok ? GRIS : (hSel == ch ? ROJO : sobre ? 0xFF6A2A14 : TINTA);
             if (!ok) EspejoHud.icono(g, EspejoHud.I_CANDADO, lx + 4, y + 3.5f, 8);
             g.drawString(font, recortar(t, lw - 12), lx + 10, y, col, false);
-            y += 12;
+            y += 11;
         }
         y += 6;
-        g.drawString(font, Component.translatable("darkcraft.sombra.libros"), lx, y, ORO, false);
+        int perdidos = EspejoCliente.estado.perdidos();
+        int nPerdidos = Integer.bitCount(perdidos >> 1);
+        g.drawString(font, Component.translatable("darkcraft.sombra.libros").append(" (" + nPerdidos + "/11)"), lx, y, ORO, false);
         y += 12;
-        y = parrafo(g, Component.translatable("darkcraft.sombra.libros.ninguno").withStyle(ChatFormatting.ITALIC), lx + 10, y, lw - 10, GRIS);
+        filasPerdidos.clear();
+        if (nPerdidos == 0) y = parrafo(g, Component.translatable("darkcraft.sombra.libros.ninguno").withStyle(ChatFormatting.ITALIC), lx + 10, y, lw - 10, GRIS);
+        for (int n = 1; n <= 11; n++) {
+            if ((perdidos & (1 << n)) == 0) continue;
+            boolean sobre = mx >= lx && mx < lx + lw && my >= y - 1 && my < y + 9;
+            int col = hSel == 100 + n ? ROJO : sobre ? 0xFF6A2A14 : TINTA;
+            EspejoHud.icono(g, EspejoHud.I_LIBRO, lx + 4, y + 3.5f, 8);
+            g.drawString(font, recortar(Component.translatable("darkcraft.perdido." + n + ".titulo"), lw - 12), lx + 10, y, col, false);
+            filasPerdidos.add(new int[]{y, n});
+            y += 10;
+        }
         y += 8;
         boolean sobreD = mx >= lx && mx < lx + lw && my >= y - 1 && my < y + 10;
         EspejoHud.icono(g, EspejoHud.I_PLUMA, lx + 4, y + 3.5f, 9);
@@ -357,6 +369,7 @@ public final class LibroScreen extends Screen {
             return;
         }
         Component titulo = hSel == 10 ? Component.translatable("darkcraft.sombra.diario")
+                : hSel > 100 ? Component.translatable("darkcraft.perdido." + (hSel - 100) + ".titulo")
                 : Component.translatable("darkcraft.capitulo", romano(hSel));
         centro(g, titulo.copy().withStyle(ChatFormatting.BOLD), rcx, ry, ROJO);
         int paginas = Math.max(1, (lineas.size() + lineasPag - 1) / lineasPag);
@@ -379,6 +392,7 @@ public final class LibroScreen extends Screen {
     }
 
     private final int[] filasHistoria = new int[1];
+    private final List<int[]> filasPerdidos = new ArrayList<>();
     private final int[] flechas = new int[3];
 
     private void flecha(GuiGraphics g, int x, int y, String s, boolean activa, int mx, int my) {
@@ -395,6 +409,16 @@ public final class LibroScreen extends Screen {
             out.add(FormattedCharSequence.EMPTY);
             for (int p = 1; p <= 20; p++) {
                 String key = "darkcraft.cap." + hSel + ".p" + p;
+                if (!I18n.exists(key)) break;
+                out.addAll(font.split(Component.translatable(key), w));
+                out.add(FormattedCharSequence.EMPTY);
+            }
+        } else if (hSel > 100) {
+            int n = hSel - 100;
+            out.addAll(font.split(Component.translatable("darkcraft.perdido." + n + ".autor").withStyle(ChatFormatting.ITALIC), w));
+            out.add(FormattedCharSequence.EMPTY);
+            for (int p = 1; p <= 20; p++) {
+                String key = "darkcraft.perdido." + n + ".p" + p;
                 if (!I18n.exists(key)) break;
                 out.addAll(font.split(Component.translatable(key), w));
                 out.add(FormattedCharSequence.EMPTY);
@@ -423,8 +447,15 @@ public final class LibroScreen extends Screen {
                 pasarPagina();
                 return true;
             }
-            y += 12;
+            y += 11;
         }
+        for (int[] f : filasPerdidos)
+            if (mx >= lx && mx < lx + lw && my >= f[0] - 1 && my < f[0] + 9) {
+                hSel = 100 + f[1];
+                hPag = 0;
+                pasarPagina();
+                return true;
+            }
         int yd = filasHistoria[0];
         if (mx >= lx && mx < lx + lw && my >= yd - 1 && my < yd + 10) {
             hSel = 10;
@@ -473,8 +504,8 @@ public final class LibroScreen extends Screen {
     private List<Object[]> cacheLogros;
 
     static final String[] COLECCION = {"mapa_valdrenn", "libro1", "libro2", "espada_diestra", "espada_siniestra", "libro3", "libro4",
-            "llave_arbol", "mandoble_juramento", "llave_hueso", "libro5"};
-    static final String[] BESTIARIO = {"escudero", "rey", "gavran"};
+            "llave_arbol", "mandoble_juramento", "llave_hueso", "libro5", "alabarda", "libro_acertijo", "amuleto_hueso", "libro6"};
+    static final String[] BESTIARIO = {"escudero", "caballero_espada", "caballero_alabarda", "caballero_ballesta", "rey", "gavran"};
 
     private static ItemStack objeto(String clave) {
         if (clave.startsWith("libro")) {
@@ -603,7 +634,8 @@ public final class LibroScreen extends Screen {
         return switch (c) {
             case "rey" -> "entity.darkcraft.rey";
             case "gavran" -> "entity.darkcraft.gavran";
-            default -> "darkcraft.gavran.escudero";
+            case "escudero" -> "darkcraft.gavran.escudero";
+            default -> "entity.darkcraft." + c;
         };
     }
 
@@ -616,6 +648,16 @@ public final class LibroScreen extends Screen {
             LivingEntity le = switch (c) {
                 case "rey" -> DarkCraftMod.REY.get().create(lvl);
                 case "gavran" -> DarkCraftMod.GAVRAN.get().create(lvl);
+                case "caballero_espada", "caballero_alabarda", "caballero_ballesta" -> {
+                    var k2 = c.equals("caballero_espada") ? DarkCraftMod.CABALLERO_ESPADA.get().create(lvl)
+                            : c.equals("caballero_alabarda") ? DarkCraftMod.CABALLERO_ALABARDA.get().create(lvl) : DarkCraftMod.CABALLERO_BALLESTA.get().create(lvl);
+                    if (k2 != null) {
+                        k2.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(c.equals("caballero_espada") ? Items.IRON_SWORD
+                                : c.equals("caballero_alabarda") ? DarkCraftMod.ALABARDA.get() : Items.CROSSBOW));
+                        if (c.equals("caballero_espada")) k2.setItemSlot(EquipmentSlot.OFFHAND, com.darkcraft.caballeros.Caballeros.escudo());
+                    }
+                    yield k2;
+                }
                 default -> {
                     var s = EntityType.SKELETON.create(lvl);
                     if (s != null) {

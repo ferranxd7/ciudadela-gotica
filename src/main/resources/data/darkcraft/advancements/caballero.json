@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:encontrar",
+  "display": {
+    "icon": {
+      "item": "darkcraft:alabarda"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.caballero.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.caballero.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 30
+  }
+}

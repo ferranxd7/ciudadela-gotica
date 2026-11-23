@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "axis=x": {"model": "darkcraft:block/reja_hueso"},
+    "axis=z": {"model": "darkcraft:block/reja_hueso", "y": 90}
+  }
+}

@@ -28,6 +28,8 @@ public final class Timeline {
     public static final int[][] GROUPS = {{0, 1}, {2, 4}, {5, 5}, {6, 7}, {8, 9}};
     /** Los del capitulo 5: la sala, el arbol en flor, la tormenta, la llave, el cielo y la despedida. */
     public static final int[][] GROUPS5 = {{0, 0}, {1, 2}, {3, 4}, {5, 5}, {6, 7}, {8, 10}};
+    /** Los del capitulo 6 (habla la Sombra): la fortaleza, el patio, la torre, el arco, el portal y el jugador. */
+    public static final int[][] GROUPS6 = {{0, 1}, {2, 4}, {5, 5}, {6, 7}, {8, 9}, {10, 11}};
 
     private record Datos(float duracion, float[][] lineas, boolean audio) {}
 
@@ -35,11 +37,11 @@ public final class Timeline {
 
     /** Si el capitulo tiene narrador (voz, subtitulos y planos de camara). */
     public static boolean narrated(int ch) {
-        return ch == 1 || ch == 5;
+        return ch == 1 || ch == 5 || ch == 6;
     }
 
     public static int[][] groups(int ch) {
-        return ch == 5 ? GROUPS5 : GROUPS;
+        return ch == 5 ? GROUPS5 : ch == 6 ? GROUPS6 : GROUPS;
     }
 
     private static synchronized Datos load(int ch) {
@@ -56,7 +58,7 @@ public final class Timeline {
             }
             d = new Datos(o.get("duracion").getAsFloat(), l, o.has("audio") && o.get("audio").getAsBoolean());
         } catch (Exception e) {
-            int n = ch == 5 ? 11 : 10;
+            int n = ch == 5 ? 11 : ch == 6 ? 12 : 10;
             float[][] l = new float[n][2];
             for (int i = 0; i < n; i++) {
                 l[i][0] = 0.3f + i * 6f;

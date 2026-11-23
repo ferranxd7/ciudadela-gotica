@@ -713,5 +713,153 @@
         "name": "darkcraft:sfx/libro_abre_1"
       }
     ]
+  },
+  "sfx.zombi_caballero_grunido": {
+    "subtitle": "subtitles.darkcraft.sfx.zombi_caballero_grunido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/zombi_caballero_grunido_1"
+      },
+      {
+        "name": "darkcraft:sfx/zombi_caballero_grunido_2"
+      },
+      {
+        "name": "darkcraft:sfx/zombi_caballero_grunido_3"
+      },
+      {
+        "name": "darkcraft:sfx/zombi_caballero_grunido_4"
+      }
+    ]
+  },
+  "sfx.zombi_caballero_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.zombi_caballero_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/zombi_caballero_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/zombi_caballero_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/zombi_caballero_dolor_3"
+      },
+      {
+        "name": "darkcraft:sfx/zombi_caballero_dolor_4"
+      }
+    ]
+  },
+  "sfx.zombi_caballero_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.zombi_caballero_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/zombi_caballero_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/zombi_caballero_muerte_2"
+      }
+    ]
+  },
+  "sfx.armadura_paso": {
+    "subtitle": "subtitles.darkcraft.sfx.armadura_paso",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/armadura_paso_1"
+      },
+      {
+        "name": "darkcraft:sfx/armadura_paso_2"
+      },
+      {
+        "name": "darkcraft:sfx/armadura_paso_3"
+      },
+      {
+        "name": "darkcraft:sfx/armadura_paso_4"
+      }
+    ]
+  },
+  "sfx.escudo_golpe": {
+    "subtitle": "subtitles.darkcraft.sfx.escudo_golpe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/escudo_golpe_1"
+      },
+      {
+        "name": "darkcraft:sfx/escudo_golpe_2"
+      }
+    ]
+  },
+  "sfx.alabarda_tajo": {
+    "subtitle": "subtitles.darkcraft.sfx.alabarda_tajo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/alabarda_tajo_1"
+      },
+      {
+        "name": "darkcraft:sfx/alabarda_tajo_2"
+      }
+    ]
+  },
+  "sfx.llave_rastro": {
+    "subtitle": "subtitles.darkcraft.sfx.llave_rastro",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/llave_rastro_1"
+      },
+      {
+        "name": "darkcraft:sfx/llave_rastro_2"
+      }
+    ]
+  },
+  "sfx.puente_hueso": {
+    "subtitle": "subtitles.darkcraft.sfx.puente_hueso",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/puente_hueso_1"
+      },
+      {
+        "name": "darkcraft:sfx/puente_hueso_2"
+      }
+    ]
+  },
+  "sfx.puerta_hueso": {
+    "subtitle": "subtitles.darkcraft.sfx.puerta_hueso",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/puerta_hueso_1"
+      }
+    ]
+  },
+  "sfx.amuleto_forja": {
+    "subtitle": "subtitles.darkcraft.sfx.amuleto_forja",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/amuleto_forja_1"
+      }
+    ]
+  },
+  "sfx.portal_abre": {
+    "subtitle": "subtitles.darkcraft.sfx.portal_abre",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/portal_abre_1"
+      }
+    ]
+  },
+  "narracion.cap6": {
+    "subtitle": "subtitles.darkcraft.narracion",
+    "sounds": [
+      {
+        "name": "darkcraft:narracion/cap6",
+        "stream": false,
+        "preload": true
+      }
+    ]
+  },
+  "musica.fortaleza": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/fortaleza",
+        "stream": true
+      }
+    ]
   }
 }

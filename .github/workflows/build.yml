@@ -57,7 +57,7 @@ jobs:
           for f in src/main/resources/assets/darkcraft/sounds/musica/*.ogg; do [ -f "$f" ] && cp "$f" "out/musica_$(basename "$f")"; done
           cat out/musica.log || true
 
-      - name: Textos, narraciones de los capitulos 1 y 5 y audios de ElevenLabs
+      - name: Textos, narraciones de los capitulos 1, 5 y 6 y audios de ElevenLabs
         run: |
           mkdir -p out
           python3 ci/historia/textos.py > out/textos.log 2>&1 || echo "AVISO: revisar textos" >> out/textos.log
@@ -67,6 +67,7 @@ jobs:
           for f in src/main/resources/assets/darkcraft/sounds/sfx/*_1.ogg; do [ -f "$f" ] && cp "$f" "out/sfx_$(basename "$f")"; done
           cp src/main/resources/assets/darkcraft/sounds/narracion/cap1.ogg out/narracion_capitulo1.ogg 2>/dev/null || true
           cp src/main/resources/assets/darkcraft/sounds/narracion/cap5.ogg out/narracion_capitulo5.ogg 2>/dev/null || true
+          cp src/main/resources/assets/darkcraft/sounds/narracion/cap6.ogg out/narracion_capitulo6.ogg 2>/dev/null || true
 
       - name: Compilar el mod
         run: |

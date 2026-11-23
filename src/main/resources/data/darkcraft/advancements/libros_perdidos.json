@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:libro_perdido",
+  "display": {
+    "icon": {
+      "item": "minecraft:lectern"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.libros_perdidos.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.libros_perdidos.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 200
+  }
+}

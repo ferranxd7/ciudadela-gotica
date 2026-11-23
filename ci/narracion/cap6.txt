@@ -1,0 +1,12 @@
+So the bone key has brought you here, above the clouds.|1.2
+Aldous writes no more. From now on, I write this chronicle.|1.4
+Those who dared not speak my name called me the Shadow.|1.0
+I gave a king what he asked for. I gave him back his queen.|0.9
+That he did not recognize her was not my fault.|1.6
+You have defeated his king. You have defeated his knight. You have read his secrets.|1.2
+And now you open my door with the amulet you forged with your own hands.|1.4
+Look closely at what lies on the other side.|1.8
+You cannot cross yet. The threshold does not know you.|1.2
+But I know you. I have seen you in every reflection of my mirror.|1.6
+Come back when you are ready. I will be waiting.|1.2
+I always wait.|0.0

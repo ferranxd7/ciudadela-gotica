@@ -54,12 +54,25 @@ SFX = {
     "madera_cruje": (3.2, 0.8, -16), "corazon_latido": (3.0, 0.8, -15), "hojas_disolver": (5.0, 1.5, -16),
     # Espejo de la Sombra y libro de la M
     "espejo_despierta": (3.0, 0.7, -14), "pluma_escribe": (2.0, 0.3, -20), "libro_abre": (2.6, 0.8, -17),
+    # caballeros zombi (el paso: solo el primero de los dos pasos de cada toma)
+    "zombi_caballero_grunido": (2.0, 0.4, -18), "zombi_caballero_dolor": (0.9, 0.2, -17), "zombi_caballero_muerte": (2.6, 0.5, -16),
+    "armadura_paso": (0.75, 0.2, -23), "escudo_golpe": (1.0, 0.3, -14), "alabarda_tajo": (1.1, 0.3, -15),
+    # la Fortaleza de Hueso
+    "llave_rastro": (2.0, 0.5, -19), "puente_hueso": (5.5, 1.2, -15), "puerta_hueso": (8.0, 1.8, -13),
+    "amuleto_forja": (5.0, 1.5, -14), "portal_abre": (7.0, 2.0, -13),
 }
 # de estos se bajaron 4 tomas (NOMBRE_1..4.mp3): las elegidas salen como NOMBRE_1.ogg, NOMBRE_2.ogg...
 TOMAS_SFX = {
     "espejo_despierta": (3,),   # empieza grave y se aclara (el zumbido que sube y la campanilla)
     "pluma_escribe": (2, 4),    # las dos de volumen mas parejo
     "libro_abre": (3,),         # la del golpe de la tapa al principio
+    "zombi_caballero_grunido": (1, 2, 3, 4), "zombi_caballero_dolor": (1, 2, 3, 4), "zombi_caballero_muerte": (1, 2),
+    "armadura_paso": (1, 2, 3, 4), "escudo_golpe": (1, 3), "alabarda_tajo": (2, 4),
+    "llave_rastro": (2, 3),      # las dos que suenan enseguida (la 4 casi no se oye)
+    "puente_hueso": (1, 2),      # las que crecen y se mantienen
+    "puerta_hueso": (1,),        # la mas larga: el cuerpo pesado dura lo que sube la reja
+    "amuleto_forja": (1,),       # golpe y brillo que se sostiene antes de apagarse
+    "portal_abre": (1,),         # crece y se mantiene cinco segundos
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "DND",
+    "NKN"
+  ],
+  "key": {
+    "D": {"item": "minecraft:diamond"},
+    "N": {"item": "minecraft:netherite_ingot"},
+    "K": {"item": "darkcraft:llave_hueso"}
+  },
+  "result": {"item": "darkcraft:amuleto_hueso", "count": 1}
+}
