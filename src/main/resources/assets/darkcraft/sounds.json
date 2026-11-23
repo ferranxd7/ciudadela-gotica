@@ -354,5 +354,319 @@
         "name": "darkcraft:sfx/ascensor_llega_2"
       }
     ]
+  },
+  "sfx.gavran_tajo": {
+    "subtitle": "subtitles.darkcraft.sfx.gavran_tajo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gavran_tajo_1"
+      }
+    ]
+  },
+  "sfx.gavran_choque": {
+    "subtitle": "subtitles.darkcraft.sfx.gavran_choque",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gavran_choque_1"
+      }
+    ]
+  },
+  "sfx.gavran_embestida": {
+    "subtitle": "subtitles.darkcraft.sfx.gavran_embestida",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gavran_embestida_1"
+      }
+    ]
+  },
+  "sfx.gavran_raices": {
+    "subtitle": "subtitles.darkcraft.sfx.gavran_raices",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gavran_raices_1"
+      }
+    ]
+  },
+  "sfx.gavran_clavar": {
+    "subtitle": "subtitles.darkcraft.sfx.gavran_clavar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gavran_clavar_1"
+      }
+    ]
+  },
+  "sfx.gavran_invocar": {
+    "subtitle": "subtitles.darkcraft.sfx.gavran_invocar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gavran_invocar_1"
+      }
+    ]
+  },
+  "sfx.gavran_paso": {
+    "subtitle": "subtitles.darkcraft.sfx.gavran_paso",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gavran_paso_1"
+      }
+    ]
+  },
+  "sfx.gavran_guardia_rota": {
+    "subtitle": "subtitles.darkcraft.sfx.gavran_guardia_rota",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gavran_guardia_rota_1"
+      }
+    ]
+  },
+  "sfx.gavran_salto": {
+    "subtitle": "subtitles.darkcraft.sfx.gavran_salto",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gavran_salto_1"
+      }
+    ]
+  },
+  "sfx.arbol_despierta": {
+    "subtitle": "subtitles.darkcraft.sfx.arbol_despierta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/arbol_despierta_1"
+      }
+    ]
+  },
+  "sfx.hojas_cortantes": {
+    "subtitle": "subtitles.darkcraft.sfx.hojas_cortantes",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/hojas_cortantes_1"
+      }
+    ]
+  },
+  "sfx.raices_atrapan": {
+    "subtitle": "subtitles.darkcraft.sfx.raices_atrapan",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/raices_atrapan_1"
+      }
+    ]
+  },
+  "sfx.espinas": {
+    "subtitle": "subtitles.darkcraft.sfx.espinas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/espinas_1"
+      }
+    ]
+  },
+  "sfx.corteza_muro": {
+    "subtitle": "subtitles.darkcraft.sfx.corteza_muro",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corteza_muro_1"
+      }
+    ]
+  },
+  "sfx.florecer": {
+    "subtitle": "subtitles.darkcraft.sfx.florecer",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/florecer_1"
+      }
+    ]
+  },
+  "sfx.madera_cruje": {
+    "subtitle": "subtitles.darkcraft.sfx.madera_cruje",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/madera_cruje_1"
+      }
+    ]
+  },
+  "sfx.corazon_latido": {
+    "subtitle": "subtitles.darkcraft.sfx.corazon_latido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corazon_latido_1"
+      }
+    ]
+  },
+  "sfx.hojas_disolver": {
+    "subtitle": "subtitles.darkcraft.sfx.hojas_disolver",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/hojas_disolver_1"
+      }
+    ]
+  },
+  "gavran.voz.1": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.2": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.3": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.4": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.5": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.6": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_6",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.7": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_7",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.8": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_8",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.9": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_9",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.10": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_10",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.11": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_11",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.12": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_12",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.13": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_13",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.14": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_14",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.15": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_15",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.16": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_16",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.17": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_17",
+        "stream": false
+      }
+    ]
+  },
+  "gavran.voz.18": {
+    "subtitle": "subtitles.darkcraft.gavran.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gavran/voz_18",
+        "stream": false
+      }
+    ]
+  },
+  "musica.gavran1": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/gavran1",
+        "stream": true
+      }
+    ]
   }
 }

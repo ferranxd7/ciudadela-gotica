@@ -44,5 +44,6 @@ van dentro del mod, en `assets/darkcraft/creditos.txt`):
 - "Darkness March" de Alexandr Zhelanov, CC-BY 4.0 — Corvin, fase 1.
 - "Dark souls type boss theme" de Philémon Weber (Helmet), CC-BY 4.0 — Corvin, fase 2.
 - "Colossal Boss Battle Theme" de Matthew Pablo (www.matthewpablo.com), CC-BY 3.0 — Corvin, fase 3.
+- "Dark Descent" de Matthew Pablo (www.matthewpablo.com), CC-BY 3.0 — Ser Gavran, fase 1.
 
 Se han pasado a OGG, sin silencio al principio y al final y con el volumen igualado.

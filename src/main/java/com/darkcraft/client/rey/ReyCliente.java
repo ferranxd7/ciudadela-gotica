@@ -101,6 +101,7 @@ public final class ReyCliente {
         return switch (c) {
             case Net.Aviso.ORO -> new float[]{1f, 0.78f, 0.2f};
             case Net.Aviso.NARANJA -> new float[]{1f, 0.42f, 0.05f};
+            case Net.Aviso.VERDE -> new float[]{0.3f, 1f, 0.42f};
             default -> new float[]{1f, 0.08f, 0.04f};
         };
     }
@@ -147,6 +148,15 @@ public final class ReyCliente {
                 float l2 = len * k;
                 quad(vc, m, a.x() + sx * w, y + 0.005, a.z() + sz * w, a.x() - sx * w, y + 0.005, a.z() - sz * w,
                         a.x() - sx * w + fx * l2, y + 0.005, a.z() - sz * w + fz * l2, a.x() + sx * w + fx * l2, y + 0.005, a.z() + sz * w + fz * l2, c, 0.25f * after);
+            }
+            case Net.Aviso.ONDA -> {
+                // anillo que se abre por el suelo a a.b() bloques por tick hasta a.a(): hay que saltarlo
+                float r = Math.min(a.a(), a.b() * age);
+                float fin = Mth.clamp(1f - (r - a.a() * 0.85f) / (a.a() * 0.15f), 0f, 1f) * (age > dur ? 0f : 1f);
+                disco(vc, m, a.x(), y, a.z(), Math.max(0, r - 1.1f), r, c, 0.55f * fin);
+                disco(vc, m, a.x(), y + 0.01, a.z(), Math.max(0, r - 0.25f), r + 0.1f, c, 0.95f * fin);
+                disco(vc, m, a.x(), y, a.z(), Math.max(0, r - 3.5f), Math.max(0, r - 1.1f), c, 0.12f * fin);
+                columna(vc, m, a.x(), y, a.z(), r, 1.1f, c, 0.35f * fin);
             }
             case Net.Aviso.SECTOR -> {
                 double mid = Math.toRadians(a.ang() + 90);
@@ -222,13 +232,46 @@ public final class ReyCliente {
 
     public static void habla(Net.ReyHabla m) {
         Minecraft mc = Minecraft.getInstance();
-        if (m.linea() < 1 || m.linea() >= DarkCraftMod.REY_VOZ.length) return;
+        boolean gavran = m.linea() > com.darkcraft.gavran.Gavran.VOZ_BASE;
+        int n = gavran ? m.linea() - com.darkcraft.gavran.Gavran.VOZ_BASE : m.linea();
+        var tabla = gavran ? DarkCraftMod.GAVRAN_VOZ : DarkCraftMod.REY_VOZ;
+        if (n < 1 || n >= tabla.length) return;
         if (voz != null) mc.getSoundManager().stop(voz);
-        voz = new SimpleSoundInstance(DarkCraftMod.REY_VOZ[m.linea()].get().getLocation(), SoundSource.MASTER, 1.0f, 1.0f,
+        voz = new SimpleSoundInstance(tabla[n].get().getLocation(), SoundSource.MASTER, 1.0f, 1.0f,
                 SoundInstance.createUnseededRandom(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true);
         mc.getSoundManager().play(voz);
         subLinea = m.linea();
-        subFin = ticks + DUR[m.linea()];
+        subFin = ticks + dur(m.linea());
+    }
+
+    /** Duracion del subtitulo de la linea (las de Gavran van de 101 a 118). */
+    private static int dur(int linea) {
+        if (linea > com.darkcraft.gavran.Gavran.VOZ_BASE) {
+            int n = linea - com.darkcraft.gavran.Gavran.VOZ_BASE;
+            return n < DUR_GAVRAN.length ? DUR_GAVRAN[n] : 80;
+        }
+        return linea < DUR.length ? DUR[linea] : 80;
+    }
+
+    private static final int[] DUR_GAVRAN = duracionesGavran();
+
+    private static int[] duracionesGavran() {
+        int[] d = new int[19];
+        float[] s = {0, 6.8f, 7.52f, 6.0f, 4.88f, 1.68f, 1.12f, 4.32f, 3.04f, 3.28f, 2.96f, 4.72f, 2.24f, 3.28f, 4.72f, 4.72f, 3.44f, 4.64f, 6.64f};
+        for (int i = 1; i < d.length; i++) d[i] = Math.round(s[i] * 20) + 25;
+        try (var in = ReyCliente.class.getResourceAsStream("/assets/darkcraft/rey_voces.json")) {
+            if (in == null) return d;
+            var root = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8))
+                    .getAsJsonObject();
+            if (!root.has("gavran")) return d;
+            var o = root.getAsJsonObject("gavran");
+            for (String k : o.keySet()) {
+                int i = Integer.parseInt(k);
+                if (i > 0 && i < d.length) d[i] = Math.round(o.get(k).getAsFloat() * 20) + 25;
+            }
+        } catch (Exception ignored) {
+        }
+        return d;
     }
 
     // ------------------------------------------------------------------ la camara mira al rey
@@ -321,12 +364,14 @@ public final class ReyCliente {
         boolean cine = ClientCine.active();
         if (subLinea <= 0 || ticks >= subFin + 10 || (cine && ClientCine.chapter() < 30)) return;
         if (mc.options.hideGui && !cine && !enFoco()) return;
-        float a = Mth.clamp((subFin + 10 - ticks - pt) / 10f, 0f, 1f) * Mth.clamp((ticks - (subFin - DUR[subLinea]) + pt) / 6f, 0f, 1f);
+        float a = Mth.clamp((subFin + 10 - ticks - pt) / 10f, 0f, 1f) * Mth.clamp((ticks - (subFin - dur(subLinea)) + pt) / 6f, 0f, 1f);
         int alpha = Math.round(a * 255);
         if (alpha <= 8) return;
         Font font = mc.font;
-        Component name = Component.translatable("darkcraft.rey.nombre_corto");
-        Component line = Component.translatable("darkcraft.rey.voz." + subLinea);
+        boolean gavran = subLinea > com.darkcraft.gavran.Gavran.VOZ_BASE;
+        Component name = Component.translatable(gavran ? "darkcraft.gavran.nombre_corto" : "darkcraft.rey.nombre_corto");
+        Component line = Component.translatable(gavran ? "darkcraft.gavran.voz." + (subLinea - com.darkcraft.gavran.Gavran.VOZ_BASE)
+                : "darkcraft.rey.voz." + subLinea);
         int band = cine ? Math.round(h * 0.12f) : (enFoco() ? Math.round(h * 0.11f) : 0);
         // tamano: grande, pero que quepa en la franja (o en la parte de abajo de la pantalla)
         float sc = 1.6f;
@@ -348,7 +393,7 @@ public final class ReyCliente {
             g.fill(-lw / 2 - 6, -2, lw / 2 + 6, lines.size() * 10 + 10, (Math.round(a * 150) << 24));
         g.pose().pushPose();
         g.pose().scale(0.75f, 0.75f, 1f);
-        g.drawCenteredString(font, name, 0, 0, (alpha << 24) | 0xC8A040);
+        g.drawCenteredString(font, name, 0, 0, (alpha << 24) | (gavran ? 0x6FD08A : 0xC8A040));
         g.pose().popPose();
         for (int i = 0; i < lines.size(); i++)
             g.drawCenteredString(font, lines.get(i), 0, 9 + i * 10, (alpha << 24) | 0xF0E6D8);
@@ -360,7 +405,12 @@ public final class ReyCliente {
     @SubscribeEvent
     public static void onBossBar(CustomizeGuiOverlayEvent.BossEventProgress e) {
         Component n = e.getBossEvent().getName();
-        if (!(n.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents tc) || !tc.getKey().equals("entity.darkcraft.rey"))
+        if (!(n.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents tc)) return;
+        if (tc.getKey().equals("entity.darkcraft.gavran")) {
+            com.darkcraft.client.gavran.GavranCliente.barra(e, ticks);
+            return;
+        }
+        if (!tc.getKey().equals("entity.darkcraft.rey"))
             return;
         if (!e.isCancelable()) return;
         e.setCanceled(true);
@@ -697,8 +747,17 @@ public final class ReyCliente {
                     fase = r.fase();
                 }
             }
-            ClientMusic.boss(fase, suave);
             barraFase = fase;
+            // Ser Gavran (temas 11 y 12) si no hay un rey luchando cerca
+            if (fase == 0)
+                for (Entity en : mc.level.entitiesForRendering())
+                    if (en instanceof com.darkcraft.gavran.Gavran g && (g.luchando() || g.flag(com.darkcraft.gavran.Gavran.F_INTRO))
+                            && g.distanceToSqr(mc.player) < 96 * 96) {
+                        suave = !g.luchando();
+                        fase = 10 + g.fase();
+                        break;
+                    }
+            ClientMusic.boss(fase, suave);
         }
         // chispas doradas del cofre
         if (cofre != null && ticks % 2 == 0) {

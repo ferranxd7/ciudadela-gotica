@@ -67,6 +67,8 @@ public final class TorreArbol {
                 }
             }
         }
+        // ---- Ser Gavran en su rama
+        com.darkcraft.gavran.GavranEventos.asegurar(ow, plan);
     }
 
     /** La puerta cerrada mas cercana a este jugador (a menos de 8 bloques), o null. */

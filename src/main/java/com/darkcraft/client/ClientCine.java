@@ -414,7 +414,7 @@ public final class ClientCine {
         if (visible(emb)) embers(g, w, h, t, emb);
         // el titulo
         if (chapter < 30) drawTitle(g, font, w, h, t);
-        else if (chapter == 30 || chapter == 31 || chapter == 32) bossTitle(g, font, w, h, t);
+        else if (chapter >= 30 && chapter <= 33) bossTitle(g, font, w, h, t);
         // fundidos a negro (cortes de plano y vuelta al jugador)
         float black = black(t);
         if (visible(black)) g.fill(0, 0, w, h, argb(black, 0, 0, 0));
@@ -586,10 +586,11 @@ public final class ClientCine {
         pose.translate(w / 2f, h * 0.68f, 0);
         pose.scale(S, S, 1);
         int al = Math.round(a * 255);
-        g.drawCenteredString(font, name, 1, 1, (al << 24) | 0x200000);
-        g.drawCenteredString(font, name, 0, 0, (al << 24) | 0xE0401A);
+        boolean verde = chapter == 33;
+        g.drawCenteredString(font, name, 1, 1, (al << 24) | (verde ? 0x002010 : 0x200000));
+        g.drawCenteredString(font, name, 0, 0, (al << 24) | (verde ? 0x5FE07A : 0xE0401A));
         pose.popPose();
-        g.drawCenteredString(font, sub, w / 2, Math.round(h * 0.68f + 11 * S), (al << 24) | 0xE8C080);
+        g.drawCenteredString(font, sub, w / 2, Math.round(h * 0.68f + 11 * S), (al << 24) | (verde ? 0xC8E0B0 : 0xE8C080));
     }
 
     private static float black(float t) {

@@ -123,6 +123,15 @@ public final class CiTest {
                         plan(lvl, tt.centerX(), tt.centerZ(), 44, tt.hallFloor + com.darkcraft.gen.TreeTower.BALCON + 1, new File(out, "13_sala_del_arbol_balcon.png"));
                         plan(lvl, tt.centerX(), tt.centerZ(), 16, tt.base() + 40, new File(out, "24_torre_arbol_escalera.png"));
                         plan(lvl, tt.centerX(), tt.centerZ(), 16, tt.hallFloor, new File(out, "25_recepcion_del_arbol.png"));
+                        // Ser Gavran: su rama (encima de la puerta) y donde cae al bajar
+                        var sa = com.darkcraft.gavran.SalaArbol.de(plan);
+                        if (sa != null) {
+                            var rama = sa.rama(lvl);
+                            acc.println("GAVRAN: rama en " + String.format("%.1f,%.1f,%.1f", rama.x, rama.y, rama.z) + " (suelo de la sala " + sa.F()
+                                    + ", " + Math.round(rama.y - sa.F()) + " por encima) bloque bajo los pies: "
+                                    + lvl.getBlockState(net.minecraft.core.BlockPos.containing(rama.x, rama.y - 1, rama.z))
+                                    + " | aterriza en " + sa.aterrizaje() + " suelo " + sa.suelo(lvl, sa.aterrizaje().x, sa.aterrizaje().z));
+                        }
                     }
                     if (res == null) continue;
                     if (res.contains("OK")) ok++;

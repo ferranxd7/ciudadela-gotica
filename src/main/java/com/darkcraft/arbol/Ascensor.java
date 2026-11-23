@@ -51,6 +51,8 @@ public class Ascensor extends Entity {
     /** Quien acaba de bajarse: no vuelve a arrancar hasta que se aparte del disco. */
     private final Set<UUID> recien = new HashSet<>();
     private int llamada;
+    /** Ticks que le quedan sin responder (hay pelea arriba). */
+    private int bloqueado;
     /** Solo el propio ascensor puede soltar a sus pasajeros (al llegar). */
     private boolean soltando;
 
@@ -143,6 +145,19 @@ public class Ascensor extends Entity {
             return p == null || p.level() != sl || !sobreDisco(p, aqui, 0.6);
         });
         encima.removeIf(p -> recien.contains(p.getUUID()));
+        // mientras Ser Gavran pelea en la sala, el disco no responde (ni sube ni baja)
+        if ((!encima.isEmpty() || !encima(sl, alli).isEmpty()) && now % 10 == 0
+                && com.darkcraft.gavran.GavranEventos.salaCerrada(sl, getX(), getZ())) {
+            for (ServerPlayer p : encima) p.displayClientMessage(Component.translatable("darkcraft.ascensor.bloqueado"), true);
+            for (ServerPlayer p : encima(sl, alli)) p.displayClientMessage(Component.translatable("darkcraft.ascensor.bloqueado"), true);
+            this.entityData.set(CARGA, 0);
+            llamada = 0;
+            bloqueado = 40;
+        }
+        if (bloqueado > 0) {
+            bloqueado--;
+            return;
+        }
         if (!encima.isEmpty()) {
             int c = this.entityData.get(CARGA) + 1;
             this.entityData.set(CARGA, c);

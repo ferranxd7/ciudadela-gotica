@@ -43,7 +43,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 20 * 60 * 14;
+    private static final int LIMIT = 20 * 60 * 18;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -126,6 +126,7 @@ public final class ClientCiTest {
                 s.run.accept(mc);
             }
             reyTick(mc);
+            gavranTick(mc);
             escTick(mc);
             if (cineStart >= 0 && (ticks - cineStart) % 40 == 0 && ticks - cineStart < 20 * 90) {
                 log("  cinematica t=" + (ticks - cineStart) / 20 + " s: activa=" + ClientCine.active() + " voz=" + ClientCine.narrationPlaying()
@@ -225,6 +226,10 @@ public final class ClientCiTest {
             modelo.setYHeadRot(0f);
             lvl.addFreshEntity(modelo);
             modelo.muestra(1, com.darkcraft.rey.Rey.POSE_SENTADO, 0, false);
+            modeloG = DarkCraftMod.GAVRAN.get().create(lvl);
+            modeloG.moveTo(ex, ey - 40, ez, 0f, 0f);
+            lvl.addFreshEntity(modeloG);
+            modeloG.muestra(com.darkcraft.gavran.Gavran.POSE_POSADO, 0, false);
         }));
         escLista = new Object[][]{
                 {1, com.darkcraft.rey.Rey.POSE_SENTADO, 0, false, "sentado", 1.5f},
@@ -261,6 +266,23 @@ public final class ClientCiTest {
                 {2, -1, com.darkcraft.rey.ReyProyectil.TAJO, false, "proy_tajo_lado", 0f},
                 {2, -1, com.darkcraft.rey.ReyProyectil.BOLA, false, "proy_bola", 0f},
                 {3, -1, com.darkcraft.rey.ReyProyectil.BOLA, false, "proy_bola_lava", 0f},
+                // Ser Gavran (fase 10 = Gavran en el escaparate)
+                {10, com.darkcraft.gavran.Gavran.POSE_POSADO, 0, false, "g_posado", 1.5f},
+                {10, com.darkcraft.gavran.Gavran.POSE_POSADO, 0, true, "g_posado_habla", 1.2f},
+                {10, com.darkcraft.gavran.Gavran.POSE_PIE, 0, false, "g_quieto", 1.0f},
+                {10, com.darkcraft.gavran.Gavran.POSE_GUARDIA, 0, false, "g_guardia", 1.0f},
+                {10, com.darkcraft.gavran.Gavran.POSE_CARGA, 0, false, "g_carga", 0.8f},
+                {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.DESCENDER, false, "g_descender", 0f},
+                {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.SALUDO, false, "g_saludo", 0f},
+                {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.COMBO3, false, "g_combo3", 0f},
+                {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.COMBO5, false, "g_combo5", 0f},
+                {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.CONTRAATAQUE, false, "g_contraataque", 0f},
+                {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.RAICES, false, "g_raices", 0f},
+                {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.CLAVAR, false, "g_clavar", 0f},
+                {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.INVOCAR, false, "g_invocar", 0f},
+                {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.ATURDIDO, false, "g_aturdido", 0f},
+                {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.SUBIR, false, "g_subir", 0f},
+                {10, com.darkcraft.gavran.Gavran.POSE_PIE, com.darkcraft.gavran.GavranAnims.MUERTE, false, "g_muerte", 0f},
         };
         // el servidor integrado puede ir con retraso (genera terreno nuevo): cada pose se pide y se espera a que el
         // cliente la tenga antes de contar el tiempo de las capturas (lo lleva escTick, tick a tick)
@@ -278,13 +300,16 @@ public final class ClientCiTest {
             server(m, sp -> {
                 if (modelo != null) modelo.discard();
                 modelo = null;
+                if (modeloG != null) modeloG.discard();
+                modeloG = null;
                 sp.setInvisible(false);
             });
         });
         return fin + 20;
     }
 
-    private static final int ESC_TICKS = 20 * 115;
+    private static final int ESC_TICKS = 20 * 190;
+    private static com.darkcraft.gavran.Gavran modeloG;
     private static Object[][] escLista;
     private static int escI = -1, escEstado, escDesde, escK, escN;
 
@@ -303,6 +328,10 @@ public final class ClientCiTest {
         final boolean grande = e.length > 6 && (Boolean) e[6];
         if (pose == -1) {
             proyTick(mc, fase, anim, name);
+            return;
+        }
+        if (fase >= 10) {
+            gavranEsc(mc, pose, anim, habla, name, anim > 0 ? com.darkcraft.gavran.GavranAnims.TICKS[anim] / 20f : (Float) e[5]);
             return;
         }
         float[] fr = anim > 0 ? new float[]{0.15f, 0.35f, 0.55f, 0.8f} : new float[]{1.0f};
@@ -335,6 +364,56 @@ public final class ClientCiTest {
                     log("  escaparate: " + name + " en el cliente");
                 } else if (ticks - escDesde > 200) {
                     log("  escaparate: " + name + " no llega al cliente (" + (cr == null ? "sin rey" : "fase " + cr.fase() + " pose " + cr.pose() + " accion " + cr.actionId()) + ")");
+                    escI++;
+                    escEstado = 0;
+                }
+            }
+            default -> {
+                if (escK < fr.length) {
+                    int when = Math.round((anim > 0 ? len * fr[escK] : len) * 20);
+                    if (ticks - escDesde >= when) {
+                        shot(mc, String.format("esc_%03d_%s_%d", escN++, name, Math.round(fr[escK] * 100)));
+                        escK++;
+                    }
+                } else {
+                    escI++;
+                    escEstado = 0;
+                }
+            }
+        }
+    }
+
+    /** Ser Gavran en el escaparate: como el rey, pero mas lejos (mide 5,5 bloques). */
+    private static void gavranEsc(Minecraft mc, int pose, int anim, boolean habla, String name, float len) {
+        float[] fr = anim > 0 ? new float[]{0.15f, 0.35f, 0.55f, 0.8f} : new float[]{1.0f};
+        switch (escEstado) {
+            case 0 -> {
+                mc.options.hideGui = true;
+                verDesde(mc, new Vec3(ex + 5.6, ey + 4.4, ez + 10.4), new Vec3(ex, ey + 2.9, ez));
+                server(mc, sp -> {
+                    if (modelo != null) modelo.moveTo(ex, ey - 40, ez, 0f, 0f);
+                    if (modeloG != null) {
+                        modeloG.muestra(pose, anim, habla);
+                        modeloG.moveTo(ex, ey, ez, 0f, 0f);
+                        modeloG.setYBodyRot(0f);
+                        modeloG.setYHeadRot(0f);
+                    }
+                });
+                escEstado = 1;
+                escDesde = ticks;
+            }
+            case 1 -> {
+                com.darkcraft.gavran.Gavran cg = null;
+                if (modeloG != null && mc.level.getEntity(modeloG.getId()) instanceof com.darkcraft.gavran.Gavran g) cg = g;
+                boolean ok = cg != null && cg.pose() == pose && cg.flag(com.darkcraft.gavran.Gavran.F_HABLA) == habla
+                        && cg.actionId() == anim && Math.abs(cg.getY() - ey) < 1;
+                if (ok) {
+                    escEstado = 2;
+                    escDesde = ticks;
+                    escK = 0;
+                    log("  escaparate: " + name + " en el cliente");
+                } else if (ticks - escDesde > 200) {
+                    log("  escaparate: " + name + " no llega al cliente (" + (cg == null ? "sin gavran" : "pose " + cg.pose() + " accion " + cg.actionId()) + ")");
                     escI++;
                     escEstado = 0;
                 }
@@ -893,11 +972,13 @@ public final class ClientCiTest {
             shot(m, "cliente_96_puerta_desde_sala");
             m.setCameraEntity(m.player);
         });
-        S = S + 490 + 230 - 280;
+        int finG = gavran(S + 490 + 232);
+        S = finG - 280;
         atTicks(S + 130 + 150, "Logros conseguidos", m -> server(m, sp -> {
             StringBuilder b = new StringBuilder("  logros:");
             for (String id : new String[]{com.darkcraft.story.Logros.ENCONTRAR, com.darkcraft.story.Logros.CAPITULO1,
-                    com.darkcraft.story.Logros.REY, com.darkcraft.story.Logros.ARBOL})
+                    com.darkcraft.story.Logros.REY, com.darkcraft.story.Logros.ARBOL, com.darkcraft.story.Logros.GAVRAN_GUARDIA,
+                    com.darkcraft.story.Logros.GAVRAN_FASE1})
                 b.append(' ').append(id).append('=').append(com.darkcraft.story.Logros.tiene(sp, id) ? "SI" : "no");
             log(b.toString());
         }));
@@ -913,6 +994,166 @@ public final class ClientCiTest {
         atTicks(S + 130 + 166, "captura de los logros", m -> shot(m, "cliente_99_logros"));
         atTicks(S + 130 + 170, "cerrar", m -> m.setScreen(null));
         atTicks(S + 130 + 175, "Fin de la prueba", ClientCiTest::finish);
+    }
+
+    // ------------------------------------------------------------------ Ser Gavran (parte B1)
+
+    private static int gavranStart = -1;
+    private static boolean seguirG;
+
+    private static java.util.Optional<com.darkcraft.gavran.Gavran> gavranCerca(net.minecraft.server.level.ServerPlayer sp) {
+        return sp.serverLevel().getEntitiesOfClass(com.darkcraft.gavran.Gavran.class, sp.getBoundingBox().inflate(120)).stream().findFirst();
+    }
+
+    private static void ataqueG(int t, String nombre, int[] capturas, String prefijo) {
+        atTicks(t, "Gavran: ataque " + nombre, m -> server(m, sp -> gavranCerca(sp).ifPresent(g -> log("  ataque " + nombre + ": " + g.forzarAtaque(nombre)
+                + " | " + g.debug()))));
+        for (int i = 0; i < capturas.length; i++) {
+            final int k = i;
+            atTicks(t + capturas[i], "Captura " + nombre, m -> {
+                m.options.hideGui = k != 0;
+                shot(m, String.format("%s_%d", prefijo, k));
+            });
+        }
+    }
+
+    /** La pelea con Ser Gavran: entrar en la sala, la entrada (cinematica), sus ataques, guardia rota y fin de la fase 1. */
+    private static int gavran(int G) {
+        atTicks(G, "Gavran: en su rama antes de entrar", m -> {
+            m.setCameraEntity(m.player);
+            server(m, sp -> {
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.setHealth(sp.getMaxHealth());
+                ItemStack sw = new ItemStack(net.minecraft.world.item.Items.NETHERITE_SWORD);
+                sw.enchant(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS, 5);
+                sp.setItemInHand(InteractionHand.MAIN_HAND, sw);
+                var g = gavranCerca(sp);
+                log("  gavran: " + g.map(x -> x.debug() + " en " + String.format("%.1f,%.1f,%.1f", x.getX(), x.getY(), x.getZ())).orElse("NO ESTA"));
+            });
+        });
+        atTicks(G + 6, "Mirar a la rama desde la sala", m -> {
+            m.options.hideGui = true;
+            verDesde(m, new Vec3(hall[0] + 7.5, hall[2] + 9, hall[1] - 34), new Vec3(hall[0] + 0.5, hall[2] + 33, hall[1] - 19.5));
+        });
+        atTicks(G + 14, "captura", m -> shot(m, "cliente_g01_rama"));
+        atTicks(G + 18, "Entrar en la Sala del Arbol", m -> {
+            m.setCameraEntity(m.player);
+            m.options.hideGui = false;
+            server(m, sp -> sp.teleportTo(sp.serverLevel(), hall[0] + 0.5, hall[2], hall[1] - 21.5, 180f, 0f));
+            gavranStart = ticks;
+        });
+        // la entrada dura 35 s: capturas en los momentos clave
+        float[] intro = {1.6f, 2.9f, 6.5f, 14.5f, 20.6f, 21.6f, 23.5f, 25.5f, 29.0f, 31.5f, 33.6f};
+        for (int i = 0; i < intro.length; i++) {
+            final int k = i;
+            atTicks(G + 18 + Math.round(intro[i] * 20), "Captura de la entrada de Gavran", m -> {
+                if (k == 1) server(m, sp -> {
+                    var d = com.darkcraft.arbol.TorreArbol.puerta(sp.serverLevel(), hall);
+                    log("  puerta: " + (d == null ? "NO ESTA" : "estado " + d.estado()) + " | barrera: "
+                            + sp.serverLevel().getBlockState(new BlockPos(hall[0], hall[2] + 2, hall[1] - 15)));
+                });
+                shot(m, String.format("cliente_g%02d_entrada_%d", 2 + k, k));
+            });
+        }
+        int L = G + 18 + 712;
+        atTicks(L, "Gavran: empieza la pelea (camara de observador)", m -> {
+            m.options.hideGui = true;
+            seguirG = true;
+            server(m, sp -> gavranCerca(sp).ifPresent(g -> log("  " + g.debug())));
+        });
+        atTicks(L + 30, "Captura: la barra de vida", m -> {
+            m.options.hideGui = false;
+            shot(m, "cliente_g20_barra");
+        });
+        ataqueG(L + 60, "combo3", new int[]{8, 13, 24, 34}, "cliente_g21_combo3");
+        ataqueG(L + 140, "raices", new int[]{8, 16, 22, 30}, "cliente_g22_raices");
+        ataqueG(L + 220, "clavar", new int[]{10, 19, 28, 40}, "cliente_g23_clavar");
+        ataqueG(L + 310, "embestida", new int[]{12, 22, 30}, "cliente_g24_embestida");
+        ataqueG(L + 380, "invocar", new int[]{10, 28, 45}, "cliente_g25_invocar");
+        ataqueG(L + 460, "combo5", new int[]{12, 30, 46, 62}, "cliente_g26_combo5");
+        ataqueG(L + 560, "guardia", new int[]{10}, "cliente_g27_guardia");
+        atTicks(L + 572, "Golpear a Gavran mientras se cubre (contraataca)", m -> server(m, sp -> gavranCerca(sp).ifPresent(g -> {
+            if (g.distanceTo(sp) > 5) sp.teleportTo(sp.serverLevel(), g.getX() + g.adelanteX() * 3.5, g.getY(), g.getZ() + g.adelanteZ() * 3.5, sp.getYRot(), sp.getXRot());
+            float h0 = g.getHealth();
+            sp.attack(g);
+            log("  golpe a la guardia: vida " + Math.round(h0) + " -> " + Math.round(g.getHealth()) + " | " + g.debug());
+        })));
+        for (int i = 0; i < 3; i++) {
+            final int k = i;
+            atTicks(L + 578 + i * 6, "Captura del contraataque", m -> shot(m, "cliente_g28_contraataque_" + k));
+        }
+        atTicks(L + 640, "Romperle la guardia", m -> server(m, sp -> gavranCerca(sp).ifPresent(g -> log("  guardia rota: " + g.forzarGuardiaRota()))));
+        atTicks(L + 662, "Captura: aturdido", m -> {
+            m.options.hideGui = false;
+            shot(m, "cliente_g29_aturdido");
+        });
+        atTicks(L + 700, "Captura: aturdido", m -> shot(m, "cliente_g30_aturdido"));
+        atTicks(L + 760, "Fin de la fase 1", m -> server(m, sp -> gavranCerca(sp).ifPresent(g -> log("  fin de la fase 1: " + g.forzarFin1()))));
+        int[] fin = {20, 60, 100, 112, 124, 150};
+        for (int i = 0; i < fin.length; i++) {
+            final int k = i;
+            atTicks(L + 760 + fin[i], "Captura del fin de la fase 1", m -> {
+                m.options.hideGui = false;
+                shot(m, String.format("cliente_g%02d_fin_%d", 31 + k, k));
+                if (k == 4) log("  titulo en pantalla: " + campoGui(m, "title") + " | " + campoGui(m, "subtitle"));
+            });
+        }
+        atTicks(L + 760 + 260, "Despues de la pelea", m -> {
+            seguirG = false;
+            m.setCameraEntity(m.player);
+            server(m, sp -> {
+                var d = com.darkcraft.arbol.TorreArbol.puerta(sp.serverLevel(), hall);
+                var est = com.darkcraft.rey.ReyEstado.get(sp.getServer());
+                log("  tras la pelea: puerta " + (d == null ? "NO ESTA" : "estado " + d.estado()) + " | barrera: "
+                        + sp.serverLevel().getBlockState(new BlockPos(hall[0], hall[2] + 2, hall[1] - 15)) + " | sala cerrada: "
+                        + com.darkcraft.gavran.GavranEventos.salaCerrada(sp.serverLevel(), hall[0], hall[1])
+                        + gavranCerca(sp).map(g -> " | " + g.debug()).orElse(" | gavran no esta"));
+                log("  logros: gavran_guardia=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_GUARDIA)
+                        + " gavran_fase1=" + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.GAVRAN_FASE1));
+                long raices = sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Display.BlockDisplay.class,
+                        sp.getBoundingBox().inflate(60), e -> e.getTags().contains(com.darkcraft.gavran.Raices.TAG)).size();
+                log("  raices que quedan: " + raices);
+            });
+        });
+        return L + 760 + 280;
+    }
+
+    /** Cada tick de la pelea con Gavran: camara de lado (dentro del anillo de la sala), golpes del jugador y registro. */
+    private static void gavranTick(Minecraft mc) {
+        if (gavranStart < 0 || mc.level == null || mc.player == null || hall == null) return;
+        int t = ticks - gavranStart;
+        com.darkcraft.gavran.Gavran cg = null;
+        for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering())
+            if (e instanceof com.darkcraft.gavran.Gavran g) cg = g;
+        if (seguirG && cg != null && !ClientCine.active()) {
+            Vec3 b = cg.position(), pp = mc.player.position();
+            Vec3 d = new Vec3(b.x - pp.x, 0, b.z - pp.z);
+            if (d.lengthSqr() < 0.01) d = new Vec3(0, 0, 1);
+            d = d.normalize();
+            Vec3 side = new Vec3(-d.z, 0, d.x);
+            Vec3 mid = b.add(pp).scale(0.5);
+            Vec3 want = mid.add(side.scale(11)).subtract(d.scale(3)).add(0, 5.5, 0);
+            // dentro del anillo de la sala (ni dentro del tronco ni fuera del muro)
+            double cx = hall[0] + 0.5, cz = hall[1] + 0.5;
+            double r = Math.hypot(want.x - cx, want.z - cz), a = Math.atan2(want.z - cz, want.x - cx);
+            r = Math.max(20.5, Math.min(36.5, r));
+            want = new Vec3(cx + Math.cos(a) * r, Math.min(hall[2] + 14, want.y), cz + Math.sin(a) * r);
+            obsPos = obsPos == null || obsPos.distanceToSqr(want) > 400 ? want : obsPos.add(want.subtract(obsPos).scale(0.12));
+            verDesde(mc, obsPos, mid.add(0, 2.2, 0));
+        }
+        if (t % 20 == 0 && t < 20 * 160)
+            server(mc, sp -> gavranCerca(sp).ifPresent(g -> log("  gavran: " + g.debug() + " | jugador vida " + Math.round(sp.getHealth())
+                    + " en " + Math.round(sp.getX()) + "," + Math.round(sp.getY()) + "," + Math.round(sp.getZ()))));
+        if (seguirG && t % 13 == 0)
+            server(mc, sp -> gavranCerca(sp).ifPresent(g -> {
+                if (g.distanceTo(sp) < 5.5 && g.luchando() && g.estado() != com.darkcraft.gavran.Gavran.Estado.FIN1) {
+                    float before = g.getHealth();
+                    sp.attack(g);
+                    sp.swing(InteractionHand.MAIN_HAND, true);
+                    if (++ataques % 5 == 0) log("  golpe del jugador: vida de gavran " + Math.round(before) + " -> " + Math.round(g.getHealth()));
+                }
+                sp.setHealth(sp.getMaxHealth());
+            }));
     }
 
     // ------------------------------------------------------------------ camara de observador

@@ -56,6 +56,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_REY_1 = sound("musica.rey1");
     public static final RegistryObject<SoundEvent> MUSICA_REY_2 = sound("musica.rey2");
     public static final RegistryObject<SoundEvent> MUSICA_REY_3 = sound("musica.rey3");
+    public static final RegistryObject<SoundEvent> MUSICA_GAVRAN_1 = sound("musica.gavran1");
 
     // efectos de sonido de ElevenLabs (ci/eleven): sustituyen a los del juego donde encajan
     public static final RegistryObject<SoundEvent> SFX_TAJO = sound("sfx.rey_tajo");
@@ -75,13 +76,37 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_PUERTA_CIERRA = sound("sfx.puerta_cierra");
     public static final RegistryObject<SoundEvent> SFX_ASCENSOR_MUEVE = sound("sfx.ascensor_mueve");
     public static final RegistryObject<SoundEvent> SFX_ASCENSOR_LLEGA = sound("sfx.ascensor_llega");
+    // Ser Gavran
+    public static final RegistryObject<SoundEvent> SFX_GAVRAN_TAJO = sound("sfx.gavran_tajo");
+    public static final RegistryObject<SoundEvent> SFX_GAVRAN_CHOQUE = sound("sfx.gavran_choque");
+    public static final RegistryObject<SoundEvent> SFX_GAVRAN_EMBESTIDA = sound("sfx.gavran_embestida");
+    public static final RegistryObject<SoundEvent> SFX_GAVRAN_RAICES = sound("sfx.gavran_raices");
+    public static final RegistryObject<SoundEvent> SFX_GAVRAN_CLAVAR = sound("sfx.gavran_clavar");
+    public static final RegistryObject<SoundEvent> SFX_GAVRAN_INVOCAR = sound("sfx.gavran_invocar");
+    public static final RegistryObject<SoundEvent> SFX_GAVRAN_PASO = sound("sfx.gavran_paso");
+    public static final RegistryObject<SoundEvent> SFX_GAVRAN_GUARDIA_ROTA = sound("sfx.gavran_guardia_rota");
+    public static final RegistryObject<SoundEvent> SFX_GAVRAN_SALTO = sound("sfx.gavran_salto");
+    public static final RegistryObject<SoundEvent> SFX_ARBOL_DESPIERTA = sound("sfx.arbol_despierta");
+    public static final RegistryObject<SoundEvent> SFX_HOJAS_CORTANTES = sound("sfx.hojas_cortantes");
+    public static final RegistryObject<SoundEvent> SFX_RAICES_ATRAPAN = sound("sfx.raices_atrapan");
+    public static final RegistryObject<SoundEvent> SFX_ESPINAS = sound("sfx.espinas");
+    public static final RegistryObject<SoundEvent> SFX_CORTEZA_MURO = sound("sfx.corteza_muro");
+    public static final RegistryObject<SoundEvent> SFX_FLORECER = sound("sfx.florecer");
+    public static final RegistryObject<SoundEvent> SFX_MADERA_CRUJE = sound("sfx.madera_cruje");
+    public static final RegistryObject<SoundEvent> SFX_CORAZON_LATIDO = sound("sfx.corazon_latido");
+    public static final RegistryObject<SoundEvent> SFX_HOJAS_DISOLVER = sound("sfx.hojas_disolver");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] REY_VOZ = new RegistryObject[14];
 
+    /** Frases de Ser Gavran (1..18). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] GAVRAN_VOZ = new RegistryObject[19];
+
     static {
         for (int i = 1; i < REY_VOZ.length; i++) REY_VOZ[i] = sound("rey.voz." + i);
+        for (int i = 1; i < GAVRAN_VOZ.length; i++) GAVRAN_VOZ[i] = sound("gavran.voz." + i);
     }
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
@@ -108,6 +133,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<ReyProyectil>> REY_PROYECTIL = ENTITIES.register("rey_proyectil",
             () -> EntityType.Builder.<ReyProyectil>of(ReyProyectil::new, MobCategory.MISC).sized(0.8f, 0.8f).fireImmune().noSave()
                     .clientTrackingRange(8).updateInterval(1).build(MODID + ":rey_proyectil"));
+
+    public static final RegistryObject<EntityType<com.darkcraft.gavran.Gavran>> GAVRAN = ENTITIES.register("gavran",
+            () -> EntityType.Builder.<com.darkcraft.gavran.Gavran>of(com.darkcraft.gavran.Gavran::new, MobCategory.MONSTER)
+                    .sized(2.4f, 5.6f).fireImmune().clientTrackingRange(10).updateInterval(1).build(MODID + ":gavran"));
 
     public static final RegistryObject<EntityType<com.darkcraft.arbol.Ascensor>> ASCENSOR = ENTITIES.register("ascensor",
             () -> EntityType.Builder.<com.darkcraft.arbol.Ascensor>of(com.darkcraft.arbol.Ascensor::new, MobCategory.MISC).sized(5f, 0.3f)
@@ -139,10 +168,12 @@ public class DarkCraftMod {
         MinecraftForge.EVENT_BUS.register(com.darkcraft.rey.Volcan.class);
         MinecraftForge.EVENT_BUS.register(com.darkcraft.arbol.TorreArbol.class);
         MinecraftForge.EVENT_BUS.register(com.darkcraft.armas.Combos.class);
+        MinecraftForge.EVENT_BUS.register(com.darkcraft.gavran.GavranEventos.class);
     }
 
     private void attributes(EntityAttributeCreationEvent e) {
         e.put(REY.get(), Rey.attributes().build());
+        e.put(GAVRAN.get(), com.darkcraft.gavran.Gavran.attributes().build());
     }
 
     private void setup(FMLCommonSetupEvent e) {

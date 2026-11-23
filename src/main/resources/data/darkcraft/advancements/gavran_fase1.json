@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:arbol",
+  "display": {
+    "icon": {
+      "item": "minecraft:oak_sapling"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.gavran_fase1.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.gavran_fase1.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 150
+  }
+}

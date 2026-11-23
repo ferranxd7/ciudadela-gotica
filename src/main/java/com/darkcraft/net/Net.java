@@ -63,8 +63,9 @@ public final class Net {
      * b = radio interior o ancho, ang = hacia donde mira en grados), cuanto falta (ticks) y color.
      */
     public record Aviso(int forma, double x, double y, double z, float a, float b, float ang, int dur, int color) {
-        public static final int CIRCULO = 0, ANILLO = 1, LINEA = 2, SECTOR = 3;
-        public static final int ROJO = 0, ORO = 1, NARANJA = 2;
+        /** ONDA: anillo que se abre desde el centro (a = radio maximo, b = bloques por tick). */
+        public static final int CIRCULO = 0, ANILLO = 1, LINEA = 2, SECTOR = 3, ONDA = 4;
+        public static final int ROJO = 0, ORO = 1, NARANJA = 2, VERDE = 3;
 
         void write(FriendlyByteBuf buf) {
             buf.writeByte(forma);
@@ -89,7 +90,7 @@ public final class Net {
         }
     }
 
-    /** El Rey dice una frase (voz y subtitulo). */
+    /** El Rey (lineas 1..13) o Ser Gavran (100 + linea) dice una frase (voz y subtitulo). */
     public record ReyHabla(int entity, int linea) {
         void write(FriendlyByteBuf b) {
             b.writeVarInt(entity);

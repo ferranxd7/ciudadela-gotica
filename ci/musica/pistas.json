@@ -43,5 +43,17 @@
     "aviso": "Music by Matthew Pablo, http://www.matthewpablo.com",
     "uso": "Corvin, fase 3 (los volcanes)",
     "lufs": -15
+  },
+  {
+    "id": "gavran1",
+    "pagina": "https://opengameart.org/node/6948",
+    "pagina2": "https://opengameart.org/content/dark-descent",
+    "busca": "descent",
+    "titulo": "Dark Descent",
+    "autor": "Matthew Pablo",
+    "licencia": "CC-BY 3.0",
+    "aviso": "Music by Matthew Pablo, http://www.matthewpablo.com",
+    "uso": "Ser Gavran, fase 1",
+    "lufs": -16
   }
 ]

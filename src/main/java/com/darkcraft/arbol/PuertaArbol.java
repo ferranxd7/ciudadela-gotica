@@ -40,6 +40,10 @@ public class PuertaArbol extends Entity {
     private static final EntityDataAccessor<Long> INICIO = SynchedEntityData.defineId(PuertaArbol.class, EntityDataSerializers.LONG);
 
     public static final int CERRADA = 0, ABRIENDO = 1, ABIERTA = 2;
+    /** Durante la pelea con Ser Gavran: se cierra sola, se queda sellada y se vuelve a abrir al acabar. */
+    public static final int CERRANDO = 3, SELLADA = 4, REABRIENDO = 5;
+    /** Ticks que tardan las hojas en cerrarse (y la barrera) y en volver a abrirse. */
+    public static final int T_CIERRE = 40, T_REAPERTURA = 80;
     /** Momentos de la secuencia (ticks desde que entra la llave). */
     public static final int T_RUNAS = 44, T_CERROJO = 52, T_HOJAS = 84, T_FIN_HOJAS = 160, T_BARRERA = 150, TOTAL = 170;
     /** Medidas: hueco de 7 x 10; cada hoja mide 3,5 x 10 x 0,375. */
@@ -68,7 +72,7 @@ public class PuertaArbol extends Entity {
     /** Ticks desde que entro la llave (con fraccion); grande si ya estaba abierta, 0 si esta cerrada. */
     public float tiempo(float pt) {
         return switch (estado()) {
-            case ABRIENDO -> level().getGameTime() + pt - this.entityData.get(INICIO);
+            case ABRIENDO, CERRANDO, REABRIENDO -> level().getGameTime() + pt - this.entityData.get(INICIO);
             case ABIERTA -> 100000f;
             default -> 0f;
         };
@@ -76,6 +80,17 @@ public class PuertaArbol extends Entity {
 
     /** 0..1: cuanto estan abiertas las hojas (90 grados al final). */
     public float abertura(float pt) {
+        int e = estado();
+        if (e == SELLADA) return 0f;
+        if (e == CERRANDO) {
+            float u = Mth.clamp(tiempo(pt) / (T_CIERRE - 4f), 0f, 1f);
+            // se cierra de golpe al final, como si alguien la empujara
+            return 1f - u * u;
+        }
+        if (e == REABRIENDO) {
+            float u = Mth.clamp((tiempo(pt) - 8f) / (T_REAPERTURA - 16f), 0f, 1f);
+            return u * u * (3 - 2 * u);
+        }
         float u = Mth.clamp((tiempo(pt) - T_HOJAS) / (T_FIN_HOJAS - T_HOJAS), 0f, 1f);
         // arranca pesada, coge impulso y frena al final
         return u * u * (3 - 2 * u);
@@ -84,7 +99,9 @@ public class PuertaArbol extends Entity {
     /** 0..1: brillo de las runas y del arbol tallado. */
     public float brillo(float pt) {
         float t = tiempo(pt);
-        if (estado() == ABIERTA) return 0.55f;
+        int e = estado();
+        if (e == CERRANDO || e == SELLADA) return 0.3f + 0.15f * Mth.sin((level().getGameTime() + pt) * 0.12f);
+        if (e == ABIERTA || e == REABRIENDO) return 0.55f;
         float on = Mth.clamp((t - T_RUNAS) / 26f, 0f, 1f);
         float pulso = t > T_RUNAS + 26 ? 0.85f + 0.15f * Mth.sin(t * 0.25f) : 1f;
         float baja = 1f - 0.45f * Mth.clamp((t - T_FIN_HOJAS) / 20f, 0f, 1f);
@@ -93,6 +110,9 @@ public class PuertaArbol extends Entity {
 
     /** 0..1: lo descorrido que esta el cerrojo i (0 arriba, 1 medio, 2 abajo). */
     public float cerrojo(int i, float pt) {
+        int e = estado();
+        if (e == CERRANDO || e == SELLADA) return 1f;
+        if (e == REABRIENDO) return 1f;
         float t0 = T_CERROJO + i * 10;
         float u = Mth.clamp((tiempo(pt) - t0) / 7f, 0f, 1f);
         return u * u * (3 - 2 * u);
@@ -134,9 +154,64 @@ public class PuertaArbol extends Entity {
         return new double[]{getX(), getY() + 4.5, getZ() + GROSOR / 2 + 0.02};
     }
 
+    // ------------------------------------------------------------------ la pelea con Ser Gavran
+
+    /** La pelea empieza: las hojas se cierran solas y el hueco queda tapado. */
+    public void cerrarLucha(ServerLevel sl) {
+        int e = estado();
+        if (e == CERRADA || e == SELLADA || e == CERRANDO) return;
+        this.entityData.set(INICIO, sl.getGameTime());
+        this.entityData.set(ESTADO, CERRANDO);
+        sl.playSound(null, getX(), getY() + 5, getZ(), SoundEvents.PISTON_EXTEND, SoundSource.BLOCKS, 1.6f, 0.5f);
+    }
+
+    /** La pelea acaba: se vuelve a abrir. */
+    public void abrirLucha(ServerLevel sl) {
+        int e = estado();
+        if (e != SELLADA && e != CERRANDO) return;
+        this.entityData.set(INICIO, sl.getGameTime());
+        this.entityData.set(ESTADO, REABRIENDO);
+        sl.playSound(null, getX(), getY() + 5, getZ(), com.darkcraft.DarkCraftMod.SFX_PUERTA_ABRE.get(), SoundSource.BLOCKS, 3.0f, 1.05f);
+    }
+
+    /** Tapa el hueco con barrera (sin tocar lo que no sea aire). */
+    public void ponerBarrera(ServerLevel sl) {
+        BlockPos b = blockPosition();
+        for (int dx = -3; dx <= 3; dx++)
+            for (int dy = 0; dy < 10; dy++) {
+                BlockPos p = b.offset(dx, dy, 0);
+                if (sl.getBlockState(p).isAir()) sl.setBlock(p, Blocks.BARRIER.defaultBlockState(), 3);
+            }
+    }
+
+    private void tickLucha(ServerLevel sl, int e, int t) {
+        if (e == CERRANDO) {
+            if (t == T_CIERRE - 4) {
+                sl.playSound(null, getX(), getY() + 5, getZ(), com.darkcraft.DarkCraftMod.SFX_PUERTA_CIERRA.get(), SoundSource.BLOCKS, 3.5f, 0.9f);
+                sl.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, getX(), getY() + 1, getZ() - 0.6, 14, 2.6, 0.3, 0.3, 0.02);
+                ponerBarrera(sl);
+            }
+            for (int i = 0; i < 3; i++)
+                if (t == T_CIERRE + 2 + i * 6) {
+                    double by = getY() + 7.5 - i * 2.5;
+                    sl.playSound(null, getX(), by, getZ(), SoundEvents.PISTON_EXTEND, SoundSource.BLOCKS, 1.4f, 0.55f);
+                    sl.playSound(null, getX(), by, getZ(), SoundEvents.IRON_DOOR_CLOSE, SoundSource.BLOCKS, 1.2f, 0.5f);
+                }
+            if (t >= T_CIERRE + 16) this.entityData.set(ESTADO, SELLADA);
+        } else if (e == REABRIENDO) {
+            if (t == T_REAPERTURA - 30) quitarBarrera(sl);
+            if (t >= T_REAPERTURA) this.entityData.set(ESTADO, ABIERTA);
+        }
+    }
+
     @Override
     public void tick() {
         super.tick();
+        int e0 = estado();
+        if (e0 == CERRANDO || e0 == REABRIENDO) {
+            if (!level().isClientSide) tickLucha((ServerLevel) level(), e0, (int) (level().getGameTime() - this.entityData.get(INICIO)));
+            return;
+        }
         if (estado() != ABRIENDO) return;
         int t = (int) (level().getGameTime() - this.entityData.get(INICIO));
         if (level().isClientSide) {

@@ -18,7 +18,7 @@ public final class Logros {
     private Logros() {}
 
     public static final String ENCONTRAR = "encontrar", CAPITULO1 = "capitulo1", REY = "rey", ARBOL = "arbol",
-            GOLPE_FINAL = "golpe_final";
+            GOLPE_FINAL = "golpe_final", GAVRAN_GUARDIA = "gavran_guardia", GAVRAN_FASE1 = "gavran_fase1";
 
     /** Logro de cada capitulo de la cronica (capitulo1, capitulo2...): se da al abrir su cofre. */
     public static String capitulo(int ch) {

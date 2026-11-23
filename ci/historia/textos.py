@@ -183,6 +183,113 @@ REY = [
  ("Another fool... for my court.",
   "Otro necio... para mi corte."),
 ]
+# --------------------------------------------------------------- lo que dice Ser Gavran (voz en ingles, subtitulos)
+GAVRAN = [
+ ("So... the King is dead. I felt it in the roots, the moment his heart stopped.",
+  "Así que... el Rey ha muerto. Lo sentí en las raíces, en el instante en que su corazón se detuvo."),
+ ("He was my king. My friend. And a fool who sold us all to the Shadow.",
+  "Era mi rey. Mi amigo. Y un necio que nos vendió a todos a la Sombra."),
+ ("But I swore an oath... and an oath does not die with the man who heard it.",
+  "Pero hice un juramento... y un juramento no muere con el hombre que lo escuchó."),
+ ("Draw your blade. Let us end this... as knights.",
+  "Desenvaina. Acabemos con esto... como caballeros."),
+ ("Too slow.",
+  "Demasiado lento."),
+ ("KNEEL!",
+  "¡DE RODILLAS!"),
+ ("Rise, my squires. Your oath is not yet fulfilled.",
+  "Alzaos, mis escuderos. Vuestro juramento aún no se ha cumplido."),
+ ("Is this the blade that felled my king?",
+  "¿Es esta la espada que derribó a mi rey?"),
+ ("You fight well. It changes nothing.",
+  "Luchas bien. No cambia nada."),
+ ("Rest now. The tree will keep you.",
+  "Descansa ya. El árbol te guardará."),
+ ("Enough! Tree of the Crown... take what is left of me!",
+  "¡Basta! Árbol de la Corona... ¡toma lo que queda de mí!"),
+ ("Judgment of the thorns!",
+  "¡Juicio de las espinas!"),
+ ("The roots run deeper than your courage.",
+  "Las raíces llegan más hondo que tu valor."),
+ ("Nowhere in this hall is beyond my reach!",
+  "¡No hay rincón en esta sala fuera de mi alcance!"),
+ ("The floor is mine. Climb... or be taken.",
+  "El suelo es mío. Trepa... o te llevará."),
+ ("The heart... you found the heart...",
+  "El corazón... has encontrado el corazón..."),
+ ("Well fought... The oath is broken... at last.",
+  "Bien luchado... El juramento se ha roto... por fin."),
+ ("Corvin, my friend... I kept my word. Let the tree... bloom.",
+  "Corvin, amigo mío... cumplí mi palabra. Que el árbol... florezca."),
+]
+GAVRAN_UI = {
+ "es": {
+  "entity.darkcraft.gavran": "Ser Gavran, el Caballero Jurado",
+  "darkcraft.gavran.nombre_corto": "Ser Gavran",
+  "subtitles.darkcraft.gavran.voz": "Ser Gavran habla",
+  "darkcraft.rey.titulo.33": "SER GAVRAN",
+  "darkcraft.rey.subtitulo.33": "El Caballero Jurado",
+  "darkcraft.gavran.escudero": "Escudero del Juramento",
+  "darkcraft.gavran.continuara.titulo": "Continuará",
+  "darkcraft.gavran.continuara": "Ser Gavran se retira a su rama: su segunda fase llegará en la próxima parte",
+  "darkcraft.ascensor.bloqueado": "El disco de runas no responde: arriba se libra una batalla",
+  "death.attack.darkcraft.gavran": "%1$s cayó ante el mandoble de %2$s",
+  "death.attack.darkcraft.gavran.player": "%1$s cayó ante el mandoble de %2$s",
+  "death.attack.darkcraft.gavran_area": "%1$s fue atravesado por las raíces de %2$s",
+  "death.attack.darkcraft.gavran_area.player": "%1$s fue atravesado por las raíces de %2$s",
+  "subtitles.darkcraft.sfx.gavran_tajo": "Mandoble de Gavran",
+  "subtitles.darkcraft.sfx.gavran_choque": "Choque de acero",
+  "subtitles.darkcraft.sfx.gavran_embestida": "Gavran embiste",
+  "subtitles.darkcraft.sfx.gavran_raices": "Brotan raíces",
+  "subtitles.darkcraft.sfx.gavran_clavar": "El mandoble se clava en el suelo",
+  "subtitles.darkcraft.sfx.gavran_invocar": "Los escuderos despiertan",
+  "subtitles.darkcraft.sfx.gavran_paso": "Pasos de hierro",
+  "subtitles.darkcraft.sfx.gavran_guardia_rota": "Guardia rota",
+  "subtitles.darkcraft.sfx.gavran_salto": "Gavran salta",
+  "subtitles.darkcraft.sfx.arbol_despierta": "El árbol despierta",
+  "subtitles.darkcraft.sfx.hojas_cortantes": "Hojas cortantes",
+  "subtitles.darkcraft.sfx.raices_atrapan": "Raíces que atrapan",
+  "subtitles.darkcraft.sfx.espinas": "Brotan espinas",
+  "subtitles.darkcraft.sfx.corteza_muro": "Se alza un muro de corteza",
+  "subtitles.darkcraft.sfx.florecer": "El árbol florece",
+  "subtitles.darkcraft.sfx.madera_cruje": "Cruje la madera",
+  "subtitles.darkcraft.sfx.corazon_latido": "Late el corazón del árbol",
+  "subtitles.darkcraft.sfx.hojas_disolver": "Se deshace en hojas",
+ },
+ "en": {
+  "entity.darkcraft.gavran": "Ser Gavran, the Sworn Knight",
+  "darkcraft.gavran.nombre_corto": "Ser Gavran",
+  "subtitles.darkcraft.gavran.voz": "Ser Gavran speaks",
+  "darkcraft.rey.titulo.33": "SER GAVRAN",
+  "darkcraft.rey.subtitulo.33": "The Sworn Knight",
+  "darkcraft.gavran.escudero": "Squire of the Oath",
+  "darkcraft.gavran.continuara.titulo": "To be continued",
+  "darkcraft.gavran.continuara": "Ser Gavran retreats to his branch: his second phase arrives in the next part",
+  "darkcraft.ascensor.bloqueado": "The rune disc does not answer: a battle rages above",
+  "death.attack.darkcraft.gavran": "%1$s fell to %2$s's greatsword",
+  "death.attack.darkcraft.gavran.player": "%1$s fell to %2$s's greatsword",
+  "death.attack.darkcraft.gavran_area": "%1$s was impaled by %2$s's roots",
+  "death.attack.darkcraft.gavran_area.player": "%1$s was impaled by %2$s's roots",
+  "subtitles.darkcraft.sfx.gavran_tajo": "Gavran's greatsword",
+  "subtitles.darkcraft.sfx.gavran_choque": "Clash of steel",
+  "subtitles.darkcraft.sfx.gavran_embestida": "Gavran charges",
+  "subtitles.darkcraft.sfx.gavran_raices": "Roots burst out",
+  "subtitles.darkcraft.sfx.gavran_clavar": "The greatsword strikes the ground",
+  "subtitles.darkcraft.sfx.gavran_invocar": "The squires awaken",
+  "subtitles.darkcraft.sfx.gavran_paso": "Iron footsteps",
+  "subtitles.darkcraft.sfx.gavran_guardia_rota": "Guard broken",
+  "subtitles.darkcraft.sfx.gavran_salto": "Gavran leaps",
+  "subtitles.darkcraft.sfx.arbol_despierta": "The tree awakens",
+  "subtitles.darkcraft.sfx.hojas_cortantes": "Cutting leaves",
+  "subtitles.darkcraft.sfx.raices_atrapan": "Grasping roots",
+  "subtitles.darkcraft.sfx.espinas": "Thorns burst out",
+  "subtitles.darkcraft.sfx.corteza_muro": "A bark wall rises",
+  "subtitles.darkcraft.sfx.florecer": "The tree blooms",
+  "subtitles.darkcraft.sfx.madera_cruje": "Wood creaks",
+  "subtitles.darkcraft.sfx.corazon_latido": "The tree's heart beats",
+  "subtitles.darkcraft.sfx.hojas_disolver": "Dissolves into leaves",
+ },
+}
 REY_UI = {
  "es": {
   "entity.darkcraft.rey": "Corvin, el Rey que Espera",
@@ -496,6 +603,10 @@ LOGROS_UI = {
   "advancements.darkcraft.capitulo4.description": "Encuentra la cuarta página a los pies del altar de la catedral",
   "advancements.darkcraft.golpe_final.title": "Bajo la luz dorada",
   "advancements.darkcraft.golpe_final.description": "Sobrevive al golpe final del Rey dentro de un círculo dorado",
+  "advancements.darkcraft.gavran_guardia.title": "Juramento quebrado",
+  "advancements.darkcraft.gavran_guardia.description": "Rompe la guardia de Ser Gavran",
+  "advancements.darkcraft.gavran_fase1.title": "La primera rama",
+  "advancements.darkcraft.gavran_fase1.description": "Aguanta la primera fase del duelo con Ser Gavran",
  },
  "en": {
   "advancements.darkcraft.raiz.title": "Dark Craft",
@@ -516,6 +627,10 @@ LOGROS_UI = {
   "advancements.darkcraft.capitulo4.description": "Find the fourth page at the foot of the cathedral altar",
   "advancements.darkcraft.golpe_final.title": "Beneath the Golden Light",
   "advancements.darkcraft.golpe_final.description": "Survive the King's final blow inside a golden circle",
+  "advancements.darkcraft.gavran_guardia.title": "Broken Oath",
+  "advancements.darkcraft.gavran_guardia.description": "Break Ser Gavran's guard",
+  "advancements.darkcraft.gavran_fase1.title": "The First Branch",
+  "advancements.darkcraft.gavran_fase1.description": "Endure the first phase of the duel with Ser Gavran",
  },
 }
 
@@ -536,7 +651,10 @@ def build():
             d[f"darkcraft.narracion.1.{i+1}"] = es if lang == "es" else en
         for i, (en, es) in enumerate(REY):
             d[f"darkcraft.rey.voz.{i+1}"] = es if lang == "es" else en
+        for i, (en, es) in enumerate(GAVRAN):
+            d[f"darkcraft.gavran.voz.{i+1}"] = es if lang == "es" else en
         d.update(REY_UI[lang])
+        d.update(GAVRAN_UI[lang])
         d.update(LOGROS_UI[lang])
         out[lang] = d
     # el resto de idiomas: lo que falte se queda en ingles (y se avisa)
@@ -556,13 +674,18 @@ def build():
             d[f"darkcraft.narracion.1.{i+1}"] = v
         for i, v in enumerate(t["rey"]):
             d[f"darkcraft.rey.voz.{i+1}"] = v
+        for i, v in enumerate(t.get("gavran", [])):
+            d[f"darkcraft.gavran.voz.{i+1}"] = v
+        if len(t.get("gavran", [])) != len(GAVRAN):
+            print(f"{code}: faltan frases de Ser Gavran ({len(t.get('gavran', []))} de {len(GAVRAN)})")
         sobra = [k for k in t["ui"] if k not in out["en"]]
         if sobra:
             print(f"{code}: claves que no existen en ingles: {sobra}")
         d.update(t["ui"])
         faltan = [k for k in out["en"] if d[k] == out["en"][k] and k not in t["ui"] and not k.endswith(".paginas")
                   and not k.startswith("darkcraft.cap.") and not k.startswith("darkcraft.pista.")
-                  and not k.startswith("darkcraft.narracion.") and not k.startswith("darkcraft.rey.voz.")]
+                  and not k.startswith("darkcraft.narracion.") and not k.startswith("darkcraft.rey.voz.")
+                  and not k.startswith("darkcraft.gavran.voz.")]
         if faltan:
             print(f"{code}: {len(faltan)} textos sin traducir (salen en ingles): {faltan[:8]}")
         out[code] = d

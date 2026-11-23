@@ -18,3 +18,7 @@ src/main/resources/assets/darkcraft/sounds/sfx/
 src/main/resources/assets/darkcraft/sounds/narracion/
 src/main/resources/assets/darkcraft/sounds/musica/
 src/main/resources/assets/darkcraft/rey_voces.json
+# cache de la cinematica inversa del modelo de Gavran (tools/gavran)
+tools/gavran/.ik_cache.pkl*
+__pycache__/
+src/main/resources/assets/darkcraft/sounds/gavran/
