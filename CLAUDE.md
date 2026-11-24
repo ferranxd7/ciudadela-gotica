@@ -78,7 +78,13 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   gira un cuarto de vuelta y se desvanece antes de abrirse las hojas. Antes la dibujaba el cliente en un evento de
   render (`ReyCliente.dibujarLlave`, ya sin usar): con shaders (Oculus) no se veia, entraba por el mango y quedaba de
   canto. **Regla: lo que se tenga que ver en el mundo, con entidades (display) o bloques, no dibujado a mano en eventos
-  de render** (el usuario juega con shaders).
+  de render** (el usuario juega con shaders). **Ojo con las `item_display`: el juego dibuja el objeto dado la vuelta
+  (media vuelta sobre el eje Y, `DisplayRenderer$ItemDisplayRenderer`) ANTES de la matriz `transformation`**: lo que en
+  la textura esta a la derecha llega a la matriz a la izquierda (`TorreArbol.llaveM` lo tiene en cuenta).
+- **Sin monstruos de Minecraft** (`world/SinMonstruos`, "desde ya"): se corta todo lo que sale solo (natural, con el
+  terreno, estructuras, patrullas, asaltos, generadores, refuerzos, jinetes) y los que quedaban de antes se van al
+  cargar su chunk (salvo con nombre o con una etiqueta `darkcraft...`, como los escuderos de Gavran). Los enemigos del
+  mod, los comandos y los huevos siguen igual.
 - **Sin carteles en los cofres de capitulo** (`StoryChest`, `StoryEvents.placeChapter`); los de mundos de antes los quita
   `StoryEvents.buscar` (cada 2 s, chunks de alrededor de cada jugador). Los cofres brillan (`StoryEvents.brillar`: polvo
   dorado que se vuelve rojo y destellos, por jugador; casi nada si ya leyo ese capitulo).

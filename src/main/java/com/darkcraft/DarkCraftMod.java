@@ -237,6 +237,7 @@ public class DarkCraftMod {
         MinecraftForge.EVENT_BUS.register(com.darkcraft.armas.Combos.class);
         MinecraftForge.EVENT_BUS.register(com.darkcraft.armas.EfectosRaiz.class);
         MinecraftForge.EVENT_BUS.register(com.darkcraft.gavran.GavranEventos.class);
+        MinecraftForge.EVENT_BUS.register(com.darkcraft.world.SinMonstruos.class);
     }
 
     private void attributes(EntityAttributeCreationEvent e) {

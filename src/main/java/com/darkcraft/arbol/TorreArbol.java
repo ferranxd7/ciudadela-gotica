@@ -142,12 +142,16 @@ public final class TorreArbol {
     }
 
     /**
-     * La llave (en la textura, la punta abajo a la derecha) con la punta hacia la puerta (-Z, el norte), su centro a
-     * {@code d} bloques por delante de la cerradura y girada {@code giro} radianes sobre su eje.
+     * La llave con la punta hacia la puerta (-Z, el norte), los dientes hacia abajo, su centro a {@code d} bloques por
+     * delante de la cerradura y girada {@code giro} radianes sobre su eje.
+     * <p>En la textura la punta esta abajo a la derecha y los dientes hacia abajo a la izquierda, pero el juego dibuja
+     * los objetos de las entidades item_display dados la vuelta (media vuelta sobre el eje vertical, antes de esta
+     * matriz): la punta llega aqui abajo a la IZQUIERDA. Con tres octavos de vuelta queda tumbada hacia +X, el cuarto
+     * de vuelta sobre Y la apunta al norte y la media vuelta final pone los dientes hacia abajo.
      */
     private static org.joml.Matrix4f llaveM(float d, float giro, float escala) {
-        return new org.joml.Matrix4f().translate(0, 0, d).rotateZ(giro).rotateY((float) (Math.PI / 2))
-                .rotateZ((float) (Math.PI / 4)).scale(escala);
+        return new org.joml.Matrix4f().translate(0, 0, d).rotateZ(giro + (float) Math.PI).rotateY((float) (Math.PI / 2))
+                .rotateZ((float) (Math.PI * 3 / 4)).scale(escala);
     }
 
     private static void llaveA(net.minecraft.world.entity.Display.ItemDisplay d, org.joml.Matrix4f m, int ticks) {

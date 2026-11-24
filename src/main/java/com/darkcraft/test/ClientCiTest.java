@@ -752,6 +752,13 @@ public final class ClientCiTest {
             shot(m, "cliente_00_ayuda");
             m.setScreen(null);
         });
+        at(30, "El cofre del capitulo 1 de cerca (tiene que brillar): se busca un sitio desde el que se vea", m -> {
+            m.setScreen(null);
+            m.options.hideGui = true;
+            server(m, sp -> mirarCofre(sp, new BlockPos(chest1[0], chest1[1], chest1[2])));
+        });
+        at(36, "Captura del cofre con su brillo", m -> shot(m, "cliente_01b_cofre_brillo"));
+        at(37, "Vuelta junto al cofre", m -> server(m, sp -> sp.teleportTo(sp.serverLevel(), chest1[0] - 2.5, chest1[1], chest1[2] + 0.5, -90f, 12f)));
         at(40, "Captura de la torre", m -> {
             m.options.hideGui = true;
             shot(m, "cliente_01_torre");
@@ -783,6 +790,43 @@ public final class ClientCiTest {
 
     private static com.darkcraft.client.espejo.LibroScreen libro;
     private static BlockPos cartelViejo;
+
+    /** Lleva al jugador a un sitio a 3-4 bloques del cofre desde el que se le ve (sin nada en medio) y le hace mirarlo. */
+    private static void mirarCofre(ServerPlayer sp, BlockPos cofre) {
+        ServerLevel lvl = sp.serverLevel();
+        Vec3 centro = Vec3.atCenterOf(cofre);
+        double mejor = -1;
+        Vec3 sitio = null;
+        for (int dx = -5; dx <= 5; dx++)
+            for (int dz = -5; dz <= 5; dz++)
+                for (int dy = 0; dy <= 2; dy++) {
+                    double d = Math.sqrt(dx * dx + dz * dz);
+                    if (d < 2.6 || d > 4.6) continue;
+                    BlockPos q = cofre.offset(dx, dy, dz);
+                    if (!lvl.getBlockState(q).isAir() || !lvl.getBlockState(q.above()).isAir() || lvl.getBlockState(q.below()).isAir()) continue;
+                    Vec3 ojo = new Vec3(q.getX() + 0.5, q.getY() + 1.62, q.getZ() + 0.5);
+                    var hit = lvl.clip(new net.minecraft.world.level.ClipContext(ojo, centro, net.minecraft.world.level.ClipContext.Block.VISUAL,
+                            net.minecraft.world.level.ClipContext.Fluid.NONE, sp));
+                    if (!hit.getBlockPos().equals(cofre)) continue;
+                    double nota = 10 - Math.abs(d - 3.4) - dy * 0.5;
+                    if (nota > mejor) {
+                        mejor = nota;
+                        sitio = new Vec3(q.getX() + 0.5, q.getY(), q.getZ() + 0.5);
+                    }
+                }
+        if (sitio == null) {
+            log("  cofre con brillo: no hay sitio despejado para mirarlo");
+            return;
+        }
+        Vec3 ojo = sitio.add(0, 1.62, 0);
+        Vec3 d = centro.subtract(ojo);
+        float yaw = (float) Math.toDegrees(Math.atan2(-d.x, d.z));
+        float pitch = (float) -Math.toDegrees(Math.atan2(d.y, Math.sqrt(d.x * d.x + d.z * d.z)));
+        sp.getAbilities().flying = false;
+        sp.onUpdateAbilities();
+        sp.teleportTo(lvl, sitio.x, sitio.y, sitio.z, yaw, pitch);
+        log("  cofre con brillo: mirando desde " + BlockPos.containing(sitio) + " (cofre en " + cofre + ")");
+    }
 
     private static void mirarAlCastillo(Minecraft m) {
         server(m, sp -> {
