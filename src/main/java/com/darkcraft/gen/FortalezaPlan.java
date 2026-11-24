@@ -34,7 +34,7 @@ public final class FortalezaPlan {
         this.Y = Y;
         Rng rng = new Rng(seed);
         isla = new Island(rng.fork(), cx, cz - 3, Y - 1, 55, 0.05, 6, 3, 46);
-        isla.surface(this::suelo).plants((x, z) -> false);
+        isla.surface(this::suelo).subsurface(this::subsuelo).plants((x, z) -> false);
         elementos.add(isla);
         f = new FortalezaHueso(rng.fork(), cx, cz, Y);
         elementos.add(f);
@@ -86,16 +86,30 @@ public final class FortalezaPlan {
 
     // ------------------------------------------------------------------ la isla
 
-    /** Suelo de ceniza y hueso: tierra seca, tierra de almas, grava y algun parche de hueso. */
+    /** Suelo de ceniza y hueso: grava y toba grises, basalto, tierra de almas, algo de tierra seca y polvo de hueso. */
     private BlockState suelo(int x, int z, int top) {
+        // manchas grandes (de varios bloques) y luego el grano de cada bloque
+        double m = isla.mancha(x, z);
         int p = Hash.pct(x, top, z, 0xA5E);
-        if (p < 34) return Pal.COARSE_DIRT;
-        if (p < 52) return Pal.b(Blocks.SOUL_SOIL);
-        if (p < 66) return Pal.GRAVEL;
-        if (p < 80) return Pal.PODZOL;
-        if (p < 86) return Pal.b(Blocks.TUFF);
-        if (p < 91) return FortalezaHueso.HUESO;
-        return Pal.b(Blocks.ROOTED_DIRT);
+        if (m > 0.35) return p < 55 ? Pal.b(Blocks.SOUL_SOIL) : p < 80 ? Pal.COARSE_DIRT : Pal.GRAVEL;
+        if (m < -0.4) return p < 45 ? Pal.b(Blocks.CALCITE) : p < 70 ? FortalezaHueso.HUESO : Pal.b(Blocks.TUFF);
+        if (p < 30) return Pal.GRAVEL;
+        if (p < 52) return Pal.b(Blocks.TUFF);
+        if (p < 66) return Pal.b(Blocks.SMOOTH_BASALT);
+        if (p < 78) return Pal.COARSE_DIRT;
+        if (p < 88) return Pal.b(Blocks.SOUL_SOIL);
+        if (p < 94) return Pal.b(Blocks.CALCITE);
+        return FortalezaHueso.HUESO;
+    }
+
+    /** Bajo el suelo: grava, toba y tierra de almas (nada de tierra marron en el borde de la isla). */
+    private BlockState subsuelo(int x, int y, int z, int fromTop) {
+        int p = Hash.pct(x, y, z, 0x5B5);
+        if (p < 34) return Pal.GRAVEL;
+        if (p < 62) return Pal.b(Blocks.TUFF);
+        if (p < 80) return Pal.b(Blocks.SOUL_SOIL);
+        if (p < 92) return Pal.b(Blocks.SMOOTH_BASALT);
+        return Pal.COARSE_DIRT;
     }
 
     /** El camino de huesos desde la puerta hasta el borde, con el arco de colmillos donde llega el puente. */

@@ -156,6 +156,21 @@ public final class FortalezaEventos {
         com.darkcraft.armas.LlaveHueso.alSostener(p);
     }
 
+    /**
+     * En la isla de la fortaleza no salen monstruos solos (ni zombis ni esqueletos ni fantasmas): la guardan los
+     * caballeros zombi, que salen en grupos desde Caballeros. Abajo, en el suelo, todo sigue igual.
+     */
+    @SubscribeEvent
+    public static void onSpawn(net.minecraftforge.event.entity.living.MobSpawnEvent.FinalizeSpawn e) {
+        if (e.getY() < Fortalezas.Y - 40 || e.getEntity() instanceof com.darkcraft.caballeros.CaballeroZombi) return;
+        if (!(e.getEntity() instanceof net.minecraft.world.entity.monster.Enemy)) return;
+        var tipo = e.getSpawnType();
+        if (tipo != net.minecraft.world.entity.MobSpawnType.NATURAL && tipo != net.minecraft.world.entity.MobSpawnType.CHUNK_GENERATION
+                && tipo != net.minecraft.world.entity.MobSpawnType.PATROL) return;
+        if (!(e.getLevel() instanceof ServerLevel sl) || sl.dimension() != Level.OVERWORLD) return;
+        if (Fortalezas.cercana(sl.getSeed(), e.getX(), e.getZ(), 150) != null) e.setSpawnCancelled(true);
+    }
+
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent e) {
         ZONA.remove(e.getEntity().getUUID());
@@ -180,8 +195,15 @@ public final class FortalezaEventos {
         }
     }
 
+    /** Ticks que se deja descansar al servidor despues de un chunk que tardo mucho (para que no se quede atras). */
+    private static int descanso = 0;
+
     /** Un chunk por tick: se construye su trozo de la fortaleza (y la puerta y el portal como esten). */
     private static void construirUno(MinecraftServer srv) {
+        if (descanso > 0) {
+            descanso--;
+            return;
+        }
         long[] t = COLA.poll();
         if (t == null) return;
         ServerLevel lvl = srv.overworld();
@@ -206,6 +228,8 @@ public final class FortalezaEventos {
         d.setDirty();
         long ms = (System.nanoTime() - t0) / 1_000_000;
         if (ms > 120) DarkCraftMod.LOGGER.info("Fortaleza: chunk {},{} en {} ms", cx, cz, ms);
+        // en un ordenador lento: como mucho la mitad del tiempo del servidor (un chunk de 150 ms, 3 ticks de descanso)
+        descanso = (int) Math.min(40, ms / 50);
     }
 
     /** Levanta ya todo lo que este cargado de la fortaleza (para los comandos y la prueba). */
@@ -213,9 +237,11 @@ public final class FortalezaEventos {
         encolar(lvl, s);
         int n = 0;
         while (!COLA.isEmpty() && n < 400) {
+            descanso = 0;
             construirUno(lvl.getServer());
             n++;
         }
+        descanso = 0;
         return n;
     }
 
@@ -337,7 +363,7 @@ public final class FortalezaEventos {
             p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 16, 0, false, false));
         } else {
             MobEffectInstance lev = p.getEffect(MobEffects.LEVITATION);
-            if (lev == null || lev.getDuration() < 6) p.addEffect(new MobEffectInstance(MobEffects.LEVITATION, 14, 13, false, false));
+            if (lev == null || lev.getDuration() < 6) p.addEffect(new MobEffectInstance(MobEffects.LEVITATION, 14, 16, false, false));
             p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 0, false, false));
         }
         p.fallDistance = 0;
@@ -477,6 +503,7 @@ public final class FortalezaEventos {
     /** El capitulo 6: la cinematica narrada en lo alto de la fortaleza; si abre, el portal se abre a mitad. */
     public static void capitulo6(ServerPlayer p, FortalezaPlan f, boolean abre) {
         ServerLevel lvl = p.serverLevel();
+        despejarAzotea(lvl, f);
         Cinematics.playCapitulo6(p, f);
         if (!abre) return;
         int t = Math.round((Timeline.cut(6, 2) + 1.2f) * 20);
@@ -485,6 +512,18 @@ public final class FortalezaEventos {
         // el amuleto se deshace en el altar
         lvl.sendParticles(ParticleTypes.END_ROD, al[0] + 0.5, al[1] + 1.6, al[2] + 0.5, 30, 0.3, 0.4, 0.3, 0.08);
         lvl.playSound(null, al[0] + 0.5, al[1] + 1, al[2] + 0.5, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 1.5f, 0.5f);
+    }
+
+    /** Fuera los monstruos (y los caballeros) de lo alto de la torre del homenaje: que no salgan en la cinematica. */
+    static void despejarAzotea(ServerLevel lvl, FortalezaPlan f) {
+        int top = f.Y + FortalezaHueso.NPISOS * FortalezaHueso.PISO;
+        net.minecraft.world.phys.AABB caja = new net.minecraft.world.phys.AABB(f.cx - 30, top - 3, f.cz - 50, f.cx + 30, top + 30, f.cz + 12);
+        for (net.minecraft.world.entity.Mob m : lvl.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, caja,
+                m -> m instanceof net.minecraft.world.entity.monster.Enemy && !m.hasCustomName()
+                        && (m instanceof com.darkcraft.caballeros.CaballeroZombi || !m.isPersistenceRequired()))) {
+            lvl.sendParticles(ParticleTypes.SOUL, m.getX(), m.getY() + 1, m.getZ(), 8, 0.3, 0.5, 0.3, 0.02);
+            m.discard();
+        }
     }
 
     /** El portal se abre desde el centro hacia fuera, en dos segundos. */
@@ -599,7 +638,8 @@ public final class FortalezaEventos {
             double b = a + k * Math.PI * 2 / 3;
             lvl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, c.x + Math.cos(b) * 0.9, c.y + 0.6 + u * 0.8, c.z + Math.sin(b) * 0.9, 1, 0, 0.02, 0, 0.01);
         }
-        lvl.sendParticles(ParticleTypes.END_ROD, d.getX(), d.getY() + 0.5, d.getZ(), 1, 0.15, 0.15, 0.15, 0.02);
+        // chispas pequenas (las de la vara del End, tan cerca de la camara, tapaban el amuleto)
+        if (i % 2 == 0) lvl.sendParticles(ParticleTypes.WAX_OFF, d.getX(), d.getY() + 0.5, d.getZ(), 2, 0.25, 0.2, 0.25, 0.4);
         if (i % 6 == 0) lvl.sendParticles(ParticleTypes.ENCHANT, c.x, c.y + 1.2, c.z, 12, 0.5, 0.5, 0.5, 0.6);
     }
 

@@ -79,29 +79,32 @@ def reja():
 # ---------------------------------------------------------------- el portal de la Sombra (animado)
 
 def portal(frames=32):
+    """Energia roja que fluye en vetas: todo con ondas de un ciclo por bloque (o varios), asi la textura casa con la de
+    al lado por los cuatro lados y el portal se ve como una sola superficie, no como baldosas con un remolino cada una.
+    La animacion tambien cierra el ciclo (32 fotogramas)."""
+    tau = math.tau
     out = np.zeros((16 * frames, 16, 4))
+    oscuro = np.array([10, 1, 8])
+    carmesi = np.array([124, 10, 28])
+    brillo = np.array([255, 104, 76])
     for f in range(frames):
         t = f / frames
         for y in range(16):
             for x in range(16):
-                dx, dy = x - 7.5, y - 7.5
-                r = math.hypot(dx, dy) / 10.6
-                a = math.atan2(dy, dx)
-                # dos brazos de remolino que giran hacia dentro, y un latido en el centro
-                brazo = 0.5 + 0.5 * math.sin(2 * a + r * 7.0 - t * math.tau * 2)
-                brazo2 = 0.5 + 0.5 * math.sin(3 * a - r * 5.0 + t * math.tau + 1.3)
-                v = 0.62 * brazo ** 2.2 + 0.25 * brazo2 ** 3 + 0.35 * max(0, 1 - r * 2.4) * (0.7 + 0.3 * math.sin(t * math.tau * 2))
-                v = min(1.0, v)
-                oscuro = np.array([10, 2, 8])
-                carmesi = np.array([140, 12, 30])
-                brillo = np.array([255, 96, 72])
-                if v < 0.55:
-                    c = oscuro + (carmesi - oscuro) * (v / 0.55)
+                u, v = (x + 0.5) / 16, (y + 0.5) / 16
+                # dominio deformado (tambien periodico) y tres ondas en direcciones distintas
+                px = u + 0.18 * math.sin(tau * v + tau * t)
+                py = v + 0.18 * math.sin(tau * u - tau * t + 1.1)
+                w1 = math.sin(tau * (px + py) + tau * t)
+                w2 = math.sin(tau * (px - 2 * py) - tau * t + 0.8)
+                w3 = math.sin(tau * (2 * px + py) + 2 * tau * t + 2.1)
+                val = min(1.0, max(0.0, 0.48 + 0.26 * w1 + 0.16 * w2 + 0.1 * w3))
+                if val < 0.6:
+                    c = oscuro + (carmesi - oscuro) * (val / 0.6) ** 1.3
                 else:
-                    c = carmesi + (brillo - carmesi) * ((v - 0.55) / 0.45)
-                c = c * (1.0 - 0.25 * r)
+                    c = carmesi + (brillo - carmesi) * ((val - 0.6) / 0.4) ** 1.1
                 out[f * 16 + y, x, :3] = np.clip(c, 0, 255)
-                out[f * 16 + y, x, 3] = 220 + 35 * v
+                out[f * 16 + y, x, 3] = 228 + 27 * val
     guardar(out, os.path.join(TEX, "block", "portal_sombra.png"))
     with open(os.path.join(TEX, "block", "portal_sombra.png.mcmeta"), "w") as fh:
         json.dump({"animation": {"frametime": 2, "interpolate": True}}, fh)
@@ -111,51 +114,50 @@ def portal(frames=32):
 # ---------------------------------------------------------------- el Amuleto de Hueso
 
 AMULETO = [
-    "......cc........",
-    ".....c..c.......",
-    "....c....c......",
-    "...c......c.....",
-    "...c......c.....",
-    "....c....c......",
-    ".....nNNn.......",
-    "....nBBBBn......",
-    "...nBbRRbBn.....",
-    "...NBRrrRBN.....",
-    "...NBRrwRBN.....",
-    "...nBbRRbBn.....",
-    "....nBBBBn......",
-    ".....nBBn.......",
-    "......nn........",
-    "................",
+    "......kkkk......",
+    ".....kc..ck.....",
+    "....kc....ck....",
+    "....kc....ck....",
+    ".....kc..ck.....",
+    "......nNNn......",
+    ".....nBBBBn.....",
+    "....nBbRRbBn....",
+    "...nBbRrrRbBn...",
+    "...NBRrwrrRBN...",
+    "...NBRrrrrRBN...",
+    "...nBbRrrRbBn...",
+    "....nBbRRbBn....",
+    ".....nBBBBn.....",
+    "......nBBn......",
+    ".......nn.......",
 ]
 
 
 def amuleto():
     img = np.zeros((16, 16, 4))
     pal = {
-        "c": (126, 118, 132),   # cadena de netherita
-        "n": (52, 46, 50),      # engaste de netherita
-        "N": (88, 80, 84),
+        "k": (58, 52, 64),      # cadena de netherita (borde)
+        "c": (138, 128, 146),   # brillo de la cadena
+        "n": (44, 38, 42),      # engaste de netherita
+        "N": (92, 84, 88),
         "B": None,              # hueso
         "b": None,
-        "R": (150, 18, 30),     # la gema roja
-        "r": (214, 40, 46),
-        "w": (255, 196, 180),
+        "R": (138, 14, 26),     # la gema roja
+        "r": (210, 34, 42),
+        "w": (255, 200, 184),
     }
     for y, fila in enumerate(AMULETO):
         for x, ch in enumerate(fila):
             if ch == ".":
                 continue
             if ch == "B":
-                col = hueso(0.62 + 0.18 * (1 - y / 16) + R.uniform(-0.05, 0.05))
+                col = hueso(0.66 + 0.2 * (1 - y / 16) + R.uniform(-0.05, 0.05))
             elif ch == "b":
-                col = hueso(0.36)
+                col = hueso(0.34)
             else:
                 col = np.array(pal[ch])
             img[y, x, :3] = col
             img[y, x, 3] = 255
-    # desplazar un poco a la derecha para centrarlo
-    img = np.roll(img, 2, axis=1)
     guardar(img, os.path.join(TEX, "item", "amuleto_hueso.png"))
 
 

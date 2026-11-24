@@ -136,8 +136,15 @@ public class AcertijoScreen extends Screen {
 
     /** La forja dibujada: la cuadricula de la mesa de crafteo con los objetos y el amuleto que sale. */
     private void dibujarForja(GuiGraphics g, int x, int y, int mx, int my) {
+        // el titulo, centrado en la pagina y mas pequeno si no cabe (en negrita se salia por la derecha)
         Component tit = Component.translatable("darkcraft.acertijo.receta").withStyle(ChatFormatting.BOLD);
-        g.drawString(font, tit, x + 96 - font.width(tit) / 2, y + 22, 0x8A1010, false);
+        int tw = font.width(tit);
+        float sc = Math.min(1f, 112f / Math.max(1, tw));
+        g.pose().pushPose();
+        g.pose().translate(x + 93, y + 22 + (1 - sc) * 4, 0);
+        g.pose().scale(sc, sc, 1f);
+        g.drawString(font, tit, -tw / 2, 0, 0x8A1010, false);
+        g.pose().popPose();
         ItemStack D = new ItemStack(Items.DIAMOND), N = new ItemStack(Items.NETHERITE_INGOT), K = new ItemStack(DarkCraftMod.LLAVE_HUESO.get());
         ItemStack[] rejilla = {D, N, D, N, K, N, ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY};
         int gx = x + 40, gy = y + 46, c = 20;

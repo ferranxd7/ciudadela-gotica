@@ -170,8 +170,8 @@ public final class CineShots {
         List<Shot> l = new ArrayList<>();
         l.add(new Shot(0f, 5.2f, 56, 0, 1, pos, look));
         l.add(new Shot(5.2f, 8.4f, 48, 0, 2,
-                p(c.x + Math.cos(a0 + 1.3) * 1.6, c.y + 1.3, c.z + Math.sin(a0 + 1.3) * 1.6, c.x + Math.cos(a0 + 1.5) * 1.2, c.y + 1.4,
-                        c.z + Math.sin(a0 + 1.5) * 1.2),
+                p(c.x + Math.cos(a0 + 1.3) * 2.3, c.y + 1.35, c.z + Math.sin(a0 + 1.3) * 2.3, c.x + Math.cos(a0 + 1.5) * 1.8, c.y + 1.45,
+                        c.z + Math.sin(a0 + 1.5) * 1.8),
                 p(c.x, c.y + 1.3, c.z, c.x, c.y + 1.45, c.z)));
         return l;
     }

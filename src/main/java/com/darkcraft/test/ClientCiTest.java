@@ -1479,8 +1479,30 @@ public final class ClientCiTest {
     }
 
     /** La Fortaleza de Hueso: se levanta sola al llegar, el puente de la llave, la corriente, la puerta, el acertijo, la forja y el capitulo 6. */
-    private static int fortaleza(int F) {
+    private static int fortaleza(int F0) {
         final int PZ = com.darkcraft.gen.FortalezaHueso.PZ;
+        // el rastro de luz de la llave de hueso (solo lo ve quien la lleva), mirando hacia su fortaleza
+        atTicks(F0, "Llave de hueso: el rastro de luz hacia la fortaleza", m -> {
+            reyStart = -1;
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                var s = com.darkcraft.fortaleza.Fortalezas.delReino(lvl.getSeed(), castle[0], castle[1]);
+                var fp = com.darkcraft.fortaleza.Fortalezas.plan(lvl.getSeed(), s);
+                int[] ce = com.darkcraft.fortaleza.Puente.centro(fp);
+                float yaw = (float) Math.toDegrees(Math.atan2(-(ce[0] + 0.5 - sp.getX()), ce[1] + 0.5 - sp.getZ()));
+                sp.setGameMode(GameType.CREATIVE);
+                sp.getAbilities().flying = true;
+                sp.onUpdateAbilities();
+                sp.teleportTo(lvl, sp.getX(), sp.getY(), sp.getZ(), yaw + 28f, 12f);
+                sp.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(DarkCraftMod.LLAVE_HUESO.get()));
+                log("  rastro: la llave apunta a " + ce[0] + "," + ce[1] + " (" + Math.round(Math.hypot(ce[0] - sp.getX(), ce[1] - sp.getZ()))
+                        + " bloques, rumbo " + com.darkcraft.armas.LlaveHueso.rumbo(ce[0] - sp.getX(), ce[1] - sp.getZ()) + ")");
+            });
+        });
+        atTicks(F0 + 70, "captura", m -> shot(m, "cliente_f00_rastro"));
+        int F = F0 + 76;
         atTicks(F, "Fortaleza: a la Fortaleza de Hueso del reino (volando, en creativo)", m -> {
             enPrimeraPersona(m);
             m.options.hideGui = true;
@@ -1509,19 +1531,23 @@ public final class ClientCiTest {
         }
         int E = F + 640;
         // (las posiciones se calculan al llegar el paso: el plano de la fortaleza aun no existe al preparar la prueba)
+        // con la distancia de vision de la CI (7 chunks) la camara va a menos de 80 bloques, sin descartar secciones tapadas
+        // (smartCull) y con tiempo para que se compilen los chunks recien construidos
         String[] nombres = {"cliente_f01_fortaleza", "cliente_f02_fortaleza_lado", "cliente_f03_desde_arriba", "cliente_f04_desde_abajo"};
-        double[][] desde = {{78, 26, 72, 0, 14, -4}, {-66, 12, 40, 0, 10, -2}, {12, 64, 44, 0, 0, 0}, {70, -26, 58, 0, -12, 0}};
+        double[][] desde = {{50, 22, 58, 0, 10, -6}, {-62, 14, 26, 0, 8, -4}, {6, 62, 34, 0, 0, -4}, {48, -30, 46, 0, -8, 0}};
         for (int k = 0; k < nombres.length; k++) {
             final int kk = k;
-            atTicks(E + k * 6, "Fortaleza desde fuera", m -> {
+            atTicks(E + k * 70, "Fortaleza desde fuera", m -> {
                 if (fplan == null) return;
+                m.smartCull = false;
                 double[] d = desde[kk];
                 verDesde(m, fv(d[0], d[1], d[2]), fv(d[3], d[4], d[5]));
             });
-            atTicks(E + k * 6 + 4, "captura", m -> shot(m, nombres[kk]));
+            atTicks(E + k * 70 + 64, "captura", m -> shot(m, nombres[kk]));
         }
+        atTicks(E + 4 * 70, "Fortaleza desde fuera: fin", m -> m.smartCull = true);
         // el puente de hueso y nubes: con la llave, al pie de la escalera
-        int P = E + 40;
+        int P = E + 4 * 70 + 4;
         atTicks(P, "Puente: con la llave al pie de la escalera", m -> {
             enPrimeraPersona(m);
             m.options.hideGui = true;
@@ -1537,21 +1563,35 @@ public final class ClientCiTest {
                 log("  puente: " + est.puente + " base " + est.baseEscalera + " logro puente=" + com.darkcraft.story.Logros.tiene(sp, "puente"));
             });
         });
-        int[][] vistas = {{20, 0}, {90, 1}, {180, 2}};
-        for (int[] v : vistas) {
-            final int vk = v[1];
-            atTicks(P + v[0], "Puente: se levanta", m -> {
+        // vistas de la escalera (se levanta de abajo arriba en ~8,5 s): desde el suelo mientras sube, y ya hecha, de lado
+        // y desde arriba; sin descartar secciones tapadas y con tiempo para que se dibujen
+        double[][] vistas = {
+                // {tick, x, y (0 = base, 1 = arriba), z, mirar x, mirar y, mirar z}
+                {60, 15, 0.012, 17, 0, 0.16, 0},
+                {190, 40, 0.52, 46, 0, 0.46, 0},
+                {260, 30, 1.04, 34, 0, 0.86, 0},
+        };
+        for (int k = 0; k < vistas.length; k++) {
+            final double[] v = vistas[k];
+            final int vk = k;
+            atTicks(P + (int) v[0], "Puente: se levanta", m -> {
+                m.smartCull = false;
                 int[] ce = com.darkcraft.fortaleza.Puente.centro(fplan);
-                double alto = fbase + (fplan.Y - fbase) * (0.3 + 0.35 * vk);
-                verDesde(m, new Vec3(ce[0] + 38 + vk * 6, alto + 14, ce[1] + 44 + vk * 6), new Vec3(ce[0] + 0.5, alto - 6, ce[1] + 0.5));
+                double h = fplan.Y - fbase;
+                verDesde(m, new Vec3(ce[0] + 0.5 + v[1], fbase + 1.6 + h * v[2], ce[1] + 0.5 + v[3]),
+                        new Vec3(ce[0] + 0.5 + v[4], fbase + h * v[5], ce[1] + 0.5 + v[6]));
             });
-            atTicks(P + v[0] + 4, "captura", m -> shot(m, "cliente_f05_puente_" + vk));
+            atTicks(P + (int) v[0] + (k == 0 ? 12 : 50), "captura", m -> shot(m, "cliente_f05_puente_" + vk));
         }
-        atTicks(P + 190, "Puente: desde arriba", m -> {
+        atTicks(P + 316, "Puente: desde arriba", m -> {
             int[] ce = com.darkcraft.fortaleza.Puente.centro(fplan);
             verDesde(m, new Vec3(ce[0] + 14, fplan.Y + 9, ce[1] - 16), new Vec3(ce[0] + 0.5, fplan.Y - 4, ce[1] + 3));
         });
-        atTicks(P + 194, "captura", m -> shot(m, "cliente_f06_puente_arriba"));
+        atTicks(P + 344, "captura", m -> {
+            shot(m, "cliente_f06_puente_arriba");
+            m.smartCull = true;
+        });
+        P += 150;
         // la corriente de nubes: en supervivencia, en el hueco de la escalera
         atTicks(P + 200, "Corriente de nubes: al hueco de la escalera", m -> {
             enPrimeraPersona(m);
@@ -1631,6 +1671,8 @@ public final class ClientCiTest {
         atTicks(H + 72, "El cofre del acertijo", m -> server(m, sp -> {
             int[] c = fplan.f.cofre();
             BlockPos b = new BlockPos(c[0], c[1], c[2]);
+            // delante del cofre: a mas de 8 bloques el servidor lo cierra en el acto
+            sp.teleportTo(sp.serverLevel(), c[0] + 0.5, fplan.Y, c[2] + 2.6, 180f, 28f);
             sp.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
             sp.gameMode.useItemOn(sp, sp.serverLevel(), ItemStack.EMPTY, InteractionHand.MAIN_HAND,
                     new BlockHitResult(Vec3.atCenterOf(b), Direction.SOUTH, b, false));
@@ -1716,7 +1758,7 @@ public final class ClientCiTest {
             sp.setItemInHand(InteractionHand.MAIN_HAND, am);
             sp.gameMode.useItem(sp, sp.serverLevel(), am, InteractionHand.MAIN_HAND);
             log("  amuleto usado: portal=" + com.darkcraft.fortaleza.FortalezaDatos.get(sp.server).de(fsit).portal + " cine=" + Cinematics.active(sp)
-                    + " logro portal=" + com.darkcraft.story.Logros.tiene(sp, "portal"));
+                    + " logro portal=" + com.darkcraft.story.Logros.tiene(sp, "portal") + " amuleto gastado=" + sp.getMainHandItem().isEmpty());
         }));
         float tot6 = Timeline.total(6);
         float[] t6 = {1.6f, 9f, Timeline.cut(6, 0) + 2f, Timeline.cut(6, 1) + 2f, Timeline.cut(6, 2) + 3.5f, Timeline.cut(6, 3) + 2f,
@@ -1763,6 +1805,10 @@ public final class ClientCiTest {
         atTicks(Q + 64, "El espejo en la fortaleza", m -> {
             m.setScreen(null);
             enPrimeraPersona(m);
+            server(m, sp -> {
+                int[] al = fplan.f.altar();
+                sp.teleportTo(sp.serverLevel(), al[0] + 0.5, al[1], al[2] + 4.5, 0f, 18f);
+            });
             log("  espejo en la fortaleza: " + com.darkcraft.client.espejo.EspejoCliente.resumen());
         });
         atTicks(Q + 80, "captura", m -> {

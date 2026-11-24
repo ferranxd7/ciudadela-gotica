@@ -90,7 +90,8 @@ def main():
     print("\n".join(lin))
     print()
     for nombre, rel in [("voz del capitulo 1", "narracion/cap1.ogg"), ("musica de los cofres", "musica/cofre.ogg"),
-                        ("campana", "campana.ogg")]:
+                        ("campana", "campana.ogg"), ("voz del capitulo 6", "narracion/cap6.ogg"),
+                        ("musica de la fortaleza", "musica/fortaleza.ogg")]:
         ruta = os.path.join(sonidos, rel)
         if not os.path.exists(ruta):
             print(f"{nombre}: no esta el archivo {rel}")

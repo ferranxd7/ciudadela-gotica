@@ -124,6 +124,38 @@ public final class FortalezaHueso extends Element {
             };
             c.lectern(a[0], a[1], a[2], mira, com.darkcraft.fortaleza.Perdidos.libro(a[3]));
         }
+        luces(c);
+    }
+
+    /** Luz invisible (bloque de luz). */
+    private static BlockState luz(int nivel) {
+        return Blocks.LIGHT.defaultBlockState().setValue(net.minecraft.world.level.block.LightBlock.LEVEL, nivel);
+    }
+
+    private void luzSi(Canvas c, int x, int y, int z, int nivel) {
+        if (c.isAir(x, y, z)) c.set(x, y, z, luz(nivel));
+    }
+
+    /**
+     * Para que dentro se vea (y no se queden a oscuras): luz invisible repartida por cada piso de la torre del homenaje,
+     * las torres y la puerta. Lo que se ve son los faroles y las antorchas de almas.
+     */
+    private void luces(Canvas c) {
+        for (int p = 0; p < NPISOS; p++) {
+            int yp = Y + p * PISO;
+            for (int i = -1; i <= 1; i++)
+                for (int z : new int[]{cz + KZ0 + 4, cz + KZ0 + 9, cz + KZ1 - 4})
+                    luzSi(c, cx + i * 5, yp + 3, z, 10);
+        }
+        for (int sx = -1; sx <= 1; sx += 2)
+            for (int sz = -1; sz <= 1; sz += 2) {
+                int tx = cx + sx * MURO, tz = cz + sz * MURO;
+                luzSi(c, tx, Y + 3, tz, 10);
+                luzSi(c, tx, Y + ALTO_MURO + 4, tz, 10);
+            }
+        luzSi(c, cx, Y + PALTO + 4, cz + PZ - 4, 10);
+        luzSi(c, cx, Y + 5, cz + PZ - 4, 9);
+        luzSi(c, cx, Y + 5, cz + PZ + 3, 8);
     }
 
     private void patio(Canvas c) {
@@ -240,6 +272,11 @@ public final class FortalezaHueso extends Element {
             }
         }
         c.set(tx, Y + alto + 1, tz, Pal.SOUL_CAMPFIRE);
+        // un farol de almas colgando en cada planta de dentro
+        c.set(tx, Y + ALTO_MURO - 1, tz, Pal.CHAIN);
+        c.set(tx, Y + ALTO_MURO - 2, tz, Pal.SOUL_LANTERN_HANG);
+        c.set(tx, Y + alto - 2, tz, Pal.CHAIN);
+        c.set(tx, Y + alto - 3, tz, Pal.SOUL_LANTERN_HANG);
     }
 
     private void puerta(Canvas c) {
@@ -367,12 +404,19 @@ public final class FortalezaHueso extends Element {
         c.chest(cf[0], cf[1], cf[2], Direction.SOUTH, Decor.loot("acertijo"));
         for (int s = -1; s <= 1; s += 2)
             c.set(cx + s * 3, Y + 4, z0 + 2, Blocks.BLACK_WALL_BANNER.defaultBlockState().setValue(WallBannerBlock.FACING, Direction.SOUTH));
-        // faroles colgando en cada piso
+        // faroles colgando en cada piso, a media altura (desde el techo no llegaba la luz al suelo)
         for (int p = 0; p < NPISOS; p++) {
             int yTecho = Y + (p + 1) * PISO - 2;
-            for (int[] f : new int[][]{{cx - 4, cz - 10}, {cx + 1, cz - 18}, {cx - 4, cz - 20}})
-                c.set(f[0], yTecho, f[1], Pal.SOUL_LANTERN_HANG);
+            for (int[] f : new int[][]{{cx - 4, cz - 10}, {cx + 1, cz - 18}, {cx - 4, cz - 20}}) {
+                for (int y = yTecho; y > yTecho - 3; y--) c.set(f[0], y, f[1], Pal.CHAIN);
+                c.set(f[0], yTecho - 3, f[1], Pal.SOUL_LANTERN_HANG);
+            }
         }
+        // antorchas de almas en las columnas de la planta baja, mirando a la alfombra
+        for (int z = z0 + 5; z <= z1 - 3; z += 5)
+            for (int s = -1; s <= 1; s += 2)
+                c.set(cx + s * 3, Y + 3, z, Blocks.SOUL_WALL_TORCH.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.WallTorchBlock.FACING, s < 0 ? Direction.EAST : Direction.WEST));
         // piso 1: el cuartel (literas de hueso y armas)
         int y1 = Y + PISO;
         for (int z = cz - 16; z <= z1 - 3; z += 3) {
@@ -453,6 +497,9 @@ public final class FortalezaHueso extends Element {
         int[] al = altar();
         c.set(al[0], al[1], al[2], Pal.PB_CHISELED);
         c.set(al[0], al[1] + 1, al[2], Pal.GILDED);
-        for (int s = -1; s <= 1; s += 2) c.set(al[0] + s * 2, al[1], al[2], Pal.SOUL_CAMPFIRE);
+        for (int s = -1; s <= 1; s += 2) {
+            c.set(al[0] + s * 2, al[1], al[2], Pal.b(Blocks.SOUL_SOIL));
+            c.set(al[0] + s * 2, al[1] + 1, al[2], Pal.b(Blocks.SOUL_FIRE));
+        }
     }
 }

@@ -20,6 +20,11 @@ public class Island extends Element {
         boolean allowed(int x, int z);
     }
 
+    /** Los bloques de debajo de la superficie (de 1 a 3 bajo ella), o null para la tierra de siempre. */
+    public interface Subsurface {
+        BlockState at(int x, int y, int z, int fromTop);
+    }
+
     public final int cx, cz, y0;
     private final double baseR, amp;
     private final int rim, drop, maxDepth;
@@ -27,6 +32,7 @@ public class Island extends Element {
     private final double off;
     private Surface surface = (x, z, t) -> null;
     private Plants plants = (x, z) -> true;
+    private Subsurface subsurface = null;
     private final List<double[]> waterfalls = new ArrayList<>(); // {angulo, ancho}
 
     public Island(long seed, int cx, int cz, int y0, double baseR, double amp, int rim, int drop, int maxDepth) {
@@ -56,9 +62,20 @@ public class Island extends Element {
         return this;
     }
 
+    /** Otros bloques bajo la superficie (y sin musgo debajo de la isla). */
+    public Island subsurface(Subsurface s) {
+        this.subsurface = s;
+        return this;
+    }
+
     public Island waterfall(double angle, double width) {
         waterfalls.add(new double[]{angle, width});
         return this;
+    }
+
+    /** Ruido suave (-1..1) en manchas de unos 20 bloques, para variar el suelo. */
+    public double mancha(int x, int z) {
+        return noise.fbm(x * 0.045 + 17.3, z * 0.045 - 9.1, 2);
     }
 
     public double radiusAt(double ang) {
@@ -140,8 +157,12 @@ public class Island extends Element {
                 BlockState sf = surface.at(x, z, top);
                 s = sf != null ? sf : wildSurface(x, top, z, r, R);
             } else if (fromTop <= 3) {
-                int p = Hash.pct(x, y, z, seed + 3);
-                s = p < 60 ? Pal.DIRT : p < 80 ? Pal.COARSE_DIRT : Pal.ROOTED_DIRT;
+                BlockState sb = subsurface != null ? subsurface.at(x, y, z, fromTop) : null;
+                if (sb != null) s = sb;
+                else {
+                    int p = Hash.pct(x, y, z, seed + 3);
+                    s = p < 60 ? Pal.DIRT : p < 80 ? Pal.COARSE_DIRT : Pal.ROOTED_DIRT;
+                }
             } else {
                 s = Pal.islandStone(x, y, z, fromTop);
                 if (fromTop > 8) {
@@ -153,7 +174,7 @@ public class Island extends Element {
                     else if (p < 14) s = Pal.b(Blocks.AMETHYST_BLOCK);
                 }
             }
-            if (y == bottom && Hash.pct(x, y, z, 5) < 30) s = Pal.MOSS;
+            if (y == bottom && subsurface == null && Hash.pct(x, y, z, 5) < 30) s = Pal.MOSS;
             c.set(x, y, z, s);
         }
         // cosas colgando debajo
