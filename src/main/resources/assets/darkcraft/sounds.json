@@ -923,5 +923,76 @@
         "name": "darkcraft:sfx/guardia_rota_2"
       }
     ]
+  },
+  "sfx.santuario_enciende": {
+    "subtitle": "subtitles.darkcraft.sfx.santuario_enciende",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/santuario_enciende_1"
+      }
+    ]
+  },
+  "sfx.santuario_fuego": {
+    "subtitle": "subtitles.darkcraft.sfx.santuario_fuego",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/santuario_fuego_1"
+      }
+    ]
+  },
+  "sfx.santuario_descanso": {
+    "subtitle": "subtitles.darkcraft.sfx.santuario_descanso",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/santuario_descanso_1"
+      }
+    ]
+  },
+  "sfx.frasco_beber": {
+    "subtitle": "subtitles.darkcraft.sfx.frasco_beber",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/frasco_beber_1"
+      },
+      {
+        "name": "darkcraft:sfx/frasco_beber_2"
+      }
+    ]
+  },
+  "sfx.nivel_sube": {
+    "subtitle": "subtitles.darkcraft.sfx.nivel_sube",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/nivel_sube_1"
+      }
+    ]
+  },
+  "sfx.menu_abre": {
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/menu_abre_1"
+      }
+    ]
+  },
+  "sfx.menu_mueve": {
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/menu_mueve_1"
+      }
+    ]
+  },
+  "sfx.menu_acepta": {
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/menu_acepta_1"
+      }
+    ]
+  },
+  "sfx.menu_cancela": {
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/menu_cancela_1"
+      }
+    ]
   }
 }

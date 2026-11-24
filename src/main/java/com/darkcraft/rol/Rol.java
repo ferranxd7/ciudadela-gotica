@@ -64,8 +64,10 @@ import java.util.WeakHashMap;
  * <li><b>Estamina</b>: atacar, cubrirse de un golpe y (solo en combate) correr y saltar la gastan; se recupera sola al
  * poco de dejar de gastar. Sin estamina no se puede atacar, correr ni saltar hasta recuperar un poco, y un golpe en el
  * escudo rompe la guardia.</li>
- * <li><b>Sin hambre</b>: el nivel de comida va fijo (no se regenera vida sola ni se pasa hambre); de momento la comida
- * cura al comerla (hasta que lleguen los frascos).</li>
+ * <li><b>Sin hambre</b>: el nivel de comida va fijo (no se regenera vida sola ni se pasa hambre) y la comida ya no hace
+ * nada: se cura con el frasco rojo ({@link Frascos}) y descansando en un santuario.</li>
+ * <li><b>Atributos y nivel</b>: los ocho atributos de la {@link Ficha} dan la vida, el mana y la estamina maximos y lo
+ * que pegan las armas ({@link #aplicar}); se suben en un santuario pagando ecos ({@link #subir}).</li>
  * </ul>
  */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID)
@@ -103,6 +105,12 @@ public final class Rol {
         Vec3 seguro;
         ResourceKey<Level> seguroDim;
         String zona = "";
+        /** Lo que dan los atributos (se recalcula en {@link #aplicar}). */
+        float estMax = EST_MAX;
+        int manaMax = 100;
+        /** Hay que mandar la ficha (atributos, frascos) al cliente. */
+        boolean fichaSucia = true;
+        int avisoComida = -1000;
     }
 
     private static final Map<UUID, Estado> ESTADOS = new HashMap<>();
@@ -124,8 +132,86 @@ public final class Rol {
         return de(p).estamina;
     }
 
+    public static float estaminaMax(Player p) {
+        return de(p).estMax;
+    }
+
+    /** El mana maximo del jugador (segun su Mente). */
+    public static int manaMax(Player p) {
+        return de(p).manaMax;
+    }
+
+    // ------------------------------------------------------------------ lo que dan los atributos
+
+    private static final UUID MOD_VIDA = UUID.fromString("5e0c1a2b-7d14-4c0a-9a51-0d4c6f1e2a01"),
+            MOD_ATAQUE = UUID.fromString("5e0c1a2b-7d14-4c0a-9a51-0d4c6f1e2a02");
+
+    /** Pone en el jugador lo que le dan sus atributos: vida maxima, mana y estamina maximos y lo que pegan sus armas. */
+    public static void aplicar(ServerPlayer sp) {
+        int[] a = Ficha.atributos(sp);
+        Estado s = de(sp);
+        s.estMax = Nivel.estamina(a[Atributo.AGUANTE.ordinal()]);
+        s.manaMax = Nivel.mana(a[Atributo.MENTE.ordinal()]);
+        modificador(sp, Attributes.MAX_HEALTH, MOD_VIDA, "darkcraft_vigor", Nivel.vida(a[Atributo.VIGOR.ordinal()]) - 20.0,
+                net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADDITION);
+        modificador(sp, Attributes.ATTACK_DAMAGE, MOD_ATAQUE, "darkcraft_fuerza",
+                Nivel.ataque(a[Atributo.FUERZA.ordinal()], a[Atributo.DESTREZA.ordinal()]) - 1.0,
+                net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_TOTAL);
+        if (sp.getHealth() > sp.getMaxHealth()) sp.setHealth(sp.getMaxHealth());
+        if (s.estamina > s.estMax) s.estamina = s.estMax;
+        s.fichaSucia = true;
+        s.enviadaDec = -1;
+    }
+
+    private static void modificador(ServerPlayer sp, net.minecraft.world.entity.ai.attributes.Attribute at, UUID id, String nombre, double v,
+                                    net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation op) {
+        var inst = sp.getAttribute(at);
+        if (inst == null) return;
+        var ya = inst.getModifier(id);
+        if (ya != null && Math.abs(ya.getAmount() - v) < 1e-6) return;
+        inst.removeModifier(id);
+        // se guarda con el jugador: al volver a entrar, la vida que tenia cabe en su vida maxima (si no, se le recortaria a 20)
+        if (Math.abs(v) > 1e-6) inst.addPermanentModifier(new net.minecraft.world.entity.ai.attributes.AttributeModifier(id, nombre, v, op));
+    }
+
+    /**
+     * Subir de nivel en un santuario: {@code nuevos} son los atributos que quiere dejar el jugador. Se cobra en ecos lo que
+     * cuesta cada nivel de mas; si no llega, no se hace nada.
+     */
+    public static boolean subir(ServerPlayer sp, int[] nuevos) {
+        int[] a = Ficha.atributos(sp);
+        if (nuevos == null || nuevos.length != a.length) return false;
+        for (int i = 0; i < a.length; i++) if (nuevos[i] < a[i] || nuevos[i] > Atributo.TOPE) return false;
+        int desde = Nivel.de(a), hasta = Nivel.de(nuevos);
+        if (hasta <= desde) return false;
+        if (!sp.isCreative() && !com.darkcraft.santuario.Santuarios.junto(sp)) return false;
+        long coste = Nivel.coste(desde, hasta);
+        if (coste > Ficha.ecos(sp)) return false;
+        Ficha.ecos(sp, (int) (Ficha.ecos(sp) - coste));
+        Ficha.atributos(sp, nuevos);
+        float antes = sp.getMaxHealth();
+        aplicar(sp);
+        // la vida que se gana se da ya (si no, la barra creceria vacia)
+        if (sp.getMaxHealth() > antes) sp.heal(sp.getMaxHealth() - antes);
+        de(sp).sucio = true;
+        sp.level().playSound(null, sp.getX(), sp.getY(), sp.getZ(), DarkCraftMod.SFX_NIVEL_SUBE.get(), SoundSource.PLAYERS, 0.9f, 1.0f);
+        if (sp.level() instanceof ServerLevel sl)
+            sl.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD, sp.getX(), sp.getY() + 1.0, sp.getZ(), 30, 0.4, 0.8, 0.4, 0.05);
+        com.darkcraft.story.Logros.dar(sp, "subir_nivel");
+        DarkCraftMod.LOGGER.info("[DarkCraft] {} sube del nivel {} al {} por {} ecos", sp.getGameProfile().getName(), desde, hasta, coste);
+        return true;
+    }
+
     public static boolean enCombate(Player p) {
         return de(p).combate > 0;
+    }
+
+    /** La estamina entera y fuera el agotamiento (al descansar en un santuario). */
+    public static void recuperado(ServerPlayer sp) {
+        Estado s = de(sp);
+        s.estamina = s.estMax;
+        s.agotado = false;
+        s.pausa = 0;
     }
 
     // ------------------------------------------------------------------ cada tick
@@ -138,7 +224,7 @@ public final class Rol {
             if (s.combate > 0) s.combate--;
             if (sp.tickCount % 20 == 3) acecho(sp, s);
             if (libre(sp)) {
-                s.estamina = EST_MAX;
+                s.estamina = s.estMax;
                 s.agotado = false;
                 s.pausa = 0;
             } else {
@@ -147,8 +233,8 @@ public final class Rol {
                     s.pausa = Math.max(s.pausa, 8);
                 }
                 if (s.pausa > 0) s.pausa--;
-                else if (s.estamina < EST_MAX)
-                    s.estamina = Math.min(EST_MAX, s.estamina + (sp.isBlocking() ? RECUPERA_GUARDIA : s.combate > 0 ? RECUPERA_COMBATE : RECUPERA));
+                else if (s.estamina < s.estMax)
+                    s.estamina = Math.min(s.estMax, s.estamina + (sp.isBlocking() ? RECUPERA_GUARDIA : s.combate > 0 ? RECUPERA_COMBATE : RECUPERA));
                 if (s.estamina <= 0f) {
                     s.estamina = 0f;
                     if (!s.agotado) {
@@ -171,6 +257,7 @@ public final class Rol {
             }
         }
         if (sp.tickCount % 10 == 4) Espadas.vista(sp);
+        if (sp.tickCount % 40 == 27) com.darkcraft.santuario.Santuarios.tick(sp);
         enviar(sp, s);
     }
 
@@ -188,7 +275,7 @@ public final class Rol {
     private static void enviar(ServerPlayer sp, Estado s) {
         int dec = Math.round(s.estamina * 10f);
         if (s.agotado != s.enviadoAgotado || (dec != s.enviadaDec && sp.tickCount - s.enviadaTick >= 2) || sp.tickCount < s.enviadaTick) {
-            Net.to(sp, new Net.Estamina(dec, Math.round(EST_MAX * 10f), s.agotado));
+            Net.to(sp, new Net.Estamina(dec, Math.round(s.estMax * 10f), s.agotado));
             s.enviadaDec = dec;
             s.enviadoAgotado = s.agotado;
             s.enviadaTick = sp.tickCount;
@@ -202,6 +289,16 @@ public final class Rol {
             s.ganados = 0;
             s.enviadoCombate = combate;
         }
+        if (s.fichaSucia) {
+            Ficha.Frascos f = Ficha.frascos(sp);
+            Net.to(sp, new Net.FichaRol(Ficha.atributos(sp), s.manaMax, f.vidaMax(), f.manaMax(), f.vida(), f.mana(), f.mejora()));
+            s.fichaSucia = false;
+        }
+    }
+
+    /** Algo de la ficha ha cambiado (los frascos, los atributos): se vuelve a mandar al cliente. */
+    public static void fichaCambiada(Player p) {
+        de(p).fichaSucia = true;
     }
 
     private static void gastar(Estado s, float cuanto, int pausa) {
@@ -213,7 +310,13 @@ public final class Rol {
 
     @SubscribeEvent
     public static void onAtaque(AttackEntityEvent e) {
-        if (!(e.getEntity() instanceof ServerPlayer sp) || libre(sp)) return;
+        if (!(e.getEntity() instanceof ServerPlayer sp)) return;
+        // con el frasco en la boca no se pega
+        if (Frascos.bebiendo(sp)) {
+            e.setCanceled(true);
+            return;
+        }
+        if (libre(sp)) return;
         Estado s = de(sp);
         if (s.agotado || s.estamina <= 0f) {
             e.setCanceled(true);
@@ -252,13 +355,26 @@ public final class Rol {
         Net.to(sp, new Net.Cartel(Net.Cartel.GUARDIA, "", 0));
     }
 
-    // ------------------------------------------------------------------ sin hambre: la comida cura
+    // ------------------------------------------------------------------ sin hambre: la comida ya no hace nada
 
+    /**
+     * La comida corriente ya no se come (no curaria ni quitaria un hambre que no hay): se avisa de que ahora se cura con
+     * el frasco. Lo que tiene efectos (una manzana dorada, una pocion) si se puede tomar. Vale en el cliente y en el
+     * servidor (el cliente no llega a empezar el gesto).
+     */
     @SubscribeEvent
-    public static void onComer(LivingEntityUseItemEvent.Finish e) {
-        if (!(e.getEntity() instanceof ServerPlayer sp)) return;
-        FoodProperties fp = e.getItem().getFoodProperties(sp);
-        if (fp != null && fp.getNutrition() > 0) sp.heal(fp.getNutrition());
+    public static void onComer(LivingEntityUseItemEvent.Start e) {
+        if (!(e.getEntity() instanceof Player p) || p.isCreative()) return;
+        FoodProperties fp = e.getItem().getFoodProperties(p);
+        if (fp == null || fp.canAlwaysEat() || !fp.getEffects().isEmpty()) return;
+        e.setCanceled(true);
+        if (p instanceof ServerPlayer sp) {
+            Estado s = de(sp);
+            if (sp.tickCount - s.avisoComida > 100 || sp.tickCount < s.avisoComida) {
+                s.avisoComida = sp.tickCount;
+                Net.to(sp, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.aviso.comida", 0));
+            }
+        }
     }
 
     // ------------------------------------------------------------------ ecos: quien pega y quien muere
@@ -361,7 +477,7 @@ public final class Rol {
             Ficha.espada(sp, new Ficha.Espada(sp.level().dimension(), p.x, p.y, p.z, ecos));
             Ficha.ecos(sp, 0);
         } else Ficha.espada(sp, null);
-        s.estamina = EST_MAX;
+        s.estamina = s.estMax;
         s.agotado = false;
         s.pausa = s.combate = 0;
         s.sucio = true;
@@ -423,8 +539,14 @@ public final class Rol {
     private static void refrescar(Player p) {
         Estado s = de(p);
         s.sucio = true;
+        s.fichaSucia = true;
         s.enviadaDec = -1;
         s.zona = "";
+        if (p instanceof ServerPlayer sp) {
+            aplicar(sp);
+            s.estamina = s.estMax;
+            com.darkcraft.armas.Combos.ajustar(sp);
+        }
     }
 
     @SubscribeEvent
@@ -434,7 +556,15 @@ public final class Rol {
 
     @SubscribeEvent
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent e) {
-        if (e.getEntity() instanceof ServerPlayer) refrescar(e.getEntity());
+        if (e.getEntity() instanceof ServerPlayer sp) {
+            refrescar(sp);
+            // se reaparece con la vida entera (la vida maxima se acaba de volver a poner) y los frascos y el mana llenos
+            if (!e.isEndConquered()) {
+                sp.setHealth(sp.getMaxHealth());
+                Frascos.rellenar(sp);
+                com.darkcraft.armas.Combos.llenar(sp);
+            }
+        }
     }
 
     @SubscribeEvent
@@ -488,5 +618,72 @@ public final class Rol {
                     Net.to(p, new Net.Cartel(t, t == Net.Cartel.JEFE ? "entity.darkcraft.rey" : t == Net.Cartel.ZONA ? "darkcraft.mapa.titulo" : "", 1234));
                     return 1;
                 })));
+    }
+    // ------------------------------------------------------------------ comandos (/darkcraft rol ...), para probar
+
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> comandoRol() {
+        var atributo = Commands.literal("atributo");
+        for (Atributo a : Atributo.values())
+            atributo.then(Commands.literal(a.clave).then(Commands.argument("valor", IntegerArgumentType.integer(1, Atributo.TOPE)).executes(c -> {
+                ServerPlayer p = c.getSource().getPlayerOrException();
+                int[] v = Ficha.atributos(p);
+                v[a.ordinal()] = IntegerArgumentType.getInteger(c, "valor");
+                Ficha.atributos(p, v);
+                aplicar(p);
+                return verNivel(c.getSource(), p);
+            })));
+        return Commands.literal("rol")
+                .then(Commands.literal("santuario").executes(c -> {
+                    ServerPlayer p = c.getSource().getPlayerOrException();
+                    ServerLevel lvl = p.serverLevel();
+                    BlockPos pos = p.blockPosition().relative(p.getDirection());
+                    BlockPos pie = pos.below();
+                    if (!lvl.getBlockState(pos).canBeReplaced() || !lvl.getBlockState(pie).isFaceSturdy(lvl, pie, Direction.UP)) {
+                        c.getSource().sendFailure(Component.translatable("darkcraft.cmd.santuario.no"));
+                        return 0;
+                    }
+                    com.darkcraft.santuario.Santuarios.poner(lvl, pos, com.darkcraft.santuario.Santuarios.SIN_NOMBRE);
+                    c.getSource().sendSuccess(() -> Component.translatable("darkcraft.cmd.santuario", pos.toShortString()), false);
+                    return 1;
+                }))
+                .then(Commands.literal("frascos")
+                        .executes(c -> verFrascos(c.getSource(), c.getSource().getPlayerOrException()))
+                        .then(Commands.argument("total", IntegerArgumentType.integer(1, Frascos.TOPE)).executes(c -> {
+                            ServerPlayer p = c.getSource().getPlayerOrException();
+                            Ficha.Frascos f = Ficha.frascos(p);
+                            int total = IntegerArgumentType.getInteger(c, "total");
+                            int mana = Math.min(f.manaMax(), total - 1), vida = total - mana;
+                            Ficha.frascos(p, new Ficha.Frascos(vida, mana, vida, mana, f.mejora()));
+                            fichaCambiada(p);
+                            return verFrascos(c.getSource(), p);
+                        }))
+                        .then(Commands.literal("mejora").then(Commands.argument("n", IntegerArgumentType.integer(0, 12)).executes(c -> {
+                            ServerPlayer p = c.getSource().getPlayerOrException();
+                            Frascos.mejorar(p, IntegerArgumentType.getInteger(c, "n"));
+                            return verFrascos(c.getSource(), p);
+                        }))))
+                .then(Commands.literal("nivel")
+                        .executes(c -> verNivel(c.getSource(), c.getSource().getPlayerOrException()))
+                        .then(Commands.literal("reiniciar").executes(c -> {
+                            ServerPlayer p = c.getSource().getPlayerOrException();
+                            Ficha.atributos(p, Atributo.deBase());
+                            aplicar(p);
+                            return verNivel(c.getSource(), p);
+                        })))
+                .then(atributo);
+    }
+
+    private static int verFrascos(CommandSourceStack src, ServerPlayer p) {
+        Ficha.Frascos f = Ficha.frascos(p);
+        src.sendSuccess(() -> Component.translatable("darkcraft.cmd.frascos", f.vida() + "/" + f.vidaMax(), f.mana() + "/" + f.manaMax(), f.mejora()), false);
+        return f.vidaMax() + f.manaMax();
+    }
+
+    private static int verNivel(CommandSourceStack src, ServerPlayer p) {
+        int[] a = Ficha.atributos(p);
+        StringBuilder b = new StringBuilder();
+        for (Atributo at : Atributo.values()) b.append(b.length() == 0 ? "" : ", ").append(at.clave).append(' ').append(a[at.ordinal()]);
+        src.sendSuccess(() -> Component.translatable("darkcraft.cmd.nivel", Nivel.de(a), b.toString()), false);
+        return Nivel.de(a);
     }
 }

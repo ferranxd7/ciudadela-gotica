@@ -1,0 +1,10 @@
+{
+ "variants": {
+  "encendido=false": {
+   "model": "darkcraft:block/santuario"
+  },
+  "encendido=true": {
+   "model": "darkcraft:block/santuario_encendido"
+  }
+ }
+}

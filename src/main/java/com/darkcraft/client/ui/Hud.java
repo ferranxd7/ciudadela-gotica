@@ -33,9 +33,11 @@ import java.util.Locale;
  * <li>arriba a la izquierda, el emblema de la Sombra y las barras de <b>vida</b> (roja), <b>mana</b> (azul: la energia
  * de las armas) y <b>estamina</b> (verde); nada de corazones, comida, armadura ni experiencia;</li>
  * <li>abajo a la derecha, el contador de <b>Ecos de la Sombra</b>;</li>
+ * <li>abajo a la izquierda, los <b>frascos</b> (rojo de vida y azul de mana) con los que quedan y su tecla;</li>
  * <li>arriba en el centro, la <b>brujula</b>;</li>
  * <li>encima de la barra de objetos, los avisos de "Pulsa [E]...".</li>
  * </ul>
+ * Las barras crecen con los atributos (mas Vigor, barra de vida mas larga; lo mismo la Mente y el Aguante).
  */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID, value = Dist.CLIENT)
 public final class Hud {
@@ -43,14 +45,23 @@ public final class Hud {
 
     private static final ResourceLocation BRILLO = new ResourceLocation(DarkCraftMod.MODID, "textures/gui/brillo.png");
     /** Donde va el emblema; las barras salen de su derecha. */
-    private static final int X0 = 3, Y0 = 3, LARGO_MANA = 76, LARGO_ESTAMINA = 96;
+    private static final int X0 = 3, Y0 = 3;
+
+    /** Lo que mide la barra de mana (76 con 100 de mana) y la de estamina (96 con 100), sin pasarse de media pantalla. */
+    private static int largoMana(int w) {
+        return Mth.clamp(Math.round(46 + ClientRol.manaMax * 0.3f), 50, Math.max(60, Math.min(200, w / 2 - 44)));
+    }
+
+    private static int largoEstamina(int w) {
+        return Mth.clamp(Math.round(46 + ClientRol.estaminaMax * 0.5f), 50, Math.max(60, Math.min(230, w / 2 - 44)));
+    }
 
     // ------------------------------------------------------------------ lo que se anima (un paso por tick)
 
-    private static float vidaAnt = -1, rastro, manaVista, estaminaVista = 100f, avisoAlfa;
+    private static float vidaAnt = -1, vidaVista = -1, rastro, manaVista, estaminaVista = 100f, avisoAlfa;
     private static int rastroTick = -1000, vidaBrillo = -1000, manaBrillo = -1000, estBrillo = -1000, jefeTick = -1000;
-    private static int manaAnt;
-    private static boolean estLlena = true;
+    private static int manaAnt, avisoQue;
+    private static boolean estLlena = true, avisoEncendido;
 
     /** Lo llama {@link ClientRol} en cada tick del cliente. */
     static void tick(Minecraft mc) {
@@ -59,6 +70,7 @@ public final class Hud {
         float vida = p.getHealth(), max = Math.max(1f, p.getMaxHealth());
         if (vidaAnt < 0 || !p.isAlive()) {
             vidaAnt = vida;
+            vidaVista = vida;
             rastro = vida;
         }
         if (vida < vidaAnt - 0.01f) {
@@ -68,19 +80,27 @@ public final class Hud {
         vidaAnt = vida;
         if (t - rastroTick > 14) rastro = Math.max(vida, rastro - max * 0.03f);
         if (rastro < vida) rastro = vida;
+        // lo que se pierde, de golpe (lo cuenta el rastro); lo que se cura, sube deprisa pero se ve subir
+        if (vidaVista < 0 || vida <= vidaVista) vidaVista = vida;
+        else vidaVista = Math.min(vida, vidaVista + Math.max(0.4f, max * 0.045f));
 
         int mana = ArmasCliente.energiaCliente();
-        manaVista += Mth.clamp(mana - manaVista, -3f, 3f);
+        manaVista += Mth.clamp(mana - manaVista, -3f, Math.max(3f, ClientRol.manaMax * 0.05f));
         if ((manaAnt < Combos.COSTE_1 && mana >= Combos.COSTE_1) || (manaAnt < Combos.COSTE_2 && mana >= Combos.COSTE_2)) manaBrillo = t;
         manaAnt = mana;
 
-        estaminaVista += Mth.clamp(ClientRol.estamina - estaminaVista, -6f, 6f);
+        float paso = Math.max(6f, ClientRol.estaminaMax * 0.06f);
+        estaminaVista += Mth.clamp(ClientRol.estamina - estaminaVista, -paso, paso);
         boolean llena = ClientRol.estamina >= ClientRol.estaminaMax - 0.05f;
         if (llena && !estLlena) estBrillo = t;
         estLlena = llena;
 
-        boolean aviso = ClientRol.juntoAEspada() && mc.screen == null;
-        avisoAlfa = Mth.clamp(avisoAlfa + (aviso ? 0.14f : -0.2f), 0f, 1f);
+        int que = mc.screen == null ? ClientRol.aMano() : ClientRol.NADA;
+        if (que != ClientRol.NADA) {
+            avisoQue = que;
+            avisoEncendido = ClientSantuario.aManoEncendido;
+        }
+        avisoAlfa = Mth.clamp(avisoAlfa + (que != ClientRol.NADA ? 0.14f : -0.2f), 0f, 1f);
     }
 
     // ------------------------------------------------------------------ fuera el HUD de Minecraft
@@ -108,10 +128,13 @@ public final class Hud {
         if (mc.screen instanceof com.darkcraft.client.espejo.LibroScreen) return;
         float t = ClientRol.ticks + pt;
         int fin = X0 + 24;
-        if (gui.shouldDrawSurvivalElements()) fin = barras(mc, g, p, t, w);
+        if (gui.shouldDrawSurvivalElements()) {
+            fin = barras(mc, g, p, t, w);
+            if (!(mc.screen instanceof net.minecraft.client.gui.screens.ChatScreen)) frascos(mc, g, t, h);
+        }
         ecos(mc, g, t, w, h);
         if (!mc.options.renderDebug && ClientRol.ticks - jefeTick > 3) brujula(mc, g, p, pt, w, fin);
-        if (avisoAlfa > 0.02f) avisoEspada(mc, g, w, h);
+        if (avisoAlfa > 0.02f) avisoDeTecla(mc, g, w, h);
         Pix.blanco();
         Pix.mezcla();
     }
@@ -146,7 +169,8 @@ public final class Hud {
             cg *= late;
             cb *= late;
         }
-        barra(g, x, Y0, largoVida, vida / max, rastro / max, relleno, cr, cg, cb);
+        float vista = vidaVista < 0 ? vida : Math.min(vida, vidaVista);
+        barra(g, x, Y0, largoVida, vista / max, rastro / max, relleno, cr, cg, cb);
         // absorcion (corazones dorados del juego): un tramo dorado a continuacion de la vida
         float abs = p.getAbsorptionAmount();
         if (abs > 0.01f) {
@@ -160,25 +184,26 @@ public final class Hud {
         destello(g, x, Y0, largoVida, vida / max, t - vidaBrillo, 1f, 0.9f, 0.9f);
 
         // --- mana (la energia de las armas)
-        float fm = Mth.clamp(manaVista / Combos.MAX, 0f, 1f);
-        barra(g, x, Y0 + 8, LARGO_MANA, fm, 0f, HudTex.MANA, 1f, 1f, 1f);
+        int largoMana = largoMana(w), largoEst = largoEstamina(w);
+        float fm = Mth.clamp(manaVista / ClientRol.manaMax, 0f, 1f);
+        barra(g, x, Y0 + 8, largoMana, fm, 0f, HudTex.MANA, 1f, 1f, 1f);
         if (EspadaRey.es(p.getMainHandItem()) || EspadaRey.es(p.getOffhandItem()) || MandobleJuramento.es(p.getMainHandItem()))
             for (int c : new int[]{Combos.COSTE_1, Combos.COSTE_2}) {
-                int mx = x + 2 + Math.round(LARGO_MANA * c / (float) Combos.MAX);
+                int mx = x + 2 + Math.round(largoMana * c / (float) ClientRol.manaMax);
                 boolean hay = manaVista >= c;
                 g.fill(mx, Y0 + 10, mx + 1, Y0 + 15, hay ? 0xFFF6E3A0 : 0xC0050408);
                 g.fill(mx - 1, Y0 + 9, mx + 2, Y0 + 10, hay ? 0xFFF6E3A0 : 0xFF6E4E1C);
             }
-        destello(g, x, Y0 + 8, LARGO_MANA, fm, t - manaBrillo, 0.85f, 0.92f, 1f);
+        destello(g, x, Y0 + 8, largoMana, fm, t - manaBrillo, 0.85f, 0.92f, 1f);
 
         // --- estamina
         float fe = Mth.clamp(estaminaVista / ClientRol.estaminaMax, 0f, 1f);
         float oscuro = ClientRol.agotado ? 0.55f : 1f;
-        barra(g, x, Y0 + 16, LARGO_ESTAMINA, fe, 0f, HudTex.ESTAMINA, oscuro, oscuro, oscuro);
-        destello(g, x, Y0 + 16, LARGO_ESTAMINA, fe, t - estBrillo, 0.9f, 1f, 0.9f);
+        barra(g, x, Y0 + 16, largoEst, fe, 0f, HudTex.ESTAMINA, oscuro, oscuro, oscuro);
+        destello(g, x, Y0 + 16, largoEst, fe, t - estBrillo, 0.9f, 1f, 0.9f);
         float sin = 1f - (t - ClientRol.sinEstaminaTick) / 12f;
         if (ClientRol.agotado) sin = Math.max(sin, 0.3f + 0.25f * Mth.sin(t * 0.6f));
-        if (sin > 0.02f) g.fill(x + 2, Y0 + 18, x + 3 + LARGO_ESTAMINA, Y0 + 23, (Math.round(150 * Math.min(1f, sin)) << 24) | 0xB81C26);
+        if (sin > 0.02f) g.fill(x + 2, Y0 + 18, x + 3 + largoEst, Y0 + 23, (Math.round(150 * Math.min(1f, sin)) << 24) | 0xB81C26);
 
         // --- el emblema, encima del arranque de las barras; con poca vida, el ojo late
         Pix.blanco();
@@ -191,7 +216,44 @@ public final class Hud {
             Pix.blanco();
             Pix.mezcla();
         }
-        return x + 3 + Math.max(largoVida, LARGO_ESTAMINA) + 8;
+        return x + 3 + Math.max(largoVida, Math.max(largoMana, largoEst)) + 8;
+    }
+
+    // ---- los frascos
+
+    /**
+     * Los dos frascos abajo a la izquierda: cada uno en su hueco de piedra, con los tragos que quedan y, encima, su
+     * tecla. Vacio, se ve apagado; al beber da un destello y, si no se pudo beber, se sacude.
+     */
+    private static void frascos(Minecraft mc, GuiGraphics g, float t, int h) {
+        Font f = mc.font;
+        int y = h - 4 - 24, col = 0;
+        for (int i = 0; i < 2; i++) {
+            boolean mana = i == 1;
+            int total = mana ? ClientRol.frascosMana : ClientRol.frascosVida, quedan = mana ? ClientRol.quedanMana : ClientRol.quedanVida;
+            if (total <= 0) continue;
+            int x = 4 + (col++) * 28;
+            float sacude = t - Bebida.sacudeTick;
+            if (Bebida.sacudeTipo == i && sacude >= 0 && sacude < 9) x += Math.round(Mth.sin(sacude * 2.4f) * 2.2f * (1f - sacude / 9f));
+            Pix.blanco();
+            Panel.hueco(g, x, y, 24, 24);
+            Panel.t(g, quedan > 0 ? (mana ? MenuTex.FRASCO_MANA : MenuTex.FRASCO_VIDA) : (mana ? MenuTex.FRASCO_MANA_VACIO : MenuTex.FRASCO_VIDA_VACIO), x + 4, y + 3);
+            float trago = t - Bebida.tragoTick;
+            if (Bebida.tragoTipo == i && trago >= 0 && trago < 18) {
+                Pix.suma();
+                if (mana) Pix.color(0.35f, 0.6f, 1f, 0.75f * (1f - trago / 18f));
+                else Pix.color(1f, 0.3f, 0.22f, 0.75f * (1f - trago / 18f));
+                g.blit(BRILLO, x - 4, y - 4, 32, 32, 0, 0, 64, 64, 64, 64);
+                Pix.blanco();
+                Pix.mezcla();
+            }
+            String n = Integer.toString(quedan);
+            g.drawString(f, n, x + 22 - f.width(n), y + 14, quedan > 0 ? 0xFFF6E3A0 : 0xFFB03038, true);
+            String k = (mana ? Teclas.FRASCO_MANA : Teclas.FRASCO_VIDA).getTranslatedKeyMessage().getString().toUpperCase(Locale.ROOT);
+            if (f.width(k) <= 24) g.drawString(f, k, x + 12 - f.width(k) / 2, y - 9, 0xC0B8A888, true);
+        }
+        Pix.blanco();
+        Pix.mezcla();
     }
 
     /** Una barra: marco de oro con punta, hueco oscuro, rastro del dano y relleno. */
@@ -290,13 +352,17 @@ public final class Hud {
         Pix.mezcla();
     }
 
-    // ---- el aviso de la espada de luz
+    // ---- el aviso de "Pulsa [E]...": la espada de luz o un santuario
 
-    private static void avisoEspada(Minecraft mc, GuiGraphics g, int w, int h) {
+    private static void avisoDeTecla(Minecraft mc, GuiGraphics g, int w, int h) {
         Component antes = Component.translatable("darkcraft.aviso.recuperar.antes");
-        Component despues = Component.translatable("darkcraft.aviso.recuperar.despues");
-        Component cuantos = Component.literal(numero(ClientRol.ecosEspada));
-        aviso(mc, g, w, h - 80, avisoAlfa, antes, mc.options.keyInventory.getTranslatedKeyMessage(), despues, cuantos);
+        Component tecla = mc.options.keyInventory.getTranslatedKeyMessage();
+        if (avisoQue == ClientRol.ESPADA)
+            aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable("darkcraft.aviso.recuperar.despues"),
+                    Component.literal(numero(ClientRol.ecosEspada)));
+        else
+            aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla,
+                    Component.translatable(avisoEncendido ? "darkcraft.aviso.descansar" : "darkcraft.aviso.encender"), null);
     }
 
     /**

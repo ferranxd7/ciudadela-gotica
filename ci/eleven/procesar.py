@@ -68,7 +68,13 @@ SFX = {
     "has_muerto": (5.0, 2.2, -13), "jefe_abatido": (5.0, 2.0, -13), "zona_descubierta": (4.0, 1.6, -16),
     "ecos_recuperados": (2.6, 0.8, -15), "ecos_ganados": (0.7, 0.3, -22), "espada_luz": (3.8, 0.9, -21),
     "guardia_rota": (1.3, 0.3, -13),
+    # santuarios, frascos, subir de nivel y los menus (parte 2b)
+    "santuario_enciende": (4.0, 1.4, -14), "santuario_fuego": (6.0, 1.0, -24), "santuario_descanso": (3.0, 0.9, -16),
+    "frasco_beber": (1.3, 0.25, -17), "nivel_sube": (2.6, 0.9, -14),
+    "menu_abre": (0.66, 0.12, -19), "menu_mueve": (0.3, 0.1, -26), "menu_acepta": (0.45, 0.15, -20), "menu_cancela": (0.4, 0.12, -20),
 }
+# los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
+ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5}
 # de estos se bajaron 4 tomas (NOMBRE_1..4.mp3): las elegidas salen como NOMBRE_1.ogg, NOMBRE_2.ogg...
 TOMAS_SFX = {
     "espejo_despierta": (3,),   # empieza grave y se aclara (el zumbido que sube y la campanilla)
@@ -88,6 +94,13 @@ TOMAS_SFX = {
     "ecos_ganados": (2, 4),      # dos soplos cortos (las otras dos casi no suenan)
     "espada_luz": (2,),          # el brillo mas parejo de principio a fin
     "guardia_rota": (1, 3),      # golpe y quejido / golpe seco con graves
+    "santuario_enciende": (1,),  # el soplo mas largo y con mas graves
+    "santuario_fuego": (3,),     # el crepitar mas parejo
+    "santuario_descanso": (3,),  # la que mas cuerpo tiene
+    "frasco_beber": (2, 1),      # corcho y dos tragos
+    "nivel_sube": (2,),          # la mas llena y larga
+    "menu_abre": (3,),           # la losa mas grave
+    "menu_mueve": (1,), "menu_acepta": (4,), "menu_cancela": (3,),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -187,9 +200,10 @@ def voz_arbol(src, dst, madera, desfase):
     return hablado * ESTIRA_ARBOL + COLA
 
 
-def efecto(src, dst, maxs, fade, lufs):
+def efecto(src, dst, maxs, fade, lufs, entrada=0.0):
     filtro = (f"silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.02,atrim=0:{maxs},"
-              f"afade=t=out:st={max(0.05, maxs - fade):.2f}:d={fade},"
+              + (f"afade=t=in:st=0:d={entrada}," if entrada > 0 else "")
+              + f"afade=t=out:st={max(0.05, maxs - fade):.2f}:d={fade},"
               f"loudnorm=I={lufs}:TP=-1.0:LRA=11")
     ff(["-i", src, "-af", filtro, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
 
@@ -253,7 +267,7 @@ def main():
                 continue
             dst = os.path.join(sfx, f"{nombre}_{i}.ogg")
             try:
-                efecto(src, dst, maxs, fade, lufs)
+                efecto(src, dst, maxs, fade, lufs, ENTRADA.get(nombre, 0.0))
                 print(f"efecto {nombre}_{i} (toma {k}): {duracion(dst):.2f} s")
             except Exception as e:  # noqa: BLE001
                 fallos += 1

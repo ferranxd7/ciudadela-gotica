@@ -852,6 +852,235 @@ public final class ClientCiTest {
         return t + 780;
     }
 
+    // ------------------------------------------------------------------ santuarios, frascos y subir de nivel
+
+    private static BlockPos santuarioPrueba;
+
+    private static String santuarioServidor(ServerPlayer sp) {
+        var f = com.darkcraft.rol.Ficha.frascos(sp);
+        return "vida=" + String.format("%.1f/%.1f", sp.getHealth(), sp.getMaxHealth()) + " ecos=" + com.darkcraft.rol.Ficha.ecos(sp)
+                + " nivel=" + com.darkcraft.rol.Ficha.nivel(sp) + " atributos=" + java.util.Arrays.toString(com.darkcraft.rol.Ficha.atributos(sp))
+                + " frascos=" + f.vida() + "/" + f.vidaMax() + " " + f.mana() + "/" + f.manaMax()
+                + " mana=" + com.darkcraft.armas.Combos.energia(sp) + "/" + com.darkcraft.rol.Rol.manaMax(sp)
+                + " estamina=" + Math.round(com.darkcraft.rol.Rol.estamina(sp)) + "/" + Math.round(com.darkcraft.rol.Rol.estaminaMax(sp))
+                + " ataque=" + String.format("%.2f", sp.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE))
+                + " reaparece=" + (sp.getRespawnPosition() == null ? "-" : sp.getRespawnPosition().toShortString())
+                + " junto=" + com.darkcraft.santuario.Santuarios.junto(sp) + " combate=" + com.darkcraft.rol.Rol.enCombate(sp)
+                + " bebiendo=" + com.darkcraft.rol.Frascos.bebiendo(sp) + " en " + sp.blockPosition().toShortString()
+                + (santuarioPrueba == null ? "" : " | bloque: " + sp.serverLevel().getBlockState(santuarioPrueba));
+    }
+
+    private static void logSantuario(Minecraft m, String what) {
+        String pantalla = m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName();
+        if (m.screen instanceof com.darkcraft.client.ui.SantuarioScreen sc) pantalla += " [" + sc.resumen() + "]";
+        if (m.screen instanceof com.darkcraft.client.ui.NivelScreen n) pantalla += " [" + n.resumen() + "]";
+        log("  santuario " + what + " (cliente): " + com.darkcraft.client.ui.ClientRol.resumen() + " | cartel: " + com.darkcraft.client.ui.Carteles.resumen()
+                + " | pantalla: " + pantalla);
+        server(m, sp -> log("  santuario " + what + " (servidor): " + santuarioServidor(sp)));
+    }
+
+    private static void usarSantuario() {
+        if (santuarioPrueba != null) com.darkcraft.net.Net.CH.sendToServer(new com.darkcraft.net.Net.SantuarioUsar(santuarioPrueba));
+    }
+
+    private static void tecla(Minecraft m, int tecla) {
+        if (m.screen != null) m.screen.keyPressed(tecla, 0, 0);
+    }
+
+    private static int santuarios(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Santuarios: supervivencia en la plataforma, con ecos y un santuario apagado delante", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.Carteles.callados = false;
+            com.darkcraft.rol.Rol.sinLimite = false;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                sp.setInvisible(false);
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.getInventory().clearContent();
+                sp.getInventory().selected = 0;
+                sp.getInventory().items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                sp.removeAllEffects();
+                comando(sp, "darkcraft ecos quitar");
+                comando(sp, "darkcraft ecos dar 20000");
+                comando(sp, "darkcraft rol nivel reiniciar");
+                comando(sp, "darkcraft rol frascos 4");
+                santuarioPrueba = BlockPos.containing(ex, ey, ez);
+                com.darkcraft.santuario.Santuarios.poner(lvl, santuarioPrueba, "darkcraft.santuario.arbol");
+                sp.setHealth(sp.getMaxHealth());
+                sp.teleportTo(lvl, ex, ey, ez - 3.0, 0f, 12f);
+            });
+        });
+        atTicks(t + 30, "captura: el santuario apagado y su aviso", m -> {
+            logSantuario(m, "apagado");
+            shot(m, "cliente_s01_santuario_apagado");
+        });
+        atTicks(t + 34, "pulsar la tecla: se enciende", m -> usarSantuario());
+        atTicks(t + 62, "captura: SANTUARIO ENCENDIDO", m -> {
+            logSantuario(m, "recien encendido");
+            shot(m, "cliente_s02_santuario_encendido");
+        });
+        atTicks(t + 140, "de noche y de cerca, para ver la llama", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.serverLevel().setDayTime(18000);
+                sp.teleportTo(sp.serverLevel(), ex + 1.5, ey, ez - 2.4, 32f, 6f);
+            });
+        });
+        atTicks(t + 176, "captura: la llama de noche", m -> shot(m, "cliente_s03_santuario_noche"));
+        atTicks(t + 180, "de dia otra vez, y herido", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                sp.serverLevel().setDayTime(6000);
+                sp.teleportTo(sp.serverLevel(), ex, ey, ez - 3.0, 0f, 12f);
+                sp.invulnerableTime = 0;
+                sp.hurt(sp.damageSources().generic(), 9f);
+            });
+        });
+        atTicks(t + 200, "captura: el aviso de descansar", m -> {
+            logSantuario(m, "encendido y herido");
+            shot(m, "cliente_s04_aviso_descansar");
+        });
+        atTicks(t + 204, "pulsar la tecla: descansar", m -> usarSantuario());
+        atTicks(t + 224, "captura: el menu del santuario", m -> {
+            logSantuario(m, "descansando");
+            shot(m, "cliente_s05_menu_santuario");
+        });
+        atTicks(t + 228, "abajo y derecha: un frasco pasa a ser de mana", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT);
+        });
+        atTicks(t + 242, "captura: el reparto de los frascos", m -> {
+            logSantuario(m, "tras repartir");
+            shot(m, "cliente_s06_reparto");
+        });
+        atTicks(t + 246, "arriba e INTRO: subir de nivel", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_UP);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+        });
+        atTicks(t + 258, "captura: subir de nivel", m -> {
+            logSantuario(m, "en subir de nivel");
+            shot(m, "cliente_s07_nivel");
+        });
+        atTicks(t + 262, "Vigor +3, Aguante +2, Fuerza +1 y Mente +1", m -> {
+            if (m.screen instanceof com.darkcraft.client.ui.NivelScreen n) {
+                n.pulsar(0, 3);
+                n.pulsar(2, 2);
+                n.pulsar(3, 1);
+                n.pulsar(1, 1);
+                n.pulsar(0, 0);
+            } else log("  FALLO: no esta la pantalla de subir de nivel");
+        });
+        atTicks(t + 272, "captura: lo elegido, antes de confirmar", m -> {
+            logSantuario(m, "con lo elegido");
+            shot(m, "cliente_s08_nivel_elegido");
+        });
+        atTicks(t + 276, "confirmar", m -> {
+            if (m.screen instanceof com.darkcraft.client.ui.NivelScreen n) n.pulsarConfirmar();
+        });
+        atTicks(t + 284, "captura: recien subido", m -> shot(m, "cliente_s09_nivel_subido"));
+        atTicks(t + 300, "tras subir de nivel", m -> logSantuario(m, "nivel subido"));
+        atTicks(t + 304, "cerrar los menus", m -> m.setScreen(null));
+        atTicks(t + 322, "captura: las barras, mas largas", m -> shot(m, "cliente_s10_hud_nivel"));
+        atTicks(t + 326, "un golpe de 14", m -> server(m, sp -> {
+            sp.invulnerableTime = 0;
+            sp.hurt(sp.damageSources().generic(), 14f);
+        }));
+        atTicks(t + 336, "beber del frasco rojo", m -> com.darkcraft.net.Net.CH.sendToServer(new com.darkcraft.net.Net.Frasco(com.darkcraft.rol.Frascos.VIDA)));
+        atTicks(t + 346, "captura: bebiendo (primera persona)", m -> {
+            logSantuario(m, "bebiendo");
+            shot(m, "cliente_s11_beber");
+        });
+        atTicks(t + 354, "captura: la vida subiendo", m -> shot(m, "cliente_s12_beber_cura"));
+        atTicks(t + 372, "tras beber", m -> logSantuario(m, "tras el frasco rojo"));
+        atTicks(t + 376, "otro golpe; ahora visto de frente", m -> {
+            m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+            server(m, sp -> {
+                sp.invulnerableTime = 0;
+                sp.hurt(sp.damageSources().generic(), 10f);
+                sp.teleportTo(sp.serverLevel(), ex, ey, ez - 3.0, 0f, 0f);
+            });
+        });
+        atTicks(t + 390, "beber otra vez", m -> com.darkcraft.net.Net.CH.sendToServer(new com.darkcraft.net.Net.Frasco(com.darkcraft.rol.Frascos.VIDA)));
+        atTicks(t + 401, "captura: bebiendo (de frente)", m -> shot(m, "cliente_s13_beber_frente"));
+        atTicks(t + 424, "primera persona; sin mana, el frasco azul", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> com.darkcraft.armas.Combos.sumar(sp, -100000));
+        });
+        atTicks(t + 430, "beber del frasco azul", m -> com.darkcraft.net.Net.CH.sendToServer(new com.darkcraft.net.Net.Frasco(com.darkcraft.rol.Frascos.MANA)));
+        atTicks(t + 462, "tras el frasco azul", m -> logSantuario(m, "tras el frasco azul"));
+        atTicks(t + 466, "con la vida entera", m -> server(m, sp -> sp.setHealth(sp.getMaxHealth())));
+        atTicks(t + 472, "beber sin que haga falta: no se gasta", m -> com.darkcraft.net.Net.CH.sendToServer(new com.darkcraft.net.Net.Frasco(com.darkcraft.rol.Frascos.VIDA)));
+        atTicks(t + 476, "captura: el frasco se sacude", m -> {
+            logSantuario(m, "sin beber (vida entera)");
+            shot(m, "cliente_s14_no_hace_falta");
+        });
+        atTicks(t + 484, "pan en la mano: la comida ya no se come", m -> server(m, sp -> {
+            sp.getInventory().items.set(1, new ItemStack(net.minecraft.world.item.Items.BREAD, 3));
+            sp.getInventory().selected = 1;
+            sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(1));
+            sp.setHealth(sp.getMaxHealth() - 6f);
+            sp.gameMode.useItem(sp, sp.serverLevel(), sp.getMainHandItem(), InteractionHand.MAIN_HAND);
+            log("  comer pan: usando=" + sp.isUsingItem() + " (tiene que ser false) pan=" + sp.getMainHandItem().getCount());
+        }));
+        atTicks(t + 498, "captura: el aviso de la comida", m -> {
+            log("  cartel: " + com.darkcraft.client.ui.Carteles.resumen());
+            shot(m, "cliente_s15_aviso_comida");
+        });
+        atTicks(t + 574, "un enemigo le pega: asi no se descansa", m -> server(m, sp -> {
+            sp.getInventory().selected = 0;
+            sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
+            sp.teleportTo(sp.serverLevel(), ex, ey, ez - 3.0, 0f, 12f);
+            net.minecraft.world.entity.monster.Husk h = net.minecraft.world.entity.EntityType.HUSK.create(sp.serverLevel());
+            if (h == null) return;
+            h.moveTo(ex + 3.5, ey, ez - 3.0, 90f, 0f);
+            h.setNoAi(true);
+            sp.serverLevel().addFreshEntity(h);
+            victima = h;
+            sp.invulnerableTime = 0;
+            sp.hurt(sp.damageSources().mobAttack(h), 2f);
+        }));
+        atTicks(t + 580, "pulsar la tecla con el enemigo encima", m -> usarSantuario());
+        atTicks(t + 592, "captura: no puedes descansar", m -> {
+            logSantuario(m, "con un enemigo");
+            shot(m, "cliente_s16_aviso_enemigos");
+        });
+        atTicks(t + 596, "morir: se reaparece junto al santuario", m -> server(m, sp -> {
+            if (victima != null) victima.discard();
+            victima = null;
+            sp.teleportTo(sp.serverLevel(), ex + 3.0, ey, ez + 3.0, 0f, 0f);
+            sp.invulnerableTime = 0;
+            sp.hurt(sp.damageSources().generic(), 1000f);
+        }));
+        atTicks(t + 650, "reaparecer", m -> {
+            if (m.player != null) m.player.respawn();
+            m.setScreen(null);
+        });
+        atTicks(t + 690, "captura: de vuelta en el santuario", m -> {
+            enPrimeraPersona(m);
+            logSantuario(m, "tras reaparecer");
+            shot(m, "cliente_s17_reaparecido");
+        });
+        atTicks(t + 700, "Fin de los santuarios", m -> {
+            com.darkcraft.client.ui.Carteles.callados = true;
+            com.darkcraft.rol.Rol.sinLimite = true;
+            server(m, sp -> {
+                comando(sp, "darkcraft rol nivel");
+                comando(sp, "darkcraft rol frascos");
+                comando(sp, "darkcraft rol nivel reiniciar");
+                comando(sp, "darkcraft rol frascos 4");
+                comando(sp, "darkcraft ecos quitar");
+                if (santuarioPrueba != null) sp.serverLevel().removeBlock(santuarioPrueba, false);
+                sp.setRespawnPosition(net.minecraft.world.level.Level.OVERWORLD, null, 0f, false, false);
+                sp.getInventory().clearContent();
+                sp.setGameMode(GameType.CREATIVE);
+                sp.setHealth(sp.getMaxHealth());
+            });
+        });
+        return t + 720;
+    }
+
     private static void logArmasAt(int t, String what) {
         atTicks(t, "estado de las armas " + what, m -> logArmas(m, what));
     }
@@ -865,6 +1094,7 @@ public final class ClientCiTest {
         int fin = escaparate();
         fin = armas(fin);
         fin = rol(fin);
+        fin = santuarios(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);
@@ -899,6 +1129,17 @@ public final class ClientCiTest {
         at(12, "El cartel de los de antes ya no esta", m -> server(m, sp -> {
             if (cartelViejo != null) log("  cartel viejo: " + (sp.serverLevel().getBlockState(cartelViejo).isAir() ? "quitado" : "SIGUE AHI: " + sp.serverLevel().getBlockState(cartelViejo)));
         }));
+        at(14, "El santuario de la Torre de Ascenso (se pone solo al pasar cerca)", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                BlockPos p = com.darkcraft.santuario.Santuarios.deSitio(sp.server, castle[0] + "," + castle[1] + ":torre_ascenso");
+                log("  santuarios puestos: " + com.darkcraft.santuario.Santuarios.resumen(sp.server) + " | el de la torre: "
+                        + (p == null ? "NO ESTA" : p.toShortString() + " " + sp.serverLevel().getBlockState(p)));
+                if (p != null) sp.teleportTo(sp.serverLevel(), p.getX() + 0.5, p.getY(), p.getZ() + 3.6, 180f, 10f);
+            });
+        });
+        at(19, "Captura del santuario de la torre", m -> shot(m, "cliente_01c_santuario_torre"));
+        at(20, "Vuelta junto al cofre", m -> server(m, sp -> sp.teleportTo(sp.serverLevel(), chest1[0] - 2.5, chest1[1], chest1[2] + 0.5, -90f, 12f)));
         // los comandos nuevos (por sitio) y la ayuda; el viejo ya no existe
         at(5, "Comandos: /darkcraft ayuda, /darkcraft valdrenn localizar y el viejo /darkcraft localizar", m -> {
             m.options.hideGui = false;
@@ -1364,7 +1605,11 @@ public final class ClientCiTest {
                     com.darkcraft.story.Logros.GAVRAN_FASE1, com.darkcraft.story.Logros.GAVRAN_FASE2, com.darkcraft.story.Logros.GAVRAN,
                     com.darkcraft.story.Logros.capitulo(5)})
                 b.append(' ').append(id).append('=').append(com.darkcraft.story.Logros.tiene(sp, id) ? "SI" : "no");
+            for (String id : new String[]{"santuario", "subir_nivel"})
+                b.append(' ').append(id).append('=').append(com.darkcraft.story.Logros.tiene(sp, id) ? "SI" : "no");
             log(b.toString());
+            // los santuarios que se han ido poniendo solos por donde ha pasado la prueba (la torre, la fuente, el arbol, la fortaleza)
+            log("  santuarios puestos al final: " + com.darkcraft.santuario.Santuarios.resumen(sp.server));
         }));
         atTicks(S + 130 + 160, "Pantalla de logros", m -> {
             m.setCameraEntity(m.player);
@@ -2122,7 +2367,7 @@ public final class ClientCiTest {
                 sp.getInventory().items.set(0, new ItemStack(DarkCraftMod.MANDOBLE_JURAMENTO.get()));
                 sp.setHealth(sp.getMaxHealth());
                 sp.getFoodData().setFoodLevel(20);
-                com.darkcraft.armas.Combos.sumar(sp, -com.darkcraft.armas.Combos.MAX);
+                com.darkcraft.armas.Combos.sumar(sp, -100000);
                 sp.teleportTo(lvl, o[0], o[1], o[2], -90f, 12f);
                 dianas.clear();
                 for (int i = 0; i < 3; i++) {

@@ -3,7 +3,8 @@
 La letra gotica en pixel art de los titulos del mod (carteles, nombres de sitios y de jefes, cabeceras de los menus).
 
 Se saca de "New Rocker" (Pablo Impallari, Brenda Gallo y Rodrigo Fuenzalida; licencia SIL Open Font 1.1, en
-tools/ui/fuentes/NewRocker-OFL.txt) dibujada sin suavizado a pocos pixeles de alto: cada letra queda en pixeles puros.
+tools/ui/fuentes/NewRocker-OFL.txt) dibujada sin suavizado a pocos pixeles de alto: cada letra queda en pixeles puros (y con las colas largas de la N y
+la L recortadas, que en una fuente de mapa de bits separarian las letras).
 Salen dos tamanos como fuentes de mapa de bits de Minecraft:
 
   darkcraft:gotica     letras de 22 px (carteles grandes; se pueden dibujar al doble)
@@ -65,6 +66,11 @@ def generar(nombre, px):
         # la tinta, pegada a la izquierda; el avance cuenta desde donde empezaba la tinta
         izq = bb[0]
         tinta = im.crop((izq, 0, bb[2], alto))
+        # las colas largas de la N, la Ñ y la L estan pensadas para meterse por debajo de la letra siguiente; en una
+        # fuente de mapa de bits no caben (la letra siguiente se iria detras de la cola y quedaria "N_"): se cortan
+        # donde acaba el avance de la letra y queda un pie corto
+        if tinta.width > avance + 1:
+            tinta = tinta.crop((0, 0, avance - 1, alto))
         # Minecraft suma un pixel al ancho: el ancho de la celda es el avance de la fuente menos uno
         fin = max(tinta.width, avance - 1)
         datos.append((ch, tinta, fin))

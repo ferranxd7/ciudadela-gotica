@@ -124,6 +124,16 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_ECOS_GANADOS = sound("sfx.ecos_ganados");
     public static final RegistryObject<SoundEvent> SFX_ESPADA_LUZ = sound("sfx.espada_luz");
     public static final RegistryObject<SoundEvent> SFX_GUARDIA_ROTA = sound("sfx.guardia_rota");
+    // santuarios, frascos, subir de nivel y los menus
+    public static final RegistryObject<SoundEvent> SFX_SANTUARIO_ENCIENDE = sound("sfx.santuario_enciende");
+    public static final RegistryObject<SoundEvent> SFX_SANTUARIO_FUEGO = sound("sfx.santuario_fuego");
+    public static final RegistryObject<SoundEvent> SFX_SANTUARIO_DESCANSO = sound("sfx.santuario_descanso");
+    public static final RegistryObject<SoundEvent> SFX_FRASCO_BEBER = sound("sfx.frasco_beber");
+    public static final RegistryObject<SoundEvent> SFX_NIVEL_SUBE = sound("sfx.nivel_sube");
+    public static final RegistryObject<SoundEvent> SFX_MENU_ABRE = sound("sfx.menu_abre");
+    public static final RegistryObject<SoundEvent> SFX_MENU_MUEVE = sound("sfx.menu_mueve");
+    public static final RegistryObject<SoundEvent> SFX_MENU_ACEPTA = sound("sfx.menu_acepta");
+    public static final RegistryObject<SoundEvent> SFX_MENU_CANCELA = sound("sfx.menu_cancela");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")
@@ -165,6 +175,20 @@ public class DarkCraftMod {
                     .noOcclusion().lightLevel(st -> 12).sound(SoundType.GLASS).pushReaction(PushReaction.BLOCK)
                     .isValidSpawn((st, l, p, t) -> false).isRedstoneConductor((st, l, p) -> false)
                     .isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false)));
+
+    /** El santuario: la hoguera de almas donde se descansa (irrompible; apagado da un rescoldo de luz, encendido alumbra). */
+    public static final RegistryObject<Block> SANTUARIO = BLOCKS.register("santuario", () -> new com.darkcraft.santuario.SantuarioBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(-1.0F, 3600000.0F).noLootTable().noOcclusion()
+                    .lightLevel(st -> st.getValue(com.darkcraft.santuario.SantuarioBlock.ENCENDIDO) ? 13 : 3).sound(SoundType.DEEPSLATE_BRICKS)
+                    .pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false).isRedstoneConductor((st, l, p) -> false)
+                    .isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false)));
+    public static final RegistryObject<Item> SANTUARIO_ITEM = ITEMS.register("santuario",
+            () -> new net.minecraft.world.item.BlockItem(SANTUARIO.get(), new Item.Properties().rarity(Rarity.EPIC)));
+    /** Los frascos no son objetos que se lleven en el inventario (van en la ficha): estos solo sirven para dibujarlos en la mano al beber. */
+    public static final RegistryObject<Item> FRASCO_VIDA = ITEMS.register("frasco_vida",
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final RegistryObject<Item> FRASCO_MANA = ITEMS.register("frasco_mana",
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
 
     public static final RegistryObject<Item> AMULETO_HUESO = ITEMS.register("amuleto_hueso",
             () -> new com.darkcraft.fortaleza.AmuletoHueso(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
@@ -270,6 +294,7 @@ public class DarkCraftMod {
             e.accept(LLAVE_HUESO);
             e.accept(AMULETO_HUESO);
             e.accept(LIBRO_ACERTIJO);
+            e.accept(SANTUARIO_ITEM);
         }
         if (e.getTabKey() == CreativeModeTabs.COMBAT) {
             e.accept(MANDOBLE_JURAMENTO);

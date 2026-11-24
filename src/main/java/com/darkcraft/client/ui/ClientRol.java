@@ -24,8 +24,9 @@ import java.util.List;
 
 /**
  * Lo que sabe el cliente del rol del jugador (se lo manda el servidor): los Ecos de la Sombra, la espada de luz, la
- * estamina y si esta en combate. Y lo que hace con ello: junto a la espada, la tecla del inventario recoge los ecos en
- * vez de abrirlo; agotado, no deja saltar ni atacar; y los ecos de un enemigo caido vuelan hasta el jugador.
+ * estamina, si esta en combate y su ficha (atributos, mana maximo y frascos). Y lo que hace con ello: junto a la espada
+ * o a un santuario, la tecla del inventario hace lo que dice el aviso en vez de abrir el inventario; las teclas de los
+ * frascos piden beber; agotado, no deja saltar ni atacar; y los ecos de un enemigo caido vuelan hasta el jugador.
  */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID, value = Dist.CLIENT)
 public final class ClientRol {
@@ -51,9 +52,31 @@ public final class ClientRol {
     public static double ex, ey, ez;
     public static int ecosEspada;
 
+    /** La ficha: los ocho atributos (en el orden de {@code Atributo}), el mana maximo y los frascos. */
+    public static int[] atributos = com.darkcraft.rol.Atributo.deBase();
+    public static int manaMax = 100;
+    public static int frascosVida = 3, frascosMana = 1, quedanVida = 3, quedanMana = 1, mejoraFrascos;
+    /** Cada vez que llega la ficha sube (las pantallas abiertas se enteran de que ha cambiado). */
+    public static int fichaVersion;
+
     public static int ticks;
-    private static int enfriamiento;
+    private static int enfriamiento, enfriamientoFrasco;
     private static boolean primero = true;
+
+    public static int nivel() {
+        return com.darkcraft.rol.Nivel.de(atributos);
+    }
+
+    public static void ficha(Net.FichaRol m) {
+        if (m.atributos().length == com.darkcraft.rol.Atributo.N) atributos = m.atributos().clone();
+        manaMax = Math.max(1, m.manaMax());
+        frascosVida = m.frascosVida();
+        frascosMana = m.frascosMana();
+        quedanVida = m.vida();
+        quedanMana = m.mana();
+        mejoraFrascos = m.mejora();
+        fichaVersion++;
+    }
 
     public static void estado(Net.RolEstado m) {
         if (m.ganados() > 0 && !primero) {
@@ -157,12 +180,15 @@ public final class ClientRol {
     public static void onTick(TickEvent.ClientTickEvent e) {
         Minecraft mc = Minecraft.getInstance();
         if (e.phase == TickEvent.Phase.START) {
-            // junto a la espada de luz, la tecla del inventario recoge los ecos (y no abre el inventario)
-            if (mc.player != null && mc.screen == null && !ClientCine.active() && juntoAEspada()) {
+            // con un aviso de "Pulsa [E]..." delante (la espada de luz, un santuario), la tecla del inventario hace eso
+            // (y no abre el inventario)
+            int que = mc.player != null && mc.screen == null && !ClientCine.active() && mc.player.isAlive() ? aMano() : NADA;
+            if (que != NADA) {
                 boolean pulsada = false;
                 while (mc.options.keyInventory.consumeClick()) pulsada = true;
                 if (pulsada && enfriamiento <= 0) {
-                    Net.CH.sendToServer(new Net.Recuperar());
+                    if (que == ESPADA) Net.CH.sendToServer(new Net.Recuperar());
+                    else if (ClientSantuario.aMano != null) Net.CH.sendToServer(new Net.SantuarioUsar(ClientSantuario.aMano));
                     enfriamiento = 12;
                 }
             }
@@ -171,6 +197,10 @@ public final class ClientRol {
         if (mc.player == null || mc.level == null || mc.isPaused()) return;
         ticks++;
         if (enfriamiento > 0) enfriamiento--;
+        if (enfriamientoFrasco > 0) enfriamientoFrasco--;
+        frascos(mc);
+        ClientSantuario.tick(mc);
+        Bebida.tick(mc);
         // el contador cuenta hacia lo que hay (lo que aun viene volando no cuenta hasta que llega)
         float hay = Math.max(0, ecos - pendiente), falta = hay - ecosVistos;
         if (Math.abs(falta) < 1f) ecosVistos = hay;
@@ -182,6 +212,25 @@ public final class ClientRol {
         }
         Hud.tick(mc);
         Carteles.tick(mc);
+    }
+
+    /** Lo que el jugador tiene a mano para la tecla del aviso. */
+    public static final int NADA = 0, ESPADA = 1, SANTUARIO = 2;
+
+    public static int aMano() {
+        if (juntoAEspada()) return ESPADA;
+        return ClientSantuario.aMano != null ? SANTUARIO : NADA;
+    }
+
+    /** Las teclas de los frascos: se pide beber (el servidor dice si se puede). */
+    private static void frascos(Minecraft mc) {
+        int pide = -1;
+        while (Teclas.FRASCO_VIDA.consumeClick()) pide = com.darkcraft.rol.Frascos.VIDA;
+        while (Teclas.FRASCO_MANA.consumeClick()) pide = com.darkcraft.rol.Frascos.MANA;
+        if (pide < 0 || enfriamientoFrasco > 0 || mc.screen != null || ClientCine.active() || !mc.player.isAlive() || mc.player.isSpectator()) return;
+        if (Bebida.yo()) return;
+        enfriamientoFrasco = 6;
+        Net.CH.sendToServer(new Net.Frasco(pide));
     }
 
     // ------------------------------------------------------------------ agotado: ni saltar ni atacar
@@ -222,12 +271,22 @@ public final class ClientRol {
         primero = true;
         MOTAS.clear();
         Carteles.olvidar();
+        atributos = com.darkcraft.rol.Atributo.deBase();
+        manaMax = 100;
+        frascosVida = quedanVida = 3;
+        frascosMana = quedanMana = 1;
+        mejoraFrascos = 0;
+        ClientSantuario.olvidar();
+        Bebida.olvidar();
     }
 
     /** Para la prueba de la CI. */
     public static String resumen() {
         return "ecos=" + ecos + " vistos=" + Math.round(ecosVistos) + " estamina=" + Math.round(estamina) + "/" + Math.round(estaminaMax)
                 + (agotado ? " AGOTADO" : "") + (combate ? " combate" : "") + (hayEspada ? " espada(" + ecosEspada + ") en "
-                + Math.round(ex) + "," + Math.round(ey) + "," + Math.round(ez) + " " + espadaDim : " sin espada") + " motas=" + MOTAS.size();
+                + Math.round(ex) + "," + Math.round(ey) + "," + Math.round(ez) + " " + espadaDim : " sin espada") + " motas=" + MOTAS.size()
+                + " | nivel=" + nivel() + " atributos=" + java.util.Arrays.toString(atributos) + " manaMax=" + manaMax
+                + " frascos=" + quedanVida + "/" + frascosVida + " " + quedanMana + "/" + frascosMana + (Bebida.yo() ? " BEBIENDO" : "")
+                + " santuario=" + (ClientSantuario.aMano == null ? "-" : ClientSantuario.aMano.toShortString() + (ClientSantuario.aManoEncendido ? " encendido" : " apagado"));
     }
 }

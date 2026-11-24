@@ -12,8 +12,8 @@ import net.minecraft.world.level.Level;
 
 /**
  * La ficha de rol de cada jugador, guardada con el (NBT persistente {@code darkcraft_rol}: sobrevive a la muerte y vale
- * igual en un servidor dedicado). De momento: los Ecos de la Sombra que lleva, la espada de luz que dejo al morir y las
- * zonas que ya ha descubierto. Aqui iran el nivel, los atributos y lo demas del rol.
+ * igual en un servidor dedicado): los Ecos de la Sombra que lleva, la espada de luz que dejo al morir, las zonas que ha
+ * descubierto, sus atributos (de ellos sale el nivel), sus frascos y los santuarios en los que ha descansado.
  */
 public final class Ficha {
     private Ficha() {}
@@ -78,6 +78,67 @@ public final class Ficha {
         t.putDouble("z", e.z());
         t.putInt("ecos", e.ecos());
         f.put("espada", t);
+    }
+
+    // ------------------------------------------------------------------ atributos y nivel
+
+    /** Los ocho atributos (en el orden de {@link Atributo}); quien aun no tiene ficha, los de base. */
+    public static int[] atributos(Player p) {
+        int[] a = leer(p).getIntArray("atributos");
+        if (a.length != Atributo.N) return Atributo.deBase();
+        int[] r = a.clone();
+        for (int i = 0; i < r.length; i++) r[i] = Math.max(1, Math.min(Atributo.TOPE, r[i]));
+        return r;
+    }
+
+    static void atributos(Player p, int[] a) {
+        abrir(p).putIntArray("atributos", a.clone());
+    }
+
+    public static int nivel(Player p) {
+        return Nivel.de(atributos(p));
+    }
+
+    // ------------------------------------------------------------------ frascos
+
+    /** Los frascos del jugador: cuantos lleva de cada (se rellenan al descansar), cuantos le quedan y su mejora. */
+    public record Frascos(int vidaMax, int manaMax, int vida, int mana, int mejora) {
+        public static final int VIDA = 0, MANA = 1;
+    }
+
+    public static Frascos frascos(Player p) {
+        CompoundTag f = leer(p);
+        if (!f.contains("frascos", Tag.TAG_COMPOUND)) return new Frascos(3, 1, 3, 1, 0);
+        CompoundTag t = f.getCompound("frascos");
+        int vm = Math.max(0, t.getInt("vida_max")), mm = Math.max(0, t.getInt("mana_max"));
+        return new Frascos(vm, mm, Math.max(0, Math.min(vm, t.getInt("vida"))), Math.max(0, Math.min(mm, t.getInt("mana"))), t.getInt("mejora"));
+    }
+
+    static void frascos(Player p, Frascos fr) {
+        CompoundTag t = new CompoundTag();
+        t.putInt("vida_max", fr.vidaMax());
+        t.putInt("mana_max", fr.manaMax());
+        t.putInt("vida", fr.vida());
+        t.putInt("mana", fr.mana());
+        t.putInt("mejora", fr.mejora());
+        abrir(p).put("frascos", t);
+    }
+
+    // ------------------------------------------------------------------ santuarios
+
+    /** Apunta el santuario (dimension y sitio) y dice si es la primera vez que este jugador descansa en el. */
+    static boolean santuarioNuevo(Player p, ResourceKey<Level> dim, net.minecraft.core.BlockPos pos) {
+        String clave = dim.location() + "@" + pos.getX() + "," + pos.getY() + "," + pos.getZ();
+        CompoundTag f = abrir(p);
+        ListTag l = f.getList("santuarios", Tag.TAG_STRING);
+        for (int i = 0; i < l.size(); i++) if (l.getString(i).equals(clave)) return false;
+        l.add(StringTag.valueOf(clave));
+        f.put("santuarios", l);
+        return true;
+    }
+
+    public static int santuarios(Player p) {
+        return leer(p).getList("santuarios", Tag.TAG_STRING).size();
     }
 
     // ------------------------------------------------------------------ zonas descubiertas

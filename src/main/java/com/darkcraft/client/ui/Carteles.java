@@ -17,8 +17,10 @@ import java.util.ArrayDeque;
 
 /**
  * Los carteles grandes del mod, con la letra gotica y florituras de oro: HAS MUERTO (lo dibuja la pantalla de muerte),
- * JEFE ABATIDO con el nombre del jefe, el nombre de una zona al entrar por primera vez y ECOS RECUPERADOS. Salen de uno
- * en uno (hacen cola), nunca encima de una cinematica ni del aviso del espejo, y cada uno con su sonido.
+ * JEFE ABATIDO con el nombre del jefe, el nombre de una zona al entrar por primera vez, ECOS RECUPERADOS y SANTUARIO
+ * ENCENDIDO con su nombre. Salen de uno en uno (hacen cola), nunca encima de una cinematica ni del aviso del espejo, y
+ * cada uno con su sonido. Aparte van los avisos cortos ("no puedes descansar con enemigos cerca"): una banda pequena
+ * con la letra del juego, encima de la barra de objetos, que no hace cola (el ultimo quita al anterior).
  */
 public final class Carteles {
     private Carteles() {}
@@ -44,6 +46,13 @@ public final class Carteles {
             case Net.Cartel.ECOS -> COLA.add(new Cartel(Net.Cartel.ECOS, Component.translatable("darkcraft.cartel.ecos"),
                     Component.literal("+" + Hud.numero(m.n()))));
             case Net.Cartel.GUARDIA -> ClientRol.sinEstaminaTick = ClientRol.ticks;
+            case Net.Cartel.SANTUARIO -> COLA.add(new Cartel(Net.Cartel.SANTUARIO, Component.translatable("darkcraft.cartel.santuario"),
+                    Component.translatable(m.clave())));
+            case Net.Cartel.AVISO -> {
+                aviso = Component.translatable(m.clave());
+                avisoInicio = ClientRol.ticks;
+                Panel.nada();
+            }
             default -> {
             }
         }
@@ -53,12 +62,17 @@ public final class Carteles {
     /** Un sitio de dentro de una zona (solo existe en el cliente: el servidor manda ZONA y aqui se decide). */
     public static final int LUGAR = 5;
 
+    /** El aviso corto que se esta viendo (o null) y desde cuando. */
+    private static Component aviso;
+    private static int avisoInicio;
+    private static final int AVISO_DURA = 70;
+
     private static boolean mayor(String clave) {
         return clave.equals("darkcraft.mapa.titulo") || clave.equals("darkcraft.mapa.lugar.fortaleza") || clave.startsWith("darkcraft.zona.");
     }
 
     private static int dura(int tipo) {
-        return tipo == Net.Cartel.JEFE ? 120 : tipo == Net.Cartel.ZONA ? 96 : tipo == LUGAR ? 64 : 76;
+        return tipo == Net.Cartel.JEFE ? 120 : tipo == Net.Cartel.ZONA || tipo == Net.Cartel.SANTUARIO ? 96 : tipo == LUGAR ? 64 : 76;
     }
 
     private static SoundEvent sonido(int tipo) {
@@ -68,6 +82,8 @@ public final class Carteles {
     }
 
     static void sonar(int tipo) {
+        // el santuario ya suena en el mundo al encenderse
+        if (tipo == Net.Cartel.SANTUARIO) return;
         // un sitio pequeno: la misma campana, mas aguda y bajita
         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sonido(tipo), tipo == LUGAR ? 1.3f : 1.0f,
                 tipo == LUGAR ? 0.3f : tipo == Net.Cartel.ZONA ? 0.7f : 0.9f));
@@ -75,6 +91,7 @@ public final class Carteles {
 
     /** Lo llama {@link ClientRol} en cada tick del cliente. */
     static void tick(Minecraft mc) {
+        if (aviso != null && (ClientRol.ticks - avisoInicio > AVISO_DURA || ClientRol.ticks < avisoInicio)) aviso = null;
         if (actual != null && ClientRol.ticks - inicio > dura(actual.tipo())) actual = null;
         if (actual == null && !COLA.isEmpty() && mc.screen == null && mc.player != null && mc.player.isAlive() && !ClientCine.active()
                 && !EspejoCliente.avisando()) {
@@ -87,18 +104,37 @@ public final class Carteles {
     static void olvidar() {
         COLA.clear();
         actual = null;
+        aviso = null;
     }
 
     /** El cartel que se esta viendo (para la prueba de la CI). */
     public static String resumen() {
         return (actual == null ? "ninguno" : "tipo " + actual.tipo() + " '" + actual.titulo().getString() + "' / '"
-                + (actual.sub() == null ? "" : actual.sub().getString()) + "'") + " en cola " + COLA.size();
+                + (actual.sub() == null ? "" : actual.sub().getString()) + "'") + " en cola " + COLA.size()
+                + (aviso == null ? "" : " aviso '" + aviso.getString() + "'");
     }
 
     public static void render(ForgeGui gui, GuiGraphics g, float pt, int w, int h) {
         Minecraft mc = Minecraft.getInstance();
-        if (actual == null || mc.options.hideGui) return;
+        if (mc.options.hideGui) return;
+        if (aviso != null && mc.screen == null && !ClientCine.active()) dibujarAviso(g, mc.font, w, h, aviso, ClientRol.ticks - avisoInicio + pt);
+        if (actual == null) return;
         dibujar(g, mc.font, w, h, actual.tipo(), actual.titulo(), actual.sub(), ClientRol.ticks - inicio + pt, dura(actual.tipo()));
+    }
+
+    /** Un aviso corto: una banda oscura con filos de oro y el texto con la letra del juego, encima de los avisos de tecla. */
+    public static void dibujarAviso(GuiGraphics g, Font f, int w, int h, Component texto, float edad) {
+        float entra = Mth.clamp(edad / 6f, 0f, 1f), sale = Mth.clamp((AVISO_DURA - edad) / 14f, 0f, 1f);
+        float a = Math.min(entra, sale);
+        int alfa = Math.round(255 * a);
+        if (alfa < 8) return;
+        int tw = f.width(texto), medio = Math.min(w / 2 - 4, tw / 2 + 60), y = h - 106;
+        Pix.franja(g, w / 2 - medio, w / 2 + medio, y, y + 17, 0x050408, 0.78f * a);
+        Pix.franja(g, w / 2 - medio, w / 2 + medio, y, y + 1, 0x96702A, 0.9f * a);
+        Pix.franja(g, w / 2 - medio, w / 2 + medio, y + 16, y + 17, 0x96702A, 0.9f * a);
+        g.drawString(f, texto, w / 2 - tw / 2, y + 5, (alfa << 24) | 0xEADBC4, true);
+        Pix.blanco();
+        Pix.mezcla();
     }
 
     /**
@@ -112,6 +148,7 @@ public final class Carteles {
         float a = Math.min(entra * entra * (3 - 2 * entra), sale);
         if (a <= 0.03f) return;
         boolean muerte = tipo == Net.Cartel.MUERTE, zona = tipo == Net.Cartel.ZONA, ecos = tipo == Net.Cartel.ECOS, lugar = tipo == LUGAR;
+        boolean santuario = tipo == Net.Cartel.SANTUARIO;
         int tw1 = Letra.anchoG(f, titulo);
         // el titulo va al doble si cabe con holgura (en pantallas estrechas, a su tamano)
         int esc = !ecos && !lugar && tw1 * 2 + 200 <= w ? 2 : 1;
@@ -127,7 +164,7 @@ public final class Carteles {
         Pix.franja(g, w / 5, w - w / 5, y0 + 2, y0 + 3, muerte ? 0x3A070C : 0x4A3312, 0.8f * a);
         Pix.franja(g, w / 5, w - w / 5, y1 - 3, y1 - 2, muerte ? 0x3A070C : 0x4A3312, 0.8f * a);
         int alfa = Math.round(255 * a);
-        int color = (alfa << 24) | (muerte ? 0xC01A22 : zona || lugar ? 0xF4F0E0 : 0xE9C766);
+        int color = (alfa << 24) | (muerte ? 0xC01A22 : zona || lugar ? 0xF4F0E0 : santuario ? 0xBFE6F8 : 0xE9C766);
         int borde = 0xFF050408;
         // las florituras se abren desde el centro
         int abre = Math.round((1f - entra) * 26f);

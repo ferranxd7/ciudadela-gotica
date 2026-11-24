@@ -41,7 +41,8 @@ public final class Combos {
     public static final int TAJO_REAL = 1, JUICIO = 2;
     /** Los del Mandoble del Juramento (el cliente pide 1 o 2 y el servidor mira que arma lleva). */
     public static final int RAICES_M = 3, ESPINAS_M = 4;
-    public static final int MAX = 100, COSTE_1 = 35, COSTE_2 = 80;
+    /** Lo que cuesta cada combo. El mana maximo sale de la Mente del jugador ({@code Rol.manaMax}; 100 de base). */
+    public static final int COSTE_1 = 35, COSTE_2 = 80;
     private static final String KEY = "darkcraft_energia";
 
     private static final class Estado {
@@ -60,14 +61,30 @@ public final class Combos {
     }
 
     private static void setEnergia(Player p, int v) {
-        v = Mth.clamp(v, 0, MAX);
+        v = Mth.clamp(v, 0, com.darkcraft.rol.Rol.manaMax(p));
         p.getPersistentData().putInt(KEY, v);
         if (p instanceof ServerPlayer sp) Net.to(sp, new Net.Energia(v));
     }
 
+    /** Lo que se gana al pegar con las armas (en mitad de un combo, nada). */
     public static void sumar(Player p, int n) {
         if (ACTIVOS.containsKey(p.getUUID())) return;
         setEnergia(p, energia(p) + n);
+    }
+
+    /** Mana que llega de fuera (el frasco azul). */
+    public static void dar(Player p, int n) {
+        setEnergia(p, energia(p) + n);
+    }
+
+    /** El mana entero (al descansar en un santuario y al reaparecer). */
+    public static void llenar(Player p) {
+        setEnergia(p, com.darkcraft.rol.Rol.manaMax(p));
+    }
+
+    /** Si el maximo ha bajado (o se acaba de entrar), que lo que hay no se pase y que el cliente lo sepa. */
+    public static void ajustar(Player p) {
+        setEnergia(p, energia(p));
     }
 
     @SubscribeEvent
@@ -79,7 +96,7 @@ public final class Combos {
 
     /** El cliente pide un combo (Shift o Ctrl + clic). */
     public static void pedir(ServerPlayer sp, int tipo) {
-        if (ACTIVOS.containsKey(sp.getUUID()) || !sp.isAlive() || sp.isSpectator()) return;
+        if (ACTIVOS.containsKey(sp.getUUID()) || !sp.isAlive() || sp.isSpectator() || com.darkcraft.rol.Frascos.bebiendo(sp)) return;
         ItemStack main = sp.getMainHandItem();
         if (MandobleJuramento.es(main)) {
             if (!MandobleJuramento.dosManos(sp)) {

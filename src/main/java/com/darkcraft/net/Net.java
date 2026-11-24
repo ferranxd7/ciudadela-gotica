@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "6";
+    private static final String V = "7";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -72,6 +72,155 @@ public final class Net {
                 .encoder((m, b) -> {}).decoder(b -> new Recuperar()).consumerMainThread(Recuperar::handle).add();
         CH.messageBuilder(Ecos.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(Ecos::write).decoder(Ecos::read).consumerMainThread(Ecos::handle).add();
+        CH.messageBuilder(FichaRol.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(FichaRol::write).decoder(FichaRol::read).consumerMainThread(FichaRol::handle).add();
+        CH.messageBuilder(SubirNivel.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(SubirNivel::write).decoder(SubirNivel::read).consumerMainThread(SubirNivel::handle).add();
+        CH.messageBuilder(Frasco.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Frasco::write).decoder(Frasco::read).consumerMainThread(Frasco::handle).add();
+        CH.messageBuilder(Bebe.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Bebe::write).decoder(Bebe::read).consumerMainThread(Bebe::handle).add();
+        CH.messageBuilder(SantuarioUsar.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(SantuarioUsar::write).decoder(SantuarioUsar::read).consumerMainThread(SantuarioUsar::handle).add();
+        CH.messageBuilder(Santuario.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Santuario::write).decoder(Santuario::read).consumerMainThread(Santuario::handle).add();
+        CH.messageBuilder(RepartoFrascos.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(RepartoFrascos::write).decoder(RepartoFrascos::read).consumerMainThread(RepartoFrascos::handle).add();
+    }
+
+    // ------------------------------------------------------------------ rol: la ficha, subir de nivel, frascos y santuarios
+
+    /**
+     * La ficha del jugador: sus ocho atributos (de ellos salen el nivel, la vida, la estamina...), el mana maximo y sus
+     * frascos (cuantos lleva de vida y de mana, cuantos le quedan y su mejora).
+     */
+    public record FichaRol(int[] atributos, int manaMax, int frascosVida, int frascosMana, int vida, int mana, int mejora) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarIntArray(atributos);
+            b.writeVarInt(manaMax);
+            b.writeVarInt(frascosVida);
+            b.writeVarInt(frascosMana);
+            b.writeVarInt(vida);
+            b.writeVarInt(mana);
+            b.writeVarInt(mejora);
+        }
+
+        static FichaRol read(FriendlyByteBuf b) {
+            return new FichaRol(b.readVarIntArray(16), b.readVarInt(), b.readVarInt(), b.readVarInt(), b.readVarInt(), b.readVarInt(), b.readVarInt());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.ClientRol.ficha(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El jugador, descansando en un santuario, confirma los atributos que quiere (el servidor comprueba y cobra los ecos). */
+    public record SubirNivel(int[] atributos) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarIntArray(atributos);
+        }
+
+        static SubirNivel read(FriendlyByteBuf b) {
+            return new SubirNivel(b.readVarIntArray(16));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.rol.Rol.subir(p, atributos);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El jugador quiere beber de un frasco (0 el de vida, 1 el de mana). */
+    public record Frasco(int tipo) {
+        void write(FriendlyByteBuf b) {
+            b.writeByte(tipo);
+        }
+
+        static Frasco read(FriendlyByteBuf b) {
+            return new Frasco(b.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.rol.Frascos.pedir(p, tipo);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /**
+     * Alguien bebe de un frasco (lo ven todos los que le ven: levanta el frasco) o, solo para el que lo pidio, por que no
+     * puede: {@link #VACIO} no le quedan, {@link #LLENO} no le hace falta.
+     */
+    public record Bebe(int entity, int tipo, int que) {
+        public static final int BEBE = 0, VACIO = 1, LLENO = 2;
+
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entity);
+            b.writeByte(tipo);
+            b.writeByte(que);
+        }
+
+        static Bebe read(FriendlyByteBuf b) {
+            return new Bebe(b.readVarInt(), b.readByte(), b.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.Bebida.recibir(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El jugador usa el santuario que tiene delante con la tecla (lo mismo que hacerle clic derecho). */
+    public record SantuarioUsar(net.minecraft.core.BlockPos pos) {
+        void write(FriendlyByteBuf b) {
+            b.writeBlockPos(pos);
+        }
+
+        static SantuarioUsar read(FriendlyByteBuf b) {
+            return new SantuarioUsar(b.readBlockPos());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.santuario.Santuarios.usar(p, pos);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El jugador descansa en un santuario: se abre su menu (con el nombre del santuario). */
+    public record Santuario(net.minecraft.core.BlockPos pos, String nombre) {
+        void write(FriendlyByteBuf b) {
+            b.writeBlockPos(pos);
+            b.writeUtf(nombre, 96);
+        }
+
+        static Santuario read(FriendlyByteBuf b) {
+            return new Santuario(b.readBlockPos(), b.readUtf(96));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.SantuarioScreen.abrir(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** En el santuario, el jugador reparte sus frascos: cuantos quiere de vida (los demas, de mana). */
+    public record RepartoFrascos(int vida) {
+        void write(FriendlyByteBuf b) {
+            b.writeByte(vida);
+        }
+
+        static RepartoFrascos read(FriendlyByteBuf b) {
+            return new RepartoFrascos(b.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.rol.Frascos.repartir(p, vida);
+            ctx.get().setPacketHandled(true);
+        }
     }
 
     // ------------------------------------------------------------------ rol: ecos, espada de luz, estamina y carteles
@@ -127,9 +276,12 @@ public final class Net {
         }
     }
 
-    /** Un cartel grande en la pantalla: jefe abatido (la clave es su nombre), zona descubierta, ecos recuperados (n)... */
+    /**
+     * Un cartel en la pantalla: jefe abatido (la clave es su nombre), zona descubierta, ecos recuperados (n), santuario
+     * encendido (la clave es su nombre) o un aviso corto (la clave es el texto). El 5 es de los carteles del cliente.
+     */
     public record Cartel(int tipo, String clave, int n) {
-        public static final int MUERTE = 0, JEFE = 1, ZONA = 2, ECOS = 3, GUARDIA = 4;
+        public static final int MUERTE = 0, JEFE = 1, ZONA = 2, ECOS = 3, GUARDIA = 4, SANTUARIO = 6, AVISO = 7;
 
         void write(FriendlyByteBuf b) {
             b.writeByte(tipo);

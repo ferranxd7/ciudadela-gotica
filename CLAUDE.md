@@ -122,9 +122,9 @@ empezarla). Lo esencial, que cambia reglas de arriba:
 - **Servidor** (`rol/`): `Ficha` (NBT persistente `darkcraft_rol` del jugador: ecos, espada {dim, x, y, z, ecos}, zonas
   vistas), `Rol` (estamina 0-100: atacar 8, mandoble 13, cubrirse 6 + 2,2 x golpe, y solo en combate correr 7,2/s y
   saltar 7; se recupera a 30-44/s tras 0,8 s; a 0 queda "agotado" hasta volver a 22: no ataca, y el nivel de comida
-  pasa de 10 a 6 para que el propio juego no deje correr; comida fija = sin hambre ni regeneracion; comer cura lo que
-  alimentaba; ecos al matar = vida x 2,2 + golpe x 7 + armadura x 3 para cada jugador que le pego; Rey 9000 y Gavran
-  14000 con el cartel; al morir, `keepInventory` siempre y los ecos a la espada: en el suelo bajo el jugador, o en el
+  pasa de 10 a 6 para que el propio juego no deje correr; comida fija = sin hambre ni regeneracion; (en la 2a comer
+  curaba; desde la 2b la comida no se come); ecos al matar = vida x 2,2 + golpe x 7 + armadura x 3 para cada jugador
+  que le pego; Rey 9000 y Gavran 14000 con el cartel; al morir, `keepInventory` siempre y los ecos a la espada: en el suelo bajo el jugador, o en el
   ultimo suelo firme si fue caida de mas de 24, lava o vacio; `zona()` la llama el Espejo cada segundo),
   `Espadas` (la espada que se ve: `item_display` con brillo y contorno dorado, etiqueta `darkcraft_espada_luz`, se
   pone a menos de 96 bloques de su dueno y nunca vuelve del disco; chispas y zumbido solo para el dueno).
@@ -135,6 +135,60 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   `zona_descubierta` (3), `ecos_recuperados` (4), `ecos_ganados` (2 y 4), `espada_luz` (2), `guardia_rota` (1 y 3).
 - La prueba del cliente tiene su tramo `rol()` (capturas `cliente_h01..h14`) y dura ya ~17,5 min: limites subidos
   (`LIMIT` 20 min, `timeout 33m`).
+
+### Plan grande, parte 2b-1: santuarios, frascos y subir de nivel
+
+- **El santuario** (`santuario/SantuarioBlock`, bloque `darkcraft:santuario`, irrompible, propiedad `encendido`): un
+  brasero de piedra con runas y cuatro garras de hueso y fuego azul palido. Modelo y texturas en pixel art de
+  `tools/santuario/modelo.py` (22 cajas; encendido, la llama son cuatro planos con textura animada de 12 fotogramas).
+  **Ojo: toda textura de bloque u objeto tiene que medir potencias de dos (tambien cada fotograma)**: si no, Minecraft
+  baja el suavizado a distancia de TODOS los bloques (por eso la llama de 16 x 20 va dentro de fotogramas de 16 x 32 y
+  el modelo usa solo su parte de abajo). Las llamitas, las motas y el rumor del fuego los pone el cliente
+  (`client/ui/ClientSantuario`, que busca los santuarios de alrededor una vez por segundo).
+- **Lo que hacen** (`santuario/Santuarios`): apagado, quien llega lo enciende (cartel SANTUARIO ENCENDIDO con su nombre,
+  logro `santuario`); encendido, se descansa: vida entera, fuera los males, frascos, mana y estamina llenos, punto de
+  reaparicion alli (`setRespawnPosition` forzado en el sitio donde esta el jugador) y se abre su menu. Con enemigos
+  encima (en combate) no se puede: aviso corto. Se usa con clic derecho o con la tecla del aviso (la del inventario)
+  **mirandolo** de cerca (solo con estar al lado no: hay que poder abrir el inventario). Despertar en una cama tras pasar
+  la noche tambien cuenta como descansar (mientras siga habiendo mundo normal).
+- **Donde estan**: en lo que ya estaba construido se ponen solos la primera vez que alguien pasa cerca (`Santuarios.tick`,
+  como los libros perdidos; SavedData `darkcraft_santuarios` con el sitio y el nombre de cada uno): en cada Reino de
+  Valdrenn, junto a la Torre de Ascenso, junto a la Fuente Mayor y en la recepcion del arbol (antes de la puerta de Ser
+  Gavran); en la Fortaleza de Hueso, en el rellano de la puerta. `/darkcraft rol santuario` pone uno delante.
+- **Atributos y nivel** (`rol/Atributo`, `rol/Nivel`, en `Ficha`): Vigor, Mente, Aguante, Fuerza, Destreza, Inteligencia,
+  Fe y Arcano, todos a 10 de base (nivel 1 = la suma - 79). `Nivel` tiene las cuentas (las usan igual servidor y
+  cliente): coste de cada nivel (la curva de Elden Ring: 673 el primero), vida (20 con Vigor 10; +2 por punto hasta 30,
+  +1 hasta 50, +0,4 despues), mana (100; +6 hasta 35, +3 hasta 60, +1), estamina (100; +3 hasta 40, +1) y dano de las
+  armas (+1,2 % por punto de Fuerza y +0,8 % por punto de Destreza). `Rol.aplicar` lo pone en el jugador (modificadores
+  de atributo que se guardan con el, mana y estamina maximos por jugador) al entrar, reaparecer y subir de nivel;
+  `Rol.subir` (paquete `Net.SubirNivel`) lo comprueba todo en el servidor: junto al santuario en el que se descanso y con
+  ecos de sobra. El mana maximo ya no es `Combos.MAX`: es `Rol.manaMax(jugador)`. Inteligencia, Fe y Arcano se guardan
+  ya; haran algo cuando lleguen hechizos y objetos.
+- **Frascos** (`rol/Frascos`): NO son objetos del inventario, van en la ficha (3 de vida y 1 de mana al empezar; hasta
+  14; mejora 0-12). Teclas **Z** (vida) y **V** (mana) (`client/ui/Teclas`). Beber dura 26 ticks y hace efecto en el 14
+  (cura 7 + 34 % de la vida maxima; el azul da 40 + 30 % del mana); mientras, se anda despacio y no se ataca. Con la
+  vida entera o el frasco vacio no se bebe (el frasco del HUD se sacude). Se rellenan al descansar y al reaparecer; en
+  el santuario se reparten entre vida y mana. Lo que se ve (`client/ui/Bebida`): en tercera persona el brazo sube a la
+  boca con el frasco (pose de brazo propia puesta en `RenderPlayerEvent.Pre`, y el objeto de la mano se cambia por el
+  frasco solo mientras se dibuja al jugador); en primera persona, el gesto de beber del juego dibujado en
+  `RenderHandEvent`. Los objetos `frasco_vida` / `frasco_mana` solo existen para dibujarlos.
+- **La comida ya no se come** (`Rol.onComer` corta el gesto y avisa); lo que tiene efectos (manzana dorada) si.
+- **Menus** (`client/ui/`): `tools/ui/menu.py` → `textures/gui/menu.png` + `MenuTex` (losa de piedra con marco de oro en
+  nueve trozos, rebaje oscuro, fila elegida, flechas, iconos de los atributos, frascos y santuario); `Panel` (dibujar
+  esas piezas, teclas dibujadas y los sonidos de los menus), `SantuarioScreen` (losa a la izquierda: subir de nivel,
+  repartir frascos, marcharse), `NivelScreen` (atributos con flechas; nivel, ecos, coste y lo que cambia antes →
+  despues; confirmar). Se manejan con raton o teclado y se cierran solos si pegan al jugador. Caben en 426 x 240 (lo
+  mas pequeno que da la escala automatica). Vista previa sin abrir el juego: `python3 tools/ui/vista_menus.py
+  captura.png 2 carpeta /tmp/cp/cpjars/client-extra.jar` (con la letra de Minecraft de verdad).
+- **HUD**: los frascos abajo a la izquierda (hueco de piedra, cuantos quedan, su tecla); las barras de mana y estamina
+  crecen con sus maximos; la vida que se cura se ve subir; el aviso de "Pulsa [E]..." vale para la espada de luz y para
+  el santuario; avisos cortos (`Net.Cartel.AVISO`: banda pequena con la letra del juego encima de la barra de objetos).
+- **La letra gotica**: la N, la Ñ y la L de New Rocker traen una cola larga que en una fuente de mapa de bits separaba
+  la letra siguiente ("SAN_TUARIO"); `tools/ui/fuente.py` la recorta donde acaba el avance de la letra.
+- Sonidos (ElevenLabs): `santuario_enciende` (1), `santuario_fuego` (3, en bucle solapado), `santuario_descanso` (3),
+  `frasco_beber` (2 y 1), `nivel_sube` (2), `menu_abre` (3), `menu_mueve` (1), `menu_acepta` (4), `menu_cancela` (3).
+- Comandos: `/darkcraft rol santuario | frascos [<n>] | frascos mejora <n> | nivel [reiniciar] | atributo <nombre> <valor>`.
+- La prueba del cliente tiene el tramo `santuarios()` (capturas `cliente_s01..s17`) y `cliente_01c_santuario_torre`.
 
 ## Compilar, probar y publicar
 
