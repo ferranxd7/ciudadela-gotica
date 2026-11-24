@@ -257,7 +257,8 @@ public final class ClientEquipo {
 
     public enum Clase {
         TODO("todo", MenuTex.ICO_TODO), ARMAS("armas", MenuTex.ICO_ESPADA), ARMADURAS("armaduras", MenuTex.ICO_PECHO),
-        OBJETOS("objetos", MenuTex.ICO_OBJETO), MATERIALES("materiales", MenuTex.ICO_MATERIAL), CLAVE("clave", MenuTex.ICO_LLAVE);
+        TALISMANES("talismanes", MenuTex.ICO_TALISMAN), OBJETOS("objetos", MenuTex.ICO_OBJETO), MATERIALES("materiales", MenuTex.ICO_MATERIAL),
+        CLAVE("clave", MenuTex.ICO_LLAVE);
 
         public final String clave;
         public final MenuTex.T icono;
@@ -269,6 +270,8 @@ public final class ClientEquipo {
 
         public static Clase de(ItemStack st) {
             Item it = st.getItem();
+            if (it instanceof com.darkcraft.rol.Talisman) return TALISMANES;
+            if (it instanceof com.darkcraft.rol.Fruto) return OBJETOS;
             Equipable eq = Equipable.get(st);
             if (it instanceof ArmorItem || it instanceof ElytraItem || (eq != null && eq.getEquipmentSlot().isArmor() && !(it instanceof ShieldItem)))
                 return ARMADURAS;

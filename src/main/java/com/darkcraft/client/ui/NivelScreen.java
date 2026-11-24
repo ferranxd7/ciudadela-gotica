@@ -225,7 +225,11 @@ public class NivelScreen extends Screen {
         stat(g, dx, dw, sy + 13, "darkcraft.menu.mana", Integer.toString(Nivel.mana(base[men])), Integer.toString(Nivel.mana(nuevo[men])));
         stat(g, dx, dw, sy + 26, "darkcraft.menu.estamina", Integer.toString(Math.round(Nivel.estamina(base[agu]))),
                 Integer.toString(Math.round(Nivel.estamina(nuevo[agu]))));
-        stat(g, dx, dw, sy + 39, "darkcraft.menu.dano", porciento(Nivel.ataque(base[fue], base[des])), porciento(Nivel.ataque(nuevo[fue], nuevo[des])));
+        // lo que pega el arma de la mano derecha (con sus letras): antes y despues
+        net.minecraft.world.item.ItemStack arma = minecraft.player != null ? minecraft.player.getMainHandItem() : net.minecraft.world.item.ItemStack.EMPTY;
+        float b0 = com.darkcraft.combate.Escalado.base(arma);
+        stat(g, dx, dw, sy + 39, "darkcraft.menu.ataque", String.format(java.util.Locale.ROOT, "%.1f", com.darkcraft.combate.Escalado.total(arma, b0, base)),
+                String.format(java.util.Locale.ROOT, "%.1f", com.darkcraft.combate.Escalado.total(arma, b0, nuevo)));
 
         // para que sirve el atributo elegido
         List<FormattedCharSequence> lineas = font.split(Component.translatable("darkcraft.atributo." + Atributo.values()[sel].clave + ".desc"), dw - 4);

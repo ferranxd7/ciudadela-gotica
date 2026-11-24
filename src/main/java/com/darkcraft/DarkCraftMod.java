@@ -146,6 +146,8 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_GOLPE_SALTO = sound("sfx.golpe_salto");
     public static final RegistryObject<SoundEvent> SFX_ATURDIDO = sound("sfx.aturdido");
     public static final RegistryObject<SoundEvent> SFX_ESFUERZO = sound("sfx.esfuerzo");
+    public static final RegistryObject<SoundEvent> SFX_COMER_FRUTO = sound("sfx.comer_fruto");
+    public static final RegistryObject<SoundEvent> SFX_TALISMAN = sound("sfx.talisman");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")
@@ -257,6 +259,17 @@ public class DarkCraftMod {
             () -> EntityType.Builder.<com.darkcraft.arbol.PuertaArbol>of(com.darkcraft.arbol.PuertaArbol::new, MobCategory.MISC).sized(7f, 10f)
                     .fireImmune().noSave().noSummon().clientTrackingRange(12).updateInterval(40).build(MODID + ":puerta_arbol"));
 
+    /** Los frutos (dan resistencias o habilidades un rato) y los talismanes (se llevan en sus huecos). */
+    public static final java.util.EnumMap<com.darkcraft.rol.Fruto.Clase, RegistryObject<Item>> FRUTOS = new java.util.EnumMap<>(com.darkcraft.rol.Fruto.Clase.class);
+    public static final java.util.EnumMap<com.darkcraft.rol.Talisman.Clase, RegistryObject<Item>> TALISMANES = new java.util.EnumMap<>(com.darkcraft.rol.Talisman.Clase.class);
+
+    static {
+        for (com.darkcraft.rol.Fruto.Clase c : com.darkcraft.rol.Fruto.Clase.values())
+            FRUTOS.put(c, ITEMS.register("fruto_" + c.id, () -> new com.darkcraft.rol.Fruto(c, new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON))));
+        for (com.darkcraft.rol.Talisman.Clase c : com.darkcraft.rol.Talisman.Clase.values())
+            TALISMANES.put(c, ITEMS.register("talisman_" + c.id, () -> new com.darkcraft.rol.Talisman(c, new Item.Properties().stacksTo(1).rarity(Rarity.RARE))));
+    }
+
     private static RegistryObject<SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(MODID, name)));
     }
@@ -268,6 +281,7 @@ public class DarkCraftMod {
         SOUNDS.register(modBus);
         BLOCKS.register(modBus);
         ENTITIES.register(modBus);
+        com.darkcraft.rol.Efectos.registrar(modBus);
         com.darkcraft.world.Valdrenn.registrar(modBus);
         com.darkcraft.fortaleza.Localizar.registrar(modBus);
         modBus.addListener(this::attributes);
@@ -313,6 +327,10 @@ public class DarkCraftMod {
             e.accept(ESPADA_DIESTRA);
             e.accept(ESPADA_SINIESTRA);
             e.accept(ALABARDA);
+            for (RegistryObject<Item> t : TALISMANES.values()) e.accept(t);
+        }
+        if (e.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
+            for (RegistryObject<Item> f : FRUTOS.values()) e.accept(f);
         }
         if (e.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
             e.accept(HUEVO_ESPADA);

@@ -160,8 +160,11 @@ jobs:
           shopt -s nullglob
           # el instalador antiguo baja ciudadela-0.1.0.jar: se sube tambien con ese nombre (es el mismo mod)
           [ -f build/libs/darkcraft-0.1.0.jar ] && cp build/libs/darkcraft-0.1.0.jar out/ciudadela-0.1.0.jar
+          # las capturas y los audios van en dos zip (subir cientos de ficheros sueltos choca con el limite de GitHub)
+          (cd out && pngs=(*.png) && [ ${#pngs[@]} -gt 0 ] && zip -q -0 capturas.zip "${pngs[@]}") || true
+          (cd out && oggs=() && for f in *.ogg; do [ "$f" != "audio_cliente.ogg" ] && oggs+=("$f"); done && [ ${#oggs[@]} -gt 0 ] && zip -q -0 audios.zip "${oggs[@]}") || true
           files=()
-          for f in build/libs/*.jar out/*.jar build.log out/*.txt out/*.log out/*.png out/*.mrpack out/*.ogg; do [ -s "$f" ] && files+=("$f"); done
+          for f in build/libs/*.jar out/*.jar build.log out/*.txt out/*.log out/capturas.zip out/audios.zip out/audio_cliente.ogg out/*.mrpack; do [ -s "$f" ] && files+=("$f"); done
           if ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null && [ "$PUBLICAR" = "si" ]; then
             gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Dark Craft - Build ${{ github.run_number }}" --notes "Version automatica ${{ github.run_number }}" --latest
           elif ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null; then

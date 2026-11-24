@@ -256,6 +256,208 @@
      ]
     }
    ]
+  },
+  {
+   "rolls": {
+    "type": "minecraft:uniform",
+    "min": 1,
+    "max": 2
+   },
+   "entries": [
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:fruto_brasa",
+     "weight": 3,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 2
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:fruto_escarcha",
+     "weight": 3,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 2
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:fruto_tormenta",
+     "weight": 3,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 2
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:fruto_lunar",
+     "weight": 3,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 2
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:fruto_ceniza",
+     "weight": 3,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 2
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:fruto_hueso",
+     "weight": 3,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 2
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:fruto_sombra",
+     "weight": 2,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 2
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:fruto_pluma",
+     "weight": 2,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 2
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:empty",
+     "weight": 4
+    }
+   ]
+  },
+  {
+   "rolls": 1,
+   "entries": [
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_vigor",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_aliento",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_mente",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_porteador",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_brasa",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_escarcha",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_trueno",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_sombra",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_hueso",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_codicia",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_garra",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_furia",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:empty",
+     "weight": 8
+    }
+   ]
   }
  ]
 }

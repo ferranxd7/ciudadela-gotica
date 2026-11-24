@@ -46,7 +46,20 @@ public class MenuScreen extends Screen {
     public static final int EQUIPO = 0, INVENTARIO = 1, ESTADO = 2, SISTEMA = 3;
     private static final String[] PESTANAS = {"equipo", "inventario", "estado", "sistema"};
     private static final int CLARO = 0xFFEADBC4, ORO = 0xFFE2BF62, LUZ = 0xFFFFF2C4, APAGADO = 0xFFB8A888, GRIS = 0xFF8A8072, VERDE = 0xFF9BE08A;
-    private static final int FRASCO_VIDA = 100, FRASCO_MANA = 101, LADO = 22, PASO = 25;
+    private static final int FRASCO_VIDA = 100, FRASCO_MANA = 101, TALISMAN = 200, LADO = 22, PASO = 25;
+
+    private static boolean esFrasco(int id) {
+        return id == FRASCO_VIDA || id == FRASCO_MANA;
+    }
+
+    private static boolean esTalisman(int id) {
+        return id >= TALISMAN && id < TALISMAN + com.darkcraft.rol.Talismanes.MAX;
+    }
+
+    /** Si el hueco de talisman esta abierto (uno al empezar y otro por cada gran jefe vencido). */
+    private static boolean abierto(int id) {
+        return id - TALISMAN < ClientRol.huecosTalisman;
+    }
 
     private final Pagina[] paginas = {new PEquipo(), new PBolsa(), new PEstado(), new PSistema()};
     private int pestana, t;
@@ -218,10 +231,17 @@ public class MenuScreen extends Screen {
         g.drawString(font, valor, x1 - font.width(valor), y, color, true);
     }
 
+    /** Lo que pega el arma de la mano derecha con los atributos de ahora (como lo cuenta el servidor al pegar). */
+    private static float ataque(LocalPlayer p) {
+        ItemStack st = p.getMainHandItem();
+        float medido = (float) p.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        float base = com.darkcraft.combate.Escalado.base(st);
+        return com.darkcraft.combate.Escalado.total(st, base, ClientRol.atributos) + (medido - base);
+    }
+
     /** El peso del equipo y el maximo que se lleva sin pasar a sobrecargado (con una cifra decimal). */
     private static String peso(LocalPlayer p) {
-        return String.format(Locale.ROOT, "%.1f / %.1f", com.darkcraft.combate.Peso.de(p.getInventory()),
-                com.darkcraft.combate.Peso.maximo(ClientRol.atributos));
+        return String.format(Locale.ROOT, "%.1f / %.1f", com.darkcraft.combate.Peso.de(p.getInventory()), ClientRol.pesoMaximo());
     }
 
     private static int colorPeso(int clase) {
@@ -240,6 +260,32 @@ public class MenuScreen extends Screen {
     /** Las lineas de la ficha de un objeto (lo que diria su recuadro en Minecraft, sin el nombre). */
     private List<FormattedCharSequence> ficha(ItemStack st, int ancho) {
         List<FormattedCharSequence> l = new ArrayList<>();
+        // un arma: lo que pega con los atributos de ahora, sus letras y sus requisitos (en rojo los que no se cumplen)
+        com.darkcraft.combate.Escalado.Datos d = com.darkcraft.combate.Escalado.de(st);
+        if (d != null) {
+            int[] at = ClientRol.atributos;
+            float base = com.darkcraft.combate.Escalado.base(st), extra = com.darkcraft.combate.Escalado.extra(st, base, at);
+            l.addAll(font.split(Component.translatable("darkcraft.arma.ataque", String.format(Locale.ROOT, "%.1f", base),
+                    (extra >= 0 ? "+ " : "- ") + String.format(Locale.ROOT, "%.1f", Math.abs(extra))).withStyle(net.minecraft.ChatFormatting.GOLD), ancho));
+            net.minecraft.network.chat.MutableComponent letras = Component.translatable("darkcraft.arma.escala");
+            net.minecraft.network.chat.MutableComponent req = Component.translatable("darkcraft.arma.requisitos");
+            boolean algunReq = false;
+            for (int i = 0; i < com.darkcraft.combate.Escalado.ATRIBUTOS.length; i++) {
+                com.darkcraft.rol.Atributo a = com.darkcraft.combate.Escalado.ATRIBUTOS[i];
+                Component corto = Component.translatable("darkcraft.atributo." + a.clave + ".corto");
+                if (d.letra(i) != '-') letras.append(" ").append(corto).append(" " + d.letra(i));
+                int r = d.requisitos()[i];
+                if (r > 0) {
+                    algunReq = true;
+                    req.append(" ").append(Component.empty().append(corto).append(" " + r)
+                            .withStyle(at[a.ordinal()] >= r ? net.minecraft.ChatFormatting.GRAY : net.minecraft.ChatFormatting.RED));
+                }
+            }
+            l.addAll(font.split(letras.withStyle(net.minecraft.ChatFormatting.GRAY), ancho));
+            if (algunReq) l.addAll(font.split(req.withStyle(net.minecraft.ChatFormatting.GRAY), ancho));
+            if (!com.darkcraft.combate.Escalado.cumple(d, at))
+                l.addAll(font.split(Component.translatable("darkcraft.arma.sin_requisitos").withStyle(net.minecraft.ChatFormatting.RED), ancho));
+        }
         List<Component> t = st.getTooltipLines(yo(), TooltipFlag.Default.NORMAL);
         for (int i = 1; i < t.size(); i++) {
             if (t.get(i).getString().isBlank()) continue;
@@ -410,6 +456,7 @@ public class MenuScreen extends Screen {
             for (int i = 0; i < 3; i++) zonas.add(new Zona(Equipo.IZQUIERDA[i], x0() + 90 + i * PASO, fila(0), MenuTex.SIL_ESCUDO));
             MenuTex.T[] sil = {MenuTex.SIL_YELMO, MenuTex.SIL_PECHO, MenuTex.SIL_PIERNAS, MenuTex.SIL_BOTAS};
             for (int i = 0; i < 4; i++) zonas.add(new Zona(Equipo.ARMADURA[i], x0() + i * PASO, fila(1), sil[i]));
+            for (int i = 0; i < com.darkcraft.rol.Talismanes.MAX; i++) zonas.add(new Zona(TALISMAN + i, x0() + 110 + i * PASO, fila(1), MenuTex.SIL_TALISMAN));
             zonas.add(new Zona(FRASCO_VIDA, x0(), fila(2), null));
             zonas.add(new Zona(FRASCO_MANA, x0() + PASO, fila(2), null));
             for (int i = 0; i < 4; i++) zonas.add(new Zona(Equipo.RAPIDOS[i], x0() + (i + 2) * PASO, fila(2), MenuTex.SIL_OBJETO));
@@ -422,6 +469,7 @@ public class MenuScreen extends Screen {
         }
 
         private ItemStack de(int id) {
+            if (esTalisman(id)) return ClientRol.talismanes[id - TALISMAN];
             return id >= 100 ? ItemStack.EMPTY : inv().getItem(id);
         }
 
@@ -432,13 +480,21 @@ public class MenuScreen extends Screen {
 
         @Override
         void dibujar(GuiGraphics g, int mx, int my, float pt) {
-            String[] grupos = {"derecha", "izquierda", "armadura", "rapidos"};
-            int[][] donde = {{x0(), fila(0)}, {x0() + 90, fila(0)}, {x0(), fila(1)}, {x0(), fila(2)}};
+            String[] grupos = {"derecha", "izquierda", "armadura", "talismanes", "rapidos"};
+            int[][] donde = {{x0(), fila(0)}, {x0() + 90, fila(0)}, {x0(), fila(1)}, {x0() + 110, fila(1)}, {x0(), fila(2)}};
             for (int i = 0; i < grupos.length; i++)
                 g.drawString(font, Component.translatable("darkcraft.menu.equipo." + grupos[i]), donde[i][0], donde[i][1] - 11, APAGADO, true);
             for (Zona z : zonas) {
                 boolean elegida = z.id == foco;
-                if (z.id >= 100) {
+                if (esTalisman(z.id) && !abierto(z.id)) {
+                    // cerrado: se abre al vencer a un gran jefe
+                    Pix.color(1f, 1f, 1f, 0.85f);
+                    Panel.t(g, MenuTex.RANURA_CERRADA, z.x, z.y);
+                    Pix.blanco();
+                    Panel.t(g, MenuTex.CANDADO, z.x + 6, z.y + 5);
+                    if (elegida) cursor(g, z.x, z.y, LADO, LADO);
+                } else if (esTalisman(z.id)) ranura(g, z.x, z.y, de(z.id), z.silueta, elegida, false);
+                else if (z.id >= 100) {
                     boolean mana = z.id == FRASCO_MANA;
                     int total = mana ? ClientRol.frascosMana : ClientRol.frascosVida, quedan = mana ? ClientRol.quedanMana : ClientRol.quedanVida;
                     ranura(g, z.x, z.y, ItemStack.EMPTY, null, elegida, false);
@@ -452,14 +508,14 @@ public class MenuScreen extends Screen {
             // en medio: lo que da el equipo
             LocalPlayer p = yo();
             int cw = Mth.clamp(pw / 4, 98, 150), cx = px + pw - 12 - cw;
-            int sx = x0() + 180, sx1 = cx - 10;
+            int sx = x0() + 218, sx1 = cx - 10;
             if (sx1 - sx >= 84) {
                 int sy = py + 14;
                 dato(g, sx, sx1, sy, "darkcraft.menu.nivel", Integer.toString(ClientRol.nivel()), ORO);
                 dato(g, sx, sx1, sy + 13, "darkcraft.menu.vida", vida(p.getHealth()) + "/" + vida(p.getMaxHealth()), ORO);
                 dato(g, sx, sx1, sy + 26, "darkcraft.menu.mana", ArmasCliente.energiaCliente() + "/" + ClientRol.manaMax, ORO);
                 dato(g, sx, sx1, sy + 39, "darkcraft.menu.estamina", Integer.toString(Math.round(ClientRol.estaminaMax)), ORO);
-                dato(g, sx, sx1, sy + 52, "darkcraft.menu.ataque", String.format(Locale.ROOT, "%.1f", p.getAttributeValue(Attributes.ATTACK_DAMAGE)), ORO);
+                dato(g, sx, sx1, sy + 52, "darkcraft.menu.ataque", String.format(Locale.ROOT, "%.1f", ataque(p)), ORO);
                 dato(g, sx, sx1, sy + 65, "darkcraft.menu.defensa", Integer.toString(p.getArmorValue()), ORO);
                 // el peso del equipo (lo que se lleva en las manos y puesto) y como deja rodar
                 int clase = com.darkcraft.client.combate.ClientCombate.clasePeso(p);
@@ -473,7 +529,11 @@ public class MenuScreen extends Screen {
             Panel.raya(g, x0() - 4, cx - 8, dy - 5);
             if (t - sinNada < 50) {
                 g.drawString(font, Component.translatable("darkcraft.menu.nada_que_poner"), x0(), dy + 2, 0xFFE0564E, true);
-            } else if (foco >= 100) {
+            } else if (esTalisman(foco) && !abierto(foco)) {
+                Letra.mediana(g, font, Component.translatable("darkcraft.menu.talisman.cerrado"), x0(), dy, 0xFFE9C766, 0xFF050408);
+                List<FormattedCharSequence> l = font.split(Component.translatable("darkcraft.menu.talisman.cerrado.desc"), ancho);
+                for (int i = 0; i < Math.min(2, l.size()); i++) g.drawString(font, l.get(i), x0(), dy + 17 + i * 9, APAGADO, false);
+            } else if (esFrasco(foco)) {
                 boolean mana = foco == FRASCO_MANA;
                 Letra.mediana(g, font, Component.translatable(mana ? "item.darkcraft.frasco_mana" : "item.darkcraft.frasco_vida"), x0(), dy, 0xFFE9C766, 0xFF050408);
                 String cuanto = mana ? Integer.toString(Nivel.manaFrasco(ClientRol.manaMax, ClientRol.mejoraFrascos))
@@ -543,12 +603,27 @@ public class MenuScreen extends Screen {
         }
 
         private void abrirLista() {
-            if (foco >= 100) {
+            if (esFrasco(foco) || (esTalisman(foco) && !abierto(foco))) {
                 Panel.nada();
                 return;
             }
             Inventory inv = inv();
             List<Integer> l = new ArrayList<>();
+            if (esTalisman(foco)) {
+                // los talismanes que se llevan en el inventario (en cualquier hueco)
+                if (!de(foco).isEmpty()) l.add(-1);
+                for (int i = 0; i < 36; i++) if (inv.getItem(i).getItem() instanceof com.darkcraft.rol.Talisman) l.add(i);
+                if (l.isEmpty()) {
+                    sinNada = t;
+                    Panel.nada();
+                    return;
+                }
+                lista = l;
+                listaSel = l.get(0) < 0 && l.size() > 1 ? 1 : 0;
+                listaDesde = 0;
+                Panel.acepta();
+                return;
+            }
             if (!inv.getItem(foco).isEmpty()) l.add(-1);
             boolean arma = foco <= 4 || foco == Equipo.OTRA_MANO;
             // primero lo propio del hueco (armas en las manos, objetos en los rapidos), luego lo demas que quepa
@@ -573,10 +648,25 @@ public class MenuScreen extends Screen {
 
         private void elegirLista(int k) {
             int hueco = lista.get(k);
+            if (esTalisman(foco)) {
+                if (hueco < 0) Net.CH.sendToServer(new Net.EquipoAccion(Net.EquipoAccion.TALISMAN_QUITAR, foco - TALISMAN, 0));
+                else Net.CH.sendToServer(new Net.EquipoAccion(Net.EquipoAccion.TALISMAN_PONER, foco - TALISMAN, hueco));
+                lista = null;
+                Panel.acepta();
+                return;
+            }
             if (hueco < 0) Net.CH.sendToServer(new Net.EquipoAccion(Net.EquipoAccion.GUARDAR, foco, 0));
             else Net.CH.sendToServer(new Net.EquipoAccion(Net.EquipoAccion.MOVER, hueco, foco));
             lista = null;
             Panel.acepta();
+        }
+
+        /** Quita lo del hueco elegido (a la bolsa); false si no hay nada que quitar. */
+        private boolean quitar() {
+            if (esFrasco(foco) || de(foco).isEmpty()) return false;
+            if (esTalisman(foco)) Net.CH.sendToServer(new Net.EquipoAccion(Net.EquipoAccion.TALISMAN_QUITAR, foco - TALISMAN, 0));
+            else Net.CH.sendToServer(new Net.EquipoAccion(Net.EquipoAccion.GUARDAR, foco, 0));
+            return true;
         }
 
         private void moverLista(int d) {
@@ -632,10 +722,8 @@ public class MenuScreen extends Screen {
             else if (esDerecha(minecraft, tecla, scan)) mover(1, 0);
             else if (esElegir(tecla, scan)) abrirLista();
             else if (esQuitar(tecla)) {
-                if (foco < 100 && !de(foco).isEmpty()) {
-                    Net.CH.sendToServer(new Net.EquipoAccion(Net.EquipoAccion.GUARDAR, foco, 0));
-                    Panel.acepta();
-                } else Panel.nada();
+                if (quitar()) Panel.acepta();
+                else Panel.nada();
             } else return false;
             return true;
         }
@@ -671,10 +759,8 @@ public class MenuScreen extends Screen {
             for (Zona z : zonas)
                 if (z.dentro(mx, my)) {
                     foco = z.id;
-                    if (b == 1 && foco < 100 && !de(foco).isEmpty()) {
-                        Net.CH.sendToServer(new Net.EquipoAccion(Net.EquipoAccion.GUARDAR, foco, 0));
-                        Panel.acepta();
-                    } else abrirLista();
+                    if (b == 1 && quitar()) Panel.acepta();
+                    else abrirLista();
                     return true;
                 }
             int cw = Mth.clamp(pw / 4, 98, 150), cx = px + pw - 12 - cw;
@@ -843,6 +929,14 @@ public class MenuScreen extends Screen {
             int hueco = cosas.get(sel);
             Inventory inv = inv();
             ItemStack st = inv.getItem(hueco);
+            if (st.getItem() instanceof com.darkcraft.rol.Talisman) {
+                // un talisman va a su hueco: el primero libre de los abiertos (o en lugar del primero)
+                int h = -1;
+                for (int i = 0; i < ClientRol.huecosTalisman && h < 0; i++) if (ClientRol.talismanes[i].isEmpty()) h = i;
+                Net.CH.sendToServer(new Net.EquipoAccion(Net.EquipoAccion.TALISMAN_PONER, Math.max(0, h), hueco));
+                Panel.acepta();
+                return;
+            }
             if (!Equipo.enBolsa(hueco)) {
                 if (Equipo.libre(yo()) < 0) {
                     Panel.nada();
@@ -1035,16 +1129,22 @@ public class MenuScreen extends Screen {
                 dato(g, x2 + 7, x21, sy, "darkcraft.menu.vida", vida(p.getHealth()) + " / " + vida(p.getMaxHealth()), ORO);
                 dato(g, x2 + 7, x21, sy + 13, "darkcraft.menu.mana", ArmasCliente.energiaCliente() + " / " + ClientRol.manaMax, ORO);
                 dato(g, x2 + 7, x21, sy + 26, "darkcraft.menu.estamina", Integer.toString(Math.round(ClientRol.estaminaMax)), ORO);
-                dato(g, x2 + 7, x21, sy + 39, "darkcraft.menu.dano",
-                        Math.round(Nivel.ataque(at[Atributo.FUERZA.ordinal()], at[Atributo.DESTREZA.ordinal()]) * 100f) + " %", ORO);
-                dato(g, x2 + 7, x21, sy + 52, "darkcraft.menu.ataque", String.format(Locale.ROOT, "%.1f", p.getAttributeValue(Attributes.ATTACK_DAMAGE)), ORO);
-                dato(g, x2 + 7, x21, sy + 65, "darkcraft.menu.defensa", Integer.toString(p.getArmorValue()), ORO);
-                dato(g, x2 + 7, x21, sy + 78, "darkcraft.menu.peso", peso(p), colorPeso(com.darkcraft.client.combate.ClientCombate.clasePeso(p)));
-                Panel.raya(g, x2 + 6, x2 + w2 - 6, sy + 91);
+                dato(g, x2 + 7, x21, sy + 39, "darkcraft.menu.ataque", String.format(Locale.ROOT, "%.1f", ataque(p)), ORO);
+                dato(g, x2 + 7, x21, sy + 52, "darkcraft.menu.defensa", Integer.toString(p.getArmorValue()), ORO);
+                dato(g, x2 + 7, x21, sy + 65, "darkcraft.menu.peso", peso(p), colorPeso(com.darkcraft.client.combate.ClientCombate.clasePeso(p)));
                 long sig = Nivel.coste(ClientRol.nivel());
-                dato(g, x2 + 7, x21, sy + 98, "darkcraft.menu.siguiente", Hud.numero((int) Math.min(Integer.MAX_VALUE, sig)), sig <= ClientRol.ecos ? VERDE : APAGADO);
-                dato(g, x2 + 7, x21, sy + 111, "item.darkcraft.frasco_vida", ClientRol.quedanVida + " / " + ClientRol.frascosVida, ORO);
-                dato(g, x2 + 7, x21, sy + 124, "item.darkcraft.frasco_mana", ClientRol.quedanMana + " / " + ClientRol.frascosMana, ORO);
+                dato(g, x2 + 7, x21, sy + 78, "darkcraft.menu.siguiente", Hud.numero((int) Math.min(Integer.MAX_VALUE, sig)), sig <= ClientRol.ecos ? VERDE : APAGADO);
+                Panel.raya(g, x2 + 6, x2 + w2 - 6, sy + 91);
+                // las resistencias (de los talismanes y de los frutos que se han comido), en dos columnas
+                com.darkcraft.rol.Resistencias.Tipo[] ts = com.darkcraft.rol.Resistencias.Tipo.values();
+                int cw2 = (w2 - 14 - 8) / 2;
+                for (int i = 0; i < ts.length; i++) {
+                    int rx = x2 + 7 + (i % 2) * (cw2 + 8), ry = sy + 97 + (i / 2) * 11;
+                    float r = com.darkcraft.rol.Resistencias.de(ClientRol.talismanes, p, ts[i]);
+                    String v = Math.round(r * 100f) + " %";
+                    g.drawString(font, Component.translatable("darkcraft.resistencia." + ts[i].id), rx, ry, r > 0f ? CLARO : GRIS, true);
+                    g.drawString(font, v, rx + cw2 - font.width(v), ry, r > 0f ? VERDE : GRIS, true);
+                }
             }
             personaje(g, cx, py + 10, cw, ph - 20);
         }

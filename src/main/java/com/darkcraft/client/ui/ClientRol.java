@@ -67,8 +67,35 @@ public final class ClientRol {
         return com.darkcraft.rol.Nivel.de(atributos);
     }
 
+    /** Los talismanes que lleva (los cuatro huecos) y cuantos huecos tiene abiertos. */
+    public static net.minecraft.world.item.ItemStack[] talismanes = vacios();
+    public static int huecosTalisman = 1;
+
+    private static net.minecraft.world.item.ItemStack[] vacios() {
+        net.minecraft.world.item.ItemStack[] r = new net.minecraft.world.item.ItemStack[com.darkcraft.rol.Talismanes.MAX];
+        java.util.Arrays.fill(r, net.minecraft.world.item.ItemStack.EMPTY);
+        return r;
+    }
+
+    public static boolean lleva(com.darkcraft.rol.Talisman.Clase c) {
+        return com.darkcraft.rol.Talismanes.lleva(talismanes, c);
+    }
+
+    /** Lo que puede llevar el jugador sin pasar a sobrecargado (como lo cuenta el servidor). */
+    public static float pesoMaximo() {
+        return com.darkcraft.combate.Peso.maximo(atributos, lleva(com.darkcraft.rol.Talisman.Clase.PORTEADOR));
+    }
+
     public static void ficha(Net.FichaRol m) {
         if (m.atributos().length == com.darkcraft.rol.Atributo.N) atributos = m.atributos().clone();
+        huecosTalisman = m.huecosTalisman();
+        net.minecraft.world.item.ItemStack[] t = vacios();
+        for (int i = 0; i < Math.min(t.length, m.talismanes().length); i++) {
+            net.minecraft.resources.ResourceLocation id = net.minecraft.resources.ResourceLocation.tryParse(m.talismanes()[i]);
+            net.minecraft.world.item.Item it = id == null || m.talismanes()[i].isEmpty() ? null : net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(id);
+            if (it != null && it != net.minecraft.world.item.Items.AIR) t[i] = new net.minecraft.world.item.ItemStack(it);
+        }
+        talismanes = t;
         manaMax = Math.max(1, m.manaMax());
         frascosVida = m.frascosVida();
         frascosMana = m.frascosMana();
@@ -283,6 +310,8 @@ public final class ClientRol {
         frascosVida = quedanVida = 3;
         frascosMana = quedanMana = 1;
         mejoraFrascos = 0;
+        talismanes = vacios();
+        huecosTalisman = 1;
         ClientSantuario.olvidar();
         Bebida.olvidar();
         Conseguidos.olvidar();

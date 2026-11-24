@@ -147,6 +147,9 @@ public final class VictoriaGavran {
         items.set(19, new ItemStack(Items.EXPERIENCE_BOTTLE, 48));
         items.set(25, new ItemStack(Items.TOTEM_OF_UNDYING, 2));
         items.set(1, new ItemStack(Items.FLOWERING_AZALEA, 8));
+        // el campeon del Rey: su talisman de hueso (y vencerle abre el tercer hueco de talisman)
+        items.set(13, new ItemStack(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.HUESO).get()));
+        items.set(12, new ItemStack(DarkCraftMod.FRUTOS.get(com.darkcraft.rol.Fruto.Clase.CENIZA).get(), 3));
         for (int slot : new int[]{20, 21, 23, 24})
             items.set(slot, EnchantmentHelper.enchantItem(lvl.random, new ItemStack(Items.BOOK), 30, true));
     }

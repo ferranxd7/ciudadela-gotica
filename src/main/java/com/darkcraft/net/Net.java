@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "8";
+    private static final String V = "9";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -212,7 +212,8 @@ public final class Net {
      * izquierda a su repuesto (a = 3 o 4, o -1 para el siguiente). Los huecos son los de {@code rol.Equipo}.
      */
     public record EquipoAccion(int que, int a, int b) {
-        public static final int MOVER = 0, GUARDAR = 1, TIRAR = 2, IZQUIERDA = 3;
+        /** Y los talismanes: PONER el del hueco b del inventario en el hueco de talisman a; QUITAR el del hueco a. */
+        public static final int MOVER = 0, GUARDAR = 1, TIRAR = 2, IZQUIERDA = 3, TALISMAN_PONER = 4, TALISMAN_QUITAR = 5;
 
         void write(FriendlyByteBuf b2) {
             b2.writeByte(que);
@@ -232,6 +233,8 @@ public final class Net {
                     case GUARDAR -> com.darkcraft.rol.Equipo.guardar(p, a);
                     case TIRAR -> com.darkcraft.rol.Equipo.tirar(p, a);
                     case IZQUIERDA -> com.darkcraft.rol.Equipo.manoIzquierda(p, a);
+                    case TALISMAN_PONER -> com.darkcraft.rol.Talismanes.poner(p, a, b);
+                    case TALISMAN_QUITAR -> com.darkcraft.rol.Talismanes.quitar(p, a);
                     default -> {
                     }
                 }
@@ -246,7 +249,8 @@ public final class Net {
      * La ficha del jugador: sus ocho atributos (de ellos salen el nivel, la vida, la estamina...), el mana maximo y sus
      * frascos (cuantos lleva de vida y de mana, cuantos le quedan y su mejora).
      */
-    public record FichaRol(int[] atributos, int manaMax, int frascosVida, int frascosMana, int vida, int mana, int mejora) {
+    public record FichaRol(int[] atributos, int manaMax, int frascosVida, int frascosMana, int vida, int mana, int mejora,
+                           int huecosTalisman, String[] talismanes) {
         void write(FriendlyByteBuf b) {
             b.writeVarIntArray(atributos);
             b.writeVarInt(manaMax);
@@ -255,10 +259,18 @@ public final class Net {
             b.writeVarInt(vida);
             b.writeVarInt(mana);
             b.writeVarInt(mejora);
+            b.writeByte(huecosTalisman);
+            b.writeByte(talismanes.length);
+            for (String t : talismanes) b.writeUtf(t, 128);
         }
 
         static FichaRol read(FriendlyByteBuf b) {
-            return new FichaRol(b.readVarIntArray(16), b.readVarInt(), b.readVarInt(), b.readVarInt(), b.readVarInt(), b.readVarInt(), b.readVarInt());
+            int[] at = b.readVarIntArray(16);
+            int mm = b.readVarInt(), fv = b.readVarInt(), fm = b.readVarInt(), v = b.readVarInt(), m = b.readVarInt(), mj = b.readVarInt();
+            int huecos = b.readByte();
+            String[] t = new String[Math.max(0, Math.min(8, b.readByte()))];
+            for (int i = 0; i < t.length; i++) t[i] = b.readUtf(128);
+            return new FichaRol(at, mm, fv, fm, v, m, mj, huecos, t);
         }
 
         void handle(Supplier<NetworkEvent.Context> ctx) {

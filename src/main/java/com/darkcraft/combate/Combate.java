@@ -296,9 +296,16 @@ public final class Combate {
         Armas.Mov m = e.mov;
         InteractionHand mano = e.izquierda && e.tipo != Armas.Tipo.PUNOS ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ItemStack arma = sp.getItemInHand(mano);
-        float base = (float) sp.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        // el ataque del arma con lo que le suman los atributos (sus letras); lo demas que lleve el jugador (fuerza de una
+        // pocion...) se suma igual
+        ItemStack principal = sp.getMainHandItem();
+        float medido = (float) sp.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        float otros = medido - Escalado.base(principal);
+        float base = Escalado.total(arma, Escalado.base(arma), Ficha.atributos(sp)) + otros;
         float encanto = EnchantmentHelper.getDamageBonus(arma, le.getMobType());
         float mult = m.mult() * (1f + Armas.CARGA_EXTRA * e.carga);
+        if (e.accion == Armas.SALTO && com.darkcraft.rol.Talismanes.lleva(sp, com.darkcraft.rol.Talisman.Clase.GARRA)) mult *= 1.15f;
+        if (e.accion == Armas.PESADO && com.darkcraft.rol.Talismanes.lleva(sp, com.darkcraft.rol.Talisman.Clase.FURIA)) mult *= 1.12f;
         float dano = (base + encanto) * mult;
         DamageSource fuente = sp.damageSources().playerAttack(sp);
         float antes = le.getHealth();
@@ -359,7 +366,7 @@ public final class Combate {
     // ------------------------------------------------------------------ el peso del equipo
 
     private static void peso(ServerPlayer sp, Estado e) {
-        float max = Peso.maximo(Ficha.atributos(sp));
+        float max = Peso.maximo(sp);
         e.clasePeso = Peso.clase(Peso.de(sp.getInventory()), max);
         var inst = sp.getAttribute(Attributes.MOVEMENT_SPEED);
         if (inst == null) return;
@@ -399,7 +406,7 @@ public final class Combate {
     public static String resumen(ServerPlayer sp) {
         Estado e = de(sp);
         return "accion=" + e.accion + " paso=" + e.paso + " t=" + e.t + (e.tipo != null ? " " + e.tipo : "") + " invulnerable=" + e.invulnerable
-                + " peso=" + String.format(java.util.Locale.ROOT, "%.1f/%.1f", Peso.de(sp.getInventory()), Peso.maximo(Ficha.atributos(sp)))
+                + " peso=" + String.format(java.util.Locale.ROOT, "%.1f/%.1f", Peso.de(sp.getInventory()), Peso.maximo(sp))
                 + " clase=" + e.clasePeso;
     }
 }

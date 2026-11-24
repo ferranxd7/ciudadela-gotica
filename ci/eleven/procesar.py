@@ -76,6 +76,7 @@ SFX = {
     "golpe_ligero": (0.55, 0.12, -17), "golpe_pesado": (0.9, 0.2, -15), "carga_golpe": (1.3, 0.1, -18),
     "impacto_carne": (0.45, 0.12, -15), "impacto_armadura": (0.6, 0.2, -16), "rodar": (0.6, 0.15, -19), "fijar": (0.45, 0.12, -20),
     "estocada": (0.45, 0.12, -16), "golpe_salto": (1.1, 0.4, -13), "aturdido": (1.3, 0.35, -15), "esfuerzo": (0.45, 0.1, -19),
+    "comer_fruto": (1.0, 0.25, -18), "talisman": (0.9, 0.25, -19),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5}
@@ -116,6 +117,8 @@ TOMAS_SFX = {
     "golpe_salto": (2, 4),       # las mas largas y con mas cuerpo
     "aturdido": (1, 4),          # las mas cortas (las otras dos llevan otro golpe detras)
     "esfuerzo": (1, 2, 3, 4),
+    "comer_fruto": (1, 2),
+    "talisman": (2, 3),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

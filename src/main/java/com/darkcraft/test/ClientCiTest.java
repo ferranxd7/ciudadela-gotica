@@ -1327,6 +1327,8 @@ public final class ClientCiTest {
                 var inv = sp.getInventory();
                 inv.clearContent();
                 inv.selected = 0;
+                // el cliente tiene que saber que hueco lleva en la mano (si no, se queda con el de antes)
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
                 inv.items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
                 sp.removeAllEffects();
                 sp.setHealth(sp.getMaxHealth());
@@ -1504,6 +1506,198 @@ public final class ClientCiTest {
         return t + 490;
     }
 
+    // ------------------------------------------------------------------ talismanes, frutos, resistencias y escalado
+
+    private static ItemStack talisman(com.darkcraft.rol.Talisman.Clase c) {
+        return new ItemStack(DarkCraftMod.TALISMANES.get(c).get());
+    }
+
+    private static ItemStack fruto(com.darkcraft.rol.Fruto.Clase c, int n) {
+        return new ItemStack(DarkCraftMod.FRUTOS.get(c).get(), n);
+    }
+
+    private static void logTalismanes(Minecraft m, String what) {
+        StringBuilder cli = new StringBuilder();
+        for (ItemStack st : com.darkcraft.client.ui.ClientRol.talismanes) cli.append(st.isEmpty() ? "-" : com.darkcraft.rol.Talisman.de(st)).append(' ');
+        log("  talismanes " + what + " (cliente): huecos=" + com.darkcraft.client.ui.ClientRol.huecosTalisman + " [" + cli.toString().trim() + "] pesoMax="
+                + String.format(java.util.Locale.ROOT, "%.1f", com.darkcraft.client.ui.ClientRol.pesoMaximo()) + " efectos=" + m.player.getActiveEffects().size()
+                + " | " + inventario(m.player.getInventory()) + " | pantalla: " + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()
+                + (m.screen instanceof com.darkcraft.client.ui.MenuScreen ms ? " [" + ms.resumen() + "]" : "")));
+        server(m, sp -> {
+            StringBuilder r = new StringBuilder();
+            for (com.darkcraft.rol.Resistencias.Tipo t : com.darkcraft.rol.Resistencias.Tipo.values())
+                r.append(t.id).append('=').append(Math.round(com.darkcraft.rol.Resistencias.de(sp, t) * 100)).append(' ');
+            ItemStack arma = sp.getMainHandItem();
+            float b = com.darkcraft.combate.Escalado.base(arma);
+            log("  talismanes " + what + " (servidor): " + com.darkcraft.rol.Talismanes.resumen(sp) + " vida=" + String.format(java.util.Locale.ROOT, "%.1f/%.1f",
+                    sp.getHealth(), sp.getMaxHealth()) + " mana=" + com.darkcraft.rol.Rol.manaMax(sp) + " ecos=" + com.darkcraft.rol.Ficha.ecos(sp)
+                    + " | resistencias " + r.toString().trim() + " | arma " + net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(arma.getItem()).getPath()
+                    + String.format(java.util.Locale.ROOT, " base %.1f total %.2f", b, com.darkcraft.combate.Escalado.total(arma, b, com.darkcraft.rol.Ficha.atributos(sp)))
+                    + " efectos=" + sp.getActiveEffects().stream().map(e -> e.getEffect().getDescriptionId().replace("effect.", "")).toList());
+        });
+    }
+
+    /** Un golpe de fuego de 4 (como estar en una hoguera) y lo que quita de verdad. */
+    private static void golpeFuego(Minecraft m, String what) {
+        server(m, sp -> {
+            float antes = sp.getHealth();
+            sp.invulnerableTime = 0;
+            sp.hurt(sp.damageSources().inFire(), 4f);
+            sp.clearFire();
+            log(String.format(java.util.Locale.ROOT, "  fuego %s: 4,0 de dano quita %.2f", what, antes - sp.getHealth()));
+            sp.setHealth(sp.getMaxHealth());
+        });
+    }
+
+    private static int talismanes(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Talismanes y frutos: dos jefes vencidos (tres huecos), talismanes y frutos en la bolsa", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = false;
+            server(m, sp -> {
+                sp.setGameMode(GameType.SURVIVAL);
+                var inv = sp.getInventory();
+                inv.clearContent();
+                inv.selected = 0;
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
+                inv.items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                inv.items.set(5, fruto(com.darkcraft.rol.Fruto.Clase.HUESO, 2));
+                inv.items.set(9, talisman(com.darkcraft.rol.Talisman.Clase.VIGOR));
+                inv.items.set(10, talisman(com.darkcraft.rol.Talisman.Clase.BRASA));
+                inv.items.set(11, talisman(com.darkcraft.rol.Talisman.Clase.CODICIA));
+                inv.items.set(12, talisman(com.darkcraft.rol.Talisman.Clase.PORTEADOR));
+                inv.items.set(13, fruto(com.darkcraft.rol.Fruto.Clase.BRASA, 3));
+                inv.items.set(14, fruto(com.darkcraft.rol.Fruto.Clase.ESCARCHA, 2));
+                inv.items.set(15, fruto(com.darkcraft.rol.Fruto.Clase.PLUMA, 2));
+                sp.removeAllEffects();
+                comando(sp, "darkcraft rol talisman quitar");
+                String yo = sp.getGameProfile().getName();
+                comando(sp, "advancement grant " + yo + " only darkcraft:rey");
+                comando(sp, "advancement grant " + yo + " only darkcraft:gavran");
+                comando(sp, "darkcraft ecos quitar");
+                com.darkcraft.rol.Rol.fichaCambiada(sp);
+                sp.setHealth(sp.getMaxHealth());
+                enCombate(sp);
+            });
+        });
+        atTicks(t + 40, "antes de nada", m -> logTalismanes(m, "al empezar"));
+        atTicks(t + 42, "fuego sin nada", m -> golpeFuego(m, "sin resistencia"));
+        atTicks(t + 120, "el menu: abajo y cuatro a la derecha, el primer hueco de talisman; INTRO: la lista", m -> {
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.EQUIPO);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+            for (int i = 0; i < 4; i++) tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+        });
+        atTicks(t + 132, "captura: la lista de talismanes", m -> {
+            logTalismanes(m, "con la lista");
+            shot(m, "cliente_t01_lista_talismanes");
+        });
+        atTicks(t + 136, "INTRO: el primero (Vigor)", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER));
+        atTicks(t + 146, "derecha, INTRO, INTRO: el siguiente hueco", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+        });
+        atTicks(t + 156, "derecha, INTRO, INTRO: el tercero", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+        });
+        atTicks(t + 166, "derecha: el cuarto (cerrado)", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT));
+        atTicks(t + 178, "captura: tres talismanes puestos y el cuarto hueco cerrado", m -> {
+            logTalismanes(m, "puestos");
+            shot(m, "cliente_t02_menu_talismanes");
+        });
+        atTicks(t + 182, "TAB: el inventario; arriba y tres a la derecha: los talismanes", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_TAB);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_UP);
+            for (int i = 0; i < 3; i++) tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+        });
+        atTicks(t + 194, "captura: los talismanes de la bolsa", m -> {
+            logTalismanes(m, "en el inventario");
+            shot(m, "cliente_t03_inventario_talismanes");
+        });
+        atTicks(t + 198, "arriba, dos a la izquierda (las armas) y abajo: la espada", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_UP);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+        });
+        atTicks(t + 210, "captura: la ficha del arma (letras y requisitos)", m -> {
+            logTalismanes(m, "con el arma");
+            shot(m, "cliente_t04_ficha_arma");
+        });
+        atTicks(t + 214, "TAB: el estado (resistencias)", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_TAB));
+        atTicks(t + 226, "captura: el estado con las resistencias", m -> shot(m, "cliente_t05_estado"));
+        atTicks(t + 230, "cerrar", m -> m.setScreen(null));
+        atTicks(t + 236, "fuego con el Talisman de la Brasa", m -> golpeFuego(m, "con el talisman (40 %)"));
+        atTicks(t + 240, "comer el fruto de brasa (en la mano)", m -> server(m, sp -> {
+            var inv = sp.getInventory();
+            inv.items.set(1, inv.items.get(13).copy());
+            inv.items.set(13, ItemStack.EMPTY);
+            inv.selected = 1;
+            sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(1));
+            sp.gameMode.useItem(sp, sp.serverLevel(), sp.getMainHandItem(), InteractionHand.MAIN_HAND);
+        }));
+        atTicks(t + 270, "tras comerlo", m -> {
+            logTalismanes(m, "tras el fruto de brasa");
+            golpeFuego(m, "con el talisman y el fruto (40 % y 50 %)");
+        });
+        atTicks(t + 274, "la G: el objeto rapido (fruto de hueso)", m -> server(m, sp -> {
+            sp.getInventory().selected = 0;
+            sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
+        }));
+        atTicks(t + 280, "mantener la G", m -> {
+            com.darkcraft.client.ui.Teclas.OBJETO_USAR.setDown(true);
+            pulsar(com.darkcraft.client.ui.Teclas.OBJETO_USAR);
+        });
+        atTicks(t + 306, "soltar la G", m -> com.darkcraft.client.ui.Teclas.OBJETO_USAR.setDown(false));
+        atTicks(t + 318, "captura: los efectos bajo las barras", m -> {
+            logTalismanes(m, "con dos frutos");
+            shot(m, "cliente_t06_hud_efectos");
+        });
+        atTicks(t + 322, "el fruto pluma y una caida de 10 bloques", m -> server(m, sp -> {
+            sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(com.darkcraft.rol.Efectos.PLUMA.get(), 400, 0, false, false, true));
+            sp.teleportTo(sp.serverLevel(), ex + 5.5, ey + 10, ez - 6.0, 0f, 30f);
+        }));
+        atTicks(t + 330, "captura: cayendo despacio", m -> shot(m, "cliente_t07_pluma"));
+        atTicks(t + 420, "tras caer", m -> logTalismanes(m, "tras caer con la pluma"));
+        atTicks(t + 424, "la Pata de Cuervo: matar una diana", m -> server(m, sp -> {
+            enCombate(sp);
+            dianaA = diana(sp.serverLevel(), ex, ez, 180f);
+            if (dianaA == null) return;
+            int antes = com.darkcraft.rol.Ficha.ecos(sp);
+            dianaA.hurt(sp.damageSources().playerAttack(sp), 10000f);
+            log("  ecos por la diana con la Pata de Cuervo: " + (com.darkcraft.rol.Ficha.ecos(sp) - antes) + " (sin ella: " + Math.round((com.darkcraft.rol.Ficha.ecos(sp) - antes) / 1.2f) + ")");
+            dianaA = null;
+        }));
+        atTicks(t + 430, "destreza 40: la espada pega mas", m -> server(m, sp -> {
+            comando(sp, "darkcraft rol atributo destreza 40");
+            enCombate(sp);
+        }));
+        atTicks(t + 440, "con destreza 40", m -> logTalismanes(m, "con destreza 40"));
+        atTicks(t + 444, "Fin de los talismanes", m -> {
+            m.setScreen(null);
+            com.darkcraft.rol.Rol.sinLimite = true;
+            server(m, sp -> {
+                String yo = sp.getGameProfile().getName();
+                comando(sp, "darkcraft rol talisman quitar");
+                comando(sp, "darkcraft rol nivel reiniciar");
+                comando(sp, "advancement revoke " + yo + " only darkcraft:gavran");
+                comando(sp, "advancement revoke " + yo + " only darkcraft:rey");
+                comando(sp, "darkcraft ecos quitar");
+                com.darkcraft.rol.Rol.fichaCambiada(sp);
+                sp.getInventory().clearContent();
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 460;
+    }
+
     private static void logArmasAt(int t, String what) {
         atTicks(t, "estado de las armas " + what, m -> logArmas(m, what));
     }
@@ -1520,6 +1714,7 @@ public final class ClientCiTest {
         fin = santuarios(fin);
         fin = menu(fin);
         fin = combate(fin);
+        fin = talismanes(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

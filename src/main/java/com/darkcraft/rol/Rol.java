@@ -151,11 +151,12 @@ public final class Rol {
         int[] a = Ficha.atributos(sp);
         Estado s = de(sp);
         s.estMax = Nivel.estamina(a[Atributo.AGUANTE.ordinal()]);
-        s.manaMax = Nivel.mana(a[Atributo.MENTE.ordinal()]);
-        modificador(sp, Attributes.MAX_HEALTH, MOD_VIDA, "darkcraft_vigor", Nivel.vida(a[Atributo.VIGOR.ordinal()]) - 20.0,
+        s.manaMax = Math.round(Nivel.mana(a[Atributo.MENTE.ordinal()]) * (Talismanes.lleva(sp, Talisman.Clase.MENTE) ? 1.15f : 1f));
+        double vida = Nivel.vida(a[Atributo.VIGOR.ordinal()]) * (Talismanes.lleva(sp, Talisman.Clase.VIGOR) ? 1.10 : 1.0);
+        modificador(sp, Attributes.MAX_HEALTH, MOD_VIDA, "darkcraft_vigor", Math.round(vida) - 20.0,
                 net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADDITION);
-        modificador(sp, Attributes.ATTACK_DAMAGE, MOD_ATAQUE, "darkcraft_fuerza",
-                Nivel.ataque(a[Atributo.FUERZA.ordinal()], a[Atributo.DESTREZA.ordinal()]) - 1.0,
+        // lo que pegan las armas ya no es un tanto por ciento para todas: cada arma escala con sus letras (combate/Escalado)
+        modificador(sp, Attributes.ATTACK_DAMAGE, MOD_ATAQUE, "darkcraft_fuerza", 0.0,
                 net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.MULTIPLY_TOTAL);
         if (sp.getHealth() > sp.getMaxHealth()) sp.setHealth(sp.getMaxHealth());
         if (s.estamina > s.estMax) s.estamina = s.estMax;
@@ -234,7 +235,8 @@ public final class Rol {
                 }
                 if (s.pausa > 0) s.pausa--;
                 else if (s.estamina < s.estMax)
-                    s.estamina = Math.min(s.estMax, s.estamina + (sp.isBlocking() ? RECUPERA_GUARDIA : s.combate > 0 ? RECUPERA_COMBATE : RECUPERA));
+                    s.estamina = Math.min(s.estMax, s.estamina + (sp.isBlocking() ? RECUPERA_GUARDIA : s.combate > 0 ? RECUPERA_COMBATE : RECUPERA)
+                            * (Talismanes.lleva(sp, Talisman.Clase.ALIENTO) ? 1.25f : 1f));
                 if (s.estamina <= 0f) {
                     s.estamina = 0f;
                     if (!s.agotado) {
@@ -291,7 +293,8 @@ public final class Rol {
         }
         if (s.fichaSucia) {
             Ficha.Frascos f = Ficha.frascos(sp);
-            Net.to(sp, new Net.FichaRol(Ficha.atributos(sp), s.manaMax, f.vidaMax(), f.manaMax(), f.vida(), f.mana(), f.mejora()));
+            Net.to(sp, new Net.FichaRol(Ficha.atributos(sp), s.manaMax, f.vidaMax(), f.manaMax(), f.vida(), f.mana(), f.mejora(),
+                    Talismanes.huecos(sp), Talismanes.nombres(sp)));
             s.fichaSucia = false;
         }
     }
@@ -444,7 +447,7 @@ public final class Rol {
         for (UUID u : todos) {
             ServerPlayer p = sl.getServer().getPlayerList().getPlayer(u);
             if (p == null || p.level() != sl || p.distanceToSqr(v) > 96 * 96) continue;
-            dar(p, valor, v.position().add(0, v.getBbHeight() * 0.5, 0));
+            dar(p, Talismanes.lleva(p, Talisman.Clase.CODICIA) ? Math.round(valor * 1.2f) : valor, v.position().add(0, v.getBbHeight() * 0.5, 0));
         }
     }
 
@@ -471,6 +474,7 @@ public final class Rol {
 
     /** Un jefe ha caido: sus ecos y el cartel grande con su nombre. */
     public static void jefe(ServerPlayer p, String claveNombre, int ecos) {
+        if (Talismanes.lleva(p, Talisman.Clase.CODICIA)) ecos = Math.round(ecos * 1.2f);
         dar(p, ecos, null);
         Net.to(p, new Net.Cartel(Net.Cartel.JEFE, claveNombre, ecos));
     }
@@ -650,7 +654,38 @@ public final class Rol {
                 aplicar(p);
                 return verNivel(c.getSource(), p);
             })));
+        // talismanes y frutos: darlos (o, con "poner", llevar el talisman en un hueco aunque este cerrado: para probar)
+        var talisman = Commands.literal("talisman").executes(c -> verTalismanes(c.getSource(), c.getSource().getPlayerOrException()));
+        for (Talisman.Clase t : Talisman.Clase.values())
+            talisman.then(Commands.literal(t.id).executes(c -> {
+                ServerPlayer p = c.getSource().getPlayerOrException();
+                p.getInventory().add(new net.minecraft.world.item.ItemStack(DarkCraftMod.TALISMANES.get(t).get()));
+                return verTalismanes(c.getSource(), p);
+            }).then(Commands.literal("poner").then(Commands.argument("hueco", IntegerArgumentType.integer(1, Talismanes.MAX)).executes(c -> {
+                ServerPlayer p = c.getSource().getPlayerOrException();
+                Talismanes.ponerDirecto(p, IntegerArgumentType.getInteger(c, "hueco") - 1, new net.minecraft.world.item.ItemStack(DarkCraftMod.TALISMANES.get(t).get()));
+                return verTalismanes(c.getSource(), p);
+            }))));
+        talisman.then(Commands.literal("quitar").executes(c -> {
+            ServerPlayer p = c.getSource().getPlayerOrException();
+            for (int h = 0; h < Talismanes.MAX; h++) Talismanes.ponerDirecto(p, h, net.minecraft.world.item.ItemStack.EMPTY);
+            return verTalismanes(c.getSource(), p);
+        }));
+        var fruto = Commands.literal("fruto");
+        for (Fruto.Clase f : Fruto.Clase.values())
+            fruto.then(Commands.literal(f.id).executes(c -> darFruto(c.getSource(), f, 1))
+                    .then(Commands.argument("n", IntegerArgumentType.integer(1, 64)).executes(c -> darFruto(c.getSource(), f, IntegerArgumentType.getInteger(c, "n")))));
         return Commands.literal("rol")
+                .then(talisman)
+                .then(fruto)
+                .then(Commands.literal("resistencias").executes(c -> {
+                    ServerPlayer p = c.getSource().getPlayerOrException();
+                    StringBuilder b = new StringBuilder();
+                    for (Resistencias.Tipo t : Resistencias.Tipo.values())
+                        b.append(b.length() > 0 ? " · " : "").append(t.id).append(' ').append(Math.round(Resistencias.de(p, t) * 100)).append('%');
+                    c.getSource().sendSuccess(() -> Component.literal(b.toString()), false);
+                    return 1;
+                }))
                 .then(Commands.literal("santuario").executes(c -> {
                     ServerPlayer p = c.getSource().getPlayerOrException();
                     ServerLevel lvl = p.serverLevel();
@@ -689,6 +724,17 @@ public final class Rol {
                             return verNivel(c.getSource(), p);
                         })))
                 .then(atributo);
+    }
+
+    private static int verTalismanes(CommandSourceStack src, ServerPlayer p) {
+        src.sendSuccess(() -> Component.literal(Talismanes.resumen(p)), false);
+        return Talismanes.huecos(p);
+    }
+
+    private static int darFruto(CommandSourceStack src, Fruto.Clase f, int n) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        ServerPlayer p = src.getPlayerOrException();
+        p.getInventory().add(new net.minecraft.world.item.ItemStack(DarkCraftMod.FRUTOS.get(f).get(), n));
+        return n;
     }
 
     private static int verFrascos(CommandSourceStack src, ServerPlayer p) {

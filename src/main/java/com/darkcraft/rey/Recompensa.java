@@ -22,6 +22,9 @@ public final class Recompensa {
         items.set(16, new ItemStack(Items.ENCHANTED_GOLDEN_APPLE, 2));
         items.set(19, new ItemStack(Items.EXPERIENCE_BOTTLE, 32));
         items.set(25, new ItemStack(Items.TOTEM_OF_UNDYING, 1));
+        // el Rey ardia: su talisman guarda del fuego (y vencerle abre el segundo hueco de talisman)
+        items.set(13, new ItemStack(com.darkcraft.DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.BRASA).get()));
+        items.set(12, new ItemStack(com.darkcraft.DarkCraftMod.FRUTOS.get(com.darkcraft.rol.Fruto.Clase.BRASA).get(), 3));
         for (int slot : new int[]{20, 21, 23})
             items.set(slot, EnchantmentHelper.enchantItem(lvl.random, new ItemStack(Items.BOOK), 30, true));
     }

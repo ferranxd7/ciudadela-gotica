@@ -143,7 +143,7 @@ public final class ClientCombate {
 
     /** La clase de peso del equipo que se lleva (la misma cuenta que hace el servidor). */
     public static int clasePeso(LocalPlayer p) {
-        return Peso.clase(Peso.de(p.getInventory()), Peso.maximo(ClientRol.atributos));
+        return Peso.clase(Peso.de(p.getInventory()), ClientRol.pesoMaximo());
     }
 
     // ------------------------------------------------------------------ cada tick, antes de que el juego mire el raton

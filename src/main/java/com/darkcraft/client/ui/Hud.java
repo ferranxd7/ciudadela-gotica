@@ -110,7 +110,8 @@ public final class Hud {
     public static void onOverlay(RenderGuiOverlayEvent.Pre e) {
         var o = e.getOverlay();
         if (o == VanillaGuiOverlay.PLAYER_HEALTH.type() || o == VanillaGuiOverlay.FOOD_LEVEL.type()
-                || o == VanillaGuiOverlay.ARMOR_LEVEL.type() || o == VanillaGuiOverlay.EXPERIENCE_BAR.type())
+                || o == VanillaGuiOverlay.ARMOR_LEVEL.type() || o == VanillaGuiOverlay.EXPERIENCE_BAR.type()
+                || o == VanillaGuiOverlay.POTION_ICONS.type())
             e.setCanceled(true);
     }
 
@@ -138,6 +139,7 @@ public final class Hud {
         com.darkcraft.client.combate.Fijar.dibujar(g, w, h, pt);
         if (gui.shouldDrawSurvivalElements()) {
             fin = barras(mc, g, p, t, w);
+            efectos(mc, g, p, t);
             // abajo a la izquierda, la cruz del equipo (lleva los frascos en su hueco de abajo)
             if (!(mc.screen instanceof net.minecraft.client.gui.screens.ChatScreen) && !(mc.screen instanceof MenuScreen) && ClientEquipo.activo())
                 Cruz.dibujar(mc, g, t, h);
@@ -148,6 +150,45 @@ public final class Hud {
         if (avisoAlfa > 0.02f) avisoDeTecla(mc, g, w, h);
         Pix.blanco();
         Pix.mezcla();
+    }
+
+    // ---- los efectos (frutos, pociones): en fila bajo las barras, con lo que les queda
+
+    /** Lo que duraba cada efecto al ponerse (para la rayita de lo que le queda). */
+    private static final java.util.Map<net.minecraft.world.effect.MobEffect, Integer> DURA = new java.util.HashMap<>();
+
+    private static void efectos(Minecraft mc, GuiGraphics g, LocalPlayer p, float t) {
+        var activos = p.getActiveEffects();
+        if (activos.isEmpty()) {
+            DURA.clear();
+            return;
+        }
+        java.util.List<net.minecraft.world.effect.MobEffectInstance> l = new java.util.ArrayList<>(activos);
+        l.removeIf(m -> !m.showIcon());
+        // los buenos primero, y entre ellos los que antes se acaban
+        l.sort((a, b) -> a.getEffect().isBeneficial() != b.getEffect().isBeneficial() ? (a.getEffect().isBeneficial() ? -1 : 1)
+                : Integer.compare(a.isInfiniteDuration() ? Integer.MAX_VALUE : a.getDuration(), b.isInfiniteDuration() ? Integer.MAX_VALUE : b.getDuration()));
+        var tex = mc.getMobEffectTextures();
+        int x = X0 + 22, y = Y0 + 27;
+        for (int i = 0; i < Math.min(8, l.size()); i++) {
+            var m = l.get(i);
+            int dur = m.getDuration();
+            int max = Math.max(dur, DURA.getOrDefault(m.getEffect(), dur));
+            DURA.put(m.getEffect(), max);
+            float f = m.isInfiniteDuration() ? 1f : dur / (float) Math.max(1, max);
+            // en los ultimos diez segundos parpadea
+            boolean apaga = !m.isInfiniteDuration() && dur < 200 && ((int) (t / 5f)) % 2 == 0;
+            g.fill(x - 1, y - 1, x + 19, y + 19, 0x8C050408);
+            g.fill(x - 1, y + 19, x + 19, y + 21, 0xC0050408);
+            g.fill(x, y + 19, x + Math.max(1, Math.round(18 * f)), y + 20, m.getEffect().isBeneficial() ? 0xFFE2BF62 : 0xFFDE3A3A);
+            Pix.mezcla();
+            Pix.color(1f, 1f, 1f, apaga ? 0.4f : 1f);
+            g.blit(x, y, 0, 18, 18, tex.get(m.getEffect()));
+            Pix.blanco();
+            if (m.getAmplifier() > 0) g.drawString(mc.font, Integer.toString(m.getAmplifier() + 1), x + 13, y + 10, 0xFFF6E3A0, true);
+            x += 22;
+        }
+        DURA.keySet().removeIf(e -> !p.hasEffect(e));
     }
 
     // ---- las barras

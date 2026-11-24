@@ -1131,5 +1131,27 @@
         "name": "darkcraft:sfx/esfuerzo_4"
       }
     ]
+  },
+  "sfx.comer_fruto": {
+    "subtitle": "subtitles.darkcraft.sfx.comer_fruto",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/comer_fruto_1"
+      },
+      {
+        "name": "darkcraft:sfx/comer_fruto_2"
+      }
+    ]
+  },
+  "sfx.talisman": {
+    "subtitle": "subtitles.darkcraft.sfx.talisman",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/talisman_1"
+      },
+      {
+        "name": "darkcraft:sfx/talisman_2"
+      }
+    ]
   }
 }

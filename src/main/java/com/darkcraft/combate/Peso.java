@@ -23,9 +23,14 @@ public final class Peso {
 
     public static final int LIGERO = 0, MEDIO = 1, PESADO = 2, SOBRECARGADO = 3;
 
-    /** Lo que se puede llevar: 45 con Aguante 10, y 1,8 mas por cada punto. */
-    public static float maximo(int[] atributos) {
-        return 45f + (atributos[Atributo.AGUANTE.ordinal()] - 10) * 1.8f;
+    /** Lo que se puede llevar: 45 con Aguante 10, y 1,8 mas por cada punto (un 15 % mas con el Talisman del Porteador). */
+    public static float maximo(int[] atributos, boolean porteador) {
+        return (45f + (atributos[Atributo.AGUANTE.ordinal()] - 10) * 1.8f) * (porteador ? 1.15f : 1f);
+    }
+
+    /** Lo que puede llevar un jugador en el servidor (con sus talismanes). */
+    public static float maximo(net.minecraft.world.entity.player.Player p) {
+        return maximo(com.darkcraft.rol.Ficha.atributos(p), com.darkcraft.rol.Talismanes.lleva(p, com.darkcraft.rol.Talisman.Clase.PORTEADOR));
     }
 
     /** Lo que pesa lo que lleva puesto el jugador. */

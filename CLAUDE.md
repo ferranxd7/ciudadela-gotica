@@ -247,6 +247,36 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   `impacto_armadura` (3), `rodar` (2), `fijar` (1), `estocada` (3), `golpe_salto` (2), `aturdido` (2), `esfuerzo` (4).
 - La prueba del cliente tiene el tramo `combate()` (capturas `cliente_c01..c20`); `LIMIT` 23 min y `timeout 37m`.
 
+### Plan grande, parte 2d-1: talismanes, frutos, resistencias y armas que escalan
+
+- **Escalado** (`combate/Escalado`, lo usan servidor y cliente): cada arma tiene letras por Fuerza, Destreza, Inteligencia,
+  Fe y Arcano (S 1,30 · A 1,00 · B 0,70 · C 0,45 · D 0,25 · E 0,10 del ataque base, por `curva(atributo)`: 0,08 a 10,
+  0,35 a 20, 0,70 a 40, 0,85 a 60, 1 a 99) y requisitos (sin ellos pega un 40 % menos). Por tipo (espada D/C, daga E/B,
+  mandoble B/E...) y las con nombre aparte (Espada del Rey C/C/Fe D, Mandoble B/Arc D). `Combate.pegar` usa
+  `Escalado.total(arma, base(arma), atributos)` + lo demas del atributo de ataque (pociones). El viejo +1,2 %/Fuerza
+  para todas (`MOD_ATAQUE`) ya no se pone (se quita a quien lo tuviera). El menu ensena "Ataque 6,0 + 0,3", las letras y
+  los requisitos (en rojo los que faltan); subir de nivel ensena lo que pega el arma antes → despues.
+- **Talismanes** (`rol/Talisman`, 12: vigor +10 % vida, aliento +25 % recuperar estamina, mente +15 % mana, porteador
+  +15 % peso, brasa / escarcha / trueno / sombra -40 % de su dano, hueso -10 % fisico, codicia +20 % ecos, garra +15 %
+  golpe del salto, furia +12 % golpe fuerte): van en la FICHA (`rol/Talismanes`, NBT `talismanes`, cache por jugador),
+  no en el inventario; 1 hueco + 1 por gran jefe vencido (logros `rey` y `gavran`; maximo 4); dos iguales no. Se ponen en
+  el menu (Equipo, fila de la armadura: `Net.EquipoAccion` TALISMAN_PONER / TALISMAN_QUITAR; los huecos cerrados con
+  candado) o desde el inventario (clase nueva Talismanes). El cliente los sabe por `Net.FichaRol` (huecos y nombres).
+  **Ojo: `Talismanes.llevados(jugador)` solo en el servidor** (la cache es estatica: en un mundo de un jugador el cliente
+  y el servidor comparten la JVM); el cliente usa `ClientRol.talismanes` / `ClientRol.lleva`.
+- **Frutos** (`rol/Fruto`, 8: brasa fuego, escarcha hielo + la nieve no congela, tormenta rayo, lunar magia: -50 %;
+  ceniza cura veneno y marchitamiento y el veneno no entra; hueso -15 % fisico; sombra -50 % marchitamiento; pluma cae
+  despacio y sin dano): se comen en 18 ticks (no son comida) y dan su efecto (`rol/Efectos`, `darkcraft:fruto_*`) 1-2 min.
+- **Resistencias** (`rol/Resistencias`: fisico, fuego, hielo, rayo, magia, veneno, sombra; segun el tipo de dano): de
+  talismanes y frutos, multiplicadas, tope 90 %; se ven en el menu (Estado).
+- **HUD**: los efectos activos (frutos, pociones) en fila bajo las barras, con una rayita de lo que les queda y
+  parpadeando los ultimos 10 s (`Hud.efectos`); los iconos del juego arriba a la derecha ya no salen.
+- Donde salen: cofres de Valdrenn (tablas `chests/*`: frutos en casi todos, talismanes raros, mas en tesoro y cripta);
+  el cofre del Rey da el Talisman de la Brasa y 3 frutos de brasa; el de Gavran, el del Escudo de Hueso y 3 de ceniza.
+- Arte: `tools/rol/objetos.py` (frutos, talismanes y los iconos de los efectos). Sonidos: `comer_fruto` (tomas 1 y 2),
+  `talisman` (2 y 3). Comandos `/darkcraft rol talisman [<nombre> [poner <hueco>] | quitar]`, `fruto <nombre> [<n>]`,
+  `resistencias`. La prueba del cliente tiene el tramo `talismanes()` (capturas `cliente_t01..t07`).
+
 ## Compilar, probar y publicar
 
 - La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (con y sin mods) y un cliente con capturas
@@ -256,6 +286,8 @@ empezarla). Lo esencial, que cambia reglas de arriba:
 - Compilar en local (solo para ver errores, ~4 s): bajar la release `classpath` (asset `classpath.tgz`) a
   `/tmp/cp/cpjars` y lanzar `javac` sobre `src/main/java` con esos jars (`[cp]` en un commit la vuelve a subir).
 - Bajar assets de releases: `gh api -H "Accept: application/octet-stream" repos/ferranxd7/ciudadela-gotica/releases/assets/<id>`.
+  Desde la build 73 las capturas van en `capturas.zip` y los audios sueltos en `audios.zip` (subir ~600 ficheros
+  sueltos chocaba con el limite secundario de GitHub y la release se quedaba a medias, en borrador).
   Las rutas REST de Actions (artifacts, secrets) no pasan por el proxy; `gh run list` sí funciona.
 - Commits: `git -c user.name="Claude" -c user.email="noreply@anthropic.com" commit`.
 
