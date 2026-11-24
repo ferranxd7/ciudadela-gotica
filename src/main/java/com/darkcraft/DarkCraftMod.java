@@ -134,6 +134,18 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_MENU_MUEVE = sound("sfx.menu_mueve");
     public static final RegistryObject<SoundEvent> SFX_MENU_ACEPTA = sound("sfx.menu_acepta");
     public static final RegistryObject<SoundEvent> SFX_MENU_CANCELA = sound("sfx.menu_cancela");
+    // el combate propio
+    public static final RegistryObject<SoundEvent> SFX_GOLPE_LIGERO = sound("sfx.golpe_ligero");
+    public static final RegistryObject<SoundEvent> SFX_GOLPE_PESADO = sound("sfx.golpe_pesado");
+    public static final RegistryObject<SoundEvent> SFX_CARGA_GOLPE = sound("sfx.carga_golpe");
+    public static final RegistryObject<SoundEvent> SFX_IMPACTO_CARNE = sound("sfx.impacto_carne");
+    public static final RegistryObject<SoundEvent> SFX_IMPACTO_ARMADURA = sound("sfx.impacto_armadura");
+    public static final RegistryObject<SoundEvent> SFX_RODAR = sound("sfx.rodar");
+    public static final RegistryObject<SoundEvent> SFX_FIJAR = sound("sfx.fijar");
+    public static final RegistryObject<SoundEvent> SFX_ESTOCADA = sound("sfx.estocada");
+    public static final RegistryObject<SoundEvent> SFX_GOLPE_SALTO = sound("sfx.golpe_salto");
+    public static final RegistryObject<SoundEvent> SFX_ATURDIDO = sound("sfx.aturdido");
+    public static final RegistryObject<SoundEvent> SFX_ESFUERZO = sound("sfx.esfuerzo");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")

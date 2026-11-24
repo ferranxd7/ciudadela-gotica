@@ -189,6 +189,63 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   `frasco_beber` (2 y 1), `nivel_sube` (2), `menu_abre` (3), `menu_mueve` (1), `menu_acepta` (4), `menu_cancela` (3).
 - Comandos: `/darkcraft rol santuario | frascos [<n>] | frascos mejora <n> | nivel [reiniciar] | atributo <nombre> <valor>`.
 - La prueba del cliente tiene el tramo `santuarios()` (capturas `cliente_s01..s17`) y `cliente_01c_santuario_torre`.
+- El santuario de la Torre de Ascenso va ARRIBA de la torre, en la plataforma (`plan.cine().ascX/ascZ`, a -4, +2 del
+  centro, radio de busqueda 3): el nombre "torre_ascenso" del mapa esta desplazado fuera de la torre, en el aire.
+
+### Plan grande, parte 2b-2: el menu (R), el inventario propio y la cruz
+
+- **Ya no se ve el inventario de Minecraft** en supervivencia: la tecla del inventario (E) abre `MenuScreen` en la
+  pestana Inventario; la R (`Teclas.MENU`) la abre en Equipo. Pestanas Equipo / Inventario / Estado / Sistema
+  (`MenuScreen`, ~1100 lineas: losa de piedra, ranuras de `menu.png`, el personaje girando a la derecha; teclado y
+  raton). Sistema lleva al Libro de la M, a los controles y a las opciones.
+- **Los huecos** (`rol/Equipo`): mano derecha = barra 0-2 (la que se lleva es la elegida); mano izquierda = la otra mano
+  (40) con dos de repuesto (3 y 4); objetos rapidos = 5-8; armadura 36-39; bolsa = 9-35. `Net.EquipoAccion`
+  (MOVER / GUARDAR / TIRAR / IZQUIERDA) lo hace en el servidor; lo que se recoge entra primero en lo que ya hay y si no
+  en la bolsa (`Equipo.onRecoger`), con su aviso (`Net.Conseguido` → `client/ui/Conseguidos`, abajo en el centro).
+- **Teclas** (`client/ui/ClientEquipo`, START de cada tick, antes que el juego): 1-3 arma derecha; 4-5 y F y flecha
+  izquierda cambian la mano izquierda; 6-9 eligen objeto rapido; flecha abajo, el siguiente; G lo usa (un frasco se
+  bebe; lo demas se pone en la mano mientras se mantiene la G y vuelve el arma); rueda = arma de la derecha; Q (soltar)
+  ya no tira nada. La barra de objetos y el nombre del objeto de Minecraft no se dibujan.
+- **La cruz** abajo a la izquierda (`client/ui/Cruz`): arriba hechizo (aun vacio), derecha arma, izquierda la otra mano,
+  abajo el objeto rapido (los frascos van ahi).
+- La prueba del cliente tiene el tramo `menu()` (capturas `cliente_q01..q15`).
+
+### Plan grande, parte 2c: el combate propio
+
+- **Armas** (`combate/Armas`, lo usan servidor y cliente): tipos PUNOS, DAGA, ESPADA, MANDOBLE, HACHA, LANZA, ALABARDA
+  (`Armas.de`: mano vacia = punos; Mandoble del Juramento; Espada del Rey; alabarda; tridente = lanza; hachas; espadas,
+  y daga si el id lo dice). Cada tipo: cadena de ligeros, golpe fuerte (cargado), ataque corriendo y golpe del salto;
+  cada movimiento (`Mov`) con duracion, ticks de dano, multiplicador, empujon, alcance, arco, estamina, desequilibrio y
+  retroceso. Herramientas, bloques y lo demas: el clic de siempre.
+- **Servidor** (`combate/Combate`): `Net.Ataque` (accion, paso, mano, carga) → comprueba (vivo, supervivencia, no
+  bebiendo, arma), cobra la estamina (`Rol.gastarCombate`) y en los ticks de dano busca a quien alcanza (arco o linea
+  recta, a la vista) y le pega con todo lo del juego (encantamientos, desgaste, `hurtEnemy` —asi las armas del Rey y el
+  Mandoble siguen cargando energia—). Carga: hasta 24 ticks, +45 % al maximo. Desequilibrio: a un enemigo normal
+  (no jefes) se le acumula y queda aturdido 1,5 s. `Net.Rodar` → instantes invulnerables (9/8/7 ticks segun el peso,
+  paso atras 5) en los que no llega nada que pegue o se dispare. Los demas jugadores ven los golpes por
+  `Net.GolpeVisto`; el que pega recibe `Net.Impacto` (temblor y un instante de parada) o `Net.GolpeNo` (se corta).
+- **Peso del equipo** (`combate/Peso`): armadura por material y pieza + las armas de las dos manos; maximo 45 (+1,8 por
+  punto de Aguante); ligero <= 30 %, medio <= 70 %, pesado <= 100 %, sobrecargado (no rueda y anda un 35 % mas lento).
+  Se ve en el menu (Equipo y Estado).
+- **Cliente** (`client/combate/`): `ClientCombate` lleva el ritmo en el START de cada tick (consume los clics de atacar
+  antes que el juego): tocar = ligero (encadena si se pulsa antes de que acabe el anterior o 8 ticks despues; lo pedido
+  antes de tiempo se guarda 10 ticks), mantener 5 ticks = carga, soltar = golpe fuerte; corriendo = ataque corriendo; en
+  el aire = golpe del salto (cae con fuerza, golpe al tocar suelo). Antes de cada golpe pregunta con el mismo evento del
+  clic del juego (`ForgeHooksClient.onClickInput`): asi los combos de Shift/Ctrl de las armas del Rey (Ctrl solo si no se
+  va corriendo), las cinematicas, beber o estar agotado siguen mandando. Frena al jugador mientras pega, le da el
+  empujon del golpe y lo mueve en la voltereta (el movimiento lo lleva el cliente). Tecla **Alt izquierdo** = rodar (con
+  direccion) o paso atras (sin ella). En primera persona dibuja el arma en `RenderHandEvent` con dos poses por golpe
+  (preparar y acabar; `Poses.fp`). `Poses`: en tercera persona, pose de brazos propia (`ArmPose` puesta en
+  `RenderPlayerEvent.Pre`) con giro del cuerpo, espejo para la mano izquierda, dos manos para los tipos a dos manos; la
+  voltereta gira el cuerpo entero (push en Pre a prioridad LOWEST, pop en Post). Los punetazos son el golpe del juego.
+- **Fijar el objetivo** (`client/combate/Fijar`): Q (va con su propio contexto de tecla: no choca con "soltar objeto")
+  o pulsar la rueda. Elige al de delante (cono de 65 grados, a la vista, enemigos antes que animales; nunca jugadores
+  ni aldeanos); la camara le sigue cada fotograma (`RenderTickEvent` START); mover el raton de golpe salta al siguiente
+  por ese lado; se suelta solo si muere, se aleja de 32 o no se ve en 2 s. La marca (`menu.png` `fijar` / `fijar_luz`)
+  se dibuja en el HUD donde cae su pecho (proyectado en `RenderLevelStageEvent` AFTER_PARTICLES: con shaders tambien).
+- Sonidos (ElevenLabs): `golpe_ligero` (4), `golpe_pesado` (2), `carga_golpe` (2), `impacto_carne` (3),
+  `impacto_armadura` (3), `rodar` (2), `fijar` (1), `estocada` (3), `golpe_salto` (2), `aturdido` (2), `esfuerzo` (4).
+- La prueba del cliente tiene el tramo `combate()` (capturas `cliente_c01..c20`); `LIMIT` 23 min y `timeout 37m`.
 
 ## Compilar, probar y publicar
 

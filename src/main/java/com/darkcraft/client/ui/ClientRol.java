@@ -201,6 +201,7 @@ public final class ClientRol {
         frascos(mc);
         ClientSantuario.tick(mc);
         Bebida.tick(mc);
+        Conseguidos.tick();
         // el contador cuenta hacia lo que hay (lo que aun viene volando no cuenta hasta que llega)
         float hay = Math.max(0, ecos - pendiente), falta = hay - ecosVistos;
         if (Math.abs(falta) < 1f) ecosVistos = hay;
@@ -227,10 +228,16 @@ public final class ClientRol {
         int pide = -1;
         while (Teclas.FRASCO_VIDA.consumeClick()) pide = com.darkcraft.rol.Frascos.VIDA;
         while (Teclas.FRASCO_MANA.consumeClick()) pide = com.darkcraft.rol.Frascos.MANA;
-        if (pide < 0 || enfriamientoFrasco > 0 || mc.screen != null || ClientCine.active() || !mc.player.isAlive() || mc.player.isSpectator()) return;
+        if (pide >= 0) pedirFrasco(pide);
+    }
+
+    /** Pide beber de un frasco (0 vida, 1 mana), si se puede pedir ahora. */
+    public static void pedirFrasco(int tipo) {
+        Minecraft mc = Minecraft.getInstance();
+        if (enfriamientoFrasco > 0 || mc.player == null || mc.screen != null || ClientCine.active() || !mc.player.isAlive() || mc.player.isSpectator()) return;
         if (Bebida.yo()) return;
         enfriamientoFrasco = 6;
-        Net.CH.sendToServer(new Net.Frasco(pide));
+        Net.CH.sendToServer(new Net.Frasco(tipo));
     }
 
     // ------------------------------------------------------------------ agotado: ni saltar ni atacar
@@ -278,6 +285,7 @@ public final class ClientRol {
         mejoraFrascos = 0;
         ClientSantuario.olvidar();
         Bebida.olvidar();
+        Conseguidos.olvidar();
     }
 
     /** Para la prueba de la CI. */

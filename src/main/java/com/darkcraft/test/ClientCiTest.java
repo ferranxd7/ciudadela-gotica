@@ -43,7 +43,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 20 * 60 * 20;
+    private static final int LIMIT = 23 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -994,19 +994,22 @@ public final class ClientCiTest {
         });
         atTicks(t + 354, "captura: la vida subiendo", m -> shot(m, "cliente_s12_beber_cura"));
         atTicks(t + 372, "tras beber", m -> logSantuario(m, "tras el frasco rojo"));
-        atTicks(t + 376, "otro golpe; ahora visto de frente", m -> {
+        atTicks(t + 376, "otro golpe; ahora visto de frente (a un lado, que la llama no tape)", m -> {
             m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
             server(m, sp -> {
                 sp.invulnerableTime = 0;
                 sp.hurt(sp.damageSources().generic(), 10f);
-                sp.teleportTo(sp.serverLevel(), ex, ey, ez - 3.0, 0f, 0f);
+                sp.teleportTo(sp.serverLevel(), ex - 2.0, ey, ez - 1.5, 180f, 0f);
             });
         });
         atTicks(t + 390, "beber otra vez", m -> com.darkcraft.net.Net.CH.sendToServer(new com.darkcraft.net.Net.Frasco(com.darkcraft.rol.Frascos.VIDA)));
         atTicks(t + 401, "captura: bebiendo (de frente)", m -> shot(m, "cliente_s13_beber_frente"));
         atTicks(t + 424, "primera persona; sin mana, el frasco azul", m -> {
             enPrimeraPersona(m);
-            server(m, sp -> com.darkcraft.armas.Combos.sumar(sp, -100000));
+            server(m, sp -> {
+                com.darkcraft.armas.Combos.sumar(sp, -100000);
+                sp.teleportTo(sp.serverLevel(), ex, ey, ez - 3.0, 0f, 12f);
+            });
         });
         atTicks(t + 430, "beber del frasco azul", m -> com.darkcraft.net.Net.CH.sendToServer(new com.darkcraft.net.Net.Frasco(com.darkcraft.rol.Frascos.MANA)));
         atTicks(t + 462, "tras el frasco azul", m -> logSantuario(m, "tras el frasco azul"));
@@ -1081,6 +1084,426 @@ public final class ClientCiTest {
         return t + 720;
     }
 
+    // ------------------------------------------------------------------ el menu del mod, el equipo y la cruz del HUD
+
+    private static String inventario(net.minecraft.world.entity.player.Inventory inv) {
+        StringBuilder b = new StringBuilder("mano=" + inv.selected);
+        for (int i = 0; i < 41; i++) {
+            ItemStack st = inv.getItem(i);
+            if (!st.isEmpty()) b.append(' ').append(i).append(':').append(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(st.getItem()).getPath())
+                    .append(st.getCount() > 1 ? "x" + st.getCount() : "");
+        }
+        return b.toString();
+    }
+
+    private static void logMenu(Minecraft m, String what) {
+        String pantalla = m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName();
+        if (m.screen instanceof com.darkcraft.client.ui.MenuScreen ms) pantalla += " [" + ms.resumen() + "]";
+        log("  menu " + what + " (cliente): " + com.darkcraft.client.ui.ClientEquipo.resumen() + " | " + inventario(m.player.getInventory()) + " | pantalla: " + pantalla);
+        server(m, sp -> log("  menu " + what + " (servidor): " + inventario(sp.getInventory()) + " vida=" + String.format("%.1f", sp.getHealth())
+                + " usando=" + sp.isUsingItem() + " armadura=" + sp.getArmorValue()));
+    }
+
+    private static void pulsar(net.minecraft.client.KeyMapping k) {
+        net.minecraft.client.KeyMapping.click(k.getKey());
+    }
+
+    private static int menu(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Menu: supervivencia en la plataforma con armas, armadura en la bolsa y objetos rapidos", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = false;
+            server(m, sp -> {
+                sp.setInvisible(false);
+                sp.setGameMode(GameType.SURVIVAL);
+                var inv = sp.getInventory();
+                inv.clearContent();
+                inv.selected = 0;
+                inv.items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                inv.items.set(1, new ItemStack(DarkCraftMod.MANDOBLE_JURAMENTO.get()));
+                inv.items.set(3, new ItemStack(net.minecraft.world.item.Items.TORCH, 16));
+                inv.items.set(5, new ItemStack(net.minecraft.world.item.Items.GOLDEN_APPLE, 3));
+                inv.items.set(6, new ItemStack(net.minecraft.world.item.Items.ENDER_PEARL, 4));
+                inv.items.set(9, new ItemStack(net.minecraft.world.item.Items.IRON_HELMET));
+                inv.items.set(10, new ItemStack(net.minecraft.world.item.Items.DIAMOND_CHESTPLATE));
+                inv.items.set(11, new ItemStack(net.minecraft.world.item.Items.LEATHER_BOOTS));
+                inv.items.set(12, new ItemStack(net.minecraft.world.item.Items.BONE, 12));
+                inv.items.set(13, new ItemStack(DarkCraftMod.LLAVE_HUESO.get()));
+                inv.items.set(14, new ItemStack(DarkCraftMod.ESPADA_DIESTRA.get()));
+                inv.items.set(15, new ItemStack(net.minecraft.world.item.Items.BOW));
+                inv.items.set(16, new ItemStack(net.minecraft.world.item.Items.ARROW, 32));
+                inv.items.set(17, new ItemStack(net.minecraft.world.item.Items.NETHERITE_INGOT, 5));
+                inv.items.set(18, new ItemStack(net.minecraft.world.item.Items.POTION));
+                sp.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(net.minecraft.world.item.Items.SHIELD));
+                sp.setHealth(sp.getMaxHealth());
+                sp.teleportTo(sp.serverLevel(), ex, ey, ez - 3.0, 0f, 6f);
+            });
+        });
+        atTicks(t + 24, "captura: la cruz del equipo en vez de la barra", m -> {
+            logMenu(m, "al empezar");
+            shot(m, "cliente_q01_cruz");
+        });
+        atTicks(t + 28, "tecla de la mano derecha: el arma siguiente", m -> pulsar(com.darkcraft.client.ui.Teclas.MANO_DERECHA));
+        atTicks(t + 36, "captura: el mandoble en la mano y su nombre", m -> {
+            logMenu(m, "tras cambiar de arma");
+            shot(m, "cliente_q02_cruz_arma");
+        });
+        atTicks(t + 40, "tecla de la mano izquierda: la antorcha", m -> pulsar(com.darkcraft.client.ui.Teclas.MANO_IZQUIERDA));
+        atTicks(t + 52, "captura: la antorcha en la izquierda", m -> {
+            logMenu(m, "tras cambiar la izquierda");
+            shot(m, "cliente_q03_cruz_izquierda");
+        });
+        atTicks(t + 56, "objeto rapido siguiente, dos veces: la manzana dorada", m -> pulsar(com.darkcraft.client.ui.Teclas.OBJETO_SIGUIENTE));
+        atTicks(t + 60, "otra vez", m -> pulsar(com.darkcraft.client.ui.Teclas.OBJETO_SIGUIENTE));
+        atTicks(t + 68, "captura: la manzana en el hueco de abajo", m -> {
+            logMenu(m, "con la manzana elegida");
+            shot(m, "cliente_q04_cruz_objeto");
+        });
+        atTicks(t + 72, "herido, se mantiene la tecla de usar: come la manzana sin soltar el arma", m -> {
+            server(m, sp -> {
+                sp.invulnerableTime = 0;
+                sp.hurt(sp.damageSources().generic(), 8f);
+            });
+            com.darkcraft.client.ui.Teclas.OBJETO_USAR.setDown(true);
+            pulsar(com.darkcraft.client.ui.Teclas.OBJETO_USAR);
+        });
+        atTicks(t + 90, "captura: comiendo la manzana", m -> {
+            logMenu(m, "usando el objeto rapido");
+            shot(m, "cliente_q05_usar_objeto");
+        });
+        atTicks(t + 116, "se suelta la tecla", m -> com.darkcraft.client.ui.Teclas.OBJETO_USAR.setDown(false));
+        atTicks(t + 126, "tras comer: el arma vuelve a la mano", m -> logMenu(m, "tras usar el objeto rapido"));
+        atTicks(t + 130, "algo en el suelo: va a la bolsa, no a la mano", m -> server(m, sp -> {
+            net.minecraft.world.entity.item.ItemEntity ie = new net.minecraft.world.entity.item.ItemEntity(sp.serverLevel(), sp.getX(), sp.getY() + 0.2, sp.getZ(),
+                    new ItemStack(net.minecraft.world.item.Items.DIAMOND, 3));
+            ie.setNoPickUpDelay();
+            sp.serverLevel().addFreshEntity(ie);
+        }));
+        atTicks(t + 146, "tras recogerlo", m -> logMenu(m, "tras recoger diamantes"));
+        atTicks(t + 150, "la tecla del menu", m -> pulsar(com.darkcraft.client.ui.Teclas.MENU));
+        atTicks(t + 162, "captura: el menu, pestana Equipo", m -> {
+            logMenu(m, "en el equipo");
+            shot(m, "cliente_q06_menu_equipo");
+        });
+        atTicks(t + 166, "abajo (armadura: el yelmo) e INTRO: la lista de lo que se puede poner", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+        });
+        atTicks(t + 176, "captura: la lista", m -> {
+            logMenu(m, "con la lista abierta");
+            shot(m, "cliente_q07_menu_lista");
+        });
+        atTicks(t + 180, "INTRO: se pone el yelmo; derecha e INTRO dos veces: el peto", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER));
+        atTicks(t + 186, "a la derecha: el pecho", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+        });
+        atTicks(t + 192, "INTRO: se pone el peto", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER));
+        atTicks(t + 206, "captura: con yelmo y peto puestos", m -> {
+            logMenu(m, "con armadura");
+            shot(m, "cliente_q08_menu_armadura");
+        });
+        atTicks(t + 210, "TAB: el inventario", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_TAB));
+        atTicks(t + 220, "captura: el inventario (todo)", m -> {
+            logMenu(m, "en el inventario");
+            shot(m, "cliente_q09_menu_inventario");
+        });
+        atTicks(t + 224, "a la derecha tres veces: la Espada Diestra", m -> {
+            for (int i = 0; i < 3; i++) tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT);
+        });
+        atTicks(t + 234, "captura: la ficha de un objeto", m -> {
+            logMenu(m, "con un objeto elegido");
+            shot(m, "cliente_q10_menu_ficha");
+        });
+        atTicks(t + 238, "INTRO: se equipa (la Espada Diestra va a la mano derecha)", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER));
+        atTicks(t + 248, "tras equipar desde el inventario", m -> logMenu(m, "tras equipar desde el inventario"));
+        atTicks(t + 250, "arriba (a las clases) y a la derecha: armas", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_UP);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT);
+        });
+        atTicks(t + 260, "captura: solo las armas", m -> {
+            logMenu(m, "en las armas");
+            shot(m, "cliente_q11_menu_armas");
+        });
+        atTicks(t + 264, "TAB: el estado", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_TAB));
+        atTicks(t + 274, "captura: el estado", m -> shot(m, "cliente_q12_menu_estado"));
+        atTicks(t + 278, "TAB: el sistema", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_TAB));
+        atTicks(t + 288, "captura: el sistema", m -> {
+            logMenu(m, "en el sistema");
+            shot(m, "cliente_q13_menu_sistema");
+        });
+        atTicks(t + 292, "ESC: se cierra", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE));
+        atTicks(t + 300, "la tecla del inventario abre el menu por el inventario", m -> m.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(m.player)));
+        atTicks(t + 310, "captura: lo que sale con la tecla del inventario", m -> {
+            logMenu(m, "con la tecla del inventario");
+            shot(m, "cliente_q14_tecla_inventario");
+        });
+        atTicks(t + 314, "cerrar; visto de frente con la armadura", m -> {
+            m.setScreen(null);
+            m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+            server(m, sp -> sp.teleportTo(sp.serverLevel(), ex - 2.0, ey, ez - 1.5, 180f, 0f));
+        });
+        atTicks(t + 334, "captura: el jugador con lo que lleva", m -> shot(m, "cliente_q15_jugador"));
+        atTicks(t + 340, "Fin del menu", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = true;
+            server(m, sp -> {
+                sp.getInventory().clearContent();
+                sp.setHealth(sp.getMaxHealth());
+                sp.removeAllEffects();
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 360;
+    }
+
+    // ------------------------------------------------------------------ el combate propio
+
+    private static net.minecraft.world.entity.monster.Husk dianaA, dianaB;
+
+    private static void logCombate(Minecraft m, String what) {
+        log("  combate " + what + " (cliente): " + com.darkcraft.client.combate.ClientCombate.resumen() + " | pose " + com.darkcraft.client.combate.Poses.resumen(m.player)
+                + " | estamina " + Math.round(com.darkcraft.client.ui.ClientRol.estamina) + (com.darkcraft.client.ui.ClientRol.agotado ? " AGOTADO" : "")
+                + String.format(java.util.Locale.ROOT, " | jugador en %.2f, %.2f, %.2f giro %.1f", m.player.getX(), m.player.getY(), m.player.getZ(), m.player.getYRot()));
+        server(m, sp -> log("  combate " + what + " (servidor): " + com.darkcraft.combate.Combate.resumen(sp) + " | estamina "
+                + Math.round(com.darkcraft.rol.Rol.estamina(sp)) + " | diana A " + (dianaA == null ? "-" : String.format(java.util.Locale.ROOT, "%.1f", dianaA.getHealth()))
+                + " | diana B " + (dianaB == null ? "-" : String.format(java.util.Locale.ROOT, "%.1f", dianaB.getHealth()))));
+    }
+
+    private static net.minecraft.world.entity.monster.Husk diana(ServerLevel lvl, double x, double z, float giro) {
+        net.minecraft.world.entity.monster.Husk h = net.minecraft.world.entity.EntityType.HUSK.create(lvl);
+        if (h == null) return null;
+        h.moveTo(x, ey, z, giro, 0f);
+        h.setYHeadRot(giro);
+        h.setYBodyRot(giro);
+        h.setNoAi(true);
+        h.setPersistenceRequired();
+        var vida = h.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
+        if (vida != null) vida.setBaseValue(300);
+        h.setHealth(300f);
+        var kb = h.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE);
+        if (kb != null) kb.setBaseValue(1.0);
+        lvl.addFreshEntity(h);
+        return h;
+    }
+
+    private static void atacar(Minecraft m) {
+        net.minecraft.client.KeyMapping.click(m.options.keyAttack.getKey());
+    }
+
+    private static void enCombate(ServerPlayer sp) {
+        sp.teleportTo(sp.serverLevel(), ex, ey, ez - 3.0, 0f, 10f);
+        sp.setDeltaMovement(Vec3.ZERO);
+    }
+
+    /** Camara de lado y por delante del jugador (de cara a el y a las dianas). */
+    private static void verCombate(Minecraft m) {
+        m.options.hideGui = true;
+        verDesde(m, new Vec3(ex + 3.4, ey + 1.7, ez - 0.6), new Vec3(ex, ey + 1.0, ez - 3.0));
+    }
+
+    private static int combate(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Combate: supervivencia en una plataforma grande, espada de hierro y dos dianas", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                int y = (int) ey - 1, fx = (int) Math.floor(ex), fz = (int) Math.floor(ez);
+                for (int x = -10; x <= 10; x++)
+                    for (int z = -12; z <= 8; z++)
+                        lvl.setBlockAndUpdate(new BlockPos(fx + x, y, fz + z), net.minecraft.world.level.block.Blocks.WHITE_CONCRETE.defaultBlockState());
+                for (int x = -10; x <= 10; x++)
+                    for (int z = -12; z <= 8; z++)
+                        for (int yy = y + 1; yy <= y + 4; yy++) {
+                            BlockPos q = new BlockPos(fx + x, yy, fz + z);
+                            if (!lvl.getBlockState(q).isAir()) lvl.removeBlock(q, false);
+                        }
+                sp.setInvisible(false);
+                sp.setGameMode(GameType.SURVIVAL);
+                var inv = sp.getInventory();
+                inv.clearContent();
+                inv.selected = 0;
+                inv.items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                lvl.setDayTime(6000);
+                dianaA = diana(lvl, ex, ez, 180f);
+                dianaB = diana(lvl, ex - 4.0, ez + 1.0, 135f);
+                enCombate(sp);
+            });
+        });
+        atTicks(t + 30, "antes de pegar", m -> logCombate(m, "antes"));
+        atTicks(t + 32, "clic: golpe ligero", m -> atacar(m));
+        atTicks(t + 36, "captura: preparando el tajo", m -> {
+            logCombate(m, "tajo 1");
+            shot(m, "cliente_c01_ligero_prepara");
+        });
+        atTicks(t + 38, "captura: el tajo", m -> shot(m, "cliente_c02_ligero_tajo"));
+        atTicks(t + 40, "clic: segundo de la cadena", m -> atacar(m));
+        atTicks(t + 46, "captura: el segundo", m -> {
+            logCombate(m, "tajo 2");
+            shot(m, "cliente_c03_cadena_2");
+        });
+        atTicks(t + 48, "clic: tercero de la cadena", m -> atacar(m));
+        atTicks(t + 55, "captura: el tercero", m -> {
+            logCombate(m, "tajo 3");
+            shot(m, "cliente_c04_cadena_3");
+        });
+        atTicks(t + 64, "tras la cadena (la estamina ha bajado)", m -> logCombate(m, "tras la cadena"));
+        atTicks(t + 66, "estamina sin limite para lo demas", m -> com.darkcraft.rol.Rol.sinLimite = true);
+        atTicks(t + 70, "mantener el clic: golpe fuerte cargado", m -> {
+            net.minecraft.client.KeyMapping.set(m.options.keyAttack.getKey(), true);
+            atacar(m);
+        });
+        atTicks(t + 90, "captura: cargando", m -> {
+            logCombate(m, "cargando");
+            shot(m, "cliente_c05_carga");
+        });
+        atTicks(t + 100, "soltar el clic", m -> net.minecraft.client.KeyMapping.set(m.options.keyAttack.getKey(), false));
+        atTicks(t + 109, "captura: el golpe fuerte", m -> {
+            logCombate(m, "golpe fuerte");
+            shot(m, "cliente_c06_pesado");
+        });
+        atTicks(t + 130, "tras el golpe fuerte", m -> logCombate(m, "tras el golpe fuerte"));
+        atTicks(t + 132, "corriendo + clic: ataque corriendo", m -> {
+            m.player.setSprinting(true);
+            atacar(m);
+        });
+        atTicks(t + 139, "captura: ataque corriendo", m -> {
+            logCombate(m, "corriendo");
+            shot(m, "cliente_c07_corriendo");
+        });
+        atTicks(t + 160, "saltar", m -> server(m, sp -> {
+            enCombate(sp);
+        }));
+        atTicks(t + 164, "saltar (cliente)", m -> m.player.jumpFromGround());
+        atTicks(t + 166, "en el aire + clic: golpe del salto", m -> atacar(m));
+        atTicks(t + 170, "captura: el salto, arriba", m -> {
+            logCombate(m, "salto arriba");
+            shot(m, "cliente_c08_salto_arriba");
+        });
+        atTicks(t + 178, "captura: al caer", m -> {
+            logCombate(m, "salto al caer");
+            shot(m, "cliente_c09_salto_cae");
+        });
+        atTicks(t + 196, "tercera persona: de lado y por delante", m -> verCombate(m));
+        atTicks(t + 200, "clic: golpe ligero", m -> atacar(m));
+        atTicks(t + 205, "captura: el tajo, de lado", m -> {
+            logCombate(m, "tajo visto de lado");
+            shot(m, "cliente_c10_tp_tajo");
+        });
+        atTicks(t + 208, "clic: el segundo", m -> atacar(m));
+        atTicks(t + 214, "captura: el segundo, de lado", m -> shot(m, "cliente_c11_tp_cadena"));
+        atTicks(t + 230, "mantener el clic", m -> {
+            net.minecraft.client.KeyMapping.set(m.options.keyAttack.getKey(), true);
+            atacar(m);
+        });
+        atTicks(t + 250, "captura: cargando, de lado", m -> {
+            logCombate(m, "cargando de lado");
+            shot(m, "cliente_c12_tp_carga");
+        });
+        atTicks(t + 254, "soltar", m -> net.minecraft.client.KeyMapping.set(m.options.keyAttack.getKey(), false));
+        atTicks(t + 263, "captura: el golpe fuerte, de lado", m -> shot(m, "cliente_c13_tp_pesado"));
+        atTicks(t + 280, "rodar hacia atras (visto de lado)", m -> {
+            m.options.hideGui = true;
+            verDesde(m, new Vec3(ex + 6.5, ey + 1.4, ez - 4.6), new Vec3(ex, ey + 0.7, ez - 4.6));
+            m.options.keyDown.setDown(true);
+            pulsar(com.darkcraft.client.ui.Teclas.RODAR);
+        });
+        atTicks(t + 281, "soltar la direccion", m -> m.options.keyDown.setDown(false));
+        atTicks(t + 285, "captura: rodando", m -> {
+            logCombate(m, "rodando");
+            shot(m, "cliente_c14_tp_rodar");
+        });
+        atTicks(t + 300, "tras rodar", m -> logCombate(m, "tras rodar"));
+        atTicks(t + 302, "de vuelta", m -> server(m, sp -> enCombate(sp)));
+        atTicks(t + 310, "rodar sin direccion: paso atras", m -> {
+            verCombate(m);
+            pulsar(com.darkcraft.client.ui.Teclas.RODAR);
+        });
+        atTicks(t + 314, "captura: paso atras", m -> {
+            logCombate(m, "paso atras");
+            shot(m, "cliente_c15_tp_paso_atras");
+        });
+        atTicks(t + 330, "el Mandoble del Juramento (a dos manos)", m -> server(m, sp -> {
+            sp.getInventory().items.set(0, new ItemStack(DarkCraftMod.MANDOBLE_JURAMENTO.get()));
+            enCombate(sp);
+        }));
+        atTicks(t + 340, "clic: barrido a dos manos", m -> atacar(m));
+        atTicks(t + 348, "captura: el barrido", m -> {
+            logCombate(m, "mandoble");
+            shot(m, "cliente_c16_tp_mandoble");
+        });
+        atTicks(t + 370, "primera persona y la espada; fijar el objetivo", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                sp.getInventory().items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                enCombate(sp);
+            });
+        });
+        atTicks(t + 378, "pulsar fijar", m -> pulsar(com.darkcraft.client.ui.Teclas.FIJAR));
+        atTicks(t + 386, "captura: el objetivo fijado", m -> {
+            logCombate(m, "fijado");
+            shot(m, "cliente_c17_fijado");
+        });
+        atTicks(t + 388, "mirar a otro lado: la camara vuelve al fijado", m -> {
+            m.player.setYRot(m.player.getYRot() - 70f);
+            log(String.format(java.util.Locale.ROOT, "  fijado: giro puesto a mano %.1f", m.player.getYRot()));
+        });
+        atTicks(t + 398, "tras volver", m -> logCombate(m, "fijado, tras mirar a otro lado"));
+        atTicks(t + 400, "el raton de golpe hacia la otra diana", m -> m.player.setYRot(m.player.getYRot() + 30f));
+        atTicks(t + 412, "captura: fijado el otro", m -> {
+            logCombate(m, "fijado el otro");
+            shot(m, "cliente_c18_fijado_otro");
+        });
+        atTicks(t + 416, "soltar", m -> {
+            pulsar(com.darkcraft.client.ui.Teclas.FIJAR);
+        });
+        atTicks(t + 420, "tras soltar", m -> logCombate(m, "suelto"));
+        atTicks(t + 424, "demasiado peso: armadura de netherita y dos mandobles", m -> server(m, sp -> {
+            var inv = sp.getInventory();
+            inv.items.set(0, new ItemStack(DarkCraftMod.MANDOBLE_JURAMENTO.get()));
+            inv.items.set(3, new ItemStack(DarkCraftMod.MANDOBLE_JURAMENTO.get()));
+            inv.armor.set(3, new ItemStack(net.minecraft.world.item.Items.NETHERITE_HELMET));
+            inv.armor.set(2, new ItemStack(net.minecraft.world.item.Items.NETHERITE_CHESTPLATE));
+            inv.armor.set(1, new ItemStack(net.minecraft.world.item.Items.NETHERITE_LEGGINGS));
+            inv.armor.set(0, new ItemStack(net.minecraft.world.item.Items.NETHERITE_BOOTS));
+            enCombate(sp);
+        }));
+        atTicks(t + 446, "rodar con sobrecarga: no se puede", m -> {
+            m.options.keyUp.setDown(true);
+            pulsar(com.darkcraft.client.ui.Teclas.RODAR);
+        });
+        atTicks(t + 447, "soltar la direccion", m -> m.options.keyUp.setDown(false));
+        atTicks(t + 452, "captura: el aviso de la sobrecarga", m -> {
+            logCombate(m, "sobrecargado");
+            log("  cartel: " + com.darkcraft.client.ui.Carteles.resumen());
+            shot(m, "cliente_c19_sobrecargado");
+        });
+        atTicks(t + 456, "el menu: el peso del equipo", m -> com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.EQUIPO));
+        atTicks(t + 470, "captura: el peso en el menu", m -> shot(m, "cliente_c20_menu_peso"));
+        atTicks(t + 474, "Fin del combate", m -> {
+            m.setScreen(null);
+            com.darkcraft.client.combate.Fijar.soltar();
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = true;
+            server(m, sp -> {
+                if (dianaA != null) dianaA.discard();
+                if (dianaB != null) dianaB.discard();
+                dianaA = dianaB = null;
+                sp.getInventory().clearContent();
+                sp.setHealth(sp.getMaxHealth());
+                sp.removeAllEffects();
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 490;
+    }
+
     private static void logArmasAt(int t, String what) {
         atTicks(t, "estado de las armas " + what, m -> logArmas(m, what));
     }
@@ -1095,6 +1518,8 @@ public final class ClientCiTest {
         fin = armas(fin);
         fin = rol(fin);
         fin = santuarios(fin);
+        fin = menu(fin);
+        fin = combate(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);
@@ -1135,7 +1560,7 @@ public final class ClientCiTest {
                 BlockPos p = com.darkcraft.santuario.Santuarios.deSitio(sp.server, castle[0] + "," + castle[1] + ":torre_ascenso");
                 log("  santuarios puestos: " + com.darkcraft.santuario.Santuarios.resumen(sp.server) + " | el de la torre: "
                         + (p == null ? "NO ESTA" : p.toShortString() + " " + sp.serverLevel().getBlockState(p)));
-                if (p != null) sp.teleportTo(sp.serverLevel(), p.getX() + 0.5, p.getY(), p.getZ() + 3.6, 180f, 10f);
+                if (p != null) mirarCofre(sp, p);
             });
         });
         at(19, "Captura del santuario de la torre", m -> shot(m, "cliente_01c_santuario_torre"));

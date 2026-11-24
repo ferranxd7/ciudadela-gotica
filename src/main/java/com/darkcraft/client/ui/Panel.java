@@ -45,6 +45,12 @@ public final class Panel {
         t(g, bd, x + w - e, y + h - f);
     }
 
+    /** El trozo repetido a lo ancho hasta llenar w pixeles. */
+    public static void tira(GuiGraphics g, MenuTex.T t, int x, int y, int w) {
+        Pix.mezcla();
+        mosaico(g, t, x, y, w, t.h());
+    }
+
     /** La losa de un panel: piedra oscura con doble marco de oro y tachuelas en las esquinas (minimo 24 x 24). */
     public static void losa(GuiGraphics g, int x, int y, int w, int h) {
         nueve(g, x, y, w, h, MenuTex.PANEL_AI, MenuTex.PANEL_A, MenuTex.PANEL_AD, MenuTex.PANEL_I, MenuTex.PANEL_C, MenuTex.PANEL_D,

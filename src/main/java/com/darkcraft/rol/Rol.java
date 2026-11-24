@@ -301,6 +301,24 @@ public final class Rol {
         de(p).fichaSucia = true;
     }
 
+    /**
+     * El combate propio gasta estamina al empezar cada golpe o voltereta: si no queda (o esta agotado), no se puede
+     * (devuelve false y el cliente lo nota). Sin limite (creativo, la prueba de la CI), siempre se puede.
+     */
+    public static boolean gastarCombate(ServerPlayer sp, float cuanto) {
+        if (libre(sp)) return true;
+        Estado s = de(sp);
+        if (s.agotado || s.estamina <= 0f) return false;
+        gastar(s, cuanto, PAUSA);
+        s.enviadaDec = -1;
+        return true;
+    }
+
+    /** Si el jugador gasta estamina (no en creativo ni en la prueba de la CI). */
+    public static boolean gasta(Player p) {
+        return !libre(p);
+    }
+
     private static void gastar(Estado s, float cuanto, int pausa) {
         s.estamina -= cuanto;
         s.pausa = Math.max(s.pausa, pausa);

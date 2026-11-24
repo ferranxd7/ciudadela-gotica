@@ -11,6 +11,10 @@ Las texturas de los menus del mod en pixel art (assets/darkcraft/textures/gui/me
   at_*         los iconos de los ocho atributos
   frasco_*     los frascos de vida (rojo) y de mana (azul), llenos y vacios; tambien salen sueltos como texturas de objeto
   santuario    el icono del santuario (la hoguera de almas)
+  ranura*      la ranura de un objeto (normal, elegida y cerrada): la usan el equipo, el inventario y la cruz del HUD
+  ico_*        iconos de las clases de objeto (espada, escudo, yelmo, pecho, piernas, botas, talisman, hechizo, objeto,
+               material, llave, todo) y sil_* los mismos en gris (lo que se ve en una ranura vacia)
+  cursor_*, punto*, candado, equipado, pestana, cruz_centro, logro_*, fijar*   piezas pequenas
 
     python3 tools/ui/menu.py [--vista carpeta]
 """
@@ -363,6 +367,317 @@ def santuario():
     return Lienzo(16, 16).sprite(SANTUARIO, PAL)
 
 
+# ---------------------------------------------------------------- ranuras del equipo y de la cruz del HUD
+RANURA = 22
+
+
+def ranura(tono=0):
+    """Una ranura de 22 x 22 para un objeto (16 x 16 dentro, a 3 del borde). tono: 0 normal, 1 elegida, 2 cerrada."""
+    n = RANURA
+    L = Lienzo(n, n, "#0a0810")
+    r = np.random.default_rng(71 + tono)
+    for _ in range(22):
+        L.px(int(r.integers(3, n - 3)), int(r.integers(3, n - 3)), "#0f0d16")
+    claro, medio, oscuro = [(ORO[4], ORO[3], ORO[1]), (ORO[6], ORO[5], ORO[3]), (PIEDRA[6], PIEDRA[5], PIEDRA[3])][tono]
+    for i in range(n):
+        L.px(i, 0, TINTA).px(i, n - 1, TINTA).px(0, i, TINTA).px(n - 1, i, TINTA)
+    for i in range(1, n - 1):
+        L.px(i, 1, claro).px(1, i, claro)
+        L.px(i, n - 2, oscuro).px(n - 2, i, oscuro)
+    for i in range(2, n - 2):
+        L.px(i, 2, "#050408").px(2, i, "#050408")
+        L.px(i, n - 3, PIEDRA[3]).px(n - 3, i, PIEDRA[3])
+    # las esquinas, achaflanadas con una tachuela
+    for (x, y) in ((0, 0), (n - 1, 0), (0, n - 1), (n - 1, n - 1)):
+        L.borrar(x, y)
+    for (x, y) in ((1, 1), (n - 2, 1), (1, n - 2), (n - 2, n - 2)):
+        L.px(x, y, TINTA)
+    for (x, y) in ((2, 2), (n - 3, 2), (2, n - 3), (n - 3, n - 3)):
+        L.px(x, y, medio)
+    if tono == 1:
+        # un resplandor rojo por dentro
+        for i in range(3, n - 3):
+            L.px(i, 3, ROJO[2]).px(3, i, ROJO[2]).px(i, n - 4, ROJO[1]).px(n - 4, i, ROJO[1])
+    return L
+
+
+ICONOS = {
+    "escudo": [
+        "................",
+        "..kkkkkkkkkkkk..",
+        ".kUTTTTqQTTTTSk.",
+        ".kTTSSSqQSSSSsk.",
+        ".kTSSSSqQSSSSsk.",
+        ".kTSSSSqQSSSSsk.",
+        ".kqqqqqqQqqqqqk.",
+        ".kQQQQQQoQQQQQk.",
+        ".kTSSSSqQSSSSsk.",
+        ".kTSSSSqQSSSssk.",
+        "..kSSSSqQSSSsk..",
+        "..kSSSSqQSSssk..",
+        "...kSSSqQSssk...",
+        "....kSSqQssk....",
+        ".....kkqQkk.....",
+        ".......kk.......",
+    ],
+    "yelmo": [
+        "................",
+        "......kkkk......",
+        "....kkUTTSkk....",
+        "...kUTTTTSSsk...",
+        "..kUTTTTTSSSsk..",
+        "..kTTTTqQSSSsk..",
+        "..kTTTTqQSSSsk..",
+        "..kqqqqqQqqqqk..",
+        "..kTkkkkQkkkSk..",
+        "..kTTTSqQSSSsk..",
+        "..kTSkSqQSkSsk..",
+        "..kTSkSqQSkssk..",
+        "..kTSSSqQSsssk..",
+        "...kSSSqQsssk...",
+        "....kkkkkkkk....",
+        "................",
+    ],
+    "pecho": [
+        "................",
+        "..kkk......kkk..",
+        ".kUTTk....kTSsk.",
+        ".kTTTTkkkkTSSsk.",
+        ".kTTTTTTTTSSSsk.",
+        "..kTTTTqQSSSsk..",
+        "..kkTTTqQSSskk..",
+        "...kTTTqQSSsk...",
+        "...kTTSqQSSsk...",
+        "...kTSSqQSSsk...",
+        "...kTSSqQSssk...",
+        "...kSSSqQSssk...",
+        "...kqqqqQqqqk...",
+        "...kSSSSSsssk...",
+        "....kkkkkkkk....",
+        "................",
+    ],
+    "piernas": [
+        "................",
+        "...kkkkkkkkkk...",
+        "...kqQQoQQQqk...",
+        "...kTTTTSSSsk...",
+        "...kTTTTSSSsk...",
+        "...kTTTkkSSsk...",
+        "...kTTSkkSSsk...",
+        "...kTTSk.kSsk...",
+        "...kTSSk.kSsk...",
+        "...kqqqk.kqqk...",
+        "...kTSSk.kSsk...",
+        "...kTSSk.kssk...",
+        "...kSSSk.kssk...",
+        "...kSSsk.kssk...",
+        "...kkkkk.kkkk...",
+        "................",
+    ],
+    "botas": [
+        "................",
+        "................",
+        "...kkkk...kkkk..",
+        "...kTSk...kTSk..",
+        "...kTSk...kTSk..",
+        "...kTSk...kTSk..",
+        "...kqQk...kqQk..",
+        "...kTSk...kTSk..",
+        "...kTSk...kTSk..",
+        "..kTTSk..kTTSk..",
+        ".kUTSSk.kUTSSk..",
+        ".kTSSSkkkTSSSk..",
+        ".kSSSsk.kSSSsk..",
+        ".kkkkkk.kkkkkk..",
+        "................",
+        "................",
+    ],
+    "talisman": [
+        "................",
+        "....kk....kk....",
+        "...kqk....kqk...",
+        "...kqk....kqk...",
+        "....kqk..kqk....",
+        ".....kqkkqk.....",
+        "......kQQk......",
+        ".....kQooQk.....",
+        "....kQoOOoQk....",
+        "....kQOYORQk....",
+        "....kQOORrQk....",
+        "....kQoRroQk....",
+        ".....kQooQk.....",
+        "......kQQk......",
+        ".......kk.......",
+        "................",
+    ],
+    "hechizo": [
+        "................",
+        "...........kk...",
+        "..........kXXk..",
+        ".........kXXxck.",
+        ".........kXxcck.",
+        "..........kcck..",
+        ".........kQkk...",
+        "........kfFk....",
+        ".......kfFk.....",
+        "......kfFk......",
+        ".....kfFk.......",
+        "....kfFk........",
+        "...kfFk.........",
+        "..kfFk..........",
+        "..kkk...........",
+        "................",
+    ],
+    "objeto": [
+        "................",
+        "......kkkk......",
+        ".....kvVVvk.....",
+        "......kqQk......",
+        ".....kkvvkk.....",
+        "....kvVVVVvk....",
+        "...kvVVwVVVvk...",
+        "..kvVVwVVVVVvk..",
+        "..kvVVVVVVVVvk..",
+        "..kvVVVVVVVvvk..",
+        "..kvVVVVVVvvvk..",
+        "..kvvVVVVvvvvk..",
+        "...kvvvvvvvvk...",
+        "....kkkkkkkk....",
+        "................",
+        "................",
+    ],
+    "material": [
+        "................",
+        "................",
+        "................",
+        "......kkkkkkk...",
+        ".....kUUTTTSk...",
+        "....kUTTTTSSk...",
+        "...kUTTTTSSsk...",
+        "..kkkkkkkkksk...",
+        "..kTTTTTTSksk...",
+        "..kTSSSSSSkk....",
+        "..kSSSSSSsk.....",
+        "..kkkkkkkkk.....",
+        "................",
+        "................",
+        "................",
+        "................",
+    ],
+    "llave": [
+        "................",
+        "................",
+        "................",
+        "...kkkk.........",
+        "..kQooQk........",
+        ".kQokkoQk.......",
+        ".kQk..kQkkkkkkk.",
+        ".kQk..kQQQQQQQk.",
+        ".kQokkoQkkQkQqk.",
+        "..kQqqQk.kqkqk..",
+        "...kkkk...k.k...",
+        "................",
+        "................",
+        "................",
+        "................",
+        "................",
+    ],
+    "todo": [
+        "................",
+        "................",
+        "..kkkkkk.kkkkkk.",
+        "..kQQQQk.kQQQQk.",
+        "..kQooQk.kQooQk.",
+        "..kQoqQk.kQoqQk.",
+        "..kQqqQk.kQqqQk.",
+        "..kkkkkk.kkkkkk.",
+        "................",
+        "..kkkkkk.kkkkkk.",
+        "..kQQQQk.kQQQQk.",
+        "..kQooQk.kQooQk.",
+        "..kQoqQk.kQoqQk.",
+        "..kQqqQk.kQqqQk.",
+        "..kkkkkk.kkkkkk.",
+        "................",
+    ],
+}
+
+
+def icono(nombre):
+    pal = dict(PAL)
+    pal.update({"v": "#5a3a1c", "V": "#8a5c2c", "w": "#b88848"})
+    filas = ATRIBUTOS["destreza"] if nombre == "espada" else ICONOS[nombre]
+    return Lienzo(16, 16).sprite(filas, pal)
+
+
+def silueta(nombre):
+    """El icono en gris oscuro (lo que se ve en una ranura vacia)."""
+    L = icono(nombre)
+    for y in range(16):
+        for x in range(16):
+            r, g, b, a = L.leer(x, y)
+            if a == 0:
+                continue
+            luz = (r * 0.35 + g * 0.45 + b * 0.2) / 255.0
+            L.px(x, y, PIEDRA[2] if luz < 0.12 else PIEDRA[4] if luz < 0.5 else PIEDRA[5])
+    return L
+
+
+def piezas():
+    """Piezas pequenas: las cuatro esquinas del cursor, puntitos, candado, marca de equipado y adornos."""
+    p = {}
+    esq = ["kkkkkk.", "kyyyyk.", "kyQQkk.", "kyQk...", "kyQk...", "kkkk...", "......."]
+    c = Lienzo(7, 7).sprite(esq, PAL)
+    p["cursor_ai"], p["cursor_ad"] = c, c.espejo_h()
+    p["cursor_bi"], p["cursor_bd"] = c.espejo_v(), c.espejo_h().espejo_v()
+    p["punto"] = Lienzo(5, 5).sprite([".kkk.", "kssSk", "kspsk", "kpppk", ".kkk."], PAL)
+    p["punto_luz"] = Lienzo(5, 5).sprite([".kkk.", "kyyQk", "kyoQk", "kQQqk", ".kkk."], PAL)
+    p["candado"] = Lienzo(9, 11).sprite([
+        "..kkkkk..", ".kSSSSSk.", ".kSkkkSk.", ".kSk.kSk.", "kkkkkkkkk", "kqQQQQQqk", "kQQkkQQqk", "kQQkkQqqk",
+        "kQQQkQqqk", "kqqqqqqqk", "kkkkkkkkk"], PAL)
+    # la marca del objetivo fijado (el combate): un rombo de oro con el centro rojo, y su latido mas claro
+    p["fijar"] = Lienzo(9, 9).sprite([
+        "....k....", "...kqk...", "..kqQqk..", ".kqQRQqk.", "kqQRORQqk", ".kqQRQqk.", "..kqQqk..", "...kqk...", "....k...."], PAL)
+    p["fijar_luz"] = Lienzo(9, 9).sprite([
+        "....k....", "...kQk...", "..kQyQk..", ".kQyOyQk.", "kQyOWOyQk", ".kQyOyQk.", "..kQyQk..", "...kQk...", "....k...."], PAL)
+    p["equipado"] = Lienzo(7, 7).sprite([".kkkkk.", "kOOOOOk", "kOkkkkk", "kOOOOk.", "kOkkkkk", "kOOOOOk", ".kkkkk."], PAL)
+    # el adorno de la pestana elegida: una raya de oro con un rombo en medio
+    m = Lienzo(41, 7)
+    for x in range(41):
+        d = abs(x - 20)
+        if d > 4:
+            m.px(x, 3, ORO[4] if d < 14 else ORO[3] if d < 18 else ORO[2])
+            if d < 16:
+                m.px(x, 4, ORO[1])
+    m.sprite(["...k...", "..kQk..", ".kQyQk.", "kQyRyQk", ".kQyQk.", "..kQk..", "...k..."], PAL, 17, 0)
+    p["pestana"] = m
+    # el centro de la cruz del HUD: un rombo con cuatro brazos
+    z = Lienzo(RANURA, RANURA)
+    for i in range(RANURA):
+        if abs(i - 10.5) > 4:
+            z.px(i, 10, ORO[2]).px(i, 11, ORO[1]).px(10, i, ORO[2]).px(11, i, ORO[1])
+    z.sprite(["...kkkk...", "..kqQQqk..", ".kqQyyQqk.", "kqQyRRyQqk", "kQyRORRyQk", "kQyRRrRyQk", "kqQyRryQqk", ".kqQyyQqk.",
+              "..kqQQqk..", "...kkkk..."], PAL, 6, 6)
+    p["cruz_centro"] = z
+    # el aviso de "has conseguido": una banda en tres trozos, 20 de alto
+    for parte in ("izq", "med", "der"):
+        w = 12 if parte != "med" else 8
+        t = Lienzo(w, 20)
+        for x in range(w):
+            xx = x if parte == "izq" else (w - 1 - x if parte == "der" else 99)
+            k = 1.0 if parte == "med" else min(1.0, (xx + 1) / 9)
+            for y in range(20):
+                if y in (0, 19):
+                    cc = rgba(mezcla(ORO[1], ORO[4], k)[:3], int(255 * k))
+                elif y in (1, 18):
+                    cc = rgba(ORO[1], int(230 * k))
+                else:
+                    cc = rgba(PIEDRA[1], int(225 * k))
+                t.px(x, y, cc)
+        p["logro_" + parte] = t
+    return p
+
+
 # ---------------------------------------------------------------- montar
 def montar():
     A = Atlas(256, 128)
@@ -382,6 +697,14 @@ def montar():
         A.poner("frasco_" + nombre, frasco(c))
         A.poner("frasco_" + nombre + "_vacio", frasco(c, False))
     A.poner("santuario", santuario())
+    for i, n in enumerate(("", "_luz", "_cerrada")):
+        A.poner("ranura" + n, ranura(i))
+    for n in ("espada", "escudo", "yelmo", "pecho", "piernas", "botas", "talisman", "hechizo", "objeto", "material", "llave", "todo"):
+        A.poner("ico_" + n, icono(n))
+    for n in ("espada", "escudo", "yelmo", "pecho", "piernas", "botas", "talisman", "hechizo", "objeto"):
+        A.poner("sil_" + n, silueta(n))
+    for n, t in piezas().items():
+        A.poner(n, t)
     A.L.guardar(os.path.join(GUI, "menu.png"))
     ruta = os.path.join(REPO, "src/main/java/com/darkcraft/client/ui/MenuTex.java")
     with open(ruta, "w", encoding="utf-8") as fh:

@@ -59,6 +59,13 @@ public final class Carteles {
         while (COLA.size() > 4) COLA.poll();
     }
 
+    /** Un aviso corto que decide el propio cliente (como los que manda el servidor). */
+    public static void aviso(Component texto) {
+        aviso = texto;
+        avisoInicio = ClientRol.ticks;
+        Panel.nada();
+    }
+
     /** Un sitio de dentro de una zona (solo existe en el cliente: el servidor manda ZONA y aqui se decide). */
     public static final int LUGAR = 5;
 

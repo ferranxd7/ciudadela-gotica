@@ -396,6 +396,176 @@ def nivel(L, W, H, base, nuevo, sel=0, ecos=12438, coste=1346, titulo="Subir de 
     tecla(L, "E", "Confirmar", tx, by + 4, APAGADO)
 
 
+# ---------------------------------------------------------------- el menu del mod (R)
+PESTANAS = ["Equipo", "Inventario", "Estado", "Sistema"]
+
+
+def ranura(L, x, y, icono=None, elegida=False, alfa=1.0, equipado=False, cuenta=None):
+    pegar(L, TM("ranura_luz" if elegida else "ranura"), x, y, alfa)
+    if icono:
+        pegar(L, TM(icono), x + 3, y + 3, alfa)
+    if cuenta:
+        MC.escribir(L, cuenta, x + 20 - MC.ancho(cuenta), y + 12, (255, 255, 255))
+    if equipado:
+        L.pegar(TM("equipado"), x + 1, y + 1)
+    if elegida:
+        L.pegar(TM("cursor_ai"), x - 2, y - 2)
+        L.pegar(TM("cursor_ad"), x + 22 - 5, y - 2)
+        L.pegar(TM("cursor_bi"), x - 2, y + 22 - 5)
+        L.pegar(TM("cursor_bd"), x + 22 - 5, y + 22 - 5)
+
+
+def marco_menu(L, W, H, pestana):
+    fill(L, 0, 0, W, H, 0x050408, 176)
+    paso = min(104, (W - 20) // 4)
+    for i, n in enumerate(PESTANAS):
+        cx = W // 2 + int(round((i - 1.5) * paso))
+        w = anchoG("gotica_m", n)
+        gotica(L, "gotica_m", n, cx - w // 2, 7, 0xF6E3A0 if i == pestana else 0x8A6A30)
+        if i == pestana:
+            L.pegar(TM("pestana"), cx - 20, 21)
+    px, py, pw, ph = 8, 30, W - 16, H - 30 - 22
+    losa(L, px, py, pw, ph)
+    ty = H - 17
+    tx = px + 4
+    tx = tecla(L, "Tab", "Pestaña", tx, ty, APAGADO) + 10
+    tx = tecla(L, "E", "Elegir", tx, ty, APAGADO) + 10
+    if pestana == 0:
+        tx = tecla(L, "Supr", "Quitar", tx, ty, APAGADO) + 10
+    tecla(L, "Esc", "Cerrar", tx, ty, APAGADO)
+    return px, py, pw, ph
+
+
+def personaje(L, x, y, w, h):
+    hueco(L, x, y, w, h)
+    # un monigote donde ira el jugador
+    esc = max(20, min((h - 26) * 10 // 21, w * 10 // 13, 78))
+    alto = int(esc * 1.8)
+    cx, pie = x + w // 2, y + h - 12
+    fill(L, cx - esc // 4, pie - alto, cx + esc // 4, pie - alto + esc // 2, 0x8A7A66)
+    fill(L, cx - esc // 4, pie - alto + esc // 2, cx + esc // 4, pie - esc * 3 // 4, 0x3A6A8A)
+    fill(L, cx - esc // 4, pie - esc * 3 // 4, cx + esc // 4, pie, 0x2A2A5A)
+    fill(L, cx - esc // 2, pie - alto + esc // 2, cx - esc // 4, pie - esc * 3 // 4, 0x8A7A66)
+    fill(L, cx + esc // 4, pie - alto + esc // 2, cx + esc // 2, pie - esc * 3 // 4, 0x8A7A66)
+
+
+def menu_equipo(L, W, H, lista=False):
+    px, py, pw, ph = marco_menu(L, W, H, 0)
+    x0 = px + 14
+    fila_y = [py + 22 + i * 42 for i in range(3)]
+    for (nombre, x, y) in (("Mano derecha", x0, fila_y[0]), ("Mano izquierda", x0 + 90, fila_y[0]), ("Armadura", x0, fila_y[1]),
+                           ("Objetos rápidos", x0, fila_y[2])):
+        MC.escribir(L, nombre, x, y - 11, rgb(APAGADO))
+    ranura(L, x0, fila_y[0], "ico_espada", elegida=not lista)
+    ranura(L, x0 + 25, fila_y[0], "ico_espada")
+    ranura(L, x0 + 50, fila_y[0], "sil_espada")
+    ranura(L, x0 + 90, fila_y[0], "ico_escudo")
+    ranura(L, x0 + 115, fila_y[0], "sil_escudo")
+    ranura(L, x0 + 140, fila_y[0], "sil_escudo")
+    for i, n in enumerate(("yelmo", "pecho", "piernas", "botas")):
+        ranura(L, x0 + i * 25, fila_y[1], ("ico_" if i == 1 else "sil_") + n, elegida=lista and i == 0)
+    ranura(L, x0, fila_y[2], "frasco_vida", cuenta="3")
+    ranura(L, x0 + 25, fila_y[2], "frasco_mana", cuenta="1")
+    for i in range(4):
+        ranura(L, x0 + (i + 2) * 25, fila_y[2], "ico_objeto" if i == 0 else "sil_objeto", cuenta="3" if i == 0 else None)
+    cw = max(98, min(150, pw // 4))
+    cx = px + pw - 12 - cw
+    sx, sx1 = x0 + 180, cx - 10
+    if sx1 - sx >= 84:
+        sy = py + 14
+        for i, (n, v) in enumerate((("Nivel", "12"), ("Vida", "115/130"), ("Maná", "100/106"), ("Estamina", "106"), ("Ataque", "7.2"), ("Defensa", "12"))):
+            MC.escribir(L, n, sx, sy + i * 13, rgb(CLARO))
+            MC.escribir(L, v, sx1 - MC.ancho(v), sy + i * 13, rgb(ORO))
+    personaje(L, cx, py + 10, cw, ph - 20)
+    dy = fila_y[2] + 22 + 9
+    raya(L, x0 - 4, cx - 8, dy - 5)
+    gotica(L, "gotica_m", "Espada de hierro", x0, dy, 0xE9C766)
+    for i, linea in enumerate(("Al tener en la mano principal:", " 6 de daño de ataque", " 1.6 de velocidad de ataque")[:max(0, (py + ph - 8 - (dy + 17)) // 9)]):
+        MC.escribir(L, linea, x0, dy + 17 + i * 9, rgb(APAGADO), False)
+    if lista:
+        x, y, w = x0 + 22 + 6, fila_y[1] - 6, 178
+        filas = ["Yelmo de hierro", "Casco de tortuga"]
+        losa(L, x, y, w, 12 + len(filas) * 18)
+        for i, n in enumerate(filas):
+            fy = y + 6 + i * 18
+            if i == 0:
+                fila(L, x + 5, fy, w - 10)
+            L.pegar(TM("ico_yelmo"), x + 9, fy + 1)
+            MC.escribir(L, n, x + 30, fy + 5, rgb(LUZ if i == 0 else CLARO))
+
+
+def menu_bolsa(L, W, H):
+    px, py, pw, ph = marco_menu(L, W, H, 1)
+    gx, gy = px + 14, py + 40
+    clases = ["todo", "espada", "pecho", "objeto", "material", "llave"]
+    for i, n in enumerate(clases):
+        pegar(L, TM("ranura_luz" if i == 1 else "ranura"), gx + i * 25, py + 10)
+        pegar(L, TM("ico_" + n), gx + i * 25 + 3, py + 13, 1.0 if i == 1 else 0.6)
+    gotica(L, "gotica_m", "Armas", gx + 6 * 25 + 6, py + 14, 0xE9C766)
+    filas = max(1, (ph - 40 - 22) // 24)
+    cosas = ["ico_espada", "ico_espada", "ico_escudo", "ico_hechizo", "ico_espada", "ico_material", "ico_objeto", "ico_llave", "ico_yelmo", "ico_pecho",
+             "ico_botas", "ico_espada", "ico_escudo"]
+    for r in range(filas):
+        for c in range(9):
+            k = r * 9 + c
+            x, y = gx + c * 24, gy + r * 24
+            if k < len(cosas):
+                ranura(L, x, y, cosas[k], elegida=k == 3, equipado=k >= 10)
+            else:
+                pegar(L, TM("ranura"), x, y, 0.35)
+    MC.escribir(L, "Bolsa: 12 / 27", gx, py + ph - 17, rgb(APAGADO))
+    x = gx + 9 * 24 + 6
+    y, w, h = py + 10, px + pw - 12 - x, ph - 20
+    if w >= 90:
+        hueco(L, x, y, w, h)
+        big = TM("ico_hechizo").imagen().resize((32, 32), 0)
+        im = L.imagen()
+        im.alpha_composite(big, (x + 7, y + 7))
+        L.a[:] = np.asarray(im)
+        nombre = "Mandoble del Juramento"
+        # el nombre, en dos lineas si hace falta
+        partes, actual = [], ""
+        for palabra in nombre.split(" "):
+            prueba = (actual + " " + palabra).strip()
+            if anchoG("gotica_m", prueba) <= w - 50 or not actual:
+                actual = prueba
+            else:
+                partes.append(actual)
+                actual = palabra
+        partes.append(actual)
+        for i, parte in enumerate(partes[:2]):
+            gotica(L, "gotica_m", parte, x + 44, y + 8 + i * 15, 0xE9C766)
+        ly = y + 44
+        MC.escribir(L, "Armas", x + 8, ly, rgb(ORO))
+        raya(L, x + 6, x + w - 6, ly + 11)
+        lineas = []
+        for t in ("A dos manos. Shift + clic: Raíces del Juramento.", "Ctrl + clic: Juicio de Espinas.", "Al tener en la mano principal:",
+                  " 11 de daño de ataque", " 1 de velocidad de ataque"):
+            lineas += MC.partir(t, w - 16)
+        caben = max(0, (y + h - 32 - (ly + 17)) // 9)
+        for i, linea in enumerate(lineas[:caben]):
+            MC.escribir(L, linea, x + 8, ly + 17 + i * 9, rgb(APAGADO), False)
+        ay = y + h - 29
+        tecla(L, "E", "Equipar", x + 8, ay, CLARO)
+        tecla(L, "Supr", "Tirar", x + 8, ay + 14, CLARO)
+
+
+def cruz(L, H):
+    x0, y0 = 4, H - 4 - 66
+    L.pegar(TM("cruz_centro"), x0 + 22, y0 + 22)
+    pegar(L, TM("ranura"), x0 + 22, y0, 0.55)
+    pegar(L, TM("sil_hechizo"), x0 + 25, y0 + 3, 0.55)
+    ranura(L, x0 + 44, y0 + 22, "ico_espada")
+    ranura(L, x0, y0 + 22, "ico_escudo")
+    ranura(L, x0 + 22, y0 + 44, "frasco_vida", cuenta="3")
+    for i in range(3):
+        L.pegar(TM("punto_luz" if i == 0 else "punto"), x0 + 44 + 3 + i * 6, y0 + 45)
+    for i in range(3):
+        L.pegar(TM("punto_luz" if i == 0 else "punto"), x0 + 46 + i * 6, y0 + 44 + 14)
+    MC.escribir(L, "Z", x0 + 22 - 3 - MC.ancho("Z"), y0 + 44 + 12, rgb(APAGADO))
+    MC.escribir(L, "Espada de hierro", x0 + 66 + 6, y0 + 29, rgb(CLARO))
+
+
 if __name__ == "__main__":
     fondo, escala, out = sys.argv[1], int(sys.argv[2]), sys.argv[3]
     MC = LetraMc(sys.argv[4] if len(sys.argv) > 4 else None)
@@ -422,3 +592,15 @@ if __name__ == "__main__":
     L = arte.Lienzo(W, H)
     nivel(L, W, H, [10] * 8, [12, 10, 11, 10, 11, 10, 10, 10], sel=0)
     guardar(L, "m_nivel_%d.png" % escala)
+    L = arte.Lienzo(W, H)
+    cruz(L, H)
+    guardar(L, "m_cruz_%d.png" % escala)
+    L = arte.Lienzo(W, H)
+    menu_equipo(L, W, H)
+    guardar(L, "m_equipo_%d.png" % escala)
+    L = arte.Lienzo(W, H)
+    menu_equipo(L, W, H, lista=True)
+    guardar(L, "m_equipo_lista_%d.png" % escala)
+    L = arte.Lienzo(W, H)
+    menu_bolsa(L, W, H)
+    guardar(L, "m_bolsa_%d.png" % escala)

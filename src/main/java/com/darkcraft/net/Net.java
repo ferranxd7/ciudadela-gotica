@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "7";
+    private static final String V = "8";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -86,6 +86,158 @@ public final class Net {
                 .encoder(Santuario::write).decoder(Santuario::read).consumerMainThread(Santuario::handle).add();
         CH.messageBuilder(RepartoFrascos.class, id++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(RepartoFrascos::write).decoder(RepartoFrascos::read).consumerMainThread(RepartoFrascos::handle).add();
+        CH.messageBuilder(EquipoAccion.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(EquipoAccion::write).decoder(EquipoAccion::read).consumerMainThread(EquipoAccion::handle).add();
+        CH.messageBuilder(Conseguido.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Conseguido::write).decoder(Conseguido::read).consumerMainThread(Conseguido::handle).add();
+        CH.messageBuilder(Ataque.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Ataque::write).decoder(Ataque::read).consumerMainThread(Ataque::handle).add();
+        CH.messageBuilder(Rodar.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Rodar::write).decoder(Rodar::read).consumerMainThread(Rodar::handle).add();
+        CH.messageBuilder(GolpeVisto.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(GolpeVisto::write).decoder(GolpeVisto::read).consumerMainThread(GolpeVisto::handle).add();
+        CH.messageBuilder(GolpeNo.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder((m, b) -> {}).decoder(b -> new GolpeNo()).consumerMainThread(GolpeNo::handle).add();
+        CH.messageBuilder(Impacto.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Impacto::write).decoder(Impacto::read).consumerMainThread(Impacto::handle).add();
+    }
+
+    // ------------------------------------------------------------------ el combate propio
+
+    /** El cliente empieza un golpe (accion de {@code combate.Armas}, paso de la cadena, mano izquierda, ticks cargados). */
+    public record Ataque(int accion, int paso, boolean izquierda, int carga) {
+        void write(FriendlyByteBuf b) {
+            b.writeByte(accion);
+            b.writeByte(paso);
+            b.writeBoolean(izquierda);
+            b.writeByte(carga);
+        }
+
+        static Ataque read(FriendlyByteBuf b) {
+            return new Ataque(b.readByte(), b.readByte(), b.readBoolean(), b.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.combate.Combate.pedir(p, accion, paso, izquierda, carga);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El cliente rueda hacia (dx, dz) (o da un paso atras). */
+    public record Rodar(float dx, float dz, boolean atras) {
+        void write(FriendlyByteBuf b) {
+            b.writeFloat(dx);
+            b.writeFloat(dz);
+            b.writeBoolean(atras);
+        }
+
+        static Rodar read(FriendlyByteBuf b) {
+            return new Rodar(b.readFloat(), b.readFloat(), b.readBoolean());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.combate.Combate.rodar(p, dx, dz, atras);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Otro jugador empieza un golpe, una carga o una voltereta (extra: el rumbo de la voltereta en grados). */
+    public record GolpeVisto(int entity, int accion, int paso, boolean izquierda, int tipo, int extra) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entity);
+            b.writeByte(accion);
+            b.writeByte(paso);
+            b.writeBoolean(izquierda);
+            b.writeByte(tipo);
+            b.writeShort(extra);
+        }
+
+        static GolpeVisto read(FriendlyByteBuf b) {
+            return new GolpeVisto(b.readVarInt(), b.readByte(), b.readByte(), b.readBoolean(), b.readByte(), b.readShort());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.combate.Poses.visto(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El servidor no deja el golpe o la voltereta que pidio el cliente (sin estamina, bebiendo...). */
+    public record GolpeNo() {
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.combate.ClientCombate.rechazado());
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El golpe del jugador ha alcanzado a alguien (la camara se sacude; mas si es fuerte). */
+    public record Impacto(boolean fuerte) {
+        void write(FriendlyByteBuf b) {
+            b.writeBoolean(fuerte);
+        }
+
+        static Impacto read(FriendlyByteBuf b) {
+            return new Impacto(b.readBoolean());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.combate.ClientCombate.impacto(fuerte));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El jugador acaba de recoger algo: sale abajo en el centro (el dibujo, el nombre y cuantos). */
+    public record Conseguido(net.minecraft.world.item.ItemStack objeto) {
+        void write(FriendlyByteBuf b) {
+            b.writeItem(objeto);
+        }
+
+        static Conseguido read(FriendlyByteBuf b) {
+            return new Conseguido(b.readItem());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.Conseguidos.recibir(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    // ------------------------------------------------------------------ rol: el equipo (lo que pide el menu del mod)
+
+    /**
+     * El menu del mod pide algo con el equipo: {@link #MOVER} cambia entre si lo de dos huecos del inventario (a y b),
+     * {@link #GUARDAR} deja en la bolsa lo del hueco a, {@link #TIRAR} lo tira al suelo e {@link #IZQUIERDA} pasa la mano
+     * izquierda a su repuesto (a = 3 o 4, o -1 para el siguiente). Los huecos son los de {@code rol.Equipo}.
+     */
+    public record EquipoAccion(int que, int a, int b) {
+        public static final int MOVER = 0, GUARDAR = 1, TIRAR = 2, IZQUIERDA = 3;
+
+        void write(FriendlyByteBuf b2) {
+            b2.writeByte(que);
+            b2.writeByte(a);
+            b2.writeByte(b);
+        }
+
+        static EquipoAccion read(FriendlyByteBuf b) {
+            return new EquipoAccion(b.readByte(), b.readByte(), b.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) {
+                switch (que) {
+                    case MOVER -> com.darkcraft.rol.Equipo.mover(p, a, b);
+                    case GUARDAR -> com.darkcraft.rol.Equipo.guardar(p, a);
+                    case TIRAR -> com.darkcraft.rol.Equipo.tirar(p, a);
+                    case IZQUIERDA -> com.darkcraft.rol.Equipo.manoIzquierda(p, a);
+                    default -> {
+                    }
+                }
+            }
+            ctx.get().setPacketHandled(true);
+        }
     }
 
     // ------------------------------------------------------------------ rol: la ficha, subir de nivel, frascos y santuarios

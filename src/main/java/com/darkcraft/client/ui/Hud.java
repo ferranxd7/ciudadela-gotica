@@ -33,7 +33,8 @@ import java.util.Locale;
  * <li>arriba a la izquierda, el emblema de la Sombra y las barras de <b>vida</b> (roja), <b>mana</b> (azul: la energia
  * de las armas) y <b>estamina</b> (verde); nada de corazones, comida, armadura ni experiencia;</li>
  * <li>abajo a la derecha, el contador de <b>Ecos de la Sombra</b>;</li>
- * <li>abajo a la izquierda, los <b>frascos</b> (rojo de vida y azul de mana) con los que quedan y su tecla;</li>
+ * <li>abajo a la izquierda, la <b>cruz del equipo</b> ({@link Cruz}: las dos manos, el objeto rapido con los frascos);</li>
+ * <li>abajo en el centro, lo que se va recogiendo ({@link Conseguidos});</li>
  * <li>arriba en el centro, la <b>brujula</b>;</li>
  * <li>encima de la barra de objetos, los avisos de "Pulsa [E]...".</li>
  * </ul>
@@ -43,7 +44,7 @@ import java.util.Locale;
 public final class Hud {
     private Hud() {}
 
-    private static final ResourceLocation BRILLO = new ResourceLocation(DarkCraftMod.MODID, "textures/gui/brillo.png");
+    static final ResourceLocation BRILLO = new ResourceLocation(DarkCraftMod.MODID, "textures/gui/brillo.png");
     /** Donde va el emblema; las barras salen de su derecha. */
     private static final int X0 = 3, Y0 = 3;
 
@@ -121,18 +122,28 @@ public final class Hud {
 
     // ------------------------------------------------------------------ dibujo
 
+    /** Con una pantalla grande del mod delante (el libro, el menu, subir de nivel) el HUD no se dibuja: estorbaria. */
+    public static boolean tapado(Minecraft mc) {
+        return mc.screen instanceof com.darkcraft.client.espejo.LibroScreen || mc.screen instanceof MenuScreen || mc.screen instanceof NivelScreen;
+    }
+
     public static void render(ForgeGui gui, GuiGraphics g, float pt, int w, int h) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer p = mc.player;
         if (p == null || mc.level == null || mc.options.hideGui || p.isSpectator() || !p.isAlive()) return;
-        if (mc.screen instanceof com.darkcraft.client.espejo.LibroScreen) return;
+        if (tapado(mc)) return;
         float t = ClientRol.ticks + pt;
         int fin = X0 + 24;
+        // la marca del objetivo fijado, debajo de todo lo demas
+        com.darkcraft.client.combate.Fijar.dibujar(g, w, h, pt);
         if (gui.shouldDrawSurvivalElements()) {
             fin = barras(mc, g, p, t, w);
-            if (!(mc.screen instanceof net.minecraft.client.gui.screens.ChatScreen)) frascos(mc, g, t, h);
+            // abajo a la izquierda, la cruz del equipo (lleva los frascos en su hueco de abajo)
+            if (!(mc.screen instanceof net.minecraft.client.gui.screens.ChatScreen) && !(mc.screen instanceof MenuScreen) && ClientEquipo.activo())
+                Cruz.dibujar(mc, g, t, h);
         }
         ecos(mc, g, t, w, h);
+        if (mc.screen == null) Conseguidos.dibujar(mc, g, t, w, h);
         if (!mc.options.renderDebug && ClientRol.ticks - jefeTick > 3) brujula(mc, g, p, pt, w, fin);
         if (avisoAlfa > 0.02f) avisoDeTecla(mc, g, w, h);
         Pix.blanco();
@@ -217,43 +228,6 @@ public final class Hud {
             Pix.mezcla();
         }
         return x + 3 + Math.max(largoVida, Math.max(largoMana, largoEst)) + 8;
-    }
-
-    // ---- los frascos
-
-    /**
-     * Los dos frascos abajo a la izquierda: cada uno en su hueco de piedra, con los tragos que quedan y, encima, su
-     * tecla. Vacio, se ve apagado; al beber da un destello y, si no se pudo beber, se sacude.
-     */
-    private static void frascos(Minecraft mc, GuiGraphics g, float t, int h) {
-        Font f = mc.font;
-        int y = h - 4 - 24, col = 0;
-        for (int i = 0; i < 2; i++) {
-            boolean mana = i == 1;
-            int total = mana ? ClientRol.frascosMana : ClientRol.frascosVida, quedan = mana ? ClientRol.quedanMana : ClientRol.quedanVida;
-            if (total <= 0) continue;
-            int x = 4 + (col++) * 28;
-            float sacude = t - Bebida.sacudeTick;
-            if (Bebida.sacudeTipo == i && sacude >= 0 && sacude < 9) x += Math.round(Mth.sin(sacude * 2.4f) * 2.2f * (1f - sacude / 9f));
-            Pix.blanco();
-            Panel.hueco(g, x, y, 24, 24);
-            Panel.t(g, quedan > 0 ? (mana ? MenuTex.FRASCO_MANA : MenuTex.FRASCO_VIDA) : (mana ? MenuTex.FRASCO_MANA_VACIO : MenuTex.FRASCO_VIDA_VACIO), x + 4, y + 3);
-            float trago = t - Bebida.tragoTick;
-            if (Bebida.tragoTipo == i && trago >= 0 && trago < 18) {
-                Pix.suma();
-                if (mana) Pix.color(0.35f, 0.6f, 1f, 0.75f * (1f - trago / 18f));
-                else Pix.color(1f, 0.3f, 0.22f, 0.75f * (1f - trago / 18f));
-                g.blit(BRILLO, x - 4, y - 4, 32, 32, 0, 0, 64, 64, 64, 64);
-                Pix.blanco();
-                Pix.mezcla();
-            }
-            String n = Integer.toString(quedan);
-            g.drawString(f, n, x + 22 - f.width(n), y + 14, quedan > 0 ? 0xFFF6E3A0 : 0xFFB03038, true);
-            String k = (mana ? Teclas.FRASCO_MANA : Teclas.FRASCO_VIDA).getTranslatedKeyMessage().getString().toUpperCase(Locale.ROOT);
-            if (f.width(k) <= 24) g.drawString(f, k, x + 12 - f.width(k) / 2, y - 9, 0xC0B8A888, true);
-        }
-        Pix.blanco();
-        Pix.mezcla();
     }
 
     /** Una barra: marco de oro con punta, hueco oscuro, rastro del dano y relleno. */

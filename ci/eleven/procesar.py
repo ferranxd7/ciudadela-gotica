@@ -72,6 +72,10 @@ SFX = {
     "santuario_enciende": (4.0, 1.4, -14), "santuario_fuego": (6.0, 1.0, -24), "santuario_descanso": (3.0, 0.9, -16),
     "frasco_beber": (1.3, 0.25, -17), "nivel_sube": (2.6, 0.9, -14),
     "menu_abre": (0.66, 0.12, -19), "menu_mueve": (0.3, 0.1, -26), "menu_acepta": (0.45, 0.15, -20), "menu_cancela": (0.4, 0.12, -20),
+    # el combate propio (parte 2c)
+    "golpe_ligero": (0.55, 0.12, -17), "golpe_pesado": (0.9, 0.2, -15), "carga_golpe": (1.3, 0.1, -18),
+    "impacto_carne": (0.45, 0.12, -15), "impacto_armadura": (0.6, 0.2, -16), "rodar": (0.6, 0.15, -19), "fijar": (0.45, 0.12, -20),
+    "estocada": (0.45, 0.12, -16), "golpe_salto": (1.1, 0.4, -13), "aturdido": (1.3, 0.35, -15), "esfuerzo": (0.45, 0.1, -19),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5}
@@ -101,6 +105,17 @@ TOMAS_SFX = {
     "nivel_sube": (2,),          # la mas llena y larga
     "menu_abre": (3,),           # la losa mas grave
     "menu_mueve": (1,), "menu_acepta": (4,), "menu_cancela": (3,),
+    "golpe_ligero": (1, 2, 3, 4),  # cuatro para que una cadena de golpes no suene siempre igual
+    "golpe_pesado": (2, 4),      # la mas fuerte y la mas grave
+    "carga_golpe": (1, 3),       # las que crecen con graves
+    "impacto_carne": (1, 2, 3),  # la 4 casi no suena
+    "impacto_armadura": (1, 3, 4),
+    "rodar": (2, 4),             # las que se oyen enteras
+    "fijar": (3,),               # clic con cuerpo, sin tanto grave
+    "estocada": (1, 3, 4),       # la 2 casi no suena
+    "golpe_salto": (2, 4),       # las mas largas y con mas cuerpo
+    "aturdido": (1, 4),          # las mas cortas (las otras dos llevan otro golpe detras)
+    "esfuerzo": (1, 2, 3, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

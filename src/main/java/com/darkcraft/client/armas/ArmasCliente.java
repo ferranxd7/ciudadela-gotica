@@ -15,7 +15,11 @@ import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-/** Combos con Shift / Ctrl + clic izquierdo (la energia, que es el mana, se ve en la barra azul del HUD). */
+/**
+ * Combos con Shift / Ctrl + clic izquierdo (la energia, que es el mana, se ve en la barra azul del HUD). El combate
+ * propio pregunta por este mismo evento antes de cada golpe ({@code ClientCombate.permitido}): si aqui sale un combo,
+ * no hay golpe normal.
+ */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID, value = Dist.CLIENT)
 public final class ArmasCliente {
     private ArmasCliente() {}
@@ -37,7 +41,8 @@ public final class ArmasCliente {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || !(EspadaRey.es(mc.player.getMainHandItem()) || com.darkcraft.armas.MandobleJuramento.es(mc.player.getMainHandItem()))) return;
         boolean shift = mc.options.keyShift.isDown();
-        boolean ctrl = mc.options.keySprint.isDown() || Screen.hasControlDown();
+        // Ctrl corriendo es el ataque corriendo del combate (el Juicio, con Ctrl estando quieto o andando)
+        boolean ctrl = (mc.options.keySprint.isDown() || Screen.hasControlDown()) && !mc.player.isSprinting();
         if (!shift && !ctrl) return;
         int tipo = ctrl ? Combos.JUICIO : Combos.TAJO_REAL;
         int coste = tipo == Combos.JUICIO ? Combos.COSTE_2 : Combos.COSTE_1;

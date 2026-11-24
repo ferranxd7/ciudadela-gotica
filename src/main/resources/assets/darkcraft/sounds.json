@@ -994,5 +994,142 @@
         "name": "darkcraft:sfx/menu_cancela_1"
       }
     ]
+  },
+  "sfx.golpe_ligero": {
+    "subtitle": "subtitles.darkcraft.sfx.golpe_ligero",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/golpe_ligero_1"
+      },
+      {
+        "name": "darkcraft:sfx/golpe_ligero_2"
+      },
+      {
+        "name": "darkcraft:sfx/golpe_ligero_3"
+      },
+      {
+        "name": "darkcraft:sfx/golpe_ligero_4"
+      }
+    ]
+  },
+  "sfx.golpe_pesado": {
+    "subtitle": "subtitles.darkcraft.sfx.golpe_pesado",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/golpe_pesado_1"
+      },
+      {
+        "name": "darkcraft:sfx/golpe_pesado_2"
+      }
+    ]
+  },
+  "sfx.carga_golpe": {
+    "subtitle": "subtitles.darkcraft.sfx.carga_golpe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/carga_golpe_1"
+      },
+      {
+        "name": "darkcraft:sfx/carga_golpe_2"
+      }
+    ]
+  },
+  "sfx.impacto_carne": {
+    "subtitle": "subtitles.darkcraft.sfx.impacto_carne",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/impacto_carne_1"
+      },
+      {
+        "name": "darkcraft:sfx/impacto_carne_2"
+      },
+      {
+        "name": "darkcraft:sfx/impacto_carne_3"
+      }
+    ]
+  },
+  "sfx.impacto_armadura": {
+    "subtitle": "subtitles.darkcraft.sfx.impacto_armadura",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/impacto_armadura_1"
+      },
+      {
+        "name": "darkcraft:sfx/impacto_armadura_2"
+      },
+      {
+        "name": "darkcraft:sfx/impacto_armadura_3"
+      }
+    ]
+  },
+  "sfx.rodar": {
+    "subtitle": "subtitles.darkcraft.sfx.rodar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rodar_1"
+      },
+      {
+        "name": "darkcraft:sfx/rodar_2"
+      }
+    ]
+  },
+  "sfx.fijar": {
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/fijar_1"
+      }
+    ]
+  },
+  "sfx.estocada": {
+    "subtitle": "subtitles.darkcraft.sfx.estocada",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/estocada_1"
+      },
+      {
+        "name": "darkcraft:sfx/estocada_2"
+      },
+      {
+        "name": "darkcraft:sfx/estocada_3"
+      }
+    ]
+  },
+  "sfx.golpe_salto": {
+    "subtitle": "subtitles.darkcraft.sfx.golpe_salto",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/golpe_salto_1"
+      },
+      {
+        "name": "darkcraft:sfx/golpe_salto_2"
+      }
+    ]
+  },
+  "sfx.aturdido": {
+    "subtitle": "subtitles.darkcraft.sfx.aturdido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aturdido_1"
+      },
+      {
+        "name": "darkcraft:sfx/aturdido_2"
+      }
+    ]
+  },
+  "sfx.esfuerzo": {
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/esfuerzo_1"
+      },
+      {
+        "name": "darkcraft:sfx/esfuerzo_2"
+      },
+      {
+        "name": "darkcraft:sfx/esfuerzo_3"
+      },
+      {
+        "name": "darkcraft:sfx/esfuerzo_4"
+      }
+    ]
   }
 }

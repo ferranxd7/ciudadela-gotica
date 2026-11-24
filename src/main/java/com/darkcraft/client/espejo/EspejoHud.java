@@ -288,7 +288,7 @@ public final class EspejoHud {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null || !EspejoCliente.activo()) return;
         if (EspejoCliente.aviso >= 0) aviso(mc, g, pt, sw, sh);
-        if (!EspejoCliente.visible || mc.options.hideGui || mc.options.renderDebug || ClientCine.active() || mc.screen instanceof LibroScreen)
+        if (!EspejoCliente.visible || mc.options.hideGui || mc.options.renderDebug || ClientCine.active() || com.darkcraft.client.ui.Hud.tapado(mc))
             return;
         tickHud = mc.player.tickCount;
         int idx = tamano(sh);

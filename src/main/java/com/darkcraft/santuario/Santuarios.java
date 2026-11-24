@@ -191,9 +191,14 @@ public final class Santuarios {
     // ------------------------------------------------------------------ los de los sitios que ya estaban construidos
 
     /** Los de un Reino de Valdrenn: {nombre, sitio del mapa (o null), dx, dz respecto al sitio}. */
+    /**
+     * Los de Valdrenn: {clave, lugar, dx, dz, radio de busqueda}. El de la Torre de Ascenso va arriba de la torre, en la
+     * plataforma (el lugar "torre_ascenso" aqui es el centro de la torre, no donde se pone su nombre en el mapa), al otro
+     * lado del cofre de la cronica; el de la fuente, a un lado de la Fuente Mayor.
+     */
     private static final Object[][] VALDRENN = {
-            {"torre_ascenso", "torre_ascenso", -4, 0},
-            {"fuente", "fuente", 4, 0},
+            {"torre_ascenso", "torre_ascenso", -4, 2, 3},
+            {"fuente", "fuente", 4, 0, 10},
     };
 
     /** Cada dos segundos: si el jugador pasa cerca del sitio de un santuario que aun no esta, se pone. */
@@ -218,11 +223,11 @@ public final class Santuarios {
             if (donde == null) donde = sitios(lvl, s);
             int[] pos = donde.lugares.get((String) v[1]);
             if (pos == null) continue;
-            int x = s[0] + pos[0] + (Integer) v[2], z = s[1] + pos[1] + (Integer) v[3];
+            int x = s[0] + pos[0] + (Integer) v[2], z = s[1] + pos[1] + (Integer) v[3], radio = (Integer) v[4];
             if (Math.hypot(x - p.getX(), z - p.getZ()) > 56) continue;
             // primero, a ras del suelo de la isla; si alli no hay hueco, un poco mas arriba o mas abajo
-            BlockPos sitio = hueco(lvl, x, z, CastlePlan.Y0, CastlePlan.Y0, 10, 2);
-            if (sitio == null) sitio = hueco(lvl, x, z, CastlePlan.Y0 - 2, CastlePlan.Y0 + 3, 10, 2);
+            BlockPos sitio = hueco(lvl, x, z, CastlePlan.Y0, CastlePlan.Y0, radio, 2);
+            if (sitio == null) sitio = hueco(lvl, x, z, CastlePlan.Y0 - 2, CastlePlan.Y0 + 3, radio, 2);
             if (sitio == null) continue;
             hecho(lvl, d, k, sitio, "darkcraft.santuario." + v[0]);
         }
@@ -283,6 +288,9 @@ public final class Santuarios {
             MapShapes.Data m = MapShapes.build(plan);
             Map<String, int[]> l = new HashMap<>();
             for (int i = 0; i < m.labels().length; i++) l.put(m.labels()[i], new int[]{m.labelPos()[i * 2], m.labelPos()[i * 2 + 1]});
+            // la torre: su centro (el nombre del mapa va desplazado, fuera de la torre, en el aire)
+            CastlePlan.Cine ci = plan.cine();
+            l.put("torre_ascenso", new int[]{ci.ascX() - s[0], ci.ascZ() - s[1]});
             return new Sitios(l, plan.treeHall());
         });
     }

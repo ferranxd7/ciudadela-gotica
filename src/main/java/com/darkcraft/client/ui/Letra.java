@@ -73,4 +73,20 @@ public final class Letra {
         }
         g.drawString(f, c, x, y, color, false);
     }
+
+    /** Lo mismo para un texto ya partido en lineas (conserva su letra). */
+    public static void contorno(GuiGraphics g, Font f, net.minecraft.util.FormattedCharSequence c, int x, int y, int color, int borde) {
+        int a = color >>> 24;
+        if (a < 8) return;
+        int b = ((borde >>> 24) * a / 255) << 24 | (borde & 0xFFFFFF);
+        if ((b >>> 24) >= 8) {
+            g.drawString(f, c, x - 1, y, b, false);
+            g.drawString(f, c, x + 1, y, b, false);
+            g.drawString(f, c, x, y - 1, b, false);
+            g.drawString(f, c, x, y + 1, b, false);
+            g.drawString(f, c, x + 1, y + 1, b, false);
+            g.drawString(f, c, x, y + 2, b, false);
+        }
+        g.drawString(f, c, x, y, color, false);
+    }
 }
