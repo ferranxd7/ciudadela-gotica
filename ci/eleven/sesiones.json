@@ -620,5 +620,75 @@
     ]
    }
   }
+ },
+ "sfx_hud": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "HUD nuevo (parte 2 del plan grande): carteles, ecos, espada de luz. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "has_muerto": {
+    "prompt": "You died: a single deep ominous orchestral hit with low brass and a dark male choir swell, slow mournful decay with long cathedral reverb tail, epic dark fantasy, 5 seconds",
+    "sesiones": [
+     "wKy3LHOXKZl2pwgV5qNU",
+     "0c4QZ0lTOZqZ9w2VPNsb",
+     "adqsUpqK8fXaZVC6R7TI",
+     "9xEe668FQzuQzJTNPfZ7"
+    ]
+   },
+   "jefe_abatido": {
+    "prompt": "Great enemy felled: triumphant but somber victory sting, huge deep drum hit with a rising choir chord and shimmering golden resonance, long majestic reverb tail, epic dark fantasy, 5 seconds",
+    "sesiones": [
+     "A5SeIHwy442mwHklKacn",
+     "2im2Az1jBSmuhhfPjjJT",
+     "X5yNO1CS8eJU2Stscels",
+     "HxqwS1l4GUhVGQFx8ytr"
+    ]
+   },
+   "zona_descubierta": {
+    "prompt": "New land discovered: one deep resonant bell toll with a soft airy choir pad swelling behind it, mysterious and solemn, dark fantasy, 4 seconds",
+    "sesiones": [
+     "F8z1uFvhmsyEbMYVeso6",
+     "9Ie1L9EBOsPrXB6t5RNU",
+     "zxEoTlu1Jt8CEGmZlrjD",
+     "ycjE9KZm4SEvGyggbPKJ"
+    ]
+   },
+   "ecos_recuperados": {
+    "prompt": "Lost souls flowing back into a body: ethereal whoosh rushing inward with ghostly whispers, ending in a soft bright shimmering chime, dark fantasy, 3 seconds",
+    "sesiones": [
+     "EXQyjZlMP2t3HFBKoGIj",
+     "EbQIEllWbpBKorGryyU2",
+     "KA5AAElatgnGGV69nyYo",
+     "JgcrLLCEDryNLoNAsDCl"
+    ]
+   },
+   "ecos_ganados": {
+    "prompt": "Small soul absorbed: very short soft ethereal inward whoosh with a tiny dark shimmer, subtle and quiet, 1 second",
+    "sesiones": [
+     "NEn7LOYwStfjZhXLRP4h",
+     "mN6kzXajoF6jMT50e9Lz",
+     "cvVcKA5IaTitTq2LKM2c",
+     "Wvg39Wkai5waJodxLFxZ"
+    ]
+   },
+   "espada_luz": {
+    "prompt": "Sword of light planted in the ground humming: gentle sacred shimmering drone with faint high crystalline chimes, calm and steady, seamless loop, 4 seconds",
+    "sesiones": [
+     "U4zwXOjeEuqb4dRurmxz",
+     "eVn5YjfseKZZibgB1mZd",
+     "YanxKiB4l8tQZPuAzVBi",
+     "0yKTkSPK27kHILUCIsKS"
+    ]
+   },
+   "guardia_rota": {
+    "prompt": "Guard broken: a wooden shield knocked aside with a loud crack and metal clang, the fighter staggering back with a short breathless grunt, close, 1.5 seconds",
+    "sesiones": [
+     "GGV23s3XZid6Goii0ISP",
+     "PWr3JEkbV7rq1zLMBHUS",
+     "aKwyjHy9X9KKkYj3v9MF",
+     "G2q1PQKnmnu5jJwWu6ry"
+    ]
+   }
+  }
  }
 }
