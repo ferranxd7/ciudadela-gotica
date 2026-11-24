@@ -92,9 +92,12 @@ public final class Pix {
         t(g, der, x + w - der.w(), y);
     }
 
-    /** Una franja horizontal de color que se apaga hacia los lados (para el fondo de los carteles). */
+    /**
+     * Una franja horizontal de color que se apaga hacia los lados (para el fondo de los carteles). Va en columnas de dos
+     * pixeles de interfaz: con menos se veian los escalones del degradado sobre un cielo claro.
+     */
     public static void franja(GuiGraphics g, int x0, int x1, int y0, int y1, int rgb, float alfa) {
-        int n = 48, w = x1 - x0;
+        int w = x1 - x0, n = Math.max(48, w / 2);
         for (int i = 0; i < n; i++) {
             float c = (i + 0.5f) / n;                       // 0..1 a lo ancho
             float k = 1f - Math.abs(c * 2f - 1f);           // 0 en los lados, 1 en el centro

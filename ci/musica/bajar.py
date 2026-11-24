@@ -155,7 +155,9 @@ def main():
                          f"  Aviso del autor: {p['aviso']}", f"  Se usa para: {p['uso']}", ""]
         log.write("RESUMEN: " + json.dumps(info, ensure_ascii=False) + "\n")
     creditos += ["Voz del narrador: Piper TTS, voz \"alan\" (en_GB), licencia libre del proyecto Piper.",
-                 "Campana fúnebre, efectos y texturas: hechos para este mod."]
+                 "Campana fúnebre, efectos y texturas: hechos para este mod.",
+                 "Letra gótica de los títulos: mapas de bits derivados de la fuente \"New Rocker\" (Pablo Impallari, Brenda Gallo y",
+                 "  Rodrigo Fuenzalida), SIL Open Font License 1.1 (el texto de la licencia va dentro del .jar, en licencias/)."]
     texto = "\n".join(creditos) + "\n"
     base = os.path.dirname(sonidos.rstrip("/"))
     with open(os.path.join(base, "creditos.txt"), "w", encoding="utf-8") as fh:
