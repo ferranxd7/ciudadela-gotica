@@ -909,5 +909,66 @@
     ]
    }
   }
+ },
+ "sfx_hechizos": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 2d-2 del plan grande: hechizos (lanzar, impacto, rayo, llamarada, curacion, bendicion). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "hechizo_lanzar": {
+    "prompt": "Casting a dark sorcery spell from a staff: a quick rising magical whoosh with a crystalline shimmer and a low resonant hum, dark fantasy RPG spell cast, no music, 0.8 seconds",
+    "sesiones": [
+     "rkcgFfdrRnttOyxcjQmP",
+     "dYcsFcV4j6j0CpFdkR6a",
+     "TjieBoVjGDKPRfLR5fR5",
+     "smUM8WrxzutMe2FYZNiM"
+    ]
+   },
+   "hechizo_impacto": {
+    "prompt": "A magic projectile hitting its target: a sharp crystalline burst with a deep thump and fading sparkles, dark fantasy spell impact, no music, 0.8 seconds",
+    "sesiones": [
+     "DDHdEQHJJXQ7N2K30QkE",
+     "vjaxkyTXzYaxvS1oWE8H",
+     "KRH4dKA524djy5q9jc5Z",
+     "crXM5TkICcdovDxY4hPH"
+    ]
+   },
+   "hechizo_rayo": {
+    "prompt": "A spear of lightning hurled by a holy knight: a crackling electric zap and a short sharp thunder crack, dark fantasy miracle, no music, 1.2 seconds",
+    "sesiones": [
+     "a9yF41LWXT2AwDKOEtvM",
+     "VsWP9rdKh2QZKyoAxqZ4",
+     "1Vb7NpqPEcJJmRNVR6hg",
+     "4GCk4vM3LkjhWDrvPxIv"
+    ]
+   },
+   "hechizo_llama": {
+    "prompt": "A burst of sacred fire erupting from an open hand: a roaring whoosh of flames that flares and quickly dies down, dark fantasy incantation, no music, 1.2 seconds",
+    "sesiones": [
+     "7sres6cpxjb332NvWAYa",
+     "zOF0V6GeoHFLwWuPgNFb",
+     "2n46shMRQ3vixsp6KvKL",
+     "SnJ3mfFztCxuqX0XcRuD"
+    ]
+   },
+   "hechizo_curar": {
+    "prompt": "A healing miracle: a warm rising choir-like chime with soft golden sparkles and a gentle exhale of relief, dark fantasy RPG, no music, 1.8 seconds",
+    "sesiones": [
+     "EvZI0sWkk0Rb81Alw5rp",
+     "zHik3PxdzF5fRBmhPp8W",
+     "VIYuAlj5EI4AtSihuDGI",
+     "lIsJnmOulE21TIIJrnLt"
+    ]
+   },
+   "hechizo_bendicion": {
+    "prompt": "A holy blessing on a warrior: a short bright angelic choir swell with a resonant bell strike and shimmering light, dark fantasy RPG buff, no music, 1.6 seconds",
+    "sesiones": [
+     "RvqtOys4984WfSq3D99L",
+     "S9uH3Ot5GXVOAXwGX0kM",
+     "RzrawPNqpyHhidp7ktKb",
+     "VdhosNS0F9McDSFFt2Dj"
+    ]
+   }
+  }
  }
 }
