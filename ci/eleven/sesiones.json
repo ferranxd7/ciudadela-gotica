@@ -778,5 +778,111 @@
     ]
    }
   }
+ },
+ "sfx_combate": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 2c del plan grande: el combate propio (golpes, carga, impactos, voltereta, fijar objetivo, estocada, golpe en salto, aturdido y el esfuerzo). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "golpe_ligero": {
+    "prompt": "A single fast one-handed sword swing: a sharp clean blade whoosh cutting through the air, close and dry, no impact, dark fantasy combat, 0.6 seconds",
+    "sesiones": [
+     "lLaFGlCbdhPpU6isq8rv",
+     "lP6Cb5CQ5dDqjp1kpdRu",
+     "jnRZSHk6OLkLnK0Aqwv0",
+     "sXP4Khym7iH7fLfi4eWK"
+    ]
+   },
+   "golpe_pesado": {
+    "prompt": "A single heavy two-handed greatsword swing: a deep powerful slow whoosh with real weight and a low rumble of moving steel, no impact, cinematic dark fantasy combat, 1 second",
+    "sesiones": [
+     "QpGWUEWmFsBb1vdhjVVx",
+     "5Bqg1Ye4mqSwdZIehMWG",
+     "V8QAyM6TIC2FNflSrUBk",
+     "sUr1fqhkqhXL6uTXpqzE"
+    ]
+   },
+   "carga_golpe": {
+    "prompt": "Charging up a heavy weapon attack: a rising tense metallic hum and grinding steel, a deep held breath, energy building steadily, no release at the end, dark fantasy, 1.3 seconds",
+    "sesiones": [
+     "PDmzudo0bRqugMp8vwfG",
+     "9HtPP6IRi7TboC8VtHFN",
+     "tJ32CgTOP4N81WHgtuBW",
+     "v7oWVyaBIbVR68LyMFK5"
+    ]
+   },
+   "impacto_carne": {
+    "prompt": "A sword slash connecting with a body: a punchy meaty cut impact with a short heavy thud, brutal but not gory, dark fantasy combat hit, 0.5 seconds",
+    "sesiones": [
+     "eIw7poIJUc1YZJoyX5O5",
+     "bzw2HlzoqfqUMm1LXd5l",
+     "KveWSAP3wPnRqPeKqAYT",
+     "io074sEJc9o0u9mFIkVf"
+    ]
+   },
+   "impacto_armadura": {
+    "prompt": "A blade striking heavy plate armor: a sharp metallic clang with a short ringing tail and gritty scrape, dark fantasy combat hit, 0.7 seconds",
+    "sesiones": [
+     "ud0SgWPqbtHUyqRQW7XJ",
+     "sYy8DTta6jHFnjS69eR1",
+     "KUAeRjW6xQciSjNcVEd2",
+     "3usRPHvz1w0RaKsOXfcx"
+    ]
+   },
+   "rodar": {
+    "prompt": "A quick combat dodge roll on a stone floor: a fast body tumble with cloth flapping and light armor rattling, a short scuff of boots at the end, close perspective, 0.7 seconds",
+    "sesiones": [
+     "gk2Y2BmqU6myTSCHl1oB",
+     "KYkYkEKpPmhEAIAxt8wo",
+     "ytkAxNWGANuxI4OZgZQc",
+     "FkGKgBOuCXsD1ybQjuwK"
+    ]
+   },
+   "fijar": {
+    "prompt": "A subtle lock-on target sound for a dark fantasy game interface: a soft low metallic click with a brief deep resonant shimmer, clean, 0.4 seconds",
+    "sesiones": [
+     "CHuzGUCBEEHVlPEKvOGW",
+     "hMNQ7rEAp4TnwXhTUo4W",
+     "YwGQjMbo7ZSZHxUECM94",
+     "bhr1SBZHgOIUAMKzYpzm"
+    ]
+   },
+   "estocada": {
+    "prompt": "A fast spear thrust: a sharp piercing whoosh of a long pole weapon stabbing straight forward, no impact, cinematic combat, 0.5 seconds",
+    "sesiones": [
+     "b2h8y92xienmHRNHtyEE",
+     "lSqwP0fjPg6uAvT5YgIv",
+     "gfVBP8b5oLLCPcNTHSvz",
+     "2NxDnVrpAzs1IEMwAd7b"
+    ]
+   },
+   "golpe_salto": {
+    "prompt": "A heavy jumping attack slamming a weapon down into stone ground: a deep thunderous impact with cracking stone and a puff of dust and debris, cinematic dark fantasy, 1.2 seconds",
+    "sesiones": [
+     "SrCB2AJNCJ1pMGtEVKlw",
+     "nVruGJtdyztTt5OIyGgn",
+     "kZohyLRjgEX3g1DNY91R",
+     "Xl72TbHJUEEmQ4jhz1uQ"
+    ]
+   },
+   "aturdido": {
+    "prompt": "An armored enemy staggered by a powerful blow: a strong heavy impact, the body reeling back with loud armor rattling and a pained grunt, dark fantasy combat, 1 second",
+    "sesiones": [
+     "8iKahycBJ1LOAdiKiUvW",
+     "qVOBuYis325eQtETr8Bt",
+     "rNSSFxGXq9JTBUiiXD1z",
+     "Zxy4oh6JYh3qgDmCmzQG"
+    ]
+   },
+   "esfuerzo": {
+    "prompt": "A male warrior's short effort grunt while swinging a heavy weapon with force, close microphone, dry, no words, 0.5 seconds",
+    "sesiones": [
+     "lJozTKMZT1UBhrRufdoU",
+     "FYJxiRIeLDefwAHNmEa9",
+     "dF362oFAaReTZVV3w7sW",
+     "bELDAV5QrbPBGazxnIFl"
+    ]
+   }
+  }
  }
 }
