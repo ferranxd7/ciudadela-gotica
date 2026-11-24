@@ -148,6 +148,7 @@ public final class FortalezaEventos {
         if (s != null) {
             encolar(lvl, s);
             double d = Math.hypot(s.x() - p.getX(), s.z() - p.getZ());
+            if (d < 100) parchear(lvl, s);
             if (d < Fortalezas.ZONA) entrar(p, s);
             else if (d > Fortalezas.ZONA + 25) salir(p);
             if (d < 150) Logros.dar(p, "fortaleza");
@@ -230,6 +231,26 @@ public final class FortalezaEventos {
         if (ms > 120) DarkCraftMod.LOGGER.info("Fortaleza: chunk {},{} en {} ms", cx, cz, ms);
         // en un ordenador lento: como mucho la mitad del tiempo del servidor (un chunk de 150 ms, 3 ticks de descanso)
         descanso = (int) Math.min(40, ms / 50);
+    }
+
+    /**
+     * Arreglos para las fortalezas que ya estaban levantadas (una vez cada una, cuando alguien esta cerca): el 1, la
+     * escalera de la torre del homenaje, que se atascaba con una columna de hueso.
+     */
+    private static void parchear(ServerLevel lvl, Fortalezas.Sitio s) {
+        FortalezaDatos d = FortalezaDatos.get(lvl.getServer());
+        FortalezaDatos.Estado est = d.de(s);
+        if (est.parche >= 1 || !est.completa) return;
+        FortalezaPlan plan = Fortalezas.plan(lvl.getSeed(), s);
+        int x0 = plan.cx + 2, x1 = plan.cx + FortalezaHueso.KX, z0 = plan.cz + FortalezaHueso.KZ0, z1 = plan.cz + FortalezaHueso.KZ0 + 7;
+        for (int cx = x0 >> 4; cx <= x1 >> 4; cx++)
+            for (int cz = z0 >> 4; cz <= z1 >> 4; cz++) if (!lvl.getChunkSource().hasChunk(cx, cz)) return;
+        for (int cx = x0 >> 4; cx <= x1 >> 4; cx++)
+            for (int cz = z0 >> 4; cz <= z1 >> 4; cz++)
+                plan.f.arreglarEscalera(new com.darkcraft.gen.Canvas(lvl, cx, cz, RandomSource.create(1)));
+        est.parche = 1;
+        d.setDirty();
+        DarkCraftMod.LOGGER.info("Fortaleza de Hueso en {}: escalera de la torre arreglada", s.clave());
     }
 
     /** Levanta ya todo lo que este cargado de la fortaleza (para los comandos y la prueba). */

@@ -32,6 +32,62 @@ Mod de Forge 1.20.1 (Java 17, mappings oficiales). El usuario habla español, ju
    repositorio de GitHub sigue llamándose `ferranxd7/ciudadela-gotica` (no tocar esa URL en el instalador).
 6. El usuario quiere las cosas **por partes y publicadas** (cada parte con `[publicar]`).
 
+## EL PLAN GRANDE (24-11-2026): Dark Craft pasa a ser una aventura completa — leer `PLAN.md`
+
+El usuario respondio 138 preguntas; estan todas en **`PLAN.md`** (leer el apartado de la parte que toque antes de
+empezarla). Lo esencial, que cambia reglas de arriba:
+
+- **Ya no hay mundo normal** (ni Nether ni End, ni monstruos de Minecraft): mundo nuevo propio, un **mar de nubes** con
+  islas flotantes; **modo aventura** (no se rompen ni ponen bloques); los mundos viejos no hace falta que funcionen.
+  Recorrido: clase -> cinematica -> isla del pueblo abandonado (5 piezas del barco, mini-jefe el Capitan) -> barco
+  volador (cinematica) -> Valdrenn -> camino de nubes -> torre con cupula de cristal -> portal -> **Morvain, las Tierras
+  Marchitas** (16.000 x 16.000, disenado a mano, colosal; castillo encadenado en el cielo; la Sombra en el centro).
+- **Interfaz 100% del mod en pixel art** (piedra oscura, oro gastado, rojo): nada de pantallas de Minecraft (titulo,
+  opciones, graficos, shaders, mods, inventario, libros, dialogos, cinematicas con marco pixel art en vez de bandas
+  negras, botones [E] en pixel art). Tecla **R** = menu del mod; **M** = solo el mapa; ESC = pausa (tambien propia).
+- **Sistemas**: vida / mana / estamina (arriba a la izquierda, rojo / azul / verde), sin corazones ni hambre ni comida
+  (frascos rojos y azules recargables en santuarios; frutos con resistencias); cruz de acceso rapido abajo a la
+  izquierda; inventario propio por categorias; rol completo como Elden Ring (8 atributos, escalado con letras, peso,
+  resistencias); talismanes (1 -> 4 huecos); hechizos con baston o sello; combate propio con combos (estilo Epic
+  Fight), voltereta, fijar objetivo; 10 clases; armaduras con modelo propio.
+- **Ecos de la Sombra** (la moneda; contador abajo a la derecha): se ganan matando; al morir conservas el equipo y
+  los ecos se quedan en una **espada de luz** donde moriste ("Pulsa [E]" para recuperarlos; si mueres otra vez, se
+  pierden). Sirven para subir de nivel, comprar, mejorar armas y aprender habilidades.
+- **Santuarios** = hogueras de almas con modelo propio (descansar, reaparecer, teletransporte en Morvain); los enemigos
+  solo reaparecen al morir o descansar.
+- **Voces**: TODO personaje con voz de ElevenLabs (ingles + subtitulos). La Sombra tiene voz propia nueva (masculina,
+  grave, susurrante; eco de vacio y susurros); los capitulos de Morvain los narra **la guia de los santuarios** (voz de
+  mujer serena). La voz de Aldous (Piper) queda solo para los capitulos 1-5.
+- **Idiomas**: cada parte sale en **espanol e ingles**; ja/fr/de/pt se anaden despues en tandas (cambia la regla 3).
+- **Distant Horizons (LGPL-3.0), Oculus y Embeddium** van dentro del .jar si su licencia lo permite, con creditos;
+  256 chunks por defecto; el usuario tiene PC potente y juega con shaders (Oculus); con amigos, **servidor dedicado**
+  (Aternos, exaroton): todo tiene que funcionar en servidor dedicado, mundo compartido y progreso de rol por jugador.
+- Los carteles de madera de los cofres de capitulo se quitan (el cofre se marca con brillo); el espejo va sin coordenadas
+  y sera redondo, con una brujula arriba en el centro.
+
+### Plan grande, parte 1: arreglos rapidos (hecha)
+
+- **Dialogos de los jefes sin pausas**: `ci/eleven/procesar.py` mide en el audio original donde acaba de hablar cada
+  frase (`silencedetect`), quita el silencio del principio y apunta en `rey_voces.json` `habla` / `habla_gavran` (el
+  segundo en que acaba de hablar, ya con lo que estira la voz de monstruo o de arbol y 0,10 s de cola). `Voces.ticks`
+  usa eso (antes, lo que duraba el fichero: ~0,5 s de silencio y eco de mas), `Voces.PAUSA` = 6 ticks (0,3 s) y
+  `SUBTITULO_EXTRA` = 16 (0,8 s). El Rey se levanta MIENTRAS dice la frase 3 y acaba justo al acabar de hablar; Gavran
+  salta, saluda y empieza la pelea nada mas acabar cada frase; en su muerte las frases 17 y 18 van seguidas y se deshace
+  al acabar. El cliente ya no corta la cola del eco de la frase anterior.
+- **La Llave del Arbol en la puerta** es una entidad `item_display` (`TorreArbol.llaveEnLaCerradura`): entra de punta,
+  gira un cuarto de vuelta y se desvanece antes de abrirse las hojas. Antes la dibujaba el cliente en un evento de
+  render (`ReyCliente.dibujarLlave`, ya sin usar): con shaders (Oculus) no se veia, entraba por el mango y quedaba de
+  canto. **Regla: lo que se tenga que ver en el mundo, con entidades (display) o bloques, no dibujado a mano en eventos
+  de render** (el usuario juega con shaders).
+- **Sin carteles en los cofres de capitulo** (`StoryChest`, `StoryEvents.placeChapter`); los de mundos de antes los quita
+  `StoryEvents.buscar` (cada 2 s, chunks de alrededor de cada jugador). Los cofres brillan (`StoryEvents.brillar`: polvo
+  dorado que se vuelve rojo y destellos, por jugador; casi nada si ya leyo ese capitulo).
+- **Espejo sin coordenadas** (`EspejoHud.texto`: solo el nombre del sitio).
+- **Escalera de la torre del homenaje**: una columna de la planta baja caia en el anillo de la escalera de caracol y
+  tapaba un escalon; ademas la valla del hueco encerraba la salida en los pisos 1 y 2. `FortalezaHueso.enEscalera`,
+  `despejarEscalera`, `vallasEscalera`; en fortalezas ya levantadas, `FortalezaEventos.parchear` (una vez,
+  `Estado.parche`). La prueba del cliente lo comprueba (`comprobarEscalera`).
+
 ## Compilar, probar y publicar
 
 - La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (con y sin mods) y un cliente con capturas

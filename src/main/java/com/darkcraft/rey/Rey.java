@@ -454,14 +454,16 @@ public class Rey extends Monster {
     // ------------------------------------------------------------------ intro: habla sentado
 
     /**
-     * Cuando dice sentado cada frase de la entrada (la 1, la 2 y la 3): salen de lo que dura cada una (Voces), con una
-     * pausa entre ellas, y no se levanta hasta un segundo despues de acabar la ultima.
+     * Cuando dice sentado cada frase de la entrada (la 1, la 2 y la 3): salen de lo que tarda en decir cada una (Voces),
+     * casi seguidas. Se levanta MIENTRAS dice la ultima ("...o muere de pie!"), de modo que acaba de levantarse justo
+     * cuando acaba de hablar y la pelea empieza al momento (el usuario no quiere pausas al final de los dialogos).
      */
     private static final int[] INTRO_LINES = {30, 30 + Voces.ticks(1) + Voces.PAUSA,
             30 + Voces.ticks(1) + Voces.PAUSA + Voces.ticks(2) + Voces.PAUSA};
-    private static final int INTRO_LEVANTA = INTRO_LINES[2] + Voces.ticks(3) + 20;
+    private static final int INTRO_LEVANTA = INTRO_LINES[2]
+            + Math.max(10, Voces.ticks(3) + Voces.PAUSA - ReyAnims.TICKS[ReyAnims.LEVANTARSE]);
     /** Duracion de la entrada (ticks): la cinematica sigue mientras se levanta. */
-    public static final int INTRO_TICKS = INTRO_LEVANTA + 60;
+    public static final int INTRO_TICKS = INTRO_LEVANTA + ReyAnims.TICKS[ReyAnims.LEVANTARSE];
 
     private void intro(ServerLevel sl) {
         setPose(POSE_SENTADO);
@@ -473,6 +475,8 @@ public class Rey extends Monster {
             if (t == INTRO_LINES[i] + Voces.ticks(i + 1)) setFlag(F_HABLA, false);
         }
         if (t >= INTRO_LEVANTA) {
+            // sigue diciendo la frase 3 mientras se levanta
+            hablaHasta = Math.max(hablaHasta, tGlobal + Math.max(0, INTRO_LINES[2] + Voces.ticks(3) - t));
             setFlag(F_HABLA, false);
             levantarse(sl);
         }
@@ -482,10 +486,10 @@ public class Rey extends Monster {
         return v;
     }
 
-    /** Segundos en que cambia de plano la entrada (a mitad de la frase 1, al final de la 2 y de la 3) y en que acaba. */
+    /** Segundos en que cambia de plano la entrada (a mitad de la frase 1, al final de la 2 y cuando se levanta) y en que acaba. */
     public static float[] cortesEntrada() {
         return new float[]{(INTRO_LINES[0] + Voces.ticks(1) * 0.5f) / 20f, (INTRO_LINES[1] + Voces.ticks(2) * 0.6f) / 20f,
-                (INTRO_LINES[2] + Voces.ticks(3)) / 20f, INTRO_TICKS / 20f - 0.6f};
+                INTRO_LEVANTA / 20f - 0.15f, INTRO_TICKS / 20f - 0.3f};
     }
 
     /** Planos de la intro: avanzar por la alfombra, su cara mientras habla, contrapicado y se levanta. */
@@ -538,7 +542,7 @@ public class Rey extends Monster {
             setFlag(F_INTRO, false);
             barra.setVisible(true);
             for (ServerPlayer p : jugadoresVivos(sl)) barra.addPlayer(p);
-            recup = 10;
+            recup = 4;
             cambiar(Estado.LUCHA);
         }
     }
@@ -1391,7 +1395,7 @@ public class Rey extends Monster {
             for (int r = 1; r <= 6; r++) anillo(sl, nf == 2 ? ParticleTypes.FLAME : ParticleTypes.LAVA, r * 1.6, getY() + 0.3, 12 + r * 6);
             sl.sendParticles(ParticleTypes.EXPLOSION_EMITTER, getX(), getY() + 1, getZ(), 1, 0, 0, 0, 0);
         }
-        if (t >= Math.max(ReyAnims.TICKS[ReyAnims.GRITO], Voces.ticks(fase() >= 3 ? 5 : 4) + 16)) {
+        if (t >= Math.max(ReyAnims.TICKS[ReyAnims.GRITO], Voces.ticks(fase() >= 3 ? 5 : 4) + Voces.PAUSA)) {
             if (fase() == 3 && level().dimension() == Level.OVERWORLD && Volcan.disponible(sl)) {
                 // a los volcanes
                 if (Volcan.llevar(sl, this, jugadoresVivos(sl))) return;
@@ -1522,7 +1526,7 @@ public class Rey extends Monster {
     private static final int FRASE_VOLCAN = 186;
 
     public static int finCine3() {
-        return Math.max((int) (Volcan.CINE * 20) + 4, FRASE_VOLCAN + Voces.ticks(10) + 16);
+        return Math.max((int) (Volcan.CINE * 20) + 4, FRASE_VOLCAN + Voces.ticks(10) + Voces.PAUSA);
     }
 
     /** Particulas que se ven aunque la camara (de una cinematica) este lejos. */

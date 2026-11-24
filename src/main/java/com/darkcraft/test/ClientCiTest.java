@@ -715,6 +715,28 @@ public final class ClientCiTest {
             chest1 = plan.storySpot(1);
             log("darkcraft en " + s[0] + "," + s[1] + "; cofre 1 en " + chest1[0] + "," + chest1[1] + "," + chest1[2]);
             sp.teleportTo(lvl, chest1[0] - 2.5, chest1[1], chest1[2] + 0.5, -90f, 12f);
+            // un cartel de capitulo de los de antes junto al cofre: el mod tiene que quitarlo solo (ya no hay carteles)
+            BlockPos cartel = null;
+            for (int[] o : new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}}) {
+                BlockPos c = new BlockPos(chest1[0] + o[0], chest1[1], chest1[2] + o[1]);
+                if (lvl.getBlockState(c).isAir() && lvl.getBlockState(c.below()).isSolid()) {
+                    cartel = c;
+                    break;
+                }
+            }
+            int yaHabia = 0;
+            for (int dx = -1; dx <= 1; dx++)
+                for (int dz = -1; dz <= 1; dz++)
+                    if (lvl.getBlockEntity(new BlockPos(chest1[0] + dx, chest1[1], chest1[2] + dz)) instanceof net.minecraft.world.level.block.entity.SignBlockEntity) yaHabia++;
+            if (cartel != null) {
+                lvl.setBlock(cartel, net.minecraft.world.level.block.Blocks.DARK_OAK_SIGN.defaultBlockState(), 3);
+                if (lvl.getBlockEntity(cartel) instanceof net.minecraft.world.level.block.entity.SignBlockEntity sg) com.darkcraft.gen.Canvas.writeSign(sg, 1);
+            }
+            cartelViejo = cartel;
+            log("  carteles junto al cofre 1 al generar: " + yaHabia + " (tiene que ser 0); cartel de los de antes puesto en " + cartel);
+        }));
+        at(12, "El cartel de los de antes ya no esta", m -> server(m, sp -> {
+            if (cartelViejo != null) log("  cartel viejo: " + (sp.serverLevel().getBlockState(cartelViejo).isAir() ? "quitado" : "SIGUE AHI: " + sp.serverLevel().getBlockState(cartelViejo)));
         }));
         // los comandos nuevos (por sitio) y la ayuda; el viejo ya no existe
         at(5, "Comandos: /darkcraft ayuda, /darkcraft valdrenn localizar y el viejo /darkcraft localizar", m -> {
@@ -760,6 +782,7 @@ public final class ClientCiTest {
     // ------------------------------------------------------------------ el Espejo de la Sombra y el libro de la M
 
     private static com.darkcraft.client.espejo.LibroScreen libro;
+    private static BlockPos cartelViejo;
 
     private static void mirarAlCastillo(Minecraft m) {
         server(m, sp -> {
@@ -1468,6 +1491,54 @@ public final class ClientCiTest {
 
     private static com.darkcraft.fortaleza.Fortalezas.Sitio fsit;
     private static com.darkcraft.gen.FortalezaPlan fplan;
+
+    private static boolean pasa(ServerLevel lvl, BlockPos p) {
+        return lvl.getBlockState(p).getCollisionShape(lvl, p).isEmpty();
+    }
+
+    /**
+     * La escalera de caracol de la torre del homenaje: que cada escalon tenga sitio para pasar (una columna de hueso la
+     * atascaba) y que al bajarse en cada piso se pueda andar por el (una valla encerraba la salida).
+     */
+    private static void comprobarEscalera(ServerLevel lvl) {
+        final int KX = com.darkcraft.gen.FortalezaHueso.KX, KZ0 = com.darkcraft.gen.FortalezaHueso.KZ0, KZ1 = com.darkcraft.gen.FortalezaHueso.KZ1;
+        final int PISO = com.darkcraft.gen.FortalezaHueso.PISO, NP = com.darkcraft.gen.FortalezaHueso.NPISOS;
+        int px = fplan.cx + KX - 4, pz = fplan.cz + KZ0 + 4, Y = fplan.Y, top = Y + NP * PISO;
+        int[][] an = {{-1, -1}, {0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}};
+        int tapados = 0;
+        for (int k = 0; k < top - Y; k++) {
+            BlockPos e = new BlockPos(px + an[k % 8][0], Y + k, pz + an[k % 8][1]);
+            boolean escalon = lvl.getBlockState(e).getBlock() instanceof net.minecraft.world.level.block.StairBlock;
+            if (!escalon || !pasa(lvl, e.above()) || !pasa(lvl, e.above(2))) {
+                tapados++;
+                log("    escalon " + k + " en " + e.toShortString() + ": " + lvl.getBlockState(e).getBlock() + " / " + lvl.getBlockState(e.above()).getBlock()
+                        + " / " + lvl.getBlockState(e.above(2)).getBlock());
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int p = 1; p <= NP; p++) {
+            int[] sale = an[(p * PISO - 1) % 8];
+            int y = Y + p * PISO;
+            java.util.ArrayDeque<BlockPos> cola = new java.util.ArrayDeque<>();
+            java.util.Set<BlockPos> vistos = new java.util.HashSet<>();
+            BlockPos ini = new BlockPos(px + 2 * sale[0], y, pz + 2 * sale[1]);
+            cola.add(ini);
+            vistos.add(ini);
+            while (!cola.isEmpty() && vistos.size() < 400) {
+                BlockPos c = cola.poll();
+                for (Direction d : Direction.Plane.HORIZONTAL) {
+                    BlockPos n = c.relative(d);
+                    if (vistos.contains(n) || Math.abs(n.getX() - fplan.cx) > KX + 1 || n.getZ() < fplan.cz + KZ0 - 1 || n.getZ() > fplan.cz + KZ1 + 1) continue;
+                    if (!pasa(lvl, n) || !pasa(lvl, n.above()) || pasa(lvl, n.below())) continue;
+                    vistos.add(n);
+                    cola.add(n);
+                }
+            }
+            sb.append(" piso ").append(p).append('=').append(vistos.size());
+        }
+        log("  escalera de la torre: " + (top - Y) + " escalones, " + tapados + " tapados (tiene que ser 0); celdas que se alcanzan al bajarse:" + sb
+                + " (antes 3 en los pisos 1 y 2)");
+    }
     private static int fbase;
 
     private static String fpos(ServerPlayer sp) {
@@ -1669,6 +1740,7 @@ public final class ClientCiTest {
             });
         });
         atTicks(H + 70, "captura", m -> shot(m, "cliente_f13_homenaje"));
+        atTicks(H + 71, "La escalera de la torre", m -> server(m, sp -> comprobarEscalera(sp.serverLevel())));
         atTicks(H + 72, "El cofre del acertijo", m -> server(m, sp -> {
             int[] c = fplan.f.cofre();
             BlockPos b = new BlockPos(c[0], c[1], c[2]);

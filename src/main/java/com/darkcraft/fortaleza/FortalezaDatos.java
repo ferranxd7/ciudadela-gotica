@@ -25,6 +25,8 @@ public final class FortalezaDatos extends SavedData {
         public boolean completa, puerta, puente, portal;
         /** Altura del suelo donde empieza la escalera del puente (para la corriente de nubes). */
         public int baseEscalera = Integer.MIN_VALUE;
+        /** Arreglos ya aplicados a una fortaleza levantada (1 = la escalera de la torre sin atascos). */
+        public int parche;
     }
 
     final Map<String, Estado> fortalezas = new HashMap<>();
@@ -55,6 +57,7 @@ public final class FortalezaDatos extends SavedData {
             e.puente = c.getBoolean("puente");
             e.portal = c.getBoolean("portal");
             e.baseEscalera = c.contains("base") ? c.getInt("base") : Integer.MIN_VALUE;
+            e.parche = c.getInt("parche");
         }
         for (Tag x : t.getList("libros", Tag.TAG_STRING)) d.libros.add(x.getAsString());
         return d;
@@ -72,6 +75,7 @@ public final class FortalezaDatos extends SavedData {
             c.putBoolean("puente", e.puente);
             c.putBoolean("portal", e.portal);
             if (e.baseEscalera != Integer.MIN_VALUE) c.putInt("base", e.baseEscalera);
+            c.putInt("parche", e.parche);
             fs.put(en.getKey(), c);
         }
         t.put("fortalezas", fs);

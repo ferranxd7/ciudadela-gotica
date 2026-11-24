@@ -5,7 +5,6 @@ import com.darkcraft.cine.Cinematics;
 import com.darkcraft.cine.Shot;
 import com.darkcraft.gen.CastlePlan;
 import com.darkcraft.gen.TreeTower;
-import com.darkcraft.net.Net;
 import com.darkcraft.rey.ReyEstado;
 import com.darkcraft.rey.Sello;
 import com.darkcraft.story.Story;
@@ -105,21 +104,75 @@ public final class TorreArbol {
         if (plan != null) ReyEstado.get(sl.getServer()).abrirSello(Sello.key(plan));
         if (!sp.isCreative()) llave.shrink(1);
         d.empezar(sl, sp);
-        double[] k = d.cerradura();
-        Net.Llave m = new Net.Llave(k[0], k[1], k[2], 70);
-        for (ServerPlayer p : sl.players()) if (p.distanceToSqr(k[0], k[1], k[2]) < 60 * 60) Net.to(p, m);
+        llaveEnLaCerradura(sl, d.cerradura());
         Cinematics.playShots(sp, Cinematics.SELLO, planos(d), 8.4f);
         // el logro lo da la propia puerta al terminar de abrirse (PuertaArbol.tick)
         DarkCraftMod.LOGGER.info("[DarkCraft] {} abre la puerta de la Sala del Arbol en {}", sp.getGameProfile().getName(), d.blockPosition());
+    }
+
+    /**
+     * La Llave del Arbol de verdad en la cerradura: una entidad (item_display), que se ve igual con y sin shaders (antes la
+     * dibujaba el cliente por su cuenta: con shaders no salia, y ademas entraba por el mango y al girar quedaba de canto).
+     * Entra de punta, gira un cuarto de vuelta sobre su eje, se queda mientras se encienden las runas y se descorren los
+     * cerrojos, y se desvanece justo antes de que se abran las hojas.
+     */
+    private static void llaveEnLaCerradura(ServerLevel sl, double[] k) {
+        net.minecraft.world.entity.Display.ItemDisplay d = net.minecraft.world.entity.EntityType.ITEM_DISPLAY.create(sl);
+        if (d == null) return;
+        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+        tag.put("item", new ItemStack(DarkCraftMod.LLAVE_ARBOL.get()).save(new net.minecraft.nbt.CompoundTag()));
+        tag.putString("item_display", "none");
+        tag.put("transformation", matriz(llaveM(1.05f, 0f, 0.8f)));
+        net.minecraft.nbt.CompoundTag luz = new net.minecraft.nbt.CompoundTag();
+        luz.putInt("sky", 15);
+        luz.putInt("block", 15);
+        tag.put("brightness", luz);
+        tag.putFloat("view_range", 2.0f);
+        d.load(tag);
+        d.moveTo(k[0], k[1], k[2], 0f, 0f);
+        com.darkcraft.armas.EfectosRaiz.efimera(d);
+        sl.addFreshEntity(d);
+        float cuarto = (float) (Math.PI / 2);
+        com.darkcraft.rey.Victoria.despues(2, () -> llaveA(d, llaveM(0.40f, 0f, 0.8f), 20));
+        com.darkcraft.rey.Victoria.despues(26, () -> llaveA(d, llaveM(0.40f, cuarto, 0.8f), 14));
+        com.darkcraft.rey.Victoria.despues(40, () -> sl.sendParticles(net.minecraft.core.particles.ParticleTypes.WAX_ON,
+                k[0], k[1], k[2] + 0.15, 10, 0.18, 0.18, 0.05, 0.6));
+        com.darkcraft.rey.Victoria.despues(PuertaArbol.T_HOJAS - 10, () -> llaveA(d, llaveM(0.40f, cuarto, 0.02f), 8));
+        com.darkcraft.rey.Victoria.despues(PuertaArbol.T_HOJAS, d::discard);
+    }
+
+    /**
+     * La llave (en la textura, la punta abajo a la derecha) con la punta hacia la puerta (-Z, el norte), su centro a
+     * {@code d} bloques por delante de la cerradura y girada {@code giro} radianes sobre su eje.
+     */
+    private static org.joml.Matrix4f llaveM(float d, float giro, float escala) {
+        return new org.joml.Matrix4f().translate(0, 0, d).rotateZ(giro).rotateY((float) (Math.PI / 2))
+                .rotateZ((float) (Math.PI / 4)).scale(escala);
+    }
+
+    private static void llaveA(net.minecraft.world.entity.Display.ItemDisplay d, org.joml.Matrix4f m, int ticks) {
+        if (!d.isAlive()) return;
+        net.minecraft.nbt.CompoundTag t = d.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+        t.put("transformation", matriz(m));
+        t.putInt("interpolation_duration", ticks);
+        t.putInt("start_interpolation", 0);
+        d.load(t);
+    }
+
+    private static net.minecraft.nbt.ListTag matriz(org.joml.Matrix4f m) {
+        net.minecraft.nbt.ListTag l = new net.minecraft.nbt.ListTag();
+        for (int i = 0; i < 16; i++) l.add(net.minecraft.nbt.FloatTag.valueOf(m.getRowColumn(i >> 2, i & 3)));
+        return l;
     }
 
     /** Planos: la llave en la cerradura, las runas y los cerrojos, y las hojas abriendose hacia la sala. */
     private static List<Shot> planos(PuertaArbol d) {
         double x = d.getX(), y = d.getY(), z = d.getZ() + PuertaArbol.GROSOR / 2;
         double[] k = d.cerradura();
+        // de lado y subiendo un poco mientras la llave gira: se le ve la cara plana antes y despues del giro
         Shot a = new Shot(0f, 2.6f, 48, 0, 1,
-                new double[]{k[0] + 1.1, k[1] + 0.35, z + 2.1, k[0] + 0.55, k[1] + 0.2, z + 1.5},
-                new double[]{k[0], k[1], k[2], k[0], k[1] - 0.05, k[2]});
+                new double[]{k[0] + 1.6, k[1] + 0.6, z + 2.0, k[0] + 1.15, k[1] + 1.0, z + 1.5},
+                new double[]{k[0], k[1], k[2] + 0.5, k[0], k[1] - 0.02, k[2] + 0.3});
         Shot b = new Shot(2.6f, 4.6f, 62, 0, 1,
                 new double[]{x + 3.4, y + 2.6, z + 6.5, x + 2.2, y + 3.4, z + 6.0},
                 new double[]{x, y + 5.0, z, x - 0.4, y + 5.2, z});

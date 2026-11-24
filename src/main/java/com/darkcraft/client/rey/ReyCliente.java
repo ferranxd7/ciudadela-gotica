@@ -257,7 +257,8 @@ public final class ReyCliente {
         int n = gavran ? linea - com.darkcraft.rey.Voces.BASE_GAVRAN : linea;
         var tabla = gavran ? DarkCraftMod.GAVRAN_VOZ : DarkCraftMod.REY_VOZ;
         if (n < 1 || n >= tabla.length) return;
-        if (voz != null) mc.getSoundManager().stop(voz);
+        // la anterior ya ha acabado de hablar: se deja sonar la cola de su eco (solo se corta si aun estaba hablando)
+        if (voz != null && ticks < vozHasta) mc.getSoundManager().stop(voz);
         voz = new SimpleSoundInstance(tabla[n].get().getLocation(), SoundSource.MASTER, 1.0f, 1.0f,
                 SoundInstance.createUnseededRandom(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true);
         mc.getSoundManager().play(voz);

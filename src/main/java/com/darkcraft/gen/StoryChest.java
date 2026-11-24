@@ -2,7 +2,10 @@ package com.darkcraft.gen;
 
 import net.minecraft.core.Direction;
 
-/** Cofre de la cronica con su cartel al lado. Se construye el ultimo para que nada lo tape. */
+/**
+ * Cofre de la cronica. Se construye el ultimo para que nada lo tape. Ya no lleva cartel al lado (el usuario pidio
+ * quitarlos): se reconoce por su brillo dorado (StoryEvents.brillar). El sitio del cartel se deja despejado.
+ */
 public final class StoryChest extends Element {
     public final int chapter, x, y, z, sx, sz;
     private final Direction facing, signFront;
@@ -28,6 +31,5 @@ public final class StoryChest extends Element {
             if (c.inXZ(p[0], p[1]) && c.isAir(p[0], y - 1, p[1])) c.set(p[0], y - 1, p[1], Pal.PB_BRICKS);
         }
         c.storyChest(x, y, z, facing, chapter);
-        c.storySign(sx, y, sz, signFront, chapter);
     }
 }

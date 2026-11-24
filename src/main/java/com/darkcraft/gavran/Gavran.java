@@ -531,13 +531,14 @@ public class Gavran extends Monster {
     private static final int P = com.darkcraft.rey.Voces.PAUSA;
     private static final int T_FRASE1 = 66;
     private static final int T_FRASE2 = T_FRASE1 + voz(1) + P;
-    private static final int T_SALTA = T_FRASE2 + voz(2) + 16;
+    private static final int T_SALTA = T_FRASE2 + voz(2) + P;
     private static final int T_FRASE3 = T_SALTA + 70;
-    private static final int T_SALUDO = T_FRASE3 + 110;
-    private static final int T_FRASE4 = Math.max(T_FRASE3 + voz(3) + P, T_SALUDO + 20);
-    public static final int T_LUCHA = T_FRASE4 + voz(4) + 30;
+    private static final int T_SALUDO = T_FRASE3 + Math.max(60, voz(3) - 14);
+    private static final int T_FRASE4 = Math.max(T_FRASE3 + voz(3) + P, T_SALUDO + 14);
+    /** La pelea empieza nada mas acabar de hablar (el usuario no quiere pausas al final de los dialogos). */
+    public static final int T_LUCHA = T_FRASE4 + voz(4) + P;
     /** Duracion de la entrada (ticks). */
-    public static final int INTRO_TICKS = T_LUCHA + 10;
+    public static final int INTRO_TICKS = T_LUCHA + 6;
     /** Lo que sube de mas al saltar de la rama (el plano del salto lo sigue con la misma cuenta). */
     private static final double SALTO_ALTO = 2.5;
 
@@ -630,7 +631,7 @@ public class Gavran extends Monster {
             setFlag(F_INTRO, false);
             barra.setVisible(true);
             for (ServerPlayer p : vivos(sl)) barra.addPlayer(p);
-            recup = 10;
+            recup = 4;
             burla = 0;
             cambiar(Estado.LUCHA);
             cds.put(Atq.INVOCAR, tGlobal + 400);
@@ -722,7 +723,7 @@ public class Gavran extends Monster {
     void habla(ServerLevel sl, int n) {
         for (ServerPlayer p : sl.players())
             if (p.distanceToSqr(this) < 96 * 96) Net.to(p, new Net.ReyHabla(getId(), VOZ_BASE + n));
-        hablaHasta = tGlobal + com.darkcraft.rey.Voces.ticks(VOZ_BASE + n) + 6;
+        hablaHasta = tGlobal + com.darkcraft.rey.Voces.ticks(VOZ_BASE + n);
         setFlag(F_HABLA, true);
     }
 
@@ -1907,7 +1908,9 @@ public class Gavran extends Monster {
 
     /** Lo que dura la cinematica de su muerte (ticks) y cuando pasa cada cosa. */
     public static final int MUERTE_TICKS = 560;
-    private static final int M_FRASE17 = 24, M_FRASE18 = 140, M_HOJAS = 278, M_FLORECE = 300, M_COFRE = 410, M_FIN = 560;
+    private static final int M_HOJAS = 278, M_FLORECE = 300, M_COFRE = 410, M_FIN = 560;
+    /** Sus dos ultimas frases, casi seguidas, y se deshace en hojas nada mas acabar la segunda. */
+    private static final int M_FRASE18 = M_HOJAS - voz(18) - 8, M_FRASE17 = Math.max(14, M_FRASE18 - voz(17) - com.darkcraft.rey.Voces.PAUSA);
 
     private void empezarMuerte(ServerLevel sl) {
         if (estado == Estado.MUERTE) return;

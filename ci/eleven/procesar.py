@@ -10,10 +10,14 @@ Monta los audios de ElevenLabs (ci/eleven/master) para el juego:
   poco mas de graves. En la fase 2 (frases 11, 12, 14, 15 y 16) la misma voz mas grave, con una segunda voz por
   debajo y madera crujiendo (como el fuego del Rey).
 Sale todo en src/main/resources/assets/darkcraft/sounds/ (rey/voz_N.ogg, gavran/voz_N.ogg, sfx/NOMBRE_K.ogg) y las
-duraciones de las frases en assets/darkcraft/rey_voces.json ("duraciones" del Rey y "gavran"). Necesita ffmpeg.
+duraciones de las frases en assets/darkcraft/rey_voces.json ("duraciones" del Rey y "gavran"; "habla" y
+"habla_gavran" = el segundo en que acaba de hablar de verdad, sin el silencio ni la cola del eco: con eso cuenta el
+juego para que la siguiente frase o la pelea no tarden en llegar). A las voces se les quita el silencio del principio.
+Necesita ffmpeg.
 """
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -92,14 +96,44 @@ def duracion(f):
     return float(p.stdout.strip())
 
 
+def habla(f):
+    """(silencio del principio, segundo en que acaba de hablar, duracion) de un audio original."""
+    r = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", f, "-af", "silencedetect=noise=-38dB:d=0.10",
+                        "-f", "null", "-"], capture_output=True, text=True)
+    dur = duracion(f)
+    ini = [float(x) for x in re.findall(r"silence_start: (-?[0-9.]+)", r.stderr)]
+    fin = [float(x) for x in re.findall(r"silence_end: ([0-9.]+)", r.stderr)]
+    principio = fin[0] if ini and ini[0] <= 0.01 and fin else 0.0
+    final = dur
+    if ini and (len(fin) < len(ini) or fin[-1] >= dur - 0.06):
+        final = max(principio + 0.2, ini[-1])
+    return principio, final, dur
+
+
+def recorte(src):
+    """El filtro que quita el silencio del principio, lo que quita (s) y lo que queda hablado (s)."""
+    principio, final, _ = habla(src)
+    r = max(0.0, principio - 0.03)
+    return (f"atrim=start={r:.3f},asetpts=PTS-STARTPTS," if r > 0.01 else ""), r, final - r
+
+
+# lo que estira la voz cada efecto (asetrate + atempo) y la cola de eco que aun se oye al acabar de hablar
+ESTIRA_MONSTRUO = 1 / (0.82 * 1.10)
+ESTIRA_ARBOL = 1 / (0.88 * 1.0606)
+COLA = 0.10
+
+
 def voz_normal(src, dst):
-    ff(["-i", src, "-af", VOZ, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    pre, _, hablado = recorte(src)
+    ff(["-i", src, "-af", pre + VOZ, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA
 
 
 def voz_monstruo(src, dst, fuego, desfase):
-    d = duracion(src) * 1.12 + 0.9
+    pre, quita, hablado = recorte(src)
+    d = (duracion(src) - quita) * 1.12 + 0.9
     grafo = (
-        "[0:a]asplit=2[v1][v2];"
+        "[0:a]" + pre + "asplit=2[v1][v2];"
         "[v1]asetrate=44100*0.82,aresample=44100,atempo=1.10[baja];"
         "[v2]asetrate=44100*0.60,aresample=44100,atempo=1.5033,volume=0.55[sub];"
         "[baja][sub]amix=inputs=2:weights=1 0.7:normalize=0,"
@@ -112,17 +146,21 @@ def voz_monstruo(src, dst, fuego, desfase):
     )
     ff(["-i", src, "-i", fuego, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1",
         "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado * ESTIRA_MONSTRUO + COLA
 
 
 def voz_gavran(src, dst):
-    ff(["-i", src, "-af", VOZ_GAVRAN, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    pre, _, hablado = recorte(src)
+    ff(["-i", src, "-af", pre + VOZ_GAVRAN, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA
 
 
 def voz_arbol(src, dst, madera, desfase):
     """La voz de la fase 2: mas grave, una segunda voz por debajo y madera crujiendo."""
-    d = duracion(src) * 1.08 + 1.0
+    pre, quita, hablado = recorte(src)
+    d = (duracion(src) - quita) * 1.08 + 1.0
     grafo = (
-        "[0:a]asplit=2[v1][v2];"
+        "[0:a]" + pre + "asplit=2[v1][v2];"
         "[v1]asetrate=44100*0.88,aresample=44100,atempo=1.0606[baja];"
         "[v2]asetrate=44100*0.66,aresample=44100,atempo=1.4141,volume=0.5[sub];"
         "[baja][sub]amix=inputs=2:weights=1 0.65:normalize=0,"
@@ -135,6 +173,7 @@ def voz_arbol(src, dst, madera, desfase):
     )
     ff(["-i", src, "-i", madera, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1",
         "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado * ESTIRA_ARBOL + COLA
 
 
 def efecto(src, dst, maxs, fade, lufs):
@@ -153,17 +192,18 @@ def main():
     os.makedirs(rey, exist_ok=True)
     os.makedirs(sfx, exist_ok=True)
     fuego = os.path.join(MASTER, "sfx", "fuego_crepitar_1.mp3")
-    dur, fallos = {}, 0
+    dur, hab, fallos = {}, {}, 0
     for n, toma in sorted(TOMAS.items()):
         src = os.path.join(MASTER, "rey", f"voz_{n}{toma}.mp3")
         dst = os.path.join(rey, f"voz_{n}.ogg")
         try:
             if n in MONSTRUO and os.path.exists(fuego):
-                voz_monstruo(src, dst, fuego, 1.5 + (n * 2.3) % 20)
+                h = voz_monstruo(src, dst, fuego, 1.5 + (n * 2.3) % 20)
             else:
-                voz_normal(src, dst)
+                h = voz_normal(src, dst)
             dur[n] = round(duracion(dst), 2)
-            print(f"voz {n:2d}{' (monstruo)' if n in MONSTRUO else ''}: {dur[n]} s")
+            hab[n] = round(min(h, dur[n]), 2)
+            print(f"voz {n:2d}{' (monstruo)' if n in MONSTRUO else ''}: {dur[n]} s (habla hasta {hab[n]})")
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO voz {n}: {e}")
@@ -171,7 +211,7 @@ def main():
     gav = os.path.join(ASSETS, "sounds", "gavran")
     os.makedirs(gav, exist_ok=True)
     madera = os.path.join(MASTER, "sfx", "madera_cruje_1.mp3")
-    dur_g = {}
+    dur_g, hab_g = {}, {}
     for n, toma in sorted(TOMAS_GAVRAN.items()):
         src = os.path.join(MASTER, "gavran", f"voz_{n}{toma}.mp3")
         dst = os.path.join(gav, f"voz_{n}.ogg")
@@ -181,16 +221,17 @@ def main():
             continue
         try:
             if n in ARBOL and os.path.exists(madera):
-                voz_arbol(src, dst, madera, (n * 0.7) % 2.5)
+                h = voz_arbol(src, dst, madera, (n * 0.7) % 2.5)
             else:
-                voz_gavran(src, dst)
+                h = voz_gavran(src, dst)
             dur_g[n] = round(duracion(dst), 2)
-            print(f"gavran {n:2d}{' (arbol)' if n in ARBOL else ''}: {dur_g[n]} s")
+            hab_g[n] = round(min(h, dur_g[n]), 2)
+            print(f"gavran {n:2d}{' (arbol)' if n in ARBOL else ''}: {dur_g[n]} s (habla hasta {hab_g[n]})")
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO gavran {n}: {e}")
     with open(os.path.join(ASSETS, "rey_voces.json"), "w") as fh:
-        json.dump({"duraciones": dur, "gavran": dur_g}, fh)
+        json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g}, fh)
     for nombre, (maxs, fade, lufs) in SFX.items():
         tomas = TOMAS_SFX.get(nombre) or ((1,) if nombre in UNA_TOMA else (1, 2))
         for i, k in enumerate(tomas, 1):

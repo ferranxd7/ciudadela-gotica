@@ -395,8 +395,10 @@ public final class FortalezaHueso extends Element {
         for (int z = z0 + 2; z <= z1 - 2; z++) for (int x = cx - 1; x <= cx + 1; x++)
             c.set(x, Y, z, (x == cx ? Blocks.RED_CARPET : Blocks.BLACK_CARPET).defaultBlockState());
         for (int z = z0 + 5; z <= z1 - 3; z += 5)
-            for (int s = -1; s <= 1; s += 2)
+            for (int s = -1; s <= 1; s += 2) {
+                if (enEscalera(cx + s * 4, z)) continue; // ahi sube la escalera de caracol: una columna la atascaba
                 for (int y = Y; y < Y + PISO - 1; y++) c.set(cx + s * 4, y, z, y == Y || y == Y + PISO - 2 ? Pal.PB_CHISELED : HUESO);
+            }
         int[] cf = cofre();
         for (int x = cx - 2; x <= cx + 2; x++) c.set(x, Y, cf[2], Pal.PB_BRICKS);
         c.set(cx - 2, Y + 1, cf[2], Pal.SOUL_LANTERN);
@@ -414,9 +416,11 @@ public final class FortalezaHueso extends Element {
         }
         // antorchas de almas en las columnas de la planta baja, mirando a la alfombra
         for (int z = z0 + 5; z <= z1 - 3; z += 5)
-            for (int s = -1; s <= 1; s += 2)
+            for (int s = -1; s <= 1; s += 2) {
+                if (enEscalera(cx + s * 4, z)) continue;
                 c.set(cx + s * 3, Y + 3, z, Blocks.SOUL_WALL_TORCH.defaultBlockState()
                         .setValue(net.minecraft.world.level.block.WallTorchBlock.FACING, s < 0 ? Direction.EAST : Direction.WEST));
+            }
         // piso 1: el cuartel (literas de hueso y armas)
         int y1 = Y + PISO;
         for (int z = cz - 16; z <= z1 - 3; z += 3) {
@@ -435,10 +439,68 @@ public final class FortalezaHueso extends Element {
         for (int x = cx - 2; x <= cx + 2; x++) for (int y = y3 + 1; y <= y3 + 5; y++) c.set(x, y, z1 - 2, x == cx - 2 || x == cx + 2 || y == y3 + 5 ? HUESO : Pal.b(Blocks.BLACK_STAINED_GLASS));
     }
 
+    /** Si (x, z) cae en la escalera de caracol (su pilar o el anillo de escalones). */
+    private boolean enEscalera(int x, int z) {
+        return Math.abs(x - (cx + KX - 4)) <= 1 && Math.abs(z - (cz + KZ0 + 4)) <= 1;
+    }
+
+    private static final int[][] ANILLO = {{-1, -1}, {0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}};
+
+    /**
+     * Arreglo para las fortalezas levantadas antes (la escalera se atascaba): quita la columna de hueso que caia sobre
+     * un escalon (y su antorcha), deja tres bloques libres sobre cada escalon y abre la valla por los pasillos pegados
+     * al muro, que encerraba a quien se bajaba en un piso. No toca nada mas, y si ya esta bien no cambia nada.
+     */
+    public void arreglarEscalera(Canvas c) {
+        int px = cx + KX - 4, pz = cz + KZ0 + 4, top = Y + NPISOS * PISO;
+        // la columna (cx + 4, cz + KZ0 + 5) y su antorcha
+        int colX = cx + 4, colZ = cz + KZ0 + 5;
+        if (enEscalera(colX, colZ)) {
+            for (int y = Y; y < Y + PISO - 1; y++) {
+                BlockState b = c.get(colX, y, colZ);
+                if (b.is(Blocks.BONE_BLOCK) || b.is(Blocks.CHISELED_POLISHED_BLACKSTONE)) c.set(colX, y, colZ, Pal.AIR);
+            }
+            if (c.get(cx + 3, Y + 3, colZ).is(Blocks.SOUL_WALL_TORCH)) c.set(cx + 3, Y + 3, colZ, Pal.AIR);
+        }
+        despejarEscalera(c, px, pz, top);
+        vallasEscalera(c, px, pz, true);
+    }
+
+    /** Tres bloques libres encima de cada escalon (menos otros escalones, que no los hay tan cerca). */
+    private void despejarEscalera(Canvas c, int px, int pz, int top) {
+        for (int k = 0; k < top - Y; k++) {
+            int[] a = ANILLO[k % 8];
+            for (int y = Y + k + 1; y <= Y + k + 3; y++) {
+                BlockState b = c.get(px + a[0], y, pz + a[1]);
+                if (!b.isAir() && !b.is(Blocks.LIGHT) && !b.is(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS)) c.set(px + a[0], y, pz + a[1], Pal.AIR);
+            }
+        }
+    }
+
+    /**
+     * La barandilla alrededor del hueco de la escalera en cada piso, menos por donde se sale y menos en los pasillos
+     * pegados a los muros norte y este (ahi no hay donde caerse, y la valla encerraba a quien se bajaba de la escalera).
+     */
+    private void vallasEscalera(Canvas c, int px, int pz, boolean soloQuitar) {
+        for (int p = 1; p <= NPISOS; p++) {
+            int[] sale = ANILLO[(p * PISO - 1) % 8];
+            int ex = px + 2 * sale[0], ez = pz + 2 * sale[1];
+            for (int dx = -2; dx <= 2; dx++)
+                for (int dz = -2; dz <= 2; dz++) {
+                    if (Math.max(Math.abs(dx), Math.abs(dz)) != 2) continue;
+                    int x = px + dx, z = pz + dz;
+                    boolean libre = Math.abs(x - ex) + Math.abs(z - ez) <= 1 || x >= cx + KX - 2 || z <= cz + KZ0 + 2;
+                    if (libre) {
+                        if (c.get(x, Y + p * PISO, z).is(Blocks.DARK_OAK_FENCE)) c.set(x, Y + p * PISO, z, Pal.AIR);
+                    } else if (!soloQuitar) c.set(x, Y + p * PISO, z, Pal.connected(Blocks.DARK_OAK_FENCE, Direction.Axis.X));
+                }
+        }
+    }
+
     /** Escalera de caracol en la esquina noreste de dentro de la torre, del suelo a la azotea. */
     private void escalera(Canvas c) {
         int px = cx + KX - 4, pz = cz + KZ0 + 4; // el pilar
-        int[][] anillo = {{-1, -1}, {0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}};
+        int[][] anillo = ANILLO;
         Direction[] mira = {Direction.EAST, Direction.EAST, Direction.SOUTH, Direction.SOUTH, Direction.WEST, Direction.WEST, Direction.NORTH, Direction.NORTH};
         int top = Y + NPISOS * PISO;
         // hueco en cada suelo (y en la azotea) y barandilla alrededor
@@ -452,18 +514,8 @@ public final class FortalezaHueso extends Element {
             int[] a = anillo[k % 8];
             c.set(px + a[0], Y + k, pz + a[1], Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, mira[k % 8], false));
         }
-        // barandilla alrededor del hueco en cada piso, menos por donde se sale
-        for (int p = 1; p <= NPISOS; p++) {
-            int[] sale = anillo[(p * PISO - 1) % 8];
-            int ex = px + 2 * sale[0], ez = pz + 2 * sale[1];
-            for (int dx = -2; dx <= 2; dx++)
-                for (int dz = -2; dz <= 2; dz++) {
-                    if (Math.max(Math.abs(dx), Math.abs(dz)) != 2) continue;
-                    int x = px + dx, z = pz + dz;
-                    if (Math.abs(x - ex) + Math.abs(z - ez) <= 1) continue;
-                    c.set(x, Y + p * PISO, z, Pal.connected(Blocks.DARK_OAK_FENCE, Direction.Axis.X));
-                }
-        }
+        despejarEscalera(c, px, pz, top);
+        vallasEscalera(c, px, pz, false);
     }
 
     private void azotea(Canvas c) {

@@ -36,8 +36,8 @@ import org.lwjgl.opengl.GL12;
 /**
  * El Espejo de la Sombra en la pantalla: un espejo ovalado de obsidiana y plata arriba a la derecha, con el mapa
  * oscurecido como un reflejo que gira con el jugador, humo de la Sombra alrededor, el ojo rojo de la cresta que late,
- * la N del norte en el marco, los lugares, cofres, jefes, amigos y marcas, y debajo el nombre del sitio y las
- * coordenadas. Bajo techo ensena la planta del piso en el que esta el jugador.
+ * la N del norte en el marco, los lugares, cofres, jefes, amigos y marcas, y debajo el nombre del sitio (sin
+ * coordenadas: el usuario pidio quitarlas). Bajo techo ensena la planta del piso en el que esta el jugador.
  */
 public final class EspejoHud {
     private EspejoHud() {}
@@ -419,7 +419,7 @@ public final class EspejoHud {
         g.flush();
     }
 
-    /** Debajo del espejo: el nombre del sitio y las coordenadas. */
+    /** Debajo del espejo: solo el nombre del sitio (el usuario pidio quitar las coordenadas: quedaban mal). */
     private static void texto(Minecraft mc, GuiGraphics g, float cx, float yBottom, float s, float a, int sw) {
         Component nombre;
         String l = EspejoCliente.lugar;
@@ -431,24 +431,20 @@ public final class EspejoHud {
             nombre = k != null && net.minecraft.client.resources.language.I18n.exists(k) ? Component.translatable(k)
                     : Component.translatable("darkcraft.espejo.desconocido");
         }
-        BlockPos p = mc.player.blockPosition();
-        String coords = "X " + p.getX() + "  Y " + p.getY() + "  Z " + p.getZ();
         float ts = Mth.clamp(s / 0.34f, 0.7f, 1.0f);
-        int w1 = mc.font.width(nombre), w2 = mc.font.width(coords);
-        float w = Math.max(w1, w2 * 0.85f) * ts + 10;
+        int w1 = mc.font.width(nombre);
+        float w = w1 * ts + 10;
         // centrado debajo del espejo, pero sin salirse por la derecha
         cx = Math.min(cx, sw - 2 - w / 2);
         float y = yBottom + 1;
         int fondo = ((int) (0x9a * a) << 24) | 0x0a0406;
-        g.fill(Math.round(cx - w / 2), Math.round(y), Math.round(cx + w / 2), Math.round(y + 21 * ts), fondo);
+        g.fill(Math.round(cx - w / 2), Math.round(y), Math.round(cx + w / 2), Math.round(y + 12 * ts), fondo);
         int borde = ((int) (0xb0 * a) << 24) | 0x6a0c12;
-        g.fill(Math.round(cx - w / 2), Math.round(y + 21 * ts), Math.round(cx + w / 2), Math.round(y + 21 * ts) + 1, borde);
+        g.fill(Math.round(cx - w / 2), Math.round(y + 12 * ts), Math.round(cx + w / 2), Math.round(y + 12 * ts) + 1, borde);
         g.pose().pushPose();
         g.pose().translate(cx, y + 2, 0);
         g.pose().scale(ts, ts, 1);
         g.drawString(mc.font, nombre, -w1 / 2, 0, ((int) (a * 255) << 24) | 0xEADBC4, true);
-        g.pose().scale(0.85f, 0.85f, 1);
-        g.drawString(mc.font, coords, -w2 / 2, 13, ((int) (a * 255) << 24) | 0x9A9AA6, false);
         g.pose().popPose();
     }
 
