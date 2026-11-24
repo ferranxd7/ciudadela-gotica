@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "5";
+    private static final String V = "6";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -62,6 +62,117 @@ public final class Net {
                 .encoder(EspejoAccion::write).decoder(EspejoAccion::read).consumerMainThread(EspejoAccion::handle).add();
         CH.messageBuilder(Fortaleza.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(Fortaleza::write).decoder(Fortaleza::read).consumerMainThread(Fortaleza::handle).add();
+        CH.messageBuilder(RolEstado.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(RolEstado::write).decoder(RolEstado::read).consumerMainThread(RolEstado::handle).add();
+        CH.messageBuilder(Estamina.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Estamina::write).decoder(Estamina::read).consumerMainThread(Estamina::handle).add();
+        CH.messageBuilder(Cartel.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Cartel::write).decoder(Cartel::read).consumerMainThread(Cartel::handle).add();
+        CH.messageBuilder(Recuperar.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder((m, b) -> {}).decoder(b -> new Recuperar()).consumerMainThread(Recuperar::handle).add();
+        CH.messageBuilder(Ecos.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Ecos::write).decoder(Ecos::read).consumerMainThread(Ecos::handle).add();
+    }
+
+    // ------------------------------------------------------------------ rol: ecos, espada de luz, estamina y carteles
+
+    /**
+     * Lo que sabe el cliente del rol del jugador: sus Ecos de la Sombra, cuantos acaba de ganar (para el "+120"), si esta
+     * en combate y su espada de luz (donde murio, con los ecos que guarda), si la hay.
+     */
+    public record RolEstado(int ecos, int ganados, boolean combate, boolean espada, String dim, double x, double y, double z,
+                            int ecosEspada) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(ecos);
+            b.writeVarInt(ganados);
+            b.writeBoolean(combate);
+            b.writeBoolean(espada);
+            if (espada) {
+                b.writeUtf(dim, 128);
+                b.writeDouble(x);
+                b.writeDouble(y);
+                b.writeDouble(z);
+                b.writeVarInt(ecosEspada);
+            }
+        }
+
+        static RolEstado read(FriendlyByteBuf b) {
+            int ecos = b.readVarInt(), ganados = b.readVarInt();
+            boolean combate = b.readBoolean(), espada = b.readBoolean();
+            if (!espada) return new RolEstado(ecos, ganados, combate, false, "", 0, 0, 0, 0);
+            return new RolEstado(ecos, ganados, combate, true, b.readUtf(128), b.readDouble(), b.readDouble(), b.readDouble(), b.readVarInt());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.ClientRol.estado(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** La estamina (en decimas), su maximo y si esta agotado (no puede correr, saltar ni atacar hasta recuperarse un poco). */
+    public record Estamina(int decimas, int max, boolean agotado) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(decimas);
+            b.writeVarInt(max);
+            b.writeBoolean(agotado);
+        }
+
+        static Estamina read(FriendlyByteBuf b) {
+            return new Estamina(b.readVarInt(), b.readVarInt(), b.readBoolean());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.ClientRol.estamina(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Un cartel grande en la pantalla: jefe abatido (la clave es su nombre), zona descubierta, ecos recuperados (n)... */
+    public record Cartel(int tipo, String clave, int n) {
+        public static final int MUERTE = 0, JEFE = 1, ZONA = 2, ECOS = 3, GUARDIA = 4;
+
+        void write(FriendlyByteBuf b) {
+            b.writeByte(tipo);
+            b.writeUtf(clave, 128);
+            b.writeVarInt(n);
+        }
+
+        static Cartel read(FriendlyByteBuf b) {
+            return new Cartel(b.readByte(), b.readUtf(128), b.readVarInt());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.Carteles.recibir(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Ecos que salen volando de un enemigo caido hacia el jugador (n: cuantos, para el tamano del rastro). */
+    public record Ecos(double x, double y, double z, int n) {
+        void write(FriendlyByteBuf b) {
+            b.writeDouble(x);
+            b.writeDouble(y);
+            b.writeDouble(z);
+            b.writeVarInt(n);
+        }
+
+        static Ecos read(FriendlyByteBuf b) {
+            return new Ecos(b.readDouble(), b.readDouble(), b.readDouble(), b.readVarInt());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.ClientRol.vuelan(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Del cliente: ha pulsado la tecla junto a su espada de luz (recoger los ecos). */
+    public record Recuperar() {
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.rol.Rol.recuperar(p);
+            ctx.get().setPacketHandled(true);
+        }
     }
 
     /** Si el jugador esta en la zona de una Fortaleza de Hueso (su musica). */

@@ -390,7 +390,9 @@ public final class Espejo {
         if (p.tickCount % 20 != 7 || !activo(p)) return;
         descubrir(p);
         if (p.tickCount % 40 == 7) coleccion(p);
-        Net.to(p, new Net.EspejoPos(lugarActual(p), amigos(p)));
+        String lugar = lugarActual(p);
+        Net.to(p, new Net.EspejoPos(lugar, amigos(p)));
+        com.darkcraft.rol.Rol.zona(p, lugar);
         if (SUCIOS.remove(p.getUUID())) enviar(p, false);
     }
 

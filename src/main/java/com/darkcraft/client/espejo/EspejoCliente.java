@@ -85,6 +85,22 @@ public final class EspejoCliente {
         return activo && estado != null;
     }
 
+    /** Si esta saliendo el aviso de que el espejo despierta (los carteles esperan a que acabe). */
+    public static boolean avisando() {
+        return aviso >= 0;
+    }
+
+    /** El cofre del capitulo que toca (x, z), si el espejo lo conoce: para la brujula. */
+    public static int[] objetivo() {
+        Minecraft mc = Minecraft.getInstance();
+        if (!activo() || mc.level == null || mc.level.dimension() != net.minecraft.world.level.Level.OVERWORLD) return null;
+        int siguiente = com.darkcraft.story.Story.next(estado.leidos());
+        for (Net.LugarE lu : estado.lugares())
+            if (lu.tipo() == com.darkcraft.espejo.Espejo.COFRE && lu.cap() == siguiente && lu.estado() != com.darkcraft.espejo.Espejo.HECHO)
+                return new int[]{lu.x(), lu.z()};
+        return null;
+    }
+
     /** Para que el HUD y el libro sepan que algo ha cambiado. */
     public static long version() {
         return estadoVersion;

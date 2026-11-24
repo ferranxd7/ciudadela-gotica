@@ -513,7 +513,7 @@ REY_UI = {
   "item.darkcraft.espada.combo2": "Ctrl + clic izquierdo: Juicio del Rey (80 de energía)",
   "item.darkcraft.espada.bloqueo": "Clic derecho: cubrirse con las espadas cruzadas",
   "item.darkcraft.espada.dos": "Con una en cada mano los combos golpean más fuerte",
-  "darkcraft.espada.sin_energia": "Te falta energía (necesitas %s): golpea con las espadas para llenarla",
+  "darkcraft.espada.sin_energia": "Te falta maná (necesitas %s): golpea con el arma para llenarlo",
   "item.darkcraft.llave_arbol": "Llave del Árbol",
   "item.darkcraft.llave_arbol.lore": "Abre la gran puerta de la Sala del Árbol",
   "item.darkcraft.llave_arbol.aqui_no": "Esta llave abre la gran puerta de la Sala del Árbol, en lo alto de la torre del árbol",
@@ -568,7 +568,7 @@ REY_UI = {
   "item.darkcraft.espada.combo2": "Ctrl + left click: King's Judgement (80 energy)",
   "item.darkcraft.espada.bloqueo": "Right click: guard with crossed swords",
   "item.darkcraft.espada.dos": "With one in each hand, combos hit harder",
-  "darkcraft.espada.sin_energia": "Not enough energy (you need %s): strike with the swords to fill it",
+  "darkcraft.espada.sin_energia": "Not enough mana (you need %s): strike with your weapon to fill it",
   "item.darkcraft.llave_arbol": "Key of the Tree",
   "item.darkcraft.llave_arbol.lore": "Opens the great door of the Tree Hall",
   "item.darkcraft.llave_arbol.aqui_no": "This key opens the great door of the Tree Hall, at the top of the tree tower",
@@ -1157,6 +1157,7 @@ LOGROS_UI = {
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import perdidos  # noqa: E402
+import rol  # noqa: E402
 
 
 def build():
@@ -1184,6 +1185,7 @@ def build():
         d.update(GAVRAN_UI[lang])
         d.update(LOGROS_UI[lang])
         d.update(perdidos.claves(lang))
+        d.update(rol.claves(lang))
         out[lang] = d
     # el resto de idiomas: lo que falte se queda en ingles (y se avisa)
     for code, mod in otros_idiomas().items():
@@ -1219,6 +1221,8 @@ def build():
                   and not k.startswith("darkcraft.cap.") and not k.startswith("darkcraft.pista.")
                   and not k.startswith("darkcraft.narracion.") and not k.startswith("darkcraft.rey.voz.")
                   and not k.startswith("darkcraft.gavran.voz.")]
+        # la interfaz nueva (rol.py) sale en espanol e ingles; los demas idiomas, mas adelante en tandas
+        faltan = [k for k in faltan if k not in rol.EN]
         if faltan:
             print(f"{code}: {len(faltan)} textos sin traducir (salen en ingles): {faltan[:8]}")
         out[code] = d

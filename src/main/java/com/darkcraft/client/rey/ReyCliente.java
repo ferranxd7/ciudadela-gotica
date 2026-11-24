@@ -343,12 +343,7 @@ public final class ReyCliente {
         if (enFoco()) {
             float in = Mth.clamp((ticks - focoIni + pt) / 15f, 0f, 1f), out = Mth.clamp((focoFin - ticks - pt) / 15f, 0f, 1f);
             bh = Math.round(h * 0.11f * Math.min(in, out));
-            if (bh > 0) {
-                g.fill(0, 0, w, bh, 0xFF000000);
-                g.fill(0, h - bh, w, h, 0xFF000000);
-                g.fill(0, bh, w, bh + 1, 0x60800000);
-                g.fill(0, h - bh - 1, w, h - bh, 0x60800000);
-            }
+            com.darkcraft.client.ui.Marco.bandas(g, w, h, bh);
         }
     }
 

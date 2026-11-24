@@ -43,7 +43,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 20 * 60 * 18;
+    private static final int LIMIT = 20 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -694,6 +694,164 @@ public final class ClientCiTest {
         return t + 20;
     }
 
+    // ------------------------------------------------------------------ el HUD nuevo y el rol (ecos, estamina, muerte y espada de luz)
+
+    private static net.minecraft.world.entity.LivingEntity victima;
+    private static Vec3 murio;
+
+    private static void diana(ServerPlayer sp, float vida) {
+        ServerLevel lvl = sp.serverLevel();
+        net.minecraft.world.entity.monster.Husk h = net.minecraft.world.entity.EntityType.HUSK.create(lvl);
+        if (h == null) return;
+        h.moveTo(ex, ey, ez - 0.6, 180f, 0f);
+        h.setYHeadRot(180f);
+        h.setYBodyRot(180f);
+        h.setNoAi(true);
+        h.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(vida);
+        h.setHealth(vida);
+        h.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+        lvl.addFreshEntity(h);
+        victima = h;
+    }
+
+    private static String rolServidor(ServerPlayer sp) {
+        var e = com.darkcraft.rol.Ficha.espada(sp);
+        return "ecos=" + com.darkcraft.rol.Ficha.ecos(sp) + " estamina=" + Math.round(com.darkcraft.rol.Rol.estamina(sp)) + " combate="
+                + com.darkcraft.rol.Rol.enCombate(sp) + " comida=" + sp.getFoodData().getFoodLevel() + " vida=" + String.format("%.1f", sp.getHealth())
+                + " espada=" + (e == null ? "no" : e.ecos() + " en " + BlockPos.containing(e.x(), e.y(), e.z()).toShortString())
+                + " entidad=" + (com.darkcraft.rol.Espadas.de(sp.getUUID()) != null);
+    }
+
+    private static void logRol(Minecraft m, String what) {
+        log("  rol " + what + " (cliente): " + com.darkcraft.client.ui.ClientRol.resumen() + " | cartel: " + com.darkcraft.client.ui.Carteles.resumen()
+                + " | pantalla: " + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()));
+        server(m, sp -> log("  rol " + what + " (servidor): " + rolServidor(sp)));
+    }
+
+    private static int rol(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Rol: supervivencia en la plataforma, con espada y escudo y sin ecos", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.Carteles.callados = false;
+            com.darkcraft.rol.Rol.sinLimite = false;
+            server(m, sp -> {
+                sp.setInvisible(false);
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.getInventory().clearContent();
+                sp.getInventory().selected = 0;
+                sp.getInventory().items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                sp.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(net.minecraft.world.item.Items.SHIELD));
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft ecos quitar");
+                sp.teleportTo(sp.serverLevel(), ex, ey, ez - 3.5, 0f, 6f);
+            });
+        });
+        atTicks(t + 30, "captura del HUD nuevo (barras, ecos y brujula)", m -> {
+            logRol(m, "al empezar");
+            shot(m, "cliente_h01_hud");
+        });
+        atTicks(t + 34, "un golpe de 9", m -> server(m, sp -> {
+            sp.invulnerableTime = 0;
+            sp.hurt(sp.damageSources().generic(), 9f);
+        }));
+        atTicks(t + 42, "captura del rastro del dano", m -> shot(m, "cliente_h02_dano"));
+        atTicks(t + 60, "un enemigo delante", m -> server(m, sp -> diana(sp, 30f)));
+        atTicks(t + 68, "cae: sus ecos vuelan al jugador", m -> server(m, sp -> {
+            if (victima != null) victima.hurt(sp.damageSources().playerAttack(sp), 1000f);
+        }));
+        atTicks(t + 76, "captura de los ecos volando", m -> shot(m, "cliente_h03_ecos_vuelan"));
+        atTicks(t + 100, "captura del contador sumando", m -> {
+            logRol(m, "tras matar a un enemigo");
+            shot(m, "cliente_h04_ecos_mas");
+        });
+        atTicks(t + 112, "muchos ecos de golpe", m -> server(m, sp -> comando(sp, "darkcraft ecos dar 12345")));
+        atTicks(t + 130, "captura del contador", m -> {
+            logRol(m, "con 12345 mas");
+            shot(m, "cliente_h05_ecos_muchos");
+        });
+        atTicks(t + 140, "una diana para gastar la estamina", m -> server(m, sp -> diana(sp, 2000f)));
+        for (int i = 0; i < 13; i++)
+            atTicks(t + 146 + i * 3, "golpe " + (i + 1) + " de 13", m -> server(m, sp -> {
+                if (victima != null) sp.attack(victima);
+            }));
+        atTicks(t + 160, "captura a media estamina", m -> {
+            logRol(m, "tras cinco golpes");
+            shot(m, "cliente_h06_estamina");
+        });
+        atTicks(t + 190, "captura sin estamina", m -> {
+            logRol(m, "agotado");
+            shot(m, "cliente_h07_agotado");
+        });
+        atTicks(t + 236, "ya recuperado", m -> logRol(m, "al recuperarse"));
+        atTicks(t + 240, "morir llevando ecos", m -> server(m, sp -> {
+            if (victima != null) victima.discard();
+            victima = null;
+            murio = sp.position();
+            sp.invulnerableTime = 0;
+            sp.hurt(sp.damageSources().generic(), 1000f);
+        }));
+        atTicks(t + 262, "captura: HAS MUERTO", m -> {
+            logRol(m, "muerto");
+            shot(m, "cliente_h08_has_muerto_0");
+        });
+        atTicks(t + 318, "captura: los botones", m -> shot(m, "cliente_h09_has_muerto_1"));
+        atTicks(t + 322, "reaparecer", m -> {
+            if (m.player != null) m.player.respawn();
+            m.setScreen(null);
+        });
+        atTicks(t + 352, "de vuelta, a cinco bloques de la espada de luz", m -> {
+            enPrimeraPersona(m);
+            logRol(m, "tras reaparecer");
+            server(m, sp -> {
+                log("  tras reaparecer: vivo=" + sp.isAlive() + " equipo conservado=" + (sp.getInventory().getItem(0).is(net.minecraft.world.item.Items.IRON_SWORD)
+                        && sp.getOffhandItem().is(net.minecraft.world.item.Items.SHIELD)));
+                sp.setHealth(sp.getMaxHealth());
+                if (murio != null) sp.teleportTo(sp.serverLevel(), murio.x, murio.y, murio.z - 5, 0f, 14f);
+            });
+        });
+        atTicks(t + 392, "captura: la espada de luz", m -> {
+            logRol(m, "mirando la espada");
+            shot(m, "cliente_h10_espada_luz");
+        });
+        atTicks(t + 396, "acercarse a la espada", m -> server(m, sp -> {
+            if (murio != null) sp.teleportTo(sp.serverLevel(), murio.x, murio.y, murio.z - 2.3, 0f, 26f);
+        }));
+        atTicks(t + 416, "captura: el aviso de la tecla", m -> {
+            log("  junto a la espada: " + com.darkcraft.client.ui.ClientRol.juntoAEspada());
+            shot(m, "cliente_h11_aviso");
+        });
+        atTicks(t + 420, "pulsar la tecla: recoger los ecos", m -> com.darkcraft.net.Net.CH.sendToServer(new com.darkcraft.net.Net.Recuperar()));
+        atTicks(t + 440, "captura: ECOS RECUPERADOS", m -> {
+            logRol(m, "tras recogerlos");
+            shot(m, "cliente_h12_ecos_recuperados");
+        });
+        atTicks(t + 510, "cartel de jefe abatido", m -> server(m, sp -> comando(sp, "darkcraft ecos cartel 1")));
+        atTicks(t + 548, "captura: JEFE ABATIDO", m -> {
+            log("  cartel: " + com.darkcraft.client.ui.Carteles.resumen());
+            shot(m, "cliente_h13_jefe_abatido");
+        });
+        atTicks(t + 650, "cartel de zona descubierta", m -> server(m, sp -> comando(sp, "darkcraft ecos cartel 2")));
+        atTicks(t + 688, "captura: zona descubierta", m -> {
+            log("  cartel: " + com.darkcraft.client.ui.Carteles.resumen());
+            shot(m, "cliente_h14_zona");
+        });
+        atTicks(t + 760, "Fin del rol", m -> {
+            // en el resto de la prueba, sin carteles de zona (taparian las otras capturas) y sin gasto de estamina (las
+            // peleas con los jefes llevan un guion de golpes seguidos)
+            com.darkcraft.client.ui.Carteles.callados = true;
+            com.darkcraft.rol.Rol.sinLimite = true;
+            server(m, sp -> {
+                comando(sp, "darkcraft ecos quitar");
+                sp.getInventory().clearContent();
+                sp.setHealth(sp.getMaxHealth());
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 780;
+    }
+
     private static void logArmasAt(int t, String what) {
         atTicks(t, "estado de las armas " + what, m -> logArmas(m, what));
     }
@@ -702,8 +860,11 @@ public final class ClientCiTest {
     private static void plan(Minecraft mc) {
         steps.clear();
         next = 0;
+        com.darkcraft.rol.Rol.sinLimite = true;
+        com.darkcraft.client.ui.Carteles.callados = true;
         int fin = escaparate();
         fin = armas(fin);
+        fin = rol(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

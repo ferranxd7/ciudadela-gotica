@@ -1,0 +1,233 @@
+package com.darkcraft.client.ui;
+
+import com.darkcraft.DarkCraftMod;
+import com.darkcraft.client.ClientCine;
+import com.darkcraft.net.Net;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.Input;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.particles.DustColorTransitionOptions;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.MovementInputUpdateEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import org.joml.Vector3f;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * Lo que sabe el cliente del rol del jugador (se lo manda el servidor): los Ecos de la Sombra, la espada de luz, la
+ * estamina y si esta en combate. Y lo que hace con ello: junto a la espada, la tecla del inventario recoge los ecos en
+ * vez de abrirlo; agotado, no deja saltar ni atacar; y los ecos de un enemigo caido vuelan hasta el jugador.
+ */
+@Mod.EventBusSubscriber(modid = DarkCraftMod.MODID, value = Dist.CLIENT)
+public final class ClientRol {
+    private ClientRol() {}
+
+    // ------------------------------------------------------------------ estado
+
+    public static int ecos;
+    /** Lo que ensena el contador (va contando hasta {@link #ecos}). */
+    public static float ecosVistos;
+    /** El "+120" de encima del contador: cuanto y desde cuando. */
+    public static int ganado, ganadoTick = -1000;
+    /** El contador da un destello (acaban de llegar ecos). */
+    public static int destelloTick = -1000;
+
+    public static float estamina = 100f, estaminaMax = 100f;
+    public static boolean agotado, combate;
+    /** Momento del ultimo intento de hacer algo sin estamina (la barra parpadea). */
+    public static int sinEstaminaTick = -1000;
+
+    public static boolean hayEspada;
+    public static String espadaDim = "";
+    public static double ex, ey, ez;
+    public static int ecosEspada;
+
+    public static int ticks;
+    private static int enfriamiento;
+    private static boolean primero = true;
+
+    public static void estado(Net.RolEstado m) {
+        if (m.ganados() > 0 && !primero) {
+            // si hay ecos volando hacia el jugador, el "+N" sale cuando llegan; si no (un comando, la espada), ya
+            if (MOTAS.isEmpty()) llegan(m.ganados());
+            else pendiente += m.ganados();
+        }
+        ecos = m.ecos();
+        if (primero) ecosVistos = ecos;
+        primero = false;
+        combate = m.combate();
+        hayEspada = m.espada();
+        espadaDim = m.dim();
+        ex = m.x();
+        ey = m.y();
+        ez = m.z();
+        ecosEspada = m.ecosEspada();
+    }
+
+    public static void estamina(Net.Estamina m) {
+        estamina = m.decimas() / 10f;
+        estaminaMax = Math.max(1f, m.max() / 10f);
+        agotado = m.agotado();
+    }
+
+    private static int pendiente;
+
+    private static void llegan(int n) {
+        if (n <= 0) return;
+        ganado = ticks - ganadoTick < 50 ? ganado + n : n;
+        ganadoTick = ticks;
+        destelloTick = ticks;
+        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(DarkCraftMod.SFX_ECOS_GANADOS.get(),
+                0.9f + (float) Math.random() * 0.2f, 0.6f));
+    }
+
+    /** Si el jugador esta junto a su espada de luz (se le ofrece recogerla). */
+    public static boolean juntoAEspada() {
+        Minecraft mc = Minecraft.getInstance();
+        if (!hayEspada || mc.player == null || mc.level == null || !mc.player.isAlive()) return false;
+        if (!mc.level.dimension().location().toString().equals(espadaDim)) return false;
+        return mc.player.distanceToSqr(ex, ey, ez) < 3.2 * 3.2;
+    }
+
+    // ------------------------------------------------------------------ los ecos que vuelan
+
+    private static final class Mota {
+        Vec3 p, v;
+        int edad;
+    }
+
+    private static final List<Mota> MOTAS = new ArrayList<>();
+    private static final DustColorTransitionOptions ROJO = new DustColorTransitionOptions(new Vector3f(1.0f, 0.30f, 0.22f),
+            new Vector3f(0.45f, 0.03f, 0.06f), 0.85f);
+
+    public static void vuelan(Net.Ecos m) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null || mc.player == null) return;
+        int n = Mth.clamp(4 + m.n() / 40, 5, 16);
+        for (int i = 0; i < n; i++) {
+            Mota o = new Mota();
+            o.p = new Vec3(m.x(), m.y(), m.z());
+            double a = mc.level.random.nextDouble() * Math.PI * 2;
+            o.v = new Vec3(Math.cos(a) * 0.16, 0.14 + mc.level.random.nextDouble() * 0.16, Math.sin(a) * 0.16);
+            o.edad = -i;
+            MOTAS.add(o);
+        }
+    }
+
+    private static void motas(Minecraft mc) {
+        if (MOTAS.isEmpty()) return;
+        Vec3 pecho = mc.player.position().add(0, mc.player.getBbHeight() * 0.6, 0);
+        boolean llego = false;
+        for (Iterator<Mota> it = MOTAS.iterator(); it.hasNext(); ) {
+            Mota o = it.next();
+            if (++o.edad <= 0) continue;
+            Vec3 a = pecho.subtract(o.p);
+            double d = a.length();
+            if (d < 0.7 || o.edad > 70) {
+                it.remove();
+                llego = true;
+                continue;
+            }
+            // primero se abren hacia fuera y luego giran hacia el jugador cada vez con mas ganas
+            double tirar = Mth.clamp((o.edad - 5) / 12.0, 0.0, 1.0);
+            double rapidez = 0.22 + o.edad * 0.02;
+            Vec3 quiere = a.scale(rapidez / d);
+            o.v = o.v.scale(1 - 0.28 * tirar).add(quiere.scale(0.28 * tirar + 0.02));
+            o.p = o.p.add(o.v);
+            mc.level.addParticle(ROJO, o.p.x, o.p.y, o.p.z, 0, 0, 0);
+        }
+        if (llego && MOTAS.isEmpty() && pendiente > 0) {
+            llegan(pendiente);
+            pendiente = 0;
+        }
+    }
+
+    // ------------------------------------------------------------------ cada tick
+
+    @SubscribeEvent
+    public static void onTick(TickEvent.ClientTickEvent e) {
+        Minecraft mc = Minecraft.getInstance();
+        if (e.phase == TickEvent.Phase.START) {
+            // junto a la espada de luz, la tecla del inventario recoge los ecos (y no abre el inventario)
+            if (mc.player != null && mc.screen == null && !ClientCine.active() && juntoAEspada()) {
+                boolean pulsada = false;
+                while (mc.options.keyInventory.consumeClick()) pulsada = true;
+                if (pulsada && enfriamiento <= 0) {
+                    Net.CH.sendToServer(new Net.Recuperar());
+                    enfriamiento = 12;
+                }
+            }
+            return;
+        }
+        if (mc.player == null || mc.level == null || mc.isPaused()) return;
+        ticks++;
+        if (enfriamiento > 0) enfriamiento--;
+        // el contador cuenta hacia lo que hay (lo que aun viene volando no cuenta hasta que llega)
+        float hay = Math.max(0, ecos - pendiente), falta = hay - ecosVistos;
+        if (Math.abs(falta) < 1f) ecosVistos = hay;
+        else ecosVistos += Math.signum(falta) * Math.max(1f, Math.abs(falta) * 0.14f);
+        motas(mc);
+        if (pendiente > 0 && MOTAS.isEmpty()) {
+            llegan(pendiente);
+            pendiente = 0;
+        }
+        Hud.tick(mc);
+        Carteles.tick(mc);
+    }
+
+    // ------------------------------------------------------------------ agotado: ni saltar ni atacar
+
+    @SubscribeEvent
+    public static void onInput(MovementInputUpdateEvent e) {
+        if (!agotado || !combate) return;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.player.isCreative() || mc.player.isSpectator()) return;
+        Input in = e.getInput();
+        if (in.jumping && mc.player.onGround()) {
+            in.jumping = false;
+            sinEstaminaTick = ticks;
+        }
+    }
+
+    @SubscribeEvent
+    public static void onAttack(InputEvent.InteractionKeyMappingTriggered e) {
+        if (!e.isAttack() || !agotado) return;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.player.isCreative() || mc.player.isSpectator()) return;
+        // sin estamina no se ataca (romper bloques si se puede: eso no es un golpe)
+        if (mc.hitResult != null && mc.hitResult.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) return;
+        e.setCanceled(true);
+        e.setSwingHand(false);
+        sinEstaminaTick = ticks;
+    }
+
+    @SubscribeEvent
+    public static void onLeave(ClientPlayerNetworkEvent.LoggingOut e) {
+        ecos = 0;
+        ecosVistos = 0;
+        ganado = 0;
+        ganadoTick = destelloTick = sinEstaminaTick = -1000;
+        estamina = estaminaMax = 100f;
+        agotado = combate = hayEspada = false;
+        pendiente = 0;
+        primero = true;
+        MOTAS.clear();
+        Carteles.olvidar();
+    }
+
+    /** Para la prueba de la CI. */
+    public static String resumen() {
+        return "ecos=" + ecos + " vistos=" + Math.round(ecosVistos) + " estamina=" + Math.round(estamina) + "/" + Math.round(estaminaMax)
+                + (agotado ? " AGOTADO" : "") + (combate ? " combate" : "") + (hayEspada ? " espada(" + ecosEspada + ") en "
+                + Math.round(ex) + "," + Math.round(ey) + "," + Math.round(ez) + " " + espadaDim : " sin espada") + " motas=" + MOTAS.size();
+    }
+}

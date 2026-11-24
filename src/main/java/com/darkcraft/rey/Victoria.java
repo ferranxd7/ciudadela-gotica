@@ -44,7 +44,10 @@ public final class Victoria {
         Runnable logro = () -> {
             for (UUID u : todos) {
                 ServerPlayer p = server.getPlayerList().getPlayer(u);
-                if (p != null) com.darkcraft.story.Logros.dar(p, com.darkcraft.story.Logros.REY);
+                if (p != null) {
+                    com.darkcraft.story.Logros.dar(p, com.darkcraft.story.Logros.REY);
+                    com.darkcraft.rol.Rol.jefe(p, "entity.darkcraft.rey", com.darkcraft.rol.Rol.ECOS_REY);
+                }
             }
         };
         despues(Volcan.es(sl) ? 70 : 30, logro);

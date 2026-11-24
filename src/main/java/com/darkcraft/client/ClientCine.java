@@ -456,12 +456,8 @@ public final class ClientCine {
         if (visible(black)) g.fill(0, 0, w, h, argb(black, 0, 0, 0));
         // bandas de cine
         int bh = Math.round(h * 0.12f * easeOut(t / 0.9f) * out);
-        if (bh > 0) {
-            g.fill(0, 0, w, bh, 0xFF000000);
-            g.fill(0, h - bh, w, h, 0xFF000000);
-            g.fill(0, bh, w, bh + 1, argb(0.35f, 90, 0, 0));
-            g.fill(0, h - bh - 1, w, h - bh, argb(0.35f, 90, 0, 0));
-        }
+        // (ya no son negras con una linea roja: el marco en pixel art del mod)
+        com.darkcraft.client.ui.Marco.bandas(g, w, h, bh);
         if (ch1) subtitles(g, font, w, h, t, bh);
         // destello del rayo
         float fl = 0;

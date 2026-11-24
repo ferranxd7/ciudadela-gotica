@@ -12,10 +12,13 @@ public final class ClientSetup {
 
     @SubscribeEvent
     public static void overlays(RegisterGuiOverlaysEvent e) {
-        e.registerAboveAll("energia", com.darkcraft.client.armas.ArmasCliente::render);
+        // de abajo arriba: el HUD del mod y el espejo; encima, las bandas de las entradas de los jefes y las cinematicas
+        // (los tapan); y por encima de todo, los carteles y los subtitulos de los jefes
+        e.registerAboveAll("hud", com.darkcraft.client.ui.Hud::render);
+        e.registerAboveAll("espejo", com.darkcraft.client.espejo.EspejoHud::render);
         e.registerAboveAll("rey", com.darkcraft.client.rey.ReyCliente::renderOverlay);
         e.registerAboveAll("cinematica", ClientCine::renderOverlay);
-        e.registerAboveAll("espejo", com.darkcraft.client.espejo.EspejoHud::render);
+        e.registerAboveAll("carteles", com.darkcraft.client.ui.Carteles::render);
         e.registerAboveAll("rey_subtitulos", com.darkcraft.client.rey.ReyCliente::renderSubtitulos);
     }
 

@@ -94,6 +94,48 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   `despejarEscalera`, `vallasEscalera`; en fortalezas ya levantadas, `FortalezaEventos.parchear` (una vez,
   `Estado.parche`). La prueba del cliente lo comprueba (`comprobarEscalera`).
 
+### Plan grande, parte 2a: HUD nuevo, Ecos de la Sombra, estamina y muerte
+
+- **Arte en pixel art** (`tools/ui/`, todo dibujado al tamano real, un pixel de textura = un pixel de interfaz):
+  `arte.py` (paletas PIEDRA / ORO / ROJO / AZUL / VERDE, `Lienzo`, `Atlas` que escribe las constantes de Java),
+  `hud.py` → `textures/gui/hud.png` + `client/ui/HudTex.java` (emblema, barras, ecos, placa, teclas, avisos, floritura,
+  cenefa y ojo de las cinematicas, brujula, botones, marcas, banda), `espejo.py` → `espejo_r28/36/46.png` (el espejo
+  redondo: mitad izquierda el marco, mitad derecha el cristal), `fuente.py` → la **letra gotica** `darkcraft:gotica`
+  (mayusculas de 17 px) y `darkcraft:gotica_m` (13 px), sacadas de New Rocker (SIL OFL, en `tools/ui/fuentes/`) como
+  fuentes de mapa de bits (lo que no traen cae en la letra del juego), `espada_luz.py` → modelo 3D y textura de
+  `darkcraft:espada_luz`. Vista previa de todo sobre una captura: `python3 tools/ui/vista.py captura.png 2 carpeta`.
+- **Cliente** (`client/ui/`): `Pix` (dibujar trozos del atlas: tiras, tres trozos, espejo, franjas que se apagan),
+  `Letra` (la gotica con contorno; `yArriba` = borde de arriba de las mayusculas), `Hud` (capa `hud`: emblema y barras
+  de vida / mana / estamina arriba a la izquierda, contador de ecos abajo a la derecha con "+N", brujula arriba en el
+  centro con el cofre que toca y la espada de luz, aviso "Pulsa [E]..." encima de la barra de objetos; quita vida,
+  comida, armadura y experiencia de Minecraft), `ClientRol` (lo que manda el servidor; la tecla del inventario junto a
+  la espada recoge los ecos —se consume en `ClientTickEvent` START, antes de que el juego abra el inventario—; agotado
+  no deja saltar ni atacar; los ecos de un enemigo vuelan al jugador como particulas), `Carteles` (capa `carteles`:
+  JEFE ABATIDO, zona descubierta, ECOS RECUPERADOS; hacen cola, esperan a que no haya cinematica ni aviso del espejo),
+  `MuerteScreen` (sustituye a `DeathScreen` —y hereda de ella, que el juego la cierra sola al reaparecer—: HAS MUERTO,
+  botones de piedra y oro; en extremo se deja la del juego), `Marco` (las bandas de las cinematicas: piedra, cenefa de
+  oro y rojo y el ojo colgando; lo usan `ClientCine` y la entrada de los jefes en `ReyCliente`).
+- El **mana** de la barra azul es la energia de las armas de `Combos` (0-100; las muescas son lo que cuesta cada combo);
+  la barra de energia vieja ya no se dibuja. La **brujula** se esconde mientras hay barra de jefe.
+- **El Espejo es redondo** (`EspejoHud`: `RADIOS` 28 / 36 / 46 segun el tamano elegido, abanico circular, una cuenta
+  roja en el aro hacia el norte, la espada de luz como marca dorada).
+- **Servidor** (`rol/`): `Ficha` (NBT persistente `darkcraft_rol` del jugador: ecos, espada {dim, x, y, z, ecos}, zonas
+  vistas), `Rol` (estamina 0-100: atacar 8, mandoble 13, cubrirse 6 + 2,2 x golpe, y solo en combate correr 7,2/s y
+  saltar 7; se recupera a 30-44/s tras 0,8 s; a 0 queda "agotado" hasta volver a 22: no ataca, y el nivel de comida
+  pasa de 10 a 6 para que el propio juego no deje correr; comida fija = sin hambre ni regeneracion; comer cura lo que
+  alimentaba; ecos al matar = vida x 2,2 + golpe x 7 + armadura x 3 para cada jugador que le pego; Rey 9000 y Gavran
+  14000 con el cartel; al morir, `keepInventory` siempre y los ecos a la espada: en el suelo bajo el jugador, o en el
+  ultimo suelo firme si fue caida de mas de 24, lava o vacio; `zona()` la llama el Espejo cada segundo),
+  `Espadas` (la espada que se ve: `item_display` con brillo y contorno dorado, etiqueta `darkcraft_espada_luz`, se
+  pone a menos de 96 bloques de su dueno y nunca vuelve del disco; chispas y zumbido solo para el dueno).
+  Paquetes `Net.RolEstado`, `Estamina`, `Cartel`, `Ecos` (de servidor a cliente) y `Recuperar`. Comandos
+  `/darkcraft ecos [dar <n> | quitar | cartel <1-3>]`.
+- **Textos** de la interfaz nueva: `ci/historia/rol.py` (espanol e ingles; los demas idiomas salen en ingles).
+- **Sonidos** (ElevenLabs, 4 tomas de cada; elegidas en `TOMAS_SFX`): `has_muerto` (3), `jefe_abatido` (1),
+  `zona_descubierta` (3), `ecos_recuperados` (4), `ecos_ganados` (2 y 4), `espada_luz` (2), `guardia_rota` (1 y 3).
+- La prueba del cliente tiene su tramo `rol()` (capturas `cliente_h01..h14`) y dura ya ~17,5 min: limites subidos
+  (`LIMIT` 20 min, `timeout 33m`).
+
 ## Compilar, probar y publicar
 
 - La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (con y sin mods) y un cliente con capturas

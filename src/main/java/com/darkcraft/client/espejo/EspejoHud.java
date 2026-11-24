@@ -34,9 +34,10 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 /**
- * El Espejo de la Sombra en la pantalla: un espejo ovalado de obsidiana y plata arriba a la derecha, con el mapa
- * oscurecido como un reflejo que gira con el jugador, humo de la Sombra alrededor, el ojo rojo de la cresta que late,
- * la N del norte en el marco, los lugares, cofres, jefes, amigos y marcas, y debajo el nombre del sitio (sin
+ * El Espejo de la Sombra en la pantalla: un espejo REDONDO en pixel art (aro de piedra oscura con filo de oro, gemas
+ * rojas y la cresta con el ojo de la Sombra; tools/ui/espejo.py) arriba a la derecha, con el mapa oscurecido como un
+ * reflejo que gira con el jugador, humo de la Sombra alrededor, el ojo de la cresta que late, una cuenta roja en el aro
+ * hacia el norte, los lugares, cofres, jefes, amigos, marcas y la espada de luz, y debajo el nombre del sitio (sin
  * coordenadas: el usuario pidio quitarlas). Bajo techo ensena la planta del piso en el que esta el jugador.
  */
 public final class EspejoHud {
@@ -75,10 +76,8 @@ public final class EspejoHud {
         BufferUploader.drawWithShader(bb.end());
     }
 
-    static final ResourceLocation MARCO = rl("textures/gui/espejo_marco.png"), CRISTAL = rl("textures/gui/espejo_cristal.png"),
-            HUMO = rl("textures/gui/humo.png"), ICONOS = rl("textures/gui/espejo_iconos.png"), BRILLO = rl("textures/gui/brillo.png");
-    /** Medidas de la textura del marco (las mismas que tools/espejo/texturas.py). */
-    static final int TW = 256, TH = 352, CX = 128, CY = 196, AI = 90, BI = 128, AO = 112, BO = 150;
+    static final ResourceLocation HUMO = rl("textures/gui/humo.png"), ICONOS = rl("textures/gui/espejo_iconos.png"),
+            BRILLO = rl("textures/gui/brillo.png");
     /** Iconos del atlas (16 por fila). */
     static final int I_JUGADOR = 0, I_COFRE = 5, I_COFRE_LEIDO = 6, I_MARCAS = 16, I_SELLO = 28, I_SELLO_GRIS = 29,
             I_CANDADO = 30, I_PERGAMINO = 31, I_MAPA = 32, I_TROFEO = 33, I_BESTIA = 34, I_PUNTO = 35, I_FLECHA = 36,
@@ -264,11 +263,25 @@ public final class EspejoHud {
 
     // ------------------------------------------------------------------ dibujo
 
-    /** Escala del espejo en la pantalla (px de la gui por px de la textura del marco). */
-    static float escala(int sh) {
-        float s = EspejoCliente.TAMANO[EspejoCliente.tamano];
-        float max = sh * 0.5f / TH;
-        return Math.min(s, max);
+    /** Radio del cristal (en px de la interfaz) de cada tamano: hay una textura dibujada a mano para cada uno. */
+    static final int[] RADIOS = {28, 36, 46};
+    /** Grosor del marco por fuera del cristal y lo que sube la cresta por encima (como en tools/ui/espejo.py). */
+    static final int BORDE = 8, CRESTA = 7;
+    private static final ResourceLocation[] REDONDO = {rl("textures/gui/espejo_r28.png"), rl("textures/gui/espejo_r36.png"),
+            rl("textures/gui/espejo_r46.png")};
+
+    /** Que tamano se dibuja: el elegido, o uno menor si la pantalla es pequena. */
+    private static int tamano(int sh) {
+        int i = Mth.clamp(EspejoCliente.tamano, 0, RADIOS.length - 1);
+        while (i > 0 && 2 * (RADIOS[i] + BORDE) + 1 + CRESTA > sh * 0.45f) i--;
+        return i;
+    }
+
+    /** Lo que ocupa el espejo a lo ancho en la esquina de arriba a la derecha (0 si no se ve): para que la brujula le deje sitio. */
+    public static int anchoEnPantalla() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || !EspejoCliente.activo() || !EspejoCliente.visible) return 0;
+        return 2 * (RADIOS[tamano(mc.getWindow().getGuiScaledHeight())] + BORDE) + 1 + 6;
     }
 
     public static void render(ForgeGui gui, GuiGraphics g, float pt, int sw, int sh) {
@@ -278,13 +291,15 @@ public final class EspejoHud {
         if (!EspejoCliente.visible || mc.options.hideGui || mc.options.renderDebug || ClientCine.active() || mc.screen instanceof LibroScreen)
             return;
         tickHud = mc.player.tickCount;
-        float s = escala(sh);
-        float W = TW * s, H = TH * s;
-        float x0 = sw - W - 3, y0 = 2 + efectos(mc);
+        int idx = tamano(sh);
+        int R = RADIOS[idx], lado = 2 * (R + BORDE) + 1;
+        int x0 = sw - lado - 3, y0 = 2 + Math.round(efectos(mc));
         float a = Mth.clamp((EspejoCliente.aparecer + pt) / 50f, 0, 1);
         if (a <= 0.01f) return;
-        float cxs = x0 + CX * s, cys = y0 + CY * s;
+        // el centro del cristal cae en el centro de un pixel de la textura
+        float cxs = x0 + R + BORDE + 0.5f, cys = y0 + CRESTA + R + BORDE + 0.5f;
         float t = (mc.player.tickCount + pt) / 20f;
+        float s = R / 128f;
 
         double px = Mth.lerp(pt, mc.player.xo, mc.player.getX()), pz = Mth.lerp(pt, mc.player.zo, mc.player.getZ());
         int bx = Mth.floor(px), bz = Mth.floor(pz);
@@ -296,11 +311,11 @@ public final class EspejoHud {
         float yaw = Mth.rotLerp(pt, mc.player.yRotO, mc.player.getYRot()) * Mth.DEG_TO_RAD;
         float fx = -Mth.sin(yaw), fz = Mth.cos(yaw), rx = -Mth.cos(yaw), rz = -Mth.sin(yaw);
         float bloques = EspejoCliente.ZOOM[EspejoCliente.zoom];
-        float esc = (BI * s) / bloques;
+        float esc = R / bloques;
 
         g.flush();
         mezcla();
-        humo(g, cxs, cys, s, t, a, false);
+        humo(g, cxs, cys, R, s, t, a, false);
         mezcla();
 
         // el mapa: un abanico de triangulos con la forma del cristal
@@ -313,39 +328,38 @@ public final class EspejoHud {
         double u0 = px - (texX - N / 2.0), v0 = pz - (texZ - N / 2.0);
         bb.vertex(mat, cxs, cys, 0).uv((float) (u0 / N), (float) (v0 / N)).color(255, 255, 255, alfa).endVertex();
         int seg = 72;
+        float rm = R + 1.0f;
         for (int k = 0; k <= seg; k++) {
             double ang = -k * Math.PI * 2 / seg;
-            float ex = (float) Math.cos(ang) * (AI + 0.5f) * s, ey = (float) Math.sin(ang) * (BI + 0.5f) * s;
+            float ex = (float) Math.cos(ang) * rm, ey = (float) Math.sin(ang) * rm;
             double dx = (ex * rx - ey * fx) / esc, dz = (ex * rz - ey * fz) / esc;
             bb.vertex(mat, cxs + ex, cys + ey, 0).uv((float) ((u0 + dx) / N), (float) ((v0 + dz) / N)).color(255, 255, 255, alfa).endVertex();
         }
         BufferUploader.drawWithShader(bb.end());
 
-        marcadores(mc, g, pt, cxs, cys, s, esc, px, pz, fx, fz, rx, rz, t, a);
+        marcadores(mc, g, pt, cxs, cys, R, esc, px, pz, fx, fz, rx, rz, t, a);
         mezcla();
 
         // el jugador: la flecha en el centro (el mapa gira, la flecha siempre mira arriba)
         RenderSystem.setShaderColor(1, 1, 1, a);
-        icono(g, I_JUGADOR, cxs, cys, 10f * (s / 0.34f));
-        RenderSystem.setShaderColor(1, 1, 1, 1);
+        icono(g, I_JUGADOR, cxs, cys, R >= 46 ? 11f : R >= 36 ? 9f : 8f);
 
-        // cristal y marco
-        RenderSystem.setShaderColor(1, 1, 1, a);
-        dibujar(g, CRISTAL, x0, y0, s);
-        mc.getTextureManager().getTexture(MARCO).setFilter(true, false);
-        dibujar(g, MARCO, x0, y0, s);
+        // el cristal (penumbra y reflejo) y el marco, pixel a pixel
+        mezcla();
+        g.blit(REDONDO[idx], x0, y0, lado, 0, lado, lado + CRESTA, lado * 2, lado + CRESTA);
+        mezcla();
+        g.blit(REDONDO[idx], x0, y0, 0, 0, lado, lado + CRESTA, lado * 2, lado + CRESTA);
         // el ojo de la cresta late
         float latido = 0.55f + 0.45f * (float) Math.pow(Math.max(0, Math.sin(t * 2.3)), 3);
         if (EspejoCliente.aparecer < 120) latido = Math.max(latido, 1.2f - (EspejoCliente.aparecer + pt) / 120f);
         suma();
-        RenderSystem.setShaderColor(1f, 0.15f, 0.12f, Math.min(1f, latido * 0.85f) * a);
-        float ojoX = x0 + CX * s, ojoY = y0 + (CY - BO - 8) * s, rOjo = 26 * s;
-        g.blit(BRILLO, Math.round(ojoX - rOjo), Math.round(ojoY - rOjo), Math.round(rOjo * 2), Math.round(rOjo * 2), 0, 0, 64, 64, 64, 64);
+        RenderSystem.setShaderColor(1f, 0.15f, 0.12f, Math.min(1f, latido * 0.8f) * a);
+        g.blit(BRILLO, x0 + R + BORDE - 9, y0 - 3, 19, 19, 0, 0, 64, 64, 64, 64);
         mezcla();
         RenderSystem.setShaderColor(1, 1, 1, 1);
-        humo(g, cxs, cys, s, t, a, true);
-        norte(mc, g, cxs, cys, s, yaw, a);
-        texto(mc, g, cxs, y0 + H, s, a, sw);
+        humo(g, cxs, cys, R, s, t, a, true);
+        norte(g, cxs, cys, R, yaw, a);
+        texto(mc, g, cxs, y0 + CRESTA + lado, a, sw);
         mezcla();
     }
 
@@ -360,15 +374,6 @@ public final class EspejoHud {
         return malo ? 52 : bueno ? 26 : 0;
     }
 
-    static void dibujar(GuiGraphics g, ResourceLocation r, float x, float y, float s) {
-        RenderSystem.enableBlend();
-        g.pose().pushPose();
-        g.pose().translate(x, y, 0);
-        g.pose().scale(s, s, 1);
-        g.blit(r, 0, 0, 0, 0, TW, TH, TW, TH);
-        g.pose().popPose();
-    }
-
     /** Un icono del atlas centrado en (x, y) con lado l (en px de la gui). */
     public static void icono(GuiGraphics g, int i, float x, float y, float l) {
         RenderSystem.enableBlend();
@@ -380,17 +385,18 @@ public final class EspejoHud {
     }
 
     /** Humo de la Sombra: bocanadas negras y rojas que salen del marco y se deshacen. */
-    private static void humo(GuiGraphics g, float cx, float cy, float s, float t, float a, boolean delante) {
+    private static void humo(GuiGraphics g, float cx, float cy, int R, float s, float t, float a, boolean delante) {
         mezcla();
-        int n = delante ? 7 : 18;
+        int n = delante ? 6 : 16;
+        float fuera = R + BORDE - 2;
         for (int i = 0; i < n; i++) {
             float fase = (i * 0.618f + (delante ? 0.31f : 0f)) % 1f;
             float vida = ((t / (delante ? 5.5f : 4.2f)) + fase) % 1f;
             double ang = (i * (Math.PI * 2 / n)) + Math.sin(t * 0.21 + i) * 0.25 + vida * 0.35;
-            float rr = (delante ? 2f : 6f) + vida * (delante ? 8f : 16f);
-            float x = cx + (float) Math.cos(ang) * (AO + rr) * s, y = cy + (float) Math.sin(ang) * (BO + rr) * s;
-            float lado = (delante ? 20f : 30f + 22f * vida) * s;
-            float al = (float) Math.sin(Math.PI * vida) * (delante ? 0.22f : 0.42f) * a;
+            float rr = ((delante ? 2f : 6f) + vida * (delante ? 8f : 16f)) * s;
+            float x = cx + (float) Math.cos(ang) * (fuera + rr), y = cy + (float) Math.sin(ang) * (fuera + rr);
+            float lado = (delante ? 22f : 34f + 24f * vida) * s;
+            float al = (float) Math.sin(Math.PI * vida) * (delante ? 0.2f : 0.4f) * a;
             if (EspejoCliente.aparecer < 80) al = Math.min(1f, al * (2.2f - EspejoCliente.aparecer / 60f));
             boolean rojo = i % 3 == 0;
             RenderSystem.setShaderColor(rojo ? 0.34f : 0.03f, rojo ? 0.02f : 0.015f, rojo ? 0.04f : 0.025f, al);
@@ -399,28 +405,22 @@ public final class EspejoHud {
         RenderSystem.setShaderColor(1, 1, 1, 1);
     }
 
-    /** La N del norte sobre el marco, en la direccion del norte (el mapa gira). */
-    private static void norte(Minecraft mc, GuiGraphics g, float cx, float cy, float s, float yaw, float a) {
+    /** El norte: una cuenta roja que recorre el aro del marco (el mapa gira); la letra va en la brujula de arriba. */
+    private static void norte(GuiGraphics g, float cx, float cy, int R, float yaw, float a) {
         float dx = Mth.sin(yaw), dy = Mth.cos(yaw);
-        float A = (AI + AO) / 2f * s, B = (BI + BO) / 2f * s;
-        float k = 1f / (float) Math.sqrt((dx / A) * (dx / A) + (dy / B) * (dy / B));
-        float x = cx + dx * k, y = cy + dy * k;
-        float l = Math.max(7f, 34f * s);
-        RenderSystem.setShaderColor(0.05f, 0.02f, 0.03f, 0.9f * a);
-        icono(g, I_PUNTO, x, y, l * 1.5f);
-        RenderSystem.setShaderColor(1, 1, 1, 1);
-        g.pose().pushPose();
-        float ts = Math.max(0.6f, 2.4f * s);
-        g.pose().translate(x, y, 0);
-        g.pose().scale(ts, ts, 1);
-        int col = ((int) (a * 255) << 24) | 0xE8302A;
-        g.drawString(mc.font, "N", -mc.font.width("N") / 2 + 1, -4, col, false);
-        g.pose().popPose();
+        float r = R + 4.5f;
+        int x = Math.round(cx + dx * r - 0.5f), y = Math.round(cy + dy * r - 0.5f);
+        int al = (int) (a * 255) << 24;
+        if ((al >>> 24) < 8) return;
+        g.fill(x - 1, y - 2, x + 2, y + 3, al | 0x050408);
+        g.fill(x - 2, y - 1, x + 3, y + 2, al | 0x050408);
+        g.fill(x - 1, y - 1, x + 2, y + 2, al | 0xDE3A3A);
+        g.fill(x - 1, y - 1, x, y, al | 0xFFD8C8);
         g.flush();
     }
 
     /** Debajo del espejo: solo el nombre del sitio (el usuario pidio quitar las coordenadas: quedaban mal). */
-    private static void texto(Minecraft mc, GuiGraphics g, float cx, float yBottom, float s, float a, int sw) {
+    private static void texto(Minecraft mc, GuiGraphics g, float cx, int yBottom, float a, int sw) {
         Component nombre;
         String l = EspejoCliente.lugar;
         if (l != null && !l.isEmpty()) nombre = Component.translatable(l);
@@ -431,37 +431,33 @@ public final class EspejoHud {
             nombre = k != null && net.minecraft.client.resources.language.I18n.exists(k) ? Component.translatable(k)
                     : Component.translatable("darkcraft.espejo.desconocido");
         }
-        float ts = Mth.clamp(s / 0.34f, 0.7f, 1.0f);
+        int alfa = (int) (a * 255);
+        if (alfa < 8) return;
         int w1 = mc.font.width(nombre);
-        float w = w1 * ts + 10;
+        int w = w1 + 10;
         // centrado debajo del espejo, pero sin salirse por la derecha
-        cx = Math.min(cx, sw - 2 - w / 2);
-        float y = yBottom + 1;
-        int fondo = ((int) (0x9a * a) << 24) | 0x0a0406;
-        g.fill(Math.round(cx - w / 2), Math.round(y), Math.round(cx + w / 2), Math.round(y + 12 * ts), fondo);
-        int borde = ((int) (0xb0 * a) << 24) | 0x6a0c12;
-        g.fill(Math.round(cx - w / 2), Math.round(y + 12 * ts), Math.round(cx + w / 2), Math.round(y + 12 * ts) + 1, borde);
-        g.pose().pushPose();
-        g.pose().translate(cx, y + 2, 0);
-        g.pose().scale(ts, ts, 1);
-        g.drawString(mc.font, nombre, -w1 / 2, 0, ((int) (a * 255) << 24) | 0xEADBC4, true);
-        g.pose().popPose();
+        int x = Math.min(Math.round(cx - w / 2f), sw - 2 - w);
+        int y = yBottom + 1;
+        g.fill(x, y, x + w, y + 12, ((int) (0x9a * a) << 24) | 0x0a0406);
+        g.fill(x, y + 12, x + w, y + 13, ((int) (0xc0 * a) << 24) | 0x96702A);
+        g.fill(x, y - 1, x + w, y, ((int) (0x80 * a) << 24) | 0x4A3312);
+        g.drawString(mc.font, nombre, x + 5, y + 2, (alfa << 24) | 0xEADBC4, true);
     }
 
     // ------------------------------------------------------------------ marcadores
 
-    private static void marcadores(Minecraft mc, GuiGraphics g, float pt, float cx, float cy, float s, float esc, double px, double pz,
+    private static void marcadores(Minecraft mc, GuiGraphics g, float pt, float cx, float cy, int R, float esc, double px, double pz,
                                    float fx, float fz, float rx, float rz, float t, float a) {
-        float l = Math.max(7f, 26f * s);
+        float l = R >= 46 ? 10f : R >= 36 ? 9f : 8f;
         Net.EspejoEstado e = EspejoCliente.estado;
         int siguiente = com.darkcraft.story.Story.next(e.leidos());
         if (mc.level.dimension() == Level.OVERWORLD) {
             for (Net.LugarE lu : e.lugares()) {
                 float[] q = pantalla(lu.x() + 0.5, lu.z() + 0.5, px, pz, fx, fz, rx, rz, esc);
                 boolean objetivo = lu.tipo() == Espejo.COFRE && lu.cap() == siguiente && lu.estado() != Espejo.HECHO;
-                boolean dentroE = dentroElipse(q[0], q[1], s, 0.94f);
+                boolean dentroE = dentro(q[0], q[1], R * 0.9f);
                 if (!dentroE && !objetivo) continue;
-                float[] d = dentroE ? q : borde(q[0], q[1], s, 0.88f);
+                float[] d = dentroE ? q : borde(q[0], q[1], R * 0.86f);
                 float x = cx + d[0], y = cy + d[1];
                 int ic = lu.icono();
                 if (lu.tipo() == Espejo.COFRE && lu.estado() == Espejo.HECHO) ic = I_COFRE_LEIDO;
@@ -487,12 +483,31 @@ public final class EspejoHud {
         if (ms != null) {
             for (Marcas.Marca m : ms.lista) {
                 float[] q = pantalla(m.x + 0.5, m.z + 0.5, px, pz, fx, fz, rx, rz, esc);
-                boolean dentroE = dentroElipse(q[0], q[1], s, 0.94f);
-                float[] d = dentroE ? q : borde(q[0], q[1], s, 0.88f);
+                boolean dentroE = dentro(q[0], q[1], R * 0.9f);
+                float[] d = dentroE ? q : borde(q[0], q[1], R * 0.86f);
                 int c = m.color;
                 RenderSystem.setShaderColor(((c >> 16) & 255) / 255f, ((c >> 8) & 255) / 255f, (c & 255) / 255f, (dentroE ? 1f : 0.7f) * a);
                 icono(g, I_MARCAS + Mth.clamp(m.icono, 0, Marcas.ICONOS - 1), cx + d[0], cy + d[1], dentroE ? l : l * 0.75f);
             }
+            RenderSystem.setShaderColor(1, 1, 1, 1);
+        }
+        // la espada de luz del jugador (donde murio): un destello dorado
+        if (com.darkcraft.client.ui.ClientRol.hayEspada
+                && mc.level.dimension().location().toString().equals(com.darkcraft.client.ui.ClientRol.espadaDim)) {
+            float[] q = pantalla(com.darkcraft.client.ui.ClientRol.ex, com.darkcraft.client.ui.ClientRol.ez, px, pz, fx, fz, rx, rz, esc);
+            boolean dentroE = dentro(q[0], q[1], R * 0.9f);
+            float[] d = dentroE ? q : borde(q[0], q[1], R * 0.86f);
+            float x = cx + d[0], y = cy + d[1];
+            float lat = 0.6f + 0.4f * (float) Math.sin(t * 3);
+            suma();
+            RenderSystem.setShaderColor(1f, 0.85f, 0.4f, 0.8f * lat * a);
+            float r = l * 1.2f;
+            g.blit(BRILLO, Math.round(x - r), Math.round(y - r), Math.round(r * 2), Math.round(r * 2), 0, 0, 64, 64, 64, 64);
+            mezcla();
+            RenderSystem.setShaderColor(1, 1, 1, (dentroE ? 1f : 0.75f) * a);
+            com.darkcraft.client.ui.HudTex.T me = com.darkcraft.client.ui.HudTex.MARCA_ESPADA;
+            g.blit(com.darkcraft.client.ui.HudTex.TEX, Math.round(x) - me.w() / 2, Math.round(y) - me.h() / 2, me.u(), me.v(), me.w(), me.h(),
+                    com.darkcraft.client.ui.HudTex.TW, com.darkcraft.client.ui.HudTex.TH);
             RenderSystem.setShaderColor(1, 1, 1, 1);
         }
         // amigos: su cara
@@ -504,8 +519,8 @@ public final class EspejoHud {
                 az = Mth.lerp(pt, ent.zo, ent.getZ());
             }
             float[] q = pantalla(ax, az, px, pz, fx, fz, rx, rz, esc);
-            boolean dentroE = dentroElipse(q[0], q[1], s, 0.92f);
-            float[] d = dentroE ? q : borde(q[0], q[1], s, 0.86f);
+            boolean dentroE = dentro(q[0], q[1], R * 0.88f);
+            float[] d = dentroE ? q : borde(q[0], q[1], R * 0.84f);
             int lado = Math.max(6, Math.round(l * (dentroE ? 1f : 0.8f)));
             float x = cx + d[0], y = cy + d[1];
             g.fill(Math.round(x - lado / 2f) - 1, Math.round(y - lado / 2f) - 1, Math.round(x - lado / 2f) + lado + 1,
@@ -529,15 +544,13 @@ public final class EspejoHud {
         return new float[]{(float) ((dx * rx + dz * rz) * esc), (float) (-(dx * fx + dz * fz) * esc)};
     }
 
-    static boolean dentroElipse(float x, float y, float s, float k) {
-        float A = AI * s * k, B = BI * s * k;
-        return (x / A) * (x / A) + (y / B) * (y / B) <= 1;
+    static boolean dentro(float x, float y, float r) {
+        return x * x + y * y <= r * r;
     }
 
-    /** El punto del borde del cristal en la direccion de (x, y). */
-    static float[] borde(float x, float y, float s, float k) {
-        float A = AI * s * k, B = BI * s * k;
-        float f = 1f / (float) Math.sqrt((x / A) * (x / A) + (y / B) * (y / B) + 1e-9f);
+    /** El punto del circulo de radio r en la direccion de (x, y). */
+    static float[] borde(float x, float y, float r) {
+        float f = r / (float) Math.sqrt(x * x + y * y + 1e-9f);
         return new float[]{x * f, y * f};
     }
 
@@ -546,19 +559,17 @@ public final class EspejoHud {
     private static void aviso(Minecraft mc, GuiGraphics g, float pt, int sw, int sh) {
         float t = EspejoCliente.aviso + pt;
         float a = t < 25 ? t / 25f : t > 160 ? Math.max(0, (200 - t) / 40f) : 1f;
-        if (a <= 0.02f) return;
+        if (a <= 0.03f) return;
         Component titulo = Component.translatable("darkcraft.espejo.despierta");
         Component sub = Component.translatable("darkcraft.espejo.despierta.teclas", EspejoCliente.TECLA_LIBRO.getTranslatedKeyMessage(),
                 EspejoCliente.TECLA_ESPEJO.getTranslatedKeyMessage());
-        float y = sh * 0.28f;
-        g.pose().pushPose();
-        g.pose().translate(sw / 2f, y, 0);
-        float esc = 2.0f + 0.08f * (float) Math.sin(t * 0.06f);
-        g.pose().scale(esc, esc, 1);
-        int w = mc.font.width(titulo);
-        g.drawString(mc.font, titulo, -w / 2, 0, ((int) (a * 255) << 24) | 0xC8242C, true);
-        g.pose().popPose();
+        int y = Math.round(sh * 0.26f);
+        int alfa = Math.round(a * 255);
+        com.darkcraft.client.ui.Pix.franja(g, 0, sw, y - 9, y + 44, 0x050408, 0.6f * a);
+        int w = com.darkcraft.client.ui.Letra.anchoG(mc.font, titulo);
+        com.darkcraft.client.ui.Letra.grande(g, mc.font, titulo, sw / 2 - w / 2, y, (alfa << 24) | 0xC8242C, 0xFF050408);
         int w2 = mc.font.width(sub);
-        g.drawString(mc.font, sub, sw / 2 - w2 / 2, Math.round(y + 24), ((int) (a * 230) << 24) | 0xD8CCB8, true);
+        g.drawString(mc.font, sub, sw / 2 - w2 / 2, y + 28, (Math.round(a * 230) << 24) | 0xD8CCB8, true);
+        mezcla();
     }
 }

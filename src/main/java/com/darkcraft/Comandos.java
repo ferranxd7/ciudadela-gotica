@@ -37,7 +37,8 @@ public final class Comandos {
                         .then(GavranEventos.comando())
                         .then(com.darkcraft.espejo.Espejo.comando())
                         .then(com.darkcraft.caballeros.Caballeros.comando()))
-                .then(com.darkcraft.fortaleza.ComandosFortaleza.comando()));
+                .then(com.darkcraft.fortaleza.ComandosFortaleza.comando())
+                .then(com.darkcraft.rol.Rol.comando()));
     }
 
     /** Cada linea de la ayuda: lo que se escribe al hacer clic, lo que se ve y la clave de su explicacion. */
@@ -76,6 +77,7 @@ public final class Comandos {
         for (Linea l : VALDRENN) src.sendSuccess(() -> linea(l), false);
         src.sendSuccess(() -> Component.translatable("darkcraft.ayuda.fortaleza").withStyle(ChatFormatting.GOLD), false);
         for (Linea l : FORTALEZA) src.sendSuccess(() -> linea(l), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft ecos ", "/darkcraft ecos / ecos dar <n> / ecos quitar", "ecos")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ayuda", "/darkcraft ayuda", "ayuda")), false);
         return 1;
     }

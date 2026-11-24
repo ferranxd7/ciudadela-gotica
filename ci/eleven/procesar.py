@@ -64,6 +64,10 @@ SFX = {
     # la Fortaleza de Hueso
     "llave_rastro": (2.0, 0.5, -19), "puente_hueso": (5.5, 1.2, -15), "puerta_hueso": (8.0, 1.8, -13),
     "amuleto_forja": (5.0, 1.5, -14), "portal_abre": (7.0, 2.0, -13),
+    # el HUD nuevo y el rol: carteles, ecos, espada de luz y guardia rota
+    "has_muerto": (5.0, 2.2, -13), "jefe_abatido": (5.0, 2.0, -13), "zona_descubierta": (4.0, 1.6, -16),
+    "ecos_recuperados": (2.6, 0.8, -15), "ecos_ganados": (0.7, 0.3, -22), "espada_luz": (3.8, 0.9, -21),
+    "guardia_rota": (1.3, 0.3, -13),
 }
 # de estos se bajaron 4 tomas (NOMBRE_1..4.mp3): las elegidas salen como NOMBRE_1.ogg, NOMBRE_2.ogg...
 TOMAS_SFX = {
@@ -77,6 +81,13 @@ TOMAS_SFX = {
     "puerta_hueso": (1,),        # la mas larga: el cuerpo pesado dura lo que sube la reja
     "amuleto_forja": (1,),       # golpe y brillo que se sostiene antes de apagarse
     "portal_abre": (1,),         # crece y se mantiene cinco segundos
+    "has_muerto": (3,),          # el golpe mas fuerte y con mas graves, que se apaga despacio
+    "jefe_abatido": (1,),        # el mas largo (3,5 s de cola) y con mas cuerpo
+    "zona_descubierta": (3,),    # una campanada clara al principio que se va apagando
+    "ecos_recuperados": (4,),    # soplo y campanilla, la que mas se oye
+    "ecos_ganados": (2, 4),      # dos soplos cortos (las otras dos casi no suenan)
+    "espada_luz": (2,),          # el brillo mas parejo de principio a fin
+    "guardia_rota": (1, 3),      # golpe y quejido / golpe seco con graves
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

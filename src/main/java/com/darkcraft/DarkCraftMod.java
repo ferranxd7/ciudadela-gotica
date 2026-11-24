@@ -116,6 +116,14 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_PUERTA_HUESO = sound("sfx.puerta_hueso");
     public static final RegistryObject<SoundEvent> SFX_AMULETO_FORJA = sound("sfx.amuleto_forja");
     public static final RegistryObject<SoundEvent> SFX_PORTAL_ABRE = sound("sfx.portal_abre");
+    // el HUD nuevo y el rol: carteles, ecos, espada de luz y guardia rota
+    public static final RegistryObject<SoundEvent> SFX_HAS_MUERTO = sound("sfx.has_muerto");
+    public static final RegistryObject<SoundEvent> SFX_JEFE_ABATIDO = sound("sfx.jefe_abatido");
+    public static final RegistryObject<SoundEvent> SFX_ZONA_DESCUBIERTA = sound("sfx.zona_descubierta");
+    public static final RegistryObject<SoundEvent> SFX_ECOS_RECUPERADOS = sound("sfx.ecos_recuperados");
+    public static final RegistryObject<SoundEvent> SFX_ECOS_GANADOS = sound("sfx.ecos_ganados");
+    public static final RegistryObject<SoundEvent> SFX_ESPADA_LUZ = sound("sfx.espada_luz");
+    public static final RegistryObject<SoundEvent> SFX_GUARDIA_ROTA = sound("sfx.guardia_rota");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")
@@ -173,6 +181,9 @@ public class DarkCraftMod {
             () -> new com.darkcraft.armas.LlaveHueso(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> ALABARDA = ITEMS.register("alabarda",
             () -> new net.minecraft.world.item.SwordItem(net.minecraft.world.item.Tiers.IRON, 5, -3.0f, new Item.Properties()));
+    /** La espada de luz que guarda los ecos donde se muere: solo la ensena una entidad (no se puede conseguir). */
+    public static final RegistryObject<Item> ESPADA_LUZ = ITEMS.register("espada_luz",
+            () -> new Item(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> LLAVE_ARBOL = ITEMS.register("llave_arbol",
             () -> new com.darkcraft.armas.LlaveArbol(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
 

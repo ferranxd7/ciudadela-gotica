@@ -861,5 +861,67 @@
         "stream": true
       }
     ]
+  },
+  "sfx.has_muerto": {
+    "subtitle": "subtitles.darkcraft.sfx.has_muerto",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/has_muerto_1"
+      }
+    ]
+  },
+  "sfx.jefe_abatido": {
+    "subtitle": "subtitles.darkcraft.sfx.jefe_abatido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/jefe_abatido_1"
+      }
+    ]
+  },
+  "sfx.zona_descubierta": {
+    "subtitle": "subtitles.darkcraft.sfx.zona_descubierta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/zona_descubierta_1"
+      }
+    ]
+  },
+  "sfx.ecos_recuperados": {
+    "subtitle": "subtitles.darkcraft.sfx.ecos_recuperados",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ecos_recuperados_1"
+      }
+    ]
+  },
+  "sfx.ecos_ganados": {
+    "subtitle": "subtitles.darkcraft.sfx.ecos_ganados",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ecos_ganados_1"
+      },
+      {
+        "name": "darkcraft:sfx/ecos_ganados_2"
+      }
+    ]
+  },
+  "sfx.espada_luz": {
+    "subtitle": "subtitles.darkcraft.sfx.espada_luz",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/espada_luz_1"
+      }
+    ]
+  },
+  "sfx.guardia_rota": {
+    "subtitle": "subtitles.darkcraft.sfx.guardia_rota",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/guardia_rota_1"
+      },
+      {
+        "name": "darkcraft:sfx/guardia_rota_2"
+      }
+    ]
   }
 }

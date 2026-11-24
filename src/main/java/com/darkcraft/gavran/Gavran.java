@@ -2000,7 +2000,10 @@ public class Gavran extends Monster {
         if (t == M_COFRE + 30)
             for (UUID u : jugadores) {
                 ServerPlayer p = sl.getServer().getPlayerList().getPlayer(u);
-                if (p != null) Logros.dar(p, Logros.GAVRAN);
+                if (p != null) {
+                    Logros.dar(p, Logros.GAVRAN);
+                    com.darkcraft.rol.Rol.jefe(p, "entity.darkcraft.gavran", com.darkcraft.rol.Rol.ECOS_GAVRAN);
+                }
             }
         if (t >= M_FIN) {
             if (s != null) {

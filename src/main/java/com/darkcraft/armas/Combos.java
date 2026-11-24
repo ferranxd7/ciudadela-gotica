@@ -388,12 +388,15 @@ public final class Combos {
         Vec3 look = p.getViewVector(1f);
         Vec3 to = from.subtract(p.position()).normalize();
         if (look.x * to.x + look.z * to.z < 0.25) return;
-        e.setAmount(e.getAmount() * 0.3f);
+        float golpe = e.getAmount();
+        e.setAmount(golpe * 0.3f);
         p.level().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ANVIL_PLACE, SoundSource.PLAYERS, 0.4f, 1.8f);
         if (p.level() instanceof ServerLevel sl)
             sl.sendParticles(ParticleTypes.CRIT, p.getX() + look.x, p.getEyeY() - 0.3, p.getZ() + look.z, 10, 0.2, 0.2, 0.2, 0.3);
         if (src.getEntity() instanceof LivingEntity att && att.distanceTo(p) < 4)
             att.knockback(0.5, p.getX() - att.getX(), p.getZ() - att.getZ());
         p.getUseItem().hurtAndBreak(1, p, x -> x.broadcastBreakEvent(p.getUsedItemHand()));
+        // parar el golpe cuesta estamina (y sin ella se rompe la guardia)
+        if (p instanceof ServerPlayer sp) com.darkcraft.rol.Rol.guardia(sp, golpe * 0.7f);
     }
 }
