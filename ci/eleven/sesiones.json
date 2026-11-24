@@ -970,5 +970,83 @@
     ]
    }
   }
+ },
+ "voz_guia": {
+  "flow": "FNZWSYJq2nK8zd5QwV5m",
+  "modelo": "eleven_v4",
+  "voz": "Autumn Veil (KoVIHoyLDrQyd4pGalbs)",
+  "nota": "Parte 2e-1: Maelis, la guia de los santuarios (voz de mujer serena). Frases 1-10, tomas a y b.",
+  "frases": {
+   "1": {
+    "prompt": "[softly] Another soul the Shadow has dragged back from the dark... [pause] You should be dead, marked one. And yet... the fire still answers to you.",
+    "sesiones": [
+     "optSBsCHbDgS4SV2fNqt",
+     "2854B4A90SwWTgygqrvv"
+    ]
+   },
+   "2": {
+    "prompt": "[calm] I am /ˈmeɪlɪs/. I tend the soul fires, as my sisters did... before Valdrenn fell to its oath.",
+    "sesiones": [
+     "b4UQQjyCim5Cr9LeSPXC",
+     "1P4x9GlmfrsOggIDUTSe"
+    ]
+   },
+   "3": {
+    "prompt": "[softly] Rest beside them when you can. The fire mends your flesh and fills your flasks... [pause] but the fallen will rise again.",
+    "sesiones": [
+     "FDto3lPLQmjZmdRjH4Jq",
+     "rOFU9NqnOhFbV9TDd9Ej"
+    ]
+   },
+   "4": {
+    "prompt": "[slowly] It is older than the kingdom. It feeds on broken oaths... [whispers] and it hungers for a door. Yours is the hand it chose to open it.",
+    "sesiones": [
+     "pSou2anxKTqhV3V5fz5I",
+     "5Z4L5f6qAiJ1YmAMnDMJ"
+    ]
+   },
+   "5": {
+    "prompt": "[softly] Because it needs you. Each time you fall, it pulls you back... and your echoes stay behind, in a sword of light. [pause] Do not lose them twice.",
+    "sesiones": [
+     "pT8XTMU3mx9lroUzBwgM",
+     "Q18s9bAdUzKA5Ypk54qq"
+    ]
+   },
+   "6": {
+    "prompt": "[warmly] Then give me the echoes you carry. I will weave them into your flesh... and your bones.",
+    "sesiones": [
+     "KBcNdYZzACEoabH9PzDf",
+     "D6D46aC63Gtk52r1bCRO"
+    ]
+   },
+   "7": {
+    "prompt": "[softly] May the fire keep you, marked one.",
+    "sesiones": [
+     "Z5JmUUfSMtg2LK6zVx6w",
+     "YOkk7TBnHjbQ2VXq5z7r"
+    ]
+   },
+   "8": {
+    "prompt": "[warmly] You have returned. Good... the fire was waiting for you.",
+    "sesiones": [
+     "PrndRfdgiYOHMSnECQxk",
+     "HXPHrFaIhbZsxhQNdKee"
+    ]
+   },
+   "9": {
+    "prompt": "[softly] The king's oath is broken at last. I felt every fire burn brighter... [whispers] and the Shadow grow hungrier.",
+    "sesiones": [
+     "WwlezGpGp98R6ZsuZHkP",
+     "rsljNH2gTCSf6aPZHnAC"
+    ]
+   },
+   "10": {
+    "prompt": "[sad] Ser Gavran kept his oath to the very end. Honor him, marked one... few in Valdrenn ever did.",
+    "sesiones": [
+     "2r2p9J4s6TQ0hlpcNbT4",
+     "IxQLPvx6jRkyDrRz5PsF"
+    ]
+   }
+  }
  }
 }

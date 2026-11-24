@@ -1,100 +1,84 @@
 {
  "descargas": [
   {
-   "archivo": "sfx/hechizo_lanzar_1.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/rkcgFfdrRnttOyxcjQmP/DtWFkQyPxosyRMSZRS7j/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=ZR2B3Fa7PetfJvysDC8UwyzG_wE="
+   "archivo": "guia/voz_1a.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/optSBsCHbDgS4SV2fNqt/g5kBPEoesxDIKfppGp7B/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=7T-S_MPNgMphxGDeYUXg9kextz8="
   },
   {
-   "archivo": "sfx/hechizo_lanzar_2.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/dYcsFcV4j6j0CpFdkR6a/RArT2H69RsXaE5k6Jz78/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=rd7t9_YWW4mIN04SrEJDeYXsHNk="
+   "archivo": "guia/voz_1b.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/2854B4A90SwWTgygqrvv/4m9fba1zFbdFADvUqCqL/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=vt-ivKgG_rm_ABfOX8_ALVOekJE="
   },
   {
-   "archivo": "sfx/hechizo_lanzar_3.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/TjieBoVjGDKPRfLR5fR5/nFueuBunq6d0JTSXrEDs/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=q6rUcD7MKkdVl4cmk9Ejh5miQo0="
+   "archivo": "guia/voz_2a.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/b4UQQjyCim5Cr9LeSPXC/Z0ql25PJSsLdjcnXLHuH/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=8deSXkAB12ASphp0VbvaDnmuFBI="
   },
   {
-   "archivo": "sfx/hechizo_lanzar_4.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/smUM8WrxzutMe2FYZNiM/zGHn4AG7gPi3kBU3oI2R/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=kEgZc2aLIBBXouo2cnJ2NxAIwOQ="
+   "archivo": "guia/voz_2b.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/1P4x9GlmfrsOggIDUTSe/EQApArQceoAUcnmgoZDC/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=Wr7YYL4J3M4J1i02hdjY_kJnABc="
   },
   {
-   "archivo": "sfx/hechizo_impacto_1.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/DDHdEQHJJXQ7N2K30QkE/iNHUXRoH6bpAV94KT3PU/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=MsAhMmufvTfe-uyRwzUAERC6ZoA="
+   "archivo": "guia/voz_3a.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/FDto3lPLQmjZmdRjH4Jq/lKuTbKcA6HK40moHKx0X/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=XrzH8gqzc6AOmg_OITjEyH7bkA8="
   },
   {
-   "archivo": "sfx/hechizo_impacto_2.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/vjaxkyTXzYaxvS1oWE8H/2Fn0UkhgIRLeNUAA01AA/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=q8EwFq4suG0chTTu5QLY5_O_oh4="
+   "archivo": "guia/voz_3b.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/rOFU9NqnOhFbV9TDd9Ej/KvKPDSdFlCW0d2pmZB12/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=NLyj3vHi5JMXazyHeKqgkJa-CBM="
   },
   {
-   "archivo": "sfx/hechizo_impacto_3.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/KRH4dKA524djy5q9jc5Z/FeieLH0ZiHg172VAvy2a/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=NdY0YjDFd09vNqgTSuWIxrgPcOk="
+   "archivo": "guia/voz_4a.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/pSou2anxKTqhV3V5fz5I/9jseXCjx5iJTMmxsuXP5/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=hSa2lVY-yMhyh-rIxWVrCxXHKMQ="
   },
   {
-   "archivo": "sfx/hechizo_impacto_4.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/crXM5TkICcdovDxY4hPH/6BnTxp8drfocQYVSWH6U/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=nGBtTksTkgyfklm8PWc2WSgQSLE="
+   "archivo": "guia/voz_4b.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/5Z4L5f6qAiJ1YmAMnDMJ/ss7tvXjxApVxlwMZqzVw/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=u0_9M5mUf2r-Y0aLrmnNeSMyK-A="
   },
   {
-   "archivo": "sfx/hechizo_rayo_1.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/a9yF41LWXT2AwDKOEtvM/8WUhDMoSYhGxR4eP1swQ/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=IoQ1KUimthu_teQW3dHQoBk-mOY="
+   "archivo": "guia/voz_5a.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/pT8XTMU3mx9lroUzBwgM/xhWQidc9s86DahOHyEzq/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=ADPLC286L7VqERLpIZMhuzkmc50="
   },
   {
-   "archivo": "sfx/hechizo_rayo_2.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/VsWP9rdKh2QZKyoAxqZ4/OIqfkRc17ScNfhUU9Ai1/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=USVgNgtrDjsvUAFgXvTY6L3JGcg="
+   "archivo": "guia/voz_5b.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/Q18s9bAdUzKA5Ypk54qq/m5CDHW2YEu0ZY773dAcu/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=RZKbX0jfW7x_2H9AGftuC9FNnf0="
   },
   {
-   "archivo": "sfx/hechizo_rayo_3.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/1Vb7NpqPEcJJmRNVR6hg/lHO9tO948YoJ4ixwyCBk/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=lbi6UPzHWjMu6dzrlKqgGYFwMbI="
+   "archivo": "guia/voz_6a.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/KBcNdYZzACEoabH9PzDf/69EicMmN6UkS4UolItGy/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=_EFuPaUifXOBe3xTHi5Tz3iKh2E="
   },
   {
-   "archivo": "sfx/hechizo_rayo_4.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/4GCk4vM3LkjhWDrvPxIv/0MzeF0jEmjvujMjnKRnt/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=uisVRId6r4SrD6pxv3SHACIVxcY="
+   "archivo": "guia/voz_6b.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/D6D46aC63Gtk52r1bCRO/XkMqP5QG8HVpGdza7cYU/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=5TuJNsbkmzVAuNOAr87CrODPfWU="
   },
   {
-   "archivo": "sfx/hechizo_llama_1.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/7sres6cpxjb332NvWAYa/O9Eblf1pXyYLrtrRoMD9/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=VCc-eTKnEsDHQEniqZEr8pOT1Kw="
+   "archivo": "guia/voz_7a.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/Z5JmUUfSMtg2LK6zVx6w/FctGjYQvlUpxBYTIoBla/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=ZDBQZnGfec3eQq_yJJGUP0a_-7k="
   },
   {
-   "archivo": "sfx/hechizo_llama_2.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/zOF0V6GeoHFLwWuPgNFb/CTj6xYKx2CWgr2ihGBQ8/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=NFBLy6HKROq9I4MWWItsgDqJNGg="
+   "archivo": "guia/voz_7b.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/YOkk7TBnHjbQ2VXq5z7r/IbThoaSj7cGk5hGMWrf4/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=rNyW8wIIXfk0ID1L2vd3ZiSeK5s="
   },
   {
-   "archivo": "sfx/hechizo_llama_3.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/2n46shMRQ3vixsp6KvKL/6vPLvohE0IncjlrNrPy5/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=42Qa6P05iHslbLZTkV1z7Khb5gI="
+   "archivo": "guia/voz_8a.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/PrndRfdgiYOHMSnECQxk/LfwMetyxqk2xV2I9DDwN/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=z373MghWFKlFsQf9ngT29lFxj0w="
   },
   {
-   "archivo": "sfx/hechizo_llama_4.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/SnJ3mfFztCxuqX0XcRuD/6z8xH5HhjpR9NGCYscfr/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=BVUgg-BXR5Jbjn_zrbDbyjlfScM="
+   "archivo": "guia/voz_8b.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/HXPHrFaIhbZsxhQNdKee/0gWITHD7541pCgE7inAn/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=UQHUnHvco6Lgxo1e3psd-mvoB8s="
   },
   {
-   "archivo": "sfx/hechizo_curar_1.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/EvZI0sWkk0Rb81Alw5rp/RZRYrXoczIKvzDuJQizj/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=bLdrbKWk0VwNOBpWr5KfMUTtn_0="
+   "archivo": "guia/voz_9a.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/WwlezGpGp98R6ZsuZHkP/NvCzKNReeJpHqqV3QEq8/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=50Tm50coC5BIocDWq_OdnE6E-58="
   },
   {
-   "archivo": "sfx/hechizo_curar_2.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/zHik3PxdzF5fRBmhPp8W/6Cljy0sEnh6iUfGoagp2/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=_IdIZCDLEIYXJytd1O3cWsUA2Qk="
+   "archivo": "guia/voz_9b.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/rsljNH2gTCSf6aPZHnAC/pVUaml9b0L8VxzPqqSi5/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=rKUkYp8CuYQ0icNCxki1TbEPycg="
   },
   {
-   "archivo": "sfx/hechizo_curar_3.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/VIYuAlj5EI4AtSihuDGI/qvPR6wg0gtUKq97RuskJ/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=kO57gdqNF72EVs420TZRsRcAVLA="
+   "archivo": "guia/voz_10a.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/2r2p9J4s6TQ0hlpcNbT4/qL2ic2wbwfhbTggNq9cz/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=dOP6rH0A7FN7-_gqPvgo-4XWK6k="
   },
   {
-   "archivo": "sfx/hechizo_curar_4.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/lIsJnmOulE21TIIJrnLt/VBUhOTO6jqbEM88ZADUT/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=_dWrFSgrcM3BsDhN35rWLGNfi14="
-  },
-  {
-   "archivo": "sfx/hechizo_bendicion_1.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/RvqtOys4984WfSq3D99L/tDrcdSxvJqhrymQ4jL1k/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=sSs4Z7Uc1ik43G51Tbp45Zz6XJ4="
-  },
-  {
-   "archivo": "sfx/hechizo_bendicion_2.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/S9uH3Ot5GXVOAXwGX0kM/7Z9yAqgHKKa0X94Byk78/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=jOL4cZ7QWxyd2w5yljcKvl2QFII="
-  },
-  {
-   "archivo": "sfx/hechizo_bendicion_3.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/RzrawPNqpyHhidp7ktKb/pAf5sIvMwur57Jjk2XWM/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=B1ANqDMMWIGn7vpLnkbReFjwaTM="
-  },
-  {
-   "archivo": "sfx/hechizo_bendicion_4.mp3",
-   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/VdhosNS0F9McDSFFt2Dj/LfDasUrP1axl1wIL1Th5/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=-a3nlUpypeiVBxkF3NnJZuPQj2A="
+   "archivo": "guia/voz_10b.mp3",
+   "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/IxQLPvx6jRkyDrRz5PsF/GS1RzbCK64Z7pczVMsMh/content.mp3?Expires=1795572000&KeyName=assets-cdn-key-1&Signature=nBhEwvMQQVJlhfRAwYx5RkAfjVY="
   }
  ],
  "caduca": "2026-11-25T02:00:00Z"
