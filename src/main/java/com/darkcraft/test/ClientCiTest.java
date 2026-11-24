@@ -1563,11 +1563,12 @@ public final class ClientCiTest {
                 log("  puente: " + est.puente + " base " + est.baseEscalera + " logro puente=" + com.darkcraft.story.Logros.tiene(sp, "puente"));
             });
         });
-        // vistas de la escalera (se levanta de abajo arriba en ~8,5 s): desde el suelo mientras sube, y ya hecha, de lado
+        // vistas de la escalera (se levanta de abajo arriba en ~8,5 s): desde su base mientras sube (en el borde de la
+        // plataforma, que siempre queda despejada: fuera de ella la camara podia quedar dentro de una loma), y ya hecha, de lado
         // y desde arriba; sin descartar secciones tapadas y con tiempo para que se dibujen
         double[][] vistas = {
                 // {tick, x, y (0 = base, 1 = arriba), z, mirar x, mirar y, mirar z}
-                {30, 15, 0.012, 17, 0, 0.16, 0},
+                {30, 0, 0, 7.8, 0, 0.16, 0},
                 {190, 40, 0.52, 46, 0, 0.46, 0},
                 {260, 30, 1.04, 34, 0, 0.86, 0},
         };
