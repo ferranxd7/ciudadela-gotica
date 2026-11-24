@@ -690,5 +690,93 @@
     ]
    }
   }
+ },
+ "sfx_santuario_menu": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 2b del plan grande: santuarios, frascos, subir de nivel y sonidos de los menus. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "santuario_enciende": {
+    "prompt": "Soul bonfire igniting: a deep airy whoosh as pale ghostly fire bursts to life in a stone brazier, followed by a low resonant bell tone and a soft ethereal choir shimmer, sacred and calm, dark fantasy, 4 seconds",
+    "sesiones": [
+     "ZnA9rGSsfaDcx0ZhrWs4",
+     "mlfAonarEbEUpztIUTAC",
+     "QaRzBhsvDF21bWbvA2sB",
+     "J6vx0QfI8A1N6G2rxubq"
+    ]
+   },
+   "santuario_fuego": {
+    "prompt": "Ghostly soul fire burning steadily in a stone brazier: soft low crackling flames with a faint airy ethereal hum, calm and constant, no music, seamless loop, 6 seconds",
+    "sesiones": [
+     "P3I9hK7Dk2FmaaCFVqej",
+     "Q9GcOL1n2SWkaPggrw7b",
+     "hyuvV9QXkO6d9b3UfUdc",
+     "D2dHKfVPgasSDhlwb0YJ"
+    ]
+   },
+   "santuario_descanso": {
+    "prompt": "Resting at a sacred bonfire: a warm gentle restorative swell, soft breath of wind, a single delicate chime and a low soothing choir pad fading out, peaceful, dark fantasy, 3 seconds",
+    "sesiones": [
+     "OopoAEcoEiXGvQKNtLbv",
+     "Mq9vuB4NFbPJEiYVoK5y",
+     "qAuEAhw0cEejmWyyGSQA",
+     "5rrjYBPcu5vJdiFmIZDg"
+    ]
+   },
+   "frasco_beber": {
+    "prompt": "Drinking a potion from a small glass flask: cork pop, two quick liquid gulps, a short relieved exhale, close microphone, dry, 1.5 seconds",
+    "sesiones": [
+     "aboPGVCsQu5q0mt4y7N7",
+     "GPqCEgFiTeABsGvmQpPR",
+     "8gIPoC6GQPuUVREHwWzs",
+     "IvJR1WUuPfOCpdpp6np5"
+    ]
+   },
+   "nivel_sube": {
+    "prompt": "Level up: a rising shimmering chime arpeggio blooming into a deep resonant choir chord with a soft golden sparkle tail, empowering and solemn, dark fantasy, 3 seconds",
+    "sesiones": [
+     "IMtJ4tOfc6KBEucobz60",
+     "Vd3IFubtLIgN7nvVVJvp",
+     "OPAfJJ9cHrvhw8s6HHFa",
+     "C7kt66UAKTXkeDuxJHKv"
+    ]
+   },
+   "menu_abre": {
+    "prompt": "Game menu opening: a heavy stone slab sliding aside with a short metal latch click, dry, dark fantasy interface sound, 0.7 seconds",
+    "sesiones": [
+     "Ox57hjCYDGIMoSNRJyfp",
+     "XyGj3DNg1dUWFTjRemxI",
+     "rUMV9ypZo0rPLvZoyczo",
+     "6gHclKV1w811ovjUrmY6"
+    ]
+   },
+   "menu_mueve": {
+    "prompt": "Game menu cursor move: one very short soft stone tick, subtle, dry, interface sound, 0.3 seconds",
+    "sesiones": [
+     "b6fglzNzj6mV4eyxt3Mp",
+     "T3AaXltGYrxiksgvBUlP",
+     "MysMZ3Id0aNIN8p0LEbI",
+     "ngE9YkVi2EdbAoQ8xgcj"
+    ]
+   },
+   "menu_acepta": {
+    "prompt": "Game menu confirm: a small metallic clink with a soft warm chime, short and satisfying, dry, dark fantasy interface sound, 0.5 seconds",
+    "sesiones": [
+     "Rq1CCLD4jtJhhdZgWaAX",
+     "NNNWuQ8GuHI8QIi3azyR",
+     "ngFMj2c1yD1VM5fsDgUH",
+     "7K9c5jYzK2FjtfRz50kW"
+    ]
+   },
+   "menu_cancela": {
+    "prompt": "Game menu cancel or close: a short low dull wooden thud with a faint stone scrape, dry, dark fantasy interface sound, 0.5 seconds",
+    "sesiones": [
+     "6fz4bO0nZ1kgaFSnrtkR",
+     "6ZlDtOd7kO0hbfmExwPE",
+     "VWoMwtZq38Vhh0qzd5Ud",
+     "GOP88en0qeCVpySpiwOE"
+    ]
+   }
+  }
  }
 }
