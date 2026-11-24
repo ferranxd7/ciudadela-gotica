@@ -884,5 +884,30 @@
     ]
    }
   }
+ },
+ "sfx_rol": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 2d del plan grande: comer un fruto y ponerse un talisman. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "comer_fruto": {
+    "prompt": "A single quick crunchy bite into a juicy magical fruit, then a soft rising shimmering magical chime as its power flows into the body, close and dry, dark fantasy RPG item use sound, no music, 1.2 seconds",
+    "sesiones": [
+     "hro4d2dVzYHXbXJzqa3Q",
+     "T2qEp7rnFpmhA4dchLP2",
+     "F16kPvo957jrSQ8Hp6Zd",
+     "ZUGmRm9BwqwcuR0ejiZP"
+    ]
+   },
+   "talisman": {
+    "prompt": "Equipping an ancient heavy amulet: a soft clink of a gold chain and a metal medallion settling, followed by a faint low mystical hum of awakening power, dark fantasy RPG menu sound, no music, 1 second",
+    "sesiones": [
+     "AYd9K37oJdS2NqihtgXz",
+     "f0gmbJB9WH7gHvS8iVex",
+     "GoxLXz9X18tstaHgIHmN",
+     "cd3XeRF3dIKOei93TyTL"
+    ]
+   }
+  }
  }
 }
