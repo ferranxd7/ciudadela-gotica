@@ -37,19 +37,31 @@ public class LlaveHueso extends Item {
         super(p);
     }
 
-    /** La fortaleza de esta llave: la primera vez, la mas cercana a quien la usa (y se queda apuntada en la llave). */
+    /**
+     * La fortaleza de esta llave (se queda apuntada en la llave): la del reino donde se gano (la apunta el cofre de Ser
+     * Gavran); si no lo tiene, la de la fortaleza donde se esta (a menos de 400 bloques) o la del reino mas cercano. No la
+     * fortaleza mas cercana sin mas: la de un reino vecino puede quedar mas cerca que la del propio.
+     */
     public static Fortalezas.Sitio destino(ServerPlayer p, ItemStack st) {
         CompoundTag t = st.getOrCreateTag();
         long seed = p.serverLevel().getSeed();
         if (t.contains("fortX")) return new Fortalezas.Sitio(t.getInt("fortX"), t.getInt("fortZ"), t.getInt("reinoX"), t.getInt("reinoZ"));
-        Fortalezas.Sitio s = Fortalezas.cercana(seed, p.getX(), p.getZ(), 7000);
+        Fortalezas.Sitio s = Fortalezas.cercana(seed, p.getX(), p.getZ(), 400);
         if (s == null) s = Fortalezas.delReino(seed, p.getX(), p.getZ());
         if (s == null) return null;
+        apuntar(st, s);
+        return s;
+    }
+
+    /** Apunta en la llave su fortaleza. */
+    public static ItemStack apuntar(ItemStack st, Fortalezas.Sitio s) {
+        if (s == null) return st;
+        CompoundTag t = st.getOrCreateTag();
         t.putInt("fortX", s.x());
         t.putInt("fortZ", s.z());
         t.putInt("reinoX", s.reinoX());
         t.putInt("reinoZ", s.reinoZ());
-        return s;
+        return st;
     }
 
     @Override

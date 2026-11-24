@@ -139,7 +139,9 @@ public final class VictoriaGavran {
         SalaArbol s = SalaArbol.cerca(lvl, pos.getX(), pos.getZ());
         if (s == null || !ReyEstado.get(lvl.getServer()).gano(s.key(), sp.getUUID())) return;
         items.set(4, new ItemStack(DarkCraftMod.MANDOBLE_JURAMENTO.get()));
-        items.set(22, new ItemStack(DarkCraftMod.LLAVE_HUESO.get()));
+        // la llave ya apunta a la Fortaleza de Hueso de este reino
+        items.set(22, com.darkcraft.armas.LlaveHueso.apuntar(new ItemStack(DarkCraftMod.LLAVE_HUESO.get()),
+                com.darkcraft.fortaleza.Fortalezas.delReino(lvl.getSeed(), pos.getX(), pos.getZ())));
         items.set(10, new ItemStack(Items.NETHERITE_INGOT, 6));
         items.set(16, new ItemStack(Items.ENCHANTED_GOLDEN_APPLE, 3));
         items.set(19, new ItemStack(Items.EXPERIENCE_BOTTLE, 48));

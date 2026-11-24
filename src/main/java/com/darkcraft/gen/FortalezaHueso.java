@@ -497,9 +497,11 @@ public final class FortalezaHueso extends Element {
         int[] al = altar();
         c.set(al[0], al[1], al[2], Pal.PB_CHISELED);
         c.set(al[0], al[1] + 1, al[2], Pal.GILDED);
+        // dos candeleros de hueso con farol de almas a los lados (el fuego de verdad echaba humo negro delante del portal)
         for (int s = -1; s <= 1; s += 2) {
-            c.set(al[0] + s * 2, al[1], al[2], Pal.b(Blocks.SOUL_SOIL));
-            c.set(al[0] + s * 2, al[1] + 1, al[2], Pal.b(Blocks.SOUL_FIRE));
+            c.set(al[0] + s * 2, al[1], al[2], Pal.PB_CHISELED);
+            c.set(al[0] + s * 2, al[1] + 1, al[2], HUESO);
+            c.set(al[0] + s * 2, al[1] + 2, al[2], Pal.SOUL_LANTERN);
         }
     }
 }

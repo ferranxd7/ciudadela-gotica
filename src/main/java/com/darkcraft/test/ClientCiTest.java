@@ -1567,7 +1567,7 @@ public final class ClientCiTest {
         // y desde arriba; sin descartar secciones tapadas y con tiempo para que se dibujen
         double[][] vistas = {
                 // {tick, x, y (0 = base, 1 = arriba), z, mirar x, mirar y, mirar z}
-                {60, 15, 0.012, 17, 0, 0.16, 0},
+                {30, 15, 0.012, 17, 0, 0.16, 0},
                 {190, 40, 0.52, 46, 0, 0.46, 0},
                 {260, 30, 1.04, 34, 0, 0.86, 0},
         };
@@ -1581,7 +1581,7 @@ public final class ClientCiTest {
                 verDesde(m, new Vec3(ce[0] + 0.5 + v[1], fbase + 1.6 + h * v[2], ce[1] + 0.5 + v[3]),
                         new Vec3(ce[0] + 0.5 + v[4], fbase + h * v[5], ce[1] + 0.5 + v[6]));
             });
-            atTicks(P + (int) v[0] + (k == 0 ? 12 : 50), "captura", m -> shot(m, "cliente_f05_puente_" + vk));
+            atTicks(P + (int) v[0] + (k == 0 ? 64 : 50), "captura", m -> shot(m, "cliente_f05_puente_" + vk));
         }
         atTicks(P + 316, "Puente: desde arriba", m -> {
             int[] ce = com.darkcraft.fortaleza.Puente.centro(fplan);
@@ -1726,7 +1726,8 @@ public final class ClientCiTest {
             m.setScreen(null);
             m.player.closeContainer();
             server(m, sp -> {
-                BlockPos mesa = sp.blockPosition().relative(Direction.NORTH, 2);
+                sp.teleportTo(sp.serverLevel(), fplan.cx + 0.5, fplan.Y, fplan.cz - 12.5, 180f, 20f);
+                BlockPos mesa = BlockPos.containing(fplan.cx + 0.5, fplan.Y, fplan.cz - 14.5);
                 sp.serverLevel().setBlock(mesa, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE.defaultBlockState(), 3);
                 ItemStack am = new ItemStack(DarkCraftMod.AMULETO_HUESO.get());
                 sp.getInventory().add(am.copy());
@@ -1753,6 +1754,7 @@ public final class ClientCiTest {
         });
         atTicks(T + 30, "captura", m -> shot(m, "cliente_f30_azotea"));
         atTicks(T + 34, "El amuleto en el altar: capitulo 6", m -> server(m, sp -> {
+            sp.setGameMode(GameType.SURVIVAL);
             sp.getCooldowns().removeCooldown(DarkCraftMod.AMULETO_HUESO.get());
             ItemStack am = new ItemStack(DarkCraftMod.AMULETO_HUESO.get());
             sp.setItemInHand(InteractionHand.MAIN_HAND, am);
@@ -1776,6 +1778,7 @@ public final class ClientCiTest {
         atTicks(Q, "El portal abierto", m -> {
             enPrimeraPersona(m);
             server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
                 int[] q = fplan.f.portal();
                 log("  portal: " + sp.serverLevel().getBlockState(new BlockPos(fplan.cx, q[1] + 3, q[2])).getBlock() + "; libro 6 en el inventario="
                         + sp.getInventory().items.stream().anyMatch(st -> st.hasTag() && st.getTag().getInt("darkcraft_libro") == 6)

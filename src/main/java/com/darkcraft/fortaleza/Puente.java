@@ -156,10 +156,13 @@ public final class Puente {
         for (int y = g; y <= Y + 3; y++)
             for (int dx = -HUECO; dx <= HUECO; dx++)
                 for (int dz = -HUECO; dz <= HUECO; dz++) out.add(new Pieza(cx + dx, y, cz + dz, Pal.AIR));
-        // 2) los escalones de abajo arriba
+        // 2) los escalones de abajo arriba, y a la vez (para que todo crezca de abajo arriba) los cuatro pilares de hueso de
+        // las esquinas, con un anillo de hueso que los une en cada vuelta: de lejos se ve una torre de huesos
         List<Paso> pasos = pasos(cx, cz, Y, g);
+        int pilar = g - 1;
         for (int k = pasos.size() - 1; k >= 0; k--) {
             Paso p = pasos.get(k);
+            for (; pilar < Math.min(p.h, Y - 1); ) pilares(out, cx, cz, ++pilar, g);
             for (int[] cel : p.celdas) {
                 out.add(new Pieza(cel[0], p.h - 1, cel[1], p.descanso ? suelo(cel[0], cel[1]) : peldano(p.dir)));
                 for (int y = p.h; y <= p.h + 2; y++) out.add(new Pieza(cel[0], y, cel[1], Pal.AIR));
@@ -172,9 +175,11 @@ public final class Puente {
             if (fuera != null && k % 2 == 0) {
                 out.add(new Pieza(fuera[0], p.h, fuera[1], HUESO_Y));
                 if (k % 10 == 0) out.add(new Pieza(fuera[0], p.h + 1, fuera[1], Pal.b(Blocks.SKELETON_SKULL)));
+                else if (k % 14 == 6) out.add(new Pieza(fuera[0], p.h + 1, fuera[1], Pal.SOUL_LANTERN));
             }
             if (fuera != null && k % 5 == 2) nube(out, fuera[0] + p.ox, p.h - 2, fuera[1] + p.oz, k);
         }
+        for (; pilar < Y - 1; ) pilares(out, cx, cz, ++pilar, g);
         // 3) el puente corto hasta el arco de colmillos: hueso con nubes a los lados y costillas por encima
         for (int z = cz - OUT - 1; z >= f.bordeZ + 1; z--) {
             for (int x = cx + IN; x <= cx + OUT; x++) {
@@ -196,6 +201,20 @@ public final class Puente {
                 }
         }
         return out;
+    }
+
+    /** Los cuatro pilares de hueso de las esquinas a la altura y, y cada 28 bloques el anillo que los une (por fuera de los escalones). */
+    private static void pilares(List<Pieza> out, int cx, int cz, int y, int g) {
+        int r = OUT + 1;
+        for (int sx = -1; sx <= 1; sx += 2)
+            for (int sz = -1; sz <= 1; sz += 2) out.add(new Pieza(cx + sx * r, y, cz + sz * r, HUESO_Y));
+        if ((y - g) % 28 == 20)
+            for (int i = -r + 1; i <= r - 1; i++) {
+                out.add(new Pieza(cx + i, y, cz - r, FortalezaHueso.hueso(Direction.Axis.X)));
+                out.add(new Pieza(cx + i, y, cz + r, FortalezaHueso.hueso(Direction.Axis.X)));
+                out.add(new Pieza(cx - r, y, cz + i, FortalezaHueso.hueso(Direction.Axis.Z)));
+                out.add(new Pieza(cx + r, y, cz + i, FortalezaHueso.hueso(Direction.Axis.Z)));
+            }
     }
 
     private static BlockState suelo(int x, int z) {
