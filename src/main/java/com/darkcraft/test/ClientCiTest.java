@@ -1698,6 +1698,288 @@ public final class ClientCiTest {
         return t + 460;
     }
 
+    // ------------------------------------------------------------------ hechizos: memorizar en el santuario y lanzar
+
+    private static void logHechizos(Minecraft m, String what) {
+        String pantalla = m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName();
+        if (m.screen instanceof com.darkcraft.client.ui.MemoriaScreen ms) pantalla += " [" + ms.resumen() + "]";
+        if (m.screen instanceof com.darkcraft.client.ui.SantuarioScreen sc) pantalla += " [" + sc.resumen() + "]";
+        if (m.screen instanceof com.darkcraft.client.ui.MenuScreen ms) pantalla += " [" + ms.resumen() + "]";
+        log("  hechizos " + what + " (cliente): memoria=" + com.darkcraft.client.ui.ClientRol.memoria + " elegido=" + com.darkcraft.client.ui.ClientRol.hechizo()
+                + " mana=" + com.darkcraft.client.armas.ArmasCliente.energiaCliente() + " | " + com.darkcraft.client.combate.ClientCombate.resumen()
+                + " | pose " + com.darkcraft.client.combate.Poses.resumen(m.player) + " | cartel: " + com.darkcraft.client.ui.Carteles.resumen()
+                + " | mano=" + m.player.getInventory().selected + " | pantalla: " + pantalla);
+        server(m, sp -> {
+            int proyectiles = sp.serverLevel().getEntitiesOfClass(com.darkcraft.hechizos.ProyectilHechizo.class, sp.getBoundingBox().inflate(40)).size();
+            log("  hechizos " + what + " (servidor): " + com.darkcraft.hechizos.Lanzar.resumen(sp) + " | vida " + String.format(java.util.Locale.ROOT, "%.1f/%.1f",
+                    sp.getHealth(), sp.getMaxHealth()) + " | estamina " + Math.round(com.darkcraft.rol.Rol.estamina(sp)) + " | proyectiles " + proyectiles
+                    + " | diana A " + (dianaA == null ? "-" : String.format(java.util.Locale.ROOT, "%.1f%s", dianaA.getHealth(), dianaA.isOnFire() ? " ardiendo" : ""))
+                    + " | diana B " + (dianaB == null ? "-" : String.format(java.util.Locale.ROOT, "%.1f", dianaB.getHealth()))
+                    + " | efectos=" + sp.getActiveEffects().stream().map(e -> e.getEffect().getDescriptionId().replace("effect.", "")).toList());
+        });
+    }
+
+    /** Elige un hechizo de los memorizados (como la flecha arriba, las veces que haga falta). */
+    private static void elegirHechizo(com.darkcraft.hechizos.Hechizo h) {
+        for (int i = 0; i < 12 && com.darkcraft.client.ui.ClientRol.hechizo() != h; i++) com.darkcraft.client.ui.ClientRol.siguienteHechizo();
+        if (com.darkcraft.client.ui.ClientRol.hechizo() != h) log("  FALLO: no se puede elegir " + h + " (memoria " + com.darkcraft.client.ui.ClientRol.memoria + ")");
+    }
+
+    /** Lleva en la mano el hueco {@code i} de la barra (y que el cliente lo sepa). */
+    private static void enMano(ServerPlayer sp, int i) {
+        sp.getInventory().selected = i;
+        sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(i));
+    }
+
+    private static ItemStack hechizoItem(com.darkcraft.hechizos.Hechizo h) {
+        return new ItemStack(DarkCraftMod.HECHIZOS.get(h).get());
+    }
+
+    /** Lejos de las dianas (9 bloques), para ver los proyectiles volar. */
+    private static void aDistancia(ServerPlayer sp) {
+        sp.teleportTo(sp.serverLevel(), ex, ey, ez - 9.0, 0f, 4f);
+        sp.setDeltaMovement(Vec3.ZERO);
+    }
+
+    /** Camara de lado, a media distancia entre el jugador lejano y la diana. */
+    private static void verHechizos(Minecraft m) {
+        m.options.hideGui = true;
+        verDesde(m, new Vec3(ex + 7.5, ey + 2.4, ez - 4.6), new Vec3(ex, ey + 1.0, ez - 4.6));
+    }
+
+    private static int hechizos(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Hechizos: supervivencia, el baston y el sello, los ocho hechizos en la bolsa y un santuario encendido al lado", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = false;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                sp.setGameMode(GameType.SURVIVAL);
+                var inv = sp.getInventory();
+                inv.clearContent();
+                inv.items.set(0, new ItemStack(DarkCraftMod.BASTON.get()));
+                inv.items.set(1, new ItemStack(DarkCraftMod.SELLO_SAGRADO.get()));
+                int k = 9;
+                for (com.darkcraft.hechizos.Hechizo h : com.darkcraft.hechizos.Hechizo.values()) inv.items.set(k++, hechizoItem(h));
+                enMano(sp, 0);
+                sp.removeAllEffects();
+                comando(sp, "darkcraft rol nivel reiniciar");
+                comando(sp, "darkcraft rol atributo inteligencia 24");
+                comando(sp, "darkcraft rol atributo fe 24");
+                comando(sp, "darkcraft rol atributo mente 28");
+                comando(sp, "darkcraft rol hechizo olvidar");
+                santuarioPrueba = BlockPos.containing(ex + 2.0, ey, ez - 3.0);
+                com.darkcraft.santuario.Santuarios.poner(lvl, santuarioPrueba, "darkcraft.santuario.arbol");
+                var st = lvl.getBlockState(santuarioPrueba);
+                if (st.getBlock() instanceof com.darkcraft.santuario.SantuarioBlock)
+                    lvl.setBlock(santuarioPrueba, st.setValue(com.darkcraft.santuario.SantuarioBlock.ENCENDIDO, true), 3);
+                sp.setHealth(sp.getMaxHealth());
+                enCombate(sp);
+            });
+        });
+        atTicks(t + 30, "al empezar", m -> logHechizos(m, "al empezar"));
+        atTicks(t + 32, "clic con el baston sin nada memorizado", m -> atacar(m));
+        atTicks(t + 36, "tras el clic", m -> logHechizos(m, "sin memorizar"));
+        atTicks(t + 40, "descansar en el santuario: su menu", m -> usarSantuario());
+        atTicks(t + 56, "abajo dos veces e INTRO: memorizar hechizos", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+        });
+        atTicks(t + 68, "captura: la memoria vacia y los ocho hechizos", m -> {
+            logHechizos(m, "memoria vacia");
+            shot(m, "cliente_m01_memoria");
+        });
+        atTicks(t + 72, "INTRO: el guijarro; abajo, INTRO: la gran lanza; abajo, INTRO: las esquirlas", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+        });
+        atTicks(t + 80, "abajo dos veces, INTRO: la llamarada (llena la memoria); abajo, INTRO: el rayo (no cabe)", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
+        });
+        atTicks(t + 92, "captura: cuatro memorizados y el aviso de que no cabe", m -> {
+            logHechizos(m, "memorizados");
+            shot(m, "cliente_m02_memorizados");
+        });
+        atTicks(t + 96, "ESC: vuelve al santuario; cerrar", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE);
+            m.setScreen(null);
+        });
+        atTicks(t + 100, "el menu: el inventario, la clase Hechizos", m -> {
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.INVENTARIO);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_UP);
+            for (int i = 0; i < 4; i++) tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+        });
+        atTicks(t + 112, "captura: los hechizos en el inventario", m -> {
+            logHechizos(m, "en el inventario");
+            shot(m, "cliente_m03_inventario_hechizos");
+        });
+        atTicks(t + 116, "cerrar; fuera el santuario (taparia la vista de lado); dos dianas y el jugador a 9 bloques", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                if (santuarioPrueba != null) sp.serverLevel().removeBlock(santuarioPrueba, false);
+                dianaA = diana(sp.serverLevel(), ex, ez, 180f);
+                dianaB = diana(sp.serverLevel(), ex - 4.0, ez + 1.0, 135f);
+                aDistancia(sp);
+            });
+        });
+        atTicks(t + 134, "captura: la cruz con el hechizo elegido", m -> {
+            logHechizos(m, "con la cruz");
+            shot(m, "cliente_m04_cruz");
+        });
+        atTicks(t + 138, "clic: el Guijarro de Sombra", m -> atacar(m));
+        atTicks(t + 142, "captura: lanzando (primera persona)", m -> {
+            logHechizos(m, "lanzando el guijarro");
+            shot(m, "cliente_m05_fp_lanzar");
+        });
+        atTicks(t + 148, "captura: el guijarro volando", m -> {
+            logHechizos(m, "guijarro volando");
+            shot(m, "cliente_m06_fp_guijarro");
+        });
+        atTicks(t + 166, "tras el guijarro; flecha arriba: la Gran Lanza; tercera persona, de lado", m -> {
+            logHechizos(m, "tras el guijarro");
+            pulsar(com.darkcraft.client.ui.Teclas.HECHIZO_SIGUIENTE);
+            verHechizos(m);
+        });
+        atTicks(t + 172, "clic: la gran lanza", m -> atacar(m));
+        atTicks(t + 182, "captura: preparando la lanza, de lado", m -> {
+            logHechizos(m, "preparando la lanza");
+            shot(m, "cliente_m07_tp_lanza_prepara");
+        });
+        atTicks(t + 194, "captura: la lanza volando", m -> {
+            logHechizos(m, "lanza volando");
+            shot(m, "cliente_m08_tp_lanza");
+        });
+        atTicks(t + 214, "tras la lanza; flecha arriba: las esquirlas", m -> {
+            logHechizos(m, "tras la lanza");
+            pulsar(com.darkcraft.client.ui.Teclas.HECHIZO_SIGUIENTE);
+        });
+        atTicks(t + 218, "clic: las esquirlas", m -> atacar(m));
+        atTicks(t + 232, "captura: las esquirlas buscando a la diana", m -> {
+            logHechizos(m, "esquirlas");
+            shot(m, "cliente_m09_tp_esquirlas");
+        });
+        atTicks(t + 256, "tras las esquirlas; cerca, el sello en la mano y la llamarada", m -> {
+            logHechizos(m, "tras las esquirlas");
+            verCombate(m);
+            server(m, sp -> {
+                enMano(sp, 1);
+                enCombate(sp);
+            });
+            elegirHechizo(com.darkcraft.hechizos.Hechizo.LLAMA);
+        });
+        atTicks(t + 262, "clic: la llamarada", m -> atacar(m));
+        atTicks(t + 272, "captura: la llamarada", m -> {
+            logHechizos(m, "llamarada");
+            shot(m, "cliente_m10_tp_llama");
+        });
+        atTicks(t + 290, "tras la llamarada; todos memorizados (con el comando); lejos otra vez", m -> {
+            logHechizos(m, "tras la llamarada");
+            verHechizos(m);
+            server(m, sp -> {
+                comando(sp, "darkcraft rol hechizo memorizar");
+                aDistancia(sp);
+            });
+        });
+        atTicks(t + 296, "elegir el rayo", m -> elegirHechizo(com.darkcraft.hechizos.Hechizo.RAYO));
+        atTicks(t + 298, "clic: la lanza de rayo", m -> atacar(m));
+        atTicks(t + 316, "captura: el rayo volando", m -> {
+            logHechizos(m, "rayo");
+            shot(m, "cliente_m11_tp_rayo");
+        });
+        atTicks(t + 334, "tras el rayo; un golpe de 10 al jugador", m -> {
+            logHechizos(m, "tras el rayo");
+            server(m, sp -> {
+                sp.invulnerableTime = 0;
+                sp.hurt(sp.damageSources().generic(), 10f);
+            });
+            elegirHechizo(com.darkcraft.hechizos.Hechizo.CURAR);
+        });
+        atTicks(t + 340, "herido", m -> logHechizos(m, "herido"));
+        atTicks(t + 342, "clic: curacion", m -> atacar(m));
+        atTicks(t + 352, "captura: rezando", m -> {
+            logHechizos(m, "rezando");
+            shot(m, "cliente_m12_tp_curar");
+        });
+        atTicks(t + 372, "tras curarse; la bendicion", m -> {
+            logHechizos(m, "curado");
+            elegirHechizo(com.darkcraft.hechizos.Hechizo.BENDICION);
+        });
+        atTicks(t + 374, "clic: la bendicion", m -> atacar(m));
+        atTicks(t + 404, "primera persona, con el HUD", m -> enPrimeraPersona(m));
+        atTicks(t + 412, "captura: la bendicion bajo las barras", m -> {
+            logHechizos(m, "bendecido");
+            shot(m, "cliente_m13_bendicion_hud");
+        });
+        atTicks(t + 416, "cerca, el baston y la Espada Fantasma; de lado", m -> {
+            verCombate(m);
+            server(m, sp -> {
+                enMano(sp, 0);
+                enCombate(sp);
+            });
+            elegirHechizo(com.darkcraft.hechizos.Hechizo.ESPADA);
+        });
+        atTicks(t + 422, "clic: la espada fantasma", m -> atacar(m));
+        atTicks(t + 431, "captura: el tajo fantasma", m -> {
+            logHechizos(m, "espada fantasma");
+            shot(m, "cliente_m14_tp_espada");
+        });
+        atTicks(t + 446, "sin mana: el guijarro; primera persona", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> com.darkcraft.armas.Combos.dar(sp, -1000));
+            elegirHechizo(com.darkcraft.hechizos.Hechizo.GUIJARRO);
+        });
+        atTicks(t + 452, "clic sin mana", m -> atacar(m));
+        atTicks(t + 458, "captura: el aviso de que no queda mana", m -> {
+            logHechizos(m, "sin mana");
+            shot(m, "cliente_m15_sin_mana");
+        });
+        atTicks(t + 462, "mana lleno; el sello con una hechiceria", m -> server(m, sp -> {
+            com.darkcraft.armas.Combos.llenar(sp);
+            enMano(sp, 1);
+        }));
+        atTicks(t + 468, "clic: no es su catalizador", m -> atacar(m));
+        atTicks(t + 472, "aviso del catalizador", m -> logHechizos(m, "otro catalizador"));
+        atTicks(t + 476, "Inteligencia 10, el baston y la gran lanza", m -> {
+            server(m, sp -> {
+                comando(sp, "darkcraft rol atributo inteligencia 10");
+                enMano(sp, 0);
+            });
+            elegirHechizo(com.darkcraft.hechizos.Hechizo.LANZA);
+        });
+        atTicks(t + 484, "clic: no llega al requisito", m -> atacar(m));
+        atTicks(t + 488, "aviso del requisito", m -> logHechizos(m, "sin el requisito"));
+        atTicks(t + 492, "Fin de los hechizos", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = true;
+            server(m, sp -> {
+                if (dianaA != null) dianaA.discard();
+                if (dianaB != null) dianaB.discard();
+                dianaA = dianaB = null;
+                if (santuarioPrueba != null) sp.serverLevel().removeBlock(santuarioPrueba, false);
+                sp.setRespawnPosition(net.minecraft.world.level.Level.OVERWORLD, null, 0f, false, false);
+                comando(sp, "darkcraft rol hechizo olvidar");
+                comando(sp, "darkcraft rol nivel reiniciar");
+                sp.getInventory().clearContent();
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 510;
+    }
+
     private static void logArmasAt(int t, String what) {
         atTicks(t, "estado de las armas " + what, m -> logArmas(m, what));
     }
@@ -1715,6 +1997,7 @@ public final class ClientCiTest {
         fin = menu(fin);
         fin = combate(fin);
         fin = talismanes(fin);
+        fin = hechizos(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

@@ -179,6 +179,11 @@ public final class Combate {
         e.pendiente = null;
     }
 
+    /** Para los hechizos: los demas ven el gesto de lanzar (el paso es el hechizo). */
+    public static void vistoHechizo(ServerPlayer sp, com.darkcraft.hechizos.Hechizo h) {
+        visto(sp, Armas.HECHIZO, h.ordinal(), false, Armas.Tipo.PUNOS, 0);
+    }
+
     /** Los que ven al jugador ven su golpe (el propio jugador ya lo anima el solo). */
     private static void visto(ServerPlayer sp, int accion, int paso, boolean izquierda, Armas.Tipo tipo, int extra) {
         Net.CH.send(PacketDistributor.TRACKING_ENTITY.with(() -> sp), new Net.GolpeVisto(sp.getId(), accion, paso, izquierda, tipo.ordinal(), extra));
@@ -306,6 +311,7 @@ public final class Combate {
         float mult = m.mult() * (1f + Armas.CARGA_EXTRA * e.carga);
         if (e.accion == Armas.SALTO && com.darkcraft.rol.Talismanes.lleva(sp, com.darkcraft.rol.Talisman.Clase.GARRA)) mult *= 1.15f;
         if (e.accion == Armas.PESADO && com.darkcraft.rol.Talismanes.lleva(sp, com.darkcraft.rol.Talisman.Clase.FURIA)) mult *= 1.12f;
+        if (sp.hasEffect(com.darkcraft.rol.Efectos.BENDICION.get())) mult *= 1.15f;
         float dano = (base + encanto) * mult;
         DamageSource fuente = sp.damageSources().playerAttack(sp);
         float antes = le.getHealth();

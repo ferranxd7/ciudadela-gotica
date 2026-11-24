@@ -41,6 +41,8 @@ public final class ClientSetup {
     public static void renderers(net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers e) {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.REY.get(), com.darkcraft.client.rey.ReyRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.REY_PROYECTIL.get(), com.darkcraft.client.rey.ProyectilRenderer::new);
+        // los hechizos que vuelan no tienen modelo: se ven por sus particulas
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PROYECTIL.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ASCENSOR.get(), com.darkcraft.client.arbol.AscensorRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PUERTA_ARBOL.get(), com.darkcraft.client.arbol.PuertaArbolRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.GAVRAN.get(), com.darkcraft.client.gavran.GavranRenderer::new);

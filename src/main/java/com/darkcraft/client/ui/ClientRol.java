@@ -67,6 +67,27 @@ public final class ClientRol {
         return com.darkcraft.rol.Nivel.de(atributos);
     }
 
+    /** Los hechizos memorizados y el que esta elegido (la flecha arriba los recorre). */
+    public static java.util.List<com.darkcraft.hechizos.Hechizo> memoria = new java.util.ArrayList<>();
+    public static int hechizoElegido;
+    public static int hechizoCambioTick = -1000;
+
+    /** El hechizo elegido (o null si no hay ninguno memorizado). */
+    public static com.darkcraft.hechizos.Hechizo hechizo() {
+        if (memoria.isEmpty()) return null;
+        return memoria.get(Math.floorMod(hechizoElegido, memoria.size()));
+    }
+
+    public static void siguienteHechizo() {
+        if (memoria.size() < 2) {
+            Panel.nada();
+            return;
+        }
+        hechizoElegido = Math.floorMod(hechizoElegido + 1, memoria.size());
+        hechizoCambioTick = ticks;
+        Panel.mueve();
+    }
+
     /** Los talismanes que lleva (los cuatro huecos) y cuantos huecos tiene abiertos. */
     public static net.minecraft.world.item.ItemStack[] talismanes = vacios();
     public static int huecosTalisman = 1;
@@ -96,6 +117,13 @@ public final class ClientRol {
             if (it != null && it != net.minecraft.world.item.Items.AIR) t[i] = new net.minecraft.world.item.ItemStack(it);
         }
         talismanes = t;
+        java.util.List<com.darkcraft.hechizos.Hechizo> mem = new java.util.ArrayList<>();
+        for (String id : m.memoria()) {
+            com.darkcraft.hechizos.Hechizo h = com.darkcraft.hechizos.Hechizo.de(id);
+            if (h != null) mem.add(h);
+        }
+        memoria = mem;
+        if (hechizoElegido >= mem.size()) hechizoElegido = 0;
         manaMax = Math.max(1, m.manaMax());
         frascosVida = m.frascosVida();
         frascosMana = m.frascosMana();
@@ -312,6 +340,8 @@ public final class ClientRol {
         mejoraFrascos = 0;
         talismanes = vacios();
         huecosTalisman = 1;
+        memoria = new java.util.ArrayList<>();
+        hechizoElegido = 0;
         ClientSantuario.olvidar();
         Bebida.olvidar();
         Conseguidos.olvidar();

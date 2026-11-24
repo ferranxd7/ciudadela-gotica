@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "9";
+    private static final String V = "10";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -100,6 +100,49 @@ public final class Net {
                 .encoder((m, b) -> {}).decoder(b -> new GolpeNo()).consumerMainThread(GolpeNo::handle).add();
         CH.messageBuilder(Impacto.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(Impacto::write).decoder(Impacto::read).consumerMainThread(Impacto::handle).add();
+        CH.messageBuilder(Lanzar.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Lanzar::write).decoder(Lanzar::read).consumerMainThread(Lanzar::handle).add();
+        CH.messageBuilder(Memorizar.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Memorizar::write).decoder(Memorizar::read).consumerMainThread(Memorizar::handle).add();
+    }
+
+    // ------------------------------------------------------------------ hechizos
+
+    /** El cliente lanza un hechizo (con el baston o el sello en la mano). */
+    public record Lanzar(String id) {
+        void write(FriendlyByteBuf b) {
+            b.writeUtf(id, 32);
+        }
+
+        static Lanzar read(FriendlyByteBuf b) {
+            return new Lanzar(b.readUtf(32));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.hechizos.Lanzar.pedir(p, id);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El menu del santuario deja memorizados estos hechizos. */
+    public record Memorizar(String[] ids) {
+        void write(FriendlyByteBuf b) {
+            b.writeByte(ids.length);
+            for (String i : ids) b.writeUtf(i, 32);
+        }
+
+        static Memorizar read(FriendlyByteBuf b) {
+            String[] r = new String[Math.max(0, Math.min(16, b.readByte()))];
+            for (int i = 0; i < r.length; i++) r[i] = b.readUtf(32);
+            return new Memorizar(r);
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.rol.Memoria.memorizar(p, ids);
+            ctx.get().setPacketHandled(true);
+        }
     }
 
     // ------------------------------------------------------------------ el combate propio
@@ -250,7 +293,7 @@ public final class Net {
      * frascos (cuantos lleva de vida y de mana, cuantos le quedan y su mejora).
      */
     public record FichaRol(int[] atributos, int manaMax, int frascosVida, int frascosMana, int vida, int mana, int mejora,
-                           int huecosTalisman, String[] talismanes) {
+                           int huecosTalisman, String[] talismanes, String[] memoria) {
         void write(FriendlyByteBuf b) {
             b.writeVarIntArray(atributos);
             b.writeVarInt(manaMax);
@@ -262,6 +305,8 @@ public final class Net {
             b.writeByte(huecosTalisman);
             b.writeByte(talismanes.length);
             for (String t : talismanes) b.writeUtf(t, 128);
+            b.writeByte(memoria.length);
+            for (String m : memoria) b.writeUtf(m, 32);
         }
 
         static FichaRol read(FriendlyByteBuf b) {
@@ -270,7 +315,9 @@ public final class Net {
             int huecos = b.readByte();
             String[] t = new String[Math.max(0, Math.min(8, b.readByte()))];
             for (int i = 0; i < t.length; i++) t[i] = b.readUtf(128);
-            return new FichaRol(at, mm, fv, fm, v, m, mj, huecos, t);
+            String[] mem = new String[Math.max(0, Math.min(16, b.readByte()))];
+            for (int i = 0; i < mem.length; i++) mem[i] = b.readUtf(32);
+            return new FichaRol(at, mm, fv, fm, v, m, mj, huecos, t, mem);
         }
 
         void handle(Supplier<NetworkEvent.Context> ctx) {

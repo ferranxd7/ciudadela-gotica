@@ -148,6 +148,12 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_ESFUERZO = sound("sfx.esfuerzo");
     public static final RegistryObject<SoundEvent> SFX_COMER_FRUTO = sound("sfx.comer_fruto");
     public static final RegistryObject<SoundEvent> SFX_TALISMAN = sound("sfx.talisman");
+    public static final RegistryObject<SoundEvent> SFX_HECHIZO_LANZAR = sound("sfx.hechizo_lanzar");
+    public static final RegistryObject<SoundEvent> SFX_HECHIZO_IMPACTO = sound("sfx.hechizo_impacto");
+    public static final RegistryObject<SoundEvent> SFX_HECHIZO_RAYO = sound("sfx.hechizo_rayo");
+    public static final RegistryObject<SoundEvent> SFX_HECHIZO_LLAMA = sound("sfx.hechizo_llama");
+    public static final RegistryObject<SoundEvent> SFX_HECHIZO_CURAR = sound("sfx.hechizo_curar");
+    public static final RegistryObject<SoundEvent> SFX_HECHIZO_BENDICION = sound("sfx.hechizo_bendicion");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")
@@ -259,6 +265,22 @@ public class DarkCraftMod {
             () -> EntityType.Builder.<com.darkcraft.arbol.PuertaArbol>of(com.darkcraft.arbol.PuertaArbol::new, MobCategory.MISC).sized(7f, 10f)
                     .fireImmune().noSave().noSummon().clientTrackingRange(12).updateInterval(40).build(MODID + ":puerta_arbol"));
 
+    /** Los hechizos que vuelan (guijarro, lanza, esquirlas, rayo): sin modelo, se ven por sus particulas. */
+    public static final RegistryObject<EntityType<com.darkcraft.hechizos.ProyectilHechizo>> PROYECTIL = ENTITIES.register("proyectil_hechizo",
+            () -> EntityType.Builder.<com.darkcraft.hechizos.ProyectilHechizo>of(com.darkcraft.hechizos.ProyectilHechizo::new, MobCategory.MISC)
+                    .sized(0.3f, 0.3f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":proyectil_hechizo"));
+    /** El baston (hechicerias, Inteligencia) y el sello (milagros, Fe). */
+    public static final RegistryObject<Item> BASTON = ITEMS.register("baston",
+            () -> new com.darkcraft.hechizos.Catalizador(com.darkcraft.hechizos.Hechizo.Escuela.HECHICERIA, new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final RegistryObject<Item> SELLO_SAGRADO = ITEMS.register("sello",
+            () -> new com.darkcraft.hechizos.Catalizador(com.darkcraft.hechizos.Hechizo.Escuela.MILAGRO, new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final java.util.EnumMap<com.darkcraft.hechizos.Hechizo, RegistryObject<Item>> HECHIZOS = new java.util.EnumMap<>(com.darkcraft.hechizos.Hechizo.class);
+
+    static {
+        for (com.darkcraft.hechizos.Hechizo h : com.darkcraft.hechizos.Hechizo.values())
+            HECHIZOS.put(h, ITEMS.register("hechizo_" + h.id, () -> new com.darkcraft.hechizos.HechizoItem(h, new Item.Properties().stacksTo(1).rarity(Rarity.RARE))));
+    }
+
     /** Los frutos (dan resistencias o habilidades un rato) y los talismanes (se llevan en sus huecos). */
     public static final java.util.EnumMap<com.darkcraft.rol.Fruto.Clase, RegistryObject<Item>> FRUTOS = new java.util.EnumMap<>(com.darkcraft.rol.Fruto.Clase.class);
     public static final java.util.EnumMap<com.darkcraft.rol.Talisman.Clase, RegistryObject<Item>> TALISMANES = new java.util.EnumMap<>(com.darkcraft.rol.Talisman.Clase.class);
@@ -328,6 +350,9 @@ public class DarkCraftMod {
             e.accept(ESPADA_SINIESTRA);
             e.accept(ALABARDA);
             for (RegistryObject<Item> t : TALISMANES.values()) e.accept(t);
+            e.accept(BASTON);
+            e.accept(SELLO_SAGRADO);
+            for (RegistryObject<Item> h : HECHIZOS.values()) e.accept(h);
         }
         if (e.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
             for (RegistryObject<Item> f : FRUTOS.values()) e.accept(f);

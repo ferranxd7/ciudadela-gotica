@@ -19,15 +19,17 @@ import net.minecraft.world.item.TridentItem;
 public final class Armas {
     private Armas() {}
 
-    /** Las acciones. */
-    public static final int LIGERO = 0, PESADO = 1, CORRIENDO = 2, SALTO = 3, CARGA = 4, RODAR = 5, PASO_ATRAS = 6;
+    /** Las acciones (HECHIZO: lanzar un hechizo con el baston o el sello; su paso es el hechizo). */
+    public static final int LIGERO = 0, PESADO = 1, CORRIENDO = 2, SALTO = 3, CARGA = 4, RODAR = 5, PASO_ATRAS = 6, HECHIZO = 7;
     /** Lo que se puede cargar un golpe fuerte (ticks) y lo que da de mas cargado del todo. */
     public static final int CARGA_MAX = 24;
     public static final float CARGA_EXTRA = 0.45f;
 
     /** Las animaciones (el cliente sabe como se ven; aqui solo el nombre). */
     public enum Anim {
-        TAJO_DI, TAJO_ID, VERTICAL, ESTOCADA, MAZAZO, BARRIDO_DI, BARRIDO_ID, SALTO, CARGA, PUNO_D, PUNO_I, DAGA_D, DAGA_I, RODAR, PASO_ATRAS
+        TAJO_DI, TAJO_ID, VERTICAL, ESTOCADA, MAZAZO, BARRIDO_DI, BARRIDO_ID, SALTO, CARGA, PUNO_D, PUNO_I, DAGA_D, DAGA_I, RODAR, PASO_ATRAS,
+        /** Hechiceria: el baston adelante. Milagro: el sello en alto. */
+        LANZAR, REZAR
     }
 
     /**
@@ -127,6 +129,18 @@ public final class Armas {
     private static final int[] RODAR_INVULNERABLE = {9, 8, 7};
     public static final int PASO_ATRAS_INVULNERABLE = 5;
     public static final float PASO_ATRAS_RAPIDEZ = 0.42f;
+
+    private static final Mov[] HECHIZOS = new Mov[com.darkcraft.hechizos.Hechizo.values().length];
+
+    /** El gesto de lanzar un hechizo: dura lo suyo y "pega" (sale) en su tick. */
+    public static Mov hechizo(com.darkcraft.hechizos.Hechizo h) {
+        Mov m = HECHIZOS[h.ordinal()];
+        if (m == null) {
+            Anim a = h.escuela == com.darkcraft.hechizos.Hechizo.Escuela.HECHICERIA ? Anim.LANZAR : Anim.REZAR;
+            HECHIZOS[h.ordinal()] = m = new Mov(a, h.dura, h.sale, h.sale, 0f, 0f, 0f, 0f, false, 0f, 0f, 0f);
+        }
+        return m;
+    }
 
     public static Mov rodar(int clasePeso) {
         return RODAR_PESO[Math.max(0, Math.min(2, clasePeso))];

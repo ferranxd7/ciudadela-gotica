@@ -77,6 +77,8 @@ SFX = {
     "impacto_carne": (0.45, 0.12, -15), "impacto_armadura": (0.6, 0.2, -16), "rodar": (0.6, 0.15, -19), "fijar": (0.45, 0.12, -20),
     "estocada": (0.45, 0.12, -16), "golpe_salto": (1.1, 0.4, -13), "aturdido": (1.3, 0.35, -15), "esfuerzo": (0.45, 0.1, -19),
     "comer_fruto": (1.0, 0.25, -18), "talisman": (0.9, 0.25, -19),
+    "hechizo_lanzar": (0.7, 0.15, -17), "hechizo_impacto": (0.6, 0.2, -16), "hechizo_rayo": (1.0, 0.3, -15),
+    "hechizo_llama": (1.1, 0.35, -16), "hechizo_curar": (1.6, 0.4, -18), "hechizo_bendicion": (1.5, 0.4, -18),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5}
@@ -119,6 +121,12 @@ TOMAS_SFX = {
     "esfuerzo": (1, 2, 3, 4),
     "comer_fruto": (1, 2),
     "talisman": (2, 3),
+    "hechizo_lanzar": (4, 1),
+    "hechizo_impacto": (2, 1),
+    "hechizo_rayo": (1, 4),
+    "hechizo_llama": (4, 1),
+    "hechizo_curar": (3, 2),
+    "hechizo_bendicion": (4, 3),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

@@ -165,6 +165,13 @@ public final class ClientCombate {
         boolean rueda = false;
         while (Teclas.RODAR.consumeClick()) rueda = true;
         if (rueda && juego && suelto(mc)) rodar(mc, false);
+        // con el baston o el sello en la mano, el clic lanza el hechizo elegido
+        com.darkcraft.hechizos.Hechizo.Escuela esc = suelto(mc) && p.getInventory().selected <= 2
+                ? com.darkcraft.hechizos.Catalizador.de(p.getMainHandItem()) : null;
+        if (esc != null && juego) {
+            lanzar(mc, esc);
+            return;
+        }
         // atacar
         if (tipo == null || !juego) {
             if (pulsada >= 0 || cargando) soltarTecla();
@@ -209,12 +216,16 @@ public final class ClientCombate {
         if (actual != null) {
             Poses.Anim_ a = actual;
             int t = ClientRol.ticks - a.inicio;
-            boolean rueda = a.accion == Armas.RODAR || a.accion == Armas.PASO_ATRAS;
-            if (!p.isAlive() || ClientCine.active() || (!rueda && tipo != a.tipo)) {
+            boolean rueda = a.accion == Armas.RODAR || a.accion == Armas.PASO_ATRAS, hechizo = a.accion == Armas.HECHIZO;
+            if (!p.isAlive() || ClientCine.active()
+                    || (hechizo ? com.darkcraft.hechizos.Catalizador.de(p.getMainHandItem()) == null : !rueda && tipo != a.tipo)) {
                 cortar();
                 return;
             }
             switch (a.accion) {
+                case Armas.HECHIZO -> {
+                    if (t >= a.mov.dura()) terminar();
+                }
                 case Armas.CARGA -> {
                     if (t > Armas.CARGA_MAX + 60) cortar();
                 }
@@ -296,6 +307,40 @@ public final class ClientCombate {
         pulsada = -1;
     }
 
+    // ------------------------------------------------------------------ lanzar hechizos
+
+    private static void lanzar(Minecraft mc, com.darkcraft.hechizos.Hechizo.Escuela esc) {
+        int clics = 0;
+        while (mc.options.keyAttack.consumeClick()) clics++;
+        if (clics == 0 || !permitido(mc)) return;
+        LocalPlayer p = mc.player;
+        com.darkcraft.hechizos.Hechizo h = ClientRol.hechizo();
+        String no = h == null ? "darkcraft.hechizo.ninguno" : h.escuela != esc ? "darkcraft.hechizo.otro_catalizador"
+                : ClientRol.atributos[h.escuela.atributo.ordinal()] < h.requisito ? "darkcraft.hechizo.no_requisito"
+                : com.darkcraft.client.armas.ArmasCliente.energiaCliente() < h.mana ? "darkcraft.hechizo.sin_mana" : null;
+        if (no != null) {
+            Carteles.aviso(Component.translatable(no));
+            return;
+        }
+        if (ClientRol.agotado) {
+            ClientRol.sinEstaminaTick = ClientRol.ticks;
+            return;
+        }
+        if (!libre() || Bebida.yo()) return;
+        if (p.isUsingItem() && mc.gameMode != null) mc.gameMode.releaseUsingItem(p);
+        Net.CH.sendToServer(new Net.Lanzar(h.id));
+        Poses.Anim_ a = new Poses.Anim_();
+        a.accion = Armas.HECHIZO;
+        a.paso = h.ordinal();
+        a.tipo = Armas.Tipo.PUNOS;
+        a.mov = Armas.hechizo(h);
+        a.inicio = ClientRol.ticks;
+        actual = a;
+        p.setSprinting(false);
+        hechos++;
+        ultimo = "hechizo " + h.id;
+    }
+
     // ------------------------------------------------------------------ pedir golpes
 
     private static void pedir(Minecraft mc, Armas.Tipo tipo, int accion, int carga) {
@@ -366,6 +411,7 @@ public final class ClientCombate {
             case Armas.CARGA -> "carga";
             case Armas.RODAR -> "rodar";
             case Armas.PASO_ATRAS -> "paso_atras";
+            case Armas.HECHIZO -> "hechizo";
             default -> "?";
         };
     }
@@ -485,6 +531,7 @@ public final class ClientCombate {
             case Armas.RODAR, Armas.PASO_ATRAS -> 0f;
             case Armas.CARGA -> 0.3f;
             case Armas.SALTO -> 1f;
+            case Armas.HECHIZO -> 0.35f;
             case Armas.CORRIENDO -> t <= a.mov.golpe1() ? 0.7f : 0.3f;
             default -> t < a.mov.libre() ? 0.2f : 0.5f;
         };
@@ -502,6 +549,13 @@ public final class ClientCombate {
     public static void onClic(InputEvent.InteractionKeyMappingTriggered e) {
         if (preguntando) return;
         Minecraft mc = Minecraft.getInstance();
+        boolean catalizador = suelto(mc) && com.darkcraft.hechizos.Catalizador.de(mc.player.getMainHandItem()) != null;
+        if (catalizador && e.isAttack()) {
+            // con el baston o el sello, el clic es para los hechizos (nunca picar bloques)
+            e.setCanceled(true);
+            e.setSwingHand(false);
+            return;
+        }
         if (armado(mc) == null) return;
         if (e.isAttack() && (pulsada >= 0 || actual != null || !loDeSiempre(mc))) {
             e.setCanceled(true);

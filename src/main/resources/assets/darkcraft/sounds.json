@@ -1153,5 +1153,71 @@
         "name": "darkcraft:sfx/talisman_2"
       }
     ]
+  },
+  "sfx.hechizo_lanzar": {
+    "subtitle": "subtitles.darkcraft.sfx.hechizo_lanzar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/hechizo_lanzar_1"
+      },
+      {
+        "name": "darkcraft:sfx/hechizo_lanzar_2"
+      }
+    ]
+  },
+  "sfx.hechizo_impacto": {
+    "subtitle": "subtitles.darkcraft.sfx.hechizo_impacto",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/hechizo_impacto_1"
+      },
+      {
+        "name": "darkcraft:sfx/hechizo_impacto_2"
+      }
+    ]
+  },
+  "sfx.hechizo_rayo": {
+    "subtitle": "subtitles.darkcraft.sfx.hechizo_rayo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/hechizo_rayo_1"
+      },
+      {
+        "name": "darkcraft:sfx/hechizo_rayo_2"
+      }
+    ]
+  },
+  "sfx.hechizo_llama": {
+    "subtitle": "subtitles.darkcraft.sfx.hechizo_llama",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/hechizo_llama_1"
+      },
+      {
+        "name": "darkcraft:sfx/hechizo_llama_2"
+      }
+    ]
+  },
+  "sfx.hechizo_curar": {
+    "subtitle": "subtitles.darkcraft.sfx.hechizo_curar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/hechizo_curar_1"
+      },
+      {
+        "name": "darkcraft:sfx/hechizo_curar_2"
+      }
+    ]
+  },
+  "sfx.hechizo_bendicion": {
+    "subtitle": "subtitles.darkcraft.sfx.hechizo_bendicion",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/hechizo_bendicion_1"
+      },
+      {
+        "name": "darkcraft:sfx/hechizo_bendicion_2"
+      }
+    ]
   }
 }

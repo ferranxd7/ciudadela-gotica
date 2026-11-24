@@ -14,14 +14,14 @@ import java.util.List;
 
 /**
  * El menu del santuario (se abre al descansar): una losa de piedra a la izquierda con el nombre del santuario, el nivel
- * y los ecos del jugador y lo que se puede hacer alli: subir de nivel, repartir los frascos entre vida y mana, y
- * marcharse. Con el raton o con el teclado (arriba y abajo, la tecla del aviso o INTRO para elegir, izquierda y derecha
+ * y los ecos del jugador y lo que se puede hacer alli: subir de nivel, repartir los frascos entre vida y mana,
+ * memorizar hechizos y marcharse. Con el raton o con el teclado (arriba y abajo, la tecla del aviso o INTRO para elegir, izquierda y derecha
  * para repartir, ESC para salir). El juego no se para: si pegan al jugador, se cierra solo.
  */
 public class SantuarioScreen extends Screen {
     private static final int FILA = 18, CABECERA = 54, PIE = 40;
-    private static final String[] OPCIONES = {"nivel", "frascos", "salir"};
-    private static final int NIVEL = 0, FRASCOS = 1, SALIR = 2;
+    private static final String[] OPCIONES = {"nivel", "frascos", "memoria", "salir"};
+    private static final int NIVEL = 0, FRASCOS = 1, MEMORIA = 2, SALIR = 3;
 
     private final BlockPos pos;
     private final Component nombre;
@@ -187,6 +187,10 @@ public class SantuarioScreen extends Screen {
                 minecraft.setScreen(new NivelScreen(this));
             }
             case FRASCOS -> Panel.nada();
+            case MEMORIA -> {
+                Panel.acepta();
+                minecraft.setScreen(new MemoriaScreen(this));
+            }
             default -> onClose();
         }
     }

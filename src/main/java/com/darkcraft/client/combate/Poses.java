@@ -90,6 +90,9 @@ public final class Poses {
         tp(Anim.DAGA_D, new P(-75, 45, 0, -25, N, N, 15), new P(-85, -45, 0, -20, N, N, -18));
         tp(Anim.DAGA_I, new P(-80, -50, 0, -20, N, N, -15), new P(-80, 40, 0, -25, N, N, 15));
         tp(Anim.RODAR, new P(-50, 0, 25, -50, 0, -25, 0), new P(-50, 0, 25, -50, 0, -25, 0));
+        // hechizos: el baston se echa atras y se lanza adelante; el sello sube en alto
+        tp(Anim.LANZAR, new P(-115, 25, 0, -30, N, N, 18), new P(-95, -8, 0, -25, N, N, -12));
+        tp(Anim.REZAR, new P(-150, -10, 0, -40, N, N, 0), new P(-162, 5, 0, -45, N, N, 0));
         tp(Anim.PASO_ATRAS, new P(-35, 0, 10, -35, 0, -10, 0), new P(-35, 0, 10, -35, 0, -10, 0));
 
         // primera persona: {x, y, z} sobre el sitio de siempre del arma (derecha, arriba, hacia la camara) y giros en
@@ -105,6 +108,8 @@ public final class Poses {
         fp(Anim.CARGA, new float[]{0.08f, 0.32f, 0.22f, 50, -15, -30}, new float[]{0.08f, 0.32f, 0.22f, 50, -15, -30});
         fp(Anim.DAGA_D, new float[]{0.08f, 0.08f, 0.04f, 0, -20, -30}, new float[]{-0.42f, -0.06f, -0.10f, -10, 30, 40});
         fp(Anim.DAGA_I, new float[]{-0.38f, 0.05f, 0.02f, 0, 25, 35}, new float[]{0.14f, -0.06f, -0.10f, -10, -25, -35});
+        fp(Anim.LANZAR, new float[]{0.05f, 0.08f, 0.18f, 30, -10, -15}, new float[]{-0.10f, 0.04f, -0.35f, -35, 5, 0});
+        fp(Anim.REZAR, new float[]{-0.12f, 0.25f, 0.05f, 35, 10, 0}, new float[]{-0.18f, 0.38f, -0.12f, 50, 10, 0});
     }
 
     // ------------------------------------------------------------------ lo que se esta animando
@@ -130,7 +135,9 @@ public final class Poses {
         a.extra = m.extra();
         Armas.Tipo[] tipos = Armas.Tipo.values();
         a.tipo = tipos[Mth.clamp(m.tipo(), 0, tipos.length - 1)];
-        a.mov = a.accion == Armas.RODAR ? Armas.rodar(a.paso) : a.accion == Armas.PASO_ATRAS ? Armas.PASO_ATRAS_MOV : a.tipo.mov(a.accion, a.paso);
+        com.darkcraft.hechizos.Hechizo[] hs = com.darkcraft.hechizos.Hechizo.values();
+        a.mov = a.accion == Armas.RODAR ? Armas.rodar(a.paso) : a.accion == Armas.PASO_ATRAS ? Armas.PASO_ATRAS_MOV
+                : a.accion == Armas.HECHIZO ? Armas.hechizo(hs[Mth.clamp(a.paso, 0, hs.length - 1)]) : a.tipo.mov(a.accion, a.paso);
         a.inicio = ClientRol.ticks;
         REMOTAS.put(m.entity(), a);
     }

@@ -42,6 +42,8 @@ public final class Teclas {
     public static final KeyMapping MANO_IZQUIERDA = tecla("mano_izquierda", GLFW.GLFW_KEY_LEFT);
     public static final KeyMapping OBJETO_SIGUIENTE = tecla("objeto_siguiente", GLFW.GLFW_KEY_DOWN);
     public static final KeyMapping OBJETO_USAR = tecla("objeto_usar", GLFW.GLFW_KEY_G);
+    /** El hechizo siguiente de los memorizados (el hueco de arriba de la cruz). */
+    public static final KeyMapping HECHIZO_SIGUIENTE = tecla("hechizo_siguiente", GLFW.GLFW_KEY_UP);
     /** Rodar (con una direccion) o dar un paso atras (sin ninguna). */
     public static final KeyMapping RODAR = tecla("rodar", GLFW.GLFW_KEY_LEFT_ALT);
     /**
@@ -60,6 +62,7 @@ public final class Teclas {
         e.register(MANO_IZQUIERDA);
         e.register(OBJETO_SIGUIENTE);
         e.register(OBJETO_USAR);
+        e.register(HECHIZO_SIGUIENTE);
         e.register(RODAR);
         e.register(FIJAR);
     }

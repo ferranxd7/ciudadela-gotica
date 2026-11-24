@@ -376,6 +376,35 @@
      "weight": 28
     }
    ]
+  },
+  {
+   "rolls": 1,
+   "entries": [
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_llama",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_rayo",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_curar",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_bendicion",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:empty",
+     "weight": 10
+    }
+   ]
   }
  ]
 }

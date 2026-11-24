@@ -53,6 +53,8 @@ public final class Efectos {
     public static final RegistryObject<MobEffect> HUESO = EFECTOS.register("fruto_hueso", () -> new Efecto(0xE2DCC4));
     public static final RegistryObject<MobEffect> SOMBRA = EFECTOS.register("fruto_sombra", () -> new Efecto(0x6A1020));
     public static final RegistryObject<MobEffect> PLUMA = EFECTOS.register("fruto_pluma", () -> new Pluma(0xBFE8EE));
+    /** El milagro de la bendicion: las armas pegan un 15 % mas ({@code combate.Combate}). */
+    public static final RegistryObject<MobEffect> BENDICION = EFECTOS.register("bendicion", () -> new Efecto(0xF6E3A0));
 
     public static void registrar(IEventBus bus) {
         EFECTOS.register(bus);

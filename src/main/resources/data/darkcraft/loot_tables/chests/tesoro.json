@@ -458,6 +458,74 @@
      "weight": 8
     }
    ]
+  },
+  {
+   "rolls": 1,
+   "entries": [
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:baston",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:sello",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:empty",
+     "weight": 5
+    }
+   ]
+  },
+  {
+   "rolls": 1,
+   "entries": [
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_guijarro",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_lanza",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_esquirlas",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_espada",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_llama",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_rayo",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_curar",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_bendicion",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:empty",
+     "weight": 6
+    }
+   ]
   }
  ]
 }

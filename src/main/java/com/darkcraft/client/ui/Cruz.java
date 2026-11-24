@@ -32,8 +32,13 @@ public final class Cruz {
         Pix.blanco();
         Panel.t(g, MenuTex.CRUZ_CENTRO, x0 + LADO, y0 + LADO);
 
-        // arriba: el hechizo (aun no hay)
-        ranura(g, f, x0 + LADO, y0, ItemStack.EMPTY, MenuTex.SIL_HECHIZO, false, 0.55f);
+        // arriba: el hechizo elegido de los memorizados (con puntos si hay mas de uno)
+        com.darkcraft.hechizos.Hechizo hz = ClientRol.hechizo();
+        ItemStack hst = hz == null ? ItemStack.EMPTY : new ItemStack(com.darkcraft.DarkCraftMod.HECHIZOS.get(hz).get());
+        float hHace = t - ClientRol.hechizoCambioTick;
+        ranura(g, f, x0 + LADO, y0, hst, MenuTex.SIL_HECHIZO, hHace >= 0 && hHace < 7, hz == null ? 0.55f : 1f);
+        int nm = ClientRol.memoria.size();
+        if (nm > 1) for (int i = 0; i < Math.min(5, nm); i++) punto(g, x0 + LADO + 11 - Math.min(5, nm) * 3 + i * 6, y0 - 4, i == Math.floorMod(ClientRol.hechizoElegido, nm), true);
 
         // derecha: lo de la mano derecha
         int mano = Mth.clamp(inv.selected, 0, 8);

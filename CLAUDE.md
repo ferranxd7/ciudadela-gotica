@@ -206,7 +206,7 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   izquierda cambian la mano izquierda; 6-9 eligen objeto rapido; flecha abajo, el siguiente; G lo usa (un frasco se
   bebe; lo demas se pone en la mano mientras se mantiene la G y vuelve el arma); rueda = arma de la derecha; Q (soltar)
   ya no tira nada. La barra de objetos y el nombre del objeto de Minecraft no se dibujan.
-- **La cruz** abajo a la izquierda (`client/ui/Cruz`): arriba hechizo (aun vacio), derecha arma, izquierda la otra mano,
+- **La cruz** abajo a la izquierda (`client/ui/Cruz`): arriba el hechizo elegido (desde la 2d-2), derecha arma, izquierda la otra mano,
   abajo el objeto rapido (los frascos van ahi).
 - La prueba del cliente tiene el tramo `menu()` (capturas `cliente_q01..q15`).
 
@@ -276,6 +276,36 @@ empezarla). Lo esencial, que cambia reglas de arriba:
 - Arte: `tools/rol/objetos.py` (frutos, talismanes y los iconos de los efectos). Sonidos: `comer_fruto` (tomas 1 y 2),
   `talisman` (2 y 3). Comandos `/darkcraft rol talisman [<nombre> [poner <hueco>] | quitar]`, `fruto <nombre> [<n>]`,
   `resistencias`. La prueba del cliente tiene el tramo `talismanes()` (capturas `cliente_t01..t07`).
+
+### Plan grande, parte 2d-2: hechizos (baston y sello)
+
+- **Catalizadores** (`hechizos/Catalizador`): el **Baston de la Sombra** (`darkcraft:baston`, hechicerias, escala A con
+  la Inteligencia) y el **Sello Sagrado** (`darkcraft:sello`; la constante es `SELLO_SAGRADO` porque `SELLO` ya es un
+  bloque; milagros, A con la Fe). Con uno en la mano derecha (barra 0-2) el clic lanza el hechizo elegido.
+- **Hechizos** (`hechizos/Hechizo`, objetos `darkcraft:hechizo_<id>`, pergaminos azules / plegarias con lacre rojo):
+  `guijarro` (8 mana, 1 hueco, Int 10), `lanza` (24, 2, Int 20, atraviesa), `esquirlas` (16, 1, Int 14, cinco que
+  buscan al enemigo), `espada` (12, 1, Int 12, tajo en arco delante), `llama` (12, 1, Fe 10, llamarada que quema),
+  `rayo` (22, 2, Fe 18), `curar` (30, 1, Fe 12, cura 6 + 30 % al que lanza y a los jugadores a 6 bloques),
+  `bendicion` (25, 1, Fe 14, efecto `darkcraft:bendicion` 30 s: +15 % de dano con las armas). Cada uno: duracion,
+  tick en que sale, dano base; el dano escala `dano x (1 + 1,00 x curva(atributo))`.
+- **Memoria** (`rol/Memoria`, NBT `memoria` de la ficha): solo se lanzan los memorizados; huecos = 2 + uno a Mente 14,
+  20, 28, 38 y 50 (`Hechizo.memoria`). Se cambian en el santuario (opcion nueva "Memorizar hechizos" →
+  `client/ui/MemoriaScreen`, lista en el orden de los hechizos; `Net.Memorizar`, el servidor exige haber descansado en
+  ese santuario —`Santuarios.junto`— o creativo, llevar los hechizos y que quepan). El cliente los sabe por
+  `Net.FichaRol` (`ClientRol.memoria`); la **flecha arriba** (`Teclas.HECHIZO_SIGUIENTE`) elige el siguiente y la cruz
+  lo ensena arriba (con puntitos).
+- **Lanzar**: el cliente (`ClientCombate.lanzar`) comprueba y avisa (ninguno memorizado, otro catalizador, requisito,
+  mana) y manda `Net.Lanzar`; el servidor (`hechizos/Lanzar`) lo vuelve a comprobar, cobra mana (`Combos`) y 6 de
+  estamina, y en el tick `sale` hace el efecto: proyectiles `hechizos/ProyectilHechizo` (sin gravedad, `NoopRenderer`:
+  solo particulas en el cliente; dano magico o de rayo) o arcos delante (espada, llamarada). Poses `LANZAR` y `REZAR`
+  (primera y tercera persona, `Poses`); los demas lo ven por `Net.GolpeVisto`.
+- Donde salen: tablas de cofres (biblioteca: hechicerias y curar; cripta: milagros; alquimia y tesoro: todos;
+  armeria y tesoro: los catalizadores). Comandos `/darkcraft rol hechizo [<nombre> | memorizar | olvidar | baston |
+  sello]` (`memorizar` = todos los que se lleven, sin mirar huecos).
+- Arte: `tools/rol/hechizos.py` (baston, sello, los 8 pergaminos y el icono del efecto). Sonidos (ElevenLabs):
+  `hechizo_lanzar` (tomas 4 y 1), `hechizo_impacto` (2 y 1), `hechizo_rayo` (1 y 4), `hechizo_llama` (4 y 1),
+  `hechizo_curar` (3 y 2), `hechizo_bendicion` (4 y 3). La prueba del cliente tiene el tramo `hechizos()` (capturas
+  `cliente_m01..m15`).
 
 ## Compilar, probar y publicar
 

@@ -294,7 +294,7 @@ public final class Rol {
         if (s.fichaSucia) {
             Ficha.Frascos f = Ficha.frascos(sp);
             Net.to(sp, new Net.FichaRol(Ficha.atributos(sp), s.manaMax, f.vidaMax(), f.manaMax(), f.vida(), f.mana(), f.mejora(),
-                    Talismanes.huecos(sp), Talismanes.nombres(sp)));
+                    Talismanes.huecos(sp), Talismanes.nombres(sp), Memoria.nombres(sp)));
             s.fichaSucia = false;
         }
     }
@@ -675,9 +675,41 @@ public final class Rol {
         for (Fruto.Clase f : Fruto.Clase.values())
             fruto.then(Commands.literal(f.id).executes(c -> darFruto(c.getSource(), f, 1))
                     .then(Commands.argument("n", IntegerArgumentType.integer(1, 64)).executes(c -> darFruto(c.getSource(), f, IntegerArgumentType.getInteger(c, "n")))));
+        // hechizos: darlos (pergamino o plegaria), memorizarlos sin santuario, el catalizador y el resumen (para probar)
+        var hechizo = Commands.literal("hechizo").executes(c -> verHechizos(c.getSource(), c.getSource().getPlayerOrException()));
+        for (com.darkcraft.hechizos.Hechizo h : com.darkcraft.hechizos.Hechizo.values())
+            hechizo.then(Commands.literal(h.id).executes(c -> {
+                ServerPlayer p = c.getSource().getPlayerOrException();
+                p.getInventory().add(new net.minecraft.world.item.ItemStack(DarkCraftMod.HECHIZOS.get(h).get()));
+                return verHechizos(c.getSource(), p);
+            }));
+        hechizo.then(Commands.literal("memorizar").executes(c -> {
+            // memoriza todos los que lleve encima, en orden, sin mirar los huecos
+            ServerPlayer p = c.getSource().getPlayerOrException();
+            java.util.List<com.darkcraft.hechizos.Hechizo> l = new java.util.ArrayList<>();
+            for (com.darkcraft.hechizos.Hechizo h : com.darkcraft.hechizos.Hechizo.values()) if (Memoria.tiene(p, h)) l.add(h);
+            Memoria.forzar(p, l);
+            return verHechizos(c.getSource(), p);
+        }));
+        hechizo.then(Commands.literal("olvidar").executes(c -> {
+            ServerPlayer p = c.getSource().getPlayerOrException();
+            Memoria.forzar(p, java.util.List.of());
+            return verHechizos(c.getSource(), p);
+        }));
+        hechizo.then(Commands.literal("baston").executes(c -> {
+            ServerPlayer p = c.getSource().getPlayerOrException();
+            p.getInventory().add(new net.minecraft.world.item.ItemStack(DarkCraftMod.BASTON.get()));
+            return verHechizos(c.getSource(), p);
+        }));
+        hechizo.then(Commands.literal("sello").executes(c -> {
+            ServerPlayer p = c.getSource().getPlayerOrException();
+            p.getInventory().add(new net.minecraft.world.item.ItemStack(DarkCraftMod.SELLO_SAGRADO.get()));
+            return verHechizos(c.getSource(), p);
+        }));
         return Commands.literal("rol")
                 .then(talisman)
                 .then(fruto)
+                .then(hechizo)
                 .then(Commands.literal("resistencias").executes(c -> {
                     ServerPlayer p = c.getSource().getPlayerOrException();
                     StringBuilder b = new StringBuilder();
@@ -729,6 +761,11 @@ public final class Rol {
     private static int verTalismanes(CommandSourceStack src, ServerPlayer p) {
         src.sendSuccess(() -> Component.literal(Talismanes.resumen(p)), false);
         return Talismanes.huecos(p);
+    }
+
+    private static int verHechizos(CommandSourceStack src, ServerPlayer p) {
+        src.sendSuccess(() -> Component.literal(com.darkcraft.hechizos.Lanzar.resumen(p)), false);
+        return Memoria.memorizados(p).size();
     }
 
     private static int darFruto(CommandSourceStack src, Fruto.Clase f, int n) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
