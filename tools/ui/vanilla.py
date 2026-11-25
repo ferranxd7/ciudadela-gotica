@@ -71,10 +71,26 @@ def deslizador(estado):
 
 
 def tirador(luz):
-    """El tirador del deslizador (se dibuja de 8 de ancho): piedra con filo de oro (mas claro con el raton encima)."""
+    """El tirador del deslizador: el juego lo dibuja de 8 x 20 con las 4 columnas de la izquierda y las 4 de la derecha
+    de esta fila (nueve trozos): un taco de oro con filo de tinta y tres muescas (mas claro con el raton encima)."""
     L = Lienzo(200, 20)
-    b = boton(200, 2 if luz else 1)
-    L.a[:] = b.a
+    claro, medio, oscuro = (ORO[6], ORO[5], ORO[3]) if luz else (ORO[5], ORO[4], ORO[2])
+    for y in range(20):
+        for x in range(200):
+            xx = x if x < 4 else 7 - (199 - x) if x >= 196 else 4
+            if xx in (0, 7) or y in (0, 19):
+                c = TINTA
+            elif y == 1 or xx == 1:
+                c = claro
+            elif y == 18 or xx == 6:
+                c = oscuro
+            elif y in (6, 9, 12) and 2 <= xx <= 5:
+                c = oscuro
+            elif y in (7, 10, 13) and 2 <= xx <= 5:
+                c = claro
+            else:
+                c = medio
+            L.px(x, y, c)
     return L
 
 

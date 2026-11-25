@@ -3044,7 +3044,10 @@ public final class ClientCiTest {
             logPantalla(m, "recursos");
             shot(m, "cliente_pa11_recursos");
         });
-        atTicks(t + 112, "ESC (sin cambiar nada: no recarga)", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE));
+        // sin pasar por su "Hecho": si la lista del juego no casa con options.txt recargaria los recursos (como en Minecraft)
+        atTicks(t + 112, "de vuelta a las opciones", m -> {
+            if (opcionesAbiertas != null) m.setScreen(opcionesAbiertas);
+        });
         atTicks(t + 118, "opciones: mods", m -> {
             logPantalla(m, "vuelta de recursos");
             opcionesP(m, "mods");
