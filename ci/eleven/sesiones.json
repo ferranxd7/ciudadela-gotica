@@ -1,1396 +1,1475 @@
 {
- "rey": {
-  "flow": "d3PMnb7mExuoP3W5fBx9",
-  "voz": "BNgbHR0DNeZixGQVzloa",
-  "modelo": "eleven_v4",
-  "lineas": {
-   "1": [
-    "RFYzWifdkkxelpjUBoux",
-    "l82ecYvwRA2fkCkDHyPo"
-   ],
-   "2": [
-    "sEKMysySrIkWj9nQETQy",
-    "rz8T7G05BadEaDShdhgN"
-   ],
-   "3": [
-    "tZ7jnSbnBik9wP8mGViU",
-    "zRxUwOKaRRz9Kx2d3X3y"
-   ],
-   "4": [
-    "H9pWAQSGVPYvUCDlC99W",
-    "X4gl4tnLsWXJmNkeoHPX"
-   ],
-   "5": [
-    "KD7k8SRQjtb8Lg43wYLK",
-    "RNOPtlea37tgRSWYFstn"
-   ],
-   "6": [
-    "Nwry2PcnDkqYlr4DvT8G",
-    "AI61qxm9MeazeXGyRV0R"
-   ],
-   "7": [
-    "1pQI0Vk8Bi8Qsn9F5WqV",
-    "j4HRQRMoUQaDqkWdrYet"
-   ],
-   "8": [
-    "1ZCrfJ4dAmRV8gI5ZveM",
-    "ueOuO7NTS6zwpFb4ZHHN"
-   ],
-   "9": [
-    "iC2t0tTvlX15KHRwHqzZ",
-    "7kFfuzXsvCK42mVBTUn7"
-   ],
-   "10": [
-    "Amss5a0YGZSkw2a8Wyif",
-    "uJK3ID2zp0HTyH8uG9Ed"
-   ],
-   "11": [
-    "KnhjZZZhwBvWG9VY6wWI",
-    "sP4S9laZnyKtri6c8hZE"
-   ],
-   "12": [
-    "CbXlxtNZLzADrUwmJMej",
-    "QQCNAIhupAY7sG6JD4a4"
-   ],
-   "13": [
-    "UNvkK2CLxqzf24JFF6bc",
-    "uJkPu6zCwlSnPb6OQF6I"
-   ]
+  "rey": {
+    "flow": "d3PMnb7mExuoP3W5fBx9",
+    "voz": "BNgbHR0DNeZixGQVzloa",
+    "modelo": "eleven_v4",
+    "lineas": {
+      "1": [
+        "RFYzWifdkkxelpjUBoux",
+        "l82ecYvwRA2fkCkDHyPo"
+      ],
+      "2": [
+        "sEKMysySrIkWj9nQETQy",
+        "rz8T7G05BadEaDShdhgN"
+      ],
+      "3": [
+        "tZ7jnSbnBik9wP8mGViU",
+        "zRxUwOKaRRz9Kx2d3X3y"
+      ],
+      "4": [
+        "H9pWAQSGVPYvUCDlC99W",
+        "X4gl4tnLsWXJmNkeoHPX"
+      ],
+      "5": [
+        "KD7k8SRQjtb8Lg43wYLK",
+        "RNOPtlea37tgRSWYFstn"
+      ],
+      "6": [
+        "Nwry2PcnDkqYlr4DvT8G",
+        "AI61qxm9MeazeXGyRV0R"
+      ],
+      "7": [
+        "1pQI0Vk8Bi8Qsn9F5WqV",
+        "j4HRQRMoUQaDqkWdrYet"
+      ],
+      "8": [
+        "1ZCrfJ4dAmRV8gI5ZveM",
+        "ueOuO7NTS6zwpFb4ZHHN"
+      ],
+      "9": [
+        "iC2t0tTvlX15KHRwHqzZ",
+        "7kFfuzXsvCK42mVBTUn7"
+      ],
+      "10": [
+        "Amss5a0YGZSkw2a8Wyif",
+        "uJK3ID2zp0HTyH8uG9Ed"
+      ],
+      "11": [
+        "KnhjZZZhwBvWG9VY6wWI",
+        "sP4S9laZnyKtri6c8hZE"
+      ],
+      "12": [
+        "CbXlxtNZLzADrUwmJMej",
+        "QQCNAIhupAY7sG6JD4a4"
+      ],
+      "13": [
+        "UNvkK2CLxqzf24JFF6bc",
+        "uJkPu6zCwlSnPb6OQF6I"
+      ]
+    }
+  },
+  "gavran_muestras": {
+    "flow": "UwyoAHy95Tq7BNgNPPy2",
+    "5AYcH1Cr8nW0XgDTtRI4 Silent Systemus": [
+      "8vHepENFShSLhsBsxFe7",
+      "wGjufbDiUH956iphJe6u"
+    ],
+    "d3qrd1ge6zWDvUxIeXiH Final Boss": [
+      "hvARjCikdcaLexqWNFSj",
+      "O2kxkLRvrQgOWnZ4iqcK"
+    ],
+    "Tj9l48J9AJbry5yCP5eW Nosferatu": [
+      "XJt3AfZDbkEkQAf4BZNI",
+      "akmNmXeCWbq57uWFm2Gk"
+    ]
+  },
+  "sfx": {
+    "flow": "qPyROhCV8tJUMnSORV80",
+    "modelo": "eleven_text_to_sound_v3",
+    "sonidos": {
+      "rey_tajo": {
+        "prompt": "Massive greatsword swing, heavy blade whooshing through air, deep and fast, close",
+        "sesiones": [
+          "WYmoo6JLzr3gWoeEUBuZ",
+          "qmtiBgomNYVWpHlH4uIM",
+          "WxE8RVKz1iXndMgfq10H",
+          "1O5NgQ7y3zElePJpl2HH"
+        ]
+      },
+      "rey_tajo_fuego": {
+        "prompt": "Blade of fire launched forward, roaring flame whoosh with crackling trail",
+        "sesiones": [
+          "AejaYnZdycdkAYZfzjVW",
+          "ewjuniMz7zdFlpFRxLYN",
+          "RGqJRBmnJNKC1364mkma",
+          "amYA93vlKepsE3sPGjRu"
+        ]
+      },
+      "rey_bola_fuego": {
+        "prompt": "Fireball launched, deep rushing whoosh of flame",
+        "sesiones": [
+          "aDQbQEp5JPzf48G4AWHC",
+          "E9zuOZLP9Pz6kDdvwQAW",
+          "wH9RwCVVflM754Dh5Ij2",
+          "9TD3cRZ0ZFAebadIATLI"
+        ]
+      },
+      "rey_explosion": {
+        "prompt": "Huge fiery explosion, deep boom, rumbling debris falling",
+        "sesiones": [
+          "7IPeC9a7PBf3ZXhePNuZ",
+          "6Ju0jDEZp5jjvPNfJSGA",
+          "QBMdx1kpib9qgnomfsk4",
+          "swHELtfPfgCtX0l1ZqN9"
+        ]
+      },
+      "rey_golpe_suelo": {
+        "prompt": "Giant armored body slamming onto stone floor, deep heavy impact, rock cracking",
+        "sesiones": [
+          "WH4tr1bGhEWnHRaEkCLy",
+          "tzePadNFGj4Fef9NrDZF",
+          "zZxpuvOC8nHhJy0MldFC",
+          "tApv17bZSacytVtl2Ubo"
+        ]
+      },
+      "rey_golpe_final": {
+        "prompt": "Colossal ground impact, massive deep boom, shockwave rumble, stone shattering",
+        "sesiones": [
+          "gRkgueuOhFuuNdzjfHhh",
+          "PnwRGcWGwmVbRbds7cRm",
+          "OQ70YEX8FXEJuY4f8TWl",
+          "X6GgXRrYtVEXNRjFHUVi"
+        ]
+      },
+      "rey_rugido": {
+        "prompt": "Monstrous deep roar of a giant, guttural growl echoing in a stone hall",
+        "sesiones": [
+          "8TbkB1AdnBByYg0rti2a",
+          "2oTfPTmvxNUAEvD5NvbX",
+          "LmMSgGn207jLKZADzLZD",
+          "Q0DgCg0ITyI2t170GQc5"
+        ]
+      },
+      "rey_geiser": {
+        "prompt": "Lava geyser erupting from the ground, violent hiss and bubbling roar",
+        "sesiones": [
+          "OlbQc2r5QeUdP2UdF5LZ",
+          "2ke1SFMXzXHUL4CzQI7r",
+          "K26bJWitoWB0DcR3mgX8",
+          "oACFzIXktIXw8nLsKFSo"
+        ]
+      },
+      "rey_pilares": {
+        "prompt": "Pillars of fire bursting up from the ground, rushing flames",
+        "sesiones": [
+          "1PJNzgulUW0ZdftmdnUJ",
+          "Z4ffVxhPXaGK8lrFTW7E",
+          "7oo5epA1VS1fIZrA5RfT",
+          "yfycmTMer5ulZcLLzLTY"
+        ]
+      },
+      "rey_carga": {
+        "prompt": "Rising ominous drone of magical fire charging up, deep rumble building",
+        "sesiones": [
+          "9IxW1k9AwX9FUk4tqORV",
+          "mVNSiqmmyMldsFxZTMAZ",
+          "p2FdW6VuyoIA5oQ5D6QD",
+          "GJwIsqA5CSNeqWYLVAsC"
+        ]
+      },
+      "cuenta_atras": {
+        "prompt": "Single deep war drum hit with a low metallic ring",
+        "sesiones": [
+          "D41OI5CszKM1kyMZcI2f",
+          "mIazkKP9gokzWD8Kleqo",
+          "TOuFRhHDlEzZbqoKPgVc",
+          "1D5cUR7v7xIXwJmhZ5oT"
+        ]
+      },
+      "circulo_dorado": {
+        "prompt": "Bright holy chime swelling, shimmering magical sparkle, warm and sacred",
+        "sesiones": [
+          "cGDm8uylBhOJ5Qmpv2cH",
+          "JGTv69Xr1TyFnQMdJlxe",
+          "dkZYf4LNVm8DuFd55EtF",
+          "BAauy28a2BbjzUGuOftc"
+        ]
+      },
+      "puerta_runas": {
+        "prompt": "Ancient magical runes awakening, resonant stone hum with glowing shimmer",
+        "sesiones": [
+          "CZBBdXjOyZ1FF8t2Slq7",
+          "Rqo6Iiplvi0U8HLlN2Sg",
+          "tRvEf25nxgFcFZpUMTS2",
+          "erqPewg1O8Jnc2UPxaoN"
+        ]
+      },
+      "puerta_abre": {
+        "prompt": "Enormous ancient wooden doors slowly grinding open, deep rumble and heavy creaking",
+        "sesiones": [
+          "fwul6yV264hJ96tF73FI",
+          "yzbImftK6UcrmMNDijyC",
+          "CYaBfLgTwd6MR3vffiyx",
+          "n4WRmVC08KONDcTVRXrl"
+        ]
+      },
+      "puerta_cierra": {
+        "prompt": "Enormous wooden castle doors slamming shut, deep boom echoing in a large hall",
+        "sesiones": [
+          "BAlJKkJqdfaksvIZLUzO",
+          "QPBg0ENm78z0Dgx8D0g7",
+          "yZRHLiPb7gONryzU4YPy",
+          "7pgKkm1bp1NMRBiLRGfy"
+        ]
+      },
+      "ascensor_mueve": {
+        "prompt": "Stone platform moving steadily, low magical humming drone with soft grinding rumble",
+        "sesiones": [
+          "5tS4fXaMRTt3qFqXeusC",
+          "2scNDBIR064H8e4jasU7",
+          "oedKnlNwEGcmDLBSFbil",
+          "RY0LSWsyDmCYjjFGhmyA"
+        ]
+      },
+      "ascensor_llega": {
+        "prompt": "Heavy stone platform stopping with a solid thud and a soft magical chime",
+        "sesiones": [
+          "9QtunEC0XKFECtduILAo",
+          "juNTdQ7rtBJ1xhQrEZz9",
+          "8RjUsBHOMvtti69rbg7p",
+          "fBbwDIxxG0ox7GVJ4Ciz"
+        ]
+      },
+      "fuego_crepitar": {
+        "prompt": "Roaring fire crackling, close-mic, intense flames and popping embers",
+        "sesiones": [
+          "PUkAdwpwnYK92gkwMYLW",
+          "aSndxytowQOA2KkwiQw7",
+          "k2dx2vLLLguleq3Z68iH",
+          "UroClWlh11VxPyRhOHyL"
+        ]
+      }
+    }
+  },
+  "gavran": {
+    "flow": "CcERsNGkAUZYFDFoRiGT",
+    "voz": "d3qrd1ge6zWDvUxIeXiH (Final Boss - Evil All Powerful Villain)",
+    "modelo": "eleven_v4",
+    "lineas": {
+      "1": [
+        "pCSqqjPwI16sVYHdv1uJ",
+        "1FSKslGX4Evqu5DyZ8v5"
+      ],
+      "2": [
+        "Gdpt6OvWtaTHDqwv1ck9",
+        "oXLcPiUp7geUAOB03fOj"
+      ],
+      "3": [
+        "VO6S1QR7ymd5ht5QWfwI",
+        "pdoYvZCPm8TNUTzaJzWE"
+      ],
+      "4": [
+        "yqlyrIKmRkpUqB5xeUff",
+        "HbIXfEKmasKactQGTYJu"
+      ],
+      "5": [
+        "lwU60mCv6jn0pDhMgZzE",
+        "As9g1MFt2PQbXbyDp4je"
+      ],
+      "6": [
+        "iTbyfWzJmhTZ4lecuE2n",
+        "zntrV7n2AC9Y3d2SUfjU"
+      ],
+      "7": [
+        "VI2MlksFDprlFUnfYzI1",
+        "N5PeKtenkHWotUIgRAhJ"
+      ],
+      "8": [
+        "UmQzTfoQfgGOAfGGAdr6",
+        "7hK9EIoMQzwhtn31jFm8"
+      ],
+      "9": [
+        "43SJJ9QeZjgGqabBTjap",
+        "B570IblA343CU4AZh7zr"
+      ],
+      "10": [
+        "rNcJGW22wNueTlBTJIXU",
+        "CUEWKOeKf6w8rFl20Zrj"
+      ],
+      "11": [
+        "2lQMweFe26udXSIgMev9",
+        "z4wi3OtZHHNamJoSpfD7"
+      ],
+      "12": [
+        "VpQdpjOEfUtz2IPMqXrA",
+        "1kmjhC08Knna6QyFXq1D"
+      ],
+      "13": [
+        "2Tx87xPiQK5UnKy56sun",
+        "PmCXgzcaPBBt79JdgqOM"
+      ],
+      "14": [
+        "GjAAGhGEHZHTUVeeh1IE",
+        "Pg5Q0zCETkUvcHTzWmmK"
+      ],
+      "15": [
+        "AEp5n2cQogfqXZM1nEG1",
+        "fksEvKzJj6T7IG2VD9qd"
+      ],
+      "16": [
+        "6Ap1YKHRwQnDIYQedNdj",
+        "HyrSQHLx7eqapgYf6eS7"
+      ],
+      "17": [
+        "OO7hqkKrJiNetSJxzBPc",
+        "021yNtl6qETqRAWT6O6O"
+      ],
+      "18": [
+        "PwsJRNYbtvZ6d0nukHTE",
+        "6rY0IXjG16PhdJ1GffFd"
+      ]
+    }
+  },
+  "sfx_gavran": {
+    "flow": "ZVZh5ccuMol4OVQChqxA",
+    "modelo": "eleven_text_to_sound_v3",
+    "sonidos": {
+      "gavran_tajo": {
+        "prompt": "Huge two-handed greatsword swing, heavy deep whoosh, steel ringing",
+        "sesiones": [
+          "rY1xZGLTIVk0lxcVliUp",
+          "AOhktZVcxMmKrsLM9P3F",
+          "iGwQTotMyGHGuiTOcAFc",
+          "5hVKYT4mbGVDx8BqL8I0"
+        ]
+      },
+      "gavran_choque": {
+        "prompt": "Greatsword blocking a sword blow, loud metallic clang, sparks",
+        "sesiones": [
+          "TXE1h9YJKwI9XS0XH2dJ",
+          "LXd6xeOOqjHX7hIxxjlf",
+          "F5gzyRUzdlndNqaZ1oYZ",
+          "uinN7vMhxcJZNt8CqaWM"
+        ]
+      },
+      "gavran_embestida": {
+        "prompt": "Armored giant shoulder charge, pounding heavy footsteps then a crushing metal impact",
+        "sesiones": [
+          "zBnxXxfb7mrXc87VymgN",
+          "o9MW8tLX1lXWErXWybMT",
+          "nBPMUEgPBAxhqU5qiEbR",
+          "kThkwUEOQ7m8LsrfXk6D"
+        ]
+      },
+      "gavran_raices": {
+        "prompt": "Thick roots bursting up through a stone floor, cracking stone and snapping wood",
+        "sesiones": [
+          "99I8dM7YB3z3UinqzIMI",
+          "AUAnvI4OUHUgJossCfH8",
+          "466srqFV1BYwItsqXuM1",
+          "lG9yGtoU3PcZxsczoRWq"
+        ]
+      },
+      "gavran_clavar": {
+        "prompt": "Giant sword stabbed into stone ground, deep impact and rolling shockwave rumble",
+        "sesiones": [
+          "k9vCGeodz6ZNYO2UTBqm",
+          "i8jADt9Q6i9jwd8w4Cry",
+          "KqJqqWBqlZCDseQ75VQY",
+          "MI2lz7BuQuqUU6g24EeX"
+        ]
+      },
+      "gavran_invocar": {
+        "prompt": "Skeletons rising from the ground, rattling bones and an eerie low whisper",
+        "sesiones": [
+          "nKPjH9uexQzZGxdkUyRP",
+          "cVI42EmIcgAChV0bNXcl",
+          "QA0oHZlSTMVsOmMTw772",
+          "MT3AOGyH0jGOZXMFT933"
+        ]
+      },
+      "gavran_paso": {
+        "prompt": "Single heavy armored giant footstep on stone, deep thud with metal clank",
+        "sesiones": [
+          "b96sBnYcaSwrKNHEUbfc",
+          "k5ihpRAkinCkYsZlRVuI",
+          "c3GGZ7gPjuPTP6Y2SW9h",
+          "YdxTJtbttCQ5isy1zGeo"
+        ]
+      },
+      "gavran_guardia_rota": {
+        "prompt": "Guard broken, heavy steel cracking and an armored giant staggering back",
+        "sesiones": [
+          "0ayoRMglCAwpBulxPL5Q",
+          "4HVaBg8G8NO9dZvZUnML",
+          "la82s1TriaqZWOiE9Rq5",
+          "H8x0f6y8Qbgx2DbHfhM9"
+        ]
+      },
+      "arbol_despierta": {
+        "prompt": "Ancient giant tree awakening, deep groaning wood, roots cracking stone, leaves rustling",
+        "sesiones": [
+          "W5SGTBWwB1Nu2I5EQ6iR",
+          "Pd2hlKSJGKbzdAsDVKoQ",
+          "V6WT4nBzaztYJ2qkyPxi",
+          "uno8H66XfpqHfo9qjtPF"
+        ]
+      },
+      "hojas_cortantes": {
+        "prompt": "Swarm of razor sharp leaves slicing through the air, fast whooshes and rustling",
+        "sesiones": [
+          "YLhdkStRkaWofvv3UZCg",
+          "8agoS6AIYJtBzcWKCZ3c",
+          "k9rkHkehuwVAQolTLy7B",
+          "bC93opw66SQXCyIMVikG"
+        ]
+      },
+      "raices_atrapan": {
+        "prompt": "Roots wrapping tightly around a body, creaking wood squeezing",
+        "sesiones": [
+          "d7Nke66j8sVTt7yQidCJ",
+          "ZSP52nUujC0z1UZpJGzN",
+          "4DMAeBCrwI1VF3hmqVl7",
+          "784blJA80be2kqXfzam6"
+        ]
+      },
+      "gavran_salto": {
+        "prompt": "Giant armored knight leaping into the air and landing hard, stone cracking",
+        "sesiones": [
+          "rI0z6f5fY2VvUhjAURg6",
+          "nrX26LD7yaDyczcsFCJ4",
+          "0y0Sz0lJZuISoZkL4XF8",
+          "FdYulCzEJbiY9CiSMg5n"
+        ]
+      },
+      "espinas": {
+        "prompt": "Sea of thorns erupting from the ground, violent wood tearing and cracking",
+        "sesiones": [
+          "CZUypN8guSFfR3LIF4xw",
+          "TfTu5ysCg0MatLyrfghP",
+          "QdmX30LF0QeTCvMsnp3s",
+          "E30MRuSlzVE8HiA6vsxJ"
+        ]
+      },
+      "corteza_muro": {
+        "prompt": "Bark wall growing fast out of the floor, creaking and grinding wood",
+        "sesiones": [
+          "cww7E4tNdDsyN3cyFf49",
+          "XrRcSW3Xr166HQvxEzzf",
+          "6lspjB2chsQaSKIFa6U5",
+          "cFkRQkI0MMuKWt20nuGr"
+        ]
+      },
+      "florecer": {
+        "prompt": "Magical blooming of a giant tree, soft shimmering chimes and rustling leaves",
+        "sesiones": [
+          "W9WgOGurcihfL56BwEMl",
+          "8hPT09OKjJbUVP75IsBe",
+          "WBlvIWZ5HQebbsDz4Gsy",
+          "A2oUNthds730QhPUpUWR"
+        ]
+      },
+      "madera_cruje": {
+        "prompt": "Deep creaking old wood, groaning tree trunk, close",
+        "sesiones": [
+          "Uoc7vsKxZXHZklb86lzR",
+          "ZUjACk0ODeTLbHpQkJSa",
+          "kYW3DjZHiq5ZADbAuIOP",
+          "hRoXD6WXh5i0xBxWoJjI"
+        ]
+      },
+      "corazon_latido": {
+        "prompt": "Single deep heartbeat inside hollow wood, resonant thump",
+        "sesiones": [
+          "28l5M5sco8JFPmQ2IMSM",
+          "IxaSZYMbwI9bPU23MU7d",
+          "YmD9Mjvt2KsU7PGqBN2D",
+          "7LnviR0zoimQ7ZEmhRcd"
+        ]
+      },
+      "hojas_disolver": {
+        "prompt": "Body dissolving into a swirl of leaves, soft rustling and a magical whisper",
+        "sesiones": [
+          "FtgPYYt6EVsXJpUO1hwj",
+          "5LpocHDCCKHnJBSMAfPF",
+          "I6Bz57JpRw0XYxXdkHBj",
+          "0ySRLzX4IxOmJqnkZFP8"
+        ]
+      }
+    }
+  },
+  "sfx_mapa_fortaleza": {
+    "flow": "k7WnlpZuqqA6KPhZdTlN",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "las 4 tomas de cada efecto se bajan como NOMBRE_1..4 (procesar.py elige cuales se usan)",
+    "sonidos": {
+      "espejo_despierta": {
+        "prompt": "Dark magical mirror awakening: deep resonant glass hum rising, shimmering crystalline chime, faint ghostly whispers, ominous epic dark fantasy, 3 seconds",
+        "sesiones": [
+          "KkBQfM2KJv5qUjh81oFs",
+          "sCA3eDI3y2yARTsaSwe2",
+          "NY3epglgQo0xjUfvT1xf",
+          "C2GRi3lwK5rSZQCj4tBH"
+        ]
+      },
+      "pluma_escribe": {
+        "prompt": "Quill pen scratching quickly on old dry parchment, writing a few words and a final flourish, close, 2 seconds",
+        "sesiones": [
+          "NXNepuO88EhG5skOopBQ",
+          "DKU5f2G9xhfEpXgfxtYQ",
+          "zFIX7QJh1vpCi0LEqI3c",
+          "2suH59aZWByF9GlkPcYC"
+        ]
+      },
+      "libro_abre": {
+        "prompt": "Opening an old heavy leather-bound tome: thick cover thud, creaking spine and pages rustling, close, dark fantasy",
+        "sesiones": [
+          "a9lcLoAWjqCHV2alBfDZ",
+          "dqc1TbUjcug1HEmbWW3V",
+          "ovfFLE4ONROtjgGjVeZ2",
+          "OgfKru8OP957shIBKqnF"
+        ]
+      },
+      "llave_rastro": {
+        "prompt": "Magical bone key resonating: eerie hollow chime, soft rattling of bones and a whooshing trail of spectral green light flying away, 2 seconds",
+        "sesiones": [
+          "Qr9GgljSxKwIkkGElaSR",
+          "DEGlr93cq3SBL1YVS0I4",
+          "JJ7L4QdANyHIGIusb4uS",
+          "LWtXXtvdKgXRepHFB6AU"
+        ]
+      },
+      "puente_hueso": {
+        "prompt": "Giant bones assembling into a bridge up to the sky: cracking and grinding bones clicking into place, clattering, deep rumble and howling wind, epic dark fantasy, 6 seconds",
+        "sesiones": [
+          "f9Wx8oWVr8gf0XedJ5UC",
+          "W1xL4Llx8aimbcEWRDAO",
+          "5HzSr1qGiyD1ahbNm5y9",
+          "NPhFsNuCAWV8A2WIJjOA"
+        ]
+      },
+      "puerta_hueso": {
+        "prompt": "Massive ancient gate of bone and dark stone slowly opening: a key turning in a huge lock, creaking bones, heavy stone grinding, chains rattling, deep boom at the end, epic dark fantasy, 8 seconds",
+        "sesiones": [
+          "bcPGja1bVLMRblZZLH95",
+          "Ch4YvkoCfVRR5o6JPoUF",
+          "9SamWGtTn1MTfAX1nAkF",
+          "koGUwRy9h4Ntg8z3QMRw"
+        ]
+      },
+      "amuleto_forja": {
+        "prompt": "Magical amulet being forged from netherite, diamonds and bone: metallic ringing hammer strikes, rising mystical hum, crackling energy and a bright chime burst at the end, epic, 5 seconds",
+        "sesiones": [
+          "tXflorwbhAKdZAEILqPO",
+          "ulNMfxM4Ih0qpEFQnbFy",
+          "EYMmFEXO4SXnINTL6eq1",
+          "eUKvSYQbI6ZVk2PFdZTt"
+        ]
+      },
+      "portal_abre": {
+        "prompt": "Ancient dimensional portal awakening: deep rumbling stone, swirling void energy, rising roar of wind and a powerful bass pulse, epic dark fantasy, 7 seconds",
+        "sesiones": [
+          "INN4yPiamIdukIRQdFR5",
+          "07imjfaDcN7NrfIrYhzK",
+          "aTXAMtw0BW15IzZTuGXJ",
+          "gXzvNXENiPVCEx52u9Cv"
+        ]
+      },
+      "zombi_caballero_grunido": {
+        "prompt": "Undead zombie knight growling: raspy guttural groan echoing inside a rusty metal helmet, menacing, 2 seconds",
+        "sesiones": [
+          "Hrq9c6NhNcjc6TBEWM0e",
+          "HhcYe3wUoTFjjEYmF21g",
+          "AnqtLGJmgiwn92XtPg5W",
+          "98mAhFcvygxxSKzOuAro"
+        ]
+      },
+      "zombi_caballero_dolor": {
+        "prompt": "Undead zombie knight hurt: short pained guttural grunt inside a metal helmet with an armor clank, 1 second",
+        "sesiones": [
+          "l9iRxOhHsFM9HU1MUvrk",
+          "n9NgQJVucIWyFDvM4xOy",
+          "P4s9BDjs8tx82zLcj6xm",
+          "fn6lIDFyusyR0vOyT6He"
+        ]
+      },
+      "zombi_caballero_muerte": {
+        "prompt": "Undead armored zombie knight dying: long guttural death rattle, then rusty armor collapsing onto a stone floor, 3 seconds",
+        "sesiones": [
+          "pPNEXaifGkqMhzDcfu86",
+          "iRoUO1c9JaT1XqsYemIB",
+          "LLRJHPglWEYlleKeZFbo",
+          "J5pUvR8RrgcsfWuLlFZL"
+        ]
+      },
+      "armadura_paso": {
+        "prompt": "Heavy rusty plate armor footsteps on stone, metal plates clanking and scraping, two slow steps, close",
+        "sesiones": [
+          "5ny318WFMJmNvMfJgWhK",
+          "vIWylLOkDWDwzA2JqfGW",
+          "P2E2IBYhKjkOi7wURuzs",
+          "S1ENBdZ2W3Taxbnh6QnO"
+        ]
+      },
+      "escudo_golpe": {
+        "prompt": "Sword blow blocked by an iron-reinforced wooden shield: heavy thud and loud metal clang, close",
+        "sesiones": [
+          "DDBxLBp7G9BGkwdQHAv9",
+          "TfuXyK9oWe8sWOCOW6HS",
+          "2KbjAY00PRyzST5o2d53",
+          "axyAmt12YTwCpCH6Gxwi"
+        ]
+      },
+      "alabarda_tajo": {
+        "prompt": "Heavy halberd swing: long iron polearm whooshing through the air, deep and fast, close",
+        "sesiones": [
+          "FLWk3eXKNSzzM95mNRsd",
+          "vsbHFLKm5EpfvCXYpNNJ",
+          "5gaCUevl34xTLKqk3Cin",
+          "9HJD2HnB7pIkh2ohu4SA"
+        ]
+      }
+    }
+  },
+  "sfx_hud": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "HUD nuevo (parte 2 del plan grande): carteles, ecos, espada de luz. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+    "sonidos": {
+      "has_muerto": {
+        "prompt": "You died: a single deep ominous orchestral hit with low brass and a dark male choir swell, slow mournful decay with long cathedral reverb tail, epic dark fantasy, 5 seconds",
+        "sesiones": [
+          "wKy3LHOXKZl2pwgV5qNU",
+          "0c4QZ0lTOZqZ9w2VPNsb",
+          "adqsUpqK8fXaZVC6R7TI",
+          "9xEe668FQzuQzJTNPfZ7"
+        ]
+      },
+      "jefe_abatido": {
+        "prompt": "Great enemy felled: triumphant but somber victory sting, huge deep drum hit with a rising choir chord and shimmering golden resonance, long majestic reverb tail, epic dark fantasy, 5 seconds",
+        "sesiones": [
+          "A5SeIHwy442mwHklKacn",
+          "2im2Az1jBSmuhhfPjjJT",
+          "X5yNO1CS8eJU2Stscels",
+          "HxqwS1l4GUhVGQFx8ytr"
+        ]
+      },
+      "zona_descubierta": {
+        "prompt": "New land discovered: one deep resonant bell toll with a soft airy choir pad swelling behind it, mysterious and solemn, dark fantasy, 4 seconds",
+        "sesiones": [
+          "F8z1uFvhmsyEbMYVeso6",
+          "9Ie1L9EBOsPrXB6t5RNU",
+          "zxEoTlu1Jt8CEGmZlrjD",
+          "ycjE9KZm4SEvGyggbPKJ"
+        ]
+      },
+      "ecos_recuperados": {
+        "prompt": "Lost souls flowing back into a body: ethereal whoosh rushing inward with ghostly whispers, ending in a soft bright shimmering chime, dark fantasy, 3 seconds",
+        "sesiones": [
+          "EXQyjZlMP2t3HFBKoGIj",
+          "EbQIEllWbpBKorGryyU2",
+          "KA5AAElatgnGGV69nyYo",
+          "JgcrLLCEDryNLoNAsDCl"
+        ]
+      },
+      "ecos_ganados": {
+        "prompt": "Small soul absorbed: very short soft ethereal inward whoosh with a tiny dark shimmer, subtle and quiet, 1 second",
+        "sesiones": [
+          "NEn7LOYwStfjZhXLRP4h",
+          "mN6kzXajoF6jMT50e9Lz",
+          "cvVcKA5IaTitTq2LKM2c",
+          "Wvg39Wkai5waJodxLFxZ"
+        ]
+      },
+      "espada_luz": {
+        "prompt": "Sword of light planted in the ground humming: gentle sacred shimmering drone with faint high crystalline chimes, calm and steady, seamless loop, 4 seconds",
+        "sesiones": [
+          "U4zwXOjeEuqb4dRurmxz",
+          "eVn5YjfseKZZibgB1mZd",
+          "YanxKiB4l8tQZPuAzVBi",
+          "0yKTkSPK27kHILUCIsKS"
+        ]
+      },
+      "guardia_rota": {
+        "prompt": "Guard broken: a wooden shield knocked aside with a loud crack and metal clang, the fighter staggering back with a short breathless grunt, close, 1.5 seconds",
+        "sesiones": [
+          "GGV23s3XZid6Goii0ISP",
+          "PWr3JEkbV7rq1zLMBHUS",
+          "aKwyjHy9X9KKkYj3v9MF",
+          "G2q1PQKnmnu5jJwWu6ry"
+        ]
+      }
+    }
+  },
+  "sfx_santuario_menu": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "Parte 2b del plan grande: santuarios, frascos, subir de nivel y sonidos de los menus. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+    "sonidos": {
+      "santuario_enciende": {
+        "prompt": "Soul bonfire igniting: a deep airy whoosh as pale ghostly fire bursts to life in a stone brazier, followed by a low resonant bell tone and a soft ethereal choir shimmer, sacred and calm, dark fantasy, 4 seconds",
+        "sesiones": [
+          "ZnA9rGSsfaDcx0ZhrWs4",
+          "mlfAonarEbEUpztIUTAC",
+          "QaRzBhsvDF21bWbvA2sB",
+          "J6vx0QfI8A1N6G2rxubq"
+        ]
+      },
+      "santuario_fuego": {
+        "prompt": "Ghostly soul fire burning steadily in a stone brazier: soft low crackling flames with a faint airy ethereal hum, calm and constant, no music, seamless loop, 6 seconds",
+        "sesiones": [
+          "P3I9hK7Dk2FmaaCFVqej",
+          "Q9GcOL1n2SWkaPggrw7b",
+          "hyuvV9QXkO6d9b3UfUdc",
+          "D2dHKfVPgasSDhlwb0YJ"
+        ]
+      },
+      "santuario_descanso": {
+        "prompt": "Resting at a sacred bonfire: a warm gentle restorative swell, soft breath of wind, a single delicate chime and a low soothing choir pad fading out, peaceful, dark fantasy, 3 seconds",
+        "sesiones": [
+          "OopoAEcoEiXGvQKNtLbv",
+          "Mq9vuB4NFbPJEiYVoK5y",
+          "qAuEAhw0cEejmWyyGSQA",
+          "5rrjYBPcu5vJdiFmIZDg"
+        ]
+      },
+      "frasco_beber": {
+        "prompt": "Drinking a potion from a small glass flask: cork pop, two quick liquid gulps, a short relieved exhale, close microphone, dry, 1.5 seconds",
+        "sesiones": [
+          "aboPGVCsQu5q0mt4y7N7",
+          "GPqCEgFiTeABsGvmQpPR",
+          "8gIPoC6GQPuUVREHwWzs",
+          "IvJR1WUuPfOCpdpp6np5"
+        ]
+      },
+      "nivel_sube": {
+        "prompt": "Level up: a rising shimmering chime arpeggio blooming into a deep resonant choir chord with a soft golden sparkle tail, empowering and solemn, dark fantasy, 3 seconds",
+        "sesiones": [
+          "IMtJ4tOfc6KBEucobz60",
+          "Vd3IFubtLIgN7nvVVJvp",
+          "OPAfJJ9cHrvhw8s6HHFa",
+          "C7kt66UAKTXkeDuxJHKv"
+        ]
+      },
+      "menu_abre": {
+        "prompt": "Game menu opening: a heavy stone slab sliding aside with a short metal latch click, dry, dark fantasy interface sound, 0.7 seconds",
+        "sesiones": [
+          "Ox57hjCYDGIMoSNRJyfp",
+          "XyGj3DNg1dUWFTjRemxI",
+          "rUMV9ypZo0rPLvZoyczo",
+          "6gHclKV1w811ovjUrmY6"
+        ]
+      },
+      "menu_mueve": {
+        "prompt": "Game menu cursor move: one very short soft stone tick, subtle, dry, interface sound, 0.3 seconds",
+        "sesiones": [
+          "b6fglzNzj6mV4eyxt3Mp",
+          "T3AaXltGYrxiksgvBUlP",
+          "MysMZ3Id0aNIN8p0LEbI",
+          "ngE9YkVi2EdbAoQ8xgcj"
+        ]
+      },
+      "menu_acepta": {
+        "prompt": "Game menu confirm: a small metallic clink with a soft warm chime, short and satisfying, dry, dark fantasy interface sound, 0.5 seconds",
+        "sesiones": [
+          "Rq1CCLD4jtJhhdZgWaAX",
+          "NNNWuQ8GuHI8QIi3azyR",
+          "ngFMj2c1yD1VM5fsDgUH",
+          "7K9c5jYzK2FjtfRz50kW"
+        ]
+      },
+      "menu_cancela": {
+        "prompt": "Game menu cancel or close: a short low dull wooden thud with a faint stone scrape, dry, dark fantasy interface sound, 0.5 seconds",
+        "sesiones": [
+          "6fz4bO0nZ1kgaFSnrtkR",
+          "6ZlDtOd7kO0hbfmExwPE",
+          "VWoMwtZq38Vhh0qzd5Ud",
+          "GOP88en0qeCVpySpiwOE"
+        ]
+      }
+    }
+  },
+  "sfx_combate": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "Parte 2c del plan grande: el combate propio (golpes, carga, impactos, voltereta, fijar objetivo, estocada, golpe en salto, aturdido y el esfuerzo). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+    "sonidos": {
+      "golpe_ligero": {
+        "prompt": "A single fast one-handed sword swing: a sharp clean blade whoosh cutting through the air, close and dry, no impact, dark fantasy combat, 0.6 seconds",
+        "sesiones": [
+          "lLaFGlCbdhPpU6isq8rv",
+          "lP6Cb5CQ5dDqjp1kpdRu",
+          "jnRZSHk6OLkLnK0Aqwv0",
+          "sXP4Khym7iH7fLfi4eWK"
+        ]
+      },
+      "golpe_pesado": {
+        "prompt": "A single heavy two-handed greatsword swing: a deep powerful slow whoosh with real weight and a low rumble of moving steel, no impact, cinematic dark fantasy combat, 1 second",
+        "sesiones": [
+          "QpGWUEWmFsBb1vdhjVVx",
+          "5Bqg1Ye4mqSwdZIehMWG",
+          "V8QAyM6TIC2FNflSrUBk",
+          "sUr1fqhkqhXL6uTXpqzE"
+        ]
+      },
+      "carga_golpe": {
+        "prompt": "Charging up a heavy weapon attack: a rising tense metallic hum and grinding steel, a deep held breath, energy building steadily, no release at the end, dark fantasy, 1.3 seconds",
+        "sesiones": [
+          "PDmzudo0bRqugMp8vwfG",
+          "9HtPP6IRi7TboC8VtHFN",
+          "tJ32CgTOP4N81WHgtuBW",
+          "v7oWVyaBIbVR68LyMFK5"
+        ]
+      },
+      "impacto_carne": {
+        "prompt": "A sword slash connecting with a body: a punchy meaty cut impact with a short heavy thud, brutal but not gory, dark fantasy combat hit, 0.5 seconds",
+        "sesiones": [
+          "eIw7poIJUc1YZJoyX5O5",
+          "bzw2HlzoqfqUMm1LXd5l",
+          "KveWSAP3wPnRqPeKqAYT",
+          "io074sEJc9o0u9mFIkVf"
+        ]
+      },
+      "impacto_armadura": {
+        "prompt": "A blade striking heavy plate armor: a sharp metallic clang with a short ringing tail and gritty scrape, dark fantasy combat hit, 0.7 seconds",
+        "sesiones": [
+          "ud0SgWPqbtHUyqRQW7XJ",
+          "sYy8DTta6jHFnjS69eR1",
+          "KUAeRjW6xQciSjNcVEd2",
+          "3usRPHvz1w0RaKsOXfcx"
+        ]
+      },
+      "rodar": {
+        "prompt": "A quick combat dodge roll on a stone floor: a fast body tumble with cloth flapping and light armor rattling, a short scuff of boots at the end, close perspective, 0.7 seconds",
+        "sesiones": [
+          "gk2Y2BmqU6myTSCHl1oB",
+          "KYkYkEKpPmhEAIAxt8wo",
+          "ytkAxNWGANuxI4OZgZQc",
+          "FkGKgBOuCXsD1ybQjuwK"
+        ]
+      },
+      "fijar": {
+        "prompt": "A subtle lock-on target sound for a dark fantasy game interface: a soft low metallic click with a brief deep resonant shimmer, clean, 0.4 seconds",
+        "sesiones": [
+          "CHuzGUCBEEHVlPEKvOGW",
+          "hMNQ7rEAp4TnwXhTUo4W",
+          "YwGQjMbo7ZSZHxUECM94",
+          "bhr1SBZHgOIUAMKzYpzm"
+        ]
+      },
+      "estocada": {
+        "prompt": "A fast spear thrust: a sharp piercing whoosh of a long pole weapon stabbing straight forward, no impact, cinematic combat, 0.5 seconds",
+        "sesiones": [
+          "b2h8y92xienmHRNHtyEE",
+          "lSqwP0fjPg6uAvT5YgIv",
+          "gfVBP8b5oLLCPcNTHSvz",
+          "2NxDnVrpAzs1IEMwAd7b"
+        ]
+      },
+      "golpe_salto": {
+        "prompt": "A heavy jumping attack slamming a weapon down into stone ground: a deep thunderous impact with cracking stone and a puff of dust and debris, cinematic dark fantasy, 1.2 seconds",
+        "sesiones": [
+          "SrCB2AJNCJ1pMGtEVKlw",
+          "nVruGJtdyztTt5OIyGgn",
+          "kZohyLRjgEX3g1DNY91R",
+          "Xl72TbHJUEEmQ4jhz1uQ"
+        ]
+      },
+      "aturdido": {
+        "prompt": "An armored enemy staggered by a powerful blow: a strong heavy impact, the body reeling back with loud armor rattling and a pained grunt, dark fantasy combat, 1 second",
+        "sesiones": [
+          "8iKahycBJ1LOAdiKiUvW",
+          "qVOBuYis325eQtETr8Bt",
+          "rNSSFxGXq9JTBUiiXD1z",
+          "Zxy4oh6JYh3qgDmCmzQG"
+        ]
+      },
+      "esfuerzo": {
+        "prompt": "A male warrior's short effort grunt while swinging a heavy weapon with force, close microphone, dry, no words, 0.5 seconds",
+        "sesiones": [
+          "lJozTKMZT1UBhrRufdoU",
+          "FYJxiRIeLDefwAHNmEa9",
+          "dF362oFAaReTZVV3w7sW",
+          "bELDAV5QrbPBGazxnIFl"
+        ]
+      }
+    }
+  },
+  "sfx_rol": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "Parte 2d del plan grande: comer un fruto y ponerse un talisman. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+    "sonidos": {
+      "comer_fruto": {
+        "prompt": "A single quick crunchy bite into a juicy magical fruit, then a soft rising shimmering magical chime as its power flows into the body, close and dry, dark fantasy RPG item use sound, no music, 1.2 seconds",
+        "sesiones": [
+          "hro4d2dVzYHXbXJzqa3Q",
+          "T2qEp7rnFpmhA4dchLP2",
+          "F16kPvo957jrSQ8Hp6Zd",
+          "ZUGmRm9BwqwcuR0ejiZP"
+        ]
+      },
+      "talisman": {
+        "prompt": "Equipping an ancient heavy amulet: a soft clink of a gold chain and a metal medallion settling, followed by a faint low mystical hum of awakening power, dark fantasy RPG menu sound, no music, 1 second",
+        "sesiones": [
+          "AYd9K37oJdS2NqihtgXz",
+          "f0gmbJB9WH7gHvS8iVex",
+          "GoxLXz9X18tstaHgIHmN",
+          "cd3XeRF3dIKOei93TyTL"
+        ]
+      }
+    }
+  },
+  "sfx_hechizos": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "Parte 2d-2 del plan grande: hechizos (lanzar, impacto, rayo, llamarada, curacion, bendicion). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+    "sonidos": {
+      "hechizo_lanzar": {
+        "prompt": "Casting a dark sorcery spell from a staff: a quick rising magical whoosh with a crystalline shimmer and a low resonant hum, dark fantasy RPG spell cast, no music, 0.8 seconds",
+        "sesiones": [
+          "rkcgFfdrRnttOyxcjQmP",
+          "dYcsFcV4j6j0CpFdkR6a",
+          "TjieBoVjGDKPRfLR5fR5",
+          "smUM8WrxzutMe2FYZNiM"
+        ]
+      },
+      "hechizo_impacto": {
+        "prompt": "A magic projectile hitting its target: a sharp crystalline burst with a deep thump and fading sparkles, dark fantasy spell impact, no music, 0.8 seconds",
+        "sesiones": [
+          "DDHdEQHJJXQ7N2K30QkE",
+          "vjaxkyTXzYaxvS1oWE8H",
+          "KRH4dKA524djy5q9jc5Z",
+          "crXM5TkICcdovDxY4hPH"
+        ]
+      },
+      "hechizo_rayo": {
+        "prompt": "A spear of lightning hurled by a holy knight: a crackling electric zap and a short sharp thunder crack, dark fantasy miracle, no music, 1.2 seconds",
+        "sesiones": [
+          "a9yF41LWXT2AwDKOEtvM",
+          "VsWP9rdKh2QZKyoAxqZ4",
+          "1Vb7NpqPEcJJmRNVR6hg",
+          "4GCk4vM3LkjhWDrvPxIv"
+        ]
+      },
+      "hechizo_llama": {
+        "prompt": "A burst of sacred fire erupting from an open hand: a roaring whoosh of flames that flares and quickly dies down, dark fantasy incantation, no music, 1.2 seconds",
+        "sesiones": [
+          "7sres6cpxjb332NvWAYa",
+          "zOF0V6GeoHFLwWuPgNFb",
+          "2n46shMRQ3vixsp6KvKL",
+          "SnJ3mfFztCxuqX0XcRuD"
+        ]
+      },
+      "hechizo_curar": {
+        "prompt": "A healing miracle: a warm rising choir-like chime with soft golden sparkles and a gentle exhale of relief, dark fantasy RPG, no music, 1.8 seconds",
+        "sesiones": [
+          "EvZI0sWkk0Rb81Alw5rp",
+          "zHik3PxdzF5fRBmhPp8W",
+          "VIYuAlj5EI4AtSihuDGI",
+          "lIsJnmOulE21TIIJrnLt"
+        ]
+      },
+      "hechizo_bendicion": {
+        "prompt": "A holy blessing on a warrior: a short bright angelic choir swell with a resonant bell strike and shimmering light, dark fantasy RPG buff, no music, 1.6 seconds",
+        "sesiones": [
+          "RvqtOys4984WfSq3D99L",
+          "S9uH3Ot5GXVOAXwGX0kM",
+          "RzrawPNqpyHhidp7ktKb",
+          "VdhosNS0F9McDSFFt2Dj"
+        ]
+      }
+    }
+  },
+  "voz_guia": {
+    "flow": "FNZWSYJq2nK8zd5QwV5m",
+    "modelo": "eleven_v4",
+    "voz": "Autumn Veil (KoVIHoyLDrQyd4pGalbs)",
+    "nota": "Parte 2e-1: Maelis, la guia de los santuarios (voz de mujer serena). Frases 1-10, tomas a y b.",
+    "frases": {
+      "1": {
+        "prompt": "[softly] Another soul the Shadow has dragged back from the dark... [pause] You should be dead, marked one. And yet... the fire still answers to you.",
+        "sesiones": [
+          "optSBsCHbDgS4SV2fNqt",
+          "2854B4A90SwWTgygqrvv"
+        ]
+      },
+      "2": {
+        "prompt": "[calm] I am /ˈmeɪlɪs/. I tend the soul fires, as my sisters did... before Valdrenn fell to its oath.",
+        "sesiones": [
+          "b4UQQjyCim5Cr9LeSPXC",
+          "1P4x9GlmfrsOggIDUTSe"
+        ]
+      },
+      "3": {
+        "prompt": "[softly] Rest beside them when you can. The fire mends your flesh and fills your flasks... [pause] but the fallen will rise again.",
+        "sesiones": [
+          "FDto3lPLQmjZmdRjH4Jq",
+          "rOFU9NqnOhFbV9TDd9Ej"
+        ]
+      },
+      "4": {
+        "prompt": "[slowly] It is older than the kingdom. It feeds on broken oaths... [whispers] and it hungers for a door. Yours is the hand it chose to open it.",
+        "sesiones": [
+          "pSou2anxKTqhV3V5fz5I",
+          "5Z4L5f6qAiJ1YmAMnDMJ"
+        ]
+      },
+      "5": {
+        "prompt": "[softly] Because it needs you. Each time you fall, it pulls you back... and your echoes stay behind, in a sword of light. [pause] Do not lose them twice.",
+        "sesiones": [
+          "pT8XTMU3mx9lroUzBwgM",
+          "Q18s9bAdUzKA5Ypk54qq"
+        ]
+      },
+      "6": {
+        "prompt": "[warmly] Then give me the echoes you carry. I will weave them into your flesh... and your bones.",
+        "sesiones": [
+          "KBcNdYZzACEoabH9PzDf",
+          "D6D46aC63Gtk52r1bCRO"
+        ]
+      },
+      "7": {
+        "prompt": "[softly] May the fire keep you, marked one.",
+        "sesiones": [
+          "Z5JmUUfSMtg2LK6zVx6w",
+          "YOkk7TBnHjbQ2VXq5z7r"
+        ]
+      },
+      "8": {
+        "prompt": "[warmly] You have returned. Good... the fire was waiting for you.",
+        "sesiones": [
+          "PrndRfdgiYOHMSnECQxk",
+          "HXPHrFaIhbZsxhQNdKee"
+        ]
+      },
+      "9": {
+        "prompt": "[softly] The king's oath is broken at last. I felt every fire burn brighter... [whispers] and the Shadow grow hungrier.",
+        "sesiones": [
+          "WwlezGpGp98R6ZsuZHkP",
+          "rsljNH2gTCSf6aPZHnAC"
+        ]
+      },
+      "10": {
+        "prompt": "[sad] Ser Gavran kept his oath to the very end. Honor him, marked one... few in Valdrenn ever did.",
+        "sesiones": [
+          "2r2p9J4s6TQ0hlpcNbT4",
+          "IxQLPvx6jRkyDrRz5PsF"
+        ]
+      }
+    }
+  },
+  "voz_herrero": {
+    "flow": "Z7tLQ5a9GyPJPZD31AIa",
+    "modelo": "eleven_v4",
+    "voz": "Fjalar - Gruff Scottish Dwarf Warrior (TLS15X9bCEDl1vGoUK57)",
+    "nota": "Parte 2e-2: Dorvan, el herrero. Frases 1-8, tomas a y b.",
+    "frases": {
+      "1": {
+        "prompt": "[gruff] Hm. Another one crawling out of the dark with a dull blade... The name's Dorvan. I keep the forge of Valdrenn burning, oath or no oath.",
+        "sesiones": [
+          "BOzp9Sq4XiCOrfMRuq7z",
+          "cpcsWIR6CcJl5arVkhfD"
+        ]
+      },
+      "2": {
+        "prompt": "[gruff] Back again? Show me what you've been swinging.",
+        "sesiones": [
+          "u3s6bzoXuhP0prVp2qW1",
+          "XoQlK1d5Mu0XsN1OjzSx"
+        ]
+      },
+      "3": {
+        "prompt": "Bring me forging stones and echoes, and I'll make that steel sing.",
+        "sesiones": [
+          "lU4ylynfbL7iwM7EaHvz",
+          "YvaxKFLqgzxh5MAqCuRs"
+        ]
+      },
+      "4": {
+        "prompt": "[satisfied] There. Sharper than the day it was forged. Try not to break it on the first skull.",
+        "sesiones": [
+          "PuC2X6lzvuowUJkNjGwa",
+          "sJ9mTXbFEtm9YdKpXY5C"
+        ]
+      },
+      "5": {
+        "prompt": "[grumbling] You're short on stones, or on echoes. The forge doesn't work for free.",
+        "sesiones": [
+          "CmRGjDv7SEyME1KuqIx7",
+          "2Frik0wnWN5wxomSNVkq"
+        ]
+      },
+      "6": {
+        "prompt": "[sighs] The king swore an oath to something that should never have heard it. After that... the forge was all I had left to keep my hands from shaking.",
+        "sesiones": [
+          "keEx5kZAaCg2g6IP4rcl",
+          "n3nfNcEVGui49nGEbBJT"
+        ]
+      },
+      "7": {
+        "prompt": "[gruff] Off you go, then. And keep your guard up.",
+        "sesiones": [
+          "fJjioorkYyJbs8G8eNRZ",
+          "2sBdWCdVZG72LNrUuCSM"
+        ]
+      },
+      "8": {
+        "prompt": "[chuckles] That one's as good as it gets. Not even I can push it further.",
+        "sesiones": [
+          "rPwrFqZGb4whfsmPcGqA",
+          "HyTAGbHPRgIcvumMl71M"
+        ]
+      }
+    }
+  },
+  "voz_mercader": {
+    "flow": "Z7tLQ5a9GyPJPZD31AIa",
+    "modelo": "eleven_v4",
+    "voz": "Cornelius - Wise Sage (6sFKzaJr574YWVu4UuJF)",
+    "nota": "Parte 2e-2: Kerrick, el mercader. Frases 1-6, tomas a y b.",
+    "frases": {
+      "1": {
+        "prompt": "[cheerfully] Ah, a customer! And a living one, more or less. Kerrick's the name. If it can be carried, I've probably got it.",
+        "sesiones": [
+          "uC6naSVQrnOeeqQsDrAN",
+          "9URGzWyeQijGzKuZSCNj"
+        ]
+      },
+      "2": {
+        "prompt": "[warmly] Welcome back, friend! Echoes in your pocket, wares on my cart.",
+        "sesiones": [
+          "PMU9YnHwdGr59x5DBVCv",
+          "qXQuiSYLCh4U5n0K5LLQ"
+        ]
+      },
+      "3": {
+        "prompt": "[pleased] A fine choice. Spend it well... or don't, and come buy another.",
+        "sesiones": [
+          "mRloJws8tKRFrqVmA8D5",
+          "ibd8YU9PJU2t8OrisgKp"
+        ]
+      },
+      "4": {
+        "prompt": "[sighs] Ah... your purse is lighter than your ambition, friend.",
+        "sesiones": [
+          "FN0UsIbzaZzCvQI9yGJs",
+          "K22ocMj0RLZglulzA3zb"
+        ]
+      },
+      "5": {
+        "prompt": "[chuckles] The dead don't care much for my prices. The living do. So I stay close to the fires... and closer to my cart.",
+        "sesiones": [
+          "F8d8jJvdNEOdo3OZN8T6",
+          "Y2GBq1JtsZwWnd41CNM1"
+        ]
+      },
+      "6": {
+        "prompt": "Safe roads, friend. And if you find any... do tell me.",
+        "sesiones": [
+          "HgkdvD5K1DCWsBTpXZK8",
+          "eMfeZIIak7BXeXzdRa4O"
+        ]
+      }
+    }
+  },
+  "sfx_forja_tienda": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "Parte 2e-2: golpe del herrero, mejorar un arma y comprar.",
+    "sonidos": {
+      "herrero_golpe": {
+        "sesiones": [
+          "pN3TsiewKQGoCXzNsesw",
+          "ctRZiKou0GHHOTxbb9cX",
+          "XMkgyuWAfUMchYQieNQk",
+          "d2x7WMpIcMXx5rigoVi2"
+        ]
+      },
+      "forja_mejora": {
+        "sesiones": [
+          "cRLHEQ87wuWXhs4T0Kms",
+          "WdW3OMrKQFem4wz6DEGf",
+          "UpeUStemMBRheNUpYaeq",
+          "ucqAqXknOM2SqGuZRmgv"
+        ]
+      },
+      "tienda_compra": {
+        "sesiones": [
+          "hdXzcWRtj42npbsqNQHW",
+          "zRImT3hsArDuu291Heyg",
+          "F9zro3lweY5Gnygz5Jiv",
+          "sI1rVW0FQUxTnuByWROO"
+        ]
+      }
+    }
+  },
+  "sfx_habilidades": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "Parte 2e-3: habilidades de las armas (cenizas de guerra) y aplicar una ceniza en la forja. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+    "sonidos": {
+      "habilidad_torbellino": {
+        "prompt": "A knight spins around with a sword in a full whirlwind attack: two fast circling metallic whooshes of the blade cutting the air, heavy and sharp, epic dark fantasy RPG weapon skill, no music, 1.0 seconds",
+        "sesiones": [
+          "uUHddYKCN0ikXwTiYUH4",
+          "qTyG9FnGqZbNz974MwAZ",
+          "P28whuZWm8HWRkzxq11l",
+          "JXSejgxgVqF8n2DWTwjk"
+        ]
+      },
+      "habilidad_estocada": {
+        "prompt": "A powerful lunging spear thrust: a fast rush of air, the swish of the long weapon driving forward and a sharp piercing impact, epic dark fantasy RPG weapon skill, no music, 0.9 seconds",
+        "sesiones": [
+          "ZBm0UIQVwiDMihjb452U",
+          "RqCoG4XKZhsV8IQOIVw0",
+          "kOkkJEJiuXaghg92BBKY",
+          "bzsfYLFu8uoD3EJJeggW"
+        ]
+      },
+      "habilidad_grito": {
+        "prompt": "A fierce warrior's war cry: one deep powerful male battle roar with a short echo, followed by a low magical surge of strength, epic dark fantasy RPG buff, no music, 1.6 seconds",
+        "sesiones": [
+          "bcl7mEbti6ze6aMwlMMs",
+          "7kbOO2XndYnnsVwdtcZO",
+          "MvfxFhRqPOW7PZ9ZGFfI",
+          "Xnm5OLYXYhuvAwlFXU05"
+        ]
+      },
+      "habilidad_sismo": {
+        "prompt": "A huge axe slammed into the ground after a jump: a massive earth-shaking boom, stone cracking and debris scattering, a deep rumbling shockwave, epic dark fantasy RPG weapon skill, no music, 1.8 seconds",
+        "sesiones": [
+          "xudIZeDYSSRJOG5NNqDj",
+          "5bj1T8hqJeKw10YfxVyU",
+          "vGz2H6xv2U8PK4rgr4lB",
+          "CboiEHyt1nZEEuxuvfuH"
+        ]
+      },
+      "habilidad_paso": {
+        "prompt": "A quick shadowy dash: a short dark magical whoosh with a soft ghostly hiss as someone blinks a few steps aside, dark fantasy RPG quickstep, no music, 0.6 seconds",
+        "sesiones": [
+          "H8mg7hYZPCetpO844JPw",
+          "1giF3iAYokl24xP39ZlU",
+          "tL2mw45zP6e3kbXpAfbR",
+          "2JRx3CXlNMmSLjhibtVu"
+        ]
+      },
+      "habilidad_llamas": {
+        "prompt": "A flaming sword slash: the blade ignites and sweeps in a wide arc with a roaring burst of fire and crackling embers, epic dark fantasy RPG weapon skill, no music, 1.2 seconds",
+        "sesiones": [
+          "YqjjpHYApAPvgYT7GMhv",
+          "FsToHg4ncvwz6cPF6Zgp",
+          "H2K9xDOTuOqJBAEynOzw",
+          "DadBjCDts872DoLJG2M8"
+        ]
+      },
+      "habilidad_escarcha": {
+        "prompt": "A frost blade slash: an icy crystalline whoosh with a gust of freezing wind and ice shards cracking and shattering, epic dark fantasy RPG weapon skill, no music, 1.2 seconds",
+        "sesiones": [
+          "eMOarZkKEHKKZTVWCTjc",
+          "TXQfi5senh513zuavZQx",
+          "Z4ZKgzDvrphHB1nJ8Wje",
+          "I45la2cV5AuldKZnDQRE"
+        ]
+      },
+      "habilidad_relampago": {
+        "prompt": "A lightning-infused sword strike: a crackling electric charge, a sharp blade swing and a bright snapping thunder crack, epic dark fantasy RPG weapon skill, no music, 1.2 seconds",
+        "sesiones": [
+          "51LIdmtfpDq8TvGjslIF",
+          "VbGUrAxf9E8HQOoPjDKx",
+          "oCsYtHpPVu7SKdgzcRIH",
+          "MdNpsaDr4UBKkjtNBnhU"
+        ]
+      },
+      "habilidad_sangre": {
+        "prompt": "A cursed bloody sword slash: a wet visceral swipe of the blade with a dark ominous pulse and a sinister low hum, epic dark fantasy RPG weapon skill, no music, 1.0 seconds",
+        "sesiones": [
+          "QKMZNabrsON4haoVw3kD",
+          "3DIgeD97XEV77UURp7Q5",
+          "KycIzh5d3ZEKbtBJm0UA",
+          "zuCdnzTt3lgrdiQtQOiv"
+        ]
+      },
+      "habilidad_parada": {
+        "prompt": "A perfect weapon parry: a sharp bright metallic clang as a blade deflects a heavy blow, with a ringing steel shimmer, epic dark fantasy RPG, no music, 0.8 seconds",
+        "sesiones": [
+          "HYx3KhqCcRLtIXEEj0VV",
+          "voouEymQJxcnQMLo4gsX",
+          "FlbTedCYq42HSfEAnFXy",
+          "gTVfNJtcnhzQzahaLto2"
+        ]
+      },
+      "ceniza_aplicar": {
+        "prompt": "Ashes of war infused into a weapon at a forge: glowing embers swirl into the blade with a rising magical whoosh, a soft metallic ring and a warm shimmering hum, dark fantasy RPG, no music, 2.0 seconds",
+        "sesiones": [
+          "ytoJ6R1LBnN1hC9bAfeu",
+          "41eXYmwjFL4N8xd0P8OY",
+          "2YADM2L75phr7WmNZLoe",
+          "rjoJ8fQY6ykO5QL2ppnm"
+        ]
+      }
+    }
+  },
+  "sfx_codice": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "Parte 2e-4: el codice (abrir, pasar pagina y cerrar). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+    "sonidos": {
+      "codice_pagina": {
+        "prompt": "Turning a single heavy page of an ancient parchment codex: a dry crisp rustle and a soft flap as the thick vellum page falls over, close and intimate, dark fantasy RPG menu, no music, 0.8 seconds",
+        "sesiones": [
+          "3XlcVNREbC31HcFEcbE2",
+          "J2GGsd4DGZZPPsmB54Ve",
+          "qUdHH1Pffv4ECM2JMPdq",
+          "DCGUCkGjsHB5852SSaEK"
+        ]
+      },
+      "codice_abre": {
+        "prompt": "Opening a large ancient leather-bound codex: the heavy cover creaks open, old leather and brittle binding, thick pages settling with a soft rustle and a faint puff of dust, dark fantasy RPG menu, no music, 1.2 seconds",
+        "sesiones": [
+          "wRkZHMNQLbl5eWn0O6qq",
+          "D6INW4YQjDU72mUOwlcu",
+          "OKQdKBCzEJI84okYWf6y",
+          "46gRQXvIj4CYyXMsrAdQ"
+        ]
+      },
+      "codice_cierra": {
+        "prompt": "Closing a large ancient leather-bound codex: the heavy cover shuts with a deep muffled thump, a creak of old leather and a small puff of dust, dark fantasy RPG menu, no music, 1.0 seconds",
+        "sesiones": [
+          "Zs3qzYM0amwcS1JC7AUo",
+          "q38ib5lePGKNZlHR5vaF",
+          "A7tzreOF5YxvfLhpiMpo",
+          "bn0eExBNe9jNd6oZubL0"
+        ]
+      }
+    }
+  },
+  "sfx_logro": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "parte 2f-1: el aviso de los logros (los de desafio llevan la fanfarria de Minecraft)",
+    "sonidos": {
+      "logro": {
+        "prompt": "Dark fantasy achievement unlocked UI sound, epic cinematic Dark Souls style: a single deep resonant bronze bell toll with a bright shimmering magical chime on top and a soft airy choir breath swelling underneath, long reverb tail in a stone cathedral, about 2 seconds, clean, no music melody.",
+        "sesiones": [
+          "fzTGvXlCySt3HSt1i6E3",
+          "I2E6pkysOd2R5qQBJ5Eq",
+          "j4LR3sgT6GPUl2bOVEVh",
+          "o2GlyAffK8RrXcWmneLI"
+        ]
+      }
+    }
+  },
+  "sfx_brumavela": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "Parte 3b: Brumavela (una pieza del barco encontrada, la losa de la cripta que se aparta y el barco reparado). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+    "sonidos": {
+      "pieza_barco": {
+        "prompt": "Dark fantasy RPG item discovery sound, epic cinematic Dark Souls style: a single deep old ship's bell strike with a rising bright shimmering magical sparkle on top, a soft creak of old wood and rope underneath, long airy reverb tail, about 2.5 seconds, clean, no music melody.",
+        "sesiones": [
+          "AKqgijgofbN5I17MLuQg",
+          "79SbzaC6LCi4GrVtpC4K",
+          "kWJOpyh1rHZjpZLpBmjV",
+          "qlUbDtWcQKna1Y7jnWPt"
+        ]
+      },
+      "cripta_abre": {
+        "prompt": "A heavy ancient stone slab slowly grinding and sliding aside on the floor of a small stone chapel, revealing a crypt: deep scraping stone rumble, falling dust and grit, a low hollow ghostly exhale of cold air rising from below at the end, echo of a stone room, epic cinematic dark fantasy, about 4 seconds, no music.",
+        "sesiones": [
+          "Jr7aFnr42gNb4iZABuJW",
+          "GbyZaJ2mOmpcXMidUSA0",
+          "goSNXLi6xh21cO4KdBXm",
+          "Uw63kS8xyJROk4fwH7kA"
+        ]
+      },
+      "barco_reparado": {
+        "prompt": "An old wrecked wooden sailing ship comes back to life: heavy timbers creaking and settling into place, ropes pulled tight, a big canvas sail unfurling and snapping full of wind, then a deep magical hum swelling from inside the hull with a bright shimmering bell-like chime as it awakens; epic cinematic dark fantasy, Dark Souls style, about 5 seconds, no music melody.",
+        "sesiones": [
+          "nXmm9sVIKUtrFJlgtfot",
+          "ly2BpHgvqp4Aa8qZ8DY8",
+          "wwHrWochX5NbKuE1ADBy",
+          "9jz4Bq6A9l0irbjDkrIK"
+        ]
+      },
+      "brumavela_viento": {
+        "prompt": "Eerie lonely ambience of an abandoned fishing village on an island floating above a sea of clouds: a soft continuous airy high-altitude wind with slow swells, old wooden beams and a moored ship creaking gently, a loose rope tapping, a faint distant bell clank once, no voices, no birds, no music, dark fantasy, calm and desolate, 20 seconds.",
+        "sesiones": [
+          "3nmjszseYgvqDnxxbNEs",
+          "guDrG7lscRwlwlVCsU25",
+          "KLnwyRwyKsiNcelFBg7V",
+          "SmTtCJ4fxa71pNGmqp71"
+        ]
+      }
+    }
+  },
+  "sfx_enemigos_brumavela": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "Parte 3c: los enemigos de Brumavela (el aldeano hueco y el marinero ahogado: gemido, alerta, dolor y muerte). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+    "sonidos": {
+      "hueco_gemido": {
+        "prompt": "A hollow undead villager groaning: a dry, raspy, breathless moan from a withered throat, slow and mournful, with a faint rattle of air in the chest, close and intimate, dark fantasy RPG enemy idle sound like a Dark Souls hollow, no music, 2.0 seconds",
+        "sesiones": [
+          "SVNq4AS1Spb0U8pAvaDT",
+          "rZfiVhDarogmXLCR67ne",
+          "2o3RGxaNTsJ19oc8Ss0g",
+          "xrlQRjvpAVx9ZTqZAtdI"
+        ]
+      },
+      "hueco_alerta": {
+        "prompt": "A hollow undead villager suddenly notices its prey: a sharp dry rasping gasp rising into a short hoarse shriek, aggressive and startled, dark fantasy RPG enemy alert sound like a Dark Souls hollow, no music, 1.2 seconds",
+        "sesiones": [
+          "PGyFcRlNanaM74hSU3Xo",
+          "Q0trb2t56mbgr2HM0N5R",
+          "5M5V8CzC93EkLWZFHL90",
+          "y6plw1X8YkNGwKDFh5Gu"
+        ]
+      },
+      "hueco_dolor": {
+        "prompt": "A hollow undead villager struck by a blade: a short dry pained grunt and a choked rasp, dark fantasy RPG enemy hurt sound, no music, 0.7 seconds",
+        "sesiones": [
+          "TP4P1hrVyjtDpfuUUgqM",
+          "ykbtRDVVUB14PLJY7WpS",
+          "tWyifEicV9XzzbE3ZTx1",
+          "bsQibMPVVJTfeqgDN8Kd"
+        ]
+      },
+      "hueco_muerte": {
+        "prompt": "A hollow undead villager dying: a long dry exhale fading into a rattling last breath, then the body collapsing softly onto stone with a rustle of rags, dark fantasy RPG enemy death sound, no music, 2.2 seconds",
+        "sesiones": [
+          "HOmXZO1sYYbd46YNwDwV",
+          "jxqb9qvlQ5HybrNS9pi2",
+          "bMDpTljclT9uLeWmEtoc",
+          "t1E0bamVDFEuNYRuRqp5"
+        ]
+      },
+      "ahogado_gorgoteo": {
+        "prompt": "A drowned undead sailor standing idle: a wet bubbling gurgle from water-filled lungs, dripping water and a low waterlogged groan, slow and eerie, dark fantasy RPG enemy idle sound, no music, 2.2 seconds",
+        "sesiones": [
+          "LKP9mB2HVRdnC7CfHD5Q",
+          "1khwS74zVoydErfs1mHC",
+          "2KrDGL30hUxEaH2PqBTE",
+          "apKDQH7vavXJbgbJAtzY"
+        ]
+      },
+      "ahogado_alerta": {
+        "prompt": "A drowned undead sailor notices its prey: a wet gurgling roar bursting out with a spray of water, aggressive and guttural, dark fantasy RPG enemy alert sound, no music, 1.4 seconds",
+        "sesiones": [
+          "CF05DeByB6u0ruEz3mXI",
+          "FiECXcY8EERgXf0TQJS5",
+          "meUE6pbMCOODjFDMDEZ7",
+          "KZq6d9IbPjJRjpWrcs7P"
+        ]
+      },
+      "ahogado_dolor": {
+        "prompt": "A drowned undead sailor struck by a blade: a short wet choked gurgle and a splat of water, dark fantasy RPG enemy hurt sound, no music, 0.7 seconds",
+        "sesiones": [
+          "o0EQqFgm1fp4GKELUVk9",
+          "V5gUePigQ7K8IT3Ofh4j",
+          "FAuEm278AWjlKYHoZuUy",
+          "VuP1XS3xsMRTlUFi62mU"
+        ]
+      },
+      "ahogado_muerte": {
+        "prompt": "A drowned undead sailor dying: a long bubbling gurgle draining away, water pouring out and a heavy wet body slumping onto wooden planks, dark fantasy RPG enemy death sound, no music, 2.4 seconds",
+        "sesiones": [
+          "WvErb4g4ZMfmVQ0Qv63c",
+          "kpU9Xq3bbVXBsLI2Enoc",
+          "Vkx6Nl81uHSgggFt4RI7",
+          "c2yppVCuYPqa19iMa4YT"
+        ]
+      }
+    }
   }
- },
- "gavran_muestras": {
-  "flow": "UwyoAHy95Tq7BNgNPPy2",
-  "5AYcH1Cr8nW0XgDTtRI4 Silent Systemus": [
-   "8vHepENFShSLhsBsxFe7",
-   "wGjufbDiUH956iphJe6u"
-  ],
-  "d3qrd1ge6zWDvUxIeXiH Final Boss": [
-   "hvARjCikdcaLexqWNFSj",
-   "O2kxkLRvrQgOWnZ4iqcK"
-  ],
-  "Tj9l48J9AJbry5yCP5eW Nosferatu": [
-   "XJt3AfZDbkEkQAf4BZNI",
-   "akmNmXeCWbq57uWFm2Gk"
-  ]
- },
- "sfx": {
-  "flow": "qPyROhCV8tJUMnSORV80",
-  "modelo": "eleven_text_to_sound_v3",
-  "sonidos": {
-   "rey_tajo": {
-    "prompt": "Massive greatsword swing, heavy blade whooshing through air, deep and fast, close",
-    "sesiones": [
-     "WYmoo6JLzr3gWoeEUBuZ",
-     "qmtiBgomNYVWpHlH4uIM",
-     "WxE8RVKz1iXndMgfq10H",
-     "1O5NgQ7y3zElePJpl2HH"
-    ]
-   },
-   "rey_tajo_fuego": {
-    "prompt": "Blade of fire launched forward, roaring flame whoosh with crackling trail",
-    "sesiones": [
-     "AejaYnZdycdkAYZfzjVW",
-     "ewjuniMz7zdFlpFRxLYN",
-     "RGqJRBmnJNKC1364mkma",
-     "amYA93vlKepsE3sPGjRu"
-    ]
-   },
-   "rey_bola_fuego": {
-    "prompt": "Fireball launched, deep rushing whoosh of flame",
-    "sesiones": [
-     "aDQbQEp5JPzf48G4AWHC",
-     "E9zuOZLP9Pz6kDdvwQAW",
-     "wH9RwCVVflM754Dh5Ij2",
-     "9TD3cRZ0ZFAebadIATLI"
-    ]
-   },
-   "rey_explosion": {
-    "prompt": "Huge fiery explosion, deep boom, rumbling debris falling",
-    "sesiones": [
-     "7IPeC9a7PBf3ZXhePNuZ",
-     "6Ju0jDEZp5jjvPNfJSGA",
-     "QBMdx1kpib9qgnomfsk4",
-     "swHELtfPfgCtX0l1ZqN9"
-    ]
-   },
-   "rey_golpe_suelo": {
-    "prompt": "Giant armored body slamming onto stone floor, deep heavy impact, rock cracking",
-    "sesiones": [
-     "WH4tr1bGhEWnHRaEkCLy",
-     "tzePadNFGj4Fef9NrDZF",
-     "zZxpuvOC8nHhJy0MldFC",
-     "tApv17bZSacytVtl2Ubo"
-    ]
-   },
-   "rey_golpe_final": {
-    "prompt": "Colossal ground impact, massive deep boom, shockwave rumble, stone shattering",
-    "sesiones": [
-     "gRkgueuOhFuuNdzjfHhh",
-     "PnwRGcWGwmVbRbds7cRm",
-     "OQ70YEX8FXEJuY4f8TWl",
-     "X6GgXRrYtVEXNRjFHUVi"
-    ]
-   },
-   "rey_rugido": {
-    "prompt": "Monstrous deep roar of a giant, guttural growl echoing in a stone hall",
-    "sesiones": [
-     "8TbkB1AdnBByYg0rti2a",
-     "2oTfPTmvxNUAEvD5NvbX",
-     "LmMSgGn207jLKZADzLZD",
-     "Q0DgCg0ITyI2t170GQc5"
-    ]
-   },
-   "rey_geiser": {
-    "prompt": "Lava geyser erupting from the ground, violent hiss and bubbling roar",
-    "sesiones": [
-     "OlbQc2r5QeUdP2UdF5LZ",
-     "2ke1SFMXzXHUL4CzQI7r",
-     "K26bJWitoWB0DcR3mgX8",
-     "oACFzIXktIXw8nLsKFSo"
-    ]
-   },
-   "rey_pilares": {
-    "prompt": "Pillars of fire bursting up from the ground, rushing flames",
-    "sesiones": [
-     "1PJNzgulUW0ZdftmdnUJ",
-     "Z4ffVxhPXaGK8lrFTW7E",
-     "7oo5epA1VS1fIZrA5RfT",
-     "yfycmTMer5ulZcLLzLTY"
-    ]
-   },
-   "rey_carga": {
-    "prompt": "Rising ominous drone of magical fire charging up, deep rumble building",
-    "sesiones": [
-     "9IxW1k9AwX9FUk4tqORV",
-     "mVNSiqmmyMldsFxZTMAZ",
-     "p2FdW6VuyoIA5oQ5D6QD",
-     "GJwIsqA5CSNeqWYLVAsC"
-    ]
-   },
-   "cuenta_atras": {
-    "prompt": "Single deep war drum hit with a low metallic ring",
-    "sesiones": [
-     "D41OI5CszKM1kyMZcI2f",
-     "mIazkKP9gokzWD8Kleqo",
-     "TOuFRhHDlEzZbqoKPgVc",
-     "1D5cUR7v7xIXwJmhZ5oT"
-    ]
-   },
-   "circulo_dorado": {
-    "prompt": "Bright holy chime swelling, shimmering magical sparkle, warm and sacred",
-    "sesiones": [
-     "cGDm8uylBhOJ5Qmpv2cH",
-     "JGTv69Xr1TyFnQMdJlxe",
-     "dkZYf4LNVm8DuFd55EtF",
-     "BAauy28a2BbjzUGuOftc"
-    ]
-   },
-   "puerta_runas": {
-    "prompt": "Ancient magical runes awakening, resonant stone hum with glowing shimmer",
-    "sesiones": [
-     "CZBBdXjOyZ1FF8t2Slq7",
-     "Rqo6Iiplvi0U8HLlN2Sg",
-     "tRvEf25nxgFcFZpUMTS2",
-     "erqPewg1O8Jnc2UPxaoN"
-    ]
-   },
-   "puerta_abre": {
-    "prompt": "Enormous ancient wooden doors slowly grinding open, deep rumble and heavy creaking",
-    "sesiones": [
-     "fwul6yV264hJ96tF73FI",
-     "yzbImftK6UcrmMNDijyC",
-     "CYaBfLgTwd6MR3vffiyx",
-     "n4WRmVC08KONDcTVRXrl"
-    ]
-   },
-   "puerta_cierra": {
-    "prompt": "Enormous wooden castle doors slamming shut, deep boom echoing in a large hall",
-    "sesiones": [
-     "BAlJKkJqdfaksvIZLUzO",
-     "QPBg0ENm78z0Dgx8D0g7",
-     "yZRHLiPb7gONryzU4YPy",
-     "7pgKkm1bp1NMRBiLRGfy"
-    ]
-   },
-   "ascensor_mueve": {
-    "prompt": "Stone platform moving steadily, low magical humming drone with soft grinding rumble",
-    "sesiones": [
-     "5tS4fXaMRTt3qFqXeusC",
-     "2scNDBIR064H8e4jasU7",
-     "oedKnlNwEGcmDLBSFbil",
-     "RY0LSWsyDmCYjjFGhmyA"
-    ]
-   },
-   "ascensor_llega": {
-    "prompt": "Heavy stone platform stopping with a solid thud and a soft magical chime",
-    "sesiones": [
-     "9QtunEC0XKFECtduILAo",
-     "juNTdQ7rtBJ1xhQrEZz9",
-     "8RjUsBHOMvtti69rbg7p",
-     "fBbwDIxxG0ox7GVJ4Ciz"
-    ]
-   },
-   "fuego_crepitar": {
-    "prompt": "Roaring fire crackling, close-mic, intense flames and popping embers",
-    "sesiones": [
-     "PUkAdwpwnYK92gkwMYLW",
-     "aSndxytowQOA2KkwiQw7",
-     "k2dx2vLLLguleq3Z68iH",
-     "UroClWlh11VxPyRhOHyL"
-    ]
-   }
-  }
- },
- "gavran": {
-  "flow": "CcERsNGkAUZYFDFoRiGT",
-  "voz": "d3qrd1ge6zWDvUxIeXiH (Final Boss - Evil All Powerful Villain)",
-  "modelo": "eleven_v4",
-  "lineas": {
-   "1": [
-    "pCSqqjPwI16sVYHdv1uJ",
-    "1FSKslGX4Evqu5DyZ8v5"
-   ],
-   "2": [
-    "Gdpt6OvWtaTHDqwv1ck9",
-    "oXLcPiUp7geUAOB03fOj"
-   ],
-   "3": [
-    "VO6S1QR7ymd5ht5QWfwI",
-    "pdoYvZCPm8TNUTzaJzWE"
-   ],
-   "4": [
-    "yqlyrIKmRkpUqB5xeUff",
-    "HbIXfEKmasKactQGTYJu"
-   ],
-   "5": [
-    "lwU60mCv6jn0pDhMgZzE",
-    "As9g1MFt2PQbXbyDp4je"
-   ],
-   "6": [
-    "iTbyfWzJmhTZ4lecuE2n",
-    "zntrV7n2AC9Y3d2SUfjU"
-   ],
-   "7": [
-    "VI2MlksFDprlFUnfYzI1",
-    "N5PeKtenkHWotUIgRAhJ"
-   ],
-   "8": [
-    "UmQzTfoQfgGOAfGGAdr6",
-    "7hK9EIoMQzwhtn31jFm8"
-   ],
-   "9": [
-    "43SJJ9QeZjgGqabBTjap",
-    "B570IblA343CU4AZh7zr"
-   ],
-   "10": [
-    "rNcJGW22wNueTlBTJIXU",
-    "CUEWKOeKf6w8rFl20Zrj"
-   ],
-   "11": [
-    "2lQMweFe26udXSIgMev9",
-    "z4wi3OtZHHNamJoSpfD7"
-   ],
-   "12": [
-    "VpQdpjOEfUtz2IPMqXrA",
-    "1kmjhC08Knna6QyFXq1D"
-   ],
-   "13": [
-    "2Tx87xPiQK5UnKy56sun",
-    "PmCXgzcaPBBt79JdgqOM"
-   ],
-   "14": [
-    "GjAAGhGEHZHTUVeeh1IE",
-    "Pg5Q0zCETkUvcHTzWmmK"
-   ],
-   "15": [
-    "AEp5n2cQogfqXZM1nEG1",
-    "fksEvKzJj6T7IG2VD9qd"
-   ],
-   "16": [
-    "6Ap1YKHRwQnDIYQedNdj",
-    "HyrSQHLx7eqapgYf6eS7"
-   ],
-   "17": [
-    "OO7hqkKrJiNetSJxzBPc",
-    "021yNtl6qETqRAWT6O6O"
-   ],
-   "18": [
-    "PwsJRNYbtvZ6d0nukHTE",
-    "6rY0IXjG16PhdJ1GffFd"
-   ]
-  }
- },
- "sfx_gavran": {
-  "flow": "ZVZh5ccuMol4OVQChqxA",
-  "modelo": "eleven_text_to_sound_v3",
-  "sonidos": {
-   "gavran_tajo": {
-    "prompt": "Huge two-handed greatsword swing, heavy deep whoosh, steel ringing",
-    "sesiones": [
-     "rY1xZGLTIVk0lxcVliUp",
-     "AOhktZVcxMmKrsLM9P3F",
-     "iGwQTotMyGHGuiTOcAFc",
-     "5hVKYT4mbGVDx8BqL8I0"
-    ]
-   },
-   "gavran_choque": {
-    "prompt": "Greatsword blocking a sword blow, loud metallic clang, sparks",
-    "sesiones": [
-     "TXE1h9YJKwI9XS0XH2dJ",
-     "LXd6xeOOqjHX7hIxxjlf",
-     "F5gzyRUzdlndNqaZ1oYZ",
-     "uinN7vMhxcJZNt8CqaWM"
-    ]
-   },
-   "gavran_embestida": {
-    "prompt": "Armored giant shoulder charge, pounding heavy footsteps then a crushing metal impact",
-    "sesiones": [
-     "zBnxXxfb7mrXc87VymgN",
-     "o9MW8tLX1lXWErXWybMT",
-     "nBPMUEgPBAxhqU5qiEbR",
-     "kThkwUEOQ7m8LsrfXk6D"
-    ]
-   },
-   "gavran_raices": {
-    "prompt": "Thick roots bursting up through a stone floor, cracking stone and snapping wood",
-    "sesiones": [
-     "99I8dM7YB3z3UinqzIMI",
-     "AUAnvI4OUHUgJossCfH8",
-     "466srqFV1BYwItsqXuM1",
-     "lG9yGtoU3PcZxsczoRWq"
-    ]
-   },
-   "gavran_clavar": {
-    "prompt": "Giant sword stabbed into stone ground, deep impact and rolling shockwave rumble",
-    "sesiones": [
-     "k9vCGeodz6ZNYO2UTBqm",
-     "i8jADt9Q6i9jwd8w4Cry",
-     "KqJqqWBqlZCDseQ75VQY",
-     "MI2lz7BuQuqUU6g24EeX"
-    ]
-   },
-   "gavran_invocar": {
-    "prompt": "Skeletons rising from the ground, rattling bones and an eerie low whisper",
-    "sesiones": [
-     "nKPjH9uexQzZGxdkUyRP",
-     "cVI42EmIcgAChV0bNXcl",
-     "QA0oHZlSTMVsOmMTw772",
-     "MT3AOGyH0jGOZXMFT933"
-    ]
-   },
-   "gavran_paso": {
-    "prompt": "Single heavy armored giant footstep on stone, deep thud with metal clank",
-    "sesiones": [
-     "b96sBnYcaSwrKNHEUbfc",
-     "k5ihpRAkinCkYsZlRVuI",
-     "c3GGZ7gPjuPTP6Y2SW9h",
-     "YdxTJtbttCQ5isy1zGeo"
-    ]
-   },
-   "gavran_guardia_rota": {
-    "prompt": "Guard broken, heavy steel cracking and an armored giant staggering back",
-    "sesiones": [
-     "0ayoRMglCAwpBulxPL5Q",
-     "4HVaBg8G8NO9dZvZUnML",
-     "la82s1TriaqZWOiE9Rq5",
-     "H8x0f6y8Qbgx2DbHfhM9"
-    ]
-   },
-   "arbol_despierta": {
-    "prompt": "Ancient giant tree awakening, deep groaning wood, roots cracking stone, leaves rustling",
-    "sesiones": [
-     "W5SGTBWwB1Nu2I5EQ6iR",
-     "Pd2hlKSJGKbzdAsDVKoQ",
-     "V6WT4nBzaztYJ2qkyPxi",
-     "uno8H66XfpqHfo9qjtPF"
-    ]
-   },
-   "hojas_cortantes": {
-    "prompt": "Swarm of razor sharp leaves slicing through the air, fast whooshes and rustling",
-    "sesiones": [
-     "YLhdkStRkaWofvv3UZCg",
-     "8agoS6AIYJtBzcWKCZ3c",
-     "k9rkHkehuwVAQolTLy7B",
-     "bC93opw66SQXCyIMVikG"
-    ]
-   },
-   "raices_atrapan": {
-    "prompt": "Roots wrapping tightly around a body, creaking wood squeezing",
-    "sesiones": [
-     "d7Nke66j8sVTt7yQidCJ",
-     "ZSP52nUujC0z1UZpJGzN",
-     "4DMAeBCrwI1VF3hmqVl7",
-     "784blJA80be2kqXfzam6"
-    ]
-   },
-   "gavran_salto": {
-    "prompt": "Giant armored knight leaping into the air and landing hard, stone cracking",
-    "sesiones": [
-     "rI0z6f5fY2VvUhjAURg6",
-     "nrX26LD7yaDyczcsFCJ4",
-     "0y0Sz0lJZuISoZkL4XF8",
-     "FdYulCzEJbiY9CiSMg5n"
-    ]
-   },
-   "espinas": {
-    "prompt": "Sea of thorns erupting from the ground, violent wood tearing and cracking",
-    "sesiones": [
-     "CZUypN8guSFfR3LIF4xw",
-     "TfTu5ysCg0MatLyrfghP",
-     "QdmX30LF0QeTCvMsnp3s",
-     "E30MRuSlzVE8HiA6vsxJ"
-    ]
-   },
-   "corteza_muro": {
-    "prompt": "Bark wall growing fast out of the floor, creaking and grinding wood",
-    "sesiones": [
-     "cww7E4tNdDsyN3cyFf49",
-     "XrRcSW3Xr166HQvxEzzf",
-     "6lspjB2chsQaSKIFa6U5",
-     "cFkRQkI0MMuKWt20nuGr"
-    ]
-   },
-   "florecer": {
-    "prompt": "Magical blooming of a giant tree, soft shimmering chimes and rustling leaves",
-    "sesiones": [
-     "W9WgOGurcihfL56BwEMl",
-     "8hPT09OKjJbUVP75IsBe",
-     "WBlvIWZ5HQebbsDz4Gsy",
-     "A2oUNthds730QhPUpUWR"
-    ]
-   },
-   "madera_cruje": {
-    "prompt": "Deep creaking old wood, groaning tree trunk, close",
-    "sesiones": [
-     "Uoc7vsKxZXHZklb86lzR",
-     "ZUjACk0ODeTLbHpQkJSa",
-     "kYW3DjZHiq5ZADbAuIOP",
-     "hRoXD6WXh5i0xBxWoJjI"
-    ]
-   },
-   "corazon_latido": {
-    "prompt": "Single deep heartbeat inside hollow wood, resonant thump",
-    "sesiones": [
-     "28l5M5sco8JFPmQ2IMSM",
-     "IxaSZYMbwI9bPU23MU7d",
-     "YmD9Mjvt2KsU7PGqBN2D",
-     "7LnviR0zoimQ7ZEmhRcd"
-    ]
-   },
-   "hojas_disolver": {
-    "prompt": "Body dissolving into a swirl of leaves, soft rustling and a magical whisper",
-    "sesiones": [
-     "FtgPYYt6EVsXJpUO1hwj",
-     "5LpocHDCCKHnJBSMAfPF",
-     "I6Bz57JpRw0XYxXdkHBj",
-     "0ySRLzX4IxOmJqnkZFP8"
-    ]
-   }
-  }
- },
- "sfx_mapa_fortaleza": {
-  "flow": "k7WnlpZuqqA6KPhZdTlN",
-  "modelo": "eleven_text_to_sound_v3",
-  "nota": "las 4 tomas de cada efecto se bajan como NOMBRE_1..4 (procesar.py elige cuales se usan)",
-  "sonidos": {
-   "espejo_despierta": {
-    "prompt": "Dark magical mirror awakening: deep resonant glass hum rising, shimmering crystalline chime, faint ghostly whispers, ominous epic dark fantasy, 3 seconds",
-    "sesiones": [
-     "KkBQfM2KJv5qUjh81oFs",
-     "sCA3eDI3y2yARTsaSwe2",
-     "NY3epglgQo0xjUfvT1xf",
-     "C2GRi3lwK5rSZQCj4tBH"
-    ]
-   },
-   "pluma_escribe": {
-    "prompt": "Quill pen scratching quickly on old dry parchment, writing a few words and a final flourish, close, 2 seconds",
-    "sesiones": [
-     "NXNepuO88EhG5skOopBQ",
-     "DKU5f2G9xhfEpXgfxtYQ",
-     "zFIX7QJh1vpCi0LEqI3c",
-     "2suH59aZWByF9GlkPcYC"
-    ]
-   },
-   "libro_abre": {
-    "prompt": "Opening an old heavy leather-bound tome: thick cover thud, creaking spine and pages rustling, close, dark fantasy",
-    "sesiones": [
-     "a9lcLoAWjqCHV2alBfDZ",
-     "dqc1TbUjcug1HEmbWW3V",
-     "ovfFLE4ONROtjgGjVeZ2",
-     "OgfKru8OP957shIBKqnF"
-    ]
-   },
-   "llave_rastro": {
-    "prompt": "Magical bone key resonating: eerie hollow chime, soft rattling of bones and a whooshing trail of spectral green light flying away, 2 seconds",
-    "sesiones": [
-     "Qr9GgljSxKwIkkGElaSR",
-     "DEGlr93cq3SBL1YVS0I4",
-     "JJ7L4QdANyHIGIusb4uS",
-     "LWtXXtvdKgXRepHFB6AU"
-    ]
-   },
-   "puente_hueso": {
-    "prompt": "Giant bones assembling into a bridge up to the sky: cracking and grinding bones clicking into place, clattering, deep rumble and howling wind, epic dark fantasy, 6 seconds",
-    "sesiones": [
-     "f9Wx8oWVr8gf0XedJ5UC",
-     "W1xL4Llx8aimbcEWRDAO",
-     "5HzSr1qGiyD1ahbNm5y9",
-     "NPhFsNuCAWV8A2WIJjOA"
-    ]
-   },
-   "puerta_hueso": {
-    "prompt": "Massive ancient gate of bone and dark stone slowly opening: a key turning in a huge lock, creaking bones, heavy stone grinding, chains rattling, deep boom at the end, epic dark fantasy, 8 seconds",
-    "sesiones": [
-     "bcPGja1bVLMRblZZLH95",
-     "Ch4YvkoCfVRR5o6JPoUF",
-     "9SamWGtTn1MTfAX1nAkF",
-     "koGUwRy9h4Ntg8z3QMRw"
-    ]
-   },
-   "amuleto_forja": {
-    "prompt": "Magical amulet being forged from netherite, diamonds and bone: metallic ringing hammer strikes, rising mystical hum, crackling energy and a bright chime burst at the end, epic, 5 seconds",
-    "sesiones": [
-     "tXflorwbhAKdZAEILqPO",
-     "ulNMfxM4Ih0qpEFQnbFy",
-     "EYMmFEXO4SXnINTL6eq1",
-     "eUKvSYQbI6ZVk2PFdZTt"
-    ]
-   },
-   "portal_abre": {
-    "prompt": "Ancient dimensional portal awakening: deep rumbling stone, swirling void energy, rising roar of wind and a powerful bass pulse, epic dark fantasy, 7 seconds",
-    "sesiones": [
-     "INN4yPiamIdukIRQdFR5",
-     "07imjfaDcN7NrfIrYhzK",
-     "aTXAMtw0BW15IzZTuGXJ",
-     "gXzvNXENiPVCEx52u9Cv"
-    ]
-   },
-   "zombi_caballero_grunido": {
-    "prompt": "Undead zombie knight growling: raspy guttural groan echoing inside a rusty metal helmet, menacing, 2 seconds",
-    "sesiones": [
-     "Hrq9c6NhNcjc6TBEWM0e",
-     "HhcYe3wUoTFjjEYmF21g",
-     "AnqtLGJmgiwn92XtPg5W",
-     "98mAhFcvygxxSKzOuAro"
-    ]
-   },
-   "zombi_caballero_dolor": {
-    "prompt": "Undead zombie knight hurt: short pained guttural grunt inside a metal helmet with an armor clank, 1 second",
-    "sesiones": [
-     "l9iRxOhHsFM9HU1MUvrk",
-     "n9NgQJVucIWyFDvM4xOy",
-     "P4s9BDjs8tx82zLcj6xm",
-     "fn6lIDFyusyR0vOyT6He"
-    ]
-   },
-   "zombi_caballero_muerte": {
-    "prompt": "Undead armored zombie knight dying: long guttural death rattle, then rusty armor collapsing onto a stone floor, 3 seconds",
-    "sesiones": [
-     "pPNEXaifGkqMhzDcfu86",
-     "iRoUO1c9JaT1XqsYemIB",
-     "LLRJHPglWEYlleKeZFbo",
-     "J5pUvR8RrgcsfWuLlFZL"
-    ]
-   },
-   "armadura_paso": {
-    "prompt": "Heavy rusty plate armor footsteps on stone, metal plates clanking and scraping, two slow steps, close",
-    "sesiones": [
-     "5ny318WFMJmNvMfJgWhK",
-     "vIWylLOkDWDwzA2JqfGW",
-     "P2E2IBYhKjkOi7wURuzs",
-     "S1ENBdZ2W3Taxbnh6QnO"
-    ]
-   },
-   "escudo_golpe": {
-    "prompt": "Sword blow blocked by an iron-reinforced wooden shield: heavy thud and loud metal clang, close",
-    "sesiones": [
-     "DDBxLBp7G9BGkwdQHAv9",
-     "TfuXyK9oWe8sWOCOW6HS",
-     "2KbjAY00PRyzST5o2d53",
-     "axyAmt12YTwCpCH6Gxwi"
-    ]
-   },
-   "alabarda_tajo": {
-    "prompt": "Heavy halberd swing: long iron polearm whooshing through the air, deep and fast, close",
-    "sesiones": [
-     "FLWk3eXKNSzzM95mNRsd",
-     "vsbHFLKm5EpfvCXYpNNJ",
-     "5gaCUevl34xTLKqk3Cin",
-     "9HJD2HnB7pIkh2ohu4SA"
-    ]
-   }
-  }
- },
- "sfx_hud": {
-  "flow": "JYf2tnYdLwluhbLBj6Nh",
-  "modelo": "eleven_text_to_sound_v3",
-  "nota": "HUD nuevo (parte 2 del plan grande): carteles, ecos, espada de luz. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
-  "sonidos": {
-   "has_muerto": {
-    "prompt": "You died: a single deep ominous orchestral hit with low brass and a dark male choir swell, slow mournful decay with long cathedral reverb tail, epic dark fantasy, 5 seconds",
-    "sesiones": [
-     "wKy3LHOXKZl2pwgV5qNU",
-     "0c4QZ0lTOZqZ9w2VPNsb",
-     "adqsUpqK8fXaZVC6R7TI",
-     "9xEe668FQzuQzJTNPfZ7"
-    ]
-   },
-   "jefe_abatido": {
-    "prompt": "Great enemy felled: triumphant but somber victory sting, huge deep drum hit with a rising choir chord and shimmering golden resonance, long majestic reverb tail, epic dark fantasy, 5 seconds",
-    "sesiones": [
-     "A5SeIHwy442mwHklKacn",
-     "2im2Az1jBSmuhhfPjjJT",
-     "X5yNO1CS8eJU2Stscels",
-     "HxqwS1l4GUhVGQFx8ytr"
-    ]
-   },
-   "zona_descubierta": {
-    "prompt": "New land discovered: one deep resonant bell toll with a soft airy choir pad swelling behind it, mysterious and solemn, dark fantasy, 4 seconds",
-    "sesiones": [
-     "F8z1uFvhmsyEbMYVeso6",
-     "9Ie1L9EBOsPrXB6t5RNU",
-     "zxEoTlu1Jt8CEGmZlrjD",
-     "ycjE9KZm4SEvGyggbPKJ"
-    ]
-   },
-   "ecos_recuperados": {
-    "prompt": "Lost souls flowing back into a body: ethereal whoosh rushing inward with ghostly whispers, ending in a soft bright shimmering chime, dark fantasy, 3 seconds",
-    "sesiones": [
-     "EXQyjZlMP2t3HFBKoGIj",
-     "EbQIEllWbpBKorGryyU2",
-     "KA5AAElatgnGGV69nyYo",
-     "JgcrLLCEDryNLoNAsDCl"
-    ]
-   },
-   "ecos_ganados": {
-    "prompt": "Small soul absorbed: very short soft ethereal inward whoosh with a tiny dark shimmer, subtle and quiet, 1 second",
-    "sesiones": [
-     "NEn7LOYwStfjZhXLRP4h",
-     "mN6kzXajoF6jMT50e9Lz",
-     "cvVcKA5IaTitTq2LKM2c",
-     "Wvg39Wkai5waJodxLFxZ"
-    ]
-   },
-   "espada_luz": {
-    "prompt": "Sword of light planted in the ground humming: gentle sacred shimmering drone with faint high crystalline chimes, calm and steady, seamless loop, 4 seconds",
-    "sesiones": [
-     "U4zwXOjeEuqb4dRurmxz",
-     "eVn5YjfseKZZibgB1mZd",
-     "YanxKiB4l8tQZPuAzVBi",
-     "0yKTkSPK27kHILUCIsKS"
-    ]
-   },
-   "guardia_rota": {
-    "prompt": "Guard broken: a wooden shield knocked aside with a loud crack and metal clang, the fighter staggering back with a short breathless grunt, close, 1.5 seconds",
-    "sesiones": [
-     "GGV23s3XZid6Goii0ISP",
-     "PWr3JEkbV7rq1zLMBHUS",
-     "aKwyjHy9X9KKkYj3v9MF",
-     "G2q1PQKnmnu5jJwWu6ry"
-    ]
-   }
-  }
- },
- "sfx_santuario_menu": {
-  "flow": "JYf2tnYdLwluhbLBj6Nh",
-  "modelo": "eleven_text_to_sound_v3",
-  "nota": "Parte 2b del plan grande: santuarios, frascos, subir de nivel y sonidos de los menus. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
-  "sonidos": {
-   "santuario_enciende": {
-    "prompt": "Soul bonfire igniting: a deep airy whoosh as pale ghostly fire bursts to life in a stone brazier, followed by a low resonant bell tone and a soft ethereal choir shimmer, sacred and calm, dark fantasy, 4 seconds",
-    "sesiones": [
-     "ZnA9rGSsfaDcx0ZhrWs4",
-     "mlfAonarEbEUpztIUTAC",
-     "QaRzBhsvDF21bWbvA2sB",
-     "J6vx0QfI8A1N6G2rxubq"
-    ]
-   },
-   "santuario_fuego": {
-    "prompt": "Ghostly soul fire burning steadily in a stone brazier: soft low crackling flames with a faint airy ethereal hum, calm and constant, no music, seamless loop, 6 seconds",
-    "sesiones": [
-     "P3I9hK7Dk2FmaaCFVqej",
-     "Q9GcOL1n2SWkaPggrw7b",
-     "hyuvV9QXkO6d9b3UfUdc",
-     "D2dHKfVPgasSDhlwb0YJ"
-    ]
-   },
-   "santuario_descanso": {
-    "prompt": "Resting at a sacred bonfire: a warm gentle restorative swell, soft breath of wind, a single delicate chime and a low soothing choir pad fading out, peaceful, dark fantasy, 3 seconds",
-    "sesiones": [
-     "OopoAEcoEiXGvQKNtLbv",
-     "Mq9vuB4NFbPJEiYVoK5y",
-     "qAuEAhw0cEejmWyyGSQA",
-     "5rrjYBPcu5vJdiFmIZDg"
-    ]
-   },
-   "frasco_beber": {
-    "prompt": "Drinking a potion from a small glass flask: cork pop, two quick liquid gulps, a short relieved exhale, close microphone, dry, 1.5 seconds",
-    "sesiones": [
-     "aboPGVCsQu5q0mt4y7N7",
-     "GPqCEgFiTeABsGvmQpPR",
-     "8gIPoC6GQPuUVREHwWzs",
-     "IvJR1WUuPfOCpdpp6np5"
-    ]
-   },
-   "nivel_sube": {
-    "prompt": "Level up: a rising shimmering chime arpeggio blooming into a deep resonant choir chord with a soft golden sparkle tail, empowering and solemn, dark fantasy, 3 seconds",
-    "sesiones": [
-     "IMtJ4tOfc6KBEucobz60",
-     "Vd3IFubtLIgN7nvVVJvp",
-     "OPAfJJ9cHrvhw8s6HHFa",
-     "C7kt66UAKTXkeDuxJHKv"
-    ]
-   },
-   "menu_abre": {
-    "prompt": "Game menu opening: a heavy stone slab sliding aside with a short metal latch click, dry, dark fantasy interface sound, 0.7 seconds",
-    "sesiones": [
-     "Ox57hjCYDGIMoSNRJyfp",
-     "XyGj3DNg1dUWFTjRemxI",
-     "rUMV9ypZo0rPLvZoyczo",
-     "6gHclKV1w811ovjUrmY6"
-    ]
-   },
-   "menu_mueve": {
-    "prompt": "Game menu cursor move: one very short soft stone tick, subtle, dry, interface sound, 0.3 seconds",
-    "sesiones": [
-     "b6fglzNzj6mV4eyxt3Mp",
-     "T3AaXltGYrxiksgvBUlP",
-     "MysMZ3Id0aNIN8p0LEbI",
-     "ngE9YkVi2EdbAoQ8xgcj"
-    ]
-   },
-   "menu_acepta": {
-    "prompt": "Game menu confirm: a small metallic clink with a soft warm chime, short and satisfying, dry, dark fantasy interface sound, 0.5 seconds",
-    "sesiones": [
-     "Rq1CCLD4jtJhhdZgWaAX",
-     "NNNWuQ8GuHI8QIi3azyR",
-     "ngFMj2c1yD1VM5fsDgUH",
-     "7K9c5jYzK2FjtfRz50kW"
-    ]
-   },
-   "menu_cancela": {
-    "prompt": "Game menu cancel or close: a short low dull wooden thud with a faint stone scrape, dry, dark fantasy interface sound, 0.5 seconds",
-    "sesiones": [
-     "6fz4bO0nZ1kgaFSnrtkR",
-     "6ZlDtOd7kO0hbfmExwPE",
-     "VWoMwtZq38Vhh0qzd5Ud",
-     "GOP88en0qeCVpySpiwOE"
-    ]
-   }
-  }
- },
- "sfx_combate": {
-  "flow": "JYf2tnYdLwluhbLBj6Nh",
-  "modelo": "eleven_text_to_sound_v3",
-  "nota": "Parte 2c del plan grande: el combate propio (golpes, carga, impactos, voltereta, fijar objetivo, estocada, golpe en salto, aturdido y el esfuerzo). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
-  "sonidos": {
-   "golpe_ligero": {
-    "prompt": "A single fast one-handed sword swing: a sharp clean blade whoosh cutting through the air, close and dry, no impact, dark fantasy combat, 0.6 seconds",
-    "sesiones": [
-     "lLaFGlCbdhPpU6isq8rv",
-     "lP6Cb5CQ5dDqjp1kpdRu",
-     "jnRZSHk6OLkLnK0Aqwv0",
-     "sXP4Khym7iH7fLfi4eWK"
-    ]
-   },
-   "golpe_pesado": {
-    "prompt": "A single heavy two-handed greatsword swing: a deep powerful slow whoosh with real weight and a low rumble of moving steel, no impact, cinematic dark fantasy combat, 1 second",
-    "sesiones": [
-     "QpGWUEWmFsBb1vdhjVVx",
-     "5Bqg1Ye4mqSwdZIehMWG",
-     "V8QAyM6TIC2FNflSrUBk",
-     "sUr1fqhkqhXL6uTXpqzE"
-    ]
-   },
-   "carga_golpe": {
-    "prompt": "Charging up a heavy weapon attack: a rising tense metallic hum and grinding steel, a deep held breath, energy building steadily, no release at the end, dark fantasy, 1.3 seconds",
-    "sesiones": [
-     "PDmzudo0bRqugMp8vwfG",
-     "9HtPP6IRi7TboC8VtHFN",
-     "tJ32CgTOP4N81WHgtuBW",
-     "v7oWVyaBIbVR68LyMFK5"
-    ]
-   },
-   "impacto_carne": {
-    "prompt": "A sword slash connecting with a body: a punchy meaty cut impact with a short heavy thud, brutal but not gory, dark fantasy combat hit, 0.5 seconds",
-    "sesiones": [
-     "eIw7poIJUc1YZJoyX5O5",
-     "bzw2HlzoqfqUMm1LXd5l",
-     "KveWSAP3wPnRqPeKqAYT",
-     "io074sEJc9o0u9mFIkVf"
-    ]
-   },
-   "impacto_armadura": {
-    "prompt": "A blade striking heavy plate armor: a sharp metallic clang with a short ringing tail and gritty scrape, dark fantasy combat hit, 0.7 seconds",
-    "sesiones": [
-     "ud0SgWPqbtHUyqRQW7XJ",
-     "sYy8DTta6jHFnjS69eR1",
-     "KUAeRjW6xQciSjNcVEd2",
-     "3usRPHvz1w0RaKsOXfcx"
-    ]
-   },
-   "rodar": {
-    "prompt": "A quick combat dodge roll on a stone floor: a fast body tumble with cloth flapping and light armor rattling, a short scuff of boots at the end, close perspective, 0.7 seconds",
-    "sesiones": [
-     "gk2Y2BmqU6myTSCHl1oB",
-     "KYkYkEKpPmhEAIAxt8wo",
-     "ytkAxNWGANuxI4OZgZQc",
-     "FkGKgBOuCXsD1ybQjuwK"
-    ]
-   },
-   "fijar": {
-    "prompt": "A subtle lock-on target sound for a dark fantasy game interface: a soft low metallic click with a brief deep resonant shimmer, clean, 0.4 seconds",
-    "sesiones": [
-     "CHuzGUCBEEHVlPEKvOGW",
-     "hMNQ7rEAp4TnwXhTUo4W",
-     "YwGQjMbo7ZSZHxUECM94",
-     "bhr1SBZHgOIUAMKzYpzm"
-    ]
-   },
-   "estocada": {
-    "prompt": "A fast spear thrust: a sharp piercing whoosh of a long pole weapon stabbing straight forward, no impact, cinematic combat, 0.5 seconds",
-    "sesiones": [
-     "b2h8y92xienmHRNHtyEE",
-     "lSqwP0fjPg6uAvT5YgIv",
-     "gfVBP8b5oLLCPcNTHSvz",
-     "2NxDnVrpAzs1IEMwAd7b"
-    ]
-   },
-   "golpe_salto": {
-    "prompt": "A heavy jumping attack slamming a weapon down into stone ground: a deep thunderous impact with cracking stone and a puff of dust and debris, cinematic dark fantasy, 1.2 seconds",
-    "sesiones": [
-     "SrCB2AJNCJ1pMGtEVKlw",
-     "nVruGJtdyztTt5OIyGgn",
-     "kZohyLRjgEX3g1DNY91R",
-     "Xl72TbHJUEEmQ4jhz1uQ"
-    ]
-   },
-   "aturdido": {
-    "prompt": "An armored enemy staggered by a powerful blow: a strong heavy impact, the body reeling back with loud armor rattling and a pained grunt, dark fantasy combat, 1 second",
-    "sesiones": [
-     "8iKahycBJ1LOAdiKiUvW",
-     "qVOBuYis325eQtETr8Bt",
-     "rNSSFxGXq9JTBUiiXD1z",
-     "Zxy4oh6JYh3qgDmCmzQG"
-    ]
-   },
-   "esfuerzo": {
-    "prompt": "A male warrior's short effort grunt while swinging a heavy weapon with force, close microphone, dry, no words, 0.5 seconds",
-    "sesiones": [
-     "lJozTKMZT1UBhrRufdoU",
-     "FYJxiRIeLDefwAHNmEa9",
-     "dF362oFAaReTZVV3w7sW",
-     "bELDAV5QrbPBGazxnIFl"
-    ]
-   }
-  }
- },
- "sfx_rol": {
-  "flow": "JYf2tnYdLwluhbLBj6Nh",
-  "modelo": "eleven_text_to_sound_v3",
-  "nota": "Parte 2d del plan grande: comer un fruto y ponerse un talisman. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
-  "sonidos": {
-   "comer_fruto": {
-    "prompt": "A single quick crunchy bite into a juicy magical fruit, then a soft rising shimmering magical chime as its power flows into the body, close and dry, dark fantasy RPG item use sound, no music, 1.2 seconds",
-    "sesiones": [
-     "hro4d2dVzYHXbXJzqa3Q",
-     "T2qEp7rnFpmhA4dchLP2",
-     "F16kPvo957jrSQ8Hp6Zd",
-     "ZUGmRm9BwqwcuR0ejiZP"
-    ]
-   },
-   "talisman": {
-    "prompt": "Equipping an ancient heavy amulet: a soft clink of a gold chain and a metal medallion settling, followed by a faint low mystical hum of awakening power, dark fantasy RPG menu sound, no music, 1 second",
-    "sesiones": [
-     "AYd9K37oJdS2NqihtgXz",
-     "f0gmbJB9WH7gHvS8iVex",
-     "GoxLXz9X18tstaHgIHmN",
-     "cd3XeRF3dIKOei93TyTL"
-    ]
-   }
-  }
- },
- "sfx_hechizos": {
-  "flow": "JYf2tnYdLwluhbLBj6Nh",
-  "modelo": "eleven_text_to_sound_v3",
-  "nota": "Parte 2d-2 del plan grande: hechizos (lanzar, impacto, rayo, llamarada, curacion, bendicion). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
-  "sonidos": {
-   "hechizo_lanzar": {
-    "prompt": "Casting a dark sorcery spell from a staff: a quick rising magical whoosh with a crystalline shimmer and a low resonant hum, dark fantasy RPG spell cast, no music, 0.8 seconds",
-    "sesiones": [
-     "rkcgFfdrRnttOyxcjQmP",
-     "dYcsFcV4j6j0CpFdkR6a",
-     "TjieBoVjGDKPRfLR5fR5",
-     "smUM8WrxzutMe2FYZNiM"
-    ]
-   },
-   "hechizo_impacto": {
-    "prompt": "A magic projectile hitting its target: a sharp crystalline burst with a deep thump and fading sparkles, dark fantasy spell impact, no music, 0.8 seconds",
-    "sesiones": [
-     "DDHdEQHJJXQ7N2K30QkE",
-     "vjaxkyTXzYaxvS1oWE8H",
-     "KRH4dKA524djy5q9jc5Z",
-     "crXM5TkICcdovDxY4hPH"
-    ]
-   },
-   "hechizo_rayo": {
-    "prompt": "A spear of lightning hurled by a holy knight: a crackling electric zap and a short sharp thunder crack, dark fantasy miracle, no music, 1.2 seconds",
-    "sesiones": [
-     "a9yF41LWXT2AwDKOEtvM",
-     "VsWP9rdKh2QZKyoAxqZ4",
-     "1Vb7NpqPEcJJmRNVR6hg",
-     "4GCk4vM3LkjhWDrvPxIv"
-    ]
-   },
-   "hechizo_llama": {
-    "prompt": "A burst of sacred fire erupting from an open hand: a roaring whoosh of flames that flares and quickly dies down, dark fantasy incantation, no music, 1.2 seconds",
-    "sesiones": [
-     "7sres6cpxjb332NvWAYa",
-     "zOF0V6GeoHFLwWuPgNFb",
-     "2n46shMRQ3vixsp6KvKL",
-     "SnJ3mfFztCxuqX0XcRuD"
-    ]
-   },
-   "hechizo_curar": {
-    "prompt": "A healing miracle: a warm rising choir-like chime with soft golden sparkles and a gentle exhale of relief, dark fantasy RPG, no music, 1.8 seconds",
-    "sesiones": [
-     "EvZI0sWkk0Rb81Alw5rp",
-     "zHik3PxdzF5fRBmhPp8W",
-     "VIYuAlj5EI4AtSihuDGI",
-     "lIsJnmOulE21TIIJrnLt"
-    ]
-   },
-   "hechizo_bendicion": {
-    "prompt": "A holy blessing on a warrior: a short bright angelic choir swell with a resonant bell strike and shimmering light, dark fantasy RPG buff, no music, 1.6 seconds",
-    "sesiones": [
-     "RvqtOys4984WfSq3D99L",
-     "S9uH3Ot5GXVOAXwGX0kM",
-     "RzrawPNqpyHhidp7ktKb",
-     "VdhosNS0F9McDSFFt2Dj"
-    ]
-   }
-  }
- },
- "voz_guia": {
-  "flow": "FNZWSYJq2nK8zd5QwV5m",
-  "modelo": "eleven_v4",
-  "voz": "Autumn Veil (KoVIHoyLDrQyd4pGalbs)",
-  "nota": "Parte 2e-1: Maelis, la guia de los santuarios (voz de mujer serena). Frases 1-10, tomas a y b.",
-  "frases": {
-   "1": {
-    "prompt": "[softly] Another soul the Shadow has dragged back from the dark... [pause] You should be dead, marked one. And yet... the fire still answers to you.",
-    "sesiones": [
-     "optSBsCHbDgS4SV2fNqt",
-     "2854B4A90SwWTgygqrvv"
-    ]
-   },
-   "2": {
-    "prompt": "[calm] I am /ˈmeɪlɪs/. I tend the soul fires, as my sisters did... before Valdrenn fell to its oath.",
-    "sesiones": [
-     "b4UQQjyCim5Cr9LeSPXC",
-     "1P4x9GlmfrsOggIDUTSe"
-    ]
-   },
-   "3": {
-    "prompt": "[softly] Rest beside them when you can. The fire mends your flesh and fills your flasks... [pause] but the fallen will rise again.",
-    "sesiones": [
-     "FDto3lPLQmjZmdRjH4Jq",
-     "rOFU9NqnOhFbV9TDd9Ej"
-    ]
-   },
-   "4": {
-    "prompt": "[slowly] It is older than the kingdom. It feeds on broken oaths... [whispers] and it hungers for a door. Yours is the hand it chose to open it.",
-    "sesiones": [
-     "pSou2anxKTqhV3V5fz5I",
-     "5Z4L5f6qAiJ1YmAMnDMJ"
-    ]
-   },
-   "5": {
-    "prompt": "[softly] Because it needs you. Each time you fall, it pulls you back... and your echoes stay behind, in a sword of light. [pause] Do not lose them twice.",
-    "sesiones": [
-     "pT8XTMU3mx9lroUzBwgM",
-     "Q18s9bAdUzKA5Ypk54qq"
-    ]
-   },
-   "6": {
-    "prompt": "[warmly] Then give me the echoes you carry. I will weave them into your flesh... and your bones.",
-    "sesiones": [
-     "KBcNdYZzACEoabH9PzDf",
-     "D6D46aC63Gtk52r1bCRO"
-    ]
-   },
-   "7": {
-    "prompt": "[softly] May the fire keep you, marked one.",
-    "sesiones": [
-     "Z5JmUUfSMtg2LK6zVx6w",
-     "YOkk7TBnHjbQ2VXq5z7r"
-    ]
-   },
-   "8": {
-    "prompt": "[warmly] You have returned. Good... the fire was waiting for you.",
-    "sesiones": [
-     "PrndRfdgiYOHMSnECQxk",
-     "HXPHrFaIhbZsxhQNdKee"
-    ]
-   },
-   "9": {
-    "prompt": "[softly] The king's oath is broken at last. I felt every fire burn brighter... [whispers] and the Shadow grow hungrier.",
-    "sesiones": [
-     "WwlezGpGp98R6ZsuZHkP",
-     "rsljNH2gTCSf6aPZHnAC"
-    ]
-   },
-   "10": {
-    "prompt": "[sad] Ser Gavran kept his oath to the very end. Honor him, marked one... few in Valdrenn ever did.",
-    "sesiones": [
-     "2r2p9J4s6TQ0hlpcNbT4",
-     "IxQLPvx6jRkyDrRz5PsF"
-    ]
-   }
-  }
- },
- "voz_herrero": {
-  "flow": "Z7tLQ5a9GyPJPZD31AIa",
-  "modelo": "eleven_v4",
-  "voz": "Fjalar - Gruff Scottish Dwarf Warrior (TLS15X9bCEDl1vGoUK57)",
-  "nota": "Parte 2e-2: Dorvan, el herrero. Frases 1-8, tomas a y b.",
-  "frases": {
-   "1": {
-    "prompt": "[gruff] Hm. Another one crawling out of the dark with a dull blade... The name's Dorvan. I keep the forge of Valdrenn burning, oath or no oath.",
-    "sesiones": [
-     "BOzp9Sq4XiCOrfMRuq7z",
-     "cpcsWIR6CcJl5arVkhfD"
-    ]
-   },
-   "2": {
-    "prompt": "[gruff] Back again? Show me what you've been swinging.",
-    "sesiones": [
-     "u3s6bzoXuhP0prVp2qW1",
-     "XoQlK1d5Mu0XsN1OjzSx"
-    ]
-   },
-   "3": {
-    "prompt": "Bring me forging stones and echoes, and I'll make that steel sing.",
-    "sesiones": [
-     "lU4ylynfbL7iwM7EaHvz",
-     "YvaxKFLqgzxh5MAqCuRs"
-    ]
-   },
-   "4": {
-    "prompt": "[satisfied] There. Sharper than the day it was forged. Try not to break it on the first skull.",
-    "sesiones": [
-     "PuC2X6lzvuowUJkNjGwa",
-     "sJ9mTXbFEtm9YdKpXY5C"
-    ]
-   },
-   "5": {
-    "prompt": "[grumbling] You're short on stones, or on echoes. The forge doesn't work for free.",
-    "sesiones": [
-     "CmRGjDv7SEyME1KuqIx7",
-     "2Frik0wnWN5wxomSNVkq"
-    ]
-   },
-   "6": {
-    "prompt": "[sighs] The king swore an oath to something that should never have heard it. After that... the forge was all I had left to keep my hands from shaking.",
-    "sesiones": [
-     "keEx5kZAaCg2g6IP4rcl",
-     "n3nfNcEVGui49nGEbBJT"
-    ]
-   },
-   "7": {
-    "prompt": "[gruff] Off you go, then. And keep your guard up.",
-    "sesiones": [
-     "fJjioorkYyJbs8G8eNRZ",
-     "2sBdWCdVZG72LNrUuCSM"
-    ]
-   },
-   "8": {
-    "prompt": "[chuckles] That one's as good as it gets. Not even I can push it further.",
-    "sesiones": [
-     "rPwrFqZGb4whfsmPcGqA",
-     "HyTAGbHPRgIcvumMl71M"
-    ]
-   }
-  }
- },
- "voz_mercader": {
-  "flow": "Z7tLQ5a9GyPJPZD31AIa",
-  "modelo": "eleven_v4",
-  "voz": "Cornelius - Wise Sage (6sFKzaJr574YWVu4UuJF)",
-  "nota": "Parte 2e-2: Kerrick, el mercader. Frases 1-6, tomas a y b.",
-  "frases": {
-   "1": {
-    "prompt": "[cheerfully] Ah, a customer! And a living one, more or less. Kerrick's the name. If it can be carried, I've probably got it.",
-    "sesiones": [
-     "uC6naSVQrnOeeqQsDrAN",
-     "9URGzWyeQijGzKuZSCNj"
-    ]
-   },
-   "2": {
-    "prompt": "[warmly] Welcome back, friend! Echoes in your pocket, wares on my cart.",
-    "sesiones": [
-     "PMU9YnHwdGr59x5DBVCv",
-     "qXQuiSYLCh4U5n0K5LLQ"
-    ]
-   },
-   "3": {
-    "prompt": "[pleased] A fine choice. Spend it well... or don't, and come buy another.",
-    "sesiones": [
-     "mRloJws8tKRFrqVmA8D5",
-     "ibd8YU9PJU2t8OrisgKp"
-    ]
-   },
-   "4": {
-    "prompt": "[sighs] Ah... your purse is lighter than your ambition, friend.",
-    "sesiones": [
-     "FN0UsIbzaZzCvQI9yGJs",
-     "K22ocMj0RLZglulzA3zb"
-    ]
-   },
-   "5": {
-    "prompt": "[chuckles] The dead don't care much for my prices. The living do. So I stay close to the fires... and closer to my cart.",
-    "sesiones": [
-     "F8d8jJvdNEOdo3OZN8T6",
-     "Y2GBq1JtsZwWnd41CNM1"
-    ]
-   },
-   "6": {
-    "prompt": "Safe roads, friend. And if you find any... do tell me.",
-    "sesiones": [
-     "HgkdvD5K1DCWsBTpXZK8",
-     "eMfeZIIak7BXeXzdRa4O"
-    ]
-   }
-  }
- },
- "sfx_forja_tienda": {
-  "flow": "JYf2tnYdLwluhbLBj6Nh",
-  "modelo": "eleven_text_to_sound_v3",
-  "nota": "Parte 2e-2: golpe del herrero, mejorar un arma y comprar.",
-  "sonidos": {
-   "herrero_golpe": {
-    "sesiones": [
-     "pN3TsiewKQGoCXzNsesw",
-     "ctRZiKou0GHHOTxbb9cX",
-     "XMkgyuWAfUMchYQieNQk",
-     "d2x7WMpIcMXx5rigoVi2"
-    ]
-   },
-   "forja_mejora": {
-    "sesiones": [
-     "cRLHEQ87wuWXhs4T0Kms",
-     "WdW3OMrKQFem4wz6DEGf",
-     "UpeUStemMBRheNUpYaeq",
-     "ucqAqXknOM2SqGuZRmgv"
-    ]
-   },
-   "tienda_compra": {
-    "sesiones": [
-     "hdXzcWRtj42npbsqNQHW",
-     "zRImT3hsArDuu291Heyg",
-     "F9zro3lweY5Gnygz5Jiv",
-     "sI1rVW0FQUxTnuByWROO"
-    ]
-   }
-  }
- },
- "sfx_habilidades": {
-  "flow": "JYf2tnYdLwluhbLBj6Nh",
-  "modelo": "eleven_text_to_sound_v3",
-  "nota": "Parte 2e-3: habilidades de las armas (cenizas de guerra) y aplicar una ceniza en la forja. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
-  "sonidos": {
-   "habilidad_torbellino": {
-    "prompt": "A knight spins around with a sword in a full whirlwind attack: two fast circling metallic whooshes of the blade cutting the air, heavy and sharp, epic dark fantasy RPG weapon skill, no music, 1.0 seconds",
-    "sesiones": [
-     "uUHddYKCN0ikXwTiYUH4",
-     "qTyG9FnGqZbNz974MwAZ",
-     "P28whuZWm8HWRkzxq11l",
-     "JXSejgxgVqF8n2DWTwjk"
-    ]
-   },
-   "habilidad_estocada": {
-    "prompt": "A powerful lunging spear thrust: a fast rush of air, the swish of the long weapon driving forward and a sharp piercing impact, epic dark fantasy RPG weapon skill, no music, 0.9 seconds",
-    "sesiones": [
-     "ZBm0UIQVwiDMihjb452U",
-     "RqCoG4XKZhsV8IQOIVw0",
-     "kOkkJEJiuXaghg92BBKY",
-     "bzsfYLFu8uoD3EJJeggW"
-    ]
-   },
-   "habilidad_grito": {
-    "prompt": "A fierce warrior's war cry: one deep powerful male battle roar with a short echo, followed by a low magical surge of strength, epic dark fantasy RPG buff, no music, 1.6 seconds",
-    "sesiones": [
-     "bcl7mEbti6ze6aMwlMMs",
-     "7kbOO2XndYnnsVwdtcZO",
-     "MvfxFhRqPOW7PZ9ZGFfI",
-     "Xnm5OLYXYhuvAwlFXU05"
-    ]
-   },
-   "habilidad_sismo": {
-    "prompt": "A huge axe slammed into the ground after a jump: a massive earth-shaking boom, stone cracking and debris scattering, a deep rumbling shockwave, epic dark fantasy RPG weapon skill, no music, 1.8 seconds",
-    "sesiones": [
-     "xudIZeDYSSRJOG5NNqDj",
-     "5bj1T8hqJeKw10YfxVyU",
-     "vGz2H6xv2U8PK4rgr4lB",
-     "CboiEHyt1nZEEuxuvfuH"
-    ]
-   },
-   "habilidad_paso": {
-    "prompt": "A quick shadowy dash: a short dark magical whoosh with a soft ghostly hiss as someone blinks a few steps aside, dark fantasy RPG quickstep, no music, 0.6 seconds",
-    "sesiones": [
-     "H8mg7hYZPCetpO844JPw",
-     "1giF3iAYokl24xP39ZlU",
-     "tL2mw45zP6e3kbXpAfbR",
-     "2JRx3CXlNMmSLjhibtVu"
-    ]
-   },
-   "habilidad_llamas": {
-    "prompt": "A flaming sword slash: the blade ignites and sweeps in a wide arc with a roaring burst of fire and crackling embers, epic dark fantasy RPG weapon skill, no music, 1.2 seconds",
-    "sesiones": [
-     "YqjjpHYApAPvgYT7GMhv",
-     "FsToHg4ncvwz6cPF6Zgp",
-     "H2K9xDOTuOqJBAEynOzw",
-     "DadBjCDts872DoLJG2M8"
-    ]
-   },
-   "habilidad_escarcha": {
-    "prompt": "A frost blade slash: an icy crystalline whoosh with a gust of freezing wind and ice shards cracking and shattering, epic dark fantasy RPG weapon skill, no music, 1.2 seconds",
-    "sesiones": [
-     "eMOarZkKEHKKZTVWCTjc",
-     "TXQfi5senh513zuavZQx",
-     "Z4ZKgzDvrphHB1nJ8Wje",
-     "I45la2cV5AuldKZnDQRE"
-    ]
-   },
-   "habilidad_relampago": {
-    "prompt": "A lightning-infused sword strike: a crackling electric charge, a sharp blade swing and a bright snapping thunder crack, epic dark fantasy RPG weapon skill, no music, 1.2 seconds",
-    "sesiones": [
-     "51LIdmtfpDq8TvGjslIF",
-     "VbGUrAxf9E8HQOoPjDKx",
-     "oCsYtHpPVu7SKdgzcRIH",
-     "MdNpsaDr4UBKkjtNBnhU"
-    ]
-   },
-   "habilidad_sangre": {
-    "prompt": "A cursed bloody sword slash: a wet visceral swipe of the blade with a dark ominous pulse and a sinister low hum, epic dark fantasy RPG weapon skill, no music, 1.0 seconds",
-    "sesiones": [
-     "QKMZNabrsON4haoVw3kD",
-     "3DIgeD97XEV77UURp7Q5",
-     "KycIzh5d3ZEKbtBJm0UA",
-     "zuCdnzTt3lgrdiQtQOiv"
-    ]
-   },
-   "habilidad_parada": {
-    "prompt": "A perfect weapon parry: a sharp bright metallic clang as a blade deflects a heavy blow, with a ringing steel shimmer, epic dark fantasy RPG, no music, 0.8 seconds",
-    "sesiones": [
-     "HYx3KhqCcRLtIXEEj0VV",
-     "voouEymQJxcnQMLo4gsX",
-     "FlbTedCYq42HSfEAnFXy",
-     "gTVfNJtcnhzQzahaLto2"
-    ]
-   },
-   "ceniza_aplicar": {
-    "prompt": "Ashes of war infused into a weapon at a forge: glowing embers swirl into the blade with a rising magical whoosh, a soft metallic ring and a warm shimmering hum, dark fantasy RPG, no music, 2.0 seconds",
-    "sesiones": [
-     "ytoJ6R1LBnN1hC9bAfeu",
-     "41eXYmwjFL4N8xd0P8OY",
-     "2YADM2L75phr7WmNZLoe",
-     "rjoJ8fQY6ykO5QL2ppnm"
-    ]
-   }
-  }
- },
- "sfx_codice": {
-  "flow": "JYf2tnYdLwluhbLBj6Nh",
-  "modelo": "eleven_text_to_sound_v3",
-  "nota": "Parte 2e-4: el codice (abrir, pasar pagina y cerrar). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
-  "sonidos": {
-   "codice_pagina": {
-    "prompt": "Turning a single heavy page of an ancient parchment codex: a dry crisp rustle and a soft flap as the thick vellum page falls over, close and intimate, dark fantasy RPG menu, no music, 0.8 seconds",
-    "sesiones": [
-     "3XlcVNREbC31HcFEcbE2",
-     "J2GGsd4DGZZPPsmB54Ve",
-     "qUdHH1Pffv4ECM2JMPdq",
-     "DCGUCkGjsHB5852SSaEK"
-    ]
-   },
-   "codice_abre": {
-    "prompt": "Opening a large ancient leather-bound codex: the heavy cover creaks open, old leather and brittle binding, thick pages settling with a soft rustle and a faint puff of dust, dark fantasy RPG menu, no music, 1.2 seconds",
-    "sesiones": [
-     "wRkZHMNQLbl5eWn0O6qq",
-     "D6INW4YQjDU72mUOwlcu",
-     "OKQdKBCzEJI84okYWf6y",
-     "46gRQXvIj4CYyXMsrAdQ"
-    ]
-   },
-   "codice_cierra": {
-    "prompt": "Closing a large ancient leather-bound codex: the heavy cover shuts with a deep muffled thump, a creak of old leather and a small puff of dust, dark fantasy RPG menu, no music, 1.0 seconds",
-    "sesiones": [
-     "Zs3qzYM0amwcS1JC7AUo",
-     "q38ib5lePGKNZlHR5vaF",
-     "A7tzreOF5YxvfLhpiMpo",
-     "bn0eExBNe9jNd6oZubL0"
-    ]
-   }
-  }
- },
- "sfx_logro": {
-  "flow": "JYf2tnYdLwluhbLBj6Nh",
-  "modelo": "eleven_text_to_sound_v3",
-  "nota": "parte 2f-1: el aviso de los logros (los de desafio llevan la fanfarria de Minecraft)",
-  "sonidos": {
-   "logro": {
-    "prompt": "Dark fantasy achievement unlocked UI sound, epic cinematic Dark Souls style: a single deep resonant bronze bell toll with a bright shimmering magical chime on top and a soft airy choir breath swelling underneath, long reverb tail in a stone cathedral, about 2 seconds, clean, no music melody.",
-    "sesiones": [
-     "fzTGvXlCySt3HSt1i6E3",
-     "I2E6pkysOd2R5qQBJ5Eq",
-     "j4LR3sgT6GPUl2bOVEVh",
-     "o2GlyAffK8RrXcWmneLI"
-    ]
-   }
-  }
- },
- "sfx_brumavela": {
-  "flow": "JYf2tnYdLwluhbLBj6Nh",
-  "modelo": "eleven_text_to_sound_v3",
-  "nota": "Parte 3b: Brumavela (una pieza del barco encontrada, la losa de la cripta que se aparta y el barco reparado). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
-  "sonidos": {
-   "pieza_barco": {
-    "prompt": "Dark fantasy RPG item discovery sound, epic cinematic Dark Souls style: a single deep old ship's bell strike with a rising bright shimmering magical sparkle on top, a soft creak of old wood and rope underneath, long airy reverb tail, about 2.5 seconds, clean, no music melody.",
-    "sesiones": [
-     "AKqgijgofbN5I17MLuQg",
-     "79SbzaC6LCi4GrVtpC4K",
-     "kWJOpyh1rHZjpZLpBmjV",
-     "qlUbDtWcQKna1Y7jnWPt"
-    ]
-   },
-   "cripta_abre": {
-    "prompt": "A heavy ancient stone slab slowly grinding and sliding aside on the floor of a small stone chapel, revealing a crypt: deep scraping stone rumble, falling dust and grit, a low hollow ghostly exhale of cold air rising from below at the end, echo of a stone room, epic cinematic dark fantasy, about 4 seconds, no music.",
-    "sesiones": [
-     "Jr7aFnr42gNb4iZABuJW",
-     "GbyZaJ2mOmpcXMidUSA0",
-     "goSNXLi6xh21cO4KdBXm",
-     "Uw63kS8xyJROk4fwH7kA"
-    ]
-   },
-   "barco_reparado": {
-    "prompt": "An old wrecked wooden sailing ship comes back to life: heavy timbers creaking and settling into place, ropes pulled tight, a big canvas sail unfurling and snapping full of wind, then a deep magical hum swelling from inside the hull with a bright shimmering bell-like chime as it awakens; epic cinematic dark fantasy, Dark Souls style, about 5 seconds, no music melody.",
-    "sesiones": [
-     "nXmm9sVIKUtrFJlgtfot",
-     "ly2BpHgvqp4Aa8qZ8DY8",
-     "wwHrWochX5NbKuE1ADBy",
-     "9jz4Bq6A9l0irbjDkrIK"
-    ]
-   },
-   "brumavela_viento": {
-    "prompt": "Eerie lonely ambience of an abandoned fishing village on an island floating above a sea of clouds: a soft continuous airy high-altitude wind with slow swells, old wooden beams and a moored ship creaking gently, a loose rope tapping, a faint distant bell clank once, no voices, no birds, no music, dark fantasy, calm and desolate, 20 seconds.",
-    "sesiones": [
-     "3nmjszseYgvqDnxxbNEs",
-     "guDrG7lscRwlwlVCsU25",
-     "KLnwyRwyKsiNcelFBg7V",
-     "SmTtCJ4fxa71pNGmqp71"
-    ]
-   }
-  }
- }
 }
