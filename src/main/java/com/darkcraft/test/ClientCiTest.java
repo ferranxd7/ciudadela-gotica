@@ -3506,15 +3506,16 @@ public final class ClientCiTest {
             });
             shot(m, "cliente_va04_fila");
         });
-        // los golpes, cada uno de cerca (la camara, a dx,dz del que golpea; todos miran al norte, -z)
+        // los golpes, cada uno de cerca (la camara, a dx,dz del que golpea; todos miran al norte, -z; la camara, delante y
+        // un poco hacia fuera de la fila: si no, el de al lado se pone en medio)
         int G = t + 506;
         Object[][] golpes = {
-                {0, com.darkcraft.enemigos.GuardiaAnims.ESPADA_TAJO, 3.2, -3.0, 12, "cliente_va05_espada_alza", 17, "cliente_va06_espada_tajo"},
-                {0, com.darkcraft.enemigos.GuardiaAnims.ESPADA_BLOQUEA, -2.8, -3.2, 5, "cliente_va07_escudo", -1, null},
-                {1, com.darkcraft.enemigos.GuardiaAnims.ALABARDA_HACHAZO, 3.6, -2.8, 20, "cliente_va08_alabarda_alza", 24, "cliente_va09_hachazo"},
-                {2, com.darkcraft.enemigos.GuardiaAnims.BALLESTA_DISPARO, 3.0, -3.0, 16, "cliente_va10_ballesta_apunta", -1, null},
-                {3, com.darkcraft.enemigos.ArqueroAnims.DISPARO, 3.6, -1.4, 19, "cliente_va11_arquero_tensa", -1, null},
-                {3, com.darkcraft.enemigos.ArqueroAnims.PATADA, 2.8, -2.6, 9, "cliente_va12_arquero_patada", -1, null}};
+                {0, com.darkcraft.enemigos.GuardiaAnims.ESPADA_TAJO, -1.6, -3.2, 12, "cliente_va05_espada_alza", 17, "cliente_va06_espada_tajo"},
+                {0, com.darkcraft.enemigos.GuardiaAnims.ESPADA_BLOQUEA, -2.4, -2.4, 5, "cliente_va07_escudo", -1, null},
+                {1, com.darkcraft.enemigos.GuardiaAnims.ALABARDA_HACHAZO, 0.9, -3.8, 20, "cliente_va08_alabarda_alza", 24, "cliente_va09_hachazo"},
+                {2, com.darkcraft.enemigos.GuardiaAnims.BALLESTA_DISPARO, 0.7, -3.4, 16, "cliente_va10_ballesta_apunta", -1, null},
+                {3, com.darkcraft.enemigos.ArqueroAnims.DISPARO, 3.4, -1.2, 19, "cliente_va11_arquero_tensa", -1, null},
+                {3, com.darkcraft.enemigos.ArqueroAnims.PATADA, 1.6, -2.8, 9, "cliente_va12_arquero_patada", -1, null}};
         for (Object[] gp : golpes) {
             final int i = (int) gp[0], accion = (int) gp[1], c1 = (int) gp[4], c2 = (int) gp[6];
             final double cdx = (double) gp[2], cdz = (double) gp[3];
@@ -3540,7 +3541,7 @@ public final class ClientCiTest {
         atTicks(G, "Guardia: el de la espada cae", m -> server(m, sp -> {
             var e = fila(0);
             if (e == null) return;
-            verDesdeServidor = new Vec3(e.getX() + 3.4, e.getY() + 1.7, e.getZ() - 3.0);
+            verDesdeServidor = new Vec3(e.getX() - 2.2, e.getY() + 1.7, e.getZ() - 3.0);
             miraServidor = new Vec3(e.getX(), e.getY() + 0.5, e.getZ());
             e.hurt(sp.serverLevel().damageSources().generic(), 9999f);
         }));
