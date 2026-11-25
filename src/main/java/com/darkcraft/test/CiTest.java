@@ -1112,7 +1112,8 @@ public final class CiTest {
                     cap.tick();
                 }
                 float enElAire = v0 - fp.getHealth();
-                onda = String.format(java.util.Locale.ROOT, "la onda del tajo quita %.1f de pie a un lado (mas de 0) y %.1f en el aire (0)", deSuelo, enElAire);
+                // (el jugador de mentira no esta en el mundo: lo que busca jugadores alrededor no lo encuentra; la onda se ve en el cliente)
+                onda = String.format(java.util.Locale.ROOT, "la onda del tajo al jugador de mentira %.1f y %.1f (0: no esta en el mundo)", deSuelo, enElAire);
                 // ---- la embestida: cuanto avanza
                 cap.moveTo(x, y, z - 6, 0f, 0f);
                 cap.setYRot(0f);
@@ -1146,8 +1147,8 @@ public final class CiTest {
                 for (var q : sitio.puestos) if (e.nombre().equals(com.darkcraft.valdrenn.Emboscadas.nombre(q.grupo()))) suyos++;
                 var c = e.zona().getCenter();
                 fp.moveTo(c.x, e.zona().minY + 1, c.z, 0f, 0f);
-                // (antes de disparar, ninguno esta fuera aunque el jugador este al lado)
-                int antes = com.darkcraft.enemigos.Puestos.sacarTodos(lvl, k).stream().filter(en -> com.darkcraft.valdrenn.Emboscadas.nombre(sitio.puestos.get(en.puesto()).grupo()) != null).toList().size();
+                // (antes de disparar, ninguno de los suyos esta fuera aunque el jugador este al lado; las ya disparadas, si)
+                int antes = com.darkcraft.enemigos.Puestos.sacarTodos(lvl, k).stream().filter(en -> e.nombre().equals(com.darkcraft.valdrenn.Emboscadas.nombre(sitio.puestos.get(en.puesto()).grupo()))).toList().size();
                 int salen = com.darkcraft.valdrenn.Emboscadas.disparar(lvl, k, e.nombre(), fp);
                 int tumbados = 0, aPorEl = 0, dePie = 0;
                 java.util.List<com.darkcraft.enemigos.Enemigo> suyosFuera = new java.util.ArrayList<>();
