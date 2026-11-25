@@ -265,6 +265,11 @@ public class DarkCraftMod {
             () -> EntityType.Builder.<com.darkcraft.arbol.PuertaArbol>of(com.darkcraft.arbol.PuertaArbol::new, MobCategory.MISC).sized(7f, 10f)
                     .fireImmune().noSave().noSummon().clientTrackingRange(12).updateInterval(40).build(MODID + ":puerta_arbol"));
 
+    /** Maelis, la guia de los santuarios (sentada junto a los santuarios importantes). */
+    public static final RegistryObject<EntityType<com.darkcraft.personajes.Guia>> GUIA = ENTITIES.register("guia",
+            () -> EntityType.Builder.<com.darkcraft.personajes.Guia>of(com.darkcraft.personajes.Guia::new, MobCategory.MISC)
+                    .sized(0.8f, 1.3f).fireImmune().clientTrackingRange(10).build(MODID + ":guia"));
+
     /** Los hechizos que vuelan (guijarro, lanza, esquirlas, rayo): sin modelo, se ven por sus particulas. */
     public static final RegistryObject<EntityType<com.darkcraft.hechizos.ProyectilHechizo>> PROYECTIL = ENTITIES.register("proyectil_hechizo",
             () -> EntityType.Builder.<com.darkcraft.hechizos.ProyectilHechizo>of(com.darkcraft.hechizos.ProyectilHechizo::new, MobCategory.MISC)
@@ -329,6 +334,7 @@ public class DarkCraftMod {
         e.put(CABALLERO_ESPADA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
         e.put(CABALLERO_ALABARDA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
         e.put(CABALLERO_BALLESTA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
+        e.put(GUIA.get(), com.darkcraft.personajes.Guia.atributos().build());
     }
 
     private void setup(FMLCommonSetupEvent e) {

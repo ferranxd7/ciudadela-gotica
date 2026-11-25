@@ -308,6 +308,32 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   `cliente_hz01..hz15`; las `cliente_mNN` son las del Mandoble).
 - El mana pasa de 127 con la Mente alta: `Net.Energia` va en VarInt (antes un byte: con 208 el cliente veia -48).
 
+### Plan grande, parte 2e-1: dialogos y Maelis, la guia de los santuarios
+
+- **Maelis** (`personajes/Guia`, entidad `darkcraft:guia`, `MobCategory.MISC`, 0,8 x 1,3): sentada en el suelo junto a
+  los santuarios importantes (de momento el de la Fuente Mayor de cada Valdrenn: `Santuarios.valdrenn` la sienta una vez
+  a 2-3 bloques, de espaldas al fuego; `puestos` `reino:guia`), con un farol de almas en la mano. No se mueve, no recibe
+  dano (salvo lo que salta la invulnerabilidad, como /kill), no se empuja, mira a quien tenga cerca (solo gira la
+  cabeza: `BodyRotationControl` quieto), guarda su santuario. Modelo: `PlayerModel` de brazos finos con su piel
+  (`tools/personajes/guia.py` → `textures/entity/guia.png`; `tools/personajes/piel.py` = donde cae cada cara en una
+  piel de 64 x 64 y una vista de frente y espalda) en la postura de ir montado, las manos en el regazo y 0,75 mas abajo
+  (`client/personajes/GuiaRenderer`). Su retrato de 64 x 64: `textures/gui/retratos/guia.png` (mismo script).
+- **Dialogos** (`dialogo/Dialogos`, igual en servidor y cliente): cada personaje, nodos de frase (voz
+  `darkcraft:voz.<pj>.<n>` → `sounds/<pj>/voz_N.ogg`, subtitulo `darkcraft.dialogo.<pj>.<n>`, siguiente y una accion al
+  acabar) o un menu (nodo 100) de respuestas. `dialogo/Conversaciones` (servidor): de cerca (4,5) y sin estar en combate,
+  decide por donde empieza segun lo ya hablado (marcas en la ficha, `Ficha.dialogo`; Maelis: la primera vez 1-2-3, luego
+  8, y una vez 9 tras el Rey y 10 tras Gavran), da el logro `maelis` y manda `Net.Dialogo`; al acabar la frase 6
+  (`Accion.NIVEL`) el cliente manda `Net.DialogoAccion` y el servidor deja subir de nivel en el santuario de la guia
+  (`Santuarios.permitir`) y abre `NivelScreen` (`Net.AbrirNivel`).
+- **La pantalla** (`client/ui/DialogoScreen`): la caja de piedra abajo, el retrato en su hueco, el nombre en gotica y su
+  titulo, la frase que se escribe al ritmo de la voz (`voces.json`, que escribe `procesar.py`: lo que tarda en decir cada
+  frase) y [E] Seguir latiendo; menus con flechas, raton y las preguntas ya hechas mas apagadas. Voz sin posicion
+  (`SoundSource.VOICE`), se para al pasar de frase o cerrar. Se habla con la tecla del aviso (la E: "Pulsa [E] para
+  hablar", `client/personajes/ClientPersonajes` mira si se la tiene delante, cono de 26 grados) o con clic derecho.
+- Voz (ElevenLabs, `eleven_v4`): **"Autumn Veil"** `KoVIHoyLDrQyd4pGalbs` (mujer serena), flow `FNZWSYJq2nK8zd5QwV5m`;
+  10 frases (tomas a y b, se usa la a: `TOMAS_GUIA`); en `procesar.py` `VOZ_GUIA` (cerca, un poco de aire de piedra).
+- Comandos `/darkcraft rol guia [olvidar]`. La prueba del cliente tiene el tramo `dialogos()` (capturas `cliente_d01..d10`).
+
 ## Compilar, probar y publicar
 
 - La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (con y sin mods) y un cliente con capturas

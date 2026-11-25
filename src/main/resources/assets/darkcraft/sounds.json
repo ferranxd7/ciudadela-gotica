@@ -1219,5 +1219,95 @@
         "name": "darkcraft:sfx/hechizo_bendicion_2"
       }
     ]
+  },
+  "voz.guia.1": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_1",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.2": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_2",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.3": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_3",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.4": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_4",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.5": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_5",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.6": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_6",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.7": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_7",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.8": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_8",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.9": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_9",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.10": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_10",
+        "stream": true
+      }
+    ]
   }
 }

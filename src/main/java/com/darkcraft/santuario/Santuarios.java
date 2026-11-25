@@ -71,6 +71,31 @@ public final class Santuarios {
         return st.getBlock() instanceof SantuarioBlock && st.getValue(SantuarioBlock.ENCENDIDO);
     }
 
+    /**
+     * Deja al jugador como si hubiera descansado en el santuario de {@code pos} para sus menus (subir de nivel,
+     * memorizar), sin curarle ni lo demas: lo usa la guia ("quiero hacerme mas fuerte").
+     */
+    public static boolean permitir(ServerPlayer sp, BlockPos pos) {
+        BlockState st = sp.level().getBlockState(pos);
+        if (!(st.getBlock() instanceof SantuarioBlock) || !st.getValue(SantuarioBlock.ENCENDIDO)) return false;
+        DESCANSO.put(sp.getUUID(), GlobalPos.of(sp.level().dimension(), pos.immutable()));
+        return true;
+    }
+
+    /** El santuario encendido mas cercano a {@code centro} (a {@code radio} bloques como mucho), o null. */
+    public static BlockPos encendidoCerca(ServerLevel lvl, BlockPos centro, int radio) {
+        BlockPos mejor = null;
+        double d = Double.MAX_VALUE;
+        for (BlockPos q : BlockPos.betweenClosed(centro.offset(-radio, -3, -radio), centro.offset(radio, 3, radio))) {
+            BlockState st = lvl.getBlockState(q);
+            if (st.getBlock() instanceof SantuarioBlock && st.getValue(SantuarioBlock.ENCENDIDO) && q.distSqr(centro) < d) {
+                d = q.distSqr(centro);
+                mejor = q.immutable();
+            }
+        }
+        return mejor;
+    }
+
     // ------------------------------------------------------------------ usar uno
 
     /** El jugador usa el santuario de {@code pos} (clic derecho o la tecla del aviso). */
@@ -231,6 +256,21 @@ public final class Santuarios {
             if (sitio == null) continue;
             hecho(lvl, d, k, sitio, "darkcraft.santuario." + v[0]);
         }
+        // la guia, sentada junto al santuario de la fuente (una vez; si alguien la quita, no vuelve sola)
+        String kg = reino + ":guia";
+        if (!d.puestos.containsKey(kg)) {
+            BlockPos f = deSitio(p.server, reino + ":fuente");
+            if (f != null && f.distToCenterSqr(p.position()) < 40 * 40 && lvl.isLoaded(f)) {
+                BlockPos sitio = junto(lvl, f);
+                // de espaldas al fuego, mirando a quien llega
+                BlockPos mira = sitio == null ? null : sitio.offset(sitio.getX() - f.getX(), 0, sitio.getZ() - f.getZ());
+                if (sitio != null && com.darkcraft.personajes.Guia.poner(lvl, sitio, mira, f) != null) {
+                    d.puestos.put(kg, sitio.getX() + "," + sitio.getY() + "," + sitio.getZ());
+                    d.setDirty();
+                    DarkCraftMod.LOGGER.info("[DarkCraft] La guia, junto al santuario de la fuente: {}", sitio.toShortString());
+                }
+            }
+        }
         // el de la recepcion del arbol: dentro del tronco, a un lado de la fuente (antes de la puerta de Ser Gavran)
         String k = reino + ":arbol";
         if (!d.puestos.containsKey(k)) {
@@ -241,6 +281,19 @@ public final class Santuarios {
                 if (sitio != null) hecho(lvl, d, k, sitio, "darkcraft.santuario.arbol");
             }
         }
+    }
+
+    /** Un sitio a dos o tres bloques del santuario (suelo firme y dos de aire) para sentar a la guia. */
+    public static BlockPos junto(ServerLevel lvl, BlockPos s) {
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        for (int r = 2; r <= 3; r++)
+            for (int k = 0; k < r * 8; k++) {
+                double a = k * Math.PI * 2 / (r * 8) + Math.PI / 4;
+                int x = s.getX() + (int) Math.round(Math.cos(a) * r), z = s.getZ() + (int) Math.round(Math.sin(a) * r);
+                for (int y = s.getY() - 1; y <= s.getY() + 1; y++)
+                    if (suelo(lvl, m, x, y, z)) return new BlockPos(x, y, z);
+            }
+        return null;
     }
 
     /** El de la Fortaleza de Hueso: en el rellano de la puerta, a un lado (cuando la fortaleza esta levantada). */

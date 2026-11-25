@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "11";
+    private static final String V = "12";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -104,6 +104,14 @@ public final class Net {
                 .encoder(Lanzar::write).decoder(Lanzar::read).consumerMainThread(Lanzar::handle).add();
         CH.messageBuilder(Memorizar.class, id++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(Memorizar::write).decoder(Memorizar::read).consumerMainThread(Memorizar::handle).add();
+        CH.messageBuilder(Hablar.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Hablar::write).decoder(Hablar::read).consumerMainThread(Hablar::handle).add();
+        CH.messageBuilder(Dialogo.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Dialogo::write).decoder(Dialogo::read).consumerMainThread(Dialogo::handle).add();
+        CH.messageBuilder(DialogoAccion.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(DialogoAccion::write).decoder(DialogoAccion::read).consumerMainThread(DialogoAccion::handle).add();
+        CH.messageBuilder(AbrirNivel.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder((m, b) -> {}).decoder(b -> new AbrirNivel()).consumerMainThread(AbrirNivel::handle).add();
     }
 
     // ------------------------------------------------------------------ hechizos
@@ -121,6 +129,69 @@ public final class Net {
         void handle(Supplier<NetworkEvent.Context> ctx) {
             ServerPlayer p = ctx.get().getSender();
             if (p != null) com.darkcraft.hechizos.Lanzar.pedir(p, id);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    // ------------------------------------------------------------------ hablar con los personajes
+
+    /** El jugador quiere hablar con el personaje {@code entidad} (la tecla del aviso). */
+    public record Hablar(int entidad) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entidad);
+        }
+
+        static Hablar read(FriendlyByteBuf b) {
+            return new Hablar(b.readVarInt());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.dialogo.Conversaciones.hablar(p, entidad);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Empieza una conversacion con el personaje {@code entidad} por el nodo {@code nodo}. */
+    public record Dialogo(int entidad, String personaje, int nodo) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entidad);
+            b.writeUtf(personaje, 32);
+            b.writeVarInt(nodo);
+        }
+
+        static Dialogo read(FriendlyByteBuf b) {
+            return new Dialogo(b.readVarInt(), b.readUtf(32), b.readVarInt());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.DialogoScreen.abrir(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Al acabar una frase con accion (subir de nivel con la guia...), el cliente se lo pide al servidor. */
+    public record DialogoAccion(int entidad, String accion) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entidad);
+            b.writeUtf(accion, 32);
+        }
+
+        static DialogoAccion read(FriendlyByteBuf b) {
+            return new DialogoAccion(b.readVarInt(), b.readUtf(32));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.dialogo.Conversaciones.accion(p, entidad, accion);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Se abre subir de nivel (lo pide la guia). */
+    public record AbrirNivel() {
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.DialogoScreen.abrirNivel());
             ctx.get().setPacketHandled(true);
         }
     }

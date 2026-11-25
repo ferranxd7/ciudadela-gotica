@@ -41,6 +41,11 @@ VOZ_GAVRAN = ("highpass=f=55,equalizer=f=120:t=q:w=1.0:g=3," + ECO_CUPULA + ","
 VOZ = ("highpass=f=65," + ECO_SALA + ",acompressor=threshold=-20dB:ratio=2.5:attack=5:release=120,"
        "loudnorm=I=-15:TP=-1.5:LRA=9")
 
+# Maelis, la guia de los santuarios (voz "Autumn Veil"): serena y cerca, con un poco de aire de piedra
+TOMAS_GUIA = {n: "a" for n in range(1, 11)}
+VOZ_GUIA = ("highpass=f=70,equalizer=f=3200:t=q:w=1.2:g=1.5,aecho=0.8:0.35:38|85:0.10|0.05,"
+            "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=160,loudnorm=I=-16:TP=-1.5:LRA=9")
+
 # efectos: nombre -> (segundos como mucho, fundido final en s, volumen integrado LUFS)
 SFX = {
     "rey_tajo": (1.4, 0.25, -14), "rey_tajo_fuego": (2.8, 0.6, -15), "rey_bola_fuego": (2.4, 0.5, -15),
@@ -283,6 +288,28 @@ def main():
             print(f"FALLO gavran {n}: {e}")
     with open(os.path.join(ASSETS, "rey_voces.json"), "w") as fh:
         json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g}, fh)
+    # los personajes (de momento, la guia): voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el
+    # texto del dialogo se escriba a su ritmo)
+    voces = {"guia": {}}
+    guia = os.path.join(ASSETS, "sounds", "guia")
+    os.makedirs(guia, exist_ok=True)
+    for n, toma in sorted(TOMAS_GUIA.items()):
+        src = os.path.join(MASTER, "guia", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(guia, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            pre, _, hablado = recorte(src)
+            ff(["-i", src, "-af", pre + VOZ_GUIA, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+            voces["guia"][str(n)] = round(min(hablado + COLA, duracion(dst)), 2)
+            print(f"guia {n:2d}: {duracion(dst):.2f} s (habla hasta {voces['guia'][str(n)]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO guia {n}: {e}")
+    with open(os.path.join(ASSETS, "voces.json"), "w") as fh:
+        json.dump(voces, fh)
     for nombre, (maxs, fade, lufs) in SFX.items():
         tomas = TOMAS_SFX.get(nombre) or ((1,) if nombre in UNA_TOMA else (1, 2))
         for i, k in enumerate(tomas, 1):

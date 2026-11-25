@@ -123,7 +123,7 @@ jobs:
           grep -nE "Error construyendo|Exception" out/server_vanilla.log | head -100 > out/vanilla/errores.txt || true
 
       - name: Prueba del cliente (capturas y sonido grabado)
-        timeout-minutes: 46
+        timeout-minutes: 48
         run: |
           sudo apt-get install -y -qq xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils python3-numpy python3-pil > /dev/null 2>&1 || true
           rm -rf run && mkdir -p run/saves run/config run/screenshots
@@ -133,7 +133,7 @@ jobs:
           sed "s#@WAV@#$PWD/out/audio_cliente.wav#" ci/cliente/alsoft.conf > "$RUNNER_TEMP/alsoft.conf"
           export ALSOFT_CONF="$RUNNER_TEMP/alsoft.conf" LIBGL_ALWAYS_SOFTWARE=1 DARKCRAFT_CLIENTE=1
           xvfb-run -a -s "-screen 0 1280x720x24" glxinfo -B > out/cliente_gl.txt 2>&1 || true
-          timeout 37m xvfb-run -a -s "-screen 0 1280x720x24" gradle runClient --no-daemon > out/cliente.log 2>&1 || echo "cliente terminado con error $?" >> out/cliente.log
+          timeout 39m xvfb-run -a -s "-screen 0 1280x720x24" gradle runClient --no-daemon > out/cliente.log 2>&1 || echo "cliente terminado con error $?" >> out/cliente.log
           cp run/ci-cliente/* out/ 2>/dev/null || true
           python3 ci/cliente/hoja.py run/screenshots out || true
           for f in run/screenshots/cliente_*.png; do [ -f "$f" ] && cp "$f" out/; done

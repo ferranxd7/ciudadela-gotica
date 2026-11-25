@@ -43,7 +43,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 23 * 60 * 20;
+    private static final int LIMIT = 25 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -1982,6 +1982,145 @@ public final class ClientCiTest {
         return t + 510;
     }
 
+    // ------------------------------------------------------------------ dialogos: Maelis, la guia de los santuarios
+
+    private static com.darkcraft.personajes.Guia guiaPrueba;
+
+    private static void logDialogo(Minecraft m, String what) {
+        String pantalla = m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName();
+        if (m.screen instanceof com.darkcraft.client.ui.DialogoScreen d) pantalla += " [" + d.resumen() + "]";
+        log("  dialogo " + what + " (cliente): a mano " + com.darkcraft.client.personajes.ClientPersonajes.aMano + " (aviso " + com.darkcraft.client.ui.ClientRol.aMano()
+                + ") | cartel: " + com.darkcraft.client.ui.Carteles.resumen() + " | pantalla: " + pantalla);
+        server(m, sp -> log("  dialogo " + what + " (servidor): guia " + (guiaPrueba == null ? "-" : (guiaPrueba.isAlive() ? "viva" : "quitada")
+                + String.format(java.util.Locale.ROOT, " en %.1f, %.1f, %.1f cabeza %.0f cuerpo %.0f", guiaPrueba.getX(), guiaPrueba.getY(), guiaPrueba.getZ(),
+                guiaPrueba.getYHeadRot(), guiaPrueba.yBodyRot) + " santuario " + guiaPrueba.santuario())
+                + " | logro maelis " + com.darkcraft.story.Logros.tiene(sp, "maelis") + " | junto " + com.darkcraft.santuario.Santuarios.junto(sp)
+                + " | ecos " + com.darkcraft.rol.Ficha.ecos(sp)));
+    }
+
+    private static void dialogo(Minecraft m, java.util.function.Consumer<com.darkcraft.client.ui.DialogoScreen> r) {
+        if (m.screen instanceof com.darkcraft.client.ui.DialogoScreen d) r.accept(d);
+        else log("  FALLO: no esta el dialogo (pantalla " + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()) + ")");
+    }
+
+    private static int dialogos(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Dialogos: supervivencia, Maelis sentada junto a un santuario encendido", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = false;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.getInventory().clearContent();
+                sp.removeAllEffects();
+                comando(sp, "darkcraft rol nivel reiniciar");
+                comando(sp, "darkcraft ecos quitar");
+                comando(sp, "darkcraft ecos dar 4000");
+                com.darkcraft.dialogo.Conversaciones.olvidar(sp);
+                lvl.setDayTime(13500);
+                santuarioPrueba = BlockPos.containing(ex + 2.0, ey, ez - 1.0);
+                com.darkcraft.santuario.Santuarios.poner(lvl, santuarioPrueba, "darkcraft.santuario.fuente");
+                var st = lvl.getBlockState(santuarioPrueba);
+                if (st.getBlock() instanceof com.darkcraft.santuario.SantuarioBlock)
+                    lvl.setBlock(santuarioPrueba, st.setValue(com.darkcraft.santuario.SantuarioBlock.ENCENDIDO, true), 3);
+                BlockPos g = BlockPos.containing(ex, ey, ez - 1.0);
+                guiaPrueba = com.darkcraft.personajes.Guia.poner(lvl, g, BlockPos.containing(ex, ey, ez - 4.0), santuarioPrueba);
+                sp.setHealth(sp.getMaxHealth());
+                // a 3 bloques, mirandola (la cabeza le queda a 0,75 del suelo)
+                sp.teleportTo(lvl, ex, ey, ez - 4.0, 0f, 17f);
+                sp.setDeltaMovement(Vec3.ZERO);
+            });
+        });
+        atTicks(t + 40, "al empezar", m -> logDialogo(m, "al empezar"));
+        atTicks(t + 42, "de frente y de cerca, sin el HUD", m -> {
+            m.options.hideGui = true;
+            verDesde(m, new Vec3(ex + 1.3, ey + 1.25, ez - 3.0), new Vec3(ex, ey + 0.55, ez - 1.0));
+        });
+        atTicks(t + 60, "captura: Maelis sentada", m -> shot(m, "cliente_d01_guia"));
+        atTicks(t + 62, "de lado", m -> verDesde(m, new Vec3(ex - 2.8, ey + 1.0, ez - 1.4), new Vec3(ex, ey + 0.5, ez - 1.0)));
+        atTicks(t + 76, "captura: de lado", m -> shot(m, "cliente_d02_guia_lado"));
+        atTicks(t + 80, "primera persona, mirandola: el aviso", m -> enPrimeraPersona(m));
+        atTicks(t + 94, "captura: Pulsa [E] para hablar", m -> {
+            logDialogo(m, "mirandola");
+            shot(m, "cliente_d03_aviso");
+        });
+        atTicks(t + 96, "fuera de combate (el golpe de la curacion)", m -> server(m, com.darkcraft.rol.Rol::sinCombate));
+        atTicks(t + 98, "la E: hablar", m -> pulsar(m.options.keyInventory));
+        atTicks(t + 118, "captura: la primera frase, escribiendose", m -> {
+            logDialogo(m, "primera frase");
+            shot(m, "cliente_d04_escribiendo");
+        });
+        atTicks(t + 150, "E: acabar de escribirla", m -> dialogo(m, com.darkcraft.client.ui.DialogoScreen::pulsarSeguir));
+        atTicks(t + 156, "captura: la frase entera con [E] Seguir", m -> {
+            logDialogo(m, "frase entera");
+            shot(m, "cliente_d05_frase");
+        });
+        atTicks(t + 160, "E: la segunda", m -> dialogo(m, com.darkcraft.client.ui.DialogoScreen::pulsarSeguir));
+        atTicks(t + 200, "E, E: la tercera", m -> dialogo(m, d -> {
+            d.pulsarSeguir();
+            d.pulsarSeguir();
+        }));
+        atTicks(t + 240, "E, E: el menu", m -> dialogo(m, d -> {
+            d.pulsarSeguir();
+            d.pulsarSeguir();
+        }));
+        atTicks(t + 250, "captura: las respuestas", m -> {
+            logDialogo(m, "menu");
+            shot(m, "cliente_d06_menu");
+        });
+        atTicks(t + 254, "la primera: que es la Sombra", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        atTicks(t + 300, "captura: la Sombra", m -> {
+            logDialogo(m, "la sombra");
+            shot(m, "cliente_d07_sombra");
+        });
+        atTicks(t + 304, "E, E: al menu otra vez", m -> dialogo(m, d -> {
+            d.pulsarSeguir();
+            d.pulsarSeguir();
+        }));
+        atTicks(t + 312, "captura: el menu con la pregunta ya hecha", m -> {
+            logDialogo(m, "menu otra vez");
+            shot(m, "cliente_d08_menu_preguntada");
+        });
+        atTicks(t + 316, "quiero hacerme mas fuerte", m -> dialogo(m, d -> d.pulsarRespuesta(2)));
+        atTicks(t + 360, "E, E: dame tus ecos (y subir de nivel)", m -> dialogo(m, d -> {
+            d.pulsarSeguir();
+            d.pulsarSeguir();
+        }));
+        atTicks(t + 376, "captura: subir de nivel con la guia", m -> {
+            logDialogo(m, "subir de nivel");
+            shot(m, "cliente_d09_nivel");
+        });
+        atTicks(t + 380, "cerrar; hablar otra vez", m -> {
+            m.setScreen(null);
+        });
+        atTicks(t + 390, "la E otra vez", m -> pulsar(m.options.keyInventory));
+        atTicks(t + 420, "captura: has vuelto", m -> {
+            logDialogo(m, "otra vez");
+            shot(m, "cliente_d10_vuelta");
+        });
+        atTicks(t + 424, "ESC", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE));
+        atTicks(t + 430, "tras ESC", m -> logDialogo(m, "cerrado"));
+        atTicks(t + 434, "Fin de los dialogos", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = true;
+            server(m, sp -> {
+                if (guiaPrueba != null) guiaPrueba.discard();
+                guiaPrueba = null;
+                if (santuarioPrueba != null) sp.serverLevel().removeBlock(santuarioPrueba, false);
+                sp.setRespawnPosition(net.minecraft.world.level.Level.OVERWORLD, null, 0f, false, false);
+                sp.serverLevel().setDayTime(6000);
+                comando(sp, "darkcraft rol nivel reiniciar");
+                comando(sp, "darkcraft ecos quitar");
+                sp.getInventory().clearContent();
+                sp.setHealth(sp.getMaxHealth());
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 450;
+    }
+
     private static void logArmasAt(int t, String what) {
         atTicks(t, "estado de las armas " + what, m -> logArmas(m, what));
     }
@@ -2000,6 +2139,7 @@ public final class ClientCiTest {
         fin = combate(fin);
         fin = talismanes(fin);
         fin = hechizos(fin);
+        fin = dialogos(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

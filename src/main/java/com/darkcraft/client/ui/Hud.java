@@ -375,6 +375,8 @@ public final class Hud {
         if (avisoQue == ClientRol.ESPADA)
             aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable("darkcraft.aviso.recuperar.despues"),
                     Component.literal(numero(ClientRol.ecosEspada)));
+        else if (avisoQue == ClientRol.PERSONAJE)
+            aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable("darkcraft.aviso.hablar"), null);
         else
             aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla,
                     Component.translatable(avisoEncendido ? "darkcraft.aviso.descansar" : "darkcraft.aviso.encender"), null);

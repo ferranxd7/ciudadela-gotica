@@ -243,7 +243,8 @@ public final class ClientRol {
                 while (mc.options.keyInventory.consumeClick()) pulsada = true;
                 if (pulsada && enfriamiento <= 0) {
                     if (que == ESPADA) Net.CH.sendToServer(new Net.Recuperar());
-                    else if (ClientSantuario.aMano != null) Net.CH.sendToServer(new Net.SantuarioUsar(ClientSantuario.aMano));
+                    else if (que == SANTUARIO && ClientSantuario.aMano != null) Net.CH.sendToServer(new Net.SantuarioUsar(ClientSantuario.aMano));
+                    else if (que == PERSONAJE) Net.CH.sendToServer(new Net.Hablar(com.darkcraft.client.personajes.ClientPersonajes.aMano));
                     enfriamiento = 12;
                 }
             }
@@ -255,6 +256,7 @@ public final class ClientRol {
         if (enfriamientoFrasco > 0) enfriamientoFrasco--;
         frascos(mc);
         ClientSantuario.tick(mc);
+        com.darkcraft.client.personajes.ClientPersonajes.tick(mc);
         Bebida.tick(mc);
         Conseguidos.tick();
         // el contador cuenta hacia lo que hay (lo que aun viene volando no cuenta hasta que llega)
@@ -271,11 +273,12 @@ public final class ClientRol {
     }
 
     /** Lo que el jugador tiene a mano para la tecla del aviso. */
-    public static final int NADA = 0, ESPADA = 1, SANTUARIO = 2;
+    public static final int NADA = 0, ESPADA = 1, SANTUARIO = 2, PERSONAJE = 3;
 
     public static int aMano() {
         if (juntoAEspada()) return ESPADA;
-        return ClientSantuario.aMano != null ? SANTUARIO : NADA;
+        if (ClientSantuario.aMano != null) return SANTUARIO;
+        return com.darkcraft.client.personajes.ClientPersonajes.aMano >= 0 ? PERSONAJE : NADA;
     }
 
     /** Las teclas de los frascos: se pide beber (el servidor dice si se puede). */

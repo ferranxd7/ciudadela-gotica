@@ -711,10 +711,24 @@ public final class Rol {
             p.getInventory().add(new net.minecraft.world.item.ItemStack(DarkCraftMod.SELLO_SAGRADO.get()));
             return verHechizos(c.getSource(), p);
         }));
+        // la guia: sentarla delante (mirando al jugador; recuerda el santuario encendido que haya cerca) u olvidar lo hablado
+        var guia = Commands.literal("guia").executes(c -> {
+            ServerPlayer p = c.getSource().getPlayerOrException();
+            ServerLevel lvl = p.serverLevel();
+            BlockPos pos = p.blockPosition().relative(p.getDirection(), 2);
+            com.darkcraft.personajes.Guia g = com.darkcraft.personajes.Guia.poner(lvl, pos, p.blockPosition(),
+                    com.darkcraft.santuario.Santuarios.encendidoCerca(lvl, pos, 8));
+            c.getSource().sendSuccess(() -> Component.literal(g == null ? "-" : "guia en " + pos.toShortString()), false);
+            return g == null ? 0 : 1;
+        }).then(Commands.literal("olvidar").executes(c -> {
+            com.darkcraft.dialogo.Conversaciones.olvidar(c.getSource().getPlayerOrException());
+            return 1;
+        }));
         return Commands.literal("rol")
                 .then(talisman)
                 .then(fruto)
                 .then(hechizo)
+                .then(guia)
                 .then(Commands.literal("resistencias").executes(c -> {
                     ServerPlayer p = c.getSource().getPlayerOrException();
                     StringBuilder b = new StringBuilder();

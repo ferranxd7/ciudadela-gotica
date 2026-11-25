@@ -36,6 +36,20 @@ public final class Ficha {
         return f;
     }
 
+    // ------------------------------------------------------------------ lo hablado con los personajes
+
+    /** Lo que ya se ha hablado con un personaje (marcas de bits; NBT {@code dialogos}). */
+    public static int dialogo(Player p, String personaje) {
+        return leer(p).getCompound("dialogos").getInt(personaje);
+    }
+
+    public static void dialogo(Player p, String personaje, int marcas) {
+        CompoundTag f = abrir(p);
+        CompoundTag d = f.getCompound("dialogos");
+        d.putInt(personaje, marcas);
+        f.put("dialogos", d);
+    }
+
     // ------------------------------------------------------------------ ecos
 
     public static int ecos(Player p) {
