@@ -1631,5 +1631,223 @@
         ]
       }
     }
+  },
+  "voz_sombra": {
+    "flow": "AqkIj7OE07LCh5cMIoZU",
+    "voz": "Grav - Deep, Dark & Sinister (6qtlupOXBYtv2nYY2VgL)",
+    "modelo": "eleven_v4",
+    "nota": "Parte 3d: la voz de la Sombra (elegida entre Obsidian, Grav y Romulus II: Grav es la mas grave, F0 ~83 Hz). Frases 1-6 = cinematica de inicio; 7-9 = viaje a Valdrenn. Cada frase: voz (tomas a, b) y susurro (tomas a, b) para la capa de susurros.",
+    "muestras": {
+      "obsidian": [
+        "ueTqN9o3KYFu4MZmQCb8",
+        "0cBDnBPi45gb9Q6cp8yz"
+      ],
+      "grav": [
+        "9N99DTF7zskJzVO2lDfA",
+        "rRQtAMSjqCpRqwK4PnPT"
+      ],
+      "romulus": [
+        "2k6UiMt99s0fJ93tse86",
+        "StEKOUurq4cNArlxrzMx"
+      ]
+    },
+    "frases": {
+      "1": {
+        "prompt": "[very low, slow, cold, intimate] You were dead.",
+        "voz": [
+          "vo3NQq8rDotHE0cVJT7I",
+          "doeGLymWq5lG3iO9o58L"
+        ],
+        "susurro": [
+          "XkWQfSi7E2v4E3eKqj5k",
+          "1LWw24B5zkoOCw8oSRQy"
+        ]
+      },
+      "2": {
+        "prompt": "[very low, slow, cold, intimate] No name... No grave... [whispers] Only the dark.",
+        "voz": [
+          "Z4tI4kCuRcUPqgVPoqyq",
+          "v96nvBc7V1QfjX31vDJb"
+        ],
+        "susurro": [
+          "25BU5awdGR6OqaTWaHDx",
+          "JpoaO6fr7dgXp6cGtYvG"
+        ]
+      },
+      "3": {
+        "prompt": "[very low, slow, cold, intimate] But I reached in... [pause] and I cast you back.",
+        "voz": [
+          "9hmzl3bx9mmNquySO2Ae",
+          "8mpWI9oqxBOPEPh5wxST"
+        ],
+        "susurro": [
+          "pa3sbdmnD8mdRj3zbv4q",
+          "DonM5nEe5v6YhPvrNUMT"
+        ]
+      },
+      "4": {
+        "prompt": "[very low, slow, cold, possessive] You carry my mark now. [pause] Death will not keep you... [whispers] not while I need you.",
+        "voz": [
+          "1qFUSlpRdxXP0P6MKAIS",
+          "7PntQw6Icp8MB96Wfy3Q"
+        ],
+        "susurro": [
+          "RDA945CzxYssnSE6kOdg",
+          "uEgBvRVZQ5YMGQhPzg5m"
+        ]
+      },
+      "5": {
+        "prompt": "[very low, slow, cold, intimate] There is a door I cannot open. [pause] You will open it for me.",
+        "voz": [
+          "xe7kLepJhIMb8ou1C0jE",
+          "O4HkCHBJw2XM0B7i4MqZ"
+        ],
+        "susurro": [
+          "lexQZfC1PFBRawUakf3V",
+          "Y5AVhTEsOG71Z3UmcpC5"
+        ]
+      },
+      "6": {
+        "prompt": "[very low, slow, commanding] Now wake... [pause] marked one.",
+        "voz": [
+          "AMZgdk3wtid6ie75CBBY",
+          "Ag7KnAGAYHgnLRxRLxSI"
+        ],
+        "susurro": [
+          "ufIxPjU2fKQmXSim37kP",
+          "wK0bO9Qyw4lM3wcy04xw"
+        ]
+      },
+      "7": {
+        "prompt": "[very low, slow, cold, savoring] There... Valdrenn. [pause] The kingdom that begged for my gift.",
+        "voz": [
+          "0z8gX5Ut1DDoXKJ4mkyT",
+          "OALyEwvp3oWwsJbHuK8z"
+        ],
+        "susurro": [
+          "saVj115LM2HfpIek8luO",
+          "4w2xmntGT4xjXYTEKLKA"
+        ]
+      },
+      "8": {
+        "prompt": "[very low, slow, cold, bitter] Its king and his knight still keep their oaths... [pause] chains around my throat.",
+        "voz": [
+          "kwJGm4NqQMunW9iNgO7a",
+          "CRw1086AxvQ0hL8GbPVy"
+        ],
+        "susurro": [
+          "vDVFgz4FbbhfGcGrTrN4",
+          "iy5Jag1ZrUtYKVuRPYHA"
+        ]
+      },
+      "9": {
+        "prompt": "[very low, slow, cold, commanding] Break them, marked one... [pause] and I will show you the door.",
+        "voz": [
+          "e64HwNb0HbM7KusQcCIx",
+          "Kvta7t4aBL7jczwjEc3e"
+        ],
+        "susurro": [
+          "g74sqAm8P8lidgKwKnHv",
+          "AgwQDcTc6kGuzmkLn0Va"
+        ]
+      }
+    }
+  },
+  "sfx_cinematicas": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "Parte 3d: las cinematicas (el inicio: la caida, la Sombra te atrapa, la marca, los latidos; el barco: se eleva, las velas, el vuelo, atraca, la campana del muelle, la reparacion). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+    "sonidos": {
+      "intro_caida": {
+        "prompt": "Falling from a great height through open sky: powerful rushing wind roaring past the ears, fast air whooshing and buffeting, constant and intense, no music",
+        "sesiones": [
+          "0YSELZAErKguhfCuYmN6",
+          "DPtEmiG42Hl7rl9Sz2am",
+          "s9jF5e3wqGESDjWtKGFy",
+          "dwnyzbyEVJft7hXTdqzY"
+        ]
+      },
+      "intro_atrapa": {
+        "prompt": "A sudden dark magical whoosh that swallows all sound: a fast reverse swell rising into one abrupt heavy sub-bass boom, then dead silence, cinematic",
+        "sesiones": [
+          "lVNjENPOmNOQxrwNKO3o",
+          "wKPbgEVBfCpVbKcyhsqN",
+          "StdKTy38N4lAyda6jJT7",
+          "7s809LHT2mn4VJDdXKOq"
+        ]
+      },
+      "intro_marca": {
+        "prompt": "A glowing dark sigil being seared into flesh: sizzling ember hiss and crackle with a deep ominous resonant hum underneath, dark magic branding, slow fade",
+        "sesiones": [
+          "fRXbyUfP4uCTcE0IanSO",
+          "QXbMz2x3wbe8a8oiVLDt",
+          "eV3GSBzu3JrIZQYgQatD",
+          "2KYGAsFwRnVvfcW9gHYR"
+        ]
+      },
+      "intro_latido": {
+        "prompt": "Two slow deep heavy heartbeats in total silence, close, muffled, low thumps, then nothing",
+        "sesiones": [
+          "2nvWMf4XBTK12FUOO5Pr",
+          "SPBQYOVApO20O1Wn4oaN",
+          "I4ZOsJSLIGQJCm39x5rS",
+          "rpkhR25sjGfAP3v1rHlW"
+        ]
+      },
+      "barco_eleva": {
+        "prompt": "A huge old wooden sailing ship slowly lifting into the air: deep hull timbers creaking and groaning under strain, thick ropes stretching, a low magical hum swelling, no music",
+        "sesiones": [
+          "lzJDXE2Qn9hD79OEc5kN",
+          "dXTDknKXNDta42PDB9OK",
+          "8i7WaA2cuA3Ywrg3nnve",
+          "MNgxkJ62ZLQswSQMEyMw"
+        ]
+      },
+      "barco_velas": {
+        "prompt": "Large heavy canvas sails unfurling and snapping taut as they catch a strong wind, ropes and rigging creaking, on a wooden ship",
+        "sesiones": [
+          "VvPd8FIrIRpbgb697vEU",
+          "q8QlLLwNmrCkULTFE6eD",
+          "YD8kBCQhRwGrMxrS6Vsi",
+          "IFR8drL5WU8W0dLArdX8"
+        ]
+      },
+      "barco_vuelo": {
+        "prompt": "Steady strong wind flowing past a wooden sailing ship flying high in the sky: airy rushing wind, canvas sails gently flapping, soft wooden creaks, vast open air ambience, seamless loop, no music",
+        "sesiones": [
+          "kswDDF1OvoZ37Bn4lAc7",
+          "gVz5MITZmDjXnhqAnjjS",
+          "IrMlOKgQQOJR7zotgoVe",
+          "NUdIyd1oW3FnEWPDVrj5"
+        ]
+      },
+      "barco_atraca": {
+        "prompt": "A heavy wooden ship gently docking: the hull bumps softly against a stone quay with a deep wooden thud, timbers creak, a thick rope is pulled taut, a chain rattles briefly",
+        "sesiones": [
+          "IfpZuRXu4OqxxPfWwUCT",
+          "00gu1uwMAZVSUrmJWgNL",
+          "Q1EY70un9Ssdc8vM1YBF",
+          "KQEeUvjlCaF88ow1sN89"
+        ]
+      },
+      "barco_campana": {
+        "prompt": "An old brass ship's bell struck twice, slow, bright metallic ring with a long lonely decay echoing over a misty harbor",
+        "sesiones": [
+          "bF3eZhCGEEFlYAAArqaU",
+          "dmo2TvKYc4h2ihtgCLFs",
+          "QPQ1M6bStMjfqElYjYPx",
+          "lQN9zYYnERwrg9ddgQ58"
+        ]
+      },
+      "barco_repara": {
+        "prompt": "A wooden ship being repaired by magic: wooden planks knocking and snapping into place one after another in quick succession, hammer taps, ropes tightening, wood creaking, building up",
+        "sesiones": [
+          "rUXcOTPdmaUCRgoZcCf2",
+          "ImPAoAK15svNK98vjonR",
+          "jh8vywA6lEXiR4WmYdE0",
+          "ArPGse9SPBVokcZ8Wdla"
+        ]
+      }
+    }
   }
 }
