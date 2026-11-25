@@ -383,7 +383,7 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   (1 y 4), `tienda_compra` (2 y 4).
 - Arte: `tools/personajes/herrero.py`, `mercader.py` (pieles y retratos) y `tools/rol/forja.py` (piedras y martillo).
 - Comandos `/darkcraft rol herrero [olvidar] | mercader [olvidar] | mejora <0-9> | piedras` (el herrero sale con su yunque
-  entre los dos). La prueba del cliente tiene el tramo `forja()` (capturas `cliente_f01..f19`).
+  entre los dos). La prueba del cliente tiene el tramo `forja()` (capturas `cliente_fg01..fg19`).
 
 ### Plan grande, parte 2e-3: cenizas de guerra (las habilidades de las armas)
 
