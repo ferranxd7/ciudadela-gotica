@@ -3042,9 +3042,8 @@ public final class ClientCiTest {
             float yaw = (float) Math.toDegrees(Math.atan2(-(q2[0] - q[0]), q2[1] - q[1]));
             var f = com.darkcraft.fortaleza.Fortalezas.delReino(lvl.getSeed(), s[0], s[1]);
             log("  nubes: camino de " + Math.round(r.largo()) + " bloques, " + r.px().length + " puntos, " + r.faroles().length
-                    + " faroles; del reino " + s[0] + "," + s[1] + " a la fortaleza " + f.x() + "," + f.z() + "; escalera en "
-                    + java.util.Arrays.toString(com.darkcraft.fortaleza.Puente.centro(com.darkcraft.fortaleza.Fortalezas.plan(lvl.getSeed(), f)))
-                    + " con la base a " + com.darkcraft.fortaleza.Puente.base(lvl, com.darkcraft.fortaleza.Fortalezas.plan(lvl.getSeed(), f)));
+                    + " faroles; del reino " + s[0] + "," + s[1] + " a la fortaleza " + f.x() + "," + f.z() + "; acaba al pie de la montana, en "
+                    + java.util.Arrays.toString(com.darkcraft.fortaleza.Puente.pie(com.darkcraft.fortaleza.Fortalezas.plan(lvl.getSeed(), f))));
             sp.getAbilities().flying = false;
             sp.onUpdateAbilities();
             sp.teleportTo(lvl, q[0], com.darkcraft.world.NubesGenerador.SUELO + 0.2, q[1], yaw, 8f);
@@ -6199,7 +6198,7 @@ public final class ClientCiTest {
                 ServerLevel lvl = sp.serverLevel();
                 var s = com.darkcraft.fortaleza.Fortalezas.delReino(lvl.getSeed(), castle[0], castle[1]);
                 var fp = com.darkcraft.fortaleza.Fortalezas.plan(lvl.getSeed(), s);
-                int[] ce = com.darkcraft.fortaleza.Puente.centro(fp);
+                int[] ce = com.darkcraft.fortaleza.Puente.pie(fp);
                 float yaw = (float) Math.toDegrees(Math.atan2(-(ce[0] + 0.5 - sp.getX()), ce[1] + 0.5 - sp.getZ()));
                 sp.setGameMode(GameType.CREATIVE);
                 sp.getAbilities().flying = true;
@@ -6285,69 +6284,112 @@ public final class ClientCiTest {
             atTicks(E + k * 70 + 64, "captura", m -> shot(m, nombres[kk]));
         }
         atTicks(E + 4 * 70, "Fortaleza desde fuera: fin", m -> m.smartCull = true);
-        // el puente de hueso y nubes: con la llave, al pie de la escalera
+        // la montana (parte 5b): al pie del sendero, un recodo con su torre y el mirador; alli la llave tiende el puente
         int P = E + 4 * 70 + 4;
-        atTicks(P, "Puente: con la llave al pie de la escalera", m -> {
-            enPrimeraPersona(m);
-            m.options.hideGui = true;
-            server(m, sp -> {
-                ServerLevel lvl = sp.serverLevel();
-                int[] ce = com.darkcraft.fortaleza.Puente.centro(fplan);
-                fbase = com.darkcraft.fortaleza.Puente.base(lvl, fplan);
-                log("  escalera en " + ce[0] + "," + ce[1] + ", suelo a " + fbase + " (sube " + (fplan.Y - fbase) + " bloques)");
-                sp.teleportTo(lvl, ce[0] + 10.5, fbase + 1, ce[1] + 10.5, 135f, -10f);
-                sp.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(DarkCraftMod.LLAVE_HUESO.get()));
-                sp.gameMode.useItem(sp, lvl, sp.getMainHandItem(), InteractionHand.MAIN_HAND);
-                var est = com.darkcraft.fortaleza.FortalezaDatos.get(sp.server).de(fsit);
-                log("  puente: " + est.puente + " base " + est.baseEscalera + " logro puente=" + com.darkcraft.story.Logros.tiene(sp, "puente"));
-            });
-        });
-        // vistas de la escalera (se levanta de abajo arriba en ~8,5 s): desde su base mientras sube (en el borde de la
-        // plataforma, que siempre queda despejada: fuera de ella la camara podia quedar dentro de una loma), y ya hecha, de lado
-        // y desde arriba; sin descartar secciones tapadas y con tiempo para que se dibujen
-        double[][] vistas = {
-                // {tick, x, y (0 = base, 1 = arriba), z, mirar x, mirar y, mirar z}
-                {30, 0, 0, 7.8, 0, 0.16, 0},
-                {190, 40, 0.52, 46, 0, 0.46, 0},
-                {260, 30, 1.04, 34, 0, 0.86, 0},
-        };
-        for (int k = 0; k < vistas.length; k++) {
-            final double[] v = vistas[k];
-            final int vk = k;
-            atTicks(P + (int) v[0], "Puente: se levanta", m -> {
-                m.smartCull = false;
-                int[] ce = com.darkcraft.fortaleza.Puente.centro(fplan);
-                double h = fplan.Y - fbase;
-                verDesde(m, new Vec3(ce[0] + 0.5 + v[1], fbase + 1.6 + h * v[2], ce[1] + 0.5 + v[3]),
-                        new Vec3(ce[0] + 0.5 + v[4], fbase + h * v[5], ce[1] + 0.5 + v[6]));
-            });
-            atTicks(P + (int) v[0] + (k == 0 ? 64 : 50), "captura", m -> shot(m, "cliente_f05_puente_" + vk));
-        }
-        atTicks(P + 316, "Puente: desde arriba", m -> {
-            int[] ce = com.darkcraft.fortaleza.Puente.centro(fplan);
-            verDesde(m, new Vec3(ce[0] + 14, fplan.Y + 9, ce[1] - 16), new Vec3(ce[0] + 0.5, fplan.Y - 4, ce[1] + 3));
-        });
-        atTicks(P + 344, "captura", m -> {
-            shot(m, "cliente_f06_puente_arriba");
-            m.smartCull = true;
-        });
-        P += 150;
-        // la corriente de nubes: en supervivencia, en el hueco de la escalera
-        atTicks(P + 200, "Corriente de nubes: al hueco de la escalera", m -> {
+        atTicks(P, "Montana: al pie del sendero", m -> {
             enPrimeraPersona(m);
             m.options.hideGui = false;
             server(m, sp -> {
-                int[] ce = com.darkcraft.fortaleza.Puente.centro(fplan);
-                sp.setGameMode(GameType.SURVIVAL);
-                sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE, 400, 4));
-                sp.teleportTo(sp.serverLevel(), ce[0] + 0.5, fbase + 0.2, ce[1] + 0.5, 180f, -35f);
-                log("  corriente: empieza en " + fpos(sp));
+                double[] pie = fplan.montana.pie();
+                // volando: hasta que se levante la montana, debajo solo hay nube (no se pisa)
+                sp.setGameMode(GameType.CREATIVE);
+                sp.getAbilities().flying = true;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), pie[0] + 0.5, pie[2] + 0.1, pie[1] + 3.5, 180f, -14f);
+                log(String.format(java.util.Locale.ROOT, "  montana: cima %d,%d a %d; pie %.1f,%.1f a %.1f; sendero de %d puntos y %d recodos",
+                        fplan.montana.mx, fplan.montana.mz, fplan.montana.cima, pie[0], pie[1], pie[2], fplan.montana.sendero().size(),
+                        fplan.montana.recodos().size()));
             });
         });
-        atTicks(P + 230, "captura", m -> shot(m, "cliente_f07_corriente"));
-        atTicks(P + 260, "Corriente: altura", m -> server(m, sp -> log("  corriente a los 3 s: " + fpos(sp) + " levitacion="
-                + sp.hasEffect(net.minecraft.world.effect.MobEffects.LEVITATION))));
-        atTicks(P + 300, "Corriente: altura", m -> server(m, sp -> log("  corriente a los 5 s: " + fpos(sp))));
+        // (los chunks de la montana se levantan al cargarse: unos segundos)
+        atTicks(P + 200, "Montana: levantada", m -> server(m, sp -> {
+            var est = com.darkcraft.fortaleza.FortalezaDatos.get(sp.server).de(fsit);
+            int n = 0, h = 0;
+            for (long k : fplan.chunks())
+                if (fplan.montana.touchesChunk((int) (k >> 32), (int) k)) {
+                    n++;
+                    if (est.hechos.contains(k)) h++;
+                }
+            log("  montana: " + h + " de " + n + " chunks levantados; lugar " + com.darkcraft.fortaleza.FortalezaEventos.lugar(sp));
+        }));
+        atTicks(P + 206, "captura", m -> shot(m, "cliente_f05_montana_pie"));
+        atTicks(P + 210, "Montana: un recodo con su torre", m -> server(m, sp -> {
+            var rs = fplan.montana.recodos();
+            double[] r = rs.get(Math.min(2, rs.size() - 1));
+            // en el recodo, mirando a la torre que tiene al lado (hacia fuera de la montana)
+            sp.teleportTo(sp.serverLevel(), r[0] - r[3] * 2 + 0.5, r[2], r[1] + 0.5, r[3] > 0 ? -90f : 90f, 8f);
+        }));
+        atTicks(P + 250, "captura", m -> shot(m, "cliente_f05_montana_recodo"));
+        atTicks(P + 254, "Montana: a pie del pie al mirador", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> lvl.getBlockState(new BlockPos(x, y, z));
+            double[] pie = fplan.montana.pie();
+            int[] a = fplan.montana.arco();
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, (int) Math.floor(pie[0]), (int) Math.round(pie[2]) + 1, (int) Math.floor(pie[1]),
+                    fplan.cx - 160, fplan.bordeZ - 40, fplan.cx + 160, fplan.montana.mz + 160, 200000);
+            log("  montana a pie: " + zona.celdas() + " celdas desde el pie; llega al mirador (ante el arco) " + zona.alcanza(a[0], a[1], a[2] + 2, 3));
+        }));
+        atTicks(P + 258, "Montana: el mirador, ante el arco de colmillos", m -> server(m, sp -> {
+            int[] a = com.darkcraft.fortaleza.Puente.arco(fplan);
+            sp.teleportTo(sp.serverLevel(), a[0] + 0.5, a[1], a[2] + 5.5, 180f, -4f);
+        }));
+        atTicks(P + 290, "captura", m -> {
+            shot(m, "cliente_f05_mirador");
+            server(m, sp -> log("  mirador: lugar " + com.darkcraft.fortaleza.FortalezaEventos.lugar(sp)));
+        });
+        atTicks(P + 294, "Puente: la llave ante el arco", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                sp.getCooldowns().removeCooldown(DarkCraftMod.LLAVE_HUESO.get());
+                sp.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(DarkCraftMod.LLAVE_HUESO.get()));
+                sp.gameMode.useItem(sp, lvl, sp.getMainHandItem(), InteractionHand.MAIN_HAND);
+                var est = com.darkcraft.fortaleza.FortalezaDatos.get(sp.server).de(fsit);
+                log("  puente: " + est.puente + " logro puente=" + com.darkcraft.story.Logros.tiene(sp, "puente") + " levantandose="
+                        + com.darkcraft.fortaleza.Puente.levantando());
+            });
+        });
+        // el puente se forma del mirador a la isla (~10 s): de lado a medias y entero, y desde el mirador
+        // (las posiciones se calculan al llegar el paso: al preparar la prueba aun no hay plano)
+        for (int k = 0; k < 2; k++) {
+            final int kk = k;
+            atTicks(P + 300 + k * 170, "Puente: se forma", m -> {
+                m.smartCull = false;
+                double zm = (fplan.montana.mz - com.darkcraft.gen.Montana.RP + fplan.bordeZ) / 2.0, ym = (fplan.montana.cima + fplan.Y) / 2.0;
+                verDesde(m, new Vec3(fplan.cx + 46, ym + 10, zm + 18), new Vec3(fplan.cx + 0.5, ym - 2, zm));
+            });
+            atTicks(P + 300 + k * 170 + (k == 0 ? 60 : 40), "captura", m -> shot(m, "cliente_f06_puente_" + kk));
+        }
+        atTicks(P + 520, "Puente: desde el mirador", m -> {
+            int[] a = com.darkcraft.fortaleza.Puente.arco(fplan);
+            verDesde(m, new Vec3(a[0] + 2.5, a[1] + 4.5, a[2] + 6.5), new Vec3(fplan.cx + 0.5, fplan.Y + 6, fplan.bordeZ));
+        });
+        atTicks(P + 556, "captura", m -> {
+            shot(m, "cliente_f06_puente_mirador");
+            m.smartCull = true;
+        });
+        atTicks(P + 560, "Puente: se cruza a pie", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> lvl.getBlockState(new BlockPos(x, y, z));
+                int[] a = com.darkcraft.fortaleza.Puente.arco(fplan);
+                var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, a[0], a[1], a[2] + 2, fplan.cx - 40, fplan.bordeZ - 60,
+                        fplan.cx + 40, a[2] + 20, 60000);
+                log("  puente a pie: del mirador a la isla " + zona.alcanza(fplan.cx, fplan.Y, fplan.bordeZ - 3, 3) + " (" + zona.celdas()
+                        + " celdas); lugar en medio del puente: (se ve en la captura)");
+                int zc = (int) Math.round((fplan.montana.mz - com.darkcraft.gen.Montana.RP + fplan.bordeZ) / 2.0);
+                double h = com.darkcraft.fortaleza.Puente.altura(fplan, zc);
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.teleportTo(lvl, fplan.cx + 0.5, h, zc + 0.5, 180f, 4f);
+            });
+        });
+        atTicks(P + 590, "captura", m -> {
+            shot(m, "cliente_f07_puente_cruzar");
+            server(m, sp -> log("  en el puente: " + fpos(sp) + " lugar " + com.darkcraft.fortaleza.FortalezaEventos.lugar(sp)));
+        });
+        P += 290;
         // la puerta: con la llave delante de la reja (cinematica)
         int D = P + 310;
         atTicks(D, "Puerta: con la llave delante de la reja", m -> {

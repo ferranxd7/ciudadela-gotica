@@ -222,8 +222,12 @@ public final class Espejo {
                     "darkcraft.mapa.lugar.fortaleza_puerta", 28, 0));
             int[] al = fp.f.altar();
             out.add(new Lugar(k + ":fortaleza_portal", LUGAR, I_PREGUNTA, al[0], al[1], al[2], "darkcraft.mapa.lugar.fortaleza_portal", 22, 0));
-            int[] ce = com.darkcraft.fortaleza.Puente.centro(fp);
-            out.add(new Lugar(k + ":fortaleza_escalera", LUGAR, I_TORRE, ce[0], fy, ce[1], "darkcraft.mapa.lugar.fortaleza_escalera", 60, 0));
+            // la montana del sur: el pie de su sendero (donde llega el camino de nubes) y el mirador del arco de la llave
+            int[] pie = com.darkcraft.fortaleza.Puente.pie(fp);
+            out.add(new Lugar(k + ":fortaleza_montana", LUGAR, I_TORRE, pie[0], com.darkcraft.gen.Montana.NUBES, pie[1],
+                    "darkcraft.mapa.lugar.fortaleza_montana", 60, 0));
+            int[] ar = com.darkcraft.fortaleza.Puente.arco(fp);
+            out.add(new Lugar(k + ":fortaleza_mirador", LUGAR, I_PUERTA, ar[0], ar[1], ar[2], "darkcraft.mapa.lugar.fortaleza_mirador", 30, 0));
         } catch (RuntimeException e) {
             DarkCraftMod.LOGGER.warn("Espejo: no se pudieron sacar los lugares de {}: {}", k, e.toString());
         }

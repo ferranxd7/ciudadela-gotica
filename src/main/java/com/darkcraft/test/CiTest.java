@@ -295,8 +295,7 @@ public final class CiTest {
                     log.println(b + " -> " + bien + " de " + n2 + " bien");
                     var fs = com.darkcraft.fortaleza.Fortalezas.delReino(seed, s[0], s[1]);
                     var fp = com.darkcraft.fortaleza.Fortalezas.plan(seed, fs);
-                    log.println("Escalera de la fortaleza en " + java.util.Arrays.toString(com.darkcraft.fortaleza.Puente.centro(fp)) + ", base a "
-                            + com.darkcraft.fortaleza.Puente.base(lvl, fp));
+                    montanaDeLaFortaleza(log, lvl, fp);
                 }
                 int x = s[0] + 900, z = s[1] + 900;
                 lvl.getChunk(x >> 4, z >> 4);
@@ -566,6 +565,48 @@ public final class CiTest {
     }
 
     // ------------------------------------------------------------ prueba de "se puede subir andando"
+
+    /**
+     * La montana de la Fortaleza de Hueso (parte 5b) en el mundo de nubes de verdad: se levantan sus chunks, se sube a pie
+     * del pie del sendero al mirador y, con el puente tendido, se cruza hasta el borde de la isla; luego se quita el puente
+     * (la prueba del cliente lo tiende con la llave).
+     */
+    private static void montanaDeLaFortaleza(java.io.PrintWriter log, ServerLevel lvl, com.darkcraft.gen.FortalezaPlan fp) {
+        try {
+            com.darkcraft.gen.Montana m = fp.montana;
+            int n = 0;
+            for (long k : fp.chunks()) {
+                int cx = (int) (k >> 32), cz = (int) k;
+                if (!m.touchesChunk(cx, cz)) continue;
+                lvl.getChunk(cx, cz);
+                fp.construir(lvl, cx, cz, net.minecraft.util.RandomSource.create(k));
+                n++;
+            }
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> lvl.getBlockState(new BlockPos(x, y, z));
+            double[] pie = m.pie();
+            int[] a = m.arco();
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, (int) Math.floor(pie[0]), (int) Math.round(pie[2]) + 1, (int) Math.floor(pie[1]),
+                    fp.cx - 160, fp.bordeZ - 40, fp.cx + 160, m.mz + 160, 200000);
+            boolean arriba = zona.alcanza(a[0], a[1], a[2] + 2, 3);
+            // el puente tendido: del mirador al borde de la isla (la isla no esta levantada: hasta el arranque del puente)
+            java.util.List<int[]> puestos = new java.util.ArrayList<>();
+            com.darkcraft.fortaleza.Puente.volcar(fp, (x, y, z, st) -> {
+                lvl.setBlock(new BlockPos(x, y, z), st, 2);
+                if (!st.isAir()) puestos.add(new int[]{x, y, z});
+            });
+            var cruza = com.darkcraft.pueblo.gen.Andar.desde(mundo, a[0], a[1], a[2] + 2, fp.cx - 40, fp.bordeZ - 10, fp.cx + 40, a[2] + 20, 60000);
+            boolean isla = cruza.alcanza(fp.cx, fp.Y, fp.bordeZ + 2, 2);
+            for (int[] q : puestos) lvl.setBlock(new BlockPos(q[0], q[1], q[2]), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+            log.println(String.format(java.util.Locale.ROOT, "Montana de la fortaleza: %d chunks; cima %d,%d a %d; pie %.1f,%.1f a %.1f (%s); "
+                            + "sendero de %d puntos y %d recodos; a pie del pie al mirador %s (%d celdas); por el puente (%d bloques) hasta la isla %s",
+                    n, m.mx, m.mz, m.cima, pie[0], pie[1], pie[2],
+                    lvl.getBlockState(new BlockPos((int) Math.floor(pie[0]), (int) Math.round(pie[2]) - 1, (int) Math.floor(pie[1]))).getBlock().getDescriptionId(),
+                    m.sendero().size(), m.recodos().size(), arriba, zona.celdas(), puestos.size(), isla));
+        } catch (Throwable t) {
+            log.println("Montana de la fortaleza: ERROR " + t);
+            t.printStackTrace();
+        }
+    }
 
     private static boolean passable(ServerLevel lvl, BlockPos.MutableBlockPos m, int x, int y, int z) {
         BlockState st = lvl.getBlockState(m.set(x, y, z));

@@ -156,6 +156,51 @@ public class Volcado {
                         }
                     }
             }
+            case "montana" -> {
+                // la fortaleza entera con su montana (parte 5b): el plano de verdad en (0, 0), patio a Y 320
+                long semilla = Long.parseLong(System.getProperty("semilla", "1234"));
+                com.darkcraft.gen.FortalezaPlan fp = new com.darkcraft.gen.FortalezaPlan(semilla, 0, 0, 320);
+                boolean todo = Boolean.parseBoolean(System.getProperty("todo", "false"));
+                com.darkcraft.gen.Montana m = fp.montana;
+                for (long k : fp.chunks()) {
+                    int cx = (int) (k >> 32), cz = (int) k;
+                    // sin "todo": solo la montana y lo que haya entre ella y la isla
+                    if (!todo && ((cz << 4) + 15 < fp.bordeZ - 20 || Math.abs(cx << 4) > 140)) continue;
+                    try {
+                        fp.construir(lvl, cx, cz, RandomSource.create(k));
+                    } catch (Throwable e) {
+                        System.out.println("error en el chunk " + cx + "," + cz + ": " + e);
+                        e.printStackTrace();
+                    }
+                }
+                // el puente ya tendido (como si se hubiera usado la llave)
+                com.darkcraft.fortaleza.Puente.volcar(fp, (x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2));
+                double[] pie = m.pie();
+                int[] arcoM = m.arco();
+                System.out.println("montana: cima " + m.mx + "," + m.mz + " a " + m.cima + "; arco " + java.util.Arrays.toString(arcoM)
+                        + "; pie " + String.format(java.util.Locale.ROOT, "%.1f,%.1f a %.1f", pie[0], pie[1], pie[2]) + "; sendero "
+                        + m.sendero().size() + " puntos, " + m.recodos().size() + " recodos; borde de la isla z " + fp.bordeZ);
+                BlockState aire = Blocks.AIR.defaultBlockState();
+                com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+                StringBuilder col = new StringBuilder("  columna del pie:");
+                for (int y = 246; y <= 254; y++)
+                    col.append(' ').append(y).append('=').append(mundo.en((int) Math.floor(pie[0]), y, (int) Math.floor(pie[1])).getBlock().getDescriptionId().replace("block.minecraft.", ""));
+                System.out.println(col);
+                var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, (int) Math.floor(pie[0]), (int) Math.round(pie[2]) + 1, (int) Math.floor(pie[1]),
+                        -160, fp.bordeZ - 200, 160, m.mz + 200, 400000);
+                System.out.println("a pie desde el pie del sendero: " + z0.celdas() + " celdas; llega al arco " + z0.alcanza(arcoM[0], arcoM[1], arcoM[2] + 2, 3)
+                        + ", a la isla por el puente " + z0.alcanza(0, 320, fp.bordeZ - 3, 3) + ", a la puerta "
+                        + z0.alcanza(0, 320, com.darkcraft.gen.TorreCupula.PFUERA + 4, 3));
+                // donde se corta: el punto del sendero mas bajo al que ya no se llega
+                List<double[]> sen = m.sendero();
+                for (int i = sen.size() - 1; i >= 0; i -= 4) {
+                    double[] q = sen.get(i);
+                    if (!z0.pisa((int) Math.floor(q[0]), (int) Math.floor(q[2]), (int) Math.floor(q[1]))) {
+                        System.out.println("  no se pisa el sendero en " + String.format(java.util.Locale.ROOT, "%.1f,%.1f a %.1f (punto %d)", q[0], q[1], q[2], i));
+                        break;
+                    }
+                }
+            }
             case "pueblo" -> {
                 com.darkcraft.pueblo.gen.PuebloPlan p = com.darkcraft.pueblo.gen.PuebloPlan.get();
                 for (long k : p.chunks()) p.construir(lvl, (int) (k >> 32), (int) k, RandomSource.create(k));

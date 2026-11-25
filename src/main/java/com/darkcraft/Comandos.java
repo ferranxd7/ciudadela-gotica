@@ -71,7 +71,7 @@ public final class Comandos {
 
     private static final Linea[] FORTALEZA = {
             new Linea(F + "localizar", F + "localizar", "f_localizar"),
-            new Linea(F + "ir", F + "ir / escalera", "f_ir"),
+            new Linea(F + "ir", F + "ir / montana / mirador", "f_ir"),
             new Linea(F + "puente", F + "puente / abrir / portal", "f_puente"),
             new Linea(F + "amuleto", F + "amuleto / acertijo / libros", "f_objetos"),
             new Linea(F + "construir", F + "construir / reiniciar", "f_reiniciar"),

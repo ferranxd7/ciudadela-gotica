@@ -66,13 +66,16 @@ public final class ComandosFortaleza {
                     p.teleportTo(p.serverLevel(), f.cx + 0.5, f.Y, f.cz + TorreCupula.PFUERA + 6.5, 180f, 5f);
                     return 1;
                 })))
-                .then(Commands.literal("escalera").executes(c -> conSitio(c, (p, s, f) -> {
-                    int[] ce = Puente.centro(f);
-                    ServerLevel lvl = p.serverLevel();
-                    // en el mundo de nubes, en la plazoleta del camino (alrededor no hay suelo)
-                    int o = com.darkcraft.world.NubesGenerador.es(lvl) ? 6 : 9;
-                    int y = o == 6 ? Puente.base(lvl, f) : lvl.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ce[0] + o, ce[1] + o);
-                    p.teleportTo(lvl, ce[0] + o + 0.5, y, ce[1] + o + 0.5, 135f, -20f);
+                .then(Commands.literal("montana").executes(c -> conSitio(c, (p, s, f) -> {
+                    // al pie del sendero, en la plazoleta donde llega el camino de nubes, mirando a la montana
+                    double[] pie = f.montana.pie();
+                    p.teleportTo(p.serverLevel(), pie[0] + 0.5, pie[2], pie[1] + 3.5, 180f, -12f);
+                    return 1;
+                })))
+                .then(Commands.literal("mirador").executes(c -> conSitio(c, (p, s, f) -> {
+                    // en lo alto, delante del arco de colmillos, mirando a la fortaleza
+                    int[] a = Puente.arco(f);
+                    p.teleportTo(p.serverLevel(), a[0] + 0.5, a[1], a[2] + 4.5, 180f, -6f);
                     return 1;
                 })))
                 .then(Commands.literal("construir").executes(c -> conSitio(c, (p, s, f) -> {
@@ -105,6 +108,7 @@ public final class ComandosFortaleza {
                     FortalezaDatos.Estado e = d.de(s);
                     ServerLevel lvl = p.serverLevel();
                     if (e.puerta) FortalezaEventos.cerrarPuerta(lvl, f);
+                    if (e.puente) Puente.quitar(lvl, f);
                     if (e.portal) {
                         int[] q = f.f.portal();
                         for (int x = q[0]; x <= q[3]; x++)

@@ -95,12 +95,14 @@ public final class CaminoNubes {
         if (!ci.asc()) return null;
         int[] f = Fortalezas.de(seed, sx, sz);
         FortalezaPlan fp = Fortalezas.plan(seed, f[0], f[1]);
-        int[] b = Puente.centro(fp);
-        // lo lejano va como antes de la parte 5a (con la escalera de la fortaleza de antes): en un mundo con parte del
-        // camino ya hecho, lo que se haga ahora sigue el mismo trazado; solo el ultimo tramo llega a la escalera de ahora
+        int[] b = Puente.pie(fp);
+        // lo lejano va como antes de la parte 5a (hacia la escalera de la fortaleza de antes): en un mundo con parte del
+        // camino ya hecho, lo que se haga ahora sigue el mismo trazado; desde alli rodea la montana hasta el pie de su
+        // sendero (parte 5b)
         int[] bv = fp.centroPuenteAntiguo();
         List<double[]> p = puntos(seed, sx, sz, ci.ascX(), ci.ascZ(), f, bv);
-        p.set(p.size() - 1, new double[]{b[0] + 0.5, b[1] + 0.5});
+        p.remove(p.size() - 1);
+        p.addAll(alPie(fp, p.get(p.size() - 1), b));
         int n = p.size();
         double[] px = new double[n], pz = new double[n];
         double minX = Double.MAX_VALUE, minZ = Double.MAX_VALUE, maxX = -Double.MAX_VALUE, maxZ = -Double.MAX_VALUE;
@@ -134,6 +136,21 @@ public final class CaminoNubes {
         int m = 16;
         return new Ruta(px, pz, plazas, fl.toArray(new int[0][]), (int) Math.floor(minX) - m, (int) Math.floor(minZ) - m,
                 (int) Math.ceil(maxX) + m, (int) Math.ceil(maxZ) + m);
+    }
+
+    /**
+     * Del sur de la isla de la fortaleza al pie del sendero de la montana: por el lado de la montana por el que se llega,
+     * lejos del cono y del hombro, y al pie desde el sur.
+     */
+    static List<double[]> alPie(FortalezaPlan fp, double[] desde, int[] pie) {
+        com.darkcraft.gen.Montana m = fp.montana;
+        int s = desde[0] <= m.mx + 0.5 ? -1 : 1;
+        List<double[]> l = new ArrayList<>();
+        l.add(new double[]{m.mx + 0.5 + s * 54, m.mz - 29.5});
+        l.add(new double[]{m.mx + 0.5 + s * 54, pie[1] + 16.5});
+        l.add(new double[]{pie[0] + 0.5, pie[1] + 16.5});
+        l.add(new double[]{pie[0] + 0.5, pie[1] + 0.5});
+        return l;
     }
 
     /**
@@ -247,8 +264,8 @@ public final class CaminoNubes {
     private static boolean cerca(long seed, int[] s, double mx, double mz) {
         if (Math.hypot(mx - s[0], mz - s[1]) <= RODEO + MARGEN) return true;
         int[] f = Fortalezas.de(seed, s[0], s[1]);
-        // junto a la fortaleza los ultimos puntos dependen de donde cae la escalera de verdad
-        if (Math.hypot(mx - f[0], mz - f[1]) <= 240) return true;
+        // junto a la fortaleza (y su montana, al sur) los ultimos puntos dependen de donde caen de verdad
+        if (Math.hypot(mx - f[0], mz - f[1]) <= 300) return true;
         double[][] q;
         String k = seed + ":" + s[0] + ":" + s[1];
         synchronized (APROX) {
