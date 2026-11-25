@@ -1240,7 +1240,7 @@
   "darkcraft.pueblo.no_aqui": "There is no Brumavela here (a cloud world is needed).",
   "darkcraft.ayuda.brumavela": "Brumavela, the village island",
   "darkcraft.ayuda.b_ir": "go to a place on the island (no name: where you wake up)",
-  "darkcraft.ayuda.b_piezas": "give ship pieces / open the crypt / repair the ship / set sail",
+  "darkcraft.ayuda.b_piezas": "give ship pieces / open the crypt / repair the ship (with \"ya\", no cinematic)",
   "darkcraft.ayuda.b_estado": "see how it stands / put everything back as it was",
   "subtitles.darkcraft.sfx.pieza_barco": "Ship piece found",
   "subtitles.darkcraft.sfx.cripta_abre": "A slab slides aside",
@@ -1326,5 +1326,18 @@
   "subtitles.darkcraft.sfx.intro_atrapa": "Something catches you",
   "subtitles.darkcraft.sfx.intro_marca": "The mark burns",
   "subtitles.darkcraft.sfx.intro_latido": "A heart beats again",
-  "darkcraft.ayuda.b_inicio": "watch the opening cinematic again (the Shadow, the fall and the awakening)"
+  "darkcraft.ayuda.b_inicio": "watch the opening cinematic again (the Shadow, the fall and the awakening)",
+  "darkcraft.aviso.cosa.llamar": "to call the Grey Heron",
+  "darkcraft.pueblo.campana.roto": "The bell rings out over the clouds. Nothing answers.",
+  "darkcraft.pueblo.campana.aqui": "The Grey Heron is already moored here.",
+  "darkcraft.pueblo.campana.viene": "The Grey Heron is already on her way.",
+  "darkcraft.mapa.lugar.muelle_valdrenn": "Valdrenn Quay",
+  "darkcraft.santuario.muelle_valdrenn": "Valdrenn Quay",
+  "subtitles.darkcraft.sfx.barco_eleva": "The hull groans and rises",
+  "subtitles.darkcraft.sfx.barco_velas": "Sails snap taut",
+  "subtitles.darkcraft.sfx.barco_vuelo": "Wind in the sails",
+  "subtitles.darkcraft.sfx.barco_atraca": "The ship docks",
+  "subtitles.darkcraft.sfx.barco_campana": "The quay bell",
+  "subtitles.darkcraft.sfx.barco_repara": "Planks knock back into place",
+  "darkcraft.ayuda.b_barco": "set sail from the helm (with \"primero\", the first-voyage cinematic) / call the ship / go to Valdrenn Quay / put the ship at a quay"
 }

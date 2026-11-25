@@ -357,6 +357,19 @@ public final class CiTest {
                 for (int x = barco.x0 - 2; x <= barco.x1 + 2; x++)
                     for (int z = barco.z0 - 2; z <= barco.z1 + 2; z++)
                         for (int y = barco.y0 - 2; y <= barco.y1 + 2; y++) roto.put(BlockPos.asLong(x, y, z), lvl.getBlockState(mb.set(x, y, z)).getBlock());
+                // (parte 3d-2) el plano del barco sin mundo tiene que ser el barco que acaba de generar el juego, estado a estado:
+                // tambien como se unen sus vallas y sus cristales, que el plano une a mano
+                {
+                    StringBuilder dp = new StringBuilder();
+                    int mal = 0;
+                    for (var c : com.darkcraft.pueblo.Garza.plano(false)) {
+                        var hay = lvl.getBlockState(mb.set(c.x(), c.y(), c.z()));
+                        if (hay == c.estado() || (c.estado().isAir() && hay.isAir())) continue;
+                        if (mal++ < 6) dp.append(" [").append(c.x()).append(',').append(c.y()).append(',').append(c.z()).append(" plano ").append(c.estado()).append(" generado ").append(hay).append(']');
+                    }
+                    log.println("Brumavela: el plano del barco roto contra el barco generado: " + mal + " celdas distintas de " + com.darkcraft.pueblo.Garza.plano(false).size()
+                            + " (tiene que ser 0)" + dp);
+                }
                 com.darkcraft.pueblo.Pueblo.levantar(lvl, true);
                 int lona = 0, yunques = 0;
                 for (long k : roto.keySet()) {
@@ -497,6 +510,19 @@ public final class CiTest {
             } catch (Throwable t) {
                 log.println("Brumavela, enemigos: ERROR " + t);
                 DarkCraftMod.LOGGER.error("[CI] enemigos de Brumavela", t);
+            }
+            // ---- el barco que va y viene (parte 3d-2): el plano sin mundo, el muelle de Valdrenn, mover el barco y los viajes
+            try {
+                barcoQueVaYViene(server, lvl, log);
+            } catch (Throwable t) {
+                log.println("La Garza Gris: ERROR " + t);
+                DarkCraftMod.LOGGER.error("[CI] el barco que va y viene", t);
+                // que la prueba del cliente se encuentre el barco roto en Brumavela, pase lo que pase
+                try {
+                    com.darkcraft.pueblo.Pueblo.reiniciar(lvl);
+                } catch (Throwable t2) {
+                    log.println("La Garza Gris: ERROR al reiniciar " + t2);
+                }
             }
             // la cinematica de inicio (parte 3d): sobre donde se despierta no hay nada con lo que tropezar al caer, y los dos
             // planos (la caida y el despertar) acaban donde tienen que acabar
@@ -785,5 +811,239 @@ public final class CiTest {
                 for (int a = 0; a < S; a++) for (int b = 0; b < S; b++) img.setRGB((dx + R) * S + a, (dz + R) * S + b, rgb);
             }
         ImageIO.write(img, "png", f);
+    }
+    /** Lo alto de la nube de verdad en esa columna (o -1 si no hay nube entre 225 y 264). */
+    private static int nubeArriba(ServerLevel lvl, BlockPos.MutableBlockPos mb, int x, int z) {
+        for (int y = 264; y >= 225; y--) if (lvl.getBlockState(mb.set(x, y, z)).getBlock() instanceof com.darkcraft.world.NubeBlock) return y;
+        return -1;
+    }
+
+    /**
+     * Parte 3d-2: el plano del barco sin mundo contra el barco de verdad, repararlo sin que salte nada, el muelle de
+     * Valdrenn (el mar en calma, el anden, que se recorre a pie), llevar el barco de un muelle al otro con lo que guardan
+     * sus barriles, y los planos y el vuelo de las tres cinematicas (la camara y el casco, siempre en el aire). Al acabar
+     * lo deja todo como estaba, tambien las nubes de Valdrenn: el muelle tiene que hacerse solo en la prueba del cliente.
+     */
+    private static void barcoQueVaYViene(net.minecraft.server.MinecraftServer server, ServerLevel lvl, java.io.PrintWriter log) {
+        final int BV = com.darkcraft.pueblo.Amarres.BRUMAVELA, VD = com.darkcraft.pueblo.Amarres.VALDRENN;
+        var d = com.darkcraft.pueblo.Pueblo.Datos.get(server);
+        BlockPos.MutableBlockPos mb = new BlockPos.MutableBlockPos();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> lvl.getBlockState(mb.set(x, y, z));
+        // 1. el plano del barco roto es el barco que se genero, estado a estado (tambien como se unen sus vallas)
+        StringBuilder dif = new StringBuilder();
+        int malRoto = 0;
+        for (var c : com.darkcraft.pueblo.Garza.plano(false)) {
+            var hay = lvl.getBlockState(mb.set(c.x(), c.y(), c.z()));
+            if (hay == c.estado() || (c.estado().isAir() && hay.isAir())) continue;
+            if (malRoto++ < 5) dif.append(" [").append(c.x()).append(',').append(c.y()).append(',').append(c.z()).append(" plano ").append(c.estado()).append(" mundo ").append(hay).append(']');
+        }
+        // 2. reparado de una vez: como el plano entero, el juego no cambiaria ninguna union y no salta nada al suelo
+        com.darkcraft.pueblo.Pueblo.repararYa(lvl);
+        int malEntero = com.darkcraft.pueblo.Garza.distintas(lvl, true, 0, 0), cambiaria = 0;
+        StringBuilder cam = new StringBuilder();
+        for (var c : com.darkcraft.pueblo.Garza.plano(true)) {
+            if (c.estado().isAir()) continue;
+            var hay = lvl.getBlockState(mb.set(c.x(), c.y(), c.z()));
+            var seria = net.minecraft.world.level.block.Block.updateFromNeighbourShapes(hay, lvl, mb);
+            if (seria == hay) continue;
+            if (cambiaria++ < 4) cam.append(" [").append(c.x()).append(',').append(c.y()).append(',').append(c.z()).append(' ').append(hay).append(" -> ").append(seria).append(']');
+        }
+        var caja = new net.minecraft.world.phys.AABB(com.darkcraft.pueblo.gen.Barco.BX - 24, 230, com.darkcraft.pueblo.gen.Barco.POPA - 24,
+                com.darkcraft.pueblo.gen.Barco.BX + 24, 290, com.darkcraft.pueblo.gen.Barco.PROA + 28);
+        int sueltos = lvl.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, caja).size();
+        log.println("La Garza Gris, el plano: roto " + com.darkcraft.pueblo.Garza.plano(false).size() + " celdas, distintas del barco generado " + malRoto
+                + " (tiene que ser 0)" + dif + "; entero " + com.darkcraft.pueblo.Garza.plano(true).size() + " celdas, distintas tras reparar " + malEntero
+                + " (0), uniones que el juego cambiaria " + cambiaria + " (0)" + cam + ", objetos sueltos junto al barco " + sueltos + " (0)");
+        // la reparacion por etapas: cuantos bloques y cuando
+        int pasos = 0;
+        float t0 = 99, t1 = 0;
+        int[] fases = new int[6];
+        java.util.Map<BlockPos, net.minecraft.world.level.block.state.BlockState> roto = new java.util.HashMap<>();
+        for (var c : com.darkcraft.pueblo.Garza.plano(false)) roto.put(new BlockPos(c.x(), c.y(), c.z()), c.estado());
+        for (var c : com.darkcraft.pueblo.Garza.plano(true)) {
+            if (roto.get(new BlockPos(c.x(), c.y(), c.z())) == c.estado()) continue;
+            float cu = com.darkcraft.cine.Reparacion.cuando(c.x(), c.y(), c.z(), c.estado());
+            pasos++;
+            t0 = Math.min(t0, cu);
+            t1 = Math.max(t1, cu);
+            fases[cu < com.darkcraft.cine.Reparacion.CASCO0 ? 0 : cu < com.darkcraft.cine.Reparacion.PALO0 ? 1 : cu < com.darkcraft.cine.Reparacion.VERGAS ? 2
+                    : cu < com.darkcraft.cine.Reparacion.VELAS0 ? 3 : cu < com.darkcraft.cine.Reparacion.PIEZAS ? 4 : 5]++;
+        }
+        log.println(String.format(java.util.Locale.ROOT, "La Garza Gris, la reparacion por etapas: %d bloques entre %.1f y %.1f s (se va lo roto %d, casco %d, palo %d, vergas %d, "
+                + "velas %d, piezas %d); el destello a los %.1f s", pasos, t0, t1, fases[0], fases[1], fases[2], fases[3], fases[4], fases[5], com.darkcraft.cine.Reparacion.DESTELLO));
+        // 3. el muelle de Valdrenn
+        int[] o = com.darkcraft.pueblo.Amarres.de(lvl, VD);
+        if (o == null) {
+            log.println("La Garza Gris: SIN RUMBO a Valdrenn (no hay reino cerca del origen)");
+            com.darkcraft.pueblo.Pueblo.reiniciar(lvl);
+            return;
+        }
+        int cx = com.darkcraft.pueblo.Amarres.CALMA_X + o[0], cz = com.darkcraft.pueblo.Amarres.CALMA_Z + o[1], R = com.darkcraft.pueblo.Amarres.CALMA_R1 + 2;
+        // (lo que habia, para dejarlo igual al acabar)
+        java.util.Map<Long, net.minecraft.world.level.block.state.BlockState> antes = new java.util.HashMap<>();
+        int natMin = 999, natMax = -999;
+        for (int x = cx - R; x <= cx + R; x++)
+            for (int z = cz - R; z <= cz + R; z++) {
+                for (int y = 222; y <= 270; y++) antes.put(BlockPos.asLong(x, y, z), lvl.getBlockState(mb.set(x, y, z)));
+                if (Math.hypot(x - cx, z - cz) <= com.darkcraft.pueblo.Amarres.CALMA_R0) {
+                    int n = nubeArriba(lvl, mb, x, z);
+                    if (n >= 0) {
+                        natMin = Math.min(natMin, n);
+                        natMax = Math.max(natMax, n);
+                    }
+                }
+            }
+        long ms = System.currentTimeMillis();
+        boolean hecho = com.darkcraft.pueblo.Amarres.hacerYa(lvl);
+        ms = System.currentTimeMillis() - ms;
+        int calMin = 999, calMax = -999, escalon = 0;
+        for (int x = cx - R; x <= cx + R; x++)
+            for (int z = cz - R; z <= cz + R; z++) {
+                int n = nubeArriba(lvl, mb, x, z);
+                if (n < 0) continue;
+                if (Math.hypot(x - cx, z - cz) <= com.darkcraft.pueblo.Amarres.CALMA_R0 - 1) {
+                    calMin = Math.min(calMin, n);
+                    calMax = Math.max(calMax, n);
+                }
+                // el mayor escalon entre una columna de nube y la de al lado (que no quede un muro de nube)
+                int n2 = nubeArriba(lvl, mb, x + 1, z);
+                if (n2 >= 0) escalon = Math.max(escalon, Math.abs(n - n2));
+            }
+        var seg = com.darkcraft.pueblo.Amarres.seguro(lvl, VD);
+        BlockPos camp = com.darkcraft.pueblo.Amarres.campana(lvl, VD);
+        BlockPos sant = new BlockPos(com.darkcraft.pueblo.gen.MuelleValdrenn.SANTUARIO_X + o[0], com.darkcraft.pueblo.gen.MuelleValdrenn.Y + 1, com.darkcraft.pueblo.gen.MuelleValdrenn.SANTUARIO_Z + o[1]);
+        log.println("Muelle de Valdrenn: hecho=" + hecho + " en " + ms + " ms, amarre a " + o[0] + ", " + o[1] + " del de Brumavela; el mar de nubes en el radio llano antes "
+                + natMin + ".." + natMax + ", ahora " + calMin + ".." + calMax + " (245..247), mayor escalon de nube " + escalon + "; bajo el sitio seguro "
+                + lvl.getBlockState(BlockPos.containing(seg[0], seg[1] - 0.5, seg[2])).getBlock().getDescriptionId() + ", la campana "
+                + lvl.getBlockState(camp).getBlock().getDescriptionId() + ", el santuario " + lvl.getBlockState(sant).getBlock().getDescriptionId() + " ("
+                + com.darkcraft.santuario.Santuarios.nombre(lvl, sant) + "), el camino junto al anden "
+                + lvl.getBlockState(new BlockPos(2 + o[0], 250, 140 + o[1])).getBlock().getDescriptionId());
+        // 4. el barco, de Brumavela a Valdrenn con lo que guarda un barril, y que se recorre todo a pie desde el camino
+        BlockPos barril = null;
+        for (var c : com.darkcraft.pueblo.Garza.plano(true)) if (barril == null && c.estado().is(net.minecraft.world.level.block.Blocks.BARREL)) barril = new BlockPos(c.x(), c.y(), c.z());
+        if (barril != null && lvl.getBlockEntity(barril) instanceof net.minecraft.world.Container cont)
+            cont.setItem(4, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 7));
+        com.darkcraft.pueblo.Travesia.mover(lvl, VD);
+        int enV = com.darkcraft.pueblo.Garza.distintas(lvl, true, o[0], o[1]), restoBV = 0, nubeDentro = 0;
+        for (var c : com.darkcraft.pueblo.Garza.plano(true)) {
+            var hay = lvl.getBlockState(mb.set(c.x(), c.y(), c.z()));
+            if (!hay.isAir() && !(hay.getBlock() instanceof com.darkcraft.world.NubeBlock)) restoBV++;
+            if (com.darkcraft.pueblo.gen.Barco.dentro(c.x(), c.y(), c.z())
+                    && lvl.getBlockState(mb.set(c.x() + o[0], c.y(), c.z() + o[1])).getBlock() instanceof com.darkcraft.world.NubeBlock) nubeDentro++;
+        }
+        String carga = "-";
+        if (barril != null && lvl.getBlockEntity(barril.offset(o[0], 0, o[1])) instanceof net.minecraft.world.Container cont) carga = cont.getItem(4).toString();
+        int sueltos2 = lvl.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, caja).size()
+                + lvl.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, caja.move(o[0], 0, o[1])).size();
+        BlockPos lle = com.darkcraft.world.MundoNubes.llegada(lvl.getSeed());
+        var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, lle.getX(), lle.getY(), lle.getZ(), o[0] - 24, o[1] + 100, o[0] + 10, o[1] + 166, 80000);
+        int[] tim = com.darkcraft.pueblo.gen.PuebloPlan.get().sitio("barco_timon"), cor = com.darkcraft.pueblo.gen.PuebloPlan.get().sitio("barco_corazon");
+        int alcazar = 0;
+        for (int n = 0; n < 8; n++) {
+            double[] al = com.darkcraft.pueblo.Amarres.alcazar(lvl, VD, n);
+            if (zona.pisa((int) Math.floor(al[0]), (int) Math.round(al[1]) - 1, (int) Math.floor(al[2]))) alcazar++;
+        }
+        log.println("La Garza Gris en Valdrenn: distintas del plano " + enV + " (0), en Brumavela queda del barco " + restoBV + " (0), nube dentro del casco " + nubeDentro
+                + " (0), el barril lleva " + carga + " (7 diamantes), objetos sueltos " + sueltos2 + " (0) | " + com.darkcraft.pueblo.Pueblo.estado(d)
+                + " | a pie desde el camino (" + zona.celdas() + " celdas): el anden " + zona.pisa((int) Math.floor(seg[0]), (int) seg[1] - 1, (int) Math.floor(seg[2]))
+                + ", la campana " + zona.alcanza(camp.getX(), camp.getY(), camp.getZ(), 2.6) + ", el santuario " + zona.alcanza(sant.getX(), sant.getY(), sant.getZ(), 2.6)
+                + ", el timon " + zona.alcanza(tim[0] + o[0], tim[1], tim[2] + o[1], 2.6) + ", la bodega " + zona.alcanza(cor[0] + o[0], cor[1], cor[2] + o[1], 2.6)
+                + ", sitios del alcazar " + alcazar + " de 8 | cosas " + com.darkcraft.pueblo.Pueblo.cosas(lvl).size());
+        // y de vuelta
+        com.darkcraft.pueblo.Travesia.mover(lvl, BV);
+        int enBV = com.darkcraft.pueblo.Garza.distintas(lvl, true, 0, 0), restoVD = 0;
+        for (var c : com.darkcraft.pueblo.Garza.plano(true)) {
+            var hay = lvl.getBlockState(mb.set(c.x() + o[0], c.y(), c.z() + o[1]));
+            if (!hay.isAir() && !(hay.getBlock() instanceof com.darkcraft.world.NubeBlock)) restoVD++;
+        }
+        String carga2 = "-";
+        if (barril != null && lvl.getBlockEntity(barril) instanceof net.minecraft.world.Container cont) {
+            carga2 = cont.getItem(4).toString();
+            cont.setItem(4, net.minecraft.world.item.ItemStack.EMPTY);
+        }
+        log.println("La Garza Gris de vuelta en Brumavela: distintas del plano " + enBV + " (0), en Valdrenn queda del barco " + restoVD + " (0), el barril lleva " + carga2
+                + " | " + com.darkcraft.pueblo.Pueblo.estado(d));
+        // 5. las cinematicas: con el barco fuera de los dos muelles, ni la camara ni el casco se meten en nada
+        com.darkcraft.pueblo.Garza.dejar(lvl, -1, 0, 0, com.darkcraft.pueblo.Amarres.cima(lvl, BV));
+        int[] cero = {0, 0};
+        Object[][] viajes = {{"primer viaje a Valdrenn", com.darkcraft.cine.Viaje.PRIMERO, cero, o, VD}, {"viaje a Valdrenn", com.darkcraft.cine.Viaje.NORMAL, cero, o, VD},
+                {"viaje a Brumavela", com.darkcraft.cine.Viaje.NORMAL, o, cero, BV}, {"llamada desde Valdrenn", com.darkcraft.cine.Viaje.LLAMADA, cero, o, VD},
+                {"llamada desde Brumavela", com.darkcraft.cine.Viaje.LLAMADA, o, cero, BV}};
+        double[][] casco = {{0, -4.6, -13}, {0, -4.6, -8}, {0, -4.6, -3}, {0, -4.6, 2}, {0, -4.6, 7}, {0, -4.6, 12}, {-4, -0.6, 0}, {4, -0.6, 0}, {0, 2.4, 20.5}, {0, 3.4, -13.5},
+                {-6, 13.4, 0}, {6, 13.4, 0}, {0, 23.4, 0}};
+        for (Object[] v : viajes) {
+            int tipo = (Integer) v[1], a = (Integer) v[4];
+            int[] de = (int[]) v[2], hacia = (int[]) v[3];
+            var T = com.darkcraft.cine.Viaje.tiempos(tipo);
+            double[] al = com.darkcraft.pueblo.Amarres.alcazar(lvl, a, 0), ojos = {al[0], al[1] + 1.62, al[2]};
+            double[] vi = com.darkcraft.pueblo.Amarres.vista(a), vista = {vi[0] + hacia[0], vi[1], vi[2] + hacia[1]};
+            var planos = com.darkcraft.cine.Viaje.planos(tipo, de, hacia, ojos, vista);
+            StringBuilder mal = new StringBuilder();
+            int malas = 0, muestras = 0;
+            for (int k = 0; k < planos.size(); k++) {
+                var sh = planos.get(k);
+                for (int i = 0; i <= 24; i++) {
+                    double t = sh.t0 + (sh.t1 - sh.t0) * i / 24.0;
+                    // (el ultimo plano de un viaje empieza en negro, con el barco ya de bloques: se mira aparte)
+                    double[] p = sh.at(t);
+                    muestras++;
+                    var st = lvl.getBlockState(BlockPos.containing(p[0], p[1], p[2]));
+                    if (st.isAir()) continue;
+                    if (malas++ < 4) mal.append(String.format(java.util.Locale.ROOT, " [plano %d a los %.1f s en %.1f %.1f %.1f: %s]", k + 1, t, p[0], p[1], p[2], st.getBlock().getDescriptionId()));
+                }
+            }
+            // el vuelo: cada cuarto de segundo, unos cuantos puntos del casco y del aparejo
+            int choques = 0, pasosVuelo = 0;
+            double altoMax = 0, lejosMax = 0;
+            StringBuilder ch = new StringBuilder();
+            for (double t = 0; t < T.total(); t += 0.25) {
+                double[] b = com.darkcraft.cine.Viaje.barco(T, t, de, hacia);
+                if (b == null) continue;
+                pasosVuelo++;
+                altoMax = Math.max(altoMax, b[1] - com.darkcraft.cine.Viaje.PY);
+                lejosMax = Math.max(lejosMax, Math.max(Math.hypot(b[0] - com.darkcraft.cine.Viaje.PX - de[0], b[2] - com.darkcraft.cine.Viaje.PZ - de[1]) < Math.hypot(b[0]
+                        - com.darkcraft.cine.Viaje.PX - hacia[0], b[2] - com.darkcraft.cine.Viaje.PZ - hacia[1]) ? Math.hypot(b[0] - com.darkcraft.cine.Viaje.PX - de[0], b[2]
+                        - com.darkcraft.cine.Viaje.PZ - de[1]) : Math.hypot(b[0] - com.darkcraft.cine.Viaje.PX - hacia[0], b[2] - com.darkcraft.cine.Viaje.PZ - hacia[1]), 0));
+                double g = Math.toRadians(b[3]), cg = Math.cos(g), sg = Math.sin(g);
+                for (double[] q : casco) {
+                    // (giro 0 = proa al sur; el giro de Minecraft: x' = x cos - z sin, z' = x sin + z cos)
+                    double x = b[0] + q[0] * cg - q[2] * sg, y = b[1] + q[1], z = b[2] + q[0] * sg + q[2] * cg;
+                    var st = lvl.getBlockState(BlockPos.containing(x, y, z));
+                    if (st.isAir() || st.getBlock() instanceof com.darkcraft.world.NubeBlock) continue;
+                    if (choques++ < 4) ch.append(String.format(java.util.Locale.ROOT, " [a los %.2f s en %.1f %.1f %.1f: %s]", t, x, y, z, st.getBlock().getDescriptionId()));
+                }
+            }
+            log.println(String.format(java.util.Locale.ROOT, "Cinematica %d (%s): %.1f s, %d planos, camara dentro de algo %d de %d (0)%s; el barco vuela %.1f s, sube hasta %.1f, "
+                            + "se aleja de su amarre hasta %.0f, choca %d veces (0)%s; cambio %.2f, salto %.2f, toca %.2f, vuelve a ser de bloques %.2f, frases %d",
+                    tipo, v[0], T.total(), planos.size(), malas, muestras, mal, pasosVuelo * 0.25, altoMax, lejosMax, choques, ch, T.cambioA, T.salto, T.toca(), T.cambioC, T.voz.length));
+        }
+        // la reparacion: sus tres planos, con el barco roto en su sitio
+        com.darkcraft.pueblo.Pueblo.reiniciar(lvl);
+        int malasR = 0;
+        StringBuilder malR = new StringBuilder();
+        var planosR = com.darkcraft.cine.Reparacion.planos();
+        for (int k = 0; k < planosR.size(); k++)
+            for (int i = 0; i <= 24; i++) {
+                var sh = planosR.get(k);
+                double[] p = sh.at(sh.t0 + (sh.t1 - sh.t0) * i / 24.0);
+                var st = lvl.getBlockState(BlockPos.containing(p[0], p[1], p[2]));
+                if (st.isAir()) continue;
+                if (malasR++ < 4) malR.append(String.format(java.util.Locale.ROOT, " [plano %d en %.1f %.1f %.1f: %s]", k + 1, p[0], p[1], p[2], st.getBlock().getDescriptionId()));
+            }
+        // 6. todo como estaba: el barco roto en Brumavela y, en Valdrenn, ni muelle ni mar en calma (se haran solos en la prueba del cliente)
+        int devueltos = 0;
+        for (var e : antes.entrySet()) {
+            mb.set(e.getKey());
+            if (lvl.getBlockState(mb) == e.getValue()) continue;
+            lvl.setBlock(mb, e.getValue(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS | net.minecraft.world.level.block.Block.UPDATE_KNOWN_SHAPE);
+            devueltos++;
+        }
+        d.muelle = false;
+        d.cambio();
+        com.darkcraft.pueblo.Amarres.olvidar();
+        log.println("La reparacion: " + planosR.size() + " planos, camara dentro de algo " + malasR + " (0)" + malR + " | al acabar: " + com.darkcraft.pueblo.Pueblo.estado(d)
+                + ", barco roto distinto del plano " + com.darkcraft.pueblo.Garza.distintas(lvl, false, 0, 0) + " (0), bloques devueltos en Valdrenn " + devueltos
+                + ", la campana " + lvl.getBlockState(camp).getBlock().getDescriptionId() + ", objetos sueltos "
+                + lvl.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, caja).size());
     }
 }

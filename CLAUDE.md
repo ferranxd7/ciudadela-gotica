@@ -724,7 +724,7 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   "Hay una puerta que yo no puedo abrir. Tu la abriras por mi." / "Ahora despierta... marcado."); dos latidos y **se abren
   los ojos** (los parpados, un parpadeo, la luz que deslumbra): tumbado boca arriba, se incorpora mirando al barco y se
   pone en pie; a los 39,6 s la camara ya es la del jugador (misma posicion, giro, cabeceo y campo de vision: no hay corte).
-- **Las cinematicas "con guion"** (del numero 38 en adelante; 39 sera reparar el barco y 40-42 los viajes): el servidor
+- **Las cinematicas "con guion"** (del numero 38 en adelante; 39 es reparar el barco y 40-42 los viajes: parte 3d-2): el servidor
   solo manda los planos (`Cinematics.playShots`) y el cliente lleva lo demas en `client/Guion` (lo que suena y cuando
   —lista de pasos con su segundo—, el negro, lo que se pinta debajo y encima del negro, el ladeo y el campo de vision de
   mas, los subtitulos de la Sombra) con los tiempos de la clase comun (`Intro`). `ClientCine` pregunta a `Guion` en sus
@@ -747,6 +747,69 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   tramo `intro()` (capturas `cliente_in01..in14`) y los niveles del audio grabado (`audio_cliente.txt` va ~9 s por delante
   del reloj del informe).
 
+### Plan grande, parte 3d-2: el barco que va y viene (la reparacion, el viaje y el muelle de Valdrenn)
+
+- **El barco es de todos y solo hay uno.** `Pueblo.Datos` guarda donde esta: `barcoEn` (el amarre donde esta o al que va:
+  `Amarres.BRUMAVELA` 0 / `VALDRENN` 1), `puesto` (donde estan de verdad sus bloques; -1 mientras vuela), `resto` (el
+  amarre del que aun hay que quitarlo; -1), `muelle` (el de Valdrenn ya esta hecho), `carga` (lo que llevaban sus
+  barriles mientras no se ha vuelto a meter) y `obra` (se esta reparando). `Travesia.onTick` pone al dia lo que se pueda
+  cada tick: si el servidor se cierra a medias o todos saltan la cinematica, el barco aparece en su destino en cuanto
+  estan cargados sus chunks.
+- **`pueblo/Garza`: el plano del barco, celda a celda** (roto y entero). Se saca dibujando `gen/Barco` en un `Canvas` que
+  solo apunta (`Canvas.apunte`: sin mundo). Ojo: la generacion del mundo **solo une las vallas puestas con `unir`**; las
+  puestas con `set` se quedan como postes sueltos, y el plano hace lo mismo (`Apunte.une`). `Garza.dejar(lvl, que, dx,
+  dz, cima)` deja un amarre con el barco roto (0), entero (1) o sin barco (-1: nube hasta lo alto del mar de nubes de ese
+  sitio y aire). **Todo se pone con `UPDATE_CLIENTS | UPDATE_KNOWN_SHAPE` (18)**: con la bandera 2 de antes los vecinos
+  se actualizaban y saltaban al suelo las escaleras de mano, el farol y la placa de presion. Lo que guardan los barriles
+  viaja con el barco (`carga` / `descargar`); un cofre que haya puesto un jugador en un hueco del barco suelta lo suyo.
+  `remendar` (una vez por sesion y amarre) vuelve a poner los bloques del barco que falten, sin tocar lo demas.
+- **`pueblo/Amarres`: los dos amarres son el mismo barco desplazado** (`de(lvl, cual)` → {dx, dz}; proa al sur, el muelle
+  al este). El de Valdrenn sale de `MundoNubes.llegada`: el anden va pegado al oeste del camino de nubes, 35-59 bloques
+  al sur de la Torre de Ascenso. **El muelle de Valdrenn no se genera con el mundo** (asi sale igual en los mundos de
+  antes): se hace la primera vez que alguien esta a menos de 150 bloques o zarpa hacia alli (`pedir` → `tick`; pide los
+  chunks con un billete propio): primero **se calma el mar de nubes** en un disco (llano hasta 36 bloques, se funde con
+  el natural hasta 56; un chunk por tick; las columnas con algo que no sea nube no se tocan) y despues se pone el anden
+  (`pueblo/gen/MuelleValdrenn`: farolas, pretiles, norays, la **campana** y un **santuario** «Muelle de Valdrenn»).
+  `hacerYa` lo hace de una vez (pruebas y comandos). La campana del espigon de Brumavela se pone sola en (2, 252, 135).
+- **Reparar** (cinematica **39**, `cine/Reparacion`): con las cinco piezas, desde la cubierta. Los bloques que le faltan
+  al barco roto se ponen por etapas (`Reparacion.cuando`: se va lo roto, el casco de proa a popa, el palo de abajo arriba,
+  las vergas, las velas desplegandose, las piezas y un destello a los 12,8 s); tres planos; la ven los que esten a menos
+  de 56 bloques.
+- **Zarpar** (desde la rueda del timon; cosa 12): viajan todos los que esten a menos de 40 bloques del palo. Cinematica
+  **40** la primera vez que se va a Valdrenn (55 s; la Sombra dice sus frases 7-9 al llegar) y **41** las demas (34 s, ir
+  o volver). **El barco que vuela es una entidad que solo existe en el cliente** (`cine/BarcoVolador` +
+  `client/cine/BarcoVoladorRenderer`: los bloques del plano con sus modelos, girados alrededor del pie del palo): mientras
+  la pantalla esta en negro (`cambioA`) el barco de bloques se quita del muelle y aparece la entidad; sube en vertical 11
+  bloques, avanza al sur, corte en negro (`corteB`: se lleva a los jugadores al otro amarre), llega del sur con la proa
+  al norte, frena sobre su amarre, **se da la vuelta a 12 de alto** (por debajo el casco daria en las farolas) y baja; en
+  otro negro (`cambioC`) vuelve a ser de bloques y el ultimo plano baja del aparejo a los ojos del jugador, de pie en el
+  alcazar. `cine/Viaje` tiene los tiempos, la trayectoria (`barco(T, t, o, d)`) y los planos (muestreados: siguen al
+  barco), iguales para servidor y cliente. Mientras tanto los jugadores flotan invisibles 80 bloques por encima (asi no
+  se les ve la armadura desde el muelle); `Cinematics.playViaje` los lleva y los deja (si se salta, en cubierta si el
+  barco ya esta; si no, en el muelle o en el camino de nubes).
+- **Los cortes los marca el cliente, no el reloj del servidor** (`Viaje.corte`, `Net.CineFase`): en cada uno de los tres
+  negros en que cambia el mundo (1: se quita el barco de bloques; 2: el salto al otro amarre; 3: se vuelve a poner) el
+  cliente avisa al servidor y **espera con la pantalla en negro y el reloj de la cinematica parado** (`Guion.espera`,
+  desde `ClientCine.onTick`) hasta ver hecho lo que toca (el palo ya no esta / el jugador ya esta alli con sus chunks /
+  el palo ya esta), con un tope de 5, 12 y 8 s. El servidor hace cada cosa cuando TODOS los que miran han avisado (o 6 s
+  despues de su hora, si alguno no avisa) y acaba la sesion cuando el cliente dice que ha terminado (`FIN_CLIENTE`).
+  Asi da igual que el servidor o el cliente vayan con retraso (al llegar a un sitio nuevo se generan muchos chunks):
+  con los dos relojes sueltos se veia el barco dos veces o el muelle vacio. En la prueba del cliente el reloj de los
+  pasos tambien se para mientras se espera (`Guion.esperadoSiempre`).
+- **Llamar** (la campana del muelle donde no esta el barco; cosas 13 y 14): cinematica **42** (17 s), sin mover al
+  jugador: el barco llega volando y atraca. Con el barco ya alli, de camino o roto, la campana solo suena y lo dice.
+- **Sonido** (ElevenLabs; tomas en `TOMAS_SFX`): `barco_campana` (1 y 4), `barco_eleva` (3), `barco_velas` (1),
+  `barco_vuelo` (4; el viento, 25 s, en streaming), `barco_atraca` (4; empieza en el segundo 3,8 de la toma: `INICIO`),
+  `barco_repara` (3). **Musica del viaje**: "The Traveller" de Viktor Kraus (CC-BY 3.0), cortada a 84 s (`"corte"` en
+  `pistas.json`): `ClientMusic.viaje`. Los que se quedan en el muelle oyen las velas al irse y el golpe al atracar.
+- En Valdrenn siempre es de noche y hay tormenta (`world/Storm`): el corte en negro tapa el cambio y la lluvia entra en
+  el ultimo plano.
+- Comandos: `/darkcraft brumavela reparar [ya] | zarpar [primero] | llamar | muelle | barco <brumavela|valdrenn>`.
+- Pruebas: servidor, `barcoQueVaYViene` (lineas `La Garza Gris, ...`, `Muelle de Valdrenn: ...`, `Cinematica 40/41/42
+  ...`, `La reparacion: ...`: el plano contra el barco generado, nada salta al suelo, el mar en calma, el barril con sus
+  diamantes, se llega a pie a todo, ni la camara ni el casco dan en nada); cliente, tramo `barco()` (capturas
+  `cliente_ba01..10` la reparacion, `vj01..19` el primer viaje y el muelle, `vn01..08` la vuelta, `vl01..06` la llamada).
+
 ### Lo siguiente: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 
 Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publicada):
@@ -754,8 +817,7 @@ Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publica
 - **3b, la isla del pueblo abandonado**: hecha (arriba).
 - **3c, enemigos**: hecha (arriba).
 - **3d-1, la cinematica de inicio**: hecha (arriba).
-- **3d-2, el barco**: la cinematica de la reparacion y el viaje volando al muelle de Valdrenn (luego se puede ir y volver
-  desde el muelle).
+- **3d-2, el barco**: hecha (arriba). Con esto la parte 3 esta entera; lo siguiente es la **parte 4** de `PLAN.md`.
 
 ## Compilar, probar y publicar
 

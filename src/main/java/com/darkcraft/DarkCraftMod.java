@@ -206,6 +206,15 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_INTRO_ATRAPA = sound("sfx.intro_atrapa");
     public static final RegistryObject<SoundEvent> SFX_INTRO_MARCA = sound("sfx.intro_marca");
     public static final RegistryObject<SoundEvent> SFX_INTRO_LATIDO = sound("sfx.intro_latido");
+    // el barco que va y viene (parte 3d): se eleva, las velas, el viento del vuelo, atraca, la campana del muelle y la
+    // reparacion; y la musica del viaje
+    public static final RegistryObject<SoundEvent> SFX_BARCO_ELEVA = sound("sfx.barco_eleva");
+    public static final RegistryObject<SoundEvent> SFX_BARCO_VELAS = sound("sfx.barco_velas");
+    public static final RegistryObject<SoundEvent> SFX_BARCO_VUELO = sound("sfx.barco_vuelo");
+    public static final RegistryObject<SoundEvent> SFX_BARCO_ATRACA = sound("sfx.barco_atraca");
+    public static final RegistryObject<SoundEvent> SFX_BARCO_CAMPANA = sound("sfx.barco_campana");
+    public static final RegistryObject<SoundEvent> SFX_BARCO_REPARA = sound("sfx.barco_repara");
+    public static final RegistryObject<SoundEvent> MUSICA_VIAJE = sound("musica.viaje");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")
@@ -351,6 +360,10 @@ public class DarkCraftMod {
     public static final RegistryObject<Item> HUEVO_BALLESTA = ITEMS.register("caballero_ballesta_spawn_egg",
             () -> new net.minecraftforge.common.ForgeSpawnEggItem(CABALLERO_BALLESTA, 0x4A6342, 0x2E4A2C, new Item.Properties()));
 
+    /** La Garza Gris volando en las cinematicas del viaje (parte 3d): solo existe en el cliente de quien la ve. */
+    public static final RegistryObject<EntityType<com.darkcraft.cine.BarcoVolador>> BARCO_VOLADOR = ENTITIES.register("barco_volador",
+            () -> EntityType.Builder.<com.darkcraft.cine.BarcoVolador>of(com.darkcraft.cine.BarcoVolador::new, MobCategory.MISC).sized(1f, 1f)
+                    .fireImmune().noSave().noSummon().clientTrackingRange(16).updateInterval(Integer.MAX_VALUE).build(MODID + ":barco_volador"));
     public static final RegistryObject<EntityType<com.darkcraft.arbol.Ascensor>> ASCENSOR = ENTITIES.register("ascensor",
             () -> EntityType.Builder.<com.darkcraft.arbol.Ascensor>of(com.darkcraft.arbol.Ascensor::new, MobCategory.MISC).sized(5f, 0.3f)
                     .fireImmune().noSave().noSummon().clientTrackingRange(12).updateInterval(20).build(MODID + ":ascensor"));

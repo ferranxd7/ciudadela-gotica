@@ -172,6 +172,21 @@ public final class ClientMusic {
         }
     }
 
+    // ------------------------------------------------------------------ el viaje de La Garza Gris (parte 3d)
+
+    private static Track viaje;
+
+    /** La musica del viaje del barco: entra poco a poco en esos segundos; con {@code false}, se va en esos segundos. */
+    public static void viaje(boolean suena, float segundos) {
+        Minecraft mc = Minecraft.getInstance();
+        if (suena) {
+            if (viaje != null && !viaje.dying() && mc.getSoundManager().isActive(viaje)) return;
+            viaje = new Track(DarkCraftMod.MUSICA_VIAJE.get(), "viaje", false);
+            mc.getSoundManager().play(viaje);
+            viaje.fadeTo(0.8f, segundos);
+        } else if (viaje != null && !viaje.dying()) viaje.kill(segundos);
+    }
+
     // ------------------------------------------------------------------ Brumavela: el viento sobre el mar de nubes (parte 3b)
 
     private static Track bruma;
@@ -182,7 +197,7 @@ public final class ClientMusic {
     private static void tickBruma(Minecraft mc) {
         if (mc.player == null || mc.level == null) enBruma = false;
         else if (mc.player.tickCount % 20 == 0) enBruma = mc.level.getBiome(mc.player.blockPosition()).is(com.darkcraft.world.PuebloFeature.BIOMA);
-        boolean quiere = enBruma && (boss == null || boss.dying()) && (story == null || story.dying());
+        boolean quiere = enBruma && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
         if (quiere) {
             if (bruma == null || bruma.dying() || !mc.getSoundManager().isActive(bruma) && brumaTicks > 40) {
                 if (bruma != null && !bruma.dying()) mc.getSoundManager().stop(bruma);
@@ -285,6 +300,10 @@ public final class ClientMusic {
         if (bruma != null && !bruma.dying()) any = true;
         tickTitulo(mc);
         if (titulo != null && !titulo.dying()) any = true;
+        if (viaje != null) {
+            if (!mc.getSoundManager().isActive(viaje) && viaje.dying()) viaje = null;
+            else any = true;
+        }
         // que no se mezcle con la musica normal del juego
         if (any) mc.getMusicManager().stopPlaying();
     }
@@ -296,7 +315,8 @@ public final class ClientMusic {
         if (boss != null) mc.getSoundManager().stop(boss);
         if (zona != null) mc.getSoundManager().stop(zona);
         if (bruma != null) mc.getSoundManager().stop(bruma);
-        story = boss = zona = bruma = null;
+        if (viaje != null) mc.getSoundManager().stop(viaje);
+        story = boss = zona = bruma = viaje = null;
         enFortaleza = enBruma = false;
         bossPhase = 0;
     }
@@ -307,6 +327,7 @@ public final class ClientMusic {
         String s = story == null ? "-" : String.format("cofre %.2f%s", story.level(), mc.getSoundManager().isActive(story) ? "" : " (parada)");
         String b = boss == null ? "-" : String.format("%s %.2f", boss.name, boss.level());
         String z = zona == null ? "" : String.format(" / fortaleza %.2f", zona.level());
-        return s + " / " + b + z;
+        String v = viaje == null ? "" : String.format(" / viaje %.2f%s", viaje.level(), mc.getSoundManager().isActive(viaje) ? "" : " (parada)");
+        return s + " / " + b + z + v;
     }
 }

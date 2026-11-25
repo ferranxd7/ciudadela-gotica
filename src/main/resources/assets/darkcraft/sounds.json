@@ -2023,5 +2023,65 @@
         "name": "darkcraft:sfx/intro_latido_1"
       }
     ]
+  },
+  "sfx.barco_eleva": {
+    "subtitle": "subtitles.darkcraft.sfx.barco_eleva",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barco_eleva_1"
+      }
+    ]
+  },
+  "sfx.barco_velas": {
+    "subtitle": "subtitles.darkcraft.sfx.barco_velas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barco_velas_1"
+      }
+    ]
+  },
+  "sfx.barco_vuelo": {
+    "subtitle": "subtitles.darkcraft.sfx.barco_vuelo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barco_vuelo_1",
+        "stream": true
+      }
+    ]
+  },
+  "sfx.barco_atraca": {
+    "subtitle": "subtitles.darkcraft.sfx.barco_atraca",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barco_atraca_1"
+      }
+    ]
+  },
+  "sfx.barco_campana": {
+    "subtitle": "subtitles.darkcraft.sfx.barco_campana",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barco_campana_1"
+      },
+      {
+        "name": "darkcraft:sfx/barco_campana_2"
+      }
+    ]
+  },
+  "sfx.barco_repara": {
+    "subtitle": "subtitles.darkcraft.sfx.barco_repara",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barco_repara_1"
+      }
+    ]
+  },
+  "musica.viaje": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/viaje",
+        "stream": true
+      }
+    ]
   }
 }

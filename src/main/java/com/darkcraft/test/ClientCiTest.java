@@ -43,7 +43,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 30 * 60 * 20;
+    private static final int LIMIT = 34 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -119,7 +119,9 @@ public final class ClientCiTest {
                 log("Dentro del mundo");
                 plan(mc);
             }
-            int t = ticks - inGame;
+            // (mientras un viaje del barco espera en negro a que el servidor cambie el mundo, su reloj no corre: el de la
+            // prueba tampoco, y asi las capturas siguen cayendo en el mismo segundo de la cinematica)
+            int t = ticks - inGame - com.darkcraft.client.Guion.esperadoSiempre();
             while (next < steps.size() && t >= steps.get(next).at) {
                 Step s = steps.get(next++);
                 log(s.what + "  | fps=" + fps + " | " + (mc.level != null ? mc.levelRenderer.getChunkStatistics() : "fuera del mundo") + " | "
@@ -3290,7 +3292,9 @@ public final class ClientCiTest {
         atTicks(t + 862, "Brumavela: se repara el barco", m -> {
             m.options.hideGui = true;
             server(m, sp -> {
-                com.darkcraft.pueblo.Pueblo.usar(sp, 11);
+                // (de una vez: la reparacion por etapas con su cinematica y los viajes tienen su tramo, barco())
+                com.darkcraft.pueblo.Pueblo.repararYa(sp.serverLevel());
+                com.darkcraft.pueblo.Pueblo.reparado(sp.serverLevel());
                 irMirando(sp, 16.5, 263, 162.5, -8, 261, 136, true);
             });
         });
@@ -3343,16 +3347,8 @@ public final class ClientCiTest {
             logPueblo(m, "al timon (a mano 12)");
             shot(m, "cliente_b17_timon");
         });
-        atTicks(t + 1044, "Brumavela: se zarpa hacia Valdrenn", m -> server(m, sp -> com.darkcraft.pueblo.Pueblo.usar(sp, 12)));
-        atTicks(t + 1134, "captura: la llegada, al pie de la Torre de Ascenso", m -> {
-            logPueblo(m, "tras zarpar (a mano 13: volver)");
-            server(m, sp -> log("  pueblo: bajo los pies " + bloque(sp.serverLevel(), sp.getX(), sp.getY() - 0.5, sp.getZ()) + ", logro zarpar="
-                    + com.darkcraft.story.Logros.tiene(sp, "zarpar")));
-            shot(m, "cliente_b18_llegada");
-        });
-        atTicks(t + 1136, "Brumavela: de vuelta", m -> server(m, sp -> com.darkcraft.pueblo.Pueblo.usar(sp, 13)));
-        atTicks(t + 1174, "Brumavela: otra vez en el barco", m -> {
-            logPueblo(m, "de vuelta en el barco");
+        atTicks(t + 1046, "Brumavela: se queda en el barco (zarpar tiene su tramo)", m -> {
+            logPueblo(m, "en el barco reparado");
             com.darkcraft.client.ui.Carteles.callados = true;
             m.options.hideGui = true;
             server(m, sp -> {
@@ -3360,7 +3356,7 @@ public final class ClientCiTest {
                 sp.onUpdateAbilities();
             });
         });
-        return t + 1178;
+        return t + 1050;
     }
 
     // ------------------------------------------------------------------ los enemigos de Brumavela (parte 3c)
@@ -3830,6 +3826,218 @@ public final class ClientCiTest {
         atTicks(fin + 4, "fin del tramo: creativo otra vez", m -> server(m, sp -> sp.setGameMode(GameType.CREATIVE)));
         return fin + 14;
     }
+    // ------------------------------------------------------------------ el barco que va y viene (parte 3d-2)
+
+    /** Una captura de una cinematica del barco a los {@code seg} segundos, con lo que pasa en el cliente y en el servidor. */
+    private static void capturaBarco(int T, float seg, String nombre) {
+        atTicks(T + Math.round(seg * 20f), "captura: barco a los " + seg + " s (" + nombre + ")", m -> {
+            net.minecraft.world.entity.Entity cam = m.getCameraEntity();
+            com.darkcraft.cine.BarcoVolador b = com.darkcraft.client.Guion.barco();
+            String vuela = b == null ? "no hay barco volando" : String.format(java.util.Locale.ROOT, "el barco vuela en %.1f %.1f %.1f giro %.0f balanceo %.1f (%d bloques, %d caras)",
+                    b.getX(), b.getY(), b.getZ(), b.getYRot(), b.balanceo, com.darkcraft.client.cine.BarcoVoladorRenderer.cuantas(), com.darkcraft.client.cine.BarcoVoladorRenderer.cuantasCaras());
+            log(String.format(java.util.Locale.ROOT, "  barco a los %.1f s: cinematica %d activa=%s t=%.2f (%s) | frase %d, sonidos %d, musica %s | camara %s en %.1f %.1f %.1f | %s | lluvia %.2f",
+                    seg, com.darkcraft.client.ClientCine.chapter(), com.darkcraft.client.ClientCine.active(), com.darkcraft.client.ClientCine.time(), com.darkcraft.client.Guion.cortes(),
+                    com.darkcraft.client.Guion.ultimaFrase(), com.darkcraft.client.Guion.sonando(), com.darkcraft.client.ClientMusic.debug(),
+                    cam == null ? "-" : cam.getClass().getSimpleName(), cam == null ? 0 : cam.getX(), cam == null ? 0 : cam.getY(), cam == null ? 0 : cam.getZ(), vuela,
+                    m.level == null ? 0f : m.level.getRainLevel(1f)));
+            server(m, sp -> log("    (servidor) " + fpos(sp) + " en cinematica=" + com.darkcraft.cine.Cinematics.active(sp) + " corte=" + com.darkcraft.cine.Cinematics.fase(sp)
+                    + " invisible=" + sp.isInvisible() + " volando="
+                    + sp.getAbilities().flying + " | " + com.darkcraft.pueblo.Pueblo.estado(com.darkcraft.pueblo.Pueblo.Datos.get(sp.server))));
+            shot(m, nombre);
+        });
+    }
+
+    /** Lo que mira un punto del amarre de Valdrenn (en las coordenadas del barco en Brumavela). */
+    private static void irAlMuelle(ServerPlayer sp, double x, double y, double z, double tx, double ty, double tz) {
+        int[] o = com.darkcraft.pueblo.Amarres.de(sp.serverLevel(), com.darkcraft.pueblo.Amarres.VALDRENN);
+        irMirando(sp, x + o[0], y, z + o[1], tx + o[0], ty, tz + o[1], false);
+    }
+
+    /**
+     * El barco que va y viene (parte 3d-2): se repara por etapas con su cinematica, el primer viaje a Valdrenn (la Sombra
+     * habla; el muelle se hace solo mientras se llega), el muelle con su campana y su santuario, la vuelta a Brumavela y
+     * la llamada con la campana del espigon.
+     */
+    private static int barco(int t0) {
+        final int C = t0;
+        atTicks(C + 2, "El barco: la isla como al principio, sin enemigos, con las cinco piezas y en cubierta", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.removeAllEffects();
+                lvl.setDayTime(6000);
+                lvl.setWeatherParameters(6000, 0, false, false);
+                comando(sp, "darkcraft brumavela reiniciar");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, com.darkcraft.pueblo.PuebloEnemigos.SITIO, true);
+                com.darkcraft.pueblo.PuebloEnemigos.capitan(lvl, true);
+                comando(sp, "darkcraft brumavela pieza todas");
+                int[] z = sitioB("barco");
+                irMirando(sp, z[0] + 0.5, z[1], z[2] + 2.5, z[0] + 0.5, z[1] + 1.2, z[2] - 2, false);
+                var d = com.darkcraft.pueblo.Pueblo.Datos.get(sp.server);
+                log("  barco: " + com.darkcraft.pueblo.Pueblo.estado(d) + " | logro zarpar=" + com.darkcraft.story.Logros.tiene(sp, "zarpar") + ", rumbo a Valdrenn "
+                        + java.util.Arrays.toString(com.darkcraft.pueblo.Amarres.de(lvl, com.darkcraft.pueblo.Amarres.VALDRENN)));
+            });
+        });
+        atTicks(C + 70, "captura: en cubierta, con las cinco piezas", m -> {
+            logPueblo(m, "antes de reparar (a mano 11)");
+            shot(m, "cliente_ba01_antes_de_reparar");
+        });
+        atTicks(C + 74, "el barco se repara (la cinematica)", m -> server(m, sp -> com.darkcraft.pueblo.Pueblo.usar(sp, 11)));
+        int R = C + 77;
+        capturaBarco(R, 1.7f, "cliente_ba02_rep_cubierta");
+        capturaBarco(R, 3.5f, "cliente_ba03_rep_casco");
+        capturaBarco(R, 6.2f, "cliente_ba04_rep_palo");
+        capturaBarco(R, 8.9f, "cliente_ba05_rep_vergas");
+        capturaBarco(R, 10.8f, "cliente_ba06_rep_velas");
+        capturaBarco(R, 12.5f, "cliente_ba07_rep_piezas");
+        capturaBarco(R, 13.9f, "cliente_ba08_rep_entero");
+        int Rf = R + Math.round((com.darkcraft.cine.Reparacion.FIN + 1.6f) * 20f);
+        atTicks(Rf, "captura: reparado (el cartel y el logro)", m -> {
+            logPueblo(m, "tras la reparacion");
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                var caja = new net.minecraft.world.phys.AABB(-34, 230, 96, 18, 290, 180);
+                log("  barco reparado: distinto del plano " + com.darkcraft.pueblo.Garza.distintas(lvl, true, 0, 0) + " (0), objetos sueltos "
+                        + lvl.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, caja).size() + " (0), el ancla colgada=" + com.darkcraft.pueblo.Pueblo.anclaColgada()
+                        + ", logro barco=" + com.darkcraft.story.Logros.tiene(sp, "barco") + ", en cinematica=" + com.darkcraft.cine.Cinematics.active(sp));
+            });
+            shot(m, "cliente_ba09_reparado");
+        });
+        atTicks(Rf + 4, "al timon", m -> server(m, sp -> {
+            int[] z = sitioB("barco_timon");
+            irMirando(sp, z[0] + 0.5, z[1], z[2] + 2.5, z[0] + 0.5, z[1] + 1.4, z[2] + 0.5, false);
+        }));
+        atTicks(Rf + 44, "captura: al timon", m -> {
+            logPueblo(m, "al timon (a mano 12: zarpar)");
+            shot(m, "cliente_ba10_timon");
+        });
+        // ---- el primer viaje a Valdrenn (con la Sombra)
+        atTicks(Rf + 48, "se zarpa hacia Valdrenn (el primer viaje)", m -> {
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> com.darkcraft.pueblo.Travesia.zarpar(sp, true));
+        });
+        int V = Rf + 51;
+        capturaBarco(V, 2.4f, "cliente_vj01_al_timon");
+        capturaBarco(V, 7.6f, "cliente_vj02_se_eleva");
+        capturaBarco(V, 11.8f, "cliente_vj03_en_el_aire");
+        capturaBarco(V, 15.6f, "cliente_vj04_las_velas");
+        capturaBarco(V, 19.2f, "cliente_vj05_se_aleja");
+        capturaBarco(V, 24.0f, "cliente_vj06_valdrenn");
+        capturaBarco(V, 29.0f, "cliente_vj07_la_torre");
+        capturaBarco(V, 33.4f, "cliente_vj08_juramentos");
+        capturaBarco(V, 37.8f, "cliente_vj09_sobre_el_muelle");
+        capturaBarco(V, 42.0f, "cliente_vj10_gira");
+        capturaBarco(V, 45.4f, "cliente_vj11_baja");
+        capturaBarco(V, 48.2f, "cliente_vj12_atraca");
+        capturaBarco(V, 51.0f, "cliente_vj13_en_cubierta");
+        capturaBarco(V, 53.8f, "cliente_vj14_a_los_ojos");
+        int A = V + Math.round((com.darkcraft.cine.Viaje.tiempos(com.darkcraft.cine.Viaje.PRIMERO).total() + 1.8f) * 20f);
+        atTicks(A, "captura: en Valdrenn, en el alcazar", m -> {
+            com.darkcraft.client.ui.Carteles.callados = false;
+            logPueblo(m, "al llegar a Valdrenn");
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                int[] o = com.darkcraft.pueblo.Amarres.de(lvl, com.darkcraft.pueblo.Amarres.VALDRENN);
+                var d = com.darkcraft.pueblo.Pueblo.Datos.get(sp.server);
+                log("  barco en Valdrenn: bajo los pies " + bloque(lvl, sp.getX(), sp.getY() - 0.5, sp.getZ()) + ", muelle hecho=" + d.muelle + ", distinto del plano "
+                        + com.darkcraft.pueblo.Garza.distintas(lvl, true, o[0], o[1]) + " (0), en Brumavela queda "
+                        + (com.darkcraft.pueblo.Garza.plano(true).size() - com.darkcraft.pueblo.Garza.distintas(lvl, true, 0, 0)) + " celdas iguales al barco, logro zarpar="
+                        + com.darkcraft.story.Logros.tiene(sp, "zarpar") + ", modo " + sp.gameMode.getGameModeForPlayer() + ", volando=" + sp.getAbilities().flying
+                        + ", invisible=" + sp.isInvisible() + ", giro " + Math.round(sp.getYRot()) + " cabeceo " + Math.round(sp.getXRot()));
+            });
+            shot(m, "cliente_vj15_llegada");
+        });
+        atTicks(A + 4, "el muelle desde el camino de nubes", m -> server(m, sp -> irAlMuelle(sp, 3.5, 251, 160.5, -6, 256, 138)));
+        atTicks(A + 50, "captura: el muelle de Valdrenn", m -> {
+            logPueblo(m, "en el camino, junto al muelle");
+            shot(m, "cliente_vj16_muelle");
+        });
+        atTicks(A + 54, "la campana del muelle", m -> server(m, sp -> irAlMuelle(sp, 0.5, 251, 133.5, -0.5, 252.4, 130.5)));
+        atTicks(A + 90, "captura: la campana (con el barco aqui no se llama)", m -> {
+            logPueblo(m, "ante la campana");
+            shot(m, "cliente_vj17_campana");
+        });
+        atTicks(A + 94, "el santuario del muelle", m -> server(m, sp -> irAlMuelle(sp, 0.5, 251, 144.5, -0.5, 251.6, 147.5)));
+        atTicks(A + 130, "captura: el santuario", m -> {
+            logPueblo(m, "ante el santuario");
+            server(m, sp -> {
+                int[] o = com.darkcraft.pueblo.Amarres.de(sp.serverLevel(), com.darkcraft.pueblo.Amarres.VALDRENN);
+                BlockPos s = new BlockPos(com.darkcraft.pueblo.gen.MuelleValdrenn.SANTUARIO_X + o[0], 251, com.darkcraft.pueblo.gen.MuelleValdrenn.SANTUARIO_Z + o[1]);
+                log("  barco: el santuario del muelle " + sp.serverLevel().getBlockState(s) + " se llama " + com.darkcraft.santuario.Santuarios.nombre(sp.serverLevel(), s));
+            });
+            shot(m, "cliente_vj18_santuario");
+        });
+        // ---- la vuelta a Brumavela (el viaje corto)
+        atTicks(A + 134, "al timon, en Valdrenn", m -> server(m, sp -> {
+            int[] z = sitioB("barco_timon");
+            irAlMuelle(sp, z[0] + 0.5, z[1], z[2] + 2.5, z[0] + 0.5, z[1] + 1.4, z[2] + 0.5);
+        }));
+        atTicks(A + 170, "captura: al timon en Valdrenn", m -> {
+            logPueblo(m, "al timon en Valdrenn (a mano 12: volver)");
+            shot(m, "cliente_vj19_timon_valdrenn");
+        });
+        atTicks(A + 174, "se vuelve a Brumavela", m -> {
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> com.darkcraft.pueblo.Pueblo.usar(sp, 12));
+        });
+        int N = A + 177;
+        capturaBarco(N, 1.6f, "cliente_vn01_al_timon");
+        capturaBarco(N, 6.6f, "cliente_vn02_se_eleva");
+        capturaBarco(N, 11.6f, "cliente_vn03_se_va");
+        capturaBarco(N, 18.4f, "cliente_vn04_llega");
+        capturaBarco(N, 23.2f, "cliente_vn05_gira");
+        capturaBarco(N, 27.0f, "cliente_vn06_baja");
+        capturaBarco(N, 31.6f, "cliente_vn07_en_cubierta");
+        int B = N + Math.round((com.darkcraft.cine.Viaje.tiempos(com.darkcraft.cine.Viaje.NORMAL).total() + 1.6f) * 20f);
+        atTicks(B, "captura: de vuelta en Brumavela", m -> {
+            logPueblo(m, "de vuelta en Brumavela");
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                int[] o = com.darkcraft.pueblo.Amarres.de(lvl, com.darkcraft.pueblo.Amarres.VALDRENN);
+                log("  barco en Brumavela: bajo los pies " + bloque(lvl, sp.getX(), sp.getY() - 0.5, sp.getZ()) + ", distinto del plano " + com.darkcraft.pueblo.Garza.distintas(lvl, true, 0, 0)
+                        + " (0), cargado el muelle de Valdrenn=" + com.darkcraft.pueblo.Garza.cargado(lvl, o[0], o[1]) + ", volando=" + sp.getAbilities().flying + ", invisible="
+                        + sp.isInvisible());
+            });
+            shot(m, "cliente_vn08_en_brumavela");
+        });
+        // ---- la campana: el barco esta en Valdrenn y se le llama desde el espigon
+        atTicks(B + 4, "el barco se va a Valdrenn (de una vez) y el jugador, a la campana del espigon", m -> server(m, sp -> {
+            com.darkcraft.pueblo.Travesia.mover(sp.serverLevel(), com.darkcraft.pueblo.Amarres.VALDRENN);
+            irMirando(sp, 0.5, 251, 133.2, 2.5, 252.4, 135.5, false);
+        }));
+        atTicks(B + 50, "captura: la campana del espigon", m -> {
+            logPueblo(m, "ante la campana del espigon (a mano 13: llamar)");
+            server(m, sp -> log("  barco: la campana del espigon " + bloque(sp.serverLevel(), 2.5, 252.5, 135.5) + " sobre " + bloque(sp.serverLevel(), 2.5, 251.5, 135.5)
+                    + ", queda del barco en Brumavela " + (com.darkcraft.pueblo.Garza.plano(true).size() - com.darkcraft.pueblo.Garza.distintas(sp.serverLevel(), true, 0, 0))));
+            shot(m, "cliente_vl01_campana");
+        });
+        atTicks(B + 54, "se toca la campana: el barco acude", m -> {
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> com.darkcraft.pueblo.Pueblo.usar(sp, com.darkcraft.pueblo.Pueblo.LLAMAR));
+        });
+        int L = B + 57;
+        capturaBarco(L, 3.0f, "cliente_vl02_viene");
+        capturaBarco(L, 8.0f, "cliente_vl03_gira");
+        capturaBarco(L, 11.8f, "cliente_vl04_baja");
+        capturaBarco(L, 15.4f, "cliente_vl05_amarrado");
+        int F = L + Math.round((com.darkcraft.cine.Viaje.tiempos(com.darkcraft.cine.Viaje.LLAMADA).total() + 1.4f) * 20f);
+        atTicks(F, "captura: el barco ha acudido", m -> {
+            logPueblo(m, "tras la llamada");
+            server(m, sp -> log("  barco tras la llamada: " + fpos(sp) + ", distinto del plano en Brumavela " + com.darkcraft.pueblo.Garza.distintas(sp.serverLevel(), true, 0, 0)
+                    + " (0), en cinematica=" + com.darkcraft.cine.Cinematics.active(sp)));
+            shot(m, "cliente_vl06_ha_acudido");
+        });
+        atTicks(F + 4, "fin del tramo: creativo otra vez", m -> {
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> sp.setGameMode(GameType.CREATIVE));
+        });
+        return F + 14;
+    }
+
     private static void logTitulo(Minecraft m, String what) {
         String r;
         if (m.screen instanceof com.darkcraft.client.ui.TituloScreen ti) r = ti.resumen();
@@ -4089,6 +4297,7 @@ public final class ClientCiTest {
         fin = pueblo(fin);
         fin = enemigos(fin);
         fin = intro(fin);
+        fin = barco(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

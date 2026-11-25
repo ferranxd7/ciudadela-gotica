@@ -81,7 +81,8 @@ public final class Comandos {
         for (Linea l : FORTALEZA) src.sendSuccess(() -> linea(l), false);
         src.sendSuccess(() -> Component.translatable("darkcraft.ayuda.brumavela").withStyle(ChatFormatting.GOLD), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela ir ", "/darkcraft brumavela ir [<sitio>]", "b_ir")), false);
-        src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela pieza ", "/darkcraft brumavela pieza <nombre>|todas / cripta / reparar / zarpar", "b_piezas")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela pieza ", "/darkcraft brumavela pieza <nombre>|todas / cripta / reparar [ya]", "b_piezas")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela zarpar", "/darkcraft brumavela zarpar [primero] / llamar / muelle / barco <brumavela|valdrenn>", "b_barco")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela estado", "/darkcraft brumavela estado / reiniciar", "b_estado")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela enemigos", "/darkcraft brumavela enemigos [volver | fuera]", "b_enemigos")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela capitan", "/darkcraft brumavela capitan [vencer | volver]", "b_capitan")), false);

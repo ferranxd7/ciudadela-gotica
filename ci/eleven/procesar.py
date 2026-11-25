@@ -138,11 +138,18 @@ SFX = {
     # que te atrapa (crece y da el golpe a los ~1,3 s), la marca que arde y los dos latidos antes de abrir los ojos
     "intro_abismo": (30.0, 4.0, -25), "intro_caida": (10.5, 1.2, -16), "intro_atrapa": (3.6, 0.9, -12),
     "intro_marca": (5.5, 2.0, -17), "intro_latido": (4.2, 0.8, -14),
+    # el barco (parte 3d): se eleva (un quejido de cuadernas que crece), las velas que se tensan, el viento del vuelo (en
+    # bucle), el golpe sordo al atracar, la campana del muelle y las tablas que vuelven a su sitio al repararlo
+    "barco_eleva": (13.5, 3.0, -15), "barco_velas": (6.0, 0.8, -15), "barco_vuelo": (25.0, 3.5, -22),
+    "barco_atraca": (6.0, 1.8, -13), "barco_campana": (5.5, 2.0, -14), "barco_repara": (11.2, 1.6, -15),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
-ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5}
+ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
+           "barco_vuelo": 3.0}
+# los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
+INICIO = {"barco_atraca": 3.8}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
-GRAVES = {"intro_atrapa", "intro_latido"}
+GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
 EXTRA = {"intro_marca": "highshelf=f=2500:g=8,"}
 # de estos se bajaron 4 tomas (NOMBRE_1..4.mp3): las elegidas salen como NOMBRE_1.ogg, NOMBRE_2.ogg...
@@ -221,6 +228,11 @@ TOMAS_SFX = {
     # la cinematica de inicio: el zumbido mas parejo, el viento que sopla igual los doce segundos, la que crece dos
     # segundos y da el golpe, la marca con mas cuerpo y los dos latidos separados dos segundos largos
     "intro_abismo": (3,), "intro_caida": (2,), "intro_atrapa": (2,), "intro_marca": (1,), "intro_latido": (4,),
+    # el barco: el quejido que crece cuatro segundos antes de llenarse, las velas con dos golpes secos (a los 2 y a los
+    # 3,5 s), el viento mas parejo, el golpe mas gordo (a los 4,5 s de la toma), las campanas con mas cuerpo y el
+    # martilleo seguido
+    "barco_eleva": (3,), "barco_velas": (1,), "barco_vuelo": (4,), "barco_atraca": (4,), "barco_campana": (1, 4),
+    "barco_repara": (3,),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -393,8 +405,9 @@ def voz_sombra(src, sus, dst, lufs=-15.0):
     return hablado + COLA
 
 
-def efecto(src, dst, maxs, fade, lufs, entrada=0.0, graves=False, extra=""):
-    filtro = (f"silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.02,atrim=0:{maxs},"
+def efecto(src, dst, maxs, fade, lufs, entrada=0.0, graves=False, extra="", inicio=0.0):
+    filtro = ((f"atrim=start={inicio},asetpts=PTS-STARTPTS," if inicio > 0 else "")
+              + f"silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.02,atrim=0:{maxs},"
               + (f"afade=t=in:st=0:d={entrada}," if entrada > 0 else "")
               + f"afade=t=out:st={max(0.05, maxs - fade):.2f}:d={fade}," + extra
               + f"loudnorm=I={lufs}:TP=-1.0:LRA=11")
@@ -530,7 +543,7 @@ def main():
                 continue
             dst = os.path.join(sfx, f"{nombre}_{i}.ogg")
             try:
-                efecto(src, dst, maxs, fade, lufs, ENTRADA.get(nombre, 0.0), nombre in GRAVES, EXTRA.get(nombre, ""))
+                efecto(src, dst, maxs, fade, lufs, ENTRADA.get(nombre, 0.0), nombre in GRAVES, EXTRA.get(nombre, ""), INICIO.get(nombre, 0.0))
                 print(f"efecto {nombre}_{i} (toma {k}): {duracion(dst):.2f} s")
             except Exception as e:  # noqa: BLE001
                 fallos += 1

@@ -67,7 +67,8 @@ import java.util.UUID;
  * Brumavela, la isla del pueblo abandonado donde se despierta (parte 3b): lo que pasa en ella. Las cinco piezas de La
  * Garza Gris (la vela en el arcon del almacen, el timon en la taberna, el mastil en la cripta de la capilla, el ancla
  * en el Saliente y el corazon en lo alto del faro), las tres campanas que abren la cripta (en el orden en que murieron
- * los fundadores: lo dicen sus lapidas), reparar el barco y zarpar hacia Valdrenn.
+ * los fundadores: lo dicen sus lapidas), reparar el barco y zarpar hacia Valdrenn. El viaje (y el barco que va y viene
+ * entre los dos muelles, parte 3d) esta en {@link Travesia}, {@link Amarres} y {@link Garza}.
  * <p>
  * Todo es <b>de todos</b>: en un servidor, la pieza que encuentra uno cuenta para el grupo y el barco se repara una vez
  * (SavedData {@code darkcraft_pueblo}). Las cosas que se usan (las "cosas": un arcon, una campana, una lapida, el
@@ -104,9 +105,10 @@ public final class Pueblo {
     public static final int TODAS = (1 << Pieza.values().length) - 1;
 
     // ---- las cosas que se usan con la tecla del aviso: las cinco piezas (0-4) y...
-    public static final int CAMPANA = 5, LAPIDA = 8, REPARAR = 11, ZARPAR = 12, VOLVER = 13, COSAS = 14;
+    // (LLAMAR y LLAMAR + 1: la campana del espigon de Brumavela y la del muelle de Valdrenn, para llamar al barco)
+    public static final int CAMPANA = 5, LAPIDA = 8, REPARAR = 11, ZARPAR = 12, LLAMAR = 13, COSAS = 15;
     /** Lo que dice el aviso de cada cosa ("Pulsa [E] para " + darkcraft.aviso.cosa.N). */
-    public static final int ABRIR = 0, RECOGER = 1, REGISTRAR = 2, TOCAR = 3, LEER = 4, A_REPARAR = 5, A_ZARPAR = 6, A_VOLVER = 7;
+    public static final int ABRIR = 0, RECOGER = 1, REGISTRAR = 2, TOCAR = 3, LEER = 4, A_REPARAR = 5, A_ZARPAR = 6, A_VOLVER = 7, A_LLAMAR = 8;
     private static final String[] QUIEN = {"pescador", "tejedora", "farero"};
     /** El orden en que murieron los fundadores: el Pescador, la Tejedora y el Farero. */
     private static final int[] ORDEN = {0, 1, 2};
@@ -142,32 +144,17 @@ public final class Pueblo {
         if (id >= CAMPANA && id < CAMPANA + 3) return sitio("campana_" + QUIEN[id - CAMPANA]);
         if (id >= LAPIDA && id < LAPIDA + 3) return sitio("lapida_" + QUIEN[id - LAPIDA]);
         if (id == REPARAR) return sitio("barco");
-        if (id == ZARPAR) return sitio("barco_timon");
-        if (id == VOLVER) {
-            BlockPos l = noray(lvl);
-            return l == null ? null : new int[]{l.getX(), l.getY(), l.getZ()};
+        if (id == ZARPAR) {
+            // el timon del barco, en el muelle donde este amarrado
+            Datos d = Datos.get(lvl.getServer());
+            int[] o = d.puesto < 0 ? null : Amarres.de(lvl, d.puesto), s = sitio("barco_timon");
+            return o == null ? null : new int[]{s[0] + o[0], s[1], s[2] + o[1]};
+        }
+        if (id >= LLAMAR && id < LLAMAR + 2) {
+            BlockPos c = Amarres.campana(lvl, id - LLAMAR);
+            return c == null ? null : new int[]{c.getX(), c.getY(), c.getZ()};
         }
         return null;
-    }
-
-    /** El noray de la llegada a Valdrenn (desde el se vuelve a Brumavela), a un lado de la plazoleta de la torre. */
-    private static BlockPos noray(ServerLevel lvl) {
-        BlockPos l = llegada(lvl);
-        return l == null ? null : l.offset(3, 0, 2);
-    }
-
-    private static BlockPos llegadaVista;
-    private static long llegadaSemilla;
-    private static boolean llegadaBuscada;
-
-    /** Donde deja el barco (se calcula una vez por mundo: hay que levantar el plano del reino). */
-    private static BlockPos llegada(ServerLevel lvl) {
-        if (!llegadaBuscada || llegadaSemilla != lvl.getSeed()) {
-            llegadaVista = MundoNubes.llegada(lvl.getSeed());
-            llegadaSemilla = lvl.getSeed();
-            llegadaBuscada = true;
-        }
-        return llegadaVista;
     }
 
     /** Las cosas que hay ahora mismo. */
@@ -185,9 +172,15 @@ public final class Pueblo {
             else if (id == REPARAR) {
                 if (d.reparado) continue;
                 accion = A_REPARAR;
+            } else if (id == ZARPAR) {
+                // desde el timon, con el barco amarrado y sin nadie de viaje
+                if (!d.amarrado() || Travesia.ocupado()) continue;
+                accion = d.puesto == Amarres.BRUMAVELA ? A_ZARPAR : A_VOLVER;
             } else {
-                if (!d.reparado) continue;
-                accion = id == ZARPAR ? A_ZARPAR : A_VOLVER;
+                // la campana del muelle donde no esta el barco
+                int k = id - LLAMAR;
+                if (!d.amarrado() || d.barcoEn == k || Travesia.ocupado() || (k == Amarres.VALDRENN && !d.muelle)) continue;
+                accion = A_LLAMAR;
             }
             int[] s = donde(lvl, id);
             if (s != null) r.add(new Cosa(id, s[0], s[1], s[2], accion));
@@ -203,8 +196,23 @@ public final class Pueblo {
         public boolean reparado, cripta, santuario;
         /** El Capitan ha caido (parte 3c): la puerta del faro esta abierta y el corazon se puede coger. */
         public boolean capitan;
+        /**
+         * El barco que va y viene (parte 3d). {@code barcoEn}: en que amarre esta (o hacia cual va); {@code puesto}: en cual
+         * esta de verdad, con sus bloques, o -1 mientras vuela; {@code resto}: el amarre del que aun hay que quitarlo (-1 si
+         * ninguno); {@code muelle}: el muelle de Valdrenn ya esta hecho; {@code carga}: lo que llevaban sus barriles,
+         * mientras no se ha vuelto a meter en ellos; {@code obra}: se esta reparando (si el servidor se cierra a medias,
+         * al volver se deja entero de una vez).
+         */
+        public int barcoEn, puesto, resto = -1;
+        public boolean muelle, obra;
+        public ListTag carga = new ListTag();
         /** Sube cada vez que cambia algo que el cliente tiene que saber. */
         int version = 1;
+
+        /** Si el barco, ya reparado, esta amarrado y quieto donde tiene que estar. */
+        public boolean amarrado() {
+            return reparado && puesto >= 0 && puesto == barcoEn && resto < 0;
+        }
 
         public static Datos get(MinecraftServer srv) {
             return srv.overworld().getDataStorage().computeIfAbsent(Datos::load, Datos::new, ID);
@@ -217,6 +225,12 @@ public final class Pueblo {
             d.cripta = t.getBoolean("cripta");
             d.santuario = t.getBoolean("santuario");
             d.capitan = t.getBoolean("capitan");
+            d.barcoEn = t.getInt("barcoEn");
+            d.puesto = t.contains("puesto") ? t.getInt("puesto") : 0;
+            d.resto = t.contains("resto") ? t.getInt("resto") : -1;
+            d.muelle = t.getBoolean("muelle");
+            d.obra = t.getBoolean("obra");
+            d.carga = t.getList("carga", net.minecraft.nbt.Tag.TAG_COMPOUND);
             return d;
         }
 
@@ -227,10 +241,16 @@ public final class Pueblo {
             t.putBoolean("cripta", cripta);
             t.putBoolean("santuario", santuario);
             t.putBoolean("capitan", capitan);
+            t.putInt("barcoEn", barcoEn);
+            t.putInt("puesto", puesto);
+            t.putInt("resto", resto);
+            t.putBoolean("muelle", muelle);
+            t.putBoolean("obra", obra);
+            t.put("carga", carga);
             return t;
         }
 
-        void cambio() {
+        public void cambio() {
             version++;
             setDirty();
         }
@@ -239,8 +259,9 @@ public final class Pueblo {
     /** La version de la lista de cosas que tiene cada jugador. */
     private static final Map<UUID, Integer> ENVIADO = new HashMap<>();
     private static final EnumMap<Pieza, Display.ItemDisplay> VISTAS = new EnumMap<>(Pieza.class);
-    /** El ancla del barco reparado, colgada de su serviola. */
+    /** El ancla del barco reparado, colgada de su serviola; y en que amarre estan puestos ella y el corazon de la bodega. */
     private static Display.ItemDisplay anclaVista;
+    private static int amarreVisto = -1;
     /** Las campanas: cuantas van bien seguidas y cuando sono la ultima. */
     private static int seguidas;
     private static long ultimoToque;
@@ -250,7 +271,10 @@ public final class Pueblo {
         ENVIADO.clear();
         VISTAS.clear();
         anclaVista = null;
+        amarreVisto = -1;
         seguidas = 0;
+        Amarres.olvidar();
+        Travesia.parar();
     }
 
     @SubscribeEvent
@@ -273,12 +297,11 @@ public final class Pueblo {
         if (p.tickCount % 20 != 11) return;
         boolean aqui = en(p);
         ServerLevel lvl = p.serverLevel();
-        boolean llegada = false;
-        if (!aqui && mundo(lvl)) {
-            BlockPos n = Datos.get(p.server).reparado ? noray(lvl) : null;
-            llegada = n != null && n.distSqr(p.blockPosition()) < 96 * 96;
-            if (llegada) ponerNoray(lvl, n);
-        }
+        // cerca del muelle de Valdrenn: que se haga si falta, y sus cosas (el timon del barco, la campana)
+        // (el muelle se hace ya desde lejos, tambien desde el reino de abajo: asi nadie ve como se calma el mar de nubes)
+        boolean cercaV = !aqui && mundo(lvl) && Amarres.cerca(lvl, p.getX(), p.getZ(), 150);
+        if (cercaV && Amarres.falta(lvl)) Amarres.pedir(lvl);
+        boolean llegada = cercaV && p.getY() > 200 && Amarres.cerca(lvl, p.getX(), p.getZ(), 110);
         if (!aqui && !llegada) {
             if (ENVIADO.remove(p.getUUID()) != null) Net.to(p, new Net.Cosas(List.of(), 0, false));
             return;
@@ -289,7 +312,11 @@ public final class Pueblo {
             ENVIADO.put(p.getUUID(), d.version);
             Net.to(p, new Net.Cosas(cosas(lvl), d.piezas, d.reparado));
         }
-        if (!aqui) return;
+        if (!aqui) {
+            if (d.muelle && Amarres.enMuelle(lvl, p.getX(), p.getZ())) Rol.zona(p, MUELLE_VALDRENN);
+            return;
+        }
+        Amarres.campanaBrumavela(lvl);
         if (!d.santuario) santuario(lvl, d);
         Logros.dar(p, "brumavela");
         // el nombre del sitio (la primera vez, el de la isla)
@@ -323,9 +350,21 @@ public final class Pueblo {
             if (cerca && (q != Pieza.MASTIL || d.cripta))
                 lvl.sendParticles(ParticleTypes.WAX_ON, s[0] + 0.5, s[1] + (q == Pieza.CORAZON ? 0.5 : 1.0), s[2] + 0.5, 3, 0.35, 0.4, 0.35, 0.02);
         }
+        // el barco reparado: en que amarre esta de verdad (con sus bloques) ahora mismo
+        int amarre = d.reparado ? Travesia.enPie(d) : -1;
+        int[] off = amarre < 0 ? null : Amarres.de(lvl, amarre);
+        if (off == null) amarre = -1;
+        if (amarre != amarreVisto) {
+            // se ha ido (o ha llegado): el corazon y el ancla se quitan y se vuelven a poner donde toque
+            Display.ItemDisplay v = d.reparado ? VISTAS.remove(Pieza.CORAZON) : null;
+            if (v != null) v.discard();
+            if (anclaVista != null) anclaVista.discard();
+            anclaVista = null;
+            amarreVisto = amarre;
+        }
         // el corazon del barco reparado late en la bodega
-        if (d.reparado) {
-            int[] s = sitio("barco_corazon");
+        if (d.reparado && off != null) {
+            int[] s0 = sitio("barco_corazon"), s = {s0[0] + off[0], s0[1], s0[2] + off[1]};
             Display.ItemDisplay v = VISTAS.get(Pieza.CORAZON);
             boolean cerca = lvl.hasChunkAt(new BlockPos(s[0], s[1], s[2])) && lvl.getNearestPlayer(s[0] + 0.5, s[1], s[2] + 0.5, 72, false) != null;
             if (cerca && (v == null || v.isRemoved())) {
@@ -338,8 +377,9 @@ public final class Pueblo {
             if (cerca) lvl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, s[0] + 0.5, s[1] + 0.4, s[2] + 0.5, 1, 0.2, 0.2, 0.2, 0.005);
         }
         // y su ancla cuelga de la serviola: el dibujo de la pieza, de canto al barco (no hay bloque que haga de ancla)
-        int[] a = Barco.ancla();
-        boolean colgada = d.reparado && lvl.hasChunkAt(new BlockPos(a[0], a[1], a[2])) && lvl.getNearestPlayer(a[0] + 0.5, a[1], a[2] + 0.5, 96, false) != null;
+        int[] a0 = Barco.ancla(), a = off == null ? a0 : new int[]{a0[0] + off[0], a0[1], a0[2] + off[1]};
+        boolean colgada = d.reparado && off != null && lvl.hasChunkAt(new BlockPos(a[0], a[1], a[2]))
+                && lvl.getNearestPlayer(a[0] + 0.5, a[1], a[2] + 0.5, 96, false) != null;
         if (colgada && (anclaVista == null || anclaVista.isRemoved())) {
             Matrix4f m = new Matrix4f().rotateY((float) (Math.PI / 2)).scale(ANCLA_TAM);
             anclaVista = dibujo(lvl, new ItemStack(Pieza.ANCLA.item()), a[0] + 0.5, a[1] - ANCLA_TAM * 0.47, a[2] + 0.5, m, false);
@@ -350,8 +390,19 @@ public final class Pueblo {
         }
     }
 
+    /** El barco se acaba de quitar de su muelle: fuera ya su ancla y su corazon (sin esperar al repaso de cada segundo). */
+    static void soltarVistas() {
+        Display.ItemDisplay v = VISTAS.remove(Pieza.CORAZON);
+        if (v != null) v.discard();
+        if (anclaVista != null) anclaVista.discard();
+        anclaVista = null;
+        amarreVisto = -1;
+    }
+
     /** Lo que mide el ancla colgada (su dibujo, en bloques). */
-    private static final float ANCLA_TAM = 1.7f;
+    public static final float ANCLA_TAM = 1.7f;
+    /** El nombre del muelle de Valdrenn (el sitio, para el Espejo y el cartel de la zona). */
+    public static final String MUELLE_VALDRENN = "darkcraft.mapa.lugar.muelle_valdrenn";
 
     /** Si el ancla del barco reparado esta a la vista (para las pruebas). */
     public static boolean anclaColgada() {
@@ -406,7 +457,12 @@ public final class Pueblo {
 
     /** El sitio de Brumavela donde esta el jugador (clave de idioma), o null si no esta en la isla. */
     public static String lugar(ServerPlayer p) {
-        if (!en(p)) return null;
+        if (!en(p)) {
+            // el muelle de Valdrenn (y el barco amarrado a el)
+            if (mundo(p.level()) && p.getY() > 240 && p.getY() < 290 && Datos.get(p.server).muelle && Amarres.enMuelle(p.serverLevel(), p.getX(), p.getZ()))
+                return MUELLE_VALDRENN;
+            return null;
+        }
         PuebloPlan plan = PuebloPlan.get();
         double x = p.getX(), y = p.getY(), z = p.getZ();
         String l = "darkcraft.mapa.lugar.bv_";
@@ -448,8 +504,8 @@ public final class Pueblo {
         else if (id == REPARAR) {
             if (d.piezas == TODAS) reparar(p);
             else Net.to(p, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.pueblo.faltan." + (Pieza.values().length - Integer.bitCount(d.piezas)), 0));
-        } else if (id == ZARPAR) zarpar(p);
-        else if (id == VOLVER) volver(p);
+        } else if (id == ZARPAR) Travesia.zarpar(p, false);
+        else Travesia.llamar(p, id - LLAMAR);
     }
 
     /** Todos los que estan en la isla. */
@@ -542,75 +598,46 @@ public final class Pueblo {
 
     // ------------------------------------------------------------------ el barco
 
-    /** Vuelve a levantar el barco, entero, encima del roto. */
+    /** Con las cinco piezas: el barco se rehace solo, por etapas, delante de quien lo repara (la cinematica: {@link Travesia#reparar}). */
     public static void reparar(ServerPlayer p) {
-        ServerLevel lvl = p.serverLevel();
         Datos d = Datos.get(p.server);
+        if (d.reparado || Travesia.ocupado()) return;
+        d.reparado = true;
+        d.obra = true;
+        d.barcoEn = d.puesto = Amarres.BRUMAVELA;
+        d.resto = -1;
+        d.cambio();
+        Travesia.reparar(p);
+        DarkCraftMod.LOGGER.info("[DarkCraft] Brumavela: {} repara La Garza Gris", p.getGameProfile().getName());
+    }
+
+    /** El barco, reparado de una vez y sin cinematica (para las pruebas y los comandos). */
+    public static void repararYa(ServerLevel lvl) {
+        Datos d = Datos.get(lvl.getServer());
         if (d.reparado) return;
         levantar(lvl, true);
         d.reparado = true;
+        d.barcoEn = d.puesto = Amarres.BRUMAVELA;
+        d.resto = -1;
         d.cambio();
+    }
+
+    /** El barco acaba de quedar entero: el destello, la fanfarria, el cartel y el logro de todos los que estan en la isla. */
+    public static void reparado(ServerLevel lvl) {
         int[] s = sitio("barco");
         double x = Barco.BX + 0.5, z = Barco.PALO + 0.5;
         for (int k = 0; k < Barco.PALO_ALTO; k += 2) lvl.sendParticles(ParticleTypes.END_ROD, x, s[1] + k, z, 6, 0.5, 0.6, 0.5, 0.03);
         lvl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, x, s[1] + 1, Barco.CORAZON_Z + 0.5, 40, 2.5, 0.6, 5, 0.03);
         lvl.playSound(null, x, s[1], z, DarkCraftMod.SFX_BARCO.get(), SoundSource.PLAYERS, 2.5f, 1.0f);
-        for (ServerPlayer o : presentes(p.server)) {
+        for (ServerPlayer o : presentes(lvl.getServer())) {
             Net.to(o, new Net.Cartel(Net.Cartel.BARCO, "darkcraft.cartel.barco.sub", 0));
             Logros.dar(o, "barco");
         }
-        DarkCraftMod.LOGGER.info("[DarkCraft] Brumavela: {} repara La Garza Gris", p.getGameProfile().getName());
     }
 
-    /** Pone el barco (roto o entero) en el mundo ya generado, chunk a chunk, y une vallas y cristales. */
+    /** Deja el barco de Brumavela roto o entero, de una vez (sin que salte nada de lo que lleva colgado o apoyado). */
     public static void levantar(ServerLevel lvl, boolean entero) {
-        Barco b = new Barco(PuebloPlan.get().barco.semilla(), entero);
-        RandomSource azar = RandomSource.create(7);
-        for (int cx = b.x0 >> 4; cx <= b.x1 >> 4; cx++)
-            for (int cz = b.z0 >> 4; cz <= b.z1 >> 4; cz++) {
-                Canvas c = new Canvas(lvl, cx, cz, azar);
-                b.despejar(c);
-                b.build(c);
-            }
-        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
-        for (int x = b.x0; x <= b.x1; x++)
-            for (int z = b.z0; z <= b.z1; z++)
-                for (int y = b.y0; y <= b.y1; y++) {
-                    BlockState s = lvl.getBlockState(m.set(x, y, z));
-                    if (!(s.getBlock() instanceof CrossCollisionBlock) && !(s.getBlock() instanceof WallBlock)) continue;
-                    BlockState n = Block.updateFromNeighbourShapes(s, lvl, m);
-                    if (n != s) lvl.setBlock(m, n, 2);
-                }
-    }
-
-    /** Del timon de La Garza Gris a Valdrenn (de momento, sin viaje: la cinematica llega en la parte 3d). */
-    private static void zarpar(ServerPlayer p) {
-        ServerLevel lvl = p.serverLevel();
-        BlockPos l = llegada(lvl);
-        if (l == null) {
-            Net.to(p, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.pueblo.sin_rumbo", 0));
-            return;
-        }
-        lvl.playSound(null, p.getX(), p.getY(), p.getZ(), DarkCraftMod.SFX_BARCO.get(), SoundSource.PLAYERS, 1.0f, 1.25f);
-        p.teleportTo(lvl, l.getX() + 0.5, l.getY() + 0.1, l.getZ() + 0.5, 180f, 0f);
-        Logros.dar(p, "zarpar");
-        Net.to(p, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.pueblo.llegada", 0));
-    }
-
-    private static void volver(ServerPlayer p) {
-        ServerLevel lvl = p.serverLevel();
-        int[] s = sitio("barco_timon");
-        lvl.playSound(null, p.getX(), p.getY(), p.getZ(), DarkCraftMod.SFX_BARCO.get(), SoundSource.PLAYERS, 1.0f, 1.25f);
-        p.teleportTo(lvl, s[0] + 0.5, s[1] + 0.1, s[2] + 2.5, 0f, 0f);
-    }
-
-    /** El noray de la llegada: un poste con su farol junto a la plazoleta de la torre (se pone una vez). */
-    private static void ponerNoray(ServerLevel lvl, BlockPos n) {
-        if (!lvl.hasChunkAt(n) || lvl.getBlockState(n).is(Blocks.DARK_OAK_LOG)) return;
-        lvl.setBlock(n.below(), DarkCraftMod.NUBE_FIRME.get().defaultBlockState(), 3);
-        lvl.setBlock(n, Blocks.DARK_OAK_LOG.defaultBlockState(), 3);
-        lvl.setBlock(n.above(), Blocks.DARK_OAK_FENCE.defaultBlockState(), 3);
-        lvl.setBlock(n.above(2), Blocks.SOUL_LANTERN.defaultBlockState(), 3);
+        Garza.dejar(lvl, entero ? 1 : 0, 0, 0, com.darkcraft.world.NubesGenerador::cima);
     }
 
     // ------------------------------------------------------------------ el clic derecho en sus bloques
@@ -619,9 +646,21 @@ public final class Pueblo {
     public static void onClic(PlayerInteractEvent.RightClickBlock e) {
         Level l = e.getLevel();
         BlockPos b = e.getPos();
-        if (l.dimension() != Level.OVERWORLD || !PuebloFeature.dentro(b.getX(), b.getZ())) return;
+        if (l.dimension() != Level.OVERWORLD) return;
+        if (!PuebloFeature.dentro(b.getX(), b.getZ())) {
+            // en el muelle de Valdrenn: la rueda del timon del barco y la campana (esto solo lo sabe el servidor)
+            if (l instanceof ServerLevel sl && mundo(sl) && Amarres.enMuelle(sl, b.getX(), b.getZ())) clicMuelle(e, sl, b, Amarres.VALDRENN);
+            return;
+        }
         if (!l.isClientSide() ? !mundo(l) : false) return;
         BlockState s = l.getBlockState(b);
+        // la campana del espigon (para llamar al barco)
+        if (s.is(Blocks.BELL) && b.getX() == Amarres.CAMPANA_BV_X && b.getZ() == Amarres.CAMPANA_BV_Z) {
+            e.setCanceled(true);
+            e.setCancellationResult(InteractionResult.SUCCESS);
+            if (l instanceof ServerLevel sl) clicMuelle(e, sl, b, Amarres.BRUMAVELA);
+            return;
+        }
         int id = -1;
         if (s.is(Blocks.IRON_BARS) && b.getX() == PuebloEnemigos.puertaFaro().getX() && b.getZ() == PuebloEnemigos.puertaFaro().getZ()
                 && Math.abs(b.getY() - PuebloEnemigos.puertaFaro().getY()) <= 1) {
@@ -634,6 +673,15 @@ public final class Pueblo {
             for (int k = 0; k < 3; k++) if (igual(b, sitio("campana_" + QUIEN[k]))) id = CAMPANA + k;
         } else if (s.is(Blocks.GRINDSTONE) && b.getX() == Barco.BX && b.getZ() == Barco.TIMON_Z) id = ZARPAR;
         if (id < 0) return;
+        if (id == ZARPAR && !l.isClientSide()) {
+            boolean hay = false;
+            for (Cosa c : cosas((ServerLevel) l)) hay |= c.id() == id;
+            if (!hay) {
+                e.setCanceled(true);
+                e.setCancellationResult(InteractionResult.SUCCESS);
+                return;
+            }
+        }
         e.setCanceled(true);
         e.setCancellationResult(InteractionResult.SUCCESS);
         if (!l.isClientSide() && e.getEntity() instanceof ServerPlayer p && e.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND) {
@@ -644,6 +692,30 @@ public final class Pueblo {
 
     private static boolean igual(BlockPos b, int[] s) {
         return s != null && b.getX() == s[0] && b.getY() == s[1] && b.getZ() == s[2];
+    }
+
+    /** Clic derecho en la rueda del timon del barco amarrado en {@code amarre} o en la campana de ese muelle. */
+    private static void clicMuelle(PlayerInteractEvent.RightClickBlock e, ServerLevel lvl, BlockPos b, int amarre) {
+        BlockState s = lvl.getBlockState(b);
+        int id = -1;
+        int[] o = Amarres.de(lvl, amarre);
+        if (o == null) return;
+        if (s.is(Blocks.GRINDSTONE) && b.getX() == Barco.BX + o[0] && b.getZ() == Barco.TIMON_Z + o[1]) id = ZARPAR;
+        else if (s.is(Blocks.BELL) && b.equals(Amarres.campana(lvl, amarre))) id = LLAMAR + amarre;
+        if (id < 0) return;
+        e.setCanceled(true);
+        e.setCancellationResult(InteractionResult.SUCCESS);
+        if (!(e.getEntity() instanceof ServerPlayer p) || e.getHand() != net.minecraft.world.InteractionHand.MAIN_HAND) return;
+        boolean hay = false;
+        for (Cosa c : cosas(lvl)) hay |= c.id() == id;
+        if (hay) usar(p, id);
+        else if (id != ZARPAR) {
+            // la campana suena, pero el barco no viene: o ya esta aqui, o va de camino, o aun esta roto
+            lvl.playSound(null, b, DarkCraftMod.SFX_BARCO_CAMPANA.get(), SoundSource.BLOCKS, 1.6f, 1.0f);
+            Datos d = Datos.get(p.server);
+            Net.to(p, new Net.Cartel(Net.Cartel.AVISO, !d.reparado ? "darkcraft.pueblo.campana.roto" : d.barcoEn == amarre ? "darkcraft.pueblo.campana.aqui"
+                    : "darkcraft.pueblo.campana.viene", 0));
+        }
     }
 
     // ------------------------------------------------------------------ comandos
@@ -660,8 +732,8 @@ public final class Pueblo {
     }
 
     /**
-     * /darkcraft brumavela ir [sitio] | pieza <nombre>|todas | cripta | reparar | zarpar | estado | reiniciar |
-     * enemigos [volver | fuera] | capitan [vencer | volver].
+     * /darkcraft brumavela ir [sitio] | pieza <nombre>|todas | cripta | reparar [ya] | zarpar [primero] | llamar | muelle |
+     * barco <brumavela|valdrenn> | estado | reiniciar | enemigos [volver | fuera] | capitan [vencer | volver] | inicio.
      */
     public static LiteralArgumentBuilder<CommandSourceStack> comando() {
         return Commands.literal("brumavela")
@@ -677,8 +749,17 @@ public final class Pueblo {
                                     for (Pieza q : Pieza.values()) if (n.equals("todas") || n.equals(q.id())) tomar(p, q);
                                 }))))
                 .then(Commands.literal("cripta").executes(c -> con(c, p -> abrirCripta(p.serverLevel(), p))))
-                .then(Commands.literal("reparar").executes(c -> con(c, Pueblo::reparar)))
-                .then(Commands.literal("zarpar").executes(c -> con(c, Pueblo::zarpar)))
+                .then(Commands.literal("reparar").executes(c -> con(c, Pueblo::reparar))
+                        .then(Commands.literal("ya").executes(c -> con(c, p -> repararYa(p.serverLevel())))))
+                // zarpar desde donde este el barco (con "primero", la cinematica del primer viaje, con la Sombra)
+                .then(Commands.literal("zarpar").executes(c -> con(c, p -> Travesia.zarpar(p, false)))
+                        .then(Commands.literal("primero").executes(c -> con(c, p -> Travesia.zarpar(p, true)))))
+                // llamar al barco desde el muelle en el que se este, ir al muelle de Valdrenn y poner el barco en un muelle
+                .then(Commands.literal("llamar").executes(c -> con(c, p -> Travesia.llamar(p, en(p) ? Amarres.BRUMAVELA : Amarres.VALDRENN))))
+                .then(Commands.literal("muelle").executes(c -> con(c, Travesia::irAlMuelle)))
+                .then(Commands.literal("barco")
+                        .then(Commands.literal("brumavela").executes(c -> con(c, p -> Travesia.mover(p.serverLevel(), Amarres.BRUMAVELA))))
+                        .then(Commands.literal("valdrenn").executes(c -> con(c, p -> Travesia.mover(p.serverLevel(), Amarres.VALDRENN)))))
                 .then(Commands.literal("estado").executes(c -> con(c, p -> {
                     Datos d = Datos.get(p.server);
                     c.getSource().sendSuccess(() -> Component.literal(estado(d)), false);
@@ -718,6 +799,8 @@ public final class Pueblo {
         StringBuilder b = new StringBuilder("Brumavela: piezas ");
         for (Pieza q : Pieza.values()) b.append((d.piezas & (1 << q.ordinal())) != 0 ? q.id().toUpperCase(java.util.Locale.ROOT) : q.id()).append(' ');
         return b.append("| cripta ").append(d.cripta ? "abierta" : "cerrada").append(" | barco ").append(d.reparado ? "reparado" : "roto")
+                .append(d.reparado ? (d.barcoEn == Amarres.VALDRENN ? " en Valdrenn" : " en Brumavela") + (d.puesto < 0 ? " (de viaje)" : "") : "")
+                .append(" | muelle de Valdrenn ").append(d.muelle ? "hecho" : "sin hacer")
                 .append(" | santuario ").append(d.santuario ? "puesto" : "sin poner").append(" | capitan ").append(d.capitan ? "vencido" : "en pie").toString();
     }
 
@@ -732,8 +815,17 @@ public final class Pueblo {
         Datos d = Datos.get(lvl.getServer());
         d.piezas = 0;
         d.cripta = false;
-        boolean estaba = d.reparado;
+        // el barco vuelve a Brumavela, roto (si estaba en el muelle de Valdrenn, se quita de alli)
+        Travesia.parar();
+        for (int k : new int[]{d.puesto, d.resto}) {
+            int[] o = k == Amarres.VALDRENN ? Amarres.de(lvl, k) : null;
+            if (o != null) Garza.dejar(lvl, -1, o[0], o[1], Amarres.cima(lvl, k));
+        }
+        d.barcoEn = d.puesto = Amarres.BRUMAVELA;
+        d.resto = -1;
+        d.carga = new ListTag();
         d.reparado = false;
+        d.obra = false;
         d.capitan = false;
         d.cambio();
         com.darkcraft.enemigos.Puestos.todos(lvl.getServer(), PuebloEnemigos.SITIO, false);
@@ -745,6 +837,6 @@ public final class Pueblo {
         BlockPos c = pos("corazon");
         if (lvl.getBlockState(c).isAir()) lvl.setBlock(c, Blocks.LIGHT.defaultBlockState(), 3);
         lvl.blockEvent(pos("vela"), Blocks.CHEST, 1, 0);
-        if (estaba) levantar(lvl, false);
+        levantar(lvl, false);
     }
 }

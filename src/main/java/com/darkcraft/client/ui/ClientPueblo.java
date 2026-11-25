@@ -14,7 +14,7 @@ import java.util.List;
 public final class ClientPueblo {
     private ClientPueblo() {}
 
-    private static final String[] ACCION = {"abrir", "recoger", "registrar", "tocar", "leer", "reparar", "zarpar", "volver"};
+    private static final String[] ACCION = {"abrir", "recoger", "registrar", "tocar", "leer", "reparar", "zarpar", "volver", "llamar"};
     private static final String[] QUIEN = {"pescador", "tejedora", "farero"};
 
     private static List<Pueblo.Cosa> cosas = List.of();
@@ -70,7 +70,7 @@ public final class ClientPueblo {
             Vec3 a = new Vec3(c.x() + 0.5 - ojo.x, c.y() + 0.5 - ojo.y, c.z() + 0.5 - ojo.z);
             double d = a.length();
             // las campanas cuelgan altas: un poco mas de alcance
-            if (d > (c.accion() == Pueblo.TOCAR ? 4.6 : 3.9)) continue;
+            if (d > (c.accion() == Pueblo.TOCAR || c.accion() == Pueblo.A_LLAMAR ? 4.6 : 3.9)) continue;
             double cos = d < 0.01 ? 1 : a.dot(mira) / d;
             // delante (un cono ancho), o casi encima
             if (cos < 0.45 && d > 1.7) continue;

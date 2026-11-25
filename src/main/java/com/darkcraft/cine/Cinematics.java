@@ -48,6 +48,19 @@ public final class Cinematics {
         double rx, ry, rz;
         float ryaw, rpitch;
         boolean flying, mayfly, invisible;
+        /**
+         * Los viajes del barco (parte 3d): cuando se lleva al jugador a cada sitio ({@code saltoT}, {@code saltoA}: flota sin
+         * verse desde el primero), cuando se le deja en su sitio ({@code vuelta}) y cual es ({@code donde}: se pregunta en
+         * ese momento, porque depende de si el barco ya esta puesto en el otro muelle). Los tiempos son solo de reserva: cada
+         * cosa se hace cuando el cliente dice que ya esta en negro ({@code fase}; {@code listo}: el barco ya esta puesto).
+         */
+        float[] saltoT;
+        double[][] saltoA;
+        int salto;
+        float vuelta;
+        java.util.function.Function<ServerPlayer, double[]> donde;
+        java.util.function.BooleanSupplier listo;
+        int fase;
     }
 
     /** Cinematicas de jefes (no son capitulos): los planos los manda quien la empieza. */
@@ -67,6 +80,90 @@ public final class Cinematics {
 
     public static boolean active(Player p) {
         return ACTIVE.containsKey(p.getUUID());
+    }
+
+    /** La cinematica que esta viendo ese jugador (0 si ninguna). */
+    public static int viendo(Player p) {
+        Session s = ACTIVE.get(p.getUUID());
+        return s == null ? 0 : s.chapter;
+    }
+
+    /**
+     * Cinematica con guion (del numero 38 en adelante) con planos cerca del jugador, sin moverle: {@code datos} es lo que
+     * necesita el cliente ademas de los planos (lo lee {@code client/Guion}).
+     */
+    public static void playGuion(ServerPlayer p, int id, List<Shot> shots, float total, double[] datos) {
+        Session s = new Session();
+        s.chapter = id;
+        s.startTick = p.getServer().getTickCount();
+        s.total = total;
+        s.shots = shots;
+        ACTIVE.put(p.getUUID(), s);
+        Net.to(p, new Net.CineStart(id, shots, datos));
+    }
+
+    /**
+     * Un viaje del barco: como {@link #playGuion}, pero al jugador se le lleva de un sitio a otro mientras la pantalla esta
+     * en negro ({@code saltoT} / {@code saltoA}: {x, y, z}; desde el primer salto flota sin verse), a los {@code vuelta}
+     * segundos se le deja donde diga {@code donde} ({x, y, z, giro, cabeceo}) y, si la salta, la acaba o se interrumpe,
+     * tambien. {@code seguro}: donde vuelve si el servidor se cierra a medias.
+     */
+    public static void playViaje(ServerPlayer p, int id, List<Shot> shots, float total, double[] datos, float[] saltoT, double[][] saltoA, float vuelta,
+                                 java.util.function.Function<ServerPlayer, double[]> donde, java.util.function.BooleanSupplier listo, double[] seguro) {
+        Session s = new Session();
+        s.chapter = id;
+        s.startTick = p.getServer().getTickCount();
+        // (el cliente avisa cuando acaba: esto es solo por si no avisa)
+        s.total = total + SIN_AVISO;
+        s.shots = shots;
+        s.saltoT = saltoT;
+        s.saltoA = saltoA;
+        s.vuelta = vuelta;
+        s.donde = donde;
+        s.listo = listo;
+        CompoundTag b = new CompoundTag();
+        b.putDouble("x", seguro[0]);
+        b.putDouble("y", seguro[1]);
+        b.putDouble("z", seguro[2]);
+        b.putFloat("yaw", (float) seguro[3]);
+        b.putFloat("pitch", (float) seguro[4]);
+        p.getPersistentData().put(BACK, b);
+        p.stopRiding();
+        ACTIVE.put(p.getUUID(), s);
+        Net.to(p, new Net.CineStart(id, shots, datos));
+    }
+
+    /** Lo que el cliente manda al acabar de ver un viaje ({@code Net.CineFase}). */
+    public static final int FIN_CLIENTE = 9;
+    /** Segundos que se espera el aviso del cliente antes de seguir sin el; y lo que se alarga la sesion por si no avisa del final. */
+    public static final float ESPERA = 6f, SIN_AVISO = 15f;
+
+    /** El cliente avisa de por donde va su viaje (ya esta en negro en ese corte) o de que ha acabado de verlo. */
+    public static void fase(ServerPlayer p, int n) {
+        Session s = ACTIVE.get(p.getUUID());
+        if (s == null || !Viaje.es(s.chapter)) return;
+        if (n >= FIN_CLIENTE) {
+            ACTIVE.remove(p.getUUID());
+            finish(p, s);
+        } else if (n > s.fase) s.fase = n;
+    }
+
+    /** Por que corte va el viaje que esta viendo ese jugador (0 si aun no ha avisado de ninguno). */
+    public static int fase(Player p) {
+        Session s = ACTIVE.get(p.getUUID());
+        return s == null ? 0 : s.fase;
+    }
+
+    /** Desde ahora el jugador flota y no se le ve (se apunta como estaba, para dejarlo igual al acabar). */
+    private static void flotar(ServerPlayer p, Session s) {
+        s.flying = p.getAbilities().flying;
+        s.mayfly = p.getAbilities().mayfly;
+        s.invisible = p.isInvisible();
+        p.getAbilities().mayfly = true;
+        p.getAbilities().flying = true;
+        p.onUpdateAbilities();
+        p.setInvisible(true);
+        s.moved = true;
     }
 
     /**
@@ -176,7 +273,19 @@ public final class Cinematics {
                 continue;
             }
             float t = (now - s.startTick) / 20f;
-            if (s.moved && !s.back) {
+            if (s.donde != null) {
+                if (!s.back) {
+                    // cada salto, cuando el cliente dice que ya esta en negro (o, si no avisa, un rato despues de su hora)
+                    while (s.salto < s.saltoT.length && (s.fase > s.salto || t >= s.saltoT[s.salto] + ESPERA)) {
+                        if (!s.moved) flotar(p, s);
+                        double[] a = s.saltoA[s.salto++];
+                        p.teleportTo(p.serverLevel(), a[0], a[1], a[2], p.getYRot(), p.getXRot());
+                        p.setDeltaMovement(Vec3.ZERO);
+                    }
+                    // y a su sitio en cubierta, cuando esta en negro y el barco ya esta puesto
+                    if ((s.fase >= 3 && (s.listo == null || s.listo.getAsBoolean())) || t >= s.vuelta + ESPERA + 2.5f) restore(p, s);
+                }
+            } else if (s.moved && !s.back) {
                 // ir al sitio de cada plano mientras la pantalla esta en negro
                 for (int k = s.shot + 1; k < s.shots.size(); k++) {
                     Shot sh = s.shots.get(k);
@@ -206,7 +315,7 @@ public final class Cinematics {
     }
 
     private static void finish(ServerPlayer p, Session s) {
-        if (s.moved && !s.back) restore(p, s);
+        if ((s.moved || s.donde != null) && !s.back) restore(p, s);
         if (s.chapter >= REY_VOLCAN) return;
         Story.markSeen(p, s.chapter);
         if (s.chapter == 6) com.darkcraft.fortaleza.FortalezaEventos.finCapitulo6(p);
@@ -214,6 +323,24 @@ public final class Cinematics {
     }
 
     private static void restore(ServerPlayer p, Session s) {
+        if (s.donde != null) {
+            // un viaje: se le deja donde toque ahora (en cubierta si el barco ya esta; si no, en el muelle)
+            if (s.back) return;
+            double[] a = s.donde.apply(p);
+            p.teleportTo(p.serverLevel(), a[0], a[1], a[2], (float) a[3], (float) a[4]);
+            p.setDeltaMovement(Vec3.ZERO);
+            if (s.moved) {
+                p.getAbilities().flying = s.flying;
+                p.getAbilities().mayfly = s.mayfly;
+                p.onUpdateAbilities();
+                p.setInvisible(s.invisible);
+            }
+            p.fallDistance = 0;
+            p.getPersistentData().remove(BACK);
+            s.moved = false;
+            s.back = true;
+            return;
+        }
         if (!s.moved) return;
         p.teleportTo(p.serverLevel(), s.rx, s.ry, s.rz, s.ryaw, s.rpitch);
         p.getAbilities().flying = s.flying;
@@ -229,7 +356,20 @@ public final class Cinematics {
     private static void abort(ServerPlayer p, boolean tell) {
         Session s = ACTIVE.remove(p.getUUID());
         if (s == null) return;
-        if (s.moved && !s.back) {
+        if (s.donde != null) {
+            if (!s.back) {
+                double[] a = s.donde.apply(p);
+                p.moveTo(a[0], a[1], a[2], (float) a[3], (float) a[4]);
+                if (s.moved) {
+                    p.getAbilities().flying = s.flying;
+                    p.getAbilities().mayfly = s.mayfly;
+                    p.onUpdateAbilities();
+                    p.setInvisible(s.invisible);
+                }
+                p.fallDistance = 0;
+                p.getPersistentData().remove(BACK);
+            }
+        } else if (s.moved && !s.back) {
             p.moveTo(s.rx, s.ry, s.rz, s.ryaw, s.rpitch);
             p.getAbilities().flying = s.flying;
             p.getAbilities().mayfly = s.mayfly;

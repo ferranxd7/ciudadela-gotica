@@ -133,7 +133,7 @@ jobs:
           sed "s#@WAV@#$PWD/out/audio_cliente.wav#" ci/cliente/alsoft.conf > "$RUNNER_TEMP/alsoft.conf"
           export ALSOFT_CONF="$RUNNER_TEMP/alsoft.conf" LIBGL_ALWAYS_SOFTWARE=1 DARKCRAFT_CLIENTE=1
           xvfb-run -a -s "-screen 0 1280x720x24" glxinfo -B > out/cliente_gl.txt 2>&1 || true
-          timeout 41m xvfb-run -a -s "-screen 0 1280x720x24" gradle runClient --no-daemon > out/cliente.log 2>&1 || echo "cliente terminado con error $?" >> out/cliente.log
+          timeout 45m xvfb-run -a -s "-screen 0 1280x720x24" gradle runClient --no-daemon > out/cliente.log 2>&1 || echo "cliente terminado con error $?" >> out/cliente.log
           cp run/ci-cliente/* out/ 2>/dev/null || true
           python3 ci/cliente/hoja.py run/screenshots out || true
           for f in run/screenshots/cliente_*.png; do [ -f "$f" ] && cp "$f" out/; done

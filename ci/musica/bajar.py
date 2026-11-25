@@ -88,11 +88,13 @@ def duracion(ruta):
         return 0.0
 
 
-def convertir(origen, destino, lufs):
-    # quitar silencio al principio y al final, volumen igualado, 44,1 kHz estereo
+def convertir(origen, destino, lufs, corte=0):
+    # quitar silencio al principio y al final, volumen igualado, 44,1 kHz estereo; con "corte", solo esos primeros
+    # segundos (y se va apagando en los cuatro ultimos): para las pistas largas de las que solo se usa el principio
     filtro = ("silenceremove=start_periods=1:start_threshold=-55dB,areverse,"
               "silenceremove=start_periods=1:start_threshold=-55dB,areverse,"
-              f"loudnorm=I={lufs}:TP=-1.5:LRA=11")
+              + (f"atrim=0:{corte},afade=t=out:st={corte - 4}:d=4," if corte > 8 else "")
+              + f"loudnorm=I={lufs}:TP=-1.5:LRA=11")
     cmd = ["ffmpeg", "-y", "-v", "error", "-i", origen, "-vn", "-af", filtro, "-ar", "44100", "-ac", "2",
            "-c:a", "libvorbis", "-q:a", "3", destino]
     r = subprocess.run(cmd, capture_output=True, text=True)
@@ -148,7 +150,7 @@ def main():
                     if fuente is None:
                         raise RuntimeError("el zip no trae audio")
                 tmp = ogg + ".tmp.ogg"
-                ok, err = convertir(fuente, tmp, p.get("lufs", -18))
+                ok, err = convertir(fuente, tmp, p.get("lufs", -18), p.get("corte", 0))
                 if not ok:
                     raise RuntimeError("ffmpeg: " + err)
                 os.replace(tmp, ogg)
@@ -162,7 +164,10 @@ def main():
                     info[pid] = {"duracion": duracion(ogg), "titulo": p["titulo"], "autor": p["autor"]}
                     log.write("  se usa la copia que ya habia\n")
             creditos += [f"- \"{p['titulo']}\" de {p['autor']}", f"  Licencia {p['licencia']} — {p['pagina']}",
-                         f"  Aviso del autor: {p['aviso']}", f"  Se usa para: {p['uso']}", ""]
+                         f"  Aviso del autor: {p['aviso']}", f"  Se usa para: {p['uso']}"]
+            if p.get("corte", 0) > 8:
+                creditos.append(f"  De esta pista se usan solo los primeros {p['corte']} segundos (se apaga al final).")
+            creditos.append("")
         log.write("RESUMEN: " + json.dumps(info, ensure_ascii=False) + "\n")
     creditos += ["Voz del narrador: Piper TTS, voz \"alan\" (en_GB), licencia libre del proyecto Piper.",
                  "Campana fúnebre, efectos y texturas: hechos para este mod.",

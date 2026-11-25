@@ -1,8 +1,13 @@
 package com.darkcraft.client;
 
 import com.darkcraft.DarkCraftMod;
+import com.darkcraft.cine.BarcoVolador;
 import com.darkcraft.cine.Intro;
+import com.darkcraft.cine.Reparacion;
 import com.darkcraft.cine.Shot;
+import com.darkcraft.cine.Viaje;
+import com.darkcraft.pueblo.gen.Barco;
+import com.darkcraft.client.cine.BarcoVoladorRenderer;
 import com.darkcraft.client.ui.Pix;
 import com.darkcraft.rey.Voces;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -12,12 +17,15 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +37,9 @@ import java.util.List;
  * planos, el marco, saltarla con ESPACIO) y pregunta aqui lo demas.
  * <p>
  * La de inicio ({@link Intro}): negro con la voz, la caida, la Sombra te atrapa, la marca, y despiertas en el muelle.
+ * La reparacion del barco ({@link Reparacion}): sus golpes y sus velas. Los viajes ({@link Viaje}): el barco que vuela
+ * (una entidad que solo existe aqui, movida cada tick con {@link Viaje#barco}), la nube que levanta al despegar y al
+ * posarse, la campana, el quejido del casco, las velas, el viento, la musica y, la primera vez, la Sombra.
  */
 public final class Guion {
     private Guion() {}
@@ -73,6 +84,19 @@ public final class Guion {
     private static Sonido abismo, viento;
     private static int ultimaFrase;
 
+    /** El viaje que se esta viendo (null si la cinematica no es un viaje): sus tiempos, de que amarre a cual y el barco que vuela. */
+    private static Viaje.Tiempos viaje;
+    private static int[] viajeDe = {0, 0}, viajeA = {0, 0};
+    private static boolean aValdrenn;
+    private static BarcoVolador barco;
+    private static final List<Sonido> vuelo = new ArrayList<>();
+    /** El numero de la entidad del barco en el cliente: tan alto que el servidor nunca dara ese a otra. */
+    private static final int BARCO_ID = 2_147_000_039;
+    /** Los cortes del viaje: el ultimo pasado, el ultimo del que se ha avisado al servidor, y los ticks esperando (en este y en total). */
+    private static int cortePasado, corteAvisado, corteTicks, esperado, esperadoSiempre;
+    /** Lo mas que se espera en cada corte, en ticks (si el servidor no llega a tiempo, se sigue). */
+    private static final int[] CORTE_LIMITE = {0, 100, 240, 160};
+
     // ------------------------------------------------------------------ empezar, cada tick, acabar
 
     public static void empezar(int capitulo, double[] datos, List<Shot> planos) {
@@ -81,7 +105,53 @@ public final class Guion {
         frases = new float[0][];
         ultimaFrase = 0;
         if (capitulo == Intro.ID) intro();
+        else if (capitulo == Reparacion.ID) reparacion();
+        else if (Viaje.es(capitulo)) viaje(capitulo, datos);
         hecho = new boolean[pasos.size()];
+    }
+
+    /** La reparacion: el martilleo mientras se cierra el casco y crece el palo, y las velas al caer (la fanfarria la pone el servidor). */
+    private static void reparacion() {
+        pasos.add(new Paso(Reparacion.CASCO0 - 0.3f, () -> suena(DarkCraftMod.SFX_BARCO_REPARA.get(), 1f)));
+        // (los dos golpes secos de la lona caen a los 2 y a los 3,5 s del sonido)
+        pasos.add(new Paso(Reparacion.VELAS0 - 1.7f, () -> suena(DarkCraftMod.SFX_BARCO_VELAS.get(), 0.9f)));
+    }
+
+    private static int dato(double[] d, int i) {
+        return d != null && i < d.length ? (int) Math.round(d[i]) : 0;
+    }
+
+    /** Un viaje del barco: {tipo, de dx, de dz, a dx, a dz, si se llega a Valdrenn} (ver {@link Viaje#datos}). */
+    private static void viaje(int capitulo, double[] datos) {
+        Viaje.Tiempos T = Viaje.tiempos(capitulo);
+        viaje = T;
+        cortePasado = corteAvisado = corteTicks = esperado = 0;
+        viajeDe = new int[]{dato(datos, 1), dato(datos, 2)};
+        viajeA = new int[]{dato(datos, 3), dato(datos, 4)};
+        aValdrenn = dato(datos, 5) != 0;
+        frases = T.voz;
+        for (float[] f : T.voz) {
+            int linea = (int) f[0];
+            pasos.add(new Paso(f[1], () -> frase(linea)));
+        }
+        float frenado = T.llega + T.crucero + T.frena;
+        if (T.cambioA >= 0) {
+            pasos.add(new Paso(0.35f, () -> suena(DarkCraftMod.SFX_BARCO_CAMPANA.get(), 0.9f)));
+            // la musica empieza suave en el corte (sus ocho primeros segundos) y el tema entra cuando el barco ya avanza
+            pasos.add(new Paso(T.cambioA + 0.45f, () -> ClientMusic.viaje(true, 2.5f)));
+            pasos.add(new Paso(T.sube - 0.3f, () -> suena(DarkCraftMod.SFX_BARCO_ELEVA.get(), 1f)));
+            pasos.add(new Paso(T.avanza - 0.6f, () -> suena(DarkCraftMod.SFX_BARCO_VELAS.get(), 0.9f)));
+            pasos.add(new Paso(T.avanza, () -> vuelo.add(suena(DarkCraftMod.SFX_BARCO_VUELO.get(), 0.9f))));
+            // el viento dura 25 s: si el vuelo es mas largo, otra vez antes de que se acabe
+            if (frenado - T.avanza > 21.5f) pasos.add(new Paso(T.avanza + 20.5f, () -> vuelo.add(suena(DarkCraftMod.SFX_BARCO_VUELO.get(), 0.9f))));
+            pasos.add(new Paso(T.ultimo, () -> ClientMusic.viaje(false, T.fin - T.ultimo + 1.5f)));
+        } else pasos.add(new Paso(0.15f, () -> vuelo.add(suena(DarkCraftMod.SFX_BARCO_VUELO.get(), 0.8f))));
+        pasos.add(new Paso(frenado - 0.6f, () -> {
+            for (Sonido v : vuelo) v.apagar(2.6f);
+            vuelo.clear();
+        }));
+        // (el golpe gordo del casco contra el muelle cae al segundo de empezar el sonido)
+        pasos.add(new Paso(T.toca() - 0.95f, () -> suena(DarkCraftMod.SFX_BARCO_ATRACA.get(), 1f)));
     }
 
     private static void intro() {
@@ -116,6 +186,112 @@ public final class Guion {
             if (t - pasos.get(i).t() < 1.0f) pasos.get(i).que().run();
         }
         sonando.removeIf(s -> s.isStopped());
+        if (viaje != null) {
+            moverBarco(mc, t);
+            // en Valdrenn siempre hay tormenta: al llegar, la lluvia entra en el ultimo plano (despues la manda el servidor)
+            if (aValdrenn && viaje.tipo != Viaje.LLAMADA && t >= viaje.ultimo && mc.level != null) {
+                float k = suave((t - viaje.ultimo) / (viaje.fin - viaje.ultimo - 0.5f));
+                if (mc.level.getRainLevel(1f) < k) {
+                    mc.level.setRainLevel(k);
+                    mc.level.setThunderLevel(0.6f * k);
+                }
+            }
+        }
+    }
+
+    /** El barco que vuela: aparece cuando el de bloques se quita (en negro), se mueve cada tick y se va cuando vuelve a ser de bloques. */
+    /**
+     * Los cortes en negro de un viaje ({@link Viaje#corte}): al llegar a cada uno se avisa al servidor (que entonces cambia
+     * el mundo: quita el barco de bloques, se lleva al jugador al otro amarre, vuelve a poner el barco) y se espera, con la
+     * pantalla en negro y el reloj parado, hasta verlo hecho. Devuelve true mientras hay que esperar.
+     */
+    public static boolean espera(Minecraft mc, int capitulo, float t) {
+        if (viaje == null || mc.level == null || mc.player == null) return false;
+        for (int k = cortePasado + 1; k <= 3; k++) {
+            float tk = Viaje.corte(viaje, k);
+            if (tk >= 0) {
+                if (t < tk) return false;
+                if (corteAvisado < k) {
+                    corteAvisado = k;
+                    corteTicks = 0;
+                    com.darkcraft.net.Net.CH.sendToServer(new com.darkcraft.net.Net.CineFase(k));
+                }
+                if (!cambiado(mc, k) && ++corteTicks <= CORTE_LIMITE[k]) {
+                    esperado++;
+                    esperadoSiempre++;
+                    return true;
+                }
+            }
+            cortePasado = k;
+        }
+        return false;
+    }
+
+    /** Si el mundo ya esta como tiene que estar tras ese corte. */
+    private static boolean cambiado(Minecraft mc, int k) {
+        net.minecraft.core.BlockPos.MutableBlockPos p = new net.minecraft.core.BlockPos.MutableBlockPos();
+        // el palo del barco de bloques: ya no esta en el muelle del que se sale, o ya esta en el que se llega
+        if (k == 1) return mc.level.getBlockState(p.set(Barco.BX + viajeDe[0], Barco.CUBIERTA + 3, Barco.PALO + viajeDe[1])).isAir();
+        if (k == 3) return !mc.level.getBlockState(p.set(Barco.BX + viajeA[0], Barco.CUBIERTA + 3, Barco.PALO + viajeA[1])).isAir();
+        // el salto: el jugador ya esta junto al otro amarre y han llegado los chunks del muelle y de por donde viene el barco
+        double[] f = Viaje.flota(viajeA, true);
+        double dx = mc.player.getX() - f[0], dz = mc.player.getZ() - f[2];
+        if (dx * dx + dz * dz > 48 * 48) return false;
+        int px = Barco.BX + viajeA[0], pz = Barco.PALO + viajeA[1];
+        var chunks = mc.level.getChunkSource();
+        return chunks.hasChunk(px >> 4, pz >> 4) && chunks.hasChunk(px >> 4, (pz + 24) >> 4) && chunks.hasChunk((px + 10) >> 4, (pz + 8) >> 4)
+                && chunks.hasChunk(mc.player.chunkPosition().x, mc.player.chunkPosition().z);
+    }
+
+    /** Los ticks que han esperado en sus cortes todos los viajes desde que se abrio el juego (para el reloj de las pruebas). */
+    public static int esperadoSiempre() {
+        return esperadoSiempre;
+    }
+
+    /** Cuantos ticks ha esperado esta cinematica en sus cortes, y por cual va (para las pruebas). */
+    public static String cortes() {
+        return viaje == null ? "-" : "corte " + cortePasado + " (avisado " + corteAvisado + "), esperado " + esperado + " ticks";
+    }
+
+    private static void moverBarco(Minecraft mc, float t) {
+        double[] s = mc.level == null ? null : Viaje.barco(viaje, t, viajeDe, viajeA);
+        if (s == null) {
+            quitarBarco(mc);
+            return;
+        }
+        boolean nuevo = barco == null || barco.isRemoved() || barco.level() != mc.level;
+        if (nuevo) {
+            quitarBarco(mc);
+            BarcoVoladorRenderer.olvidar();
+            barco = new BarcoVolador(DarkCraftMod.BARCO_VOLADOR.get(), mc.level);
+            barco.setId(BARCO_ID);
+            barco.setPos(s[0], s[1], s[2]);
+            mc.level.putNonPlayerEntity(BARCO_ID, barco);
+        }
+        // de golpe al aparecer y al saltar de un amarre al otro (en negro); si no, entre un tick y el siguiente
+        boolean golpe = nuevo || barco.distanceToSqr(s[0], s[1], s[2]) > 40 * 40;
+        barco.mover(s[0], s[1], s[2], (float) s[3], (float) s[4], (float) s[5], golpe);
+        // la nube que levanta el casco al despegar y al posarse
+        double alto = s[1] - Viaje.PY;
+        if (alto > 0.15 && alto < 7.5) {
+            RandomSource r = mc.level.random;
+            for (int i = 0; i < 5; i++) {
+                double ang = r.nextDouble() * Math.PI * 2, ca = Math.cos(ang), sa = Math.sin(ang);
+                double x = s[0] + ca * (3 + r.nextDouble() * 4), z = s[2] + 1 + sa * (6 + r.nextDouble() * 10);
+                mc.level.addParticle(ParticleTypes.CLOUD, x, Viaje.PY - 3.6 + r.nextDouble() * 1.2, z, ca * 0.12, 0.02 + r.nextDouble() * 0.05, sa * 0.12);
+            }
+        }
+    }
+
+    private static void quitarBarco(Minecraft mc) {
+        if (barco == null) return;
+        if (mc.level != null && barco.level() == mc.level) mc.level.removeEntity(BARCO_ID, Entity.RemovalReason.DISCARDED);
+        barco = null;
+    }
+
+    /** El barco que vuela ahora mismo, si lo hay (para las pruebas). */
+    public static BarcoVolador barco() {
+        return barco;
     }
 
     /** Se acaba (sola, saltada o porque lo dice el servidor): lo que sonaba se apaga enseguida. */
@@ -123,6 +299,13 @@ public final class Guion {
         for (Sonido s : sonando) s.apagar(0.25f);
         sonando.clear();
         abismo = viento = null;
+        vuelo.clear();
+        if (viaje != null) {
+            // (si se salta a medias, la musica se va enseguida; si acaba sola, ya se estaba yendo)
+            ClientMusic.viaje(false, 1.5f);
+            quitarBarco(Minecraft.getInstance());
+            viaje = null;
+        }
     }
 
     private static Sonido suena(SoundEvent ev, float vol) {
@@ -162,7 +345,37 @@ public final class Guion {
             if (t < Intro.OJOS) return 1f;
             return 0f;                                                        // (los parpados van aparte)
         }
+        if (viaje != null) return Viaje.negro(viaje, t);
+        if (capitulo == Reparacion.ID) {
+            // la entrada, un corte corto en cada cambio de plano y el fundido de vuelta a los ojos del jugador
+            float a = t < 0.6f ? 1f - suave(t / 0.6f) : 0f;
+            for (int i = 1; i < Reparacion.PLANO.length - 1; i++) {
+                float tc = Reparacion.PLANO[i];
+                if (t >= tc - 0.3f && t < tc) a = Math.max(a, suave(1f - (tc - t) / 0.3f));
+                else if (t >= tc && t < tc + 0.5f) a = Math.max(a, 1f - suave((t - tc) / 0.5f));
+            }
+            float vuelve = total - 0.45f;
+            if (t >= vuelve - 0.4f && t < vuelve) a = Math.max(a, suave(1f - (vuelve - t) / 0.4f));
+            else if (t >= vuelve) a = Math.max(a, 1f - suave((t - vuelve) / 0.45f));
+            return a;
+        }
         return 0f;
+    }
+
+    /**
+     * Cuanto se sube el brillo (0-1) mientras manda la camara de cine: en los viajes y la reparacion, del todo (en Valdrenn
+     * es siempre de noche), y al acabar un viaje baja poco a poco hasta el del jugador (acaba en sus ojos: sin salto).
+     */
+    public static float brillo(int capitulo, float t) {
+        if (capitulo == Intro.ID) return 0f;
+        if (viaje != null && viaje.tipo != Viaje.LLAMADA) return 1f - suave((t - (viaje.fin - 1.8f)) / 1.6f);
+        return 1f;
+    }
+
+    /** Si en ese momento se dibuja a los jugadores: reparando el barco y esperandolo en el muelle, si; a bordo, hasta que despega. */
+    public static boolean jugadores(int capitulo, float t) {
+        if (capitulo == Reparacion.ID || capitulo == Viaje.LLAMADA) return true;
+        return viaje != null && viaje.cambioA >= 0 && t < viaje.cambioA - 0.1f;
     }
 
     /** Grados que se ladea la camara de mas. */
@@ -179,6 +392,8 @@ public final class Guion {
     public static double fov(int capitulo, float t, double delPlano, double delJugador) {
         if (capitulo == Intro.ID && t >= Intro.FIN - 1.6f) return Mth.lerp(suave((t - (Intro.FIN - 1.6f)) / 1.6f), delPlano, delJugador);
         if (capitulo == Intro.ID && t >= Intro.CAIDA && t < Intro.OJOS) return delPlano + 10 * suave((t - Intro.CAIDA) / 6f);
+        // los viajes acaban en los ojos del jugador, de pie en el alcazar
+        if (viaje != null && viaje.tipo != Viaje.LLAMADA && t >= viaje.fin - 1.6f) return Mth.lerp(suave((t - (viaje.fin - 1.6f)) / 1.6f), delPlano, delJugador);
         return delPlano;
     }
 

@@ -99,6 +99,17 @@ public final class ClientCine {
         }
     }
 
+    /** El brillo de las cinematicas con guion: {@code k} de 0 (el del jugador) a 1 (como poco, el de "claro"). */
+    private static void brilloGuion(Minecraft mc, float k) {
+        if (k <= 0.001f) {
+            if (savedGamma != null) mc.options.gamma().set(savedGamma);
+            savedGamma = null;
+            return;
+        }
+        if (savedGamma == null) savedGamma = mc.options.gamma().get();
+        mc.options.gamma().set(savedGamma + (Math.max(savedGamma, 1.0) - savedGamma) * Math.min(1f, k));
+    }
+
     public static boolean active() {
         return active;
     }
@@ -184,6 +195,13 @@ public final class ClientCine {
             return;
         }
         if (mc.isPaused()) return;
+        if (chapter >= GUION && Guion.espera(mc, chapter, ticks / 20f)) {
+            // un viaje del barco, parado en negro hasta que el servidor cambie el mundo (el reloj no corre); se puede saltar
+            if (mc.screen == null && mc.options.keyJump.isDown()) {
+                if (++skipHold >= SKIP_TICKS) stop(true);
+            } else skipHold = Math.max(0, skipHold - 2);
+            return;
+        }
         ticks++;
         float t = ticks / 20f;
         // saltar: mantener ESPACIO un momento
@@ -233,8 +251,10 @@ public final class ClientCine {
         }
         // camara de cine
         if (!shots.isEmpty()) updateCamera(mc, t);
-        // (en las de guion no se toca el brillo: la de inicio acaba en los ojos del jugador y se notaria el salto)
-        verMejor(mc, camOn && chapter < GUION);
+        // (en las de guion la lluvia no se toca y el brillo lo dice el guion: la de inicio acaba en los ojos del jugador y un
+        // salto se notaria; en los viajes baja poco a poco al final)
+        if (chapter < GUION) verMejor(mc, camOn);
+        else brilloGuion(mc, camOn ? Guion.brillo(chapter, t) : 0f);
         if (camOn) mc.options.setCameraType(CameraType.FIRST_PERSON);
         else {
             mc.player.setYRot(lockYaw);
@@ -242,7 +262,12 @@ public final class ClientCine {
             mc.player.yRotO = lockYaw;
             mc.player.xRotO = lockPitch;
         }
-        if (t >= total) stop(false);
+        if (t >= total) {
+            // (los viajes del barco: el servidor espera a que se acabe de ver)
+            boolean avisar = com.darkcraft.cine.Viaje.es(chapter);
+            stop(false);
+            if (avisar) Net.CH.sendToServer(new Net.CineFase(com.darkcraft.cine.Cinematics.FIN_CLIENTE));
+        }
     }
 
     /** Antes caia un rayo con destello y temblor; ahora solo suena el trueno (sin rayo ni destello). */
@@ -337,8 +362,8 @@ public final class ClientCine {
 
     @SubscribeEvent
     public static void onPlayerRender(RenderPlayerEvent.Pre e) {
-        // en el capitulo 5 si se ve a los jugadores: el ultimo plano es el suyo
-        if (active && camOn && chapter != 5) e.setCanceled(true);
+        // en el capitulo 5 si se ve a los jugadores: el ultimo plano es el suyo (y en algunas de guion, a ratos)
+        if (active && camOn && chapter != 5 && !(chapter >= GUION && Guion.jugadores(chapter, time()))) e.setCanceled(true);
     }
 
     /** Sin nombres flotando encima de los jugadores mientras la camara de cine esta puesta. */

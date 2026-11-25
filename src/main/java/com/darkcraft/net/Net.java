@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "16";
+    private static final String V = "17";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -134,6 +134,8 @@ public final class Net {
                 .encoder(Cosas::write).decoder(Cosas::read).consumerMainThread(Cosas::handle).add();
         CH.messageBuilder(CosaUsar.class, id++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(CosaUsar::write).decoder(CosaUsar::read).consumerMainThread(CosaUsar::handle).add();
+        CH.messageBuilder(CineFase.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(CineFase::write).decoder(CineFase::read).consumerMainThread(CineFase::handle).add();
     }
 
     // ------------------------------------------------------------------ Brumavela (parte 3b)
@@ -1187,6 +1189,27 @@ public final class Net {
         void handle(Supplier<NetworkEvent.Context> ctx) {
             ServerPlayer p = ctx.get().getSender();
             if (p != null) Cinematics.skip(p);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /**
+     * El cliente dice por donde va un viaje del barco (cinematicas 40-42): ya tiene la pantalla en negro en el corte
+     * {@code fase} (1: el barco de bloques deja paso al que vuela; 2: el salto al otro amarre; 3: vuelve a ser de bloques)
+     * y el servidor puede cambiar el mundo; {@link Cinematics#FIN_CLIENTE}: ha acabado de verla.
+     */
+    public record CineFase(int fase) {
+        void write(FriendlyByteBuf b) {
+            b.writeByte(fase);
+        }
+
+        static CineFase read(FriendlyByteBuf b) {
+            return new CineFase(b.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) Cinematics.fase(p, fase);
             ctx.get().setPacketHandled(true);
         }
     }

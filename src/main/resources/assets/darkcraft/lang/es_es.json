@@ -1240,7 +1240,7 @@
   "darkcraft.pueblo.no_aqui": "Aquí no hay ninguna Brumavela (hace falta un mundo de nubes).",
   "darkcraft.ayuda.brumavela": "Brumavela, la isla del pueblo",
   "darkcraft.ayuda.b_ir": "ir a un sitio de la isla (sin nombre, a donde se despierta)",
-  "darkcraft.ayuda.b_piezas": "dar piezas del barco / abrir la cripta / reparar el barco / zarpar",
+  "darkcraft.ayuda.b_piezas": "dar piezas del barco / abrir la cripta / reparar el barco (con «ya», sin cinemática)",
   "darkcraft.ayuda.b_estado": "ver cómo va / dejarlo todo como al principio",
   "subtitles.darkcraft.sfx.pieza_barco": "Pieza del barco encontrada",
   "subtitles.darkcraft.sfx.cripta_abre": "Una losa se aparta",
@@ -1326,5 +1326,18 @@
   "subtitles.darkcraft.sfx.intro_atrapa": "Algo te atrapa",
   "subtitles.darkcraft.sfx.intro_marca": "La marca arde",
   "subtitles.darkcraft.sfx.intro_latido": "Un corazón vuelve a latir",
-  "darkcraft.ayuda.b_inicio": "volver a ver la cinemática de inicio (la Sombra, la caída y el despertar)"
+  "darkcraft.ayuda.b_inicio": "volver a ver la cinemática de inicio (la Sombra, la caída y el despertar)",
+  "darkcraft.aviso.cosa.llamar": "para llamar a La Garza Gris",
+  "darkcraft.pueblo.campana.roto": "La campana suena sobre las nubes. Nada responde.",
+  "darkcraft.pueblo.campana.aqui": "La Garza Gris ya está amarrada aquí.",
+  "darkcraft.pueblo.campana.viene": "La Garza Gris ya viene de camino.",
+  "darkcraft.mapa.lugar.muelle_valdrenn": "Muelle de Valdrenn",
+  "darkcraft.santuario.muelle_valdrenn": "Muelle de Valdrenn",
+  "subtitles.darkcraft.sfx.barco_eleva": "El casco cruje y se eleva",
+  "subtitles.darkcraft.sfx.barco_velas": "Las velas se tensan",
+  "subtitles.darkcraft.sfx.barco_vuelo": "El viento en las velas",
+  "subtitles.darkcraft.sfx.barco_atraca": "El barco atraca",
+  "subtitles.darkcraft.sfx.barco_campana": "La campana del muelle",
+  "subtitles.darkcraft.sfx.barco_repara": "Las tablas vuelven a su sitio",
+  "darkcraft.ayuda.b_barco": "zarpar desde el timón (con «primero», la cinemática del primer viaje) / llamar al barco / ir al muelle de Valdrenn / poner el barco en un muelle"
 }

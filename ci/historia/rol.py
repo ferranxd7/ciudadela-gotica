@@ -1252,7 +1252,7 @@ ES.update({
     "darkcraft.pueblo.no_aqui": "Aquí no hay ninguna Brumavela (hace falta un mundo de nubes).",
     "darkcraft.ayuda.brumavela": "Brumavela, la isla del pueblo",
     "darkcraft.ayuda.b_ir": "ir a un sitio de la isla (sin nombre, a donde se despierta)",
-    "darkcraft.ayuda.b_piezas": "dar piezas del barco / abrir la cripta / reparar el barco / zarpar",
+    "darkcraft.ayuda.b_piezas": "dar piezas del barco / abrir la cripta / reparar el barco (con «ya», sin cinemática)",
     "darkcraft.ayuda.b_estado": "ver cómo va / dejarlo todo como al principio",
     "subtitles.darkcraft.sfx.pieza_barco": "Pieza del barco encontrada",
     "subtitles.darkcraft.sfx.cripta_abre": "Una losa se aparta",
@@ -1331,7 +1331,7 @@ EN.update({
     "darkcraft.pueblo.no_aqui": "There is no Brumavela here (a cloud world is needed).",
     "darkcraft.ayuda.brumavela": "Brumavela, the village island",
     "darkcraft.ayuda.b_ir": "go to a place on the island (no name: where you wake up)",
-    "darkcraft.ayuda.b_piezas": "give ship pieces / open the crypt / repair the ship / set sail",
+    "darkcraft.ayuda.b_piezas": "give ship pieces / open the crypt / repair the ship (with \"ya\", no cinematic)",
     "darkcraft.ayuda.b_estado": "see how it stands / put everything back as it was",
     "subtitles.darkcraft.sfx.pieza_barco": "Ship piece found",
     "subtitles.darkcraft.sfx.cripta_abre": "A slab slides aside",
@@ -1500,6 +1500,38 @@ EN.update({
     "subtitles.darkcraft.sfx.intro_marca": "The mark burns",
     "subtitles.darkcraft.sfx.intro_latido": "A heart beats again",
     "darkcraft.ayuda.b_inicio": "watch the opening cinematic again (the Shadow, the fall and the awakening)",
+})
+
+# ---------------------------------------------------------------- parte 3d-2: el barco va y viene
+ES.update({
+    "darkcraft.aviso.cosa.llamar": "para llamar a La Garza Gris",
+    "darkcraft.pueblo.campana.roto": "La campana suena sobre las nubes. Nada responde.",
+    "darkcraft.pueblo.campana.aqui": "La Garza Gris ya está amarrada aquí.",
+    "darkcraft.pueblo.campana.viene": "La Garza Gris ya viene de camino.",
+    "darkcraft.mapa.lugar.muelle_valdrenn": "Muelle de Valdrenn",
+    "darkcraft.santuario.muelle_valdrenn": "Muelle de Valdrenn",
+    "subtitles.darkcraft.sfx.barco_eleva": "El casco cruje y se eleva",
+    "subtitles.darkcraft.sfx.barco_velas": "Las velas se tensan",
+    "subtitles.darkcraft.sfx.barco_vuelo": "El viento en las velas",
+    "subtitles.darkcraft.sfx.barco_atraca": "El barco atraca",
+    "subtitles.darkcraft.sfx.barco_campana": "La campana del muelle",
+    "subtitles.darkcraft.sfx.barco_repara": "Las tablas vuelven a su sitio",
+    "darkcraft.ayuda.b_barco": "zarpar desde el timón (con «primero», la cinemática del primer viaje) / llamar al barco / ir al muelle de Valdrenn / poner el barco en un muelle",
+})
+EN.update({
+    "darkcraft.aviso.cosa.llamar": "to call the Grey Heron",
+    "darkcraft.pueblo.campana.roto": "The bell rings out over the clouds. Nothing answers.",
+    "darkcraft.pueblo.campana.aqui": "The Grey Heron is already moored here.",
+    "darkcraft.pueblo.campana.viene": "The Grey Heron is already on her way.",
+    "darkcraft.mapa.lugar.muelle_valdrenn": "Valdrenn Quay",
+    "darkcraft.santuario.muelle_valdrenn": "Valdrenn Quay",
+    "subtitles.darkcraft.sfx.barco_eleva": "The hull groans and rises",
+    "subtitles.darkcraft.sfx.barco_velas": "Sails snap taut",
+    "subtitles.darkcraft.sfx.barco_vuelo": "Wind in the sails",
+    "subtitles.darkcraft.sfx.barco_atraca": "The ship docks",
+    "subtitles.darkcraft.sfx.barco_campana": "The quay bell",
+    "subtitles.darkcraft.sfx.barco_repara": "Planks knock back into place",
+    "darkcraft.ayuda.b_barco": "set sail from the helm (with \"primero\", the first-voyage cinematic) / call the ship / go to Valdrenn Quay / put the ship at a quay",
 })
 
 assert set(ES) == set(EN), sorted(set(ES) ^ set(EN))
