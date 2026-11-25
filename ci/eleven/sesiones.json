@@ -2300,5 +2300,192 @@
     ]
    }
   }
+ },
+ "sfx_valdrenn_guardianes": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 4d: los dos guardianes (Ser Brandt, el Muro del Rey, y Vareth, el Guardian de Corteza) y el sello que se rompe. Se generaron 4 tomas de cada uno; se bajan solo las tomas 1 y 2 como NOMBRE_1..2",
+  "sonidos": {
+   "brandt_rugido": {
+    "prompt": "Rugido de Ser Brandt, un caballero enorme no-muerto con yelmo cerrado: grito grave y metalico, armadura pesada (~2.5 s)",
+    "sesiones": [
+     "1uAkZ2ZUTfe2W7HyI6LY",
+     "rzsTFHhSDjY9PMxTovVl",
+     "NAhnNh6plcHISMUSXSkE",
+     "jZcCW109RHlK4LCuuPVg"
+    ],
+    "generaciones": [
+     "8VqkcmwB4Fdlzbff5xl4",
+     "mYlj73F0PYto8hwyXfHz",
+     "ekd5WJVLZRu2M7iWjaPd",
+     "p43nXwMMxsTdkyEwo7z9"
+    ]
+   },
+   "brandt_martillazo": {
+    "prompt": "Martillo de guerra enorme que cae sobre la piedra: golpe sordo, piedra que cruje y escombros (~1.5 s)",
+    "sesiones": [
+     "TlKEz5KoKJLFhL29Kw9U",
+     "BkVxidfDdpGwp5RU4aJY",
+     "Uhd0J1LyjekAtKZpMDA1",
+     "ELrbKlySGp8MOqkPiLPl"
+    ],
+    "generaciones": [
+     "LaTlDqCbUtdrZ04nMtNs",
+     "UxSwqZ4qCANelmVqe13h",
+     "FS56C7Reqt7Q5x69hCQc",
+     "67ubBQ7WTEr0Hp7rpIqR"
+    ]
+   },
+   "brandt_escudo": {
+    "prompt": "Un golpe que rebota en un paves de hierro: choque metalico grave con eco (~1 s)",
+    "sesiones": [
+     "ZlwmNg2eOZzfy6LCkj3I",
+     "dQv3Y1OtTyz36Eidnlxs",
+     "q7LuQWLy1SfyWERJONW9",
+     "TaUmu5sTNujYTWH05z8h"
+    ],
+    "generaciones": [
+     "ijnUYUQ6VPoKKK4wZHQ3",
+     "0zWYHA07PFTlEGHgenWm",
+     "3keTKCfhqV4vq2cPU3Ex",
+     "wLR8N5dlSThfhA3v7o9x"
+    ]
+   },
+   "brandt_dolor": {
+    "prompt": "Ser Brandt herido: gruñido grave dentro del yelmo y placas que chocan (~0.8 s)",
+    "sesiones": [
+     "dk2nQ4yeOmEl5AOQQlyj",
+     "DDxKmOpQXZte5Rf06v9S",
+     "QhLAV6Aenqr7PXPQlLx5",
+     "jCMne0IhrN0rhsqpMori"
+    ],
+    "generaciones": [
+     "y4eiitu2HBC6Z5vwJ4BM",
+     "vjMUKD4q45MIB7HnT5Ie",
+     "nKFFTfgWU364kLR1KuC0",
+     "ekoubv0hF4qqbJQJvssD"
+    ]
+   },
+   "brandt_muerte": {
+    "prompt": "Ser Brandt cae: lamento largo, la armadura se derrumba y el martillo cae al suelo (~3.5 s)",
+    "sesiones": [
+     "1t1w7Vt2ZX35fE7qcBzl",
+     "XeQXM0r2loqwkDHly2wX",
+     "Ha9o11goMbX0dEU8UVUk",
+     "ELsLrwWghhVqgzCIEBxJ"
+    ],
+    "generaciones": [
+     "0kIhUoZUy3k1lmN6J92h",
+     "JI5M8gQ4riGMClr5T6ii",
+     "rapbZN0UEQWfSMN0ZLnl",
+     "e8SidF999txAX6SkmF7Y"
+    ]
+   },
+   "corteza_rugido": {
+    "prompt": "Rugido de Vareth, un caballero-arbol antiguo: bramido de madera, crujidos y hojas (~2.5 s)",
+    "sesiones": [
+     "JX8O3tQuWHOM9WCrblur",
+     "WVld9sIwbmdcDsMNlXgG",
+     "G7fslhjSFiKRMoOqzNEM",
+     "WFPpl5ic2NqkAyhcqe7y"
+    ],
+    "generaciones": [
+     "xns661szRI0B7MbKtN0k",
+     "n2ub2tq8aKwtuz1OBqon",
+     "YVGQiJ4UM5c51qER5AxQ",
+     "xWO6hLT3TO5YluiduVHb"
+    ]
+   },
+   "corteza_zarpazo": {
+    "prompt": "A massive wooden claw swiping through the air and raking: a heavy whoosh followed by a harsh scraping crack of hard bark and splintering wood, dark fantasy monster melee attack, no music, about 0.8 seconds",
+    "sesiones": [
+     "RQ2UPEq3VnKJ2gBR6sgj",
+     "BNzrrYtSmSih1pN98IfH",
+     "npP1k4voRsHSHBSJQkxE",
+     "1MZ3j2pwjOhaWdY2x4vJ"
+    ],
+    "generaciones": [
+     "pKOt4X70GaCZWI0DFKCP",
+     "hptVtB85DDiqymSQJD8I",
+     "XtR16VdagxcB8h6zcq54",
+     "e6SSTA7feXi8w9vvGutt"
+    ]
+   },
+   "corteza_raices": {
+    "prompt": "Giant tree roots erupting violently out of a stone floor one after another in a fast running line: cracking stone, bursting earth, thick roots stabbing upward with woody thuds and creaks, dark fantasy magic attack, no music, about 2 seconds",
+    "sesiones": [
+     "MhmxFO87np3qRf0vMxuW",
+     "fTGnNJdkFc5AzL9yAEt7",
+     "x04N9SnSkNHZ9bgpTSMZ",
+     "cCYT3XcwuW82pTFb1pyZ"
+    ],
+    "generaciones": [
+     "H6ZPfJkV0EmtmGEQxwHL",
+     "WyY6ISHQLQuGzi0i2gwE",
+     "iEG6lXBBqiY5p2nMEjoV",
+     "WGT1ap9Vion7l3Bjov35"
+    ]
+   },
+   "corteza_espinas": {
+    "prompt": "A sudden burst of sharp wooden thorns shot outward in a wide spray: a tense creaking wind-up of bending wood, then a sharp explosive release with many whistling thorns flying and thudding into stone, dark fantasy boss attack, no music, about 1.5 seconds",
+    "sesiones": [
+     "PfJPPLhyDlSWLJbH4etg",
+     "RuK1FZVWtCcl3SJqHlEr",
+     "kumqTiLwZAXLp0IZpFeG",
+     "fbyt8C87jbLJ8O56v3UR"
+    ],
+    "generaciones": [
+     "U7IEXuOupCnJnOsr67gP",
+     "8kH6royMoblH6omr9Fho",
+     "0dY065bYHOXDz3x8fVGe",
+     "EfFTz6CyUTMGgbPvqVRY"
+    ]
+   },
+   "corteza_dolor": {
+    "prompt": "A huge tree creature getting hurt: a deep wooden groan with bark cracking and splintering, a hollow pained creak, dark fantasy boss hurt sound, no music, about 0.8 seconds",
+    "sesiones": [
+     "LCPFwkDI1yVtsO2z1tof",
+     "Nsxv90dVG1b7UYIWwmgM",
+     "VE1ip0EoR4VRlAu0IWQx",
+     "Gg0sy6cH29cldulJ1899"
+    ],
+    "generaciones": [
+     "voto6VYZuB8khvXJRPN0",
+     "pi0L3Ym5OmH1JkcvqeR4",
+     "MR47TbzfpLAUYpfetjn6",
+     "xyIECxnlKcZvJd8qQqCh"
+    ]
+   },
+   "corteza_muerte": {
+    "prompt": "A giant ancient tree knight dying: a long, deep, sorrowful wooden groan, the trunk cracking apart and collapsing to the ground with heavy thuds, dry leaves rustling down, then a soft fading sigh like wind through branches, dark fantasy boss death, no music, about 4 seconds",
+    "sesiones": [
+     "jMMFNiDfzXhco9dclLp0",
+     "e5VMtMjWj2nRHIPuHHFh",
+     "y8JMe3xtututwhgFclzy",
+     "2FhV0HNkBnGXOg9zOOox"
+    ],
+    "generaciones": [
+     "xxqRSQer6YYsTMbAqgsA",
+     "Zz3mTud8SyUsFLMk6Pzl",
+     "OssemCOnRaGzY74YDemu",
+     "Z4nbgQmiqkjMdvBJhXht"
+    ]
+   },
+   "sello_rompe": {
+    "prompt": "A magical seal of shadow shattering: a dark resonant hum that rises and then breaks like a huge pane of black glass, crystalline shards tinkling, a deep whoosh of released energy fading away, dark fantasy, no music, about 2.5 seconds",
+    "sesiones": [
+     "Xzmy4Euewqhoxb0ZTIdZ",
+     "A8p7f0w8f2FaoG50ZjhP",
+     "20baUyufmBeHUx3n9ClW",
+     "pOcGgEdrFyEYSFGSyw5L"
+    ],
+    "generaciones": [
+     "sbUTZIuuVYcGWwuvibwB",
+     "0aiKr2XUxPcuZj8uPT8w",
+     "EKWx9bkrgPgVbh12lFhW",
+     "bGRzJVXhAuyOzj80f5QT"
+    ]
+   }
+  }
  }
 }
