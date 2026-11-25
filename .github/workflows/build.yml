@@ -165,6 +165,8 @@ jobs:
           (cd out && oggs=() && for f in *.ogg; do [ "$f" != "audio_cliente.ogg" ] && oggs+=("$f"); done && [ ${#oggs[@]} -gt 0 ] && zip -q -0 audios.zip "${oggs[@]}") || true
           files=()
           for f in build/libs/*.jar out/*.jar build.log out/*.txt out/*.log out/capturas.zip out/audios.zip out/audio_cliente.ogg out/*.mrpack; do [ -s "$f" ] && files+=("$f"); done
+          # si es un reintento, la version que dejo el intento fallido anterior se sustituye
+          gh release delete "build-${{ github.run_number }}" --yes >/dev/null 2>&1 || true
           if ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null && [ "$PUBLICAR" = "si" ]; then
             gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Dark Craft - Build ${{ github.run_number }}" --notes "Version automatica ${{ github.run_number }}" --latest
           elif ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null; then
