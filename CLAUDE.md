@@ -743,7 +743,9 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   se oian.
 - **Ojo con los enlaces de ElevenLabs: caducan a las ~2 horas de generar el audio** (no a las 00:00 UTC): se apunta
   `descargas.json` y se hace push nada mas generar.
-- Pruebas: servidor, linea `Inicio: ...` (nada tapa la caida, donde acaba cada plano, lo que duran las frases); cliente,
+- Pruebas: servidor, linea `Inicio: ...` (nada tapa la caida, donde acaba cada plano, lo que duran las frases; en la
+  prueba CON los otros mods sale "bloques que tapan 1 [Y 701 ...red_mosaic_glass]": es el escaparate de bloques de esa
+  prueba, que esta encima del origen, no un fallo); cliente,
   tramo `intro()` (capturas `cliente_in01..in14`) y los niveles del audio grabado (`audio_cliente.txt` va ~9 s por delante
   del reloj del informe).
 
