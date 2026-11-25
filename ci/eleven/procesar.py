@@ -105,6 +105,8 @@ SFX = {
     "habilidad_parada": (0.8, 0.25, -14), "ceniza_aplicar": (2.0, 0.6, -15),
     # el codice de la historia (parte 2e-4): abrirlo, pasar una pagina y cerrarlo
     "codice_abre": (1.0, 0.3, -18), "codice_pagina": (0.6, 0.15, -19), "codice_cierra": (0.8, 0.3, -16),
+    # el aviso de los logros (parte 2f-1; los de desafio llevan la fanfarria de Minecraft)
+    "logro": (2.0, 0.6, -18),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5}
@@ -170,6 +172,7 @@ TOMAS_SFX = {
     "codice_abre": (2, 1),           # las dos que se oyen (la 3 y la 4 casi no suenan)
     "codice_pagina": (1, 3),         # la hoja que cae clara
     "codice_cierra": (4, 1),         # el golpe de la tapa con mas graves
+    "logro": (2, 4),                 # las campanas mas graves y largas
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

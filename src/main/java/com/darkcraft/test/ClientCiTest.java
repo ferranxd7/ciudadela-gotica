@@ -2798,6 +2798,13 @@ public final class ClientCiTest {
             logCodice(m, "portada");
             shot(m, "cliente_cx01_portada");
         });
+        atTicks(t + 36, "un diario largo (varios pliegos) para pasar paginas", m -> {
+            List<com.darkcraft.net.Net.DiarioE> largo = new ArrayList<>();
+            String[] ls = {"espejo", "capitulo1", "santuario", "maelis", "subir_nivel", "dorvan", "kerrick", "compra", "mejora",
+                    "ceniza", "parada", "caballero", "capitulo2", "rey", "golpe_final", "capitulo3", "capitulo4", "arbol"};
+            for (int i = 0; i < ls.length; i++) largo.add(new com.darkcraft.net.Net.DiarioE(1 + i * 2, ls[i]));
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.diario(largo));
+        });
         atTicks(t + 38, "pasar la pagina (la hoja a medio girar)", m -> codiceP(m, c -> c.probarGiro(0.3f)));
         atTicks(t + 42, "captura: la hoja levantandose", m -> {
             logCodice(m, "girando");
@@ -2867,6 +2874,181 @@ public final class ClientCiTest {
         return t + 150;
     }
 
+    // ------------------------------------------------------------------ la pausa, las opciones, los mods y los logros (parte 2f-1)
+
+    private static void logPantalla(Minecraft m, String what) {
+        String r;
+        if (m.screen instanceof com.darkcraft.client.ui.PausaScreen p) r = p.resumen();
+        else if (m.screen instanceof com.darkcraft.client.ui.OpcionesScreen o) r = o.resumen();
+        else if (m.screen instanceof com.darkcraft.client.ui.ModsScreen s) r = s.resumen();
+        else r = "pantalla " + (m.screen == null ? "ninguna" : m.screen.getClass().getName());
+        log("  pantalla " + what + ": " + r);
+    }
+
+    private static void opcionesP(Minecraft m, String seccion) {
+        if (m.screen instanceof com.darkcraft.client.ui.OpcionesScreen o) {
+            if (!o.probar(seccion)) log("  opciones: NO HAY el apartado " + seccion);
+        } else log("  opciones: no esta abierta (" + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()) + ")");
+    }
+
+    /** Un logro de verdad del cliente (para el aviso): el primero con ese marco, o el de ese nombre si esta. */
+    private static net.minecraft.advancements.Advancement logroCliente(Minecraft m, String id, net.minecraft.advancements.FrameType marco) {
+        if (m.player == null) return null;
+        var lista = m.player.connection.getAdvancements().getAdvancements();
+        net.minecraft.advancements.Advancement a = lista.get(new net.minecraft.resources.ResourceLocation(com.darkcraft.DarkCraftMod.MODID, id));
+        if (a != null && a.getDisplay() != null) return a;
+        for (net.minecraft.advancements.Advancement x : lista.getAllAdvancements())
+            if (x.getDisplay() != null && x.getDisplay().getFrame() == marco) return x;
+        return null;
+    }
+
+    private static com.darkcraft.client.ui.OpcionesScreen opcionesAbiertas;
+
+    private static int pausa(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Pausa: ESC (sale la del mod, no la de Minecraft)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            m.pauseGame(false);
+        });
+        atTicks(t + 8, "captura: la pausa", m -> {
+            logPantalla(m, "pausa");
+            shot(m, "cliente_pa01_pausa");
+        });
+        atTicks(t + 10, "flecha abajo dos veces (Opciones)", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
+        });
+        atTicks(t + 14, "captura: la pausa con Opciones elegida", m -> {
+            logPantalla(m, "pausa elegida");
+            shot(m, "cliente_pa02_pausa_opciones");
+        });
+        atTicks(t + 16, "Intro: las opciones", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER));
+        atTicks(t + 22, "captura: opciones, general", m -> {
+            logPantalla(m, "opciones");
+            if (m.screen instanceof com.darkcraft.client.ui.OpcionesScreen o) opcionesAbiertas = o;
+            shot(m, "cliente_pa03_general");
+        });
+        atTicks(t + 24, "opciones: sonido", m -> opcionesP(m, "sonido"));
+        atTicks(t + 30, "captura: sonido", m -> {
+            logPantalla(m, "sonido");
+            shot(m, "cliente_pa04_sonido");
+        });
+        atTicks(t + 32, "opciones: controles", m -> opcionesP(m, "controles"));
+        atTicks(t + 38, "captura: controles", m -> {
+            logPantalla(m, "controles");
+            shot(m, "cliente_pa05_controles");
+        });
+        atTicks(t + 40, "opciones: chat, bajando", m -> {
+            opcionesP(m, "chat");
+            if (m.screen instanceof com.darkcraft.client.ui.OpcionesScreen o) o.probarScroll(3);
+        });
+        atTicks(t + 46, "captura: chat (bajado tres filas)", m -> {
+            logPantalla(m, "chat");
+            shot(m, "cliente_pa06_chat");
+        });
+        atTicks(t + 48, "opciones: accesibilidad", m -> opcionesP(m, "accesibilidad"));
+        atTicks(t + 54, "captura: accesibilidad", m -> {
+            logPantalla(m, "accesibilidad");
+            shot(m, "cliente_pa07_accesibilidad");
+        });
+        atTicks(t + 56, "opciones: graficos (la pantalla de Minecraft, con los botones del mod)", m -> opcionesP(m, "graficos"));
+        atTicks(t + 64, "captura: graficos", m -> {
+            logPantalla(m, "graficos");
+            shot(m, "cliente_pa08_graficos");
+        });
+        atTicks(t + 66, "ESC: vuelve a las opciones", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE));
+        atTicks(t + 70, "tras ESC en graficos", m -> logPantalla(m, "vuelta de graficos"));
+        atTicks(t + 72, "las teclas", m -> {
+            if (opcionesAbiertas != null)
+                m.setScreen(new net.minecraft.client.gui.screens.controls.KeyBindsScreen(opcionesAbiertas, m.options));
+        });
+        atTicks(t + 80, "captura: las teclas", m -> {
+            logPantalla(m, "teclas");
+            shot(m, "cliente_pa09_teclas");
+        });
+        atTicks(t + 82, "ESC", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE));
+        atTicks(t + 86, "opciones: idioma", m -> opcionesP(m, "idioma"));
+        atTicks(t + 94, "captura: idioma", m -> {
+            logPantalla(m, "idioma");
+            shot(m, "cliente_pa10_idioma");
+        });
+        atTicks(t + 96, "ESC", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE));
+        atTicks(t + 100, "opciones: recursos", m -> opcionesP(m, "recursos"));
+        atTicks(t + 110, "captura: recursos", m -> {
+            logPantalla(m, "recursos");
+            shot(m, "cliente_pa11_recursos");
+        });
+        atTicks(t + 112, "ESC (sin cambiar nada: no recarga)", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE));
+        atTicks(t + 118, "opciones: mods", m -> {
+            logPantalla(m, "vuelta de recursos");
+            opcionesP(m, "mods");
+        });
+        atTicks(t + 126, "captura: los mods (Dark Craft el primero)", m -> {
+            logPantalla(m, "mods");
+            shot(m, "cliente_pa12_mods");
+        });
+        atTicks(t + 128, "mods: forge", m -> {
+            if (m.screen instanceof com.darkcraft.client.ui.ModsScreen s) s.probar("forge");
+        });
+        atTicks(t + 132, "captura: la ficha de Forge", m -> {
+            logPantalla(m, "mods forge");
+            shot(m, "cliente_pa13_mods_forge");
+        });
+        atTicks(t + 134, "ESC dos veces: a la pausa", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE));
+        atTicks(t + 138, "ESC", m -> {
+            logPantalla(m, "vuelta de mods");
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE);
+        });
+        atTicks(t + 142, "de vuelta en la pausa", m -> logPantalla(m, "vuelta a la pausa"));
+        atTicks(t + 144, "las de Minecraft se cambian solas: opciones y mods (desde el titulo de Minecraft)", m -> {
+            m.setScreen(new net.minecraft.client.gui.screens.OptionsScreen(null, m.options));
+            logPantalla(m, "OptionsScreen de Minecraft");
+            m.setScreen(new net.minecraftforge.client.gui.ModListScreen(null));
+            logPantalla(m, "ModListScreen de Forge");
+            m.setScreen(new net.minecraft.client.gui.screens.PauseScreen(false));
+            logPantalla(m, "pausa de F3 + ESC (se deja la de Minecraft)");
+            m.setScreen(new net.minecraft.client.gui.screens.advancements.AdvancementsScreen(m.player.connection.getAdvancements()));
+            logPantalla(m, "progresos de Minecraft (la L)");
+            m.setScreen(null);
+        });
+        atTicks(t + 148, "un logro: el aviso del mod en vez del de Minecraft", m -> {
+            m.setScreen(null);
+            net.minecraft.advancements.Advancement a = logroCliente(m, "maelis", net.minecraft.advancements.FrameType.TASK);
+            log("  logro para el aviso: " + (a == null ? "NINGUNO" : a.getId()));
+            if (a != null) m.getToasts().addToast(new net.minecraft.client.gui.components.toasts.AdvancementToast(a));
+        });
+        atTicks(t + 172, "captura: el aviso del logro, en el juego", m -> {
+            log("  " + com.darkcraft.client.ui.AvisoLogro.resumen());
+            shot(m, "cliente_pa14_logro");
+        });
+        atTicks(t + 200, "una hazana (desafio) con el menu abierto (sale cuando acabe el otro)", m -> {
+            net.minecraft.advancements.Advancement a = logroCliente(m, "rey", net.minecraft.advancements.FrameType.CHALLENGE);
+            log("  hazana para el aviso: " + (a == null ? "NINGUNA" : a.getId()));
+            if (a != null) m.getToasts().addToast(new net.minecraft.client.gui.components.toasts.AdvancementToast(a));
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+        });
+        atTicks(t + 290, "captura: la hazana con el menu", m -> {
+            log("  " + com.darkcraft.client.ui.AvisoLogro.resumen());
+            shot(m, "cliente_pa15_hazana_menu");
+        });
+        atTicks(t + 380, "un aviso del sistema (de los que se quedan: con la losa del mod)", m -> {
+            m.setScreen(null);
+            net.minecraft.client.gui.components.toasts.SystemToast.add(m.getToasts(),
+                    net.minecraft.client.gui.components.toasts.SystemToast.SystemToastIds.PERIODIC_NOTIFICATION,
+                    net.minecraft.network.chat.Component.literal("Aviso de Minecraft"),
+                    net.minecraft.network.chat.Component.literal("Asi se ven los avisos que quedan"));
+        });
+        atTicks(t + 400, "captura: el aviso del sistema", m -> shot(m, "cliente_pa16_aviso_sistema"));
+        atTicks(t + 404, "Fin de la pausa", m -> {
+            m.setScreen(null);
+            m.getToasts().clear();
+            com.darkcraft.client.ui.AvisoLogro.olvidar();
+        });
+        return t + 410;
+    }
+
     /**
      * El bloque de la plataforma de las pruebas (donde esta {@code ex, ey, ez}). Ojo: {@code ex} y {@code ez} se ponen al
      * entrar al mundo, despues de montar el guion: dentro de cada paso, nunca al montarlo.
@@ -2905,6 +3087,7 @@ public final class ClientCiTest {
         fin = forja(fin);
         fin = habilidades(fin);
         fin = codice(fin);
+        fin = pausa(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

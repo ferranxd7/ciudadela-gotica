@@ -174,6 +174,8 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_CODICE_ABRE = sound("sfx.codice_abre");
     public static final RegistryObject<SoundEvent> SFX_CODICE_PAGINA = sound("sfx.codice_pagina");
     public static final RegistryObject<SoundEvent> SFX_CODICE_CIERRA = sound("sfx.codice_cierra");
+    // el aviso de los logros (parte 2f-1)
+    public static final RegistryObject<SoundEvent> SFX_LOGRO = sound("sfx.logro");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")

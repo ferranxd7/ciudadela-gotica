@@ -1625,5 +1625,16 @@
         "name": "darkcraft:sfx/codice_cierra_2"
       }
     ]
+  },
+  "sfx.logro": {
+    "subtitle": "subtitles.darkcraft.sfx.logro",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/logro_1"
+      },
+      {
+        "name": "darkcraft:sfx/logro_2"
+      }
+    ]
   }
 }

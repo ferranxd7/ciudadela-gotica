@@ -441,7 +441,7 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   (cada jugador en su idioma); `acertijo()` (sus versos y el sello: al pulsarlo sale la pagina de la receta, la forja
   dibujada; sustituye a la `AcertijoScreen` vieja); `escrito(libro)` para cualquier libro escrito (los del mod por sus
   marcas; los demas con lo que llevan en el NBT).
-- **Nunca sale la pantalla de libro ni la del atril de Minecraft** (`ClientCodice`, `ScreenEvent.Opening`): el libro de la
+- **Nunca sale la pantalla de libro ni la del atril de Minecraft** (`Pantallas`, `ScreenEvent.Opening`): el libro de la
   mano se abre en el codice; el del atril tambien (el atril sigue siendo un contenedor del servidor —asi se apuntan los
   libros perdidos—: el libro llega un poco despues y al cerrar se cierra el contenedor).
 - **El menu (R) tiene seis pestanas**: Equipo, Inventario, Estado, **Historia** (la cronica con los capitulos leidos —los
@@ -458,6 +458,38 @@ empezarla). Lo esencial, que cambia reglas de arriba:
 - La prueba del cliente tiene el tramo `codice()` (capturas `cliente_cx01..cx08`: portada, la hoja girando, segundo
   pliego, final, el capitulo 6, el atril y el diario); la historia y los logros del menu salen en `cliente_e10..e12`,
   `e18..e20` y `f41..f43`, y el acertijo en `f15_acertijo_*` y `f16_forja`.
+
+### Plan grande, parte 2f-1: la pausa, las opciones, los mods y el aviso de los logros
+
+- **Pantallas de Minecraft que ya no salen** (`client/ui/Pantallas`, `ScreenEvent.Opening`; sustituye a `ClientCodice`):
+  el libro y el atril (el codice), la pausa (`PausaScreen`; la de F3 + ESC, sin menu, se deja: se mira la tecla F3 y el
+  unico booleano de `PauseScreen`, buscado por su tipo), las opciones de Minecraft (`OpcionesScreen`, con la pantalla a
+  la que volvian: su unico campo de tipo pantalla), la lista de mods de Forge (`ModsScreen`) y los progresos de la L
+  (la pestana Logros del menu). **Campos privados de
+  Minecraft: se buscan por su tipo, nunca por el nombre** (fuera del entorno de desarrollo los nombres son otros).
+- **La pausa** (`PausaScreen`): losa con "Pausa" en gotica, la partida, el nivel y los ecos, y botones de piedra y oro:
+  volver, menu (R), opciones, mods, abrir a la red local (solo en un mundo de un jugador sin abrir) y guardar y salir
+  (desconectar en un servidor: lo mismo que hace la pausa de Minecraft). Teclado (flechas, Intro, la E) y raton.
+- **Las opciones** (`OpcionesScreen`): los apartados a la izquierda y las opciones del elegido a la derecha, de dos en
+  dos, con barra y rueda (filas enteras: las que no caben se esconden, nada de recortes). Los botones y deslizadores son
+  los de Minecraft (`OptionInstance.createButton`) con el texto en oro. General (dificultad en un mundo propio, campo de
+  vision, brillo...), Sonido (cada volumen, dispositivo, subtitulos), Controles (raton, saltar, agacharse; boton a las
+  teclas de Minecraft), Chat y Accesibilidad aqui mismo; Graficos (o la de Embeddium si esta), Idioma, Recursos, Aspecto
+  (la piel), Shaders (Oculus) y Lejania (Distant Horizons) —estas dos solo si el mod esta— y Mods abren su pantalla.
+- **Los mods** (`ModsScreen`): Dark Craft el primero; ficha con nombre, version, autores y descripcion; "Configurar"
+  (`ConfigScreenHandler`) y la carpeta de los mods.
+- **Las pantallas de Minecraft que quedan** (graficos, teclas, idioma, recursos, la piel, crear mundo, las de otros
+  mods...) salen con los botones, deslizadores, casillas, fondos, separadores y avisos del mod: `tools/ui/vanilla.py`
+  reescribe `assets/minecraft/textures/gui/` (widgets.png —solo las filas de los botones—, slider.png, checkbox.png,
+  options_background.png, light_dirt_background.png, toasts.png —las cuatro bandas—, header/footer_separator.png)
+  partiendo de las de verdad del juego (`client-extra.jar`).
+- **El aviso de los logros** (`AvisoLogro`): el de Minecraft (`AdvancementToast`, por `ToastAddEvent`) se cambia por una
+  losa con el icono, "Logro" (o "Hazana" en los de desafio, con la fanfarria de Minecraft) en gotica y el nombre; en el
+  juego arriba en el centro bajo la brujula, con una pantalla abierta arriba a la derecha; de uno en uno; en las
+  cinematicas esperan. Sonido `sfx.logro` (ElevenLabs, tomas 2 y 4: campana grave con brillo).
+- La prueba del cliente tiene el tramo `pausa()` (capturas `cliente_pa01..pa16`: pausa, opciones por apartados, las
+  pantallas de Minecraft con el estilo del mod, mods, el aviso de un logro, una hazana sobre el menu y un aviso del
+  sistema). El codice pasa paginas en un diario largo (`cliente_cx02..cx05`).
 
 ## Compilar, probar y publicar
 
