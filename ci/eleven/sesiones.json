@@ -1971,5 +1971,207 @@
         ]
       }
     }
+  },
+  "sfx_valdrenn_perros_espectros": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "Parte 4b: el perro de hueso (grunido, ladrido, aullido, mordisco, dolor, muerte) y el espectro de la corte (susurro, alerta, lamento, zarpazo, desvanecerse, dolor, muerte). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+    "sonidos": {
+      "perro_grunido": {
+        "prompt": "A skeletal undead hound growling low: a dry, rattling, guttural growl from a fleshless throat, jaw bones clicking and loose vertebrae rattling, dark fantasy RPG creature idle sound like Dark Souls, no music, about 2 seconds",
+        "sesiones": [
+          "ssC9oPopoyW6po9Qf57E",
+          "qq9puV2fCOcmUWjuOxzg",
+          "oh8Ma2SPvHzMQ9MdStF4",
+          "G5ljFEBZuVrWx0EyYsMG"
+        ],
+        "generaciones": [
+          "ju22E8nXLYrYV68APByy",
+          "UysCt8RJW6tV9F0aK47g",
+          "DiLEg9VSTrhHH8U3j9lw",
+          "KDNdShj7MDvbldWiMUyr"
+        ]
+      },
+      "perro_ladrido": {
+        "prompt": "An undead skeleton dog spotting its prey: two harsh, hollow, rasping barks that echo out of an empty ribcage, bones rattling as it lunges forward, dark fantasy RPG enemy alert sound like Dark Souls, no music, about 1.5 seconds",
+        "sesiones": [
+          "NtkiszMPh5mH36kO7Zgz",
+          "fKUEJX8LZzc4iUoKzpzO",
+          "8BBVJGwX12tq7CdNqS4K",
+          "Uo1AggVBNfhNc7KC4nzJ"
+        ],
+        "generaciones": [
+          "JeEc1ndc3vA5NT7BGWL8",
+          "Vnh8nqKnFFVBmfPnxW3q",
+          "P1CQOFUdGWLED4EEJeY1",
+          "4LxDtBCRINY2mbm8SnQx"
+        ]
+      },
+      "perro_aullido": {
+        "prompt": "A skeletal hellhound howling to call its pack: one long, eerie, hollow, ghostly howl with a dry rattling undertone, echoing across a stone castle courtyard at night, dark fantasy, no music, about 3 seconds",
+        "sesiones": [
+          "xWn9KSzsu26WPxROKYTD",
+          "XEnCewBIUhphzsIFD2hm",
+          "c4hPnF1FlHE67w7eNcAi",
+          "rbXKW1VNEP5BaE9WemiV"
+        ],
+        "generaciones": [
+          "1IpweqVBJW6Qk7arrBkh",
+          "ljJujwib1CYCwrXkN1FN",
+          "84jbjQ3dOtEDkHBi3ga4",
+          "ZaB3seDd8NsJfBwj4l3d"
+        ]
+      },
+      "perro_mordisco": {
+        "prompt": "The bony jaws of a skeletal dog snapping shut hard: a sharp clack of teeth, a short vicious snarl and bones rattling, punchy close combat sound, dark fantasy, no music, under 1 second",
+        "sesiones": [
+          "yZXkg2evMRS7B01ed49s",
+          "WlhdaMpdcMrLE4YVYf6f",
+          "aBS7wrRzCfgfAkhunVSs",
+          "K6OUy2kRyDd53aeaIsWv"
+        ],
+        "generaciones": [
+          "d3kCoLgOJNXqipD8LVTq",
+          "1hatVWWTX1QsLyRiVZGQ",
+          "rgwzkFGCW7qGvf34ui3F",
+          "oD8T1VRf3zLCE0Zdjl2D"
+        ]
+      },
+      "perro_dolor": {
+        "prompt": "A skeletal undead dog being struck by a sword: a short pained hollow yelp mixed with cracking bone and a rattle, dark fantasy creature hurt sound, no music, under 1 second",
+        "sesiones": [
+          "VqNrN8wElaNNgD6A7lGD",
+          "lFlAOlmuXqwj1gxt6mZK",
+          "0yomtlCIh6cG5bTIsDpY",
+          "PltbGceK0qXuUqbt95yk"
+        ],
+        "generaciones": [
+          "G4HvSs0yrgrVxprjbU5r",
+          "kzztIiBkybTuSS8aB8jX",
+          "rUSHANordl3xqqqpsTyj",
+          "W4E2jNl12AM8iNyVUsZt"
+        ]
+      },
+      "perro_muerte": {
+        "prompt": "A skeletal hound collapsing dead: a last rasping whimper fading out while its bones clatter and scatter onto a stone floor, dark fantasy creature death sound like Dark Souls, no music, about 2 seconds",
+        "sesiones": [
+          "wirShIDFnSVucHdMYzcf",
+          "nQ1rtjdIS7lMfjOSRiKa",
+          "16ArYlE7YifelPOwyhap",
+          "FXbwymyBpg0CishAhuTu"
+        ],
+        "generaciones": [
+          "RQYAnxyNOw521HTQbSEN",
+          "IZXFJcQSqTY2ifMaFe7n",
+          "bByfdCUm0Vqynvg22zwp",
+          "DDBT1kN63A1oiHIFMsOj"
+        ]
+      },
+      "espectro_susurro": {
+        "prompt": "The ghost of a royal courtier drifting through a haunted castle hall: faint, breathy, unintelligible whispers and a cold airy moan with a soft ethereal shimmer, dark fantasy enemy idle sound, no music, about 3 seconds",
+        "sesiones": [
+          "l3UjLrl5zfCp8G06QxT6",
+          "te42hnxtFqSzN50YbTxK",
+          "KoeAloJDsveILVG6XQ7P",
+          "kogpD00jaxxI3Imaa6FQ"
+        ],
+        "generaciones": [
+          "RgZ84xk1BfzpExo1IMQN",
+          "raeB3lvfQ0t57trSDetM",
+          "GHHRyfYjsZh0EljNfRn0",
+          "OsqpvwYMsBlzRa0ndl4c"
+        ]
+      },
+      "espectro_alerta": {
+        "prompt": "A spectral ghost noticing an intruder: a sudden chilling distorted shriek that rises and echoes, with an icy whoosh, dark fantasy enemy alert sound like Dark Souls, no music, about 1.5 seconds",
+        "sesiones": [
+          "prhU1ZFAPIHIrreUNTQ7",
+          "lTtV2H8QzOi8OULo4a0W",
+          "C24sSjuhkUTTghK192KR",
+          "0qpDvfecSoVvx4sVDuTK"
+        ],
+        "generaciones": [
+          "FqyZUgZnELYKMK2LgHEk",
+          "Xir9sVitRc7s8gWMyFyY",
+          "3XpzWwaIhFAvuxob6qJ2",
+          "92MvOdbkh2AVfPobaM54"
+        ]
+      },
+      "espectro_lamento": {
+        "prompt": "A banshee-like court spectre's mournful wail attack: a long piercing ghostly scream that swells, layered with echoing sorrowful voices and a freezing gust of wind, dark fantasy magic attack sound, no music, about 2.5 seconds",
+        "sesiones": [
+          "fIvuIYp1521YWq1FdeHv",
+          "qJ5AloKbTdA2YtU9OYsH",
+          "EzIRjAhjLhM778fLsyGE",
+          "Ky6iL6vdQiJLDekkSb3G"
+        ],
+        "generaciones": [
+          "sHK01NR5eEcmY6hJHTdW",
+          "TLl6X06E4zPFd7KviVjN",
+          "zn2ZKZJJXMlhal69dApk",
+          "FkbhC1PcWYAuHlckWFtB"
+        ]
+      },
+      "espectro_zarpazo": {
+        "prompt": "A ghost's spectral claw swipe: a fast icy airy whoosh with a faint ghostly hiss and a crystalline shimmer at the end, dark fantasy combat sound, no music, under 1 second",
+        "sesiones": [
+          "VXS27zN9uv95Tm4Rkzq6",
+          "NdY3OsvR1eG5VK4N2DIa",
+          "eqlV6eWx1kSJVT6Scvbc",
+          "9awnGaODgLR901sipW6X"
+        ],
+        "generaciones": [
+          "37Y7TaWCsJ2AgeeTVN8y",
+          "MUYQDFU5HRl5jw7Pof8v",
+          "Lc9U8Dq4rhWaytjOCqew",
+          "9fR0huXlvBvg5IWTdDJH"
+        ]
+      },
+      "espectro_desvanece": {
+        "prompt": "A ghost vanishing and reappearing a few steps away: a reversed ethereal whoosh that sucks inward, a cold shimmer and a soft ghostly sigh, dark fantasy teleport sound, no music, about 1 second",
+        "sesiones": [
+          "KBuc2cFVzY8QTmWG1fIv",
+          "WOj9cZmOkUzEiRwPod4M",
+          "5jBZaI342yF79itz7YQ7",
+          "k0277Wss4n6bhPE9vIvS"
+        ],
+        "generaciones": [
+          "7GY4qggBqqvHhhDpj9Lt",
+          "KwG6KVcSdYNsUkKdPdpv",
+          "Kbo100QQfYD5dxN4zxu0",
+          "tTgDW5VkQxmXzFlGS1Yz"
+        ]
+      },
+      "espectro_dolor": {
+        "prompt": "A spectral ghost being hit by a sword: a short distorted ghostly gasp with a crackle like breaking ice and an echoing hiss, dark fantasy enemy hurt sound, no music, under 1 second",
+        "sesiones": [
+          "wWqZ2Is5sTRMgXHq3YNP",
+          "ZMuI7oGYT2due0cMNxtM",
+          "ydHw6oQD6qlVDvZdoVlj",
+          "wLwV0ocnsX3o7GhP0iLG"
+        ],
+        "generaciones": [
+          "g5BWLVnpt9ZzbKv4lMZF",
+          "paSIBrhaClhEvk7C5cnx",
+          "GjSpXfSH7zRTqUVMVEPE",
+          "V2iJKew5E5Pir0JS13ED"
+        ]
+      },
+      "espectro_muerte": {
+        "prompt": "A court spectre dissolving into nothing: a long fading sorrowful sigh that breaks apart into whispers and an icy shimmer that drifts away, dark fantasy enemy death sound like Dark Souls, no music, about 2.5 seconds",
+        "sesiones": [
+          "8KIrhdDe9S57hCo8dPeZ",
+          "b7Ut2lCSDdim19fvnFhc",
+          "iRP2grOFylXEjFybYfwu",
+          "ccBTg8hnTUW1ntlYBPwL"
+        ],
+        "generaciones": [
+          "0MKGWnqRnzkAbPdQqRP7",
+          "OYIAEchLoqsIPwskKxyc",
+          "dCysxhJiv3Ht78XJOo5l",
+          "korfOfJJZDfgm6puOiVO"
+        ]
+      }
+    }
   }
 }
