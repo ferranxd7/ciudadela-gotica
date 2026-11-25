@@ -207,6 +207,11 @@ public final class Rol {
         return de(p).combate > 0;
     }
 
+    /** Para la prueba de la CI: fuera del combate (como si hubieran pasado los 8 s sin pelear). */
+    public static void sinCombate(ServerPlayer sp) {
+        de(sp).combate = 0;
+    }
+
     /** La estamina entera y fuera el agotamiento (al descansar en un santuario). */
     public static void recuperado(ServerPlayer sp) {
         Estado s = de(sp);

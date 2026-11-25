@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "10";
+    private static final String V = "11";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -750,14 +750,14 @@ public final class Net {
         }
     }
 
-    /** Energia de los combos (0-100) para la barra. */
+    /** El mana (la energia de los combos) para la barra: pasa de 127 con la Mente alta, asi que va como VarInt. */
     public record Energia(int valor) {
         void write(FriendlyByteBuf b) {
-            b.writeByte(valor);
+            b.writeVarInt(Math.max(0, valor));
         }
 
         static Energia read(FriendlyByteBuf b) {
-            return new Energia(b.readByte());
+            return new Energia(b.readVarInt());
         }
 
         void handle(Supplier<NetworkEvent.Context> ctx) {

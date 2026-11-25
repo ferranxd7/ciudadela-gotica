@@ -1645,10 +1645,11 @@ public final class ClientCiTest {
             logTalismanes(m, "tras el fruto de brasa");
             golpeFuego(m, "con el talisman y el fruto (40 % y 50 %)");
         });
-        atTicks(t + 274, "la G: el objeto rapido (fruto de hueso)", m -> server(m, sp -> {
+        atTicks(t + 274, "la G: el objeto rapido (fruto de hueso, elegido en la cruz: si no, van primero los frascos)", m -> server(m, sp -> {
             sp.getInventory().selected = 0;
             sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
         }));
+        atTicks(t + 277, "elegir el fruto de hueso abajo en la cruz", m -> com.darkcraft.client.ui.ClientEquipo.elegirRapido(5));
         atTicks(t + 280, "mantener la G", m -> {
             com.darkcraft.client.ui.Teclas.OBJETO_USAR.setDown(true);
             pulsar(com.darkcraft.client.ui.Teclas.OBJETO_USAR);
@@ -1781,6 +1782,7 @@ public final class ClientCiTest {
         atTicks(t + 30, "al empezar", m -> logHechizos(m, "al empezar"));
         atTicks(t + 32, "clic con el baston sin nada memorizado", m -> atacar(m));
         atTicks(t + 36, "tras el clic", m -> logHechizos(m, "sin memorizar"));
+        atTicks(t + 38, "fuera de combate (la diana de los talismanes)", m -> server(m, com.darkcraft.rol.Rol::sinCombate));
         atTicks(t + 40, "descansar en el santuario: su menu", m -> usarSantuario());
         atTicks(t + 56, "abajo dos veces e INTRO: memorizar hechizos", m -> {
             tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN);
@@ -1789,7 +1791,7 @@ public final class ClientCiTest {
         });
         atTicks(t + 68, "captura: la memoria vacia y los ocho hechizos", m -> {
             logHechizos(m, "memoria vacia");
-            shot(m, "cliente_m01_memoria");
+            shot(m, "cliente_hz01_memoria");
         });
         atTicks(t + 72, "INTRO: el guijarro; abajo, INTRO: la gran lanza; abajo, INTRO: las esquirlas", m -> {
             tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER);
@@ -1807,7 +1809,7 @@ public final class ClientCiTest {
         });
         atTicks(t + 92, "captura: cuatro memorizados y el aviso de que no cabe", m -> {
             logHechizos(m, "memorizados");
-            shot(m, "cliente_m02_memorizados");
+            shot(m, "cliente_hz02_memorizados");
         });
         atTicks(t + 96, "ESC: vuelve al santuario; cerrar", m -> {
             tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE);
@@ -1821,7 +1823,7 @@ public final class ClientCiTest {
         });
         atTicks(t + 112, "captura: los hechizos en el inventario", m -> {
             logHechizos(m, "en el inventario");
-            shot(m, "cliente_m03_inventario_hechizos");
+            shot(m, "cliente_hz03_inventario_hechizos");
         });
         atTicks(t + 116, "cerrar; fuera el santuario (taparia la vista de lado); dos dianas y el jugador a 9 bloques", m -> {
             m.setScreen(null);
@@ -1834,16 +1836,16 @@ public final class ClientCiTest {
         });
         atTicks(t + 134, "captura: la cruz con el hechizo elegido", m -> {
             logHechizos(m, "con la cruz");
-            shot(m, "cliente_m04_cruz");
+            shot(m, "cliente_hz04_cruz");
         });
         atTicks(t + 138, "clic: el Guijarro de Sombra", m -> atacar(m));
         atTicks(t + 142, "captura: lanzando (primera persona)", m -> {
             logHechizos(m, "lanzando el guijarro");
-            shot(m, "cliente_m05_fp_lanzar");
+            shot(m, "cliente_hz05_fp_lanzar");
         });
         atTicks(t + 148, "captura: el guijarro volando", m -> {
             logHechizos(m, "guijarro volando");
-            shot(m, "cliente_m06_fp_guijarro");
+            shot(m, "cliente_hz06_fp_guijarro");
         });
         atTicks(t + 166, "tras el guijarro; flecha arriba: la Gran Lanza; tercera persona, de lado", m -> {
             logHechizos(m, "tras el guijarro");
@@ -1853,11 +1855,11 @@ public final class ClientCiTest {
         atTicks(t + 172, "clic: la gran lanza", m -> atacar(m));
         atTicks(t + 182, "captura: preparando la lanza, de lado", m -> {
             logHechizos(m, "preparando la lanza");
-            shot(m, "cliente_m07_tp_lanza_prepara");
+            shot(m, "cliente_hz07_tp_lanza_prepara");
         });
         atTicks(t + 194, "captura: la lanza volando", m -> {
             logHechizos(m, "lanza volando");
-            shot(m, "cliente_m08_tp_lanza");
+            shot(m, "cliente_hz08_tp_lanza");
         });
         atTicks(t + 214, "tras la lanza; flecha arriba: las esquirlas", m -> {
             logHechizos(m, "tras la lanza");
@@ -1866,7 +1868,7 @@ public final class ClientCiTest {
         atTicks(t + 218, "clic: las esquirlas", m -> atacar(m));
         atTicks(t + 232, "captura: las esquirlas buscando a la diana", m -> {
             logHechizos(m, "esquirlas");
-            shot(m, "cliente_m09_tp_esquirlas");
+            shot(m, "cliente_hz09_tp_esquirlas");
         });
         atTicks(t + 256, "tras las esquirlas; cerca, el sello en la mano y la llamarada", m -> {
             logHechizos(m, "tras las esquirlas");
@@ -1880,7 +1882,7 @@ public final class ClientCiTest {
         atTicks(t + 262, "clic: la llamarada", m -> atacar(m));
         atTicks(t + 272, "captura: la llamarada", m -> {
             logHechizos(m, "llamarada");
-            shot(m, "cliente_m10_tp_llama");
+            shot(m, "cliente_hz10_tp_llama");
         });
         atTicks(t + 290, "tras la llamarada; todos memorizados (con el comando); lejos otra vez", m -> {
             logHechizos(m, "tras la llamarada");
@@ -1894,7 +1896,7 @@ public final class ClientCiTest {
         atTicks(t + 298, "clic: la lanza de rayo", m -> atacar(m));
         atTicks(t + 316, "captura: el rayo volando", m -> {
             logHechizos(m, "rayo");
-            shot(m, "cliente_m11_tp_rayo");
+            shot(m, "cliente_hz11_tp_rayo");
         });
         atTicks(t + 334, "tras el rayo; un golpe de 10 al jugador", m -> {
             logHechizos(m, "tras el rayo");
@@ -1908,7 +1910,7 @@ public final class ClientCiTest {
         atTicks(t + 342, "clic: curacion", m -> atacar(m));
         atTicks(t + 352, "captura: rezando", m -> {
             logHechizos(m, "rezando");
-            shot(m, "cliente_m12_tp_curar");
+            shot(m, "cliente_hz12_tp_curar");
         });
         atTicks(t + 372, "tras curarse; la bendicion", m -> {
             logHechizos(m, "curado");
@@ -1918,7 +1920,7 @@ public final class ClientCiTest {
         atTicks(t + 404, "primera persona, con el HUD", m -> enPrimeraPersona(m));
         atTicks(t + 412, "captura: la bendicion bajo las barras", m -> {
             logHechizos(m, "bendecido");
-            shot(m, "cliente_m13_bendicion_hud");
+            shot(m, "cliente_hz13_bendicion_hud");
         });
         atTicks(t + 416, "cerca, el baston y la Espada Fantasma; de lado", m -> {
             verCombate(m);
@@ -1931,7 +1933,7 @@ public final class ClientCiTest {
         atTicks(t + 422, "clic: la espada fantasma", m -> atacar(m));
         atTicks(t + 431, "captura: el tajo fantasma", m -> {
             logHechizos(m, "espada fantasma");
-            shot(m, "cliente_m14_tp_espada");
+            shot(m, "cliente_hz14_tp_espada");
         });
         atTicks(t + 446, "sin mana: el guijarro; primera persona", m -> {
             enPrimeraPersona(m);
@@ -1941,7 +1943,7 @@ public final class ClientCiTest {
         atTicks(t + 452, "clic sin mana", m -> atacar(m));
         atTicks(t + 458, "captura: el aviso de que no queda mana", m -> {
             logHechizos(m, "sin mana");
-            shot(m, "cliente_m15_sin_mana");
+            shot(m, "cliente_hz15_sin_mana");
         });
         atTicks(t + 462, "mana lleno; el sello con una hechiceria", m -> server(m, sp -> {
             com.darkcraft.armas.Combos.llenar(sp);

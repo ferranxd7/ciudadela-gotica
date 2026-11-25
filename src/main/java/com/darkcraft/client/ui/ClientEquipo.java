@@ -91,6 +91,11 @@ public final class ClientEquipo {
         return rapido;
     }
 
+    /** Para la prueba de la CI: deja elegido el objeto rapido del hueco {@code h} (si tiene algo). */
+    public static void elegirRapido(int h) {
+        if (rapidos().contains(h)) rapido = h;
+    }
+
     private static void rapidoSiguiente() {
         List<Integer> l = rapidos();
         if (l.size() < 2) return;

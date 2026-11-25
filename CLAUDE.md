@@ -305,7 +305,8 @@ empezarla). Lo esencial, que cambia reglas de arriba:
 - Arte: `tools/rol/hechizos.py` (baston, sello, los 8 pergaminos y el icono del efecto). Sonidos (ElevenLabs):
   `hechizo_lanzar` (tomas 4 y 1), `hechizo_impacto` (2 y 1), `hechizo_rayo` (1 y 4), `hechizo_llama` (4 y 1),
   `hechizo_curar` (3 y 2), `hechizo_bendicion` (4 y 3). La prueba del cliente tiene el tramo `hechizos()` (capturas
-  `cliente_m01..m15`).
+  `cliente_hz01..hz15`; las `cliente_mNN` son las del Mandoble).
+- El mana pasa de 127 con la Mente alta: `Net.Energia` va en VarInt (antes un byte: con 208 el cliente veia -48).
 
 ## Compilar, probar y publicar
 
