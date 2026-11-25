@@ -172,7 +172,7 @@ public class TiendaScreen extends Screen {
 
     /** Las flechas de la cantidad (en el detalle): x de la izquierda y de la derecha, y su fila. */
     private int flechaY() {
-        return py() + LISTA_Y - 3 + 84;
+        return py() + LISTA_Y - 3 + 89;
     }
 
     private int flechaX(boolean derecha) {
@@ -269,18 +269,19 @@ public class TiendaScreen extends Screen {
         g.renderItem(st, 0, 0);
         g.renderItemDecorations(font, st, 0, 0);
         g.pose().popPose();
-        List<FormattedCharSequence> ln = font.split(Letra.m(st.getHoverName()), w - 54);
-        if (!ln.isEmpty()) Letra.contorno(g, font, ln.get(0), x + 46, y + 9, 0xFFE9C766, 0xFF050408);
-        // para que sirve (lo que diria su recuadro, sin el nombre): hasta dos lineas
+        Panel.nombre(g, font, st.getHoverName(), x + 46, y + 9, w - 54);
+        boolean dos = font.width(Letra.m(st.getHoverName())) > w - 54 && font.split(st.getHoverName(), w - 54).size() > 1;
+        // para que sirve (lo que diria su recuadro, sin el nombre): hasta tres lineas (dos si el nombre ocupa dos)
         List<FormattedCharSequence> desc = new ArrayList<>();
         List<Component> tip = st.getTooltipLines(minecraft.player, TooltipFlag.Default.NORMAL);
-        for (int i = 1; i < tip.size() && desc.size() < 2; i++) {
+        for (int i = 1; i < tip.size() && desc.size() < 3; i++) {
             if (tip.get(i).getString().isBlank()) continue;
             desc.addAll(font.split(tip.get(i), w - 54));
         }
-        for (int i = 0; i < Math.min(2, desc.size()); i++) g.drawString(font, desc.get(i), x + 46, y + 22 + i * 9, APAGADO, false);
-        Panel.raya(g, x + 6, x + w - 6, y + 42);
-        int ly = y + 48;
+        int dy = dos ? y + 26 : y + 20, caben = dos ? 2 : 3;
+        for (int i = 0; i < Math.min(caben, desc.size()); i++) g.drawString(font, desc.get(i), x + 46, dy + i * 9, APAGADO, false);
+        Panel.raya(g, x + 6, x + w - 6, y + 48);
+        int ly = y + 53;
         // precio, cuantas quedan y cuantas se llevan
         dato(g, x, w, ly, "darkcraft.tienda.precio", Hud.numero(o.precio()), ORO);
         int q = quedan(sel);

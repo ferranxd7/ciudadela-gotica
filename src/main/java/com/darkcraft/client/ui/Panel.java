@@ -121,4 +121,18 @@ public final class Panel {
     private static void suena(SoundEvent s, float tono, float volumen) {
         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(s, tono, volumen));
     }
+
+    /**
+     * El nombre de un objeto en la cabecera de una ficha (al lado de su icono en grande): en letra gotica si cabe en
+     * {@code w}; si no, con la letra del juego en una o dos lineas (que no se corte a media palabra: "Baston de la").
+     */
+    public static void nombre(GuiGraphics g, Font f, Component nombre, int x, int y, int w) {
+        if (f.width(Letra.m(nombre)) <= w) {
+            Letra.contorno(g, f, Letra.m(nombre), x, y, 0xFFE9C766, 0xFF050408);
+            return;
+        }
+        java.util.List<net.minecraft.util.FormattedCharSequence> l = f.split(nombre, w);
+        int y0 = l.size() > 1 ? y - 4 : y + 2;
+        for (int i = 0; i < Math.min(2, l.size()); i++) g.drawString(f, l.get(i), x, y0 + i * 10, 0xFFE9C766, true);
+    }
 }

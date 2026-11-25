@@ -272,7 +272,7 @@ public class ForjaScreen extends Screen {
     }
 
     private int opcionY() {
-        return py() + LISTA_Y - 3 + 96;
+        return py() + LISTA_Y - 3 + 84;
     }
 
     private int opcionEn(double mx, double my) {
@@ -384,8 +384,7 @@ public class ForjaScreen extends Screen {
         g.pose().scale(2f, 2f, 1f);
         g.renderItem(st, 0, 0);
         g.pose().popPose();
-        List<FormattedCharSequence> ln = font.split(Letra.m(st.getHoverName()), w - 54);
-        if (!ln.isEmpty()) Letra.contorno(g, font, ln.get(0), x + 46, y + 9, 0xFFE9C766, 0xFF050408);
+        Panel.nombre(g, font, st.getHoverName(), x + 46, y + 9, w - 54);
     }
 
     private void detalle(GuiGraphics g, int x, int y, int w) {
@@ -448,9 +447,9 @@ public class ForjaScreen extends Screen {
         }
         Panel.raya(g, x + 6, x + w - 6, y + 42);
         if (h != null) {
-            g.drawString(font, CenizaGuerra.coste(h), x + 7, y + 47, 0xFF8FC8E8, false);
+            g.drawString(font, CenizaGuerra.coste(h), x + 7, y + 46, 0xFF8FC8E8, false);
             List<FormattedCharSequence> d = font.split(Component.translatable(h.clave() + ".desc"), w - 14);
-            for (int i = 0; i < Math.min(3, d.size()); i++) g.drawString(font, d.get(i), x + 7, y + 58 + i * 9, APAGADO, false);
+            for (int i = 0; i < Math.min(3, d.size()); i++) g.drawString(font, d.get(i), x + 7, y + 55 + i * 9, APAGADO, false);
         }
         // las cenizas que se llevan
         int oy = opcionY();
@@ -500,7 +499,8 @@ public class ForjaScreen extends Screen {
                     : Component.translatable("darkcraft.forja.cambia", Component.translatable(h == null ? "darkcraft.habilidad.ninguna_corta" : h.clave()),
                     Component.translatable(ch.clave()));
         }
-        g.drawString(font, recortar(que.getString(), w - 14), x + 7, oy + 22, aplicable() ? LUZ : 0xFF9A8F7E, true);
+        // lo que hara (encima de los botones)
+        g.drawString(font, recortar(que.getString(), w - 14), x + 7, oy + 20, aplicable() ? LUZ : 0xFF9A8F7E, true);
     }
 
     private void stat(GuiGraphics g, int x, int w, int y, String clave, String antes, String despues) {
