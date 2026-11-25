@@ -111,31 +111,5 @@
     "aviso": "Music by Matthew Pablo, http://www.matthewpablo.com",
     "uso": "El Capitán de Brumavela",
     "lufs": -16
-  },
-  {
-    "id": "viaje",
-    "pagina": "https://opengameart.org/node/85933",
-    "pagina2": "https://opengameart.org/content/the-traveller",
-    "busca": "traveller",
-    "titulo": "The Traveller",
-    "autor": "Viktor Kraus",
-    "licencia": "CC-BY 3.0",
-    "aviso": "\"The Traveller\" composed, performed, mixed and mastered by Viktor Kraus",
-    "uso": "El viaje de La Garza Gris (candidata, en pruebas)",
-    "lufs": -16
-  },
-  {
-    "id": "viaje_b",
-    "pagina": "https://opengameart.org/content/ocean-music-pack",
-    "busca": "exploring",
-    "zip_prefiere": [
-      "exploring"
-    ],
-    "titulo": "Exploring the Ocean (Ocean music pack)",
-    "autor": "Leonardo Paz (leohpaz)",
-    "licencia": "CC-BY 4.0",
-    "aviso": "Music by Leonardo Paz",
-    "uso": "El viaje de La Garza Gris (candidata, en pruebas)",
-    "lufs": -16
   }
 ]

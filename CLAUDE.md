@@ -712,15 +712,50 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   Prueba del cliente: tramo `enemigos()` (capturas `cliente_en01..en28`); el tramo `pueblo()` de la 3b corre sin
   enemigos y con el faro abierto.
 
+### Plan grande, parte 3d-1: la cinematica de inicio (la Sombra, la caida y el despertar)
+
+- **Cuando sale**: nada mas elegir clase (`Clase.pedir` → `cine/Intro.empezar`), donde este el jugador (en un mundo nuevo,
+  en el muelle de Brumavela, mirando al barco roto). Otra vez: `/darkcraft brumavela inicio`. Dura 40 s; se salta con ESPACIO.
+- **Lo que pasa** (`cine/Intro`: los tiempos y los dos planos; es la cinematica **38**): en negro, la Sombra habla
+  ("Estabas muerto." / "Sin nombre... Sin tumba... Solo la oscuridad." / "Pero meti la mano... y te arroje de vuelta."); a
+  los 11,6 s **la caida** (camara en primera persona, de 510 bloques de alto hasta 2,3 sobre los pies, mirando abajo y
+  girando: se ve la isla entera; "Ahora llevas mi marca..."); a los 21,4 s **la Sombra te atrapa** (negro de golpe); **la
+  marca** arde en lo negro (un ojo en un aro roto con tres espinas: `tools/cine/marca.py` → `textures/gui/marca_sombra.png`;
+  "Hay una puerta que yo no puedo abrir. Tu la abriras por mi." / "Ahora despierta... marcado."); dos latidos y **se abren
+  los ojos** (los parpados, un parpadeo, la luz que deslumbra): tumbado boca arriba, se incorpora mirando al barco y se
+  pone en pie; a los 39,6 s la camara ya es la del jugador (misma posicion, giro, cabeceo y campo de vision: no hay corte).
+- **Las cinematicas "con guion"** (del numero 38 en adelante; 39 sera reparar el barco y 40-42 los viajes): el servidor
+  solo manda los planos (`Cinematics.playShots`) y el cliente lleva lo demas en `client/Guion` (lo que suena y cuando
+  —lista de pasos con su segundo—, el negro, lo que se pinta debajo y encima del negro, el ladeo y el campo de vision de
+  mas, los subtitulos de la Sombra) con los tiempos de la clase comun (`Intro`). `ClientCine` pregunta a `Guion` en sus
+  ganchos (`GUION` = 38): sin oscurecer la imagen ni subir el brillo (acaba en los ojos del jugador y se notaria).
+- **La voz de la Sombra** (ElevenLabs, `eleven_v4`): **"Grav - Deep, Dark & Sinister"** `6qtlupOXBYtv2nYY2VgL`, flow
+  `AqkIj7OE07LCh5cMIoZU` (elegida por tono: la mas grave de las probadas, F0 ~65-83 Hz; si al usuario no le gusta, se
+  cambia). 9 frases con la voz normal (tomas a/b) y **las mismas susurradas** (`susurro_N`): `procesar.py` `voz_sombra`
+  monta la voz (un 5 % mas grave) + tres copias del susurro retrasadas a izquierda, derecha y centro + tres ecos + un
+  eco de vacio de 5,5 s (`afir` con ruido que se apaga: `dry=1`, que es la ganancia de la ENTRADA), en **estereo**, a
+  -15 LUFS. Salen `sounds/sombra/voz_N.ogg` (suenan sin sitio: `sombra.voz.N`) y `habla_sombra` en `rey_voces.json`
+  (`Voces.sombra(n)`: lo que tarda en decir cada frase; los subtitulos `darkcraft.sombra.voz.N` duran eso + 0,9 s). Las
+  frases 7-9 son las del viaje a Valdrenn (3d-2).
+- Efectos (ElevenLabs, 4 tomas; las elegidas en `TOMAS_SFX`): `intro_abismo` (3; el zumbido bajo la voz, 30 s),
+  `intro_caida` (2; el viento), `intro_atrapa` (2; crece y da el golpe a los ~1,3 s), `intro_marca` (1), `intro_latido`
+  (4). Los que son casi todo graves (`GRAVES`) llevan sumadas la octava y la quinta de encima: en altavoces pequenos no
+  se oian.
+- **Ojo con los enlaces de ElevenLabs: caducan a las ~2 horas de generar el audio** (no a las 00:00 UTC): se apunta
+  `descargas.json` y se hace push nada mas generar.
+- Pruebas: servidor, linea `Inicio: ...` (nada tapa la caida, donde acaba cada plano, lo que duran las frases); cliente,
+  tramo `intro()` (capturas `cliente_in01..in14`) y los niveles del audio grabado (`audio_cliente.txt` va ~9 s por delante
+  del reloj del informe).
+
 ### Lo siguiente: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 
 Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publicada):
 - **3a, el mundo de nubes**: hecha (arriba).
 - **3b, la isla del pueblo abandonado**: hecha (arriba).
 - **3c, enemigos**: hecha (arriba).
-- **3d, cinematicas**: al elegir clase, la de inicio con voz (quien eres, caes del cielo; despiertas en el borde de la
-  isla junto a los restos del barco; `Clase.elegir` es donde empezarla); reparar el barco y el viaje volando al muelle de
-  Valdrenn (luego se puede ir y volver desde el muelle).
+- **3d-1, la cinematica de inicio**: hecha (arriba).
+- **3d-2, el barco**: la cinematica de la reparacion y el viaje volando al muelle de Valdrenn (luego se puede ir y volver
+  desde el muelle).
 
 ## Compilar, probar y publicar
 
@@ -739,7 +774,7 @@ Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publica
 ## Audios de ElevenLabs (cómo se traen al repositorio)
 
 - Se generan con el conector de ElevenLabs (en la CI no hay clave). Los enlaces firmados de los audios caducan a
-  las **00:00 UTC**; desde el espacio de trabajo no se pueden bajar, desde GitHub Actions sí.
+  las **~2 horas** de generarlos; desde el espacio de trabajo no se pueden bajar, desde GitHub Actions sí.
 - Pasos: apuntar `{archivo, url}` en `ci/eleven/descargas.json` → push → el workflow `eleven.yml` los baja a
   `ci/eleven/master/` y hace commit él solo → en cada build `ci/eleven/procesar.py` los monta en OGG
   (`sounds/rey/voz_N.ogg`, `sounds/sfx/NOMBRE_K.ogg`, `rey_voces.json`). Si un enlace caducó, se vuelve a pedir el
