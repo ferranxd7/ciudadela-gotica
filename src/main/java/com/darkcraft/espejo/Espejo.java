@@ -364,10 +364,8 @@ public final class Espejo {
                 return;
             }
         }
-        if (activo(p)) {
-            SUCIOS.add(p.getUUID());
-            enviar(p, false);
-        }
+        SUCIOS.add(p.getUUID());
+        enviar(p, false);
     }
 
     @SubscribeEvent
@@ -387,7 +385,12 @@ public final class Espejo {
     @SubscribeEvent
     public static void onTick(TickEvent.PlayerTickEvent e) {
         if (e.phase != TickEvent.Phase.END || e.side != LogicalSide.SERVER || !(e.player instanceof ServerPlayer p)) return;
-        if (p.tickCount % 20 != 7 || !activo(p)) return;
+        if (p.tickCount % 20 != 7) return;
+        if (!activo(p)) {
+            // dormido: solo lo que necesita el menu (logros, diario, libros), cuando cambia
+            if (SUCIOS.remove(p.getUUID())) enviar(p, false);
+            return;
+        }
         descubrir(p);
         if (p.tickCount % 40 == 7) coleccion(p);
         String lugar = lugarActual(p);
@@ -541,7 +544,8 @@ public final class Espejo {
             CompoundTag c = (CompoundTag) t;
             di.add(new Net.DiarioE(c.getInt("d"), c.getString("k")));
         }
-        Net.to(p, new Net.EspejoEstado(true, aviso, leidos, new ArrayList<>(conjunto(d, "coleccion")),
+        // aunque el espejo aun no haya despertado: el menu (R) ensena la historia, el diario y los logros
+        Net.to(p, new Net.EspejoEstado(activo(p), aviso, leidos, new ArrayList<>(conjunto(d, "coleccion")),
                 new ArrayList<>(conjunto(d, "bestiario")), ls, lg, di, d.getInt("perdidos")));
     }
 

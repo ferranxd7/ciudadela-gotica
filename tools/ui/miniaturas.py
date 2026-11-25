@@ -1,0 +1,757 @@
+#!/usr/bin/env python3
+"""
+Las miniaturas del codice (parte 2e-4): una escena pintada para cada capitulo de la cronica y para los libros
+perdidos, el diario y el acertijo, como las de los manuscritos iluminados pero en la paleta del mod (noche azul, rojo
+y oro). Cada una mide 128 x 80 y van juntas en textures/gui/miniaturas.png (4 x 3 huecos de 128 x 80).
+
+    python3 tools/ui/miniaturas.py [--vista carpeta]
+"""
+import math
+import os
+import sys
+
+import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from arte import GUI, HUESO, Lienzo, ORO, PIEDRA, ROJO, AZUL, VERDE, TINTA, mezcla, rgba  # noqa: E402
+
+W, H = 128, 80
+NEGRO = "#07050a"
+CIELO = ["#07061a", "#0b0a24", "#12123a", "#1a1c4e", "#252860", "#33306c"]
+OCASO = ["#2a0c22", "#3e0f22", "#5a1420", "#7a2420", "#9a3a22"]
+LUNA = ["#c8b888", "#e8dcb0", "#fff4d0"]
+FUEGO = ["#5a1a06", "#9a4a0a", "#e08a1a", "#f8c040", "#fff0a0"]
+AGUA = ["#1a3a7a", "#2f5cc6", "#5a8ae6", "#a0c0f8", "#e0f0ff"]
+ROSA = ["#7a2848", "#b04878", "#e088b0", "#f8c8dc", "#fff0f6"]
+MADERA = ["#1e120a", "#2e1c10", "#442a16", "#5e3c1e", "#7a5028"]
+PIEDRA_C = ["#2a2632", "#3a3444", "#4c4558", "#625a70", "#7c7488", "#9a92a6"]
+NUBE = ["#3a3048", "#5a4e66", "#80748a", "#a89cae", "#d0c6d2", "#efe8ee"]
+VIOLETA = ["#14061e", "#2a0c3c", "#46146a", "#6a2a9a", "#9a5ad0", "#d0a0f4"]
+
+BAYER = np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]) / 16.0
+
+
+class Mini(Lienzo):
+    def __init__(self, fondo=NEGRO):
+        super().__init__(W, H, fondo)
+
+    def degradado(self, colores, y0, y1, x0=0, x1=W):
+        """Degradado vertical entre colores de la lista, con tramado ordenado (sin colores nuevos)."""
+        n = len(colores) - 1
+        for y in range(y0, y1):
+            t = (y - y0) / max(1, y1 - y0 - 1) * n
+            i = min(n - 1, int(t))
+            f = t - i
+            for x in range(x0, x1):
+                self.px(x, y, colores[i + 1] if f > BAYER[y % 4, x % 4] else colores[i])
+        return self
+
+    def poli(self, pts, c):
+        """Rellena un poligono (puntos en pixeles, centros incluidos)."""
+        ys = [p[1] for p in pts]
+        for y in range(max(0, int(min(ys))), min(H, int(math.ceil(max(ys))) + 1)):
+            cortes = []
+            for i in range(len(pts)):
+                (x0, y0), (x1, y1) = pts[i], pts[(i + 1) % len(pts)]
+                if (y0 <= y + 0.5 < y1) or (y1 <= y + 0.5 < y0):
+                    cortes.append(x0 + (y + 0.5 - y0) * (x1 - x0) / (y1 - y0))
+            cortes.sort()
+            for a, b in zip(cortes[0::2], cortes[1::2]):
+                for x in range(int(math.ceil(a - 0.5)), int(math.floor(b - 0.5)) + 1):
+                    self.px(x, y, c)
+        return self
+
+    def linea(self, x0, y0, x1, y1, c):
+        x0, y0, x1, y1 = int(round(x0)), int(round(y0)), int(round(x1)), int(round(y1))
+        dx, dy = abs(x1 - x0), -abs(y1 - y0)
+        sx, sy = (1 if x0 < x1 else -1), (1 if y0 < y1 else -1)
+        e = dx + dy
+        while True:
+            self.px(x0, y0, c)
+            if x0 == x1 and y0 == y1:
+                break
+            e2 = 2 * e
+            if e2 >= dy:
+                e += dy
+                x0 += sx
+            if e2 <= dx:
+                e += dx
+                y0 += sy
+        return self
+
+    def elipse(self, cx, cy, rx, ry, c):
+        for y in range(int(cy - ry) - 1, int(cy + ry) + 2):
+            for x in range(int(cx - rx) - 1, int(cx + rx) + 2):
+                if ((x - cx) / max(rx, 0.1)) ** 2 + ((y - cy) / max(ry, 0.1)) ** 2 <= 1.0:
+                    self.px(x, y, c)
+        return self
+
+    def aro(self, cx, cy, rx, ry, c, grueso=1.0):
+        for y in range(int(cy - ry) - 2, int(cy + ry) + 3):
+            for x in range(int(cx - rx) - 2, int(cx + rx) + 3):
+                d = math.hypot((x - cx) / max(rx, 0.1), (y - cy) / max(ry, 0.1))
+                if abs(d - 1.0) * min(rx, ry) <= grueso * 0.5:
+                    self.px(x, y, c)
+        return self
+
+    def estrellas(self, n, semilla, y1=40, x0=0, x1=W):
+        r = np.random.default_rng(semilla)
+        for _ in range(n):
+            x, y = int(r.integers(x0, x1)), int(r.integers(0, y1))
+            c = self.leer(x, y)
+            if sum(c[:3]) > 200:
+                continue
+            brillo = r.random()
+            self.px(x, y, LUNA[2] if brillo > 0.85 else LUNA[0] if brillo > 0.5 else "#6a6a90")
+            if brillo > 0.95:
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    self.px(x + dx, y + dy, "#8a86a8")
+        return self
+
+    def tinta(self, mascara, c=NEGRO):
+        """Contorno de tinta alrededor de una mascara booleana (H x W)."""
+        b = np.zeros_like(mascara)
+        b[1:, :] |= mascara[:-1, :]
+        b[:-1, :] |= mascara[1:, :]
+        b[:, 1:] |= mascara[:, :-1]
+        b[:, :-1] |= mascara[:, 1:]
+        b &= ~mascara
+        self.a[b] = rgba(c)
+        return self
+
+
+def capa():
+    """Un lienzo transparente del tamano de la miniatura (para dibujar una figura y luego contornearla)."""
+    L = Mini()
+    L.a[:] = 0
+    return L
+
+
+def girar(L, x0, y0, w, h, grados):
+    """Gira un trozo (x0, y0, w, h) del lienzo L sobre su centro (vecino mas cercano) y lo devuelve en otro lienzo."""
+    a = math.radians(grados)
+    n = int(math.ceil(math.hypot(w, h))) + 2
+    out = capa()
+    cx, cy = x0 + w / 2, y0 + h / 2
+    for y in range(n):
+        for x in range(n):
+            dx, dy = x - n / 2, y - n / 2
+            sx = cx + dx * math.cos(a) + dy * math.sin(a)
+            sy = cy - dx * math.sin(a) + dy * math.cos(a)
+            ix, iy = int(math.floor(sx)), int(math.floor(sy))
+            if x0 <= ix < x0 + w and y0 <= iy < y0 + h:
+                c = L.leer(ix, iy)
+                if c[3] > 0:
+                    out.px(x, y, c)
+    return out
+
+
+def medio_aro(M, cx, cy, rx, ry, c, grueso=1.0):
+    for y in range(int(cy - ry) - 2, int(cy) + 1):
+        for x in range(int(cx - rx) - 2, int(cx + rx) + 3):
+            d = math.hypot((x - cx) / max(rx, 0.1), (y - cy) / max(ry, 0.1))
+            if abs(d - 1.0) * min(rx, ry) <= grueso * 0.5:
+                M.px(x, y, c)
+    return M
+
+
+def pegar_con_tinta(M, fig, c=NEGRO):
+    mask = fig.a[..., 3] > 0
+    M.tinta(mask, c)
+    M.pegar(fig, 0, 0)
+    return M
+
+
+def luna(M, cx, cy, r, creciente=True):
+    """La luna (creciente: solo la parte iluminada; el resto del cielo queda como esta)."""
+    for y in range(cy - r - 1, cy + r + 2):
+        for x in range(cx - r - 1, cx + r + 2):
+            if math.hypot(x - cx, y - cy) > r:
+                continue
+            if creciente and math.hypot(x - (cx + r * 0.55), y - (cy - r * 0.15)) <= r * 0.9:
+                continue
+            borde = math.hypot(x - cx, y - cy) > r - 1.2
+            M.px(x, y, LUNA[2] if not borde and x < cx else LUNA[1])
+    return M
+
+
+def almenas(M, y, x0, x1, c, alto=3, ancho=3, hueco=3):
+    x = x0
+    while x < x1:
+        M.rect(x, y - alto, ancho, alto, c)
+        x += ancho + hueco
+    return M
+
+
+def llama(M, x, y, alto=4):
+    """Una llamita de vela o de brasero (con su halo)."""
+    for r, c in ((4, mezcla(M.leer(x, y - 2), FUEGO[2], 0.25)), (2, mezcla(M.leer(x, y - 2), FUEGO[3], 0.35))):
+        for yy in range(y - alto - r, y + r):
+            for xx in range(x - r - 1, x + r + 2):
+                if math.hypot(xx - x, (yy - (y - alto / 2)) * 0.8) <= r + alto / 2 and M.leer(xx, yy)[3] > 0:
+                    base = M.leer(xx, yy)
+                    if sum(base[:3]) < 300:
+                        M.px(xx, yy, mezcla(base, c, 0.5))
+    M.px(x, y - alto, FUEGO[2])
+    for i in range(1, alto):
+        M.px(x, y - i, FUEGO[3] if i > 1 else FUEGO[4])
+    M.px(x, y, FUEGO[1])
+    return M
+
+
+# ================================================================= 1. La Corona Rota
+def corona_rota():
+    M = Mini()
+    M.degradado(CIELO[:5] + [OCASO[1], OCASO[2]], 0, 60)
+    M.estrellas(46, 3, 44)
+    luna(M, 104, 13, 7)
+    # el rayo de la tormenta de Valdrenn, a lo lejos
+    pts = [(84, 0), (81, 9), (85, 10), (79, 22), (83, 23), (77, 36)]
+    for (a, b) in zip(pts, pts[1:]):
+        M.linea(a[0], a[1], b[0], b[1], ORO[5])
+        M.linea(a[0] + 1, a[1], b[0] + 1, b[1], mezcla(ORO[3], CIELO[2], 0.4))
+    # murallas y torres del reino en el horizonte
+    sil = PIEDRA[1]
+    M.rect(0, 50, W, 12, sil)
+    almenas(M, 50, 0, W, sil)
+    for (x, w, h) in ((40, 7, 12), (56, 9, 18), (70, 6, 10), (92, 8, 14), (110, 7, 9)):
+        M.rect(x, 50 - h, w, h, sil)
+        almenas(M, 50 - h, x, x + w, sil, 2, 2, 1)
+        M.px(x + w // 2, 50 - h + 4, FUEGO[2])
+    # la Torre de Ascenso, alta y delgada, con su tejado
+    M.rect(14, 14, 11, 48, PIEDRA[2])
+    M.rect(14, 14, 2, 48, PIEDRA[3])
+    M.rect(23, 14, 2, 48, PIEDRA[1])
+    M.poli([(12, 15), (19.5, 1), (27, 15)], PIEDRA[1])
+    M.linea(19, 2, 13, 14, PIEDRA[3])
+    for y in range(18, 60, 3):
+        M.hline(14, y, 11, PIEDRA[1])
+    M.rect(18, 24, 3, 5, FUEGO[2])
+    M.px(19, 25, FUEGO[4])
+    M.rect(18, 38, 3, 4, FUEGO[1])
+    # suelo y escalones de piedra
+    M.degradado([PIEDRA[1], PIEDRA[2]], 60, 66)
+    for i, (y, x0, x1) in enumerate(((66, 22, 106), (71, 14, 114), (76, 6, 122))):
+        M.rect(x0, y, x1 - x0, 5, PIEDRA_C[2 - i // 2])
+        M.hline(x0, y, x1 - x0, PIEDRA_C[4])
+        M.hline(x0, y + 4, x1 - x0, PIEDRA_C[0])
+        for x in range(x0 + 6, x1, 13):
+            M.vline(x, y + 1, 3, PIEDRA_C[1])
+    # la corona, rota en dos: una mitad de pie y la otra tumbada
+    fig = capa()
+    # mitad izquierda (de pie, un poco inclinada)
+    base = [(44, 64), (62, 64), (62, 58), (44, 58)]
+    fig.poli(base, ORO[3])
+    for (x, h) in ((44, 10), (50, 13), (56, 9)):
+        fig.poli([(x, 58), (x + 3, 58 - h), (x + 6, 58)], ORO[4])
+        fig.px(x + 3, 58 - h - 1, ROJO[5])
+        fig.px(x + 3, 58 - h, ROJO[4])
+    fig.hline(44, 59, 18, ORO[5])
+    fig.hline(44, 63, 18, ORO[1])
+    for x in (47, 53, 59):
+        fig.px(x, 61, ROJO[4]).px(x + 1, 61, ROJO[3])
+    # la grieta: zigzag por donde se partio
+    for i, (x, y) in enumerate(((62, 58), (61, 60), (63, 61), (61, 63), (62, 64))):
+        fig.px(x, y, NEGRO)
+    # mitad derecha: la misma pieza, caida de lado sobre el escalon
+    trozo = capa()
+    trozo.poli([(0, 12), (16, 12), (16, 7), (0, 7)], ORO[2])
+    for (x, h) in ((1, 7), (7, 10)):
+        trozo.poli([(x, 7), (x + 3, 7 - h), (x + 6, 7)], ORO[3])
+        trozo.px(x + 3, 7 - h - 1, ROJO[5])
+    trozo.hline(0, 8, 16, ORO[4])
+    trozo.px(4, 10, ROJO[4]).px(10, 10, ROJO[4])
+    girada = girar(trozo, 0, 0, 17, 17, -62)
+    fig.pegar(girada, 66, 47)
+    # destellos
+    fig.px(46, 59, ORO[6]).px(51, 47, ORO[6]).px(69, 61, ORO[5])
+    pegar_con_tinta(M, fig)
+    # unas gemas sueltas que saltaron
+    M.px(88, 65, ROJO[5]).px(91, 69, ROJO[4]).px(36, 64, ROJO[5])
+    return M
+
+
+# ================================================================= 2. Donde el agua aun canta
+def fuente():
+    M = Mini()
+    M.degradado(CIELO[:5], 0, 52)
+    M.estrellas(40, 5, 36)
+    luna(M, 20, 12, 6)
+    # setos y arcos del jardin
+    M.rect(0, 40, W, 22, VERDE[0])
+    for x in range(0, W, 6):
+        M.elipse(x + 3, 41, 4, 3, VERDE[0])
+        M.px(x + 2, 39, VERDE[1])
+    for cx in (14, 114):
+        # cipreses
+        M.poli([(cx - 5, 62), (cx, 18), (cx + 5, 62)], VERDE[0])
+        M.linea(cx, 20, cx - 3, 60, VERDE[1])
+    for cx in (40, 88):
+        medio_aro(M, cx, 44, 12, 14, PIEDRA_C[1], 2.5)
+        M.rect(cx - 13, 44, 3, 18, PIEDRA_C[1])
+        M.rect(cx + 11, 44, 3, 18, PIEDRA_C[1])
+    # el suelo del patio
+    M.degradado([PIEDRA[2], PIEDRA[3], PIEDRA[2]], 62, 80)
+    for y in (66, 71, 77):
+        M.hline(0, y, W, PIEDRA[1])
+    fig = capa()
+    cx = 64
+    # la taza grande de abajo
+    fig.elipse(cx, 66, 30, 6, PIEDRA_C[3])
+    fig.rect(cx - 30, 66, 61, 6, PIEDRA_C[2])
+    fig.elipse(cx, 72, 30, 4, PIEDRA_C[1])
+    fig.elipse(cx, 66, 27, 4, AGUA[1])
+    for x in range(cx - 24, cx + 25, 6):
+        fig.hline(x, 66 + (x // 6) % 2, 3, AGUA[3])
+    # el pie y la taza de arriba
+    fig.rect(cx - 3, 46, 7, 20, PIEDRA_C[3])
+    fig.vline(cx - 3, 46, 20, PIEDRA_C[4])
+    fig.vline(cx + 3, 46, 20, PIEDRA_C[1])
+    fig.elipse(cx, 45, 14, 4, PIEDRA_C[3])
+    fig.rect(cx - 14, 45, 29, 3, PIEDRA_C[2])
+    fig.elipse(cx, 44, 12, 2, AGUA[2])
+    fig.rect(cx - 1, 33, 3, 11, PIEDRA_C[3])
+    fig.elipse(cx, 32, 3, 3, PIEDRA_C[4])
+    pegar_con_tinta(M, fig)
+    # los chorros: del remate arriba y de la taza de arriba a la de abajo
+    for lado in (-1, 1):
+        for i in range(14):
+            t = i / 13
+            x = cx + lado * (1 + t * 9)
+            y = 31 - 6 * math.sin(t * math.pi * 0.9) + t * 12
+            M.px(int(x), int(y), AGUA[4] if i % 3 else AGUA[3])
+        for i in range(18):
+            t = i / 17
+            x = cx + lado * (13 + t * 10)
+            y = 46 + t * t * 19
+            M.px(int(x), int(y), AGUA[3] if i % 2 else AGUA[4])
+            M.px(int(x) + lado, int(y), AGUA[2])
+    # gotas y brillo de luna en el agua
+    for (x, y) in ((50, 40), (78, 38), (44, 58), (85, 57), (60, 63), (70, 64)):
+        M.px(x, y, AGUA[4])
+    # las rosas de la reina, al pie
+    for (x, y) in ((30, 72), (36, 75), (96, 73), (101, 76), (24, 76), (106, 77)):
+        M.elipse(x, y + 1, 3, 2, VERDE[2])
+        M.px(x - 2, y + 2, VERDE[3])
+        M.elipse(x, y, 1.6, 1.6, ROJO[4])
+        M.px(x, y - 1, ROJO[6])
+    return M
+
+
+# ================================================================= 3. El Rey que Espera
+def trono():
+    M = Mini(PIEDRA[0])
+    M.degradado([PIEDRA[0], PIEDRA[1], PIEDRA[2]], 0, 56)
+    # columnas
+    for x in (6, 30, 92, 116):
+        M.rect(x, 0, 7, 58, PIEDRA[2])
+        M.vline(x, 0, 58, PIEDRA[3])
+        M.vline(x + 6, 0, 58, PIEDRA[1])
+    # estandartes rojos con el borde de oro y una corona
+    for x in (14, 100):
+        M.rect(x, 0, 13, 40, ROJO[2])
+        M.poli([(x, 40), (x + 6.5, 46), (x + 13, 40)], ROJO[2])
+        M.vline(x, 0, 40, ORO[2])
+        M.vline(x + 12, 0, 40, ORO[2])
+        M.rect(x + 4, 16, 5, 3, ORO[4])
+        for dx in (0, 2, 4):
+            M.px(x + 4 + dx, 15, ORO[4])
+        M.vline(x + 3, 0, 40, ROJO[3])
+    # el suelo en damero
+    for y in range(56, 80):
+        for x in range(W):
+            k = ((x - 64) * 40 // max(1, y - 30)) // 7 + (y - 56) // 4
+            M.px(x, y, PIEDRA_C[1] if k % 2 else PIEDRA_C[3])
+    # escalones al trono
+    M.rect(38, 54, 52, 4, PIEDRA_C[2])
+    M.hline(38, 54, 52, PIEDRA_C[4])
+    M.rect(44, 50, 40, 4, PIEDRA_C[3])
+    M.hline(44, 50, 40, PIEDRA_C[5])
+    fig = capa()
+    cx = 64
+    # el trono: respaldo alto con pinchos y brazos
+    fig.rect(cx - 10, 14, 21, 32, MADERA[1])
+    for (x, h) in ((cx - 10, 8), (cx - 4, 12), (cx + 3, 12), (cx + 9, 8)):
+        fig.poli([(x, 14), (x + 1, 14 - h), (x + 2, 14)], MADERA[2])
+    fig.poli([(cx - 1, 14), (cx, 2), (cx + 1, 14)], ORO[3])
+    fig.rect(cx - 7, 18, 15, 22, ROJO[1])
+    fig.rect(cx - 6, 19, 13, 20, ROJO[2])
+    fig.rect(cx - 14, 34, 29, 5, MADERA[2])
+    fig.rect(cx - 14, 39, 4, 11, MADERA[1])
+    fig.rect(cx + 11, 39, 4, 11, MADERA[1])
+    fig.rect(cx - 10, 40, 21, 4, MADERA[3])
+    fig.hline(cx - 14, 34, 29, ORO[3])
+    fig.px(cx - 14, 33, ORO[5]).px(cx + 14, 33, ORO[5])
+    # la corona del Rey, dejada en el asiento
+    fig.rect(cx - 4, 37, 9, 3, ORO[3])
+    for x in (cx - 4, cx, cx + 4):
+        fig.px(x, 36, ORO[4])
+    fig.px(cx, 38, ROJO[5])
+    pegar_con_tinta(M, fig)
+    # las dos espadas del Rey, cruzadas y clavadas delante
+    for (x0, y0, x1, y1) in ((44, 74, 76, 44), (84, 74, 52, 44)):
+        M.linea(x0, y0, x1, y1, "#c8ccd8")
+        M.linea(x0 + 1, y0, x1 + 1, y1, "#7c8090")
+        M.px(x1, y1, "#ffffff")
+    for (x, y, d) in ((74, 47, 1), (54, 47, -1)):
+        M.linea(x - 4, y + 4 * d * 0, x + 4, y, ORO[3])
+        M.rect(x - 1, y - 4, 2, 4, MADERA[2])
+        M.px(x - 1, y - 5, ORO[4])
+    # braseros a los lados
+    for x in (40, 88):
+        M.rect(x - 3, 46, 7, 2, PIEDRA_C[4])
+        M.rect(x - 1, 48, 3, 6, PIEDRA_C[2])
+        llama(M, x, 45, 4)
+        llama(M, x - 2, 46, 2)
+        llama(M, x + 2, 46, 3)
+    return M
+
+
+# ================================================================= 4. La Reina bajo el Altar
+def catedral():
+    M = Mini(NEGRO)
+    M.degradado([NEGRO, PIEDRA[0], PIEDRA[1]], 0, 60)
+    # el arco gotico del fondo
+    M.poli([(26, 80), (26, 30), (40, 8), (64, 0), (88, 8), (102, 30), (102, 80)], PIEDRA[1])
+    M.poli([(32, 80), (32, 32), (44, 13), (64, 6), (84, 13), (96, 32), (96, 80)], PIEDRA[0])
+    # el roseton con sus vidrieras
+    cx, cy, r = 64, 22, 13
+    colores = [ROJO[4], AZUL[4], ORO[4], ROJO[3], AZUL[3], VERDE[3], ORO[5], AZUL[5]]
+    for y in range(cy - r, cy + r + 1):
+        for x in range(cx - r, cx + r + 1):
+            d = math.hypot(x - cx, y - cy)
+            if d > r:
+                continue
+            ang = (math.atan2(y - cy, x - cx) + math.pi) / (2 * math.pi)
+            sector = int(ang * 8) % 8
+            if d < 3.5:
+                M.px(x, y, ORO[5])
+            elif abs(d - 7.5) < 0.7 or (ang * 8) % 1 < 0.12:
+                M.px(x, y, PIEDRA[0])
+            else:
+                M.px(x, y, colores[(sector + (1 if d > 7.5 else 0)) % 8])
+    M.aro(cx, cy, r + 0.5, r + 0.5, PIEDRA[3], 1.6)
+    # rayos de luz que bajan del roseton
+    for i, x0 in enumerate((56, 64, 72)):
+        for y in range(cy + r, 64):
+            for dx in range(-2, 3):
+                x = int(x0 + (y - cy) * (i - 1) * 0.35) + dx
+                if (x + y) % 3 == 0 and 0 <= x < W:
+                    M.px(x, y, mezcla(M.leer(x, y), ORO[4], 0.35))
+    # los bancos a los lados
+    for k in range(4):
+        y = 50 + k * 7
+        M.rect(0, y, 24 - k * 2, 3, MADERA[2])
+        M.rect(104 + k * 2, y, 24, 3, MADERA[2])
+        M.hline(0, y, 24 - k * 2, MADERA[4])
+        M.hline(104 + k * 2, y, 24, MADERA[4])
+    # el suelo
+    M.degradado([PIEDRA[2], PIEDRA[3]], 64, 80, 26, 102)
+    fig = capa()
+    # el altar
+    fig.rect(44, 46, 41, 4, PIEDRA_C[4])
+    fig.rect(47, 50, 35, 12, PIEDRA_C[2])
+    fig.hline(44, 46, 41, PIEDRA_C[5])
+    fig.rect(61, 52, 7, 8, ROJO[2])
+    fig.rect(63, 53, 3, 6, ORO[3])
+    # el sepulcro de la reina delante, con su figura tumbada
+    fig.rect(36, 64, 57, 10, PIEDRA_C[3])
+    fig.hline(36, 64, 57, PIEDRA_C[5])
+    fig.rect(36, 74, 57, 2, PIEDRA_C[1])
+    fig.elipse(64, 62, 22, 2.5, HUESO[3])
+    fig.elipse(44, 61, 3, 2.5, HUESO[4])
+    fig.px(43, 58, ORO[4]).px(44, 58, ORO[5]).px(45, 58, ORO[4])
+    fig.hline(50, 61, 26, HUESO[2])
+    pegar_con_tinta(M, fig)
+    # velas en el altar
+    for x in (48, 53, 76, 81):
+        M.rect(x, 41, 2, 5, HUESO[4])
+        llama(M, x, 40, 3)
+    return M
+
+
+# ================================================================= 5. El Ultimo Juramento
+def juramento():
+    M = Mini()
+    M.degradado([CIELO[0], CIELO[1], VERDE[0]], 0, 64)
+    # el arbol enorme, en flor
+    M.rect(78, 20, 18, 60, MADERA[1])
+    M.vline(80, 20, 60, MADERA[3])
+    M.vline(84, 26, 50, MADERA[2])
+    for (x0, y0, x1, y1) in ((86, 30, 120, 14), (80, 28, 54, 10), (90, 24, 104, 4), (82, 40, 60, 30)):
+        M.linea(x0, y0, x1, y1, MADERA[1])
+        M.linea(x0, y0 + 1, x1, y1 + 1, MADERA[2])
+    r = np.random.default_rng(9)
+    for _ in range(170):
+        cx, cy = r.normal(88, 22), r.normal(16, 9)
+        if 0 <= cx < W and 0 <= cy < 44:
+            M.elipse(cx, cy, 2.2, 1.6, VERDE[1] if r.random() < 0.35 else ROSA[int(r.integers(1, 4))])
+    for _ in range(60):
+        x, y = int(r.normal(88, 22)), int(r.normal(14, 8))
+        M.px(x, y, ROSA[4])
+    # raices en el suelo
+    M.degradado([VERDE[0], MADERA[0]], 64, 80)
+    for (x0, x1, y) in ((78, 50, 74), (96, 124, 72), (88, 108, 78)):
+        M.linea(x0, 66, x1, y, MADERA[2])
+        M.linea(x0, 67, x1, y + 1, MADERA[1])
+    # petalos cayendo
+    for _ in range(40):
+        x, y = int(r.integers(0, W)), int(r.integers(10, 78))
+        M.px(x, y, ROSA[3] if r.random() < 0.5 else ROSA[4])
+    # el caballero de rodillas, con el mandoble clavado delante
+    fig = capa()
+    a = "#1a1a1e"
+    b = "#2e2e36"
+    c = "#46464f"
+    # pierna doblada y rodilla en el suelo
+    fig.poli([(30, 74), (44, 74), (44, 69), (34, 66), (30, 70)], a)
+    fig.poli([(42, 74), (52, 74), (50, 62), (44, 60), (42, 66)], b)
+    # cuerpo inclinado
+    fig.poli([(34, 66), (46, 62), (48, 46), (40, 40), (33, 44), (31, 56)], b)
+    fig.poli([(36, 46), (40, 41), (46, 45), (44, 52), (37, 54)], c)
+    # capa
+    fig.poli([(31, 44), (26, 72), (34, 72), (35, 50)], ROJO[1])
+    # cabeza agachada (yelmo) con los ojos verdes
+    fig.elipse(46, 38, 4.5, 4.5, b)
+    fig.rect(45, 33, 3, 2, c)
+    fig.px(49, 39, VERDE[5]).px(50, 39, VERDE[6])
+    # brazos al pomo
+    fig.poli([(44, 46), (56, 50), (57, 53), (45, 51)], a)
+    # el mandoble clavado
+    fig.rect(57, 44, 3, 32, "#9aa0b0")
+    fig.vline(57, 44, 32, "#d0d4e0")
+    fig.rect(52, 44, 13, 2, ORO[3])
+    fig.rect(57, 38, 3, 6, MADERA[2])
+    fig.rect(56, 36, 5, 2, ORO[4])
+    fig.poli([(57, 76), (58.5, 79), (60, 76)], "#9aa0b0")
+    pegar_con_tinta(M, fig)
+    # un poco de luz verde en el pecho (el corazon del arbol)
+    M.px(40, 49, VERDE[4]).px(41, 49, VERDE[5])
+    return M
+
+
+# ================================================================= 6. La puerta sobre las nubes
+def portal():
+    M = Mini()
+    M.degradado([VIOLETA[0], CIELO[1], OCASO[1], OCASO[2], OCASO[3]], 0, 58)
+    M.estrellas(38, 11, 30)
+    # el mar de nubes
+    r = np.random.default_rng(12)
+    M.degradado([NUBE[1], NUBE[2], NUBE[1]], 58, 80)
+    for capa_y, tono in ((54, 2), (60, 3), (67, 4), (74, 3)):
+        for _ in range(16):
+            x = int(r.integers(-6, W + 6))
+            rx, ry = r.integers(6, 14), r.integers(3, 5)
+            M.elipse(x, capa_y, rx, ry, NUBE[tono])
+            M.elipse(x - 1, capa_y - 1, rx - 2, ry - 1, NUBE[min(5, tono + 1)])
+    # la isla de hueso y el arco del portal encima
+    fig = capa()
+    fig.poli([(34, 60), (94, 60), (86, 68), (70, 72), (50, 70), (40, 66)], PIEDRA[2])
+    fig.hline(34, 60, 61, HUESO[2])
+    cx = 64
+    for lado in (-1, 1):
+        x = cx + lado * 17
+        fig.rect(x - 4, 22, 8, 38, HUESO[3])
+        fig.vline(x - 4, 22, 38, HUESO[4])
+        fig.vline(x + 3, 22, 38, HUESO[1])
+        for y in range(26, 60, 6):
+            fig.hline(x - 4, y, 8, HUESO[1])
+    for i in range(30):
+        t = i / 29
+        ang = math.pi * t
+        x = cx - 17 * math.cos(ang)
+        y = 22 - 14 * math.sin(ang)
+        fig.elipse(x, y, 4, 4, HUESO[3] if i % 4 else HUESO[1])
+    # la puerta: remolino violeta con el ojo rojo en medio
+    for y in range(12, 60):
+        for x in range(cx - 13, cx + 14):
+            dx, dy = (x - cx) / 13.0, (y - 34) / 24.0
+            if dx * dx + dy * dy > 1 or (y < 24 and math.hypot(x - cx, (y - 23) * 0.95) > 13):
+                continue
+            ang = math.atan2(dy, dx)
+            d = math.hypot(dx, dy)
+            v = (math.sin(ang * 3 + d * 9) + 1) / 2
+            fig.px(x, y, VIOLETA[int(1 + v * 3 * (1 - d * 0.5))])
+    fig.elipse(cx, 34, 7, 3.4, ROJO[3])
+    fig.elipse(cx, 34, 5, 2.4, ROJO[5])
+    fig.elipse(cx, 34, 1.4, 2.2, NEGRO)
+    fig.px(cx - 2, 33, ROJO[6])
+    pegar_con_tinta(M, fig)
+    return M
+
+
+# ================================================================= 7. Libros perdidos de Valdrenn
+def perdidos_valdrenn():
+    M = Mini(MADERA[0])
+    M.degradado([PIEDRA[0], PIEDRA[1]], 0, 52)
+    for y in range(4, 52, 8):
+        for x in range((y // 8) % 2 * 9, W, 18):
+            M.rect(x, y, 17, 7, PIEDRA[1])
+            M.hline(x, y, 17, PIEDRA[2])
+    # la ventana con la noche
+    M.rect(84, 8, 24, 30, PIEDRA[0])
+    M.degradado(CIELO[1:4], 10, 36, 86, 106)
+    M.estrellas(8, 21, 36, 86, 106)
+    M.vline(96, 10, 26, PIEDRA[2])
+    M.hline(86, 22, 20, PIEDRA[2])
+    # la mesa
+    M.rect(0, 52, W, 28, MADERA[2])
+    M.hline(0, 52, W, MADERA[4])
+    for y in range(56, 80, 5):
+        M.hline(0, y, W, MADERA[1])
+    fig = capa()
+    # el libro abierto
+    fig.poli([(30, 66), (60, 62), (60, 48), (32, 52)], "#c8b890")
+    fig.poli([(60, 62), (90, 66), (88, 52), (60, 48)], "#d8c8a0")
+    fig.vline(60, 48, 15, "#8a7a5a")
+    for k in range(5):
+        y0 = 54 + k * 2
+        fig.linea(35, y0 + 1, 56, y0 - 2, "#6a5a40")
+        fig.linea(64, y0 - 2, 84, y0 + 1, "#6a5a40")
+    # el tintero y la pluma
+    fig.rect(98, 54, 8, 7, "#14121e")
+    fig.rect(99, 52, 6, 2, "#2a283a")
+    fig.linea(102, 52, 114, 30, "#e8e0d0")
+    fig.linea(103, 52, 116, 31, "#b8b0a0")
+    for i in range(8):
+        fig.linea(108 + i * 0.6, 40 - i * 1.2, 111 + i * 0.6, 41 - i * 1.2, "#d8d0c0")
+    # la vela
+    fig.rect(14, 40, 5, 16, HUESO[4])
+    fig.vline(14, 40, 16, HUESO[5])
+    fig.rect(12, 56, 9, 3, ORO[2])
+    pegar_con_tinta(M, fig)
+    llama(M, 16, 38, 5)
+    # cera derretida
+    M.px(15, 41, HUESO[5]).px(18, 43, HUESO[4])
+    return M
+
+
+# ================================================================= 8. Libros perdidos de la Fortaleza
+def perdidos_fortaleza():
+    M = Mini()
+    M.degradado([CIELO[0], OCASO[1], OCASO[2]], 0, 50)
+    M.estrellas(20, 31, 30)
+    M.degradado([NUBE[1], NUBE[2]], 62, 80)
+    # la muralla de hueso y piedra negra
+    M.rect(0, 30, W, 40, PIEDRA[1])
+    almenas(M, 30, 0, W, PIEDRA[1], 4, 4, 4)
+    for y in range(34, 70, 5):
+        M.hline(0, y, W, PIEDRA[0])
+    fig = capa()
+    cx = 64
+    # la calavera enorme de la puerta
+    fig.elipse(cx, 36, 22, 18, HUESO[3])
+    fig.rect(cx - 14, 44, 29, 14, HUESO[3])
+    fig.elipse(cx - 9, 34, 6, 6, NEGRO)
+    fig.elipse(cx + 9, 34, 6, 6, NEGRO)
+    fig.px(cx - 9, 34, ROJO[5]).px(cx + 9, 34, ROJO[5])
+    fig.poli([(cx - 3, 46), (cx, 40), (cx + 3, 46)], NEGRO)
+    for x in range(cx - 12, cx + 13, 4):
+        fig.rect(x, 52, 3, 6, HUESO[4])
+    fig.hline(cx - 14, 51, 29, HUESO[1])
+    for y in range(22, 50, 4):
+        fig.px(cx - 18 + (y % 8), y, HUESO[1])
+    # la reja de hueso abajo
+    fig.rect(cx - 13, 58, 27, 14, NEGRO)
+    for x in range(cx - 12, cx + 13, 4):
+        fig.vline(x, 58, 14, HUESO[2])
+    for y in (61, 66):
+        fig.hline(cx - 13, y, 27, HUESO[2])
+    pegar_con_tinta(M, fig)
+    for _ in range(14):
+        x = int(np.random.default_rng(_).integers(0, W))
+        M.elipse(x, 74, 8, 3, NUBE[3])
+    return M
+
+
+# ================================================================= 9. El diario
+def diario():
+    M = Mini(NEGRO)
+    M.degradado([NEGRO, ROJO[0], PIEDRA[0]], 0, 50)
+    # humo de la Sombra alrededor
+    r = np.random.default_rng(41)
+    for _ in range(90):
+        x, y = int(r.integers(0, W)), int(r.integers(0, 48))
+        M.px(x, y, mezcla(M.leer(x, y), ROJO[2], 0.4))
+    M.rect(0, 50, W, 30, MADERA[1])
+    M.hline(0, 50, W, MADERA[3])
+    fig = capa()
+    # el espejo redondo de la Sombra, apoyado
+    cx, cy = 34, 34
+    fig.elipse(cx, cy, 17, 17, ORO[3])
+    fig.elipse(cx, cy, 15, 15, ORO[1])
+    fig.elipse(cx, cy, 13, 13, "#0c0a18")
+    for y in range(cy - 13, cy + 14):
+        for x in range(cx - 13, cx + 14):
+            if math.hypot(x - cx, y - cy) < 13 and (x - y) % 7 == 0:
+                fig.px(x, y, "#1a1630")
+    fig.elipse(cx, cy, 5, 2.5, ROJO[3])
+    fig.elipse(cx, cy, 1.2, 2, NEGRO)
+    fig.px(cx - 2, cy - 1, ROJO[6])
+    fig.px(cx, cy - 17, ROJO[5]).px(cx, cy - 16, ROJO[4])
+    fig.rect(cx - 3, 50, 7, 4, ORO[2])
+    # el diario abierto
+    fig.poli([(56, 70), (84, 66), (84, 52), (58, 56)], "#c8b890")
+    fig.poli([(84, 66), (112, 70), (110, 56), (84, 52)], "#d8c8a0")
+    fig.vline(84, 52, 15, "#8a7a5a")
+    for k in range(5):
+        y0 = 58 + k * 2
+        fig.linea(61, y0 + 1, 80, y0 - 2, "#6a5a40")
+        fig.linea(88, y0 - 2, 106, y0 + 1, "#5e1010" if k == 0 else "#6a5a40")
+    # la pluma
+    fig.linea(94, 60, 118, 34, "#e8e0d0")
+    for i in range(9):
+        fig.linea(110 + i * 0.8, 44 - i * 1.0, 114 + i * 0.8, 45 - i * 1.0, "#d8d0c0")
+    pegar_con_tinta(M, fig)
+    return M
+
+
+# ================================================================= 10. El acertijo (el yunque y la llave de hueso)
+def acertijo():
+    M = Mini(NEGRO)
+    M.degradado([NEGRO, FUEGO[0], ROJO[1]], 0, 58)
+    r = np.random.default_rng(51)
+    M.rect(0, 58, W, 22, PIEDRA[1])
+    M.hline(0, 58, W, PIEDRA[3])
+    fig = capa()
+    # el yunque
+    fig.poli([(34, 40), (96, 40), (106, 36), (96, 46), (34, 46), (24, 42)], "#3a3a46")
+    fig.hline(34, 40, 62, "#7a7a8a")
+    fig.rect(52, 46, 26, 6, "#2a2a34")
+    fig.poli([(44, 58), (86, 58), (78, 52), (52, 52)], "#2a2a34")
+    # la llave de hueso encima
+    fig.elipse(50, 36, 5, 4, HUESO[4])
+    fig.elipse(50, 36, 2, 1.6, NEGRO)
+    fig.rect(55, 35, 26, 3, HUESO[3])
+    fig.hline(55, 35, 26, HUESO[5])
+    for x in (72, 76, 80):
+        fig.rect(x, 38, 2, 3, HUESO[3])
+    pegar_con_tinta(M, fig)
+    # chispas
+    for _ in range(30):
+        x, y = int(r.normal(66, 18)), int(r.normal(26, 10))
+        M.px(x, y, FUEGO[3] if r.random() < 0.6 else FUEGO[4])
+    return M
+
+
+ESCENAS = [corona_rota, fuente, trono, catedral, juramento, portal, perdidos_valdrenn, perdidos_fortaleza, diario, acertijo]
+
+
+def montar():
+    """Las diez miniaturas en un atlas de 512 x 256 (cuatro por fila)."""
+    A = Lienzo(512, 256)
+    for i, f in enumerate(ESCENAS):
+        m = f()
+        A.pegar(m, (i % 4) * W, (i // 4) * H)
+    return A
+
+
+if __name__ == "__main__":
+    A = montar()
+    A.guardar(os.path.join(GUI, "miniaturas.png"))
+    if "--vista" in sys.argv:
+        d = sys.argv[sys.argv.index("--vista") + 1]
+        os.makedirs(d, exist_ok=True)
+        from PIL import Image
+        A.imagen().resize((512 * 3, 256 * 3), Image.NEAREST).save(os.path.join(d, "miniaturas.png"))
+    print("miniaturas: hecho")

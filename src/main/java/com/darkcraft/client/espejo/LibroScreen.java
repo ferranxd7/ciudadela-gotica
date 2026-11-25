@@ -41,10 +41,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * El libro de la Sombra (tecla M): un libro viejo de cuero negro con costuras rojas y tres cintas, Historia (la
- * cronica de Valdrenn, los libros perdidos y el diario), Mapa (lo explorado en cada dimension, con niebla donde no se
- * ha estado, los lugares, cofres, jefes, amigos y las marcas propias, que se escriben con la pluma) y Logros (los
- * logros del mod, la coleccion de objetos y el bestiario).
+ * El mapa del libro de la Sombra (tecla M): un libro viejo de cuero negro con costuras rojas con lo explorado en cada
+ * dimension (con niebla donde no se ha estado), los lugares, cofres, jefes, amigos y las marcas propias, que se escriben
+ * con la pluma. La historia, el diario y los logros estan en el menu (R): {@code client.ui.MenuScreen} (parte 2e-4).
  */
 public final class LibroScreen extends Screen {
     static final ResourceLocation LIBRO = EspejoHud.rl("textures/gui/libro.png"), PESTANAS = EspejoHud.rl("textures/gui/libro_pestanas.png"),
@@ -54,9 +53,6 @@ public final class LibroScreen extends Screen {
     static final long DURA = 2600;
     static final int TINTA = 0xFF3A2414, ROJO = 0xFF8E1418, GRIS = 0xFF8C7C66, ORO = 0xFF7A4E10, CLARO = 0xFFB8A27E;
 
-    /** La seccion abierta (se recuerda entre aperturas). */
-    private static int seccion = 0, subLogros = 0;
-    private static int hSel = -1;
 
     private int bx, by, bw, bh;
     private float k;
@@ -81,8 +77,8 @@ public final class LibroScreen extends Screen {
 
     @Override
     protected void init() {
-        // el libro mas las cintas (que asoman por la derecha: 68 px de la textura + 34) caben en la pantalla
-        int maxW = Math.min(Math.round((width - 12 - 34) / (1f + 68f / LW)), 560), maxH = height - 22;
+        // el libro abierto cabe en la pantalla
+        int maxW = Math.min(width - 24, 560), maxH = height - 22;
         bw = maxW;
         bh = Math.round(bw * LH / (float) LW);
         if (bh > maxH) {
@@ -90,8 +86,7 @@ public final class LibroScreen extends Screen {
             bw = Math.round(bh * LW / (float) LH);
         }
         k = bw / (float) LW;
-        int total = bw + Math.round(68 * k) + 34;
-        bx = (width - total) / 2;
+        bx = (width - bw) / 2;
         by = (height - bh) / 2;
         if (marca != null) marca.colocar();
         if (vista == null) vista = new Vista();
@@ -130,7 +125,7 @@ public final class LibroScreen extends Screen {
             onClose();
             return true;
         }
-        if (seccion == 1 && marca == null) {
+        if (marca == null) {
             if (EspejoCliente.TECLA_ACERCAR.matches(key, scan)) {
                 vista.zoom(1, vista.cx(), vista.cy());
                 return true;
@@ -155,52 +150,26 @@ public final class LibroScreen extends Screen {
     }
 
     private boolean clic(double mx, double my, int b) {
-        // cintas
-        for (int i = 0; i < 3; i++) {
-            int[] r = cinta(i);
-            if (mx >= r[0] && mx < r[2] && my >= r[1] && my < r[3]) {
-                if (seccion != i) {
-                    seccion = i;
-                    if (marca != null) marca.cerrar();
-                    pasarPagina();
-                }
-                return true;
-            }
-        }
         if (marca != null) return marca.clic(mx, my, b);
-        return switch (seccion) {
-            case 0 -> clicHistoria(mx, my);
-            case 1 -> vista.clic(mx, my, b);
-            default -> clicLogros(mx, my);
-        };
+        return vista.clic(mx, my, b);
     }
 
     @Override
     public boolean mouseReleased(double mx, double my, int b) {
-        if (seccion == 1 && vista != null) vista.soltarRaton();
+        if (vista != null) vista.soltarRaton();
         return super.mouseReleased(mx, my, b);
     }
 
     @Override
     public boolean mouseDragged(double mx, double my, int b, double dx, double dy) {
-        if (seccion == 1 && marca == null && vista.arrastrar(mx, my, dx, dy)) return true;
+        if (marca == null && vista.arrastrar(mx, my, dx, dy)) return true;
         return super.mouseDragged(mx, my, b, dx, dy);
     }
 
     @Override
     public boolean mouseScrolled(double mx, double my, double d) {
         if (marca != null) return true;
-        if (seccion == 1) return vista.zoom(d > 0 ? 1 : -1, mx, my);
-        if (seccion == 2) {
-            scroll = Math.max(0, scroll - (int) Math.signum(d));
-            return true;
-        }
-        if (seccion == 0) {
-            if (d < 0) hPag++;
-            else hPag = Math.max(0, hPag - 1);
-            return true;
-        }
-        return false;
+        return vista.zoom(d > 0 ? 1 : -1, mx, my);
     }
 
     void pasarPagina() {
@@ -238,10 +207,7 @@ public final class LibroScreen extends Screen {
             onClose();
             return;
         }
-        if (version != EspejoCliente.version()) {
-            version = EspejoCliente.version();
-            cacheLogros = null;
-        }
+        if (version != EspejoCliente.version()) version = EspejoCliente.version();
         renderBackground(g);
         EspejoHud.mezcla();
         float p = Mth.clamp((net.minecraft.Util.getMillis() - abierto) / 220f, 0, 1);
@@ -253,13 +219,8 @@ public final class LibroScreen extends Screen {
         RenderSystem.enableBlend();
         if (minecraft != null) minecraft.getTextureManager().getTexture(LIBRO).setFilter(true, false);
         g.blit(LIBRO, bx, by, bw, bh, 0, 0, LW, LH, LW, LH);
-        cintas(g, mx, my);
         if (marca != null) marca.render(g, mx, my, pt);
-        else switch (seccion) {
-            case 0 -> historia(g, mx, my);
-            case 1 -> vista.render(g, mx, my, pt);
-            default -> logros(g, mx, my, pt);
-        }
+        else vista.render(g, mx, my, pt);
         g.pose().popPose();
         super.render(g, mx, my, pt);
         if (tooltip != null) {
@@ -276,27 +237,6 @@ public final class LibroScreen extends Screen {
         tooltip = out;
     }
 
-    /** Rectangulo de la cinta i (en px de la gui). */
-    int[] cinta(int i) {
-        int x0 = bx + bw - Math.round(8 * k), y0 = by + Math.round((38 + i * 34) * k);
-        int w = Math.round(76 * k) + 26, h = Math.max(16, Math.round(24 * k));
-        return new int[]{x0, y0, x0 + w, y0 + h};
-    }
-
-    private void cintas(GuiGraphics g, int mx, int my) {
-        String[] claves = {"darkcraft.sombra.historia", "darkcraft.sombra.mapa", "darkcraft.sombra.logros"};
-        int[] iconos = {EspejoHud.I_PERGAMINO, EspejoHud.I_MAPA, EspejoHud.I_TROFEO};
-        for (int i = 0; i < 3; i++) {
-            int[] r = cinta(i);
-            boolean sel = seccion == i, sobre = mx >= r[0] && mx < r[2] && my >= r[1] && my < r[3];
-            int extra = sel ? 8 : sobre ? 4 : 0;
-            EspejoHud.mezcla();
-            g.blit(PESTANAS, r[0], r[1], r[2] - r[0] + extra, r[3] - r[1], 0, sel ? 22 : 0, 72, 22, 72, 44);
-            EspejoHud.icono(g, iconos[i], r[0] + 12 + extra / 2f, (r[1] + r[3]) / 2f, 12);
-            g.drawString(font, Component.translatable(claves[i]), r[0] + 21 + extra / 2, (r[1] + r[3]) / 2 - 4, sel ? 0xFFFFF0D8 : 0xFFE0C8A8, true);
-        }
-    }
-
     void centro(GuiGraphics g, Component c, int cx, int y, int col) {
         g.drawString(font, c, cx - font.width(c) / 2, y, col, false);
     }
@@ -308,174 +248,6 @@ public final class LibroScreen extends Screen {
             y += 10;
         }
         return y;
-    }
-
-    // ------------------------------------------------------------------ Historia
-
-    private int hPag;
-    private List<FormattedCharSequence> hLineas;
-    private int hLineasDe = Integer.MIN_VALUE;
-
-    private boolean leido(int ch) {
-        return (EspejoCliente.estado.leidos() & (1 << ch)) != 0;
-    }
-
-    private void historia(GuiGraphics g, int mx, int my) {
-        int lx = X(34), ly = Y(26), lw = X(240) - lx;
-        centro(g, Component.translatable("darkcraft.sombra.historia").withStyle(ChatFormatting.BOLD), (X(34) + X(240)) / 2, ly, ROJO);
-        int y = ly + 16;
-        g.drawString(font, Component.translatable("darkcraft.sombra.cronica"), lx, y, ORO, false);
-        y += 12;
-        for (int ch = 1; ch <= Story.CHAPTERS; ch++) {
-            boolean ok = leido(ch);
-            Component t = ok ? Component.literal(romano(ch) + ". ").append(Component.translatable("darkcraft.cap." + ch + ".titulo"))
-                    : Component.literal(romano(ch) + ". ").append(Component.translatable("darkcraft.sombra.sin_leer"));
-            boolean sobre = ok && mx >= lx && mx < lx + lw && my >= y - 1 && my < y + 10;
-            int col = !ok ? GRIS : (hSel == ch ? ROJO : sobre ? 0xFF6A2A14 : TINTA);
-            if (!ok) EspejoHud.icono(g, EspejoHud.I_CANDADO, lx + 4, y + 3.5f, 8);
-            g.drawString(font, recortar(t, lw - 12), lx + 10, y, col, false);
-            y += 11;
-        }
-        y += 6;
-        int perdidos = EspejoCliente.estado.perdidos();
-        int nPerdidos = Integer.bitCount(perdidos >> 1);
-        g.drawString(font, Component.translatable("darkcraft.sombra.libros").append(" (" + nPerdidos + "/11)"), lx, y, ORO, false);
-        y += 12;
-        filasPerdidos.clear();
-        if (nPerdidos == 0) y = parrafo(g, Component.translatable("darkcraft.sombra.libros.ninguno").withStyle(ChatFormatting.ITALIC), lx + 10, y, lw - 10, GRIS);
-        for (int n = 1; n <= 11; n++) {
-            if ((perdidos & (1 << n)) == 0) continue;
-            boolean sobre = mx >= lx && mx < lx + lw && my >= y - 1 && my < y + 9;
-            int col = hSel == 100 + n ? ROJO : sobre ? 0xFF6A2A14 : TINTA;
-            EspejoHud.icono(g, EspejoHud.I_LIBRO, lx + 4, y + 3.5f, 8);
-            g.drawString(font, recortar(Component.translatable("darkcraft.perdido." + n + ".titulo"), lw - 12), lx + 10, y, col, false);
-            filasPerdidos.add(new int[]{y, n});
-            y += 10;
-        }
-        y += 8;
-        boolean sobreD = mx >= lx && mx < lx + lw && my >= y - 1 && my < y + 10;
-        EspejoHud.icono(g, EspejoHud.I_PLUMA, lx + 4, y + 3.5f, 9);
-        g.drawString(font, Component.translatable("darkcraft.sombra.diario"), lx + 10, y, hSel == 10 ? ROJO : sobreD ? 0xFF6A2A14 : ORO, false);
-        filasHistoria[0] = y;
-        // pagina derecha
-        int rx = X(272), ry = Y(26), rw = X(478) - rx;
-        int rcx = (X(272) + X(478)) / 2;
-        int lineasPag = Math.max(4, (Y(278) - (ry + 18)) / 10);
-        List<FormattedCharSequence> lineas = lineasHistoria(rw);
-        if (hSel == -1) {
-            centro(g, Component.translatable("darkcraft.sombra.titulo").withStyle(ChatFormatting.BOLD), rcx, ry, ROJO);
-            int yy = parrafo(g, Component.translatable("darkcraft.sombra.intro"), rx, ry + 20, rw, TINTA);
-            EspejoHud.icono(g, EspejoHud.I_SELLO, rcx, Math.min(Y(270), yy + 30), 28);
-            return;
-        }
-        Component titulo = hSel == 10 ? Component.translatable("darkcraft.sombra.diario")
-                : hSel > 100 ? Component.translatable("darkcraft.perdido." + (hSel - 100) + ".titulo")
-                : Component.translatable("darkcraft.capitulo", romano(hSel));
-        centro(g, titulo.copy().withStyle(ChatFormatting.BOLD), rcx, ry, ROJO);
-        int paginas = Math.max(1, (lineas.size() + lineasPag - 1) / lineasPag);
-        hPag = Mth.clamp(hPag, 0, paginas - 1);
-        int yy = ry + 18;
-        for (int i = hPag * lineasPag; i < Math.min(lineas.size(), (hPag + 1) * lineasPag); i++) {
-            g.drawString(font, lineas.get(i), rx, yy, TINTA, false);
-            yy += 10;
-        }
-        // flechas de pagina
-        int fy = Y(284);
-        Component pag = Component.translatable("darkcraft.sombra.pagina", hPag + 1, paginas);
-        centro(g, pag, rcx, fy, GRIS);
-        boolean ant = hPag > 0, sig = hPag < paginas - 1;
-        flecha(g, rx + 4, fy, "◀", ant, mx, my);
-        flecha(g, X(478) - 10, fy, "▶", sig, mx, my);
-        flechas[0] = rx + 4;
-        flechas[1] = X(478) - 10;
-        flechas[2] = fy;
-    }
-
-    private final int[] filasHistoria = new int[1];
-    private final List<int[]> filasPerdidos = new ArrayList<>();
-    private final int[] flechas = new int[3];
-
-    private void flecha(GuiGraphics g, int x, int y, String s, boolean activa, int mx, int my) {
-        boolean sobre = activa && mx >= x - 3 && mx < x + 10 && my >= y - 3 && my < y + 11;
-        g.drawString(font, s, x, y, !activa ? 0x40000000 | (CLARO & 0xffffff) : sobre ? ROJO : TINTA, false);
-    }
-
-    private List<FormattedCharSequence> lineasHistoria(int w) {
-        int clave = hSel * 1000 + w + (int) (EspejoCliente.version() * 7);
-        if (hLineas != null && hLineasDe == clave) return hLineas;
-        List<FormattedCharSequence> out = new ArrayList<>();
-        if (hSel >= 1 && hSel <= Story.CHAPTERS) {
-            out.addAll(font.split(Component.translatable("darkcraft.cap." + hSel + ".titulo").withStyle(ChatFormatting.ITALIC), w));
-            out.add(FormattedCharSequence.EMPTY);
-            for (int p = 1; p <= 20; p++) {
-                String key = "darkcraft.cap." + hSel + ".p" + p;
-                if (!I18n.exists(key)) break;
-                out.addAll(font.split(Component.translatable(key), w));
-                out.add(FormattedCharSequence.EMPTY);
-            }
-        } else if (hSel > 100) {
-            int n = hSel - 100;
-            out.addAll(font.split(Component.translatable("darkcraft.perdido." + n + ".autor").withStyle(ChatFormatting.ITALIC), w));
-            out.add(FormattedCharSequence.EMPTY);
-            for (int p = 1; p <= 20; p++) {
-                String key = "darkcraft.perdido." + n + ".p" + p;
-                if (!I18n.exists(key)) break;
-                out.addAll(font.split(Component.translatable(key), w));
-                out.add(FormattedCharSequence.EMPTY);
-            }
-        } else if (hSel == 10) {
-            List<Net.DiarioE> d = EspejoCliente.estado.diario();
-            if (d.isEmpty()) out.addAll(font.split(Component.translatable("darkcraft.sombra.diario.vacio").withStyle(ChatFormatting.ITALIC), w));
-            for (Net.DiarioE e : d) {
-                out.addAll(font.split(Component.translatable("darkcraft.sombra.dia", e.dia()).withStyle(s -> s.withColor(ROJO & 0xffffff).withBold(true)), w));
-                out.addAll(font.split(Component.translatable("darkcraft.diario." + e.clave()), w));
-                out.add(FormattedCharSequence.EMPTY);
-            }
-        }
-        hLineas = out;
-        hLineasDe = clave;
-        return out;
-    }
-
-    private boolean clicHistoria(double mx, double my) {
-        int lx = X(34), lw = X(240) - lx;
-        int y = Y(26) + 16 + 12;
-        for (int ch = 1; ch <= Story.CHAPTERS; ch++) {
-            if (leido(ch) && mx >= lx && mx < lx + lw && my >= y - 1 && my < y + 10) {
-                hSel = ch;
-                hPag = 0;
-                pasarPagina();
-                return true;
-            }
-            y += 11;
-        }
-        for (int[] f : filasPerdidos)
-            if (mx >= lx && mx < lx + lw && my >= f[0] - 1 && my < f[0] + 9) {
-                hSel = 100 + f[1];
-                hPag = 0;
-                pasarPagina();
-                return true;
-            }
-        int yd = filasHistoria[0];
-        if (mx >= lx && mx < lx + lw && my >= yd - 1 && my < yd + 10) {
-            hSel = 10;
-            hPag = 0;
-            pasarPagina();
-            return true;
-        }
-        if (hSel != -1 && Math.abs(my - flechas[2] - 3) < 8) {
-            if (Math.abs(mx - flechas[0] - 3) < 8 && hPag > 0) {
-                hPag--;
-                pasarPagina();
-                return true;
-            }
-            if (Math.abs(mx - flechas[1] - 3) < 8) {
-                hPag++;
-                pasarPagina();
-                return true;
-            }
-        }
-        return false;
     }
 
     static String romano(int n) {
@@ -491,327 +263,16 @@ public final class LibroScreen extends Screen {
         };
     }
 
+    private void flecha(GuiGraphics g, int x, int y, String s, boolean activa, int mx, int my) {
+        boolean sobre = activa && mx >= x - 3 && mx < x + 10 && my >= y - 3 && my < y + 11;
+        g.drawString(font, s, x, y, !activa ? 0x40000000 | (CLARO & 0xffffff) : sobre ? ROJO : TINTA, false);
+    }
+
     Component recortar(Component c, int w) {
         if (font.width(c) <= w) return c;
         String s = c.getString();
         while (s.length() > 1 && font.width(s + "...") > w) s = s.substring(0, s.length() - 1);
         return Component.literal(s + "...").withStyle(c.getStyle());
-    }
-
-    // ------------------------------------------------------------------ Logros, coleccion y bestiario
-
-    private int scroll, lSel = 0;
-    private List<Object[]> cacheLogros;
-
-    static final String[] COLECCION = {"mapa_valdrenn", "libro1", "libro2", "espada_diestra", "espada_siniestra", "libro3", "libro4",
-            "llave_arbol", "mandoble_juramento", "llave_hueso", "libro5", "alabarda", "libro_acertijo", "amuleto_hueso", "libro6"};
-    static final String[] BESTIARIO = {"escudero", "caballero_espada", "caballero_alabarda", "caballero_ballesta", "rey", "gavran"};
-
-    private static ItemStack objeto(String clave) {
-        if (clave.startsWith("libro")) {
-            try {
-                return Story.book(Integer.parseInt(clave.substring(5)));
-            } catch (NumberFormatException e) {
-                return new ItemStack(Items.WRITTEN_BOOK);
-            }
-        }
-        Item i = ForgeRegistries.ITEMS.getValue(new ResourceLocation(DarkCraftMod.MODID, clave));
-        return i == null ? new ItemStack(Items.BARRIER) : new ItemStack(i);
-    }
-
-    private static ItemStack icono(String id) {
-        Item i = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
-        return i == null ? new ItemStack(Items.BOOK) : new ItemStack(i);
-    }
-
-    private void logros(GuiGraphics g, int mx, int my, float pt) {
-        Net.EspejoEstado e = EspejoCliente.estado;
-        int lx = X(34), ly = Y(24), lw = X(240) - lx;
-        // pestanas de arriba
-        String[] subs = {"darkcraft.sombra.logros", "darkcraft.sombra.coleccion", "darkcraft.sombra.bestiario"};
-        int hechos = 0;
-        for (Net.LogroE l : e.logros()) if (l.hecho()) hechos++;
-        int col = 0;
-        for (String c : COLECCION) if (e.coleccion().contains(c)) col++;
-        int bes = 0;
-        for (String b : BESTIARIO) if (e.bestiario().contains(b)) bes++;
-        String[] cuenta = {hechos + "/" + e.logros().size(), col + "/" + COLECCION.length, bes + "/" + BESTIARIO.length};
-        int x = lx;
-        int[] anchos = new int[3];
-        for (int i = 0; i < 3; i++) {
-            Component t = Component.translatable(subs[i]);
-            int w = font.width(t);
-            boolean sel = subLogros == i, sobre = mx >= x && mx < x + w && my >= ly - 1 && my < ly + 18;
-            g.drawString(font, t, x, ly, sel ? ROJO : sobre ? 0xFF6A2A14 : TINTA, false);
-            g.pose().pushPose();
-            g.pose().translate(x + w / 2f, ly + 10, 0);
-            g.pose().scale(0.75f, 0.75f, 1);
-            g.drawString(font, cuenta[i], -font.width(cuenta[i]) / 2, 0, GRIS, false);
-            g.pose().popPose();
-            if (sel) g.fill(x, ly + 17, x + w, ly + 18, ROJO);
-            subX[i] = x;
-            anchos[i] = w;
-            x += w + 10;
-        }
-        subW = anchos;
-        int top = ly + 24, bottom = Y(296);
-        g.fill(lx, top - 3, lx + lw, top - 2, 0x40000000 | (TINTA & 0xffffff));
-        switch (subLogros) {
-            case 0 -> listaLogros(g, e, lx, top, lw, bottom, mx, my);
-            case 1 -> rejillaColeccion(g, e, lx, top, lw, bottom, mx, my);
-            default -> listaBestiario(g, e, lx, top, lw, bottom, mx, my);
-        }
-        detalle(g, e, mx, my, pt);
-    }
-
-    private final int[] subX = new int[3];
-    private int[] subW = new int[3];
-
-    private void listaLogros(GuiGraphics g, Net.EspejoEstado e, int lx, int top, int lw, int bottom, int mx, int my) {
-        int fila = 20, caben = Math.max(1, (bottom - top) / fila);
-        scroll = Mth.clamp(scroll, 0, Math.max(0, e.logros().size() - caben));
-        int y = top;
-        for (int i = scroll; i < Math.min(e.logros().size(), scroll + caben); i++) {
-            Net.LogroE l = e.logros().get(i);
-            boolean sobre = mx >= lx && mx < lx + lw && my >= y && my < y + fila;
-            if (i == lSel) g.fill(lx - 2, y, lx + lw, y + fila - 2, 0x30000000 | (ROJO & 0xffffff));
-            else if (sobre) g.fill(lx - 2, y, lx + lw, y + fila - 2, 0x18000000);
-            ItemStack ic = icono(l.icono());
-            if (!l.hecho()) RenderSystem.setShaderColor(0.25f, 0.22f, 0.2f, 0.55f);
-            g.renderItem(ic, lx, y + 1);
-            g.flush();
-            RenderSystem.setShaderColor(1, 1, 1, 1);
-            Component t = l.secreto() && !l.hecho() ? Component.translatable("darkcraft.sombra.secreto") : Component.translatable(l.titulo());
-            g.drawString(font, recortar(t, lw - 40), lx + 20, y + 5, l.hecho() ? TINTA : GRIS, false);
-            EspejoHud.icono(g, l.hecho() ? EspejoHud.I_SELLO : EspejoHud.I_SELLO_GRIS, lx + lw - 8, y + 9, l.hecho() ? 14 : 11);
-            y += fila;
-        }
-        barra(g, lx + lw + 3, top, bottom, scroll, caben, e.logros().size());
-    }
-
-    private void barra(GuiGraphics g, int x, int top, int bottom, int desde, int caben, int total) {
-        if (total <= caben) return;
-        int h = bottom - top;
-        int bh2 = Math.max(10, h * caben / total);
-        int y = top + (h - bh2) * desde / Math.max(1, total - caben);
-        g.fill(x, top, x + 2, bottom, 0x30000000);
-        g.fill(x, y, x + 2, y + bh2, ROJO);
-    }
-
-    private void rejillaColeccion(GuiGraphics g, Net.EspejoEstado e, int lx, int top, int lw, int bottom, int mx, int my) {
-        int cel = 24, cols = Math.max(1, lw / cel);
-        int x0 = lx + (lw - cols * cel) / 2;
-        for (int i = 0; i < COLECCION.length; i++) {
-            int x = x0 + (i % cols) * cel, y = top + (i / cols) * cel;
-            boolean tiene = e.coleccion().contains(COLECCION[i]);
-            boolean sobre = mx >= x && mx < x + cel - 2 && my >= y && my < y + cel - 2;
-            g.fill(x, y, x + cel - 2, y + cel - 2, i == lSel ? 0x50000000 | (ROJO & 0xffffff) : sobre ? 0x30000000 : 0x1c000000);
-            g.fill(x, y + cel - 3, x + cel - 2, y + cel - 2, 0x40000000 | (TINTA & 0xffffff));
-            if (!tiene) RenderSystem.setShaderColor(0, 0, 0, 0.7f);
-            g.renderItem(objeto(COLECCION[i]), x + (cel - 2 - 16) / 2, y + (cel - 2 - 16) / 2);
-            g.flush();
-            RenderSystem.setShaderColor(1, 1, 1, 1);
-            if (sobre) tooltip(List.of(tiene ? objeto(COLECCION[i]).getHoverName() : Component.literal("???")));
-        }
-    }
-
-    private void listaBestiario(GuiGraphics g, Net.EspejoEstado e, int lx, int top, int lw, int bottom, int mx, int my) {
-        int fila = 22, y = top;
-        for (int i = 0; i < BESTIARIO.length; i++) {
-            boolean visto = e.bestiario().contains(BESTIARIO[i]);
-            boolean sobre = mx >= lx && mx < lx + lw && my >= y && my < y + fila;
-            if (i == lSel) g.fill(lx - 2, y, lx + lw, y + fila - 2, 0x30000000 | (ROJO & 0xffffff));
-            else if (sobre) g.fill(lx - 2, y, lx + lw, y + fila - 2, 0x18000000);
-            EspejoHud.icono(g, EspejoHud.I_BESTIA, lx + 8, y + 9, 14);
-            Component n = visto ? Component.translatable(nombreBestia(BESTIARIO[i])) : Component.literal("???");
-            g.drawString(font, recortar(n, lw - 44), lx + 20, y + 5, visto ? TINTA : GRIS, false);
-            if (visto) EspejoHud.icono(g, EspejoHud.I_SELLO, lx + lw - 8, y + 9, 13);
-            y += fila;
-        }
-    }
-
-    static String nombreBestia(String c) {
-        return switch (c) {
-            case "rey" -> "entity.darkcraft.rey";
-            case "gavran" -> "entity.darkcraft.gavran";
-            case "escudero" -> "darkcraft.gavran.escudero";
-            default -> "entity.darkcraft." + c;
-        };
-    }
-
-    private final Map<String, LivingEntity> criaturas = new HashMap<>();
-
-    private LivingEntity criatura(String clave) {
-        if (minecraft == null || minecraft.level == null) return null;
-        return criaturas.computeIfAbsent(clave, c -> {
-            Level lvl = minecraft.level;
-            LivingEntity le = switch (c) {
-                case "rey" -> DarkCraftMod.REY.get().create(lvl);
-                case "gavran" -> DarkCraftMod.GAVRAN.get().create(lvl);
-                case "caballero_espada", "caballero_alabarda", "caballero_ballesta" -> {
-                    var k2 = c.equals("caballero_espada") ? DarkCraftMod.CABALLERO_ESPADA.get().create(lvl)
-                            : c.equals("caballero_alabarda") ? DarkCraftMod.CABALLERO_ALABARDA.get().create(lvl) : DarkCraftMod.CABALLERO_BALLESTA.get().create(lvl);
-                    if (k2 != null) {
-                        k2.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(c.equals("caballero_espada") ? Items.IRON_SWORD
-                                : c.equals("caballero_alabarda") ? DarkCraftMod.ALABARDA.get() : Items.CROSSBOW));
-                        if (c.equals("caballero_espada")) k2.setItemSlot(EquipmentSlot.OFFHAND, com.darkcraft.caballeros.Caballeros.escudo());
-                    }
-                    yield k2;
-                }
-                default -> {
-                    var s = EntityType.SKELETON.create(lvl);
-                    if (s != null) {
-                        s.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
-                        s.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.CHAINMAIL_CHESTPLATE));
-                        ItemStack casco = new ItemStack(Items.LEATHER_HELMET);
-                        ((DyeableLeatherItem) Items.LEATHER_HELMET).setColor(casco, 0x2E4A2C);
-                        s.setItemSlot(EquipmentSlot.HEAD, casco);
-                    }
-                    yield s;
-                }
-            };
-            return le;
-        });
-    }
-
-    /** La pagina derecha: lo elegido en la izquierda, en grande. */
-    private void detalle(GuiGraphics g, Net.EspejoEstado e, int mx, int my, float pt) {
-        int rx = X(272), ry = Y(26), rw = X(478) - rx, rcx = (X(272) + X(478)) / 2;
-        if (subLogros == 0) {
-            if (e.logros().isEmpty()) return;
-            lSel = Mth.clamp(lSel, 0, e.logros().size() - 1);
-            Net.LogroE l = e.logros().get(lSel);
-            boolean oculto = l.secreto() && !l.hecho();
-            g.pose().pushPose();
-            g.pose().translate(rcx - 24, ry + 6, 0);
-            g.pose().scale(3, 3, 1);
-            if (!l.hecho()) RenderSystem.setShaderColor(0.25f, 0.22f, 0.2f, 0.6f);
-            g.renderItem(icono(l.icono()), 0, 0);
-            g.flush();
-            RenderSystem.setShaderColor(1, 1, 1, 1);
-            g.pose().popPose();
-            int y = ry + 62;
-            Component t = oculto ? Component.translatable("darkcraft.sombra.secreto") : Component.translatable(l.titulo());
-            for (FormattedCharSequence s : font.split(t.copy().withStyle(ChatFormatting.BOLD), rw)) {
-                g.drawString(font, s, rcx - font.width(s) / 2, y, l.hecho() ? ROJO : GRIS, false);
-                y += 10;
-            }
-            centro(g, Component.translatable("darkcraft.sombra.marco." + Mth.clamp(l.marco(), 0, 2)), rcx, y + 2, ORO);
-            y += 18;
-            Component d = l.hecho() ? Component.translatable(l.desc()) : Component.literal("???");
-            for (FormattedCharSequence s : font.split(d, rw - 10)) {
-                g.drawString(font, s, rcx - font.width(s) / 2, y, TINTA, false);
-                y += 10;
-            }
-            EspejoHud.icono(g, l.hecho() ? EspejoHud.I_SELLO : EspejoHud.I_SELLO_GRIS, rcx, Y(262), l.hecho() ? 30 : 24);
-            centro(g, Component.translatable(l.hecho() ? "darkcraft.sombra.conseguido" : "darkcraft.sombra.pendiente"), rcx, Y(282),
-                    l.hecho() ? ROJO : GRIS);
-        } else if (subLogros == 1) {
-            lSel = Mth.clamp(lSel, 0, COLECCION.length - 1);
-            String c = COLECCION[lSel];
-            boolean tiene = e.coleccion().contains(c);
-            ItemStack st = objeto(c);
-            g.pose().pushPose();
-            g.pose().translate(rcx - 32, ry + 8, 0);
-            g.pose().scale(4, 4, 1);
-            if (!tiene) RenderSystem.setShaderColor(0, 0, 0, 0.75f);
-            g.renderItem(st, 0, 0);
-            g.flush();
-            RenderSystem.setShaderColor(1, 1, 1, 1);
-            g.pose().popPose();
-            int y = ry + 82;
-            Component n = tiene ? st.getHoverName().copy() : Component.literal("???");
-            for (FormattedCharSequence s : font.split(n.copy().withStyle(ChatFormatting.BOLD), rw)) {
-                g.drawString(font, s, rcx - font.width(s) / 2, y, tiene ? ROJO : GRIS, false);
-                y += 10;
-            }
-            y += 6;
-            Component d = !tiene ? Component.translatable("darkcraft.sombra.coleccion.falta")
-                    : c.startsWith("libro") ? Component.translatable("darkcraft.coleccion.libro", romano(Integer.parseInt(c.substring(5))))
-                    : Component.translatable("darkcraft.coleccion." + c);
-            parrafo(g, d, rx + 4, y, rw - 8, tiene ? TINTA : GRIS);
-        } else {
-            lSel = Mth.clamp(lSel, 0, BESTIARIO.length - 1);
-            String c = BESTIARIO[lSel];
-            boolean visto = e.bestiario().contains(c);
-            LivingEntity le = criatura(c);
-            int caja = Math.round(130 * k);
-            if (le != null) {
-                float giro = (net.minecraft.Util.getMillis() % 12000L) / 12000f * 360f;
-                le.yBodyRot = 180 + giro;
-                le.yBodyRotO = le.yBodyRot;
-                le.setYRot(180 + giro);
-                le.yHeadRot = le.getYRot();
-                le.yHeadRotO = le.yHeadRot;
-                le.setXRot(0);
-                int esc = Math.max(8, Math.round(caja * 0.7f / Math.max(1f, Math.max(le.getBbHeight(), le.getBbWidth() * 1.3f))));
-                if (visto) RenderSystem.setShaderColor(0.92f, 0.84f, 0.72f, 1f);
-                else RenderSystem.setShaderColor(0, 0, 0, 1);
-                try {
-                    InventoryScreen.renderEntityInInventory(g, rcx, ry + 8 + Math.round(caja * 0.8f), esc, new Quaternionf().rotateZ((float) Math.PI), null, le);
-                } catch (RuntimeException ex) {
-                    DarkCraftMod.LOGGER.debug("Bestiario: no se pudo dibujar {}: {}", c, ex.toString());
-                }
-                RenderSystem.setShaderColor(1, 1, 1, 1);
-            }
-            int y = ry + caja + 18;
-            Component n = visto ? Component.translatable(nombreBestia(c)) : Component.literal("???");
-            for (FormattedCharSequence s : font.split(n.copy().withStyle(ChatFormatting.BOLD), rw)) {
-                g.drawString(font, s, rcx - font.width(s) / 2, y, visto ? ROJO : GRIS, false);
-                y += 10;
-            }
-            y += 4;
-            Component d = visto ? Component.translatable("darkcraft.bestiario." + c + ".desc") : Component.translatable("darkcraft.sombra.bestiario.falta");
-            y = parrafo(g, d, rx + 4, y, rw - 8, visto ? TINTA : GRIS);
-            if (visto) {
-                g.pose().pushPose();
-                g.pose().translate(X(450), Y(70), 0);
-                g.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(-14));
-                Component sello = Component.translatable("darkcraft.sombra.bestiario.derrotado").withStyle(ChatFormatting.BOLD);
-                int w = font.width(sello);
-                g.fill(-w / 2 - 4, -3, w / 2 + 4, 10, 0x30000000 | (ROJO & 0xffffff));
-                g.drawString(font, sello, -w / 2, 0, ROJO, false);
-                g.pose().popPose();
-            }
-        }
-    }
-
-    private boolean clicLogros(double mx, double my) {
-        int lx = X(34), ly = Y(24), lw = X(240) - lx;
-        for (int i = 0; i < 3; i++) {
-            if (mx >= subX[i] && mx < subX[i] + subW[i] && my >= ly - 1 && my < ly + 18) {
-                if (subLogros != i) {
-                    subLogros = i;
-                    lSel = 0;
-                    scroll = 0;
-                    pasarPagina();
-                }
-                return true;
-            }
-        }
-        int top = ly + 24;
-        if (subLogros == 0) {
-            int i = scroll + (int) Math.floor((my - top) / 20.0);
-            if (mx >= lx && mx < lx + lw && my >= top && i >= 0 && i < EspejoCliente.estado.logros().size()) {
-                lSel = i;
-                return true;
-            }
-        } else if (subLogros == 1) {
-            int cel = 24, cols = Math.max(1, lw / cel), x0 = lx + (lw - cols * cel) / 2;
-            int cx = (int) Math.floor((mx - x0) / cel), cy = (int) Math.floor((my - top) / cel);
-            int i = cy * cols + cx;
-            if (mx >= x0 && cx < cols && cy >= 0 && i >= 0 && i < COLECCION.length) {
-                lSel = i;
-                return true;
-            }
-        } else {
-            int i = (int) Math.floor((my - top) / 22.0);
-            if (mx >= lx && mx < lx + lw && my >= top && i >= 0 && i < BESTIARIO.length) {
-                lSel = i;
-                return true;
-            }
-        }
-        return false;
     }
 
     // ------------------------------------------------------------------ Mapa
@@ -1438,23 +899,8 @@ public final class LibroScreen extends Screen {
 
     // ------------------------------------------------------------------ para las pruebas de la CI
 
-    /** Abre la seccion s (0 historia, 1 mapa, 2 logros) con la sub-pestana sub y lo elegido sel. */
-    public void probar(int s, int sub, int sel) {
-        seccion = s;
-        if (s == 0) {
-            hSel = sel;
-            hPag = 0;
-        } else if (s == 2) {
-            subLogros = sub;
-            lSel = sel;
-            scroll = 0;
-        }
-        if (marca != null) marca.cerrar();
-    }
-
     /** Abre el dialogo de una marca nueva en la posicion del jugador con ese nombre (y la escribe si escribir). */
     public void probarMarca(String nombre, int icono, int color, boolean escribir) {
-        seccion = 1;
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         if (marca != null) marca.cerrar();
@@ -1467,7 +913,6 @@ public final class LibroScreen extends Screen {
 
     /** Para las pruebas: el mapa del libro centrado en el jugador con este zoom (px por bloque). */
     public void probarZoom(float ppb) {
-        seccion = 1;
         if (vista != null) {
             vista.ppb = ppb;
             Minecraft mc = Minecraft.getInstance();

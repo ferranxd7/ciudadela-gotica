@@ -422,6 +422,43 @@ empezarla). Lo esencial, que cambia reglas de arriba:
 - Comandos `/darkcraft rol ceniza <id> [poner] | quitar` (sin `poner` la da; con `poner` se la pone al arma de la mano
   derecha). La prueba del cliente tiene el tramo `habilidades()` (capturas `cliente_cg01..cg18`). `Net.V` = "14".
 
+### Plan grande, parte 2e-4: el codice, y la historia y los logros en el menu (R)
+
+- **El codice** (`client/ui/CodiceScreen`): los libros a pantalla completa en pixel art. La tapa de cuero negro con
+  filete de oro (nueve trozos de `textures/gui/codice.png` + `codice_cuero.png` repetido), dos paginas de pergamino oscuro
+  (`codice_pergamino.png`, 256 x 256 que se repite sin costuras; bordes quemados, canto de las hojas, sombra y costura del
+  lomo, filigrana en las esquinas de fuera, numero de pagina) y la cinta roja por el lomo. La primera pagina de cada libro:
+  su **miniatura** (`textures/gui/miniaturas.png`, diez de 128 x 80 con marco de oro: los seis capitulos —la corona rota,
+  la fuente, el trono, la catedral, el juramento, la puerta sobre las nubes—, libros perdidos de Valdrenn y de la
+  fortaleza, el diario y el acertijo), la cabecera en gotica, el titulo en cursiva, el autor y un floron; el texto con la
+  letra del juego en tinta, la **letra capital** iluminada (marco rojo en la cronica, negro y rojo en la Sombra —con tinta
+  roja oscura—, azul en los libros perdidos, verde en el diario) y un calderon rojo en cada parrafo; los saltos de linea
+  se respetan (versos). Al final, una hoja de hiedra roja. **Pasar pagina**: la hoja gira sobre el lomo (se estrecha la
+  pagina de delante y luego crece la de detras, oscurecida al levantarse, con su sombra; 380 ms) con
+  `sfx.codice_pagina`; flechas, A/D, espacio, la E, la rueda o clic en cada pagina; en el ultimo pliego, adelante cierra.
+  Al abrir `sfx.codice_abre` y al cerrar `sfx.codice_cierra` (ElevenLabs: tomas 2 y 1, 1 y 3, 4 y 1).
+- **Libros** (`CodiceScreen.Libro`): `capitulo(n)`, `perdido(n)` y `diario(entradas)` se montan con las claves de idioma
+  (cada jugador en su idioma); `acertijo()` (sus versos y el sello: al pulsarlo sale la pagina de la receta, la forja
+  dibujada; sustituye a la `AcertijoScreen` vieja); `escrito(libro)` para cualquier libro escrito (los del mod por sus
+  marcas; los demas con lo que llevan en el NBT).
+- **Nunca sale la pantalla de libro ni la del atril de Minecraft** (`ClientCodice`, `ScreenEvent.Opening`): el libro de la
+  mano se abre en el codice; el del atril tambien (el atril sigue siendo un contenedor del servidor —asi se apuntan los
+  libros perdidos—: el libro llega un poco despues y al cerrar se cierra el contenedor).
+- **El menu (R) tiene seis pestanas**: Equipo, Inventario, Estado, **Historia** (la cronica con los capitulos leidos —los
+  demas con candado—, los libros perdidos encontrados y el diario; a la derecha la miniatura, el titulo y como empieza;
+  elegir lo abre en el codice y al cerrarlo se vuelve al menu), **Logros** (apartados Logros / Coleccion / Bestiario con
+  las flechas izquierda y derecha: lista a la izquierda y la ficha a la derecha, con la criatura girando en el bestiario;
+  `client/ui/Coleccion`) y Sistema. Si no caben las seis con la letra gotica, se encogen igual. **La M ya solo abre el
+  mapa** (`LibroScreen` sin cintas ni historia ni logros).
+- El Espejo manda su estado aunque aun no haya despertado (con `activo` falso): el menu siempre tiene la historia, el
+  diario y los logros (`EspejoCliente.estado()`).
+- Arte: `tools/ui/codice.py` (pergamino, cuero, tapa, capitales, floron, hiedra, cinta, marco, esquinas, lacre;
+  escribe `CodiceTex.java`) y `tools/ui/miniaturas.py` (las diez miniaturas, dibujadas con poligonos, degradados con
+  tramado y contorno de tinta).
+- La prueba del cliente tiene el tramo `codice()` (capturas `cliente_cx01..cx08`: portada, la hoja girando, segundo
+  pliego, final, el capitulo 6, el atril y el diario); la historia y los logros del menu salen en `cliente_e10..e12`,
+  `e18..e20` y `f41..f43`, y el acertijo en `f15_acertijo_*` y `f16_forja`.
+
 ## Compilar, probar y publicar
 
 - La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (con y sin mods) y un cliente con capturas

@@ -170,6 +170,10 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_HABILIDAD_SANGRE = sound("sfx.habilidad_sangre");
     public static final RegistryObject<SoundEvent> SFX_HABILIDAD_PARADA = sound("sfx.habilidad_parada");
     public static final RegistryObject<SoundEvent> SFX_CENIZA_APLICAR = sound("sfx.ceniza_aplicar");
+    // el codice de la historia (parte 2e-4): abrirlo, pasar una pagina y cerrarlo
+    public static final RegistryObject<SoundEvent> SFX_CODICE_ABRE = sound("sfx.codice_abre");
+    public static final RegistryObject<SoundEvent> SFX_CODICE_PAGINA = sound("sfx.codice_pagina");
+    public static final RegistryObject<SoundEvent> SFX_CODICE_CIERRA = sound("sfx.codice_cierra");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")

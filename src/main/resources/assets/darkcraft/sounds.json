@@ -1592,5 +1592,38 @@
         "name": "darkcraft:sfx/ceniza_aplicar_2"
       }
     ]
+  },
+  "sfx.codice_abre": {
+    "subtitle": "subtitles.darkcraft.sfx.codice_abre",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/codice_abre_1"
+      },
+      {
+        "name": "darkcraft:sfx/codice_abre_2"
+      }
+    ]
+  },
+  "sfx.codice_pagina": {
+    "subtitle": "subtitles.darkcraft.sfx.codice_pagina",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/codice_pagina_1"
+      },
+      {
+        "name": "darkcraft:sfx/codice_pagina_2"
+      }
+    ]
+  },
+  "sfx.codice_cierra": {
+    "subtitle": "subtitles.darkcraft.sfx.codice_cierra",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/codice_cierra_1"
+      },
+      {
+        "name": "darkcraft:sfx/codice_cierra_2"
+      }
+    ]
   }
 }

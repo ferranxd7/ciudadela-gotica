@@ -103,6 +103,8 @@ SFX = {
     "habilidad_sismo": (1.8, 0.6, -13), "habilidad_paso": (0.6, 0.15, -18), "habilidad_llamas": (1.2, 0.4, -15),
     "habilidad_escarcha": (1.2, 0.4, -15), "habilidad_relampago": (1.2, 0.4, -14), "habilidad_sangre": (1.0, 0.3, -15),
     "habilidad_parada": (0.8, 0.25, -14), "ceniza_aplicar": (2.0, 0.6, -15),
+    # el codice de la historia (parte 2e-4): abrirlo, pasar una pagina y cerrarlo
+    "codice_abre": (1.0, 0.3, -18), "codice_pagina": (0.6, 0.15, -19), "codice_cierra": (0.8, 0.3, -16),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5}
@@ -165,6 +167,9 @@ TOMAS_SFX = {
     "habilidad_sangre": (1, 4),
     "habilidad_parada": (2, 3),      # el choque mas claro
     "ceniza_aplicar": (1, 4),        # la mas llena (la 2 casi no suena)
+    "codice_abre": (2, 1),           # las dos que se oyen (la 3 y la 4 casi no suenan)
+    "codice_pagina": (1, 3),         # la hoja que cae clara
+    "codice_cierra": (4, 1),         # el golpe de la tapa con mas graves
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

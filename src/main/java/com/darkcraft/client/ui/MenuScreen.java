@@ -30,21 +30,23 @@ import java.util.Locale;
 
 /**
  * El menu del mod (tecla R; en supervivencia tambien la del inventario), en pixel art, en vez de las pantallas de
- * Minecraft. Cuatro pestanas:
+ * Minecraft. Seis pestanas:
  * <ul>
  * <li><b>Equipo</b>: las tres armas de cada mano, la armadura y los objetos rapidos, con el personaje girando al lado;
  * al elegir un hueco sale la lista de lo que se puede poner en el.</li>
  * <li><b>Inventario</b>: todo lo que se lleva, por clases (armas, armaduras, objetos, materiales, objetos clave), con la
  * ficha de cada cosa; se equipa, se quita y se tira desde aqui.</li>
  * <li><b>Estado</b>: nivel, ecos, atributos y lo que dan.</li>
- * <li><b>Sistema</b>: el mapa y el diario, los logros, los controles y las opciones.</li>
+ * <li><b>Historia</b>: la cronica de Valdrenn, los libros perdidos y el diario; se leen en el codice ({@link CodiceScreen}).</li>
+ * <li><b>Logros</b>: los logros del mod, la coleccion de objetos y el bestiario.</li>
+ * <li><b>Sistema</b>: el mapa (tambien con la M), los controles y las opciones.</li>
  * </ul>
  * Con raton o con teclado (flechas o WASD, INTRO o la tecla del inventario para elegir, TAB para cambiar de pestana, ESC
  * o R para cerrar). El juego no se para: si pegan al jugador, se cierra solo.
  */
 public class MenuScreen extends Screen {
-    public static final int EQUIPO = 0, INVENTARIO = 1, ESTADO = 2, SISTEMA = 3;
-    private static final String[] PESTANAS = {"equipo", "inventario", "estado", "sistema"};
+    public static final int EQUIPO = 0, INVENTARIO = 1, ESTADO = 2, HISTORIA = 3, LOGROS = 4, SISTEMA = 5;
+    private static final String[] PESTANAS = {"equipo", "inventario", "estado", "historia", "logros", "sistema"};
     private static final int CLARO = 0xFFEADBC4, ORO = 0xFFE2BF62, LUZ = 0xFFFFF2C4, APAGADO = 0xFFB8A888, GRIS = 0xFF8A8072, VERDE = 0xFF9BE08A;
     private static final int FRASCO_VIDA = 100, FRASCO_MANA = 101, TALISMAN = 200, LADO = 22, PASO = 25;
 
@@ -61,7 +63,7 @@ public class MenuScreen extends Screen {
         return id - TALISMAN < ClientRol.huecosTalisman;
     }
 
-    private final Pagina[] paginas = {new PEquipo(), new PBolsa(), new PEstado(), new PSistema()};
+    private final Pagina[] paginas = {new PEquipo(), new PBolsa(), new PEstado(), new PHistoria(), new PLogros(), new PSistema()};
     private int pestana, t;
     private float giro = 25f;
     private boolean girando;
@@ -142,10 +144,19 @@ public class MenuScreen extends Screen {
         g.fill(0, 0, width, height, (Math.round(176 * abre) << 24) | 0x050408);
         // las pestanas
         int encima = pestanaEn(mx, my);
+        // si las seis no caben con la letra gotica (pantallas pequenas), se encogen todas igual
+        int paso = Math.min(104, (width - 20) / PESTANAS.length), mayor = 1;
+        for (String n : PESTANAS) mayor = Math.max(mayor, Letra.anchoM(font, Component.translatable("darkcraft.menu.pestana." + n)));
+        float esc = Math.min(1f, (paso - 6) / (float) mayor);
         for (int i = 0; i < PESTANAS.length; i++) {
             Component c = Component.translatable("darkcraft.menu.pestana." + PESTANAS[i]);
             int w = Letra.anchoM(font, c), x = pestanaX(i) - w / 2;
+            g.pose().pushPose();
+            g.pose().translate(pestanaX(i), 7 + Letra.ALTO_M / 2f, 0);
+            g.pose().scale(esc, esc, 1f);
+            g.pose().translate(-pestanaX(i), -(7 + Letra.ALTO_M / 2f), 0);
             Letra.mediana(g, font, c, x, 7, i == pestana ? 0xFFF6E3A0 : i == encima ? 0xFFC0963C : 0xFF8A6A30, 0xFF050408);
+            g.pose().popPose();
             if (i == pestana) {
                 Pix.blanco();
                 Panel.t(g, MenuTex.PESTANA, pestanaX(i) - 20, 21);
@@ -1168,6 +1179,600 @@ public class MenuScreen extends Screen {
         }
     }
 
+    // ================================================================== HISTORIA
+
+    /** Una fila de la Historia: cabecera de apartado, o un libro (capitulo 1-6, libro perdido 101-111, diario 200; -1 nada). */
+    private record FilaH(int id, Component texto, boolean cabecera, boolean abierto) {}
+
+    private static final int FILA_H = 14, CABECERA_H = 18;
+
+    /**
+     * La cronica de Valdrenn (los capitulos leidos; los demas con candado), los libros perdidos encontrados y el diario.
+     * A la derecha, la miniatura del elegido y como empieza; con la tecla de elegir se lee en el codice.
+     */
+    private final class PHistoria extends Pagina {
+        private final List<FilaH> filas = new ArrayList<>();
+        private int sel = -1, arriba;
+
+        @Override
+        void medir() {
+            leer();
+        }
+
+        @Override
+        void tick() {
+            leer();
+        }
+
+        private void leer() {
+            int antes = sel >= 0 && sel < filas.size() ? filas.get(sel).id() : 1;
+            filas.clear();
+            Net.EspejoEstado e = com.darkcraft.client.espejo.EspejoCliente.estado();
+            int leidos = e == null ? 0 : e.leidos(), perdidos = e == null ? 0 : e.perdidos();
+            filas.add(new FilaH(0, Component.translatable("darkcraft.menu.historia.cronica"), true, true));
+            for (int ch = 1; ch <= com.darkcraft.story.Story.CHAPTERS; ch++) {
+                boolean ok = (leidos & (1 << ch)) != 0;
+                filas.add(new FilaH(ch, Component.literal(CodiceScreen.romano(ch) + ". ").append(ok ? Component.translatable("darkcraft.cap." + ch + ".titulo")
+                        : Component.translatable("darkcraft.menu.historia.sin_leer")), false, ok));
+            }
+            int total = com.darkcraft.fortaleza.Perdidos.TOTAL, n = Integer.bitCount(perdidos >> 1);
+            filas.add(new FilaH(0, Component.translatable("darkcraft.menu.historia.perdidos").append(" (" + n + "/" + total + ")"), true, true));
+            for (int k = 1; k <= total; k++)
+                if ((perdidos & (1 << k)) != 0) filas.add(new FilaH(100 + k, Component.translatable("darkcraft.perdido." + k + ".titulo"), false, true));
+            if (n == 0) filas.add(new FilaH(-1, Component.translatable("darkcraft.menu.historia.ninguno"), false, false));
+            filas.add(new FilaH(0, Component.translatable("darkcraft.menu.historia.diario"), true, true));
+            filas.add(new FilaH(200, Component.translatable("darkcraft.menu.historia.diario.entradas", e == null ? 0 : e.diario().size()), false, true));
+            sel = -1;
+            for (int i = 0; i < filas.size(); i++) if (filas.get(i).id() == antes) sel = i;
+            if (sel < 0) sel = siguiente(-1, 1);
+        }
+
+        private boolean elegible(int i) {
+            return i >= 0 && i < filas.size() && !filas.get(i).cabecera() && filas.get(i).id() > 0;
+        }
+
+        private int siguiente(int desde, int d) {
+            for (int i = desde + d; i >= 0 && i < filas.size(); i += d) if (elegible(i)) return i;
+            return desde;
+        }
+
+        private int lw() {
+            return Mth.clamp(pw * 42 / 100, 150, 236);
+        }
+
+        private int alto(int i) {
+            return filas.get(i).cabecera() ? CABECERA_H : FILA_H;
+        }
+
+        /** La y de cada fila (con lo que se ha bajado la lista para que se vea la elegida). */
+        private int[] ys() {
+            int[] y = new int[filas.size() + 1];
+            int top = py + 10;
+            for (int i = 0; i < filas.size(); i++) y[i + 1] = y[i] + alto(i);
+            int visible = ph - 20;
+            if (sel >= 0) {
+                if (y[sel] - arriba < 0) arriba = y[sel] - (sel > 0 && filas.get(sel - 1).cabecera() ? CABECERA_H : 0);
+                if (y[sel + 1] - arriba > visible) arriba = y[sel + 1] - visible;
+            }
+            arriba = Mth.clamp(arriba, 0, Math.max(0, y[filas.size()] - visible));
+            for (int i = 0; i <= filas.size(); i++) y[i] += top - arriba;
+            return y;
+        }
+
+        @Override
+        void dibujar(GuiGraphics g, int mx, int my, float pt) {
+            if (filas.isEmpty()) leer();
+            int x = px + 12, w = lw();
+            int[] y = ys();
+            g.enableScissor(x - 2, py + 8, x + w + 2, py + ph - 8);
+            for (int i = 0; i < filas.size(); i++) {
+                FilaH f = filas.get(i);
+                int fy = y[i];
+                if (fy + alto(i) < py + 6 || fy > py + ph - 6) continue;
+                if (f.cabecera()) {
+                    Letra.mediana(g, font, f.texto(), x, fy + 3, 0xFFE9C766, 0xFF050408);
+                    continue;
+                }
+                if (i == sel) {
+                    Pix.blanco();
+                    Panel.fila(g, x - 2, fy - 2, w + 4);
+                }
+                int icono = f.id() >= 1 && f.id() <= 6 ? (f.abierto() ? com.darkcraft.client.espejo.EspejoHud.I_PERGAMINO : com.darkcraft.client.espejo.EspejoHud.I_CANDADO)
+                        : f.id() > 100 && f.id() < 200 ? com.darkcraft.client.espejo.EspejoHud.I_LIBRO : f.id() == 200 ? com.darkcraft.client.espejo.EspejoHud.I_PLUMA : -1;
+                if (icono >= 0) {
+                    Pix.mezcla();
+                    com.darkcraft.client.espejo.EspejoHud.icono(g, icono, x + 5, fy + 5, 10);
+                }
+                int col = f.id() < 0 ? GRIS : !f.abierto() ? GRIS : i == sel ? LUZ : CLARO;
+                Component t = recortar(f.texto(), w - 16);
+                g.drawString(font, t, x + 13, fy + 1, col, f.id() > 0);
+            }
+            g.disableScissor();
+            detalle(g, x + w + 10);
+        }
+
+        private Component recortar(Component c, int w) {
+            if (font.width(c) <= w) return c;
+            String s = c.getString();
+            while (s.length() > 1 && font.width(s + "...") > w) s = s.substring(0, s.length() - 1);
+            return Component.literal(s + "...");
+        }
+
+        /** El panel de la derecha: la miniatura, el titulo y como empieza (o el candado). */
+        private void detalle(GuiGraphics g, int x2) {
+            int w2 = px + pw - 12 - x2, y2 = py + 8, h2 = ph - 16;
+            if (w2 < 100 || sel < 0 || sel >= filas.size()) return;
+            Pix.blanco();
+            Panel.hueco(g, x2, y2, w2, h2);
+            FilaH f = filas.get(sel);
+            int id = f.id();
+            int mini = id >= 1 && id <= 6 ? id - 1 : id > 100 && id < 200 ? (id - 100 <= 5 ? CodiceScreen.MIN_PERDIDO_VALDRENN : CodiceScreen.MIN_PERDIDO_FORTALEZA)
+                    : CodiceScreen.MIN_DIARIO;
+            int y = y2 + 8;
+            boolean conMini = w2 >= CodiceScreen.MINI_W + 2 * CodiceScreen.MINI_MARCO + 12 && h2 >= CodiceScreen.MINI_H + 90;
+            if (conMini) {
+                int mx0 = x2 + (w2 - CodiceScreen.MINI_W) / 2, my0 = y + CodiceScreen.MINI_MARCO;
+                if (!f.abierto()) Pix.color(0.22f, 0.2f, 0.24f, 1f);
+                CodiceScreen.miniatura(g, mini, mx0, my0);
+                Pix.blanco();
+                if (!f.abierto()) {
+                    Pix.mezcla();
+                    com.darkcraft.client.espejo.EspejoHud.icono(g, com.darkcraft.client.espejo.EspejoHud.I_CANDADO, mx0 + CodiceScreen.MINI_W / 2f,
+                            my0 + CodiceScreen.MINI_H / 2f, 26);
+                }
+                y = my0 + CodiceScreen.MINI_H + CodiceScreen.MINI_MARCO + 7;
+            }
+            Component titulo, sub;
+            String inicio;
+            if (id >= 1 && id <= 6) {
+                titulo = f.abierto() ? Component.translatable("darkcraft.cap." + id + ".titulo") : Component.literal("???");
+                sub = Component.translatable("darkcraft.capitulo", CodiceScreen.romano(id));
+                inicio = f.abierto() ? net.minecraft.client.resources.language.I18n.get("darkcraft.cap." + id + ".p1")
+                        : net.minecraft.client.resources.language.I18n.get("darkcraft.menu.historia.bloqueado");
+            } else if (id > 100 && id < 200) {
+                titulo = Component.translatable("darkcraft.perdido." + (id - 100) + ".titulo");
+                sub = Component.translatable("darkcraft.perdido." + (id - 100) + ".autor");
+                inicio = net.minecraft.client.resources.language.I18n.get("darkcraft.perdido." + (id - 100) + ".p1");
+            } else {
+                titulo = Component.translatable("darkcraft.menu.historia.diario");
+                Net.EspejoEstado e = com.darkcraft.client.espejo.EspejoCliente.estado();
+                List<Net.DiarioE> d = e == null ? List.of() : e.diario();
+                sub = Component.translatable("darkcraft.menu.historia.diario.entradas", d.size());
+                inicio = d.isEmpty() ? net.minecraft.client.resources.language.I18n.get("darkcraft.sombra.diario.vacio")
+                        : net.minecraft.client.resources.language.I18n.get("darkcraft.diario." + d.get(d.size() - 1).clave());
+            }
+            for (FormattedCharSequence l : font.split(Letra.m(titulo), w2 - 16)) {
+                Letra.contorno(g, font, l, x2 + (w2 - font.width(l)) / 2, y + Letra.BAJA_M, 0xFFE9C766, 0xFF050408);
+                y += Letra.ALTO_M + 3;
+            }
+            Component s2 = sub.copy().withStyle(net.minecraft.ChatFormatting.ITALIC);
+            for (FormattedCharSequence l : font.split(s2, w2 - 16)) {
+                g.drawString(font, l, x2 + (w2 - font.width(l)) / 2, y, APAGADO, true);
+                y += 10;
+            }
+            y += 4;
+            Panel.raya(g, x2 + 10, x2 + w2 - 10, y);
+            y += 6;
+            int caben = Math.max(0, (y2 + h2 - 8 - y) / 10);
+            List<FormattedCharSequence> ls = font.split(Component.literal(inicio.replace('\n', ' ')), w2 - 18);
+            for (int i = 0; i < Math.min(caben, ls.size()); i++) {
+                FormattedCharSequence l = ls.get(i);
+                if (i == caben - 1 && ls.size() > caben) {
+                    String txt = recortar(Component.literal(texto(l)), w2 - 30).getString();
+                    if (!txt.endsWith("...")) txt += "...";
+                    g.drawString(font, txt, x2 + 9, y, f.abierto() ? CLARO : GRIS, false);
+                } else g.drawString(font, l, x2 + 9, y, f.abierto() ? CLARO : GRIS, false);
+                y += 10;
+            }
+        }
+
+        private String texto(FormattedCharSequence l) {
+            StringBuilder b = new StringBuilder();
+            l.accept((i, st, cp) -> {
+                b.appendCodePoint(cp);
+                return true;
+            });
+            return b.toString();
+        }
+
+        private void leerLibro() {
+            if (sel < 0 || sel >= filas.size()) return;
+            FilaH f = filas.get(sel);
+            if (!f.abierto() || f.id() <= 0) {
+                Panel.nada();
+                return;
+            }
+            Panel.acepta();
+            int id = f.id();
+            CodiceScreen.Libro l;
+            if (id <= 6) l = CodiceScreen.capitulo(id);
+            else if (id < 200) l = CodiceScreen.perdido(id - 100);
+            else {
+                Net.EspejoEstado e = com.darkcraft.client.espejo.EspejoCliente.estado();
+                l = CodiceScreen.diario(e == null ? List.of() : e.diario());
+            }
+            CodiceScreen.abrir(l, MenuScreen.this);
+        }
+
+        @Override
+        int teclas(GuiGraphics g, int x, int y) {
+            return Panel.tecla(g, font, Component.literal("\u25b2\u25bc"), Component.translatable("darkcraft.menu.tecla.mover"), x, y, APAGADO) + 10;
+        }
+
+        @Override
+        boolean tecla(int tecla, int scan) {
+            if (esArriba(minecraft, tecla, scan)) {
+                int n = siguiente(sel, -1);
+                if (n != sel) Panel.mueve();
+                sel = n;
+            } else if (esAbajo(minecraft, tecla, scan)) {
+                int n = siguiente(sel, 1);
+                if (n != sel) Panel.mueve();
+                sel = n;
+            } else if (esElegir(tecla, scan)) leerLibro();
+            else return false;
+            return true;
+        }
+
+        private int en(double mx, double my) {
+            int x = px + 12, w = lw();
+            if (mx < x - 2 || mx >= x + w + 2 || my < py + 8 || my >= py + ph - 8) return -1;
+            int[] y = ys();
+            for (int i = 0; i < filas.size(); i++) if (elegible(i) && my >= y[i] - 2 && my < y[i] + alto(i) - 2) return i;
+            return -1;
+        }
+
+        @Override
+        void raton(double mx, double my) {
+            int i = en(mx, my);
+            if (i >= 0 && i != sel) {
+                sel = i;
+                Panel.mueve();
+            }
+        }
+
+        @Override
+        boolean clic(double mx, double my, int b) {
+            int i = en(mx, my);
+            if (i < 0 || b != 0) return false;
+            if (i == sel) leerLibro();
+            else {
+                sel = i;
+                Panel.mueve();
+            }
+            return true;
+        }
+
+        @Override
+        boolean rueda(double mx, double my, double r) {
+            int n = siguiente(sel, r > 0 ? -1 : 1);
+            if (n != sel) {
+                sel = n;
+                Panel.mueve();
+            }
+            return true;
+        }
+
+        String resumen() {
+            return "historia " + filas.size() + " filas, elegida " + (sel >= 0 && sel < filas.size() ? filas.get(sel).id() + " " + filas.get(sel).texto().getString() : "-");
+        }
+
+        void probar(int id) {
+            leer();
+            for (int i = 0; i < filas.size(); i++) if (filas.get(i).id() == id) sel = i;
+        }
+    }
+
+    // ================================================================== LOGROS
+
+    /** Los logros del mod, la coleccion de objetos y el bestiario: lista a la izquierda y la ficha a la derecha. */
+    private final class PLogros extends Pagina {
+        private static final int FILA = 20;
+        private final String[] subs = {"darkcraft.sombra.logros", "darkcraft.sombra.coleccion", "darkcraft.sombra.bestiario"};
+        private int sub, sel, arriba;
+
+        private Net.EspejoEstado estado() {
+            return com.darkcraft.client.espejo.EspejoCliente.estado();
+        }
+
+        private int cuantos() {
+            Net.EspejoEstado e = estado();
+            return switch (sub) {
+                case 0 -> e == null ? 0 : e.logros().size();
+                case 1 -> Coleccion.COLECCION.length;
+                default -> Coleccion.BESTIARIO.length;
+            };
+        }
+
+        private int lw() {
+            return Mth.clamp(pw * 46 / 100, 160, 250);
+        }
+
+        private int top() {
+            return py + 34;
+        }
+
+        private int caben() {
+            return Math.max(1, (py + ph - 10 - top()) / FILA);
+        }
+
+        @Override
+        void dibujar(GuiGraphics g, int mx, int my, float pt) {
+            Net.EspejoEstado e = estado();
+            int x = px + 12, w = lw();
+            // los tres apartados, arriba
+            int hechos = 0, col = 0, bes = 0;
+            if (e != null) {
+                for (Net.LogroE l : e.logros()) if (l.hecho()) hechos++;
+                for (String c : Coleccion.COLECCION) if (e.coleccion().contains(c)) col++;
+                for (String b : Coleccion.BESTIARIO) if (e.bestiario().contains(b)) bes++;
+            }
+            String[] cuenta = {hechos + "/" + (e == null ? 0 : e.logros().size()), col + "/" + Coleccion.COLECCION.length, bes + "/" + Coleccion.BESTIARIO.length};
+            int sx = x;
+            for (int i = 0; i < 3; i++) {
+                Component c = Component.translatable(subs[i]);
+                int cw = Letra.anchoM(font, c);
+                int color = i == sub ? 0xFFF6E3A0 : 0xFF8A6A30;
+                Letra.mediana(g, font, c, sx, py + 9, color, 0xFF050408);
+                g.drawString(font, cuenta[i], sx + cw + 3, py + 13, i == sub ? ORO : GRIS, true);
+                if (i == sub) {
+                    Pix.blanco();
+                    Panel.raya(g, sx - 2, sx + cw + 3 + font.width(cuenta[i]), py + 25);
+                }
+                subX[i] = sx;
+                subW[i] = cw + 3 + font.width(cuenta[i]);
+                sx += subW[i] + 12;
+            }
+            int n = cuantos(), cb = caben();
+            sel = Mth.clamp(sel, 0, Math.max(0, n - 1));
+            if (sel < arriba) arriba = sel;
+            if (sel >= arriba + cb) arriba = sel - cb + 1;
+            arriba = Mth.clamp(arriba, 0, Math.max(0, n - cb));
+            if (n == 0) {
+                g.drawString(font, Component.translatable("darkcraft.menu.logros.nada"), x, top() + 4, GRIS, true);
+            }
+            for (int i = arriba; i < Math.min(n, arriba + cb); i++) {
+                int fy = top() + (i - arriba) * FILA;
+                if (i == sel) {
+                    Pix.blanco();
+                    Panel.fila(g, x - 2, fy, w + 4);
+                }
+                fila(g, e, i, x, fy, w);
+            }
+            if (n > cb) {
+                int h = cb * FILA, bh2 = Math.max(10, h * cb / n), by2 = top() + (h - bh2) * arriba / Math.max(1, n - cb);
+                g.fill(x + w + 4, top(), x + w + 6, top() + h, 0x40000000);
+                g.fill(x + w + 4, by2, x + w + 6, by2 + bh2, 0xFFC0963C);
+            }
+            ficha(g, e, x + w + 12, pt);
+        }
+
+        private final int[] subX = new int[3], subW = new int[3];
+
+        /** Una fila de la lista (icono, nombre y el sello si esta conseguido). */
+        private void fila(GuiGraphics g, Net.EspejoEstado e, int i, int x, int y, int w) {
+            ItemStack ic;
+            Component nombre;
+            boolean hecho;
+            if (sub == 0) {
+                Net.LogroE l = e.logros().get(i);
+                hecho = l.hecho();
+                ic = Coleccion.icono(l.icono());
+                nombre = l.secreto() && !hecho ? Component.translatable("darkcraft.sombra.secreto") : Component.translatable(l.titulo());
+            } else if (sub == 1) {
+                String c = Coleccion.COLECCION[i];
+                hecho = e != null && e.coleccion().contains(c);
+                ic = Coleccion.objeto(c);
+                nombre = hecho ? ic.getHoverName() : Component.literal("???");
+            } else {
+                String c = Coleccion.BESTIARIO[i];
+                hecho = e != null && e.bestiario().contains(c);
+                ic = null;
+                nombre = hecho ? Component.translatable(Coleccion.nombreBestia(c)) : Component.literal("???");
+            }
+            if (ic != null) {
+                if (!hecho) Pix.color(0.2f, 0.18f, 0.2f, 0.8f);
+                g.renderItem(ic, x + 1, y + 1);
+                g.flush();
+                Pix.blanco();
+            } else {
+                Pix.mezcla();
+                com.darkcraft.client.espejo.EspejoHud.icono(g, com.darkcraft.client.espejo.EspejoHud.I_BESTIA, x + 9, y + 9, 14);
+            }
+            String t = nombre.getString();
+            while (t.length() > 1 && font.width(t) > w - 40) t = t.substring(0, t.length() - 1);
+            if (!t.equals(nombre.getString())) t += "...";
+            g.drawString(font, t, x + 21, y + 5, hecho ? (i == sel ? LUZ : CLARO) : GRIS, true);
+            if (hecho) {
+                Pix.mezcla();
+                com.darkcraft.client.espejo.EspejoHud.icono(g, com.darkcraft.client.espejo.EspejoHud.I_SELLO, x + w - 8, y + 9, 13);
+            }
+        }
+
+        /** La ficha de lo elegido: el icono en grande (o la criatura girando), el nombre y lo que dice. */
+        private void ficha(GuiGraphics g, Net.EspejoEstado e, int x2, float pt) {
+            int w2 = px + pw - 12 - x2, y2 = py + 8, h2 = ph - 16;
+            if (w2 < 100 || cuantos() == 0) return;
+            Pix.blanco();
+            Panel.hueco(g, x2, y2, w2, h2);
+            int cx = x2 + w2 / 2, y = y2 + 10;
+            Component titulo, sub2 = null, desc;
+            boolean hecho;
+            if (sub == 2) {
+                String c = Coleccion.BESTIARIO[sel];
+                hecho = e != null && e.bestiario().contains(c);
+                net.minecraft.world.entity.LivingEntity le = Coleccion.criatura(c);
+                int caja = Mth.clamp(h2 / 2, 60, 120);
+                if (le != null) {
+                    float giro2 = (net.minecraft.Util.getMillis() % 12000L) / 12000f * 360f;
+                    le.yBodyRot = 180 + giro2;
+                    le.yBodyRotO = le.yBodyRot;
+                    le.setYRot(180 + giro2);
+                    le.yHeadRot = le.getYRot();
+                    le.yHeadRotO = le.yHeadRot;
+                    le.setXRot(0);
+                    int esc = Math.max(8, Math.round(caja * 0.8f / Math.max(1f, Math.max(le.getBbHeight(), le.getBbWidth() * 1.3f))));
+                    if (hecho) Pix.color(1f, 0.95f, 0.88f, 1f);
+                    else Pix.color(0f, 0f, 0f, 1f);
+                    g.enableScissor(x2 + 2, y2 + 2, x2 + w2 - 2, y2 + h2 - 2);
+                    g.pose().pushPose();
+                    g.pose().translate(0, 0, 150);
+                    try {
+                        InventoryScreen.renderEntityInInventory(g, cx, y + caja, esc, new Quaternionf().rotateZ((float) Math.PI), null, le);
+                    } catch (RuntimeException ex) {
+                        com.darkcraft.DarkCraftMod.LOGGER.debug("Bestiario: no se pudo dibujar {}: {}", c, ex.toString());
+                    } finally {
+                        g.pose().popPose();
+                        g.disableScissor();
+                    }
+                    Pix.blanco();
+                }
+                y += caja + 8;
+                titulo = hecho ? Component.translatable(Coleccion.nombreBestia(c)) : Component.literal("???");
+                desc = hecho ? Component.translatable("darkcraft.bestiario." + c + ".desc") : Component.translatable("darkcraft.sombra.bestiario.falta");
+                if (hecho) sub2 = Component.translatable("darkcraft.sombra.bestiario.derrotado");
+            } else {
+                ItemStack ic;
+                if (sub == 0) {
+                    Net.LogroE l = e.logros().get(sel);
+                    hecho = l.hecho();
+                    ic = Coleccion.icono(l.icono());
+                    titulo = l.secreto() && !hecho ? Component.translatable("darkcraft.sombra.secreto") : Component.translatable(l.titulo());
+                    sub2 = Component.translatable("darkcraft.sombra.marco." + Mth.clamp(l.marco(), 0, 2));
+                    desc = hecho || !l.secreto() ? Component.translatable(l.desc()) : Component.literal("???");
+                } else {
+                    String c = Coleccion.COLECCION[sel];
+                    hecho = e != null && e.coleccion().contains(c);
+                    ic = Coleccion.objeto(c);
+                    titulo = hecho ? ic.getHoverName() : Component.literal("???");
+                    desc = !hecho ? Component.translatable("darkcraft.sombra.coleccion.falta")
+                            : c.startsWith("libro") && c.length() > 5 && Character.isDigit(c.charAt(5))
+                            ? Component.translatable("darkcraft.coleccion.libro", CodiceScreen.romano(Integer.parseInt(c.substring(5))))
+                            : Component.translatable("darkcraft.coleccion." + c);
+                }
+                g.pose().pushPose();
+                g.pose().translate(cx - 24, y, 0);
+                g.pose().scale(3, 3, 1);
+                if (!hecho) Pix.color(0.2f, 0.18f, 0.2f, 0.8f);
+                g.renderItem(ic, 0, 0);
+                g.flush();
+                Pix.blanco();
+                g.pose().popPose();
+                y += 56;
+            }
+            for (FormattedCharSequence l : font.split(Letra.m(titulo), w2 - 16)) {
+                Letra.contorno(g, font, l, cx - font.width(l) / 2, y + Letra.BAJA_M, hecho ? 0xFFE9C766 : GRIS, 0xFF050408);
+                y += Letra.ALTO_M + 3;
+            }
+            if (sub2 != null) {
+                g.drawString(font, sub2, cx - font.width(sub2) / 2, y, sub == 2 ? 0xFFDE3A3A : ORO, true);
+                y += 12;
+            }
+            Panel.raya(g, x2 + 10, x2 + w2 - 10, y + 1);
+            y += 8;
+            int caben2 = Math.max(0, (y2 + h2 - (sub == 0 ? 30 : 8) - y) / 10);
+            List<FormattedCharSequence> ls = font.split(desc, w2 - 18);
+            for (int i = 0; i < Math.min(caben2, ls.size()); i++) {
+                g.drawString(font, ls.get(i), cx - font.width(ls.get(i)) / 2, y, hecho ? CLARO : GRIS, true);
+                y += 10;
+            }
+            if (sub == 0) {
+                Pix.mezcla();
+                com.darkcraft.client.espejo.EspejoHud.icono(g, hecho ? com.darkcraft.client.espejo.EspejoHud.I_SELLO : com.darkcraft.client.espejo.EspejoHud.I_SELLO_GRIS,
+                        cx - 34, y2 + h2 - 14, 16);
+                Component st = Component.translatable(hecho ? "darkcraft.sombra.conseguido" : "darkcraft.sombra.pendiente");
+                g.drawString(font, st, cx - 22, y2 + h2 - 18, hecho ? 0xFFDE3A3A : GRIS, true);
+            }
+        }
+
+        @Override
+        int teclas(GuiGraphics g, int x, int y) {
+            x = Panel.tecla(g, font, Component.literal("\u25c0\u25b6"), Component.translatable("darkcraft.menu.tecla.apartado"), x, y, APAGADO) + 10;
+            return Panel.tecla(g, font, Component.literal("\u25b2\u25bc"), Component.translatable("darkcraft.menu.tecla.mover"), x, y, APAGADO) + 10;
+        }
+
+        private void cambiar(int n) {
+            n = Math.floorMod(n, 3);
+            if (n == sub) return;
+            sub = n;
+            sel = 0;
+            arriba = 0;
+            Panel.mueve();
+        }
+
+        @Override
+        boolean tecla(int tecla, int scan) {
+            int n = cuantos();
+            if (esArriba(minecraft, tecla, scan)) {
+                if (sel > 0) {
+                    sel--;
+                    Panel.mueve();
+                }
+            } else if (esAbajo(minecraft, tecla, scan)) {
+                if (sel < n - 1) {
+                    sel++;
+                    Panel.mueve();
+                }
+            } else if (esIzquierda(minecraft, tecla, scan)) cambiar(sub - 1);
+            else if (esDerecha(minecraft, tecla, scan)) cambiar(sub + 1);
+            else return false;
+            return true;
+        }
+
+        @Override
+        boolean clic(double mx, double my, int b) {
+            if (b != 0) return false;
+            for (int i = 0; i < 3; i++)
+                if (mx >= subX[i] - 2 && mx < subX[i] + subW[i] + 2 && my >= py + 4 && my < py + 28) {
+                    cambiar(i);
+                    return true;
+                }
+            int x = px + 12, w = lw();
+            if (mx >= x - 2 && mx < x + w + 2 && my >= top()) {
+                int i = arriba + (int) Math.floor((my - top()) / FILA);
+                if (i >= 0 && i < Math.min(cuantos(), arriba + caben())) {
+                    sel = i;
+                    Panel.mueve();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        void raton(double mx, double my) {
+            int x = px + 12, w = lw();
+            if (mx >= x - 2 && mx < x + w + 2 && my >= top()) {
+                int i = arriba + (int) Math.floor((my - top()) / FILA);
+                if (i >= 0 && i < Math.min(cuantos(), arriba + caben()) && i != sel) {
+                    sel = i;
+                    Panel.mueve();
+                }
+            }
+        }
+
+        @Override
+        boolean rueda(double mx, double my, double r) {
+            int n = cuantos();
+            int s2 = Mth.clamp(sel + (r > 0 ? -1 : 1), 0, Math.max(0, n - 1));
+            if (s2 != sel) {
+                sel = s2;
+                Panel.mueve();
+            }
+            return true;
+        }
+
+        String resumen() {
+            return "logros apartado " + sub + " elegido " + sel + " de " + cuantos();
+        }
+
+        void probar(int s, int i) {
+            sub = Mth.clamp(s, 0, 2);
+            sel = i;
+            arriba = 0;
+        }
+    }
+
     // ================================================================== SISTEMA
 
     private final class PSistema extends Pagina {
@@ -1249,11 +1854,30 @@ public class MenuScreen extends Screen {
         }
     }
 
+    /** Para la prueba de la CI: en la Historia, elige el libro {@code id} (1-6 capitulos, 101-111 perdidos, 200 diario). */
+    public void probarHistoria(int id) {
+        cambiarPestana(HISTORIA);
+        if (paginas[HISTORIA] instanceof PHistoria h) h.probar(id);
+    }
+
+    /** Para la prueba de la CI: los Logros en su apartado {@code sub} (0 logros, 1 coleccion, 2 bestiario) con {@code sel} elegido. */
+    public void probarLogros(int sub, int sel) {
+        cambiarPestana(LOGROS);
+        if (paginas[LOGROS] instanceof PLogros l) l.probar(sub, sel);
+    }
+
+    /** Para la prueba de la CI: lee lo elegido en la Historia (abre el codice). */
+    public void probarLeer() {
+        if (paginas[pestana] instanceof PHistoria h) h.leerLibro();
+    }
+
     /** Para la prueba de la CI. */
     public String resumen() {
         String s = "menu pestana " + PESTANAS[pestana];
         if (paginas[pestana] instanceof PEquipo e) s += " foco " + e.foco + (e.lista != null ? " lista " + e.lista + " sel " + e.listaSel : "");
         if (paginas[pestana] instanceof PBolsa b) s += " clase " + b.clase + " cosas " + b.cosas + " sel " + b.sel + (b.enClases ? " (en clases)" : "");
+        if (paginas[pestana] instanceof PHistoria h) s += " " + h.resumen();
+        if (paginas[pestana] instanceof PLogros l) s += " " + l.resumen();
         return s;
     }
 }

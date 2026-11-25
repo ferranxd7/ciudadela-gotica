@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * El libro del acertijo del maestre Velan (en el cofre de la planta baja de la torre del homenaje): el acertijo en verso
- * del Amuleto de Hueso y un sello que, al pulsarlo, dibuja la forja (la receta).
+ * del Amuleto de Hueso y un sello que, al pulsarlo, dibuja la forja (la receta). Se lee en el codice.
  */
 public class LibroAcertijo extends Item {
     public LibroAcertijo(Properties p) {
@@ -28,7 +28,8 @@ public class LibroAcertijo extends Item {
     public InteractionResultHolder<ItemStack> use(Level lvl, Player p, InteractionHand hand) {
         ItemStack st = p.getItemInHand(hand);
         if (p instanceof ServerPlayer sp) FortalezaEventos.leerAcertijo(sp);
-        if (lvl.isClientSide) DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.fortaleza.AcertijoScreen.abrir());
+        if (lvl.isClientSide) DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+                com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.acertijo()));
         return InteractionResultHolder.sidedSuccess(st, lvl.isClientSide);
     }
 

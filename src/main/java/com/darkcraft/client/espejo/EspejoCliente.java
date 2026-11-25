@@ -85,6 +85,11 @@ public final class EspejoCliente {
         return activo && estado != null;
     }
 
+    /** Lo ultimo que mando el servidor del Espejo (aunque aun no haya despertado: logros, diario, libros), o null. */
+    public static Net.EspejoEstado estado() {
+        return estado;
+    }
+
     /** Si esta saliendo el aviso de que el espejo despierta (los carteles esperan a que acabe). */
     public static boolean avisando() {
         return aviso >= 0;

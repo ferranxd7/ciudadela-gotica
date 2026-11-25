@@ -79,7 +79,7 @@ public final class EspejoHud {
     static final ResourceLocation HUMO = rl("textures/gui/humo.png"), ICONOS = rl("textures/gui/espejo_iconos.png"),
             BRILLO = rl("textures/gui/brillo.png");
     /** Iconos del atlas (16 por fila). */
-    static final int I_JUGADOR = 0, I_COFRE = 5, I_COFRE_LEIDO = 6, I_MARCAS = 16, I_SELLO = 28, I_SELLO_GRIS = 29,
+    public static final int I_JUGADOR = 0, I_COFRE = 5, I_COFRE_LEIDO = 6, I_MARCAS = 16, I_SELLO = 28, I_SELLO_GRIS = 29,
             I_CANDADO = 30, I_PERGAMINO = 31, I_MAPA = 32, I_TROFEO = 33, I_BESTIA = 34, I_PUNTO = 35, I_FLECHA = 36,
             I_LIBRO = 14, I_PLUMA = 15, I_EQUIS = 21;
 

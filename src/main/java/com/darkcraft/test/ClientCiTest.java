@@ -2158,6 +2158,16 @@ public final class ClientCiTest {
         });
     }
 
+    private static void menuP(Minecraft m, java.util.function.Consumer<com.darkcraft.client.ui.MenuScreen> r) {
+        if (m.screen instanceof com.darkcraft.client.ui.MenuScreen ms) r.accept(ms);
+        else log("  FALLO: no esta el menu (pantalla " + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()) + ")");
+    }
+
+    private static void codiceP(Minecraft m, java.util.function.Consumer<com.darkcraft.client.ui.CodiceScreen> r) {
+        if (m.screen instanceof com.darkcraft.client.ui.CodiceScreen c) r.accept(c);
+        else log("  FALLO: no esta el codice (pantalla " + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()) + ")");
+    }
+
     private static void forjaP(Minecraft m, java.util.function.Consumer<com.darkcraft.client.ui.ForjaScreen> r) {
         if (m.screen instanceof com.darkcraft.client.ui.ForjaScreen f) r.accept(f);
         else log("  FALLO: no esta la forja (pantalla " + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()) + ")");
@@ -2760,6 +2770,103 @@ public final class ClientCiTest {
         return t + 180;
     }
 
+    // ------------------------------------------------------------------ el codice (los libros de la historia)
+
+    private static void logCodice(Minecraft m, String what) {
+        log("  codice " + what + ": " + (m.screen instanceof com.darkcraft.client.ui.CodiceScreen c ? c.resumen()
+                : "pantalla " + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName())));
+    }
+
+    private static int codice(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Codice: supervivencia, el libro del capitulo 1 en la mano", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.getInventory().clearContent();
+                sp.getInventory().items.set(0, com.darkcraft.story.Story.book(1));
+                enMano(sp, 0);
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                enCombate(sp);
+                com.darkcraft.rol.Rol.sinCombate(sp);
+            });
+        });
+        atTicks(t + 20, "clic derecho con el libro: sale el codice (no el libro de Minecraft)", m -> m.gameMode.useItem(m.player, InteractionHand.MAIN_HAND));
+        atTicks(t + 34, "captura: la portada del capitulo 1", m -> {
+            logCodice(m, "portada");
+            shot(m, "cliente_cx01_portada");
+        });
+        atTicks(t + 38, "pasar la pagina (la hoja a medio girar)", m -> codiceP(m, c -> c.probarGiro(0.3f)));
+        atTicks(t + 42, "captura: la hoja levantandose", m -> {
+            logCodice(m, "girando");
+            shot(m, "cliente_cx02_girando");
+        });
+        atTicks(t + 44, "la hoja casi al otro lado", m -> codiceP(m, c -> c.probarGiro(0.74f)));
+        atTicks(t + 48, "captura: la hoja cayendo al otro lado", m -> shot(m, "cliente_cx03_girando_b"));
+        atTicks(t + 50, "el segundo pliego", m -> codiceP(m, c -> c.probar(1, false)));
+        atTicks(t + 56, "captura: el segundo pliego", m -> {
+            logCodice(m, "segundo pliego");
+            shot(m, "cliente_cx04_pliego2");
+        });
+        atTicks(t + 58, "el ultimo pliego", m -> codiceP(m, c -> c.probar(c.pliegosTotal() - 1, false)));
+        atTicks(t + 64, "captura: el final (la hoja de hiedra)", m -> {
+            logCodice(m, "final");
+            shot(m, "cliente_cx05_final");
+        });
+        atTicks(t + 66, "flecha derecha en el ultimo pliego: se cierra", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT));
+        atTicks(t + 72, "tras cerrar", m -> logCodice(m, "cerrado"));
+        atTicks(t + 74, "el capitulo 6 (lo escribe la Sombra)", m -> com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.capitulo(6)));
+        atTicks(t + 84, "captura: el capitulo 6", m -> {
+            logCodice(m, "capitulo 6");
+            shot(m, "cliente_cx06_sombra");
+        });
+        atTicks(t + 86, "ESC", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE));
+        atTicks(t + 90, "un atril con el libro perdido 2 delante", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            BlockPos at = new BlockPos(bx(), by(), bz() - 1);
+            lvl.setBlock(at, net.minecraft.world.level.block.Blocks.LECTERN.defaultBlockState()
+                    .setValue(net.minecraft.world.level.block.LecternBlock.FACING, Direction.NORTH)
+                    .setValue(net.minecraft.world.level.block.LecternBlock.HAS_BOOK, true), 3);
+            if (lvl.getBlockEntity(at) instanceof net.minecraft.world.level.block.entity.LecternBlockEntity le)
+                le.setBook(com.darkcraft.fortaleza.Perdidos.libro(2));
+            sp.getInventory().clearContent();
+            enCombate(sp);
+        }));
+        atTicks(t + 100, "clic derecho en el atril", m -> {
+            BlockPos at = new BlockPos(bx(), by(), bz() - 1);
+            m.gameMode.useItemOn(m.player, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(at), Direction.NORTH, at, false));
+        });
+        atTicks(t + 116, "captura: el libro del atril, en el codice", m -> {
+            logCodice(m, "atril");
+            shot(m, "cliente_cx07_atril");
+        });
+        atTicks(t + 118, "ESC: se cierra el atril", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE));
+        atTicks(t + 124, "tras cerrar el atril", m -> {
+            logCodice(m, "atril cerrado");
+            log("  cliente: contenedor " + m.player.containerMenu.getClass().getSimpleName());
+            server(m, sp -> log("  servidor: contenedor " + sp.containerMenu.getClass().getSimpleName() + ", libro perdido 2 apuntado "
+                    + ((com.darkcraft.espejo.Espejo.perdidos(sp) & 4) != 0)));
+        });
+        atTicks(t + 126, "el diario (tres entradas)", m -> com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.diario(List.of(
+                new com.darkcraft.net.Net.DiarioE(1, "maelis"), new com.darkcraft.net.Net.DiarioE(3, "dorvan"), new com.darkcraft.net.Net.DiarioE(6, "ceniza")))));
+        atTicks(t + 136, "captura: el diario", m -> {
+            logCodice(m, "diario");
+            shot(m, "cliente_cx08_diario");
+        });
+        atTicks(t + 138, "Fin del codice", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                sp.serverLevel().removeBlock(new BlockPos(bx(), by(), bz() - 1), false);
+                sp.getInventory().clearContent();
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 150;
+    }
+
     /**
      * El bloque de la plataforma de las pruebas (donde esta {@code ex, ey, ez}). Ojo: {@code ex} y {@code ez} se ponen al
      * entrar al mundo, despues de montar el guion: dentro de cada paso, nunca al montarlo.
@@ -2797,6 +2904,7 @@ public final class ClientCiTest {
         fin = dialogos(fin);
         fin = forja(fin);
         fin = habilidades(fin);
+        fin = codice(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);
@@ -2986,19 +3094,24 @@ public final class ClientCiTest {
         atTicks(t + 228, "zoom de lejos fuera", m -> com.darkcraft.client.espejo.EspejoCliente.probar(4, 1));
         atTicks(t + 232, "captura", m -> shot(m, "cliente_e08_fuera_lejos"));
         final int L = t + 236;
-        atTicks(L + 0, "Libro de la Sombra: historia", m -> {
+        atTicks(L + 0, "El menu (R): la historia", m -> {
             com.darkcraft.client.espejo.EspejoCliente.probar(2, 1);
-            // como con la tecla M (da el logro libro_sombra)
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.HISTORIA);
+            menuP(m, mm -> mm.probarHistoria(1));
+        });
+        atTicks(L + 8, "captura", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_e10_historia");
+        });
+        atTicks(L + 10, "un capitulo sin leer", m -> menuP(m, mm -> mm.probarHistoria(4)));
+        atTicks(L + 14, "captura", m -> shot(m, "cliente_e11_cronica_sin_leer"));
+        atTicks(L + 16, "el diario", m -> menuP(m, mm -> mm.probarHistoria(200)));
+        atTicks(L + 20, "captura", m -> shot(m, "cliente_e12_diario"));
+        atTicks(L + 22, "el mapa (la M: da el logro libro_sombra)", m -> {
             com.darkcraft.client.espejo.LibroScreen.abrir();
             libro = (com.darkcraft.client.espejo.LibroScreen) m.screen;
-            libro.probar(0, 0, -1);
+            libro.probarZoom(1.5f);
         });
-        atTicks(L + 8, "captura", m -> shot(m, "cliente_e10_historia"));
-        atTicks(L + 10, "la cronica, capitulo 1", m -> libro.probar(0, 0, 1));
-        atTicks(L + 14, "captura", m -> shot(m, "cliente_e11_cronica"));
-        atTicks(L + 16, "el diario", m -> libro.probar(0, 0, 10));
-        atTicks(L + 20, "captura", m -> shot(m, "cliente_e12_diario"));
-        atTicks(L + 22, "el mapa", m -> libro.probarZoom(1.5f));
         atTicks(L + 32, "captura", m -> shot(m, "cliente_e13_mapa"));
         atTicks(L + 34, "el mapa de lejos", m -> libro.probarZoom(0.3f));
         atTicks(L + 44, "captura", m -> shot(m, "cliente_e14_mapa_lejos"));
@@ -3017,11 +3130,17 @@ public final class ClientCiTest {
             log("  espejo con la marca: " + com.darkcraft.client.espejo.EspejoCliente.resumen());
             shot(m, "cliente_e17_mapa_marca");
         });
-        atTicks(L + 116, "logros", m -> libro.probar(2, 0, 0));
-        atTicks(L + 122, "captura", m -> shot(m, "cliente_e18_logros"));
-        atTicks(L + 124, "coleccion", m -> libro.probar(2, 1, 0));
+        atTicks(L + 116, "el menu (R): los logros", m -> {
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(0, 0));
+        });
+        atTicks(L + 122, "captura", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_e18_logros");
+        });
+        atTicks(L + 124, "coleccion", m -> menuP(m, mm -> mm.probarLogros(1, 0)));
         atTicks(L + 130, "captura", m -> shot(m, "cliente_e19_coleccion"));
-        atTicks(L + 132, "bestiario", m -> libro.probar(2, 2, 1));
+        atTicks(L + 132, "bestiario", m -> menuP(m, mm -> mm.probarLogros(2, 1)));
         atTicks(L + 142, "captura", m -> shot(m, "cliente_e20_bestiario"));
         atTicks(L + 144, "cerrar el libro", m -> {
             m.setScreen(null);
@@ -3923,8 +4042,11 @@ public final class ClientCiTest {
         for (int k = 0; k < 4; k++) {
             final int kk = k;
             atTicks(H + 100 + k * 8, "pagina del acertijo", m -> {
-                if (m.screen instanceof com.darkcraft.client.fortaleza.AcertijoScreen a) a.probar(Math.min(kk, 2), kk == 3);
-                else log("  el acertijo no esta abierto: " + (m.screen == null ? "nada" : m.screen.getClass().getSimpleName()));
+                if (m.screen instanceof com.darkcraft.client.ui.CodiceScreen c) {
+                    if (kk < 3) c.probar(kk == 2 ? c.pliegosTotal() - 1 : kk, false);
+                    else c.probarReceta();
+                    log("  " + c.resumen());
+                } else log("  el acertijo no esta abierto: " + (m.screen == null ? "nada" : m.screen.getClass().getSimpleName()));
             });
             atTicks(H + 106 + k * 8, "captura", m -> shot(m, kk < 3 ? "cliente_f15_acertijo_" + (kk + 1) : "cliente_f16_forja"));
         }
@@ -4018,18 +4140,17 @@ public final class ClientCiTest {
         }));
         atTicks(Q + 30, "El portal empuja", m -> server(m, sp -> log("  despues de tocar el portal: " + fpos(sp) + " (el portal esta en z "
                 + fplan.f.portal()[2] + ")")));
-        atTicks(Q + 34, "El libro de la M: capitulo 6 y un libro perdido", m -> {
-            com.darkcraft.client.espejo.LibroScreen.abrir();
-            if (m.screen instanceof com.darkcraft.client.espejo.LibroScreen l) l.probar(0, 0, 6);
+        atTicks(Q + 34, "El menu (R): la historia, capitulo 6 y un libro perdido", m -> {
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.HISTORIA);
+            menuP(m, mm -> mm.probarHistoria(6));
         });
-        atTicks(Q + 42, "captura", m -> shot(m, "cliente_f41_libro_cap6"));
-        atTicks(Q + 44, "libro perdido", m -> {
-            if (m.screen instanceof com.darkcraft.client.espejo.LibroScreen l) l.probar(0, 0, 111);
+        atTicks(Q + 42, "captura", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_f41_libro_cap6");
         });
+        atTicks(Q + 44, "libro perdido", m -> menuP(m, mm -> mm.probarHistoria(111)));
         atTicks(Q + 52, "captura", m -> shot(m, "cliente_f42_libro_perdido"));
-        atTicks(Q + 54, "coleccion", m -> {
-            if (m.screen instanceof com.darkcraft.client.espejo.LibroScreen l) l.probar(2, 1, 0);
-        });
+        atTicks(Q + 54, "coleccion", m -> menuP(m, mm -> mm.probarLogros(1, 0)));
         atTicks(Q + 62, "captura", m -> shot(m, "cliente_f43_coleccion"));
         atTicks(Q + 64, "El espejo en la fortaleza", m -> {
             m.setScreen(null);
