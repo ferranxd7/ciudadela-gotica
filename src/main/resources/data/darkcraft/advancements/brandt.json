@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:capitulo2",
+  "display": {
+    "icon": {
+      "item": "minecraft:shield"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.brandt.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.brandt.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 300
+  }
+}

@@ -43,7 +43,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 34 * 60 * 20;
+    private static final int LIMIT = 38 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -4017,6 +4017,297 @@ public final class ClientCiTest {
         return G + 152;
     }
 
+    // ------------------------------------------------------------------ parte 4d: los dos guardianes
+
+    private static com.darkcraft.enemigos.Guardian guardian(String tipo) {
+        return puestoDe(com.darkcraft.enemigos.Puestos.JEFE, tipo) instanceof com.darkcraft.enemigos.Guardian g ? g : null;
+    }
+
+    private static com.darkcraft.enemigos.Puestos.Puesto puestoGuardian(String tipo) {
+        return primerPuesto(com.darkcraft.enemigos.Puestos.JEFE, tipo);
+    }
+
+    /** El centro de los bloques del sello de ese guardian: los de la puerta mas cercana a el, o todos. */
+    private static Vec3 centroSello(String tipo, boolean todos) {
+        var l = com.darkcraft.valdrenn.Guardianes.bloques(reinoK, tipo);
+        var q = puestoGuardian(tipo);
+        if (l.isEmpty() || q == null) return null;
+        BlockPos cerca = l.get(0);
+        for (BlockPos b : l) if (b.distToCenterSqr(q.x() + 0.5, q.y(), q.z() + 0.5) < cerca.distToCenterSqr(q.x() + 0.5, q.y(), q.z() + 0.5)) cerca = b;
+        double x = 0, y = 0, z = 0;
+        int n = 0;
+        for (BlockPos b : l) {
+            if (!todos && (Math.abs(b.getX() - cerca.getX()) > 2 || Math.abs(b.getZ() - cerca.getZ()) > 2)) continue;
+            x += b.getX() + 0.5;
+            y += b.getY() + 0.5;
+            z += b.getZ() + 0.5;
+            n++;
+        }
+        return new Vec3(x / n, y / n, z / n);
+    }
+
+    /** El jugador de pie delante del puesto de un guardian ({@code lejos} hacia donde mira, {@code lado} a un lado), mirandole. */
+    private static void delanteDe(ServerPlayer sp, com.darkcraft.enemigos.Puestos.Puesto q, double lejos, double lado) {
+        if (q == null) return;
+        double fx = -Math.sin(Math.toRadians(q.giro())), fz = Math.cos(Math.toRadians(q.giro()));
+        irMirando(sp, q.x() + 0.5 + fx * lejos + fz * lado, q.y(), q.z() + 0.5 + fz * lejos - fx * lado, q.x() + 0.5, q.y() + 1.8, q.z() + 0.5, false);
+    }
+
+    /**
+     * El sello de un guardian de cerca. Ser Brandt: entre el y la puerta del trono que guarda, mirandola. Vareth: junto a la
+     * entrada de la torre, mirando a los dos huecos (la escalera y el ascensor).
+     */
+    private static void verSello(ServerPlayer sp, String tipo) {
+        boolean brandt = tipo.equals(com.darkcraft.valdrenn.ValdrennEnemigos.BRANDT);
+        Vec3 c = centroSello(tipo, !brandt);
+        var q = puestoGuardian(tipo);
+        if (c == null || q == null) return;
+        if (!brandt) {
+            irMirando(sp, c.x, c.y + 1.0, c.z + 4.3, c.x, c.y - 0.3, c.z, true);
+            return;
+        }
+        double dx = c.x - (q.x() + 0.5), dz = c.z - (q.z() + 0.5), l = Math.max(0.1, Math.hypot(dx, dz)), ux = dx / l, uz = dz / l;
+        irMirando(sp, c.x - ux * 4.5 + uz * 1.5, c.y - 1.2, c.z - uz * 4.5 - ux * 1.5, c.x, c.y, c.z, true);
+    }
+
+    private static String estadoGuardian(String tipo) {
+        var g = guardian(tipo);
+        return estadoE(g) + (g == null ? "" : " | pelea " + g.enPelea() + ", segunda " + g.segunda() + ", rivales " + g.rivales().size())
+                + " | " + com.darkcraft.valdrenn.Guardianes.estado(reinoK);
+    }
+
+    /**
+     * Uno de los guardianes de principio a fin: de rodillas ante su sello (y el sello de cerca), en supervivencia se levanta
+     * y ruge (su barra y su musica), sus golpes de cerca, a media vida ruge otra vez, cae (el sello se rompe) y el cartel de
+     * JEFE ABATIDO con la hazana. {@code golpes}: {accion, giro al hacerla, camara dx, dy, dz desde el (girada con el), mira
+     * delante, tick de la 1a captura, nombre, tick de la 2a (-1 sin ella), nombre}.
+     */
+    private static int unGuardian(int t0, String tipo, String nombre, String pre, int levantarse, double lejos, double lado, Object[][] golpes) {
+        int t = t0;
+        atTicks(t, nombre + ": ante el, de rodillas (en creativo)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                sp.removeAllEffects();
+                verDeNoche(sp);
+                anteElPuesto(sp, puestoGuardian(tipo), lejos, lado, 1.6);
+            });
+        });
+        atTicks(t + 70, "captura: " + nombre + " de rodillas", m -> {
+            server(m, sp -> log("  guardianes, " + nombre + " esperando: " + estadoGuardian(tipo)));
+            shot(m, pre + "01_" + tipo);
+        });
+        // el sello, de cerca (con la cortina de chispas)
+        atTicks(t + 72, nombre + ": su sello de cerca", m -> server(m, sp -> verSello(sp, tipo)));
+        atTicks(t + 110, "captura: el sello", m -> {
+            server(m, sp -> log("  guardianes, el sello de " + nombre + ": " + com.darkcraft.valdrenn.Guardianes.estado(reinoK)));
+            shot(m, pre + "02_sello");
+        });
+        // en supervivencia, delante de el: le ve, se levanta y ruge
+        int F = t + 112;
+        atTicks(F, nombre + ": en supervivencia delante de el", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                verDeNoche(sp);
+                delanteDe(sp, puestoGuardian(tipo), lejos, lado);
+            });
+        });
+        atTicks(F + 30, "captura: se levanta", m -> {
+            server(m, sp -> log("  guardianes, " + nombre + " al verle: " + estadoGuardian(tipo)));
+            shot(m, pre + "03_se_alza");
+        });
+        atTicks(F + levantarse + 26, "captura: ruge (su barra)", m -> {
+            server(m, sp -> log("  guardianes, " + nombre + " ruge: " + estadoGuardian(tipo) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())));
+            log("  guardianes: musica " + ClientMusic.debug());
+            shot(m, pre + "04_barra");
+        });
+        // sus golpes de cerca (en creativo, con la camara de observador: el se queda en su sitio)
+        int G = F + levantarse + 30;
+        atTicks(G, nombre + ": sus golpes de cerca (creativo)", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                // (a un lado, que no le estorbe al embestir)
+                delanteDe(sp, puestoGuardian(tipo), 2.0, 8.0);
+            });
+        });
+        G += 2;
+        for (Object[] gp : golpes) {
+            final int accion = (int) gp[0], c1 = (int) gp[6], c2 = (int) gp[8];
+            final float giro = ((Number) gp[1]).floatValue();
+            final double cdx = (double) gp[2], cdy = (double) gp[3], cdz = (double) gp[4], delante = (double) gp[5];
+            final String n1 = (String) gp[7], n2 = (String) gp[9];
+            atTicks(G, nombre + ": " + n1, m -> server(m, sp -> {
+                var e = guardian(tipo);
+                var q = puestoGuardian(tipo);
+                if (e == null || q == null) return;
+                float g = q.giro() + giro;
+                e.setTarget(null);
+                e.moveTo(q.x() + 0.5, q.y(), q.z() + 0.5, g, 0f);
+                e.setYRot(g);
+                e.yBodyRot = e.yHeadRot = g;
+                e.empezar(accion);
+                double fx = -Math.sin(Math.toRadians(g)), fz = Math.cos(Math.toRadians(g));
+                // (dx a la derecha del guardian, dz hacia delante)
+                verDesdeServidor = new Vec3(e.getX() - fz * cdx + fx * cdz, e.getY() + cdy, e.getZ() + fx * cdx + fz * cdz);
+                miraServidor = new Vec3(e.getX() + fx * delante, e.getY() + 1.2, e.getZ() + fz * delante);
+            }));
+            atTicks(G + 2, "camara de cerca", m -> {
+                if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+            });
+            atTicks(G + c1, "captura: " + n1, m -> {
+                server(m, sp -> log("  guardianes, " + nombre + " " + n1 + ": " + estadoE(guardian(tipo))));
+                shot(m, n1);
+            });
+            if (n2 != null) atTicks(G + c2, "captura: " + n2, m -> shot(m, n2));
+            G += Math.max(c1, c2) + 34;
+        }
+        // a media vida, en supervivencia: ruge otra vez (la barra a menos de la mitad)
+        atTicks(G, nombre + ": a media vida (supervivencia)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                verDeNoche(sp);
+                var e = guardian(tipo);
+                var q = puestoGuardian(tipo);
+                if (e == null || q == null) return;
+                e.moveTo(q.x() + 0.5, q.y(), q.z() + 0.5, q.giro(), 0f);
+                delanteDe(sp, q, lejos, lado);
+                e.setTarget(sp);
+                e.setHealth(e.getMaxHealth() * 0.45f);
+            });
+        });
+        // (vuelve a empezar la pelea: primero ruge por verle y, al acabar, por la media vida)
+        atTicks(G + 40, "a los 2 s", m -> server(m, sp -> log("  guardianes, " + nombre + " a media vida, a los 2 s: " + estadoGuardian(tipo))));
+        atTicks(G + 70, "captura: a media vida", m -> {
+            server(m, sp -> log("  guardianes, " + nombre + " a media vida, a los 3,5 s: " + estadoGuardian(tipo)));
+            log("  guardianes: musica " + ClientMusic.debug());
+            shot(m, pre + "20_mitad");
+        });
+        // cae: de rodillas, el sello se rompe, el cartel y la hazana
+        int C = G + 72;
+        atTicks(C, nombre + ": cae", m -> {
+            com.darkcraft.client.ui.Carteles.callados = false;
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var e = guardian(tipo);
+                if (e == null) return;
+                double fx = -Math.sin(Math.toRadians(e.getYRot())), fz = Math.cos(Math.toRadians(e.getYRot()));
+                verDesdeServidor = new Vec3(e.getX() + fx * 5.5 + fz * 2.5, e.getY() + 2.4, e.getZ() + fz * 5.5 - fx * 2.5);
+                miraServidor = new Vec3(e.getX(), e.getY() + 1.0, e.getZ());
+                log("  guardianes, antes de caer " + nombre + ": ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, tipo.equals(com.darkcraft.valdrenn.ValdrennEnemigos.BRANDT) ? "brandt" : "vareth"));
+                // (kill: con el paves delante, en el muro no le entraria nada; lo que deja va a los que le plantaron cara)
+                e.kill();
+            });
+        });
+        atTicks(C + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 26, "captura: de rodillas", m -> shot(m, pre + "21_cae"));
+        atTicks(C + 56, "captura: caido", m -> {
+            server(m, sp -> log("  guardianes, " + nombre + " caido: " + com.darkcraft.valdrenn.Guardianes.estado(reinoK)));
+            shot(m, pre + "22_caido");
+        });
+        atTicks(C + 58, "el sello, roto", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> verSello(sp, tipo));
+        });
+        atTicks(C + 76, "captura: el sello roto", m -> shot(m, pre + "23_sello_roto"));
+        atTicks(C + 78, "el cartel", m -> m.options.hideGui = false);
+        atTicks(C + 120, "captura: JEFE ABATIDO", m -> {
+            log("  guardianes: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  guardianes, tras caer " + nombre + ": ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro "
+                    + com.darkcraft.story.Logros.tiene(sp, tipo.equals(com.darkcraft.valdrenn.ValdrennEnemigos.BRANDT) ? "brandt" : "vareth")));
+            shot(m, pre + "24_jefe_abatido");
+        });
+        atTicks(C + 150, nombre + ": se acaba", m -> {
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+            });
+        });
+        return C + 152;
+    }
+
+    /**
+     * Los dos guardianes (parte 4d): Ser Brandt ante el salon del trono (el martillazo y su onda, el escudazo, el muro, la
+     * embestida y, a media vida, el terremoto) y Vareth al pie de la torre del arbol (el zarpazo, el doble zarpazo, las
+     * raices en linea, las espinas y las raices de alrededor), cada uno con su sello, su barra, su musica, su caida y su
+     * cartel; y los dos en el bestiario. Al acabar, los puestos del reino por caidos (lo que viene despues es de antes).
+     */
+    private static int guardianes(int t0) {
+        base = 0;
+        int t = t0;
+        final String B = com.darkcraft.valdrenn.ValdrennEnemigos.BRANDT, V = com.darkcraft.valdrenn.ValdrennEnemigos.CORTEZA;
+        atTicks(t, "Guardianes: en pie solo los dos guardianes (el Rey y Ser Gavran, sin vencer)", m -> server(m, sp -> {
+            var est = com.darkcraft.rey.ReyEstado.get(sp.server);
+            CastlePlan plan = com.darkcraft.story.Story.planAt(sp.serverLevel(), reino[0], reino[1]);
+            var sala = com.darkcraft.gavran.SalaArbol.de(plan);
+            log("  guardianes: el Rey " + est.get(plan.cx + "," + plan.cz) + ", Ser Gavran " + (sala == null ? "-" : est.get(sala.key())) + " (0 dormido, 2 vencido)");
+            com.darkcraft.enemigos.Puestos.todos(sp.server, reinoK, true);
+            for (String tp : new String[]{B, V}) {
+                int n = com.darkcraft.valdrenn.Guardianes.puesto(reinoK, tp);
+                if (n >= 0) com.darkcraft.enemigos.Puestos.marcar(sp.server, reinoK, n, false);
+            }
+            log("  guardianes: " + com.darkcraft.valdrenn.ValdrennEnemigos.estado(sp.server, reinoK) + " | " + com.darkcraft.valdrenn.Guardianes.estado(reinoK));
+        }));
+        t += 2;
+        // Ser Brandt (mira al sur, de espaldas a la puerta del trono): {accion, giro, camara dx dy dz, mira delante, c1, n1, c2, n2}
+        Object[][] brandt = {
+                {com.darkcraft.enemigos.BrandtAnims.MARTILLAZO, 0f, 4.2, 2.6, 4.4, 2.0, 15, "cliente_vd05_martillazo_alza", 23, "cliente_vd06_martillazo_onda"},
+                {com.darkcraft.enemigos.BrandtAnims.ESCUDAZO, 0f, 3.6, 2.2, 4.0, 1.5, 9, "cliente_vd07_escudazo_recoge", 13, "cliente_vd08_escudazo"},
+                {com.darkcraft.enemigos.BrandtAnims.MURO, 0f, 3.8, 2.0, 4.6, 0.5, 16, "cliente_vd09_muro", -1, null},
+                {com.darkcraft.enemigos.BrandtAnims.EMBESTIDA, 0f, 6.0, 2.6, 8.0, 3.5, 12, "cliente_vd10_embestida_carga", 24, "cliente_vd11_embestida"},
+                {com.darkcraft.enemigos.BrandtAnims.TERREMOTO, 0f, 5.5, 2.8, 6.5, 1.0, 21, "cliente_vd12_terremoto_salta", 28, "cliente_vd13_terremoto"}};
+        t = unGuardian(t, B, "Ser Brandt", "cliente_vd", com.darkcraft.enemigos.BrandtAnims.TICKS[com.darkcraft.enemigos.BrandtAnims.LEVANTARSE], 7.5, 1.5, brandt);
+        // Vareth (mira a la entrada de la torre; para las raices y las espinas se vuelve hacia el lado abierto de la sala)
+        Object[][] vareth = {
+                {com.darkcraft.enemigos.CortezaAnims.ZARPAZO, 0f, 3.4, 2.4, 3.8, 1.5, 10, "cliente_ve05_zarpazo_alza", 14, "cliente_ve06_zarpazo"},
+                {com.darkcraft.enemigos.CortezaAnims.DOBLE, 0f, 3.6, 2.4, 4.0, 1.5, 15, "cliente_ve07_doble", -1, null},
+                {com.darkcraft.enemigos.CortezaAnims.GOLPE_SUELO, -90f, 4.5, 4.5, 6.0, 5.0, 23, "cliente_ve08_golpe_suelo", 34, "cliente_ve09_raices_linea"},
+                {com.darkcraft.enemigos.CortezaAnims.ESPINAS, -90f, 4.0, 3.0, 5.0, 3.0, 14, "cliente_ve10_espinas_carga", 21, "cliente_ve11_espinas"},
+                {com.darkcraft.enemigos.CortezaAnims.RAICES, 0f, 5.0, 5.5, 5.0, 0.0, 20, "cliente_ve12_raices_alza", 30, "cliente_ve13_raices_alrededor"}};
+        // (delante de el esta el hueco de cristal del ascensor: se le mira desde un lado)
+        t = unGuardian(t, V, "Vareth", "cliente_ve", com.darkcraft.enemigos.CortezaAnims.TICKS[com.darkcraft.enemigos.CortezaAnims.LEVANTARSE], 5.0, 6.0, vareth);
+        // los dos en el bestiario
+        atTicks(t, "el bestiario: Ser Brandt", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("brandt")));
+        });
+        atTicks(t + 16, "captura: Ser Brandt en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_vd30_bestiario_brandt");
+        });
+        atTicks(t + 18, "el bestiario: Vareth", m -> menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("corteza"))));
+        atTicks(t + 34, "captura: Vareth en el bestiario", m -> shot(m, "cliente_ve30_bestiario_vareth"));
+        // todo como estaba: en creativo, los puestos por caidos (los sellos, abiertos)
+        atTicks(t + 36, "Guardianes: se acaba (creativo; los puestos, por caidos)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = calladosAntes;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                sp.getInventory().clearContent();
+                com.darkcraft.enemigos.Puestos.todos(sp.server, reinoK, true);
+                com.darkcraft.valdrenn.Guardianes.revisar(sp.serverLevel(), reinoK);
+                log("  guardianes, al acabar: " + com.darkcraft.valdrenn.ValdrennEnemigos.estado(sp.server, reinoK) + " | " + com.darkcraft.valdrenn.Guardianes.estado(reinoK));
+            });
+        });
+        return t + 40;
+    }
+
     /** En supervivencia, con una espada de hierro, la vida entera y sin que le hagan dano de verdad (para que la prueba no muera). */
     private static void aPelear(ServerPlayer sp, boolean aguanta) {
         sp.setGameMode(GameType.SURVIVAL);
@@ -4947,6 +5238,7 @@ public final class ClientCiTest {
         fin = guardia(fin);
         fin = perrosEspectros(fin);
         fin = elitesEmboscadas(fin);
+        fin = guardianes(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

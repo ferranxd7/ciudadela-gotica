@@ -172,12 +172,23 @@ public class Volcado {
                         case "perro" -> "P";
                         case "espectro" -> q.variante() == 0 ? "S" : "D";
                         case "elite" -> "C";
+                        case "brandt" -> "K";
+                        case "corteza" -> "V";
                         default -> "GAB".substring(q.variante(), q.variante() + 1);
                     };
                     marcas.put(letra + (k++), new int[]{q.lx(), q.y(), q.lz()});
-                    if (!q.grupo().startsWith("torreon") && !q.grupo().startsWith("emb_") && !q.grupo().startsWith("torre_arbol") && !q.tipo().equals("elite")) continue;
+                    if (!q.grupo().startsWith("torreon") && !q.grupo().startsWith("emb_") && !q.grupo().startsWith("torre_arbol") && !q.tipo().equals("elite") && !q.grupo().startsWith("jefe")) continue;
                     System.out.println("  dentro: " + letra + (k - 1) + " " + q.grupo() + " " + q.tipo() + "/" + q.variante() + " en " + q.lx() + "," + q.y() + "," + q.lz()
                             + " postura " + q.postura());
+                }
+                // los sellos de los guardianes (parte 4d): que hay en sus huecos (tiene que ser aire, o algo que se pueda tapar)
+                for (String n : new String[]{"trono", "arbol"}) {
+                    var l = n.equals("trono") ? com.darkcraft.valdrenn.ValdrennEnemigos.selloTrono(p) : com.darkcraft.valdrenn.ValdrennEnemigos.selloArbol(p);
+                    java.util.Map<String, Integer> hay = new java.util.TreeMap<>();
+                    for (BlockPos b : l) hay.merge(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(mundo.en(b.getX(), b.getY(), b.getZ()).getBlock()).getPath(), 1, Integer::sum);
+                    StringBuilder donde = new StringBuilder();
+                    for (int i = 0; i < l.size() && i < 40; i++) donde.append(' ').append(l.get(i).getX()).append(',').append(l.get(i).getY()).append(',').append(l.get(i).getZ());
+                    System.out.println("sello del " + n + ": " + l.size() + " bloques " + hay + " |" + donde);
                 }
             }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));

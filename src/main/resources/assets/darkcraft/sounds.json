@@ -2415,5 +2415,153 @@
         "name": "darkcraft:sfx/emboscada_alzarse_2"
       }
     ]
+  },
+  "sfx.brandt_rugido": {
+    "subtitle": "subtitles.darkcraft.sfx.brandt_rugido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/brandt_rugido_1"
+      },
+      {
+        "name": "darkcraft:sfx/brandt_rugido_2"
+      }
+    ]
+  },
+  "sfx.brandt_martillazo": {
+    "subtitle": "subtitles.darkcraft.sfx.brandt_martillazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/brandt_martillazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/brandt_martillazo_2"
+      }
+    ]
+  },
+  "sfx.brandt_escudo": {
+    "subtitle": "subtitles.darkcraft.sfx.brandt_escudo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/brandt_escudo_1"
+      },
+      {
+        "name": "darkcraft:sfx/brandt_escudo_2"
+      }
+    ]
+  },
+  "sfx.brandt_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.brandt_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/brandt_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/brandt_dolor_2"
+      }
+    ]
+  },
+  "sfx.brandt_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.brandt_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/brandt_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/brandt_muerte_2"
+      }
+    ]
+  },
+  "sfx.corteza_rugido": {
+    "subtitle": "subtitles.darkcraft.sfx.corteza_rugido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corteza_rugido_1"
+      },
+      {
+        "name": "darkcraft:sfx/corteza_rugido_2"
+      }
+    ]
+  },
+  "sfx.corteza_zarpazo": {
+    "subtitle": "subtitles.darkcraft.sfx.corteza_zarpazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corteza_zarpazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/corteza_zarpazo_2"
+      }
+    ]
+  },
+  "sfx.corteza_raices": {
+    "subtitle": "subtitles.darkcraft.sfx.corteza_raices",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corteza_raices_1"
+      },
+      {
+        "name": "darkcraft:sfx/corteza_raices_2"
+      }
+    ]
+  },
+  "sfx.corteza_espinas": {
+    "subtitle": "subtitles.darkcraft.sfx.corteza_espinas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corteza_espinas_1"
+      },
+      {
+        "name": "darkcraft:sfx/corteza_espinas_2"
+      }
+    ]
+  },
+  "sfx.corteza_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.corteza_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corteza_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/corteza_dolor_2"
+      }
+    ]
+  },
+  "sfx.corteza_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.corteza_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corteza_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/corteza_muerte_2"
+      }
+    ]
+  },
+  "sfx.sello_rompe": {
+    "subtitle": "subtitles.darkcraft.sfx.sello_rompe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sello_rompe_1"
+      },
+      {
+        "name": "darkcraft:sfx/sello_rompe_2"
+      }
+    ]
+  },
+  "musica.brandt": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/brandt",
+        "stream": true
+      }
+    ]
+  },
+  "musica.vareth": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/vareth",
+        "stream": true
+      }
+    ]
   }
 }

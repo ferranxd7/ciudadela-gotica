@@ -50,9 +50,9 @@ public final class Puestos {
             return new BlockPos(x, y, z);
         }
 
-        /** Los jefes no vuelven al descansar ni al morir: caen una vez. */
+        /** Los jefes no vuelven al descansar ni al morir: caen una vez (tambien los "jefe~..." de Valdrenn: los guardianes). */
         public boolean jefe() {
-            return grupo.equals(JEFE);
+            return grupo.equals(JEFE) || grupo.startsWith(JEFE + "~");
         }
     }
 
@@ -161,6 +161,12 @@ public final class Puestos {
         public static Datos get(MinecraftServer srv) {
             return srv.overworld().getDataStorage().computeIfAbsent(Datos::load, Datos::new, "darkcraft_puestos");
         }
+    }
+
+    /** Si ese puesto esta en uso ahora (en Valdrenn, los que se van al caer el Rey o Ser Gavran ya no). */
+    public static boolean enUso(ServerLevel lvl, String sitio, int puesto) {
+        Sitio s = SITIOS.get(sitio);
+        return s != null && puesto >= 0 && puesto < s.puestos.size() && s.activo.test(lvl, s.puestos.get(puesto));
     }
 
     /** Si el enemigo de ese puesto esta muerto (hasta que alguien descanse o muera). */

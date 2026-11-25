@@ -157,6 +157,12 @@ SFX = {
     "elite_alerta": (1.5, 0.3, -15), "elite_grito": (2.6, 0.5, -13), "elite_dolor": (0.7, 0.2, -15),
     "elite_muerte": (3.0, 0.6, -15), "elite_impacto": (2.0, 0.5, -13), "elite_embestida": (1.2, 0.3, -14),
     "emboscada": (2.5, 0.6, -14), "emboscada_alzarse": (1.6, 0.4, -16),
+    # los dos guardianes (parte 4d): Ser Brandt, el Muro del Rey; Vareth, el Guardian de Corteza; el sello que se rompe
+    "brandt_rugido": (2.4, 0.5, -13), "brandt_martillazo": (2.2, 0.6, -13), "brandt_escudo": (0.9, 0.25, -15),
+    "brandt_dolor": (0.6, 0.2, -15), "brandt_muerte": (3.2, 0.8, -15),
+    "corteza_rugido": (2.2, 0.5, -13), "corteza_zarpazo": (0.7, 0.15, -15), "corteza_raices": (1.6, 0.4, -14),
+    "corteza_espinas": (1.3, 0.3, -14), "corteza_dolor": (0.7, 0.2, -15), "corteza_muerte": (3.4, 0.8, -15),
+    "sello_rompe": (2.0, 0.6, -14),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -263,6 +269,11 @@ TOMAS_SFX = {
     # el cuerno mas largo y el de mas graves; los que se alzan, los mas fuertes
     "elite_alerta": (2, 4), "elite_grito": (2, 4), "elite_dolor": (1, 3, 4), "elite_muerte": (1, 4),
     "elite_impacto": (4, 1, 3), "elite_embestida": (1, 3), "emboscada": (4, 1), "emboscada_alzarse": (1, 2),
+    # los guardianes (de estos se bajaron solo las tomas 1 y 2): de Brandt, el rugido mas grave y el martillazo mas seco
+    # primero; de Vareth, el rugido fuerte primero (el otro es flojo: lo iguala el volumen); el sello, la toma mas llena
+    "brandt_rugido": (1, 2), "brandt_martillazo": (2, 1), "brandt_escudo": (2, 1), "brandt_dolor": (2, 1),
+    "brandt_muerte": (1, 2), "corteza_rugido": (2, 1), "corteza_zarpazo": (2, 1), "corteza_raices": (2, 1),
+    "corteza_espinas": (1, 2), "corteza_dolor": (2, 1), "corteza_muerte": (2, 1), "sello_rompe": (2, 1),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

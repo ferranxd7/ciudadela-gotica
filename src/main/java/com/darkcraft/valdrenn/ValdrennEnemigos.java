@@ -39,6 +39,8 @@ public final class ValdrennEnemigos {
     private ValdrennEnemigos() {}
 
     public static final String GUARDIA = "guardia", ARQUERO = "arquero", PERRO = "perro", ESPECTRO = "espectro", ELITE = "elite";
+    /** Los dos guardianes (parte 4d). */
+    public static final String BRANDT = "brandt", CORTEZA = "corteza";
     /** Lo que se anade al grupo de los puestos que se van al caer el Rey o Ser Gavran. */
     public static final String REY = "~rey", GAVRAN = "~gavran";
     public static final String PREFIJO = "valdrenn@";
@@ -298,8 +300,7 @@ public final class ValdrennEnemigos {
                 String clase = r.type.name();
                 switch (r.type) {
                     case GREAT_HALL -> {
-                        sala.add(new Local(ESPECTRO, C, ax, f.y, mz, SUR, DE_PIE, 3, g, 0));
-                        sala.add(new Local(ESPECTRO, D, bx, f.y, mz, SUR, DE_PIE, 3, g, 1));
+                        // (desde la parte 4d lo guarda Ser Brandt: guardianes(plan))
                     }
                     case DINING -> {
                         sala.add(new Local(ESPECTRO, C, ax, f.y, az, giro, DE_PIE, 2, g, 0));
@@ -350,12 +351,56 @@ public final class ValdrennEnemigos {
         return todo;
     }
 
-    /** Todos los puestos del reino: los de fuera, los del torreon, la emboscada de su escalera y la torre del arbol. */
+    /** Todos los puestos del reino: los de fuera, los del torreon, la emboscada de su escalera, la torre del arbol y los guardianes. */
     public static List<Local> todos(CastlePlan plan) {
         List<Local> l = new ArrayList<>(locales(sur(plan)));
         l.addAll(interiores(plan));
         l.addAll(deLaEscalera(plan));
         l.addAll(arbol(plan));
+        l.addAll(guardianes(plan));
+        return l;
+    }
+
+    /** La puerta del salon del trono que da al gran salon (la del muro del sur): {x, z, alto} en el mundo, o null. */
+    static int[] puertaDelTrono(CastlePlan plan) {
+        CastlePlan.Throne t = plan.throne();
+        if (t == null || t.doors().isEmpty()) return null;
+        int[] mejor = null;
+        for (int[] d : t.doors()) if (mejor == null || d[1] > mejor[1]) mejor = d;
+        return mejor;
+    }
+
+    /**
+     * Los dos guardianes (parte 4d), en el grupo de los jefes (caen una vez): Ser Brandt, de rodillas en el gran salon,
+     * siete bloques delante de la puerta del trono, de espaldas a ella; se va al caer el Rey. Vareth, de rodillas en la base
+     * de la torre del arbol, al norte del ascensor, mirando a la entrada; se va al caer Ser Gavran.
+     */
+    public static List<Local> guardianes(CastlePlan plan) {
+        List<Local> l = new ArrayList<>();
+        int[] d = puertaDelTrono(plan);
+        if (d != null) l.add(new Local(BRANDT, 0, d[0] - plan.cx, Y, d[1] - plan.cz + 7, SUR, REZA, 0, Puestos.JEFE, 1));
+        com.darkcraft.gen.TreeTower tr = plan.arbol();
+        if (tr != null) l.add(new Local(CORTEZA, 0, tr.centerX() - plan.cx, tr.base(), tr.centerZ() - plan.cz - 6, SUR, REZA, 0, Puestos.JEFE, 2));
+        return l;
+    }
+
+    /** Lo que cierra el sello de Ser Brandt: las puertas del salon del trono, todas, de arriba abajo. */
+    public static List<BlockPos> selloTrono(CastlePlan plan) {
+        List<BlockPos> l = new ArrayList<>();
+        CastlePlan.Throne t = plan.throne();
+        if (t == null) return l;
+        for (int[] d : t.doors()) for (int y = t.y(); y < t.y() + d[2]; y++) l.add(new BlockPos(d[0], y, d[1]));
+        return l;
+    }
+
+    /** Lo que cierra el sello de Vareth: el primer peldano de la escalera de la torre del arbol y la entrada del ascensor. */
+    public static List<BlockPos> selloArbol(CastlePlan plan) {
+        List<BlockPos> l = new ArrayList<>();
+        com.darkcraft.gen.TreeTower tr = plan.arbol();
+        if (tr == null) return l;
+        int cx = tr.centerX(), cz = tr.centerZ(), b = tr.base();
+        for (int x = 9; x <= 11; x++) for (int y = b + 1; y <= b + 4; y++) l.add(new BlockPos(cx + x, y, cz + 7));
+        for (int x = -1; x <= 1; x++) for (int y = b; y <= b + 2; y++) l.add(new BlockPos(cx + x, y, cz + com.darkcraft.gen.TreeTower.SHAFT_Z + 3));
         return l;
     }
 
@@ -409,6 +454,7 @@ public final class ValdrennEnemigos {
             if (p.grupo().endsWith(GAVRAN)) return gavran == null || ReyEstado.get(l.getServer()).get(gavran) != ReyEstado.MUERTO;
             return true;
         });
+        Guardianes.apuntar(k, plan);
         DarkCraftMod.LOGGER.info("[DarkCraft] Valdrenn en {}, {}: {} puestos de enemigos", cx, cz, Puestos.sitio(k).puestos.size());
     }
 
@@ -438,8 +484,11 @@ public final class ValdrennEnemigos {
         Puestos.tipo(PERRO, DarkCraftMod.PERRO);
         Puestos.tipo(ESPECTRO, DarkCraftMod.ESPECTRO);
         Puestos.tipo(ELITE, DarkCraftMod.ELITE);
+        Puestos.tipo(BRANDT, DarkCraftMod.BRANDT);
+        Puestos.tipo(CORTEZA, DarkCraftMod.CORTEZA);
         Puestos.alVolver(Emboscadas::rearmar);
         Puestos.alCaer(Emboscadas::alCaer);
+        Puestos.alCaer(Guardianes::alCaer);
     }
 
     // ------------------------------------------------------------------ comandos: /darkcraft valdrenn enemigos ...

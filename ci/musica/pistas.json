@@ -124,5 +124,28 @@
     "uso": "El viaje de La Garza Gris entre Brumavela y Valdrenn",
     "lufs": -16,
     "corte": 84
+  },
+  {
+    "id": "brandt",
+    "pagina": "https://opengameart.org/node/114162",
+    "busca": "red_mountain",
+    "titulo": "Fantasy - The March Upon the Red Mountain",
+    "autor": "HitCtrl",
+    "licencia": "CC-BY 3.0",
+    "aviso": "HitCtrl",
+    "uso": "Ser Brandt, el Muro del Rey (el guardian del salon del trono de Valdrenn)",
+    "lufs": -16
+  },
+  {
+    "id": "vareth",
+    "pagina": "https://opengameart.org/content/sinister-boss-appears",
+    "pagina2": "https://opengameart.org/node/84711",
+    "busca": "sinister",
+    "titulo": "Sinister Boss Appears!",
+    "autor": "cynicmusic (Alex Smith)",
+    "licencia": "CC0",
+    "aviso": "http://cynicmusic.com http://pixelsphere.org",
+    "uso": "Vareth, el Guardian de Corteza (el guardian de la torre del arbol)",
+    "lufs": -16
   }
 ]

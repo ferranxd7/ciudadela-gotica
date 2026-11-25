@@ -407,6 +407,10 @@ public final class ReyCliente {
             com.darkcraft.client.enemigos.CapitanCliente.barra(e, ticks);
             return;
         }
+        if (tc.getKey().equals("entity.darkcraft.brandt") || tc.getKey().equals("entity.darkcraft.corteza")) {
+            com.darkcraft.client.enemigos.GuardianCliente.barra(e, ticks, tc.getKey().substring("entity.darkcraft.".length()));
+            return;
+        }
         if (!tc.getKey().equals("entity.darkcraft.rey"))
             return;
         if (!e.isCancelable()) return;
@@ -768,6 +772,14 @@ public final class ReyCliente {
                 for (Entity en : mc.level.entitiesForRendering())
                     if (en instanceof com.darkcraft.enemigos.Capitan c && c.isAlive() && c.enPelea() && c.distanceToSqr(mc.player) < 72 * 72) {
                         fase = 21;
+                        suave = false;
+                        break;
+                    }
+            // los guardianes de Valdrenn (temas 31 y 32)
+            if (fase == 0)
+                for (Entity en : mc.level.entitiesForRendering())
+                    if (en instanceof com.darkcraft.enemigos.Guardian gu && gu.isAlive() && gu.enPelea() && gu.distanceToSqr(mc.player) < 72 * 72) {
+                        fase = gu.musica();
                         suave = false;
                         break;
                     }

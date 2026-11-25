@@ -37,7 +37,8 @@ public final class Comandos {
                         .then(GavranEventos.comando())
                         .then(com.darkcraft.espejo.Espejo.comando())
                         .then(com.darkcraft.caballeros.Caballeros.comando())
-                        .then(com.darkcraft.valdrenn.ValdrennEnemigos.comando()))
+                        .then(com.darkcraft.valdrenn.ValdrennEnemigos.comando())
+                        .then(com.darkcraft.valdrenn.Guardianes.comando()))
                 .then(com.darkcraft.fortaleza.ComandosFortaleza.comando())
                 .then(com.darkcraft.pueblo.Pueblo.comando())
                 .then(com.darkcraft.rol.Rol.comando())
@@ -63,6 +64,7 @@ public final class Comandos {
             new Linea(V + "espejo ", V + "espejo despertar / dormir / revelar", "espejo"),
             new Linea(V + "caballeros ", V + "caballeros grupo / quitar", "caballeros"),
             new Linea(V + "enemigos", V + "enemigos [volver | fuera | sacar | ir <grupo>]", "v_enemigos"),
+            new Linea(V + "guardian ", V + "guardian <brandt | vareth> [ir | vencer | volver]", "v_guardian"),
     };
 
     private static final String F = "/darkcraft fortaleza ";

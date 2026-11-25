@@ -218,6 +218,19 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_ELITE_EMBESTIDA = sound("sfx.elite_embestida");
     public static final RegistryObject<SoundEvent> SFX_EMBOSCADA = sound("sfx.emboscada");
     public static final RegistryObject<SoundEvent> SFX_EMBOSCADA_ALZARSE = sound("sfx.emboscada_alzarse");
+    // ---- los guardianes: Ser Brandt y Vareth (parte 4d)
+    public static final RegistryObject<SoundEvent> SFX_BRANDT_RUGIDO = sound("sfx.brandt_rugido");
+    public static final RegistryObject<SoundEvent> SFX_BRANDT_MARTILLAZO = sound("sfx.brandt_martillazo");
+    public static final RegistryObject<SoundEvent> SFX_BRANDT_ESCUDO = sound("sfx.brandt_escudo");
+    public static final RegistryObject<SoundEvent> SFX_BRANDT_DOLOR = sound("sfx.brandt_dolor");
+    public static final RegistryObject<SoundEvent> SFX_BRANDT_MUERTE = sound("sfx.brandt_muerte");
+    public static final RegistryObject<SoundEvent> SFX_CORTEZA_RUGIDO = sound("sfx.corteza_rugido");
+    public static final RegistryObject<SoundEvent> SFX_CORTEZA_ZARPAZO = sound("sfx.corteza_zarpazo");
+    public static final RegistryObject<SoundEvent> SFX_CORTEZA_RAICES = sound("sfx.corteza_raices");
+    public static final RegistryObject<SoundEvent> SFX_CORTEZA_ESPINAS = sound("sfx.corteza_espinas");
+    public static final RegistryObject<SoundEvent> SFX_CORTEZA_DOLOR = sound("sfx.corteza_dolor");
+    public static final RegistryObject<SoundEvent> SFX_CORTEZA_MUERTE = sound("sfx.corteza_muerte");
+    public static final RegistryObject<SoundEvent> SFX_SELLO_ROMPE = sound("sfx.sello_rompe");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_GORGOTEO = sound("sfx.ahogado_gorgoteo");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_ALERTA = sound("sfx.ahogado_alerta");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_DOLOR = sound("sfx.ahogado_dolor");
@@ -230,6 +243,8 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_CAPITAN_MUERTE = sound("sfx.capitan_muerte");
     public static final RegistryObject<SoundEvent> SFX_FARO_SELLO = sound("sfx.faro_sello");
     public static final RegistryObject<SoundEvent> MUSICA_CAPITAN = sound("musica.capitan");
+    public static final RegistryObject<SoundEvent> MUSICA_BRANDT = sound("musica.brandt");
+    public static final RegistryObject<SoundEvent> MUSICA_VARETH = sound("musica.vareth");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -395,6 +410,13 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Espectro>> ESPECTRO = ENTITIES.register("espectro",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Espectro>of(com.darkcraft.enemigos.Espectro::new, MobCategory.MONSTER)
                     .sized(0.65f, 2.0f).clientTrackingRange(8).build(MODID + ":espectro"));
+    // ---- los guardianes de Valdrenn (parte 4d)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Brandt>> BRANDT = ENTITIES.register("brandt",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Brandt>of(com.darkcraft.enemigos.Brandt::new, MobCategory.MONSTER)
+                    .sized(1.1f, 3.0f).fireImmune().clientTrackingRange(10).build(MODID + ":brandt"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Corteza>> CORTEZA = ENTITIES.register("corteza",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Corteza>of(com.darkcraft.enemigos.Corteza::new, MobCategory.MONSTER)
+                    .sized(1.1f, 2.9f).clientTrackingRange(10).build(MODID + ":corteza"));
     // ---- el capitan de elite de la guardia (parte 4c)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Elite>> ELITE = ENTITIES.register("elite",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Elite>of(com.darkcraft.enemigos.Elite::new, MobCategory.MONSTER)
@@ -528,6 +550,8 @@ public class DarkCraftMod {
         e.put(PERRO.get(), com.darkcraft.enemigos.Perro.atributos().build());
         e.put(ESPECTRO.get(), com.darkcraft.enemigos.Espectro.atributos().build());
         e.put(ELITE.get(), com.darkcraft.enemigos.Elite.atributos().build());
+        e.put(BRANDT.get(), com.darkcraft.enemigos.Brandt.atributos().build());
+        e.put(CORTEZA.get(), com.darkcraft.enemigos.Corteza.atributos().build());
         e.put(GUIA.get(), com.darkcraft.personajes.Guia.atributos().build());
         e.put(HERRERO.get(), com.darkcraft.personajes.Herrero.atributos().build());
         e.put(MERCADER.get(), com.darkcraft.personajes.Mercader.atributos().build());

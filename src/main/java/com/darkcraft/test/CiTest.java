@@ -80,6 +80,7 @@ public final class CiTest {
             guardiaDeValdrenn(server, lvl, log, s);
             perrosYEspectros(server, lvl, log, s);
             elitesYEmboscadas(server, lvl, log, s);
+            guardianesDeValdrenn(server, lvl, log, s);
 
             int Y0 = CastlePlan.Y0;
             topView(lvl, s[0], s[1], R, new File(out, "1_vista_aerea.png"));
@@ -878,7 +879,9 @@ public final class CiTest {
                     String[] nombres = e instanceof com.darkcraft.enemigos.Arquero ? com.darkcraft.enemigos.ArqueroAnims.NOMBRES
                             : e instanceof com.darkcraft.enemigos.Perro ? com.darkcraft.enemigos.PerroAnims.NOMBRES
                             : e instanceof com.darkcraft.enemigos.Espectro ? com.darkcraft.enemigos.EspectroAnims.NOMBRES
-                            : e instanceof com.darkcraft.enemigos.Elite ? com.darkcraft.enemigos.EliteAnims.NOMBRES : com.darkcraft.enemigos.GuardiaAnims.NOMBRES;
+                            : e instanceof com.darkcraft.enemigos.Elite ? com.darkcraft.enemigos.EliteAnims.NOMBRES
+                            : e instanceof com.darkcraft.enemigos.Brandt ? com.darkcraft.enemigos.BrandtAnims.NOMBRES
+                            : e instanceof com.darkcraft.enemigos.Corteza ? com.darkcraft.enemigos.CortezaAnims.NOMBRES : com.darkcraft.enemigos.GuardiaAnims.NOMBRES;
                     int acciones = nombres.length;
                     for (int a = 1; a < acciones; a++) {
                         String nombre = nombres[a];
@@ -1192,6 +1195,219 @@ public final class CiTest {
             log.println("Valdrenn, capitanes y emboscadas: ERROR " + t);
             DarkCraftMod.LOGGER.error("[CI] capitanes y emboscadas", t);
         }
+    }
+
+    /**
+     * Parte 4d: los dos guardianes. Sus sellos (con el guardian en pie se cierran; al caer se rompen; con su jefe vencido no
+     * hay), la pelea (empieza al ver a alguien: se levanta y ruge; a media vida ruge otra vez y cambia), el paves de Ser
+     * Brandt (de frente casi nada; en el muro nada y luego contesta con un escudazo; por la espalda todo; las flechas no),
+     * las raices y las espinas de Vareth y el fuego (le hace el doble), lo que queda al caer y que no vuelven al descansar.
+     */
+    private static void guardianesDeValdrenn(net.minecraft.server.MinecraftServer server, ServerLevel lvl, java.io.PrintWriter log, int[] s) {
+        var est = com.darkcraft.rey.ReyEstado.get(server);
+        String claveRey = null, claveGavran = null, k = null;
+        int rey0 = 0, gav0 = 0;
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            CastlePlan plan = com.darkcraft.story.Story.planAt(lvl, s[0], s[1]);
+            com.darkcraft.valdrenn.ValdrennEnemigos.apuntar(plan);
+            k = com.darkcraft.valdrenn.ValdrennEnemigos.clave(plan);
+            final String B = com.darkcraft.valdrenn.ValdrennEnemigos.BRANDT, V = com.darkcraft.valdrenn.ValdrennEnemigos.CORTEZA;
+            claveRey = plan.cx + "," + plan.cz;
+            var sala = com.darkcraft.gavran.SalaArbol.de(plan);
+            claveGavran = sala == null ? null : sala.key();
+            rey0 = est.get(claveRey);
+            gav0 = claveGavran == null ? 0 : est.get(claveGavran);
+            // (ni el Rey ni Ser Gavran vencidos: si no, no hay guardianes)
+            est.set(claveRey, com.darkcraft.rey.ReyEstado.DORMIDO);
+            if (claveGavran != null) est.set(claveGavran, com.darkcraft.rey.ReyEstado.DORMIDO);
+            com.darkcraft.enemigos.Puestos.todos(server, k, false);
+            int pb = com.darkcraft.valdrenn.Guardianes.puesto(k, B), pv = com.darkcraft.valdrenn.Guardianes.puesto(k, V);
+            for (String t : new String[]{B, V})
+                for (BlockPos b : com.darkcraft.valdrenn.Guardianes.bloques(k, t)) lvl.getChunk(b.getX() >> 4, b.getZ() >> 4);
+            // ---- los sellos, con los dos en pie
+            com.darkcraft.valdrenn.Guardianes.revisar(lvl, k);
+            String cerrados = sello(lvl, k, B) + ", " + sello(lvl, k, V);
+            // ---- salen los dos (de rodillas en su puesto) y pelean con un jugador de mentira
+            com.darkcraft.enemigos.Brandt brandt = null;
+            com.darkcraft.enemigos.Corteza vareth = null;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarGrupo(lvl, k, g -> g.startsWith(com.darkcraft.enemigos.Puestos.JEFE))) {
+                quitar.add(e);
+                if (e instanceof com.darkcraft.enemigos.Brandt b) brandt = b;
+                else if (e instanceof com.darkcraft.enemigos.Corteza c) vareth = c;
+            }
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(lvl, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5f2b8c1e-3d4a-4e6b-9a7c-1b2d3e4f5a6b"), "[DarkCraftCI]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            String sb = "Ser Brandt no sale", sv = "Vareth no sale";
+            if (brandt != null) {
+                String sitio = String.format(java.util.Locale.ROOT, "en %d,%d,%d del reino", brandt.getBlockX() - s[0], brandt.getBlockY(), brandt.getBlockZ() - s[1]);
+                sb = guardianPelea(brandt, fp, com.darkcraft.enemigos.BrandtAnims.RUGIDO) + " " + sitio + "; " + paves(lvl, brandt, fp);
+            }
+            if (vareth != null) {
+                String sitio = String.format(java.util.Locale.ROOT, "en %d,%d,%d del reino", vareth.getBlockX() - s[0], vareth.getBlockY(), vareth.getBlockZ() - s[1]);
+                sv = guardianPelea(vareth, fp, com.darkcraft.enemigos.CortezaAnims.RUGIDO) + " " + sitio + "; " + corteza(lvl, vareth, fp, quitar);
+            }
+            log.println("Valdrenn, los guardianes: sellos " + cerrados + " (cerrados del todo); " + sb + " | " + sv);
+            // ---- caen: el sello se rompe en el acto, el puesto queda por caido y al descansar no vuelven
+            int repartos0 = com.darkcraft.valdrenn.Guardianes.repartosPendientes();
+            String caen = "";
+            for (var g : new com.darkcraft.enemigos.Guardian[]{brandt, vareth}) {
+                if (g == null) continue;
+                g.setTarget(fp);
+                g.hurt(lvl.damageSources().playerAttack(fp), 99999f);
+                caen += String.format(java.util.Locale.ROOT, " %s cae (vivo %s, puesto por caido %s, rivales %d);", g.tipo(), g.isAlive(),
+                        com.darkcraft.enemigos.Puestos.muerto(server, k, g.puesto()), g.rivales().size());
+                for (int t = 0; t < 70 && !g.isRemoved(); t++) g.tick();
+            }
+            String abiertos = sello(lvl, k, B) + ", " + sello(lvl, k, V);
+            int repartos = com.darkcraft.valdrenn.Guardianes.repartosPendientes() - repartos0;
+            fp.moveTo(s[0] + 0.5, CastlePlan.Y0, s[1] + 66.5, 0f, 0f);
+            com.darkcraft.enemigos.Puestos.reaparecer(fp);
+            boolean siguenCaidos = (pb < 0 || com.darkcraft.enemigos.Puestos.muerto(server, k, pb)) && (pv < 0 || com.darkcraft.enemigos.Puestos.muerto(server, k, pv));
+            com.darkcraft.valdrenn.Guardianes.revisar(lvl, k);
+            String tras = sello(lvl, k, B) + ", " + sello(lvl, k, V);
+            // ---- con el Rey vencido no hay Ser Brandt (ni sello); con Ser Gavran vencido, ni Vareth
+            com.darkcraft.enemigos.Puestos.todos(server, k, false);
+            est.set(claveRey, com.darkcraft.rey.ReyEstado.MUERTO);
+            if (claveGavran != null) est.set(claveGavran, com.darkcraft.rey.ReyEstado.MUERTO);
+            com.darkcraft.valdrenn.Guardianes.revisar(lvl, k);
+            String sinJefes = sello(lvl, k, B) + ", " + sello(lvl, k, V);
+            int salenSinJefes = com.darkcraft.enemigos.Puestos.sacarGrupo(lvl, k, g -> g.startsWith(com.darkcraft.enemigos.Puestos.JEFE)).size();
+            log.println("Valdrenn, los guardianes caen:" + caen + " sellos " + abiertos + " (abiertos); quedan por repartir " + repartos
+                    + " (2: a los 4 s, cartel, ecos y logro); al descansar siguen caidos " + siguenCaidos + " y los sellos " + tras
+                    + "; con el Rey y Ser Gavran vencidos salen " + salenSinJefes + " (0) y los sellos " + sinJefes);
+        } catch (Throwable t) {
+            log.println("Valdrenn, los guardianes: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] los guardianes", t);
+        } finally {
+            // todo como estaba: los dos en pie, los sellos abiertos (se cierran cuando llegue alguien) y el Rey y Ser Gavran
+            try {
+                for (var e : quitar) if (!e.isRemoved()) e.discard();
+                if (claveRey != null) est.set(claveRey, rey0);
+                if (claveGavran != null) est.set(claveGavran, gav0);
+                if (k != null) {
+                    com.darkcraft.enemigos.Puestos.todos(server, k, true);
+                    com.darkcraft.valdrenn.Guardianes.revisar(lvl, k);
+                    com.darkcraft.enemigos.Puestos.todos(server, k, false);
+                    com.darkcraft.valdrenn.Emboscadas.armar(k);
+                }
+            } catch (Throwable t) {
+                DarkCraftMod.LOGGER.error("[CI] los guardianes, al acabar", t);
+            }
+        }
+    }
+
+    /** Cuantos bloques de un sello estan cerrados ("brandt 45/45"). */
+    private static String sello(ServerLevel lvl, String k, String tipo) {
+        var l = com.darkcraft.valdrenn.Guardianes.bloques(k, tipo);
+        int n = 0;
+        for (BlockPos b : l) if (com.darkcraft.valdrenn.Guardianes.cerrado(lvl, b)) n++;
+        return tipo + " " + n + "/" + l.size();
+    }
+
+    /** La pelea de un guardian: de rodillas ve a alguien, se levanta y ruge; a media vida ruge otra vez y cambia. */
+    private static String guardianPelea(com.darkcraft.enemigos.Guardian g, net.minecraft.server.level.ServerPlayer fp, int rugido) {
+        float giro = g.getYRot();
+        double fx = -Math.sin(Math.toRadians(giro)), fz = Math.cos(Math.toRadians(giro));
+        fp.moveTo(g.getX() + fx * 7, g.getY(), g.getZ() + fz * 7, giro + 180f, 0f);
+        int postura0 = g.postura();
+        g.setTarget(fp);
+        boolean pelea = g.enPelea(), dePie = false, ruge = false;
+        int t = 0;
+        for (; t < 160 && !ruge; t++) {
+            g.tick();
+            if (g.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE) dePie = true;
+            if (g.accion() == rugido) ruge = true;
+        }
+        int tRuge = t;
+        for (int i = 0; i < 80 && g.accion() != 0; i++) g.tick();
+        float max = g.getMaxHealth();
+        g.setHealth(max * 0.45f);
+        boolean segunda = false, rugeOtra = false;
+        for (int i = 0; i < 240 && !rugeOtra; i++) {
+            g.tick();
+            if (g.segunda()) segunda = true;
+            if (segunda && g.accion() == rugido) rugeOtra = true;
+        }
+        for (int i = 0; i < 80 && g.accion() != 0; i++) g.tick();
+        return String.format(java.util.Locale.ROOT, "%s (%.0f de vida) de rodillas %s, al verle pelea %s, en pie %s, ruge %s (a los %d ticks), a media vida pasa a la segunda %s y ruge %s",
+                g.tipo(), max, postura0 == com.darkcraft.enemigos.Enemigo.REZA ? "si" : "no (" + postura0 + ")", pelea, dePie, ruge, tRuge, segunda, rugeOtra);
+    }
+
+    /** Lo que le quita un golpe (y le devuelve la vida). */
+    private static float pegar(net.minecraft.world.entity.LivingEntity e, net.minecraft.world.damagesource.DamageSource s, float d) {
+        e.invulnerableTime = 0;
+        float v0 = e.getHealth();
+        e.hurt(s, d);
+        float q = v0 - e.getHealth();
+        e.setHealth(v0);
+        e.invulnerableTime = 0;
+        return q;
+    }
+
+    /** El paves de Ser Brandt (mirando al sur): de frente, por la espalda, una flecha, y en el muro (y lo que hace despues). */
+    private static String paves(ServerLevel lvl, com.darkcraft.enemigos.Brandt b, net.minecraft.server.level.ServerPlayer fp) {
+        b.setTarget(null);
+        for (int i = 0; i < 120 && b.accion() != 0; i++) b.tick();
+        double x = b.getX(), y = b.getY(), z = b.getZ();
+        b.moveTo(x, y, z, 0f, 0f);
+        b.setYRot(0f);
+        b.yBodyRot = b.yHeadRot = 0f;
+        b.setHealth(b.getMaxHealth());
+        fp.moveTo(x, y, z + 2.5, 180f, 0f);
+        float deFrente = pegar(b, lvl.damageSources().playerAttack(fp), 20f);
+        fp.moveTo(x, y, z - 2.5, 0f, 0f);
+        float porDetras = pegar(b, lvl.damageSources().playerAttack(fp), 20f);
+        var flecha = new net.minecraft.world.entity.projectile.Arrow(lvl, x, y + 1.5, z + 3.0);
+        flecha.setOwner(fp);
+        float conFlecha = pegar(b, lvl.damageSources().arrow(flecha, fp), 20f);
+        flecha.discard();
+        // el muro: de frente no le entra nada y, al acabar, contesta
+        fp.moveTo(x, y, z + 2.5, 180f, 0f);
+        b.setTarget(fp);
+        b.empezar(com.darkcraft.enemigos.BrandtAnims.MURO);
+        for (int i = 0; i < 4; i++) b.tick();
+        float enMuro = pegar(b, lvl.damageSources().playerAttack(fp), 20f);
+        int despues = -1;
+        for (int i = 0; i < 80 && despues < 0; i++) {
+            b.tick();
+            int a = b.accion();
+            if (a != com.darkcraft.enemigos.BrandtAnims.MURO && a != 0) despues = a;
+        }
+        for (int i = 0; i < 60 && b.accion() != 0; i++) b.tick();
+        return String.format(java.util.Locale.ROOT, "el paves: de frente quita %.1f, por la espalda %.1f, una flecha de frente %.1f (0), en el muro %.1f (0) y luego %s",
+                deFrente, porDetras, conFlecha, enMuro, despues < 0 ? "nada" : com.darkcraft.enemigos.BrandtAnims.NOMBRES[despues] + (despues == com.darkcraft.enemigos.BrandtAnims.ESCUDAZO ? "" : " (tenia que ser escudazo)"));
+    }
+
+    /** Vareth: el fuego (el doble), y cuantas raices salen en linea y cuantas espinas (las entidades que se ven). */
+    private static String corteza(ServerLevel lvl, com.darkcraft.enemigos.Corteza v, net.minecraft.server.level.ServerPlayer fp,
+                                  java.util.List<net.minecraft.world.entity.Entity> quitar) {
+        v.setTarget(null);
+        for (int i = 0; i < 120 && v.accion() != 0; i++) v.tick();
+        v.setHealth(v.getMaxHealth());
+        float normal = pegar(v, lvl.damageSources().generic(), 10f);
+        float fuego = pegar(v, lvl.damageSources().onFire(), 10f);
+        v.clearFire();
+        int raices = brotan(lvl, v, com.darkcraft.enemigos.CortezaAnims.GOLPE_SUELO, quitar);
+        int espinas = brotan(lvl, v, com.darkcraft.enemigos.CortezaAnims.ESPINAS, quitar);
+        int alrededor = brotan(lvl, v, com.darkcraft.enemigos.CortezaAnims.RAICES, quitar);
+        return String.format(java.util.Locale.ROOT, "el fuego le quita %.1f y lo de siempre %.1f (el doble); salen %d raices en linea (hasta 9), %d espinas (9) y %d raices alrededor (hasta 22)",
+                fuego, normal, raices, espinas, alrededor);
+    }
+
+    /** Hace esa accion y cuenta cuantas entidades de raiz o espina salen a su alrededor. */
+    private static int brotan(ServerLevel lvl, com.darkcraft.enemigos.Enemigo e, int accion, java.util.List<net.minecraft.world.entity.Entity> quitar) {
+        var caja = e.getBoundingBox().inflate(16, 6, 16);
+        java.util.Set<net.minecraft.world.entity.Entity> antes = new java.util.HashSet<>(lvl.getEntitiesOfClass(net.minecraft.world.entity.Display.class, caja));
+        java.util.Set<net.minecraft.world.entity.Entity> nuevas = new java.util.HashSet<>();
+        e.empezar(accion);
+        for (int i = 0; i < 100; i++) {
+            e.tick();
+            for (var d : lvl.getEntitiesOfClass(net.minecraft.world.entity.Display.class, caja)) if (!antes.contains(d)) nuevas.add(d);
+            if (e.accion() != accion && i > 40) break;
+        }
+        quitar.addAll(nuevas);
+        return nuevas.size();
     }
 
     private static void barcoQueVaYViene(net.minecraft.server.MinecraftServer server, ServerLevel lvl, java.io.PrintWriter log) {

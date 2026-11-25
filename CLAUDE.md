@@ -938,6 +938,52 @@ torreon por dentro. **4c**: capitanes de elite, emboscadas y la torre del arbol 
   `Valdrenn, las emboscadas: N de 5 bien ...`); cliente, tramo `elitesEmboscadas()` (capturas `cliente_vc01..17`: el capitan
   y sus golpes, su caida, el de la puerta, un rellano de la torre del arbol y la emboscada de la plaza en supervivencia).
 
+### Plan grande, parte 4d: los dos guardianes (Ser Brandt y Vareth)
+
+Respuesta 15 del plan: un mini-jefe guardian antes de CADA jefe (el salon del Rey y la torre del arbol), con barra y logro.
+- **`enemigos/Guardian`** (lo comun): esperan de rodillas en su puesto (grupo `Puestos.JEFE`: caen una vez y no vuelven al
+  descansar; `quita` 1 / 2: con el Rey / Ser Gavran vencidos ya no salen). De rodillas ven a 16 bloques si hay linea de
+  vista. Al ver a alguien empieza la pelea (`EN_PELEA`, sincronizado): se levanta y ruge. **Barra de vida propia**
+  (`ServerBossEvent` con su nombre para quien este a 48; el cliente la dibuja con su arte: `client/enemigos/GuardianCliente`
+  con `textures/gui/<tipo>_barra.png` de `tools/hud/barra_guardianes.py`; chispas o hojas que caen) y **su musica** mientras
+  pelea (temas 31 y 32 de `ClientMusic.boss`: `ReyCliente` la pone si hay un guardian peleando a 72 bloques). Con amigos, mas
+  vida (`paraGrupo`). A **media vida**, una vez por pelea, ruge otra vez y cambia (`alSegundaMitad`). 110 ticks sin presa:
+  vuelve a lo suyo con la vida entera. Ni las caidas ni los demas enemigos le hacen dano; el fuego tampoco (salvo a Vareth).
+- **Ser Brandt, el Muro del Rey** (`enemigos/Brandt`, `tools/enemigos/brandt.py`, escala 1,5: coraza, yelmo con corona y
+  puas, un paves en la muneca izquierda —angulos fijos del brazo, sin cinematica inversa— y un martillo de guerra): 420 de
+  vida, golpe 9, armadura 14. De rodillas en el gran salon, 7 bloques delante de la puerta del trono, de espaldas a ella.
+  **El paves**: de frente (75 grados a cada lado), quieto, en el muro o embistiendo, deja pasar el 15 % (las flechas, nada).
+  Tras tres golpes seguidos se pone en el **muro** (no le entra nada) y, si le pegaron, contesta con un **escudazo**.
+  **Martillazo** (lo alza casi un segundo; onda al dar en el suelo: saltando o rodando se libra), **golpe** de lado,
+  **escudazo** (empuja y frena), **embestida**; a media vida, el **terremoto** (salta y la onda llega a 6 bloques). Deja
+  3500 ecos, dos piedras de forja II y la ceniza del sismo.
+- **Vareth, el Guardian de Corteza** (`enemigos/Corteza`, `tools/enemigos/corteza.py`, escala 1,45: corteza y musgo,
+  astas de ramas, garras de tres dedos, el corazon verde y los ojos en la capa de brillo): 520 de vida, golpe 9,5,
+  armadura 8; **el fuego le hace el doble**. De rodillas en la base de la torre del arbol, detras del hueco de cristal del
+  ascensor (no ve a quien entra hasta que lo rodea). **Zarpazo**, **doble zarpazo**, **raices en linea** (brotan por el
+  suelo hacia delante cada 1,4 bloques hasta 13: `EfectosRaiz.estaca` y el dano un instante despues, `Brote`), **espinas**
+  (abanico de 70 grados hasta 8 bloques, frenan); a media vida, **raices alrededor** (dos anillos). Deja 5000 ecos, tres
+  piedras II y el talisman del hueso.
+- **Los sellos** (`valdrenn/Guardianes`): mientras vive su guardian (y su puesto esta en uso) y hay alguien a 48 bloques,
+  barreras invisibles con una cortina de chispas rojas y negras y fuego de almas cierran todas las puertas del salon del
+  trono (`ValdrennEnemigos.selloTrono`: 45 bloques) y la escalera y el ascensor de la base de la torre del arbol
+  (`selloArbol`: 21); solo en huecos de aire. Aviso al acercarse (`darkcraft.guardian.sello.<tipo>`). Al caer el guardian
+  el sello se rompe en el acto (`sfx.sello_rompe`, almas) y 4 s despues, a cada uno de los que le plantaron cara (y a los
+  que esten a 48): el cartel de JEFE ABATIDO con sus ecos, la hazana (`brandt` / `vareth`, con su entrada del diario) y el
+  bestiario. Al abrirse quita toda barrera de sus huecos (tambien las que quedaron de antes de cerrar el servidor).
+- Sonido (ElevenLabs, solo se bajaron las tomas 1 y 2): `brandt_rugido`, `brandt_martillazo`, `brandt_escudo`,
+  `brandt_dolor`, `brandt_muerte`, `corteza_rugido`, `corteza_zarpazo`, `corteza_raices`, `corteza_espinas`,
+  `corteza_dolor`, `corteza_muerte`, `sello_rompe`. Musica: "Fantasy - The March Upon the Red Mountain" de HitCtrl
+  (CC-BY 3.0, id `brandt`) y "Sinister Boss Appears!" de cynicmusic (CC0, id `vareth`).
+- Comandos: `/darkcraft valdrenn guardian <brandt | vareth> [ir | vencer | volver]` (sin mas: como esta y su sello).
+- Sin abrir el juego: `tools/vista3d/Volcado.java valdrenn` marca a los guardianes (K Brandt, V Vareth) y escribe que hay en
+  los huecos de cada sello (`sello del trono: 45 bloques {air=45}`).
+- Pruebas: servidor, `guardianesDeValdrenn` (lineas `Valdrenn, los guardianes: ...` —sellos cerrados, la pelea, el paves,
+  el fuego y las raices de Vareth— y `Valdrenn, los guardianes caen: ...` —sellos rotos, repartos, no vuelven al
+  descansar, con sus jefes vencidos no salen—); cliente, tramo `guardianes()` (capturas `cliente_vd01..24` Ser Brandt,
+  `cliente_ve01..24` Vareth y los dos en el bestiario, `vd30` y `ve30`). Al acabar el tramo los puestos del reino quedan
+  por caidos (las pruebas de despues, el Rey y Ser Gavran, son de antes).
+
 ### Lo siguiente: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 
 Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publicada):
@@ -946,8 +992,8 @@ Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publica
 - **3c, enemigos**: hecha (arriba).
 - **3d-1, la cinematica de inicio**: hecha (arriba).
 - **3d-2, el barco**: hecha (arriba). Con esto la parte 3 esta entera; lo siguiente es la **parte 4** de `PLAN.md`
-  (Valdrenn dificil: 4a la guardia, 4b perros y espectros y 4c capitanes de elite, emboscadas y la torre del arbol por
-  dentro, hechas arriba; 4d los dos guardianes, por hacer).
+  (Valdrenn dificil: 4a la guardia, 4b perros y espectros, 4c capitanes de elite, emboscadas y la torre del arbol por
+  dentro, y 4d los dos guardianes, hechas arriba). Despues, la **parte 5** de `PLAN.md`.
 
 ## Compilar, probar y publicar
 
