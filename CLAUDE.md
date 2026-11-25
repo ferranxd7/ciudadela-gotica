@@ -545,7 +545,9 @@ empezarla). Lo esencial, que cambia reglas de arriba:
 - **Generador** `darkcraft:nubes` (`world/NubesGenerador`, registrado en `world/MundoNubes`): sin suelo; un mar de nubes del
   bloque `darkcraft:nube` (translucido, sin choque ni recuadro al mirarlo, la luz del cielo pasa, sin caras entre nube y
   nube) en bollos de ruido fijo (no depende de la semilla): lo alto entre 235 y 261 (media 248), 14-21 de grueso; por debajo,
-  el vacio. Sustituye al preset `minecraft:normal` (`data/minecraft/worldgen/world_preset/normal.json`: solo el
+  el vacio. La nube lleva la propiedad `tono` (0-3, `NubeBlock.tono`: lo honda que esta bajo lo alto de su columna; cuatro
+  texturas, de casi blanca a gris lila) y su modelo va sin sombreado por caras ni oclusion: el volumen lo dan los tonos
+  (con el sombreado de los cubos parecia piedra gris a terrazas). Sustituye al preset `minecraft:normal` (`data/minecraft/worldgen/world_preset/normal.json`: solo el
   overworld, sin Nether ni End; vale igual en servidor dedicado, `level-type` por defecto) con el bioma fijo
   `darkcraft:nubes` (sin lluvia ni bichos). El bioma va en `#darkcraft:has_structure/valdrenn` (la estructura de
   Valdrenn y la de la fortaleza) y en `#darkcraft:islas` (el `CastleFeature`, por `add_valdrenn`); **no** en
@@ -567,6 +569,8 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   fantasmas. De momento: la isla del pueblo y el barco (3b-3d) cambian esto. **El vacio**: 10 bloques por debajo del fondo
   de la nube se muere en el acto (dano de caer del mundo: la espada de luz va al ultimo suelo firme; los jefes vuelven a
   su sitio); creativo y espectador no. Con la camara dentro de una nube, niebla blanca cerrada (`client/ClientNubes`).
+  Las nubes de Minecraft van a Y 640 (`ClientNubes.Efectos`, los efectos `darkcraft:nubes` del tipo de dimension del
+  overworld): a 192 quedaban escondidas bajo el mar de nubes.
 - `/darkcraft fortaleza escalera` lleva a la plazoleta. Texturas: `tools/mundo/nubes.py`. Prueba del servidor: generador,
   aparicion y muestras del camino (`informe.txt`); prueba del cliente: el escaparate sube a Y 320 (por encima de las
   nubes) y el tramo `nubes()` (capturas `cliente_n01..n05`: la torre desde el camino, la torre y Valdrenn, el camino,

@@ -1,5 +1,16 @@
 {
   "variants": {
-    "": { "model": "darkcraft:block/nube" }
+    "tono=0": {
+      "model": "darkcraft:block/nube"
+    },
+    "tono=1": {
+      "model": "darkcraft:block/nube_1"
+    },
+    "tono=2": {
+      "model": "darkcraft:block/nube_2"
+    },
+    "tono=3": {
+      "model": "darkcraft:block/nube_3"
+    }
   }
 }

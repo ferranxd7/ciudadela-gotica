@@ -293,7 +293,8 @@ public final class CaminoNubes {
         boolean faroles = false;
         for (int[] f : r.faroles()) if (f[0] >= x0 && f[0] <= x0 + 15 && f[1] >= z0 && f[1] <= z0 + 15) faroles = true;
         if (tramos.isEmpty() && plazas.isEmpty() && !faroles) return;
-        BlockState firme = DarkCraftMod.NUBE_FIRME.get().defaultBlockState(), nube = DarkCraftMod.NUBE.get().defaultBlockState();
+        BlockState firme = DarkCraftMod.NUBE_FIRME.get().defaultBlockState();
+        BlockState[] nube = NubesGenerador.nubes();
         BlockState aire = Blocks.AIR.defaultBlockState();
         BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
         for (int dx = 0; dx < 16; dx++)
@@ -309,13 +310,19 @@ public final class CaminoNubes {
                 // se despeja la nube de encima (y a los lados tambien la de la altura del camino: asi asoma un bloque)
                 for (int y = camino ? Y + 1 : Y; y <= Math.max(arriba, Y + 4); y++)
                     if (c.getBlockState(m.set(x, y, z)).is(DarkCraftMod.NUBE.get())) c.setBlockState(m, aire, false);
-                if (!camino) continue;
+                if (!camino) {
+                    // lo que queda arriba en la zanja vuelve a ser "lo alto" de su columna (el tono claro)
+                    if (arriba >= Y)
+                        for (int y = Y - 1; y >= Y - 6; y--)
+                            if (c.getBlockState(m.set(x, y, z)).is(DarkCraftMod.NUBE.get())) c.setBlockState(m, nube[NubeBlock.tono(Y - 1 - y)], false);
+                    continue;
+                }
                 BlockState ahora = c.getBlockState(m.set(x, Y, z));
                 if (ahora.isAir() || ahora.is(DarkCraftMod.NUBE.get())) c.setBlockState(m, firme, false);
                 // el banco de nube bajo el camino, si el mar de nubes queda mas abajo
                 for (int y = Y - 1; y > arriba; y--) {
                     if (!c.getBlockState(m.set(x, y, z)).isAir()) break;
-                    c.setBlockState(m, nube, false);
+                    c.setBlockState(m, nube[NubeBlock.tono(Y - y)], false);
                 }
             }
         BlockState hueso = Blocks.BONE_BLOCK.defaultBlockState().setValue(RotatedPillarBlock.AXIS, Direction.Axis.Y);

@@ -64,6 +64,13 @@ public class NubesGenerador extends ChunkGenerator {
         return cima(x, z) - 14 - Math.min(7, (int) Math.round(Math.abs(v)));
     }
 
+    /** La nube en sus cuatro tonos (0 = lo alto de la columna). */
+    public static BlockState[] nubes() {
+        BlockState[] n = new BlockState[4];
+        for (int t = 0; t < 4; t++) n[t] = DarkCraftMod.NUBE.get().defaultBlockState().setValue(NubeBlock.TONO, t);
+        return n;
+    }
+
     /** Si el nivel es un mundo de nubes. */
     public static boolean es(net.minecraft.world.level.Level l) {
         return l instanceof net.minecraft.server.level.ServerLevel sl && sl.getChunkSource().getGenerator() instanceof NubesGenerador;
@@ -100,15 +107,15 @@ public class NubesGenerador extends ChunkGenerator {
 
     @Override
     public CompletableFuture<ChunkAccess> fillFromNoise(Executor e, Blender b, RandomState rs, StructureManager sm, ChunkAccess c) {
-        BlockState nube = DarkCraftMod.NUBE.get().defaultBlockState();
+        BlockState[] nube = nubes();
         BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
         int x0 = c.getPos().getMinBlockX(), z0 = c.getPos().getMinBlockZ();
         for (int dx = 0; dx < 16; dx++)
             for (int dz = 0; dz < 16; dz++) {
                 int x = x0 + dx, z = z0 + dz;
                 int arriba = cima(x, z), abajo = fondo(x, z);
-                // (el ProtoChunk apunta solo las alturas de los mapas de la generacion)
-                for (int y = abajo; y <= arriba; y++) c.setBlockState(m.set(x, y, z), nube, false);
+                // cada bloque con el tono de lo hondo que esta (el ProtoChunk apunta solo las alturas de la generacion)
+                for (int y = abajo; y <= arriba; y++) c.setBlockState(m.set(x, y, z), nube[NubeBlock.tono(arriba - y)], false);
             }
         return CompletableFuture.completedFuture(c);
     }
