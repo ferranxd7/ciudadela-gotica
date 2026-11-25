@@ -3642,6 +3642,8 @@ public final class ClientCiTest {
         atTicks(C + 230, "el farol", m -> server(m, sp -> {
             var e = enemigoB(CAP);
             if (e != null) {
+                // los dos bien dentro de la explanada del penon (en el borde, bajo el centro del jugador no hay suelo)
+                e.moveTo(73.5, 276, -74.5, 90f, 0f);
                 sp.teleportTo(sp.serverLevel(), e.getX() - 5.5, e.getY(), e.getZ() + 0.5, -90f, 0f);
                 e.setTarget(sp);
                 e.empezar(com.darkcraft.enemigos.CapitanAnims.FAROL);
@@ -3656,8 +3658,11 @@ public final class ClientCiTest {
             logEnemigo(m, "el Capitan, farol", CAP);
             shot(m, "cliente_en19_capitan_farol");
         });
-        atTicks(C + 270, "captura: la llama", m -> {
+        atTicks(C + 269, "captura: la llama", m -> {
             logEnemigo(m, "el Capitan, la llama", CAP);
+            server(m, sp -> {
+                if (enemigoB(CAP) instanceof com.darkcraft.enemigos.Capitan c) log("  enemigos: llamas marcadas o encendidas " + c.llamasPuestas());
+            });
             shot(m, "cliente_en20_capitan_llama");
         });
         atTicks(C + 300, "a media vida llama a su tripulacion", m -> server(m, sp -> {

@@ -670,7 +670,8 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   del faro; no hay sala cerrada: la pelea empieza cuando ve a alguien en lo alto del penon y, si todos caen o se van
   (110 ticks sin presa), vuelve con la vida entera. Tajo de arriba abajo que sostiene un instante, dos tajos anchos
   avanzando, estocada a fondo; **el farol de animas** (marca bajo los pies de cada uno y a los 17 ticks sale la llama;
-  a media vida, tres tandas) y, a media vida, **llama a su tripulacion** (2 ahogados, +1 por jugador de mas hasta 4:
+  a media vida, tres tandas; la marca va a los pies del jugador si pisa, aunque este en un borde sin suelo bajo su
+  centro: en build-96 ahi no salia) y, a media vida, **llama a su tripulacion** (2 ahogados, +1 por jugador de mas hasta 4:
   `efimero`, se deshacen al acabar). Barra propia (`client/enemigos/CapitanCliente`, arte de
   `tools/hud/barra_capitan.py`: liston de cubierta con cabos, su farol en el centro, relleno de bruma verdemar, gotas),
   musica "Blackmoor Tides" de Matthew Pablo (CC-BY 3.0, id `capitan`, tema 21 de `ClientMusic.boss`; del zip se

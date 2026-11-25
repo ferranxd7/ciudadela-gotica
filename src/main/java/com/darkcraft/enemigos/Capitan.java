@@ -74,6 +74,12 @@ public class Capitan extends Enemigo {
     private record Llama(double x, double y, double z, int cuando) {}
 
     private final List<Llama> llamas = new ArrayList<>();
+    /** Cuantas marcas ha puesto en el suelo desde que existe (para las pruebas). */
+    private int llamasPuestas;
+
+    public int llamasPuestas() {
+        return llamasPuestas;
+    }
 
     public Capitan(EntityType<? extends Capitan> t, Level l) {
         super(t, l);
@@ -248,11 +254,27 @@ public class Capitan extends Enemigo {
         int mecha = segundaMitad() ? MECHA_2 : MECHA;
         for (ServerPlayer p : sl.players()) {
             if (!p.isAlive() || p.isSpectator() || p.isCreative() || p.distanceToSqr(this) > 22 * 22) continue;
-            Vec3 s = suelo(sl, p.position());
+            Vec3 s = suelo(sl, p);
             if (s == null) continue;
             llamas.add(new Llama(s.x, s.y, s.z, tickCount + mecha));
+            llamasPuestas++;
             sl.playSound(null, s.x, s.y, s.z, net.minecraft.sounds.SoundEvents.SOUL_ESCAPE, SoundSource.HOSTILE, 1.4f, 0.7f);
         }
+    }
+
+    /**
+     * Donde se enciende el suelo bajo un jugador: sus pies si pisa (aunque asome medio cuerpo por un borde y bajo su centro
+     * no haya nada), y si va por el aire el suelo que tenga debajo o justo al lado; null si cae al vacio.
+     */
+    private static Vec3 suelo(ServerLevel sl, Player p) {
+        if (p.onGround()) return p.position();
+        Vec3 s = suelo(sl, p.position());
+        if (s != null) return s;
+        for (int[] d : new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}) {
+            s = suelo(sl, p.position().add(d[0] * 0.6, 0, d[1] * 0.6));
+            if (s != null) return new Vec3(p.getX(), s.y, p.getZ());
+        }
+        return null;
     }
 
     /** El suelo firme bajo un punto (hasta cuatro bloques mas abajo), o null. */
