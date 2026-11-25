@@ -701,7 +701,9 @@ public final class Pueblo {
                             p.teleportTo(p.serverLevel(), q.x() - 9.5, q.y() + 0.1, q.z() + 0.5, -90f, 0f);
                         }))
                         .then(Commands.literal("vencer").executes(c -> con(c, p -> PuebloEnemigos.capitan(p.serverLevel(), true))))
-                        .then(Commands.literal("volver").executes(c -> con(c, p -> PuebloEnemigos.capitan(p.serverLevel(), false)))));
+                        .then(Commands.literal("volver").executes(c -> con(c, p -> PuebloEnemigos.capitan(p.serverLevel(), false)))))
+                // la cinematica de inicio otra vez, donde se este (la Sombra, la caida y el despertar)
+                .then(Commands.literal("inicio").executes(c -> con(c, com.darkcraft.cine.Intro::empezar)));
     }
 
     /** Cuantos enemigos quedan en la isla y cuantos hay ahora mismo fuera (para los comandos y las pruebas). */

@@ -11,9 +11,12 @@ Monta los audios de ElevenLabs (ci/eleven/master) para el juego:
   debajo y madera crujiendo (como el fuego del Rey).
 - Voz del Capitan de Brumavela (voz "Matthew Schmitz - Old Pirate Captain"): mas grave, con una segunda voz sorda por
   debajo (un ahogado) y eco corto.
+- Voz de la Sombra (voz "Grav - Deep, Dark & Sinister"): grave y de cerca, con susurros por debajo que repiten sus
+  palabras (otra toma de la misma frase susurrada: uno a cada lado y otro mas tarde) y un eco de vacio largo y oscuro.
+  Es la unica en estereo (suena sin sitio, en las cinematicas).
 Sale todo en src/main/resources/assets/darkcraft/sounds/ (rey/voz_N.ogg, gavran/voz_N.ogg, sfx/NOMBRE_K.ogg) y las
-duraciones de las frases en assets/darkcraft/rey_voces.json ("duraciones" del Rey, "gavran" y "capitan"; "habla",
-"habla_gavran" y "habla_capitan" = el segundo en que acaba de hablar de verdad, sin el silencio ni la cola del eco: con eso cuenta el
+duraciones de las frases en assets/darkcraft/rey_voces.json ("duraciones" del Rey, "gavran", "capitan" y "sombra"; "habla",
+"habla_gavran", "habla_capitan" y "habla_sombra" = el segundo en que acaba de hablar de verdad, sin el silencio ni la cola del eco: con eso cuenta el
 juego para que la siguiente frase o la pelea no tarden en llegar). A las voces se les quita el silencio del principio.
 Necesita ffmpeg.
 """
@@ -22,6 +25,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(AQUI, "..", ".."))
@@ -60,6 +64,13 @@ VOZ_MERCADER = ("highpass=f=75,equalizer=f=3000:t=q:w=1.2:g=1.5,aecho=0.8:0.25:2
 # el Capitan de Brumavela (voz "Matthew Schmitz - Old Pirate Captain"): un ahogado. La misma voz algo mas grave, con una
 # segunda voz sorda y temblona por debajo (como oida bajo el agua) y el eco corto del penon del faro
 TOMAS_CAPITAN = {n: "a" for n in range(1, 6)}
+# la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
+# la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
+# Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
+TOMAS_SOMBRA = {1: "b", 2: "b", 3: "a", 4: "a", 5: "b", 6: "b", 7: "a", 8: "a", 9: "a"}
+SUSURROS_SOMBRA = {1: "b", 2: "b", 3: "b", 4: "a", 5: "b", 6: "a", 7: "a", 8: "a", 9: "a"}
+# lo que resuena el eco de vacio tras la ultima palabra (s)
+COLA_SOMBRA = 3.4
 # los personajes con dialogo: id -> (tomas, filtro)
 PERSONAJES = {"guia": (TOMAS_GUIA, VOZ_GUIA), "herrero": (TOMAS_HERRERO, VOZ_HERRERO), "mercader": (TOMAS_MERCADER, VOZ_MERCADER)}
 
@@ -123,9 +134,17 @@ SFX = {
     # el Capitan: alza el farol, la llama que sale del suelo, llama a su tripulacion, dolor y muerte; y la reja del faro
     "capitan_farol": (2.0, 0.6, -15), "capitan_llama": (1.8, 0.6, -14), "capitan_llamar": (4.0, 1.0, -14),
     "capitan_dolor": (1.2, 0.3, -16), "capitan_muerte": (3.0, 0.6, -14), "faro_sello": (3.0, 0.8, -15),
+    # la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra (en bucle), el viento de la caida, la Sombra
+    # que te atrapa (crece y da el golpe a los ~1,3 s), la marca que arde y los dos latidos antes de abrir los ojos
+    "intro_abismo": (30.0, 4.0, -25), "intro_caida": (10.5, 1.2, -16), "intro_atrapa": (3.6, 0.9, -12),
+    "intro_marca": (5.5, 2.0, -17), "intro_latido": (4.2, 0.8, -14),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
-ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5}
+ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5}
+# casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
+GRAVES = {"intro_atrapa", "intro_latido"}
+# un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
+EXTRA = {"intro_marca": "highshelf=f=2500:g=8,"}
 # de estos se bajaron 4 tomas (NOMBRE_1..4.mp3): las elegidas salen como NOMBRE_1.ogg, NOMBRE_2.ogg...
 TOMAS_SFX = {
     "espejo_despierta": (3,),   # empieza grave y se aclara (el zumbido que sube y la campanilla)
@@ -199,6 +218,9 @@ TOMAS_SFX = {
     # el Capitan: las tomas mas llenas (la 2 de la reja casi no suena)
     "capitan_farol": (2, 4), "capitan_llama": (4, 3), "capitan_llamar": (4, 1), "capitan_dolor": (2, 4, 1),
     "capitan_muerte": (3, 4), "faro_sello": (3, 1),
+    # la cinematica de inicio: el zumbido mas parejo, el viento que sopla igual los doce segundos, la que crece dos
+    # segundos y da el golpe, la marca con mas cuerpo y los dos latidos separados dos segundos largos
+    "intro_abismo": (3,), "intro_caida": (2,), "intro_atrapa": (2,), "intro_marca": (1,), "intro_latido": (4,),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -315,11 +337,73 @@ def voz_capitan(src, dst):
     return hablado + COLA
 
 
-def efecto(src, dst, maxs, fade, lufs, entrada=0.0):
+def sonoridad(f):
+    """(LUFS integrado, pico real en dBFS) de un audio."""
+    r = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", f, "-af", "ebur128=peak=true", "-f", "null", "-"],
+                       capture_output=True, text=True)
+    cola = r.stderr[r.stderr.rfind("Summary:"):]
+    i = float(re.search(r"I:\s+(-?[0-9.]+) LUFS", cola).group(1))
+    p = float(re.search(r"Peak:\s+(-?[0-9.]+) dBFS", cola).group(1))
+    return i, p
+
+
+def voz_sombra(src, sus, dst, lufs=-15.0):
+    """La Sombra: grave y de cerca; por debajo, la misma frase susurrada tres veces (a la izquierda a los 0,4 s, a la
+    derecha y mas aguda a los 0,9 s, y en medio, mas grave, a los 1,65 s), tres ecos cada vez mas sordos y un eco de
+    vacio largo (ruido que se apaga en 5,5 s, distinto a cada lado). En estereo. Devuelve el segundo en que acaba de hablar."""
+    pre, _, hablado = recorte(src)
+    pre_s, _, _ = recorte(sus)
+    with tempfile.TemporaryDirectory() as tmp:
+        seco, mojado, mezcla = (os.path.join(tmp, n + ".wav") for n in ("seco", "mojado", "mezcla"))
+        grafo = (
+            "[0:a]" + pre + "aresample=44100,asetrate=44100*0.95,aresample=44100,atempo=1.0526,highpass=f=40,"
+            "equalizer=f=80:t=q:w=1.0:g=2,equalizer=f=320:t=q:w=1.2:g=-2,equalizer=f=2400:t=q:w=0.8:g=6,highshelf=f=6000:g=3,"
+            "acompressor=threshold=-24dB:ratio=3.5:attack=5:release=160:makeup=3,"
+            f"apad=pad_dur={COLA_SOMBRA},asplit=4[v][va][vb][vc];"
+            "[1:a]" + pre_s + "aresample=44100,highpass=f=700,equalizer=f=3000:t=q:w=1.0:g=4,"
+            "acompressor=threshold=-30dB:ratio=4:attack=3:release=120:makeup=4,asplit=3[s1][s2][s3];"
+            "[s1]adelay=420:all=1,volume=0.55,pan=stereo|c0=c0|c1=0.2*c0[w1];"
+            "[s2]asetrate=44100*1.06,aresample=44100,atempo=0.9434,adelay=930:all=1,volume=0.44,pan=stereo|c0=0.2*c0|c1=c0[w2];"
+            "[s3]asetrate=44100*0.92,aresample=44100,atempo=1.087,lowpass=f=3800,adelay=1650:all=1,volume=0.31,"
+            "pan=stereo|c0=0.75*c0|c1=0.75*c0[w3];"
+            "[va]adelay=560:all=1,lowpass=f=2000,volume=0.36,pan=stereo|c0=c0|c1=0.5*c0[e1];"
+            "[vb]adelay=1180:all=1,lowpass=f=1500,volume=0.24,pan=stereo|c0=0.5*c0|c1=c0[e2];"
+            "[vc]adelay=1900:all=1,lowpass=f=1100,volume=0.15,pan=stereo|c0=c0|c1=c0[e3];"
+            "[v]pan=stereo|c0=c0|c1=c0[d];"
+            "[d][w1][w2][w3][e1][e2][e3]amix=inputs=7:normalize=0:duration=first[seco]"
+        )
+        ff(["-i", src, "-i", sus, "-filter_complex", grafo, "-map", "[seco]", "-ar", "44100", "-ac", "2", "-c:a", "pcm_s24le", seco])
+        vacio = (
+            "anoisesrc=d=5.5:c=white:r=44100:a=0.5:seed=4217,lowpass=f=2300,highpass=f=140,afade=t=out:st=0:d=5.5:curve=exp[irl];"
+            "anoisesrc=d=5.5:c=white:r=44100:a=0.5:seed=9133,lowpass=f=2300,highpass=f=140,afade=t=out:st=0:d=5.5:curve=exp[irr];"
+            "[irl][irr]join=inputs=2:channel_layout=stereo[ir];"
+            "[0:a]adelay=70:all=1[ida];[ida][ir]afir=dry=1:wet=1:gtype=peak[eco]"
+        )
+        ff(["-i", seco, "-filter_complex", vacio, "-map", "[eco]", "-ar", "44100", "-ac", "2", "-c:a", "pcm_f32le", mojado])
+        # el eco de vacio, 9,5 LU por debajo de lo seco; y el conjunto, al volumen de las demas voces
+        i_s, _ = sonoridad(seco)
+        i_m, _ = sonoridad(mojado)
+        d = duracion(seco)
+        ff(["-i", seco, "-i", mojado, "-filter_complex",
+            f"[1:a]volume={(i_s - 9.5) - i_m:.2f}dB[m];[0:a][m]amix=inputs=2:normalize=0:duration=first,"
+            f"afade=t=out:st={d - 0.9:.2f}:d=0.9[out]", "-map", "[out]", "-ar", "44100", "-ac", "2", "-c:a", "pcm_s24le", mezcla])
+        i, _ = sonoridad(mezcla)
+        ff(["-i", mezcla, "-af", f"volume={lufs - i:.2f}dB,alimiter=level_in=1:level_out=1:limit=0.84:attack=4:release=60:level=false",
+            "-ar", "44100", "-ac", "2", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA
+
+
+def efecto(src, dst, maxs, fade, lufs, entrada=0.0, graves=False, extra=""):
     filtro = (f"silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.02,atrim=0:{maxs},"
               + (f"afade=t=in:st=0:d={entrada}," if entrada > 0 else "")
-              + f"afade=t=out:st={max(0.05, maxs - fade):.2f}:d={fade},"
-              f"loudnorm=I={lufs}:TP=-1.0:LRA=11")
+              + f"afade=t=out:st={max(0.05, maxs - fade):.2f}:d={fade}," + extra
+              + f"loudnorm=I={lufs}:TP=-1.0:LRA=11")
+    if graves:
+        grafo = ("[0:a]aresample=44100,asplit=3[a][b][c];[b]asetrate=44100*2,aresample=44100,atempo=0.5,volume=0.9[o1];"
+                 "[c]asetrate=44100*3,aresample=44100,atempo=0.5,atempo=0.666667,volume=0.5[o2];"
+                 "[a][o1][o2]amix=inputs=3:normalize=0,asoftclip=type=tanh:threshold=0.8," + filtro + "[out]")
+        ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+        return
     ff(["-i", src, "-af", filtro, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
 
 
@@ -389,8 +473,29 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO capitan {n}: {e}")
+    # la Sombra
+    som = os.path.join(ASSETS, "sounds", "sombra")
+    os.makedirs(som, exist_ok=True)
+    dur_s, hab_s = {}, {}
+    for n, toma in sorted(TOMAS_SOMBRA.items()):
+        src = os.path.join(MASTER, "sombra", f"voz_{n}{toma}.mp3")
+        sus = os.path.join(MASTER, "sombra", f"susurro_{n}{SUSURROS_SOMBRA[n]}.mp3")
+        dst = os.path.join(som, f"voz_{n}.ogg")
+        if not os.path.exists(src) or not os.path.exists(sus):
+            print("falta", src if not os.path.exists(src) else sus)
+            fallos += 1
+            continue
+        try:
+            h = voz_sombra(src, sus, dst)
+            dur_s[n] = round(duracion(dst), 2)
+            hab_s[n] = round(min(h, dur_s[n]), 2)
+            print(f"sombra {n:2d}: {dur_s[n]} s (habla hasta {hab_s[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO sombra {n}: {e}")
     with open(os.path.join(ASSETS, "rey_voces.json"), "w") as fh:
-        json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g, "capitan": dur_c, "habla_capitan": hab_c}, fh)
+        json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g, "capitan": dur_c, "habla_capitan": hab_c,
+                   "sombra": dur_s, "habla_sombra": hab_s}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}
@@ -425,7 +530,7 @@ def main():
                 continue
             dst = os.path.join(sfx, f"{nombre}_{i}.ogg")
             try:
-                efecto(src, dst, maxs, fade, lufs, ENTRADA.get(nombre, 0.0))
+                efecto(src, dst, maxs, fade, lufs, ENTRADA.get(nombre, 0.0), nombre in GRAVES, EXTRA.get(nombre, ""))
                 print(f"efecto {nombre}_{i} (toma {k}): {duracion(dst):.2f} s")
             except Exception as e:  # noqa: BLE001
                 fallos += 1

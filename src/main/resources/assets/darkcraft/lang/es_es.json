@@ -1310,5 +1310,21 @@
   "advancements.darkcraft.capitan.title": "El último capitán",
   "advancements.darkcraft.capitan.description": "Derrota al Capitán de Brumavela",
   "darkcraft.diario.hueco": "Las casas no están vacías. La gente sigue aquí, pero ya no hay nadie detrás de sus ojos. Tuve que defenderme.",
-  "darkcraft.diario.capitan": "El Capitán guardaba la puerta de su faro. Al caer dijo que me lo llevara, y que me los llevara con él. La reja se abrió sola."
+  "darkcraft.diario.capitan": "El Capitán guardaba la puerta de su faro. Al caer dijo que me lo llevara, y que me los llevara con él. La reja se abrió sola.",
+  "darkcraft.sombra.voz.1": "Estabas muerto.",
+  "darkcraft.sombra.voz.2": "Sin nombre... Sin tumba... Solo la oscuridad.",
+  "darkcraft.sombra.voz.3": "Pero metí la mano... y te arrojé de vuelta.",
+  "darkcraft.sombra.voz.4": "Ahora llevas mi marca. La muerte no se quedará contigo... no mientras yo te necesite.",
+  "darkcraft.sombra.voz.5": "Hay una puerta que yo no puedo abrir. Tú la abrirás por mí.",
+  "darkcraft.sombra.voz.6": "Ahora despierta... marcado.",
+  "darkcraft.sombra.voz.7": "Ahí está... Valdrenn. El reino que suplicó mi don.",
+  "darkcraft.sombra.voz.8": "Su rey y su caballero aún guardan sus juramentos... cadenas alrededor de mi garganta.",
+  "darkcraft.sombra.voz.9": "Rómpelas, marcado... y te mostraré la puerta.",
+  "subtitles.darkcraft.sombra.voz": "Habla la Sombra",
+  "subtitles.darkcraft.sfx.intro_abismo": "El vacío respira",
+  "subtitles.darkcraft.sfx.intro_caida": "El viento de la caída",
+  "subtitles.darkcraft.sfx.intro_atrapa": "Algo te atrapa",
+  "subtitles.darkcraft.sfx.intro_marca": "La marca arde",
+  "subtitles.darkcraft.sfx.intro_latido": "Un corazón vuelve a latir",
+  "darkcraft.ayuda.b_inicio": "volver a ver la cinemática de inicio (la Sombra, la caída y el despertar)"
 }

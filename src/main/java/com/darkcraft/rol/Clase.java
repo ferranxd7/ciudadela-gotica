@@ -214,7 +214,12 @@ public enum Clase {
     /** El cliente elige (Net.ElegirClase). */
     public static void pedir(ServerPlayer sp, String id) {
         boolean forzar = OTRA_VEZ.remove(sp.getUUID());
-        if (!elegir(sp, de(id), forzar)) DarkCraftMod.LOGGER.info("{} no puede elegir la clase {}", sp.getGameProfile().getName(), id);
+        if (!elegir(sp, de(id), forzar)) {
+            DarkCraftMod.LOGGER.info("{} no puede elegir la clase {}", sp.getGameProfile().getName(), id);
+            return;
+        }
+        // la primera vez (no al volver a elegir con el comando): la Sombra le habla y despierta en el muelle
+        if (!forzar) com.darkcraft.cine.Intro.empezar(sp);
     }
 
     // ------------------------------------------------------------------ comandos: /darkcraft rol clase ...

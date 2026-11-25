@@ -498,6 +498,29 @@ public final class CiTest {
                 log.println("Brumavela, enemigos: ERROR " + t);
                 DarkCraftMod.LOGGER.error("[CI] enemigos de Brumavela", t);
             }
+            // la cinematica de inicio (parte 3d): sobre donde se despierta no hay nada con lo que tropezar al caer, y los dos
+            // planos (la caida y el despertar) acaban donde tienen que acabar
+            try {
+                net.minecraft.core.BlockPos ap = com.darkcraft.world.MundoNubes.aparicion();
+                net.minecraft.world.phys.Vec3 pies = new net.minecraft.world.phys.Vec3(ap.getX() + 0.5, ap.getY(), ap.getZ() + 0.5);
+                int tapan = 0;
+                for (int y = ap.getY(); y <= lvl.getMaxBuildHeight() + 2; y++)
+                    if (!lvl.getBlockState(new net.minecraft.core.BlockPos(ap.getX(), y, ap.getZ())).isAir()) tapan++;
+                double dx = com.darkcraft.pueblo.gen.Barco.BX + 0.5 - pies.x, dz = com.darkcraft.pueblo.gen.Barco.PALO + 0.5 - pies.z;
+                float giro = (float) (Math.toDegrees(Math.atan2(dz, dx)) - 90.0);
+                java.util.List<com.darkcraft.cine.Shot> pl = com.darkcraft.cine.Intro.planos(pies, giro);
+                double[] arriba = pl.get(0).at(com.darkcraft.cine.Intro.CAIDA), abajo = pl.get(0).at(com.darkcraft.cine.Intro.ATRAPA);
+                double[] fin = pl.get(1).at(com.darkcraft.cine.Intro.FIN);
+                float[] mira = com.darkcraft.cine.Shot.angles(fin);
+                log.println(String.format(java.util.Locale.ROOT, "Inicio: sobre donde se despierta, bloques que tapan %d (tiene que ser 0); cae de Y %.0f a %.1f en %.1f s; "
+                                + "acaba en %.2f %.2f %.2f mirando giro %.0f cabeceo %.0f (el barco queda a giro %.0f); las frases de la Sombra duran %s",
+                        tapan, arriba[1], abajo[1], com.darkcraft.cine.Intro.ATRAPA - com.darkcraft.cine.Intro.CAIDA, fin[0], fin[1], fin[2], mira[0], mira[1], giro,
+                        java.util.stream.IntStream.rangeClosed(1, 9).mapToObj(fr -> String.format(java.util.Locale.ROOT, "%.1f", com.darkcraft.rey.Voces.sombra(fr)))
+                                .collect(java.util.stream.Collectors.joining(" "))));
+            } catch (Throwable t) {
+                log.println("Inicio: ERROR " + t);
+                DarkCraftMod.LOGGER.error("[CI] cinematica de inicio", t);
+            }
             log.println("Calibracion de muebles: " + (com.darkcraft.gen.Calib.done ? "hecha" : "NO"));
             log.println("Tiempo total: " + (System.currentTimeMillis() - t0) / 1000 + " s");
             log.println("OK");

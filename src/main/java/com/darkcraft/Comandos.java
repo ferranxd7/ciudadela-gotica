@@ -85,6 +85,7 @@ public final class Comandos {
         src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela estado", "/darkcraft brumavela estado / reiniciar", "b_estado")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela enemigos", "/darkcraft brumavela enemigos [volver | fuera]", "b_enemigos")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela capitan", "/darkcraft brumavela capitan [vencer | volver]", "b_capitan")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela inicio", "/darkcraft brumavela inicio", "b_inicio")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ecos ", "/darkcraft ecos / ecos dar <n> / ecos quitar", "ecos")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft rol ", "/darkcraft rol clase [<nombre> | elegir | olvidar | ninguna] / santuario / frascos [<n>] / nivel [reiniciar] / atributo <nombre> <valor> / talisman <nombre> [poner <hueco>] / fruto <nombre> [<n>] / hechizo <nombre>|memorizar|olvidar|baston|sello / guia [olvidar] / herrero [olvidar] / mercader [olvidar] / mejora <0-9> / piedras / ceniza <nombre> [poner] | quitar / resistencias", "rol")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ayuda", "/darkcraft ayuda", "ayuda")), false);

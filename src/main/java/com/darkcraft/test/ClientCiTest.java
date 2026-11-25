@@ -3769,6 +3769,67 @@ public final class ClientCiTest {
 
     // ------------------------------------------------------------------ guardar y salir: el titulo y las partidas (parte 2f-2)
 
+
+    /** Una captura de la cinematica de inicio a los {@code seg} segundos, con lo que esta pasando apuntado en el informe. */
+    private static void capturaIntro(int T, float seg, String nombre) {
+        atTicks(T + Math.round(seg * 20f), "captura: inicio a los " + seg + " s", m -> {
+            net.minecraft.world.entity.Entity cam = m.getCameraEntity();
+            log(String.format(java.util.Locale.ROOT, "  inicio a los %.1f s: cinematica %d activa=%s t=%.2f | frase de la Sombra %d, sonidos del guion %d | camara %s en %.1f %.1f %.1f | pantalla %s",
+                    seg, com.darkcraft.client.ClientCine.chapter(), com.darkcraft.client.ClientCine.active(), com.darkcraft.client.ClientCine.time(),
+                    com.darkcraft.client.Guion.ultimaFrase(), com.darkcraft.client.Guion.sonando(), cam == null ? "-" : cam.getClass().getSimpleName(),
+                    cam == null ? 0 : cam.getX(), cam == null ? 0 : cam.getY(), cam == null ? 0 : cam.getZ(), m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()));
+            shot(m, nombre);
+        });
+    }
+
+    /**
+     * La cinematica de inicio (parte 3d): la Sombra habla en lo negro, la caida sobre el muelle, la Sombra te atrapa, la
+     * marca que arde, se abren los ojos y el jugador se incorpora mirando al barco roto.
+     */
+    private static int intro(int t0) {
+        final int C = t0;
+        atTicks(C + 2, "Inicio: al muelle de Brumavela, por la manana y en modo aventura", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.removeAllEffects();
+                BlockPos ap = com.darkcraft.world.MundoNubes.aparicion();
+                sp.teleportTo(sp.serverLevel(), ap.getX() + 0.5, ap.getY(), ap.getZ() + 0.5, 180f, 0f);
+                comando(sp, "time set 1500");
+                comando(sp, "weather clear");
+            });
+        });
+        atTicks(C + 44, "empieza la cinematica de inicio", m -> server(m, sp -> {
+            com.darkcraft.cine.Intro.empezar(sp);
+            log("  inicio: empezada en " + fpos(sp) + " mirando giro " + Math.round(sp.getYRot()) + ", en cinematica=" + com.darkcraft.cine.Cinematics.active(sp));
+        }));
+        // (el cliente la empieza un par de ticks despues de pedirla)
+        int T = C + 47;
+        capturaIntro(T, 2.0f, "cliente_in01_estabas_muerto");
+        capturaIntro(T, 7.0f, "cliente_in02_solo_la_oscuridad");
+        capturaIntro(T, com.darkcraft.cine.Intro.CAIDA + 0.6f, "cliente_in03_te_arroja");
+        capturaIntro(T, 16.0f, "cliente_in04_caida");
+        capturaIntro(T, 19.6f, "cliente_in05_caida_isla");
+        capturaIntro(T, com.darkcraft.cine.Intro.ATRAPA - 0.5f, "cliente_in06_antes_de_atrapar");
+        capturaIntro(T, com.darkcraft.cine.Intro.MARCA + 0.25f, "cliente_in07_marca_entra");
+        capturaIntro(T, 25.5f, "cliente_in08_marca");
+        capturaIntro(T, 30.8f, "cliente_in09_despierta_marcado");
+        capturaIntro(T, com.darkcraft.cine.Intro.OJOS + 0.6f, "cliente_in10_parpadeo");
+        capturaIntro(T, com.darkcraft.cine.Intro.OJOS + 2.2f, "cliente_in11_ojos_abiertos");
+        capturaIntro(T, com.darkcraft.cine.Intro.OJOS + 4.2f, "cliente_in12_se_incorpora");
+        capturaIntro(T, com.darkcraft.cine.Intro.FIN - 0.3f, "cliente_in13_en_pie");
+        int fin = T + Math.round((com.darkcraft.cine.Intro.FIN + 2.0f) * 20f);
+        atTicks(fin, "captura: acabada, el jugador en el muelle", m -> {
+            log("  inicio acabada: cinematica activa=" + com.darkcraft.client.ClientCine.active() + ", sonidos del guion " + com.darkcraft.client.Guion.sonando()
+                    + ", camara " + (m.getCameraEntity() == m.player ? "el jugador" : "otra") + ", giro " + Math.round(m.player.getYRot()) + " cabeceo " + Math.round(m.player.getXRot()));
+            server(m, sp -> log("  inicio acabada (servidor): " + fpos(sp) + " modo " + sp.gameMode.getGameModeForPlayer() + ", en cinematica=" + com.darkcraft.cine.Cinematics.active(sp)));
+            shot(m, "cliente_in14_despierto");
+        });
+        atTicks(fin + 4, "fin del tramo: creativo otra vez", m -> server(m, sp -> sp.setGameMode(GameType.CREATIVE)));
+        return fin + 14;
+    }
     private static void logTitulo(Minecraft m, String what) {
         String r;
         if (m.screen instanceof com.darkcraft.client.ui.TituloScreen ti) r = ti.resumen();
@@ -4027,6 +4088,7 @@ public final class ClientCiTest {
         fin = nubes(fin);
         fin = pueblo(fin);
         fin = enemigos(fin);
+        fin = intro(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

@@ -31,12 +31,15 @@ public final class Voces {
     private static final float[] GAVRAN = {0, 6.63f, 7.26f, 5.9f, 4.67f, 1.34f, 1.02f, 4.46f, 2.98f, 3.29f, 2.66f, 4.85f, 2.21f,
             3.04f, 4.7f, 4.92f, 3.27f, 4.36f, 6.44f};
     private static final float[] CAPITAN = {0, 7.15f, 3.74f, 2.7f, 2.95f, 4.06f};
+    // la Sombra en las cinematicas (1..6 la de inicio, 7..9 el viaje a Valdrenn)
+    private static final float[] SOMBRA = {0, 2.26f, 4.23f, 3.56f, 6.57f, 5.44f, 3.17f, 6.06f, 5.98f, 4.63f};
 
     static {
         try (InputStream in = Voces.class.getResourceAsStream("/assets/darkcraft/rey_voces.json")) {
             if (in != null) {
                 JsonObject o = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
                 leer(o, "habla_capitan", CAPITAN);
+                leer(o, "habla_sombra", SOMBRA);
                 if (o.has("habla")) {
                     leer(o, "habla", REY);
                     leer(o, "habla_gavran", GAVRAN);
@@ -86,6 +89,11 @@ public final class Voces {
             return n > 0 && n < GAVRAN.length ? GAVRAN[n] : 4f;
         }
         return linea > 0 && linea < REY.length ? REY[linea] : 4f;
+    }
+
+    /** Segundos que tarda la Sombra en decir su frase n (1..9) de las cinematicas. */
+    public static float sombra(int n) {
+        return n > 0 && n < SOMBRA.length ? SOMBRA[n] : 4f;
     }
 
     public static int ticks(int linea) {

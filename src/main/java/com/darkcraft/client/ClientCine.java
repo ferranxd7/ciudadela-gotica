@@ -55,6 +55,8 @@ public final class ClientCine {
     private static final ResourceLocation OVERLAY = new ResourceLocation(DarkCraftMod.MODID, "cinematica");
     private static final ResourceLocation VIGNETTE = new ResourceLocation(DarkCraftMod.MODID, "textures/gui/vinieta.png");
     private static final int SKIP_TICKS = 24;
+    /** Desde este numero, las cinematicas con guion ({@link Guion}): la de inicio, la reparacion del barco, los viajes. */
+    private static final int GUION = 38;
 
     private static boolean active;
     private static int chapter, ticks, skipHold, camShot = -1, boltId = -2_000_000;
@@ -136,6 +138,12 @@ public final class ClientCine {
         narr = null;
         lockYaw = mc.player.getYRot();
         lockPitch = mc.player.getXRot();
+        if (chapter >= GUION) {
+            // las cinematicas con guion: lo que llega en "bolts" son sus datos, no rayos
+            Guion.empezar(chapter, bolts, shots);
+            bolts = new double[0];
+            boltDone = new boolean[0];
+        }
         savedCam = mc.options.getCameraType();
         mc.options.setCameraType(CameraType.FIRST_PERSON);
         mc.getMusicManager().stopPlaying();
@@ -150,6 +158,7 @@ public final class ClientCine {
         active = false;
         if (narr != null) mc.getSoundManager().stop(narr);
         narr = null;
+        Guion.acabar();
         if (camOn && mc.player != null) mc.setCameraEntity(mc.player);
         camOn = false;
         cam = null;
@@ -184,6 +193,7 @@ public final class ClientCine {
                 return;
             }
         } else skipHold = Math.max(0, skipHold - 2);
+        if (chapter >= GUION) Guion.tick(mc, chapter, t);
         // el rayo del titulo, delante del jugador
         if (chapter >= 30) titleBolt = true;
         if (!titleBolt && t >= Timeline.BOLT) {
@@ -223,7 +233,8 @@ public final class ClientCine {
         }
         // camara de cine
         if (!shots.isEmpty()) updateCamera(mc, t);
-        verMejor(mc, camOn);
+        // (en las de guion no se toca el brillo: la de inicio acaba en los ojos del jugador y se notaria el salto)
+        verMejor(mc, camOn && chapter < GUION);
         if (camOn) mc.options.setCameraType(CameraType.FIRST_PERSON);
         else {
             mc.player.setYRot(lockYaw);
@@ -383,11 +394,11 @@ public final class ClientCine {
             float[] ang = Shot.angles(a);
             e.setYaw(ang[0]);
             e.setPitch(ang[1]);
-            roll = s.roll;
+            roll = s.roll + (chapter >= GUION ? Guion.ladeo(chapter, t) : 0);
         } else if (!camOn) {
             e.setYaw(lockYaw);
             e.setPitch(lockPitch);
-            roll = -1.5f * smooth(t / 3f) * (1 - smooth((t - (total - 1.2f)) / 1.2f));
+            if (chapter < GUION) roll = -1.5f * smooth(t / 3f) * (1 - smooth((t - (total - 1.2f)) / 1.2f));
         }
         float k = shakeK * (float) Math.exp(-Math.max(0, t - shakeT) * 5.0) * (t >= shakeT ? 1 : 0);
         if (chapter == 34) k = Math.max(k, temblorArbol(t));
@@ -403,8 +414,10 @@ public final class ClientCine {
     public static void onFov(ViewportEvent.ComputeFov e) {
         if (!active || !e.usedConfiguredFov()) return;
         float t = time((float) e.getPartialTick());
-        if (camOn && camShot >= 0 && camShot < shots.size()) e.setFOV(shots.get(camShot).fov);
-        else if (!Timeline.narrated(chapter)) e.setFOV(e.getFOV() * (1.0 - 0.12 * smooth(t / total)));
+        if (camOn && camShot >= 0 && camShot < shots.size()) {
+            double f = shots.get(camShot).fov;
+            e.setFOV(chapter >= GUION ? Guion.fov(chapter, t, f, e.getFOV()) : f);
+        } else if (!Timeline.narrated(chapter) && chapter < GUION) e.setFOV(e.getFOV() * (1.0 - 0.12 * smooth(t / total)));
     }
 
     // ------------------------------------------------------------------ dibujo
@@ -440,6 +453,21 @@ public final class ClientCine {
         boolean ch1 = Timeline.narrated(chapter);
         float in = smooth(t / 0.8f), out = 1 - smooth((t - (total - 0.8f)) / 0.8f);
         float frame = Math.min(in, out);
+        if (chapter >= GUION) {
+            // las de guion: sin oscurecer la imagen; las rayas y los parpados van bajo el negro, y sobre el las brasas,
+            // la marca, el marco y los subtitulos de la Sombra
+            vignette(g, w, h, 0.55f * frame);
+            Guion.bajoNegro(g, w, h, chapter, t);
+            float negro = black(t);
+            if (visible(negro)) g.fill(0, 0, w, h, argb(negro, 0, 0, 0));
+            if (Guion.brasas(chapter, t)) embers(g, w, h, t, 0.8f * Math.min(smooth((t - 0.6f) / 1.0f), out));
+            Guion.sobreNegro(g, w, h, chapter, t);
+            int alto = Math.round(h * 0.12f * easeOut(t / 0.9f) * out);
+            com.darkcraft.client.ui.Marco.bandas(g, w, h, alto);
+            Guion.subtitulos(g, font, w, h, t, alto);
+            skipHint(g, font, w, h, t, alto);
+            return;
+        }
         // mundo mas oscuro y vineta
         // (en las de Ser Gavran, menos: armadura negra en una sala oscura)
         if (!ch1) g.fill(0, 0, w, h, argb((chapter >= 33 && chapter <= 37 ? 0.1f : 0.32f) * frame, 8, 0, 0));
@@ -626,6 +654,7 @@ public final class ClientCine {
     }
 
     private static float black(float t) {
+        if (chapter >= GUION) return Guion.negro(chapter, t, total);
         if (chapter >= 30 && !shots.isEmpty()) {
             float a = 0;
             for (int i = 1; i < shots.size(); i++) {

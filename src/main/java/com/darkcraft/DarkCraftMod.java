@@ -199,6 +199,13 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_CAPITAN_MUERTE = sound("sfx.capitan_muerte");
     public static final RegistryObject<SoundEvent> SFX_FARO_SELLO = sound("sfx.faro_sello");
     public static final RegistryObject<SoundEvent> MUSICA_CAPITAN = sound("musica.capitan");
+    // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
+    // que arde y los latidos antes de abrir los ojos
+    public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
+    public static final RegistryObject<SoundEvent> SFX_INTRO_CAIDA = sound("sfx.intro_caida");
+    public static final RegistryObject<SoundEvent> SFX_INTRO_ATRAPA = sound("sfx.intro_atrapa");
+    public static final RegistryObject<SoundEvent> SFX_INTRO_MARCA = sound("sfx.intro_marca");
+    public static final RegistryObject<SoundEvent> SFX_INTRO_LATIDO = sound("sfx.intro_latido");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")
@@ -212,10 +219,15 @@ public class DarkCraftMod {
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] CAPITAN_VOZ = new RegistryObject[6];
 
+    /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[10];
+
     static {
         for (int i = 1; i < REY_VOZ.length; i++) REY_VOZ[i] = sound("rey.voz." + i);
         for (int i = 1; i < GAVRAN_VOZ.length; i++) GAVRAN_VOZ[i] = sound("gavran.voz." + i);
         for (int i = 1; i < CAPITAN_VOZ.length; i++) CAPITAN_VOZ[i] = sound("capitan.voz." + i);
+        for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);

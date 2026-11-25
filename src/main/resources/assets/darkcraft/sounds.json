@@ -1901,5 +1901,127 @@
         "stream": true
       }
     ]
+  },
+  "sombra.voz.1": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.2": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.3": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.4": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.5": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.6": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_6",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.7": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_7",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.8": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_8",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.9": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_9",
+        "stream": false
+      }
+    ]
+  },
+  "sfx.intro_abismo": {
+    "subtitle": "subtitles.darkcraft.sfx.intro_abismo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/intro_abismo_1",
+        "stream": true
+      }
+    ]
+  },
+  "sfx.intro_caida": {
+    "subtitle": "subtitles.darkcraft.sfx.intro_caida",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/intro_caida_1"
+      }
+    ]
+  },
+  "sfx.intro_atrapa": {
+    "subtitle": "subtitles.darkcraft.sfx.intro_atrapa",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/intro_atrapa_1"
+      }
+    ]
+  },
+  "sfx.intro_marca": {
+    "subtitle": "subtitles.darkcraft.sfx.intro_marca",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/intro_marca_1"
+      }
+    ]
+  },
+  "sfx.intro_latido": {
+    "subtitle": "subtitles.darkcraft.sfx.intro_latido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/intro_latido_1"
+      }
+    ]
   }
 }

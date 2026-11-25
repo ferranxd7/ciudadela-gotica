@@ -1463,6 +1463,45 @@ EN.update({
     "darkcraft.diario.capitan": "The Captain was guarding the door of his lighthouse. As he fell he told me to take it, and to take them with it. The grate opened by itself.",
 })
 
+# ---------------------------------------------------------------- parte 3d: las cinematicas (la Sombra habla)
+ES.update({
+    # la cinematica de inicio (1-6) y el viaje a Valdrenn (7-9): la voz es de la Sombra
+    "darkcraft.sombra.voz.1": "Estabas muerto.",
+    "darkcraft.sombra.voz.2": "Sin nombre... Sin tumba... Solo la oscuridad.",
+    "darkcraft.sombra.voz.3": "Pero metí la mano... y te arrojé de vuelta.",
+    "darkcraft.sombra.voz.4": "Ahora llevas mi marca. La muerte no se quedará contigo... no mientras yo te necesite.",
+    "darkcraft.sombra.voz.5": "Hay una puerta que yo no puedo abrir. Tú la abrirás por mí.",
+    "darkcraft.sombra.voz.6": "Ahora despierta... marcado.",
+    "darkcraft.sombra.voz.7": "Ahí está... Valdrenn. El reino que suplicó mi don.",
+    "darkcraft.sombra.voz.8": "Su rey y su caballero aún guardan sus juramentos... cadenas alrededor de mi garganta.",
+    "darkcraft.sombra.voz.9": "Rómpelas, marcado... y te mostraré la puerta.",
+    "subtitles.darkcraft.sombra.voz": "Habla la Sombra",
+    "subtitles.darkcraft.sfx.intro_abismo": "El vacío respira",
+    "subtitles.darkcraft.sfx.intro_caida": "El viento de la caída",
+    "subtitles.darkcraft.sfx.intro_atrapa": "Algo te atrapa",
+    "subtitles.darkcraft.sfx.intro_marca": "La marca arde",
+    "subtitles.darkcraft.sfx.intro_latido": "Un corazón vuelve a latir",
+    "darkcraft.ayuda.b_inicio": "volver a ver la cinemática de inicio (la Sombra, la caída y el despertar)",
+})
+EN.update({
+    "darkcraft.sombra.voz.1": "You were dead.",
+    "darkcraft.sombra.voz.2": "No name... No grave... Only the dark.",
+    "darkcraft.sombra.voz.3": "But I reached in... and I cast you back.",
+    "darkcraft.sombra.voz.4": "You carry my mark now. Death will not keep you... not while I need you.",
+    "darkcraft.sombra.voz.5": "There is a door I cannot open. You will open it for me.",
+    "darkcraft.sombra.voz.6": "Now wake... marked one.",
+    "darkcraft.sombra.voz.7": "There... Valdrenn. The kingdom that begged for my gift.",
+    "darkcraft.sombra.voz.8": "Its king and his knight still keep their oaths... chains around my throat.",
+    "darkcraft.sombra.voz.9": "Break them, marked one... and I will show you the door.",
+    "subtitles.darkcraft.sombra.voz": "The Shadow speaks",
+    "subtitles.darkcraft.sfx.intro_abismo": "The void breathes",
+    "subtitles.darkcraft.sfx.intro_caida": "Wind of the fall",
+    "subtitles.darkcraft.sfx.intro_atrapa": "Something catches you",
+    "subtitles.darkcraft.sfx.intro_marca": "The mark burns",
+    "subtitles.darkcraft.sfx.intro_latido": "A heart beats again",
+    "darkcraft.ayuda.b_inicio": "watch the opening cinematic again (the Shadow, the fall and the awakening)",
+})
+
 assert set(ES) == set(EN), sorted(set(ES) ^ set(EN))
 
 
