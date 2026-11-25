@@ -96,7 +96,11 @@ public final class CaminoNubes {
         int[] f = Fortalezas.de(seed, sx, sz);
         FortalezaPlan fp = Fortalezas.plan(seed, f[0], f[1]);
         int[] b = Puente.centro(fp);
-        List<double[]> p = puntos(seed, sx, sz, ci.ascX(), ci.ascZ(), f, b);
+        // lo lejano va como antes de la parte 5a (con la escalera de la fortaleza de antes): en un mundo con parte del
+        // camino ya hecho, lo que se haga ahora sigue el mismo trazado; solo el ultimo tramo llega a la escalera de ahora
+        int[] bv = fp.centroPuenteAntiguo();
+        List<double[]> p = puntos(seed, sx, sz, ci.ascX(), ci.ascZ(), f, bv);
+        p.set(p.size() - 1, new double[]{b[0] + 0.5, b[1] + 0.5});
         int n = p.size();
         double[] px = new double[n], pz = new double[n];
         double minX = Double.MAX_VALUE, minZ = Double.MAX_VALUE, maxX = -Double.MAX_VALUE, maxZ = -Double.MAX_VALUE;
