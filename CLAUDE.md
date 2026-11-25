@@ -537,8 +537,24 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   empezar. Forzada (al entrar por primera vez) no se cierra con ESC.
 - `darkcraft_partida.json` ya apunta la clase (la lista de partidas la usara). Comandos `/darkcraft rol clase [<id> |
   elegir | olvidar | ninguna]` (con id la pone ya, sin preguntar). La prueba del cliente: al entrar comprueba que sale la
-  pantalla forzada y deja al jugador sin clase; el tramo `clases()` (capturas `cliente_cl01..cl06`: caballero, hechicero,
-  desdichado, la pregunta, el bandido en el juego y su equipo en el menu).
+  pantalla forzada y deja al jugador sin clase (en la CI entra en creativo: no se le pregunta); el tramo `clases()`
+  (capturas `cliente_cl01..cl06`: caballero, hechicero, desdichado, la pregunta, el bandido en el juego y su equipo).
+
+### Lo siguiente: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
+
+Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publicada):
+- **3a, el mundo de nubes**: generador propio (vacio + un mar de nubes de un bloque `nube` translucido y sin choque, en
+  bollos con ruido, hacia Y 100-140; caer por debajo = vacio) sustituyendo el preset `minecraft:normal`
+  (`data/minecraft/worldgen/world_preset/normal.json`, solo el overworld: sin Nether ni End), bioma de nubes en
+  `#darkcraft:has_structure/valdrenn` para que siga saliendo Valdrenn (estructura + `CastleFeature`; su isla ya flota);
+  modo aventura por defecto; la isla del pueblo en el 0,0. Tiene que valer igual en servidor dedicado.
+- **3b, la isla del pueblo abandonado**: ruinas, notas, el barco roto en el muelle, las 5 piezas (vela, timon, mastil,
+  ancla y el corazon: cofre, tras enemigos, acertijo, nota/cadaver y mini-jefe).
+- **3c, enemigos**: aldeanos huecos (horcas, hoces, antorchas), marineros ahogados (sables, arpones, junto al muelle) y el
+  mini-jefe **el Capitan** (barra de jefe; guarda el corazon del barco).
+- **3d, cinematicas**: al elegir clase, la de inicio con voz (quien eres, caes del cielo; despiertas en el borde de la
+  isla junto a los restos del barco; `Clase.elegir` es donde empezarla); reparar el barco y el viaje volando al muelle de
+  Valdrenn (luego se puede ir y volver desde el muelle).
 
 ## Compilar, probar y publicar
 

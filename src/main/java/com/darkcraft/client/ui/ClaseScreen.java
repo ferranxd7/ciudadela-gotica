@@ -86,11 +86,11 @@ public class ClaseScreen extends Screen {
     }
 
     private int ly() {
-        return y0() + 44;
+        return y0() + 47;
     }
 
     private int lh() {
-        return alto() - 44 - 34;
+        return alto() - 47 - 34;
     }
 
     private int paso() {
@@ -150,12 +150,12 @@ public class ClaseScreen extends Screen {
         int x = x0(), y = y0(), w = ancho(), h = alto();
         Pix.blanco();
         Panel.losa(g, x, y, w, h);
-        Letra.grande(g, font, title, (width - Letra.anchoG(font, title)) / 2, y + 8, 0xFFE9C766, 0xFF050408);
+        Letra.grande(g, font, title, (width - Letra.anchoG(font, title)) / 2, y + 7, 0xFFE9C766, 0xFF050408);
         Component sub = Component.translatable("darkcraft.clase.subtitulo");
         String s = sub.getString();
         while (font.width(s) > w - 30 && s.length() > 4) s = s.substring(0, s.length() - 2);
-        g.drawString(font, s, (width - font.width(s)) / 2, y + 27, APAGADO, true);
-        Panel.raya(g, x + 12, x + w - 12, y + 38);
+        g.drawString(font, s, (width - font.width(s)) / 2, y + 30, APAGADO, true);
+        Panel.raya(g, x + 12, x + w - 12, y + 41);
         lista(g, mx, my);
         figura(g, pt);
         ficha(g, mx, my);
