@@ -6104,47 +6104,76 @@ public final class ClientCiTest {
     }
 
     /**
-     * La escalera de caracol de la torre del homenaje: que cada escalon tenga sitio para pasar (una columna de hueso la
-     * atascaba) y que al bajarse en cada piso se pueda andar por el (una valla encerraba la salida).
+     * La escalera de caracol de la torrecilla (al este de la torre): que cada escalon, del sotano a la terraza, tenga su
+     * bloque y sitio para pasar por encima, y que al salir por la puerta de cada planta se pueda andar por ella (y por la
+     * terraza). Tambien el tubo del ascensor: la placa de hueso, abajo o arriba.
      */
     private static void comprobarEscalera(ServerLevel lvl) {
-        final int KX = com.darkcraft.gen.FortalezaHueso.KX, KZ0 = com.darkcraft.gen.FortalezaHueso.KZ0, KZ1 = com.darkcraft.gen.FortalezaHueso.KZ1;
-        final int PISO = com.darkcraft.gen.FortalezaHueso.PISO, NP = com.darkcraft.gen.FortalezaHueso.NPISOS;
-        int px = fplan.cx + KX - 4, pz = fplan.cz + KZ0 + 4, Y = fplan.Y, top = Y + NP * PISO;
-        int[][] an = {{-1, -1}, {0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}};
-        int tapados = 0;
-        for (int k = 0; k < top - Y; k++) {
-            BlockPos e = new BlockPos(px + an[k % 8][0], Y + k, pz + an[k % 8][1]);
-            boolean escalon = lvl.getBlockState(e).getBlock() instanceof net.minecraft.world.level.block.StairBlock;
-            if (!escalon || !pasa(lvl, e.above()) || !pasa(lvl, e.above(2))) {
-                tapados++;
-                log("    escalon " + k + " en " + e.toShortString() + ": " + lvl.getBlockState(e).getBlock() + " / " + lvl.getBlockState(e.above()).getBlock()
-                        + " / " + lvl.getBlockState(e.above(2)).getBlock());
-            }
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int p = 1; p <= NP; p++) {
-            int[] sale = an[(p * PISO - 1) % 8];
-            int y = Y + p * PISO;
-            java.util.ArrayDeque<BlockPos> cola = new java.util.ArrayDeque<>();
-            java.util.Set<BlockPos> vistos = new java.util.HashSet<>();
-            BlockPos ini = new BlockPos(px + 2 * sale[0], y, pz + 2 * sale[1]);
-            cola.add(ini);
-            vistos.add(ini);
-            while (!cola.isEmpty() && vistos.size() < 400) {
-                BlockPos c = cola.poll();
-                for (Direction d : Direction.Plane.HORIZONTAL) {
-                    BlockPos n = c.relative(d);
-                    if (vistos.contains(n) || Math.abs(n.getX() - fplan.cx) > KX + 1 || n.getZ() < fplan.cz + KZ0 - 1 || n.getZ() > fplan.cz + KZ1 + 1) continue;
-                    if (!pasa(lvl, n) || !pasa(lvl, n.above()) || pasa(lvl, n.below())) continue;
-                    vistos.add(n);
-                    cola.add(n);
+        final int PISO = com.darkcraft.gen.TorreCupula.PISO, TX = com.darkcraft.gen.TorreCupula.TX;
+        final int SOT = com.darkcraft.gen.TorreCupula.SOTANO / PISO, TER = com.darkcraft.gen.TorreCupula.TERRAZA / PISO;
+        final double RTU = com.darkcraft.gen.TorreCupula.RTU;
+        int Y = fplan.Y, tx = fplan.cx + TX, tz = fplan.cz, pasos = PISO;
+        int tapados = 0, escalones = 0;
+        for (int n = SOT; n <= TER; n++)
+            for (int s = 0; s < pasos; s++) {
+                if (n == SOT && s < pasos / 2 || n == TER && s > pasos / 2) continue;
+                int y = Y + n * PISO + (s - pasos / 2);
+                // una celda del escalon, en mitad de su sector
+                BlockPos e = null;
+                for (double r : new double[]{2.0, 2.4, 1.6, 2.6, 1.3}) {
+                    double a = (s + 0.5) * Math.PI * 2 / pasos;
+                    int x = tx + (int) Math.round(Math.cos(a) * r), z = tz + (int) Math.round(Math.sin(a) * r);
+                    double d = Math.hypot(x - tx, z - tz), aa = Math.atan2(z - tz, x - tx);
+                    if (aa < 0) aa += Math.PI * 2;
+                    if (d >= 1.0 && d <= RTU - 0.9 && (int) (aa / (Math.PI * 2 / pasos)) == s) {
+                        e = new BlockPos(x, y - 1, z);
+                        break;
+                    }
+                }
+                escalones++;
+                if (e == null) {
+                    tapados++;
+                    log("    escalon " + n + "/" + s + ": sin celda");
+                    continue;
+                }
+                boolean pisa = !pasa(lvl, e) && (s == pasos / 2 || lvl.getBlockState(e).getBlock() instanceof net.minecraft.world.level.block.StairBlock);
+                if (!pisa || !pasa(lvl, e.above()) || !pasa(lvl, e.above(2))) {
+                    tapados++;
+                    log("    escalon " + n + "/" + s + " en " + e.toShortString() + ": " + lvl.getBlockState(e).getBlock() + " / "
+                            + lvl.getBlockState(e.above()).getBlock() + " / " + lvl.getBlockState(e.above(2)).getBlock());
                 }
             }
-            sb.append(" piso ").append(p).append('=').append(vistos.size());
+        // al salir por la puerta de cada planta: celdas de la torre (o de la terraza) que se alcanzan andando
+        StringBuilder sb = new StringBuilder();
+        for (int n = SOT; n <= TER; n++) {
+            int y = Y + n * PISO;
+            boolean terraza = n == TER;
+            java.util.ArrayDeque<BlockPos> cola = new java.util.ArrayDeque<>();
+            java.util.Set<BlockPos> vistos = new java.util.HashSet<>();
+            BlockPos ini = new BlockPos(fplan.cx + com.darkcraft.gen.TorreCupula.AT - com.darkcraft.gen.TorreCupula.GT, y, tz);
+            cola.add(ini);
+            vistos.add(ini);
+            while (!cola.isEmpty() && vistos.size() < 900) {
+                BlockPos c = cola.poll();
+                for (Direction d : Direction.Plane.HORIZONTAL) {
+                    BlockPos q = c.relative(d);
+                    int dx = q.getX() - fplan.cx, dz = q.getZ() - fplan.cz;
+                    boolean dentro = terraza ? Math.max(Math.abs(dx), Math.abs(dz)) < com.darkcraft.gen.TorreCupula.TL
+                            : com.darkcraft.gen.TorreCupula.octo(dx, dz) <= com.darkcraft.gen.TorreCupula.AT - com.darkcraft.gen.TorreCupula.GT + 0.5;
+                    if (vistos.contains(q) || !dentro) continue;
+                    if (!pasa(lvl, q) || !pasa(lvl, q.above()) || pasa(lvl, q.below())) continue;
+                    vistos.add(q);
+                    cola.add(q);
+                }
+            }
+            sb.append(' ').append(n == SOT ? "sotano" : terraza ? "terraza" : "planta " + n).append('=').append(vistos.size());
         }
-        log("  escalera de la torre: " + (top - Y) + " escalones, " + tapados + " tapados (tiene que ser 0); celdas que se alcanzan al bajarse:" + sb
-                + " (antes 3 en los pisos 1 y 2)");
+        log("  escalera de la torrecilla: " + escalones + " escalones, " + tapados + " tapados (tiene que ser 0); celdas que se alcanzan al salir:" + sb);
+        var a = com.darkcraft.fortaleza.FortalezaEventos.ascensor(lvl, fplan);
+        int[] ar = fplan.f.ascensorArriba();
+        log("  ascensor de la torre: " + (a == null ? "NO HAY" : String.format(java.util.Locale.ROOT, "placa de hueso=%s en %.1f %.1f %.1f, de %d a %d",
+                a.deHueso(), a.getX(), a.getY(), a.getZ(), a.y0(), a.y1())) + "; tapa de arriba "
+                + lvl.getBlockState(new BlockPos(ar[0], ar[1] - 1, ar[2])).getBlock());
     }
     private static int fbase;
 
@@ -6158,7 +6187,7 @@ public final class ClientCiTest {
 
     /** La Fortaleza de Hueso: se levanta sola al llegar, el puente de la llave, la corriente, la puerta, el acertijo, la forja y el capitulo 6. */
     private static int fortaleza(int F0) {
-        final int PZ = com.darkcraft.gen.FortalezaHueso.PZ;
+        final int PFUERA = com.darkcraft.gen.TorreCupula.PFUERA;
         // el rastro de luz de la llave de hueso (solo lo ve quien la lleva), mirando hacia su fortaleza
         atTicks(F0, "Llave de hueso: el rastro de luz hacia la fortaleza", m -> {
             reyStart = -1;
@@ -6212,7 +6241,7 @@ public final class ClientCiTest {
         // con la distancia de vision de la CI (7 chunks) la camara va a menos de 80 bloques, sin descartar secciones tapadas
         // (smartCull) y con tiempo para que se compilen los chunks recien construidos
         String[] nombres = {"cliente_f01_fortaleza", "cliente_f02_fortaleza_lado", "cliente_f03_desde_arriba", "cliente_f04_desde_abajo"};
-        double[][] desde = {{50, 22, 58, 0, 10, -6}, {-62, 14, 26, 0, 8, -4}, {6, 62, 34, 0, 0, -4}, {48, -30, 46, 0, -8, 0}};
+        double[][] desde = {{48, 26, 62, 0, 18, -4}, {-70, 18, 20, 0, 16, -2}, {6, 92, 40, 0, 10, -4}, {52, -34, 50, 0, -10, 0}};
         for (int k = 0; k < nombres.length; k++) {
             final int kk = k;
             atTicks(E + k * 70, "Fortaleza desde fuera", m -> {
@@ -6295,7 +6324,7 @@ public final class ClientCiTest {
                 ServerLevel lvl = sp.serverLevel();
                 sp.setGameMode(GameType.CREATIVE);
                 sp.removeEffect(net.minecraft.world.effect.MobEffects.LEVITATION);
-                sp.teleportTo(lvl, fplan.cx + 0.5, fplan.Y, fplan.cz + PZ + 8.5, 180f, 0f);
+                sp.teleportTo(lvl, fplan.cx + 0.5, fplan.Y, fplan.cz + PFUERA + 4.5, 180f, 0f);
                 sp.getCooldowns().removeCooldown(DarkCraftMod.LLAVE_HUESO.get());
                 sp.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(DarkCraftMod.LLAVE_HUESO.get()));
                 sp.gameMode.useItem(sp, lvl, sp.getMainHandItem(), InteractionHand.MAIN_HAND);
@@ -6338,12 +6367,12 @@ public final class ClientCiTest {
             log("  caballeros que ve el cliente: " + l.size());
         });
         atTicks(H + 40, "captura", m -> shot(m, "cliente_f12_caballeros"));
-        atTicks(H + 44, "Torre del homenaje: la planta baja", m -> {
+        atTicks(H + 44, "La torre: la planta baja, con el tubo del ascensor", m -> {
             enPrimeraPersona(m);
             server(m, sp -> {
                 sp.serverLevel().getEntitiesOfClass(com.darkcraft.caballeros.CaballeroZombi.class, sp.getBoundingBox().inflate(80))
                         .forEach(net.minecraft.world.entity.Entity::discard);
-                sp.teleportTo(sp.serverLevel(), fplan.cx + 0.5, fplan.Y, fplan.cz - 8.5, 180f, 8f);
+                sp.teleportTo(sp.serverLevel(), fplan.cx + 0.5, fplan.Y, fplan.cz + 7.5, 180f, -4f);
             });
         });
         atTicks(H + 70, "captura", m -> shot(m, "cliente_f13_homenaje"));
@@ -6392,6 +6421,8 @@ public final class ClientCiTest {
                         + sp.getRecipeBook().contains(new net.minecraft.resources.ResourceLocation("darkcraft", "amuleto_hueso")));
                 int[] a = fplan.f.atriles()[1];
                 BlockPos b = new BlockPos(a[0], a[1], a[2]);
+                // delante del atril (mira al este): a mas de 8 bloques el servidor cierra el libro en el acto
+                sp.teleportTo(sp.serverLevel(), a[0] + 2.5, a[1], a[2] + 0.5, 90f, 25f);
                 log("  atril: " + sp.serverLevel().getBlockState(b));
                 sp.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                 sp.gameMode.useItemOn(sp, sp.serverLevel(), ItemStack.EMPTY, InteractionHand.MAIN_HAND,
@@ -6409,8 +6440,10 @@ public final class ClientCiTest {
             m.setScreen(null);
             m.player.closeContainer();
             server(m, sp -> {
-                sp.teleportTo(sp.serverLevel(), fplan.cx + 0.5, fplan.Y, fplan.cz - 12.5, 180f, 20f);
-                BlockPos mesa = BlockPos.containing(fplan.cx + 0.5, fplan.Y, fplan.cz - 14.5);
+                // en la terraza, al sur (despejado: la camara gira alrededor de la mesa)
+                int top = fplan.Y + com.darkcraft.gen.TorreCupula.TERRAZA;
+                sp.teleportTo(sp.serverLevel(), fplan.cx + 0.5, top, fplan.cz + 10.5, 180f, 20f);
+                BlockPos mesa = BlockPos.containing(fplan.cx + 0.5, top, fplan.cz + 8.5);
                 sp.serverLevel().setBlock(mesa, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE.defaultBlockState(), 3);
                 ItemStack am = new ItemStack(DarkCraftMod.AMULETO_HUESO.get());
                 sp.getInventory().add(am.copy());
@@ -6425,11 +6458,12 @@ public final class ClientCiTest {
         }
         // lo alto de la torre: el altar, el amuleto y el capitulo 6 (se abre el portal)
         int T = A + 190;
-        int top = com.darkcraft.gen.FortalezaHueso.NPISOS * com.darkcraft.gen.FortalezaHueso.PISO;
-        atTicks(T, "Azotea: junto al altar", m -> {
+        atTicks(T, "Terraza: junto al altar", m -> {
             enPrimeraPersona(m);
             m.options.hideGui = false;
             server(m, sp -> {
+                int top = fplan.Y + com.darkcraft.gen.TorreCupula.TERRAZA;
+                sp.serverLevel().setBlock(BlockPos.containing(fplan.cx + 0.5, top, fplan.cz + 8.5), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
                 int[] al = fplan.f.altar();
                 sp.teleportTo(sp.serverLevel(), al[0] + 0.5, al[1], al[2] + 2.5, 180f, -8f);
                 log("  altar: " + sp.serverLevel().getBlockState(new BlockPos(al[0], al[1] + 1, al[2])).getBlock());
@@ -6492,7 +6526,7 @@ public final class ClientCiTest {
             enPrimeraPersona(m);
             server(m, sp -> {
                 int[] al = fplan.f.altar();
-                sp.teleportTo(sp.serverLevel(), al[0] + 0.5, al[1], al[2] + 4.5, 0f, 18f);
+                sp.teleportTo(sp.serverLevel(), al[0] + 0.5, al[1], al[2] + 2.5, 0f, 18f);
             });
             log("  espejo en la fortaleza: " + com.darkcraft.client.espejo.EspejoCliente.resumen());
         });

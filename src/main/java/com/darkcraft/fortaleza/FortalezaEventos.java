@@ -6,7 +6,7 @@ import com.darkcraft.cine.CineShots;
 import com.darkcraft.cine.Cinematics;
 import com.darkcraft.cine.Shot;
 import com.darkcraft.cine.Timeline;
-import com.darkcraft.gen.FortalezaHueso;
+import com.darkcraft.gen.TorreCupula;
 import com.darkcraft.gen.FortalezaPlan;
 import com.darkcraft.net.Net;
 import com.darkcraft.story.Logros;
@@ -104,7 +104,7 @@ public final class FortalezaEventos {
     static boolean enIsla(ServerPlayer p) {
         Fortalezas.Sitio s = ZONA.get(p.getUUID());
         if (s == null) return false;
-        return Math.hypot(s.x() - p.getX(), s.z() - p.getZ()) < 62 && p.getY() > Fortalezas.Y - 8 && p.getY() < Fortalezas.Y + 60;
+        return Math.hypot(s.x() - p.getX(), s.z() - p.getZ()) < 80 && p.getY() > Fortalezas.Y - 14 && p.getY() < Fortalezas.Y + 80;
     }
 
     // ------------------------------------------------------------------ cada tick
@@ -148,8 +148,11 @@ public final class FortalezaEventos {
         if (s != null) {
             encolar(lvl, s);
             double d = Math.hypot(s.x() - p.getX(), s.z() - p.getZ());
-            if (d < 100) parchear(lvl, s);
-            if (d < Fortalezas.ZONA) entrar(p, s);
+            if (d < 150) devolverLlave(p, s);
+            if (d < Fortalezas.ZONA) {
+                entrar(p, s);
+                asegurarAscensor(lvl, s, p);
+            }
             else if (d > Fortalezas.ZONA + 25) salir(p);
             if (d < 150) Logros.dar(p, "fortaleza");
         } else salir(p);
@@ -183,9 +186,13 @@ public final class FortalezaEventos {
     private static void encolar(ServerLevel lvl, Fortalezas.Sitio s) {
         FortalezaDatos d = FortalezaDatos.get(lvl.getServer());
         FortalezaDatos.Estado est = d.de(s);
+        // el santuario de la de antes estaba en otro sitio: se vuelve a poner en el rellano de la nueva
+        if (rehacer(s, est, d)) com.darkcraft.santuario.Santuarios.olvidar(lvl.getServer(), "f" + s.clave());
         if (est.completa) return;
         FortalezaPlan plan = Fortalezas.plan(lvl.getSeed(), s);
-        for (long k : plan.chunks()) {
+        java.util.Set<Long> todos = new java.util.LinkedHashSet<>(plan.chunks());
+        todos.addAll(est.porLimpiar);
+        for (long k : todos) {
             if (est.hechos.contains(k)) continue;
             String clave = s.clave() + ":" + k;
             if (EN_COLA.contains(clave)) continue;
@@ -218,6 +225,11 @@ public final class FortalezaEventos {
         if (est.hechos.contains(k)) return;
         FortalezaPlan plan = Fortalezas.plan(lvl.getSeed(), fx, fz);
         long t0 = System.nanoTime();
+        if (est.porLimpiar.remove(k)) limpiar(lvl, cx, cz);
+        if (!plan.toca(cx, cz)) {
+            d.setDirty();
+            return;
+        }
         plan.construir(lvl, cx, cz, RandomSource.create(lvl.getSeed() ^ k));
         aplicarEstado(lvl, plan, est, cx, cz);
         pintarBioma(lvl, plan, cx, cz);
@@ -234,23 +246,79 @@ public final class FortalezaEventos {
     }
 
     /**
-     * Arreglos para las fortalezas que ya estaban levantadas (una vez cada una, cuando alguien esta cerca): el 1, la
-     * escalera de la torre del homenaje, que se atascaba con una columna de hueso.
+     * Respuestas 3 y 4 del plan: una fortaleza de antes (la de las murallas cuadradas) se rehace de cero al acercarse
+     * alguien: se vacian sus chunks y se levanta la nueva, con la puerta cerrada y sin portal (los logros se quedan). A
+     * quien ya habia vencido a Ser Gavran se le devuelve la llave de hueso ({@link #devolverLlave}).
      */
-    private static void parchear(ServerLevel lvl, Fortalezas.Sitio s) {
-        FortalezaDatos d = FortalezaDatos.get(lvl.getServer());
-        FortalezaDatos.Estado est = d.de(s);
-        if (est.parche >= 1 || !est.completa) return;
-        FortalezaPlan plan = Fortalezas.plan(lvl.getSeed(), s);
-        int x0 = plan.cx + 2, x1 = plan.cx + FortalezaHueso.KX, z0 = plan.cz + FortalezaHueso.KZ0, z1 = plan.cz + FortalezaHueso.KZ0 + 7;
-        for (int cx = x0 >> 4; cx <= x1 >> 4; cx++)
-            for (int cz = z0 >> 4; cz <= z1 >> 4; cz++) if (!lvl.getChunkSource().hasChunk(cx, cz)) return;
-        for (int cx = x0 >> 4; cx <= x1 >> 4; cx++)
-            for (int cz = z0 >> 4; cz <= z1 >> 4; cz++)
-                plan.f.arreglarEscalera(new com.darkcraft.gen.Canvas(lvl, cx, cz, RandomSource.create(1)));
-        est.parche = 1;
+    private static boolean rehacer(Fortalezas.Sitio s, FortalezaDatos.Estado est, FortalezaDatos d) {
+        if (est.version >= FortalezaDatos.VERSION) return false;
+        est.porLimpiar.addAll(est.hechos);
+        est.hechos.clear();
+        est.completa = false;
+        est.rehecha = est.rehecha || !est.porLimpiar.isEmpty();
+        est.puerta = est.puente = est.portal = false;
+        est.baseEscalera = Integer.MIN_VALUE;
+        est.parche = 0;
+        est.version = FortalezaDatos.VERSION;
         d.setDirty();
-        DarkCraftMod.LOGGER.info("Fortaleza de Hueso en {}: escalera de la torre arreglada", s.clave());
+        DarkCraftMod.LOGGER.info("Fortaleza de Hueso en {}: se rehace (la de antes ocupaba {} chunks)", s.clave(), est.porLimpiar.size());
+        return true;
+    }
+
+    /**
+     * El ascensor del tubo del centro de la torre (la placa de hueso): uno, cuando la fortaleza ya esta levantada y su
+     * chunk procesa entidades. Sale abajo o arriba segun donde este quien llega.
+     */
+    private static void asegurarAscensor(ServerLevel lvl, Fortalezas.Sitio s, ServerPlayer p) {
+        if (!FortalezaDatos.get(lvl.getServer()).de(s).completa) return;
+        FortalezaPlan f = Fortalezas.plan(lvl.getSeed(), s);
+        int[] ab = f.f.ascensorAbajo(), ar = f.f.ascensorArriba();
+        if (!lvl.isPositionEntityTicking(new BlockPos(ab[0], ab[1], ab[2]))) return;
+        net.minecraft.world.phys.AABB col = new net.minecraft.world.phys.AABB(ab[0] - 3, ab[1] - 3, ab[2] - 3, ab[0] + 4, ar[1] + 4, ab[2] + 4);
+        List<com.darkcraft.arbol.Ascensor> as = lvl.getEntitiesOfClass(com.darkcraft.arbol.Ascensor.class, col);
+        for (int i = 1; i < as.size(); i++) if (as.get(i).getPassengers().isEmpty()) as.get(i).discard();
+        if (!as.isEmpty()) return;
+        com.darkcraft.arbol.Ascensor a = DarkCraftMod.ASCENSOR.get().create(lvl);
+        if (a == null) return;
+        boolean arriba = p.getY() > (ab[1] + ar[1]) / 2.0;
+        a.moveTo(ab[0] + 0.5, arriba ? ar[1] : ab[1], ab[2] + 0.5, 0f, 0f);
+        a.setTipo(com.darkcraft.arbol.Ascensor.FORTALEZA);
+        a.preparar(ab[1], ar[1], arriba);
+        lvl.addFreshEntity(a);
+    }
+
+    /** Para las pruebas: el ascensor de la torre de esta fortaleza (o null). */
+    public static com.darkcraft.arbol.Ascensor ascensor(ServerLevel lvl, FortalezaPlan f) {
+        int[] ab = f.f.ascensorAbajo(), ar = f.f.ascensorArriba();
+        net.minecraft.world.phys.AABB col = new net.minecraft.world.phys.AABB(ab[0] - 3, ab[1] - 3, ab[2] - 3, ab[0] + 4, ar[1] + 4, ab[2] + 4);
+        List<com.darkcraft.arbol.Ascensor> as = lvl.getEntitiesOfClass(com.darkcraft.arbol.Ascensor.class, col);
+        return as.isEmpty() ? null : as.get(0);
+    }
+
+    /** En una fortaleza rehecha, a quien ya tenia la llave (vencio a Ser Gavran) y no la lleva, se le da otra (una vez). */
+    private static void devolverLlave(ServerPlayer p, Fortalezas.Sitio s) {
+        FortalezaDatos d = FortalezaDatos.get(p.server);
+        FortalezaDatos.Estado est = d.de(s);
+        if (!est.rehecha || est.puerta || est.llaves.contains(p.getStringUUID()) || !Logros.tiene(p, "gavran")) return;
+        for (net.minecraft.world.item.ItemStack it : p.getInventory().items) if (it.is(DarkCraftMod.LLAVE_HUESO.get())) return;
+        net.minecraft.world.item.ItemStack llave = new net.minecraft.world.item.ItemStack(DarkCraftMod.LLAVE_HUESO.get());
+        com.darkcraft.armas.LlaveHueso.apuntar(llave, s);
+        com.darkcraft.rol.Equipo.dar(p, llave);
+        est.llaves.add(p.getStringUUID());
+        d.setDirty();
+        p.sendSystemMessage(net.minecraft.network.chat.Component.translatable("darkcraft.fortaleza.llave_devuelta"));
+    }
+
+    /** Vacia lo que quedaba de la fortaleza de antes en un chunk (de lo alto de las nubes para arriba). */
+    private static void limpiar(ServerLevel lvl, int cx, int cz) {
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        var aire = Blocks.AIR.defaultBlockState();
+        for (int x = cx << 4; x < (cx << 4) + 16; x++)
+            for (int z = cz << 4; z < (cz << 4) + 16; z++)
+                for (int y = Fortalezas.Y - 55; y <= Fortalezas.Y + 110; y++) {
+                    m.set(x, y, z);
+                    if (!lvl.getBlockState(m).isAir()) lvl.setBlock(m, aire, 2 | 16);
+                }
     }
 
     /** Levanta ya todo lo que este cargado de la fortaleza (para los comandos y la prueba). */
@@ -274,7 +342,7 @@ public final class FortalezaEventos {
                 for (int x = r[0]; x <= r[3]; x++) {
                     if ((x >> 4) != cx) continue;
                     for (int y = r[1]; y <= r[4]; y++) lvl.setBlock(new BlockPos(x, y, r[2]), Blocks.AIR.defaultBlockState(), 2);
-                    for (int y = r[4] + 1; y <= r[4] + FortalezaHueso.PALTO; y++) lvl.setBlock(new BlockPos(x, y, r[2]), reja(), 2);
+                    for (int y = r[4] + 1; y <= r[4] + TorreCupula.PALTO; y++) lvl.setBlock(new BlockPos(x, y, r[2]), reja(), 2);
                 }
         }
         if (est.portal) {
@@ -282,7 +350,7 @@ public final class FortalezaEventos {
             if ((q[2] >> 4) == cz)
                 for (int x = q[0]; x <= q[3]; x++)
                     for (int y = q[1]; y <= q[4]; y++)
-                        if ((x >> 4) == cx) lvl.setBlock(new BlockPos(x, y, q[2]), DarkCraftMod.PORTAL_SOMBRA.get().defaultBlockState(), 2);
+                        if ((x >> 4) == cx && f.f.enPortal(x, y)) lvl.setBlock(new BlockPos(x, y, q[2]), DarkCraftMod.PORTAL_SOMBRA.get().defaultBlockState(), 2);
         }
     }
 
@@ -352,12 +420,14 @@ public final class FortalezaEventos {
         int[] c = Puente.centro(f);
         if (Math.max(Math.abs(p.getX() - c[0] - 0.5), Math.abs(p.getZ() - c[1] - 0.5)) < 10 && y < f.Y + 3)
             return "darkcraft.mapa.lugar.fortaleza_escalera";
-        if (Math.abs(dx) <= FortalezaHueso.KX + 1 && dz >= FortalezaHueso.KZ0 - 1 && dz <= FortalezaHueso.KZ1 + 1 && y > f.Y - 2) {
-            if (y >= f.Y + FortalezaHueso.NPISOS * FortalezaHueso.PISO - 1) return "darkcraft.mapa.lugar.fortaleza_portal";
+        if (y >= f.Y + TorreCupula.TERRAZA - 1 && Math.max(Math.abs(dx), Math.abs(dz)) <= TorreCupula.TL + 1)
+            return "darkcraft.mapa.lugar.fortaleza_portal";
+        if ((TorreCupula.octo(dx, dz) <= TorreCupula.AT + 1 || Math.hypot(dx - TorreCupula.TX, dz) <= TorreCupula.RTU + 1) && y > f.Y + TorreCupula.SOTANO - 2)
             return "darkcraft.mapa.lugar.fortaleza_homenaje";
-        }
-        if (Math.abs(dx) <= 9 && dz > FortalezaHueso.MURO - 6 && dz < FortalezaHueso.PZ + 8 && y > f.Y - 2 && y < f.Y + 18)
+        if (Math.abs(dx) <= 16 && dz > TorreCupula.RM - 5 && dz < TorreCupula.PFUERA + 9 && y > f.Y - 2 && y < f.Y + 2 * TorreCupula.PALTO + 6)
             return "darkcraft.mapa.lugar.fortaleza_puerta";
+        if (Math.hypot(dx, dz) < TorreCupula.RD && y > f.Y - 2 && y < f.Y + TorreCupula.RD)
+            return "darkcraft.mapa.lugar.fortaleza_cupula";
         return "darkcraft.mapa.lugar.fortaleza";
     }
 
@@ -439,7 +509,7 @@ public final class FortalezaEventos {
         for (int k = 0; k < 18; k++) despues(srv, 16 + k * 4, () -> ojos(lvl, f));
         int[] r = f.f.reja();
         despues(srv, 86, () -> lvl.playSound(null, f.cx + 0.5, r[1] + 3, r[2] + 0.5, DarkCraftMod.SFX_PUERTA_HUESO.get(), SoundSource.BLOCKS, 3.0f, 1.0f));
-        for (int k = 1; k <= FortalezaHueso.PALTO; k++) {
+        for (int k = 1; k <= TorreCupula.PALTO; k++) {
             final int paso = k;
             despues(srv, 92 + (k - 1) * 10, () -> subirReja(lvl, f, paso));
         }
@@ -470,7 +540,7 @@ public final class FortalezaEventos {
         int[] r = f.f.reja();
         for (int x = r[0]; x <= r[3]; x++) {
             for (int y = r[1]; y <= r[4]; y++) lvl.setBlock(new BlockPos(x, y, r[2]), reja(), 3);
-            for (int y = r[4] + 1; y <= r[4] + FortalezaHueso.PALTO; y++) lvl.setBlock(new BlockPos(x, y, r[2]), Blocks.AIR.defaultBlockState(), 3);
+            for (int y = r[4] + 1; y <= r[4] + TorreCupula.PALTO; y++) lvl.setBlock(new BlockPos(x, y, r[2]), Blocks.AIR.defaultBlockState(), 3);
         }
     }
 
@@ -537,7 +607,7 @@ public final class FortalezaEventos {
 
     /** Fuera los monstruos (y los caballeros) de lo alto de la torre del homenaje: que no salgan en la cinematica. */
     static void despejarAzotea(ServerLevel lvl, FortalezaPlan f) {
-        int top = f.Y + FortalezaHueso.NPISOS * FortalezaHueso.PISO;
+        int top = f.Y + TorreCupula.TERRAZA;
         net.minecraft.world.phys.AABB caja = new net.minecraft.world.phys.AABB(f.cx - 30, top - 3, f.cz - 50, f.cx + 30, top + 30, f.cz + 12);
         for (net.minecraft.world.entity.Mob m : lvl.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, caja,
                 m -> m instanceof net.minecraft.world.entity.monster.Enemy && !m.hasCustomName()
@@ -552,7 +622,7 @@ public final class FortalezaEventos {
         int[] q = f.f.portal();
         double mx = (q[0] + q[3]) / 2.0, my = (q[1] + q[4]) / 2.0;
         List<BlockPos> celdas = new ArrayList<>();
-        for (int x = q[0]; x <= q[3]; x++) for (int y = q[1]; y <= q[4]; y++) celdas.add(new BlockPos(x, y, q[2]));
+        for (int x = q[0]; x <= q[3]; x++) for (int y = q[1]; y <= q[4]; y++) if (f.f.enPortal(x, y)) celdas.add(new BlockPos(x, y, q[2]));
         celdas.sort((a, b) -> Double.compare(Math.hypot(a.getX() - mx, (a.getY() - my) * 0.6), Math.hypot(b.getX() - mx, (b.getY() - my) * 0.6)));
         lvl.playSound(null, mx + 0.5, my, q[2] + 0.5, DarkCraftMod.SFX_PORTAL_ABRE.get(), SoundSource.BLOCKS, 4.0f, 1.0f);
         for (int i = 0; i < celdas.size(); i++) {

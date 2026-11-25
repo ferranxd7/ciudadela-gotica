@@ -137,6 +137,25 @@ public class Volcado {
                 com.darkcraft.gen.FortalezaPlan p = new com.darkcraft.gen.FortalezaPlan(1234L, 0, 0, 320);
                 for (long k : p.chunks()) p.construir(lvl, (int) (k >> 32), (int) k, RandomSource.create(k));
             }
+            case "torre" -> {
+                // la fortaleza nueva de la parte 5a (isla, murallas, cupula y torre) en (0, 0), patio a Y 320
+                long semilla = Long.parseLong(System.getProperty("semilla", "1234"));
+                com.darkcraft.gen.Island isla = new com.darkcraft.gen.Island(semilla, 0, -3, 319, 80, 0.05, 6, 3, 52);
+                isla.surface((x, z, top) -> net.minecraft.world.level.block.Blocks.GRAVEL.defaultBlockState())
+                        .subsurface((x, y, z, d) -> net.minecraft.world.level.block.Blocks.TUFF.defaultBlockState()).plants((x, z) -> false);
+                com.darkcraft.gen.TorreCupula t = new com.darkcraft.gen.TorreCupula(semilla, 0, 0, 320);
+                for (int cx = -7; cx <= 6; cx++)
+                    for (int cz = -7; cz <= 6; cz++) {
+                        com.darkcraft.gen.Canvas cv = new com.darkcraft.gen.Canvas(lvl, cx, cz, RandomSource.create(cx * 31L + cz));
+                        try {
+                            if (isla.touchesChunk(cx, cz)) isla.build(cv);
+                            if (t.touchesChunk(cx, cz)) t.build(cv);
+                        } catch (Throwable e) {
+                            System.out.println("error en el chunk " + cx + "," + cz + ": " + e);
+                            e.printStackTrace();
+                        }
+                    }
+            }
             case "pueblo" -> {
                 com.darkcraft.pueblo.gen.PuebloPlan p = com.darkcraft.pueblo.gen.PuebloPlan.get();
                 for (long k : p.chunks()) p.construir(lvl, (int) (k >> 32), (int) k, RandomSource.create(k));

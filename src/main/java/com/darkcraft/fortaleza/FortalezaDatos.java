@@ -19,6 +19,8 @@ import java.util.Set;
  */
 public final class FortalezaDatos extends SavedData {
     public static final String ID = "darkcraft_fortalezas";
+    /** La fortaleza que se levanta ahora: 1 la de antes (murallas cuadradas), 2 la torre bajo la cupula (parte 5a). */
+    public static final int VERSION = 2;
 
     public static final class Estado {
         public final Set<Long> hechos = new HashSet<>();
@@ -27,6 +29,13 @@ public final class FortalezaDatos extends SavedData {
         public int baseEscalera = Integer.MIN_VALUE;
         /** Arreglos ya aplicados a una fortaleza levantada (1 = la escalera de la torre sin atascos). */
         public int parche;
+        /** La fortaleza que hay levantada (la de antes se rehace: {@link #VERSION}). */
+        public int version = VERSION;
+        /** Chunks de la fortaleza de antes que hay que vaciar antes de levantar la nueva. */
+        public final Set<Long> porLimpiar = new HashSet<>();
+        /** Se rehizo (de una de antes): a quien ya la abrio se le devuelve la llave de hueso, una vez. */
+        public boolean rehecha;
+        public final Set<String> llaves = new HashSet<>();
     }
 
     final Map<String, Estado> fortalezas = new HashMap<>();
@@ -58,6 +67,10 @@ public final class FortalezaDatos extends SavedData {
             e.portal = c.getBoolean("portal");
             e.baseEscalera = c.contains("base") ? c.getInt("base") : Integer.MIN_VALUE;
             e.parche = c.getInt("parche");
+            e.version = c.contains("version") ? c.getInt("version") : 1;
+            for (long l : c.getLongArray("limpiar")) e.porLimpiar.add(l);
+            e.rehecha = c.getBoolean("rehecha");
+            for (Tag x : c.getList("llaves", Tag.TAG_STRING)) e.llaves.add(x.getAsString());
         }
         for (Tag x : t.getList("libros", Tag.TAG_STRING)) d.libros.add(x.getAsString());
         return d;
@@ -76,6 +89,12 @@ public final class FortalezaDatos extends SavedData {
             c.putBoolean("portal", e.portal);
             if (e.baseEscalera != Integer.MIN_VALUE) c.putInt("base", e.baseEscalera);
             c.putInt("parche", e.parche);
+            c.putInt("version", e.version);
+            if (!e.porLimpiar.isEmpty()) c.put("limpiar", new LongArrayTag(e.porLimpiar.stream().mapToLong(Long::longValue).toArray()));
+            c.putBoolean("rehecha", e.rehecha);
+            ListTag ll = new ListTag();
+            for (String u : e.llaves) ll.add(StringTag.valueOf(u));
+            c.put("llaves", ll);
             fs.put(en.getKey(), c);
         }
         t.put("fortalezas", fs);

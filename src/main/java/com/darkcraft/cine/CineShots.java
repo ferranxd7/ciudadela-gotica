@@ -132,24 +132,29 @@ public final class CineShots {
     // ------------------------------------------------------------------ la Fortaleza de Hueso
 
     /**
-     * La puerta de hueso se abre (15 s): la calavera de la puerta desde el camino, la reja subiendo de cerca, la camara
-     * cruza la puerta hasta el patio de las costillas y sube mirando a lo alto de la torre del homenaje.
+     * La puerta de hueso se abre (15 s): la puerta entre las dos estatuas desde el camino (se les encienden los ojos), la
+     * reja subiendo de cerca, la camara cruza la puerta hasta el jardin muerto bajo la cupula y sube mirando la torre.
      */
     public static List<Shot> puertaHueso(com.darkcraft.gen.FortalezaPlan f) {
-        double cx = f.cx + 0.5, Y = f.Y, zp = f.cz + com.darkcraft.gen.FortalezaHueso.PZ + 0.5;
+        double cx = f.cx + 0.5, cz = f.cz + 0.5, Y = f.Y;
+        double zr = f.cz + com.darkcraft.gen.TorreCupula.PZ + 0.5, zf = f.cz + com.darkcraft.gen.TorreCupula.PFUERA + 0.5;
         List<Shot> l = new ArrayList<>();
+        // 1) desde el camino: el cuerpo de la puerta y las estatuas (los ojos se encienden en este plano)
         l.add(new Shot(0f, 4.4f, 62, 0, 1,
-                p(cx + 7, Y + 2.2, zp + 17, cx + 5, Y + 2.8, zp + 14, cx + 3, Y + 3.2, zp + 11),
-                p(cx, Y + 9, zp + 1, cx, Y + 8, zp + 1, cx, Y + 7, zp + 1)));
+                p(cx + 3, Y + 4, zf + 19, cx + 2, Y + 5, zf + 16, cx + 1, Y + 6, zf + 13),
+                p(cx, Y + 13, zf, cx, Y + 12, zf, cx, Y + 11, zf)));
+        // 2) en el rellano: la reja sube por su ranura
         l.add(new Shot(4.4f, 9.2f, 58, 0, 1,
-                p(cx - 3.5, Y + 1.7, zp + 6.5, cx, Y + 1.9, zp + 6, cx + 3.5, Y + 2.1, zp + 6.5),
-                p(cx, Y + 3.5, zp, cx, Y + 4.5, zp, cx, Y + 5.5, zp)));
+                p(cx - 2.5, Y + 1.8, zf + 2.5, cx, Y + 2.0, zf + 2.0, cx + 2.5, Y + 2.2, zf + 2.5),
+                p(cx, Y + 3.5, zr, cx, Y + 5, zr, cx, Y + 6.5, zr)));
+        // 3) la camara cruza la puerta y la de la cupula hasta la fuente rota
         l.add(new Shot(9.2f, 12.6f, 66, 0, 1,
-                p(cx, Y + 2.2, zp + 4, cx, Y + 2.6, zp - 4, cx, Y + 3.2, zp - 13),
-                p(cx, Y + 3, zp - 8, cx, Y + 6, zp - 22, cx, Y + 14, f.cz - 6)));
+                p(cx, Y + 2.4, zf + 1.5, cx, Y + 2.8, cz + 39, cx, Y + 3.6, cz + 31),
+                p(cx, Y + 3, cz + 38, cx, Y + 8, cz + 22, cx, Y + 18, cz + 10)));
+        // 4) sube junto al camino mirando la torre que atraviesa la cupula (sin llegar a las lianas del techo)
         l.add(new Shot(12.6f, 15.4f, 64, 0, 2,
-                p(cx + 1, Y + 4, f.cz + 16, cx + 2, Y + 12, f.cz + 21, cx + 3, Y + 21, f.cz + 25),
-                p(cx, Y + 30, f.cz - 12, cx, Y + 38, f.cz - 16, cx, Y + 44, f.cz - 18)));
+                p(cx + 1, Y + 3.5, cz + 22, cx + 1.5, Y + 9, cz + 25, cx + 2, Y + 15, cz + 27.5),
+                p(cx, Y + 26, cz + 8, cx, Y + 36, cz + 4, cx, Y + 46, cz + 2)));
         return l;
     }
 
@@ -177,40 +182,54 @@ public final class CineShots {
     }
 
     /**
-     * Capitulo 6 (habla la Sombra): la fortaleza sobre las nubes desde fuera, el patio de las costillas, la torre del
-     * homenaje subiendo, el arco del portal en lo alto (se abre en este plano), el portal de cerca y, al final, el jugador
-     * junto al altar. Todo cerca: no se mueve al jugador.
+     * Capitulo 6 (habla la Sombra): la fortaleza sobre las nubes desde fuera, el jardin muerto bajo la cupula, la torre
+     * subiendo hacia la cupula, el arco del portal en la terraza (se abre en este plano), el portal de cerca y, al final,
+     * el jugador junto al altar. Todo cerca: no se mueve al jugador.
      */
     public static List<Shot> chapter6(com.darkcraft.gen.FortalezaPlan f, ServerLevel sl, Vec3 eye, float yaw) {
         float t0 = Timeline.NARR_START - 0.6f, back = Timeline.back(6);
         float c1 = Timeline.cut(6, 0), c2 = Timeline.cut(6, 1), c3 = Timeline.cut(6, 2), c4 = Timeline.cut(6, 3), c5 = Timeline.cut(6, 4);
         double cx = f.cx + 0.5, cz = f.cz + 0.5, Y = f.Y;
-        double top = Y + com.darkcraft.gen.FortalezaHueso.NPISOS * com.darkcraft.gen.FortalezaHueso.PISO;
-        double az = f.cz + com.darkcraft.gen.FortalezaHueso.AZ + 0.5;
+        double top = Y + com.darkcraft.gen.TorreCupula.TERRAZA;
+        double az = f.cz + com.darkcraft.gen.TorreCupula.AZ + 0.5;
         List<Shot> l = new ArrayList<>();
         // 1) "...hasta aqui, sobre las nubes": la fortaleza entera desde fuera, la camara gira despacio
         l.add(new Shot(t0, c1, 66, 0, 1,
-                p(cx + 96, Y + 18, cz + 74, cx + 84, Y + 24, cz + 92, cx + 64, Y + 30, cz + 106),
-                p(cx, Y + 16, cz - 8, cx, Y + 18, cz - 8, cx, Y + 20, cz - 8)));
-        // 2) "...me llamaron la Sombra": entre las costillas del patio, mirando arriba
-        l.add(new Shot(c1, c2, 70, 0, 1,
-                p(cx - 7, Y + 2.5, cz + 22, cx - 2, Y + 3.5, cz + 14, cx + 4, Y + 4.5, cz + 6),
-                p(cx, Y + 20, cz + 8, cx, Y + 24, cz + 2, cx, Y + 26, cz - 6)));
-        // 3) "Has vencido a su rey...": sube por la fachada de la torre del homenaje
-        l.add(new Shot(c2, c3, 64, 0, 0,
-                p(cx + 15, Y + 4, cz - 1, cx + 16, Y + 22, cz - 2, cx + 15, top + 6, cz - 3),
-                p(cx, Y + 8, cz - 15, cx, Y + 26, cz - 15, cx, top + 4, az)));
-        // 4) "...abres mi puerta con el amuleto": el arco del portal en lo alto (aqui se abre)
+                p(cx + 100, Y + 24, cz + 66, cx + 88, Y + 30, cz + 86, cx + 68, Y + 36, cz + 100),
+                p(cx, Y + 26, cz - 4, cx, Y + 28, cz - 4, cx, Y + 30, cz - 4)));
+        // 2) "...me llamaron la Sombra": por el camino del jardin muerto, bajo la cupula, mirando arriba
+        l.add(primero(sl,
+                new Shot(c1, c2, 70, 0, 1,
+                        p(cx + 1.5, Y + 2.6, cz + 36, cx + 0.5, Y + 3.2, cz + 31, cx - 0.5, Y + 3.6, cz + 26),
+                        p(cx, Y + 22, cz + 6, cx, Y + 30, cz + 3, cx, Y + 38, cz)),
+                new Shot(c1, c2, 70, 0, 1,
+                        p(cx + 1.5, Y + 2.2, cz + 34, cx + 0.5, Y + 2.4, cz + 30, cx - 0.5, Y + 2.6, cz + 26),
+                        p(cx, Y + 22, cz + 6, cx, Y + 30, cz + 3, cx, Y + 38, cz))));
+        // 3) "Has vencido a su rey...": sube junto a la cara sur de la torre, de la puerta hacia la cupula
+        l.add(primero(sl,
+                new Shot(c2, c3, 64, 0, 0,
+                        p(cx - 6, Y + 3, cz + 19, cx - 5, Y + 12, cz + 18, cx - 4, Y + 21, cz + 17),
+                        p(cx, Y + 8, cz + 10, cx, Y + 26, cz + 8, cx, Y + 44, cz + 4)),
+                new Shot(c2, c3, 64, 0, 0,
+                        p(cx + 1, Y + 3, cz + 21, cx + 1, Y + 11, cz + 20, cx + 1, Y + 19, cz + 19),
+                        p(cx, Y + 8, cz + 10, cx, Y + 26, cz + 8, cx, Y + 44, cz + 4))));
+        // 4) "...abres mi puerta con el amuleto": el arco del portal en la terraza (aqui se abre)
         l.add(new Shot(c3, c4, 60, 0, 1,
-                p(cx + 7, top + 2.5, az + 9, cx + 4, top + 2.2, az + 7.5, cx + 2, top + 2, az + 6),
-                p(cx, top + 4, az, cx, top + 4, az, cx, top + 4, az)));
+                p(cx + 6, top + 3.2, cz + 9, cx + 5, top + 3.0, cz + 6.5, cx + 4.5, top + 2.8, cz + 4.5),
+                p(cx, top + 6, az, cx, top + 6, az, cx, top + 6, az)));
         // 5) "Todavia no puedes cruzar...": el remolino de cerca
         l.add(new Shot(c4, c5, 50, 0, 1,
-                p(cx - 1.2, top + 3.4, az + 3.4, cx, top + 3.6, az + 2.6, cx + 1.2, top + 3.8, az + 2.2),
-                p(cx, top + 3.6, az, cx, top + 3.8, az, cx, top + 4, az)));
+                p(cx - 1.4, top + 5.2, az + 3.6, cx, top + 5.6, az + 2.8, cx + 1.4, top + 6.0, az + 2.4),
+                p(cx, top + 5.6, az, cx, top + 5.8, az, cx, top + 6, az)));
         // 6) "Vuelve cuando estes preparado...": el jugador junto al altar
         l.add(jugador(sl, eye, yaw, c5, back + 0.05f));
         return l;
+    }
+
+    /** La primera opcion con la camara libre (o la primera, si ninguna lo esta). */
+    private static Shot primero(ServerLevel sl, Shot... opciones) {
+        for (Shot sh : opciones) if (camaraLibre(sl, sh)) return sh;
+        return opciones[0];
     }
 
     /** Si en (x, y, z) puede ir la camara (aire o luz; lo que no este cargado no se mira). */

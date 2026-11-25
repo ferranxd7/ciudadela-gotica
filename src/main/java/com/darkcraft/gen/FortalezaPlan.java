@@ -15,12 +15,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * La Fortaleza de Hueso entera: la isla de roca y ceniza, la fortaleza, el camino de huesos hasta el borde (donde llega el
- * puente de la llave) y el mar de nubes alrededor. Se construye chunk a chunk, como el castillo de Valdrenn.
+ * La Fortaleza de Hueso entera (desde la parte 5a, {@link TorreCupula}: la torre bajo la cupula de cristal): la isla de
+ * roca y ceniza, la fortaleza, el camino de huesos hasta el borde (donde llega el puente de la llave) y el mar de nubes
+ * alrededor. Se construye chunk a chunk, como el castillo de Valdrenn.
  */
 public final class FortalezaPlan {
     public final int cx, cz, Y;
-    public final FortalezaHueso f;
+    public final TorreCupula f;
     public final Island isla;
     /** Borde de la isla delante de la puerta: donde empieza el camino (z) y donde llega el puente (z + 1). */
     public final int bordeZ;
@@ -33,13 +34,13 @@ public final class FortalezaPlan {
         this.cz = cz;
         this.Y = Y;
         Rng rng = new Rng(seed);
-        isla = new Island(rng.fork(), cx, cz - 3, Y - 1, 55, 0.05, 6, 3, 46);
+        isla = new Island(rng.fork(), cx, cz - 3, Y - 1, 74, 0.05, 6, 3, 52);
         isla.surface(this::suelo).subsurface(this::subsuelo).plants((x, z) -> false);
         elementos.add(isla);
-        f = new FortalezaHueso(rng.fork(), cx, cz, Y);
+        f = new TorreCupula(rng.fork(), cx, cz, Y);
         elementos.add(f);
         int b = cz;
-        while (b < cz + 90 && isla.topAt(cx, b + 1) != Integer.MIN_VALUE && isla.topAt(cx - 2, b + 1) != Integer.MIN_VALUE
+        while (b < cz + 110 && isla.topAt(cx, b + 1) != Integer.MIN_VALUE && isla.topAt(cx - 2, b + 1) != Integer.MIN_VALUE
                 && isla.topAt(cx + 2, b + 1) != Integer.MIN_VALUE) b++;
         bordeZ = b;
         elementos.add(new Camino(rng.fork()));
@@ -92,14 +93,14 @@ public final class FortalezaPlan {
         double m = isla.mancha(x, z);
         int p = Hash.pct(x, top, z, 0xA5E);
         if (m > 0.35) return p < 55 ? Pal.b(Blocks.SOUL_SOIL) : p < 80 ? Pal.COARSE_DIRT : Pal.GRAVEL;
-        if (m < -0.4) return p < 45 ? Pal.b(Blocks.CALCITE) : p < 70 ? FortalezaHueso.HUESO : Pal.b(Blocks.TUFF);
+        if (m < -0.4) return p < 45 ? Pal.b(Blocks.CALCITE) : p < 70 ? TorreCupula.HUESO : Pal.b(Blocks.TUFF);
         if (p < 30) return Pal.GRAVEL;
         if (p < 52) return Pal.b(Blocks.TUFF);
         if (p < 66) return Pal.b(Blocks.SMOOTH_BASALT);
         if (p < 78) return Pal.COARSE_DIRT;
         if (p < 88) return Pal.b(Blocks.SOUL_SOIL);
         if (p < 94) return Pal.b(Blocks.CALCITE);
-        return FortalezaHueso.HUESO;
+        return TorreCupula.HUESO;
     }
 
     /** Bajo el suelo: grava, toba y tierra de almas (nada de tierra marron en el borde de la isla). */
@@ -117,12 +118,12 @@ public final class FortalezaPlan {
         Camino(long seed) {
             super(seed);
             this.layer = 4;
-            bounds(cx - 9, Y - 3, cz + FortalezaHueso.PZ + 6, cx + 9, Y + 14, bordeZ + 2);
+            bounds(cx - 9, Y - 3, cz + TorreCupula.PFUERA + 7, cx + 9, Y + 14, bordeZ + 2);
         }
 
         @Override
         public void build(Canvas c) {
-            int z0 = cz + FortalezaHueso.PZ + 7;
+            int z0 = cz + TorreCupula.PFUERA + 8;
             for (int z = z0; z <= bordeZ; z++) {
                 for (int x = cx - 2; x <= cx + 2; x++) {
                     BlockState s = Math.abs(x - cx) <= 1 ? Pal.b(Blocks.BLACKSTONE) : Pal.PB_BRICKS;
@@ -137,7 +138,7 @@ public final class FortalezaPlan {
                     for (int s = -1; s <= 1; s += 2) {
                         int x = cx + s * 3;
                         c.set(x, Y - 1, z, Pal.PB_BRICKS);
-                        for (int y = Y; y <= Y + 2; y++) c.set(x, y, z, FortalezaHueso.HUESO);
+                        for (int y = Y; y <= Y + 2; y++) c.set(x, y, z, TorreCupula.HUESO);
                         c.set(x, Y + 3, z, Pal.b(Blocks.SKELETON_SKULL));
                         c.set(x + s, Y + 2, z, Blocks.SOUL_LANTERN.defaultBlockState()
                                 .setValue(net.minecraft.world.level.block.LanternBlock.HANGING, false));
@@ -149,8 +150,8 @@ public final class FortalezaPlan {
                     double t = i / 30.0;
                     double x = cx + s * (4.5 - t * 3.2), y = Y - 1 + Math.sin(t * Math.PI * 0.55) * 12;
                     int bx = (int) Math.round(x), by = (int) Math.round(y);
-                    c.set(bx, by, bordeZ, FortalezaHueso.HUESO);
-                    if (t < 0.5) c.set(bx, by, bordeZ - 1, FortalezaHueso.HUESO);
+                    c.set(bx, by, bordeZ, TorreCupula.HUESO);
+                    if (t < 0.5) c.set(bx, by, bordeZ - 1, TorreCupula.HUESO);
                 }
             c.set(cx, Y + 11, bordeZ, Pal.b(Blocks.SKELETON_SKULL));
             for (int s = -1; s <= 1; s += 2) c.set(cx + s, Y + 10, bordeZ, Pal.CHAIN);
@@ -171,14 +172,14 @@ public final class FortalezaPlan {
             for (int x = Math.max(x0, c.minX); x <= Math.min(x1, c.maxX); x++)
                 for (int z = Math.max(z0, c.minZ); z <= Math.min(z1, c.maxZ); z++) {
                     int top = isla.topAt(x, z);
-                    if (top == Integer.MIN_VALUE || f.dentroMuros(x, z) || Math.abs(x - cx) <= 9 && z > cz + FortalezaHueso.PZ - 2) continue;
-                    if (Math.max(Math.abs(x - cx), Math.abs(z - cz)) <= FortalezaHueso.MURO + 6) continue; // las torres y su sombra
+                    if (top == Integer.MIN_VALUE || f.dentroMuros(x, z) || Math.abs(x - cx) <= 16 && z > cz + TorreCupula.RM - 4) continue;
+                    if (Math.hypot(x - cx, z - cz) <= TorreCupula.RM + 7) continue; // las torrecillas y su sombra
                     if (!c.isAir(x, top + 1, z)) continue;
                     int p = Hash.h(x, top, z, seed) % 1000;
                     BlockState s = null;
                     if (p < 40) s = Pal.b(Blocks.DEAD_BUSH);
                     else if (p < 46) s = Pal.b(Blocks.SKELETON_SKULL);
-                    else if (p < 52) s = FortalezaHueso.hueso(Hash.pct(x, 1, z, seed) < 50 ? Direction.Axis.X : Direction.Axis.Z);
+                    else if (p < 52) s = TorreCupula.hueso(Hash.pct(x, 1, z, seed) < 50 ? Direction.Axis.X : Direction.Axis.Z);
                     else if (p < 54) s = Pal.b(Blocks.WITHER_ROSE);
                     else if (p < 58) s = Pal.b(Blocks.BROWN_MUSHROOM);
                     if (s == null) continue;
@@ -192,7 +193,7 @@ public final class FortalezaPlan {
                 }
             // lapidas de los guardias caidos, al oeste
             for (int k = 0; k < 7; k++) {
-                int x = cx - FortalezaHueso.MURO - 12 + (k % 3) * 3 - Hash.pct(k, 5, 0, seed) % 2, z = cz - 12 + (k / 3) * 5;
+                int x = cx - TorreCupula.RM - 14 + (k % 3) * 3 - Hash.pct(k, 5, 0, seed) % 2, z = cz - 12 + (k / 3) * 5;
                 int top = isla.topAt(x, z);
                 if (top == Integer.MIN_VALUE) continue;
                 c.set(x, top + 1, z, Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, Direction.EAST, false));
@@ -210,7 +211,7 @@ public final class FortalezaPlan {
             this.layer = 1;
             Rng r = new Rng(seed);
             for (int k = 0; k < 22; k++) {
-                double a = r.nextDouble() * Math.PI * 2, d = 58 + r.nextDouble() * 40;
+                double a = r.nextDouble() * Math.PI * 2, d = 84 + r.nextDouble() * 40;
                 double bx = cx + Math.cos(a) * d, bz = cz - 3 + Math.sin(a) * d, by = Y - 7 - r.nextDouble() * 9;
                 // el sur (por donde llega el puente) mas despejado
                 if (Math.sin(a) > 0.82 && d < 80) continue;
@@ -223,7 +224,7 @@ public final class FortalezaPlan {
                     bolas.add(b);
                 }
             }
-            int R = 112;
+            int R = 136;
             bounds(cx - R, Y - 22, cz - R, cx + R, Y, cz + R);
         }
 

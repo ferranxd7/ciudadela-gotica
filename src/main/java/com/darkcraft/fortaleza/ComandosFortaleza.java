@@ -1,7 +1,7 @@
 package com.darkcraft.fortaleza;
 
 import com.darkcraft.DarkCraftMod;
-import com.darkcraft.gen.FortalezaHueso;
+import com.darkcraft.gen.TorreCupula;
 import com.darkcraft.gen.FortalezaPlan;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -56,14 +56,14 @@ public final class ComandosFortaleza {
                     int d = (int) Math.round(Math.hypot(s.x() - p.getX(), s.z() - p.getZ()));
                     Component pos = Component.literal("X " + s.x() + "  Y " + f.Y + "  Z " + s.z()).withStyle(Style.EMPTY
                             .withColor(ChatFormatting.YELLOW).withUnderlined(true)
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + s.x() + " " + (f.Y + 1) + " " + (s.z() + FortalezaHueso.PZ + 8)))
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + s.x() + " " + (f.Y + 1) + " " + (s.z() + TorreCupula.PFUERA + 6)))
                             .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("darkcraft.ayuda.clic"))));
                     c.getSource().sendSuccess(() -> Component.translatable("darkcraft.fortaleza.localizar", pos, d,
                             s.reinoX() + ", " + s.reinoZ()).withStyle(ChatFormatting.GOLD), false);
                     return 1;
                 })))
                 .then(Commands.literal("ir").executes(c -> conSitio(c, (p, s, f) -> {
-                    p.teleportTo(p.serverLevel(), f.cx + 0.5, f.Y, f.cz + FortalezaHueso.PZ + 9.5, 180f, 5f);
+                    p.teleportTo(p.serverLevel(), f.cx + 0.5, f.Y, f.cz + TorreCupula.PFUERA + 6.5, 180f, 5f);
                     return 1;
                 })))
                 .then(Commands.literal("escalera").executes(c -> conSitio(c, (p, s, f) -> {
@@ -109,7 +109,7 @@ public final class ComandosFortaleza {
                         int[] q = f.f.portal();
                         for (int x = q[0]; x <= q[3]; x++)
                             for (int y = q[1]; y <= q[4]; y++)
-                                lvl.setBlock(new net.minecraft.core.BlockPos(x, y, q[2]), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+                                if (f.f.enPortal(x, y)) lvl.setBlock(new net.minecraft.core.BlockPos(x, y, q[2]), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
                     }
                     e.puerta = e.portal = e.puente = false;
                     e.baseEscalera = Integer.MIN_VALUE;

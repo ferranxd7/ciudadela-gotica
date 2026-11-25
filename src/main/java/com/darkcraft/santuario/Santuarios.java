@@ -5,7 +5,7 @@ import com.darkcraft.armas.Combos;
 import com.darkcraft.fortaleza.FortalezaDatos;
 import com.darkcraft.fortaleza.Fortalezas;
 import com.darkcraft.gen.CastlePlan;
-import com.darkcraft.gen.FortalezaHueso;
+import com.darkcraft.gen.TorreCupula;
 import com.darkcraft.gen.MapShapes;
 import com.darkcraft.net.Net;
 import com.darkcraft.rol.Frascos;
@@ -401,11 +401,11 @@ public final class Santuarios {
         return null;
     }
 
-    /** El de la Fortaleza de Hueso: en el rellano de la puerta, a un lado (cuando la fortaleza esta levantada). */
+    /** El de la Fortaleza de Hueso: en el rellano de fuera de la puerta, a un lado del paso (cuando la fortaleza esta levantada). */
     private static void fortaleza(ServerPlayer p, ServerLevel lvl, Fortalezas.Sitio f, Datos d) {
         String k = "f" + f.clave();
         if (d.puestos.containsKey(k) || !FortalezaDatos.get(p.server).de(f).completa) return;
-        int x = f.x() + 4, z = f.z() + FortalezaHueso.PZ + 4;
+        int x = f.x() + 5, z = f.z() + TorreCupula.PFUERA + 5;
         if (Math.hypot(x - p.getX(), z - p.getZ()) > 56) return;
         BlockPos sitio = hueco(lvl, x, z, Fortalezas.Y, Fortalezas.Y, 2, 1);
         if (sitio != null) hecho(lvl, d, k, sitio, "darkcraft.santuario.fortaleza");
@@ -416,6 +416,12 @@ public final class Santuarios {
         d.puestos.put(k, sitio.getX() + "," + sitio.getY() + "," + sitio.getZ());
         d.setDirty();
         DarkCraftMod.LOGGER.info("[DarkCraft] Santuario {} puesto en {}", nombre, sitio.toShortString());
+    }
+
+    /** Olvida el santuario de un sitio (su sitio se rehizo): se vuelve a poner donde toque al acercarse alguien. */
+    public static void olvidar(MinecraftServer srv, String clave) {
+        Datos d = Datos.get(srv);
+        if (d.puestos.remove(clave) != null) d.setDirty();
     }
 
     /** Donde esta el santuario de un sitio construido ("x,z:torre_ascenso", "x,z:fuente", "x,z:arbol"...), o null si aun no se ha puesto. */

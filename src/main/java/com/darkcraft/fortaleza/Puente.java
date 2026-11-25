@@ -1,7 +1,7 @@
 package com.darkcraft.fortaleza;
 
 import com.darkcraft.DarkCraftMod;
-import com.darkcraft.gen.FortalezaHueso;
+import com.darkcraft.gen.TorreCupula;
 import com.darkcraft.gen.FortalezaPlan;
 import com.darkcraft.gen.Hash;
 import com.darkcraft.gen.Pal;
@@ -132,7 +132,7 @@ public final class Puente {
 
     // ------------------------------------------------------------------ las piezas
 
-    private static final BlockState HUESO_Y = FortalezaHueso.HUESO;
+    private static final BlockState HUESO_Y = TorreCupula.HUESO;
 
     private static BlockState peldano(Direction d) {
         return Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, d, false);
@@ -171,7 +171,7 @@ public final class Puente {
             }
             // el espinazo: hueso debajo de la celda del medio
             int[] mid = p.celdas.get(p.celdas.size() / 2);
-            out.add(new Pieza(mid[0], p.h - 2, mid[1], FortalezaHueso.hueso(p.dir.getAxis() == Direction.Axis.X ? Direction.Axis.X : Direction.Axis.Z)));
+            out.add(new Pieza(mid[0], p.h - 2, mid[1], TorreCupula.hueso(p.dir.getAxis() == Direction.Axis.X ? Direction.Axis.X : Direction.Axis.Z)));
             // barandilla de hueso por fuera cada dos escalones, con calavera de vez en cuando; nubes cada cinco
             int[] fuera = p.fuera;
             if (fuera != null && k % 2 == 0) {
@@ -212,10 +212,10 @@ public final class Puente {
             for (int sz = -1; sz <= 1; sz += 2) out.add(new Pieza(cx + sx * r, y, cz + sz * r, HUESO_Y));
         if ((y - g) % 28 == 20)
             for (int i = -r + 1; i <= r - 1; i++) {
-                out.add(new Pieza(cx + i, y, cz - r, FortalezaHueso.hueso(Direction.Axis.X)));
-                out.add(new Pieza(cx + i, y, cz + r, FortalezaHueso.hueso(Direction.Axis.X)));
-                out.add(new Pieza(cx - r, y, cz + i, FortalezaHueso.hueso(Direction.Axis.Z)));
-                out.add(new Pieza(cx + r, y, cz + i, FortalezaHueso.hueso(Direction.Axis.Z)));
+                out.add(new Pieza(cx + i, y, cz - r, TorreCupula.hueso(Direction.Axis.X)));
+                out.add(new Pieza(cx + i, y, cz + r, TorreCupula.hueso(Direction.Axis.X)));
+                out.add(new Pieza(cx - r, y, cz + i, TorreCupula.hueso(Direction.Axis.Z)));
+                out.add(new Pieza(cx + r, y, cz + i, TorreCupula.hueso(Direction.Axis.Z)));
             }
     }
 

@@ -20,10 +20,14 @@ import org.joml.Matrix4f;
  * El disco de runas: un disco de piedra negra con aro de oro y runas que brillan (mas cuando alguien espera
  * encima y mucho mientras viaja), con un anillo de luz que gira. Cuando el disco no esta arriba, en el hueco
  * de la recepcion se ve su circulo de runas, tenue, para que se sepa que ahi se le llama.
+ * <p>
+ * El de la Fortaleza de Hueso es una placa cuadrada de hueso con runas rojas y una calavera (que le brillan los ojos).
  */
 public class AscensorRenderer extends EntityRenderer<Ascensor> {
     private static final ResourceLocation TEX = new ResourceLocation(DarkCraftMod.MODID, "textures/entity/ascensor.png");
     private static final ResourceLocation GLOW = new ResourceLocation(DarkCraftMod.MODID, "textures/entity/ascensor_brillo.png");
+    private static final ResourceLocation TEX_HUESO = new ResourceLocation(DarkCraftMod.MODID, "textures/entity/ascensor_hueso.png");
+    private static final ResourceLocation GLOW_HUESO = new ResourceLocation(DarkCraftMod.MODID, "textures/entity/ascensor_hueso_brillo.png");
     private static final int N = 48;
     private static final float GROSOR = 0.3f;
 
@@ -34,6 +38,11 @@ public class AscensorRenderer extends EntityRenderer<Ascensor> {
 
     @Override
     public void render(Ascensor e, float yaw, float pt, PoseStack ps, MultiBufferSource buf, int light) {
+        if (e.deHueso()) {
+            placaHueso(e, pt, ps, buf, light);
+            super.render(e, yaw, pt, ps, buf, light);
+            return;
+        }
         float t = e.tickCount + pt;
         float r = (float) Ascensor.RADIO - 0.02f;
         boolean viaja = e.enMarcha();
@@ -64,6 +73,60 @@ public class AscensorRenderer extends EntityRenderer<Ascensor> {
             ps.popPose();
         }
         super.render(e, yaw, pt, ps, buf, light);
+    }
+
+    /** La placa de hueso: runas rojas (mas vivas al esperar o al viajar), un marco de luz que late y el cuadro de arriba. */
+    private void placaHueso(Ascensor e, float pt, PoseStack ps, MultiBufferSource buf, int light) {
+        float t = e.tickCount + pt;
+        float r = (float) Ascensor.RADIO - 0.02f;
+        boolean viaja = e.enMarcha();
+        placa(ps, buf.getBuffer(RenderType.entityCutoutNoCull(TEX_HUESO)), r, 0f, light, 1f, 1f, 1f, true);
+        float k = viaja ? 1f : 0.3f + 0.7f * e.carga() + 0.08f * Mth.sin(t * 0.15f);
+        VertexConsumer g = buf.getBuffer(RenderType.eyes(GLOW_HUESO));
+        placa(ps, g, r, 0.004f, LightTexture.FULL_BRIGHT, k, k * 0.35f, k * 0.3f, false);
+        // un marco de luz roja que sube y baja por encima (al viajar o al despertar)
+        float aro = viaja ? 1f : e.carga();
+        if (aro > 0.02f) {
+            ps.pushPose();
+            ps.translate(0, 0.05 + 0.1 * (0.5f + 0.5f * Mth.sin(t * 0.25f)), 0);
+            placa(ps, g, r * 1.03f, 0f, LightTexture.FULL_BRIGHT, 0.5f * aro, 0.08f * aro, 0.06f * aro, false);
+            ps.popPose();
+        }
+        // el cuadro tenue en la terraza mientras la placa no esta arriba (ahi se la llama)
+        double arriba = e.y1() - Mth.lerp(pt, e.yo, e.getY());
+        if (arriba > 1.5) {
+            ps.pushPose();
+            ps.translate(0, arriba + 0.01, 0);
+            float a = 0.24f + 0.07f * Mth.sin(t * 0.1f);
+            placa(ps, g, r, 0f, LightTexture.FULL_BRIGHT, a, a * 0.3f, a * 0.25f, false);
+            ps.popPose();
+        }
+    }
+
+    /** Placa cuadrada de medio lado r: cara de arriba (y la de abajo y los cantos si 'solido'), centrada en el origen. */
+    private static void placa(PoseStack ps, VertexConsumer vc, float r, float dy, int light, float cr, float cg, float cb, boolean solido) {
+        Matrix4f m = ps.last().pose();
+        Matrix3f n = ps.last().normal();
+        float s = 96f / 128f;
+        v(vc, m, n, -r, dy, -r, 0, 0, light, cr, cg, cb, 0, 1, 0);
+        v(vc, m, n, -r, dy, r, 0, s, light, cr, cg, cb, 0, 1, 0);
+        v(vc, m, n, r, dy, r, s, s, light, cr, cg, cb, 0, 1, 0);
+        v(vc, m, n, r, dy, -r, s, 0, light, cr, cg, cb, 0, 1, 0);
+        if (!solido) return;
+        float yb = dy - GROSOR, o = 0.6f;
+        v(vc, m, n, -r, yb, -r, 0, 0, light, cr * o, cg * o, cb * o, 0, -1, 0);
+        v(vc, m, n, r, yb, -r, s, 0, light, cr * o, cg * o, cb * o, 0, -1, 0);
+        v(vc, m, n, r, yb, r, s, s, light, cr * o, cg * o, cb * o, 0, -1, 0);
+        v(vc, m, n, -r, yb, r, 0, s, light, cr * o, cg * o, cb * o, 0, -1, 0);
+        float[][] lados = {{-r, -r, r, -r, 0, -1}, {r, -r, r, r, 1, 0}, {r, r, -r, r, 0, 1}, {-r, r, -r, -r, -1, 0}};
+        for (int i = 0; i < 4; i++) {
+            float[] l = lados[i];
+            float u0 = i * 0.25f, u1 = u0 + 0.25f;
+            v(vc, m, n, l[0], dy, l[1], u0, 96f / 128f, light, cr, cg, cb, l[4], 0, l[5]);
+            v(vc, m, n, l[2], dy, l[3], u1, 96f / 128f, light, cr, cg, cb, l[4], 0, l[5]);
+            v(vc, m, n, l[2], yb, l[3], u1, 104f / 128f, light, cr, cg, cb, l[4], 0, l[5]);
+            v(vc, m, n, l[0], yb, l[1], u0, 104f / 128f, light, cr, cg, cb, l[4], 0, l[5]);
+        }
     }
 
     /** Disco de radio r: cara de arriba (y la de abajo y el canto si 'solido'), centrado en el origen. */
@@ -108,6 +171,6 @@ public class AscensorRenderer extends EntityRenderer<Ascensor> {
 
     @Override
     public ResourceLocation getTextureLocation(Ascensor e) {
-        return TEX;
+        return e.deHueso() ? TEX_HUESO : TEX;
     }
 }

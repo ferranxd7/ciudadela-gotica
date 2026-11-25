@@ -35,6 +35,9 @@ import java.util.UUID;
  * de la torre (por dentro de un tubo de cristal) hasta la recepcion del arbol, y baja. Quien se queda encima
  * dos segundos viaja montado en el (no se puede caer ni bajarse a medio camino); desde el otro extremo se le
  * llama igual, esperando dos segundos encima de la runa.
+ * <p>
+ * El de la torre de la Fortaleza de Hueso (parte 5a) es el mismo, de otro tipo: una placa cuadrada de hueso con runas
+ * rojas y una calavera, que sube por el tubo de barrotes del centro de la torre hasta la terraza del portal.
  */
 public class Ascensor extends Entity {
     private static final EntityDataAccessor<Integer> ESTADO = SynchedEntityData.defineId(Ascensor.class, EntityDataSerializers.INT);
@@ -42,6 +45,10 @@ public class Ascensor extends Entity {
     private static final EntityDataAccessor<Integer> Y0 = SynchedEntityData.defineId(Ascensor.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> Y1 = SynchedEntityData.defineId(Ascensor.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> CARGA = SynchedEntityData.defineId(Ascensor.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> TIPO = SynchedEntityData.defineId(Ascensor.class, EntityDataSerializers.INT);
+
+    /** Los tipos: el disco de oro de la torre del arbol y la placa de hueso de la fortaleza. */
+    public static final int ARBOL = 0, FORTALEZA = 1;
 
     public static final int ABAJO = 0, ARRIBA = 1, SUBE = 2, BAJA = 3;
     /** Duracion del viaje (ticks) y lo que hay que esperar encima para que arranque. */
@@ -69,6 +76,20 @@ public class Ascensor extends Entity {
         this.entityData.define(Y0, 0);
         this.entityData.define(Y1, 0);
         this.entityData.define(CARGA, 0);
+        this.entityData.define(TIPO, ARBOL);
+    }
+
+    public void setTipo(int t) {
+        this.entityData.set(TIPO, t);
+    }
+
+    public int tipo() {
+        return this.entityData.get(TIPO);
+    }
+
+    /** La placa de hueso de la fortaleza (y no el disco de la torre del arbol). */
+    public boolean deHueso() {
+        return tipo() == FORTALEZA;
     }
 
     /** Recorrido: de y0 (suelo de abajo) a y1 (suelo de la recepcion), parado en un extremo. */
@@ -217,8 +238,9 @@ public class Ascensor extends Entity {
         this.entityData.set(ESTADO, dir);
         sl.playSound(null, getX(), getY(), getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 1.2f, 1.2f);
         // el ruido del disco va pegado a el y sube (o baja) con los que van encima
-        sl.playSound(null, this, com.darkcraft.DarkCraftMod.SFX_ASCENSOR_MUEVE.get(), SoundSource.BLOCKS, 1.8f, 1.0f);
-        sl.sendParticles(new DustParticleOptions(new Vector3f(1f, 0.8f, 0.3f), 1.4f), getX(), getY() + 0.2, getZ(), 50, 1.6, 0.1, 1.6, 0.02);
+        sl.playSound(null, this, com.darkcraft.DarkCraftMod.SFX_ASCENSOR_MUEVE.get(), SoundSource.BLOCKS, 1.8f, deHueso() ? 0.8f : 1.0f);
+        sl.sendParticles(new DustParticleOptions(color(), 1.4f), getX(), getY() + 0.2, getZ(), 50, 1.6, 0.1, 1.6, 0.02);
+        if (deHueso()) sl.sendParticles(ParticleTypes.WHITE_ASH, getX(), getY() + 0.3, getZ(), 40, 1.6, 0.2, 1.6, 0.02);
     }
 
     private void llegar(ServerLevel sl) {
@@ -226,7 +248,10 @@ public class Ascensor extends Entity {
         this.entityData.set(ESTADO, arriba ? ARRIBA : ABAJO);
         setPos(getX(), arriba ? y1() : y0(), getZ());
         sl.playSound(null, getX(), getY(), getZ(), com.darkcraft.DarkCraftMod.SFX_ASCENSOR_LLEGA.get(), SoundSource.BLOCKS, 2.0f, 1.0f);
-        sl.sendParticles(ParticleTypes.END_ROD, getX(), getY() + 0.3, getZ(), 30, 1.8, 0.2, 1.8, 0.04);
+        if (deHueso()) {
+            sl.sendParticles(ParticleTypes.SOUL, getX(), getY() + 0.3, getZ(), 18, 1.8, 0.2, 1.8, 0.03);
+            sl.sendParticles(ParticleTypes.WHITE_ASH, getX(), getY() + 0.4, getZ(), 50, 1.8, 0.3, 1.8, 0.03);
+        } else sl.sendParticles(ParticleTypes.END_ROD, getX(), getY() + 0.3, getZ(), 30, 1.8, 0.2, 1.8, 0.04);
         soltarTodos();
     }
 
@@ -310,18 +335,29 @@ public class Ascensor extends Entity {
     public void lerpMotion(double x, double y, double z) {
     }
 
+    /** El color del polvo de las runas: oro en el disco del arbol, rojo sangre en la placa de hueso. */
+    private Vector3f color() {
+        return deHueso() ? new Vector3f(0.78f, 0.1f, 0.07f) : new Vector3f(1f, 0.78f, 0.28f);
+    }
+
     private void particulas(long now) {
         if (enMarcha()) {
             for (int i = 0; i < 3; i++) {
                 double a = random.nextDouble() * Math.PI * 2;
                 double r = RADIO - 0.1;
-                level().addParticle(new DustParticleOptions(new Vector3f(1f, 0.78f, 0.28f), 1.0f),
-                        getX() + Math.cos(a) * r, getY() - 0.1, getZ() + Math.sin(a) * r, 0, 0, 0);
+                // por el borde: en la placa cuadrada, por su contorno
+                double ox = Math.cos(a) * r, oz = Math.sin(a) * r;
+                if (deHueso()) {
+                    double m = Math.max(Math.abs(Math.cos(a)), Math.abs(Math.sin(a)));
+                    ox /= m;
+                    oz /= m;
+                }
+                level().addParticle(new DustParticleOptions(color(), 1.0f), getX() + ox, getY() - 0.1, getZ() + oz, 0, 0, 0);
             }
             if (now % 3 == 0) {
                 double a = random.nextDouble() * Math.PI * 2;
-                level().addParticle(ParticleTypes.END_ROD, getX() + Math.cos(a) * 1.8, getY() + 0.1, getZ() + Math.sin(a) * 1.8, 0,
-                        estado() == SUBE ? -0.08 : 0.08, 0);
+                level().addParticle(deHueso() ? ParticleTypes.WHITE_ASH : ParticleTypes.END_ROD, getX() + Math.cos(a) * 1.8, getY() + 0.1,
+                        getZ() + Math.sin(a) * 1.8, 0, estado() == SUBE ? -0.08 : 0.08, 0);
             }
         } else if (this.entityData.get(CARGA) > 0) {
             for (int i = 0; i < 2; i++) {
@@ -368,6 +404,7 @@ public class Ascensor extends Entity {
         this.entityData.set(Y0, t.getInt("Y0"));
         this.entityData.set(Y1, t.getInt("Y1"));
         this.entityData.set(ESTADO, t.getBoolean("Arriba") ? ARRIBA : ABAJO);
+        this.entityData.set(TIPO, t.getInt("Tipo"));
     }
 
     @Override
@@ -375,6 +412,7 @@ public class Ascensor extends Entity {
         t.putInt("Y0", y0());
         t.putInt("Y1", y1());
         t.putBoolean("Arriba", estado() == ARRIBA || estado() == SUBE);
+        t.putInt("Tipo", tipo());
     }
 
     @Override

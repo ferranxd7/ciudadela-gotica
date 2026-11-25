@@ -218,7 +218,7 @@ public final class Espejo {
             com.darkcraft.gen.FortalezaPlan fp = com.darkcraft.fortaleza.Fortalezas.plan(srv.overworld().getSeed(), fo[0], fo[1]);
             int fy = fp.Y;
             out.add(new Lugar(k + ":fortaleza", LUGAR, I_CALAVERA, fp.cx, fy, fp.cz, "darkcraft.mapa.lugar.fortaleza", 150, 0));
-            out.add(new Lugar(k + ":fortaleza_puerta", LUGAR, I_PUERTA, fp.cx, fy, fp.cz + com.darkcraft.gen.FortalezaHueso.PZ + 1,
+            out.add(new Lugar(k + ":fortaleza_puerta", LUGAR, I_PUERTA, fp.cx, fy, fp.cz + com.darkcraft.gen.TorreCupula.PFUERA + 3,
                     "darkcraft.mapa.lugar.fortaleza_puerta", 28, 0));
             int[] al = fp.f.altar();
             out.add(new Lugar(k + ":fortaleza_portal", LUGAR, I_PREGUNTA, al[0], al[1], al[2], "darkcraft.mapa.lugar.fortaleza_portal", 22, 0));

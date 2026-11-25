@@ -4,7 +4,7 @@ import com.darkcraft.DarkCraftMod;
 import com.darkcraft.fortaleza.FortalezaEventos;
 import com.darkcraft.fortaleza.Fortalezas;
 import com.darkcraft.fortaleza.Puente;
-import com.darkcraft.gen.FortalezaHueso;
+import com.darkcraft.gen.TorreCupula;
 import com.darkcraft.gen.FortalezaPlan;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
@@ -93,7 +93,7 @@ public class LlaveHueso extends Item {
         // delante de la reja: abre la puerta
         int[] r = f.f.reja();
         double dPuerta = Math.hypot(p.getX() - (f.cx + 0.5), p.getZ() - (r[2] + 0.5));
-        if (dPuerta < 9 && Math.abs(p.getY() - f.Y) < 6) {
+        if (dPuerta < 13 && Math.abs(p.getY() - f.Y) < 6) {
             if (FortalezaEventos.abrirPuerta(p, s))
                 p.displayClientMessage(Component.translatable("darkcraft.llave.puerta").withStyle(ChatFormatting.GOLD, ChatFormatting.ITALIC), true);
             else p.displayClientMessage(Component.translatable("darkcraft.llave.puerta_ya").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC), true);
@@ -158,7 +158,7 @@ public class LlaveHueso extends Item {
         Vec3 obj;
         if (com.darkcraft.fortaleza.FortalezaDatos.get(p.server).de(s).puente && Math.abs(p.getY() - f.Y) < 4
                 && Math.hypot(p.getX() - f.cx, p.getZ() - f.cz) < 70)
-            obj = new Vec3(f.cx + 0.5, f.Y, f.cz + FortalezaHueso.PZ + 1.5); // ya arriba: hacia la puerta
+            obj = new Vec3(f.cx + 0.5, f.Y, f.cz + TorreCupula.PZ + 1.5); // ya arriba: hacia la reja de la puerta
         else obj = new Vec3(c[0] + 0.5, f.Y, c[1] + 0.5);
         rastro(p, obj, 16, 12);
         if (p.tickCount % 120 == 13)
