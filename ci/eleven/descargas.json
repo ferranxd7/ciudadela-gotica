@@ -1,21 +1,52 @@
 {
   "descargas": [
     {
-      "archivo": "sfx/logro_1.mp3",
-      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/fzTGvXlCySt3HSt1i6E3/PMuDGGTXLn3HCd1qfq6y/content.mp3?Expires=1795582800&KeyName=assets-cdn-key-1&Signature=-Ohiny1hLjJ8aWLQV92pQfVkEAw="
+      "archivo": "sfx/pieza_barco_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/AKqgijgofbN5I17MLuQg/uUNKUAkOzZ9cTEQKjaFq/content.mp3?Expires=1795600800&KeyName=assets-cdn-key-1&Signature=ys-VL5HAUpSY_4DwbCwM2Nn5KjM="
     },
     {
-      "archivo": "sfx/logro_2.mp3",
-      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/I2E6pkysOd2R5qQBJ5Eq/ma0wvRT0D7C9eZZUVl9c/content.mp3?Expires=1795582800&KeyName=assets-cdn-key-1&Signature=DXyVMFME61BL8oMZxw8EGP6wMB4="
+      "archivo": "sfx/pieza_barco_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/79SbzaC6LCi4GrVtpC4K/lYffEvntzIspy7nXlGbN/content.mp3?Expires=1795600800&KeyName=assets-cdn-key-1&Signature=YEh37W3xK5wHUdg0Y06Vbutbko4="
     },
     {
-      "archivo": "sfx/logro_3.mp3",
-      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/j4LR3sgT6GPUl2bOVEVh/swbZTS56xvGrG7fVGAO8/content.mp3?Expires=1795582800&KeyName=assets-cdn-key-1&Signature=9zBulantqgnYGCoiVV8mBBsPv08="
+      "archivo": "sfx/pieza_barco_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/kWJOpyh1rHZjpZLpBmjV/lQI2RGbzvC1ugiymAVff/content.mp3?Expires=1795600800&KeyName=assets-cdn-key-1&Signature=V_SNjItPuA_cIA6wbUajxjNX39A="
     },
     {
-      "archivo": "sfx/logro_4.mp3",
-      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/o2GlyAffK8RrXcWmneLI/LU7vrDhy0ZMzTgVf7IjR/content.mp3?Expires=1795582800&KeyName=assets-cdn-key-1&Signature=EPvHEmWKJUx55bT0REASNLyvwtQ="
+      "archivo": "sfx/pieza_barco_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/qlUbDtWcQKna1Y7jnWPt/6qFIOduV8OQbl7FMBTHC/content.mp3?Expires=1795600800&KeyName=assets-cdn-key-1&Signature=-Ae69gm7zSugd3WNsiWiF39BjrA="
+    },
+    {
+      "archivo": "sfx/cripta_abre_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/Jr7aFnr42gNb4iZABuJW/2FUEuuEu7gMri3KYlPpp/content.mp3?Expires=1795600800&KeyName=assets-cdn-key-1&Signature=BajPvH5EoFgKbiXNboZlsXdp1g0="
+    },
+    {
+      "archivo": "sfx/cripta_abre_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/GbyZaJ2mOmpcXMidUSA0/rFSS10W4MvxO3gMXAiRL/content.mp3?Expires=1795600800&KeyName=assets-cdn-key-1&Signature=T4UYBIOvQpSpOd3I2jepdeBy4RA="
+    },
+    {
+      "archivo": "sfx/cripta_abre_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/goSNXLi6xh21cO4KdBXm/OgRqR1FfGBghv9FHVRsX/content.mp3?Expires=1795600800&KeyName=assets-cdn-key-1&Signature=IDrkvs_kz0BNnxibETf9qy4S0Xc="
+    },
+    {
+      "archivo": "sfx/cripta_abre_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/Uw63kS8xyJROk4fwH7kA/x8jgv5THxUKZISLUe2wd/content.mp3?Expires=1795600800&KeyName=assets-cdn-key-1&Signature=CVQMgnTtNUid2xo309IWrUFI-5U="
+    },
+    {
+      "archivo": "sfx/barco_reparado_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/nXmm9sVIKUtrFJlgtfot/ttdrtu6bcQrmL3yPPTvT/content.mp3?Expires=1795600800&KeyName=assets-cdn-key-1&Signature=6_Ogmr0wdBmtue3JcFn7QQLOZWM="
+    },
+    {
+      "archivo": "sfx/barco_reparado_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/ly2BpHgvqp4Aa8qZ8DY8/IckOpEgPjEXMrlUA1MZM/content.mp3?Expires=1795600800&KeyName=assets-cdn-key-1&Signature=o1sDtx9mQJb0EReeLs65Ufzppjs="
+    },
+    {
+      "archivo": "sfx/barco_reparado_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/wwHrWochX5NbKuE1ADBy/lsho3xWY8zXAOtOZspqW/content.mp3?Expires=1795600800&KeyName=assets-cdn-key-1&Signature=-R4LizDdjITtMATmpDVrdezgJYo="
+    },
+    {
+      "archivo": "sfx/barco_reparado_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/9jz4Bq6A9l0irbjDkrIK/E5OFUXQ6tEWPRk7vdShZ/content.mp3?Expires=1795600800&KeyName=assets-cdn-key-1&Signature=zgox2AeGfR0o84sSijYav0FqdAc="
     }
-  ],
-  "caduca": "2026-11-25T05:00:00Z"
+  ]
 }

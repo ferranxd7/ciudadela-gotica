@@ -1349,5 +1349,39 @@
     ]
    }
   }
+ },
+ "sfx_brumavela": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 3b: Brumavela (una pieza del barco encontrada, la losa de la cripta que se aparta y el barco reparado). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "pieza_barco": {
+    "prompt": "Dark fantasy RPG item discovery sound, epic cinematic Dark Souls style: a single deep old ship's bell strike with a rising bright shimmering magical sparkle on top, a soft creak of old wood and rope underneath, long airy reverb tail, about 2.5 seconds, clean, no music melody.",
+    "sesiones": [
+     "AKqgijgofbN5I17MLuQg",
+     "79SbzaC6LCi4GrVtpC4K",
+     "kWJOpyh1rHZjpZLpBmjV",
+     "qlUbDtWcQKna1Y7jnWPt"
+    ]
+   },
+   "cripta_abre": {
+    "prompt": "A heavy ancient stone slab slowly grinding and sliding aside on the floor of a small stone chapel, revealing a crypt: deep scraping stone rumble, falling dust and grit, a low hollow ghostly exhale of cold air rising from below at the end, echo of a stone room, epic cinematic dark fantasy, about 4 seconds, no music.",
+    "sesiones": [
+     "Jr7aFnr42gNb4iZABuJW",
+     "GbyZaJ2mOmpcXMidUSA0",
+     "goSNXLi6xh21cO4KdBXm",
+     "Uw63kS8xyJROk4fwH7kA"
+    ]
+   },
+   "barco_reparado": {
+    "prompt": "An old wrecked wooden sailing ship comes back to life: heavy timbers creaking and settling into place, ropes pulled tight, a big canvas sail unfurling and snapping full of wind, then a deep magical hum swelling from inside the hull with a bright shimmering bell-like chime as it awakens; epic cinematic dark fantasy, Dark Souls style, about 5 seconds, no music melody.",
+    "sesiones": [
+     "nXmm9sVIKUtrFJlgtfot",
+     "ly2BpHgvqp4Aa8qZ8DY8",
+     "wwHrWochX5NbKuE1ADBy",
+     "9jz4Bq6A9l0irbjDkrIK"
+    ]
+   }
+  }
  }
 }
