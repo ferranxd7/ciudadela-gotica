@@ -323,7 +323,7 @@ public final class Pueblo {
             Display.ItemDisplay v = VISTAS.get(Pieza.CORAZON);
             boolean cerca = lvl.hasChunkAt(new BlockPos(s[0], s[1], s[2])) && lvl.getNearestPlayer(s[0] + 0.5, s[1], s[2] + 0.5, 72, false) != null;
             if (cerca && (v == null || v.isRemoved())) {
-                v = vista(lvl, Pieza.CORAZON, new int[]{s[0], s[1] - 1, s[2]});
+                v = vista(lvl, Pieza.CORAZON, s);
                 if (v != null) VISTAS.put(Pieza.CORAZON, v);
             } else if (!cerca && v != null) {
                 v.discard();
@@ -337,6 +337,7 @@ public final class Pueblo {
         if (colgada && (anclaVista == null || anclaVista.isRemoved())) {
             Matrix4f m = new Matrix4f().rotateY((float) (Math.PI / 2)).scale(ANCLA_TAM);
             anclaVista = dibujo(lvl, new ItemStack(Pieza.ANCLA.item()), a[0] + 0.5, a[1] - ANCLA_TAM * 0.47, a[2] + 0.5, m, false);
+            DarkCraftMod.LOGGER.info("[DarkCraft] El ancla de La Garza Gris, colgada en {}, {}, {}", a[0], a[1] - 1, a[2]);
         } else if (!colgada && anclaVista != null) {
             anclaVista.discard();
             anclaVista = null;
@@ -370,7 +371,7 @@ public final class Pueblo {
 
     /**
      * El dibujo de un objeto puesto en el mundo (una entidad item_display que no se guarda). {@code deCara}: siempre de
-     * cara a quien mira y con luz propia (lo que hay que encontrar); si no, quieto y con la luz que le llegue.
+     * cara a quien mira y a plena luz (lo que hay que encontrar); si no, quieto y con la luz del cielo.
      */
     private static Display.ItemDisplay dibujo(ServerLevel lvl, ItemStack objeto, double x, double y, double z, Matrix4f m, boolean deCara) {
         Display.ItemDisplay d = EntityType.ITEM_DISPLAY.create(lvl);
@@ -381,13 +382,12 @@ public final class Pueblo {
         ListTag l = new ListTag();
         for (int i = 0; i < 16; i++) l.add(FloatTag.valueOf(m.getRowColumn(i >> 2, i & 3)));
         tag.put("transformation", l);
-        if (deCara) {
-            tag.putString("billboard", "vertical");
-            CompoundTag luz = new CompoundTag();
-            luz.putInt("sky", 15);
-            luz.putInt("block", 15);
-            tag.put("brightness", luz);
-        }
+        CompoundTag luz = new CompoundTag();
+        luz.putInt("sky", 15);
+        // lo que hay que encontrar, a plena luz; lo demas, con la del cielo y un poco propia (que no quede negro a la sombra)
+        luz.putInt("block", deCara ? 15 : 8);
+        tag.put("brightness", luz);
+        if (deCara) tag.putString("billboard", "vertical");
         tag.putFloat("view_range", deCara ? 1.2f : 1.6f);
         d.load(tag);
         d.moveTo(x, y, z, 0f, 0f);

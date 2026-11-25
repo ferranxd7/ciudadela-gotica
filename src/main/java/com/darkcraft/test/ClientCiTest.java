@@ -3304,7 +3304,8 @@ public final class ClientCiTest {
         });
         atTicks(t + 932, "Brumavela: el ancla, desde el espigon", m -> server(m, sp -> {
             int[] an = com.darkcraft.pueblo.gen.Barco.ancla();
-            irMirando(sp, 0.5, 251, an[2] + 3.5, an[0] + 0.5, an[1] - 0.6, an[2] + 0.5, false);
+            // (desde el canto del espigon, por detras del pilote que queda junto al ancla)
+            irMirando(sp, -1.5, 251, an[2] - 2.0, an[0] + 0.5, an[1] - 0.8, an[2] + 0.5, false);
         }));
         atTicks(t + 964, "captura: el ancla en su serviola", m -> shot(m, "cliente_b16b_ancla"));
         atTicks(t + 966, "Brumavela: la bodega, con el corazon en su cuna", m -> server(m, sp -> {
@@ -3315,13 +3316,16 @@ public final class ClientCiTest {
             server(m, sp -> {
                 ServerLevel lvl = sp.serverLevel();
                 int[] c = sitioB("barco_corazon");
-                int nube = 0;
-                for (int x = c[0] - 3; x <= c[0] + 3; x++)
-                    for (int z = com.darkcraft.pueblo.gen.Barco.POPA + 1; z < com.darkcraft.pueblo.gen.Barco.PROA; z++)
-                        for (int y = com.darkcraft.pueblo.gen.Barco.CUBIERTA - 4; y < com.darkcraft.pueblo.gen.Barco.CUBIERTA; y++)
+                int nube = 0, celdas = 0;
+                for (int x = c[0] - 4; x <= c[0] + 4; x++)
+                    for (int z = com.darkcraft.pueblo.gen.Barco.POPA; z <= com.darkcraft.pueblo.gen.Barco.PROA; z++)
+                        for (int y = com.darkcraft.pueblo.gen.Barco.CUBIERTA - 5; y < com.darkcraft.pueblo.gen.Barco.CUBIERTA; y++) {
+                            if (!com.darkcraft.pueblo.gen.Barco.dentro(x, y, z)) continue;
+                            celdas++;
                             if (lvl.getBlockState(new BlockPos(x, y, z)).getBlock() instanceof com.darkcraft.world.NubeBlock) nube++;
+                        }
                 log("  pueblo: en la bodega " + fpos(sp) + ", la cuna " + bloque(lvl, c[0], c[1] - 1, c[2]) + ", sobre ella " + bloque(lvl, c[0], c[1], c[2])
-                        + ", nube dentro del casco " + nube + " (tiene que ser 0)");
+                        + ", nube dentro del casco " + nube + " de " + celdas + " celdas (tiene que ser 0)");
             });
             shot(m, "cliente_b16c_bodega");
         });

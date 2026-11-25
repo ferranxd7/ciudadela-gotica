@@ -72,6 +72,13 @@ public final class Barco extends Element {
         return d >= 5 ? m - 3 : d == 4 ? m - 2 : d == 3 ? m - 1 : m;
     }
 
+    /** Si esa celda cae dentro del casco, por dentro del forro (el aire de la bodega y lo que haya en ella). */
+    public static boolean dentro(int x, int y, int z) {
+        if (y < CUBIERTA - 4 || y >= CUBIERTA || z <= POPA || z >= PROA) return false;
+        int a = Math.abs(x - BX);
+        return a < ancho(manga(z), y) && a < ancho(manga(z - 1), y) && a < ancho(manga(z + 1), y);
+    }
+
     private BlockState forro(int x, int y, int z) {
         int p = Hash.pct(x, y, z, seed + 1);
         if (y <= CUBIERTA - 4) return p < 70 ? Pal.DO_PLANKS : Pal.b(Blocks.STRIPPED_DARK_OAK_WOOD);
