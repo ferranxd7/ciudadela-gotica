@@ -171,8 +171,6 @@ public final class Travesia {
         if (!d.amarrado() || ocupado() || d.barcoEn == aqui || aqui < 0 || aqui > 1 || Cinematics.active(p)) return;
         int[] o = Amarres.de(lvl, d.barcoEn), dd = Amarres.de(lvl, aqui);
         if (o == null || dd == null || (aqui == Amarres.VALDRENN && !d.muelle)) return;
-        BlockPos c = Amarres.campana(lvl, aqui);
-        if (c != null) lvl.playSound(null, c, DarkCraftMod.SFX_BARCO_CAMPANA.get(), SoundSource.BLOCKS, 2.0f, 1.0f);
         // el otro muelle tiene que cargarse para quitar de alli el barco
         billetes(lvl, o, 2);
         List<ServerPlayer> quien = junto(lvl, dd, MIRAN);
@@ -191,6 +189,8 @@ public final class Travesia {
             m.quien.add(q.getUUID());
         }
         marcha = m;
+        // (la campana: los que ven la cinematica la oyen en ella; los demas, desde el muelle)
+        oyen(lvl, dd, DarkCraftMod.SFX_BARCO_CAMPANA.get());
         d.resto = d.barcoEn;
         d.puesto = -1;
         d.barcoEn = aqui;

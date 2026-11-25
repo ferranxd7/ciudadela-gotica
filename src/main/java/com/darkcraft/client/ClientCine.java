@@ -184,6 +184,23 @@ public final class ClientCine {
         return (ticks + pt) / 20f;
     }
 
+    /**
+     * A donde queda mirando el jugador cuando acabe la cinematica (si no, a donde miraba al empezar): los viajes del barco
+     * acaban en sus ojos, en otro sitio y mirando a otro lado (en build-100 la vista daba media vuelta al acabar).
+     */
+    static void mirar(float giro, float cabeceo) {
+        lockYaw = giro;
+        lockPitch = cabeceo;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+        mc.player.setYRot(giro);
+        mc.player.setXRot(cabeceo);
+        mc.player.yRotO = giro;
+        mc.player.xRotO = cabeceo;
+        mc.player.yHeadRot = mc.player.yHeadRotO = giro;
+        mc.player.yBodyRot = mc.player.yBodyRotO = giro;
+    }
+
     // ------------------------------------------------------------------ cada tick
 
     @SubscribeEvent

@@ -3939,6 +3939,8 @@ public final class ClientCiTest {
         atTicks(A, "captura: en Valdrenn, en el alcazar", m -> {
             com.darkcraft.client.ui.Carteles.callados = false;
             logPueblo(m, "al llegar a Valdrenn");
+            log("  barco, lo que mira el cliente al llegar: giro " + Math.round(net.minecraft.util.Mth.wrapDegrees(m.player.getYRot())) + " cabeceo " + Math.round(m.player.getXRot())
+                    + " (tiene que ser lo mismo que dice el servidor: hacia la torre)");
             server(m, sp -> {
                 ServerLevel lvl = sp.serverLevel();
                 int[] o = com.darkcraft.pueblo.Amarres.de(lvl, com.darkcraft.pueblo.Amarres.VALDRENN);
@@ -3995,6 +3997,9 @@ public final class ClientCiTest {
         int B = N + Math.round((com.darkcraft.cine.Viaje.tiempos(com.darkcraft.cine.Viaje.NORMAL).total() + 1.6f) * 20f);
         atTicks(B, "captura: de vuelta en Brumavela", m -> {
             logPueblo(m, "de vuelta en Brumavela");
+            log("  barco, lo que mira el cliente al volver: giro " + Math.round(net.minecraft.util.Mth.wrapDegrees(m.player.getYRot())) + " cabeceo " + Math.round(m.player.getXRot())
+                    + " (hacia el pueblo: cerca de 170 y -10)");
+            server(m, sp -> log("  barco, lo que dice el servidor: giro " + Math.round(net.minecraft.util.Mth.wrapDegrees(sp.getYRot())) + " cabeceo " + Math.round(sp.getXRot())));
             server(m, sp -> {
                 ServerLevel lvl = sp.serverLevel();
                 int[] o = com.darkcraft.pueblo.Amarres.de(lvl, com.darkcraft.pueblo.Amarres.VALDRENN);
@@ -4020,16 +4025,17 @@ public final class ClientCiTest {
             server(m, sp -> com.darkcraft.pueblo.Pueblo.usar(sp, com.darkcraft.pueblo.Pueblo.LLAMAR));
         });
         int L = B + 57;
-        capturaBarco(L, 3.0f, "cliente_vl02_viene");
-        capturaBarco(L, 8.0f, "cliente_vl03_gira");
-        capturaBarco(L, 11.8f, "cliente_vl04_baja");
-        capturaBarco(L, 15.4f, "cliente_vl05_amarrado");
+        capturaBarco(L, 2.2f, "cliente_vl02_viene");
+        capturaBarco(L, 6.0f, "cliente_vl03_frena");
+        capturaBarco(L, 10.4f, "cliente_vl04_gira");
+        capturaBarco(L, 14.2f, "cliente_vl05_baja");
+        capturaBarco(L, 17.9f, "cliente_vl06_amarrado");
         int F = L + Math.round((com.darkcraft.cine.Viaje.tiempos(com.darkcraft.cine.Viaje.LLAMADA).total() + 1.4f) * 20f);
         atTicks(F, "captura: el barco ha acudido", m -> {
             logPueblo(m, "tras la llamada");
             server(m, sp -> log("  barco tras la llamada: " + fpos(sp) + ", distinto del plano en Brumavela " + com.darkcraft.pueblo.Garza.distintas(sp.serverLevel(), true, 0, 0)
                     + " (0), en cinematica=" + com.darkcraft.cine.Cinematics.active(sp)));
-            shot(m, "cliente_vl06_ha_acudido");
+            shot(m, "cliente_vl07_ha_acudido");
         });
         atTicks(F + 4, "fin del tramo: creativo otra vez", m -> {
             com.darkcraft.client.ui.Carteles.callados = true;

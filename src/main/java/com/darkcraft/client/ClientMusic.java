@@ -183,9 +183,16 @@ public final class ClientMusic {
             if (viaje != null && !viaje.dying() && mc.getSoundManager().isActive(viaje)) return;
             viaje = new Track(DarkCraftMod.MUSICA_VIAJE.get(), "viaje", false);
             mc.getSoundManager().play(viaje);
-            viaje.fadeTo(0.8f, segundos);
+            viaje.fadeTo(VIAJE, segundos);
         } else if (viaje != null && !viaje.dying()) viaje.kill(segundos);
     }
+
+    /** La musica del viaje, a ese volumen en esos segundos (baja mientras habla la Sombra; lo normal es {@link #VIAJE}). */
+    public static void viajeNivel(float nivel, float segundos) {
+        if (viaje != null && !viaje.dying()) viaje.fadeTo(nivel, segundos);
+    }
+
+    public static final float VIAJE = 0.8f;
 
     // ------------------------------------------------------------------ Brumavela: el viento sobre el mar de nubes (parte 3b)
 

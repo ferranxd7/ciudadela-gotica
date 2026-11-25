@@ -117,18 +117,18 @@ public final class Viaje {
         T_NORMAL = t;
 
         t = new Tiempos(LLAMADA);
-        t.llega = 0.6f;
+        t.llega = 0.4f;
         t.velocidad = 8f;
-        t.crucero = 0f;
+        t.crucero = 2.6f;
         t.frena = 5.0f;
         t.gira = 4.4f;
         t.baja = 3.0f;
         t.alto = 15;
-        t.cambioC = 13.75f;
-        t.ultimo = 14.4f;
-        t.fin = 16.6f;
+        t.cambioC = 16.15f;
+        t.ultimo = 16.8f;
+        t.fin = 19.0f;
         // llega | amarrado
-        t.plano = new float[]{0f, 13.9f, 16.6f};
+        t.plano = new float[]{0f, 16.3f, 19.0f};
         T_LLAMADA = t;
     }
 
@@ -313,21 +313,22 @@ public final class Viaje {
             }));
             k++;
         }
-        // atraca: desde el muelle, se da la vuelta en el aire y baja a su amarre
-        double[] f0 = en(d, 0.6, 252.3, 147.4), f1 = en(d, 0.2, 252.6, 146.2);
+        // atraca: desde el mar de nubes en calma, al sureste (el muelle delante y, en Valdrenn, la torre detras): pasa, se
+        // detiene sobre su amarre, se da la vuelta en el aire y baja. (Desde el propio anden no cabia en el plano.)
+        double[] f0 = en(d, 13.0, 253.8, 166.0), f1 = en(d, 10.5, 254.8, 161.5);
         float t0 = p[k], t1 = p[k + 1];
         float desde = Math.max(t0, T.llega), hasta = T.toca();
         Punto camMuelle = t -> mezcla(f0, f1, suave((t - desde) / (hasta - desde)));
         Punto miraMuelle = t -> {
             double[] s = barco(T, Math.min(Math.max(t, T.llega), T.cambioC - 0.05), o, d);
-            return new double[]{s[0], s[1] + 3, s[2]};
+            return new double[]{s[0], s[1] + 7, s[2]};
         };
         l.add(plano(t0, t1, 72f, 40, camMuelle, miraMuelle));
         k++;
         float t2 = p[k], t3 = p[k + 1];
         if (tipo == LLAMADA) {
             // amarrado: el barco, ya de bloques, desde el muelle
-            double[] quieto = {PX + d[0], PY + 3, PZ + d[1]};
+            double[] quieto = {PX + d[0], PY + 7, PZ + d[1]};
             l.add(plano(t2, t3, 72f, 4, t -> f1, t -> quieto));
             return l;
         }

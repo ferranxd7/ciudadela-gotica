@@ -813,8 +813,13 @@ public final class CiTest {
         ImageIO.write(img, "png", f);
     }
     /** Lo alto de la nube de verdad en esa columna (o -1 si no hay nube entre 225 y 264). */
+    /** Lo alto del mar de nubes en esa columna; -1 si lo de mas arriba no es nube (el anden, el camino de nube firme, el barco). */
     private static int nubeArriba(ServerLevel lvl, BlockPos.MutableBlockPos mb, int x, int z) {
-        for (int y = 264; y >= 225; y--) if (lvl.getBlockState(mb.set(x, y, z)).getBlock() instanceof com.darkcraft.world.NubeBlock) return y;
+        for (int y = 290; y >= 225; y--) {
+            var s = lvl.getBlockState(mb.set(x, y, z));
+            if (s.isAir()) continue;
+            return s.is(DarkCraftMod.NUBE.get()) ? y : -1;
+        }
         return -1;
     }
 

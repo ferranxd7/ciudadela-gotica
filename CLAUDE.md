@@ -798,12 +798,25 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   Asi da igual que el servidor o el cliente vayan con retraso (al llegar a un sitio nuevo se generan muchos chunks):
   con los dos relojes sueltos se veia el barco dos veces o el muelle vacio. En la prueba del cliente el reloj de los
   pasos tambien se para mientras se espera (`Guion.esperadoSiempre`).
-- **Llamar** (la campana del muelle donde no esta el barco; cosas 13 y 14): cinematica **42** (17 s), sin mover al
-  jugador: el barco llega volando y atraca. Con el barco ya alli, de camino o roto, la campana solo suena y lo dice.
+- **Llamar** (la campana del muelle donde no esta el barco; cosas 13 y 14): cinematica **42** (20 s), sin mover al
+  jugador: el barco llega volando y atraca (sin musica: la campana, el viento, las velas al detenerse, el casco al bajar
+  y el golpe). Con el barco ya alli, de camino o roto, la campana solo suena y lo dice.
+- **Los planos** (`Viaje.planos`): el timon con el jugador de cara (se le lleva detras de la rueda) | se eleva, desde la
+  aleta de babor a ras de nube | las velas, desde lo alto por la popa | (solo la primera vez) Valdrenn, siguiendole por
+  detras, y los juramentos, desde abajo | **atraca: desde el mar de nubes en calma, al sureste** (el muelle delante y la
+  torre o el pueblo detras; desde el propio anden el barco no cabia en el plano) | en cubierta: la camara baja del aparejo
+  a los ojos del jugador. **Al acabar el jugador mira a donde acaba mirando la camara** (`ClientCine.mirar`, al pasar el
+  corte 3: si no, `ClientCine` le dejaba mirando a donde miraba al empezar y la vista daba media vuelta).
+- **El barco que vuela se dibuja siempre con toda la luz del cielo** y un minimo de luz propia
+  (`BarcoVoladorRenderer.getSkyLightLevel` / `getBlockLightLevel`): lejos del jugador o muy alto el cliente a veces da
+  luz 0 y en build-100 se veia negro al alejarse. En Valdrenn es de noche cerrada y no hay rayos (regla de `Storm`: solo
+  truenos): la llegada sale oscura en las capturas sin shaders; el anden lleva cuatro farolas.
 - **Sonido** (ElevenLabs; tomas en `TOMAS_SFX`): `barco_campana` (1 y 4), `barco_eleva` (3), `barco_velas` (1),
   `barco_vuelo` (4; el viento, 25 s, en streaming), `barco_atraca` (4; empieza en el segundo 3,8 de la toma: `INICIO`),
   `barco_repara` (3). **Musica del viaje**: "The Traveller" de Viktor Kraus (CC-BY 3.0), cortada a 84 s (`"corte"` en
-  `pistas.json`): `ClientMusic.viaje`. Los que se quedan en el muelle oyen las velas al irse y el golpe al atracar.
+  `pistas.json`): `ClientMusic.viaje`. **Mientras habla la Sombra la musica baja a 0,36 y el viento a 0,4** (`Guion.viaje`:
+  entre dos frases seguidas no suben; sin eso, en build-100 la voz quedaba al mismo nivel que la musica). Los que se
+  quedan en el muelle oyen las velas al irse, la campana y el golpe al atracar (`Travesia.oyen`).
 - En Valdrenn siempre es de noche y hay tormenta (`world/Storm`): el corte en negro tapa el cambio y la lluvia entra en
   el ultimo plano.
 - Comandos: `/darkcraft brumavela reparar [ya] | zarpar [primero] | llamar | muelle | barco <brumavela|valdrenn>`.

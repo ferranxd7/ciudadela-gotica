@@ -58,11 +58,12 @@ public final class MuelleValdrenn extends Element {
         // los pilotes
         int[][] pilotes = {{X0, Z0}, {X0, 133}, {X0, 139}, {X0, 145}, {X0, Z1}, {X1, Z0}, {X1, 139}, {X1, Z1}, {-1, Z0}, {-1, Z1}};
         for (int[] q : pilotes) for (int y = Y - 14; y <= Y - 2; y++) c.set(q[0], y, q[1], Pal.BASALT);
-        // dos farolas en las esquinas del lado del barco
-        for (int z : new int[]{Z0, Z1}) {
-            for (int k = 1; k <= 3; k++) c.set(X0, Y + k, z, Blocks.POLISHED_BLACKSTONE_WALL.defaultBlockState());
-            c.set(X0, Y + 4, z, Pal.SOUL_LANTERN);
-        }
+        // cuatro farolas, en las esquinas (en Valdrenn siempre es de noche)
+        for (int z : new int[]{Z0, Z1})
+            for (int x : new int[]{X0, X1}) {
+                for (int k = 1; k <= 3; k++) c.set(x, Y + k, z, Blocks.POLISHED_BLACKSTONE_WALL.defaultBlockState());
+                c.set(x, Y + 4, z, Pal.SOUL_LANTERN);
+            }
         // el pretil de los dos extremos
         for (int x = X0 + 1; x <= X1 - 1; x++) {
             c.unir(x, Y + 1, Z0, Blocks.POLISHED_BLACKSTONE_WALL.defaultBlockState());

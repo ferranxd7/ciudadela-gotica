@@ -51,7 +51,7 @@ public final class Guion {
 
     /** Un sonido sin sitio (se oye igual en los dos oidos) que se puede apagar poco a poco. */
     private static final class Sonido extends AbstractTickableSoundInstance {
-        private float baja;
+        private float baja, hacia = -1, paso;
 
         Sonido(SoundEvent ev, float vol) {
             super(ev, SoundSource.MASTER, SoundInstance.createUnseededRandom());
@@ -65,8 +65,18 @@ public final class Guion {
             if (baja <= 0) baja = Math.max(0.004f, volume / Math.max(1f, segundos * 20f));
         }
 
+        /** A ese volumen, poco a poco (sin apagarse). */
+        void nivel(float vol, float segundos) {
+            hacia = vol;
+            paso = Math.max(0.002f, Math.abs(vol - volume) / Math.max(1f, segundos * 20f));
+        }
+
         @Override
         public void tick() {
+            if (baja <= 0 && hacia >= 0) {
+                volume = volume < hacia ? Math.min(hacia, volume + paso) : Math.max(hacia, volume - paso);
+                if (volume == hacia) hacia = -1;
+            }
             if (baja <= 0) return;
             volume -= baja;
             if (volume <= 0.003f) stop();
@@ -90,10 +100,13 @@ public final class Guion {
     private static boolean aValdrenn;
     private static BarcoVolador barco;
     private static final List<Sonido> vuelo = new ArrayList<>();
+    /** El quejido del casco mientras baja en la llamada (se apaga al posarse). */
+    private static final List<Sonido> quejidos = new ArrayList<>();
     /** El numero de la entidad del barco en el cliente: tan alto que el servidor nunca dara ese a otra. */
     private static final int BARCO_ID = 2_147_000_039;
     /** Los cortes del viaje: el ultimo pasado, el ultimo del que se ha avisado al servidor, y los ticks esperando (en este y en total). */
     private static int cortePasado, corteAvisado, corteTicks, esperado, esperadoSiempre;
+    private static Shot ultimoPlano;
     /** Lo mas que se espera en cada corte, en ticks (si el servidor no llega a tiempo, se sigue). */
     private static final int[] CORTE_LIMITE = {0, 100, 240, 160};
 
@@ -101,6 +114,7 @@ public final class Guion {
 
     public static void empezar(int capitulo, double[] datos, List<Shot> planos) {
         acabar();
+        ultimoPlano = planos.isEmpty() ? null : planos.get(planos.size() - 1);
         pasos.clear();
         frases = new float[0][];
         ultimaFrase = 0;
@@ -116,6 +130,14 @@ public final class Guion {
         // (los dos golpes secos de la lona caen a los 2 y a los 3,5 s del sonido)
         pasos.add(new Paso(Reparacion.VELAS0 - 1.7f, () -> suena(DarkCraftMod.SFX_BARCO_VELAS.get(), 0.9f)));
     }
+
+    /** El viento del vuelo, a ese volumen (el que ya suena y el que empiece despues). */
+    private static void viento(float nivel, float segundos) {
+        vientoNivel = nivel;
+        for (Sonido v : vuelo) v.nivel(nivel, segundos);
+    }
+
+    private static float vientoNivel = 0.9f;
 
     private static int dato(double[] d, int i) {
         return d != null && i < d.length ? (int) Math.round(d[i]) : 0;
@@ -134,6 +156,23 @@ public final class Guion {
             int linea = (int) f[0];
             pasos.add(new Paso(f[1], () -> frase(linea)));
         }
+        // mientras habla la Sombra, la musica y el viento bajan (si no, no se la entiende); entre dos frases seguidas no suben
+        vientoNivel = 0.9f;
+        for (int i = 0; i < T.voz.length; i++) {
+            float desde = T.voz[i][1], hasta = desde + Voces.sombra((int) T.voz[i][0]);
+            while (i + 1 < T.voz.length && T.voz[i + 1][1] - hasta < 3.5f) {
+                i++;
+                hasta = T.voz[i][1] + Voces.sombra((int) T.voz[i][0]);
+            }
+            pasos.add(new Paso(desde - 0.45f, () -> {
+                ClientMusic.viajeNivel(0.36f, 0.5f);
+                viento(0.4f, 0.5f);
+            }));
+            pasos.add(new Paso(hasta + 0.15f, () -> {
+                ClientMusic.viajeNivel(ClientMusic.VIAJE, 1.1f);
+                viento(0.9f, 1.1f);
+            }));
+        }
         float frenado = T.llega + T.crucero + T.frena;
         if (T.cambioA >= 0) {
             pasos.add(new Paso(0.35f, () -> suena(DarkCraftMod.SFX_BARCO_CAMPANA.get(), 0.9f)));
@@ -141,15 +180,29 @@ public final class Guion {
             pasos.add(new Paso(T.cambioA + 0.45f, () -> ClientMusic.viaje(true, 2.5f)));
             pasos.add(new Paso(T.sube - 0.3f, () -> suena(DarkCraftMod.SFX_BARCO_ELEVA.get(), 1f)));
             pasos.add(new Paso(T.avanza - 0.6f, () -> suena(DarkCraftMod.SFX_BARCO_VELAS.get(), 0.9f)));
-            pasos.add(new Paso(T.avanza, () -> vuelo.add(suena(DarkCraftMod.SFX_BARCO_VUELO.get(), 0.9f))));
+            pasos.add(new Paso(T.avanza, () -> vuelo.add(suena(DarkCraftMod.SFX_BARCO_VUELO.get(), vientoNivel))));
             // el viento dura 25 s: si el vuelo es mas largo, otra vez antes de que se acabe
-            if (frenado - T.avanza > 21.5f) pasos.add(new Paso(T.avanza + 20.5f, () -> vuelo.add(suena(DarkCraftMod.SFX_BARCO_VUELO.get(), 0.9f))));
+            if (frenado - T.avanza > 21.5f) pasos.add(new Paso(T.avanza + 20.5f, () -> vuelo.add(suena(DarkCraftMod.SFX_BARCO_VUELO.get(), vientoNivel))));
             pasos.add(new Paso(T.ultimo, () -> ClientMusic.viaje(false, T.fin - T.ultimo + 1.5f)));
-        } else pasos.add(new Paso(0.15f, () -> vuelo.add(suena(DarkCraftMod.SFX_BARCO_VUELO.get(), 0.8f))));
-        pasos.add(new Paso(frenado - 0.6f, () -> {
-            for (Sonido v : vuelo) v.apagar(2.6f);
-            vuelo.clear();
-        }));
+            pasos.add(new Paso(frenado - 0.6f, () -> {
+                for (Sonido v : vuelo) v.apagar(2.6f);
+                vuelo.clear();
+            }));
+        } else {
+            // la llamada no lleva musica: la campana, el viento hasta que se posa, las velas al detenerse y el casco al bajar
+            pasos.add(new Paso(0.05f, () -> suena(DarkCraftMod.SFX_BARCO_CAMPANA.get(), 1f)));
+            pasos.add(new Paso(0.3f, () -> vuelo.add(suena(DarkCraftMod.SFX_BARCO_VUELO.get(), 1f))));
+            pasos.add(new Paso(frenado - 0.5f, () -> suena(DarkCraftMod.SFX_BARCO_VELAS.get(), 0.85f)));
+            pasos.add(new Paso(frenado + T.gira - 0.4f, () -> {
+                quejidos.add(suena(DarkCraftMod.SFX_BARCO_ELEVA.get(), 0.6f));
+            }));
+            pasos.add(new Paso(T.toca() - 0.3f, () -> {
+                for (Sonido v : vuelo) v.apagar(2.0f);
+                vuelo.clear();
+                for (Sonido v : quejidos) v.apagar(1.2f);
+                quejidos.clear();
+            }));
+        }
         // (el golpe gordo del casco contra el muelle cae al segundo de empezar el sonido)
         pasos.add(new Paso(T.toca() - 0.95f, () -> suena(DarkCraftMod.SFX_BARCO_ATRACA.get(), 1f)));
     }
@@ -223,6 +276,11 @@ public final class Guion {
                 }
             }
             cortePasado = k;
+            // el jugador ya esta en cubierta: que al acabar mire a donde acaba mirando la camara (el ultimo plano termina en sus ojos)
+            if (k == 3 && viaje.tipo != Viaje.LLAMADA && ultimoPlano != null) {
+                float[] a = Shot.angles(ultimoPlano.at(ultimoPlano.t1));
+                ClientCine.mirar(a[0], a[1]);
+            }
         }
         return false;
     }
@@ -300,6 +358,7 @@ public final class Guion {
         sonando.clear();
         abismo = viento = null;
         vuelo.clear();
+        quejidos.clear();
         if (viaje != null) {
             // (si se salta a medias, la musica se va enseguida; si acaba sola, ya se estaba yendo)
             ClientMusic.viaje(false, 1.5f);

@@ -129,6 +129,21 @@ public class BarcoVoladorRenderer extends EntityRenderer<BarcoVolador> {
         super.render(e, giroEntidad, pt, pose, buffers, luz);
     }
 
+    /**
+     * El barco vuela siempre a cielo abierto: toda la luz del cielo, este donde este. (Lejos del jugador, o muy alto, el
+     * cliente a veces no tiene la luz de ese sitio y da 0: en build-100 el barco se veia negro al alejarse.)
+     */
+    @Override
+    protected int getSkyLightLevel(BarcoVolador e, BlockPos p) {
+        return 15;
+    }
+
+    /** Y algo de luz propia (sus faroles y el corazon): de noche no se queda en una sombra. */
+    @Override
+    protected int getBlockLightLevel(BarcoVolador e, BlockPos p) {
+        return Math.max(6, super.getBlockLightLevel(e, p));
+    }
+
     @Override
     public ResourceLocation getTextureLocation(BarcoVolador e) {
         return InventoryMenu.BLOCK_ATLAS;
