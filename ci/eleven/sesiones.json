@@ -1048,5 +1048,150 @@
     ]
    }
   }
+ },
+ "voz_herrero": {
+  "flow": "Z7tLQ5a9GyPJPZD31AIa",
+  "modelo": "eleven_v4",
+  "voz": "Fjalar - Gruff Scottish Dwarf Warrior (TLS15X9bCEDl1vGoUK57)",
+  "nota": "Parte 2e-2: Dorvan, el herrero. Frases 1-8, tomas a y b.",
+  "frases": {
+   "1": {
+    "prompt": "[gruff] Hm. Another one crawling out of the dark with a dull blade... The name's Dorvan. I keep the forge of Valdrenn burning, oath or no oath.",
+    "sesiones": [
+     "BOzp9Sq4XiCOrfMRuq7z",
+     "cpcsWIR6CcJl5arVkhfD"
+    ]
+   },
+   "2": {
+    "prompt": "[gruff] Back again? Show me what you've been swinging.",
+    "sesiones": [
+     "u3s6bzoXuhP0prVp2qW1",
+     "XoQlK1d5Mu0XsN1OjzSx"
+    ]
+   },
+   "3": {
+    "prompt": "Bring me forging stones and echoes, and I'll make that steel sing.",
+    "sesiones": [
+     "lU4ylynfbL7iwM7EaHvz",
+     "YvaxKFLqgzxh5MAqCuRs"
+    ]
+   },
+   "4": {
+    "prompt": "[satisfied] There. Sharper than the day it was forged. Try not to break it on the first skull.",
+    "sesiones": [
+     "PuC2X6lzvuowUJkNjGwa",
+     "sJ9mTXbFEtm9YdKpXY5C"
+    ]
+   },
+   "5": {
+    "prompt": "[grumbling] You're short on stones, or on echoes. The forge doesn't work for free.",
+    "sesiones": [
+     "CmRGjDv7SEyME1KuqIx7",
+     "2Frik0wnWN5wxomSNVkq"
+    ]
+   },
+   "6": {
+    "prompt": "[sighs] The king swore an oath to something that should never have heard it. After that... the forge was all I had left to keep my hands from shaking.",
+    "sesiones": [
+     "keEx5kZAaCg2g6IP4rcl",
+     "n3nfNcEVGui49nGEbBJT"
+    ]
+   },
+   "7": {
+    "prompt": "[gruff] Off you go, then. And keep your guard up.",
+    "sesiones": [
+     "fJjioorkYyJbs8G8eNRZ",
+     "2sBdWCdVZG72LNrUuCSM"
+    ]
+   },
+   "8": {
+    "prompt": "[chuckles] That one's as good as it gets. Not even I can push it further.",
+    "sesiones": [
+     "rPwrFqZGb4whfsmPcGqA",
+     "HyTAGbHPRgIcvumMl71M"
+    ]
+   }
+  }
+ },
+ "voz_mercader": {
+  "flow": "Z7tLQ5a9GyPJPZD31AIa",
+  "modelo": "eleven_v4",
+  "voz": "Cornelius - Wise Sage (6sFKzaJr574YWVu4UuJF)",
+  "nota": "Parte 2e-2: Kerrick, el mercader. Frases 1-6, tomas a y b.",
+  "frases": {
+   "1": {
+    "prompt": "[cheerfully] Ah, a customer! And a living one, more or less. Kerrick's the name. If it can be carried, I've probably got it.",
+    "sesiones": [
+     "uC6naSVQrnOeeqQsDrAN",
+     "9URGzWyeQijGzKuZSCNj"
+    ]
+   },
+   "2": {
+    "prompt": "[warmly] Welcome back, friend! Echoes in your pocket, wares on my cart.",
+    "sesiones": [
+     "PMU9YnHwdGr59x5DBVCv",
+     "qXQuiSYLCh4U5n0K5LLQ"
+    ]
+   },
+   "3": {
+    "prompt": "[pleased] A fine choice. Spend it well... or don't, and come buy another.",
+    "sesiones": [
+     "mRloJws8tKRFrqVmA8D5",
+     "ibd8YU9PJU2t8OrisgKp"
+    ]
+   },
+   "4": {
+    "prompt": "[sighs] Ah... your purse is lighter than your ambition, friend.",
+    "sesiones": [
+     "FN0UsIbzaZzCvQI9yGJs",
+     "K22ocMj0RLZglulzA3zb"
+    ]
+   },
+   "5": {
+    "prompt": "[chuckles] The dead don't care much for my prices. The living do. So I stay close to the fires... and closer to my cart.",
+    "sesiones": [
+     "F8d8jJvdNEOdo3OZN8T6",
+     "Y2GBq1JtsZwWnd41CNM1"
+    ]
+   },
+   "6": {
+    "prompt": "Safe roads, friend. And if you find any... do tell me.",
+    "sesiones": [
+     "HgkdvD5K1DCWsBTpXZK8",
+     "eMfeZIIak7BXeXzdRa4O"
+    ]
+   }
+  }
+ },
+ "sfx_forja_tienda": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 2e-2: golpe del herrero, mejorar un arma y comprar.",
+  "sonidos": {
+   "herrero_golpe": {
+    "sesiones": [
+     "pN3TsiewKQGoCXzNsesw",
+     "ctRZiKou0GHHOTxbb9cX",
+     "XMkgyuWAfUMchYQieNQk",
+     "d2x7WMpIcMXx5rigoVi2"
+    ]
+   },
+   "forja_mejora": {
+    "sesiones": [
+     "cRLHEQ87wuWXhs4T0Kms",
+     "WdW3OMrKQFem4wz6DEGf",
+     "UpeUStemMBRheNUpYaeq",
+     "ucqAqXknOM2SqGuZRmgv"
+    ]
+   },
+   "tienda_compra": {
+    "sesiones": [
+     "hdXzcWRtj42npbsqNQHW",
+     "zRImT3hsArDuu291Heyg",
+     "F9zro3lweY5Gnygz5Jiv",
+     "sI1rVW0FQUxTnuByWROO"
+    ]
+   }
+  }
  }
 }
