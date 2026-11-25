@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:hueco",
+  "display": {
+    "icon": {
+      "item": "darkcraft:pieza_corazon"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.capitan.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.capitan.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 300
+  }
+}

@@ -146,6 +146,8 @@ public class Volcado {
                 for (boolean abierta : new boolean[]{false, true}) {
                     var pasos = com.darkcraft.pueblo.gen.Recorrido.comprobar(mundo, abierta);
                     System.out.println("recorrido (cripta " + (abierta ? "abierta" : "cerrada") + "): " + com.darkcraft.pueblo.gen.Recorrido.resumen(pasos));
+                    // y los puestos de los enemigos (parte 3c): que se pisan, que se llega y que no agobian donde se despierta
+                    if (abierta) System.out.println("puestos de los enemigos: " + com.darkcraft.pueblo.PuebloEnemigos.comprobar(mundo));
                 }
                 marcas.putAll(p.sitios());
             }

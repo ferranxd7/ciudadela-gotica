@@ -1685,5 +1685,221 @@
         "stream": true
       }
     ]
+  },
+  "sfx.hueco_gemido": {
+    "subtitle": "subtitles.darkcraft.sfx.hueco_gemido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/hueco_gemido_1"
+      },
+      {
+        "name": "darkcraft:sfx/hueco_gemido_2"
+      },
+      {
+        "name": "darkcraft:sfx/hueco_gemido_3"
+      }
+    ]
+  },
+  "sfx.hueco_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.hueco_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/hueco_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/hueco_alerta_2"
+      }
+    ]
+  },
+  "sfx.hueco_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.hueco_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/hueco_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/hueco_dolor_2"
+      }
+    ]
+  },
+  "sfx.hueco_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.hueco_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/hueco_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/hueco_muerte_2"
+      }
+    ]
+  },
+  "sfx.ahogado_gorgoteo": {
+    "subtitle": "subtitles.darkcraft.sfx.ahogado_gorgoteo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ahogado_gorgoteo_1"
+      },
+      {
+        "name": "darkcraft:sfx/ahogado_gorgoteo_2"
+      },
+      {
+        "name": "darkcraft:sfx/ahogado_gorgoteo_3"
+      }
+    ]
+  },
+  "sfx.ahogado_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.ahogado_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ahogado_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/ahogado_alerta_2"
+      }
+    ]
+  },
+  "sfx.ahogado_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.ahogado_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ahogado_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/ahogado_dolor_2"
+      }
+    ]
+  },
+  "sfx.ahogado_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.ahogado_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ahogado_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/ahogado_muerte_2"
+      }
+    ]
+  },
+  "sfx.capitan_farol": {
+    "subtitle": "subtitles.darkcraft.sfx.capitan_farol",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capitan_farol_1"
+      },
+      {
+        "name": "darkcraft:sfx/capitan_farol_2"
+      }
+    ]
+  },
+  "sfx.capitan_llama": {
+    "subtitle": "subtitles.darkcraft.sfx.capitan_llama",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capitan_llama_1"
+      },
+      {
+        "name": "darkcraft:sfx/capitan_llama_2"
+      }
+    ]
+  },
+  "sfx.capitan_llamar": {
+    "subtitle": "subtitles.darkcraft.sfx.capitan_llamar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capitan_llamar_1"
+      },
+      {
+        "name": "darkcraft:sfx/capitan_llamar_2"
+      }
+    ]
+  },
+  "sfx.capitan_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.capitan_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capitan_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/capitan_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/capitan_dolor_3"
+      }
+    ]
+  },
+  "sfx.capitan_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.capitan_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capitan_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/capitan_muerte_2"
+      }
+    ]
+  },
+  "sfx.faro_sello": {
+    "subtitle": "subtitles.darkcraft.sfx.faro_sello",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/faro_sello_1"
+      },
+      {
+        "name": "darkcraft:sfx/faro_sello_2"
+      }
+    ]
+  },
+  "capitan.voz.1": {
+    "subtitle": "subtitles.darkcraft.capitan.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:capitan/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "capitan.voz.2": {
+    "subtitle": "subtitles.darkcraft.capitan.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:capitan/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "capitan.voz.3": {
+    "subtitle": "subtitles.darkcraft.capitan.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:capitan/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "capitan.voz.4": {
+    "subtitle": "subtitles.darkcraft.capitan.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:capitan/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "capitan.voz.5": {
+    "subtitle": "subtitles.darkcraft.capitan.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:capitan/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "musica.capitan": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/capitan",
+        "stream": true
+      }
+    ]
   }
 }

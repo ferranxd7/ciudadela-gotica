@@ -3,6 +3,7 @@ package com.darkcraft.pueblo;
 import com.darkcraft.DarkCraftMod;
 import com.darkcraft.gen.Canvas;
 import com.darkcraft.net.Net;
+import com.darkcraft.enemigos.Puestos.Puesto;
 import com.darkcraft.pueblo.gen.Barco;
 import com.darkcraft.pueblo.gen.Capilla;
 import com.darkcraft.pueblo.gen.PuebloPlan;
@@ -200,6 +201,8 @@ public final class Pueblo {
         public static final String ID = "darkcraft_pueblo";
         public int piezas;
         public boolean reparado, cripta, santuario;
+        /** El Capitan ha caido (parte 3c): la puerta del faro esta abierta y el corazon se puede coger. */
+        public boolean capitan;
         /** Sube cada vez que cambia algo que el cliente tiene que saber. */
         int version = 1;
 
@@ -213,6 +216,7 @@ public final class Pueblo {
             d.reparado = t.getBoolean("reparado");
             d.cripta = t.getBoolean("cripta");
             d.santuario = t.getBoolean("santuario");
+            d.capitan = t.getBoolean("capitan");
             return d;
         }
 
@@ -222,6 +226,7 @@ public final class Pueblo {
             t.putBoolean("reparado", reparado);
             t.putBoolean("cripta", cripta);
             t.putBoolean("santuario", santuario);
+            t.putBoolean("capitan", capitan);
             return t;
         }
 
@@ -298,6 +303,7 @@ public final class Pueblo {
         ServerLevel lvl = e.getServer().overworld();
         if (!mundo(lvl)) return;
         Datos d = Datos.get(e.getServer());
+        PuebloEnemigos.reja(lvl);
         for (Pieza q : Pieza.values()) {
             int[] s = sitio(q.id());
             BlockPos b = new BlockPos(s[0], s[1], s[2]);
@@ -428,6 +434,14 @@ public final class Pueblo {
         if (c == null) return;
         if (p.getEyePosition().distanceTo(new net.minecraft.world.phys.Vec3(c.x() + 0.5, c.y() + 0.5, c.z() + 0.5)) > ALCANCE + 1.2) return;
         Datos d = Datos.get(p.server);
+        if (id == Pieza.TIMON.ordinal() && PuebloEnemigos.timonGuardado(lvl)) {
+            Net.to(p, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.pueblo.timon_guardado", 0));
+            return;
+        }
+        if (id == Pieza.CORAZON.ordinal() && PuebloEnemigos.capitanEnPie(lvl)) {
+            Net.to(p, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.pueblo.corazon_guardado", 0));
+            return;
+        }
         if (id < Pieza.values().length) tomar(p, Pieza.values()[id]);
         else if (id < LAPIDA) tocar(p, id - CAMPANA, c);
         else if (id < REPARAR) Net.to(p, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.pueblo.lapida." + QUIEN[id - LAPIDA], 0));
@@ -609,6 +623,12 @@ public final class Pueblo {
         if (!l.isClientSide() ? !mundo(l) : false) return;
         BlockState s = l.getBlockState(b);
         int id = -1;
+        if (s.is(Blocks.IRON_BARS) && b.getX() == PuebloEnemigos.puertaFaro().getX() && b.getZ() == PuebloEnemigos.puertaFaro().getZ()
+                && Math.abs(b.getY() - PuebloEnemigos.puertaFaro().getY()) <= 1) {
+            if (!l.isClientSide() && e.getEntity() instanceof ServerPlayer p && e.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND)
+                Net.to(p, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.pueblo.reja", 0));
+            return;
+        }
         if (s.is(Blocks.CHEST) && igual(b, sitio("vela"))) id = Pieza.VELA.ordinal();
         else if (s.is(Blocks.BELL)) {
             for (int k = 0; k < 3; k++) if (igual(b, sitio("campana_" + QUIEN[k]))) id = CAMPANA + k;
@@ -639,7 +659,10 @@ public final class Pueblo {
         return 1;
     }
 
-    /** /darkcraft brumavela ir [sitio] | pieza <nombre>|todas | cripta | reparar | zarpar | estado | reiniciar. */
+    /**
+     * /darkcraft brumavela ir [sitio] | pieza <nombre>|todas | cripta | reparar | zarpar | estado | reiniciar |
+     * enemigos [volver | fuera] | capitan [vencer | volver].
+     */
     public static LiteralArgumentBuilder<CommandSourceStack> comando() {
         return Commands.literal("brumavela")
                 .then(Commands.literal("ir").executes(c -> con(c, p -> ir(p, "inicio")))
@@ -660,14 +683,40 @@ public final class Pueblo {
                     Datos d = Datos.get(p.server);
                     c.getSource().sendSuccess(() -> Component.literal(estado(d)), false);
                 })))
-                .then(Commands.literal("reiniciar").executes(c -> con(c, p -> reiniciar(p.serverLevel()))));
+                .then(Commands.literal("reiniciar").executes(c -> con(c, p -> reiniciar(p.serverLevel()))))
+                .then(Commands.literal("enemigos")
+                        .executes(c -> con(c, p -> c.getSource().sendSuccess(() -> Component.literal(enemigos(p.server)), false)))
+                        .then(Commands.literal("volver").executes(c -> con(c, p -> {
+                            com.darkcraft.enemigos.Puestos.todos(p.server, PuebloEnemigos.SITIO, false);
+                            if (Datos.get(p.server).capitan) com.darkcraft.enemigos.Puestos.marcar(p.server, PuebloEnemigos.SITIO, PuebloEnemigos.puestoCapitan(), true);
+                            c.getSource().sendSuccess(() -> Component.literal(enemigos(p.server)), false);
+                        })))
+                        .then(Commands.literal("fuera").executes(c -> con(c, p -> {
+                            com.darkcraft.enemigos.Puestos.todos(p.server, PuebloEnemigos.SITIO, true);
+                            c.getSource().sendSuccess(() -> Component.literal(enemigos(p.server)), false);
+                        }))))
+                .then(Commands.literal("capitan")
+                        .executes(c -> con(c, p -> {
+                            Puesto q = PuebloEnemigos.puestos().get(PuebloEnemigos.puestoCapitan());
+                            p.teleportTo(p.serverLevel(), q.x() - 9.5, q.y() + 0.1, q.z() + 0.5, -90f, 0f);
+                        }))
+                        .then(Commands.literal("vencer").executes(c -> con(c, p -> PuebloEnemigos.capitan(p.serverLevel(), true))))
+                        .then(Commands.literal("volver").executes(c -> con(c, p -> PuebloEnemigos.capitan(p.serverLevel(), false)))));
+    }
+
+    /** Cuantos enemigos quedan en la isla y cuantos hay ahora mismo fuera (para los comandos y las pruebas). */
+    public static String enemigos(MinecraftServer srv) {
+        return "Brumavela: " + com.darkcraft.enemigos.Puestos.quedan(srv, PuebloEnemigos.SITIO) + " de " + PuebloEnemigos.puestos().size()
+                + " enemigos en pie (" + com.darkcraft.enemigos.Puestos.fuera(PuebloEnemigos.SITIO) + " a la vista), en la taberna "
+                + com.darkcraft.enemigos.Puestos.quedan(srv, PuebloEnemigos.SITIO, PuebloEnemigos.TABERNA) + ", el Capitan "
+                + (Datos.get(srv).capitan ? "vencido" : "en pie");
     }
 
     public static String estado(Datos d) {
         StringBuilder b = new StringBuilder("Brumavela: piezas ");
         for (Pieza q : Pieza.values()) b.append((d.piezas & (1 << q.ordinal())) != 0 ? q.id().toUpperCase(java.util.Locale.ROOT) : q.id()).append(' ');
         return b.append("| cripta ").append(d.cripta ? "abierta" : "cerrada").append(" | barco ").append(d.reparado ? "reparado" : "roto")
-                .append(" | santuario ").append(d.santuario ? "puesto" : "sin poner").toString();
+                .append(" | santuario ").append(d.santuario ? "puesto" : "sin poner").append(" | capitan ").append(d.capitan ? "vencido" : "en pie").toString();
     }
 
     private static void ir(ServerPlayer p, String nombre) {
@@ -683,7 +732,10 @@ public final class Pueblo {
         d.cripta = false;
         boolean estaba = d.reparado;
         d.reparado = false;
+        d.capitan = false;
         d.cambio();
+        com.darkcraft.enemigos.Puestos.todos(lvl.getServer(), PuebloEnemigos.SITIO, false);
+        PuebloEnemigos.reja(lvl);
         seguidas = 0;
         int y = PuebloPlan.get().capilla.y;
         for (int x = Capilla.BX0; x <= Capilla.BX1; x++)

@@ -53,6 +53,14 @@ public final class ClientSetup {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CABALLERO_ESPADA.get(), com.darkcraft.client.caballeros.CaballeroRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CABALLERO_ALABARDA.get(), com.darkcraft.client.caballeros.CaballeroRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CABALLERO_BALLESTA.get(), com.darkcraft.client.caballeros.CaballeroRenderer::new);
+        // los enemigos de Brumavela (modelos y animaciones de tools/enemigos)
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.HUECO.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
+                new com.darkcraft.client.enemigos.HuecoModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.HuecoModelo.CAPA)), "hueco", 3, 0.45f, 1f));
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.AHOGADO.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
+                new com.darkcraft.client.enemigos.AhogadoModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.AhogadoModelo.CAPA)), "ahogado", 2, 0.55f, 1.06f));
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CAPITAN.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
+                new com.darkcraft.client.enemigos.CapitanModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.CapitanModelo.CAPA)), "capitan", 1, 0.7f, 1.22f));
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ARPON.get(), com.darkcraft.client.enemigos.ArponRenderer::new);
     }
 
     @SubscribeEvent
@@ -61,5 +69,8 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.gavran.GavranModel.LAYER, com.darkcraft.client.gavran.GavranGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.caballeros.CaballeroModelo.CAPA, com.darkcraft.client.caballeros.CaballeroModelo::crear);
         e.registerLayerDefinition(com.darkcraft.client.personajes.MercaderRenderer.CAPA, com.darkcraft.client.personajes.MercaderRenderer::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.HuecoModelo.CAPA, com.darkcraft.client.enemigos.HuecoGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.AhogadoModelo.CAPA, com.darkcraft.client.enemigos.AhogadoGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.CapitanModelo.CAPA, com.darkcraft.client.enemigos.CapitanGeometria::crear);
     }
 }

@@ -436,7 +436,7 @@ public final class Combate {
         if (s.getDirectEntity() instanceof net.minecraft.world.entity.projectile.Projectile pr) pr.discard();
         if (s.getEntity() instanceof LivingEntity le && le != sp) {
             desequilibrar(sp, le, 9999f);
-            if (!(le instanceof com.darkcraft.rey.Rey) && !(le instanceof com.darkcraft.gavran.Gavran))
+            if (!(le instanceof com.darkcraft.rey.Rey) && !(le instanceof com.darkcraft.gavran.Gavran) && !(le instanceof com.darkcraft.enemigos.Capitan))
                 le.knockback(0.5, sp.getX() - le.getX(), sp.getZ() - le.getZ());
         }
         Net.to(sp, new Net.Impacto(true));
@@ -627,11 +627,17 @@ public final class Combate {
         if (pasado > 40) eq[0] = Math.max(0f, eq[0] - (pasado - 40) * 2f);
         eq[0] += cuanto;
         eq[1] = ahora;
-        float aguanta = Math.max(18f, le.getMaxHealth() * 0.5f);
+        // (al Capitan cuesta mas desequilibrarle a golpes: lo suyo es pararle)
+        float aguanta = le instanceof com.darkcraft.enemigos.Capitan ? 90f : Math.max(18f, le.getMaxHealth() * 0.5f);
         if (eq[0] < aguanta) return;
         eq[0] = 0f;
-        le.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 30, 9, false, false, false));
-        le.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 30, 4, false, false, false));
+        if (le instanceof com.darkcraft.enemigos.Enemigo en) {
+            // los enemigos del mod tienen su propio aturdimiento (corta lo que estuvieran haciendo)
+            en.aturdir();
+        } else {
+            le.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 30, 9, false, false, false));
+            le.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 30, 4, false, false, false));
+        }
         if (le instanceof Mob mob) mob.getNavigation().stop();
         ServerLevel sl = sp.serverLevel();
         sl.sendParticles(ParticleTypes.CRIT, le.getX(), le.getY() + le.getBbHeight() + 0.2, le.getZ(), 14, 0.3, 0.1, 0.3, 0.05);

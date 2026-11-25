@@ -644,14 +644,79 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   `cliente_b01..b18`). **Ojo: la prueba del cliente juega en el mundo que deja la prueba del servidor** (`srv2/world`):
   lo que esta deje mal puesto sale en las capturas (asi se vio que `despejar` dejaba trozos de vela al reiniciar).
 
+### Plan grande, parte 3c: los enemigos de Brumavela (huecos, ahogados y el Capitan)
+
+- **Enemigos propios con forma de persona** (`enemigos/Enemigo`, hereda de `Monster`; nada de zombis con otra piel):
+  cada ataque es una **accion** con su animacion, que dura lo que dura y pega en sus **ticks de golpe** a quien pille
+  delante, en su alcance y su arco (`Golpe(alcance, arco, dano, empuje)`); mientras se prepara sigue a su presa con el
+  cuerpo y 3 ticks antes del golpe ya no gira (apartarse = esquivar). No pegan por tocar. Estado sincronizado: variante,
+  accion + serie (para que el cliente arranque la animacion), postura (`DE_PIE`, `REZA`, `TUMBADO`). No ven a quien
+  llega por la espalda agachado (`percibe`); el que recibe un golpe avisa a los que tiene a 7 bloques; si su presa se
+  aleja de su puesto (`correa`) la dejan y vuelven. Morir es su animacion (`die` / `tickDeath`), no la voltereta.
+  `aturdir()` (su accion de aturdido): lo llama `Combate.desequilibrar` (romper la guardia o **parar un golpe**).
+- **Los puestos** (`enemigos/Puestos`, SavedData `darkcraft_puestos`): cada sitio apunta su lista (`registrar(clave,
+  puestos, aqui)`: tipo, variante, x y z, giro, postura, ronda, grupo). Salen a 72 bloques de un jugador y se recogen a
+  104 (no se guardan con el mundo); el que muere no vuelve hasta que alguien **descansa en un santuario o muere**
+  (`reaparecer`, lo llaman `Santuarios.descanso` y `Rol.muerte`; no vuelven los que quedarian a 28 de OTRO jugador, ni
+  los del grupo `Puestos.JEFE`, nunca). Con amigos, +50 % de vida por jugador de mas (`paraGrupo`); en pacifico, nadie.
+  `quedan(sitio[, grupo])`, `enemigo(sitio, n)`, `marcar`, `todos`, `sacarTodos` (pruebas), `alCaer(...)`.
+- **Aldeano hueco** (`Hueco`, 24 de vida, 4,5 de golpe): horca (estocada larga, barrido), hoz (tajo y doble tajo,
+  rapidos) y antorcha (golpe y barrido que prenden). Esperan de pie, **rezando** o **tumbados** como un muerto mas (se
+  levantan si te acercas). **Marinero ahogado** (`Ahogado`, 34 y 6, lento): sable (tajo ancho y tanda de tres
+  avanzando) y arpon (lo **lanza** —`Arpon`, una flecha pesada con su dibujante `ArponRenderer`; apunta un instante,
+  se esquiva de lado; tambien cuesta abajo— y pincha de cerca; tras lanzar saca otro de la espalda: mientras, el modelo
+  no dibuja el arpon de la mano, `AhogadoAnims.ARPON_OTRO`).
+- **El Capitan** (`Capitan`, Edrik Maroll; 260 de vida, 10 de golpe; el primer jefe con barra): espera ante la puerta
+  del faro; no hay sala cerrada: la pelea empieza cuando ve a alguien en lo alto del penon y, si todos caen o se van
+  (110 ticks sin presa), vuelve con la vida entera. Tajo de arriba abajo que sostiene un instante, dos tajos anchos
+  avanzando, estocada a fondo; **el farol de animas** (marca bajo los pies de cada uno y a los 17 ticks sale la llama;
+  a media vida, tres tandas) y, a media vida, **llama a su tripulacion** (2 ahogados, +1 por jugador de mas hasta 4:
+  `efimero`, se deshacen al acabar). Barra propia (`client/enemigos/CapitanCliente`, arte de
+  `tools/hud/barra_capitan.py`: liston de cubierta con cabos, su farol en el centro, relleno de bruma verdemar, gotas),
+  musica "Blackmoor Tides" de Matthew Pablo (CC-BY 3.0, id `capitan`, tema 21 de `ClientMusic.boss`; del zip se
+  prefiere la version sin voces: `zip_prefiere` en `pistas.json`) y **voz** (ElevenLabs, **"Matthew Schmitz - Old
+  Pirate Captain"** `4Vl3K2x290GidNvuaLm7`, `eleven_v4`, flow `JMcBqvpYNqJH1beI5j7S`; 5 frases, tomas a; en
+  `procesar.py` `voz_capitan`: mas grave, una segunda voz sorda por debajo y eco corto): `Net.ReyHabla` con linea
+  **40 + N** (`Voces.BASE_CAPITAN`; subtitulos `darkcraft.capitan.voz.N`): 1 al empezar (no la repite en 4 min), 2 al
+  llamar, 3 si cae su presa, 4 la primera vez que alza el farol, 5 al morir. Al caer: `Rol.jefe` (1500 ecos y el
+  cartel), logro `capitan` (hazana), **un frasco mas** (`Frascos.otro`) y piedras de forja.
+- **En Brumavela** (`pueblo/PuebloEnemigos`, sitio `brumavela`, 38 puestos): el primero, un hueco de rodillas en el
+  canto del muelle; ahogados al pie de la Cuesta (de espaldas), en el almacen de la vela, en el muelle, en el Saliente y
+  al pie del penon; un hueco a media Cuesta y un arponero arriba; **los cuatro de la taberna** (grupo `taberna`: la
+  tabernera tras la barra) —mientras quede uno, **el timon no se coge**—; calles, capitania (Odo Varn ante su mesa),
+  la casa de Lena, cementerio (tumbados), capilla (rezando), cripta, campos; y el Capitan ante la puerta del faro, que
+  lleva **una reja** (`PuebloEnemigos.reja`, cada segundo, barrotes de hierro) mientras siga en pie: el **corazon no se
+  coge** hasta vencerle (`Pueblo.Datos.capitan`). Nadie a menos de 18 bloques de donde se despierta ni de 14 del
+  santuario; `PuebloEnemigos.comprobar` (lo pasan la prueba del servidor y `tools/vista3d/vista.sh pueblo`) mira que
+  cada puesto se pisa y se llega a pie. En pacifico no hay nadie y nada esta guardado.
+- **Hacer otro enemigo** (`tools/enemigos/`, `python3 tools/enemigos/generar.py [--vistas carpeta] [--solo nombre]`):
+  un modulo por personaje (`hueco.py`, `ahogado.py`, `capitan.py`) con `rig()` (esqueleto comun `modelo.humanoide`:
+  caderas, muslos y piernas, torso, cabeza, brazos con codo y mano; las armas cuelgan de la mano y apuntan a -Z),
+  `materiales(v)` / `brillo(v)` (texturas pintadas por cajas con `pinta.py`; la capa de brillo es lo que luce: ojos,
+  llamas), `animaciones(rig)` (bucles y acciones por poses; las manos se escriben **donde van** y **hacia donde apunta
+  el arma** —`_mano_d`, `_arma`, `_mano_i`, `_arma_i`, `_agarra`: cinematica inversa de `ik.py`, con memoria en
+  `.ik_cache.pkl`—) y `OCULTAS` (piezas que esconde cada variante). Sale la textura y su brillo
+  (`textures/entity/enemigos/NOMBRE_V[_brillo].png`), `client/enemigos/<Nombre>Geometria.java` y
+  `<Nombre>Animaciones.java` (fotogramas en cadenas, `Animaciones.leer`) y `enemigos/<Nombre>Anims.java` (numeros,
+  duraciones y ticks de golpe para el servidor). `--vistas` dibuja cada variante y cada animacion fotograma a
+  fotograma (`vista.py`, un dibujante por software) para revisarlo todo sin abrir el juego. En Java: una clase que
+  herede de `Enemigo` (`elegir`, `golpe`, `alAvanzar`), su `<Nombre>Modelo` (hereda de `EnemigoModelo`: que bucles y
+  acciones se ponen) y el `EnemigoRenderer` generico (textura por variante + capa de brillo + escala).
+- Efectos (ElevenLabs, tomas en `TOMAS_SFX`): `hueco_gemido/alerta/dolor/muerte`, `ahogado_gorgoteo/alerta/dolor/muerte`,
+  `capitan_farol` (2 y 4), `capitan_llama` (4 y 3), `capitan_llamar` (4 y 1), `capitan_dolor` (2, 4 y 1),
+  `capitan_muerte` (3 y 4), `faro_sello` (3 y 1). Bestiario: `hueco_horca/hoz/antorcha`, `ahogado_sable/arpon`,
+  `capitan`. Logros `hueco` (el primero que se vence) y `capitan`.
+- Comandos `/darkcraft brumavela enemigos [volver | fuera]` y `capitan [vencer | volver]` (sin mas, lleva ante el).
+  Prueba del servidor: los puestos, todos fuera haciendo todas sus acciones, lo que guardan y la caida del Capitan.
+  Prueba del cliente: tramo `enemigos()` (capturas `cliente_en01..en28`); el tramo `pueblo()` de la 3b corre sin
+  enemigos y con el faro abierto.
+
 ### Lo siguiente: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 
 Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publicada):
 - **3a, el mundo de nubes**: hecha (arriba).
-- **3b, la isla del pueblo abandonado**: hecha (arriba). El timon y el corazon se cogen sin mas: en la 3c el timon queda
-  entre enemigos y el corazon lo guarda el Capitan.
-- **3c, enemigos**: aldeanos huecos (horcas, hoces, antorchas), marineros ahogados (sables, arpones, junto al muelle) y el
-  mini-jefe **el Capitan** (barra de jefe; guarda el corazon del barco).
+- **3b, la isla del pueblo abandonado**: hecha (arriba).
+- **3c, enemigos**: hecha (arriba).
 - **3d, cinematicas**: al elegir clase, la de inicio con voz (quien eres, caes del cielo; despiertas en el borde de la
   isla junto a los restos del barco; `Clase.elegir` es donde empezarla); reparar el barco y el viaje volando al muelle de
   Valdrenn (luego se puede ir y volver desde el muelle).

@@ -48,7 +48,7 @@ def elegir(lista, busca):
     return cand[0] if cand else None
 
 
-def de_zip(ruta, destino, log):
+def de_zip(ruta, destino, log, prefiere=()):
     with zipfile.ZipFile(ruta) as z:
         miembros = [i for i in z.infolist() if i.filename.lower().endswith(AUDIO) and not i.filename.startswith("__MACOSX")]
         for i in miembros:
@@ -59,6 +59,16 @@ def de_zip(ruta, destino, log):
         bucles = [i for i in miembros if "loop" in i.filename.lower()]
         orden = {".ogg": 0, ".flac": 1, ".wav": 2, ".mp3": 3}
         pool = bucles or miembros
+        # "zip_prefiere" de la pista: si alguno lleva en el nombre una de esas palabras (la version sin voces...), entre esos
+        if prefiere:
+            def casa(i):
+                n = os.path.basename(i.filename).lower().replace("_", " ").replace("-", " ")
+                return any(p.lower() in n for p in prefiere)
+            elegidos = [i for i in pool if casa(i)] or [i for i in miembros if casa(i)]
+            if elegidos:
+                pool = elegidos
+            else:
+                log.write(f"    ninguno lleva en el nombre {list(prefiere)}: se elige como siempre\n")
         pool.sort(key=lambda i: (orden.get(os.path.splitext(i.filename.lower())[1], 9), -i.file_size))
         # entre formatos, quedarse con el mas grande del mejor formato disponible
         mejor = pool[0]
@@ -134,7 +144,7 @@ def main():
                 log.write(f"  original: {os.path.basename(bruto)} ({os.path.getsize(bruto) // 1024} KB)\n")
                 fuente = bruto
                 if bruto.lower().endswith(".zip"):
-                    fuente = de_zip(bruto, cache, log)
+                    fuente = de_zip(bruto, cache, log, p.get("zip_prefiere", ()))
                     if fuente is None:
                         raise RuntimeError("el zip no trae audio")
                 tmp = ogg + ".tmp.ogg"

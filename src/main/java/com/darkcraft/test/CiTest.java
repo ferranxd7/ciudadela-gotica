@@ -409,6 +409,95 @@ public final class CiTest {
                 log.println("Brumavela: ERROR " + t);
                 DarkCraftMod.LOGGER.error("[CI] Brumavela", t);
             }
+            // ---- los enemigos de Brumavela (parte 3c): sus puestos, que salen y hacen lo suyo sin romper nada, lo que guardan
+            try {
+                String sitio = com.darkcraft.pueblo.PuebloEnemigos.SITIO;
+                BlockPos.MutableBlockPos mb = new BlockPos.MutableBlockPos();
+                com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> lvl.getBlockState(mb.set(x, y, z));
+                log.println("Brumavela, puestos de los enemigos: " + com.darkcraft.pueblo.PuebloEnemigos.comprobar(mundo) + " | dificultad " + lvl.getDifficulty());
+                com.darkcraft.pueblo.Pueblo.reiniciar(lvl);
+                var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(lvl, sitio);
+                int enSuelo = 0, chocan = 0, fallos = 0;
+                java.util.Map<String, Integer> tipos = new java.util.TreeMap<>();
+                StringBuilder mal = new StringBuilder();
+                for (var e : fuera) {
+                    tipos.merge(e.tipo() + (e.postura() == 1 ? " (reza)" : e.postura() == 2 ? " (tumbado)" : ""), 1, Integer::sum);
+                    boolean suelo = !lvl.getBlockState(BlockPos.containing(e.getX(), e.getY() - 0.2, e.getZ())).getCollisionShape(lvl, BlockPos.ZERO).isEmpty();
+                    if (suelo) enSuelo++;
+                    else if (mal.length() < 300) mal.append(' ').append(e.tipo()).append(" en el aire en ").append(e.blockPosition().toShortString()).append(';');
+                    if (!lvl.noCollision(e)) {
+                        chocan++;
+                        if (mal.length() < 300) mal.append(' ').append(e.tipo()).append(" metido en un bloque en ").append(e.blockPosition().toShortString()).append(';');
+                    }
+                }
+                // cada uno hace todas sus acciones (sin presa): que ninguna rompa nada
+                com.darkcraft.enemigos.Capitan capitan = null;
+                int arpones = 0;
+                for (var e : fuera) {
+                    if (e instanceof com.darkcraft.enemigos.Capitan c) capitan = c;
+                    try {
+                        e.postura(0);
+                        int acciones = e instanceof com.darkcraft.enemigos.Capitan ? com.darkcraft.enemigos.CapitanAnims.TICKS.length
+                                : e instanceof com.darkcraft.enemigos.Ahogado ? com.darkcraft.enemigos.AhogadoAnims.TICKS.length
+                                : com.darkcraft.enemigos.HuecoAnims.TICKS.length;
+                        for (int a = 1; a < acciones; a++) {
+                            String nombre = e instanceof com.darkcraft.enemigos.Capitan ? com.darkcraft.enemigos.CapitanAnims.NOMBRES[a]
+                                    : e instanceof com.darkcraft.enemigos.Ahogado ? com.darkcraft.enemigos.AhogadoAnims.NOMBRES[a] : com.darkcraft.enemigos.HuecoAnims.NOMBRES[a];
+                            if (nombre.equals("morir")) continue;
+                            e.empezar(a);
+                            for (int k = 0; k < 80 && e.accion() == a; k++) e.tick();
+                            if (e.accion() == a) {
+                                fallos++;
+                                if (mal.length() < 500) mal.append(' ').append(e.tipo()).append(": la accion ").append(nombre).append(" no acaba;");
+                            }
+                        }
+                        for (int k = 0; k < 20; k++) e.tick();
+                    } catch (Throwable t) {
+                        fallos++;
+                        if (mal.length() < 700) mal.append(' ').append(e.tipo()).append(": ").append(t).append(';');
+                        DarkCraftMod.LOGGER.error("[CI] enemigo " + e.tipo(), t);
+                    }
+                }
+                arpones = lvl.getEntitiesOfClass(com.darkcraft.enemigos.Arpon.class, new net.minecraft.world.phys.AABB(-160, 200, -160, 160, 330, 170)).size();
+                log.println("Brumavela, enemigos fuera: " + fuera.size() + " de " + com.darkcraft.pueblo.PuebloEnemigos.puestos().size() + " " + tipos + "; en el suelo " + enSuelo
+                        + ", metidos en un bloque " + chocan + " (tiene que ser 0), acciones que fallan " + fallos + " (tiene que ser 0), arpones lanzados " + arpones + mal);
+                // lo que guardan: el timon (los de la taberna) y la puerta del faro (el Capitan)
+                boolean timon0 = com.darkcraft.pueblo.PuebloEnemigos.timonGuardado(lvl), cap0 = com.darkcraft.pueblo.PuebloEnemigos.capitanEnPie(lvl);
+                com.darkcraft.pueblo.PuebloEnemigos.reja(lvl);
+                boolean reja0 = com.darkcraft.pueblo.PuebloEnemigos.rejaPuesta(lvl);
+                int tripulacion = -1;
+                String caida = "sin capitan";
+                if (capitan != null) {
+                    capitan.empezar(com.darkcraft.enemigos.CapitanAnims.LLAMAR);
+                    for (int k = 0; k < 40; k++) capitan.tick();
+                    tripulacion = capitan.tripulacion();
+                    capitan.hurt(lvl.damageSources().generic(), 99999f);
+                    for (int k = 0; k < 100 && !capitan.isRemoved(); k++) capitan.tick();
+                    caida = "vivo=" + capitan.isAlive() + " quitado=" + capitan.isRemoved() + " tripulacion " + capitan.tripulacion();
+                }
+                com.darkcraft.pueblo.PuebloEnemigos.reja(lvl);
+                var d3 = com.darkcraft.pueblo.Pueblo.Datos.get(server);
+                boolean cap1 = com.darkcraft.pueblo.PuebloEnemigos.capitanEnPie(lvl), reja1 = com.darkcraft.pueblo.PuebloEnemigos.rejaPuesta(lvl);
+                // los de la taberna caen: el timon queda libre
+                int taberna0 = com.darkcraft.enemigos.Puestos.quedan(server, sitio, com.darkcraft.pueblo.PuebloEnemigos.TABERNA);
+                for (var e : fuera) {
+                    var q = e.puesto() >= 0 ? com.darkcraft.pueblo.PuebloEnemigos.puestos().get(e.puesto()) : null;
+                    if (q != null && q.grupo().equals(com.darkcraft.pueblo.PuebloEnemigos.TABERNA)) e.hurt(lvl.damageSources().generic(), 99999f);
+                }
+                boolean timon1 = com.darkcraft.pueblo.PuebloEnemigos.timonGuardado(lvl);
+                int quedan1 = com.darkcraft.enemigos.Puestos.quedan(server, sitio);
+                log.println("Brumavela, lo que guardan: timon guardado " + timon0 + " -> " + timon1 + " (taberna " + taberna0 + " -> "
+                        + com.darkcraft.enemigos.Puestos.quedan(server, sitio, com.darkcraft.pueblo.PuebloEnemigos.TABERNA) + "); el Capitan en pie " + cap0 + " -> " + cap1
+                        + ", la reja " + reja0 + " -> " + reja1 + ", llama a " + tripulacion + " marineros, al caer: " + caida + ", capitan vencido=" + d3.capitan
+                        + "; quedan " + quedan1 + " en pie");
+                // todo como al principio (la prueba del cliente juega en este mundo)
+                com.darkcraft.pueblo.Pueblo.reiniciar(lvl);
+                log.println("Brumavela, tras reiniciar: " + com.darkcraft.pueblo.Pueblo.enemigos(server) + ", la reja " + com.darkcraft.pueblo.PuebloEnemigos.rejaPuesta(lvl)
+                        + " | " + com.darkcraft.pueblo.Pueblo.estado(d3));
+            } catch (Throwable t) {
+                log.println("Brumavela, enemigos: ERROR " + t);
+                DarkCraftMod.LOGGER.error("[CI] enemigos de Brumavela", t);
+            }
             log.println("Calibracion de muebles: " + (com.darkcraft.gen.Calib.done ? "hecha" : "NO"));
             log.println("Tiempo total: " + (System.currentTimeMillis() - t0) / 1000 + " s");
             log.println("OK");

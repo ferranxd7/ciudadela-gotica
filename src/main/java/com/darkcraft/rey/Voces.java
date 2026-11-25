@@ -19,6 +19,8 @@ public final class Voces {
 
     /** Frases de Gavran en el paquete de voz: 100 + N (las del Rey van de 1 a 13). */
     public static final int BASE_GAVRAN = 100;
+    /** Las del Capitan de Brumavela: 40 + N (1..5). */
+    public static final int BASE_CAPITAN = 40;
     /** Pausa entre dos frases seguidas (ticks): 0,3 s. */
     public static final int PAUSA = 6;
     /** Lo que se queda el subtitulo despues de acabar de hablar (ticks): 0,8 s. */
@@ -28,11 +30,13 @@ public final class Voces {
     private static final float[] REY = {0, 6.37f, 5.73f, 4.31f, 3.92f, 5.76f, 3.07f, 2.52f, 3.93f, 3.13f, 6.48f, 3.21f, 4.36f, 3.6f};
     private static final float[] GAVRAN = {0, 6.63f, 7.26f, 5.9f, 4.67f, 1.34f, 1.02f, 4.46f, 2.98f, 3.29f, 2.66f, 4.85f, 2.21f,
             3.04f, 4.7f, 4.92f, 3.27f, 4.36f, 6.44f};
+    private static final float[] CAPITAN = {0, 7.15f, 3.74f, 2.7f, 2.95f, 4.06f};
 
     static {
         try (InputStream in = Voces.class.getResourceAsStream("/assets/darkcraft/rey_voces.json")) {
             if (in != null) {
                 JsonObject o = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
+                leer(o, "habla_capitan", CAPITAN);
                 if (o.has("habla")) {
                     leer(o, "habla", REY);
                     leer(o, "habla_gavran", GAVRAN);
@@ -61,13 +65,22 @@ public final class Voces {
         return linea > BASE_GAVRAN;
     }
 
-    /** Si la linea existe (1..13 el Rey, 101..118 Gavran). */
+    public static boolean esCapitan(int linea) {
+        return linea > BASE_CAPITAN && linea < BASE_GAVRAN;
+    }
+
+    /** Si la linea existe (1..13 el Rey, 41..45 el Capitan, 101..118 Gavran). */
     public static boolean valida(int linea) {
+        if (esCapitan(linea)) return linea - BASE_CAPITAN < CAPITAN.length;
         return esGavran(linea) ? linea - BASE_GAVRAN < GAVRAN.length : linea > 0 && linea < REY.length;
     }
 
     /** Segundos que tarda en decir la frase (hasta que acaba de hablar). */
     public static float seg(int linea) {
+        if (esCapitan(linea)) {
+            int n = linea - BASE_CAPITAN;
+            return n > 0 && n < CAPITAN.length ? CAPITAN[n] : 4f;
+        }
         if (esGavran(linea)) {
             int n = linea - BASE_GAVRAN;
             return n > 0 && n < GAVRAN.length ? GAVRAN[n] : 4f;
@@ -84,6 +97,10 @@ public final class Voces {
      * Las demas (las de las cinematicas) siempre se dicen enteras, aunque tengan que esperar un poco.
      */
     public static boolean deRelleno(int linea) {
+        if (esCapitan(linea)) {
+            int n = linea - BASE_CAPITAN;
+            return n == 3 || n == 4;
+        }
         if (esGavran(linea)) {
             int n = linea - BASE_GAVRAN;
             return n == 5 || n == 6 || n == 8 || n == 9 || n == 10 || n == 13 || n == 14 || n == 15;

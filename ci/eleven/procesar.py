@@ -9,9 +9,11 @@ Monta los audios de ElevenLabs (ci/eleven/master) para el juego:
 - Voz de Ser Gavran (voz "Final Boss - Evil All Powerful Villain"): eco de sala grande (la cupula del arbol) y un
   poco mas de graves. En la fase 2 (frases 11, 12, 14, 15 y 16) la misma voz mas grave, con una segunda voz por
   debajo y madera crujiendo (como el fuego del Rey).
+- Voz del Capitan de Brumavela (voz "Matthew Schmitz - Old Pirate Captain"): mas grave, con una segunda voz sorda por
+  debajo (un ahogado) y eco corto.
 Sale todo en src/main/resources/assets/darkcraft/sounds/ (rey/voz_N.ogg, gavran/voz_N.ogg, sfx/NOMBRE_K.ogg) y las
-duraciones de las frases en assets/darkcraft/rey_voces.json ("duraciones" del Rey y "gavran"; "habla" y
-"habla_gavran" = el segundo en que acaba de hablar de verdad, sin el silencio ni la cola del eco: con eso cuenta el
+duraciones de las frases en assets/darkcraft/rey_voces.json ("duraciones" del Rey, "gavran" y "capitan"; "habla",
+"habla_gavran" y "habla_capitan" = el segundo en que acaba de hablar de verdad, sin el silencio ni la cola del eco: con eso cuenta el
 juego para que la siguiente frase o la pelea no tarden en llegar). A las voces se les quita el silencio del principio.
 Necesita ffmpeg.
 """
@@ -55,6 +57,9 @@ VOZ_HERRERO = ("highpass=f=60,equalizer=f=140:t=q:w=1.0:g=2,equalizer=f=2600:t=q
 TOMAS_MERCADER = {n: "a" for n in range(1, 7)}
 VOZ_MERCADER = ("highpass=f=75,equalizer=f=3000:t=q:w=1.2:g=1.5,aecho=0.8:0.25:24:0.06,"
                 "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=150,loudnorm=I=-16:TP=-1.5:LRA=9")
+# el Capitan de Brumavela (voz "Matthew Schmitz - Old Pirate Captain"): un ahogado. La misma voz algo mas grave, con una
+# segunda voz sorda y temblona por debajo (como oida bajo el agua) y el eco corto del penon del faro
+TOMAS_CAPITAN = {n: "a" for n in range(1, 6)}
 # los personajes con dialogo: id -> (tomas, filtro)
 PERSONAJES = {"guia": (TOMAS_GUIA, VOZ_GUIA), "herrero": (TOMAS_HERRERO, VOZ_HERRERO), "mercader": (TOMAS_MERCADER, VOZ_MERCADER)}
 
@@ -111,6 +116,13 @@ SFX = {
     "pieza_barco": (2.8, 0.8, -16), "cripta_abre": (4.6, 1.2, -15), "barco_reparado": (6.0, 1.5, -14),
     # el viento de Brumavela: se repite en bucle (entra y sale poco a poco, como una racha)
     "brumavela_viento": (17.5, 3.0, -23),
+    # los enemigos de Brumavela (parte 3c): el aldeano hueco y el marinero ahogado
+    "hueco_gemido": (2.0, 0.4, -21), "hueco_alerta": (1.2, 0.25, -16), "hueco_dolor": (0.75, 0.2, -17), "hueco_muerte": (2.2, 0.5, -17),
+    "ahogado_gorgoteo": (2.2, 0.4, -21), "ahogado_alerta": (1.4, 0.3, -16), "ahogado_dolor": (0.75, 0.2, -17),
+    "ahogado_muerte": (2.4, 0.5, -16),
+    # el Capitan: alza el farol, la llama que sale del suelo, llama a su tripulacion, dolor y muerte; y la reja del faro
+    "capitan_farol": (2.0, 0.6, -15), "capitan_llama": (1.8, 0.6, -14), "capitan_llamar": (4.0, 1.0, -14),
+    "capitan_dolor": (1.2, 0.3, -16), "capitan_muerte": (3.0, 0.6, -14), "faro_sello": (3.0, 0.8, -15),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5}
@@ -181,6 +193,12 @@ TOMAS_SFX = {
     "cripta_abre": (1, 3),           # las que arrastran la losa mas de tres segundos (la 4 casi no se oye)
     "barco_reparado": (1, 3),        # la que suena los cinco segundos enteros, y la del zumbido mas largo
     "brumavela_viento": (3,),        # la mas pareja de principio a fin (para repetirla en bucle)
+    # los enemigos de Brumavela: las tomas con mas cuerpo (las muy flojas o casi todo silencio, fuera)
+    "hueco_gemido": (4, 3, 1), "hueco_alerta": (3, 2), "hueco_dolor": (3, 2), "hueco_muerte": (4, 2),
+    "ahogado_gorgoteo": (4, 2, 3), "ahogado_alerta": (4, 1), "ahogado_dolor": (4, 3), "ahogado_muerte": (2, 1),
+    # el Capitan: las tomas mas llenas (la 2 de la reja casi no suena)
+    "capitan_farol": (2, 4), "capitan_llama": (4, 3), "capitan_llamar": (4, 1), "capitan_dolor": (2, 4, 1),
+    "capitan_muerte": (3, 4), "faro_sello": (3, 1),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -280,6 +298,23 @@ def voz_arbol(src, dst, madera, desfase):
     return hablado * ESTIRA_ARBOL + COLA
 
 
+def voz_capitan(src, dst):
+    """El Capitan: mas grave (sin alargarla), una segunda voz sorda con coro por debajo y eco corto de piedra."""
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]" + pre + "asplit=2[v1][v2];"
+        "[v1]asetrate=44100*0.92,aresample=44100,atempo=1.0870[baja];"
+        "[v2]asetrate=44100*0.92,aresample=44100,atempo=1.0870,lowpass=f=650,"
+        "chorus=0.6:0.9:50|60:0.4|0.32:0.25|0.4:2|1.3,volume=0.7[agua];"
+        "[baja][agua]amix=inputs=2:weights=1 0.6:normalize=0,"
+        "equalizer=f=110:t=q:w=1.0:g=4,equalizer=f=3000:t=q:w=1.4:g=-1.5,"
+        "aecho=0.8:0.5:60|135|220:0.20|0.12|0.06,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA
+
+
 def efecto(src, dst, maxs, fade, lufs, entrada=0.0):
     filtro = (f"silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.02,atrim=0:{maxs},"
               + (f"afade=t=in:st=0:d={entrada}," if entrada > 0 else "")
@@ -335,8 +370,27 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO gavran {n}: {e}")
+    # el Capitan de Brumavela
+    cap = os.path.join(ASSETS, "sounds", "capitan")
+    os.makedirs(cap, exist_ok=True)
+    dur_c, hab_c = {}, {}
+    for n, toma in sorted(TOMAS_CAPITAN.items()):
+        src = os.path.join(MASTER, "capitan", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(cap, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_capitan(src, dst)
+            dur_c[n] = round(duracion(dst), 2)
+            hab_c[n] = round(min(h, dur_c[n]), 2)
+            print(f"capitan {n:2d}: {dur_c[n]} s (habla hasta {hab_c[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO capitan {n}: {e}")
     with open(os.path.join(ASSETS, "rey_voces.json"), "w") as fh:
-        json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g}, fh)
+        json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g, "capitan": dur_c, "habla_capitan": hab_c}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

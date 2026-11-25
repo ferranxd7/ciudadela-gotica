@@ -43,7 +43,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 27 * 60 * 20;
+    private static final int LIMIT = 30 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -3131,6 +3131,9 @@ public final class ClientCiTest {
                 lvl.setDayTime(6000);
                 lvl.setWeatherParameters(6000, 0, false, false);
                 comando(sp, "darkcraft brumavela reiniciar");
+                // (este tramo es el de la 3b: sin enemigos y con el faro abierto; los de la 3c tienen el suyo despues)
+                com.darkcraft.enemigos.Puestos.todos(sp.server, com.darkcraft.pueblo.PuebloEnemigos.SITIO, true);
+                com.darkcraft.pueblo.PuebloEnemigos.capitan(lvl, true);
                 irMirando(sp, ap.getX() + 0.5, ap.getY(), ap.getZ() + 0.5, ap.getX() - 2.5, ap.getY() + 2.5, ap.getZ() + 22, false);
                 log("  pueblo: se aparece en " + ap.toShortString() + " (calculado " + com.darkcraft.world.MundoNubes.aparicion().toShortString() + "), modo por defecto "
                         + sp.server.getDefaultGameType() + ", bioma " + lvl.getBiome(ap).unwrapKey().map(k -> k.location().toString()).orElse("?"));
@@ -3359,6 +3362,405 @@ public final class ClientCiTest {
         });
         return t + 1178;
     }
+
+    // ------------------------------------------------------------------ los enemigos de Brumavela (parte 3c)
+
+    private static com.darkcraft.enemigos.Enemigo enemigoB(int puesto) {
+        return com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.pueblo.PuebloEnemigos.SITIO, puesto);
+    }
+
+    private static String estadoE(com.darkcraft.enemigos.Enemigo e) {
+        if (e == null) return "no esta";
+        return e.tipo() + String.format(java.util.Locale.ROOT, " en %.1f, %.1f, %.1f giro %.0f", e.getX(), e.getY(), e.getZ(), e.getYRot()) + " postura " + e.postura()
+                + " accion " + e.accion() + " (tick " + e.accionTicks() + ") vida " + Math.round(e.getHealth()) + "/" + Math.round(e.getMaxHealth())
+                + " presa " + (e.getTarget() == null ? "ninguna" : e.getTarget().getName().getString());
+    }
+
+    private static void logEnemigo(Minecraft m, String que, int puesto) {
+        server(m, sp -> log("  enemigos " + que + ": " + estadoE(enemigoB(puesto)) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())
+                + " | " + com.darkcraft.pueblo.Pueblo.enemigos(sp.server)));
+    }
+
+    /** En supervivencia, con una espada de hierro, la vida entera y sin que le hagan dano de verdad (para que la prueba no muera). */
+    private static void aPelear(ServerPlayer sp, boolean aguanta) {
+        sp.setGameMode(GameType.SURVIVAL);
+        var inv = sp.getInventory();
+        inv.clearContent();
+        inv.selected = 0;
+        sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
+        inv.items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+        sp.removeAllEffects();
+        sp.setHealth(sp.getMaxHealth());
+        if (aguanta) sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE, 4000, 4, false, false, false));
+    }
+
+    /**
+     * Los enemigos de Brumavela: donde esperan (el hueco del muelle, la Cuesta, la taberna, el cementerio, la capilla), el
+     * timon guardado, una pelea con un hueco, el arponero, y el Capitan: su barra, sus golpes, el farol, la tripulacion,
+     * su caida, la reja del faro abierta y el bestiario.
+     */
+    private static int enemigos(int t0) {
+        base = 0;
+        int t = t0;
+        final String S = com.darkcraft.pueblo.PuebloEnemigos.SITIO;
+        final int CAP = com.darkcraft.pueblo.PuebloEnemigos.puestoCapitan();
+        atTicks(t, "Enemigos de Brumavela: todo como al principio (en creativo no hacen caso)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            com.darkcraft.rol.Rol.sinLimite = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                sp.setGameMode(GameType.CREATIVE);
+                lvl.setDayTime(6000);
+                lvl.setWeatherParameters(6000, 0, false, false);
+                comando(sp, "darkcraft brumavela reiniciar");
+                irMirando(sp, -19.5, 251, 112.5, -23.5, 251.7, 116.5, false);
+                log("  enemigos: " + com.darkcraft.pueblo.Pueblo.enemigos(sp.server) + " | dificultad " + lvl.getDifficulty());
+            });
+        });
+        atTicks(t + 56, "captura: el hueco de rodillas ante el mar de nubes", m -> {
+            logEnemigo(m, "el del muelle", 0);
+            shot(m, "cliente_en01_hueco_muelle");
+        });
+        atTicks(t + 58, "Enemigos: la Cuesta (uno al pie, de espaldas; otro a media subida; el arponero arriba)", m -> server(m, sp ->
+                irMirando(sp, 3.5, 251, 97.5, 0.5, 256.5, 70, false)));
+        atTicks(t + 110, "captura: la Cuesta", m -> {
+            logEnemigo(m, "el del pie de la Cuesta", 1);
+            logEnemigo(m, "el de media Cuesta", 5);
+            shot(m, "cliente_en02_cuesta");
+        });
+        atTicks(t + 112, "Enemigos: la taberna", m -> server(m, sp -> irMirando(sp, 20.5, 267, -0.5, 21.5, 267.9, -8, false)));
+        atTicks(t + 164, "captura: los de la taberna", m -> {
+            logEnemigo(m, "la tabernera", 7);
+            logEnemigo(m, "uno que mira la jarra", 8);
+            shot(m, "cliente_en03_taberna");
+        });
+        atTicks(t + 166, "Enemigos: el timon esta guardado", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                int[] z = sitioB("timon");
+                irMirando(sp, z[0] - 1.5, z[1], z[2] + 3.5, z[0] + 0.5, z[1] + 1.1, z[2] + 0.5, false);
+            });
+        });
+        atTicks(t + 190, "se intenta coger el timon", m -> server(m, sp -> {
+            com.darkcraft.pueblo.Pueblo.usar(sp, 1);
+            log("  enemigos: timon guardado=" + com.darkcraft.pueblo.PuebloEnemigos.timonGuardado(sp.serverLevel()) + ", el Capitan en pie="
+                    + com.darkcraft.pueblo.PuebloEnemigos.capitanEnPie(sp.serverLevel()));
+        }));
+        atTicks(t + 204, "captura: no se puede coger el timon", m -> {
+            logPueblo(m, "timon guardado (sale el aviso y no se coge)");
+            shot(m, "cliente_en04_timon_guardado");
+        });
+        atTicks(t + 206, "Enemigos: el cementerio", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> irMirando(sp, -47.5, 277.5, -29.5, -49, 273.3, -35.5, true));
+        });
+        atTicks(t + 258, "captura: los del cementerio", m -> {
+            logEnemigo(m, "uno tumbado entre las tumbas", 24);
+            logEnemigo(m, "el que reza ante la lapida", 26);
+            shot(m, "cliente_en05_cementerio");
+        });
+        atTicks(t + 260, "Enemigos: la capilla", m -> server(m, sp -> irMirando(sp, -44.5, 273, -45.5, -52, 273.7, -46, false)));
+        atTicks(t + 312, "captura: los que rezan en la capilla", m -> {
+            logEnemigo(m, "uno que reza en la capilla", 27);
+            shot(m, "cliente_en06_capilla");
+        });
+        // ---- una pelea: el hueco de la hoz de la calle del oeste
+        int P = t + 314;
+        atTicks(P, "Pelea: en supervivencia, delante del hueco de la calle del oeste", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                aPelear(sp, false);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), -29.5, 267, 6.5, 90f, 5f);
+            });
+        });
+        atTicks(P + 40, "el hueco ya ha salido: de cerca, y que ataque", m -> {
+            server(m, sp -> {
+                var e = enemigoB(14);
+                log("  enemigos pelea, antes: " + estadoE(e));
+                if (e != null) {
+                    sp.teleportTo(sp.serverLevel(), e.getX() + 1.9, e.getY(), e.getZ(), 90f, 5f);
+                    e.setTarget(sp);
+                    e.empezar(com.darkcraft.enemigos.HuecoAnims.HOZ_DOBLE);
+                    verDesdeServidor = new Vec3(e.getX() + 1.0, e.getY() + 1.7, e.getZ() + 3.6);
+                    miraServidor = new Vec3(e.getX() + 0.9, e.getY() + 1.0, e.getZ());
+                }
+            });
+        });
+        atTicks(P + 42, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(P + 49, "captura: el hueco arma el tajo", m -> {
+            logEnemigo(m, "pelea, armando", 14);
+            shot(m, "cliente_en07_hueco_arma");
+        });
+        atTicks(P + 53, "captura: el tajo", m -> {
+            logEnemigo(m, "pelea, tajo", 14);
+            shot(m, "cliente_en08_hueco_tajo");
+        });
+        atTicks(P + 61, "captura: el segundo tajo", m -> {
+            logEnemigo(m, "pelea, segundo tajo", 14);
+            shot(m, "cliente_en09_hueco_segundo");
+        });
+        atTicks(P + 80, "el jugador pega (en primera persona)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                var e = enemigoB(14);
+                if (e != null) sp.teleportTo(sp.serverLevel(), e.getX() + 1.7, e.getY(), e.getZ(), 90f, 8f);
+                sp.setHealth(sp.getMaxHealth());
+            });
+        });
+        atTicks(P + 90, "clic", m -> atacar(m));
+        atTicks(P + 100, "clic", m -> atacar(m));
+        atTicks(P + 108, "captura: el jugador le pega", m -> {
+            logEnemigo(m, "pelea, tras dos golpes del jugador", 14);
+            shot(m, "cliente_en10_golpe_jugador");
+        });
+        atTicks(P + 112, "cae", m -> {
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                var e = enemigoB(14);
+                if (e != null) {
+                    verDesdeServidor = new Vec3(e.getX() + 1.0, e.getY() + 1.7, e.getZ() + 3.6);
+                    miraServidor = new Vec3(e.getX() + 0.6, e.getY() + 0.7, e.getZ());
+                    e.hurt(sp.damageSources().playerAttack(sp), 9999f);
+                }
+            });
+        });
+        atTicks(P + 114, "camara de lado", m -> {
+            m.options.hideGui = true;
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(P + 132, "captura: el hueco cae", m -> shot(m, "cliente_en11_hueco_cae"));
+        atTicks(P + 160, "tras caer: ecos, logro y bestiario", m -> {
+            var est = com.darkcraft.client.espejo.EspejoCliente.estado();
+            log("  enemigos tras caer el hueco: ecos " + com.darkcraft.client.ui.ClientRol.ecos + ", bestiario " + (est == null ? "?" : est.bestiario()));
+            server(m, sp -> log("  enemigos: logro hueco=" + com.darkcraft.story.Logros.tiene(sp, "hueco") + ", " + com.darkcraft.pueblo.Pueblo.enemigos(sp.server)
+                    + ", el puesto 14 muerto=" + com.darkcraft.enemigos.Puestos.muerto(sp.server, S, 14)));
+        });
+        // ---- el arponero de lo alto de la Cuesta
+        int A = P + 164;
+        atTicks(A, "El arponero: a media Cuesta, sin el de la horca", m -> {
+            com.darkcraft.client.ui.Carteles.callados = true;
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                com.darkcraft.enemigos.Puestos.marcar(sp.server, S, 5, true);
+                sp.setGameMode(GameType.CREATIVE);
+                sp.teleportTo(sp.serverLevel(), 0.5, 264, 52.5, 180f, -10f);
+            });
+        });
+        atTicks(A + 44, "el arponero apunta", m -> {
+            server(m, sp -> {
+                var e = enemigoB(6);
+                log("  enemigos arponero, antes: " + estadoE(e));
+                aPelear(sp, true);
+                sp.teleportTo(sp.serverLevel(), 0.5, 264, 52.5, 180f, -10f);
+                if (e != null) {
+                    e.setTarget(sp);
+                    e.empezar(com.darkcraft.enemigos.AhogadoAnims.ARPON_LANZAR);
+                }
+            });
+            verDesde(m, new Vec3(6.2, 269.6, 51.5), new Vec3(0.5, 266.6, 48.8));
+        });
+        atTicks(A + 62, "captura: el arponero apunta", m -> {
+            logEnemigo(m, "arponero, apuntando", 6);
+            shot(m, "cliente_en12_arpon_apunta");
+        });
+        atTicks(A + 68, "captura: el arpon vuela", m -> {
+            server(m, sp -> log("  enemigos arponero: arpones en el aire "
+                    + sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Arpon.class, sp.getBoundingBox().inflate(40)).size()));
+            shot(m, "cliente_en13_arpon_vuela");
+        });
+        atTicks(A + 100, "tras el arpon", m -> logEnemigo(m, "arponero, tras lanzar (saca otro)", 6));
+        // ---- el Capitan
+        int C = A + 104;
+        atTicks(C, "El Capitan ante la puerta del faro (en creativo, desde lo alto de la rampa)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                sp.removeAllEffects();
+                irMirando(sp, 63.5, 276, -72.5, 73.5, 277.4, -78, false);
+            });
+        });
+        atTicks(C + 60, "captura: el Capitan y la reja", m -> {
+            logEnemigo(m, "el Capitan, esperando", CAP);
+            server(m, sp -> {
+                BlockPos puerta = com.darkcraft.pueblo.PuebloEnemigos.puertaFaro();
+                log("  enemigos: la reja puesta=" + com.darkcraft.pueblo.PuebloEnemigos.rejaPuesta(sp.serverLevel()) + " (" + sp.serverLevel().getBlockState(puerta)
+                        + "), el Capitan en pie=" + com.darkcraft.pueblo.PuebloEnemigos.capitanEnPie(sp.serverLevel()));
+            });
+            shot(m, "cliente_en14_capitan");
+        });
+        atTicks(C + 62, "de cerca", m -> server(m, sp -> irMirando(sp, 68.5, 276, -77.0, 72.5, 277.9, -77.5, false)));
+        atTicks(C + 90, "captura: el Capitan de cerca", m -> shot(m, "cliente_en15_capitan_cerca"));
+        atTicks(C + 92, "Empieza la pelea (supervivencia)", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                sp.teleportTo(sp.serverLevel(), 65.5, 276, -76.5, -100f, 0f);
+            });
+        });
+        atTicks(C + 140, "captura: la barra del Capitan y su primera frase", m -> {
+            logEnemigo(m, "el Capitan, en pelea", CAP);
+            server(m, sp -> {
+                if (enemigoB(CAP) instanceof com.darkcraft.enemigos.Capitan c) log("  enemigos: el Capitan enPelea=" + c.enPelea() + " rivales " + c.rivales().size());
+            });
+            log("  enemigos: musica " + ClientMusic.debug());
+            shot(m, "cliente_en16_capitan_barra");
+        });
+        atTicks(C + 170, "el tajo", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var e = enemigoB(CAP);
+                if (e != null) {
+                    sp.teleportTo(sp.serverLevel(), e.getX() - 2.6, e.getY(), e.getZ() + 0.2, -90f, 0f);
+                    e.setTarget(sp);
+                    e.empezar(com.darkcraft.enemigos.CapitanAnims.TAJO);
+                    verDesdeServidor = new Vec3(e.getX() - 1.6, e.getY() + 2.2, e.getZ() + 5.4);
+                    miraServidor = new Vec3(e.getX() - 1.2, e.getY() + 1.5, e.getZ());
+                }
+            });
+        });
+        atTicks(C + 172, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 187, "captura: el Capitan levanta el sable", m -> {
+            logEnemigo(m, "el Capitan, tajo arriba", CAP);
+            shot(m, "cliente_en17_capitan_tajo_arriba");
+        });
+        atTicks(C + 192, "captura: el tajo cae", m -> {
+            logEnemigo(m, "el Capitan, tajo", CAP);
+            shot(m, "cliente_en18_capitan_tajo");
+        });
+        atTicks(C + 230, "el farol", m -> server(m, sp -> {
+            var e = enemigoB(CAP);
+            if (e != null) {
+                sp.teleportTo(sp.serverLevel(), e.getX() - 5.5, e.getY(), e.getZ() + 0.5, -90f, 0f);
+                e.setTarget(sp);
+                e.empezar(com.darkcraft.enemigos.CapitanAnims.FAROL);
+                verDesdeServidor = new Vec3(e.getX() - 3.0, e.getY() + 2.8, e.getZ() + 7.0);
+                miraServidor = new Vec3(e.getX() - 2.8, e.getY() + 1.0, e.getZ());
+            }
+        }));
+        atTicks(C + 232, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 258, "captura: alza el farol y el suelo avisa", m -> {
+            logEnemigo(m, "el Capitan, farol", CAP);
+            shot(m, "cliente_en19_capitan_farol");
+        });
+        atTicks(C + 270, "captura: la llama", m -> {
+            logEnemigo(m, "el Capitan, la llama", CAP);
+            shot(m, "cliente_en20_capitan_llama");
+        });
+        atTicks(C + 300, "a media vida llama a su tripulacion", m -> server(m, sp -> {
+            var e = enemigoB(CAP);
+            if (e != null) {
+                e.setHealth(e.getMaxHealth() * 0.45f);
+                sp.teleportTo(sp.serverLevel(), e.getX() - 6.0, e.getY(), e.getZ() + 0.5, -90f, 0f);
+                e.setTarget(sp);
+                e.empezar(com.darkcraft.enemigos.CapitanAnims.LLAMAR);
+                verDesdeServidor = new Vec3(e.getX() - 4.0, e.getY() + 4.2, e.getZ() + 9.0);
+                miraServidor = new Vec3(e.getX() - 1.5, e.getY() + 1.0, e.getZ());
+            }
+        }));
+        atTicks(C + 302, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 334, "captura: llama a su tripulacion", m -> {
+            logEnemigo(m, "el Capitan, llamando", CAP);
+            server(m, sp -> {
+                if (enemigoB(CAP) instanceof com.darkcraft.enemigos.Capitan c) log("  enemigos: tripulacion " + c.tripulacion());
+            });
+            shot(m, "cliente_en21_capitan_tripulacion");
+        });
+        atTicks(C + 372, "captura: la tripulacion pelea", m -> {
+            server(m, sp -> {
+                if (enemigoB(CAP) instanceof com.darkcraft.enemigos.Capitan c) log("  enemigos: tripulacion " + c.tripulacion() + ", ahogados cerca "
+                        + sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Ahogado.class, sp.getBoundingBox().inflate(16)).size());
+            });
+            shot(m, "cliente_en22_tripulacion");
+        });
+        atTicks(C + 380, "el Capitan cae", m -> {
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                var e = enemigoB(CAP);
+                log("  enemigos antes de caer el Capitan: frascos " + com.darkcraft.rol.Ficha.frascos(sp) + ", ecos " + com.darkcraft.rol.Ficha.ecos(sp));
+                if (e != null) {
+                    verDesdeServidor = new Vec3(e.getX() - 3.2, e.getY() + 2.0, e.getZ() + 4.6);
+                    miraServidor = new Vec3(e.getX() - 0.6, e.getY() + 1.0, e.getZ());
+                    e.hurt(sp.damageSources().playerAttack(sp), 99999f);
+                }
+            });
+        });
+        atTicks(C + 382, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 404, "captura: el Capitan cae de rodillas", m -> shot(m, "cliente_en23_capitan_rodillas"));
+        atTicks(C + 436, "captura: el Capitan, caido", m -> shot(m, "cliente_en24_capitan_caido"));
+        atTicks(C + 462, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 500, "captura: JEFE ABATIDO", m -> {
+            log("  enemigos: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  enemigos tras caer el Capitan: logro capitan=" + com.darkcraft.story.Logros.tiene(sp, "capitan") + ", frascos "
+                    + com.darkcraft.rol.Ficha.frascos(sp) + ", ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", la reja puesta="
+                    + com.darkcraft.pueblo.PuebloEnemigos.rejaPuesta(sp.serverLevel()) + ", " + com.darkcraft.pueblo.Pueblo.enemigos(sp.server) + ", ahogados cerca "
+                    + sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Ahogado.class, sp.getBoundingBox().inflate(16)).size()));
+            shot(m, "cliente_en25_jefe_abatido");
+        });
+        atTicks(C + 560, "la puerta del faro, abierta", m -> {
+            com.darkcraft.client.ui.Carteles.callados = true;
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                sp.removeAllEffects();
+                BlockPos puerta = com.darkcraft.pueblo.PuebloEnemigos.puertaFaro();
+                irMirando(sp, puerta.getX() - 4.5, puerta.getY(), puerta.getZ() + 0.5, puerta.getX() + 0.5, puerta.getY() + 1.0, puerta.getZ() + 0.5, false);
+            });
+        });
+        atTicks(C + 600, "captura: la reja abierta", m -> shot(m, "cliente_en26_reja_abierta"));
+        atTicks(C + 602, "descansar o morir: vuelven los caidos, el Capitan no", m -> server(m, sp -> {
+            int antes = com.darkcraft.enemigos.Puestos.quedan(sp.server, S);
+            int vuelven = com.darkcraft.enemigos.Puestos.reaparecer(sp);
+            log("  enemigos: al descansar vuelven " + vuelven + " (" + antes + " -> " + com.darkcraft.enemigos.Puestos.quedan(sp.server, S) + " de "
+                    + com.darkcraft.pueblo.PuebloEnemigos.puestos().size() + "), el Capitan muerto=" + com.darkcraft.enemigos.Puestos.muerto(sp.server, S, CAP));
+        }));
+        atTicks(C + 606, "el bestiario", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, 5));
+        });
+        atTicks(C + 622, "captura: el Capitan en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_en27_bestiario_capitan");
+        });
+        atTicks(C + 624, "el hueco de la hoz", m -> menuP(m, mm -> mm.probarLogros(2, 1)));
+        atTicks(C + 634, "captura: el hueco en el bestiario", m -> shot(m, "cliente_en28_bestiario_hueco"));
+        atTicks(C + 636, "fin del tramo: todo como al principio", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                sp.removeAllEffects();
+                sp.getInventory().clearContent();
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft brumavela reiniciar");
+            });
+        });
+        return C + 650;
+    }
+
+    /** Donde poner la camara de observador (lo calcula el servidor con el enemigo delante y lo usa el cliente dos ticks despues). */
+    private static volatile Vec3 verDesdeServidor, miraServidor;
 
     // ------------------------------------------------------------------ guardar y salir: el titulo y las partidas (parte 2f-2)
 
@@ -3619,6 +4021,7 @@ public final class ClientCiTest {
         fin = clases(fin);
         fin = nubes(fin);
         fin = pueblo(fin);
+        fin = enemigos(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

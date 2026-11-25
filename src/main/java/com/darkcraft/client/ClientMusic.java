@@ -110,7 +110,7 @@ public final class ClientMusic {
     private static int bossPhase, bossTicks;
     private static boolean bossSoft;
 
-    /** Musica del combate: 0 la apaga; 1..3 pone (o cambia a) el tema de esa fase del Rey (11 y 12: Ser Gavran). Suave en la entrada. */
+    /** Musica del combate: 0 la apaga; 1..3 pone (o cambia a) el tema de esa fase del Rey (11 y 12: Ser Gavran; 21: el Capitan). Suave en la entrada. */
     public static void boss(int phase, boolean soft) {
         if (phase == bossPhase && (phase == 0 || (boss != null && !boss.dying()))) {
             if (boss != null && soft != bossSoft) {
@@ -129,9 +129,10 @@ public final class ClientMusic {
             case 2 -> DarkCraftMod.MUSICA_REY_2.get();
             case 11 -> DarkCraftMod.MUSICA_GAVRAN_1.get();
             case 12 -> DarkCraftMod.MUSICA_GAVRAN_2.get();
+            case 21 -> DarkCraftMod.MUSICA_CAPITAN.get();
             default -> DarkCraftMod.MUSICA_REY_3.get();
         };
-        boss = new Track(ev, phase >= 11 ? "gavran" + (phase - 10) : "rey" + phase, true);
+        boss = new Track(ev, phase == 21 ? "capitan" : phase >= 11 ? "gavran" + (phase - 10) : "rey" + phase, true);
         bossTicks = 0;
         Minecraft.getInstance().getSoundManager().play(boss);
         boss.fadeTo(soft ? 0.3f : 0.85f, phase == 1 ? 3.0f : 2.2f);

@@ -182,6 +182,23 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
+    // los enemigos de Brumavela (parte 3c)
+    public static final RegistryObject<SoundEvent> SFX_HUECO_GEMIDO = sound("sfx.hueco_gemido");
+    public static final RegistryObject<SoundEvent> SFX_HUECO_ALERTA = sound("sfx.hueco_alerta");
+    public static final RegistryObject<SoundEvent> SFX_HUECO_DOLOR = sound("sfx.hueco_dolor");
+    public static final RegistryObject<SoundEvent> SFX_HUECO_MUERTE = sound("sfx.hueco_muerte");
+    public static final RegistryObject<SoundEvent> SFX_AHOGADO_GORGOTEO = sound("sfx.ahogado_gorgoteo");
+    public static final RegistryObject<SoundEvent> SFX_AHOGADO_ALERTA = sound("sfx.ahogado_alerta");
+    public static final RegistryObject<SoundEvent> SFX_AHOGADO_DOLOR = sound("sfx.ahogado_dolor");
+    public static final RegistryObject<SoundEvent> SFX_AHOGADO_MUERTE = sound("sfx.ahogado_muerte");
+    // el Capitan: el farol que se alza, la llama que sale del suelo, la llamada a la tripulacion, y la reja del faro
+    public static final RegistryObject<SoundEvent> SFX_CAPITAN_FAROL = sound("sfx.capitan_farol");
+    public static final RegistryObject<SoundEvent> SFX_CAPITAN_LLAMA = sound("sfx.capitan_llama");
+    public static final RegistryObject<SoundEvent> SFX_CAPITAN_LLAMAR = sound("sfx.capitan_llamar");
+    public static final RegistryObject<SoundEvent> SFX_CAPITAN_DOLOR = sound("sfx.capitan_dolor");
+    public static final RegistryObject<SoundEvent> SFX_CAPITAN_MUERTE = sound("sfx.capitan_muerte");
+    public static final RegistryObject<SoundEvent> SFX_FARO_SELLO = sound("sfx.faro_sello");
+    public static final RegistryObject<SoundEvent> MUSICA_CAPITAN = sound("musica.capitan");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")
@@ -191,9 +208,14 @@ public class DarkCraftMod {
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] GAVRAN_VOZ = new RegistryObject[19];
 
+    /** Frases del Capitan de Brumavela (1..5). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] CAPITAN_VOZ = new RegistryObject[6];
+
     static {
         for (int i = 1; i < REY_VOZ.length; i++) REY_VOZ[i] = sound("rey.voz." + i);
         for (int i = 1; i < GAVRAN_VOZ.length; i++) GAVRAN_VOZ[i] = sound("gavran.voz." + i);
+        for (int i = 1; i < CAPITAN_VOZ.length; i++) CAPITAN_VOZ[i] = sound("capitan.voz." + i);
     }
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
@@ -297,6 +319,19 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.caballeros.CaballeroZombi.Ballesta>> CABALLERO_BALLESTA = ENTITIES.register("caballero_ballesta",
             () -> EntityType.Builder.<com.darkcraft.caballeros.CaballeroZombi.Ballesta>of(com.darkcraft.caballeros.CaballeroZombi.Ballesta::new, MobCategory.MONSTER)
                     .sized(0.6f, 1.95f).clientTrackingRange(8).build(MODID + ":caballero_ballesta"));
+    // ---- los enemigos de Brumavela (parte 3c)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Hueco>> HUECO = ENTITIES.register("hueco",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Hueco>of(com.darkcraft.enemigos.Hueco::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.9f).clientTrackingRange(8).build(MODID + ":hueco"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Ahogado>> AHOGADO = ENTITIES.register("ahogado",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Ahogado>of(com.darkcraft.enemigos.Ahogado::new, MobCategory.MONSTER)
+                    .sized(0.7f, 1.95f).clientTrackingRange(8).build(MODID + ":ahogado"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Capitan>> CAPITAN = ENTITIES.register("capitan",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Capitan>of(com.darkcraft.enemigos.Capitan::new, MobCategory.MONSTER)
+                    .sized(0.85f, 2.35f).fireImmune().clientTrackingRange(10).build(MODID + ":capitan"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Arpon>> ARPON = ENTITIES.register("arpon",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Arpon>of(com.darkcraft.enemigos.Arpon::new, MobCategory.MISC)
+                    .sized(0.5f, 0.5f).clientTrackingRange(4).updateInterval(20).build(MODID + ":arpon"));
     public static final RegistryObject<Item> HUEVO_ESPADA = ITEMS.register("caballero_espada_spawn_egg",
             () -> new net.minecraftforge.common.ForgeSpawnEggItem(CABALLERO_ESPADA, 0x4A6342, 0x8E1418, new Item.Properties()));
     public static final RegistryObject<Item> HUEVO_ALABARDA = ITEMS.register("caballero_alabarda_spawn_egg",
@@ -385,6 +420,7 @@ public class DarkCraftMod {
         com.darkcraft.rol.Efectos.registrar(modBus);
         com.darkcraft.world.Valdrenn.registrar(modBus);
         com.darkcraft.world.MundoNubes.registrar(modBus);
+        com.darkcraft.pueblo.PuebloEnemigos.registrar();
         com.darkcraft.fortaleza.Localizar.registrar(modBus);
         modBus.addListener(this::attributes);
         modBus.addListener(this::setup);
@@ -409,6 +445,9 @@ public class DarkCraftMod {
         e.put(CABALLERO_ESPADA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
         e.put(CABALLERO_ALABARDA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
         e.put(CABALLERO_BALLESTA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
+        e.put(HUECO.get(), com.darkcraft.enemigos.Hueco.atributos().build());
+        e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
+        e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUIA.get(), com.darkcraft.personajes.Guia.atributos().build());
         e.put(HERRERO.get(), com.darkcraft.personajes.Herrero.atributos().build());
         e.put(MERCADER.get(), com.darkcraft.personajes.Mercader.atributos().build());

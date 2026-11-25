@@ -88,5 +88,28 @@
     "aviso": "Music by William Hector (https://www.youtube.com/@WilliamHectorMusic)",
     "uso": "La pantalla de titulo",
     "lufs": -17
+  },
+  {
+    "id": "capitan",
+    "pagina": "https://opengameart.org/content/blackmoor-tides-epic-pirate-battle-theme",
+    "pagina2": "https://opengameart.org/node/20946",
+    "busca": "blackmoor",
+    "zip_prefiere": [
+      "no vocal",
+      "novocal",
+      "no voc",
+      "without",
+      "instrumental",
+      "no vox",
+      "novox",
+      "no chant",
+      "no choir"
+    ],
+    "titulo": "Blackmoor Tides (Epic Pirate Battle Theme)",
+    "autor": "Matthew Pablo",
+    "licencia": "CC-BY 3.0",
+    "aviso": "Music by Matthew Pablo, http://www.matthewpablo.com",
+    "uso": "El Capitán de Brumavela",
+    "lufs": -16
   }
 ]

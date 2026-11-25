@@ -470,7 +470,9 @@ public final class Rol {
     static int valor(LivingEntity e) {
         if (!(e instanceof Enemy)) return 0;
         // los jefes dan los suyos al acabar su muerte (Rol.jefe)
-        if (e instanceof com.darkcraft.rey.Rey || e instanceof com.darkcraft.gavran.Gavran) return 0;
+        if (e instanceof com.darkcraft.rey.Rey || e instanceof com.darkcraft.gavran.Gavran || e instanceof com.darkcraft.enemigos.Capitan) return 0;
+        // ni los que llama un jefe (se deshacen con el)
+        if (e instanceof com.darkcraft.enemigos.Enemigo en && en.esEfimero()) return 0;
         double vida = e.getMaxHealth();
         double golpe = e.getAttribute(Attributes.ATTACK_DAMAGE) != null ? e.getAttributeValue(Attributes.ATTACK_DAMAGE) : 2;
         double armadura = e.getArmorValue();
@@ -523,6 +525,8 @@ public final class Rol {
         s.agotado = false;
         s.pausa = s.combate = 0;
         s.sucio = true;
+        // al morir, los enemigos caidos vuelven a sus puestos
+        com.darkcraft.enemigos.Puestos.reaparecer(sp);
         DarkCraftMod.LOGGER.info("[DarkCraft] {} ha muerto: {} ecos en la espada de luz{}", sp.getGameProfile().getName(), ecos,
                 vieja != null ? " (se pierden los " + vieja.ecos() + " de la anterior)" : "");
     }

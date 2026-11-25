@@ -253,9 +253,9 @@ public final class ReyCliente {
 
     private static void sonar(int linea) {
         Minecraft mc = Minecraft.getInstance();
-        boolean gavran = com.darkcraft.rey.Voces.esGavran(linea);
-        int n = gavran ? linea - com.darkcraft.rey.Voces.BASE_GAVRAN : linea;
-        var tabla = gavran ? DarkCraftMod.GAVRAN_VOZ : DarkCraftMod.REY_VOZ;
+        boolean gavran = com.darkcraft.rey.Voces.esGavran(linea), capitan = com.darkcraft.rey.Voces.esCapitan(linea);
+        int n = gavran ? linea - com.darkcraft.rey.Voces.BASE_GAVRAN : capitan ? linea - com.darkcraft.rey.Voces.BASE_CAPITAN : linea;
+        var tabla = gavran ? DarkCraftMod.GAVRAN_VOZ : capitan ? DarkCraftMod.CAPITAN_VOZ : DarkCraftMod.REY_VOZ;
         if (n < 1 || n >= tabla.length) return;
         // la anterior ya ha acabado de hablar: se deja sonar la cola de su eco (solo se corta si aun estaba hablando)
         if (voz != null && ticks < vozHasta) mc.getSoundManager().stop(voz);
@@ -361,10 +361,10 @@ public final class ReyCliente {
         int alpha = Math.round(a * 255);
         if (alpha <= 8) return;
         Font font = mc.font;
-        boolean gavran = subLinea > com.darkcraft.gavran.Gavran.VOZ_BASE;
-        Component name = Component.translatable(gavran ? "darkcraft.gavran.nombre_corto" : "darkcraft.rey.nombre_corto");
+        boolean gavran = subLinea > com.darkcraft.gavran.Gavran.VOZ_BASE, capitan = com.darkcraft.rey.Voces.esCapitan(subLinea);
+        Component name = Component.translatable(gavran ? "darkcraft.gavran.nombre_corto" : capitan ? "darkcraft.capitan.nombre_corto" : "darkcraft.rey.nombre_corto");
         Component line = Component.translatable(gavran ? "darkcraft.gavran.voz." + (subLinea - com.darkcraft.gavran.Gavran.VOZ_BASE)
-                : "darkcraft.rey.voz." + subLinea);
+                : capitan ? "darkcraft.capitan.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_CAPITAN) : "darkcraft.rey.voz." + subLinea);
         int band = cine ? Math.round(h * 0.12f) : (enFoco() ? Math.round(h * 0.11f) : 0);
         // tamano: grande, pero que quepa en la franja (o en la parte de abajo de la pantalla)
         float sc = 1.6f;
@@ -386,7 +386,7 @@ public final class ReyCliente {
             g.fill(-lw / 2 - 6, -2, lw / 2 + 6, lines.size() * 10 + 10, (Math.round(a * 150) << 24));
         g.pose().pushPose();
         g.pose().scale(0.75f, 0.75f, 1f);
-        g.drawCenteredString(font, name, 0, 0, (alpha << 24) | (gavran ? 0x6FD08A : 0xC8A040));
+        g.drawCenteredString(font, name, 0, 0, (alpha << 24) | (gavran ? 0x6FD08A : capitan ? 0x7FD8CC : 0xC8A040));
         g.pose().popPose();
         for (int i = 0; i < lines.size(); i++)
             g.drawCenteredString(font, lines.get(i), 0, 9 + i * 10, (alpha << 24) | 0xF0E6D8);
@@ -401,6 +401,10 @@ public final class ReyCliente {
         if (!(n.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents tc)) return;
         if (tc.getKey().equals("entity.darkcraft.gavran")) {
             com.darkcraft.client.gavran.GavranCliente.barra(e, ticks);
+            return;
+        }
+        if (tc.getKey().equals("entity.darkcraft.capitan")) {
+            com.darkcraft.client.enemigos.CapitanCliente.barra(e, ticks);
             return;
         }
         if (!tc.getKey().equals("entity.darkcraft.rey"))
@@ -758,6 +762,14 @@ public final class ReyCliente {
                             fase = 10 + g.fase();
                             break;
                         }
+                    }
+            // el Capitan de Brumavela (tema 21), si no hay otro jefe luchando cerca
+            if (fase == 0)
+                for (Entity en : mc.level.entitiesForRendering())
+                    if (en instanceof com.darkcraft.enemigos.Capitan c && c.isAlive() && c.enPelea() && c.distanceToSqr(mc.player) < 72 * 72) {
+                        fase = 21;
+                        suave = false;
+                        break;
                     }
             ClientMusic.boss(fase, suave);
         }

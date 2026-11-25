@@ -26,7 +26,8 @@ public final class Coleccion {
 
     public static final String[] COLECCION = {"mapa_valdrenn", "libro1", "libro2", "espada_diestra", "espada_siniestra", "libro3", "libro4",
             "llave_arbol", "mandoble_juramento", "llave_hueso", "libro5", "alabarda", "libro_acertijo", "amuleto_hueso", "libro6"};
-    public static final String[] BESTIARIO = {"escudero", "caballero_espada", "caballero_alabarda", "caballero_ballesta", "rey", "gavran"};
+    public static final String[] BESTIARIO = {"hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon", "capitan",
+            "escudero", "caballero_espada", "caballero_alabarda", "caballero_ballesta", "rey", "gavran"};
 
     /** El objeto de una clave de la coleccion (los libros de la cronica, con su texto). */
     public static ItemStack objeto(String clave) {
@@ -52,6 +53,7 @@ public final class Coleccion {
             case "rey" -> "entity.darkcraft.rey";
             case "gavran" -> "entity.darkcraft.gavran";
             case "escudero" -> "darkcraft.gavran.escudero";
+            case "hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon" -> "darkcraft.bestiario." + c;
             default -> "entity.darkcraft." + c;
         };
     }
@@ -70,6 +72,17 @@ public final class Coleccion {
         return CRIATURAS.computeIfAbsent(clave, c -> {
             Level lvl = mc.level;
             return switch (c) {
+                case "hueco_horca", "hueco_hoz", "hueco_antorcha" -> {
+                    var h = DarkCraftMod.HUECO.get().create(lvl);
+                    if (h != null) h.variante(c.endsWith("horca") ? 0 : c.endsWith("hoz") ? 1 : 2);
+                    yield h;
+                }
+                case "ahogado_sable", "ahogado_arpon" -> {
+                    var m = DarkCraftMod.AHOGADO.get().create(lvl);
+                    if (m != null) m.variante(c.endsWith("arpon") ? 1 : 0);
+                    yield m;
+                }
+                case "capitan" -> DarkCraftMod.CAPITAN.get().create(lvl);
                 case "rey" -> DarkCraftMod.REY.get().create(lvl);
                 case "gavran" -> DarkCraftMod.GAVRAN.get().create(lvl);
                 case "caballero_espada", "caballero_alabarda", "caballero_ballesta" -> {
