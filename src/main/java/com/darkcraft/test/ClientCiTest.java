@@ -2121,6 +2121,250 @@ public final class ClientCiTest {
         return t + 450;
     }
 
+    // ------------------------------------------------------------------ la forja de Dorvan y la tienda de Kerrick
+
+    private static com.darkcraft.personajes.Herrero herreroPrueba;
+    private static com.darkcraft.personajes.Mercader mercaderPrueba;
+
+    private static com.darkcraft.personajes.Herrero herreroCliente(Minecraft m) {
+        for (net.minecraft.world.entity.Entity e : m.level.entitiesForRendering())
+            if (e instanceof com.darkcraft.personajes.Herrero h) return h;
+        return null;
+    }
+
+    private static void logForja(Minecraft m, String what) {
+        String pantalla = m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName();
+        if (m.screen instanceof com.darkcraft.client.ui.DialogoScreen d) pantalla += " [" + d.resumen() + "]";
+        if (m.screen instanceof com.darkcraft.client.ui.ForjaScreen f) pantalla += " [" + f.resumen() + "]";
+        if (m.screen instanceof com.darkcraft.client.ui.TiendaScreen ti) pantalla += " [" + ti.resumen() + "]";
+        com.darkcraft.personajes.Herrero hc = herreroCliente(m);
+        log("  forja " + what + " (cliente): herrero " + (hc == null ? "-" : "ciclo " + hc.ciclo + String.format(java.util.Locale.ROOT, " atencion %.2f", hc.atencion))
+                + " | a mano " + com.darkcraft.client.personajes.ClientPersonajes.aMano + " | arma " + com.darkcraft.forja.Forja.nombre(m.player.getMainHandItem()).getString()
+                + " | ecos " + com.darkcraft.client.ui.ClientRol.ecos + " | cartel: " + com.darkcraft.client.ui.Carteles.resumen() + " | pantalla: " + pantalla);
+        server(m, sp -> {
+            var inv = sp.getInventory();
+            log("  forja " + what + " (servidor): arma +" + com.darkcraft.forja.Forja.nivel(sp.getMainHandItem()) + " | piedras I/II/III "
+                    + inv.countItem(com.darkcraft.forja.Forja.piedra(1)) + "/" + inv.countItem(com.darkcraft.forja.Forja.piedra(2)) + "/"
+                    + inv.countItem(com.darkcraft.forja.Forja.piedra(3)) + " | ecos " + com.darkcraft.rol.Ficha.ecos(sp)
+                    + " | arco " + inv.countItem(net.minecraft.world.item.Items.BOW) + " | comprados " + java.util.Arrays.toString(com.darkcraft.tienda.Tienda.comprados(sp))
+                    + " | logros dorvan " + com.darkcraft.story.Logros.tiene(sp, "dorvan") + " kerrick " + com.darkcraft.story.Logros.tiene(sp, "kerrick")
+                    + " mejora " + com.darkcraft.story.Logros.tiene(sp, "mejora") + " compra " + com.darkcraft.story.Logros.tiene(sp, "compra")
+                    + " | dialogos herrero " + com.darkcraft.rol.Ficha.dialogo(sp, "herrero") + " mercader " + com.darkcraft.rol.Ficha.dialogo(sp, "mercader"));
+        });
+    }
+
+    private static void forjaP(Minecraft m, java.util.function.Consumer<com.darkcraft.client.ui.ForjaScreen> r) {
+        if (m.screen instanceof com.darkcraft.client.ui.ForjaScreen f) r.accept(f);
+        else log("  FALLO: no esta la forja (pantalla " + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()) + ")");
+    }
+
+    private static void tiendaP(Minecraft m, java.util.function.Consumer<com.darkcraft.client.ui.TiendaScreen> r) {
+        if (m.screen instanceof com.darkcraft.client.ui.TiendaScreen f) r.accept(f);
+        else log("  FALLO: no esta la tienda (pantalla " + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()) + ")");
+    }
+
+    private static int forja(int t0) {
+        base = 0;
+        int t = t0;
+        int fx = (int) Math.floor(ex), fz = (int) Math.floor(ez), fy = (int) ey;
+        atTicks(t, "Forja: Dorvan con su yunque y Kerrick en la plataforma, de dia; espada de hierro, baston, 4 piedras y 3000 ecos", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = false;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.getInventory().clearContent();
+                sp.removeAllEffects();
+                comando(sp, "darkcraft rol nivel reiniciar");
+                comando(sp, "darkcraft ecos quitar");
+                comando(sp, "darkcraft ecos dar 3000");
+                com.darkcraft.dialogo.Conversaciones.olvidar(sp, "herrero");
+                com.darkcraft.dialogo.Conversaciones.olvidar(sp, "mercader");
+                com.darkcraft.tienda.Tienda.olvidar(sp);
+                lvl.setDayTime(6000);
+                BlockPos yunque = new BlockPos(fx - 3, fy, fz - 3), el = new BlockPos(fx - 2, fy, fz - 3);
+                lvl.setBlock(yunque, net.minecraft.world.level.block.Blocks.ANVIL.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.AnvilBlock.FACING, net.minecraft.core.Direction.NORTH), 3);
+                lvl.setBlock(new BlockPos(fx - 3, fy, fz - 4), net.minecraft.world.level.block.Blocks.BLAST_FURNACE.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.FACING, net.minecraft.core.Direction.SOUTH)
+                        .setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT, true), 3);
+                herreroPrueba = com.darkcraft.personajes.Herrero.poner(lvl, el, yunque);
+                mercaderPrueba = com.darkcraft.personajes.Mercader.poner(lvl, new BlockPos(fx + 2, fy, fz - 3), new BlockPos(fx + 2, fy, fz + 3));
+                sp.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                sp.getInventory().setItem(1, new net.minecraft.world.item.ItemStack(DarkCraftMod.BASTON.get()));
+                sp.getInventory().setItem(9, new net.minecraft.world.item.ItemStack(DarkCraftMod.PIEDRA_FORJA_1.get(), 4));
+                sp.getInventory().selected = 0;
+                sp.setHealth(sp.getMaxHealth());
+                // lejos (mas de 4,6 bloques de Dorvan): sigue martilleando
+                sp.teleportTo(lvl, ex + 3.5, ey, ez + 4.0, 180f, 10f);
+                sp.setDeltaMovement(Vec3.ZERO);
+            });
+        });
+        atTicks(t + 36, "al empezar", m -> logForja(m, "al empezar"));
+        atTicks(t + 38, "de cerca, a Dorvan martilleando (sin el HUD)", m -> {
+            m.options.hideGui = true;
+            verDesde(m, new Vec3(ex - 4.6, ey + 1.9, ez - 5.4), new Vec3(ex - 2.4, ey + 1.0, ez - 2.9));
+        });
+        // tres momentos del martillazo (cada uno dura 30 ticks; el golpe cae en el 20)
+        atTicks(t + 52, "captura: martilleando 1", m -> {
+            logForja(m, "martilleando 1");
+            shot(m, "cliente_f01_martillo_a");
+        });
+        atTicks(t + 61, "captura: martilleando 2", m -> {
+            logForja(m, "martilleando 2");
+            shot(m, "cliente_f02_martillo_b");
+        });
+        atTicks(t + 68, "captura: martilleando 3", m -> {
+            logForja(m, "martilleando 3");
+            shot(m, "cliente_f03_martillo_c");
+        });
+        atTicks(t + 72, "Kerrick de frente", m -> verDesde(m, new Vec3(ex + 3.3, ey + 1.6, ez - 0.5), new Vec3(ex + 2.0, ey + 1.05, ez - 2.9)));
+        atTicks(t + 86, "captura: Kerrick", m -> shot(m, "cliente_f04_kerrick"));
+        atTicks(t + 88, "Kerrick de espaldas (la mochila)", m -> verDesde(m, new Vec3(ex + 0.6, ey + 2.1, ez - 6.0), new Vec3(ex + 2.0, ey + 1.0, ez - 2.9)));
+        atTicks(t + 102, "captura: la mochila", m -> shot(m, "cliente_f05_kerrick_espalda"));
+        atTicks(t + 104, "cerca de Dorvan: deja el martillo y mira", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                sp.teleportTo(sp.serverLevel(), ex - 2.0, ey, ez, 180f, 9f);
+                sp.setDeltaMovement(Vec3.ZERO);
+            });
+        });
+        atTicks(t + 130, "captura: Dorvan atiende (y el aviso)", m -> {
+            logForja(m, "cerca");
+            shot(m, "cliente_f06_dorvan_mira");
+        });
+        atTicks(t + 132, "fuera de combate; la E: hablar", m -> {
+            server(m, com.darkcraft.rol.Rol::sinCombate);
+            pulsar(m.options.keyInventory);
+        });
+        atTicks(t + 156, "captura: Dorvan se presenta", m -> {
+            logForja(m, "se presenta");
+            shot(m, "cliente_f07_dorvan_habla");
+        });
+        atTicks(t + 160, "E, E: el menu", m -> dialogo(m, d -> {
+            d.pulsarSeguir();
+            d.pulsarSeguir();
+        }));
+        atTicks(t + 170, "captura: el menu de Dorvan", m -> {
+            logForja(m, "menu");
+            shot(m, "cliente_f08_menu");
+        });
+        atTicks(t + 174, "quiero mejorar mi arma", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        atTicks(t + 200, "captura: la forja", m -> {
+            logForja(m, "forja");
+            shot(m, "cliente_f09_forja");
+        });
+        atTicks(t + 204, "mejorar (+1: una piedra I y 275 ecos)", m -> forjaP(m, com.darkcraft.client.ui.ForjaScreen::pulsarMejorar));
+        atTicks(t + 228, "captura: mejorada", m -> {
+            logForja(m, "+1");
+            shot(m, "cliente_f10_mejorada");
+        });
+        atTicks(t + 232, "mejorar otra vez (+2: dos piedras y 450)", m -> forjaP(m, com.darkcraft.client.ui.ForjaScreen::pulsarMejorar));
+        atTicks(t + 252, "tras +2", m -> logForja(m, "+2"));
+        atTicks(t + 254, "mejorar otra vez (+3: tres piedras; solo queda una)", m -> forjaP(m, com.darkcraft.client.ui.ForjaScreen::pulsarMejorar));
+        atTicks(t + 268, "captura: falta algo", m -> {
+            logForja(m, "falta");
+            shot(m, "cliente_f11_falta");
+        });
+        atTicks(t + 272, "el baston", m -> forjaP(m, f -> f.pulsarHueco(1)));
+        atTicks(t + 278, "captura: el baston (potencia)", m -> {
+            logForja(m, "baston");
+            shot(m, "cliente_f12_baston");
+        });
+        atTicks(t + 282, "la espada a +9 (comando) y mejorar: ya no da mas", m -> {
+            server(m, sp -> com.darkcraft.forja.Forja.poner(sp, 9));
+        });
+        atTicks(t + 290, "mejorar la de +9", m -> forjaP(m, f -> {
+            f.pulsarHueco(0);
+            f.pulsarMejorar();
+        }));
+        atTicks(t + 310, "captura: al maximo", m -> {
+            logForja(m, "tope");
+            shot(m, "cliente_f13_tope");
+        });
+        atTicks(t + 314, "ESC", m -> tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE));
+        atTicks(t + 318, "a Kerrick", m -> server(m, sp -> {
+            sp.teleportTo(sp.serverLevel(), ex + 2.0, ey, ez, 180f, 9f);
+            sp.setDeltaMovement(Vec3.ZERO);
+            com.darkcraft.rol.Rol.sinCombate(sp);
+        }));
+        atTicks(t + 330, "la E: hablar con Kerrick", m -> pulsar(m.options.keyInventory));
+        atTicks(t + 354, "captura: Kerrick se presenta", m -> {
+            logForja(m, "kerrick");
+            shot(m, "cliente_f14_kerrick_habla");
+        });
+        atTicks(t + 358, "E, E: el menu", m -> dialogo(m, d -> {
+            d.pulsarSeguir();
+            d.pulsarSeguir();
+        }));
+        atTicks(t + 366, "ensename tu mercancia", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        atTicks(t + 386, "captura: la tienda", m -> {
+            logForja(m, "tienda");
+            shot(m, "cliente_f15_tienda");
+        });
+        atTicks(t + 388, "tres piedras I (660)", m -> tiendaP(m, ti -> {
+            ti.pulsar(0, 3);
+            ti.pulsarComprar();
+        }));
+        atTicks(t + 410, "captura: comprado", m -> {
+            logForja(m, "comprado");
+            shot(m, "cliente_f16_comprado");
+        });
+        atTicks(t + 414, "el talisman (3500): no llegan los ecos", m -> tiendaP(m, ti -> {
+            ti.pulsar(15, 1);
+            ti.pulsarComprar();
+        }));
+        atTicks(t + 432, "captura: sin ecos", m -> {
+            logForja(m, "sin ecos");
+            shot(m, "cliente_f17_sin_ecos");
+        });
+        atTicks(t + 436, "el arco (uno por jugador)", m -> tiendaP(m, ti -> {
+            ti.pulsar(6, 1);
+            ti.pulsarComprar();
+        }));
+        atTicks(t + 456, "el arco otra vez: agotado", m -> tiendaP(m, com.darkcraft.client.ui.TiendaScreen::pulsarComprar));
+        atTicks(t + 462, "captura: agotado", m -> {
+            logForja(m, "agotado");
+            shot(m, "cliente_f18_agotado");
+        });
+        atTicks(t + 466, "ESC; mirando al yunque", m -> {
+            tecla(m, org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE);
+            server(m, sp -> {
+                sp.teleportTo(sp.serverLevel(), ex - 3.0, ey, ez - 0.5, 180f, 24f);
+                sp.setDeltaMovement(Vec3.ZERO);
+                com.darkcraft.rol.Rol.sinCombate(sp);
+            });
+        });
+        atTicks(t + 480, "clic derecho en el yunque", m -> {
+            logForja(m, "ante el yunque");
+            pulsar(m.options.keyUse);
+        });
+        atTicks(t + 500, "captura: el yunque lleva a Dorvan", m -> {
+            logForja(m, "yunque");
+            shot(m, "cliente_f19_yunque");
+        });
+        atTicks(t + 504, "Fin de la forja y la tienda", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                if (herreroPrueba != null) herreroPrueba.discard();
+                if (mercaderPrueba != null) mercaderPrueba.discard();
+                herreroPrueba = null;
+                mercaderPrueba = null;
+                lvl.removeBlock(new BlockPos(fx - 3, fy, fz - 3), false);
+                lvl.removeBlock(new BlockPos(fx - 3, fy, fz - 4), false);
+                comando(sp, "darkcraft rol nivel reiniciar");
+                comando(sp, "darkcraft ecos quitar");
+                sp.getInventory().clearContent();
+                sp.setHealth(sp.getMaxHealth());
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 520;
+    }
+
     private static void logArmasAt(int t, String what) {
         atTicks(t, "estado de las armas " + what, m -> logArmas(m, what));
     }
@@ -2140,6 +2384,7 @@ public final class ClientCiTest {
         fin = talismanes(fin);
         fin = hechizos(fin);
         fin = dialogos(fin);
+        fin = forja(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

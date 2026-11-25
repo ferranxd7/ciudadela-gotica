@@ -1309,5 +1309,167 @@
         "stream": true
       }
     ]
+  },
+  "voz.herrero.1": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:herrero/voz_1",
+        "stream": true
+      }
+    ]
+  },
+  "voz.herrero.2": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:herrero/voz_2",
+        "stream": true
+      }
+    ]
+  },
+  "voz.herrero.3": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:herrero/voz_3",
+        "stream": true
+      }
+    ]
+  },
+  "voz.herrero.4": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:herrero/voz_4",
+        "stream": true
+      }
+    ]
+  },
+  "voz.herrero.5": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:herrero/voz_5",
+        "stream": true
+      }
+    ]
+  },
+  "voz.herrero.6": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:herrero/voz_6",
+        "stream": true
+      }
+    ]
+  },
+  "voz.herrero.7": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:herrero/voz_7",
+        "stream": true
+      }
+    ]
+  },
+  "voz.herrero.8": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:herrero/voz_8",
+        "stream": true
+      }
+    ]
+  },
+  "voz.mercader.1": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:mercader/voz_1",
+        "stream": true
+      }
+    ]
+  },
+  "voz.mercader.2": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:mercader/voz_2",
+        "stream": true
+      }
+    ]
+  },
+  "voz.mercader.3": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:mercader/voz_3",
+        "stream": true
+      }
+    ]
+  },
+  "voz.mercader.4": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:mercader/voz_4",
+        "stream": true
+      }
+    ]
+  },
+  "voz.mercader.5": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:mercader/voz_5",
+        "stream": true
+      }
+    ]
+  },
+  "voz.mercader.6": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:mercader/voz_6",
+        "stream": true
+      }
+    ]
+  },
+  "sfx.herrero_golpe": {
+    "subtitle": "subtitles.darkcraft.sfx.herrero_golpe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/herrero_golpe_1"
+      },
+      {
+        "name": "darkcraft:sfx/herrero_golpe_2"
+      },
+      {
+        "name": "darkcraft:sfx/herrero_golpe_3"
+      }
+    ]
+  },
+  "sfx.forja_mejora": {
+    "subtitle": "subtitles.darkcraft.sfx.forja_mejora",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/forja_mejora_1"
+      },
+      {
+        "name": "darkcraft:sfx/forja_mejora_2"
+      }
+    ]
+  },
+  "sfx.tienda_compra": {
+    "subtitle": "subtitles.darkcraft.sfx.tienda_compra",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/tienda_compra_1"
+      },
+      {
+        "name": "darkcraft:sfx/tienda_compra_2"
+      }
+    ]
   }
 }

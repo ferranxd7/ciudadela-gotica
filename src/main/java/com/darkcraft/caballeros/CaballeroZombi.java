@@ -79,6 +79,13 @@ public abstract class CaballeroZombi extends Zombie {
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 
+    /** A veces dejan una piedra de forja (para Dorvan). */
+    @Override
+    protected void dropCustomDeathLoot(net.minecraft.world.damagesource.DamageSource s, int saqueo, boolean jugador) {
+        super.dropCustomDeathLoot(s, saqueo, jugador);
+        if (jugador && random.nextFloat() < 0.07f + 0.02f * saqueo) spawnAtLocation(com.darkcraft.DarkCraftMod.PIEDRA_FORJA_1.get());
+    }
+
     @Override
     protected boolean isSunSensitive() {
         return false;

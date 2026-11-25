@@ -203,6 +203,16 @@ public final class Rol {
         return true;
     }
 
+    /** Cobra ecos (la forja, la tienda): si no llegan, no cobra nada y devuelve false. */
+    public static boolean pagar(ServerPlayer sp, int n) {
+        if (n <= 0) return true;
+        int e = Ficha.ecos(sp);
+        if (e < n) return false;
+        Ficha.ecos(sp, e - n);
+        de(sp).sucio = true;
+        return true;
+    }
+
     public static boolean enCombate(Player p) {
         return de(p).combate > 0;
     }
@@ -724,11 +734,54 @@ public final class Rol {
             com.darkcraft.dialogo.Conversaciones.olvidar(c.getSource().getPlayerOrException());
             return 1;
         }));
+        // el herrero y el mercader: ponerlos delante (el herrero con su yunque entre los dos) u olvidar lo hablado
+        var herrero = Commands.literal("herrero").executes(c -> {
+            ServerPlayer p = c.getSource().getPlayerOrException();
+            ServerLevel lvl = p.serverLevel();
+            BlockPos yunque = p.blockPosition().relative(p.getDirection(), 2);
+            BlockPos pos = yunque.relative(p.getDirection());
+            lvl.setBlock(yunque, net.minecraft.world.level.block.Blocks.ANVIL.defaultBlockState()
+                    .setValue(net.minecraft.world.level.block.AnvilBlock.FACING, p.getDirection().getClockWise()), 3);
+            com.darkcraft.personajes.Herrero h = com.darkcraft.personajes.Herrero.poner(lvl, pos, yunque);
+            c.getSource().sendSuccess(() -> Component.literal(h == null ? "-" : "herrero en " + pos.toShortString()), false);
+            return h == null ? 0 : 1;
+        }).then(Commands.literal("olvidar").executes(c -> {
+            com.darkcraft.dialogo.Conversaciones.olvidar(c.getSource().getPlayerOrException(), "herrero");
+            return 1;
+        }));
+        var mercader = Commands.literal("mercader").executes(c -> {
+            ServerPlayer p = c.getSource().getPlayerOrException();
+            BlockPos pos = p.blockPosition().relative(p.getDirection(), 2);
+            com.darkcraft.personajes.Mercader m = com.darkcraft.personajes.Mercader.poner(p.serverLevel(), pos, p.blockPosition());
+            c.getSource().sendSuccess(() -> Component.literal(m == null ? "-" : "mercader en " + pos.toShortString()), false);
+            return m == null ? 0 : 1;
+        }).then(Commands.literal("olvidar").executes(c -> {
+            ServerPlayer p = c.getSource().getPlayerOrException();
+            com.darkcraft.dialogo.Conversaciones.olvidar(p, "mercader");
+            com.darkcraft.tienda.Tienda.olvidar(p);
+            return 1;
+        }));
+        // la mejora del arma de la mano derecha y piedras de forja
+        var mejora = Commands.literal("mejora").then(Commands.argument("n", IntegerArgumentType.integer(0, com.darkcraft.forja.Forja.MAX)).executes(c -> {
+            ServerPlayer p = c.getSource().getPlayerOrException();
+            com.darkcraft.forja.Forja.poner(p, IntegerArgumentType.getInteger(c, "n"));
+            c.getSource().sendSuccess(() -> com.darkcraft.forja.Forja.nombre(p.getMainHandItem()), false);
+            return 1;
+        }));
+        var piedras = Commands.literal("piedras").executes(c -> {
+            ServerPlayer p = c.getSource().getPlayerOrException();
+            for (int g = 1; g <= 3; g++) Equipo.dar(p, new net.minecraft.world.item.ItemStack(com.darkcraft.forja.Forja.piedra(g), 6));
+            return 1;
+        });
         return Commands.literal("rol")
                 .then(talisman)
                 .then(fruto)
                 .then(hechizo)
                 .then(guia)
+                .then(herrero)
+                .then(mercader)
+                .then(mejora)
+                .then(piedras)
                 .then(Commands.literal("resistencias").executes(c -> {
                     ServerPlayer p = c.getSource().getPlayerOrException();
                     StringBuilder b = new StringBuilder();

@@ -25,6 +25,8 @@ public final class Recompensa {
         // el Rey ardia: su talisman guarda del fuego (y vencerle abre el segundo hueco de talisman)
         items.set(13, new ItemStack(com.darkcraft.DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.BRASA).get()));
         items.set(12, new ItemStack(com.darkcraft.DarkCraftMod.FRUTOS.get(com.darkcraft.rol.Fruto.Clase.BRASA).get(), 3));
+        // piedras de forja para Dorvan
+        items.set(14, new ItemStack(com.darkcraft.DarkCraftMod.PIEDRA_FORJA_2.get(), 3));
         for (int slot : new int[]{20, 21, 23})
             items.set(slot, EnchantmentHelper.enchantItem(lvl.random, new ItemStack(Items.BOOK), 30, true));
     }

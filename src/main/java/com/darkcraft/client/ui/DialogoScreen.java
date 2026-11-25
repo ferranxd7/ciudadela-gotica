@@ -39,6 +39,8 @@ public class DialogoScreen extends Screen {
     private SoundInstance voz;
     private List<String> lineas = List.of();
     private int letras, t, abierto, sel = 0, encima = -1;
+    /** Se ha pedido algo al servidor (la forja, la tienda): se espera a que abra su pantalla (o se cierra sola). */
+    private int esperando;
     private float escritas, ritmo;
 
     private DialogoScreen(int entidad, Dialogos.Personaje pj) {
@@ -148,15 +150,22 @@ public class DialogoScreen extends Screen {
             return;
         }
         Panel.mueve();
-        if (nodo.accion() == Dialogos.Accion.NIVEL) Net.CH.sendToServer(new Net.DialogoAccion(entidad, "nivel"));
+        if (nodo.accion() != Dialogos.Accion.NADA) Net.CH.sendToServer(new Net.DialogoAccion(entidad, nodo.accion().id()));
         ir(nodo.siguiente());
     }
 
     private void elegir(int i) {
-        if (nodo == null || !nodo.menu() || i < 0 || i >= nodo.respuestas().length) return;
+        if (nodo == null || !nodo.menu() || i < 0 || i >= nodo.respuestas().length || esperando > 0) return;
         preguntadas.add(i);
         Panel.acepta();
-        ir(nodo.respuestas()[i].destino());
+        Dialogos.Respuesta r = nodo.respuestas()[i];
+        if (r.accion() != Dialogos.Accion.NADA) {
+            // la forja o la tienda: la abre el servidor (esta pantalla se queda hasta entonces)
+            Net.CH.sendToServer(new Net.DialogoAccion(entidad, r.accion().id()));
+            esperando = 30;
+            return;
+        }
+        ir(r.destino());
     }
 
     private void pararVoz() {
@@ -184,6 +193,7 @@ public class DialogoScreen extends Screen {
             return;
         }
         if (nodo != null && !nodo.menu() && escritas < letras) escritas = Math.min(letras, escritas + ritmo);
+        if (esperando > 0 && --esperando == 0) cerrar();
     }
 
     // ------------------------------------------------------------------ dibujar
@@ -307,6 +317,11 @@ public class DialogoScreen extends Screen {
         }
         seguir();
         return true;
+    }
+
+    /** La entidad con la que se habla (para la prueba de la CI y para que el herrero sepa que le miran). */
+    public int entidad() {
+        return entidad;
     }
 
     /** Para la prueba de la CI. */

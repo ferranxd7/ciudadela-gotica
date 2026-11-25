@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "12";
+    private static final String V = "13";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -112,6 +112,18 @@ public final class Net {
                 .encoder(DialogoAccion::write).decoder(DialogoAccion::read).consumerMainThread(DialogoAccion::handle).add();
         CH.messageBuilder(AbrirNivel.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder((m, b) -> {}).decoder(b -> new AbrirNivel()).consumerMainThread(AbrirNivel::handle).add();
+        CH.messageBuilder(AbrirForja.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(AbrirForja::write).decoder(AbrirForja::read).consumerMainThread(AbrirForja::handle).add();
+        CH.messageBuilder(Mejorar.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Mejorar::write).decoder(Mejorar::read).consumerMainThread(Mejorar::handle).add();
+        CH.messageBuilder(ForjaHecho.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(ForjaHecho::write).decoder(ForjaHecho::read).consumerMainThread(ForjaHecho::handle).add();
+        CH.messageBuilder(AbrirTienda.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(AbrirTienda::write).decoder(AbrirTienda::read).consumerMainThread(AbrirTienda::handle).add();
+        CH.messageBuilder(Comprar.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Comprar::write).decoder(Comprar::read).consumerMainThread(Comprar::handle).add();
+        CH.messageBuilder(TiendaHecho.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(TiendaHecho::write).decoder(TiendaHecho::read).consumerMainThread(TiendaHecho::handle).add();
     }
 
     // ------------------------------------------------------------------ hechizos
@@ -192,6 +204,116 @@ public final class Net {
     public record AbrirNivel() {
         void handle(Supplier<NetworkEvent.Context> ctx) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.DialogoScreen.abrirNivel());
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    // ------------------------------------------------------------------ la forja de Dorvan y la tienda de Kerrick
+
+    /** Se abre la forja de Dorvan ({@code entidad}). */
+    public record AbrirForja(int entidad) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entidad);
+        }
+
+        static AbrirForja read(FriendlyByteBuf b) {
+            return new AbrirForja(b.readVarInt());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.ForjaScreen.abrir(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El cliente pide mejorar lo que hay en el hueco {@code hueco} de su inventario. */
+    public record Mejorar(int entidad, int hueco) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entidad);
+            b.writeVarInt(hueco);
+        }
+
+        static Mejorar read(FriendlyByteBuf b) {
+            return new Mejorar(b.readVarInt(), b.readVarInt());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.forja.Forja.mejorar(p, entidad, hueco);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Lo que ha pasado al forjar ({@code forja.Forja}: HECHO, FALTA, TOPE o NO) y como queda el arma. */
+    public record ForjaHecho(int entidad, int hueco, int nivel, int codigo) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entidad);
+            b.writeVarInt(hueco);
+            b.writeByte(nivel);
+            b.writeByte(codigo);
+        }
+
+        static ForjaHecho read(FriendlyByteBuf b) {
+            return new ForjaHecho(b.readVarInt(), b.readVarInt(), b.readByte(), b.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.ForjaScreen.hecho(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Se abre la tienda de Kerrick ({@code entidad}) con lo que ya ha comprado el jugador de cada cosa. */
+    public record AbrirTienda(int entidad, int[] comprados) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entidad);
+            b.writeVarIntArray(comprados);
+        }
+
+        static AbrirTienda read(FriendlyByteBuf b) {
+            return new AbrirTienda(b.readVarInt(), b.readVarIntArray(64));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.TiendaScreen.abrir(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El cliente compra {@code veces} la oferta {@code oferta}. */
+    public record Comprar(int entidad, int oferta, int veces) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entidad);
+            b.writeVarInt(oferta);
+            b.writeVarInt(veces);
+        }
+
+        static Comprar read(FriendlyByteBuf b) {
+            return new Comprar(b.readVarInt(), b.readVarInt(), b.readVarInt());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.tienda.Tienda.comprar(p, entidad, oferta, veces);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Lo que ha pasado al comprar ({@code tienda.Tienda}: HECHO, FALTA, AGOTADO o NO) y lo comprado ya de esa oferta. */
+    public record TiendaHecho(int entidad, int oferta, int comprado, int codigo) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entidad);
+            b.writeVarInt(oferta);
+            b.writeVarInt(comprado);
+            b.writeByte(codigo);
+        }
+
+        static TiendaHecho read(FriendlyByteBuf b) {
+            return new TiendaHecho(b.readVarInt(), b.readVarInt(), b.readVarInt(), b.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.TiendaScreen.hecho(this));
             ctx.get().setPacketHandled(true);
         }
     }

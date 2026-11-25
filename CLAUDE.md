@@ -334,6 +334,57 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   10 frases (tomas a y b, se usa la a: `TOMAS_GUIA`); en `procesar.py` `VOZ_GUIA` (cerca, un poco de aire de piedra).
 - Comandos `/darkcraft rol guia [olvidar]`. La prueba del cliente tiene el tramo `dialogos()` (capturas `cliente_d01..d10`).
 
+### Plan grande, parte 2e-2: Dorvan el herrero, Kerrick el mercader, la forja y la tienda
+
+- **Personajes** (`personajes/PersonajeBase`: lo comun —quietos, sin dano ni empujones, no se van, miran a quien tengan
+  cerca girando solo la cabeza, hablan con clic derecho o la E—; `Guia`, `Herrero` y `Mercader` lo heredan y dicen su
+  dialogo con `dialogo()`). Entidades `darkcraft:herrero` y `darkcraft:mercader` (`MobCategory.MISC`, 0,7 x 1,95).
+- **Dorvan** (`personajes/Herrero`): de pie ante su yunque, martilleando sin parar (todo en el cliente: `ciclo` de 30
+  ticks, el golpe en el 20 con chispas —llamitas y lava— y `sfx.herrero_golpe`); si hay un jugador a menos de 4,6 deja el
+  martillo abajo y le mira (`atencion`, suavizado). Modelo: `PlayerModel` de brazos anchos con su piel
+  (`tools/personajes/herrero.py`: calvo, barba trenzada con anilla de hierro, delantal chamuscado, guante en la
+  izquierda) y el `martillo_herrero` en la mano (`client/personajes/HerreroRenderer`, pose del martillazo en
+  `martillo(f)`). En cada Valdrenn, una vez, `Santuarios.herreria` le monta la herreria en el patio de armas
+  (`HERRERIA` = 112, 161 del centro, el lado este del campo): yunque delante (al oeste), alto horno encendido y hoguera a
+  su izquierda, barril, piedra de afilar y farol (`puestos` `reino:herrero`).
+- **Kerrick** (`personajes/Mercader`): de pie con los pulgares en las correas, al otro lado del santuario de la fuente
+  (`Santuarios.cerca`, lejos de la guia), con dos barriles y un farol (`reino:mercader`). Modelo de brazos finos con
+  **piezas de mas** (`client/personajes/MercaderRenderer.crear`, capa `darkcraft:mercader`, textura de 128 x 64): sombrero
+  de ala ancha (copa y ala, en la cabeza), mochila enorme, manta enrollada, olla y farol (en el cuerpo). La textura y el
+  retrato salen de `tools/personajes/mercader.py` (`piel.py` ya es la clase `Piel` con cajas de mas y pieles de 128 x 64).
+- **Dialogos** (`Dialogos.HERRERO` / `MERCADER`): la primera vez se presentan (1) y luego saludan (2) (`Ficha.dialogo`,
+  bit 1); las respuestas pueden llevar accion (`Respuesta.accion`: `FORJA`, `TIENDA`): el cliente la pide
+  (`Net.DialogoAccion`) y espera a que el servidor abra la pantalla (`Net.AbrirForja` / `AbrirTienda`). Logros `dorvan`,
+  `kerrick`, `mejora`, `mejora_maxima` (desafio) y `compra`; todos con su entrada del diario (y la de `maelis`, que faltaba).
+- **La forja** (`forja/Forja`, lo usan servidor y cliente): armas del combate (no los punos) y catalizadores, de +0 a +9
+  (NBT `darkcraft_mejora`); cada nivel +8 % (`Escalado.total` multiplica base y escalado; `Lanzar` el dano y lo que cura
+  el hechizo). Pide piedras de forja (`forja/PiedraForja`, `darkcraft:piedra_forja_1..3`): +1/+2/+3 una, dos y tres de
+  grado I; +4..+6 de grado II; +7..+9 de grado III; y ecos (`ecos(d)` = 150 + 100 d + 25 d²: 12 925 de +0 a +9).
+  `Net.Mejorar` → `Forja.mejorar` (cerca de Dorvan, lo comprueba todo, cobra con `Rol.pagar`, chispas y
+  `sfx.forja_mejora` en el yunque) → `Net.ForjaHecho` (HECHO, FALTA, TOPE, NO). El nombre sale con "+3" en el menu, la cruz
+  y la forja (`Forja.nombre`); la ficha del menu ensena el ataque ya mejorado y "Mejora +3 de +9".
+- **La tienda** (`tienda/Tienda.KERRICK`, igual en los dos lados): 16 cosas con precio y algunas con limite por jugador
+  (lo comprado en la ficha, `Ficha.comprado`): piedras I (220, sin limite) y II (760, 6), frutos, arco y flechas, espada y
+  hacha de hierro, baston, sello, tres hechizos y el talisman del porteador. `Net.Comprar` → `Tienda.comprar` (lo da con
+  `Equipo.dar`: a la bolsa, nunca a las manos; con su aviso de "conseguido") → `Net.TiendaHecho`.
+- **Pantallas** (`client/ui/ForjaScreen`, `TiendaScreen`): losa con la lista a la izquierda (icono, nombre, "+n" o precio),
+  el detalle a la derecha (lo de ahora → lo de despues; piedras y ecos en rojo si faltan; cantidad con flechas y total),
+  botones y teclas; abajo lo que dice el personaje (`client/ui/Bocadillo`: retrato pequeno, la frase al ritmo de su voz,
+  sin repetirla seguida). Dorvan: al abrir la 3, al mejorar la 4, si falta algo la 5, al maximo la 8. Kerrick: al comprar
+  la 3, sin ecos la 4.
+- **Los yunques** (`personajes/Yunques`): ya no abren la pantalla de Minecraft (salvo en creativo): junto a un herrero es
+  hablar con el; sin herrero, aviso.
+- Donde salen las piedras: cofres (armeria I y II, tesoro I-III, cripta I y II, comun y bodega I, raras), los caballeros
+  zombi (7 % una piedra I), el cofre del Rey (3 de grado II) y el de Gavran (3 de grado III), y Kerrick.
+- Voces (ElevenLabs, `eleven_v4`): Dorvan **"Fjalar - Gruff Scottish Dwarf Warrior"** `TLS15X9bCEDl1vGoUK57` (8 frases,
+  toma a salvo la 5b; `VOZ_HERRERO`: graves y eco corto de herreria); Kerrick **"Cornelius - Wise Sage"**
+  `6sFKzaJr574YWVu4UuJF` (6 frases, tomas a; `VOZ_MERCADER`: casi seca). `procesar.py` monta todos los personajes con
+  `PERSONAJES` (id → tomas y filtro) y escribe `voces.json`. Efectos: `herrero_golpe` (tomas 4, 1 y 3), `forja_mejora`
+  (1 y 4), `tienda_compra` (2 y 4).
+- Arte: `tools/personajes/herrero.py`, `mercader.py` (pieles y retratos) y `tools/rol/forja.py` (piedras y martillo).
+- Comandos `/darkcraft rol herrero [olvidar] | mercader [olvidar] | mejora <0-9> | piedras` (el herrero sale con su yunque
+  entre los dos). La prueba del cliente tiene el tramo `forja()` (capturas `cliente_f01..f19`).
+
 ## Compilar, probar y publicar
 
 - La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (con y sin mods) y un cliente con capturas

@@ -264,9 +264,13 @@ public class MenuScreen extends Screen {
         com.darkcraft.combate.Escalado.Datos d = com.darkcraft.combate.Escalado.de(st);
         if (d != null) {
             int[] at = ClientRol.atributos;
-            float base = com.darkcraft.combate.Escalado.base(st), extra = com.darkcraft.combate.Escalado.extra(st, base, at);
+            // con la mejora de la forja: el base y lo que suman las letras, multiplicados
+            float k = com.darkcraft.forja.Forja.mult(st);
+            float base = com.darkcraft.combate.Escalado.base(st), extra = com.darkcraft.combate.Escalado.extra(st, base, at) * k;
+            base *= k;
             l.addAll(font.split(Component.translatable("darkcraft.arma.ataque", String.format(Locale.ROOT, "%.1f", base),
                     (extra >= 0 ? "+ " : "- ") + String.format(Locale.ROOT, "%.1f", Math.abs(extra))).withStyle(net.minecraft.ChatFormatting.GOLD), ancho));
+            if (com.darkcraft.forja.Forja.mejorable(st)) l.addAll(font.split(com.darkcraft.forja.Forja.linea(st), ancho));
             net.minecraft.network.chat.MutableComponent letras = Component.translatable("darkcraft.arma.escala");
             net.minecraft.network.chat.MutableComponent req = Component.translatable("darkcraft.arma.requisitos");
             boolean algunReq = false;
@@ -285,7 +289,7 @@ public class MenuScreen extends Screen {
             if (algunReq) l.addAll(font.split(req.withStyle(net.minecraft.ChatFormatting.GRAY), ancho));
             if (!com.darkcraft.combate.Escalado.cumple(d, at))
                 l.addAll(font.split(Component.translatable("darkcraft.arma.sin_requisitos").withStyle(net.minecraft.ChatFormatting.RED), ancho));
-        }
+        } else if (com.darkcraft.forja.Forja.mejorable(st)) l.addAll(font.split(com.darkcraft.forja.Forja.linea(st), ancho));
         List<Component> t = st.getTooltipLines(yo(), TooltipFlag.Default.NORMAL);
         for (int i = 1; i < t.size(); i++) {
             if (t.get(i).getString().isBlank()) continue;
@@ -544,7 +548,7 @@ public class MenuScreen extends Screen {
                 ItemStack st = de(foco);
                 if (st.isEmpty()) g.drawString(font, Component.translatable("darkcraft.menu.vacio"), x0(), dy + 2, GRIS, true);
                 else {
-                    Letra.mediana(g, font, Component.literal(recortar(st.getHoverName().getString(), ancho - 8)), x0(), dy, 0xFFE9C766, 0xFF050408);
+                    Letra.mediana(g, font, Component.literal(recortar(com.darkcraft.forja.Forja.nombre(st).getString(), ancho - 8)), x0(), dy, 0xFFE9C766, 0xFF050408);
                     List<FormattedCharSequence> l = ficha(st, ancho);
                     int caben = Math.max(0, (py + ph - 8 - (dy + 17)) / 9);
                     for (int i = 0; i < Math.min(caben, l.size()); i++) g.drawString(font, l.get(i), x0(), dy + 17 + i * 9, APAGADO, false);
@@ -592,7 +596,7 @@ public class MenuScreen extends Screen {
                     ItemStack st = inv().getItem(hueco);
                     g.renderItem(st, x + 9, fy + 1);
                     g.renderItemDecorations(font, st, x + 9, fy + 1);
-                    g.drawString(font, recortar(st.getHoverName().getString(), ANCHO_LISTA - 44), x + 30, fy + 5, k == listaSel ? LUZ : CLARO, true);
+                    g.drawString(font, recortar(com.darkcraft.forja.Forja.nombre(st).getString(), ANCHO_LISTA - 44), x + 30, fy + 5, k == listaSel ? LUZ : CLARO, true);
                 }
             }
             // las flechitas de que hay mas arriba o abajo
@@ -901,7 +905,7 @@ public class MenuScreen extends Screen {
             g.pose().popPose();
             Pix.mezcla();
             // el nombre, en dos lineas si hace falta
-            List<FormattedCharSequence> nombre = font.split(Letra.m(st.getHoverName()), w - 50);
+            List<FormattedCharSequence> nombre = font.split(Letra.m(com.darkcraft.forja.Forja.nombre(st)), w - 50);
             for (int i = 0; i < Math.min(2, nombre.size()); i++) Letra.contorno(g, font, nombre.get(i), x + 44, y + 8 + Letra.BAJA_M + i * 15, 0xFFE9C766, 0xFF050408);
             boolean equipado = !Equipo.enBolsa(hueco);
             int ly = y + 44;

@@ -317,6 +317,20 @@
      "weight": 16
     }
    ]
+  },
+  {
+   "rolls": 1,
+   "entries": [
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:piedra_forja_1",
+     "weight": 2
+    },
+    {
+     "type": "minecraft:empty",
+     "weight": 10
+    }
+   ]
   }
  ]
 }

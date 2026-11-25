@@ -44,6 +44,8 @@ public final class ClientSetup {
         // los hechizos que vuelan no tienen modelo: se ven por sus particulas
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PROYECTIL.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.GUIA.get(), com.darkcraft.client.personajes.GuiaRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.HERRERO.get(), com.darkcraft.client.personajes.HerreroRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.MERCADER.get(), com.darkcraft.client.personajes.MercaderRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ASCENSOR.get(), com.darkcraft.client.arbol.AscensorRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PUERTA_ARBOL.get(), com.darkcraft.client.arbol.PuertaArbolRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.GAVRAN.get(), com.darkcraft.client.gavran.GavranRenderer::new);
@@ -57,5 +59,6 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.rey.ReyModel.LAYER, com.darkcraft.client.rey.ReyGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.gavran.GavranModel.LAYER, com.darkcraft.client.gavran.GavranGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.caballeros.CaballeroModelo.CAPA, com.darkcraft.client.caballeros.CaballeroModelo::crear);
+        e.registerLayerDefinition(com.darkcraft.client.personajes.MercaderRenderer.CAPA, com.darkcraft.client.personajes.MercaderRenderer::crear);
     }
 }

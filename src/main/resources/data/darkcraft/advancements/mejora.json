@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:dorvan",
+  "display": {
+    "icon": {
+      "item": "darkcraft:piedra_forja_1"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.mejora.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.mejora.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 20
+  }
+}

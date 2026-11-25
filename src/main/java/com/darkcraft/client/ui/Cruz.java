@@ -99,8 +99,8 @@ public final class Cruz {
             float a = hace > 32 ? (44 - hace) / 12f : Math.min(1f, hace / 3f);
             int alfa = Math.round(255 * a);
             Component nombre = switch (ClientEquipo.cambio) {
-                case 0 -> der.isEmpty() ? null : der.getHoverName();
-                case 1 -> izq.isEmpty() ? null : izq.getHoverName();
+                case 0 -> der.isEmpty() ? null : com.darkcraft.forja.Forja.nombre(der);
+                case 1 -> izq.isEmpty() ? null : com.darkcraft.forja.Forja.nombre(izq);
                 default -> q == ClientEquipo.FRASCO_VIDA ? Component.translatable("item.darkcraft.frasco_vida")
                         : q == ClientEquipo.FRASCO_MANA ? Component.translatable("item.darkcraft.frasco_mana")
                         : q >= 0 && !inv.getItem(q).isEmpty() ? inv.getItem(q).getHoverName() : null;

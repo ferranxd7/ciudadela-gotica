@@ -150,6 +150,8 @@ public final class VictoriaGavran {
         // el campeon del Rey: su talisman de hueso (y vencerle abre el tercer hueco de talisman)
         items.set(13, new ItemStack(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.HUESO).get()));
         items.set(12, new ItemStack(DarkCraftMod.FRUTOS.get(com.darkcraft.rol.Fruto.Clase.CENIZA).get(), 3));
+        // piedras de forja para Dorvan
+        items.set(14, new ItemStack(DarkCraftMod.PIEDRA_FORJA_3.get(), 3));
         for (int slot : new int[]{20, 21, 23, 24})
             items.set(slot, EnchantmentHelper.enchantItem(lvl.random, new ItemStack(Items.BOOK), 30, true));
     }

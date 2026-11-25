@@ -1,7 +1,7 @@
 package com.darkcraft.client.personajes;
 
 import com.darkcraft.dialogo.Conversaciones;
-import com.darkcraft.personajes.Guia;
+import com.darkcraft.personajes.PersonajeBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.Vec3;
 
@@ -17,9 +17,9 @@ public final class ClientPersonajes {
         if (mc.player == null || mc.level == null || !mc.player.isAlive() || mc.player.isSpectator()) return;
         Vec3 ojo = mc.player.getEyePosition(), mira = mc.player.getLookAngle();
         double mejor = Math.cos(Math.toRadians(26));
-        for (Guia g : mc.level.getEntitiesOfClass(Guia.class, mc.player.getBoundingBox().inflate(Conversaciones.ALCANCE + 1))) {
-            // sentada: la cabeza le queda a 1,1 del suelo y el regazo a 0,4
-            Vec3 c = g.position().add(0, 0.75, 0).subtract(ojo);
+        for (PersonajeBase g : mc.level.getEntitiesOfClass(PersonajeBase.class, mc.player.getBoundingBox().inflate(Conversaciones.ALCANCE + 1))) {
+            // hacia el pecho (la guia, sentada: la cabeza le queda a 1,1 del suelo y el regazo a 0,4)
+            Vec3 c = g.position().add(0, g.getBbHeight() * 0.58, 0).subtract(ojo);
             double d = c.length();
             if (d > Conversaciones.ALCANCE || d < 1e-3) continue;
             double cos = c.dot(mira) / d;

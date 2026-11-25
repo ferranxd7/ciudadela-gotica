@@ -16,13 +16,23 @@ import java.util.Map;
 public final class Dialogos {
     private Dialogos() {}
 
-    /** Lo que puede pasar al acabar una frase. */
-    public enum Accion { NADA, NIVEL }
+    /**
+     * Lo que puede pasar al acabar una frase o al elegir una respuesta: subir de nivel (la guia), la forja (el herrero) o
+     * la tienda (el mercader). Su nombre en minusculas es lo que manda el cliente ({@code Net.DialogoAccion}).
+     */
+    public enum Accion {
+        NADA, NIVEL, FORJA, TIENDA;
+
+        public String id() {
+            return name().toLowerCase(java.util.Locale.ROOT);
+        }
+    }
 
     /** Fin de la conversacion; el menu de respuestas de cada personaje es el nodo 100. */
     public static final int FIN = 0, MENU = 100;
 
-    public record Respuesta(String clave, int destino) {}
+    /** Una respuesta del menu: su texto, a que nodo lleva y, a veces, algo que pasa al elegirla (abrir la forja...). */
+    public record Respuesta(String clave, int destino, Accion accion) {}
 
     public record Nodo(int id, int voz, int siguiente, Accion accion, Respuesta[] respuestas) {
         public boolean menu() {
@@ -89,7 +99,12 @@ public final class Dialogos {
     }
 
     private static Respuesta r(String pj, String clave, int destino) {
-        return new Respuesta("darkcraft.dialogo." + pj + ".op." + clave, destino);
+        return new Respuesta("darkcraft.dialogo." + pj + ".op." + clave, destino, Accion.NADA);
+    }
+
+    /** Una respuesta que hace algo al elegirla (y cierra la conversacion). */
+    private static Respuesta r(String pj, String clave, Accion a) {
+        return new Respuesta("darkcraft.dialogo." + pj + ".op." + clave, FIN, a);
     }
 
     /**
@@ -103,6 +118,24 @@ public final class Dialogos {
             .frase(6, FIN, Accion.NIVEL).frase(7, FIN)
             .frase(8, MENU).frase(9, MENU).frase(10, MENU)
             .menu(r("guia", "sombra", 4), r("guia", "vivo", 5), r("guia", "fuerte", 6), r("guia", "adios", 7))
+            .hecho();
+
+    /**
+     * Dorvan, el herrero. La primera vez se presenta (1), despues saluda (2); el menu: mejorar un arma (abre la forja, que
+     * le hace decir la 3 y, segun vaya, la 4, la 5 o la 8), lo que paso en Valdrenn (6) y despedirse (7).
+     */
+    public static final Personaje HERRERO = new Hacer("herrero")
+            .frase(1, MENU).frase(2, MENU).frase(6, MENU).frase(7, FIN)
+            .menu(r("herrero", "mejorar", Accion.FORJA), r("herrero", "valdrenn", 6), r("herrero", "adios", 7))
+            .hecho();
+
+    /**
+     * Kerrick, el mercader. La primera vez se presenta (1), despues saluda (2); el menu: ver la mercancia (abre la tienda,
+     * que le hace decir la 3 al comprar y la 4 si no llegan los ecos), que hace aqui (5) y despedirse (6).
+     */
+    public static final Personaje MERCADER = new Hacer("mercader")
+            .frase(1, MENU).frase(2, MENU).frase(5, MENU).frase(6, FIN)
+            .menu(r("mercader", "comprar", Accion.TIENDA), r("mercader", "aqui", 5), r("mercader", "adios", 6))
             .hecho();
 
     // ------------------------------------------------------------------ lo que dura cada frase

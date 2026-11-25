@@ -85,7 +85,8 @@ public final class Lanzar {
             return;
         }
         if (gasta) Combos.dar(sp, -h.mana);
-        LANZANDO.put(sp.getUUID(), new Lanzando(h, sp.server.getTickCount(), h.danoCon(at)));
+        // el catalizador mejorado en la forja pega (y cura) mas
+        LANZANDO.put(sp.getUUID(), new Lanzando(h, sp.server.getTickCount(), h.danoCon(at) * com.darkcraft.forja.Forja.mult(sp.getMainHandItem())));
         com.darkcraft.combate.Combate.vistoHechizo(sp, h);
         sonido(sp, DarkCraftMod.SFX_HECHIZO_LANZAR.get(), 0.7f);
     }
@@ -136,7 +137,7 @@ public final class Lanzar {
             }
             case CURAR -> {
                 for (ServerPlayer o : sl.getEntitiesOfClass(ServerPlayer.class, sp.getBoundingBox().inflate(6.0), x -> x.isAlive() && !x.isSpectator())) {
-                    o.heal(6f + o.getMaxHealth() * 0.3f);
+                    o.heal((6f + o.getMaxHealth() * 0.3f) * com.darkcraft.forja.Forja.mult(sp.getMainHandItem()));
                     sl.sendParticles(ParticleTypes.HEART, o.getX(), o.getY() + 1.4, o.getZ(), 5, 0.4, 0.4, 0.4, 0.02);
                     sl.sendParticles(ORO, o.getX(), o.getY() + 1.0, o.getZ(), 20, 0.4, 0.7, 0.4, 0.02);
                 }

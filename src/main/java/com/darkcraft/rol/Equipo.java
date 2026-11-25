@@ -119,18 +119,11 @@ public final class Equipo {
     // ------------------------------------------------------------------ lo que se recoge va a la bolsa
 
     /**
-     * Al recoger algo del suelo: primero se junta con lo que ya se lleva igual (este donde este) y lo demas va a un
-     * hueco libre de la bolsa; asi nada de lo que se recoge se mete solo en la mano ni en los objetos rapidos. Con la
-     * bolsa llena se deja que el juego lo ponga donde quepa.
+     * Mete un objeto en el inventario como si se recogiera: primero junto a lo igual que ya se lleve y lo demas en huecos
+     * libres de la bolsa (nunca en las manos ni en los objetos rapidos). Lo que no quepa se queda en {@code st}.
      */
-    @SubscribeEvent
-    public static void onRecoger(EntityItemPickupEvent e) {
-        if (!(e.getEntity() instanceof ServerPlayer sp) || sp.isCreative()) return;
-        ItemEntity ie = e.getItem();
-        ItemStack st = ie.getItem();
+    public static void meter(Inventory inv, ItemStack st) {
         if (st.isEmpty()) return;
-        Inventory inv = sp.getInventory();
-        int antes = st.getCount();
         // juntar con montones iguales que no esten llenos
         if (st.isStackable())
             for (int i = 0; i < HUECOS && !st.isEmpty(); i++) {
@@ -145,7 +138,7 @@ public final class Equipo {
             }
         // lo que quede, a la bolsa
         while (!st.isEmpty()) {
-            int libre = libre(sp);
+            int libre = libre(inv.player);
             if (libre < 0) break;
             int n = Math.min(st.getCount(), st.getMaxStackSize());
             ItemStack parte = st.copy();
@@ -154,6 +147,32 @@ public final class Equipo {
             inv.setItem(libre, parte);
             st.shrink(n);
         }
+    }
+
+    /** Da un objeto (lo comprado...): a la bolsa; si no cabe, donde lo ponga el juego; y si tampoco, al suelo. Con su aviso. */
+    public static void dar(ServerPlayer sp, ItemStack st) {
+        if (st.isEmpty()) return;
+        ItemStack aviso = st.copy();
+        meter(sp.getInventory(), st);
+        if (!st.isEmpty() && !sp.getInventory().add(st) && !st.isEmpty()) sp.drop(st, false);
+        sp.getInventory().setChanged();
+        com.darkcraft.net.Net.to(sp, new com.darkcraft.net.Net.Conseguido(aviso));
+    }
+
+    /**
+     * Al recoger algo del suelo: primero se junta con lo que ya se lleva igual (este donde este) y lo demas va a un
+     * hueco libre de la bolsa; asi nada de lo que se recoge se mete solo en la mano ni en los objetos rapidos. Con la
+     * bolsa llena se deja que el juego lo ponga donde quepa.
+     */
+    @SubscribeEvent
+    public static void onRecoger(EntityItemPickupEvent e) {
+        if (!(e.getEntity() instanceof ServerPlayer sp) || sp.isCreative()) return;
+        ItemEntity ie = e.getItem();
+        ItemStack st = ie.getItem();
+        if (st.isEmpty()) return;
+        Inventory inv = sp.getInventory();
+        int antes = st.getCount();
+        meter(inv, st);
         if (st.getCount() == antes) return;          // no cabia nada: que lo intente el juego a su manera
         ItemStack cogido = ie.getItem().copy();
         cogido.setCount(antes - st.getCount());

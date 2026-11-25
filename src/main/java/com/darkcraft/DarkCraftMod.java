@@ -154,6 +154,10 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_HECHIZO_LLAMA = sound("sfx.hechizo_llama");
     public static final RegistryObject<SoundEvent> SFX_HECHIZO_CURAR = sound("sfx.hechizo_curar");
     public static final RegistryObject<SoundEvent> SFX_HECHIZO_BENDICION = sound("sfx.hechizo_bendicion");
+    // el herrero y el mercader: el martillo en el yunque, mejorar un arma y comprar
+    public static final RegistryObject<SoundEvent> SFX_HERRERO_GOLPE = sound("sfx.herrero_golpe");
+    public static final RegistryObject<SoundEvent> SFX_FORJA_MEJORA = sound("sfx.forja_mejora");
+    public static final RegistryObject<SoundEvent> SFX_TIENDA_COMPRA = sound("sfx.tienda_compra");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")
@@ -270,6 +274,23 @@ public class DarkCraftMod {
             () -> EntityType.Builder.<com.darkcraft.personajes.Guia>of(com.darkcraft.personajes.Guia::new, MobCategory.MISC)
                     .sized(0.8f, 1.3f).fireImmune().clientTrackingRange(10).build(MODID + ":guia"));
 
+    /** Dorvan, el herrero (de pie ante su yunque, martilleando) y Kerrick, el mercader (con su mochila enorme). */
+    public static final RegistryObject<EntityType<com.darkcraft.personajes.Herrero>> HERRERO = ENTITIES.register("herrero",
+            () -> EntityType.Builder.<com.darkcraft.personajes.Herrero>of(com.darkcraft.personajes.Herrero::new, MobCategory.MISC)
+                    .sized(0.7f, 1.95f).fireImmune().clientTrackingRange(10).build(MODID + ":herrero"));
+    public static final RegistryObject<EntityType<com.darkcraft.personajes.Mercader>> MERCADER = ENTITIES.register("mercader",
+            () -> EntityType.Builder.<com.darkcraft.personajes.Mercader>of(com.darkcraft.personajes.Mercader::new, MobCategory.MISC)
+                    .sized(0.7f, 1.95f).fireImmune().clientTrackingRange(10).build(MODID + ":mercader"));
+    /** El martillo de Dorvan (solo para que lo lleve en la mano) y las piedras de forja (I, II y III: mejoran las armas). */
+    public static final RegistryObject<Item> MARTILLO_HERRERO = ITEMS.register("martillo_herrero",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> PIEDRA_FORJA_1 = ITEMS.register("piedra_forja_1",
+            () -> new com.darkcraft.forja.PiedraForja(1, new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON)));
+    public static final RegistryObject<Item> PIEDRA_FORJA_2 = ITEMS.register("piedra_forja_2",
+            () -> new com.darkcraft.forja.PiedraForja(2, new Item.Properties().stacksTo(64).rarity(Rarity.RARE)));
+    public static final RegistryObject<Item> PIEDRA_FORJA_3 = ITEMS.register("piedra_forja_3",
+            () -> new com.darkcraft.forja.PiedraForja(3, new Item.Properties().stacksTo(64).rarity(Rarity.EPIC)));
+
     /** Los hechizos que vuelan (guijarro, lanza, esquirlas, rayo): sin modelo, se ven por sus particulas. */
     public static final RegistryObject<EntityType<com.darkcraft.hechizos.ProyectilHechizo>> PROYECTIL = ENTITIES.register("proyectil_hechizo",
             () -> EntityType.Builder.<com.darkcraft.hechizos.ProyectilHechizo>of(com.darkcraft.hechizos.ProyectilHechizo::new, MobCategory.MISC)
@@ -335,6 +356,8 @@ public class DarkCraftMod {
         e.put(CABALLERO_ALABARDA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
         e.put(CABALLERO_BALLESTA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
         e.put(GUIA.get(), com.darkcraft.personajes.Guia.atributos().build());
+        e.put(HERRERO.get(), com.darkcraft.personajes.Herrero.atributos().build());
+        e.put(MERCADER.get(), com.darkcraft.personajes.Mercader.atributos().build());
     }
 
     private void setup(FMLCommonSetupEvent e) {
@@ -349,6 +372,9 @@ public class DarkCraftMod {
             e.accept(AMULETO_HUESO);
             e.accept(LIBRO_ACERTIJO);
             e.accept(SANTUARIO_ITEM);
+            e.accept(PIEDRA_FORJA_1);
+            e.accept(PIEDRA_FORJA_2);
+            e.accept(PIEDRA_FORJA_3);
         }
         if (e.getTabKey() == CreativeModeTabs.COMBAT) {
             e.accept(MANDOBLE_JURAMENTO);

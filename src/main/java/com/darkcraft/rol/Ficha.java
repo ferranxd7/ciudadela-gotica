@@ -50,6 +50,19 @@ public final class Ficha {
         f.put("dialogos", d);
     }
 
+    /** Cuantas se han comprado de una cosa de la tienda (las que tienen limite; clave = el id del objeto). */
+    public static int comprado(Player p, String clave) {
+        return leer(p).getCompound("compras").getInt(clave);
+    }
+
+    public static void comprado(Player p, String clave, int n) {
+        CompoundTag f = abrir(p);
+        CompoundTag d = f.getCompound("compras");
+        if (n <= 0) d.remove(clave);
+        else d.putInt(clave, n);
+        f.put("compras", d);
+    }
+
     // ------------------------------------------------------------------ ecos
 
     public static int ecos(Player p) {

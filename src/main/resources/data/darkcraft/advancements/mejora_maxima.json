@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:mejora",
+  "display": {
+    "icon": {
+      "item": "darkcraft:piedra_forja_3"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.mejora_maxima.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.mejora_maxima.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}

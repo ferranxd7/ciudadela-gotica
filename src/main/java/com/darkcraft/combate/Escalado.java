@@ -107,8 +107,11 @@ public final class Escalado {
         return base * k;
     }
 
-    /** Lo que pega el arma con esos atributos (base + escalado), partiendo de un ataque base ya medido. */
+    /**
+     * Lo que pega el arma con esos atributos (base + escalado, por la mejora de la forja: {@code forja.Forja}), partiendo
+     * de un ataque base ya medido.
+     */
     public static float total(ItemStack st, float base, int[] atributos) {
-        return Math.max(0.5f, base + extra(st, base, atributos));
+        return Math.max(0.5f, (base + extra(st, base, atributos)) * com.darkcraft.forja.Forja.mult(st));
     }
 }

@@ -3,6 +3,9 @@ package com.darkcraft.dialogo;
 import com.darkcraft.DarkCraftMod;
 import com.darkcraft.net.Net;
 import com.darkcraft.personajes.Guia;
+import com.darkcraft.personajes.Herrero;
+import com.darkcraft.personajes.Mercader;
+import com.darkcraft.personajes.PersonajeBase;
 import com.darkcraft.rol.Ficha;
 import com.darkcraft.rol.Rol;
 import com.darkcraft.santuario.Santuarios;
@@ -13,8 +16,8 @@ import net.minecraft.world.entity.Entity;
 
 /**
  * Las conversaciones, en el servidor: quien habla con quien (de cerca y sin pelear), por donde empieza segun lo que ya se
- * haya hablado (en la ficha del jugador, {@link Ficha#dialogo}) y lo que pasa al acabar ciertas frases (con la guia,
- * subir de nivel en su santuario).
+ * haya hablado (en la ficha del jugador, {@link Ficha#dialogo}) y lo que pasa al acabar ciertas frases o al elegir ciertas
+ * respuestas (con la guia, subir de nivel en su santuario; con el herrero, la forja; con el mercader, la tienda).
  */
 public final class Conversaciones {
     private Conversaciones() {}
@@ -24,22 +27,30 @@ public final class Conversaciones {
 
     // marcas de lo hablado con la guia
     private static final int GUIA_CONOCIDA = 1, GUIA_REY = 2, GUIA_GAVRAN = 4;
+    // con los demas: ya se presento
+    private static final int CONOCIDO = 1;
 
     public static void hablar(ServerPlayer sp, int entidad) {
         Entity e = sp.level().getEntity(entidad);
-        if (e instanceof Guia g) hablar(sp, g);
+        if (e instanceof PersonajeBase p) hablar(sp, p);
     }
 
-    public static void hablar(ServerPlayer sp, Guia g) {
-        if (!sp.isAlive() || sp.isSpectator() || sp.distanceToSqr(g) > (ALCANCE + 1) * (ALCANCE + 1)) return;
+    public static void hablar(ServerPlayer sp, PersonajeBase p) {
+        if (!sp.isAlive() || sp.isSpectator() || sp.distanceToSqr(p) > (ALCANCE + 1) * (ALCANCE + 1)) return;
+        Dialogos.Personaje d = Dialogos.de(p.dialogo());
+        if (d == null) return;
         if (!sp.isCreative() && Rol.enCombate(sp)) {
             Net.to(sp, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.dialogo.combate", 0));
             return;
         }
-        int nodo = inicioGuia(sp);
-        Net.to(sp, new Net.Dialogo(g.getId(), Dialogos.GUIA.id(), nodo));
-        Logros.dar(sp, "maelis");
-        DarkCraftMod.LOGGER.info("[DarkCraft] {} habla con la guia (nodo {})", sp.getGameProfile().getName(), nodo);
+        int nodo = p instanceof Guia ? inicioGuia(sp) : inicio(sp, d.id());
+        Net.to(sp, new Net.Dialogo(p.getId(), d.id(), nodo));
+        Logros.dar(sp, switch (d.id()) {
+            case "herrero" -> "dorvan";
+            case "mercader" -> "kerrick";
+            default -> "maelis";
+        });
+        DarkCraftMod.LOGGER.info("[DarkCraft] {} habla con {} (nodo {})", sp.getGameProfile().getName(), d.id(), nodo);
     }
 
     /** Por donde empieza la guia: la primera vez se presenta; luego saluda (y una vez, habla del Rey y de Gavran). */
@@ -60,11 +71,19 @@ public final class Conversaciones {
         return nodo;
     }
 
-    /** Lo que pide el cliente al acabar una frase con accion. */
+    /** Los demas: la primera vez se presentan (1) y luego saludan (2). */
+    private static int inicio(ServerPlayer sp, String id) {
+        int m = Ficha.dialogo(sp, id);
+        if ((m & CONOCIDO) != 0) return 2;
+        Ficha.dialogo(sp, id, m | CONOCIDO);
+        return 1;
+    }
+
+    /** Lo que pide el cliente al acabar una frase o elegir una respuesta con accion. */
     public static void accion(ServerPlayer sp, int entidad, String accion) {
         Entity e = sp.level().getEntity(entidad);
-        if (!(e instanceof Guia g) || sp.distanceToSqr(g) > (ALCANCE + 3) * (ALCANCE + 3)) return;
-        if ("nivel".equals(accion)) {
+        if (!(e instanceof PersonajeBase) || sp.distanceToSqr(e) > (ALCANCE + 3) * (ALCANCE + 3)) return;
+        if ("nivel".equals(accion) && e instanceof Guia g) {
             BlockPos s = g.santuario();
             if (s == null || !Santuarios.permitir(sp, s)) {
                 s = Santuarios.encendidoCerca(sp.serverLevel(), g.blockPosition(), 8);
@@ -75,11 +94,19 @@ public final class Conversaciones {
                 g.santuario(s);
             }
             Net.to(sp, new Net.AbrirNivel());
+        } else if ("forja".equals(accion) && e instanceof Herrero) {
+            Net.to(sp, new Net.AbrirForja(entidad));
+        } else if ("tienda".equals(accion) && e instanceof Mercader) {
+            Net.to(sp, new Net.AbrirTienda(entidad, com.darkcraft.tienda.Tienda.comprados(sp)));
         }
     }
 
-    /** Para el comando y la prueba: olvida lo hablado con la guia. */
+    /** Para el comando y la prueba: olvida lo hablado con un personaje ("guia", "herrero", "mercader"). */
+    public static void olvidar(ServerPlayer sp, String id) {
+        Ficha.dialogo(sp, id, 0);
+    }
+
     public static void olvidar(ServerPlayer sp) {
-        Ficha.dialogo(sp, "guia", 0);
+        olvidar(sp, "guia");
     }
 }

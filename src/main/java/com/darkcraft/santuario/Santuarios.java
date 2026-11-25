@@ -271,6 +271,36 @@ public final class Santuarios {
                 }
             }
         }
+        // Kerrick, el mercader: al otro lado del santuario de la fuente (lejos de la guia), con un par de barriles (una vez)
+        String km = reino + ":mercader";
+        if (!d.puestos.containsKey(km)) {
+            BlockPos f = deSitio(p.server, reino + ":fuente");
+            if (f != null && f.distToCenterSqr(p.position()) < 40 * 40 && lvl.isLoaded(f)) {
+                BlockPos sitio = cerca(lvl, f, 3, 4, deSitio(p.server, kg), 3.0);
+                if (sitio != null) {
+                    BlockPos mira = sitio.offset(sitio.getX() - f.getX(), 0, sitio.getZ() - f.getZ());
+                    if (com.darkcraft.personajes.Mercader.poner(lvl, sitio, mira) != null) {
+                        puesto(lvl, sitio, mira);
+                        d.puestos.put(km, sitio.getX() + "," + sitio.getY() + "," + sitio.getZ());
+                        d.setDirty();
+                        DarkCraftMod.LOGGER.info("[DarkCraft] El mercader, junto al santuario de la fuente: {}", sitio.toShortString());
+                    }
+                }
+            }
+        }
+        // Dorvan, el herrero: en el patio de armas, con su yunque, su fragua y sus cosas (una vez)
+        String kh = reino + ":herrero";
+        if (!d.puestos.containsKey(kh)) {
+            int x = s[0] + HERRERIA[0], z = s[1] + HERRERIA[1];
+            if (Math.hypot(x - p.getX(), z - p.getZ()) <= 48 && lvl.isLoaded(new BlockPos(x, CastlePlan.Y0, z))) {
+                BlockPos sitio = herreria(lvl, x, z);
+                if (sitio != null) {
+                    d.puestos.put(kh, sitio.getX() + "," + sitio.getY() + "," + sitio.getZ());
+                    d.setDirty();
+                    DarkCraftMod.LOGGER.info("[DarkCraft] El herrero, en el patio de armas: {}", sitio.toShortString());
+                }
+            }
+        }
         // el de la recepcion del arbol: dentro del tronco, a un lado de la fuente (antes de la puerta de Ser Gavran)
         String k = reino + ":arbol";
         if (!d.puestos.containsKey(k)) {
@@ -281,6 +311,79 @@ public final class Santuarios {
                 if (sitio != null) hecho(lvl, d, k, sitio, "darkcraft.santuario.arbol");
             }
         }
+    }
+
+    /** Donde va la herreria de Dorvan respecto al centro del reino: en el patio de armas, a un lado (este) del campo. */
+    private static final int[] HERRERIA = {112, 161};
+
+    /**
+     * Un sitio a entre {@code r0} y {@code r1} bloques de {@code s} (suelo firme y dos de aire, con sitio alrededor) y a
+     * mas de {@code lejos} de {@code evitar} (si lo hay).
+     */
+    public static BlockPos cerca(ServerLevel lvl, BlockPos s, int r0, int r1, BlockPos evitar, double lejos) {
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        for (int r = r0; r <= r1; r++)
+            for (int k = 0; k < r * 8; k++) {
+                double a = k * Math.PI * 2 / (r * 8) - Math.PI * 3 / 4;
+                int x = s.getX() + (int) Math.round(Math.cos(a) * r), z = s.getZ() + (int) Math.round(Math.sin(a) * r);
+                if (evitar != null && Math.hypot(x - evitar.getX(), z - evitar.getZ()) < lejos) continue;
+                for (int y = s.getY() - 1; y <= s.getY() + 1; y++) {
+                    if (!suelo(lvl, m, x, y, z)) continue;
+                    int lados = 0;
+                    for (Direction d : Direction.Plane.HORIZONTAL) if (suelo(lvl, m, x + d.getStepX(), y, z + d.getStepZ())) lados++;
+                    if (lados >= 3) return new BlockPos(x, y, z);
+                }
+            }
+        return null;
+    }
+
+    /** Los barriles del mercader, a su lado (donde haya sitio). */
+    private static void puesto(ServerLevel lvl, BlockPos sitio, BlockPos mira) {
+        Direction frente = Direction.getNearest(mira.getX() - sitio.getX(), 0, mira.getZ() - sitio.getZ());
+        Direction lado = frente.getClockWise();
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        BlockPos[] donde = {sitio.relative(lado, 2), sitio.relative(lado, 2).relative(frente.getOpposite()), sitio.relative(lado.getOpposite(), 2)};
+        BlockState[] que = {net.minecraft.world.level.block.Blocks.BARREL.defaultBlockState().setValue(net.minecraft.world.level.block.BarrelBlock.FACING, Direction.UP),
+                net.minecraft.world.level.block.Blocks.BARREL.defaultBlockState().setValue(net.minecraft.world.level.block.BarrelBlock.FACING, lado),
+                net.minecraft.world.level.block.Blocks.LANTERN.defaultBlockState()};
+        for (int i = 0; i < donde.length; i++)
+            if (suelo(lvl, m, donde[i].getX(), donde[i].getY(), donde[i].getZ())) lvl.setBlock(donde[i], que[i], 3);
+    }
+
+    /**
+     * La herreria de Dorvan cerca de (x, z): el yunque delante de el, la fragua encendida (alto horno y hoguera) a su
+     * izquierda, un barril y una piedra de afilar a su derecha. Dorvan mira al oeste, al yunque. Devuelve donde esta el.
+     */
+    private static BlockPos herreria(ServerLevel lvl, int x, int z) {
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        for (int r = 0; r <= 4; r++)
+            for (int k = 0; k < Math.max(1, r * 8); k++) {
+                double a = k * Math.PI * 2 / Math.max(1, r * 8);
+                int sx = x + (int) Math.round(Math.cos(a) * r), sz = z + (int) Math.round(Math.sin(a) * r);
+                for (int y = CastlePlan.Y0 - 1; y <= CastlePlan.Y0 + 2; y++) {
+                    // el y el yunque, con aire y suelo; y que se pueda llegar por delante del yunque
+                    if (!suelo(lvl, m, sx, y, sz) || !suelo(lvl, m, sx - 1, y, sz) || !suelo(lvl, m, sx - 2, y, sz)) continue;
+                    BlockPos el = new BlockPos(sx, y, sz), yunque = el.west();
+                    lvl.setBlock(yunque, net.minecraft.world.level.block.Blocks.ANVIL.defaultBlockState()
+                            .setValue(net.minecraft.world.level.block.AnvilBlock.FACING, Direction.NORTH), 3);
+                    Object[][] cosas = {
+                            {-1, 2, net.minecraft.world.level.block.Blocks.BLAST_FURNACE.defaultBlockState()
+                                    .setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.FACING, Direction.NORTH)
+                                    .setValue(net.minecraft.world.level.block.AbstractFurnaceBlock.LIT, true)},
+                            {0, 2, net.minecraft.world.level.block.Blocks.CAMPFIRE.defaultBlockState()},
+                            {1, 2, net.minecraft.world.level.block.Blocks.BARREL.defaultBlockState()
+                                    .setValue(net.minecraft.world.level.block.BarrelBlock.FACING, Direction.UP)},
+                            {-1, -2, net.minecraft.world.level.block.Blocks.GRINDSTONE.defaultBlockState()},
+                            {1, -2, net.minecraft.world.level.block.Blocks.LANTERN.defaultBlockState()},
+                    };
+                    for (Object[] c : cosas) {
+                        BlockPos q = el.offset((Integer) c[0], 0, (Integer) c[1]);
+                        if (suelo(lvl, m, q.getX(), q.getY(), q.getZ())) lvl.setBlock(q, (BlockState) c[2], 3);
+                    }
+                    return com.darkcraft.personajes.Herrero.poner(lvl, el, yunque) != null ? el : null;
+                }
+            }
+        return null;
     }
 
     /** Un sitio a dos o tres bloques del santuario (suelo firme y dos de aire) para sentar a la guia. */

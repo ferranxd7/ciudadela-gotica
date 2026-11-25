@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:maelis",
+  "display": {
+    "icon": {
+      "item": "darkcraft:martillo_herrero"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.dorvan.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.dorvan.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 20
+  }
+}

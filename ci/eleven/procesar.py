@@ -45,6 +45,18 @@ VOZ = ("highpass=f=65," + ECO_SALA + ",acompressor=threshold=-20dB:ratio=2.5:att
 TOMAS_GUIA = {n: "a" for n in range(1, 11)}
 VOZ_GUIA = ("highpass=f=70,equalizer=f=3200:t=q:w=1.2:g=1.5,aecho=0.8:0.35:38|85:0.10|0.05,"
             "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=160,loudnorm=I=-16:TP=-1.5:LRA=9")
+# Dorvan, el herrero (voz "Fjalar - Gruff Scottish Dwarf Warrior"): ronco, con algo de graves y el eco corto de la
+# herreria (piedra y metal). La 5b es mas corta y va al grano (la 5a se toma un respiro al empezar).
+TOMAS_HERRERO = {n: "a" for n in range(1, 9)} | {5: "b"}
+VOZ_HERRERO = ("highpass=f=60,equalizer=f=140:t=q:w=1.0:g=2,equalizer=f=2600:t=q:w=1.3:g=1,"
+               "aecho=0.8:0.4:32|71:0.14|0.07,acompressor=threshold=-21dB:ratio=2.5:attack=5:release=140,"
+               "loudnorm=I=-15:TP=-1.5:LRA=9")
+# Kerrick, el mercader (voz "Cornelius - Wise Sage"): al aire libre, casi seco y cercano
+TOMAS_MERCADER = {n: "a" for n in range(1, 7)}
+VOZ_MERCADER = ("highpass=f=75,equalizer=f=3000:t=q:w=1.2:g=1.5,aecho=0.8:0.25:24:0.06,"
+                "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=150,loudnorm=I=-16:TP=-1.5:LRA=9")
+# los personajes con dialogo: id -> (tomas, filtro)
+PERSONAJES = {"guia": (TOMAS_GUIA, VOZ_GUIA), "herrero": (TOMAS_HERRERO, VOZ_HERRERO), "mercader": (TOMAS_MERCADER, VOZ_MERCADER)}
 
 # efectos: nombre -> (segundos como mucho, fundido final en s, volumen integrado LUFS)
 SFX = {
@@ -84,6 +96,8 @@ SFX = {
     "comer_fruto": (1.0, 0.25, -18), "talisman": (0.9, 0.25, -19),
     "hechizo_lanzar": (0.7, 0.15, -17), "hechizo_impacto": (0.6, 0.2, -16), "hechizo_rayo": (1.0, 0.3, -15),
     "hechizo_llama": (1.1, 0.35, -16), "hechizo_curar": (1.6, 0.4, -18), "hechizo_bendicion": (1.5, 0.4, -18),
+    # el herrero y el mercader (parte 2e-2): el martillo en el yunque, mejorar un arma y comprar
+    "herrero_golpe": (0.9, 0.35, -17), "forja_mejora": (2.0, 0.7, -14), "tienda_compra": (0.8, 0.25, -18),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5}
@@ -132,6 +146,9 @@ TOMAS_SFX = {
     "hechizo_llama": (4, 1),
     "hechizo_curar": (3, 2),
     "hechizo_bendicion": (4, 3),
+    "herrero_golpe": (4, 1, 3),  # tres martillazos distintos (la 2 suena mas fina)
+    "forja_mejora": (1, 4),      # el golpe y el brillo que se sostiene (la 1, la mas llena)
+    "tienda_compra": (2, 4),     # monedas: las dos que mas se oyen
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -288,26 +305,28 @@ def main():
             print(f"FALLO gavran {n}: {e}")
     with open(os.path.join(ASSETS, "rey_voces.json"), "w") as fh:
         json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g}, fh)
-    # los personajes (de momento, la guia): voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el
-    # texto del dialogo se escriba a su ritmo)
-    voces = {"guia": {}}
-    guia = os.path.join(ASSETS, "sounds", "guia")
-    os.makedirs(guia, exist_ok=True)
-    for n, toma in sorted(TOMAS_GUIA.items()):
-        src = os.path.join(MASTER, "guia", f"voz_{n}{toma}.mp3")
-        dst = os.path.join(guia, f"voz_{n}.ogg")
-        if not os.path.exists(src):
-            print("falta", src)
-            fallos += 1
-            continue
-        try:
-            pre, _, hablado = recorte(src)
-            ff(["-i", src, "-af", pre + VOZ_GUIA, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
-            voces["guia"][str(n)] = round(min(hablado + COLA, duracion(dst)), 2)
-            print(f"guia {n:2d}: {duracion(dst):.2f} s (habla hasta {voces['guia'][str(n)]})")
-        except Exception as e:  # noqa: BLE001
-            fallos += 1
-            print(f"FALLO guia {n}: {e}")
+    # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
+    # dialogo se escriba a su ritmo)
+    voces = {}
+    for pj, (tomas, filtro) in PERSONAJES.items():
+        voces[pj] = {}
+        carpeta = os.path.join(ASSETS, "sounds", pj)
+        os.makedirs(carpeta, exist_ok=True)
+        for n, toma in sorted(tomas.items()):
+            src = os.path.join(MASTER, pj, f"voz_{n}{toma}.mp3")
+            dst = os.path.join(carpeta, f"voz_{n}.ogg")
+            if not os.path.exists(src):
+                print("falta", src)
+                fallos += 1
+                continue
+            try:
+                pre, _, hablado = recorte(src)
+                ff(["-i", src, "-af", pre + filtro, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+                voces[pj][str(n)] = round(min(hablado + COLA, duracion(dst)), 2)
+                print(f"{pj} {n:2d}: {duracion(dst):.2f} s (habla hasta {voces[pj][str(n)]})")
+            except Exception as e:  # noqa: BLE001
+                fallos += 1
+                print(f"FALLO {pj} {n}: {e}")
     with open(os.path.join(ASSETS, "voces.json"), "w") as fh:
         json.dump(voces, fh)
     for nombre, (maxs, fade, lufs) in SFX.items():
