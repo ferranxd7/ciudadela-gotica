@@ -795,6 +795,7 @@ public final class Rol {
             return 1;
         }));
         return Commands.literal("rol")
+                .then(Clase.comando())
                 .then(ceniza)
                 .then(talisman)
                 .then(fruto)

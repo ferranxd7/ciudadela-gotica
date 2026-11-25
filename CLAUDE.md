@@ -420,7 +420,7 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   `ceniza_aplicar` (1 y 4).
 - Arte: `tools/rol/cenizas.py` (las diez cenizas: una brasa de su color sobre un monton de ceniza, y el icono de la furia).
 - Comandos `/darkcraft rol ceniza <id> [poner] | quitar` (sin `poner` la da; con `poner` se la pone al arma de la mano
-  derecha). La prueba del cliente tiene el tramo `habilidades()` (capturas `cliente_cg01..cg18`). `Net.V` = "14".
+  derecha). La prueba del cliente tiene el tramo `habilidades()` (capturas `cliente_cg01..cg18`). `Net.V` = "14" (desde la 2f-3, "15").
 
 ### Plan grande, parte 2e-4: el codice, y la historia y los logros en el menu (R)
 
@@ -514,6 +514,31 @@ empezarla). Lo esencial, que cambia reglas de arriba:
 - La prueba del cliente acaba con el tramo `titulo()`: apunta la partida, guarda y sale desde la pausa del mod y captura
   el titulo (`cliente_ti01..ti03`, con un rayo y otra opcion elegida), las partidas (`ti04`) y las opciones fuera del
   mundo (`ti05`). Desde que se sale, los pasos siguen corriendo sin mundo (los de `server(...)` ya no valen).
+
+### Plan grande, parte 2f-3: las diez clases
+
+- **Clases** (`rol/Clase`, como las de Elden Ring; el nivel sale de los atributos: suma - 79): Caballero (9, espada,
+  escudo y hierro), Vagabundo (9, espada, arco y cuero), Barbaro (7, hacha, escudo y malla), Guerrero (8, una espada en
+  cada mano), Bandido (5, `darkcraft:daga` —nueva, `tools/rol/daga.py`— y arco; arcano 14), Hechicero (6, baston y
+  guijarro, esquirlas y espada de la Sombra memorizados; frascos 2 + 2), Profeta (7, sello, curar, llamarada y bendicion,
+  tridente; 2 + 2), Confesor (10, espada, escudo, sello, curar y bendicion), Prisionero (9, espada, baston, guijarro y
+  espada de la Sombra, el casco de hierro de la jaula) y Desdichado (1, todo a 10, una espada de madera). `Clase.kit()`:
+  las tres armas de la derecha (barra 0-2), la izquierda, la armadura, la bolsa y los hechizos; `Clase.elegir` vacia el
+  inventario y lo pone todo (atributos, `Memoria.forzar`, frascos, vida y mana llenos, logro `clase` "Marcado por la
+  Sombra" con su entrada del diario).
+- Se guarda en la ficha (`Ficha.clase`: "" = aun no ha elegido; "-" = `Clase.SIN_CLASE`, quien ya jugaba antes de las
+  clases). Al entrar (`Clase.onEntrar`): quien es nuevo de verdad (menos de 1 min jugado, nivel 1, sin ecos, no en
+  creativo) recibe `Net.AbrirClase(forzada)`; los demas se quedan sin clase y no se les pregunta. `Net.ElegirClase` →
+  `Clase.pedir` (solo si no tenia; con `/darkcraft rol clase elegir` se puede volver a elegir una vez). `Net.V` = "15".
+- **La pantalla** (`client/ui/ClaseScreen`, con el fondo del titulo): las diez a la izquierda (nombre en gotica y nivel),
+  el personaje en el centro con lo que lleva esa clase (un `RemotePlayer` con su perfil y el equipo puesto, girando) y la
+  ficha a la derecha (nombre, nivel, lo que es, los ocho atributos con sus iconos —en verde los de mas de 10, en rojo los
+  de menos—, frascos y los objetos con que empieza, con su recuadro al pasar el raton). "Elegir" pregunta antes de
+  empezar. Forzada (al entrar por primera vez) no se cierra con ESC.
+- `darkcraft_partida.json` ya apunta la clase (la lista de partidas la usara). Comandos `/darkcraft rol clase [<id> |
+  elegir | olvidar | ninguna]` (con id la pone ya, sin preguntar). La prueba del cliente: al entrar comprueba que sale la
+  pantalla forzada y deja al jugador sin clase; el tramo `clases()` (capturas `cliente_cl01..cl06`: caballero, hechicero,
+  desdichado, la pregunta, el bandido en el juego y su equipo en el menu).
 
 ## Compilar, probar y publicar
 

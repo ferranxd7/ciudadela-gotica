@@ -126,6 +126,15 @@ public final class Ficha {
         return Nivel.de(atributos(p));
     }
 
+    /** La clase con la que empezo ("" si aun no ha elegido; {@link Clase#SIN_CLASE} si ya jugaba antes de las clases). */
+    public static String clase(Player p) {
+        return abrir(p).getString("clase");
+    }
+
+    static void clase(Player p, String c) {
+        abrir(p).putString("clase", c == null ? "" : c);
+    }
+
     // ------------------------------------------------------------------ frascos
 
     /** Los frascos del jugador: cuantos lleva de cada (se rellenan al descansar), cuantos le quedan y su mejora. */

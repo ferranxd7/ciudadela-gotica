@@ -52,7 +52,8 @@ public final class Partida {
             o.addProperty("ecos", Ficha.ecos(sp));
             String zona = Rol.de(sp).zona;
             o.addProperty("zona", zona == null ? "" : zona);
-            o.addProperty("clase", "");
+            String clase = Ficha.clase(sp);
+            o.addProperty("clase", Clase.SIN_CLASE.equals(clase) ? "" : clase);
             o.addProperty("dia", sp.level().getDayTime() / 24000L + 1);
             int ticks = sp.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME));
             o.addProperty("horas", Math.round(ticks / 72000.0 * 10) / 10.0);

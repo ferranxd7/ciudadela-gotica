@@ -323,6 +323,9 @@ public class DarkCraftMod {
             () -> EntityType.Builder.<com.darkcraft.hechizos.ProyectilHechizo>of(com.darkcraft.hechizos.ProyectilHechizo::new, MobCategory.MISC)
                     .sized(0.3f, 0.3f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":proyectil_hechizo"));
     /** El baston (hechicerias, Inteligencia) y el sello (milagros, Fe). */
+    /** La daga de los bandidos (parte 2f-3): el combate la trata como daga por su nombre. */
+    public static final RegistryObject<Item> DAGA = ITEMS.register("daga",
+            () -> new net.minecraft.world.item.SwordItem(net.minecraft.world.item.Tiers.IRON, 1, -1.6f, new Item.Properties()));
     public static final RegistryObject<Item> BASTON = ITEMS.register("baston",
             () -> new com.darkcraft.hechizos.Catalizador(com.darkcraft.hechizos.Hechizo.Escuela.HECHICERIA, new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
     public static final RegistryObject<Item> SELLO_SAGRADO = ITEMS.register("sello",
@@ -409,6 +412,7 @@ public class DarkCraftMod {
             e.accept(ESPADA_SINIESTRA);
             e.accept(ALABARDA);
             for (RegistryObject<Item> t : TALISMANES.values()) e.accept(t);
+            e.accept(DAGA);
             e.accept(BASTON);
             e.accept(SELLO_SAGRADO);
             for (RegistryObject<Item> h : HECHIZOS.values()) e.accept(h);

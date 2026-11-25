@@ -2905,6 +2905,80 @@ public final class ClientCiTest {
 
     private static com.darkcraft.client.ui.OpcionesScreen opcionesAbiertas;
 
+    // ------------------------------------------------------------------ las clases (parte 2f-3)
+
+    private static void logClase(Minecraft m, String what) {
+        log("  clase " + what + ": " + (m.screen instanceof com.darkcraft.client.ui.ClaseScreen c ? c.resumen()
+                : "pantalla " + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName())));
+    }
+
+    private static void claseP(Minecraft m, java.util.function.Consumer<com.darkcraft.client.ui.ClaseScreen> f) {
+        if (m.screen instanceof com.darkcraft.client.ui.ClaseScreen c) f.accept(c);
+    }
+
+    private static int clases(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Clases: supervivencia y la pantalla de elegir clase (con el comando)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.getInventory().clearContent();
+                comando(sp, "darkcraft rol clase elegir");
+            });
+        });
+        atTicks(t + 14, "captura: el caballero", m -> {
+            logClase(m, "caballero");
+            shot(m, "cliente_cl01_caballero");
+        });
+        atTicks(t + 16, "el hechicero", m -> claseP(m, c -> c.probarElegir("hechicero")));
+        atTicks(t + 24, "captura: el hechicero", m -> {
+            logClase(m, "hechicero");
+            shot(m, "cliente_cl02_hechicero");
+        });
+        atTicks(t + 26, "el desdichado", m -> claseP(m, c -> c.probarElegir("desdichado")));
+        atTicks(t + 34, "captura: el desdichado", m -> shot(m, "cliente_cl03_desdichado"));
+        atTicks(t + 36, "el bandido y la pregunta", m -> claseP(m, c -> {
+            c.probarElegir("bandido");
+            c.probarPregunta();
+        }));
+        atTicks(t + 44, "captura: la pregunta", m -> {
+            logClase(m, "pregunta");
+            shot(m, "cliente_cl04_pregunta");
+        });
+        atTicks(t + 46, "empezar como bandido", m -> claseP(m, com.darkcraft.client.ui.ClaseScreen::probarEmpezar));
+        atTicks(t + 60, "lo que lleva el bandido", m -> {
+            logClase(m, "tras elegir");
+            server(m, sp -> {
+                StringBuilder b = new StringBuilder("  bandido (servidor): clase " + com.darkcraft.rol.Ficha.clase(sp) + " nivel "
+                        + com.darkcraft.rol.Ficha.nivel(sp) + " atributos " + java.util.Arrays.toString(com.darkcraft.rol.Ficha.atributos(sp))
+                        + " vida " + sp.getHealth() + "/" + sp.getMaxHealth() + " frascos " + com.darkcraft.rol.Ficha.frascos(sp) + " |");
+                for (int i = 0; i < sp.getInventory().getContainerSize(); i++) {
+                    net.minecraft.world.item.ItemStack st = sp.getInventory().getItem(i);
+                    if (!st.isEmpty()) b.append(' ').append(i).append(':').append(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(st.getItem()).getPath())
+                            .append(st.getCount() > 1 ? "x" + st.getCount() : "");
+                }
+                log(b.toString());
+            });
+        });
+        atTicks(t + 64, "tercera persona para ver al bandido", m -> m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT));
+        atTicks(t + 80, "captura: el bandido en el juego", m -> shot(m, "cliente_cl05_bandido"));
+        atTicks(t + 82, "el menu: equipo del bandido", m -> com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.EQUIPO));
+        atTicks(t + 92, "captura: el equipo del bandido", m -> shot(m, "cliente_cl06_menu"));
+        atTicks(t + 94, "Fin de las clases", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                comando(sp, "darkcraft rol nivel reiniciar");
+                comando(sp, "darkcraft rol clase ninguna");
+                sp.getInventory().clearContent();
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 100;
+    }
+
     // ------------------------------------------------------------------ guardar y salir: el titulo y las partidas (parte 2f-2)
 
     private static void logTitulo(Minecraft m, String what) {
@@ -3142,6 +3216,12 @@ public final class ClientCiTest {
         next = 0;
         com.darkcraft.rol.Rol.sinLimite = true;
         com.darkcraft.client.ui.Carteles.callados = true;
+        atTicks(12, "Al entrar por primera vez sale la eleccion de clase (no se puede cerrar)", m -> {
+            log("  al entrar: " + (m.screen instanceof com.darkcraft.client.ui.ClaseScreen c ? c.resumen()
+                    : "pantalla " + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName())));
+            m.setScreen(null);
+            server(m, sp -> comando(sp, "darkcraft rol clase ninguna"));
+        });
         int fin = escaparate();
         fin = armas(fin);
         fin = rol(fin);
@@ -3155,6 +3235,7 @@ public final class ClientCiTest {
         fin = habilidades(fin);
         fin = codice(fin);
         fin = pausa(fin);
+        fin = clases(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

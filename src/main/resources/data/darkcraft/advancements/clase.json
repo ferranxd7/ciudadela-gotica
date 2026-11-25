@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:raiz",
+  "display": {
+    "icon": {
+      "item": "darkcraft:espada_luz"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.clase.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.clase.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 0
+  }
+}

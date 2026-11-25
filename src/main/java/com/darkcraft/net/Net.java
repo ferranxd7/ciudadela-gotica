@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "14";
+    private static final String V = "15";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -126,6 +126,45 @@ public final class Net {
                 .encoder(Comprar::write).decoder(Comprar::read).consumerMainThread(Comprar::handle).add();
         CH.messageBuilder(TiendaHecho.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(TiendaHecho::write).decoder(TiendaHecho::read).consumerMainThread(TiendaHecho::handle).add();
+        CH.messageBuilder(AbrirClase.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(AbrirClase::write).decoder(AbrirClase::read).consumerMainThread(AbrirClase::handle).add();
+        CH.messageBuilder(ElegirClase.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ElegirClase::write).decoder(ElegirClase::read).consumerMainThread(ElegirClase::handle).add();
+    }
+
+    // ------------------------------------------------------------------ las clases (parte 2f-3)
+
+    /** Hay que elegir clase (al entrar por primera vez: {@code forzada}, no se puede cerrar; o con el comando). */
+    public record AbrirClase(boolean forzada) {
+        void write(FriendlyByteBuf b) {
+            b.writeBoolean(forzada);
+        }
+
+        static AbrirClase read(FriendlyByteBuf b) {
+            return new AbrirClase(b.readBoolean());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.ClaseScreen.abrir(forzada));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El cliente elige su clase. */
+    public record ElegirClase(String id) {
+        void write(FriendlyByteBuf b) {
+            b.writeUtf(id, 32);
+        }
+
+        static ElegirClase read(FriendlyByteBuf b) {
+            return new ElegirClase(b.readUtf(32));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.rol.Clase.pedir(p, id);
+            ctx.get().setPacketHandled(true);
+        }
     }
 
     // ------------------------------------------------------------------ hechizos

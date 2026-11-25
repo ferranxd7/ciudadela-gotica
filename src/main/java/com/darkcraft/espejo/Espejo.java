@@ -61,7 +61,7 @@ public final class Espejo {
             I_CORONA = 8, I_ESPADA = 9, I_PUERTA = 10, I_CASA = 11, I_LIBRO = 14, I_ESPADAS = 26, I_PREGUNTA = 27;
 
     /** Logros del mod en el orden de la historia (los que no esten aqui van al final). */
-    public static final String[] ORDEN_LOGROS = {"encontrar", "libro_sombra", "primera_marca", "capitulo1", "capitulo2",
+    public static final String[] ORDEN_LOGROS = {"clase", "encontrar", "libro_sombra", "primera_marca", "capitulo1", "capitulo2",
             "rey", "golpe_final", "capitulo3", "capitulo4", "arbol", "gavran_guardia", "gavran_fase1", "gavran_corazon",
             "gavran_juicio", "gavran_fase2", "gavran", "capitulo5", "cartografo", "caballero", "caballeros_50", "fortaleza", "puente",
             "puerta_hueso", "acertijo", "amuleto", "portal", "capitulo6", "libro_perdido", "libros_perdidos"};
