@@ -912,6 +912,32 @@ torreon por dentro. **4c**: capitanes de elite, emboscadas y la torre del arbol 
   cliente, tramo `perrosEspectros()` (capturas `cliente_vb01..17`: la fila y sus golpes, uno que se deshace, una jauria,
   la catedral, el torreon, la perrera en supervivencia y el lamento de cerca).
 
+### Plan grande, parte 4c: capitanes de elite, emboscadas y la torre del arbol por dentro
+
+- **`enemigos/Elite`** (`tools/enemigos/elite.py`, escala 1,15: armadura negra y oro, corona con penacho, capa, mandoble;
+  ojos rojos en la capa de brillo): 120 de vida, golpe 7, armadura 12, bestiario `capitan_elite`. Al ver a alguien a menos
+  de 16 **grita** primero (`arengar`, en el tick 9 del grito: el y los enemigos a 18 bloques +30 % de dano 12 s —
+  `Enemigo.animo(mas, ticks)`, chispas rojas— y van a por esa presa —`Enemigo.acudir`—); **tajo** de arriba abajo con
+  **onda** (`onda()`: a quien este DE PIE a 2,7 bloques del golpe, 0,65 del dano; saltando o rodando se libra), **barrido**,
+  **estocada** y **embestida** (entre 4,6 y 9,5 bloques; cruza media plaza). Al caer: logro `capitan_elite` y los suyos a 18
+  bloques **se desaniman** (-25 % de dano y de paso 15 s, humo; dudan un momento). Deja piedra de forja I (60 %) y II (18 %).
+- **Capitanes** (`ValdrennEnemigos`): en la puerta exterior (con sus alabardas), en el patio de armas (se va con el Rey) y
+  de ronda por el patio de la fuente.
+- **Emboscadas** (`valdrenn/Emboscadas`, respuesta 14 del plan: el puente, la plaza de la fuente, la escalera del torreon,
+  el cementerio y la biblioteca): cada una, una zona (`AABB`) y sus puestos (grupo `emb_<sitio>`, tumbados como un muerto
+  mas) que **no salen hasta que se dispara**: un jugador en supervivencia entra en la zona → cuerno (`sfx.emboscada`), humo
+  y almas, se alzan todos a la vez (`Puestos.sacarGrupo`, `sfx.emboscada_alzarse`) y van a por el. Al descansar o morir
+  (`Puestos.alVolver` → `rearmar`) los que siguen en pie vuelven a esconderse y se vuelve a armar; vencerlos a todos da el
+  logro `emboscada`. La de la escalera del torreon: dos caballeros en el rellano del tercer piso y un perro en el del segundo.
+- **La torre del arbol por dentro** (`ValdrennEnemigos.arbol`, de `TreeTower.escalera()`): en uno de cada dos rellanos,
+  por turnos, un caballero, dos perros, una alabarda o una dama; en el ultimo, un capitan (grupo `torre_arbol_tras_puerta`,
+  se van con Ser Gavran; `comprobar` los cuenta aparte).
+- Sonido (ElevenLabs, `TOMAS_SFX`): `elite_alerta`, `elite_grito`, `elite_dolor`, `elite_muerte`, `elite_impacto`,
+  `elite_embestida`, `emboscada`, `emboscada_alzarse`. Comandos: `/darkcraft valdrenn enemigos emboscada [armar | <nombre>]`.
+- Pruebas: servidor, `elitesYEmboscadas` (lineas `Valdrenn, el capitan de elite: ...` —arenga, onda, embestida, desanimo— y
+  `Valdrenn, las emboscadas: N de 5 bien ...`); cliente, tramo `elitesEmboscadas()` (capturas `cliente_vc01..17`: el capitan
+  y sus golpes, su caida, el de la puerta, un rellano de la torre del arbol y la emboscada de la plaza en supervivencia).
+
 ### Lo siguiente: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 
 Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publicada):
@@ -920,8 +946,8 @@ Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publica
 - **3c, enemigos**: hecha (arriba).
 - **3d-1, la cinematica de inicio**: hecha (arriba).
 - **3d-2, el barco**: hecha (arriba). Con esto la parte 3 esta entera; lo siguiente es la **parte 4** de `PLAN.md`
-  (Valdrenn dificil: 4a la guardia y 4b perros y espectros, hechas arriba; 4c capitanes de elite, emboscadas y la torre
-  del arbol por dentro, y 4d los dos guardianes, por hacer).
+  (Valdrenn dificil: 4a la guardia, 4b perros y espectros y 4c capitanes de elite, emboscadas y la torre del arbol por
+  dentro, hechas arriba; 4d los dos guardianes, por hacer).
 
 ## Compilar, probar y publicar
 
