@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:clase",
+  "display": {
+    "icon": {
+      "item": "darkcraft:pieza_ancla"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.brumavela.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.brumavela.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 0
+  }
+}

@@ -180,6 +180,8 @@ public final class CaminoNubes {
      */
     private static void esquivar(long seed, int sx, int sz, int[] f, List<double[]> p) {
         List<double[]> obs = new ArrayList<>();
+        // la isla de Brumavela, en el origen, con su cala
+        obs.add(new double[]{0.5, 40.5, 250});
         int rx0 = Math.floorDiv(sx, CastleSites.REGION), rz0 = Math.floorDiv(sz, CastleSites.REGION);
         for (int rx = rx0 - 2; rx <= rx0 + 2; rx++)
             for (int rz = rz0 - 2; rz <= rz0 + 2; rz++) {

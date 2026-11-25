@@ -734,11 +734,73 @@ def acertijo():
     return M
 
 
-ESCENAS = [corona_rota, fuente, trono, catedral, juramento, portal, perdidos_valdrenn, perdidos_fortaleza, diario, acertijo]
+# ================================================================= 11. Las notas de Brumavela
+def perdidos_brumavela():
+    """El muelle de Brumavela al caer la tarde: el faro encendido en su penon, el espigon y La Garza Gris, rota, sobre el mar de nubes."""
+    M = Mini()
+    M.degradado(["#10121e", "#1c2234", "#30384c", "#525a6c", "#7c8494"], 0, 50)
+    # el sol palido tras la bruma
+    M.elipse(98, 20, 8, 8, "#9aa0ac")
+    M.elipse(98, 20, 6, 6, "#c4c8cc")
+    for x0, x1, y in ((84, 114, 17), (88, 110, 22), (80, 104, 26)):
+        M.hline(x0, y, x1 - x0, "#525a6c")
+    # el penon y el faro, lejos, a la izquierda
+    fig = capa()
+    fig.poli([(0, 50), (0, 30), (10, 26), (22, 27), (30, 33), (38, 44), (44, 50)], PIEDRA_C[0])
+    fig.poli([(2, 34), (10, 28), (20, 29), (27, 35), (22, 38), (8, 37)], PIEDRA_C[1])
+    fig.rect(13, 9, 5, 19, "#8a8a92")
+    fig.vline(13, 9, 19, "#b0b0b6")
+    fig.rect(13, 16, 5, 2, "#3a3a44")
+    fig.rect(11, 7, 9, 2, MADERA[2])
+    fig.rect(13, 3, 5, 4, AGUA[3])
+    fig.poli([(11, 3), (20, 3), (15.5, -1)], "#2a2632")
+    pegar_con_tinta(M, fig)
+    M.px(15, 4, AGUA[4]).px(15, 5, AGUA[4])
+    for k in range(1, 9):
+        M.px(20 + k * 2, 5 - (k // 3), AGUA[2] if k % 2 else AGUA[1])
+        M.px(10 - k, 5 + (k // 2), AGUA[1])
+    # el mar de nubes
+    M.degradado([NUBE[3], NUBE[2], NUBE[1], NUBE[0]], 50, H)
+    r = np.random.default_rng(31)
+    for _ in range(26):
+        x, y, rx = int(r.integers(-6, W)), int(r.integers(50, 78)), int(r.integers(7, 18))
+        M.elipse(x, y, rx, 2.5, NUBE[4] if y < 60 else NUBE[3] if y < 70 else NUBE[2])
+        M.hline(x - rx + 2, y - 2, max(1, rx), NUBE[5] if y < 62 else NUBE[4])
+    # el espigon
+    fig = capa()
+    fig.rect(28, 52, 44, 3, MADERA[3])
+    fig.hline(28, 52, 44, MADERA[4])
+    for x in range(31, 72, 8):
+        fig.rect(x, 55, 2, 9 + (x % 3), MADERA[1])
+    fig.rect(69, 45, 2, 7, MADERA[2])
+    fig.rect(68, 43, 4, 2, AGUA[2])
+    # La Garza Gris: el casco, el alcazar, el palo tronchado y el baupres
+    fig.poli([(70, 50), (118, 48), (124, 44), (120, 58), (110, 63), (82, 63), (73, 58)], MADERA[2])
+    fig.poli([(70, 50), (118, 48), (119, 51), (72, 53)], MADERA[4])
+    fig.poli([(70, 50), (70, 43), (86, 42), (86, 50)], MADERA[3])
+    fig.hline(70, 43, 16, MADERA[4])
+    for x in (74, 79):
+        fig.rect(x, 46, 2, 2, FUEGO[3])
+    fig.rect(96, 36, 3, 13, MADERA[3])
+    fig.poli([(95, 36), (97, 31), (98, 35), (100, 33), (99, 37)], MADERA[4])
+    fig.linea(120, 46, 127, 40, MADERA[3])
+    for x in range(76, 116, 7):
+        fig.vline(x, 54, 8, MADERA[1])
+    pegar_con_tinta(M, fig)
+    # la bruma por delante
+    for x0, x1, y in ((60, 128, 62), (0, 50, 66), (40, 110, 71)):
+        for x in range(x0, x1):
+            if (x + y) % 3 != 0:
+                M.px(x, y, NUBE[4])
+    return M
+
+
+ESCENAS = [corona_rota, fuente, trono, catedral, juramento, portal, perdidos_valdrenn, perdidos_fortaleza, diario, acertijo,
+           perdidos_brumavela]
 
 
 def montar():
-    """Las diez miniaturas en un atlas de 512 x 256 (cuatro por fila)."""
+    """Las miniaturas en un atlas de 512 x 256 (cuatro por fila)."""
     A = Lienzo(512, 256)
     for i, f in enumerate(ESCENAS):
         m = f()

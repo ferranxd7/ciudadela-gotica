@@ -43,7 +43,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 25 * 60 * 20;
+    private static final int LIMIT = 27 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -2991,15 +2991,16 @@ public final class ClientCiTest {
     private static int nubes(int t0) {
         base = 0;
         int t = t0;
-        atTicks(t, "Nubes: donde se aparece (en el camino, delante de la Torre de Ascenso)", m -> {
+        atTicks(t, "Nubes: donde llega el barco (en el camino, delante de la Torre de Ascenso)", m -> {
             m.setScreen(null);
             enPrimeraPersona(m);
             m.options.hideGui = true;
             server(m, sp -> {
                 ServerLevel lvl = sp.serverLevel();
-                BlockPos ap = lvl.getSharedSpawnPos();
+                BlockPos ap = com.darkcraft.world.MundoNubes.llegada(lvl.getSeed());
                 log("  nubes: generador " + lvl.getChunkSource().getGenerator().getClass().getSimpleName() + ", se aparece en "
-                        + ap.toShortString() + " (calculado " + com.darkcraft.world.MundoNubes.aparicion(lvl.getSeed()) + "), radio "
+                        + lvl.getSharedSpawnPos().toShortString() + " (calculado " + com.darkcraft.world.MundoNubes.aparicion() + "), el barco llega a "
+                        + ap.toShortString() + ", radio "
                         + lvl.getGameRules().getInt(net.minecraft.world.level.GameRules.RULE_SPAWN_RADIUS) + ", bioma "
                         + lvl.getBiome(ap).unwrapKey().map(k -> k.location().toString()).orElse("?") + ", dimensiones "
                         + sp.server.levelKeys().size() + " " + sp.server.levelKeys());
@@ -3020,7 +3021,7 @@ public final class ClientCiTest {
         atTicks(t + 112, "captura: la torre saliendo de las nubes", m -> shot(m, "cliente_n01_torre_desde_el_camino"));
         atTicks(t + 114, "Nubes: la torre y la isla desde lejos", m -> server(m, sp -> {
             ServerLevel lvl = sp.serverLevel();
-            BlockPos ap = lvl.getSharedSpawnPos();
+            BlockPos ap = com.darkcraft.world.MundoNubes.llegada(lvl.getSeed());
             sp.getAbilities().flying = true;
             sp.onUpdateAbilities();
             sp.teleportTo(lvl, ap.getX() + 46.5, ap.getY() + 26, ap.getZ() + 62.5, 143f, -14f);
@@ -3087,6 +3088,242 @@ public final class ClientCiTest {
             sp.onUpdateAbilities();
         }));
         return t + 384;
+    }
+
+    // ------------------------------------------------------------------ Brumavela, la isla del pueblo (parte 3b)
+
+    /** Lleva al jugador a (x, y, z) mirando a (tx, ty, tz). */
+    private static void irMirando(ServerPlayer sp, double x, double y, double z, double tx, double ty, double tz, boolean volando) {
+        double dx = tx - x, dz = tz - z, dy = ty - (y + 1.62);
+        float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz)), pitch = (float) -Math.toDegrees(Math.atan2(dy, Math.hypot(dx, dz)));
+        sp.getAbilities().flying = volando;
+        sp.onUpdateAbilities();
+        sp.teleportTo(sp.serverLevel(), x, y, z, yaw, pitch);
+    }
+
+    private static int[] sitioB(String nombre) {
+        return com.darkcraft.pueblo.gen.PuebloPlan.get().sitio(nombre);
+    }
+
+    private static void logPueblo(Minecraft m, String que) {
+        String cli = "cosas en el cliente " + com.darkcraft.client.ui.ClientPueblo.cuantas() + ", a mano " + com.darkcraft.client.ui.ClientPueblo.aMano
+                + ", cartel " + com.darkcraft.client.ui.Carteles.resumen();
+        server(m, sp -> log("  pueblo " + que + ": " + fpos(sp) + " | " + com.darkcraft.pueblo.Pueblo.estado(com.darkcraft.pueblo.Pueblo.Datos.get(sp.server))
+                + " | sitio " + com.darkcraft.pueblo.Pueblo.lugar(sp) + " | " + cli));
+    }
+
+    /**
+     * Brumavela: donde se despierta, el muelle y el barco roto, el arcon de la vela, la plaza y su santuario, el timon en
+     * la taberna, las campanas y la cripta, el Saliente, el faro y el corazon, reparar el barco y zarpar.
+     */
+    private static int pueblo(int t0) {
+        base = 0;
+        int t = t0;
+        final int VELA = 0, TIMON = 1, MASTIL = 2, ANCLA = 3, CORAZON = 4;
+        atTicks(t, "Brumavela: donde se despierta", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                BlockPos ap = lvl.getSharedSpawnPos();
+                sp.setGameMode(GameType.CREATIVE);
+                lvl.setDayTime(6000);
+                lvl.setWeatherParameters(6000, 0, false, false);
+                comando(sp, "darkcraft brumavela reiniciar");
+                irMirando(sp, ap.getX() + 0.5, ap.getY(), ap.getZ() + 0.5, ap.getX() - 2.5, ap.getY() + 2.5, ap.getZ() + 22, false);
+                log("  pueblo: se aparece en " + ap.toShortString() + " (calculado " + com.darkcraft.world.MundoNubes.aparicion().toShortString() + "), modo por defecto "
+                        + sp.server.getDefaultGameType() + ", bioma " + lvl.getBiome(ap).unwrapKey().map(k -> k.location().toString()).orElse("?"));
+            });
+        });
+        atTicks(t + 90, "Brumavela: el cartel de la zona", m -> {
+            logPueblo(m, "al despertar");
+            server(m, sp -> log("  pueblo: bajo los pies " + bloque(sp.serverLevel(), sp.getX(), sp.getY() - 0.5, sp.getZ()) + ", en el suelo=" + sp.onGround()
+                    + ", la nube de al lado " + com.darkcraft.world.NubesGenerador.cima(-8, 119) + ", logro brumavela=" + com.darkcraft.story.Logros.tiene(sp, "brumavela")));
+            com.darkcraft.client.ui.Carteles.callados = false;
+            com.darkcraft.client.ui.Carteles.recibir(new com.darkcraft.net.Net.Cartel(com.darkcraft.net.Net.Cartel.ZONA, "darkcraft.zona.brumavela", 0));
+        });
+        atTicks(t + 116, "captura: se despierta en el muelle", m -> shot(m, "cliente_b01_despertar"));
+        atTicks(t + 118, "Brumavela: el muelle desde arriba", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> irMirando(sp, -38.5, 277, 158.5, -2, 250, 124, true));
+        });
+        atTicks(t + 180, "captura: el muelle y el barco roto", m -> shot(m, "cliente_b02_muelle"));
+        atTicks(t + 182, "Brumavela: el arcon de la vela, en el almacen", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                int[] v = sitioB("vela");
+                irMirando(sp, v[0] - 2.5, v[1], v[2] + 0.5, v[0] + 0.5, v[1] + 0.5, v[2] + 0.5, false);
+            });
+        });
+        atTicks(t + 226, "captura: el arcon de la vela", m -> {
+            logPueblo(m, "ante el arcon (a mano 0)");
+            shot(m, "cliente_b03_arcon");
+        });
+        atTicks(t + 228, "Brumavela: se abre el arcon", m -> server(m, sp -> com.darkcraft.pueblo.Pueblo.usar(sp, VELA)));
+        atTicks(t + 254, "captura: la vela", m -> {
+            logPueblo(m, "con la vela");
+            shot(m, "cliente_b04_pieza_vela");
+        });
+        atTicks(t + 256, "Brumavela: la plaza del pozo", m -> server(m, sp -> {
+            int[] z = sitioB("pozo");
+            irMirando(sp, z[0] + 7.5, z[1], z[2] + 9.5, z[0] - 2, z[1] + 1.5, z[2], false);
+        }));
+        atTicks(t + 312, "captura: la plaza y su santuario", m -> {
+            server(m, sp -> {
+                int[] z = sitioB("santuario");
+                log("  pueblo: el santuario " + sp.serverLevel().getBlockState(new BlockPos(z[0], z[1], z[2])) + " | "
+                        + com.darkcraft.santuario.Santuarios.nombre(sp.serverLevel(), new BlockPos(z[0], z[1], z[2])));
+            });
+            shot(m, "cliente_b05_plaza");
+        });
+        atTicks(t + 314, "Brumavela: el timon, tras la barra de la taberna", m -> server(m, sp -> {
+            int[] z = sitioB("timon");
+            irMirando(sp, z[0] - 1.5, z[1], z[2] + 3.5, z[0] + 0.5, z[1] + 1.1, z[2] + 0.5, false);
+        }));
+        atTicks(t + 358, "captura: el timon", m -> {
+            logPueblo(m, "ante el timon (a mano 1)");
+            shot(m, "cliente_b06_timon");
+        });
+        atTicks(t + 360, "Brumavela: la capilla y el cementerio", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                com.darkcraft.pueblo.Pueblo.usar(sp, TIMON);
+                irMirando(sp, -24.5, 286, -14.5, -50, 280, -44, true);
+            });
+        });
+        atTicks(t + 424, "captura: la capilla", m -> shot(m, "cliente_b07_capilla"));
+        atTicks(t + 426, "Brumavela: el campanario", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                int[] z = sitioB("campanario"), c = sitioB("campana_pescador");
+                irMirando(sp, z[0] + 0.5, z[1], z[2] + 0.5, c[0] + 0.5, c[1] + 0.3, c[2] + 0.5, false);
+            });
+        });
+        atTicks(t + 470, "captura: la campana del Pescador", m -> {
+            logPueblo(m, "en el campanario (a mano 5)");
+            shot(m, "cliente_b08_campanario");
+        });
+        atTicks(t + 472, "Brumavela: las campanas en mal orden", m -> server(m, sp -> {
+            com.darkcraft.pueblo.Pueblo.usar(sp, 6);
+            com.darkcraft.pueblo.Pueblo.usar(sp, 5);
+            com.darkcraft.pueblo.Pueblo.usar(sp, 7);
+        }));
+        atTicks(t + 484, "Brumavela: las campanas callan", m -> logPueblo(m, "campanas en mal orden (aviso de que callan; cripta cerrada)"));
+        atTicks(t + 486, "Brumavela: las campanas en su orden", m -> server(m, sp -> {
+            com.darkcraft.pueblo.Pueblo.usar(sp, 5);
+            com.darkcraft.pueblo.Pueblo.usar(sp, 6);
+            com.darkcraft.pueblo.Pueblo.usar(sp, 7);
+            log("  pueblo: logro campanas=" + com.darkcraft.story.Logros.tiene(sp, "campanas"));
+        }));
+        atTicks(t + 492, "Brumavela: la losa apartada", m -> {
+            logPueblo(m, "campanas en orden (cripta abierta)");
+            server(m, sp -> {
+                int y = com.darkcraft.pueblo.gen.PuebloPlan.get().capilla.y;
+                irMirando(sp, -48.5, y, -45.5, -57, y - 3, -45.5, false);
+            });
+        });
+        atTicks(t + 540, "captura: la cripta abierta", m -> shot(m, "cliente_b09_cripta_abierta"));
+        atTicks(t + 542, "Brumavela: el mastil, en la cripta", m -> server(m, sp -> {
+            int[] z = sitioB("mastil");
+            irMirando(sp, z[0] + 2.5, z[1], z[2] + 3.5, z[0] + 0.5, z[1] + 1.1, z[2] + 0.5, false);
+        }));
+        atTicks(t + 586, "captura: el mastil", m -> {
+            logPueblo(m, "ante el mastil (a mano 2)");
+            shot(m, "cliente_b10_mastil");
+        });
+        atTicks(t + 588, "Brumavela: el Saliente", m -> server(m, sp -> {
+            com.darkcraft.pueblo.Pueblo.usar(sp, MASTIL);
+            int[] z = sitioB("ancla");
+            irMirando(sp, z[0] + 3.5, z[1], z[2] + 1.5, z[0] + 0.5, z[1] + 0.8, z[2] + 0.5, false);
+        }));
+        atTicks(t + 650, "captura: el Saliente y lo que queda de Tobias", m -> {
+            logPueblo(m, "en el Saliente (a mano 3)");
+            shot(m, "cliente_b11_saliente");
+        });
+        atTicks(t + 652, "Brumavela: el faro", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                com.darkcraft.pueblo.Pueblo.usar(sp, ANCLA);
+                irMirando(sp, 50.5, 286, -50.5, 80, 290, -78, true);
+            });
+        });
+        atTicks(t + 716, "captura: el faro", m -> shot(m, "cliente_b12_faro"));
+        atTicks(t + 718, "Brumavela: el corazon, en la linterna del faro", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                int[] z = sitioB("faro_alto"), c = sitioB("corazon");
+                irMirando(sp, z[0] + 0.5, z[1], z[2] + 0.5, c[0] + 0.5, c[1] + 0.6, c[2] + 0.5, false);
+            });
+        });
+        atTicks(t + 762, "captura: el corazon de la Garza", m -> {
+            logPueblo(m, "ante el corazon (a mano 4)");
+            shot(m, "cliente_b13_corazon");
+        });
+        atTicks(t + 764, "Brumavela: el barco roto desde el espigon", m -> server(m, sp -> {
+            com.darkcraft.pueblo.Pueblo.usar(sp, CORAZON);
+            int[] c = sitioB("corazon");
+            log("  pueblo: la luz del faro tras llevarse el corazon: " + sp.serverLevel().getBlockState(new BlockPos(c[0], c[1], c[2])) + ", logro piezas="
+                    + com.darkcraft.story.Logros.tiene(sp, "piezas"));
+            irMirando(sp, 1.5, 251, 140.5, -8, 252, 133, false);
+        }));
+        atTicks(t + 826, "captura: el barco roto", m -> {
+            logPueblo(m, "con las cinco piezas");
+            shot(m, "cliente_b14_barco_roto");
+        });
+        atTicks(t + 828, "Brumavela: en la cubierta", m -> server(m, sp -> {
+            int[] z = sitioB("barco");
+            irMirando(sp, z[0] + 0.5, z[1], z[2] + 2.5, z[0] + 0.5, z[1] + 1.2, z[2] - 2, false);
+        }));
+        atTicks(t + 860, "captura: reparar el barco", m -> {
+            logPueblo(m, "en la cubierta (a mano 11)");
+            shot(m, "cliente_b15_cubierta");
+        });
+        atTicks(t + 862, "Brumavela: se repara el barco", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                com.darkcraft.pueblo.Pueblo.usar(sp, 11);
+                irMirando(sp, 16.5, 263, 162.5, -8, 261, 136, true);
+            });
+        });
+        atTicks(t + 930, "captura: La Garza Gris, reparada", m -> {
+            logPueblo(m, "barco reparado");
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                log("  pueblo: el palo a media altura " + bloque(lvl, -8, 262, 135) + ", la vela " + bloque(lvl, -8, 258, 137) + ", la rueda del timon "
+                        + bloque(lvl, -8, 256, 125) + ", el ancla " + bloque(lvl, -5, 249, 146) + ", logro barco=" + com.darkcraft.story.Logros.tiene(sp, "barco"));
+            });
+            shot(m, "cliente_b16_barco_reparado");
+        });
+        atTicks(t + 932, "Brumavela: al timon", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                int[] z = sitioB("barco_timon");
+                irMirando(sp, z[0] + 0.5, z[1], z[2] + 2.5, z[0] + 0.5, z[1] + 1.4, z[2] + 0.5, false);
+            });
+        });
+        atTicks(t + 968, "captura: zarpar", m -> {
+            logPueblo(m, "al timon (a mano 12)");
+            shot(m, "cliente_b17_timon");
+        });
+        atTicks(t + 970, "Brumavela: se zarpa hacia Valdrenn", m -> server(m, sp -> com.darkcraft.pueblo.Pueblo.usar(sp, 12)));
+        atTicks(t + 1060, "captura: la llegada, al pie de la Torre de Ascenso", m -> {
+            logPueblo(m, "tras zarpar (a mano 13: volver)");
+            server(m, sp -> log("  pueblo: bajo los pies " + bloque(sp.serverLevel(), sp.getX(), sp.getY() - 0.5, sp.getZ()) + ", logro zarpar="
+                    + com.darkcraft.story.Logros.tiene(sp, "zarpar")));
+            shot(m, "cliente_b18_llegada");
+        });
+        atTicks(t + 1062, "Brumavela: de vuelta", m -> server(m, sp -> com.darkcraft.pueblo.Pueblo.usar(sp, 13)));
+        atTicks(t + 1100, "Brumavela: otra vez en el barco", m -> {
+            logPueblo(m, "de vuelta en el barco");
+            com.darkcraft.client.ui.Carteles.callados = true;
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.getAbilities().flying = true;
+                sp.onUpdateAbilities();
+            });
+        });
+        return t + 1104;
     }
 
     // ------------------------------------------------------------------ guardar y salir: el titulo y las partidas (parte 2f-2)
@@ -3347,6 +3584,7 @@ public final class ClientCiTest {
         fin = pausa(fin);
         fin = clases(fin);
         fin = nubes(fin);
+        fin = pueblo(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

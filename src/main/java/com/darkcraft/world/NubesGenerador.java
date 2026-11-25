@@ -55,7 +55,7 @@ public class NubesGenerador extends ChunkGenerator {
      * La cala de Brumavela (la isla del pueblo, en el origen): ahi el mar de nubes esta en calma, a ras del muelle, para
      * que el barco roto y el espigon queden posados en la nube (fuera de ese circulo, los bollos de siempre).
      */
-    public static final int CALMA_X = 0, CALMA_Z = 136, CALMA_R0 = 40, CALMA_R1 = 78, CALMA_Y = 248;
+    public static final int CALMA_X = 0, CALMA_Z = 136, CALMA_R0 = 40, CALMA_R1 = 78, CALMA_Y = 246;
 
     /** Lo mas alto de la nube en esa columna (235 .. 261). */
     public static int cima(int x, int z) {

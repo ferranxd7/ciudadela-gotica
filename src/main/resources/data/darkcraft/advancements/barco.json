@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:piezas",
+  "display": {
+    "icon": {
+      "item": "darkcraft:pieza_timon"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.barco.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.barco.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 60
+  }
+}

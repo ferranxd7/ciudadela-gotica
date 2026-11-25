@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:barco",
+  "display": {
+    "icon": {
+      "item": "darkcraft:pieza_mastil"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.zarpar.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.zarpar.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 30
+  }
+}

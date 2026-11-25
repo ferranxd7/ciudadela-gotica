@@ -494,6 +494,11 @@ public final class Rol {
         Net.to(p, new Net.Cartel(Net.Cartel.JEFE, claveNombre, ecos));
     }
 
+    /** Si el jugador ya ha estado en esa zona (la clave de su nombre). */
+    public static boolean zonaVista(ServerPlayer p, String clave) {
+        return Ficha.zonaVista(p, clave);
+    }
+
     /** El sitio donde esta el jugador (lo dice el Espejo cada segundo): la primera vez que entra, el cartel de la zona. */
     public static void zona(ServerPlayer p, String clave) {
         Estado s = de(p);

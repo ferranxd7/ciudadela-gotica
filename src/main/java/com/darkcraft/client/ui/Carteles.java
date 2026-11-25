@@ -48,6 +48,9 @@ public final class Carteles {
             case Net.Cartel.GUARDIA -> ClientRol.sinEstaminaTick = ClientRol.ticks;
             case Net.Cartel.SANTUARIO -> COLA.add(new Cartel(Net.Cartel.SANTUARIO, Component.translatable("darkcraft.cartel.santuario"),
                     Component.translatable(m.clave())));
+            case Net.Cartel.PIEZA -> COLA.add(new Cartel(Net.Cartel.PIEZA, Component.translatable(m.clave()),
+                    Component.translatable("darkcraft.cartel.pieza", m.n(), 5)));
+            case Net.Cartel.BARCO -> COLA.add(new Cartel(Net.Cartel.BARCO, Component.translatable("darkcraft.cartel.barco"), Component.translatable(m.clave())));
             case Net.Cartel.AVISO -> {
                 aviso = Component.translatable(m.clave());
                 avisoInicio = ClientRol.ticks;
@@ -79,7 +82,8 @@ public final class Carteles {
     }
 
     private static int dura(int tipo) {
-        return tipo == Net.Cartel.JEFE ? 120 : tipo == Net.Cartel.ZONA || tipo == Net.Cartel.SANTUARIO ? 96 : tipo == LUGAR ? 64 : 76;
+        return tipo == Net.Cartel.JEFE || tipo == Net.Cartel.BARCO ? 120 : tipo == Net.Cartel.ZONA || tipo == Net.Cartel.SANTUARIO || tipo == Net.Cartel.PIEZA ? 96
+                : tipo == LUGAR ? 64 : 76;
     }
 
     private static SoundEvent sonido(int tipo) {
@@ -89,8 +93,8 @@ public final class Carteles {
     }
 
     static void sonar(int tipo) {
-        // el santuario ya suena en el mundo al encenderse
-        if (tipo == Net.Cartel.SANTUARIO) return;
+        // el santuario ya suena en el mundo al encenderse (y las piezas del barco, y el barco)
+        if (tipo == Net.Cartel.SANTUARIO || tipo == Net.Cartel.PIEZA || tipo == Net.Cartel.BARCO) return;
         // un sitio pequeno: la misma campana, mas aguda y bajita
         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sonido(tipo), tipo == LUGAR ? 1.3f : 1.0f,
                 tipo == LUGAR ? 0.3f : tipo == Net.Cartel.ZONA ? 0.7f : 0.9f));

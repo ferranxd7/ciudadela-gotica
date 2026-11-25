@@ -22,3 +22,6 @@ src/main/resources/assets/darkcraft/rey_voces.json
 tools/gavran/.ik_cache.pkl*
 __pycache__/
 src/main/resources/assets/darkcraft/sounds/gavran/
+
+# lo que deja la herramienta de diseno (tools/vista3d) al arrancar los registros de Minecraft
+logs/

@@ -572,7 +572,7 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   Las nubes de Minecraft van a Y 640 (`ClientNubes.Efectos`, los efectos `darkcraft:nubes` del tipo de dimension del
   overworld): a 192 quedaban escondidas bajo el mar de nubes.
 - En el origen del mundo (donde ira la isla del pueblo) el mar de nubes esta **en calma**: a 40 bloques de (0, 136) lo alto
-  es 247-249 y se funde con los bollos de siempre hasta los 78 (`NubesGenerador.CALMA_*`): ahi iran el muelle y el barco.
+  es 245-247 y se funde con los bollos de siempre hasta los 78 (`NubesGenerador.CALMA_*`): ahi iran el muelle y el barco.
 - `Canvas.unir(x, y, z, estado)`: para vallas, muros bajos, barrotes, cristales y escalones de tejado en esquina; los pone
   sueltos y apunta la posicion para que el juego los una a sus vecinos al acabar de generarse el chunk (tambien en los
   bordes entre chunks). Solo al generar el mundo (`WorldGenRegion`).
@@ -581,13 +581,65 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   nubes) y el tramo `nubes()` (capturas `cliente_n01..n05`: la torre desde el camino, la torre y Valdrenn, el camino,
   el camino desde arriba, dentro de una nube; y un muneco que se pierde en el vacio).
 
+### Plan grande, parte 3b: Brumavela, la isla del pueblo abandonado
+
+- **La isla** (`pueblo/gen/`, en el origen del mundo, igual en todos: semilla fija `PuebloPlan.SEMILLA`; la levanta
+  `world/PuebloFeature` chunk a chunk al generar, y pinta el bioma `darkcraft:brumavela` —hierba apagada, bruma, ceniza
+  blanca en el aire—). `PuebloPlan` (singleton): `Terreno` (meseta a Y 266 que sale de las nubes, colina de la capilla al
+  noroeste, penon del faro al noreste con su rampa, la cala del muelle al sur a Y 250, la Cuesta —un tajo que baja de la
+  plaza al muelle—, la bajada y el Saliente al oeste; medias losas en las cuestas y donde una calle sube un bloque),
+  `Casa` (26: entramado, piedra o madera; ruina 0-2; taberna, herreria, capitania, almacen, granero), `Capilla` (nave,
+  campanario con escalera de mano y tres campanas en sus arcos, la cripta bajo la losa negra), `Faro` (7 de ancho,
+  escalera de caracol sin saltos: rellanos llanos en las esquinas, galeria y linterna), `Muelle` (frente de sillar,
+  espigon, cabria, embarcadero y bote), `Barco` (La Garza Gris, roto o `entero`), `Detalles` (pozo, puestos, farolas,
+  carros, cementerio, campos, arboles muertos, rocas, el arco de la Cuesta, el Saliente, y lo de la historia dentro de
+  las casas) y `Trozo` (una pieza pequena escrita en el sitio). Los **sitios con nombre** (`plan.sitio("vela")`...: la
+  vela, el timon, las campanas, donde se despierta...) los apunta cada pieza al crearse; todo lo demas los usa.
+- **Disenar sin abrir el juego**: `tools/vista3d/vista.sh pueblo /tmp/pueblo --vistas "planta;so" --zoom 4` compila el
+  mod, arranca solo los registros de Minecraft, levanta el plano en un mundo de mentira (`Volcado.java`), lo dibuja
+  (`vista.py`: planta, cortes `x=N` / `z=N` / `y=N`, vistas `so/se/no/ne` o `"azimut,elevacion"`, `--caja` para un trozo)
+  y **comprueba que se recorre a pie** (`pueblo/gen/Andar`: andar, saltar un bloque, caer hasta cuatro, escaleras de
+  mano; `Recorrido`: de donde se despierta a todos los sitios, y a la cripta solo con la losa apartada). Fuera del juego
+  no hay bloques del mod (solo vainilla en los planos; `instanceof NubeBlock` si vale) ni etiquetas de bloque.
+- **Se despierta en el muelle** (`MundoNubes.aparicion()`, el sitio `inicio`), en **modo aventura** (al crear el mundo y
+  al entrar: quien esta en supervivencia pasa a aventura; creativo sigue). A menos de 17 bloques no hay puertas, cofres
+  ni nada de clic (la proteccion del punto de aparicion de un servidor dedicado). El barco deja en `MundoNubes.llegada`
+  (el camino de nubes, al pie de la Torre de Ascenso). Las fortalezas y el camino de nubes esquivan el origen.
+- **Lo que pasa** (`pueblo/Pueblo`, SavedData `darkcraft_pueblo`, **de todos**: la pieza que encuentra uno cuenta para
+  el grupo): cinco piezas (`Pieza`: la vela en el arcon del almacen, el timon tras la barra de la taberna, el mastil en
+  la cripta, el ancla en el Saliente con lo que queda de Tobias, el corazon en la linterna del faro —al llevarselo el
+  faro se apaga—). No son objetos del inventario: se ven como `item_display` de cara a quien mira (no se guardan) con
+  chispas doradas, y salen en un cartel ("La Vela Mayor / Pieza de La Garza Gris · 1 de 5"). **Las tres campanas**: en
+  el orden en que murieron los fundadores (Pescador 187, Tejedora 198, Farero 212: lo dicen sus lapidas y la nota de la
+  capilla) apartan la losa de la cripta. Con las cinco, en la cubierta: **reparar** (`Pueblo.levantar`: se vuelve a
+  levantar `Barco` entero encima —palo, vergas y velas, la rueda del timon (una piedra de afilar), el ancla, el corazon
+  en la bodega—) y desde el timon **zarpar** (de momento un salto a la llegada; el viaje es de la 3d) y volver desde el
+  noray de la llegada.
+- **Las "cosas"** (lo que se usa con la tecla del aviso, "Pulsa [E] para..."): el servidor manda la lista de las que hay
+  (`Net.Cosas`, al entrar en la isla y cuando cambia) y el cliente (`client/ui/ClientPueblo`) elige la que se tiene
+  delante a menos de 4 bloques y pide usarla (`Net.CosaUsar` → `Pueblo.usar`). El clic derecho en el arcon de la vela,
+  las campanas y la rueda del timon hace lo mismo (y no abre nada de Minecraft). `Net.V` = "16".
+- **Notas**: son los libros perdidos 12-16 (`Perdidos.TOTAL` = 16; solo en espanol e ingles, los demas idiomas salen en
+  ingles), en atriles: el aviso del capitan de puerto (capitania; dice donde esta cada pieza), el cuaderno de la
+  tabernera, las tres campanas (capilla), la carta de Tobias y la ultima hoja del diario del Capitan (faro). Miniatura
+  nueva en el codice (`tools/ui/miniaturas.py`, la 11).
+- Santuario en la plaza del pozo (se pone al llegar alguien). Sitios con nombre (`Pueblo.lugar`: Brumavela, el Muelle, la
+  Cuesta, la Plaza del Pozo, La Red Vacia, la Capilla, la Cripta, el Faro, el Saliente, los Campos Secos): tambien sin
+  el Espejo despierto. Logros `brumavela`, `pieza`, `campanas`, `piezas`, `barco`, `zarpar` (con su entrada del diario).
+  Botin de las casas: `chests/pueblo` y `pueblo_bueno`. En la fortaleza hay ya una mesa de trabajo junto al cofre del
+  acertijo (en aventura no se puede poner una).
+- Arte: `tools/pueblo/piezas.py` (las cinco piezas, 32 x 32). Sonidos (ElevenLabs): `pieza_barco` (tomas 3 y 2),
+  `cripta_abre` (1 y 3), `barco_reparado` (1 y 3).
+- Comandos `/darkcraft brumavela ir [<sitio>] | pieza <nombre>|todas | cripta | reparar | zarpar | estado | reiniciar`.
+  Prueba del servidor: genera la isla entera, la recorre a pie, mira los bloques de la historia, abre la cripta, repara
+  el barco y lo deja todo como estaba. Prueba del cliente: tramo `pueblo()` (capturas `cliente_b01..b18`).
+
 ### Lo siguiente: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 
 Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publicada):
-- **3a, el mundo de nubes**: hecha (arriba). Queda para la 3b: el modo aventura por defecto y la isla del pueblo en el
-  0,0 (y alli el punto de aparicion: ojo con la proteccion de 16 bloques de los servidores dedicados).
-- **3b, la isla del pueblo abandonado**: ruinas, notas, el barco roto en el muelle, las 5 piezas (vela, timon, mastil,
-  ancla y el corazon: cofre, tras enemigos, acertijo, nota/cadaver y mini-jefe).
+- **3a, el mundo de nubes**: hecha (arriba).
+- **3b, la isla del pueblo abandonado**: hecha (arriba). El timon y el corazon se cogen sin mas: en la 3c el timon queda
+  entre enemigos y el corazon lo guarda el Capitan.
 - **3c, enemigos**: aldeanos huecos (horcas, hoces, antorchas), marineros ahogados (sables, arpones, junto al muelle) y el
   mini-jefe **el Capitan** (barra de jefe; guarda el corazon del barco).
 - **3d, cinematicas**: al elegir clase, la de inicio con voz (quien eres, caes del cielo; despiertas en el borde de la

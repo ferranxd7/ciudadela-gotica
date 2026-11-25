@@ -107,6 +107,8 @@ SFX = {
     "codice_abre": (1.0, 0.3, -18), "codice_pagina": (0.6, 0.15, -19), "codice_cierra": (0.8, 0.3, -16),
     # el aviso de los logros (parte 2f-1; los de desafio llevan la fanfarria de Minecraft)
     "logro": (2.0, 0.6, -18),
+    # Brumavela (parte 3b): una pieza del barco, la losa de la cripta y el barco que despierta
+    "pieza_barco": (2.8, 0.8, -16), "cripta_abre": (4.6, 1.2, -15), "barco_reparado": (6.0, 1.5, -14),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5}
@@ -173,6 +175,9 @@ TOMAS_SFX = {
     "codice_pagina": (1, 3),         # la hoja que cae clara
     "codice_cierra": (4, 1),         # el golpe de la tapa con mas graves
     "logro": (2, 4),                 # las campanas mas graves y largas
+    "pieza_barco": (3, 2),           # las dos campanadas con mas cuerpo
+    "cripta_abre": (1, 3),           # las que arrastran la losa mas de tres segundos (la 4 casi no se oye)
+    "barco_reparado": (1, 3),        # la que suena los cinco segundos enteros, y la del zumbido mas largo
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

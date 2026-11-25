@@ -1306,7 +1306,7 @@ public class MenuScreen extends Screen {
             Panel.hueco(g, x2, y2, w2, h2);
             FilaH f = filas.get(sel);
             int id = f.id();
-            int mini = id >= 1 && id <= 6 ? id - 1 : id > 100 && id < 200 ? (id - 100 <= 5 ? CodiceScreen.MIN_PERDIDO_VALDRENN : CodiceScreen.MIN_PERDIDO_FORTALEZA)
+            int mini = id >= 1 && id <= 6 ? id - 1 : id > 100 && id < 200 ? CodiceScreen.miniaturaPerdido(id - 100)
                     : CodiceScreen.MIN_DIARIO;
             int y = y2 + 8;
             boolean conMini = w2 >= CodiceScreen.MINI_W + 2 * CodiceScreen.MINI_MARCO + 12 && h2 >= CodiceScreen.MINI_H + 90;

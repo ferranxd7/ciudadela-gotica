@@ -1,0 +1,6 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#darkcraft:islas",
+  "features": "darkcraft:brumavela",
+  "step": "top_layer_modification"
+}

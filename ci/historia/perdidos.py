@@ -8,7 +8,8 @@ darkcraft.narracion.6.N.
 
 # N -> donde esta: "valdrenn" o "fortaleza"
 DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdrenn",
-         6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza"}
+         6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza",
+         12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -256,6 +257,51 @@ LIBROS = {
   "ja": ("本日の命令", "衛兵隊長", [
    "昼の番:全員。\n夜の番:全員。\n交代:なし。\n\n城壁で眠った者は、二度と目覚めるな。"]),
  },
+ # ---- las notas de Brumavela, la isla del pueblo (parte 3b): de momento en espanol e ingles
+ 12: {
+  "es": ("Aviso del capitán de puerto", "Odo Varn, capitán de puerto", [
+   "A quien aún sepa leer:\n\nLa Garza Gris no volverá a zarpar. El Capitán ha mandado desarmarla, y lo que él manda en Brumavela todavía se hace.",
+   "La vela, al almacén del muelle. El timón se lo quedó la tabernera, en pago de lo que le debe la tripulación. El mástil nuevo lo guardan los frailes en la cripta: es madera bendecida.",
+   "Del ancla solo sé que bajaron con ella al pobre Tobías por el Saliente, y que la cadena sigue allí.\n\nY el corazón se lo ha subido él al faro. Dice que mientras arda, los nuestros sabrán volver."]),
+  "en": ("The Harbourmaster's Notice", "Odo Varn, harbourmaster", [
+   "To whoever can still read:\n\nThe Grey Heron will not sail again. The Captain has ordered her taken apart, and what he orders in Brumavela is still done.",
+   "The sail, to the warehouse on the quay. The tavern keeper kept the helm, for what the crew owes her. The friars guard the new mast in the crypt: it is blessed wood.",
+   "Of the anchor I only know they lowered poor Tobias with it down the Ledge, and the chain is still there.\n\nAnd the heart he carried up to the lighthouse himself. He says that while it burns, our own will find the way back."]),
+ },
+ 13: {
+  "es": ("Cuaderno de la tabernera", "Marga, de La Red Vacía", [
+   "Ya nadie paga. Se sientan, miran la jarra y no beben. Ayer le hablé a Hobb el joven y tardó un rato largo en volver la cabeza.\n\nNo había nadie detrás de sus ojos.",
+   "Dicen que es la bruma, que sube del mar de nubes desde que el Rey de Valdrenn hizo lo que hizo.\n\nHe colgado el timón de la Garza tras la barra. Si vienen a por él, que vengan. Yo ya no espero a nadie."]),
+  "en": ("The Tavern Keeper's Ledger", "Marga, of The Empty Net", [
+   "Nobody pays any more. They sit, stare at the mug and do not drink. Yesterday I spoke to young Hobb and it took him a long while to turn his head.\n\nThere was no one behind his eyes.",
+   "They say it is the mist, rising from the sea of clouds ever since the King of Valdrenn did what he did.\n\nI have hung the Heron's helm behind the bar. If they come for it, let them. I am not waiting for anyone."]),
+ },
+ 14: {
+  "es": ("Las tres campanas", "Fray Tomé, el último", [
+   "Tres fundadores tuvo Brumavela, y tres campanas llevan su nombre: la del Pescador mira al muelle, la de la Tejedora al norte y la del Farero a su faro.",
+   "Cuando calle el último de nosotros, que suenen en el orden en que ellos se fueron, y la cripta se abrirá para darnos sitio.\n\nSus lápidas no mienten: están al pie de la capilla."]),
+  "en": ("The Three Bells", "Brother Tome, the last", [
+   "Brumavela had three founders, and three bells bear their names: the Fisherman's looks to the quay, the Weaver's to the north and the Keeper's to his lighthouse.",
+   "When the last of us falls silent, let them ring in the order in which the founders left, and the crypt will open to make room for us.\n\nTheir gravestones do not lie: they stand at the foot of the chapel."]),
+ },
+ 15: {
+  "es": ("Carta de un marinero", "Tobías, gaviero de la Garza Gris", [
+   "Lena: el Capitán dice que la isla se nos va, que la bruma la arrastra, y quiere amarrarla a las nubes con el ancla de la Garza. Mañana bajo yo con ella por el Saliente.",
+   "No te rías. Tú no has visto latir el corazón del barco: una piedra de tormenta, azul, que canta bajito. Con eso vuela la Garza. Con eso volveremos a Valdrenn.\n\nGuárdame la cena."]),
+  "en": ("A Sailor's Letter", "Tobias, topman of the Grey Heron", [
+   "Lena: the Captain says the island is slipping away, that the mist is dragging it, and he means to moor it to the clouds with the Heron's anchor. Tomorrow I go down the Ledge with it.",
+   "Do not laugh. You have not seen the ship's heart beat: a storm stone, blue, that sings very softly. That is what makes the Heron fly. That is how we will get back to Valdrenn.\n\nKeep my supper for me."]),
+ },
+ 16: {
+  "es": ("Diario del Capitán: última hoja", "Edrik Maroll, capitán de la Garza Gris", [
+   "Desarmé la Garza con mis propias manos. Si nadie puede irse, nadie llevará esto a otra isla. Eso me dije.",
+   "Subí el corazón al faro. Mientras arda, los que cayeron al mar de nubes sabrán volver a casa.\n\nY volvieron. Dios nos valga: volvieron.",
+   "Suben del muelle cada noche, chorreando bruma, y no me conocen. Yo tampoco me conozco ya.\n\nQuien lea esto: no te lleves el corazón. O llévatelo, y llévanos contigo."]),
+  "en": ("The Captain's Log: Last Leaf", "Edrik Maroll, captain of the Grey Heron", [
+   "I took the Heron apart with my own hands. If no one can leave, no one will carry this to another island. So I told myself.",
+   "I carried the heart up to the lighthouse. While it burns, those who fell into the sea of clouds will find their way home.\n\nAnd they did. God help us: they did.",
+   "They come up from the quay every night, dripping mist, and they do not know me. I no longer know myself.\n\nWhoever reads this: do not take the heart. Or take it, and take us with you."]),
+ },
 }
 
 # el libro del acertijo del amuleto (con el boton que dibuja la receta)
@@ -336,7 +382,8 @@ def claves(lang):
     """Las claves de idioma de todo lo de este fichero para un idioma."""
     d = {}
     for n, libro in LIBROS.items():
-        titulo, autor, paginas = libro[lang]
+        # (los que aun no estan traducidos salen en ingles)
+        titulo, autor, paginas = libro.get(lang) or libro["en"]
         d[f"darkcraft.perdido.{n}.titulo"] = titulo
         d[f"darkcraft.perdido.{n}.autor"] = autor
         d[f"darkcraft.perdido.{n}.paginas"] = str(len(paginas))

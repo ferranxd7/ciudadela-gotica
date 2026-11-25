@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:brumavela",
+  "display": {
+    "icon": {
+      "item": "minecraft:bell"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.campanas.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.campanas.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 40
+  }
+}

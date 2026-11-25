@@ -44,7 +44,12 @@ public class CodiceScreen extends Screen {
     /** Estilos: la cronica de Aldous (capital roja), la Sombra (negra y roja, tinta roja), libros perdidos (azul), diario (verde). */
     public static final int CRONICA = 0, SOMBRA = 1, PERDIDO = 2, DIARIO = 3;
     /** Las miniaturas de miniaturas.png: 0-5 los capitulos, y estas. */
-    public static final int MIN_PERDIDO_VALDRENN = 6, MIN_PERDIDO_FORTALEZA = 7, MIN_DIARIO = 8, MIN_ACERTIJO = 9;
+    public static final int MIN_PERDIDO_VALDRENN = 6, MIN_PERDIDO_FORTALEZA = 7, MIN_DIARIO = 8, MIN_ACERTIJO = 9, MIN_PERDIDO_BRUMAVELA = 10;
+
+    /** La miniatura de un libro perdido: los de Valdrenn (1-5), los de la fortaleza (6-11) y las notas de Brumavela (12-16). */
+    public static int miniaturaPerdido(int n) {
+        return n <= 5 ? MIN_PERDIDO_VALDRENN : n <= 11 ? MIN_PERDIDO_FORTALEZA : MIN_PERDIDO_BRUMAVELA;
+    }
     static final int TINTA = 0xFF24170C, TINTA_SOMBRA = 0xFF3C0A0E, RUBRICA = 0xFF801212, AZUL_T = 0xFF1C2E78, PALIDA = 0xFF5E4A30;
     private static final int LINEA = 10, CAPITAL = 30, MIN_W = 128, MIN_H = 80, MARCO = 6, GIRO_MS = 380;
     private static final int PAD = 13, PAD_ARRIBA = 12, PAD_ABAJO = 20, BORDE = 11;
@@ -112,7 +117,7 @@ public class CodiceScreen extends Screen {
         l.cabecera = Component.translatable("darkcraft.codice.perdido");
         l.titulo = Component.translatable("darkcraft.perdido." + n + ".titulo");
         l.autor = Component.translatable("darkcraft.perdido." + n + ".autor");
-        l.miniatura = n <= 5 ? MIN_PERDIDO_VALDRENN : MIN_PERDIDO_FORTALEZA;
+        l.miniatura = miniaturaPerdido(n);
         l.estilo = PERDIDO;
         for (int p = 1; p <= 40; p++) {
             String k = "darkcraft.perdido." + n + ".p" + p;

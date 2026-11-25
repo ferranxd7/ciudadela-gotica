@@ -63,6 +63,7 @@ public final class Hud {
     private static int rastroTick = -1000, vidaBrillo = -1000, manaBrillo = -1000, estBrillo = -1000, jefeTick = -1000;
     private static int manaAnt, avisoQue;
     private static boolean estLlena = true, avisoEncendido;
+    private static String avisoCosa = "";
 
     /** Lo llama {@link ClientRol} en cada tick del cliente. */
     static void tick(Minecraft mc) {
@@ -100,6 +101,7 @@ public final class Hud {
         if (que != ClientRol.NADA) {
             avisoQue = que;
             avisoEncendido = ClientSantuario.aManoEncendido;
+            if (que == ClientRol.COSA) avisoCosa = ClientPueblo.clave();
         }
         avisoAlfa = Mth.clamp(avisoAlfa + (que != ClientRol.NADA ? 0.14f : -0.2f), 0f, 1f);
     }
@@ -377,6 +379,8 @@ public final class Hud {
                     Component.literal(numero(ClientRol.ecosEspada)));
         else if (avisoQue == ClientRol.PERSONAJE)
             aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable("darkcraft.aviso.hablar"), null);
+        else if (avisoQue == ClientRol.COSA)
+            aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable(avisoCosa), null);
         else
             aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla,
                     Component.translatable(avisoEncendido ? "darkcraft.aviso.descansar" : "darkcraft.aviso.encender"), null);

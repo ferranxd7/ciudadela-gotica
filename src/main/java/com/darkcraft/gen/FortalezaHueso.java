@@ -404,6 +404,8 @@ public final class FortalezaHueso extends Element {
         c.set(cx - 2, Y + 1, cf[2], Pal.SOUL_LANTERN);
         c.set(cx + 2, Y + 1, cf[2], Pal.SOUL_LANTERN);
         c.chest(cf[0], cf[1], cf[2], Direction.SOUTH, Decor.loot("acertijo"));
+        // la mesa donde se forja el amuleto (en modo aventura no se puede poner una)
+        c.set(cx + 1, Y + 1, cf[2], Pal.b(Blocks.CRAFTING_TABLE));
         for (int s = -1; s <= 1; s += 2)
             c.set(cx + s * 3, Y + 4, z0 + 2, Blocks.BLACK_WALL_BANNER.defaultBlockState().setValue(WallBannerBlock.FACING, Direction.SOUTH));
         // faroles colgando en cada piso, a media altura (desde el techo no llegaba la luz al suelo)

@@ -463,6 +463,9 @@ public final class Espejo {
         if (p.level().dimension() != Level.OVERWORLD) return "";
         String f = com.darkcraft.fortaleza.FortalezaEventos.lugar(p);
         if (f != null) return f;
+        // en Brumavela, la isla del pueblo (parte 3b)
+        String b = com.darkcraft.pueblo.Pueblo.lugar(p);
+        if (b != null) return b;
         // de pie en el camino de nubes (el mundo de nubes, parte 3a)
         if (p.onGround() && p.level().getBlockState(p.blockPosition().below()).is(com.darkcraft.DarkCraftMod.NUBE_FIRME.get()))
             return "darkcraft.mapa.lugar.camino_nubes";

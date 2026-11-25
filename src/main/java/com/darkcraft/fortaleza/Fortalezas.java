@@ -44,7 +44,8 @@ public final class Fortalezas {
         for (int k2 = 0; k2 < 16; k2++) {
             double a = a0 + k2 * Math.PI * 2 / 16;
             int fx = sx + (int) Math.round(Math.cos(a) * DIST), fz = sz + (int) Math.round(Math.sin(a) * DIST);
-            double d = Double.MAX_VALUE;
+            // (el origen cuenta como un reino mas: ahi esta la isla de Brumavela)
+            double d = Math.hypot(fx, fz);
             int rx0 = Math.floorDiv(fx, CastleSites.REGION), rz0 = Math.floorDiv(fz, CastleSites.REGION);
             for (int rx = rx0 - 2; rx <= rx0 + 2; rx++)
                 for (int rz = rz0 - 2; rz <= rz0 + 2; rz++) {

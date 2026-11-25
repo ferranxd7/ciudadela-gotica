@@ -38,6 +38,7 @@ public final class Comandos {
                         .then(com.darkcraft.espejo.Espejo.comando())
                         .then(com.darkcraft.caballeros.Caballeros.comando()))
                 .then(com.darkcraft.fortaleza.ComandosFortaleza.comando())
+                .then(com.darkcraft.pueblo.Pueblo.comando())
                 .then(com.darkcraft.rol.Rol.comando())
                 .then(com.darkcraft.rol.Rol.comandoRol()));
     }
@@ -78,6 +79,10 @@ public final class Comandos {
         for (Linea l : VALDRENN) src.sendSuccess(() -> linea(l), false);
         src.sendSuccess(() -> Component.translatable("darkcraft.ayuda.fortaleza").withStyle(ChatFormatting.GOLD), false);
         for (Linea l : FORTALEZA) src.sendSuccess(() -> linea(l), false);
+        src.sendSuccess(() -> Component.translatable("darkcraft.ayuda.brumavela").withStyle(ChatFormatting.GOLD), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela ir ", "/darkcraft brumavela ir [<sitio>]", "b_ir")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela pieza ", "/darkcraft brumavela pieza <nombre>|todas / cripta / reparar / zarpar", "b_piezas")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela estado", "/darkcraft brumavela estado / reiniciar", "b_estado")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ecos ", "/darkcraft ecos / ecos dar <n> / ecos quitar", "ecos")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft rol ", "/darkcraft rol clase [<nombre> | elegir | olvidar | ninguna] / santuario / frascos [<n>] / nivel [reiniciar] / atributo <nombre> <valor> / talisman <nombre> [poner <hueco>] / fruto <nombre> [<n>] / hechizo <nombre>|memorizar|olvidar|baston|sello / guia [olvidar] / herrero [olvidar] / mercader [olvidar] / mejora <0-9> / piedras / ceniza <nombre> [poner] | quitar / resistencias", "rol")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ayuda", "/darkcraft ayuda", "ayuda")), false);

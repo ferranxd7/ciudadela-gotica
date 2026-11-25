@@ -1644,5 +1644,38 @@
         "stream": true
       }
     ]
+  },
+  "sfx.pieza_barco": {
+    "subtitle": "subtitles.darkcraft.sfx.pieza_barco",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pieza_barco_1"
+      },
+      {
+        "name": "darkcraft:sfx/pieza_barco_2"
+      }
+    ]
+  },
+  "sfx.cripta_abre": {
+    "subtitle": "subtitles.darkcraft.sfx.cripta_abre",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/cripta_abre_1"
+      },
+      {
+        "name": "darkcraft:sfx/cripta_abre_2"
+      }
+    ]
+  },
+  "sfx.barco_reparado": {
+    "subtitle": "subtitles.darkcraft.sfx.barco_reparado",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barco_reparado_1"
+      },
+      {
+        "name": "darkcraft:sfx/barco_reparado_2"
+      }
+    ]
   }
 }

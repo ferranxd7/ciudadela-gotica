@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "15";
+    private static final String V = "16";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -130,6 +130,55 @@ public final class Net {
                 .encoder(AbrirClase::write).decoder(AbrirClase::read).consumerMainThread(AbrirClase::handle).add();
         CH.messageBuilder(ElegirClase.class, id++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(ElegirClase::write).decoder(ElegirClase::read).consumerMainThread(ElegirClase::handle).add();
+        CH.messageBuilder(Cosas.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Cosas::write).decoder(Cosas::read).consumerMainThread(Cosas::handle).add();
+        CH.messageBuilder(CosaUsar.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(CosaUsar::write).decoder(CosaUsar::read).consumerMainThread(CosaUsar::handle).add();
+    }
+
+    // ------------------------------------------------------------------ Brumavela (parte 3b)
+
+    /** Las cosas de Brumavela que se usan con la tecla del aviso (las que hay ahora mismo; vacia al irse de la isla). */
+    public record Cosas(java.util.List<com.darkcraft.pueblo.Pueblo.Cosa> lista) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(lista.size());
+            for (com.darkcraft.pueblo.Pueblo.Cosa c : lista) {
+                b.writeByte(c.id());
+                b.writeInt(c.x());
+                b.writeInt(c.y());
+                b.writeInt(c.z());
+                b.writeByte(c.accion());
+            }
+        }
+
+        static Cosas read(FriendlyByteBuf b) {
+            int n = Math.min(64, b.readVarInt());
+            java.util.List<com.darkcraft.pueblo.Pueblo.Cosa> l = new java.util.ArrayList<>(n);
+            for (int i = 0; i < n; i++) l.add(new com.darkcraft.pueblo.Pueblo.Cosa(b.readByte(), b.readInt(), b.readInt(), b.readInt(), b.readByte()));
+            return new Cosas(l);
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.ClientPueblo.recibir(lista));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El jugador pulsa la tecla del aviso junto a una cosa de Brumavela. */
+    public record CosaUsar(int id) {
+        void write(FriendlyByteBuf b) {
+            b.writeByte(id);
+        }
+
+        static CosaUsar read(FriendlyByteBuf b) {
+            return new CosaUsar(b.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.pueblo.Pueblo.usar(p, id);
+            ctx.get().setPacketHandled(true);
+        }
     }
 
     // ------------------------------------------------------------------ las clases (parte 2f-3)
@@ -746,6 +795,8 @@ public final class Net {
      */
     public record Cartel(int tipo, String clave, int n) {
         public static final int MUERTE = 0, JEFE = 1, ZONA = 2, ECOS = 3, GUARDIA = 4, SANTUARIO = 6, AVISO = 7;
+        /** Una pieza del barco encontrada (la clave es su nombre; n, cuantas van) y el barco reparado. */
+        public static final int PIEZA = 8, BARCO = 9;
 
         void write(FriendlyByteBuf b) {
             b.writeByte(tipo);

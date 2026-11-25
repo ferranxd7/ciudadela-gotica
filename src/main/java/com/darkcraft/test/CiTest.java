@@ -304,6 +304,84 @@ public final class CiTest {
                 log.println("Mundo de nubes: ERROR " + t);
                 DarkCraftMod.LOGGER.error("[CI] mundo de nubes", t);
             }
+            // ---- Brumavela, la isla del pueblo (parte 3b): se genera entera, se recorre a pie y se prueba lo que cambia
+            try {
+                var pueblo = com.darkcraft.pueblo.gen.PuebloPlan.get();
+                long tp = System.currentTimeMillis();
+                for (long k : pueblo.chunks()) lvl.getChunk((int) (k >> 32), (int) k);
+                int[] ini = pueblo.sitio("inicio");
+                BlockPos ap = lvl.getSharedSpawnPos();
+                log.println("Brumavela: " + pueblo.chunks().size() + " chunks en " + (System.currentTimeMillis() - tp) + " ms; se aparece en " + ap.toShortString()
+                        + " (el plano dice " + ini[0] + ", " + ini[1] + ", " + ini[2] + "), bajo los pies " + lvl.getBlockState(ap.below()).getBlock().getDescriptionId()
+                        + ", bioma " + lvl.getBiome(ap).unwrapKey().map(k -> k.location().toString()).orElse("?") + ", modo por defecto " + server.getDefaultGameType()
+                        + ", nube junto al espigon " + com.darkcraft.world.NubesGenerador.cima(-8, 119) + ".." + com.darkcraft.world.NubesGenerador.cima(6, 140));
+                BlockPos.MutableBlockPos mb = new BlockPos.MutableBlockPos();
+                com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> lvl.getBlockState(mb.set(x, y, z));
+                for (boolean abierta : new boolean[]{false, true})
+                    log.println("Brumavela a pie (cripta " + (abierta ? "abierta" : "cerrada") + "): "
+                            + com.darkcraft.pueblo.gen.Recorrido.resumen(com.darkcraft.pueblo.gen.Recorrido.comprobar(mundo, abierta)));
+                // a menos de 17 bloques de donde se aparece no puede haber nada que se use con clic (la proteccion de un servidor dedicado)
+                StringBuilder cerca = new StringBuilder();
+                int usables = 0;
+                for (int x = ap.getX() - 16; x <= ap.getX() + 16; x++)
+                    for (int z = ap.getZ() - 16; z <= ap.getZ() + 16; z++)
+                        for (int y = ap.getY() - 8; y <= ap.getY() + 30; y++) {
+                            var b = lvl.getBlockState(mb.set(x, y, z)).getBlock();
+                            if (b instanceof net.minecraft.world.level.block.DoorBlock || b instanceof net.minecraft.world.level.block.TrapDoorBlock
+                                    || b instanceof net.minecraft.world.level.block.ChestBlock || b instanceof net.minecraft.world.level.block.LecternBlock
+                                    || b instanceof net.minecraft.world.level.block.BellBlock || b instanceof net.minecraft.world.level.block.FenceGateBlock) {
+                                usables++;
+                                if (usables <= 6) cerca.append(' ').append(b.getDescriptionId()).append('@').append(x).append(',').append(y).append(',').append(z);
+                            }
+                        }
+                log.println("Brumavela: cosas de clic a menos de 17 bloques de donde se aparece: " + usables + " (tiene que ser 0)" + cerca);
+                // los bloques de la historia
+                StringBuilder bl = new StringBuilder();
+                for (String sitio : new String[]{"vela", "campana_pescador", "campana_tejedora", "campana_farero", "corazon", "nota_capitania", "nota_taberna", "nota_campanas",
+                        "nota_marinero", "nota_capitan", "losa"}) {
+                    int[] q = pueblo.sitio(sitio);
+                    BlockPos b = new BlockPos(q[0], q[1], q[2]);
+                    bl.append(' ').append(sitio).append('=').append(lvl.getBlockState(b).getBlock().getDescriptionId().replace("block.minecraft.", ""));
+                    if (lvl.getBlockEntity(b) instanceof net.minecraft.world.level.block.entity.LecternBlockEntity le)
+                        bl.append("(libro ").append(com.darkcraft.fortaleza.Perdidos.de(le.getBook())).append(')');
+                }
+                log.println("Brumavela, bloques:" + bl);
+                // la cripta se abre, el barco se repara y todo vuelve a su sitio
+                var d = com.darkcraft.pueblo.Pueblo.Datos.get(server);
+                int[] losa = pueblo.sitio("losa");
+                com.darkcraft.pueblo.Pueblo.abrirCripta(lvl, null);
+                String abierta = lvl.getBlockState(new BlockPos(losa[0], losa[1], losa[2])).getBlock().getDescriptionId();
+                com.darkcraft.pueblo.Pueblo.levantar(lvl, true);
+                String palo = lvl.getBlockState(new BlockPos(com.darkcraft.pueblo.gen.Barco.BX, com.darkcraft.pueblo.gen.Barco.CUBIERTA + 12, com.darkcraft.pueblo.gen.Barco.PALO))
+                        .getBlock().getDescriptionId();
+                String rueda = lvl.getBlockState(new BlockPos(com.darkcraft.pueblo.gen.Barco.BX, com.darkcraft.pueblo.gen.Barco.ALCAZAR_Y + 2, com.darkcraft.pueblo.gen.Barco.TIMON_Z))
+                        .getBlock().getDescriptionId();
+                String baranda = lvl.getBlockState(new BlockPos(com.darkcraft.pueblo.gen.Barco.BX - 1, com.darkcraft.pueblo.gen.Barco.ALCAZAR_Y + 1, com.darkcraft.pueblo.gen.Barco.POPA)).toString();
+                d.reparado = true;
+                com.darkcraft.pueblo.Pueblo.reiniciar(lvl);
+                log.println("Brumavela: la losa tras las campanas " + abierta + "; el barco reparado: palo " + palo + ", rueda " + rueda + ", barandilla " + baranda
+                        + "; tras reiniciar: losa " + lvl.getBlockState(new BlockPos(losa[0], losa[1], losa[2])).getBlock().getDescriptionId() + ", palo "
+                        + lvl.getBlockState(new BlockPos(com.darkcraft.pueblo.gen.Barco.BX, com.darkcraft.pueblo.gen.Barco.CUBIERTA + 12, com.darkcraft.pueblo.gen.Barco.PALO))
+                        .getBlock().getDescriptionId() + " | " + com.darkcraft.pueblo.Pueblo.estado(d) + " | cosas " + com.darkcraft.pueblo.Pueblo.cosas(lvl).size());
+                // el botin de las casas
+                for (String name : new String[]{"pueblo", "pueblo_bueno"}) {
+                    var table = server.getLootData().getLootTable(new net.minecraft.resources.ResourceLocation(DarkCraftMod.MODID, "chests/" + name));
+                    var params = new net.minecraft.world.level.storage.loot.LootParams.Builder(lvl)
+                            .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN, net.minecraft.world.phys.Vec3.atCenterOf(ap))
+                            .create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CHEST);
+                    int cosas = 0;
+                    java.util.Set<String> tipos = new java.util.TreeSet<>();
+                    for (int i = 0; i < 100; i++)
+                        for (var st : table.getRandomItems(params)) {
+                            cosas++;
+                            tipos.add(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(st.getItem()).getPath());
+                        }
+                    log.println("Botin " + name + ": " + cosas + " cosas en 100 cofres, " + tipos.size() + " distintas");
+                }
+            } catch (Throwable t) {
+                log.println("Brumavela: ERROR " + t);
+                DarkCraftMod.LOGGER.error("[CI] Brumavela", t);
+            }
             log.println("Calibracion de muebles: " + (com.darkcraft.gen.Calib.done ? "hecha" : "NO"));
             log.println("Tiempo total: " + (System.currentTimeMillis() - t0) / 1000 + " s");
             log.println("OK");

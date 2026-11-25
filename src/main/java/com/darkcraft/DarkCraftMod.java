@@ -44,6 +44,7 @@ public class DarkCraftMod {
 
     public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, MODID);
     public static final RegistryObject<Feature<NoneFeatureConfiguration>> CASTLE = FEATURES.register("valdrenn", CastleFeature::new);
+    public static final RegistryObject<Feature<NoneFeatureConfiguration>> BRUMAVELA = FEATURES.register("brumavela", com.darkcraft.world.PuebloFeature::new);
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
     public static final RegistryObject<Item> MAPA = ITEMS.register("mapa_valdrenn",
@@ -177,6 +178,9 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_CODICE_CIERRA = sound("sfx.codice_cierra");
     // el aviso de los logros (parte 2f-1)
     public static final RegistryObject<SoundEvent> SFX_LOGRO = sound("sfx.logro");
+    public static final RegistryObject<SoundEvent> SFX_PIEZA = sound("sfx.pieza_barco");
+    public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
+    public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")
@@ -243,6 +247,13 @@ public class DarkCraftMod {
             () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
     public static final RegistryObject<Item> FRASCO_MANA = ITEMS.register("frasco_mana",
             () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+
+    /** Las piezas de La Garza Gris (parte 3b): no se llevan en el inventario; se dibujan en el mundo y en los carteles. */
+    public static final RegistryObject<Item> PIEZA_VELA = ITEMS.register("pieza_vela", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final RegistryObject<Item> PIEZA_TIMON = ITEMS.register("pieza_timon", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final RegistryObject<Item> PIEZA_MASTIL = ITEMS.register("pieza_mastil", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final RegistryObject<Item> PIEZA_ANCLA = ITEMS.register("pieza_ancla", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final RegistryObject<Item> PIEZA_CORAZON = ITEMS.register("pieza_corazon", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
 
     public static final RegistryObject<Item> AMULETO_HUESO = ITEMS.register("amuleto_hueso",
             () -> new com.darkcraft.fortaleza.AmuletoHueso(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
