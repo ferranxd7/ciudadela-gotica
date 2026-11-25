@@ -36,6 +36,8 @@ public final class FortalezaDatos extends SavedData {
         /** Se rehizo (de una de antes): a quien ya la abrio se le devuelve la llave de hueso, una vez. */
         public boolean rehecha;
         public final Set<String> llaves = new HashSet<>();
+        /** La escalera de hueso de la fortaleza de antes que queda por quitar: {x, z del centro, altura de su base}, o null. */
+        public int[] puenteViejo;
     }
 
     final Map<String, Estado> fortalezas = new HashMap<>();
@@ -71,6 +73,7 @@ public final class FortalezaDatos extends SavedData {
             for (long l : c.getLongArray("limpiar")) e.porLimpiar.add(l);
             e.rehecha = c.getBoolean("rehecha");
             for (Tag x : c.getList("llaves", Tag.TAG_STRING)) e.llaves.add(x.getAsString());
+            if (c.contains("puente_viejo")) e.puenteViejo = c.getIntArray("puente_viejo");
         }
         for (Tag x : t.getList("libros", Tag.TAG_STRING)) d.libros.add(x.getAsString());
         return d;
@@ -95,6 +98,7 @@ public final class FortalezaDatos extends SavedData {
             ListTag ll = new ListTag();
             for (String u : e.llaves) ll.add(StringTag.valueOf(u));
             c.put("llaves", ll);
+            if (e.puenteViejo != null) c.putIntArray("puente_viejo", e.puenteViejo);
             fs.put(en.getKey(), c);
         }
         t.put("fortalezas", fs);

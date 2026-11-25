@@ -29,7 +29,11 @@ public final class FortalezaPlan {
     private final Map<Long, List<Element>> indice = new HashMap<>();
     private final Set<String> avisados = new HashSet<>();
 
+    /** La semilla del plano (para calcular cosas de la fortaleza de antes). */
+    private final long semilla;
+
     public FortalezaPlan(long seed, int cx, int cz, int Y) {
+        this.semilla = seed;
         this.cx = cx;
         this.cz = cz;
         this.Y = Y;
@@ -49,8 +53,29 @@ public final class FortalezaPlan {
         elementos.sort(java.util.Comparator.comparingInt(e -> e.layer));
         for (Element e : elementos)
             for (int x = e.x0 >> 4; x <= e.x1 >> 4; x++)
-                for (int z = e.z0 >> 4; z <= e.z1 >> 4; z++)
+                for (int z = e.z0 >> 4; z <= e.z1 >> 4; z++) {
                     indice.computeIfAbsent(clave(x, z), k -> new ArrayList<>()).add(e);
+                    if (!(e instanceof Nubes)) nucleo.add(clave(x, z));
+                }
+    }
+
+    /**
+     * El centro de la escalera de hueso de la fortaleza de antes (la de las murallas cuadradas, parte 3, con una isla mas
+     * pequena): la misma isla con el radio de entonces, y la escalera delante de su borde sur, como en Puente.centro.
+     */
+    public int[] centroPuenteAntiguo() {
+        Island vieja = new Island(new Rng(semilla).fork(), cx, cz - 3, Y - 1, 55, 0.05, 6, 3, 46);
+        int b = cz;
+        while (b < cz + 90 && vieja.topAt(cx, b + 1) != Integer.MIN_VALUE && vieja.topAt(cx - 2, b + 1) != Integer.MIN_VALUE
+                && vieja.topAt(cx + 2, b + 1) != Integer.MIN_VALUE) b++;
+        return new int[]{cx - 5, b + 13};
+    }
+
+    /** Los chunks de la isla y la fortaleza (sin el mar de nubes de alrededor): con ellos hechos, la fortaleza esta en pie. */
+    private final Set<Long> nucleo = new java.util.HashSet<>();
+
+    public Set<Long> nucleo() {
+        return nucleo;
     }
 
     public static long clave(int chunkX, int chunkZ) {

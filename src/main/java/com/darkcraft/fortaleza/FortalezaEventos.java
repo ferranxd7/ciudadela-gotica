@@ -187,9 +187,14 @@ public final class FortalezaEventos {
         FortalezaDatos d = FortalezaDatos.get(lvl.getServer());
         FortalezaDatos.Estado est = d.de(s);
         // el santuario de la de antes estaba en otro sitio: se vuelve a poner en el rellano de la nueva
-        if (rehacer(s, est, d)) com.darkcraft.santuario.Santuarios.olvidar(lvl.getServer(), "f" + s.clave());
-        if (est.completa) return;
         FortalezaPlan plan = Fortalezas.plan(lvl.getSeed(), s);
+        if (rehacer(s, est, d, plan)) com.darkcraft.santuario.Santuarios.olvidar(lvl.getServer(), "f" + s.clave());
+        if (est.puenteViejo != null && quitarPuenteViejo(lvl, est.puenteViejo, plan.Y)) {
+            est.puenteViejo = null;
+            d.setDirty();
+        }
+        // (en pie con la isla y la fortaleza; las nubes de alrededor se siguen haciendo segun se cargan sus chunks)
+        if (est.completa && est.hechos.size() >= plan.chunks().size() && est.porLimpiar.isEmpty()) return;
         java.util.Set<Long> todos = new java.util.LinkedHashSet<>(plan.chunks());
         todos.addAll(est.porLimpiar);
         for (long k : todos) {
@@ -234,9 +239,9 @@ public final class FortalezaEventos {
         aplicarEstado(lvl, plan, est, cx, cz);
         pintarBioma(lvl, plan, cx, cz);
         est.hechos.add(k);
-        if (est.hechos.containsAll(plan.chunks())) {
+        if (!est.completa && est.hechos.containsAll(plan.nucleo())) {
             est.completa = true;
-            DarkCraftMod.LOGGER.info("Fortaleza de Hueso en {} levantada ({} chunks)", clave, est.hechos.size());
+            DarkCraftMod.LOGGER.info("Fortaleza de Hueso en {} levantada ({} chunks de {})", clave, est.hechos.size(), plan.chunks().size());
         }
         d.setDirty();
         long ms = (System.nanoTime() - t0) / 1_000_000;
@@ -250,8 +255,13 @@ public final class FortalezaEventos {
      * alguien: se vacian sus chunks y se levanta la nueva, con la puerta cerrada y sin portal (los logros se quedan). A
      * quien ya habia vencido a Ser Gavran se le devuelve la llave de hueso ({@link #devolverLlave}).
      */
-    private static boolean rehacer(Fortalezas.Sitio s, FortalezaDatos.Estado est, FortalezaDatos d) {
+    private static boolean rehacer(Fortalezas.Sitio s, FortalezaDatos.Estado est, FortalezaDatos d, FortalezaPlan plan) {
         if (est.version >= FortalezaDatos.VERSION) return false;
+        // la escalera de hueso de la de antes, si se levanto: lo de debajo de la isla se quita aparte (quitarPuenteViejo)
+        if (est.puente && est.baseEscalera != Integer.MIN_VALUE) {
+            int[] c = plan.centroPuenteAntiguo();
+            est.puenteViejo = new int[]{c[0], c[1], est.baseEscalera};
+        }
         est.porLimpiar.addAll(est.hechos);
         est.hechos.clear();
         est.completa = false;
@@ -307,6 +317,37 @@ public final class FortalezaEventos {
         est.llaves.add(p.getStringUUID());
         d.setDirty();
         p.sendSystemMessage(net.minecraft.network.chat.Component.translatable("darkcraft.fortaleza.llave_devuelta"));
+    }
+
+    /** Lo que es de la escalera de hueso (hueso, piedra negra, losas, nubes de lana, farolillos y calaveras). */
+    private static boolean dePuente(BlockState b) {
+        return b.is(Blocks.BONE_BLOCK) || b.is(Blocks.POLISHED_BLACKSTONE_BRICKS) || b.is(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS)
+                || b.is(Blocks.CHISELED_POLISHED_BLACKSTONE) || b.is(Blocks.DEEPSLATE_TILES) || b.is(Blocks.BLACKSTONE)
+                || b.is(Blocks.WHITE_WOOL) || b.is(Blocks.LIGHT_GRAY_WOOL) || b.is(Blocks.WHITE_STAINED_GLASS)
+                || b.is(Blocks.SOUL_LANTERN) || b.is(Blocks.SKELETON_SKULL);
+    }
+
+    /**
+     * Quita lo que quedaba de la escalera de hueso de la fortaleza de antes: lo que hay por debajo de lo que se vacia con
+     * los chunks (de su base, con las patas, hasta Y - 56), solo sus bloques. Devuelve false si aun no estan cargados.
+     */
+    private static boolean quitarPuenteViejo(ServerLevel lvl, int[] pv, int Y) {
+        int r = 12;
+        for (int x = (pv[0] - r) >> 4; x <= (pv[0] + r) >> 4; x++)
+            for (int z = (pv[1] - r) >> 4; z <= (pv[1] + r) >> 4; z++)
+                if (!lvl.getChunkSource().hasChunk(x, z)) return false;
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        var aire = Blocks.AIR.defaultBlockState();
+        int n = 0;
+        for (int x = pv[0] - r; x <= pv[0] + r; x++)
+            for (int z = pv[1] - r; z <= pv[1] + r; z++)
+                for (int y = Math.max(lvl.getMinBuildHeight(), pv[2] - 15); y <= Y - 56; y++)
+                    if (dePuente(lvl.getBlockState(m.set(x, y, z)))) {
+                        lvl.setBlock(m, aire, 2 | 16);
+                        n++;
+                    }
+        DarkCraftMod.LOGGER.info("Fortaleza de Hueso: quitada la escalera de la de antes en {},{} ({} bloques)", pv[0], pv[1], n);
+        return true;
     }
 
     /** Vacia lo que quedaba de la fortaleza de antes en un chunk (de lo alto de las nubes para arriba). */

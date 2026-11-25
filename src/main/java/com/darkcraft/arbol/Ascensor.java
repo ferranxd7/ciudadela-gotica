@@ -182,7 +182,7 @@ public class Ascensor extends Entity {
         if (!encima.isEmpty()) {
             int c = this.entityData.get(CARGA) + 1;
             this.entityData.set(CARGA, c);
-            for (ServerPlayer p : encima) p.displayClientMessage(Component.translatable(abajo ? "darkcraft.ascensor.sube" : "darkcraft.ascensor.baja", barra(c)), true);
+            for (ServerPlayer p : encima) p.displayClientMessage(Component.translatable(texto(abajo ? "sube" : "baja"), barra(c)), true);
             if (c % 10 == 1) sl.playSound(null, getX(), getY(), getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 1.5f, 0.6f + c / (float) ESPERA);
             if (c >= ESPERA) {
                 for (ServerPlayer p : encima) if (!p.isPassenger()) p.startRiding(this, true);
@@ -199,7 +199,7 @@ public class Ascensor extends Entity {
             return;
         }
         llamada++;
-        for (ServerPlayer p : lejos) p.displayClientMessage(Component.translatable("darkcraft.ascensor.llama", barra(llamada)), true);
+        for (ServerPlayer p : lejos) p.displayClientMessage(Component.translatable(texto("llama"), barra(llamada)), true);
         if (llamada % 10 == 1) {
             sl.playSound(null, getX(), alli, getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 1.5f, 0.6f + llamada / (float) ESPERA);
         }
@@ -207,6 +207,11 @@ public class Ascensor extends Entity {
             llamada = 0;
             arrancar(sl, abajo ? SUBE : BAJA);
         }
+    }
+
+    /** Los avisos: del disco de runas o de la placa de hueso. */
+    private String texto(String que) {
+        return (deHueso() ? "darkcraft.ascensor.hueso." : "darkcraft.ascensor.") + que;
     }
 
     private static String barra(int c) {

@@ -92,7 +92,7 @@ empezarla). Lo esencial, que cambia reglas de arriba:
 - **Escalera de la torre del homenaje**: una columna de la planta baja caia en el anillo de la escalera de caracol y
   tapaba un escalon; ademas la valla del hueco encerraba la salida en los pisos 1 y 2. `FortalezaHueso.enEscalera`,
   `despejarEscalera`, `vallasEscalera`; en fortalezas ya levantadas, `FortalezaEventos.parchear` (una vez,
-  `Estado.parche`). La prueba del cliente lo comprueba (`comprobarEscalera`).
+  `Estado.parche`). (Desde la parte 5a esa fortaleza ya no existe: se rehace como `gen/TorreCupula`.)
 
 ### Plan grande, parte 2a: HUD nuevo, Ecos de la Sombra, estamina y muerte
 
@@ -984,7 +984,67 @@ Respuesta 15 del plan: un mini-jefe guardian antes de CADA jefe (el salon del Re
   `cliente_ve01..24` Vareth y los dos en el bestiario, `vd30` y `ve30`). Al acabar el tramo los puestos del reino quedan
   por caidos (las pruebas de despues, el Rey y Ser Gavran, son de antes).
 
-### Lo siguiente: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
+### Plan grande, parte 5a: la torre bajo la cupula (la Fortaleza de Hueso nueva)
+
+Respuestas 3, 4, 27-35, 38-43, 45 y 50 del plan. La fortaleza de murallas cuadradas (`FortalezaHueso`, borrada) se cambia
+por **`gen/TorreCupula`** (en `gen/FortalezaPlan`, que sigue siendo el plano: isla de radio 74, camino, ruinas, nubes):
+- **Medidas** (constantes publicas de `TorreCupula`): murallas en ruinas en anillo de radio `RM` 44 (seis tramos caidos
+  con escombros, ocho torrecillas rotas); **cupula** semiesfera de radio `RD` 40 con el centro en el suelo del patio
+  (nervios de hueso y basalto pulido, paneles ahumados, negros y rojos —una banda entera roja—, rotos uno de cada cinco,
+  mas por el oeste); **torre** octogonal de apotema `AT` 10 y muros de 2 que atraviesa la cupula: sotano (mazmorras) en
+  `Y + SOTANO` (-10), plantas cada `PISO` (10) desde Y (planta baja: sala de guardias y armeria con el cofre del acertijo;
+  capilla; aposentos x2; ruina; observatorio) y la **terraza** en `Y + TERRAZA` (60), cuadrada de 27 (`TL` 13), con el
+  portal (hueco 9 x 13, `AX`/`AALTO`, en `cz + AZ` = -11; arco con `arcoPortal`) y el altar delante (`cz - 6`).
+- **Puerta** (`PX`, `PALTO` 13, `PZ` 45 = la reja, `PFUERA` 48 = la cara de fuera): cuerpo de puerta de 30 de alto con
+  arco gotico apuntado en las dos caras (`arco(h)`), paso rectangular de 7 x 13 por dentro, la reja en su ranura (sube
+  `PALTO` bloques), la sala del torno encima (escalera de mano al este) y el rellano de fuera (z `PFUERA+1..+7`). A los
+  lados, **dos caballeros encapuchados** de 18 de alto con espada clavada (`ojos()`: se les encienden al abrir).
+- **Jardin muerto** bajo la cupula: caminos, parterres, estanques con nenufares bajo los huecos (`bajoHueco`), cristales
+  caidos, 9 arboles secos (nunca a menos de 8 del camino del sur: por alli pasan las camaras de las cinematicas), 14
+  rosales, 16 bancos y la fuente rota en `cz + 28`. Lianas que cuelgan de la cupula (no mas abajo de Y + 3), enredaderas
+  por la torre, musgo y hongos dentro.
+- **Escalera**: de caracol en la torrecilla del este (centro `cx + TX`, radio `RTU`): 10 escalones por vuelta, uno por
+  bloque de altura (`pisaEscalon`), el del oeste es el descansillo de cada planta con su puerta hacia la torre (del sotano
+  a la terraza); sigue por encima de la terraza hasta su tejado conico (la terraza no la pisa) y arriba tiene suelo donde
+  ya no hay escalones.
+- **Ascensor** (respuestas 43/45/50): el mismo `arbol/Ascensor` de tipo `FORTALEZA` (`setTipo`, sincronizado y guardado):
+  **placa cuadrada de hueso** con runas rojas y una calavera (`textures/entity/ascensor_hueso[_brillo].png`, de
+  `tools/fortaleza/ascensor_hueso.py <carpeta>`), particulas rojas y ceniza blanca, avisos
+  `darkcraft.ascensor.hueso.*`. Sube por el tubo de barrotes y cristal rojo del centro de la torre (5 x 5) de Y a la
+  terraza; abajo se entra por el sur, arriba el hueco esta tapado con barrera (encima se la llama). Lo pone
+  `FortalezaEventos.asegurarAscensor` (uno, con la fortaleza en pie y el chunk procesando entidades).
+- **Mundos de antes** (respuestas 3 y 4): `FortalezaDatos.VERSION` = 2; una fortaleza guardada sin version (= 1) se
+  rehace al acercarse alguien (`rehacer`): sus chunks pasan a `porLimpiar` (se vacian de Y - 55 a Y + 110 antes de
+  construir), puerta cerrada, sin puente ni portal (los logros se quedan), el santuario se vuelve a poner en el rellano
+  nuevo (`Santuarios.olvidar`), lo que quedara de su escalera de hueso por debajo se quita (`puenteViejo`,
+  `FortalezaPlan.centroPuenteAntiguo` rehace la isla de antes, `quitarPuenteViejo`: solo sus bloques) y a quien ya
+  vencio a Ser Gavran y no lleva la llave se le da otra (`devolverLlave`, una vez por jugador, `llave_devuelta`).
+- **En pie** (`completa`) con los chunks de la isla y la fortaleza (`FortalezaPlan.nucleo`): el mar de nubes llega a 136
+  bloques y con distancia de vision 7 no se carga entero; sus chunks se siguen haciendo segun se cargan.
+- Cinematicas nuevas: `CineShots.puertaHueso` (desde el camino entre las estatuas, la reja de cerca, cruza al jardin y
+  sube mirando la torre) y `chapter6` (de fuera, el jardin, la torre, la terraza y el portal; `primero` elige la toma
+  con la camara libre).
+- El Espejo: "Jardin de la Cupula" (`fortaleza_cupula`), la torre sigue siendo "Torre del Homenaje".
+- Sin abrir el juego: `tools/vista3d/Volcado.java torre` (la isla y la torre en 0,0, Y 320).
+- Pruebas (cliente, tramo `fortaleza()`): al llegar la convierte en una "de antes" con escalera (columna de hueso) y
+  comprueba que se rehace (linea `fortaleza de antes, rehecha: ...`); `comprobarEscalera` sube la escalera de la
+  torrecilla del sotano a la terraza (`... 0 tapados`) y cuenta lo que se anda en cada planta; al final viaja en el
+  ascensor de hueso (`cliente_f45..47`).
+
+### Lo siguiente: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
+
+Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
+- **5a, la torre bajo la cupula**: hecha (arriba).
+- **5b, la montana y el puente largo** (36, 37): la montana junto a la fortaleza (roca oscura, sendero en zigzag, restos
+  de torres, mirador con el arco de la llave en la cima) y el puente largo de hueso y nubes que tiende la llave desde
+  alli; fuera la escalera de caracol y la corriente de nubes (`fortaleza/Puente`).
+- **5c, dentro de la fortaleza** (44, 46, 47): trampas (suelo que cede, pinchos de hueso, flechas), el libro perdido extra
+  y la sala secreta tras un muro falso, caballeros zombi y espectros nuevos que aparecen y desaparecen.
+- **5d, el camino de nubes** de Valdrenn a la torre (81): largo, a pie, con islotes de parada (ruinas, enemigos, cofres).
+- **5e, el portal** (48-68): marco nuevo (piedra de sombra con runas que laten, hueso, hierro negro y cadenas), remolino,
+  estatuas gigantes y pilares, el pedestal del amuleto, la voz de la Sombra, la cinematica del rayo rojo y el cielo rojo.
+
+### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 
 Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publicada):
 - **3a, el mundo de nubes**: hecha (arriba).
@@ -1186,6 +1246,7 @@ fortaleza; cada parte publicada. Juega solo y con amigos.
   (`FortalezaEventos.encolar/construirUno`, chunks hechos en el SavedData `darkcraft_fortalezas`), asi funciona igual en
   mundos de antes. Al construir cada chunk pinta el bioma `darkcraft:fortaleza` (lluvia, cielo gris; como /fillbiome) y
   aplica el estado guardado (puerta abierta, portal).
+- (Desde la **parte 5a** del plan grande la fortaleza es otra: `gen/TorreCupula`, ver alli; lo de aqui es la de antes.)
 - Plano (`gen/FortalezaPlan`): isla de ceniza y hueso (`Island`), `gen/FortalezaHueso` (murallas de 60x60 con cuatro
   torres, puerta con calavera gigante y reja de hueso `darkcraft:reja_hueso` irrompible, patio con costillas, torre del
   homenaje de 4 pisos con escalera de caracol, el cofre del acertijo (`chests/acertijo`) en la planta baja, atriles con

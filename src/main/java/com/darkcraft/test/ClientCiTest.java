@@ -6098,6 +6098,8 @@ public final class ClientCiTest {
 
     private static com.darkcraft.fortaleza.Fortalezas.Sitio fsit;
     private static com.darkcraft.gen.FortalezaPlan fplan;
+    /** El centro de la escalera de la fortaleza "de antes" de la prueba (o null). */
+    private static int[] fvieja;
 
     private static boolean pasa(ServerLevel lvl, BlockPos p) {
         return lvl.getBlockState(p).getCollisionShape(lvl, p).isEmpty();
@@ -6218,7 +6220,26 @@ public final class ClientCiTest {
                 fsit = com.darkcraft.fortaleza.Fortalezas.delReino(lvl.getSeed(), castle[0], castle[1]);
                 fplan = com.darkcraft.fortaleza.Fortalezas.plan(lvl.getSeed(), fsit);
                 log("fortaleza en " + fsit.x() + "," + fsit.z() + " (reino " + fsit.reinoX() + "," + fsit.reinoZ() + ") Y " + fplan.Y
-                        + " borde de la isla z " + fplan.bordeZ + ", " + fplan.chunks().size() + " chunks en el plano");
+                        + " borde de la isla z " + fplan.bordeZ + ", " + fplan.chunks().size() + " chunks en el plano (" + fplan.nucleo().size()
+                        + " de la isla y la fortaleza)");
+                // como si fuera una fortaleza de antes (parte 3) con su escalera levantada: al llegar se rehace (se vacia lo de
+                // antes, se quita lo que quedaba de su escalera) y a quien vencio a Ser Gavran se le devuelve la llave
+                var fd = com.darkcraft.fortaleza.FortalezaDatos.get(sp.server);
+                var est = fd.de(fsit);
+                if (est.hechos.isEmpty()) {
+                    est.version = 1;
+                    est.hechos.add(com.darkcraft.gen.FortalezaPlan.clave(fplan.cx >> 4, fplan.cz >> 4));
+                    est.completa = est.puente = true;
+                    est.baseEscalera = fplan.Y - 70;
+                    fvieja = fplan.centroPuenteAntiguo();
+                    for (int y = est.baseEscalera; y <= fplan.Y - 57; y++)
+                        lvl.setBlock(new BlockPos(fvieja[0] + 7, y, fvieja[1] + 7), net.minecraft.world.level.block.Blocks.BONE_BLOCK.defaultBlockState(), 2);
+                    lvl.setBlock(new BlockPos(fplan.cx, fplan.Y + 80, fplan.cz), net.minecraft.world.level.block.Blocks.GOLD_BLOCK.defaultBlockState(), 2);
+                    fd.setDirty();
+                    sp.getInventory().clearOrCountMatchingItems(st -> st.is(DarkCraftMod.LLAVE_HUESO.get()), -1, sp.inventoryMenu.getCraftSlots());
+                    log("  fortaleza de antes: escalera vieja en " + fvieja[0] + "," + fvieja[1] + " (columna de hueso de " + est.baseEscalera + " a "
+                            + (fplan.Y - 57) + "), oro en lo alto; sin llave (logro gavran=" + com.darkcraft.story.Logros.tiene(sp, "gavran") + ")");
+                }
                 sp.setGameMode(GameType.CREATIVE);
                 sp.getAbilities().flying = true;
                 sp.onUpdateAbilities();
@@ -6231,8 +6252,19 @@ public final class ClientCiTest {
                 log("  musica: " + ClientMusic.debug());
                 server(m, sp -> {
                     var est = com.darkcraft.fortaleza.FortalezaDatos.get(sp.server).de(fsit);
-                    log("  fortaleza a los " + kk * 5 + " s: " + est.hechos.size() + " de " + fplan.chunks().size() + " chunks; zona="
-                            + (com.darkcraft.fortaleza.FortalezaEventos.zona(sp) != null) + " lluvia=" + sp.serverLevel().isRaining());
+                    log("  fortaleza a los " + kk * 5 + " s: " + est.hechos.size() + " de " + fplan.chunks().size() + " chunks (en pie "
+                            + est.completa + "); zona=" + (com.darkcraft.fortaleza.FortalezaEventos.zona(sp) != null) + " lluvia=" + sp.serverLevel().isRaining());
+                    if (kk == 1 && fvieja != null) {
+                        ServerLevel lvl = sp.serverLevel();
+                        int quedan = 0;
+                        for (int y = fplan.Y - 70; y <= fplan.Y - 57; y++)
+                            if (lvl.getBlockState(new BlockPos(fvieja[0] + 7, y, fvieja[1] + 7)).is(net.minecraft.world.level.block.Blocks.BONE_BLOCK)) quedan++;
+                        boolean llave = sp.getInventory().items.stream().anyMatch(st -> st.is(DarkCraftMod.LLAVE_HUESO.get()));
+                        log("  fortaleza de antes, rehecha: version " + est.version + " rehecha=" + est.rehecha + " por limpiar " + est.porLimpiar.size()
+                                + "; de la escalera vieja quedan " + quedan + " bloques de hueso (tiene que ser 0, quitada=" + (est.puenteViejo == null)
+                                + "); lo alto: " + lvl.getBlockState(new BlockPos(fplan.cx, fplan.Y + 80, fplan.cz)).getBlock()
+                                + "; puente=" + est.puente + "; llave devuelta=" + llave + " (anotada " + est.llaves.contains(sp.getStringUUID()) + ")");
+                    }
                 });
             });
         }
@@ -6539,7 +6571,41 @@ public final class ClientCiTest {
                 log(b.toString());
             });
         });
-        return Q + 90;
+        // el ascensor de hueso: encima de la placa (donde este, abajo o arriba) dos segundos y viaja por el tubo
+        int V = Q + 86;
+        final boolean[] subia = new boolean[1];
+        atTicks(V, "Ascensor de hueso: encima de la placa", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                var a = com.darkcraft.fortaleza.FortalezaEventos.ascensor(sp.serverLevel(), fplan);
+                if (a == null) {
+                    log("  ascensor de hueso: NO HAY");
+                    return;
+                }
+                sp.setGameMode(GameType.SURVIVAL);
+                boolean arriba = a.estado() == com.darkcraft.arbol.Ascensor.ARRIBA;
+                subia[0] = !arriba;
+                sp.teleportTo(sp.serverLevel(), a.getX(), arriba ? a.y1() : a.y0(), a.getZ() + 1.2, 180f, arriba ? 35f : -35f);
+                log("  ascensor de hueso: la placa esta " + (arriba ? "arriba (baja)" : "abajo (sube)") + ", de " + a.y0() + " a " + a.y1()
+                        + "; el jugador en " + fpos(sp));
+            });
+        });
+        atTicks(V + 30, "captura", m -> shot(m, "cliente_f45_ascensor_espera"));
+        atTicks(V + 60, "Ascensor de hueso: en marcha", m -> server(m, sp -> log("  ascensor de hueso a los 3 s: montado="
+                + (sp.getVehicle() instanceof com.darkcraft.arbol.Ascensor) + " en " + fpos(sp))));
+        atTicks(V + 200, "captura", m -> {
+            shot(m, "cliente_f46_ascensor_viaje");
+            server(m, sp -> log("  ascensor de hueso a medio camino: " + fpos(sp)));
+        });
+        atTicks(V + 380, "Ascensor de hueso: llega", m -> server(m, sp -> {
+            int[] ab = fplan.f.ascensorAbajo(), ar = fplan.f.ascensorArriba();
+            int fin = subia[0] ? ar[1] : ab[1];
+            log("  ascensor de hueso al llegar: montado=" + (sp.getVehicle() instanceof com.darkcraft.arbol.Ascensor) + " en " + fpos(sp)
+                    + " (tenia que llegar a " + fin + "), en el suelo=" + sp.onGround());
+        }));
+        atTicks(V + 390, "captura", m -> shot(m, "cliente_f47_ascensor_llega"));
+        return V + 400;
     }
 
     // ------------------------------------------------------------------ el Mandoble del Juramento (parte B3)
