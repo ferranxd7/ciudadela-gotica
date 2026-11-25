@@ -19,9 +19,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 /**
- * /darkcraft fortaleza ...: localizar (la del reino mas cercano), ir (a la puerta), escalera (al pie del puente),
- * construir (levanta ya lo que este cargado), puente, abrir (la puerta), portal (el capitulo 6), amuleto, acertijo,
- * libros (los once libros perdidos) y reiniciar (cierra la puerta, quita el portal y olvida el puente).
+ * /darkcraft fortaleza ...: localizar (la del reino mas cercano), ir (a la puerta), montana (al pie), mirador (ante el
+ * arco), secreto (ante el muro falso), muro (lo deshace), cripta (junto a la trampilla), trampas, enemigos [volver |
+ * fuera], construir (levanta ya lo que este cargado), puente, abrir (la puerta), portal (el capitulo 6), amuleto,
+ * acertijo, libros (los libros perdidos) y reiniciar (cierra la puerta, quita el portal, olvida el puente y vuelve a
+ * poner el muro falso).
  */
 public final class ComandosFortaleza {
     private ComandosFortaleza() {}
@@ -78,6 +80,45 @@ public final class ComandosFortaleza {
                     p.teleportTo(p.serverLevel(), a[0] + 0.5, a[1], a[2] + 4.5, 180f, -6f);
                     return 1;
                 })))
+                .then(Commands.literal("secreto").executes(c -> conSitio(c, (p, s, f) -> {
+                    // en el sotano, delante del muro falso, mirandolo (al oeste)
+                    int[][] m = f.f.muroFalso();
+                    int[] q = m[m.length / 2];
+                    p.teleportTo(p.serverLevel(), q[0] + 3.5, q[1], q[2] + 0.5, 90f, 0f);
+                    return 1;
+                })))
+                .then(Commands.literal("muro").executes(c -> conSitio(c, (p, s, f) -> Trampas.abrirMuro(p, s) ? 1 : 0)))
+                .then(Commands.literal("cripta").executes(c -> conSitio(c, (p, s, f) -> {
+                    // junto a la trampilla escondida al pie de la fuente, mirandola
+                    int[] t = f.f.trampilla();
+                    p.teleportTo(p.serverLevel(), t[0] + 0.5, t[1] + 1, t[2] + 2.5, 180f, 40f);
+                    return 1;
+                })))
+                .then(Commands.literal("trampas").executes(c -> conSitio(c, (p, s, f) -> {
+                    c.getSource().sendSuccess(() -> Component.literal(Trampas.resumen(p.serverLevel(), f)), false);
+                    return 1;
+                })))
+                .then(Commands.literal("enemigos")
+                        .executes(c -> conSitio(c, (p, s, f) -> {
+                            c.getSource().sendSuccess(() -> Component.literal(FortalezaEnemigos.resumen(p.serverLevel(), s, f)), false);
+                            return 1;
+                        }))
+                        .then(Commands.literal("volver").executes(c -> conSitio(c, (p, s, f) -> {
+                            com.darkcraft.enemigos.Puestos.todos(p.server, FortalezaEnemigos.clave(s), false);
+                            c.getSource().sendSuccess(() -> Component.literal(FortalezaEnemigos.resumen(p.serverLevel(), s, f)), false);
+                            return 1;
+                        })))
+                        .then(Commands.literal("fuera").executes(c -> conSitio(c, (p, s, f) -> {
+                            com.darkcraft.enemigos.Puestos.todos(p.server, FortalezaEnemigos.clave(s), true);
+                            c.getSource().sendSuccess(() -> Component.literal(FortalezaEnemigos.resumen(p.serverLevel(), s, f)), false);
+                            return 1;
+                        })))
+                        .then(Commands.literal("sacar").executes(c -> conSitio(c, (p, s, f) -> {
+                            if (!com.darkcraft.enemigos.Puestos.apuntado(FortalezaEnemigos.clave(s))) FortalezaEnemigos.apuntar(p.serverLevel(), s);
+                            int n = com.darkcraft.enemigos.Puestos.sacarTodos(p.serverLevel(), FortalezaEnemigos.clave(s)).size();
+                            c.getSource().sendSuccess(() -> Component.literal(n + " fuera; " + FortalezaEnemigos.resumen(p.serverLevel(), s, f)), false);
+                            return n;
+                        }))))
                 .then(Commands.literal("construir").executes(c -> conSitio(c, (p, s, f) -> {
                     int n = FortalezaEventos.construirYa(p.serverLevel(), s);
                     c.getSource().sendSuccess(() -> Component.literal("fortaleza: " + n + " chunks"), false);
@@ -115,6 +156,7 @@ public final class ComandosFortaleza {
                             for (int y = q[1]; y <= q[4]; y++)
                                 if (f.f.enPortal(x, y)) lvl.setBlock(new net.minecraft.core.BlockPos(x, y, q[2]), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
                     }
+                    Trampas.reiniciar(lvl, f, e);
                     e.puerta = e.portal = e.puente = false;
                     e.baseEscalera = Integer.MIN_VALUE;
                     d.setDirty();

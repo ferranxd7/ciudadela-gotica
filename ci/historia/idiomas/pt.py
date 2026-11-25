@@ -492,7 +492,7 @@ T = {
   "advancements.darkcraft.libro_perdido.title": "O que o povo dizia",
   "advancements.darkcraft.libro_perdido.description": "Leia um livro perdido",
   "advancements.darkcraft.libros_perdidos.title": "A biblioteca perdida",
-  "advancements.darkcraft.libros_perdidos.description": "Encontre os dezesseis livros perdidos",
+  "advancements.darkcraft.libros_perdidos.description": "Encontre os dezessete livros perdidos",
   "darkcraft.diario.fortaleza": "Vi a Fortaleza de Osso flutuando acima das nuvens. A chave não para de tremer.",
   "darkcraft.diario.puerta_hueso": "A grade de osso subiu sozinha quando a chave a tocou.",
   "darkcraft.diario.acertijo": "O mestre Velan deixou um enigma: é preciso forjar um amuleto.",

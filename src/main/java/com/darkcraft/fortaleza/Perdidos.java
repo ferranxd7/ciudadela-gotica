@@ -34,9 +34,9 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class Perdidos {
     private Perdidos() {}
 
-    public static final int TOTAL = 16;
+    public static final int TOTAL = 17;
     /** Paginas de cada libro (las mismas en todos los idiomas; ver ci/historia/perdidos.py). */
-    private static final int[] PAGINAS = {0, 2, 2, 3, 2, 3, 2, 3, 2, 3, 3, 1, 3, 2, 2, 2, 3};
+    private static final int[] PAGINAS = {0, 2, 2, 3, 2, 3, 2, 3, 2, 3, 3, 1, 3, 2, 2, 2, 3, 3};
     /** Donde va cada libro de Valdrenn: el sitio del mapa (MapShapes). */
     private static final String[] SITIO = {null, "pueblo", "puerta_interior", "catedral", "jardin", "patio_armas"};
     public static final String TAG = "darkcraft_perdido";

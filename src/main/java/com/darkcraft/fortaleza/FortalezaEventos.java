@@ -64,7 +64,8 @@ import java.util.UUID;
 
 /**
  * Lo que pasa en las Fortalezas de Hueso: se levantan chunk a chunk cuando alguien se acerca (tambien en mundos de
- * antes), su zona (la isla y la montana del sur: lluvia sin tormenta, su musica, los caballeros zombi), el puente largo
+ * antes), su zona (la isla y la montana del sur: lluvia sin tormenta, su musica; los enemigos van en sus puestos,
+ * {@link FortalezaEnemigos}), el puente largo
  * que tiende la llave desde la montana, la puerta que abre la llave (cinematica), el amuleto en el altar (el capitulo 6
  * y el portal) y la forja del amuleto.
  */
@@ -73,11 +74,6 @@ public final class FortalezaEventos {
     private FortalezaEventos() {}
 
     public static final ResourceKey<Biome> BIOMA = ResourceKey.create(Registries.BIOME, new ResourceLocation(DarkCraftMod.MODID, "fortaleza"));
-
-    static {
-        // los caballeros zombi tambien salen en la fortaleza (en la isla y dentro de las murallas)
-        Caballeros.ZONAS.add(FortalezaEventos::enIsla);
-    }
 
     // ------------------------------------------------------------------ tareas programadas
 
@@ -266,10 +262,27 @@ public final class FortalezaEventos {
             }
             est.puente = false;
             est.baseEscalera = Integer.MIN_VALUE;
+            est.version = 3;
+            d.setDirty();
+            DarkCraftMod.LOGGER.info("Fortaleza de Hueso en {}: pasa a la version 3 (se sube por la montana)", s.clave());
+        }
+        if (est.version == 3) {
+            // parte 5c: la torre lleva trampas, la cripta bajo la fuente y la sala secreta: se vuelven a levantar los chunks
+            // de la isla y la torre (la montana y las nubes no cambian); la puerta, el puente y el portal se quedan como
+            // estaban (aplicarEstado los vuelve a poner)
+            int n = 0;
+            for (long k : plan.nucleo())
+                if (est.hechos.remove(k)) {
+                    est.porLimpiar.add(k);
+                    n++;
+                }
+            est.completa = false;
+            est.muro = false;
             est.version = FortalezaDatos.VERSION;
             d.setDirty();
-            DarkCraftMod.LOGGER.info("Fortaleza de Hueso en {}: pasa a la version {} (se sube por la montana)", s.clave(), est.version);
-            return false;
+            DarkCraftMod.LOGGER.info("Fortaleza de Hueso en {}: pasa a la version {} (trampas y secretos: {} chunks se vuelven a levantar)",
+                    s.clave(), est.version, n);
+            return n > 0;
         }
         // la escalera de hueso de la de antes, si se levanto: lo de debajo de la isla se quita aparte (quitarPuenteViejo)
         if (est.puente && est.baseEscalera != Integer.MIN_VALUE) {
@@ -395,7 +408,7 @@ public final class FortalezaEventos {
         return n;
     }
 
-    /** La puerta y el portal como esten guardados, en un chunk recien construido. */
+    /** La puerta, el puente, el muro falso y el portal como esten guardados, en un chunk recien construido. */
     private static void aplicarEstado(ServerLevel lvl, FortalezaPlan f, FortalezaDatos.Estado est, int cx, int cz) {
         if (est.puente) Puente.enChunk(lvl, f, cx, cz);
         if (est.puerta) {
@@ -407,6 +420,9 @@ public final class FortalezaEventos {
                     for (int y = r[4] + 1; y <= r[4] + TorreCupula.PALTO; y++) lvl.setBlock(new BlockPos(x, y, r[2]), reja(), 2);
                 }
         }
+        if (est.muro)
+            for (int[] q : f.f.muroFalso())
+                if ((q[0] >> 4) == cx && (q[2] >> 4) == cz) lvl.setBlock(new BlockPos(q[0], q[1], q[2]), Blocks.AIR.defaultBlockState(), 2);
         if (est.portal) {
             int[] q = f.f.portal();
             if ((q[2] >> 4) == cz)

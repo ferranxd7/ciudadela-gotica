@@ -39,6 +39,11 @@ public final class EfectosRaiz {
     public static void estaca(ServerLevel sl, double x, double y, double z, float yaw, float tilt, float alto, float grueso, int retraso, int dura) {
         RandomSource r = sl.random;
         BlockState st = r.nextInt(4) == 0 ? Blocks.MANGROVE_ROOTS.defaultBlockState() : DarkCraftMod.RAIZ_GAVRAN.get().defaultBlockState();
+        estaca(sl, st, x, y, z, yaw, tilt, alto, grueso, retraso, dura);
+    }
+
+    /** La misma estaca, de otro bloque (los pinchos de hueso de las trampas de la fortaleza). */
+    public static void estaca(ServerLevel sl, BlockState st, double x, double y, double z, float yaw, float tilt, float alto, float grueso, int retraso, int dura) {
         Matrix4f lleno = new Matrix4f().rotateY(yaw).rotateX(tilt).scale(grueso, alto, grueso).translate(-0.5f, 0f, -0.5f);
         Matrix4f vacio = new Matrix4f(lleno).scale(1f, 0.02f, 1f);
         Display.BlockDisplay d = display(sl, st, x, y, z, vacio);

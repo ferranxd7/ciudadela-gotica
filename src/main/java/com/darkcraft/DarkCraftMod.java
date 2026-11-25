@@ -518,6 +518,7 @@ public class DarkCraftMod {
         com.darkcraft.world.MundoNubes.registrar(modBus);
         com.darkcraft.pueblo.PuebloEnemigos.registrar();
         com.darkcraft.valdrenn.ValdrennEnemigos.registrar();
+        com.darkcraft.fortaleza.FortalezaEnemigos.registrar();
         com.darkcraft.fortaleza.Localizar.registrar(modBus);
         modBus.addListener(this::attributes);
         modBus.addListener(this::setup);

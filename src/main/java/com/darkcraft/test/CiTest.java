@@ -588,6 +588,8 @@ public final class CiTest {
             var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, (int) Math.floor(pie[0]), (int) Math.round(pie[2]) + 1, (int) Math.floor(pie[1]),
                     fp.cx - 160, fp.bordeZ - 40, fp.cx + 160, m.mz + 160, 200000);
             boolean arriba = zona.alcanza(a[0], a[1], a[2] + 2, 3);
+            // los enemigos del sendero y del mirador (parte 5c): que cada puesto se pisa y se llega
+            log.println("Montana de la fortaleza, enemigos: " + com.darkcraft.fortaleza.FortalezaEnemigos.comprobar(mundo, fp, true));
             // el puente tendido: del mirador al borde de la isla (la isla no esta levantada: hasta el arranque del puente)
             java.util.List<int[]> puestos = new java.util.ArrayList<>();
             com.darkcraft.fortaleza.Puente.volcar(fp, (x, y, z, st) -> {

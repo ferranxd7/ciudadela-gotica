@@ -492,7 +492,7 @@ T = {
   "advancements.darkcraft.libro_perdido.title": "Was die Leute sagten",
   "advancements.darkcraft.libro_perdido.description": "Lies ein verlorenes Buch",
   "advancements.darkcraft.libros_perdidos.title": "Die verlorene Bibliothek",
-  "advancements.darkcraft.libros_perdidos.description": "Finde alle sechzehn verlorenen Bücher",
+  "advancements.darkcraft.libros_perdidos.description": "Finde alle siebzehn verlorenen Bücher",
   "darkcraft.diario.fortaleza": "Ich sah die Knochenfestung über den Wolken schweben. Der Schlüssel hört nicht auf zu zittern.",
   "darkcraft.diario.puerta_hueso": "Das Knochenfallgitter hob sich von selbst, als der Schlüssel es berührte.",
   "darkcraft.diario.acertijo": "Magister Velan hinterließ ein Rätsel: Ein Amulett muss geschmiedet werden.",

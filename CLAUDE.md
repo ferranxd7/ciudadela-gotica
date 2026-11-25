@@ -1072,14 +1072,69 @@ tiende un puente largo desde su cima.
   (capturas `cliente_f05_montana_pie`, `f05_montana_recodo`, `f05_mirador`, el puente formandose `f06_puente_0/1`,
   `f06_puente_mirador` y `f07_puente_cruzar`; lineas `montana a pie: ...` y `puente a pie: ...`).
 
+### Plan grande, parte 5c: trampas, secretos y enemigos de la fortaleza
+
+Respuestas 37, 44, 46 y 47 del plan.
+- **Trampas** (`fortaleza/Trampas`, en memoria por fortaleza; solo saltan con jugadores en supervivencia o aventura): el
+  **suelo que cede** (`TorreCupula.sueloQueCede`, 3 x 3 de losas agrietadas en la planta 4, la de la ruina: al pisarlo
+  cruje, a los 0,3 s se hunde y se cae a la planta de abajo; vuelve a los 30 s si no hay nadie en el hueco —`vuelve`, la
+  prueba lo acorta—; una vez por sesion, con su chunk cargado, se repone si quedo hundido), los **pinchos de hueso**
+  (`pinchos`: seis losas cinceladas en el pasillo norte del sotano y seis en el camino norte del jardin; al pisar una, un
+  chasquido y a los 0,3 s `EfectosRaiz.estaca` con BONE_BLOCK en las seis —la sobrecarga con bloque es de la 5c—, 6 de
+  dano y lentitud; 2,5 s entre una y otra) y las **flechas** del paso de la puerta (`flechasDisparo`, la fila de dentro de
+  la reja; salen de las cuatro aspilleras de los lados, `flechasAspilleras`: flechas del juego que no se recogen, 3 de
+  dano cada una; 4 s entre tandas). **Ojo con los relojes de las esperas: no empezar en `Long.MIN_VALUE`** (t - MIN_VALUE
+  se da la vuelta y sale negativo: la trampa no saltaba nunca).
+- **El muro falso** (`muroFalso`: el muro de la torre al oeste de la sala de guardia del sotano, 2 x 3 x 3 de la misma
+  piedra, `bloqueMuro`): se deshace al golpearlo. En aventura el cliente no manda el clic de romper bloques: lo abre el
+  ataque del combate (`Combate.pedir` llama a `Trampas.golpe`, que mira 4 bloques delante de los ojos); en creativo, el
+  clic izquierdo (`PlayerInteractEvent.LeftClickBlock`, cancelado). Queda abierto para siempre (`FortalezaDatos.Estado.muro`,
+  `aplicarEstado` lo quita en un chunk que se vuelva a levantar), logro `secreto` (oculto, "El muro que no es muro").
+  Detras, **la sala secreta** (`salaSecreta`, x -18..-12 del centro, un paso de tres): el cofre `chests/fortaleza_secreto`
+  (piedra de forja III, dos o tres II, un talisman, una ceniza, frutos y oro), oro, velas rojas y los huesos.
+- **La cripta del vigia** (`cripta`, bajo la fuente rota): una trampilla de roble oscuro en la taza (`trampilla`, cerrada,
+  mitad de arriba: parece suelo), escalera de mano y una salita con el **libro perdido 17** en un atril
+  (`atrilEscondido`): "Confesion bajo la fuente", de Oswin, el ultimo vigia (cuenta de los vigias y donde esta el muro
+  falso). `Perdidos.TOTAL` = 17 (logro `libros_perdidos`: diecisiete); en el codice lleva la miniatura de la fortaleza.
+  Abierta, una trampilla sobre una escalera de mano que mira igual hace de escalera (asi se sube); `Andar` no lo sabe: en
+  `Volcado` se cambia por una escalera para comprobar que se llega.
+- **Las mazmorras se rehicieron** (en la 5a habia 11 celdas a las que se llegaba): pasillo norte-sur con celdas a los dos
+  lados y dos salas de guardia alrededor del tubo (este, la de la escalera; oeste, la del muro falso) que unen las dos
+  mitades.
+- **Enemigos** (`fortaleza/FortalezaEnemigos`, sitio `fortaleza@x,z` de `Puestos`, 34 puestos): en el **Monte del
+  Colmillo** un caballero a media cuesta de cada tramo (mirando cuesta abajo), dos perros dormidos en el ultimo tramo,
+  arqueros en los recodos sin torre (tiran a lo largo del tramo de debajo), algo dentro de cada torre en ruinas y, en el
+  **mirador**, un capitan de elite con dos alabardas ante el arco; dentro (solo con la fortaleza en pie, `completa`):
+  alabardas al salir del paso de la puerta (a 16 del santuario), caballeros de ronda por el jardin, una ballesta, una dama
+  velando, los **vigias** junto a la fuente, la sala de guardias y la armeria, una dama rezando en la capilla, espectros
+  por los aposentos y el observatorio, un caballero en la ruina; en el sotano perros dormidos en la sala del muro falso,
+  huesos en una celda y un carcelero. Ya no salen caballeros zombi al azar en la isla (`Caballeros.ZONAS` queda vacia).
+  `comprobar(mundo, plan[, soloFuera])`: cada puesto se pisa y se llega (los de fuera desde el pie, los de dentro desde el
+  jardin).
+- **El vigia** (`Espectro.VIGIA` = 2, bestiario `espectro_vigia`, "Vigia de la cupula"): capucha de punta, habito negro y
+  rojo con cordon, la capa y el estoque del cortesano, la cara en sombra y **ojos rojos** (`tools/enemigos/espectro.py`:
+  piezas `capucha` y `cordon`, `OCULTAS[2]`; `espectro_2.png`); se dibuja algo rojizo en vez de azulado. Pelea como el
+  cortesano (6 de golpe); **sin presa se apaga y aparece en otro sitio de su ronda** cada 6-13 s
+  (`aparecerEnRonda`), peleando se desvanece mucho mas (tambien tras pegar, `irse`) y aparece siempre a la espalda.
+- **Mundos de antes**: `FortalezaDatos.VERSION` = 4. Una de la 5b (version 3) vuelve a levantar los chunks de la isla y
+  la torre (`nucleo`; la montana y las nubes no) con la puerta, el puente y el portal como estaban; una de la 5a pasa por
+  la 3 y luego por esto; las de antes, enteras como siempre.
+- Comandos `/darkcraft fortaleza secreto` (ante el muro falso), `muro` (lo deshace), `cripta` (junto a la trampilla),
+  `trampas` (como estan), `enemigos [volver | fuera | sacar]`; `reiniciar` tambien vuelve a poner el muro.
+- Sin abrir el juego: `tools/vista3d/Volcado.java montana` con `-Dtodo=true` escribe la linea `enemigos: ...`, las trampas,
+  lo que se llega desde el jardin (sotano, muro, terraza) y con el muro deshecho y la trampilla abierta (cofre secreto,
+  atril de la cripta); las marcas de los puestos (G caballero, A arquero, P perro, E espectro, C capitan).
+- Pruebas: servidor, linea `Montana de la fortaleza, enemigos: ...`; cliente, tramo `secretos()` (capturas
+  `cliente_f50_muro_falso`, `f51_sala_secreta`, `f52_trampilla`, `f53_cripta`, `f54_suelo_cede`, `f55_pinchos`,
+  `f56_flechas`, `f57_jardin_enemigos`, `f58_vigia`, `f59_capitan_mirador`). En el resto del tramo de la fortaleza sus
+  enemigos estan por caidos (las vistas de la 5a y la 5b van sin ellos).
+
 ### Lo siguiente: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5a, la torre bajo la cupula**: hecha (arriba).
 - **5b, la montana y el puente largo**: hecha (arriba). Los enemigos del sendero van con los de dentro (5c).
-- **5c, dentro de la fortaleza y en la montana** (37, 44, 46, 47): trampas (suelo que cede, pinchos de hueso, flechas), el
-  libro perdido extra y la sala secreta tras un muro falso, caballeros zombi y espectros nuevos que aparecen y
-  desaparecen; enemigos por el sendero de la montana (en las torres en ruinas de los recodos).
+- **5c, dentro de la fortaleza y en la montana**: hecha (arriba).
 - **5d, el camino de nubes** de Valdrenn a la torre (81): largo, a pie, con islotes de parada (ruinas, enemigos, cofres).
 - **5e, el portal** (48-68): marco nuevo (piedra de sombra con runas que laten, hueso, hierro negro y cadenas), remolino,
   estatuas gigantes y pilares, el pedestal del amuleto, la voz de la Sombra, la cinematica del rayo rojo y el cielo rojo.

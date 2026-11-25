@@ -24,10 +24,15 @@ import net.minecraft.world.phys.Vec3;
  * la espalda) de quien persiguen. El cortesano ({@link #ESTOQUE}) tira estocadas que llegan lejos y un tajo doble; la dama
  * ({@link #GARRAS}) da zarpazos que dejan frio (lentitud) y **se lamenta**: un grito alrededor (se ve venir) que frena y
  * quita fuerzas. Si le dan, a veces se va de un salto a otro sitio.
+ * <p>
+ * El **vigia** ({@link #VIGIA}, parte 5c: los de la Fortaleza de Hueso; capucha, capa larga y ojos rojos) pelea como el
+ * cortesano pero no se esta quieto: sin presa se apaga y aparece en otro sitio de su ronda cada pocos segundos; peleando
+ * se desvanece mucho mas a menudo (tambien tras pegar) y siempre aparece a la espalda.
  */
 public class Espectro extends Enemigo {
-    public static final int ESTOQUE = 0, GARRAS = 1;
-    private int lamentoEspera = 40, desvaneceEspera = 60;
+    public static final int ESTOQUE = 0, GARRAS = 1, VIGIA = 2;
+    private int lamentoEspera = 40, desvaneceEspera = 60, vigiaEspera = 100;
+    private boolean irse;
 
     public Espectro(EntityType<? extends Espectro> t, Level l) {
         super(t, l);
@@ -41,7 +46,11 @@ public class Espectro extends Enemigo {
 
     @Override
     public String tipo() {
-        return variante() == GARRAS ? "espectro_dama" : "espectro_cortesano";
+        return switch (variante()) {
+            case GARRAS -> "espectro_dama";
+            case VIGIA -> "espectro_vigia";
+            default -> "espectro_cortesano";
+        };
     }
 
     @Override
@@ -73,8 +82,9 @@ public class Espectro extends Enemigo {
     @Override
     protected int elegir(LivingEntity presa, double d) {
         if (Math.abs(presa.getY() - getY()) > 2.4) return 0;
-        // lejos (o tras un rato sin llegar): se desvanece y aparece al lado
+        // lejos (o tras un rato sin llegar): se desvanece y aparece al lado (el vigia, tambien de cerca)
         if (d > 6.5 && desvaneceEspera <= 0 && random.nextFloat() < 0.18f) return EspectroAnims.DESVANECERSE;
+        if (variante() == VIGIA && d > 2.0 && desvaneceEspera <= 0 && random.nextFloat() < 0.3f) return EspectroAnims.DESVANECERSE;
         if (variante() == GARRAS) {
             if (d <= 4.6 && lamentoEspera <= 0 && random.nextFloat() < 0.3f) return EspectroAnims.LAMENTO;
             if (d <= 2.5) return EspectroAnims.ZARPAZO;
@@ -109,8 +119,11 @@ public class Espectro extends Enemigo {
             if (t == 6) playSound(DarkCraftMod.SFX_ESPECTRO_LAMENTO.get(), 2.0f, 0.95f + random.nextFloat() * 0.1f);
             if (t == EspectroAnims.GOLPES[accion][0]) lamento();
         } else if (accion == EspectroAnims.DESVANECERSE) {
-            if (t == 3) playSound(DarkCraftMod.SFX_ESPECTRO_DESVANECE.get(), 1.0f, 1.0f);
-            if (t == 12) aparecerJunto();
+            if (t == 3) playSound(DarkCraftMod.SFX_ESPECTRO_DESVANECE.get(), 1.0f, variante() == VIGIA ? 0.8f : 1.0f);
+            if (t == 12) {
+                if (getTarget() == null && variante() == VIGIA) aparecerEnRonda();
+                else aparecerJunto();
+            }
         }
     }
 
@@ -134,12 +147,13 @@ public class Espectro extends Enemigo {
     /** A 2-3,5 bloques de su presa, a un lado o detras (donde quepa y haya suelo); si no hay sitio, se queda. */
     private void aparecerJunto() {
         LivingEntity p = getTarget();
-        desvaneceEspera = 140 + random.nextInt(100);
+        boolean vigia = variante() == VIGIA;
+        desvaneceEspera = vigia ? 60 + random.nextInt(50) : 140 + random.nextInt(100);
         if (p == null || !(level() instanceof ServerLevel sl)) return;
         Vec3 mira = Vec3.directionFromRotation(0, p.getYRot());
         for (int k = 0; k < 10; k++) {
-            // detras o de lado (nunca justo delante de quien mira)
-            double ang = Math.toRadians(90 + random.nextDouble() * 180) + Math.atan2(mira.z, mira.x);
+            // detras o de lado (nunca justo delante de quien mira); el vigia, a la espalda
+            double ang = Math.toRadians(vigia ? 150 + random.nextDouble() * 60 : 90 + random.nextDouble() * 180) + Math.atan2(mira.z, mira.x);
             double r = 2.0 + random.nextDouble() * 1.5;
             double x = p.getX() + Math.cos(ang) * r, z = p.getZ() + Math.sin(ang) * r;
             BlockPos b = BlockPos.containing(x, p.getY() + 0.5, z);
@@ -156,6 +170,29 @@ public class Espectro extends Enemigo {
             girarHacia(p, 180f);
             sl.sendParticles(ParticleTypes.SOUL, x, y + 1.0, z, 14, 0.3, 0.6, 0.3, 0.02);
             playSound(DarkCraftMod.SFX_ESPECTRO_DESVANECE.get(), 1.0f, 1.25f);
+            return;
+        }
+    }
+
+    /** El vigia sin presa: aparece en otro sitio de su ronda (donde quepa y haya suelo) mirando a donde miraba. */
+    private void aparecerEnRonda() {
+        vigiaEspera = 120 + random.nextInt(140);
+        BlockPos h = hogar();
+        if (h == null || !(level() instanceof ServerLevel sl)) return;
+        for (int k = 0; k < 12; k++) {
+            double x = h.getX() + 0.5 + (random.nextDouble() - 0.5) * 9, z = h.getZ() + 0.5 + (random.nextDouble() - 0.5) * 9;
+            BlockPos b = BlockPos.containing(x, h.getY() + 0.5, z);
+            double y = Puestos.suelo(sl, b.getX(), b.getY(), b.getZ());
+            if (Math.abs(y - h.getY()) > 1.5) continue;
+            Vec3 antes = position();
+            setPos(x, y, z);
+            if (!sl.noCollision(this) || sl.noCollision(this, getBoundingBox().move(0, -1.2, 0))) {
+                setPos(antes.x, antes.y, antes.z);
+                continue;
+            }
+            sl.sendParticles(ParticleTypes.SOUL, antes.x, antes.y + 1.0, antes.z, 10, 0.3, 0.6, 0.3, 0.02);
+            teleportTo(x, y, z);
+            sl.sendParticles(ParticleTypes.SOUL, x, y + 1.0, z, 10, 0.3, 0.6, 0.3, 0.02);
             return;
         }
     }
@@ -187,12 +224,23 @@ public class Espectro extends Enemigo {
 
     @Override
     protected int pausaTras(int accion) {
+        // el vigia, tras pegar, a veces se va (en cuanto acaba: aiStep)
+        if (variante() == VIGIA && getTarget() != null && (accion == EspectroAnims.ESTOCADA || accion == EspectroAnims.TAJO_DOBLE)
+                && desvaneceEspera <= 30 && random.nextFloat() < 0.35f) irse = true;
         return accion == EspectroAnims.LAMENTO ? 16 + random.nextInt(12) : 8 + random.nextInt(14);
     }
 
     @Override
     protected double distanciaDeseada() {
         return variante() == GARRAS ? 1.8 : 2.4;
+    }
+
+    /** El vigia pega algo mas fuerte que el cortesano (los de la fortaleza). */
+    @Override
+    public void variante(int v) {
+        super.variante(v);
+        var a = getAttribute(Attributes.ATTACK_DAMAGE);
+        if (a != null) a.setBaseValue(v == VIGIA ? 6.0 : 5.0);
     }
 
     @Override
@@ -206,6 +254,16 @@ public class Espectro extends Enemigo {
         }
         if (lamentoEspera > 0) lamentoEspera--;
         if (desvaneceEspera > 0) desvaneceEspera--;
+        if (irse && accion() == 0 && isAlive()) {
+            irse = false;
+            empezar(EspectroAnims.DESVANECERSE);
+        }
+        // el vigia, sin presa, no se esta quieto: se apaga y aparece en otro sitio de su ronda
+        if (variante() == VIGIA && vigiaEspera > 0) vigiaEspera--;
+        if (variante() == VIGIA && vigiaEspera <= 0 && getTarget() == null && accion() == 0 && postura() == DE_PIE && isAlive()) {
+            vigiaEspera = 120 + random.nextInt(140);
+            empezar(EspectroAnims.DESVANECERSE);
+        }
     }
 
     /** Flotan: ni caen con fuerza ni se hacen dano al caer, ni hacen ruido al moverse. */

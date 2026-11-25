@@ -6243,6 +6243,9 @@ public final class ClientCiTest {
                 sp.getAbilities().flying = true;
                 sp.onUpdateAbilities();
                 sp.teleportTo(lvl, fplan.cx + 0.5, fplan.Y + 34, fplan.cz + 0.5, 180f, 40f);
+                // (sus enemigos, por caidos: las vistas de la fortaleza y la montana van sin ellos; salen en el tramo de la 5c)
+                com.darkcraft.fortaleza.FortalezaEnemigos.apuntar(lvl, fsit);
+                com.darkcraft.enemigos.Puestos.todos(sp.server, com.darkcraft.fortaleza.FortalezaEnemigos.clave(fsit), true);
             });
         });
         for (int k = 1; k <= 6; k++) {
@@ -6647,7 +6650,188 @@ public final class ClientCiTest {
                     + " (tenia que llegar a " + fin + "), en el suelo=" + sp.onGround());
         }));
         atTicks(V + 390, "captura", m -> shot(m, "cliente_f47_ascensor_llega"));
-        return V + 400;
+        return secretos(V + 400);
+    }
+
+    /**
+     * Parte 5c: las trampas, los secretos y los enemigos de la Fortaleza de Hueso. El muro falso del sotano se deshace de un
+     * golpe (en aventura, con una espada: el ataque del combate del mod), la sala secreta y su cofre, la trampilla de la
+     * fuente y la cripta con el libro perdido 17, el suelo que cede (y vuelve), los pinchos de hueso del jardin, las flechas
+     * del paso de la puerta y los enemigos en sus puestos (los vigias junto a la fuente, el capitan del mirador).
+     */
+    private static int secretos(int S) {
+        final int ys = com.darkcraft.gen.TorreCupula.SOTANO;
+        atTicks(S, "Secretos: ante el muro falso del sotano (aventura, con una espada)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                if (sp.getVehicle() != null) sp.stopRiding();
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.setHealth(sp.getMaxHealth());
+                sp.getInventory().selected = 0;
+                sp.getInventory().items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                int[][] mf = fplan.f.muroFalso();
+                int[] q = mf[mf.length / 2];
+                // (abajo esta muy oscuro: con vision nocturna para las capturas)
+                sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false));
+                sp.teleportTo(lvl, q[0] + 3.5, fplan.Y + ys, q[2] + 0.5, 90f, 4f);
+                log("  trampas al llegar: " + com.darkcraft.fortaleza.Trampas.resumen(lvl, fplan) + "; muro abierto="
+                        + com.darkcraft.fortaleza.FortalezaDatos.get(sp.server).de(fsit).muro + "; el muro: "
+                        + lvl.getBlockState(new BlockPos(q[0], q[1] + 1, q[2])).getBlock() + " (tiene que ser el de la torre)");
+            });
+        });
+        atTicks(S + 30, "captura", m -> shot(m, "cliente_f50_muro_falso"));
+        atTicks(S + 34, "Secretos: un golpe al muro (el ataque del combate)", m -> server(m, sp -> {
+            com.darkcraft.combate.Combate.pedir(sp, com.darkcraft.combate.Armas.LIGERO, 0, false, 0);
+            log("  tras el golpe: " + com.darkcraft.fortaleza.Trampas.resumen(sp.serverLevel(), fplan) + "; muro abierto="
+                    + com.darkcraft.fortaleza.FortalezaDatos.get(sp.server).de(fsit).muro + "; logro secreto=" + com.darkcraft.story.Logros.tiene(sp, "secreto"));
+        }));
+        atTicks(S + 60, "Secretos: en el paso de la sala secreta", m -> server(m, sp -> {
+            int[] cf = fplan.f.cofreSecreto();
+            sp.teleportTo(sp.serverLevel(), cf[0] + 5.5, cf[1], cf[2] + 0.5, 90f, 14f);
+        }));
+        atTicks(S + 84, "captura", m -> {
+            shot(m, "cliente_f51_sala_secreta");
+            server(m, sp -> {
+                int[] cf = fplan.f.cofreSecreto();
+                var be = sp.serverLevel().getBlockEntity(new BlockPos(cf[0], cf[1], cf[2]));
+                StringBuilder b = new StringBuilder("  cofre secreto: ");
+                if (be instanceof net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity c) {
+                    c.unpackLootTable(sp);
+                    int n = 0;
+                    for (int i = 0; i < c.getContainerSize(); i++) {
+                        ItemStack st = c.getItem(i);
+                        if (st.isEmpty()) continue;
+                        n++;
+                        b.append(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(st.getItem()).getPath()).append(" x").append(st.getCount()).append(", ");
+                    }
+                    b.append("(").append(n).append(" montones)");
+                } else b.append("NO HAY (").append(be).append(")");
+                log(b.toString());
+            });
+        });
+        atTicks(S + 90, "Secretos: la trampilla de la fuente", m -> server(m, sp -> {
+            int[] t = fplan.f.trampilla();
+            sp.teleportTo(sp.serverLevel(), t[0] + 0.5, t[1] + 1, t[2] + 2.6, 180f, 52f);
+            log("  trampilla: " + sp.serverLevel().getBlockState(new BlockPos(t[0], t[1], t[2])));
+        }));
+        atTicks(S + 118, "captura", m -> shot(m, "cliente_f52_trampilla"));
+        atTicks(S + 122, "Secretos: se abre la trampilla y se baja a la cripta", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            int[] t = fplan.f.trampilla(), a = fplan.f.atrilEscondido();
+            BlockPos tb = new BlockPos(t[0], t[1], t[2]);
+            var st = lvl.getBlockState(tb);
+            if (st.hasProperty(net.minecraft.world.level.block.TrapDoorBlock.OPEN))
+                lvl.setBlock(tb, st.setValue(net.minecraft.world.level.block.TrapDoorBlock.OPEN, true), 3);
+            sp.teleportTo(lvl, t[0] + 0.5, t[1] - 4, t[2] - 1.5, -135f, 22f);
+            var be = lvl.getBlockEntity(new BlockPos(a[0], a[1], a[2]));
+            int libro = be instanceof net.minecraft.world.level.block.entity.LecternBlockEntity le ? com.darkcraft.fortaleza.Perdidos.de(le.getBook()) : -1;
+            log("  cripta: atril con el libro perdido " + libro + " (tiene que ser 17); escalera " + lvl.getBlockState(new BlockPos(t[0], t[1] - 2, t[2])).getBlock()
+                    + "; trampilla abierta " + lvl.getBlockState(tb));
+        }));
+        atTicks(S + 160, "captura", m -> shot(m, "cliente_f53_cripta"));
+        // el suelo que cede (planta 4): para la prueba vuelve a los 5 s
+        atTicks(S + 166, "Trampas: el suelo que cede", m -> server(m, sp -> {
+            com.darkcraft.fortaleza.Trampas.vuelve = 100;
+            sp.setHealth(sp.getMaxHealth());
+            int[][] cs = fplan.f.sueloQueCede();
+            sp.teleportTo(sp.serverLevel(), cs[4][0] + 0.5, cs[4][1] + 1, cs[4][2] + 0.5, 0f, 30f);
+            log("  suelo que cede: el jugador encima en " + fpos(sp) + "; " + com.darkcraft.fortaleza.Trampas.resumen(sp.serverLevel(), fplan));
+        }));
+        atTicks(S + 190, "Trampas: el suelo ha cedido", m -> server(m, sp -> {
+            int[][] cs = fplan.f.sueloQueCede();
+            log("  suelo que cede a 1 s: " + com.darkcraft.fortaleza.Trampas.resumen(sp.serverLevel(), fplan) + "; el jugador en " + fpos(sp)
+                    + " (el suelo estaba en " + cs[4][1] + "), vida " + String.format(java.util.Locale.ROOT, "%.1f de %.1f", sp.getHealth(), sp.getMaxHealth()));
+            sp.teleportTo(sp.serverLevel(), sp.getX(), sp.getY(), sp.getZ(), 0f, -62f);
+        }));
+        atTicks(S + 200, "captura", m -> shot(m, "cliente_f54_suelo_cede"));
+        // los pinchos de hueso (camino norte del jardin)
+        atTicks(S + 206, "Trampas: los pinchos del jardin", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            int[][] pin = fplan.f.pinchos();
+            int[] q = pin[7];
+            sp.teleportTo(sp.serverLevel(), q[0] + 0.5, q[1], q[2] + 0.5, 0f, 34f);
+        }));
+        atTicks(S + 216, "captura", m -> {
+            shot(m, "cliente_f55_pinchos");
+            server(m, sp -> {
+                int estacas = sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.Display.BlockDisplay.class, sp.getBoundingBox().inflate(4)).size();
+                log("  pinchos: " + estacas + " estacas de hueso alrededor; vida " + String.format(java.util.Locale.ROOT, "%.1f de %.1f", sp.getHealth(), sp.getMaxHealth())
+                        + "; lentitud " + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN));
+            });
+        });
+        // las flechas del paso de la puerta (por dentro de la reja)
+        atTicks(S + 224, "Trampas: las flechas del paso de la puerta", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            int[] q = fplan.f.flechasDisparo()[com.darkcraft.gen.TorreCupula.PX];
+            sp.teleportTo(sp.serverLevel(), q[0] + 0.5, q[1], q[2] + 0.5, 90f, 4f);
+        }));
+        atTicks(S + 236, "captura", m -> {
+            shot(m, "cliente_f56_flechas");
+            server(m, sp -> {
+                int fl = sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.projectile.Arrow.class, sp.getBoundingBox().inflate(8)).size();
+                log("  flechas: " + fl + " en el aire o clavadas; vida " + String.format(java.util.Locale.ROOT, "%.1f de %.1f", sp.getHealth(), sp.getMaxHealth()));
+            });
+        });
+        // los enemigos en sus puestos: fuera todos; los vigias junto a la fuente
+        atTicks(S + 244, "Enemigos de la fortaleza: en sus puestos", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            sp.setGameMode(GameType.CREATIVE);
+            sp.getAbilities().flying = true;
+            sp.onUpdateAbilities();
+            String k = com.darkcraft.fortaleza.FortalezaEnemigos.clave(fsit);
+            com.darkcraft.enemigos.Puestos.todos(sp.server, k, false);
+            sp.teleportTo(lvl, fplan.cx + 0.5, fplan.Y + 3, fplan.cz + 36.5, 180f, 12f);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(lvl, k);
+            java.util.Map<String, Integer> n = new java.util.TreeMap<>();
+            for (var e : fuera) n.merge(e.tipo(), 1, Integer::sum);
+            log("  enemigos de la fortaleza: " + fuera.size() + " fuera " + n + "; " + com.darkcraft.fortaleza.FortalezaEnemigos.resumen(lvl, fsit, fplan));
+        }));
+        atTicks(S + 300, "captura", m -> {
+            shot(m, "cliente_f57_jardin_enemigos");
+            server(m, sp -> {
+                int vig = 0, cerca = 0;
+                for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Espectro.class, sp.getBoundingBox().inflate(40))) {
+                    cerca++;
+                    if (e.variante() == com.darkcraft.enemigos.Espectro.VIGIA) vig++;
+                }
+                log("  espectros cerca: " + cerca + " (" + vig + " vigias); trampas: " + com.darkcraft.fortaleza.Trampas.resumen(sp.serverLevel(), fplan)
+                        + " (el suelo ya tiene que haber vuelto: 9/9)");
+            });
+        });
+        atTicks(S + 304, "Enemigos: un vigia de cerca", m -> server(m, sp -> {
+            com.darkcraft.enemigos.Espectro v = null;
+            for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Espectro.class, sp.getBoundingBox().inflate(48)))
+                if (e.variante() == com.darkcraft.enemigos.Espectro.VIGIA && (v == null || e.distanceToSqr(sp) < v.distanceToSqr(sp))) v = e;
+            if (v == null) {
+                log("  vigia de cerca: NO HAY");
+                return;
+            }
+            double yaw = Math.toRadians(v.getYRot());
+            double x = v.getX() - Math.sin(yaw) * 3.2, z = v.getZ() + Math.cos(yaw) * 3.2;
+            sp.teleportTo(sp.serverLevel(), x, v.getY() + 0.4, z, v.getYRot() + 180f, 8f);
+            log("  vigia de cerca en " + String.format(java.util.Locale.ROOT, "%.1f,%.1f,%.1f", v.getX(), v.getY(), v.getZ()) + " (" + v.tipo() + ")");
+        }));
+        atTicks(S + 330, "captura", m -> shot(m, "cliente_f58_vigia"));
+        atTicks(S + 336, "Enemigos: el capitan del mirador", m -> server(m, sp -> {
+            int[] a = fplan.montana.arco();
+            sp.teleportTo(sp.serverLevel(), fplan.montana.mx + 0.5, a[1] + 2.5, fplan.montana.mz + 7.5, 180f, 10f);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(sp.serverLevel(), com.darkcraft.fortaleza.FortalezaEnemigos.clave(fsit));
+            int el = 0;
+            for (var e : fuera) if (e instanceof com.darkcraft.enemigos.Elite) el++;
+            log("  mirador: " + fuera.size() + " fuera (" + el + " capitan)");
+        }));
+        atTicks(S + 380, "captura", m -> shot(m, "cliente_f59_capitan_mirador"));
+        atTicks(S + 386, "Fortaleza 5c: fin (sus enemigos, por caidos)", m -> server(m, sp -> {
+            com.darkcraft.fortaleza.Trampas.vuelve = com.darkcraft.fortaleza.Trampas.VUELVE;
+            sp.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+            com.darkcraft.enemigos.Puestos.todos(sp.server, com.darkcraft.fortaleza.FortalezaEnemigos.clave(fsit), true);
+            StringBuilder b = new StringBuilder("  logros de la 5c:");
+            for (String id : new String[]{"secreto", "libro_perdido"}) b.append(' ').append(id).append('=').append(com.darkcraft.story.Logros.tiene(sp, id) ? "SI" : "no");
+            log(b + "; libros perdidos apuntados " + Integer.bitCount(com.darkcraft.espejo.Espejo.perdidos(sp) >> 1));
+        }));
+        return S + 392;
     }
 
     // ------------------------------------------------------------------ el Mandoble del Juramento (parte B3)

@@ -28,7 +28,7 @@ public final class Coleccion {
             "llave_arbol", "mandoble_juramento", "llave_hueso", "libro5", "alabarda", "libro_acertijo", "amuleto_hueso", "libro6"};
     public static final String[] BESTIARIO = {"hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon", "capitan",
             "escudero", "caballero_espada", "caballero_alabarda", "caballero_ballesta", "arquero", "perro", "espectro_cortesano",
-            "espectro_dama", "capitan_elite", "brandt", "corteza", "rey", "gavran"};
+            "espectro_dama", "espectro_vigia", "capitan_elite", "brandt", "corteza", "rey", "gavran"};
 
     /** El objeto de una clave de la coleccion (los libros de la cronica, con su texto). */
     public static ItemStack objeto(String clave) {
@@ -98,9 +98,10 @@ public final class Coleccion {
                 case "capitan_elite" -> DarkCraftMod.ELITE.get().create(lvl);
                 case "brandt" -> DarkCraftMod.BRANDT.get().create(lvl);
                 case "corteza" -> DarkCraftMod.CORTEZA.get().create(lvl);
-                case "espectro_cortesano", "espectro_dama" -> {
+                case "espectro_cortesano", "espectro_dama", "espectro_vigia" -> {
                     var s = DarkCraftMod.ESPECTRO.get().create(lvl);
-                    if (s != null) s.variante(c.endsWith("dama") ? com.darkcraft.enemigos.Espectro.GARRAS : com.darkcraft.enemigos.Espectro.ESTOQUE);
+                    if (s != null) s.variante(c.endsWith("dama") ? com.darkcraft.enemigos.Espectro.GARRAS
+                            : c.endsWith("vigia") ? com.darkcraft.enemigos.Espectro.VIGIA : com.darkcraft.enemigos.Espectro.ESTOQUE);
                     yield s;
                 }
                 default -> {

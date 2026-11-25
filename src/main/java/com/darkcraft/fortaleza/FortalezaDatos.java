@@ -21,9 +21,10 @@ public final class FortalezaDatos extends SavedData {
     public static final String ID = "darkcraft_fortalezas";
     /**
      * La fortaleza que se levanta ahora: 1 la de antes (murallas cuadradas), 2 la torre bajo la cupula (parte 5a, con la
-     * escalera de caracol delante), 3 la misma a la que se sube por la montana y su puente largo (parte 5b).
+     * escalera de caracol delante), 3 la misma a la que se sube por la montana y su puente largo (parte 5b), 4 con sus
+     * trampas, la cripta bajo la fuente y la sala secreta (parte 5c).
      */
-    public static final int VERSION = 3;
+    public static final int VERSION = 4;
 
     public static final class Estado {
         public final Set<Long> hechos = new HashSet<>();
@@ -44,6 +45,8 @@ public final class FortalezaDatos extends SavedData {
          * null. La de antes de la 5a solo por debajo de la isla; la de la 5a, pieza a pieza.
          */
         public int[] puenteViejo;
+        /** El muro falso del sotano ya se deshizo (la sala secreta queda abierta). */
+        public boolean muro;
     }
 
     final Map<String, Estado> fortalezas = new HashMap<>();
@@ -80,6 +83,7 @@ public final class FortalezaDatos extends SavedData {
             e.rehecha = c.getBoolean("rehecha");
             for (Tag x : c.getList("llaves", Tag.TAG_STRING)) e.llaves.add(x.getAsString());
             if (c.contains("puente_viejo")) e.puenteViejo = c.getIntArray("puente_viejo");
+            e.muro = c.getBoolean("muro");
         }
         for (Tag x : t.getList("libros", Tag.TAG_STRING)) d.libros.add(x.getAsString());
         return d;
@@ -105,6 +109,7 @@ public final class FortalezaDatos extends SavedData {
             for (String u : e.llaves) ll.add(StringTag.valueOf(u));
             c.put("llaves", ll);
             if (e.puenteViejo != null) c.putIntArray("puente_viejo", e.puenteViejo);
+            c.putBoolean("muro", e.muro);
             fs.put(en.getKey(), c);
         }
         t.put("fortalezas", fs);

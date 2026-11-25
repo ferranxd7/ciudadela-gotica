@@ -191,6 +191,42 @@ public class Volcado {
                 System.out.println("a pie desde el pie del sendero: " + z0.celdas() + " celdas; llega al arco " + z0.alcanza(arcoM[0], arcoM[1], arcoM[2] + 2, 3)
                         + ", a la isla por el puente " + z0.alcanza(0, 320, fp.bordeZ - 3, 3) + ", a la puerta "
                         + z0.alcanza(0, 320, com.darkcraft.gen.TorreCupula.PFUERA + 4, 3));
+                // parte 5c: los puestos de los enemigos, las trampas, la cripta y la sala secreta (con todo el plano)
+                if (todo) {
+                    com.darkcraft.gen.TorreCupula t = fp.f;
+                    System.out.println("enemigos: " + com.darkcraft.fortaleza.FortalezaEnemigos.comprobar(mundo, fp));
+                    int nm = 0;
+                    for (var q : com.darkcraft.fortaleza.FortalezaEnemigos.puestos(fp))
+                        marcas.put((q.tipo().equals("elite") ? "C" : q.tipo().substring(0, 1).toUpperCase()) + (nm++), new int[]{q.x(), q.y(), q.z()});
+                    var jardin = com.darkcraft.pueblo.gen.Andar.desde(mundo, fp.cx, fp.Y + 1, fp.cz + 40, -90, -90, 90, 90, 3_000_000);
+                    int ys = fp.Y + com.darkcraft.gen.TorreCupula.SOTANO;
+                    StringBuilder tr = new StringBuilder("trampas: suelo que cede");
+                    for (int[] q : t.sueloQueCede()) tr.append(' ').append(mundo.en(q[0], q[1], q[2]).getBlock().getDescriptionId().replace("block.minecraft.", "")).append(jardin.pisa(q[0], q[1], q[2]) ? "+" : "-");
+                    tr.append("; pinchos");
+                    for (int[] q : t.pinchos()) tr.append(' ').append(jardin.pisa(q[0], q[1] - 1, q[2]) ? "+" : "-");
+                    tr.append("; flechas: disparo");
+                    for (int[] q : t.flechasDisparo()) tr.append(' ').append(mundo.en(q[0], q[1], q[2]).isAir() ? "aire" : "?");
+                    tr.append(", aspilleras");
+                    for (int[] q : t.flechasAspilleras()) tr.append(' ').append(mundo.en(q[0], q[1], q[2]).isAir() ? "aire" : mundo.en(q[0], q[1], q[2]).getBlock().getDescriptionId().replace("block.minecraft.", ""));
+                    System.out.println(tr);
+                    System.out.println("a pie desde el jardin: " + jardin.celdas() + " celdas; sotano " + jardin.alcanza(fp.cx - 7, ys, fp.cz, 2)
+                            + ", ante el muro falso " + jardin.pisa(fp.cx - 7, ys - 1, fp.cz) + ", cofre secreto (con el muro) " + jardin.alcanza(t.cofreSecreto()[0], t.cofreSecreto()[1], t.cofreSecreto()[2], 3)
+                            + ", atril de la cripta (cerrada) " + jardin.alcanza(t.atrilEscondido()[0], t.atrilEscondido()[1], t.atrilEscondido()[2], 3)
+                            + ", terraza " + jardin.alcanza(fp.cx, fp.Y + com.darkcraft.gen.TorreCupula.TERRAZA, fp.cz + 6, 3));
+                    // con el muro falso deshecho y la trampilla abierta
+                    for (int[] q : t.muroFalso()) MUNDO.put(BlockPos.asLong(q[0], q[1], q[2]), aire);
+                    int[] tp = t.trampilla();
+                    BlockState trampilla = mundo.en(tp[0], tp[1], tp[2]);
+                    // (abierta, una trampilla sobre una escalera de mano que mira igual hace de escalera: asi la ve Andar)
+                    MUNDO.put(BlockPos.asLong(tp[0], tp[1], tp[2]), Blocks.LADDER.defaultBlockState()
+                            .setValue(net.minecraft.world.level.block.LadderBlock.FACING, net.minecraft.core.Direction.NORTH));
+                    var abierto = com.darkcraft.pueblo.gen.Andar.desde(mundo, fp.cx, fp.Y + 1, fp.cz + 40, -90, -90, 90, 90, 3_000_000);
+                    System.out.println("con el muro deshecho y la trampilla (" + trampilla.getBlock().getDescriptionId().replace("block.minecraft.", "")
+                            + ") abierta: " + abierto.celdas() + " celdas; cofre secreto " + abierto.alcanza(t.cofreSecreto()[0], t.cofreSecreto()[1], t.cofreSecreto()[2], 3)
+                            + ", atril de la cripta " + abierto.alcanza(t.atrilEscondido()[0], t.atrilEscondido()[1], t.atrilEscondido()[2], 3)
+                            + " (" + mundo.en(t.atrilEscondido()[0], t.atrilEscondido()[1], t.atrilEscondido()[2]).getBlock().getDescriptionId().replace("block.minecraft.", "") + ")");
+                    MUNDO.put(BlockPos.asLong(tp[0], tp[1], tp[2]), trampilla);
+                }
                 // donde se corta: el punto del sendero mas bajo al que ya no se llega
                 List<double[]> sen = m.sendero();
                 for (int i = sen.size() - 1; i >= 0; i -= 4) {

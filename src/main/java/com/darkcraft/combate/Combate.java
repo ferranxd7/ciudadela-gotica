@@ -105,6 +105,8 @@ public final class Combate {
             no(sp);
             return;
         }
+        // el muro falso de la Fortaleza de Hueso se deshace a golpes (en aventura no llega el clic de romper bloques)
+        com.darkcraft.fortaleza.Trampas.golpe(sp);
         if (accion == Armas.HABILIDAD) {
             habilidad(sp, paso);
             return;

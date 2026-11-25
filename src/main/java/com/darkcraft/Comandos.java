@@ -74,6 +74,8 @@ public final class Comandos {
             new Linea(F + "ir", F + "ir / montana / mirador", "f_ir"),
             new Linea(F + "puente", F + "puente / abrir / portal", "f_puente"),
             new Linea(F + "amuleto", F + "amuleto / acertijo / libros", "f_objetos"),
+            new Linea(F + "secreto", F + "secreto / muro / cripta / trampas", "f_secretos"),
+            new Linea(F + "enemigos", F + "enemigos [volver | fuera | sacar]", "f_enemigos"),
             new Linea(F + "construir", F + "construir / reiniciar", "f_reiniciar"),
     };
 

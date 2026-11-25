@@ -6,6 +6,8 @@ Caras chupadas, cuencas hondas con una luz fria y la boca abierta. Dos variantes
   0 cortesano: jubon, gorguera, gorra con pluma, media capa y un estoque fino. Estocada que llega lejos y tajo doble.
   1 dama: vestido de cuello alto, diadema y velo; garras largas. Zarpazo, y el lamento (un grito alrededor: frena y
     quita fuerzas; se ve venir: echa la cabeza atras y abre los brazos).
+  2 vigia (parte 5c, los de la Fortaleza de Hueso): los guardas de la cupula. Capucha de punta, habito de lana negra y
+    roja con cordon, la capa y el estoque del cortesano (pelea como el); la cara en sombra y los ojos ROJOS.
 
 Los dos se desvanecen y aparecen al lado de su presa (la accion `desvanecerse`: el dibujante los apaga y los enciende).
 """
@@ -14,7 +16,7 @@ from modelo import Box, Rig, g, humanoide
 from pinta import (claro, delante, dibujo, liso, mezcla, oscuro, por_cara, ruido, sombra, tela)
 
 NOMBRE = "espectro"
-VARIANTES = ("estoque", "garras")
+VARIANTES = ("estoque", "garras", "vigia")
 ESCALA = 1.0
 
 # ---------------------------------------------------------------- el modelo
@@ -51,6 +53,16 @@ def rig():
     r.pieza("cuello_alto", "torso", (0, -12, 0), boxes=[Box(-4.6, -2.4, -2.4, 9.2, 3, 4.8, "cuello_alto")])
     for n in ("d", "i"):
         r.pieza(f"garra_{n}", f"mano_{n}", (0, 0, 0), boxes=[Box(-1.4, -0.2, -1.4, 2.8, 4.6, 2.8, f"garras_{n}")])
+    # ---- 2, el vigia: la capucha de punta (abierta por delante: la cara queda en sombra) y un cordon en la cintura
+    r.pieza("capucha", "cabeza", (0, -8, 0), boxes=[
+        Box(-4.7, -0.7, -4.9, 9.4, 1.0, 9.6, "capucha_arriba"),
+        Box(-4.7, -0.7, -4.9, 0.8, 8.6, 9.6, "capucha_lado"),
+        Box(3.9, -0.7, -4.9, 0.8, 8.6, 9.6, "capucha_lado"),
+        Box(-4.7, -0.7, 4.0, 9.4, 9.4, 0.8, "capucha_nuca"),
+        Box(-1.4, -2.2, 2.2, 2.8, 1.6, 3.4, "capucha_punta"),
+    ])
+    r.pieza("cordon", "torso", (0, -1.6, 0), boxes=[Box(-4.3, -0.6, -2.3, 8.6, 1.0, 4.6, "cordon"),
+                                                     Box(1.6, 0.2, -2.5, 0.8, 4.4, 0.6, "cordon_cabo")])
     r.empaquetar()
     return r
 
@@ -58,8 +70,9 @@ def rig():
 PIERNAS = ["muslo_d", "muslo_i", "pierna_d", "pierna_i"]
 #: lo que se esconde en cada variante
 OCULTAS = {
-    0: PIERNAS + ["toca", "cuello_alto", "garra_d", "garra_i"],
-    1: PIERNAS + ["gorguera", "gorra", "capa", "estoque"],
+    0: PIERNAS + ["toca", "cuello_alto", "garra_d", "garra_i", "capucha", "cordon"],
+    1: PIERNAS + ["gorguera", "gorra", "capa", "estoque", "capucha", "cordon"],
+    2: PIERNAS + ["toca", "cuello_alto", "garra_d", "garra_i", "gorguera", "gorra"],
 }
 
 # ---------------------------------------------------------------- las texturas
@@ -68,6 +81,9 @@ OCULTAS = {
 ALMA = ["#1b2430", "#2a3747", "#3d4f63", "#56708a", "#7b95ad", "#a6bdd0", "#d4e3ee"]
 TELA_A = ["#141c27", "#1e2a3a", "#2a3a4f", "#3a4e66", "#4e6680"]     # el jubon del cortesano
 TELA_B = ["#1a1626", "#272137", "#352d4a", "#463c5f", "#5b4f78"]     # el vestido de la dama (algo violeta)
+TELA_C = ["#1a1416", "#271c20", "#36252b", "#493037", "#613c45"]     # el habito del vigia (negro con algo de rojo)
+ROJO = ["#3a0d10", "#5e1418", "#8a1d20"]
+OJO_ROJO = "#ff3d2e"
 BLANCO = ["#8fa6b8", "#b4c8d6", "#d6e4ee", "#eef6fb"]
 HUECO = "#06090e"
 OJO = "#8ff0ff"
@@ -78,7 +94,8 @@ def materiales(variante):
     alma = ruido(ALMA[3:7], 711, grano=0.4, base=0.55)
     jubon = tela(TELA_A, 721, pliegue=3, grano=0.12)
     vestido = tela(TELA_B, 722, pliegue=4, grano=0.12, luz=0.3)
-    ropa = jubon if variante == 0 else vestido
+    habito = tela(TELA_C, 723, pliegue=3, grano=0.18, luz=0.2)
+    ropa = (jubon, vestido, habito)[variante]
     blanco = ruido(BLANCO, 731, grano=0.35)
 
     def cabeza(cara, x, y, w, h):
@@ -96,7 +113,11 @@ def materiales(variante):
                 "oocsscoo",
             ], C)
             v = cara_(cara, x, y, w, h)
-            return v if v is not None else c
+            v = v if v is not None else c
+            if variante == 2:
+                # bajo la capucha: casi negra, algo mas clara abajo (la barbilla)
+                return mezcla(v, HUECO, 0.78 - 0.05 * max(0, y - 4))
+            return v
         if cara in ("der", "izq"):
             d = delante(cara, x, w)
             if d <= 2 and y in (4, 5, 6):
@@ -109,6 +130,13 @@ def materiales(variante):
     def torso(cara, x, y, w, h):
         c = ropa(cara, x, y, w, h)
         if cara == "frente":
+            if variante == 2:
+                # la abertura del habito, con un forro rojo oscuro, y el escudo de la cupula (un arco) en el pecho
+                if x in (3, 4) and y >= 2:
+                    return ROJO[0] if y % 3 else ROJO[1]
+                if y in (2, 3) and x in (1, 6) or y == 1 and x in (2, 5):
+                    return ROJO[1]
+                return c
             if variante == 0:
                 if x in (3, 4):
                     return ORO[1] if y % 2 == 0 else oscuro(c, 0.1)     # los botones del jubon
@@ -187,7 +215,23 @@ def materiales(variante):
         largo = h - 1 - ((x * 5 + 2) % 3)
         if y > largo:
             return None
+        if variante == 2:
+            c = habito(cara, x, y, w, h)
+            return mezcla(c, ROJO[0], 0.35) if y == 0 else oscuro(c, 0.04 * (y / 3))
         return oscuro(jubon(cara, x, y, w, h), 0.05 * (y / 3))
+
+    def capucha(cara, x, y, w, h):
+        c = ruido(TELA_C[1:5], 742, grano=0.35)(cara, x, y, w, h)
+        if cara == "abajo":
+            return oscuro(c, 0.5)
+        # el borde de la abertura, con el forro rojo
+        if cara == "frente" and (x == 0 or x == w - 1 or y == 0):
+            return mezcla(c, ROJO[1], 0.6)
+        return c
+
+    def cordon(cara, x, y, w, h):
+        c = ruido(ROJO, 743, grano=0.3)(cara, x, y, w, h)
+        return claro(c, 0.15) if (x + y) % 3 == 0 else c
 
     def velo(cara, x, y, w, h):
         if cara in ("arriba", "abajo"):
@@ -229,12 +273,14 @@ def materiales(variante):
         "puno": liso(TELA_A[2]), "pomo": liso(ORO[1]), "taza": sombra(liso(BLANCO[0]), abajo=0.2), "gavilan": liso(BLANCO[1]),
         "hoja_fina": por_cara(liso(BLANCO[2]), arriba=liso(BLANCO[3])),
         "diadema": diadema, "velo": velo, "cuello_alto": cuello_alto, "garras_d": garras, "garras_i": garras,
+        "capucha_arriba": capucha, "capucha_lado": capucha, "capucha_nuca": capucha, "capucha_punta": capucha,
+        "cordon": cordon, "cordon_cabo": cordon,
     }
 
 
 def brillo(variante):
-    """Lo que brilla: la luz fria de las cuencas, y el filo del estoque."""
-    C = {"R": OJO}
+    """Lo que brilla: la luz fria de las cuencas (roja en el vigia), y el filo del estoque."""
+    C = {"R": OJO_ROJO if variante == 2 else OJO}
     ojos = dibujo([
         "........",
         "........",
@@ -244,6 +290,8 @@ def brillo(variante):
     b = {"cabeza": por_cara(liso(None), frente=ojos)}
     if variante == 0:
         b["hoja_fina"] = lambda cara, x, y, w, h: "#9ad9ee" if (y + x) % 5 == 0 else None
+    if variante == 2:
+        b["hoja_fina"] = lambda cara, x, y, w, h: "#d8382c" if (y + x) % 6 == 0 else None
     return b
 
 
@@ -432,7 +480,8 @@ def variante_de(nombre):
 
 def reposo(v, anims):
     import anim
-    return anim.sumar(anims["quieto"].muestra(0), anims[f"porte_{VARIANTES[v]}"].muestra(0))
+    # (el vigia lleva el estoque como el cortesano)
+    return anim.sumar(anims["quieto"].muestra(0), anims[f"porte_{('estoque', 'garras', 'estoque')[v]}"].muestra(0))
 
 
 def base_de(nombre, anims):

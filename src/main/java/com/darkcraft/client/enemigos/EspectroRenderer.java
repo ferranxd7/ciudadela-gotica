@@ -13,7 +13,7 @@ import net.minecraft.util.Mth;
  */
 public class EspectroRenderer extends EnemigoRenderer<Espectro, EspectroModelo> {
     public EspectroRenderer(EntityRendererProvider.Context ctx) {
-        super(ctx, new EspectroModelo(ctx.bakeLayer(EspectroModelo.CAPA)), "espectro", 2, 0.0f, 1.0f);
+        super(ctx, new EspectroModelo(ctx.bakeLayer(EspectroModelo.CAPA)), "espectro", 3, 0.0f, 1.0f);
     }
 
     /** Lo opaco que se ve ahora (0-1). */

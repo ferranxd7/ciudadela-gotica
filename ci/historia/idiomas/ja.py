@@ -493,7 +493,7 @@ T = {
   "advancements.darkcraft.libro_perdido.title": "人々の言葉",
   "advancements.darkcraft.libro_perdido.description": "失われた本を読む",
   "advancements.darkcraft.libros_perdidos.title": "失われた書庫",
-  "advancements.darkcraft.libros_perdidos.description": "失われた本を16冊すべて見つける",
+  "advancements.darkcraft.libros_perdidos.description": "失われた本を17冊すべて見つける",
   "darkcraft.diario.fortaleza": "雲の上に浮かぶ骨の要塞を見た。鍵の震えが止まらない。",
   "darkcraft.diario.puerta_hueso": "鍵が触れると、骨の格子はひとりでに上がった。",
   "darkcraft.diario.acertijo": "学匠ヴェランは謎かけを残した。護符を鍛えねばならない。",

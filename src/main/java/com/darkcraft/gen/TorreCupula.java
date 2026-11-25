@@ -193,6 +193,72 @@ public final class TorreCupula extends Element {
         return o;
     }
 
+    // ------------------------------------------------------------------ trampas y secretos (parte 5c)
+
+    /** El suelo que cede (planta 4, la de la ruina, al noreste): los bloques del suelo {x, y, z} (3 x 3). */
+    public int[][] sueloQueCede() {
+        int[][] o = new int[9][];
+        int k = 0, y = piso(4) - 1;
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dz = -1; dz <= 1; dz++) o[k++] = new int[]{cx + 5 + dx, y, cz - 5 + dz};
+        return o;
+    }
+
+    /** Las losas de los pinchos de hueso: {x, y que se pisa, z} (pasillo norte del sotano y camino norte del jardin). */
+    public int[][] pinchos() {
+        int ys = Y + SOTANO;
+        return new int[][]{
+                {cx - 1, ys, cz - 6}, {cx, ys, cz - 6}, {cx + 1, ys, cz - 6},
+                {cx - 1, ys, cz - 7}, {cx, ys, cz - 7}, {cx + 1, ys, cz - 7},
+                {cx - 1, Y, cz - 17}, {cx, Y, cz - 17}, {cx + 1, Y, cz - 17},
+                {cx - 1, Y, cz - 18}, {cx, Y, cz - 18}, {cx + 1, Y, cz - 18},
+        };
+    }
+
+    /** La trampa de flechas del paso de la puerta (por dentro de la reja): las celdas que la disparan {x, y, z}. */
+    public int[][] flechasDisparo() {
+        int[][] o = new int[2 * PX + 1][];
+        for (int dx = -PX; dx <= PX; dx++) o[dx + PX] = new int[]{cx + dx, Y, cz + PZ - 2};
+        return o;
+    }
+
+    /** Las aspilleras de la trampa de flechas: {x, y, z, de que lado dispara (-1 desde el oeste, 1 desde el este)}. */
+    public int[][] flechasAspilleras() {
+        int z = cz + PZ - 2;
+        return new int[][]{{cx - PX - 1, Y + 1, z, -1}, {cx + PX + 1, Y + 1, z, 1}, {cx - PX - 1, Y + 1, z - 1, -1}, {cx + PX + 1, Y + 1, z - 1, 1}};
+    }
+
+    /** El muro falso del sotano (el muro de la torre al oeste de la sala de guardia de abajo): {x, y, z} de cada bloque. */
+    public int[][] muroFalso() {
+        int ys = Y + SOTANO;
+        int[][] o = new int[18][];
+        int k = 0;
+        for (int x = cx - AT; x <= cx - AT + GT - 1; x++)
+            for (int z = cz - 1; z <= cz + 1; z++)
+                for (int y = ys; y < ys + 3; y++) o[k++] = new int[]{x, y, z};
+        return o;
+    }
+
+    /** El bloque que va en ese sitio del muro falso (el del muro de la torre: para volver a ponerlo). */
+    public BlockState bloqueMuro(int x, int y, int z) {
+        return piedra(x, y, z);
+    }
+
+    /** El cofre de la sala secreta (detras del muro falso). */
+    public int[] cofreSecreto() {
+        return new int[]{cx - AT - 6, Y + SOTANO, cz};
+    }
+
+    /** La trampilla escondida en la taza de la fuente rota (baja a la cripta del vigia). */
+    public int[] trampilla() {
+        return new int[]{cx + 1, Y - 1, cz + 30};
+    }
+
+    /** El atril de la cripta de debajo de la fuente: el libro perdido 17. */
+    public int[] atrilEscondido() {
+        return new int[]{cx + 3, Y - 5, cz + 27};
+    }
+
     // ------------------------------------------------------------------ construir
 
     @Override
@@ -363,6 +429,7 @@ public final class TorreCupula extends Element {
                 if (w < 0) c.set(cx, Y + h, z, HUESO);
             }
         cerrarReja(c);
+        for (int[] a : flechasAspilleras()) if (c.inXZ(a[0], a[2])) c.set(a[0], a[1], a[2], Pal.AIR);
         // faroles de almas bajo el arco y la escalera de mano a la sala del torno (por la cara de dentro, al este)
         c.set(cx, Y + PALTO - 1, z0 + 1, Pal.SOUL_LANTERN_HANG);
         int lx = cx + PX + 2;
@@ -518,6 +585,8 @@ public final class TorreCupula extends Element {
         }
         bancos(c);
         fuente(c, cx, cz + 28);
+        // las losas de los pinchos del camino norte (cinceladas)
+        for (int[] q : pinchos()) if (q[1] == Y && c.inXZ(q[0], q[2])) c.set(q[0], Y - 1, q[2], Pal.b(Blocks.CHISELED_DEEPSLATE));
     }
 
     private void arbolSeco(Canvas c, int x0, int z0, int k) {
@@ -597,6 +666,44 @@ public final class TorreCupula extends Element {
         for (int i = 1; i <= 3; i++) c.set(fx + i, Y, fz - 1, i == 3 ? Pal.b(Blocks.CHISELED_DEEPSLATE) : Pal.b(Blocks.POLISHED_DEEPSLATE));
         c.set(fx - 2, Y, fz + 1, Pal.b(Blocks.WATER));
         c.set(fx - 1, Y, fz + 2, Pal.b(Blocks.WATER));
+        cripta(c);
+    }
+
+    /**
+     * La cripta del vigia (parte 5c, el libro perdido 17): una trampilla en la taza de la fuente, una escalera de mano y
+     * debajo una salita con el atril, los huesos del vigia y un farol.
+     */
+    private void cripta(Canvas c) {
+        int[] t = trampilla();
+        int x0 = cx - 1, x1 = cx + 4, z0 = cz + 26, z1 = cz + 30, yb = Y - 6;
+        for (int x = x0 - 1; x <= x1 + 1; x++)
+            for (int z = z0 - 1; z <= z1 + 1; z++)
+                for (int y = yb; y <= Y - 2; y++) {
+                    if (!c.inXZ(x, z)) continue;
+                    boolean borde = x < x0 || x > x1 || z < z0 || z > z1 || y == yb || y == Y - 2;
+                    c.set(x, y, z, borde ? (y == yb ? Pal.DS_TILES : Pal.DS_BRICKS) : Pal.AIR);
+                }
+        // el pozo de la trampilla (con la escalera de mano por el lado sur)
+        for (int y = Y - 5; y <= Y - 2; y++) {
+            c.set(t[0], y, t[2], Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.NORTH));
+            c.set(t[0], y, t[2] + 1, Pal.DS_BRICKS);
+        }
+        c.set(t[0], t[1], t[2], Blocks.DARK_OAK_TRAPDOOR.defaultBlockState()
+                .setValue(net.minecraft.world.level.block.TrapDoorBlock.FACING, Direction.NORTH)
+                .setValue(net.minecraft.world.level.block.TrapDoorBlock.HALF, net.minecraft.world.level.block.state.properties.Half.TOP));
+        // los huesos del vigia, su farol y velas
+        c.set(cx - 1, Y - 5, cz + 26, Pal.b(Blocks.SKELETON_SKULL));
+        c.set(cx, Y - 5, cz + 26, hueso(Direction.Axis.X));
+        c.set(cx - 1, Y - 5, cz + 27, hueso(Direction.Axis.Z));
+        c.set(cx + 4, Y - 5, cz + 30, Pal.SOUL_LANTERN);
+        c.set(cx + 4, Y - 5, cz + 26, Pal.candles(Blocks.BLACK_CANDLE, 3));
+        c.set(t[0], Y, t[2], Pal.AIR);
+        int[] a = atrilEscondido();
+        try {
+            c.lectern(a[0], a[1], a[2], Direction.SOUTH, com.darkcraft.fortaleza.Perdidos.libro(17));
+        } catch (Throwable e) {
+            c.set(a[0], a[1], a[2], Pal.facing(Blocks.LECTERN, Direction.SOUTH));
+        }
     }
 
     // ------------------------------------------------------------------ la cupula
@@ -839,23 +946,25 @@ public final class TorreCupula extends Element {
 
     private void mazmorras(Canvas c) {
         int ys = Y + SOTANO;
-        // un pasillo norte-sur bajo la torre con celdas a los dos lados
+        // un pasillo norte-sur bajo la torre con celdas a los dos lados; alrededor del tubo del ascensor, dos salas de
+        // guardia (al este, donde da la puerta de la escalera, y al oeste) que unen las dos mitades del pasillo
         for (int x = cx - AT + GT; x <= cx + AT - GT; x++)
             for (int z = cz - AT + GT; z <= cz + AT - GT; z++) {
                 if (!c.inXZ(x, z) || octo(x - cx, z - cz) > AT - GT + 0.5) continue;
-                int dx = x - cx;
-                // las rejas de las celdas (en x = +-3) con su puerta
-                if (Math.abs(dx) == 3 && Math.abs(z - cz) > ASC + 1) {
-                    for (int y = ys; y < ys + 4; y++) c.set(x, y, z, Pal.IRON_BARS);
-                    if (Math.floorMod(z - cz, 4) == 1) for (int y = ys; y < ys + 2; y++) c.set(x, y, z, Pal.AIR);
+                int dx = x - cx, dz = z - cz;
+                boolean sala = Math.abs(dz) <= ASC + 2 && Math.abs(dx) > ASC + 1;
+                // las rejas de las celdas (en x = +-3) con su puerta; junto a las salas, abiertas
+                if (Math.abs(dx) == 3 && Math.abs(dz) > ASC + 1) {
+                    boolean abierta = Math.abs(dz) == ASC + 2 || Math.floorMod(dz, 4) == 1;
+                    for (int y = ys; y < ys + 4; y++) c.set(x, y, z, abierta && y < ys + 2 ? Pal.AIR : Pal.IRON_BARS);
                 }
-                // separaciones entre celdas
-                if (Math.abs(dx) > 3 && Math.floorMod(z - cz, 4) == 3) for (int y = ys; y < ys + 4; y++) c.set(x, y, z, Pal.DS_BRICKS);
+                // separaciones entre celdas (no en las salas)
+                if (!sala && Math.abs(dx) > 3 && Math.floorMod(dz, 4) == 3) for (int y = ys; y < ys + 4; y++) c.set(x, y, z, Pal.DS_BRICKS);
                 // techo bajo
                 c.set(x, ys + 4, z, Pal.DS_TILES);
                 for (int y = ys + 5; y < Y - 1; y++) c.set(x, y, z, Pal.foundation(x, y, z));
                 // lo que hay en las celdas: cadenas, paja podrida, huesos
-                if (Math.abs(dx) > 4) {
+                if (!sala && Math.abs(dx) > 4) {
                     int p = Hash.pct(x, ys, z, seed);
                     if (p < 10) c.set(x, ys, z, Pal.b(Blocks.HAY_BLOCK));
                     else if (p < 16) c.set(x, ys, z, Pal.b(Blocks.SKELETON_SKULL));
@@ -868,11 +977,52 @@ public final class TorreCupula extends Element {
         for (int x = cx - ASC - 1; x <= cx + ASC + 1; x++)
             for (int z = cz - ASC - 1; z <= cz + ASC + 1; z++)
                 for (int y = ys; y < ys + 4; y++) if (Math.max(Math.abs(x - cx), Math.abs(z - cz)) == ASC + 1) c.set(x, y, z, Pal.DS_BRICKS);
-        // faroles colgando del techo del pasillo
+        // faroles colgando del techo del pasillo y de las salas
         for (int z = cz - 6; z <= cz + 6; z += 6) {
             if (Math.abs(z - cz) <= ASC + 1) continue;
             c.set(cx, ys + 3, z, Pal.SOUL_LANTERN_HANG);
         }
+        for (int s2 = -1; s2 <= 1; s2 += 2) c.set(cx + s2 * 6, ys + 3, cz, Pal.SOUL_LANTERN_HANG);
+        // las losas de los pinchos (cinceladas: el que se fija, las ve)
+        for (int[] q : pinchos()) if (q[1] == ys) c.set(q[0], q[1] - 1, q[2], Pal.b(Blocks.CHISELED_DEEPSLATE));
+        salaSecreta(c);
+    }
+
+    /**
+     * La sala secreta (parte 5c): detras del muro falso del oeste del sotano (parece el muro de la torre; se abre al
+     * golpearlo, fortaleza/Trampas), una cueva labrada en la roca de la isla con el tesoro del Maestre Velan.
+     */
+    private void salaSecreta(Canvas c) {
+        int ys = Y + SOTANO;
+        // el muro falso: el muro de siempre (se quita en el juego)
+        for (int[] q : muroFalso()) c.set(q[0], q[1], q[2], piedra(q[0], q[1], q[2]));
+        int x0 = cx - AT - 8, x1 = cx - AT - 1, z0 = cz - 3, z1 = cz + 3;
+        for (int x = x0 - 1; x <= x1; x++)
+            for (int z = z0 - 1; z <= z1 + 1; z++)
+                for (int y = ys - 1; y <= ys + 4; y++) {
+                    if (!c.inXZ(x, z)) continue;
+                    boolean borde = x < x0 || z < z0 || z > z1 || y == ys - 1 || y == ys + 4;
+                    if (x == x1 && !borde) {
+                        // lo que queda entre el muro de la torre y la sala: el paso, de tres de ancho
+                        c.set(x, y, z, Math.abs(z - cz) <= 1 && y < ys + 3 ? Pal.AIR : Pal.DS_BRICKS);
+                        continue;
+                    }
+                    c.set(x, y, z, borde ? (y == ys - 1 ? Pal.DS_TILES_CRACKED : Pal.DS_BRICKS_CRACKED) : Pal.AIR);
+                }
+        // el tesoro: el cofre, velas, oro desparramado y los huesos del que lo guardaba
+        int[] cf = cofreSecreto();
+        try {
+            c.chest(cf[0], cf[1], cf[2], Direction.EAST, new net.minecraft.resources.ResourceLocation(com.darkcraft.DarkCraftMod.MODID, "chests/fortaleza_secreto"));
+        } catch (Throwable t) {
+            c.set(cf[0], cf[1], cf[2], Pal.facing(Blocks.CHEST, Direction.EAST));
+        }
+        c.set(cf[0], cf[1], cf[2] - 2, Pal.b(Blocks.GOLD_BLOCK));
+        c.set(cf[0], cf[1], cf[2] + 2, Pal.GILDED);
+        c.set(cf[0] + 1, cf[1], cf[2] + 2, Pal.candles(Blocks.RED_CANDLE, 4));
+        c.set(cf[0] + 1, cf[1], cf[2] - 2, Pal.candles(Blocks.RED_CANDLE, 3));
+        c.set(cf[0] + 3, cf[1], cf[2] + 3, Pal.b(Blocks.SKELETON_SKULL));
+        c.set(cf[0] + 3, cf[1], cf[2] + 2, hueso(Direction.Axis.Z));
+        c.set(cf[0] + 2, cf[1] + 3, cf[2], Pal.SOUL_LANTERN_HANG);
     }
 
     // ------------------------------------------------------------------ cada planta
@@ -883,6 +1033,7 @@ public final class TorreCupula extends Element {
         aposentos(c, piso(2), 0);
         aposentos(c, piso(3), 1);
         ruina(c, piso(4));
+        for (int[] q : sueloQueCede()) if (c.inXZ(q[0], q[2])) c.set(q[0], q[1], q[2], Pal.DS_TILES_CRACKED);
         observatorio(c, piso(5));
     }
 

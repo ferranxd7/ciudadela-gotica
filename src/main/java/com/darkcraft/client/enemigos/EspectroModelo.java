@@ -24,14 +24,18 @@ public class EspectroModelo extends EnemigoModelo<Espectro> {
 
     /** Lo opaco que se dibuja ahora (lo pone el dibujante antes de cada vez). */
     public float alfa = 0.7f;
+    /** El vigia (parte 5c) no es azulado: va hacia el rojo. */
+    private boolean vigia;
 
     public EspectroModelo(ModelPart root) {
-        super(root, RenderType::entityTranslucent, EspectroGeometria.OCULTAS_0, EspectroGeometria.OCULTAS_1);
+        super(root, RenderType::entityTranslucent, EspectroGeometria.OCULTAS_0, EspectroGeometria.OCULTAS_1, EspectroGeometria.OCULTAS_2);
     }
 
     @Override
     protected boolean animar(Espectro e, float paso, float cuanto, float edad, float guardia) {
-        int v = Math.max(0, Math.min(1, e.variante()));
+        // (el vigia lleva el estoque y pelea como el cortesano)
+        int v = e.variante() == Espectro.GARRAS ? 1 : 0;
+        vigia = e.variante() == Espectro.VIGIA;
         int accion = e.accionVista();
         if (accion == 0) {
             switch (e.postura()) {
@@ -51,7 +55,8 @@ public class EspectroModelo extends EnemigoModelo<Espectro> {
 
     @Override
     public void renderToBuffer(PoseStack ps, VertexConsumer vc, int luz, int capa, float r, float g, float b, float a) {
-        // algo azulado y frio, y medio transparente
-        super.renderToBuffer(ps, vc, luz, capa, r * 0.86f, g * 0.95f, b, a * alfa);
+        // algo azulado y frio (el vigia, algo rojizo), y medio transparente
+        if (vigia) super.renderToBuffer(ps, vc, luz, capa, r, g * 0.84f, b * 0.82f, a * alfa);
+        else super.renderToBuffer(ps, vc, luz, capa, r * 0.86f, g * 0.95f, b, a * alfa);
     }
 }

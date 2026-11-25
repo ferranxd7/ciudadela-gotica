@@ -9,7 +9,8 @@ darkcraft.narracion.6.N.
 # N -> donde esta: "valdrenn" o "fortaleza"
 DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdrenn",
          6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza",
-         12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela"}
+         12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
+         17: "fortaleza"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -301,6 +302,16 @@ LIBROS = {
    "I took the Heron apart with my own hands. If no one can leave, no one will carry this to another island. So I told myself.",
    "I carried the heart up to the lighthouse. While it burns, those who fell into the sea of clouds will find their way home.\n\nAnd they did. God help us: they did.",
    "They come up from the quay every night, dripping mist, and they do not know me. I no longer know myself.\n\nWhoever reads this: do not take the heart. Or take it, and take us with you."]),
+ },
+ 17: {
+  "es": ("Confesión bajo la fuente", "Oswin, el último vigía de la cúpula", [
+   "Éramos doce vigías bajo la cúpula. Velábamos el jardín, la torre del maestre Velan y, de noche, por turnos, la puerta de lo más alto. Nunca nos dijeron qué guardaba.",
+   "Cuando el cielo se puso rojo, los otros once subieron a mirar. No bajaron. Ahora rondan el jardín con los ojos encendidos y se apagan si los miras.\n\nYo me escondí aquí, bajo la fuente.",
+   "El tesoro del maestre no está en la armería. Está tras el muro que no es muro: en el sótano, en la sala de guardia del oeste. Un buen golpe y se deshace como ceniza.\n\nQue me perdone. Ya nadie lo necesita."]),
+  "en": ("Confession Beneath the Fountain", "Oswin, last watchman of the dome", [
+   "There were twelve of us watchmen beneath the dome. We kept the garden, Maester Velan's tower and, by night, in turns, the door at the very top. No one ever told us what it guarded.",
+   "When the sky turned red, the other eleven went up to look. They never came down. Now they walk the garden with burning eyes and fade away if you look at them.\n\nI hid down here, beneath the fountain.",
+   "The maester's treasure is not in the armoury. It lies behind the wall that is no wall: in the cellar, in the west guardroom. Strike it well and it crumbles like ash.\n\nMay he forgive me. No one needs it now."]),
  },
 }
 
