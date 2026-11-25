@@ -171,6 +171,46 @@ public final class ClientMusic {
         }
     }
 
+    // ------------------------------------------------------------------ la pantalla de titulo (parte 2f-2)
+
+    private static Track titulo;
+    private static int tituloTicks;
+
+    /** Fuera de un mundo, con una pantalla de menu delante (no las de cargar o conectar): la musica del titulo. */
+    private static boolean enMenus(Minecraft mc) {
+        if (mc.level != null || mc.getOverlay() != null || mc.screen == null) return false;
+        var s = mc.screen;
+        return !(s instanceof net.minecraft.client.gui.screens.LevelLoadingScreen
+                || s instanceof net.minecraft.client.gui.screens.ReceivingLevelScreen
+                || s instanceof net.minecraft.client.gui.screens.GenericDirtMessageScreen
+                || s instanceof net.minecraft.client.gui.screens.ProgressScreen
+                || s instanceof net.minecraft.client.gui.screens.ConnectScreen);
+    }
+
+    private static void tickTitulo(Minecraft mc) {
+        boolean quiere = enMenus(mc);
+        if (quiere) {
+            if (titulo == null || titulo.dying() || !mc.getSoundManager().isActive(titulo) && tituloTicks > 40) {
+                if (titulo != null && !titulo.dying()) mc.getSoundManager().stop(titulo);
+                titulo = new Track(DarkCraftMod.MUSICA_TITULO.get(), "titulo", true);
+                tituloTicks = 0;
+                mc.getSoundManager().play(titulo);
+                titulo.fadeTo(0.6f, 3.0f);
+            }
+        } else if (titulo != null && !titulo.dying()) titulo.kill(2.0f);
+        if (titulo != null) {
+            tituloTicks++;
+            if (titulo.dying() && !mc.getSoundManager().isActive(titulo) && tituloTicks > 40) titulo = null;
+        }
+    }
+
+    /** Para la prueba de la CI: si suena la musica del titulo. */
+    public static String titulo() {
+        Minecraft mc = Minecraft.getInstance();
+        return titulo == null ? "sin musica de titulo" : String.format("musica de titulo %.2f%s", titulo.level(),
+                mc.getSoundManager().isActive(titulo) ? "" : " (parada)");
+    }
+
     // ------------------------------------------------------------------ cada tick
 
     @SubscribeEvent
@@ -214,6 +254,8 @@ public final class ClientMusic {
         }
         tickZona(mc);
         if (zona != null && !zona.dying()) any = true;
+        tickTitulo(mc);
+        if (titulo != null && !titulo.dying()) any = true;
         // que no se mezcle con la musica normal del juego
         if (any) mc.getMusicManager().stopPlaying();
     }

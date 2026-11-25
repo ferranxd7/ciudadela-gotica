@@ -165,6 +165,11 @@ public class PausaScreen extends Screen {
         opciones.get(i).accion().run();
     }
 
+    /** Para la prueba de la CI: guardar y salir. */
+    public void probarSalir() {
+        salir();
+    }
+
     /** Para la prueba de la CI. */
     public String resumen() {
         StringBuilder b = new StringBuilder("pausa:");

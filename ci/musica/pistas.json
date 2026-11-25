@@ -77,5 +77,16 @@
     "aviso": "Music by Matthew Pablo, http://www.matthewpablo.com",
     "uso": "La Fortaleza de Hueso",
     "lufs": -18
+  },
+  {
+    "id": "titulo",
+    "pagina": "https://opengameart.org/content/ashbringer-epic-main-menu-theme",
+    "busca": "ashbringer",
+    "titulo": "Ashbringer (Epic Main Menu Theme)",
+    "autor": "William Hector",
+    "licencia": "CC-BY 4.0",
+    "aviso": "Music by William Hector (https://www.youtube.com/@WilliamHectorMusic)",
+    "uso": "La pantalla de titulo",
+    "lufs": -17
   }
 ]

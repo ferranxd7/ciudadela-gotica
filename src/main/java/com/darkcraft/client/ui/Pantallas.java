@@ -6,6 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ScreenEvent;
@@ -24,7 +26,8 @@ import java.lang.reflect.Modifier;
  * <li>la pausa (ESC): {@link PausaScreen} (la de F3 + ESC, que no tiene menu, se deja);</li>
  * <li>las opciones (desde el titulo de Minecraft, mientras no haya uno propio): {@link OpcionesScreen};</li>
  * <li>la lista de mods de Forge: {@link ModsScreen};</li>
- * <li>los progresos de Minecraft (la L): la pestana de logros del menu ({@link MenuScreen}).</li>
+ * <li>los progresos de Minecraft (la L): la pestana de logros del menu ({@link MenuScreen});</li>
+ * <li>el titulo ({@link TituloScreen}) y la lista de mundos ({@link PartidasScreen}).</li>
  * </ul>
  * Las demas (graficos, controles, idioma, recursos...) siguen siendo las de Minecraft, pero con los botones, los
  * deslizadores y los fondos del mod (tools/ui/vanilla.py).
@@ -47,6 +50,9 @@ public final class Pantallas {
         if (s.getClass() == PauseScreen.class && conMenu((PauseScreen) s)) return new PausaScreen();
         if (s.getClass() == OptionsScreen.class) return new OpcionesScreen(anterior(s, OptionsScreen.class));
         if (s.getClass() == ModListScreen.class) return new ModsScreen(anterior(s, ModListScreen.class));
+        // el titulo y la lista de mundos (parte 2f-2)
+        if (s.getClass() == TitleScreen.class) return new TituloScreen();
+        if (s.getClass() == SelectWorldScreen.class) return new PartidasScreen(anterior(s, SelectWorldScreen.class));
         // los progresos (la L): la pestana de logros del menu
         if (s instanceof AdvancementsScreen && Minecraft.getInstance().player != null) {
             Panel.abre();

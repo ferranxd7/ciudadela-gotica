@@ -93,8 +93,8 @@ public final class ClientCiTest {
                 finish(mc);
                 return;
             }
-            if (mc.level == null || mc.player == null) {
-                if (!loading && mc.screen instanceof TitleScreen && ticks > 40) {
+            if ((mc.level == null || mc.player == null) && inGame < 0) {
+                if (!loading && (mc.screen instanceof TitleScreen || mc.screen instanceof com.darkcraft.client.ui.TituloScreen) && ticks > 40) {
                     loading = true;
                     log("Pantalla de titulo: abriendo el mundo 'darkcraft'");
                     Object flows = Minecraft.class.getMethod("createWorldOpenFlows").invoke(mc);
@@ -122,7 +122,8 @@ public final class ClientCiTest {
             int t = ticks - inGame;
             while (next < steps.size() && t >= steps.get(next).at) {
                 Step s = steps.get(next++);
-                log(s.what + "  | fps=" + fps + " | " + mc.levelRenderer.getChunkStatistics() + " | " + mc.getSoundManager().getDebugString());
+                log(s.what + "  | fps=" + fps + " | " + (mc.level != null ? mc.levelRenderer.getChunkStatistics() : "fuera del mundo") + " | "
+                        + mc.getSoundManager().getDebugString());
                 s.run.accept(mc);
             }
             reyTick(mc);
@@ -2904,6 +2905,69 @@ public final class ClientCiTest {
 
     private static com.darkcraft.client.ui.OpcionesScreen opcionesAbiertas;
 
+    // ------------------------------------------------------------------ guardar y salir: el titulo y las partidas (parte 2f-2)
+
+    private static void logTitulo(Minecraft m, String what) {
+        String r;
+        if (m.screen instanceof com.darkcraft.client.ui.TituloScreen ti) r = ti.resumen();
+        else if (m.screen instanceof com.darkcraft.client.ui.PartidasScreen p) r = p.resumen();
+        else r = "pantalla " + (m.screen == null ? "ninguna" : m.screen.getClass().getName());
+        log("  titulo " + what + ": " + r + " | " + com.darkcraft.client.ClientMusic.titulo());
+    }
+
+    private static com.darkcraft.client.ui.TituloScreen tituloAbierto;
+
+    /** Al final de todo: lo que el mod apunta de la partida, guardar y salir (sale el titulo del mod) y las partidas. */
+    private static int titulo(int t0) {
+        int t = t0;
+        atTicks(t, "Lo que se apunta de la partida (darkcraft_partida.json)", m -> server(m, sp -> {
+            com.darkcraft.rol.Partida.escribir(sp);
+            try {
+                java.nio.file.Path f = sp.server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT)
+                        .resolve(com.darkcraft.rol.Partida.FICHERO);
+                log("  partida: " + (java.nio.file.Files.exists(f) ? java.nio.file.Files.readString(f) : "NO ESTA"));
+            } catch (Exception ex) {
+                log("  partida: " + ex);
+            }
+        }));
+        atTicks(t + 4, "La pausa: guardar y salir", m -> {
+            m.setScreen(null);
+            m.pauseGame(false);
+            if (m.screen instanceof com.darkcraft.client.ui.PausaScreen p) p.probarSalir();
+            else log("  no esta la pausa del mod: " + (m.screen == null ? "ninguna" : m.screen.getClass().getName()));
+        });
+        atTicks(t + 200, "Fuera del mundo: el titulo del mod", m -> {
+            logTitulo(m, "tras salir");
+            if (m.screen instanceof com.darkcraft.client.ui.TituloScreen ti) tituloAbierto = ti;
+        });
+        atTicks(t + 260, "captura: el titulo", m -> {
+            logTitulo(m, "titulo");
+            shot(m, "cliente_ti01_titulo");
+        });
+        atTicks(t + 262, "un rayo", m -> {
+            if (m.screen instanceof com.darkcraft.client.ui.TituloScreen ti) ti.probarRayo();
+        });
+        atTicks(t + 264, "captura: el titulo con el rayo", m -> shot(m, "cliente_ti02_rayo"));
+        atTicks(t + 266, "elegir la tercera opcion", m -> {
+            if (m.screen instanceof com.darkcraft.client.ui.TituloScreen ti) ti.probarElegir(2);
+        });
+        atTicks(t + 270, "captura: el titulo con otra opcion elegida", m -> shot(m, "cliente_ti03_elegida"));
+        atTicks(t + 272, "las partidas", m -> m.setScreen(new com.darkcraft.client.ui.PartidasScreen(m.screen)));
+        atTicks(t + 300, "captura: las partidas", m -> {
+            logTitulo(m, "partidas");
+            shot(m, "cliente_ti04_partidas");
+        });
+        atTicks(t + 302, "las opciones (fuera del mundo)", m -> m.setScreen(new com.darkcraft.client.ui.OpcionesScreen(tituloAbierto)));
+        atTicks(t + 310, "captura: las opciones desde el titulo", m -> shot(m, "cliente_ti05_opciones"));
+        atTicks(t + 312, "la lista de mundos de Minecraft se cambia sola", m -> {
+            m.setScreen(new net.minecraft.client.gui.screens.worldselection.SelectWorldScreen(tituloAbierto));
+            logTitulo(m, "SelectWorldScreen de Minecraft");
+            m.setScreen(tituloAbierto);
+        });
+        atTicks(t + 330, "de vuelta al titulo", m -> logTitulo(m, "vuelta"));
+        return t + 340;
+    }
+
     private static int pausa(int t0) {
         base = 0;
         int t = t0;
@@ -3627,7 +3691,8 @@ public final class ClientCiTest {
         });
         atTicks(S + 130 + 166, "captura de los logros", m -> shot(m, "cliente_99_logros"));
         atTicks(S + 130 + 170, "cerrar", m -> m.setScreen(null));
-        atTicks(S + 130 + 175, "Fin de la prueba", ClientCiTest::finish);
+        int finT = titulo(S + 130 + 175);
+        atTicks(finT, "Fin de la prueba", ClientCiTest::finish);
     }
 
     // ------------------------------------------------------------------ Ser Gavran (parte B1)

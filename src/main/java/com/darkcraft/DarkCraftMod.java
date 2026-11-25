@@ -55,6 +55,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> NARRACION_5 = sound("narracion.cap5");
     public static final RegistryObject<SoundEvent> NARRACION_6 = sound("narracion.cap6");
     public static final RegistryObject<SoundEvent> MUSICA_FORTALEZA = sound("musica.fortaleza");
+    public static final RegistryObject<SoundEvent> MUSICA_TITULO = sound("musica.titulo");
     public static final RegistryObject<SoundEvent> MUSICA_COFRE = sound("musica.cofre");
     public static final RegistryObject<SoundEvent> MUSICA_REY_1 = sound("musica.rey1");
     public static final RegistryObject<SoundEvent> MUSICA_REY_2 = sound("musica.rey2");

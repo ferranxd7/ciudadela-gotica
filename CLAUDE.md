@@ -491,6 +491,30 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   pantallas de Minecraft con el estilo del mod, mods, el aviso de un logro, una hazana sobre el menu y un aviso del
   sistema). El codice pasa paginas en un diario largo (`cliente_cx02..cx05`).
 
+### Plan grande, parte 2f-2: la pantalla de titulo y las partidas
+
+- **El titulo** (`client/ui/TituloScreen`, sustituye a `TitleScreen` desde `Pantallas`): Valdrenn sobre su isla flotante
+  en una noche de tormenta, en capas de 480 x 270 que se estiran a toda la pantalla (`tools/ui/titulo.py` →
+  `textures/gui/titulo/`: `cielo.png` con la luna y las nubes altas, `lejos.png` con el castillo —la aguja de la Torre de
+  Ascenso delante de la luna, la torre-arbol de Ser Gavran con su copa, los rios que caen al vacio— e islas pequenas,
+  `nubes_lejos.png` / `nubes_cerca.png` de 512 de ancho que se repiten y se mueven a distinta velocidad, `rayo.png` y
+  `logo.png`). Rayos cada 7-17 s con destello detras del castillo y trueno; brasas que suben; un velo oscuro a la
+  izquierda para leer el menu; sale de negro al abrir. El logo "Dark Craft" (New Rocker en oro con filo rojo y tinta) a
+  escala entera. Menu en gotica a la izquierda: continuar (la ultima partida, con su linea de nivel y zona), partidas,
+  nueva partida (de momento la de Minecraft, con el estilo del mod), multijugador, opciones, mods y salir; teclado y raton.
+- **Musica del titulo** (`ClientMusic.tickTitulo`): "Ashbringer (Epic Main Menu Theme)" de William Hector (CC-BY 4.0,
+  `ci/musica/pistas.json` id `titulo`), en bucle mientras no hay mundo y hay una pantalla de menu delante (no las de
+  cargar o conectar); para la musica del juego.
+- **Las partidas** (`PartidasScreen`, sustituye a la lista de mundos): cada mundo con su dibujo (`FaviconTexture`), su
+  nombre, "Nivel 12 · Torre de Ascenso", las horas jugadas y la fecha; jugar (doble clic o Intro), nueva, borrar (con
+  pregunta; `LevelStorageAccess.deleteLevel`) y volver. Lo del mod sale de `darkcraft_partida.json` en la carpeta del
+  mundo (`rol/Partida`: nivel, ecos, zona —`Rol.de(p).zona`, clave de idioma—, clase —desde la 2f-3—, dia, horas y
+  version), que se escribe al guardar el mundo y al salir, solo en los mundos de un jugador (lo de su dueno).
+  `client/ui/Guardadas` las carga (`LevelStorageSource.loadLevelSummaries`) con lo del fichero.
+- La prueba del cliente acaba con el tramo `titulo()`: apunta la partida, guarda y sale desde la pausa del mod y captura
+  el titulo (`cliente_ti01..ti03`, con un rayo y otra opcion elegida), las partidas (`ti04`) y las opciones fuera del
+  mundo (`ti05`). Desde que se sale, los pasos siguen corriendo sin mundo (los de `server(...)` ya no valen).
+
 ## Compilar, probar y publicar
 
 - La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (con y sin mods) y un cliente con capturas
