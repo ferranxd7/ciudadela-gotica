@@ -25,6 +25,10 @@ public final class FortalezaPlan {
     public final Island isla;
     /** Borde de la isla delante de la puerta: donde empieza el camino (z) y donde llega el puente (z + 1). */
     public final int bordeZ;
+    /** La montana del sur (parte 5b): de su mirador sale el puente largo hasta el borde de la isla. */
+    public final Montana montana;
+    /** Largo del puente (en z, del mirador al borde de la isla) y lo que queda la cima por debajo del patio. */
+    public static final int LARGO = 78, BAJO_CIMA = 16;
     private final List<Element> elementos = new ArrayList<>();
     private final Map<Long, List<Element>> indice = new HashMap<>();
     private final Set<String> avisados = new HashSet<>();
@@ -49,13 +53,16 @@ public final class FortalezaPlan {
         bordeZ = b;
         elementos.add(new Camino(rng.fork()));
         elementos.add(new Ruinas(rng.fork()));
-        elementos.add(new Nubes(rng.fork()));
+        int mzM = bordeZ + LARGO + Montana.RP + 1;
+        elementos.add(new Nubes(rng.fork(), mzM));
+        montana = new Montana(rng.fork(), cx, mzM, Y - BAJO_CIMA);
+        elementos.add(montana);
         elementos.sort(java.util.Comparator.comparingInt(e -> e.layer));
         for (Element e : elementos)
             for (int x = e.x0 >> 4; x <= e.x1 >> 4; x++)
                 for (int z = e.z0 >> 4; z <= e.z1 >> 4; z++) {
                     indice.computeIfAbsent(clave(x, z), k -> new ArrayList<>()).add(e);
-                    if (!(e instanceof Nubes)) nucleo.add(clave(x, z));
+                    if (!(e instanceof Nubes) && !(e instanceof Montana)) nucleo.add(clave(x, z));
                 }
     }
 
@@ -231,7 +238,7 @@ public final class FortalezaPlan {
     final class Nubes extends Element {
         private final List<double[]> bolas = new ArrayList<>(); // x, y, z, rx, ry, rz
 
-        Nubes(long seed) {
+        Nubes(long seed, int mzM) {
             super(seed);
             this.layer = 1;
             Rng r = new Rng(seed);
@@ -244,8 +251,10 @@ public final class FortalezaPlan {
                 for (int i = 0; i < n; i++) {
                     double[] b = {bx + (r.nextDouble() - 0.5) * 16, by + (r.nextDouble() - 0.5) * 2.5, bz + (r.nextDouble() - 0.5) * 16,
                             4 + r.nextDouble() * 6, 1.6 + r.nextDouble() * 1.6, 4 + r.nextDouble() * 6};
-                    // nada de nubes donde ira la escalera de hueso (al sur, delante de la puerta)
+                    // nada de nubes donde iba la escalera de hueso (parte 5a: al sur, delante de la puerta) ni a lo largo del
+                    // puente que tiende la llave desde la montana (5b)
                     if (Math.hypot(b[0] - (cx - 5), b[2] - (bordeZ + 13)) < 28 + Math.max(b[3], b[5])) continue;
+                    if (b[2] > bordeZ - 6 && b[2] < mzM && Math.abs(b[0] - cx) < 12 + Math.max(b[3], b[5])) continue;
                     bolas.add(b);
                 }
             }

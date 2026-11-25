@@ -99,25 +99,42 @@ public class LlaveHueso extends Item {
             else p.displayClientMessage(Component.translatable("darkcraft.llave.puerta_ya").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC), true);
             return;
         }
-        // bajo la fortaleza, en el sitio de la escalera: levanta el puente de hueso y nubes
-        int[] c = Puente.centro(f);
-        double dEscalera = Math.hypot(p.getX() - (c[0] + 0.5), p.getZ() - (c[1] + 0.5));
-        if (dEscalera < 48) {
+        // en el mirador de la montana, delante del arco de colmillos: tiende el puente largo hasta la isla
+        int[] a = Puente.arco(f);
+        double dArco = Math.hypot(p.getX() - (a[0] + 0.5), p.getZ() - (a[2] + 0.5));
+        if (dArco < 14 && Math.abs(p.getY() - a[1]) < 8) {
             if (FortalezaEventos.levantarPuente(p, s))
                 p.displayClientMessage(Component.translatable("darkcraft.llave.puente").withStyle(ChatFormatting.GOLD, ChatFormatting.ITALIC), true);
             else {
                 p.displayClientMessage(Component.translatable("darkcraft.llave.puente_ya").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC), true);
-                rastro(p, new Vec3(c[0] + 0.5, p.getY(), c[1] + 0.5), 40, 18);
+                rastro(p, new Vec3(f.cx + 0.5, f.Y, f.bordeZ + 0.5), 40, 18);
             }
             return;
         }
-        // lejos: el rastro tira fuerte hacia la escalera de la fortaleza, y dice hacia donde y a cuantos bloques
-        Vec3 obj = new Vec3(c[0] + 0.5, f.Y, c[1] + 0.5);
+        // lejos: el rastro tira fuerte hacia donde toca (el pie de la montana, el mirador o la puerta) y dice hacia donde
+        Vec3 obj = objetivo(p, s, f);
         rastro(p, obj, 60, 30);
         double d = Math.hypot(obj.x - p.getX(), obj.z - p.getZ());
         Component dir = Component.translatable("darkcraft.dir." + rumbo(obj.x - p.getX(), obj.z - p.getZ()));
         String clave = d < 300 ? "darkcraft.llave.cerca" : "darkcraft.llave.rastro";
         p.displayClientMessage(Component.translatable(clave, dir, (int) Math.round(d)).withStyle(ChatFormatting.WHITE, ChatFormatting.ITALIC), true);
+    }
+
+    /**
+     * Hacia donde tira la llave: con el puente tendido y ya arriba (en el puente o en la isla), a la reja de la puerta; en
+     * la montana, al arco del mirador; si no, al pie del sendero de la montana (donde llega el camino de nubes).
+     */
+    static Vec3 objetivo(ServerPlayer p, Fortalezas.Sitio s, FortalezaPlan f) {
+        boolean puente = com.darkcraft.fortaleza.FortalezaDatos.get(p.server).de(s).puente;
+        boolean arriba = Math.abs(p.getY() - f.Y) < 6 && (Math.hypot(p.getX() - f.cx, p.getZ() - f.cz) < 80
+                || Puente.enPuente(f, p.getX(), p.getY(), p.getZ()));
+        if (puente && arriba) return new Vec3(f.cx + 0.5, f.Y, f.cz + TorreCupula.PZ + 1.5);
+        if (f.montana.distancia(p.getX(), p.getZ()) < 6 && p.getY() > com.darkcraft.gen.Montana.NUBES - 3) {
+            int[] a = Puente.arco(f);
+            return new Vec3(a[0] + 0.5, a[1], a[2] + 0.5);
+        }
+        double[] pie = f.montana.pie();
+        return new Vec3(pie[0] + 0.5, pie[2], pie[1] + 0.5);
     }
 
     /** "n", "ne", "e", "se", "s", "so", "o" o "no" (el norte es -z). */
@@ -154,12 +171,7 @@ public class LlaveHueso extends Item {
         Fortalezas.Sitio s = destino(p, st);
         if (s == null) return;
         FortalezaPlan f = Fortalezas.plan(p.serverLevel().getSeed(), s);
-        int[] c = Puente.centro(f);
-        Vec3 obj;
-        if (com.darkcraft.fortaleza.FortalezaDatos.get(p.server).de(s).puente && Math.abs(p.getY() - f.Y) < 4
-                && Math.hypot(p.getX() - f.cx, p.getZ() - f.cz) < 70)
-            obj = new Vec3(f.cx + 0.5, f.Y, f.cz + TorreCupula.PZ + 1.5); // ya arriba: hacia la reja de la puerta
-        else obj = new Vec3(c[0] + 0.5, f.Y, c[1] + 0.5);
+        Vec3 obj = objetivo(p, s, f);
         rastro(p, obj, 16, 12);
         if (p.tickCount % 120 == 13)
             p.serverLevel().playSound(null, p.getX(), p.getY(), p.getZ(), DarkCraftMod.SFX_LLAVE_RASTRO.get(), SoundSource.PLAYERS, 0.35f, 1.15f);

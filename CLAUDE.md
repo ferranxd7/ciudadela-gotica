@@ -1031,15 +1031,55 @@ por **`gen/TorreCupula`** (en `gen/FortalezaPlan`, que sigue siendo el plano: is
   torrecilla del sotano a la terraza (`... 0 tapados`) y cuenta lo que se anda en cada planta; al final viaja en el
   ascensor de hueso (`cliente_f45..47`).
 
+### Plan grande, parte 5b: la montana y el puente largo
+
+Respuestas 36 y 37 del plan: ya no hay escalera de caracol ni corriente de nubes; se sube por una montana y la llave
+tiende un puente largo desde su cima.
+- **`gen/Montana`** (en `FortalezaPlan.montana`, cima en `(cx, bordeZ + LARGO + RP + 1)` a `Y - BAJO_CIMA`, es decir 304;
+  `LARGO` 78): solo del mundo de nubes. Un cono de roca oscura (`CONO` 2,6 de bajada por bloque, crestas con ruido y ocho
+  agujas de roca por los lados, nunca al sur ni al norte) con un **hombro** al sur (`HOMBRO` 22 de medio ancho, baja 0,8
+  por bloque) por el que va el **sendero en zigzag**: tramos de `2*MEDIO` (32) a lo ancho, un bloque de bajada por cada
+  tres (siguen el plano del hombro: avanzan hacia el sur), y **recodos** de radio `RECODO` (3) con medias losas; tres de
+  ancho, enlosado, despejado por encima, relleno por debajo y con pretil donde hay caida (faroles en postes de hueso).
+  Acaba en `NUBES` (251, lo que se pisa en los caminos de nube firme) en una **plazoleta** (`pie()`), un poco mas alla del
+  ultimo punto; ahi el hombro se corta. Por debajo de `CORTE` (232) la roca cuelga como una isla hasta `FONDO` (190).
+  **Restos de torres** en los recodos (uno de cada dos y el ultimo). Arriba, el **mirador** (`RP` 9, enlosado, anillo de
+  hueso, pretil) con el **arco de colmillos** al norte (`arco()`), de cara a la fortaleza. `distancia(x, z)`: lo lejos
+  de la montana (la zona de la fortaleza la incluye: musica, lluvia, `lugar`).
+- **El puente** (`fortaleza/Puente`, reescrito): del mirador (`z0` = mz - RP - 1, a la altura de la cima) al borde de la
+  isla (`bordeZ + 1`, a Y) en medias losas; tablero de cinco (espinazo de hueso, piedra negra), barandillas con postes de
+  hueso y calaveras, costillas de hueso por encima cada seis, farolillos colgados, viga y vertebras por debajo y nubes
+  colgando. Se forma del mirador a la isla en ~10 s (`levantar` / `tick`; los muretes con la bandera 3 para que se unan).
+  `enChunk` lo vuelve a poner en un chunk que se construya despues (`aplicarEstado`); `volcar` da sus bloques (vistas y
+  pruebas); `enPuente` y `altura`.
+- **La llave** (`LlaveHueso`): ante el arco del mirador (a 14 bloques) tiende el puente; si no, su rastro va a donde toque
+  (`objetivo`): el pie de la montana, el arco (si se esta en la montana) o la reja (con el puente tendido y ya arriba).
+- **Mundos de antes**: `FortalezaDatos.VERSION` = 3. Una de la 5a (version 2) se queda, pero su escalera de caracol (si
+  se levanto) se quita pieza a pieza (`fortaleza/EscaleraVieja`, el codigo de la escalera de la 5a, solo para eso:
+  `puenteViejo` con un 1 al final) y `puente` vuelve a falso. Una de antes de la 5a se rehace entera (como en la 5a).
+- **Camino de nubes** (`CaminoNubes`): lo lejano sigue el trazado de siempre (hacia la escalera de la fortaleza de antes
+  de la 5a, `centroPuenteAntiguo`: en un mundo con parte del camino hecho no se rompe) y desde alli `alPie` rodea la
+  montana por el lado por el que llega (a 54 del centro) hasta su plazoleta, desde el sur; la cuenta rapida (`cerca`) usa
+  la ruta de verdad a menos de 300 de la fortaleza. Las nubes del plano no tapan la linea del puente.
+- El Espejo: "Monte del Colmillo" (`fortaleza_montana`, el pie), "Mirador del Colmillo" (`fortaleza_mirador`) y "Puente
+  de Hueso" (`fortaleza_puente`). Comandos `/darkcraft fortaleza montana` (al pie) y `mirador` (ante el arco); `escalera`
+  ya no existe.
+- Sin abrir el juego: `tools/vista3d/Volcado.java montana` (la fortaleza con su montana en 0,0 y el puente tendido; con
+  `-Dtodo=true` todos los chunks del plano): escribe donde caen la cima, el arco y el pie y **si se llega a pie** del pie
+  al arco, por el puente a la isla y a la puerta (`Andar`).
+- Pruebas: servidor, `montanaDeLaFortaleza` (linea `Montana de la fortaleza: ...`: levanta sus chunks en el mundo de
+  nubes de verdad, sube a pie del pie al mirador y cruza el puente; luego lo quita); cliente, tramo `fortaleza()`
+  (capturas `cliente_f05_montana_pie`, `f05_montana_recodo`, `f05_mirador`, el puente formandose `f06_puente_0/1`,
+  `f06_puente_mirador` y `f07_puente_cruzar`; lineas `montana a pie: ...` y `puente a pie: ...`).
+
 ### Lo siguiente: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5a, la torre bajo la cupula**: hecha (arriba).
-- **5b, la montana y el puente largo** (36, 37): la montana junto a la fortaleza (roca oscura, sendero en zigzag, restos
-  de torres, mirador con el arco de la llave en la cima) y el puente largo de hueso y nubes que tiende la llave desde
-  alli; fuera la escalera de caracol y la corriente de nubes (`fortaleza/Puente`).
-- **5c, dentro de la fortaleza** (44, 46, 47): trampas (suelo que cede, pinchos de hueso, flechas), el libro perdido extra
-  y la sala secreta tras un muro falso, caballeros zombi y espectros nuevos que aparecen y desaparecen.
+- **5b, la montana y el puente largo**: hecha (arriba). Los enemigos del sendero van con los de dentro (5c).
+- **5c, dentro de la fortaleza y en la montana** (37, 44, 46, 47): trampas (suelo que cede, pinchos de hueso, flechas), el
+  libro perdido extra y la sala secreta tras un muro falso, caballeros zombi y espectros nuevos que aparecen y
+  desaparecen; enemigos por el sendero de la montana (en las torres en ruinas de los recodos).
 - **5d, el camino de nubes** de Valdrenn a la torre (81): largo, a pie, con islotes de parada (ruinas, enemigos, cofres).
 - **5e, el portal** (48-68): marco nuevo (piedra de sombra con runas que laten, hueso, hierro negro y cadenas), remolino,
   estatuas gigantes y pilares, el pedestal del amuleto, la voz de la Sombra, la cinematica del rayo rojo y el cielo rojo.

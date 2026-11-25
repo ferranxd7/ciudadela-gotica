@@ -64,8 +64,9 @@ import java.util.UUID;
 
 /**
  * Lo que pasa en las Fortalezas de Hueso: se levantan chunk a chunk cuando alguien se acerca (tambien en mundos de
- * antes), su zona (lluvia sin tormenta, su musica, los caballeros zombi), la corriente de nubes de la escalera, la
- * puerta que abre la llave (cinematica), el amuleto en el altar (el capitulo 6 y el portal) y la forja del amuleto.
+ * antes), su zona (la isla y la montana del sur: lluvia sin tormenta, su musica, los caballeros zombi), el puente largo
+ * que tiende la llave desde la montana, la puerta que abre la llave (cinematica), el amuleto en el altar (el capitulo 6
+ * y el portal) y la forja del amuleto.
  */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID)
 public final class FortalezaEventos {
@@ -136,8 +137,6 @@ public final class FortalezaEventos {
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent e) {
         if (e.phase != TickEvent.Phase.END || e.side != LogicalSide.SERVER || !(e.player instanceof ServerPlayer p)) return;
-        Fortalezas.Sitio z = ZONA.get(p.getUUID());
-        if (z != null) corriente(p, z);
         if (p.tickCount % 20 != 13) return;
         if (p.level().dimension() != Level.OVERWORLD) {
             salir(p);
@@ -148,12 +147,14 @@ public final class FortalezaEventos {
         if (s != null) {
             encolar(lvl, s);
             double d = Math.hypot(s.x() - p.getX(), s.z() - p.getZ());
+            // la montana del sur (y su puente) tambien es de la fortaleza
+            double dm = Fortalezas.plan(lvl.getSeed(), s).montana.distancia(p.getX(), p.getZ());
             if (d < 150) devolverLlave(p, s);
-            if (d < Fortalezas.ZONA) {
+            if (d < Fortalezas.ZONA || dm < 24) {
                 entrar(p, s);
                 asegurarAscensor(lvl, s, p);
             }
-            else if (d > Fortalezas.ZONA + 25) salir(p);
+            else if (d > Fortalezas.ZONA + 25 && dm > 48) salir(p);
             if (d < 150) Logros.dar(p, "fortaleza");
         } else salir(p);
         if (p.tickCount % 40 == 13) Perdidos.tick(p);
@@ -189,7 +190,7 @@ public final class FortalezaEventos {
         // el santuario de la de antes estaba en otro sitio: se vuelve a poner en el rellano de la nueva
         FortalezaPlan plan = Fortalezas.plan(lvl.getSeed(), s);
         if (rehacer(s, est, d, plan)) com.darkcraft.santuario.Santuarios.olvidar(lvl.getServer(), "f" + s.clave());
-        if (est.puenteViejo != null && quitarPuenteViejo(lvl, est.puenteViejo, plan.Y)) {
+        if (est.puenteViejo != null && quitarPuenteViejo(lvl, est.puenteViejo, plan)) {
             est.puenteViejo = null;
             d.setDirty();
         }
@@ -257,6 +258,19 @@ public final class FortalezaEventos {
      */
     private static boolean rehacer(Fortalezas.Sitio s, FortalezaDatos.Estado est, FortalezaDatos d, FortalezaPlan plan) {
         if (est.version >= FortalezaDatos.VERSION) return false;
+        if (est.version == 2) {
+            // la de la parte 5a se queda; su escalera de caracol (si se levanto) se quita: ahora se sube por la montana
+            if (est.puente && est.baseEscalera != Integer.MIN_VALUE) {
+                int[] c = EscaleraVieja.centro(plan);
+                est.puenteViejo = new int[]{c[0], c[1], est.baseEscalera, 1};
+            }
+            est.puente = false;
+            est.baseEscalera = Integer.MIN_VALUE;
+            est.version = FortalezaDatos.VERSION;
+            d.setDirty();
+            DarkCraftMod.LOGGER.info("Fortaleza de Hueso en {}: pasa a la version {} (se sube por la montana)", s.clave(), est.version);
+            return false;
+        }
         // la escalera de hueso de la de antes, si se levanto: lo de debajo de la isla se quita aparte (quitarPuenteViejo)
         if (est.puente && est.baseEscalera != Integer.MIN_VALUE) {
             int[] c = plan.centroPuenteAntiguo();
@@ -331,11 +345,17 @@ public final class FortalezaEventos {
      * Quita lo que quedaba de la escalera de hueso de la fortaleza de antes: lo que hay por debajo de lo que se vacia con
      * los chunks (de su base, con las patas, hasta Y - 56), solo sus bloques. Devuelve false si aun no estan cargados.
      */
-    private static boolean quitarPuenteViejo(ServerLevel lvl, int[] pv, int Y) {
-        int r = 12;
+    private static boolean quitarPuenteViejo(ServerLevel lvl, int[] pv, FortalezaPlan plan) {
+        int Y = plan.Y, r = 12;
         for (int x = (pv[0] - r) >> 4; x <= (pv[0] + r) >> 4; x++)
             for (int z = (pv[1] - r) >> 4; z <= (pv[1] + r) >> 4; z++)
                 if (!lvl.getChunkSource().hasChunk(x, z)) return false;
+        if (pv.length > 3 && pv[3] == 1) {
+            // la escalera de caracol de la parte 5a: pieza a pieza (alli esta ya la isla nueva)
+            int n = EscaleraVieja.quitar(lvl, plan, pv[2]);
+            DarkCraftMod.LOGGER.info("Fortaleza de Hueso: quitada la escalera de la parte 5a en {},{} ({} bloques)", pv[0], pv[1], n);
+            return true;
+        }
         BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
         var aire = Blocks.AIR.defaultBlockState();
         int n = 0;
@@ -377,6 +397,7 @@ public final class FortalezaEventos {
 
     /** La puerta y el portal como esten guardados, en un chunk recien construido. */
     private static void aplicarEstado(ServerLevel lvl, FortalezaPlan f, FortalezaDatos.Estado est, int cx, int cz) {
+        if (est.puente) Puente.enChunk(lvl, f, cx, cz);
         if (est.puerta) {
             int[] r = f.f.reja();
             if ((r[2] >> 4) == cz)
@@ -458,9 +479,13 @@ public final class FortalezaEventos {
         if (s == null) return null;
         FortalezaPlan f = Fortalezas.plan(p.serverLevel().getSeed(), s);
         double dx = p.getX() - f.cx, dz = p.getZ() - f.cz, y = p.getY();
-        int[] c = Puente.centro(f);
-        if (Math.max(Math.abs(p.getX() - c[0] - 0.5), Math.abs(p.getZ() - c[1] - 0.5)) < 10 && y < f.Y + 3)
-            return "darkcraft.mapa.lugar.fortaleza_escalera";
+        if (Puente.enPuente(f, p.getX(), y, p.getZ())) return "darkcraft.mapa.lugar.fortaleza_puente";
+        com.darkcraft.gen.Montana m = f.montana;
+        if (m.distancia(p.getX(), p.getZ()) < 6 && y > com.darkcraft.gen.Montana.FONDO) {
+            if (Math.hypot(p.getX() - m.mx - 0.5, p.getZ() - m.mz - 0.5) <= com.darkcraft.gen.Montana.RP + 2 && y > m.cima - 4)
+                return "darkcraft.mapa.lugar.fortaleza_mirador";
+            return "darkcraft.mapa.lugar.fortaleza_montana";
+        }
         if (y >= f.Y + TorreCupula.TERRAZA - 1 && Math.max(Math.abs(dx), Math.abs(dz)) <= TorreCupula.TL + 1)
             return "darkcraft.mapa.lugar.fortaleza_portal";
         if ((TorreCupula.octo(dx, dz) <= TorreCupula.AT + 1 || Math.hypot(dx - TorreCupula.TX, dz) <= TorreCupula.RTU + 1) && y > f.Y + TorreCupula.SOTANO - 2)
@@ -472,45 +497,9 @@ public final class FortalezaEventos {
         return "darkcraft.mapa.lugar.fortaleza";
     }
 
-    // ------------------------------------------------------------------ la corriente de nubes
-
-    private static void corriente(ServerPlayer p, Fortalezas.Sitio s) {
-        if (p.isSpectator() || p.getAbilities().flying) return;
-        FortalezaDatos.Estado est = FortalezaDatos.get(p.server).de(s);
-        if (!est.puente || est.baseEscalera == Integer.MIN_VALUE) return;
-        FortalezaPlan f = Fortalezas.plan(p.serverLevel().getSeed(), s);
-        if (!Puente.enHueco(f, est.baseEscalera, p.getX(), p.getY(), p.getZ())) return;
-        int[] c = Puente.centro(f);
-        if (p.getY() >= f.Y + 0.6) {
-            // arriba: al descansillo que da al puente, cayendo despacio
-            p.removeEffect(MobEffects.LEVITATION);
-            p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 50, 0, false, false));
-            Vec3 obj = new Vec3(c[0] + Puente.IN + 1.5, f.Y + 0.2, c[1] - Puente.IN - 0.5);
-            Vec3 v = obj.subtract(p.position()).multiply(1, 0, 1);
-            if (v.lengthSqr() > 1e-4) v = v.normalize().scale(0.3);
-            p.setDeltaMovement(v.x, Math.max(0.04, p.getDeltaMovement().y * 0.6), v.z);
-            p.hurtMarked = true;
-        } else if (p.isShiftKeyDown()) {
-            p.removeEffect(MobEffects.LEVITATION);
-            p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 16, 0, false, false));
-        } else {
-            MobEffectInstance lev = p.getEffect(MobEffects.LEVITATION);
-            if (lev == null || lev.getDuration() < 6) p.addEffect(new MobEffectInstance(MobEffects.LEVITATION, 14, 16, false, false));
-            p.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 40, 0, false, false));
-        }
-        p.fallDistance = 0;
-        if (p.tickCount % 3 == 0)
-            p.serverLevel().sendParticles(ParticleTypes.CLOUD, p.getX(), p.getY() - 0.4, p.getZ(), 2, 0.7, 0.2, 0.7, 0.03);
-        Integer t = AVISOS.get(p.getUUID());
-        if (t == null || p.tickCount - t > 400 || p.tickCount < t) {
-            AVISOS.put(p.getUUID(), p.tickCount);
-            p.displayClientMessage(Component.translatable("darkcraft.corriente").withStyle(ChatFormatting.WHITE, ChatFormatting.ITALIC), true);
-        }
-    }
-
     // ------------------------------------------------------------------ el puente (desde la llave)
 
-    /** Levanta la escalera de la fortaleza s (si no estaba). Devuelve false si ya estaba. */
+    /** Tiende el puente largo desde el mirador de la montana de la fortaleza s (si no estaba). Devuelve false si ya estaba. */
     public static boolean levantarPuente(ServerPlayer p, Fortalezas.Sitio s) {
         ServerLevel lvl = p.serverLevel();
         FortalezaDatos d = FortalezaDatos.get(p.server);
@@ -518,13 +507,14 @@ public final class FortalezaEventos {
         if (est.puente) return false;
         FortalezaPlan f = Fortalezas.plan(lvl.getSeed(), s);
         est.puente = true;
-        est.baseEscalera = Puente.levantar(lvl, f);
         d.setDirty();
+        Puente.levantar(lvl, f);
         Logros.dar(p, "puente");
-        int[] c = Puente.centro(f);
+        int[] c = Puente.arco(f);
         for (ServerPlayer q : lvl.players())
-            if (q.distanceToSqr(c[0], q.getY(), c[1]) < 80 * 80) Logros.dar(q, "puente");
-        lvl.playSound(null, c[0] + 0.5, est.baseEscalera, c[1] + 0.5, DarkCraftMod.SFX_PUENTE_HUESO.get(), SoundSource.BLOCKS, 3.0f, 0.8f);
+            if (q.distanceToSqr(c[0], q.getY(), c[2]) < 80 * 80) Logros.dar(q, "puente");
+        lvl.playSound(null, c[0] + 0.5, c[1] + 2, c[2] + 0.5, DarkCraftMod.SFX_PUENTE_HUESO.get(), SoundSource.BLOCKS, 3.0f, 0.8f);
+        lvl.sendParticles(ParticleTypes.SOUL, c[0] + 0.5, c[1] + 6, c[2] + 0.5, 40, 2.5, 4, 0.6, 0.03);
         return true;
     }
 

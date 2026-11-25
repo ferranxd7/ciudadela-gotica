@@ -19,8 +19,11 @@ import java.util.Set;
  */
 public final class FortalezaDatos extends SavedData {
     public static final String ID = "darkcraft_fortalezas";
-    /** La fortaleza que se levanta ahora: 1 la de antes (murallas cuadradas), 2 la torre bajo la cupula (parte 5a). */
-    public static final int VERSION = 2;
+    /**
+     * La fortaleza que se levanta ahora: 1 la de antes (murallas cuadradas), 2 la torre bajo la cupula (parte 5a, con la
+     * escalera de caracol delante), 3 la misma a la que se sube por la montana y su puente largo (parte 5b).
+     */
+    public static final int VERSION = 3;
 
     public static final class Estado {
         public final Set<Long> hechos = new HashSet<>();
@@ -36,7 +39,10 @@ public final class FortalezaDatos extends SavedData {
         /** Se rehizo (de una de antes): a quien ya la abrio se le devuelve la llave de hueso, una vez. */
         public boolean rehecha;
         public final Set<String> llaves = new HashSet<>();
-        /** La escalera de hueso de la fortaleza de antes que queda por quitar: {x, z del centro, altura de su base}, o null. */
+        /**
+         * La escalera de hueso que queda por quitar: {x, z del centro, altura de su base[, 1 si es la de la parte 5a]}, o
+         * null. La de antes de la 5a solo por debajo de la isla; la de la 5a, pieza a pieza.
+         */
         public int[] puenteViejo;
     }
 
