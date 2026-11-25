@@ -1471,5 +1471,165 @@
         ]
       }
     }
+  },
+  "voz_capitan": {
+    "flow": "JMcBqvpYNqJH1beI5j7S",
+    "modelo": "eleven_v4",
+    "voz": "Matthew Schmitz - Old Pirate Captain (4Vl3K2x290GidNvuaLm7)",
+    "nota": "Parte 3c: el Capitan de Brumavela (Edrik Maroll). Frases 1-5, tomas a y b.",
+    "frases": {
+      "1": {
+        "prompt": "[deep, hoarse, slow] No one sails from Brumavela. [menacing] The light stays lit... until my crew comes home.",
+        "sesiones": [
+          "ZIOWUmFfONNn0cFckXoL",
+          "ogPILnhJdMnTK9cIpDGf"
+        ],
+        "generaciones": [
+          "FDvttEiOC2Dm4wrRKm8n",
+          "AHptRvU0apM2Q9ydR8lO"
+        ]
+      },
+      "2": {
+        "prompt": "[shouting, commanding] All hands! Up from the deep! All hands on deck!",
+        "sesiones": [
+          "x4bJ8xlkrOwpshJDnR8i",
+          "KUJInTLyMg3nWkOWx28y"
+        ],
+        "generaciones": [
+          "1Ax57AQzvCOwi323V04a",
+          "QFrrCjYK4Lt5kvUnDTnr"
+        ]
+      },
+      "3": {
+        "prompt": "[low, cold, contemptuous] Down you go... with the rest of them.",
+        "sesiones": [
+          "voo3RLfxQLqRTICXocCE",
+          "vhPSFr90Bs516YmkqpI2"
+        ],
+        "generaciones": [
+          "wTegCz4pQvUANLtjShBb",
+          "VAwh6V1APmXTKa1L7bXC"
+        ]
+      },
+      "4": {
+        "prompt": "[growling, angry] The heart is not yours to take!",
+        "sesiones": [
+          "7wRuWkIATwp6UW6YF73B",
+          "4H8rzpzPrWFYLD765QBZ"
+        ],
+        "generaciones": [
+          "IZq17Y9EvYWpIUoBdgXJ",
+          "DxZ5ynY28uHswZJmDYmD"
+        ]
+      },
+      "5": {
+        "prompt": "[weak, fading, dying breath] Take it, then... [exhales] and take us... with you.",
+        "sesiones": [
+          "7h1GwGO0gzQ5v3qNvaEf",
+          "WXkTakOiKHEjvjiNjMlK"
+        ],
+        "generaciones": [
+          "GYafF8KUfrejOhaIoDRF",
+          "At7Nj7hw81WbFXqyrg2H"
+        ]
+      }
+    }
+  },
+  "sfx_capitan": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "Parte 3c: el Capitan (el farol, la llama del suelo, llamar a la tripulacion, dolor y muerte) y la reja del faro. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+    "sonidos": {
+      "capitan_farol": {
+        "prompt": "Eerie ghostly lantern flaring up: a rising spectral whoosh with a glassy shimmer and a deep ominous hum, dark fantasy, cinematic, about two seconds",
+        "sesiones": [
+          "RIZfrHhIPngI9xyWt71H",
+          "VgB5BWuql5URReT7lJJR",
+          "ToPtUYb0nHECAjhf0PcC",
+          "EEVpBBqMBUevFMANlDx0"
+        ],
+        "generaciones": [
+          "BifKzu1xFXvAvMPHo5fa",
+          "wG7bYZkBZo50zspusPn7",
+          "yTvzSETVp5YxuvbAbXW0",
+          "y31r529mKSgL5z8AxIfc"
+        ]
+      },
+      "capitan_llama": {
+        "prompt": "A burst of ghostly soul fire erupting from the ground: sharp fiery whoosh with a hollow spectral roar and hissing embers, dark fantasy, cinematic, short and punchy",
+        "sesiones": [
+          "vxG80wGXICQPWsqvP77n",
+          "h5xy5iPvVsKpjVOFFohM",
+          "FIjsky8AkoYGRtZTsu9b",
+          "CZmkdWN2NEIl2LuTL5o4"
+        ],
+        "generaciones": [
+          "OlSFPoPiYOvPubzjhnCR",
+          "jWr8x6WYGYZWE5nl4JO6",
+          "eAXABQSmuxHrMOQRyeau",
+          "pAMlvepSjtvaQLMoybRi"
+        ]
+      },
+      "capitan_llamar": {
+        "prompt": "A deep old ship's bell tolling once over a low distant foghorn, then wet ghostly moans of drowned sailors rising from the deep, dark fantasy, cinematic, about four seconds",
+        "sesiones": [
+          "6C7lof4V6SDN2kIMIFMf",
+          "eNLCUOm2CwLi0JvEFCvN",
+          "pFaFimZIoxsGKQljsh45",
+          "4nN2OFtpXGLzlDPVUrRe"
+        ],
+        "generaciones": [
+          "UG2jc5mmA4ELe7OzH7rk",
+          "fYLVj4dVBfLUgpHew3Xg",
+          "kZpbclDE97prwofsTZ5U",
+          "PFGITNxmRuhfJKlApbc7"
+        ]
+      },
+      "capitan_dolor": {
+        "prompt": "Deep hoarse grunt of pain from a huge drowned undead man, wet and guttural, very short, no words",
+        "sesiones": [
+          "oxalomE20bUC9WrLEjkp",
+          "GfOnEDioZgMRhzyYQPFW",
+          "DQEzxT2Cb9xZXueHsVrU",
+          "kqI0tRVyRCe2UbGdZNfu"
+        ],
+        "generaciones": [
+          "ztQPXaEj6P2jwjwgqPK4",
+          "jraxfXkbo0QkujtxDrc9",
+          "IJibfWLp1afebMS0YjDP",
+          "3K6titsI4nkZWgDWYAyz"
+        ]
+      },
+      "capitan_muerte": {
+        "prompt": "A huge drowned undead sea captain dying: a long deep guttural death groan dissolving into gurgling water and a last rattling breath, dark fantasy, cinematic, about three seconds, no words",
+        "sesiones": [
+          "gX91CI3ttwerW8RLD7SV",
+          "tyH0lPBN2iUKGEaq5KEs",
+          "f2eKkSxYqSLOhVSVyHn8",
+          "ys1SX8hTMDBHnxqQj633"
+        ],
+        "generaciones": [
+          "1dHjE4sqBfZeH6ymb7Oq",
+          "GkWLHKiboyk39lcwNlEV",
+          "G9QZMfAAeE6anj7pjfVa",
+          "VgiLv6iOLobUfWYW6O4W"
+        ]
+      },
+      "faro_sello": {
+        "prompt": "Heavy rusted iron bars of an old gate unlocking and grinding open with a metallic clank, followed by a ghostly sigh of released air, dark fantasy, cinematic, about three seconds",
+        "sesiones": [
+          "jNt3tJMc1I6eUKmxoHUs",
+          "H97Z0BNFhmWdx5r5pwct",
+          "z3CRH6QuArqKUUp65xWi",
+          "zL0RbsG4HYHwMoTFbpo4"
+        ],
+        "generaciones": [
+          "tTQxuWpqqufNRMbqU76B",
+          "eUA5TJDRFMuCiVTXLJ7n",
+          "emiP6HtvabWlTGng9kNk",
+          "g3tYQd3p63whztNT7Bnv"
+        ]
+      }
+    }
   }
 }
