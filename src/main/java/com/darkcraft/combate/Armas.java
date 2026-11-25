@@ -19,8 +19,11 @@ import net.minecraft.world.item.TridentItem;
 public final class Armas {
     private Armas() {}
 
-    /** Las acciones (HECHIZO: lanzar un hechizo con el baston o el sello; su paso es el hechizo). */
-    public static final int LIGERO = 0, PESADO = 1, CORRIENDO = 2, SALTO = 3, CARGA = 4, RODAR = 5, PASO_ATRAS = 6, HECHIZO = 7;
+    /**
+     * Las acciones (HECHIZO: lanzar un hechizo con el baston o el sello; su paso es el hechizo. HABILIDAD: la habilidad
+     * del arma, la de su ceniza de guerra; su paso es la {@link Habilidad}).
+     */
+    public static final int LIGERO = 0, PESADO = 1, CORRIENDO = 2, SALTO = 3, CARGA = 4, RODAR = 5, PASO_ATRAS = 6, HECHIZO = 7, HABILIDAD = 8;
     /** Lo que se puede cargar un golpe fuerte (ticks) y lo que da de mas cargado del todo. */
     public static final int CARGA_MAX = 24;
     public static final float CARGA_EXTRA = 0.45f;
@@ -29,7 +32,9 @@ public final class Armas {
     public enum Anim {
         TAJO_DI, TAJO_ID, VERTICAL, ESTOCADA, MAZAZO, BARRIDO_DI, BARRIDO_ID, SALTO, CARGA, PUNO_D, PUNO_I, DAGA_D, DAGA_I, RODAR, PASO_ATRAS,
         /** Hechiceria: el baston adelante. Milagro: el sello en alto. */
-        LANZAR, REZAR
+        LANZAR, REZAR,
+        /** Habilidades: la vuelta entera del torbellino, el grito de guerra, la parada y el paso rapido. */
+        GIRO, GRITO, PARADA, PASO
     }
 
     /**

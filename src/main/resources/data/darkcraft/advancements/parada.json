@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:maelis",
+  "display": {
+    "icon": {
+      "item": "darkcraft:ceniza_parada"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.parada.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.parada.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 40
+  }
+}

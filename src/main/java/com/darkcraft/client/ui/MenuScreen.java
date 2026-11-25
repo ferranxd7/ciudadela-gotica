@@ -271,6 +271,10 @@ public class MenuScreen extends Screen {
             l.addAll(font.split(Component.translatable("darkcraft.arma.ataque", String.format(Locale.ROOT, "%.1f", base),
                     (extra >= 0 ? "+ " : "- ") + String.format(Locale.ROOT, "%.1f", Math.abs(extra))).withStyle(net.minecraft.ChatFormatting.GOLD), ancho));
             if (com.darkcraft.forja.Forja.mejorable(st)) l.addAll(font.split(com.darkcraft.forja.Forja.linea(st), ancho));
+            // la habilidad del arma (la de su ceniza de guerra) y lo que gasta
+            com.darkcraft.combate.Habilidad hab = com.darkcraft.combate.Habilidad.de(st);
+            if (hab != null) l.addAll(font.split(Component.translatable("darkcraft.habilidad.linea", Component.translatable(hab.clave()),
+                    com.darkcraft.forja.CenizaGuerra.coste(hab)).withStyle(net.minecraft.ChatFormatting.DARK_AQUA), ancho));
             net.minecraft.network.chat.MutableComponent letras = Component.translatable("darkcraft.arma.escala");
             net.minecraft.network.chat.MutableComponent req = Component.translatable("darkcraft.arma.requisitos");
             boolean algunReq = false;

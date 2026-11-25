@@ -343,6 +343,40 @@
      "weight": 4
     }
    ]
+  },
+  {
+   "rolls": 1,
+   "entries": [
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:ceniza_torbellino",
+     "weight": 2
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:ceniza_estocada",
+     "weight": 2
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:ceniza_parada",
+     "weight": 2
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:ceniza_sismo",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:ceniza_grito",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:empty",
+     "weight": 30
+    }
+   ]
   }
  ]
 }

@@ -1471,5 +1471,126 @@
         "name": "darkcraft:sfx/tienda_compra_2"
       }
     ]
+  },
+  "sfx.habilidad_torbellino": {
+    "subtitle": "subtitles.darkcraft.sfx.habilidad_torbellino",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/habilidad_torbellino_1"
+      },
+      {
+        "name": "darkcraft:sfx/habilidad_torbellino_2"
+      }
+    ]
+  },
+  "sfx.habilidad_estocada": {
+    "subtitle": "subtitles.darkcraft.sfx.habilidad_estocada",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/habilidad_estocada_1"
+      },
+      {
+        "name": "darkcraft:sfx/habilidad_estocada_2"
+      }
+    ]
+  },
+  "sfx.habilidad_grito": {
+    "subtitle": "subtitles.darkcraft.sfx.habilidad_grito",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/habilidad_grito_1"
+      },
+      {
+        "name": "darkcraft:sfx/habilidad_grito_2"
+      }
+    ]
+  },
+  "sfx.habilidad_sismo": {
+    "subtitle": "subtitles.darkcraft.sfx.habilidad_sismo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/habilidad_sismo_1"
+      },
+      {
+        "name": "darkcraft:sfx/habilidad_sismo_2"
+      }
+    ]
+  },
+  "sfx.habilidad_paso": {
+    "subtitle": "subtitles.darkcraft.sfx.habilidad_paso",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/habilidad_paso_1"
+      },
+      {
+        "name": "darkcraft:sfx/habilidad_paso_2"
+      }
+    ]
+  },
+  "sfx.habilidad_llamas": {
+    "subtitle": "subtitles.darkcraft.sfx.habilidad_llamas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/habilidad_llamas_1"
+      },
+      {
+        "name": "darkcraft:sfx/habilidad_llamas_2"
+      }
+    ]
+  },
+  "sfx.habilidad_escarcha": {
+    "subtitle": "subtitles.darkcraft.sfx.habilidad_escarcha",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/habilidad_escarcha_1"
+      },
+      {
+        "name": "darkcraft:sfx/habilidad_escarcha_2"
+      }
+    ]
+  },
+  "sfx.habilidad_relampago": {
+    "subtitle": "subtitles.darkcraft.sfx.habilidad_relampago",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/habilidad_relampago_1"
+      },
+      {
+        "name": "darkcraft:sfx/habilidad_relampago_2"
+      }
+    ]
+  },
+  "sfx.habilidad_sangre": {
+    "subtitle": "subtitles.darkcraft.sfx.habilidad_sangre",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/habilidad_sangre_1"
+      },
+      {
+        "name": "darkcraft:sfx/habilidad_sangre_2"
+      }
+    ]
+  },
+  "sfx.habilidad_parada": {
+    "subtitle": "subtitles.darkcraft.sfx.habilidad_parada",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/habilidad_parada_1"
+      },
+      {
+        "name": "darkcraft:sfx/habilidad_parada_2"
+      }
+    ]
+  },
+  "sfx.ceniza_aplicar": {
+    "subtitle": "subtitles.darkcraft.sfx.ceniza_aplicar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ceniza_aplicar_1"
+      },
+      {
+        "name": "darkcraft:sfx/ceniza_aplicar_2"
+      }
+    ]
   }
 }

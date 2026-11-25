@@ -98,6 +98,11 @@ SFX = {
     "hechizo_llama": (1.1, 0.35, -16), "hechizo_curar": (1.6, 0.4, -18), "hechizo_bendicion": (1.5, 0.4, -18),
     # el herrero y el mercader (parte 2e-2): el martillo en el yunque, mejorar un arma y comprar
     "herrero_golpe": (0.9, 0.35, -17), "forja_mejora": (2.0, 0.7, -14), "tienda_compra": (0.8, 0.25, -18),
+    # las habilidades de las armas (cenizas de guerra, parte 2e-3) y ponerle una ceniza a un arma
+    "habilidad_torbellino": (1.0, 0.3, -15), "habilidad_estocada": (0.9, 0.25, -15), "habilidad_grito": (1.6, 0.4, -14),
+    "habilidad_sismo": (1.8, 0.6, -13), "habilidad_paso": (0.6, 0.15, -18), "habilidad_llamas": (1.2, 0.4, -15),
+    "habilidad_escarcha": (1.2, 0.4, -15), "habilidad_relampago": (1.2, 0.4, -14), "habilidad_sangre": (1.0, 0.3, -15),
+    "habilidad_parada": (0.8, 0.25, -14), "ceniza_aplicar": (2.0, 0.6, -15),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5}
@@ -149,6 +154,17 @@ TOMAS_SFX = {
     "herrero_golpe": (4, 1, 3),  # tres martillazos distintos (la 2 suena mas fina)
     "forja_mejora": (1, 4),      # el golpe y el brillo que se sostiene (la 1, la mas llena)
     "tienda_compra": (2, 4),     # monedas: las dos que mas se oyen
+    "habilidad_torbellino": (1, 4),  # los dos silbidos mas fuertes
+    "habilidad_estocada": (1, 3),    # las mas llenas
+    "habilidad_grito": (4, 2),       # el rugido mas fuerte y largo
+    "habilidad_sismo": (1, 4),       # las de mas graves
+    "habilidad_paso": (3, 4),        # las que se oyen (la 1 y la 2 casi no suenan)
+    "habilidad_llamas": (4, 2),
+    "habilidad_escarcha": (1, 2),
+    "habilidad_relampago": (3, 1),
+    "habilidad_sangre": (1, 4),
+    "habilidad_parada": (2, 3),      # el choque mas claro
+    "ceniza_aplicar": (1, 4),        # la mas llena (la 2 casi no suena)
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

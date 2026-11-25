@@ -37,8 +37,8 @@ public final class Forja {
     public static final int MAX = 9;
     public static final float POR_NIVEL = 0.08f;
     public static final String NBT = "darkcraft_mejora";
-    /** Lo que contesta el servidor al forjar. */
-    public static final int HECHO = 0, FALTA = 1, TOPE = 2, NO = 3;
+    /** Lo que contesta el servidor al forjar (CENIZA: se ha puesto una ceniza de guerra; QUITADA: se le ha quitado). */
+    public static final int HECHO = 0, FALTA = 1, TOPE = 2, NO = 3, CENIZA = 4, QUITADA = 5;
 
     public static int nivel(ItemStack st) {
         return st.isEmpty() || !st.hasTag() ? 0 : Mth.clamp(st.getTag().getInt(NBT), 0, MAX);
@@ -132,6 +132,51 @@ public final class Forja {
             }
         }
         Net.to(sp, new Net.ForjaHecho(entidad, hueco, nivel, codigo));
+    }
+
+    /**
+     * Ponerle al arma del hueco {@code arma} la ceniza de guerra del hueco {@code ceniza} (o, con -1, quitarle la que
+     * lleve: vuelve a su habilidad de siempre). La ceniza que tuviera antes vuelve a la bolsa; la nueva se gasta.
+     */
+    public static void ceniza(ServerPlayer sp, int entidad, int arma, int ceniza) {
+        int codigo = NO;
+        Entity e = sp.level().getEntity(entidad);
+        Inventory inv = sp.getInventory();
+        if (e instanceof Herrero h && sp.distanceToSqr(h) <= (Conversaciones.ALCANCE + 3) * (Conversaciones.ALCANCE + 3)
+                && arma >= 0 && arma < inv.getContainerSize() && ceniza >= -1 && ceniza < inv.getContainerSize()) {
+            ItemStack st = inv.getItem(arma);
+            com.darkcraft.combate.Habilidad antes = com.darkcraft.combate.Habilidad.puesta(st);
+            if (com.darkcraft.combate.Habilidad.admite(st)) {
+                if (ceniza < 0) {
+                    if (antes != null) {
+                        com.darkcraft.combate.Habilidad.poner(st, null);
+                        com.darkcraft.rol.Equipo.dar(sp, new ItemStack(DarkCraftMod.CENIZAS.get(antes).get()));
+                        codigo = QUITADA;
+                    }
+                } else {
+                    ItemStack c = inv.getItem(ceniza);
+                    com.darkcraft.combate.Habilidad nueva = CenizaGuerra.de(c);
+                    if (nueva != null && nueva.vale(Armas.de(st)) && nueva != com.darkcraft.combate.Habilidad.de(st)) {
+                        c.shrink(1);
+                        com.darkcraft.combate.Habilidad.poner(st, nueva);
+                        if (antes != null) com.darkcraft.rol.Equipo.dar(sp, new ItemStack(DarkCraftMod.CENIZAS.get(antes).get()));
+                        codigo = CENIZA;
+                        Logros.dar(sp, "ceniza");
+                    }
+                }
+                if (codigo != NO) {
+                    inv.setChanged();
+                    Vec3 p = h.puntoGolpe();
+                    ServerLevel sl = sp.serverLevel();
+                    sl.playSound(null, p.x, p.y, p.z, DarkCraftMod.SFX_CENIZA_APLICAR.get(), SoundSource.NEUTRAL, 0.9f, 1.0f);
+                    sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, p.x, p.y + 0.1, p.z, 16, 0.2, 0.2, 0.2, 0.03);
+                    sl.sendParticles(ParticleTypes.ASH, p.x, p.y + 0.3, p.z, 30, 0.4, 0.4, 0.4, 0.02);
+                    DarkCraftMod.LOGGER.info("[DarkCraft] {} {} la ceniza de {}: {}", sp.getGameProfile().getName(),
+                            codigo == CENIZA ? "pone" : "quita", st.getItem(), com.darkcraft.combate.Habilidad.de(st));
+                }
+            }
+        }
+        Net.to(sp, new Net.ForjaHecho(entidad, arma, nivel(inv.getItem(Math.max(0, Math.min(inv.getContainerSize() - 1, arma)))), codigo));
     }
 
     private static void quitar(Inventory inv, Item it, int n) {

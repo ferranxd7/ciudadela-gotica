@@ -64,7 +64,10 @@ public final class Tienda {
             new Oferta("darkcraft:hechizo_guijarro", 1, 1200, 1),
             new Oferta("darkcraft:hechizo_llama", 1, 1200, 1),
             new Oferta("darkcraft:hechizo_curar", 1, 2400, 1),
-            new Oferta("darkcraft:talisman_porteador", 1, 3500, 1));
+            new Oferta("darkcraft:talisman_porteador", 1, 3500, 1),
+            new Oferta("darkcraft:ceniza_parada", 1, 2200, 1),
+            new Oferta("darkcraft:ceniza_llamas", 1, 2800, 1),
+            new Oferta("darkcraft:ceniza_escarcha", 1, 2800, 1));
 
     /** Lo ya comprado de cada oferta (para mandarlo al cliente al abrir la tienda). */
     public static int[] comprados(ServerPlayer sp) {

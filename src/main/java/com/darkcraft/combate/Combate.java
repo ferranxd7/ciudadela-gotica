@@ -72,6 +72,9 @@ public final class Combate {
         int[] pendiente;
         int invulnerable;
         int clasePeso = Peso.LIGERO;
+        /** La habilidad del arma que se esta haciendo (accion HABILIDAD) y si la parada esta en su instante. */
+        Habilidad habilidad;
+        boolean parada;
     }
 
     private static final Map<UUID, Estado> ESTADOS = new HashMap<>();
@@ -100,6 +103,10 @@ public final class Combate {
     public static void pedir(ServerPlayer sp, int accion, int paso, boolean izquierda, int carga) {
         if (!sp.isAlive() || sp.isSpectator() || sp.isCreative() || Frascos.bebiendo(sp) || sp.isUsingItem()) {
             no(sp);
+            return;
+        }
+        if (accion == Armas.HABILIDAD) {
+            habilidad(sp, paso);
             return;
         }
         Armas.Tipo tipo = Armas.de(sp.getMainHandItem());
@@ -177,6 +184,265 @@ public final class Combate {
         e.mov = null;
         e.cargaDesde = -1;
         e.pendiente = null;
+        e.habilidad = null;
+        e.parada = false;
+    }
+
+    // ------------------------------------------------------------------ la habilidad del arma (su ceniza de guerra)
+
+    /** El cliente usa la habilidad del arma de la mano derecha ({@code ord}: la que el cree que tiene). */
+    private static void habilidad(ServerPlayer sp, int ord) {
+        ItemStack arma = sp.getMainHandItem();
+        Armas.Tipo tipo = Armas.de(arma);
+        Habilidad h = Habilidad.de(arma);
+        if (tipo == null || h == null || h.ordinal() != ord) {
+            no(sp);
+            return;
+        }
+        Estado e = de(sp);
+        if (e.accion >= 0 && e.accion != Armas.CARGA && e.mov != null && e.t < e.mov.libre()) {
+            no(sp);
+            return;
+        }
+        boolean gasta = Rol.gasta(sp);
+        if (gasta && h.mana > 0 && Combos.energia(sp) < h.mana) {
+            Net.to(sp, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.hechizo.sin_mana", 0));
+            no(sp);
+            return;
+        }
+        float vida = sp.getMaxHealth() * Habilidad.VIDA_SANGRE;
+        if (gasta && h == Habilidad.SANGRE && sp.getHealth() <= vida + 1f) {
+            Net.to(sp, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.habilidad.sin_vida", 0));
+            no(sp);
+            return;
+        }
+        if (!Rol.gastarCombate(sp, h.mov.estamina())) {
+            no(sp);
+            return;
+        }
+        if (gasta) {
+            if (h.mana > 0) Combos.dar(sp, -h.mana);
+            if (h == Habilidad.SANGRE) sp.setHealth(Math.max(1f, sp.getHealth() - vida));
+        }
+        e.accion = Armas.HABILIDAD;
+        e.habilidad = h;
+        e.tipo = tipo;
+        e.mov = h.mov;
+        e.paso = ord;
+        e.t = 0;
+        e.izquierda = false;
+        e.aterrizo = false;
+        e.carga = 0f;
+        e.cargaDesde = -1;
+        e.tocados.clear();
+        e.pendiente = null;
+        e.parada = false;
+        e.invulnerable = h == Habilidad.PASO ? Habilidad.PASO_INVULNERABLE : 0;
+        if (h == Habilidad.PASO || h == Habilidad.PARADA)
+            sp.level().playSound(sp, sp.getX(), sp.getY() + 1, sp.getZ(), sonido(h), SoundSource.PLAYERS, 0.8f, 0.95f + sp.getRandom().nextFloat() * 0.1f);
+        else sp.level().playSound(sp, sp.getX(), sp.getY() + 1, sp.getZ(), DarkCraftMod.SFX_ESFUERZO.get(), SoundSource.PLAYERS, 0.7f, 0.95f);
+        visto(sp, Armas.HABILIDAD, ord, false, tipo, 0);
+        DarkCraftMod.LOGGER.info("[DarkCraft] {} usa la habilidad {} ({})", sp.getGameProfile().getName(), h.id, tipo);
+    }
+
+    /** El sonido de cada habilidad. */
+    public static SoundEvent sonido(Habilidad h) {
+        return switch (h) {
+            case TORBELLINO -> DarkCraftMod.SFX_HABILIDAD_TORBELLINO.get();
+            case ESTOCADA -> DarkCraftMod.SFX_HABILIDAD_ESTOCADA.get();
+            case GRITO -> DarkCraftMod.SFX_HABILIDAD_GRITO.get();
+            case SISMO -> DarkCraftMod.SFX_HABILIDAD_SISMO.get();
+            case PASO -> DarkCraftMod.SFX_HABILIDAD_PASO.get();
+            case LLAMAS -> DarkCraftMod.SFX_HABILIDAD_LLAMAS.get();
+            case ESCARCHA -> DarkCraftMod.SFX_HABILIDAD_ESCARCHA.get();
+            case RELAMPAGO -> DarkCraftMod.SFX_HABILIDAD_RELAMPAGO.get();
+            case SANGRE -> DarkCraftMod.SFX_HABILIDAD_SANGRE.get();
+            case PARADA -> DarkCraftMod.SFX_HABILIDAD_PARADA.get();
+        };
+    }
+
+    /** Cada tick de una habilidad. */
+    private static void tickHabilidad(ServerPlayer sp, Estado e) {
+        Habilidad h = e.habilidad;
+        Armas.Mov m = e.mov;
+        if (h == null || m == null) {
+            fin(e);
+            return;
+        }
+        switch (h) {
+            case SISMO -> {
+                if (e.t == 1) sp.fallDistance = 0;
+                if (!e.aterrizo && e.t >= 6 && (sp.onGround() || sp.isInWater() || e.t >= 34)) {
+                    e.aterrizo = true;
+                    e.t = 0;
+                    sismo(sp, e);
+                } else if (e.aterrizo && e.t >= 8) fin(e);
+            }
+            case GRITO -> {
+                if (e.t == m.golpe0()) grito(sp);
+                if (e.t >= m.dura()) fin(e);
+            }
+            case PASO -> {
+                if (e.t >= m.dura()) fin(e);
+            }
+            case PARADA -> {
+                e.parada = e.t >= m.golpe0() && e.t <= m.golpe1();
+                if (e.t >= m.dura()) fin(e);
+            }
+            default -> {
+                if (e.t == Math.max(1, m.golpe0() - 2))
+                    sp.level().playSound(sp, sp.getX(), sp.getY() + 1, sp.getZ(), sonido(h), SoundSource.PLAYERS, 0.9f, 0.95f + sp.getRandom().nextFloat() * 0.1f);
+                if (e.t == m.golpe0()) estela(sp, h);
+                if (e.t >= m.golpe0() && e.t <= m.golpe1()) golpear(sp, e, false);
+                if (e.t >= m.dura()) fin(e);
+            }
+        }
+    }
+
+    /** El grito de guerra: un rato pegando mas fuerte. */
+    private static void grito(ServerPlayer sp) {
+        sp.addEffect(new MobEffectInstance(com.darkcraft.rol.Efectos.FURIA.get(), Habilidad.FURIA_DURA, 0, false, false, true));
+        ServerLevel sl = sp.serverLevel();
+        sl.playSound(sp, sp.getX(), sp.getY() + 1, sp.getZ(), sonido(Habilidad.GRITO), SoundSource.PLAYERS, 1.0f, 1.0f);
+        sl.sendParticles(ParticleTypes.ANGRY_VILLAGER, sp.getX(), sp.getY() + 2.1, sp.getZ(), 3, 0.3, 0.1, 0.3, 0.0);
+        for (int i = 0; i < 24; i++) {
+            double a = i * Math.PI * 2 / 24;
+            sl.sendParticles(ParticleTypes.FLAME, sp.getX() + Math.cos(a) * 1.2, sp.getY() + 0.2, sp.getZ() + Math.sin(a) * 1.2, 1,
+                    Math.cos(a) * 0.1, 0.05, Math.sin(a) * 0.1, 0.02);
+        }
+    }
+
+    /** El sismo: la onda alrededor de donde cae (sobre todo delante). */
+    private static void sismo(ServerPlayer sp, Estado e) {
+        ServerLevel sl = sp.serverLevel();
+        Vec3 mira = sp.getLookAngle();
+        Vec3 h = new Vec3(mira.x, 0, mira.z);
+        h = h.lengthSqr() < 1e-4 ? Vec3.ZERO : h.normalize();
+        Vec3 c = sp.position().add(h.scale(1.0));
+        BlockState suelo = sl.getBlockState(BlockPos.containing(c.x, sp.getY() - 0.5, c.z));
+        if (!suelo.isAir()) {
+            for (int i = 0; i < 32; i++) {
+                double a = i * Math.PI * 2 / 32;
+                sl.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, suelo), c.x + Math.cos(a) * 2.2, sp.getY() + 0.1, c.z + Math.sin(a) * 2.2,
+                        3, 0.2, 0.05, 0.2, 0.15);
+            }
+        }
+        sl.sendParticles(ParticleTypes.EXPLOSION, c.x, sp.getY() + 0.3, c.z, 2, 0.4, 0.05, 0.4, 0.0);
+        sl.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, c.x, sp.getY() + 0.2, c.z, 10, 1.2, 0.05, 1.2, 0.01);
+        sl.playSound(null, c.x, sp.getY(), c.z, sonido(Habilidad.SISMO), SoundSource.PLAYERS, 1.0f, 0.95f + sp.getRandom().nextFloat() * 0.1f);
+        boolean alguno = false;
+        for (LivingEntity le : sl.getEntitiesOfClass(LivingEntity.class, new AABB(c, c).inflate(3.4, 2.0, 3.4), x -> Combos.valido(sp, x))) {
+            if (e.tocados.contains(le.getId()) || le.distanceToSqr(c.x, le.getY(), c.z) > 3.4 * 3.4) continue;
+            e.tocados.add(le.getId());
+            if (pegar(sp, e, le)) {
+                alguno = true;
+                le.setDeltaMovement(le.getDeltaMovement().add(0, 0.45, 0));
+                le.hurtMarked = true;
+            }
+        }
+        if (alguno) Net.to(sp, new Net.Impacto(true));
+    }
+
+    /** Lo que se ve del golpe de cada habilidad (para todos): llamas, escarcha, el rayo en linea, sangre... */
+    private static void estela(ServerPlayer sp, Habilidad h) {
+        ServerLevel sl = sp.serverLevel();
+        Vec3 mira = sp.getLookAngle();
+        Vec3 f = new Vec3(mira.x, 0, mira.z);
+        f = f.lengthSqr() < 1e-4 ? new Vec3(0, 0, 1) : f.normalize();
+        Vec3 o = sp.position().add(0, sp.getBbHeight() * 0.6, 0);
+        double base = Math.atan2(f.z, f.x);
+        switch (h) {
+            case LLAMAS, ESCARCHA, SANGRE, TORBELLINO -> {
+                double arco = h == Habilidad.TORBELLINO ? Math.PI : Math.toRadians(h.mov.arco());
+                int n = h == Habilidad.TORBELLINO ? 28 : 16;
+                for (int i = 0; i <= n; i++) {
+                    double a = base - arco + 2 * arco * i / n;
+                    double r = 1.9 + sp.getRandom().nextDouble() * 0.5;
+                    double x = o.x + Math.cos(a) * r, z = o.z + Math.sin(a) * r;
+                    switch (h) {
+                        case LLAMAS -> {
+                            sl.sendParticles(ParticleTypes.FLAME, x, o.y, z, 2, 0.08, 0.1, 0.08, 0.02);
+                            if (i % 3 == 0) sl.sendParticles(ParticleTypes.LAVA, x, o.y, z, 1, 0, 0, 0, 0);
+                        }
+                        case ESCARCHA -> {
+                            sl.sendParticles(ParticleTypes.SNOWFLAKE, x, o.y, z, 3, 0.1, 0.12, 0.1, 0.02);
+                            if (i % 2 == 0) sl.sendParticles(ParticleTypes.ITEM_SNOWBALL, x, o.y, z, 1, 0.05, 0.05, 0.05, 0.05);
+                        }
+                        case SANGRE -> sl.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(0.62f, 0.02f, 0.05f), 1.6f),
+                                x, o.y, z, 3, 0.1, 0.1, 0.1, 0.0);
+                        default -> {
+                            if (i % 4 == 0) sl.sendParticles(ParticleTypes.SWEEP_ATTACK, x, o.y, z, 1, 0, 0, 0, 0);
+                        }
+                    }
+                }
+            }
+            case RELAMPAGO, ESTOCADA -> {
+                double largo = (h == Habilidad.RELAMPAGO ? 5.0 : 3.6);
+                for (double d = 0.8; d <= largo; d += 0.35) {
+                    double x = o.x + mira.x * d, y = o.y + mira.y * d, z = o.z + mira.z * d;
+                    if (h == Habilidad.RELAMPAGO) {
+                        sl.sendParticles(ParticleTypes.ELECTRIC_SPARK, x, y, z, 3, 0.12, 0.12, 0.12, 0.05);
+                        if (d > largo - 0.4) sl.sendParticles(ParticleTypes.FLASH, x, y, z, 1, 0, 0, 0, 0);
+                    } else sl.sendParticles(ParticleTypes.CRIT, x, y, z, 2, 0.05, 0.05, 0.05, 0.1);
+                }
+            }
+            default -> {
+            }
+        }
+    }
+
+    /** Lo que hace de mas el golpe de una habilidad al que alcanza. */
+    private static void efectoGolpe(ServerPlayer sp, Habilidad h, LivingEntity le, float dano) {
+        ServerLevel sl = sp.serverLevel();
+        Vec3 c = le.position().add(0, le.getBbHeight() * 0.6, 0);
+        switch (h) {
+            case LLAMAS -> {
+                if (!le.fireImmune()) le.setSecondsOnFire(5);
+                sl.sendParticles(ParticleTypes.FLAME, c.x, c.y, c.z, 12, 0.25, 0.35, 0.25, 0.03);
+            }
+            case ESCARCHA -> {
+                le.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 70, 2, false, true, true));
+                le.setTicksFrozen(Math.max(le.getTicksFrozen(), 180));
+                sl.sendParticles(ParticleTypes.SNOWFLAKE, c.x, c.y, c.z, 16, 0.3, 0.4, 0.3, 0.03);
+            }
+            case RELAMPAGO -> {
+                // un rayo de mas (dano de rayo: lo frenan las resistencias al rayo)
+                le.invulnerableTime = 0;
+                le.hurt(new DamageSource(sl.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.DAMAGE_TYPE)
+                        .getHolderOrThrow(net.minecraft.world.damagesource.DamageTypes.LIGHTNING_BOLT), sp, sp), dano * 0.35f);
+                sl.sendParticles(ParticleTypes.ELECTRIC_SPARK, c.x, c.y, c.z, 20, 0.3, 0.5, 0.3, 0.15);
+            }
+            case SANGRE -> sl.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(0.7f, 0.0f, 0.04f), 1.8f),
+                    c.x, c.y, c.z, 24, 0.3, 0.4, 0.3, 0.0);
+            default -> {
+            }
+        }
+    }
+
+    /** Si el jugador esta en el instante de la parada. */
+    public static boolean parando(Player p) {
+        Estado e = ESTADOS.get(p.getUUID());
+        return e != null && e.parada;
+    }
+
+    /** La parada ha desviado un golpe: el que pego se queda aturdido (los jefes no) y se oye el choque. */
+    private static void parar(ServerPlayer sp, Estado e, DamageSource s) {
+        e.parada = false;
+        ServerLevel sl = sp.serverLevel();
+        Vec3 c = sp.position().add(sp.getLookAngle().scale(0.8)).add(0, sp.getBbHeight() * 0.65, 0);
+        sl.playSound(null, c.x, c.y, c.z, sonido(Habilidad.PARADA), SoundSource.PLAYERS, 1.0f, 0.95f + sp.getRandom().nextFloat() * 0.1f);
+        sl.sendParticles(ParticleTypes.CRIT, c.x, c.y, c.z, 14, 0.15, 0.15, 0.15, 0.4);
+        sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, 10, 0.2, 0.2, 0.2, 0.3);
+        if (s.getDirectEntity() instanceof net.minecraft.world.entity.projectile.Projectile pr) pr.discard();
+        if (s.getEntity() instanceof LivingEntity le && le != sp) {
+            desequilibrar(sp, le, 9999f);
+            if (!(le instanceof com.darkcraft.rey.Rey) && !(le instanceof com.darkcraft.gavran.Gavran))
+                le.knockback(0.5, sp.getX() - le.getX(), sp.getZ() - le.getZ());
+        }
+        Net.to(sp, new Net.Impacto(true));
+        com.darkcraft.story.Logros.dar(sp, "parada");
+        DarkCraftMod.LOGGER.info("[DarkCraft] {} para un golpe de {}", sp.getGameProfile().getName(),
+                s.getEntity() == null ? s.getMsgId() : s.getEntity().getType().toShortString());
     }
 
     /** Para los hechizos: los demas ven el gesto de lanzar (el paso es el hechizo). */
@@ -215,6 +481,7 @@ public final class Combate {
                 case Armas.CARGA -> {
                     if (e.t > Armas.CARGA_MAX + 60) fin(e);
                 }
+                case Armas.HABILIDAD -> tickHabilidad(sp, e);
                 case Armas.SALTO -> {
                     if (e.t == 1) sp.fallDistance = 0;
                     if (!e.aterrizo && e.t >= 2 && (sp.onGround() || sp.isInWater() || e.t >= 30)) {
@@ -312,11 +579,13 @@ public final class Combate {
         if (e.accion == Armas.SALTO && com.darkcraft.rol.Talismanes.lleva(sp, com.darkcraft.rol.Talisman.Clase.GARRA)) mult *= 1.15f;
         if (e.accion == Armas.PESADO && com.darkcraft.rol.Talismanes.lleva(sp, com.darkcraft.rol.Talisman.Clase.FURIA)) mult *= 1.12f;
         if (sp.hasEffect(com.darkcraft.rol.Efectos.BENDICION.get())) mult *= 1.15f;
+        if (sp.hasEffect(com.darkcraft.rol.Efectos.FURIA.get())) mult *= 1f + Habilidad.FURIA_EXTRA;
         float dano = (base + encanto) * mult;
         DamageSource fuente = sp.damageSources().playerAttack(sp);
         float antes = le.getHealth();
         le.invulnerableTime = 0;
         if (!le.hurt(fuente, dano)) return false;
+        if (e.accion == Armas.HABILIDAD && e.habilidad != null) efectoGolpe(sp, e.habilidad, le, dano);
         // retroceso hacia donde mira el que pega
         float kb = m.retroceso() + EnchantmentHelper.getKnockbackBonus(sp) * 0.5f;
         if (kb > 0) le.knockback(kb, Mth.sin(sp.getYRot() * Mth.DEG_TO_RAD), -Mth.cos(sp.getYRot() * Mth.DEG_TO_RAD));
@@ -387,8 +656,24 @@ public final class Combate {
     /** En los instantes invulnerables de la voltereta no llega nada de lo que pega o se dispara (caer, ahogarse o el veneno, si). */
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onAtaque(LivingAttackEvent ev) {
-        if (!(ev.getEntity() instanceof ServerPlayer sp) || !invulnerable(sp)) return;
+        if (!(ev.getEntity() instanceof ServerPlayer sp)) return;
         DamageSource s = ev.getSource();
+        // la parada: un golpe que llega de delante en su instante se desvia
+        Estado pe = ESTADOS.get(sp.getUUID());
+        if (pe != null && pe.parada && !s.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+            net.minecraft.world.entity.Entity de = s.getDirectEntity() != null ? s.getDirectEntity() : s.getEntity();
+            if (de != null) {
+                Vec3 a = de.position().subtract(sp.position());
+                Vec3 mira = sp.getLookAngle();
+                double l = Math.sqrt(a.x * a.x + a.z * a.z), lm = Math.sqrt(mira.x * mira.x + mira.z * mira.z);
+                if (l < 1e-3 || lm < 1e-3 || (a.x * mira.x + a.z * mira.z) / (l * lm) > 0.2) {
+                    ev.setCanceled(true);
+                    parar(sp, pe, s);
+                    return;
+                }
+            }
+        }
+        if (!invulnerable(sp)) return;
         if (s.getEntity() != null || s.getDirectEntity() != null || s.is(net.minecraft.tags.DamageTypeTags.IS_EXPLOSION)) ev.setCanceled(true);
     }
 
@@ -412,7 +697,7 @@ public final class Combate {
     public static String resumen(ServerPlayer sp) {
         Estado e = de(sp);
         return "accion=" + e.accion + " paso=" + e.paso + " t=" + e.t + (e.tipo != null ? " " + e.tipo : "") + " invulnerable=" + e.invulnerable
-                + " peso=" + String.format(java.util.Locale.ROOT, "%.1f/%.1f", Peso.de(sp.getInventory()), Peso.maximo(sp))
+                + (e.habilidad != null ? " habilidad=" + e.habilidad.id : "") + (e.parada ? " PARANDO" : "") + " peso=" + String.format(java.util.Locale.ROOT, "%.1f/%.1f", Peso.de(sp.getInventory()), Peso.maximo(sp))
                 + " clase=" + e.clasePeso;
     }
 }

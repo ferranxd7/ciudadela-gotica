@@ -27,6 +27,8 @@ public final class Recompensa {
         items.set(12, new ItemStack(com.darkcraft.DarkCraftMod.FRUTOS.get(com.darkcraft.rol.Fruto.Clase.BRASA).get(), 3));
         // piedras de forja para Dorvan
         items.set(14, new ItemStack(com.darkcraft.DarkCraftMod.PIEDRA_FORJA_2.get(), 3));
+        // y la ceniza del fuego del Rey
+        items.set(22, new ItemStack(com.darkcraft.DarkCraftMod.CENIZAS.get(com.darkcraft.combate.Habilidad.LLAMAS).get()));
         for (int slot : new int[]{20, 21, 23})
             items.set(slot, EnchantmentHelper.enchantItem(lvl.random, new ItemStack(Items.BOOK), 30, true));
     }

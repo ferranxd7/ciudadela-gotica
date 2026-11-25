@@ -1288,6 +1288,20 @@ public final class ClientCiTest {
         return h;
     }
 
+    /** La plataforma de hormigon blanco del combate (21 x 21 bajo los pies) y nada encima en cuatro bloques. */
+    private static void plataforma(ServerLevel lvl) {
+        int y = (int) ey - 1, fx = (int) Math.floor(ex), fz = (int) Math.floor(ez);
+        for (int x = -10; x <= 10; x++)
+            for (int z = -12; z <= 8; z++)
+                lvl.setBlockAndUpdate(new BlockPos(fx + x, y, fz + z), net.minecraft.world.level.block.Blocks.WHITE_CONCRETE.defaultBlockState());
+        for (int x = -10; x <= 10; x++)
+            for (int z = -12; z <= 8; z++)
+                for (int yy = y + 1; yy <= y + 4; yy++) {
+                    BlockPos q = new BlockPos(fx + x, yy, fz + z);
+                    if (!lvl.getBlockState(q).isAir()) lvl.removeBlock(q, false);
+                }
+    }
+
     private static void atacar(Minecraft m) {
         net.minecraft.client.KeyMapping.click(m.options.keyAttack.getKey());
     }
@@ -1312,16 +1326,7 @@ public final class ClientCiTest {
             com.darkcraft.client.ui.Carteles.callados = true;
             server(m, sp -> {
                 ServerLevel lvl = sp.serverLevel();
-                int y = (int) ey - 1, fx = (int) Math.floor(ex), fz = (int) Math.floor(ez);
-                for (int x = -10; x <= 10; x++)
-                    for (int z = -12; z <= 8; z++)
-                        lvl.setBlockAndUpdate(new BlockPos(fx + x, y, fz + z), net.minecraft.world.level.block.Blocks.WHITE_CONCRETE.defaultBlockState());
-                for (int x = -10; x <= 10; x++)
-                    for (int z = -12; z <= 8; z++)
-                        for (int yy = y + 1; yy <= y + 4; yy++) {
-                            BlockPos q = new BlockPos(fx + x, yy, fz + z);
-                            if (!lvl.getBlockState(q).isAir()) lvl.removeBlock(q, false);
-                        }
+                plataforma(lvl);
                 sp.setInvisible(false);
                 sp.setGameMode(GameType.SURVIVAL);
                 var inv = sp.getInventory();
@@ -2365,6 +2370,340 @@ public final class ClientCiTest {
         return t + 520;
     }
 
+    // ------------------------------------------------------------------ las habilidades de las armas (cenizas de guerra)
+
+    private static String estadoDiana(net.minecraft.world.entity.LivingEntity h) {
+        if (h == null) return "-";
+        return String.format(java.util.Locale.ROOT, "%.1f en %.1f,%.1f,%.1f", h.getHealth(), h.getX(), h.getY(), h.getZ())
+                + (h.isOnFire() ? " ARDE" : "") + (h.getTicksFrozen() > 0 ? " HIELO " + h.getTicksFrozen() : "")
+                + (h.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) ? " LENTO" : "")
+                + (h.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS) ? " ATURDIDO" : "");
+    }
+
+    private static void logHabilidad(Minecraft m, String what) {
+        ItemStack st = m.player.getMainHandItem();
+        log("  habilidad " + what + " (cliente): " + com.darkcraft.forja.Forja.nombre(st).getString() + " -> " + com.darkcraft.combate.Habilidad.de(st)
+                + " | " + com.darkcraft.client.combate.ClientCombate.resumen() + " | pose " + com.darkcraft.client.combate.Poses.resumen(m.player)
+                + " | mana " + com.darkcraft.client.armas.ArmasCliente.energiaCliente() + " estamina " + Math.round(com.darkcraft.client.ui.ClientRol.estamina)
+                + (com.darkcraft.client.ui.ClientRol.agotado ? " AGOTADO" : "")
+                + String.format(java.util.Locale.ROOT, " | vida %.1f/%.1f | jugador en %.2f, %.2f, %.2f", m.player.getHealth(), m.player.getMaxHealth(),
+                m.player.getX(), m.player.getY(), m.player.getZ())
+                + (m.player.hasEffect(com.darkcraft.rol.Efectos.FURIA.get()) ? " FURIA" : "") + " | cartel: " + com.darkcraft.client.ui.Carteles.resumen());
+        server(m, sp -> log("  habilidad " + what + " (servidor): " + com.darkcraft.combate.Combate.resumen(sp) + " | mana "
+                + com.darkcraft.armas.Combos.energia(sp) + "/" + com.darkcraft.rol.Rol.manaMax(sp)
+                + String.format(java.util.Locale.ROOT, " | vida %.1f/%.1f", sp.getHealth(), sp.getMaxHealth())
+                + (sp.hasEffect(com.darkcraft.rol.Efectos.FURIA.get()) ? " FURIA" : "") + " | arma " + com.darkcraft.combate.Habilidad.de(sp.getMainHandItem())
+                + " | diana A " + estadoDiana(dianaA) + " | diana B " + estadoDiana(dianaB)
+                + " | logros ceniza " + com.darkcraft.story.Logros.tiene(sp, "ceniza") + " parada " + com.darkcraft.story.Logros.tiene(sp, "parada")));
+    }
+
+    /** Las dos dianas en su sitio, enteras y sin nada encima (fuego, hielo, aturdidas). */
+    private static void dianasEnSitio() {
+        ponerDiana(dianaA, ex, ez, 180f);
+        ponerDiana(dianaB, ex - 2.2, ez - 3.6, 110f);
+    }
+
+    private static void ponerDiana(net.minecraft.world.entity.monster.Husk d, double x, double z, float giro) {
+        if (d == null) return;
+        d.clearFire();
+        d.setTicksFrozen(0);
+        d.removeAllEffects();
+        d.setHealth(d.getMaxHealth());
+        d.teleportTo(x, ey, z);
+        d.setYRot(giro);
+        d.setYHeadRot(giro);
+        d.setYBodyRot(giro);
+        d.setDeltaMovement(Vec3.ZERO);
+    }
+
+    /** Pone la ceniza {@code id} al arma de la mano derecha (con el comando) y todo vuelve a su sitio. */
+    private static void conCeniza(Minecraft m, String id) {
+        server(m, sp -> {
+            comando(sp, "darkcraft rol ceniza " + id + " poner");
+            enCombate(sp);
+            dianasEnSitio();
+        });
+    }
+
+    /** El hueco del inventario (del cliente) donde se lleva la ceniza de esa habilidad (o -2 si no se lleva). */
+    private static int huecoCeniza(Minecraft m, com.darkcraft.combate.Habilidad h) {
+        var inv = m.player.getInventory();
+        for (int i = 0; i < inv.getContainerSize(); i++) if (com.darkcraft.forja.CenizaGuerra.de(inv.getItem(i)) == h) return i;
+        log("  FALLO: no se lleva la ceniza " + h);
+        return -2;
+    }
+
+    private static void pulsarHabilidad() {
+        pulsar(com.darkcraft.client.ui.Teclas.HABILIDAD);
+    }
+
+    private static int habilidades(int t0) {
+        base = 0;
+        int t = t0;
+        int fx = (int) Math.floor(ex), fz = (int) Math.floor(ez), fy = (int) ey;
+        atTicks(t, "Habilidades: supervivencia, Mente 40, espada, hacha y tridente, dos dianas", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                plataforma(lvl);
+                sp.setGameMode(GameType.SURVIVAL);
+                var inv = sp.getInventory();
+                inv.clearContent();
+                inv.items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                inv.items.set(1, new ItemStack(net.minecraft.world.item.Items.IRON_AXE));
+                inv.items.set(2, new ItemStack(net.minecraft.world.item.Items.TRIDENT));
+                enMano(sp, 0);
+                sp.removeAllEffects();
+                comando(sp, "darkcraft rol nivel reiniciar");
+                comando(sp, "darkcraft rol atributo mente 40");
+                com.darkcraft.armas.Combos.llenar(sp);
+                sp.setHealth(sp.getMaxHealth());
+                lvl.setDayTime(6000);
+                dianaA = diana(lvl, ex, ez, 180f);
+                dianaB = diana(lvl, ex - 2.2, ez - 3.6, 110f);
+                enCombate(sp);
+            });
+        });
+        atTicks(t + 20, "mana lleno (con la Mente 40)", m -> server(m, com.darkcraft.armas.Combos::llenar));
+        atTicks(t + 36, "al empezar (la espada trae el torbellino)", m -> logHabilidad(m, "al empezar"));
+        // 1. el torbellino de la espada, en primera persona (con el HUD: baja el mana)
+        atTicks(t + 40, "C: el torbellino", m -> pulsarHabilidad());
+        atTicks(t + 49, "captura: el torbellino en primera persona", m -> {
+            logHabilidad(m, "torbellino (primera persona)");
+            shot(m, "cliente_cg01_torbellino_fp");
+        });
+        atTicks(t + 66, "tras el torbellino", m -> logHabilidad(m, "tras el torbellino"));
+        // 2. otra vez, visto de lado: da la vuelta entera
+        atTicks(t + 70, "de lado; las dianas en su sitio", m -> {
+            verCombate(m);
+            server(m, sp -> {
+                enCombate(sp);
+                dianasEnSitio();
+            });
+        });
+        atTicks(t + 80, "C: el torbellino (de lado)", m -> pulsarHabilidad());
+        atTicks(t + 89, "captura: la vuelta (1)", m -> {
+            logHabilidad(m, "torbellino de lado");
+            shot(m, "cliente_cg02_torbellino");
+        });
+        atTicks(t + 92, "captura: la vuelta (2)", m -> shot(m, "cliente_cg03_torbellino_b"));
+        atTicks(t + 106, "tras el torbellino de lado (las dos dianas)", m -> logHabilidad(m, "tras el torbellino de lado"));
+        // 3. la estocada del tridente (la de la lanza)
+        atTicks(t + 110, "el tridente", m -> server(m, sp -> {
+            enMano(sp, 2);
+            enCombate(sp);
+            dianasEnSitio();
+        }));
+        atTicks(t + 120, "C: la estocada", m -> pulsarHabilidad());
+        atTicks(t + 129, "captura: la estocada", m -> {
+            logHabilidad(m, "estocada");
+            shot(m, "cliente_cg04_estocada");
+        });
+        atTicks(t + 146, "tras la estocada", m -> logHabilidad(m, "tras la estocada"));
+        // 4. el sismo del hacha
+        atTicks(t + 150, "el hacha", m -> server(m, sp -> {
+            enMano(sp, 1);
+            enCombate(sp);
+            dianasEnSitio();
+        }));
+        atTicks(t + 160, "C: el sismo", m -> pulsarHabilidad());
+        atTicks(t + 166, "captura: el salto", m -> {
+            logHabilidad(m, "sismo en el aire");
+            shot(m, "cliente_cg05_sismo_salto");
+        });
+        atTicks(t + 173, "captura: el golpe en el suelo", m -> {
+            logHabilidad(m, "sismo al caer");
+            shot(m, "cliente_cg06_sismo_golpe");
+        });
+        atTicks(t + 190, "tras el sismo", m -> logHabilidad(m, "tras el sismo"));
+        // 5. el grito de guerra (ceniza en el hacha)
+        atTicks(t + 194, "la ceniza del grito en el hacha", m -> conCeniza(m, "grito"));
+        atTicks(t + 204, "con la ceniza del grito", m -> logHabilidad(m, "ceniza del grito"));
+        atTicks(t + 206, "C: el grito", m -> pulsarHabilidad());
+        atTicks(t + 218, "captura: el grito", m -> {
+            logHabilidad(m, "grito");
+            shot(m, "cliente_cg07_grito");
+        });
+        atTicks(t + 226, "primera persona: la furia en el HUD", m -> enPrimeraPersona(m));
+        atTicks(t + 234, "captura: la furia", m -> {
+            logHabilidad(m, "furia");
+            shot(m, "cliente_cg08_furia");
+        });
+        // 6. el paso de sombra (ceniza en la espada), hacia atras y visto de lado
+        atTicks(t + 238, "la espada con la ceniza del paso", m -> server(m, sp -> {
+            enMano(sp, 0);
+            comando(sp, "darkcraft rol ceniza paso poner");
+            enCombate(sp);
+            dianasEnSitio();
+        }));
+        atTicks(t + 246, "camara de lado", m -> {
+            m.options.hideGui = true;
+            verDesde(m, new Vec3(ex + 6.5, ey + 1.4, ez - 4.6), new Vec3(ex, ey + 0.7, ez - 4.6));
+        });
+        atTicks(t + 250, "atras + C: el paso", m -> {
+            m.options.keyDown.setDown(true);
+            pulsarHabilidad();
+        });
+        atTicks(t + 251, "soltar la direccion", m -> m.options.keyDown.setDown(false));
+        atTicks(t + 253, "captura: el paso", m -> {
+            logHabilidad(m, "paso");
+            shot(m, "cliente_cg09_paso");
+        });
+        atTicks(t + 266, "tras el paso", m -> logHabilidad(m, "tras el paso"));
+        // 7-10. las de los elementos y la sangre (cenizas en la espada), vistas de lado
+        atTicks(t + 270, "la ceniza de las llamas", m -> {
+            verCombate(m);
+            conCeniza(m, "llamas");
+        });
+        atTicks(t + 280, "C: las llamas", m -> pulsarHabilidad());
+        atTicks(t + 289, "captura: las llamas", m -> {
+            logHabilidad(m, "llamas");
+            shot(m, "cliente_cg10_llamas");
+        });
+        atTicks(t + 300, "tras las llamas", m -> logHabilidad(m, "tras las llamas"));
+        atTicks(t + 304, "la ceniza de la escarcha", m -> conCeniza(m, "escarcha"));
+        atTicks(t + 314, "C: la escarcha", m -> pulsarHabilidad());
+        atTicks(t + 322, "captura: la escarcha", m -> {
+            logHabilidad(m, "escarcha");
+            shot(m, "cliente_cg11_escarcha");
+        });
+        atTicks(t + 334, "tras la escarcha", m -> logHabilidad(m, "tras la escarcha"));
+        atTicks(t + 338, "la ceniza del relampago", m -> conCeniza(m, "relampago"));
+        atTicks(t + 348, "C: el relampago", m -> pulsarHabilidad());
+        atTicks(t + 358, "captura: el relampago", m -> {
+            logHabilidad(m, "relampago");
+            shot(m, "cliente_cg12_relampago");
+        });
+        atTicks(t + 370, "tras el relampago", m -> logHabilidad(m, "tras el relampago"));
+        atTicks(t + 374, "la ceniza de la sangre (y la vida entera)", m -> {
+            conCeniza(m, "sangre");
+            server(m, sp -> sp.setHealth(sp.getMaxHealth()));
+        });
+        atTicks(t + 382, "antes de la sangre", m -> logHabilidad(m, "antes de la sangre"));
+        atTicks(t + 384, "C: la sangre", m -> pulsarHabilidad());
+        atTicks(t + 392, "captura: la sangre", m -> {
+            logHabilidad(m, "sangre");
+            shot(m, "cliente_cg13_sangre");
+        });
+        atTicks(t + 404, "tras la sangre (cuesta vida)", m -> logHabilidad(m, "tras la sangre"));
+        // 11. la parada: la diana pega en el instante y se desvia
+        atTicks(t + 408, "la ceniza de la parada (y la vida entera)", m -> {
+            conCeniza(m, "parada");
+            server(m, sp -> sp.setHealth(sp.getMaxHealth()));
+        });
+        atTicks(t + 418, "C: la parada", m -> pulsarHabilidad());
+        atTicks(t + 422, "la diana pega en el instante de la parada", m -> server(m, sp -> {
+            log("  parada: antes del golpe " + com.darkcraft.combate.Combate.resumen(sp) + " parando=" + com.darkcraft.combate.Combate.parando(sp));
+            if (dianaA != null) dianaA.doHurtTarget(sp);
+        }));
+        atTicks(t + 424, "captura: la parada", m -> {
+            logHabilidad(m, "parada");
+            shot(m, "cliente_cg14_parada");
+        });
+        atTicks(t + 432, "tras la parada (sin dano y la diana aturdida)", m -> logHabilidad(m, "tras la parada"));
+        atTicks(t + 440, "la diana pega otra vez, ya sin parada", m -> server(m, sp -> {
+            if (dianaA != null) {
+                dianaA.removeAllEffects();
+                dianaA.doHurtTarget(sp);
+            }
+        }));
+        atTicks(t + 446, "sin parada", m -> logHabilidad(m, "sin parada"));
+        // 12. sin mana: aviso
+        atTicks(t + 450, "sin mana: la espada con el torbellino otra vez", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                comando(sp, "darkcraft rol ceniza quitar");
+                com.darkcraft.armas.Combos.dar(sp, -10000);
+                sp.setHealth(sp.getMaxHealth());
+                sp.removeAllEffects();
+                enCombate(sp);
+            });
+        });
+        atTicks(t + 458, "C sin mana", m -> pulsarHabilidad());
+        atTicks(t + 464, "captura: el aviso de que no queda mana", m -> {
+            logHabilidad(m, "sin mana");
+            shot(m, "cliente_cg15_sin_mana");
+        });
+        // 13. la forja: la pestana de las cenizas
+        atTicks(t + 468, "la forja: Dorvan con su yunque y tres cenizas en la bolsa", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            if (dianaA != null) dianaA.discard();
+            if (dianaB != null) dianaB.discard();
+            dianaA = dianaB = null;
+            com.darkcraft.armas.Combos.llenar(sp);
+            BlockPos yunque = new BlockPos(fx - 3, fy, fz - 3), el = new BlockPos(fx - 2, fy, fz - 3);
+            lvl.setBlock(yunque, net.minecraft.world.level.block.Blocks.ANVIL.defaultBlockState()
+                    .setValue(net.minecraft.world.level.block.AnvilBlock.FACING, net.minecraft.core.Direction.NORTH), 3);
+            herreroPrueba = com.darkcraft.personajes.Herrero.poner(lvl, el, yunque);
+            com.darkcraft.rol.Equipo.dar(sp, new ItemStack(DarkCraftMod.CENIZAS.get(com.darkcraft.combate.Habilidad.LLAMAS).get()));
+            com.darkcraft.rol.Equipo.dar(sp, new ItemStack(DarkCraftMod.CENIZAS.get(com.darkcraft.combate.Habilidad.ESCARCHA).get()));
+            com.darkcraft.rol.Equipo.dar(sp, new ItemStack(DarkCraftMod.CENIZAS.get(com.darkcraft.combate.Habilidad.SANGRE).get()));
+            sp.teleportTo(lvl, ex - 2.0, ey, ez, 180f, 9f);
+            sp.setDeltaMovement(Vec3.ZERO);
+            com.darkcraft.rol.Rol.sinCombate(sp);
+        }));
+        atTicks(t + 484, "abrir la forja de Dorvan", m -> {
+            com.darkcraft.personajes.Herrero h = herreroCliente(m);
+            if (h == null) log("  FALLO: no se ve a Dorvan");
+            else com.darkcraft.client.ui.ForjaScreen.abrir(new com.darkcraft.net.Net.AbrirForja(h.getId()));
+        });
+        atTicks(t + 490, "la pestana de las cenizas", m -> forjaP(m, f -> f.pulsarModo(com.darkcraft.client.ui.ForjaScreen.CENIZAS)));
+        atTicks(t + 502, "captura: las cenizas en la forja", m -> {
+            logForja(m, "cenizas");
+            logHabilidad(m, "forja cenizas");
+            shot(m, "cliente_cg16_forja_cenizas");
+        });
+        atTicks(t + 506, "poner la de las llamas a la espada", m -> {
+            int h = huecoCeniza(m, com.darkcraft.combate.Habilidad.LLAMAS);
+            if (h >= 0) forjaP(m, f -> f.pulsarCeniza(h));
+        });
+        atTicks(t + 526, "captura: puesta", m -> {
+            logForja(m, "ceniza puesta");
+            logHabilidad(m, "ceniza puesta");
+            shot(m, "cliente_cg17_ceniza_puesta");
+        });
+        atTicks(t + 530, "quitarsela (vuelve la ceniza)", m -> forjaP(m, f -> f.pulsarCeniza(-1)));
+        atTicks(t + 546, "tras quitarla", m -> {
+            logForja(m, "ceniza quitada");
+            logHabilidad(m, "ceniza quitada");
+        });
+        atTicks(t + 548, "poner la de la escarcha", m -> {
+            int h = huecoCeniza(m, com.darkcraft.combate.Habilidad.ESCARCHA);
+            if (h >= 0) forjaP(m, f -> f.pulsarCeniza(h));
+        });
+        atTicks(t + 566, "ESC y el menu: la habilidad en la ficha del arma", m -> {
+            logHabilidad(m, "escarcha puesta");
+            m.setScreen(null);
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.EQUIPO);
+        });
+        atTicks(t + 580, "captura: la ficha de la espada", m -> {
+            log("  menu: " + (m.screen instanceof com.darkcraft.client.ui.MenuScreen ms ? ms.resumen() : "no esta"));
+            shot(m, "cliente_cg18_menu_habilidad");
+        });
+        atTicks(t + 584, "Fin de las habilidades", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                if (herreroPrueba != null) herreroPrueba.discard();
+                herreroPrueba = null;
+                if (dianaA != null) dianaA.discard();
+                if (dianaB != null) dianaB.discard();
+                dianaA = dianaB = null;
+                lvl.removeBlock(new BlockPos(fx - 3, fy, fz - 3), false);
+                comando(sp, "darkcraft rol nivel reiniciar");
+                sp.getInventory().clearContent();
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 600;
+    }
+
     private static void logArmasAt(int t, String what) {
         atTicks(t, "estado de las armas " + what, m -> logArmas(m, what));
     }
@@ -2385,6 +2724,7 @@ public final class ClientCiTest {
         fin = hechizos(fin);
         fin = dialogos(fin);
         fin = forja(fin);
+        fin = habilidades(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

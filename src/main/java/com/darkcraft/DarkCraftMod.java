@@ -158,6 +158,18 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_HERRERO_GOLPE = sound("sfx.herrero_golpe");
     public static final RegistryObject<SoundEvent> SFX_FORJA_MEJORA = sound("sfx.forja_mejora");
     public static final RegistryObject<SoundEvent> SFX_TIENDA_COMPRA = sound("sfx.tienda_compra");
+    // las habilidades de las armas (cenizas de guerra) y ponerle una ceniza a un arma
+    public static final RegistryObject<SoundEvent> SFX_HABILIDAD_TORBELLINO = sound("sfx.habilidad_torbellino");
+    public static final RegistryObject<SoundEvent> SFX_HABILIDAD_ESTOCADA = sound("sfx.habilidad_estocada");
+    public static final RegistryObject<SoundEvent> SFX_HABILIDAD_GRITO = sound("sfx.habilidad_grito");
+    public static final RegistryObject<SoundEvent> SFX_HABILIDAD_SISMO = sound("sfx.habilidad_sismo");
+    public static final RegistryObject<SoundEvent> SFX_HABILIDAD_PASO = sound("sfx.habilidad_paso");
+    public static final RegistryObject<SoundEvent> SFX_HABILIDAD_LLAMAS = sound("sfx.habilidad_llamas");
+    public static final RegistryObject<SoundEvent> SFX_HABILIDAD_ESCARCHA = sound("sfx.habilidad_escarcha");
+    public static final RegistryObject<SoundEvent> SFX_HABILIDAD_RELAMPAGO = sound("sfx.habilidad_relampago");
+    public static final RegistryObject<SoundEvent> SFX_HABILIDAD_SANGRE = sound("sfx.habilidad_sangre");
+    public static final RegistryObject<SoundEvent> SFX_HABILIDAD_PARADA = sound("sfx.habilidad_parada");
+    public static final RegistryObject<SoundEvent> SFX_CENIZA_APLICAR = sound("sfx.ceniza_aplicar");
 
     /** Frases del Rey (1..13; la 13 es la 7 con la voz de monstruo de la fase 3). */
     @SuppressWarnings("unchecked")
@@ -291,6 +303,14 @@ public class DarkCraftMod {
     public static final RegistryObject<Item> PIEDRA_FORJA_3 = ITEMS.register("piedra_forja_3",
             () -> new com.darkcraft.forja.PiedraForja(3, new Item.Properties().stacksTo(64).rarity(Rarity.EPIC)));
 
+    /** Las cenizas de guerra: cada una cambia la habilidad de un arma (en la forja de Dorvan). */
+    public static final java.util.EnumMap<com.darkcraft.combate.Habilidad, RegistryObject<Item>> CENIZAS = new java.util.EnumMap<>(com.darkcraft.combate.Habilidad.class);
+
+    static {
+        for (com.darkcraft.combate.Habilidad h : com.darkcraft.combate.Habilidad.values())
+            CENIZAS.put(h, ITEMS.register("ceniza_" + h.id, () -> new com.darkcraft.forja.CenizaGuerra(h, new Item.Properties().stacksTo(1).rarity(Rarity.RARE))));
+    }
+
     /** Los hechizos que vuelan (guijarro, lanza, esquirlas, rayo): sin modelo, se ven por sus particulas. */
     public static final RegistryObject<EntityType<com.darkcraft.hechizos.ProyectilHechizo>> PROYECTIL = ENTITIES.register("proyectil_hechizo",
             () -> EntityType.Builder.<com.darkcraft.hechizos.ProyectilHechizo>of(com.darkcraft.hechizos.ProyectilHechizo::new, MobCategory.MISC)
@@ -385,6 +405,7 @@ public class DarkCraftMod {
             e.accept(BASTON);
             e.accept(SELLO_SAGRADO);
             for (RegistryObject<Item> h : HECHIZOS.values()) e.accept(h);
+            for (RegistryObject<Item> c : CENIZAS.values()) e.accept(c);
         }
         if (e.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
             for (RegistryObject<Item> f : FRUTOS.values()) e.accept(f);

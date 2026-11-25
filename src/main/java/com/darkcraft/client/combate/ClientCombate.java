@@ -8,6 +8,8 @@ import com.darkcraft.client.ui.ClientEquipo;
 import com.darkcraft.client.ui.ClientRol;
 import com.darkcraft.client.ui.Teclas;
 import com.darkcraft.combate.Armas;
+import com.darkcraft.combate.Combate;
+import com.darkcraft.combate.Habilidad;
 import com.darkcraft.combate.Peso;
 import com.darkcraft.net.Net;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -165,6 +167,10 @@ public final class ClientCombate {
         boolean rueda = false;
         while (Teclas.RODAR.consumeClick()) rueda = true;
         if (rueda && juego && suelto(mc)) rodar(mc, false);
+        // la habilidad del arma
+        boolean hab = false;
+        while (Teclas.HABILIDAD.consumeClick()) hab = true;
+        if (hab && juego && tipo != null) habilidad(mc, tipo);
         // con el baston o el sello en la mano, el clic lanza el hechizo elegido
         com.darkcraft.hechizos.Hechizo.Escuela esc = suelto(mc) && p.getInventory().selected <= 2
                 ? com.darkcraft.hechizos.Catalizador.de(p.getMainHandItem()) : null;
@@ -243,6 +249,7 @@ public final class ClientCombate {
                     if (t >= a.mov.dura()) terminar();
                     else mover(p, a, t);
                 }
+                case Armas.HABILIDAD -> avanzarHabilidad(mc, p, a, t);
                 default -> {
                     if (t == Math.max(0, a.mov.golpe0() - 2)) silbido(mc, a);
                     if (t == Math.max(0, a.mov.golpe0() - 1)) {
@@ -280,6 +287,8 @@ public final class ClientCombate {
     private static boolean libre() {
         if (actual == null) return true;
         int t = ClientRol.ticks - actual.inicio;
+        if (actual.accion == Armas.HABILIDAD && Poses.saltando(actual))
+            return actual.aterrizo >= 0 && ClientRol.ticks - actual.aterrizo >= 5;
         return switch (actual.accion) {
             case Armas.CARGA -> false;
             case Armas.SALTO -> actual.aterrizo >= 0 && ClientRol.ticks - actual.aterrizo >= 4;
@@ -339,6 +348,114 @@ public final class ClientCombate {
         p.setSprinting(false);
         hechos++;
         ultimo = "hechizo " + h.id;
+    }
+
+    // ------------------------------------------------------------------ la habilidad del arma
+
+    /** La C: la habilidad del arma de la mano derecha (con su aviso si no tiene, no queda mana o no se puede ahora). */
+    private static void habilidad(Minecraft mc, Armas.Tipo tipo) {
+        LocalPlayer p = mc.player;
+        Habilidad h = Habilidad.de(p.getMainHandItem());
+        String no = h == null ? "darkcraft.habilidad.ninguna"
+                : h.mana > 0 && !p.isCreative() && com.darkcraft.client.armas.ArmasCliente.energiaCliente() < h.mana ? "darkcraft.hechizo.sin_mana"
+                : h == Habilidad.SANGRE && !p.isCreative() && p.getHealth() <= p.getMaxHealth() * Habilidad.VIDA_SANGRE + 1f ? "darkcraft.habilidad.sin_vida"
+                : null;
+        if (no != null) {
+            Carteles.aviso(Component.translatable(no));
+            return;
+        }
+        if (ClientRol.agotado) {
+            ClientRol.sinEstaminaTick = ClientRol.ticks;
+            return;
+        }
+        if (!libre() || Bebida.yo() || !permitido(mc)) return;
+        if (p.isUsingItem() && mc.gameMode != null) mc.gameMode.releaseUsingItem(p);
+        Net.CH.sendToServer(new Net.Ataque(Armas.HABILIDAD, h.ordinal(), false, 0));
+        Poses.Anim_ a = new Poses.Anim_();
+        a.accion = Armas.HABILIDAD;
+        a.paso = h.ordinal();
+        a.tipo = tipo;
+        a.mov = h.mov;
+        a.inicio = ClientRol.ticks;
+        actual = a;
+        cargando = false;
+        if (pulsada >= 0) pulsada = -2;
+        cadenaHasta = -1000;
+        p.setSprinting(false);
+        if (h == Habilidad.PASO) {
+            // hacia donde se anda (o adelante si no se anda)
+            var o = mc.options;
+            float f = (o.keyUp.isDown() ? 1 : 0) - (o.keyDown.isDown() ? 1 : 0), s = (o.keyLeft.isDown() ? 1 : 0) - (o.keyRight.isDown() ? 1 : 0);
+            if (f == 0 && s == 0) f = 1;
+            float n = Mth.sqrt(f * f + s * s), yaw = p.getYRot() * Mth.DEG_TO_RAD;
+            f /= n;
+            s /= n;
+            rodarDx = s * Mth.cos(yaw) - f * Mth.sin(yaw);
+            rodarDz = f * Mth.cos(yaw) + s * Mth.sin(yaw);
+            rodarRapidez = 0.66f;
+            a.extra = Math.round((float) Math.toDegrees(Math.atan2(rodarDz, rodarDx)));
+        }
+        if (h == Habilidad.PASO || h == Habilidad.PARADA) sonar(mc, Combate.sonido(h), 0.8f, 0.95f + (float) Math.random() * 0.1f);
+        else sonar(mc, DarkCraftMod.SFX_ESFUERZO.get(), 0.7f, 0.95f);
+        hechos++;
+        ultimo = "habilidad " + h.id;
+    }
+
+    /** La habilidad en marcha: su sonido a su tiempo, el salto del sismo, el paso rapido y el empujon de la estocada. */
+    private static void avanzarHabilidad(Minecraft mc, LocalPlayer p, Poses.Anim_ a, int t) {
+        Habilidad h = Habilidad.values()[Mth.clamp(a.paso, 0, Habilidad.values().length - 1)];
+        switch (h) {
+            case SISMO -> {
+                if (t == 1 && a.aterrizo < 0) {
+                    // salta (un poco hacia delante) y cae con fuerza
+                    Vec3 m = p.getLookAngle();
+                    Vec3 hz = new Vec3(m.x, 0, m.z);
+                    hz = hz.lengthSqr() > 1e-4 ? hz.normalize().scale(0.22) : Vec3.ZERO;
+                    p.setDeltaMovement(hz.x, p.onGround() ? 0.62 : p.getDeltaMovement().y, hz.z);
+                }
+                if (a.aterrizo < 0 && t == 8 && p.getDeltaMovement().y > -0.3) p.setDeltaMovement(p.getDeltaMovement().add(0, -0.35, 0));
+                if (a.aterrizo < 0 && t >= 6 && (p.onGround() || p.isInWater() || t >= 34)) {
+                    a.aterrizo = ClientRol.ticks;
+                    sacudir(true);
+                    sonar(mc, Combate.sonido(h), 1.0f, 0.95f + (float) Math.random() * 0.1f);
+                }
+                if (a.aterrizo >= 0 && ClientRol.ticks - a.aterrizo >= 9) terminar();
+            }
+            case PASO -> {
+                if (t >= a.mov.dura()) terminar();
+                else if (t < 6) {
+                    float v = rodarRapidez * (t < 4 ? 1f : 0.45f);
+                    p.setDeltaMovement(rodarDx * v, p.getDeltaMovement().y, rodarDz * v);
+                }
+            }
+            case GRITO -> {
+                if (t == a.mov.golpe0()) sonar(mc, Combate.sonido(h), 1.0f, 1.0f);
+                if (t >= a.mov.dura()) terminar();
+            }
+            case PARADA -> {
+                if (t >= a.mov.dura()) terminar();
+            }
+            default -> {
+                if (t == Math.max(0, a.mov.golpe0() - 2)) sonar(mc, Combate.sonido(h), 0.9f, 0.95f + (float) Math.random() * 0.1f);
+                if (h == Habilidad.ESTOCADA && t >= a.mov.golpe0() - 3 && t <= a.mov.golpe0() && p.onGround()) {
+                    // se lanza hacia delante
+                    Vec3 m = p.getLookAngle();
+                    Vec3 hz = new Vec3(m.x, 0, m.z);
+                    if (hz.lengthSqr() > 1e-4) {
+                        hz = hz.normalize().scale(0.55);
+                        p.setDeltaMovement(hz.x, p.getDeltaMovement().y, hz.z);
+                    }
+                } else if (t == Math.max(0, a.mov.golpe0() - 1) && a.mov.empuje() > 0 && p.onGround()) {
+                    Vec3 m = p.getLookAngle();
+                    Vec3 hz = new Vec3(m.x, 0, m.z);
+                    if (hz.lengthSqr() > 1e-4) {
+                        hz = hz.normalize().scale(a.mov.empuje());
+                        p.setDeltaMovement(p.getDeltaMovement().add(hz.x, 0, hz.z));
+                    }
+                }
+                if (t >= a.mov.dura()) terminar();
+            }
+        }
     }
 
     // ------------------------------------------------------------------ pedir golpes
@@ -412,6 +529,7 @@ public final class ClientCombate {
             case Armas.RODAR -> "rodar";
             case Armas.PASO_ATRAS -> "paso_atras";
             case Armas.HECHIZO -> "hechizo";
+            case Armas.HABILIDAD -> "habilidad";
             default -> "?";
         };
     }
@@ -532,12 +650,14 @@ public final class ClientCombate {
             case Armas.CARGA -> 0.3f;
             case Armas.SALTO -> 1f;
             case Armas.HECHIZO -> 0.35f;
+            case Armas.HABILIDAD -> a.paso == Habilidad.PASO.ordinal() || a.paso == Habilidad.ESTOCADA.ordinal() ? 0f
+                    : Poses.saltando(a) ? 0.6f : t < a.mov.libre() ? 0.2f : 0.5f;
             case Armas.CORRIENDO -> t <= a.mov.golpe1() ? 0.7f : 0.3f;
             default -> t < a.mov.libre() ? 0.2f : 0.5f;
         };
         in.forwardImpulse *= k;
         in.leftImpulse *= k;
-        if (a.accion != Armas.SALTO) in.jumping = false;
+        if (a.accion != Armas.SALTO && !Poses.saltando(a)) in.jumping = false;
         if (k == 0f) in.shiftKeyDown = false;
     }
 

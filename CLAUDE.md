@@ -385,6 +385,43 @@ empezarla). Lo esencial, que cambia reglas de arriba:
 - Comandos `/darkcraft rol herrero [olvidar] | mercader [olvidar] | mejora <0-9> | piedras` (el herrero sale con su yunque
   entre los dos). La prueba del cliente tiene el tramo `forja()` (capturas `cliente_f01..f19`).
 
+### Plan grande, parte 2e-3: cenizas de guerra (las habilidades de las armas)
+
+- **Habilidades** (`combate/Habilidad`, igual en servidor y cliente; tecla **C**, `Teclas.HABILIDAD`, sin chocar con
+  "guardar la barra" del creativo): cada una con su movimiento del combate (`Armas.Mov`, accion `Armas.HABILIDAD` = 8), su
+  mana (de `Combos`) y su estamina. `torbellino` (14, vuelta entera: en tercera persona gira el cuerpo entero —
+  `Poses.girar`—; espada, hacha, alabarda, mandoble), `estocada` (14, se lanza hacia delante y atraviesa en linea; lanza,
+  espada, daga, alabarda), `grito` (18, efecto `darkcraft:furia` 20 s: +20 % de dano; mandoble, hacha, alabarda), `sismo`
+  (20, salta y la onda al caer, radio 3,4, levanta a los que pilla; hacha, mandoble, alabarda), `paso` (6, paso rapido de
+  sombra hacia donde se ande, 8 ticks invulnerable; daga, espada), `llamas` (16, quema 5 s), `escarcha` (16, frena y
+  congela), `relampago` (20, en linea, +35 % de dano de rayo) —estas tres valen para todas—, `sangre` (no gasta mana: el 8 %
+  de la vida maxima; espada, daga, hacha, mandoble) y `parada` (0; daga, espada: lo que llegue de delante en los ticks 2-7 se
+  desvia —`Combate.onAtaque`—, el que pego se queda aturdido —los jefes no— y da el logro `parada`).
+- **La de cada arma** (`Habilidad.porDefecto`): espada y alabarda el torbellino, daga el paso, mandoble el grito, hacha el
+  sismo, lanza (tridente) la estocada. Las armas con nombre (Espadas del Rey, Mandoble del Juramento) no tienen: llevan sus
+  combos de Shift/Ctrl. Una ceniza puesta va en el NBT del arma (`darkcraft_ceniza`).
+- **Servidor** (`Combate.habilidad` / `tickHabilidad`): lo comprueba todo (arma, mana, vida de la sangrienta, estamina),
+  cobra y en los ticks de golpe pega con `pegar` (+ `efectoGolpe`: fuego, hielo, rayo, sangre); la estela de cada una
+  (`estela`, particulas para todos); el sismo cuenta el golpe al caer; el grito pone la furia en el tick 10.
+  **Cliente** (`ClientCombate.habilidad` / `avanzarHabilidad`): avisos (sin habilidad, sin mana, sin vida), el salto del
+  sismo, el paso (direccion de las teclas, adelante si no se anda), el empujon de la estocada y sus sonidos. Poses nuevas
+  `GIRO`, `GRITO`, `PARADA`, `PASO` (primera y tercera persona); los demas lo ven por `Net.GolpeVisto`.
+- **Cenizas** (`forja/CenizaGuerra`, objetos `darkcraft:ceniza_<id>`, raros, de una en una): se ponen en la forja de
+  Dorvan, pestana nueva **Cenizas** (`ForjaScreen`: pestanas Mejorar / Cenizas con TAB o clic; el arma a la izquierda, las
+  cenizas que se llevan y "quitar la suya" abajo a la derecha, con lo que hace y lo que gasta): `Net.Ceniza` →
+  `Forja.ceniza` (codigos `CENIZA` y `QUITADA`; la ceniza que tenia el arma vuelve a la bolsa; logro `ceniza`; llamas de
+  almas y `sfx.ceniza_aplicar` en el yunque). La ficha del arma en el menu dice su habilidad y lo que gasta.
+- Donde salen: cofres (armeria: torbellino, estocada, parada, sismo, grito; tesoro: llamas, escarcha, relampago, sangre,
+  paso; cripta: sangre, escarcha, paso), Kerrick (parada 2200, llamas y escarcha 2800, una de cada), el cofre del Rey
+  (llamas) y el de Gavran (sangre).
+- Efectos de ElevenLabs (tomas en `TOMAS_SFX`): `habilidad_torbellino` (1 y 4), `habilidad_estocada` (1 y 3),
+  `habilidad_grito` (4 y 2), `habilidad_sismo` (1 y 4), `habilidad_paso` (3 y 4), `habilidad_llamas` (4 y 2),
+  `habilidad_escarcha` (1 y 2), `habilidad_relampago` (3 y 1), `habilidad_sangre` (1 y 4), `habilidad_parada` (2 y 3),
+  `ceniza_aplicar` (1 y 4).
+- Arte: `tools/rol/cenizas.py` (las diez cenizas: una brasa de su color sobre un monton de ceniza, y el icono de la furia).
+- Comandos `/darkcraft rol ceniza <id> [poner] | quitar` (sin `poner` la da; con `poner` se la pone al arma de la mano
+  derecha). La prueba del cliente tiene el tramo `habilidades()` (capturas `cliente_cg01..cg18`). `Net.V` = "14".
+
 ## Compilar, probar y publicar
 
 - La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (con y sin mods) y un cliente con capturas

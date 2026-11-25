@@ -1,6 +1,8 @@
 package com.darkcraft.client.ui;
 
+import com.darkcraft.combate.Habilidad;
 import com.darkcraft.dialogo.Dialogos;
+import com.darkcraft.forja.CenizaGuerra;
 import com.darkcraft.forja.Forja;
 import com.darkcraft.net.Net;
 import net.minecraft.client.Minecraft;
@@ -19,16 +21,23 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * La forja de Dorvan: a la izquierda las armas y catalizadores que se llevan (con su mejora), a la derecha la elegida:
- * lo que pega ahora y con la siguiente mejora, las piedras y los ecos que pide (en rojo lo que falta) y los botones.
- * Abajo, lo que va diciendo Dorvan ({@link Bocadillo}): al abrir, la frase 3; al mejorar, la 4; si falta algo, la 5; si
- * ya esta al maximo, la 8. El servidor lo comprueba todo ({@link Forja#mejorar}).
+ * La forja de Dorvan, con dos pestanas (arriba, en gotica; TAB o clic para cambiar):
+ * <ul>
+ * <li><b>Mejorar</b>: a la izquierda las armas y catalizadores que se llevan (con su mejora), a la derecha el elegido:
+ * lo que pega ahora y con la siguiente mejora, las piedras y los ecos que pide (en rojo lo que falta).</li>
+ * <li><b>Cenizas de guerra</b>: a la izquierda las armas que admiten cenizas, a la derecha su habilidad (la suya o la de
+ * su ceniza), lo que gasta y para que sirve, y debajo las cenizas que se llevan (flechas para elegir; las que no le
+ * valen, apagadas; si ya lleva una, la primera opcion es quitarsela).</li>
+ * </ul>
+ * Abajo, lo que va diciendo Dorvan ({@link Bocadillo}): al abrir, la frase 3; al mejorar o poner una ceniza, la 4; si
+ * falta algo, la 5; si ya esta al maximo, la 8. El servidor lo comprueba todo ({@link Forja#mejorar}, {@link Forja#ceniza}).
  */
 public class ForjaScreen extends Screen {
     private static final int ANCHO = 396, ALTO = 182, FILA = 20, FILAS = 6, IZQ = 186, LISTA_Y = 40;
     private static final int CLARO = 0xFFEADBC4, ORO = 0xFFE2BF62, LUZ = 0xFFFFF2C4, APAGADO = 0xFFB8A888, VERDE = 0xFF9BE08A, ROJO = 0xFFE0564E;
     /** El orden en que salen los huecos: mano derecha, mano izquierda, bolsa y objetos rapidos. */
     private static final int[] ORDEN;
+    public static final int MEJORAR = 0, CENIZAS = 1;
 
     static {
         List<Integer> o = new ArrayList<>(List.of(0, 1, 2, 40, 3, 4));
@@ -40,7 +49,9 @@ public class ForjaScreen extends Screen {
     private final int entidad;
     private final Bocadillo dorvan = new Bocadillo(Dialogos.HERRERO);
     private final List<Integer> huecos = new ArrayList<>();
-    private int sel, arriba, t, esperando, destello = -100, destelloHueco = -1;
+    /** En la pestana de cenizas: lo que se puede elegir (-1 = quitarle la suya; si no, el hueco de una ceniza). */
+    private final List<Integer> opciones = new ArrayList<>();
+    private int modo = MEJORAR, sel, arriba, opcion, t, esperando, destello = -100, destelloHueco = -1;
     private boolean saludo;
 
     private ForjaScreen(int entidad) {
@@ -79,17 +90,30 @@ public class ForjaScreen extends Screen {
         super.removed();
     }
 
-    /** Lo que se puede mejorar de lo que se lleva (se vuelve a mirar cada tick: el servidor cambia el inventario). */
+    private boolean vale(ItemStack st) {
+        return modo == MEJORAR ? Forja.mejorable(st) : Habilidad.admite(st);
+    }
+
+    /** Lo que se puede mejorar (o lo que admite cenizas) de lo que se lleva; se vuelve a mirar cada tick. */
     private void leer() {
         Integer antes = huecos.isEmpty() ? null : huecos.get(Mth.clamp(sel, 0, huecos.size() - 1));
         huecos.clear();
         Inventory inv = minecraft.player.getInventory();
-        for (int h : ORDEN) if (Forja.mejorable(inv.getItem(h))) huecos.add(h);
+        for (int h : ORDEN) if (vale(inv.getItem(h))) huecos.add(h);
         if (antes != null && huecos.contains(antes)) sel = huecos.indexOf(antes);
         sel = huecos.isEmpty() ? 0 : Mth.clamp(sel, 0, huecos.size() - 1);
         if (sel < arriba) arriba = sel;
         if (sel >= arriba + FILAS) arriba = sel - FILAS + 1;
         arriba = Mth.clamp(arriba, 0, Math.max(0, huecos.size() - FILAS));
+        // las cenizas que se llevan (y quitar la puesta, si la hay)
+        Integer antesOpcion = opciones.isEmpty() ? null : opciones.get(Mth.clamp(opcion, 0, opciones.size() - 1));
+        opciones.clear();
+        if (modo == CENIZAS && !huecos.isEmpty()) {
+            if (Habilidad.puesta(elegido()) != null) opciones.add(-1);
+            for (int h = 0; h < inv.getContainerSize(); h++) if (CenizaGuerra.de(inv.getItem(h)) != null) opciones.add(h);
+        }
+        if (antesOpcion != null && opciones.contains(antesOpcion)) opcion = opciones.indexOf(antesOpcion);
+        opcion = opciones.isEmpty() ? 0 : Mth.clamp(opcion, 0, opciones.size() - 1);
     }
 
     private ItemStack elegido() {
@@ -108,10 +132,25 @@ public class ForjaScreen extends Screen {
         leer();
     }
 
-    // ------------------------------------------------------------------ mejorar
+    private void cambiarModo(int m) {
+        if (m == modo) return;
+        modo = m;
+        sel = 0;
+        arriba = 0;
+        opcion = 0;
+        Panel.mueve();
+        leer();
+    }
+
+    // ------------------------------------------------------------------ mejorar y poner cenizas
 
     private boolean gasta() {
         return !minecraft.player.isCreative();
+    }
+
+    private void hacer() {
+        if (modo == MEJORAR) mejorar();
+        else aplicar();
     }
 
     private void mejorar() {
@@ -137,10 +176,30 @@ public class ForjaScreen extends Screen {
         Panel.acepta();
     }
 
+    /** Si la opcion elegida se puede poner (o quitar) en el arma elegida. */
+    private boolean aplicable() {
+        if (huecos.isEmpty() || opciones.isEmpty()) return false;
+        int o = opciones.get(opcion);
+        if (o < 0) return true;
+        Habilidad h = CenizaGuerra.de(minecraft.player.getInventory().getItem(o));
+        ItemStack st = elegido();
+        return h != null && h.vale(com.darkcraft.combate.Armas.de(st)) && h != Habilidad.de(st);
+    }
+
+    private void aplicar() {
+        if (esperando > 0 || !aplicable()) {
+            Panel.nada();
+            return;
+        }
+        Net.CH.sendToServer(new Net.Ceniza(entidad, huecos.get(sel), opciones.get(opcion)));
+        esperando = 40;
+        Panel.acepta();
+    }
+
     private void resultado(Net.ForjaHecho m) {
         esperando = 0;
         switch (m.codigo()) {
-            case Forja.HECHO -> {
+            case Forja.HECHO, Forja.CENIZA, Forja.QUITADA -> {
                 destello = t;
                 destelloHueco = m.hueco();
                 dorvan.decirSiHaceRato(4, 600);
@@ -190,6 +249,39 @@ public class ForjaScreen extends Screen {
         return mx >= botonX(i) && mx < botonX(i) + BOTON_W && my >= botonY() && my < botonY() + 20;
     }
 
+    /** Las dos pestanas del titulo: {x, ancho} de cada una. */
+    private int[] pestana(int i) {
+        Component a = Component.translatable("darkcraft.forja.pestana.mejorar"), b = Component.translatable("darkcraft.forja.pestana.cenizas");
+        int wa = Letra.anchoM(font, a), wb = Letra.anchoM(font, b), hueco = 26;
+        int x0 = px() + (ANCHO - wa - wb - hueco) / 2;
+        return i == 0 ? new int[]{x0, wa} : new int[]{x0 + wa + hueco, wb};
+    }
+
+    private int pestanaEn(double mx, double my) {
+        if (my < py() + 8 || my > py() + 28) return -1;
+        for (int i = 0; i < 2; i++) {
+            int[] p = pestana(i);
+            if (mx >= p[0] - 4 && mx < p[0] + p[1] + 4) return i;
+        }
+        return -1;
+    }
+
+    /** La fila de las cenizas en el detalle: x de la opcion i y su y. */
+    private int opcionX(int i, int dx) {
+        return dx + 8 + i * 22;
+    }
+
+    private int opcionY() {
+        return py() + LISTA_Y - 3 + 96;
+    }
+
+    private int opcionEn(double mx, double my) {
+        if (modo != CENIZAS || my < opcionY() - 2 || my >= opcionY() + 20) return -1;
+        int dx = px() + 10 + IZQ + 10;
+        for (int i = 0; i < Math.min(opciones.size(), 7); i++) if (mx >= opcionX(i, dx) - 2 && mx < opcionX(i, dx) + 20) return i;
+        return -1;
+    }
+
     // ------------------------------------------------------------------ dibujo
 
     @Override
@@ -199,20 +291,26 @@ public class ForjaScreen extends Screen {
         g.fill(0, 0, width, height, (Math.round(150 * Mth.clamp(e / 5f, 0f, 1f)) << 24) | 0x050408);
         Pix.blanco();
         Panel.losa(g, x, y, ANCHO, ALTO);
-        int tw = Letra.anchoG(font, title);
-        Letra.grande(g, font, title, x + (ANCHO - tw) / 2, y + 11, 0xFFE9C766, 0xFF050408);
-        Pix.blanco();
-        if (tw + 2 * 82 < ANCHO - 30) {
-            Pix.t(g, HudTex.FLORITURA, x + (ANCHO - tw) / 2 - 10 - 72, y + 14);
-            Pix.tEspejo(g, HudTex.FLORITURA, x + (ANCHO + tw) / 2 + 10, y + 14);
+        // las dos pestanas, en gotica (la elegida en oro con su raya; la otra apagada)
+        int encimaP = pestanaEn(mx, my);
+        for (int i = 0; i < 2; i++) {
+            int[] p = pestana(i);
+            Component c = Component.translatable(i == 0 ? "darkcraft.forja.pestana.mejorar" : "darkcraft.forja.pestana.cenizas");
+            boolean es = i == modo;
+            Letra.mediana(g, font, c, p[0], y + 12, es ? 0xFFE9C766 : i == encimaP ? 0xFFB8A888 : 0xFF7A6E5C, 0xFF050408);
+            if (es) Panel.raya(g, p[0] - 2, p[0] + p[1] + 2, y + 27);
         }
+        Pix.blanco();
+        int[] p0 = pestana(0), p1 = pestana(1);
+        g.drawString(font, "◆", (p0[0] + p0[1] + p1[0]) / 2 - 3, y + 15, 0xFF6E5A3A, false);
         Panel.raya(g, x + 12, x + ANCHO - 12, y + 33);
 
-        // ---- a la izquierda: lo que se puede mejorar
+        // ---- a la izquierda: las armas
+        Pix.blanco();
         Panel.hueco(g, x + 10, y + LISTA_Y - 3, IZQ, FILAS * FILA + 6);
         Inventory inv = minecraft.player.getInventory();
         if (huecos.isEmpty()) {
-            List<FormattedCharSequence> l = font.split(Component.translatable("darkcraft.forja.nada"), IZQ - 16);
+            List<FormattedCharSequence> l = font.split(Component.translatable(modo == MEJORAR ? "darkcraft.forja.nada" : "darkcraft.forja.nada_cenizas"), IZQ - 16);
             for (int i = 0; i < l.size(); i++) g.drawString(font, l.get(i), x + 18, y + LISTA_Y + 8 + i * 10, APAGADO, false);
         }
         int encima = filaEn(mx, my);
@@ -222,12 +320,20 @@ public class ForjaScreen extends Screen {
             Pix.blanco();
             if (i == sel) Panel.fila(g, x + 12, fy + 1, IZQ - 4);
             g.renderItem(st, x + 16, fy + 2);
-            int n = Forja.nivel(st);
-            String nivel = n >= Forja.MAX ? "+" + n : n > 0 ? "+" + n : "";
-            int nw = font.width(nivel);
+            String derecha;
+            int colorDer;
+            if (modo == MEJORAR) {
+                int n = Forja.nivel(st);
+                derecha = n > 0 ? "+" + n : "";
+                colorDer = n >= Forja.MAX ? 0xFFFFD866 : ORO;
+            } else {
+                derecha = Habilidad.puesta(st) != null ? "◆" : "";
+                colorDer = 0xFFE2BF62;
+            }
+            int nw = font.width(derecha);
             String nombre = recortar(st.getHoverName().getString(), IZQ - 44 - nw);
             g.drawString(font, nombre, x + 36, fy + 6, i == sel ? LUZ : i == encima ? CLARO : 0xFFC8B89A, true);
-            if (!nivel.isEmpty()) g.drawString(font, nivel, x + 10 + IZQ - 8 - nw, fy + 6, n >= Forja.MAX ? 0xFFFFD866 : ORO, true);
+            if (!derecha.isEmpty()) g.drawString(font, derecha, x + 10 + IZQ - 8 - nw, fy + 6, colorDer, true);
             if (huecos.get(i) == destelloHueco && t - destello < 24) {
                 Pix.suma();
                 Pix.color(1f, 0.8f, 0.4f, 0.6f * (1f - (e - destello) / 24f));
@@ -236,31 +342,34 @@ public class ForjaScreen extends Screen {
                 Pix.mezcla();
             }
         }
-        // flechitas si hay mas por arriba o por abajo
         if (arriba > 0) g.drawString(font, "▲", x + 10 + IZQ - 12, y + LISTA_Y - 12, APAGADO, false);
         if (arriba + FILAS < huecos.size()) g.drawString(font, "▼", x + 10 + IZQ - 12, y + LISTA_Y + FILAS * FILA + 4, APAGADO, false);
 
-        // ---- a la derecha: la elegida
+        // ---- a la derecha: el elegido
         int dx = x + 10 + IZQ + 10, dw = ANCHO - 14 - (10 + IZQ + 10);
         Pix.blanco();
         Panel.hueco(g, dx, y + LISTA_Y - 3, dw, FILAS * FILA + 6);
-        // los ecos que se llevan, arriba a la derecha del todo
         String ecos = Hud.numero(ClientRol.ecos);
         Pix.mezcla();
         Pix.t(g, HudTex.ECO_0, x + ANCHO - 16 - font.width(ecos) - 18, y + 14);
         g.drawString(font, ecos, x + ANCHO - 16 - font.width(ecos), y + 18, ORO, true);
-        if (!huecos.isEmpty()) detalle(g, dx, y + LISTA_Y - 3, dw, e);
+        if (!huecos.isEmpty()) {
+            if (modo == MEJORAR) detalle(g, dx, y + LISTA_Y - 3, dw);
+            else detalleCeniza(g, dx, y + LISTA_Y - 3, dw, mx, my);
+        }
 
         // ---- abajo: botones y teclas
-        ItemStack st = elegido();
-        boolean puede = !huecos.isEmpty() && Forja.nivel(st) < Forja.MAX && esperando <= 0;
-        boton(g, 0, Component.translatable("darkcraft.forja.mejorar"), puede, enBoton(mx, my, 0));
+        boolean puede = esperando <= 0 && (modo == MEJORAR ? !huecos.isEmpty() && Forja.nivel(elegido()) < Forja.MAX : aplicable());
+        Component accion = Component.translatable(modo == MEJORAR ? "darkcraft.forja.mejorar"
+                : !opciones.isEmpty() && opciones.get(opcion) < 0 ? "darkcraft.forja.quitar" : "darkcraft.forja.aplicar");
+        boton(g, 0, accion, puede, enBoton(mx, my, 0));
         boton(g, 1, Component.translatable("darkcraft.menu.volver"), true, enBoton(mx, my, 1));
         int ty = botonY() + 4, tx = x + 14;
-        tx = Panel.tecla(g, font, Component.literal("↑↓"), Component.translatable("darkcraft.menu.tecla.elegir"), tx, ty, APAGADO) + 8;
+        tx = Panel.tecla(g, font, Component.literal("TAB"), Component.translatable("darkcraft.menu.tecla.pestana"), tx, ty, APAGADO) + 8;
+        if (modo == CENIZAS) tx = Panel.tecla(g, font, Component.literal("←→"), Component.translatable("darkcraft.forja.tecla.ceniza"), tx, ty, APAGADO) + 8;
+        else tx = Panel.tecla(g, font, Component.literal("↑↓"), Component.translatable("darkcraft.menu.tecla.elegir"), tx, ty, APAGADO) + 8;
         Component k = minecraft.options.keyInventory.getTranslatedKeyMessage();
-        if (tx + Panel.anchoTecla(font, k, Component.translatable("darkcraft.forja.mejorar")) < botonX(0) - 6)
-            Panel.tecla(g, font, k, Component.translatable("darkcraft.forja.mejorar"), tx, ty, APAGADO);
+        if (tx + Panel.anchoTecla(font, k, accion) < botonX(0) - 6) Panel.tecla(g, font, k, accion, tx, ty, APAGADO);
 
         // ---- lo que dice Dorvan
         dorvan.render(g, font, x, y + ALTO + 4, ANCHO, pt);
@@ -268,19 +377,22 @@ public class ForjaScreen extends Screen {
         Pix.mezcla();
     }
 
-    private void detalle(GuiGraphics g, int x, int y, int w, float e) {
-        ItemStack st = elegido();
-        Inventory inv = minecraft.player.getInventory();
-        int n = Forja.nivel(st);
-        // el objeto en grande y su nombre
+    /** El objeto en grande con su nombre en gotica (arriba del detalle). */
+    private void cabecera(GuiGraphics g, ItemStack st, int x, int y, int w) {
         g.pose().pushPose();
         g.pose().translate(x + 8, y + 7, 0);
         g.pose().scale(2f, 2f, 1f);
         g.renderItem(st, 0, 0);
         g.pose().popPose();
-        Component nombre = Letra.m(st.getHoverName());
-        List<FormattedCharSequence> ln = font.split(nombre, w - 54);
+        List<FormattedCharSequence> ln = font.split(Letra.m(st.getHoverName()), w - 54);
         if (!ln.isEmpty()) Letra.contorno(g, font, ln.get(0), x + 46, y + 9, 0xFFE9C766, 0xFF050408);
+    }
+
+    private void detalle(GuiGraphics g, int x, int y, int w) {
+        ItemStack st = elegido();
+        Inventory inv = minecraft.player.getInventory();
+        int n = Forja.nivel(st);
+        cabecera(g, st, x, y, w);
         String paso = n >= Forja.MAX ? "+" + n : "+" + n + "  →  +" + (n + 1);
         g.drawString(font, paso, x + 46, y + 27, n >= Forja.MAX ? 0xFFFFD866 : LUZ, true);
         Panel.raya(g, x + 6, x + w - 6, y + 42);
@@ -305,13 +417,11 @@ public class ForjaScreen extends Screen {
         Item piedra = Forja.piedra(Forja.grado(d));
         int tiene = inv.countItem(piedra), pide = Forja.piedras(d);
         boolean libre = !gasta();
-        // las piedras: el icono, cuantas pide y cuantas se tienen
         g.drawString(font, Component.translatable("darkcraft.forja.piedras"), x + 7, ly + 20, CLARO, true);
         String sp = pide + " / " + tiene;
         int spw = font.width(sp);
         g.drawString(font, sp, x + w - 7 - spw, ly + 20, tiene >= pide || libre ? ORO : ROJO, true);
         g.renderItem(new ItemStack(piedra), x + w - 7 - spw - 19, ly + 16);
-        // los ecos
         g.drawString(font, Component.translatable("darkcraft.forja.ecos"), x + 7, ly + 40, CLARO, true);
         String se = Hud.numero(Forja.ecos(d));
         int sew = font.width(se);
@@ -319,9 +429,78 @@ public class ForjaScreen extends Screen {
         Pix.mezcla();
         Pix.t(g, HudTex.ECO_0, x + w - 7 - sew - 18, ly + 36);
         Pix.blanco();
-        // el nombre de la piedra, pequeno
         String np = recortar(new ItemStack(piedra).getHoverName().getString(), w - 14);
         g.drawString(font, np, x + 7, ly + 30, APAGADO, false);
+    }
+
+    /** La pestana de cenizas: la habilidad del arma, lo que gasta, para que sirve y las cenizas que se llevan. */
+    private void detalleCeniza(GuiGraphics g, int x, int y, int w, int mx, int my) {
+        ItemStack st = elegido();
+        Inventory inv = minecraft.player.getInventory();
+        Habilidad h = Habilidad.de(st);
+        boolean puesta = Habilidad.puesta(st) != null;
+        cabecera(g, st, x, y, w);
+        if (h != null) {
+            Component nombre = Component.translatable(h.clave());
+            g.drawString(font, nombre, x + 46, y + 27, LUZ, true);
+            Component marca = Component.translatable(puesta ? "darkcraft.forja.de_ceniza" : "darkcraft.forja.la_suya");
+            g.drawString(font, marca, x + 46 + font.width(nombre) + 6, y + 27, puesta ? ORO : APAGADO, false);
+        }
+        Panel.raya(g, x + 6, x + w - 6, y + 42);
+        if (h != null) {
+            g.drawString(font, CenizaGuerra.coste(h), x + 7, y + 47, 0xFF8FC8E8, false);
+            List<FormattedCharSequence> d = font.split(Component.translatable(h.clave() + ".desc"), w - 14);
+            for (int i = 0; i < Math.min(3, d.size()); i++) g.drawString(font, d.get(i), x + 7, y + 58 + i * 9, APAGADO, false);
+        }
+        // las cenizas que se llevan
+        int oy = opcionY();
+        if (opciones.isEmpty()) {
+            g.drawString(font, Component.translatable("darkcraft.forja.sin_cenizas"), x + 7, oy + 5, 0xFF7A705E, false);
+            return;
+        }
+        int encimaO = opcionEn(mx, my);
+        for (int i = 0; i < Math.min(opciones.size(), 7); i++) {
+            int ox = opcionX(i, x);
+            int o = opciones.get(i);
+            Pix.blanco();
+            Panel.hueco(g, ox - 2, oy - 2, 20, 20);
+            boolean vale;
+            if (o < 0) {
+                // quitar: la habilidad de siempre del arma (una cruz roja encima)
+                ItemStack suya = new ItemStack(net.minecraft.world.item.Items.BARRIER);
+                g.renderItem(suya, ox, oy);
+                vale = true;
+            } else {
+                ItemStack c = inv.getItem(o);
+                Habilidad ch = CenizaGuerra.de(c);
+                vale = ch != null && ch.vale(com.darkcraft.combate.Armas.de(st)) && ch != h;
+                g.renderItem(c, ox, oy);
+                if (!vale) {
+                    Pix.mezcla();
+                    g.fill(ox, oy, ox + 16, oy + 16, 0xA0101014);
+                }
+            }
+            if (i == opcion || i == encimaO) {
+                int c = i == opcion ? 0xFFE2BF62 : 0x80E2BF62;
+                g.fill(ox - 2, oy - 2, ox + 18, oy - 1, c);
+                g.fill(ox - 2, oy + 17, ox + 18, oy + 18, c);
+                g.fill(ox - 2, oy - 2, ox - 1, oy + 18, c);
+                g.fill(ox + 17, oy - 2, ox + 18, oy + 18, c);
+            }
+        }
+        // lo que hace la elegida
+        int o = opciones.get(opcion);
+        Component que;
+        if (o < 0) que = Component.translatable("darkcraft.forja.quitar_ceniza", Component.translatable(Habilidad.porDefecto(com.darkcraft.combate.Armas.de(st)).clave()));
+        else {
+            Habilidad ch = CenizaGuerra.de(inv.getItem(o));
+            que = ch == null ? Component.empty() : !ch.vale(com.darkcraft.combate.Armas.de(st))
+                    ? Component.translatable("darkcraft.forja.no_vale")
+                    : ch == h ? Component.translatable("darkcraft.forja.ya_la_tiene")
+                    : Component.translatable("darkcraft.forja.cambia", Component.translatable(h == null ? "darkcraft.habilidad.ninguna_corta" : h.clave()),
+                    Component.translatable(ch.clave()));
+        }
+        g.drawString(font, recortar(que.getString(), w - 14), x + 7, oy + 22, aplicable() ? LUZ : 0xFF9A8F7E, true);
     }
 
     private void stat(GuiGraphics g, int x, int w, int y, String clave, String antes, String despues) {
@@ -349,7 +528,7 @@ public class ForjaScreen extends Screen {
 
     private String recortar(String s, int ancho) {
         if (font.width(s) <= ancho) return s;
-        return font.plainSubstrByWidth(s, ancho - font.width("…")) + "…";
+        return font.plainSubstrByWidth(s, Math.max(0, ancho - font.width("…"))) + "…";
     }
 
     // ------------------------------------------------------------------ raton y teclado
@@ -357,10 +536,25 @@ public class ForjaScreen extends Screen {
     private void elegir(int i) {
         if (huecos.isEmpty()) return;
         int n = Mth.clamp(i, 0, huecos.size() - 1);
-        if (n != sel) Panel.mueve();
+        if (n != sel) {
+            Panel.mueve();
+            opcion = 0;
+        }
         sel = n;
         if (sel < arriba) arriba = sel;
         if (sel >= arriba + FILAS) arriba = sel - FILAS + 1;
+        leer();
+    }
+
+    private void elegirOpcion(int i) {
+        if (opciones.isEmpty()) return;
+        int n = Mth.clamp(i, 0, opciones.size() - 1);
+        if (n == opcion) {
+            Panel.nada();
+            return;
+        }
+        opcion = n;
+        Panel.mueve();
     }
 
     @Override
@@ -372,12 +566,22 @@ public class ForjaScreen extends Screen {
     @Override
     public boolean mouseClicked(double mx, double my, int b) {
         if (b != 0) return false;
+        int p = pestanaEn(mx, my);
+        if (p >= 0) {
+            cambiarModo(p);
+            return true;
+        }
         if (enBoton(mx, my, 0)) {
-            mejorar();
+            hacer();
             return true;
         }
         if (enBoton(mx, my, 1)) {
             volver();
+            return true;
+        }
+        int o = opcionEn(mx, my);
+        if (o >= 0) {
+            elegirOpcion(o);
             return true;
         }
         int i = filaEn(mx, my);
@@ -399,6 +603,10 @@ public class ForjaScreen extends Screen {
             volver();
             return true;
         }
+        if (tecla == GLFW.GLFW_KEY_TAB) {
+            cambiarModo(1 - modo);
+            return true;
+        }
         if (tecla == GLFW.GLFW_KEY_UP || o.keyUp.matches(tecla, scan)) {
             elegir(sel - 1);
             return true;
@@ -407,8 +615,16 @@ public class ForjaScreen extends Screen {
             elegir(sel + 1);
             return true;
         }
+        if (modo == CENIZAS && (tecla == GLFW.GLFW_KEY_LEFT || o.keyLeft.matches(tecla, scan))) {
+            elegirOpcion(opcion - 1);
+            return true;
+        }
+        if (modo == CENIZAS && (tecla == GLFW.GLFW_KEY_RIGHT || o.keyRight.matches(tecla, scan))) {
+            elegirOpcion(opcion + 1);
+            return true;
+        }
         if (tecla == GLFW.GLFW_KEY_ENTER || tecla == GLFW.GLFW_KEY_KP_ENTER || o.keyInventory.matches(tecla, scan)) {
-            mejorar();
+            hacer();
             return true;
         }
         return super.keyPressed(tecla, scan, mods);
@@ -418,7 +634,9 @@ public class ForjaScreen extends Screen {
 
     public String resumen() {
         ItemStack st = elegido();
-        return "forja " + huecos.size() + " mejorables, elegida " + (huecos.isEmpty() ? "-" : huecos.get(sel) + " " + st.getItem() + " +" + Forja.nivel(st))
+        return "forja " + (modo == MEJORAR ? "mejorar" : "cenizas") + " " + huecos.size() + " armas, elegida "
+                + (huecos.isEmpty() ? "-" : huecos.get(sel) + " " + st.getItem() + " +" + Forja.nivel(st) + " habilidad " + Habilidad.de(st))
+                + (modo == CENIZAS ? " opciones " + opciones + " elegida " + opcion : "")
                 + " | dorvan dice " + dorvan.numero() + (dorvan.hablando() ? " (sonando)" : "") + (esperando > 0 ? " (esperando)" : "");
     }
 
@@ -430,5 +648,16 @@ public class ForjaScreen extends Screen {
 
     public void pulsarMejorar() {
         mejorar();
+    }
+
+    public void pulsarModo(int m) {
+        cambiarModo(m);
+    }
+
+    /** Elige la ceniza del hueco {@code hueco} (o -1: quitar) y la pone. */
+    public void pulsarCeniza(int hueco) {
+        int i = opciones.indexOf(hueco);
+        if (i >= 0) opcion = i;
+        aplicar();
     }
 }

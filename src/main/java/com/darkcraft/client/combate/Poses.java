@@ -94,6 +94,12 @@ public final class Poses {
         tp(Anim.LANZAR, new P(-115, 25, 0, -30, N, N, 18), new P(-95, -8, 0, -25, N, N, -12));
         tp(Anim.REZAR, new P(-150, -10, 0, -40, N, N, 0), new P(-162, 5, 0, -45, N, N, 0));
         tp(Anim.PASO_ATRAS, new P(-35, 0, 10, -35, 0, -10, 0), new P(-35, 0, 10, -35, 0, -10, 0));
+        // habilidades: el torbellino lleva el arma de un lado al otro (y el cuerpo da la vuelta entera, en girar), el grito
+        // abre los brazos en alto, la parada da un golpe seco de lado y el paso rapido va agachado y con los brazos atras
+        tp(Anim.GIRO, new P(-85, 75, 0, -45, N, N, 55), new P(-85, -80, 0, -45, N, N, -60));
+        tp(Anim.GRITO, new P(-25, 0, 25, -25, 0, -25, 0), new P(-165, -25, 35, -165, 25, -35, 0));
+        tp(Anim.PARADA, new P(-80, 50, 0, -45, N, N, 30), new P(-105, -25, 0, -30, N, N, -12));
+        tp(Anim.PASO, new P(25, 0, 20, 25, 0, -20, 0), new P(25, 0, 20, 25, 0, -20, 0));
 
         // primera persona: {x, y, z} sobre el sitio de siempre del arma (derecha, arriba, hacia la camara) y giros en
         // grados: X+ echa la hoja hacia atras (arriba), Y+ la lleva hacia la izquierda, Z+ la inclina a la izquierda
@@ -110,6 +116,9 @@ public final class Poses {
         fp(Anim.DAGA_I, new float[]{-0.38f, 0.05f, 0.02f, 0, 25, 35}, new float[]{0.14f, -0.06f, -0.10f, -10, -25, -35});
         fp(Anim.LANZAR, new float[]{0.05f, 0.08f, 0.18f, 30, -10, -15}, new float[]{-0.10f, 0.04f, -0.35f, -35, 5, 0});
         fp(Anim.REZAR, new float[]{-0.12f, 0.25f, 0.05f, 35, 10, 0}, new float[]{-0.18f, 0.38f, -0.12f, 50, 10, 0});
+        fp(Anim.GIRO, new float[]{0.28f, 0.10f, 0.10f, 5, -40, -85}, new float[]{-0.80f, -0.06f, -0.06f, -5, 60, 85});
+        fp(Anim.GRITO, new float[]{0.02f, 0.06f, 0.10f, 15, 0, -8}, new float[]{-0.08f, 0.48f, 0.04f, 65, 0, -20});
+        fp(Anim.PARADA, new float[]{0.06f, 0.06f, 0.10f, 10, -28, -45}, new float[]{-0.30f, 0.12f, -0.06f, 18, 28, 35});
     }
 
     // ------------------------------------------------------------------ lo que se esta animando
@@ -136,8 +145,10 @@ public final class Poses {
         Armas.Tipo[] tipos = Armas.Tipo.values();
         a.tipo = tipos[Mth.clamp(m.tipo(), 0, tipos.length - 1)];
         com.darkcraft.hechizos.Hechizo[] hs = com.darkcraft.hechizos.Hechizo.values();
+        com.darkcraft.combate.Habilidad[] habs = com.darkcraft.combate.Habilidad.values();
         a.mov = a.accion == Armas.RODAR ? Armas.rodar(a.paso) : a.accion == Armas.PASO_ATRAS ? Armas.PASO_ATRAS_MOV
-                : a.accion == Armas.HECHIZO ? Armas.hechizo(hs[Mth.clamp(a.paso, 0, hs.length - 1)]) : a.tipo.mov(a.accion, a.paso);
+                : a.accion == Armas.HECHIZO ? Armas.hechizo(hs[Mth.clamp(a.paso, 0, hs.length - 1)])
+                : a.accion == Armas.HABILIDAD ? habs[Mth.clamp(a.paso, 0, habs.length - 1)].mov : a.tipo.mov(a.accion, a.paso);
         a.inicio = ClientRol.ticks;
         REMOTAS.put(m.entity(), a);
     }
@@ -149,8 +160,9 @@ public final class Poses {
             Entity e = mc.level.getEntity(en.getKey());
             if (e == null || !e.isAlive()) return true;
             int t = ClientRol.ticks - a.inicio;
-            if (a.accion == Armas.SALTO) {
-                if (a.aterrizo < 0 && t >= 2 && (e.onGround() || t >= 30)) a.aterrizo = ClientRol.ticks;
+            if (saltando(a)) {
+                int desde = a.accion == Armas.SALTO ? 2 : 6;
+                if (a.aterrizo < 0 && t >= desde && (e.onGround() || t >= 34)) a.aterrizo = ClientRol.ticks;
                 return a.aterrizo >= 0 && ClientRol.ticks - a.aterrizo > 8;
             }
             if (a.accion == Armas.CARGA) return t > Armas.CARGA_MAX + 60;
@@ -160,6 +172,11 @@ public final class Poses {
 
     static void olvidar() {
         REMOTAS.clear();
+    }
+
+    /** Si va de un salto y golpea al caer: el golpe del salto y la habilidad del sismo. */
+    public static boolean saltando(Anim_ a) {
+        return a.accion == Armas.SALTO || (a.accion == Armas.HABILIDAD && a.mov != null && a.mov.anim() == Anim.SALTO);
     }
 
     private static Anim_ de(Entity e) {
@@ -191,7 +208,7 @@ public final class Poses {
         P[] dos = TP.get(m.anim());
         if (dos == null) return null;
         P prep = dos[0], golpe = dos[1];
-        if (a.tipo != null && a.tipo.dosManos && a.accion != Armas.RODAR && a.accion != Armas.PASO_ATRAS) {
+        if (a.tipo != null && a.tipo.dosManos && a.accion != Armas.RODAR && a.accion != Armas.PASO_ATRAS && m.anim() != Anim.GRITO && m.anim() != Anim.PASO) {
             prep = prep.dosManos();
             golpe = golpe.dosManos();
         }
@@ -199,7 +216,8 @@ public final class Poses {
             prep = prep.espejo();
             golpe = golpe.espejo();
         }
-        switch (a.accion) {
+        int accion = saltando(a) ? Armas.SALTO : a.accion == Armas.HABILIDAD && m.anim() == Anim.PASO ? Armas.PASO_ATRAS : a.accion;
+        switch (accion) {
             case Armas.CARGA -> {
                 // se sube el arma y se queda temblando de la fuerza
                 float w = suave(t / 5f);
@@ -272,6 +290,17 @@ public final class Poses {
     public static void girar(RenderPlayerEvent.Pre e) {
         AbstractClientPlayer p = (AbstractClientPlayer) e.getEntity();
         Anim_ a = de(p);
+        if (a != null && a.accion == Armas.HABILIDAD && a.mov.anim() == Anim.GIRO) {
+            // el torbellino: una vuelta entera sobre si mismo mientras pega
+            float t = ClientRol.ticks - a.inicio + e.getPartialTick();
+            float g0 = Math.max(1, a.mov.golpe0() - 2), g1 = a.mov.golpe1() + 2;
+            float k = suave((t - g0) / Math.max(1f, g1 - g0));
+            PoseStack ps = e.getPoseStack();
+            ps.pushPose();
+            ps.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-360f * k));
+            GIRADOS.add(p.getId());
+            return;
+        }
         if (a == null || (a.accion != Armas.RODAR && a.accion != Armas.PASO_ATRAS)) return;
         float t = ClientRol.ticks - a.inicio + e.getPartialTick();
         float k = Mth.clamp(t / a.mov.dura(), 0f, 1f);
@@ -308,7 +337,7 @@ public final class Poses {
         float[] prep = dos[0], golpe = dos[1];
         float[] r = new float[6];
         float k;
-        switch (a.accion) {
+        switch (saltando(a) ? Armas.SALTO : a.accion) {
             case Armas.CARGA -> k = 0f;
             case Armas.SALTO -> k = a.aterrizo < 0 ? 0f : latigo((ClientRol.ticks - a.aterrizo + (t - (int) t)) / 2f);
             default -> {

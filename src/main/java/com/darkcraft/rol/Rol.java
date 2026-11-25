@@ -773,7 +773,29 @@ public final class Rol {
             for (int g = 1; g <= 3; g++) Equipo.dar(p, new net.minecraft.world.item.ItemStack(com.darkcraft.forja.Forja.piedra(g), 6));
             return 1;
         });
+        // las cenizas de guerra: darla o ponersela al arma de la mano derecha
+        var ceniza = Commands.literal("ceniza");
+        for (com.darkcraft.combate.Habilidad h : com.darkcraft.combate.Habilidad.values())
+            ceniza.then(Commands.literal(h.id).executes(c -> {
+                Equipo.dar(c.getSource().getPlayerOrException(), new net.minecraft.world.item.ItemStack(DarkCraftMod.CENIZAS.get(h).get()));
+                return 1;
+            }).then(Commands.literal("poner").executes(c -> {
+                ServerPlayer p = c.getSource().getPlayerOrException();
+                net.minecraft.world.item.ItemStack st = p.getMainHandItem();
+                if (!com.darkcraft.combate.Habilidad.admite(st) || !h.vale(com.darkcraft.combate.Armas.de(st))) return 0;
+                com.darkcraft.combate.Habilidad.poner(st, h);
+                p.getInventory().setChanged();
+                c.getSource().sendSuccess(() -> Component.translatable(h.clave()), false);
+                return 1;
+            })));
+        ceniza.then(Commands.literal("quitar").executes(c -> {
+            ServerPlayer p = c.getSource().getPlayerOrException();
+            com.darkcraft.combate.Habilidad.poner(p.getMainHandItem(), null);
+            p.getInventory().setChanged();
+            return 1;
+        }));
         return Commands.literal("rol")
+                .then(ceniza)
                 .then(talisman)
                 .then(fruto)
                 .then(hechizo)

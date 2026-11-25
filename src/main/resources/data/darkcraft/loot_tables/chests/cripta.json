@@ -434,6 +434,30 @@
      "weight": 5
     }
    ]
+  },
+  {
+   "rolls": 1,
+   "entries": [
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:ceniza_sangre",
+     "weight": 2
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:ceniza_escarcha",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:ceniza_paso",
+     "weight": 1
+    },
+    {
+     "type": "minecraft:empty",
+     "weight": 24
+    }
+   ]
   }
  ]
 }

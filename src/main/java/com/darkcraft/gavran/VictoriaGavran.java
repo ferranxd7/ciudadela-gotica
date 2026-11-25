@@ -152,6 +152,8 @@ public final class VictoriaGavran {
         items.set(12, new ItemStack(DarkCraftMod.FRUTOS.get(com.darkcraft.rol.Fruto.Clase.CENIZA).get(), 3));
         // piedras de forja para Dorvan
         items.set(14, new ItemStack(DarkCraftMod.PIEDRA_FORJA_3.get(), 3));
+        // y la ceniza de sus espinas
+        items.set(15, new ItemStack(DarkCraftMod.CENIZAS.get(com.darkcraft.combate.Habilidad.SANGRE).get()));
         for (int slot : new int[]{20, 21, 23, 24})
             items.set(slot, EnchantmentHelper.enchantItem(lvl.random, new ItemStack(Items.BOOK), 30, true));
     }

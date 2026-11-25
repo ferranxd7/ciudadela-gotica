@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "13";
+    private static final String V = "14";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -118,6 +118,8 @@ public final class Net {
                 .encoder(Mejorar::write).decoder(Mejorar::read).consumerMainThread(Mejorar::handle).add();
         CH.messageBuilder(ForjaHecho.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(ForjaHecho::write).decoder(ForjaHecho::read).consumerMainThread(ForjaHecho::handle).add();
+        CH.messageBuilder(Ceniza.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Ceniza::write).decoder(Ceniza::read).consumerMainThread(Ceniza::handle).add();
         CH.messageBuilder(AbrirTienda.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(AbrirTienda::write).decoder(AbrirTienda::read).consumerMainThread(AbrirTienda::handle).add();
         CH.messageBuilder(Comprar.class, id++, NetworkDirection.PLAY_TO_SERVER)
@@ -259,6 +261,25 @@ public final class Net {
 
         void handle(Supplier<NetworkEvent.Context> ctx) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.ForjaScreen.hecho(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El cliente pide ponerle al arma del hueco {@code arma} la ceniza del hueco {@code ceniza} (-1: quitarle la suya). */
+    public record Ceniza(int entidad, int arma, int ceniza) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entidad);
+            b.writeVarInt(arma);
+            b.writeVarInt(ceniza + 1);
+        }
+
+        static Ceniza read(FriendlyByteBuf b) {
+            return new Ceniza(b.readVarInt(), b.readVarInt(), b.readVarInt() - 1);
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.forja.Forja.ceniza(p, entidad, arma, ceniza);
             ctx.get().setPacketHandled(true);
         }
     }

@@ -47,6 +47,12 @@ public final class Teclas {
     /** Rodar (con una direccion) o dar un paso atras (sin ninguna). */
     public static final KeyMapping RODAR = tecla("rodar", GLFW.GLFW_KEY_LEFT_ALT);
     /**
+     * La habilidad del arma de la mano derecha (la de su ceniza de guerra). Va en la C, que en el juego es "guardar la barra
+     * de objetos" (solo en creativo): no choca con ella, asi que los controles no la marcan en rojo.
+     */
+    public static final KeyMapping HABILIDAD = new KeyMapping("key.darkcraft.habilidad", SIN_CHOQUE, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_C,
+            "key.categories.darkcraft");
+    /**
      * Fijar el objetivo (y soltarlo). Va en la Q, que en el juego es "soltar objeto" (con el mod no se tira nada con una
      * tecla): no choca con ella, asi que los controles no la marcan en rojo. La rueda del raton (pulsarla) tambien fija.
      */
@@ -64,6 +70,7 @@ public final class Teclas {
         e.register(OBJETO_USAR);
         e.register(HECHIZO_SIGUIENTE);
         e.register(RODAR);
+        e.register(HABILIDAD);
         e.register(FIJAR);
     }
 }
