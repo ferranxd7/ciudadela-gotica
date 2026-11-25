@@ -52,6 +52,9 @@ public abstract class Enemigo extends Monster {
     public static final int DE_PIE = 0, REZA = 1, TUMBADO = 2;
 
     private static final UUID MOD_GRUPO = UUID.fromString("7b1e2c90-5a44-4d7e-9c1b-3f0a6d2e8b11");
+    /** El animo (parte 4c): un capitan de elite les arenga (pegan mas) o ha caido el suyo (pegan menos y van mas despacio). */
+    private static final UUID MOD_ANIMO = UUID.fromString("c1d7a3e2-6b5f-4e8a-9d21-7f3b0a4c5e66");
+    private static final UUID MOD_ANIMO_PASO = UUID.fromString("a4e2b7c9-1d3f-4b6a-8e5c-2f9d0b7a6c13");
 
     /** Un golpe: hasta donde llega (bloques), el arco que barre (grados), por cuanto multiplica el ataque y lo que empuja de mas. */
     public record Golpe(float alcance, float arco, float dano, float empuje) {}
@@ -78,6 +81,8 @@ public abstract class Enemigo extends Monster {
     private int enCasa, atascado;
     /** Los que llama un jefe: no se guardan y, pasado su tiempo sin presa, se deshacen. */
     private int efimero;
+    private int animoT;
+    private double animo;
 
     protected Enemigo(EntityType<? extends Enemigo> t, Level l) {
         super(t, l);
@@ -264,6 +269,37 @@ public abstract class Enemigo extends Monster {
 
     public boolean esEfimero() {
         return efimero > 0;
+    }
+
+    /**
+     * El animo (parte 4c): {@code mas} &gt; 0, un capitan les ha arengado (pegan un tanto mas); {@code mas} &lt; 0, ha caido
+     * su capitan (pegan menos y van mas despacio). Dura {@code ticks}; 0 lo quita.
+     */
+    public void animo(double mas, int ticks) {
+        var ataque = getAttribute(Attributes.ATTACK_DAMAGE);
+        var paso = getAttribute(Attributes.MOVEMENT_SPEED);
+        if (ataque != null) {
+            ataque.removeModifier(MOD_ANIMO);
+            if (mas != 0 && ticks > 0) ataque.addTransientModifier(new AttributeModifier(MOD_ANIMO, "darkcraft_animo", mas, AttributeModifier.Operation.MULTIPLY_TOTAL));
+        }
+        if (paso != null) {
+            paso.removeModifier(MOD_ANIMO_PASO);
+            if (mas < 0 && ticks > 0) paso.addTransientModifier(new AttributeModifier(MOD_ANIMO_PASO, "darkcraft_animo_paso", mas * 0.6, AttributeModifier.Operation.MULTIPLY_TOTAL));
+        }
+        animo = mas;
+        animoT = mas == 0 ? 0 : Math.max(0, ticks);
+    }
+
+    /** El animo que tiene ahora (0 si ninguno). */
+    public double animo() {
+        return animoT > 0 ? animo : 0;
+    }
+
+    /** Le avisan de alguien (un capitan, una emboscada): va a por el si es valido y no se aleja demasiado de su puesto. */
+    public boolean acudir(LivingEntity quien) {
+        if (level().isClientSide || !isAlive() || quien == null || !quien.isAlive() || !objetivoValido(quien) || lejosDeCasa(quien)) return false;
+        setTarget(quien);
+        return true;
     }
 
     /** Se deshace en bruma (sin botin ni ecos: no ha muerto). */
@@ -550,6 +586,14 @@ public abstract class Enemigo extends Monster {
         }
         if (!isAlive()) return;
         if (pausa > 0) pausa--;
+        if (animoT > 0) {
+            if (--animoT == 0) animo(0, 0);
+            else if (tickCount % 9 == 0 && level() instanceof net.minecraft.server.level.ServerLevel sl) {
+                if (animo > 0) sl.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(0.78f, 0.06f, 0.06f), 1.1f),
+                        getX(), getY() + getBbHeight() * 0.55, getZ(), 2, getBbWidth() * 0.4, getBbHeight() * 0.25, getBbWidth() * 0.4, 0.0);
+                else sl.sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE, getX(), getY() + getBbHeight() + 0.2, getZ(), 1, 0.15, 0.05, 0.15, 0.005);
+            }
+        }
         if (efimero > 0 && getTarget() == null && accion() == 0 && ++sinPresaEfimero > efimero) {
             disolver();
             return;

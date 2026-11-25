@@ -63,7 +63,7 @@ public final class Espejo {
     /** Logros del mod en el orden de la historia (los que no esten aqui van al final). */
     public static final String[] ORDEN_LOGROS = {"clase", "encontrar", "libro_sombra", "primera_marca", "capitulo1", "capitulo2",
             "rey", "golpe_final", "capitulo3", "capitulo4", "arbol", "gavran_guardia", "gavran_fase1", "gavran_corazon",
-            "gavran_juicio", "gavran_fase2", "gavran", "capitulo5", "cartografo", "caballero", "caballeros_50", "fortaleza", "puente",
+            "gavran_juicio", "gavran_fase2", "gavran", "capitulo5", "cartografo", "caballero", "caballeros_50", "capitan_elite", "emboscada", "fortaleza", "puente",
             "puerta_hueso", "acertijo", "amuleto", "portal", "capitulo6", "libro_perdido", "libros_perdidos"};
 
     /** Un sitio del mapa: id unico ("x,z:nombre"), tipo, icono, posicion, clave del nombre, radio para descubrirlo. */

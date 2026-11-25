@@ -2321,5 +2321,99 @@
         "name": "darkcraft:sfx/espectro_muerte_2"
       }
     ]
+  },
+  "sfx.elite_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.elite_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/elite_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/elite_alerta_2"
+      }
+    ]
+  },
+  "sfx.elite_grito": {
+    "subtitle": "subtitles.darkcraft.sfx.elite_grito",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/elite_grito_1"
+      },
+      {
+        "name": "darkcraft:sfx/elite_grito_2"
+      }
+    ]
+  },
+  "sfx.elite_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.elite_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/elite_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/elite_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/elite_dolor_3"
+      }
+    ]
+  },
+  "sfx.elite_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.elite_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/elite_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/elite_muerte_2"
+      }
+    ]
+  },
+  "sfx.elite_impacto": {
+    "subtitle": "subtitles.darkcraft.sfx.elite_impacto",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/elite_impacto_1"
+      },
+      {
+        "name": "darkcraft:sfx/elite_impacto_2"
+      },
+      {
+        "name": "darkcraft:sfx/elite_impacto_3"
+      }
+    ]
+  },
+  "sfx.elite_embestida": {
+    "subtitle": "subtitles.darkcraft.sfx.elite_embestida",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/elite_embestida_1"
+      },
+      {
+        "name": "darkcraft:sfx/elite_embestida_2"
+      }
+    ]
+  },
+  "sfx.emboscada": {
+    "subtitle": "subtitles.darkcraft.sfx.emboscada",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/emboscada_1"
+      },
+      {
+        "name": "darkcraft:sfx/emboscada_2"
+      }
+    ]
+  },
+  "sfx.emboscada_alzarse": {
+    "subtitle": "subtitles.darkcraft.sfx.emboscada_alzarse",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/emboscada_alzarse_1"
+      },
+      {
+        "name": "darkcraft:sfx/emboscada_alzarse_2"
+      }
+    ]
   }
 }

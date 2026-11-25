@@ -459,6 +459,11 @@ public final class CastlePlan {
     private TreeTower tree;
     private Building keep;
 
+    /** La torre del arbol (su escalera: los enemigos de dentro salen de ahi). */
+    public TreeTower arbol() {
+        return tree;
+    }
+
     /** El torreon (sus plantas y salas: los enemigos de dentro salen de ahi). */
     public Building torreon() {
         return keep;

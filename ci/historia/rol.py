@@ -1613,6 +1613,49 @@ EN.update({
     "subtitles.darkcraft.sfx.espectro_muerte": "A spectre dissolves",
 })
 
+# ---- parte 4c: el capitan de elite de la guardia y las emboscadas
+ES.update({
+    "entity.darkcraft.elite": "Capitán de la guardia",
+    "darkcraft.bestiario.capitan_elite": "Capitán de la guardia",
+    "darkcraft.bestiario.capitan_elite.desc": "Los capitanes del Rey Corvin aún mandan a los suyos. Al verte alza el mandoble y grita: los que le oyen van a por ti y pegan más fuerte. Su tajo hace temblar el suelo (salta o rueda) y su embestida cruza media plaza. Si cae, los demás pierden el ánimo.",
+    "subtitles.darkcraft.sfx.elite_alerta": "Un capitán te ha visto",
+    "subtitles.darkcraft.sfx.elite_grito": "Un capitán arenga a los suyos",
+    "subtitles.darkcraft.sfx.elite_dolor": "Un capitán gruñe",
+    "subtitles.darkcraft.sfx.elite_muerte": "Cae un capitán",
+    "subtitles.darkcraft.sfx.elite_impacto": "Un mandoble golpea el suelo",
+    "subtitles.darkcraft.sfx.elite_embestida": "Un capitán embiste",
+    "subtitles.darkcraft.sfx.emboscada": "¡Una emboscada!",
+    "subtitles.darkcraft.sfx.emboscada_alzarse": "Algo sale de la tierra",
+    "advancements.darkcraft.capitan_elite.title": "La guardia sin cabeza",
+    "advancements.darkcraft.capitan_elite.description": "Vence a un capitán de la guardia de Valdrenn",
+    "advancements.darkcraft.emboscada.title": "Era una trampa",
+    "advancements.darkcraft.emboscada.description": "Vence a todos los de una emboscada en Valdrenn",
+    "darkcraft.diario.capitan_elite": "La guardia tiene capitanes. Cuando cayó el suyo, los demás dudaron. Lo recordaré.",
+    "darkcraft.diario.emboscada": "Los muertos de Valdrenn sabían que yo venía: salieron de la tierra a mi alrededor. Sigo vivo.",
+    "darkcraft.ayuda.v_enemigos": "los enemigos de este reino: cuántos quedan, sacarlos o darlos por caídos; sus emboscadas (dispararlas o armarlas)",
+})
+EN.update({
+    "entity.darkcraft.elite": "Guard Captain",
+    "darkcraft.bestiario.capitan_elite": "Guard Captain",
+    "darkcraft.bestiario.capitan_elite.desc": "King Corvin's captains still command their men. When he sees you he raises his greatsword and roars: those who hear him come for you and hit harder. His overhead strike shakes the ground (jump or roll) and his charge crosses half a square. If he falls, the rest lose heart.",
+    "subtitles.darkcraft.sfx.elite_alerta": "A captain spots you",
+    "subtitles.darkcraft.sfx.elite_grito": "A captain rallies his men",
+    "subtitles.darkcraft.sfx.elite_dolor": "A captain grunts",
+    "subtitles.darkcraft.sfx.elite_muerte": "A captain falls",
+    "subtitles.darkcraft.sfx.elite_impacto": "A greatsword strikes the ground",
+    "subtitles.darkcraft.sfx.elite_embestida": "A captain charges",
+    "subtitles.darkcraft.sfx.emboscada": "An ambush!",
+    "subtitles.darkcraft.sfx.emboscada_alzarse": "Something rises from the earth",
+    "advancements.darkcraft.capitan_elite.title": "The Headless Guard",
+    "advancements.darkcraft.capitan_elite.description": "Defeat a captain of the Valdrenn guard",
+    "advancements.darkcraft.emboscada.title": "It Was a Trap",
+    "advancements.darkcraft.emboscada.description": "Defeat everyone in an ambush in Valdrenn",
+    "darkcraft.diario.capitan_elite": "The guard has captains. When theirs fell, the others faltered. I will remember that.",
+    "darkcraft.diario.emboscada": "The dead of Valdrenn knew I was coming: they rose from the earth all around me. I am still alive.",
+    "darkcraft.ayuda.v_enemigos": "the enemies of this kingdom: how many are left, spawn them or mark them as fallen; its ambushes (trigger or re-arm them)",
+})
+
+
 
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""

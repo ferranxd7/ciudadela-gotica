@@ -126,6 +126,13 @@ public final class Puestos {
         AL_CAER.add(f);
     }
 
+    /** Quien quiere enterarse de que alguien ha descansado o ha muerto (lo que vuelve a su sitio: las emboscadas). */
+    private static final List<java.util.function.Consumer<ServerPlayer>> AL_VOLVER = new ArrayList<>();
+
+    public static void alVolver(java.util.function.Consumer<ServerPlayer> f) {
+        AL_VOLVER.add(f);
+    }
+
     public static Sitio sitio(String clave) {
         return SITIOS.get(clave);
     }
@@ -344,6 +351,7 @@ public final class Puestos {
             }
         }
         if (vuelven > 0) d.setDirty();
+        for (java.util.function.Consumer<ServerPlayer> f : AL_VOLVER) f.accept(quien);
         return vuelven;
     }
 
@@ -365,6 +373,42 @@ public final class Puestos {
             if (s.fuera[i] != null) r.add(s.fuera[i]);
         }
         return r;
+    }
+
+    /**
+     * Saca ya a los que falten de los puestos de esos grupos (los que no esten muertos y esten en uso), haya o no jugadores
+     * cerca: las emboscadas. Devuelve los que acaban de salir.
+     */
+    public static List<Enemigo> sacarGrupo(ServerLevel lvl, String sitio, Predicate<String> grupo) {
+        List<Enemigo> r = new ArrayList<>();
+        Sitio s = SITIOS.get(sitio);
+        if (s == null) return r;
+        BitSet muertos = Datos.get(lvl.getServer()).de(sitio);
+        for (int i = 0; i < s.fuera.length; i++) {
+            Puesto p = s.puestos.get(i);
+            if (!grupo.test(p.grupo()) || muertos.get(i)) continue;
+            if (s.fuera[i] != null && (s.fuera[i].isRemoved() || !s.fuera[i].isAlive())) s.fuera[i] = null;
+            if (s.fuera[i] != null || !s.activo.test(lvl, p)) continue;
+            s.fuera[i] = sacar(lvl, s, i);
+            if (s.fuera[i] != null) r.add(s.fuera[i]);
+        }
+        return r;
+    }
+
+    /** Recoge (sin que mueran) a los que haya fuera de esos grupos y cumplan {@code cual}: vuelven a esperar escondidos. */
+    public static int recogerGrupo(String sitio, Predicate<String> grupo, Predicate<Enemigo> cual) {
+        Sitio s = SITIOS.get(sitio);
+        if (s == null) return 0;
+        int n = 0;
+        for (int i = 0; i < s.fuera.length; i++) {
+            Enemigo e = s.fuera[i];
+            if (e == null || !grupo.test(s.puestos.get(i).grupo())) continue;
+            if (!e.isRemoved() && e.isAlive() && !cual.test(e)) continue;
+            if (!e.isRemoved()) e.discard();
+            s.fuera[i] = null;
+            n++;
+        }
+        return n;
     }
 
     /** Da por caido (o por vivo) el enemigo de un puesto sin que nadie lo mate (comandos, pruebas, lo que ya estaba hecho). */

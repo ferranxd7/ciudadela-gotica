@@ -209,6 +209,15 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_ESPECTRO_DESVANECE = sound("sfx.espectro_desvanece");
     public static final RegistryObject<SoundEvent> SFX_ESPECTRO_DOLOR = sound("sfx.espectro_dolor");
     public static final RegistryObject<SoundEvent> SFX_ESPECTRO_MUERTE = sound("sfx.espectro_muerte");
+    // ---- el capitan de elite y las emboscadas de Valdrenn (parte 4c)
+    public static final RegistryObject<SoundEvent> SFX_ELITE_ALERTA = sound("sfx.elite_alerta");
+    public static final RegistryObject<SoundEvent> SFX_ELITE_GRITO = sound("sfx.elite_grito");
+    public static final RegistryObject<SoundEvent> SFX_ELITE_DOLOR = sound("sfx.elite_dolor");
+    public static final RegistryObject<SoundEvent> SFX_ELITE_MUERTE = sound("sfx.elite_muerte");
+    public static final RegistryObject<SoundEvent> SFX_ELITE_IMPACTO = sound("sfx.elite_impacto");
+    public static final RegistryObject<SoundEvent> SFX_ELITE_EMBESTIDA = sound("sfx.elite_embestida");
+    public static final RegistryObject<SoundEvent> SFX_EMBOSCADA = sound("sfx.emboscada");
+    public static final RegistryObject<SoundEvent> SFX_EMBOSCADA_ALZARSE = sound("sfx.emboscada_alzarse");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_GORGOTEO = sound("sfx.ahogado_gorgoteo");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_ALERTA = sound("sfx.ahogado_alerta");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_DOLOR = sound("sfx.ahogado_dolor");
@@ -386,6 +395,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Espectro>> ESPECTRO = ENTITIES.register("espectro",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Espectro>of(com.darkcraft.enemigos.Espectro::new, MobCategory.MONSTER)
                     .sized(0.65f, 2.0f).clientTrackingRange(8).build(MODID + ":espectro"));
+    // ---- el capitan de elite de la guardia (parte 4c)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Elite>> ELITE = ENTITIES.register("elite",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Elite>of(com.darkcraft.enemigos.Elite::new, MobCategory.MONSTER)
+                    .sized(0.75f, 2.3f).clientTrackingRange(10).build(MODID + ":elite"));
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Arpon>> ARPON = ENTITIES.register("arpon",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Arpon>of(com.darkcraft.enemigos.Arpon::new, MobCategory.MISC)
                     .sized(0.5f, 0.5f).clientTrackingRange(4).updateInterval(20).build(MODID + ":arpon"));
@@ -514,6 +527,7 @@ public class DarkCraftMod {
         e.put(ARQUERO.get(), com.darkcraft.enemigos.Arquero.atributos().build());
         e.put(PERRO.get(), com.darkcraft.enemigos.Perro.atributos().build());
         e.put(ESPECTRO.get(), com.darkcraft.enemigos.Espectro.atributos().build());
+        e.put(ELITE.get(), com.darkcraft.enemigos.Elite.atributos().build());
         e.put(GUIA.get(), com.darkcraft.personajes.Guia.atributos().build());
         e.put(HERRERO.get(), com.darkcraft.personajes.Herrero.atributos().build());
         e.put(MERCADER.get(), com.darkcraft.personajes.Mercader.atributos().build());

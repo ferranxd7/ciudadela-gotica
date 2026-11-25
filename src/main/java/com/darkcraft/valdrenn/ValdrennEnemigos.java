@@ -38,12 +38,14 @@ import java.util.Locale;
 public final class ValdrennEnemigos {
     private ValdrennEnemigos() {}
 
-    public static final String GUARDIA = "guardia", ARQUERO = "arquero", PERRO = "perro", ESPECTRO = "espectro";
+    public static final String GUARDIA = "guardia", ARQUERO = "arquero", PERRO = "perro", ESPECTRO = "espectro", ELITE = "elite";
     /** Lo que se anade al grupo de los puestos que se van al caer el Rey o Ser Gavran. */
     public static final String REY = "~rey", GAVRAN = "~gavran";
     public static final String PREFIJO = "valdrenn@";
     /** Los puestos de los grupos que acaban asi estan donde no se llega andando (a proposito). */
     static final String ALTO = "_en_alto";
+    /** Los de la torre del arbol: tras la puerta de la Llave del Arbol (no se llega andando hasta abrirla). */
+    static final String TRAS_PUERTA = "_tras_puerta";
     /** Hacia donde miran (giro de Minecraft: 0 al sur, 90 al oeste, 180 al norte, -90 al este). */
     static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     static final int Y = CastlePlan.Y0, MURALLA = CastlePlan.Y0 + 26, MURALLA_INT = CastlePlan.Y0 + 36;
@@ -147,6 +149,124 @@ public final class ValdrennEnemigos {
         l.add(new Local(ESPECTRO, D, 92, Y + 1, -78, SUR, DE_PIE, 0, "catedral", 0));
         l.add(new Local(ESPECTRO, C, 72, Y, 0, SUR, DE_PIE, 5, "catedral", 1));
         l.add(new Local(ESPECTRO, C, 112, Y, -30, NORTE, DE_PIE, 5, "catedral", 2));
+        // ================================================================ parte 4c: capitanes de elite y emboscadas
+        // ---- los capitanes: al mando de la puerta exterior, del patio de armas y del patio de la fuente (el de la torre
+        //      del arbol, en arbol(plan)); al verte arengan a los suyos y, si caen, los suyos se desaniman
+        l.add(new Local(ELITE, 0, 0, Y, 239, SUR, DE_PIE, 0, "puerta", 0));
+        l.add(new Local(ELITE, 0, 104, Y, 170, NORTE, DE_PIE, 0, "patio_armas", 1));
+        l.add(new Local(ELITE, 0, 0, Y, 48, SUR, DE_PIE, 2, "patio", 0));
+        // ---- las emboscadas: no estan hasta que alguien entra en su zona (emboscadas(plan)); salen de la tierra
+        String EM = Emboscadas.GRUPO;
+        // el puente: dos perros por detras (desde la torre) y un alabardero delante
+        l.add(new Local(PERRO, P, -1, Y, sur + 29, NORTE, TUMBADO, 0, EM + "puente", 1));
+        l.add(new Local(PERRO, P, 1, Y, sur + 31, NORTE, TUMBADO, 0, EM + "puente", 1));
+        l.add(new Local(GUARDIA, A, 0, Y, sur - 1, SUR, TUMBADO, 0, EM + "puente", 0));
+        // la plaza: cuatro alrededor de la Fuente Mayor
+        l.add(new Local(GUARDIA, E, -12, Y, 70, ESTE, TUMBADO, 0, EM + "plaza", 0));
+        l.add(new Local(GUARDIA, E, 12, Y, 86, OESTE, TUMBADO, 0, EM + "plaza", 0));
+        l.add(new Local(GUARDIA, A, 12, Y, 70, OESTE, TUMBADO, 0, EM + "plaza", 1));
+        l.add(new Local(PERRO, P, -12, Y, 86, ESTE, TUMBADO, 0, EM + "plaza", 1));
+        // el cementerio: entre las tumbas del lado del pueblo (entre el mausoleo y la tapia), alrededor del arquero que
+        //      reza, los muertos se levantan
+        l.add(new Local(GUARDIA, E, -158, Y, -9, SUR, TUMBADO, 0, EM + "cementerio", 0));
+        l.add(new Local(GUARDIA, A, -155, Y, 5, OESTE, TUMBADO, 0, EM + "cementerio", 0));
+        l.add(new Local(GUARDIA, E, -161, Y, 10, NORTE, TUMBADO, 0, EM + "cementerio", 1));
+        l.add(new Local(PERRO, P, -154, Y, -3, OESTE, TUMBADO, 0, EM + "cementerio", 1));
+        // la biblioteca: tres espectros entre las estanterias de la sala grande
+        l.add(new Local(ESPECTRO, C, -100, Y, -24, ESTE, TUMBADO, 0, EM + "biblioteca", 0));
+        l.add(new Local(ESPECTRO, C, -86, Y, -36, OESTE, TUMBADO, 0, EM + "biblioteca", 1));
+        l.add(new Local(ESPECTRO, D, -86, Y, -22, OESTE, TUMBADO, 0, EM + "biblioteca", 0));
+        return l;
+    }
+
+    /** Las zonas que disparan las emboscadas de un reino, en el mundo (sus puestos: los grupos emb_*). */
+    public static List<Emboscadas.Emboscada> emboscadas(CastlePlan plan) {
+        List<Emboscadas.Emboscada> l = new ArrayList<>();
+        int sur = sur(plan);
+        if (plan.cine().asc()) l.add(new Emboscadas.Emboscada("puente", caja(plan, -4, Y - 3, sur + 12, 4, Y + 6, sur + 24)));
+        l.add(new Emboscadas.Emboscada("plaza", caja(plan, -11, Y - 2, 66, 11, Y + 5, 90)));
+        int[] e = escalera(plan);
+        if (e != null) l.add(new Emboscadas.Emboscada("escalera", new net.minecraft.world.phys.AABB(e[0] - 4.5, e[4] + 1, e[1] - 4.5, e[0] + 5.5, e[5] - 0.5, e[1] + 5.5)));
+        l.add(new Emboscadas.Emboscada("cementerio", caja(plan, -166, Y - 2, -6, -152, Y + 5, 6)));
+        l.add(new Emboscadas.Emboscada("biblioteca", caja(plan, -100, Y - 1, -37, -86, Y + 5, -23)));
+        return l;
+    }
+
+    private static net.minecraft.world.phys.AABB caja(CastlePlan plan, int x0, int y0, int z0, int x1, int y1, int z1) {
+        return new net.minecraft.world.phys.AABB(plan.cx + x0, y0, plan.cz + z0, plan.cx + x1 + 1, y1, plan.cz + z1 + 1);
+    }
+
+    /**
+     * La escalera de caracol del torreon (su torreta): {x, z, sx, sz, suelo de la planta 2, suelo de la planta 3} en el
+     * mundo (sx, sz: hacia donde da su puerta), o null si no la tiene.
+     */
+    static int[] escalera(CastlePlan plan) {
+        var keep = plan.torreon();
+        if (keep == null) return null;
+        int[] t = keep.turretInfo(), sg = keep.turretSigns();
+        if (t == null || sg == null) return null;
+        int y2 = Integer.MIN_VALUE, y3 = Integer.MIN_VALUE;
+        for (var f : keep.plantas()) {
+            if (f.index == 2) y2 = f.y;
+            if (f.index == 3) y3 = f.y;
+        }
+        if (y2 == Integer.MIN_VALUE || y3 == Integer.MIN_VALUE) return null;
+        return new int[]{t[0], t[1], sg[0], sg[1], y2, y3};
+    }
+
+    /**
+     * La emboscada de la escalera del torreon (depende del plano): subiendo de la segunda planta a la tercera salen dos
+     * caballeros en el rellano de arriba y un perro en el de abajo (en el lado contrario a la puerta de cada rellano).
+     */
+    public static List<Local> deLaEscalera(CastlePlan plan) {
+        List<Local> l = new ArrayList<>();
+        int[] e = escalera(plan);
+        if (e == null) return l;
+        int lx = e[0] - plan.cx, lz = e[1] - plan.cz, sx = e[2], sz = e[3];
+        String g = Emboscadas.GRUPO + "escalera";
+        l.add(new Local(GUARDIA, Guardia.ESPADA, lx - 3 * sx, e[5], lz, sx > 0 ? ESTE : OESTE, TUMBADO, 0, g, 0));
+        l.add(new Local(GUARDIA, Guardia.ESPADA, lx, e[5], lz - 3 * sz, sz > 0 ? SUR : NORTE, TUMBADO, 0, g, 1));
+        l.add(new Local(PERRO, 0, lx - 3 * sx, e[4], lz, sx > 0 ? ESTE : OESTE, TUMBADO, 0, g, 1));
+        return l;
+    }
+
+    /**
+     * La torre del arbol por dentro (parte 4c): en los rellanos de su escalera, uno de cada dos, de abajo arriba: un
+     * caballero, dos perros, un alabardero, una dama de la corte y, en el ultimo, el capitan de la torre. Se van al caer
+     * Ser Gavran.
+     */
+    public static List<Local> arbol(CastlePlan plan) {
+        List<Local> l = new ArrayList<>();
+        com.darkcraft.gen.TreeTower tr = plan.arbol();
+        if (tr == null) return l;
+        List<int[]> esc = tr.escalera();
+        List<int[]> rellanos = new ArrayList<>();
+        for (int i = 1; i < esc.size(); i++) if (esc.get(i)[4] == 1) rellanos.add(esc.get(i));
+        String g = "torre_arbol" + TRAS_PUERTA;
+        int k = 0;
+        for (int i = 1; i < rellanos.size(); i += 2) {
+            int[] r = rellanos.get(i);
+            // mirando escalera abajo (por donde llega quien sube)
+            float giro = switch (r[3]) {
+                case 0 -> SUR;
+                case 1 -> ESTE;
+                case 2 -> NORTE;
+                default -> OESTE;
+            };
+            int lx = tr.centerX() + r[0] - plan.cx, lz = tr.centerZ() + r[1] - plan.cz, y = r[2];
+            int sx = Integer.signum(r[0]), sz = Integer.signum(r[1]);
+            boolean ultimo = i + 2 >= rellanos.size();
+            if (ultimo) l.add(new Local(ELITE, 0, lx, y, lz, giro, DE_PIE, 0, g, 2));
+            else switch (k++ % 4) {
+                case 0 -> l.add(new Local(GUARDIA, Guardia.ESPADA, lx, y, lz, giro, DE_PIE, 0, g, 2));
+                case 1 -> {
+                    l.add(new Local(PERRO, 0, lx, y, lz, giro, REZA, 0, g, 2));
+                    l.add(new Local(PERRO, 0, lx - sx, y, lz - sz, giro, REZA, 0, g, 2));
+                }
+                case 2 -> l.add(new Local(GUARDIA, Guardia.ALABARDA, lx, y, lz, giro, DE_PIE, 0, g, 2));
+                default -> l.add(new Local(ESPECTRO, Espectro.GARRAS, lx, y, lz, giro, DE_PIE, 0, g, 2));
+            }
+        }
         return l;
     }
 
@@ -230,10 +350,12 @@ public final class ValdrennEnemigos {
         return todo;
     }
 
-    /** Todos los puestos del reino: los de fuera y los de dentro. */
+    /** Todos los puestos del reino: los de fuera, los del torreon, la emboscada de su escalera y la torre del arbol. */
     public static List<Local> todos(CastlePlan plan) {
         List<Local> l = new ArrayList<>(locales(sur(plan)));
         l.addAll(interiores(plan));
+        l.addAll(deLaEscalera(plan));
+        l.addAll(arbol(plan));
         return l;
     }
 
@@ -280,7 +402,9 @@ public final class ValdrennEnemigos {
         String k = clave(plan);
         final int cx = plan.cx, cz = plan.cz;
         String gavran = com.darkcraft.gavran.SalaArbol.de(plan) == null ? null : com.darkcraft.gavran.SalaArbol.de(plan).key();
+        Emboscadas.apuntar(k, emboscadas(plan));
         Puestos.registrar(k, puestos(plan), l -> l.dimension() == Level.OVERWORLD, (l, p) -> {
+            if (!Emboscadas.disparada(k, p.grupo())) return false;
             if (p.grupo().endsWith(REY)) return ReyEstado.get(l.getServer()).get(cx + "," + cz) != ReyEstado.MUERTO;
             if (p.grupo().endsWith(GAVRAN)) return gavran == null || ReyEstado.get(l.getServer()).get(gavran) != ReyEstado.MUERTO;
             return true;
@@ -313,6 +437,9 @@ public final class ValdrennEnemigos {
         Puestos.tipo(ARQUERO, DarkCraftMod.ARQUERO);
         Puestos.tipo(PERRO, DarkCraftMod.PERRO);
         Puestos.tipo(ESPECTRO, DarkCraftMod.ESPECTRO);
+        Puestos.tipo(ELITE, DarkCraftMod.ELITE);
+        Puestos.alVolver(Emboscadas::rearmar);
+        Puestos.alCaer(Emboscadas::alCaer);
     }
 
     // ------------------------------------------------------------------ comandos: /darkcraft valdrenn enemigos ...
@@ -345,6 +472,22 @@ public final class ValdrennEnemigos {
                     int n = Puestos.sacarTodos(p.serverLevel(), k).size();
                     c.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal(n + " fuera; " + estado(p.server, k)), false);
                 })))
+                .then(net.minecraft.commands.Commands.literal("emboscada")
+                        .executes(c -> con(c, (p, k) -> {
+                            StringBuilder b = new StringBuilder();
+                            for (var e : Emboscadas.de(k)) b.append(' ').append(e.nombre()).append(Emboscadas.disparadas(k).contains(e.nombre()) ? " (disparada)" : "");
+                            c.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal("Emboscadas:" + b), false);
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("armar").executes(c -> con(c, (p, k) -> {
+                            Emboscadas.armar(k);
+                            c.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal("Emboscadas armadas"), false);
+                        })))
+                        .then(net.minecraft.commands.Commands.argument("nombre", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .executes(c -> con(c, (p, k) -> {
+                                    String n = com.mojang.brigadier.arguments.StringArgumentType.getString(c, "nombre");
+                                    int salen = Emboscadas.disparar(p.serverLevel(), k, n, p);
+                                    c.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal(salen < 0 ? "No hay ninguna emboscada " + n : "Emboscada " + n + ": salen " + salen), false);
+                                }))))
                 .then(net.minecraft.commands.Commands.literal("ir").then(net.minecraft.commands.Commands.argument("grupo", com.mojang.brigadier.arguments.StringArgumentType.word())
                         .executes(c -> con(c, (p, k) -> {
                             String g = com.mojang.brigadier.arguments.StringArgumentType.getString(c, "grupo");
@@ -381,8 +524,9 @@ public final class ValdrennEnemigos {
         int sur = sur(plan);
         int cx = plan.cx, cz = plan.cz;
         StringBuilder mal = new StringBuilder();
-        int bien = 0, sinSitio = 0, lejos = 0, enAlto = 0, n = 0;
-        Andar.Zona zona = Andar.desde(m, cx, Y, cz + sur - 4, cx - 260, cz - 260, cx + 260, cz + sur + 4, 4_000_000);
+        int bien = 0, sinSitio = 0, lejos = 0, enAlto = 0, trasPuerta = 0, n = 0;
+        // (hasta la torre de ascenso: el puente entero, donde salen los perros de la emboscada)
+        Andar.Zona zona = Andar.desde(m, cx, Y, cz + sur - 4, cx - 260, cz - 260, cx + 260, cz + sur + 42, 4_000_000);
         for (Local p : todos(plan)) {
             n++;
             int[] sitio = null;
@@ -401,6 +545,10 @@ public final class ValdrennEnemigos {
                 }
                 if (pie && p.grupo().endsWith(ALTO)) {
                     enAlto++;
+                    continue;
+                }
+                if (pie && p.grupo().endsWith(TRAS_PUERTA)) {
+                    trasPuerta++;
                     continue;
                 }
                 if (pie) lejos++;
@@ -431,8 +579,8 @@ public final class ValdrennEnemigos {
             }
             ven.append(String.format(Locale.ROOT, " %s %d,%d: %d/%d;", p.grupo(), p.lx(), p.lz(), k, total));
         }
-        return String.format(Locale.ROOT, "%d puestos (sur %d): %d bien, %d en alto (sin camino, a proposito), %d sin sitio, %d no se llega; recorrido %d celdas%s; del camino a tiro, lo que ve cada arquero:%s",
-                n, sur, bien, enAlto, sinSitio, lejos, zona.celdas(), mal, ven);
+        return String.format(Locale.ROOT, "%d puestos (sur %d): %d bien, %d en alto (sin camino, a proposito), %d tras la puerta del arbol, %d sin sitio, %d no se llega; recorrido %d celdas%s; del camino a tiro, lo que ve cada arquero:%s",
+                n, sur, bien, enAlto, trasPuerta, sinSitio, lejos, zona.celdas(), mal, ven);
     }
 
     private static boolean solido(net.minecraft.world.level.block.state.BlockState s) {

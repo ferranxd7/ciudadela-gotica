@@ -171,10 +171,11 @@ public class Volcado {
                         case "arquero" -> "A";
                         case "perro" -> "P";
                         case "espectro" -> q.variante() == 0 ? "S" : "D";
+                        case "elite" -> "C";
                         default -> "GAB".substring(q.variante(), q.variante() + 1);
                     };
                     marcas.put(letra + (k++), new int[]{q.lx(), q.y(), q.lz()});
-                    if (!q.grupo().startsWith("torreon")) continue;
+                    if (!q.grupo().startsWith("torreon") && !q.grupo().startsWith("emb_") && !q.grupo().startsWith("torre_arbol") && !q.tipo().equals("elite")) continue;
                     System.out.println("  dentro: " + letra + (k - 1) + " " + q.grupo() + " " + q.tipo() + "/" + q.variante() + " en " + q.lx() + "," + q.y() + "," + q.lz()
                             + " postura " + q.postura());
                 }

@@ -153,6 +153,10 @@ SFX = {
     "espectro_susurro": (2.4, 0.6, -22), "espectro_alerta": (1.3, 0.3, -15), "espectro_lamento": (2.2, 0.5, -14),
     "espectro_zarpazo": (0.6, 0.15, -16), "espectro_desvanece": (1.0, 0.1, -17), "espectro_dolor": (0.7, 0.2, -16),
     "espectro_muerte": (2.2, 0.6, -16),
+    # el capitan de elite y las emboscadas (parte 4c)
+    "elite_alerta": (1.5, 0.3, -15), "elite_grito": (2.6, 0.5, -13), "elite_dolor": (0.7, 0.2, -15),
+    "elite_muerte": (3.0, 0.6, -15), "elite_impacto": (2.0, 0.5, -13), "elite_embestida": (1.2, 0.3, -14),
+    "emboscada": (2.5, 0.6, -14), "emboscada_alzarse": (1.6, 0.4, -16),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -255,6 +259,10 @@ TOMAS_SFX = {
     "perro_dolor": (3, 1, 4), "perro_muerte": (4, 1, 3),
     "espectro_susurro": (1, 3, 4), "espectro_alerta": (4, 3), "espectro_lamento": (4, 1), "espectro_zarpazo": (2, 1),
     "espectro_desvanece": (2, 4), "espectro_dolor": (4, 2), "espectro_muerte": (4, 3),
+    # el capitan de elite: las alertas mas llenas, los gritos mas fuertes, los golpes al suelo mas graves; la emboscada:
+    # el cuerno mas largo y el de mas graves; los que se alzan, los mas fuertes
+    "elite_alerta": (2, 4), "elite_grito": (2, 4), "elite_dolor": (1, 3, 4), "elite_muerte": (1, 4),
+    "elite_impacto": (4, 1, 3), "elite_embestida": (1, 3), "emboscada": (4, 1), "emboscada_alzarse": (1, 2),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

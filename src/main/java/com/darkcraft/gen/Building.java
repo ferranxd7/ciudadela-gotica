@@ -207,6 +207,13 @@ public class Building extends Element {
         return new int[]{t[0], t[1], lowest, lastY};
     }
 
+    /** {sx, sz}: hacia donde da la puerta de la torreta de escalera (de su centro hacia dentro del edificio), o null. */
+    public int[] turretSigns() {
+        if (turretCorner < 0) return null;
+        int[] t = turretCenter();
+        return new int[]{t[2], t[3]};
+    }
+
     public List<Integer> floorLevels() {
         List<Integer> l = new ArrayList<>();
         for (Floor f : floors) if (f.index >= 0) l.add(f.y);

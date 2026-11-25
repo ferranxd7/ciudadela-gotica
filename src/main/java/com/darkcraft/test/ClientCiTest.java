@@ -3830,6 +3830,193 @@ public final class ClientCiTest {
         return G + 140;
     }
 
+    // ------------------------------------------------------------------ parte 4c: capitanes de elite y emboscadas
+
+    /** Lo que hay fuera de las emboscadas: cuantos, tumbados, en pie y con el jugador por presa. */
+    private static String estadoEmboscadas(ServerPlayer sp) {
+        var s = com.darkcraft.enemigos.Puestos.sitio(reinoK);
+        if (s == null) return "sin apuntar";
+        int fuera = 0, tumbados = 0, aPorEl = 0, animados = 0;
+        for (int i = 0; i < s.puestos.size(); i++) {
+            if (com.darkcraft.valdrenn.Emboscadas.nombre(s.puestos.get(i).grupo()) == null) continue;
+            var e = com.darkcraft.enemigos.Puestos.enemigo(reinoK, i);
+            if (e == null) continue;
+            fuera++;
+            if (e.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) tumbados++;
+            if (e.getTarget() == sp) aPorEl++;
+            if (e.animo() != 0) animados++;
+        }
+        return "emboscadas: fuera " + fuera + " (tumbados " + tumbados + ", a por el jugador " + aPorEl + ", con animo " + animados + "), disparadas "
+                + com.darkcraft.valdrenn.Emboscadas.disparadas(reinoK) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth());
+    }
+
+    /**
+     * Los capitanes de elite y las emboscadas (parte 4c): el capitan delante de la fuente con sus golpes (el grito, el tajo
+     * y su onda, el barrido, la estocada, la embestida) y su caida; el de la puerta con los suyos; un rellano de la torre
+     * del arbol; y, en supervivencia, la emboscada de la plaza (salen de la tierra alrededor de la fuente).
+     */
+    private static int elitesEmboscadas(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Capitanes: al patio de la fuente (los puestos, otra vez en pie; las emboscadas, armadas)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                verDeNoche(sp);
+                com.darkcraft.enemigos.Puestos.todos(sp.server, reinoK, false);
+                com.darkcraft.valdrenn.Emboscadas.armar(reinoK);
+                var s = com.darkcraft.enemigos.Puestos.sitio(reinoK);
+                for (int i = 0; i < s.puestos.size(); i++) {
+                    var q = s.puestos.get(i);
+                    if (Math.abs(q.x() - reino[0]) <= 8 && Math.abs(q.z() - (reino[1] + 58)) <= 12) com.darkcraft.enemigos.Puestos.marcar(sp.server, reinoK, i, true);
+                }
+                irMirando(sp, reino[0] + 0.5, CastlePlan.Y0, reino[1] + 59.5, reino[0] + 0.5, CastlePlan.Y0 + 1.4, reino[1] + 66.5, false);
+                log("  capitanes: " + com.darkcraft.valdrenn.ValdrennEnemigos.estado(sp.server, reinoK) + "; emboscadas " + com.darkcraft.valdrenn.Emboscadas.de(reinoK).size());
+            });
+        });
+        atTicks(t + 60, "Capitanes: el capitan de elite delante de la fuente", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            for (var e : FILA) if (e != null && !e.isRemoved()) e.discard();
+            FILA.clear();
+            var c = DarkCraftMod.ELITE.get().create(lvl);
+            if (c == null) return;
+            c.moveTo(reino[0] + 0.5, CastlePlan.Y0, reino[1] + 66.5, 180f, 0f);
+            c.yBodyRot = c.yHeadRot = 180f;
+            lvl.addFreshEntity(c);
+            FILA.add(c);
+            irMirando(sp, reino[0] + 1.5, CastlePlan.Y0, reino[1] + 61.5, reino[0] + 0.5, CastlePlan.Y0 + 1.6, reino[1] + 66.5, false);
+        }));
+        atTicks(t + 92, "captura: el capitan", m -> {
+            server(m, sp -> log("  capitanes, el capitan: " + estadoE(fila(0))));
+            shot(m, "cliente_vc01_capitan");
+        });
+        int G = t + 94;
+        Object[][] golpes = {
+                // (mira al norte, -z; la camara delante y a un lado: el mandoble llega lejos)
+                {com.darkcraft.enemigos.EliteAnims.GRITO, -2.6, -4.2, 12, "cliente_vc02_grito", -1, null},
+                {com.darkcraft.enemigos.EliteAnims.TAJO, -3.0, -4.6, 15, "cliente_vc03_tajo_alza", 21, "cliente_vc04_tajo_onda"},
+                {com.darkcraft.enemigos.EliteAnims.BARRIDO, 2.4, -4.6, 11, "cliente_vc05_barrido_recoge", 17, "cliente_vc06_barrido"},
+                {com.darkcraft.enemigos.EliteAnims.ESTOCADA, 3.2, -3.8, 10, "cliente_vc07_estocada_recoge", 14, "cliente_vc08_estocada"},
+                {com.darkcraft.enemigos.EliteAnims.EMBESTIDA, 5.2, -5.4, 8, "cliente_vc09_embestida_agacha", 14, "cliente_vc10_embestida"}};
+        for (Object[] gp : golpes) {
+            final int accion = (int) gp[0], c1 = (int) gp[3], c2 = (int) gp[5];
+            final double cdx = (double) gp[1], cdz = (double) gp[2];
+            final String n1 = (String) gp[4], n2 = (String) gp[6];
+            atTicks(G, "Capitanes: " + n1, m -> server(m, sp -> {
+                var e = fila(0);
+                if (e == null) return;
+                e.moveTo(reino[0] + 0.5, CastlePlan.Y0, reino[1] + 66.5, 180f, 0f);
+                e.yBodyRot = e.yHeadRot = 180f;
+                e.empezar(accion);
+                verDesdeServidor = new Vec3(e.getX() + cdx, e.getY() + 1.9, e.getZ() + cdz);
+                miraServidor = new Vec3(e.getX(), e.getY() + 1.3, e.getZ() - (accion == com.darkcraft.enemigos.EliteAnims.EMBESTIDA ? 2.5 : 0.6));
+            }));
+            atTicks(G + 2, "camara de cerca", m -> {
+                if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+            });
+            atTicks(G + c1, "captura: " + n1, m -> {
+                server(m, sp -> log("  capitanes, " + n1 + ": " + estadoE(fila(0))));
+                shot(m, n1);
+            });
+            if (n2 != null) atTicks(G + c2, "captura: " + n2, m -> shot(m, n2));
+            G += Math.max(c1, c2) + 40;
+        }
+        // el capitan cae
+        atTicks(G, "Capitanes: el capitan cae", m -> server(m, sp -> {
+            var e = fila(0);
+            if (e == null) return;
+            e.moveTo(reino[0] + 0.5, CastlePlan.Y0, reino[1] + 66.5, 180f, 0f);
+            verDesdeServidor = new Vec3(e.getX() - 2.8, e.getY() + 1.9, e.getZ() - 3.8);
+            miraServidor = new Vec3(e.getX(), e.getY() + 0.8, e.getZ());
+            e.hurt(sp.serverLevel().damageSources().generic(), 9999f);
+        }));
+        atTicks(G + 2, "camara de cerca", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(G + 24, "captura: de rodillas", m -> shot(m, "cliente_vc11_capitan_rodillas"));
+        atTicks(G + 50, "captura: caido", m -> shot(m, "cliente_vc12_capitan_cae"));
+        atTicks(G + 52, "de vuelta a los ojos del jugador", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                for (var e : FILA) if (e != null && !e.isRemoved()) e.discard();
+                FILA.clear();
+            });
+        });
+        G += 54;
+        // el capitan de la puerta exterior, con sus alabarderos
+        atTicks(G, "Capitanes: el de la puerta exterior", m -> server(m, sp -> anteElPuesto(sp, primerPuesto("puerta", com.darkcraft.valdrenn.ValdrennEnemigos.ELITE), 6.5, 2.5, 1.2)));
+        atTicks(G + 150, "captura: el capitan de la puerta", m -> {
+            server(m, sp -> log("  capitanes, el de la puerta: " + estadoE(puestoDe("puerta", com.darkcraft.valdrenn.ValdrennEnemigos.ELITE))));
+            shot(m, "cliente_vc13_capitan_puerta");
+        });
+        G += 152;
+        // un rellano de la torre del arbol (el primero con alguien)
+        atTicks(G, "Capitanes: un rellano de la torre del arbol", m -> server(m, sp -> {
+            var q = primerPuesto("torre_arbol", com.darkcraft.valdrenn.ValdrennEnemigos.GUARDIA);
+            anteElPuesto(sp, q, 4.5, 0.0, 0.6);
+            log("  capitanes, la torre del arbol: " + (q == null ? "sin puestos" : "ante el puesto de " + (q.x() - reino[0]) + "," + q.y() + "," + (q.z() - reino[1])));
+        }));
+        atTicks(G + 160, "captura: la torre del arbol", m -> {
+            server(m, sp -> log("  capitanes, la torre del arbol: " + estadoE(puestoDe("torre_arbol", com.darkcraft.valdrenn.ValdrennEnemigos.GUARDIA))));
+            shot(m, "cliente_vc14_torre_arbol");
+        });
+        G += 162;
+        // ---- la emboscada de la plaza, en supervivencia: se entra en su zona junto a la fuente
+        atTicks(G, "Emboscada: en supervivencia, hacia la Fuente Mayor (aun fuera de la zona)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                verDeNoche(sp);
+                irMirando(sp, reino[0] + 0.5, CastlePlan.Y0, reino[1] + 62.5, reino[0] + 0.5, CastlePlan.Y0 + 1.0, reino[1] + 78.5, false);
+            });
+        });
+        atTicks(G + 40, "antes de entrar", m -> server(m, sp -> log("  emboscada, antes de entrar: " + estadoEmboscadas(sp))));
+        atTicks(G + 42, "Emboscada: entra en la zona (junto a la fuente)", m -> server(m, sp ->
+                irMirando(sp, reino[0] + 0.5, CastlePlan.Y0, reino[1] + 67.5, reino[0] + 0.5, CastlePlan.Y0 + 0.6, reino[1] + 78.5, false)));
+        atTicks(G + 54, "captura: salen de la tierra", m -> {
+            server(m, sp -> log("  emboscada, al entrar: " + estadoEmboscadas(sp)));
+            shot(m, "cliente_vc15_emboscada");
+        });
+        atTicks(G + 56, "mirar atras (los del sur de la fuente)", m -> server(m, sp ->
+                irMirando(sp, sp.getX(), sp.getY(), sp.getZ(), reino[0] + 0.5, CastlePlan.Y0 + 1.0, reino[1] + 92.5, false)));
+        atTicks(G + 80, "captura: se alzan", m -> {
+            server(m, sp -> log("  emboscada, a los 2 s: " + estadoEmboscadas(sp)));
+            shot(m, "cliente_vc16_se_alzan");
+        });
+        atTicks(G + 82, "mirar a la fuente", m -> server(m, sp ->
+                irMirando(sp, sp.getX(), sp.getY(), sp.getZ(), reino[0] + 0.5, CastlePlan.Y0 + 1.0, reino[1] + 78.5, false)));
+        atTicks(G + 130, "captura: rodeado", m -> {
+            server(m, sp -> log("  emboscada, a los 4,5 s: " + estadoEmboscadas(sp)));
+            shot(m, "cliente_vc17_rodeado");
+        });
+        // descansar: se esconden y se vuelven a armar
+        atTicks(G + 140, "Emboscada: el jugador descansa (se esconden y se arman)", m -> server(m, sp -> {
+            int n = com.darkcraft.enemigos.Puestos.reaparecer(sp);
+            log("  emboscada, tras descansar: " + estadoEmboscadas(sp) + " (vuelven " + n + ")");
+        }));
+        // todo como estaba
+        atTicks(G + 146, "Capitanes y emboscadas: se acaba (creativo; los puestos, por caidos)", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = calladosAntes;
+            server(m, sp -> {
+                for (var e : FILA) if (e != null && !e.isRemoved()) e.discard();
+                FILA.clear();
+                sp.setGameMode(GameType.CREATIVE);
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                com.darkcraft.enemigos.Puestos.todos(sp.server, reinoK, true);
+                com.darkcraft.valdrenn.Emboscadas.armar(reinoK);
+                log("  capitanes y emboscadas, al acabar: " + com.darkcraft.valdrenn.ValdrennEnemigos.estado(sp.server, reinoK));
+            });
+        });
+        return G + 152;
+    }
+
     /** En supervivencia, con una espada de hierro, la vida entera y sin que le hagan dano de verdad (para que la prueba no muera). */
     private static void aPelear(ServerPlayer sp, boolean aguanta) {
         sp.setGameMode(GameType.SURVIVAL);
@@ -4759,6 +4946,7 @@ public final class ClientCiTest {
         fin = barco(fin);
         fin = guardia(fin);
         fin = perrosEspectros(fin);
+        fin = elitesEmboscadas(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

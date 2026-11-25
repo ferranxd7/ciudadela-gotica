@@ -79,6 +79,7 @@ public final class CiTest {
             log.println("Entidades de bloque: " + be);
             guardiaDeValdrenn(server, lvl, log, s);
             perrosYEspectros(server, lvl, log, s);
+            elitesYEmboscadas(server, lvl, log, s);
 
             int Y0 = CastlePlan.Y0;
             topView(lvl, s[0], s[1], R, new File(out, "1_vista_aerea.png"));
@@ -845,6 +846,8 @@ public final class CiTest {
             com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> lvl.getBlockState(mb.set(x, y, z));
             log.println("Valdrenn, puestos de la guardia: " + com.darkcraft.valdrenn.ValdrennEnemigos.comprobar(mundo, plan));
             com.darkcraft.enemigos.Puestos.todos(server, k, false);
+            // (las emboscadas, por disparadas: asi salen tambien sus puestos)
+            com.darkcraft.valdrenn.Emboscadas.marcarTodas(k);
             var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(lvl, k);
             var puestos = com.darkcraft.enemigos.Puestos.sitio(k).puestos;
             int enSuelo = 0, chocan = 0, movidos = 0, fallos = 0;
@@ -874,7 +877,8 @@ public final class CiTest {
                     e.postura(0);
                     String[] nombres = e instanceof com.darkcraft.enemigos.Arquero ? com.darkcraft.enemigos.ArqueroAnims.NOMBRES
                             : e instanceof com.darkcraft.enemigos.Perro ? com.darkcraft.enemigos.PerroAnims.NOMBRES
-                            : e instanceof com.darkcraft.enemigos.Espectro ? com.darkcraft.enemigos.EspectroAnims.NOMBRES : com.darkcraft.enemigos.GuardiaAnims.NOMBRES;
+                            : e instanceof com.darkcraft.enemigos.Espectro ? com.darkcraft.enemigos.EspectroAnims.NOMBRES
+                            : e instanceof com.darkcraft.enemigos.Elite ? com.darkcraft.enemigos.EliteAnims.NOMBRES : com.darkcraft.enemigos.GuardiaAnims.NOMBRES;
                     int acciones = nombres.length;
                     for (int a = 1; a < acciones; a++) {
                         String nombre = nombres[a];
@@ -965,6 +969,7 @@ public final class CiTest {
             est.set(claveRey, rey0);
             if (sala != null) est.set(sala.key(), gav0);
             com.darkcraft.enemigos.Puestos.todos(server, k, false);
+            com.darkcraft.valdrenn.Emboscadas.armar(k);
             log.println("Valdrenn, la guardia: escudo " + escudo + "; disparan " + disparos + "; con el Rey vencido salen " + sinRey + " de " + puestos.size()
                     + ", con el Rey y Ser Gavran " + sinLosDos + " | " + com.darkcraft.valdrenn.ValdrennEnemigos.estado(server, k));
         } catch (Throwable t) {
@@ -1044,6 +1049,148 @@ public final class CiTest {
         } catch (Throwable t) {
             log.println("Valdrenn, perros y espectros: ERROR " + t);
             DarkCraftMod.LOGGER.error("[CI] perros y espectros", t);
+        }
+    }
+
+    /**
+     * Parte 4c: el capitan de elite (la arenga a los suyos, la onda del tajo, la embestida, los suyos desanimados al caer)
+     * y las emboscadas (cada una saca a los suyos tumbados y a por quien la dispara; al descansar se esconden y se arman).
+     */
+    private static void elitesYEmboscadas(net.minecraft.server.MinecraftServer server, ServerLevel lvl, java.io.PrintWriter log, int[] s) {
+        try {
+            double x = s[0] + 0.5, y = CastlePlan.Y0, z = s[1] + 66.5;
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(lvl, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5f2b8c1e-3d4a-4e6b-9a7c-1b2d3e4f5a6b"), "[DarkCraftCI]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- la arenga: el capitan y dos caballeros sin presa a 4 bloques; la presa, a 8 delante
+            String arenga = "sin capitan", cae = "", onda = "", embestida = "";
+            var cap = DarkCraftMod.ELITE.get().create(lvl);
+            var g1 = DarkCraftMod.GUARDIA.get().create(lvl);
+            var g2 = DarkCraftMod.GUARDIA.get().create(lvl);
+            if (cap != null && g1 != null && g2 != null) {
+                cap.moveTo(x, y, z, 0f, 0f);
+                cap.yBodyRot = cap.yHeadRot = 0f;
+                g1.moveTo(x - 4, y, z, 0f, 0f);
+                g2.moveTo(x + 4, y, z, 0f, 0f);
+                lvl.addFreshEntity(cap);
+                lvl.addFreshEntity(g1);
+                lvl.addFreshEntity(g2);
+                fp.moveTo(x, y, z + 8, 180f, 0f);
+                cap.setTarget(fp);
+                cap.empezar(com.darkcraft.enemigos.EliteAnims.GRITO);
+                for (int t = 0; t < 14; t++) cap.tick();
+                int vanAPor = (g1.getTarget() == fp ? 1 : 0) + (g2.getTarget() == fp ? 1 : 0);
+                arenga = String.format(java.util.Locale.ROOT, "los dos de al lado van a por su presa %d/2, animo %.2f y %.2f (tiene que ser 0,30), golpe %.1f -> %.1f",
+                        vanAPor, g1.animo(), g2.animo(), com.darkcraft.enemigos.Guardia.atributos().build().getValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE),
+                        g1.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE));
+                for (int t = 0; t < 30 && cap.accion() != 0; t++) cap.tick();
+                // ---- la onda del tajo: un jugador de pie a un lado del golpe (fuera del arco de la hoja) la recibe; en el aire, no
+                fp.setHealth(fp.getMaxHealth());
+                fp.invulnerableTime = 0;
+                cap.moveTo(x, y, z, 0f, 0f);
+                cap.yBodyRot = cap.yHeadRot = 0f;
+                cap.setYRot(0f);
+                fp.moveTo(x + 1.9, y, z + 2.9, 180f, 0f);
+                fp.setOnGround(true);
+                float v0 = fp.getHealth();
+                cap.setTarget(null);
+                cap.empezar(com.darkcraft.enemigos.EliteAnims.TAJO);
+                for (int t = 0; t < 40 && cap.accion() != 0; t++) {
+                    fp.setOnGround(true);
+                    cap.tick();
+                }
+                float deSuelo = v0 - fp.getHealth();
+                fp.setHealth(fp.getMaxHealth());
+                fp.invulnerableTime = 0;
+                cap.moveTo(x, y, z, 0f, 0f);
+                cap.setYRot(0f);
+                fp.moveTo(x + 1.9, y + 1.2, z + 2.9, 180f, 0f);
+                fp.setOnGround(false);
+                v0 = fp.getHealth();
+                cap.empezar(com.darkcraft.enemigos.EliteAnims.TAJO);
+                for (int t = 0; t < 40 && cap.accion() != 0; t++) {
+                    fp.setOnGround(false);
+                    cap.tick();
+                }
+                float enElAire = v0 - fp.getHealth();
+                onda = String.format(java.util.Locale.ROOT, "la onda del tajo quita %.1f de pie a un lado (mas de 0) y %.1f en el aire (0)", deSuelo, enElAire);
+                // ---- la embestida: cuanto avanza
+                cap.moveTo(x, y, z - 6, 0f, 0f);
+                cap.setYRot(0f);
+                cap.yBodyRot = cap.yHeadRot = 0f;
+                double z0 = cap.getZ();
+                cap.empezar(com.darkcraft.enemigos.EliteAnims.EMBESTIDA);
+                for (int t = 0; t < 34 && cap.accion() != 0; t++) cap.tick();
+                embestida = String.format(java.util.Locale.ROOT, "la embestida avanza %.1f bloques (3-6)", cap.getZ() - z0);
+                // ---- cae el capitan: los suyos se desaniman
+                cap.hurt(lvl.damageSources().generic(), 9999f);
+                cae = String.format(java.util.Locale.ROOT, "al caer el capitan, animo de los suyos %.2f y %.2f (tiene que ser -0,25), su paso %.3f -> %.3f",
+                        g1.animo(), g2.animo(), com.darkcraft.enemigos.Guardia.atributos().build().getValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED),
+                        g1.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED));
+                for (int t = 0; t < 70 && !cap.isRemoved(); t++) cap.tick();
+                cap.discard();
+                g1.discard();
+                g2.discard();
+            }
+            log.println("Valdrenn, el capitan de elite: arenga " + arenga + "; " + onda + "; " + embestida + "; " + cae);
+            // ---- las emboscadas del reino: cada una, junto a su zona
+            CastlePlan plan = com.darkcraft.story.Story.planAt(lvl, s[0], s[1]);
+            String k = com.darkcraft.valdrenn.ValdrennEnemigos.clave(plan);
+            com.darkcraft.enemigos.Puestos.todos(server, k, false);
+            com.darkcraft.valdrenn.Emboscadas.armar(k);
+            var sitio = com.darkcraft.enemigos.Puestos.sitio(k);
+            StringBuilder b = new StringBuilder();
+            int bien = 0, todas = 0;
+            for (var e : com.darkcraft.valdrenn.Emboscadas.de(k)) {
+                todas++;
+                int suyos = 0;
+                for (var q : sitio.puestos) if (e.nombre().equals(com.darkcraft.valdrenn.Emboscadas.nombre(q.grupo()))) suyos++;
+                var c = e.zona().getCenter();
+                fp.moveTo(c.x, e.zona().minY + 1, c.z, 0f, 0f);
+                // (antes de disparar, ninguno esta fuera aunque el jugador este al lado)
+                int antes = com.darkcraft.enemigos.Puestos.sacarTodos(lvl, k).stream().filter(en -> com.darkcraft.valdrenn.Emboscadas.nombre(sitio.puestos.get(en.puesto()).grupo()) != null).toList().size();
+                int salen = com.darkcraft.valdrenn.Emboscadas.disparar(lvl, k, e.nombre(), fp);
+                int tumbados = 0, aPorEl = 0, dePie = 0;
+                java.util.List<com.darkcraft.enemigos.Enemigo> suyosFuera = new java.util.ArrayList<>();
+                for (int i = 0; i < sitio.puestos.size(); i++) {
+                    if (!e.nombre().equals(com.darkcraft.valdrenn.Emboscadas.nombre(sitio.puestos.get(i).grupo()))) continue;
+                    var en = com.darkcraft.enemigos.Puestos.enemigo(k, i);
+                    if (en == null) continue;
+                    suyosFuera.add(en);
+                    if (en.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) tumbados++;
+                    if (en.getTarget() == fp) aPorEl++;
+                }
+                for (int t = 0; t < 50; t++) for (var en : suyosFuera) en.tick();
+                for (var en : suyosFuera) if (en.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE) dePie++;
+                if (antes == 0 && salen == suyos && tumbados == suyos && aPorEl == suyos && dePie == suyos) bien++;
+                b.append(String.format(java.util.Locale.ROOT, " %s: %d puestos, antes fuera %d, salen %d, tumbados %d, a por el %d, en pie a los 2,5 s %d;",
+                        e.nombre(), suyos, antes, salen, tumbados, aPorEl, dePie));
+                // los demas que salieron con sacarTodos (para contar los de antes), fuera
+                com.darkcraft.enemigos.Puestos.todos(server, k, false);
+            }
+            // al descansar (o morir) se esconden los que quedan en pie y se vuelven a armar
+            com.darkcraft.valdrenn.Emboscadas.marcarTodas(k);
+            int sacados = com.darkcraft.valdrenn.Emboscadas.disparar(lvl, k, "plaza", fp);
+            com.darkcraft.valdrenn.Emboscadas.marcarTodas(k);
+            int fueraAntes = 0;
+            for (int i = 0; i < sitio.puestos.size(); i++)
+                if (com.darkcraft.valdrenn.Emboscadas.nombre(sitio.puestos.get(i).grupo()) != null && com.darkcraft.enemigos.Puestos.enemigo(k, i) != null) fueraAntes++;
+            com.darkcraft.enemigos.Puestos.reaparecer(fp);
+            int fueraDespues = 0;
+            for (int i = 0; i < sitio.puestos.size(); i++)
+                if (com.darkcraft.valdrenn.Emboscadas.nombre(sitio.puestos.get(i).grupo()) != null && com.darkcraft.enemigos.Puestos.enemigo(k, i) != null) fueraDespues++;
+            int arbol = 0, elites = 0;
+            for (var q : sitio.puestos) {
+                if (q.grupo().startsWith("torre_arbol")) arbol++;
+                if (q.tipo().equals(com.darkcraft.valdrenn.ValdrennEnemigos.ELITE)) elites++;
+            }
+            log.println("Valdrenn, las emboscadas: " + bien + " de " + todas + " bien (tiene que ser todas);" + b + " al descansar: de " + fueraAntes + " fuera quedan "
+                    + fueraDespues + " (0), disparadas " + com.darkcraft.valdrenn.Emboscadas.disparadas(k).size() + " (0) [antes salian " + sacados + "]; la torre del arbol "
+                    + arbol + " puestos, capitanes de elite en el reino " + elites);
+            com.darkcraft.enemigos.Puestos.todos(server, k, false);
+            com.darkcraft.valdrenn.Emboscadas.armar(k);
+        } catch (Throwable t) {
+            log.println("Valdrenn, capitanes y emboscadas: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] capitanes y emboscadas", t);
         }
     }
 
