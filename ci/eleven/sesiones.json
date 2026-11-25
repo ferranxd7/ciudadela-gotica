@@ -1299,5 +1299,39 @@
     ]
    }
   }
+ },
+ "sfx_codice": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 2e-4: el codice (abrir, pasar pagina y cerrar). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "codice_pagina": {
+    "prompt": "Turning a single heavy page of an ancient parchment codex: a dry crisp rustle and a soft flap as the thick vellum page falls over, close and intimate, dark fantasy RPG menu, no music, 0.8 seconds",
+    "sesiones": [
+     "3XlcVNREbC31HcFEcbE2",
+     "J2GGsd4DGZZPPsmB54Ve",
+     "qUdHH1Pffv4ECM2JMPdq",
+     "DCGUCkGjsHB5852SSaEK"
+    ]
+   },
+   "codice_abre": {
+    "prompt": "Opening a large ancient leather-bound codex: the heavy cover creaks open, old leather and brittle binding, thick pages settling with a soft rustle and a faint puff of dust, dark fantasy RPG menu, no music, 1.2 seconds",
+    "sesiones": [
+     "wRkZHMNQLbl5eWn0O6qq",
+     "D6INW4YQjDU72mUOwlcu",
+     "OKQdKBCzEJI84okYWf6y",
+     "46gRQXvIj4CYyXMsrAdQ"
+    ]
+   },
+   "codice_cierra": {
+    "prompt": "Closing a large ancient leather-bound codex: the heavy cover shuts with a deep muffled thump, a creak of old leather and a small puff of dust, dark fantasy RPG menu, no music, 1.0 seconds",
+    "sesiones": [
+     "Zs3qzYM0amwcS1JC7AUo",
+     "q38ib5lePGKNZlHR5vaF",
+     "A7tzreOF5YxvfLhpiMpo",
+     "bn0eExBNe9jNd6oZubL0"
+    ]
+   }
+  }
  }
 }
