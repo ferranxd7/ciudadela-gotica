@@ -51,10 +51,24 @@ public class NubesGenerador extends ChunkGenerator {
         super(b);
     }
 
-    /** Lo mas alto de la nube en esa columna (233 .. 263). */
+    /**
+     * La cala de Brumavela (la isla del pueblo, en el origen): ahi el mar de nubes esta en calma, a ras del muelle, para
+     * que el barco roto y el espigon queden posados en la nube (fuera de ese circulo, los bollos de siempre).
+     */
+    public static final int CALMA_X = 0, CALMA_Z = 136, CALMA_R0 = 40, CALMA_R1 = 78, CALMA_Y = 248;
+
+    /** Lo mas alto de la nube en esa columna (235 .. 261). */
     public static int cima(int x, int z) {
         double v = 9.0 * GRANDE.getValue(x / 170.0, z / 170.0) + 4.0 * MEDIO.getValue(x / 48.0, z / 48.0)
                 + 1.5 * FINO.getValue(x / 14.0, z / 14.0);
+        double dx = x - CALMA_X, dz = z - CALMA_Z, d2 = dx * dx + dz * dz;
+        if (d2 < CALMA_R1 * CALMA_R1) {
+            double d = Math.sqrt(d2);
+            double k = d <= CALMA_R0 ? 1 : (CALMA_R1 - d) / (double) (CALMA_R1 - CALMA_R0);
+            k = k * k * (3 - 2 * k);
+            double calma = CALMA_Y - MEDIA + 0.9 * FINO.getValue(x / 11.0 + 3.3, z / 11.0 - 8.1);
+            v += (calma - v) * k;
+        }
         return MEDIA + (int) Math.round(v);
     }
 

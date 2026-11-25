@@ -60,6 +60,16 @@ public final class Canvas {
         level.setBlock(m.set(x, y, z), s, 2);
     }
 
+    /**
+     * Vallas, muros bajos, barrotes y cristales: se ponen sueltos y se unen solos a sus vecinos cuando el chunk acaba de
+     * generarse (el juego repasa las posiciones apuntadas con los chunks de alrededor ya hechos: tambien en los bordes).
+     */
+    public void unir(int x, int y, int z, BlockState s) {
+        if (!in(x, y, z)) return;
+        level.setBlock(m.set(x, y, z), s, 2);
+        if (level instanceof net.minecraft.server.level.WorldGenRegion) level.getChunk(m).markPosForPostprocessing(m);
+    }
+
     public BlockState get(int x, int y, int z) {
         if (!in(x, y, z)) return Pal.AIR;
         return level.getBlockState(m.set(x, y, z));

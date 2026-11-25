@@ -571,6 +571,11 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   su sitio); creativo y espectador no. Con la camara dentro de una nube, niebla blanca cerrada (`client/ClientNubes`).
   Las nubes de Minecraft van a Y 640 (`ClientNubes.Efectos`, los efectos `darkcraft:nubes` del tipo de dimension del
   overworld): a 192 quedaban escondidas bajo el mar de nubes.
+- En el origen del mundo (donde ira la isla del pueblo) el mar de nubes esta **en calma**: a 40 bloques de (0, 136) lo alto
+  es 247-249 y se funde con los bollos de siempre hasta los 78 (`NubesGenerador.CALMA_*`): ahi iran el muelle y el barco.
+- `Canvas.unir(x, y, z, estado)`: para vallas, muros bajos, barrotes, cristales y escalones de tejado en esquina; los pone
+  sueltos y apunta la posicion para que el juego los una a sus vecinos al acabar de generarse el chunk (tambien en los
+  bordes entre chunks). Solo al generar el mundo (`WorldGenRegion`).
 - `/darkcraft fortaleza escalera` lleva a la plazoleta. Texturas: `tools/mundo/nubes.py`. Prueba del servidor: generador,
   aparicion y muestras del camino (`informe.txt`); prueba del cliente: el escaparate sube a Y 320 (por encima de las
   nubes) y el tramo `nubes()` (capturas `cliente_n01..n05`: la torre desde el camino, la torre y Valdrenn, el camino,

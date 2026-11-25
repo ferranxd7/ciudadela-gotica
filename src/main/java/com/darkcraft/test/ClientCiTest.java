@@ -3058,36 +3058,6 @@ public final class ClientCiTest {
             sp.onUpdateAbilities();
             sp.teleportTo(sp.serverLevel(), sp.getX() - 18, sp.getY() + 34, sp.getZ() - 18, sp.getYRot(), 52f);
         }));
-        atTicks(t + 338, "Nubes: lo que hay bajo la camara", m -> server(m, sp -> {
-            ServerLevel lvl = sp.serverLevel();
-            StringBuilder b = new StringBuilder();
-            int otros = 0, raras = 0;
-            BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
-            for (int dx = -14; dx <= 14; dx++)
-                for (int dz = -14; dz <= 14; dz++) {
-                    int x = sp.getBlockX() + dx, z = sp.getBlockZ() + dz, alto = Integer.MIN_VALUE;
-                    for (int y = sp.getBlockY(); y >= 226; y--) {
-                        var st = lvl.getBlockState(p.set(x, y, z));
-                        if (st.isAir()) continue;
-                        if (alto == Integer.MIN_VALUE) alto = y;
-                        if (st.is(DarkCraftMod.NUBE.get())) continue;
-                        if (otros++ < 30) b.append(' ').append(dx).append(',').append(y).append(',').append(dz).append('=')
-                                .append(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(st.getBlock()).getPath());
-                    }
-                    // lo mas alto de verdad frente a lo que dice el ruido (sin contar el camino y su zanja)
-                    int cima = com.darkcraft.world.NubesGenerador.cima(x, z);
-                    if (alto != cima && alto != com.darkcraft.world.NubesGenerador.CAMINO && alto != com.darkcraft.world.NubesGenerador.CAMINO - 1
-                            && alto != com.darkcraft.world.NubesGenerador.CAMINO + 2 && raras++ < 12)
-                        b.append(" [").append(dx).append(',').append(dz).append(": alto ").append(alto).append(" cima ").append(cima).append(']');
-                }
-            StringBuilder e = new StringBuilder();
-            for (net.minecraft.world.entity.Entity en : lvl.getEntities(sp, sp.getBoundingBox().inflate(64)))
-                e.append(' ').append(net.minecraftforge.registries.ForgeRegistries.ENTITY_TYPES.getKey(en.getType()).getPath()).append('@')
-                        .append(en.blockPosition().toShortString());
-            log("  nubes: bajo la camara (" + fpos(sp) + "), bloques que no son nube: " + otros + b + " | columnas raras: " + raras
-                    + " | entidades:" + e + " | luz de bloque en la nube de debajo: "
-                    + lvl.getBrightness(net.minecraft.world.level.LightLayer.BLOCK, new BlockPos(sp.getBlockX(), com.darkcraft.world.NubesGenerador.cima(sp.getBlockX(), sp.getBlockZ()) + 1, sp.getBlockZ())));
-        }));
         atTicks(t + 340, "captura: el camino desde arriba", m -> shot(m, "cliente_n04_camino_desde_arriba"));
         // dentro de una nube (la niebla blanca) y el vacio: un muneco que cae por debajo de las nubes se pierde
         atTicks(t + 342, "Nubes: dentro de una nube", m -> server(m, sp -> {
