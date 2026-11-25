@@ -681,10 +681,14 @@ public abstract class Enemigo extends Monster {
             int a = accion();
             for (AnimationState st : acciones) st.stop();
             if (a > 0 && a < acciones.length) acciones[a].start(tickCount);
+            accionDesde = tickCount;
         } else if (accion() == 0) {
             for (AnimationState st : acciones) st.stop();
         }
     }
+
+    /** En el cliente: el tick en que empezo la accion que se esta viendo (-1 si ninguna). */
+    public int accionDesde = -1;
 
     /** La accion que se esta viendo en el cliente (0 = ninguna). */
     public int accionVista() {

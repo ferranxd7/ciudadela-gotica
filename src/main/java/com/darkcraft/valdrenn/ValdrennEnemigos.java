@@ -2,6 +2,7 @@ package com.darkcraft.valdrenn;
 
 import com.darkcraft.DarkCraftMod;
 import com.darkcraft.enemigos.Enemigo;
+import com.darkcraft.enemigos.Espectro;
 import com.darkcraft.enemigos.Guardia;
 import com.darkcraft.enemigos.Puestos;
 import com.darkcraft.enemigos.Puestos.Puesto;
@@ -37,7 +38,7 @@ import java.util.Locale;
 public final class ValdrennEnemigos {
     private ValdrennEnemigos() {}
 
-    public static final String GUARDIA = "guardia", ARQUERO = "arquero";
+    public static final String GUARDIA = "guardia", ARQUERO = "arquero", PERRO = "perro", ESPECTRO = "espectro";
     /** Lo que se anade al grupo de los puestos que se van al caer el Rey o Ser Gavran. */
     public static final String REY = "~rey", GAVRAN = "~gavran";
     public static final String PREFIJO = "valdrenn@";
@@ -121,6 +122,118 @@ public final class ValdrennEnemigos {
         l.add(new Local(GUARDIA, B, 146, Y, 40, OESTE, DE_PIE, 0, "este", 2));
         l.add(new Local(GUARDIA, E, -28, Y, -165, SUR, DE_PIE, 0, "norte", 1));
         l.add(new Local(GUARDIA, A, 29, Y, -167, SUR, DE_PIE, 0, "norte", 2));
+        // ================================================================ parte 4b: perros de hueso y espectros de la corte
+        // ---- las jaurias: dormidas junto al cuartel, sueltas por las calles, entre los muertos del cementerio, en el
+        //      laberinto de setos y a la puerta de las cuadras
+        int P = 0;
+        l.add(new Local(PERRO, P, 75, Y, 150, OESTE, REZA, 0, "perrera", 1));
+        l.add(new Local(PERRO, P, 78, Y, 153, OESTE, REZA, 0, "perrera", 1));
+        l.add(new Local(PERRO, P, 75, Y, 156, OESTE, REZA, 0, "perrera", 2));
+        int[][] jaurias = {{-101, 171, 2}, {101, -120, 2}, {-150, -137, 2}, {137, 154, 3}};
+        for (int[] j : jaurias)
+            for (int k = 0; k < j[2]; k++)
+                l.add(new Local(PERRO, P, j[0] + 2 * k, Y, j[1] + 2 * k, k % 2 == 0 ? SUR : ESTE, DE_PIE, 4, "jauria", k == 0 ? 0 : 1));
+        l.add(new Local(PERRO, P, -190, Y, 20, ESTE, TUMBADO, 0, "cementerio", 1));
+        l.add(new Local(PERRO, P, -186, Y, -10, ESTE, TUMBADO, 0, "cementerio", 2));
+        l.add(new Local(PERRO, P, 79, Y, -171, SUR, DE_PIE, 3, "laberinto", 0));
+        l.add(new Local(PERRO, P, 81, Y, -169, SUR, DE_PIE, 3, "laberinto", 1));
+        l.add(new Local(PERRO, P, 77, Y, -173, SUR, DE_PIE, 3, "laberinto", 2));
+        l.add(new Local(PERRO, P, 148, Y, 10, OESTE, DE_PIE, 0, "cuadras", 1));
+        l.add(new Local(PERRO, P, 148, Y, 14, OESTE, DE_PIE, 0, "cuadras", 2));
+        // ---- la catedral: rezando en el pasillo de la nave, uno en el altar y dos que rondan por las naves de los lados
+        int C = Espectro.ESTOQUE, D = Espectro.GARRAS;
+        l.add(new Local(ESPECTRO, D, 92, Y, -10, NORTE, REZA, 0, "catedral", 0));
+        l.add(new Local(ESPECTRO, C, 92, Y, 30, NORTE, REZA, 0, "catedral", 1));
+        l.add(new Local(ESPECTRO, D, 92, Y + 1, -78, SUR, DE_PIE, 0, "catedral", 0));
+        l.add(new Local(ESPECTRO, C, 72, Y, 0, SUR, DE_PIE, 5, "catedral", 1));
+        l.add(new Local(ESPECTRO, C, 112, Y, -30, NORTE, DE_PIE, 5, "catedral", 2));
+        return l;
+    }
+
+    /**
+     * Los de dentro del torreon (parte 4b): salen de sus salas (de cada planta, segun lo que sea cada una), asi que
+     * dependen del plano. En coordenadas del reino, como los de fuera.
+     */
+    public static List<Local> interiores(CastlePlan plan) {
+        List<Local> todo = new ArrayList<>();
+        com.darkcraft.gen.Building keep = plan.torreon();
+        if (keep == null) return todo;
+        int C = Espectro.ESTOQUE, D = Espectro.GARRAS, E = Guardia.ESPADA, A = Guardia.ALABARDA;
+        for (var f : keep.plantas()) {
+            // en cada planta, como mucho estas salas con gente (la planta baja, todas); de cada clase de sala, por turnos
+            // (el primer sotano, las bodegas, no: llenas de toneles y sin paso desde arriba en muchos planos)
+            int tope = f.index == 0 ? 99 : f.index == 1 ? 5 : f.index == 2 ? 4 : f.index > 2 ? 3 : f.index == -1 ? 0 : 3;
+            String g = "torreon_" + (f.index < 0 ? "sotano" + (-f.index) : "planta" + f.index);
+            java.util.Map<String, List<List<Local>>> porClase = new java.util.TreeMap<>();
+            int n = 0;
+            for (var r : f.rooms) {
+                var q = r.r;
+                int w = q.x1 - q.x0, h = q.z1 - q.z0;
+                if (w < 4 || h < 4) continue;
+                // a un tercio y a dos tercios de la sala (en el centro suele haber una mesa)
+                int ax = q.x0 + w / 3 - plan.cx, bx = q.x0 + 2 * w / 3 - plan.cx;
+                int mz = q.z0 + h / 2 - plan.cz, az = q.z0 + h / 3 - plan.cz;
+                float giro = (n++ % 2 == 0) ? SUR : NORTE;
+                List<Local> sala = new ArrayList<>();
+                String clase = r.type.name();
+                switch (r.type) {
+                    case GREAT_HALL -> {
+                        sala.add(new Local(ESPECTRO, C, ax, f.y, mz, SUR, DE_PIE, 3, g, 0));
+                        sala.add(new Local(ESPECTRO, D, bx, f.y, mz, SUR, DE_PIE, 3, g, 1));
+                    }
+                    case DINING -> {
+                        sala.add(new Local(ESPECTRO, C, ax, f.y, az, giro, DE_PIE, 2, g, 0));
+                        sala.add(new Local(ESPECTRO, D, bx, f.y, az, giro, DE_PIE, 2, g, 1));
+                    }
+                    case KITCHEN, SERVANTS, CELLAR, WINE_CELLAR -> {
+                        sala.add(new Local(PERRO, 0, ax, f.y, mz, giro, REZA, 0, g, 0));
+                        sala.add(new Local(PERRO, 0, bx, f.y, mz, giro, REZA, 0, g, 1));
+                        clase = "PERROS";
+                    }
+                    case LIVING, GALLERY, BALLROOM -> sala.add(new Local(ESPECTRO, n % 2 == 0 ? C : D, ax, f.y, mz, giro, DE_PIE, 3, g, n % 2));
+                    case ARMORY, TREASURY -> {
+                        sala.add(new Local(GUARDIA, E, ax, f.y, mz, giro, DE_PIE, 0, g, 0));
+                        if (w >= 8) sala.add(new Local(GUARDIA, A, bx, f.y, mz, giro, DE_PIE, 0, g, 1));
+                        clase = "GUARDIA";
+                    }
+                    case CHAPEL, CRYPT -> sala.add(new Local(ESPECTRO, D, ax, f.y, mz, NORTE, REZA, 0, g, 0));
+                    case LIBRARY, STUDY, ALCHEMY -> {
+                        sala.add(new Local(ESPECTRO, C, ax, f.y, mz, giro, DE_PIE, 2, g, n % 2));
+                        clase = "ESTUDIO";
+                    }
+                    case BEDROOM -> sala.add(new Local(ESPECTRO, D, ax, f.y, mz, giro, TUMBADO, 0, g, 1));
+                    case PRISON -> sala.add(new Local(PERRO, 0, ax, f.y, mz, giro, TUMBADO, 0, g, 0));
+                    default -> {
+                    }
+                }
+                if (!sala.isEmpty()) porClase.computeIfAbsent(clase, k -> new ArrayList<>()).add(sala);
+            }
+            // por turnos: una sala de cada clase, luego otra de cada... sin dos salas a menos de 10 bloques
+            List<List<Local>> elegidas = new ArrayList<>();
+            List<List<List<Local>>> colas = new ArrayList<>(porClase.values());
+            for (var c : colas) c.sort(java.util.Comparator.comparingInt(sl -> Math.floorMod(sl.get(0).lx() * 31 + sl.get(0).lz() * 17, 97)));
+            boolean algo = true;
+            for (int ronda = 0; algo && elegidas.size() < tope; ronda++) {
+                algo = false;
+                for (var c : colas) {
+                    if (ronda >= c.size() || elegidas.size() >= tope) continue;
+                    algo = true;
+                    List<Local> sala = c.get(ronda);
+                    boolean cerca = false;
+                    for (var o : elegidas)
+                        if (Math.hypot(o.get(0).lx() - sala.get(0).lx(), o.get(0).lz() - sala.get(0).lz()) < 10) cerca = true;
+                    if (!cerca) elegidas.add(sala);
+                }
+            }
+            for (var sala : elegidas) todo.addAll(sala);
+        }
+        return todo;
+    }
+
+    /** Todos los puestos del reino: los de fuera y los de dentro. */
+    public static List<Local> todos(CastlePlan plan) {
+        List<Local> l = new ArrayList<>(locales(sur(plan)));
+        l.addAll(interiores(plan));
         return l;
     }
 
@@ -134,7 +247,7 @@ public final class ValdrennEnemigos {
     /** Los puestos de un reino, ya en coordenadas del mundo. */
     public static List<Puesto> puestos(CastlePlan plan) {
         List<Puesto> r = new ArrayList<>();
-        for (Local p : locales(sur(plan))) {
+        for (Local p : todos(plan)) {
             String g = p.grupo() + (p.quita() == 1 ? REY : p.quita() == 2 ? GAVRAN : "");
             r.add(new Puesto(p.tipo(), p.variante(), plan.cx + p.lx(), p.y(), plan.cz + p.lz(), p.giro(), p.postura(), p.ronda(), g));
         }
@@ -198,6 +311,8 @@ public final class ValdrennEnemigos {
     public static void registrar() {
         Puestos.tipo(GUARDIA, DarkCraftMod.GUARDIA);
         Puestos.tipo(ARQUERO, DarkCraftMod.ARQUERO);
+        Puestos.tipo(PERRO, DarkCraftMod.PERRO);
+        Puestos.tipo(ESPECTRO, DarkCraftMod.ESPECTRO);
     }
 
     // ------------------------------------------------------------------ comandos: /darkcraft valdrenn enemigos ...
@@ -268,7 +383,7 @@ public final class ValdrennEnemigos {
         StringBuilder mal = new StringBuilder();
         int bien = 0, sinSitio = 0, lejos = 0, enAlto = 0, n = 0;
         Andar.Zona zona = Andar.desde(m, cx, Y, cz + sur - 4, cx - 260, cz - 260, cx + 260, cz + sur + 4, 4_000_000);
-        for (Local p : locales(sur)) {
+        for (Local p : todos(plan)) {
             n++;
             int[] sitio = null;
             for (int r = 0; r <= 3 && sitio == null; r++)
@@ -296,7 +411,7 @@ public final class ValdrennEnemigos {
         // lo que ve cada arquero del camino de la puerta (del puente a la puerta interior, cada 4 bloques) a tiro: los de lo
         // alto de las puertas tienen que ver casi todo el suyo; los de las almenas de las murallas, lo que tienen delante
         StringBuilder ven = new StringBuilder();
-        for (Local p : locales(sur)) {
+        for (Local p : todos(plan)) {
             if (!p.tipo().equals(ARQUERO) || p.postura() != DE_PIE) continue;
             int k = 0, total = 0;
             double ox = cx + p.lx() + 0.5, oy = p.y() + 1.74, oz = cz + p.lz() + 0.5;

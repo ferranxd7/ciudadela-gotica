@@ -458,6 +458,11 @@ public final class CastlePlan {
 
     private TreeTower tree;
     private Building keep;
+
+    /** El torreon (sus plantas y salas: los enemigos de dentro salen de ahi). */
+    public Building torreon() {
+        return keep;
+    }
     private int ascX = Integer.MIN_VALUE, ascZ;
 
     /**

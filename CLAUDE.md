@@ -827,9 +827,9 @@ empezarla). Lo esencial, que cambia reglas de arriba:
 
 ### Plan grande, parte 4a: la guardia de Valdrenn (caballeros y arqueros en sus puestos)
 
-Respuestas 10-20 de `PLAN.md` ("Valdrenn dificil"), primera tanda. **4b**: perros de hueso, espectros de la corte,
-capitanes de elite, emboscadas, el interior del castillo y la torre del arbol. **4c**: los dos guardianes (mini-jefes
-con barra y logro) antes del Rey y de Ser Gavran.
+Respuestas 10-20 de `PLAN.md` ("Valdrenn dificil"), primera tanda. **4b**: perros de hueso, espectros de la corte y el
+torreon por dentro. **4c**: capitanes de elite, emboscadas y la torre del arbol por dentro. **4d**: los dos guardianes
+(mini-jefes con barra y logro) antes del Rey y de Ser Gavran.
 - **`enemigos/Guardia`** (los caballeros de antes rehechos como `Enemigo`, modelo de `tools/enemigos/guardia.py`): tres
   variantes, `ESPADA` 0 (espada y escudo, tabardo rojo), `ALABARDA` 1 (morado) y `BALLESTA` 2 (verde). 40 de vida,
   golpe 5,5, armadura 8. Acciones (`GuardiaAnims`): espada_tajo / combo / escudazo / **bloquea**, alabarda_pica /
@@ -876,6 +876,42 @@ con barra y logro) antes del Rey y de Ser Gavran.
   con vision nocturna: en Valdrenn siempre es de noche). Al acabar el tramo los puestos de ese reino quedan por caidos (las
   pruebas de despues son de antes de la guardia).
 
+### Plan grande, parte 4b: perros de hueso y espectros de la corte (y el torreon por dentro)
+
+- **`enemigos/Perro`** (`tools/enemigos/perro.py`: un esqueleto de perro con jirones de pellejo, collar de pinchos y brasas en
+  las cuencas; las patas se llaman como las de una persona —brazo / antebrazo / mano delante, muslo / pierna / pata
+  detras— y van sin cinematica inversa). 16 de vida, 3,5 de golpe, muy rapido (`prisa` 1,25). **Mordisco** (1 s) y
+  **salto** (se agacha medio segundo —se ve venir— y vuela hasta 4-5 bloques: en `alAvanzar` se le da la velocidad en el
+  tick 11 y se le quita el frenado de las acciones mientras va por el aire; muerde al caer). El primero que ve a alguien
+  **aulla** (`setTarget` → accion `aullido`; como mucho uno cada 6 s en todo el servidor) y los perros a 20 bloques
+  acuden. Posturas: `REZA` = echado durmiendo, `TUMBADO` = un monton de huesos (se levanta al acercarse). En el cliente
+  trota o galopa segun lo que corre (`PerroModelo`: dos bucles de andar mezclados).
+- **`enemigos/Espectro`** (`tools/enemigos/espectro.py`): sin piernas (el faldon acaba en jirones), flota (en el modelo:
+  `ARRIBA` 3,2 px), no cae con dano ni hace ruido al moverse. Variantes `ESTOQUE` 0 (el cortesano: gorguera, gorra con
+  pluma, media capa; **estocada** que llega a 4,4 y **tajo doble**) y `GARRAS` 1 (la dama: diadema, velo, cuello alto;
+  **zarpazo** que deja lentitud y **lamento**: a los 0,9 s un grito a 5 bloques —dano magico, lentitud y debilidad—, con
+  la cabeza atras y los brazos abiertos antes). Los dos se **desvanecen** (lejos de su presa, o a veces tras un golpe) y
+  aparecen a 2-3,5 bloques a su lado o a su espalda. **Se dibujan medio transparentes** (`EspectroRenderer` +
+  `EspectroModelo`, `RenderType.entityTranslucent`; el alfa respira, baja a 0 al desvanecerse y al morir se va apagando
+  mientras sube; la capa de brillo tambien). `EnemigoModelo` acepta otro tipo de dibujo; `Enemigo.accionDesde` = el tick
+  del cliente en que empezo la accion que se ve.
+- **Puestos nuevos** (`ValdrennEnemigos`): fuera, jaurias (la perrera junto al cuartel, durmiendo; cuatro sueltas por las
+  calles; dos tiradas en el cementerio; tres en el laberinto de setos; dos a la puerta de las cuadras) y la catedral (dos
+  rezando en el pasillo de la nave, una dama en el altar y dos cortesanos que rondan por las naves de los lados). **Dentro
+  del torreon** (`interiores(plan)`, de las salas del plano: `CastlePlan.torreon()` y `Building.plantas()`): la planta
+  baja entera (gran salon: un cortesano y una dama; comedor: dos; cocina: dos perros durmiendo; sala: uno; armeria: dos
+  caballeros) y, arriba y en la cripta, salas sueltas por turnos de cada clase (capilla y cripta: una dama rezando;
+  biblioteca / estudio: un cortesano; galeria: uno; dormitorio: una dama acurrucada; carcel: un perro tirado; tesoro: un
+  caballero), separadas 10 bloques y con tope por planta (5, 4, 3, 3; el primer sotano no: lleno de toneles y sin paso).
+  `todos(plan)` = los de fuera y los de dentro (~116 en total); `comprobar` los mira todos.
+- Sonido (ElevenLabs, `TOMAS_SFX`): `perro_grunido`, `perro_ladrido`, `perro_aullido`, `perro_mordisco`, `perro_dolor`,
+  `perro_muerte`, `espectro_susurro`, `espectro_alerta`, `espectro_lamento`, `espectro_zarpazo`, `espectro_desvanece`,
+  `espectro_dolor`, `espectro_muerte`. Bestiario: `perro`, `espectro_cortesano`, `espectro_dama`.
+- Pruebas: servidor, `perrosYEspectros` (linea `Valdrenn, perros y espectros: el salto avanza ...; el espectro aparece a ...;
+  el caballero sin un rasguno, la flecha sigue`) y los de siempre (`la guardia fuera` ya cuenta perros y espectros);
+  cliente, tramo `perrosEspectros()` (capturas `cliente_vb01..17`: la fila y sus golpes, uno que se deshace, una jauria,
+  la catedral, el torreon, la perrera en supervivencia y el lamento de cerca).
+
 ### Lo siguiente: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 
 Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publicada):
@@ -884,7 +920,8 @@ Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publica
 - **3c, enemigos**: hecha (arriba).
 - **3d-1, la cinematica de inicio**: hecha (arriba).
 - **3d-2, el barco**: hecha (arriba). Con esto la parte 3 esta entera; lo siguiente es la **parte 4** de `PLAN.md`
-  (Valdrenn dificil: 4a la guardia, hecha arriba; 4b y 4c, por hacer).
+  (Valdrenn dificil: 4a la guardia y 4b perros y espectros, hechas arriba; 4c capitanes de elite, emboscadas y la torre
+  del arbol por dentro, y 4d los dos guardianes, por hacer).
 
 ## Compilar, probar y publicar
 

@@ -78,6 +78,7 @@ public final class CiTest {
             log.println("Chunks generados: " + n + " en " + (t1 - t0) / 1000 + " s (" + (t1 - t0) / Math.max(1, n) + " ms/chunk)");
             log.println("Entidades de bloque: " + be);
             guardiaDeValdrenn(server, lvl, log, s);
+            perrosYEspectros(server, lvl, log, s);
 
             int Y0 = CastlePlan.Y0;
             topView(lvl, s[0], s[1], R, new File(out, "1_vista_aerea.png"));
@@ -871,10 +872,12 @@ public final class CiTest {
                 try {
                     int postura = e.postura();
                     e.postura(0);
-                    boolean arq = e instanceof com.darkcraft.enemigos.Arquero;
-                    int acciones = arq ? com.darkcraft.enemigos.ArqueroAnims.TICKS.length : com.darkcraft.enemigos.GuardiaAnims.TICKS.length;
+                    String[] nombres = e instanceof com.darkcraft.enemigos.Arquero ? com.darkcraft.enemigos.ArqueroAnims.NOMBRES
+                            : e instanceof com.darkcraft.enemigos.Perro ? com.darkcraft.enemigos.PerroAnims.NOMBRES
+                            : e instanceof com.darkcraft.enemigos.Espectro ? com.darkcraft.enemigos.EspectroAnims.NOMBRES : com.darkcraft.enemigos.GuardiaAnims.NOMBRES;
+                    int acciones = nombres.length;
                     for (int a = 1; a < acciones; a++) {
-                        String nombre = arq ? com.darkcraft.enemigos.ArqueroAnims.NOMBRES[a] : com.darkcraft.enemigos.GuardiaAnims.NOMBRES[a];
+                        String nombre = nombres[a];
                         if (nombre.equals("morir")) continue;
                         e.empezar(a);
                         for (int t = 0; t < 90 && e.accion() == a; t++) e.tick();
@@ -967,6 +970,80 @@ public final class CiTest {
         } catch (Throwable t) {
             log.println("Valdrenn, la guardia: ERROR " + t);
             DarkCraftMod.LOGGER.error("[CI] la guardia de Valdrenn", t);
+        }
+    }
+
+    /**
+     * Parte 4b: el salto del perro (cuanto avanza y si muerde al caer), el espectro que se desvanece (donde aparece) y que
+     * las flechas de los arqueros pasen entre los suyos.
+     */
+    private static void perrosYEspectros(net.minecraft.server.MinecraftServer server, ServerLevel lvl, java.io.PrintWriter log, int[] s) {
+        try {
+            double x = s[0] + 0.5, y = CastlePlan.Y0, z = s[1] + 66.5;
+            // el salto: a 5 bloques de un soporte de armadura (que hace de presa)
+            String salto = "sin perro";
+            var perro = DarkCraftMod.PERRO.get().create(lvl);
+            var blanco = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(lvl);
+            if (perro != null && blanco != null) {
+                blanco.moveTo(x, y, z + 5.0, 180f, 0f);
+                lvl.addFreshEntity(blanco);
+                perro.moveTo(x, y, z, 0f, 0f);
+                perro.yBodyRot = perro.yHeadRot = 0f;
+                lvl.addFreshEntity(perro);
+                perro.setTarget(blanco);
+                for (int t = 0; t < 45 && perro.accion() != 0; t++) perro.tick(); // (el aullido de cuando ve a alguien)
+                float v0 = blanco.getHealth();
+                double z0 = perro.getZ();
+                perro.empezar(com.darkcraft.enemigos.PerroAnims.SALTO);
+                double alto = 0;
+                for (int t = 0; t < 32; t++) {
+                    perro.tick();
+                    alto = Math.max(alto, perro.getY() - y);
+                }
+                salto = String.format(java.util.Locale.ROOT, "avanza %.1f bloques (tiene que ser 2-5) y sube %.1f; le quita al blanco %.1f", perro.getZ() - z0, alto, v0 - blanco.getHealth());
+                perro.discard();
+                blanco.discard();
+            }
+            // el espectro: a 10 bloques de su presa se desvanece y aparece a su lado o a su espalda
+            String desvanece = "sin espectro";
+            var esp = DarkCraftMod.ESPECTRO.get().create(lvl);
+            var presa = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(lvl);
+            if (esp != null && presa != null) {
+                presa.moveTo(x, y, z + 10.0, 180f, 0f);
+                lvl.addFreshEntity(presa);
+                esp.moveTo(x, y, z, 0f, 0f);
+                lvl.addFreshEntity(esp);
+                esp.setTarget(presa);
+                esp.empezar(com.darkcraft.enemigos.EspectroAnims.DESVANECERSE);
+                for (int t = 0; t < 30; t++) esp.tick();
+                desvanece = String.format(java.util.Locale.ROOT, "aparece a %.1f de su presa (tiene que ser 2-3,5), %s", esp.distanceTo(presa),
+                        lvl.noCollision(esp) ? "en un sitio libre" : "METIDO EN UN BLOQUE");
+                esp.discard();
+                presa.discard();
+            }
+            // las flechas de los suyos: una flecha de un arquero contra un caballero que esta en medio
+            String flecha = "sin flecha";
+            var arq = DarkCraftMod.ARQUERO.get().create(lvl);
+            var cab = DarkCraftMod.GUARDIA.get().create(lvl);
+            if (arq != null && cab != null) {
+                arq.moveTo(x, y, z - 6, 0f, 0f);
+                cab.moveTo(x, y, z, 180f, 0f);
+                lvl.addFreshEntity(arq);
+                lvl.addFreshEntity(cab);
+                var f = new com.darkcraft.enemigos.Flecha(lvl, arq);
+                f.setPos(x, y + 1.2, z - 3.0);
+                f.shoot(0, 0, 1, 2.0f, 0f);
+                lvl.addFreshEntity(f);
+                for (int t = 0; t < 6; t++) f.tick();
+                flecha = String.format(java.util.Locale.ROOT, "el caballero %s, la flecha sigue (z %+.1f del caballero)", cab.getHealth() >= cab.getMaxHealth() ? "sin un rasguno" : "HERIDO", f.getZ() - z);
+                f.discard();
+                arq.discard();
+                cab.discard();
+            }
+            log.println("Valdrenn, perros y espectros: el salto del perro " + salto + "; el espectro " + desvanece + "; " + flecha);
+        } catch (Throwable t) {
+            log.println("Valdrenn, perros y espectros: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] perros y espectros", t);
         }
     }
 

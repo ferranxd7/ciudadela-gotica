@@ -27,7 +27,8 @@ public final class Coleccion {
     public static final String[] COLECCION = {"mapa_valdrenn", "libro1", "libro2", "espada_diestra", "espada_siniestra", "libro3", "libro4",
             "llave_arbol", "mandoble_juramento", "llave_hueso", "libro5", "alabarda", "libro_acertijo", "amuleto_hueso", "libro6"};
     public static final String[] BESTIARIO = {"hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon", "capitan",
-            "escudero", "caballero_espada", "caballero_alabarda", "caballero_ballesta", "arquero", "rey", "gavran"};
+            "escudero", "caballero_espada", "caballero_alabarda", "caballero_ballesta", "arquero", "perro", "espectro_cortesano",
+            "espectro_dama", "rey", "gavran"};
 
     /** El objeto de una clave de la coleccion (los libros de la cronica, con su texto). */
     public static ItemStack objeto(String clave) {
@@ -93,6 +94,12 @@ public final class Coleccion {
                     yield k;
                 }
                 case "arquero" -> DarkCraftMod.ARQUERO.get().create(lvl);
+                case "perro" -> DarkCraftMod.PERRO.get().create(lvl);
+                case "espectro_cortesano", "espectro_dama" -> {
+                    var s = DarkCraftMod.ESPECTRO.get().create(lvl);
+                    if (s != null) s.variante(c.endsWith("dama") ? com.darkcraft.enemigos.Espectro.GARRAS : com.darkcraft.enemigos.Espectro.ESTOQUE);
+                    yield s;
+                }
                 default -> {
                     var s = EntityType.SKELETON.create(lvl);
                     if (s != null) {

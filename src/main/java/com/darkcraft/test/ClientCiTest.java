@@ -3618,6 +3618,218 @@ public final class ClientCiTest {
         return G + 170;
     }
 
+    // ------------------------------------------------------------------ parte 4b: perros de hueso y espectros de la corte
+
+    private static com.darkcraft.enemigos.Enemigo puestoDe(String grupo, String tipo) {
+        var s = com.darkcraft.enemigos.Puestos.sitio(reinoK);
+        if (s == null) return null;
+        for (int i = 0; i < s.puestos.size(); i++)
+            if (s.puestos.get(i).grupo().startsWith(grupo) && s.puestos.get(i).tipo().equals(tipo)) return com.darkcraft.enemigos.Puestos.enemigo(reinoK, i);
+        return null;
+    }
+
+    private static com.darkcraft.enemigos.Puestos.Puesto primerPuesto(String grupo, String tipo) {
+        var s = com.darkcraft.enemigos.Puestos.sitio(reinoK);
+        if (s == null) return null;
+        for (var q : s.puestos) if (q.grupo().startsWith(grupo) && q.tipo().equals(tipo)) return q;
+        return null;
+    }
+
+    /** Lleva al jugador (volando, en creativo) a unos pasos delante de un puesto, mirandolo. */
+    private static void anteElPuesto(ServerPlayer sp, com.darkcraft.enemigos.Puestos.Puesto q, double lejos, double lado, double alto) {
+        if (q == null) return;
+        double fx = -Math.sin(Math.toRadians(q.giro())), fz = Math.cos(Math.toRadians(q.giro()));
+        double x = q.x() + 0.5 + fx * lejos + fz * lado, z = q.z() + 0.5 + fz * lejos - fx * lado;
+        irMirando(sp, x, q.y() + alto, z, q.x() + 0.5, q.y() + 0.8, q.z() + 0.5, true);
+    }
+
+    /**
+     * Los perros de hueso y los espectros (parte 4b): en fila delante de la fuente y cada uno con sus golpes, una jauria
+     * en su calle, la perrera, los espectros de la catedral y del torreon, en supervivencia contra la jauria de la perrera
+     * (aulla y acuden) y contra una dama (el lamento), y uno que se deshace.
+     */
+    private static int perrosEspectros(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Perros y espectros: al patio de la fuente (los puestos, otra vez en pie)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                verDeNoche(sp);
+                com.darkcraft.enemigos.Puestos.todos(sp.server, reinoK, false);
+                var s = com.darkcraft.enemigos.Puestos.sitio(reinoK);
+                for (int i = 0; i < s.puestos.size(); i++) {
+                    var q = s.puestos.get(i);
+                    if (Math.abs(q.x() - reino[0]) <= 8 && Math.abs(q.z() - (reino[1] + 58)) <= 8) com.darkcraft.enemigos.Puestos.marcar(sp.server, reinoK, i, true);
+                }
+                irMirando(sp, reino[0] + 0.5, CastlePlan.Y0, reino[1] + 59.5, reino[0] + 0.5, CastlePlan.Y0 + 1.1, reino[1] + 66.5, false);
+                log("  perros y espectros: " + com.darkcraft.valdrenn.ValdrennEnemigos.estado(sp.server, reinoK));
+            });
+        });
+        atTicks(t + 60, "Perros y espectros: el perro, el cortesano y la dama en fila", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            for (var e : FILA) if (e != null && !e.isRemoved()) e.discard();
+            FILA.clear();
+            double z = reino[1] + 66.5;
+            com.darkcraft.enemigos.Enemigo[] fila = {DarkCraftMod.PERRO.get().create(lvl), DarkCraftMod.ESPECTRO.get().create(lvl), DarkCraftMod.ESPECTRO.get().create(lvl)};
+            double[] xs = {-3.2, 0.0, 3.2};
+            for (int i = 0; i < 3; i++) {
+                var e = fila[i];
+                if (e == null) continue;
+                if (i == 2) e.variante(com.darkcraft.enemigos.Espectro.GARRAS);
+                e.moveTo(reino[0] + 0.5 + xs[i], CastlePlan.Y0, z, 180f, 0f);
+                e.yBodyRot = e.yHeadRot = 180f;
+                lvl.addFreshEntity(e);
+                FILA.add(e);
+            }
+        }));
+        atTicks(t + 92, "captura: la fila de la 4b", m -> {
+            server(m, sp -> {
+                StringBuilder b = new StringBuilder();
+                for (var e : FILA) b.append(" | ").append(estadoE(e));
+                log("  perros y espectros, la fila:" + b);
+            });
+            shot(m, "cliente_vb01_fila");
+        });
+        int G = t + 94;
+        Object[][] golpes = {
+                // (la camara, delante y algo hacia fuera de la fila: el perro es el del oeste, la dama la del este)
+                {0, com.darkcraft.enemigos.PerroAnims.MORDISCO, -1.4, -2.4, 10, "cliente_vb02_perro_mordisco", -1, null},
+                {0, com.darkcraft.enemigos.PerroAnims.AULLIDO, -1.8, -2.2, 18, "cliente_vb03_perro_aulla", -1, null},
+                {0, com.darkcraft.enemigos.PerroAnims.SALTO, -4.6, -1.6, 10, "cliente_vb04_perro_agacha", 15, "cliente_vb05_perro_salta"},
+                {1, com.darkcraft.enemigos.EspectroAnims.ESTOCADA, 0.8, -3.6, 9, "cliente_vb06_cortesano_recoge", 13, "cliente_vb07_estocada"},
+                {2, com.darkcraft.enemigos.EspectroAnims.ZARPAZO, 1.4, -3.0, 8, "cliente_vb08_dama_alza", 11, "cliente_vb09_zarpazo"},
+                {2, com.darkcraft.enemigos.EspectroAnims.LAMENTO, 1.2, -3.6, 20, "cliente_vb10_lamento", -1, null},
+                {1, com.darkcraft.enemigos.EspectroAnims.DESVANECERSE, 0.6, -3.2, 9, "cliente_vb11_desvanece", -1, null}};
+        for (Object[] gp : golpes) {
+            final int i = (int) gp[0], accion = (int) gp[1], c1 = (int) gp[4], c2 = (int) gp[6];
+            final double cdx = (double) gp[2], cdz = (double) gp[3];
+            final String n1 = (String) gp[5], n2 = (String) gp[7];
+            atTicks(G, "Perros y espectros: " + n1, m -> server(m, sp -> {
+                var e = fila(i);
+                if (e == null) return;
+                // el salto: que vuelva a su sitio antes (el anterior lo pudo mover)
+                e.moveTo(reino[0] + 0.5 + (i == 0 ? -3.2 : i == 1 ? 0.0 : 3.2), CastlePlan.Y0, reino[1] + 66.5, 180f, 0f);
+                e.yBodyRot = e.yHeadRot = 180f;
+                e.empezar(accion);
+                verDesdeServidor = new Vec3(e.getX() + cdx, e.getY() + (i == 0 ? 1.0 : 1.5), e.getZ() + cdz);
+                miraServidor = new Vec3(e.getX(), e.getY() + (i == 0 ? 0.6 : 1.1), e.getZ() - (accion == com.darkcraft.enemigos.PerroAnims.SALTO && i == 0 ? 1.5 : 0));
+            }));
+            atTicks(G + 2, "camara de cerca", m -> {
+                if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+            });
+            atTicks(G + c1, "captura: " + n1, m -> {
+                server(m, sp -> log("  perros y espectros, " + n1 + ": " + estadoE(fila(i))));
+                shot(m, n1);
+            });
+            if (n2 != null) atTicks(G + c2, "captura: " + n2, m -> shot(m, n2));
+            G += Math.max(c1, c2) + 34;
+        }
+        // el cortesano se deshace
+        atTicks(G, "Perros y espectros: el cortesano se deshace", m -> server(m, sp -> {
+            var e = fila(1);
+            if (e == null) return;
+            e.moveTo(reino[0] + 0.5, CastlePlan.Y0, reino[1] + 66.5, 180f, 0f);
+            verDesdeServidor = new Vec3(e.getX() + 0.8, e.getY() + 1.6, e.getZ() - 3.8);
+            miraServidor = new Vec3(e.getX(), e.getY() + 1.6, e.getZ());
+            e.hurt(sp.serverLevel().damageSources().generic(), 9999f);
+        }));
+        atTicks(G + 2, "camara de cerca", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(G + 22, "captura: se deshace", m -> shot(m, "cliente_vb12_se_deshace"));
+        atTicks(G + 24, "de vuelta a los ojos del jugador", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                for (var e : FILA) if (e != null && !e.isRemoved()) e.discard();
+                FILA.clear();
+            });
+        });
+        G += 26;
+        // una jauria en su calle (de las del pueblo)
+        atTicks(G, "Perros y espectros: una jauria del pueblo", m -> server(m, sp -> anteElPuesto(sp, primerPuesto("jauria", com.darkcraft.valdrenn.ValdrennEnemigos.PERRO), 7, 2, 1.5)));
+        atTicks(G + 160, "captura: la jauria", m -> {
+            server(m, sp -> log("  perros y espectros, la jauria: " + estadoE(puestoDe("jauria", com.darkcraft.valdrenn.ValdrennEnemigos.PERRO))));
+            shot(m, "cliente_vb13_jauria");
+        });
+        G += 162;
+        // la catedral: rezando en el pasillo
+        atTicks(G, "Perros y espectros: la catedral", m -> server(m, sp -> {
+            // la dama que reza en el pasillo, de cara (mira al altar, al norte)
+            var q = primerPuesto("catedral", com.darkcraft.valdrenn.ValdrennEnemigos.ESPECTRO);
+            if (q != null) irMirando(sp, q.x() + 3.5, q.y() + 0.4, q.z() - 5.0, q.x() + 0.5, q.y() + 0.7, q.z() + 0.5, true);
+        }));
+        atTicks(G + 160, "captura: la catedral", m -> {
+            server(m, sp -> log("  perros y espectros, la catedral: " + estadoE(puestoDe("catedral", com.darkcraft.valdrenn.ValdrennEnemigos.ESPECTRO))));
+            shot(m, "cliente_vb14_catedral");
+        });
+        G += 162;
+        // el gran salon del torreon
+        atTicks(G, "Perros y espectros: el gran salon del torreon", m -> server(m, sp -> {
+            var q = primerPuesto("torreon_planta0", com.darkcraft.valdrenn.ValdrennEnemigos.ESPECTRO);
+            anteElPuesto(sp, q, 4.5, 1.0, 0.4);
+            log("  perros y espectros, en el torreon: " + (q == null ? "sin puestos" : "ante el puesto de " + q.x() + "," + q.y() + "," + q.z()));
+        }));
+        atTicks(G + 120, "captura: el torreon", m -> {
+            server(m, sp -> log("  perros y espectros, el torreon: " + estadoE(puestoDe("torreon_planta0", com.darkcraft.valdrenn.ValdrennEnemigos.ESPECTRO))));
+            shot(m, "cliente_vb15_torreon");
+        });
+        G += 122;
+        // en supervivencia ante la perrera: se despiertan, uno aulla y vienen todos
+        atTicks(G, "Perros y espectros: en supervivencia, junto a la perrera", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                var q = primerPuesto("perrera", com.darkcraft.valdrenn.ValdrennEnemigos.PERRO);
+                aPelear(sp, true);
+                verDeNoche(sp);
+                if (q != null) irMirando(sp, q.x() - 4.5, q.y(), q.z() + 0.5, q.x() + 0.5, q.y() + 0.5, q.z() + 0.5, false);
+            });
+        });
+        atTicks(G + 50, "a los 2,5 s", m -> server(m, sp -> log("  perros y espectros, la perrera a los 2,5 s: " + estadoE(puestoDe("perrera", com.darkcraft.valdrenn.ValdrennEnemigos.PERRO))
+                + " | " + estadoGuardia(sp))));
+        atTicks(G + 90, "captura: la jauria ataca", m -> {
+            server(m, sp -> log("  perros y espectros, la perrera a los 4,5 s: " + estadoE(puestoDe("perrera", com.darkcraft.valdrenn.ValdrennEnemigos.PERRO))));
+            shot(m, "cliente_vb16_jauria_ataca");
+        });
+        // y una dama que se lamenta (a su lado, en supervivencia: el grito frena y quita fuerzas)
+        atTicks(G + 92, "Perros y espectros: una dama se lamenta junto al jugador", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Perro.class, sp.getBoundingBox().inflate(30))) e.discard();
+            var d = DarkCraftMod.ESPECTRO.get().create(lvl);
+            if (d == null) return;
+            d.variante(com.darkcraft.enemigos.Espectro.GARRAS);
+            d.moveTo(sp.getX() + 2.5, sp.getY(), sp.getZ(), 90f, 0f);
+            lvl.addFreshEntity(d);
+            FILA.add(d);
+            d.setTarget(sp);
+            d.empezar(com.darkcraft.enemigos.EspectroAnims.LAMENTO);
+            irMirando(sp, sp.getX(), sp.getY(), sp.getZ(), d.getX(), d.getY() + 1.4, d.getZ(), false);
+        }));
+        atTicks(G + 114, "captura: el lamento", m -> shot(m, "cliente_vb17_lamento_cerca"));
+        atTicks(G + 130, "lo que hace el lamento", m -> server(m, sp -> log("  perros y espectros, tras el lamento: lentitud " + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)
+                + ", debilidad " + sp.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS) + ", vida " + Math.round(sp.getHealth()) + " | " + estadoE(fila(0)))));
+        // todo como estaba: en creativo y los de este reino dados por caidos
+        atTicks(G + 134, "Perros y espectros: se acaba (creativo; los puestos, por caidos)", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = calladosAntes;
+            server(m, sp -> {
+                for (var e : FILA) if (e != null && !e.isRemoved()) e.discard();
+                FILA.clear();
+                sp.setGameMode(GameType.CREATIVE);
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                com.darkcraft.enemigos.Puestos.todos(sp.server, reinoK, true);
+                log("  perros y espectros, al acabar: " + com.darkcraft.valdrenn.ValdrennEnemigos.estado(sp.server, reinoK));
+            });
+        });
+        return G + 140;
+    }
+
     /** En supervivencia, con una espada de hierro, la vida entera y sin que le hagan dano de verdad (para que la prueba no muera). */
     private static void aPelear(ServerPlayer sp, boolean aguanta) {
         sp.setGameMode(GameType.SURVIVAL);
@@ -4546,6 +4758,7 @@ public final class ClientCiTest {
         fin = intro(fin);
         fin = barco(fin);
         fin = guardia(fin);
+        fin = perrosEspectros(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

@@ -21,6 +21,8 @@ import net.minecraft.resources.ResourceLocation;
 public class EnemigoRenderer<T extends Enemigo, M extends EnemigoModelo<T>> extends MobRenderer<T, M> {
     private final ResourceLocation[] texturas, brillos;
     private final float escala;
+    /** Lo que luce la capa de brillo (el espectro la apaga al desvanecerse). */
+    protected float brillo = 1f;
 
     public EnemigoRenderer(EntityRendererProvider.Context ctx, M modelo, String nombre, int variantes, float sombra, float escala) {
         super(ctx, modelo, sombra);
@@ -74,7 +76,7 @@ public class EnemigoRenderer<T extends Enemigo, M extends EnemigoModelo<T>> exte
         public void render(PoseStack ps, MultiBufferSource buf, int luz, T e, float paso, float cuanto, float pt, float edad, float giro, float inclinacion) {
             if (e.isInvisible()) return;
             VertexConsumer vc = buf.getBuffer(RenderType.eyes(brillos[variante(e)]));
-            getParentModel().renderToBuffer(ps, vc, 0xF000F0, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+            getParentModel().renderToBuffer(ps, vc, 0xF000F0, OverlayTexture.NO_OVERLAY, brillo, brillo, brillo, 1f);
         }
     }
 }

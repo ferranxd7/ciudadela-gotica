@@ -66,6 +66,9 @@ public final class ClientSetup {
                 new com.darkcraft.client.enemigos.GuardiaModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.GuardiaModelo.CAPA)), "guardia", 3, 0.5f, 1.08f));
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ARQUERO.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
                 new com.darkcraft.client.enemigos.ArqueroModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.ArqueroModelo.CAPA)), "arquero", 1, 0.45f, 1.0f));
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PERRO.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
+                new com.darkcraft.client.enemigos.PerroModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.PerroModelo.CAPA)), "perro", 1, 0.45f, 1.0f));
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ESPECTRO.get(), com.darkcraft.client.enemigos.EspectroRenderer::new);
         // La Garza Gris volando en las cinematicas del viaje (solo existe en el cliente)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BARCO_VOLADOR.get(), com.darkcraft.client.cine.BarcoVoladorRenderer::new);
     }
@@ -81,5 +84,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CapitanModelo.CAPA, com.darkcraft.client.enemigos.CapitanGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.GuardiaModelo.CAPA, com.darkcraft.client.enemigos.GuardiaGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.ArqueroModelo.CAPA, com.darkcraft.client.enemigos.ArqueroGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.PerroModelo.CAPA, com.darkcraft.client.enemigos.PerroGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.EspectroModelo.CAPA, com.darkcraft.client.enemigos.EspectroGeometria::crear);
     }
 }

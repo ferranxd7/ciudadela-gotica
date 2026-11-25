@@ -166,8 +166,18 @@ public class Volcado {
                 com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
                 System.out.println("puestos de Valdrenn: " + com.darkcraft.valdrenn.ValdrennEnemigos.comprobar(mundo, p));
                 int k = 0;
-                for (var q : com.darkcraft.valdrenn.ValdrennEnemigos.locales(com.darkcraft.valdrenn.ValdrennEnemigos.sur(p)))
-                    marcas.put((q.tipo().equals("arquero") ? "A" : "GAB".substring(q.variante(), q.variante() + 1)) + (k++), new int[]{q.lx(), q.y(), q.lz()});
+                for (var q : com.darkcraft.valdrenn.ValdrennEnemigos.todos(p)) {
+                    String letra = switch (q.tipo()) {
+                        case "arquero" -> "A";
+                        case "perro" -> "P";
+                        case "espectro" -> q.variante() == 0 ? "S" : "D";
+                        default -> "GAB".substring(q.variante(), q.variante() + 1);
+                    };
+                    marcas.put(letra + (k++), new int[]{q.lx(), q.y(), q.lz()});
+                    if (!q.grupo().startsWith("torreon")) continue;
+                    System.out.println("  dentro: " + letra + (k - 1) + " " + q.grupo() + " " + q.tipo() + "/" + q.variante() + " en " + q.lx() + "," + q.y() + "," + q.lz()
+                            + " postura " + q.postura());
+                }
             }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));

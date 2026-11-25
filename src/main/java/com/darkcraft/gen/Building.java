@@ -346,6 +346,11 @@ public class Building extends Element {
         }
     }
 
+    /** Las plantas (sotanos primero), con sus salas. */
+    public List<Floor> plantas() {
+        return java.util.Collections.unmodifiableList(floors);
+    }
+
     protected Floor floorByIndex(int idx) {
         for (Floor f : floors) if (f.index == idx) return f;
         return null;

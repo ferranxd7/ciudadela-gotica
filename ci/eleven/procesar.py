@@ -147,6 +147,12 @@ SFX = {
     "arco_tensar": (1.0, 0.15, -20), "arco_suelta": (0.7, 0.2, -15),
     "arquero_alerta": (1.1, 0.3, -16), "arquero_huesos": (1.8, 0.4, -22), "arquero_dolor": (0.6, 0.2, -16),
     "arquero_muerte": (2.0, 0.5, -16),
+    # el perro de hueso y el espectro de la corte (parte 4b)
+    "perro_grunido": (1.6, 0.3, -20), "perro_ladrido": (1.0, 0.25, -15), "perro_aullido": (2.6, 0.5, -15),
+    "perro_mordisco": (0.6, 0.15, -14), "perro_dolor": (0.7, 0.2, -15), "perro_muerte": (2.0, 0.5, -15),
+    "espectro_susurro": (2.4, 0.6, -22), "espectro_alerta": (1.3, 0.3, -15), "espectro_lamento": (2.2, 0.5, -14),
+    "espectro_zarpazo": (0.6, 0.15, -16), "espectro_desvanece": (1.0, 0.1, -17), "espectro_dolor": (0.7, 0.2, -16),
+    "espectro_muerte": (2.2, 0.6, -16),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -242,6 +248,13 @@ TOMAS_SFX = {
     # golpe seco al principio; los huesos mas llenos; los golpes mas secos y las muertes mas largas
     "guardia_alerta": (2, 1), "arco_tensar": (2, 1), "arco_suelta": (1, 2), "arquero_alerta": (2, 4),
     "arquero_huesos": (4, 3, 1), "arquero_dolor": (1, 3, 4), "arquero_muerte": (1, 3, 4),
+    # el perro: el grunido mas grave, los ladridos mas llenos, los aullidos mas largos, los mordiscos mas secos; el
+    # espectro: los susurros mas claros, los gritos mas llenos, el desvanecerse que crece hasta el final (aparece al
+    # acabar), los dolores y la muerte mas fuertes
+    "perro_grunido": (4, 1), "perro_ladrido": (2, 1), "perro_aullido": (4, 2), "perro_mordisco": (2, 3),
+    "perro_dolor": (3, 1, 4), "perro_muerte": (4, 1, 3),
+    "espectro_susurro": (1, 3, 4), "espectro_alerta": (4, 3), "espectro_lamento": (4, 1), "espectro_zarpazo": (2, 1),
+    "espectro_desvanece": (2, 4), "espectro_dolor": (4, 2), "espectro_muerte": (4, 3),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

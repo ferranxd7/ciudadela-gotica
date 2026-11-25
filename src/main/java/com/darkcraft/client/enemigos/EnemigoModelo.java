@@ -23,6 +23,13 @@ public abstract class EnemigoModelo<T extends Enemigo> extends HierarchicalModel
     private final ModelPart[] todasLasOcultas;
 
     protected EnemigoModelo(ModelPart root, String[]... ocultasPorVariante) {
+        this(root, net.minecraft.client.renderer.RenderType::entityCutoutNoCull, ocultasPorVariante);
+    }
+
+    /** Con otro tipo de dibujo (el espectro: medio transparente). */
+    protected EnemigoModelo(ModelPart root, java.util.function.Function<net.minecraft.resources.ResourceLocation, net.minecraft.client.renderer.RenderType> tipo,
+                            String[]... ocultasPorVariante) {
+        super(tipo);
         this.root = root;
         this.cabeza = pieza("cabeza");
         this.ocultas = new ModelPart[ocultasPorVariante.length][];

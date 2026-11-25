@@ -2169,5 +2169,157 @@
         "name": "darkcraft:sfx/arquero_muerte_3"
       }
     ]
+  },
+  "sfx.perro_grunido": {
+    "subtitle": "subtitles.darkcraft.sfx.perro_grunido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/perro_grunido_1"
+      },
+      {
+        "name": "darkcraft:sfx/perro_grunido_2"
+      }
+    ]
+  },
+  "sfx.perro_ladrido": {
+    "subtitle": "subtitles.darkcraft.sfx.perro_ladrido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/perro_ladrido_1"
+      },
+      {
+        "name": "darkcraft:sfx/perro_ladrido_2"
+      }
+    ]
+  },
+  "sfx.perro_aullido": {
+    "subtitle": "subtitles.darkcraft.sfx.perro_aullido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/perro_aullido_1"
+      },
+      {
+        "name": "darkcraft:sfx/perro_aullido_2"
+      }
+    ]
+  },
+  "sfx.perro_mordisco": {
+    "subtitle": "subtitles.darkcraft.sfx.perro_mordisco",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/perro_mordisco_1"
+      },
+      {
+        "name": "darkcraft:sfx/perro_mordisco_2"
+      }
+    ]
+  },
+  "sfx.perro_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.perro_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/perro_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/perro_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/perro_dolor_3"
+      }
+    ]
+  },
+  "sfx.perro_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.perro_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/perro_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/perro_muerte_2"
+      },
+      {
+        "name": "darkcraft:sfx/perro_muerte_3"
+      }
+    ]
+  },
+  "sfx.espectro_susurro": {
+    "subtitle": "subtitles.darkcraft.sfx.espectro_susurro",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/espectro_susurro_1"
+      },
+      {
+        "name": "darkcraft:sfx/espectro_susurro_2"
+      },
+      {
+        "name": "darkcraft:sfx/espectro_susurro_3"
+      }
+    ]
+  },
+  "sfx.espectro_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.espectro_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/espectro_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/espectro_alerta_2"
+      }
+    ]
+  },
+  "sfx.espectro_lamento": {
+    "subtitle": "subtitles.darkcraft.sfx.espectro_lamento",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/espectro_lamento_1"
+      },
+      {
+        "name": "darkcraft:sfx/espectro_lamento_2"
+      }
+    ]
+  },
+  "sfx.espectro_zarpazo": {
+    "subtitle": "subtitles.darkcraft.sfx.espectro_zarpazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/espectro_zarpazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/espectro_zarpazo_2"
+      }
+    ]
+  },
+  "sfx.espectro_desvanece": {
+    "subtitle": "subtitles.darkcraft.sfx.espectro_desvanece",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/espectro_desvanece_1"
+      },
+      {
+        "name": "darkcraft:sfx/espectro_desvanece_2"
+      }
+    ]
+  },
+  "sfx.espectro_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.espectro_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/espectro_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/espectro_dolor_2"
+      }
+    ]
+  },
+  "sfx.espectro_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.espectro_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/espectro_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/espectro_muerte_2"
+      }
+    ]
   }
 }

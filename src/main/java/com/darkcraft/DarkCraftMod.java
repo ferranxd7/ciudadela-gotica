@@ -195,6 +195,20 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_ARQUERO_HUESOS = sound("sfx.arquero_huesos");
     public static final RegistryObject<SoundEvent> SFX_ARQUERO_DOLOR = sound("sfx.arquero_dolor");
     public static final RegistryObject<SoundEvent> SFX_ARQUERO_MUERTE = sound("sfx.arquero_muerte");
+    // ---- el perro de hueso y el espectro de la corte (parte 4b)
+    public static final RegistryObject<SoundEvent> SFX_PERRO_GRUNIDO = sound("sfx.perro_grunido");
+    public static final RegistryObject<SoundEvent> SFX_PERRO_LADRIDO = sound("sfx.perro_ladrido");
+    public static final RegistryObject<SoundEvent> SFX_PERRO_AULLIDO = sound("sfx.perro_aullido");
+    public static final RegistryObject<SoundEvent> SFX_PERRO_MORDISCO = sound("sfx.perro_mordisco");
+    public static final RegistryObject<SoundEvent> SFX_PERRO_DOLOR = sound("sfx.perro_dolor");
+    public static final RegistryObject<SoundEvent> SFX_PERRO_MUERTE = sound("sfx.perro_muerte");
+    public static final RegistryObject<SoundEvent> SFX_ESPECTRO_SUSURRO = sound("sfx.espectro_susurro");
+    public static final RegistryObject<SoundEvent> SFX_ESPECTRO_ALERTA = sound("sfx.espectro_alerta");
+    public static final RegistryObject<SoundEvent> SFX_ESPECTRO_LAMENTO = sound("sfx.espectro_lamento");
+    public static final RegistryObject<SoundEvent> SFX_ESPECTRO_ZARPAZO = sound("sfx.espectro_zarpazo");
+    public static final RegistryObject<SoundEvent> SFX_ESPECTRO_DESVANECE = sound("sfx.espectro_desvanece");
+    public static final RegistryObject<SoundEvent> SFX_ESPECTRO_DOLOR = sound("sfx.espectro_dolor");
+    public static final RegistryObject<SoundEvent> SFX_ESPECTRO_MUERTE = sound("sfx.espectro_muerte");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_GORGOTEO = sound("sfx.ahogado_gorgoteo");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_ALERTA = sound("sfx.ahogado_alerta");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_DOLOR = sound("sfx.ahogado_dolor");
@@ -365,6 +379,13 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Arquero>> ARQUERO = ENTITIES.register("arquero",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Arquero>of(com.darkcraft.enemigos.Arquero::new, MobCategory.MONSTER)
                     .sized(0.6f, 1.95f).clientTrackingRange(10).build(MODID + ":arquero"));
+    // ---- el perro de hueso y el espectro de la corte (parte 4b)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Perro>> PERRO = ENTITIES.register("perro",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Perro>of(com.darkcraft.enemigos.Perro::new, MobCategory.MONSTER)
+                    .sized(0.8f, 0.95f).clientTrackingRange(8).build(MODID + ":perro"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Espectro>> ESPECTRO = ENTITIES.register("espectro",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Espectro>of(com.darkcraft.enemigos.Espectro::new, MobCategory.MONSTER)
+                    .sized(0.65f, 2.0f).clientTrackingRange(8).build(MODID + ":espectro"));
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Arpon>> ARPON = ENTITIES.register("arpon",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Arpon>of(com.darkcraft.enemigos.Arpon::new, MobCategory.MISC)
                     .sized(0.5f, 0.5f).clientTrackingRange(4).updateInterval(20).build(MODID + ":arpon"));
@@ -491,6 +512,8 @@ public class DarkCraftMod {
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());
         e.put(ARQUERO.get(), com.darkcraft.enemigos.Arquero.atributos().build());
+        e.put(PERRO.get(), com.darkcraft.enemigos.Perro.atributos().build());
+        e.put(ESPECTRO.get(), com.darkcraft.enemigos.Espectro.atributos().build());
         e.put(GUIA.get(), com.darkcraft.personajes.Guia.atributos().build());
         e.put(HERRERO.get(), com.darkcraft.personajes.Herrero.atributos().build());
         e.put(MERCADER.get(), com.darkcraft.personajes.Mercader.atributos().build());

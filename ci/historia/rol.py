@@ -1565,6 +1565,54 @@ EN.update({
     "darkcraft.ayuda.v_enemigos": "the enemies of this kingdom: how many are left, spawn them or mark them as fallen",
 })
 
+# ---- parte 4b: el perro de hueso y el espectro de la corte
+ES.update({
+    "entity.darkcraft.perro": "Perro de hueso",
+    "entity.darkcraft.espectro": "Espectro de la corte",
+    "darkcraft.bestiario.perro": "Perro de hueso",
+    "darkcraft.bestiario.perro.desc": "Los lebreles de la guardia siguieron cazando cuando ya no les quedaba carne. Van en jauría: el primero que te ve aúlla y acuden los demás. Antes de saltar se agachan: rueda de lado.",
+    "darkcraft.bestiario.espectro_cortesano": "Espectro de la corte (cortesano)",
+    "darkcraft.bestiario.espectro_cortesano.desc": "Un noble del Rey Corvin que no se fue del castillo. Su estoque llega más lejos de lo que parece; se desvanece y aparece a tu espalda.",
+    "darkcraft.bestiario.espectro_dama": "Espectro de la corte (dama)",
+    "darkcraft.bestiario.espectro_dama.desc": "Una dama de la corte que aún vaga por los salones. Su toque deja frío y, cuando echa la cabeza atrás, viene el lamento: aléjate antes de que grite.",
+    "subtitles.darkcraft.sfx.perro_grunido": "Gruñe un perro de hueso",
+    "subtitles.darkcraft.sfx.perro_ladrido": "Ladra un perro de hueso",
+    "subtitles.darkcraft.sfx.perro_aullido": "Aúlla un perro de hueso",
+    "subtitles.darkcraft.sfx.perro_mordisco": "Unas mandíbulas se cierran",
+    "subtitles.darkcraft.sfx.perro_dolor": "Gime un perro de hueso",
+    "subtitles.darkcraft.sfx.perro_muerte": "Un perro de hueso se desmorona",
+    "subtitles.darkcraft.sfx.espectro_susurro": "Susurros",
+    "subtitles.darkcraft.sfx.espectro_alerta": "Un espectro te ha visto",
+    "subtitles.darkcraft.sfx.espectro_lamento": "Un espectro se lamenta",
+    "subtitles.darkcraft.sfx.espectro_zarpazo": "Un zarpazo helado",
+    "subtitles.darkcraft.sfx.espectro_desvanece": "Un espectro se desvanece",
+    "subtitles.darkcraft.sfx.espectro_dolor": "Un espectro se estremece",
+    "subtitles.darkcraft.sfx.espectro_muerte": "Un espectro se deshace",
+})
+EN.update({
+    "entity.darkcraft.perro": "Bone Hound",
+    "entity.darkcraft.espectro": "Court Spectre",
+    "darkcraft.bestiario.perro": "Bone Hound",
+    "darkcraft.bestiario.perro.desc": "The guard's hounds kept hunting long after their flesh was gone. They run in packs: the first to see you howls and the rest come. They crouch before they leap: roll aside.",
+    "darkcraft.bestiario.espectro_cortesano": "Court Spectre (courtier)",
+    "darkcraft.bestiario.espectro_cortesano.desc": "A noble of King Corvin who never left the castle. His rapier reaches further than it seems; he fades away and appears behind you.",
+    "darkcraft.bestiario.espectro_dama": "Court Spectre (lady)",
+    "darkcraft.bestiario.espectro_dama.desc": "A lady of the court who still wanders the halls. Her touch leaves you cold, and when she throws her head back the wail is coming: get away before she screams.",
+    "subtitles.darkcraft.sfx.perro_grunido": "A bone hound growls",
+    "subtitles.darkcraft.sfx.perro_ladrido": "A bone hound barks",
+    "subtitles.darkcraft.sfx.perro_aullido": "A bone hound howls",
+    "subtitles.darkcraft.sfx.perro_mordisco": "Jaws snap shut",
+    "subtitles.darkcraft.sfx.perro_dolor": "A bone hound yelps",
+    "subtitles.darkcraft.sfx.perro_muerte": "A bone hound collapses",
+    "subtitles.darkcraft.sfx.espectro_susurro": "Whispers",
+    "subtitles.darkcraft.sfx.espectro_alerta": "A spectre spots you",
+    "subtitles.darkcraft.sfx.espectro_lamento": "A spectre wails",
+    "subtitles.darkcraft.sfx.espectro_zarpazo": "An icy claw",
+    "subtitles.darkcraft.sfx.espectro_desvanece": "A spectre fades away",
+    "subtitles.darkcraft.sfx.espectro_dolor": "A spectre shudders",
+    "subtitles.darkcraft.sfx.espectro_muerte": "A spectre dissolves",
+})
+
 
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
