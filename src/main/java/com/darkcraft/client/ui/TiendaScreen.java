@@ -23,7 +23,7 @@ import java.util.List;
  * comprueba todo ({@link Tienda#comprar}).
  */
 public class TiendaScreen extends Screen {
-    private static final int ANCHO = 396, ALTO = 182, FILA = 20, FILAS = 6, IZQ = 196, LISTA_Y = 40;
+    private static final int ANCHO = 396, ALTO = 182, FILA = 18, FILAS = 6, IZQ = 196, LISTA_Y = 40;
     private static final int CLARO = 0xFFEADBC4, ORO = 0xFFE2BF62, LUZ = 0xFFFFF2C4, APAGADO = 0xFFB8A888, ROJO = 0xFFE0564E;
 
     private final int entidad;
@@ -217,20 +217,20 @@ public class TiendaScreen extends Screen {
             Tienda.Oferta o = of.get(i);
             boolean agotada = quedan(i) <= 0;
             Pix.blanco();
-            if (i == sel) Panel.fila(g, x + 12, fy + 1, IZQ - 4);
+            if (i == sel) Panel.fila(g, x + 12, fy, IZQ - 4);
             ItemStack st = o.muestra();
-            g.renderItem(st, x + 16, fy + 2);
-            g.renderItemDecorations(font, st, x + 16, fy + 2);
+            g.renderItem(st, x + 16, fy + 1);
+            g.renderItemDecorations(font, st, x + 16, fy + 1);
             String precio = agotada ? Component.translatable("darkcraft.tienda.agotado").getString() : Hud.numero(o.precio());
             int pw = font.width(precio);
             String nombre = recortar(st.getHoverName().getString(), IZQ - 44 - pw - 6);
             int color = agotada ? 0xFF7A705E : i == sel ? LUZ : i == encima ? CLARO : 0xFFC8B89A;
-            g.drawString(font, nombre, x + 36, fy + 6, color, true);
-            g.drawString(font, precio, x + 10 + IZQ - 8 - pw, fy + 6, agotada ? 0xFF7A705E : !gasta() || o.precio() <= ClientRol.ecos ? ORO : ROJO, true);
+            g.drawString(font, nombre, x + 36, fy + 5, color, true);
+            g.drawString(font, precio, x + 10 + IZQ - 8 - pw, fy + 5, agotada ? 0xFF7A705E : !gasta() || o.precio() <= ClientRol.ecos ? ORO : ROJO, true);
             if (i == destelloFila && t - destello < 24) {
                 Pix.suma();
                 Pix.color(1f, 0.85f, 0.45f, 0.55f * (1f - (e - destello) / 24f));
-                g.fill(x + 13, fy + 1, x + 10 + IZQ - 3, fy + FILA - 1, 0xFFFFFFFF);
+                g.fill(x + 13, fy, x + 10 + IZQ - 3, fy + FILA, 0xFFFFFFFF);
                 Pix.blanco();
                 Pix.mezcla();
             }

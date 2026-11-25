@@ -1591,7 +1591,8 @@ public class MenuScreen extends Screen {
 
         /** La ficha de lo elegido: el icono en grande (o la criatura girando), el nombre y lo que dice. */
         private void ficha(GuiGraphics g, Net.EspejoEstado e, int x2, float pt) {
-            int w2 = px + pw - 12 - x2, y2 = py + 8, h2 = ph - 16;
+            // debajo de los tres apartados (que asoman por encima de la ficha: "Bestiario" no se tapa)
+            int w2 = px + pw - 12 - x2, y2 = py + 30, h2 = ph - 38;
             if (w2 < 100 || cuantos() == 0) return;
             Pix.blanco();
             Panel.hueco(g, x2, y2, w2, h2);
