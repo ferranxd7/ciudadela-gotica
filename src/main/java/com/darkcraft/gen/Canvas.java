@@ -263,4 +263,26 @@ public final class Canvas {
         if (apunte != null || !inXZ((int) Math.floor(e.getX()), (int) Math.floor(e.getZ()))) return;
         level.addFreshEntity(e);
     }
+
+    /**
+     * Una entidad nueva para poner con {@link #addEntity}, o null si no se puede (dibujando un plano o levantandolo fuera
+     * del juego, en tools/vista3d, no hay mundo de verdad del que sacarla).
+     */
+    public net.minecraft.server.level.ServerLevel nivel() {
+        if (apunte != null) return null;
+        try {
+            return level.getLevel();
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
+    public <T extends Entity> T crear(net.minecraft.world.entity.EntityType<T> tipo) {
+        if (apunte != null) return null;
+        try {
+            return tipo.create(level.getLevel());
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
 }

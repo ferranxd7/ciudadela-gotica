@@ -61,6 +61,11 @@ public final class ClientSetup {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CAPITAN.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
                 new com.darkcraft.client.enemigos.CapitanModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.CapitanModelo.CAPA)), "capitan", 1, 0.7f, 1.22f));
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ARPON.get(), com.darkcraft.client.enemigos.ArponRenderer::new);
+        // la guardia de Valdrenn y el arquero esqueleto (parte 4a)
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.GUARDIA.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
+                new com.darkcraft.client.enemigos.GuardiaModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.GuardiaModelo.CAPA)), "guardia", 3, 0.5f, 1.08f));
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ARQUERO.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
+                new com.darkcraft.client.enemigos.ArqueroModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.ArqueroModelo.CAPA)), "arquero", 1, 0.45f, 1.0f));
         // La Garza Gris volando en las cinematicas del viaje (solo existe en el cliente)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BARCO_VOLADOR.get(), com.darkcraft.client.cine.BarcoVoladorRenderer::new);
     }
@@ -74,5 +79,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.HuecoModelo.CAPA, com.darkcraft.client.enemigos.HuecoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.AhogadoModelo.CAPA, com.darkcraft.client.enemigos.AhogadoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CapitanModelo.CAPA, com.darkcraft.client.enemigos.CapitanGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.GuardiaModelo.CAPA, com.darkcraft.client.enemigos.GuardiaGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.ArqueroModelo.CAPA, com.darkcraft.client.enemigos.ArqueroGeometria::crear);
     }
 }

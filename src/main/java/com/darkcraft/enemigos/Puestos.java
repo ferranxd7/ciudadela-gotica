@@ -63,13 +63,19 @@ public final class Puestos {
         public final String clave;
         public final List<Puesto> puestos;
         final Predicate<ServerLevel> aqui;
+        /** Si ese puesto esta en uso ahora (en Valdrenn, tras caer el Rey o Gavran se van algunos: el reino queda mas tranquilo). */
+        final java.util.function.BiPredicate<ServerLevel, Puesto> activo;
         final Enemigo[] fuera;
+        /** Hasta que tick no se vuelve a intentar sacar a ese (no habia sitio libre en su puesto). */
+        final int[] espera;
 
-        Sitio(String clave, List<Puesto> puestos, Predicate<ServerLevel> aqui) {
+        Sitio(String clave, List<Puesto> puestos, Predicate<ServerLevel> aqui, java.util.function.BiPredicate<ServerLevel, Puesto> activo) {
             this.clave = clave;
             this.puestos = List.copyOf(puestos);
             this.aqui = aqui;
+            this.activo = activo;
             this.fuera = new Enemigo[puestos.size()];
+            this.espera = new int[puestos.size()];
         }
     }
 
@@ -85,7 +91,35 @@ public final class Puestos {
 
     /** Apunta un sitio con sus puestos. {@code aqui}: si ese mundo es el suyo (y el sitio esta ahi). */
     public static void registrar(String clave, List<Puesto> puestos, Predicate<ServerLevel> aqui) {
-        SITIOS.put(clave, new Sitio(clave, puestos, aqui));
+        registrar(clave, puestos, aqui, (l, p) -> true);
+    }
+
+    /** Igual, con los puestos que pueden quedarse vacios segun como vaya la partida ({@code activo}). */
+    public static void registrar(String clave, List<Puesto> puestos, Predicate<ServerLevel> aqui, java.util.function.BiPredicate<ServerLevel, Puesto> activo) {
+        Sitio antes = SITIOS.get(clave);
+        if (antes != null) recoger(antes);
+        SITIOS.put(clave, new Sitio(clave, puestos, aqui, activo));
+    }
+
+    /** Si ese sitio ya esta apuntado. */
+    public static boolean apuntado(String clave) {
+        return SITIOS.containsKey(clave);
+    }
+
+    /** Olvida los sitios cuya clave empieza asi (los de Valdrenn, que se apuntan segun el mundo; al cerrar el servidor). */
+    public static void olvidar(String prefijo) {
+        SITIOS.entrySet().removeIf(e -> {
+            if (!e.getKey().startsWith(prefijo)) return false;
+            recoger(e.getValue());
+            return true;
+        });
+    }
+
+    /** Las claves de los sitios apuntados que empiezan asi. */
+    public static List<String> claves(String prefijo) {
+        List<String> r = new ArrayList<>();
+        for (String k : SITIOS.keySet()) if (k.startsWith(prefijo)) r.add(k);
+        return r;
     }
 
     public static void alCaer(BiConsumer<Enemigo, ServerPlayer> f) {
@@ -173,6 +207,7 @@ public final class Puestos {
             }
             if (datos == null) datos = Datos.get(srv);
             BitSet muertos = datos.de(s.clave);
+            int ahora = srv.getTickCount();
             for (int i = 0; i < s.fuera.length; i++) {
                 Enemigo e = s.fuera[i];
                 if (e != null && (e.isRemoved() || !e.isAlive())) e = s.fuera[i] = null;
@@ -180,7 +215,11 @@ public final class Puestos {
                 Puesto p = s.puestos.get(i);
                 double d2 = masCerca(lvl, e != null ? e.getX() : p.x() + 0.5, e != null ? e.getY() : p.y(), e != null ? e.getZ() : p.z() + 0.5);
                 if (e == null) {
-                    if (d2 < APARECE * APARECE && lvl.isPositionEntityTicking(p.pos())) s.fuera[i] = sacar(lvl, s, i);
+                    if (d2 < APARECE * APARECE && ahora >= s.espera[i] && lvl.isPositionEntityTicking(p.pos()) && s.activo.test(lvl, p)) {
+                        s.fuera[i] = sacar(lvl, s, i);
+                        // (si no habia sitio libre, no se vuelve a mirar en un rato)
+                        if (s.fuera[i] == null) s.espera[i] = ahora + 200;
+                    }
                 } else if (d2 > SE_VA * SE_VA) {
                     e.discard();
                     s.fuera[i] = null;
@@ -204,12 +243,33 @@ public final class Puestos {
         Enemigo e = t == null ? null : t.get().create(lvl);
         if (e == null) return null;
         e.moveTo(p.x() + 0.5, suelo(lvl, p.x(), p.y(), p.z()), p.z() + 0.5, p.giro(), 0f);
+        // si su sitio esta ocupado (un carro, un arbol, una farola: en Valdrenn lo de adorno cambia con la semilla), al lado
+        if (!libre(lvl, e)) {
+            boolean hay = false;
+            for (int r = 1; r <= 3 && !hay; r++)
+                for (int dx = -r; dx <= r && !hay; dx++)
+                    for (int dz = -r; dz <= r && !hay; dz++) {
+                        if (Math.max(Math.abs(dx), Math.abs(dz)) != r) continue;
+                        e.moveTo(p.x() + dx + 0.5, suelo(lvl, p.x() + dx, p.y(), p.z() + dz), p.z() + dz + 0.5, p.giro(), 0f);
+                        hay = libre(lvl, e);
+                    }
+            if (!hay) {
+                e.discard();
+                return null;
+            }
+        }
         e.variante(p.variante());
         e.asignar(s.clave, i, p.pos(), p.giro(), p.postura(), p.ronda());
         int cerca = 0;
         for (ServerPlayer q : lvl.players()) if (!q.isSpectator() && q.distanceToSqr(e) < 96 * 96) cerca++;
         e.paraGrupo(cerca);
         return lvl.addFreshEntity(e) ? e : null;
+    }
+
+    /** Si el enemigo cabe donde esta y tiene suelo bajo los pies (a menos de un bloque y medio). */
+    private static boolean libre(ServerLevel lvl, Enemigo e) {
+        if (!lvl.noCollision(e, e.getBoundingBox().deflate(0.02))) return false;
+        return !lvl.noCollision(e, e.getBoundingBox().move(0, -1.5, 0).deflate(0.02));
     }
 
     /** Lo alto del suelo de esa columna cerca de esa altura (una losa, una alfombra...): donde quedan los pies. */
@@ -301,7 +361,7 @@ public final class Puestos {
         BitSet muertos = Datos.get(lvl.getServer()).de(sitio);
         for (int i = 0; i < s.fuera.length; i++) {
             if (s.fuera[i] != null && (s.fuera[i].isRemoved() || !s.fuera[i].isAlive())) s.fuera[i] = null;
-            if (s.fuera[i] == null && !muertos.get(i)) s.fuera[i] = sacar(lvl, s, i);
+            if (s.fuera[i] == null && !muertos.get(i) && s.activo.test(lvl, s.puestos.get(i))) s.fuera[i] = sacar(lvl, s, i);
             if (s.fuera[i] != null) r.add(s.fuera[i]);
         }
         return r;

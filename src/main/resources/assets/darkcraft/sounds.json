@@ -2083,5 +2083,91 @@
         "stream": true
       }
     ]
+  },
+  "sfx.guardia_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.guardia_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/guardia_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/guardia_alerta_2"
+      }
+    ]
+  },
+  "sfx.arco_tensar": {
+    "subtitle": "subtitles.darkcraft.sfx.arco_tensar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/arco_tensar_1"
+      },
+      {
+        "name": "darkcraft:sfx/arco_tensar_2"
+      }
+    ]
+  },
+  "sfx.arco_suelta": {
+    "subtitle": "subtitles.darkcraft.sfx.arco_suelta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/arco_suelta_1"
+      },
+      {
+        "name": "darkcraft:sfx/arco_suelta_2"
+      }
+    ]
+  },
+  "sfx.arquero_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.arquero_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/arquero_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/arquero_alerta_2"
+      }
+    ]
+  },
+  "sfx.arquero_huesos": {
+    "subtitle": "subtitles.darkcraft.sfx.arquero_huesos",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/arquero_huesos_1"
+      },
+      {
+        "name": "darkcraft:sfx/arquero_huesos_2"
+      },
+      {
+        "name": "darkcraft:sfx/arquero_huesos_3"
+      }
+    ]
+  },
+  "sfx.arquero_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.arquero_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/arquero_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/arquero_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/arquero_dolor_3"
+      }
+    ]
+  },
+  "sfx.arquero_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.arquero_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/arquero_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/arquero_muerte_2"
+      },
+      {
+        "name": "darkcraft:sfx/arquero_muerte_3"
+      }
+    ]
   }
 }

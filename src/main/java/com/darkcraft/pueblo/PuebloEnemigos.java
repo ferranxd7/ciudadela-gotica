@@ -195,7 +195,8 @@ public final class PuebloEnemigos {
         if (!(e.level() instanceof ServerLevel lvl)) return;
         if (quien != null && !e.esEfimero()) {
             com.darkcraft.espejo.Espejo.bestia(quien, e.tipo());
-            Logros.dar(quien, "hueco");
+            // (el logro del primero que se vence es de los de Brumavela; la guardia de Valdrenn tiene los suyos)
+            if (e instanceof Hueco || e instanceof com.darkcraft.enemigos.Ahogado) Logros.dar(quien, "hueco");
         }
         if (!(e instanceof Capitan c) || !SITIO.equals(e.sitio())) return;
         Pueblo.Datos d = Pueblo.Datos.get(lvl.getServer());

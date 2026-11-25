@@ -1537,6 +1537,35 @@ EN.update({
 assert set(ES) == set(EN), sorted(set(ES) ^ set(EN))
 
 
+# ---- parte 4a: la guardia de Valdrenn (los caballeros de las tres companias) y los arqueros esqueleto
+ES.update({
+    "entity.darkcraft.guardia": "Guardia de Valdrenn",
+    "entity.darkcraft.arquero": "Arquero esqueleto",
+    "darkcraft.bestiario.arquero.desc": "Los arqueros del Rey siguen en las murallas y en lo alto de las torres. Tensan el arco despacio: cuando veas la cuerda en su barbilla, muévete de lado o rueda. Arriba, cerca de él, no aguanta nada.",
+    "subtitles.darkcraft.sfx.guardia_alerta": "Un caballero te ha visto",
+    "subtitles.darkcraft.sfx.arco_tensar": "Un arco se tensa",
+    "subtitles.darkcraft.sfx.arco_suelta": "Sale una flecha",
+    "subtitles.darkcraft.sfx.arquero_alerta": "Un arquero esqueleto te ha visto",
+    "subtitles.darkcraft.sfx.arquero_huesos": "Crujen unos huesos",
+    "subtitles.darkcraft.sfx.arquero_dolor": "Se quiebra un hueso",
+    "subtitles.darkcraft.sfx.arquero_muerte": "Un esqueleto se desmorona",
+    "darkcraft.ayuda.v_enemigos": "los enemigos de este reino: cuántos quedan, sacarlos o darlos por caídos",
+})
+EN.update({
+    "entity.darkcraft.guardia": "Valdrenn Guard",
+    "entity.darkcraft.arquero": "Skeleton Archer",
+    "darkcraft.bestiario.arquero.desc": "The King's archers still stand on the walls and the tower tops. They draw slowly: when the string reaches the chin, step aside or roll. Up close, on their wall, they cannot last.",
+    "subtitles.darkcraft.sfx.guardia_alerta": "A knight spots you",
+    "subtitles.darkcraft.sfx.arco_tensar": "A bow is drawn",
+    "subtitles.darkcraft.sfx.arco_suelta": "An arrow flies",
+    "subtitles.darkcraft.sfx.arquero_alerta": "A skeleton archer spots you",
+    "subtitles.darkcraft.sfx.arquero_huesos": "Bones rattle",
+    "subtitles.darkcraft.sfx.arquero_dolor": "A bone cracks",
+    "subtitles.darkcraft.sfx.arquero_muerte": "A skeleton collapses",
+    "darkcraft.ayuda.v_enemigos": "the enemies of this kingdom: how many are left, spawn them or mark them as fallen",
+})
+
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

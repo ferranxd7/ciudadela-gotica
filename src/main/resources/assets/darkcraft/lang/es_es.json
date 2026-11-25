@@ -1339,5 +1339,16 @@
   "subtitles.darkcraft.sfx.barco_atraca": "El barco atraca",
   "subtitles.darkcraft.sfx.barco_campana": "La campana del muelle",
   "subtitles.darkcraft.sfx.barco_repara": "Las tablas vuelven a su sitio",
-  "darkcraft.ayuda.b_barco": "zarpar desde el timón (con «primero», la cinemática del primer viaje) / llamar al barco / ir al muelle de Valdrenn / poner el barco en un muelle"
+  "darkcraft.ayuda.b_barco": "zarpar desde el timón (con «primero», la cinemática del primer viaje) / llamar al barco / ir al muelle de Valdrenn / poner el barco en un muelle",
+  "entity.darkcraft.guardia": "Guardia de Valdrenn",
+  "entity.darkcraft.arquero": "Arquero esqueleto",
+  "darkcraft.bestiario.arquero.desc": "Los arqueros del Rey siguen en las murallas y en lo alto de las torres. Tensan el arco despacio: cuando veas la cuerda en su barbilla, muévete de lado o rueda. Arriba, cerca de él, no aguanta nada.",
+  "subtitles.darkcraft.sfx.guardia_alerta": "Un caballero te ha visto",
+  "subtitles.darkcraft.sfx.arco_tensar": "Un arco se tensa",
+  "subtitles.darkcraft.sfx.arco_suelta": "Sale una flecha",
+  "subtitles.darkcraft.sfx.arquero_alerta": "Un arquero esqueleto te ha visto",
+  "subtitles.darkcraft.sfx.arquero_huesos": "Crujen unos huesos",
+  "subtitles.darkcraft.sfx.arquero_dolor": "Se quiebra un hueso",
+  "subtitles.darkcraft.sfx.arquero_muerte": "Un esqueleto se desmorona",
+  "darkcraft.ayuda.v_enemigos": "los enemigos de este reino: cuántos quedan, sacarlos o darlos por caídos"
 }

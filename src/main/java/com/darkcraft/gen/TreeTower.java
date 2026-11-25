@@ -400,7 +400,8 @@ public class TreeTower extends Element {
                 new net.minecraft.resources.ResourceLocation("minecraft", name));
         var holder = net.minecraft.core.registries.BuiltInRegistries.PAINTING_VARIANT.getHolder(key);
         if (holder.isEmpty()) return;
-        c.addEntity(new net.minecraft.world.entity.decoration.Painting(c.level.getLevel(), new net.minecraft.core.BlockPos(x, y, z), mira, holder.get()));
+        var lv = c.nivel();
+        if (lv != null) c.addEntity(new net.minecraft.world.entity.decoration.Painting(lv, new net.minecraft.core.BlockPos(x, y, z), mira, holder.get()));
     }
 
     // ------------------------------------------------------------ cuenco de madera que sostiene la sala
@@ -766,7 +767,7 @@ public class TreeTower extends Element {
             c.set(x, F, z, Pal.PB_CHISELED);
             c.set(x, F - 1, z, Pal.GILDED);
             if (!c.inXZ(x, z)) continue;
-            net.minecraft.world.entity.decoration.ArmorStand st = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(c.level.getLevel());
+            net.minecraft.world.entity.decoration.ArmorStand st = c.crear(net.minecraft.world.entity.EntityType.ARMOR_STAND);
             if (st == null) continue;
             float yaw = (float) Math.toDegrees(Math.atan2(cz + 0.5 - (z + 0.5), cx + 0.5 - (x + 0.5))) - 90f;
             st.moveTo(x + 0.5, F + 1, z + 0.5, yaw, 0);

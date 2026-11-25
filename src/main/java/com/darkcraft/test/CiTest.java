@@ -77,6 +77,7 @@ public final class CiTest {
             long t1 = System.currentTimeMillis();
             log.println("Chunks generados: " + n + " en " + (t1 - t0) / 1000 + " s (" + (t1 - t0) / Math.max(1, n) + " ms/chunk)");
             log.println("Entidades de bloque: " + be);
+            guardiaDeValdrenn(server, lvl, log, s);
 
             int Y0 = CastlePlan.Y0;
             topView(lvl, s[0], s[1], R, new File(out, "1_vista_aerea.png"));
@@ -829,6 +830,146 @@ public final class CiTest {
      * sus barriles, y los planos y el vuelo de las tres cinematicas (la camara y el casco, siempre en el aire). Al acabar
      * lo deja todo como estaba, tambien las nubes de Valdrenn: el muelle tiene que hacerse solo en la prueba del cliente.
      */
+    /**
+     * La guardia de Valdrenn (parte 4a): los puestos del reino en el mundo de verdad (que se pisan y se llega), que salen
+     * todos y en el suelo, que cada uno hace todas sus acciones sin romper nada, el escudo (de frente para casi todo; por la
+     * espalda no), que la ballesta y el arco disparan, y que al caer el Rey y Ser Gavran se van los que tienen que irse.
+     */
+    private static void guardiaDeValdrenn(net.minecraft.server.MinecraftServer server, ServerLevel lvl, java.io.PrintWriter log, int[] s) {
+        try {
+            CastlePlan plan = com.darkcraft.story.Story.planAt(lvl, s[0], s[1]);
+            com.darkcraft.valdrenn.ValdrennEnemigos.apuntar(plan);
+            String k = com.darkcraft.valdrenn.ValdrennEnemigos.clave(plan);
+            BlockPos.MutableBlockPos mb = new BlockPos.MutableBlockPos();
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> lvl.getBlockState(mb.set(x, y, z));
+            log.println("Valdrenn, puestos de la guardia: " + com.darkcraft.valdrenn.ValdrennEnemigos.comprobar(mundo, plan));
+            com.darkcraft.enemigos.Puestos.todos(server, k, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(lvl, k);
+            var puestos = com.darkcraft.enemigos.Puestos.sitio(k).puestos;
+            int enSuelo = 0, chocan = 0, movidos = 0, fallos = 0;
+            java.util.Map<String, Integer> tipos = new java.util.TreeMap<>();
+            StringBuilder mal = new StringBuilder();
+            for (var e : fuera) {
+                tipos.merge(e.tipo() + (e.postura() == 1 ? " (reza)" : e.postura() == 2 ? " (tumbado)" : ""), 1, Integer::sum);
+                boolean suelo = !lvl.getBlockState(BlockPos.containing(e.getX(), e.getY() - 0.2, e.getZ())).getCollisionShape(lvl, BlockPos.ZERO).isEmpty();
+                if (suelo) enSuelo++;
+                else if (mal.length() < 300) mal.append(' ').append(e.tipo()).append(" en el aire en ").append(e.blockPosition().toShortString()).append(';');
+                if (!lvl.noCollision(e)) {
+                    chocan++;
+                    if (mal.length() < 400) mal.append(' ').append(e.tipo()).append(" metido en un bloque en ").append(e.blockPosition().toShortString()).append(';');
+                }
+                var q = puestos.get(e.puesto());
+                if (Math.abs(e.getX() - (q.x() + 0.5)) > 0.1 || Math.abs(e.getZ() - (q.z() + 0.5)) > 0.1) movidos++;
+            }
+            StringBuilder sinSitio = new StringBuilder();
+            for (int i = 0; i < puestos.size(); i++)
+                if (com.darkcraft.enemigos.Puestos.enemigo(k, i) == null && sinSitio.length() < 400)
+                    sinSitio.append(' ').append(puestos.get(i).grupo()).append(' ').append(puestos.get(i).tipo()).append(" en ")
+                            .append(puestos.get(i).x() - s[0]).append(',').append(puestos.get(i).y()).append(',').append(puestos.get(i).z() - s[1]).append(';');
+            // cada uno hace todas sus acciones (sin presa): que ninguna rompa nada
+            for (var e : fuera) {
+                try {
+                    int postura = e.postura();
+                    e.postura(0);
+                    boolean arq = e instanceof com.darkcraft.enemigos.Arquero;
+                    int acciones = arq ? com.darkcraft.enemigos.ArqueroAnims.TICKS.length : com.darkcraft.enemigos.GuardiaAnims.TICKS.length;
+                    for (int a = 1; a < acciones; a++) {
+                        String nombre = arq ? com.darkcraft.enemigos.ArqueroAnims.NOMBRES[a] : com.darkcraft.enemigos.GuardiaAnims.NOMBRES[a];
+                        if (nombre.equals("morir")) continue;
+                        e.empezar(a);
+                        for (int t = 0; t < 90 && e.accion() == a; t++) e.tick();
+                        if (e.accion() == a) {
+                            fallos++;
+                            if (mal.length() < 600) mal.append(' ').append(e.tipo()).append(": la accion ").append(nombre).append(" no acaba;");
+                        }
+                    }
+                    for (int t = 0; t < 10; t++) e.tick();
+                    e.postura(postura);
+                } catch (Throwable t) {
+                    fallos++;
+                    if (mal.length() < 800) mal.append(' ').append(e.tipo()).append(": ").append(t).append(';');
+                    DarkCraftMod.LOGGER.error("[CI] guardia " + e.tipo(), t);
+                }
+            }
+            log.println("Valdrenn, la guardia fuera: " + fuera.size() + " de " + puestos.size() + " " + tipos + "; en el suelo " + enSuelo + ", metidos en un bloque "
+                    + chocan + " (tiene que ser 0), apartados de su sitio " + movidos + ", acciones que fallan " + fallos + " (tiene que ser 0); sin sitio:" + sinSitio + mal);
+            // el escudo: de frente casi nada; por la espalda, todo. Un muneco que hace de atacante (no se mete en el mundo)
+            var g = DarkCraftMod.GUARDIA.get().create(lvl);
+            var otro = DarkCraftMod.GUARDIA.get().create(lvl);
+            String escudo = "sin guardia";
+            if (g != null && otro != null) {
+                double gx = s[0] + 0.5, gy = CastlePlan.Y0, gz = s[1] + 66.5;
+                g.variante(com.darkcraft.enemigos.Guardia.ESPADA);
+                g.moveTo(gx, gy, gz, 0f, 0f);
+                g.yBodyRot = g.yHeadRot = 0f;
+                lvl.addFreshEntity(g);
+                otro.moveTo(gx, gy, gz + 2, 180f, 0f);
+                float v0 = g.getHealth();
+                g.hurt(lvl.damageSources().mobAttack(otro), 10f);
+                float deFrente = v0 - g.getHealth();
+                int bloquea = g.accion();
+                g.setHealth(g.getMaxHealth());
+                g.invulnerableTime = 0;
+                for (int t = 0; t < 15; t++) g.tick();
+                otro.moveTo(gx, gy, gz - 2, 0f, 0f);
+                v0 = g.getHealth();
+                g.hurt(lvl.damageSources().mobAttack(otro), 10f);
+                float porDetras = v0 - g.getHealth();
+                escudo = String.format(java.util.Locale.ROOT, "de frente quita %.1f (accion %s), por la espalda %.1f", deFrente,
+                        bloquea == com.darkcraft.enemigos.GuardiaAnims.ESPADA_BLOQUEA ? "bloquea" : String.valueOf(bloquea), porDetras);
+                g.discard();
+            }
+            // la ballesta y el arco disparan (a un soporte de armadura a 12 bloques, que hace de presa)
+            int flechas0 = lvl.getEntitiesOfClass(net.minecraft.world.entity.projectile.Arrow.class, new net.minecraft.world.phys.AABB(s[0] - 40, 360, s[1] + 40, s[0] + 40, 420, s[1] + 100)).size();
+            var blanco = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(lvl);
+            var b = DarkCraftMod.GUARDIA.get().create(lvl);
+            var a = DarkCraftMod.ARQUERO.get().create(lvl);
+            String disparos = "sin tiradores";
+            if (blanco != null && b != null && a != null) {
+                blanco.moveTo(s[0] + 0.5, CastlePlan.Y0, s[1] + 82.5, 0f, 0f);
+                lvl.addFreshEntity(blanco);
+                b.variante(com.darkcraft.enemigos.Guardia.BALLESTA);
+                b.moveTo(s[0] - 3.5, CastlePlan.Y0, s[1] + 70.5, 0f, 0f);
+                a.moveTo(s[0] + 3.5, CastlePlan.Y0, s[1] + 70.5, 0f, 0f);
+                lvl.addFreshEntity(b);
+                lvl.addFreshEntity(a);
+                b.setTarget(blanco);
+                a.setTarget(blanco);
+                b.empezar(com.darkcraft.enemigos.GuardiaAnims.BALLESTA_DISPARO);
+                a.empezar(com.darkcraft.enemigos.ArqueroAnims.DISPARO);
+                for (int t = 0; t < 30; t++) {
+                    b.tick();
+                    a.tick();
+                }
+                int flechas = lvl.getEntitiesOfClass(net.minecraft.world.entity.projectile.Arrow.class, new net.minecraft.world.phys.AABB(s[0] - 40, 360, s[1] + 40, s[0] + 40, 420, s[1] + 100)).size() - flechas0;
+                disparos = flechas + " flechas (tiene que ser 2)";
+                for (var f : lvl.getEntitiesOfClass(net.minecraft.world.entity.projectile.Arrow.class, new net.minecraft.world.phys.AABB(s[0] - 40, 360, s[1] + 40, s[0] + 40, 420, s[1] + 100))) f.discard();
+                blanco.discard();
+                b.discard();
+                a.discard();
+            }
+            // al caer el Rey y Ser Gavran se van los suyos
+            com.darkcraft.enemigos.Puestos.todos(server, k, false);
+            var est = com.darkcraft.rey.ReyEstado.get(server);
+            String claveRey = plan.cx + "," + plan.cz;
+            var sala = com.darkcraft.gavran.SalaArbol.de(plan);
+            int rey0 = est.get(claveRey), gav0 = sala == null ? 0 : est.get(sala.key());
+            est.set(claveRey, com.darkcraft.rey.ReyEstado.MUERTO);
+            int sinRey = com.darkcraft.enemigos.Puestos.sacarTodos(lvl, k).size();
+            com.darkcraft.enemigos.Puestos.todos(server, k, false);
+            if (sala != null) est.set(sala.key(), com.darkcraft.rey.ReyEstado.MUERTO);
+            int sinLosDos = com.darkcraft.enemigos.Puestos.sacarTodos(lvl, k).size();
+            est.set(claveRey, rey0);
+            if (sala != null) est.set(sala.key(), gav0);
+            com.darkcraft.enemigos.Puestos.todos(server, k, false);
+            log.println("Valdrenn, la guardia: escudo " + escudo + "; disparan " + disparos + "; con el Rey vencido salen " + sinRey + " de " + puestos.size()
+                    + ", con el Rey y Ser Gavran " + sinLosDos + " | " + com.darkcraft.valdrenn.ValdrennEnemigos.estado(server, k));
+        } catch (Throwable t) {
+            log.println("Valdrenn, la guardia: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] la guardia de Valdrenn", t);
+        }
+    }
+
     private static void barcoQueVaYViene(net.minecraft.server.MinecraftServer server, ServerLevel lvl, java.io.PrintWriter log) {
         final int BV = com.darkcraft.pueblo.Amarres.BRUMAVELA, VD = com.darkcraft.pueblo.Amarres.VALDRENN;
         var d = com.darkcraft.pueblo.Pueblo.Datos.get(server);

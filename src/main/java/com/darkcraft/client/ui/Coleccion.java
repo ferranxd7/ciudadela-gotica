@@ -27,7 +27,7 @@ public final class Coleccion {
     public static final String[] COLECCION = {"mapa_valdrenn", "libro1", "libro2", "espada_diestra", "espada_siniestra", "libro3", "libro4",
             "llave_arbol", "mandoble_juramento", "llave_hueso", "libro5", "alabarda", "libro_acertijo", "amuleto_hueso", "libro6"};
     public static final String[] BESTIARIO = {"hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon", "capitan",
-            "escudero", "caballero_espada", "caballero_alabarda", "caballero_ballesta", "rey", "gavran"};
+            "escudero", "caballero_espada", "caballero_alabarda", "caballero_ballesta", "arquero", "rey", "gavran"};
 
     /** El objeto de una clave de la coleccion (los libros de la cronica, con su texto). */
     public static ItemStack objeto(String clave) {
@@ -86,15 +86,13 @@ public final class Coleccion {
                 case "rey" -> DarkCraftMod.REY.get().create(lvl);
                 case "gavran" -> DarkCraftMod.GAVRAN.get().create(lvl);
                 case "caballero_espada", "caballero_alabarda", "caballero_ballesta" -> {
-                    var k = c.equals("caballero_espada") ? DarkCraftMod.CABALLERO_ESPADA.get().create(lvl)
-                            : c.equals("caballero_alabarda") ? DarkCraftMod.CABALLERO_ALABARDA.get().create(lvl) : DarkCraftMod.CABALLERO_BALLESTA.get().create(lvl);
-                    if (k != null) {
-                        k.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(c.equals("caballero_espada") ? Items.IRON_SWORD
-                                : c.equals("caballero_alabarda") ? DarkCraftMod.ALABARDA.get() : Items.CROSSBOW));
-                        if (c.equals("caballero_espada")) k.setItemSlot(EquipmentSlot.OFFHAND, com.darkcraft.caballeros.Caballeros.escudo());
-                    }
+                    // (desde la parte 4a, la guardia de Valdrenn con su modelo propio)
+                    var k = DarkCraftMod.GUARDIA.get().create(lvl);
+                    if (k != null) k.variante(c.equals("caballero_espada") ? com.darkcraft.enemigos.Guardia.ESPADA
+                            : c.equals("caballero_alabarda") ? com.darkcraft.enemigos.Guardia.ALABARDA : com.darkcraft.enemigos.Guardia.BALLESTA);
                     yield k;
                 }
+                case "arquero" -> DarkCraftMod.ARQUERO.get().create(lvl);
                 default -> {
                     var s = EntityType.SKELETON.create(lvl);
                     if (s != null) {

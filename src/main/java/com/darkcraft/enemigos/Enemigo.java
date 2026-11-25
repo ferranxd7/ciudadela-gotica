@@ -139,6 +139,35 @@ public abstract class Enemigo extends Monster {
         return 2.6;
     }
 
+    /**
+     * Hacia donde soltar una flecha (unitario) para que, saliendo a esa velocidad, caiga en un blanco que esta a h bloques
+     * en horizontal (hacia dir, unitario y sin y) y dy por encima: el tiro bajo, con la caida y el frenado de las flechas
+     * del juego (cada tick: avanza, se frena un 1% y cae 0,05). Si no llega, el tiro mas largo que hay.
+     */
+    public static Vec3 tiro(double h, double dy, Vec3 dir, double v) {
+        double lo = -1.45, hi = 0.72;
+        for (int it = 0; it < 28; it++) {
+            double mid = (lo + hi) * 0.5;
+            if (alturaA(mid, h, v) < dy) lo = mid;
+            else hi = mid;
+        }
+        double a = (lo + hi) * 0.5;
+        return new Vec3(dir.x * Math.cos(a), Math.sin(a), dir.z * Math.cos(a));
+    }
+
+    /** A que altura pasa la flecha lanzada con ese angulo al recorrer h en horizontal (muy abajo si no llega). */
+    private static double alturaA(double a, double h, double v) {
+        double vx = Math.cos(a) * v, vy = Math.sin(a) * v, x = 0, y = 0;
+        for (int t = 0; t < 160 && vx > 1e-3; t++) {
+            if (x + vx >= h) return y + vy * (h - x) / vx;
+            x += vx;
+            y += vy;
+            vx *= 0.99;
+            vy = vy * 0.99 - 0.05;
+        }
+        return -1e9;
+    }
+
     /** Lo deprisa que persigue (por lo que anda). */
     protected double prisa() {
         return 1.0;
@@ -592,6 +621,8 @@ public abstract class Enemigo extends Monster {
 
     @Override
     public boolean hurt(DamageSource s, float cuanto) {
+        // las flechas de los arqueros y ballesteros no hacen nada a los suyos (en la puerta disparan por encima de la pelea)
+        if (s.getEntity() instanceof Enemigo && s.getDirectEntity() instanceof net.minecraft.world.entity.projectile.Projectile) return false;
         boolean ok = super.hurt(s, cuanto);
         // el que recibe un golpe avisa a los que tiene al lado (no a toda la calle)
         if (ok && !level().isClientSide && s.getEntity() instanceof LivingEntity quien && isAlive() && objetivoValido(quien)) {

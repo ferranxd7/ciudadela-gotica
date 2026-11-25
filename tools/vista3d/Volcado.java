@@ -151,6 +151,24 @@ public class Volcado {
                 }
                 marcas.putAll(p.sitios());
             }
+            case "valdrenn" -> {
+                // un Reino de Valdrenn entero con la semilla que se pida (VALDRENN_SEMILLA, por defecto 1234) en (0, 0)
+                long semilla = Long.parseLong(System.getProperty("semilla", "1234"));
+                com.darkcraft.gen.CastlePlan p = com.darkcraft.gen.CastlePlan.create(semilla, 0, 0, (x, z) -> com.darkcraft.world.NubesGenerador.SUELO);
+                java.util.Set<Long> hechos = new java.util.HashSet<>();
+                for (com.darkcraft.gen.Element e : p.elements())
+                    for (int cx = e.x0 >> 4; cx <= e.x1 >> 4; cx++)
+                        for (int cz = e.z0 >> 4; cz <= e.z1 >> 4; cz++)
+                            if (p.touches(cx, cz) && hechos.add(((long) cx << 32) ^ (cz & 0xFFFFFFFFL))) p.buildChunk(lvl, cx, cz, RandomSource.create(cx * 31L + cz));
+                System.out.println("valdrenn: " + p.elementCount() + " piezas, " + hechos.size() + " chunks");
+                // los puestos de la guardia (parte 4): que se pisan y donde queda cada uno
+                BlockState aire = Blocks.AIR.defaultBlockState();
+                com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+                System.out.println("puestos de Valdrenn: " + com.darkcraft.valdrenn.ValdrennEnemigos.comprobar(mundo, p));
+                int k = 0;
+                for (var q : com.darkcraft.valdrenn.ValdrennEnemigos.locales(com.darkcraft.valdrenn.ValdrennEnemigos.sur(p)))
+                    marcas.put((q.tipo().equals("arquero") ? "A" : "GAB".substring(q.variante(), q.variante() + 1)) + (k++), new int[]{q.lx(), q.y(), q.lz()});
+            }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);

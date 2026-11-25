@@ -142,6 +142,11 @@ SFX = {
     # bucle), el golpe sordo al atracar, la campana del muelle y las tablas que vuelven a su sitio al repararlo
     "barco_eleva": (13.5, 3.0, -15), "barco_velas": (6.0, 0.8, -15), "barco_vuelo": (25.0, 3.5, -22),
     "barco_atraca": (6.0, 1.8, -13), "barco_campana": (5.5, 2.0, -14), "barco_repara": (11.2, 1.6, -15),
+    # la guardia de Valdrenn y el arquero esqueleto (parte 4a)
+    "guardia_alerta": (1.3, 0.3, -15),
+    "arco_tensar": (1.0, 0.15, -20), "arco_suelta": (0.7, 0.2, -15),
+    "arquero_alerta": (1.1, 0.3, -16), "arquero_huesos": (1.8, 0.4, -22), "arquero_dolor": (0.6, 0.2, -16),
+    "arquero_muerte": (2.0, 0.5, -16),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -233,6 +238,10 @@ TOMAS_SFX = {
     # martilleo seguido
     "barco_eleva": (3,), "barco_velas": (1,), "barco_vuelo": (4,), "barco_atraca": (4,), "barco_campana": (1, 4),
     "barco_repara": (3,),
+    # la guardia y el arquero: el grunido mas grave y el que crece; los crujidos del arco mas llenos; las cuerdas con
+    # golpe seco al principio; los huesos mas llenos; los golpes mas secos y las muertes mas largas
+    "guardia_alerta": (2, 1), "arco_tensar": (2, 1), "arco_suelta": (1, 2), "arquero_alerta": (2, 4),
+    "arquero_huesos": (4, 3, 1), "arquero_dolor": (1, 3, 4), "arquero_muerte": (1, 3, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

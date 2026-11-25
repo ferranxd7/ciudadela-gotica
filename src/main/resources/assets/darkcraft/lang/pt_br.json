@@ -1339,5 +1339,16 @@
   "subtitles.darkcraft.sfx.barco_atraca": "The ship docks",
   "subtitles.darkcraft.sfx.barco_campana": "The quay bell",
   "subtitles.darkcraft.sfx.barco_repara": "Planks knock back into place",
-  "darkcraft.ayuda.b_barco": "set sail from the helm (with \"primero\", the first-voyage cinematic) / call the ship / go to Valdrenn Quay / put the ship at a quay"
+  "darkcraft.ayuda.b_barco": "set sail from the helm (with \"primero\", the first-voyage cinematic) / call the ship / go to Valdrenn Quay / put the ship at a quay",
+  "entity.darkcraft.guardia": "Valdrenn Guard",
+  "entity.darkcraft.arquero": "Skeleton Archer",
+  "darkcraft.bestiario.arquero.desc": "The King's archers still stand on the walls and the tower tops. They draw slowly: when the string reaches the chin, step aside or roll. Up close, on their wall, they cannot last.",
+  "subtitles.darkcraft.sfx.guardia_alerta": "A knight spots you",
+  "subtitles.darkcraft.sfx.arco_tensar": "A bow is drawn",
+  "subtitles.darkcraft.sfx.arco_suelta": "An arrow flies",
+  "subtitles.darkcraft.sfx.arquero_alerta": "A skeleton archer spots you",
+  "subtitles.darkcraft.sfx.arquero_huesos": "Bones rattle",
+  "subtitles.darkcraft.sfx.arquero_dolor": "A bone cracks",
+  "subtitles.darkcraft.sfx.arquero_muerte": "A skeleton collapses",
+  "darkcraft.ayuda.v_enemigos": "the enemies of this kingdom: how many are left, spawn them or mark them as fallen"
 }

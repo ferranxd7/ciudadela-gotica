@@ -98,8 +98,9 @@ public final class Caballeros {
         ServerLevel lvl = p.serverLevel();
         if (lvl.getDifficulty() == Difficulty.PEACEFUL || !lvl.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING)) return;
         if (com.darkcraft.cine.Cinematics.active(p) || com.darkcraft.rey.ReyEventos.luchaDe(p) != null) return;
-        if (!enZona(p) || p.getRandom().nextFloat() > 0.7f) return;
-        int cerca = lvl.getEntitiesOfClass(CaballeroZombi.class, new AABB(p.blockPosition()).inflate(48)).size();
+        // (en Valdrenn ya no salen al azar: la guardia esta en sus puestos, parte 4a; quedan las otras zonas)
+        if (!enZona(p) || enValdrenn(lvl, p.getX(), p.getY(), p.getZ()) || p.getRandom().nextFloat() > 0.7f) return;
+        int cerca = lvl.getEntitiesOfClass(com.darkcraft.enemigos.Guardia.class, new AABB(p.blockPosition()).inflate(48), g -> g.puesto() < 0).size();
         if (cerca >= TOPE) return;
         grupo(lvl, p, Math.min(TOPE - cerca, 2 + p.getRandom().nextInt(3)));
     }
@@ -115,16 +116,19 @@ public final class Caballeros {
             for (int i = 0; i < n * 3 && hechos < n; i++) {
                 BlockPos q = suelo(lvl, c.getX() + r.nextInt(7) - 3, c.getY(), c.getZ() + r.nextInt(7) - 3);
                 if (q == null) continue;
-                EntityType<? extends CaballeroZombi> t = switch (r.nextInt(5)) {
-                    case 0, 1 -> DarkCraftMod.CABALLERO_ESPADA.get();
-                    case 2, 3 -> DarkCraftMod.CABALLERO_ALABARDA.get();
-                    default -> DarkCraftMod.CABALLERO_BALLESTA.get();
-                };
-                CaballeroZombi z = t.create(lvl);
+                // (desde la parte 4a, la guardia nueva: espada y escudo, alabarda o ballesta)
+                com.darkcraft.enemigos.Guardia z = DarkCraftMod.GUARDIA.get().create(lvl);
                 if (z == null) continue;
+                z.variante(switch (r.nextInt(5)) {
+                    case 0, 1 -> com.darkcraft.enemigos.Guardia.ESPADA;
+                    case 2, 3 -> com.darkcraft.enemigos.Guardia.ALABARDA;
+                    default -> com.darkcraft.enemigos.Guardia.BALLESTA;
+                });
                 z.moveTo(q.getX() + 0.5, q.getY(), q.getZ() + 0.5, r.nextFloat() * 360f, 0);
                 if (!lvl.noCollision(z)) continue;
-                z.finalizeSpawn(lvl, lvl.getCurrentDifficultyAt(q), MobSpawnType.EVENT, null, null);
+                int cuantos = 0;
+                for (ServerPlayer o : lvl.players()) if (!o.isSpectator() && o.distanceToSqr(z) < 96 * 96) cuantos++;
+                z.paraGrupo(cuantos);
                 lvl.addFreshEntity(z);
                 hechos++;
             }
@@ -159,9 +163,12 @@ public final class Caballeros {
 
     @SubscribeEvent
     public static void onMuerte(LivingDeathEvent e) {
-        if (!(e.getEntity() instanceof CaballeroZombi c) || c.level().isClientSide()) return;
-        if (!(e.getSource().getEntity() instanceof ServerPlayer p)) return;
-        com.darkcraft.espejo.Espejo.bestia(p, c.tipo());
+        if (e.getEntity().level().isClientSide()) return;
+        String tipo = e.getEntity() instanceof CaballeroZombi c ? c.tipo() : e.getEntity() instanceof com.darkcraft.enemigos.Guardia g ? g.tipo() : null;
+        if (tipo == null) return;
+        ServerPlayer p = e.getSource().getEntity() instanceof ServerPlayer q ? q : e.getEntity().getKillCredit() instanceof ServerPlayer q2 ? q2 : null;
+        if (p == null) return;
+        com.darkcraft.espejo.Espejo.bestia(p, tipo);
         Logros.dar(p, "caballero");
         CompoundTag d = datos(p);
         int n = d.getInt("caballeros") + 1;

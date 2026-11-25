@@ -187,6 +187,14 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_HUECO_ALERTA = sound("sfx.hueco_alerta");
     public static final RegistryObject<SoundEvent> SFX_HUECO_DOLOR = sound("sfx.hueco_dolor");
     public static final RegistryObject<SoundEvent> SFX_HUECO_MUERTE = sound("sfx.hueco_muerte");
+    // ---- la guardia de Valdrenn y el arquero esqueleto (parte 4a)
+    public static final RegistryObject<SoundEvent> SFX_GUARDIA_ALERTA = sound("sfx.guardia_alerta");
+    public static final RegistryObject<SoundEvent> SFX_ARCO_TENSAR = sound("sfx.arco_tensar");
+    public static final RegistryObject<SoundEvent> SFX_ARCO_SUELTA = sound("sfx.arco_suelta");
+    public static final RegistryObject<SoundEvent> SFX_ARQUERO_ALERTA = sound("sfx.arquero_alerta");
+    public static final RegistryObject<SoundEvent> SFX_ARQUERO_HUESOS = sound("sfx.arquero_huesos");
+    public static final RegistryObject<SoundEvent> SFX_ARQUERO_DOLOR = sound("sfx.arquero_dolor");
+    public static final RegistryObject<SoundEvent> SFX_ARQUERO_MUERTE = sound("sfx.arquero_muerte");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_GORGOTEO = sound("sfx.ahogado_gorgoteo");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_ALERTA = sound("sfx.ahogado_alerta");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_DOLOR = sound("sfx.ahogado_dolor");
@@ -350,6 +358,13 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Capitan>> CAPITAN = ENTITIES.register("capitan",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Capitan>of(com.darkcraft.enemigos.Capitan::new, MobCategory.MONSTER)
                     .sized(0.85f, 2.35f).fireImmune().clientTrackingRange(10).build(MODID + ":capitan"));
+    // ---- la guardia de Valdrenn (parte 4a)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Guardia>> GUARDIA = ENTITIES.register("guardia",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Guardia>of(com.darkcraft.enemigos.Guardia::new, MobCategory.MONSTER)
+                    .sized(0.65f, 2.05f).clientTrackingRange(8).build(MODID + ":guardia"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Arquero>> ARQUERO = ENTITIES.register("arquero",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Arquero>of(com.darkcraft.enemigos.Arquero::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.95f).clientTrackingRange(10).build(MODID + ":arquero"));
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Arpon>> ARPON = ENTITIES.register("arpon",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Arpon>of(com.darkcraft.enemigos.Arpon::new, MobCategory.MISC)
                     .sized(0.5f, 0.5f).clientTrackingRange(4).updateInterval(20).build(MODID + ":arpon"));
@@ -446,6 +461,7 @@ public class DarkCraftMod {
         com.darkcraft.world.Valdrenn.registrar(modBus);
         com.darkcraft.world.MundoNubes.registrar(modBus);
         com.darkcraft.pueblo.PuebloEnemigos.registrar();
+        com.darkcraft.valdrenn.ValdrennEnemigos.registrar();
         com.darkcraft.fortaleza.Localizar.registrar(modBus);
         modBus.addListener(this::attributes);
         modBus.addListener(this::setup);
@@ -473,6 +489,8 @@ public class DarkCraftMod {
         e.put(HUECO.get(), com.darkcraft.enemigos.Hueco.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
+        e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());
+        e.put(ARQUERO.get(), com.darkcraft.enemigos.Arquero.atributos().build());
         e.put(GUIA.get(), com.darkcraft.personajes.Guia.atributos().build());
         e.put(HERRERO.get(), com.darkcraft.personajes.Herrero.atributos().build());
         e.put(MERCADER.get(), com.darkcraft.personajes.Mercader.atributos().build());

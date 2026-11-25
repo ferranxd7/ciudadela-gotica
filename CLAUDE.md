@@ -825,6 +825,57 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   diamantes, se llega a pie a todo, ni la camara ni el casco dan en nada); cliente, tramo `barco()` (capturas
   `cliente_ba01..10` la reparacion, `vj01..19` el primer viaje y el muelle, `vn01..08` la vuelta, `vl01..06` la llamada).
 
+### Plan grande, parte 4a: la guardia de Valdrenn (caballeros y arqueros en sus puestos)
+
+Respuestas 10-20 de `PLAN.md` ("Valdrenn dificil"), primera tanda. **4b**: perros de hueso, espectros de la corte,
+capitanes de elite, emboscadas, el interior del castillo y la torre del arbol. **4c**: los dos guardianes (mini-jefes
+con barra y logro) antes del Rey y de Ser Gavran.
+- **`enemigos/Guardia`** (los caballeros de antes rehechos como `Enemigo`, modelo de `tools/enemigos/guardia.py`): tres
+  variantes, `ESPADA` 0 (espada y escudo, tabardo rojo), `ALABARDA` 1 (morado) y `BALLESTA` 2 (verde). 40 de vida,
+  golpe 5,5, armadura 8. Acciones (`GuardiaAnims`): espada_tajo / combo / escudazo / **bloquea**, alabarda_pica /
+  hachazo / barrido, ballesta_disparo / culatazo, aturdido, morir, levantarse, alzarse. **El de espada se cubre**: de pie,
+  sin atacar y con el golpe de frente (`cubre`), las flechas no le hacen nada y los golpes x0,2 (suena el escudo y hace
+  `ESPADA_BLOQUEA`); por la espalda o mientras ataca, todo. El de ballesta se queda a ~9 bloques y dispara (recarga 1,7-3 s).
+- **`enemigos/Arquero`** (esqueleto, `tools/enemigos/arquero.py`): 22 de vida, **alcance de vista 64** (en lo alto de las
+  murallas los jugadores quedan a 40-60 bloques), dispara a menos de 52 en horizontal y hasta 56 de desnivel, no persigue
+  a nadie (solo patada o golpe con el arco a quien llega a su lado). **Las flechas se apuntan con la caida en cuenta**
+  (`Enemigo.tiro`: el tiro bajo que con la fisica de las flechas del juego —avanza, frena un 1%, cae 0,05 por tick— cae
+  en el blanco; lo usan arco y ballesta): con la formula de los esqueletos del juego, desde una muralla, caian cortas.
+  Disparan `enemigos/Flecha` (una flecha del juego que **pasa entre los suyos**: desde lo alto de la puerta tiran por
+  encima de la pelea; ademas `Enemigo.hurt` no deja que un proyectil de un enemigo dane a otro).
+- **`valdrenn/ValdrennEnemigos`: 62 puestos en coordenadas del reino** (`locales(sur)`; `sur` = donde acaba el puente de la
+  Torre de Ascenso): el puente (2), el camino y la puerta exterior (3 alabardas), arqueros en las **almenas** de la muralla
+  exterior (x ±36 y ±60) y en las de **lo alto de la puerta** (x ±10, y 413: `puerta_en_alto`, sin camino a proposito: ven
+  el camino desde 12 bloques de la puerta hasta el puente y hay que pasar corriendo), el camino mayor, el cuartel y el
+  patio de armas (entrenando de dos en dos), la puerta interior (2 alabardas y 2 arqueros en las almenas de su tejado, que
+  ven todo el camino mayor), las almenas de la muralla interior, el patio de la fuente y la puerta del torreon, cuatro de
+  ronda, once en los cruces del pueblo, el cementerio (velando de rodillas y tirados entre los muertos) y los edificios del
+  este y del norte. **Los arqueros se ponen EN el hueco de la almena (de pie sobre el antepecho), nunca en el adarve**:
+  desde el adarve el muro les tapa todo lo de abajo. Los huecos caen en las x con `x % 4` 3 o 0 en las dos murallas y en
+  las dos puertas; un arquero en una almena solo ve lo que tiene mas o menos delante (los merlones tapan los lados).
+  Puestos con `quita` 1 / 2 (grupo `~rey` / `~gavran`): dejan de salir con el Rey / Ser Gavran vencidos (el reino mas
+  tranquilo). Se apuntan solos cuando alguien pasa a menos de `FOOTPRINT + 160` del centro (`onServidor`).
+- **`enemigos/Puestos`** (lo de 3c, ahora para mas sitios): `registrar(clave, puestos, aqui, activo)` (activo: si ese puesto
+  sale ahora), `apuntado`, `olvidar`, `claves`, `marcar`, `todos`, `sacarTodos`; si el sitio del puesto esta ocupado busca al
+  lado (a 1-3 bloques). Un caido no vuelve hasta que alguien descansa en un santuario o muere (`reaparecer`).
+- **Ya no salen caballeros al azar en Valdrenn** (`caballeros/Caballeros`); fuera (la Fortaleza de Hueso...) los que salen
+  son `Guardia`. El logro de los huecos solo cuenta huecos y ahogados.
+- `gen/Canvas.nivel()` / `crear(tipo)`: en un `Canvas` sin mundo (`tools/vista3d` y el plano de `Garza`) los soportes de
+  armadura y los cuadros no se ponen (antes saltaba `getLevel()` y se cortaba el edificio a medias).
+- Comandos: `/darkcraft valdrenn enemigos [volver | fuera | sacar | ir <grupo>]`.
+- Sonido (ElevenLabs, `TOMAS_SFX`): `guardia_alerta`, `arco_tensar`, `arco_suelta`, `arquero_alerta`, `arquero_huesos`,
+  `arquero_dolor`, `arquero_muerte`; los caballeros siguen con los de antes (`zombi_caballero_*`, `armadura_paso`,
+  `escudo_golpe`).
+- Sin abrir el juego: `tools/vista3d/Volcado.java valdrenn` levanta el reino entero (marcas de los puestos: G espada, A
+  alabarda o arquero, B ballesta) y escribe `ValdrennEnemigos.comprobar`: cada puesto se pisa y se llega andando desde el
+  puente (salvo los `_en_alto`) y lo que ve cada arquero del camino a tiro.
+- Pruebas: servidor, `guardiaDeValdrenn` (lineas `Valdrenn, puestos de la guardia`, `Valdrenn, la guardia fuera` —todos en el
+  suelo, ninguno metido en un bloque, todas las acciones acaban— y `Valdrenn, la guardia: escudo ...; disparan 2 flechas;
+  con el Rey vencido salen ...`); cliente, tramo `guardia()` (capturas `cliente_va01..17`: la entrada, la puerta, el arquero
+  de la almena, la fila delante de la fuente y sus golpes, uno que cae, el cementerio y en supervivencia ante la puerta;
+  con vision nocturna: en Valdrenn siempre es de noche). Al acabar el tramo los puestos de ese reino quedan por caidos (las
+  pruebas de despues son de antes de la guardia).
+
 ### Lo siguiente: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 
 Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publicada):
@@ -832,7 +883,8 @@ Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publica
 - **3b, la isla del pueblo abandonado**: hecha (arriba).
 - **3c, enemigos**: hecha (arriba).
 - **3d-1, la cinematica de inicio**: hecha (arriba).
-- **3d-2, el barco**: hecha (arriba). Con esto la parte 3 esta entera; lo siguiente es la **parte 4** de `PLAN.md`.
+- **3d-2, el barco**: hecha (arriba). Con esto la parte 3 esta entera; lo siguiente es la **parte 4** de `PLAN.md`
+  (Valdrenn dificil: 4a la guardia, hecha arriba; 4b y 4c, por hacer).
 
 ## Compilar, probar y publicar
 

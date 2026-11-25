@@ -365,7 +365,7 @@ public final class Decor {
     private void armorStand(int x, int z, Direction look, boolean dark) {
         if (!free(x, z) || !c.inXZ(x, z)) return;
         use(x, z);
-        ArmorStand st = EntityType.ARMOR_STAND.create(c.level.getLevel());
+        ArmorStand st = c.crear(EntityType.ARMOR_STAND);
         if (st == null) return;
         st.moveTo(x + 0.5, F, z + 0.5, look.toYRot(), 0);
         if (dark) {
@@ -1488,7 +1488,8 @@ public final class Decor {
                     int i1 = (pw - 1) / -2, j1 = (ph - 1) / -2;
                     Direction ccw = w.in.getCounterClockWise();
                     int bx = w.x - ccw.getStepX() * i1, by = y0 - j1, bz = w.z - ccw.getStepZ() * i1;
-                    c.addEntity(new net.minecraft.world.entity.decoration.Painting(c.level.getLevel(),
+                    var lv = c.nivel();
+                    if (lv != null) c.addEntity(new net.minecraft.world.entity.decoration.Painting(lv,
                             new net.minecraft.core.BlockPos(bx, by, bz), w.in, holder.get()));
                     lastPlaced = idx;
                     step++;

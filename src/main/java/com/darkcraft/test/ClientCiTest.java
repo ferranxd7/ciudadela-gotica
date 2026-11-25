@@ -3377,6 +3377,246 @@ public final class ClientCiTest {
                 + " | " + com.darkcraft.pueblo.Pueblo.enemigos(sp.server)));
     }
 
+    // ------------------------------------------------------------------ parte 4a: la guardia de Valdrenn
+
+    private static int[] reino;
+    private static String reinoK;
+    private static final java.util.List<com.darkcraft.enemigos.Enemigo> FILA = new java.util.ArrayList<>();
+    private static boolean calladosAntes;
+
+    /** En Valdrenn siempre es de noche y hay tormenta: para que en las capturas se vea a la guardia, vision nocturna. */
+    private static void verDeNoche(ServerPlayer sp) {
+        sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 120, 0, false, false, false));
+    }
+
+    private static com.darkcraft.enemigos.Enemigo fila(int i) {
+        return i < FILA.size() ? FILA.get(i) : null;
+    }
+
+    private static String estadoGuardia(ServerPlayer sp) {
+        var s = com.darkcraft.enemigos.Puestos.sitio(reinoK);
+        if (s == null) return "sin apuntar";
+        int fuera = 0, conPresa = 0, arqueros = 0, arquerosConPresa = 0;
+        for (int i = 0; i < s.puestos.size(); i++) {
+            var e = com.darkcraft.enemigos.Puestos.enemigo(reinoK, i);
+            if (e == null) continue;
+            fuera++;
+            boolean presa = e.getTarget() != null;
+            if (presa) conPresa++;
+            if (e instanceof com.darkcraft.enemigos.Arquero) {
+                arqueros++;
+                if (presa) arquerosConPresa++;
+            }
+        }
+        int flechas = sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.projectile.Arrow.class, sp.getBoundingBox().inflate(48)).size();
+        return "fuera " + fuera + " (con presa " + conPresa + "), arqueros " + arqueros + " (con presa " + arquerosConPresa + "), flechas cerca " + flechas
+                + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth()) + " | " + com.darkcraft.valdrenn.ValdrennEnemigos.estado(sp.server, reinoK);
+    }
+
+    /** Cada arquero que hay fuera a menos de 80 bloques: donde (respecto al reino), si tiene presa, si ve al jugador y que hace. */
+    private static String arqueros(ServerPlayer sp) {
+        var s = com.darkcraft.enemigos.Puestos.sitio(reinoK);
+        if (s == null) return "";
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < s.puestos.size(); i++) {
+            var e = com.darkcraft.enemigos.Puestos.enemigo(reinoK, i);
+            if (!(e instanceof com.darkcraft.enemigos.Arquero) || e.distanceTo(sp) > 80) continue;
+            b.append(String.format(java.util.Locale.ROOT, " [%s en %.0f,%.0f,%.0f a %.0f: presa %s, ve %s, accion %d]", s.puestos.get(i).grupo(), e.getX() - reino[0], e.getY(),
+                    e.getZ() - reino[1], e.distanceTo(sp), e.getTarget() == sp ? "el jugador" : e.getTarget() == null ? "ninguna" : "otra", e.hasLineOfSight(sp) ? "si" : "no", e.accion()));
+        }
+        return b.toString();
+    }
+
+    /**
+     * La guardia de Valdrenn: la entrada desde el puente (los dos del final, las alabardas de la puerta, los arqueros de lo
+     * alto de la puerta), un arquero en su almena, los tres caballeros y el arquero en fila haciendo sus golpes, el escudo,
+     * uno que cae, el cementerio y, en supervivencia ante la puerta, que los arqueros disparan y los de la puerta vienen.
+     */
+    private static int guardia(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Guardia de Valdrenn: al final del puente de la Torre de Ascenso, mirando a la puerta (con vision nocturna)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            calladosAntes = com.darkcraft.client.ui.Carteles.callados;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                sp.setGameMode(GameType.CREATIVE);
+                verDeNoche(sp);
+                reino = CastleSites.nearest(lvl.getSeed(), 0, 0, 3);
+                CastlePlan plan = com.darkcraft.story.Story.planAt(lvl, reino[0], reino[1]);
+                com.darkcraft.valdrenn.ValdrennEnemigos.apuntar(plan);
+                reinoK = com.darkcraft.valdrenn.ValdrennEnemigos.clave(plan);
+                com.darkcraft.enemigos.Puestos.todos(sp.server, reinoK, false);
+                int sur = com.darkcraft.valdrenn.ValdrennEnemigos.sur(plan);
+                irMirando(sp, reino[0] + 0.5, CastlePlan.Y0, reino[1] + sur + 3.5, reino[0] + 0.5, CastlePlan.Y0 + 9, reino[1] + 222, false);
+                log("  guardia: reino en " + reino[0] + "," + reino[1] + ", el puente acaba en " + sur + "; puestos " + com.darkcraft.enemigos.Puestos.sitio(reinoK).puestos.size());
+            });
+        });
+        atTicks(t + 240, "captura: la entrada", m -> {
+            server(m, sp -> log("  guardia, la entrada: " + estadoGuardia(sp)));
+            shot(m, "cliente_va01_entrada");
+        });
+        atTicks(t + 242, "Guardia: ante la puerta exterior", m -> server(m, sp ->
+                irMirando(sp, reino[0] + 7.5, CastlePlan.Y0, reino[1] + 243.5, reino[0] + 0.5, CastlePlan.Y0 + 14, reino[1] + 218, false)));
+        atTicks(t + 300, "captura: la puerta exterior, las alabardas y los arqueros de lo alto", m -> {
+            server(m, sp -> log("  guardia, la puerta: " + estadoGuardia(sp) + arqueros(sp)));
+            shot(m, "cliente_va02_puerta");
+        });
+        // un arquero en su almena, en lo alto de la puerta (volando delante de el)
+        atTicks(t + 302, "Guardia: un arquero en lo alto de la puerta, de cerca", m -> server(m, sp ->
+                irMirando(sp, reino[0] + 6.5, CastlePlan.Y0 + 33.2, reino[1] + 235.5, reino[0] + 10.5, CastlePlan.Y0 + 34.4, reino[1] + 228.5, true)));
+        atTicks(t + 350, "captura: el arquero en su almena", m -> {
+            server(m, sp -> log("  guardia, el arquero de la puerta:" + arqueros(sp)));
+            shot(m, "cliente_va03_arquero_almena");
+        });
+        // ---- en fila delante de la fuente (mirando al norte): espada, alabarda, ballesta y el arquero
+        atTicks(t + 352, "Guardia: al patio de la fuente (se espera a que esten sus chunks)", m -> server(m, sp -> {
+            // el del patio que ronda donde se pone la camara, fuera mientras tanto
+            var s = com.darkcraft.enemigos.Puestos.sitio(reinoK);
+            for (int i = 0; i < s.puestos.size(); i++) {
+                var q = s.puestos.get(i);
+                if (Math.abs(q.x() - reino[0]) <= 8 && Math.abs(q.z() - (reino[1] + 58)) <= 8) com.darkcraft.enemigos.Puestos.marcar(sp.server, reinoK, i, true);
+            }
+            irMirando(sp, reino[0] + 0.5, CastlePlan.Y0, reino[1] + 59.5, reino[0] + 0.5, CastlePlan.Y0 + 1.1, reino[1] + 66.5, false);
+        }));
+        atTicks(t + 472, "Guardia: los tres caballeros y el arquero, en fila delante de la fuente", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            for (var e : FILA) if (e != null && !e.isRemoved()) e.discard();
+            FILA.clear();
+            double x0 = reino[0] - 3.55, z = reino[1] + 66.5;
+            for (int i = 0; i < 4; i++) {
+                com.darkcraft.enemigos.Enemigo e = i < 3 ? DarkCraftMod.GUARDIA.get().create(lvl) : DarkCraftMod.ARQUERO.get().create(lvl);
+                if (e == null) continue;
+                if (i < 3) e.variante(i);
+                e.moveTo(x0 + i * 2.7, CastlePlan.Y0, z, 180f, 0f);
+                e.yBodyRot = e.yHeadRot = 180f;
+                lvl.addFreshEntity(e);
+                FILA.add(e);
+            }
+            irMirando(sp, reino[0] + 0.5, CastlePlan.Y0, reino[1] + 59.5, reino[0] + 0.5, CastlePlan.Y0 + 1.1, reino[1] + 66.5, false);
+        }));
+        atTicks(t + 504, "captura: la fila", m -> {
+            server(m, sp -> {
+                StringBuilder b = new StringBuilder();
+                for (var e : FILA) b.append(" | ").append(estadoE(e));
+                log("  guardia, la fila:" + b);
+            });
+            shot(m, "cliente_va04_fila");
+        });
+        // los golpes, cada uno de cerca (la camara, a dx,dz del que golpea; todos miran al norte, -z)
+        int G = t + 506;
+        Object[][] golpes = {
+                {0, com.darkcraft.enemigos.GuardiaAnims.ESPADA_TAJO, 3.2, -3.0, 12, "cliente_va05_espada_alza", 17, "cliente_va06_espada_tajo"},
+                {0, com.darkcraft.enemigos.GuardiaAnims.ESPADA_BLOQUEA, -2.8, -3.2, 5, "cliente_va07_escudo", -1, null},
+                {1, com.darkcraft.enemigos.GuardiaAnims.ALABARDA_HACHAZO, 3.6, -2.8, 20, "cliente_va08_alabarda_alza", 24, "cliente_va09_hachazo"},
+                {2, com.darkcraft.enemigos.GuardiaAnims.BALLESTA_DISPARO, 3.0, -3.0, 16, "cliente_va10_ballesta_apunta", -1, null},
+                {3, com.darkcraft.enemigos.ArqueroAnims.DISPARO, 3.6, -1.4, 19, "cliente_va11_arquero_tensa", -1, null},
+                {3, com.darkcraft.enemigos.ArqueroAnims.PATADA, 2.8, -2.6, 9, "cliente_va12_arquero_patada", -1, null}};
+        for (Object[] gp : golpes) {
+            final int i = (int) gp[0], accion = (int) gp[1], c1 = (int) gp[4], c2 = (int) gp[6];
+            final double cdx = (double) gp[2], cdz = (double) gp[3];
+            final String n1 = (String) gp[5], n2 = (String) gp[7];
+            atTicks(G, "Guardia: " + n1, m -> server(m, sp -> {
+                var e = fila(i);
+                if (e == null) return;
+                e.empezar(accion);
+                verDesdeServidor = new Vec3(e.getX() + cdx, e.getY() + 1.55, e.getZ() + cdz);
+                miraServidor = new Vec3(e.getX(), e.getY() + 1.15, e.getZ());
+            }));
+            atTicks(G + 2, "camara de cerca", m -> {
+                if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+            });
+            atTicks(G + c1, "captura: " + n1, m -> {
+                server(m, sp -> log("  guardia, " + n1 + ": " + estadoE(fila(i))));
+                shot(m, n1);
+            });
+            if (n2 != null) atTicks(G + c2, "captura: " + n2, m -> shot(m, n2));
+            G += Math.max(c1, c2) + 34;
+        }
+        // uno que cae (el de la espada)
+        atTicks(G, "Guardia: el de la espada cae", m -> server(m, sp -> {
+            var e = fila(0);
+            if (e == null) return;
+            verDesdeServidor = new Vec3(e.getX() + 3.4, e.getY() + 1.7, e.getZ() - 3.0);
+            miraServidor = new Vec3(e.getX(), e.getY() + 0.5, e.getZ());
+            e.hurt(sp.serverLevel().damageSources().generic(), 9999f);
+        }));
+        atTicks(G + 2, "camara de cerca", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(G + 20, "captura: cae", m -> shot(m, "cliente_va13_cae"));
+        atTicks(G + 46, "captura: en el suelo", m -> {
+            server(m, sp -> log("  guardia, el que cae: " + estadoE(fila(0))));
+            shot(m, "cliente_va14_caido");
+        });
+        atTicks(G + 48, "de vuelta a los ojos del jugador", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+        });
+        G += 50;
+        // el cementerio: uno que vela de rodillas (volando, un poco por encima de las tumbas)
+        atTicks(G, "Guardia: el cementerio", m -> server(m, sp -> {
+            var s = com.darkcraft.enemigos.Puestos.sitio(reinoK);
+            for (var q : s.puestos)
+                if (q.grupo().startsWith("cementerio") && q.tipo().equals(com.darkcraft.valdrenn.ValdrennEnemigos.GUARDIA) && q.postura() == com.darkcraft.enemigos.Enemigo.REZA) {
+                    double fx = -Math.sin(Math.toRadians(q.giro())), fz = Math.cos(Math.toRadians(q.giro()));
+                    double cx = q.x() + 0.5 + fx * 4.5 + fz * 3.5, cz = q.z() + 0.5 + fz * 4.5 - fx * 3.5;
+                    irMirando(sp, cx, q.y() + 1.3, cz, q.x() + 0.5, q.y() + 0.7, q.z() + 0.5, true);
+                    log("  guardia, el cementerio: mirando al de " + q.x() + "," + q.y() + "," + q.z() + " desde " + String.format(java.util.Locale.ROOT, "%.1f, %.1f", cx, cz));
+                    break;
+                }
+        }));
+        atTicks(G + 200, "captura: velando en el cementerio", m -> {
+            server(m, sp -> log("  guardia, el cementerio: " + estadoGuardia(sp)));
+            shot(m, "cliente_va15_cementerio");
+        });
+        G += 202;
+        // en supervivencia ante la puerta: los arqueros de lo alto disparan y los de la puerta vienen
+        atTicks(G, "Guardia: en supervivencia ante la puerta exterior", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                for (var e : FILA) if (e != null && !e.isRemoved()) e.discard();
+                FILA.clear();
+                aPelear(sp, true);
+                verDeNoche(sp);
+                irMirando(sp, reino[0] + 0.5, CastlePlan.Y0, reino[1] + 246.5, reino[0] + 0.5, CastlePlan.Y0 + 8, reino[1] + 228.5, false);
+            });
+        });
+        atTicks(G + 60, "a los 3 s", m -> server(m, sp -> log("  guardia, en supervivencia a los 3 s: " + estadoGuardia(sp) + arqueros(sp))));
+        atTicks(G + 100, "mirar arriba, a lo alto de la puerta", m -> server(m, sp ->
+                irMirando(sp, reino[0] + 0.5, CastlePlan.Y0, reino[1] + 246.5, reino[0] + 0.5, CastlePlan.Y0 + 31, reino[1] + 228.5, false)));
+        atTicks(G + 112, "captura: disparan desde lo alto", m -> {
+            server(m, sp -> log("  guardia, en supervivencia a los 5,5 s: " + estadoGuardia(sp) + arqueros(sp)));
+            shot(m, "cliente_va16_disparan");
+        });
+        atTicks(G + 114, "mirar a la puerta", m -> server(m, sp ->
+                irMirando(sp, reino[0] + 0.5, CastlePlan.Y0, reino[1] + 246.5, reino[0] + 0.5, CastlePlan.Y0 + 3, reino[1] + 232.5, false)));
+        atTicks(G + 160, "captura: vienen", m -> {
+            server(m, sp -> log("  guardia, en supervivencia a los 8 s: " + estadoGuardia(sp) + arqueros(sp)));
+            shot(m, "cliente_va17_vienen");
+        });
+        // todo como estaba: en creativo y los de este reino dados por caidos (las pruebas de despues, que son de antes de
+        // la guardia, no cuentan con ellos)
+        atTicks(G + 162, "Guardia: se acaba (creativo; los puestos, por caidos)", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = calladosAntes;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                sp.setGameMode(GameType.CREATIVE);
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                com.darkcraft.enemigos.Puestos.todos(sp.server, reinoK, true);
+                for (var f : lvl.getEntitiesOfClass(net.minecraft.world.entity.projectile.Arrow.class, sp.getBoundingBox().inflate(96))) f.discard();
+                log("  guardia, al acabar: " + com.darkcraft.valdrenn.ValdrennEnemigos.estado(sp.server, reinoK));
+            });
+        });
+        return G + 170;
+    }
+
     /** En supervivencia, con una espada de hierro, la vida entera y sin que le hagan dano de verdad (para que la prueba no muera). */
     private static void aPelear(ServerPlayer sp, boolean aguanta) {
         sp.setGameMode(GameType.SURVIVAL);
@@ -4304,6 +4544,7 @@ public final class ClientCiTest {
         fin = enemigos(fin);
         fin = intro(fin);
         fin = barco(fin);
+        fin = guardia(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);
