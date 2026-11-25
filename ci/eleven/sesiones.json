@@ -1193,5 +1193,111 @@
     ]
    }
   }
+ },
+ "sfx_habilidades": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 2e-3: habilidades de las armas (cenizas de guerra) y aplicar una ceniza en la forja. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "habilidad_torbellino": {
+    "prompt": "A knight spins around with a sword in a full whirlwind attack: two fast circling metallic whooshes of the blade cutting the air, heavy and sharp, epic dark fantasy RPG weapon skill, no music, 1.0 seconds",
+    "sesiones": [
+     "uUHddYKCN0ikXwTiYUH4",
+     "qTyG9FnGqZbNz974MwAZ",
+     "P28whuZWm8HWRkzxq11l",
+     "JXSejgxgVqF8n2DWTwjk"
+    ]
+   },
+   "habilidad_estocada": {
+    "prompt": "A powerful lunging spear thrust: a fast rush of air, the swish of the long weapon driving forward and a sharp piercing impact, epic dark fantasy RPG weapon skill, no music, 0.9 seconds",
+    "sesiones": [
+     "ZBm0UIQVwiDMihjb452U",
+     "RqCoG4XKZhsV8IQOIVw0",
+     "kOkkJEJiuXaghg92BBKY",
+     "bzsfYLFu8uoD3EJJeggW"
+    ]
+   },
+   "habilidad_grito": {
+    "prompt": "A fierce warrior's war cry: one deep powerful male battle roar with a short echo, followed by a low magical surge of strength, epic dark fantasy RPG buff, no music, 1.6 seconds",
+    "sesiones": [
+     "bcl7mEbti6ze6aMwlMMs",
+     "7kbOO2XndYnnsVwdtcZO",
+     "MvfxFhRqPOW7PZ9ZGFfI",
+     "Xnm5OLYXYhuvAwlFXU05"
+    ]
+   },
+   "habilidad_sismo": {
+    "prompt": "A huge axe slammed into the ground after a jump: a massive earth-shaking boom, stone cracking and debris scattering, a deep rumbling shockwave, epic dark fantasy RPG weapon skill, no music, 1.8 seconds",
+    "sesiones": [
+     "xudIZeDYSSRJOG5NNqDj",
+     "5bj1T8hqJeKw10YfxVyU",
+     "vGz2H6xv2U8PK4rgr4lB",
+     "CboiEHyt1nZEEuxuvfuH"
+    ]
+   },
+   "habilidad_paso": {
+    "prompt": "A quick shadowy dash: a short dark magical whoosh with a soft ghostly hiss as someone blinks a few steps aside, dark fantasy RPG quickstep, no music, 0.6 seconds",
+    "sesiones": [
+     "H8mg7hYZPCetpO844JPw",
+     "1giF3iAYokl24xP39ZlU",
+     "tL2mw45zP6e3kbXpAfbR",
+     "2JRx3CXlNMmSLjhibtVu"
+    ]
+   },
+   "habilidad_llamas": {
+    "prompt": "A flaming sword slash: the blade ignites and sweeps in a wide arc with a roaring burst of fire and crackling embers, epic dark fantasy RPG weapon skill, no music, 1.2 seconds",
+    "sesiones": [
+     "YqjjpHYApAPvgYT7GMhv",
+     "FsToHg4ncvwz6cPF6Zgp",
+     "H2K9xDOTuOqJBAEynOzw",
+     "DadBjCDts872DoLJG2M8"
+    ]
+   },
+   "habilidad_escarcha": {
+    "prompt": "A frost blade slash: an icy crystalline whoosh with a gust of freezing wind and ice shards cracking and shattering, epic dark fantasy RPG weapon skill, no music, 1.2 seconds",
+    "sesiones": [
+     "eMOarZkKEHKKZTVWCTjc",
+     "TXQfi5senh513zuavZQx",
+     "Z4ZKgzDvrphHB1nJ8Wje",
+     "I45la2cV5AuldKZnDQRE"
+    ]
+   },
+   "habilidad_relampago": {
+    "prompt": "A lightning-infused sword strike: a crackling electric charge, a sharp blade swing and a bright snapping thunder crack, epic dark fantasy RPG weapon skill, no music, 1.2 seconds",
+    "sesiones": [
+     "51LIdmtfpDq8TvGjslIF",
+     "VbGUrAxf9E8HQOoPjDKx",
+     "oCsYtHpPVu7SKdgzcRIH",
+     "MdNpsaDr4UBKkjtNBnhU"
+    ]
+   },
+   "habilidad_sangre": {
+    "prompt": "A cursed bloody sword slash: a wet visceral swipe of the blade with a dark ominous pulse and a sinister low hum, epic dark fantasy RPG weapon skill, no music, 1.0 seconds",
+    "sesiones": [
+     "QKMZNabrsON4haoVw3kD",
+     "3DIgeD97XEV77UURp7Q5",
+     "KycIzh5d3ZEKbtBJm0UA",
+     "zuCdnzTt3lgrdiQtQOiv"
+    ]
+   },
+   "habilidad_parada": {
+    "prompt": "A perfect weapon parry: a sharp bright metallic clang as a blade deflects a heavy blow, with a ringing steel shimmer, epic dark fantasy RPG, no music, 0.8 seconds",
+    "sesiones": [
+     "HYx3KhqCcRLtIXEEj0VV",
+     "voouEymQJxcnQMLo4gsX",
+     "FlbTedCYq42HSfEAnFXy",
+     "gTVfNJtcnhzQzahaLto2"
+    ]
+   },
+   "ceniza_aplicar": {
+    "prompt": "Ashes of war infused into a weapon at a forge: glowing embers swirl into the blade with a rising magical whoosh, a soft metallic ring and a warm shimmering hum, dark fantasy RPG, no music, 2.0 seconds",
+    "sesiones": [
+     "ytoJ6R1LBnN1hC9bAfeu",
+     "41eXYmwjFL4N8xd0P8OY",
+     "2YADM2L75phr7WmNZLoe",
+     "rjoJ8fQY6ykO5QL2ppnm"
+    ]
+   }
+  }
  }
 }
