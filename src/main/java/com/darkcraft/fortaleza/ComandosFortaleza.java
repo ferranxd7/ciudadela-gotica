@@ -69,8 +69,10 @@ public final class ComandosFortaleza {
                 .then(Commands.literal("escalera").executes(c -> conSitio(c, (p, s, f) -> {
                     int[] ce = Puente.centro(f);
                     ServerLevel lvl = p.serverLevel();
-                    int y = lvl.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ce[0] + 9, ce[1] + 9);
-                    p.teleportTo(lvl, ce[0] + 9.5, y, ce[1] + 9.5, 135f, -20f);
+                    // en el mundo de nubes, en la plazoleta del camino (alrededor no hay suelo)
+                    int o = com.darkcraft.world.NubesGenerador.es(lvl) ? 6 : 9;
+                    int y = o == 6 ? Puente.base(lvl, f) : lvl.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ce[0] + o, ce[1] + o);
+                    p.teleportTo(lvl, ce[0] + o + 0.5, y, ce[1] + o + 0.5, 135f, -20f);
                     return 1;
                 })))
                 .then(Commands.literal("construir").executes(c -> conSitio(c, (p, s, f) -> {

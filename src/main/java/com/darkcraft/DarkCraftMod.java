@@ -225,6 +225,17 @@ public class DarkCraftMod {
                     .lightLevel(st -> st.getValue(com.darkcraft.santuario.SantuarioBlock.ENCENDIDO) ? 13 : 3).sound(SoundType.DEEPSLATE_BRICKS)
                     .pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false).isRedstoneConductor((st, l, p) -> false)
                     .isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false)));
+    /** El mar de nubes (parte 3a): la nube de verdad no se pisa (se cae a traves, al vacio); la firme es la de los caminos. */
+    public static final RegistryObject<Block> NUBE = BLOCKS.register("nube", () -> new com.darkcraft.world.NubeBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(-1.0F, 3600000.0F).noLootTable().noCollission()
+                    .noOcclusion().sound(SoundType.WOOL).pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false)
+                    .isRedstoneConductor((st, l, p) -> false).isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false),
+            false));
+    public static final RegistryObject<Block> NUBE_FIRME = BLOCKS.register("nube_firme", () -> new com.darkcraft.world.NubeBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.GOLD).strength(-1.0F, 3600000.0F).noLootTable()
+                    .noOcclusion().sound(SoundType.WOOL).pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false)
+                    .isRedstoneConductor((st, l, p) -> false).isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false),
+            true));
     public static final RegistryObject<Item> SANTUARIO_ITEM = ITEMS.register("santuario",
             () -> new net.minecraft.world.item.BlockItem(SANTUARIO.get(), new Item.Properties().rarity(Rarity.EPIC)));
     /** Los frascos no son objetos que se lleven en el inventario (van en la ficha): estos solo sirven para dibujarlos en la mano al beber. */
@@ -361,6 +372,7 @@ public class DarkCraftMod {
         ENTITIES.register(modBus);
         com.darkcraft.rol.Efectos.registrar(modBus);
         com.darkcraft.world.Valdrenn.registrar(modBus);
+        com.darkcraft.world.MundoNubes.registrar(modBus);
         com.darkcraft.fortaleza.Localizar.registrar(modBus);
         modBus.addListener(this::attributes);
         modBus.addListener(this::setup);

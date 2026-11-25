@@ -1,0 +1,14 @@
+{
+  "dimensions": {
+    "minecraft:overworld": {
+      "type": "minecraft:overworld",
+      "generator": {
+        "type": "darkcraft:nubes",
+        "biome_source": {
+          "type": "minecraft:fixed",
+          "biome": "darkcraft:nubes"
+        }
+      }
+    }
+  }
+}

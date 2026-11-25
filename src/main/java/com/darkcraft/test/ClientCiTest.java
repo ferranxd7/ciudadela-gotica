@@ -187,8 +187,8 @@ public final class ClientCiTest {
     // ------------------------------------------------------------------ escaparate: el rey quieto en cada animacion
 
     private static com.darkcraft.rey.Rey modelo;
-    /** Donde se monta el escaparate: lejos de cualquier ciudadela (alli siempre es de noche). */
-    private static double ex, ey = 241, ez;
+    /** Donde se monta el escaparate: lejos de cualquier ciudadela (alli siempre es de noche) y por encima del mar de nubes. */
+    private static double ex, ey = 320, ez;
 
     private static int escaparate() {
         base = 0;
@@ -2979,6 +2979,116 @@ public final class ClientCiTest {
         return t + 100;
     }
 
+    // ------------------------------------------------------------------ el mundo de nubes (parte 3a)
+
+    private static net.minecraft.world.entity.decoration.ArmorStand nubesMuneco;
+
+    private static String bloque(ServerLevel lvl, double x, double y, double z) {
+        return net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(lvl.getBlockState(BlockPos.containing(x, y, z)).getBlock()).getPath();
+    }
+
+    /** El mundo de nubes: donde se aparece, la torre saliendo de las nubes, el camino de nubes, dentro de una nube y el vacio. */
+    private static int nubes(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Nubes: donde se aparece (en el camino, delante de la Torre de Ascenso)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                BlockPos ap = lvl.getSharedSpawnPos();
+                log("  nubes: generador " + lvl.getChunkSource().getGenerator().getClass().getSimpleName() + ", se aparece en "
+                        + ap.toShortString() + " (calculado " + com.darkcraft.world.MundoNubes.aparicion(lvl.getSeed()) + "), radio "
+                        + lvl.getGameRules().getInt(net.minecraft.world.level.GameRules.RULE_SPAWN_RADIUS) + ", bioma "
+                        + lvl.getBiome(ap).unwrapKey().map(k -> k.location().toString()).orElse("?") + ", dimensiones "
+                        + sp.server.levelKeys().size() + " " + sp.server.levelKeys());
+                sp.setGameMode(GameType.CREATIVE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(lvl, ap.getX() + 0.5, ap.getY(), ap.getZ() + 0.5, 180f, -24f);
+                lvl.setDayTime(6000);
+                lvl.setWeatherParameters(6000, 0, false, false);
+            });
+        });
+        atTicks(t + 110, "Nubes: lo que se pisa al aparecer", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            log("  nubes: al aparecer en " + fpos(sp) + " bajo los pies " + bloque(lvl, sp.getX(), sp.getY() - 0.5, sp.getZ())
+                    + ", en el suelo=" + sp.onGround() + ", la nube en esa columna " + com.darkcraft.world.NubesGenerador.fondo(sp.getBlockX(), sp.getBlockZ())
+                    + ".." + com.darkcraft.world.NubesGenerador.cima(sp.getBlockX(), sp.getBlockZ()));
+        }));
+        atTicks(t + 112, "captura: la torre saliendo de las nubes", m -> shot(m, "cliente_n01_torre_desde_el_camino"));
+        atTicks(t + 114, "Nubes: la torre y la isla desde lejos", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            BlockPos ap = lvl.getSharedSpawnPos();
+            sp.getAbilities().flying = true;
+            sp.onUpdateAbilities();
+            sp.teleportTo(lvl, ap.getX() + 46.5, ap.getY() + 26, ap.getZ() + 62.5, 143f, -14f);
+        }));
+        atTicks(t + 190, "captura: la torre y la isla", m -> shot(m, "cliente_n02_torre_y_valdrenn"));
+        // el camino, a 700 bloques de la torre (generado al llegar)
+        atTicks(t + 192, "Nubes: el camino, lejos de la torre", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            int[] s = CastleSites.nearest(lvl.getSeed(), 0, 0, 3);
+            var r = com.darkcraft.world.CaminoNubes.ruta(lvl.getSeed(), s[0], s[1]);
+            if (r == null) {
+                log("  nubes: SIN CAMINO");
+                return;
+            }
+            double[] q = r.punto(700), q2 = r.punto(712);
+            float yaw = (float) Math.toDegrees(Math.atan2(-(q2[0] - q[0]), q2[1] - q[1]));
+            var f = com.darkcraft.fortaleza.Fortalezas.delReino(lvl.getSeed(), s[0], s[1]);
+            log("  nubes: camino de " + Math.round(r.largo()) + " bloques, " + r.px().length + " puntos, " + r.faroles().length
+                    + " faroles; del reino " + s[0] + "," + s[1] + " a la fortaleza " + f.x() + "," + f.z() + "; escalera en "
+                    + java.util.Arrays.toString(com.darkcraft.fortaleza.Puente.centro(com.darkcraft.fortaleza.Fortalezas.plan(lvl.getSeed(), f)))
+                    + " con la base a " + com.darkcraft.fortaleza.Puente.base(lvl, com.darkcraft.fortaleza.Fortalezas.plan(lvl.getSeed(), f)));
+            sp.getAbilities().flying = false;
+            sp.onUpdateAbilities();
+            sp.teleportTo(lvl, q[0], com.darkcraft.world.NubesGenerador.SUELO + 0.2, q[1], yaw, 8f);
+        }));
+        atTicks(t + 290, "Nubes: en el camino", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            log("  nubes: en el camino en " + fpos(sp) + " bajo los pies " + bloque(lvl, sp.getX(), sp.getY() - 0.5, sp.getZ()) + ", en el suelo="
+                    + sp.onGround() + ", nube de la columna " + com.darkcraft.world.NubesGenerador.fondo(sp.getBlockX(), sp.getBlockZ()) + ".."
+                    + com.darkcraft.world.NubesGenerador.cima(sp.getBlockX(), sp.getBlockZ()));
+        }));
+        atTicks(t + 292, "captura: el camino de nubes", m -> shot(m, "cliente_n03_camino"));
+        atTicks(t + 294, "Nubes: el camino desde arriba", m -> server(m, sp -> {
+            sp.getAbilities().flying = true;
+            sp.onUpdateAbilities();
+            sp.teleportTo(sp.serverLevel(), sp.getX() - 18, sp.getY() + 34, sp.getZ() - 18, sp.getYRot(), 52f);
+        }));
+        atTicks(t + 340, "captura: el camino desde arriba", m -> shot(m, "cliente_n04_camino_desde_arriba"));
+        // dentro de una nube (la niebla blanca) y el vacio: un muneco que cae por debajo de las nubes se pierde
+        atTicks(t + 342, "Nubes: dentro de una nube", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            int x = sp.getBlockX() + 40, z = sp.getBlockZ() + 40;
+            int y = com.darkcraft.world.NubesGenerador.cima(x, z) - 4;
+            sp.teleportTo(lvl, x + 0.5, y, z + 0.5, 0f, 0f);
+        }));
+        atTicks(t + 372, "captura: dentro de una nube", m -> {
+            log("  nubes: la camara dentro de " + (m.level == null ? "?" : m.level.getBlockState(BlockPos.containing(m.gameRenderer.getMainCamera().getPosition()))));
+            shot(m, "cliente_n05_dentro_de_la_nube");
+        });
+        atTicks(t + 374, "Nubes: un muneco por debajo de las nubes", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            int x = sp.getBlockX(), z = sp.getBlockZ();
+            nubesMuneco = net.minecraft.world.entity.EntityType.ARMOR_STAND.create(lvl);
+            if (nubesMuneco == null) return;
+            nubesMuneco.moveTo(x + 0.5, com.darkcraft.world.NubesGenerador.fondo(x, z) - 14, z + 0.5, 0f, 0f);
+            nubesMuneco.addTag("darkcraft_prueba");
+            lvl.addFreshEntity(nubesMuneco);
+        }));
+        atTicks(t + 380, "Nubes: el muneco se ha perdido en el vacio", m -> server(m, sp -> {
+            log("  nubes: muneco bajo las nubes vivo=" + (nubesMuneco != null && nubesMuneco.isAlive()) + " (tiene que ser false); jugador en creativo vivo="
+                    + sp.isAlive());
+            if (nubesMuneco != null) nubesMuneco.discard();
+            sp.getAbilities().flying = true;
+            sp.onUpdateAbilities();
+        }));
+        return t + 384;
+    }
+
     // ------------------------------------------------------------------ guardar y salir: el titulo y las partidas (parte 2f-2)
 
     private static void logTitulo(Minecraft m, String what) {
@@ -3236,6 +3346,7 @@ public final class ClientCiTest {
         fin = codice(fin);
         fin = pausa(fin);
         fin = clases(fin);
+        fin = nubes(fin);
         base = fin;
         at(2, "Preparar: modo creativo y a la torre del capitulo 1", m -> server(m, sp -> {
             sp.setGameMode(GameType.CREATIVE);

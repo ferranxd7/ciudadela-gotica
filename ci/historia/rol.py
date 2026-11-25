@@ -602,6 +602,10 @@ ES = {
     "advancements.darkcraft.clase.title": "Marcado por la Sombra",
     "advancements.darkcraft.clase.description": "Elige quién fuiste antes de despertar",
     "darkcraft.diario.clase": "Desperté sin saber cómo. Debería estar muerto. Sé quién fui, y eso tendrá que bastar.",
+    # parte 3a: el mundo de nubes
+    "block.darkcraft.nube": "Nube",
+    "block.darkcraft.nube_firme": "Nube firme",
+    "darkcraft.mapa.lugar.camino_nubes": "Camino de nubes",
 }
 
 EN = {
@@ -1184,6 +1188,10 @@ EN = {
     "advancements.darkcraft.clase.title": "Marked by the Shadow",
     "advancements.darkcraft.clase.description": "Choose who you were before you awoke",
     "darkcraft.diario.clase": "I awoke without knowing how. I should be dead. I know who I was, and that will have to be enough.",
+    # part 3a: the cloud world
+    "block.darkcraft.nube": "Cloud",
+    "block.darkcraft.nube_firme": "Firm Cloud",
+    "darkcraft.mapa.lugar.camino_nubes": "Cloud Road",
 }
 
 assert set(ES) == set(EN), sorted(set(ES) ^ set(EN))

@@ -1157,5 +1157,8 @@
   "item.darkcraft.daga": "Daga",
   "advancements.darkcraft.clase.title": "Marcado por la Sombra",
   "advancements.darkcraft.clase.description": "Elige quién fuiste antes de despertar",
-  "darkcraft.diario.clase": "Desperté sin saber cómo. Debería estar muerto. Sé quién fui, y eso tendrá que bastar."
+  "darkcraft.diario.clase": "Desperté sin saber cómo. Debería estar muerto. Sé quién fui, y eso tendrá que bastar.",
+  "block.darkcraft.nube": "Nube",
+  "block.darkcraft.nube_firme": "Nube firme",
+  "darkcraft.mapa.lugar.camino_nubes": "Camino de nubes"
 }

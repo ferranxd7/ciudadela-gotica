@@ -70,6 +70,8 @@ public final class Puente {
      * que haya muy arriba (nubes de la fortaleza, ramas de arboles altos).
      */
     public static int base(ServerLevel lvl, FortalezaPlan f) {
+        // en el mundo de nubes no hay suelo: la escalera sale de la plazoleta del camino de nubes
+        if (com.darkcraft.world.NubesGenerador.es(lvl)) return com.darkcraft.world.NubesGenerador.SUELO;
         int[] c = centro(f);
         int g = lvl.getMinBuildHeight() + 1;
         BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();

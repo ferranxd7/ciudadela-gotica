@@ -262,6 +262,48 @@ public final class CiTest {
                 }
                 log.println("Botin " + name + ": " + books + " libros encantados en 200 cofres, " + ench + " con encantamientos");
             }
+            // ---- el mundo de nubes (parte 3a): generador, donde se aparece y el camino de nubes hasta la fortaleza
+            try {
+                var gen = lvl.getChunkSource().getGenerator();
+                log.println("Mundo: generador " + gen.getClass().getSimpleName() + ", dimensiones " + server.levelKeys());
+                BlockPos ap = lvl.getSharedSpawnPos();
+                lvl.getChunk(ap.getX() >> 4, ap.getZ() >> 4);
+                log.println("Se aparece en " + ap.toShortString() + " (radio " + lvl.getGameRules().getInt(net.minecraft.world.level.GameRules.RULE_SPAWN_RADIUS)
+                        + "): bajo los pies " + lvl.getBlockState(ap.below()).getBlock().getDescriptionId() + ", encima "
+                        + lvl.getBlockState(ap).getBlock().getDescriptionId() + " y " + lvl.getBlockState(ap.above()).getBlock().getDescriptionId());
+                var ruta = com.darkcraft.world.CaminoNubes.ruta(seed, s[0], s[1]);
+                if (ruta == null) log.println("Camino de nubes: NO HAY");
+                else {
+                    StringBuilder b = new StringBuilder("Camino de nubes: " + Math.round(ruta.largo()) + " bloques, " + ruta.px().length + " puntos, "
+                            + ruta.faroles().length + " faroles; muestras:");
+                    int bien = 0, n2 = 0;
+                    for (double d : new double[]{30, 200, 600, 1200, 1800, ruta.largo() - 60, ruta.largo() - 2}) {
+                        double[] q = ruta.punto(d);
+                        int qx = (int) Math.floor(q[0]), qz = (int) Math.floor(q[1]);
+                        lvl.getChunk(qx >> 4, qz >> 4);
+                        var st = lvl.getBlockState(new BlockPos(qx, com.darkcraft.world.NubesGenerador.CAMINO, qz));
+                        boolean ok = st.is(DarkCraftMod.NUBE_FIRME.get()) && lvl.getBlockState(new BlockPos(qx, com.darkcraft.world.NubesGenerador.SUELO, qz)).isAir()
+                                && lvl.getBlockState(new BlockPos(qx, com.darkcraft.world.NubesGenerador.SUELO + 1, qz)).isAir();
+                        n2++;
+                        if (ok) bien++;
+                        b.append(" ").append(Math.round(d)).append("=").append(qx).append(",").append(qz).append(ok ? " OK" : " MAL(" + st.getBlock().getDescriptionId() + ")");
+                    }
+                    log.println(b + " -> " + bien + " de " + n2 + " bien");
+                    var fs = com.darkcraft.fortaleza.Fortalezas.delReino(seed, s[0], s[1]);
+                    var fp = com.darkcraft.fortaleza.Fortalezas.plan(seed, fs);
+                    log.println("Escalera de la fortaleza en " + java.util.Arrays.toString(com.darkcraft.fortaleza.Puente.centro(fp)) + ", base a "
+                            + com.darkcraft.fortaleza.Puente.base(lvl, fp));
+                }
+                int x = s[0] + 900, z = s[1] + 900;
+                lvl.getChunk(x >> 4, z >> 4);
+                log.println("Nube en " + x + "," + z + ": " + com.darkcraft.world.NubesGenerador.fondo(x, z) + ".." + com.darkcraft.world.NubesGenerador.cima(x, z)
+                        + " -> " + lvl.getBlockState(new BlockPos(x, com.darkcraft.world.NubesGenerador.cima(x, z), z)).getBlock().getDescriptionId()
+                        + " / encima " + lvl.getBlockState(new BlockPos(x, com.darkcraft.world.NubesGenerador.cima(x, z) + 1, z)).getBlock().getDescriptionId()
+                        + " / debajo " + lvl.getBlockState(new BlockPos(x, com.darkcraft.world.NubesGenerador.fondo(x, z) - 1, z)).getBlock().getDescriptionId());
+            } catch (Throwable t) {
+                log.println("Mundo de nubes: ERROR " + t);
+                DarkCraftMod.LOGGER.error("[CI] mundo de nubes", t);
+            }
             log.println("Calibracion de muebles: " + (com.darkcraft.gen.Calib.done ? "hecha" : "NO"));
             log.println("Tiempo total: " + (System.currentTimeMillis() - t0) / 1000 + " s");
             log.println("OK");

@@ -1157,5 +1157,8 @@
   "item.darkcraft.daga": "Dagger",
   "advancements.darkcraft.clase.title": "Marked by the Shadow",
   "advancements.darkcraft.clase.description": "Choose who you were before you awoke",
-  "darkcraft.diario.clase": "I awoke without knowing how. I should be dead. I know who I was, and that will have to be enough."
+  "darkcraft.diario.clase": "I awoke without knowing how. I should be dead. I know who I was, and that will have to be enough.",
+  "block.darkcraft.nube": "Cloud",
+  "block.darkcraft.nube_firme": "Firm Cloud",
+  "darkcraft.mapa.lugar.camino_nubes": "Cloud Road"
 }

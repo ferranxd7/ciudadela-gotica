@@ -1,6 +1,6 @@
 {
   "type": "forge:add_features",
-  "biomes": "#minecraft:is_overworld",
+  "biomes": "#darkcraft:islas",
   "features": "darkcraft:valdrenn",
   "step": "top_layer_modification"
 }

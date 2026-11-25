@@ -540,14 +540,43 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   pantalla forzada y deja al jugador sin clase (en la CI entra en creativo: no se le pregunta); el tramo `clases()`
   (capturas `cliente_cl01..cl06`: caballero, hechicero, desdichado, la pregunta, el bandido en el juego y su equipo).
 
+### Plan grande, parte 3a: el mundo de nubes
+
+- **Generador** `darkcraft:nubes` (`world/NubesGenerador`, registrado en `world/MundoNubes`): sin suelo; un mar de nubes del
+  bloque `darkcraft:nube` (translucido, sin choque ni recuadro al mirarlo, la luz del cielo pasa, sin caras entre nube y
+  nube) en bollos de ruido fijo (no depende de la semilla): lo alto entre 235 y 261 (media 248), 14-21 de grueso; por debajo,
+  el vacio. Sustituye al preset `minecraft:normal` (`data/minecraft/worldgen/world_preset/normal.json`: solo el
+  overworld, sin Nether ni End; vale igual en servidor dedicado, `level-type` por defecto) con el bioma fijo
+  `darkcraft:nubes` (sin lluvia ni bichos). El bioma va en `#darkcraft:has_structure/valdrenn` (la estructura de
+  Valdrenn y la de la fortaleza) y en `#darkcraft:islas` (el `CastleFeature`, por `add_valdrenn`); **no** en
+  `#minecraft:is_overworld` (saldrian minas abandonadas y las fortalezas de los ojos de Ender flotando en el vacio). `getBaseHeight` = 251
+  (`NubesGenerador.SUELO`): ahi sale la Torre de Ascenso (ya solo sube 128) y la escalera de hueso de la fortaleza
+  (`Puente.base`).
+- **Camino de nubes provisional** (`world/CaminoNubes`, lo pone `buildSurface` antes que el castillo; el de verdad, con
+  paradas, en la parte 5): de la puerta de la Torre de Ascenso a la escalera de la fortaleza de su reino. Tres de ancho de
+  `darkcraft:nube_firme` (se pisa; oro en el mapa) a Y 250 sobre un banco de nube, con la nube despejada por encima y a
+  los lados (zanja donde el mar sube mas; el camino asoma un bloque) y un farol de almas sobre un hueso cada 28 bloques a
+  un lado y a otro. Sale al sur, rodea la isla a 445 del centro hasta quedar de cara a la fortaleza, llega a la escalera
+  por el sur (si viene del norte rodea la isla de la fortaleza) y esquiva los demas reinos (445) y fortalezas (112);
+  plazoletas delante de la torre (r 5) y donde se levanta la escalera (r 10). La cuenta rapida (`cerca`, sin planos)
+  descarta chunks; la ruta de verdad (`ruta`, con `PlanCache` y `Fortalezas.plan`) se guarda por reino. En el Espejo,
+  de pie en el camino: "Camino de nubes".
+- **Al crear el mundo** (`MundoNubes.onCrearAparicion`): se aparece en el camino, 24 al sur del centro de la Torre de
+  Ascenso del reino mas cercano al origen (fuera de los 16 de la proteccion del punto de aparicion de un servidor
+  dedicado, donde quien no es operador no puede abrir cofres), radio de aparicion 0, sin comerciantes, patrullas ni
+  fantasmas. De momento: la isla del pueblo y el barco (3b-3d) cambian esto. **El vacio**: 10 bloques por debajo del fondo
+  de la nube se muere en el acto (dano de caer del mundo: la espada de luz va al ultimo suelo firme; los jefes vuelven a
+  su sitio); creativo y espectador no. Con la camara dentro de una nube, niebla blanca cerrada (`client/ClientNubes`).
+- `/darkcraft fortaleza escalera` lleva a la plazoleta. Texturas: `tools/mundo/nubes.py`. Prueba del servidor: generador,
+  aparicion y muestras del camino (`informe.txt`); prueba del cliente: el escaparate sube a Y 320 (por encima de las
+  nubes) y el tramo `nubes()` (capturas `cliente_n01..n05`: la torre desde el camino, la torre y Valdrenn, el camino,
+  el camino desde arriba, dentro de una nube; y un muneco que se pierde en el vacio).
+
 ### Lo siguiente: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 
 Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publicada):
-- **3a, el mundo de nubes**: generador propio (vacio + un mar de nubes de un bloque `nube` translucido y sin choque, en
-  bollos con ruido, hacia Y 100-140; caer por debajo = vacio) sustituyendo el preset `minecraft:normal`
-  (`data/minecraft/worldgen/world_preset/normal.json`, solo el overworld: sin Nether ni End), bioma de nubes en
-  `#darkcraft:has_structure/valdrenn` para que siga saliendo Valdrenn (estructura + `CastleFeature`; su isla ya flota);
-  modo aventura por defecto; la isla del pueblo en el 0,0. Tiene que valer igual en servidor dedicado.
+- **3a, el mundo de nubes**: hecha (arriba). Queda para la 3b: el modo aventura por defecto y la isla del pueblo en el
+  0,0 (y alli el punto de aparicion: ojo con la proteccion de 16 bloques de los servidores dedicados).
 - **3b, la isla del pueblo abandonado**: ruinas, notas, el barco roto en el muelle, las 5 piezas (vela, timon, mastil,
   ancla y el corazon: cofre, tras enemigos, acertijo, nota/cadaver y mini-jefe).
 - **3c, enemigos**: aldeanos huecos (horcas, hoces, antorchas), marineros ahogados (sables, arpones, junto al muelle) y el

@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "#minecraft:is_overworld",
+    "darkcraft:nubes",
     {
       "id": "darkcraft:tormenta",
       "required": false
