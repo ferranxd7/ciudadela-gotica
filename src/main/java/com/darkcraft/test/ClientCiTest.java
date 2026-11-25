@@ -6254,7 +6254,7 @@ public final class ClientCiTest {
                     var est = com.darkcraft.fortaleza.FortalezaDatos.get(sp.server).de(fsit);
                     log("  fortaleza a los " + kk * 5 + " s: " + est.hechos.size() + " de " + fplan.chunks().size() + " chunks (en pie "
                             + est.completa + "); zona=" + (com.darkcraft.fortaleza.FortalezaEventos.zona(sp) != null) + " lluvia=" + sp.serverLevel().isRaining());
-                    if (kk == 1 && fvieja != null) {
+                    if (kk == 4 && fvieja != null) {
                         ServerLevel lvl = sp.serverLevel();
                         int quedan = 0;
                         for (int y = fplan.Y - 70; y <= fplan.Y - 57; y++)

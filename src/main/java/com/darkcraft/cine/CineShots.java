@@ -143,10 +143,10 @@ public final class CineShots {
         l.add(new Shot(0f, 4.4f, 62, 0, 1,
                 p(cx + 3, Y + 4, zf + 19, cx + 2, Y + 5, zf + 16, cx + 1, Y + 6, zf + 13),
                 p(cx, Y + 13, zf, cx, Y + 12, zf, cx, Y + 11, zf)));
-        // 2) en el rellano: la reja sube por su ranura
+        // 2) desde el borde del rellano: el arco entero y la reja que sube por su ranura
         l.add(new Shot(4.4f, 9.2f, 58, 0, 1,
-                p(cx - 2.5, Y + 1.8, zf + 2.5, cx, Y + 2.0, zf + 2.0, cx + 2.5, Y + 2.2, zf + 2.5),
-                p(cx, Y + 3.5, zr, cx, Y + 5, zr, cx, Y + 6.5, zr)));
+                p(cx - 3, Y + 2.2, zf + 7, cx, Y + 2.4, zf + 6.2, cx + 3, Y + 2.6, zf + 7),
+                p(cx, Y + 5, zr, cx, Y + 6, zr, cx, Y + 7, zr)));
         // 3) la camara cruza la puerta y la de la cupula hasta la fuente rota
         l.add(new Shot(9.2f, 12.6f, 66, 0, 1,
                 p(cx, Y + 2.4, zf + 1.5, cx, Y + 2.8, cz + 39, cx, Y + 3.6, cz + 31),
