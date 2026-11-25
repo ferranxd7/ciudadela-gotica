@@ -171,6 +171,32 @@ public final class ClientMusic {
         }
     }
 
+    // ------------------------------------------------------------------ Brumavela: el viento sobre el mar de nubes (parte 3b)
+
+    private static Track bruma;
+    private static int brumaTicks;
+    private static boolean enBruma;
+
+    /** En Brumavela (por su bioma) suena el viento, en bucle y bajito, y calla la musica de Minecraft. */
+    private static void tickBruma(Minecraft mc) {
+        if (mc.player == null || mc.level == null) enBruma = false;
+        else if (mc.player.tickCount % 20 == 0) enBruma = mc.level.getBiome(mc.player.blockPosition()).is(com.darkcraft.world.PuebloFeature.BIOMA);
+        boolean quiere = enBruma && (boss == null || boss.dying()) && (story == null || story.dying());
+        if (quiere) {
+            if (bruma == null || bruma.dying() || !mc.getSoundManager().isActive(bruma) && brumaTicks > 40) {
+                if (bruma != null && !bruma.dying()) mc.getSoundManager().stop(bruma);
+                bruma = new Track(DarkCraftMod.AMBIENTE_BRUMAVELA.get(), "brumavela", true);
+                brumaTicks = 0;
+                mc.getSoundManager().play(bruma);
+                bruma.fadeTo(0.5f, 4.0f);
+            }
+        } else if (bruma != null && !bruma.dying()) bruma.kill(3.0f);
+        if (bruma != null) {
+            brumaTicks++;
+            if (bruma.dying() && !mc.getSoundManager().isActive(bruma) && brumaTicks > 40) bruma = null;
+        }
+    }
+
     // ------------------------------------------------------------------ la pantalla de titulo (parte 2f-2)
 
     private static Track titulo;
@@ -254,6 +280,8 @@ public final class ClientMusic {
         }
         tickZona(mc);
         if (zona != null && !zona.dying()) any = true;
+        tickBruma(mc);
+        if (bruma != null && !bruma.dying()) any = true;
         tickTitulo(mc);
         if (titulo != null && !titulo.dying()) any = true;
         // que no se mezcle con la musica normal del juego
@@ -266,8 +294,9 @@ public final class ClientMusic {
         if (story != null) mc.getSoundManager().stop(story);
         if (boss != null) mc.getSoundManager().stop(boss);
         if (zona != null) mc.getSoundManager().stop(zona);
-        story = boss = zona = null;
-        enFortaleza = false;
+        if (bruma != null) mc.getSoundManager().stop(bruma);
+        story = boss = zona = bruma = null;
+        enFortaleza = enBruma = false;
         bossPhase = 0;
     }
 

@@ -109,9 +109,11 @@ SFX = {
     "logro": (2.0, 0.6, -18),
     # Brumavela (parte 3b): una pieza del barco, la losa de la cripta y el barco que despierta
     "pieza_barco": (2.8, 0.8, -16), "cripta_abre": (4.6, 1.2, -15), "barco_reparado": (6.0, 1.5, -14),
+    # el viento de Brumavela: se repite en bucle (entra y sale poco a poco, como una racha)
+    "brumavela_viento": (17.5, 3.0, -23),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
-ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5}
+ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5}
 # de estos se bajaron 4 tomas (NOMBRE_1..4.mp3): las elegidas salen como NOMBRE_1.ogg, NOMBRE_2.ogg...
 TOMAS_SFX = {
     "espejo_despierta": (3,),   # empieza grave y se aclara (el zumbido que sube y la campanilla)
@@ -178,6 +180,7 @@ TOMAS_SFX = {
     "pieza_barco": (3, 2),           # las dos campanadas con mas cuerpo
     "cripta_abre": (1, 3),           # las que arrastran la losa mas de tres segundos (la 4 casi no se oye)
     "barco_reparado": (1, 3),        # la que suena los cinco segundos enteros, y la del zumbido mas largo
+    "brumavela_viento": (3,),        # la mas pareja de principio a fin (para repetirla en bucle)
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

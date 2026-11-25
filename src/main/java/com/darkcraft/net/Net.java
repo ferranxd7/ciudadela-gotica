@@ -139,8 +139,10 @@ public final class Net {
     // ------------------------------------------------------------------ Brumavela (parte 3b)
 
     /** Las cosas de Brumavela que se usan con la tecla del aviso (las que hay ahora mismo; vacia al irse de la isla). */
-    public record Cosas(java.util.List<com.darkcraft.pueblo.Pueblo.Cosa> lista) {
+    public record Cosas(java.util.List<com.darkcraft.pueblo.Pueblo.Cosa> lista, int piezas, boolean reparado) {
         void write(FriendlyByteBuf b) {
+            b.writeByte(piezas);
+            b.writeBoolean(reparado);
             b.writeVarInt(lista.size());
             for (com.darkcraft.pueblo.Pueblo.Cosa c : lista) {
                 b.writeByte(c.id());
@@ -152,14 +154,16 @@ public final class Net {
         }
 
         static Cosas read(FriendlyByteBuf b) {
+            int piezas = b.readByte();
+            boolean reparado = b.readBoolean();
             int n = Math.min(64, b.readVarInt());
             java.util.List<com.darkcraft.pueblo.Pueblo.Cosa> l = new java.util.ArrayList<>(n);
             for (int i = 0; i < n; i++) l.add(new com.darkcraft.pueblo.Pueblo.Cosa(b.readByte(), b.readInt(), b.readInt(), b.readInt(), b.readByte()));
-            return new Cosas(l);
+            return new Cosas(l, piezas, reparado);
         }
 
         void handle(Supplier<NetworkEvent.Context> ctx) {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.ClientPueblo.recibir(lista));
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.ClientPueblo.recibir(lista, piezas, reparado));
             ctx.get().setPacketHandled(true);
         }
     }

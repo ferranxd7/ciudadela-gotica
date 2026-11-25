@@ -26,7 +26,7 @@ import java.util.zip.GZIPOutputStream;
  *
  *     tools/vista3d/vista.sh pueblo /tmp/pueblo        (compila el mod y esto, vuelca y dibuja)
  *
- * Planos: fortaleza (la Fortaleza de Hueso), pueblo (la isla de Brumavela).
+ * Planos: fortaleza (la Fortaleza de Hueso), pueblo (la isla de Brumavela), barco y barco_roto (La Garza Gris sola).
  */
 public class Volcado {
     static final Map<Long, BlockState> MUNDO = new HashMap<>(1 << 20);
@@ -149,6 +149,8 @@ public class Volcado {
                 }
                 marcas.putAll(p.sitios());
             }
+            case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
+            case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);
         }
         System.out.println(que + ": " + MUNDO.size() + " bloques en " + (System.currentTimeMillis() - t0) + " ms; caja " + minX + "," + minY + "," + minZ

@@ -1677,5 +1677,13 @@
         "name": "darkcraft:sfx/barco_reparado_2"
       }
     ]
+  },
+  "ambiente.brumavela": {
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/brumavela_viento_1",
+        "stream": true
+      }
+    ]
   }
 }

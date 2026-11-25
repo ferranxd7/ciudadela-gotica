@@ -351,7 +351,23 @@ public final class CiTest {
                 int[] losa = pueblo.sitio("losa");
                 com.darkcraft.pueblo.Pueblo.abrirCripta(lvl, null);
                 String abierta = lvl.getBlockState(new BlockPos(losa[0], losa[1], losa[2])).getBlock().getDescriptionId();
+                // (el barco roto, bloque a bloque, para comprobar que reparar y reiniciar lo deja como estaba)
+                var barco = pueblo.barco;
+                java.util.Map<Long, net.minecraft.world.level.block.Block> roto = new java.util.HashMap<>();
+                for (int x = barco.x0 - 2; x <= barco.x1 + 2; x++)
+                    for (int z = barco.z0 - 2; z <= barco.z1 + 2; z++)
+                        for (int y = barco.y0 - 2; y <= barco.y1 + 2; y++) roto.put(BlockPos.asLong(x, y, z), lvl.getBlockState(mb.set(x, y, z)).getBlock());
                 com.darkcraft.pueblo.Pueblo.levantar(lvl, true);
+                int lona = 0, yunques = 0;
+                for (long k : roto.keySet()) {
+                    var b = lvl.getBlockState(mb.set(k)).getBlock();
+                    if (b == net.minecraft.world.level.block.Blocks.LIGHT_GRAY_WOOL || b == net.minecraft.world.level.block.Blocks.WHITE_WOOL
+                            || b == net.minecraft.world.level.block.Blocks.GRAY_WOOL) lona++;
+                    if (b instanceof net.minecraft.world.level.block.FallingBlock) yunques++;
+                }
+                int[] an = com.darkcraft.pueblo.gen.Barco.ancla();
+                String eslabon = lvl.getBlockState(new BlockPos(an[0], an[1], an[2])).getBlock().getDescriptionId() + " sobre "
+                        + lvl.getBlockState(new BlockPos(an[0], an[1] - 1, an[2])).getBlock().getDescriptionId();
                 String palo = lvl.getBlockState(new BlockPos(com.darkcraft.pueblo.gen.Barco.BX, com.darkcraft.pueblo.gen.Barco.CUBIERTA + 12, com.darkcraft.pueblo.gen.Barco.PALO))
                         .getBlock().getDescriptionId();
                 String rueda = lvl.getBlockState(new BlockPos(com.darkcraft.pueblo.gen.Barco.BX, com.darkcraft.pueblo.gen.Barco.ALCAZAR_Y + 2, com.darkcraft.pueblo.gen.Barco.TIMON_Z))
@@ -363,6 +379,17 @@ public final class CiTest {
                         + "; tras reiniciar: losa " + lvl.getBlockState(new BlockPos(losa[0], losa[1], losa[2])).getBlock().getDescriptionId() + ", palo "
                         + lvl.getBlockState(new BlockPos(com.darkcraft.pueblo.gen.Barco.BX, com.darkcraft.pueblo.gen.Barco.CUBIERTA + 12, com.darkcraft.pueblo.gen.Barco.PALO))
                         .getBlock().getDescriptionId() + " | " + com.darkcraft.pueblo.Pueblo.estado(d) + " | cosas " + com.darkcraft.pueblo.Pueblo.cosas(lvl).size());
+                int distintos = 0;
+                StringBuilder dif = new StringBuilder();
+                for (var e : roto.entrySet()) {
+                    var b = lvl.getBlockState(mb.set(e.getKey())).getBlock();
+                    if (b == e.getValue()) continue;
+                    distintos++;
+                    if (distintos <= 6) dif.append(' ').append(BlockPos.of(e.getKey()).toShortString()).append(": ").append(e.getValue().getDescriptionId()).append(" -> ")
+                            .append(b.getDescriptionId());
+                }
+                log.println("Brumavela: el barco reparado lleva " + lona + " bloques de lona, " + yunques + " bloques que caen (tiene que ser 0) y el eslabon del ancla "
+                        + eslabon + "; tras reiniciar quedan " + distintos + " bloques distintos del barco roto (tiene que ser 0)" + dif);
                 // el botin de las casas
                 for (String name : new String[]{"pueblo", "pueblo_bueno"}) {
                     var table = server.getLootData().getLootTable(new net.minecraft.resources.ResourceLocation(DarkCraftMod.MODID, "chests/" + name));

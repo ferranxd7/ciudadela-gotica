@@ -3167,7 +3167,7 @@ public final class ClientCiTest {
         });
         atTicks(t + 256, "Brumavela: la plaza del pozo", m -> server(m, sp -> {
             int[] z = sitioB("pozo");
-            irMirando(sp, z[0] + 7.5, z[1], z[2] + 9.5, z[0] - 2, z[1] + 1.5, z[2], false);
+            irMirando(sp, z[0] + 9.5, z[1], z[2] + 2.5, z[0] - 3, z[1] + 1.2, z[2] + 2.5, false);
         }));
         atTicks(t + 312, "captura: la plaza y su santuario", m -> {
             server(m, sp -> {
@@ -3218,16 +3218,21 @@ public final class ClientCiTest {
         }));
         atTicks(t + 492, "Brumavela: la losa apartada", m -> {
             logPueblo(m, "campanas en orden (cripta abierta)");
+            m.options.hideGui = true;
             server(m, sp -> {
                 int y = com.darkcraft.pueblo.gen.PuebloPlan.get().capilla.y;
-                irMirando(sp, -48.5, y, -45.5, -57, y - 3, -45.5, false);
+                irMirando(sp, com.darkcraft.pueblo.gen.Capilla.BX1 + 3.0, y, com.darkcraft.pueblo.gen.Capilla.BZ0 + 1.5,
+                        com.darkcraft.pueblo.gen.Capilla.BX0 + 0.5, y - 4.2, com.darkcraft.pueblo.gen.Capilla.BZ0 + 1.5, false);
             });
         });
         atTicks(t + 540, "captura: la cripta abierta", m -> shot(m, "cliente_b09_cripta_abierta"));
-        atTicks(t + 542, "Brumavela: el mastil, en la cripta", m -> server(m, sp -> {
-            int[] z = sitioB("mastil");
-            irMirando(sp, z[0] + 2.5, z[1], z[2] + 3.5, z[0] + 0.5, z[1] + 1.1, z[2] + 0.5, false);
-        }));
+        atTicks(t + 542, "Brumavela: el mastil, en la cripta", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                int[] z = sitioB("mastil");
+                irMirando(sp, z[0] + 2.5, z[1], z[2] + 3.5, z[0] + 0.5, z[1] + 1.1, z[2] + 0.5, false);
+            });
+        });
         atTicks(t + 586, "captura: el mastil", m -> {
             logPueblo(m, "ante el mastil (a mano 2)");
             shot(m, "cliente_b10_mastil");
@@ -3290,31 +3295,56 @@ public final class ClientCiTest {
             logPueblo(m, "barco reparado");
             server(m, sp -> {
                 ServerLevel lvl = sp.serverLevel();
+                int[] an = com.darkcraft.pueblo.gen.Barco.ancla();
                 log("  pueblo: el palo a media altura " + bloque(lvl, -8, 262, 135) + ", la vela " + bloque(lvl, -8, 258, 137) + ", la rueda del timon "
-                        + bloque(lvl, -8, 256, 125) + ", el ancla " + bloque(lvl, -5, 249, 146) + ", logro barco=" + com.darkcraft.story.Logros.tiene(sp, "barco"));
+                        + bloque(lvl, -8, 256, 125) + ", el ancla colgada=" + com.darkcraft.pueblo.Pueblo.anclaColgada() + " (de su eslabon " + bloque(lvl, an[0], an[1], an[2])
+                        + "), logro barco=" + com.darkcraft.story.Logros.tiene(sp, "barco"));
             });
             shot(m, "cliente_b16_barco_reparado");
         });
-        atTicks(t + 932, "Brumavela: al timon", m -> {
+        atTicks(t + 932, "Brumavela: el ancla, desde el espigon", m -> server(m, sp -> {
+            int[] an = com.darkcraft.pueblo.gen.Barco.ancla();
+            irMirando(sp, 0.5, 251, an[2] + 3.5, an[0] + 0.5, an[1] - 0.6, an[2] + 0.5, false);
+        }));
+        atTicks(t + 964, "captura: el ancla en su serviola", m -> shot(m, "cliente_b16b_ancla"));
+        atTicks(t + 966, "Brumavela: la bodega, con el corazon en su cuna", m -> server(m, sp -> {
+            int[] c = sitioB("barco_corazon");
+            irMirando(sp, c[0] - 0.5, c[1] - 1, c[2] - 2.8, c[0] + 0.5, c[1] + 0.3, c[2] + 0.5, false);
+        }));
+        atTicks(t + 1004, "captura: la bodega", m -> {
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                int[] c = sitioB("barco_corazon");
+                int nube = 0;
+                for (int x = c[0] - 3; x <= c[0] + 3; x++)
+                    for (int z = com.darkcraft.pueblo.gen.Barco.POPA + 1; z < com.darkcraft.pueblo.gen.Barco.PROA; z++)
+                        for (int y = com.darkcraft.pueblo.gen.Barco.CUBIERTA - 4; y < com.darkcraft.pueblo.gen.Barco.CUBIERTA; y++)
+                            if (lvl.getBlockState(new BlockPos(x, y, z)).getBlock() instanceof com.darkcraft.world.NubeBlock) nube++;
+                log("  pueblo: en la bodega " + fpos(sp) + ", la cuna " + bloque(lvl, c[0], c[1] - 1, c[2]) + ", sobre ella " + bloque(lvl, c[0], c[1], c[2])
+                        + ", nube dentro del casco " + nube + " (tiene que ser 0)");
+            });
+            shot(m, "cliente_b16c_bodega");
+        });
+        atTicks(t + 1006, "Brumavela: al timon", m -> {
             m.options.hideGui = false;
             server(m, sp -> {
                 int[] z = sitioB("barco_timon");
                 irMirando(sp, z[0] + 0.5, z[1], z[2] + 2.5, z[0] + 0.5, z[1] + 1.4, z[2] + 0.5, false);
             });
         });
-        atTicks(t + 968, "captura: zarpar", m -> {
+        atTicks(t + 1042, "captura: zarpar", m -> {
             logPueblo(m, "al timon (a mano 12)");
             shot(m, "cliente_b17_timon");
         });
-        atTicks(t + 970, "Brumavela: se zarpa hacia Valdrenn", m -> server(m, sp -> com.darkcraft.pueblo.Pueblo.usar(sp, 12)));
-        atTicks(t + 1060, "captura: la llegada, al pie de la Torre de Ascenso", m -> {
+        atTicks(t + 1044, "Brumavela: se zarpa hacia Valdrenn", m -> server(m, sp -> com.darkcraft.pueblo.Pueblo.usar(sp, 12)));
+        atTicks(t + 1134, "captura: la llegada, al pie de la Torre de Ascenso", m -> {
             logPueblo(m, "tras zarpar (a mano 13: volver)");
             server(m, sp -> log("  pueblo: bajo los pies " + bloque(sp.serverLevel(), sp.getX(), sp.getY() - 0.5, sp.getZ()) + ", logro zarpar="
                     + com.darkcraft.story.Logros.tiene(sp, "zarpar")));
             shot(m, "cliente_b18_llegada");
         });
-        atTicks(t + 1062, "Brumavela: de vuelta", m -> server(m, sp -> com.darkcraft.pueblo.Pueblo.usar(sp, 13)));
-        atTicks(t + 1100, "Brumavela: otra vez en el barco", m -> {
+        atTicks(t + 1136, "Brumavela: de vuelta", m -> server(m, sp -> com.darkcraft.pueblo.Pueblo.usar(sp, 13)));
+        atTicks(t + 1174, "Brumavela: otra vez en el barco", m -> {
             logPueblo(m, "de vuelta en el barco");
             com.darkcraft.client.ui.Carteles.callados = true;
             m.options.hideGui = true;
@@ -3323,7 +3353,7 @@ public final class ClientCiTest {
                 sp.onUpdateAbilities();
             });
         });
-        return t + 1104;
+        return t + 1178;
     }
 
     // ------------------------------------------------------------------ guardar y salir: el titulo y las partidas (parte 2f-2)

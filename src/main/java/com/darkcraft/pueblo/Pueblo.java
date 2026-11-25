@@ -151,8 +151,22 @@ public final class Pueblo {
 
     /** El noray de la llegada a Valdrenn (desde el se vuelve a Brumavela), a un lado de la plazoleta de la torre. */
     private static BlockPos noray(ServerLevel lvl) {
-        BlockPos l = MundoNubes.llegada(lvl.getSeed());
+        BlockPos l = llegada(lvl);
         return l == null ? null : l.offset(3, 0, 2);
+    }
+
+    private static BlockPos llegadaVista;
+    private static long llegadaSemilla;
+    private static boolean llegadaBuscada;
+
+    /** Donde deja el barco (se calcula una vez por mundo: hay que levantar el plano del reino). */
+    private static BlockPos llegada(ServerLevel lvl) {
+        if (!llegadaBuscada || llegadaSemilla != lvl.getSeed()) {
+            llegadaVista = MundoNubes.llegada(lvl.getSeed());
+            llegadaSemilla = lvl.getSeed();
+            llegadaBuscada = true;
+        }
+        return llegadaVista;
     }
 
     /** Las cosas que hay ahora mismo. */
@@ -220,6 +234,8 @@ public final class Pueblo {
     /** La version de la lista de cosas que tiene cada jugador. */
     private static final Map<UUID, Integer> ENVIADO = new HashMap<>();
     private static final EnumMap<Pieza, Display.ItemDisplay> VISTAS = new EnumMap<>(Pieza.class);
+    /** El ancla del barco reparado, colgada de su serviola. */
+    private static Display.ItemDisplay anclaVista;
     /** Las campanas: cuantas van bien seguidas y cuando sono la ultima. */
     private static int seguidas;
     private static long ultimoToque;
@@ -228,6 +244,7 @@ public final class Pueblo {
     public static void onParada(ServerStoppedEvent e) {
         ENVIADO.clear();
         VISTAS.clear();
+        anclaVista = null;
         seguidas = 0;
     }
 
@@ -258,14 +275,14 @@ public final class Pueblo {
             if (llegada) ponerNoray(lvl, n);
         }
         if (!aqui && !llegada) {
-            if (ENVIADO.remove(p.getUUID()) != null) Net.to(p, new Net.Cosas(List.of()));
+            if (ENVIADO.remove(p.getUUID()) != null) Net.to(p, new Net.Cosas(List.of(), 0, false));
             return;
         }
         Datos d = Datos.get(p.server);
         Integer v = ENVIADO.get(p.getUUID());
         if (v == null || v != d.version) {
             ENVIADO.put(p.getUUID(), d.version);
-            Net.to(p, new Net.Cosas(cosas(lvl)));
+            Net.to(p, new Net.Cosas(cosas(lvl), d.piezas, d.reparado));
         }
         if (!aqui) return;
         if (!d.santuario) santuario(lvl, d);
@@ -314,6 +331,24 @@ public final class Pueblo {
             }
             if (cerca) lvl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, s[0] + 0.5, s[1] + 0.4, s[2] + 0.5, 1, 0.2, 0.2, 0.2, 0.005);
         }
+        // y su ancla cuelga de la serviola: el dibujo de la pieza, de canto al barco (no hay bloque que haga de ancla)
+        int[] a = Barco.ancla();
+        boolean colgada = d.reparado && lvl.hasChunkAt(new BlockPos(a[0], a[1], a[2])) && lvl.getNearestPlayer(a[0] + 0.5, a[1], a[2] + 0.5, 96, false) != null;
+        if (colgada && (anclaVista == null || anclaVista.isRemoved())) {
+            Matrix4f m = new Matrix4f().rotateY((float) (Math.PI / 2)).scale(ANCLA_TAM);
+            anclaVista = dibujo(lvl, new ItemStack(Pieza.ANCLA.item()), a[0] + 0.5, a[1] - ANCLA_TAM * 0.47, a[2] + 0.5, m, false);
+        } else if (!colgada && anclaVista != null) {
+            anclaVista.discard();
+            anclaVista = null;
+        }
+    }
+
+    /** Lo que mide el ancla colgada (su dibujo, en bloques). */
+    private static final float ANCLA_TAM = 1.7f;
+
+    /** Si el ancla del barco reparado esta a la vista (para las pruebas). */
+    public static boolean anclaColgada() {
+        return anclaVista != null && !anclaVista.isRemoved();
     }
 
     private static void santuario(ServerLevel lvl, Datos d) {
@@ -327,25 +362,35 @@ public final class Pueblo {
 
     /** La pieza que se ve: el dibujo del objeto, de cara a quien mira, con luz propia. */
     private static Display.ItemDisplay vista(ServerLevel lvl, Pieza q, int[] s) {
-        Display.ItemDisplay d = EntityType.ITEM_DISPLAY.create(lvl);
-        if (d == null) return null;
         float alto = q == Pieza.CORAZON ? 0.55f : 1.1f, tam = q == Pieza.CORAZON ? 1.0f : 1.25f;
         // (el juego dibuja el objeto dado la vuelta: media vuelta para que quede como en su textura)
         Matrix4f m = new Matrix4f().translate(0f, alto, 0f).rotateY((float) Math.PI).scale(tam);
+        return dibujo(lvl, new ItemStack(q.item()), s[0] + 0.5, s[1], s[2] + 0.5, m, true);
+    }
+
+    /**
+     * El dibujo de un objeto puesto en el mundo (una entidad item_display que no se guarda). {@code deCara}: siempre de
+     * cara a quien mira y con luz propia (lo que hay que encontrar); si no, quieto y con la luz que le llegue.
+     */
+    private static Display.ItemDisplay dibujo(ServerLevel lvl, ItemStack objeto, double x, double y, double z, Matrix4f m, boolean deCara) {
+        Display.ItemDisplay d = EntityType.ITEM_DISPLAY.create(lvl);
+        if (d == null) return null;
         CompoundTag tag = new CompoundTag();
-        tag.put("item", new ItemStack(q.item()).save(new CompoundTag()));
+        tag.put("item", objeto.save(new CompoundTag()));
         tag.putString("item_display", "none");
-        tag.putString("billboard", "vertical");
         ListTag l = new ListTag();
         for (int i = 0; i < 16; i++) l.add(FloatTag.valueOf(m.getRowColumn(i >> 2, i & 3)));
         tag.put("transformation", l);
-        CompoundTag luz = new CompoundTag();
-        luz.putInt("sky", 15);
-        luz.putInt("block", 15);
-        tag.put("brightness", luz);
-        tag.putFloat("view_range", 1.2f);
+        if (deCara) {
+            tag.putString("billboard", "vertical");
+            CompoundTag luz = new CompoundTag();
+            luz.putInt("sky", 15);
+            luz.putInt("block", 15);
+            tag.put("brightness", luz);
+        }
+        tag.putFloat("view_range", deCara ? 1.2f : 1.6f);
         d.load(tag);
-        d.moveTo(s[0] + 0.5, s[1], s[2] + 0.5, 0f, 0f);
+        d.moveTo(x, y, z, 0f, 0f);
         d.addTag(TAG);
         lvl.addFreshEntity(d);
         return d;
@@ -527,7 +572,7 @@ public final class Pueblo {
     /** Del timon de La Garza Gris a Valdrenn (de momento, sin viaje: la cinematica llega en la parte 3d). */
     private static void zarpar(ServerPlayer p) {
         ServerLevel lvl = p.serverLevel();
-        BlockPos l = MundoNubes.llegada(lvl.getSeed());
+        BlockPos l = llegada(lvl);
         if (l == null) {
             Net.to(p, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.pueblo.sin_rumbo", 0));
             return;

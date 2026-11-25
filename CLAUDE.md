@@ -612,9 +612,17 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   chispas doradas, y salen en un cartel ("La Vela Mayor / Pieza de La Garza Gris · 1 de 5"). **Las tres campanas**: en
   el orden en que murieron los fundadores (Pescador 187, Tejedora 198, Farero 212: lo dicen sus lapidas y la nota de la
   capilla) apartan la losa de la cripta. Con las cinco, en la cubierta: **reparar** (`Pueblo.levantar`: se vuelve a
-  levantar `Barco` entero encima —palo, vergas y velas, la rueda del timon (una piedra de afilar), el ancla, el corazon
-  en la bodega—) y desde el timon **zarpar** (de momento un salto a la llegada; el viaje es de la 3d) y volver desde el
-  noray de la llegada.
+  levantar `Barco` entero encima —palo, vergas y velas, la rueda del timon (una piedra de afilar), el corazon en la
+  bodega—) y desde el timon **zarpar** (de momento un salto a la llegada; el viaje es de la 3d) y volver desde el
+  noray de la llegada. **El ancla** del barco reparado no es un bloque (un yunque colgado se cae: los bloques que caen
+  no se pueden colgar): es el dibujo de la pieza en un `item_display` quieto, de canto al barco, bajo la serviola
+  (`Barco.ancla()`; lo mantiene `Pueblo.onServidor`, como el corazon de la bodega). `Barco.despejar` quita lo del barco
+  antes de volver a levantarlo: fuera de la manga del casco (donde esta el espigon) solo de `CUBIERTA + 5` para arriba.
+- **El marcador de las piezas** (`Hud.piezas`): en el borde derecho de la pantalla, las cinco una debajo de otra (las que
+  faltan, apagadas; la recien encontrada destella), mientras se esta en la isla con el barco roto. `Net.Cosas` lleva
+  tambien las piezas encontradas y si el barco esta reparado.
+- **El viento**: en el bioma de la isla suena en bucle `ambiente.brumavela` (`ClientMusic.tickBruma`, calla la musica de
+  Minecraft; master `brumavela_viento`, toma 3).
 - **Las "cosas"** (lo que se usa con la tecla del aviso, "Pulsa [E] para..."): el servidor manda la lista de las que hay
   (`Net.Cosas`, al entrar en la isla y cuando cambia) y el cliente (`client/ui/ClientPueblo`) elige la que se tiene
   delante a menos de 4 bloques y pide usarla (`Net.CosaUsar` → `Pueblo.usar`). El clic derecho en el arcon de la vela,
@@ -632,7 +640,9 @@ empezarla). Lo esencial, que cambia reglas de arriba:
   `cripta_abre` (1 y 3), `barco_reparado` (1 y 3).
 - Comandos `/darkcraft brumavela ir [<sitio>] | pieza <nombre>|todas | cripta | reparar | zarpar | estado | reiniciar`.
   Prueba del servidor: genera la isla entera, la recorre a pie, mira los bloques de la historia, abre la cripta, repara
-  el barco y lo deja todo como estaba. Prueba del cliente: tramo `pueblo()` (capturas `cliente_b01..b18`).
+  el barco y lo deja todo como estaba (compara el barco bloque a bloque). Prueba del cliente: tramo `pueblo()` (capturas
+  `cliente_b01..b18`). **Ojo: la prueba del cliente juega en el mundo que deja la prueba del servidor** (`srv2/world`):
+  lo que esta deje mal puesto sale en las capturas (asi se vio que `despejar` dejaba trozos de vela al reiniciar).
 
 ### Lo siguiente: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

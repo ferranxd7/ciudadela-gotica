@@ -86,13 +86,17 @@ public final class Barco extends Element {
                 || (Math.abs(x - BX) <= 1 && z == CASTILLO - 2 && Hash.pct(x, 0, z, seed + 2) < 60);
     }
 
-    /** Quita lo que haya del barco (no las nubes): para volver a levantarlo entero. */
+    /**
+     * Quita lo que haya del barco (no las nubes), para volver a levantarlo entero o roto. Fuera de la manga del casco
+     * esta el espigon, con una farola que llega a {@code CUBIERTA + 4}: ahi solo se quita lo que vuela por encima, que
+     * son las vergas y las velas (la mayor empieza en {@code CUBIERTA + 5}).
+     */
     public void despejar(Canvas c) {
         for (int x = x0; x <= x1; x++)
             for (int z = z0; z <= z1; z++) {
                 boolean casco = x >= BX - 5 && x <= BX + 4;
                 for (int y = y0; y <= y1; y++) {
-                    if (!casco && y < CUBIERTA + 8) continue;
+                    if (!casco && y < CUBIERTA + 5) continue;
                     BlockState s = c.get(x, y, z);
                     if (!s.isAir() && !(s.getBlock() instanceof NubeBlock)) c.set(x, y, z, Pal.AIR);
                 }
@@ -272,8 +276,11 @@ public final class Barco extends Element {
     }
 
     private BlockState lona(int x, int y) {
-        int p = Hash.pct(x, y, 7, seed + 5);
-        return Pal.b(p < 62 ? Blocks.LIGHT_GRAY_WOOL : p < 88 ? Blocks.WHITE_WOOL : Blocks.GRAY_WOOL);
+        // panos a lo alto, con remiendos grandes (no a pixeles sueltos)
+        int p = Hash.pct(x >> 1, y / 3, 7, seed + 5), q = Hash.pct(x, y, 9, seed + 5);
+        if (p < 3) return Pal.b(Blocks.GRAY_WOOL);
+        if (Math.floorMod(x - BX, 4) == 2) return Pal.b(q < 85 ? Blocks.WHITE_WOOL : Blocks.LIGHT_GRAY_WOOL);
+        return Pal.b(q < 8 ? Blocks.WHITE_WOOL : Blocks.LIGHT_GRAY_WOOL);
     }
 
     private void proa(Canvas c) {
@@ -281,13 +288,16 @@ public final class Barco extends Element {
         c.set(BX, CUBIERTA + 2, PROA, Pal.DO_LOG);
         for (int k = 1; k <= 6; k++) c.set(BX, CUBIERTA + 1 + (k + 1) / 3, PROA + k, Pal.log(Blocks.STRIPPED_SPRUCE_LOG, Direction.Axis.Z));
         c.set(BX, CUBIERTA + 2, PROA + 6, Pal.SOUL_LANTERN_HANG);
-        // la serviola del ancla, a estribor (del lado del espigon): la cadena, y el ancla si esta
-        int ax = BX + manga(PROA - 4) + 1, az = PROA - 4;
-        c.set(ax, CUBIERTA + 1, az, Pal.log(Blocks.STRIPPED_DARK_OAK_LOG, Direction.Axis.X));
-        if (entero) {
-            c.set(ax, CUBIERTA, az, Pal.CHAIN);
-            c.set(ax, CUBIERTA - 1, az, Pal.facing(Blocks.ANVIL, Direction.NORTH));
-        } else for (int k = 0; k < 4; k++) c.set(ax, CUBIERTA - k, az, Pal.CHAIN);
+        // la serviola del ancla, a estribor (del lado del espigon): la cadena colgando vacia, o recogida con el ancla
+        // (que no es un bloque: un yunque colgado se cae; la pinta pueblo/Pueblo con el dibujo de la pieza)
+        int[] a = ancla();
+        c.set(a[0], CUBIERTA + 1, a[2], Pal.log(Blocks.STRIPPED_DARK_OAK_LOG, Direction.Axis.X));
+        for (int k = 0; k < (entero ? 1 : 4); k++) c.set(a[0], CUBIERTA - k, a[2], Pal.CHAIN);
+    }
+
+    /** Donde cuelga el ancla del barco reparado: bajo la serviola (el bloque de su eslabon). */
+    public static int[] ancla() {
+        return new int[]{BX + manga(PROA - 4) + 1, CUBIERTA, PROA - 4};
     }
 
     private void detalles(Canvas c) {

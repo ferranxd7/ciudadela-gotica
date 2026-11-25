@@ -149,6 +149,7 @@ public final class Hud {
         ecos(mc, g, t, w, h);
         if (mc.screen == null) Conseguidos.dibujar(mc, g, t, w, h);
         if (!mc.options.renderDebug && ClientRol.ticks - jefeTick > 3) brujula(mc, g, p, pt, w, fin);
+        if (ClientPueblo.marcador() && !mc.options.renderDebug && mc.screen == null) piezas(g, t, w, h);
         if (avisoAlfa > 0.02f) avisoDeTecla(mc, g, w, h);
         Pix.blanco();
         Pix.mezcla();
@@ -430,6 +431,52 @@ public final class Hud {
 
     private static final int[] RUMBOS = {180, -90, 0, 90};
     private static final String[] LETRAS = {"n", "e", "s", "o"};
+
+    private static final net.minecraft.world.item.ItemStack[] PIEZAS = new net.minecraft.world.item.ItemStack[5];
+
+    /**
+     * En Brumavela, en el borde derecho de la pantalla: las cinco piezas de La Garza Gris, una debajo de otra; las que
+     * faltan, apagadas. La que se acaba de encontrar destella un momento. (Ahi no hay nada mas: arriba en el centro
+     * salen los carteles y los logros.)
+     */
+    private static void piezas(GuiGraphics g, float t, int w, int h) {
+        if (PIEZAS[0] == null) {
+            PIEZAS[0] = new net.minecraft.world.item.ItemStack(DarkCraftMod.PIEZA_VELA.get());
+            PIEZAS[1] = new net.minecraft.world.item.ItemStack(DarkCraftMod.PIEZA_TIMON.get());
+            PIEZAS[2] = new net.minecraft.world.item.ItemStack(DarkCraftMod.PIEZA_MASTIL.get());
+            PIEZAS[3] = new net.minecraft.world.item.ItemStack(DarkCraftMod.PIEZA_ANCLA.get());
+            PIEZAS[4] = new net.minecraft.world.item.ItemStack(DarkCraftMod.PIEZA_CORAZON.get());
+        }
+        int paso = 20, x = w - 5 - 17, y0 = h / 2 - (5 * paso - 2) / 2;
+        float hace = t - ClientPueblo.cambio;
+        for (int i = 0; i < 5; i++) {
+            int y = y0 + i * paso;
+            boolean hay = (ClientPueblo.piezas & (1 << i)) != 0;
+            // la casilla: fondo oscuro con sus filos de oro (apagados si falta la pieza)
+            int filo = hay ? 0xD0C0963C : 0x904A3312;
+            g.fill(x - 1, y - 1, x + 17, y + 17, 0xA6050408);
+            g.fill(x - 1, y - 1, x + 17, y, filo);
+            g.fill(x - 1, y + 16, x + 17, y + 17, filo);
+            g.fill(x - 1, y, x, y + 16, filo);
+            g.fill(x + 16, y, x + 17, y + 16, filo);
+            g.renderItem(PIEZAS[i], x, y);
+            if (!hay) {
+                // la que falta: su sombra
+                g.pose().pushPose();
+                g.pose().translate(0, 0, 220);
+                g.fill(x, y, x + 16, y + 16, 0xC8050408);
+                g.pose().popPose();
+            } else if (hace < 30 && (ClientPueblo.nuevas & (1 << i)) != 0) {
+                g.pose().pushPose();
+                g.pose().translate(0, 0, 220);
+                int a = Math.round(150 * (1f - hace / 30f));
+                g.fill(x - 1, y - 1, x + 17, y + 17, (a << 24) | 0xFFF2C4);
+                g.pose().popPose();
+            }
+        }
+        Pix.blanco();
+        Pix.mezcla();
+    }
 
     private static void brujula(Minecraft mc, GuiGraphics g, LocalPlayer p, float pt, int w, int finBarras) {
         int libre = w / 2 - Math.max(finBarras, EspejoHud.anchoEnPantalla() + 8);

@@ -72,7 +72,8 @@ public final class Muelle extends Element {
             for (int y = Y - 10; y <= cima; y++) c.set(x, y, FRENTE, y == Y && cima == Y ? Mat.losas(x, y, FRENTE, seed) : Mat.sillar(x, y, FRENTE, seed));
             for (int y = cima + 1; y <= Y + 4; y++)
                 if (c.get(x, y, FRENTE).getBlock() instanceof NubeBlock) c.set(x, y, FRENTE, Pal.AIR);
-            if (cima == Y && Math.abs(x) % 8 == 6 && !enEspigon(x, Z0) && !enChico(x, Z0)) {
+            // los norayes (ninguno delante de donde se despierta, que tapa el barco)
+            if (cima == Y && Math.abs(x) % 8 == 2 && !enEspigon(x, Z0) && !enChico(x, Z0)) {
                 c.set(x, Y + 1, FRENTE, Pal.DO_LOG);
                 c.set(x, Y + 2, FRENTE, Pal.slab(Blocks.DARK_OAK_SLAB, false));
             }

@@ -22,14 +22,33 @@ public final class ClientPueblo {
     public static int aMano = -1;
     private static int accion;
 
-    public static void recibir(List<Pueblo.Cosa> lista) {
+    /** Las piezas del barco que ya se han encontrado (un bit por pieza) y si el barco esta reparado. */
+    public static int piezas;
+    public static boolean reparado;
+    /** Cuando cambio lo encontrado (para el destello del marcador). */
+    static int cambio = -1000, nuevas;
+
+    public static void recibir(List<Pueblo.Cosa> lista, int piezasAhora, boolean reparadoAhora) {
+        if (!lista.isEmpty() && !cosas.isEmpty() && (piezasAhora & ~piezas) != 0) {
+            cambio = ClientRol.ticks;
+            nuevas = piezasAhora & ~piezas;
+        }
         cosas = lista;
+        piezas = piezasAhora;
+        reparado = reparadoAhora;
         aMano = -1;
     }
 
     static void olvidar() {
         cosas = List.of();
         aMano = -1;
+        piezas = 0;
+        reparado = false;
+    }
+
+    /** Si hay que ensenar el marcador de las piezas: en la isla, mientras el barco siga roto. */
+    static boolean marcador() {
+        return !cosas.isEmpty() && !reparado;
     }
 
     /** Lo que dice el aviso de la cosa que se tiene a mano ("Pulsa [E] " + esto). */
