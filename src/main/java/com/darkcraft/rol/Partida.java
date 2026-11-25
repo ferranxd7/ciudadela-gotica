@@ -30,7 +30,8 @@ public final class Partida {
 
     public static final String FICHERO = "darkcraft_partida.json";
 
-    @SubscribeEvent
+    /** Lo primero al salir: despues el rol olvida su estado (y con el la zona). */
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
     public static void onSalir(PlayerEvent.PlayerLoggedOutEvent e) {
         if (e.getEntity() instanceof ServerPlayer sp) escribir(sp);
     }

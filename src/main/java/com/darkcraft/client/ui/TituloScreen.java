@@ -214,6 +214,30 @@ public class TituloScreen extends Screen {
         super.render(g, mx, my, pt);
     }
 
+    /**
+     * El fondo del titulo para las demas pantallas de los menus fuera del mundo (opciones, mods, partidas...): las nubes
+     * siguen moviendose, sin rayos ni brasas, y oscurecido para que se lea la losa.
+     */
+    public static void fondoMenus(GuiGraphics g, int width, int height) {
+        float tt = (net.minecraft.Util.getMillis() % 10_000_000L) / 50f;
+        float s = Math.max(width / (float) FW, height / (float) FH);
+        float ox = (width - FW * s) / 2f, oy = (height - FH * s) / 2f;
+        g.pose().pushPose();
+        g.pose().translate(ox, oy, 0);
+        g.pose().scale(s, s, 1);
+        Pix.mezcla();
+        Pix.blanco();
+        g.blit(CIELO, 0, 0, 0, 0, FW, FH, FW, FH);
+        g.blit(LEJOS, 0, 0, 0, 0, FW, FH, FW, FH);
+        int offL = Math.round((tt * 0.12f) % NUBES_W), offC = Math.round((tt * 0.35f) % NUBES_W);
+        for (int x = -offL; x < FW; x += NUBES_W) g.blit(NUBES_LEJOS, x, NUBES_LEJOS_Y, 0, 0, NUBES_W, NUBES_LEJOS_H, NUBES_W, NUBES_LEJOS_H);
+        for (int x = -offC; x < FW; x += NUBES_W) g.blit(NUBES_CERCA, x, NUBES_CERCA_Y, 0, 0, NUBES_W, NUBES_CERCA_H, NUBES_W, NUBES_CERCA_H);
+        g.pose().popPose();
+        g.fill(0, 0, width, height, 0x9A050308);
+        Pix.blanco();
+        Pix.mezcla();
+    }
+
     private void fondo(GuiGraphics g, float tt) {
         float s = escala();
         float ox = (width - FW * s) / 2f, oy = (height - FH * s) / 2f;

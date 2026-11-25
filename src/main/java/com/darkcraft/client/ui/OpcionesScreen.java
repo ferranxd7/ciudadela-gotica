@@ -273,6 +273,12 @@ public class OpcionesScreen extends Screen {
     }
 
     @Override
+    public void renderBackground(GuiGraphics g) {
+        if (minecraft.level == null) TituloScreen.fondoMenus(g, width, height);
+        else super.renderBackground(g);
+    }
+
+    @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
         renderBackground(g);
         int x = x0(), y = y0(), w = ancho(), h = alto();

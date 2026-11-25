@@ -94,7 +94,14 @@ public final class AvisoLogro {
         dibujar(Minecraft.getInstance(), e.getGuiGraphics(), true);
     }
 
+    /** Al salir del mundo se olvidan los que quedaran por salir (no tienen que verse en el titulo). */
+    @SubscribeEvent
+    public static void onSalir(net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut e) {
+        olvidar();
+    }
+
     private static void dibujar(Minecraft mc, GuiGraphics g, boolean conPantalla) {
+        if (mc.level == null) return;
         long ahora = Util.getMillis();
         long paso = Math.max(0, Math.min(250, ahora - ultimo));
         ultimo = ahora;

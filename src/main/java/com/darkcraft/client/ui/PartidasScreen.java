@@ -14,8 +14,6 @@ import org.lwjgl.glfw.GLFW;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,6 +124,12 @@ public class PartidasScreen extends Screen {
     // ------------------------------------------------------------------ dibujo
 
     @Override
+    public void renderBackground(GuiGraphics g) {
+        if (minecraft.level == null) TituloScreen.fondoMenus(g, width, height);
+        else super.renderBackground(g);
+    }
+
+    @Override
     public void render(GuiGraphics g, int mx, int my, float pt) {
         renderBackground(g);
         int x = x0(), y = y0(), w = ancho(), h = alto();
@@ -167,8 +171,10 @@ public class PartidasScreen extends Screen {
 
     private void fila(GuiGraphics g, Guardadas.Una u, int x, int y, int w, boolean elegida, boolean encima) {
         if (elegida) {
-            Pix.blanco();
-            Panel.fila(g, x, y + 10, w);
+            // toda la fila: rojo oscuro con un filo de oro arriba y abajo que se apaga a los lados
+            g.fill(x + 1, y, x + w - 1, y + FILA - 1, 0x70300A10);
+            Pix.franja(g, x, x + w, y, y + 1, 0xC0963C, 0.95f);
+            Pix.franja(g, x, x + w, y + FILA - 2, y + FILA - 1, 0xC0963C, 0.95f);
         } else if (encima) {
             g.fill(x + 1, y + 1, x + w - 1, y + FILA - 1, 0x30E2BF62);
         }
@@ -187,7 +193,7 @@ public class PartidasScreen extends Screen {
         String linea = u.linea().getString();
         if (u.horas() > 0) linea += " · " + Component.translatable("darkcraft.partidas.horas", String.format("%.1f", u.horas())).getString();
         g.drawString(font, recortar(linea, tw), tx, y + 18, elegida ? CLARO : APAGADO, true);
-        String cuando = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(new Date(u.mundo().getLastPlayed()));
+        String cuando = Guardadas.fecha(u.mundo().getLastPlayed());
         if (u.mundo().isHardcore()) cuando += " · " + Component.translatable("darkcraft.partidas.extremo").getString();
         if (!u.jugable()) cuando += " · " + Component.translatable("darkcraft.partidas.no_se_abre").getString();
         g.drawString(font, recortar(cuando, tw), tx, y + 28, u.jugable() ? GRIS : ROJO, true);

@@ -86,6 +86,14 @@ public final class Guardadas {
         return new Una(s, nivel, zona, clase, ecos, dia, horas);
     }
 
+    /** La fecha y la hora en el idioma del juego ("25 nov 2026, 3:47"). */
+    public static String fecha(long millis) {
+        String idioma = Minecraft.getInstance().getLanguageManager().getSelected();
+        String[] q = idioma.split("_");
+        java.util.Locale l = q.length >= 2 ? new java.util.Locale(q[0], q[1].toUpperCase(java.util.Locale.ROOT)) : new java.util.Locale(q[0]);
+        return java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT, l).format(new java.util.Date(millis));
+    }
+
     /** La carpeta del icono del mundo (icon.png), si lo tiene. */
     public static Path icono(Una u) {
         Path p = u.mundo().getIcon();
