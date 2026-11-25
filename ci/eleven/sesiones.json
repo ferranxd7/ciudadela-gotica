@@ -1859,5 +1859,117 @@
         "nota": "30 s cada toma; la 2 no se bajo (tardo en generarse)"
       }
     }
+  },
+  "sfx_valdrenn_guardia": {
+    "flow": "JYf2tnYdLwluhbLBj6Nh",
+    "modelo": "eleven_text_to_sound_v3",
+    "nota": "Parte 4a: la guardia de Valdrenn (la alerta del caballero) y el arquero esqueleto (tensar y soltar el arco, alerta, huesos, dolor y muerte). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+    "sonidos": {
+      "guardia_alerta": {
+        "prompt": "An undead armored knight spotting an intruder: a deep, hoarse, menacing growl-roar muffled inside a closed iron helmet, with a sharp clank of plate armor as he raises his weapon, dark fantasy RPG enemy alert sound like Dark Souls, no music, about 1.5 seconds",
+        "sesiones": [
+          "SYtCqiLLxo1WR0z6f9kf",
+          "RqK83bCPKgXmSOIREOPM",
+          "2KKOCsxGKPF7CmDwp50q",
+          "4FZ4JtX7TpENVpbRqTXO"
+        ],
+        "generaciones": [
+          "73z4sBRQ3qyOghkoZKcG",
+          "HLDjeMLsiV0TduMhSOuQ",
+          "dXDFqb62QUyPlEYFCSJp",
+          "ki3PdlHtGfxsBMa2IENF"
+        ]
+      },
+      "arco_tensar": {
+        "prompt": "An old wooden longbow being drawn: the slow creak and strain of the bow limbs bending and the taut bowstring stretching back, tense and close up, dark fantasy, about 1 second, no music, clean",
+        "sesiones": [
+          "2kBfj4HnxWnM2q7rZ9VH",
+          "loAlbQZ7vZkDzNhfPTaz",
+          "AIs7rGjrS6hPGUV74Zsp",
+          "eEy2KixnYf6By3b1hlMU"
+        ],
+        "generaciones": [
+          "TZAiRkz2m43m6nzA0TC3",
+          "AxXC9XNmaNxKY8U28kWF",
+          "LMALvIg8ub4S3z5UrXrC",
+          "BpMvH5flK3OGRZ79u8sx"
+        ]
+      },
+      "arco_suelta": {
+        "prompt": "An arrow released from a heavy longbow: a sharp deep bowstring twang and a fast whoosh of the arrow flying away, crisp and close, dark fantasy, about 0.8 seconds, no music",
+        "sesiones": [
+          "GBLYXiqw0CRsjBRO75gH",
+          "L09peEA0lFZp1gKsVIs8",
+          "Xj5HyQTRP3s0eNR40umo",
+          "PRiyiYymleW03u9YA1g4"
+        ],
+        "generaciones": [
+          "gWwL2z2G0AZWGrm27SFz",
+          "nPvx9ZrhYW4br2h3yHC1",
+          "wsuXy0r0TuhD5tAcWIKg",
+          "HFoFI6OugttvBLSzf5BY"
+        ]
+      },
+      "arquero_alerta": {
+        "prompt": "An undead skeleton archer noticing an intruder: a dry rattling clatter of old bones and a raspy hollow hiss from a fleshless skull, eerie and threatening, dark fantasy RPG enemy alert sound, about 1.2 seconds, no music",
+        "sesiones": [
+          "oYqZWTk8pFz6UuXLLw18",
+          "6xmUkZWLBRASFyV2xFej",
+          "kXSdjaisQLUkC1p414nm",
+          "7NNGGruZQfDGQ79MmyVZ"
+        ],
+        "generaciones": [
+          "xJUowgV3Z5XqzEx0FLS9",
+          "dNYhKLFkqiDMLgLmym9f",
+          "M8NRpFZUuoKQKjWFlKZv",
+          "NeYwPcycXObaJf0qtd6k"
+        ]
+      },
+      "arquero_huesos": {
+        "prompt": "Idle undead skeleton: soft dry clicking and rattling of old bones shifting, a faint creak of a loose jaw, quiet and eerie, close, about 1.8 seconds, no music",
+        "sesiones": [
+          "Oa2hepi3Mlcp1ESdv7zB",
+          "Pkp8Aj3hrdrDeDwLbWBQ",
+          "I7gPIvNc5URFPS8fdOoE",
+          "DtXODfHL0s71n5nWipqq"
+        ],
+        "generaciones": [
+          "Ro1VV6J7MKbsqSTJYhhe",
+          "ADYzDp4OYbiSIVYJboSm",
+          "Ktn5rLFIH5Ueis6Qdyyo",
+          "OKXHjT7FBPRapXOBsLvK"
+        ]
+      },
+      "arquero_dolor": {
+        "prompt": "A skeleton warrior being struck by a sword: a hard crack of brittle bone with a short dry rattle, punchy and impactful, dark fantasy combat hurt sound, about 0.6 seconds, no music",
+        "sesiones": [
+          "E21ARB5EPGaZgrKptsws",
+          "HvJej4akrLgFVeIn29FE",
+          "y3ghO7CQisEOhxPdckl2",
+          "PNDKuafLr8hsN5A73R2t"
+        ],
+        "generaciones": [
+          "Xuz5hpqWdff5Q7DmslKP",
+          "kuvAJOzpHbJlxVzGp8on",
+          "gaboiKBieqnwYIaeIpN4",
+          "zQU7n61yUSitt7efxv65"
+        ]
+      },
+      "arquero_muerte": {
+        "prompt": "A skeleton warrior collapsing and dying: bones cracking apart and clattering down onto a stone floor in a heap, a dry hollow hiss fading out, dark fantasy RPG death sound, about 2 seconds, no music",
+        "sesiones": [
+          "5aLnwYWwd671fC5YaMzZ",
+          "hBbM21pGLvLAIg6g0yJo",
+          "ZMHbCAC2fY9sxW6wQw3H",
+          "wfe67MspVYdsGWFXXkzg"
+        ],
+        "generaciones": [
+          "xkBvdHWOxvPYKxngKb4H",
+          "zh5xkls3NydugKzzv3T8",
+          "tC3DiwsGhYDAWStWPg3F",
+          "SlsThdxmLFMWN0cz5Q5X"
+        ]
+      }
+    }
   }
 }
