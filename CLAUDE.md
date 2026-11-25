@@ -936,6 +936,10 @@ Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publica
   sueltos chocaba con el limite secundario de GitHub y la release se quedaba a medias, en borrador).
   Las rutas REST de Actions (artifacts, secrets) no pasan por el proxy; `gh run list` sí funciona.
 - Commits: `git -c user.name="Claude" -c user.email="noreply@anthropic.com" commit`.
+- Si una build falla por la red (maven), `gh run rerun ID --failed` la repite con el mismo numero: el paso "Subir
+  release" borra antes la release `build-N` que dejo el intento fallido (desde esta sesion no se pueden borrar
+  releases a mano: da 403). Un reintento usa el workflow del commit original: para builds de antes de ese arreglo,
+  mejor lanzar otra (`gh workflow run build.yml --ref RAMA`, numero nuevo).
 
 ## Audios de ElevenLabs (cómo se traen al repositorio)
 
