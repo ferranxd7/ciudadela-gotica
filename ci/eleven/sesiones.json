@@ -1333,5 +1333,21 @@
     ]
    }
   }
+ },
+ "sfx_logro": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "parte 2f-1: el aviso de los logros (los de desafio llevan la fanfarria de Minecraft)",
+  "sonidos": {
+   "logro": {
+    "prompt": "Dark fantasy achievement unlocked UI sound, epic cinematic Dark Souls style: a single deep resonant bronze bell toll with a bright shimmering magical chime on top and a soft airy choir breath swelling underneath, long reverb tail in a stone cathedral, about 2 seconds, clean, no music melody.",
+    "sesiones": [
+     "fzTGvXlCySt3HSt1i6E3",
+     "I2E6pkysOd2R5qQBJ5Eq",
+     "j4LR3sgT6GPUl2bOVEVh",
+     "o2GlyAffK8RrXcWmneLI"
+    ]
+   }
+  }
  }
 }
