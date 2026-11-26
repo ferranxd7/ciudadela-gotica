@@ -41,6 +41,10 @@ import java.util.List;
  * ({@link Capital#esperas}): guardias con su escudo en el camino, en la puerta, en el adarve y en la sala de la guardia;
  * incendiarios por las calles y en las ventanas; cenicientos enterrados en los montones de ceniza y dentro de las casas; y
  * los del cuartel.</li>
+ * <li><b>La Academia Espectral</b> (sitio {@value #ACADEMIA}, parte 7o): los eruditos que apunta el plano ({@link Academia#esperas}):
+ * aprendices leyendo en las galerias del claustro, a las mesas de la biblioteca, en los pupitres del scriptorium y en los bancos
+ * del aula, o tumbados entre los libros; maestros de ronda (por el claustro y el altillo), en la catedra y en el archivo de la
+ * torre; custodios en la puerta, entre los estantes, ante el grimorio y en la veta.</li>
  * </ul>
  * Nadie a menos de 18 bloques del arco ni de 14 de un santuario.
  */
@@ -49,9 +53,10 @@ public final class MorvainEnemigos {
 
     public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo",
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
-            CAPITAL = "capital", JURAMENTO = "juramento";
+            CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
-            BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable";
+            BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
+            ERUDITO = "erudito";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
@@ -60,7 +65,7 @@ public final class MorvainEnemigos {
     private static final List<Puesto> VELMOR_P = new ArrayList<>(), LLANURAS_P = new ArrayList<>(), MOLINO_P = new ArrayList<>(),
             ARBOLEDA_P = new ArrayList<>(), PATIBULO_P = new ArrayList<>(), PILOTES_P = new ArrayList<>(), LAGUNA_P = new ArrayList<>(),
             BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>(), ERMITA_P = new ArrayList<>(), CUMBRE_P = new ArrayList<>(),
-            CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>();
+            CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -167,6 +172,9 @@ public final class MorvainEnemigos {
         for (Juramento.Espera e : Juramento.get().esperas())
             JURAMENTO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? CONDESTABLE : CALCINADO, e.variante(), e.x(), e.y(), e.z(), e.giro(),
                     e.postura(), e.ronda(), e.grupo()));
+        // ---- la Academia Espectral (parte 7o): los eruditos que apunta el plano
+        for (Academia.Espera e : Academia.get().esperas())
+            ACADEMIA_P.add(new Puesto(ERUDITO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -206,6 +214,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(ABAD, DarkCraftMod.ABAD);
         Puestos.tipo(CALCINADO, DarkCraftMod.CALCINADO);
         Puestos.tipo(CONDESTABLE, DarkCraftMod.CONDESTABLE);
+        Puestos.tipo(ERUDITO, DarkCraftMod.ERUDITO);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -224,6 +233,7 @@ public final class MorvainEnemigos {
         // la guardia de la Puerta Oeste y los que querian salir solo mientras vive el Condestable (vencido, descansan)
         Puestos.registrar(CAPITAL, CAPITAL_P, Morvain::es, (l, p) -> !Juramento.DESCANSAN.contains(p.grupo()) || !Juramento.enPaz(l.getServer()));
         Puestos.registrar(JURAMENTO, JURAMENTO_P, Morvain::es);
+        Puestos.registrar(ACADEMIA, ACADEMIA_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -296,6 +306,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> juramento() {
         preparar();
         return List.copyOf(JURAMENTO_P);
+    }
+
+    public static List<Puesto> academia() {
+        preparar();
+        return List.copyOf(ACADEMIA_P);
     }
 
     public static List<Puesto> velmor() {
@@ -841,6 +856,61 @@ public final class MorvainEnemigos {
         return s;
     }
 
+    /** {@code /darkcraft academia [ir <sitio> | enemigos [volver | fuera | sacar]]} (parte 7o): la Academia Espectral. */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoAcademia() {
+        return net.minecraft.commands.Commands.literal("academia")
+                .executes(c -> decir(c, estadoAcademia(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irAcademia(c.getSource(), "entrada"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Academia.get().sitios().keySet(), b))
+                                .executes(c -> irAcademia(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoAcademia(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), ACADEMIA, false);
+                            return decir(c, "vuelven todos los eruditos");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), ACADEMIA, true);
+                            return decir(c, "fuera todos los eruditos");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            net.minecraft.server.level.ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, ACADEMIA).size();
+                            return decir(c, "fuera " + n);
+                        })));
+    }
+
+    private static int irAcademia(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Academia.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Academia.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando hacia el norte (a la biblioteca); en la biblioteca, al estrado del grimorio
+        double tx = s[0], tz = s[2] - 10;
+        if (Academia.enBiblioteca(s[0], s[2])) {
+            tx = Academia.CX;
+            tz = Academia.CZ - 48;
+            if (Math.hypot(tx - s[0], tz - s[2]) < 3) tz = s[2] + 10;
+        }
+        float giro = (float) (Math.toDegrees(Math.atan2(tz - s[2], tx - s[0])) - 90.0);
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
+        return 1;
+    }
+
+    /** Cuantos eruditos quedan y cuantos andan fuera (y como esta la academia, si esta cargada). */
+    public static String estadoAcademia(net.minecraft.server.MinecraftServer srv) {
+        String s = "academia espectral: quedan " + Puestos.quedan(srv, ACADEMIA) + " de " + ACADEMIA_P.size() + " (fuera "
+                + Puestos.fuera(ACADEMIA) + ")";
+        var m = Morvain.nivel(srv);
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(Academia.CX, Academia.PISO, Academia.CZ - 48))) s += "; " + Academia.resumen(m);
+        return s;
+    }
+
     /**
      * {@code /darkcraft condestable [ir | vencer | volver | patio <sitio> | rastrillo [bajar | subir]]} (parte 7n): como esta el
      * Condestable, llevar ante el (a la puerta del patio), vencerle, que vuelva (y la capital como estaba), ir a un sitio del patio
@@ -952,6 +1022,7 @@ public final class MorvainEnemigos {
         todos.addAll(CUMBRE_P);
         todos.addAll(CAPITAL_P);
         todos.addAll(JURAMENTO_P);
+        todos.addAll(ACADEMIA_P);
         for (Puesto p : todos) {
             if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
             for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
@@ -965,6 +1036,6 @@ public final class MorvainEnemigos {
                 + " en el patibulo, " + PILOTES_P.size() + " en la aldea de los pilotes, " + LAGUNA_P.size() + " en la laguna negra y "
                 + BARCA_P.size() + " en la barca, " + MONASTERIO_P.size() + " en el monasterio, " + ERMITA_P.size() + " en la escalera de la ermita y "
                 + CUMBRE_P.size() + " en la cumbre, " + CAPITAL_P.size() + " en la puerta oeste de la capital, " + JURAMENTO_P.size()
-                + " en el patio del Juramento; cerca del arco o de un santuario " + cerca;
+                + " en el patio del Juramento, " + ACADEMIA_P.size() + " en la academia espectral; cerca del arco o de un santuario " + cerca;
     }
 }

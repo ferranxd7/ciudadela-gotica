@@ -243,13 +243,22 @@ SFX = {
     "condestable_embestida": (2.6, 0.6, -14), "condestable_llamarada": (3.0, 1.0, -13), "condestable_rastrillo": (3.6, 0.8, -12),
     "condestable_abrir": (8.0, 1.5, -15), "condestable_cuerno": (5.5, 1.5, -13), "condestable_alzar": (3.0, 1.0, -14),
     "condestable_dolor": (0.9, 0.25, -15), "condestable_muerte": (6.5, 1.8, -14), "condestable_espera": (6.0, 1.2, -22),
+    # los eruditos de la Academia Espectral (parte 7o): el susurro de la leccion (muy flojo de origen), el respingo al ver a
+    # alguien, el quejido, la muerte (un suspiro y las hojas que se lleva el viento), el plumazo del calamo, el tintero que
+    # revienta, el orbe que se carga y sale, el circulo de runas que se enciende y revienta, el parpadeo, el tomazo contra el
+    # suelo, la cadena que voltea el tomo y alzarse de un monton de libros; y el ambiente de la academia
+    "erudito_susurro": (5.0, 1.2, -21), "erudito_alerta": (2.2, 0.6, -15), "erudito_dolor": (1.2, 0.4, -16),
+    "erudito_muerte": (4.5, 1.4, -16), "erudito_pluma": (1.0, 0.3, -14), "erudito_tinta": (1.4, 0.5, -14),
+    "erudito_orbe": (2.6, 0.8, -15), "erudito_runas": (2.4, 0.6, -14), "erudito_parpadeo": (1.6, 0.5, -15),
+    "erudito_tomazo": (2.8, 0.8, -13), "erudito_cadena": (2.0, 0.6, -14), "erudito_alzarse": (3.5, 1.0, -16),
+    "academia_ambiente": (20.0, 2.0, -25),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
            "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0, "abad_ventisca": 1.5, "abad_rezo": 0.4,
-           "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6}
+           "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6, "academia_ambiente": 2.0, "erudito_susurro": 0.8}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
-INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8}
+INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
 GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
@@ -429,6 +438,15 @@ TOMAS_SFX = {
     "condestable_grito": (4, 2), "condestable_tajo": (4, 1), "condestable_barrido": (4, 1), "condestable_embestida": (3, 2),
     "condestable_llamarada": (2, 1), "condestable_rastrillo": (4, 1), "condestable_abrir": (1, 4), "condestable_cuerno": (4, 2),
     "condestable_alzar": (3, 2), "condestable_dolor": (3, 1, 4), "condestable_muerte": (2, 4), "condestable_espera": (1, 3),
+    # los eruditos: los dos susurros mas fuertes (la 1 y la 4); los dos respingos con el golpe mas claro al principio (la 3 y la
+    # 1: se corta antes del segundo ruido); tres quejidos; las dos muertes mas largas; los dos plumazos con dos golpes; los
+    # dos tinteros que revientan fuerte (se salta hasta poco antes); los dos orbes mas parejos; las dos runas que mas suben;
+    # los dos parpadeos mas claros; el tomazo gordo (la 1) y el seco (la 4); las dos cadenas mas fuertes; los dos alzarse
+    # que suben de verdad; y los dos ambientes mas parejos
+    "erudito_susurro": (1, 4), "erudito_alerta": (3, 1), "erudito_dolor": (3, 1, 4), "erudito_muerte": (1, 2),
+    "erudito_pluma": (1, 3), "erudito_tinta": (4, 3), "erudito_orbe": (2, 4), "erudito_runas": (1, 3),
+    "erudito_parpadeo": (1, 2), "erudito_tomazo": (1, 4), "erudito_cadena": (2, 3), "erudito_alzarse": (1, 2),
+    "academia_ambiente": (3, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

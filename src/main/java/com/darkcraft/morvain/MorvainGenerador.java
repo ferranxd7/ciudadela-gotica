@@ -195,6 +195,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el patio del Juramento en el chunk {}", c.getPos(), t);
         }
+        // la Academia Espectral, en la meseta del noreste, a la puerta de su santuario (parte 7o)
+        try {
+            if (Academia.toca(c.getPos().x, c.getPos().z)) Academia.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la academia en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

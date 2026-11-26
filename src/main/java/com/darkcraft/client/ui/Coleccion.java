@@ -31,7 +31,7 @@ public final class Coleccion {
             "espectro_dama", "espectro_vigia", "capitan_elite", "brandt", "corteza", "rey", "gavran", "marchito_guadana", "marchito_farol",
             "marchito_campana", "molinera", "ahorcado_garras", "ahorcado_soga", "verdugo", "podrido", "podrido_fatuo", "podrido_hinchado", "barquero",
             "helado_monje", "helado_penitente", "helado_peregrino", "abad", "calcinado_guardia", "calcinado_incendiario", "calcinado_ceniciento",
-            "condestable"};
+            "condestable", "erudito_aprendiz", "erudito_maestro", "erudito_custodio"};
 
     /** El objeto de una clave de la coleccion (los libros de la cronica, con su texto). */
     public static ItemStack objeto(String clave) {
@@ -59,7 +59,8 @@ public final class Coleccion {
             case "escudero" -> "darkcraft.gavran.escudero";
             case "hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon", "marchito_guadana", "marchito_farol",
                  "marchito_campana", "ahorcado_garras", "ahorcado_soga", "podrido_fatuo", "podrido_hinchado", "helado_monje", "helado_penitente",
-                 "helado_peregrino", "calcinado_guardia", "calcinado_incendiario", "calcinado_ceniciento" -> "darkcraft.bestiario." + c;
+                 "helado_peregrino", "calcinado_guardia", "calcinado_incendiario", "calcinado_ceniciento", "erudito_aprendiz", "erudito_maestro",
+                 "erudito_custodio" -> "darkcraft.bestiario." + c;
             default -> "entity.darkcraft." + c;
         };
     }
@@ -116,6 +117,12 @@ public final class Coleccion {
                     var k = DarkCraftMod.CALCINADO.get().create(lvl);
                     if (k != null) k.variante(c.endsWith("incendiario") ? com.darkcraft.enemigos.Calcinado.INCENDIARIO
                             : c.endsWith("ceniciento") ? com.darkcraft.enemigos.Calcinado.CENICIENTO : com.darkcraft.enemigos.Calcinado.GUARDIA);
+                    yield k;
+                }
+                case "erudito_aprendiz", "erudito_maestro", "erudito_custodio" -> {
+                    var k = DarkCraftMod.ERUDITO.get().create(lvl);
+                    if (k != null) k.variante(c.endsWith("maestro") ? com.darkcraft.enemigos.Erudito.MAESTRO
+                            : c.endsWith("custodio") ? com.darkcraft.enemigos.Erudito.CUSTODIO : com.darkcraft.enemigos.Erudito.APRENDIZ);
                     yield k;
                 }
                 case "rey" -> DarkCraftMod.REY.get().create(lvl);

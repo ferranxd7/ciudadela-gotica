@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 66 * 60 * 20;
+    private static final int LIMIT = 70 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -6009,6 +6009,8 @@ public final class ClientCiTest {
         t = capital(t);
         // el Patio del Juramento y Ser Halvard, el Condestable, el jefe de la Capital en ruinas (parte 7n)
         t = juramento(t);
+        // la Academia Espectral y los eruditos (parte 7o)
+        t = academia(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -8446,6 +8448,321 @@ public final class ClientCiTest {
                 sp.clearFire();
                 sp.setHealth(sp.getMaxHealth());
                 comando(sp, "darkcraft capital enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ la Academia Espectral y los eruditos (parte 7o)
+
+    private static final com.darkcraft.enemigos.Erudito[] ERUDITOS = new com.darkcraft.enemigos.Erudito[3];
+
+    private static com.darkcraft.enemigos.Erudito eruditoNuevo(ServerLevel lvl, int variante, double x, double y, double z, float giro, int postura) {
+        var a = DarkCraftMod.ERUDITO.get().create(lvl);
+        if (a == null) return null;
+        a.variante(variante);
+        a.moveTo(x, y, z, giro, 0f);
+        a.yBodyRot = a.yHeadRot = giro;
+        if (postura != com.darkcraft.enemigos.Enemigo.DE_PIE) a.asignar("", -1, a.blockPosition(), giro, postura, 0);
+        lvl.addFreshEntity(a);
+        return a;
+    }
+
+    private static void quitarEruditos(ServerLevel lvl) {
+        for (int i = 0; i < ERUDITOS.length; i++) {
+            if (ERUDITOS[i] != null && !ERUDITOS[i].isRemoved()) ERUDITOS[i].discard();
+            ERUDITOS[i] = null;
+        }
+        if (lvl == null) return;
+        int x = com.darkcraft.morvain.Academia.CX, z = com.darkcraft.morvain.Academia.CZ;
+        var caja = new net.minecraft.world.phys.AABB(x - 60, 200, z - 80, x + 60, 320, z + 80);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Tinta.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Orbe.class, caja)) e.discard();
+    }
+
+    private static String estadoEruditos() {
+        StringBuilder sb = new StringBuilder();
+        for (var a : ERUDITOS) sb.append(a == null ? "-" : estadoE(a)).append(" | ");
+        return sb + String.format(java.util.Locale.ROOT, "tinteros %d (revientan %d, ciegan %d), orbes %d (dan %d), runas %d (dan %d), parpadeos %d, tomazos %d (ondas %d), cadenazos %d",
+                com.darkcraft.enemigos.Erudito.TINTEROS, com.darkcraft.enemigos.Tinta.REVIENTAN, com.darkcraft.enemigos.Tinta.CIEGAN,
+                com.darkcraft.enemigos.Erudito.ORBES, com.darkcraft.enemigos.Orbe.DAN, com.darkcraft.enemigos.Erudito.RUNAS, com.darkcraft.enemigos.Erudito.RUNAS_DAN,
+                com.darkcraft.enemigos.Erudito.PARPADEOS, com.darkcraft.enemigos.Erudito.TOMAZOS, com.darkcraft.enemigos.Erudito.ONDAS,
+                com.darkcraft.enemigos.Erudito.CADENAZOS);
+    }
+
+    /** Un golpe de un erudito visto de lado: el erudito en (x, z) mirando al sur, el jugador delante (al sur) y la camara al este. */
+    private static int golpeErudito(int t, String nombre, int variante, int accion, double dist, int captura, double ex, double ez, int PISO) {
+        atTicks(t, "La academia: " + nombre, m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarEruditos(lvl);
+                aPelear(sp, true);
+                ERUDITOS[0] = eruditoNuevo(lvl, variante, ex, PISO, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+                irMirando(sp, ex, PISO, ez + dist, ex, PISO + 1.4, ez, false);
+                var a = ERUDITOS[0];
+                if (a == null) return;
+                a.setTarget(sp);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(accion);
+                verDesdeServidor = new Vec3(ex + 4.2, PISO + 2.4, ez + dist * 0.5 + 0.8);
+                miraServidor = new Vec3(ex, PISO + 1.2, ez + dist * 0.5);
+            });
+        });
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += captura - 2;
+        final String cap = "cliente_" + nombre;
+        atTicks(t, "captura: " + nombre, m -> {
+            server(m, sp -> log("  " + nombre + ": " + estadoEruditos() + " | jugador vida " + Math.round(sp.getHealth()) + ", ciego "
+                    + sp.hasEffect(net.minecraft.world.effect.MobEffects.BLINDNESS) + ", frenado " + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)
+                    + String.format(java.util.Locale.ROOT, " en %.1f, %.1f, %.1f", sp.getX(), sp.getY(), sp.getZ())));
+            shot(m, cap);
+        });
+        return t;
+    }
+
+    /**
+     * La Academia Espectral: desde el santuario de la Puerta de la Academia, la puerta, entrar a pie (el cartel con su nombre, el
+     * logro y el viento de la meseta), el claustro con la fuente de amatista, una galeria, la Gran Biblioteca (desde la puerta, desde
+     * el altillo y el estrado del grimorio), el scriptorium, el aula, la torre del archivo y su sala, la veta de amatista y todo
+     * desde lo alto, con los eruditos en sus puestos; en supervivencia, en el patio de entrada: el plumazo, el tintero (en el aire y
+     * la tinta que ciega), el orbe (al lanzarlo y en vuelo), las runas (encendidas bajo los pies y al reventar), el parpadeo, el
+     * tomazo y el cadenazo, un aprendiz tumbado que se levanta y uno que cae; el libro de Maese Orlen y el bestiario. Al acabar
+     * vuelven los eruditos.
+     */
+    private static int academia(int T) {
+        final int CX = com.darkcraft.morvain.Academia.CX, CZ = com.darkcraft.morvain.Academia.CZ, PISO = com.darkcraft.morvain.Academia.PISO;
+        final int ALT = com.darkcraft.morvain.Academia.ALTILLO, ARCH = com.darkcraft.morvain.Academia.ARCHIVO;
+        final var SA = com.darkcraft.morvain.SantuariosMorvain.porId("puerta_academia");
+        int t = T;
+        atTicks(t, "La academia: desde el santuario de la Puerta de la Academia", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft academia enemigos volver");
+                irMirando(sp, SA.x() + 9.5, SA.y() + 6, SA.z() + 8.5, CX, PISO + 12, CZ + 40, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv222_academia_santuario");
+            server(m, sp -> log("  " + com.darkcraft.morvain.MorvainEnemigos.estadoAcademia(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "La academia: la puerta", m -> server(m, sp -> irMirando(sp, CX - 5.5, PISO + 2.5, CZ + 58.5, CX, PISO + 9, CZ + 44, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv223_academia_puerta"));
+        t += 10;
+        // ---- entrar a pie por la puerta, en aventura: el cartel con el nombre, el logro y el viento de la meseta
+        atTicks(t, "La academia: entrar por la puerta", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft academia enemigos fuera");
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), CX + 0.5, PISO, CZ + 37.5, 180f, 2f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura", m -> {
+            log("  academia: " + ClientMusic.academia());
+            shot(m, "cliente_mv224_academia_dentro");
+            server(m, sp -> log("  al entrar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + ", logro academia " + com.darkcraft.story.Logros.tiene(sp, "academia")
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+        });
+        t += 10;
+        atTicks(t, "La academia: vuelven los eruditos", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft academia enemigos volver");
+            });
+        });
+        t += 4;
+        atTicks(t, "La academia: el claustro y la fuente", m -> server(m, sp -> irMirando(sp, CX - 13.5, PISO + 3.2, CZ + 23.5, CX, PISO + 2, CZ + 13, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv225_academia_claustro"));
+        t += 10;
+        atTicks(t, "La academia: la galeria del oeste", m -> server(m, sp -> irMirando(sp, CX - 20.5, PISO + 0.6, CZ + 26.5, CX - 20.5, PISO + 1.4, CZ, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv226_academia_galeria"));
+        t += 10;
+        atTicks(t, "La academia: la Gran Biblioteca desde la puerta", m -> server(m, sp -> irMirando(sp, CX + 0.5, PISO + 1.2, CZ - 4.5, CX + 0.5, PISO + 4, CZ - 46, true)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv227_biblioteca");
+            server(m, sp -> log("  la biblioteca: lugar " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "La academia: la biblioteca desde el altillo", m -> server(m, sp -> irMirando(sp, CX - 13.5, ALT + 1.2, CZ - 7.5, CX + 6, PISO + 2, CZ - 38, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv228_biblioteca_altillo"));
+        t += 10;
+        atTicks(t, "La academia: el estrado del grimorio", m -> server(m, sp -> irMirando(sp, CX + 0.5, PISO + 1.4, CZ - 41.5, CX + 0.5, PISO + 2.6, CZ - 50, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv229_estrado"));
+        t += 10;
+        atTicks(t, "La academia: el scriptorium", m -> server(m, sp -> irMirando(sp, CX - 24.5, PISO + 1.2, CZ + 26.5, CX - 31, PISO + 1, CZ + 4, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv230_scriptorium"));
+        t += 10;
+        atTicks(t, "La academia: el aula", m -> server(m, sp -> irMirando(sp, CX + 28.5, PISO + 1.6, CZ + 27.5, CX + 28.5, PISO + 2, CZ - 2, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv231_aula"));
+        t += 10;
+        atTicks(t, "La academia: la torre del archivo", m -> server(m, sp -> irMirando(sp, CX + 15.5, PISO + 3, CZ - 22.5, CX + 25, PISO + 28, CZ - 53, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv232_torre"));
+        t += 10;
+        atTicks(t, "La academia: la sala del archivo", m -> server(m, sp -> irMirando(sp, CX + 26.5, ARCH + 0.2, CZ - 50.5, CX + 23, ARCH + 1, CZ - 55, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv233_archivo"));
+        t += 10;
+        atTicks(t, "La academia: la veta de amatista", m -> server(m, sp -> irMirando(sp, CX - 16.5, PISO + 4, CZ - 16.5, CX - 27, PISO + 3, CZ - 33, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv234_veta"));
+        t += 10;
+        atTicks(t, "La academia: todo desde lo alto", m -> server(m, sp -> irMirando(sp, CX + 58.5, PISO + 56, CZ + 74.5, CX, PISO, CZ - 10, true)));
+        t += 90;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv235_academia_alto");
+            server(m, sp -> log("  desde lo alto: " + com.darkcraft.morvain.MorvainEnemigos.estadoAcademia(sp.server)));
+        });
+        t += 10;
+        // ---- en supervivencia, en el patio de entrada: los golpes de los eruditos, de lado
+        atTicks(t, "La academia: a pelear (supervivencia)", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> comando(sp, "darkcraft academia enemigos fuera"));
+        });
+        t += 4;
+        final double ex = CX + 0.5, ez = CZ + 33.5;
+        final int AP = com.darkcraft.enemigos.Erudito.APRENDIZ, MA = com.darkcraft.enemigos.Erudito.MAESTRO, CU = com.darkcraft.enemigos.Erudito.CUSTODIO;
+        t = golpeErudito(t, "mv236_plumazo", AP, com.darkcraft.enemigos.EruditoAnims.PLUMAZO, 1.9, 9, ex, ez, PISO) + 26;
+        t = golpeErudito(t, "mv237_tintero", AP, com.darkcraft.enemigos.EruditoAnims.TINTERO, 7.0, 18, ex, ez, PISO) + 2;
+        // la tinta revienta a los pies del jugador: en primera persona (la ceguera)
+        atTicks(t, "La academia: la tinta, en primera persona", m -> enPrimeraPersona(m));
+        t += 20;
+        atTicks(t, "captura: la tinta", m -> {
+            server(m, sp -> log("  la tinta: " + estadoEruditos() + " | jugador ciego " + sp.hasEffect(net.minecraft.world.effect.MobEffects.BLINDNESS)
+                    + ", frenado " + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)));
+            shot(m, "cliente_mv238_tinta");
+        });
+        t += 30;
+        t = golpeErudito(t, "mv239_orbe", MA, com.darkcraft.enemigos.EruditoAnims.ORBE, 8.0, 13, ex, ez, PISO) + 9;
+        atTicks(t, "captura: el orbe en vuelo", m -> {
+            server(m, sp -> log("  el orbe en vuelo: " + estadoEruditos()));
+            shot(m, "cliente_mv240_orbe_vuelo");
+        });
+        t += 30;
+        // las runas: el circulo bajo los pies del jugador, visto desde arriba y de lado
+        t = golpeErudito(t, "mv241_runas", MA, com.darkcraft.enemigos.EruditoAnims.RUNAS, 6.0, 26, ex, ez, PISO);
+        atTicks(t, "camara: las runas desde arriba", m -> verDesde(m, new Vec3(ex + 3.5, PISO + 5.5, ez + 6.0 + 3.5), new Vec3(ex, PISO, ez + 6.0)));
+        t += 13;
+        atTicks(t, "captura: las runas revientan", m -> {
+            server(m, sp -> log("  las runas revientan: " + estadoEruditos() + String.format(java.util.Locale.ROOT, " | jugador en %.2f (sube %.2f)", sp.getY(),
+                    sp.getDeltaMovement().y)));
+            shot(m, "cliente_mv242_runas_revientan");
+        });
+        t += 30;
+        t = golpeErudito(t, "mv243_parpadeo", MA, com.darkcraft.enemigos.EruditoAnims.PARPADEO, 2.2, 7, ex, ez, PISO) + 9;
+        atTicks(t, "captura: aparece lejos", m -> {
+            server(m, sp -> log("  aparece lejos: " + estadoEruditos()));
+            shot(m, "cliente_mv244_parpadeo_lejos");
+        });
+        t += 20;
+        t = golpeErudito(t, "mv245_tomazo", CU, com.darkcraft.enemigos.EruditoAnims.TOMAZO, 2.4, 18, ex, ez, PISO) + 30;
+        t = golpeErudito(t, "mv246_cadenazo", CU, com.darkcraft.enemigos.EruditoAnims.CADENAZO, 4.2, 14, ex, ez, PISO) + 30;
+        // ---- un aprendiz tumbado entre los libros (en el patio, sobre la hierba) que se levanta al llegar el jugador
+        atTicks(t, "La academia: un aprendiz tumbado", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarEruditos(lvl);
+                aPelear(sp, true);
+                sp.removeAllEffects();
+                aPelear(sp, true);
+                ERUDITOS[1] = eruditoNuevo(lvl, AP, ex, PISO, ez, 0f, com.darkcraft.enemigos.Enemigo.TUMBADO);
+                irMirando(sp, ex, PISO, ez + 6.0, ex, PISO + 0.3, ez, false);
+            });
+        });
+        t += 6;
+        atTicks(t, "captura: tumbado", m -> {
+            server(m, sp -> log("  tumbado: " + estadoEruditos()));
+            shot(m, "cliente_mv247_tumbado");
+        });
+        t += 4;
+        atTicks(t, "La academia: el jugador se acerca", m -> server(m, sp -> irMirando(sp, ex, PISO, ez + 2.4, ex, PISO + 1.0, ez, false)));
+        t += 26;
+        atTicks(t, "captura: se levanta", m -> {
+            server(m, sp -> log("  se levanta: " + estadoEruditos()));
+            shot(m, "cliente_mv248_se_levanta");
+        });
+        t += 10;
+        // ---- y cae (se deshace en paginas)
+        atTicks(t, "La academia: el aprendiz cae", m -> server(m, sp -> {
+            var a = ERUDITOS[1];
+            if (a == null) return;
+            a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+            a.setDeltaMovement(Vec3.ZERO);
+        }));
+        t += 22;
+        atTicks(t, "captura: cae", m -> {
+            server(m, sp -> log("  cae: " + estadoEruditos() + " | logro erudito " + com.darkcraft.story.Logros.tiene(sp, "erudito")));
+            shot(m, "cliente_mv249_erudito_cae");
+        });
+        t += 30;
+        atTicks(t, "La academia: sin eruditos (para el libro y el bestiario)", m -> server(m, sp -> {
+            quitarEruditos(sp.serverLevel());
+            sp.removeAllEffects();
+            sp.clearFire();
+            sp.setHealth(sp.getMaxHealth());
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        t += 6;
+        atTicks(t, "La academia: el libro de Maese Orlen", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(24));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv250_libro_orlen"));
+        t += 6;
+        atTicks(t, "el bestiario: el aprendiz (el que acaba de caer)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("erudito_aprendiz")));
+        });
+        t += 18;
+        atTicks(t, "captura: el aprendiz en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv251_bestiario_erudito");
+        });
+        t += 4;
+        atTicks(t, "La academia: fin (vuelven los eruditos, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                quitarEruditos(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft academia enemigos volver");
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

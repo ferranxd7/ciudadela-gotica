@@ -11,7 +11,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza",
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
-         22: "morvain", 23: "morvain"}
+         22: "morvain", 23: "morvain", 24: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -373,6 +373,16 @@ LIBROS = {
    "To the Oath Guard, at every gate. Tonight the sky burns and fire falls upon the palace. If it leaves these walls, the whole kingdom will burn. Shut the gates. No one comes in and no one goes out: not the people, not the guard, not I.",
    "I hear the people in the streets. They beat on the portcullis, they call me by my name. I hold the order. That is what we swore: to guard the gate, not to sleep, not to die. I swore it first, here, before the stone. If I am wrong, let the sky judge me... not them.",
    "If someone reads this, my gate has opened and I guard it no more. Then there is no oath left to keep. Open the gates. Let them go home.\n\nSer Halvard, Constable of the Oath"]),
+ },
+ 24: {
+  "es": ("Notas del bibliotecario", "Maese Orlen, guardián de la Gran Biblioteca", [
+   "Noche del cielo rojo. La Rectora Ysolde ha subido al observatorio con sus maestros a leer el fuego que cae. Dice que no es fuego: es escritura. A los de abajo nos ha mandado seguir estudiando y no salir. Los custodios han encadenado los tomos.",
+   "Los aprendices ya no duermen. Leen sin pasar la página; si les hablas, te contestan con la línea que tienen delante. La veta canta por debajo del claustro. Del observatorio no baja nadie, pero la luz de la Rectora sigue encendida.",
+   "Si estás leyendo esto, no lo hagas en voz alta: lo que ellos leen se queda contigo. Al este, en el observatorio, la Rectora sigue leyendo el cielo... y el cielo la lee a ella.\n\nMaese Orlen, guardián de la Gran Biblioteca"]),
+  "en": ("The Librarian's Notes", "Master Orlen, Keeper of the Great Library", [
+   "Night of the red sky. Rector Ysolde has gone up to the observatory with her masters to read the fire that falls. She says it is not fire: it is writing. Those of us below she has bidden to keep studying and not go out. The custodians have chained the tomes.",
+   "The apprentices sleep no more. They read without turning the page; if you speak to them, they answer with the line in front of them. The vein sings beneath the cloister. No one comes down from the observatory, but the Rector's light still burns.",
+   "If you are reading this, do not read it aloud: what they read stays with you. To the east, in the observatory, the Rector is still reading the sky... and the sky is reading her.\n\nMaster Orlen, Keeper of the Great Library"]),
  },
 }
 

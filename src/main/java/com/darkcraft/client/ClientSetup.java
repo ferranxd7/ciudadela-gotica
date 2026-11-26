@@ -71,6 +71,9 @@ public final class ClientSetup {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PERRO.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
                 new com.darkcraft.client.enemigos.PerroModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.PerroModelo.CAPA)), "perro", 1, 0.45f, 1.0f));
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ESPECTRO.get(), com.darkcraft.client.enemigos.EspectroRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ERUDITO.get(), com.darkcraft.client.enemigos.EruditoRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.TINTA.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ORBE.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ELITE.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
                 new com.darkcraft.client.enemigos.EliteModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.EliteModelo.CAPA)), "elite", 1, 0.6f, 1.15f));
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BRANDT.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
@@ -120,6 +123,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.ArqueroModelo.CAPA, com.darkcraft.client.enemigos.ArqueroGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.PerroModelo.CAPA, com.darkcraft.client.enemigos.PerroGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.EspectroModelo.CAPA, com.darkcraft.client.enemigos.EspectroGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.EruditoModelo.CAPA, com.darkcraft.client.enemigos.EruditoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.EliteModelo.CAPA, com.darkcraft.client.enemigos.EliteGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.BrandtModelo.CAPA, com.darkcraft.client.enemigos.BrandtGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CortezaModelo.CAPA, com.darkcraft.client.enemigos.CortezaGeometria::crear);

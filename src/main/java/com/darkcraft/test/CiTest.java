@@ -736,6 +736,7 @@ public final class CiTest {
         ermita(server, m, log, out);
         capital(server, m, log, out);
         juramento(server, m, log, out);
+        academia(server, m, log, out);
     }
 
     /**
@@ -1006,6 +1007,215 @@ public final class CiTest {
         } catch (Throwable t) {
             log.println("Morvain, los calcinados: ERROR " + t);
             DarkCraftMod.LOGGER.error("[CI] calcinados", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /**
+     * Parte 7o: la Academia Espectral (el recinto con su puerta, el claustro con la fuente de amatista, la Gran Biblioteca con
+     * el libro 24 en el estrado del grimorio, las alas y la torre del archivo; a pie desde el camino del santuario a todos sus
+     * sitios y a cada erudito) y los eruditos: donde esperan (en su suelo, ninguno metido en un bloque), el que lee se alza y el
+     * tumbado se levanta, cada accion acaba, el plumazo, el tintero (revienta), el orbe (sale, sigue a su presa y le da), las
+     * runas (se encienden y revientan), el parpadeo (se aparta lejos), el tomazo (su onda) y el cadenazo (llega lejos y frena).
+     */
+    private static void academia(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.ACADEMIA;
+        var A = com.darkcraft.morvain.Academia.get();
+        final int CX = com.darkcraft.morvain.Academia.CX, CZ = com.darkcraft.morvain.Academia.CZ, PISO = com.darkcraft.morvain.Academia.PISO;
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : A.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            // a pie desde el camino del santuario (las alfombras —los papeles— no estorban); el altillo y el archivo, por sus escalas
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock ? aire : st;
+            };
+            int[] en = A.sitio("entrada");
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, en[0], en[1], en[2], CX - 42, CZ - 66, CX + 42, CZ + 64, 4_000_000);
+            StringBuilder ap = new StringBuilder();
+            int llega = 0, sitios = 0;
+            for (var e : A.sitios().entrySet()) {
+                sitios++;
+                int[] q = e.getValue();
+                if (zona.alcanza(q[0], q[1], q[2], 2)) llega++;
+                else ap.append(' ').append(e.getKey());
+            }
+            int lejos = 0;
+            for (var o : A.esperas()) if (!zona.alcanza(o.x(), o.y(), o.z(), 2)) lejos++;
+            var sc = com.darkcraft.morvain.SantuariosMorvain.porId("puerta_academia");
+            log.println("Morvain, la academia espectral: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Academia.resumen(m)
+                    + "; santuario " + com.darkcraft.santuario.Santuarios.nombre(m, sc.pos()) + " a " + Math.round(Math.hypot(sc.x() - CX, sc.z() - (CZ + 47)))
+                    + " de la puerta; a pie desde el camino (" + zona.celdas() + " celdas) a " + llega + " de " + sitios + " sitios"
+                    + (ap.length() == 0 ? "" : ", no a:" + ap) + "; eruditos a los que no se llega " + lejos + " de " + A.esperas().size());
+            topView(m, CX, CZ - 6, 66, new File(out, "morvain_academia.png"));
+            topView(m, CX, CZ - 27, 18, new File(out, "morvain_academia_biblioteca.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, la academia espectral: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] academia", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 10; k++)
+                for (var e : fuera) if (e.isAlive()) e.tick();
+            int leyendo = 0, tumbados = 0, dePie = 0, enSuelo = 0, chocan = 0;
+            int[] porVariante = new int[3];
+            StringBuilder mal = new StringBuilder();
+            com.darkcraft.enemigos.Erudito lector = null, tumbado = null;
+            for (var e : fuera) {
+                if (!(e instanceof com.darkcraft.enemigos.Erudito c)) continue;
+                porVariante[Math.max(0, Math.min(2, c.variante()))]++;
+                if (!m.noCollision(c)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(c.blockPosition().toShortString()).append(';');
+                }
+                if (c.postura() == com.darkcraft.enemigos.Enemigo.REZA) {
+                    leyendo++;
+                    if (lector == null) lector = c;
+                } else if (c.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) {
+                    tumbados++;
+                    if (tumbado == null) tumbado = c;
+                } else dePie++;
+                if (!m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+                else if (mal.length() < 400) mal.append(' ').append(c.tipo()).append(" en el aire en ").append(c.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, los eruditos: " + com.darkcraft.morvain.MorvainEnemigos.comprobar() + "; fuera " + fuera.size() + " de "
+                    + com.darkcraft.morvain.MorvainEnemigos.academia().size() + " (aprendices " + porVariante[0] + ", maestros " + porVariante[1]
+                    + ", custodios " + porVariante[2] + "): leyendo " + leyendo + ", tumbados " + tumbados + ", de pie " + dePie
+                    + " (en su suelo " + enSuelo + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+            StringBuilder sb = new StringBuilder("Morvain, los eruditos en accion:");
+            // ---- el que lee se alza y el tumbado se levanta (una presa a su lado)
+            for (var c : new com.darkcraft.enemigos.Erudito[]{lector, tumbado}) {
+                if (c == null) {
+                    sb.append(" NO HAY ").append(c == lector ? "NINGUNO LEYENDO;" : "NINGUNO TUMBADO;");
+                    continue;
+                }
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (presa == null) continue;
+                presa.moveTo(c.getX() + 1.5, c.getY(), c.getZ() + 0.5, 0f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(presa);
+                quitar.add(presa);
+                int antes = c.postura();
+                c.setTarget(presa);
+                int sale = -1;
+                for (int k = 0; k < 80; k++) {
+                    c.tickCount++;
+                    c.tick();
+                    int a = c.accion();
+                    if (sale < 0 && (a == com.darkcraft.enemigos.EruditoAnims.LEVANTARSE || a == com.darkcraft.enemigos.EruditoAnims.ALZARSE)) sale = k;
+                    if (sale >= 0 && a == 0) break;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " el %s (%s, en %s) se %s en el tick %d y queda de pie %s;", c.tipo(),
+                        antes == com.darkcraft.enemigos.Enemigo.REZA ? "leyendo" : "tumbado", c.blockPosition().toShortString(),
+                        antes == com.darkcraft.enemigos.Enemigo.REZA ? "alza" : "levanta", sale, c.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE));
+                c.setTarget(null);
+            }
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
+            // ---- en el patio de entrada (de cara al sur, a la puerta): uno de cada, cada accion acaba
+            for (int v2 = 0; v2 < 3; v2++) {
+                var a = DarkCraftMod.ERUDITO.get().create(m);
+                if (a == null) continue;
+                a.variante(v2);
+                a.moveTo(CX - 4.5 + v2 * 4, PISO, CZ + 32.5, 0f, 0f);
+                m.addFreshEntity(a);
+                quitar.add(a);
+                StringBuilder no = new StringBuilder();
+                for (int ac = 1; ac < com.darkcraft.enemigos.EruditoAnims.TICKS.length; ac++) {
+                    String nombre = com.darkcraft.enemigos.EruditoAnims.NOMBRES[ac];
+                    if (nombre.equals("morir")) continue;
+                    a.empezar(ac);
+                    for (int k = 0; k < 90 && a.accion() == ac; k++) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    if (a.accion() == ac) no.append(' ').append(nombre);
+                    for (int k = 0; k < 10; k++) a.tick();
+                }
+                sb.append(' ').append(a.tipo()).append(String.format(java.util.Locale.ROOT, " (vida %.0f, golpe %.1f, armadura %d)", a.getMaxHealth(),
+                        a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), a.getArmorValue()))
+                        .append(": acciones que no acaban").append(no.length() == 0 ? " ninguna" : no).append(';');
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Tinta.class, a.getBoundingBox().inflate(24))) f.discard();
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Orbe.class, a.getBoundingBox().inflate(24))) f.discard();
+                a.discard();
+            }
+            log.println(sb);
+            // ---- contra una presa (un aldeano quieto en el patio de entrada, al sur del erudito)
+            sb = new StringBuilder("Morvain, los eruditos contra una presa:");
+            int tint = com.darkcraft.enemigos.Erudito.TINTEROS, rev = com.darkcraft.enemigos.Tinta.REVIENTAN, orb = com.darkcraft.enemigos.Erudito.ORBES,
+                    orbDan = com.darkcraft.enemigos.Orbe.DAN, run = com.darkcraft.enemigos.Erudito.RUNAS, parp = com.darkcraft.enemigos.Erudito.PARPADEOS,
+                    tom = com.darkcraft.enemigos.Erudito.TOMAZOS, ond = com.darkcraft.enemigos.Erudito.ONDAS, cad = com.darkcraft.enemigos.Erudito.CADENAZOS;
+            String[] nombres = {"plumazo", "tintero", "orbe", "runas", "parpadeo", "tomazo", "cadenazo"};
+            int[] acciones = {com.darkcraft.enemigos.EruditoAnims.PLUMAZO, com.darkcraft.enemigos.EruditoAnims.TINTERO, com.darkcraft.enemigos.EruditoAnims.ORBE,
+                    com.darkcraft.enemigos.EruditoAnims.RUNAS, com.darkcraft.enemigos.EruditoAnims.PARPADEO, com.darkcraft.enemigos.EruditoAnims.TOMAZO,
+                    com.darkcraft.enemigos.EruditoAnims.CADENAZO};
+            int[] variantes = {com.darkcraft.enemigos.Erudito.APRENDIZ, com.darkcraft.enemigos.Erudito.APRENDIZ, com.darkcraft.enemigos.Erudito.MAESTRO,
+                    com.darkcraft.enemigos.Erudito.MAESTRO, com.darkcraft.enemigos.Erudito.MAESTRO, com.darkcraft.enemigos.Erudito.CUSTODIO,
+                    com.darkcraft.enemigos.Erudito.CUSTODIO};
+            double[] dist = {1.8, 7.0, 7.0, 6.0, 2.4, 2.4, 4.2};
+            int[] dura = {40, 70, 120, 60, 40, 50, 50};
+            final double gx = CX + 0.5, gz = CZ + 31.5;
+            for (int i = 0; i < nombres.length; i++) {
+                var a = DarkCraftMod.ERUDITO.get().create(m);
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (a == null || presa == null) continue;
+                a.variante(variantes[i]);
+                a.moveTo(gx, PISO, gz, 0f, 0f);
+                presa.moveTo(gx, PISO, gz + dist[i], 180f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(a);
+                m.addFreshEntity(presa);
+                quitar.add(a);
+                quitar.add(presa);
+                a.setTarget(presa);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(acciones[i]);
+                float vida = presa.getHealth();
+                boolean frenada = false;
+                double lejosMax = 0;
+                for (int k = 0; k < dura[i]; k++) {
+                    if (!a.isRemoved()) {
+                        a.tickCount++;
+                        a.tick();
+                        lejosMax = Math.max(lejosMax, Math.hypot(a.getX() - gx, a.getZ() - gz));
+                    }
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Tinta.class, presa.getBoundingBox().inflate(16))) {
+                        if (!quitar.contains(f)) quitar.add(f);
+                        f.tick();
+                    }
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Orbe.class, presa.getBoundingBox().inflate(16))) {
+                        if (!quitar.contains(f)) quitar.add(f);
+                        f.tick();
+                    }
+                    presa.setOnGround(true);
+                    frenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                    presa.invulnerableTime = 0;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " %s (%s) a %.1f: la presa -%.1f%s%s;", nombres[i], a.tipo(), dist[i], vida - presa.getHealth(),
+                        i == 6 ? ", frenada " + frenada : "", i == 4 ? String.format(java.util.Locale.ROOT, ", se aparta a %.1f", lejosMax)
+                                : i == 3 ? ", runas por reventar " + a.runasPendientes() : ""));
+                a.discard();
+                presa.discard();
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " tinteros +%d (revientan +%d), orbes +%d (dan +%d), runas +%d, parpadeos +%d, tomazos +%d (ondas +%d), cadenazos +%d",
+                    com.darkcraft.enemigos.Erudito.TINTEROS - tint, com.darkcraft.enemigos.Tinta.REVIENTAN - rev, com.darkcraft.enemigos.Erudito.ORBES - orb,
+                    com.darkcraft.enemigos.Orbe.DAN - orbDan, com.darkcraft.enemigos.Erudito.RUNAS - run, com.darkcraft.enemigos.Erudito.PARPADEOS - parp,
+                    com.darkcraft.enemigos.Erudito.TOMAZOS - tom, com.darkcraft.enemigos.Erudito.ONDAS - ond, com.darkcraft.enemigos.Erudito.CADENAZOS - cad));
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println("Morvain, los eruditos: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] eruditos", t);
         } finally {
             for (var e : quitar) if (!e.isRemoved()) e.discard();
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);

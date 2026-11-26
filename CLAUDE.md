@@ -2138,6 +2138,88 @@ capital la noche del cielo rojo para que el fuego no saliera, y la gente ardio e
   Oeste abierta (`mv218`), la torre por dentro (`mv219`), el libro de Ser Halvard (`mv220`) y el bestiario (`mv221`). Con este tramo
   la prueba del cliente pasa de la hora: `LIMIT` 66 min (`lanzar.sh` 72 y 70 min, el paso 100, el trabajo 145).
 
+### Plan grande, parte 7o: la Academia Espectral — los Eruditos y la Academia
+
+Respuestas 125, 131 y 132 del plan; la sexta region con su contenido (despues, la **7p**: el jefe de la academia, la Rectora
+Ysolde en el observatorio —"subio a leer el fuego que caia... y el cielo la lee a ella", libro 24—).
+- **El erudito** (`enemigos/Erudito`, entidad `darkcraft:erudito`, 0,65 x 2,0; modelo de `tools/enemigos/erudito.py`: toga larga y
+  esclavina, la cara en sombra con los ojos lilas en la capa de brillo; `EruditoGeometria/Animaciones`, `EruditoAnims`,
+  `client/enemigos/EruditoModelo` y `EruditoRenderer`). **Flotan como los espectros** (`ARRIBA` 3,2 px; ni caen con dano ni hacen
+  ruido) y **se dibujan medio transparentes** (`entityTranslucent`, el alfa respira; en el parpadeo se apagan y vuelven; al morir se
+  deshacen en paginas y letras). Tres: **aprendiz** (26 de vida, 4,5 de golpe: cartera, calamo con pluma y tintero; **plumazo**, dos
+  punaladas con el calamo, y de 4 a 12 bloques el **tintero**: `enemigos/Tinta`, un `ThrowableItemProjectile` con el dibujo del saco
+  de tinta que cae en arco —`Cantaro.tiro`— y revienta en un charco de tinta de radio 1,8: ceguera 2,5 s, lentitud y 2 de dano a los
+  jugadores), **maestro** (30 y 5: birrete con borla, barba, estola con runas que lucen, vara de cristal y libro; se queda lejos: el
+  **orbe** —`enemigos/Orbe`, sin gravedad, solo particulas (`NoopRenderer`), sigue a su presa girando 0,1 por tick a 0,55 bloques por
+  tick durante 4,5 s y hace dano magico; se rompe al darle—, las **runas** —un circulo lila bajo los pies de su presa que revienta a
+  los 22 ticks (`RUNAS_TICKS`, radio 1,8): dano x1,3 y la lanza por el aire; hay que salir— y el **parpadeo** —si se le acercan a
+  menos de 3,2 (o a veces tras un golpe) se apaga y aparece a 6-9 bloques, de espaldas a su presa—) y **custodio** (70, 7 y 4 de
+  armadura; capucha, llaves al cinto y el **tomo encadenado**, escala 1,25: el **tomazo** —lo estrella contra el suelo: la onda da a
+  quien este de pie a 2,8 del golpe, `R_ONDA`; saltando o rodando se libra— y el **cadenazo** —lo voltea con la cadena: llega a 4,8
+  y frena—). Esperan **leyendo** (`REZA`: de rodillas con el libro abierto) o **tumbados entre los libros** (`TUMBADO`) o de pie (de
+  ronda); al despertar, `ALZARSE` / `LEVANTARSE`. Bestiario `erudito_aprendiz` / `erudito_maestro` / `erudito_custodio`, logro
+  `erudito`; a veces una piedra de forja (el custodio, alguna II). Contadores para las pruebas: `TINTEROS`, `ORBES`, `RUNAS`,
+  `RUNAS_DAN`, `PARPADEOS`, `TOMAZOS`, `ONDAS`, `CADENAZOS`, `Tinta.REVIENTAN` / `CIEGAN` y `Orbe.DAN`.
+- **La Academia Espectral** (`morvain/Academia`, en la meseta de caliza, a la puerta del santuario de la Puerta de la Academia —el
+  santuario en (4110, -3176), la puerta del recinto 27 bloques al norte—; `CX` 4110, `CZ` -3250, `SUELO` 242; u = x - CX, v = z - CZ;
+  se dibuja chunk a chunk al adornar; en su caja `Adorno` no pone nada; la piedra es la caliza de la meseta —`piedra`: calcita,
+  diorita y algo de toba— con zocalos, cornisas, marcos y arcos de pizarra labrada —`oscura`—, tejados de pizarra, vidrieras moradas,
+  faroles de almas, amatista y obsidiana llorosa): el **recinto** (|u| <= 36, v -60..44: muralla de 8 con almenas, contrafuertes por
+  fuera y cuatro torres de esquina con chapitel); al sur el **cuerpo de la puerta** (v 40..47: el paso de cinco con boveda apuntada,
+  dos torres de 20 con chapitel y su aguja con luz, pendones morados, el **ojo que llora** —obsidiana llorosa en su medallon— sobre el
+  arco, faroles y las hojas de la puerta: una abierta contra el paso, la otra caida en el camino); fuera, el **camino** hasta el
+  santuario. Dentro: el **patio de entrada** (pebeteros de almas y arboles secos); el **claustro** (|u| <= 22, v -2..28: cuatro
+  galerias con techo de pizarra, arquerias de columnas de pizarra con arcos apuntados —`arqueria`: cada escalon mira a su columna mas
+  cercana; el arco del medio, de cinco, donde entra el sendero—, faroles colgando, bancos; el **jardin** con la cruz de senderos, los
+  pebeteros y la **fuente de amatista**: pilon ochavado con agua y el obelisco de amatista con la obsidiana llorosa); al norte la
+  **Gran Biblioteca** (|u| <= 16, v -51..-3, muros de 16 con contrafuertes de dos escalones, tejado a dos aguas hasta `SUELO + 33`,
+  ventanales de tres con su punta sobre el altillo y lancetas abajo —alguno roto—, dos **rosetones** en los hastiales; dentro la
+  alfombra morada del pasillo, **nueve filas de estantes** a cada lado —alguno vacio (estanteria cincelada) o caido; en dos se vino
+  abajo el medio—, atriles al final de las filas, **mesas de lectura** con velas moradas, el **altillo** —`ALTILLO`, suelo de tablas
+  sobre pilares, baranda con velas, estantes contra los muros, dos escalas al sur—, tres **lamparas** de almas colgando de la
+  cumbrera y al fondo el **estrado del grimorio**: el escalon, el suelo ajedrezado, el muro de libros, los pendones, el **relicario de
+  amatista**, las velas en sus pies y el **atril con el libro perdido 24** —"Notas del bibliotecario", de Maese Orlen;
+  `Perdidos.TOTAL` = 24— con el arcon `chests/academia_bueno`); al oeste el **scriptorium** (|u| 23..34: los pupitres de los copistas
+  —atriles— junto a las ventanas, la mesa larga con velas y papeles, estantes, manchas de tinta, barriles); al este el **aula** (la
+  catedra con su atril y la **pizarra**, y seis filas de bancos con pupitre); al noreste la **torre del archivo** (u 21..29, v -57..-49,
+  `TORRE_ALTO` = SUELO + 38 y su chapitel con el mastil y la luz: lo mas alto de la meseta; por dentro una escala pegada al muro del
+  norte hasta la sala del archivo —`ARCHIVO`—: estantes, atril, velas y un arcon) y las **ruinas del aula vieja** (muros rotos,
+  columnas de cuarzo en pie y caidas, escombros); al noroeste la **veta**: el afloramiento de amatista sobre el que se levanto la
+  academia (un lomo de calcita, toba y basalto con la amatista asomando, racimos y cinco agujas). Las alas tienen tejado a dos aguas
+  con vigas y faroles. Botin: `chests/academia` y `academia_bueno` (papel, libros, tinta, amatista, lapislazuli, frutos lunares y de la
+  tormenta, piedras, los hechizos de la Sombra, el baston, el talisman de la mente, cenizas del relampago y del paso). Sitios
+  (`Academia.sitio`): `entrada`, `puerta`, `patio`, `claustro`, `jardin`, `fuente`, `biblioteca`, `pasillo`, `altillo`, `estrado`,
+  `atril`, `arcon`, `scriptorium`, `aula`, `catedra`, `torre`, `archivo`, `veta`, `ruinas`. El Espejo: "La Academia Espectral" y,
+  dentro de la biblioteca, "La Gran Biblioteca" (`Morvain.lugar`, `Academia.dentro` / `enBiblioteca`); logro `academia` al entrar.
+- **Los puestos** (`MorvainEnemigos`, sitio `academia`, 36, de `Academia.esperas`): un aprendiz leyendo junto al camino; un custodio
+  en el paso de la puerta; dos aprendices de ronda en el patio de entrada; en el claustro dos maestros de ronda por las galerias y tres
+  aprendices leyendo; en el jardin un maestro ante la fuente y dos tumbados en la hierba; en la biblioteca dos custodios de ronda entre
+  los estantes, tres aprendices leyendo y dos tumbados entre los libros, dos maestros de ronda por el altillo y un custodio ante el
+  grimorio; en el scriptorium tres copistas y un maestro; en el aula cuatro aprendices en los bancos y el maestro en la catedra; un
+  custodio y un tumbado en la veta; un maestro y un tumbado en las ruinas; y un maestro arriba en el archivo.
+- **La academia suena** (`ClientMusic.tickAcademia`): en la region de la academia entre Y 200 y 330, `ambiente.academia` (viento en
+  la meseta, susurros lejanos de lecciones, paginas y campanillas de cristal; una de dos tomas cada vez).
+- Sonidos (ElevenLabs, flow `oREixXYwkQfS64iE6kai`, `TOMAS_SFX`): `erudito_susurro` (1 y 4), `erudito_alerta` (3 y 1),
+  `erudito_dolor` (3, 1 y 4), `erudito_muerte` (1 y 2), `erudito_pluma` (1 y 3), `erudito_tinta` (4 y 3), `erudito_orbe` (2 y 4),
+  `erudito_runas` (1 y 3), `erudito_parpadeo` (1 y 2), `erudito_tomazo` (1 y 4), `erudito_cadena` (2 y 3), `erudito_alzarse` (1 y 2),
+  `academia_ambiente` (3 y 4, `stream`).
+- Comandos `/darkcraft academia [ir <sitio> | enemigos [volver | fuera | sacar]]` (sin mas: como esta).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_academia carpeta` (con `--techo Y` para ver dentro): el recinto entero con
+  las marcas de los eruditos (En); si se llega a pie desde la entrada a cada sitio (el altillo y el archivo por sus escalas) y a cada
+  erudito (las alfombras —los papeles— no cuentan como bloque), que ninguno esta metido en un bloque y que todos tienen suelo.
+- Pruebas: servidor, lineas `Morvain, la academia espectral: ...` (el atril con el libro 24, el arcon, la fuente, la aguja de la
+  torre, los estantes; a pie desde el camino; vistas `morvain_academia.png` y `morvain_academia_biblioteca.png`), `Morvain, los
+  eruditos: ...`, `Morvain, los eruditos en accion: ...` (el que lee se alza y el tumbado se levanta; cada accion acaba) y `Morvain,
+  los eruditos contra una presa: ...` (plumazo, tintero, orbe, runas, parpadeo, tomazo y su onda, cadenazo que frena); cliente, tramo
+  `academia()` despues del Condestable: desde el santuario (`cliente_mv222`), la puerta (`mv223`), entrar a pie con el cartel, el
+  logro y el viento (`mv224`), el claustro y la fuente (`mv225`), una galeria (`mv226`), la biblioteca desde la puerta (`mv227`) y
+  desde el altillo (`mv228`), el estrado del grimorio (`mv229`), el scriptorium (`mv230`), el aula (`mv231`), la torre (`mv232`) y la
+  sala del archivo (`mv233`), la veta (`mv234`), todo desde lo alto (`mv235`); en supervivencia, en el patio de entrada: el plumazo
+  (`mv236`), el tintero en el aire (`mv237`) y la tinta que ciega (`mv238`), el orbe (`mv239`) y en vuelo (`mv240`), las runas
+  (`mv241`) y al reventar (`mv242`), el parpadeo (`mv243`) y donde aparece (`mv244`), el tomazo (`mv245`), el cadenazo (`mv246`), un
+  aprendiz tumbado (`mv247`) que se levanta (`mv248`) y cae (`mv249`), el libro de Maese Orlen (`mv250`) y el bestiario (`mv251`).
+  `LIMIT` 70 min (`lanzar.sh` 76 y 74 min).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -2148,7 +2230,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j, la 7k, la 7l, la 7m y la 7n arriba; despues, region a region su
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j, la 7k, la 7l, la 7m, la 7n y la 7o arriba; despues, region a region su
   contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes

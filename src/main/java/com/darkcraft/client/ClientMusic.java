@@ -339,6 +339,39 @@ public final class ClientMusic {
         }
     }
 
+    // ------------------------------------------------------------------ la academia (parte 7o): viento en la meseta y susurros
+
+    private static Track academia;
+    private static int academiaTicks;
+    private static boolean enAcademia;
+
+    private static void tickAcademia(Minecraft mc) {
+        if (mc.player == null || mc.level == null) enAcademia = false;
+        else if (mc.player.tickCount % 20 == 13)
+            enAcademia = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() > 200 && mc.player.getY() < 330
+                    && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.ACADEMIA;
+        boolean quiere = enAcademia && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        if (quiere) {
+            if (academia == null || academia.dying() || !mc.getSoundManager().isActive(academia) && academiaTicks > 20) {
+                if (academia != null && !academia.dying()) mc.getSoundManager().stop(academia);
+                academia = new Track(DarkCraftMod.AMBIENTE_ACADEMIA.get(), "academia", false);
+                academiaTicks = 0;
+                mc.getSoundManager().play(academia);
+                academia.fadeTo(0.85f, 2.5f);
+            }
+        } else if (academia != null && !academia.dying()) academia.kill(3.0f);
+        if (academia != null) {
+            academiaTicks++;
+            if (academia.dying() && !mc.getSoundManager().isActive(academia) && academiaTicks > 20) academia = null;
+        }
+    }
+
+    /** Para la prueba de la CI: si suena el viento de la academia. */
+    public static String academia() {
+        Minecraft mc = Minecraft.getInstance();
+        return academia == null ? "sin la academia" : String.format("la academia %.2f%s", academia.level(), mc.getSoundManager().isActive(academia) ? "" : " (parada)");
+    }
+
     /** Para la prueba de la CI: si suenan las ruinas de la capital. */
     public static String capital() {
         Minecraft mc = Minecraft.getInstance();
@@ -457,6 +490,8 @@ public final class ClientMusic {
         if (montana != null && !montana.dying()) any = true;
         tickCapital(mc);
         if (capital != null && !capital.dying()) any = true;
+        tickAcademia(mc);
+        if (academia != null && !academia.dying()) any = true;
         tickTitulo(mc);
         if (titulo != null && !titulo.dying()) any = true;
         if (viaje != null) {
@@ -479,8 +514,9 @@ public final class ClientMusic {
         if (pantano != null) mc.getSoundManager().stop(pantano);
         if (montana != null) mc.getSoundManager().stop(montana);
         if (capital != null) mc.getSoundManager().stop(capital);
-        story = boss = zona = bruma = viaje = arboleda = pantano = montana = capital = null;
-        enFortaleza = enBruma = enArboleda = enPantano = enMontana = enCapital = false;
+        if (academia != null) mc.getSoundManager().stop(academia);
+        story = boss = zona = bruma = viaje = arboleda = pantano = montana = capital = academia = null;
+        enFortaleza = enBruma = enArboleda = enPantano = enMontana = enCapital = enAcademia = false;
         bossPhase = 0;
     }
 

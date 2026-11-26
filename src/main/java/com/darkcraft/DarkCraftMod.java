@@ -287,6 +287,22 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_DOLOR = sound("sfx.condestable_dolor");
     public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_MUERTE = sound("sfx.condestable_muerte");
     public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_ESPERA = sound("sfx.condestable_espera");
+    // los eruditos de la Academia Espectral (parte 7o): el susurro de la leccion, el respingo, el quejido, la muerte, el
+    // plumazo del calamo, el tintero que revienta, el orbe, el circulo de runas, el parpadeo, el tomazo, la cadena y alzarse
+    // de entre los libros; y el ambiente de la academia
+    public static final RegistryObject<SoundEvent> SFX_ERUDITO_SUSURRO = sound("sfx.erudito_susurro");
+    public static final RegistryObject<SoundEvent> SFX_ERUDITO_ALERTA = sound("sfx.erudito_alerta");
+    public static final RegistryObject<SoundEvent> SFX_ERUDITO_DOLOR = sound("sfx.erudito_dolor");
+    public static final RegistryObject<SoundEvent> SFX_ERUDITO_MUERTE = sound("sfx.erudito_muerte");
+    public static final RegistryObject<SoundEvent> SFX_ERUDITO_PLUMA = sound("sfx.erudito_pluma");
+    public static final RegistryObject<SoundEvent> SFX_ERUDITO_TINTA = sound("sfx.erudito_tinta");
+    public static final RegistryObject<SoundEvent> SFX_ERUDITO_ORBE = sound("sfx.erudito_orbe");
+    public static final RegistryObject<SoundEvent> SFX_ERUDITO_RUNAS = sound("sfx.erudito_runas");
+    public static final RegistryObject<SoundEvent> SFX_ERUDITO_PARPADEO = sound("sfx.erudito_parpadeo");
+    public static final RegistryObject<SoundEvent> SFX_ERUDITO_TOMAZO = sound("sfx.erudito_tomazo");
+    public static final RegistryObject<SoundEvent> SFX_ERUDITO_CADENA = sound("sfx.erudito_cadena");
+    public static final RegistryObject<SoundEvent> SFX_ERUDITO_ALZARSE = sound("sfx.erudito_alzarse");
+    public static final RegistryObject<SoundEvent> AMBIENTE_ACADEMIA = sound("ambiente.academia");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -603,6 +619,16 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Cantaro>> CANTARO = ENTITIES.register("cantaro",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Cantaro>of(com.darkcraft.enemigos.Cantaro::new, MobCategory.MISC)
                     .sized(0.4f, 0.4f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":cantaro"));
+    // ---- los eruditos de la Academia Espectral (parte 7o), su tintero y su orbe
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Erudito>> ERUDITO = ENTITIES.register("erudito",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Erudito>of(com.darkcraft.enemigos.Erudito::new, MobCategory.MONSTER)
+                    .sized(0.65f, 2.0f).clientTrackingRange(8).build(MODID + ":erudito"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Tinta>> TINTA = ENTITIES.register("tinta",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Tinta>of(com.darkcraft.enemigos.Tinta::new, MobCategory.MISC)
+                    .sized(0.3f, 0.3f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":tinta"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Orbe>> ORBE = ENTITIES.register("orbe",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Orbe>of(com.darkcraft.enemigos.Orbe::new, MobCategory.MISC)
+                    .sized(0.4f, 0.4f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":orbe"));
     // ---- Hrodric, el Abad de la Cumbre, el jefe de las Montanas Nevadas (parte 7l)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Abad>> ABAD = ENTITIES.register("abad",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Abad>of(com.darkcraft.enemigos.Abad::new, MobCategory.MONSTER)
@@ -790,6 +816,7 @@ public class DarkCraftMod {
         e.put(ABAD.get(), com.darkcraft.enemigos.Abad.atributos().build());
         e.put(CALCINADO.get(), com.darkcraft.enemigos.Calcinado.atributos().build());
         e.put(CONDESTABLE.get(), com.darkcraft.enemigos.Condestable.atributos().build());
+        e.put(ERUDITO.get(), com.darkcraft.enemigos.Erudito.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());

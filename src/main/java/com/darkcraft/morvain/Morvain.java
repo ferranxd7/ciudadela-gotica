@@ -345,6 +345,10 @@ public final class Morvain {
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Juramento.enPatio(p.getX(), p.getZ()) && Math.abs(p.getY() - Juramento.PISO) < 20)
                 com.darkcraft.story.Logros.dar(p, "juramento");
+        // y quien entra en la Academia Espectral (parte 7o)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Academia.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Academia.PISO) < 40)
+                com.darkcraft.story.Logros.dar(p, "academia");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -413,6 +417,10 @@ public final class Morvain {
         if (Juramento.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Juramento.PISO) < 40) return "darkcraft.morvain.lugar.juramento";
         // la Puerta Oeste de la Capital (parte 7m)
         if (Capital.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Capital.PISO) < 40) return "darkcraft.morvain.lugar.capital_puerta";
+        // la Academia Espectral y su Gran Biblioteca (parte 7o)
+        if (Academia.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Academia.PISO) < 50)
+            return Academia.enBiblioteca(p.getX(), p.getZ()) && p.getY() < Academia.PISO + 30 ? "darkcraft.morvain.lugar.biblioteca"
+                    : "darkcraft.morvain.lugar.academia";
         return "darkcraft.zona.morvain." + Terreno.region(p.getX(), p.getZ()).id;
     }
 

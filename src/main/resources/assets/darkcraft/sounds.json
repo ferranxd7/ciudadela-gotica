@@ -4061,5 +4061,153 @@
         "stream": false
       }
     ]
+  },
+  "sfx.erudito_susurro": {
+    "subtitle": "subtitles.darkcraft.sfx.erudito_susurro",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/erudito_susurro_1"
+      },
+      {
+        "name": "darkcraft:sfx/erudito_susurro_2"
+      }
+    ]
+  },
+  "sfx.erudito_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.erudito_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/erudito_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/erudito_alerta_2"
+      }
+    ]
+  },
+  "sfx.erudito_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.erudito_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/erudito_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/erudito_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/erudito_dolor_3"
+      }
+    ]
+  },
+  "sfx.erudito_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.erudito_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/erudito_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/erudito_muerte_2"
+      }
+    ]
+  },
+  "sfx.erudito_pluma": {
+    "subtitle": "subtitles.darkcraft.sfx.erudito_pluma",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/erudito_pluma_1"
+      },
+      {
+        "name": "darkcraft:sfx/erudito_pluma_2"
+      }
+    ]
+  },
+  "sfx.erudito_tinta": {
+    "subtitle": "subtitles.darkcraft.sfx.erudito_tinta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/erudito_tinta_1"
+      },
+      {
+        "name": "darkcraft:sfx/erudito_tinta_2"
+      }
+    ]
+  },
+  "sfx.erudito_orbe": {
+    "subtitle": "subtitles.darkcraft.sfx.erudito_orbe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/erudito_orbe_1"
+      },
+      {
+        "name": "darkcraft:sfx/erudito_orbe_2"
+      }
+    ]
+  },
+  "sfx.erudito_runas": {
+    "subtitle": "subtitles.darkcraft.sfx.erudito_runas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/erudito_runas_1"
+      },
+      {
+        "name": "darkcraft:sfx/erudito_runas_2"
+      }
+    ]
+  },
+  "sfx.erudito_parpadeo": {
+    "subtitle": "subtitles.darkcraft.sfx.erudito_parpadeo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/erudito_parpadeo_1"
+      },
+      {
+        "name": "darkcraft:sfx/erudito_parpadeo_2"
+      }
+    ]
+  },
+  "sfx.erudito_tomazo": {
+    "subtitle": "subtitles.darkcraft.sfx.erudito_tomazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/erudito_tomazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/erudito_tomazo_2"
+      }
+    ]
+  },
+  "sfx.erudito_cadena": {
+    "subtitle": "subtitles.darkcraft.sfx.erudito_cadena",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/erudito_cadena_1"
+      },
+      {
+        "name": "darkcraft:sfx/erudito_cadena_2"
+      }
+    ]
+  },
+  "sfx.erudito_alzarse": {
+    "subtitle": "subtitles.darkcraft.sfx.erudito_alzarse",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/erudito_alzarse_1"
+      },
+      {
+        "name": "darkcraft:sfx/erudito_alzarse_2"
+      }
+    ]
+  },
+  "ambiente.academia": {
+    "subtitle": "subtitles.darkcraft.ambiente.academia",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/academia_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/academia_ambiente_2",
+        "stream": true
+      }
+    ]
   }
 }

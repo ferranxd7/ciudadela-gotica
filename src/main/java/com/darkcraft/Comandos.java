@@ -57,6 +57,7 @@ public final class Comandos {
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoAbad())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoCapital())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoCondestable())
+                .then(com.darkcraft.morvain.MorvainEnemigos.comandoAcademia())
                 .then(com.darkcraft.rol.Rol.comando())
                 .then(com.darkcraft.rol.Rol.comandoRol()));
     }
@@ -127,6 +128,7 @@ public final class Comandos {
         src.sendSuccess(() -> linea(new Linea("/darkcraft capital ", "/darkcraft capital [ir <sitio> | enemigos [volver | fuera | sacar]]", "capital")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft condestable ", "/darkcraft condestable [ir | vencer | volver | patio <sitio> | rastrillo [subir]]",
                 "condestable")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft academia ", "/darkcraft academia [ir <sitio> | enemigos [volver | fuera | sacar]]", "academia")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ecos ", "/darkcraft ecos / ecos dar <n> / ecos quitar", "ecos")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft rol ", "/darkcraft rol clase [<nombre> | elegir | olvidar | ninguna] / santuario / frascos [<n>] / nivel [reiniciar] / atributo <nombre> <valor> / talisman <nombre> [poner <hueco>] / fruto <nombre> [<n>] / hechizo <nombre>|memorizar|olvidar|baston|sello / guia [olvidar] / herrero [olvidar] / mercader [olvidar] / mejora <0-9> / piedras / ceniza <nombre> [poner] | quitar / resistencias", "rol")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ayuda", "/darkcraft ayuda", "ayuda")), false);
