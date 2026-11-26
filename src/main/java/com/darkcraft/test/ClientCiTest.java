@@ -6003,6 +6003,8 @@ public final class ClientCiTest {
         t = barquero(t);
         // el Monasterio de la Helada y los helados, en las Montanas Nevadas (parte 7k)
         t = monasterio(t);
+        // la escalera de los penitentes y Hrodric, el Abad de la Cumbre, el jefe de las Montanas Nevadas (parte 7l)
+        t = abad(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -7825,6 +7827,300 @@ public final class ClientCiTest {
             });
         });
         return t + 30;
+    }
+
+    // ------------------------------------------------------------------ la escalera de los penitentes y el Abad (parte 7l)
+
+    private static com.darkcraft.enemigos.Abad abadE() {
+        var e = com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.CUMBRE, com.darkcraft.morvain.MorvainEnemigos.abad());
+        return e instanceof com.darkcraft.enemigos.Abad a ? a : null;
+    }
+
+    /**
+     * La escalera de los penitentes y Hrodric, el Abad de la Cumbre: la escalera desde el postigo del monasterio, a media
+     * subida y entre muros; llegar a pie al calvario (el cartel con su nombre); el calvario desde lo alto, el Abad rezando de
+     * rodillas, la ermita por dentro y la cruz de hielo; en supervivencia habla, se levanta y ruge con su barra; sus golpes (el
+     * baculazo con su fila de puas, el barrido, el pisoton, el aliento, los carambanos); a media vida llama a sus hermanos y
+     * levanta la ventisca (lejos de los braseros se hiela; junto a uno, se deshiela); cae de rodillas y se rompe (el cartel), la
+     * iglesia del monasterio en paz y el bestiario. Al acabar vuelve todo como estaba.
+     */
+    private static int abad(int T) {
+        final var V = com.darkcraft.morvain.Ermita.get();
+        final int CX = com.darkcraft.morvain.Ermita.CX, CZ = com.darkcraft.morvain.Ermita.CZ, PISO = com.darkcraft.morvain.Ermita.PISO;
+        final int[] PO = V.sitio("postigo"), MI = V.sitio("mitad"), CO = V.sitio("corte"), EN = V.sitio("entrada"), ER = V.sitio("ermita"),
+                AL = V.sitio("altar"), BR = V.sitio("brasero_0");
+        final var B0 = V.braseros().get(0);
+        int t = T;
+        atTicks(t, "La escalera de los penitentes: desde el postigo del monasterio", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft abad volver");
+                comando(sp, "darkcraft ermita enemigos volver");
+                comando(sp, "darkcraft monasterio enemigos volver");
+                irMirando(sp, PO[0] + 0.5, PO[1] + 1.2, PO[2] + 0.5, MI[0] + 0.5, MI[1] + 3, MI[2] + 0.5, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv155_escalera_postigo");
+            server(m, sp -> log("  la escalera: " + com.darkcraft.morvain.MorvainEnemigos.estadoErmita(sp.server) + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoAbad(sp.server)
+                    + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 6;
+        atTicks(t, "La escalera: a media subida", m -> server(m, sp -> irMirando(sp, MI[0] + 1.5, MI[1] + 1.0, MI[2] + 5.5, MI[0] + 0.5, MI[1] + 9, MI[2] - 14, true)));
+        t += 90;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv156_escalera_mitad");
+            server(m, sp -> log("  a media subida: sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 6;
+        atTicks(t, "La escalera: entre muros, cortada en la roca", m -> server(m, sp -> irMirando(sp, CO[0] + 0.5, CO[1] + 0.4, CO[2] + 6.5, CO[0] + 0.5, CO[1] + 6, CO[2] - 10, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv157_escalera_corte"));
+        t += 6;
+        // ---- llegar a pie al calvario, en aventura: el cartel con el nombre (los helados de la escalera, fuera)
+        atTicks(t, "El calvario: llegar a pie por la escalera", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft ermita enemigos fuera");
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), EN[0] + 0.5, EN[1], EN[2] + 3.5, 180f, 4f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv158_calvario_llegada");
+            server(m, sp -> log("  al llegar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + " | cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | "
+                    + com.darkcraft.morvain.MorvainEnemigos.estadoAbad(sp.server) + " | jugador " + fpos(sp)));
+        });
+        t += 6;
+        atTicks(t, "El calvario desde lo alto", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft ermita enemigos volver");
+                irMirando(sp, CX + 21.5, PISO + 17, CZ + 25.5, CX, PISO + 1, CZ - 9, true);
+            });
+        });
+        t += 70;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv159_calvario_alto"));
+        t += 6;
+        atTicks(t, "El Abad, rezando de rodillas", m -> server(m, sp -> irMirando(sp, CX + 4.5, PISO + 1.6, CZ - 5.5, CX + 0.5, PISO + 1.8, CZ + 0.5, true)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv160_abad_reza");
+            server(m, sp -> log("  el Abad rezando: " + estadoE(abadE()) + " | " + (abadE() == null ? "" : abadE().estado())));
+        });
+        t += 6;
+        atTicks(t, "La ermita por dentro", m -> server(m, sp -> irMirando(sp, ER[0] + 0.5, ER[1] + 0.2, ER[2] + 2.5, AL[0] + 0.5, AL[1] + 1.2, AL[2] + 0.5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv161_ermita");
+            server(m, sp -> log("  en la ermita: sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 6;
+        atTicks(t, "La cruz de hielo, detras de la ermita", m -> server(m, sp -> irMirando(sp, CX + 9.5, PISO + 9, CZ - 30.5, CX, PISO + 12, CZ - 46, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv162_cruz"));
+        t += 6;
+        // ---- en supervivencia, en el calvario de cara a el: habla mientras se levanta y ruge al acabar
+        final int F = t;
+        final int dura = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Abad.VOZ_BASE + 1);
+        atTicks(F, "El Abad: en supervivencia en el calvario", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                irMirando(sp, CX + 0.5, PISO, CZ + 11.5, CX + 0.5, PISO + 3.2, CZ + 0.5, false);
+                var e = abadE();
+                if (e != null) e.setTarget(sp);
+            });
+        });
+        atTicks(F + 40, "captura: se levanta (y habla)", m -> {
+            server(m, sp -> log("  el Abad al verle: " + estadoE(abadE()) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv163_abad_habla");
+        });
+        atTicks(F + dura + 6, "captura: ruge (su barra)", m -> {
+            server(m, sp -> log("  el Abad ruge: " + estadoE(abadE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())));
+            log("  abad: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv164_abad_ruge");
+        });
+        t = F + dura + 60;
+        // ---- sus golpes (en creativo, con la camara de observador), en medio del calvario mirando al sur
+        atTicks(t, "El Abad: sus golpes (creativo)", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                irMirando(sp, CX + 12.5, PISO + 5, CZ + 12.5, CX, PISO + 1, CZ, true);
+            });
+        });
+        t += 4;
+        // {accion, camara: a su derecha, arriba, delante; mira delante; tick de la captura, nombre}
+        Object[][] golpes = {
+                {com.darkcraft.enemigos.AbadAnims.BACULAZO, 7.0, 3.6, 5.5, 6.0, 31, "cliente_mv165_baculazo"},
+                {com.darkcraft.enemigos.AbadAnims.BARRIDO, 6.5, 3.4, 4.5, 1.5, 21, "cliente_mv166_barrido"},
+                {com.darkcraft.enemigos.AbadAnims.PISOTON, 8.0, 5.0, 3.0, 0.0, 25, "cliente_mv167_pisoton"},
+                {com.darkcraft.enemigos.AbadAnims.ALIENTO, 7.0, 3.6, 5.5, 5.0, 30, "cliente_mv168_aliento"},
+                {com.darkcraft.enemigos.AbadAnims.CARAMBANOS, 10.0, 7.0, 2.0, 0.0, 43, "cliente_mv169_carambanos"}};
+        for (Object[] gp : golpes) {
+            final int accion = (int) gp[0], c1 = (int) gp[5];
+            final double cdx = (double) gp[1], cdy = (double) gp[2], cdz = (double) gp[3], delante = (double) gp[4];
+            final String n1 = (String) gp[6];
+            final int G = t;
+            atTicks(G, "El Abad: " + n1, m -> server(m, sp -> {
+                var e = abadE();
+                if (e == null) return;
+                float g = 0f;
+                e.setTarget(null);
+                e.moveTo(CX + 0.5, PISO, CZ + 0.5, g, 0f);
+                e.setYRot(g);
+                e.yBodyRot = e.yHeadRot = g;
+                e.empezar(accion);
+                double fx = -Math.sin(Math.toRadians(g)), fz = Math.cos(Math.toRadians(g));
+                verDesdeServidor = new Vec3(e.getX() - fz * cdx + fx * cdz, e.getY() + cdy, e.getZ() + fx * cdx + fz * cdz);
+                miraServidor = new Vec3(e.getX() + fx * delante, e.getY() + 2.2, e.getZ() + fz * delante);
+            }));
+            atTicks(G + 2, "camara de cerca", m -> {
+                if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+            });
+            atTicks(G + c1, "captura: " + n1, m -> {
+                server(m, sp -> log("  el Abad, " + n1 + ": " + estadoE(abadE()) + " | " + (abadE() == null ? "" : abadE().estado())));
+                shot(m, n1);
+            });
+            t = G + Math.max(c1, com.darkcraft.enemigos.AbadAnims.TICKS[accion]) + 16;
+        }
+        // ---- a media vida, en supervivencia: grita, se alzan sus hermanos de la nieve y se levanta la ventisca
+        final int H = t;
+        atTicks(H, "El Abad: a media vida (supervivencia)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                var e = abadE();
+                if (e == null) return;
+                aPelear(sp, true);
+                sp.setTicksFrozen(0);
+                e.moveTo(CX + 0.5, PISO, CZ + 0.5, 0f, 0f);
+                irMirando(sp, CX + 0.5, PISO, CZ + 12.5, CX + 0.5, PISO + 2.6, CZ + 0.5, false);
+                e.setTarget(sp);
+                e.mediaVida();
+            });
+        });
+        atTicks(H + 30, "captura: llama a sus hermanos", m -> {
+            server(m, sp -> log("  el Abad llama a sus hermanos: " + (abadE() == null ? "" : abadE().estado()) + " | jugador " + fpos(sp)));
+            log("  abad: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv170_abad_hermanos");
+        });
+        atTicks(H + 90, "captura: la ventisca (lejos de los braseros)", m -> {
+            server(m, sp -> log("  la ventisca, lejos de los braseros: jugador frio " + sp.getTicksFrozen() + " helado del todo " + sp.isFullyFrozen() + " | "
+                    + (abadE() == null ? "" : abadE().estado())));
+            shot(m, "cliente_mv171_ventisca");
+        });
+        atTicks(H + 94, "El Abad: al calor de un brasero", m -> server(m, sp -> {
+            for (var h : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Helado.class, sp.getBoundingBox().inflate(40))) h.setTarget(null);
+            irMirando(sp, BR[0] + 0.5, BR[1], BR[2] + 0.5, B0.getX() + 0.5, B0.getY() + 0.6, B0.getZ() + 0.5, false);
+            log("  junto al brasero: jugador frio " + sp.getTicksFrozen() + ", al calor " + com.darkcraft.enemigos.Abad.alCalor(sp.getX(), sp.getY(), sp.getZ()));
+        }));
+        atTicks(H + 150, "captura: se deshiela junto al brasero", m -> {
+            server(m, sp -> log("  junto al brasero, al rato: jugador frio " + sp.getTicksFrozen() + " | " + (abadE() == null ? "" : abadE().estado())));
+            shot(m, "cliente_mv172_brasero");
+        });
+        // ---- cae: de rodillas sobre el baculo, se rompe en hielo; el cartel, la hazana
+        final int C = H + 156;
+        atTicks(C, "El Abad: cae", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var e = abadE();
+                if (e == null) return;
+                sp.setGameMode(GameType.CREATIVE);
+                sp.setTicksFrozen(0);
+                for (var h : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Helado.class, sp.getBoundingBox().inflate(60))) h.setTarget(null);
+                log("  antes de caer el Abad: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "abad") + " | "
+                        + com.darkcraft.morvain.MorvainEnemigos.estadoMonasterio(sp.server));
+                double fx = -Math.sin(Math.toRadians(e.getYRot())), fz = Math.cos(Math.toRadians(e.getYRot()));
+                verDesdeServidor = new Vec3(e.getX() + fx * 8 + fz * 3.5, e.getY() + 3.2, e.getZ() + fz * 8 - fx * 3.5);
+                miraServidor = new Vec3(e.getX(), e.getY() + 1.8, e.getZ());
+                e.hurt(sp.damageSources().playerAttack(sp), 99999f);
+            });
+        });
+        atTicks(C + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 70, "captura: de rodillas sobre el baculo", m -> shot(m, "cliente_mv173_abad_de_rodillas"));
+        atTicks(C + 109, "captura: se rompe en hielo", m -> shot(m, "cliente_mv174_abad_se_rompe"));
+        atTicks(C + 114, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 194, "captura: JEFE ABATIDO", m -> {
+            log("  abad: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  tras caer el Abad: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "abad")
+                    + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoAbad(sp.server)));
+            shot(m, "cliente_mv175_abad_abatido");
+        });
+        // ---- la iglesia del monasterio en paz: los hermanos que rezaban en los bancos ya no estan
+        atTicks(C + 198, "La iglesia del monasterio, en paz", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Helado.class, sp.getBoundingBox().inflate(80)))
+                    if (e.esEfimero()) e.discard();
+                irMirando(sp, com.darkcraft.morvain.Monasterio.CX + 0.5, com.darkcraft.morvain.Monasterio.PISO + 1.4, com.darkcraft.morvain.Monasterio.CZ - 13.5,
+                        com.darkcraft.morvain.Monasterio.CX + 0.5, com.darkcraft.morvain.Monasterio.PISO + 2, com.darkcraft.morvain.Monasterio.CZ - 29, true);
+            });
+        });
+        atTicks(C + 280, "captura: la iglesia en paz", m -> {
+            server(m, sp -> {
+                // los de los bancos de la iglesia: ninguno fuera (ya no vuelven); los demas del monasterio, si
+                int iglesia = 0, otros = 0;
+                var lista = com.darkcraft.morvain.MorvainEnemigos.monasterio();
+                for (int i = 0; i < lista.size(); i++)
+                    if (com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.MONASTERIO, i) instanceof com.darkcraft.enemigos.Helado h && h.isAlive()) {
+                        if ("iglesia".equals(lista.get(i).grupo())) iglesia++;
+                        else otros++;
+                    }
+                log("  la iglesia tras caer el Abad: fuera en la iglesia " + iglesia + " (tiene que ser 0), en el resto del monasterio " + otros + " | "
+                        + com.darkcraft.morvain.MorvainEnemigos.estadoMonasterio(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp));
+            });
+            shot(m, "cliente_mv176_iglesia_en_paz");
+        });
+        atTicks(C + 284, "el bestiario: el Abad", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("abad")));
+        });
+        atTicks(C + 302, "captura: el Abad en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv177_bestiario_abad");
+        });
+        atTicks(C + 306, "El Abad: fin (vuelve a rezar, los helados de la escalera y los de la iglesia, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setTicksFrozen(0);
+                sp.setHealth(sp.getMaxHealth());
+                for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Helado.class, sp.getBoundingBox().inflate(80)))
+                    if (e.esEfimero()) e.discard();
+                comando(sp, "darkcraft abad volver");
+                comando(sp, "darkcraft ermita enemigos volver");
+                comando(sp, "darkcraft monasterio enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return C + 336;
     }
 
     // ------------------------------------------------------------------ el molino y la Molinera de Velmor (parte 7f)

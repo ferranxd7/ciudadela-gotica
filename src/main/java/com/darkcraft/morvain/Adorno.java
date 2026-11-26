@@ -38,6 +38,8 @@ final class Adorno {
         if (LagunaNegra.cerca(x0, z0)) return;
         // ni en el Monasterio de la Helada (parte 7k): ni rocas ni abetos en la terraza ni en el camino
         if (Monasterio.cerca(x0, z0)) return;
+        // ni en la escalera de los penitentes ni en el calvario de la ermita (parte 7l)
+        if (Ermita.cerca(x0, z0)) return;
         // en la Arboleda de los Ahorcados (parte 7g) solo setas y helechos: los arboles son los suyos
         if (Arboleda.cerca(x0, z0)) {
             hierba(nivel, c, r, 20, Blocks.BROWN_MUSHROOM.defaultBlockState(), Blocks.FERN.defaultBlockState());

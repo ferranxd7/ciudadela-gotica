@@ -301,6 +301,11 @@ public final class Monasterio {
         }
     }
 
+    /** Si (u, v) es el hueco del postigo del norte, en el muro del huerto (parte 7l: la escalera de la ermita). */
+    static boolean postigo(int u, int v) {
+        return v == V0 && Math.abs(x(u) - Ermita.ESC_X) <= 1;
+    }
+
     // ------------------------------------------------------------------ las zonas de la terraza
 
     enum Zona { IGLESIA, CLAUSTRO, PATIO, ENTRADA, CELDAS, REFECTORIO, CEMENTERIO, HUERTO, MURO }
@@ -372,7 +377,11 @@ public final class Monasterio {
                 // donde estan las alas, la muralla es su muro de atras (y el tejado va encima)
                 boolean ala = (u == U0 || u == U1) && v >= -9 && v <= 12;
                 int alto = ala ? ALTO_ALA : ALTO_MURALLA;
-                for (int y = base(u, v); y <= SUELO + alto; y++) put(m, u, y, v, piedra(x(u), y, z(v)));
+                for (int y = base(u, v); y <= SUELO + alto; y++) {
+                    // el postigo del huerto (parte 7l): de el sale la escalera de los penitentes, que sube a la ermita
+                    if (postigo(u, v) && y >= PISO && y <= PISO + 2) continue;
+                    put(m, u, y, v, y == PISO + 3 && postigo(u, v) ? b(Blocks.CHISELED_STONE_BRICKS) : piedra(x(u), y, z(v)));
+                }
                 if (ala) continue;
                 // las almenas, con nieve; en las esquinas, un pilar mas alto con su remate
                 boolean esquina = (u == U0 || u == U1) && (v == V0 || v == V1);

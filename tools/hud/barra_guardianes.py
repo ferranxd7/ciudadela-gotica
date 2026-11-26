@@ -20,7 +20,12 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   derecha y el garfio en la izquierda), cadenitas con monedas viejas colgando y la linterna de almas en el centro; relleno
   de agua negra con ondas y destellos de almas; gotas, una moneda y chispas de almas que caen al recibir dano.
 
-Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png y barquero_barra.png (256x128):
+  Hrodric, el Abad de la Cumbre (parte 7l): el baculo tumbado (la vara de plata escarchada con nudos de oro, el regaton y la
+  voluta de hielo con su cristal), carambanos colgando y en el centro la mitra de hielo con su banda de oro; relleno de hielo
+  azul que corre; copos y esquirlas que caen al recibir dano.
+
+Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png y
+abad_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -663,6 +668,150 @@ def gotas():
     return img
 
 
+# ---------------------------------------------------------------- Hrodric, el Abad de la Cumbre (parte 7l)
+
+P_DD, P_D, P, P_L, P_H = hexc("1b2026"), hexc("353e47"), hexc("5b6873"), hexc("95a3ad"), hexc("d6e0e6")
+Q_DD, Q_D, Q, Q_L, Q_H = hexc("10283a"), hexc("2f5f7a"), hexc("4a86a3"), hexc("9bd2e6"), hexc("ecfbff")
+O2_D, O2, O2_L = hexc("6e4a14"), hexc("b8862a"), hexc("e8c560")
+
+
+def marco_abad():
+    """El baculo tumbado: la vara de plata escarchada con nudos de oro, el regaton a la izquierda y a la derecha la voluta
+    de hielo que sube y se enrosca con el cristal que luce; carambanos colgando de la vara; en el centro la mitra de hielo
+    (las dos hojas en punta, la banda de oro, el cristal de la punta) y a los lados dos cruces pequenas."""
+    rnd = random.Random(131)
+    n = noise2(137)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 4, FX1 + 3, FY0 - 4, FY1 + 3
+    rect(img, x0, y0, x1, y1, OUT)
+    # la vara: plata con vetas a lo largo, luz arriba, escarcha a trozos
+    for y in range(y0 + 1, y1):
+        for x in range(x0 + 1, x1):
+            v = n(x * 0.07, y * 0.8)
+            c = P_D if v < 0.38 else P if v < 0.8 else P_L
+            if y == y0 + 1:
+                c = mix(c, P_H, 0.5)
+            if y == y1 - 1:
+                c = mix(c, P_DD, 0.5)
+            if n(x * 0.3 + 40, y * 0.9) > 0.86:
+                c = mix(c, Q_H, 0.6)
+            put(img, x, y, c)
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, P_DD)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # los nudos de oro (anillos) a lo largo
+    for x in range(x0 + 26, x1 - 30, 38):
+        if abs(x - FW // 2) < 26:
+            continue
+        for y in range(y0 - 1, y1 + 2):
+            if FY0 - 1 <= y <= FY1:
+                continue
+            for k in range(4):
+                put(img, x + k, y, O2_L if k == 0 else O2 if k < 3 else O2_D)
+        for k in range(-1, 5):
+            put(img, x + k, y0 - 2, OUT)
+            put(img, x + k, y1 + 2, OUT)
+    # el regaton (punta izquierda): una punta de plata
+    for x in range(0, 6):
+        for y in range(y0 + 1, y1):
+            if abs(y - (y0 + y1) / 2) <= (x + 1) * 0.7:
+                put(img, x, y, P_L if y < (y0 + y1) / 2 else P_D)
+    # la voluta de hielo (punta derecha): sube por la derecha, se enrosca hacia dentro y luce el cristal en la curva
+    vx = FW - 12
+    for y in range(1, y1):
+        for dx in range(3):
+            put(img, vx + 6 + dx, y, Q_L if dx == 0 else Q if dx == 1 else Q_D)
+        put(img, vx + 5, y, OUT)
+        put(img, vx + 9, y, OUT)
+    for x in range(vx - 2, vx + 9):
+        for dy in range(3):
+            put(img, x, 1 + dy, Q_L if dy == 0 else Q if dy == 1 else Q_D)
+        put(img, x, 0, OUT)
+        put(img, x, 4, OUT)
+    for y in range(4, 11):
+        for dx in range(3):
+            put(img, vx - 2 + dx, y, Q_L if dx == 0 else Q if dx == 1 else Q_D)
+        put(img, vx - 3, y, OUT)
+    for x in range(vx - 2, vx + 2):
+        put(img, x, 11, OUT)
+    # el cristal dentro de la curva
+    for y in range(5, 10):
+        for x in range(vx + 1, vx + 5):
+            d = abs(x - (vx + 2.5)) + abs(y - 7)
+            if d <= 2.5:
+                put(img, x, y, Q_H if d < 1.2 else Q_L)
+    # los carambanos que cuelgan de la vara
+    for xx in (x0 + 36, x0 + 50, x0 + 80, x1 - 86, x1 - 62, x1 - 44):
+        largo = rnd.randint(3, 6)
+        for i in range(largo):
+            ancho = 1 if i >= largo - 2 else 2
+            for dx in range(ancho):
+                put(img, xx + dx, y1 + 1 + i, Q_H if dx == 0 and i < 2 else Q_L if i < largo - 1 else Q)
+        put(img, xx - 1, y1 + 1, OUT)
+    # dos cruces de oro pequenas sobre la vara, a los lados de la mitra
+    for cx in (FW // 2 - 40, FW // 2 + 40):
+        for y in range(y0 - 7, y0 + 1):
+            put(img, cx, y, O2_L if y < y0 - 3 else O2)
+            put(img, cx + 1, y, O2_D)
+        for x in range(cx - 2, cx + 4):
+            put(img, x, y0 - 5, O2_L)
+        put(img, cx, y0 - 8, OUT)
+    # en el centro: la mitra de hielo (de y 0 a 18), con su banda de oro y el cristal de la punta
+    cx = FW // 2
+    for y in range(0, 19):
+        semi = 7 if y >= 7 else max(1, int((y + 1) * 1.0))
+        for dx in range(-semi - 1, semi + 2):
+            put(img, cx + dx, y, OUT)
+    for y in range(1, 18):
+        semi = 6 if y >= 7 else max(0, int(y * 0.95))
+        for dx in range(-semi, semi + 1):
+            c = Q_L if dx < -semi // 2 else Q if dx <= semi // 2 else Q_D
+            if dx == 0 and y >= 4:
+                c = mix(O2, Q_L, 0.35)          # la franja de oro de en medio, bajo el hielo
+            if y >= 15:
+                c = O2_L if (dx + y) % 2 else O2   # la banda
+            put(img, cx + dx, y, c)
+    for y in range(0, 4):
+        put(img, cx, y, Q_H)
+    put(img, cx - 2, 16, Q_H)
+    put(img, cx + 2, 16, Q_H)
+    return img
+
+
+def relleno_abad(k):
+    """Hielo azul que corre, con vetas claras y destellos blancos que pasan."""
+    n = noise2(167)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            t = 0.25 + 0.45 * mid + 0.4 * (n((x - k * 3) * 0.08, y * 0.5) - 0.5)
+            c = mix(Q_D, Q, max(0.0, min(1.0, t * 1.4)))
+            veta = (x - k * 3 + int(2 * math.sin((x + y * 4) * 0.17))) % 19
+            if veta in (0, 1) and 1 <= y <= 5:
+                c = mix(c, Q_L, 0.65)
+            if y == 0:
+                c = mix(c, Q_H, 0.45)
+            if y == 6:
+                c = mix(c, Q_DD, 0.6)
+            if (x * 13 + y * 5 - k * 31) % 89 == 0 and 1 <= y <= 5:
+                c = Q_H
+            img.putpixel((x, y), c)
+    return img
+
+
+def copos():
+    """Lo que cae al recibir dano: copos de nieve y esquirlas de hielo."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = ([".w.", "wWw", ".w."], ["w.w", ".W.", "w.w"], [".q", "qQ", "q."], ["q", "Q", "q"])
+    col = {"w": Q_L, "W": Q_H, "q": Q, "Q": Q_H}
+    for k, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, k * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 # ---------------------------------------------------------------- comun
 
 
@@ -702,6 +851,7 @@ if __name__ == "__main__":
         "molinera": atlas(marco_molinera(), relleno_molinera, hueco("0b0908", "1c1815"), rastro("f6f2e6", "d6cdb6"), ceniza()),
         "verdugo": atlas(marco_verdugo(), relleno_verdugo, hueco("0a0606", "1a1110"), rastro("f6ece2", "d8b9a6"), fibras()),
         "barquero": atlas(marco_barquero(), relleno_barquero, hueco("040607", "0f1a1e"), rastro("eefcff", "a9dbe6"), gotas()),
+        "abad": atlas(marco_abad(), relleno_abad, hueco("05090c", "121c24"), rastro("f6fcff", "c4e2ef"), copos()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

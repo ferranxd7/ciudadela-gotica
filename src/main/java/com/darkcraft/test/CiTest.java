@@ -733,6 +733,332 @@ public final class CiTest {
         pilotes(server, m, log, out);
         barquero(server, m, log, out);
         monasterio(server, m, log, out);
+        ermita(server, m, log, out);
+    }
+
+    /**
+     * Parte 7l: la escalera de los penitentes y la ermita de la cumbre (los braseros encendidos, el arcon, la campana, la rosa
+     * de hielo, la cruz; la escalera, escalon a escalon, y a pie del postigo del monasterio a todos sus sitios), sus helados
+     * (de rodillas en los rellanos de la escalera y enterrados junto al calvario) y Hrodric, el Abad de la Cumbre: de rodillas en
+     * medio del calvario; al ver a alguien habla, se levanta y ruge al acabar la frase; cada accion acaba; sus golpes a un
+     * marchito (el baculazo y su fila de puas, que llega mas lejos que el baculo; el barrido; el pisoton; el aliento que hiela y
+     * frena; los carambanos que caen donde esta); la ventisca: lejos de los braseros se hiela y duele, junto a uno se deshiela;
+     * a media vida llama a sus hermanos (se alzan de la nieve) y levanta la ventisca; el frio no le hace nada y el fuego, mas; y
+     * al caer, la cumbre en paz: los hermanos que rezaban en la iglesia del monasterio descansan y ya no vuelven.
+     */
+    private static void ermita(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String escalera = com.darkcraft.morvain.MorvainEnemigos.ERMITA, cumbre = com.darkcraft.morvain.MorvainEnemigos.CUMBRE,
+                monasterio = com.darkcraft.morvain.MorvainEnemigos.MONASTERIO;
+        var E = com.darkcraft.morvain.Ermita.get();
+        final int CX = com.darkcraft.morvain.Ermita.CX, CZ = com.darkcraft.morvain.Ermita.CZ, PISO = com.darkcraft.morvain.Ermita.PISO;
+        final int EX = com.darkcraft.morvain.Ermita.ESC_X, EZ0 = com.darkcraft.morvain.Ermita.ESC_Z0, EZ1 = com.darkcraft.morvain.Ermita.ESC_Z1;
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : E.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            // la escalera, escalon a escalon (los tres de ancho): se pisa y encima hay hueco (tres de alto)
+            int malos = 0, subida = 0;
+            StringBuilder raros = new StringBuilder();
+            for (int z = EZ1; z <= EZ0; z++) {
+                int h = com.darkcraft.morvain.Ermita.escalon(z);
+                if (z > EZ1) subida = Math.max(subida, Math.abs(h - com.darkcraft.morvain.Ermita.escalon(z - 1)));
+                for (int dx = -1; dx <= 1; dx++) {
+                    BlockPos q = new BlockPos(EX + dx, h, z);
+                    boolean bien = !m.getBlockState(q.below()).getCollisionShape(m, q.below()).isEmpty();
+                    // (encima, hueco: aire o, como mucho, un poco de nieve)
+                    for (int dy = 0; dy < 3; dy++) {
+                        var st = m.getBlockState(q.above(dy));
+                        bien &= st.getCollisionShape(m, q.above(dy)).isEmpty() || dy == 0 && st.is(net.minecraft.world.level.block.Blocks.SNOW);
+                    }
+                    if (!bien) {
+                        malos++;
+                        if (raros.length() < 300) raros.append(' ').append(q.toShortString()).append(';');
+                    }
+                }
+            }
+            // a pie desde el postigo del huerto del monasterio
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> m.getBlockState(new BlockPos(x, y, z));
+            int[] po = E.sitio("postigo");
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, po[0], po[1], po[2], com.darkcraft.morvain.Ermita.X0, com.darkcraft.morvain.Ermita.Z0,
+                    com.darkcraft.morvain.Ermita.X1, EZ0 + 6, 600000);
+            StringBuilder ap = new StringBuilder();
+            int llega = 0, sitios = 0;
+            for (var en : E.sitios().entrySet()) {
+                if (en.getKey().equals("cruz_alta")) continue;
+                sitios++;
+                int[] q = en.getValue();
+                if (zona.alcanza(q[0], q[1], q[2], 2)) llega++;
+                else ap.append(' ').append(en.getKey());
+            }
+            log.println("Morvain, la ermita de la cumbre: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Ermita.resumen(m)
+                    + "; la escalera: " + (EZ0 - EZ1 + 1) + " filas de Y " + com.darkcraft.morvain.Ermita.escalon(EZ0) + " a " + com.darkcraft.morvain.Ermita.escalon(EZ1)
+                    + ", el escalon mas alto " + subida + " (tiene que ser 1), escalones sin pisar o sin hueco " + malos + raros
+                    + "; a pie desde el postigo (" + zona.celdas() + " celdas) a " + llega + " de " + sitios + " sitios" + (ap.length() == 0 ? "" : ", no a:" + ap));
+            topView(m, CX, CZ - 12, 46, new File(out, "morvain_ermita.png"));
+            topView(m, EX, (EZ0 + EZ1) / 2, 62, new File(out, "morvain_escalera.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, la ermita de la cumbre: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] ermita", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            // ---- los helados de la escalera: de rodillas en los rellanos, enterrados junto al calvario
+            com.darkcraft.enemigos.Puestos.todos(server, escalera, false);
+            var suyos = com.darkcraft.enemigos.Puestos.sacarTodos(m, escalera);
+            for (int k = 0; k < 10; k++)
+                for (var e : suyos) if (e.isAlive()) e.tick();
+            int rezan = 0, enterrados = 0, enSuelo = 0, chocan = 0;
+            StringBuilder mal = new StringBuilder();
+            for (var e : suyos) {
+                if (!m.noCollision(e)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(e.blockPosition().toShortString()).append(';');
+                }
+                if (e.postura() == com.darkcraft.enemigos.Enemigo.REZA) rezan++;
+                else if (e.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) enterrados++;
+                if (!m.getBlockState(BlockPos.containing(e.getX(), e.getY() - 0.2, e.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+                else if (mal.length() < 400) mal.append(' ').append(e.tipo()).append(" en el aire en ").append(e.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, la escalera de los penitentes: fuera " + suyos.size() + " de " + com.darkcraft.morvain.MorvainEnemigos.ermita().size()
+                    + ": de rodillas " + rezan + ", enterrados " + enterrados + " (en su suelo " + enSuelo + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+            com.darkcraft.enemigos.Puestos.todos(server, escalera, false);
+            // ---- el Abad, de rodillas en medio del calvario
+            com.darkcraft.enemigos.Puestos.todos(server, cumbre, false);
+            com.darkcraft.enemigos.Abad ab = null;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, cumbre)) if (e instanceof com.darkcraft.enemigos.Abad x) ab = x;
+            if (ab == null) {
+                log.println("Morvain, el Abad: NO SALE");
+                return;
+            }
+            boolean suelo = !m.getBlockState(BlockPos.containing(ab.getX(), ab.getY() - 0.2, ab.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty();
+            StringBuilder sb = new StringBuilder("Morvain, el Abad: en " + ab.blockPosition().toShortString() + " postura " + ab.postura() + " (1 de rodillas), giro "
+                    + Math.round(ab.getYRot()) + ", en el suelo " + suelo + ", metido en un bloque " + !m.noCollision(ab) + ", vida " + Math.round(ab.getMaxHealth())
+                    + ", caja " + ab.getBbWidth() + " x " + ab.getBbHeight() + ", al calor de un brasero en el centro " + com.darkcraft.enemigos.Abad.alCalor(CX + 0.5, PISO, CZ + 0.5));
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("9c4d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e71"), "[DarkCraftCI6]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- le ve desde la entrada del calvario: habla, se levanta y ruge al acabar la frase
+            int[] an = E.sitio("ante_abad");
+            final double fxx = an[0] + 0.5, fyy = an[1], fzz = an[2] + 0.5;
+            fp.moveTo(fxx, fyy, fzz, 180f, 0f);
+            fp.setOnGround(true);
+            ab.setTarget(fp);
+            int levanta = -1, ruge = -1, ataca = -1, quien = 0;
+            for (int k = 0; k < 360; k++) {
+                ab.tickCount++;
+                ab.tick();
+                fp.moveTo(fxx, fyy, fzz, 180f, 0f);
+                int a = ab.accion();
+                if (levanta < 0 && a == com.darkcraft.enemigos.AbadAnims.LEVANTARSE) levanta = k;
+                if (ruge < 0 && a == com.darkcraft.enemigos.AbadAnims.GRITO) ruge = k;
+                if (ruge >= 0 && ataca < 0 && a != 0 && a != com.darkcraft.enemigos.AbadAnims.GRITO) {
+                    ataca = k;
+                    quien = a;
+                    break;
+                }
+            }
+            sb.append("; al verle: pelea ").append(ab.enPelea()).append(", se levanta en el tick ").append(levanta).append(", ruge en el ").append(ruge)
+                    .append(" (la frase 1 dura ").append(com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Abad.VOZ_BASE + 1)).append("), y luego ")
+                    .append(quien == 0 ? "nada" : com.darkcraft.enemigos.AbadAnims.NOMBRES[quien]).append(" en el ").append(ataca)
+                    .append(String.format(java.util.Locale.ROOT, ", de pie %s a %.1f de su presa", ab.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE,
+                            Math.hypot(ab.getX() - fp.getX(), ab.getZ() - fp.getZ())));
+            // ---- cada accion acaba (sin presa)
+            ab.setTarget(null);
+            StringBuilder no = new StringBuilder();
+            for (int a = 1; a < com.darkcraft.enemigos.AbadAnims.TICKS.length; a++) {
+                String nombre = com.darkcraft.enemigos.AbadAnims.NOMBRES[a];
+                if (nombre.equals("morir")) continue;
+                ab.empezar(a);
+                for (int k = 0; k < 140 && ab.accion() == a; k++) {
+                    ab.tickCount++;
+                    ab.tick();
+                }
+                if (ab.accion() == a) no.append(' ').append(nombre);
+            }
+            for (int k = 0; k < 40 && ab.pendientes() > 0; k++) {
+                ab.tickCount++;
+                ab.tick();
+            }
+            sb.append("; acciones que no acaban:").append(no.length() == 0 ? " ninguna" : no);
+            log.println(sb);
+            // ---- sus golpes a un marchito, en el calvario (el Abad mirando al sur, hacia la entrada)
+            StringBuilder sg = new StringBuilder("Morvain, los golpes del Abad a un marchito:");
+            float giro = 0f;
+            double fx = -Math.sin(Math.toRadians(giro)), fz = Math.cos(Math.toRadians(giro));
+            double y = PISO, x0 = CX + 0.5, z0 = CZ + 2.5;
+            var victima = DarkCraftMod.MARCHITO.get().create(m);
+            if (victima != null) {
+                victima.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(600.0);
+                victima.moveTo(x0 + fx * 3, y, z0 + fz * 3, giro + 180f, 0f);
+                m.addFreshEntity(victima);
+                quitar.add(victima);
+                // {accion, a cuanto delante (o detras, negativo)}
+                String[] golpes = {"baculazo de cerca", "baculazo de lejos (las puas)", "barrido", "pisoton por la espalda", "aliento", "carambanos"};
+                int[] acc = {com.darkcraft.enemigos.AbadAnims.BACULAZO, com.darkcraft.enemigos.AbadAnims.BACULAZO, com.darkcraft.enemigos.AbadAnims.BARRIDO,
+                        com.darkcraft.enemigos.AbadAnims.PISOTON, com.darkcraft.enemigos.AbadAnims.ALIENTO, com.darkcraft.enemigos.AbadAnims.CARAMBANOS};
+                double[] lejos = {3.0, 8.1, 3.0, -2.6, 6.0, 7.0};
+                for (int i = 0; i < golpes.length; i++) {
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    victima.hurtTime = 0;
+                    victima.setTicksFrozen(0);
+                    victima.removeAllEffects();
+                    double px = x0 + fx * lejos[i], pz = z0 + fz * lejos[i];
+                    victima.moveTo(px, y, pz, giro + 180f, 0f);
+                    int pu = ab.puasQueDan(), ca = ab.carambanosQueDan(), al = ab.heladosAliento();
+                    ab.moveTo(x0, y, z0, giro, 0f);
+                    ab.setTarget(victima);
+                    ab.setYRot(giro);
+                    ab.yBodyRot = ab.yHeadRot = giro;
+                    ab.empezar(acc[i]);
+                    float antes = victima.getHealth();
+                    int frio = 0;
+                    for (int k = 0; k < 140 && (ab.accion() == acc[i] || ab.pendientes() > 0); k++) {
+                        ab.tickCount++;
+                        ab.tick();
+                        ab.moveTo(x0, y, z0, giro, 0f);
+                        ab.setYRot(giro);
+                        ab.yBodyRot = ab.yHeadRot = giro;
+                        victima.moveTo(px, y, pz, giro + 180f, 0f);
+                        victima.invulnerableTime = 0;
+                        frio = Math.max(frio, victima.getTicksFrozen());
+                    }
+                    sg.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " a %.1f: -%.1f, helado %d", Math.abs(lejos[i]), antes - victima.getHealth(), frio))
+                            .append(victima.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) ? ", frenado" : "")
+                            .append(ab.puasQueDan() > pu ? ", le da una pua" : "").append(ab.carambanosQueDan() > ca ? ", le cae un carambano" : "")
+                            .append(ab.heladosAliento() > al ? ", le hiela el aliento" : "").append(';');
+                }
+                sg.append(" en total: baculazos ").append(ab.baculazos()).append(", puas ").append(ab.puas()).append(" (dan ").append(ab.puasQueDan())
+                        .append("), pisotones ").append(ab.pisotones()).append(", alientos ").append(ab.alientos()).append(", carambanos ").append(ab.carambanos())
+                        .append(" (dan ").append(ab.carambanosQueDan()).append(')');
+                victima.discard();
+            }
+            log.println(sg);
+            // ---- la ventisca: lejos de los braseros se hiela (y le duele); junto a uno, se deshiela
+            StringBuilder sv = new StringBuilder("Morvain, la ventisca del Abad:");
+            var lejosV = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            var calorV = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            int[] br = E.sitio("brasero_0");
+            if (lejosV != null && calorV != null) {
+                lejosV.moveTo(CX + 0.5, PISO, CZ + 6.5, 0f, 0f);
+                calorV.moveTo(br[0] + 0.5, br[1], br[2] + 0.5, 0f, 0f);
+                lejosV.setNoAi(true);
+                calorV.setNoAi(true);
+                m.addFreshEntity(lejosV);
+                m.addFreshEntity(calorV);
+                quitar.add(lejosV);
+                quitar.add(calorV);
+                calorV.setTicksFrozen(120);
+                float vida = lejosV.getHealth();
+                int hel = ab.heladosVentisca(), des = ab.deshelados();
+                ab.ventisca(true);
+                boolean hay = ab.ventisca();
+                int heladoEn = -1;
+                for (int k = 0; k < 90; k++) {
+                    ab.tickCount++;
+                    ab.ventiscaSobre(lejosV);
+                    ab.ventiscaSobre(calorV);
+                    lejosV.invulnerableTime = 0;
+                    if (heladoEn < 0 && lejosV.isFullyFrozen()) heladoEn = k;
+                }
+                sv.append(" empieza ").append(hay).append(String.format(java.util.Locale.ROOT,
+                        "; lejos de los braseros: helado del todo en el tick %d, -%.1f de vida (le duele %d veces); junto al brasero (al calor %s): de 120 a %d de frio, se deshiela %d veces",
+                        heladoEn, vida - lejosV.getHealth(), ab.heladosVentisca() - hel, com.darkcraft.enemigos.Abad.alCalor(calorV.getX(), calorV.getY(), calorV.getZ()),
+                        calorV.getTicksFrozen(), ab.deshelados() - des));
+                ab.ventisca(false);
+                sv.append("; se acaba ").append(!ab.ventisca());
+            }
+            log.println(sv);
+            // ---- a media vida: grita, se alzan sus hermanos de la nieve del calvario y se levanta la ventisca
+            StringBuilder sm = new StringBuilder("Morvain, el Abad a media vida:");
+            ab.moveTo(CX + 0.5, PISO, CZ + 0.5, 0f, 0f);
+            fp.moveTo(fxx, fyy, fzz, 180f, 0f);
+            ab.setTarget(fp);
+            int vent = ab.ventiscas();
+            ab.mediaVida();
+            for (int k = 0; k < 40 && ab.alzados() == 0; k++) {
+                ab.tickCount++;
+                ab.tick();
+                fp.moveTo(fxx, fyy, fzz, 180f, 0f);
+            }
+            int bien = 0, conPresa = 0;
+            for (var h : m.getEntitiesOfClass(com.darkcraft.enemigos.Helado.class, ab.getBoundingBox().inflate(24))) {
+                if (!h.esEfimero()) continue;
+                quitar.add(h);
+                boolean pisa = !m.getBlockState(BlockPos.containing(h.getX(), h.getY() - 0.2, h.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty();
+                if (pisa && m.noCollision(h)) bien++;
+                if (h.getTarget() == fp) conPresa++;
+            }
+            sm.append(" segunda ").append(ab.segunda()).append(", se alzan ").append(ab.alzados()).append(" (en su suelo y sin meterse en nada ").append(bien)
+                    .append(", con presa ").append(conPresa).append("), en pie ").append(ab.suyos()).append(", ventisca ").append(ab.ventisca())
+                    .append(" (ventiscas +").append(ab.ventiscas() - vent).append(')');
+            // ---- el frio no le hace nada; el fuego, mas que un golpe igual
+            ab.invulnerableTime = 0;
+            float v0 = ab.getHealth();
+            boolean frioLe = ab.hurt(m.damageSources().freeze(), 10f);
+            ab.invulnerableTime = 0;
+            float v1 = ab.getHealth();
+            ab.hurt(m.damageSources().generic(), 10f);
+            ab.invulnerableTime = 0;
+            float v2 = ab.getHealth();
+            ab.hurt(m.damageSources().inFire(), 10f);
+            ab.invulnerableTime = 0;
+            sm.append(String.format(java.util.Locale.ROOT, "; el frio le hace %s (-%.1f); un golpe de 10, -%.1f; el fuego de 10, -%.1f", frioLe ? "dano" : "nada", v0 - v1,
+                    v1 - v2, v2 - ab.getHealth()));
+            log.println(sm);
+            // ---- cae: la cumbre en paz; los hermanos que rezaban en la iglesia del monasterio descansan y ya no vuelven
+            com.darkcraft.enemigos.Puestos.todos(server, monasterio, false);
+            int iglesiaAntes = 0;
+            java.util.List<com.darkcraft.enemigos.Enemigo> deLaIglesia = new java.util.ArrayList<>();
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, monasterio))
+                if ("iglesia".equals(com.darkcraft.morvain.MorvainEnemigos.monasterio().get(e.puesto()).grupo())) {
+                    iglesiaAntes++;
+                    deLaIglesia.add(e);
+                }
+            ab.setTarget(null);
+            ab.hurt(m.damageSources().playerAttack(fp), 99999f);
+            int k = 0;
+            for (; k < 150 && !ab.isRemoved(); k++) {
+                ab.tickCount++;
+                ab.tick();
+            }
+            int descansan = 0;
+            for (var e : deLaIglesia) if (e.isRemoved()) descansan++;
+            int objetos = m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, ab.getBoundingBox().inflate(5)).size();
+            com.darkcraft.enemigos.Puestos.todos(server, monasterio, false);
+            int iglesiaDespues = 0, otrosDespues = 0;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, monasterio)) {
+                if ("iglesia".equals(com.darkcraft.morvain.MorvainEnemigos.monasterio().get(e.puesto()).grupo())) iglesiaDespues++;
+                else otrosDespues++;
+            }
+            log.println("Morvain, el Abad cae: se va en " + k + " ticks (vivo " + ab.isAlive() + "), objetos " + objetos + ", la cumbre en paz "
+                    + com.darkcraft.morvain.Ermita.enPaz(server) + ", sus hermanos en pie " + ab.suyos() + "; de los " + iglesiaAntes
+                    + " hermanos de la iglesia descansan " + descansan + "; despues salen " + iglesiaDespues + " en la iglesia (tiene que ser 0) y " + otrosDespues
+                    + " por el resto del monasterio; " + com.darkcraft.morvain.MorvainEnemigos.estadoAbad(server));
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, ab.getBoundingBox().inflate(8))) it.discard();
+        } catch (Throwable t) {
+            log.println("Morvain, el Abad: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] abad", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.Helado.class, new net.minecraft.world.phys.AABB(CX - 40, PISO - 10, CZ - 50, CX + 40, PISO + 20, CZ + 40)))
+                if (e.esEfimero()) e.discard();
+            // todo como antes: el Abad de rodillas en el calvario y los hermanos de la iglesia
+            com.darkcraft.enemigos.Puestos.todos(server, cumbre, false);
+            com.darkcraft.enemigos.Puestos.todos(server, monasterio, false);
+            com.darkcraft.enemigos.Puestos.todos(server, escalera, false);
+            try {
+                com.darkcraft.enemigos.Puestos.sacarTodos(m, cumbre);
+                log.println("Morvain, el Abad vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoAbad(server) + " | iglesia del monasterio: quedan "
+                        + com.darkcraft.enemigos.Puestos.quedan(server, monasterio, "iglesia"));
+            } catch (Throwable t) {
+                log.println("Morvain, el Abad vuelve: ERROR " + t);
+            }
+            com.darkcraft.enemigos.Puestos.todos(server, cumbre, false);
+        }
     }
 
     /**

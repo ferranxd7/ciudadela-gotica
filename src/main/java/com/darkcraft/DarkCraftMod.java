@@ -248,6 +248,18 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_HELADO_MARTILLO = sound("sfx.helado_martillo");
     public static final RegistryObject<SoundEvent> SFX_HELADO_ESQUIRLAS = sound("sfx.helado_esquirlas");
     public static final RegistryObject<SoundEvent> SFX_MONASTERIO_CAMPANA = sound("sfx.monasterio_campana");
+    // Hrodric, el Abad de la Cumbre (parte 7l)
+    public static final RegistryObject<SoundEvent> SFX_ABAD_GRITO = sound("sfx.abad_grito");
+    public static final RegistryObject<SoundEvent> SFX_ABAD_BACULAZO = sound("sfx.abad_baculazo");
+    public static final RegistryObject<SoundEvent> SFX_ABAD_BARRIDO = sound("sfx.abad_barrido");
+    public static final RegistryObject<SoundEvent> SFX_ABAD_PISOTON = sound("sfx.abad_pisoton");
+    public static final RegistryObject<SoundEvent> SFX_ABAD_ALIENTO = sound("sfx.abad_aliento");
+    public static final RegistryObject<SoundEvent> SFX_ABAD_INVOCAR = sound("sfx.abad_invocar");
+    public static final RegistryObject<SoundEvent> SFX_ABAD_CARAMBANO = sound("sfx.abad_carambano");
+    public static final RegistryObject<SoundEvent> SFX_ABAD_VENTISCA = sound("sfx.abad_ventisca");
+    public static final RegistryObject<SoundEvent> SFX_ABAD_DOLOR = sound("sfx.abad_dolor");
+    public static final RegistryObject<SoundEvent> SFX_ABAD_MUERTE = sound("sfx.abad_muerte");
+    public static final RegistryObject<SoundEvent> SFX_ABAD_REZO = sound("sfx.abad_rezo");
     public static final RegistryObject<SoundEvent> AMBIENTE_MONTANA = sound("ambiente.montana");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
@@ -326,6 +338,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_MOLINERA = sound("musica.molinera");
     public static final RegistryObject<SoundEvent> MUSICA_VERDUGO = sound("musica.verdugo");
     public static final RegistryObject<SoundEvent> MUSICA_BARQUERO = sound("musica.barquero");
+    public static final RegistryObject<SoundEvent> MUSICA_ABAD = sound("musica.abad");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -367,6 +380,10 @@ public class DarkCraftMod {
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] BARQUERO_VOZ = new RegistryObject[6];
 
+    /** Frases de Hrodric, el Abad de la Cumbre (1..5, parte 7l). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] ABAD_VOZ = new RegistryObject[6];
+
     /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[10];
@@ -378,6 +395,7 @@ public class DarkCraftMod {
         for (int i = 1; i < MOLINERA_VOZ.length; i++) MOLINERA_VOZ[i] = sound("molinera.voz." + i);
         for (int i = 1; i < VERDUGO_VOZ.length; i++) VERDUGO_VOZ[i] = sound("verdugo.voz." + i);
         for (int i = 1; i < BARQUERO_VOZ.length; i++) BARQUERO_VOZ[i] = sound("barquero.voz." + i);
+        for (int i = 1; i < ABAD_VOZ.length; i++) ABAD_VOZ[i] = sound("abad.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -546,6 +564,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Esquirla>> ESQUIRLA = ENTITIES.register("esquirla",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Esquirla>of(com.darkcraft.enemigos.Esquirla::new, MobCategory.MISC)
                     .sized(0.3f, 0.3f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":esquirla"));
+    // ---- Hrodric, el Abad de la Cumbre, el jefe de las Montanas Nevadas (parte 7l)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Abad>> ABAD = ENTITIES.register("abad",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Abad>of(com.darkcraft.enemigos.Abad::new, MobCategory.MONSTER)
+                    .sized(1.6f, 4.6f).clientTrackingRange(10).build(MODID + ":abad"));
     // ---- la Molinera de Velmor, el jefe de las Llanuras Palidas (parte 7f)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Molinera>> MOLINERA = ENTITIES.register("molinera",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Molinera>of(com.darkcraft.enemigos.Molinera::new, MobCategory.MONSTER)
@@ -722,6 +744,7 @@ public class DarkCraftMod {
         e.put(AHORCADO.get(), com.darkcraft.enemigos.Ahorcado.atributos().build());
         e.put(PODRIDO.get(), com.darkcraft.enemigos.Podrido.atributos().build());
         e.put(HELADO.get(), com.darkcraft.enemigos.Helado.atributos().build());
+        e.put(ABAD.get(), com.darkcraft.enemigos.Abad.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());

@@ -19,7 +19,9 @@ import java.util.Random;
  * el corazon verde; savia que corre y hojas que caen); y la de la Molinera de Velmor (parte 7f: la viga del molino con
  * espigas y la piedra de moler; brasas que corren y ceniza que cae) y la del Verdugo de la Arboleda (parte 7h: la viga de la
  * horca con el lazo y la capucha; una soga con sangre que gira y hebras que caen) y la del Barquero de la Laguna Negra
- * (parte 7j: el remo con el garfio, las monedas del peaje y la linterna de almas; agua negra que corre y gotas que caen).
+ * (parte 7j: el remo con el garfio, las monedas del peaje y la linterna de almas; agua negra que corre y gotas que caen) y
+ * la del Abad de la Cumbre (parte 7l: el baculo con la voluta de hielo, la mitra y los carambanos; escarcha que corre y
+ * copos que caen meciendose).
  * Las texturas las pinta tools/hud/barra_guardianes.py.
  */
 public final class GuardianCliente {
@@ -39,7 +41,7 @@ public final class GuardianCliente {
 
     private static final List<Gota> GOTAS = new ArrayList<>();
 
-    /** {@code nombre}: "brandt", "corteza", "molinera", "verdugo" o "barquero" (el de la clave de su nombre). */
+    /** {@code nombre}: "brandt", "corteza", "molinera", "verdugo", "barquero" o "abad" (el de la clave de su nombre). */
     public static void barra(CustomizeGuiOverlayEvent.BossEventProgress e, int ticks, String nombre) {
         if (!e.isCancelable()) return;
         if (!nombre.equals(actual)) {
@@ -47,7 +49,8 @@ public final class GuardianCliente {
             BARRA = new ResourceLocation(DarkCraftMod.MODID, "textures/gui/" + nombre + "_barra.png");
             ultimo = ticks - 100;
         }
-        boolean hojas = nombre.equals("corteza"), ceniza = nombre.equals("molinera"), soga = nombre.equals("verdugo"), agua = nombre.equals("barquero");
+        boolean hojas = nombre.equals("corteza"), ceniza = nombre.equals("molinera"), soga = nombre.equals("verdugo"), agua = nombre.equals("barquero"),
+                nieve = nombre.equals("abad");
         e.setCanceled(true);
         GuiGraphics g = e.getGuiGraphics();
         Minecraft mc = Minecraft.getInstance();
@@ -82,7 +85,11 @@ public final class GuardianCliente {
             while (it.hasNext()) {
                 Gota h = it.next();
                 h.edad++;
-                if (actual.equals("corteza") || actual.equals("molinera") || actual.equals("verdugo") || actual.equals("barquero")) {
+                if (actual.equals("abad")) {
+                    // copos: caen despacio y se mecen
+                    h.vy = Math.min(0.55f, h.vy + 0.03f);
+                    h.x += h.vx * 0.6f + (float) Math.sin((h.edad + h.tipo * 9) * 0.25) * 0.6f;
+                } else if (actual.equals("corteza") || actual.equals("molinera") || actual.equals("verdugo") || actual.equals("barquero")) {
                     h.vy = Math.min(0.9f, h.vy + 0.05f);
                     h.x += h.vx + (float) Math.sin((h.edad + h.tipo * 7) * 0.35) * 0.45f;
                 } else {
@@ -101,7 +108,7 @@ public final class GuardianCliente {
         g.pose().scale(sc, sc, 1f);
         g.pose().translate(-128, 0, 0);
         g.drawCenteredString(mc.font, Component.translatable("entity.darkcraft." + nombre), 128, -8,
-                hojas ? 0xFFB9F0C4 : ceniza ? 0xFFF2DDB8 : soga ? 0xFFE6D2B0 : agua ? 0xFFBFEAF2 : 0xFFF0C8B8);
+                hojas ? 0xFFB9F0C4 : ceniza ? 0xFFF2DDB8 : soga ? 0xFFE6D2B0 : agua ? 0xFFBFEAF2 : nieve ? 0xFFE4F4FF : 0xFFF0C8B8);
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         // hueco, rastro y relleno (la bruma corre)
         g.blit(BARRA, 8, 19, 0, 80, 240, 7, 256, 128);
@@ -111,7 +118,8 @@ public final class GuardianCliente {
         if (wf > 0) g.blit(BARRA, 8, 19, 0, 48 + 8 * cuadro, wf, 7, 256, 128);
         // destello al recibir un golpe
         if (ticks - golpe < 4 && wf > 0)
-            g.fill(8 + Math.max(0, wf - 6), 19, 8 + wf, 26, hojas ? 0x80E6FFF0 : ceniza ? 0x80FFF4E0 : soga ? 0x80FFE8D8 : agua ? 0x80E0FAFF : 0x80FFE4DA);
+            g.fill(8 + Math.max(0, wf - 6), 19, 8 + wf, 26, hojas ? 0x80E6FFF0 : ceniza ? 0x80FFF4E0 : soga ? 0x80FFE8D8 : agua ? 0x80E0FAFF
+                    : nieve ? 0x90F4FCFF : 0x80FFE4DA);
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         g.blit(BARRA, 0, 0, 0, 0, 256, 40, 256, 128);
         // las gotas que caen

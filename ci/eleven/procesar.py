@@ -71,6 +71,8 @@ TOMAS_MOLINERA = {n: "a" for n in range(1, 6)}
 TOMAS_VERDUGO = {n: "a" for n in range(1, 6)}
 # el Barquero de la Laguna Negra (parte 7j; voz "Gravel Midnight - Deep Character Voice"): las tomas a
 TOMAS_BARQUERO = {n: "a" for n in range(1, 6)}
+# Hrodric, el Abad de la Cumbre (parte 7l; voz "Elder Rowan"): las tomas a (las b dicen lo mismo, con las mismas pausas)
+TOMAS_ABAD = {n: "a" for n in range(1, 6)}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -214,10 +216,17 @@ SFX = {
     "helado_muerte": (1.8, 0.6, -14), "helado_romper": (1.6, 0.5, -15), "helado_incensario": (1.0, 0.3, -15),
     "helado_aliento": (1.8, 0.5, -15), "helado_martillo": (1.5, 0.5, -13), "helado_esquirlas": (1.0, 0.3, -15),
     "montana_ambiente": (20.0, 2.0, -26), "monasterio_campana": (5.6, 1.6, -16),
+    # el Abad de la Cumbre (parte 7l): el grito (y la llamada a los hermanos), el baculo contra el suelo helado, el barrido,
+    # el pisoton que levanta el anillo de puas, el aliento que hiela, la llamada al cielo antes de los carambanos, el carambano
+    # que cae y revienta, la ventisca (dura lo que dura: 18 s), el dolor, la muerte (se rompe) y el rezo de rodillas
+    "abad_grito": (3.4, 0.9, -13), "abad_baculazo": (1.6, 0.5, -13), "abad_barrido": (1.0, 0.3, -14),
+    "abad_pisoton": (1.8, 0.6, -13), "abad_aliento": (2.4, 0.6, -15), "abad_invocar": (1.8, 0.6, -16),
+    "abad_carambano": (1.2, 0.4, -15), "abad_ventisca": (18.0, 2.5, -20), "abad_dolor": (0.75, 0.2, -15),
+    "abad_muerte": (3.6, 0.9, -14), "abad_rezo": (7.0, 1.6, -20),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
-           "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0}
+           "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0, "abad_ventisca": 1.5, "abad_rezo": 0.4}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
@@ -374,6 +383,14 @@ TOMAS_SFX = {
     "helado_gemido": (4, 2), "helado_alerta": (3, 1), "helado_dolor": (2, 4), "helado_muerte": (4, 1), "helado_romper": (4, 1),
     "helado_incensario": (4, 3), "helado_aliento": (1, 2), "helado_martillo": (4, 3), "helado_esquirlas": (1, 3),
     "monasterio_campana": (1, 4), "montana_ambiente": (1, 2),
+    # el Abad: los gritos que antes llegan arriba y mas aguantan (la 3 y la 4); los dos baculazos que pegan nada mas empezar;
+    # los dos barridos mas rapidos; los dos pisotones con mas graves (la 4, casi todo graves); los dos alientos mas fuertes
+    # desde el principio; las dos llamadas que mas suenan (la 4 casi no se oye); tres carambanos (caen muchos a la vez); la
+    # ventisca: las dos que suenan de principio a fin; tres quejidos; las dos muertes que mas duran fuertes; y los dos rezos
+    # mas largos y parejos
+    "abad_grito": (3, 4), "abad_baculazo": (3, 1), "abad_barrido": (3, 1), "abad_pisoton": (4, 3), "abad_aliento": (4, 1),
+    "abad_invocar": (1, 3), "abad_carambano": (3, 1, 4), "abad_ventisca": (2, 4), "abad_dolor": (2, 4, 1),
+    "abad_muerte": (2, 3), "abad_rezo": (4, 3),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -546,6 +563,26 @@ def voz_barquero(src, dst):
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA + 0.1
+
+
+def voz_abad(src, dst):
+    """
+    Hrodric, el Abad de la Cumbre: un viejo gigante helado que habla desde lo alto del calvario. Algo mas grave, una segunda
+    voz una octava por debajo muy baja (el pecho del gigante), un poco de brillo frio arriba y el eco largo de la cumbre
+    entre las rocas del circo (como en la nave de una iglesia, pero al raso: largo, abierto y sin retumbar).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=2[v1][v2];"
+        "[v1]asetrate=44100*0.92,aresample=44100,atempo=1.0870[baja];"
+        "[v2]asetrate=44100*0.5,aresample=44100,atempo=2.0,lowpass=f=650,volume=0.28[honda];"
+        "[baja][honda]amix=inputs=2:weights=1 0.4:normalize=0,"
+        "asoftclip=type=atan:threshold=0.85,equalizer=f=150:t=q:w=1.0:g=2,highshelf=f=5000:g=1.5,"
+        "aecho=0.8:0.4:110|250|430|680:0.22|0.15|0.10|0.06,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.15
 
 
 def sonoridad(f):
@@ -789,6 +826,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO barquero {n}: {e}")
+    # Hrodric, el Abad de la Cumbre (parte 7l)
+    aba = os.path.join(ASSETS, "sounds", "abad")
+    os.makedirs(aba, exist_ok=True)
+    dur_a, hab_a = {}, {}
+    for n, toma in sorted(TOMAS_ABAD.items()):
+        src = os.path.join(MASTER, "abad", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(aba, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_abad(src, dst)
+            dur_a[n] = round(duracion(dst), 2)
+            hab_a[n] = round(min(h, dur_a[n]), 2)
+            print(f"abad {n:2d}: {dur_a[n]} s (habla hasta {hab_a[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO abad {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -819,7 +875,8 @@ def main():
     with open(os.path.join(ASSETS, "rey_voces.json"), "w") as fh:
         json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g, "capitan": dur_c, "habla_capitan": hab_c,
                    "sombra": dur_s, "habla_sombra": hab_s, "molinera": dur_m, "habla_molinera": hab_m,
-                   "verdugo": dur_v, "habla_verdugo": hab_v, "barquero": dur_b, "habla_barquero": hab_b}, fh)
+                   "verdugo": dur_v, "habla_verdugo": hab_v, "barquero": dur_b, "habla_barquero": hab_b,
+                   "abad": dur_a, "habla_abad": hab_a}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

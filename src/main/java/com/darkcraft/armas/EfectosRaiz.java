@@ -67,7 +67,39 @@ public final class EfectosRaiz {
         PASOS.add(new Paso(d, tick + 7 + dura, m2, 0, true));
     }
 
+    /**
+     * Un carambano enorme que cae del cielo en (x, y, z) (parte 7l, los del Abad de la Cumbre): aparece {@value #CARAMBANO_ALTO}
+     * bloques encima (crece en un instante), cuelga hasta {@code espera} ticks, cae en {@code cae} ticks hasta clavarse en el
+     * suelo y se rompe (se encoge y se quita).
+     */
+    public static void carambano(ServerLevel sl, double x, double y, double z, float grueso, float largo, int espera, int cae) {
+        BlockState st = (sl.random.nextBoolean() ? Blocks.PACKED_ICE : Blocks.BLUE_ICE).defaultBlockState();
+        float giro = sl.random.nextFloat() * Mth.TWO_PI;
+        Matrix4f chico = forma(CARAMBANO_ALTO, giro, grueso * 0.2f, largo * 0.1f);
+        Matrix4f arriba = forma(CARAMBANO_ALTO, giro, grueso, largo);
+        Matrix4f abajo = forma(-0.35f, giro, grueso, largo);
+        Matrix4f roto = forma(-0.35f, giro, grueso * 1.6f, 0.05f);
+        Display.BlockDisplay d = display(sl, st, x, y, z, chico, 3f, CARAMBANO_ALTO + largo + 2f);
+        if (d == null) return;
+        PASOS.add(new Paso(d, tick + 1, arriba, 4, false));
+        PASOS.add(new Paso(d, tick + 1 + espera, abajo, cae, false));
+        PASOS.add(new Paso(d, tick + 1 + espera + cae, roto, 3, false));
+        PASOS.add(new Paso(d, tick + 5 + espera + cae, roto, 0, true));
+    }
+
+    /** Lo alto (bloques) desde donde caen los carambanos. */
+    public static final float CARAMBANO_ALTO = 13f;
+
+    private static Matrix4f forma(float alto, float giro, float grueso, float largo) {
+        return new Matrix4f().translate(0f, alto, 0f).rotateY(giro).scale(grueso, largo, grueso).translate(-0.5f, 0f, -0.5f);
+    }
+
     private static Display.BlockDisplay display(ServerLevel sl, BlockState st, double x, double y, double z, Matrix4f m) {
+        return display(sl, st, x, y, z, m, 0f, 0f);
+    }
+
+    /** {@code ancho} y {@code alto}: la caja para no dejar de dibujarla al no ver su pie (0: la del juego). */
+    private static Display.BlockDisplay display(ServerLevel sl, BlockState st, double x, double y, double z, Matrix4f m, float ancho, float alto) {
         Display.BlockDisplay d = EntityType.BLOCK_DISPLAY.create(sl);
         if (d == null) return null;
         CompoundTag tag = new CompoundTag();
@@ -79,6 +111,10 @@ public final class EfectosRaiz {
         luz.putInt("block", 11);
         tag.put("brightness", luz);
         tag.putFloat("view_range", 1.0f);
+        if (ancho > 0) {
+            tag.putFloat("width", ancho);
+            tag.putFloat("height", alto);
+        }
         d.load(tag);
         d.moveTo(x, y, z, 0f, 0f);
         d.addTag(TAG);

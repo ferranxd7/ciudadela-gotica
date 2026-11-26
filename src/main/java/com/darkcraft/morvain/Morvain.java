@@ -293,7 +293,10 @@ public final class Morvain {
         // la laguna negra (parte 7j): con el Barquero vencido, sus faroles de almas se vuelven faroles de verdad
         if (m != null && srv.getTickCount() % 100 == 61) LagunaNegra.paz(m);
         // el monasterio de la Helada (parte 7k): de vez en cuando su campana rota tañe sola
-        if (m != null && srv.getTickCount() % 100 == 83) Monasterio.campana(m);
+        // (hasta que cae el Abad de la Cumbre, parte 7l: entonces da su ultimo toque y calla)
+        if (m != null && srv.getTickCount() % 100 == 83 && !Ermita.enPaz(srv)) Monasterio.campana(m);
+        // la ermita (parte 7l): con el Abad caido, los hermanos de la iglesia que quedaban de rodillas descansan
+        if (m != null && srv.getTickCount() % 100 == 91) Ermita.paz(m);
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
             if (Llegada.cerca(p.getX(), p.getZ(), 160)) {
@@ -376,6 +379,10 @@ public final class Morvain {
         if (LagunaNegra.dentro(p.getX(), p.getZ()) && p.getY() < 120) return "darkcraft.morvain.lugar.laguna";
         // el Monasterio de la Helada (parte 7k)
         if (Monasterio.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Monasterio.PISO) < 30) return "darkcraft.morvain.lugar.monasterio";
+        // la escalera de los penitentes y el calvario de la ermita, en la cumbre (parte 7l)
+        if (Ermita.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Ermita.PISO) < 30) return "darkcraft.morvain.lugar.ermita";
+        if (Ermita.enEscalera(p.getX(), p.getZ()) && p.getY() > Monasterio.PISO - 10 && p.getY() < Ermita.PISO + 20)
+            return "darkcraft.morvain.lugar.escalera_penitentes";
         return "darkcraft.zona.morvain." + Terreno.region(p.getX(), p.getZ()).id;
     }
 

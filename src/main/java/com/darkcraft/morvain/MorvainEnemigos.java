@@ -44,9 +44,9 @@ public final class MorvainEnemigos {
     private MorvainEnemigos() {}
 
     public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo",
-            PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio";
+            PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
-            BARQUERO = "barquero", HELADO = "helado";
+            BARQUERO = "barquero", HELADO = "helado", ABAD = "abad";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
@@ -54,7 +54,7 @@ public final class MorvainEnemigos {
 
     private static final List<Puesto> VELMOR_P = new ArrayList<>(), LLANURAS_P = new ArrayList<>(), MOLINO_P = new ArrayList<>(),
             ARBOLEDA_P = new ArrayList<>(), PATIBULO_P = new ArrayList<>(), PILOTES_P = new ArrayList<>(), LAGUNA_P = new ArrayList<>(),
-            BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>();
+            BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>(), ERMITA_P = new ArrayList<>(), CUMBRE_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -146,6 +146,13 @@ public final class MorvainEnemigos {
         // ---- el Monasterio de la Helada (parte 7k): los helados que apunta el plano
         for (Monasterio.Espera e : Monasterio.get().esperas())
             MONASTERIO_P.add(new Puesto(HELADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
+        // ---- la escalera de los penitentes y el calvario (parte 7l): los helados de rodillas en los rellanos y los enterrados
+        Ermita er = Ermita.get();
+        for (Ermita.Espera e : er.esperas())
+            ERMITA_P.add(new Puesto(HELADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
+        // ---- la cumbre (parte 7l): el Abad, de rodillas en la rosa de hielo del calvario, rezando de cara a la ermita
+        int[] ab = er.sitio("abad");
+        CUMBRE_P.add(new Puesto(ABAD, 0, ab[0], ab[1], ab[2], NORTE, REZA, 0, Puestos.JEFE));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -163,6 +170,11 @@ public final class MorvainEnemigos {
         return 0;
     }
 
+    /** El numero del puesto del Abad en el sitio de la cumbre. */
+    public static int abad() {
+        return 0;
+    }
+
     /** Lo apunta el mod al arrancar. */
     public static void registrar() {
         Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
@@ -172,6 +184,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(PODRIDO, DarkCraftMod.PODRIDO);
         Puestos.tipo(BARQUERO, DarkCraftMod.BARQUERO);
         Puestos.tipo(HELADO, DarkCraftMod.HELADO);
+        Puestos.tipo(ABAD, DarkCraftMod.ABAD);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -183,7 +196,10 @@ public final class MorvainEnemigos {
         // los pasajeros del Barquero solo mientras vive el (vencido, la laguna queda en paz: ya no vuelven)
         Puestos.registrar(LAGUNA, LAGUNA_P, Morvain::es, (l, p) -> !"pasajeros".equals(p.grupo()) || !LagunaNegra.enPaz(l.getServer()));
         Puestos.registrar(BARCA, BARCA_P, Morvain::es);
-        Puestos.registrar(MONASTERIO, MONASTERIO_P, Morvain::es);
+        // los hermanos de rodillas en la iglesia solo mientras vive el Abad (vencido, descansan: ya no vuelven)
+        Puestos.registrar(MONASTERIO, MONASTERIO_P, Morvain::es, (l, p) -> !"iglesia".equals(p.grupo()) || !Ermita.enPaz(l.getServer()));
+        Puestos.registrar(ERMITA, ERMITA_P, Morvain::es);
+        Puestos.registrar(CUMBRE, CUMBRE_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -194,6 +210,9 @@ public final class MorvainEnemigos {
             // y al caer el Barquero, la laguna queda en paz
             if (e instanceof com.darkcraft.enemigos.Barquero && BARCA.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
                 LagunaNegra.liberar(sl);
+            // y al caer el Abad, los hermanos de la iglesia del monasterio descansan
+            if (e instanceof com.darkcraft.enemigos.Abad && CUMBRE.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
+                Ermita.liberar(sl);
         });
     }
 
@@ -230,6 +249,16 @@ public final class MorvainEnemigos {
     public static List<Puesto> monasterio() {
         preparar();
         return List.copyOf(MONASTERIO_P);
+    }
+
+    public static List<Puesto> ermita() {
+        preparar();
+        return List.copyOf(ERMITA_P);
+    }
+
+    public static List<Puesto> cumbre() {
+        preparar();
+        return List.copyOf(CUMBRE_P);
     }
 
     public static List<Puesto> velmor() {
@@ -629,6 +658,98 @@ public final class MorvainEnemigos {
         return s;
     }
 
+    /** {@code /darkcraft ermita [ir <sitio> | enemigos [volver | fuera | sacar]]} (parte 7l): la escalera de los penitentes y la ermita. */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoErmita() {
+        return net.minecraft.commands.Commands.literal("ermita")
+                .executes(c -> decir(c, estadoErmita(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irErmita(c.getSource(), "entrada"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Ermita.get().sitios().keySet(), b))
+                                .executes(c -> irErmita(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoErmita(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), ERMITA, false);
+                            return decir(c, "vuelven todos los helados de la escalera");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), ERMITA, true);
+                            return decir(c, "fuera todos los helados de la escalera");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            net.minecraft.server.level.ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, ERMITA).size();
+                            return decir(c, "fuera " + n);
+                        })));
+    }
+
+    private static int irErmita(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Ermita.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Ermita.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // en la escalera, mirando cuesta arriba (al norte); en el calvario, al centro (y desde el centro, a la ermita)
+        float giro = 180f;
+        if (!Ermita.enEscalera(s[0] + 0.5, s[2] + 0.5) && Math.hypot(s[0] - Ermita.CX, s[2] - Ermita.CZ) > 3)
+            giro = (float) (Math.toDegrees(Math.atan2(Ermita.CZ - s[2], Ermita.CX - s[0])) - 90.0);
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
+        return 1;
+    }
+
+    /** Cuantos helados de la escalera quedan y cuantos andan fuera (y como esta la ermita, si esta cargada). */
+    public static String estadoErmita(net.minecraft.server.MinecraftServer srv) {
+        String s = "escalera de la ermita: quedan " + Puestos.quedan(srv, ERMITA) + " de " + ERMITA_P.size() + " (fuera " + Puestos.fuera(ERMITA) + ")";
+        var m = Morvain.nivel(srv);
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(Ermita.CX, Ermita.PISO, Ermita.CZ))) s += "; " + Ermita.resumen(m);
+        return s;
+    }
+
+    /** {@code /darkcraft abad [ir | vencer | volver]} (parte 7l): como esta el Abad, llevar ante el, vencerle o que vuelva. */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoAbad() {
+        return net.minecraft.commands.Commands.literal("abad")
+                .executes(c -> decir(c, estadoAbad(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> {
+                    var sp = c.getSource().getPlayerOrException();
+                    var m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    // a la entrada del calvario, mirando al abad (al norte)
+                    int[] e = Ermita.get().sitio("entrada");
+                    sp.teleportTo(m, e[0] + 0.5, e[1] + 0.05, e[2] + 0.5, 180f, 5f);
+                    return decir(c, estadoAbad(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(CUMBRE, abad());
+                    if (e != null) e.kill();
+                    else {
+                        Puestos.marcar(srv, CUMBRE, abad(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "abad");
+                        var m = Morvain.nivel(srv);
+                        if (m != null) Ermita.liberar(m);
+                    }
+                    return decir(c, estadoAbad(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, CUMBRE, abad(), false);
+                    // los hermanos de la iglesia vuelven a rezar en cuanto salgan
+                    Puestos.todos(srv, MONASTERIO, false);
+                    return decir(c, estadoAbad(srv));
+                }));
+    }
+
+    /** Como esta el Abad (para el comando y las pruebas). */
+    public static String estadoAbad(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(CUMBRE, abad());
+        String s = "el Abad: " + (Ermita.enPaz(srv) ? "caido (la cumbre esta en paz)" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Abad a) s += ", " + a.estado();
+        return s;
+    }
+
     private static int decir(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, String s) {
         c.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal(s), false);
         return 1;
@@ -659,6 +780,8 @@ public final class MorvainEnemigos {
         todos.addAll(LAGUNA_P);
         todos.addAll(BARCA_P);
         todos.addAll(MONASTERIO_P);
+        todos.addAll(ERMITA_P);
+        todos.addAll(CUMBRE_P);
         for (Puesto p : todos) {
             if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
             for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
@@ -670,6 +793,7 @@ public final class MorvainEnemigos {
         return VELMOR_P.size() + " en Velmor (" + camp + " campaneros), " + LLANURAS_P.size() + " por las llanuras, " + MOLINO_P.size()
                 + " en el molino, " + ARBOLEDA_P.size() + " en la arboleda (" + colg + " colgados) y " + PATIBULO_P.size()
                 + " en el patibulo, " + PILOTES_P.size() + " en la aldea de los pilotes, " + LAGUNA_P.size() + " en la laguna negra y "
-                + BARCA_P.size() + " en la barca, " + MONASTERIO_P.size() + " en el monasterio; cerca del arco o de un santuario " + cerca;
+                + BARCA_P.size() + " en la barca, " + MONASTERIO_P.size() + " en el monasterio, " + ERMITA_P.size() + " en la escalera de la ermita y "
+                + CUMBRE_P.size() + " en la cumbre; cerca del arco o de un santuario " + cerca;
     }
 }
