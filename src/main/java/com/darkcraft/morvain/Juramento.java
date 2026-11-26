@@ -925,6 +925,9 @@ public final class Juramento {
                 if (m.getBlockState(p).isAir()) m.setBlock(p, Blocks.IRON_BARS.defaultBlockState(), 3);
             }
         }
+        // y los dos barrotes doblados del suelo (uno en la fila del rastrillo y el caido en el paso), como los pone la capital
+        for (BlockPos p : new BlockPos[]{new BlockPos(Capital.CX - 3, PISO, Capital.CZ + 2), new BlockPos(Capital.CX - 2, PISO, Capital.CZ - 1)})
+            if (m.getBlockState(p).isAir()) m.setBlock(p, Blocks.IRON_BARS.defaultBlockState(), 3);
         for (int v = -3; v <= 3; v++)
             for (int y = PISO; y <= PISO + 6; y++) {
                 BlockPos p = new BlockPos(Capital.CX - 3, y, Capital.CZ + v);
