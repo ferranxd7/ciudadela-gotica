@@ -1417,7 +1417,7 @@ doble salto, se ataca montado, si lo hieren mucho se deshace un rato"). Publicad
 
 ### Plan grande, parte 7c: los santuarios de Morvain y el viaje entre ellos
 
-Respuesta 92 del plan ("santuarios con teletransporte").
+Respuesta 92 del plan ("santuarios con teletransporte"). Publicada con la build de prueba 132 bien.
 - **Diecinueve santuarios** mas el del Arco del Umbral (`morvain/SantuariosMorvain`: `SITIOS`, `UMBRAL`, `todos()`), dos o
   tres por region y uno junto al crater: sitios elegidos sin abrir el juego (con `Terreno`: lo mas llano y seco cerca de
   donde se queria, en su region; en el pantano, un islote). Cada uno es una tarima redonda (radio 4, fundida con el
