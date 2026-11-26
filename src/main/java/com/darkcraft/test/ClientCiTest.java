@@ -6434,7 +6434,7 @@ public final class ClientCiTest {
                 if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
                 sp.setGameMode(GameType.CREATIVE);
                 comando(sp, "darkcraft molinera volver");
-                irMirando(sp, 1072.5, 86, 4057.5, com.darkcraft.morvain.Molino.MX, Y + 16, EZ, true);
+                irMirando(sp, 1093.5, 84, 4079.5, com.darkcraft.morvain.Molino.MX, Y + 15, EZ, true);
             });
         });
         t += 260;
@@ -6443,7 +6443,7 @@ public final class ClientCiTest {
             server(m, sp -> log("  molino: " + com.darkcraft.morvain.MorvainEnemigos.estadoMolinera(sp.server)));
         });
         t += 10;
-        atTicks(t, "El molino: la era y la Molinera de rodillas", m -> server(m, sp -> irMirando(sp, EX - 13.5, Y + 4, EZ - 6.5, EX + 1, Y + 2, EZ, true)));
+        atTicks(t, "El molino: la era y la Molinera de rodillas", m -> server(m, sp -> irMirando(sp, EX - 8.5, Y + 3, EZ - 4.5, EX + 2, Y + 1.5, EZ, true)));
         t += 90;
         atTicks(t, "captura", m -> {
             shot(m, "cliente_mv60_molinera_rodillas");
