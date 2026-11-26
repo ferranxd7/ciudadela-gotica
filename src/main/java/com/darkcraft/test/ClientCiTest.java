@@ -1,6 +1,7 @@
 package com.darkcraft.test;
 
 import com.darkcraft.DarkCraftMod;
+import com.darkcraft.client.Lejania;
 import com.darkcraft.cine.Cinematics;
 import com.darkcraft.cine.Timeline;
 import com.darkcraft.client.ClientCine;
@@ -43,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 38 * 60 * 20;
+    private static final int LIMIT = 46 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -59,7 +60,7 @@ public final class ClientCiTest {
     private static void log(String s) {
         try {
             if (log == null) {
-                File d = new File("ci-cliente");
+                File d = new File(net.minecraftforge.fml.loading.FMLPaths.GAMEDIR.get().toFile(), "ci-cliente");
                 d.mkdirs();
                 log = new PrintWriter(new FileWriter(new File(d, "informe_cliente.txt")), true);
             }
@@ -97,18 +98,8 @@ public final class ClientCiTest {
                 if (!loading && (mc.screen instanceof TitleScreen || mc.screen instanceof com.darkcraft.client.ui.TituloScreen) && ticks > 40) {
                     loading = true;
                     log("Pantalla de titulo: abriendo el mundo 'darkcraft'");
-                    Object flows = Minecraft.class.getMethod("createWorldOpenFlows").invoke(mc);
-                    Method load = null;
-                    for (Method m : flows.getClass().getMethods())
-                        if (m.getName().equals("loadLevel") && m.getParameterCount() == 2) load = m;
-                    if (load == null) {
-                        StringBuilder sb = new StringBuilder();
-                        for (Method m : flows.getClass().getMethods()) sb.append(m).append('\n');
-                        log("No encuentro loadLevel. Metodos:\n" + sb);
-                        finish(mc);
-                        return;
-                    }
-                    load.invoke(flows, mc.screen, "darkcraft");
+                    lejaniaAlEmpezar();
+                    mc.createWorldOpenFlows().loadLevel(mc.screen, "darkcraft");
                 } else if (ticks % 200 == 0) {
                     log("esperando... pantalla=" + (mc.screen == null ? "ninguna" : mc.screen.getClass().getName()));
                 }
@@ -161,16 +152,9 @@ public final class ClientCiTest {
 
     private static void shot(Minecraft mc, String name) {
         try {
-            Method grab = null;
-            for (Method m : net.minecraft.client.Screenshot.class.getMethods())
-                if (m.getName().equals("grab") && m.getParameterCount() == 4) grab = m;
-            if (grab == null) {
-                log("no encuentro Screenshot.grab");
-                return;
-            }
             Consumer<net.minecraft.network.chat.Component> msg = c -> {};
-            grab.invoke(null, mc.gameDirectory, name + ".png", mc.getMainRenderTarget(), msg);
-            log("captura " + name);
+            net.minecraft.client.Screenshot.grab(mc.gameDirectory, name + ".png", mc.getMainRenderTarget(), msg);
+            log("captura " + name + (Lejania.shadersEnUso() ? " (con shaders, " + fps + " fps)" : ""));
         } catch (Throwable ex) {
             log("captura " + name + " fallida: " + ex);
         }
@@ -513,10 +497,22 @@ public final class ClientCiTest {
         return b.toString();
     }
 
-    /** El titulo o subtitulo que se ve ahora en pantalla (campos protegidos de Gui; nombres de desarrollo). */
+    /**
+     * El titulo o subtitulo que se ve ahora en pantalla (campos protegidos de Gui). En desarrollo por su nombre; en el juego
+     * de verdad los nombres son otros: por su orden entre los campos de tipo Component (overlay, title, subtitle).
+     */
     private static String campoGui(Minecraft m, String campo) {
         try {
-            var f = net.minecraft.client.gui.Gui.class.getDeclaredField(campo);
+            java.lang.reflect.Field f = null;
+            try {
+                f = net.minecraft.client.gui.Gui.class.getDeclaredField(campo);
+            } catch (NoSuchFieldException ex) {
+                int quiero = campo.equals("title") ? 1 : campo.equals("subtitle") ? 2 : -1, i = 0;
+                for (java.lang.reflect.Field g : net.minecraft.client.gui.Gui.class.getDeclaredFields())
+                    if (!java.lang.reflect.Modifier.isStatic(g.getModifiers()) && g.getType() == net.minecraft.network.chat.Component.class)
+                        if (i++ == quiero) f = g;
+            }
+            if (f == null) return "?";
             f.setAccessible(true);
             Object v = f.get(m.gui);
             return v instanceof net.minecraft.network.chat.Component c ? c.getString() : "-";
@@ -5777,8 +5773,135 @@ public final class ClientCiTest {
         });
         atTicks(S + 130 + 166, "captura de los logros", m -> shot(m, "cliente_99_logros"));
         atTicks(S + 130 + 170, "cerrar", m -> m.setScreen(null));
-        int finT = titulo(S + 130 + 175);
+        int finT = titulo(lejania(S + 130 + 175));
         atTicks(finT, "Fin de la prueba", ClientCiTest::finish);
+    }
+
+    // ------------------------------------------------------------------ parte 6: la lejania y los shaders
+
+    /** Lo que diga el fichero de configuracion para esas claves (con el apartado [..] en que estan). */
+    private static String claves(String fichero, String... claves) {
+        try {
+            java.nio.file.Path f = net.minecraftforge.fml.loading.FMLPaths.GAMEDIR.get().resolve(fichero);
+            if (!java.nio.file.Files.exists(f)) return fichero + ": no esta";
+            StringBuilder b = new StringBuilder(fichero + ":");
+            String apartado = "";
+            for (String l : java.nio.file.Files.readAllLines(f, java.nio.charset.StandardCharsets.UTF_8)) {
+                String t = l.trim();
+                if (t.startsWith("[")) apartado = t;
+                for (String c : claves)
+                    if (t.startsWith(c + " ") || t.startsWith(c + "=")) b.append(' ').append(apartado).append(' ').append(t).append(';');
+            }
+            return b.toString();
+        } catch (Exception e) {
+            return fichero + ": " + e;
+        }
+    }
+
+    /**
+     * Antes de abrir el mundo: los mods que van dentro de Dark Craft y lo que dejo puesto su arranque la primera vez (la
+     * lejania a 256 y Complementary encendido). Para el resto de la prueba se apagan (con el dibujo por software irian
+     * lentisimos): el tramo {@link #lejania} los enciende al final.
+     */
+    private static void lejaniaAlEmpezar() {
+        log("Mods dentro de Dark Craft: distanthorizons " + Lejania.version("distanthorizons") + ", oculus " + Lejania.version("oculus")
+                + ", embeddium " + Lejania.version("embeddium"));
+        log("  al arrancar: " + Lejania.resumenDH());
+        log("  al arrancar: " + Lejania.resumenOculus());
+        log("  " + claves("config/darkcraft-arranque.properties", "lejania", "shaders"));
+        log("  " + claves("config/DistantHorizons.toml", "lodChunkRenderDistanceRadius", "enableAutoUpdater", "enableDistantGeneration"));
+        log("  " + claves("config/oculus.properties", "shaderPack", "enableShaders"));
+        if (Lejania.hayOculus()) log("  para la prueba: " + Lejania.shaders(false));
+        if (Lejania.hayDH()) log("  para la prueba: " + Lejania.dhPoner(false, "graphics", "renderingEnabled") + ", "
+                + Lejania.dhPoner(false, "worldGenerator", "enableDistantGeneration") + " -> " + Lejania.resumenDH());
+    }
+
+    /** Teletransporta y mira; en creativo y volando, sin la interfaz. */
+    private static void vista(Minecraft m, double x, double y, double z, double tx, double ty, double tz, long hora) {
+        m.setScreen(null);
+        enPrimeraPersona(m);
+        m.options.hideGui = true;
+        server(m, sp -> {
+            if (sp.getVehicle() != null) sp.stopRiding();
+            sp.setGameMode(GameType.CREATIVE);
+            sp.serverLevel().setDayTime(hora);
+            sp.serverLevel().setWeatherParameters(6000, 0, false, false);
+            irMirando(sp, x, y, z, tx, ty, tz, true);
+        });
+    }
+
+    /**
+     * Parte 6: Distant Horizons (la lejania, 256 chunks como la deja el arranque) y los shaders (Oculus con Complementary
+     * Unbound), que van dentro de Dark Craft. Tres vistas con la lejania (Valdrenn desde Brumavela de dia, la fortaleza desde
+     * el camino de nubes, Valdrenn de noche desde arriba) y las mismas con shaders, mas el portal y el jardin de la cupula.
+     */
+    private static int lejania(int L) {
+        final double[][] v = new double[5][];
+        atTicks(L, "Lejania: Distant Horizons como lo tiene el jugador (sin lo de la prueba)", m -> {
+            log("  " + Lejania.dhQuitar("graphics", "renderingEnabled") + ", " + Lejania.dhQuitar("worldGenerator", "enableDistantGeneration"));
+            log("  lejania: " + Lejania.resumenDH() + " | " + Lejania.resumenOculus());
+            BlockPos b = com.darkcraft.world.MundoNubes.aparicion();
+            double vx = castle != null ? castle[0] : 1200, vz = castle != null ? castle[1] : 0;
+            v[0] = new double[]{b.getX(), 330, b.getZ(), vx, 380, vz, 6000};
+            if (fplan != null) {
+                double dx = vx - fplan.cx, dz = vz - fplan.cz, d = Math.max(1, Math.hypot(dx, dz));
+                v[1] = new double[]{fplan.cx + dx / d * 230, fplan.Y + 95, fplan.cz + dz / d * 230, fplan.cx, fplan.Y + 40, fplan.cz, 6000};
+                int[] al = fplan.f.altar();
+                v[3] = new double[]{al[0] + 3.5, al[1], al[2] + 3.5, fplan.cx + 0.5, al[1] + 6, fplan.f.portal()[2] + 0.5, 18000};
+                v[4] = new double[]{fplan.cx + 21.5, fplan.Y + 3, fplan.cz + 21.5, fplan.cx, fplan.Y + 28, fplan.cz, 6000};
+            }
+            double dx = b.getX() - vx, dz = b.getZ() - vz, d = Math.max(1, Math.hypot(dx, dz));
+            v[2] = new double[]{vx + dx / d * 170, 470, vz + dz / d * 170, vx, 400, vz, 18000};
+            double[] q = v[0];
+            vista(m, q[0], q[1], q[2], q[3], q[4], q[5], (long) q[6]);
+        });
+        String[] nombres = {"brumavela", "fortaleza", "valdrenn"};
+        int[] espera = {1200, 600, 600};
+        int t = L;
+        for (int i = 0; i < 3; i++) {
+            final int k = i;
+            if (i > 0) atTicks(t, "Lejania: " + nombres[k], m -> {
+                double[] q = v[k];
+                if (q == null) return;
+                vista(m, q[0], q[1], q[2], q[3], q[4], q[5], (long) q[6]);
+            });
+            t += espera[i];
+            atTicks(t, "captura", m -> {
+                if (v[k] == null) return;
+                shot(m, "cliente_l0" + (k + 1) + "_lejania_" + nombres[k]);
+                log("  " + Lejania.resumenDH() + "; fps " + fps);
+            });
+            t += 10;
+        }
+        atTicks(t, "Shaders: encendidos (Complementary)", m -> {
+            log("  " + Lejania.shaders(true) + " -> " + Lejania.resumenOculus());
+            double[] q = v[0];
+            vista(m, q[0], q[1], q[2], q[3], q[4], q[5], (long) q[6]);
+        });
+        t += 600;
+        String[] conShaders = {"brumavela", "fortaleza", "valdrenn", "portal", "jardin"};
+        for (int i = 0; i < 5; i++) {
+            final int k = i;
+            if (i > 0) atTicks(t, "Shaders: " + conShaders[k], m -> {
+                double[] q = v[k];
+                if (q == null) return;
+                vista(m, q[0], q[1], q[2], q[3], q[4], q[5], (long) q[6]);
+                if (k == 3) server(m, sp -> log("  el cielo rojo: " + com.darkcraft.fortaleza.CieloRojo.resumen(sp.server)));
+            });
+            t += i == 0 ? 0 : 200;
+            atTicks(t, "captura", m -> {
+                if (v[k] == null) return;
+                shot(m, "cliente_l" + (k + 4 < 10 ? "0" : "") + (k + 4) + "_shaders_" + conShaders[k]);
+                log("  " + Lejania.resumenOculus() + "; fps " + fps);
+            });
+            t += 10;
+        }
+        atTicks(t, "Shaders: apagados para lo que queda", m -> {
+            log("  " + Lejania.shaders(false));
+            m.options.hideGui = false;
+            enPrimeraPersona(m);
+        });
+        return t + 20;
     }
 
     // ------------------------------------------------------------------ Ser Gavran (parte B1)

@@ -128,7 +128,9 @@ public class OpcionesScreen extends Screen {
         secciones.clear();
         secciones.add(new Seccion("general", this::general, null));
         secciones.add(new Seccion("sonido", this::sonido, null));
-        secciones.add(new Seccion("graficos", null, () -> new VideoSettingsScreen(this, o)));
+        // (con Embeddium, que va dentro de Dark Craft, la suya: la de Minecraft no trae sus opciones)
+        Supplier<Screen> embeddium = deMod("embeddium");
+        secciones.add(new Seccion("graficos", null, embeddium != null ? embeddium : () -> new VideoSettingsScreen(this, o)));
         secciones.add(new Seccion("controles", this::controles, null));
         secciones.add(new Seccion("chat", this::chat, null));
         secciones.add(new Seccion("accesibilidad", this::accesibilidad, null));

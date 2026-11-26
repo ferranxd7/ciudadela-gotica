@@ -1,0 +1,47 @@
+{
+  "_": "Lo que va dentro del jar de Dark Craft (parte 6) y el shader que baja el instalador. Version fijada: si no esta en Modrinth se usa la mas nueva con el mismo principio (y se avisa).",
+  "mods": [
+    {
+      "proyecto": "distanthorizons",
+      "version": "3.3.2-1.20.1",
+      "prefijo": "3.",
+      "modid": "distanthorizons",
+      "nombre": "Distant Horizons",
+      "autores": "James Seibel y el equipo de Distant Horizons",
+      "licencia": "LGPL-3.0-only",
+      "fuente": "https://gitlab.com/distant-horizons-team/distant-horizons",
+      "pagina": "https://modrinth.com/mod/distanthorizons"
+    },
+    {
+      "proyecto": "oculus",
+      "version": "1.20.1-1.8.0",
+      "prefijo": "1.20.1-1.",
+      "modid": "oculus",
+      "nombre": "Oculus",
+      "autores": "Asek3, dima_dencep y colaboradores (version para Forge de Iris, de coderbot, IMS212 y colaboradores)",
+      "licencia": "LGPL-3.0-only",
+      "fuente": "https://github.com/Asek3/Oculus (rama 1.20.1-new)",
+      "pagina": "https://modrinth.com/mod/oculus"
+    },
+    {
+      "proyecto": "embeddium",
+      "version": "0.3.31+mc1.20.1",
+      "prefijo": "0.3.",
+      "modid": "embeddium",
+      "nombre": "Embeddium",
+      "autores": "embeddedt (a partir de Rubidium y de Sodium, de CaffeineMC / JellySquid)",
+      "licencia": "LGPL-3.0-only",
+      "fuente": "https://github.com/embeddedt/embeddium (rama 20.1/forge)",
+      "pagina": "https://modrinth.com/mod/embeddium"
+    }
+  ],
+  "shader": {
+    "proyecto": "complementary-unbound",
+    "version": "r5.8.1",
+    "prefijo": "r5.",
+    "nombre": "Complementary Shaders - Unbound",
+    "autores": "EminGT (Complementary Development)",
+    "licencia": "Complementary License Agreement (no se puede subir dentro del jar: se baja de Modrinth)",
+    "pagina": "https://www.complementary.dev/"
+  }
+}

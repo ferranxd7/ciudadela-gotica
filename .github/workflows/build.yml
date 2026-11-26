@@ -19,7 +19,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 105
     steps:
       - uses: actions/checkout@v4
 
@@ -74,6 +74,12 @@ jobs:
           set -o pipefail
           gradle build --no-daemon --stacktrace 2>&1 | tee build.log
 
+      - name: Distant Horizons, Oculus y Embeddium dentro del jar (y el shader para el instalador)
+        run: |
+          set -o pipefail
+          mkdir -p out
+          python3 ci/dentro/meter.py build/libs/darkcraft-0.1.0.jar ci/dentro/mods.json out 2>&1 | tee out/mods_dentro.txt
+
       - name: Firmas de la API (para programar)
         if: always()
         run: bash ci/firmas.sh > out/firmas.txt 2>&1 || true
@@ -106,7 +112,8 @@ jobs:
           python3 ci/download_mods.py srv/mods $MODS || true
           cp out/../srv/mods_descargados.txt out/ 2>/dev/null || cp srv/mods_descargados.txt out/ || true
           cp build/libs/darkcraft-*.jar srv/mods/
-          python3 ci/make_mrpack.py srv/mrpack_files.json build/libs/darkcraft-0.1.0.jar out/DarkCraft-modpack.mrpack "${FORGE#1.20.1-}" 
+          python3 ci/make_mrpack.py srv/mrpack_files.json build/libs/darkcraft-0.1.0.jar out/DarkCraft-modpack.mrpack "${FORGE#1.20.1-}" out/shader.json
+          python3 ci/instalador.py srv/mrpack_files.json out/shader.json out/instalar_mods.bat || true
           echo "-Xmx6G -Ddarkcraft.ciTest=true" > srv/user_jvm_args.txt
           (cd srv && timeout 50m ./run.sh nogui 2>&1 | tee ../out/server_mods.log) || true
           mkdir -p out/mods && cp -r srv/ci-out/* out/mods/ 2>/dev/null || true
@@ -122,24 +129,23 @@ jobs:
           mkdir -p out/vanilla && cp -r srv2/ci-out/* out/vanilla/ 2>/dev/null || true
           grep -nE "Error construyendo|Exception" out/server_vanilla.log | head -100 > out/vanilla/errores.txt || true
 
+      - uses: actions/cache@v4
+        with:
+          path: ~/.pmc
+          key: pmc-${{ env.FORGE }}-v1
+
       - name: Prueba del cliente (capturas y sonido grabado)
-        timeout-minutes: 50
+        timeout-minutes: 75
         run: |
-          sudo apt-get install -y -qq xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils python3-numpy python3-pil > /dev/null 2>&1 || true
-          rm -rf run && mkdir -p run/saves run/config run/screenshots
-          if [ -d srv2/world ]; then cp -r srv2/world run/saves/darkcraft; else echo "sin mundo de la prueba del servidor"; fi
-          cp ci/cliente/options.txt run/options.txt
-          printf 'earlyWindowControl = false\n' > run/config/fml.toml
-          sed "s#@WAV@#$PWD/out/audio_cliente.wav#" ci/cliente/alsoft.conf > "$RUNNER_TEMP/alsoft.conf"
-          export ALSOFT_CONF="$RUNNER_TEMP/alsoft.conf" LIBGL_ALWAYS_SOFTWARE=1 DARKCRAFT_CLIENTE=1
-          xvfb-run -a -s "-screen 0 1280x720x24" glxinfo -B > out/cliente_gl.txt 2>&1 || true
-          timeout 50m xvfb-run -a -s "-screen 0 1280x720x24" gradle runClient --no-daemon > out/cliente.log 2>&1 || echo "cliente terminado con error $?" >> out/cliente.log
+          sudo apt-get install -y -qq xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils python3-numpy python3-pil python3-venv > /dev/null 2>&1 || true
+          # el juego de verdad con el jar de la release (DH, Oculus y Embeddium dentro); si no entra, en desarrollo
+          bash ci/cliente/lanzar.sh "$FORGE" build/libs/darkcraft-0.1.0.jar
           cp run/ci-cliente/* out/ 2>/dev/null || true
           python3 ci/cliente/hoja.py run/screenshots out || true
           for f in run/screenshots/cliente_*.png; do [ -f "$f" ] && cp "$f" out/; done
           python3 ci/cliente/audio.py out/audio_cliente.wav src/main/resources/assets/darkcraft/sounds out > out/audio_cliente.txt 2>&1 || true
           rm -f out/audio_cliente.wav
-          grep -nE "\[CI cliente\]|Exception|ERROR|OpenAL|Sound" out/cliente.log | head -200 > out/cliente_resumen.txt || true
+          grep -nE "\[CI cliente\]|Exception|ERROR|OpenAL|Sound" out/cliente_latest.log out/cliente.log 2>/dev/null | head -300 > out/cliente_resumen.txt || true
           tail -50 out/audio_cliente.txt || true
 
       - name: Publicar resultados
@@ -164,11 +170,12 @@ jobs:
           (cd out && pngs=(*.png) && [ ${#pngs[@]} -gt 0 ] && zip -q -0 capturas.zip "${pngs[@]}") || true
           (cd out && oggs=() && for f in *.ogg; do [ "$f" != "audio_cliente.ogg" ] && oggs+=("$f"); done && [ ${#oggs[@]} -gt 0 ] && zip -q -0 audios.zip "${oggs[@]}") || true
           files=()
-          for f in build/libs/*.jar out/*.jar build.log out/*.txt out/*.log out/capturas.zip out/audios.zip out/audio_cliente.ogg out/*.mrpack; do [ -s "$f" ] && files+=("$f"); done
+          for f in build/libs/*.jar out/*.jar build.log out/*.txt out/*.log out/capturas.zip out/audios.zip out/audio_cliente.ogg out/*.mrpack out/instalar_mods.bat; do [ -s "$f" ] && files+=("$f"); done
           # si es un reintento, la version que dejo el intento fallido anterior se sustituye
           gh release delete "build-${{ github.run_number }}" --yes >/dev/null 2>&1 || true
           if ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null && [ "$PUBLICAR" = "si" ]; then
-            gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Dark Craft - Build ${{ github.run_number }}" --notes "Version automatica ${{ github.run_number }}" --latest
+            { echo "Version automatica ${{ github.run_number }}. Se instala con instalar_mods.bat (en esta pagina)."; echo; echo '```'; cat out/creditos_mods.txt 2>/dev/null; echo '```'; } > out/notas.md
+            gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Dark Craft - Build ${{ github.run_number }}" --notes-file out/notas.md --latest
           elif ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null; then
             gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }} (en desarrollo)" --notes "Version de pruebas: no es la que se instala" --prerelease --latest=false
           else

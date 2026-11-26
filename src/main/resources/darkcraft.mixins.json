@@ -1,0 +1,13 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "com.darkcraft.arranque.mixin",
+  "plugin": "com.darkcraft.arranque.Arranque",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [],
+  "client": [],
+  "server": ["OculusEnServidor"],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}
