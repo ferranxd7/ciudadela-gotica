@@ -1129,13 +1129,49 @@ Respuestas 37, 44, 46 y 47 del plan.
   `f56_flechas`, `f57_jardin_enemigos`, `f58_vigia`, `f59_capitan_mirador`). En el resto del tramo de la fortaleza sus
   enemigos estan por caidos (las vistas de la 5a y la 5b van sin ellos).
 
+### Plan grande, parte 5d: las paradas del camino de nubes
+
+Respuesta 81 del plan ("largo, a pie, con paradas: islotes con ruinas, enemigos y algun cofre").
+- **Seis paradas por camino** (`camino/Paradas`: `de(seed, reinoX, reinoZ)`, `colocar` con un camino cualquiera): repartidas
+  por el camino de nubes del reino (`CaminoNubes.ruta`), sin ninguna en los primeros `DESDE` (220) ni en los ultimos `HASTA`
+  (260) bloques; con un camino mas corto, menos (`tipos`: siempre la capilla y el campamento). Cada una es un islote de roca
+  (`gen/Parada`, radio 14-19) centrado en el camino, con lo de arriba a la altura del camino (`Parada.Y` = 250, los pies en
+  251): el camino lo cruza enlosado (`alCamino` < 1,6; nada se pone a menos de 2,4 por debajo de Y + 4) y lo de cada
+  parada va a un lado (`lado`, alternando), en un marco girado a la direccion cardinal mas cercana (`Marco`: a a la
+  derecha, b hacia el camino; `cimiento` rellena hasta la roca). Encima se despeja la nube y alrededor se baja (un claro).
+  1. **Atalaya Rota**: torre redonda en ruinas con escalera de mano a la plataforma (el arquero) y el cofre dentro.
+  2. **Capilla del Peregrino**: la nave sin techo, el altar y los bancos rotos; delante, un **santuario** (sin enemigos).
+  3. **La Caravana Perdida**: un carro con toldo, otro volcado, la carga, los huesos del caballo y el cofre.
+  4. **Puerta de las Nubes**: un arco apuntado sobre el camino, dos estatuas y la muralla rota a los lados.
+  5. **Cementerio de las Nubes**: tumbas en filas, verja, un arbol seco y una cripta con escalones (el cofre abajo).
+  6. **Campamento de la Guardia**: tiendas, la hoguera, yunque y estandartes; al llegar, el ultimo **santuario**.
+- **No se generan con el mundo**: se levantan chunk a chunk (uno por tick, con descanso si tarda) la primera vez que alguien
+  pasa a menos de `CERCA` (170) de una (`onPlayerTick` cada 2 s → `encolar` → `construirUno`); SavedData `darkcraft_paradas`
+  (chunks hechos y completas). Los santuarios los pone `Santuarios.ponerEn` al hacerse su chunk, con su nombre
+  (`darkcraft.santuario.parada_capilla` / `_campamento`). Cofres con `chests/camino` (frutos, flechas, oro, piedras de
+  forja I y a veces II; raro, un hechizo, una ceniza o un talisman).
+- **Enemigos** (`Paradas.puestos`, sitio `camino@x,z` del reino, grupo `nombre:k`: salen cuando su parada esta en pie):
+  atalaya (el arquero arriba, una ballesta en la puerta y dos caballeros de ronda), caravana (tres perros y dos huecos),
+  arco (dos alabardas bajo el arco, un caballero y una ballesta), cementerio (una dama velando, un cortesano, dos perros y
+  un hueco tumbados), campamento (el capitan de elite, dos caballeros, una ballesta y un perro, a mas de 14 del santuario);
+  la capilla, nadie. Todos miran hacia donde se llega desde Valdrenn.
+- El Espejo: el nombre de cada parada (`Paradas.lugar`, antes que "Camino de nubes"; `darkcraft.mapa.lugar.parada_*`).
+- Comandos `/darkcraft camino` (las paradas del camino del reino de alrededor), `ir <0-5>`, `levantar <0-5>`,
+  `enemigos volver | fuera`.
+- Sin abrir el juego: `tools/vista3d/Volcado.java camino` (las seis en un camino de mentira de lana blanca;
+  `-Dparada=N` solo una): por cada una `Paradas.comprobar` (se cruza por el camino, se llega al cofre y al santuario, cada
+  puesto se pisa, ninguno a menos de 14 del santuario) y marcas de los puestos, cofres y santuarios.
+- Pruebas: servidor, `paradasDelCamino` (lineas `Camino de nubes, paradas: ...` y una por parada: las levanta en el mundo
+  de nubes de verdad y las comprueba); cliente, tramo `camino()` (capturas `cliente_cn01_atalaya` ... `cn06_campamento`,
+  lineas `en la parada N: lugar ...`).
+
 ### Lo siguiente: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5a, la torre bajo la cupula**: hecha (arriba).
 - **5b, la montana y el puente largo**: hecha (arriba). Los enemigos del sendero van con los de dentro (5c).
 - **5c, dentro de la fortaleza y en la montana**: hecha (arriba).
-- **5d, el camino de nubes** de Valdrenn a la torre (81): largo, a pie, con islotes de parada (ruinas, enemigos, cofres).
+- **5d, el camino de nubes**: hecha (arriba).
 - **5e, el portal** (48-68): marco nuevo (piedra de sombra con runas que laten, hueso, hierro negro y cadenas), remolino,
   estatuas gigantes y pilares, el pedestal del amuleto, la voz de la Sombra, la cinematica del rayo rojo y el cielo rojo.
 

@@ -6650,7 +6650,75 @@ public final class ClientCiTest {
                     + " (tenia que llegar a " + fin + "), en el suelo=" + sp.onGround());
         }));
         atTicks(V + 390, "captura", m -> shot(m, "cliente_f47_ascensor_llega"));
-        return secretos(V + 400);
+        return camino(secretos(V + 400));
+    }
+
+    /**
+     * Parte 5d: las seis paradas del camino de nubes del reino. Para cada una: se levanta, una vista desde lo alto (desde el
+     * lado de llegada, al otro lado del camino) y, de pie en el centro, el nombre del sitio y sus enemigos.
+     */
+    private static int camino(int C) {
+        final java.util.List<?>[] ps = new java.util.List<?>[1];
+        atTicks(C, "Camino de nubes: las paradas del camino del reino", m -> server(m, sp -> {
+            ps[0] = com.darkcraft.camino.Paradas.de(sp.serverLevel().getSeed(), castle[0], castle[1]);
+            com.darkcraft.camino.Paradas.apuntar(sp.serverLevel(), castle[0], castle[1]);
+            com.darkcraft.enemigos.Puestos.todos(sp.server, com.darkcraft.camino.Paradas.clave(castle[0], castle[1]), false);
+            log("  " + com.darkcraft.camino.Paradas.resumen(sp.serverLevel(), castle[0], castle[1]));
+        }));
+        for (int k = 0; k < 6; k++) {
+            final int kk = k;
+            int T = C + 10 + k * 120;
+            atTicks(T, "Camino de nubes: a la parada " + k, m -> {
+                enPrimeraPersona(m);
+                m.options.hideGui = true;
+                m.smartCull = false;
+                server(m, sp -> {
+                    if (ps[0] == null || kk >= ps[0].size()) return;
+                    var s = (com.darkcraft.camino.Paradas.Sitio) ps[0].get(kk);
+                    var p = s.plan();
+                    ServerLevel lvl = sp.serverLevel();
+                    sp.setGameMode(GameType.CREATIVE);
+                    sp.getAbilities().flying = true;
+                    sp.onUpdateAbilities();
+                    int[] o = p.en(-(p.r + 10), -(p.r + 4));
+                    // (el jugador, un poco por detras y por encima de la camara: si no, su modelo se ve desde dentro)
+                    double dx = p.cx - o[0], dz = p.cz - o[1], dl = Math.max(1, Math.hypot(dx, dz));
+                    sp.teleportTo(lvl, o[0] + 0.5 - dx / dl * 6, com.darkcraft.gen.Parada.Y + 19, o[1] + 0.5 - dz / dl * 6, 0f, 30f);
+                    for (long c : p.chunks()) lvl.getChunk((int) (c >> 32), (int) c);
+                    int n = com.darkcraft.camino.Paradas.construirYa(lvl, s);
+                    log("  parada " + kk + " (" + s.nombre() + ") en " + p.cx + "," + p.cz + ": " + n + " chunks levantados");
+                });
+            });
+            atTicks(T + 8, "vista de la parada", m -> {
+                if (ps[0] == null || kk >= ps[0].size()) return;
+                var p = ((com.darkcraft.camino.Paradas.Sitio) ps[0].get(kk)).plan();
+                int[] o = p.en(-(p.r + 10), -(p.r + 4));
+                verDesde(m, new Vec3(o[0] + 0.5, com.darkcraft.gen.Parada.Y + 16, o[1] + 0.5), new Vec3(p.cx + 0.5, com.darkcraft.gen.Parada.Y + 2, p.cz + 0.5));
+            });
+            atTicks(T + 70, "captura", m -> {
+                if (ps[0] == null || kk >= ps[0].size()) return;
+                var s = (com.darkcraft.camino.Paradas.Sitio) ps[0].get(kk);
+                shot(m, String.format(java.util.Locale.ROOT, "cliente_cn%02d_%s", kk + 1, s.nombre()));
+            });
+            atTicks(T + 76, "Camino de nubes: en la parada", m -> {
+                m.smartCull = true;
+                server(m, sp -> {
+                    if (ps[0] == null || kk >= ps[0].size()) return;
+                    var s = (com.darkcraft.camino.Paradas.Sitio) ps[0].get(kk);
+                    var p = s.plan();
+                    sp.teleportTo(sp.serverLevel(), p.cx + 0.5, com.darkcraft.gen.Parada.Y + 1, p.cz + 0.5, 0f, 0f);
+                    int[] sa = p.santuario();
+                    String k2 = com.darkcraft.camino.Paradas.clave(castle[0], castle[1]);
+                    log("  en la parada " + kk + ": lugar " + com.darkcraft.camino.Paradas.lugar(sp) + "; completa "
+                            + com.darkcraft.camino.Paradas.Datos.get(sp.server).completa(s.clave()) + "; enemigos a la vista " + com.darkcraft.enemigos.Puestos.fuera(k2)
+                            + (sa == null ? "" : "; santuario " + sp.serverLevel().getBlockState(new BlockPos(sa[0], sa[1], sa[2])).getBlock()));
+                });
+            });
+        }
+        int F = C + 10 + 6 * 120;
+        atTicks(F, "Camino de nubes: fin (sus enemigos, por caidos)", m -> server(m, sp ->
+                com.darkcraft.enemigos.Puestos.todos(sp.server, com.darkcraft.camino.Paradas.clave(castle[0], castle[1]), true)));
+        return F + 6;
     }
 
     /**

@@ -470,6 +470,9 @@ public final class Espejo {
         // en Brumavela, la isla del pueblo (parte 3b)
         String b = com.darkcraft.pueblo.Pueblo.lugar(p);
         if (b != null) return b;
+        // en una parada del camino de nubes (parte 5d)
+        String parada = com.darkcraft.camino.Paradas.lugar(p);
+        if (parada != null) return parada;
         // de pie en el camino de nubes (el mundo de nubes, parte 3a)
         if (p.onGround() && p.level().getBlockState(p.blockPosition().below()).is(com.darkcraft.DarkCraftMod.NUBE_FIRME.get()))
             return "darkcraft.mapa.lugar.camino_nubes";

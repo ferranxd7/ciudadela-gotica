@@ -296,6 +296,7 @@ public final class CiTest {
                     var fs = com.darkcraft.fortaleza.Fortalezas.delReino(seed, s[0], s[1]);
                     var fp = com.darkcraft.fortaleza.Fortalezas.plan(seed, fs);
                     montanaDeLaFortaleza(log, lvl, fp);
+                    paradasDelCamino(log, lvl, s);
                 }
                 int x = s[0] + 900, z = s[1] + 900;
                 lvl.getChunk(x >> 4, z >> 4);
@@ -606,6 +607,38 @@ public final class CiTest {
                     m.sendero().size(), m.recodos().size(), arriba, zona.celdas(), puestos.size(), isla));
         } catch (Throwable t) {
             log.println("Montana de la fortaleza: ERROR " + t);
+            t.printStackTrace();
+        }
+    }
+
+    /**
+     * Las paradas del camino de nubes (parte 5d) en el mundo de nubes de verdad: donde caen, se levantan una a una y se mira
+     * que se cruzan por el camino, que se llega al cofre y al santuario y que cada puesto de sus enemigos se pisa.
+     */
+    private static void paradasDelCamino(java.io.PrintWriter log, ServerLevel lvl, int[] s) {
+        try {
+            var ps = com.darkcraft.camino.Paradas.de(lvl.getSeed(), s[0], s[1]);
+            StringBuilder b = new StringBuilder("Camino de nubes, paradas: " + ps.size() + ":");
+            for (var p : ps)
+                b.append(String.format(java.util.Locale.ROOT, " %d %s en %d,%d (a %d)", p.k(), p.nombre(), p.plan().cx, p.plan().cz, Math.round(p.s())));
+            log.println(b);
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> lvl.getBlockState(new BlockPos(x, y, z));
+            for (var p : ps) {
+                long t0 = System.currentTimeMillis();
+                for (long k : p.plan().chunks()) lvl.getChunk((int) (k >> 32), (int) k);
+                int n = com.darkcraft.camino.Paradas.construirYa(lvl, p);
+                String r = com.darkcraft.camino.Paradas.comprobar(mundo, p);
+                int[] sa = p.plan().santuario(), cf = p.plan().cofre();
+                String extra = (sa == null ? "" : "; santuario " + (lvl.getBlockState(new BlockPos(sa[0], sa[1], sa[2])).is(DarkCraftMod.SANTUARIO.get()) ? "puesto" : "NO"))
+                        + (cf == null ? "" : "; cofre " + (lvl.getBlockEntity(new BlockPos(cf[0], cf[1], cf[2])) instanceof net.minecraft.world.level.block.entity.ChestBlockEntity ? "puesto" : "NO"));
+                log.println("  parada " + r + "; " + n + " chunks en " + (System.currentTimeMillis() - t0) + " ms" + extra);
+            }
+            String k = com.darkcraft.camino.Paradas.clave(s[0], s[1]);
+            log.println("  " + com.darkcraft.camino.Paradas.resumen(lvl, s[0], s[1]));
+            // (la prueba del cliente las vuelve a ver; los enemigos, por caidos hasta entonces)
+            if (com.darkcraft.enemigos.Puestos.apuntado(k)) com.darkcraft.enemigos.Puestos.todos(lvl.getServer(), k, true);
+        } catch (Throwable t) {
+            log.println("Camino de nubes, paradas: ERROR " + t);
             t.printStackTrace();
         }
     }

@@ -40,6 +40,7 @@ public final class Comandos {
                         .then(com.darkcraft.valdrenn.ValdrennEnemigos.comando())
                         .then(com.darkcraft.valdrenn.Guardianes.comando()))
                 .then(com.darkcraft.fortaleza.ComandosFortaleza.comando())
+                .then(com.darkcraft.camino.Paradas.comando())
                 .then(com.darkcraft.pueblo.Pueblo.comando())
                 .then(com.darkcraft.rol.Rol.comando())
                 .then(com.darkcraft.rol.Rol.comandoRol()));
@@ -85,6 +86,8 @@ public final class Comandos {
         for (Linea l : VALDRENN) src.sendSuccess(() -> linea(l), false);
         src.sendSuccess(() -> Component.translatable("darkcraft.ayuda.fortaleza").withStyle(ChatFormatting.GOLD), false);
         for (Linea l : FORTALEZA) src.sendSuccess(() -> linea(l), false);
+        src.sendSuccess(() -> Component.translatable("darkcraft.ayuda.camino").withStyle(ChatFormatting.GOLD), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft camino", "/darkcraft camino / ir <0-5> / levantar <0-5> / enemigos volver|fuera", "c_paradas")), false);
         src.sendSuccess(() -> Component.translatable("darkcraft.ayuda.brumavela").withStyle(ChatFormatting.GOLD), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela ir ", "/darkcraft brumavela ir [<sitio>]", "b_ir")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela pieza ", "/darkcraft brumavela pieza <nombre>|todas / cripta / reparar [ya]", "b_piezas")), false);

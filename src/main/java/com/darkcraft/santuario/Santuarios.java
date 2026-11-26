@@ -411,6 +411,13 @@ public final class Santuarios {
         if (sitio != null) hecho(lvl, d, k, sitio, "darkcraft.santuario.fortaleza");
     }
 
+    /** Pone el santuario de un sitio (si aun no estaba puesto): las paradas del camino de nubes (parte 5d). */
+    public static void ponerEn(ServerLevel lvl, String k, BlockPos sitio, String nombre) {
+        Datos d = Datos.get(lvl.getServer());
+        if (d.puestos.containsKey(k)) return;
+        hecho(lvl, d, k, sitio, nombre);
+    }
+
     private static void hecho(ServerLevel lvl, Datos d, String k, BlockPos sitio, String nombre) {
         poner(lvl, sitio, nombre);
         d.puestos.put(k, sitio.getX() + "," + sitio.getY() + "," + sitio.getZ());

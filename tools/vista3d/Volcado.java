@@ -237,6 +237,36 @@ public class Volcado {
                     }
                 }
             }
+            case "camino" -> {
+                // las paradas del camino de nubes (parte 5d) en un camino de mentira (tramos rectos con giros, como el de
+                // verdad, de 2700 bloques): el camino de nube firme va de lana blanca (fuera del juego no hay bloques del mod)
+                long semilla = Long.parseLong(System.getProperty("semilla", "1234"));
+                double[] px = {0, 700, 1300, 1900, 2350}, pz = {0, 260, 300, 120, 640};
+                var paradas = com.darkcraft.camino.Paradas.colocar(semilla, 0, 0, px, pz);
+                BlockState lana = Blocks.WHITE_WOOL.defaultBlockState(), aire = Blocks.AIR.defaultBlockState();
+                int solo = Integer.parseInt(System.getProperty("parada", "-1"));
+                int dx0 = Integer.parseInt(System.getProperty("dx", "0"));
+                for (var sp : paradas) {
+                    if (solo >= 0 && sp.k() != solo) continue;
+                    var pl = sp.plan();
+                    // el camino de nube alrededor (a 1,6 de la linea, 40 bloques a cada lado de la parada)
+                    for (int x = pl.cx - 60; x <= pl.cx + 60; x++)
+                        for (int z = pl.cz - 60; z <= pl.cz + 60; z++)
+                            if (pl.alCamino(x, z) <= 1.6) lvl.setBlock(new BlockPos(x, 250, z), lana, 2);
+                    for (long k : pl.chunks()) pl.construir(lvl, (int) (k >> 32), (int) k, RandomSource.create(k));
+                    com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+                    System.out.println("parada " + com.darkcraft.camino.Paradas.comprobar(mundo, sp) + " en " + pl.cx + "," + pl.cz
+                            + " (a " + Math.round(sp.s()) + " del principio)");
+                    List<com.darkcraft.enemigos.Puestos.Puesto> ps = new ArrayList<>();
+                    com.darkcraft.camino.Paradas.puestos(ps, sp);
+                    int n = 0;
+                    for (var q : ps) marcas.put(q.tipo().substring(0, 1).toUpperCase() + sp.k() + "_" + (n++), new int[]{q.x(), q.y(), q.z()});
+                    if (pl.cofre() != null) marcas.put("cofre" + sp.k(), pl.cofre());
+                    if (pl.santuario() != null) marcas.put("SANTUARIO" + sp.k(), pl.santuario());
+                }
+                System.out.println("paradas: " + paradas.size() + " (tipos " + java.util.Arrays.toString(com.darkcraft.camino.Paradas.tipos(2700)) + ")");
+                for (var sp : paradas) System.out.println("  " + sp.k() + " " + sp.nombre() + " centro " + sp.plan().cx + "," + sp.plan().cz);
+            }
             case "pueblo" -> {
                 com.darkcraft.pueblo.gen.PuebloPlan p = com.darkcraft.pueblo.gen.PuebloPlan.get();
                 for (long k : p.chunks()) p.construir(lvl, (int) (k >> 32), (int) k, RandomSource.create(k));
