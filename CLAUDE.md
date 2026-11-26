@@ -1668,8 +1668,9 @@ Respuestas 125 y 131 del plan; el segundo jefe de Morvain (el del libro perdido 
   colgados, 3 si cae su presa, 4 la primera vez que engancha a alguien y 5 al morir.
 - **Barra** (`GuardianCliente`, arte de `tools/hud/barra_guardianes.py` "verdugo": la viga de la horca con vueltas de soga, los
   postes con sus tornapuntas y en el centro el lazo con la capucha y los ojos; relleno de una soga con sangre que gira;
-  hebras de canamo y hojas que caen). **Musica**: "Dark souls type boss theme" de ProjectHelmet (Philemon Weber, CC-BY 4.0,
-  id `verdugo`, tema 34 de `ClientMusic.boss`).
+  hebras de canamo y hojas que caen). **Musica**: "Epic boss theme" (Ordmaer, King of the Windymoon) de ProjectHelmet (Philemon
+  Weber, CC-BY 4.0, id `verdugo`, tema 34 de `ClientMusic.boss`; la primera que se puso era la de la fase 2 del Rey: **cada
+  jefe, su musica**, mirar `ci/musica/pistas.json` antes de elegir).
 - **Al caer** (lo reparte `valdrenn/Guardianes`): el cartel de JEFE ABATIDO con 8000 ecos, la hazana `verdugo` ("La cuenta
   esta cerrada", con su entrada del diario) y el bestiario; deja dos piedras de forja II, una III y la ceniza de la sangre.
   **La cuenta se cierra** (`Arboleda.liberar`, desde `Puestos.alCaer`): los colgados que aun cuelgan se deshacen en almas,
