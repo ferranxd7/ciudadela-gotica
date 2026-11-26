@@ -3164,5 +3164,181 @@
     ]
    }
   }
+ },
+ "verdugo": {
+  "flow": "3ClnHX7LlNDqJW4ZiWtF",
+  "voz": "1BfrkuYXmEwp8AWqSLWk",
+  "nombre_voz": "Declan Graves - Haunted Rasps and Old World Dread",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7h: Maese Odran, el Verdugo de la Arboleda (el jefe del Bosque Muerto). Tomas a y b de cada frase como verdugo/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[slow, weary, deep voice] Another one for the tree... [low, menacing] Kneel. The rope is waiting.",
+    "sesiones": [
+     "HIdqnsyvcciLLXjr13Xq",
+     "G9JcXUynidX4H5ywMlQV"
+    ],
+    "generaciones": [
+     "4vPQn9pbPg1gfEuODXJh",
+     "vZ6TTyEa2oUlWtNfUX0Z"
+    ]
+   },
+   "2": {
+    "texto": "[shouting, furious] Up, my hanged ones! [growling] There is work to do!",
+    "sesiones": [
+     "SaG3bIZZvYnpG0ikUoqP",
+     "9f46brxEouEAkzKjvnpA"
+    ],
+    "generaciones": [
+     "G3jvDv1RVheywceRVd6g",
+     "CqyxXhXGnzJxES5hxYUb"
+    ]
+   },
+   "3": {
+    "texto": "[quietly, to himself, cold] One more... for the count.",
+    "sesiones": [
+     "IRAL0RShfKHAKt5D3irm",
+     "KWtoW1UmAIv1lVnmL8cC"
+    ],
+    "generaciones": [
+     "SXSvDUDhxoWLMyz7ZugQ",
+     "QhSBxxdEgxFH8dWUh2B9"
+    ]
+   },
+   "4": {
+    "texto": "[calm, cold] Hold still... [whispering] it is quicker that way.",
+    "sesiones": [
+     "YTrvlvWtbCM0OxISUUYF",
+     "bJvN8jset5Nwf6LjlFg5"
+    ],
+    "generaciones": [
+     "lUfjkXdXaK6bK2evgXfP",
+     "WHUlxoOyjf8VU0xow9ss"
+    ]
+   },
+   "5": {
+    "texto": "[exhausted, fading, slow] The count... is closed. [sighs] At last.",
+    "sesiones": [
+     "16icdNz07YgOLojoUVAo",
+     "RgtuEf9qdHQiOq8YZowO"
+    ],
+    "generaciones": [
+     "jzferBpFZfTr0raS8Wpa",
+     "XY89Q8Rq3ErREfu3HXmt"
+    ]
+   }
+  }
+ },
+ "sfx_verdugo": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7h: el Verdugo de la Arboleda (el grito, el hachazo contra el suelo, el barrido, el lazo, el salto desde el patibulo, el dolor, la muerte). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "verdugo_grito": {
+    "prompt": "A huge undead executioner lets out a deep, guttural, furious roar that echoes through a dead forest, old branches creaking in answer, dark fantasy, no music, 2.5 seconds",
+    "sesiones": [
+     "Ch0J6vRHMdMv8bJTtRzK",
+     "LxGL9aLeq2MUeMuM230P",
+     "0Rq2SHGkg5m4LEJ0uX4A",
+     "wuOxPHvGxmnkLEtTW0VL"
+    ],
+    "generaciones": [
+     "WHUYNTu5NfG6ZjdxZrhG",
+     "d3HPYRyCHzPNwWiVBg74",
+     "AfZCO8gpl2Gnjxiouewe",
+     "1NIVgH1t46bB8y8hUi9u"
+    ]
+   },
+   "verdugo_hachazo": {
+    "prompt": "A giant executioner's axe slammed down into packed earth and roots: a deep booming thud, wood splintering, the ground cracking, dark fantasy, no music, 1.5 seconds",
+    "sesiones": [
+     "kqvEYP4UVhHU9b8To3dL",
+     "3f22EISwGbKiUraBu6dd",
+     "lFdoQD0ghLzygVwDrHYt",
+     "5kBnBzrJux1eV3ocufeV"
+    ],
+    "generaciones": [
+     "ybmHEe4kdKVvwEdu4t2d",
+     "3CbymHcVFWOcsMton9yj",
+     "hkI06g8v97MVX0Qcc9U7",
+     "J3fWTqb2ZgLLkkiWqGsz"
+    ]
+   },
+   "verdugo_barrido": {
+    "prompt": "A massive executioner's axe swung in a wide horizontal arc: a deep, heavy whoosh with a low metallic ring, dark fantasy, no music, 1 second",
+    "sesiones": [
+     "HETWdO5KdizedGqnyKoB",
+     "Axn34Tv3mAds0mhvmrc5",
+     "FMvrF5nvLVlldnUaxJ8K",
+     "qoCFUuGpYNGTZgLLzQ7e"
+    ],
+    "generaciones": [
+     "5BN654gaqRdkAGYufeY2",
+     "KkrjqJl8Z1aQcV5qwnFg",
+     "n0jOCjA9EUCJ647NjxTH",
+     "4uBDGt6ZlgPbedoASf1o"
+    ]
+   },
+   "verdugo_lazo": {
+    "prompt": "A heavy hemp noose whirled overhead and thrown: a whipping whoosh, then the rope snapping taut with a sharp creak and a strained pull, dark fantasy, no music, 1.4 seconds",
+    "sesiones": [
+     "RWGIkn0wnoVARi1PYNUq",
+     "1IUzMQ6SoswCRGIN5fJi",
+     "4bqQOaVMxfOMBn2mZKU9",
+     "4WpEf1BJzkiTv2PBlmtD"
+    ],
+    "generaciones": [
+     "Q8CHcj2E6QC4fjjmAdNm",
+     "e2M8giXXGucktAndm10u",
+     "Un3zWudDb458J9vivZ3D",
+     "V6CD4SvMo6EPxX0rwjfN"
+    ]
+   },
+   "verdugo_salto": {
+    "prompt": "A huge heavy body leaps down from a wooden scaffold and lands on the forest floor: planks creaking, then a deep booming impact that shakes the ground, dark fantasy, no music, 1.6 seconds",
+    "sesiones": [
+     "KAKyCuPmfYFHoSQOKJKn",
+     "2mWC3tkjg36PJcqEFf4W",
+     "xMX91V5eCbH8hOBFyHGt",
+     "wENEeBn8x3hdv7oCJad5"
+    ],
+    "generaciones": [
+     "gtx3BpyMCcKi6QXqMRw7",
+     "ZuQiftQwC2qfRaEaCG4Z",
+     "wAntrOR3XCXu0Jo9zgX0",
+     "8KT68HAUuyPlHE6myBLP"
+    ]
+   },
+   "verdugo_dolor": {
+    "prompt": "A huge undead executioner grunting in pain: a short, deep growl through clenched teeth, dark fantasy, no music, 0.8 seconds",
+    "sesiones": [
+     "txr5ZfBZIXaB2ABuIPzI",
+     "mXLWW2e7zEt8QU3TbPih",
+     "9jtqXhuPhdbAK3a54xqS",
+     "MztK7p2qDcZOX52NJ7iY"
+    ],
+    "generaciones": [
+     "HQxTsN9QsVItAAq25A3J",
+     "mPcnIJlNQcxizmQv1YVd",
+     "bBuewRVFoUoTlZNifEMv",
+     "ASRQ6qq3YlrPHeRg8nfq"
+    ]
+   },
+   "verdugo_muerte": {
+    "prompt": "A huge undead executioner's dying groan: a long, deep, rattling exhale, then his heavy axe falls and thuds onto wooden planks, dark fantasy, no music, 3.5 seconds",
+    "sesiones": [
+     "aUy0YqoBdRxk1bwTXpPS",
+     "a2dHuuQsIxrGMbg2Obsn",
+     "0q5dOrO48hGMy43UYETU",
+     "bx8dxwUZKhL8uq2K2Bg2"
+    ],
+    "generaciones": [
+     "ueMxqf46Iqm6LM7cbBx8",
+     "Vsm4AQSWdjENH3fR0PAs",
+     "kXzK8a4cxwGtKqKvXYYt",
+     "k2uPj4wJS4EaP4FALndg"
+    ]
+   }
+  }
  }
 }
