@@ -4519,5 +4519,207 @@
     ]
    }
   }
+ },
+ "sfx_erudito": {
+  "flow": "oREixXYwkQfS64iE6kai",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7o: los eruditos de la Academia Espectral (susurro, alerta, dolor, muerte, el plumazo, el tintero, el orbe, las runas, el parpadeo, el tomazo, la cadena, alzarse de los libros) y el ambiente de la academia. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "erudito_susurro": {
+    "prompt": "Ghostly scholars whispering an ancient lesson in an unknown language, overlapping hushed murmurs, an old book page turning, eerie stone library reverb, dark fantasy, no music",
+    "sesiones": [
+     "vkda3mryIkl3iIgxgXR8",
+     "oyzLqDaaITKlN36OPc6j",
+     "lO7qCuCmIhRo0wpkmB4j",
+     "WmuNBsLMBoCF7AT2JzEC"
+    ],
+    "generaciones": [
+     "KvbHXnCuWFqbaJfml2jY",
+     "GVIVxjjZGpCMG4rh3VVW",
+     "4avG7rWbH2iKWBgrpxNT",
+     "OavqYfZCfcwhqmeyejYV"
+    ]
+   },
+   "erudito_alerta": {
+    "prompt": "A spectral scholar notices an intruder: a sharp ghostly hiss and gasp, a heavy old book snapping shut, a cold airy whoosh, dark fantasy, no music",
+    "sesiones": [
+     "vqNcgNjxCRJLLJ38Pg4X",
+     "wbWOwUPbnBeayo7IB8Yz",
+     "9DHt7KidZZvv7j5tzllh",
+     "pUrqgKD2oW93vAvIDuug"
+    ],
+    "generaciones": [
+     "tmCSVmfibQi8uOMerJVY",
+     "hy5MHuTfd5EG3YWDdicJ",
+     "8kWtgxlA6loHtRzAEk4W",
+     "bnmFV6m3ITMKtoEMJkLc"
+    ]
+   },
+   "erudito_dolor": {
+    "prompt": "A ghost in pain: a short airy spectral wail with a breathy echo, dark fantasy creature hurt sound, no music",
+    "sesiones": [
+     "T51VvsAGkbUpo1r1dmL7",
+     "nk7FSxJm5Oi5iwffe2Mu",
+     "UNnq6uO3G7UkkZoDJbXa",
+     "9Tn5or75J8PR6h8MFZbU"
+    ],
+    "generaciones": [
+     "6EW9qUTGuyzq12JfCCjo",
+     "BKXrSK6LKJsVtKuBvWo4",
+     "GxFv9h5uOwli9alTU7zn",
+     "1OpMX087z63lTigQfGO5"
+    ]
+   },
+   "erudito_muerte": {
+    "prompt": "A spectral scholar dissolving: a long fading ghostly sigh, loose book pages scattering in the wind, a soft magical shimmer fading out, dark fantasy, no music",
+    "sesiones": [
+     "vudIz76sxFIBIGSc3Kgf",
+     "DbmD7NTPlVjhYcJyQpgo",
+     "zy8E0ZqFXQj4WVAAEoAc",
+     "3jZCGPdNfeAFAoXi716y"
+    ],
+    "generaciones": [
+     "QrQ7hrjJ7v7p58Hu1O4b",
+     "SaohgzXFjGY2fB5wgCIS",
+     "5dCe62kEjw83aAEi5I5Y",
+     "ZsatwCSbFdIAzibRmDRO"
+    ]
+   },
+   "erudito_pluma": {
+    "prompt": "Two fast vicious stabs with a sharp metal quill blade: quick airy swishes and a thin metallic scrape, dark fantasy combat, no music",
+    "sesiones": [
+     "KXwJCbEbMFd4K3DjFImG",
+     "Ewfx6v2EF3SbdImnBigD",
+     "Rl6SuHpGOtIUZ1o6D75D",
+     "jBplnlbO7b4ZTWtwpHyu"
+    ],
+    "generaciones": [
+     "5BiB0A7pZPTtDHAfrrsd",
+     "Crp2VTiUuUfI9Xi2N10X",
+     "1wzCVVSz5DRJ2XemxpfH",
+     "I5lbtPHWqwZuuhYJtE5d"
+    ]
+   },
+   "erudito_tinta": {
+    "prompt": "A small glass ink bottle thrown through the air, then it shatters on stone with a thick wet splash of ink, dark fantasy, no music",
+    "sesiones": [
+     "jvMDkupuJJGZrMqnyS8y",
+     "GQ4iLVHUlWHTbhEQtANS",
+     "EIcOPODtnduy0xx81NfR",
+     "cwkS2OrYpB2tnr7o7cyu"
+    ],
+    "generaciones": [
+     "sVDVgucdqN6kOYgMGxrB",
+     "xYD7WOMvyGQJZUMTy5SW",
+     "XsoveB6GlKnZQ9TG17Uj",
+     "oYNSbDSgfcSNmYuFofwT"
+    ]
+   },
+   "erudito_orbe": {
+    "prompt": "A sorcerer casts an arcane orb: a rising magical hum charging up, then a bright whooshing release of glowing energy flying away, dark fantasy spell, no music",
+    "sesiones": [
+     "Vgcni4k1MdwO9nSGEYEk",
+     "DHP0KaQMtgfL6SHaEZKS",
+     "ApVUVWVZxehdfzz2dzeu",
+     "LTSwrQ8301kN3GhssE2b"
+    ],
+    "generaciones": [
+     "rULACg7XekrA4FWLWeqO",
+     "hbAlBFon02eyw8ntMoac",
+     "WTCYSJDNxr7Alu1xF8QA",
+     "iutWdl35ucgKzbgIpenQ"
+    ]
+   },
+   "erudito_runas": {
+    "prompt": "A circle of magic runes ignites on a stone floor: a low ominous hum and crackling arcane energy building for one second, then a sharp magical burst, dark fantasy, no music",
+    "sesiones": [
+     "WkRaI8QWEgwUk1XTJQMY",
+     "qNGxBuMiiagDo7aInRP4",
+     "hO1zvu4NJHeDaWEBwI48",
+     "RCZ5atTB6Y2oSEaFwXuC"
+    ],
+    "generaciones": [
+     "LcGYOg4sSJD1oNPYFtdq",
+     "k5KGJMGM3WytmaTn8EqL",
+     "ns9zIR2pMCUelhFttg7a",
+     "5EDpTKmQerNRFEyJJOTd"
+    ]
+   },
+   "erudito_parpadeo": {
+    "prompt": "A ghost teleports away: a quick reversed whoosh and a soft crystalline chime, spectral blink, dark fantasy, no music",
+    "sesiones": [
+     "rXYqQ06ce0qTyQTU0yP5",
+     "LCvkNd4lHklcl8JUqdfX",
+     "90HsBfcVjfb2NZxQUTCT",
+     "xxXuoFmVeioTjjNtumHA"
+    ],
+    "generaciones": [
+     "fhL1d39BzxjFdsmnZxtw",
+     "xyXT4F8y5P9mPcjRnRkg",
+     "xbaEWqV1JreCDoMU685A",
+     "hQKHLHD6nG2f8NSk2CJv"
+    ]
+   },
+   "erudito_tomazo": {
+    "prompt": "A huge heavy ancient book slammed down onto a stone floor with tremendous force: deep thud, shockwave rumble, iron chains rattling, dark fantasy, no music",
+    "sesiones": [
+     "gKNRHOit1ZBEJeYlv6QW",
+     "yUVjwBNGDkqykSZShO4L",
+     "D2Xq7Qb5QRhsoZCBNe5W",
+     "fLP8O4vRvJhMI1YNMX4Z"
+    ],
+    "generaciones": [
+     "4wGDYn7e2Cp1PrbKE9ul",
+     "MUguI9GvMGoGc1ySwMMN",
+     "adcwwGQzmk6uN5AMAbYq",
+     "cxasmOkwGP5e8zW2QaTR"
+    ]
+   },
+   "erudito_cadena": {
+    "prompt": "A heavy iron chain whipped through the air in a wide arc with a massive book at its end: a deep whooshing swing and rattling chain links, dark fantasy, no music",
+    "sesiones": [
+     "C8YOYyTuzfRhkplW9BbN",
+     "TTCUtC1v6f3y3Itn2xff",
+     "e8SH0wIV9eEtJouBHIQL",
+     "t15WzW393ZaMi3GnPb81"
+    ],
+    "generaciones": [
+     "li0OZLSIDaEUv5yGaqTb",
+     "xTWlSo9nK0QhpPVdnDn2",
+     "FvGap6sEMBqpsSE70eEE",
+     "1mTmliR0C8AuWpg64Vkt"
+    ]
+   },
+   "erudito_alzarse": {
+    "prompt": "A ghost rising from a pile of old books on the floor: rustling pages, a cold rising spectral breath, dark fantasy, no music",
+    "sesiones": [
+     "hOBNylML5SgpebORhamf",
+     "FVaDFaUi86b430JueQQU",
+     "no26XwTe0QhXOCirpDp4",
+     "ylcJPNRl2vgfGliAXz81"
+    ],
+    "generaciones": [
+     "sU22zIWewtAkm0eFoJW1",
+     "msBRGtMFXR8x16bCsOH7",
+     "6EylYwDSQioXllSmMiti",
+     "Z98ZAXcS0rs5gA4LyFid"
+    ]
+   },
+   "academia_ambiente": {
+    "prompt": "20 seconds of ambience of a ruined academy of magic on a windy high plateau at dusk: cold wind through broken stone arches, distant ghostly whispers reciting lessons, pages fluttering, faint crystal chimes, eerie and lonely, seamless loop, no music",
+    "sesiones": [
+     "O9zx0ZZtV1H0JD6LQYKr",
+     "KtcsakT7wDIqaLafQHZA",
+     "a7JQzGCDObiVcVewKYIy",
+     "QlcbQosq773A7f4MCgST"
+    ],
+    "generaciones": [
+     "gjgJpKjhNZOMycmTz50V",
+     "u8CGJz7F9yhPHp6VOfcg",
+     "CQj3cqw8oCo0Fgu49jZw",
+     "qg1vYg7y2n5m5DFcdHiW"
+    ]
+   }
+  }
  }
 }
