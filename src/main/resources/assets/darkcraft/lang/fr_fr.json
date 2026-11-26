@@ -1559,5 +1559,6 @@
   "advancements.darkcraft.mapa_morvain.title": "Cartographer of the Withered Lands",
   "advancements.darkcraft.mapa_morvain.description": "Copy all nine map fragments of Morvain",
   "darkcraft.diario.fragmento": "Beside the fire stood a stele with the region's map carved into the stone and a parchment nailed to it. I copied it into the Shadow's book: now I know where I am.",
-  "darkcraft.diario.mapa_morvain": "Nine steles, nine fragments. The map of Morvain is whole in my book... and every road leads to the chained castle."
+  "darkcraft.diario.mapa_morvain": "Nine steles, nine fragments. The map of Morvain is whole in my book... and every road leads to the chained castle.",
+  "darkcraft.sombra.dim.darkcraft.morvain": "Morvain"
 }
