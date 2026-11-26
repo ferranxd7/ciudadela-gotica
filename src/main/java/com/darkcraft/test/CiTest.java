@@ -598,7 +598,7 @@ public final class CiTest {
                 + ", biomas " + gen.getBiomeSource().getClass().getSimpleName() + ", hora fija " + m.dimensionType().fixedTime().orElse(-1L)
                 + ", efectos " + m.dimensionType().effectsLocation());
         Object[][] muestras = {{"llanuras", 0, 5600}, {"bosque", -4700, 4300}, {"pantano", -5900, 300}, {"montanas", -2200, -6600},
-                {"capital", 4900, 600}, {"academia", 4700, -4100}, {"costa", 6900, 4300}, {"sin_fe", 0, 2100}, {"centro", 500, 500}, {"mar", 0, 7900}};
+                {"capital", 4700, 1100}, {"academia", 4700, -4100}, {"costa", 6200, 4600}, {"sin_fe", 0, 2100}, {"centro", 500, 500}, {"mar", 0, 7900}};
         StringBuilder sb = new StringBuilder("Morvain, regiones:");
         int bien = 0;
         long total = 0;

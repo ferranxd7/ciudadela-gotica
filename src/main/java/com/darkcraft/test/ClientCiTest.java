@@ -5809,7 +5809,8 @@ public final class ClientCiTest {
         log("  al arrancar: " + Lejania.resumenDH());
         log("  al arrancar: " + Lejania.resumenOculus());
         log("  " + claves("config/darkcraft-arranque.properties", "lejania", "shaders"));
-        log("  " + claves("config/DistantHorizons.toml", "lodChunkRenderDistanceRadius", "enableAutoUpdater", "blocksToIgnore", "enableDistantGeneration"));
+        log("  " + claves("config/DistantHorizons.toml", "lodChunkRenderDistanceRadius", "enableAutoUpdater", "blocksToIgnore", "enableDistantGeneration",
+                "generatorPlan"));
         log("  " + claves("config/oculus.properties", "shaderPack", "enableShaders"));
         if (Lejania.hayOculus()) log("  para la prueba: " + Lejania.shaders(false));
         if (Lejania.hayDH()) log("  para la prueba: " + Lejania.dhPoner(false, "graphics", "renderingEnabled") + ", "
@@ -5932,6 +5933,7 @@ public final class ClientCiTest {
             m.setScreen(null);
             enPrimeraPersona(m);
             m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
             server(m, sp -> {
                 mv[0] = com.darkcraft.morvain.Morvain.nivel(sp.server);
                 log("  Morvain: " + (mv[0] == null ? "NO EXISTE" : "dimension " + mv[0].dimension().location() + ", alto " + mv[0].getMinBuildHeight()
@@ -5956,7 +5958,7 @@ public final class ClientCiTest {
                 com.darkcraft.morvain.Morvain.cruzar(sp, hueco, mv[0]);
             }
         }));
-        t += 60;
+        t += 30;
         atTicks(t, "Morvain: ha cruzado?", m -> server(m, sp -> {
             if (sp.level().dimension() == com.darkcraft.morvain.Morvain.NIVEL) {
                 log("  ha cruzado al entrar en el hueco del portal");
@@ -5965,19 +5967,20 @@ public final class ClientCiTest {
             log("  NO ha cruzado al entrar en el hueco (" + fpos(sp) + "): se cruza a mano");
             if (fplan != null && mv[0] != null) com.darkcraft.morvain.Morvain.cruzar(sp, new BlockPos(fplan.cx, fplan.f.portal()[1], fplan.f.portal()[2]), mv[0]);
         }));
-        t += 80;
+        t += 30;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv01_llegada");
+            log("  cliente en " + (m.level == null ? "?" : m.level.dimension().location()) + ", bioma "
+                    + (m.level == null || m.player == null ? "?" : m.level.getBiome(m.player.blockPosition()).unwrapKey().map(k -> k.location().toString()).orElse("?"))
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen());
+        });
+        t += 50;
         atTicks(t, "Morvain: la llegada", m -> server(m, sp -> {
             boolean alli = sp.level().dimension() == com.darkcraft.morvain.Morvain.NIVEL;
             log("  en " + sp.level().dimension().location() + " " + fpos(sp) + (alli ? " | " + com.darkcraft.morvain.Morvain.resumen(sp.serverLevel())
                     + " | lugar " + com.darkcraft.morvain.Morvain.lugar(sp) : " | NO HA CRUZADO") + " | cartel " + com.darkcraft.client.ui.Carteles.resumen());
         }));
-        t += 20;
-        atTicks(t, "captura", m -> {
-            shot(m, "cliente_mv01_llegada");
-            log("  cliente en " + (m.level == null ? "?" : m.level.dimension().location()) + ", bioma "
-                    + (m.level == null || m.player == null ? "?" : m.level.getBiome(m.player.blockPosition()).unwrapKey().map(k -> k.location().toString()).orElse("?")));
-        });
-        t += 120;
+        t += 30;
         atTicks(t, "captura", m -> shot(m, "cliente_mv02_llegada_cartel"));
         t += 10;
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
@@ -5985,15 +5988,15 @@ public final class ClientCiTest {
         final double[][] v = {
                 {ll[0] + 0.5, ll[1] + 3, ll[2] - 5, ll[0] + 0.5, ll[1] + 7, ll[3] + 0.5},          // el arco y su remolino, desde la plaza
                 {ll[0] + 9.5, ll[1] + 4, ll[2] + 9, ll[0] - 2, ll[1] + 1, ll[2] - 3},              // la plaza, el santuario y la guia
-                {ll[0] + 0.5, ll[1] + 60, ll[2] + 120, 0, 420, 0},                                // las llanuras hacia el norte (la ciudadela al fondo)
+                {ll[0] + 0.5, ll[1] + 40, ll[2] + 60, ll[0] + 0.5, ll[1] + 10, ll[2] - 400},      // las llanuras hacia el norte
                 {170, 600, 230, 0, 590, 0},                                                         // la ciudadela
                 {420, 190, 260, 0, 470, 0},                                                         // las cadenas, desde el crater
                 {0, 150, 2600, 0, 80, 1900},                                                        // la Tierra sin Fe
-                {-2200, 420, -4300, -2200, 600, -6600},                                             // las montanas (un coloso)
+                {-2200, 660, -6150, -2200, 707, -6600},                                             // las montanas (la ladera de un coloso)
                 {-5450, 110, 950, -5900, 64, 150},                                                  // el pantano
                 {-4300, 140, 4900, -4700, 100, 4250},                                               // el bosque muerto
-                {4250, 160, 1300, 4900, 100, 500},                                                  // la capital (aun sin ruinas)
-                {4100, 210, -3000, 4700, 250, -4100},                                               // la meseta de la academia
+                {4700, 130, 1150, 4950, 92, 500},                                                   // la capital (aun sin ruinas)
+                {4300, 290, -3300, 4700, 245, -4100},                                               // la meseta de la academia
                 {6200, 100, 4700, 7300, 64, 4200},                                                  // la costa de los huesos
         };
         String[] nombres = {"arco", "plaza", "llanuras", "ciudadela", "cadenas", "sin_fe", "montanas", "pantano", "bosque", "capital", "academia", "costa"};
@@ -6970,12 +6973,9 @@ public final class ClientCiTest {
             });
         });
         atTicks(Q + 10, "captura", m -> shot(m, "cliente_f40_portal"));
-        atTicks(Q + 12, "Tocar el portal", m -> server(m, sp -> {
-            int[] q = fplan.f.portal();
-            sp.teleportTo(sp.serverLevel(), fplan.cx + 0.5, q[1] + 1, q[2] + 0.5, 180f, 0f);
-        }));
-        atTicks(Q + 30, "El portal empuja", m -> server(m, sp -> log("  despues de tocar el portal: " + fpos(sp) + " (el portal esta en z "
-                + fplan.f.portal()[2] + ")")));
+        // (desde la parte 7a el portal lleva a Morvain: se cruza en el tramo de Morvain, al final)
+        atTicks(Q + 12, "El portal: se cruza en el tramo de Morvain", m -> server(m, sp -> log("  Morvain "
+                + (com.darkcraft.morvain.Morvain.nivel(sp.server) != null ? "existe" : "NO EXISTE") + "; el portal esta en z " + fplan.f.portal()[2])));
         atTicks(Q + 34, "El menu (R): la historia, capitulo 6 y un libro perdido", m -> {
             com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.HISTORIA);
             menuP(m, mm -> mm.probarHistoria(6));

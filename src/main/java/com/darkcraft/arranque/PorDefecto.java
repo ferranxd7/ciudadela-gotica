@@ -36,9 +36,12 @@ public final class PorDefecto {
     /**
      * Version de lo que se pone por defecto en DH (si sube, se vuelve a poner una vez): 1 = la lejania a 256, sin
      * actualizador (DH va dentro del jar: no se puede actualizar solo) y con las nubes en la lejania ({@code blocksToIgnore}
-     * NONE: con NON_COLLIDING, el de DH, el mar de nubes —que no tiene choque— no salia en la lejania).
+     * NONE: con NON_COLLIDING, el de DH, el mar de nubes —que no tiene choque— no salia en la lejania); 2 = ademas, la
+     * lejania se genera solo con chunks de verdad ({@code generatorPlan} CHUNKS_ONLY): la "superficie aproximada" de DH
+     * sale del ruido de los generadores de Minecraft, y los de Dark Craft (el mar de nubes, Morvain) no lo tienen: daba un
+     * mar plano a la altura 63 y, encima, trozos de terreno de verdad como mesetas flotantes.
      */
-    static final int DH_VERSION = 1;
+    static final int DH_VERSION = 2;
 
     /** Lo minimo para DH: el resto lo rellena el al arrancar (y respeta estos valores). */
     static final String DH_MINIMO = String.join("\n",
@@ -52,20 +55,29 @@ public final class PorDefecto {
             "\t\t\t\tblocksToIgnore = \"NONE\"",
             "\t\t[client.advanced.autoUpdater]",
             "\t\t\tenableAutoUpdater = false",
+            "[common]",
+            "\t[common.worldGenerator]",
+            "\t\tgeneratorPlan = \"CHUNKS_ONLY\"",
             "");
 
-    /** En un servidor dedicado: solo sin actualizador. */
+    /** En un servidor dedicado: sin actualizador y la lejania solo con chunks de verdad (la manda el servidor). */
     static final String DH_SERVIDOR = String.join("\n",
             "# Dark Craft: Distant Horizons va dentro del jar de Dark Craft (no se actualiza solo).",
             "[client]",
             "\t[client.advanced]",
             "\t\t[client.advanced.autoUpdater]",
             "\t\t\tenableAutoUpdater = false",
+            "[common]",
+            "\t[common.worldGenerator]",
+            "\t\tgeneratorPlan = \"CHUNKS_ONLY\"",
             "");
+    /** Version de lo del servidor dedicado (1 = sin actualizador; 2 = y solo chunks de verdad). */
+    static final int SERVIDOR_VERSION = 2;
 
     private static final Pattern RADIO = Pattern.compile("(?m)^(\\s*lodChunkRenderDistanceRadius\\s*=\\s*)(\\d+)");
     private static final Pattern ACTUALIZADOR = Pattern.compile("(?m)^(\\s*enableAutoUpdater\\s*=\\s*)true\\b");
     private static final Pattern IGNORAR = Pattern.compile("(?m)^(\\s*blocksToIgnore\\s*=\\s*)\"[A-Z_]+\"");
+    private static final Pattern PLAN = Pattern.compile("(?m)^(\\s*generatorPlan\\s*=\\s*)\"[A-Z_]+\"");
 
     /** Aplica lo que falte; devuelve lo que ha hecho (para el registro). Nunca lanza. */
     public static List<String> aplicar(Path juego) {
@@ -126,8 +138,9 @@ public final class PorDefecto {
         String t = RADIO.matcher(s).replaceFirst("$1" + LEJANIA);
         t = ACTUALIZADOR.matcher(t).replaceAll("$1false");
         t = IGNORAR.matcher(t).replaceAll("$1\"NONE\"");
+        t = PLAN.matcher(t).replaceAll("$1\"CHUNKS_ONLY\"");
         if (!t.equals(s)) Files.writeString(f, t, StandardCharsets.UTF_8);
-        return "lejania: " + antes + " -> " + LEJANIA + " chunks en el " + DH + " que habia (nubes en la lejania, sin actualizador)";
+        return "lejania: " + antes + " -> " + LEJANIA + " chunks en el " + DH + " que habia (nubes en la lejania, sin actualizador, solo chunks)";
     }
 
     /** En un servidor dedicado (una vez): DH sin actualizador (va dentro del jar). */
@@ -141,18 +154,19 @@ public final class PorDefecto {
             if (Files.exists(fm)) try (InputStream in = Files.newInputStream(fm)) {
                 marca.load(in);
             }
-            if (version(marca.getProperty("servidor")) >= 1) return hecho;
+            if (version(marca.getProperty("servidor")) >= SERVIDOR_VERSION) return hecho;
             Path f = config.resolve(DH);
             if (!Files.exists(f)) {
                 Files.writeString(f, DH_SERVIDOR, StandardCharsets.UTF_8);
-                hecho.add("servidor: " + DH + " creado sin actualizador");
+                hecho.add("servidor: " + DH + " creado sin actualizador y solo con chunks");
             } else {
                 String s = Files.readString(f, StandardCharsets.UTF_8);
                 String t = ACTUALIZADOR.matcher(s).replaceAll("$1false");
+                t = PLAN.matcher(t).replaceAll("$1\"CHUNKS_ONLY\"");
                 if (!t.equals(s)) Files.writeString(f, t, StandardCharsets.UTF_8);
-                hecho.add("servidor: " + DH + " sin actualizador");
+                hecho.add("servidor: " + DH + " sin actualizador y solo con chunks");
             }
-            marca.setProperty("servidor", "1");
+            marca.setProperty("servidor", String.valueOf(SERVIDOR_VERSION));
             try (OutputStream out = Files.newOutputStream(fm)) {
                 marca.store(out, "Dark Craft: lo que ya se ha puesto por defecto una vez (borra una linea para repetirlo)");
             }

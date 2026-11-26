@@ -207,19 +207,26 @@ public final class Morvain {
                 Math.round(x), Math.round(y), Math.round(z));
     }
 
-    /** Lo alto del suelo en (x, z) cerca de la altura y (donde se ponen los pies), o NaN si no hay. */
+    /**
+     * Donde ponerse de pie en (x, z) cerca de la altura y: primero a esa altura o un poco por encima (si alli hay un cascote
+     * se sube encima), despues hasta tres por debajo (nunca mas: bajo la terraza del portal estan las salas de la torre).
+     * NaN si no hay.
+     */
     private static double suelo(ServerLevel l, double x, double y, double z) {
-        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
         int bx = Mth.floor(x), bz = Mth.floor(z), y0 = Mth.floor(y);
-        for (int yy = y0 + 1; yy >= y0 - 8; yy--) {
-            m.set(bx, yy - 1, bz);
-            boolean firme = !l.getBlockState(m).getCollisionShape(l, m).isEmpty();
-            m.set(bx, yy, bz);
-            boolean libre = l.getBlockState(m).getCollisionShape(l, m).isEmpty();
-            m.set(bx, yy + 1, bz);
-            if (firme && libre && l.getBlockState(m).getCollisionShape(l, m).isEmpty()) return yy;
-        }
+        for (int yy = y0; yy <= y0 + 4; yy++) if (dePie(l, bx, yy, bz)) return yy;
+        for (int yy = y0 - 1; yy >= y0 - 3; yy--) if (dePie(l, bx, yy, bz)) return yy;
         return Double.NaN;
+    }
+
+    /** Si en (x, y, z) se puede estar de pie: algo firme debajo y dos huecos libres. */
+    private static boolean dePie(ServerLevel l, int x, int y, int z) {
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos(x, y - 1, z);
+        if (l.getBlockState(m).getCollisionShape(l, m).isEmpty()) return false;
+        m.set(x, y, z);
+        if (!l.getBlockState(m).getCollisionShape(l, m).isEmpty()) return false;
+        m.set(x, y + 1, z);
+        return l.getBlockState(m).getCollisionShape(l, m).isEmpty();
     }
 
     // ------------------------------------------------------------------ el Arco del Umbral
