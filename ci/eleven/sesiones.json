@@ -2846,5 +2846,69 @@
     ]
    }
   }
+ },
+ "molinera": {
+  "flow": "eDmyp1z5phPwszhGJdPA",
+  "voz": "5PWbsfogbLtky5sxqtBz",
+  "nombre_voz": "Kayla - Evil Witch Villian Storyteller",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7f: la Molinera de Velmor (el jefe de las Llanuras Palidas). Tomas a y b de cada frase como molinera/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[raspy, slow, menacing] Who treads upon my wheat...? [whispering] Nothing grows here anymore. Nothing... [sinister laugh] but me.",
+    "sesiones": [
+     "VLQxukf1BjSwbIuhd628",
+     "exoqGqRSPIpphFZ3ewSS"
+    ],
+    "generaciones": [
+     "0YX3Nhm6fIMWwg2eLimx",
+     "gTg17PFMs4BkKLhoiyvD"
+    ]
+   },
+   "2": {
+    "texto": "[shouting, furious] Grind, wheel, grind! [raspy] Come, children of Velmor... [shouting] the harvest is here!",
+    "sesiones": [
+     "pzj0yhzcLX28CikKAzyN",
+     "j6NZ0brC1wauN5qf8C4D"
+    ],
+    "generaciones": [
+     "vXYGDGj4OqBPLiJvCcAb",
+     "tOEyPyzyyVOuOtxwRFWy"
+    ]
+   },
+   "3": {
+    "texto": "[raspy, mocking] Into the sack with you... [whispering] like all the others.",
+    "sesiones": [
+     "qe42AHUSlbJmpYvzn9RR",
+     "NBhmgtGMmNmWBHEnAN6T"
+    ],
+    "generaciones": [
+     "FXkswhLT2v676cU58495",
+     "BKjmmrQbDJJuRc9SYJjU"
+    ]
+   },
+   "4": {
+    "texto": "[cackling, sing-song] Round and round the millstone goes!",
+    "sesiones": [
+     "Ytd40jxBtds6lu5LOxlY",
+     "jA2JxSVbOJ7lEbkeSUd3"
+    ],
+    "generaciones": [
+     "Nb21RdqEPyxzhLQVK3CC",
+     "D5nT66rKm4nbyPE3jFpo"
+    ]
+   },
+   "5": {
+    "texto": "[weak, dying, raspy] The wheel... [exhales] has stopped... [whispering] at last.",
+    "sesiones": [
+     "q0HrSPUFhVoqwuHQdd4h",
+     "BSLMFYPIwslz3j8P1xB6"
+    ],
+    "generaciones": [
+     "pgoPJZAZMYoqBfQDxqPw",
+     "1KyjwhQH1CsC8hvQSkm8"
+    ]
+   }
+  }
  }
 }
