@@ -2016,7 +2016,8 @@ del Juramento —el que mando cerrar las puertas la noche del cielo rojo, libro 
   torre del norte —la puerta de abajo por dentro, al este—): la mesa, el caldero, el torno con las cadenas del rastrillo, el arcon y el
   **atril con el libro perdido 22** —"La guardia de la Puerta Oeste", del sargento Brannoc; `Perdidos.TOTAL` = 22—. Fuera, el
   **camino** del santuario con faroles y **cuatro carros quemados**. Dentro, la **calle mayor** (u 2..96, |v| <= 3) entre **casas
-  quemadas** (`CasaCapital`: las de Brumavela ennegrecidas, sin tejado casi todas), la **calle del cruce** (u 44), la ronda pegada a la
+  quemadas** (`CasaCapital`: las de Brumavela ennegrecidas; `ruina`: casi todas con el tejado hundido, alguna en pie y alguna en
+  ruinas), la **calle del cruce** (u 44), la ronda pegada a la
   muralla, **solares** con cimientos y arboles quemados, y al final la **plaza** (radio 15) con el pedestal y **la estatua del
   caballero derribada** (las piernas en pie, el torso, el yelmo y el brazo de la mano alzada en el suelo), los puestos quemados del
   mercado y, al norte, el **cuartel del Juramento** (u 84..108, v -46..-24: el tejado hundido, literas quemadas, el armero, la mesa
