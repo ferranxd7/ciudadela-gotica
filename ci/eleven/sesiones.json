@@ -2749,5 +2749,102 @@
     ]
    }
   }
+ },
+ "sfx_marchito": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7e: los Marchitos de Velmor (el gemido, la alerta, el dolor, la muerte en ceniza, la campana del campanero y el farol que estalla en fuego de almas). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "marchito_gemido": {
+    "prompt": "A withered undead villager moaning softly to itself: a dry, raspy, hollow groan like wind through cracked lips, faint crackle of embers and drifting ash, dark fantasy, no music, 2 seconds",
+    "sesiones": [
+     "mTfXG6qamUGsaWDA6a4U",
+     "244RrVtQ8IbuqQqYVpnx",
+     "l2K5ZLvDyYT9oxkmKIRq",
+     "hIPN2Fud0gz1wkMHGyMn"
+    ],
+    "generaciones": [
+     "HungdaSB1RncQ1h73Q0N",
+     "v3PMYHCJPTyIGyMQtY8I",
+     "R4IpGFLI4WtZ7Y60Rmb5",
+     "g51sU4IpElo5D7EGBtNP"
+    ]
+   },
+   "marchito_alerta": {
+    "prompt": "An ash-covered undead peasant suddenly noticing an intruder: a sharp dry rasping inhale that rises into a hoarse croaking shriek, crackling embers, dark fantasy, no music, 1.5 seconds",
+    "sesiones": [
+     "n4YHa85jX6W5sHUnR55u",
+     "oD3r7hFcIYyvVPLv8jT7",
+     "rCRGwZhwlNYLtcYS8tny",
+     "KBWdiRduLZRUUtZJWJZc"
+    ],
+    "generaciones": [
+     "hZNIp8sIVW74AfwK3cOF",
+     "BqUu14GoIVNY5WCt94aa",
+     "D8Y7WpaFzNFs3b8W6K3T",
+     "2UOrj5qAuUNe6db4fGnA"
+    ]
+   },
+   "marchito_dolor": {
+    "prompt": "A withered undead peasant struck by a blade: a short dry pained croak with a puff of crumbling ash and a brittle crack, dark fantasy, no music, 0.8 seconds",
+    "sesiones": [
+     "zdqj9XDb1RhiMixaeVSI",
+     "QsanteD8EaFWyIWSdi4u",
+     "rqh1Hw7qCHoBAuevHj3e",
+     "zpbqv4ntojxJqDnNQUtR"
+    ],
+    "generaciones": [
+     "K6BXd7LaontqODCPz38x",
+     "6xrRo0ncjfphOHzH9ryE",
+     "ZCkio3eXfkgLrgFKvsXQ",
+     "cke1e4vCXJJmqoNeDhFX"
+    ]
+   },
+   "marchito_muerte": {
+    "prompt": "A withered undead villager crumbling into ash: a long dying rasping sigh, then a dry brittle body collapsing into dust and cinders, soft ember crackles fading out, dark fantasy, no music, 2.5 seconds",
+    "sesiones": [
+     "LuiKqeRuoNeBqCLOdHBc",
+     "HW8QZi00ou4cmWEJ5qOe",
+     "GZGlBbnXZlje6DMOLUJf",
+     "uVvMSaaqMCSm1yQJgozi"
+    ],
+    "generaciones": [
+     "odNuoPPR3K5b2hObjAOP",
+     "todWEC89og7sin1aiIB4",
+     "VA6p2NBipm6F8ETquek6",
+     "4EkqkMZ14Qzi7fJt6r96"
+    ]
+   },
+   "marchito_campana": {
+    "prompt": "A cracked old iron handbell rung urgently four times by an undead bell-ringer: harsh dissonant clanging with a broken rattle, the alarm echoing across an empty ruined village, dark fantasy, no music, 3 seconds",
+    "sesiones": [
+     "MzeMAnSUeT4b3AX9GiON",
+     "wVTSH5QlL8xBBK7wawWN",
+     "hIDHgzqdIkzvm3kP0FIS",
+     "bs2Bf4sgw0POXsp98yYt"
+    ],
+    "generaciones": [
+     "lL6Po2oyeHl09WZw4W26",
+     "VwVsqOHjWYpHhrWyqOTv",
+     "TVkAYdXl8yvVhMq5HH2a",
+     "0ee3tzPl5OfT6imrBwRU"
+    ]
+   },
+   "marchito_farol": {
+    "prompt": "An old iron lantern swung hard and smashed against the ground, bursting into ghostly blue soul fire: glass shattering, a whoosh of flames igniting and crackling, dark fantasy, no music, 1.5 seconds",
+    "sesiones": [
+     "qvuYRT9hyu3mqT0dsC2d",
+     "VIYTCgQs3orfr939k4N3",
+     "28g9AYMEgItuGtEHkQtY",
+     "q8ebJCJoDWUhNu9b6EEb"
+    ],
+    "generaciones": [
+     "CCfWOOWuf1QLFD0mEfMB",
+     "WnvPsHQ1PQk1XpM5B7QT",
+     "TsznYcatZxB7UPQvcVlH",
+     "KPmbEzoJPAdSIUDwRLVU"
+    ]
+   }
+  }
  }
 }
