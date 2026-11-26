@@ -985,7 +985,7 @@
     ]
    },
    "2": {
-    "prompt": "[calm] I am /\u02c8me\u026al\u026as/. I tend the soul fires, as my sisters did... before Valdrenn fell to its oath.",
+    "prompt": "[calm] I am /ˈmeɪlɪs/. I tend the soul fires, as my sisters did... before Valdrenn fell to its oath.",
     "sesiones": [
      "b4UQQjyCim5Cr9LeSPXC",
      "1P4x9GlmfrsOggIDUTSe"
@@ -2501,7 +2501,7 @@
     ]
    },
    "brandt_dolor": {
-    "prompt": "Ser Brandt herido: gru\u00f1ido grave dentro del yelmo y placas que chocan (~0.8 s)",
+    "prompt": "Ser Brandt herido: gruñido grave dentro del yelmo y placas que chocan (~0.8 s)",
     "sesiones": [
      "dk2nQ4yeOmEl5AOQQlyj",
      "DDxKmOpQXZte5Rf06v9S",
@@ -5163,7 +5163,7 @@
  "ballenero": {
   "flow": "yIxYNc9wejnQYo6s9uh8",
   "voz": "1BfrkuYXmEwp8AWqSLWk",
-  "nombre_voz": "Declan Graves \u2013 Haunted Rasps and Old World Dread",
+  "nombre_voz": "Declan Graves – Haunted Rasps and Old World Dread",
   "modelo": "eleven_v4",
   "nota": "Parte 7r: Brann, el Ballenero (el jefe de la Costa de los Huesos, en el Costillar de la Ballena). Tomas a y b de cada frase como ballenero/voz_Na.mp3 / voz_Nb.mp3",
   "lineas": {
