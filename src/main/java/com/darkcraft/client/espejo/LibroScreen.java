@@ -800,6 +800,19 @@ public final class LibroScreen extends Screen {
             EspejoHud.icono(g, EspejoHud.I_CIUDADELA, cx, cy, l * 1.6f);
             if (Math.abs(mx - cx) <= l * 0.8f && Math.abs(my - cy) <= l * 0.8f)
                 hover.add(Component.translatable("darkcraft.morvain.lugar.ciudadela").withStyle(ChatFormatting.DARK_RED));
+            // Velmor, el pueblo marchito (parte 7e): con el mapa de las llanuras
+            if (com.darkcraft.client.morvain.ClientMapa.tiene("llanuras")) {
+                float vx = sx(com.darkcraft.morvain.Velmor.X + 0.5), vy = sy(com.darkcraft.morvain.Velmor.Z - 30.5);
+                EspejoHud.icono(g, EspejoHud.I_CASA, vx, vy, l * 1.15f);
+                Component vn = Component.translatable("darkcraft.morvain.lugar.velmor");
+                if (ppb > 0.05f) {
+                    int w = font.width(vn);
+                    g.drawString(font, vn, Math.round(vx - w / 2f) + 1, Math.round(vy + l * 0.7f) + 1, 0x70F0E2BC, false);
+                    g.drawString(font, vn, Math.round(vx - w / 2f), Math.round(vy + l * 0.7f), 0xFF3A2414, false);
+                    EspejoHud.mezcla();
+                }
+                if (Math.abs(mx - vx) <= l * 0.6f && Math.abs(my - vy) <= l * 0.6f) hover.add(vn.copy().withStyle(ChatFormatting.GOLD));
+            }
             var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
             float ux = sx(u.x() + 0.5), uy = sy(u.z() + 15.5);
             EspejoHud.icono(g, EspejoHud.I_PORTAL, ux, uy, l);
