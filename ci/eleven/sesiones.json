@@ -985,7 +985,7 @@
     ]
    },
    "2": {
-    "prompt": "[calm] I am /ˈmeɪlɪs/. I tend the soul fires, as my sisters did... before Valdrenn fell to its oath.",
+    "prompt": "[calm] I am /\u02c8me\u026al\u026as/. I tend the soul fires, as my sisters did... before Valdrenn fell to its oath.",
     "sesiones": [
      "b4UQQjyCim5Cr9LeSPXC",
      "1P4x9GlmfrsOggIDUTSe"
@@ -2501,7 +2501,7 @@
     ]
    },
    "brandt_dolor": {
-    "prompt": "Ser Brandt herido: gruñido grave dentro del yelmo y placas que chocan (~0.8 s)",
+    "prompt": "Ser Brandt herido: gru\u00f1ido grave dentro del yelmo y placas que chocan (~0.8 s)",
     "sesiones": [
      "dk2nQ4yeOmEl5AOQQlyj",
      "DDxKmOpQXZte5Rf06v9S",
@@ -5156,6 +5156,257 @@
      "w70HrMmGkktWxgU0zYV7",
      "JYQms9OEHwwHTZkAwXkh",
      "CJsIpvttXiTTJ3Xv2rRa"
+    ]
+   }
+  }
+ },
+ "ballenero": {
+  "flow": "yIxYNc9wejnQYo6s9uh8",
+  "voz": "1BfrkuYXmEwp8AWqSLWk",
+  "nombre_voz": "Declan Graves \u2013 Haunted Rasps and Old World Dread",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7r: Brann, el Ballenero (el jefe de la Costa de los Huesos, en el Costillar de la Ballena). Tomas a y b de cada frase como ballenero/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[gravelly, low] Another hand for the boats? Good... [grim chuckle] grab a line, lad. She's surfacing.",
+    "sesiones": [
+     "SNrvHM9ejbud9Kqj5Xjz",
+     "cWqebzXFhQa9nUkEW64W"
+    ],
+    "generaciones": [
+     "P3wRZ4zLDcr8Y8DuOOs6",
+     "1EsjYOHDy6KLa6GeeSrx"
+    ]
+   },
+   "2": {
+    "texto": "[shouting, wild-eyed] There she blows! [roaring] THERE... SHE... BLOWS!",
+    "sesiones": [
+     "Nv3RWJ8BdoVKLZKqVMpJ",
+     "zqHC9DGwl4vsVBFeU77e"
+    ],
+    "generaciones": [
+     "MkeaxYbNC5NmdLQqvYVf",
+     "mqSglOWL56mifdcFc2I6"
+    ]
+   },
+   "3": {
+    "texto": "[cold, quiet] Overboard. [pause] The sea keeps what it takes.",
+    "sesiones": [
+     "HtLvG5ODT2P80wTEBXJU",
+     "lfG8B1fEjijeuFBR8mhv"
+    ],
+    "generaciones": [
+     "mv9wUz8CdPyLqNNE3Dho",
+     "mI5oQxAHjuuCbtfvs8vl"
+    ]
+   },
+   "4": {
+    "texto": "[intense, hoarse] Forty years I've hunted her... [growling] she won't slip me now.",
+    "sesiones": [
+     "b7EBKLLTSkPtYEpVUBzn",
+     "XfkxdNvGnKe9HFMh26LI"
+    ],
+    "generaciones": [
+     "kx6p41feJ91XP13MjK1g",
+     "TFGANa0wgWIZG5FCPsA3"
+    ]
+   },
+   "5": {
+    "texto": "[weak, breathless, wondering] The tide... d'you hear it? [softly] The tide's... coming back...",
+    "sesiones": [
+     "L7XRTIHEzzcIp8KvdYBm",
+     "BkHR5K7KSFOWFtY7FM71"
+    ],
+    "generaciones": [
+     "mvB9ie3puuHBTIclrF2y",
+     "OPJocqg2hLGyCQ2SMEjB"
+    ]
+   }
+  }
+ },
+ "sfx_ballenero": {
+  "flow": "yIxYNc9wejnQYo6s9uh8",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7r: Brann, el Ballenero (grito, arpon lanzado, tiron de la cuerda, arponazo, cuchillo de descarnar, farol de aceite, la Vieja que sale, su embestida, dolor, muerte y espera) y el viento del Costillar (costillar_ambiente). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "ballenero_grito": {
+    "prompt": "An old whaler's furious battle roar echoing inside a cathedral of giant whale bones, a hoarse gravelly scream, then a deep haunting ghostly whale call answering from far away, dark fantasy boss, no music",
+    "sesiones": [
+     "Ula5cj2LsGEnSK13XPcg",
+     "0tLCOzmICz0n7NlpyotK",
+     "owM0tIX9r6hiu7Rml4CS",
+     "vBggUdQlaCgQDC1akNS6"
+    ],
+    "generaciones": [
+     "lKdp1x2WE3ui8kmJJgOa",
+     "RqnmsBg7xACLASJrHSQ2",
+     "vYhgc8inE3hKkmhgmpB4",
+     "cNA4HsFvIjg4pBhgEp6x"
+    ]
+   },
+   "ballenero_arpon": {
+    "prompt": "A heavy iron whaling harpoon is hurled hard: a deep whoosh and a thick rope uncoiling fast and rattling behind it, then a meaty thunk as it bites, dark fantasy, no music",
+    "sesiones": [
+     "covZnKDgWnRFJu6yH2Mj",
+     "SbsySzTf4aR2vmnXAGiR",
+     "LPYUNMOcbpVcvm7FwDW4",
+     "YvzFm6HYBBZL0vuiA8cN"
+    ],
+    "generaciones": [
+     "QpvKmjEBCvdaNBGXfglO",
+     "tVT4fKRXJ1SCyJdQ3IPr",
+     "jRadFU8zLz0wo8uPgMMv",
+     "0uY7yC3xmbenBAqrbJv0"
+    ]
+   },
+   "ballenero_tiron": {
+    "prompt": "A thick wet whaling rope snaps taut with a creak and is yanked violently, a heavy body dragged fast through sand and gravel, dark fantasy, no music",
+    "sesiones": [
+     "05g7o31owGDjEuKARdtJ",
+     "j92vfn3DGFMaueQYCU13",
+     "0TfWcgl5aH3zWpW8hJcX",
+     "GL95p5zX71oX4OqlxnQV"
+    ],
+    "generaciones": [
+     "RkQF1rk5Tqz5eutsmqT7",
+     "dsxjfgt34VfXQgDuNLxU",
+     "VAsU1xRkAqpnUnJs800H",
+     "U2HHKJkA0YmrB5wzxsqc"
+    ]
+   },
+   "ballenero_arponazo": {
+    "prompt": "A huge barbed iron harpoon thrust: a short heavy swing and a brutal piercing impact with a crunch of bone and metal, dark fantasy melee, no music",
+    "sesiones": [
+     "E048sKuKSdt55yK9S2N2",
+     "8NNHiL3GND4uDrO3OLlk",
+     "qMUZ4C6WeAOpOoj6s9qV",
+     "offVYntpTmsa2ExeNT2i"
+    ],
+    "generaciones": [
+     "oWKY98CVswDyYKyYC2cC",
+     "kB6nTWmdV3tvxjROnRzc",
+     "ex99sH7JnaDr1lh7DMMK",
+     "WEe1FZ38VKNF5cKK6Cty"
+    ]
+   },
+   "ballenero_cuchillo": {
+    "prompt": "Two fast heavy slashes of a long curved flensing knife cutting the air, a sharp metallic swish and a wet blade ring, dark fantasy melee, no music",
+    "sesiones": [
+     "dKvrDFiAwwzaAE2H6dt6",
+     "tx8VFya8TYqMuZSr7LF9",
+     "rKEsJakW83wFUUzpF2El",
+     "knLucJcvDanv9xoVZng9"
+    ],
+    "generaciones": [
+     "zsKKW3CEJ6Yl6MH8bojd",
+     "WnFIkiSJnbVZLit01WuD",
+     "8yUM7CcoopK8q7w47FDM",
+     "u7Qex7RFyPLtdUIhXTeb"
+    ]
+   },
+   "ballenero_aceite": {
+    "prompt": "An old glass whale-oil lantern shatters on stone and the spilled oil bursts into roaring flames that spread across the ground, crackling fire, dark fantasy, no music",
+    "sesiones": [
+     "7sbouAiYWBCgw0WBWUbZ",
+     "eY9Sd0B2iAKtpWWVRhFt",
+     "TgjZM5AWnUDHqx4DOrwK",
+     "G93CL9eYJTj3jRa9OLjS"
+    ],
+    "generaciones": [
+     "raSx3e0MD4QiZdKYXe51",
+     "AzPzFxCCHZ10eE1gmGgn",
+     "HTW603ItCVuLGauEbcb1",
+     "2bAuRP6DWUre3ncYcWm7"
+    ]
+   },
+   "ballenero_vieja": {
+    "prompt": "A colossal ghost whale surfaces: an enormous haunting whale song, distorted, reverberant and otherworldly, giant bones creaking and grinding, a deep rumbling swell, dark fantasy boss, no music",
+    "sesiones": [
+     "6XhUsjtWW8blZGm79RZn",
+     "eX0RPohPGFM1os7AsNDn",
+     "w3tSNj5uichO2ia6OLKi",
+     "50LryQJwya8WR3bG4ddr"
+    ],
+    "generaciones": [
+     "MVGJaZD18UBAnH0qGMwm",
+     "OicidHFzi1YaYvuRR67k",
+     "5QL7IJbmIVHkHw3a7VmR",
+     "pJS54X87pWLvnsgysPU1"
+    ]
+   },
+   "ballenero_embestida": {
+    "prompt": "A gigantic spectral whale charges past through sand: a huge rushing roar like a breaking wave, sand and bones rattling and scattering, a deep booming impact as it dives, dark fantasy, no music",
+    "sesiones": [
+     "eQCTNQHu6JnVDyG1zjSO",
+     "0G6PebD48tnoXyf8my5h",
+     "klEP09griSwDhSA1oTGr",
+     "Ls1KHrPXWZNEoYKUBKch"
+    ],
+    "generaciones": [
+     "GKBLJHNOONJ2PFr4IsmT",
+     "790nypcUXZllgBlA1W7F",
+     "RZh3dqsmsMLLD2fUeCzL",
+     "mYweYAB9W3I3HgyQWZWo"
+    ]
+   },
+   "ballenero_dolor": {
+    "prompt": "An old sea-hardened man grunts in pain through gritted teeth, a rope creaks and salt crust cracks, short, dark fantasy, no music",
+    "sesiones": [
+     "K21NJOumnPLJXLpQ2hHW",
+     "4KEERBuTGxiJFMbFmh3O",
+     "AwlxOIt6XMiQXJJnL2si",
+     "SdkfLOKvU9aEGSxNZHDb"
+    ],
+    "generaciones": [
+     "XV5Gatkq9Ey7fMJcOkof",
+     "FMMBDFS7DNPs3SZfs2d5",
+     "5DLrQymSzIERx7cv6BCG",
+     "osiPCGvtz1dsng3QkRDa"
+    ]
+   },
+   "ballenero_muerte": {
+    "prompt": "An old whaler falls to his knees with a long tired sigh, a heavy iron harpoon clatters onto stone, then distant ocean waves slowly rolling back in and a faint whale song fading away, dark fantasy, no music",
+    "sesiones": [
+     "jwM6GNE9D05SSmPwJ2ii",
+     "TIoGTYAgMLcd0z3RspP6",
+     "I32gK3ATSkx09BXXvHO5",
+     "ROI2Vtiwbjoh3vzWMDK3"
+    ],
+    "generaciones": [
+     "YP5yPql27s9IjacGVOQn",
+     "l5JL7U1R0c3NyrfOOI1C",
+     "IQtmF9UD7saxXV9cvHiu",
+     "D8QJqMDUf6sAnr9Td8Pi"
+    ]
+   },
+   "ballenero_espera": {
+    "prompt": "Idle ambience of a waiting whaler, 10 seconds: a taut rope slowly creaking, cold wind whistling through giant whale bones, a low distant hum, quiet and tense, no music",
+    "sesiones": [
+     "L27VS44nC37ap6HHCqEm",
+     "xBMU5WaugFXSfRtxUn4b",
+     "MqZN4C95Rne7cnxBq2WO",
+     "7DK1UG5YRrLtazLn8iyd"
+    ],
+    "generaciones": [
+     "pnDaQwgpt6TgWP5oZAgl",
+     "hhsg0fOQ2NgBDLbJjXXT",
+     "Ag49Z23YBSoB4hVBPFCX",
+     "YaTLeH1wgUdNtnl1Mi0T"
+    ]
+   },
+   "costillar_ambiente": {
+    "prompt": "Ambience inside the ribcage of a colossal ancient whale skeleton on a dead dry coast, 20 seconds: wind howling and moaning through enormous hollow ribs, deep resonant bone hum, sand hissing, very distant thunder of a sea that never comes, no music",
+    "sesiones": [
+     "8swqmZ7P441k6qggXWlQ",
+     "zTvddHzUv1bqKQFsi46L",
+     "PdpzdZlg8P6OaXEdnLsS",
+     "V7XepIkLhLhkxEcQEhOQ"
+    ],
+    "generaciones": [
+     "U7RHYSI08bWKCqucNVar",
+     "4ewTMTMdBtEGDPK5FB7F",
+     "wm0EBPuUYQI0MO68bLIr",
+     "2YtPvBHUrFCKSx1N8hQd"
     ]
    }
   }
