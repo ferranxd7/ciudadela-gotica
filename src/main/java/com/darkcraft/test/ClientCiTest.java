@@ -8625,7 +8625,7 @@ public final class ClientCiTest {
         t += 50;
         atTicks(t, "captura", m -> shot(m, "cliente_mv231_aula"));
         t += 10;
-        atTicks(t, "La academia: la torre del archivo", m -> server(m, sp -> irMirando(sp, CX + 15.5, PISO + 3, CZ - 22.5, CX + 25, PISO + 28, CZ - 53, true)));
+        atTicks(t, "La academia: la torre del archivo", m -> server(m, sp -> irMirando(sp, CX + 19.5, PISO + 3, CZ - 31.5, CX + 25, PISO + 22, CZ - 53, true)));
         t += 50;
         atTicks(t, "captura", m -> shot(m, "cliente_mv232_torre"));
         t += 10;
@@ -8633,11 +8633,11 @@ public final class ClientCiTest {
         t += 50;
         atTicks(t, "captura", m -> shot(m, "cliente_mv233_archivo"));
         t += 10;
-        atTicks(t, "La academia: la veta de amatista", m -> server(m, sp -> irMirando(sp, CX - 16.5, PISO + 4, CZ - 16.5, CX - 27, PISO + 3, CZ - 33, true)));
+        atTicks(t, "La academia: la veta de amatista", m -> server(m, sp -> irMirando(sp, CX - 20.5, PISO + 4, CZ - 7.5, CX - 28, PISO + 3, CZ - 22, true)));
         t += 50;
         atTicks(t, "captura", m -> shot(m, "cliente_mv234_veta"));
         t += 10;
-        atTicks(t, "La academia: todo desde lo alto", m -> server(m, sp -> irMirando(sp, CX + 58.5, PISO + 56, CZ + 74.5, CX, PISO, CZ - 10, true)));
+        atTicks(t, "La academia: todo desde lo alto", m -> server(m, sp -> irMirando(sp, CX + 40.5, PISO + 34, CZ + 56.5, CX, PISO + 4, CZ - 10, true)));
         t += 90;
         atTicks(t, "captura", m -> {
             shot(m, "cliente_mv235_academia_alto");
@@ -8645,12 +8645,17 @@ public final class ClientCiTest {
         });
         t += 10;
         // ---- en supervivencia, en el patio de entrada: los golpes de los eruditos, de lado
+        final double ex = CX + 0.5, ez = CZ + 33.5;
+        // (antes del primer golpe, el jugador ya en el patio de entrada: asi sus chunks y los eruditos que salgan se ven)
         atTicks(t, "La academia: a pelear (supervivencia)", m -> {
             m.options.hideGui = false;
-            server(m, sp -> comando(sp, "darkcraft academia enemigos fuera"));
+            server(m, sp -> {
+                comando(sp, "darkcraft academia enemigos fuera");
+                aPelear(sp, true);
+                irMirando(sp, ex, PISO, ez + 3.0, ex, PISO + 1.4, ez, false);
+            });
         });
-        t += 4;
-        final double ex = CX + 0.5, ez = CZ + 33.5;
+        t += 30;
         final int AP = com.darkcraft.enemigos.Erudito.APRENDIZ, MA = com.darkcraft.enemigos.Erudito.MAESTRO, CU = com.darkcraft.enemigos.Erudito.CUSTODIO;
         t = golpeErudito(t, "mv236_plumazo", AP, com.darkcraft.enemigos.EruditoAnims.PLUMAZO, 1.9, 9, ex, ez, PISO) + 26;
         t = golpeErudito(t, "mv237_tintero", AP, com.darkcraft.enemigos.EruditoAnims.TINTERO, 7.0, 18, ex, ez, PISO) + 2;
@@ -8671,7 +8676,7 @@ public final class ClientCiTest {
         t += 30;
         // las runas: el circulo bajo los pies del jugador, visto desde arriba y de lado
         t = golpeErudito(t, "mv241_runas", MA, com.darkcraft.enemigos.EruditoAnims.RUNAS, 6.0, 26, ex, ez, PISO);
-        atTicks(t, "camara: las runas desde arriba", m -> verDesde(m, new Vec3(ex + 3.5, PISO + 5.5, ez + 6.0 + 3.5), new Vec3(ex, PISO, ez + 6.0)));
+        atTicks(t, "camara: las runas desde arriba", m -> verDesde(m, new Vec3(ex + 3.0, PISO + 6.0, ez + 1.0), new Vec3(ex, PISO, ez + 6.0)));
         t += 13;
         atTicks(t, "captura: las runas revientan", m -> {
             server(m, sp -> log("  las runas revientan: " + estadoEruditos() + String.format(java.util.Locale.ROOT, " | jugador en %.2f (sube %.2f)", sp.getY(),
