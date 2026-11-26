@@ -11,7 +11,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza",
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
-         22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain"}
+         22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -393,6 +393,16 @@ LIBROS = {
    "Night of the red sky, third hour. The fire falling on the capital is not fire: it is lines. They join stars that were on no chart. I have sent my masters to their lecterns and closed the door with the seal. No one goes down until we have read it all.",
    "Sixth hour. I can read it now. It is a name, written with the stars of the whole sky, and it is no one's name who was ever born. The more I read it, the clearer it shows. My masters no longer speak: they copy. I cannot take my eye from the telescope.",
    "I do not know the hour. This night does not end. It is no longer I who read: something reads me, line by line, from above. If anyone finds these pages, do not look through the telescope. And if you see me still standing before it, make me lower my eyes. Please.\n\nYsolde"]),
+ },
+ 26: {
+  "es": ("El cuaderno del farero", "Tomé, farero del Puerto Varado", [
+   "Noche del cielo rojo. Con la marea alta, el mar se fue. No bajó: se fue, todo de golpe, como si alguien se lo bebiera. Las barcas se quedaron tumbadas en la arena, y la ballena que seguía a la flota quedó varada en mitad de la bahía.",
+   "Al amanecer bajaron todos a la arena a recoger los peces, las conchas, lo que el mar había dejado. Les grité desde la galería que subieran. No subieron. El mar no volvió y la sal empezó a subirles por las piernas. Ahora siguen ahí abajo, faenando.",
+   "He encendido el faro con fuego frío: es lo único que todavía arde. Si alguien lee esto, que no baje a la bahía. Y que no vaya al norte, al Costillar: el viejo Brann, el ballenero, sigue allí arponeando una ballena que hace mucho que no está.\n\nTomé, farero del Puerto Varado"]),
+  "en": ("The Lighthouse Keeper's Notebook", "Tomé, keeper of the Stranded Harbour's light", [
+   "Night of the red sky. At high tide the sea went away. It did not ebb: it went, all at once, as if someone had drunk it. The boats were left lying on the sand, and the whale that followed the fleet was stranded in the middle of the bay.",
+   "At dawn everyone went down onto the sand to gather the fish, the shells, whatever the sea had left. I shouted from the gallery for them to come up. They did not. The sea did not come back, and the salt began to creep up their legs. Now they are still down there, at work.",
+   "I have lit the lighthouse with cold fire: it is the only thing that still burns. If anyone reads this, do not go down into the bay. And do not go north, to the Ribcage: old Brann the whaler is still there, harpooning a whale that has long been gone.\n\nTomé, keeper of the Stranded Harbour's light"]),
  },
 }
 

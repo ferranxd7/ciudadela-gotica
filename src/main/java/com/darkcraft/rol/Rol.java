@@ -347,6 +347,18 @@ public final class Rol {
         s.pausa = Math.max(s.pausa, pausa);
     }
 
+    /**
+     * Lo que se lleva un golpe que deja sin aliento (el punado de sal del salinero, parte 7q): baja la estamina (no de 0) y
+     * tarda un poco mas en volver. Nada en creativo ni en la prueba de la CI.
+     */
+    public static void quitarEstamina(ServerPlayer sp, float cuanto) {
+        if (libre(sp)) return;
+        Estado s = de(sp);
+        s.estamina = Math.max(0f, s.estamina - cuanto);
+        s.pausa = Math.max(s.pausa, PAUSA + 10);
+        s.enviadaDec = -1;
+    }
+
     // ------------------------------------------------------------------ estamina: atacar, saltar y cubrirse
 
     @SubscribeEvent

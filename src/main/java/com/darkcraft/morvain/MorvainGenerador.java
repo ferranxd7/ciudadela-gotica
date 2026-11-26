@@ -207,6 +207,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el observatorio en el chunk {}", c.getPos(), t);
         }
+        // el Puerto Varado, en la Costa de los Huesos, a la puerta del santuario del Faro de los Huesos (parte 7q)
+        try {
+            if (Varadero.toca(c.getPos().x, c.getPos().z)) Varadero.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el puerto varado en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

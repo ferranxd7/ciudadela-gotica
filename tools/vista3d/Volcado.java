@@ -732,6 +732,42 @@ public class Volcado {
                 for (var o : v.esperas()) marcas.put((n == 0 ? "Y" : "E") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
                 andarObservatorio(lvl, v);
             }
+            case "morvain_puerto" -> {
+                // el Puerto Varado (parte 7q): el pueblo (el arco de costillas, la plaza con el ancla, la lonja, las casas, los
+                // secaderos, las salinas, el varadero y la casa del farero), el muelle, la bahia seca (las barcas y la ballena), el
+                // espigon y el Faro de los Huesos (-Dcaja=x0,z0,x1,z1 para un trozo)
+                int PX = com.darkcraft.morvain.Varadero.CX, PZ = com.darkcraft.morvain.Varadero.CZ;
+                String[] k = System.getProperty("caja", (PX - 62) + "," + (PZ - 68) + "," + (PX + 126) + "," + (PZ + 64)).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 40);
+                com.darkcraft.morvain.Varadero v = com.darkcraft.morvain.Varadero.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("El puerto: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " salobres; "
+                        + v.casas + " casas, " + v.barcas + " barcas, " + v.costillas + " costillas, " + v.norays + " norays, " + v.secaderos
+                        + " secaderos, " + v.estanques + " estanques, " + v.montones + " montones de sal, " + v.faroles + " faroles, " + v.escalones
+                        + " escalones; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas()) marcas.put("S" + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarPuerto(lvl, v);
+            }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);
@@ -1079,6 +1115,49 @@ public class Volcado {
      * reja quitada; la azotea por su escala) y a cada uno de los que esperan; ninguno metido en un bloque (la Rectora mide 3,3)
      * y todos con suelo. Con el sello cerrado no se pasa del vestibulo a la rotonda.
      */
+    /**
+     * El Puerto Varado (parte 7q): se llega a pie desde la entrada (junto al santuario) a cada sitio (la bahia por las escaleras
+     * del muelle y la grada, lo alto del faro por su escalera) y a cada salobre; ninguno esta metido en un bloque y todos tienen
+     * suelo (el agua de los charcos cuenta como suelo: se pisa el barro de debajo).
+     */
+    static void andarPuerto(WorldGenLevel lvl, com.darkcraft.morvain.Varadero v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+            BlockState s = MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+            return s.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || s.getBlock() instanceof net.minecraft.world.level.block.SnowLayerBlock
+                    && s.getValue(net.minecraft.world.level.block.SnowLayerBlock.LAYERS) <= 4 ? aire : s;
+        };
+        int[] e = v.sitio("entrada");
+        int X = com.darkcraft.morvain.Varadero.CX, Z = com.darkcraft.morvain.Varadero.CZ;
+        var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], X - 60, Z - 66, X + 124, Z + 62, 6_000_000);
+        StringBuilder sb = new StringBuilder("a pie desde la entrada: " + z0.celdas() + " celdas;");
+        for (String s : v.sitios().keySet()) {
+            int[] q = v.sitio(s);
+            sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+        }
+        System.out.println(sb);
+        int malos = 0, chocan = 0, sinSuelo = 0;
+        for (var o : v.esperas()) {
+            if (!z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                malos++;
+                System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z());
+            }
+            for (int dy = 0; dy < 2; dy++) {
+                BlockState st = mundo.en(o.x(), o.y() + dy, o.z());
+                if (choca(st)) {
+                    chocan++;
+                    System.out.println("  " + o.grupo() + " metido en un bloque: " + o.x() + "," + (o.y() + dy) + "," + o.z() + " " + st);
+                }
+            }
+            BlockState abajo = mundo.en(o.x(), o.y() - 1, o.z());
+            if (!choca(abajo) && !abajo.is(Blocks.WATER)) {
+                sinSuelo++;
+                System.out.println("  " + o.grupo() + " sin suelo: " + o.x() + "," + o.y() + "," + o.z() + " " + abajo);
+            }
+        }
+        System.out.println("salobres: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
+    }
+
     static void andarObservatorio(WorldGenLevel lvl, com.darkcraft.morvain.Observatorio v) {
         BlockState aire = Blocks.AIR.defaultBlockState();
         com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {

@@ -4410,5 +4410,131 @@
         "stream": true
       }
     ]
+  },
+  "sfx.salobre_gemido": {
+    "subtitle": "subtitles.darkcraft.sfx.salobre_gemido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/salobre_gemido_1"
+      },
+      {
+        "name": "darkcraft:sfx/salobre_gemido_2"
+      }
+    ]
+  },
+  "sfx.salobre_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.salobre_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/salobre_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/salobre_alerta_2"
+      }
+    ]
+  },
+  "sfx.salobre_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.salobre_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/salobre_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/salobre_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/salobre_dolor_3"
+      }
+    ]
+  },
+  "sfx.salobre_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.salobre_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/salobre_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/salobre_muerte_2"
+      }
+    ]
+  },
+  "sfx.salobre_plomo": {
+    "subtitle": "subtitles.darkcraft.sfx.salobre_plomo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/salobre_plomo_1"
+      },
+      {
+        "name": "darkcraft:sfx/salobre_plomo_2"
+      }
+    ]
+  },
+  "sfx.salobre_red": {
+    "subtitle": "subtitles.darkcraft.sfx.salobre_red",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/salobre_red_1"
+      },
+      {
+        "name": "darkcraft:sfx/salobre_red_2"
+      }
+    ]
+  },
+  "sfx.salobre_garfio": {
+    "subtitle": "subtitles.darkcraft.sfx.salobre_garfio",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/salobre_garfio_1"
+      },
+      {
+        "name": "darkcraft:sfx/salobre_garfio_2"
+      }
+    ]
+  },
+  "sfx.salobre_rastrillo": {
+    "subtitle": "subtitles.darkcraft.sfx.salobre_rastrillo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/salobre_rastrillo_1"
+      },
+      {
+        "name": "darkcraft:sfx/salobre_rastrillo_2"
+      }
+    ]
+  },
+  "sfx.salobre_sal": {
+    "subtitle": "subtitles.darkcraft.sfx.salobre_sal",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/salobre_sal_1"
+      },
+      {
+        "name": "darkcraft:sfx/salobre_sal_2"
+      }
+    ]
+  },
+  "sfx.salobre_alzarse": {
+    "subtitle": "subtitles.darkcraft.sfx.salobre_alzarse",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/salobre_alzarse_1"
+      },
+      {
+        "name": "darkcraft:sfx/salobre_alzarse_2"
+      }
+    ]
+  },
+  "ambiente.costa": {
+    "subtitle": "subtitles.darkcraft.ambiente.costa",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/costa_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/costa_ambiente_2",
+        "stream": true
+      }
+    ]
   }
 }

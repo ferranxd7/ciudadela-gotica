@@ -49,6 +49,10 @@ import java.util.List;
  * puesto 0, grupo de los jefes), dos custodios a la puerta del vestibulo, un maestro entre los instrumentos y dos aprendices en
  * el camino ({@link Observatorio#esperas}). Con la Rectora caida, los eruditos que esperaban leyendo (aqui y en la Academia)
  * descansan: ya no vuelven.</li>
+ * <li><b>El Puerto Varado</b> (sitio {@value #PUERTO}, parte 7q): los salobres que apunta el plano ({@link Varadero#esperas}):
+ * rederos remendando de rodillas en la plaza, en la lonja, en el muelle y en el espigon; bicheros de ronda o mirando al mar que no
+ * esta (en el muelle, a la puerta y en lo alto del faro); salineros faenando en las salinas y enterrados en las costras de sal de
+ * la bahia, junto a las barcas y dentro de la ballena.</li>
  * </ul>
  * Nadie a menos de 18 bloques del arco ni de 14 de un santuario.
  */
@@ -57,10 +61,11 @@ public final class MorvainEnemigos {
 
     public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo",
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
-            CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio";
+            CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio",
+            PUERTO = "puerto";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
-            ERUDITO = "erudito", RECTORA = "rectora";
+            ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
@@ -69,7 +74,8 @@ public final class MorvainEnemigos {
     private static final List<Puesto> VELMOR_P = new ArrayList<>(), LLANURAS_P = new ArrayList<>(), MOLINO_P = new ArrayList<>(),
             ARBOLEDA_P = new ArrayList<>(), PATIBULO_P = new ArrayList<>(), PILOTES_P = new ArrayList<>(), LAGUNA_P = new ArrayList<>(),
             BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>(), ERMITA_P = new ArrayList<>(), CUMBRE_P = new ArrayList<>(),
-            CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>();
+            CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>(),
+            PUERTO_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -183,6 +189,9 @@ public final class MorvainEnemigos {
         for (Observatorio.Espera e : Observatorio.get().esperas())
             OBSERVATORIO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? RECTORA : ERUDITO, e.variante(), e.x(), e.y(), e.z(), e.giro(),
                     e.postura(), e.ronda(), e.grupo()));
+        // ---- el Puerto Varado (parte 7q): los salobres que apunta el plano
+        for (Varadero.Espera e : Varadero.get().esperas())
+            PUERTO_P.add(new Puesto(SALOBRE, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -229,6 +238,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(CONDESTABLE, DarkCraftMod.CONDESTABLE);
         Puestos.tipo(ERUDITO, DarkCraftMod.ERUDITO);
         Puestos.tipo(RECTORA, DarkCraftMod.RECTORA);
+        Puestos.tipo(SALOBRE, DarkCraftMod.SALOBRE);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -251,6 +261,7 @@ public final class MorvainEnemigos {
         Puestos.registrar(ACADEMIA, ACADEMIA_P, Morvain::es, (l, p) -> p.postura() != REZA || !Observatorio.enPaz(l.getServer()));
         Puestos.registrar(OBSERVATORIO, OBSERVATORIO_P, Morvain::es,
                 (l, p) -> Puestos.JEFE.equals(p.grupo()) || p.postura() != REZA || !Observatorio.enPaz(l.getServer()));
+        Puestos.registrar(PUERTO, PUERTO_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -336,6 +347,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> observatorio() {
         preparar();
         return List.copyOf(OBSERVATORIO_P);
+    }
+
+    public static List<Puesto> puerto() {
+        preparar();
+        return List.copyOf(PUERTO_P);
     }
 
     public static List<Puesto> velmor() {
@@ -927,6 +943,60 @@ public final class MorvainEnemigos {
         return 1;
     }
 
+    /** {@code /darkcraft puerto [ir <sitio> | enemigos [volver | fuera | sacar]]} (parte 7q): el Puerto Varado. */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoPuerto() {
+        return net.minecraft.commands.Commands.literal("puerto")
+                .executes(c -> decir(c, estadoPuerto(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irPuerto(c.getSource(), "entrada"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Varadero.get().sitios().keySet(), b))
+                                .executes(c -> irPuerto(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoPuerto(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), PUERTO, false);
+                            return decir(c, "vuelven todos los salobres");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), PUERTO, true);
+                            return decir(c, "fuera todos los salobres");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            net.minecraft.server.level.ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, PUERTO).size();
+                            return decir(c, "fuera " + n);
+                        })));
+    }
+
+    private static int irPuerto(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Varadero.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Varadero.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando hacia el faro (desde el faro, hacia el pueblo)
+        double tx = Varadero.CX + Varadero.FARO_U, tz = Varadero.CZ + Varadero.FARO_V;
+        if (Math.hypot(tx - s[0], tz - s[2]) < 12) {
+            tx = Varadero.CX;
+            tz = Varadero.CZ;
+        }
+        float giro = (float) (Math.toDegrees(Math.atan2(tz - s[2], tx - s[0])) - 90.0);
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
+        return 1;
+    }
+
+    /** Cuantos salobres quedan y cuantos andan fuera (y como esta el puerto, si esta cargado). */
+    public static String estadoPuerto(net.minecraft.server.MinecraftServer srv) {
+        String s = "puerto varado: quedan " + Puestos.quedan(srv, PUERTO) + " de " + PUERTO_P.size() + " (fuera " + Puestos.fuera(PUERTO) + ")";
+        var m = Morvain.nivel(srv);
+        int[] at = Varadero.get().sitio("atril");
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(at[0], at[1], at[2]))) s += "; " + Varadero.resumen(m);
+        return s;
+    }
+
     /** Cuantos eruditos quedan y cuantos andan fuera (y como esta la academia, si esta cargada). */
     public static String estadoAcademia(net.minecraft.server.MinecraftServer srv) {
         String s = "academia espectral: quedan " + Puestos.quedan(srv, ACADEMIA) + " de " + ACADEMIA_P.size() + " (fuera "
@@ -1124,6 +1194,7 @@ public final class MorvainEnemigos {
         todos.addAll(JURAMENTO_P);
         todos.addAll(ACADEMIA_P);
         todos.addAll(OBSERVATORIO_P);
+        todos.addAll(PUERTO_P);
         for (Puesto p : todos) {
             if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
             for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
@@ -1138,6 +1209,6 @@ public final class MorvainEnemigos {
                 + BARCA_P.size() + " en la barca, " + MONASTERIO_P.size() + " en el monasterio, " + ERMITA_P.size() + " en la escalera de la ermita y "
                 + CUMBRE_P.size() + " en la cumbre, " + CAPITAL_P.size() + " en la puerta oeste de la capital, " + JURAMENTO_P.size()
                 + " en el patio del Juramento, " + ACADEMIA_P.size() + " en la academia espectral, " + OBSERVATORIO_P.size()
-                + " en el observatorio; cerca del arco o de un santuario " + cerca;
+                + " en el observatorio, " + PUERTO_P.size() + " en el puerto varado; cerca del arco o de un santuario " + cerca;
     }
 }

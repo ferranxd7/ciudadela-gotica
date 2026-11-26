@@ -2316,6 +2316,92 @@ ella").
   (`mv275`), su celda abierta (`mv276`), su libro (`mv277`) y el bestiario (`mv278`). `LIMIT` 78 min (`lanzar.sh` 84 y 82 min, el
   paso 115, el trabajo 160).
 
+### Plan grande, parte 7q: la Costa de los Huesos — los Salobres y el Puerto Varado
+
+Respuestas 125, 131 y 132 del plan; la septima region con su contenido (despues, la **7r**: el jefe de la costa, el Ballenero —"el
+viejo Brann sigue arponeando una ballena que hace mucho que no esta", libro 26— en el Costillar de la Ballena, (5244, 3000)).
+- **El salobre** (`enemigos/Salobre`, entidad `darkcraft:salobre`, 0,65 x 1,95; modelo de `tools/enemigos/salobre.py`: chubasquero
+  de hule mostaza con costras de sal, botas altas, cristales de sal en los hombros y la cabeza, la piel blanca y agrietada y los ojos
+  con una luz fria de agua en la capa de brillo; `SalobreGeometria/Animaciones`, `SalobreAnims`, `client/enemigos/SalobreModelo` y
+  `SalobreRenderer`). **Andan** (no flotan). La gente del puerto: la noche del cielo rojo el mar se retiro de golpe, bajaron a la
+  arena a recoger lo que dejaba y el mar no volvio; la sal se los comio. Tres: **redero** (30 de vida, 4,5 de golpe; gorro de lana,
+  la red al hombro y el plomo colgando de su cuerda: la **plomada** —lo voltea por encima de la cabeza y lo descarga— y de 3,6 a 11
+  bloques la **red** —`enemigos/Red`, un `ThrowableItemProjectile` con el dibujo de la telarana a 2,2 que vuela en arco
+  (`Cantaro.tiro`); a quien pilla lo **enreda** 45 ticks (lentitud 6: casi quieto) y se le queda enganchada en los pies (`PEGADA`,
+  sincronizado: el cliente la pone donde esta su presa); si da en el suelo se queda 30 ticks y se deshace; desde que la lanza hasta
+  que acaba la accion el modelo no dibuja la del hombro—), **bichero** (36 y 5,5; el sueste y el bichero, la pertiga con su gancho de
+  hierro: el **garfio** —llega a 4,8; clava y **tira**: arrastra a su presa hacia el, `TIRON` 0,85 menos lo que aguante el empujon— y
+  el **bichazo**, un barrido ancho) y **salinero** (60, 7,5 y 3 de armadura, escala 1,15; sombrero de paja, delantal, los brazos al
+  aire comidos de sal, el saco a la espalda y el rastro de las salinas: el **rastrillazo** —lo estrella delante: frena, y alli queda
+  una **costra de sal** 80 ticks, radio 2,3, que frena a quien la pisa— y la **sal** —un punado a la cara en un cono de 64 grados
+  hasta 4,6: dano x0,5, lentitud, debilidad y se lleva 38 de **estamina** (`Rol.quitarEstamina`, nueva: no en creativo ni en la
+  prueba)—). Esperan **faenando de rodillas** (`REZA`: cada uno lo suyo) o **enterrados en la costra de sal** (`TUMBADO`: el
+  dibujante los hunde 0,22 y se alzan de golpe rompiendo la costra) o de pie. Al morir caen de rodillas, de bruces, y **se deshacen
+  en sal**. Bestiario `salobre_redero` / `salobre_bichero` / `salobre_salinero`, logro `salobre`; a veces una piedra de forja (el
+  salinero, alguna II). Contadores: `REDES`, `ENREDADOS`, `GARFIOS`, `ARRASTRE`, `COSTRAS`, `FRENADOS`, `SALES`, `SALADOS`,
+  `ALZADOS`, `DESHECHOS`, `Red.PILLAN` / `AL_SUELO`.
+- **El Puerto Varado** (`morvain/Varadero`, en la Costa de los Huesos, junto al santuario del Faro de los Huesos —(5612, 4779), su
+  tarima no se toca: radio 11—; `CX` 5640, `CZ` 4740, `SUELO` 65 —el de la tarima—, `PISO` 66 y `FONDO` 57 —el de la bahia—; u = x -
+  CX, v = z - CZ; se dibuja chunk a chunk al adornar y en su caja `Adorno` no pone nada). El mar de verdad queda a unos 650 bloques al
+  este: el puerto se quedo en seco. El **pueblo** (u -54..23, v -60..56, allanado): el **arco de costillas** de ballena sobre el camino
+  del santuario (`arcoHueso`), la **plaza** redonda con el **ancla** del monumento sobre su peana, los bancos y el **pozo** seco, la
+  **lonja** (nave abierta de postes de picea con tejado a dos aguas hundido por un lado, mesas de piedra, barriles, la balanza y las
+  redes colgadas), siete **casas** de pescadores (`casa`: zocalo, paredes de cal, picea o piedra de arena, ventanas, tejado a dos
+  aguas con hastiales, algunas en ruinas; dentro mesa, barril, el hogar apagado, redes y la sal que ha entrado) con dos barcas
+  volcadas, los **secaderos** (tres filas de varas con las algas secas encima y las redes), las **salinas** (estanques de sal uno mas
+  bajo que el suelo entre caballones de barro, dos con salmuera, montones de sal), el **varadero** (la **grada** —`GRADA_V` 40, una
+  rampa de losas con dos carriles de madera que baja del pueblo a la bahia cortando el muelle, con medias losas— con el barco a medio
+  hacer —quilla, cuadernas, roda— y sus andamios, y el taller) y la **casa del farero** (al arranque del espigon: estantes, la mesa de
+  cartas, su catalejo, el arcon `chests/puerto_bueno` y el **atril con el libro perdido 26** —"El cuaderno del farero", de Tome;
+  `Perdidos.TOTAL` = 26—). El **muelle** (`MUELLE_U` 22: un muro de sillar de dos que cae ocho bloques a la bahia, algas secas abajo,
+  norays y cadenas en sus argollas, el paseo de losas; dos **escaleras** bajan pegadas al muro, `ESCALERAS`). La **bahia seca**
+  (`bahia`: media elipse desde el muelle, 100 x 60; hasta 0,78 el fondo llano, despues la orilla sube hasta el terreno): arena,
+  **costras de sal** (calcita y hormigon blanco), barro y **charcos** de agua sobre arcilla, corales muertos; cinco **barcas**
+  varadas, escoradas o volcadas (`barca`: el casco puntiagudo hundido un bloque, los bancos, el palo roto y la vela hecha jirones),
+  montones de sal, un ancla perdida con su cadena y la **ballena** (`BALLENA_V` 30: la cola hundida, el espinazo con sus apofisis por
+  encima de siete **costillas** en arco —alguna rota—, la calavera con sus cuencas, el hocico y las dos quijadas tiradas). El
+  **espigon** (`ESPIGON_V` -20, siete de ancho con su pretil, faroles de almas y una bajada a la bahia por el sur, `BAJADA_U`) llega
+  a la roca del **Faro de los Huesos** (`FARO_U` 86, `ROCA_R` 8): la torre de hueso (siete de ancho, bandas de piedra de arena,
+  saeteras), cuatro **costillas** que la abrazan por fuera, dos **quijadas** en arco a la puerta (al oeste), la escalera de caracol
+  de Brumavela (`ANILLO`, tres vueltas de doce peldanos, `FARO_ALTO` 36) con faroles de almas, la **galeria** con su barandilla de
+  hierro y la **linterna** (`LINTERNA` = PISO + 36: cristales azules, la **luz del mar** con el **fuego frio** de almas encima, el
+  arcon `chests/puerto_bueno` y el tejado de piedra de arena con su punta de hueso). Sitios (`Varadero.sitio`): `entrada`, `arco`,
+  `plaza`, `lonja`, `casa_farero`, `atril`, `arcon`, `secadero`, `salinas`, `muelle`, `varadero`, `bahia`, `barcas`, `ballena`,
+  `espigon`, `faro`, `faro_alto`. El Espejo: "El Puerto Varado" (`Varadero.dentro`) y "El Faro de los Huesos" (`enFaro`); logros
+  `puerto` ("Bajamar eterna") al entrar y `faro` ("Luz para nadie", de los que se ven en el cielo) arriba del faro (`arribaDelFaro`).
+  Botin: `chests/puerto` y `puerto_bueno` (cuerda, huesos, algas secas, prismarina, nautilos, oro, frutos del hueso, la tormenta y la
+  pluma, piedras de forja, el talisman del porteador y el del hueso, cenizas de la estocada, la escarcha y la parada, la lanza de la
+  Sombra, un catalejo).
+- **Los puestos** (`MorvainEnemigos`, sitio `puerto`, 33, de `Varadero.esperas`): rederos remendando en la plaza, en la lonja, junto
+  a las casas, en los secaderos, en el borde del muelle, en la grada, en el espigon y junto a una barca; bicheros de ronda o mirando al
+  mar que no esta (la lonja, las casas, los secaderos, el muelle, la puerta de la casa del farero, la grada, el espigon, la puerta del
+  faro y **arriba, en la galeria**); salineros faenando y enterrados en las salinas, enterrados en las costras de la bahia y **dentro de
+  la ballena**, y uno de ronda junto a ella; uno tirado en la casa del farero.
+- **La costa suena** (`ClientMusic.tickCosta`): en la region de la costa entre Y 30 y 160, `ambiente.costa` (viento frio sobre la
+  arena seca, un mar lejano que no llega, barcas varadas que crujen, cabos contra los palos y el zumbido de los huesos; una de dos
+  tomas cada vez).
+- Sonidos (ElevenLabs, flow `0mqKDVbquq0P7oXJ6BVV`, `TOMAS_SFX`): `salobre_gemido` (2 y 3), `salobre_alerta` (3 y 4),
+  `salobre_dolor` (2, 4 y 3), `salobre_muerte` (2 y 1), `salobre_plomo` (2 y 4), `salobre_red` (2 y 1), `salobre_garfio` (4 y 2),
+  `salobre_rastrillo` (4 y 1), `salobre_sal` (2 y 3), `salobre_alzarse` (3 y 4: empiezan tarde, `INICIO` 4,2), `costa_ambiente` (1 y
+  3, `stream`).
+- Comandos `/darkcraft puerto [ir <sitio> | enemigos [volver | fuera | sacar]]` (sin mas: como esta).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_puerto carpeta` (con `--techo Y` para ver dentro): el pueblo, el muelle, la
+  bahia y el faro con las marcas de los salobres (Sn); si se llega a pie desde la entrada a cada sitio (la bahia por las escaleras y
+  la grada, lo alto del faro por su escalera) y a cada salobre (las capas finas de nieve —la sal— no cuentan como bloque; el agua de
+  los charcos vale como suelo), que ninguno esta metido en un bloque y que todos tienen suelo.
+- Pruebas: servidor, lineas `Morvain, el puerto varado: ...` (el atril con el libro 26, el arcon, el fuego del faro, el muelle, el
+  fondo seco, las costillas de la ballena; a pie desde la entrada; vistas `morvain_puerto.png` y `morvain_puerto_pueblo.png`),
+  `Morvain, los salobres: ...`, `Morvain, los salobres en accion: ...` (el de rodillas se levanta y el enterrado se alza; cada accion
+  acaba) y `Morvain, los salobres contra una presa: ...` (la plomada, la red que enreda, el garfio que arrastra, el bichazo, el
+  rastrillazo con su costra que frena, la sal; uno que cae se deshace en sal); cliente, tramo `puerto()` despues del Observatorio:
+  desde el santuario (`cliente_mv279`), bajo el arco (`mv280`), entrar a pie con el cartel, el logro y el viento (`mv281`), la plaza
+  (`mv282`), la lonja (`mv283`), los secaderos (`mv284`), las salinas (`mv285`), el varadero (`mv286`), la bahia desde el muelle
+  (`mv287`), las barcas (`mv288`), la ballena por dentro (`mv289`), el espigon (`mv290`), el faro (`mv291`), su linterna (`mv292`), la
+  bahia desde la galeria con el logro (`mv293`), todo desde lo alto (`mv294`), la casa del farero (`mv295`); en supervivencia, en la
+  calle mayor: la plomada (`mv296`), la red en el aire (`mv297`) y el enredo (`mv298`), el garfio (`mv299`), el bichazo (`mv300`), el
+  rastrillazo y su costra (`mv301`), la sal (`mv302`), un salinero enterrado (`mv303`) que se alza (`mv304`) y cae (`mv305`), el
+  cuaderno del farero (`mv306`) y el bestiario (`mv307`). `LIMIT` 82 min (`lanzar.sh` 88 y 86 min).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -2326,7 +2412,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j, la 7k, la 7l, la 7m, la 7n, la 7o y la 7p arriba; despues, region a region su
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j, la 7k, la 7l, la 7m, la 7n, la 7o, la 7p y la 7q arriba; despues, region a region su
   contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes

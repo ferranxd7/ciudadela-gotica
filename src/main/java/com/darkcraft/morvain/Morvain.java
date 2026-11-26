@@ -361,6 +361,12 @@ public final class Morvain {
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Observatorio.enRotonda(p.getX(), p.getZ()) && Math.abs(p.getY() - Observatorio.PISO) < 12)
                 com.darkcraft.story.Logros.dar(p, "observatorio");
+        // y quien entra en el Puerto Varado, y quien sube a lo alto del Faro de los Huesos (parte 7q)
+        for (ServerPlayer p : m.players()) {
+            if (p.isSpectator() || Math.abs(p.getX() - Varadero.CX) > 200 || Math.abs(p.getZ() - Varadero.CZ) > 200) continue;
+            if (Varadero.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Varadero.PISO) < 30) com.darkcraft.story.Logros.dar(p, "puerto");
+            if (Varadero.arribaDelFaro(p.getX(), p.getY(), p.getZ())) com.darkcraft.story.Logros.dar(p, "faro");
+        }
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -429,6 +435,11 @@ public final class Morvain {
         if (Juramento.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Juramento.PISO) < 40) return "darkcraft.morvain.lugar.juramento";
         // la Puerta Oeste de la Capital (parte 7m)
         if (Capital.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Capital.PISO) < 40) return "darkcraft.morvain.lugar.capital_puerta";
+        // el Faro de los Huesos y el Puerto Varado (parte 7q)
+        if (Math.abs(p.getX() - Varadero.CX) < 200 && Math.abs(p.getZ() - Varadero.CZ) < 200) {
+            if (Varadero.enFaro(p.getX(), p.getZ()) && Math.abs(p.getY() - Varadero.PISO) < 60) return "darkcraft.morvain.lugar.faro";
+            if (Varadero.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Varadero.PISO) < 40) return "darkcraft.morvain.lugar.puerto";
+        }
         // el Observatorio de la Rectora (parte 7p)
         if (Observatorio.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Observatorio.PISO) < 40) return "darkcraft.morvain.lugar.observatorio";
         // la Academia Espectral y su Gran Biblioteca (parte 7o)

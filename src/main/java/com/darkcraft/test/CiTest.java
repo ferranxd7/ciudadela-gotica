@@ -738,6 +738,7 @@ public final class CiTest {
         juramento(server, m, log, out);
         academia(server, m, log, out);
         observatorio(server, m, log, out);
+        puerto(server, m, log, out);
     }
 
     /**
@@ -1583,6 +1584,235 @@ public final class CiTest {
             } catch (Throwable t) {
                 log.println("Morvain, la Rectora vuelve: ERROR " + t);
             }
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /**
+     * Parte 7q: el Puerto Varado (a pie desde el santuario del Faro de los Huesos, bajo el arco de costillas, a todos sus sitios:
+     * la bahia por las escaleras del muelle, la grada y la bajada del espigon, y lo alto del faro por su escalera de caracol; el
+     * atril con el libro 26, el arcon, el muelle, el fondo seco, las costillas de la ballena y el fuego del faro) y los salobres:
+     * en sus puestos (faenando, enterrados en la sal o de pie), uno de rodillas que se levanta y uno enterrado que se alza; cada
+     * accion de cada uno acaba; sus golpes a una presa (el plomo, la red que vuela y enreda, el garfio que arrastra, el bichazo,
+     * el rastrillazo con su costra de sal que frena y el punado de sal) y uno que cae y se deshace en sal. Al acabar, todo como
+     * estaba.
+     */
+    private static void puerto(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.PUERTO;
+        var A = com.darkcraft.morvain.Varadero.get();
+        final int CX = com.darkcraft.morvain.Varadero.CX, CZ = com.darkcraft.morvain.Varadero.CZ, PISO = com.darkcraft.morvain.Varadero.PISO;
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : A.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            // a pie desde la entrada (las capas finas de nieve —la sal— no estorban)
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || st.getBlock() instanceof net.minecraft.world.level.block.SnowLayerBlock
+                        && st.getValue(net.minecraft.world.level.block.SnowLayerBlock.LAYERS) <= 4 ? aire : st;
+            };
+            int[] en = A.sitio("entrada");
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, en[0], en[1], en[2], CX - 60, CZ - 66, CX + 124, CZ + 62, 6_000_000);
+            StringBuilder ap = new StringBuilder();
+            int llega = 0, sitios = 0;
+            for (var e : A.sitios().entrySet()) {
+                sitios++;
+                int[] q = e.getValue();
+                if (zona.alcanza(q[0], q[1], q[2], 2)) llega++;
+                else ap.append(' ').append(e.getKey());
+            }
+            int lejos = 0;
+            for (var o : A.esperas()) if (!zona.alcanza(o.x(), o.y(), o.z(), 2)) lejos++;
+            var sc = com.darkcraft.morvain.SantuariosMorvain.porId("faro_huesos");
+            log.println("Morvain, el puerto varado: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Varadero.resumen(m)
+                    + "; santuario " + com.darkcraft.santuario.Santuarios.nombre(m, sc.pos()) + " (" + m.getBlockState(sc.pos()).getBlock().getDescriptionId()
+                    + ") a " + Math.round(Math.hypot(sc.x() - (CX - 12), sc.z() - CZ)) + " de la plaza; a pie desde la entrada (" + zona.celdas()
+                    + " celdas) a " + llega + " de " + sitios + " sitios" + (ap.length() == 0 ? "" : ", no a:" + ap) + "; salobres a los que no se llega "
+                    + lejos + " de " + A.esperas().size() + "; lugar en la plaza " + (com.darkcraft.morvain.Varadero.dentro(CX - 12, CZ) ? "puerto" : "NO")
+                    + ", en el faro " + com.darkcraft.morvain.Varadero.enFaro(CX + com.darkcraft.morvain.Varadero.FARO_U, CZ + com.darkcraft.morvain.Varadero.FARO_V)
+                    + ", arriba " + com.darkcraft.morvain.Varadero.arribaDelFaro(CX + com.darkcraft.morvain.Varadero.FARO_U - 4 + 0.5,
+                    com.darkcraft.morvain.Varadero.LINTERNA, CZ + com.darkcraft.morvain.Varadero.FARO_V + 0.5));
+            topView(m, CX + 30, CZ - 2, 96, new File(out, "morvain_puerto.png"));
+            topView(m, CX - 14, CZ - 4, 40, new File(out, "morvain_puerto_pueblo.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, el puerto varado: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] puerto", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 10; k++)
+                for (var e : fuera) if (e.isAlive()) e.tick();
+            int faenando = 0, tumbados = 0, dePie = 0, enSuelo = 0, chocan = 0;
+            int[] porVariante = new int[3];
+            StringBuilder mal = new StringBuilder();
+            com.darkcraft.enemigos.Salobre rodillas = null, enterrado = null;
+            for (var e : fuera) {
+                if (!(e instanceof com.darkcraft.enemigos.Salobre c)) continue;
+                porVariante[Math.max(0, Math.min(2, c.variante()))]++;
+                if (!m.noCollision(c)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(c.blockPosition().toShortString()).append(';');
+                }
+                if (c.postura() == com.darkcraft.enemigos.Enemigo.REZA) {
+                    faenando++;
+                    if (rodillas == null) rodillas = c;
+                } else if (c.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) {
+                    tumbados++;
+                    if (enterrado == null) enterrado = c;
+                } else dePie++;
+                var abajo = m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ()));
+                if (!abajo.getCollisionShape(m, BlockPos.ZERO).isEmpty() || c.isInWater()) enSuelo++;
+                else if (mal.length() < 400) mal.append(' ').append(c.tipo()).append(" en el aire en ").append(c.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, los salobres: " + com.darkcraft.morvain.MorvainEnemigos.comprobar() + "; fuera " + fuera.size() + " de "
+                    + com.darkcraft.morvain.MorvainEnemigos.puerto().size() + " (rederos " + porVariante[0] + ", bicheros " + porVariante[1]
+                    + ", salineros " + porVariante[2] + "): faenando " + faenando + ", enterrados " + tumbados + ", de pie " + dePie
+                    + " (en su suelo " + enSuelo + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+            StringBuilder sb = new StringBuilder("Morvain, los salobres en accion:");
+            // ---- el de rodillas se levanta y el enterrado se alza (una presa a su lado)
+            int alz = com.darkcraft.enemigos.Salobre.ALZADOS;
+            for (var c : new com.darkcraft.enemigos.Salobre[]{rodillas, enterrado}) {
+                if (c == null) {
+                    sb.append(" NO HAY ").append(c == rodillas ? "NINGUNO DE RODILLAS;" : "NINGUNO ENTERRADO;");
+                    continue;
+                }
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (presa == null) continue;
+                presa.moveTo(c.getX() + 1.5, c.getY(), c.getZ() + 0.5, 0f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(presa);
+                quitar.add(presa);
+                int antes = c.postura();
+                c.setTarget(presa);
+                int sale = -1;
+                for (int k = 0; k < 80; k++) {
+                    c.tickCount++;
+                    c.tick();
+                    int a = c.accion();
+                    if (sale < 0 && (a == com.darkcraft.enemigos.SalobreAnims.LEVANTARSE || a == com.darkcraft.enemigos.SalobreAnims.ALZARSE)) sale = k;
+                    if (sale >= 0 && a == 0) break;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " el %s (%s, en %s) se %s en el tick %d y queda de pie %s;", c.tipo(),
+                        antes == com.darkcraft.enemigos.Enemigo.REZA ? "de rodillas" : "enterrado", c.blockPosition().toShortString(),
+                        antes == com.darkcraft.enemigos.Enemigo.REZA ? "levanta" : "alza", sale, c.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE));
+                c.setTarget(null);
+            }
+            sb.append(" alzados de la sal +").append(com.darkcraft.enemigos.Salobre.ALZADOS - alz).append(';');
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
+            // ---- en la plaza (de cara al sur): uno de cada, cada accion acaba
+            for (int v2 = 0; v2 < 3; v2++) {
+                var a = DarkCraftMod.SALOBRE.get().create(m);
+                if (a == null) continue;
+                a.variante(v2);
+                a.moveTo(CX - 16.5 + v2 * 4, PISO, CZ - 6.5, 0f, 0f);
+                m.addFreshEntity(a);
+                quitar.add(a);
+                StringBuilder no = new StringBuilder();
+                for (int ac = 1; ac < com.darkcraft.enemigos.SalobreAnims.TICKS.length; ac++) {
+                    String nombre = com.darkcraft.enemigos.SalobreAnims.NOMBRES[ac];
+                    if (nombre.equals("morir")) continue;
+                    a.empezar(ac);
+                    for (int k = 0; k < 90 && a.accion() == ac; k++) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    if (a.accion() == ac) no.append(' ').append(nombre);
+                    for (int k = 0; k < 10; k++) a.tick();
+                }
+                sb.append(' ').append(a.tipo()).append(String.format(java.util.Locale.ROOT, " (vida %.0f, golpe %.1f, armadura %d)", a.getMaxHealth(),
+                        a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), a.getArmorValue()))
+                        .append(": acciones que no acaban").append(no.length() == 0 ? " ninguna" : no).append(';');
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Red.class, a.getBoundingBox().inflate(24))) f.discard();
+                a.discard();
+            }
+            log.println(sb);
+            // ---- contra una presa (un aldeano quieto en la calle mayor, al sur del salobre)
+            sb = new StringBuilder("Morvain, los salobres contra una presa:");
+            int redes = com.darkcraft.enemigos.Salobre.REDES, pillan = com.darkcraft.enemigos.Red.PILLAN, garf = com.darkcraft.enemigos.Salobre.GARFIOS,
+                    cos = com.darkcraft.enemigos.Salobre.COSTRAS, fre = com.darkcraft.enemigos.Salobre.FRENADOS, sal = com.darkcraft.enemigos.Salobre.SALES,
+                    sald = com.darkcraft.enemigos.Salobre.SALADOS;
+            String[] nombres = {"plomada", "red", "garfio", "bichazo", "rastrillazo", "sal"};
+            int[] acciones = {com.darkcraft.enemigos.SalobreAnims.PLOMADA, com.darkcraft.enemigos.SalobreAnims.RED, com.darkcraft.enemigos.SalobreAnims.GARFIO,
+                    com.darkcraft.enemigos.SalobreAnims.BICHAZO, com.darkcraft.enemigos.SalobreAnims.RASTRILLAZO, com.darkcraft.enemigos.SalobreAnims.SAL};
+            int[] variantes = {com.darkcraft.enemigos.Salobre.REDERO, com.darkcraft.enemigos.Salobre.REDERO, com.darkcraft.enemigos.Salobre.BICHERO,
+                    com.darkcraft.enemigos.Salobre.BICHERO, com.darkcraft.enemigos.Salobre.SALINERO, com.darkcraft.enemigos.Salobre.SALINERO};
+            double[] dist = {1.8, 7.0, 4.3, 2.3, 2.2, 3.0};
+            int[] dura = {40, 80, 50, 50, 60, 40};
+            final double gx = CX + 6.5, gz = CZ - 1.5;
+            for (int i = 0; i < nombres.length; i++) {
+                var a = DarkCraftMod.SALOBRE.get().create(m);
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (a == null || presa == null) continue;
+                a.variante(variantes[i]);
+                a.moveTo(gx, PISO, gz, -90f, 0f);
+                presa.moveTo(gx + dist[i], PISO, gz, 90f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(a);
+                m.addFreshEntity(presa);
+                quitar.add(a);
+                quitar.add(presa);
+                a.setTarget(presa);
+                a.setYRot(-90f);
+                a.yBodyRot = a.yHeadRot = -90f;
+                a.empezar(acciones[i]);
+                float vida = presa.getHealth();
+                boolean frenada = false;
+                double cerca = dist[i];
+                for (int k = 0; k < dura[i]; k++) {
+                    if (!a.isRemoved()) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Red.class, presa.getBoundingBox().inflate(16))) {
+                        if (!quitar.contains(f)) quitar.add(f);
+                        f.tick();
+                    }
+                    // la presa se mueve con lo que le den (el tiron del garfio): a mano, que sin IA no anda
+                    net.minecraft.world.phys.Vec3 dv = presa.getDeltaMovement();
+                    if (dv.lengthSqr() > 1e-4) {
+                        presa.move(net.minecraft.world.entity.MoverType.SELF, dv);
+                        presa.setDeltaMovement(dv.x * 0.55, presa.onGround() ? 0 : dv.y - 0.08, dv.z * 0.55);
+                    }
+                    cerca = Math.min(cerca, Math.hypot(presa.getX() - a.getX(), presa.getZ() - a.getZ()));
+                    frenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                    presa.invulnerableTime = 0;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " %s (%s) a %.1f: la presa -%.1f%s%s;", nombres[i], a.tipo(), dist[i], vida - presa.getHealth(),
+                        i == 1 || i == 4 || i == 5 ? ", frenada " + frenada : "", i == 2 ? String.format(java.util.Locale.ROOT, ", arrastrada hasta %.1f", cerca) : ""));
+                a.discard();
+                presa.discard();
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " redes +%d (enredan +%d), garfios +%d (tiron %.2f), costras +%d (frenan +%d), punados de sal +%d (salan +%d)",
+                    com.darkcraft.enemigos.Salobre.REDES - redes, com.darkcraft.enemigos.Red.PILLAN - pillan, com.darkcraft.enemigos.Salobre.GARFIOS - garf,
+                    com.darkcraft.enemigos.Salobre.ARRASTRE, com.darkcraft.enemigos.Salobre.COSTRAS - cos, com.darkcraft.enemigos.Salobre.FRENADOS - fre,
+                    com.darkcraft.enemigos.Salobre.SALES - sal, com.darkcraft.enemigos.Salobre.SALADOS - sald));
+            // ---- uno que cae: se deshace en sal
+            var c = DarkCraftMod.SALOBRE.get().create(m);
+            if (c != null) {
+                c.variante(com.darkcraft.enemigos.Salobre.SALINERO);
+                c.moveTo(gx, PISO, gz, 0f, 0f);
+                m.addFreshEntity(c);
+                quitar.add(c);
+                int des = com.darkcraft.enemigos.Salobre.DESHECHOS;
+                c.hurt(m.damageSources().generic(), 9999f);
+                int k = 0;
+                for (; k < 60 && !c.isRemoved(); k++) c.tick();
+                sb.append(String.format(java.util.Locale.ROOT, "; uno que cae se deshace en sal +%d y se va en %d ticks", com.darkcraft.enemigos.Salobre.DESHECHOS - des, k));
+            }
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println("Morvain, los salobres: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] salobres", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
         }
     }

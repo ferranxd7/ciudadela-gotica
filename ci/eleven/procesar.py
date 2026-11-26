@@ -265,14 +265,23 @@ SFX = {
     "rectora_parpadeo": (1.6, 0.5, -15), "rectora_alzarse": (6.0, 1.6, -15), "rectora_dolor": (1.0, 0.3, -15),
     "rectora_muerte": (6.0, 1.8, -15), "rectora_espera": (14.0, 2.0, -23),
     "observatorio_sello": (4.0, 1.0, -13), "observatorio_abre": (4.0, 1.2, -15),
+    # los salobres del Puerto Varado (parte 7q): el gemido (la sal que cruje y un aliento de arena), el grito al ver a alguien,
+    # el quejido, la muerte (se deshacen en sal), el plomo que zumba y da, la red que vuela y cae, el garfio que muerde y
+    # tira, el rastro contra la costra de sal, el punado de sal y alzarse de la costra; y el viento de la Costa de los Huesos
+    "salobre_gemido": (4.5, 1.2, -19), "salobre_alerta": (2.4, 0.6, -15), "salobre_dolor": (1.2, 0.4, -16),
+    "salobre_muerte": (3.2, 1.0, -16), "salobre_plomo": (1.6, 0.4, -14), "salobre_red": (2.4, 0.7, -14),
+    "salobre_garfio": (2.0, 0.6, -14), "salobre_rastrillo": (1.4, 0.5, -13), "salobre_sal": (1.6, 0.5, -15),
+    "salobre_alzarse": (2.6, 0.8, -16),
+    "costa_ambiente": (20.0, 2.0, -25),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
            "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0, "abad_ventisca": 1.5, "abad_rezo": 0.4,
            "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6, "academia_ambiente": 2.0, "erudito_susurro": 0.8,
-           "rectora_espera": 1.0}
+           "rectora_espera": 1.0, "costa_ambiente": 2.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
-INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7}
+INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
+          "salobre_alzarse": 4.2}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
 GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
@@ -471,6 +480,14 @@ TOMAS_SFX = {
     "rectora_estrella_cae": (3, 2), "rectora_constelacion": (2, 4), "rectora_parpadeo": (2, 4), "rectora_alzarse": (1, 4),
     "rectora_dolor": (4, 1, 3), "rectora_muerte": (4, 1), "rectora_espera": (2, 3),
     "observatorio_sello": (1, 4), "observatorio_abre": (1, 3),
+    # los salobres: los dos gemidos mas llenos (la 2 y la 3); los dos gritos con el golpe al principio (la 3 y la 4); tres
+    # quejidos (2, 4 y 3); las dos muertes que mas se oyen (la 2 y la 1); el plomo que zumba y da (la 2) y el del golpe
+    # seco (la 4); las dos redes que vuelan parejas (la 2 y la 1); el garfio seco (la 4) y el que muerde y tira (la 2); los
+    # dos rastros que dan de golpe (la 4 y la 1); los dos punados de sal mas parejos (la 2 y la 3); las dos alzadas, que
+    # empiezan tarde (se salta hasta poco antes); y del viento de la costa, el mas lleno (la 1) y el que sube y baja (la 3)
+    "salobre_gemido": (2, 3), "salobre_alerta": (3, 4), "salobre_dolor": (2, 4, 3), "salobre_muerte": (2, 1),
+    "salobre_plomo": (2, 4), "salobre_red": (2, 1), "salobre_garfio": (4, 2), "salobre_rastrillo": (4, 1),
+    "salobre_sal": (2, 3), "salobre_alzarse": (3, 4), "costa_ambiente": (1, 3),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

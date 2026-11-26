@@ -318,6 +318,20 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_ERUDITO_CADENA = sound("sfx.erudito_cadena");
     public static final RegistryObject<SoundEvent> SFX_ERUDITO_ALZARSE = sound("sfx.erudito_alzarse");
     public static final RegistryObject<SoundEvent> AMBIENTE_ACADEMIA = sound("ambiente.academia");
+    // los salobres del Puerto Varado (parte 7q): el gemido, el grito al ver a alguien, el quejido, la muerte (se deshacen en
+    // sal), el plomo de la red, la red, el garfio, el rastro contra la sal, el punado de sal y alzarse de la costra; y el viento
+    // de la Costa de los Huesos
+    public static final RegistryObject<SoundEvent> SFX_SALOBRE_GEMIDO = sound("sfx.salobre_gemido");
+    public static final RegistryObject<SoundEvent> SFX_SALOBRE_ALERTA = sound("sfx.salobre_alerta");
+    public static final RegistryObject<SoundEvent> SFX_SALOBRE_DOLOR = sound("sfx.salobre_dolor");
+    public static final RegistryObject<SoundEvent> SFX_SALOBRE_MUERTE = sound("sfx.salobre_muerte");
+    public static final RegistryObject<SoundEvent> SFX_SALOBRE_PLOMO = sound("sfx.salobre_plomo");
+    public static final RegistryObject<SoundEvent> SFX_SALOBRE_RED = sound("sfx.salobre_red");
+    public static final RegistryObject<SoundEvent> SFX_SALOBRE_GARFIO = sound("sfx.salobre_garfio");
+    public static final RegistryObject<SoundEvent> SFX_SALOBRE_RASTRILLO = sound("sfx.salobre_rastrillo");
+    public static final RegistryObject<SoundEvent> SFX_SALOBRE_SAL = sound("sfx.salobre_sal");
+    public static final RegistryObject<SoundEvent> SFX_SALOBRE_ALZARSE = sound("sfx.salobre_alzarse");
+    public static final RegistryObject<SoundEvent> AMBIENTE_COSTA = sound("ambiente.costa");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -650,6 +664,13 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Orbe>> ORBE = ENTITIES.register("orbe",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Orbe>of(com.darkcraft.enemigos.Orbe::new, MobCategory.MISC)
                     .sized(0.4f, 0.4f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":orbe"));
+    // ---- los salobres del Puerto Varado (parte 7q) y la red del redero
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Salobre>> SALOBRE = ENTITIES.register("salobre",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Salobre>of(com.darkcraft.enemigos.Salobre::new, MobCategory.MONSTER)
+                    .sized(0.65f, 1.95f).clientTrackingRange(8).build(MODID + ":salobre"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Red>> RED = ENTITIES.register("red",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Red>of(com.darkcraft.enemigos.Red::new, MobCategory.MISC)
+                    .sized(0.5f, 0.5f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":red"));
     // ---- Hrodric, el Abad de la Cumbre, el jefe de las Montanas Nevadas (parte 7l)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Abad>> ABAD = ENTITIES.register("abad",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Abad>of(com.darkcraft.enemigos.Abad::new, MobCategory.MONSTER)
@@ -843,6 +864,7 @@ public class DarkCraftMod {
         e.put(CONDESTABLE.get(), com.darkcraft.enemigos.Condestable.atributos().build());
         e.put(RECTORA.get(), com.darkcraft.enemigos.Rectora.atributos().build());
         e.put(ERUDITO.get(), com.darkcraft.enemigos.Erudito.atributos().build());
+        e.put(SALOBRE.get(), com.darkcraft.enemigos.Salobre.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());

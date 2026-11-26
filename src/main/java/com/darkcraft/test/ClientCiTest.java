@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 78 * 60 * 20;
+    private static final int LIMIT = 82 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -6013,6 +6013,8 @@ public final class ClientCiTest {
         t = academia(t);
         // el Observatorio y Ysolde, la Rectora, la jefa de la Academia Espectral (parte 7p)
         t = observatorio(t);
+        // el Puerto Varado y los salobres de la Costa de los Huesos (parte 7q)
+        t = puerto(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -9103,6 +9105,327 @@ public final class ClientCiTest {
                 comando(sp, "darkcraft rectora volver");
                 com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
                 log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoRectora(sp.server));
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el Puerto Varado y los salobres (parte 7q)
+
+    private static final com.darkcraft.enemigos.Salobre[] SALOBRES = new com.darkcraft.enemigos.Salobre[3];
+
+    private static com.darkcraft.enemigos.Salobre salobreNuevo(ServerLevel lvl, int variante, double x, double y, double z, float giro, int postura) {
+        var a = DarkCraftMod.SALOBRE.get().create(lvl);
+        if (a == null) return null;
+        a.variante(variante);
+        a.moveTo(x, y, z, giro, 0f);
+        a.yBodyRot = a.yHeadRot = giro;
+        if (postura != com.darkcraft.enemigos.Enemigo.DE_PIE) a.asignar("", -1, a.blockPosition(), giro, postura, 0);
+        lvl.addFreshEntity(a);
+        return a;
+    }
+
+    private static void quitarSalobres(ServerLevel lvl) {
+        for (int i = 0; i < SALOBRES.length; i++) {
+            if (SALOBRES[i] != null && !SALOBRES[i].isRemoved()) SALOBRES[i].discard();
+            SALOBRES[i] = null;
+        }
+        if (lvl == null) return;
+        int x = com.darkcraft.morvain.Varadero.CX, z = com.darkcraft.morvain.Varadero.CZ;
+        var caja = new net.minecraft.world.phys.AABB(x - 70, 40, z - 80, x + 130, 140, z + 80);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Red.class, caja)) e.discard();
+    }
+
+    private static String estadoSalobres() {
+        StringBuilder sb = new StringBuilder();
+        for (var a : SALOBRES) sb.append(a == null ? "-" : estadoE(a)).append(" | ");
+        return sb + String.format(java.util.Locale.ROOT, "redes %d (enredan %d, al suelo %d), garfios %d (tiron %.2f), costras %d (frenan %d), sal %d (salan %d), alzados %d, deshechos %d",
+                com.darkcraft.enemigos.Salobre.REDES, com.darkcraft.enemigos.Red.PILLAN, com.darkcraft.enemigos.Red.AL_SUELO, com.darkcraft.enemigos.Salobre.GARFIOS,
+                com.darkcraft.enemigos.Salobre.ARRASTRE, com.darkcraft.enemigos.Salobre.COSTRAS, com.darkcraft.enemigos.Salobre.FRENADOS,
+                com.darkcraft.enemigos.Salobre.SALES, com.darkcraft.enemigos.Salobre.SALADOS, com.darkcraft.enemigos.Salobre.ALZADOS,
+                com.darkcraft.enemigos.Salobre.DESHECHOS);
+    }
+
+    /** Un golpe de un salobre visto de lado: el salobre en (x, z) mirando al sur, el jugador delante (al sur) y la camara al este. */
+    private static int golpeSalobre(int t, String nombre, int variante, int accion, double dist, int captura, double ex, double ez, int PISO) {
+        atTicks(t, "El puerto: " + nombre, m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarSalobres(lvl);
+                aPelear(sp, true);
+                sp.removeAllEffects();
+                aPelear(sp, true);
+                SALOBRES[0] = salobreNuevo(lvl, variante, ex, PISO, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+                irMirando(sp, ex, PISO, ez + dist, ex, PISO + 1.4, ez, false);
+                var a = SALOBRES[0];
+                if (a == null) return;
+                a.setTarget(sp);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(accion);
+                verDesdeServidor = new Vec3(ex + 4.4, PISO + 2.4, ez + dist * 0.5 + 0.8);
+                miraServidor = new Vec3(ex, PISO + 1.2, ez + dist * 0.5);
+            });
+        });
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += captura - 2;
+        final String cap = "cliente_" + nombre;
+        atTicks(t, "captura: " + nombre, m -> {
+            server(m, sp -> log("  " + nombre + ": " + estadoSalobres() + " | jugador vida " + Math.round(sp.getHealth()) + ", frenado "
+                    + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) + ", estamina " + Math.round(com.darkcraft.rol.Rol.estamina(sp))
+                    + String.format(java.util.Locale.ROOT, " en %.1f, %.1f, %.1f", sp.getX(), sp.getY(), sp.getZ())));
+            shot(m, cap);
+        });
+        return t;
+    }
+
+    /**
+     * El Puerto Varado: desde el santuario del Faro de los Huesos, el arco de costillas, entrar a pie (el cartel con su nombre,
+     * el logro y el viento de la costa), la plaza con el ancla, la lonja, los secaderos, las salinas, el varadero, la bahia seca
+     * desde el muelle, las barcas, la ballena por dentro, el espigon y el faro, su linterna con el fuego frio y la bahia desde la
+     * galeria (el logro), todo desde lo alto y el atril del farero, con los salobres en sus puestos; en supervivencia, en la calle
+     * mayor: el plomo, la red (en el aire y el enredo), el garfio que arrastra, el bichazo, el rastrillazo y su costra de sal, el
+     * punado de sal, un salinero enterrado en la sal que se alza y uno que cae y se deshace; el cuaderno del farero y el
+     * bestiario. Al acabar vuelven los salobres.
+     */
+    private static int puerto(int T) {
+        final int CX = com.darkcraft.morvain.Varadero.CX, CZ = com.darkcraft.morvain.Varadero.CZ, PISO = com.darkcraft.morvain.Varadero.PISO;
+        final int FONDO = com.darkcraft.morvain.Varadero.FONDO, LIN = com.darkcraft.morvain.Varadero.LINTERNA;
+        final int FU = com.darkcraft.morvain.Varadero.FARO_U, FV = com.darkcraft.morvain.Varadero.FARO_V;
+        final var SA = com.darkcraft.morvain.SantuariosMorvain.porId("faro_huesos");
+        int t = T;
+        atTicks(t, "El puerto: desde el santuario del Faro de los Huesos", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft puerto enemigos volver");
+                irMirando(sp, SA.x() + 6.5, SA.y() + 5, SA.z() + 7.5, CX - 24, PISO + 6, CZ + 20, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv279_puerto_santuario");
+            server(m, sp -> log("  " + com.darkcraft.morvain.MorvainEnemigos.estadoPuerto(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "El puerto: bajo el arco de costillas", m -> server(m, sp -> irMirando(sp, CX - 26.5, PISO + 1.6, CZ + 33.5, CX - 14, PISO + 4, CZ + 2, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv280_puerto_arco"));
+        t += 10;
+        // ---- entrar a pie, en aventura: el cartel con el nombre, el logro y el viento de la costa
+        atTicks(t, "El puerto: entrar", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft puerto enemigos fuera");
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), CX - 19.5, PISO, CZ + 11.5, 200f, 2f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura", m -> {
+            log("  costa: " + ClientMusic.costa());
+            shot(m, "cliente_mv281_puerto_dentro");
+            server(m, sp -> log("  al entrar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + ", logro puerto " + com.darkcraft.story.Logros.tiene(sp, "puerto")
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+        });
+        t += 10;
+        atTicks(t, "El puerto: vuelven los salobres", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft puerto enemigos volver");
+            });
+        });
+        t += 4;
+        atTicks(t, "El puerto: la plaza y el ancla", m -> server(m, sp -> irMirando(sp, CX - 5.5, PISO + 3, CZ + 8.5, CX - 12, PISO + 3, CZ, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv282_puerto_plaza"));
+        t += 10;
+        atTicks(t, "El puerto: la lonja", m -> server(m, sp -> irMirando(sp, CX - 15.5, PISO + 2.2, CZ - 12.5, CX - 15, PISO + 2, CZ - 25, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv283_puerto_lonja"));
+        t += 10;
+        atTicks(t, "El puerto: los secaderos y el muelle", m -> server(m, sp -> irMirando(sp, CX + 0.5, PISO + 3, CZ - 1.5, CX + 14, PISO + 2, CZ - 12, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv284_puerto_secaderos"));
+        t += 10;
+        atTicks(t, "El puerto: las salinas", m -> server(m, sp -> irMirando(sp, CX - 7.5, PISO + 5, CZ + 9.5, CX + 8, PISO, CZ + 24, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv285_puerto_salinas"));
+        t += 10;
+        atTicks(t, "El puerto: el varadero", m -> server(m, sp -> irMirando(sp, CX + 2.5, PISO + 5, CZ + 30.5, CX + 30, PISO - 4, CZ + 40, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv286_puerto_varadero"));
+        t += 10;
+        atTicks(t, "El puerto: la bahia seca desde el muelle", m -> server(m, sp -> irMirando(sp, CX + 20.5, PISO + 3.5, CZ + 4.5, CX + 62, FONDO + 2, CZ + 14, true)));
+        t += 60;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv287_puerto_bahia");
+            server(m, sp -> log("  la bahia: lugar " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "El puerto: las barcas varadas", m -> server(m, sp -> irMirando(sp, CX + 29.5, FONDO + 3.2, CZ - 5.5, CX + 40, FONDO + 1, CZ + 6, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv288_puerto_barcas"));
+        t += 10;
+        atTicks(t, "El puerto: la ballena por dentro", m -> server(m, sp -> irMirando(sp, CX + 46.5, FONDO + 1.2, CZ + 32.5, CX + 78, FONDO + 5, CZ + 30, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv289_puerto_ballena"));
+        t += 10;
+        atTicks(t, "El puerto: el espigon y el faro", m -> server(m, sp -> irMirando(sp, CX + 26.5, PISO + 2.2, CZ - 19.5, CX + FU, PISO + 22, CZ + FV, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv290_puerto_espigon"));
+        t += 10;
+        atTicks(t, "El puerto: el Faro de los Huesos de cerca", m -> server(m, sp -> irMirando(sp, CX + FU - 13.5, PISO + 3, CZ + FV + 6.5, CX + FU, PISO + 9, CZ + FV, true)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv291_faro");
+            server(m, sp -> log("  el faro: lugar " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "El puerto: la linterna y su fuego frio", m -> server(m, sp -> irMirando(sp, CX + FU - 1.5, LIN + 0.1, CZ + FV - 1.5, CX + FU + 0.5, LIN + 1.2, CZ + FV + 0.5, false)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv292_faro_linterna"));
+        t += 10;
+        // ---- la bahia desde la galeria (en aventura: el logro de lo alto del faro)
+        atTicks(t, "El puerto: desde la galeria del faro", m -> server(m, sp -> {
+            sp.setGameMode(GameType.ADVENTURE);
+            sp.getAbilities().flying = false;
+            sp.onUpdateAbilities();
+            irMirando(sp, CX + FU - 3.5, LIN, CZ + FV + 0.5, CX, PISO, CZ + 4, false);
+        }));
+        t += 60;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv293_faro_galeria");
+            server(m, sp -> {
+                log("  en la galeria: logro faro " + com.darkcraft.story.Logros.tiene(sp, "faro") + ", lugar " + com.darkcraft.morvain.Morvain.lugar(sp)
+                        + " " + fpos(sp));
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        t += 10;
+        atTicks(t, "El puerto: todo desde lo alto", m -> server(m, sp -> irMirando(sp, CX - 34.5, PISO + 62, CZ + 74.5, CX + 36, FONDO, CZ - 6, true)));
+        t += 90;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv294_puerto_alto");
+            server(m, sp -> log("  desde lo alto: " + com.darkcraft.morvain.MorvainEnemigos.estadoPuerto(sp.server)));
+        });
+        t += 10;
+        atTicks(t, "El puerto: la casa del farero y su atril", m -> server(m, sp -> irMirando(sp, CX + 9.5, PISO + 0.6, CZ - 28.5, CX + 9.5, PISO + 1, CZ - 33.5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv295_casa_farero"));
+        t += 10;
+        // ---- en supervivencia, en la calle mayor: los golpes de los salobres, de lado
+        atTicks(t, "El puerto: a pelear (supervivencia)", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> comando(sp, "darkcraft puerto enemigos fuera"));
+        });
+        t += 4;
+        final double ex = CX + 6.5, ez = CZ - 0.5;
+        final int RE = com.darkcraft.enemigos.Salobre.REDERO, BI = com.darkcraft.enemigos.Salobre.BICHERO, SL = com.darkcraft.enemigos.Salobre.SALINERO;
+        t = golpeSalobre(t, "mv296_plomada", RE, com.darkcraft.enemigos.SalobreAnims.PLOMADA, 1.9, 12, ex, ez, PISO) + 26;
+        t = golpeSalobre(t, "mv297_red", RE, com.darkcraft.enemigos.SalobreAnims.RED, 7.0, 26, ex, ez, PISO) + 2;
+        // la red cae sobre el jugador: enredado, en primera persona
+        t += 12;
+        atTicks(t, "captura: enredado", m -> {
+            server(m, sp -> log("  enredado: " + estadoSalobres() + " | jugador frenado " + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)));
+            shot(m, "cliente_mv298_enredado");
+        });
+        t += 30;
+        t = golpeSalobre(t, "mv299_garfio", BI, com.darkcraft.enemigos.SalobreAnims.GARFIO, 4.3, 17, ex, ez, PISO) + 30;
+        t = golpeSalobre(t, "mv300_bichazo", BI, com.darkcraft.enemigos.SalobreAnims.BICHAZO, 2.3, 18, ex, ez, PISO) + 30;
+        t = golpeSalobre(t, "mv301_rastrillazo", SL, com.darkcraft.enemigos.SalobreAnims.RASTRILLAZO, 2.4, 21, ex, ez, PISO) + 30;
+        t = golpeSalobre(t, "mv302_sal", SL, com.darkcraft.enemigos.SalobreAnims.SAL, 3.0, 15, ex, ez, PISO) + 30;
+        // ---- un salinero enterrado en la sal (en la calle) que se alza al llegar el jugador
+        atTicks(t, "El puerto: un salinero enterrado en la sal", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarSalobres(lvl);
+                sp.removeAllEffects();
+                aPelear(sp, true);
+                SALOBRES[1] = salobreNuevo(lvl, SL, ex, PISO, ez, 0f, com.darkcraft.enemigos.Enemigo.TUMBADO);
+                irMirando(sp, ex, PISO, ez + 6.0, ex, PISO + 0.3, ez, false);
+            });
+        });
+        t += 6;
+        atTicks(t, "captura: enterrado", m -> {
+            server(m, sp -> log("  enterrado: " + estadoSalobres()));
+            shot(m, "cliente_mv303_enterrado");
+        });
+        t += 4;
+        atTicks(t, "El puerto: el jugador se acerca", m -> server(m, sp -> irMirando(sp, ex, PISO, ez + 2.6, ex, PISO + 1.0, ez, false)));
+        t += 24;
+        atTicks(t, "captura: se alza", m -> {
+            server(m, sp -> log("  se alza: " + estadoSalobres()));
+            shot(m, "cliente_mv304_se_alza");
+        });
+        t += 10;
+        atTicks(t, "El puerto: el salinero cae", m -> server(m, sp -> {
+            var a = SALOBRES[1];
+            if (a == null) return;
+            a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+            a.setDeltaMovement(Vec3.ZERO);
+        }));
+        t += 30;
+        atTicks(t, "captura: se deshace en sal", m -> {
+            server(m, sp -> log("  cae: " + estadoSalobres() + " | logro salobre " + com.darkcraft.story.Logros.tiene(sp, "salobre")));
+            shot(m, "cliente_mv305_salobre_cae");
+        });
+        t += 30;
+        atTicks(t, "El puerto: sin salobres (para el libro y el bestiario)", m -> server(m, sp -> {
+            quitarSalobres(sp.serverLevel());
+            sp.removeAllEffects();
+            sp.clearFire();
+            sp.setHealth(sp.getMaxHealth());
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        t += 6;
+        atTicks(t, "El puerto: el cuaderno del farero", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(26));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv306_libro_farero"));
+        t += 6;
+        atTicks(t, "el bestiario: el salinero (el que acaba de caer)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("salobre_salinero")));
+        });
+        t += 18;
+        atTicks(t, "captura: el salinero en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv307_bestiario_salobre");
+        });
+        t += 4;
+        atTicks(t, "El puerto: fin (vuelven los salobres, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                quitarSalobres(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft puerto enemigos volver");
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

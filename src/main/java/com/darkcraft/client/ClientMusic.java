@@ -367,6 +367,39 @@ public final class ClientMusic {
         }
     }
 
+    // ------------------------------------------------------------------ la Costa de los Huesos (parte 7q): viento sobre la arena seca
+
+    private static Track costa;
+    private static int costaTicks;
+    private static boolean enCosta;
+
+    private static void tickCosta(Minecraft mc) {
+        if (mc.player == null || mc.level == null) enCosta = false;
+        else if (mc.player.tickCount % 20 == 17)
+            enCosta = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() > 30 && mc.player.getY() < 160
+                    && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.COSTA;
+        boolean quiere = enCosta && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        if (quiere) {
+            if (costa == null || costa.dying() || !mc.getSoundManager().isActive(costa) && costaTicks > 20) {
+                if (costa != null && !costa.dying()) mc.getSoundManager().stop(costa);
+                costa = new Track(DarkCraftMod.AMBIENTE_COSTA.get(), "costa", false);
+                costaTicks = 0;
+                mc.getSoundManager().play(costa);
+                costa.fadeTo(0.85f, 2.5f);
+            }
+        } else if (costa != null && !costa.dying()) costa.kill(3.0f);
+        if (costa != null) {
+            costaTicks++;
+            if (costa.dying() && !mc.getSoundManager().isActive(costa) && costaTicks > 20) costa = null;
+        }
+    }
+
+    /** Para la prueba de la CI: si suena el viento de la costa. */
+    public static String costa() {
+        Minecraft mc = Minecraft.getInstance();
+        return costa == null ? "sin la costa" : String.format("la costa %.2f%s", costa.level(), mc.getSoundManager().isActive(costa) ? "" : " (parada)");
+    }
+
     /** Para la prueba de la CI: si suena el viento de la academia. */
     public static String academia() {
         Minecraft mc = Minecraft.getInstance();
@@ -493,6 +526,8 @@ public final class ClientMusic {
         if (capital != null && !capital.dying()) any = true;
         tickAcademia(mc);
         if (academia != null && !academia.dying()) any = true;
+        tickCosta(mc);
+        if (costa != null && !costa.dying()) any = true;
         tickTitulo(mc);
         if (titulo != null && !titulo.dying()) any = true;
         if (viaje != null) {
@@ -516,8 +551,9 @@ public final class ClientMusic {
         if (montana != null) mc.getSoundManager().stop(montana);
         if (capital != null) mc.getSoundManager().stop(capital);
         if (academia != null) mc.getSoundManager().stop(academia);
-        story = boss = zona = bruma = viaje = arboleda = pantano = montana = capital = academia = null;
-        enFortaleza = enBruma = enArboleda = enPantano = enMontana = enCapital = enAcademia = false;
+        if (costa != null) mc.getSoundManager().stop(costa);
+        story = boss = zona = bruma = viaje = arboleda = pantano = montana = capital = academia = costa = null;
+        enFortaleza = enBruma = enArboleda = enPantano = enMontana = enCapital = enAcademia = enCosta = false;
         bossPhase = 0;
     }
 
