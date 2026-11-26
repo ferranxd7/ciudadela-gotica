@@ -7758,7 +7758,11 @@ public final class ClientCiTest {
             server(m, sp -> log("  enterrado: " + estadoHelados()));
             shot(m, "cliente_mv150_enterrado");
         });
-        t += 22;
+        t += 4;
+        // (enterrado solo repara en quien se le acerca a menos de 3.6 bloques)
+        atTicks(t, "El monasterio: el jugador se acerca al enterrado", m -> server(m, sp ->
+                irMirando(sp, CX + 4.5, PISO, CZ - 1.4, CX + 4.5, PISO + 1.0, CZ - 4.5, false)));
+        t += 24;
         atTicks(t, "captura: se alza", m -> {
             server(m, sp -> log("  se alza: " + estadoHelados()));
             shot(m, "cliente_mv151_se_alza");
@@ -7793,14 +7797,14 @@ public final class ClientCiTest {
         t += 30;
         atTicks(t, "captura", m -> shot(m, "cliente_mv153_libro_wendel"));
         t += 6;
-        atTicks(t, "el bestiario: el penitente helado", m -> {
+        atTicks(t, "el bestiario: el peregrino helado (el que acaba de caer)", m -> {
             m.setScreen(null);
             m.options.hideGui = false;
             com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
-            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("helado_penitente")));
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("helado_peregrino")));
         });
         t += 18;
-        atTicks(t, "captura: el penitente en el bestiario", m -> {
+        atTicks(t, "captura: el peregrino en el bestiario", m -> {
             menuP(m, mm -> log("  " + mm.resumen()));
             shot(m, "cliente_mv154_bestiario_helado");
         });

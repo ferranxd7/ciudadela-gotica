@@ -887,6 +887,8 @@ public final class CiTest {
                 sb.append(String.format(java.util.Locale.ROOT, " %s a %.1f: la presa -%.1f, helada %d, frenada %s;", nombres[i], lejos[i], vida - presa.getHealth(),
                         frio, presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)));
                 a.discard();
+                // (fuera tambien la presa: las esquirlas de la siguiente le darian a ella, que se queda en medio)
+                presa.discard();
             }
             sb.append(String.format(java.util.Locale.ROOT, " alientos +%d, puas +%d, esquirlas +%d (dan %d);", com.darkcraft.enemigos.Helado.ALIENTOS - ali,
                     com.darkcraft.enemigos.Helado.PUAS - pua, com.darkcraft.enemigos.Helado.ESQUIRLAS - esq, com.darkcraft.enemigos.Esquirla.DAN - dan));
