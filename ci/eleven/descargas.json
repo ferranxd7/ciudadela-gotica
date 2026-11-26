@@ -1943,6 +1943,174 @@
     {
       "archivo": "sfx/pantano_ambiente_4.mp3",
       "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/ZxWsxUWm6YMSXZippW8k/KSm9EGYKXBCttQrPust5/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=rzFjQFYzQQtBLyYk3oGHpvAMbNk="
+    },
+    {
+      "archivo": "barquero/voz_1a.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/4CsA98Sdvwbjtv6Z3fmw/sKY8625Z6Rgkb2MlEL6y/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=eWJkhuaauAb12xUuEAVvDW1mzZc="
+    },
+    {
+      "archivo": "barquero/voz_1b.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/6BBazt4MKpstBAIRd7Z9/r9rqhvao8mvrdCptYkyH/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=WJDUllDYltOtMIcBC0faLyl0bhw="
+    },
+    {
+      "archivo": "barquero/voz_2a.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/zsOOXl432BYqCHLfbE4O/HShHCazY5okWIwTyTNly/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=EMRgjBAG5kS_TyTz439PhrcB-1M="
+    },
+    {
+      "archivo": "barquero/voz_2b.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/zFelgOGtcijB6xvzL4Yw/GTxYHfTilVUWXapf8OsZ/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=iiPaZTpPO_VkczSF5tXTHW9c7S4="
+    },
+    {
+      "archivo": "barquero/voz_3a.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/xMSJn7OXzYFffKqswh9y/BjsqeO4oovlOFVdlaysO/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=RSNj7LXrXQyQjsyrPlLN453uz-4="
+    },
+    {
+      "archivo": "barquero/voz_3b.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/7GdiHZzdmp4rTYAxdZN8/1ysBnCMJ81cQL6p3d8j9/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=WUuj7IMo_CGCK3yjQP-kGJgjmdE="
+    },
+    {
+      "archivo": "barquero/voz_4a.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/UUjwFFPMhGbAclX6HryC/KOhKZnt8UqVayTVCMz8x/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=DyjmsNNPWfQN0zgaFmj8axr0iZw="
+    },
+    {
+      "archivo": "barquero/voz_4b.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/w2yR0OXrebRZqEVN2Sdg/z4pxnXySUa3ftOWyMWdc/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=I07NYkm98TyS4fDF-GlJazS0l7o="
+    },
+    {
+      "archivo": "barquero/voz_5a.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/U57rm5Bn7Zq34fjPszBV/jwV7SLrbY1UlmVJXz6BJ/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=dzKWZU-PAkrpZzDYbPlGkcZ6cEI="
+    },
+    {
+      "archivo": "barquero/voz_5b.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/TNzWUFd9MDyj8KFqFfmG/oG6IQdbZP8FVVz75X4Vy/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=ya3E6U-cVDvyLhl87aZ1SPvBgZ4="
+    },
+    {
+      "archivo": "sfx/barquero_grito_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/3Xx8s0tejERD6Rm2PxMf/QmfTamZNtB30D1MBcqSd/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=RaOhCGd1yx0rJEsSZB-EkBNGcqU="
+    },
+    {
+      "archivo": "sfx/barquero_grito_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/D41isGGxK7fF1xAvjWTV/jbR8jmy8SVKzXfA1s086/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=PWy-FNV8-Uy0vWKkqLyeaKXeRxk="
+    },
+    {
+      "archivo": "sfx/barquero_grito_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/wDodercvyeHY0Oaku7vm/1ZkxVTUoxLAH7VEiE2WS/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=RfKOVM_otcK7Ia0y8SQz2vKfX1s="
+    },
+    {
+      "archivo": "sfx/barquero_grito_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/MkzurjOqG4DDc5GWbNbu/1rzVZtDBsOcSScoB06Gw/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=njS1_xWHLSiXoqThZqwBMSviuTo="
+    },
+    {
+      "archivo": "sfx/barquero_remazo_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/DMLktNseexnsDtsMn4PM/srpz67S66pc60mZgV6BI/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=MsPcUB4PfiL1TCGh0DT1QqEmA4U="
+    },
+    {
+      "archivo": "sfx/barquero_remazo_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/stIkT7ybIGdAs0Wu9Oqp/7pNtnqsOh1mLZd1eC3to/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=QVdx15JJaeKkFUspsbgnudCaqJk="
+    },
+    {
+      "archivo": "sfx/barquero_remazo_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/rOliGgle9ccGI6jYeWzN/ofsS1FkCBHStLokMTFgx/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=V_3vmu77MwH7W78iQSNpmcq-MZI="
+    },
+    {
+      "archivo": "sfx/barquero_remazo_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/W59TIu3uIRuZVV6TJt6X/7ImQGhXvaiQcxPIuwlmL/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=1x5Ax_FPBID4gAwlLT1mC8CwqJA="
+    },
+    {
+      "archivo": "sfx/barquero_barrido_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/orQ85jl5GddpZuNhCdHB/oLdh8xi7J8UoJFgfVgEL/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=YZway34K4B4_bT8fr2LA67WYCuA="
+    },
+    {
+      "archivo": "sfx/barquero_barrido_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/M9dqBFr8fHJsW3p4Gpvn/syuJZin3FzocvW0uwgF4/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=iQnO-zgyqGNnboz6raPwpBX8eKM="
+    },
+    {
+      "archivo": "sfx/barquero_barrido_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/JVjZtlddFqx0aRY3mA82/EYlnOYOU961LDYs14rsg/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=GNxS2LXkZHHZEPoldesYhh-FFWM="
+    },
+    {
+      "archivo": "sfx/barquero_barrido_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/gVKHEK8QZzeClz3KGpdI/B8LS5Hpxfap3f6x1eJZ1/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=cOdRR9_pkG6p1EiJFLdbz2fMlJI="
+    },
+    {
+      "archivo": "sfx/barquero_bichero_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/ICxmp1UruOBsrFcgcDM7/Dz5Q5QmOKYe5nBlga2Tc/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=ILo0fKqRBeXzXvKJGcyeE9_xhDE="
+    },
+    {
+      "archivo": "sfx/barquero_bichero_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/9hHx7DCaPmjGpq35s5NI/9LKNppa2RPp9hzNCLQ9k/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=ysAuaj-jZo-_pWaS4vkE7FvZ8k8="
+    },
+    {
+      "archivo": "sfx/barquero_bichero_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/gJSPh2ULhf3yhxtS1EFl/oEbtIh3FpwwaEg1niSX9/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=bpXEPjy3EHChpmaBSLTN2DV-0Xc="
+    },
+    {
+      "archivo": "sfx/barquero_bichero_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/ccSi5wcxiRQn1JETFJCl/uuFTWvThHzqdAOu8vdRn/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=7dlb8yl05M-VM_DM_5dCcCS1v7E="
+    },
+    {
+      "archivo": "sfx/barquero_linterna_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/SDBwvsdjsvh1SVp0kKmq/bStJnS3qn2gRgJkg0s7v/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=SrD-CcFLEJT5nSPIelTFw70R90s="
+    },
+    {
+      "archivo": "sfx/barquero_linterna_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/tOZkl8j5bOCJGsDR61s1/5DYt75lBRKH4rofiZmXu/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=7naFpur8SqV-Fz6TVLDooTf2TsY="
+    },
+    {
+      "archivo": "sfx/barquero_linterna_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/OKnuQmJ9hCvJ0mf2vz9i/gYfAxEJTezCvEKsjhrWR/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=E1ZSQCzyBgwimll2FEgq4CjiX18="
+    },
+    {
+      "archivo": "sfx/barquero_linterna_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/GOnpqR1Og4ZKs3b95peB/L8gBj2cDwlEn2pIopzof/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=RYr2sS_o6mkjxtwiOE28nynIJIg="
+    },
+    {
+      "archivo": "sfx/barquero_dolor_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/5OgRTiU6gzPYKNOBwSvK/UP7LlzJwzvVyD2RRYrn7/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=pRe-nM_kUOoWOZJ1vWwN3oNIubk="
+    },
+    {
+      "archivo": "sfx/barquero_dolor_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/P29bxBJddGfeMGawFTWm/cnER3E0ouCg2WTj6PGUp/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=Zxa-4-h8h_4XCFx8YlzMC7Ih3MY="
+    },
+    {
+      "archivo": "sfx/barquero_dolor_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/X4kzaInY95CkC6Ij8JiA/ZM0v50pmDoUotAmrOHD0/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=o33-pD095yshp4UfB1XDHdZZE1c="
+    },
+    {
+      "archivo": "sfx/barquero_dolor_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/DV7CQZ7lD6JilREt39Y4/wG4Tkoi6ewl8z7RaQnDq/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=BXYRPKBBL9-cV6vblKwBb8Ft0N8="
+    },
+    {
+      "archivo": "sfx/barquero_muerte_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/H7WWZ1E97O03x6xIZnyj/0at6VVoyviOHpvE1KiAW/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=Y358i-HC3FB-lSASK2y4Q71Wy0M="
+    },
+    {
+      "archivo": "sfx/barquero_muerte_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/2jyuE3suDBhSxvKDe9Sv/AH6VcdrUw2RHMLVdg5US/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=P5dm4ojdAwT28AjEZKmROTovZJs="
+    },
+    {
+      "archivo": "sfx/barquero_muerte_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/Luc54WcSSRcvleDQTmcm/HudHQJqYmiEenzDfyWWu/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=pZ_SN2nbMHBXh7VChwSBZ77aQoI="
+    },
+    {
+      "archivo": "sfx/barquero_muerte_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/WtpVWT7WfsEnWF21dO0U/8gTWmH01g1Eu27yunsDw/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=bSXSvPSqO8QYNGnmu1ZolUK7n-U="
+    },
+    {
+      "archivo": "sfx/barquero_remo_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/4SOtJSTs57Wgg5la6kcu/Tdrpk7JjcbfwGOPEgWpE/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=qJ5UNwDI5fWKUJCJVzbKAe_0Tgc="
+    },
+    {
+      "archivo": "sfx/barquero_remo_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/k0Rnvg8jwBqOmew5GHZy/gBlH5oa6qlZwzVfhLZIZ/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=Et9L6ffzaG8n8g0lZMFGCCiP-EY="
+    },
+    {
+      "archivo": "sfx/barquero_remo_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/WLD9LLHtICYvSCCohMfr/8yI7DM4EuQmjXZFvcflG/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=VRzDQfYI2knVmjTohOcoQlHfDdk="
+    },
+    {
+      "archivo": "sfx/barquero_remo_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/FZqaoqRcEwb3fRCb9yWN/bVaabhgIXDPjfqj8h6Tt/content.mp3?Expires=1795708800&KeyName=assets-cdn-key-1&Signature=tDNtIp2Vt0z0qJ8bMokrSiViCUg="
     }
   ]
 }

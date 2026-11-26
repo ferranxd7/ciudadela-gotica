@@ -3497,5 +3497,196 @@
     ]
    }
   }
+ },
+ "barquero": {
+  "flow": "MwR3v95olYFzccpu1TzZ",
+  "voz": "M5E055lOUxMi0kJpGyE9",
+  "nombre_voz": "Gravel Midnight - Deep Character Voice",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7j: el Barquero del Pantano Podrido (el jefe del pantano). Tomas a y b de cada frase como barquero/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[slow, hollow, menacing] Another soul for the crossing... [low whisper] Pay the toll... or swim.",
+    "sesiones": [
+     "4CsA98Sdvwbjtv6Z3fmw",
+     "6BBazt4MKpstBAIRd7Z9"
+    ],
+    "generaciones": [
+     "sKY8625Z6Rgkb2MlEL6y",
+     "r9rqhvao8mvrdCptYkyH"
+    ]
+   },
+   "2": {
+    "texto": "[shouting, furious] Rise, my passengers! The boat is not yet full!",
+    "sesiones": [
+     "zsOOXl432BYqCHLfbE4O",
+     "zFelgOGtcijB6xvzL4Yw"
+    ],
+    "generaciones": [
+     "HShHCazY5okWIwTyTNly",
+     "GTxYHfTilVUWXapf8OsZ"
+    ]
+   },
+   "3": {
+    "texto": "[quiet, cold] The water always takes its due.",
+    "sesiones": [
+     "xMSJn7OXzYFffKqswh9y",
+     "7GdiHZzdmp4rTYAxdZN8"
+    ],
+    "generaciones": [
+     "BjsqeO4oovlOFVdlaysO",
+     "1ysBnCMJ81cQL6p3d8j9"
+    ]
+   },
+   "4": {
+    "texto": "[hissing whisper] Come aboard...",
+    "sesiones": [
+     "UUjwFFPMhGbAclX6HryC",
+     "w2yR0OXrebRZqEVN2Sdg"
+    ],
+    "generaciones": [
+     "KOhKZnt8UqVayTVCMz8x",
+     "z4pxnXySUa3ftOWyMWdc"
+    ]
+   },
+   "5": {
+    "texto": "[weak, fading, relieved] The shore... at last... I can see the shore.",
+    "sesiones": [
+     "U57rm5Bn7Zq34fjPszBV",
+     "TNzWUFd9MDyj8KFqFfmG"
+    ],
+    "generaciones": [
+     "jwV7SLrbY1UlmVJXz6BJ",
+     "oG6IQdbZP8FVVz75X4Vy"
+    ]
+   }
+  }
+ },
+ "sfx_barquero": {
+  "flow": "hDtV8BlS51uvJUsEJk6K",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7j: el Barquero (el grito, el remazo contra el agua, el barrido del remo, el bichero, la linterna de almas, el dolor, la muerte, el remo en el agua). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "barquero_grito": {
+    "prompt": "Undead ferryman lets out a hollow, echoing wail over dark water, ghostly and furious, water dripping, dark fantasy, no music, 2.5 seconds",
+    "sesiones": [
+     "3Xx8s0tejERD6Rm2PxMf",
+     "D41isGGxK7fF1xAvjWTV",
+     "wDodercvyeHY0Oaku7vm",
+     "MkzurjOqG4DDc5GWbNbu"
+    ],
+    "generaciones": [
+     "QmfTamZNtB30D1MBcqSd",
+     "jbR8jmy8SVKzXfA1s086",
+     "1ZkxVTUoxLAH7VEiE2WS",
+     "1rzVZtDBsOcSScoB06Gw"
+    ]
+   },
+   "barquero_remazo": {
+    "prompt": "Heavy wooden oar slammed down onto wet mud and shallow water, deep thud, big splash, wood creaking, no music, 1.5 seconds",
+    "sesiones": [
+     "DMLktNseexnsDtsMn4PM",
+     "stIkT7ybIGdAs0Wu9Oqp",
+     "rOliGgle9ccGI6jYeWzN",
+     "W59TIu3uIRuZVV6TJt6X"
+    ],
+    "generaciones": [
+     "srpz67S66pc60mZgV6BI",
+     "7pNtnqsOh1mLZd1eC3to",
+     "ofsS1FkCBHStLokMTFgx",
+     "7ImQGhXvaiQcxPIuwlmL"
+    ]
+   },
+   "barquero_barrido": {
+    "prompt": "Long heavy wooden oar swung fast through the air, deep whoosh, water droplets flung off, no music, 1 second",
+    "sesiones": [
+     "orQ85jl5GddpZuNhCdHB",
+     "M9dqBFr8fHJsW3p4Gpvn",
+     "JVjZtlddFqx0aRY3mA82",
+     "gVKHEK8QZzeClz3KGpdI"
+    ],
+    "generaciones": [
+     "oLdh8xi7J8UoJFgfVgEL",
+     "syuJZin3FzocvW0uwgF4",
+     "EYlnOYOU961LDYs14rsg",
+     "B8LS5Hpxfap3f6x1eJZ1"
+    ]
+   },
+   "barquero_bichero": {
+    "prompt": "Rusty iron boathook thrust forward on a long pole, metal scrape and a hard catch, chain rattle, no music, 1.3 seconds",
+    "sesiones": [
+     "ICxmp1UruOBsrFcgcDM7",
+     "9hHx7DCaPmjGpq35s5NI",
+     "gJSPh2ULhf3yhxtS1EFl",
+     "ccSi5wcxiRQn1JETFJCl"
+    ],
+    "generaciones": [
+     "Dz5Q5QmOKYe5nBlga2Tc",
+     "9LKNppa2RPp9hzNCLQ9k",
+     "oEbtIh3FpwwaEg1niSX9",
+     "uuFTWvThHzqdAOu8vdRn"
+    ]
+   },
+   "barquero_linterna": {
+    "prompt": "Ghostly soul lantern flaring up, eerie cold fire roaring outward in a ring over water, hissing spectral flames, dark fantasy magic, no music, 2 seconds",
+    "sesiones": [
+     "SDBwvsdjsvh1SVp0kKmq",
+     "tOZkl8j5bOCJGsDR61s1",
+     "OKnuQmJ9hCvJ0mf2vz9i",
+     "GOnpqR1Og4ZKs3b95peB"
+    ],
+    "generaciones": [
+     "bStJnS3qn2gRgJkg0s7v",
+     "5DYt75lBRKH4rofiZmXu",
+     "gYfAxEJTezCvEKsjhrWR",
+     "L8gBj2cDwlEn2pIopzof"
+    ]
+   },
+   "barquero_dolor": {
+    "prompt": "Hollow undead old man grunting in pain, wet raspy groan, close, no music, 0.8 seconds",
+    "sesiones": [
+     "5OgRTiU6gzPYKNOBwSvK",
+     "P29bxBJddGfeMGawFTWm",
+     "X4kzaInY95CkC6Ij8JiA",
+     "DV7CQZ7lD6JilREt39Y4"
+    ],
+    "generaciones": [
+     "UP7LlzJwzvVyD2RRYrn7",
+     "cnER3E0ouCg2WTj6PGUp",
+     "ZM0v50pmDoUotAmrOHD0",
+     "wG4Tkoi6ewl8z7RaQnDq"
+    ]
+   },
+   "barquero_muerte": {
+    "prompt": "Undead ferryman collapsing into dark water, long fading death rattle, heavy splash, a lantern flame snuffed out with a hiss, no music, 3.5 seconds",
+    "sesiones": [
+     "H7WWZ1E97O03x6xIZnyj",
+     "2jyuE3suDBhSxvKDe9Sv",
+     "Luc54WcSSRcvleDQTmcm",
+     "WtpVWT7WfsEnWF21dO0U"
+    ],
+    "generaciones": [
+     "0at6VVoyviOHpvE1KiAW",
+     "AH6VcdrUw2RHMLVdg5US",
+     "HudHQJqYmiEenzDfyWWu",
+     "8gTWmH01g1Eu27yunsDw"
+    ]
+   },
+   "barquero_remo": {
+    "prompt": "Slow oar strokes in still black water, old wooden boat creaking, gentle lapping, eerie and quiet, no music, 6 seconds",
+    "sesiones": [
+     "4SOtJSTs57Wgg5la6kcu",
+     "k0Rnvg8jwBqOmew5GHZy",
+     "WLD9LLHtICYvSCCohMfr",
+     "FZqaoqRcEwb3fRCb9yWN"
+    ],
+    "generaciones": [
+     "Tdrpk7JjcbfwGOPEgWpE",
+     "gBlH5oa6qlZwzVfhLZIZ",
+     "8yI7DM4EuQmjXZFvcflG",
+     "bVaabhgIXDPjfqj8h6Tt"
+    ]
+   }
+  }
  }
 }
