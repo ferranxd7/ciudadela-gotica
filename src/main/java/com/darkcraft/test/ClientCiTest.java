@@ -6005,6 +6005,8 @@ public final class ClientCiTest {
         t = monasterio(t);
         // la escalera de los penitentes y Hrodric, el Abad de la Cumbre, el jefe de las Montanas Nevadas (parte 7l)
         t = abad(t);
+        // la Puerta Oeste de la Capital y los calcinados (parte 7m)
+        t = capital(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -8121,6 +8123,330 @@ public final class ClientCiTest {
             });
         });
         return C + 336;
+    }
+
+    // ------------------------------------------------------------------ la Puerta Oeste de la Capital y los calcinados (parte 7m)
+
+    private static final com.darkcraft.enemigos.Calcinado[] CALCINADOS = new com.darkcraft.enemigos.Calcinado[3];
+
+    private static com.darkcraft.enemigos.Calcinado calcinadoNuevo(ServerLevel lvl, int variante, double x, double y, double z, float giro, int postura) {
+        var a = DarkCraftMod.CALCINADO.get().create(lvl);
+        if (a == null) return null;
+        a.variante(variante);
+        a.moveTo(x, y, z, giro, 0f);
+        a.yBodyRot = a.yHeadRot = giro;
+        if (postura != com.darkcraft.enemigos.Enemigo.DE_PIE) a.asignar("", -1, a.blockPosition(), giro, postura, 0);
+        lvl.addFreshEntity(a);
+        return a;
+    }
+
+    private static void quitarCalcinados(ServerLevel lvl) {
+        for (int i = 0; i < CALCINADOS.length; i++) {
+            if (CALCINADOS[i] != null && !CALCINADOS[i].isRemoved()) CALCINADOS[i].discard();
+            CALCINADOS[i] = null;
+        }
+        if (lvl == null) return;
+        int x = com.darkcraft.morvain.Capital.CX, z = com.darkcraft.morvain.Capital.CZ;
+        var caja = new net.minecraft.world.phys.AABB(x - 80, 60, z - 90, x + 130, 160, z + 90);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.Llamas.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(net.minecraft.world.entity.AreaEffectCloud.class, caja)) e.discard();
+    }
+
+    private static String estadoCalcinados() {
+        StringBuilder sb = new StringBuilder();
+        for (var a : CALCINADOS) sb.append(a == null ? "-" : estadoE(a)).append(" | ");
+        return sb + String.format(java.util.Locale.ROOT, "bloqueos %d, cantaros %d (revientan %d, dan %d, llamas queman %d), agarrones %d, quemados %d, cenizas %d, alzados %d",
+                com.darkcraft.enemigos.Calcinado.BLOQUEOS, com.darkcraft.enemigos.Calcinado.CANTAROS, com.darkcraft.enemigos.Cantaro.REVIENTAN,
+                com.darkcraft.enemigos.Cantaro.DAN, com.darkcraft.enemigos.Cantaro.LLAMAS_QUEMAN, com.darkcraft.enemigos.Calcinado.AGARRONES,
+                com.darkcraft.enemigos.Calcinado.QUEMADOS, com.darkcraft.enemigos.Calcinado.CENIZAS, com.darkcraft.enemigos.Calcinado.ALZADOS);
+    }
+
+    /**
+     * La Puerta Oeste de la Capital: el camino con los carros quemados y la puerta desde el santuario; entrar a pie por el paso
+     * del rastrillo, en aventura (el cartel con su nombre, el logro y el ruido de las ruinas); la sala de la guardia con el
+     * atril, el adarve, la calle mayor, la plaza de la estatua caida, el cuartel y todo desde lo alto; en supervivencia, el
+     * escudo de la guardia (de frente) y su tajo, el cantaro del incendiario y las llamas que deja, un ceniciento que se alza
+     * de la ceniza, su agarron y la nube de ceniza al morir; el libro del sargento Brannoc y el bestiario. Al acabar vuelven.
+     */
+    private static int capital(int T) {
+        final var V = com.darkcraft.morvain.Capital.get();
+        final int CX = com.darkcraft.morvain.Capital.CX, CZ = com.darkcraft.morvain.Capital.CZ, PISO = com.darkcraft.morvain.Capital.PISO;
+        final int ADARVE = PISO + 8, PU = com.darkcraft.morvain.Capital.PLAZA_U;
+        final var SC = com.darkcraft.morvain.SantuariosMorvain.porId("puerta_capital");
+        int t = T;
+        atTicks(t, "La capital: desde el santuario de la Puerta de la Capital", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft capital enemigos volver");
+                irMirando(sp, SC.x() + 6.5, SC.y() + 7, SC.z() + 9.5, CX, PISO + 9, CZ, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv178_capital_santuario");
+            server(m, sp -> log("  " + com.darkcraft.morvain.MorvainEnemigos.estadoCapital(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "La capital: el camino con los carros quemados", m -> server(m, sp -> irMirando(sp, CX - 40.5, PISO + 3.5, CZ + 7.5, CX - 2, PISO + 6, CZ, true)));
+        t += 70;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv179_capital_camino"));
+        t += 10;
+        // ---- entrar a pie por el paso de la puerta, en aventura: el cartel con el nombre, el logro y las ruinas
+        atTicks(t, "La capital: entrar por la puerta", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft capital enemigos fuera");
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), CX + 7.5, PISO, CZ + 0.5, -90f, 2f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura", m -> {
+            log("  capital: " + ClientMusic.capital());
+            shot(m, "cliente_mv180_capital_dentro");
+            server(m, sp -> log("  al entrar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + ", logro capital " + com.darkcraft.story.Logros.tiene(sp, "capital")
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+        });
+        t += 10;
+        atTicks(t, "La capital: vuelven los calcinados", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft capital enemigos volver");
+            });
+        });
+        t += 4;
+        atTicks(t, "La capital: el paso de la puerta y el rastrillo", m -> server(m, sp -> irMirando(sp, CX - 9.5, PISO + 1.6, CZ + 0.5, CX + 12, PISO + 1.6, CZ + 0.5, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv181_capital_puerta"));
+        t += 10;
+        atTicks(t, "La capital: la sala de la guardia y el atril", m -> server(m, sp -> irMirando(sp, CX + 3.5, ADARVE + 2.6, CZ - 0.5, CX + 0.5, ADARVE + 1.4, CZ + 2.5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv182_capital_sala_guardia"));
+        t += 10;
+        atTicks(t, "La capital: el adarve", m -> server(m, sp -> irMirando(sp, CX - 0.5, ADARVE + 2.6, CZ - 20.5, CX + 20, PISO + 3, CZ + 6, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv183_capital_adarve"));
+        t += 10;
+        atTicks(t, "La capital: la calle mayor", m -> server(m, sp -> irMirando(sp, CX + 12.5, PISO + 2.2, CZ + 0.5, CX + 60, PISO + 2, CZ + 0.5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv184_capital_calle"));
+        t += 10;
+        atTicks(t, "La capital: la plaza de la estatua caida", m -> server(m, sp -> irMirando(sp, CX + PU - 13.5, PISO + 3.5, CZ + 9.5, CX + PU + 1, PISO + 2, CZ - 1, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv185_capital_plaza"));
+        t += 10;
+        atTicks(t, "La capital: el cuartel", m -> server(m, sp -> irMirando(sp, CX + 96.5, PISO + 2.5, CZ - 13.5, CX + 96.5, PISO + 4, CZ - 30, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv186_capital_cuartel"));
+        t += 10;
+        atTicks(t, "La capital: todo desde lo alto", m -> server(m, sp -> irMirando(sp, CX - 34.5, PISO + 46, CZ + 62.5, CX + 46, PISO, CZ - 4, true)));
+        t += 90;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv187_capital_alto");
+            server(m, sp -> log("  desde lo alto: " + com.darkcraft.morvain.MorvainEnemigos.estadoCapital(sp.server)));
+        });
+        t += 10;
+        // ---- en supervivencia, en la calle mayor: el escudo de la guardia de frente (el golpe apenas entra)
+        atTicks(t, "La capital: el escudo de la guardia (supervivencia)", m -> {
+            m.options.hideGui = false;
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                comando(sp, "darkcraft capital enemigos fuera");
+                ServerLevel lvl = sp.serverLevel();
+                quitarCalcinados(lvl);
+                aPelear(sp, true);
+                CALCINADOS[0] = calcinadoNuevo(lvl, com.darkcraft.enemigos.Calcinado.GUARDIA, CX + 22.5, PISO, CZ + 0.5, 90f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+                irMirando(sp, CX + 19.6, PISO, CZ + 0.5, CX + 22.5, PISO + 1.2, CZ + 0.5, false);
+                var a = CALCINADOS[0];
+                if (a == null) return;
+                a.setNoAi(true);
+                float v0 = a.getHealth();
+                a.hurt(sp.damageSources().playerAttack(sp), 8f);
+                log("  el escudo de frente: -" + String.format(java.util.Locale.ROOT, "%.1f", v0 - a.getHealth()) + " de 8 | " + estadoCalcinados());
+            });
+        });
+        t += 6;
+        atTicks(t, "captura: el escudo", m -> shot(m, "cliente_mv188_escudo"));
+        t += 20;
+        // ---- el tajo al rojo, de lado
+        atTicks(t, "La capital: el tajo", m -> server(m, sp -> {
+            var a = CALCINADOS[0];
+            if (a == null) return;
+            a.setNoAi(false);
+            a.setTarget(sp);
+            a.setYRot(90f);
+            a.yBodyRot = a.yHeadRot = 90f;
+            a.empezar(com.darkcraft.enemigos.CalcinadoAnims.TAJO);
+            verDesdeServidor = new Vec3(CX + 21.0, PISO + 1.8, CZ + 5.5);
+            miraServidor = new Vec3(CX + 21.0, PISO + 1.2, CZ + 0.5);
+        }));
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += 17;
+        atTicks(t, "captura: el tajo", m -> {
+            server(m, sp -> log("  el tajo: " + estadoCalcinados() + " | jugador ardiendo " + sp.getRemainingFireTicks()));
+            shot(m, "cliente_mv189_tajo");
+        });
+        t += 30;
+        // ---- el cantaro del incendiario, de lado (en el aire) y las llamas que deja
+        atTicks(t, "La capital: el cantaro de brea", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarCalcinados(lvl);
+                aPelear(sp, true);
+                sp.clearFire();
+                CALCINADOS[1] = calcinadoNuevo(lvl, com.darkcraft.enemigos.Calcinado.INCENDIARIO, CX + 30.5, PISO, CZ + 0.5, 90f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+                irMirando(sp, CX + 21.5, PISO, CZ + 0.5, CX + 30.5, PISO + 1.4, CZ + 0.5, false);
+                var a = CALCINADOS[1];
+                if (a == null) return;
+                a.setTarget(sp);
+                a.empezar(com.darkcraft.enemigos.CalcinadoAnims.LANZAR);
+                verDesdeServidor = new Vec3(CX + 26.0, PISO + 2.4, CZ + 9.5);
+                miraServidor = new Vec3(CX + 26.0, PISO + 2.0, CZ + 0.5);
+            });
+        });
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += 19;
+        atTicks(t, "captura: el cantaro en el aire", m -> {
+            server(m, sp -> log("  el cantaro: " + estadoCalcinados()));
+            shot(m, "cliente_mv190_cantaro");
+        });
+        t += 22;
+        atTicks(t, "captura: las llamas de la brea", m -> {
+            server(m, sp -> log("  las llamas: " + estadoCalcinados() + " | jugador ardiendo " + sp.getRemainingFireTicks()));
+            shot(m, "cliente_mv191_llamas");
+        });
+        t += 30;
+        // ---- un ceniciento enterrado en un monton de ceniza que se alza al llegar el jugador
+        atTicks(t, "La capital: un ceniciento enterrado", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarCalcinados(lvl);
+                aPelear(sp, true);
+                sp.clearFire();
+                CALCINADOS[2] = calcinadoNuevo(lvl, com.darkcraft.enemigos.Calcinado.CENICIENTO, CX + 28.5, PISO, CZ + 0.5, 90f, com.darkcraft.enemigos.Enemigo.TUMBADO);
+                irMirando(sp, CX + 23.0, PISO, CZ + 0.5, CX + 28.5, PISO + 0.3, CZ + 0.5, false);
+            });
+        });
+        t += 6;
+        atTicks(t, "captura: enterrado", m -> {
+            server(m, sp -> log("  enterrado: " + estadoCalcinados()));
+            shot(m, "cliente_mv192_enterrado");
+        });
+        t += 4;
+        // (enterrado solo repara en quien se le acerca a menos de 3.6 bloques)
+        atTicks(t, "La capital: el jugador se acerca al ceniciento", m -> server(m, sp -> irMirando(sp, CX + 25.6, PISO, CZ + 0.5, CX + 28.5, PISO + 1.0, CZ + 0.5, false)));
+        t += 24;
+        atTicks(t, "captura: se alza", m -> {
+            server(m, sp -> log("  se alza: " + estadoCalcinados()));
+            shot(m, "cliente_mv193_se_alza");
+        });
+        t += 16;
+        // ---- el agarron, de lado
+        atTicks(t, "La capital: el agarron", m -> server(m, sp -> {
+            var a = CALCINADOS[2];
+            if (a == null) return;
+            irMirando(sp, CX + 25.0, PISO, CZ + 0.5, CX + 28.5, PISO + 1.0, CZ + 0.5, false);
+            a.setTarget(sp);
+            a.setYRot(90f);
+            a.yBodyRot = a.yHeadRot = 90f;
+            a.empezar(com.darkcraft.enemigos.CalcinadoAnims.AGARRON);
+            verDesdeServidor = new Vec3(CX + 26.5, PISO + 1.8, CZ + 6.5);
+            miraServidor = new Vec3(CX + 26.5, PISO + 1.0, CZ + 0.5);
+        }));
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += 14;
+        atTicks(t, "captura: el agarron", m -> {
+            server(m, sp -> log("  el agarron: " + estadoCalcinados() + " | jugador ardiendo " + sp.getRemainingFireTicks() + ", frenado "
+                    + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)));
+            shot(m, "cliente_mv194_agarron");
+        });
+        t += 20;
+        // ---- cae y revienta en ceniza (al lado del jugador, en primera persona: la ceguera)
+        atTicks(t, "La capital: el ceniciento revienta en ceniza", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                var a = CALCINADOS[2];
+                if (a == null) return;
+                sp.clearFire();
+                // a dos bloques: la nube le ciega
+                irMirando(sp, a.getX() - 2.0, PISO, a.getZ(), a.getX(), PISO + 1.0, a.getZ(), false);
+                a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+            });
+        });
+        t += 44;
+        atTicks(t, "captura: la ceniza", m -> {
+            server(m, sp -> log("  la ceniza: " + estadoCalcinados() + " | jugador ciego " + sp.hasEffect(net.minecraft.world.effect.MobEffects.BLINDNESS)
+                    + " | logro calcinado " + com.darkcraft.story.Logros.tiene(sp, "calcinado")));
+            shot(m, "cliente_mv195_ceniza");
+        });
+        t += 12;
+        // sin fuego ni efectos (con cada golpe se cerrarian el codice y el menu) y en creativo
+        atTicks(t, "La capital: sin calcinados (para el libro y el bestiario)", m -> server(m, sp -> {
+            quitarCalcinados(sp.serverLevel());
+            sp.removeAllEffects();
+            sp.clearFire();
+            sp.setHealth(sp.getMaxHealth());
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        t += 6;
+        atTicks(t, "La capital: el libro del sargento Brannoc", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(22));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv196_libro_brannoc"));
+        t += 6;
+        atTicks(t, "el bestiario: el ceniciento (el que acaba de caer)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("calcinado_ceniciento")));
+        });
+        t += 18;
+        atTicks(t, "captura: el ceniciento en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv197_bestiario_calcinado");
+        });
+        t += 4;
+        atTicks(t, "La capital: fin (vuelven los calcinados, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                quitarCalcinados(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft capital enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
     }
 
     // ------------------------------------------------------------------ el molino y la Molinera de Velmor (parte 7f)

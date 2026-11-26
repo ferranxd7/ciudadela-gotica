@@ -83,6 +83,8 @@ public final class ClientSetup {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PODRIDO.get(), com.darkcraft.client.enemigos.PodridoRenderer::new);
         // los helados de las Montanas Nevadas y sus esquirlas (parte 7k)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.HELADO.get(), com.darkcraft.client.enemigos.HeladoRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CALCINADO.get(), com.darkcraft.client.enemigos.CalcinadoRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CANTARO.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ESQUIRLA.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.FUEGO_FATUO.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
         // los marchitos de Morvain (parte 7e)
@@ -123,6 +125,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.MarchitoModelo.CAPA, com.darkcraft.client.enemigos.MarchitoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.PodridoModelo.CAPA, com.darkcraft.client.enemigos.PodridoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.HeladoModelo.CAPA, com.darkcraft.client.enemigos.HeladoGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.CalcinadoModelo.CAPA, com.darkcraft.client.enemigos.CalcinadoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.AhorcadoModelo.CAPA, com.darkcraft.client.enemigos.AhorcadoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.MolineraModelo.CAPA, com.darkcraft.client.enemigos.MolineraGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.VerdugoModelo.CAPA, com.darkcraft.client.enemigos.VerdugoGeometria::crear);
