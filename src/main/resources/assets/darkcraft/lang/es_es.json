@@ -1177,6 +1177,7 @@
   "darkcraft.titulo.mods": "Mods",
   "darkcraft.titulo.salir": "Salir del juego",
   "darkcraft.titulo.musica": "♪ Ashbringer — William Hector",
+  "darkcraft.titulo.memoria": "Poca memoria para la lejanía y los shaders (%s GB): sube la de TLauncher a 8 GB en sus ajustes",
   "darkcraft.partidas.titulo": "Partidas",
   "darkcraft.partidas.cargando": "Buscando las partidas...",
   "darkcraft.partidas.ninguna": "Aún no hay ninguna partida.",

@@ -207,6 +207,12 @@ public class TituloScreen extends Screen {
         g.drawString(font, "Dark Craft " + ver + " · Minecraft " + SharedConstants.getCurrentVersion().getName(), 4, height - 10, GRIS, true);
         Component musica = Component.translatable("darkcraft.titulo.musica");
         g.drawString(font, musica, width - 4 - font.width(musica), height - 10, GRIS, true);
+        // con Distant Horizons a 256 chunks y shaders hace falta memoria: si el lanzador da poca, se avisa
+        long mem = Runtime.getRuntime().maxMemory();
+        if (mem < 5_500_000_000L && com.darkcraft.client.Lejania.hayDH()) {
+            Component aviso = Component.translatable("darkcraft.titulo.memoria", String.format(java.util.Locale.ROOT, "%.1f", mem / 1073741824.0));
+            g.drawString(font, aviso, 4, height - 21, 0xFFD8704A, true);
+        }
         // al abrir, sale de la oscuridad
         if (tt < 30) g.fill(0, 0, width, height, (Math.round(255 * (1f - tt / 30f)) << 24));
         Pix.blanco();

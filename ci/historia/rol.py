@@ -554,6 +554,8 @@ ES = {
     "darkcraft.titulo.mods": "Mods",
     "darkcraft.titulo.salir": "Salir del juego",
     "darkcraft.titulo.musica": "♪ Ashbringer — William Hector",
+    # parte 6: la memoria para Distant Horizons y los shaders
+    "darkcraft.titulo.memoria": "Poca memoria para la lejanía y los shaders (%s GB): sube la de TLauncher a 8 GB en sus ajustes",
     "darkcraft.partidas.titulo": "Partidas",
     "darkcraft.partidas.cargando": "Buscando las partidas...",
     "darkcraft.partidas.ninguna": "Aún no hay ninguna partida.",
@@ -1140,6 +1142,7 @@ EN = {
     "darkcraft.titulo.mods": "Mods",
     "darkcraft.titulo.salir": "Quit game",
     "darkcraft.titulo.musica": "♪ Ashbringer — William Hector",
+    "darkcraft.titulo.memoria": "Not much memory for the view distance and shaders (%s GB): give the launcher 8 GB in its settings",
     "darkcraft.partidas.titulo": "Saved games",
     "darkcraft.partidas.cargando": "Looking for saved games...",
     "darkcraft.partidas.ninguna": "No saved games yet.",

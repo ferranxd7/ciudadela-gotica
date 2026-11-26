@@ -1,12 +1,35 @@
 # Dark Craft (Forge 1.20.1)
 
-El Reino de Valdrenn: un reino maldito, con su gran castillo gótico, sobre una isla flotante de 800 × 800 bloques que aparece de forma
-natural (y rara) en el Overworld.
+Una aventura oscura sobre un mar de nubes: la isla de Brumavela, el barco volador, el Reino de Valdrenn, el camino de
+nubes, la Fortaleza de Hueso y el portal de la Sombra.
 
 ## Instalación
-1. Instala Forge 1.20.1 (47.x).
-2. Copia `darkcraft-x.y.z.jar` en la carpeta `mods`.
-3. **Crea un mundo nuevo**: el mod sube el límite de altura del Overworld hasta Y=703.
+1. En TLauncher instala y abre una vez la versión **Forge 1.20.1** (47.x).
+2. Baja `instalar_mods.bat` de la [última release](https://github.com/ferranxd7/ciudadela-gotica/releases/latest) y
+   ábrelo: pone Dark Craft, los mods de decoración y los shaders (Complementary) en tu `.minecraft`.
+3. Sube la memoria de TLauncher a **8 GB o más**: la lejanía de Distant Horizons (256 chunks) y los shaders la necesitan.
+4. **Crea una partida nueva.**
+
+Con amigos: un **servidor dedicado** de Forge 1.20.1 con el mismo `darkcraft-0.1.0.jar` en su carpeta `mods` (Oculus,
+que solo es del cliente, se queda quieto en el servidor).
+
+## Mods que lleva dentro Dark Craft
+Van dentro del jar, **sin ningún cambio**, y Forge los carga como mods normales (jar-in-jar). Son software libre con
+la licencia GNU LGPL-3.0 (el texto, y el de la GPL-3.0 a la que remite, van en `META-INF/darkcraft/` dentro del jar,
+con `CREDITOS-MODS.txt`: versión exacta, sha512 y dónde está su código fuente):
+- **Distant Horizons** — James Seibel y el equipo de Distant Horizons —
+  [código fuente](https://gitlab.com/distant-horizons-team/distant-horizons) · [Modrinth](https://modrinth.com/mod/distanthorizons).
+  Por defecto, lejanía de 256 chunks.
+- **Oculus** (Iris para Forge) — Asek3, dima_dencep y colaboradores; Iris de coderbot, IMS212 y colaboradores —
+  [código fuente](https://github.com/Asek3/Oculus) · [Modrinth](https://modrinth.com/mod/oculus).
+- **Embeddium** — embeddedt (a partir de Rubidium y Sodium, de CaffeineMC / JellySquid) —
+  [código fuente](https://github.com/embeddedt/embeddium) · [Modrinth](https://modrinth.com/mod/embeddium).
+
+## Shaders
+Dark Craft enciende por defecto **Complementary Shaders – Unbound**, de **EminGT**
+([complementary.dev](https://www.complementary.dev/)), si está en la carpeta `shaderpacks` (lo baja el instalador desde
+Modrinth; no va dentro del jar). Se usa sin cambios y con su licencia (Complementary License Agreement); cualquier
+problema que dé dentro de Dark Craft es responsabilidad de Dark Craft, no de Complementary Development.
 
 ## Comandos (requieren trucos / operador)
 - `/darkcraft valdrenn localizar` – te dice dónde está el Reino de Valdrenn más cercano (con botón para teletransportarte).
