@@ -4268,5 +4268,256 @@
     ]
    }
   }
+ },
+ "condestable": {
+  "flow": "wtXHOi3XBvDIwjFd82AX",
+  "voz": "TxWZERZ5Hc6h9dGxVmXa",
+  "nombre_voz": "Jerry B. - Military Commander | Gruff, Gritty Authority",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7n: el Condestable del Juramento (el jefe de la Capital en ruinas). Tomas a y b de cada frase como condestable/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[commanding, stern] Halt! By order of the Constable, the gates are shut. [menacing, slow] No one enters... and no one leaves.",
+    "sesiones": [
+     "oooJbRkkVxxBgmrX5LqI",
+     "EluWYEOzNqiS0d6v48NW"
+    ],
+    "generaciones": [
+     "1QeWptDClmtuDhW6Tqz2",
+     "V4zjv0pT8wk7dRo5tWuT"
+    ]
+   },
+   "2": {
+    "texto": "[shouting, battle command] Guard! To me! [shouting] Hold the gate!",
+    "sesiones": [
+     "sbsANc44TJIjv6aXO8yc",
+     "m78dxuXc5YtjMe0SAjfO"
+    ],
+    "generaciones": [
+     "IkKjHoiGfGloutC9MpA6",
+     "hmqvoArbio7CwUf36rtX"
+    ]
+   },
+   "3": {
+    "texto": "[cold, quiet, grim] The gate holds.",
+    "sesiones": [
+     "6beVoGIqwKxVO9vSQkOY",
+     "AZy8ZLaaRmvuM3xnngd6"
+    ],
+    "generaciones": [
+     "u5UftbkppNKtK9WgViTL",
+     "KXB4FmdgudozTtuULy82"
+    ]
+   },
+   "4": {
+    "texto": "[strained, through gritted teeth] I swore... [roaring] not to die!",
+    "sesiones": [
+     "7iB6moOkCtqwwz9Aa8uL",
+     "lmfk0F2uc7qXlZla97qG"
+    ],
+    "generaciones": [
+     "5LxvCFPwddQmp6GjDwN3",
+     "dQ2Oahx7GpY2XOz1sWAW"
+    ]
+   },
+   "5": {
+    "texto": "[weak, hoarse, exhausted] Open... open the gates. [softly, relieved] Let them go home.",
+    "sesiones": [
+     "LMT91yHm9QJHAnQw6bQH",
+     "7VlB4Kcv8Cx6OyP6kVJt"
+    ],
+    "generaciones": [
+     "Hnz6f2yp10AMIJPDgAp7",
+     "vYPo83607kiP1YEteMme"
+    ]
+   }
+  }
+ },
+ "sfx_condestable": {
+  "flow": "wtXHOi3XBvDIwjFd82AX",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7n: el Condestable del Juramento (grito, tajo de fuego, barrido, embestida, llamarada en anillo, el rastrillo que cae y el que se alza, el cuerno, alzar la espada al cielo, dolor, muerte y la espera de rodillas). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "condestable_grito": {
+    "prompt": "A colossal burning knight roars a furious war cry through a closed iron helm, with a roaring burst of flames and crackling embers, huge courtyard reverb, dark fantasy boss, no music",
+    "sesiones": [
+     "L4SCk3QY8aB0ESddBXm5",
+     "UDBtUwhGd3CWba9lurpU",
+     "Di7LHiW9DmSJBvJFDeNu",
+     "vUCYPznAsCirnmmCyJN1"
+    ],
+    "generaciones": [
+     "uhIEBiaigqF6XqbPKUou",
+     "25MlnveqLKNwS1UyIDrn",
+     "HwtcB8RhjIl6nXFdndUW",
+     "8lAQTAua5FZf19h6NSmV"
+    ]
+   },
+   "condestable_tajo": {
+    "prompt": "A huge flaming greatsword slams down onto stone: massive heavy metal impact, then a burst of fire rushing along the ground, crackling embers, dark fantasy, no music",
+    "sesiones": [
+     "LaHX4zm7LQaUtzhQERxf",
+     "59v7e8kEk4WuQdhyetXg",
+     "hsbKEp7ez16iIOqNYAPE",
+     "XXDB29YhaAsGrnW7CVIs"
+    ],
+    "generaciones": [
+     "KJT1MngIBv41siYbrmMg",
+     "zUGt25S0AWF2VLKV0RLe",
+     "dUAthxZkdvy1QhEYtYhj",
+     "CvBh9Eyyno3AAZCa84DI"
+    ]
+   },
+   "condestable_barrido": {
+    "prompt": "A giant flaming greatsword swung fast through the air: one deep heavy whoosh with a roaring trail of fire, no music",
+    "sesiones": [
+     "cgfQReNyAo84H3Qw40S8",
+     "obyfFZjM7Z15h2IWMxv7",
+     "B560zAXiIkk56iKApRrE",
+     "gevEQFBixDWUAlhSmAhS"
+    ],
+    "generaciones": [
+     "6mjrmiSVtmlYIEshz914",
+     "VGUv0NE7ipL7PoHAPlCw",
+     "xCJ2uVZPYyQCkZ1cfFka",
+     "AdOMWzJMDcFB9PXt6wBq"
+    ]
+   },
+   "condestable_embestida": {
+    "prompt": "A giant knight in heavy plate armor charges: fast thundering armored footsteps and clanking plates, ending in a crashing shoulder impact, no music",
+    "sesiones": [
+     "DQvK8pfyEv4zoXPFMBA3",
+     "LzGzrGBtTMICXZIPZtjW",
+     "00LIDgm836wYhsS47Rzd",
+     "za7j9HbFzVBjj6vNXLPV"
+    ],
+    "generaciones": [
+     "pfE1eCbAXaKjQPQx92rd",
+     "ykQH55mnS9iBEysUIZmJ",
+     "ltFzcie19cx7NcaUKLCC",
+     "jJtLh0j5gxs1eiwgYtq0"
+    ]
+   },
+   "condestable_llamarada": {
+    "prompt": "A ring of fire explodes outward around a giant: a deep whoomp, roaring flames spreading fast, scattering embers and sparks, no music",
+    "sesiones": [
+     "klqdiqRBhiGhZ1JbHxty",
+     "kEdLZ9uYaYG6AAChcSne",
+     "VQ43DNLXIxbWhq0krU6P",
+     "Tk1vGSxhKovHD1kcLpw2"
+    ],
+    "generaciones": [
+     "dVhGi862CyC76RopzXZh",
+     "TXnuh7tRw0h9kKCmINe7",
+     "7GgzFrCh4cFsequrIfPP",
+     "HVAsk9JSldDp6hjG3Xst"
+    ]
+   },
+   "condestable_rastrillo": {
+    "prompt": "A heavy iron portcullis drops and slams shut: chains running out fast and rattling, then a massive iron gate crashing onto stone, echoing in a walled courtyard, no music",
+    "sesiones": [
+     "28Xog3c9pneolEtK4Xf8",
+     "3FySNUDjkH0WJs9P5yW6",
+     "znjudzJ2M5cQEywgKrH1",
+     "OjWhehiTkojHsOO6Ox3m"
+    ],
+    "generaciones": [
+     "sbxnXxfeWQkcFM4sgcRd",
+     "JFkzwYeDbQfiHVM0WzOo",
+     "j3LwxhfnRmsIb6p1uDQK",
+     "hUUxhzuoaynVyMHNNd5V"
+    ]
+   },
+   "condestable_abrir": {
+    "prompt": "An old iron portcullis is slowly raised: chains winding up, a ratchet clicking, heavy grinding iron and creaking timber, ending with a clunk, no music",
+    "sesiones": [
+     "6QECJglMP1laHZph7wug",
+     "FEi61XAlQGHI0Qiferjx",
+     "pwGG1AgWee8X1mTUNqGC",
+     "huzliFl5ZZWtm3ko8c9R"
+    ],
+    "generaciones": [
+     "5jaqPTrOJfLE8qsNoUXm",
+     "yhpGh39GcN5jXxxTjWS0",
+     "VazPz6dUtEUhVOIVcmra",
+     "G4EKsrFelo5PZa1K4lk7"
+    ]
+   },
+   "condestable_cuerno": {
+    "prompt": "A war horn sounds a call to arms over a burnt ruined city: one long deep mournful horn blast with a cracked edge, echoing off stone walls, no music",
+    "sesiones": [
+     "emFTTJ3eVCzHZw4B3836",
+     "pys5nARGFmJsFCm77LuS",
+     "Slirmo8drMkhZoFGtxcM",
+     "GGHi504LK90D3REzUfPi"
+    ],
+    "generaciones": [
+     "D0uM3vEFlHbxDinlyD7s",
+     "pp9mkYJX3usFgyG7FpLZ",
+     "2LMZ8JsjbipMMmgaKvHF",
+     "WOVU5NtFuofmQNzheyqV"
+    ]
+   },
+   "condestable_alzar": {
+    "prompt": "A giant knight raises his burning sword to the sky: flames roar upward with a rising whoosh and a crackling fiery swell, no music",
+    "sesiones": [
+     "AzXxmqd27su8cGTSXruw",
+     "qCE1NB61VQNYCjoK2NS3",
+     "duVP0xGHTkqI5spbPzWJ",
+     "2r96JzYQiQN9zHPFQ6zM"
+    ],
+    "generaciones": [
+     "D3RiZiLC6d6G5A1Kdzxb",
+     "dvfgsnLVyUigpYnMcift",
+     "jkkLHCEzAeHHndwRjeiP",
+     "i7lb2WDWr01lDsgc1kew"
+    ]
+   },
+   "condestable_dolor": {
+    "prompt": "A giant armored knight is hit: a short deep pained grunt inside an iron helm, iron plates clattering, a spray of sparks, no music",
+    "sesiones": [
+     "y4DfcDxCsompPOmS0xVH",
+     "n3RzCRNBrgxYEZITdQB4",
+     "wxaLaA6RuT7xzzH8h4wC",
+     "gAQNGhHo8sVQiek8Wp56"
+    ],
+    "generaciones": [
+     "eDPFfg1aGV1KtwMS9erZ",
+     "YRA8NmuaM67ch0saJizG",
+     "qWr6SxIvFsPwNpZGnL8k",
+     "oWAbOTdMm9a37EgJWyJS"
+    ]
+   },
+   "condestable_muerte": {
+    "prompt": "A giant burning knight collapses: heavy armor crashing to the stone floor, a long final exhale, the flames dying out into hissing embers and falling ash, no music",
+    "sesiones": [
+     "vo4U6Iy90WY16HmE0HLZ",
+     "AS69724HGZDvi8SfYcbd",
+     "OVP60KEXxfrBJBA0OYQ8",
+     "2JXskb0sSXQHcs6sTa4P"
+    ],
+    "generaciones": [
+     "rGOUz5mRh97HqJoYAq0G",
+     "lhcna3gcgpTFXbgBAXum",
+     "PDXQytenjf1KkrQfftm9",
+     "xQwJ2CFMducUBKqRDtyJ"
+    ]
+   },
+   "condestable_espera": {
+    "prompt": "A kneeling knight burning quietly in an empty courtyard: slow crackling flames, creaking hot iron armor, one slow heavy breath, no music, 6 seconds",
+    "sesiones": [
+     "5qYQXqzDedZ1Z8FVbEsU",
+     "iRnrTZg2kCGVvQGAwRh1",
+     "V0UBbOY6l9tyE3z5pb72",
+     "hJNvONjIUzylSfr9G9gH"
+    ],
+    "generaciones": [
+     "1LZcAV6YJPmGUqXuu9Oq",
+     "A9BhWMOR3LnpV2DbW4Ep",
+     "hxd93O2RAc75plFB9PAK",
+     "LxOUAoUD6OQ1DauGwvK0"
+    ]
+   }
+  }
  }
 }
