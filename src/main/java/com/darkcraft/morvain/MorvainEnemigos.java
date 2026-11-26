@@ -49,9 +49,9 @@ public final class MorvainEnemigos {
 
     public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo",
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
-            CAPITAL = "capital";
+            CAPITAL = "capital", JURAMENTO = "juramento";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
-            BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado";
+            BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
@@ -60,7 +60,7 @@ public final class MorvainEnemigos {
     private static final List<Puesto> VELMOR_P = new ArrayList<>(), LLANURAS_P = new ArrayList<>(), MOLINO_P = new ArrayList<>(),
             ARBOLEDA_P = new ArrayList<>(), PATIBULO_P = new ArrayList<>(), PILOTES_P = new ArrayList<>(), LAGUNA_P = new ArrayList<>(),
             BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>(), ERMITA_P = new ArrayList<>(), CUMBRE_P = new ArrayList<>(),
-            CAPITAL_P = new ArrayList<>();
+            CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -162,6 +162,11 @@ public final class MorvainEnemigos {
         // ---- la Puerta Oeste de la Capital (parte 7m): los calcinados que apunta el plano
         for (Capital.Espera e : Capital.get().esperas())
             CAPITAL_P.add(new Puesto(CALCINADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
+        // ---- el Patio del Juramento (parte 7n): el Condestable de rodillas en el estrado, de cara a la puerta (el puesto 0), y
+        // la guardia de su puerta
+        for (Juramento.Espera e : Juramento.get().esperas())
+            JURAMENTO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? CONDESTABLE : CALCINADO, e.variante(), e.x(), e.y(), e.z(), e.giro(),
+                    e.postura(), e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -184,6 +189,11 @@ public final class MorvainEnemigos {
         return 0;
     }
 
+    /** El numero del puesto del Condestable en el sitio del Juramento. */
+    public static int condestable() {
+        return 0;
+    }
+
     /** Lo apunta el mod al arrancar. */
     public static void registrar() {
         Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
@@ -195,6 +205,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(HELADO, DarkCraftMod.HELADO);
         Puestos.tipo(ABAD, DarkCraftMod.ABAD);
         Puestos.tipo(CALCINADO, DarkCraftMod.CALCINADO);
+        Puestos.tipo(CONDESTABLE, DarkCraftMod.CONDESTABLE);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -210,7 +221,9 @@ public final class MorvainEnemigos {
         Puestos.registrar(MONASTERIO, MONASTERIO_P, Morvain::es, (l, p) -> !"iglesia".equals(p.grupo()) || !Ermita.enPaz(l.getServer()));
         Puestos.registrar(ERMITA, ERMITA_P, Morvain::es);
         Puestos.registrar(CUMBRE, CUMBRE_P, Morvain::es);
-        Puestos.registrar(CAPITAL, CAPITAL_P, Morvain::es);
+        // la guardia de la Puerta Oeste y los que querian salir solo mientras vive el Condestable (vencido, descansan)
+        Puestos.registrar(CAPITAL, CAPITAL_P, Morvain::es, (l, p) -> !Juramento.DESCANSAN.contains(p.grupo()) || !Juramento.enPaz(l.getServer()));
+        Puestos.registrar(JURAMENTO, JURAMENTO_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -224,6 +237,9 @@ public final class MorvainEnemigos {
             // y al caer el Abad, los hermanos de la iglesia del monasterio descansan
             if (e instanceof com.darkcraft.enemigos.Abad && CUMBRE.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
                 Ermita.liberar(sl);
+            // y al caer el Condestable, la capital deja de guardar sus puertas (lo hace Juramento.paz cada segundo; aqui, el aviso)
+            if (e instanceof com.darkcraft.enemigos.Condestable && JURAMENTO.equals(e.sitio()))
+                DarkCraftMod.LOGGER.info("[DarkCraft] El Condestable del Juramento cae: se abren las puertas de la capital");
         });
     }
 
@@ -275,6 +291,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> capital() {
         preparar();
         return List.copyOf(CAPITAL_P);
+    }
+
+    public static List<Puesto> juramento() {
+        preparar();
+        return List.copyOf(JURAMENTO_P);
     }
 
     public static List<Puesto> velmor() {
@@ -820,6 +841,83 @@ public final class MorvainEnemigos {
         return s;
     }
 
+    /**
+     * {@code /darkcraft condestable [ir | vencer | volver | patio <sitio> | rastrillo [bajar | subir]]} (parte 7n): como esta el
+     * Condestable, llevar ante el (a la puerta del patio), vencerle, que vuelva (y la capital como estaba), ir a un sitio del patio
+     * o mover el rastrillo a mano.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoCondestable() {
+        return net.minecraft.commands.Commands.literal("condestable")
+                .executes(c -> decir(c, estadoCondestable(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irJuramento(c.getSource(), "patio")))
+                .then(net.minecraft.commands.Commands.literal("patio")
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Juramento.get().sitios().keySet(), b))
+                                .executes(c -> irJuramento(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(JURAMENTO, condestable());
+                    if (e instanceof com.darkcraft.enemigos.Condestable k) k.vencer();
+                    else {
+                        Puestos.marcar(srv, JURAMENTO, condestable(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "condestable");
+                    }
+                    return decir(c, estadoCondestable(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, JURAMENTO, condestable(), false);
+                    var m = Morvain.nivel(srv);
+                    if (m != null) Juramento.deshacerPaz(m);
+                    // la guardia de la puerta oeste vuelve a su sitio en cuanto salga
+                    Puestos.todos(srv, CAPITAL, false);
+                    return decir(c, estadoCondestable(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("rastrillo")
+                        .executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            return m == null ? 0 : decir(c, Juramento.resumen(m));
+                        })
+                        .then(net.minecraft.commands.Commands.literal("subir").executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            Juramento.alzarYa(m);
+                            return decir(c, Juramento.resumen(m));
+                        })));
+    }
+
+    private static int irJuramento(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Juramento.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Juramento.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando al estrado (al este); en la torre, al patio (al oeste)
+        double tx = Juramento.CX + Juramento.CENTRO_U, tz = Juramento.CZ;
+        if (s[0] > tx + 10) tx = s[0] - 20;
+        float giro = (float) (Math.toDegrees(Math.atan2(tz - s[2], tx - s[0])) - 90.0);
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
+        return decir(src, estadoCondestable(src.getServer()));
+    }
+
+    private static int decir(net.minecraft.commands.CommandSourceStack src, String s) {
+        src.sendSuccess(() -> net.minecraft.network.chat.Component.literal(s), false);
+        return 1;
+    }
+
+    /** Como esta el Condestable (y su patio, si esta cargado): para el comando y las pruebas. */
+    public static String estadoCondestable(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(JURAMENTO, condestable());
+        String s = "el Condestable: " + (Juramento.enPaz(srv) ? "caido (la capital ya no guarda sus puertas)" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Condestable k) s += ", " + k.estado();
+        var m = Morvain.nivel(srv);
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(Juramento.CX + Juramento.CENTRO_U, Juramento.PISO, Juramento.CZ)))
+            s += "; " + Juramento.resumen(m);
+        return s;
+    }
+
     private static int decir(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, String s) {
         c.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal(s), false);
         return 1;
@@ -853,6 +951,7 @@ public final class MorvainEnemigos {
         todos.addAll(ERMITA_P);
         todos.addAll(CUMBRE_P);
         todos.addAll(CAPITAL_P);
+        todos.addAll(JURAMENTO_P);
         for (Puesto p : todos) {
             if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
             for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
@@ -865,6 +964,7 @@ public final class MorvainEnemigos {
                 + " en el molino, " + ARBOLEDA_P.size() + " en la arboleda (" + colg + " colgados) y " + PATIBULO_P.size()
                 + " en el patibulo, " + PILOTES_P.size() + " en la aldea de los pilotes, " + LAGUNA_P.size() + " en la laguna negra y "
                 + BARCA_P.size() + " en la barca, " + MONASTERIO_P.size() + " en el monasterio, " + ERMITA_P.size() + " en la escalera de la ermita y "
-                + CUMBRE_P.size() + " en la cumbre, " + CAPITAL_P.size() + " en la puerta oeste de la capital; cerca del arco o de un santuario " + cerca;
+                + CUMBRE_P.size() + " en la cumbre, " + CAPITAL_P.size() + " en la puerta oeste de la capital, " + JURAMENTO_P.size()
+                + " en el patio del Juramento; cerca del arco o de un santuario " + cerca;
     }
 }

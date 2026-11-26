@@ -29,6 +29,8 @@ public final class Voces {
     public static final int BASE_BARQUERO = 80;
     /** Las de Hrodric, el Abad de la Cumbre (parte 7l): 90 + N (1..5). */
     public static final int BASE_ABAD = 90;
+    /** Las del Condestable del Juramento (parte 7n): 20 + N (1..5; entre las del Rey, 1..13, y las del Capitan). */
+    public static final int BASE_CONDESTABLE = 20;
     /** Pausa entre dos frases seguidas (ticks): 0,3 s. */
     public static final int PAUSA = 6;
     /** Lo que se queda el subtitulo despues de acabar de hablar (ticks): 0,8 s. */
@@ -43,6 +45,7 @@ public final class Voces {
     private static final float[] VERDUGO = {0, 5.82f, 4.09f, 2.36f, 3.1f, 5.46f};
     private static final float[] BARQUERO = {0, 5.2f, 3.9f, 2.4f, 1.4f, 4.1f};
     private static final float[] ABAD = {0, 8.25f, 5.2f, 3.5f, 2.7f, 5.3f};
+    private static final float[] CONDESTABLE = {0, 7.21f, 2.68f, 1.39f, 3.2f, 4.15f};
     // la Sombra en las cinematicas (1..6 la de inicio, 7..9 el viaje a Valdrenn)
     private static final float[] SOMBRA = {0, 2.26f, 4.23f, 3.56f, 6.57f, 5.44f, 3.17f, 6.06f, 5.98f, 4.63f};
 
@@ -55,6 +58,7 @@ public final class Voces {
                 leer(o, "habla_verdugo", VERDUGO);
                 leer(o, "habla_barquero", BARQUERO);
                 leer(o, "habla_abad", ABAD);
+                leer(o, "habla_condestable", CONDESTABLE);
                 leer(o, "habla_sombra", SOMBRA);
                 if (o.has("habla")) {
                     leer(o, "habla", REY);
@@ -104,8 +108,16 @@ public final class Voces {
         return linea > BASE_ABAD && linea < BASE_GAVRAN;
     }
 
-    /** Si la linea existe (1..13 el Rey, 41..45 el Capitan, 61..65 la Molinera, 71..75 el Verdugo, 81..85 el Barquero, 91..95 el Abad, 101..118 Gavran). */
+    public static boolean esCondestable(int linea) {
+        return linea > BASE_CONDESTABLE && linea < BASE_CAPITAN;
+    }
+
+    /**
+     * Si la linea existe (1..13 el Rey, 21..25 el Condestable, 41..45 el Capitan, 61..65 la Molinera, 71..75 el Verdugo, 81..85
+     * el Barquero, 91..95 el Abad, 101..118 Gavran).
+     */
     public static boolean valida(int linea) {
+        if (esCondestable(linea)) return linea - BASE_CONDESTABLE < CONDESTABLE.length;
         if (esCapitan(linea)) return linea - BASE_CAPITAN < CAPITAN.length;
         if (esMolinera(linea)) return linea - BASE_MOLINERA < MOLINERA.length;
         if (esVerdugo(linea)) return linea - BASE_VERDUGO < VERDUGO.length;
@@ -116,6 +128,10 @@ public final class Voces {
 
     /** Segundos que tarda en decir la frase (hasta que acaba de hablar). */
     public static float seg(int linea) {
+        if (esCondestable(linea)) {
+            int n = linea - BASE_CONDESTABLE;
+            return n > 0 && n < CONDESTABLE.length ? CONDESTABLE[n] : 4f;
+        }
         if (esCapitan(linea)) {
             int n = linea - BASE_CAPITAN;
             return n > 0 && n < CAPITAN.length ? CAPITAN[n] : 4f;
@@ -157,6 +173,10 @@ public final class Voces {
      * Las demas (las de las cinematicas) siempre se dicen enteras, aunque tengan que esperar un poco.
      */
     public static boolean deRelleno(int linea) {
+        if (esCondestable(linea)) {
+            int n = linea - BASE_CONDESTABLE;
+            return n == 3;
+        }
         if (esCapitan(linea)) {
             int n = linea - BASE_CAPITAN;
             return n == 3 || n == 4;

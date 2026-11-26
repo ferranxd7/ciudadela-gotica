@@ -188,6 +188,13 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la puerta de la capital en el chunk {}", c.getPos(), t);
         }
+        // el Patio del Juramento, al este de la plaza de la capital, donde espera el Condestable (parte 7n): despues de la
+        // capital, que su suelo llega hasta la calle de ella
+        try {
+            if (Juramento.toca(c.getPos().x, c.getPos().z)) Juramento.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el patio del Juramento en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

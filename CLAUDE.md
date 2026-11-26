@@ -2052,6 +2052,92 @@ del Juramento —el que mando cerrar las puertas la noche del cielo rojo, libro 
   enterrado (`mv192`) que se alza (`mv193`), su agarron (`mv194`), la nube de ceniza al morir (`mv195`), el libro del sargento Brannoc
   (`mv196`) y el bestiario (`mv197`).
 
+### Plan grande, parte 7n: Ser Halvard, el Condestable del Juramento (el jefe de la Capital en ruinas)
+
+Respuestas 125 y 131 del plan; el quinto jefe de Morvain (el del libro perdido 22: el que mando cerrar todas las puertas de la
+capital la noche del cielo rojo para que el fuego no saliera, y la gente ardio en las calles).
+- **El Patio del Juramento** (`morvain/Juramento`, al este de la plaza de la capital, mismas coordenadas que `Capital`: u = x - 3240,
+  v = z - 345, `PISO` = 94; se dibuja chunk a chunk al adornar, despues de la capital; en su caja `Adorno` no pone nada): la **calle
+  del Juramento** sigue la calle mayor desde la plaza (`Capital.calle` la deja libre hasta u 118; `Juramento` de u 119 a la puerta,
+  con escombros, montones de ceniza y un ceniciento enterrado) hasta el **cuerpo de la puerta** (u 128..135, el paso abovedado de
+  cinco con el **rastrillo** del mod —`DarkCraftMod.RASTRILLO`, eje Z— subido en u 132: se le ven los dientes; estandartes y faroles).
+  Dentro, el **patio** (u 136..184, v ±24) cerrado por muros de 9 con almenas y **cuatro torres de esquina**; en medio el **estrado**
+  con la mano alzada en el suelo, la **piedra del Juramento** (u 168, oro en lo alto) con su **asta y bandera** (u 172), **cuatro
+  braseros** encendidos en (u 160 ±11, ±11) y seis **montones de ceniza** (`Juramento.montones`). Al este, fuera del muro, la **torre
+  del Condestable** (u 187..199, v ±6, 20 de alto): su **reja** (u 186) esta bajada mientras el viva; dentro la mesa larga con el mapa
+  y las velas, el hogar, el yunque, barriles, el **arcon** (`chests/juramento`: piedras de forja II y III, talismanes de la brasa, el
+  hueso, la furia o el vigor, la ceniza del grito, del torbellino o de las llamas, hechizos, frutos de la escarcha, la brasa y la
+  ceniza, oro y diamantes) y el **atril con el libro perdido 23** —"La ultima orden del Condestable", de Ser Halvard;
+  `Perdidos.TOTAL` = 23—; una escalera de mano sube a lo alto (un brasero de senales). Sitios (`Juramento.sitio`): `calle`,
+  `puerta`, `rastrillo`, `patio`, `ante_condestable`, `condestable`, `piedra`, `brasero_0..3`, `torre`, `dentro_torre`, `arcon`,
+  `atril`, `alto_torre`. El Espejo: "El Patio del Juramento" (`Juramento.dentro`, antes que la Puerta Oeste); logro `juramento`
+  ("Y nadie sale") al pisar el patio (`Juramento.enPatio`, pasado el rastrillo).
+- **El rastrillo** (`Juramento.tick`, cada tick con alguien a 140 del patio, desde `Morvain.onTick`, con su propio reloj: en las
+  pruebas del servidor no corre el del mundo): **cae de golpe** (una fila por tick, y antes saca hacia dentro a quien este debajo) en
+  cuanto el Condestable empieza a pelear —detras de quien entro: no se sale— y **se alza despacio** (una fila cada 16 ticks, con el
+  torno) cuando acaba: si caen todos o se van, al volver el a su sitio; si cae el, **50 ticks despues**, mientras dice "abrid las
+  puertas" (`cerrar` guarda al ultimo Condestable visto: caido, `Puestos.enemigo` ya no lo da). Lo bajado se mira en el mundo (si el
+  servidor se para a media pelea, al volver se alza solo). `CAIDAS` / `ALZADOS`, `rastrilloBajado`, `alzarYa` (pruebas).
+- **Al caer el Condestable** (`Juramento.paz`, cada segundo; tambien con alguien a 100 de la Puerta Oeste aunque el patio quede
+  lejos): se alza la reja de su torre, **se abre por fin el rastrillo de la Puerta Oeste** (lo que quedaba bajado desde la noche
+  del cielo rojo, `abrirPuertaOeste`) y los de la Puerta Oeste que seguian esperando (grupos `fuera`, `puerta`, `muralla`, `camara`:
+  `Juramento.DESCANSAN`) se deshacen en ceniza y **ya no vuelven** (el sitio `capital` se registra con `activo`). `deshacerPaz`
+  (comando y pruebas) lo deja como estaba.
+- **Los puestos** (`MorvainEnemigos`, sitio `juramento`, de `Juramento.esperas`): el Condestable (puesto 0, grupo `Puestos.JEFE`),
+  dos guardias calcinadas de rodillas a la puerta y un ceniciento enterrado en la calle.
+- **El Condestable** (`enemigos/Condestable`, entidad `darkcraft:condestable`, 1,6 x 4,6, `fireImmune`; hereda de `Guardian`):
+  modelo de `tools/enemigos/condestable.py` (un caballero gigante con la armadura quemada y grietas de brasa que lucen, yelmo con
+  cresta y cimera, gola, coraza, faldar, la sobreveste negra con **la mano alzada en oro**, capa, hombreras, guanteletes, grebas y
+  el **montante** de dos manos con los filos al rojo; escala 2; `client/enemigos/CondestableModelo` y `CondestableRenderer`, el
+  brillo late y se apaga al morir). 1024 de vida (el tope del juego), golpe 15, armadura 14 (dureza 8), no se le empuja. **El fuego
+  no le hace nada; el frio, un 60 % mas; el agua le duele.** Espera **de rodilla en su estrado** (`REZA`, mirando a la puerta) con
+  el fuego quieto de su armadura (`sfx.condestable_espera` de vez en cuando).
+- **La pelea** (solo con quien esta dentro del patio: `percibe` y `objetivoValido`): al verle dice la frase 1 mientras se levanta y
+  ruge al acabarla. El **tajo** (manda el fuego por el suelo en linea hasta 13 bloques —`Cantaro.Llamas` una tras otra, quema a quien
+  pillan al salir—; a media vida y con furia, tres lineas en abanico), el **barrido** ancho (frena; con furia deja llamas), la
+  **embestida** (de 6,5 a 17 bloques cruza el patio arrollando; si da contra un muro se queda **aturdido**), la **llamarada** a quien
+  se le pega o se le pone detras (clava el montante y revienta un **anillo de fuego** de 8,5: saltandolo no quema) y **alzar** el
+  montante al cielo: desde lo alto de los muros (`Juramento.almenasDeDentro`) cae **brea** ardiendo —un `Cantaro` hacia cada uno y a
+  dos o tres sitios mas, con la marca en el suelo mientras vuela—. Lo que pega, quema. A **media vida** toca el **cuerno**: "¡Guardia,
+  a mi!" y de los montones de ceniza se alza **su guardia** (calcinados efimeros; dos, uno mas por amigo, hasta cuatro). **El
+  juramento**: el primer golpe de muerte de cada pelea no le mata —`setHealth` lo para en 1—: hinca la rodilla ("Jure... ¡no
+  morir!"; mientras, no le entra nada), se cura hasta el 30 % y se alza con un anillo de fuego de 11 y **furia** (mas rapido, lineas
+  de fuego mas largas). `Condestable.mediaVida()`, `vencer()` (sin jurar) y contadores para las pruebas.
+- **Voz** (ElevenLabs, `eleven_v4`, **"Jerry B. - Military Commander"** `TxWZERZ5Hc6h9dGxVmXa`, flow `wtXHOi3XBvDIwjFd82AX`; 5
+  frases, tomas a; en `procesar.py` `voz_condestable`: algo mas grave con una voz una octava por debajo, el eco metalico del yelmo,
+  un poco de distorsion y el eco del patio): linea **20 + N** (`Voces.BASE_CONDESTABLE`, `esCondestable`; `habla_condestable` en
+  `rey_voces.json`; subtitulos `darkcraft.condestable.voz.N`): 1 al empezar (no la repite en 4 min), 2 al tocar el cuerno, 3 si cae
+  su presa, 4 al jurar y 5 al morir ("Abrid... abrid las puertas. Que vuelvan a casa").
+- **Barra** (`GuardianCliente`, arte de `tools/hud/barra_guardianes.py` "condestable": el montante con la cruz y el pomo de oro, el
+  yelmo en el centro y las manos de oro; relleno de brasas; suben brasas). **Musica**: "Massive Battle" de Eldritch Grim (CC0, id
+  `condestable`, tema 37 de `ClientMusic.boss`).
+- **Al caer** se queda de rodilla apoyado en el montante, dice su ultima frase, se apaga y **se deshace en ceniza** (`tickDeath`
+  propio, 130 ticks); lo demas lo reparte `valdrenn/Guardianes`: el cartel de JEFE ABATIDO con 12500 ecos, la hazana `condestable`
+  ("Que vuelvan a casa", con su entrada del diario) y el bestiario; deja tres piedras de forja III, dos II y la ceniza del grito.
+- Sonidos (ElevenLabs, flow `wtXHOi3XBvDIwjFd82AX`, `TOMAS_SFX`): `condestable_grito` (4 y 2), `condestable_tajo` (4 y 1),
+  `condestable_barrido` (4 y 1), `condestable_embestida` (3 y 2), `condestable_llamarada` (2 y 1), `condestable_rastrillo` (4 y 1),
+  `condestable_abrir` (1 y 4), `condestable_cuerno` (4 y 2), `condestable_alzar` (3 y 2), `condestable_dolor` (3, 1 y 4),
+  `condestable_muerte` (2 y 4), `condestable_espera` (1 y 3).
+- Comandos `/darkcraft condestable [ir | patio <sitio> | vencer | volver | rastrillo [subir]]` (sin mas: como esta; `volver` le pone
+  otra vez de rodilla, vuelve a bajar la Puerta Oeste y la reja de su torre y vuelven los de la puerta).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_juramento carpeta` (con la capital al lado): la calle, la puerta, el patio y
+  la torre con las marcas de los puestos (K el Condestable, C los calcinados); si se llega a pie a cada sitio (la torre, solo sin la
+  reja), que ninguno esta metido en un bloque y que el estrado y el paso del rastrillo estan libres.
+- Pruebas: servidor, lineas `Morvain, el patio del Juramento: ...` (el atril con el libro 23, el arcon, la reja, los dientes del
+  rastrillo, la piedra, los braseros, el suelo del patio; a pie desde la plaza; vista `morvain_juramento.png`), `Morvain, el
+  Condestable: ...` (de rodilla; al verle habla, se levanta, cae el rastrillo —y saca del paso al que estaba debajo— y ruge al acabar
+  la frase; cada accion acaba), `Morvain, los golpes del Condestable a un marchito: ...` (el tajo de cerca y su linea de fuego de
+  lejos, el barrido, la llamarada por la espalda, la embestida, la brea; contra el muro se estrella), `Morvain, el Condestable a
+  media vida: ...` (la guardia que se alza; el fuego nada, el frio mas), `Morvain, el juramento del Condestable: ...`, `Morvain, el
+  Condestable cae: ...` (el rastrillo se alza, la Puerta Oeste se abre, los de la puerta descansan y no vuelven) y `Morvain, el
+  Condestable vuelve: ...`; cliente, tramo `juramento()` despues de la capital: la calle (`cliente_mv198`), la puerta y su guardia
+  (`mv199`), entrar a pie con el cartel y el logro (`mv200`), el patio desde lo alto (`mv201`), el Condestable de rodilla (`mv202`), en
+  supervivencia habla (`mv203`), el rastrillo cae a la espalda (`mv204`) y ruge con su barra (`mv205`), sus golpes (`mv206..mv210`:
+  tajo, barrido, embestida, llamarada, alzar), el cuerno y su guardia (`mv211`), jura de rodilla (`mv212`) y se alza con furia
+  (`mv213`), cae de rodilla (`mv214`), el rastrillo se alza (`mv215`), se deshace en ceniza (`mv216`), el cartel (`mv217`), la Puerta
+  Oeste abierta (`mv218`), la torre por dentro (`mv219`), el libro de Ser Halvard (`mv220`) y el bestiario (`mv221`). Con este tramo
+  la prueba del cliente pasa de la hora: `LIMIT` 66 min (`lanzar.sh` 72 y 70 min, el paso 100, el trabajo 145).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -2062,7 +2148,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j, la 7k, la 7l y la 7m arriba; despues, region a region su
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j, la 7k, la 7l, la 7m y la 7n arriba; despues, region a region su
   contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes

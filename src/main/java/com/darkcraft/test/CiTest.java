@@ -735,6 +735,7 @@ public final class CiTest {
         monasterio(server, m, log, out);
         ermita(server, m, log, out);
         capital(server, m, log, out);
+        juramento(server, m, log, out);
     }
 
     /**
@@ -1007,6 +1008,337 @@ public final class CiTest {
             DarkCraftMod.LOGGER.error("[CI] calcinados", t);
         } finally {
             for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /**
+     * Parte 7n: el Patio del Juramento (a pie desde la plaza de la capital por la calle y el paso del rastrillo a todos sus
+     * sitios, y con la reja de la torre bajada no se entra en la torre; el atril con el libro 23, el arcon, la reja, los dientes
+     * del rastrillo, la piedra y los braseros) y el Condestable: de rodilla en el estrado; al verle habla, se levanta, el rastrillo
+     * cae (y saca del paso a quien estuviera debajo) y ruge al acabar la frase; cada accion acaba; sus golpes a un marchito (el
+     * tajo y su linea de fuego, que llega mas lejos que el montante; el barrido; la llamarada por la espalda; la embestida; la
+     * brea que cae de los muros) y la embestida contra un muro (se queda aturdido); a media vida toca el cuerno y se alza la
+     * guardia de la ceniza; el fuego no le hace nada y el frio mas; el juramento (no cae la primera vez: se alza con un tercio de
+     * la vida y furia; jurando no le entra nada); y al caer de verdad: el rastrillo se alza, la reja de su torre tambien, la
+     * Puerta Oeste se abre y su guardia ya no vuelve. Al acabar, todo como estaba.
+     */
+    private static void juramento(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.JURAMENTO, capital = com.darkcraft.morvain.MorvainEnemigos.CAPITAL;
+        var J = com.darkcraft.morvain.Juramento.get();
+        var C = com.darkcraft.morvain.Capital.get();
+        final int CX = com.darkcraft.morvain.Juramento.CX, CZ = com.darkcraft.morvain.Juramento.CZ, PISO = com.darkcraft.morvain.Juramento.PISO;
+        final int CU = com.darkcraft.morvain.Juramento.CENTRO_U;
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : J.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock ? aire : st;
+            };
+            int[] pl = C.sitio("plaza");
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, pl[0], pl[1], pl[2], CX + 70, CZ - 50, CX + 215, CZ + 50, 2_500_000);
+            StringBuilder si = new StringBuilder(), no = new StringBuilder();
+            for (var e : J.sitios().entrySet()) {
+                int[] q = e.getValue();
+                (zona.alcanza(q[0], q[1], q[2], 2) ? si : no).append(' ').append(e.getKey());
+            }
+            log.println("Morvain, el patio del Juramento: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Juramento.resumen(m)
+                    + "; a pie desde la plaza (" + zona.celdas() + " celdas) a:" + si + "; no (la reja de la torre esta bajada):" + no);
+            topView(m, CX + CU, CZ, 44, new File(out, "morvain_juramento.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, el patio del Juramento: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] juramento", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Condestable ko = null;
+            int guardia = 0, enSuelo = 0, chocan = 0;
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 6; k++)
+                for (var e : fuera) if (e.isAlive() && !(e instanceof com.darkcraft.enemigos.Condestable)) e.tick();
+            for (var e : fuera) {
+                if (e instanceof com.darkcraft.enemigos.Condestable x) ko = x;
+                else guardia++;
+                if (!m.noCollision(e)) chocan++;
+                if (!m.getBlockState(BlockPos.containing(e.getX(), e.getY() - 0.2, e.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+            }
+            if (ko == null) {
+                log.println("Morvain, el Condestable: NO SALE");
+                return;
+            }
+            for (var e : fuera) if (e != ko) e.discard();
+            StringBuilder sb = new StringBuilder("Morvain, el Condestable: en " + ko.blockPosition().toShortString() + " postura " + ko.postura()
+                    + " (1 de rodilla), giro " + Math.round(ko.getYRot()) + ", vida " + Math.round(ko.getMaxHealth()) + ", caja " + ko.getBbWidth() + " x "
+                    + ko.getBbHeight() + "; su guardia " + guardia + "; en su suelo " + enSuelo + " de " + fuera.size() + ", metidos en un bloque " + chocan
+                    + " (tiene que ser 0)");
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("4a6b8c0d-2e3f-4a5b-9c7d-1e2f3a4b5c83"), "[DarkCraftCI8]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- le ve desde dentro del patio: habla, se levanta, cae el rastrillo (y saca del paso al que esta debajo) y ruge
+            int[] an = J.sitio("ante_condestable");
+            final double fxx = an[0] + 0.5, fyy = an[1], fzz = an[2] + 0.5;
+            fp.moveTo(fxx, fyy, fzz, -90f, 0f);
+            fp.setOnGround(true);
+            var debajo = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            if (debajo != null) {
+                debajo.moveTo(CX + com.darkcraft.morvain.Juramento.RASTRILLO_U + 0.5, PISO, CZ + 0.5, -90f, 0f);
+                debajo.setNoAi(true);
+                m.addFreshEntity(debajo);
+                quitar.add(debajo);
+            }
+            com.darkcraft.morvain.Juramento.alzarYa(m);
+            int caidas = com.darkcraft.morvain.Juramento.CAIDAS;
+            ko.setTarget(fp);
+            int levanta = -1, ruge = -1, ataca = -1, quien = 0, bajado = -1;
+            for (int k = 0; k < 360; k++) {
+                ko.tickCount++;
+                ko.tick();
+                com.darkcraft.morvain.Juramento.tick(m);
+                fp.moveTo(fxx, fyy, fzz, -90f, 0f);
+                if (bajado < 0 && com.darkcraft.morvain.Juramento.rastrilloBajado(m)) bajado = k;
+                int a = ko.accion();
+                if (levanta < 0 && a == com.darkcraft.enemigos.CondestableAnims.LEVANTARSE) levanta = k;
+                if (ruge < 0 && a == com.darkcraft.enemigos.CondestableAnims.GRITO) ruge = k;
+                if (ruge >= 0 && ataca < 0 && a != 0 && a != com.darkcraft.enemigos.CondestableAnims.GRITO) {
+                    ataca = k;
+                    quien = a;
+                    break;
+                }
+            }
+            sb.append("; al verle: pelea ").append(ko.enPelea()).append(", se levanta en el tick ").append(levanta).append(", el rastrillo cae del todo en el ")
+                    .append(bajado).append(" (caidas +").append(com.darkcraft.morvain.Juramento.CAIDAS - caidas).append("), el que estaba debajo ")
+                    .append(debajo == null ? "?" : debajo.getX() > CX + com.darkcraft.morvain.Juramento.RASTRILLO_U + 1.2 ? "pasa dentro" : "SIGUE DEBAJO en " + debajo.getX())
+                    .append(", ruge en el ").append(ruge).append(" (la frase 1 dura ").append(com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Condestable.VOZ_BASE + 1))
+                    .append("), y luego ").append(quien == 0 ? "nada" : com.darkcraft.enemigos.CondestableAnims.NOMBRES[quien]).append(" en el ").append(ataca)
+                    .append(String.format(java.util.Locale.ROOT, ", de pie %s a %.1f de su presa", ko.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE,
+                            Math.hypot(ko.getX() - fp.getX(), ko.getZ() - fp.getZ())));
+            if (debajo != null) debajo.discard();
+            // ---- cada accion acaba (sin presa)
+            ko.setTarget(null);
+            StringBuilder nn = new StringBuilder();
+            for (int a = 1; a < com.darkcraft.enemigos.CondestableAnims.TICKS.length; a++) {
+                String nombre = com.darkcraft.enemigos.CondestableAnims.NOMBRES[a];
+                if (nombre.equals("morir")) continue;
+                ko.moveTo(CX + CU + 0.5, PISO, CZ + 0.5, 90f, 0f);
+                ko.empezar(a);
+                for (int k = 0; k < 140 && ko.accion() == a; k++) {
+                    ko.tickCount++;
+                    ko.tick();
+                }
+                if (ko.accion() == a) nn.append(' ').append(nombre);
+            }
+            for (int k = 0; k < 40 && ko.pendientes() > 0; k++) {
+                ko.tickCount++;
+                ko.tick();
+            }
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.class, ko.getBoundingBox().inflate(40))) f.discard();
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.Llamas.class, ko.getBoundingBox().inflate(40))) f.discard();
+            sb.append("; acciones que no acaban:").append(nn.length() == 0 ? " ninguna" : nn);
+            log.println(sb);
+            // ---- sus golpes a un marchito, en el patio (el Condestable en el estrado mirando al oeste, a la puerta)
+            StringBuilder sg = new StringBuilder("Morvain, los golpes del Condestable a un marchito:");
+            float giro = 90f;
+            double fx = -Math.sin(Math.toRadians(giro)), fz = Math.cos(Math.toRadians(giro));
+            double y = PISO, x0 = CX + CU + 0.5, z0 = CZ + 0.5;
+            var victima = DarkCraftMod.MARCHITO.get().create(m);
+            if (victima != null) {
+                victima.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(900.0);
+                victima.moveTo(x0 + fx * 3, y, z0 + fz * 3, giro + 180f, 0f);
+                m.addFreshEntity(victima);
+                quitar.add(victima);
+                String[] golpes = {"tajo de cerca", "tajo de lejos (la linea de fuego)", "barrido", "llamarada por la espalda", "embestida", "alzar (la brea)"};
+                int[] acc = {com.darkcraft.enemigos.CondestableAnims.TAJO, com.darkcraft.enemigos.CondestableAnims.TAJO, com.darkcraft.enemigos.CondestableAnims.BARRIDO,
+                        com.darkcraft.enemigos.CondestableAnims.LLAMARADA, com.darkcraft.enemigos.CondestableAnims.EMBESTIDA, com.darkcraft.enemigos.CondestableAnims.ALZAR};
+                double[] lejos = {3.0, 9.5, 3.0, -2.4, 10.0, 8.0};
+                for (int i = 0; i < golpes.length; i++) {
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    victima.hurtTime = 0;
+                    victima.clearFire();
+                    victima.removeAllEffects();
+                    double px = x0 + fx * lejos[i], pz = z0 + fz * lejos[i];
+                    victima.moveTo(px, y, pz, giro + 180f, 0f);
+                    int ll = ko.llamasQueDan(), an2 = ko.anillosQueDan(), em = ko.embestidasQueDan(), br = ko.brea(), rev = com.darkcraft.enemigos.Cantaro.REVIENTAN,
+                            qu = com.darkcraft.enemigos.Cantaro.LLAMAS_QUEMAN;
+                    ko.moveTo(x0, y, z0, giro, 0f);
+                    ko.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    ko.setTarget(victima);
+                    ko.setYRot(giro);
+                    ko.yBodyRot = ko.yHeadRot = giro;
+                    ko.empezar(acc[i]);
+                    float antes = victima.getHealth();
+                    int fuego = 0;
+                    double recorre = 0;
+                    for (int k = 0; k < 150 && (ko.accion() == acc[i] || ko.pendientes() > 0 || k < 60); k++) {
+                        ko.tickCount++;
+                        ko.tick();
+                        if (acc[i] != com.darkcraft.enemigos.CondestableAnims.EMBESTIDA) ko.moveTo(x0, y, z0, giro, 0f);
+                        else recorre = Math.max(recorre, Math.hypot(ko.getX() - x0, ko.getZ() - z0));
+                        ko.setYRot(giro);
+                        ko.yBodyRot = ko.yHeadRot = giro;
+                        if (acc[i] != com.darkcraft.enemigos.CondestableAnims.EMBESTIDA) victima.moveTo(px, y, pz, giro + 180f, 0f);
+                        victima.invulnerableTime = 0;
+                        for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.class, ko.getBoundingBox().inflate(40))) {
+                            if (!quitar.contains(f)) quitar.add(f);
+                            f.tick();
+                        }
+                        for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.Llamas.class, ko.getBoundingBox().inflate(40))) {
+                            if (!quitar.contains(f)) quitar.add(f);
+                            f.tick();
+                        }
+                        fuego = Math.max(fuego, victima.getRemainingFireTicks());
+                    }
+                    sg.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " a %.1f: -%.1f, ardiendo %d", Math.abs(lejos[i]), antes - victima.getHealth(), fuego))
+                            .append(victima.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) ? ", frenado" : "")
+                            .append(ko.llamasQueDan() > ll ? ", le da la linea de fuego" : "").append(ko.anillosQueDan() > an2 ? ", le da el anillo" : "")
+                            .append(ko.embestidasQueDan() > em ? String.format(java.util.Locale.ROOT, ", le arrolla (corre %.1f)", recorre) : "")
+                            .append(acc[i] == com.darkcraft.enemigos.CondestableAnims.ALZAR ? ", cantaros " + (ko.brea() - br) + " (revientan "
+                                    + (com.darkcraft.enemigos.Cantaro.REVIENTAN - rev) + ", sus llamas queman " + (com.darkcraft.enemigos.Cantaro.LLAMAS_QUEMAN - qu) + ")" : "")
+                            .append(';');
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.Llamas.class, ko.getBoundingBox().inflate(40))) f.discard();
+                }
+                sg.append(" en total: tajos ").append(ko.tajos()).append(", llamas ").append(ko.llamasHechas()).append(" (dan ").append(ko.llamasQueDan())
+                        .append("), barridos ").append(ko.barridos()).append(", llamaradas ").append(ko.llamaradas()).append(" (dan ").append(ko.anillosQueDan())
+                        .append("), embestidas ").append(ko.embestidas()).append(" (dan ").append(ko.embestidasQueDan()).append("), alzar ").append(ko.alzados())
+                        .append(" (brea ").append(ko.brea()).append(')');
+                victima.discard();
+            }
+            // ---- la embestida contra el muro del norte: se estrella y se queda aturdido
+            ko.setTarget(null);
+            ko.moveTo(CX + CU + 0.5, PISO, CZ - com.darkcraft.morvain.Juramento.PATIO_V + 6.5, 180f, 0f);
+            ko.setYRot(180f);
+            ko.yBodyRot = ko.yHeadRot = 180f;
+            int choques = ko.choques();
+            ko.empezar(com.darkcraft.enemigos.CondestableAnims.EMBESTIDA);
+            boolean aturdido = false;
+            for (int k = 0; k < 60; k++) {
+                ko.tickCount++;
+                ko.tick();
+                ko.setYRot(180f);
+                aturdido |= ko.aturdido();
+            }
+            sg.append("; contra el muro: se estrella ").append(ko.choques() > choques).append(", aturdido ").append(aturdido);
+            log.println(sg);
+            // ---- a media vida: el cuerno y la guardia que se alza de los montones de ceniza
+            StringBuilder sm = new StringBuilder("Morvain, el Condestable a media vida:");
+            ko.moveTo(CX + CU + 0.5, PISO, CZ + 0.5, 90f, 0f);
+            fp.moveTo(fxx, fyy, fzz, -90f, 0f);
+            ko.setTarget(fp);
+            ko.mediaVida();
+            for (int k = 0; k < 40 && ko.guardiasAlzados() == 0; k++) {
+                ko.tickCount++;
+                ko.tick();
+                fp.moveTo(fxx, fyy, fzz, -90f, 0f);
+            }
+            int bien = 0, conPresa = 0, guardias = 0;
+            for (var c : m.getEntitiesOfClass(com.darkcraft.enemigos.Calcinado.class, ko.getBoundingBox().inflate(30))) {
+                if (!c.esEfimero()) continue;
+                quitar.add(c);
+                if (c.variante() == com.darkcraft.enemigos.Calcinado.GUARDIA) guardias++;
+                boolean pisa = !m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty();
+                if (pisa && m.noCollision(c)) bien++;
+                if (c.getTarget() == fp) conPresa++;
+            }
+            sm.append(" segunda ").append(ko.segunda()).append(", se alzan ").append(ko.guardiasAlzados()).append(" (guardias ").append(guardias)
+                    .append(", en su suelo y sin meterse en nada ").append(bien).append(", con presa ").append(conPresa).append("), en pie ").append(ko.suyos());
+            // ---- el fuego no le hace nada; el frio, un 60 % mas que un golpe igual
+            ko.invulnerableTime = 0;
+            float v0 = ko.getHealth();
+            boolean fuegoLe = ko.hurt(m.damageSources().inFire(), 10f);
+            ko.invulnerableTime = 0;
+            float v1 = ko.getHealth();
+            ko.hurt(m.damageSources().generic(), 10f);
+            ko.invulnerableTime = 0;
+            float v2 = ko.getHealth();
+            ko.hurt(m.damageSources().freeze(), 10f);
+            ko.invulnerableTime = 0;
+            sm.append(String.format(java.util.Locale.ROOT, "; el fuego le hace %s (-%.1f); un golpe de 10, -%.1f; el frio de 10, -%.1f", fuegoLe ? "dano" : "nada", v0 - v1,
+                    v1 - v2, v2 - ko.getHealth()));
+            log.println(sm);
+            // ---- el juramento: el golpe de muerte no le mata la primera vez; jurando no le entra nada; se alza con un tercio
+            StringBuilder sj = new StringBuilder("Morvain, el juramento del Condestable:");
+            ko.setHealth(20f);
+            ko.invulnerableTime = 0;
+            ko.hurt(m.damageSources().playerAttack(fp), 500f);
+            sj.append(String.format(java.util.Locale.ROOT, " tras un golpe de muerte: vivo %s, vida %.0f, jura %s (juramentos %d)", ko.isAlive(), ko.getHealth(),
+                    ko.accion() == com.darkcraft.enemigos.CondestableAnims.JURAMENTO, ko.juramentos()));
+            ko.invulnerableTime = 0;
+            boolean entra = ko.hurt(m.damageSources().playerAttack(fp), 50f);
+            sj.append(", jurando un golpe de 50 ").append(entra ? "ENTRA" : "no entra");
+            int k = 0;
+            for (; k < 120 && ko.accion() == com.darkcraft.enemigos.CondestableAnims.JURAMENTO; k++) {
+                ko.tickCount++;
+                ko.tick();
+                fp.moveTo(fxx, fyy, fzz, -90f, 0f);
+            }
+            sj.append(String.format(java.util.Locale.ROOT, "; se alza en %d ticks con %.0f de %.0f (%.0f %%), furia %s", k, ko.getHealth(), ko.getMaxHealth(),
+                    100f * ko.getHealth() / ko.getMaxHealth(), ko.furia()));
+            log.println(sj);
+            // ---- cae de verdad: el rastrillo se alza, la reja de su torre tambien, la Puerta Oeste se abre y su guardia descansa
+            com.darkcraft.enemigos.Puestos.todos(server, capital, false);
+            int deLaPuerta = 0;
+            java.util.List<com.darkcraft.enemigos.Enemigo> puerta = new java.util.ArrayList<>();
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, capital))
+                if (com.darkcraft.morvain.Juramento.DESCANSAN.contains(com.darkcraft.morvain.MorvainEnemigos.capital().get(e.puesto()).grupo())) {
+                    deLaPuerta++;
+                    puerta.add(e);
+                }
+            int barrotes = com.darkcraft.morvain.Juramento.barrotesPuertaOeste(m), alzados = com.darkcraft.morvain.Juramento.ALZADOS;
+            ko.setTarget(null);
+            ko.invulnerableTime = 0;
+            ko.hurt(m.damageSources().playerAttack(fp), 99999f);
+            boolean bajadoAlCaer = com.darkcraft.morvain.Juramento.rastrilloBajado(m);
+            int fin = 0;
+            for (; fin < 260; fin++) {
+                if (!ko.isRemoved()) {
+                    ko.tickCount++;
+                    ko.tick();
+                }
+                com.darkcraft.morvain.Juramento.tick(m);
+                if (ko.isRemoved() && com.darkcraft.morvain.Juramento.ALZADOS > alzados) break;
+            }
+            com.darkcraft.morvain.Juramento.paz(m);
+            int descansan = 0;
+            for (var e : puerta) if (e.isRemoved()) descansan++;
+            int objetos = m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, ko.getBoundingBox().inflate(6)).size();
+            com.darkcraft.enemigos.Puestos.todos(server, capital, false);
+            int vuelven = 0;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, capital))
+                if (com.darkcraft.morvain.Juramento.DESCANSAN.contains(com.darkcraft.morvain.MorvainEnemigos.capital().get(e.puesto()).grupo())) vuelven++;
+            log.println("Morvain, el Condestable cae: el rastrillo bajado al caer " + bajadoAlCaer + ", alzado del todo en " + fin + " ticks (alzados +"
+                    + (com.darkcraft.morvain.Juramento.ALZADOS - alzados) + "), vivo " + ko.isAlive() + ", objetos " + objetos + ", en paz "
+                    + com.darkcraft.morvain.Juramento.enPaz(server) + ", su guardia en pie " + ko.suyos() + "; la Puerta Oeste: de " + barrotes
+                    + " barrotes quedan " + com.darkcraft.morvain.Juramento.barrotesPuertaOeste(m) + "; de los " + deLaPuerta + " de la puerta descansan " + descansan
+                    + ", despues vuelven " + vuelven + " (tiene que ser 0); " + com.darkcraft.morvain.MorvainEnemigos.estadoCondestable(server));
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, ko.getBoundingBox().inflate(8))) it.discard();
+        } catch (Throwable t) {
+            log.println("Morvain, el Condestable: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] condestable", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.Calcinado.class, new net.minecraft.world.phys.AABB(CX + 110, PISO - 10, CZ - 40, CX + 205, PISO + 30, CZ + 40)))
+                if (e.esEfimero()) e.discard();
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.class, new net.minecraft.world.phys.AABB(CX + 110, PISO - 10, CZ - 40, CX + 205, PISO + 30, CZ + 40)))
+                f.discard();
+            // todo como antes: el Condestable de rodilla en su estrado, el rastrillo subido, la reja y la Puerta Oeste como estaban
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, com.darkcraft.morvain.MorvainEnemigos.condestable(), false);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Puestos.todos(server, capital, false);
+            try {
+                com.darkcraft.morvain.Juramento.deshacerPaz(m);
+                com.darkcraft.morvain.Juramento.alzarYa(m);
+                com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+                log.println("Morvain, el Condestable vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoCondestable(server));
+            } catch (Throwable t) {
+                log.println("Morvain, el Condestable vuelve: ERROR " + t);
+            }
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
         }
     }

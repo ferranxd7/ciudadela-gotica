@@ -266,6 +266,9 @@ public final class Morvain {
         m.addFreshEntity(r);
     }
 
+    /** Si hay alguien cerca del Patio del Juramento (se mira cada segundo). */
+    private static boolean cercaJuramento;
+
     /** Al acabar cada tick, los que entraron en un portal; y cada segundo, con alguien cerca del arco, su remolino. */
     @SubscribeEvent
     public static void onTick(TickEvent.ServerTickEvent e) {
@@ -297,6 +300,21 @@ public final class Morvain {
         if (m != null && srv.getTickCount() % 100 == 83 && !Ermita.enPaz(srv)) Monasterio.campana(m);
         // la ermita (parte 7l): con el Abad caido, los hermanos de la iglesia que quedaban de rodillas descansan
         if (m != null && srv.getTickCount() % 100 == 91) Ermita.paz(m);
+        // el Patio del Juramento (parte 7n): su rastrillo (cae al empezar la pelea, se alza al acabar) y, con el Condestable caido,
+        // la reja de su torre, la Puerta Oeste abierta y su guardia en paz; cada tick con alguien cerca
+        if (m != null) {
+            if (srv.getTickCount() % 20 == 11) {
+                cercaJuramento = false;
+                boolean cercaPuerta = false;
+                for (ServerPlayer p : m.players()) {
+                    if (Math.abs(p.getX() - (Juramento.CX + Juramento.CENTRO_U)) < 140 && Math.abs(p.getZ() - Juramento.CZ) < 140) cercaJuramento = true;
+                    else if (Math.abs(p.getX() - Capital.CX) < 100 && Math.abs(p.getZ() - Capital.CZ) < 100) cercaPuerta = true;
+                }
+                // con el Condestable caido, la Puerta Oeste se abre aunque el patio quede lejos (su chunk puede no estar cargado)
+                if (cercaPuerta && !cercaJuramento) Juramento.paz(m);
+            }
+            if (cercaJuramento) Juramento.tick(m);
+        }
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
             if (Llegada.cerca(p.getX(), p.getZ(), 160)) {
@@ -323,6 +341,10 @@ public final class Morvain {
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Capital.intramuros(p.getX(), p.getZ()) && Math.abs(p.getY() - Capital.PISO) < 40)
                 com.darkcraft.story.Logros.dar(p, "capital");
+        // y quien entra en el Patio del Juramento (parte 7n)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Juramento.enPatio(p.getX(), p.getZ()) && Math.abs(p.getY() - Juramento.PISO) < 20)
+                com.darkcraft.story.Logros.dar(p, "juramento");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -387,6 +409,8 @@ public final class Morvain {
         if (Ermita.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Ermita.PISO) < 30) return "darkcraft.morvain.lugar.ermita";
         if (Ermita.enEscalera(p.getX(), p.getZ()) && p.getY() > Monasterio.PISO - 10 && p.getY() < Ermita.PISO + 20)
             return "darkcraft.morvain.lugar.escalera_penitentes";
+        // el Patio del Juramento, donde espera el Condestable (parte 7n)
+        if (Juramento.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Juramento.PISO) < 40) return "darkcraft.morvain.lugar.juramento";
         // la Puerta Oeste de la Capital (parte 7m)
         if (Capital.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Capital.PISO) < 40) return "darkcraft.morvain.lugar.capital_puerta";
         return "darkcraft.zona.morvain." + Terreno.region(p.getX(), p.getZ()).id;

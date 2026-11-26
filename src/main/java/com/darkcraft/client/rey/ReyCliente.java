@@ -255,12 +255,15 @@ public final class ReyCliente {
         Minecraft mc = Minecraft.getInstance();
         boolean gavran = com.darkcraft.rey.Voces.esGavran(linea), capitan = com.darkcraft.rey.Voces.esCapitan(linea),
                 molinera = com.darkcraft.rey.Voces.esMolinera(linea), verdugo = com.darkcraft.rey.Voces.esVerdugo(linea),
-                barquero = com.darkcraft.rey.Voces.esBarquero(linea), abad = com.darkcraft.rey.Voces.esAbad(linea);
+                barquero = com.darkcraft.rey.Voces.esBarquero(linea), abad = com.darkcraft.rey.Voces.esAbad(linea),
+                condestable = com.darkcraft.rey.Voces.esCondestable(linea);
         int n = gavran ? linea - com.darkcraft.rey.Voces.BASE_GAVRAN : capitan ? linea - com.darkcraft.rey.Voces.BASE_CAPITAN
                 : molinera ? linea - com.darkcraft.rey.Voces.BASE_MOLINERA : verdugo ? linea - com.darkcraft.rey.Voces.BASE_VERDUGO
-                : barquero ? linea - com.darkcraft.rey.Voces.BASE_BARQUERO : abad ? linea - com.darkcraft.rey.Voces.BASE_ABAD : linea;
+                : barquero ? linea - com.darkcraft.rey.Voces.BASE_BARQUERO : abad ? linea - com.darkcraft.rey.Voces.BASE_ABAD
+                : condestable ? linea - com.darkcraft.rey.Voces.BASE_CONDESTABLE : linea;
         var tabla = gavran ? DarkCraftMod.GAVRAN_VOZ : capitan ? DarkCraftMod.CAPITAN_VOZ : molinera ? DarkCraftMod.MOLINERA_VOZ
-                : verdugo ? DarkCraftMod.VERDUGO_VOZ : barquero ? DarkCraftMod.BARQUERO_VOZ : abad ? DarkCraftMod.ABAD_VOZ : DarkCraftMod.REY_VOZ;
+                : verdugo ? DarkCraftMod.VERDUGO_VOZ : barquero ? DarkCraftMod.BARQUERO_VOZ : abad ? DarkCraftMod.ABAD_VOZ
+                : condestable ? DarkCraftMod.CONDESTABLE_VOZ : DarkCraftMod.REY_VOZ;
         if (n < 1 || n >= tabla.length) return;
         // la anterior ya ha acabado de hablar: se deja sonar la cola de su eco (solo se corta si aun estaba hablando)
         if (voz != null && ticks < vozHasta) mc.getSoundManager().stop(voz);
@@ -368,16 +371,19 @@ public final class ReyCliente {
         Font font = mc.font;
         boolean gavran = subLinea > com.darkcraft.gavran.Gavran.VOZ_BASE, capitan = com.darkcraft.rey.Voces.esCapitan(subLinea),
                 molinera = com.darkcraft.rey.Voces.esMolinera(subLinea), verdugo = com.darkcraft.rey.Voces.esVerdugo(subLinea),
-                barquero = com.darkcraft.rey.Voces.esBarquero(subLinea), abad = com.darkcraft.rey.Voces.esAbad(subLinea);
+                barquero = com.darkcraft.rey.Voces.esBarquero(subLinea), abad = com.darkcraft.rey.Voces.esAbad(subLinea),
+                condestable = com.darkcraft.rey.Voces.esCondestable(subLinea);
         Component name = Component.translatable(gavran ? "darkcraft.gavran.nombre_corto" : capitan ? "darkcraft.capitan.nombre_corto"
                 : molinera ? "darkcraft.molinera.nombre_corto" : verdugo ? "darkcraft.verdugo.nombre_corto"
-                : barquero ? "darkcraft.barquero.nombre_corto" : abad ? "darkcraft.abad.nombre_corto" : "darkcraft.rey.nombre_corto");
+                : barquero ? "darkcraft.barquero.nombre_corto" : abad ? "darkcraft.abad.nombre_corto"
+                : condestable ? "darkcraft.condestable.nombre_corto" : "darkcraft.rey.nombre_corto");
         Component line = Component.translatable(gavran ? "darkcraft.gavran.voz." + (subLinea - com.darkcraft.gavran.Gavran.VOZ_BASE)
                 : capitan ? "darkcraft.capitan.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_CAPITAN)
                 : molinera ? "darkcraft.molinera.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_MOLINERA)
                 : verdugo ? "darkcraft.verdugo.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_VERDUGO)
                 : barquero ? "darkcraft.barquero.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_BARQUERO)
-                : abad ? "darkcraft.abad.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_ABAD) : "darkcraft.rey.voz." + subLinea);
+                : abad ? "darkcraft.abad.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_ABAD)
+                : condestable ? "darkcraft.condestable.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_CONDESTABLE) : "darkcraft.rey.voz." + subLinea);
         int band = cine ? Math.round(h * 0.12f) : (enFoco() ? Math.round(h * 0.11f) : 0);
         // tamano: grande, pero que quepa en la franja (o en la parte de abajo de la pantalla)
         float sc = 1.6f;
@@ -421,7 +427,8 @@ public final class ReyCliente {
             return;
         }
         if (tc.getKey().equals("entity.darkcraft.brandt") || tc.getKey().equals("entity.darkcraft.corteza") || tc.getKey().equals("entity.darkcraft.molinera")
-                || tc.getKey().equals("entity.darkcraft.verdugo") || tc.getKey().equals("entity.darkcraft.barquero") || tc.getKey().equals("entity.darkcraft.abad")) {
+                || tc.getKey().equals("entity.darkcraft.verdugo") || tc.getKey().equals("entity.darkcraft.barquero") || tc.getKey().equals("entity.darkcraft.abad")
+                || tc.getKey().equals("entity.darkcraft.condestable")) {
             com.darkcraft.client.enemigos.GuardianCliente.barra(e, ticks, tc.getKey().substring("entity.darkcraft.".length()));
             return;
         }
