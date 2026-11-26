@@ -4987,5 +4987,177 @@
     ]
    }
   }
+ },
+ "sfx_salobre": {
+  "flow": "0mqKDVbquq0P7oXJ6BVV",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7q: los Salobres de la Costa de los Huesos (gemido, alerta, dolor, muerte, el plomo, la red, el garfio, el rastrillo, la sal y alzarse) y el viento del Puerto Varado (costa_ambiente). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "salobre_gemido": {
+    "prompt": "A salt-crusted drowned fisherman corpse groans low and wet: crackling salt crust, a hollow gurgling breath through a throat full of sand, dark fantasy undead ambience, no music",
+    "sesiones": [
+     "1mYBAYi9Fbo4oDPWFTqB",
+     "14Px63N7CafEGRlyYj5T",
+     "T4UQTzK4smkBfxC6Bc74",
+     "oyH7c7k1rOiwiHdiD6hE"
+    ],
+    "generaciones": [
+     "QED3dxZoNtfl5mql63oj",
+     "VG9FCEnMxNqR23kROlK7",
+     "IoMs6Ak11gyVGMoXmLAL",
+     "ThOLfMY4SmJiwa1w2QHm"
+    ]
+   },
+   "salobre_alerta": {
+    "prompt": "An undead salt-encrusted sailor notices an intruder: a harsh rasping shout through a throat full of salt and sand, crackling crust breaking as it turns, dark fantasy enemy alert, no music",
+    "sesiones": [
+     "7fGUsLTPg5wjfHYMH3oa",
+     "CFpNsoel1Y7JPjHn8uou",
+     "PyHLgOsZC41eOMMUbbHk",
+     "4lRWWGlcUf8d0nptijcQ"
+    ],
+    "generaciones": [
+     "Lt6BJP0huAcgxM3VyLen",
+     "SjhABxpgoOBwfU79rjDW",
+     "BK9wnsFWzEDO3QlQgJJk",
+     "d57qiezHutqfXxaA3ZuV"
+    ]
+   },
+   "salobre_dolor": {
+    "prompt": "A salt-crusted undead fisherman is struck: a short pained hiss with crunching, cracking salt crystals and grit falling to the ground, dark fantasy, no music",
+    "sesiones": [
+     "BeuGW1edurrC5ztNJmqQ",
+     "Tj1c08iVAL38Tnsnq13E",
+     "xU21MLI98bXUm8W0wVU1",
+     "iUKJUWW5XOMFiTMDfx79"
+    ],
+    "generaciones": [
+     "3KP562ykaHT5S8qmECwl",
+     "DzCkNCZrSbiHkhBrHU6n",
+     "59TGoKs6vIQ8nQFk3570",
+     "gk7NRRp3C4S4TJAc9jEH"
+    ]
+   },
+   "salobre_muerte": {
+    "prompt": "A salt-encrusted undead collapses and crumbles into a pile of salt and sand: a final rasping sigh, crystalline crust breaking apart and pouring down, a hollow thud, dark fantasy, no music",
+    "sesiones": [
+     "mhKskmZDDk96z8kdxV1M",
+     "YUPRGfZjJzXh4ZgXxFXe",
+     "rc5HMjVzjqSzzbwWBDdG",
+     "g7nhvBUbOthbf7Gew8Ob"
+    ],
+    "generaciones": [
+     "aqkunmePEtk9ndaHF9ON",
+     "HFRpeL3XzQZlsA7jw3lL",
+     "w6wzv6hrWSo42kriz6Kq",
+     "k7ouXEWQPHkw84yn5BHL"
+    ]
+   },
+   "salobre_plomo": {
+    "prompt": "A heavy lead fishing weight swung on a wet rope whooshes through the air and hits hard with a dull heavy thud, dark fantasy melee attack, no music",
+    "sesiones": [
+     "L2tpvX8bsCSIiCH5rdPk",
+     "w8yO8HYEf6HYex6QOCz3",
+     "WNhWfhbOfKSmZ3c3aOEx",
+     "vxIzbZ99zYp9nqUD22B7"
+    ],
+    "generaciones": [
+     "5nQXZahugS87dKDbEglD",
+     "UxRS7dxO04ShqBPozNsd",
+     "hymL0PkM7bEUhNbSYrFS",
+     "Ial35q3CpQij5bcbgDx3"
+    ]
+   },
+   "salobre_red": {
+    "prompt": "A large weighted fishing net is thrown: a rope whoosh, the net spreading in the air with rattling lead weights, then landing over someone with a heavy wet slap, dark fantasy, no music",
+    "sesiones": [
+     "xst6w7t38KybJKLmvRYT",
+     "RXpxXd42bdwImXb8su7o",
+     "nbmHKsqZ5aOi9y4ao66J",
+     "X9khjrHnvEeGA1AXI8Kn"
+    ],
+    "generaciones": [
+     "mjR9llFseyVDiEZGHzau",
+     "MJpC0BMH5fusbftaTxPP",
+     "2LguAujufh7tjNduVMqg",
+     "n6dKoE1lMtjKVvLmOnKP"
+    ]
+   },
+   "salobre_garfio": {
+    "prompt": "A rusty iron gaff hook on a long wooden pole thrusts and catches: a sharp metallic scrape and a hook biting, then a strong rope yank pulling something heavy, dark fantasy, no music",
+    "sesiones": [
+     "5J55pJ8vqXmOzfV3WlUq",
+     "UJ6ssaT5K5S2R6XtQRTM",
+     "FlzWQBZ1e5WhIl5Mu4WD",
+     "V91mDGNaef8EWFFTuQcx"
+    ],
+    "generaciones": [
+     "PMIfZqHaJuqSY8nosb9e",
+     "zwaTGL0FloblIMp3XVBs",
+     "2RJNtCEnlBjlD0eYtVmR",
+     "Jb22oqdeGDxoMGKWh3a7"
+    ]
+   },
+   "salobre_rastrillo": {
+    "prompt": "A huge wooden salt rake slams down onto a thick crust of salt: a heavy wooden impact, crunching salt crystals bursting and scattering across the ground, dark fantasy heavy attack, no music",
+    "sesiones": [
+     "u9lvFogXLrs4CQM8Cicr",
+     "tRhUYArXGeEHk99iBLoz",
+     "7rZH66HA8Ot8UDw2Pxaw",
+     "ThLIVPav1gDZHtPLPUSD"
+    ],
+    "generaciones": [
+     "weBGR70NPAuhFl75AKE7",
+     "GEzyLLcKPEQfPYv06jS4",
+     "UGueVbsMyOKMoYJt7drI",
+     "nw1k3SAmJMwtwN68ZRHS"
+    ]
+   },
+   "salobre_sal": {
+    "prompt": "A handful of coarse sea salt is flung hard through the air: a sharp hissing spray of crystals scattering like sand in a gust of wind, then a faint sizzle, no music",
+    "sesiones": [
+     "BC1mDL0qvsNJ6TQV3W1d",
+     "p6gNpRRuuJVMpKUIkSGZ",
+     "T2divGbKHvxMYVKR8Rly",
+     "vZ5jmOnOTf4nMtRSKAU7"
+    ],
+    "generaciones": [
+     "DnuUrxROv3UiWTck7RGA",
+     "6urJiBi94PI97IsRHC7R",
+     "W3jPhXskDS4qb6kf7O6M",
+     "Hjk0ZuwCT66v73QqXZfV"
+    ]
+   },
+   "salobre_alzarse": {
+    "prompt": "A salt-crusted corpse rises from a bed of salt and sand: a grinding crust cracking open, sand pouring off its body, a slow rasping breath, dark fantasy undead, no music",
+    "sesiones": [
+     "MbhLFHbKf5cR5KtRlWkO",
+     "6LpFcxN5xLjxZDkPl3Mf",
+     "UNJrxAv5uli7WhH9qknx",
+     "SeHQ6UQpZNTBWKyUToei"
+    ],
+    "generaciones": [
+     "rjoNdgFavQBjeLi5Up24",
+     "q3iwlY3joZB6Le9Tq4WT",
+     "XocJr1NldjlwGzdnzOZH",
+     "KIVQmo2fkYwkYeoWOVjg"
+    ]
+   },
+   "costa_ambiente": {
+    "prompt": "Desolate dead coast ambience, 20 seconds: a cold wind over endless dry sand flats, distant surf far away that never arrives, creaking stranded wooden boats, loose ropes knocking against old masts, giant whale bones humming low in the wind, eerie and empty, no music, no birds",
+    "sesiones": [
+     "7ig8i7dhKkyf7PboazPM",
+     "AGvULwKwxraaCGLbXqdI",
+     "sD5yBPDrsKGxbsL5cfCn",
+     "XLOfGpSWAux3n863MQqC"
+    ],
+    "generaciones": [
+     "5m08NZMh0bHEnCxeCBZ0",
+     "w70HrMmGkktWxgU0zYV7",
+     "JYQms9OEHwwHTZkAwXkh",
+     "CJsIpvttXiTTJ3Xv2rRa"
+    ]
+   }
+  }
  }
 }
