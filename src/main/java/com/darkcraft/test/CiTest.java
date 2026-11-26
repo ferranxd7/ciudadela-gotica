@@ -892,6 +892,7 @@ public final class CiTest {
             mo.setTarget(fp);
             int levanta = -1, grita = -1;
             for (int k = 0; k < 260; k++) {
+                mo.tickCount++;
                 mo.tick();
                 if (levanta < 0 && mo.accion() == com.darkcraft.enemigos.MolineraAnims.LEVANTARSE) levanta = k;
                 if (grita < 0 && mo.accion() == com.darkcraft.enemigos.MolineraAnims.GRITO) grita = k;
@@ -899,7 +900,10 @@ public final class CiTest {
             }
             sb.append("; al verle: pelea ").append(mo.enPelea()).append(", se levanta en el tick ").append(levanta).append(", grita en el ")
                     .append(grita).append(" (la frase 1 dura ").append(com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Molinera.VOZ_BASE + 1)).append(")");
-            for (int k = 0; k < 60 && mo.accion() != 0; k++) mo.tick();
+            for (int k = 0; k < 60 && mo.accion() != 0; k++) {
+                mo.tickCount++;
+                mo.tick();
+            }
             // cada accion acaba (sin presa); la siega, con uno de pie delante y luego saltando
             mo.setTarget(null);
             StringBuilder mal = new StringBuilder();
@@ -907,7 +911,10 @@ public final class CiTest {
                 String nombre = com.darkcraft.enemigos.MolineraAnims.NOMBRES[a];
                 if (nombre.equals("morir")) continue;
                 mo.empezar(a);
-                for (int k = 0; k < 120 && mo.accion() == a; k++) mo.tick();
+                for (int k = 0; k < 120 && mo.accion() == a; k++) {
+                    mo.tickCount++;
+                    mo.tick();
+                }
                 if (mo.accion() == a) mal.append(' ').append(nombre).append(" no acaba;");
             }
             sb.append("; acciones que no acaban:").append(mal.length() == 0 ? " ninguna" : mal);
@@ -918,27 +925,34 @@ public final class CiTest {
                     com.darkcraft.enemigos.MolineraAnims.ESTOCADA, com.darkcraft.enemigos.MolineraAnims.PISOTON};
             double[] lejos = {3.0, 3.0, 3.5, 6.0, -2.4};
             double[] alto = {0, 1.1, 0, 0, 0};
-            sb.append("; golpes:");
-            for (int i = 0; i < golpes.length; i++) {
-                fp.setHealth(fp.getMaxHealth());
-                fp.invulnerableTime = 0;
-                fp.hurtTime = 0;
-                double px = mo.getX() + fx * lejos[i], pz = mo.getZ() + fz * lejos[i];
-                fp.moveTo(px, y + alto[i], pz, giro + 180f, 0f);
-                fp.setOnGround(alto[i] == 0);
-                int ondas = mo.ondas();
-                mo.setYRot(giro);
-                mo.yBodyRot = mo.yHeadRot = giro;
-                mo.empezar(acc[i]);
-                float antes = fp.getHealth();
-                for (int k = 0; k < 120 && mo.accion() == acc[i]; k++) {
-                    mo.tick();
-                    fp.moveTo(px, y + alto[i], pz, giro + 180f, 0f);
-                    fp.setOnGround(alto[i] == 0);
+            sb.append("; golpes (a un marchito: al jugador de mentira no le entra nada):");
+            var victima = DarkCraftMod.MARCHITO.get().create(m);
+            if (victima != null) {
+                victima.moveTo(mo.getX() + fx * 3, y, mo.getZ() + fz * 3, giro + 180f, 0f);
+                m.addFreshEntity(victima);
+                for (int i = 0; i < golpes.length; i++) {
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    victima.hurtTime = 0;
+                    double px = mo.getX() + fx * lejos[i], pz = mo.getZ() + fz * lejos[i];
+                    victima.moveTo(px, y + alto[i], pz, giro + 180f, 0f);
+                    int ondas = mo.ondas();
+                    mo.setTarget(victima);
+                    mo.setYRot(giro);
+                    mo.yBodyRot = mo.yHeadRot = giro;
+                    mo.empezar(acc[i]);
+                    float antes = victima.getHealth();
+                    for (int k = 0; k < 120 && mo.accion() == acc[i]; k++) {
+                        mo.tickCount++;
+                        mo.tick();
+                        victima.moveTo(px, y + alto[i], pz, giro + 180f, 0f);
+                    }
+                    sb.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " -%.1f", antes - victima.getHealth()))
+                            .append(mo.ondas() > ondas ? " (onda)" : "").append(';');
+                    mo.moveTo(mo.hogar().getX() + 0.5, mo.hogar().getY(), mo.hogar().getZ() + 0.5, giro, 0f);
                 }
-                sb.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " -%.1f", antes - fp.getHealth()))
-                        .append(mo.ondas() > ondas ? " (onda)" : "").append(';');
-                mo.moveTo(mo.hogar().getX() + 0.5, mo.hogar().getY(), mo.hogar().getZ() + 0.5, giro, 0f);
+                mo.setTarget(null);
+                victima.discard();
             }
             fp.setHealth(fp.getMaxHealth());
             // a media vida: grita y salen los suyos
@@ -947,6 +961,7 @@ public final class CiTest {
             mo.setHealth(mo.getMaxHealth() * 0.45f);
             int llamaron = -1;
             for (int k = 0; k < 120; k++) {
+                mo.tickCount++;
                 mo.tick();
                 if (mo.suyos() > 0) {
                     llamaron = k;
@@ -960,7 +975,10 @@ public final class CiTest {
             int[] cofre = com.darkcraft.morvain.Molino.get().sitio("cofre_molino");
             mo.setTarget(null);
             mo.hurt(m.damageSources().playerAttack(fp), 99999f);
-            for (int k = 0; k < 80 && !mo.isRemoved(); k++) mo.tick();
+            for (int k = 0; k < 80 && !mo.isRemoved(); k++) {
+                mo.tickCount++;
+                mo.tick();
+            }
             int objetos = m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, mo.getBoundingBox().inflate(4)).size();
             log.println("Morvain, la Molinera cae: viva " + mo.isAlive() + ", caida " + com.darkcraft.morvain.Molino.vencida(server) + ", suyos en pie "
                     + mo.suyos() + ", objetos " + objetos + "; " + com.darkcraft.morvain.Molino.resumen(m) + " (arcon en " + cofre[0] + "," + cofre[1] + "," + cofre[2] + ")");
