@@ -24,7 +24,7 @@ public final class FortalezaDatos extends SavedData {
      * escalera de caracol delante), 3 la misma a la que se sube por la montana y su puente largo (parte 5b), 4 con sus
      * trampas, la cripta bajo la fuente y la sala secreta (parte 5c).
      */
-    public static final int VERSION = 4;
+    public static final int VERSION = 5;
 
     public static final class Estado {
         public final Set<Long> hechos = new HashSet<>();

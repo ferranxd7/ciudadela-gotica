@@ -48,6 +48,7 @@ public final class ClientSetup {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.HERRERO.get(), com.darkcraft.client.personajes.HerreroRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.MERCADER.get(), com.darkcraft.client.personajes.MercaderRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ASCENSOR.get(), com.darkcraft.client.arbol.AscensorRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.REMOLINO.get(), com.darkcraft.client.fortaleza.RemolinoRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PUERTA_ARBOL.get(), com.darkcraft.client.arbol.PuertaArbolRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.GAVRAN.get(), com.darkcraft.client.gavran.GavranRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CABALLERO_ESPADA.get(), com.darkcraft.client.caballeros.CaballeroRenderer::new);

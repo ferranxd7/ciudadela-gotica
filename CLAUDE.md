@@ -1165,6 +1165,42 @@ Respuesta 81 del plan ("largo, a pie, con paradas: islotes con ruinas, enemigos 
   de nubes de verdad y las comprueba); cliente, tramo `camino()` (capturas `cliente_cn01_atalaya` ... `cn06_campamento`,
   lineas `en la parada N: lugar ...`).
 
+### Plan grande, parte 5e-1: el portal nuevo (marco, remolino, pilares, estatuas y pedestal)
+
+Respuestas 48-56 del plan. En la terraza de lo alto de la torre (`TorreCupula.terraza` → `marcoPortal`, `pilarPortal`,
+`estatua`, `pedestal`):
+- **Bloques nuevos** (irrompibles, sin objeto; texturas de `tools/fortaleza/portal.py`): `piedra_sombra` (tres tallas al
+  azar por sitio, una lista de modelos en el blockstate; encima, sus runas rojas animadas en otro elemento del mismo cubo
+  con `forge_data` `block_light`/`sky_light` 15 y `shade: false`: brillan de noche), `hueso_labrado` (columna, como el
+  bloque de hueso), `hierro_negro` y `gema_roja` (`GemaBlock`, propiedad `luz`: apagada luz 1, encendida 11 con su brillo
+  propio). En el mundo de mentira de las vistas no hay bloques del mod: `TorreCupula.piedraSombra()` etc. devuelven
+  obsidiana, hueso, netherita y redstone/luz de hongo.
+- **El marco**: arco apuntado de 9 x 13 (`arcoPortal`), tres de hondo; anillos por distancia a lo ajedrez al hueco
+  (`anillo(dx, h)`): 1 hueso labrado (de pie en los lados, tumbado arriba), 2 piedra de sombra; zocalo de hierro negro,
+  remate con punta de hueso; gemas en los lados (filas 2, 5 y 8) y la clave, solo en las caras de fuera.
+- **Pilares** a `cx +- PILAR` (10) en el plano del portal: fuste en cruz de piedra de sombra con bandas de hierro, capitel de
+  hierro, punta de hueso con gema; **cadenas** (filas 3, 7 y 10) del marco al pilar.
+- **Estatuas encapuchadas** de 16 de alto en `cx +- EX, cz + EZ` (9, 7), mirando al norte (al portal): manto de pizarra,
+  capucha de piedra negra con la cara oscura y dos gemas por ojos, manos sobre una espada de hueso con una gema en el pomo.
+- **Pedestal** en `altar()`: zocalo de hierro negro, columna de hueso con contrafuertes y el hueco arriba (losas); dos
+  braseros a los lados.
+- **Al abrirse** (`TorreCupula.alAbrir()`: lista de `Cambio` con el bloque de antes, el de despues y la fase): se encienden
+  las gemas del marco de abajo arriba, luego los ojos y pomos de las estatuas, saltan las cadenas, revientan lo alto de los
+  pilares (queda un munon) y caen cascotes a la terraza (`FortalezaEventos.abrirPortal`, con sonidos y particulas).
+  `aplicarEstado` lo deja asi en un chunk que se vuelve a levantar; `cerrarPortal` lo deshace (comando reiniciar).
+- **El remolino** (`fortaleza/Remolino`, entidad sin guardar ni cuerpo en el pie del hueco): el cliente dibuja todo el
+  hueco fila a fila con `textures/entity/remolino.png` girando hacia el centro en dos capas (`RemolinoRenderer`,
+  `entityTranslucentEmissive`, luz plena); al abrirse crece desde el ojo (`abierto` 0 → 1 en 2 s). El bloque
+  `portal_sombra` ya no se dibuja (`RenderShape.INVISIBLE`): pone el roce, el empujon y las chispas.
+- **El amuleto** se queda en su pedestal: un `item_display` (etiqueta `darkcraft_amuleto_altar`, efimero) que flota y gira
+  (un octavo de vuelta cada medio segundo, `girarAmuletos`). `asegurarPortal` (cada segundo con alguien en la zona) pone el
+  remolino y el amuleto si faltan.
+- **Version 5** de `FortalezaDatos`: de la 4 se rehacen solo los chunks de la terraza (`FortalezaPlan.terraza()`); de la 3,
+  todo el nucleo (como antes).
+- Pruebas: cliente, `cliente_f40a_portal_noche` (con la linea `portal abierto: hueco N/N; gemas ... remolino 1 ... amuleto
+  en el pedestal 1`, de `FortalezaEventos.resumenPortal`) y `cliente_f40b_estatuas`. Sin abrir el juego: `Volcado torre`
+  (`-Dabierto=true`: abierto) y `montana -Dtodo=true` (se llega ante el pedestal, ante el portal y al atril de la terraza).
+
 ### Lo siguiente: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1172,8 +1208,9 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5b, la montana y el puente largo**: hecha (arriba). Los enemigos del sendero van con los de dentro (5c).
 - **5c, dentro de la fortaleza y en la montana**: hecha (arriba).
 - **5d, el camino de nubes**: hecha (arriba).
-- **5e, el portal** (48-68): marco nuevo (piedra de sombra con runas que laten, hueso, hierro negro y cadenas), remolino,
-  estatuas gigantes y pilares, el pedestal del amuleto, la voz de la Sombra, la cinematica del rayo rojo y el cielo rojo.
+- **5e, el portal** (48-68): 5e-1 hecha (arriba: marco, remolino, pilares, estatuas y pedestal). Falta 5e-2: la voz de la
+  Sombra (ElevenLabs), el capitulo 6 reescrito y su cinematica de un minuto con el rayo rojo, las nubes, el cielo y la
+  niebla rojos y la luna de sangre (hasta vencer a la Sombra), para todos los jugadores.
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

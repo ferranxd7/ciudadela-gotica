@@ -128,6 +128,7 @@ public final class FortalezaEventos {
         }
         construirUno(srv);
         Puente.tick(srv);
+        girarAmuletos(now);
     }
 
     @SubscribeEvent
@@ -149,6 +150,7 @@ public final class FortalezaEventos {
             if (d < Fortalezas.ZONA || dm < 24) {
                 entrar(p, s);
                 asegurarAscensor(lvl, s, p);
+                asegurarPortal(lvl, s);
             }
             else if (d > Fortalezas.ZONA + 25 && dm > 48) salir(p);
             if (d < 150) Logros.dar(p, "fortaleza");
@@ -266,23 +268,26 @@ public final class FortalezaEventos {
             d.setDirty();
             DarkCraftMod.LOGGER.info("Fortaleza de Hueso en {}: pasa a la version 3 (se sube por la montana)", s.clave());
         }
-        if (est.version == 3) {
+        if (est.version == 3 || est.version == 4) {
             // parte 5c: la torre lleva trampas, la cripta bajo la fuente y la sala secreta: se vuelven a levantar los chunks
-            // de la isla y la torre (la montana y las nubes no cambian); la puerta, el puente y el portal se quedan como
-            // estaban (aplicarEstado los vuelve a poner)
+            // de la isla y la torre (la montana y las nubes no cambian); parte 5e: el portal nuevo de lo alto (de la 4 basta
+            // con los de la terraza). La puerta, el puente, el muro falso y el portal se quedan como estaban (aplicarEstado
+            // los vuelve a poner)
+            boolean de3 = est.version == 3;
             int n = 0;
-            for (long k : plan.nucleo())
+            for (long k : de3 ? plan.nucleo() : plan.terraza())
                 if (est.hechos.remove(k)) {
                     est.porLimpiar.add(k);
                     n++;
                 }
             est.completa = false;
-            est.muro = false;
+            if (de3) est.muro = false;
             est.version = FortalezaDatos.VERSION;
             d.setDirty();
-            DarkCraftMod.LOGGER.info("Fortaleza de Hueso en {}: pasa a la version {} (trampas y secretos: {} chunks se vuelven a levantar)",
-                    s.clave(), est.version, n);
-            return n > 0;
+            DarkCraftMod.LOGGER.info("Fortaleza de Hueso en {}: pasa a la version {} ({}: {} chunks se vuelven a levantar)",
+                    s.clave(), est.version, de3 ? "trampas, secretos y el portal nuevo" : "el portal nuevo", n);
+            // (el santuario del rellano no se toca al rehacer solo la terraza)
+            return de3 && n > 0;
         }
         // la escalera de hueso de la de antes, si se levanto: lo de debajo de la isla se quita aparte (quitarPuenteViejo)
         if (est.puente && est.baseEscalera != Integer.MIN_VALUE) {
@@ -429,6 +434,10 @@ public final class FortalezaEventos {
                 for (int x = q[0]; x <= q[3]; x++)
                     for (int y = q[1]; y <= q[4]; y++)
                         if ((x >> 4) == cx && f.f.enPortal(x, y)) lvl.setBlock(new BlockPos(x, y, q[2]), DarkCraftMod.PORTAL_SOMBRA.get().defaultBlockState(), 2);
+            // las gemas encendidas, las cadenas rotas, los pilares sin su capitel y los cascotes (el remolino y el amuleto
+            // los pone asegurarPortal)
+            for (TorreCupula.Cambio c : f.f.alAbrir())
+                if ((c.x() >> 4) == cx && (c.z() >> 4) == cz) lvl.setBlock(new BlockPos(c.x(), c.y(), c.z()), c.despues(), 2);
         }
     }
 
@@ -664,7 +673,10 @@ public final class FortalezaEventos {
         }
     }
 
-    /** El portal se abre desde el centro hacia fuera, en dos segundos. */
+    /**
+     * El portal se abre (respuestas 52, 53 y 55): el remolino crece desde el centro, se encienden las gemas del marco de
+     * abajo arriba y los ojos de las estatuas, saltan las cadenas y revientan lo alto de los pilares.
+     */
     public static void abrirPortal(ServerLevel lvl, FortalezaPlan f) {
         int[] q = f.f.portal();
         double mx = (q[0] + q[3]) / 2.0, my = (q[1] + q[4]) / 2.0;
@@ -672,12 +684,185 @@ public final class FortalezaEventos {
         for (int x = q[0]; x <= q[3]; x++) for (int y = q[1]; y <= q[4]; y++) if (f.f.enPortal(x, y)) celdas.add(new BlockPos(x, y, q[2]));
         celdas.sort((a, b) -> Double.compare(Math.hypot(a.getX() - mx, (a.getY() - my) * 0.6), Math.hypot(b.getX() - mx, (b.getY() - my) * 0.6)));
         lvl.playSound(null, mx + 0.5, my, q[2] + 0.5, DarkCraftMod.SFX_PORTAL_ABRE.get(), SoundSource.BLOCKS, 4.0f, 1.0f);
+        quitarRemolinos(lvl, f);
+        ponerRemolino(lvl, f, 0f);
+        // (el bloque del portal no se ve: pone el roce y las chispas; el remolino es el dibujo)
         for (int i = 0; i < celdas.size(); i++) {
             BlockPos b = celdas.get(i);
-            despues(lvl.getServer(), i, () -> {
+            despues(lvl.getServer(), i / 3, () -> {
                 lvl.setBlock(b, DarkCraftMod.PORTAL_SOMBRA.get().defaultBlockState(), 3);
-                lvl.sendParticles(ParticleTypes.REVERSE_PORTAL, b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5, 8, 0.3, 0.3, 0.3, 0.1);
+                lvl.sendParticles(ParticleTypes.REVERSE_PORTAL, b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5, 6, 0.3, 0.3, 0.3, 0.1);
             });
+        }
+        int k = 0;
+        for (TorreCupula.Cambio c : f.f.alAbrir()) {
+            BlockPos b = new BlockPos(c.x(), c.y(), c.z());
+            switch (c.fase()) {
+                case TorreCupula.GEMAS_MARCO -> despues(lvl.getServer(), 6 + (c.y() - q[1]) * 3, () -> {
+                    lvl.setBlock(b, c.despues(), 3);
+                    lvl.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(1f, 0.1f, 0.05f), 1.6f),
+                            b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5, 10, 0.4, 0.4, 0.4, 0.02);
+                    lvl.playSound(null, b, SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.BLOCKS, 1.6f, 0.6f + (c.y() - q[1]) * 0.04f);
+                });
+                case TorreCupula.OJOS -> despues(lvl.getServer(), 52, () -> {
+                    lvl.setBlock(b, c.despues(), 3);
+                    lvl.sendParticles(ParticleTypes.FLAME, b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5, 6, 0.2, 0.2, 0.2, 0.01);
+                    lvl.playSound(null, b, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 1.2f, 0.5f);
+                });
+                case TorreCupula.CADENA -> {
+                    int t = 62 + (k++ % 6) * 2;
+                    despues(lvl.getServer(), t, () -> {
+                        BlockState era = lvl.getBlockState(b);
+                        lvl.setBlock(b, c.despues(), 3);
+                        lvl.sendParticles(new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK, era.isAir() ? c.antes() : era),
+                                b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5, 14, 0.3, 0.2, 0.3, 0.1);
+                        lvl.playSound(null, b, SoundEvents.CHAIN_BREAK, SoundSource.BLOCKS, 2.0f, 0.6f);
+                    });
+                }
+                case TorreCupula.PILARES -> despues(lvl.getServer(), 76, () -> {
+                    BlockState era = lvl.getBlockState(b);
+                    lvl.setBlock(b, c.despues(), 3);
+                    lvl.sendParticles(new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK, era.isAir() ? c.antes() : era),
+                            b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5, 20, 0.5, 0.5, 0.5, 0.15);
+                    if (c.antes().getBlock() == DarkCraftMod.GEMA_ROJA.get()) {
+                        lvl.sendParticles(ParticleTypes.EXPLOSION_EMITTER, b.getX() + 0.5, b.getY() + 0.5, b.getZ() + 0.5, 1, 0, 0, 0, 0);
+                        lvl.playSound(null, b, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 2.5f, 0.7f);
+                        lvl.playSound(null, b, SoundEvents.GLASS_BREAK, SoundSource.BLOCKS, 2.0f, 0.5f);
+                    }
+                });
+                case TorreCupula.CASCOTES -> despues(lvl.getServer(), 84, () -> {
+                    lvl.setBlock(b, c.despues(), 3);
+                    lvl.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, b.getX() + 0.5, b.getY() + 0.6, b.getZ() + 0.5, 3, 0.3, 0.1, 0.3, 0.01);
+                    lvl.playSound(null, b, SoundEvents.DEEPSLATE_BRICKS_FALL, SoundSource.BLOCKS, 1.5f, 0.7f);
+                });
+                default -> {
+                }
+            }
+        }
+        // el amuleto se queda en su pedestal, flotando
+        despues(lvl.getServer(), 10, () -> ponerAmuleto(lvl, f));
+    }
+
+    /** Para el comando de reiniciar: el portal cerrado y todo lo suyo como antes de abrirse. */
+    public static void cerrarPortal(ServerLevel lvl, FortalezaPlan f) {
+        int[] q = f.f.portal();
+        for (int x = q[0]; x <= q[3]; x++)
+            for (int y = q[1]; y <= q[4]; y++)
+                if (f.f.enPortal(x, y)) lvl.setBlock(new BlockPos(x, y, q[2]), Blocks.AIR.defaultBlockState(), 3);
+        for (TorreCupula.Cambio c : f.f.alAbrir()) lvl.setBlock(new BlockPos(c.x(), c.y(), c.z()), c.antes(), 3);
+        quitarRemolinos(lvl, f);
+        int[] al = f.f.altar();
+        for (Display.ItemDisplay d : lvl.getEntitiesOfClass(Display.ItemDisplay.class, cajaAltar(al), d -> d.getTags().contains(AMULETO_ALTAR))) d.discard();
+    }
+
+    // ------------------------------------------------------------------ el remolino y el amuleto del portal abierto
+
+    /** La etiqueta del amuleto que flota en su pedestal (respuesta 56). */
+    public static final String AMULETO_ALTAR = "darkcraft_amuleto_altar";
+    /** Los amuletos que hay en sus pedestales (se giran desde onServerTick). */
+    private static final List<Display.ItemDisplay> AMULETOS = new ArrayList<>();
+
+    private static net.minecraft.world.phys.AABB cajaRemolino(FortalezaPlan f) {
+        int[] q = f.f.portal();
+        return new net.minecraft.world.phys.AABB(f.cx - 2, q[1] - 2, q[2] - 2, f.cx + 3, q[1] + 3, q[2] + 3);
+    }
+
+    private static net.minecraft.world.phys.AABB cajaAltar(int[] al) {
+        return new net.minecraft.world.phys.AABB(al[0] - 1, al[1], al[2] - 1, al[0] + 2, al[1] + 5, al[2] + 2);
+    }
+
+    private static void quitarRemolinos(ServerLevel lvl, FortalezaPlan f) {
+        for (Remolino r : lvl.getEntitiesOfClass(Remolino.class, cajaRemolino(f))) r.discard();
+    }
+
+    /** El remolino del portal (abierto de 0 a 1: con 0 crece desde el centro). */
+    static Remolino ponerRemolino(ServerLevel lvl, FortalezaPlan f, float abierto) {
+        Remolino r = DarkCraftMod.REMOLINO.get().create(lvl);
+        if (r == null) return null;
+        int[] q = f.f.portal();
+        r.moveTo(f.cx + 0.5, q[1], q[2] + 0.5, 0f, 0f);
+        r.abierto(abierto);
+        r.abiertoO = abierto;
+        lvl.addFreshEntity(r);
+        return r;
+    }
+
+    /** El amuleto en el hueco de su pedestal: flota, gira y brilla. */
+    static void ponerAmuleto(ServerLevel lvl, FortalezaPlan f) {
+        int[] al = f.f.altar();
+        for (Display.ItemDisplay d : lvl.getEntitiesOfClass(Display.ItemDisplay.class, cajaAltar(al), d -> d.getTags().contains(AMULETO_ALTAR))) d.discard();
+        Display.ItemDisplay d = EntityType.ITEM_DISPLAY.create(lvl);
+        if (d == null) return;
+        CompoundTag tag = new CompoundTag();
+        tag.put("item", new ItemStack(DarkCraftMod.AMULETO_HUESO.get()).save(new CompoundTag()));
+        tag.putString("item_display", "fixed");
+        tag.put("transformation", matriz(new Matrix4f().scale(0.8f)));
+        CompoundTag luz = new CompoundTag();
+        luz.putInt("sky", 15);
+        luz.putInt("block", 15);
+        tag.put("brightness", luz);
+        d.load(tag);
+        d.moveTo(al[0] + 0.5, al[1] + 2.6, al[2] + 0.5, 0f, 0f);
+        d.addTag(AMULETO_ALTAR);
+        com.darkcraft.armas.EfectosRaiz.efimera(d);
+        lvl.addFreshEntity(d);
+        AMULETOS.add(d);
+        lvl.sendParticles(ParticleTypes.END_ROD, al[0] + 0.5, al[1] + 2.6, al[2] + 0.5, 16, 0.2, 0.2, 0.2, 0.05);
+    }
+
+    /** Con el portal abierto y su chunk en marcha: un remolino en el arco y el amuleto en su pedestal. */
+    private static void asegurarPortal(ServerLevel lvl, Fortalezas.Sitio s) {
+        FortalezaDatos.Estado est = FortalezaDatos.get(lvl.getServer()).de(s);
+        if (!est.portal || !est.completa) return;
+        FortalezaPlan f = Fortalezas.plan(lvl.getSeed(), s);
+        int[] q = f.f.portal(), al = f.f.altar();
+        if (!lvl.isPositionEntityTicking(new BlockPos(f.cx, q[1], q[2])) || !lvl.isPositionEntityTicking(new BlockPos(al[0], al[1], al[2]))) return;
+        List<Remolino> rs = lvl.getEntitiesOfClass(Remolino.class, cajaRemolino(f));
+        for (int i = 1; i < rs.size(); i++) rs.get(i).discard();
+        if (rs.isEmpty()) ponerRemolino(lvl, f, 1f);
+        List<Display.ItemDisplay> ds = lvl.getEntitiesOfClass(Display.ItemDisplay.class, cajaAltar(al), d -> d.getTags().contains(AMULETO_ALTAR));
+        for (int i = 1; i < ds.size(); i++) ds.get(i).discard();
+        if (ds.isEmpty()) ponerAmuleto(lvl, f);
+        else if (!AMULETOS.contains(ds.get(0))) AMULETOS.add(ds.get(0));
+        if (lvl.random.nextInt(2) == 0)
+            lvl.sendParticles(ParticleTypes.ENCHANT, al[0] + 0.5, al[1] + 2.9, al[2] + 0.5, 6, 0.4, 0.4, 0.4, 0.4);
+    }
+
+    /** Para las pruebas y el comando: como esta el portal (lo que cambia al abrirse, el remolino y el amuleto). */
+    public static String resumenPortal(ServerLevel lvl, FortalezaPlan f) {
+        int[] n = new int[5], hechos = new int[5];
+        for (TorreCupula.Cambio c : f.f.alAbrir()) {
+            n[c.fase()]++;
+            if (lvl.getBlockState(new BlockPos(c.x(), c.y(), c.z())).equals(c.despues())) hechos[c.fase()]++;
+        }
+        int[] q = f.f.portal();
+        int bloques = 0, celdas = 0;
+        for (int x = q[0]; x <= q[3]; x++)
+            for (int y = q[1]; y <= q[4]; y++)
+                if (f.f.enPortal(x, y)) {
+                    celdas++;
+                    if (lvl.getBlockState(new BlockPos(x, y, q[2])).is(DarkCraftMod.PORTAL_SOMBRA.get())) bloques++;
+                }
+        List<Remolino> rs = lvl.getEntitiesOfClass(Remolino.class, cajaRemolino(f));
+        int[] al = f.f.altar();
+        int am = lvl.getEntitiesOfClass(Display.ItemDisplay.class, cajaAltar(al), d -> d.getTags().contains(AMULETO_ALTAR)).size();
+        return String.format(java.util.Locale.ROOT, "hueco %d/%d; gemas del marco %d/%d, ojos %d/%d, cadenas rotas %d/%d, pilares %d/%d, cascotes %d/%d;"
+                        + " remolino %d%s; amuleto en el pedestal %d", bloques, celdas, hechos[0], n[0], hechos[1], n[1], hechos[2], n[2], hechos[3], n[3],
+                hechos[4], n[4], rs.size(), rs.isEmpty() ? "" : String.format(java.util.Locale.ROOT, " (abierto %.2f)", rs.get(0).abierto()), am);
+    }
+
+    /** Cada medio segundo: un octavo de vuelta (y un poco arriba o abajo) a los amuletos de los pedestales. */
+    private static void girarAmuletos(int tick) {
+        if (AMULETOS.isEmpty() || tick % 10 != 0) return;
+        AMULETOS.removeIf(d -> d.isRemoved());
+        int paso = tick / 10;
+        for (Display.ItemDisplay d : AMULETOS) {
+            CompoundTag t = d.saveWithoutId(new CompoundTag());
+            t.put("transformation", matriz(new Matrix4f().translate(0, 0.09f * (float) Math.sin(paso * Math.PI / 4), 0)
+                    .rotateY((float) (paso * Math.PI / 4)).scale(0.8f)));
+            t.putInt("interpolation_duration", 10);
+            t.putInt("start_interpolation", 0);
+            d.load(t);
         }
     }
 

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column_horizontal",
+  "textures": {
+    "end": "darkcraft:block/hueso_labrado_top",
+    "side": "darkcraft:block/hueso_labrado"
+  }
+}

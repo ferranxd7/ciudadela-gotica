@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "luz=false": {
+      "model": "darkcraft:block/gema_roja"
+    },
+    "luz=true": {
+      "model": "darkcraft:block/gema_roja_luz"
+    }
+  }
+}

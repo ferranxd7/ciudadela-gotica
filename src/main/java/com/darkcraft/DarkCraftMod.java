@@ -313,6 +313,22 @@ public class DarkCraftMod {
                     .isValidSpawn((st, l, p, t) -> false).isRedstoneConductor((st, l, p) -> false)
                     .isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false)));
 
+    /** El marco del portal de la Sombra (parte 5e): piedra de sombra con runas rojas que laten (tres tallas), hueso labrado,
+     * hierro negro y las gemas rojas que se encienden al abrirse. Irrompibles. */
+    public static final RegistryObject<Block> PIEDRA_SOMBRA = BLOCKS.register("piedra_sombra", () -> new Block(
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(-1.0F, 3600000.0F).noLootTable()
+                    .lightLevel(st -> 4).sound(SoundType.DEEPSLATE_BRICKS).pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false)));
+    public static final RegistryObject<Block> HUESO_LABRADO = BLOCKS.register("hueso_labrado", () -> new net.minecraft.world.level.block.RotatedPillarBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.SAND).strength(-1.0F, 3600000.0F).noLootTable()
+                    .sound(SoundType.BONE_BLOCK).pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false)));
+    public static final RegistryObject<Block> HIERRO_NEGRO = BLOCKS.register("hierro_negro", () -> new Block(
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY).strength(-1.0F, 3600000.0F).noLootTable()
+                    .sound(SoundType.NETHERITE_BLOCK).pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false)));
+    public static final RegistryObject<Block> GEMA_ROJA = BLOCKS.register("gema_roja", () -> new com.darkcraft.fortaleza.GemaBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(-1.0F, 3600000.0F).noLootTable()
+                    .lightLevel(st -> st.getValue(com.darkcraft.fortaleza.GemaBlock.LUZ) ? 11 : 1).sound(SoundType.AMETHYST)
+                    .pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false)));
+
     /** El santuario: la hoguera de almas donde se descansa (irrompible; apagado da un rescoldo de luz, encendido alumbra). */
     public static final RegistryObject<Block> SANTUARIO = BLOCKS.register("santuario", () -> new com.darkcraft.santuario.SantuarioBlock(
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(-1.0F, 3600000.0F).noLootTable().noOcclusion()
@@ -435,6 +451,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.cine.BarcoVolador>> BARCO_VOLADOR = ENTITIES.register("barco_volador",
             () -> EntityType.Builder.<com.darkcraft.cine.BarcoVolador>of(com.darkcraft.cine.BarcoVolador::new, MobCategory.MISC).sized(1f, 1f)
                     .fireImmune().noSave().noSummon().clientTrackingRange(16).updateInterval(Integer.MAX_VALUE).build(MODID + ":barco_volador"));
+    /** El remolino del portal de la Sombra (parte 5e): solo se dibuja; no se guarda. */
+    public static final RegistryObject<EntityType<com.darkcraft.fortaleza.Remolino>> REMOLINO = ENTITIES.register("remolino",
+            () -> EntityType.Builder.<com.darkcraft.fortaleza.Remolino>of(com.darkcraft.fortaleza.Remolino::new, MobCategory.MISC).sized(1f, 1f)
+                    .fireImmune().noSave().noSummon().clientTrackingRange(16).updateInterval(20).build(MODID + ":remolino"));
     public static final RegistryObject<EntityType<com.darkcraft.arbol.Ascensor>> ASCENSOR = ENTITIES.register("ascensor",
             () -> EntityType.Builder.<com.darkcraft.arbol.Ascensor>of(com.darkcraft.arbol.Ascensor::new, MobCategory.MISC).sized(5f, 0.3f)
                     .fireImmune().noSave().noSummon().clientTrackingRange(12).updateInterval(20).build(MODID + ":ascensor"));

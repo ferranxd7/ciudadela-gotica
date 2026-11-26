@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/piedra_sombra_1"
+      },
+      {
+        "model": "darkcraft:block/piedra_sombra_2"
+      },
+      {
+        "model": "darkcraft:block/piedra_sombra_3"
+      }
+    ]
+  }
+}

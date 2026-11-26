@@ -155,6 +155,9 @@ public class Volcado {
                             e.printStackTrace();
                         }
                     }
+                // -Dabierto=true: con el portal abierto (gemas encendidas, cadenas rotas, cascotes)
+                if (Boolean.getBoolean("abierto"))
+                    for (var c : t.alAbrir()) lvl.setBlock(new BlockPos(c.x(), c.y(), c.z()), c.despues(), 2);
             }
             case "montana" -> {
                 // la fortaleza entera con su montana (parte 5b): el plano de verdad en (0, 0), patio a Y 320
@@ -212,7 +215,10 @@ public class Volcado {
                     System.out.println("a pie desde el jardin: " + jardin.celdas() + " celdas; sotano " + jardin.alcanza(fp.cx - 7, ys, fp.cz, 2)
                             + ", ante el muro falso " + jardin.pisa(fp.cx - 7, ys - 1, fp.cz) + ", cofre secreto (con el muro) " + jardin.alcanza(t.cofreSecreto()[0], t.cofreSecreto()[1], t.cofreSecreto()[2], 3)
                             + ", atril de la cripta (cerrada) " + jardin.alcanza(t.atrilEscondido()[0], t.atrilEscondido()[1], t.atrilEscondido()[2], 3)
-                            + ", terraza " + jardin.alcanza(fp.cx, fp.Y + com.darkcraft.gen.TorreCupula.TERRAZA, fp.cz + 6, 3));
+                            + ", terraza " + jardin.alcanza(fp.cx, fp.Y + com.darkcraft.gen.TorreCupula.TERRAZA, fp.cz + 6, 3)
+                            + ", ante el pedestal " + jardin.alcanza(t.altar()[0], t.altar()[1], t.altar()[2] + 2, 1)
+                            + ", ante el portal " + jardin.alcanza(fp.cx, fp.Y + com.darkcraft.gen.TorreCupula.TERRAZA, fp.cz + com.darkcraft.gen.TorreCupula.AZ + 2, 1)
+                            + ", atril de la terraza " + jardin.alcanza(t.atriles()[5][0], t.atriles()[5][1], t.atriles()[5][2], 3));
                     // con el muro falso deshecho y la trampilla abierta
                     for (int[] q : t.muroFalso()) MUNDO.put(BlockPos.asLong(q[0], q[1], q[2]), aire);
                     int[] tp = t.trampilla();

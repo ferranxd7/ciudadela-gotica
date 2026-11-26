@@ -16,13 +16,19 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * El portal de la Sombra, en el arco de lo alto de la Fortaleza de Hueso: un remolino rojo y negro que no se puede
- * cruzar todavia (quien lo toca sale despedido hacia atras: "el umbral aun no te conoce").
+ * cruzar todavia (quien lo toca sale despedido hacia atras: "el umbral aun no te conoce"). El bloque no se dibuja: el
+ * remolino es un solo dibujo grande ({@link Remolino}); el bloque pone el roce, las chispas y el sonido.
  */
 public class PortalSombraBlock extends HalfTransparentBlock {
     private static final VoxelShape FORMA = net.minecraft.world.level.block.Block.box(0, 0, 5, 16, 16, 11);
 
     public PortalSombraBlock(Properties p) {
         super(p);
+    }
+
+    @Override
+    public net.minecraft.world.level.block.RenderShape getRenderShape(BlockState st) {
+        return net.minecraft.world.level.block.RenderShape.INVISIBLE;
     }
 
     @Override

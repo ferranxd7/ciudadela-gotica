@@ -9,6 +9,9 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * La Fortaleza de Hueso rehecha (parte 5a; respuestas 27-45 del plan): una torre gotica de ~70 bloques en el centro de
  * la isla, con su patio alrededor y todo bajo una <b>cupula de cristal ahumado</b> enorme (paneles rojos, nervios de
@@ -71,6 +74,42 @@ public final class TorreCupula extends Element {
             return com.darkcraft.DarkCraftMod.REJA_HUESO.get().defaultBlockState();
         } catch (Throwable t) {
             return Pal.IRON_BARS;
+        }
+    }
+
+    /** La piedra de sombra con runas rojas del marco del portal (parte 5e); en las vistas (sin bloques del mod), obsidiana. */
+    public static BlockState piedraSombra() {
+        try {
+            return com.darkcraft.DarkCraftMod.PIEDRA_SOMBRA.get().defaultBlockState();
+        } catch (Throwable t) {
+            return Pal.b(Blocks.OBSIDIAN);
+        }
+    }
+
+    /** El hueso labrado (el anillo de dentro del arco del portal). */
+    public static BlockState huesoLabrado(Direction.Axis a) {
+        try {
+            return com.darkcraft.DarkCraftMod.HUESO_LABRADO.get().defaultBlockState().setValue(RotatedPillarBlock.AXIS, a);
+        } catch (Throwable t) {
+            return hueso(a);
+        }
+    }
+
+    /** El hierro negro (los zocalos y capiteles del portal). */
+    public static BlockState hierroNegro() {
+        try {
+            return com.darkcraft.DarkCraftMod.HIERRO_NEGRO.get().defaultBlockState();
+        } catch (Throwable t) {
+            return Pal.b(Blocks.NETHERITE_BLOCK);
+        }
+    }
+
+    /** Una gema roja del portal, apagada o encendida. */
+    public static BlockState gema(boolean luz) {
+        try {
+            return com.darkcraft.DarkCraftMod.GEMA_ROJA.get().defaultBlockState().setValue(com.darkcraft.fortaleza.GemaBlock.LUZ, luz);
+        } catch (Throwable t) {
+            return Pal.b(luz ? Blocks.SHROOMLIGHT : Blocks.REDSTONE_BLOCK);
         }
     }
 
@@ -1196,30 +1235,255 @@ public final class TorreCupula extends Element {
                         for (int y = t + 1; y <= t + 6; y++) c.set(x, y, z, y == t + 6 ? Pal.b(Blocks.END_ROD) : HUESO);
                 }
             }
-        // el arco del portal (parte 5d le pone su piedra y su remolino): de momento piedra negra y hueso
-        int z = cz + AZ;
-        for (int x = cx - AX - 2; x <= cx + AX + 2; x++)
-            for (int h = 0; h <= AALTO + 2; h++) {
-                int dx = Math.abs(x - cx), w = arcoPortal(h);
-                boolean hueco = w >= 0 && dx <= w;
-                int borde = w >= 0 ? w + 2 : (h == AALTO ? 1 : h == AALTO + 1 ? 0 : -1);
-                if (hueco) c.set(x, t + h, z, Pal.AIR);
-                else if (dx <= borde) for (int g = -1; g <= 1; g++) c.set(x, t + h, z + g, (h % 3 == 1 || dx == 0) ? Pal.CRYING_OBSIDIAN : HUESO);
-            }
-        // el pedestal del amuleto
-        int[] al = altar();
-        c.set(al[0], al[1], al[2], Pal.PB_CHISELED);
-        c.set(al[0], al[1] + 1, al[2], Pal.GILDED);
-        for (int s = -1; s <= 1; s += 2) {
-            c.set(al[0] + s * 3, al[1], al[2], Pal.PB_CHISELED);
-            c.set(al[0] + s * 3, al[1] + 1, al[2], HUESO);
-            c.set(al[0] + s * 3, al[1] + 2, al[2], Pal.SOUL_LANTERN);
+        // el portal de la Sombra (parte 5e): el arco con su marco labrado, los pilares de las cadenas, las estatuas
+        // encapuchadas y el pedestal del amuleto
+        marcoPortal(c, t);
+        for (int sg = -1; sg <= 1; sg += 2) {
+            pilarPortal(c, cx + sg * PILAR, t, cz + AZ, sg);
+            estatua(c, cx + sg * EX, t, cz + EZ);
         }
+        pedestal(c, t);
         // el barandal del hueco del ascensor (menos por el sur, por donde se sale)
         for (int dx = -ASC - 1; dx <= ASC + 1; dx++)
             for (int dz = -ASC - 1; dz <= ASC + 1; dz++)
                 if (Math.max(Math.abs(dx), Math.abs(dz)) == ASC + 1 && !(dz == ASC + 1 && Math.abs(dx) <= 1))
                     c.unir(cx + dx, t, cz + dz, Pal.b(Blocks.POLISHED_BLACKSTONE_BRICK_WALL));
+    }
+
+    // ------------------------------------------------------------------ el portal de la Sombra (parte 5e)
+
+    /** Los pilares de las cadenas, a cada lado del portal (x = cx +- PILAR, en su plano), y la fila de su capitel. */
+    public static final int PILAR = 10, PILAR_ALTO = 11;
+    /** Las estatuas encapuchadas: x = cx +- EX, z = cz + EZ; miran al norte, al portal. */
+    public static final int EX = 9, EZ = 7;
+    /** Las filas (sobre la terraza) de las cadenas que sujetan el marco a los pilares. */
+    private static final int[] CADENAS = {3, 7, 10};
+    /** Las filas de las gemas de los lados del marco (la clave va arriba del todo, en AALTO + 1). */
+    private static final int[] GEMAS = {2, 5, 8};
+    /** Medio ancho de lo que ocupa el marco (con el zocalo). */
+    public static final int MARCO = AX + 3;
+
+    private static final int[][] ANILLOS = anillos();
+
+    /** Distancia (en el plano del portal, a lo ajedrez) de cada sitio al hueco del arco: 0 el hueco. */
+    private static int[][] anillos() {
+        int[][] o = new int[2 * MARCO + 1][AALTO + 4];
+        for (int dx = -MARCO; dx <= MARCO; dx++)
+            for (int h = 0; h < AALTO + 4; h++) {
+                int d = 99;
+                for (int hh = 0; hh < AALTO; hh++) {
+                    int w = arcoPortal(hh);
+                    int x = Math.max(-w, Math.min(w, dx));
+                    d = Math.min(d, Math.max(Math.abs(dx - x), Math.abs(h - hh)));
+                }
+                o[dx + MARCO][h] = d;
+            }
+        return o;
+    }
+
+    /** El anillo del marco en (dx, h) del plano del portal: 0 el hueco, 1 el de hueso labrado, 2 el de piedra; -1 nada. */
+    public static int anillo(int dx, int h) {
+        if (h < 0 || h >= AALTO + 4 || Math.abs(dx) > MARCO) return -1;
+        int d = ANILLOS[dx + MARCO][h];
+        return d <= 2 ? d : -1;
+    }
+
+    /** Lo que ocupa el marco a cada lado en la fila h (el borde de fuera del anillo de piedra), o -1. */
+    private static int bordeMarco(int h) {
+        for (int dx = MARCO; dx >= 0; dx--) if (anillo(dx, h) > 0) return dx;
+        return -1;
+    }
+
+    /**
+     * El marco del arco apuntado (respuestas 51 y 52): tres de hondo; por dentro un anillo de hueso labrado, por fuera
+     * otro de piedra de sombra con sus runas (con las gemas rojas, apagadas hasta que se abre, a los lados y en la clave),
+     * zocalo de hierro negro y un remate en la punta.
+     */
+    private void marcoPortal(Canvas c, int t) {
+        int z = cz + AZ;
+        for (int dx = -MARCO; dx <= MARCO; dx++)
+            for (int h = 0; h <= AALTO + 4; h++) {
+                int x = cx + dx, a = anillo(dx, h), w = arcoPortal(h);
+                if (a == 0) {
+                    c.set(x, t + h, z, Pal.AIR);
+                    continue;
+                }
+                for (int g = -1; g <= 1; g++) {
+                    BlockState b = null;
+                    if (a == 1) b = h == 0 ? hierroNegro() : huesoLabrado(w >= 0 && Math.abs(dx) == w + 1 ? Direction.Axis.Y : Direction.Axis.X);
+                    else if (a == 2) {
+                        boolean gemaLado = Math.abs(dx) == AX + 2 && contiene(GEMAS, h), clave = dx == 0 && h == AALTO + 1;
+                        if (h <= 1) b = hierroNegro();
+                        else if ((gemaLado || clave) && g != 0) b = gema(false);
+                        else b = piedraSombra();
+                    } else if (h == 0 && Math.abs(dx) == MARCO) b = hierroNegro();               // el zocalo
+                    else if (h == AALTO + 2 && Math.abs(dx) <= 1) b = hierroNegro();           // el remate
+                    else if (h == AALTO + 3 && dx == 0 && g == 0) b = huesoLabrado(Direction.Axis.Y);
+                    if (b != null) c.set(x, t + h, z + g, b);
+                }
+            }
+    }
+
+    private static boolean contiene(int[] v, int n) {
+        for (int k : v) if (k == n) return true;
+        return false;
+    }
+
+    /** Las cadenas de un lado: del borde del marco al brazo del pilar, en las filas de CADENAS. {x, y, z}. */
+    private int[][] cadenas(int sg, int t) {
+        List<int[]> o = new ArrayList<>();
+        for (int h : CADENAS)
+            for (int dx = bordeMarco(h) + 1; dx <= PILAR - 2; dx++) o.add(new int[]{cx + sg * dx, t + h, cz + AZ});
+        return o.toArray(new int[0][]);
+    }
+
+    /**
+     * Un pilar de las cadenas (respuesta 55): fuste en cruz de piedra de sombra con bandas de hierro negro, capitel de
+     * hierro, punta de hueso con una gema; las cadenas lo atan al marco (se rompen al abrirse: {@link #alAbrir}).
+     */
+    private void pilarPortal(Canvas c, int px, int t, int pz, int sg) {
+        for (int a = -1; a <= 1; a++)
+            for (int b = -1; b <= 1; b++) {
+                c.set(px + a, t, pz + b, hierroNegro());
+                c.set(px + a, t + PILAR_ALTO, pz + b, hierroNegro());
+                if (Math.abs(a) + Math.abs(b) > 1) continue;
+                for (int h = 1; h < PILAR_ALTO; h++)
+                    c.set(px + a, t + h, pz + b, (h == 4 || h == 8) && (a != 0 || b != 0) ? hierroNegro() : piedraSombra());
+            }
+        c.set(px, t + PILAR_ALTO + 1, pz, huesoLabrado(Direction.Axis.Y));
+        c.set(px, t + PILAR_ALTO + 2, pz, gema(false));
+        BlockState cadena = Blocks.CHAIN.defaultBlockState().setValue(net.minecraft.world.level.block.ChainBlock.AXIS, Direction.Axis.X);
+        for (int[] q : cadenas(sg, t)) c.set(q[0], q[1], q[2], cadena);
+    }
+
+    /**
+     * Una estatua encapuchada gigante (respuesta 55): 16 de alto, de pie sobre su zocalo, con las manos sobre una espada de
+     * hueso clavada delante; mira al norte (al portal). Bajo la capucha, oscuridad y dos gemas por ojos (se encienden al
+     * abrirse el portal, como el pomo de la espada).
+     */
+    private void estatua(Canvas c, int sx, int t, int sz) {
+        // (a: a lo ancho; b: hacia atras, el norte es b < 0; h: sobre la terraza)
+        for (int a = -3; a <= 3; a++)
+            for (int b = -3; b <= 2; b++)
+                for (int h = 0; h <= 16; h++) {
+                    BlockState st = estatua(sx + a, t + h, sz + b, a, b, h);
+                    if (st != null) c.set(sx + a, t + h, sz + b, st);
+                }
+    }
+
+    private BlockState estatua(int x, int y, int z, int a, int b, int h) {
+        int aa = Math.abs(a);
+        // el zocalo: hierro negro por el borde, piedra negra dentro
+        if (h == 0) return aa <= 3 && b >= -3 && b <= 2 ? (aa == 3 || b == -3 || b == 2 ? hierroNegro() : Pal.PB_BRICKS) : null;
+        // la espada de hueso, clavada delante (b = -3), con la guarda, el puno, las manos y el pomo
+        if (b == -3) {
+            if (a == 0 && h <= 5) return huesoLabrado(Direction.Axis.Y);
+            if (aa <= 1 && h == 6) return hierroNegro();
+            if (a == 0 && h == 7) return hierroNegro();
+            if (aa == 1 && h == 7) return Pal.DS_TILES;
+            if (a == 0 && h == 8) return gema(false);
+            return null;
+        }
+        // los brazos: de los hombros, por los lados, hasta las manos
+        if (aa == 3 && b == 0 && (h == 7 || h == 8)) return Pal.DS_TILES;
+        if (aa == 3 && b == -1 && h == 7) return Pal.DS_TILES;
+        if (aa == 2 && b == -2 && h == 7) return Pal.DS_TILES;
+        // el manto: ancho abajo, luego el cuerpo y los hombros
+        int ancho, del, det = 1;
+        if (h == 1) { ancho = 3; del = -2; }
+        else if (h == 2) { ancho = 2; del = -2; }
+        else if (h <= 8) { ancho = 2; del = -1; }
+        else if (h <= 10) { ancho = 3; del = -1; }
+        else if (h <= 13) { ancho = 2; del = -2; }
+        else if (h == 14) { ancho = 1; del = -1; det = 0; }
+        else if (h == 15) { ancho = 0; del = 0; det = 0; }
+        else return null;
+        if (aa > ancho || b < del || b > det) return null;
+        // los hombros y la capucha en pendiente (escalones con lo alto hacia dentro)
+        Direction dentro = a > 0 ? Direction.WEST : Direction.EAST;
+        if (h == 10 && aa == 3) return Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, dentro, false);
+        if ((h == 13 && aa == 2) || (h == 14 && aa == 1)) return Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, dentro, false);
+        if (h == 15) return Pal.b(Blocks.POLISHED_BLACKSTONE_BRICK_WALL);
+        if (h >= 11) {
+            // la capucha: su borde por delante (b = -2) solo en los lados y por arriba; dentro, la oscuridad y los ojos
+            if (b == -2 && aa <= 1 && h <= 12) return null;
+            if (b == -1 && aa <= 1 && h <= 12) return h == 11 && aa == 1 ? gema(false) : Pal.b(Blocks.BLACK_CONCRETE);
+            return Hash.pct(x, y, z, seed ^ 0x77) < 18 ? Pal.PB_BRICKS_CRACKED : Pal.PB_BRICKS;
+        }
+        if (h >= 9) return Pal.PB_BRICKS;
+        // los pliegues del manto
+        if (Hash.pct(x, y, z, seed ^ 0x78) < 10) return Pal.DS_TILES_CRACKED;
+        return (a & 1) == 0 ? Pal.DS_TILES : Pal.DS_POLISHED;
+    }
+
+    /**
+     * El pedestal del amuleto (respuesta 56): zocalo de hierro negro, columna de hueso labrado con sus contrafuertes y
+     * arriba el hueco donde se queda el amuleto (flotando y girando, desde que abre el portal). A los lados, dos braseros.
+     */
+    private void pedestal(Canvas c, int t) {
+        int[] al = altar();
+        int x = al[0], y = al[1], z = al[2];
+        for (int a = -1; a <= 1; a++)
+            for (int b = -1; b <= 1; b++) c.set(x + a, y, z + b, hierroNegro());
+        c.set(x, y + 1, z, huesoLabrado(Direction.Axis.Y));
+        for (Direction d : Direction.Plane.HORIZONTAL) {
+            c.set(x + d.getStepX(), y + 1, z + d.getStepZ(), Pal.stairs(Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, d.getOpposite(), false));
+            c.set(x + d.getStepX(), y + 2, z + d.getStepZ(), Pal.slab(Blocks.POLISHED_BLACKSTONE_BRICK_SLAB, false));
+        }
+        c.set(x, y + 2, z, Pal.AIR);
+        for (int sg = -1; sg <= 1; sg += 2) {
+            c.set(x + sg * 3, y, z, hierroNegro());
+            c.set(x + sg * 3, y + 1, z, huesoLabrado(Direction.Axis.Y));
+            c.set(x + sg * 3, y + 2, z, Pal.SOUL_LANTERN);
+        }
+    }
+
+    /** Lo que cambia al abrirse el portal: el bloque de antes y el de despues, y en que momento (fase) de la apertura. */
+    public record Cambio(int x, int y, int z, BlockState antes, BlockState despues, int fase) {}
+
+    /** Fases de la apertura: las gemas del marco, los ojos de las estatuas, las cadenas, lo alto de los pilares, cascotes. */
+    public static final int GEMAS_MARCO = 0, OJOS = 1, CADENA = 2, PILARES = 3, CASCOTES = 4;
+
+    /**
+     * Todo lo que cambia al abrirse el portal (respuestas 52 y 55): se encienden las gemas (las del marco y los ojos y los
+     * pomos de las estatuas), se rompen las cadenas y lo alto de los pilares, y caen cascotes a la terraza. Sirve para
+     * abrirlo ({@code FortalezaEventos.abrirPortal}), para dejarlo abierto en un chunk que se vuelve a levantar y para
+     * cerrarlo (el comando de reiniciar).
+     */
+    public List<Cambio> alAbrir() {
+        int t = Y + TERRAZA, z = cz + AZ;
+        List<Cambio> o = new ArrayList<>();
+        BlockState aire = Pal.AIR, apagada = gema(false), encendida = gema(true);
+        // las gemas del marco, de abajo arriba, y la clave
+        for (int h : GEMAS)
+            for (int sg = -1; sg <= 1; sg += 2)
+                for (int g = -1; g <= 1; g += 2) o.add(new Cambio(cx + sg * (AX + 2), t + h, z + g, apagada, encendida, GEMAS_MARCO));
+        for (int g = -1; g <= 1; g += 2) o.add(new Cambio(cx, t + AALTO + 1, z + g, apagada, encendida, GEMAS_MARCO));
+        BlockState cadena = Blocks.CHAIN.defaultBlockState().setValue(net.minecraft.world.level.block.ChainBlock.AXIS, Direction.Axis.X);
+        for (int sg = -1; sg <= 1; sg += 2) {
+            // los ojos y el pomo de la espada de cada estatua
+            int sx = cx + sg * EX, sz = cz + EZ;
+            o.add(new Cambio(sx - 1, t + 11, sz - 1, apagada, encendida, OJOS));
+            o.add(new Cambio(sx + 1, t + 11, sz - 1, apagada, encendida, OJOS));
+            o.add(new Cambio(sx, t + 8, sz - 3, apagada, encendida, OJOS));
+            for (int[] q : cadenas(sg, t)) o.add(new Cambio(q[0], q[1], q[2], cadena, aire, CADENA));
+            // lo alto del pilar salta: el capitel, la punta y la gema, y los brazos de la fila de debajo
+            int px = cx + sg * PILAR;
+            for (int a = -1; a <= 1; a++)
+                for (int b = -1; b <= 1; b++) {
+                    o.add(new Cambio(px + a, t + PILAR_ALTO, z + b, hierroNegro(), aire, PILARES));
+                    if (Math.abs(a) + Math.abs(b) == 1) o.add(new Cambio(px + a, t + PILAR_ALTO - 1, z + b, piedraSombra(), aire, PILARES));
+                }
+            o.add(new Cambio(px, t + PILAR_ALTO - 1, z, piedraSombra(), Pal.DS_COBBLED, PILARES));
+            o.add(new Cambio(px, t + PILAR_ALTO + 1, z, huesoLabrado(Direction.Axis.Y), aire, PILARES));
+            o.add(new Cambio(px, t + PILAR_ALTO + 2, z, apagada, aire, PILARES));
+            // los cascotes, en la terraza alrededor del pilar (ni en su zocalo, ni en el pretil, ni en el del marco)
+            int[][] cas = {{8, 2}, {9, 3}, {11, 2}, {12, 0}, {8, -1}, {12, 3}};
+            BlockState[] que = {Pal.DS_COBBLED, piedraSombra(), hierroNegro(), Pal.slab(Blocks.COBBLED_DEEPSLATE_SLAB, false), Pal.PB_BRICKS_CRACKED,
+                    Pal.slab(Blocks.POLISHED_BLACKSTONE_BRICK_SLAB, false)};
+            for (int k = 0; k < cas.length; k++) o.add(new Cambio(cx + sg * cas[k][0], t, z + cas[k][1], aire, que[k], CASCOTES));
+        }
+        return o;
     }
 
     // ------------------------------------------------------------------ lo que se vino abajo

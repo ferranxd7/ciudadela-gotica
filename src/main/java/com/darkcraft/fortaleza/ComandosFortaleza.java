@@ -150,12 +150,7 @@ public final class ComandosFortaleza {
                     ServerLevel lvl = p.serverLevel();
                     if (e.puerta) FortalezaEventos.cerrarPuerta(lvl, f);
                     if (e.puente) Puente.quitar(lvl, f);
-                    if (e.portal) {
-                        int[] q = f.f.portal();
-                        for (int x = q[0]; x <= q[3]; x++)
-                            for (int y = q[1]; y <= q[4]; y++)
-                                if (f.f.enPortal(x, y)) lvl.setBlock(new net.minecraft.core.BlockPos(x, y, q[2]), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
-                    }
+                    if (e.portal) FortalezaEventos.cerrarPortal(lvl, f);
                     Trampas.reiniciar(lvl, f, e);
                     e.puerta = e.portal = e.puente = false;
                     e.baseEscalera = Integer.MIN_VALUE;

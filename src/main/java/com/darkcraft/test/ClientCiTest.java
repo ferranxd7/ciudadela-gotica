@@ -6568,7 +6568,41 @@ public final class ClientCiTest {
                         ClientCine.active(), ClientCine.chapter(), ClientCine.narrationPlaying(), Timeline.hasAudio(6)));
             });
         }
-        int Q = C6 + Math.round(tot6 * 20) + 30;
+        // parte 5e: el portal abierto de noche (las runas, las gemas y el remolino brillan) y las estatuas encapuchadas
+        int Qa = C6 + Math.round(tot6 * 20) + 30;
+        final long[] hora = new long[1];
+        atTicks(Qa, "El portal abierto, de noche", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                hora[0] = lvl.getDayTime();
+                lvl.setDayTime(18000);
+                sp.setGameMode(GameType.CREATIVE);
+                sp.getAbilities().flying = true;
+                sp.onUpdateAbilities();
+                int[] q = fplan.f.portal();
+                sp.teleportTo(lvl, fplan.cx + 0.5, q[1] + 3.0, fplan.cz + 1.5, 180f, -10f);
+                log("  portal abierto: " + com.darkcraft.fortaleza.FortalezaEventos.resumenPortal(lvl, fplan));
+            });
+        });
+        atTicks(Qa + 30, "captura", m -> shot(m, "cliente_f40a_portal_noche"));
+        atTicks(Qa + 32, "Las estatuas encapuchadas", m -> server(m, sp -> {
+            int top = fplan.Y + com.darkcraft.gen.TorreCupula.TERRAZA;
+            sp.teleportTo(sp.serverLevel(), fplan.cx + 0.5, top + 3.0, fplan.cz - 5.5, 0f, -18f);
+        }));
+        atTicks(Qa + 60, "captura", m -> shot(m, "cliente_f40b_estatuas"));
+        atTicks(Qa + 62, "El portal abierto: de dia otra vez", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                sp.serverLevel().setDayTime(hora[0]);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                int[] al = fplan.f.altar();
+                sp.teleportTo(sp.serverLevel(), al[0] + 0.5, al[1], al[2] + 2.5, 180f, -8f);
+            });
+        });
+        int Q = Qa + 80;
         atTicks(Q, "El portal abierto", m -> {
             enPrimeraPersona(m);
             server(m, sp -> {

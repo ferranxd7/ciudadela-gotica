@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "darkcraft:block/hueso_labrado_horizontal",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "darkcraft:block/hueso_labrado"
+    },
+    "axis=z": {
+      "model": "darkcraft:block/hueso_labrado_horizontal",
+      "x": 90
+    }
+  }
+}

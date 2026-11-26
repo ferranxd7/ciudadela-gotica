@@ -85,6 +85,16 @@ public final class FortalezaPlan {
         return nucleo;
     }
 
+    /** Los chunks de la terraza de lo alto de la torre (el portal de la parte 5e): los que se rehacen al pasar a la version 5. */
+    public Set<Long> terraza() {
+        Set<Long> o = new java.util.LinkedHashSet<>();
+        int r = TorreCupula.TL + 1;
+        for (int x = (cx - r) >> 4; x <= (cx + r) >> 4; x++)
+            for (int z = (cz - r) >> 4; z <= (cz + r) >> 4; z++)
+                if (nucleo.contains(clave(x, z))) o.add(clave(x, z));
+        return o;
+    }
+
     public static long clave(int chunkX, int chunkZ) {
         return ((long) chunkX << 32) ^ (chunkZ & 0xffffffffL);
     }
