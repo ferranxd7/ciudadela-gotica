@@ -311,6 +311,39 @@ public final class ClientMusic {
         }
     }
 
+    // ------------------------------------------------------------------ la capital (parte 7m): crujen las ruinas quemadas
+
+    private static Track capital;
+    private static int capitalTicks;
+    private static boolean enCapital;
+
+    private static void tickCapital(Minecraft mc) {
+        if (mc.player == null || mc.level == null) enCapital = false;
+        else if (mc.player.tickCount % 20 == 17)
+            enCapital = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() < 170
+                    && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.CAPITAL;
+        boolean quiere = enCapital && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        if (quiere) {
+            if (capital == null || capital.dying() || !mc.getSoundManager().isActive(capital) && capitalTicks > 20) {
+                if (capital != null && !capital.dying()) mc.getSoundManager().stop(capital);
+                capital = new Track(DarkCraftMod.AMBIENTE_CAPITAL.get(), "capital", false);
+                capitalTicks = 0;
+                mc.getSoundManager().play(capital);
+                capital.fadeTo(0.85f, 2.5f);
+            }
+        } else if (capital != null && !capital.dying()) capital.kill(3.0f);
+        if (capital != null) {
+            capitalTicks++;
+            if (capital.dying() && !mc.getSoundManager().isActive(capital) && capitalTicks > 20) capital = null;
+        }
+    }
+
+    /** Para la prueba de la CI: si suenan las ruinas de la capital. */
+    public static String capital() {
+        Minecraft mc = Minecraft.getInstance();
+        return capital == null ? "sin las ruinas" : String.format("las ruinas %.2f%s", capital.level(), mc.getSoundManager().isActive(capital) ? "" : " (paradas)");
+    }
+
     /** Para la prueba de la CI: si suena la ventisca. */
     public static String montana() {
         Minecraft mc = Minecraft.getInstance();
@@ -421,6 +454,8 @@ public final class ClientMusic {
         if (pantano != null && !pantano.dying()) any = true;
         tickMontana(mc);
         if (montana != null && !montana.dying()) any = true;
+        tickCapital(mc);
+        if (capital != null && !capital.dying()) any = true;
         tickTitulo(mc);
         if (titulo != null && !titulo.dying()) any = true;
         if (viaje != null) {
@@ -442,8 +477,9 @@ public final class ClientMusic {
         if (arboleda != null) mc.getSoundManager().stop(arboleda);
         if (pantano != null) mc.getSoundManager().stop(pantano);
         if (montana != null) mc.getSoundManager().stop(montana);
-        story = boss = zona = bruma = viaje = arboleda = pantano = montana = null;
-        enFortaleza = enBruma = enArboleda = enPantano = enMontana = false;
+        if (capital != null) mc.getSoundManager().stop(capital);
+        story = boss = zona = bruma = viaje = arboleda = pantano = montana = capital = null;
+        enFortaleza = enBruma = enArboleda = enPantano = enMontana = enCapital = false;
         bossPhase = 0;
     }
 

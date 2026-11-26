@@ -261,6 +261,18 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_ABAD_MUERTE = sound("sfx.abad_muerte");
     public static final RegistryObject<SoundEvent> SFX_ABAD_REZO = sound("sfx.abad_rezo");
     public static final RegistryObject<SoundEvent> AMBIENTE_MONTANA = sound("ambiente.montana");
+    // los calcinados de la Capital en ruinas (parte 7m)
+    public static final RegistryObject<SoundEvent> SFX_CALCINADO_GEMIDO = sound("sfx.calcinado_gemido");
+    public static final RegistryObject<SoundEvent> SFX_CALCINADO_ALERTA = sound("sfx.calcinado_alerta");
+    public static final RegistryObject<SoundEvent> SFX_CALCINADO_DOLOR = sound("sfx.calcinado_dolor");
+    public static final RegistryObject<SoundEvent> SFX_CALCINADO_MUERTE = sound("sfx.calcinado_muerte");
+    public static final RegistryObject<SoundEvent> SFX_CALCINADO_ALZARSE = sound("sfx.calcinado_alzarse");
+    public static final RegistryObject<SoundEvent> SFX_CALCINADO_TAJO = sound("sfx.calcinado_tajo");
+    public static final RegistryObject<SoundEvent> SFX_CALCINADO_ESCUDO = sound("sfx.calcinado_escudo");
+    public static final RegistryObject<SoundEvent> SFX_CALCINADO_CANTARO = sound("sfx.calcinado_cantaro");
+    public static final RegistryObject<SoundEvent> SFX_CALCINADO_FUEGO = sound("sfx.calcinado_fuego");
+    public static final RegistryObject<SoundEvent> SFX_CALCINADO_CENIZA = sound("sfx.calcinado_ceniza");
+    public static final RegistryObject<SoundEvent> AMBIENTE_CAPITAL = sound("ambiente.capital");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -564,6 +576,13 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Esquirla>> ESQUIRLA = ENTITIES.register("esquirla",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Esquirla>of(com.darkcraft.enemigos.Esquirla::new, MobCategory.MISC)
                     .sized(0.3f, 0.3f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":esquirla"));
+    // ---- los calcinados de la Capital en ruinas y el cantaro de pez que lanzan (parte 7m)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Calcinado>> CALCINADO = ENTITIES.register("calcinado",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Calcinado>of(com.darkcraft.enemigos.Calcinado::new, MobCategory.MONSTER)
+                    .sized(0.7f, 2.05f).fireImmune().clientTrackingRange(8).build(MODID + ":calcinado"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Cantaro>> CANTARO = ENTITIES.register("cantaro",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Cantaro>of(com.darkcraft.enemigos.Cantaro::new, MobCategory.MISC)
+                    .sized(0.4f, 0.4f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":cantaro"));
     // ---- Hrodric, el Abad de la Cumbre, el jefe de las Montanas Nevadas (parte 7l)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Abad>> ABAD = ENTITIES.register("abad",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Abad>of(com.darkcraft.enemigos.Abad::new, MobCategory.MONSTER)
@@ -745,6 +764,7 @@ public class DarkCraftMod {
         e.put(PODRIDO.get(), com.darkcraft.enemigos.Podrido.atributos().build());
         e.put(HELADO.get(), com.darkcraft.enemigos.Helado.atributos().build());
         e.put(ABAD.get(), com.darkcraft.enemigos.Abad.atributos().build());
+        e.put(CALCINADO.get(), com.darkcraft.enemigos.Calcinado.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());

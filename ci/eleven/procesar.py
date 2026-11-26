@@ -223,10 +223,20 @@ SFX = {
     "abad_pisoton": (1.8, 0.6, -13), "abad_aliento": (2.4, 0.6, -15), "abad_invocar": (1.8, 0.6, -16),
     "abad_carambano": (1.2, 0.4, -15), "abad_ventisca": (18.0, 2.5, -20), "abad_dolor": (0.75, 0.2, -15),
     "abad_muerte": (3.6, 0.9, -14), "abad_rezo": (7.0, 1.6, -20),
+    # los calcinados de la Capital (parte 7m): el gemido entre brasas, el chillido con la llamarada al ver a alguien, el
+    # quejido que suelta chispas, la muerte (se deshace en ceniza), alzarse de un monton de ceniza, el tajo de la espada al
+    # rojo, el golpe del escudo, el cantaro de brea que revienta, la brea que arde en el suelo (suena una vez, lo que duran
+    # las llamas) y el estallido de ceniza del ceniciento; y el ambiente de la capital quemada
+    "calcinado_gemido": (2.0, 0.5, -20), "calcinado_alerta": (1.4, 0.4, -15), "calcinado_dolor": (0.6, 0.15, -17),
+    "calcinado_muerte": (2.0, 0.6, -15), "calcinado_alzarse": (1.3, 0.4, -16), "calcinado_tajo": (0.8, 0.3, -14),
+    "calcinado_escudo": (0.8, 0.3, -13), "calcinado_cantaro": (0.9, 0.4, -14), "calcinado_fuego": (3.0, 1.0, -19),
+    "calcinado_ceniza": (1.3, 0.5, -15),
+    "capital_ambiente": (20.0, 2.0, -26),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
-           "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0, "abad_ventisca": 1.5, "abad_rezo": 0.4}
+           "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0, "abad_ventisca": 1.5, "abad_rezo": 0.4,
+           "capital_ambiente": 2.0, "calcinado_fuego": 0.25}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
@@ -391,6 +401,14 @@ TOMAS_SFX = {
     "abad_grito": (3, 4), "abad_baculazo": (3, 1), "abad_barrido": (3, 1), "abad_pisoton": (4, 3), "abad_aliento": (4, 1),
     "abad_invocar": (1, 3), "abad_carambano": (3, 1, 4), "abad_ventisca": (2, 4), "abad_dolor": (2, 4, 1),
     "abad_muerte": (2, 3), "abad_rezo": (4, 3),
+    # los calcinados: los dos gemidos mas llenos de principio a fin (la 4 y la 2); los dos chillidos mas fuertes; tres
+    # quejidos (la 3 y la 4, las mas fuertes, y la 1); las dos muertes que mas duran fuertes; las dos salidas de la ceniza que
+    # se oyen (la 1; la 2 flojita; la 3 y la 4 casi no suenan); los dos tajos con mas cuerpo; los dos escudazos mas fuertes;
+    # los dos cantaros que revientan con golpe (la 3 y la 4); las dos brasas que arden de principio a fin; los dos estallidos
+    # de ceniza mas llenos; y del ambiente, la 1 (pareja de principio a fin) y la 4 (sube y baja)
+    "calcinado_gemido": (4, 2), "calcinado_alerta": (1, 3), "calcinado_dolor": (3, 4, 1), "calcinado_muerte": (3, 2),
+    "calcinado_alzarse": (1, 2), "calcinado_tajo": (4, 2), "calcinado_escudo": (3, 2), "calcinado_cantaro": (3, 4),
+    "calcinado_fuego": (2, 4), "calcinado_ceniza": (2, 4), "capital_ambiente": (1, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

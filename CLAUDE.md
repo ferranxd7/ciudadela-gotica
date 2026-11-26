@@ -1983,6 +1983,74 @@ perdonara, y el frio le contesto... y no te arrodilles nunca en esta casa").
   junto al brasero (`mv172`), cae de rodillas (`mv173`) y se rompe (`mv174`), el cartel (`mv175`), la iglesia en paz (`mv176`) y el
   bestiario (`mv177`).
 
+### Plan grande, parte 7m: la Capital en ruinas — los Calcinados y la Puerta Oeste
+
+Respuestas 125, 131 y 132 del plan; la quinta region con su contenido (despues, la **7n**: el jefe de la capital, el Condestable
+del Juramento —el que mando cerrar las puertas la noche del cielo rojo, libro 22—).
+- **El calcinado** (`enemigos/Calcinado`, entidad `darkcraft:calcinado`, 0,7 x 2,05, `fireImmune`; modelo de
+  `tools/enemigos/calcinado.py`: carne de carbon con grietas de brasa que lucen —`_grietas`, en la capa de brillo con los ojos, el
+  filo de la espada, la mecha y la llama—; `CalcinadoGeometria/Animaciones`, `CalcinadoAnims`, `client/enemigos/CalcinadoModelo` y
+  `CalcinadoRenderer`, escala 1,05). 30 de vida, golpe 5,5, armadura 3. Tres: **guardia** (la guardia del Juramento: yelmo con
+  cimera, peto, sobreveste roja, espada al rojo y **escudo de torre** en el brazo izquierdo; +40 % de vida y +5 de armadura: **tajo**
+  que quema y **escudazo** que empuja y frena; de pie, sin atacar y de frente —70 grados a cada lado— **el escudo** deja pasar el 20 %
+  y las flechas nada —`ESCUDO`, `cubre`, accion `BLOQUEO`—; por la espalda o mientras ataca, todo), **incendiario** (vecinos con
+  trapo en la cabeza y delantal, cantarillos al cinto y el **cantaro de brea** con su mecha en la mano: de 4,5 a 15 bloques lo
+  **lanza** en arco —`enemigos/Cantaro`, un `ThrowableItemProjectile` con el dibujo del jarron decorado; `Cantaro.tiro` apunta con la
+  caida; no da a los enemigos— que revienta en barro y fuego y deja **llamas** en el suelo —`Cantaro.Llamas`, una nube sin efectos de
+  radio 1,8 que encoge en 3,5 s y quema cada medio segundo a quien este dentro (no a los calcinados)—; de cerca, la **tea**) y
+  **ceniciento** (harapos y ceniza: **zarpazo** y **agarron** —de 2 a 4,4 bloques se echa encima: sujeta (lentitud IV) y quema—;
+  al morir **revienta en ceniza**: ciega y frena a los jugadores a 2,6 y deja una nube que ciega). Lo que pega, quema
+  (`Calcinado.quemar`). **El fuego no les hace nada (ni la lava); el frio, un 60 % mas; el agua les duele** (`isSensitiveToWater`);
+  la ceguera no les entra (si la lentitud: la ceniza de la escarcha sirve). Esperan **agazapados** junto a los rescoldos (`REZA`) o
+  **enterrados en los montones de ceniza** (`TUMBADO`, el dibujante los hunde 0,25 y suben al alzarse) o de pie. Al morir se
+  deshacen en carbon y ceniza (`tickDeath` propio). Bestiario `calcinado_guardia` / `calcinado_incendiario` /
+  `calcinado_ceniciento`, logro `calcinado`; a veces una piedra de forja (la guardia, alguna II). Contadores para las pruebas:
+  `BLOQUEOS`, `CANTAROS`, `QUEMADOS`, `AGARRONES`, `CENIZAS`, `ALZADOS` y `Cantaro.REVIENTAN`, `DAN`, `LLAMAS_QUEMAN`.
+- **La Puerta Oeste de la Capital** (`morvain/Capital`, en la Capital en ruinas, al este del santuario de la Puerta de la Capital; la
+  muralla en x = 3240, el camino en z = 345, `SUELO` = 93; coordenadas de la ciudad u = x - CX, v = z - CZ; se dibuja chunk a chunk al
+  adornar; en su caja `Adorno` no pone nada): la **muralla** de norte a sur (u -2..1, sillares ennegrecidos con hollin —`piedra`—,
+  almenas por fuera, pretil por dentro, el adarve en `PISO + 8`), **cuatro torres** huecas con su escalera de mano (la de v -26
+  rota), **dos trozos caidos** con rampas de escombros (`CAIDOS`) y las escaleras de subida al adarve pegadas por dentro; la
+  **puerta**: dos torres (u -5..5) con el paso abovedado, el **rastrillo** medio bajado (barrotes en u -3, alguno doblado), las hojas
+  quemadas caidas por dentro, estandartes negros y faroles de almas; encima la **sala de la guardia** (se sube por la escalera de la
+  torre del norte —la puerta de abajo por dentro, al este—): la mesa, el caldero, el torno con las cadenas del rastrillo, el arcon y el
+  **atril con el libro perdido 22** —"La guardia de la Puerta Oeste", del sargento Brannoc; `Perdidos.TOTAL` = 22—. Fuera, el
+  **camino** del santuario con faroles y **cuatro carros quemados**. Dentro, la **calle mayor** (u 2..96, |v| <= 3) entre **casas
+  quemadas** (`CasaCapital`: las de Brumavela ennegrecidas, sin tejado casi todas), la **calle del cruce** (u 44), la ronda pegada a la
+  muralla, **solares** con cimientos y arboles quemados, y al final la **plaza** (radio 15) con el pedestal y **la estatua del
+  caballero derribada** (las piernas en pie, el torso, el yelmo y el brazo de la mano alzada en el suelo), los puestos quemados del
+  mercado y, al norte, el **cuartel del Juramento** (u 84..108, v -46..-24: el tejado hundido, literas quemadas, el armero, la mesa
+  larga, el arcon bueno; delante, muñecos de practicar). **Montones de ceniza** (diez: alli esperan los cenicientos), escombros y
+  rescoldos por todas partes. Botin: `chests/capital` y `capital_bueno` (frutos de la escarcha y de la brasa, el talisman de la brasa,
+  la ceniza de la escarcha: lo que sirve contra ellos). Sitios (`Capital.sitio`): `entrada`, `puerta`, `paso`, `camara`, `atril`,
+  `arcon_camara`, `adarve`, `calle`, `cruce`, `plaza`, `estatua`, `cuartel`, `dentro_cuartel`, `arcon`. El Espejo: "La Puerta Oeste
+  de la Capital" (`Morvain.lugar`, `Capital.dentro`); logro `capital` al cruzar la puerta (`Capital.intramuros`).
+- **Los puestos** (`MorvainEnemigos`, sitio `capital`, 31, de `Capital.esperas`): dos cenicientos enterrados junto a los carros y
+  una guardia en el paso; dos incendiarios en el adarve de cara al camino y una guardia de ronda; uno agazapado junto al atril;
+  por la calle mayor tres cenicientos en los montones, dos guardias de ronda y un incendiario agazapado; cinco en la calle del cruce;
+  siete en la plaza; cuatro en el cuartel; y dos agazapados dentro de las casas (junto a la puerta).
+- **La capital suena** (`ClientMusic.tickCapital`): en la region de la capital por debajo de 170, `ambiente.capital` (viento,
+  brasas, madera que cruje y algun derrumbe lejos; una de dos tomas cada vez).
+- Sonidos (ElevenLabs, flow `ztrM0NNznpPby1X4ViYn`, `TOMAS_SFX`): `calcinado_gemido` (4 y 2), `calcinado_alerta` (1 y 3),
+  `calcinado_dolor` (3, 4 y 1), `calcinado_muerte` (3 y 2), `calcinado_alzarse` (1 y 2), `calcinado_tajo` (4 y 2),
+  `calcinado_escudo` (3 y 2), `calcinado_cantaro` (3 y 4), `calcinado_fuego` (2 y 4; suena una vez al reventar: dura lo que las
+  llamas), `calcinado_ceniza` (2 y 4), `capital_ambiente` (1 y 4, `stream`).
+- Comandos `/darkcraft capital [ir <sitio> | enemigos [volver | fuera | sacar]]` (sin mas: como esta).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_capital carpeta`: la puerta y el barrio con las marcas de los calcinados
+  (Cn); si se llega a pie desde la entrada a cada sitio (salvo lo alto de la estatua) y a cada calcinado (**las alfombras de ceniza
+  no cuentan como bloque**), que ninguno esta metido en un bloque y que todos tienen suelo.
+- Pruebas: servidor, lineas `Morvain, la puerta oeste de la capital: ...` (el atril con el libro 22, los arcones, el rastrillo, la
+  estatua, la calle libre; a pie desde el camino; vistas `morvain_capital.png` y `morvain_capital_puerta.png`), `Morvain, los
+  calcinados: ...`, `Morvain, los calcinados en accion: ...` (el agazapado se levanta y el enterrado se alza; cada accion acaba) y
+  `Morvain, los calcinados contra una presa: ...` (el escudo de frente, la flecha y por la espalda; el tajo quema; el cantaro revienta
+  y sus llamas queman; el agarron frena y quema; el fuego y la lava nada, el frio mas; el ceniciento revienta en ceniza); cliente,
+  tramo `capital()` despues del Abad: desde el santuario (`cliente_mv178`), el camino con los carros (`mv179`), entrar por la puerta
+  con el cartel, el logro y el ruido de las ruinas (`mv180`), el paso del rastrillo (`mv181`), la sala de la guardia (`mv182`), el
+  adarve (`mv183`), la calle mayor (`mv184`), la plaza (`mv185`), el cuartel (`mv186`), todo desde lo alto (`mv187`), en
+  supervivencia el escudo (`mv188`) y el tajo (`mv189`), el cantaro en el aire (`mv190`) y sus llamas (`mv191`), un ceniciento
+  enterrado (`mv192`) que se alza (`mv193`), su agarron (`mv194`), la nube de ceniza al morir (`mv195`), el libro del sargento Brannoc
+  (`mv196`) y el bestiario (`mv197`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1993,7 +2061,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j, la 7k y la 7l arriba; despues, region a region su
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j, la 7k, la 7l y la 7m arriba; despues, region a region su
   contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
