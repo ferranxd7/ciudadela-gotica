@@ -3688,5 +3688,177 @@
     ]
    }
   }
+ },
+ "sfx_helado": {
+  "flow": "rhWNGHLuqUSprUyMuX2H",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7k: las Montanas Nevadas (los helados: gemido, alerta, dolor, muerte al romperse, romper el hielo al alzarse, incensario, aliento helado, martillo de hielo, esquirlas; el viento de la ventisca y la campana del monasterio). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "helado_gemido": {
+    "prompt": "Frozen undead monk murmuring a broken prayer through cracking ice, raspy frosty breath, faint ice creaking, dark fantasy horror, no music, 2.5 seconds",
+    "sesiones": [
+     "2MSkVpOD4jy5odAptfFC",
+     "2BB4b8QVZYRfRl4L4Jcr",
+     "yFhKRfULVnKiR62Czn8j",
+     "8xsi8NppxrpN6oMC9H0q"
+    ],
+    "generaciones": [
+     "9u3EcNviePTMgFThUILV",
+     "qCLZELBF09xvTyjBtzaR",
+     "irDzLd9IRU2t1uQmgDXb",
+     "afdW7HZieD1Y82fXmmQP"
+    ]
+   },
+   "helado_alerta": {
+    "prompt": "Frozen corpse spotting its prey, ice cracking off its face and a hoarse icy shriek, close, dark fantasy horror, no music, 1.6 seconds",
+    "sesiones": [
+     "80pMWzwYFQiDGeeGzwS2",
+     "CWuI9AvgsdYDCSkcPs0l",
+     "k3IM7GZfgqXAuFNu4q3C",
+     "qY5tKEljgTm6dyJHxEDe"
+    ],
+    "generaciones": [
+     "8gJIgoLKK5beKiyO67YT",
+     "yynGsutQA3cizXdJk0LE",
+     "OGZWOOISENuUYBWHoM2s",
+     "JLmyJKYnF32jActkODYs"
+    ]
+   },
+   "helado_dolor": {
+    "prompt": "Blade striking a frozen corpse, ice chipping and a brittle crunch with a short frosty grunt, no music, 0.8 seconds",
+    "sesiones": [
+     "4tf6sbLe13bjsQc9zK21",
+     "mPSZDK4VITxnnwAbp5GS",
+     "ERaKmawHMO1wkp3JmHvr",
+     "d00i7KO2qpnDdHcPp03n"
+    ],
+    "generaciones": [
+     "YbXDDWp2zOyHpDQW1p3j",
+     "2LF1NzJrDg1XXuMKOF7S",
+     "DsUXCStVp6hPWG80ygx0",
+     "FNah6EHpU7MCbblHYjNG"
+    ]
+   },
+   "helado_muerte": {
+    "prompt": "Frozen body shattering into ice shards, heavy glassy crash and tinkling falling fragments, dark fantasy, no music, 2 seconds",
+    "sesiones": [
+     "QBDUtsH8NEIG8mhXD0U5",
+     "xtFB4GXm0HpDxs9FpPGb",
+     "F2yl2WJ70lpNJwCffLc2",
+     "oVf8GX0HobIjBqkovjvs"
+    ],
+    "generaciones": [
+     "OkSturuhx548QVg9vGIg",
+     "YnyDd9KN75oAUe6yGJWz",
+     "gT5O08eOWvE06xMtTRXA",
+     "2qYP2ZVGvDZ5R9O7FiCr"
+    ]
+   },
+   "helado_romper": {
+    "prompt": "Thick ice cracking and bursting apart as a frozen figure breaks free, snow and chunks of ice falling, no music, 1.8 seconds",
+    "sesiones": [
+     "YH15m0Qfq6hU7ZBkdieO",
+     "lXhaKnyAxYYlOjqEqqQ1",
+     "CP9qRHCSTa5AqKhL5JT2",
+     "bLfNtzHdiz4ZGGgZzhhR"
+    ],
+    "generaciones": [
+     "uTcepAtYKmwsHTOVMljd",
+     "WDMvZpZkheyOAisOVxH5",
+     "QLon46fK3xh8FewlsH7a",
+     "jB3MmHdGWWs6HwwGulzQ"
+    ]
+   },
+   "helado_incensario": {
+    "prompt": "Heavy iron censer on a chain swung hard through the air, chain rattling, deep whoosh, frosty hiss, no music, 1.2 seconds",
+    "sesiones": [
+     "WUtuZiBo6oYIWPBvIrHY",
+     "1Pd2Bkoyjn2O3MSZLCfI",
+     "xrkx0p1XzDw8DpLrlXkQ",
+     "vyIpAkELyUB5IorFoba3"
+    ],
+    "generaciones": [
+     "jMe0QS8zTCZiMqKn3THZ",
+     "EhA0eE1mPUqhElcNDRu4",
+     "2IVvsYszgpLOlfI8S2dZ",
+     "jyduM7cESTPIj5oKN20b"
+    ]
+   },
+   "helado_aliento": {
+    "prompt": "Freezing breath blown out in a long icy gust, crackling frost spreading over stone, cold hiss, dark fantasy, no music, 2 seconds",
+    "sesiones": [
+     "gAJWxdvThaj6j6iPySXf",
+     "65IPwg2bZd437srXKOoI",
+     "rS9oiemUjNdaGJZpPXMU",
+     "s9MY0AttuJc0uVXX2UKB"
+    ],
+    "generaciones": [
+     "y2gOzuM03IkJ7pucUxpx",
+     "clUMPO2VpFUrQCqtOW8D",
+     "eDCjBWpCrGSAtlI0jzAC",
+     "l8DuYClIQqWfvv5AADT0"
+    ]
+   },
+   "helado_martillo": {
+    "prompt": "Huge ice hammer slammed into frozen ground, deep crunching impact, jagged ice spikes erupting from the ground, no music, 1.8 seconds",
+    "sesiones": [
+     "qnGTI0fbLt2SIpN4tCP9",
+     "yp2ZGGSRuLpmmBWJkjGD",
+     "CHq3RON6dMCCs1wVAexa",
+     "d1KBVLuzYnRN72i8VdWK"
+    ],
+    "generaciones": [
+     "17jxsM4qKOoXCc42LM2g",
+     "4Qk73c7E2032nfipKKBD",
+     "sHwBek5OZMYSKEqIsERT",
+     "pwXSnJ7ZgWgOT4b7SunX"
+    ]
+   },
+   "helado_esquirlas": {
+    "prompt": "Sharp ice shards launched through the air, crystalline whistling whoosh then shattering on impact, no music, 1.2 seconds",
+    "sesiones": [
+     "vgnDqqXDYwJqfCSOOzQE",
+     "23YwXvhfBGUx3wIQAdFF",
+     "VSFpKcJsmFrRZNp8cWhQ",
+     "24z4BCtTYH7Uj2wobztj"
+    ],
+    "generaciones": [
+     "fLGke1blyLV99qRRZmjN",
+     "t5hZd7h1PucTQkfOpeuv",
+     "SWumyEcA99CXwJsxPe36",
+     "5sb1sLNvaq8JEbcpsVxJ"
+    ]
+   },
+   "montana_ambiente": {
+    "prompt": "Howling mountain blizzard, strong cold wind gusting, snow hissing, distant creaking of ice, bleak and lonely, ambience, no music, 22 seconds",
+    "sesiones": [
+     "FVyGjTDSf0MDvYmQDepv",
+     "iyCt3K4SsgCSttcbQvz3",
+     "vZ8dPTeJqaSQCZU5CwF9",
+     "vzYqLwWx1nZ17MdobsEP"
+    ],
+    "generaciones": [
+     "hRhSzQ3lKqObT6a2VslJ",
+     "BKB1PuK8v43ZIx74HEwc",
+     "zmS6spDy5zpEDRuGve3n",
+     "G2NnSbhR0W3KG8DqTM3C"
+    ]
+   },
+   "monasterio_campana": {
+    "prompt": "A cracked, frozen monastery bell tolling once in a blizzard, mournful and distant, long ringing decay with wind, no music, 6 seconds",
+    "sesiones": [
+     "gDivDkcbNLbMv6gRqbE8",
+     "j0PGrP8psO4AEvVz0I0B",
+     "iKLtlGQt8ov7r123AaZV",
+     "KchCixnmUwNSmucNzmPP"
+    ],
+    "generaciones": [
+     "nkBYxqKHJjXxA35auLdr",
+     "MPi3zlr0W7FUP7P3So7b",
+     "o7uVRG3ea2NqGnzqmjmt",
+     "o4oMVJmXYVONuOSfn7uL"
+    ]
+   }
+  }
  }
 }
