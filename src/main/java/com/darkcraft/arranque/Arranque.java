@@ -48,6 +48,12 @@ public final class Arranque implements IMixinConfigPlugin {
     public void onLoad(String paquete) {
         if (servidor()) {
             LOG.info("Servidor dedicado: Oculus (si esta) se queda sin hacer nada; Distant Horizons y Embeddium van solos");
+            try {
+                for (String s : PorDefecto.servidor(FMLPaths.GAMEDIR.get()))
+                    LOG.info("Por defecto (primera vez): {}", s);
+            } catch (Throwable t) {
+                LOG.warn("No se ha podido quitar el actualizador de Distant Horizons", t);
+            }
             return;
         }
         try {

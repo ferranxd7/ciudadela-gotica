@@ -33,7 +33,14 @@ public final class PorDefecto {
     static final String DH = "DistantHorizons.toml";
     static final String OCULUS = "oculus.properties";
 
-    /** Lo minimo para DH: el resto lo rellena el al arrancar (y respeta estos dos valores). */
+    /**
+     * Version de lo que se pone por defecto en DH (si sube, se vuelve a poner una vez): 1 = la lejania a 256, sin
+     * actualizador (DH va dentro del jar: no se puede actualizar solo) y con las nubes en la lejania ({@code blocksToIgnore}
+     * NONE: con NON_COLLIDING, el de DH, el mar de nubes —que no tiene choque— no salia en la lejania).
+     */
+    static final int DH_VERSION = 1;
+
+    /** Lo minimo para DH: el resto lo rellena el al arrancar (y respeta estos valores). */
     static final String DH_MINIMO = String.join("\n",
             "# Dark Craft: la lejania de Distant Horizons empieza en " + LEJANIA + " chunks (se puede cambiar en Opciones > Lejania).",
             "[client]",
@@ -41,12 +48,24 @@ public final class PorDefecto {
             "\t\t[client.advanced.graphics]",
             "\t\t\t[client.advanced.graphics.quality]",
             "\t\t\t\tlodChunkRenderDistanceRadius = " + LEJANIA,
+            "\t\t\t[client.advanced.graphics.culling]",
+            "\t\t\t\tblocksToIgnore = \"NONE\"",
+            "\t\t[client.advanced.autoUpdater]",
+            "\t\t\tenableAutoUpdater = false",
+            "");
+
+    /** En un servidor dedicado: solo sin actualizador. */
+    static final String DH_SERVIDOR = String.join("\n",
+            "# Dark Craft: Distant Horizons va dentro del jar de Dark Craft (no se actualiza solo).",
+            "[client]",
+            "\t[client.advanced]",
             "\t\t[client.advanced.autoUpdater]",
             "\t\t\tenableAutoUpdater = false",
             "");
 
     private static final Pattern RADIO = Pattern.compile("(?m)^(\\s*lodChunkRenderDistanceRadius\\s*=\\s*)(\\d+)");
     private static final Pattern ACTUALIZADOR = Pattern.compile("(?m)^(\\s*enableAutoUpdater\\s*=\\s*)true\\b");
+    private static final Pattern IGNORAR = Pattern.compile("(?m)^(\\s*blocksToIgnore\\s*=\\s*)\"[A-Z_]+\"");
 
     /** Aplica lo que falte; devuelve lo que ha hecho (para el registro). Nunca lanza. */
     public static List<String> aplicar(Path juego) {
@@ -60,11 +79,11 @@ public final class PorDefecto {
                 marca.load(in);
             }
             boolean cambia = false;
-            if (!"1".equals(marca.getProperty("lejania"))) {
+            if (version(marca.getProperty("lejania")) < DH_VERSION) {
                 String r = lejania(config);
                 hecho.add(r);
                 if (r.startsWith("lejania:")) {
-                    marca.setProperty("lejania", "1");
+                    marca.setProperty("lejania", String.valueOf(DH_VERSION));
                     cambia = true;
                 }
             }
@@ -85,12 +104,20 @@ public final class PorDefecto {
         return hecho;
     }
 
+    static int version(String v) {
+        try {
+            return v == null ? 0 : Integer.parseInt(v.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     /** "lejania: ..." si queda puesta; otra cosa si no se ha podido (se reintenta en el siguiente arranque). */
     static String lejania(Path config) throws IOException {
         Path f = config.resolve(DH);
         if (!Files.exists(f)) {
             Files.writeString(f, DH_MINIMO, StandardCharsets.UTF_8);
-            return "lejania: " + DH + " creado con " + LEJANIA + " chunks y sin actualizador";
+            return "lejania: " + DH + " creado con " + LEJANIA + " chunks, las nubes en la lejania y sin actualizador";
         }
         String s = Files.readString(f, StandardCharsets.UTF_8);
         Matcher m = RADIO.matcher(s);
@@ -98,8 +125,41 @@ public final class PorDefecto {
         String antes = m.group(2);
         String t = RADIO.matcher(s).replaceFirst("$1" + LEJANIA);
         t = ACTUALIZADOR.matcher(t).replaceAll("$1false");
+        t = IGNORAR.matcher(t).replaceAll("$1\"NONE\"");
         if (!t.equals(s)) Files.writeString(f, t, StandardCharsets.UTF_8);
-        return "lejania: " + antes + " -> " + LEJANIA + " chunks en el " + DH + " que habia";
+        return "lejania: " + antes + " -> " + LEJANIA + " chunks en el " + DH + " que habia (nubes en la lejania, sin actualizador)";
+    }
+
+    /** En un servidor dedicado (una vez): DH sin actualizador (va dentro del jar). */
+    public static List<String> servidor(Path juego) {
+        List<String> hecho = new ArrayList<>();
+        try {
+            Path config = juego.resolve("config");
+            Files.createDirectories(config);
+            Path fm = config.resolve(MARCA);
+            Properties marca = new Properties();
+            if (Files.exists(fm)) try (InputStream in = Files.newInputStream(fm)) {
+                marca.load(in);
+            }
+            if (version(marca.getProperty("servidor")) >= 1) return hecho;
+            Path f = config.resolve(DH);
+            if (!Files.exists(f)) {
+                Files.writeString(f, DH_SERVIDOR, StandardCharsets.UTF_8);
+                hecho.add("servidor: " + DH + " creado sin actualizador");
+            } else {
+                String s = Files.readString(f, StandardCharsets.UTF_8);
+                String t = ACTUALIZADOR.matcher(s).replaceAll("$1false");
+                if (!t.equals(s)) Files.writeString(f, t, StandardCharsets.UTF_8);
+                hecho.add("servidor: " + DH + " sin actualizador");
+            }
+            marca.setProperty("servidor", "1");
+            try (OutputStream out = Files.newOutputStream(fm)) {
+                marca.store(out, "Dark Craft: lo que ya se ha puesto por defecto una vez (borra una linea para repetirlo)");
+            }
+        } catch (Throwable t) {
+            hecho.add("fallo: " + t);
+        }
+        return hecho;
     }
 
     /** "shaders: ..." si quedan puestos; si no hay Complementary en shaderpacks/ se reintenta en el siguiente arranque. */

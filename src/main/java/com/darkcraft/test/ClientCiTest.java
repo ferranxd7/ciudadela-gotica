@@ -5809,62 +5809,71 @@ public final class ClientCiTest {
         log("  al arrancar: " + Lejania.resumenDH());
         log("  al arrancar: " + Lejania.resumenOculus());
         log("  " + claves("config/darkcraft-arranque.properties", "lejania", "shaders"));
-        log("  " + claves("config/DistantHorizons.toml", "lodChunkRenderDistanceRadius", "enableAutoUpdater", "enableDistantGeneration"));
+        log("  " + claves("config/DistantHorizons.toml", "lodChunkRenderDistanceRadius", "enableAutoUpdater", "blocksToIgnore", "enableDistantGeneration"));
         log("  " + claves("config/oculus.properties", "shaderPack", "enableShaders"));
         if (Lejania.hayOculus()) log("  para la prueba: " + Lejania.shaders(false));
         if (Lejania.hayDH()) log("  para la prueba: " + Lejania.dhPoner(false, "graphics", "renderingEnabled") + ", "
-                + Lejania.dhPoner(false, "worldGenerator", "enableDistantGeneration") + " -> " + Lejania.resumenDH());
+                + Lejania.dhPoner(false, "worldGenerator", "enableDistantWorldGeneration") + " -> " + Lejania.resumenDH());
     }
 
     /** Teletransporta y mira; en creativo y volando, sin la interfaz. */
-    private static void vista(Minecraft m, double x, double y, double z, double tx, double ty, double tz, long hora) {
+    private static void vista(Minecraft m, double[] q) {
+        if (q == null) return;
         m.setScreen(null);
         enPrimeraPersona(m);
         m.options.hideGui = true;
         server(m, sp -> {
             if (sp.getVehicle() != null) sp.stopRiding();
             sp.setGameMode(GameType.CREATIVE);
-            sp.serverLevel().setDayTime(hora);
+            sp.serverLevel().setDayTime((long) q[6]);
             sp.serverLevel().setWeatherParameters(6000, 0, false, false);
-            irMirando(sp, x, y, z, tx, ty, tz, true);
+            irMirando(sp, q[0], q[1], q[2], q[3], q[4], q[5], true);
         });
     }
 
+    private static final List<net.minecraft.world.entity.Entity> VITRINA = new ArrayList<>();
+    private static BlockPos santuarioVitrina;
+
     /**
      * Parte 6: Distant Horizons (la lejania, 256 chunks como la deja el arranque) y los shaders (Oculus con Complementary
-     * Unbound), que van dentro de Dark Craft. Tres vistas con la lejania (Valdrenn desde Brumavela de dia, la fortaleza desde
-     * el camino de nubes, Valdrenn de noche desde arriba) y las mismas con shaders, mas el portal y el jardin de la cupula.
+     * Unbound), que van dentro de Dark Craft. Sin el cielo rojo (como casi toda la partida): Brumavela de dia mirando a
+     * Valdrenn, la fortaleza desde el camino de nubes y Valdrenn de noche; las mismas con shaders, el portal (con el cielo
+     * rojo otra vez), el jardin de la cupula y una vitrina (santuario, enemigos y avisos del suelo de los jefes): lo que se
+     * dibuja a mano tiene que verse con shaders.
      */
     private static int lejania(int L) {
-        final double[][] v = new double[5][];
-        atTicks(L, "Lejania: Distant Horizons como lo tiene el jugador (sin lo de la prueba)", m -> {
-            log("  " + Lejania.dhQuitar("graphics", "renderingEnabled") + ", " + Lejania.dhQuitar("worldGenerator", "enableDistantGeneration"));
+        final double[][] v = new double[6][];
+        final List<int[]> columnas = new ArrayList<>();
+        atTicks(L, "Lejania: Distant Horizons dibujando y generando (sin el cielo rojo)", m -> {
+            log("  " + Lejania.dhPoner(true, "graphics", "renderingEnabled") + ", " + Lejania.dhPoner(true, "worldGenerator", "enableDistantWorldGeneration"));
             log("  lejania: " + Lejania.resumenDH() + " | " + Lejania.resumenOculus());
+            server(m, sp -> {
+                columnas.clear();
+                columnas.addAll(com.darkcraft.fortaleza.CieloRojo.get(sp.server).columnas);
+                com.darkcraft.fortaleza.CieloRojo.apagar(sp.server, false);
+                log("  cielo rojo apagado para las vistas (columnas guardadas: " + columnas.size() + ")");
+            });
             BlockPos b = com.darkcraft.world.MundoNubes.aparicion();
             double vx = castle != null ? castle[0] : 1200, vz = castle != null ? castle[1] : 0;
-            v[0] = new double[]{b.getX(), 330, b.getZ(), vx, 380, vz, 6000};
+            v[0] = new double[]{b.getX() + 0.5, b.getY() + 7, b.getZ() + 0.5, vx, 300, vz, 6000};
             if (fplan != null) {
                 double dx = vx - fplan.cx, dz = vz - fplan.cz, d = Math.max(1, Math.hypot(dx, dz));
-                v[1] = new double[]{fplan.cx + dx / d * 230, fplan.Y + 95, fplan.cz + dz / d * 230, fplan.cx, fplan.Y + 40, fplan.cz, 6000};
+                v[1] = new double[]{fplan.cx + dx / d * 160, 263, fplan.cz + dz / d * 160, fplan.cx, fplan.Y + 30, fplan.cz, 6000};
                 int[] al = fplan.f.altar();
                 v[3] = new double[]{al[0] + 3.5, al[1], al[2] + 3.5, fplan.cx + 0.5, al[1] + 6, fplan.f.portal()[2] + 0.5, 18000};
                 v[4] = new double[]{fplan.cx + 21.5, fplan.Y + 3, fplan.cz + 21.5, fplan.cx, fplan.Y + 28, fplan.cz, 6000};
+                v[5] = new double[]{fplan.cx + 0.5, fplan.Y + 2, fplan.cz + 34.5, fplan.cx + 0.5, fplan.Y + 1, fplan.cz + 24.5, 6000};
             }
             double dx = b.getX() - vx, dz = b.getZ() - vz, d = Math.max(1, Math.hypot(dx, dz));
-            v[2] = new double[]{vx + dx / d * 170, 470, vz + dz / d * 170, vx, 400, vz, 18000};
-            double[] q = v[0];
-            vista(m, q[0], q[1], q[2], q[3], q[4], q[5], (long) q[6]);
+            v[2] = new double[]{vx + dx / d * 170, 430, vz + dz / d * 170, vx, 390, vz, 18000};
+            vista(m, v[0]);
         });
         String[] nombres = {"brumavela", "fortaleza", "valdrenn"};
-        int[] espera = {1200, 600, 600};
+        int[] espera = {1200, 700, 600};
         int t = L;
         for (int i = 0; i < 3; i++) {
             final int k = i;
-            if (i > 0) atTicks(t, "Lejania: " + nombres[k], m -> {
-                double[] q = v[k];
-                if (q == null) return;
-                vista(m, q[0], q[1], q[2], q[3], q[4], q[5], (long) q[6]);
-            });
+            if (i > 0) atTicks(t, "Lejania: " + nombres[k], m -> vista(m, v[k]));
             t += espera[i];
             atTicks(t, "captura", m -> {
                 if (v[k] == null) return;
@@ -5875,20 +5884,21 @@ public final class ClientCiTest {
         }
         atTicks(t, "Shaders: encendidos (Complementary)", m -> {
             log("  " + Lejania.shaders(true) + " -> " + Lejania.resumenOculus());
-            double[] q = v[0];
-            vista(m, q[0], q[1], q[2], q[3], q[4], q[5], (long) q[6]);
+            vista(m, v[0]);
         });
         t += 600;
-        String[] conShaders = {"brumavela", "fortaleza", "valdrenn", "portal", "jardin"};
-        for (int i = 0; i < 5; i++) {
+        String[] conShaders = {"brumavela", "fortaleza", "valdrenn", "portal", "jardin", "vitrina"};
+        for (int i = 0; i < 6; i++) {
             final int k = i;
             if (i > 0) atTicks(t, "Shaders: " + conShaders[k], m -> {
-                double[] q = v[k];
-                if (q == null) return;
-                vista(m, q[0], q[1], q[2], q[3], q[4], q[5], (long) q[6]);
-                if (k == 3) server(m, sp -> log("  el cielo rojo: " + com.darkcraft.fortaleza.CieloRojo.resumen(sp.server)));
+                vista(m, v[k]);
+                if (k == 3) server(m, sp -> {
+                    if (!columnas.isEmpty()) com.darkcraft.fortaleza.CieloRojo.encender(sp.server, columnas.get(0));
+                    log("  el cielo rojo otra vez: " + com.darkcraft.fortaleza.CieloRojo.resumen(sp.server));
+                });
+                if (k == 5) vitrina(m, v[5]);
             });
-            t += i == 0 ? 0 : 200;
+            t += i == 0 ? 0 : (i == 3 ? 240 : 200);
             atTicks(t, "captura", m -> {
                 if (v[k] == null) return;
                 shot(m, "cliente_l" + (k + 4 < 10 ? "0" : "") + (k + 4) + "_shaders_" + conShaders[k]);
@@ -5896,12 +5906,67 @@ public final class ClientCiTest {
             });
             t += 10;
         }
-        atTicks(t, "Shaders: apagados para lo que queda", m -> {
+        atTicks(t, "Shaders: apagados para lo que queda (y fuera la vitrina)", m -> {
             log("  " + Lejania.shaders(false));
             m.options.hideGui = false;
             enPrimeraPersona(m);
+            server(m, sp -> {
+                for (var e : VITRINA) if (!e.isRemoved()) e.discard();
+                VITRINA.clear();
+                if (santuarioVitrina != null) sp.serverLevel().removeBlock(santuarioVitrina, false);
+            });
         });
         return t + 20;
+    }
+
+    /** Delante de la camara (que mira al norte desde q): un santuario encendido, tres enemigos quietos y avisos de jefe. */
+    private static void vitrina(Minecraft m, double[] q) {
+        if (q == null) return;
+        server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            for (var e : VITRINA) if (!e.isRemoved()) e.discard();
+            VITRINA.clear();
+            double x = q[3], z = q[5];
+            int y = (int) Math.floor(q[4]);
+            // el suelo de verdad debajo de cada sitio
+            java.util.function.BiFunction<Double, Double, Integer> suelo = (xx, zz) -> {
+                BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos(xx, y + 6, zz);
+                for (int i = 0; i < 14 && lvl.getBlockState(p).getCollisionShape(lvl, p).isEmpty(); i++) p.move(0, -1, 0);
+                return p.getY() + 1;
+            };
+            santuarioVitrina = BlockPos.containing(x + 3.5, suelo.apply(x + 3.5, z + 2.0), z + 2.0);
+            com.darkcraft.santuario.Santuarios.poner(lvl, santuarioVitrina, "darkcraft.santuario.arbol");
+            var st = lvl.getBlockState(santuarioVitrina);
+            if (st.getBlock() instanceof com.darkcraft.santuario.SantuarioBlock)
+                lvl.setBlock(santuarioVitrina, st.setValue(com.darkcraft.santuario.SantuarioBlock.ENCENDIDO, true), 3);
+            com.darkcraft.enemigos.Enemigo[] fila = {DarkCraftMod.GUARDIA.get().create(lvl), DarkCraftMod.ESPECTRO.get().create(lvl),
+                    DarkCraftMod.PERRO.get().create(lvl)};
+            double[] xs = {-3.0, 0.0, 3.0};
+            for (int i = 0; i < 3; i++) {
+                var e = fila[i];
+                if (e == null) continue;
+                e.setNoAi(true);
+                e.moveTo(x + 0.5 + xs[i], suelo.apply(x + 0.5 + xs[i], z - 2.0), z - 2.0, 0f, 0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                lvl.addFreshEntity(e);
+                VITRINA.add(e);
+            }
+            log("  vitrina: santuario en " + santuarioVitrina.toShortString() + " (" + lvl.getBlockState(santuarioVitrina).getBlock() + "), "
+                    + VITRINA.size() + " enemigos");
+        });
+        // los avisos del suelo de los jefes (rojo: el golpe; oro con columna: donde se salva), como los manda el Rey
+        double x = q[3], z = q[5];
+        aviso(m, com.darkcraft.net.Net.Aviso.CIRCULO, x - 3.0, z + 2.5, 2.6f, 0f, com.darkcraft.net.Net.Aviso.ROJO);
+        aviso(m, com.darkcraft.net.Net.Aviso.CIRCULO, x + 3.0, z + 6.0, 2.2f, 1f, com.darkcraft.net.Net.Aviso.ORO);
+        aviso(m, com.darkcraft.net.Net.Aviso.LINEA, x, z + 4.0, 7f, 1.2f, com.darkcraft.net.Net.Aviso.NARANJA);
+    }
+
+    /** Un aviso del suelo (como los de los jefes) sobre lo que haya debajo de x, z (en el cliente). */
+    private static void aviso(Minecraft m, int forma, double x, double z, float a, float b, int color) {
+        if (m.level == null || m.player == null) return;
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos(x, m.player.getY() + 4, z);
+        for (int i = 0; i < 16 && m.level.getBlockState(p).getCollisionShape(m.level, p).isEmpty(); i++) p.move(0, -1, 0);
+        com.darkcraft.client.rey.ReyCliente.aviso(new com.darkcraft.net.Net.Aviso(forma, x, p.getY() + 1, z, a, b, 0f, 600, color));
     }
 
     // ------------------------------------------------------------------ Ser Gavran (parte B1)

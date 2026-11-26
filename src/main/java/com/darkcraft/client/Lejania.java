@@ -141,7 +141,9 @@ public final class Lejania {
         }
         return "Distant Horizons " + version("distanthorizons") + ": lejania " + dh("graphics", "chunkRenderDistance")
                 + " (la del jugador " + dhDelJugador("graphics", "chunkRenderDistance") + "), dibuja "
-                + dh("graphics", "renderingEnabled") + ", genera " + dh("worldGenerator", "enableDistantGeneration");
+                + dh("graphics", "renderingEnabled") + " (" + dh("graphics", "renderingMode") + "), genera "
+                + dh("worldGenerator", "enableDistantWorldGeneration") + " (" + dh("worldGenerator", "distantGeneratorMode") + ", "
+                + dh("worldGenerator", "chunkGeneratorMode") + ")";
     }
 
     // ------------------------------------------------------------------ Oculus
@@ -160,13 +162,30 @@ public final class Lejania {
         }
     }
 
-    /** Si hay un pack de shaders funcionando ahora mismo. */
+    private static Object irisApi;
+    private static Method enUso;
+    private static boolean sinIris;
+
+    /**
+     * Si hay un pack de shaders funcionando ahora mismo (se pregunta en cada fotograma: lo de Iris se busca una vez). Con
+     * shaders, lo que el mod dibuja a mano en el cielo (el velo rojo, la luna de sangre) no se dibuja: los shaders hacen su
+     * propio cielo y esos dibujos salian rotos (triangulos rosas).
+     */
     public static boolean shadersEnUso() {
+        if (sinIris) return false;
         try {
-            Class<?> api = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
-            Object inst = api.getMethod("getInstance").invoke(null);
-            return (boolean) api.getMethod("isShaderPackInUse").invoke(inst);
+            if (enUso == null) {
+                if (!hayOculus()) {
+                    sinIris = true;
+                    return false;
+                }
+                Class<?> api = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+                irisApi = api.getMethod("getInstance").invoke(null);
+                enUso = api.getMethod("isShaderPackInUse");
+            }
+            return (boolean) enUso.invoke(irisApi);
         } catch (Throwable t) {
+            sinIris = true;
             return false;
         }
     }

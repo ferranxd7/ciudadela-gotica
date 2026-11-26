@@ -136,11 +136,16 @@ public final class CieloRojoCliente {
         else if (e.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) columnas(e);
     }
 
-    /** El velo rojo sobre el cielo (una caja alrededor de la camara, sin profundidad: lo de despues la tapa) y la luna de sangre. */
+    /**
+     * El velo rojo sobre el cielo (una caja alrededor de la camara, sin profundidad: lo de despues la tapa) y la luna de
+     * sangre. Sin shaders: con ellos el cielo es el del pack.
+     */
     private static void cielo(RenderLevelStageEvent e) {
         Minecraft mc = Minecraft.getInstance();
         float pt = e.getPartialTick(), k = k(pt);
         if (k <= 0 || mc.level == null) return;
+        // con shaders (Oculus) el cielo lo hace el pack y esto salia roto: queda el rojo de la niebla, las nubes y las columnas
+        if (com.darkcraft.client.Lejania.shadersEnUso()) return;
         PoseStack ps = e.getPoseStack();
         Matrix4f m = ps.last().pose();
         RenderSystem.enableBlend();
