@@ -3022,5 +3022,147 @@
     ]
    }
   }
+ },
+ "sfx_ahorcado": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7g: los ahorcados del Bosque Muerto (la soga que cruje, el gemido, la alerta, la caida de la rama, el zarpazo, el lazo, el dolor, la muerte) y el viento de la Arboleda de los Ahorcados. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "ahorcado_soga": {
+    "prompt": "A thick old hemp rope creaking under the weight of a hanging body, slow swaying creaks and the groan of a dead tree branch, dark fantasy, no music, 3 seconds",
+    "sesiones": [
+     "lNMkPf2QyEElx9rL2Pt6",
+     "yCB5brSvtbBjS56akhJI",
+     "JaQoTa9RM3josjjViO4L",
+     "LQregy03HdHsA1n4Xrqj"
+    ],
+    "generaciones": [
+     "VjT7MIXzTMIROPa6x4eH",
+     "9vStGJAB5q2jqX0WP1za",
+     "qQJtMdOL7tFBCTZsGhKN",
+     "9Ky623uIsJLSbkNwCx42"
+    ]
+   },
+   "ahorcado_gemido": {
+    "prompt": "A hanged undead corpse making a choked, strangled gurgling moan through a crushed throat, raspy and wet, dark fantasy, no music, 2 seconds",
+    "sesiones": [
+     "RANLUze8VFH0HEcMCZ3s",
+     "X5gK7fM2pzcuTs7clovZ",
+     "IMekAzpkORdYLcmZGNsh",
+     "RiteKx3CwF1Mah5i6ylj"
+    ],
+    "generaciones": [
+     "l5f14WyVxMl57MXKyNdz",
+     "FzkBq8LrRBiWtq9CVuFo",
+     "RCIRNcHyrD4zV0zZvDhH",
+     "wM3B1ZR61OGLYoBBGo94"
+    ]
+   },
+   "ahorcado_alerta": {
+    "prompt": "A hanged ghoul suddenly lets out a strangled rasping shriek, choking and hissing, dark fantasy, no music, 1.5 seconds",
+    "sesiones": [
+     "UbgfCSZFsiBNPRCoDQuw",
+     "xJzwz9euhrNwKJmkZ2Ye",
+     "bAtHXDe1XeweasS239iu",
+     "zNtRndQ71ZOsP4Va7O1C"
+    ],
+    "generaciones": [
+     "uCUojBvN7SOn88de2FQ0",
+     "9nXIcJHKj2h5L794Brd1",
+     "mFPQlnLrQkv8PhPeNIiR",
+     "Cv2FyCZuZOpzpISqedOn"
+    ]
+   },
+   "ahorcado_cae": {
+    "prompt": "A taut rope snaps and a body drops from a tree, landing hard on dirt with a heavy thud and rustling dead leaves, dark fantasy, no music, 1.5 seconds",
+    "sesiones": [
+     "w3Dad9e77xrRSBgLLzIx",
+     "rpYonEy3Rs01MpOoLjpM",
+     "HraGE8AePb1VVypDY6hG",
+     "zNmOVLPqlstCSKit0pRw"
+    ],
+    "generaciones": [
+     "Lj9tVZrspLCqxRv1ai0I",
+     "cXZEyxqbpoZ5n8BqhXTb",
+     "7MJsxUHAGw3TPXFvOaGe",
+     "cz29svg3SUb1fOIo7nxp"
+    ]
+   },
+   "ahorcado_zarpazo": {
+    "prompt": "Long bony claws slashing through the air in a quick vicious swipe, sharp whoosh and scrape, dark fantasy, no music, 0.8 seconds",
+    "sesiones": [
+     "FwxNyc1AhrcKeooj84G8",
+     "TQQWTZRGeRqjTQrXXuyh",
+     "jQEq3TWIEnSZRyoFQkQ9",
+     "tYRaFtFXOtyxhqgzLSnF"
+    ],
+    "generaciones": [
+     "0j2PXMKnBSYAbM1onS8R",
+     "AdBUoORDyff3ZHC3nu0s",
+     "3aCg75rzbieIii5wPI1l",
+     "SMcYw13EmSJgfjmgrO4R"
+    ]
+   },
+   "ahorcado_lazo": {
+    "prompt": "A heavy rope noose whipping through the air and cracking like a whip, then pulled tight with a sharp snap, dark fantasy, no music, 1.5 seconds",
+    "sesiones": [
+     "1uuU7uMUUM4He8DXeM35",
+     "DmHBUWAuPX2dKQuMTqBz",
+     "fUBF3xVuqWcrO69TvpUd",
+     "XY5UePtqvlxt0y1zHMGd"
+    ],
+    "generaciones": [
+     "rUKsl24Nwi9CsBiuxh8q",
+     "zppuqnsGFIAAW3xOUKxD",
+     "TNPveejzv41ew0YeGukP",
+     "0rkk6IRStYFosb9EmSo7"
+    ]
+   },
+   "ahorcado_dolor": {
+    "prompt": "A hanged undead corpse struck hard: a short choked raspy grunt, dark fantasy, no music, 0.7 seconds",
+    "sesiones": [
+     "ma1EcIGO3y1kX3w4sKmZ",
+     "mWhf7WnJYsLHY973IAwZ",
+     "4mo1kckGzJQz4SImQMgN",
+     "ALRTCcveEHbBrpN4EKyq"
+    ],
+    "generaciones": [
+     "tVqTmtg9CZoVWtaL2IzF",
+     "HwC6J0B5ULOs3pTH5AvD",
+     "P5zXsO9fC86KovikF1R2",
+     "q1Iub13CWcDCUAAr7I2s"
+    ]
+   },
+   "ahorcado_muerte": {
+    "prompt": "A hanged ghoul dying: a long choked rattling gasp fading out as the body collapses onto dry leaves, dark fantasy, no music, 2.5 seconds",
+    "sesiones": [
+     "PY5RuKTJNVHVdxbNi40y",
+     "LoqSbc11416BMXyJfj21",
+     "yxUrU71xMoSHQnUILRwE",
+     "uYST66d2VDA1J1dWAkKS"
+    ],
+    "generaciones": [
+     "TMOHPFdURdRnjqcGLhBa",
+     "nVlKmMUFEjdGYsvXdtgT",
+     "r5SyQQeLONNfa88X72mV",
+     "3EReN5xLNl1tqrlcDzwa"
+    ]
+   },
+   "arboleda_viento": {
+    "prompt": "Cold wind moaning through a forest of dead leafless trees, distant creaking ropes and branches, a lone crow cawing far away, dark fantasy ambience, no music, 6 seconds",
+    "sesiones": [
+     "ExUVuCv2QPNPUG0MCC2Q",
+     "U8tSPYf8wFFblCd6lAJD",
+     "KgJSPWYU78r92jg5gnqd",
+     "3gkBxuhWpeYL1DMkwrla"
+    ],
+    "generaciones": [
+     "A0TDKns30dWpYbO57yMe",
+     "gxockMr5t1P7HEWKTJQX",
+     "a7HZzVbLBzR3tJEPZCLT",
+     "O2EplbU2J4wCBkVMybsq"
+    ]
+   }
+  }
  }
 }
