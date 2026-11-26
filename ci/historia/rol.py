@@ -2293,6 +2293,67 @@ EN.update({
 })
 
 
+
+# ---------------------------------------------------------------- parte 7l: Hrodric, el Abad de la Cumbre (el jefe de las Montanas Nevadas)
+ES.update({
+    "entity.darkcraft.abad": "Hrodric, el Abad de la Cumbre",
+    "darkcraft.abad.nombre_corto": "El Abad",
+    "darkcraft.abad.voz.1": "Has subido a la cumbre... como subí yo. Arrodíllate, hijo. El frío también te contestará.",
+    "darkcraft.abad.voz.2": "¡Hermanos! ¡Alzaos de la nieve! ¡Que la escarcha se los lleve a todos!",
+    "darkcraft.abad.voz.3": "Descansa. El frío lo perdona todo.",
+    "darkcraft.abad.voz.4": "Quieto... quieto ya.",
+    "darkcraft.abad.voz.5": "Qué calor... qué calor hace... Perdonadme, hermanos.",
+    "subtitles.darkcraft.abad.voz": "Habla el Abad",
+    "darkcraft.bestiario.abad.desc": "Cuando el frío entró en el monasterio, el abad Hrodric subió solo a la ermita de la cumbre a rezar por sus hermanos, y la Sombra le contestó. Ahora es un gigante de hielo que reza de rodillas ante la ermita. Su báculo abre una fila de púas de hielo que llega mucho más lejos que él: apártate de lado. Si te pones a su espalda o muy cerca, da un pisotón y las púas brotan en anillo. De lejos echa un aliento helado que barre de lado a lado, y alza el báculo para que caigan carámbanos donde estás: sal de la marca del suelo. Herido, llama a sus hermanos y levanta una ventisca que te hiela hasta los huesos: solo te calientan los braseros del calvario. El fuego le hace más daño.",
+    "subtitles.darkcraft.sfx.abad_grito": "El Abad ruge",
+    "subtitles.darkcraft.sfx.abad_baculazo": "Un báculo golpea el hielo",
+    "subtitles.darkcraft.sfx.abad_barrido": "Un báculo corta el aire",
+    "subtitles.darkcraft.sfx.abad_pisoton": "El Abad da un pisotón",
+    "subtitles.darkcraft.sfx.abad_aliento": "El Abad sopla escarcha",
+    "subtitles.darkcraft.sfx.abad_invocar": "El Abad llama al cielo",
+    "subtitles.darkcraft.sfx.abad_carambano": "Cae un carámbano",
+    "subtitles.darkcraft.sfx.abad_ventisca": "Se levanta la ventisca",
+    "subtitles.darkcraft.sfx.abad_dolor": "El Abad se queja",
+    "subtitles.darkcraft.sfx.abad_muerte": "El Abad se rompe",
+    "subtitles.darkcraft.sfx.abad_rezo": "El Abad reza",
+    "darkcraft.morvain.lugar.ermita": "La Ermita de la Cumbre",
+    "darkcraft.morvain.lugar.escalera_penitentes": "La Escalera de los Penitentes",
+    "advancements.darkcraft.abad.title": "El último toque",
+    "advancements.darkcraft.abad.description": "Vence a Hrodric, el Abad de la Cumbre",
+    "darkcraft.diario.abad": "En lo alto de la escalera de los penitentes, el abad Hrodric rezaba de rodillas ante su ermita, hecho hielo. Cuando cayó se rompió en pedazos, y abajo, en el monasterio, la campana dio un último toque. Los hermanos que seguían rezando en la iglesia descansan por fin. Al final dijo que tenía calor.",
+    "darkcraft.ayuda.ermita": "La escalera de los penitentes y la ermita: ir a uno de sus sitios, que vuelvan sus helados o quitarlos",
+    "darkcraft.ayuda.abad": "El Abad: cómo está, llevarte ante él, vencerle o que vuelva",
+})
+EN.update({
+    "entity.darkcraft.abad": "Hrodric, Abbot of the Summit",
+    "darkcraft.abad.nombre_corto": "The Abbot",
+    "darkcraft.abad.voz.1": "You climbed to the summit... as I once did. Kneel, child. The cold will answer you too.",
+    "darkcraft.abad.voz.2": "Brothers! Rise from the snow! Let the frost take them all!",
+    "darkcraft.abad.voz.3": "Rest now. The cold forgives everything.",
+    "darkcraft.abad.voz.4": "Be still... be still now.",
+    "darkcraft.abad.voz.5": "Warm... it is so warm... Forgive me, brothers.",
+    "subtitles.darkcraft.abad.voz": "The Abbot speaks",
+    "darkcraft.bestiario.abad.desc": "When the cold crept into the monastery, Abbot Hrodric climbed alone to the summit hermitage to pray for his brothers, and the Shadow answered him. Now he is a giant of ice who kneels in prayer before the hermitage. His crozier opens a row of ice spikes that reaches much further than he does: step aside. If you stand behind him or too close, he stomps and the spikes burst out in a ring. From afar he breathes a freezing gust that sweeps from side to side, and he raises his crozier to bring icicles down where you stand: get out of the mark on the ground. Wounded, he calls his brothers and raises a blizzard that freezes you to the bone: only the braziers of the calvary keep you warm. Fire hurts him more.",
+    "subtitles.darkcraft.sfx.abad_grito": "The Abbot roars",
+    "subtitles.darkcraft.sfx.abad_baculazo": "A crozier strikes the ice",
+    "subtitles.darkcraft.sfx.abad_barrido": "A crozier cleaves the air",
+    "subtitles.darkcraft.sfx.abad_pisoton": "The Abbot stomps",
+    "subtitles.darkcraft.sfx.abad_aliento": "The Abbot breathes frost",
+    "subtitles.darkcraft.sfx.abad_invocar": "The Abbot calls on the sky",
+    "subtitles.darkcraft.sfx.abad_carambano": "An icicle falls",
+    "subtitles.darkcraft.sfx.abad_ventisca": "A blizzard rises",
+    "subtitles.darkcraft.sfx.abad_dolor": "The Abbot groans",
+    "subtitles.darkcraft.sfx.abad_muerte": "The Abbot shatters",
+    "subtitles.darkcraft.sfx.abad_rezo": "The Abbot prays",
+    "darkcraft.morvain.lugar.ermita": "The Summit Hermitage",
+    "darkcraft.morvain.lugar.escalera_penitentes": "The Penitents' Stair",
+    "advancements.darkcraft.abad.title": "The Last Toll",
+    "advancements.darkcraft.abad.description": "Defeat Hrodric, Abbot of the Summit",
+    "darkcraft.diario.abad": "At the top of the Penitents' Stair, Abbot Hrodric knelt in prayer before his hermitage, turned to ice. When he fell he shattered, and far below, in the monastery, the bell tolled one last time. The brothers still praying in the church are finally at rest. At the end he said he was warm.",
+    "darkcraft.ayuda.ermita": "The Penitents' Stair and the hermitage: go to one of its places, bring its Frozen Ones back or remove them",
+    "darkcraft.ayuda.abad": "The Abbot: how he is, take you before him, defeat him or bring him back",
+})
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

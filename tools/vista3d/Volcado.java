@@ -547,6 +547,46 @@ public class Volcado {
                 for (var o : v.esperas()) marcas.put("H" + (n++), new int[]{o.x(), o.y() + 1, o.z()});
                 andarMonasterio(lvl, v);
             }
+            case "morvain_ermita" -> {
+                // la Ermita de la Cumbre (parte 7l): la escalera de los penitentes desde el postigo del huerto del monasterio,
+                // el calvario con sus braseros y pilares, la ermita y la gran cruz de hielo (-Dcaja=x0,z0,x1,z1 para un trozo)
+                int EX = com.darkcraft.morvain.Ermita.CX, EZ = com.darkcraft.morvain.Ermita.CZ;
+                String[] k = System.getProperty("caja", (EX - 36) + "," + (EZ - 60) + "," + (EX + 36) + "," + (com.darkcraft.morvain.Ermita.ESC_Z0 + 14)).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 280);
+                com.darkcraft.morvain.Monasterio mo = com.darkcraft.morvain.Monasterio.get();
+                com.darkcraft.morvain.Ermita v = com.darkcraft.morvain.Ermita.get();
+                int hechos = 0;
+                for (long c : mo.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    mo.construir(lvl, cx, cz, RandomSource.create(c));
+                }
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("La ermita: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " helados; "
+                        + v.escalones + " escalones (" + v.cortados() + " entre muros), " + v.pilares + " pilares, " + v.braseros().size()
+                        + " braseros; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas()) marcas.put("H" + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarErmita(lvl, v);
+            }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);
@@ -673,6 +713,67 @@ public class Volcado {
             }
         }
         System.out.println("helados: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
+    }
+
+    /**
+     * La ermita (parte 7l): se llega a pie desde el postigo del huerto del monasterio a todo (la escalera, el calvario, la
+     * ermita, la cruz); cada helado cabe y tiene suelo; donde reza el abad (1,6 x 4,8) no hay nada.
+     */
+    static void andarErmita(WorldGenLevel lvl, com.darkcraft.morvain.Ermita v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+        int[] e = v.sitio("postigo");
+        int X = com.darkcraft.morvain.Ermita.CX, Z = com.darkcraft.morvain.Ermita.CZ;
+        var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], X - 34, Z - 58, X + 34, com.darkcraft.morvain.Ermita.ESC_Z0 + 12, 3_000_000);
+        StringBuilder sb = new StringBuilder("a pie desde el postigo: " + z0.celdas() + " celdas;");
+        for (String s : v.sitios().keySet()) {
+            if (s.equals("cruz_alta")) continue;
+            int[] q = v.sitio(s);
+            sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+        }
+        System.out.println(sb);
+        // la escalera, escalon a escalon: se pisa y no hay nada encima (tres de alto)
+        int malEsc = 0;
+        for (int z = com.darkcraft.morvain.Ermita.ESC_Z1; z <= com.darkcraft.morvain.Ermita.ESC_Z0; z++) {
+            int h = com.darkcraft.morvain.Ermita.escalon(z);
+            for (int dx = -1; dx <= 1; dx++) {
+                int x = com.darkcraft.morvain.Ermita.ESC_X + dx;
+                boolean bien = choca(mundo.en(x, h - 1, z)) && !choca(mundo.en(x, h, z)) && !choca(mundo.en(x, h + 1, z)) && !choca(mundo.en(x, h + 2, z));
+                if (!bien) {
+                    malEsc++;
+                    if (malEsc < 12) System.out.println("  escalon raro en " + x + "," + h + "," + z + ": " + mundo.en(x, h - 1, z) + " / " + mundo.en(x, h, z) + " / "
+                            + mundo.en(x, h + 1, z) + " / " + mundo.en(x, h + 2, z));
+                }
+            }
+        }
+        System.out.println("escalera: " + v.escalones + " escalones, raros " + malEsc);
+        int malos = 0, chocan = 0, sinSuelo = 0;
+        for (var o : v.esperas()) {
+            if (!z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                malos++;
+                System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z());
+            }
+            for (int dy = 0; dy < 3; dy++)
+                if (choca(mundo.en(o.x(), o.y() + dy, o.z()))) {
+                    chocan++;
+                    System.out.println("  " + o.grupo() + " metido en un bloque: " + o.x() + "," + (o.y() + dy) + "," + o.z() + " " + mundo.en(o.x(), o.y() + dy, o.z()));
+                }
+            if (!choca(mundo.en(o.x(), o.y() - 1, o.z()))) {
+                sinSuelo++;
+                System.out.println("  " + o.grupo() + " sin suelo: " + o.x() + "," + o.y() + "," + o.z() + " " + mundo.en(o.x(), o.y() - 1, o.z()));
+            }
+        }
+        System.out.println("helados: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
+        int[] a = v.sitio("abad");
+        int estorba = 0;
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dz = -1; dz <= 1; dz++)
+                for (int y = a[1]; y <= a[1] + 5; y++)
+                    if (choca(mundo.en(a[0] + dx, y, a[2] + dz))) {
+                        estorba++;
+                        System.out.println("  estorba al abad: " + (a[0] + dx) + "," + y + "," + (a[2] + dz) + " " + mundo.en(a[0] + dx, y, a[2] + dz));
+                    }
+        System.out.println("el abad: suelo " + mundo.en(a[0], a[1] - 1, a[2]) + ", lo que estorba donde reza " + estorba + " (tiene que ser 0)");
     }
 
     /** Si un bloque tiene caja de choque (sin la cache de formas del juego, que fuera de el no esta hecha). */

@@ -1904,6 +1904,85 @@ que la torre, con una mitra de hielo"—).
   frio, sin efectos y en creativo**: cada golpe (del veneno, del frio) cierra las pantallas (asi salieron vacias las `mv119`/`mv120` de
   la build 145).
 
+### Plan grande, parte 7l: Hrodric, el Abad de la Cumbre (el jefe de las Montanas Nevadas)
+
+Respuestas 125 y 131 del plan; el cuarto jefe de Morvain (el del libro perdido 21: "subio a la cumbre a pedirle al frio que nos
+perdonara, y el frio le contesto... y no te arrodilles nunca en esta casa").
+- **La escalera de los penitentes y la Ermita de la Cumbre** (`morvain/Ermita`, en las Montanas Nevadas, al norte del monasterio;
+  el centro del calvario en (3326, -5612), `SUELO` = 385; se dibuja chunk a chunk al adornar, despues del monasterio; en su caja
+  `Adorno` no pone nada): la **escalera** sale del **postigo** del huerto del monasterio (`Monasterio.postigo`: un hueco en la
+  muralla del norte con su dintel) y sube recta al norte (x = 3326, tres de ancho, de -5484 a -5596; `Ermita.escalon(z)`: nunca
+  sube mas de uno por fila —una pasada hacia arriba con la ladera y otra hacia abajo para llegar al calvario—, peldanos de
+  `stone_brick_stairs`); donde va por debajo de la ladera, **entre muros** cortados en la roca (con hornacinas con farol cada doce y
+  **estaciones**: cruces de hielo metidas en el muro), donde va por encima, sobre su relleno con pretil y contrafuertes, y a ras,
+  con bordillo y faroles en postes. Arriba, en un circo de la montana, el **calvario**: una terraza redonda (`R_PLAZA` 16, se funde
+  con la ladera en 12,5) de sillares con un anillo de andesita, la **rosa de hielo** en el centro (donde reza el abad; sin nieve),
+  ocho **pilares** rotos alrededor y dos con dintel en la entrada, un **murete caido** (r 21-22), los **cuatro braseros**
+  encendidos en (±9, ±9) (`Ermita.braseros`) y al norte, un escalon mas arriba, la **ermita**: muros de 7, puerta con arco,
+  ventanas con barrotes y rosetones, tejado a dos aguas de pizarra, la **espadana** con su campana, dentro el altar con velas, la
+  cruz de hielo, reclinatorios, un farol y el **arcon** (`chests/ermita`: piedras de forja II y III, talismanes, hechizos, frutos de
+  la escarcha, algun libro encantado); detras, en lo alto, una **gran cruz de hielo** de 18. Sitios (`Ermita.sitio`): `postigo`,
+  `escalera`, `mitad`, `corte`, `entrada`, `ante_abad`, `abad`, `calvario`, `ermita`, `puerta_ermita`, `altar`, `arcon`, `cruz`,
+  `brasero_0..3`, `cruz_alta`. El Espejo: "La Escalera de los Penitentes" y "La Ermita de la Cumbre" (`Morvain.lugar`).
+- **Los helados de la escalera** (`MorvainEnemigos`, sitio `ermita`, 8, de `Ermita.esperas`): seis de rodillas por la escalera
+  rezando hacia la cumbre (cada quince o veinte filas: en lo llano en medio; en el tramo empinado en un escalon, a un lado) y dos
+  peregrinos enterrados a los lados de la llegada al calvario.
+- **El Abad** (`enemigos/Abad`, entidad `darkcraft:abad`, 1,6 x 4,6; hereda de `Guardian`): modelo de `tools/enemigos/abad.py` (un
+  viejo gigante helado: la mitra de hielo con sus cristales e infulas, la barba con carambanos, la capa carmesi con capillo, estola y
+  broche de oro, el alba blanca con escarcha, cristales de hielo en la espalda, mangas con carambanos; el baculo largo con la voluta
+  y un cristal que luce; escala 2, `AbadAnims.ESCALA`; `client/enemigos/AbadModelo` y `AbadRenderer`, que apaga el brillo mientras
+  muere). 1100 de vida, golpe 14, armadura 10. **El frio no le hace nada; el fuego, un 50 % mas.** Espera **de rodillas en la rosa
+  de hielo, de cara a la ermita, rezando** (postura `REZA`; el puesto 0 del sitio `cumbre`, grupo `Puestos.JEFE`; `sfx.abad_rezo`
+  de vez en cuando: se le oye desde la escalera).
+- **La pelea**: al verle (16 bloques) dice la frase 1 mientras se levanta y al acabarla ruge. Despues: el **baculazo** (alza el
+  baculo y lo estrella delante: del golpe brota una **fila de puas de hielo** por el suelo hasta 12 bloques —`EfectosRaiz.estaca`, el
+  dano al brotar; de lado se libra—; a media vida, tres filas en abanico), el **barrido** a media altura (frena), el **pisoton** a
+  quien se le pega o se le pone detras (dos anillos de puas), el **aliento de la cumbre** (un soplo de 9 bloques que barre de su
+  derecha a su izquierda: hiela, duele y frena) y los **carambanos** (alza el baculo al cielo; bajo cada uno, y en dos o tres sitios
+  mas, una marca de escarcha en el suelo; 22 ticks despues cae alli un carambano enorme —`EfectosRaiz.carambano`, un BlockDisplay
+  que cae de 13 bloques— y revienta; a media vida, otra tanda). Lo que pega, hiela (`Helado.helar`). A **media vida** grita:
+  "¡hermanos, alzaos de la nieve!": se alzan **helados de la nieve** del calvario (efimeros; dos, uno mas por amigo, hasta cuatro) y
+  se levanta la **ventisca** (18 s; vuelve cada 16 mientras dura la pelea): quien no este **junto a un brasero** (`Abad.alCalor`,
+  3,6 bloques) se va helando y, helado del todo, le duele; junto al fuego se deshiela. `Abad.mediaVida()` y `Abad.ventisca(bool)` /
+  `ventiscaSobre(le)` (pruebas).
+- **Voz** (ElevenLabs, `eleven_v4`, **"Elder Rowan"** `N8jsIhEtPnj3PWFmH8hZ`, flow `jCsDZ5HeBZc9gQNRbklp`; 5 frases, tomas a; en
+  `procesar.py` `voz_abad`: algo mas grave, una segunda voz una octava por debajo muy baja, un poco de brillo frio y el eco largo de
+  la cumbre): linea **90 + N** (`Voces.BASE_ABAD`, `esAbad`; `habla_abad` en `rey_voces.json`; subtitulos `darkcraft.abad.voz.N`): 1
+  al empezar (no la repite en 4 min), 2 al llamar a sus hermanos, 3 si cae su presa, 4 la primera vez que alguien se hiela del todo
+  con la ventisca y 5 al morir.
+- **Barra** (`GuardianCliente`, arte de `tools/hud/barra_guardianes.py` "abad": el marco de hielo con carambanos y el baculo;
+  relleno de escarcha; caen copos que se mecen). **Musica**: "Final Confrontation" de tcarisland (CC-BY 4.0, id `abad`, tema 36 de
+  `ClientMusic.boss`).
+- **Al caer** se queda de rodillas apoyado en el baculo y **se rompe en hielo** (`tickDeath` propio); lo demas lo reparte
+  `valdrenn/Guardianes`: el cartel de JEFE ABATIDO con 11000 ecos, la hazana `abad` ("El ultimo toque", con su entrada del diario) y
+  el bestiario; deja dos piedras de forja III, dos II y la ceniza de la escarcha. **La cumbre queda en paz** (`Ermita.liberar`, desde
+  `Puestos.alCaer`): los hermanos que seguian de rodillas en la **iglesia del monasterio** se deshacen en escarcha y la **campana del
+  monasterio da su ultimo toque** para todos los de alrededor; ya no suena sola (`Morvain.onTick`) y los de la iglesia **ya no
+  vuelven** (el sitio `monasterio` se registra con `activo` = los del grupo `iglesia` solo mientras el Abad no este muerto:
+  `Ermita.enPaz`; `Ermita.paz` repasa cada 5 s los que quedaran). Los demas del monasterio siguen.
+- Sonidos (ElevenLabs, flow `GbVjOICP5JrNCshfCnzi`, `TOMAS_SFX`): `abad_grito` (3 y 4), `abad_baculazo` (3 y 1), `abad_barrido`
+  (3 y 1), `abad_pisoton` (4 y 3), `abad_aliento` (4 y 1), `abad_invocar` (1 y 3), `abad_carambano` (3, 1 y 4), `abad_ventisca`
+  (2 y 4, 18 s, `stream`), `abad_dolor` (2, 4 y 1), `abad_muerte` (2 y 3), `abad_rezo` (4 y 3).
+- Comandos `/darkcraft ermita [ir <sitio> | enemigos [volver | fuera | sacar]]` y `/darkcraft abad [ir | vencer | volver]` (sin
+  mas: como esta; `volver` le pone otra vez de rodillas y vuelven los hermanos de la iglesia).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_ermita carpeta` (con el monasterio debajo): la escalera, el calvario, la
+  ermita y la cruz con las marcas de los helados (H); si se llega a pie desde el postigo a cada sitio, la escalera escalon a escalon
+  (se pisa y hay hueco encima; ojo: un poco de nieve cuenta como bloque), que ningun helado esta metido en un bloque y que donde reza
+  el Abad no estorba nada.
+- Pruebas: servidor, lineas `Morvain, la ermita de la cumbre: ...` (los braseros encendidos, el arcon, la campana, la rosa, la cruz,
+  el suelo del calvario; la escalera; a pie desde el postigo; vistas `morvain_ermita.png` y `morvain_escalera.png`), `Morvain, la
+  escalera de los penitentes: ...`, `Morvain, el Abad: ...` (de rodillas en la rosa; al verle habla, se levanta y ruge al acabar la
+  frase; cada accion acaba), `Morvain, los golpes del Abad a un marchito: ...` (el baculazo de cerca y sus puas de lejos, el
+  barrido, el pisoton, el aliento, los carambanos), `Morvain, la ventisca del Abad: ...` (lejos de los braseros se hiela y le
+  duele; junto a uno, se deshiela), `Morvain, el Abad a media vida: ...` (se alzan sus hermanos, la ventisca; el frio no le hace
+  nada y el fuego mas), `Morvain, el Abad cae: ...` (la cumbre en paz; los de la iglesia descansan y ya no salen) y `Morvain, el
+  Abad vuelve: ...`; cliente, tramo `abad()` despues del monasterio: la escalera desde el postigo (`cliente_mv155`), a media subida
+  (`mv156`) y entre muros (`mv157`), llegar al calvario con el cartel (`mv158`), el calvario desde lo alto (`mv159`), el Abad
+  rezando (`mv160`), la ermita (`mv161`), la cruz (`mv162`), en supervivencia habla (`mv163`) y ruge con su barra (`mv164`), sus
+  golpes (`mv165..mv169`: baculazo, barrido, pisoton, aliento, carambanos), llama a sus hermanos (`mv170`), la ventisca (`mv171`),
+  junto al brasero (`mv172`), cae de rodillas (`mv173`) y se rompe (`mv174`), el cartel (`mv175`), la iglesia en paz (`mv176`) y el
+  bestiario (`mv177`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1914,7 +1993,8 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j y la 7k arriba; despues, region a region su contenido).
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j, la 7k y la 7l arriba; despues, region a region su
+  contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

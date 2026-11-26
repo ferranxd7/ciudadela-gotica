@@ -175,6 +175,13 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el monasterio en el chunk {}", c.getPos(), t);
         }
+        // la escalera de los penitentes y la ermita de la cumbre, donde reza el Abad (parte 7l): despues del monasterio,
+        // que la escalera sale por el postigo de su huerto
+        try {
+            if (Ermita.toca(c.getPos().x, c.getPos().z)) Ermita.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la ermita en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

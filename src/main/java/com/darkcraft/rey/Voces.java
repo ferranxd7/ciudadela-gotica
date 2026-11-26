@@ -27,6 +27,8 @@ public final class Voces {
     public static final int BASE_VERDUGO = 70;
     /** Las del Barquero de la Laguna Negra (parte 7j): 80 + N (1..5). */
     public static final int BASE_BARQUERO = 80;
+    /** Las de Hrodric, el Abad de la Cumbre (parte 7l): 90 + N (1..5). */
+    public static final int BASE_ABAD = 90;
     /** Pausa entre dos frases seguidas (ticks): 0,3 s. */
     public static final int PAUSA = 6;
     /** Lo que se queda el subtitulo despues de acabar de hablar (ticks): 0,8 s. */
@@ -40,6 +42,7 @@ public final class Voces {
     private static final float[] MOLINERA = {0, 9.0f, 6.43f, 3.86f, 4.39f, 4.67f};
     private static final float[] VERDUGO = {0, 5.82f, 4.09f, 2.36f, 3.1f, 5.46f};
     private static final float[] BARQUERO = {0, 5.2f, 3.9f, 2.4f, 1.4f, 4.1f};
+    private static final float[] ABAD = {0, 8.25f, 5.2f, 3.5f, 2.7f, 5.3f};
     // la Sombra en las cinematicas (1..6 la de inicio, 7..9 el viaje a Valdrenn)
     private static final float[] SOMBRA = {0, 2.26f, 4.23f, 3.56f, 6.57f, 5.44f, 3.17f, 6.06f, 5.98f, 4.63f};
 
@@ -51,6 +54,7 @@ public final class Voces {
                 leer(o, "habla_molinera", MOLINERA);
                 leer(o, "habla_verdugo", VERDUGO);
                 leer(o, "habla_barquero", BARQUERO);
+                leer(o, "habla_abad", ABAD);
                 leer(o, "habla_sombra", SOMBRA);
                 if (o.has("habla")) {
                     leer(o, "habla", REY);
@@ -93,15 +97,20 @@ public final class Voces {
     }
 
     public static boolean esBarquero(int linea) {
-        return linea > BASE_BARQUERO && linea < BASE_GAVRAN;
+        return linea > BASE_BARQUERO && linea < BASE_ABAD;
     }
 
-    /** Si la linea existe (1..13 el Rey, 41..45 el Capitan, 61..65 la Molinera, 71..75 el Verdugo, 81..85 el Barquero, 101..118 Gavran). */
+    public static boolean esAbad(int linea) {
+        return linea > BASE_ABAD && linea < BASE_GAVRAN;
+    }
+
+    /** Si la linea existe (1..13 el Rey, 41..45 el Capitan, 61..65 la Molinera, 71..75 el Verdugo, 81..85 el Barquero, 91..95 el Abad, 101..118 Gavran). */
     public static boolean valida(int linea) {
         if (esCapitan(linea)) return linea - BASE_CAPITAN < CAPITAN.length;
         if (esMolinera(linea)) return linea - BASE_MOLINERA < MOLINERA.length;
         if (esVerdugo(linea)) return linea - BASE_VERDUGO < VERDUGO.length;
         if (esBarquero(linea)) return linea - BASE_BARQUERO < BARQUERO.length;
+        if (esAbad(linea)) return linea - BASE_ABAD < ABAD.length;
         return esGavran(linea) ? linea - BASE_GAVRAN < GAVRAN.length : linea > 0 && linea < REY.length;
     }
 
@@ -122,6 +131,10 @@ public final class Voces {
         if (esBarquero(linea)) {
             int n = linea - BASE_BARQUERO;
             return n > 0 && n < BARQUERO.length ? BARQUERO[n] : 4f;
+        }
+        if (esAbad(linea)) {
+            int n = linea - BASE_ABAD;
+            return n > 0 && n < ABAD.length ? ABAD[n] : 4f;
         }
         if (esGavran(linea)) {
             int n = linea - BASE_GAVRAN;
@@ -158,6 +171,10 @@ public final class Voces {
         }
         if (esBarquero(linea)) {
             int n = linea - BASE_BARQUERO;
+            return n == 3 || n == 4;
+        }
+        if (esAbad(linea)) {
+            int n = linea - BASE_ABAD;
             return n == 3 || n == 4;
         }
         if (esGavran(linea)) {

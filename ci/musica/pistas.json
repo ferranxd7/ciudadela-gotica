@@ -180,5 +180,16 @@
     "aviso": "Music by Scrabbit (OpenGameArt)",
     "uso": "El Barquero de la Laguna Negra (el jefe del Pantano Podrido de Morvain)",
     "lufs": -16
+  },
+  {
+    "id": "abad",
+    "pagina": "https://opengameart.org/node/165847",
+    "busca": "final_confrontation",
+    "titulo": "Final Confrontation",
+    "autor": "tcarisland",
+    "licencia": "CC-BY 4.0",
+    "aviso": "Music by tcarisland (OpenGameArt)",
+    "uso": "Hrodric, el Abad de la Cumbre (el jefe de las Montañas Nevadas de Morvain)",
+    "lufs": -16
   }
 ]

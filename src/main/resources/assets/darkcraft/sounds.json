@@ -3565,5 +3565,187 @@
         "stream": true
       }
     ]
+  },
+  "sfx.abad_grito": {
+    "subtitle": "subtitles.darkcraft.sfx.abad_grito",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/abad_grito_1"
+      },
+      {
+        "name": "darkcraft:sfx/abad_grito_2"
+      }
+    ]
+  },
+  "sfx.abad_baculazo": {
+    "subtitle": "subtitles.darkcraft.sfx.abad_baculazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/abad_baculazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/abad_baculazo_2"
+      }
+    ]
+  },
+  "sfx.abad_barrido": {
+    "subtitle": "subtitles.darkcraft.sfx.abad_barrido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/abad_barrido_1"
+      },
+      {
+        "name": "darkcraft:sfx/abad_barrido_2"
+      }
+    ]
+  },
+  "sfx.abad_pisoton": {
+    "subtitle": "subtitles.darkcraft.sfx.abad_pisoton",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/abad_pisoton_1"
+      },
+      {
+        "name": "darkcraft:sfx/abad_pisoton_2"
+      }
+    ]
+  },
+  "sfx.abad_aliento": {
+    "subtitle": "subtitles.darkcraft.sfx.abad_aliento",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/abad_aliento_1"
+      },
+      {
+        "name": "darkcraft:sfx/abad_aliento_2"
+      }
+    ]
+  },
+  "sfx.abad_invocar": {
+    "subtitle": "subtitles.darkcraft.sfx.abad_invocar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/abad_invocar_1"
+      },
+      {
+        "name": "darkcraft:sfx/abad_invocar_2"
+      }
+    ]
+  },
+  "sfx.abad_carambano": {
+    "subtitle": "subtitles.darkcraft.sfx.abad_carambano",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/abad_carambano_1"
+      },
+      {
+        "name": "darkcraft:sfx/abad_carambano_2"
+      },
+      {
+        "name": "darkcraft:sfx/abad_carambano_3"
+      }
+    ]
+  },
+  "sfx.abad_ventisca": {
+    "subtitle": "subtitles.darkcraft.sfx.abad_ventisca",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/abad_ventisca_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/abad_ventisca_2",
+        "stream": true
+      }
+    ]
+  },
+  "sfx.abad_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.abad_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/abad_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/abad_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/abad_dolor_3"
+      }
+    ]
+  },
+  "sfx.abad_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.abad_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/abad_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/abad_muerte_2"
+      }
+    ]
+  },
+  "sfx.abad_rezo": {
+    "subtitle": "subtitles.darkcraft.sfx.abad_rezo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/abad_rezo_1"
+      },
+      {
+        "name": "darkcraft:sfx/abad_rezo_2"
+      }
+    ]
+  },
+  "musica.abad": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/abad",
+        "stream": true
+      }
+    ]
+  },
+  "abad.voz.1": {
+    "subtitle": "subtitles.darkcraft.abad.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:abad/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "abad.voz.2": {
+    "subtitle": "subtitles.darkcraft.abad.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:abad/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "abad.voz.3": {
+    "subtitle": "subtitles.darkcraft.abad.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:abad/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "abad.voz.4": {
+    "subtitle": "subtitles.darkcraft.abad.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:abad/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "abad.voz.5": {
+    "subtitle": "subtitles.darkcraft.abad.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:abad/voz_5",
+        "stream": false
+      }
+    ]
   }
 }
