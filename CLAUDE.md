@@ -1236,7 +1236,65 @@ Respuestas 57-67 del plan.
   `cliente_f301_capitulo6_titulo` ... `f310_..._final` (las gemas, los pilares, las nubes, el rayo, el cielo rojo),
   `cliente_f40c_luna_sangre`, `cliente_f40d_cielo_rojo` y las lineas `tras el rayo: cielo rojo SI ... columnas 1`.
 
-### Lo siguiente: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
+### Plan grande, parte 6: Distant Horizons, Oculus y Embeddium dentro del mod
+
+Respuestas 71, 72, 82-84, 131, 134 y 135 del plan.
+- **Dentro del jar** (`ci/dentro/meter.py`, paso de la CI justo despues de compilar): baja de Modrinth (Forge, 1.20.1) las
+  versiones fijadas en `ci/dentro/mods.json` (Distant Horizons 3.3.2-1.20.1, Oculus 1.20.1-1.8.0, Embeddium
+  0.3.31+mc1.20.1; si una ya no esta, la mas nueva con el mismo principio, avisando), comprueba su sha512 y las mete SIN
+  CAMBIOS en `META-INF/jarjar/` (guardadas sin comprimir) con `META-INF/jarjar/metadata.json` (el jar-in-jar de Forge:
+  `identifier` maven.modrinth:<proyecto>, `range` [version] exacta, `isObfuscated` false). Forge las carga como mods
+  normales (tambien los jars que lleva Oculus dentro). Licencias (`ci/dentro/LGPL-3.0.txt` y `GPL-3.0.txt`, las de
+  Debian) y `CREDITOS-MODS.txt` (version, sha512, codigo fuente) en `META-INF/darkcraft/`; los creditos van tambien en la
+  pagina de cada release publicada (`out/notas.md`), en el README y en la descripcion del mod (`gradle.properties`).
+  `out/mods_dentro.txt` dice lo que pide cada uno (Forge, mixins).
+- **El shader: Complementary Shaders - Unbound** (EminGT). Su licencia (Complementary License Agreement 1.8, punto 1.2.d)
+  NO deja subirlo dentro del jar: se anade "con el sistema de Modrinth". `meter.py` lo baja a `out/shaderpacks/` (solo
+  para la prueba del cliente; no se sube a la release) y escribe `out/shader.json`; el **instalador** lo baja a
+  `.minecraft/shaderpacks/` y el **modpack** (`ci/make_mrpack.py`) lo lleva como un fichero mas de Modrinth. Tampoco se le
+  cambian opciones (la licencia prohibe hasta "simple variable changes").
+- **El instalador lo escribe la CI** (`ci/instalador.py` → `out/instalar_mods.bat`, CRLF, subido a cada release): los mods
+  de decoracion que ha probado la CI (`srv/mrpack_files.json`), Dark Craft (de la ultima release) y el shader; avisa de
+  subir la memoria de TLauncher a 8 GB. `instalar_mods.bat` del repositorio es una copia de uno de esos.
+- **El arranque** (`com.darkcraft.arranque`): `darkcraft.mixins.json` (en el manifiesto del jar, `MixinConfigs`) solo
+  tiene su plugin `Arranque`, que Mixin carga antes que el juego. En el cliente, `PorDefecto.aplicar` pone UNA vez por
+  instalacion (lo apunta en `config/darkcraft-arranque.properties`: `lejania=<version>`, `shaders=1`): en
+  `config/DistantHorizons.toml` la lejania a 256 (`[client.advanced.graphics.quality] lodChunkRenderDistanceRadius`), sin
+  actualizador (`[client.advanced.autoUpdater] enableAutoUpdater = false`: DH no puede actualizarse dentro de otro jar)
+  y con las nubes en la lejania (`[client.advanced.graphics.culling] blocksToIgnore = "NONE"`: con NON_COLLIDING, el de DH,
+  el mar de nubes —que no tiene choque— no salia); si hay un Complementary en `shaderpacks/`, en `config/oculus.properties`
+  `shaderPack` ese y `enableShaders=true`. Tiene que ser asi de pronto: **Oculus lee su configuracion al crear las
+  opciones del juego (`Options.load`), antes de construir los mods**. `DH_VERSION` sube si cambia lo de DH (se vuelve a
+  poner una vez). En un servidor dedicado, `PorDefecto.servidor` solo quita el actualizador de DH.
+- **Servidor dedicado** (respuesta 84): Oculus es solo del cliente y su clase de mod (`net.irisshaders.iris.Iris`) no
+  carga en un servidor (toca pantallas y teclas que no existen: "invalid dist DEDICATED_SERVER"). El mixin vacio
+  `arranque/mixin/OculusEnServidor` (solo en `"server"`, `@Pseudo`) hace que Mixin pase esa clase por
+  `Arranque.preApply`, que le quita todos los metodos salvo `<clinit>` y un constructor vacio: Forge la construye y
+  Oculus no hace nada. Embeddium y DH van solos en un servidor (DH genera alli la lejania para los jugadores).
+- **En el cliente** (`client/Lejania`, por reflexion: el mod va igual sin ellos): la API de DH (`DhApi.Delayed.configs`:
+  `graphics().chunkRenderDistance()`, `renderingEnabled()`, `renderingMode()`, `worldGenerator().enableDistantWorldGeneration()`;
+  `setValue` pone un valor "de la API" que manda en la sesion sin guardarse, `clearValue` lo quita; **ojo: poner
+  `renderingEnabled` cambia tambien `renderingMode`, y quitarlo despues no lo devuelve**) y la de Iris
+  (`IrisApi.getInstance().getConfig().setShadersEnabledAndApply`, `isShaderPackInUse`). Las opciones del mod abren la
+  pantalla de Embeddium en Graficos, la de Oculus en Shaders y la de DH en Lejania (`ConfigScreenHandler`). El titulo
+  avisa si el lanzador da menos de 5,5 GB (`darkcraft.titulo.memoria`).
+- **Con shaders** lo dibujado a mano con `BufferUploader` en el cielo salia roto (triangulos rosas): el velo rojo y la luna
+  de sangre (`CieloRojoCliente.cielo`) no se dibujan si `Lejania.shadersEnUso()`; el cielo rojo queda en la niebla (el
+  pack la usa para sus nubes de noche), el mar de nubes tenido y las columnas. Lo que va por `RenderType` (entidades,
+  `Tipos.BRILLO` de los avisos del suelo, el remolino) se dibuja con el programa del pack.
+- **La prueba del cliente es el juego de verdad** (`ci/cliente/lanzar.sh`): portablemc 5.0.6 (en un venv) instala Forge
+  47.3.0 (cache `~/.pmc`) y lanza el jar de la release con DH, Oculus y Embeddium; `-Ddarkcraft.ciClient=true`, 5 GB.
+  Si portablemc falla o el juego no entra en el mundo en 14 min, se corta y se repite con `gradle runClient` (sin esos
+  mods; `out/cliente_modo.txt` dice cual fue). Por eso en `ClientCiTest` nada de reflexion con nombres de desarrollo
+  (abrir el mundo y las capturas van directas; el titulo de la pantalla se busca por el orden de los campos). Al empezar
+  apunta lo que dejo el arranque y apaga shaders y lejania (con el dibujo por software irian lentisimos); el tramo
+  `lejania()` del final los enciende: `cliente_l01..03` lejania sin shaders (sin el cielo rojo), `l04..l09` con shaders
+  (Brumavela, la fortaleza, Valdrenn, el portal con el cielo rojo, el jardin y una vitrina: santuario, enemigos y avisos
+  de jefe). Se suben tambien `cliente_config_*.txt` (las configuraciones de DH y Oculus), `crash_*.txt` y los logs.
+- Las capturas de los demas tramos salen iguales que en desarrollo (Embeddium dibuja los bloques, los brillos y las
+  runas igual).
+
+### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5a, la torre bajo la cupula**: hecha (arriba).
@@ -1245,6 +1303,8 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5d, el camino de nubes**: hecha (arriba).
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
+- Despues, la **parte 6** (arriba) y lo siguiente: la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y
+  125-132 de `PLAN.md`), por regiones.
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 
