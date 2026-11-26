@@ -1527,7 +1527,8 @@ prueba 136 bien.
 
 ### Plan grande, parte 7f: la Molinera de Velmor (el jefe de las Llanuras Palidas) y su molino
 
-Respuestas 125 ("mas de 10 jefes principales, varios por region") y 131 del plan; el primer jefe de Morvain.
+Respuestas 125 ("mas de 10 jefes principales, varios por region") y 131 del plan; el primer jefe de Morvain. Publicada con
+la build de prueba 138 bien.
 - **La Molinera** (`enemigos/Molinera`, entidad `darkcraft:molinera`, 1,3 x 3,7; hereda de `Guardian`: barra, musica, rugido
   al empezar y a media vida, vuelve a su puesto con la vida entera si todos caen o se van). La molinera del libro del
   campanero, crecida por la Sombra hasta el doble de alto: modelo de `tools/enemigos/molinera.py` (vieja enorme y encorvada
