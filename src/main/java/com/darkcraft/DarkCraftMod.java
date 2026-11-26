@@ -199,6 +199,16 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_MOLINERA_DOLOR = sound("sfx.molinera_dolor");
     public static final RegistryObject<SoundEvent> SFX_MOLINERA_MUERTE = sound("sfx.molinera_muerte");
     public static final RegistryObject<SoundEvent> SFX_MOLINO_VIENTO = sound("sfx.molino_viento");
+    // los ahorcados del Bosque Muerto (parte 7g) y el viento de su arboleda
+    public static final RegistryObject<SoundEvent> SFX_AHORCADO_SOGA = sound("sfx.ahorcado_soga");
+    public static final RegistryObject<SoundEvent> SFX_AHORCADO_GEMIDO = sound("sfx.ahorcado_gemido");
+    public static final RegistryObject<SoundEvent> SFX_AHORCADO_ALERTA = sound("sfx.ahorcado_alerta");
+    public static final RegistryObject<SoundEvent> SFX_AHORCADO_CAE = sound("sfx.ahorcado_cae");
+    public static final RegistryObject<SoundEvent> SFX_AHORCADO_ZARPAZO = sound("sfx.ahorcado_zarpazo");
+    public static final RegistryObject<SoundEvent> SFX_AHORCADO_LAZO = sound("sfx.ahorcado_lazo");
+    public static final RegistryObject<SoundEvent> SFX_AHORCADO_DOLOR = sound("sfx.ahorcado_dolor");
+    public static final RegistryObject<SoundEvent> SFX_AHORCADO_MUERTE = sound("sfx.ahorcado_muerte");
+    public static final RegistryObject<SoundEvent> AMBIENTE_ARBOLEDA = sound("ambiente.arboleda");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -390,6 +400,11 @@ public class DarkCraftMod {
                     .isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false)));
     public static final RegistryObject<Item> ESTELA_MAPA_ITEM = ITEMS.register("estela_mapa",
             () -> new net.minecraft.world.item.BlockItem(ESTELA_MAPA.get(), new Item.Properties().rarity(Rarity.EPIC)));
+    /** La soga de la Arboleda de los Ahorcados (parte 7g): cuelga de las ramas; ni se choca con ella ni se rompe. */
+    public static final RegistryObject<Block> SOGA = BLOCKS.register("soga", () -> new com.darkcraft.morvain.SogaBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BROWN).strength(-1.0F, 3600000.0F).noLootTable().noOcclusion()
+                    .noCollission().sound(SoundType.WOOL).pushReaction(PushReaction.BLOCK).isValidSpawn((st, l, p, t) -> false)
+                    .isRedstoneConductor((st, l, p) -> false).isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false)));
     /** Los frascos no son objetos que se lleven en el inventario (van en la ficha): estos solo sirven para dibujarlos en la mano al beber. */
     public static final RegistryObject<Item> FRASCO_VIDA = ITEMS.register("frasco_vida",
             () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
@@ -461,6 +476,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Marchito>> MARCHITO = ENTITIES.register("marchito",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Marchito>of(com.darkcraft.enemigos.Marchito::new, MobCategory.MONSTER)
                     .sized(0.6f, 2.05f).clientTrackingRange(8).build(MODID + ":marchito"));
+    // ---- los ahorcados del Bosque Muerto (parte 7g)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Ahorcado>> AHORCADO = ENTITIES.register("ahorcado",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Ahorcado>of(com.darkcraft.enemigos.Ahorcado::new, MobCategory.MONSTER)
+                    .sized(0.6f, 2.4f).clientTrackingRange(8).build(MODID + ":ahorcado"));
     // ---- la Molinera de Velmor, el jefe de las Llanuras Palidas (parte 7f)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Molinera>> MOLINERA = ENTITIES.register("molinera",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Molinera>of(com.darkcraft.enemigos.Molinera::new, MobCategory.MONSTER)
@@ -626,6 +645,7 @@ public class DarkCraftMod {
         e.put(CABALLERO_BALLESTA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
         e.put(HUECO.get(), com.darkcraft.enemigos.Hueco.atributos().build());
         e.put(MARCHITO.get(), com.darkcraft.enemigos.Marchito.atributos().build());
+        e.put(AHORCADO.get(), com.darkcraft.enemigos.Ahorcado.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());

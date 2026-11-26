@@ -728,6 +728,183 @@ public final class CiTest {
         }
         velmor(server, m, log, out);
         molinera(server, m, log, out);
+        arboleda(server, m, log, out);
+    }
+
+    /**
+     * Parte 7g: la Arboleda de los Ahorcados (el Arbol de la Horca, el atril con el libro 19, el arcon, las sogas) y los
+     * ahorcados: los colgados salen bajo su soga, en el aire y sin tocar nada; los demas en el suelo; cada accion acaba; uno
+     * colgado se descuelga hacia su presa (la soga se queda deshilachada) y el golpe de la caida le alcanza; el lazo engancha
+     * y tira de la presa; el salto se lanza a por ella; y caen sin dejar el cuerpo.
+     */
+    private static void arboleda(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.ARBOLEDA;
+        var v = com.darkcraft.morvain.Arboleda.get();
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : v.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            log.println("Morvain, la arboleda: " + nch + " chunks en " + (System.currentTimeMillis() - t0) + " ms; " + com.darkcraft.morvain.Arboleda.resumen(m)
+                    + "; santuario " + com.darkcraft.santuario.Santuarios.nombre(m, com.darkcraft.morvain.SantuariosMorvain.porId("ahorcados").pos()));
+            topView(m, com.darkcraft.morvain.Arboleda.GX + 6, com.darkcraft.morvain.Arboleda.GZ, 56, new File(out, "morvain_arboleda.png"));
+            topView(m, com.darkcraft.morvain.Arboleda.PX, com.darkcraft.morvain.Arboleda.PZ, 14, new File(out, "morvain_arboleda_patibulo.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, la arboleda: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] arboleda", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            int colgados = 0, conSoga = 0, alto = 0, chocan = 0, enSuelo = 0, otros = 0;
+            StringBuilder mal = new StringBuilder();
+            com.darkcraft.enemigos.Ahorcado uno = null;
+            for (var e : fuera) {
+                if (!(e instanceof com.darkcraft.enemigos.Ahorcado a)) continue;
+                if (!m.noCollision(a)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(a.blockPosition().toShortString()).append(';');
+                }
+                if (a.postura() == com.darkcraft.enemigos.Enemigo.COLGADO) {
+                    colgados++;
+                    if (a.soga() != null && m.getBlockState(a.soga()).getBlock() instanceof com.darkcraft.morvain.SogaBlock) conSoga++;
+                    // los pies, entre 0,8 y 1,6 sobre el suelo de su puesto
+                    double sobre = a.getY() - a.hogar().getY();
+                    if (sobre > 0.8 && sobre < 1.6) alto++;
+                    else if (mal.length() < 400) mal.append(String.format(java.util.Locale.ROOT, " colgado a %.2f del suelo;", sobre));
+                    if (uno == null && a.variante() == com.darkcraft.enemigos.Ahorcado.GARRAS) uno = a;
+                } else {
+                    otros++;
+                    if (!m.getBlockState(BlockPos.containing(a.getX(), a.getY() - 0.2, a.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+                    else if (mal.length() < 400) mal.append(' ').append(a.tipo()).append(" en el aire en ").append(a.blockPosition().toShortString()).append(';');
+                }
+            }
+            log.println("Morvain, los ahorcados: " + com.darkcraft.morvain.MorvainEnemigos.comprobar() + "; fuera " + fuera.size() + " de "
+                    + com.darkcraft.morvain.MorvainEnemigos.arboleda().size() + ": colgados " + colgados + " (con su soga encima " + conSoga + ", a la altura "
+                    + alto + "), los demas " + otros + " (en el suelo " + enSuelo + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5f2b8c1e-3d4a-4e6b-9a7c-1b2d3e4f5a6d"), "[DarkCraftCI3]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            StringBuilder sb = new StringBuilder("Morvain, los ahorcados en accion:");
+            // ---- se descuelga: hacia su presa (un marchito a 3 bloques), la soga se queda deshilachada y el golpe le alcanza
+            if (uno != null) {
+                var victima = DarkCraftMod.MARCHITO.get().create(m);
+                if (victima != null) {
+                    BlockPos h = uno.hogar();
+                    double vy = com.darkcraft.enemigos.Puestos.suelo(m, h.getX() + 3, h.getY(), h.getZ());
+                    victima.moveTo(h.getX() + 3.5, vy, h.getZ() + 0.5, 90f, 0f);
+                    m.addFreshEntity(victima);
+                    quitar.add(victima);
+                    double antes = Math.hypot(uno.getX() - victima.getX(), uno.getZ() - victima.getZ());
+                    float vida = victima.getHealth();
+                    int caidas = com.darkcraft.enemigos.Ahorcado.CAIDAS;
+                    BlockPos soga = uno.soga();
+                    uno.setTarget(victima);
+                    int suelta = -1;
+                    for (int k = 0; k < 60; k++) {
+                        uno.tickCount++;
+                        uno.tick();
+                        victima.tick();
+                        if (suelta < 0 && uno.accion() == com.darkcraft.enemigos.AhorcadoAnims.CAER) suelta = k;
+                        if (suelta >= 0 && uno.accion() == 0) break;
+                    }
+                    double despues = Math.hypot(uno.getX() - victima.getX(), uno.getZ() - victima.getZ());
+                    var parte = soga == null ? null : m.getBlockState(soga).getBlock() instanceof com.darkcraft.morvain.SogaBlock
+                            ? m.getBlockState(soga).getValue(com.darkcraft.morvain.SogaBlock.PARTE) : null;
+                    sb.append(String.format(java.util.Locale.ROOT, " se descuelga en el tick %d, de %.1f a %.1f de su presa, en el suelo %s, postura %d, caidas +%d,"
+                                    + " la presa -%.1f, la soga %s;", suelta, antes, despues, uno.onGround(), uno.postura(), com.darkcraft.enemigos.Ahorcado.CAIDAS - caidas,
+                            vida - victima.getHealth(), parte));
+                }
+            } else sb.append(" NO HAY NINGUNO COLGADO;");
+            // ---- uno de cada en el claro: cada accion acaba; el lazo engancha y tira; el salto se lanza
+            int gx = com.darkcraft.morvain.Arboleda.GX + 8, gz = com.darkcraft.morvain.Arboleda.GZ + 8;
+            double gy = com.darkcraft.enemigos.Puestos.suelo(m, gx, com.darkcraft.morvain.Arboleda.pie(gx, gz), gz);
+            for (int v2 = 0; v2 < 2; v2++) {
+                var a = DarkCraftMod.AHORCADO.get().create(m);
+                if (a == null) continue;
+                a.variante(v2);
+                a.moveTo(gx + 0.5 + v2 * 4, gy, gz + 0.5, 0f, 0f);
+                m.addFreshEntity(a);
+                quitar.add(a);
+                StringBuilder no = new StringBuilder();
+                for (int ac = 1; ac < com.darkcraft.enemigos.AhorcadoAnims.TICKS.length; ac++) {
+                    String nombre = com.darkcraft.enemigos.AhorcadoAnims.NOMBRES[ac];
+                    if (nombre.equals("morir")) continue;
+                    a.setNoGravity(false);
+                    a.empezar(ac);
+                    for (int k = 0; k < 90 && a.accion() == ac; k++) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    if (a.accion() == ac) no.append(' ').append(nombre);
+                    for (int k = 0; k < 10; k++) a.tick();
+                }
+                sb.append(' ').append(a.tipo()).append(": acciones que no acaban").append(no.length() == 0 ? " ninguna" : no).append(';');
+            }
+            // el lazo: a 7 bloques delante
+            var lazo = DarkCraftMod.AHORCADO.get().create(m);
+            var presa = DarkCraftMod.MARCHITO.get().create(m);
+            if (lazo != null && presa != null) {
+                lazo.variante(com.darkcraft.enemigos.Ahorcado.SOGA);
+                lazo.moveTo(gx + 0.5, gy, gz - 8 + 0.5, 0f, 0f);
+                double py = com.darkcraft.enemigos.Puestos.suelo(m, gx, com.darkcraft.morvain.Arboleda.pie(gx, gz - 1), gz - 1);
+                presa.moveTo(gx + 0.5, py, gz - 1 + 0.5, 180f, 0f);
+                m.addFreshEntity(lazo);
+                m.addFreshEntity(presa);
+                quitar.add(lazo);
+                quitar.add(presa);
+                lazo.setTarget(presa);
+                lazo.empezar(com.darkcraft.enemigos.AhorcadoAnims.LAZO);
+                int lazos = com.darkcraft.enemigos.Ahorcado.LAZOS;
+                double antes = lazo.distanceTo(presa);
+                for (int k = 0; k < 60 && lazo.accion() == com.darkcraft.enemigos.AhorcadoAnims.LAZO; k++) {
+                    lazo.tickCount++;
+                    lazo.tick();
+                    presa.tick();
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " el lazo: engancha %s, la presa de %.1f a %.1f;", com.darkcraft.enemigos.Ahorcado.LAZOS > lazos,
+                        antes, lazo.distanceTo(presa)));
+            }
+            // el salto: a 5,5 bloques
+            var salta = DarkCraftMod.AHORCADO.get().create(m);
+            var otra = DarkCraftMod.MARCHITO.get().create(m);
+            if (salta != null && otra != null) {
+                salta.variante(com.darkcraft.enemigos.Ahorcado.GARRAS);
+                salta.moveTo(gx - 6 + 0.5, gy, gz + 0.5, -90f, 0f);
+                double py = com.darkcraft.enemigos.Puestos.suelo(m, gx, com.darkcraft.morvain.Arboleda.pie(gx - 1, gz), gz);
+                otra.moveTo(gx - 0.5, py, gz + 0.5, 90f, 0f);
+                m.addFreshEntity(salta);
+                m.addFreshEntity(otra);
+                quitar.add(salta);
+                quitar.add(otra);
+                salta.setTarget(otra);
+                salta.setYRot(-90f);
+                salta.yBodyRot = salta.yHeadRot = -90f;
+                salta.empezar(com.darkcraft.enemigos.AhorcadoAnims.SALTO);
+                double antes = salta.distanceTo(otra);
+                float vida = otra.getHealth();
+                for (int k = 0; k < 50 && salta.accion() == com.darkcraft.enemigos.AhorcadoAnims.SALTO; k++) {
+                    salta.tickCount++;
+                    salta.tick();
+                    otra.tick();
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " el salto: de %.1f a %.1f, la presa -%.1f;", antes, salta.distanceTo(otra), vida - otra.getHealth()));
+                // cae: sin quedarse el cuerpo
+                salta.setTarget(null);
+                salta.hurt(m.damageSources().playerAttack(fp), 9999f);
+                for (int k = 0; k < 80 && !salta.isRemoved(); k++) salta.tick();
+                sb.append(" uno cae: vivo ").append(salta.isAlive()).append(", quitado ").append(salta.isRemoved());
+            }
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println("Morvain, los ahorcados: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] ahorcados", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
     }
 
     /**

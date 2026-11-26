@@ -48,8 +48,8 @@ public abstract class Enemigo extends Monster {
     private static final EntityDataAccessor<Byte> SERIE = SynchedEntityData.defineId(Enemigo.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Byte> POSTURA = SynchedEntityData.defineId(Enemigo.class, EntityDataSerializers.BYTE);
 
-    /** Como espera en su puesto. */
-    public static final int DE_PIE = 0, REZA = 1, TUMBADO = 2;
+    /** Como espera en su puesto (COLGADO: de la soga de una rama, los ahorcados de la parte 7g). */
+    public static final int DE_PIE = 0, REZA = 1, TUMBADO = 2, COLGADO = 3;
 
     private static final UUID MOD_GRUPO = UUID.fromString("7b1e2c90-5a44-4d7e-9c1b-3f0a6d2e8b11");
     /** El animo (parte 4c): un capitan de elite les arenga (pegan mas) o ha caido el suyo (pegan menos y van mas despacio). */

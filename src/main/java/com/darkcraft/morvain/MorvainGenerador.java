@@ -155,6 +155,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el molino en el chunk {}", c.getPos(), t);
         }
+        // la Arboleda de los Ahorcados, en el Bosque Muerto (parte 7g)
+        try {
+            if (Arboleda.toca(c.getPos().x, c.getPos().z)) Arboleda.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la arboleda en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

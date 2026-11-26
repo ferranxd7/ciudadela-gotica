@@ -1585,6 +1585,62 @@ la build de prueba 138 bien.
   (`mv63..mv67`), a media vida llama a los suyos (`mv68`), cae (`mv69`), el cartel (`mv70`), la reja abierta (`mv71`) y el
   bestiario (`mv72`).
 
+### Plan grande, parte 7g: el Bosque Muerto — los Ahorcados y la Arboleda de los Ahorcados
+
+Respuestas 125, 131 y 132 del plan; la segunda region con su contenido (despues, la **7h**: el jefe del bosque, el Verdugo
+de la Arboleda —Maese Odran, el del libro 19—).
+- **El ahorcado** (`enemigos/Ahorcado`, entidad `darkcraft:ahorcado`, 0,6 x 2,4; modelo de `tools/enemigos/ahorcado.py`: largo
+  y flaco, el cuello estirado y torcido, piel gris verdosa con moratones, camisa y calzones rotos, la soga al cuello —en el
+  torso: la cabeza se ladea sin moverla— y el cabo cortado por la espalda; `AhorcadoGeometria/Animaciones`, `AhorcadoAnims`,
+  `client/enemigos/AhorcadoModelo` y `AhorcadoRenderer`, escala 1,1). 28 de vida, golpe 5, rapido. Dos: **garras**
+  (zarpazo, doble zarpazo y **salto** a quien esta a 3,6-7,5) y **soga** (el del saco en la cabeza: **latigazo** que llega a
+  3,8 y **lazo** a quien esta a 4-10 bloques: en el tick 18 engancha si le entra el golpe —rodar o cubrirse libran— y tira
+  de el hasta sus pies con `hurtMarked`; el cliente dibuja la soga de la mano a quien lleva, como la correa del juego,
+  `AhorcadoRenderer.soga`, con el id sincronizado `LAZO`). Posturas: **colgado** (`Enemigo.COLGADO` = 3, nueva), de
+  rodillas, tumbado o de pie. Bestiario `ahorcado_garras` / `ahorcado_soga`, logro `ahorcado`; a veces una piedra de forja I.
+- **Colgado**: el puesto es el suelo bajo su soga; al salir (`Ahorcado.asignar` → `colgar`) busca la soga de bloques encima
+  (la primera a 1-9 bloques) y se cuelga sin gravedad con el **nudo** justo debajo: el modelo tiene la pieza `colgadero`
+  (pivote en el nudo, `NUDO` de `ahorcado.py`, exportado a `AhorcadoAnims.NUDO_X/Y/Z` y `SOGA_ARRIBA`): el bucle `colgado`
+  lo gira alrededor del nudo y la pieza `soga_arriba` sube 12 px hasta la soga de bloques (`NUDO_ALTO` + `SOGA_ALTO`: los
+  pies 2,84 por debajo del fondo de la soga; el centro 0,30 al otro lado del nudo, segun su giro). Nada le empuja; cruje la
+  soga (`sfx.ahorcado_soga`). **Se descuelga** (`CAER`, la accion de despertar del colgado) sobre quien pasa a menos de
+  `CAIDA` 4,2 en horizontal (agachado, la mitad) o si le pegan: tick 1 la soga se parte (el bloque de abajo pasa a
+  `cabo`; al volver a colgar se rehace), tick 2 cae hacia su presa, tick 8 el golpe de la caida (radio 2,6, 360 grados) con
+  `sfx.ahorcado_cae`. Vuelve a colgar al reaparecer (descansar, morir, o alejarse y volver).
+- **La soga** (`morvain/SogaBlock`, `darkcraft:soga`, irrompible, sin choque; estado `parte`: `cuerda`, `cabo` deshilachado,
+  `lazo` vacio; modelos y textura de `tools/morvain/soga.py`). En las vistas sin juego sale como cadena.
+- **La Arboleda de los Ahorcados** (`morvain/Arboleda`, en el Bosque Muerto, al oeste del santuario "ahorcados" —el de la
+  estela del bosque—; centro del **Arbol de la Horca** en (-4888, 3192); se dibuja como Velmor, chunk a chunk al adornar;
+  `Adorno` solo pone setas y helechos en su caja): el suelo del bosque (podzol, raices, setas, huesos), el **camino** del
+  santuario al claro con picas con calaveras y farolas de almas, la **puerta** (dos arboles a los lados del camino, uno
+  colgado encima), el **Arbol de la Horca** (tronco de 3 x 3, raices al aire, ocho ramas, seis colgados, lazos vacios y
+  cabos; la copa muerta), diez **arboles con sus sogas** alrededor, el **patibulo** al norte (tablado a 3 del suelo con
+  barandilla y escalera al sur, la horca con tres sogas —el colgado sobre la trampilla—, el **atril con el libro perdido 19**
+  "El registro del verdugo" de Maese Odran —`Perdidos.TOTAL` = 19— y un arcon `velmor_bueno`) y las **tumbas** al suroeste
+  (cruces de madera). Lo decidido de cada pieza va en listas de bloques (`Lista` → `Trozo`). Sitios: `arbol`, `claro`,
+  `puerta`, `entrada`, `patibulo`, `atril`, `arcon`, `escalera`, `tumbas`. El Espejo: "La Arboleda de los Ahorcados"
+  (`Morvain.lugar`); logro `arboleda` al entrar; el **viento de la arboleda** (`ambiente.arboleda`, rachas de una de dos
+  tomas: `ClientMusic.tickArboleda`).
+- **Los puestos** (`MorvainEnemigos`, sitio `arboleda`, 22): los catorce colgados que apunta el plano (`Arboleda.colgados`:
+  seis en el Arbol de la Horca, seis en los de alrededor, el de la puerta y el del patibulo) y los demas
+  (`Arboleda.otros`): tres de rodillas al pie del arbol mirando al tronco, tres tumbados entre las tumbas, uno junto al
+  patibulo y otro que ronda por el camino.
+- Sonidos (ElevenLabs, `TOMAS_SFX`): `ahorcado_soga` (4, 1 y 3), `ahorcado_gemido` (4, 1 y 3), `ahorcado_alerta` (2 y 4),
+  `ahorcado_cae` (4, 2 y 1), `ahorcado_zarpazo` (3 y 1), `ahorcado_lazo` (3, 1 y 4), `ahorcado_dolor` (4, 2 y 3),
+  `ahorcado_muerte` (1 y 3), `arboleda_viento` (3 y 2); el chasquido de la soga es el del nudo de una correa del juego.
+- Comandos `/darkcraft arboleda [ir <sitio> | enemigos [volver | fuera | sacar]]` (sin mas: como esta).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_arboleda carpeta` (`-Dcaja=...`): el claro, los arboles, el patibulo
+  y las tumbas con las marcas de los puestos (C colgados, A los demas) y si se llega a pie (de la entrada al arbol, a la
+  puerta, a lo alto del patibulo y a cada puesto) y que cada colgado tiene su soga encima y nada le toca.
+- Pruebas: servidor, lineas `Morvain, la arboleda: ...` (las sogas, el atril con el libro 19, el arcon; vistas
+  `morvain_arboleda*.png`), `Morvain, los ahorcados: ...` (los colgados bajo su soga y a la altura, los demas en el suelo) y
+  `Morvain, los ahorcados en accion: ...` (uno se descuelga hacia su presa y la soga queda deshilachada; cada accion acaba;
+  el lazo engancha y tira; el salto; cae sin dejar el cuerpo); cliente, tramo `arboleda()` despues del molino: desde el
+  santuario (`cliente_mv73`), entrar a pie con el cartel y el logro (`mv74`), el Arbol de la Horca (`mv75`), un colgado de
+  cerca (`mv76`), la puerta (`mv77`), el patibulo (`mv78`), en supervivencia el de la puerta se descuelga al pasar
+  (`mv79`, `mv80`), el lazo (`mv81`), el zarpazo y el salto (`mv82`, `mv83`), las tumbas (`mv84`), el libro del verdugo
+  (`mv85`) y el bestiario (`mv86`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1595,7 +1651,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e y la 7f arriba; despues, region a region su contenido).
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f y la 7g arriba; despues, region a region su contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

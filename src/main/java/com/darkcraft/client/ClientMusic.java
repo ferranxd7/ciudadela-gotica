@@ -223,6 +223,44 @@ public final class ClientMusic {
         }
     }
 
+    // ------------------------------------------------------------------ el viento de la Arboleda de los Ahorcados (parte 7g)
+
+    private static Track arboleda;
+    private static int arboledaTicks;
+    private static boolean enArboleda;
+
+    /**
+     * En la arboleda, rachas de viento entre los arboles muertos (con crujidos de sogas): una toma tras otra (cada vez una de
+     * las dos, al azar), sin musica de jefe ni de cofre encima.
+     */
+    private static void tickArboleda(Minecraft mc) {
+        if (mc.player == null || mc.level == null) enArboleda = false;
+        else if (mc.player.tickCount % 20 == 3)
+            enArboleda = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && com.darkcraft.morvain.Arboleda.dentro(mc.player.getX(), mc.player.getZ())
+                    && mc.player.getY() < 160;
+        boolean quiere = enArboleda && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        if (quiere) {
+            if (arboleda == null || arboleda.dying() || !mc.getSoundManager().isActive(arboleda) && arboledaTicks > 20) {
+                if (arboleda != null && !arboleda.dying()) mc.getSoundManager().stop(arboleda);
+                arboleda = new Track(DarkCraftMod.AMBIENTE_ARBOLEDA.get(), "arboleda", false);
+                arboledaTicks = 0;
+                mc.getSoundManager().play(arboleda);
+                arboleda.fadeTo(0.55f, 1.0f);
+            }
+        } else if (arboleda != null && !arboleda.dying()) arboleda.kill(2.5f);
+        if (arboleda != null) {
+            arboledaTicks++;
+            if (arboleda.dying() && !mc.getSoundManager().isActive(arboleda) && arboledaTicks > 20) arboleda = null;
+        }
+    }
+
+    /** Para la prueba de la CI: si suena el viento de la arboleda. */
+    public static String arboleda() {
+        Minecraft mc = Minecraft.getInstance();
+        return arboleda == null ? "sin viento de la arboleda" : String.format("viento de la arboleda %.2f%s", arboleda.level(),
+                mc.getSoundManager().isActive(arboleda) ? "" : " (parado)");
+    }
+
     // ------------------------------------------------------------------ la pantalla de titulo (parte 2f-2)
 
     private static Track titulo;
@@ -308,6 +346,8 @@ public final class ClientMusic {
         if (zona != null && !zona.dying()) any = true;
         tickBruma(mc);
         if (bruma != null && !bruma.dying()) any = true;
+        tickArboleda(mc);
+        if (arboleda != null && !arboleda.dying()) any = true;
         tickTitulo(mc);
         if (titulo != null && !titulo.dying()) any = true;
         if (viaje != null) {
@@ -326,8 +366,9 @@ public final class ClientMusic {
         if (zona != null) mc.getSoundManager().stop(zona);
         if (bruma != null) mc.getSoundManager().stop(bruma);
         if (viaje != null) mc.getSoundManager().stop(viaje);
-        story = boss = zona = bruma = viaje = null;
-        enFortaleza = enBruma = false;
+        if (arboleda != null) mc.getSoundManager().stop(arboleda);
+        story = boss = zona = bruma = viaje = arboleda = null;
+        enFortaleza = enBruma = enArboleda = false;
         bossPhase = 0;
     }
 

@@ -2931,5 +2931,121 @@
         "stream": true
       }
     ]
+  },
+  "sfx.ahorcado_soga": {
+    "subtitle": "subtitles.darkcraft.sfx.ahorcado_soga",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ahorcado_soga_1"
+      },
+      {
+        "name": "darkcraft:sfx/ahorcado_soga_2"
+      },
+      {
+        "name": "darkcraft:sfx/ahorcado_soga_3"
+      }
+    ]
+  },
+  "sfx.ahorcado_gemido": {
+    "subtitle": "subtitles.darkcraft.sfx.ahorcado_gemido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ahorcado_gemido_1"
+      },
+      {
+        "name": "darkcraft:sfx/ahorcado_gemido_2"
+      },
+      {
+        "name": "darkcraft:sfx/ahorcado_gemido_3"
+      }
+    ]
+  },
+  "sfx.ahorcado_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.ahorcado_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ahorcado_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/ahorcado_alerta_2"
+      }
+    ]
+  },
+  "sfx.ahorcado_cae": {
+    "subtitle": "subtitles.darkcraft.sfx.ahorcado_cae",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ahorcado_cae_1"
+      },
+      {
+        "name": "darkcraft:sfx/ahorcado_cae_2"
+      },
+      {
+        "name": "darkcraft:sfx/ahorcado_cae_3"
+      }
+    ]
+  },
+  "sfx.ahorcado_zarpazo": {
+    "subtitle": "subtitles.darkcraft.sfx.ahorcado_zarpazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ahorcado_zarpazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/ahorcado_zarpazo_2"
+      }
+    ]
+  },
+  "sfx.ahorcado_lazo": {
+    "subtitle": "subtitles.darkcraft.sfx.ahorcado_lazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ahorcado_lazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/ahorcado_lazo_2"
+      },
+      {
+        "name": "darkcraft:sfx/ahorcado_lazo_3"
+      }
+    ]
+  },
+  "sfx.ahorcado_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.ahorcado_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ahorcado_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/ahorcado_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/ahorcado_dolor_3"
+      }
+    ]
+  },
+  "sfx.ahorcado_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.ahorcado_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ahorcado_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/ahorcado_muerte_2"
+      }
+    ]
+  },
+  "ambiente.arboleda": {
+    "subtitle": "subtitles.darkcraft.ambiente.arboleda",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/arboleda_viento_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/arboleda_viento_2",
+        "stream": true
+      }
+    ]
   }
 }

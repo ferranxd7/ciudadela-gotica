@@ -502,7 +502,7 @@ T = {
   "advancements.darkcraft.libro_perdido.title": "Ce que disaient les gens",
   "advancements.darkcraft.libro_perdido.description": "Lis un livre perdu",
   "advancements.darkcraft.libros_perdidos.title": "La bibliothèque perdue",
-  "advancements.darkcraft.libros_perdidos.description": "Trouve les dix-sept livres perdus",
+  "advancements.darkcraft.libros_perdidos.description": "Trouve tous les livres perdus",
   "darkcraft.diario.fortaleza": "J'ai vu la Forteresse d'os flotter au-dessus des nuages. La clé ne cesse de trembler.",
   "darkcraft.diario.puerta_hueso": "La herse d'os s'est levée d'elle-même quand la clé l'a touchée.",
   "darkcraft.diario.acertijo": "Maître Velan a laissé une énigme : il faut forger une amulette.",

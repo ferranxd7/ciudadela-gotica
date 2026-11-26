@@ -411,6 +411,42 @@ public class Volcado {
                 // y se recorre a pie: del camino a la era, a la puerta del molino y (con la reja abierta) al arcon de arriba
                 andarMolino(lvl, v);
             }
+            case "morvain_arboleda" -> {
+                // la Arboleda de los Ahorcados, en el Bosque Muerto (parte 7g): el claro con el Arbol de la Horca, los arboles
+                // con sus sogas, la puerta, el patibulo y las tumbas (-Dcaja=x0,z0,x1,z1 para un trozo)
+                String[] k = System.getProperty("caja", (com.darkcraft.morvain.Arboleda.GX - 48) + "," + (com.darkcraft.morvain.Arboleda.GZ - 52) + ",-4826,"
+                        + (com.darkcraft.morvain.Arboleda.GZ + 46)).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 70);
+                com.darkcraft.morvain.Arboleda v = com.darkcraft.morvain.Arboleda.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("La arboleda: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.colgados().size() + " colgados, "
+                        + v.otros().size() + " mas; " + v.sogas + " sogas de colgar, " + v.lazos + " lazos, " + v.cabos + " cabos; el patibulo a Y " + v.fy
+                        + "; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var c : v.colgados()) marcas.put("C" + (n++), new int[]{c.x(), c.y() + 1, c.z()});
+                n = 0;
+                for (var o : v.otros()) marcas.put("A" + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarArboleda(lvl, v);
+            }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);
@@ -452,6 +488,56 @@ public class Volcado {
                         .append(z1.pisa(X + 2, y, Z) ? "[pisa]" : "");
             System.out.println(g);
         }
+    }
+
+    /**
+     * La arboleda (parte 7g): de la entrada (junto al santuario) se llega a pie al claro, a la puerta, a lo alto del
+     * patibulo (el atril y el arcon), a las tumbas y a cada puesto; cada colgado tiene su soga encima (a 5-9 bloques) y
+     * nada le estorba (el cuerpo colgado no toca ningun bloque).
+     */
+    static void andarArboleda(WorldGenLevel lvl, com.darkcraft.morvain.Arboleda v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+        int[] e = v.sitio("entrada");
+        int G = com.darkcraft.morvain.Arboleda.GX, Z = com.darkcraft.morvain.Arboleda.GZ;
+        var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], G - 60, Z - 60, -4820, Z + 60, 1_500_000);
+        StringBuilder sb = new StringBuilder("a pie desde la entrada: " + z0.celdas() + " celdas;");
+        for (String s : new String[]{"arbol", "claro", "puerta", "escalera", "patibulo", "atril", "arcon", "tumbas"}) {
+            int[] q = v.sitio(s);
+            sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+        }
+        System.out.println(sb);
+        int malos = 0, sinSoga = 0, tocan = 0;
+        for (var c : v.colgados()) {
+            if (!z0.alcanza(c.x(), c.y(), c.z(), 2.5)) {
+                malos++;
+                System.out.println("  colgado sin llegar a pie: " + c.x() + "," + c.y() + "," + c.z());
+            }
+            int arriba = -1;
+            for (int dy = 1; dy <= 9 && arriba < 0; dy++) {
+                BlockState st = mundo.en(c.x(), c.y() + dy, c.z());
+                if (st.is(Blocks.CHAIN) || st.getBlock().getClass().getSimpleName().equals("SogaBlock")) arriba = dy;
+            }
+            if (arriba < 0) sinSoga++;
+            else {
+                // el cuerpo colgado: de 1,16 sobre el suelo hasta 3,56 (y 0,3 a cada lado del centro, que esta a 0,3 de la soga)
+                for (int dy = 1; dy <= 3; dy++)
+                    for (int dx = -1; dx <= 1; dx++)
+                        for (int dz = -1; dz <= 1; dz++) {
+                            if (Math.abs(dx) + Math.abs(dz) > 1) continue;
+                            BlockState st = mundo.en(c.x() + dx, c.y() + dy, c.z() + dz);
+                            if (!st.isAir() && !st.is(Blocks.CHAIN) && st.blocksMotion()) tocan++;
+                        }
+            }
+        }
+        int otrosMal = 0;
+        for (var o : v.otros())
+            if (!z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                otrosMal++;
+                System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z());
+            }
+        System.out.println("colgados: " + v.colgados().size() + ", a los que no se llega " + malos + ", sin soga encima " + sinSoga + ", bloques que tocan el cuerpo "
+                + tocan + "; los demas: " + v.otros().size() + ", a los que no se llega " + otrosMal);
     }
 
     /** El volcado: caja, paleta de estados y un indice de 16 bits por bloque (x, z, y), comprimido. */

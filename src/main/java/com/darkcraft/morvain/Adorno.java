@@ -32,6 +32,11 @@ final class Adorno {
             hierba(nivel, c, r, 40, Blocks.GRASS.defaultBlockState(), Blocks.DEAD_BUSH.defaultBlockState());
             return;
         }
+        // en la Arboleda de los Ahorcados (parte 7g) solo setas y helechos: los arboles son los suyos
+        if (Arboleda.cerca(x0, z0)) {
+            hierba(nivel, c, r, 20, Blocks.BROWN_MUSHROOM.defaultBlockState(), Blocks.FERN.defaultBlockState());
+            return;
+        }
         switch (reg) {
             case LLANURAS -> {
                 if (r.nextInt(3) == 0) arbol(nivel, c, r, Blocks.OAK_LOG.defaultBlockState(), 4, 4, 1);

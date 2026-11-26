@@ -10,7 +10,7 @@ darkcraft.narracion.6.N.
 DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdrenn",
          6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza",
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
-         17: "fortaleza", 18: "morvain"}
+         17: "fortaleza", 18: "morvain", 19: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -322,6 +322,16 @@ LIBROS = {
    "I have rung the bell of Velmor for as long as I can remember: for mass, for fire, for the dead. When the sky turned red over the heart of the land, I rang it for fire. No one came.",
    "They did not die. They stayed. The miller's wife is still in her field, reaping what no longer grows; the smith strikes a cold anvil; no one drinks in the tavern. We broke the bridge so that nothing would come. It made no difference: what withers us does not travel by road.",
    "They are walking ash, and ash thirsts for whatever still breathes. If you hear my bell, it is not mass: it means someone living has entered Velmor, and they know it.\n\nI hear it now from the inside too."]),
+ },
+ 19: {
+  "es": ("El registro del verdugo", "Maese Odran, verdugo de la Arboleda", [
+   "Año del cielo rojo. Colgados en la Arboleda: dos cuatreros, el molinero de Brezal (grano robado), tres desertores del Juramento y una mujer que decía que la Sombra le hablaba en sueños. Todo como manda la ley.",
+   "Ya no traen a nadie: no queda nadie que juzgue. Pero las sogas crujen igual, y esta mañana el molinero tenía los ojos abiertos. Me miraba. Les corté la soga a dos y echaron a andar entre los árboles.",
+   "Si lees esto, no cortes ninguna soga y no pases bajo las ramas. Yo me quedo con ellos. Alguien tiene que llevar la cuenta... y el árbol todavía tiene sitio.\n\nO."]),
+  "en": ("The Hangman's Ledger", "Master Odran, hangman of the Grove", [
+   "Year of the red sky. Hanged in the Grove: two horse thieves, the miller of Brezal (stolen grain), three deserters of the Oath and a woman who said the Shadow spoke to her in dreams. All as the law commands.",
+   "They bring no one anymore: there is no one left to judge. But the ropes creak all the same, and this morning the miller had his eyes open. He was watching me. I cut two of them down and they walked off among the trees.",
+   "If you read this, cut no rope and do not walk beneath the branches. I am staying with them. Someone has to keep the count... and the tree still has room.\n\nO."]),
  },
 }
 

@@ -16,10 +16,14 @@ public final class AhorcadoAnims {
     public static final int ALZARSE = 10;
 
     /** Lo que dura cada accion, en ticks (por numero). */
-    public static final int[] TICKS = {0, 22, 30, 32, 32, 40, 28, 30, 48, 32, 40};
+    public static final int[] TICKS = {0, 22, 30, 32, 32, 40, 26, 30, 48, 32, 40};
 
     /** Los ticks (desde que empieza la accion) en los que el arma llega: ahi pega el servidor. */
-    public static final int[][] GOLPES = {{}, {11}, {10, 19}, {21}, {17}, {18}, {12}, {}, {}, {}, {}};
+    public static final int[][] GOLPES = {{}, {11}, {10, 19}, {21}, {17}, {18}, {8}, {}, {}, {}, {}};
 
     public static final String[] NOMBRES = {"", "zarpazo", "doble", "salto", "latigazo", "lazo", "caer", "aturdido", "morir", "levantarse", "alzarse"};
+
+    /** El nudo de la soga en la postura de colgado (px del modelo, sin escalar) y lo que sube la soga del modelo. */
+    public static final float NUDO_X = 4.4f, NUDO_Y = -5.25f, NUDO_Z = 0.0f, SOGA_ARRIBA = 12.0f;
+    public static final float ESCALA = 1.1f;
 }

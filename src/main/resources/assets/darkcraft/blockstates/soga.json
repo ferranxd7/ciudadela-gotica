@@ -1,0 +1,13 @@
+{
+ "variants": {
+  "parte=cuerda": {
+   "model": "darkcraft:block/soga_cuerda"
+  },
+  "parte=cabo": {
+   "model": "darkcraft:block/soga_cabo"
+  },
+  "parte=lazo": {
+   "model": "darkcraft:block/soga_lazo"
+  }
+ }
+}

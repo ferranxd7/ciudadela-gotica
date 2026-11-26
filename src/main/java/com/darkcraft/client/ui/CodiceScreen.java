@@ -49,7 +49,7 @@ public class CodiceScreen extends Screen {
     /** La miniatura de un libro perdido: los de Valdrenn (1-5), los de la fortaleza (6-11) y las notas de Brumavela (12-16). */
     public static int miniaturaPerdido(int n) {
         // (1-5 Valdrenn, 6-11 la fortaleza, 12-16 Brumavela, 17 la fortaleza otra vez: la cripta de la parte 5c; 18 Velmor,
-        // en Morvain: la del pueblo)
+        // en Morvain: la del pueblo; 19 el registro del verdugo de la Arboleda de los Ahorcados: tambien)
         return n <= 5 ? MIN_PERDIDO_VALDRENN : n <= 11 || n == 17 ? MIN_PERDIDO_FORTALEZA : MIN_PERDIDO_BRUMAVELA;
     }
     static final int TINTA = 0xFF24170C, TINTA_SOMBRA = 0xFF3C0A0E, RUBRICA = 0xFF801212, AZUL_T = 0xFF1C2E78, PALIDA = 0xFF5E4A30;

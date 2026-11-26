@@ -179,9 +179,14 @@ SFX = {
     "molinera_grito": (2.4, 0.6, -13), "molinera_siega": (1.0, 0.3, -14), "molinera_golpe": (2.4, 0.8, -13),
     "molinera_giro": (1.4, 0.4, -14), "molinera_dolor": (0.7, 0.2, -15), "molinera_muerte": (3.4, 0.9, -14),
     "molino_viento": (5.5, 1.2, -21),
+    # los ahorcados del Bosque Muerto (parte 7g): la soga que cruje (mientras cuelgan), el gemido, el chillido, la caida de
+    # la rama (el golpe contra el suelo), el zarpazo, el lazo que restalla, el dolor, la muerte; y el viento de la arboleda
+    "ahorcado_soga": (3.0, 0.6, -22), "ahorcado_gemido": (2.0, 0.5, -21), "ahorcado_alerta": (1.4, 0.3, -16),
+    "ahorcado_cae": (1.2, 0.4, -14), "ahorcado_zarpazo": (0.6, 0.15, -16), "ahorcado_lazo": (1.2, 0.3, -15),
+    "ahorcado_dolor": (0.6, 0.15, -17), "ahorcado_muerte": (2.4, 0.6, -17), "arboleda_viento": (6.0, 1.6, -24),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
-ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
+ENTRADA = {"arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
            "barco_vuelo": 3.0, "molino_viento": 1.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8}
@@ -309,6 +314,12 @@ TOMAS_SFX = {
     # molino: el que mas cruje y el mas parejo (para el bucle)
     "molinera_grito": (3, 1), "molinera_siega": (4, 1, 3), "molinera_golpe": (3, 4), "molinera_giro": (2, 4),
     "molinera_dolor": (1, 3, 2), "molinera_muerte": (4, 2), "molino_viento": (4, 1),
+    # los ahorcados: los tres crujidos de soga mas llenos (la 3, la mas larga); los tres gemidos con mas cuerpo; los dos
+    # chillidos mas fuertes; los tres golpes contra el suelo (la 4 con mas hojas); los dos zarpazos mas llenos; los tres
+    # restallidos (la 3 silba antes); tres quejidos; las dos muertes mas largas; y dos rachas de viento (una cada vez, al azar)
+    "ahorcado_soga": (4, 1, 3), "ahorcado_gemido": (4, 1, 3), "ahorcado_alerta": (2, 4), "ahorcado_cae": (4, 2, 1),
+    "ahorcado_zarpazo": (3, 1), "ahorcado_lazo": (3, 1, 4), "ahorcado_dolor": (4, 2, 3), "ahorcado_muerte": (1, 3),
+    "arboleda_viento": (3, 2),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

@@ -297,6 +297,9 @@ public final class Morvain {
         // quien entra en Velmor (parte 7e): su logro
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Velmor.dentro(p.getX(), p.getZ()) && p.getY() < 140) com.darkcraft.story.Logros.dar(p, "velmor");
+        // y quien entra en la Arboleda de los Ahorcados (parte 7g)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Arboleda.dentro(p.getX(), p.getZ()) && p.getY() < 160) com.darkcraft.story.Logros.dar(p, "arboleda");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -349,6 +352,8 @@ public final class Morvain {
         if (Velmor.dentro(p.getX(), p.getZ()) && p.getY() < 140) return "darkcraft.morvain.lugar.velmor";
         // el molino de la Molinera (parte 7f)
         if (Molino.dentro(p.getX(), p.getZ()) && p.getY() < 140) return "darkcraft.morvain.lugar.molino";
+        // la Arboleda de los Ahorcados (parte 7g)
+        if (Arboleda.dentro(p.getX(), p.getZ()) && p.getY() < 160) return "darkcraft.morvain.lugar.arboleda";
         return "darkcraft.zona.morvain." + Terreno.region(p.getX(), p.getZ()).id;
     }
 
