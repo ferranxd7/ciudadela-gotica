@@ -474,7 +474,8 @@ public final class Molino {
         Aspas(long seed) {
             super(seed);
             this.layer = 5;
-            bounds(HX - 1, HY - LARGO - 1, HZ - LARGO - 4, HX + 1, HY + LARGO + 4, HZ + LARGO + 4);
+            // (con el armazon caido al norte del molino)
+            bounds(HX - 1, Y - 2, HZ - LARGO - 4, MX + 4, HY + LARGO + 4, HZ + LARGO + 4);
         }
 
         private void lona(Canvas c, int x, int y, int z) {
