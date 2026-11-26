@@ -1896,6 +1896,8 @@ ES.update({
     "darkcraft.diario.fragmento": "Junto al fuego había una estela con el mapa de la región tallado en la piedra y un pergamino clavado. Lo copié en el libro de la Sombra: ahora sé dónde estoy.",
     "darkcraft.diario.mapa_morvain": "Nueve estelas, nueve fragmentos. El mapa de Morvain está entero en mi libro... y todos los caminos llevan al castillo encadenado.",
     "darkcraft.ayuda.mapa": "los fragmentos del mapa de Morvain: los que tienes, dártelos, quitártelos o llevarte ante una estela",
+    "darkcraft.sombra.dim.minecraft.overworld": "Mar de nubes",
+    "darkcraft.sombra.dim.darkcraft.morvain": "Morvain",
 })
 EN.update({
     "block.darkcraft.estela_mapa": "Map Stele",
@@ -1915,6 +1917,8 @@ EN.update({
     "darkcraft.diario.fragmento": "Beside the fire stood a stele with the region's map carved into the stone and a parchment nailed to it. I copied it into the Shadow's book: now I know where I am.",
     "darkcraft.diario.mapa_morvain": "Nine steles, nine fragments. The map of Morvain is whole in my book... and every road leads to the chained castle.",
     "darkcraft.ayuda.mapa": "the map fragments of Morvain: the ones you have, give them to you, take them away or take you to a stele",
+    "darkcraft.sombra.dim.minecraft.overworld": "Sea of Clouds",
+    "darkcraft.sombra.dim.darkcraft.morvain": "Morvain",
 })
 
 

@@ -110,7 +110,7 @@
   "darkcraft.sombra.mapa.tam.1": "mediano",
   "darkcraft.sombra.mapa.tam.2": "grande",
   "darkcraft.sombra.mapa.ayuda": "Arrastra: mover · Rueda: zoom · Clic derecho: marcar",
-  "darkcraft.sombra.dim.minecraft.overworld": "Superficie",
+  "darkcraft.sombra.dim.minecraft.overworld": "Mar de nubes",
   "darkcraft.sombra.dim.minecraft.the_nether": "Nether",
   "darkcraft.sombra.dim.minecraft.the_end": "El Fin",
   "darkcraft.sombra.dim.darkcraft.volcanes": "Volcanes de Corvin",
@@ -1559,5 +1559,6 @@
   "advancements.darkcraft.mapa_morvain.title": "Cartógrafo de las Tierras Marchitas",
   "advancements.darkcraft.mapa_morvain.description": "Copia los nueve fragmentos del mapa de Morvain",
   "darkcraft.diario.fragmento": "Junto al fuego había una estela con el mapa de la región tallado en la piedra y un pergamino clavado. Lo copié en el libro de la Sombra: ahora sé dónde estoy.",
-  "darkcraft.diario.mapa_morvain": "Nueve estelas, nueve fragmentos. El mapa de Morvain está entero en mi libro... y todos los caminos llevan al castillo encadenado."
+  "darkcraft.diario.mapa_morvain": "Nueve estelas, nueve fragmentos. El mapa de Morvain está entero en mi libro... y todos los caminos llevan al castillo encadenado.",
+  "darkcraft.sombra.dim.darkcraft.morvain": "Morvain"
 }
