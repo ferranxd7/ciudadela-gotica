@@ -7193,6 +7193,14 @@ public final class ClientCiTest {
             shot(m, "cliente_mv118_revienta");
         });
         t = H + 112;
+        // sin nubes ni veneno: con cada golpe del veneno se cerraba el codice y el menu (build-145)
+        atTicks(t, "Los pilotes: sin nubes ni veneno (para el libro y el bestiario)", m -> server(m, sp -> {
+            for (var n : sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.AreaEffectCloud.class, sp.getBoundingBox().inflate(40))) n.discard();
+            sp.removeAllEffects();
+            sp.setHealth(sp.getMaxHealth());
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        t += 6;
         atTicks(t, "Los pilotes: el libro de la hermana Ilse", m -> {
             enPrimeraPersona(m);
             com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(20));
