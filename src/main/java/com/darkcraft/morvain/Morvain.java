@@ -302,6 +302,9 @@ public final class Morvain {
         // y quien entra en la Arboleda de los Ahorcados (parte 7g)
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Arboleda.dentro(p.getX(), p.getZ()) && p.getY() < 160) com.darkcraft.story.Logros.dar(p, "arboleda");
+        // y quien entra en la Aldea de los Pilotes (parte 7i)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Pilotes.dentro(p.getX(), p.getZ()) && p.getY() < 120) com.darkcraft.story.Logros.dar(p, "pilotes");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -356,6 +359,8 @@ public final class Morvain {
         if (Molino.dentro(p.getX(), p.getZ()) && p.getY() < 140) return "darkcraft.morvain.lugar.molino";
         // la Arboleda de los Ahorcados (parte 7g)
         if (Arboleda.dentro(p.getX(), p.getZ()) && p.getY() < 160) return "darkcraft.morvain.lugar.arboleda";
+        // la Aldea de los Pilotes (parte 7i)
+        if (Pilotes.dentro(p.getX(), p.getZ()) && p.getY() < 120) return "darkcraft.morvain.lugar.pilotes";
         return "darkcraft.zona.morvain." + Terreno.region(p.getX(), p.getZ()).id;
     }
 

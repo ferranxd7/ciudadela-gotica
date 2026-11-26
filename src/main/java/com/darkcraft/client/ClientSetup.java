@@ -79,6 +79,9 @@ public final class ClientSetup {
                 new com.darkcraft.client.enemigos.CortezaModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.CortezaModelo.CAPA)), "corteza", 1, 0.9f, 1.45f));
         // el corcel de Morvain (parte 7b)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CORCEL.get(), com.darkcraft.client.montura.CorcelRenderer::new);
+        // los podridos del Pantano Podrido y su fuego fatuo (parte 7i)
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PODRIDO.get(), com.darkcraft.client.enemigos.PodridoRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.FUEGO_FATUO.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
         // los marchitos de Morvain (parte 7e)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.MARCHITO.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
                 new com.darkcraft.client.enemigos.MarchitoModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.MarchitoModelo.CAPA)), "marchito", 3, 0.5f, 1.08f));
@@ -111,6 +114,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CortezaModelo.CAPA, com.darkcraft.client.enemigos.CortezaGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.montura.CorcelModelo.CAPA, com.darkcraft.client.enemigos.CorcelGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.MarchitoModelo.CAPA, com.darkcraft.client.enemigos.MarchitoGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.PodridoModelo.CAPA, com.darkcraft.client.enemigos.PodridoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.AhorcadoModelo.CAPA, com.darkcraft.client.enemigos.AhorcadoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.MolineraModelo.CAPA, com.darkcraft.client.enemigos.MolineraGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.VerdugoModelo.CAPA, com.darkcraft.client.enemigos.VerdugoGeometria::crear);

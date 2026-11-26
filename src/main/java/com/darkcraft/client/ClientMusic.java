@@ -255,6 +255,39 @@ public final class ClientMusic {
         }
     }
 
+    // ------------------------------------------------------------------ el pantano (parte 7i): borbotea, croa y zumba
+
+    private static Track pantano;
+    private static int pantanoTicks;
+    private static boolean enPantano;
+
+    private static void tickPantano(Minecraft mc) {
+        if (mc.player == null || mc.level == null) enPantano = false;
+        else if (mc.player.tickCount % 20 == 11)
+            enPantano = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() < 120
+                    && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.PANTANO;
+        boolean quiere = enPantano && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        if (quiere) {
+            if (pantano == null || pantano.dying() || !mc.getSoundManager().isActive(pantano) && pantanoTicks > 20) {
+                if (pantano != null && !pantano.dying()) mc.getSoundManager().stop(pantano);
+                pantano = new Track(DarkCraftMod.AMBIENTE_PANTANO.get(), "pantano", false);
+                pantanoTicks = 0;
+                mc.getSoundManager().play(pantano);
+                pantano.fadeTo(0.8f, 2.0f);
+            }
+        } else if (pantano != null && !pantano.dying()) pantano.kill(3.0f);
+        if (pantano != null) {
+            pantanoTicks++;
+            if (pantano.dying() && !mc.getSoundManager().isActive(pantano) && pantanoTicks > 20) pantano = null;
+        }
+    }
+
+    /** Para la prueba de la CI: si suena el pantano. */
+    public static String pantano() {
+        Minecraft mc = Minecraft.getInstance();
+        return pantano == null ? "sin el pantano" : String.format("el pantano %.2f%s", pantano.level(), mc.getSoundManager().isActive(pantano) ? "" : " (parado)");
+    }
+
     /** Para la prueba de la CI: si suena el viento de la arboleda. */
     public static String arboleda() {
         Minecraft mc = Minecraft.getInstance();
@@ -349,6 +382,8 @@ public final class ClientMusic {
         if (bruma != null && !bruma.dying()) any = true;
         tickArboleda(mc);
         if (arboleda != null && !arboleda.dying()) any = true;
+        tickPantano(mc);
+        if (pantano != null && !pantano.dying()) any = true;
         tickTitulo(mc);
         if (titulo != null && !titulo.dying()) any = true;
         if (viaje != null) {
@@ -368,8 +403,9 @@ public final class ClientMusic {
         if (bruma != null) mc.getSoundManager().stop(bruma);
         if (viaje != null) mc.getSoundManager().stop(viaje);
         if (arboleda != null) mc.getSoundManager().stop(arboleda);
-        story = boss = zona = bruma = viaje = arboleda = null;
-        enFortaleza = enBruma = enArboleda = false;
+        if (pantano != null) mc.getSoundManager().stop(pantano);
+        story = boss = zona = bruma = viaje = arboleda = pantano = null;
+        enFortaleza = enBruma = enArboleda = enPantano = false;
         bossPhase = 0;
     }
 

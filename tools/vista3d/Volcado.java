@@ -447,6 +447,39 @@ public class Volcado {
                 for (var o : v.otros()) marcas.put("A" + (n++), new int[]{o.x(), o.y() + 1, o.z()});
                 andarArboleda(lvl, v);
             }
+            case "morvain_pilotes" -> {
+                // la Aldea de los Pilotes, en el Pantano Podrido (parte 7i): la laguna, la plaza, las chozas, las pasarelas, la
+                // capilla hundida y el embarcadero hasta el santuario (-Dcaja=x0,z0,x1,z1 para un trozo)
+                int PX = com.darkcraft.morvain.Pilotes.CX, PZ = com.darkcraft.morvain.Pilotes.CZ;
+                String[] k = System.getProperty("caja", (PX - 50) + "," + (PZ - 62) + "," + (PX + 52) + "," + (PZ + 54)).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 50);
+                com.darkcraft.morvain.Pilotes v = com.darkcraft.morvain.Pilotes.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("La aldea de los pilotes: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " podridos; "
+                        + v.tablas + " tablas, " + v.pilotes + " pilotes, " + v.faroles + " faroles; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas()) marcas.put("P" + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarPilotes(lvl, v);
+            }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);
@@ -454,6 +487,42 @@ public class Volcado {
         System.out.println(que + ": " + MUNDO.size() + " bloques en " + (System.currentTimeMillis() - t0) + " ms; caja " + minX + "," + minY + "," + minZ
                 + " .. " + maxX + "," + maxY + "," + maxZ + "; entidades " + ENTIDADES.size());
         escribir(salida, marcas);
+    }
+
+    /** La aldea de los pilotes (parte 7i): se llega a pie desde la entrada (junto al santuario) a todo, y cada podrido cabe en su sitio. */
+    static void andarPilotes(WorldGenLevel lvl, com.darkcraft.morvain.Pilotes v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+        int[] e = v.sitio("entrada");
+        int X = com.darkcraft.morvain.Pilotes.CX, Z = com.darkcraft.morvain.Pilotes.CZ;
+        var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], X - 60, Z - 66, X + 60, Z + 60, 1_500_000);
+        StringBuilder sb = new StringBuilder("a pie desde la entrada: " + z0.celdas() + " celdas;");
+        for (String s : v.sitios().keySet()) {
+            int[] q = v.sitio(s);
+            sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+        }
+        System.out.println(sb);
+        int malos = 0, chocan = 0;
+        for (var o : v.esperas()) {
+            boolean agua = o.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO;
+            if (!agua && !z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                malos++;
+                System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z());
+            }
+            // de pie cabe (dos de alto: 1,95); flotando, el fondo bajo sus pies
+            for (int dy = 0; dy < 2; dy++)
+                if (choca(mundo.en(o.x(), o.y() + dy, o.z()))) {
+                    chocan++;
+                    System.out.println("  " + o.grupo() + " metido en un bloque: " + o.x() + "," + (o.y() + dy) + "," + o.z() + " " + mundo.en(o.x(), o.y() + dy, o.z()));
+                }
+            if (!choca(mundo.en(o.x(), o.y() - 1, o.z()))) System.out.println("  " + o.grupo() + " sin suelo: " + o.x() + "," + o.y() + "," + o.z());
+        }
+        System.out.println("podridos: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan);
+    }
+
+    /** Si un bloque tiene caja de choque (sin la cache de formas del juego, que fuera de el no esta hecha). */
+    static boolean choca(BlockState st) {
+        return !st.isAir() && !st.getCollisionShape(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, BlockPos.ZERO).isEmpty();
     }
 
     /** El molino (parte 7f): se llega a pie del camino a la era y a la puerta; con la reja quitada, al arcon de arriba. */

@@ -10,7 +10,7 @@ darkcraft.narracion.6.N.
 DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdrenn",
          6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza",
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
-         17: "fortaleza", 18: "morvain", 19: "morvain"}
+         17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -332,6 +332,16 @@ LIBROS = {
    "Year of the red sky. Hanged in the Grove: two horse thieves, the miller of Brezal (stolen grain), three deserters of the Oath and a woman who said the Shadow spoke to her in dreams. All as the law commands.",
    "They bring no one anymore: there is no one left to judge. But the ropes creak all the same, and this morning the miller had his eyes open. He was watching me. I cut two of them down and they walked off among the trees.",
    "If you read this, cut no rope and do not walk beneath the branches. I am staying with them. Someone has to keep the count... and the tree still has room.\n\nO."]),
+ },
+ 20: {
+  "es": ("Lo que trae el agua negra", "Hermana Ilse, de la capilla de los pilotes", [
+   "Desde que el cielo se puso rojo, el agua de la laguna es negra. Los peces flotan panza arriba y nadie los come. Las redes salen llenas de algo que no es pez. Esta mañana he bendecido el agua tres veces; las tres se ha vuelto a oscurecer.",
+   "Los que se ahogan no se quedan en el fondo. Vuelven a la superficie hinchados, boca abajo, y una noche se ponen en pie. De noche hay luces verdes entre los juncos: los niños las siguen y ya no vuelven. No sigas las luces.",
+   "El barquero sigue cruzando la laguna, aunque ya no queda nadie a quien llevar. Le oigo remar bajo la capilla. Hoy ha llamado a la puerta. Rezo con el agua por las rodillas: si lees esto, no subas a su barca.\n\nHna. Ilse"]),
+  "en": ("What the Black Water Brings", "Sister Ilse, of the chapel on the stilts", [
+   "Since the sky turned red, the water of the lagoon is black. The fish float belly up and no one eats them. The nets come up full of something that is not fish. This morning I blessed the water three times; three times it darkened again.",
+   "Those who drown do not stay at the bottom. They rise to the surface bloated, face down, and one night they stand up. At night there are green lights among the reeds: the children follow them and never come back. Do not follow the lights.",
+   "The ferryman still crosses the lagoon, though there is no one left to carry. I hear him rowing beneath the chapel. Today he knocked at the door. I pray with the water up to my knees: if you read this, do not board his boat.\n\nSr. Ilse"]),
  },
 }
 
