@@ -111,8 +111,8 @@ public class MorvainGenerador extends ChunkGenerator {
                         }
                 }
             // lo construido: el Arco del Umbral (donde se llega) y la ciudadela encadenada con sus cadenas
-            boolean llegada = Llegada.toca(x0, z0), ciudadela = Ciudadela.toca(x0, z0);
-            if (llegada || ciudadela) {
+            boolean llegada = Llegada.toca(x0, z0), ciudadela = Ciudadela.toca(x0, z0), santuario = SantuariosMorvain.toca(x0, z0);
+            if (llegada || ciudadela || santuario) {
                 Escritor es = (x, y, z, st) -> {
                     int dx = x - x0, dz = z - z0;
                     if (dx < 0 || dx > 15 || dz < 0 || dz > 15 || y <= min || y > max) return;
@@ -121,6 +121,7 @@ public class MorvainGenerador extends ChunkGenerator {
                     cima.update(dx, y, dz, st);
                 };
                 if (llegada) Llegada.chunk(es, x0, z0, tops);
+                if (santuario) SantuariosMorvain.chunk(es, x0, z0, tops);
                 if (ciudadela) Ciudadela.chunk(es, x0, z0);
             }
         } finally {

@@ -43,6 +43,7 @@ public final class Comandos {
                 .then(com.darkcraft.camino.Paradas.comando())
                 .then(com.darkcraft.pueblo.Pueblo.comando())
                 .then(com.darkcraft.montura.Montura.comando())
+                .then(com.darkcraft.morvain.Viaje.comando())
                 .then(com.darkcraft.rol.Rol.comando())
                 .then(com.darkcraft.rol.Rol.comandoRol()));
     }
@@ -98,6 +99,7 @@ public final class Comandos {
         src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela capitan", "/darkcraft brumavela capitan [vencer | volver]", "b_capitan")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft brumavela inicio", "/darkcraft brumavela inicio", "b_inicio")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft corcel ", "/darkcraft corcel [llamar | silbato | deshacer | herir <n> | espera]", "corcel")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft viaje ", "/darkcraft viaje [lista | conocer <id>|todos | olvidar | ir <id>]", "viaje")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ecos ", "/darkcraft ecos / ecos dar <n> / ecos quitar", "ecos")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft rol ", "/darkcraft rol clase [<nombre> | elegir | olvidar | ninguna] / santuario / frascos [<n>] / nivel [reiniciar] / atributo <nombre> <valor> / talisman <nombre> [poner <hueco>] / fruto <nombre> [<n>] / hechizo <nombre>|memorizar|olvidar|baston|sello / guia [olvidar] / herrero [olvidar] / mercader [olvidar] / mejora <0-9> / piedras / ceniza <nombre> [poner] | quitar / resistencias", "rol")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ayuda", "/darkcraft ayuda", "ayuda")), false);

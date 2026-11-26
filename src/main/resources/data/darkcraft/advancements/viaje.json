@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:morvain",
+  "display": {
+    "icon": {
+      "item": "minecraft:soul_campfire"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.viaje.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.viaje.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 30
+  }
+}

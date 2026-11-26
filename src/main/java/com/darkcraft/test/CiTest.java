@@ -682,6 +682,31 @@ public final class CiTest {
         } catch (Throwable t) {
             log.println("Morvain, el corcel: ERROR " + t);
         }
+        // los santuarios (parte 7c): cada uno con su bloque en su sitio y con su nombre; tres vistos desde arriba
+        try {
+            StringBuilder ss = new StringBuilder("Morvain, los santuarios:");
+            int bienS = 0;
+            long t1 = System.currentTimeMillis();
+            for (com.darkcraft.morvain.SantuariosMorvain.Sitio s : com.darkcraft.morvain.SantuariosMorvain.SITIOS) {
+                m.getChunk(s.x() >> 4, s.z() >> 4);
+                BlockPos p = s.pos();
+                boolean hay = m.getBlockState(p).is(DarkCraftMod.SANTUARIO.get());
+                String nombre = com.darkcraft.santuario.Santuarios.nombre(m, p);
+                if (hay && nombre.equals(s.nombre())) bienS++;
+                else ss.append(' ').append(s.id()).append(hay ? " (se llama " + nombre + ")" : " (NO hay santuario en " + p.toShortString() + ": "
+                        + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(m.getBlockState(p).getBlock()).getPath() + ")").append(';');
+            }
+            log.println(ss + " " + bienS + " de " + com.darkcraft.morvain.SantuariosMorvain.SITIOS.length + " en su sitio y con su nombre ("
+                    + (System.currentTimeMillis() - t1) + " ms)");
+            for (String id : new String[]{"encrucijada", "juncos", "helada"}) {
+                com.darkcraft.morvain.SantuariosMorvain.Sitio s = com.darkcraft.morvain.SantuariosMorvain.porId(id);
+                for (int cx = (s.x() - 22) >> 4; cx <= (s.x() + 22) >> 4; cx++)
+                    for (int cz = (s.z() - 22) >> 4; cz <= (s.z() + 22) >> 4; cz++) m.getChunk(cx, cz);
+                topView(m, s.x(), s.z(), 22, new File(out, "morvain_santuario_" + id + ".png"));
+            }
+        } catch (Throwable t) {
+            log.println("Morvain, los santuarios: ERROR " + t);
+        }
     }
 
     /** Las celdas del hueco del arco del portal (las de bloque de portal). */
