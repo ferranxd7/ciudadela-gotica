@@ -4721,5 +4721,271 @@
     ]
    }
   }
+ },
+ "rectora": {
+  "flow": "L04DwwrYLk66HudZzb1F",
+  "voz": "sssn4wp3AspuK2kvy3Ym",
+  "nombre_voz": "Enchantress - mysterious, witchy, villain character",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7p: Ysolde, la Rectora de la Academia (la jefa de la Academia Espectral, en el Observatorio). Tomas a y b de cada frase como rectora/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[calm, cold, distant] Another reader? [slow, ominous] Come, then... the sky has written your name tonight.",
+    "sesiones": [
+     "QWtYQNFBAo38pdLyNVdY",
+     "mIqK4FFj5RB2nriqGVS6"
+    ],
+    "generaciones": [
+     "pmjMejVsDOfjYXbmlQys",
+     "WAnX7Brla0f22YhpXyZ4"
+    ]
+   },
+   "2": {
+    "texto": "[commanding, imperious] Masters! To your places! [ominous] The lesson is not over.",
+    "sesiones": [
+     "QScmUCoINekRga7uezr1",
+     "N8RNTD7pnUNQqTAsxN29"
+    ],
+    "generaciones": [
+     "eV76RbHEBhsG2dtupe7s",
+     "ORlXwvZmgAODUSYaqZRo"
+    ]
+   },
+   "3": {
+    "texto": "[cold, quiet, final] Your page is turned.",
+    "sesiones": [
+     "03vOhcZ6HjWr4AsT9PT5",
+     "zTpyfg4lFUajgfFKlTe8"
+    ],
+    "generaciones": [
+     "WKwEwH4zNe2BN6TO3gVU",
+     "0fvRptgaLockM6WIKZee"
+    ]
+   },
+   "4": {
+    "texto": "[whispering, enraptured] Read the stars... [cold, mocking] if you can.",
+    "sesiones": [
+     "YOyyLb3UmNeix6PHFf5v",
+     "1Oa5Q8u1tom5F2gKdLt6"
+    ],
+    "generaciones": [
+     "3eLl08bb6yvg3MugZjPf",
+     "8yd9IGXyCt04aqa5IVYQ"
+    ]
+   },
+   "5": {
+    "texto": "[weak, fading, exhausted] At last... [whispering, relieved] the sky has stopped reading me.",
+    "sesiones": [
+     "QaBQxF6py2QXbiPBdAUV",
+     "K8uNyPX0QfY1ypFmyAbu"
+    ],
+    "generaciones": [
+     "M4VmjDAjynHoyAeA6yX5",
+     "1VIDLb5sD7q5jGlqKbqE"
+    ]
+   }
+  }
+ },
+ "sfx_rectora": {
+  "flow": "L04DwwrYLk66HudZzb1F",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7p: la Rectora (grito, el baculo, los orbes, la lluvia de estrellas y la estrella que cae, la constelacion, el parpadeo, alzarse, dolor, muerte y su espera leyendo el cielo) y el sello del Observatorio (cerrarse y abrirse). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "rectora_grito": {
+    "prompt": "A spectral sorceress cries out with an otherworldly echoing scream layered with a choir of whispers and a shimmering cosmic hum, vast domed observatory reverb, dark fantasy boss, no music",
+    "sesiones": [
+     "JyaR0ZSsmCaWD4BnPb0m",
+     "MNR7c6fWUjMhMxAPrBjC",
+     "GNKy4pV4RrPXF0yhksqP",
+     "cdyuAN8fnIyGCtI9fVuo"
+    ],
+    "generaciones": [
+     "yKV1c9s7bde49O1nsx2b",
+     "xVYHtPln6owBu503TpOO",
+     "noX8ZWwSaASwJk1UJieX",
+     "wSXDlZCLTSy8MtvPpYcu"
+    ]
+   },
+   "rectora_baculo": {
+    "prompt": "A heavy crystal-topped staff sweeps through the air with a deep magical whoosh and a ringing celestial chime, then strikes hard, dark fantasy boss attack, no music",
+    "sesiones": [
+     "lrWtlH06xFQFLSzW4CFo",
+     "dw5D10sMh3I9FvT3kzMj",
+     "8KTgzt2fk56ADYTybjUa",
+     "z9hk7kxEQ6zCNGQwChp8"
+    ],
+    "generaciones": [
+     "rrg7YWRQsnc6fXL5qR3C",
+     "B0C9ebUdsPWh5VJ7oaxH",
+     "igWNh7FScTrIwV3SVID5",
+     "8OLAlJqD2daeMshacaEy"
+    ]
+   },
+   "rectora_orbes": {
+    "prompt": "Three orbs of starlight conjured at once: a rising crystalline hum and sparkling arcane energy, then released together with soft magical whooshes, dark fantasy spell, no music",
+    "sesiones": [
+     "lr7Osc9iYbYrB0S2q2Qe",
+     "d2eQgqvbbDSZ6lIFpGIn",
+     "cb5Pdp2YOdITkhreWPaD",
+     "uMzSY2Q2gclciYtSnhdr"
+    ],
+    "generaciones": [
+     "7pyuyztBDKWNiZimtn6f",
+     "J6pFIcmse2bz8gbCwWwD",
+     "UWzCHWLpjuWfolOdZR5i",
+     "sYOmEU6RklW4gyo8C3g0"
+    ]
+   },
+   "rectora_estrellas": {
+    "prompt": "A sorceress raises her arms to the night sky: a growing ominous cosmic drone, distant stars twinkling and shimmering, energy gathering high above before it falls, dark fantasy, no music",
+    "sesiones": [
+     "oEaHsgTHNhjzZJm2Qx6P",
+     "dy1ZvL1arHnuAfh1koGF",
+     "k782jdAqp4Khlrv0KhKv",
+     "E6e7UI24ySc39FNyOYc4"
+    ],
+    "generaciones": [
+     "mIkHKf4cpqtnFfBmScnK",
+     "AkApm7GjQ3Np6jcfRj3w",
+     "XxlKerI9W6Dhi9NoWOZN",
+     "z5G23F3SuCIJWnAo4iM1"
+    ]
+   },
+   "rectora_estrella_cae": {
+    "prompt": "A small falling star streaks down with a high descending whistle and crashes into stone with a bright magical explosion and tinkling crystal shards, dark fantasy, no music",
+    "sesiones": [
+     "CvVmsyB9HJECcX8Evvvk",
+     "xhvUiOIjY4wldBWwylFg",
+     "LCL8Qnt1ZQ87RMy8z2po",
+     "CeaJxApbe84PnPZFVPCc"
+    ],
+    "generaciones": [
+     "iS1dPoEp2KD0AxkeARej",
+     "NDj4uox7eEJ3sTWJtNc2",
+     "PtEHNBMdY595mbZcbUFI",
+     "XeslirB6ZsN1MG0nOvqL"
+    ]
+   },
+   "rectora_constelacion": {
+    "prompt": "Points of starlight connect into a constellation: crisp crystalline pings one after another, then beams of light ignite between them with an electric arcane hum and sizzle, dark fantasy, no music",
+    "sesiones": [
+     "1elRFlyz46go25K4CXzZ",
+     "SlHh2Ljzf93ObvLas8cu",
+     "Z4zNodDIEpaA3U6F83SN",
+     "SeITUAxLNeEvcVbGgr1V"
+    ],
+    "generaciones": [
+     "lgWywEuAOnauWOLLrm5D",
+     "j3fQCrwKrVwN9dJTInGl",
+     "lWl0ICDbTMH4KRTYS6e7",
+     "hdo3jbMENYrgnwVavpE5"
+    ]
+   },
+   "rectora_parpadeo": {
+    "prompt": "A spectral figure vanishes and reappears elsewhere: a quick reversed whoosh, a shimmer of glass and a soft echoing pop of light, dark fantasy magic, no music",
+    "sesiones": [
+     "ZNNMdhZkV2oAr6YJuJic",
+     "I2kgj0Ys2aqMjh4Okle1",
+     "NszaTVTJKlYVkrjqaVJF",
+     "FEsF1kQ3Z4Ze8NisC5A4"
+    ],
+    "generaciones": [
+     "9F1tl8cRorPTWMNkQ0HW",
+     "M6wY6Kyq243QYjFRlkvV",
+     "6pbNgYFV5gpxJ5CpGlDL",
+     "AtJ7ZTvVCq6nD8v9GZwT"
+    ]
+   },
+   "rectora_alzarse": {
+    "prompt": "A ghostly sorceress levitates into the air as the night sky answers her: a deep rumbling swell, a distant choir of voices rising, rushing cosmic wind, tense and grand, dark fantasy boss, no music",
+    "sesiones": [
+     "OR2r4cNjZuXhnmuADTW8",
+     "FqJEvDcrVnN4gvZOkPAg",
+     "Do6x9iKgIMkTfKKCMIqr",
+     "uT9UN0magSnJKOA6C6YE"
+    ],
+    "generaciones": [
+     "tXlf7s0IH3DYwSl0Qh9f",
+     "2nXBoiUOH0oDQfh9WKbs",
+     "qOe148W1hJRRou72q2ht",
+     "qlYGyMj4c2YrHtKO7G21"
+    ]
+   },
+   "rectora_dolor": {
+    "prompt": "A spectral woman in pain: a short sharp ethereal gasp with a glassy echo, dark fantasy boss hurt sound, no music",
+    "sesiones": [
+     "O2TdRWzFXSWDQt5K8HFp",
+     "kxg8XwtmtkwrsTw0lsZf",
+     "5U2rzE4KmqGgTHAOn1Vc",
+     "dIAy5rGZgW48sRiSxFvE"
+    ],
+    "generaciones": [
+     "2nIkJTYEW1Sq7RX0OI5b",
+     "gywn7q7VnuZx68cscW2m",
+     "P5w0urY8D3EV65BuvTJC",
+     "XzvUxsdmdTamaL90CIRT"
+    ]
+   },
+   "rectora_muerte": {
+    "prompt": "A ghostly sorceress fades away: a long relieved sigh dissolving into soft wind, a celestial chime ringing out, stars twinkling and then silence, melancholic dark fantasy, no music",
+    "sesiones": [
+     "H1OcEQj9xHCBxTNYYFuT",
+     "9aV9NVLe3T8128jEpByp",
+     "QSZD2zCSooHbGPlHeq6H",
+     "57jAlxuCDGa1bDKZ2Xbm"
+    ],
+    "generaciones": [
+     "StYuMxx1TOrnY2ZGlIDh",
+     "56MrNJb7iFnHKPLrIYJW",
+     "7K2UHqw1Kq3EzWUfxqUO",
+     "61arL39BhuoSqskpWL1c"
+    ]
+   },
+   "rectora_espera": {
+    "prompt": "A spectral astronomer reading the night sky: a low steady celestial hum, faint whispers, soft crystal chimes and pages turning slowly, eerie and calm, seamless loop, no music",
+    "sesiones": [
+     "zM5rsQvi2lb0PRqzvHNc",
+     "8SHkeZYNlHsEgNNv2CvR",
+     "C37M8A0vcAnX76SJ5ftd",
+     "Kd2Wx77TBqkHz2lvolIc"
+    ],
+    "generaciones": [
+     "iefobfQyVzJLHBWwCkVz",
+     "FtynJ2XQ9u0Id6ECodj4",
+     "hrJE1rPaaBTBGpuQijt5",
+     "KcVxLDl3XmKVXklJ0KV7"
+    ]
+   },
+   "observatorio_sello": {
+    "prompt": "A heavy magical seal closes over a stone doorway: a deep resonant boom, a wall of shimmering light snapping into place with a crystalline ring and a low hum, dark fantasy, no music",
+    "sesiones": [
+     "954Jd8pD5PoeX4KTBwKu",
+     "ZVBMlR5msc2RfcH6ka36",
+     "2A1dRx629sUfk0rTT9UN",
+     "gIeGFbOKQtNmPxaW5X4z"
+    ],
+    "generaciones": [
+     "lD9OdgEZI8RgcTJi8BJo",
+     "JjHF5uGr7JDuOFr1c08G",
+     "zlM6jQD0TUAT62OHHgaD",
+     "mwlsLUvHENh5S8XIlY57"
+    ]
+   },
+   "observatorio_abre": {
+    "prompt": "A magical seal of starlight shatters like glass and fades away with a soft chime and a gust of cold night wind, dark fantasy, no music",
+    "sesiones": [
+     "geWWNKQaOgnn4hOnOWXi",
+     "8BfVUgHO7PfylWTiCb2O",
+     "HP919O4stiPQwIbi6uZF",
+     "lTx7f65zUlgiAZlwFuLG"
+    ],
+    "generaciones": [
+     "JV1JV7cBJ7DWuf17jZSL",
+     "WWcXnEupbLv9XQPgopSD",
+     "9EcaYFXe212ue7uZi9mF",
+     "7zpq0wOkwoP7bJYFpehV"
+    ]
+   }
+  }
  }
 }
