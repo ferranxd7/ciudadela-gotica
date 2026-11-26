@@ -74,7 +74,8 @@ public final class Viaje {
         if (!conocidos(sp).contains(id) && !sp.isCreative()) return;
         ServerLevel m = sp.serverLevel();
         m.playSound(null, sp.getX(), sp.getY(), sp.getZ(), DarkCraftMod.SFX_SANTUARIO_DESCANSO.get(), SoundSource.PLAYERS, 0.9f, 0.8f);
-        m.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, sp.getX(), sp.getY() + 1, sp.getZ(), 30, 0.4, 0.8, 0.4, 0.03);
+        // a los pies (a la altura de los ojos tapaban la camara de quien viaja)
+        m.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, sp.getX(), sp.getY() + 0.2, sp.getZ(), 26, 0.7, 0.12, 0.7, 0.02);
         Net.to(sp, new Net.Fundido(FUNDIDO));
         PENDIENTES.put(sp.getUUID(), new Pendiente(id, sp.server.getTickCount() + CORTE));
         DarkCraftMod.LOGGER.info("[DarkCraft] viaje: {} de {} a {}", sp.getGameProfile().getName(), desde.id(), id);
@@ -107,7 +108,7 @@ public final class Viaje {
         sp.setDeltaMovement(0, 0, 0);
         sp.resetFallDistance();
         m.playSound(null, sitio[0], sitio[1], sitio[2], DarkCraftMod.SFX_SANTUARIO_DESCANSO.get(), SoundSource.PLAYERS, 0.8f, 1.1f);
-        m.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, sitio[0], sitio[1] + 1, sitio[2], 30, 0.4, 0.8, 0.4, 0.03);
+        m.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, sitio[0], sitio[1] + 0.2, sitio[2], 26, 0.7, 0.12, 0.7, 0.02);
         Logros.dar(sp, "viaje");
         HECHOS++;
         DarkCraftMod.LOGGER.info("[DarkCraft] viaje: {} llega a {} ({} {} {})", sp.getGameProfile().getName(), s.id(), Mth.floor(sitio[0]),
