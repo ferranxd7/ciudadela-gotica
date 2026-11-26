@@ -20,20 +20,24 @@ import java.util.List;
  * <li><b>Las llanuras</b> (sitio {@value #LLANURAS}): tres que vagan solos entre el Arco del Umbral y Velmor.</li>
  * <li><b>El molino</b> (sitio {@value #MOLINO}, parte 7f): la Molinera de rodillas en medio de la era (un jefe: cae una
  * vez) y dos marchitos por el camino que va de Velmor al molino.</li>
+ * <li><b>La Arboleda de los Ahorcados</b> (sitio {@value #ARBOLEDA}, parte 7g, en el Bosque Muerto): los ahorcados que cuelgan
+ * de las sogas del Arbol de la Horca, de los arboles de alrededor, de la puerta y del patibulo ({@link Arboleda#colgados}),
+ * tres de rodillas al pie del arbol, tres tumbados entre las tumbas, uno junto al patibulo y otro por el camino.</li>
  * </ul>
  * Nadie a menos de 18 bloques del arco ni de 14 de un santuario.
  */
 public final class MorvainEnemigos {
     private MorvainEnemigos() {}
 
-    public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino";
-    static final String MARCHITO = "marchito", MOLINERA = "molinera";
+    public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda";
+    static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
     private static final int G = Marchito.GUADANA, F = Marchito.FAROL, C = Marchito.CAMPANA;
 
-    private static final List<Puesto> VELMOR_P = new ArrayList<>(), LLANURAS_P = new ArrayList<>(), MOLINO_P = new ArrayList<>();
+    private static final List<Puesto> VELMOR_P = new ArrayList<>(), LLANURAS_P = new ArrayList<>(), MOLINO_P = new ArrayList<>(),
+            ARBOLEDA_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -103,6 +107,12 @@ public final class MorvainEnemigos {
         MOLINO_P.add(new Puesto(MOLINERA, 0, Molino.EX, Molino.Y + 1, Molino.EZ, ESTE, REZA, 0, Puestos.JEFE));
         MOLINO_P.add(new Puesto(MARCHITO, F, 1030, Molino.pie(1030, 4055), 4055, OESTE, DE_PIE, 4, "camino_molino"));
         MOLINO_P.add(new Puesto(MARCHITO, G, 1062, Molino.pie(1062, 4059), 4059, ESTE, REZA, 0, "camino_molino"));
+        // ---- la Arboleda de los Ahorcados (parte 7g): los que cuelgan de las sogas (bajo cada una) y los demas
+        Arboleda a = Arboleda.get();
+        for (Arboleda.Colgado c : a.colgados())
+            ARBOLEDA_P.add(new Puesto(AHORCADO, c.variante(), c.x(), c.y(), c.z(), c.giro(), Enemigo.COLGADO, 0, "colgados"));
+        for (Arboleda.Otro o : a.otros())
+            ARBOLEDA_P.add(new Puesto(AHORCADO, o.variante(), o.x(), o.y(), o.z(), o.giro(), o.postura(), o.ronda(), o.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -114,10 +124,12 @@ public final class MorvainEnemigos {
     public static void registrar() {
         Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
         Puestos.tipo(MOLINERA, DarkCraftMod.MOLINERA);
+        Puestos.tipo(AHORCADO, DarkCraftMod.AHORCADO);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
         Puestos.registrar(MOLINO, MOLINO_P, Morvain::es);
+        Puestos.registrar(ARBOLEDA, ARBOLEDA_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -128,6 +140,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> molino() {
         preparar();
         return List.copyOf(MOLINO_P);
+    }
+
+    public static List<Puesto> arboleda() {
+        preparar();
+        return List.copyOf(ARBOLEDA_P);
     }
 
     public static List<Puesto> velmor() {
@@ -200,6 +217,60 @@ public final class MorvainEnemigos {
                 + " (la Molinera " + (Molino.vencida(srv) ? "caida" : Puestos.enemigo(MOLINO, molinera()) != null ? "fuera" : "esperando") + ")";
     }
 
+    /** {@code /darkcraft arboleda [ir <sitio> | enemigos [volver | fuera | sacar]]} (parte 7g). */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoArboleda() {
+        return net.minecraft.commands.Commands.literal("arboleda")
+                .executes(c -> decir(c, estadoArboleda(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irArboleda(c.getSource(), "entrada"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Arboleda.get().sitios().keySet(), b))
+                                .executes(c -> irArboleda(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoArboleda(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), ARBOLEDA, false);
+                            return decir(c, "vuelven todos los ahorcados (y vuelven a colgar)");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), ARBOLEDA, true);
+                            return decir(c, "fuera todos los ahorcados");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            net.minecraft.server.level.ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, ARBOLEDA).size();
+                            return decir(c, "fuera " + n);
+                        })));
+    }
+
+    private static int irArboleda(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Arboleda.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Arboleda.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando al arbol de la horca
+        float giro = (float) (Math.toDegrees(Math.atan2(Arboleda.GZ - s[2], Arboleda.GX - s[0])) - 90.0);
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
+        return 1;
+    }
+
+    /** Cuantos ahorcados quedan y cuantos andan fuera (y cuantos cuelgan todavia). */
+    public static String estadoArboleda(net.minecraft.server.MinecraftServer srv) {
+        int cuelgan = 0;
+        var sitio = Puestos.sitio(ARBOLEDA);
+        if (sitio != null)
+            for (int i = 0; i < ARBOLEDA_P.size(); i++)
+                if (Puestos.enemigo(ARBOLEDA, i) instanceof com.darkcraft.enemigos.Ahorcado ah && ah.cuelga()) cuelgan++;
+        String s = "arboleda: quedan " + Puestos.quedan(srv, ARBOLEDA) + " de " + ARBOLEDA_P.size() + " (fuera " + Puestos.fuera(ARBOLEDA) + ", colgados "
+                + cuelgan + ")";
+        var m = Morvain.nivel(srv);
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(Arboleda.PX, 80, Arboleda.PZ))) s += "; " + Arboleda.resumen(m);
+        return s;
+    }
+
     /** {@code /darkcraft molinera [ir | vencer | volver]}: como esta la Molinera, llevar ante la era, vencerla o que vuelva. */
     public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoMolinera() {
         return net.minecraft.commands.Commands.literal("molinera")
@@ -257,13 +328,16 @@ public final class MorvainEnemigos {
         List<Puesto> todos = new ArrayList<>(VELMOR_P);
         todos.addAll(LLANURAS_P);
         todos.addAll(MOLINO_P);
+        todos.addAll(ARBOLEDA_P);
         for (Puesto p : todos) {
             if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
             for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
         }
         int camp = 0;
         for (Puesto p : VELMOR_P) if (p.variante() == C) camp++;
-        return VELMOR_P.size() + " en Velmor (" + camp + " campaneros), " + LLANURAS_P.size() + " por las llanuras y " + MOLINO_P.size()
-                + " en el molino; cerca del arco o de un santuario " + cerca;
+        int colg = 0;
+        for (Puesto p : ARBOLEDA_P) if (p.postura() == Enemigo.COLGADO) colg++;
+        return VELMOR_P.size() + " en Velmor (" + camp + " campaneros), " + LLANURAS_P.size() + " por las llanuras, " + MOLINO_P.size()
+                + " en el molino y " + ARBOLEDA_P.size() + " en la arboleda (" + colg + " colgados); cerca del arco o de un santuario " + cerca;
     }
 }

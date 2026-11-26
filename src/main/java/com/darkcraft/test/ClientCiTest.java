@@ -5993,6 +5993,8 @@ public final class ClientCiTest {
         t = velmor(t);
         // el molino y la Molinera de Velmor (parte 7f)
         t = molinera(t);
+        // la Arboleda de los Ahorcados, en el Bosque Muerto (parte 7g)
+        t = arboleda(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -6400,6 +6402,273 @@ public final class ClientCiTest {
             m.options.hideGui = false;
             server(m, sp -> {
                 comando(sp, "darkcraft velmor enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ la Arboleda de los Ahorcados (parte 7g)
+
+    /** El ahorcado del puesto de la arboleda cuyo sitio es (x, z) (o null si no esta fuera). */
+    private static com.darkcraft.enemigos.Ahorcado ahorcadoEn(int x, int z) {
+        var l = com.darkcraft.morvain.MorvainEnemigos.arboleda();
+        for (int i = 0; i < l.size(); i++)
+            if (l.get(i).x() == x && l.get(i).z() == z
+                    && com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.ARBOLEDA, i) instanceof com.darkcraft.enemigos.Ahorcado a) return a;
+        return null;
+    }
+
+    private static final com.darkcraft.enemigos.Ahorcado[] AHORCADOS = new com.darkcraft.enemigos.Ahorcado[2];
+
+    private static String estadoAhorcados() {
+        StringBuilder sb = new StringBuilder();
+        for (var a : AHORCADOS) sb.append(' ').append(a == null ? "-" : a.estado() + " accion " + a.accion());
+        return sb + " | caidas " + com.darkcraft.enemigos.Ahorcado.CAIDAS + ", lazos " + com.darkcraft.enemigos.Ahorcado.LAZOS;
+    }
+
+    /**
+     * La Arboleda de los Ahorcados: el claro desde el santuario, el Arbol de la Horca con sus colgados, uno de cerca, la puerta
+     * del camino, el patibulo; en supervivencia, el de la puerta se descuelga encima al pasar por debajo; el lazo que engancha
+     * y tira; el zarpazo y el salto; los de rodillas y los tumbados; el libro del verdugo, el bestiario y entrar a pie (el
+     * cartel y el logro, el viento de la arboleda). Al acabar vuelven todos (y vuelven a colgar).
+     */
+    private static int arboleda(int T) {
+        final var A = com.darkcraft.morvain.Arboleda.get();
+        final int GX = com.darkcraft.morvain.Arboleda.GX, GZ = com.darkcraft.morvain.Arboleda.GZ;
+        final int PX = com.darkcraft.morvain.Arboleda.PX, PZ = com.darkcraft.morvain.Arboleda.PZ, FY = A.fy;
+        // el colgado de la puerta (encima del camino) y el primero de la rama del este del Arbol de la Horca
+        final int QX = GX + 30, QZ = GZ + 6;
+        final int g = com.darkcraft.morvain.Arboleda.pie(GX + 9, GZ + 6);
+        int t = T;
+        atTicks(t, "La arboleda: desde el santuario", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft arboleda enemigos volver");
+                irMirando(sp, -4836.5, com.darkcraft.morvain.Arboleda.pie(-4836, 3207) + 6, 3207.5, GX + 4, g + 6, GZ, true);
+                log("  arboleda: " + com.darkcraft.morvain.MorvainEnemigos.comprobar());
+            });
+        });
+        t += 300;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv73_arboleda_santuario");
+            server(m, sp -> log("  " + com.darkcraft.morvain.MorvainEnemigos.estadoArboleda(sp.server)));
+        });
+        t += 10;
+        // ---- entrar a pie desde el santuario, en aventura: el cartel con el nombre, el logro y el viento
+        atTicks(t, "La arboleda: entrar a pie desde el santuario", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft arboleda enemigos fuera");
+                int[] p = A.sitio("entrada");
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), p[0] - 6.5, com.darkcraft.morvain.Arboleda.pie(p[0] - 7, p[2]), p[2] + 0.5, 90f, 2f);
+            });
+        });
+        t += 70;
+        atTicks(t, "captura", m -> {
+            log("  arboleda: " + ClientMusic.arboleda());
+            shot(m, "cliente_mv74_arboleda_cartel");
+            server(m, sp -> log("  al entrar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + ", logro arboleda " + com.darkcraft.story.Logros.tiene(sp, "arboleda")
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+        });
+        t += 10;
+        atTicks(t, "La arboleda: vuelven los ahorcados", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft arboleda enemigos volver");
+            });
+        });
+        t += 4;
+        atTicks(t, "La arboleda: el Arbol de la Horca", m -> server(m, sp -> irMirando(sp, GX + 17.5, g + 4, GZ + 11.5, GX, g + 7, GZ, true)));
+        t += 120;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv75_arbol_horca");
+            server(m, sp -> log("  bajo el arbol: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoArboleda(sp.server)));
+        });
+        t += 10;
+        atTicks(t, "La arboleda: un colgado de cerca", m -> server(m, sp -> {
+            int x = GX + 5, y = com.darkcraft.morvain.Arboleda.pie(GX + 5, GZ);
+            irMirando(sp, x + 3.5, y + 1.2, GZ + 3.5, x + 0.2, y + 2.6, GZ + 0.5, true);
+            var a = ahorcadoEn(x, GZ);
+            log("  el colgado de cerca: " + (a == null ? "no esta" : a.estado() + " giro " + Math.round(a.getYRot())));
+        }));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv76_colgado_cerca"));
+        t += 10;
+        atTicks(t, "La arboleda: la puerta del camino", m -> server(m, sp -> {
+            int y = com.darkcraft.morvain.Arboleda.pie(QX + 9, QZ);
+            irMirando(sp, QX + 9.5, y + 2.5, QZ + 1.5, QX, y + 3, QZ, true);
+        }));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv77_puerta"));
+        t += 10;
+        atTicks(t, "La arboleda: el patibulo", m -> server(m, sp -> irMirando(sp, PX + 9.5, FY + 4, PZ + 11.5, PX, FY + 3, PZ - 1, true)));
+        t += 70;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv78_patibulo");
+            server(m, sp -> log("  el patibulo: " + com.darkcraft.morvain.Arboleda.resumen(sp.serverLevel())));
+        });
+        t += 10;
+        // ---- en supervivencia: el de la puerta se descuelga encima de quien pasa por debajo
+        final int D = t;
+        atTicks(D, "La arboleda: pasar bajo el de la puerta (supervivencia)", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                int y = com.darkcraft.morvain.Arboleda.pie(QX + 8, QZ);
+                irMirando(sp, QX + 8.5, y, QZ + 0.5, QX, y + 3.5, QZ + 0.5, false);
+                AHORCADOS[0] = ahorcadoEn(QX, QZ);
+                log("  antes de pasar: " + estadoAhorcados());
+            });
+        });
+        atTicks(D + 30, "un paso: a tres bloques", m -> server(m, sp -> {
+            int y = com.darkcraft.morvain.Arboleda.pie(QX + 3, QZ);
+            irMirando(sp, QX + 3.5, y, QZ + 0.5, QX, y + 3.0, QZ + 0.5, false);
+        }));
+        atTicks(D + 48, "captura: se descuelga", m -> {
+            server(m, sp -> log("  al pasar por debajo: " + estadoAhorcados() + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())));
+            shot(m, "cliente_mv79_se_descuelga");
+        });
+        atTicks(D + 70, "captura: le cae encima", m -> {
+            server(m, sp -> {
+                var a = AHORCADOS[0];
+                log("  tras caer: " + estadoAhorcados() + " | soga " + (a == null || a.soga() == null ? "-" : sp.serverLevel().getBlockState(a.soga())));
+            });
+            shot(m, "cliente_mv80_cae_encima");
+        });
+        // ---- el lazo: uno con soga a siete bloques lo lanza (camara de lado) y tira
+        t = D + 76;
+        final int L = t;
+        atTicks(L, "La arboleda: el lazo", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                if (AHORCADOS[0] != null && !AHORCADOS[0].isRemoved()) AHORCADOS[0].discard();
+                comando(sp, "darkcraft arboleda enemigos fuera");
+                aPelear(sp, true);
+                int x = GX + 9, z = GZ + 8;
+                double y = com.darkcraft.enemigos.Puestos.suelo(lvl, x, com.darkcraft.morvain.Arboleda.pie(x, z), z);
+                var a = DarkCraftMod.AHORCADO.get().create(lvl);
+                if (a == null) return;
+                a.variante(com.darkcraft.enemigos.Ahorcado.SOGA);
+                a.moveTo(x + 0.5, y, z - 7 + 0.5, 0f, 0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                lvl.addFreshEntity(a);
+                AHORCADOS[1] = a;
+                irMirando(sp, x + 0.5, com.darkcraft.morvain.Arboleda.pie(x, z), z + 0.5, x + 0.5, y + 1.5, z - 7 + 0.5, false);
+                a.setTarget(sp);
+                a.empezar(com.darkcraft.enemigos.AhorcadoAnims.LAZO);
+                verDesdeServidor = new Vec3(x + 7.5, y + 2.5, z - 3);
+                miraServidor = new Vec3(x + 0.5, y + 1.4, z - 3);
+            });
+        });
+        atTicks(L + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(L + 23, "captura: el lazo tira", m -> {
+            server(m, sp -> log("  el lazo: " + estadoAhorcados() + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv81_lazo");
+        });
+        // ---- el zarpazo y el salto (en creativo, de cerca)
+        t = L + 48;
+        final int Z = t;
+        atTicks(Z, "La arboleda: el zarpazo", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                sp.setGameMode(GameType.CREATIVE);
+                if (AHORCADOS[1] != null && !AHORCADOS[1].isRemoved()) AHORCADOS[1].discard();
+                int x = GX + 10, z = GZ + 6;
+                double y = com.darkcraft.enemigos.Puestos.suelo(lvl, x, com.darkcraft.morvain.Arboleda.pie(x, z), z);
+                var a = DarkCraftMod.AHORCADO.get().create(lvl);
+                if (a == null) return;
+                a.variante(com.darkcraft.enemigos.Ahorcado.GARRAS);
+                a.moveTo(x + 0.5, y, z + 0.5, 0f, 0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                lvl.addFreshEntity(a);
+                AHORCADOS[1] = a;
+                irMirando(sp, x + 2.5, y + 0.4, z + 4.5, x + 0.5, y + 1.6, z + 0.5, true);
+                a.empezar(com.darkcraft.enemigos.AhorcadoAnims.ZARPAZO);
+            });
+        });
+        atTicks(Z + 11, "captura: el zarpazo", m -> shot(m, "cliente_mv82_zarpazo"));
+        atTicks(Z + 30, "el salto", m -> server(m, sp -> {
+            var a = AHORCADOS[1];
+            if (a != null) a.empezar(com.darkcraft.enemigos.AhorcadoAnims.SALTO);
+        }));
+        atTicks(Z + 46, "captura: el salto", m -> {
+            server(m, sp -> log("  el salto: " + estadoAhorcados()));
+            shot(m, "cliente_mv83_salto");
+        });
+        // ---- los de rodillas al pie del arbol y los tumbados entre las tumbas
+        t = Z + 70;
+        atTicks(t, "La arboleda: las tumbas", m -> server(m, sp -> {
+            if (AHORCADOS[1] != null && !AHORCADOS[1].isRemoved()) AHORCADOS[1].discard();
+            comando(sp, "darkcraft arboleda enemigos volver");
+            int[] q = A.sitio("tumbas");
+            irMirando(sp, q[0] + 8.5, q[1] + 4, q[2] + 9.5, q[0], q[1] + 0.5, q[2], true);
+        }));
+        t += 70;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv84_tumbas");
+            server(m, sp -> log("  las tumbas: " + com.darkcraft.morvain.MorvainEnemigos.estadoArboleda(sp.server)));
+        });
+        t += 6;
+        atTicks(t, "La arboleda: el libro del verdugo", m -> com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(19)));
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv85_libro_verdugo"));
+        t += 6;
+        // ---- cae uno (en supervivencia: el bestiario y su logro)
+        atTicks(t, "La arboleda: cae un ahorcado", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                int x = GX + 10, z = GZ + 6;
+                double y = com.darkcraft.enemigos.Puestos.suelo(lvl, x, com.darkcraft.morvain.Arboleda.pie(x, z), z);
+                var a = DarkCraftMod.AHORCADO.get().create(lvl);
+                if (a == null) return;
+                a.variante(com.darkcraft.enemigos.Ahorcado.SOGA);
+                a.moveTo(x + 0.5, y, z + 0.5, 0f, 0f);
+                lvl.addFreshEntity(a);
+                sp.setGameMode(GameType.SURVIVAL);
+                a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        t += 20;
+        atTicks(t, "el bestiario: el ahorcado", m -> {
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("ahorcado_soga")));
+        });
+        t += 18;
+        atTicks(t, "captura: el ahorcado en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            server(m, sp -> log("  logro ahorcado " + com.darkcraft.story.Logros.tiene(sp, "ahorcado")));
+            shot(m, "cliente_mv86_bestiario_ahorcado");
+        });
+        t += 4;
+        atTicks(t, "La arboleda: fin (vuelven los ahorcados, vuelta al arco)", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft arboleda enemigos volver");
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

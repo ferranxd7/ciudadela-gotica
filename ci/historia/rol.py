@@ -2020,6 +2020,59 @@ EN.update({
 })
 
 
+# ---------------------------------------------------------------- parte 7g: los Ahorcados y la Arboleda (el Bosque Muerto)
+ES.update({
+    "entity.darkcraft.ahorcado": "Ahorcado",
+    "block.darkcraft.soga": "Soga",
+    "darkcraft.bestiario.ahorcado_garras": "Ahorcado",
+    "darkcraft.bestiario.ahorcado_soga": "Ahorcado del saco",
+    "darkcraft.bestiario.ahorcado_garras.desc": "Los colgaron en la Arboleda y la Sombra no los dejó morir. Esperan colgados de su soga, girando despacio, y se descuelgan sobre quien pasa cerca: mira arriba antes de pasar bajo una rama. En el suelo son rápidos: un zarpazo, otro doble y un salto desde lejos.",
+    "darkcraft.bestiario.ahorcado_soga.desc": "Lleva un saco en la cabeza y la soga en la mano. Su latigazo llega lejos y su lazo, más: si te engancha, tira de ti hasta sus pies. Rueda o cúbrete cuando lo lance.",
+    "subtitles.darkcraft.sfx.ahorcado_soga": "Cruje una soga",
+    "subtitles.darkcraft.sfx.ahorcado_gemido": "Un ahorcado gime",
+    "subtitles.darkcraft.sfx.ahorcado_alerta": "Un ahorcado chilla",
+    "subtitles.darkcraft.sfx.ahorcado_cae": "Un ahorcado cae de su rama",
+    "subtitles.darkcraft.sfx.ahorcado_zarpazo": "Unas garras cortan el aire",
+    "subtitles.darkcraft.sfx.ahorcado_lazo": "Restalla una soga",
+    "subtitles.darkcraft.sfx.ahorcado_dolor": "Un ahorcado se queja",
+    "subtitles.darkcraft.sfx.ahorcado_muerte": "Un ahorcado se desploma",
+    "subtitles.darkcraft.ambiente.arboleda": "El viento entre los árboles muertos",
+    "darkcraft.morvain.lugar.arboleda": "La Arboleda de los Ahorcados",
+    "advancements.darkcraft.ahorcado.title": "Cortar la soga",
+    "advancements.darkcraft.ahorcado.description": "Vence a un ahorcado del Bosque Muerto",
+    "advancements.darkcraft.arboleda.title": "Bajo el Árbol de la Horca",
+    "advancements.darkcraft.arboleda.description": "Entra en la Arboleda de los Ahorcados",
+    "darkcraft.diario.ahorcado": "En el Bosque Muerto los árboles dan un fruto que no se come. Cuelgan, giran despacio con el viento... y se descuelgan cuando pasas por debajo.",
+    "darkcraft.diario.arboleda": "La Arboleda de los Ahorcados: un árbol enorme lleno de sogas, un patíbulo con su trampilla y las cruces de los que bajaron. Alguien llevaba la cuenta de todos.",
+    "darkcraft.ayuda.arboleda": "La Arboleda de los Ahorcados: ir a uno de sus sitios, que vuelvan sus ahorcados (y vuelvan a colgar) o quitarlos",
+})
+EN.update({
+    "entity.darkcraft.ahorcado": "Hanged One",
+    "block.darkcraft.soga": "Rope",
+    "darkcraft.bestiario.ahorcado_garras": "Hanged One",
+    "darkcraft.bestiario.ahorcado_soga": "Hooded Hanged One",
+    "darkcraft.bestiario.ahorcado_garras.desc": "They were hanged in the Grove and the Shadow would not let them die. They wait on their ropes, turning slowly, and drop onto whoever passes close: look up before walking under a branch. On the ground they are quick: a swipe, a double swipe and a leap from afar.",
+    "darkcraft.bestiario.ahorcado_soga.desc": "It wears a sack over its head and carries the rope in its hand. Its lash reaches far and its noose even further: if it catches you, it drags you to its feet. Roll or raise your shield when it throws.",
+    "subtitles.darkcraft.sfx.ahorcado_soga": "A rope creaks",
+    "subtitles.darkcraft.sfx.ahorcado_gemido": "Hanged One moans",
+    "subtitles.darkcraft.sfx.ahorcado_alerta": "Hanged One shrieks",
+    "subtitles.darkcraft.sfx.ahorcado_cae": "A Hanged One drops from its branch",
+    "subtitles.darkcraft.sfx.ahorcado_zarpazo": "Claws slash the air",
+    "subtitles.darkcraft.sfx.ahorcado_lazo": "A rope cracks",
+    "subtitles.darkcraft.sfx.ahorcado_dolor": "Hanged One hurts",
+    "subtitles.darkcraft.sfx.ahorcado_muerte": "Hanged One collapses",
+    "subtitles.darkcraft.ambiente.arboleda": "Wind among the dead trees",
+    "darkcraft.morvain.lugar.arboleda": "The Grove of the Hanged",
+    "advancements.darkcraft.ahorcado.title": "Cut Down",
+    "advancements.darkcraft.ahorcado.description": "Defeat a Hanged One of the Dead Forest",
+    "advancements.darkcraft.arboleda.title": "Beneath the Gallows Tree",
+    "advancements.darkcraft.arboleda.description": "Enter the Grove of the Hanged",
+    "darkcraft.diario.ahorcado": "In the Dead Forest the trees bear a fruit no one eats. It hangs, turning slowly in the wind... and drops when you pass beneath.",
+    "darkcraft.diario.arboleda": "The Grove of the Hanged: a huge tree full of ropes, a gallows with its trapdoor and the crosses of those who were cut down. Someone kept count of them all.",
+    "darkcraft.ayuda.arboleda": "The Grove of the Hanged: go to one of its places, bring its Hanged Ones back (hanging again) or remove them",
+})
+
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

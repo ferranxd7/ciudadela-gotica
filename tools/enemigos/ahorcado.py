@@ -18,18 +18,33 @@ ESCALA = 1.1
 # ---------------------------------------------------------------- el modelo
 
 
+#: el nudo de la soga en la postura de colgado (px, absolutos, con el torso derecho): colgado, el cuerpo gira alrededor de
+#: el (es donde la soga sube a la rama) y el servidor coloca al ahorcado para que caiga justo bajo la soga de bloques
+NUDO = (4.4, -5.25, 0.0)
+#: lo que sube la soga de arriba desde el nudo (px): por encima, la soga de bloques de la rama
+SOGA_ARRIBA = 12.0
+
+
 def rig():
     r = Rig(NOMBRE, 128)
+    # el colgadero: el nudo (colgado, el bucle lo gira; en lo demas no se mueve). La raiz cuelga de el.
+    r.pieza("colgadero", "", NUDO)
     # largo y flaco: los brazos casi hasta las rodillas, el cuello estirado
     humanoide(r, torso=(7, 13, 4), cabeza=(7, 8, 7), brazo=(3, 18, 3), pierna=(3, 14, 3), cuello=1.5)
+    raiz = r.por_nombre["raiz"]
+    raiz.parent = "colgadero"
+    raiz.pivot = (-NUDO[0], 24 - NUDO[1], -NUDO[2])
     # el faldon de la camisa, por fuera de los calzones
     r.pieza("faldon", "cadera", (0, 0, 0), boxes=[Box(-4, -0.5, -2.5, 8, 5, 5, "faldon", grow=g(0.3))])
-    # la soga al cuello: la vuelta y el nudo, y el cabo cortado que cuelga por la espalda
-    r.pieza("soga_cuello", "cabeza", (0, 1.0, 0), boxes=[
-        Box(-3.5, -1.5, -3.5, 7, 2, 7, "soga", grow=g(0.25)),
-        Box(2.6, -2.2, -1.0, 2, 2, 2, "nudo"),
+    # la soga al cuello (en el torso: la cabeza se ladea sin moverla): la vuelta y el nudo, a su izquierda
+    r.pieza("soga_cuello", "torso", (0, -13.75, 0), boxes=[
+        Box(-3.5, -0.75, -3.5, 7, 1.5, 7, "soga", grow=g(0.25)),
+        Box(3.4, -1.5, -1.0, 2, 2, 2, "nudo"),
     ])
+    # el cabo cortado que cuelga por la espalda (si ya no cuelga)
     r.pieza("cabo", "torso", (0, -13, 2.2), boxes=[Box(-0.5, 0, 0, 1, 7, 1, "soga")])
+    # la soga de arriba (colgado): del nudo a la soga de bloques de la rama
+    r.pieza("soga_arriba", "colgadero", (0, 0, 0), boxes=[Box(-0.75, -SOGA_ARRIBA, -0.75, 1.5, SOGA_ARRIBA, 1.5, "soga")])
     # el saco de arpillera (1), con la soga que lo ata al cuello
     r.pieza("saco", "cabeza", (0, 0, 0), boxes=[
         Box(-3.5, -8.5, -3.5, 7, 9, 7, "saco", grow=g(0.55)),
@@ -58,8 +73,8 @@ def rig():
 
 #: lo que se esconde en cada variante
 OCULTAS = {
-    0: ["saco", "soga_mano", "lazo"],
-    1: ["unas_d"],
+    0: ["saco", "soga_mano", "lazo", "soga_arriba"],
+    1: ["unas_d", "soga_arriba"],
 }
 
 # ---------------------------------------------------------------- las texturas
@@ -228,7 +243,7 @@ BASE = dict(raiz=raiz(-0.4), torso=(16, 0, 0), cabeza=(14, 0, 26), muslo_d=(-4, 
             pierna_i=(6, 0, 0), brazo_d=(-6, 0, 8), antebrazo_d=(-10, 0, 0), brazo_i=(-4, 0, -8), antebrazo_i=(-12, 0, 0),
             faldon=(6, 0, 0))
 # colgado: las piernas muertas, las puntas de los pies abajo, los brazos sueltos, la cabeza vencida
-COLGADO = dict(raiz=raiz(0.0), torso=(2, 0, 0), cabeza=(30, 0, 30), muslo_d=(2, 0, 2), pierna_d=(4, 0, 0), muslo_i=(-2, 0, -2),
+COLGADO = dict(raiz=raiz(0.0), torso=(0, 0, 0), cabeza=(22, 0, -32), muslo_d=(2, 0, 2), pierna_d=(4, 0, 0), muslo_i=(-2, 0, -2),
                pierna_i=(6, 0, 0), brazo_d=(2, 0, 6), antebrazo_d=(-4, 0, 0), brazo_i=(4, 0, -6), antebrazo_i=(-6, 0, 0),
                faldon=(0, 0, 0))
 # en guardia: agachado, las garras delante
@@ -269,13 +284,13 @@ def animaciones(r=None):
                                     "torso": (18, ty, -ty * 0.6), "cabeza": (12, -ty, 26), "raiz": raiz(-0.4 + up),
                                     "brazo_d": (-md * 0.5, 0, 10), "brazo_i": (-mi * 0.5, 0, -10), "faldon": (-md * 0.2, 0, 0)}))
     bucle("andar", 1.4, pasos)
-    # ---- colgado: gira despacio en su soga
+    # ---- colgado: gira despacio en su soga (alrededor del nudo, que es donde sube la soga)
     bucle("colgado", 6.0, [
-        (0.0, con(COLGADO, raiz=raiz(0.0, rot=(0, -14, 0)))),
-        (1.5, con(COLGADO, raiz=raiz(0.0, rot=(2, 0, 2)), brazo_d=(6, 0, 8), pierna_i=(10, 0, 0))),
-        (3.0, con(COLGADO, raiz=raiz(0.0, rot=(0, 14, 0)), cabeza=(32, 0, 26))),
-        (4.5, con(COLGADO, raiz=raiz(0.0, rot=(-2, 0, -2)), brazo_i=(8, 0, -8), pierna_d=(10, 0, 0))),
-        (6.0, con(COLGADO, raiz=raiz(0.0, rot=(0, -14, 0)))),
+        (0.0, con(COLGADO, colgadero=(0, -14, 0))),
+        (1.5, con(COLGADO, colgadero=(2, 0, 2), brazo_d=(6, 0, 8), pierna_i=(10, 0, 0))),
+        (3.0, con(COLGADO, colgadero=(0, 14, 0), cabeza=(24, 0, -28))),
+        (4.5, con(COLGADO, colgadero=(-2, 0, -2), brazo_i=(8, 0, -8), pierna_d=(10, 0, 0))),
+        (6.0, con(COLGADO, colgadero=(0, -14, 0))),
     ])
     # la soga al costado (1), colgando de la mano, con lo demas del bucle que toque
     PORTE = dict(brazo_d=(-6, 0, 12), antebrazo_d=(-30, 0, 0), mano_d=(70, 0, 0))
@@ -343,8 +358,9 @@ def animaciones(r=None):
     C_ATERRIZA = con(LISTO, raiz=raiz(-5.0), torso=(50, 0, 0), cabeza=(-30, 0, 10), muslo_d=(-80, 0, 10), pierna_d=(110, 0, 0),
                      muslo_i=(-74, 0, -10), pierna_i=(106, 0, 0), brazo_d=(-30, 0, 40), antebrazo_d=(-30, 0, 0), brazo_i=(-30, 0, -40),
                      antebrazo_i=(-30, 0, 0))
-    accion("caer", 1.4, [(0.00, COLGADO), (0.15, C_SUELTA), (0.50, C_SUELTA), (0.60, C_ATERRIZA), (0.95, C_ATERRIZA), (1.40, LISTO)],
-           golpes=(0.60,))
+    # (el servidor lo suelta en el tick 2 y cae en unos 5: toca el suelo hacia el tick 7 y pega en el 8)
+    accion("caer", 1.3, [(0.00, COLGADO), (0.10, C_SUELTA), (0.34, C_SUELTA), (0.42, C_ATERRIZA), (0.80, C_ATERRIZA), (1.30, LISTO)],
+           golpes=(0.42,))
     # ---- 7 aturdido
     AT = dict(raiz=raiz(-1.2, 2.0), torso=(-8, 0, 10), cabeza=(-20, 0, 30), muslo_d=(-8, 0, 8), pierna_d=(20, 0, 0), muslo_i=(10, 0, -8),
               pierna_i=(16, 0, 0), brazo_d=(16, 0, 30), antebrazo_d=(-20, 0, 0), brazo_i=(18, 0, -30), antebrazo_i=(-16, 0, 0))
@@ -371,6 +387,15 @@ def animaciones(r=None):
                                         muslo_i=(-20, 0, -6), pierna_i=(80, 0, 0), brazo_d=(-30, 0, 20), brazo_i=(-30, 0, -20))),
                             (2.00, LISTO)])
     return B, A
+
+
+# lo que necesita el servidor para colgarlo bajo su soga (en AhorcadoAnims)
+TABLA_EXTRA = (
+    "",
+    "    /** El nudo de la soga en la postura de colgado (px del modelo, sin escalar) y lo que sube la soga del modelo. */",
+    f"    public static final float NUDO_X = {NUDO[0]}f, NUDO_Y = {NUDO[1]}f, NUDO_Z = {NUDO[2]}f, SOGA_ARRIBA = {SOGA_ARRIBA}f;",
+    f"    public static final float ESCALA = {ESCALA}f;",
+)
 
 
 # ---------------------------------------------------------------- para las hojas de revision (generar.py --vistas)

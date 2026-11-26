@@ -47,6 +47,7 @@ public final class Comandos {
                 .then(com.darkcraft.morvain.Fragmentos.comando())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comando())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoMolinera())
+                .then(com.darkcraft.morvain.MorvainEnemigos.comandoArboleda())
                 .then(com.darkcraft.rol.Rol.comando())
                 .then(com.darkcraft.rol.Rol.comandoRol()));
     }
@@ -106,6 +107,7 @@ public final class Comandos {
         src.sendSuccess(() -> linea(new Linea("/darkcraft mapa ", "/darkcraft mapa [lista | dar <region>|todos | quitar | ir <region>]", "mapa")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft velmor ", "/darkcraft velmor [ir <sitio> | enemigos [volver | fuera | sacar]]", "velmor")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft molinera ", "/darkcraft molinera [ir | vencer | volver]", "molinera")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft arboleda ", "/darkcraft arboleda [ir <sitio> | enemigos [volver | fuera | sacar]]", "arboleda")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ecos ", "/darkcraft ecos / ecos dar <n> / ecos quitar", "ecos")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft rol ", "/darkcraft rol clase [<nombre> | elegir | olvidar | ninguna] / santuario / frascos [<n>] / nivel [reiniciar] / atributo <nombre> <valor> / talisman <nombre> [poner <hueco>] / fruto <nombre> [<n>] / hechizo <nombre>|memorizar|olvidar|baston|sello / guia [olvidar] / herrero [olvidar] / mercader [olvidar] / mejora <0-9> / piedras / ceniza <nombre> [poner] | quitar / resistencias", "rol")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ayuda", "/darkcraft ayuda", "ayuda")), false);
