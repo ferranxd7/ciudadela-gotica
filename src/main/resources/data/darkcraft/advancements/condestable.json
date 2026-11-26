@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:juramento",
+  "display": {
+    "icon": {
+      "item": "minecraft:netherite_sword"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.condestable.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.condestable.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 500
+  }
+}

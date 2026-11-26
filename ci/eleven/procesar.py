@@ -73,6 +73,8 @@ TOMAS_VERDUGO = {n: "a" for n in range(1, 6)}
 TOMAS_BARQUERO = {n: "a" for n in range(1, 6)}
 # Hrodric, el Abad de la Cumbre (parte 7l; voz "Elder Rowan"): las tomas a (las b dicen lo mismo, con las mismas pausas)
 TOMAS_ABAD = {n: "a" for n in range(1, 6)}
+# el Condestable del Juramento (parte 7n; voz "Jerry B. - Military Commander"): las tomas a (las b dicen lo mismo)
+TOMAS_CONDESTABLE = {n: "a" for n in range(1, 6)}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -232,11 +234,20 @@ SFX = {
     "calcinado_escudo": (0.8, 0.3, -13), "calcinado_cantaro": (0.9, 0.4, -14), "calcinado_fuego": (3.0, 1.0, -19),
     "calcinado_ceniza": (1.3, 0.5, -15),
     "capital_ambiente": (20.0, 2.0, -26),
+    # el Condestable del Juramento (parte 7n): el grito con su llamarada, el tajo del montante en llamas contra la piedra (y
+    # el fuego que corre por el suelo), el barrido, la embestida con la armadura, el anillo de fuego que revienta, el rastrillo
+    # que cae (y el que se alza despacio con su torno), el cuerno que llama a la guardia, alzar la espada al cielo, el dolor,
+    # la muerte (la armadura contra el suelo y las brasas que se apagan) y la espera de rodillas (el fuego quieto, una
+    # respiracion; muy floja de origen)
+    "condestable_grito": (4.2, 1.0, -13), "condestable_tajo": (3.0, 0.9, -13), "condestable_barrido": (1.6, 0.5, -14),
+    "condestable_embestida": (2.6, 0.6, -14), "condestable_llamarada": (3.0, 1.0, -13), "condestable_rastrillo": (3.6, 0.8, -12),
+    "condestable_abrir": (8.0, 1.5, -15), "condestable_cuerno": (5.5, 1.5, -13), "condestable_alzar": (3.0, 1.0, -14),
+    "condestable_dolor": (0.9, 0.25, -15), "condestable_muerte": (6.5, 1.8, -14), "condestable_espera": (6.0, 1.2, -22),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
            "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0, "abad_ventisca": 1.5, "abad_rezo": 0.4,
-           "capital_ambiente": 2.0, "calcinado_fuego": 0.25}
+           "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
@@ -409,6 +420,15 @@ TOMAS_SFX = {
     "calcinado_gemido": (4, 2), "calcinado_alerta": (1, 3), "calcinado_dolor": (3, 4, 1), "calcinado_muerte": (3, 2),
     "calcinado_alzarse": (1, 2), "calcinado_tajo": (4, 2), "calcinado_escudo": (3, 2), "calcinado_cantaro": (3, 4),
     "calcinado_fuego": (2, 4), "calcinado_ceniza": (2, 4), "capital_ambiente": (1, 4),
+    # el Condestable: los dos gritos que mas aguantan arriba (la 4 y la 2); los dos tajos con el golpe mas gordo (la 4 y la
+    # 1); los dos barridos mas secos; las dos embestidas que acaban en choque (la 3 y la 2); las dos llamaradas que revientan
+    # con golpe (la 2 y la 1); los dos rastrillos que caen de golpe (la 4 y la 1); el torno que sube parejo y acaba en el
+    # golpe (la 1 y la 4); los dos cuernos mas largos (la 4 y la 2); las dos espadas al cielo que mas suben (la 3 y la 2);
+    # tres quejidos (la 3, la 1 y la 4); las dos muertes que mas duran (la 2 y la 4); y las dos esperas mas parejas (la 1 y
+    # la 3: las cuatro llegan muy flojas)
+    "condestable_grito": (4, 2), "condestable_tajo": (4, 1), "condestable_barrido": (4, 1), "condestable_embestida": (3, 2),
+    "condestable_llamarada": (2, 1), "condestable_rastrillo": (4, 1), "condestable_abrir": (1, 4), "condestable_cuerno": (4, 2),
+    "condestable_alzar": (3, 2), "condestable_dolor": (3, 1, 4), "condestable_muerte": (2, 4), "condestable_espera": (1, 3),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -601,6 +621,27 @@ def voz_abad(src, dst):
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA + 0.15
+
+
+def voz_condestable(src, dst):
+    """
+    El Condestable del Juramento: un caballero gigante que ardio dentro de su armadura. Algo mas grave, una segunda voz una
+    octava por debajo (el pecho del gigante), la resonancia del yelmo cerrado (dos ecos cortisimos y un pico en los medios:
+    habla desde dentro del hierro), un poco de raspa y el eco del patio entre los muros (corto y duro: piedra cerca).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=2[v1][v2];"
+        "[v1]asetrate=44100*0.93,aresample=44100,atempo=1.0753[baja];"
+        "[v2]asetrate=44100*0.5,aresample=44100,atempo=2.0,lowpass=f=650,volume=0.3[honda];"
+        "[baja][honda]amix=inputs=2:weights=1 0.42:normalize=0,"
+        "aecho=0.9:0.6:5|9:0.32|0.2,equalizer=f=950:t=q:w=1.4:g=3.5,equalizer=f=140:t=q:w=1.0:g=2,highshelf=f=6500:g=-2.5,"
+        "asoftclip=type=atan:threshold=0.8,"
+        "aecho=0.8:0.35:80|190|340:0.2|0.12|0.06,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.1
 
 
 def sonoridad(f):
@@ -863,6 +904,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO abad {n}: {e}")
+    # el Condestable del Juramento (parte 7n)
+    con = os.path.join(ASSETS, "sounds", "condestable")
+    os.makedirs(con, exist_ok=True)
+    dur_k, hab_k = {}, {}
+    for n, toma in sorted(TOMAS_CONDESTABLE.items()):
+        src = os.path.join(MASTER, "condestable", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(con, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_condestable(src, dst)
+            dur_k[n] = round(duracion(dst), 2)
+            hab_k[n] = round(min(h, dur_k[n]), 2)
+            print(f"condestable {n:2d}: {dur_k[n]} s (habla hasta {hab_k[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO condestable {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -894,7 +954,7 @@ def main():
         json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g, "capitan": dur_c, "habla_capitan": hab_c,
                    "sombra": dur_s, "habla_sombra": hab_s, "molinera": dur_m, "habla_molinera": hab_m,
                    "verdugo": dur_v, "habla_verdugo": hab_v, "barquero": dur_b, "habla_barquero": hab_b,
-                   "abad": dur_a, "habla_abad": hab_a}, fh)
+                   "abad": dur_a, "habla_abad": hab_a, "condestable": dur_k, "habla_condestable": hab_k}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

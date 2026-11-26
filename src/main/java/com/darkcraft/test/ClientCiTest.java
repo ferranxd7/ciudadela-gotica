@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 56 * 60 * 20;
+    private static final int LIMIT = 66 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -6007,6 +6007,8 @@ public final class ClientCiTest {
         t = abad(t);
         // la Puerta Oeste de la Capital y los calcinados (parte 7m)
         t = capital(t);
+        // el Patio del Juramento y Ser Halvard, el Condestable, el jefe de la Capital en ruinas (parte 7n)
+        t = juramento(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -8444,6 +8446,355 @@ public final class ClientCiTest {
                 sp.clearFire();
                 sp.setHealth(sp.getMaxHealth());
                 comando(sp, "darkcraft capital enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el Patio del Juramento y el Condestable (parte 7n)
+
+    private static com.darkcraft.enemigos.Condestable condestableE() {
+        var e = com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.JURAMENTO, com.darkcraft.morvain.MorvainEnemigos.condestable());
+        return e instanceof com.darkcraft.enemigos.Condestable k ? k : null;
+    }
+
+    /** Lo que deja el fuego del Condestable en el patio (las llamas, los cantaros) y su guardia alzada de la ceniza. */
+    private static void limpiarJuramento(ServerLevel lvl) {
+        int x = com.darkcraft.morvain.Juramento.CX + com.darkcraft.morvain.Juramento.CENTRO_U, z = com.darkcraft.morvain.Juramento.CZ;
+        var caja = new net.minecraft.world.phys.AABB(x - 60, 60, z - 50, x + 60, 160, z + 50);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.Llamas.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Calcinado.class, caja)) if (e.esEfimero()) e.discard();
+    }
+
+    /**
+     * El Patio del Juramento y Ser Halvard, el Condestable: la calle desde la plaza, la puerta con su guardia de rodillas, entrar
+     * a pie en el patio (el cartel con su nombre y el logro), el patio desde lo alto y el Condestable de rodilla en su estrado; en
+     * supervivencia habla mientras se levanta, cae el rastrillo a la espalda y ruge (su barra); sus golpes (el tajo con su linea
+     * de fuego, el barrido, la embestida, la llamarada, la brea de los muros); a media vida toca el cuerno y se alza su guardia
+     * de la ceniza; el golpe de muerte no le mata: jura de rodilla y se alza con furia; cae de verdad (de rodilla sobre el
+     * montante, el rastrillo se alza, se deshace en ceniza; el cartel), la Puerta Oeste abierta, la torre por dentro, su libro y
+     * el bestiario. Al acabar vuelve todo como estaba (el Condestable de rodilla, la Puerta Oeste medio bajada).
+     */
+    private static int juramento(int T) {
+        final var J = com.darkcraft.morvain.Juramento.get();
+        final int CX = com.darkcraft.morvain.Juramento.CX, CZ = com.darkcraft.morvain.Juramento.CZ, PISO = com.darkcraft.morvain.Juramento.PISO;
+        final int CU = com.darkcraft.morvain.Juramento.CENTRO_U;
+        final String SITIO = com.darkcraft.morvain.MorvainEnemigos.JURAMENTO;
+        final int[] AN = J.sitio("ante_condestable");
+        // la camara de la puerta: dentro del patio, mirando el rastrillo por el paso
+        final Vec3 puertaDesde = new Vec3(CX + 140.5, PISO + 2.6, CZ + 0.5), puertaMira = new Vec3(CX + 132.5, PISO + 2.2, CZ + 0.5);
+        int t = T;
+        atTicks(t, "El Patio del Juramento: la calle desde la plaza", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft condestable volver");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                irMirando(sp, CX + 106.5, PISO + 2.0, CZ + 1.5, CX + 131, PISO + 5, CZ + 0.5, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv198_juramento_calle");
+            server(m, sp -> log("  el patio del Juramento: " + com.darkcraft.morvain.MorvainEnemigos.estadoCondestable(sp.server) + " | sitio "
+                    + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "El Patio del Juramento: la puerta y su guardia de rodillas", m -> server(m, sp -> {
+            comando(sp, "darkcraft condestable rastrillo subir");
+            irMirando(sp, CX + 119.5, PISO + 0.8, CZ - 3.5, CX + 126.5, PISO + 1.4, CZ + 0.5, true);
+        }));
+        t += 60;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv199_juramento_puerta");
+            server(m, sp -> {
+                StringBuilder s = new StringBuilder();
+                for (int i = 0; i < com.darkcraft.morvain.MorvainEnemigos.juramento().size(); i++)
+                    s.append(i == 0 ? "" : " | ").append(estadoE(com.darkcraft.enemigos.Puestos.enemigo(SITIO, i)));
+                log("  la puerta del patio: " + s + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp));
+            });
+        });
+        t += 10;
+        // ---- entrar a pie, en aventura, por el paso del rastrillo: el cartel con el nombre y el logro (la guardia de la puerta, fuera)
+        atTicks(t, "El Patio del Juramento: entrar por la puerta", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                for (int i = 0; i < com.darkcraft.morvain.MorvainEnemigos.juramento().size(); i++)
+                    if (i != com.darkcraft.morvain.MorvainEnemigos.condestable()) com.darkcraft.enemigos.Puestos.marcar(sp.server, SITIO, i, true);
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), CX + 133.5, PISO, CZ + 0.5, -90f, 2f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv200_juramento_patio");
+            server(m, sp -> log("  al entrar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + ", logro juramento " + com.darkcraft.story.Logros.tiene(sp, "juramento")
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoCondestable(sp.server)));
+        });
+        t += 10;
+        atTicks(t, "El Patio del Juramento: desde lo alto", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                irMirando(sp, CX + 124.5, PISO + 26, CZ + 33.5, CX + 166, PISO + 1, CZ - 2, true);
+            });
+        });
+        t += 90;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv201_juramento_alto"));
+        t += 10;
+        atTicks(t, "El Condestable, de rodilla en su estrado", m -> server(m, sp -> irMirando(sp, CX + 153.5, PISO + 1.0, CZ - 4.5, CX + CU + 0.5, PISO + 2.0, CZ + 0.5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv202_condestable_reza");
+            server(m, sp -> log("  el Condestable de rodilla: " + estadoE(condestableE()) + " | " + (condestableE() == null ? "" : condestableE().estado())));
+        });
+        t += 10;
+        // ---- en supervivencia, ante el estrado: habla mientras se levanta, cae el rastrillo a la espalda y ruge al acabar
+        final int F = t;
+        final int dura = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Condestable.VOZ_BASE + 1);
+        atTicks(F, "El Condestable: en supervivencia ante el estrado", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                irMirando(sp, AN[0] + 0.5, AN[1], AN[2] + 0.5, CX + CU + 0.5, PISO + 3.4, CZ + 0.5, false);
+                log("  antes de la pelea: " + com.darkcraft.morvain.Juramento.resumen(sp.serverLevel()));
+                var e = condestableE();
+                if (e != null) e.setTarget(sp);
+            });
+        });
+        atTicks(F + 40, "captura: se levanta (y habla)", m -> {
+            server(m, sp -> log("  el Condestable al verle: " + estadoE(condestableE()) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv203_condestable_habla");
+        });
+        atTicks(F + 56, "camara: el rastrillo, a la espalda", m -> verDesde(m, puertaDesde, puertaMira));
+        atTicks(F + 60, "captura: el rastrillo bajado", m -> {
+            server(m, sp -> log("  el rastrillo: " + com.darkcraft.morvain.Juramento.resumen(sp.serverLevel()) + " (caidas " + com.darkcraft.morvain.Juramento.CAIDAS + ")"));
+            shot(m, "cliente_mv204_rastrillo_cae");
+        });
+        atTicks(F + 62, "camara: la del jugador", ClientCiTest::enPrimeraPersona);
+        atTicks(F + dura + 6, "captura: ruge (su barra)", m -> {
+            server(m, sp -> log("  el Condestable ruge: " + estadoE(condestableE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())));
+            log("  condestable: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv205_condestable_ruge");
+        });
+        t = F + dura + 60;
+        // ---- sus golpes (en creativo, con la camara de observador), en su estrado mirando al oeste (a la puerta)
+        atTicks(t, "El Condestable: sus golpes (creativo)", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                limpiarJuramento(sp.serverLevel());
+                sp.clearFire();
+                irMirando(sp, CX + CU - 14.5, PISO + 7, CZ + 16.5, CX + CU, PISO + 1, CZ, true);
+            });
+        });
+        t += 4;
+        // {accion, camara: a su derecha, arriba, delante; mira delante; tick de la captura, nombre}
+        Object[][] golpes = {
+                {com.darkcraft.enemigos.CondestableAnims.TAJO, 9.0, 4.4, 6.0, 7.0, 31, "cliente_mv206_tajo"},
+                {com.darkcraft.enemigos.CondestableAnims.BARRIDO, 8.0, 4.2, 5.0, 2.0, 21, "cliente_mv207_barrido"},
+                {com.darkcraft.enemigos.CondestableAnims.EMBESTIDA, 11.0, 4.0, 4.0, 6.0, 22, "cliente_mv208_embestida"},
+                {com.darkcraft.enemigos.CondestableAnims.LLAMARADA, 10.0, 6.5, 3.0, 0.0, 25, "cliente_mv209_llamarada"},
+                {com.darkcraft.enemigos.CondestableAnims.ALZAR, 16.0, 10.0, 2.0, 0.0, 32, "cliente_mv210_alzar"}};
+        for (Object[] gp : golpes) {
+            final int accion = (int) gp[0], c1 = (int) gp[5];
+            final double cdx = (double) gp[1], cdy = (double) gp[2], cdz = (double) gp[3], delante = (double) gp[4];
+            final String n1 = (String) gp[6];
+            final int G = t;
+            atTicks(G, "El Condestable: " + n1, m -> server(m, sp -> {
+                var e = condestableE();
+                if (e == null) return;
+                float g = 90f;
+                limpiarJuramento(sp.serverLevel());
+                e.setTarget(null);
+                e.postura(com.darkcraft.enemigos.Enemigo.DE_PIE);
+                e.moveTo(CX + CU + 0.5, PISO, CZ + 0.5, g, 0f);
+                e.setDeltaMovement(Vec3.ZERO);
+                e.setYRot(g);
+                e.yBodyRot = e.yHeadRot = g;
+                e.empezar(accion);
+                double fx = -Math.sin(Math.toRadians(g)), fz = Math.cos(Math.toRadians(g));
+                verDesdeServidor = new Vec3(e.getX() - fz * cdx + fx * cdz, e.getY() + cdy, e.getZ() + fx * cdx + fz * cdz);
+                miraServidor = new Vec3(e.getX() + fx * delante, e.getY() + 2.4, e.getZ() + fz * delante);
+            }));
+            atTicks(G + 2, "camara de cerca", m -> {
+                if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+            });
+            atTicks(G + c1, "captura: " + n1, m -> {
+                server(m, sp -> log("  el Condestable, " + n1 + ": " + estadoE(condestableE()) + " | " + (condestableE() == null ? "" : condestableE().estado())));
+                shot(m, n1);
+            });
+            t = G + Math.max(c1, com.darkcraft.enemigos.CondestableAnims.TICKS[accion]) + 16;
+        }
+        // ---- a media vida, en supervivencia: toca el cuerno y de los montones de ceniza se alza su guardia
+        final int H = t;
+        atTicks(H, "El Condestable: a media vida (supervivencia)", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                var e = condestableE();
+                if (e == null) return;
+                limpiarJuramento(sp.serverLevel());
+                aPelear(sp, true);
+                sp.clearFire();
+                e.postura(com.darkcraft.enemigos.Enemigo.DE_PIE);
+                e.moveTo(CX + CU + 0.5, PISO, CZ + 0.5, 90f, 0f);
+                e.setYRot(90f);
+                e.yBodyRot = e.yHeadRot = 90f;
+                irMirando(sp, AN[0] + 0.5, AN[1], AN[2] + 0.5, CX + CU + 0.5, PISO + 3.0, CZ + 0.5, false);
+                e.setTarget(sp);
+                e.mediaVida();
+            });
+        });
+        atTicks(H + 2, "camara: el patio, de lado", m -> verDesde(m, new Vec3(CX + 146.5, PISO + 5.0, CZ + 5.5), new Vec3(CX + 162, PISO + 1.5, CZ - 8)));
+        atTicks(H + 34, "captura: el cuerno y la guardia que se alza de la ceniza", m -> {
+            server(m, sp -> log("  el Condestable a media vida: " + (condestableE() == null ? "" : condestableE().estado()) + " | jugador " + fpos(sp)));
+            log("  condestable: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv211_cuerno");
+        });
+        // ---- el golpe de muerte no le mata: jura de rodilla (no le entra nada) y se alza con un tercio de la vida y furia
+        final int Jt = H + 44;
+        atTicks(Jt, "El Condestable: el golpe de muerte (jura)", m -> server(m, sp -> {
+            var e = condestableE();
+            if (e == null) return;
+            double fx = -Math.sin(Math.toRadians(e.getYRot())), fz = Math.cos(Math.toRadians(e.getYRot()));
+            verDesdeServidor = new Vec3(e.getX() + fx * 7 + fz * 4, e.getY() + 3.0, e.getZ() + fz * 7 - fx * 4);
+            miraServidor = new Vec3(e.getX(), e.getY() + 1.9, e.getZ());
+            e.invulnerableTime = 0;
+            e.hurt(sp.damageSources().playerAttack(sp), 99999f);
+            log("  tras el golpe de muerte: vivo " + e.isAlive() + ", jura " + (e.accion() == com.darkcraft.enemigos.CondestableAnims.JURAMENTO) + " | " + e.estado());
+        }));
+        atTicks(Jt + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(Jt + 26, "captura: jura de rodilla", m -> {
+            server(m, sp -> {
+                var e = condestableE();
+                if (e == null) return;
+                e.invulnerableTime = 0;
+                boolean entra = e.hurt(sp.damageSources().playerAttack(sp), 50f);
+                log("  jurando: " + e.estado() + " | un golpe de 50 " + (entra ? "ENTRA" : "no entra"));
+            });
+            shot(m, "cliente_mv212_juramento");
+        });
+        atTicks(Jt + 70, "captura: se alza con furia (el anillo de fuego)", m -> {
+            server(m, sp -> log("  se alza: " + (condestableE() == null ? "no esta" : condestableE().estado())));
+            shot(m, "cliente_mv213_se_alza");
+        });
+        // ---- cae de verdad: de rodilla sobre el montante (su ultima frase), el rastrillo se alza, se deshace en ceniza; el cartel
+        final int C = Jt + 96;
+        atTicks(C, "El Condestable: cae", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var e = condestableE();
+                if (e == null) return;
+                sp.setGameMode(GameType.CREATIVE);
+                sp.clearFire();
+                log("  antes de caer el Condestable: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "condestable")
+                        + " | " + e.estado() + " | Puerta Oeste " + com.darkcraft.morvain.Juramento.barrotesPuertaOeste(sp.serverLevel()) + " barrotes");
+                double fx = -Math.sin(Math.toRadians(e.getYRot())), fz = Math.cos(Math.toRadians(e.getYRot()));
+                verDesdeServidor = new Vec3(e.getX() + fx * 8 + fz * 4, e.getY() + 3.4, e.getZ() + fz * 8 - fx * 4);
+                miraServidor = new Vec3(e.getX(), e.getY() + 1.9, e.getZ());
+                e.invulnerableTime = 0;
+                e.hurt(sp.damageSources().playerAttack(sp), 99999f);
+                log("  el Condestable cae: vivo " + e.isAlive() + ", en paz " + com.darkcraft.morvain.Juramento.enPaz(sp.server));
+            });
+        });
+        atTicks(C + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 60, "captura: de rodilla sobre el montante", m -> shot(m, "cliente_mv214_condestable_cae"));
+        atTicks(C + 62, "camara: el rastrillo", m -> verDesde(m, puertaDesde, puertaMira));
+        atTicks(C + 86, "captura: el rastrillo se alza", m -> {
+            server(m, sp -> log("  el rastrillo, al caer el Condestable: " + com.darkcraft.morvain.Juramento.resumen(sp.serverLevel()) + " (alzados "
+                    + com.darkcraft.morvain.Juramento.ALZADOS + ")"));
+            shot(m, "cliente_mv215_rastrillo_se_alza");
+        });
+        atTicks(C + 88, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 131, "captura: se deshace en ceniza", m -> shot(m, "cliente_mv216_condestable_ceniza"));
+        atTicks(C + 134, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 194, "captura: JEFE ABATIDO", m -> {
+            log("  condestable: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  tras caer el Condestable: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "condestable")
+                    + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoCondestable(sp.server)));
+            shot(m, "cliente_mv217_condestable_abatido");
+        });
+        // ---- la Puerta Oeste de la Capital, abierta por fin (desde el camino, como en la parte 7m)
+        t = C + 198;
+        atTicks(t, "La Puerta Oeste, abierta", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                limpiarJuramento(sp.serverLevel());
+                irMirando(sp, CX - 9.5, PISO + 1.6, CZ + 0.5, CX + 12, PISO + 1.6, CZ + 0.5, true);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura", m -> {
+            server(m, sp -> log("  la Puerta Oeste tras caer el Condestable: " + com.darkcraft.morvain.Juramento.barrotesPuertaOeste(sp.serverLevel())
+                    + " barrotes (tiene que ser 0) | " + com.darkcraft.morvain.MorvainEnemigos.estadoCapital(sp.server)));
+            shot(m, "cliente_mv218_puerta_oeste_abierta");
+        });
+        t += 10;
+        // ---- la torre del Condestable por dentro (la reja ya no esta): la mesa, el hogar, el arcon y el atril
+        atTicks(t, "La torre del Condestable, por dentro", m -> server(m, sp -> irMirando(sp, CX + 188.5, PISO + 0.4, CZ + 0.5, CX + 197, PISO + 1, CZ + 0.5, true)));
+        t += 70;
+        atTicks(t, "captura", m -> {
+            server(m, sp -> log("  la torre: " + com.darkcraft.morvain.Juramento.resumen(sp.serverLevel()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+            shot(m, "cliente_mv219_torre");
+        });
+        t += 6;
+        atTicks(t, "El libro de Ser Halvard", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(23));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv220_libro_halvard"));
+        t += 6;
+        atTicks(t, "el bestiario: el Condestable", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("condestable")));
+        });
+        t += 18;
+        atTicks(t, "captura: el Condestable en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv221_bestiario_condestable");
+        });
+        t += 4;
+        atTicks(t, "El Condestable: fin (vuelve a su estrado, la Puerta Oeste medio bajada, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                limpiarJuramento(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft condestable volver");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                comando(sp, "darkcraft condestable rastrillo subir");
+                log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoCondestable(sp.server));
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

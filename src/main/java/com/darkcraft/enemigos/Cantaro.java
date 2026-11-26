@@ -133,14 +133,23 @@ public class Cantaro extends ThrowableItemProjectile {
      * nube vacia que se acaba enseguida).
      */
     public static class Llamas extends AreaEffectCloud {
+        /** Si suena la brea ardiendo al prender (las filas de fuego del Condestable, parte 7n, solo la primera). */
+        private final boolean suena;
+
         public Llamas(Level l, double x, double y, double z, LivingEntity dueno) {
+            this(l, x, y, z, dueno, R_LLAMAS, LLAMAS, true);
+        }
+
+        /** Unas llamas de otro tamano y otra duracion (las del montante del Condestable: mas pequenas y mas cortas). */
+        public Llamas(Level l, double x, double y, double z, LivingEntity dueno, float radio, int ticks, boolean suena) {
             super(l, x, y, z);
+            this.suena = suena;
             if (dueno != null) setOwner(dueno);
-            setRadius(R_LLAMAS);
+            setRadius(radio);
             setRadiusOnUse(0f);
             setWaitTime(0);
-            setDuration(LLAMAS);
-            setRadiusPerTick(-R_LLAMAS * 0.35f / LLAMAS);
+            setDuration(ticks);
+            setRadiusPerTick(-radio * 0.35f / ticks);
             setParticle(ParticleTypes.FLAME);
         }
 
@@ -151,11 +160,11 @@ public class Cantaro extends ThrowableItemProjectile {
             float r = getRadius();
             if (tickCount % 4 == 0) sl.sendParticles(ParticleTypes.SMOKE, getX(), getY() + 0.3, getZ(), 3, r * 0.5, 0.1, r * 0.5, 0.01);
             // la brea ardiendo suena una vez: dura (3 s, con su fundido) lo que duran las llamas
-            if (tickCount == 1)
+            if (tickCount == 1 && suena)
                 sl.playSound(null, getX(), getY(), getZ(), DarkCraftMod.SFX_CALCINADO_FUEGO.get(), SoundSource.HOSTILE, 0.9f, 0.9f + random.nextFloat() * 0.2f);
             if (tickCount % 10 != 0) return;
             for (LivingEntity le : level().getEntitiesOfClass(LivingEntity.class, new AABB(getX() - r, getY() - 0.5, getZ() - r, getX() + r, getY() + 1.5, getZ() + r),
-                    o -> o.isAlive() && !(o instanceof Calcinado) && !(o instanceof Player p && (p.isCreative() || p.isSpectator())))) {
+                    o -> o.isAlive() && !(o instanceof Calcinado) && !o.fireImmune() && !(o instanceof Player p && (p.isCreative() || p.isSpectator())))) {
                 if (le.distanceToSqr(getX(), le.getY(), getZ()) > r * r) continue;
                 if (le.hurt(damageSources().inFire(), 2.0f)) LLAMAS_QUEMAN++;
                 Calcinado.quemar(le, 3);

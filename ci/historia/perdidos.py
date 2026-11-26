@@ -11,7 +11,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza",
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
-         22: "morvain"}
+         22: "morvain", 23: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -363,6 +363,16 @@ LIBROS = {
    "Night of the red sky. The Constable orders the West Gate shut: no one comes in, no one goes out. The bridge watch had not yet come back. We lowered the portcullis with them calling from the other side. I write that down too.",
    "Across the river the palace was burning. That fire did not catch on the roofs: it fell from the sky, red, and water would not put it out. Those inside threw themselves against the gate to get out. We held it. That is what we swore.",
    "\"I swear to guard the gate. I swear not to sleep. I swear not to die.\"\n\nWe sleep no more. We burn without burning away and we keep to the wall-walk. The Constable says the gate is still shut. If you read this, you come from outside... and no one passes this gate.\n\nSgt. Brannoc"]),
+ },
+ 23: {
+  "es": ("La última orden del Condestable", "Ser Halvard, Condestable del Juramento", [
+   "A la guardia del Juramento, en todas las puertas. Esta noche el cielo arde y el fuego cae sobre el palacio. Si sale de estos muros, arderá el reino entero. Cerrad las puertas. Nadie entra y nadie sale: ni el pueblo, ni la guardia, ni yo.",
+   "Oigo a la gente en las calles. Golpean el rastrillo, me llaman por mi nombre. Mantengo la orden. Para esto juramos: guardar la puerta, no dormir, no morir. Yo lo juré el primero, aquí, ante la piedra. Si me equivoco, que me juzgue el cielo... que no me juzguen ellos.",
+   "Si alguien lee esto, es que mi puerta se abrió y yo ya no la guardo. Entonces no queda juramento que cumplir. Abrid las puertas. Dejad que vuelvan a casa.\n\nSer Halvard, Condestable del Juramento"]),
+  "en": ("The Constable's Last Order", "Ser Halvard, Constable of the Oath", [
+   "To the Oath Guard, at every gate. Tonight the sky burns and fire falls upon the palace. If it leaves these walls, the whole kingdom will burn. Shut the gates. No one comes in and no one goes out: not the people, not the guard, not I.",
+   "I hear the people in the streets. They beat on the portcullis, they call me by my name. I hold the order. That is what we swore: to guard the gate, not to sleep, not to die. I swore it first, here, before the stone. If I am wrong, let the sky judge me... not them.",
+   "If someone reads this, my gate has opened and I guard it no more. Then there is no oath left to keep. Open the gates. Let them go home.\n\nSer Halvard, Constable of the Oath"]),
  },
 }
 

@@ -35,7 +35,7 @@ if [ -f "$JAR" ] && { [ -x "$PMCV/bin/portablemc" ] || { python3 -m venv "$PMCV"
     mkdir -p run/mods && cp "$JAR" run/mods/
     cp "$OUT"/shaderpacks/*.zip run/shaderpacks/ 2>/dev/null || true
     echo "cliente: el juego de verdad (portablemc, Forge $FORGE, $(basename "$JAR"))" | tee "$OUT/cliente_modo.txt"
-    ( timeout 62m xvfb-run -a -s "-screen 0 1280x720x24" "${PMC[@]}" --resolution 1280x720 -u Dev \
+    ( timeout 72m xvfb-run -a -s "-screen 0 1280x720x24" "${PMC[@]}" --resolution 1280x720 -u Dev \
         --jvm-arg=-Xmx5G,-Ddarkcraft.ciClient=true > "$OUT/cliente.log" 2>&1 || echo "cliente terminado con error $?" >> "$OUT/cliente.log" ) &
     PID=$!
     for i in $(seq 1 84); do
@@ -66,7 +66,7 @@ fi
 if [ "$MODO" = desarrollo ]; then
   echo "cliente: prueba en el entorno de desarrollo (sin Distant Horizons, Oculus ni Embeddium)" | tee -a "$OUT/cliente_modo.txt"
   preparar
-  timeout 60m xvfb-run -a -s "-screen 0 1280x720x24" gradle runClient --no-daemon > "$OUT/cliente.log" 2>&1 || echo "cliente terminado con error $?" >> "$OUT/cliente.log"
+  timeout 70m xvfb-run -a -s "-screen 0 1280x720x24" gradle runClient --no-daemon > "$OUT/cliente.log" 2>&1 || echo "cliente terminado con error $?" >> "$OUT/cliente.log"
 fi
 
 cp run/logs/latest.log "$OUT/cliente_latest.log" 2>/dev/null || true

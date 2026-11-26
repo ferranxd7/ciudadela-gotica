@@ -329,6 +329,8 @@ public final class Capital {
         if (u >= 2 && u <= PLAZA_U && Math.abs(v) <= 3) return true;
         if (Math.abs(u - CRUCE_U) <= 2 && v >= V0 + 4 && v <= V1 - 4) return true;
         if (u >= 2 && u <= 6 && v >= V0 + 2 && v <= V1 - 2) return true;
+        // de la plaza al este, la calle del Juramento (parte 7n: sigue en {@link Juramento} hasta su puerta)
+        if (u >= PLAZA_U && u <= U1 && Math.abs(v) <= Juramento.CALLE_V) return true;
         // del cuartel a la plaza
         return Math.abs(u - 96) <= 2 && v >= -22 && v <= -PLAZA_R + 2;
     }

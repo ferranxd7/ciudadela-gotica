@@ -191,5 +191,16 @@
     "aviso": "Music by tcarisland (OpenGameArt)",
     "uso": "Hrodric, el Abad de la Cumbre (el jefe de las Montañas Nevadas de Morvain)",
     "lufs": -16
+  },
+  {
+    "id": "condestable",
+    "pagina": "https://opengameart.org/node/158915",
+    "busca": "massive_hunt",
+    "titulo": "Massive Battle",
+    "autor": "Eldritch Grim",
+    "licencia": "CC0",
+    "aviso": "Music by Eldritch Grim (OpenGameArt, CC0)",
+    "uso": "El Condestable del Juramento (el jefe de la Capital en ruinas de Morvain)",
+    "lufs": -16
   }
 ]

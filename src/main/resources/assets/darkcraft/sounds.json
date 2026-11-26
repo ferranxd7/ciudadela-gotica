@@ -3873,5 +3873,193 @@
         "stream": true
       }
     ]
+  },
+  "sfx.condestable_grito": {
+    "subtitle": "subtitles.darkcraft.sfx.condestable_grito",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/condestable_grito_1"
+      },
+      {
+        "name": "darkcraft:sfx/condestable_grito_2"
+      }
+    ]
+  },
+  "sfx.condestable_tajo": {
+    "subtitle": "subtitles.darkcraft.sfx.condestable_tajo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/condestable_tajo_1"
+      },
+      {
+        "name": "darkcraft:sfx/condestable_tajo_2"
+      }
+    ]
+  },
+  "sfx.condestable_barrido": {
+    "subtitle": "subtitles.darkcraft.sfx.condestable_barrido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/condestable_barrido_1"
+      },
+      {
+        "name": "darkcraft:sfx/condestable_barrido_2"
+      }
+    ]
+  },
+  "sfx.condestable_embestida": {
+    "subtitle": "subtitles.darkcraft.sfx.condestable_embestida",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/condestable_embestida_1"
+      },
+      {
+        "name": "darkcraft:sfx/condestable_embestida_2"
+      }
+    ]
+  },
+  "sfx.condestable_llamarada": {
+    "subtitle": "subtitles.darkcraft.sfx.condestable_llamarada",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/condestable_llamarada_1"
+      },
+      {
+        "name": "darkcraft:sfx/condestable_llamarada_2"
+      }
+    ]
+  },
+  "sfx.condestable_rastrillo": {
+    "subtitle": "subtitles.darkcraft.sfx.condestable_rastrillo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/condestable_rastrillo_1"
+      },
+      {
+        "name": "darkcraft:sfx/condestable_rastrillo_2"
+      }
+    ]
+  },
+  "sfx.condestable_abrir": {
+    "subtitle": "subtitles.darkcraft.sfx.condestable_abrir",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/condestable_abrir_1"
+      },
+      {
+        "name": "darkcraft:sfx/condestable_abrir_2"
+      }
+    ]
+  },
+  "sfx.condestable_cuerno": {
+    "subtitle": "subtitles.darkcraft.sfx.condestable_cuerno",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/condestable_cuerno_1"
+      },
+      {
+        "name": "darkcraft:sfx/condestable_cuerno_2"
+      }
+    ]
+  },
+  "sfx.condestable_alzar": {
+    "subtitle": "subtitles.darkcraft.sfx.condestable_alzar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/condestable_alzar_1"
+      },
+      {
+        "name": "darkcraft:sfx/condestable_alzar_2"
+      }
+    ]
+  },
+  "sfx.condestable_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.condestable_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/condestable_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/condestable_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/condestable_dolor_3"
+      }
+    ]
+  },
+  "sfx.condestable_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.condestable_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/condestable_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/condestable_muerte_2"
+      }
+    ]
+  },
+  "sfx.condestable_espera": {
+    "subtitle": "subtitles.darkcraft.sfx.condestable_espera",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/condestable_espera_1"
+      },
+      {
+        "name": "darkcraft:sfx/condestable_espera_2"
+      }
+    ]
+  },
+  "musica.condestable": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/condestable",
+        "stream": true
+      }
+    ]
+  },
+  "condestable.voz.1": {
+    "subtitle": "subtitles.darkcraft.condestable.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:condestable/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "condestable.voz.2": {
+    "subtitle": "subtitles.darkcraft.condestable.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:condestable/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "condestable.voz.3": {
+    "subtitle": "subtitles.darkcraft.condestable.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:condestable/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "condestable.voz.4": {
+    "subtitle": "subtitles.darkcraft.condestable.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:condestable/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "condestable.voz.5": {
+    "subtitle": "subtitles.darkcraft.condestable.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:condestable/voz_5",
+        "stream": false
+      }
+    ]
   }
 }

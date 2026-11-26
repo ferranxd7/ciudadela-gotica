@@ -24,8 +24,12 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   voluta de hielo con su cristal), carambanos colgando y en el centro la mitra de hielo con su banda de oro; relleno de hielo
   azul que corre; copos y esquirlas que caen al recibir dano.
 
-Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png y
-abad_barra.png (256x128):
+  El Condestable del Juramento (parte 7n): el montante tumbado (la hoja negra con los filos al rojo, la cruz de oro, el puno
+  y el pomo a la izquierda, la punta a la derecha), dos manos alzadas de oro y en el centro el gran yelmo cerrado con la
+  rendija encendida y la cimera en ascuas; relleno de fuego que corre; brasas y chispas que suben al recibir dano.
+
+Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
+abad_barra.png y condestable_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -812,6 +816,131 @@ def copos():
     return img
 
 
+# ---------------------------------------------------------------- el Condestable del Juramento (parte 7n)
+
+K_DD, K_D, K, K_L, K_H = hexc("08080a"), hexc("17161a"), hexc("2a282e"), hexc("47434c"), hexc("6e6874")
+E_DD, E_D, E, E_L, E_H = hexc("3a0d06"), hexc("8a2208"), hexc("d24a14"), hexc("f88a2c"), hexc("ffe08a")
+G_D, G, G_L = hexc("6e5622"), hexc("a8842e"), hexc("e2c464")
+CR_D, CR = hexc("451210"), hexc("74221c")
+
+
+def marco_condestable():
+    """El montante tumbado: la hoja negra con los filos al rojo y rajas de brasa; a la izquierda la cruz de oro, el puno de
+    cuero y el pomo; a la derecha la punta; dos manos alzadas de oro a los lados y en el centro el gran yelmo cerrado con la
+    rendija encendida y su cimera de crines en ascuas."""
+    rnd = random.Random(171)
+    n = noise2(173)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 4, FX1 + 3, FY0 - 4, FY1 + 3
+    rect(img, x0, y0, x1, y1, OUT)
+    # la hoja: acero ennegrecido; los filos de arriba y de abajo al rojo; rajas de brasa
+    for y in range(y0 + 1, y1):
+        for x in range(x0 + 1, x1):
+            v = n(x * 0.06, y * 0.7)
+            c = K_D if v < 0.4 else K if v < 0.82 else K_L
+            if y == y0 + 1:
+                c = E_L if (x // 3) % 4 else E
+            if y == y1 - 1:
+                c = E if (x // 3) % 4 else E_D
+            if n(x * 0.25 + 70, y * 0.8) > 0.88 and y0 + 1 < y < y1 - 1:
+                c = E_D
+            put(img, x, y, c)
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, K_DD)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # la punta (derecha): la hoja se estrecha
+    for x in range(x1, FW):
+        semi = (FW - x) * 0.45
+        for y in range(y0 - 1, y1 + 2):
+            m = (y0 + y1) / 2
+            if abs(y - m) <= semi:
+                put(img, x, y, E_L if abs(abs(y - m) - semi) < 1 else K)
+    # la cruz de oro (izquierda), el puno y el pomo
+    cx0 = x0 + 2
+    for y in range(y0 - 7, y1 + 8):
+        for dx in range(3):
+            put(img, cx0 + dx, y, G_L if dx == 0 else G if dx == 1 else G_D)
+        put(img, cx0 - 1, y, OUT)
+        put(img, cx0 + 3, y, OUT)
+    for dx in range(-1, 4):
+        put(img, cx0 + dx, y0 - 8, OUT)
+        put(img, cx0 + dx, y1 + 8, OUT)
+    for x in range(0, cx0 - 1):
+        for y in range(y0 + 2, y1 - 1):
+            put(img, x, y, CR_D if (x + y) % 3 == 0 else hexc("2e2015"))
+    for y in range(y0, y1 + 1):
+        for x in range(0, 2):
+            put(img, x, y, G_L if x == 0 else G)
+    # dos manos alzadas de oro, a los lados del yelmo
+    mano = ["#.#.#", "#.#.#", "#####", "#####", ".###.", "..#.."]
+    for mx in (FW // 2 - 42, FW // 2 + 38):
+        for yy, fila in enumerate(mano):
+            for xx, ch in enumerate(fila):
+                if ch == "#":
+                    put(img, mx + xx, y0 - 6 + yy, G_L if yy < 2 else G if yy < 4 else G_D)
+    # en el centro: el gran yelmo (de y 1 a 18) con la rendija encendida, la nervadura y la cimera
+    cx = FW // 2
+    for y in range(1, 19):
+        semi = 7 if y >= 4 else 5 + (y - 1) // 2
+        for dx in range(-semi - 1, semi + 2):
+            put(img, cx + dx, y, OUT)
+    for y in range(2, 18):
+        semi = 6 if y >= 4 else 4 + (y - 2) // 2
+        for dx in range(-semi, semi + 1):
+            c = K_L if dx < -semi // 2 else K if dx <= semi // 2 else K_D
+            if y == 9 and abs(dx) <= 5:
+                c = OUT if abs(dx) in (0, 1) else (E_H if abs(dx) in (3, 4) else E_L)   # la rendija y los ojos
+            if dx == 0 and y >= 10:
+                c = K_H                                       # la nervadura
+            if y in (12, 14) and abs(dx) in (2, 4):
+                c = K_DD                                      # los respiraderos
+            if y == 5:
+                c = G if (dx + y) % 2 else G_L                # la banda de oro de la frente
+            put(img, cx + dx, y, c)
+    # la cimera: crines en ascuas que suben del yelmo
+    for dx in range(-2, 3):
+        alto = 3 + rnd.randint(0, 2) - abs(dx)
+        for i in range(alto):
+            put(img, cx + dx, 1 - i if 1 - i >= 0 else 0, E_H if i == alto - 1 else E_L)
+    return img
+
+
+def relleno_condestable(k):
+    """Fuego que corre: brasas rojas y naranjas que se mueven, con lenguas amarillas que pasan."""
+    n = noise2(181)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            v = n((x - k * 5) * 0.1, y * 0.6 - k * 0.3)
+            t = 0.25 + 0.5 * mid + 0.5 * (v - 0.5)
+            c = mix(E_D, E, max(0.0, min(1.0, t * 1.5)))
+            if t > 0.62:
+                c = mix(c, E_L, min(1.0, (t - 0.62) * 3))
+            if t > 0.86:
+                c = mix(c, E_H, min(1.0, (t - 0.86) * 4))
+            if y == 0:
+                c = mix(c, E_L, 0.4)
+            if y == 6:
+                c = mix(c, E_DD, 0.65)
+            if (x * 7 + y * 13 - k * 29) % 101 == 0 and 1 <= y <= 5:
+                c = E_H
+            img.putpixel((x, y), c)
+    return img
+
+
+def brasas():
+    """Lo que salta al recibir dano: brasas y chispas (suben, no caen: lo hace el cliente)."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = ([".e.", "eHe", ".e."], ["h.", ".E"], [".h", "hE", "e."], ["H", "e", "."])
+    col = {"e": E_L, "E": E, "h": E_H, "H": E_H}
+    for kk, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, kk * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 # ---------------------------------------------------------------- comun
 
 
@@ -852,6 +981,7 @@ if __name__ == "__main__":
         "verdugo": atlas(marco_verdugo(), relleno_verdugo, hueco("0a0606", "1a1110"), rastro("f6ece2", "d8b9a6"), fibras()),
         "barquero": atlas(marco_barquero(), relleno_barquero, hueco("040607", "0f1a1e"), rastro("eefcff", "a9dbe6"), gotas()),
         "abad": atlas(marco_abad(), relleno_abad, hueco("05090c", "121c24"), rastro("f6fcff", "c4e2ef"), copos()),
+        "condestable": atlas(marco_condestable(), relleno_condestable, hueco("0a0605", "1c1210"), rastro("fff2e0", "f0b88a"), brasas()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

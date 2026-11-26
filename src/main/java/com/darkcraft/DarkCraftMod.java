@@ -273,6 +273,20 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_CALCINADO_FUEGO = sound("sfx.calcinado_fuego");
     public static final RegistryObject<SoundEvent> SFX_CALCINADO_CENIZA = sound("sfx.calcinado_ceniza");
     public static final RegistryObject<SoundEvent> AMBIENTE_CAPITAL = sound("ambiente.capital");
+    // el Condestable del Juramento (parte 7n): el grito, el tajo del montante en llamas, el barrido, la embestida, el anillo de
+    // fuego, el rastrillo que cae y el que se alza, el cuerno de la guardia, la espada al cielo, el dolor, la muerte y la espera
+    public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_GRITO = sound("sfx.condestable_grito");
+    public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_TAJO = sound("sfx.condestable_tajo");
+    public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_BARRIDO = sound("sfx.condestable_barrido");
+    public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_EMBESTIDA = sound("sfx.condestable_embestida");
+    public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_LLAMARADA = sound("sfx.condestable_llamarada");
+    public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_RASTRILLO = sound("sfx.condestable_rastrillo");
+    public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_ABRIR = sound("sfx.condestable_abrir");
+    public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_CUERNO = sound("sfx.condestable_cuerno");
+    public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_ALZAR = sound("sfx.condestable_alzar");
+    public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_DOLOR = sound("sfx.condestable_dolor");
+    public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_MUERTE = sound("sfx.condestable_muerte");
+    public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_ESPERA = sound("sfx.condestable_espera");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -351,6 +365,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_VERDUGO = sound("musica.verdugo");
     public static final RegistryObject<SoundEvent> MUSICA_BARQUERO = sound("musica.barquero");
     public static final RegistryObject<SoundEvent> MUSICA_ABAD = sound("musica.abad");
+    public static final RegistryObject<SoundEvent> MUSICA_CONDESTABLE = sound("musica.condestable");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -396,6 +411,10 @@ public class DarkCraftMod {
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] ABAD_VOZ = new RegistryObject[6];
 
+    /** Frases del Condestable del Juramento (1..5, parte 7n). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] CONDESTABLE_VOZ = new RegistryObject[6];
+
     /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[10];
@@ -408,6 +427,7 @@ public class DarkCraftMod {
         for (int i = 1; i < VERDUGO_VOZ.length; i++) VERDUGO_VOZ[i] = sound("verdugo.voz." + i);
         for (int i = 1; i < BARQUERO_VOZ.length; i++) BARQUERO_VOZ[i] = sound("barquero.voz." + i);
         for (int i = 1; i < ABAD_VOZ.length; i++) ABAD_VOZ[i] = sound("abad.voz." + i);
+        for (int i = 1; i < CONDESTABLE_VOZ.length; i++) CONDESTABLE_VOZ[i] = sound("condestable.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -587,6 +607,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Abad>> ABAD = ENTITIES.register("abad",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Abad>of(com.darkcraft.enemigos.Abad::new, MobCategory.MONSTER)
                     .sized(1.6f, 4.6f).clientTrackingRange(10).build(MODID + ":abad"));
+    // ---- el Condestable del Juramento, el jefe de la Capital en ruinas (parte 7n)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Condestable>> CONDESTABLE = ENTITIES.register("condestable",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Condestable>of(com.darkcraft.enemigos.Condestable::new, MobCategory.MONSTER)
+                    .sized(1.6f, 4.6f).fireImmune().clientTrackingRange(10).build(MODID + ":condestable"));
     // ---- la Molinera de Velmor, el jefe de las Llanuras Palidas (parte 7f)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Molinera>> MOLINERA = ENTITIES.register("molinera",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Molinera>of(com.darkcraft.enemigos.Molinera::new, MobCategory.MONSTER)
@@ -765,6 +789,7 @@ public class DarkCraftMod {
         e.put(HELADO.get(), com.darkcraft.enemigos.Helado.atributos().build());
         e.put(ABAD.get(), com.darkcraft.enemigos.Abad.atributos().build());
         e.put(CALCINADO.get(), com.darkcraft.enemigos.Calcinado.atributos().build());
+        e.put(CONDESTABLE.get(), com.darkcraft.enemigos.Condestable.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());
