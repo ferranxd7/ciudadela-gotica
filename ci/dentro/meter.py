@@ -90,6 +90,20 @@ for m in lista["mods"]:
     v, aviso = elegir(m, ["forge"])
     f, ruta, datos = bajar(v, dentro)
     informe.append(f"OK {m['nombre']} {v['version_number']} -> {f['filename']} ({len(datos) // 1024} KiB, sha512 bien){aviso}")
+    # lo que pide (Forge, Minecraft y otros mods): en TLauncher hay que tener un Forge que valga
+    try:
+        import io, re
+        with zipfile.ZipFile(io.BytesIO(datos)) as zz:
+            toml = zz.read("META-INF/mods.toml").decode("utf-8", "replace")
+            mf = zz.read("META-INF/MANIFEST.MF").decode("utf-8", "replace") if "META-INF/MANIFEST.MF" in zz.namelist() else ""
+            anidados = [n for n in zz.namelist() if n.startswith("META-INF/jarjar/") and n.endswith(".jar")]
+        loader = re.search(r'loaderVersion\s*=\s*"([^"]*)"', toml)
+        deps = re.findall(r'modId\s*=\s*"([^"]+)"\s*\n\s*mandatory\s*=\s*(\w+)\s*\n\s*versionRange\s*=\s*"([^"]*)"', toml)
+        mix = re.search(r"MixinConfigs:\s*(.*)", mf)
+        informe.append(f"   pide: loader {loader.group(1) if loader else '?'}; " + ", ".join(f"{d[0]} {d[2]}{'' if d[1] == 'true' else ' (opcional)'}" for d in deps)
+                       + (f"; mixins {mix.group(1).strip()}" if mix else "") + (f"; lleva dentro {len(anidados)} jar" if anidados else ""))
+    except Exception as e:
+        informe.append(f"   (no se lee su mods.toml: {e})")
     meta.append({
         "identifier": {"group": "maven.modrinth", "artifact": m["proyecto"]},
         "version": {"range": f"[{v['version_number']}]", "artifactVersion": v["version_number"]},
