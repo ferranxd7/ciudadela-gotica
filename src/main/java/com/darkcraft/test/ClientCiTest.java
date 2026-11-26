@@ -6001,6 +6001,8 @@ public final class ClientCiTest {
         t = pilotes(t);
         // la Laguna Negra y el Barquero, el jefe del Pantano Podrido (parte 7j)
         t = barquero(t);
+        // el Monasterio de la Helada y los helados, en las Montanas Nevadas (parte 7k)
+        t = monasterio(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -7503,6 +7505,316 @@ public final class ClientCiTest {
                 sp.setHealth(sp.getMaxHealth());
                 for (var n : sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.AreaEffectCloud.class, sp.getBoundingBox().inflate(40))) n.discard();
                 comando(sp, "darkcraft pilotes enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el Monasterio de la Helada y los helados (parte 7k)
+
+    private static final com.darkcraft.enemigos.Helado[] HELADOS = new com.darkcraft.enemigos.Helado[3];
+
+    private static com.darkcraft.enemigos.Helado heladoNuevo(ServerLevel lvl, int variante, double x, double y, double z, float giro, int postura) {
+        var a = DarkCraftMod.HELADO.get().create(lvl);
+        if (a == null) return null;
+        a.variante(variante);
+        a.moveTo(x, y, z, giro, 0f);
+        a.yBodyRot = a.yHeadRot = giro;
+        if (postura != com.darkcraft.enemigos.Enemigo.DE_PIE) a.asignar("", -1, a.blockPosition(), giro, postura, 0);
+        lvl.addFreshEntity(a);
+        return a;
+    }
+
+    private static void quitarHelados() {
+        for (int i = 0; i < HELADOS.length; i++) {
+            if (HELADOS[i] != null && !HELADOS[i].isRemoved()) HELADOS[i].discard();
+            HELADOS[i] = null;
+        }
+    }
+
+    private static String estadoHelados() {
+        StringBuilder sb = new StringBuilder();
+        for (var a : HELADOS) sb.append(a == null ? "-" : estadoE(a)).append(" | ");
+        return sb + String.format(java.util.Locale.ROOT, "alientos %d, puas %d, esquirlas %d (dan %d), hielos rotos %d, helados %d, estallidos %d",
+                com.darkcraft.enemigos.Helado.ALIENTOS, com.darkcraft.enemigos.Helado.PUAS, com.darkcraft.enemigos.Helado.ESQUIRLAS,
+                com.darkcraft.enemigos.Esquirla.DAN, com.darkcraft.enemigos.Helado.ROTOS, com.darkcraft.enemigos.Helado.HELADOS,
+                com.darkcraft.enemigos.Helado.ESTALLIDOS);
+    }
+
+    /**
+     * El Monasterio de la Helada: desde el santuario de la Cumbre Helada, entrar a pie por la puerta (el cartel, el logro, la
+     * campana y la ventisca), el claustro desde lo alto, la iglesia con los monjes de rodillas, el refectorio, el campanario
+     * desde el cementerio; en supervivencia uno rompe el hielo al llegar, el incensario, el aliento que hiela, el martillazo
+     * con sus puas, las esquirlas, uno enterrado que se alza y uno que se rompe al morir; el libro del hermano Wendel y el
+     * bestiario. Al acabar vuelven todos.
+     */
+    private static int monasterio(int T) {
+        final var V = com.darkcraft.morvain.Monasterio.get();
+        final int CX = com.darkcraft.morvain.Monasterio.CX, CZ = com.darkcraft.morvain.Monasterio.CZ, PISO = com.darkcraft.morvain.Monasterio.PISO;
+        final var SH = com.darkcraft.morvain.SantuariosMorvain.porId("helada");
+        int t = T;
+        atTicks(t, "El monasterio: desde el santuario de la Cumbre Helada", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft monasterio enemigos volver");
+                irMirando(sp, SH.x() + 2.5, SH.y() + 9, SH.z() + 8.5, CX, PISO + 6, CZ - 6, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv139_monasterio_santuario");
+            server(m, sp -> log("  " + com.darkcraft.morvain.MorvainEnemigos.estadoMonasterio(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        // ---- entrar a pie por la puerta, en aventura: el cartel con el nombre, el logro, la campana y la ventisca
+        atTicks(t, "El monasterio: entrar por la puerta", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft monasterio enemigos fuera");
+                int[] q = V.sitio("escalera");
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), q[0] + 0.5, PISO, q[2] - 3.5, 180f, 2f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura", m -> {
+            log("  monasterio: " + ClientMusic.montana());
+            shot(m, "cliente_mv140_monasterio_puerta");
+            server(m, sp -> log("  al entrar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + ", logro monasterio " + com.darkcraft.story.Logros.tiene(sp, "monasterio")
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+        });
+        t += 10;
+        atTicks(t, "El monasterio: vuelven los helados", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft monasterio enemigos volver");
+            });
+        });
+        t += 4;
+        atTicks(t, "El monasterio: el claustro desde lo alto", m -> server(m, sp -> irMirando(sp, CX + 16.5, PISO + 18, CZ + 26.5, CX, PISO + 1, CZ - 2, true)));
+        t += 90;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv141_claustro");
+            server(m, sp -> log("  el claustro: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoMonasterio(sp.server)));
+        });
+        t += 10;
+        atTicks(t, "El monasterio: la iglesia", m -> server(m, sp -> irMirando(sp, CX + 0.5, PISO + 1.4, CZ - 13.5, CX + 0.5, PISO + 2, CZ - 29, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv142_iglesia"));
+        t += 10;
+        atTicks(t, "El monasterio: el refectorio", m -> server(m, sp -> irMirando(sp, CX + 13.5, PISO + 2.2, CZ + 10.5, CX + 18, PISO + 0.5, CZ - 4, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv143_refectorio"));
+        t += 10;
+        atTicks(t, "El monasterio: el campanario desde el cementerio", m -> server(m, sp -> irMirando(sp, CX - 19.5, PISO + 3, CZ - 11.5, CX - 12, PISO + 16, CZ - 29, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv144_campanario"));
+        t += 10;
+        // ---- en supervivencia: uno de rodillas en el claustro rompe el hielo al llegar el jugador
+        atTicks(t, "El monasterio: uno de rodillas rompe el hielo (supervivencia)", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft monasterio enemigos fuera");
+                ServerLevel lvl = sp.serverLevel();
+                quitarHelados();
+                HELADOS[0] = heladoNuevo(lvl, com.darkcraft.enemigos.Helado.MONJE, CX - 3.5, PISO, CZ + 6.5, -90f, com.darkcraft.enemigos.Enemigo.REZA);
+                aPelear(sp, true);
+                irMirando(sp, CX + 1.5, PISO, CZ + 6.5, CX - 3.5, PISO + 1, CZ + 6.5, false);
+                log("  antes: " + estadoHelados());
+            });
+        });
+        t += 26;
+        atTicks(t, "captura: rompe el hielo", m -> {
+            server(m, sp -> log("  rompe el hielo: " + estadoHelados() + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv145_rompe_hielo");
+        });
+        t += 10;
+        // ---- el incensario, de lado
+        atTicks(t, "El monasterio: el incensario", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            quitarHelados();
+            aPelear(sp, true);
+            HELADOS[0] = heladoNuevo(lvl, com.darkcraft.enemigos.Helado.MONJE, CX + 0.5, PISO, CZ + 4.5, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+            irMirando(sp, CX + 0.5, PISO, CZ + 7.0, CX + 0.5, PISO + 1, CZ + 4.5, false);
+            var a = HELADOS[0];
+            if (a == null) return;
+            a.setTarget(sp);
+            a.empezar(com.darkcraft.enemigos.HeladoAnims.INCENSARIO);
+            verDesdeServidor = new Vec3(CX + 5.0, PISO + 1.8, CZ + 6.0);
+            miraServidor = new Vec3(CX + 0.5, PISO + 1.1, CZ + 5.5);
+        }));
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += 14;
+        atTicks(t, "captura: el incensario", m -> {
+            server(m, sp -> log("  el incensario: " + estadoHelados() + " | jugador frio " + sp.getTicksFrozen()));
+            shot(m, "cliente_mv146_incensario");
+        });
+        t += 24;
+        // ---- el aliento: hiela al jugador (la escarcha en la pantalla)
+        atTicks(t, "El monasterio: el aliento", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                var a = HELADOS[0];
+                if (a == null) return;
+                sp.setTicksFrozen(0);
+                irMirando(sp, CX + 0.5, PISO, CZ + 7.5, CX + 0.5, PISO + 1.4, CZ + 4.5, false);
+                a.setTarget(sp);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(com.darkcraft.enemigos.HeladoAnims.ALIENTO);
+            });
+        });
+        t += 36;
+        atTicks(t, "captura: el aliento", m -> {
+            server(m, sp -> log("  el aliento: " + estadoHelados() + " | jugador frio " + sp.getTicksFrozen() + " helado del todo " + sp.isFullyFrozen()
+                    + " frenado " + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)));
+            shot(m, "cliente_mv147_aliento");
+        });
+        t += 20;
+        // ---- el martillazo y sus puas, de lado
+        atTicks(t, "El monasterio: el martillazo", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            quitarHelados();
+            sp.setTicksFrozen(0);
+            sp.removeAllEffects();
+            aPelear(sp, true);
+            HELADOS[1] = heladoNuevo(lvl, com.darkcraft.enemigos.Helado.PENITENTE, CX + 0.5, PISO, CZ + 3.5, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+            irMirando(sp, CX + 0.5, PISO, CZ + 8.0, CX + 0.5, PISO + 1, CZ + 3.5, false);
+            var a = HELADOS[1];
+            if (a == null) return;
+            a.setTarget(sp);
+            a.empezar(com.darkcraft.enemigos.HeladoAnims.MARTILLAZO);
+            verDesdeServidor = new Vec3(CX + 6.5, PISO + 2.2, CZ + 7.0);
+            miraServidor = new Vec3(CX + 0.5, PISO + 0.8, CZ + 6.0);
+        }));
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += 26;
+        atTicks(t, "captura: el martillazo", m -> {
+            server(m, sp -> log("  el martillazo: " + estadoHelados() + " | jugador frio " + sp.getTicksFrozen()));
+            shot(m, "cliente_mv148_martillazo");
+        });
+        t += 30;
+        // ---- las esquirlas del peregrino, de lado
+        atTicks(t, "El monasterio: las esquirlas", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            quitarHelados();
+            sp.setTicksFrozen(0);
+            sp.removeAllEffects();
+            aPelear(sp, true);
+            HELADOS[2] = heladoNuevo(lvl, com.darkcraft.enemigos.Helado.PEREGRINO, CX + 0.5, PISO, CZ + 4.5, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+            irMirando(sp, CX + 0.5, PISO, CZ + 12.5, CX + 0.5, PISO + 1.4, CZ + 4.5, false);
+            var a = HELADOS[2];
+            if (a == null) return;
+            a.setTarget(sp);
+            a.empezar(com.darkcraft.enemigos.HeladoAnims.ESQUIRLAS);
+            verDesdeServidor = new Vec3(CX + 6.5, PISO + 2.0, CZ + 8.5);
+            miraServidor = new Vec3(CX + 0.5, PISO + 1.5, CZ + 8.5);
+        }));
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += 21;
+        atTicks(t, "captura: las esquirlas", m -> {
+            server(m, sp -> log("  las esquirlas: " + estadoHelados() + " | jugador frio " + sp.getTicksFrozen()));
+            shot(m, "cliente_mv149_esquirlas");
+        });
+        t += 30;
+        // ---- uno enterrado en la nieve que se alza al llegar el jugador
+        atTicks(t, "El monasterio: uno enterrado se alza", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarHelados();
+                sp.setTicksFrozen(0);
+                sp.removeAllEffects();
+                aPelear(sp, true);
+                HELADOS[0] = heladoNuevo(lvl, com.darkcraft.enemigos.Helado.PEREGRINO, CX + 4.5, PISO, CZ - 4.5, 0f, com.darkcraft.enemigos.Enemigo.TUMBADO);
+                irMirando(sp, CX + 4.5, PISO, CZ + 1.0, CX + 4.5, PISO + 0.4, CZ - 4.5, false);
+            });
+        });
+        t += 6;
+        atTicks(t, "captura: enterrado", m -> {
+            server(m, sp -> log("  enterrado: " + estadoHelados()));
+            shot(m, "cliente_mv150_enterrado");
+        });
+        t += 22;
+        atTicks(t, "captura: se alza", m -> {
+            server(m, sp -> log("  se alza: " + estadoHelados()));
+            shot(m, "cliente_mv151_se_alza");
+        });
+        t += 30;
+        // ---- uno que cae y se rompe en esquirlas
+        atTicks(t, "El monasterio: cae y se rompe", m -> server(m, sp -> {
+            var a = HELADOS[0];
+            if (a == null) return;
+            a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+        }));
+        t += 44;
+        atTicks(t, "captura: se rompe", m -> {
+            server(m, sp -> log("  se rompe: " + estadoHelados() + " | logro helado " + com.darkcraft.story.Logros.tiene(sp, "helado")));
+            shot(m, "cliente_mv152_se_rompe");
+        });
+        t += 12;
+        // sin frio ni efectos (con cada golpe se cerrarian el codice y el menu) y en creativo
+        atTicks(t, "El monasterio: sin frio ni helados (para el libro y el bestiario)", m -> server(m, sp -> {
+            quitarHelados();
+            sp.removeAllEffects();
+            sp.setTicksFrozen(0);
+            sp.setHealth(sp.getMaxHealth());
+            sp.setGameMode(GameType.CREATIVE);
+            for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Esquirla.class, sp.getBoundingBox().inflate(40))) e.discard();
+        }));
+        t += 6;
+        atTicks(t, "El monasterio: el libro del hermano Wendel", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(21));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv153_libro_wendel"));
+        t += 6;
+        atTicks(t, "el bestiario: el penitente helado", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("helado_penitente")));
+        });
+        t += 18;
+        atTicks(t, "captura: el penitente en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv154_bestiario_helado");
+        });
+        t += 4;
+        atTicks(t, "El monasterio: fin (vuelven los helados, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                quitarHelados();
+                sp.removeAllEffects();
+                sp.setTicksFrozen(0);
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft monasterio enemigos volver");
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

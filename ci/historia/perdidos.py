@@ -10,7 +10,7 @@ darkcraft.narracion.6.N.
 DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdrenn",
          6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza",
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
-         17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain"}
+         17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -342,6 +342,16 @@ LIBROS = {
    "Since the sky turned red, the water of the lagoon is black. The fish float belly up and no one eats them. The nets come up full of something that is not fish. This morning I blessed the water three times; three times it darkened again.",
    "Those who drown do not stay at the bottom. They rise to the surface bloated, face down, and one night they stand up. At night there are green lights among the reeds: the children follow them and never come back. Do not follow the lights.",
    "The ferryman still crosses the lagoon, though there is no one left to carry. I hear him rowing beneath the chapel. Today he knocked at the door. I pray with the water up to my knees: if you read this, do not board his boat.\n\nSr. Ilse"]),
+ },
+ 21: {
+  "es": ("Lo que vi desde la portería", "Hermano Wendel, portero del Monasterio de la Helada", [
+   "Cuarenta inviernos llevo abriendo esta puerta a los peregrinos. Subían con la nieve por la cintura para rezar con nosotros en la Helada. Desde que el cielo se puso rojo ya no sube nadie... y los que estaban en el camino no han llegado.",
+   "El frío entró en la iglesia durante las vísperas. El padre prior mandó seguir rezando: «el Señor no abandona a los suyos». Rezamos hasta que no pudimos movernos. Los hermanos siguen ahí, de rodillas en los bancos, con escarcha en la barba. A veces les oigo susurrar.",
+   "El abad Hrodric no rezó con nosotros. Subió a la cumbre a pedirle al frío que nos perdonara, y el frío le contestó. Le he visto bajar de noche, más alto que la torre, con una mitra de hielo. Si lees esto, no subas a la cumbre. Y no te arrodilles nunca en esta casa.\n\nHno. Wendel"]),
+  "en": ("What I Saw from the Gatehouse", "Brother Wendel, gatekeeper of the Frostbound Monastery", [
+   "For forty winters I have opened this gate to the pilgrims. They climbed waist-deep in snow to pray with us at the Frost. Since the sky turned red no one comes up anymore... and those who were already on the road never arrived.",
+   "The cold came into the church during vespers. Father Prior bade us keep praying: \"the Lord does not forsake His own\". We prayed until we could no longer move. The brothers are still there, kneeling in the pews, frost in their beards. Sometimes I hear them whisper.",
+   "Abbot Hrodric did not pray with us. He climbed to the summit to beg the cold to spare us, and the cold answered him. I have seen him come down at night, taller than the tower, wearing a mitre of ice. If you read this, do not climb to the summit. And never kneel in this house.\n\nBr. Wendel"]),
  },
 }
 

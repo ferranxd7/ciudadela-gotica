@@ -206,10 +206,18 @@ SFX = {
     "barquero_grito": (2.4, 0.6, -13), "barquero_remazo": (1.4, 0.5, -13), "barquero_barrido": (0.9, 0.3, -14),
     "barquero_bichero": (1.2, 0.3, -15), "barquero_linterna": (1.9, 0.6, -14), "barquero_dolor": (0.75, 0.2, -15),
     "barquero_muerte": (3.4, 0.9, -14), "barquero_remo": (4.4, 1.0, -21),
+    # los helados de las Montanas Nevadas (parte 7k): el rezo roto entre el hielo, el chillido al ver a alguien, el golpe en
+    # el hielo, la muerte (se rompe en esquirlas), el hielo que revienta al alzarse, el incensario de hierro, el aliento que
+    # congela, el martillo de hielo con sus puas y las esquirlas que vuelan; la ventisca de las montanas y la campana del
+    # monasterio
+    "helado_gemido": (2.2, 0.5, -20), "helado_alerta": (1.4, 0.3, -15), "helado_dolor": (0.6, 0.15, -17),
+    "helado_muerte": (1.8, 0.6, -14), "helado_romper": (1.6, 0.5, -15), "helado_incensario": (1.0, 0.3, -15),
+    "helado_aliento": (1.8, 0.5, -15), "helado_martillo": (1.5, 0.5, -13), "helado_esquirlas": (1.0, 0.3, -15),
+    "montana_ambiente": (20.0, 2.0, -26), "monasterio_campana": (5.6, 1.6, -16),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
-           "barco_vuelo": 3.0, "molino_viento": 1.0}
+           "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
@@ -359,6 +367,13 @@ TOMAS_SFX = {
     # tres quejidos; las dos muertes con mas cola; y los dos remos que reman de verdad (la 2, varias paladas; la 4, una)
     "barquero_grito": (3, 4), "barquero_remazo": (3, 1), "barquero_barrido": (4, 1), "barquero_bichero": (4, 2),
     "barquero_linterna": (1, 4), "barquero_dolor": (2, 3, 1), "barquero_muerte": (4, 2), "barquero_remo": (2, 4),
+    # los helados: los dos rezos mas largos y mas graves (la 4 y la 2); los dos chillidos que mas duran; los dos golpes mas
+    # fuertes; las dos roturas con mas cola; los dos hielos que revientan con mas trozos cayendo; los dos incensarios con la
+    # cadena (la 4 y la 3); los dos alientos que mas soplan; los dos martillazos con cola (puas); las dos esquirlas mas
+    # largas; las dos campanas con mas eco (la 1 y la 4); y las dos tomas de la ventisca que suenan de principio a fin
+    "helado_gemido": (4, 2), "helado_alerta": (3, 1), "helado_dolor": (2, 4), "helado_muerte": (4, 1), "helado_romper": (4, 1),
+    "helado_incensario": (4, 3), "helado_aliento": (1, 2), "helado_martillo": (4, 3), "helado_esquirlas": (1, 3),
+    "monasterio_campana": (1, 4), "montana_ambiente": (1, 2),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

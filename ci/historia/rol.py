@@ -2231,6 +2231,68 @@ EN.update({
     "darkcraft.ayuda.barquero": "The Ferryman: how he is, take you to the landing, defeat him or bring him back",
 })
 
+
+# ---------------------------------------------------------------- parte 7k: los Helados y el Monasterio de la Helada (las Montanas Nevadas)
+ES.update({
+    "entity.darkcraft.helado": "Helado",
+    "entity.darkcraft.esquirla": "Esquirla de hielo",
+    "darkcraft.bestiario.helado_monje": "Monje helado",
+    "darkcraft.bestiario.helado_penitente": "Penitente helado",
+    "darkcraft.bestiario.helado_peregrino": "Peregrino helado",
+    "darkcraft.bestiario.helado_monje.desc": "Se quedaron rezando en vísperas mientras el frío entraba en la iglesia, y la Sombra los despertó dentro del hielo. Esperan de rodillas, cubiertos de escarcha, y rompen el hielo cuando te acercas. Voltea su incensario de hierro y, de un poco lejos, echa un aliento helado que congela y frena: no te quedes delante. El fuego les hace más daño.",
+    "darkcraft.bestiario.helado_penitente.desc": "El torso al aire y cruzado de cadenas, con cristales de hielo que le crecen en la espalda. Lleva un martillo de hielo a dos manos: al descargarlo brota delante una fila de púas de hielo que llega más lejos que el martillo; apártate de lado. También barre a media altura.",
+    "darkcraft.bestiario.helado_peregrino.desc": "Subían con la nieve por la cintura a rezar en la Helada y se quedaron en el camino. Su bastón lleva un cristal de hielo en la punta: de cerca golpea con él y, de lejos, lanza tres esquirlas que hielan y frenan. Algunos siguen enterrados en la nieve, junto al camino.",
+    "subtitles.darkcraft.sfx.helado_gemido": "Un helado reza entre el hielo",
+    "subtitles.darkcraft.sfx.helado_alerta": "Un helado chilla",
+    "subtitles.darkcraft.sfx.helado_dolor": "El hielo cruje",
+    "subtitles.darkcraft.sfx.helado_muerte": "Un helado se rompe en esquirlas",
+    "subtitles.darkcraft.sfx.helado_romper": "El hielo revienta",
+    "subtitles.darkcraft.sfx.helado_incensario": "Un incensario silba",
+    "subtitles.darkcraft.sfx.helado_aliento": "Un aliento helado",
+    "subtitles.darkcraft.sfx.helado_martillo": "Un martillo de hielo golpea el suelo",
+    "subtitles.darkcraft.sfx.helado_esquirlas": "Vuelan esquirlas de hielo",
+    "subtitles.darkcraft.sfx.monasterio_campana": "Tañe una campana rota",
+    "subtitles.darkcraft.ambiente.montana": "Aúlla la ventisca",
+    "darkcraft.morvain.lugar.monasterio": "El Monasterio de la Helada",
+    "advancements.darkcraft.helado.title": "Romper el hielo",
+    "advancements.darkcraft.helado.description": "Vence a un helado de las Montañas Nevadas",
+    "advancements.darkcraft.monasterio.title": "Vísperas eternas",
+    "advancements.darkcraft.monasterio.description": "Entra en el Monasterio de la Helada",
+    "darkcraft.diario.helado": "En las Montañas Nevadas los monjes y los peregrinos se quedaron helados rezando. Rompen el hielo cuando pasas y su frío se te mete en los huesos. Con fuego caen antes.",
+    "darkcraft.diario.monasterio": "El Monasterio de la Helada: una terraza en la ladera, un claustro con la fuente helada y una iglesia donde los monjes siguen de rodillas en los bancos. La campana suena sola de vez en cuando.",
+    "darkcraft.ayuda.monasterio": "El Monasterio de la Helada: ir a uno de sus sitios, que vuelvan sus helados o quitarlos",
+})
+EN.update({
+    "entity.darkcraft.helado": "Frozen One",
+    "entity.darkcraft.esquirla": "Ice Shard",
+    "darkcraft.bestiario.helado_monje": "Frozen Monk",
+    "darkcraft.bestiario.helado_penitente": "Frozen Penitent",
+    "darkcraft.bestiario.helado_peregrino": "Frozen Pilgrim",
+    "darkcraft.bestiario.helado_monje.desc": "They kept praying at vespers while the cold crept into the church, and the Shadow woke them inside the ice. They wait on their knees, covered in frost, and break the ice when you come close. It swings its iron censer and, from a little further away, breathes out a freezing breath that chills and slows: do not stand in front of it. Fire hurts them more.",
+    "darkcraft.bestiario.helado_penitente.desc": "Bare-chested and crossed with chains, with ice crystals growing from its back. It wields a two-handed hammer of ice: when it brings it down, a row of ice spikes bursts out ahead, reaching further than the hammer; step aside. It also sweeps at waist height.",
+    "darkcraft.bestiario.helado_peregrino.desc": "They climbed waist-deep in snow to pray at the Frost and stayed on the road. Its staff bears an ice crystal at the tip: up close it strikes with it and, from afar, it hurls three shards that freeze and slow. Some still lie buried in the snow beside the road.",
+    "subtitles.darkcraft.sfx.helado_gemido": "A Frozen One prays through the ice",
+    "subtitles.darkcraft.sfx.helado_alerta": "A Frozen One shrieks",
+    "subtitles.darkcraft.sfx.helado_dolor": "Ice cracks",
+    "subtitles.darkcraft.sfx.helado_muerte": "A Frozen One shatters",
+    "subtitles.darkcraft.sfx.helado_romper": "Ice bursts",
+    "subtitles.darkcraft.sfx.helado_incensario": "A censer whistles",
+    "subtitles.darkcraft.sfx.helado_aliento": "A freezing breath",
+    "subtitles.darkcraft.sfx.helado_martillo": "An ice hammer strikes the ground",
+    "subtitles.darkcraft.sfx.helado_esquirlas": "Ice shards fly",
+    "subtitles.darkcraft.sfx.monasterio_campana": "A cracked bell tolls",
+    "subtitles.darkcraft.ambiente.montana": "The blizzard howls",
+    "darkcraft.morvain.lugar.monasterio": "The Frostbound Monastery",
+    "advancements.darkcraft.helado.title": "Breaking the Ice",
+    "advancements.darkcraft.helado.description": "Defeat a Frozen One of the Snowbound Mountains",
+    "advancements.darkcraft.monasterio.title": "Endless Vespers",
+    "advancements.darkcraft.monasterio.description": "Enter the Frostbound Monastery",
+    "darkcraft.diario.helado": "In the Snowbound Mountains the monks and the pilgrims froze as they prayed. They break the ice when you pass and their cold seeps into your bones. Fire brings them down sooner.",
+    "darkcraft.diario.monasterio": "The Frostbound Monastery: a terrace cut into the slope, a cloister with a frozen fountain and a church where the monks are still kneeling in the pews. Now and then the bell tolls by itself.",
+    "darkcraft.ayuda.monasterio": "The Frostbound Monastery: go to one of its places, bring its Frozen Ones back or remove them",
+})
+
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

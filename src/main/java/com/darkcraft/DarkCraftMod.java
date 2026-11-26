@@ -237,6 +237,18 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_BARQUERO_DOLOR = sound("sfx.barquero_dolor");
     public static final RegistryObject<SoundEvent> SFX_BARQUERO_MUERTE = sound("sfx.barquero_muerte");
     public static final RegistryObject<SoundEvent> SFX_BARQUERO_REMO = sound("sfx.barquero_remo");
+    // los helados de las Montanas Nevadas, la ventisca y la campana del monasterio (parte 7k)
+    public static final RegistryObject<SoundEvent> SFX_HELADO_GEMIDO = sound("sfx.helado_gemido");
+    public static final RegistryObject<SoundEvent> SFX_HELADO_ALERTA = sound("sfx.helado_alerta");
+    public static final RegistryObject<SoundEvent> SFX_HELADO_DOLOR = sound("sfx.helado_dolor");
+    public static final RegistryObject<SoundEvent> SFX_HELADO_MUERTE = sound("sfx.helado_muerte");
+    public static final RegistryObject<SoundEvent> SFX_HELADO_ROMPER = sound("sfx.helado_romper");
+    public static final RegistryObject<SoundEvent> SFX_HELADO_INCENSARIO = sound("sfx.helado_incensario");
+    public static final RegistryObject<SoundEvent> SFX_HELADO_ALIENTO = sound("sfx.helado_aliento");
+    public static final RegistryObject<SoundEvent> SFX_HELADO_MARTILLO = sound("sfx.helado_martillo");
+    public static final RegistryObject<SoundEvent> SFX_HELADO_ESQUIRLAS = sound("sfx.helado_esquirlas");
+    public static final RegistryObject<SoundEvent> SFX_MONASTERIO_CAMPANA = sound("sfx.monasterio_campana");
+    public static final RegistryObject<SoundEvent> AMBIENTE_MONTANA = sound("ambiente.montana");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -527,6 +539,13 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.FuegoFatuo>> FUEGO_FATUO = ENTITIES.register("fuego_fatuo",
             () -> EntityType.Builder.<com.darkcraft.enemigos.FuegoFatuo>of(com.darkcraft.enemigos.FuegoFatuo::new, MobCategory.MISC)
                     .sized(0.35f, 0.35f).noSave().clientTrackingRange(8).updateInterval(2).build(MODID + ":fuego_fatuo"));
+    // ---- los helados de las Montanas Nevadas y las esquirlas de hielo que lanzan (parte 7k)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Helado>> HELADO = ENTITIES.register("helado",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Helado>of(com.darkcraft.enemigos.Helado::new, MobCategory.MONSTER)
+                    .sized(0.7f, 2.15f).clientTrackingRange(8).build(MODID + ":helado"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Esquirla>> ESQUIRLA = ENTITIES.register("esquirla",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Esquirla>of(com.darkcraft.enemigos.Esquirla::new, MobCategory.MISC)
+                    .sized(0.3f, 0.3f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":esquirla"));
     // ---- la Molinera de Velmor, el jefe de las Llanuras Palidas (parte 7f)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Molinera>> MOLINERA = ENTITIES.register("molinera",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Molinera>of(com.darkcraft.enemigos.Molinera::new, MobCategory.MONSTER)
@@ -702,6 +721,7 @@ public class DarkCraftMod {
         e.put(MARCHITO.get(), com.darkcraft.enemigos.Marchito.atributos().build());
         e.put(AHORCADO.get(), com.darkcraft.enemigos.Ahorcado.atributos().build());
         e.put(PODRIDO.get(), com.darkcraft.enemigos.Podrido.atributos().build());
+        e.put(HELADO.get(), com.darkcraft.enemigos.Helado.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());

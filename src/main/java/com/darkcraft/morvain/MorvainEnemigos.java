@@ -34,6 +34,9 @@ import java.util.List;
  * y el del fuego fatuo en el islote del norte), que solo vuelven mientras el Barquero sigue en pie.</li>
  * <li><b>La barca</b> (sitio {@value #BARCA}, parte 7j): el Barquero, de pie en su barca con la linterna en alto (un jefe:
  * cae una vez). Vencido, la laguna queda en paz ({@link LagunaNegra#liberar}).</li>
+ * <li><b>El Monasterio de la Helada</b> (sitio {@value #MONASTERIO}, parte 7k, en las Montanas Nevadas): los helados que apunta
+ * el plano ({@link Monasterio#esperas}): de rodillas en los bancos de la iglesia, en el claustro, en las celdas y a la mesa
+ * del refectorio; enterrados en la nieve del patio, del cementerio y del camino; de pie en la puerta y de ronda.</li>
  * </ul>
  * Nadie a menos de 18 bloques del arco ni de 14 de un santuario.
  */
@@ -41,9 +44,9 @@ public final class MorvainEnemigos {
     private MorvainEnemigos() {}
 
     public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo",
-            PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca";
+            PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
-            BARQUERO = "barquero";
+            BARQUERO = "barquero", HELADO = "helado";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
@@ -51,7 +54,7 @@ public final class MorvainEnemigos {
 
     private static final List<Puesto> VELMOR_P = new ArrayList<>(), LLANURAS_P = new ArrayList<>(), MOLINO_P = new ArrayList<>(),
             ARBOLEDA_P = new ArrayList<>(), PATIBULO_P = new ArrayList<>(), PILOTES_P = new ArrayList<>(), LAGUNA_P = new ArrayList<>(),
-            BARCA_P = new ArrayList<>();
+            BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -140,6 +143,9 @@ public final class MorvainEnemigos {
         // ---- la barca (parte 7j): el Barquero de pie en ella, la linterna en alto, mirando al embarcadero (al oeste)
         int[] bq = ln.sitio("barquero");
         BARCA_P.add(new Puesto(BARQUERO, 0, bq[0], bq[1], bq[2], OESTE, REZA, 0, Puestos.JEFE));
+        // ---- el Monasterio de la Helada (parte 7k): los helados que apunta el plano
+        for (Monasterio.Espera e : Monasterio.get().esperas())
+            MONASTERIO_P.add(new Puesto(HELADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -165,6 +171,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(VERDUGO, DarkCraftMod.VERDUGO);
         Puestos.tipo(PODRIDO, DarkCraftMod.PODRIDO);
         Puestos.tipo(BARQUERO, DarkCraftMod.BARQUERO);
+        Puestos.tipo(HELADO, DarkCraftMod.HELADO);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -176,6 +183,7 @@ public final class MorvainEnemigos {
         // los pasajeros del Barquero solo mientras vive el (vencido, la laguna queda en paz: ya no vuelven)
         Puestos.registrar(LAGUNA, LAGUNA_P, Morvain::es, (l, p) -> !"pasajeros".equals(p.grupo()) || !LagunaNegra.enPaz(l.getServer()));
         Puestos.registrar(BARCA, BARCA_P, Morvain::es);
+        Puestos.registrar(MONASTERIO, MONASTERIO_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -217,6 +225,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> barca() {
         preparar();
         return List.copyOf(BARCA_P);
+    }
+
+    public static List<Puesto> monasterio() {
+        preparar();
+        return List.copyOf(MONASTERIO_P);
     }
 
     public static List<Puesto> velmor() {
@@ -565,6 +578,57 @@ public final class MorvainEnemigos {
         return s;
     }
 
+    /** {@code /darkcraft monasterio [ir <sitio> | enemigos [volver | fuera | sacar]]} (parte 7k). */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoMonasterio() {
+        return net.minecraft.commands.Commands.literal("monasterio")
+                .executes(c -> decir(c, estadoMonasterio(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irMonasterio(c.getSource(), "entrada"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Monasterio.get().sitios().keySet(), b))
+                                .executes(c -> irMonasterio(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoMonasterio(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), MONASTERIO, false);
+                            return decir(c, "vuelven todos los helados");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), MONASTERIO, true);
+                            return decir(c, "fuera todos los helados");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            net.minecraft.server.level.ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, MONASTERIO).size();
+                            return decir(c, "fuera " + n);
+                        })));
+    }
+
+    private static int irMonasterio(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Monasterio.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Monasterio.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando a la fuente del claustro (o, desde dentro de la iglesia, al altar)
+        double tx = Monasterio.CX, tz = Monasterio.CZ;
+        if (s[2] < Monasterio.CZ - 12) tz = Monasterio.CZ - 30;
+        float giro = (float) (Math.toDegrees(Math.atan2(tz - s[2], tx - s[0])) - 90.0);
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
+        return 1;
+    }
+
+    /** Cuantos helados quedan y cuantos andan fuera (y como esta el monasterio, si esta cargado). */
+    public static String estadoMonasterio(net.minecraft.server.MinecraftServer srv) {
+        String s = "monasterio de la helada: quedan " + Puestos.quedan(srv, MONASTERIO) + " de " + MONASTERIO_P.size() + " (fuera "
+                + Puestos.fuera(MONASTERIO) + ")";
+        var m = Morvain.nivel(srv);
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(Monasterio.CX, Monasterio.PISO, Monasterio.CZ - 28))) s += "; " + Monasterio.resumen(m);
+        return s;
+    }
+
     private static int decir(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, String s) {
         c.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal(s), false);
         return 1;
@@ -594,6 +658,7 @@ public final class MorvainEnemigos {
         todos.addAll(PILOTES_P);
         todos.addAll(LAGUNA_P);
         todos.addAll(BARCA_P);
+        todos.addAll(MONASTERIO_P);
         for (Puesto p : todos) {
             if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
             for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
@@ -605,6 +670,6 @@ public final class MorvainEnemigos {
         return VELMOR_P.size() + " en Velmor (" + camp + " campaneros), " + LLANURAS_P.size() + " por las llanuras, " + MOLINO_P.size()
                 + " en el molino, " + ARBOLEDA_P.size() + " en la arboleda (" + colg + " colgados) y " + PATIBULO_P.size()
                 + " en el patibulo, " + PILOTES_P.size() + " en la aldea de los pilotes, " + LAGUNA_P.size() + " en la laguna negra y "
-                + BARCA_P.size() + " en la barca; cerca del arco o de un santuario " + cerca;
+                + BARCA_P.size() + " en la barca, " + MONASTERIO_P.size() + " en el monasterio; cerca del arco o de un santuario " + cerca;
     }
 }

@@ -169,6 +169,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la aldea de los pilotes en el chunk {}", c.getPos(), t);
         }
+        // el Monasterio de la Helada, en las Montanas Nevadas (parte 7k)
+        try {
+            if (Monasterio.toca(c.getPos().x, c.getPos().z)) Monasterio.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el monasterio en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

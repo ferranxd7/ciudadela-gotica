@@ -732,6 +732,195 @@ public final class CiTest {
         verdugo(server, m, log);
         pilotes(server, m, log, out);
         barquero(server, m, log, out);
+        monasterio(server, m, log, out);
+    }
+
+    /**
+     * Parte 7k: el Monasterio de la Helada (la terraza, el atril con el libro 21, el arcon, la campana, la fuente helada, los
+     * bancos de la iglesia) y los helados: los de rodillas y los enterrados salen en su sitio, los de pie en su suelo y ninguno
+     * metido en un bloque; cada accion acaba; el de rodillas rompe el hielo al llegar su presa y el enterrado se alza; el aliento
+     * hiela y frena; el martillazo hace brotar sus puas, que llegan mas lejos que el martillo; las esquirlas dan y hielan; el
+     * frio no les hace nada y el fuego, mas; al morir se rompen en esquirlas. Al acabar todo vuelve a estar como antes.
+     */
+    private static void monasterio(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.MONASTERIO;
+        var v = com.darkcraft.morvain.Monasterio.get();
+        final int CX = com.darkcraft.morvain.Monasterio.CX, CZ = com.darkcraft.morvain.Monasterio.CZ, PISO = com.darkcraft.morvain.Monasterio.PISO;
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : v.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            log.println("Morvain, el monasterio de la helada: " + nch + " chunks en " + (System.currentTimeMillis() - t0) + " ms; "
+                    + com.darkcraft.morvain.Monasterio.resumen(m) + "; santuario " + com.darkcraft.santuario.Santuarios.nombre(m,
+                    com.darkcraft.morvain.SantuariosMorvain.porId("helada").pos()));
+            topView(m, CX + 6, CZ + 8, 50, new File(out, "morvain_monasterio.png"));
+            topView(m, CX, CZ - 21, 14, new File(out, "morvain_monasterio_iglesia.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, el monasterio de la helada: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] monasterio", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 10; k++)
+                for (var e : fuera) if (e.isAlive()) e.tick();
+            int rezan = 0, enterrados = 0, dePie = 0, enSuelo = 0, chocan = 0;
+            StringBuilder mal = new StringBuilder();
+            com.darkcraft.enemigos.Helado rezando = null, enterrado = null;
+            for (var e : fuera) {
+                if (!(e instanceof com.darkcraft.enemigos.Helado h)) continue;
+                if (!m.noCollision(h)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(h.blockPosition().toShortString()).append(';');
+                }
+                if (h.postura() == com.darkcraft.enemigos.Enemigo.REZA) {
+                    rezan++;
+                    if (rezando == null && "claustro".equals(h.sitio() == null ? "" : com.darkcraft.morvain.MorvainEnemigos.monasterio().get(h.puesto()).grupo()))
+                        rezando = h;
+                } else if (h.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) {
+                    enterrados++;
+                    if (enterrado == null) enterrado = h;
+                } else dePie++;
+                if (!m.getBlockState(BlockPos.containing(h.getX(), h.getY() - 0.2, h.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+                else if (mal.length() < 400) mal.append(' ').append(h.tipo()).append(" en el aire en ").append(h.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, los helados: " + com.darkcraft.morvain.MorvainEnemigos.comprobar() + "; fuera " + fuera.size() + " de "
+                    + com.darkcraft.morvain.MorvainEnemigos.monasterio().size() + ": de rodillas " + rezan + ", enterrados " + enterrados + ", de pie " + dePie
+                    + " (en su suelo " + enSuelo + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+            StringBuilder sb = new StringBuilder("Morvain, los helados en accion:");
+            // ---- el de rodillas rompe el hielo y se levanta; el enterrado se alza (una presa a su lado)
+            int rotos = com.darkcraft.enemigos.Helado.ROTOS;
+            for (var h : new com.darkcraft.enemigos.Helado[]{rezando, enterrado}) {
+                if (h == null) {
+                    sb.append(" NO HAY ").append(h == rezando ? "NINGUNO DE RODILLAS;" : "NINGUNO ENTERRADO;");
+                    continue;
+                }
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (presa == null) continue;
+                presa.moveTo(h.getX() + 2.5, h.getY(), h.getZ() + 0.5, 0f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(presa);
+                quitar.add(presa);
+                int antes = h.postura();
+                h.setTarget(presa);
+                int rompe = -1;
+                for (int k = 0; k < 80; k++) {
+                    h.tickCount++;
+                    h.tick();
+                    int a = h.accion();
+                    if (rompe < 0 && (a == com.darkcraft.enemigos.HeladoAnims.LEVANTARSE || a == com.darkcraft.enemigos.HeladoAnims.ALZARSE)) rompe = k;
+                    if (rompe >= 0 && a == 0) break;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " el %s (en %s) rompe el hielo en el tick %d y queda de pie %s;",
+                        antes == com.darkcraft.enemigos.Enemigo.REZA ? "de rodillas" : "enterrado", h.blockPosition().toShortString(), rompe,
+                        h.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE));
+                h.setTarget(null);
+            }
+            sb.append(" hielos rotos +").append(com.darkcraft.enemigos.Helado.ROTOS - rotos).append(';');
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
+            // ---- uno de cada en el patio del claustro: cada accion acaba
+            for (int v2 = 0; v2 < 3; v2++) {
+                var a = DarkCraftMod.HELADO.get().create(m);
+                if (a == null) continue;
+                a.variante(v2);
+                a.moveTo(CX - 4.5 + v2 * 4, PISO, CZ + 6.5, 0f, 0f);
+                m.addFreshEntity(a);
+                quitar.add(a);
+                StringBuilder no = new StringBuilder();
+                for (int ac = 1; ac < com.darkcraft.enemigos.HeladoAnims.TICKS.length; ac++) {
+                    String nombre = com.darkcraft.enemigos.HeladoAnims.NOMBRES[ac];
+                    if (nombre.equals("morir")) continue;
+                    a.empezar(ac);
+                    for (int k = 0; k < 90 && a.accion() == ac; k++) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    if (a.accion() == ac) no.append(' ').append(nombre);
+                    for (int k = 0; k < 10; k++) a.tick();
+                }
+                sb.append(' ').append(a.tipo()).append(String.format(java.util.Locale.ROOT, " (vida %.0f)", a.getMaxHealth())).append(": acciones que no acaban")
+                        .append(no.length() == 0 ? " ninguna" : no).append(';');
+                a.discard();
+            }
+            // ---- el aliento, el martillazo (sus puas, mas alla del martillo) y las esquirlas contra una presa
+            int ali = com.darkcraft.enemigos.Helado.ALIENTOS, pua = com.darkcraft.enemigos.Helado.PUAS, esq = com.darkcraft.enemigos.Helado.ESQUIRLAS,
+                    dan = com.darkcraft.enemigos.Esquirla.DAN;
+            String[] nombres = {"aliento", "martillazo", "esquirlas"};
+            int[] acciones = {com.darkcraft.enemigos.HeladoAnims.ALIENTO, com.darkcraft.enemigos.HeladoAnims.MARTILLAZO, com.darkcraft.enemigos.HeladoAnims.ESQUIRLAS};
+            int[] variantes = {com.darkcraft.enemigos.Helado.MONJE, com.darkcraft.enemigos.Helado.PENITENTE, com.darkcraft.enemigos.Helado.PEREGRINO};
+            double[] lejos = {3.0, 4.4, 8.0};
+            for (int i = 0; i < 3; i++) {
+                var a = DarkCraftMod.HELADO.get().create(m);
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (a == null || presa == null) continue;
+                a.variante(variantes[i]);
+                // al sur de la fuente, mirando al sur (hacia el portico)
+                a.moveTo(CX + 0.5, PISO, CZ + 4.5, 0f, 0f);
+                presa.moveTo(CX + 0.5, PISO, CZ + 4.5 + lejos[i], 180f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(a);
+                m.addFreshEntity(presa);
+                quitar.add(a);
+                quitar.add(presa);
+                a.setTarget(presa);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(acciones[i]);
+                float vida = presa.getHealth();
+                int frio = 0;
+                for (int k = 0; k < 70; k++) {
+                    a.tickCount++;
+                    a.tick();
+                    frio = Math.max(frio, presa.getTicksFrozen());
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Esquirla.class, presa.getBoundingBox().inflate(12))) {
+                        if (!quitar.contains(f)) quitar.add(f);
+                        f.tick();
+                    }
+                    frio = Math.max(frio, presa.getTicksFrozen());
+                    presa.invulnerableTime = 0;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " %s a %.1f: la presa -%.1f, helada %d, frenada %s;", nombres[i], lejos[i], vida - presa.getHealth(),
+                        frio, presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)));
+                a.discard();
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " alientos +%d, puas +%d, esquirlas +%d (dan %d);", com.darkcraft.enemigos.Helado.ALIENTOS - ali,
+                    com.darkcraft.enemigos.Helado.PUAS - pua, com.darkcraft.enemigos.Helado.ESQUIRLAS - esq, com.darkcraft.enemigos.Esquirla.DAN - dan));
+            // ---- el frio no les hace nada; el fuego, un 60 % mas
+            var h1 = DarkCraftMod.HELADO.get().create(m);
+            var h2 = DarkCraftMod.HELADO.get().create(m);
+            if (h1 != null && h2 != null) {
+                h1.moveTo(CX - 5.5, PISO, CZ - 3.5, 0f, 0f);
+                h2.moveTo(CX + 5.5, PISO, CZ - 3.5, 0f, 0f);
+                m.addFreshEntity(h1);
+                m.addFreshEntity(h2);
+                quitar.add(h1);
+                quitar.add(h2);
+                float v1 = h1.getHealth(), v2 = h2.getHealth();
+                boolean frioLe = h1.hurt(m.damageSources().freeze(), 5f);
+                h2.hurt(m.damageSources().inFire(), 5f);
+                sb.append(String.format(java.util.Locale.ROOT, " el frio le hace %s (-%.1f); el fuego -%.1f de 5;", frioLe ? "dano" : "nada", v1 - h1.getHealth(),
+                        v2 - h2.getHealth()));
+                // ---- y al morir se rompe en esquirlas
+                int est = com.darkcraft.enemigos.Helado.ESTALLIDOS;
+                var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("7a3c9d2e-4b5f-4c6d-8e9f-0a1b2c3d4e60"), "[DarkCraftCI5]"));
+                h1.hurt(m.damageSources().playerAttack(fp), 9999f);
+                int k = 0;
+                for (; k < 90 && !h1.isRemoved(); k++) h1.tick();
+                sb.append(String.format(java.util.Locale.ROOT, " al morir se rompe %s y se va en %d ticks", com.darkcraft.enemigos.Helado.ESTALLIDOS > est, k));
+            }
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println("Morvain, los helados: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] helados", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
     }
 
     /**

@@ -1828,6 +1828,82 @@ a su barca").
   linterna (`mv132`, `mv133`), llama a sus pasajeros (`mv134`), cae (`mv135`), el cartel (`mv136`), los faroles en paz (`mv137`)
   y el bestiario (`mv138`).
 
+### Plan grande, parte 7k: las Montanas Nevadas — los Helados y el Monasterio de la Helada
+
+Respuestas 125, 131 ("iglesias y ruinas") y 132 del plan; la cuarta region con su contenido (despues, la **7l**: el jefe de las
+montanas, el abad Hrodric —el del libro 21: "subio a la cumbre a pedirle al frio que nos perdonara... bajar de noche, mas alto
+que la torre, con una mitra de hielo"—).
+- **El helado** (`enemigos/Helado`, entidad `darkcraft:helado`, 0,7 x 2,15; modelo de `tools/enemigos/helado.py`: piel azul gris con
+  escarcha a motas y a grumos —`_azar01`, sin el hash de Python—, la barba de hielo, los ojos azul blanco en la capa de brillo y
+  carambanos en los antebrazos; brazo de 14: la mano llega a unos 11 de su hombro; `HeladoGeometria/Animaciones`, `HeladoAnims`,
+  `client/enemigos/HeladoModelo` y `HeladoRenderer`, escala 1,1; el penitente, un 6 % mas). 32 de vida (el penitente +45 %), golpe
+  5,5, armadura 3. Tres: **monje** (capucha, habito con escapulario rojo bordado; el **incensario** de hierro colgando de su cadena
+  —la pieza gira en la mano para voltearlo— y el **aliento**: un soplo blanco de 5 bloques y 50 grados que hiela un poco cada tick a
+  quien este en el, con el dano de frio y lentitud la primera vez), **penitente** (el torso al aire con cadenas cruzadas, cristales
+  de hielo en la espalda que lucen, martillo de hielo a dos manos: el **martillazo** hace brotar cuatro **puas de hielo** en fila
+  delante —`EfectosRaiz.estaca` con hielo compacto y azul, el dano un instante despues, mas alla del martillo— y **barrido**) y
+  **peregrino** (sombrero de ala ancha nevado, capa de viaje, baston con un cristal de hielo que luce: **bastonazo** de punta y, de
+  4 a 16 bloques, tres **esquirlas**: `enemigos/Esquirla`, casi rectas y rapidas, sin modelo —escarcha y copos—, dano de frio,
+  hielan y frenan; a los enemigos no les dan). **El frio**: lo suyo hiela (`Helado.helar`: `setTicksFrozen`, la escarcha en la
+  pantalla, frena y, helado del todo, duele; el fruto de la escarcha lo quita, `Resistencias`; la armadura de cuero tambien, como en
+  la nieve en polvo) y el dano de frio (`Helado.frio`: `DamageTypes.FREEZE` con quien lo hace) lo frenan el fruto y el talisman de
+  la escarcha. **A ellos el frio no les hace nada y el fuego un 60 % mas.** Esperan **de rodillas** helados rezando (`REZA`, un bucle
+  por variante: el incensario colgando, el martillo al hombro, el baston de pie) y al acercarse **rompen el hielo** (trozos de hielo,
+  `sfx.helado_romper`) o **enterrados** boca arriba en la nieve (`TUMBADO`, el dibujante los hunde 0,2; se alzan de golpe). Al morir
+  se quedan de rodillas, vencidos, y **se rompen en esquirlas** (`tickDeath` propio: sin el humo de Minecraft). Bestiario
+  `helado_monje` / `helado_penitente` / `helado_peregrino`, logro `helado`; a veces una piedra de forja (el penitente, alguna II).
+  Contadores para las pruebas: `ALIENTOS`, `PUAS`, `ESQUIRLAS`, `ROTOS`, `HELADOS`, `ESTALLIDOS` y `Esquirla.DAN`.
+- **El Monasterio de la Helada** (`morvain/Monasterio`, en las Montanas Nevadas, al noroeste del santuario de la Cumbre Helada; el
+  centro del claustro en (3312, -5452); se dibuja como la aldea de los pilotes, chunk a chunk al adornar; en su caja `Adorno` no pone
+  nada): una **terraza** cortada en la ladera (`SUELO` = 294; por el norte la montana queda por encima de la muralla, por el sur el
+  muro de contencion con contrafuertes) dentro de una **muralla** almenada con nieve (`U0..U1` x `V0..V1`, pilares mas altos en las
+  esquinas, carambanos); la **puerta** del sur (cuerpo de puerta con arco, almenas y una cruz de hielo encima) y la **escalera** que
+  baja al terreno; el **patio de entrada**; el **claustro** (cuatro arquerias de columnas cada tres con arcos y el portico del patio
+  —`arqueria`, columnas donde |k| % 3 == fase—, galerias con techo de pizarra y faroles colgando, el patio nevado y la **fuente
+  helada**); la **iglesia** al norte (muros de 11, tejado a dos aguas de pizarra con nieve —`tejado`—, contrafuertes, ocho vidrieras
+  azules, alguna rota con la nieve entrando, la puerta con su arco y el roseton; dentro, el pasillo con alfombra roja, seis filas de
+  bancos, dos lamparas colgando de la cumbrera, la grada y el presbiterio con el altar y sus velas, la **cruz de hielo**, el **atril con
+  el libro perdido 21** —"Lo que vi desde la porteria", del hermano Wendel; `Perdidos.TOTAL` = 21— y un arcon); el **campanario**
+  en su esquina del noroeste (la sala de la campana con arcos y la **campana rota**, el chapitel de pizarra y la cruz de hierro); al
+  oeste las **celdas** (pasillo y cuatro celdas con su jergon, vela y ventanuco con barrotes), al este el **refectorio** (la mesa larga
+  con sus bancos y velas, el hogar frio con la chimenea, la cocina con un caldero de nieve en polvo); en la esquina del noroeste el
+  **cementerio** de los monjes (lapidas con su monton de nieve y un arbol muerto) y en la del noreste el **huerto** (el pozo helado,
+  los bancales y la lenera); fuera, el **camino** de grava hasta el santuario con faroles. Botin: `chests/monasterio` y
+  `monasterio_bueno` (frutos de la escarcha, talisman de la escarcha, hechizo de llamarada, ceniza de las llamas: lo que sirve contra
+  los helados). Sitios (`Monasterio.sitio`): `entrada`, `escalera`, `puerta`, `patio`, `claustro`, `fuente`, `iglesia`, `altar`,
+  `atril`, `arcon`, `campana`, `celdas`, `refectorio`, `cementerio`, `huerto`. El Espejo: "El Monasterio de la Helada"
+  (`Morvain.lugar`); logro `monasterio` al entrar (con un toque de la campana); y de vez en cuando la **campana suena sola** para
+  quien este a 140 bloques (`Monasterio.campana`, desde `Morvain.onTick`).
+- **Los puestos** (`MorvainEnemigos`, sitio `monasterio`, 31, de `Monasterio.esperas`): peregrinos de rodillas y enterrados por el
+  camino y un monje enterrado al pie de la escalera; un penitente en la puerta; en el patio de entrada; en el claustro (uno de rodillas
+  ante la puerta de la iglesia, dos de ronda, dos rezando a la fuente y uno enterrado en el patio); en la iglesia, cinco de rodillas
+  entre los bancos, el penitente ante la grada y un peregrino en el presbiterio; dos en sus celdas y uno de ronda por el pasillo;
+  tres a la mesa del refectorio y un penitente junto a la cocina; dos enterrados en el cementerio y un penitente de rodillas ante las
+  tumbas; uno de ronda por el huerto.
+- **Las montanas suenan** (`ClientMusic.tickMontana`): en la region de las montanas por encima de 150, `ambiente.montana` (la
+  ventisca; una de dos tomas cada vez).
+- Sonidos (ElevenLabs, flow `rhWNGHLuqUSprUyMuX2H`, `TOMAS_SFX`): `helado_gemido` (4 y 2), `helado_alerta` (3 y 1), `helado_dolor`
+  (2 y 4), `helado_muerte` (4 y 1), `helado_romper` (4 y 1), `helado_incensario` (4 y 3), `helado_aliento` (1 y 2),
+  `helado_martillo` (4 y 3), `helado_esquirlas` (1 y 3), `monasterio_campana` (1 y 4), `montana_ambiente` (1 y 2).
+- Comandos `/darkcraft monasterio [ir <sitio> | enemigos [volver | fuera | sacar]]` (sin mas: como esta).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_monasterio carpeta` (`-Dcaja=...`; para verlo de cerca, `vista.py` con
+  `--caja 3286 286 -5486 3338 325 -5426 --zoom 7` y cortes `y=295`, `x=3312`): el monasterio y el camino con las marcas de los
+  helados (H); si se llega a pie desde la entrada (junto al santuario) a cada sitio y a cada helado, que ninguno esta metido en un
+  bloque (ojo: la alfombra cuenta) y que todos tienen suelo.
+- Pruebas: servidor, lineas `Morvain, el monasterio de la helada: ...` (el atril con el libro 21, el arcon, la campana, la fuente
+  helada, los bancos, la nieve del patio; vistas `morvain_monasterio*.png`), `Morvain, los helados: ...` (de rodillas, enterrados y de
+  pie en su suelo, ninguno metido en un bloque) y `Morvain, los helados en accion: ...` (el de rodillas rompe el hielo y el enterrado
+  se alza; cada accion acaba; el aliento hiela y frena; las puas alcanzan a 4,4, mas alla del martillo; las esquirlas dan y hielan;
+  el frio no les hace nada y el fuego mas; al morir se rompen y se van) —**las presas de las pruebas son aldeanos sin IA**: las
+  esquirlas (y el fuego fatuo de los podridos) no dan a los enemigos, y a los marchitos no les entra el veneno (no muertos)—;
+  cliente, tramo `monasterio()` despues del Barquero: desde el santuario de la Cumbre Helada (`cliente_mv139`), entrar por la puerta
+  con el cartel, el logro y la ventisca (`mv140`), el claustro desde lo alto (`mv141`), la iglesia (`mv142`), el refectorio (`mv143`),
+  el campanario desde el cementerio (`mv144`), en supervivencia uno rompe el hielo (`mv145`), el incensario (`mv146`), el aliento que
+  hiela (`mv147`), el martillazo con sus puas (`mv148`), las esquirlas (`mv149`), uno enterrado que se alza (`mv150`, `mv151`), uno
+  que se rompe al morir (`mv152`), el libro del hermano Wendel (`mv153`) y el bestiario (`mv154`). **Antes del codice y del menu, sin
+  frio, sin efectos y en creativo**: cada golpe (del veneno, del frio) cierra las pantallas (asi salieron vacias las `mv119`/`mv120` de
+  la build 145).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1838,7 +1914,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i y la 7j arriba; despues, region a region su contenido).
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j y la 7k arriba; despues, region a region su contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

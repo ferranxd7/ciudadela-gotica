@@ -292,6 +292,8 @@ public final class Morvain {
         if (m != null && srv.getTickCount() % 100 == 37) Arboleda.cuenta(m);
         // la laguna negra (parte 7j): con el Barquero vencido, sus faroles de almas se vuelven faroles de verdad
         if (m != null && srv.getTickCount() % 100 == 61) LagunaNegra.paz(m);
+        // el monasterio de la Helada (parte 7k): de vez en cuando su campana rota tañe sola
+        if (m != null && srv.getTickCount() % 100 == 83) Monasterio.campana(m);
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
             if (Llegada.cerca(p.getX(), p.getZ(), 160)) {
@@ -307,6 +309,13 @@ public final class Morvain {
         // y quien entra en la Aldea de los Pilotes (parte 7i)
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Pilotes.dentro(p.getX(), p.getZ()) && p.getY() < 120) com.darkcraft.story.Logros.dar(p, "pilotes");
+        // y quien entra en el Monasterio de la Helada (parte 7k): la campana le recibe la primera vez
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Monasterio.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Monasterio.PISO) < 30
+                    && !com.darkcraft.story.Logros.tiene(p, "monasterio")) {
+                com.darkcraft.story.Logros.dar(p, "monasterio");
+                p.playNotifySound(DarkCraftMod.SFX_MONASTERIO_CAMPANA.get(), net.minecraft.sounds.SoundSource.AMBIENT, 1.4f, 0.95f);
+            }
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -365,6 +374,8 @@ public final class Morvain {
         if (Pilotes.dentro(p.getX(), p.getZ()) && p.getY() < 120) return "darkcraft.morvain.lugar.pilotes";
         // la Laguna Negra (parte 7j)
         if (LagunaNegra.dentro(p.getX(), p.getZ()) && p.getY() < 120) return "darkcraft.morvain.lugar.laguna";
+        // el Monasterio de la Helada (parte 7k)
+        if (Monasterio.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Monasterio.PISO) < 30) return "darkcraft.morvain.lugar.monasterio";
         return "darkcraft.zona.morvain." + Terreno.region(p.getX(), p.getZ()).id;
     }
 

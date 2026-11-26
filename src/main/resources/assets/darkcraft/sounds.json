@@ -3442,5 +3442,128 @@
         "stream": false
       }
     ]
+  },
+  "sfx.helado_gemido": {
+    "subtitle": "subtitles.darkcraft.sfx.helado_gemido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/helado_gemido_1"
+      },
+      {
+        "name": "darkcraft:sfx/helado_gemido_2"
+      }
+    ]
+  },
+  "sfx.helado_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.helado_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/helado_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/helado_alerta_2"
+      }
+    ]
+  },
+  "sfx.helado_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.helado_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/helado_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/helado_dolor_2"
+      }
+    ]
+  },
+  "sfx.helado_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.helado_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/helado_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/helado_muerte_2"
+      }
+    ]
+  },
+  "sfx.helado_romper": {
+    "subtitle": "subtitles.darkcraft.sfx.helado_romper",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/helado_romper_1"
+      },
+      {
+        "name": "darkcraft:sfx/helado_romper_2"
+      }
+    ]
+  },
+  "sfx.helado_incensario": {
+    "subtitle": "subtitles.darkcraft.sfx.helado_incensario",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/helado_incensario_1"
+      },
+      {
+        "name": "darkcraft:sfx/helado_incensario_2"
+      }
+    ]
+  },
+  "sfx.helado_aliento": {
+    "subtitle": "subtitles.darkcraft.sfx.helado_aliento",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/helado_aliento_1"
+      },
+      {
+        "name": "darkcraft:sfx/helado_aliento_2"
+      }
+    ]
+  },
+  "sfx.helado_martillo": {
+    "subtitle": "subtitles.darkcraft.sfx.helado_martillo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/helado_martillo_1"
+      },
+      {
+        "name": "darkcraft:sfx/helado_martillo_2"
+      }
+    ]
+  },
+  "sfx.helado_esquirlas": {
+    "subtitle": "subtitles.darkcraft.sfx.helado_esquirlas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/helado_esquirlas_1"
+      },
+      {
+        "name": "darkcraft:sfx/helado_esquirlas_2"
+      }
+    ]
+  },
+  "sfx.monasterio_campana": {
+    "subtitle": "subtitles.darkcraft.sfx.monasterio_campana",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/monasterio_campana_1"
+      },
+      {
+        "name": "darkcraft:sfx/monasterio_campana_2"
+      }
+    ]
+  },
+  "ambiente.montana": {
+    "subtitle": "subtitles.darkcraft.ambiente.montana",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/montana_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/montana_ambiente_2",
+        "stream": true
+      }
+    ]
   }
 }

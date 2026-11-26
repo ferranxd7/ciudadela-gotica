@@ -283,6 +283,39 @@ public final class ClientMusic {
         }
     }
 
+    // ------------------------------------------------------------------ las montanas (parte 7k): aulla la ventisca
+
+    private static Track montana;
+    private static int montanaTicks;
+    private static boolean enMontana;
+
+    private static void tickMontana(Minecraft mc) {
+        if (mc.player == null || mc.level == null) enMontana = false;
+        else if (mc.player.tickCount % 20 == 13)
+            enMontana = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() > 150
+                    && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.MONTANAS;
+        boolean quiere = enMontana && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        if (quiere) {
+            if (montana == null || montana.dying() || !mc.getSoundManager().isActive(montana) && montanaTicks > 20) {
+                if (montana != null && !montana.dying()) mc.getSoundManager().stop(montana);
+                montana = new Track(DarkCraftMod.AMBIENTE_MONTANA.get(), "montana", false);
+                montanaTicks = 0;
+                mc.getSoundManager().play(montana);
+                montana.fadeTo(0.85f, 2.5f);
+            }
+        } else if (montana != null && !montana.dying()) montana.kill(3.0f);
+        if (montana != null) {
+            montanaTicks++;
+            if (montana.dying() && !mc.getSoundManager().isActive(montana) && montanaTicks > 20) montana = null;
+        }
+    }
+
+    /** Para la prueba de la CI: si suena la ventisca. */
+    public static String montana() {
+        Minecraft mc = Minecraft.getInstance();
+        return montana == null ? "sin la ventisca" : String.format("la ventisca %.2f%s", montana.level(), mc.getSoundManager().isActive(montana) ? "" : " (parada)");
+    }
+
     /** Para la prueba de la CI: si suena el pantano. */
     public static String pantano() {
         Minecraft mc = Minecraft.getInstance();
@@ -385,6 +418,8 @@ public final class ClientMusic {
         if (arboleda != null && !arboleda.dying()) any = true;
         tickPantano(mc);
         if (pantano != null && !pantano.dying()) any = true;
+        tickMontana(mc);
+        if (montana != null && !montana.dying()) any = true;
         tickTitulo(mc);
         if (titulo != null && !titulo.dying()) any = true;
         if (viaje != null) {
@@ -405,8 +440,9 @@ public final class ClientMusic {
         if (viaje != null) mc.getSoundManager().stop(viaje);
         if (arboleda != null) mc.getSoundManager().stop(arboleda);
         if (pantano != null) mc.getSoundManager().stop(pantano);
-        story = boss = zona = bruma = viaje = arboleda = pantano = null;
-        enFortaleza = enBruma = enArboleda = enPantano = false;
+        if (montana != null) mc.getSoundManager().stop(montana);
+        story = boss = zona = bruma = viaje = arboleda = pantano = montana = null;
+        enFortaleza = enBruma = enArboleda = enPantano = enMontana = false;
         bossPhase = 0;
     }
 
