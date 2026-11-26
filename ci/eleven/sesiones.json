@@ -1636,7 +1636,7 @@
   "flow": "AqkIj7OE07LCh5cMIoZU",
   "voz": "Grav - Deep, Dark & Sinister (6qtlupOXBYtv2nYY2VgL)",
   "modelo": "eleven_v4",
-  "nota": "Parte 3d: la voz de la Sombra (elegida entre Obsidian, Grav y Romulus II: Grav es la mas grave, F0 ~83 Hz). Frases 1-6 = cinematica de inicio; 7-9 = viaje a Valdrenn. Cada frase: voz (tomas a, b) y susurro (tomas a, b) para la capa de susurros.",
+  "nota": "Parte 3d: la voz de la Sombra (elegida entre Obsidian, Grav y Romulus II: Grav es la mas grave, F0 ~83 Hz). Frases 1-6 = cinematica de inicio; 7-9 = viaje a Valdrenn. Cada frase: voz (tomas a, b) y susurro (tomas a, b) para la capa de susurros. Frases 10-20 = el capitulo 6 (parte 5e: la Sombra abre su puerta; el susurro es el mismo texto con [whispers]).",
   "muestras": {
    "obsidian": [
     "ueTqN9o3KYFu4MZmQCb8",
@@ -1749,6 +1749,127 @@
     "susurro": [
      "g74sqAm8P8lidgKwKnHv",
      "AgwQDcTc6kGuzmkLn0Va"
+    ]
+   },
+   "10": {
+    "prompt": "[very low, slow, cold, amused] So... the marked one has climbed all the way to my door.",
+    "voz": [
+     "9ijGUH0ZRQD1Srx2ZHJr",
+     "QO6fX2rbOddCTEDPoSAV"
+    ],
+    "susurro": [
+     "4eSoFK3cPAEjsFkSbHaC",
+     "B0EtiH72F7DW03BsMDQU"
+    ]
+   },
+   "11": {
+    "prompt": "[very low, slow, cold, contemptuous] A king begged me for his queen. [pause] A knight gave his soul to keep me out.",
+    "voz": [
+     "fPlvpkyhH5EGFWPLSHTE",
+     "AEocx9LWQnez08vAk4Td"
+    ],
+    "susurro": [
+     "8Beku9sK4vkkM549QkP9",
+     "IQcSq1Hx3hL6KHBS1K8f"
+    ]
+   },
+   "12": {
+    "prompt": "[very low, slow, cold] They failed. [pause] You did not.",
+    "voz": [
+     "0zODQKl75o2OhqiLV24s",
+     "6q1sJHZsOZlJldokTEdD"
+    ],
+    "susurro": [
+     "9el7ThJNDERPsrBL3HRy",
+     "UaEDON60jw9Fpw9AEIg7"
+    ]
+   },
+   "13": {
+    "prompt": "[very low, slow, cold, intimate] You forged the amulet with your own hands... [pause] and you opened my door.",
+    "voz": [
+     "znCjoXO258BUGlyBvq9V",
+     "ceBAeViph4z7p0zk0yCH"
+    ],
+    "susurro": [
+     "iRFXbfWvZFaKPJQdXycl",
+     "QjnLYvHBBxawK28tXLm9"
+    ]
+   },
+   "14": {
+    "prompt": "[very low, slow, sinister, grateful] Thank you. [pause] I have waited a thousand winters for those hands.",
+    "voz": [
+     "9tXttyNlXAGTxK9hGdX9",
+     "JjOadVEvGOAWbP54K8Bc"
+    ],
+    "susurro": [
+     "WHcu4oHfXw3pAdWm7UML",
+     "iecRR5ypRZF8Eg5is0Ax"
+    ]
+   },
+   "15": {
+    "prompt": "[very low, slow, commanding] Now... [pause] look up.",
+    "voz": [
+     "1E9WiCd5byQJHLXPWWbk",
+     "WnlpAwCvswvNEm5zoFQ5"
+    ],
+    "susurro": [
+     "opUfHkv4lziWpIpHaFT3",
+     "C0sDunSzdyfjnwTdyS2n"
+    ]
+   },
+   "16": {
+    "prompt": "[very low, slow, triumphant] The sky remembers my name.",
+    "voz": [
+     "xuaDfZgLKFW3InGMIXXT",
+     "4sMCLsbfKocCnYUo5xHi"
+    ],
+    "susurro": [
+     "Zo34Xzn0EqLoYU3uwbfi",
+     "TPzCWLw4MeaAt1cfkIKo"
+    ]
+   },
+   "17": {
+    "prompt": "[very low, slow, cold, menacing] Every cloud in this world will burn red... [pause] until you stand before me.",
+    "voz": [
+     "TUz8NB42IuvpmFfHe9On",
+     "yrSzKpm7TddYao2ZbWqy"
+    ],
+    "susurro": [
+     "fyjEawmkf1AFaCRz3VWv",
+     "ZmEnePzRvz8vR1gf5WiG"
+    ]
+   },
+   "18": {
+    "prompt": "[very low, slow, cold, possessive] Beyond this door lie the Withered Lands. [pause] Morvain. [pause] My lands.",
+    "voz": [
+     "D8yvOb7sXr3nTwFVhxEH",
+     "qoJ1kmX0KUqVnO3jWyaa"
+    ],
+    "susurro": [
+     "LG8M1RUKtEO4vUrYPFHQ",
+     "gUA5uwjh5GvVOUfY8BMC"
+    ]
+   },
+   "19": {
+    "prompt": "[very low, slow, commanding] Cross, marked one. [pause] I will be waiting at the heart of it all.",
+    "voz": [
+     "2WPpguFebNwIN49Z9gTY",
+     "mYn8GtmNeXKLLftKLRQG"
+    ],
+    "susurro": [
+     "VcwZZmgwEcr4lkPHJbLj",
+     "U1oS78gxg7iUG16yfVhg"
+    ]
+   },
+   "20": {
+    "prompt": "[very low, slow, cold, intimate] [whispers] I always wait.",
+    "voz": [
+     "Fc419vvQHOtgjGFNOSft",
+     "xIc8cZrUXlAWbjI6nq5W"
+    ],
+    "susurro": [
+     "lpaWJ5AckIHgcqtOYExT",
+     "s24g8i6apmu6mkz74MJl"
     ]
    }
   }
