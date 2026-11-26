@@ -1,0 +1,193 @@
+package com.darkcraft.morvain;
+
+import com.darkcraft.DarkCraftMod;
+import com.darkcraft.enemigos.Enemigo;
+import com.darkcraft.enemigos.Marchito;
+import com.darkcraft.enemigos.Puestos;
+import com.darkcraft.enemigos.Puestos.Puesto;
+import com.darkcraft.pueblo.gen.Casa;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Los Marchitos de las Llanuras Palidas (parte 7e): donde espera cada uno ({@link Puestos}, en Morvain).
+ * <ul>
+ * <li><b>Velmor</b> (sitio {@value #VELMOR}): uno en cada cabeza del puente roto (el primero que se ve llegando del arco,
+ * en la orilla de enfrente), por las calles, en la plaza (uno de rodillas ante la horca), rezando en la capilla y en el
+ * cementerio, en la taberna, la herreria y la casa del alguacil, por los campos; y dos <b>campaneros</b>: a la puerta de la
+ * capilla y en los campos del este. Si un campanero te ve, toca y acuden los de alrededor ({@link Marchito#LLAMADA}).</li>
+ * <li><b>Las llanuras</b> (sitio {@value #LLANURAS}): tres que vagan solos entre el Arco del Umbral y Velmor.</li>
+ * </ul>
+ * Nadie a menos de 18 bloques del arco ni de 14 de un santuario.
+ */
+public final class MorvainEnemigos {
+    private MorvainEnemigos() {}
+
+    public static final String VELMOR = "velmor", LLANURAS = "llanuras";
+    static final String MARCHITO = "marchito";
+    // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
+    private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
+    private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
+    private static final int G = Marchito.GUADANA, F = Marchito.FAROL, C = Marchito.CAMPANA;
+
+    private static final List<Puesto> VELMOR_P = new ArrayList<>(), LLANURAS_P = new ArrayList<>();
+
+    /** Uno fuera, de pie en el suelo de Morvain. */
+    private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
+        l.add(new Puesto(MARCHITO, variante, x, Velmor.pie(x, z), z, giro, postura, ronda, grupo));
+    }
+
+    /** Uno a una altura dada (el puente, la capilla, dentro de una casa). */
+    private static void en(List<Puesto> l, int variante, int x, int y, int z, float giro, int postura, int ronda, String grupo) {
+        l.add(new Puesto(MARCHITO, variante, x, y, z, giro, postura, ronda, grupo));
+    }
+
+    /** Dentro de una casa: (a, b) en las coordenadas de quien entra. */
+    private static void casa(List<Puesto> l, Casa k, int variante, int a, int b, float giro, int postura, String grupo) {
+        l.add(new Puesto(MARCHITO, variante, k.lx(a, b), k.y, k.lz(a, b), giro, postura, 0, grupo));
+    }
+
+    static synchronized void preparar() {
+        if (!VELMOR_P.isEmpty()) return;
+        Velmor v = Velmor.get();
+        List<Puesto> l = VELMOR_P;
+        int t = Velmor.TABLERO + 1, g = v.capillaY;
+        // ---- el puente roto: uno en cada cabeza (el de la orilla del oeste mira a quien llega del arco)
+        en(l, G, Velmor.PUENTE_X0 + 6, t, Velmor.PUENTE_Z, OESTE, DE_PIE, 0, "puente");
+        en(l, F, Velmor.PUENTE_X1 - 4, t, Velmor.PUENTE_Z + 1, OESTE, DE_PIE, 0, "puente");
+        // ---- la calle del puente
+        fuera(l, G, 790, 4041, ESTE, DE_PIE, 5, "calle");
+        fuera(l, G, 818, 4039, OESTE, DE_PIE, 0, "calle");
+        fuera(l, G, 905, 4041, ESTE, DE_PIE, 0, "calle");
+        fuera(l, G, 940, 4038, OESTE, TUMBADO, 0, "calle");
+        // ---- la plaza: el del farol junto al pozo, uno de rodillas ante la horca, otro tirado
+        fuera(l, F, 850, 4034, SUR, DE_PIE, 3, "plaza");
+        fuera(l, G, 854, 4029, SUR, REZA, 0, "plaza");
+        fuera(l, G, 842, 4041, ESTE, TUMBADO, 0, "plaza");
+        // ---- la calle mayor
+        fuera(l, G, 850, 3995, SUR, DE_PIE, 4, "calle");
+        fuera(l, G, 849, 3962, SUR, DE_PIE, 0, "calle");
+        fuera(l, G, 851, 4100, NORTE, DE_PIE, 5, "calle");
+        fuera(l, F, 850, 4146, SUR, DE_PIE, 0, "puerta_sur");
+        // ---- la capilla: el campanero a la puerta, dos rezando en los bancos y uno ante el altar
+        en(l, C, 850, g, 3931, SUR, DE_PIE, 0, "capilla");
+        en(l, G, 844, g, 3917, NORTE, REZA, 0, "capilla");
+        en(l, G, 856, g, 3914, NORTE, REZA, 0, "capilla");
+        en(l, F, 850, g, 3909, SUR, DE_PIE, 0, "capilla");
+        // ---- el cementerio
+        fuera(l, F, 820, 3914, ESTE, DE_PIE, 3, "cementerio");
+        fuera(l, G, 817, 3917, SUR, TUMBADO, 0, "cementerio");
+        fuera(l, G, 814, 3913, NORTE, REZA, 0, "cementerio");
+        // ---- dentro: la taberna (dos sentados a sus jarras), la herreria y la casa del alguacil
+        casa(l, v.taberna, G, 2, 3, ESTE, REZA, "taberna");
+        casa(l, v.taberna, G, v.taberna.A - 3, 5, OESTE, REZA, "taberna");
+        casa(l, v.herreria, G, 3, 4, NORTE, DE_PIE, "herreria");
+        casa(l, v.alcaldia, F, 4, 4, SUR, DE_PIE, "alcaldia");
+        // ---- los campos: el otro campanero en los del este, y quien sigue segando
+        fuera(l, C, 920, 4090, NORTE, DE_PIE, 0, "campos");
+        fuera(l, F, 935, 4105, OESTE, DE_PIE, 4, "campos");
+        fuera(l, G, 910, 4075, ESTE, REZA, 0, "campos");
+        fuera(l, G, 780, 3970, SUR, DE_PIE, 5, "campos");
+        fuera(l, G, 771, 3986, ESTE, TUMBADO, 0, "campos");
+        // ---- los que vagan por las llanuras, entre el arco y Velmor
+        int[][] solos = {{250, 3640}, {420, 3790}, {596, 3905}};
+        for (int[] s : solos) {
+            int x = s[0], z = s[1];
+            LLANURAS_P.add(new Puesto(MARCHITO, G, x, (int) Math.floor(Terreno.columna(x, z).altura()) + 1, z, NORTE, DE_PIE, 8, "llanuras"));
+        }
+    }
+
+    /** Lo apunta el mod al arrancar. */
+    public static void registrar() {
+        Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
+        preparar();
+        Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
+        Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
+    }
+
+    public static List<Puesto> velmor() {
+        preparar();
+        return List.copyOf(VELMOR_P);
+    }
+
+    public static List<Puesto> llanuras() {
+        preparar();
+        return List.copyOf(LLANURAS_P);
+    }
+
+    // ------------------------------------------------------------------ el comando
+
+    /** {@code /darkcraft velmor [ir <sitio> | enemigos [volver | fuera | sacar]]}. */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comando() {
+        return net.minecraft.commands.Commands.literal("velmor")
+                .executes(c -> {
+                    var src = c.getSource();
+                    src.sendSuccess(() -> net.minecraft.network.chat.Component.literal(comprobar() + "; " + estado(src.getServer())), false);
+                    return 1;
+                })
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> ir(c.getSource(), "pozo"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Velmor.get().sitios().keySet(), b))
+                                .executes(c -> ir(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> {
+                            var src = c.getSource();
+                            src.sendSuccess(() -> net.minecraft.network.chat.Component.literal(estado(src.getServer())), false);
+                            return 1;
+                        })
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), VELMOR, false);
+                            Puestos.todos(c.getSource().getServer(), LLANURAS, false);
+                            c.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal("vuelven todos los marchitos"), false);
+                            return 1;
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), VELMOR, true);
+                            Puestos.todos(c.getSource().getServer(), LLANURAS, true);
+                            c.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal("fuera todos los marchitos"), false);
+                            return 1;
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            net.minecraft.server.level.ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, VELMOR).size();
+                            c.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal("fuera " + n), false);
+                            return n;
+                        })));
+    }
+
+    private static int ir(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Velmor.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Velmor.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 1.5, 180f, 10f);
+        return 1;
+    }
+
+    /** Cuantos quedan en pie y cuantos andan fuera. */
+    public static String estado(net.minecraft.server.MinecraftServer srv) {
+        return "Velmor: quedan " + Puestos.quedan(srv, VELMOR) + " de " + VELMOR_P.size() + " (fuera " + Puestos.fuera(VELMOR) + "); llanuras: quedan "
+                + Puestos.quedan(srv, LLANURAS) + " de " + LLANURAS_P.size();
+    }
+
+    /** Para la prueba: que ningun puesto quede cerca del arco ni de un santuario. */
+    public static String comprobar() {
+        preparar();
+        int cerca = 0;
+        List<Puesto> todos = new ArrayList<>(VELMOR_P);
+        todos.addAll(LLANURAS_P);
+        for (Puesto p : todos) {
+            if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
+            for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
+        }
+        int camp = 0;
+        for (Puesto p : VELMOR_P) if (p.variante() == C) camp++;
+        return VELMOR_P.size() + " en Velmor (" + camp + " campaneros) y " + LLANURAS_P.size() + " por las llanuras; cerca del arco o de un santuario "
+                + cerca;
+    }
+}

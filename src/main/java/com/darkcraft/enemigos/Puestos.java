@@ -209,11 +209,11 @@ public final class Puestos {
     public static void onServidor(TickEvent.ServerTickEvent ev) {
         if (ev.phase != TickEvent.Phase.END || ev.getServer().getTickCount() % 10 != 7 || SITIOS.isEmpty()) return;
         MinecraftServer srv = ev.getServer();
-        ServerLevel lvl = srv.overworld();
-        boolean nadie = lvl.players().isEmpty();
         Datos datos = null;
         for (Sitio s : SITIOS.values()) {
-            if (!s.aqui.test(lvl)) continue;
+            ServerLevel lvl = nivel(srv, s);
+            if (lvl == null) continue;
+            boolean nadie = lvl.players().isEmpty();
             if (nadie || lvl.getDifficulty() == Difficulty.PEACEFUL) {
                 recoger(s);
                 continue;
@@ -239,6 +239,17 @@ public final class Puestos {
                 }
             }
         }
+    }
+
+    /**
+     * El mundo de un sitio: el primero de los del servidor que diga que es el suyo (casi todos estan en el de las nubes;
+     * los de Morvain, parte 7e, en Morvain). Null si ninguno.
+     */
+    public static ServerLevel nivel(MinecraftServer srv, Sitio s) {
+        ServerLevel o = srv.overworld();
+        if (s.aqui.test(o)) return o;
+        for (ServerLevel l : srv.getAllLevels()) if (l != o && s.aqui.test(l)) return l;
+        return null;
     }
 
     private static double masCerca(ServerLevel lvl, double x, double y, double z) {
@@ -335,11 +346,11 @@ public final class Puestos {
      * con la vida entera si no estan peleando con otro.
      */
     public static int reaparecer(ServerPlayer quien) {
-        ServerLevel lvl = quien.server.overworld();
         Datos d = Datos.get(quien.server);
         int vuelven = 0;
         for (Sitio s : SITIOS.values()) {
-            if (!s.aqui.test(lvl)) continue;
+            ServerLevel lvl = nivel(quien.server, s);
+            if (lvl == null) continue;
             BitSet m = d.de(s.clave);
             for (int i = m.nextSetBit(0); i >= 0; i = m.nextSetBit(i + 1)) {
                 if (i >= s.puestos.size()) continue;

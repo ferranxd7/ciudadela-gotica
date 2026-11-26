@@ -10,7 +10,7 @@ darkcraft.narracion.6.N.
 DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdrenn",
          6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza",
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
-         17: "fortaleza"}
+         17: "fortaleza", 18: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -312,6 +312,16 @@ LIBROS = {
    "There were twelve of us watchmen beneath the dome. We kept the garden, Maester Velan's tower and, by night, in turns, the door at the very top. No one ever told us what it guarded.",
    "When the sky turned red, the other eleven went up to look. They never came down. Now they walk the garden with burning eyes and fade away if you look at them.\n\nI hid down here, beneath the fountain.",
    "The maester's treasure is not in the armoury. It lies behind the wall that is no wall: in the cellar, in the west guardroom. Strike it well and it crumbles like ash.\n\nMay he forgive me. No one needs it now."]),
+ },
+ 18: {
+  "es": ("La campana de Velmor", "Anselm, el campanero", [
+   "Toco la campana de Velmor desde que tengo memoria: a misa, a fuego, a muerto. Cuando el cielo se puso rojo sobre el centro de la tierra, la toqué a fuego. Nadie vino.",
+   "No murieron. Se quedaron. La molinera sigue en su campo, segando lo que ya no crece; el herrero golpea un yunque frío; en la taberna nadie bebe. Rompimos el puente para que no llegara nada. No sirvió: lo que nos marchita no viene por los caminos.",
+   "Son ceniza que anda, y la ceniza tiene sed de lo que aún respira. Si oyes mi campana, no es misa: es que alguien vivo ha entrado en Velmor, y ellos lo saben.\n\nYo también la oigo ya desde dentro."]),
+  "en": ("The Bell of Velmor", "Anselm, the bell-ringer", [
+   "I have rung the bell of Velmor for as long as I can remember: for mass, for fire, for the dead. When the sky turned red over the heart of the land, I rang it for fire. No one came.",
+   "They did not die. They stayed. The miller's wife is still in her field, reaping what no longer grows; the smith strikes a cold anvil; no one drinks in the tavern. We broke the bridge so that nothing would come. It made no difference: what withers us does not travel by road.",
+   "They are walking ash, and ash thirsts for whatever still breathes. If you hear my bell, it is not mass: it means someone living has entered Velmor, and they know it.\n\nI hear it now from the inside too."]),
  },
 }
 

@@ -1476,6 +1476,54 @@ Respuesta 92 del plan ("fragmentos de mapa"), como en Elden Ring. Publicada con 
   (`mv40`, cartel), la M con solo las Llanuras (`mv41`), con todo (`mv42`), de cerca (`mv43`), la pregunta del viaje
   (`mv44`) y despues del viaje al vado (`mv45`, linea `tras viajar desde el mapa: ...`); en combate no se viaja.
 
+### Plan grande, parte 7e: las Llanuras Palidas — los Marchitos y Velmor, el pueblo marchito
+
+Respuestas 125, 131 ("pueblos derrumbados") y 132 del plan; la primera region con su contenido.
+- **El Marchito** (`enemigos/Marchito`, entidad `darkcraft:marchito`; modelo de `tools/enemigos/marchito.py`: aldeano de
+  ceniza agrietada con brasas en las grietas, harapos y capucha; `MarchitoGeometria/Animaciones`, `MarchitoAnims`,
+  `MarchitoModelo`, el `EnemigoRenderer` de siempre a escala 1,08). 32 de vida, golpe 5,5, lento. Tres: **guadana**
+  (siega a ras de suelo de 170 grados —se salta o se rueda— y tajo de arriba abajo que llega a 3,8), **farol** (dos
+  cuchilladas y el farol de almas: lo estrella delante y deja **fuego de almas** `FUEGO_TICKS` 50 en un radio de 1,6 que
+  quema a quien lo pisa; sus golpes prenden) y **campanero** (baculazo; si ve a alguien entre 4,5 y 20 bloques **toca la
+  campana**: tres campanadas, cada una llama a los enemigos a `LLAMADA` 26 a por su presa —`Enemigo.acudir`— y frena a
+  quien este a 6; una vez cada `ESPERA_CAMPANA` 22 s; `Marchito.CAMPANADAS` para la prueba). Posturas de pie, de
+  rodillas o tumbado. Al caer se deshace en ceniza (bestiario `marchito_guadana/farol/campana`, logro `marchito`); a veces
+  una piedra de forja I.
+- **Velmor** (`morvain/Velmor`, en la orilla este del rio palido, al norte del santuario del Vado; el cruce de sus dos
+  calles en (850, 4040)): se dibuja como Brumavela —las casas son `pueblo/gen/Casa` (`CasaVelmor`: barro, adobe y madera
+  vieja en vez de cal) sobre el terreno de Morvain (`Velmor.alto`, con cache; `Casa` ya acepta cualquier
+  `pueblo/gen/Alturas` y su botin con `botin(normal, bueno)`, null = sin arcon)— chunk a chunk al adornar
+  (`MorvainGenerador.applyBiomeDecoration`, despues de `Adorno`, que en la caja de Velmor solo pone hierba). 33 casas por
+  las dos calles (muchas en ruina; la taberna, la herreria, la casa del alguacil y el granero), la plaza con el pozo, la
+  **horca** y un puesto; al norte **la capilla** sin tejado (la esquina del noreste caida, bancos rotos, altar con velas,
+  el atril con el **libro perdido 18**, "La campana de Velmor" de Anselm el campanero; arcon de la sacristia) y su
+  **campanario** de 22 con chapitel, escalera de mano y la campana (arcon arriba); al oeste el **cementerio** con el
+  **panteon** (arcon); campos secos al oeste y al sureste (trigo seco, gavillas, espantapajaros); farolas de almas (unas
+  apagadas o caidas), carros, arboles muertos sin hojas (`Landscape.DeadTree.sinHojas`), las puertas del sur y del este;
+  el **puente roto** sobre el rio (cuatro arcos, el tercero hundido: un hueco de diez que a pie no se salta y el corcel
+  si) y el **vado** de piedras al sur. Botin `chests/velmor` y `velmor_bueno`. Sitios con nombre (`Velmor.sitio`: atril,
+  campana, pozo, horca, puente_oeste/este/hueco, vado, puerta_sur/este, capilla, cementerio, panteon, cofres...). Al
+  entrar: el nombre "Velmor" (`Morvain.lugar`, cartel la primera vez) y el logro `velmor`.
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_velmor carpeta` (`-Dcaja=x0,z0,x1,z1` para un trozo) dibuja el
+  terreno y el pueblo con las marcas de sus sitios.
+- **Los puestos** (`morvain/MorvainEnemigos`): sitio `velmor` (29: uno en cada cabeza del puente, calles, la plaza —uno de
+  rodillas ante la horca—, la capilla —el campanero a la puerta, dos rezando y uno ante el altar—, el cementerio, la
+  taberna, la herreria, la casa del alguacil y los campos, con el otro campanero) y `llanuras` (tres que vagan entre el
+  arco y Velmor). **`Puestos` ya vale para cualquier dimension**: cada sitio va en el primer mundo del servidor que diga
+  que es el suyo (`Puestos.nivel`); antes solo miraba el de las nubes.
+- Sonidos (ElevenLabs, `TOMAS_SFX`): `marchito_gemido` (1, 3 y 2), `marchito_alerta` (1 y 3), `marchito_dolor` (3, 1 y
+  4), `marchito_muerte` (2 y 3), `marchito_campana` (las cuatro: cada toma es una sola campanada) y `marchito_farol` (1,
+  4 y 2).
+- Comandos `/darkcraft velmor [ir <sitio> | enemigos [volver | fuera | sacar]]`.
+- Pruebas: servidor, lineas `Morvain, Velmor: ...` (chunks, casas, el atril con el libro 18, la campana, arcones; vistas
+  `morvain_velmor*.png`), `Morvain, los marchitos: ...` (puestos, ninguno cerca del arco ni de un santuario), `... fuera:`
+  (en el suelo, ninguno metido en un bloque, todas sus acciones acaban) y `Morvain, la campana de los marchitos: ...` (las
+  campanadas llaman al de 8 y al de 12 bloques y no al de 40; el farol deja fuego; uno cae en ceniza); cliente, tramo
+  `velmor()` despues del mapa: el puente desde la otra orilla (`cliente_mv46`), el pueblo (`mv47`), la plaza (`mv48`), la
+  capilla (`mv49`), el altar y el atril (`mv50`), la campana (`mv51`), los tres marchitos (`mv52`), el campanero tocando
+  (`mv53`), el farol (`mv54`), la siega (`mv55`), la ceniza (`mv56`), el libro del campanero (`mv57`) y entrar a pie por la
+  puerta del sur (`mv58`, el cartel y el logro).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1486,7 +1534,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c y la 7d arriba; despues, region a region su contenido).
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d y la 7e arriba; despues, region a region su contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

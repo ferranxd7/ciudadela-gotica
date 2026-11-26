@@ -2714,5 +2714,86 @@
         "name": "darkcraft:sfx/corcel_dolor_3"
       }
     ]
+  },
+  "sfx.marchito_gemido": {
+    "subtitle": "subtitles.darkcraft.sfx.marchito_gemido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marchito_gemido_1"
+      },
+      {
+        "name": "darkcraft:sfx/marchito_gemido_2"
+      },
+      {
+        "name": "darkcraft:sfx/marchito_gemido_3"
+      }
+    ]
+  },
+  "sfx.marchito_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.marchito_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marchito_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/marchito_alerta_2"
+      }
+    ]
+  },
+  "sfx.marchito_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.marchito_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marchito_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/marchito_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/marchito_dolor_3"
+      }
+    ]
+  },
+  "sfx.marchito_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.marchito_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marchito_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/marchito_muerte_2"
+      }
+    ]
+  },
+  "sfx.marchito_campana": {
+    "subtitle": "subtitles.darkcraft.sfx.marchito_campana",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marchito_campana_1"
+      },
+      {
+        "name": "darkcraft:sfx/marchito_campana_2"
+      },
+      {
+        "name": "darkcraft:sfx/marchito_campana_3"
+      },
+      {
+        "name": "darkcraft:sfx/marchito_campana_4"
+      }
+    ]
+  },
+  "sfx.marchito_farol": {
+    "subtitle": "subtitles.darkcraft.sfx.marchito_farol",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marchito_farol_1"
+      },
+      {
+        "name": "darkcraft:sfx/marchito_farol_2"
+      },
+      {
+        "name": "darkcraft:sfx/marchito_farol_3"
+      }
+    ]
   }
 }

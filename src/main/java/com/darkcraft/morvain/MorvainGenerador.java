@@ -143,6 +143,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo adornar el chunk {}", c.getPos(), t);
         }
+        // Velmor, el pueblo marchito de las llanuras (parte 7e): despues de la hierba, encima
+        try {
+            if (Velmor.toca(c.getPos().x, c.getPos().z)) Velmor.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar Velmor en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override
