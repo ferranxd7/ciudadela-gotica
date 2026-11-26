@@ -6321,7 +6321,7 @@ public final class ClientCiTest {
         t += 10;
         atTicks(t, "Mapa: en combate no se viaja desde el mapa", m -> server(m, sp -> {
             sp.setGameMode(GameType.SURVIVAL);
-            com.darkcraft.rol.Rol.guardia(sp, 0f);
+            com.darkcraft.rol.Rol.conCombate(sp);
             boolean antes = com.darkcraft.rol.Rol.enCombate(sp);
             com.darkcraft.morvain.Viaje.desdeMapa(sp, "llegada");
             log("  desde el mapa en combate (" + antes + "): viaje en marcha " + com.darkcraft.morvain.Viaje.pendiente(sp));
