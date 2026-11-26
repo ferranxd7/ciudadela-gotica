@@ -10,7 +10,8 @@ darkcraft.narracion.6.N.
 DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdrenn",
          6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza",
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
-         17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain"}
+         17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
+         22: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -352,6 +353,16 @@ LIBROS = {
    "For forty winters I have opened this gate to the pilgrims. They climbed waist-deep in snow to pray with us at the Frost. Since the sky turned red no one comes up anymore... and those who were already on the road never arrived.",
    "The cold came into the church during vespers. Father Prior bade us keep praying: \"the Lord does not forsake His own\". We prayed until we could no longer move. The brothers are still there, kneeling in the pews, frost in their beards. Sometimes I hear them whisper.",
    "Abbot Hrodric did not pray with us. He climbed to the summit to beg the cold to spare us, and the cold answered him. I have seen him come down at night, taller than the tower, wearing a mitre of ice. If you read this, do not climb to the summit. And never kneel in this house.\n\nBr. Wendel"]),
+ },
+ 22: {
+  "es": ("La guardia de la Puerta Oeste", "Sargento Brannoc, de la guardia del Juramento", [
+   "Noche del cielo rojo. El Condestable manda cerrar la Puerta Oeste: nadie entra y nadie sale. Los de la ronda del puente aún no habían vuelto. Bajamos el rastrillo con ellos llamando al otro lado. Eso también lo apunto.",
+   "Al otro lado del río ardía el palacio. Aquel fuego no prendía en los tejados: caía del cielo, rojo, y el agua no lo apagaba. Los de dentro se echaban contra la puerta para salir. La guardamos. Para eso juramos.",
+   "«Juro guardar la puerta. Juro no dormir. Juro no morir.»\n\nYa no dormimos. Ardemos sin consumirnos y seguimos en el adarve. El Condestable dice que la puerta sigue cerrada. Si lees esto, vienes de fuera... y por esta puerta no pasa nadie.\n\nSgto. Brannoc"]),
+  "en": ("The Watch of the West Gate", "Sergeant Brannoc, of the Oath Guard", [
+   "Night of the red sky. The Constable orders the West Gate shut: no one comes in, no one goes out. The bridge watch had not yet come back. We lowered the portcullis with them calling from the other side. I write that down too.",
+   "Across the river the palace was burning. That fire did not catch on the roofs: it fell from the sky, red, and water would not put it out. Those inside threw themselves against the gate to get out. We held it. That is what we swore.",
+   "\"I swear to guard the gate. I swear not to sleep. I swear not to die.\"\n\nWe sleep no more. We burn without burning away and we keep to the wall-walk. The Constable says the gate is still shut. If you read this, you come from outside... and no one passes this gate.\n\nSgt. Brannoc"]),
  },
 }
 

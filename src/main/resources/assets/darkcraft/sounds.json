@@ -3747,5 +3747,131 @@
         "stream": false
       }
     ]
+  },
+  "sfx.calcinado_gemido": {
+    "subtitle": "subtitles.darkcraft.sfx.calcinado_gemido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/calcinado_gemido_1"
+      },
+      {
+        "name": "darkcraft:sfx/calcinado_gemido_2"
+      }
+    ]
+  },
+  "sfx.calcinado_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.calcinado_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/calcinado_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/calcinado_alerta_2"
+      }
+    ]
+  },
+  "sfx.calcinado_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.calcinado_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/calcinado_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/calcinado_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/calcinado_dolor_3"
+      }
+    ]
+  },
+  "sfx.calcinado_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.calcinado_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/calcinado_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/calcinado_muerte_2"
+      }
+    ]
+  },
+  "sfx.calcinado_alzarse": {
+    "subtitle": "subtitles.darkcraft.sfx.calcinado_alzarse",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/calcinado_alzarse_1"
+      },
+      {
+        "name": "darkcraft:sfx/calcinado_alzarse_2"
+      }
+    ]
+  },
+  "sfx.calcinado_tajo": {
+    "subtitle": "subtitles.darkcraft.sfx.calcinado_tajo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/calcinado_tajo_1"
+      },
+      {
+        "name": "darkcraft:sfx/calcinado_tajo_2"
+      }
+    ]
+  },
+  "sfx.calcinado_escudo": {
+    "subtitle": "subtitles.darkcraft.sfx.calcinado_escudo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/calcinado_escudo_1"
+      },
+      {
+        "name": "darkcraft:sfx/calcinado_escudo_2"
+      }
+    ]
+  },
+  "sfx.calcinado_cantaro": {
+    "subtitle": "subtitles.darkcraft.sfx.calcinado_cantaro",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/calcinado_cantaro_1"
+      },
+      {
+        "name": "darkcraft:sfx/calcinado_cantaro_2"
+      }
+    ]
+  },
+  "sfx.calcinado_fuego": {
+    "subtitle": "subtitles.darkcraft.sfx.calcinado_fuego",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/calcinado_fuego_1"
+      },
+      {
+        "name": "darkcraft:sfx/calcinado_fuego_2"
+      }
+    ]
+  },
+  "sfx.calcinado_ceniza": {
+    "subtitle": "subtitles.darkcraft.sfx.calcinado_ceniza",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/calcinado_ceniza_1"
+      },
+      {
+        "name": "darkcraft:sfx/calcinado_ceniza_2"
+      }
+    ]
+  },
+  "ambiente.capital": {
+    "subtitle": "subtitles.darkcraft.ambiente.capital",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capital_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/capital_ambiente_2",
+        "stream": true
+      }
+    ]
   }
 }

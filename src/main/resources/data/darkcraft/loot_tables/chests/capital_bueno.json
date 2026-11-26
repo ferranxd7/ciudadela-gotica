@@ -1,0 +1,197 @@
+{
+ "type": "minecraft:chest",
+ "pools": [
+  {
+   "rolls": {
+    "type": "minecraft:uniform",
+    "min": 3,
+    "max": 5
+   },
+   "entries": [
+    {
+     "type": "minecraft:item",
+     "name": "minecraft:gold_nugget",
+     "weight": 5,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 3,
+        "max": 8
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "minecraft:gold_ingot",
+     "weight": 4,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 3
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "minecraft:iron_ingot",
+     "weight": 5,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 4
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "minecraft:arrow",
+     "weight": 4,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 4,
+        "max": 10
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "minecraft:experience_bottle",
+     "weight": 3,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 3
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:fruto_escarcha",
+     "weight": 6,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 3
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:fruto_brasa",
+     "weight": 5,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 1,
+        "max": 3
+       }
+      }
+     ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:fruto_hueso",
+     "weight": 3
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:fruto_ceniza",
+     "weight": 3
+    }
+   ]
+  },
+  {
+   "rolls": 1,
+   "entries": [
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:piedra_forja_1",
+     "weight": 30
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:piedra_forja_2",
+     "weight": 26
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:piedra_forja_3",
+     "weight": 3
+    },
+    {
+     "type": "minecraft:empty",
+     "weight": 12
+    }
+   ]
+  },
+  {
+   "rolls": 1,
+   "entries": [
+    {
+     "type": "minecraft:empty",
+     "weight": 26
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_brasa",
+     "weight": 6
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_hueso",
+     "weight": 3
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:talisman_porteador",
+     "weight": 2
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:ceniza_escarcha",
+     "weight": 5
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:ceniza_torbellino",
+     "weight": 3
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_lanza",
+     "weight": 3
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:hechizo_esquirlas",
+     "weight": 3
+    }
+   ]
+  }
+ ]
+}

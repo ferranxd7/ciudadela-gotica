@@ -40,6 +40,8 @@ final class Adorno {
         if (Monasterio.cerca(x0, z0)) return;
         // ni en la escalera de los penitentes ni en el calvario de la ermita (parte 7l)
         if (Ermita.cerca(x0, z0)) return;
+        // ni en la Puerta Oeste de la Capital (parte 7m): los arboles quemados y los escombros los pone la ciudad
+        if (Capital.cerca(x0, z0)) return;
         // en la Arboleda de los Ahorcados (parte 7g) solo setas y helechos: los arboles son los suyos
         if (Arboleda.cerca(x0, z0)) {
             hierba(nivel, c, r, 20, Blocks.BROWN_MUSHROOM.defaultBlockState(), Blocks.FERN.defaultBlockState());

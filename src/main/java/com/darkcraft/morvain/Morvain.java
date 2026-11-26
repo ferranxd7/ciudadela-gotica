@@ -319,6 +319,10 @@ public final class Morvain {
                 com.darkcraft.story.Logros.dar(p, "monasterio");
                 p.playNotifySound(DarkCraftMod.SFX_MONASTERIO_CAMPANA.get(), net.minecraft.sounds.SoundSource.AMBIENT, 1.4f, 0.95f);
             }
+        // y quien cruza la Puerta Oeste de la Capital (parte 7m): por esta puerta no pasa nadie... salvo el
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Capital.intramuros(p.getX(), p.getZ()) && Math.abs(p.getY() - Capital.PISO) < 40)
+                com.darkcraft.story.Logros.dar(p, "capital");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -383,6 +387,8 @@ public final class Morvain {
         if (Ermita.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Ermita.PISO) < 30) return "darkcraft.morvain.lugar.ermita";
         if (Ermita.enEscalera(p.getX(), p.getZ()) && p.getY() > Monasterio.PISO - 10 && p.getY() < Ermita.PISO + 20)
             return "darkcraft.morvain.lugar.escalera_penitentes";
+        // la Puerta Oeste de la Capital (parte 7m)
+        if (Capital.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Capital.PISO) < 40) return "darkcraft.morvain.lugar.capital_puerta";
         return "darkcraft.zona.morvain." + Terreno.region(p.getX(), p.getZ()).id;
     }
 

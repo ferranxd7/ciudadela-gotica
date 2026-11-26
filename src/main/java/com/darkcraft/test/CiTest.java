@@ -734,6 +734,281 @@ public final class CiTest {
         barquero(server, m, log, out);
         monasterio(server, m, log, out);
         ermita(server, m, log, out);
+        capital(server, m, log, out);
+    }
+
+    /**
+     * Parte 7m: la Puerta Oeste de la Capital (la muralla, la puerta con su rastrillo, la sala de la guardia con el libro 22,
+     * la calle mayor, la plaza de la estatua caida y el cuartel; a pie desde el camino del santuario a todos sus sitios) y los
+     * calcinados: donde esperan (en su suelo, ninguno metido en un bloque), el agazapado se levanta y el enterrado se alza de
+     * la ceniza, cada accion acaba, el escudo de la guardia (de frente deja pasar poco y las flechas nada; por la espalda,
+     * todo), el tajo que quema, el cantaro de brea (revienta y deja llamas que queman), el agarron del ceniciento (sujeta y
+     * quema), su nube de ceniza al morir, y el fuego no les hace nada y el frio, mas.
+     */
+    private static void capital(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.CAPITAL;
+        var C = com.darkcraft.morvain.Capital.get();
+        final int CX = com.darkcraft.morvain.Capital.CX, CZ = com.darkcraft.morvain.Capital.CZ, PISO = com.darkcraft.morvain.Capital.PISO;
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : C.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            // a pie desde el camino del santuario (las alfombras de ceniza no estorban)
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock ? aire : st;
+            };
+            int[] en = C.sitio("entrada");
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, en[0], en[1], en[2], CX - 70, CZ - 80, CX + 124, CZ + 80, 3_000_000);
+            StringBuilder ap = new StringBuilder();
+            int llega = 0, sitios = 0;
+            for (var e : C.sitios().entrySet()) {
+                // (la estatua es lo alto del pedestal: no se sube)
+                if (e.getKey().equals("estatua")) continue;
+                sitios++;
+                int[] q = e.getValue();
+                if (zona.alcanza(q[0], q[1], q[2], 2)) llega++;
+                else ap.append(' ').append(e.getKey());
+            }
+            int lejos = 0;
+            for (var o : C.esperas()) if (!zona.alcanza(o.x(), o.y(), o.z(), 2)) lejos++;
+            var sc = com.darkcraft.morvain.SantuariosMorvain.porId("puerta_capital");
+            log.println("Morvain, la puerta oeste de la capital: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Capital.resumen(m)
+                    + "; santuario " + com.darkcraft.santuario.Santuarios.nombre(m, sc.pos()) + "; a pie desde el camino (" + zona.celdas() + " celdas) a "
+                    + llega + " de " + sitios + " sitios" + (ap.length() == 0 ? "" : ", no a:" + ap) + "; calcinados a los que no se llega " + lejos
+                    + " de " + C.esperas().size());
+            topView(m, CX + 40, CZ, 90, new File(out, "morvain_capital.png"));
+            topView(m, CX, CZ, 16, new File(out, "morvain_capital_puerta.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, la puerta oeste de la capital: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] capital", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 10; k++)
+                for (var e : fuera) if (e.isAlive()) e.tick();
+            int agazapados = 0, enterrados = 0, dePie = 0, enSuelo = 0, chocan = 0;
+            int[] porVariante = new int[3];
+            StringBuilder mal = new StringBuilder();
+            com.darkcraft.enemigos.Calcinado agazapado = null, enterrado = null;
+            for (var e : fuera) {
+                if (!(e instanceof com.darkcraft.enemigos.Calcinado c)) continue;
+                porVariante[Math.max(0, Math.min(2, c.variante()))]++;
+                if (!m.noCollision(c)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(c.blockPosition().toShortString()).append(';');
+                }
+                if (c.postura() == com.darkcraft.enemigos.Enemigo.REZA) {
+                    agazapados++;
+                    if (agazapado == null) agazapado = c;
+                } else if (c.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) {
+                    enterrados++;
+                    if (enterrado == null) enterrado = c;
+                } else dePie++;
+                if (!m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+                else if (mal.length() < 400) mal.append(' ').append(c.tipo()).append(" en el aire en ").append(c.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, los calcinados: " + com.darkcraft.morvain.MorvainEnemigos.comprobar() + "; fuera " + fuera.size() + " de "
+                    + com.darkcraft.morvain.MorvainEnemigos.capital().size() + " (guardias " + porVariante[0] + ", incendiarios " + porVariante[1]
+                    + ", cenicientos " + porVariante[2] + "): agazapados " + agazapados + ", enterrados " + enterrados + ", de pie " + dePie
+                    + " (en su suelo " + enSuelo + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+            StringBuilder sb = new StringBuilder("Morvain, los calcinados en accion:");
+            // ---- el agazapado se levanta y el enterrado se alza de la ceniza (una presa a su lado)
+            int alzados = com.darkcraft.enemigos.Calcinado.ALZADOS;
+            for (var c : new com.darkcraft.enemigos.Calcinado[]{agazapado, enterrado}) {
+                if (c == null) {
+                    sb.append(" NO HAY ").append(c == agazapado ? "NINGUNO AGAZAPADO;" : "NINGUNO ENTERRADO;");
+                    continue;
+                }
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (presa == null) continue;
+                presa.moveTo(c.getX() + 2.0, c.getY(), c.getZ() + 0.5, 0f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(presa);
+                quitar.add(presa);
+                int antes = c.postura();
+                c.setTarget(presa);
+                int sale = -1;
+                for (int k = 0; k < 80; k++) {
+                    c.tickCount++;
+                    c.tick();
+                    int a = c.accion();
+                    if (sale < 0 && (a == com.darkcraft.enemigos.CalcinadoAnims.LEVANTARSE || a == com.darkcraft.enemigos.CalcinadoAnims.ALZARSE)) sale = k;
+                    if (sale >= 0 && a == 0) break;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " el %s (%s, en %s) se %s en el tick %d y queda de pie %s;", c.tipo(),
+                        antes == com.darkcraft.enemigos.Enemigo.REZA ? "agazapado" : "enterrado", c.blockPosition().toShortString(),
+                        antes == com.darkcraft.enemigos.Enemigo.REZA ? "levanta" : "alza", sale, c.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE));
+                c.setTarget(null);
+            }
+            sb.append(" alzados +").append(com.darkcraft.enemigos.Calcinado.ALZADOS - alzados).append(';');
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
+            // ---- en la calle mayor (de cara al oeste, a la puerta): uno de cada, cada accion acaba
+            for (int v2 = 0; v2 < 3; v2++) {
+                var a = DarkCraftMod.CALCINADO.get().create(m);
+                if (a == null) continue;
+                a.variante(v2);
+                a.moveTo(CX + 16.5 + v2 * 4, PISO, CZ + 0.5, 90f, 0f);
+                m.addFreshEntity(a);
+                quitar.add(a);
+                StringBuilder no = new StringBuilder();
+                for (int ac = 1; ac < com.darkcraft.enemigos.CalcinadoAnims.TICKS.length; ac++) {
+                    String nombre = com.darkcraft.enemigos.CalcinadoAnims.NOMBRES[ac];
+                    if (nombre.equals("morir")) continue;
+                    a.empezar(ac);
+                    for (int k = 0; k < 90 && a.accion() == ac; k++) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    if (a.accion() == ac) no.append(' ').append(nombre);
+                    for (int k = 0; k < 10; k++) a.tick();
+                }
+                sb.append(' ').append(a.tipo()).append(String.format(java.util.Locale.ROOT, " (vida %.0f, armadura %.0f)", a.getMaxHealth(), a.getArmorValue()))
+                        .append(": acciones que no acaban").append(no.length() == 0 ? " ninguna" : no).append(';');
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.class, a.getBoundingBox().inflate(20))) f.discard();
+                a.discard();
+            }
+            log.println(sb);
+            sb = new StringBuilder("Morvain, los calcinados contra una presa:");
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("3e5f7a9b-1c2d-4e6f-8a0b-2c4d6e8f0a72"), "[DarkCraftCI7]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            final double gx = CX + 20.5, gz = CZ + 0.5;
+            // ---- el escudo de la guardia: de frente (al oeste) deja pasar el 20 %, la flecha nada; por la espalda, todo
+            var g = DarkCraftMod.CALCINADO.get().create(m);
+            if (g != null) {
+                g.variante(com.darkcraft.enemigos.Calcinado.GUARDIA);
+                g.moveTo(gx, PISO, gz, 90f, 0f);
+                g.yBodyRot = g.yHeadRot = 90f;
+                g.setNoAi(true);
+                m.addFreshEntity(g);
+                quitar.add(g);
+                int bloq = com.darkcraft.enemigos.Calcinado.BLOQUEOS;
+                fp.moveTo(gx - 2.0, PISO, gz, -90f, 0f);
+                float v0 = g.getHealth();
+                g.hurt(m.damageSources().playerAttack(fp), 10f);
+                float deFrente = v0 - g.getHealth();
+                g.invulnerableTime = 0;
+                var flecha = new net.minecraft.world.entity.projectile.Arrow(m, fp);
+                flecha.setPos(gx - 1.6, PISO + 1.2, gz);
+                v0 = g.getHealth();
+                boolean entra = g.hurt(m.damageSources().arrow(flecha, fp), 6f);
+                float conFlecha = v0 - g.getHealth();
+                g.invulnerableTime = 0;
+                fp.moveTo(gx + 2.0, PISO, gz, 90f, 0f);
+                v0 = g.getHealth();
+                g.hurt(m.damageSources().playerAttack(fp), 10f);
+                float porDetras = v0 - g.getHealth();
+                sb.append(String.format(java.util.Locale.ROOT, " el escudo: de frente -%.1f de 10, la flecha %s (-%.1f), por la espalda -%.1f; bloqueos +%d;",
+                        deFrente, entra ? "entra" : "no entra", conFlecha, porDetras, com.darkcraft.enemigos.Calcinado.BLOQUEOS - bloq));
+                g.discard();
+            }
+            // ---- el tajo (quema), el cantaro de brea (revienta y deja llamas que queman) y el agarron (sujeta y quema)
+            int cant = com.darkcraft.enemigos.Calcinado.CANTAROS, rev = com.darkcraft.enemigos.Cantaro.REVIENTAN, dan = com.darkcraft.enemigos.Cantaro.DAN,
+                    queman = com.darkcraft.enemigos.Cantaro.LLAMAS_QUEMAN, agarra = com.darkcraft.enemigos.Calcinado.AGARRONES,
+                    quem = com.darkcraft.enemigos.Calcinado.QUEMADOS;
+            String[] nombres = {"tajo", "cantaro", "agarron"};
+            int[] acciones = {com.darkcraft.enemigos.CalcinadoAnims.TAJO, com.darkcraft.enemigos.CalcinadoAnims.LANZAR, com.darkcraft.enemigos.CalcinadoAnims.AGARRON};
+            int[] variantes = {com.darkcraft.enemigos.Calcinado.GUARDIA, com.darkcraft.enemigos.Calcinado.INCENDIARIO, com.darkcraft.enemigos.Calcinado.CENICIENTO};
+            double[] lejos = {2.4, 8.0, 3.4};
+            int[] dura = {40, 110, 40};
+            for (int i = 0; i < 3; i++) {
+                var a = DarkCraftMod.CALCINADO.get().create(m);
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (a == null || presa == null) continue;
+                a.variante(variantes[i]);
+                // en la calle mayor, mirando al este (hacia la plaza)
+                a.moveTo(gx, PISO, gz, -90f, 0f);
+                presa.moveTo(gx + lejos[i], PISO, gz, 90f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(a);
+                m.addFreshEntity(presa);
+                quitar.add(a);
+                quitar.add(presa);
+                a.setTarget(presa);
+                a.setYRot(-90f);
+                a.yBodyRot = a.yHeadRot = -90f;
+                a.empezar(acciones[i]);
+                float vida = presa.getHealth();
+                int fuego = 0;
+                boolean frenada = false, llamas = false;
+                for (int k = 0; k < dura[i]; k++) {
+                    if (!a.isRemoved()) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.class, presa.getBoundingBox().inflate(14))) {
+                        if (!quitar.contains(f)) quitar.add(f);
+                        f.tick();
+                    }
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.Llamas.class, presa.getBoundingBox().inflate(14))) {
+                        if (!quitar.contains(f)) quitar.add(f);
+                        llamas = true;
+                        f.tick();
+                    }
+                    // (la presa no se mueve: que no se apague sola el fuego entre golpe y golpe)
+                    fuego = Math.max(fuego, presa.getRemainingFireTicks());
+                    frenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                    presa.invulnerableTime = 0;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " %s a %.1f: la presa -%.1f, ardiendo %d ticks, frenada %s%s;", nombres[i], lejos[i],
+                        vida - presa.getHealth(), fuego, frenada, i == 1 ? ", llamas en el suelo " + llamas : ""));
+                a.discard();
+                presa.discard();
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " cantaros +%d (revientan +%d, dan +%d, sus llamas queman +%d), agarrones +%d, quemados +%d;",
+                    com.darkcraft.enemigos.Calcinado.CANTAROS - cant, com.darkcraft.enemigos.Cantaro.REVIENTAN - rev, com.darkcraft.enemigos.Cantaro.DAN - dan,
+                    com.darkcraft.enemigos.Cantaro.LLAMAS_QUEMAN - queman, com.darkcraft.enemigos.Calcinado.AGARRONES - agarra,
+                    com.darkcraft.enemigos.Calcinado.QUEMADOS - quem));
+            // ---- el fuego no les hace nada; el frio, un 60 % mas
+            var c1 = DarkCraftMod.CALCINADO.get().create(m);
+            var c2 = DarkCraftMod.CALCINADO.get().create(m);
+            if (c1 != null && c2 != null) {
+                c1.variante(com.darkcraft.enemigos.Calcinado.CENICIENTO);
+                c2.variante(com.darkcraft.enemigos.Calcinado.CENICIENTO);
+                c1.moveTo(gx - 6, PISO, gz + 1.5, 0f, 0f);
+                c2.moveTo(gx - 6, PISO, gz - 1.5, 0f, 0f);
+                m.addFreshEntity(c1);
+                m.addFreshEntity(c2);
+                quitar.add(c1);
+                quitar.add(c2);
+                float v1 = c1.getHealth(), v2 = c2.getHealth();
+                boolean fuegoLe = c1.hurt(m.damageSources().inFire(), 5f);
+                boolean lavaLe = c1.hurt(m.damageSources().lava(), 5f);
+                c2.hurt(m.damageSources().freeze(), 5f);
+                sb.append(String.format(java.util.Locale.ROOT, " el fuego le hace %s y la lava %s (-%.1f); el frio -%.1f de 5;", fuegoLe ? "dano" : "nada",
+                        lavaLe ? "dano" : "nada", v1 - c1.getHealth(), v2 - c2.getHealth()));
+                // ---- y al morir el ceniciento revienta en una nube de ceniza
+                int cen = com.darkcraft.enemigos.Calcinado.CENIZAS;
+                c2.hurt(m.damageSources().playerAttack(fp), 9999f);
+                int k = 0;
+                boolean nube = false;
+                for (; k < 90 && !c2.isRemoved(); k++) {
+                    c2.tick();
+                    for (var n : m.getEntitiesOfClass(net.minecraft.world.entity.AreaEffectCloud.class, c2.getBoundingBox().inflate(4)))
+                        if (n.getOwner() == c2) {
+                            nube = true;
+                            if (!quitar.contains(n)) quitar.add(n);
+                        }
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " al morir el ceniciento revienta en ceniza %s (nube %s) y se va en %d ticks",
+                        com.darkcraft.enemigos.Calcinado.CENIZAS > cen, nube, k));
+            }
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println("Morvain, los calcinados: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] calcinados", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
     }
 
     /**

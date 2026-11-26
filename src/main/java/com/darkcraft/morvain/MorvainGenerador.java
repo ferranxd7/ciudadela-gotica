@@ -182,6 +182,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la ermita en el chunk {}", c.getPos(), t);
         }
+        // la Puerta Oeste de la Capital y el barrio quemado de detras (parte 7m)
+        try {
+            if (Capital.toca(c.getPos().x, c.getPos().z)) Capital.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la puerta de la capital en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override
