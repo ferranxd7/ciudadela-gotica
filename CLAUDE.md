@@ -1478,7 +1478,8 @@ Respuesta 92 del plan ("fragmentos de mapa"), como en Elden Ring. Publicada con 
 
 ### Plan grande, parte 7e: las Llanuras Palidas — los Marchitos y Velmor, el pueblo marchito
 
-Respuestas 125, 131 ("pueblos derrumbados") y 132 del plan; la primera region con su contenido.
+Respuestas 125, 131 ("pueblos derrumbados") y 132 del plan; la primera region con su contenido. Publicada con la build de
+prueba 136 bien.
 - **El Marchito** (`enemigos/Marchito`, entidad `darkcraft:marchito`; modelo de `tools/enemigos/marchito.py`: aldeano de
   ceniza agrietada con brasas en las grietas, harapos y capucha; `MarchitoGeometria/Animaciones`, `MarchitoAnims`,
   `MarchitoModelo`, el `EnemigoRenderer` de siempre a escala 1,08). 32 de vida, golpe 5,5, lento. Tres: **guadana**

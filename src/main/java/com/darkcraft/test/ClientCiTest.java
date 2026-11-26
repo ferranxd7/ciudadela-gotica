@@ -6281,7 +6281,7 @@ public final class ClientCiTest {
             server(m, sp -> log("  en la plaza: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + " | " + com.darkcraft.morvain.MorvainEnemigos.estado(sp.server)));
         });
         t += 10;
-        atTicks(t, "Velmor: la capilla y su campanario", m -> server(m, sp -> irMirando(sp, 857.5, g + 3, 3946.5, 843, g + 9, 3922, true)));
+        atTicks(t, "Velmor: la capilla y su campanario", m -> server(m, sp -> irMirando(sp, 850.5, g + 3.5, 3945.5, 843, g + 9, 3922, true)));
         t += 100;
         atTicks(t, "captura", m -> shot(m, "cliente_mv49_velmor_capilla"));
         t += 10;
