@@ -3340,5 +3340,162 @@
     ]
    }
   }
+ },
+ "sfx_podrido": {
+  "flow": "um9O1CHUekivKrw70cJm",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7i: el Pantano Podrido (los podridos: gemido, alerta, dolor, muerte, alzarse del agua, vomito, fuego fatuo, gas, aplastar; y el ambiente del pantano). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "podrido_gemido": {
+    "prompt": "Bloated drowned corpse groaning in a swamp, low wet bubbling moan through water-filled lungs, gurgling throat, dark fantasy horror, no music, 2.5 seconds",
+    "sesiones": [
+     "vcBRtBwrImWpFvN99pOe",
+     "FKy07uZtpM14IZQzleWw",
+     "tBMoWUxOwSuRNYo1gaf6",
+     "ySgVvk9bPJeJrI1MoZbS"
+    ],
+    "generaciones": [
+     "ZdTOtXc7Yx2S30eUU0RF",
+     "rpUFTRVIW5QEAWT7kH2g",
+     "H8SX6lLpOoaR4gO3ffKv",
+     "aAv7c7pY8tXUCAKit6Nl"
+    ]
+   },
+   "podrido_alerta": {
+    "prompt": "Drowned corpse spotting its prey, choking gargling roar, black water rattling in its throat, close, dark fantasy horror, no music, 1.8 seconds",
+    "sesiones": [
+     "4FXUokWyT38SVKff2651",
+     "j26dKe8T6r2FOzY2dm0W",
+     "mFKqjO3LedUJDQzVIqfC",
+     "er78fPa902QPg2uMyb9J"
+    ],
+    "generaciones": [
+     "bYDpck0LQyyY8w2QcDND",
+     "HOObg2o0aruY0AsigGon",
+     "CXPA4NT2Bqsu8C8lOWV0",
+     "WvTnrP86MPKUsMcWDIC0"
+    ]
+   },
+   "podrido_dolor": {
+    "prompt": "Rotten bloated corpse struck by a blade, wet squelching thud of soggy flesh and a short gurgling grunt, no music, 0.8 seconds",
+    "sesiones": [
+     "2yQD4KeK3VDO8FRKJA1C",
+     "CNTGyJUZSJwm6OtMUIgb",
+     "t30ILEkASzv6Fqko1naa",
+     "3GtmKpPDxk3hss8vXD2B"
+    ],
+    "generaciones": [
+     "dnv2UveHnAKgomVP0ZJV",
+     "H58Sfy1DNGuM0CpjpA3e",
+     "MHODpNB3WIRSzmMJdKhF",
+     "DImLna4IjlwpzMRctph9"
+    ]
+   },
+   "podrido_muerte": {
+    "prompt": "Drowned swamp corpse dying, long gurgling death rattle, body slumping into shallow muddy water with a heavy splash and rising bubbles, dark fantasy, no music, 3 seconds",
+    "sesiones": [
+     "GHQzBtzoIGvuRfomxtEL",
+     "8NUHUZv9xnC4GMp2NAWj",
+     "VpmRAWiCVPD8bkvPReyB",
+     "khWKlBpSe0qQTojnjNp3"
+    ],
+    "generaciones": [
+     "8XriFXLuHtjeVAZxhBoz",
+     "kO19F2qnejC2lOGXfUiK",
+     "7Rl1vEsWkWRpNwp7IFct",
+     "RctfAWclvFhYH5LhJACs"
+    ]
+   },
+   "podrido_alzarse": {
+    "prompt": "Corpse rising out of shallow swamp water, heavy splash, water pouring and dripping off its body, mud sucking at its feet, low wet groan, no music, 2.5 seconds",
+    "sesiones": [
+     "Paf2aMf2sMP9KzqhPCKK",
+     "MCBHgWEJuV4XHXDiK7wF",
+     "KhEG5g23UZ4IgPBYWkPj",
+     "ezgqaK2zcxpArxtXVgTO"
+    ],
+    "generaciones": [
+     "DDygmgPbXH6lXd1Wif6d",
+     "OGpzwyym4L7noqKVcdIT",
+     "rDUQLpfg6iYqx195UtT3",
+     "1lX0MP2jULsDNv3rmKvj"
+    ]
+   },
+   "podrido_vomito": {
+    "prompt": "Rotting corpse retching and spewing a torrent of thick black swamp water, violent wet heaving, liquid splattering on mud, horror, no music, 2 seconds",
+    "sesiones": [
+     "BCqujtbFAKYTCzwcGg46",
+     "XuLeRN3vWbod7OonnCj0",
+     "HFTPcK23j3c2We4jNZiQ",
+     "apYVp9BAsAEDnbQ3nKpP"
+    ],
+    "generaciones": [
+     "XExx8KZNYV8Gxqkpjh8Z",
+     "mTMcN4AkA1FsvUuweuyh",
+     "DIcYA0HzGwUCXXFISpK7",
+     "nhPTXd2AIanMERcPNq8K"
+    ]
+   },
+   "podrido_fatuo": {
+    "prompt": "Ghostly green will-o'-the-wisp fireball hurled through the air, eerie hollow whoosh with a crackling hissing spectral flame, dark fantasy magic, no music, 1.5 seconds",
+    "sesiones": [
+     "SnidOQJGlP9tLfT1rP6O",
+     "vWW33gGrNc6lffgSElR1",
+     "nvQJ8uNPY0125ucwdckh",
+     "UG5D8sFw1OAwpoief9YH"
+    ],
+    "generaciones": [
+     "Gr19nBuyKt4jtoVCZJYE",
+     "WRnzFFB1iEJM3XogTHVe",
+     "ZxjrgijjaThOHUPrljM5",
+     "7T15PgODKcylVYJ1VI1N"
+    ]
+   },
+   "podrido_gas": {
+    "prompt": "Bloated corpse bursting open, wet fleshy pop followed by a long hiss of foul gas escaping and bubbling liquid, horror, no music, 2 seconds",
+    "sesiones": [
+     "4Wavn1omCDz7EHr8QmTj",
+     "ZHnNviviybgBDTthzJQF",
+     "LTGjNLau7IRDgxSLv2Xv",
+     "7Rbzd6ILOOE8F1mem42C"
+    ],
+    "generaciones": [
+     "O4acd3uStYnrrW0xkuNJ",
+     "QSYDwSsSGBPpnaENxfCo",
+     "3eFfCQklefL5TFB2kKZ6",
+     "FAGuu3sKciLOu7nzJriN"
+    ]
+   },
+   "podrido_aplastar": {
+    "prompt": "Huge bloated body belly-flopping onto wet mud, heavy sloppy squelching impact, splash of swamp water, deep thud, no music, 1.2 seconds",
+    "sesiones": [
+     "HlnX2kiyynRBXCqgvtun",
+     "i7tGR3AsX0Rqrsvpj1Nj",
+     "Pl0M4cHplE1Bi1rjSfBK",
+     "YC2hcpsG9m59Of88uyeI"
+    ],
+    "generaciones": [
+     "Eu2OhiE3WZ79odv6cGMd",
+     "UIPx8puZQ6boO8uWYogT",
+     "owE61ptkE0FxUvoMp0O4",
+     "AxAogu3BV6g7yeKjfCd0"
+    ]
+   },
+   "pantano_ambiente": {
+    "prompt": "Eerie dark swamp ambience at dusk, slow bubbling mud, distant croaking frogs, buzzing insects, water dripping, old wooden stilts creaking softly, no music, no voices, 20 seconds",
+    "sesiones": [
+     "SbrzoOZqnag8xGlDXfbK",
+     "KCfrVIzWU01R4tOB7JfB",
+     "6LqofyjZNDhDhHQzGwjA",
+     "ZxWsxUWm6YMSXZippW8k"
+    ],
+    "generaciones": [
+     "LksU1jMQ8IRGB1IEGks7",
+     "L68Hd8AKmuNbAW199yvh",
+     "jhe2twEnjz7feOOBxzIf",
+     "KSm9EGYKXBCttQrPust5"
+    ]
+   }
+  }
  }
 }
