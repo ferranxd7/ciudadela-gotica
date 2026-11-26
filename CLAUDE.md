@@ -1448,7 +1448,7 @@ Respuesta 92 del plan ("santuarios con teletransporte"). Publicada con la build 
 
 ### Plan grande, parte 7d: los fragmentos del mapa y el mapa de la M en Morvain
 
-Respuesta 92 del plan ("fragmentos de mapa"), como en Elden Ring.
+Respuesta 92 del plan ("fragmentos de mapa"), como en Elden Ring. Publicada con la build de prueba 134 bien.
 - **Las estelas del mapa** (`morvain/EstelaBlock`, bloque `darkcraft:estela_mapa`, irrompible, `facing`; modelo y
   texturas de `tools/morvain/estela.py`: obelisco bajo de piedra negra, el mapa de la region tallado con filete de oro,
   runas azules en los costados y un pergamino clavado arriba). Una por region de tierra (`morvain/Fragmentos.ESTELAS`): la
