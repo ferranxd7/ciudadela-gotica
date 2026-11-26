@@ -209,6 +209,14 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_AHORCADO_DOLOR = sound("sfx.ahorcado_dolor");
     public static final RegistryObject<SoundEvent> SFX_AHORCADO_MUERTE = sound("sfx.ahorcado_muerte");
     public static final RegistryObject<SoundEvent> AMBIENTE_ARBOLEDA = sound("ambiente.arboleda");
+    // Maese Odran, el Verdugo de la Arboleda (parte 7h)
+    public static final RegistryObject<SoundEvent> SFX_VERDUGO_GRITO = sound("sfx.verdugo_grito");
+    public static final RegistryObject<SoundEvent> SFX_VERDUGO_HACHAZO = sound("sfx.verdugo_hachazo");
+    public static final RegistryObject<SoundEvent> SFX_VERDUGO_BARRIDO = sound("sfx.verdugo_barrido");
+    public static final RegistryObject<SoundEvent> SFX_VERDUGO_LAZO = sound("sfx.verdugo_lazo");
+    public static final RegistryObject<SoundEvent> SFX_VERDUGO_SALTO = sound("sfx.verdugo_salto");
+    public static final RegistryObject<SoundEvent> SFX_VERDUGO_DOLOR = sound("sfx.verdugo_dolor");
+    public static final RegistryObject<SoundEvent> SFX_VERDUGO_MUERTE = sound("sfx.verdugo_muerte");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -284,6 +292,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_BRANDT = sound("musica.brandt");
     public static final RegistryObject<SoundEvent> MUSICA_VARETH = sound("musica.vareth");
     public static final RegistryObject<SoundEvent> MUSICA_MOLINERA = sound("musica.molinera");
+    public static final RegistryObject<SoundEvent> MUSICA_VERDUGO = sound("musica.verdugo");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -317,6 +326,10 @@ public class DarkCraftMod {
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] MOLINERA_VOZ = new RegistryObject[6];
 
+    /** Frases de Maese Odran, el Verdugo de la Arboleda (1..5, parte 7h). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] VERDUGO_VOZ = new RegistryObject[6];
+
     /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[10];
@@ -326,6 +339,7 @@ public class DarkCraftMod {
         for (int i = 1; i < GAVRAN_VOZ.length; i++) GAVRAN_VOZ[i] = sound("gavran.voz." + i);
         for (int i = 1; i < CAPITAN_VOZ.length; i++) CAPITAN_VOZ[i] = sound("capitan.voz." + i);
         for (int i = 1; i < MOLINERA_VOZ.length; i++) MOLINERA_VOZ[i] = sound("molinera.voz." + i);
+        for (int i = 1; i < VERDUGO_VOZ.length; i++) VERDUGO_VOZ[i] = sound("verdugo.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -484,6 +498,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Molinera>> MOLINERA = ENTITIES.register("molinera",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Molinera>of(com.darkcraft.enemigos.Molinera::new, MobCategory.MONSTER)
                     .sized(1.3f, 3.7f).fireImmune().clientTrackingRange(10).build(MODID + ":molinera"));
+    // ---- Maese Odran, el Verdugo de la Arboleda, el jefe del Bosque Muerto (parte 7h): se manda cada 2 ticks (el salto)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Verdugo>> VERDUGO = ENTITIES.register("verdugo",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Verdugo>of(com.darkcraft.enemigos.Verdugo::new, MobCategory.MONSTER)
+                    .sized(1.2f, 3.4f).fireImmune().clientTrackingRange(10).updateInterval(2).build(MODID + ":verdugo"));
     // ---- la guardia de Valdrenn (parte 4a)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Guardia>> GUARDIA = ENTITIES.register("guardia",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Guardia>of(com.darkcraft.enemigos.Guardia::new, MobCategory.MONSTER)
@@ -656,6 +674,7 @@ public class DarkCraftMod {
         e.put(BRANDT.get(), com.darkcraft.enemigos.Brandt.atributos().build());
         e.put(CORTEZA.get(), com.darkcraft.enemigos.Corteza.atributos().build());
         e.put(MOLINERA.get(), com.darkcraft.enemigos.Molinera.atributos().build());
+        e.put(VERDUGO.get(), com.darkcraft.enemigos.Verdugo.atributos().build());
         e.put(CORCEL.get(), com.darkcraft.montura.Corcel.atributos().build());
         e.put(GUIA.get(), com.darkcraft.personajes.Guia.atributos().build());
         e.put(HERRERO.get(), com.darkcraft.personajes.Herrero.atributos().build());

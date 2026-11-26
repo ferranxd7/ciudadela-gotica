@@ -729,6 +729,7 @@ public final class CiTest {
         velmor(server, m, log, out);
         molinera(server, m, log, out);
         arboleda(server, m, log, out);
+        verdugo(server, m, log);
     }
 
     /**
@@ -903,6 +904,222 @@ public final class CiTest {
             DarkCraftMod.LOGGER.error("[CI] ahorcados", t);
         } finally {
             for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /**
+     * Parte 7h: Maese Odran, el Verdugo de la Arboleda. Sale apoyado en el hacha en el tablado del patibulo; al ver a alguien se
+     * yergue, no ruge hasta acabar de hablar y luego salta del patibulo sobre su presa (cae en el suelo, cerca de ella y sin
+     * meterse en nada); cada accion acaba; sus golpes a un marchito (el hachazo con su onda, el barrido que pilla tambien a
+     * quien salta, el doble, el pisoton detras); el lazo engancha, tira y le sigue la ejecucion; a media vida despierta a los
+     * colgados de cerca y, sin colgados, se alzan otros de la tierra; al caer, la cuenta se cierra: los colgados descansan, sus
+     * sogas se quedan con el lazo vacio y ya no vuelven a colgar. Al acabar todo vuelve a estar como antes.
+     */
+    private static void verdugo(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.PATIBULO, arb = com.darkcraft.morvain.MorvainEnemigos.ARBOLEDA;
+        var A = com.darkcraft.morvain.Arboleda.get();
+        final int PX = com.darkcraft.morvain.Arboleda.PX, PZ = com.darkcraft.morvain.Arboleda.PZ;
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Puestos.todos(server, arb, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            com.darkcraft.enemigos.Verdugo ve = null;
+            for (var e : fuera) if (e instanceof com.darkcraft.enemigos.Verdugo x) ve = x;
+            if (ve == null) {
+                log.println("Morvain, el Verdugo: NO SALE (" + fuera.size() + " fuera)");
+                return;
+            }
+            boolean suelo = !m.getBlockState(BlockPos.containing(ve.getX(), ve.getY() - 0.2, ve.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty();
+            StringBuilder sb = new StringBuilder("Morvain, el Verdugo: en " + ve.blockPosition().toShortString() + " postura " + ve.postura()
+                    + " (1 apoyado en el hacha), en el tablado " + (Math.abs(ve.getY() - (A.fy + 1)) < 0.05) + ", en el suelo " + suelo
+                    + ", metido en un bloque " + !m.noCollision(ve) + ", vida " + Math.round(ve.getMaxHealth()) + ", caja " + ve.getBbWidth() + " x " + ve.getBbHeight());
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5f2b8c1e-3d4a-4e6b-9a7c-1b2d3e4f5a6e"), "[DarkCraftCI4]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- le ve a nueve bloques, abajo, delante del patibulo: se yergue mientras habla, ruge al acabar y salta
+            final int fzz = PZ + 10;
+            final double fyy = com.darkcraft.enemigos.Puestos.suelo(m, PX, com.darkcraft.morvain.Arboleda.pie(PX, fzz), fzz);
+            fp.moveTo(PX + 0.5, fyy, fzz + 0.5, 180f, 0f);
+            double yAntes = ve.getY();
+            ve.setTarget(fp);
+            int levanta = -1, ruge = -1, salta = -1, cae = -1;
+            for (int k = 0; k < 400; k++) {
+                ve.tickCount++;
+                ve.tick();
+                fp.moveTo(PX + 0.5, fyy, fzz + 0.5, 180f, 0f);
+                if (levanta < 0 && ve.accion() == com.darkcraft.enemigos.VerdugoAnims.LEVANTARSE) levanta = k;
+                if (ruge < 0 && ve.accion() == com.darkcraft.enemigos.VerdugoAnims.GRITO) ruge = k;
+                if (salta < 0 && ve.accion() == com.darkcraft.enemigos.VerdugoAnims.SALTO) salta = k;
+                if (salta >= 0 && ve.accion() != com.darkcraft.enemigos.VerdugoAnims.SALTO) {
+                    cae = k;
+                    break;
+                }
+            }
+            for (int k = 0; k < 6; k++) ve.tick();
+            boolean sueloTras = !m.getBlockState(BlockPos.containing(ve.getX(), ve.getY() - 0.2, ve.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty();
+            sb.append("; al verle: pelea ").append(ve.enPelea()).append(", se yergue en el tick ").append(levanta).append(", ruge en el ").append(ruge)
+                    .append(" (la frase 1 dura ").append(com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Verdugo.VOZ_BASE + 1)).append("), salta en el ")
+                    .append(salta).append(" y acaba en el ").append(cae).append(String.format(java.util.Locale.ROOT,
+                            ": de Y %.1f a %.1f, a %.1f de su presa, en el suelo %s, metido en un bloque %s, saltos %d", yAntes, ve.getY(),
+                            Math.hypot(ve.getX() - fp.getX(), ve.getZ() - fp.getZ()), sueloTras, !m.noCollision(ve), ve.saltos()));
+            // ---- cada accion acaba (sin presa)
+            ve.setTarget(null);
+            StringBuilder mal = new StringBuilder();
+            for (int a = 1; a < com.darkcraft.enemigos.VerdugoAnims.TICKS.length; a++) {
+                String nombre = com.darkcraft.enemigos.VerdugoAnims.NOMBRES[a];
+                if (nombre.equals("morir")) continue;
+                ve.empezar(a);
+                for (int k = 0; k < 120 && ve.accion() == a; k++) {
+                    ve.tickCount++;
+                    ve.tick();
+                }
+                if (ve.accion() == a) mal.append(' ').append(nombre).append(" no acaba;");
+                if (ve.volando()) mal.append(' ').append(nombre).append(": sigue volando;");
+            }
+            sb.append("; acciones que no acaban:").append(mal.length() == 0 ? " ninguna" : mal);
+            // ---- sus golpes, a un marchito (al jugador de mentira no le entra nada)
+            float giro = ve.getYRot();
+            double fx = -Math.sin(Math.toRadians(giro)), fz = Math.cos(Math.toRadians(giro));
+            double y = ve.getY(), x0 = ve.getX(), z0 = ve.getZ();
+            String[] golpes = {"hachazo", "barrido de pie", "barrido saltando", "doble", "pisoton detras", "ejecucion"};
+            int[] acc = {com.darkcraft.enemigos.VerdugoAnims.HACHAZO, com.darkcraft.enemigos.VerdugoAnims.BARRIDO, com.darkcraft.enemigos.VerdugoAnims.BARRIDO,
+                    com.darkcraft.enemigos.VerdugoAnims.DOBLE, com.darkcraft.enemigos.VerdugoAnims.PISOTON, com.darkcraft.enemigos.VerdugoAnims.EJECUCION};
+            double[] lejos = {3.0, 3.0, 3.0, 2.5, -2.2, 2.4};
+            double[] alto = {0, 0, 1.1, 0, 0, 0};
+            sb.append("; golpes a un marchito:");
+            var victima = DarkCraftMod.MARCHITO.get().create(m);
+            if (victima != null) {
+                victima.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(300.0);
+                victima.moveTo(x0 + fx * 3, y, z0 + fz * 3, giro + 180f, 0f);
+                m.addFreshEntity(victima);
+                quitar.add(victima);
+                for (int i = 0; i < golpes.length; i++) {
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    victima.hurtTime = 0;
+                    double px = x0 + fx * lejos[i], pz = z0 + fz * lejos[i];
+                    victima.moveTo(px, y + alto[i], pz, giro + 180f, 0f);
+                    int ondas = ve.ondas();
+                    ve.moveTo(x0, y, z0, giro, 0f);
+                    ve.setTarget(victima);
+                    ve.setYRot(giro);
+                    ve.yBodyRot = ve.yHeadRot = giro;
+                    ve.empezar(acc[i]);
+                    float antes = victima.getHealth();
+                    for (int k = 0; k < 120 && ve.accion() == acc[i]; k++) {
+                        ve.tickCount++;
+                        ve.tick();
+                        victima.moveTo(px, y + alto[i], pz, giro + 180f, 0f);
+                    }
+                    sb.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " -%.1f", antes - victima.getHealth()))
+                            .append(ve.ondas() > ondas ? " (onda)" : "").append(';');
+                }
+                // ---- el lazo: a ocho bloques delante; engancha, tira y la ejecucion
+                victima.setHealth(victima.getMaxHealth());
+                victima.invulnerableTime = 0;
+                victima.hurtTime = 0;
+                double px = x0 + fx * 8, pz = z0 + fz * 8;
+                double py = com.darkcraft.enemigos.Puestos.suelo(m, net.minecraft.util.Mth.floor(px), net.minecraft.util.Mth.floor(y), net.minecraft.util.Mth.floor(pz));
+                victima.moveTo(px, py, pz, giro + 180f, 0f);
+                ve.moveTo(x0, y, z0, giro, 0f);
+                ve.setTarget(victima);
+                ve.setYRot(giro);
+                ve.yBodyRot = ve.yHeadRot = giro;
+                int lazos = ve.lazos(), ejec = ve.ejecuciones();
+                double antes = Math.hypot(victima.getX() - ve.getX(), victima.getZ() - ve.getZ());
+                float vida = victima.getHealth();
+                ve.empezar(com.darkcraft.enemigos.VerdugoAnims.LAZO);
+                double cerca = antes;
+                for (int k = 0; k < 110 && ve.accion() != 0; k++) {
+                    ve.tickCount++;
+                    ve.tick();
+                    victima.tick();
+                    cerca = Math.min(cerca, Math.hypot(victima.getX() - ve.getX(), victima.getZ() - ve.getZ()));
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " el lazo: engancha %s, la presa de %.1f a %.1f, ejecucion %s, la presa -%.1f;",
+                        ve.lazos() > lazos, antes, cerca, ve.ejecuciones() > ejec, vida - victima.getHealth()));
+                victima.discard();
+            }
+            log.println(sb);
+            // ---- a media vida: despierta a los colgados de cerca (los de la arboleda, fuera)
+            StringBuilder sm = new StringBuilder("Morvain, el Verdugo a media vida:");
+            com.darkcraft.enemigos.Puestos.todos(server, arb, false);
+            var ahorcados = com.darkcraft.enemigos.Puestos.sacarTodos(m, arb);
+            int colgandoAntes = 0;
+            for (var e : ahorcados) if (e instanceof com.darkcraft.enemigos.Ahorcado ah && ah.cuelga()) colgandoAntes++;
+            ve.moveTo(PX + 0.5, fyy, PZ + 6.5, 180f, 0f);
+            fp.moveTo(PX + 0.5, fyy, fzz + 0.5, 180f, 0f);
+            ve.setTarget(fp);
+            ve.setHealth(ve.getMaxHealth() * 0.45f);
+            for (int k = 0; k < 160 && ve.descolgados() + ve.alzados() == 0; k++) {
+                ve.tickCount++;
+                ve.tick();
+                fp.moveTo(PX + 0.5, fyy, fzz + 0.5, 180f, 0f);
+            }
+            int caen = 0;
+            for (var e : ahorcados) if (e instanceof com.darkcraft.enemigos.Ahorcado ah && ah.getTarget() == fp) caen++;
+            sm.append(" segunda ").append(ve.segunda()).append(", colgados fuera ").append(colgandoAntes).append(", se descuelgan ").append(ve.descolgados())
+                    .append(" (con presa ").append(caen).append("), se alzan de la tierra ").append(ve.alzados()).append(';');
+            // ---- otra pelea, sin colgados: se alzan de la tierra
+            ve.setTarget(null);
+            for (int k = 0; k < 130 && ve.enPelea(); k++) {
+                ve.tickCount++;
+                ve.tick();
+            }
+            com.darkcraft.enemigos.Puestos.todos(server, arb, true);
+            boolean acabo = !ve.enPelea();
+            int alzados = ve.alzados();
+            ve.setTarget(fp);
+            for (int k = 0; k < 80; k++) {
+                ve.tickCount++;
+                ve.tick();
+                fp.moveTo(PX + 0.5, fyy, fzz + 0.5, 180f, 0f);
+            }
+            ve.setHealth(ve.getMaxHealth() * 0.45f);
+            for (int k = 0; k < 200 && ve.alzados() == alzados; k++) {
+                ve.tickCount++;
+                ve.tick();
+                fp.moveTo(PX + 0.5, fyy, fzz + 0.5, 180f, 0f);
+            }
+            sm.append(" otra pelea (la anterior acabo ").append(acabo).append(") sin colgados: se alzan ").append(ve.alzados() - alzados)
+                    .append(", en pie ").append(ve.suyos());
+            log.println(sm);
+            // ---- cae: la cuenta se cierra
+            ve.setTarget(null);
+            ve.hurt(m.damageSources().playerAttack(fp), 99999f);
+            for (int k = 0; k < 90 && !ve.isRemoved(); k++) {
+                ve.tickCount++;
+                ve.tick();
+            }
+            int objetos = m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, ve.getBoundingBox().inflate(4)).size();
+            String sogas = com.darkcraft.morvain.Arboleda.sogasColgados(m);
+            // ya no salen colgados (los demas, si)
+            com.darkcraft.enemigos.Puestos.todos(server, arb, false);
+            int colgadosDespues = 0, otrosDespues = 0;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, arb)) {
+                if (e.postura() == com.darkcraft.enemigos.Enemigo.COLGADO || "colgados".equals(com.darkcraft.morvain.MorvainEnemigos.arboleda().get(e.puesto()).grupo())) colgadosDespues++;
+                else otrosDespues++;
+            }
+            log.println("Morvain, el Verdugo cae: vivo " + ve.isAlive() + ", la cuenta cerrada " + com.darkcraft.morvain.Arboleda.cuentaCerrada(server) + ", alzados en pie "
+                    + ve.suyos() + ", objetos " + objetos + "; " + sogas + "; despues salen " + colgadosDespues + " colgados (tiene que ser 0) y " + otrosDespues + " de los demas");
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, ve.getBoundingBox().inflate(6))) it.discard();
+            for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.Ahorcado.class, ve.getBoundingBox().inflate(40))) if (e.esEfimero()) e.discard();
+        } catch (Throwable t) {
+            log.println("Morvain, el Verdugo: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] verdugo", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            // todo como antes: el Verdugo en pie, los colgados de vuelta en sus sogas (las rehacen al colgar)
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Puestos.todos(server, arb, false);
+            try {
+                com.darkcraft.enemigos.Puestos.sacarTodos(m, arb);
+                log.println("Morvain, el Verdugo vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoVerdugo(server));
+            } catch (Throwable t) {
+                log.println("Morvain, el Verdugo vuelve: ERROR " + t);
+            }
+            com.darkcraft.enemigos.Puestos.todos(server, arb, false);
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
         }
     }

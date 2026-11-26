@@ -288,6 +288,8 @@ public final class Morvain {
         }
         // el molino de la Molinera (parte 7f): la reja de su puerta y su crujido con el viento
         if (m != null && srv.getTickCount() % 100 == 13) Molino.crujir(m);
+        // la arboleda (parte 7h): con el Verdugo vencido, las sogas de los colgados se quedan con el lazo vacio
+        if (m != null && srv.getTickCount() % 100 == 37) Arboleda.cuenta(m);
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
             if (Llegada.cerca(p.getX(), p.getZ(), 160)) {

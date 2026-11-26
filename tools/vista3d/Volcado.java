@@ -538,6 +538,25 @@ public class Volcado {
             }
         System.out.println("colgados: " + v.colgados().size() + ", a los que no se llega " + malos + ", sin soga encima " + sinSoga + ", bloques que tocan el cuerpo "
                 + tocan + "; los demas: " + v.otros().size() + ", a los que no se llega " + otrosMal);
+    
+        // el Verdugo (parte 7h): su sitio en el tablado (cabe de pie: 1,2 de ancho y 3,4 de alto), se llega a pie y, delante,
+        // el claro donde cae al saltar (sin nada que le corte de lado a lado del patibulo hasta 14 bloques)
+        int[] vp = v.sitio("verdugo"), ap = v.sitio("ante_patibulo");
+        // (su caja, con el centro en x + 0,5, z + 0,5: de x - 0,1 a x + 1,1; se mira, de mas, cada bloque que toca)
+        int choca = 0;
+        for (int dy = 0; dy <= 3; dy++)
+            for (int dx = -1; dx <= 1; dx++)
+                for (int dz = -1; dz <= 1; dz++)
+                    if (mundo.en(vp[0] + dx, vp[1] + dy, vp[2] + dz).blocksMotion()) choca++;
+        int claroLleno = 0;
+        for (int z = vp[2] + 4; z <= vp[2] + 14; z++)
+            for (int x = vp[0] - 1; x <= vp[0] + 1; x++) {
+                int pie = com.darkcraft.morvain.Arboleda.pie(x, z);
+                for (int dy = 0; dy < 3; dy++) if (mundo.en(x, pie + dy, z).blocksMotion()) claroLleno++;
+            }
+        System.out.println("el Verdugo: en " + vp[0] + "," + vp[1] + "," + vp[2] + ", bloques en su caja " + choca + " (tiene que ser 0), se llega a pie "
+                + z0.alcanza(vp[0], vp[1], vp[2], 1.5) + "; ante el patibulo (" + ap[0] + "," + ap[1] + "," + ap[2] + ") se llega " + z0.alcanza(ap[0], ap[1], ap[2], 1.5)
+                + "; bloques que estorban en el claro de delante " + claroLleno);
     }
 
     /** El volcado: caja, paleta de estados y un indice de 16 bits por bloque (x, z, y), comprimido. */

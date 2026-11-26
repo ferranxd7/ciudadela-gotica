@@ -2073,6 +2073,53 @@ EN.update({
 })
 
 
+# ---------------------------------------------------------------- parte 7h: Maese Odran, el Verdugo de la Arboleda (el jefe del Bosque Muerto)
+ES.update({
+    "entity.darkcraft.verdugo": "Maese Odran, el Verdugo",
+    "darkcraft.verdugo.nombre_corto": "Maese Odran",
+    "darkcraft.verdugo.voz.1": "Otro más para el árbol... De rodillas. La soga espera.",
+    "darkcraft.verdugo.voz.2": "¡Arriba, mis ahorcados! ¡Hay trabajo!",
+    "darkcraft.verdugo.voz.3": "Uno más... para la cuenta.",
+    "darkcraft.verdugo.voz.4": "Quieto... así es más rápido.",
+    "darkcraft.verdugo.voz.5": "La cuenta... está cerrada. Por fin.",
+    "subtitles.darkcraft.verdugo.voz": "Habla el Verdugo",
+    "darkcraft.bestiario.verdugo.desc": "Maese Odran colgaba a los que mandaba la ley y llevaba la cuenta de todos. Cuando ya no quedó nadie que juzgar, se quedó con ellos. Espera en su patíbulo y baja de un salto con el hacha por delante. Su hachazo abre la tierra; el barrido va a media altura: no se salta, se rueda. A quien se aleja le echa el lazo y, si le engancha, lo arrastra hasta sus pies para ejecutarlo. Herido, despierta a sus ahorcados.",
+    "subtitles.darkcraft.sfx.verdugo_grito": "El Verdugo ruge",
+    "subtitles.darkcraft.sfx.verdugo_hachazo": "Un hacha se clava en la tierra",
+    "subtitles.darkcraft.sfx.verdugo_barrido": "Un hacha enorme corta el aire",
+    "subtitles.darkcraft.sfx.verdugo_lazo": "El Verdugo lanza su lazo",
+    "subtitles.darkcraft.sfx.verdugo_salto": "El Verdugo cae de un salto",
+    "subtitles.darkcraft.sfx.verdugo_dolor": "El Verdugo se queja",
+    "subtitles.darkcraft.sfx.verdugo_muerte": "El Verdugo se desploma",
+    "advancements.darkcraft.verdugo.title": "La cuenta está cerrada",
+    "advancements.darkcraft.verdugo.description": "Vence a Maese Odran, el Verdugo de la Arboleda",
+    "darkcraft.diario.verdugo": "El verdugo de la Arboleda seguía en su patíbulo, apoyado en el hacha, llevando la cuenta. Bajó de un salto y echaba el lazo como quien echa una red. Cuando cayó, los ahorcados dejaron de crujir en sus sogas: ya nadie los cuenta.",
+    "darkcraft.ayuda.verdugo": "Maese Odran, el Verdugo: cómo está, llevarte ante el patíbulo, vencerle o que vuelva",
+})
+EN.update({
+    "entity.darkcraft.verdugo": "Master Odran, the Hangman",
+    "darkcraft.verdugo.nombre_corto": "Master Odran",
+    "darkcraft.verdugo.voz.1": "Another one for the tree... Kneel. The rope is waiting.",
+    "darkcraft.verdugo.voz.2": "Up, my hanged ones! There is work to do!",
+    "darkcraft.verdugo.voz.3": "One more... for the count.",
+    "darkcraft.verdugo.voz.4": "Hold still... it is quicker that way.",
+    "darkcraft.verdugo.voz.5": "The count... is closed. At last.",
+    "subtitles.darkcraft.verdugo.voz": "The Hangman speaks",
+    "darkcraft.bestiario.verdugo.desc": "Master Odran hanged whoever the law commanded and kept count of them all. When there was no one left to judge, he stayed with them. He waits on his gallows and leaps down with his axe first. His chop splits the earth; his sweep comes at waist height: you cannot jump it, roll. Whoever backs away gets his noose and, if it catches, is dragged to his feet to be executed. Wounded, he wakes his hanged ones.",
+    "subtitles.darkcraft.sfx.verdugo_grito": "The Hangman roars",
+    "subtitles.darkcraft.sfx.verdugo_hachazo": "An axe bites into the earth",
+    "subtitles.darkcraft.sfx.verdugo_barrido": "A huge axe cleaves the air",
+    "subtitles.darkcraft.sfx.verdugo_lazo": "The Hangman throws his noose",
+    "subtitles.darkcraft.sfx.verdugo_salto": "The Hangman lands with a crash",
+    "subtitles.darkcraft.sfx.verdugo_dolor": "The Hangman hurts",
+    "subtitles.darkcraft.sfx.verdugo_muerte": "The Hangman collapses",
+    "advancements.darkcraft.verdugo.title": "The Count Is Closed",
+    "advancements.darkcraft.verdugo.description": "Defeat Master Odran, the Hangman of the Grove",
+    "darkcraft.diario.verdugo": "The Grove's hangman was still on his gallows, leaning on his axe, keeping count. He leapt down and cast his noose the way a fisherman casts a net. When he fell, the hanged stopped creaking on their ropes: no one counts them anymore.",
+    "darkcraft.ayuda.verdugo": "Master Odran, the Hangman: how he is, take you before the gallows, defeat him or bring him back",
+})
+
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

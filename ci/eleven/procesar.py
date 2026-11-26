@@ -66,6 +66,9 @@ VOZ_MERCADER = ("highpass=f=75,equalizer=f=3000:t=q:w=1.2:g=1.5,aecho=0.8:0.25:2
 TOMAS_CAPITAN = {n: "a" for n in range(1, 6)}
 # la Molinera de Velmor (parte 7f): las tomas a (las b de la 1, la 2 y la 4 se cortan sin acabar)
 TOMAS_MOLINERA = {n: "a" for n in range(1, 6)}
+# Maese Odran, el Verdugo de la Arboleda (parte 7h; voz "Declan Graves - Haunted Rasps and Old World Dread"): las tomas a
+# (la 3b dice la frase en tres trozos, con un silencio delante)
+TOMAS_VERDUGO = {n: "a" for n in range(1, 6)}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -184,6 +187,11 @@ SFX = {
     "ahorcado_soga": (3.0, 0.6, -22), "ahorcado_gemido": (2.0, 0.5, -21), "ahorcado_alerta": (1.4, 0.3, -16),
     "ahorcado_cae": (1.2, 0.4, -14), "ahorcado_zarpazo": (0.6, 0.15, -16), "ahorcado_lazo": (1.2, 0.3, -15),
     "ahorcado_dolor": (0.6, 0.15, -17), "ahorcado_muerte": (2.4, 0.6, -17), "arboleda_viento": (6.0, 1.6, -24),
+    # el Verdugo de la Arboleda (parte 7h): el grito, el hacha contra el suelo, el barrido, el lazo que restalla, la caida
+    # del salto (del patibulo al suelo), el dolor y la muerte (el hacha cae sobre las tablas)
+    "verdugo_grito": (2.4, 0.6, -13), "verdugo_hachazo": (1.4, 0.5, -13), "verdugo_barrido": (0.9, 0.3, -14),
+    "verdugo_lazo": (1.3, 0.3, -15), "verdugo_salto": (1.4, 0.5, -13), "verdugo_dolor": (0.75, 0.2, -15),
+    "verdugo_muerte": (3.4, 0.9, -14),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -320,6 +328,11 @@ TOMAS_SFX = {
     "ahorcado_soga": (4, 1, 3), "ahorcado_gemido": (4, 1, 3), "ahorcado_alerta": (2, 4), "ahorcado_cae": (4, 2, 1),
     "ahorcado_zarpazo": (3, 1), "ahorcado_lazo": (3, 1, 4), "ahorcado_dolor": (4, 2, 3), "ahorcado_muerte": (1, 3),
     "arboleda_viento": (3, 2),
+    # el Verdugo: los dos gritos que mas crecen por el medio; los dos hachazos con mas graves y mas cola; los dos barridos
+    # mas largos; los dos lazos que silban y restallan (la 3 empieza callada); las dos caidas con mas cuerpo (la 1 es un
+    # chasquido); tres quejidos; las dos muertes enteras
+    "verdugo_grito": (3, 1), "verdugo_hachazo": (4, 2), "verdugo_barrido": (4, 1), "verdugo_lazo": (1, 4),
+    "verdugo_salto": (4, 2), "verdugo_dolor": (1, 4, 3), "verdugo_muerte": (1, 2),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -449,6 +462,26 @@ def voz_molinera(src, dst):
         "[baja][honda]amix=inputs=2:weights=1 0.55:normalize=0,"
         "asoftclip=type=atan:threshold=0.75,equalizer=f=140:t=q:w=1.0:g=3,equalizer=f=3200:t=q:w=1.2:g=-1.5,"
         "aecho=0.8:0.35:240|520:0.16|0.08,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA
+
+
+def voz_verdugo(src, dst):
+    """
+    Maese Odran, el Verdugo de la Arboleda: un hombreton muerto y cosido. Mas grave (sin alargarla), una segunda voz casi
+    una octava por debajo, sorda y baja, que le da el cuerpo, algo de raspa y el eco corto del bosque muerto (troncos cerca,
+    ninguna sala).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=2[v1][v2];"
+        "[v1]asetrate=44100*0.89,aresample=44100,atempo=1.1236[baja];"
+        "[v2]asetrate=44100*0.66,aresample=44100,atempo=1.5152,lowpass=f=700,volume=0.38[honda];"
+        "[baja][honda]amix=inputs=2:weights=1 0.5:normalize=0,"
+        "asoftclip=type=atan:threshold=0.78,equalizer=f=120:t=q:w=1.0:g=3,equalizer=f=3000:t=q:w=1.2:g=-1,"
+        "aecho=0.8:0.3:70|160|310:0.16|0.10|0.05,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
@@ -658,6 +691,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO molinera {n}: {e}")
+    # Maese Odran, el Verdugo de la Arboleda (parte 7h)
+    ver = os.path.join(ASSETS, "sounds", "verdugo")
+    os.makedirs(ver, exist_ok=True)
+    dur_v, hab_v = {}, {}
+    for n, toma in sorted(TOMAS_VERDUGO.items()):
+        src = os.path.join(MASTER, "verdugo", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(ver, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_verdugo(src, dst)
+            dur_v[n] = round(duracion(dst), 2)
+            hab_v[n] = round(min(h, dur_v[n]), 2)
+            print(f"verdugo {n:2d}: {dur_v[n]} s (habla hasta {hab_v[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO verdugo {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -687,7 +739,8 @@ def main():
         print(f"FALLO capitulo 6: {e}")
     with open(os.path.join(ASSETS, "rey_voces.json"), "w") as fh:
         json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g, "capitan": dur_c, "habla_capitan": hab_c,
-                   "sombra": dur_s, "habla_sombra": hab_s, "molinera": dur_m, "habla_molinera": hab_m}, fh)
+                   "sombra": dur_s, "habla_sombra": hab_s, "molinera": dur_m, "habla_molinera": hab_m,
+                   "verdugo": dur_v, "habla_verdugo": hab_v}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

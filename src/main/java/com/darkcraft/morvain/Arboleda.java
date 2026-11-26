@@ -168,6 +168,9 @@ public final class Arboleda {
         sitio("arcon", PX + 3, fy + 1, PZ + 1);
         sitio("escalera", PX, pie(PX, PZ + 7), PZ + 7);
         sitio("tumbas", GX - 22, pie(GX - 22, GZ + 15), GZ + 15);
+        // el Verdugo (parte 7h): de pie en el tablado, delante de la horca y de la trampilla; y donde se le ve desde el claro
+        sitio("verdugo", PX, fy + 1, PZ + 1);
+        sitio("ante_patibulo", PX, pie(PX, PZ + 17), PZ + 17);
         elementos.sort(java.util.Comparator.comparingInt(e -> e.layer));
         for (Element e : elementos)
             for (int x = e.x0 >> 4; x <= e.x1 >> 4; x++)
@@ -726,6 +729,86 @@ public final class Arboleda {
                     for (int k = 1; k <= 2; k++) if (!c.isAir(x, t + k, z) && c.get(x, t + k, z).canBeReplaced()) c.set(x, t + k, z, Pal.AIR);
                 }
         }
+    }
+
+    // ------------------------------------------------------------------ la cuenta del Verdugo (parte 7h)
+
+    /** Si el Verdugo ha caido: la cuenta se cierra y los colgados ya no vuelven a colgar. */
+    public static boolean cuentaCerrada(net.minecraft.server.MinecraftServer srv) {
+        return com.darkcraft.enemigos.Puestos.muerto(srv, MorvainEnemigos.PATIBULO, MorvainEnemigos.verdugo());
+    }
+
+    /** La soga de bloques de un colgado: la de mas abajo, a menos de nueve bloques de su sitio (o null). */
+    private static BlockPos sogaDe(ServerLevel m, Colgado c) {
+        for (int dy = 1; dy <= 9; dy++) {
+            BlockPos b = new BlockPos(c.x(), c.y() + dy, c.z());
+            if (!m.isLoaded(b)) return null;
+            if (m.getBlockState(b).getBlock() instanceof SogaBlock) return b;
+        }
+        return null;
+    }
+
+    /**
+     * Ha caido el Verdugo: los que siguen colgando descansan (se deshacen en almas) y sus sogas se quedan con el lazo vacio
+     * (los que ya andan sueltos siguen peleando; ninguno vuelve a colgar: {@code MorvainEnemigos} los da por fuera de uso).
+     */
+    public static void liberar(ServerLevel m) {
+        int n = 0;
+        var sitio = com.darkcraft.enemigos.Puestos.sitio(MorvainEnemigos.ARBOLEDA);
+        if (sitio != null)
+            for (int i = 0; i < MorvainEnemigos.arboleda().size(); i++)
+                if (com.darkcraft.enemigos.Puestos.enemigo(MorvainEnemigos.ARBOLEDA, i) instanceof Ahorcado a && a.postura() == com.darkcraft.enemigos.Enemigo.COLGADO
+                        && a.accion() == 0) {
+                    m.sendParticles(net.minecraft.core.particles.ParticleTypes.SOUL, a.getX(), a.getY() + 1.6, a.getZ(), 14, 0.25, 0.7, 0.25, 0.03);
+                    m.playSound(null, a.getX(), a.getY() + 1.5, a.getZ(), net.minecraft.sounds.SoundEvents.SOUL_ESCAPE, net.minecraft.sounds.SoundSource.HOSTILE, 1.6f, 0.7f);
+                    a.disolver();
+                    n++;
+                }
+        int lazos = vaciar(m);
+        DarkCraftMod.LOGGER.info("[DarkCraft] La cuenta del Verdugo se cierra: descansan {} colgados, {} sogas con el lazo vacio", n, lazos);
+    }
+
+    /** Deja con el lazo vacio la soga de cada colgado (la de mas abajo); devuelve cuantas ha cambiado. */
+    private static int vaciar(ServerLevel m) {
+        int n = 0;
+        for (Colgado c : get().colgados) {
+            BlockPos b = sogaDe(m, c);
+            if (b == null) continue;
+            BlockState s = m.getBlockState(b);
+            if (s.getValue(SogaBlock.PARTE) == SogaBlock.Parte.LAZO) continue;
+            m.setBlock(b, s.setValue(SogaBlock.PARTE, SogaBlock.Parte.LAZO), 2);
+            n++;
+        }
+        return n;
+    }
+
+    /** Cada 5 s, con alguien cerca: con la cuenta cerrada, las sogas de los colgados con el lazo vacio (las de chunks que no estaban). */
+    public static void cuenta(ServerLevel m) {
+        boolean alguien = false;
+        for (var p : m.players())
+            if (p.distanceToSqr(GX, p.getY(), GZ) < 110 * 110) {
+                alguien = true;
+                break;
+            }
+        if (alguien && cuentaCerrada(m.getServer())) vaciar(m);
+    }
+
+    /** Para la prueba y el comando: como estan las sogas de los colgados (por su parte de abajo). */
+    public static String sogasColgados(ServerLevel m) {
+        int cuerda = 0, lazo = 0, cabo = 0, nada = 0;
+        for (Colgado c : get().colgados) {
+            BlockPos b = sogaDe(m, c);
+            if (b == null) {
+                nada++;
+                continue;
+            }
+            switch (m.getBlockState(b).getValue(SogaBlock.PARTE)) {
+                case CUERDA -> cuerda++;
+                case LAZO -> lazo++;
+                default -> cabo++;
+            }
+        }
+        return "sogas de los colgados: " + cuerda + " con su colgado, " + lazo + " con el lazo vacio, " + cabo + " cortadas" + (nada > 0 ? ", " + nada + " sin ver" : "");
     }
 
     // ------------------------------------------------------------------ para la prueba

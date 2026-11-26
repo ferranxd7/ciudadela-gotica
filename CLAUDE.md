@@ -1641,6 +1641,58 @@ de la Arboleda —Maese Odran, el del libro 19—).
   (`mv79`, `mv80`), el lazo (`mv81`), el zarpazo y el salto (`mv82`, `mv83`), las tumbas (`mv84`), el libro del verdugo
   (`mv85`) y el bestiario (`mv86`).
 
+### Plan grande, parte 7h: Maese Odran, el Verdugo de la Arboleda (el jefe del Bosque Muerto)
+
+Respuestas 125 y 131 del plan; el segundo jefe de Morvain (el del libro perdido 19, "alguien tiene que llevar la cuenta").
+- **El Verdugo** (`enemigos/Verdugo`, entidad `darkcraft:verdugo`, 1,2 x 3,4, se manda cada 2 ticks —`updateInterval(2)`: el
+  salto—; hereda de `Guardian`): modelo de `tools/enemigos/verdugo.py` (un hombreton muerto y cosido: la capucha negra con
+  los ojos encendidos —capa de brillo—, el pecho al aire con costuras, el mandil de cuero manchado, el cinto con la soga
+  enrollada, brazales y botas; el hacha de verdugo a dos manos y el lazo en la izquierda; escala 1,5, `VerdugoAnims.ESCALA`;
+  `client/enemigos/VerdugoModelo` y `VerdugoRenderer`, que dibuja la soga del lazo como la de los ahorcados). 820 de vida,
+  golpe 12, armadura 10. Espera **de pie en el tablado del patibulo, apoyado en el hacha** (postura `REZA` = el bucle
+  `apoyado`; el puesto 0 del sitio `patibulo` de `MorvainEnemigos`, grupo `Puestos.JEFE`), mirando al Arbol de la Horca.
+- **La pelea**: al verle (16 bloques, con linea de vista) se yergue y dice la frase 1; mientras la dice no se mueve del
+  patibulo (`distanciaDeseada` 99) ni ataca; al acabarla ruge y **salta** sobre su presa (`SALTO`: despega en el tick 9 y
+  cae en el 20 en un arco que no choca con nada —`noPhysics`: pasa por encima de la barandilla—, hasta poco antes de ella,
+  como mucho 11 bloques, donde quepa; golpe alrededor al caer y una onda por el suelo). Despues: **hachazo** (onda delante:
+  saltando o rodando se libra), **barrido** a media altura (no se salta), **doble** avanzando, **pisoton** a quien se le pone
+  detras, **lazo** a quien esta a 5-12 bloques (engancha si le entra el golpe —rodar o cubrirse libran—, lo arrastra a sus
+  pies y le sigue la **ejecucion**, el hachazo rapido) y un **salto** a quien se aleja. A **media vida** grita y **despierta a
+  los colgados**: los que siguen colgando a 28 bloques se descuelgan sobre el jugador que tengan mas cerca; si no hay
+  bastantes (dos, uno mas por amigo, hasta cuatro), se alzan otros ahorcados de la tierra (efimeros). `Verdugo.mediaVida()`
+  (pruebas) lo hace ya.
+- **Voz** (ElevenLabs, `eleven_v4`, **"Declan Graves - Haunted Rasps and Old World Dread"** `1BfrkuYXmEwp8AWqSLWk`, flow
+  `3ClnHX7LlNDqJW4ZiWtF`; 5 frases, tomas a; en `procesar.py` `voz_verdugo`: mas grave, una segunda voz casi una octava por
+  debajo, algo de raspa y el eco corto del bosque): linea **70 + N** (`Voces.BASE_VERDUGO`, `esVerdugo`; `habla_verdugo` en
+  `rey_voces.json`; subtitulos `darkcraft.verdugo.voz.N`): 1 al empezar (no la repite en 4 min), 2 al despertar a los
+  colgados, 3 si cae su presa, 4 la primera vez que engancha a alguien y 5 al morir.
+- **Barra** (`GuardianCliente`, arte de `tools/hud/barra_guardianes.py` "verdugo": la viga de la horca con vueltas de soga, los
+  postes con sus tornapuntas y en el centro el lazo con la capucha y los ojos; relleno de una soga con sangre que gira;
+  hebras de canamo y hojas que caen). **Musica**: "Dark souls type boss theme" de ProjectHelmet (Philemon Weber, CC-BY 4.0,
+  id `verdugo`, tema 34 de `ClientMusic.boss`).
+- **Al caer** (lo reparte `valdrenn/Guardianes`): el cartel de JEFE ABATIDO con 8000 ecos, la hazana `verdugo` ("La cuenta
+  esta cerrada", con su entrada del diario) y el bestiario; deja dos piedras de forja II, una III y la ceniza de la sangre.
+  **La cuenta se cierra** (`Arboleda.liberar`, desde `Puestos.alCaer`): los colgados que aun cuelgan se deshacen en almas,
+  la soga de cada colgado se queda con el **lazo vacio** (`Arboleda.cuenta` lo repasa cada 5 s con alguien cerca) y **ya no
+  vuelven a colgar**: el sitio `arboleda` se registra con `activo` = los del grupo `colgados` solo mientras el Verdugo no
+  este muerto (`Arboleda.cuentaCerrada`). Los demas ahorcados siguen.
+- Sonidos (ElevenLabs, `TOMAS_SFX`): `verdugo_grito` (3 y 1), `verdugo_hachazo` (4 y 2), `verdugo_barrido` (4 y 1),
+  `verdugo_lazo` (1 y 4), `verdugo_salto` (4 y 2; tambien el pisoton), `verdugo_dolor` (1, 4 y 3), `verdugo_muerte` (1 y 2).
+- Sitios nuevos de la arboleda: `verdugo` (su puesto) y `ante_patibulo` (en el claro, a 16 de el). Comandos
+  `/darkcraft verdugo [ir | vencer | volver]` (sin mas: como esta y las sogas de los colgados; `volver` le pone en pie y
+  vuelven los colgados).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_arboleda carpeta` escribe tambien la linea `el Verdugo: ...` (su caja en
+  el tablado libre, se llega a pie, el claro de delante).
+- Pruebas: servidor, lineas `Morvain, el Verdugo: ...` (sale apoyado en el tablado; al verle se yergue, ruge al acabar la frase
+  y salta del patibulo hasta su presa sin meterse en nada; cada accion acaba; los golpes a un marchito; el lazo engancha,
+  arrastra y ejecuta), `Morvain, el Verdugo a media vida: ...` (se descuelgan los de cerca; sin colgados se alzan de la
+  tierra), `Morvain, el Verdugo cae: ...` (la cuenta cerrada, las sogas con el lazo vacio, ya no salen colgados) y
+  `Morvain, el Verdugo vuelve: ...`; cliente, tramo `verdugo()` despues de la arboleda: el patibulo desde el claro
+  (`cliente_mv87`), de cerca (`mv88`), en supervivencia se yergue hablando (`mv89`), ruge con su barra (`mv90`), salta (`mv91`)
+  y cae delante (`mv92`), sus golpes (`mv93..mv97`: hachazo, barrido, doble, pisoton, el salto de lado), el lazo y la
+  ejecucion (`mv98`, `mv99`), despierta a los colgados (`mv100`), cae (`mv101`), el cartel (`mv102`), los lazos vacios del
+  Arbol de la Horca (`mv103`) y el bestiario (`mv104`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1651,7 +1703,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f y la 7g arriba; despues, region a region su contenido).
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g y la 7h arriba; despues, region a region su contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

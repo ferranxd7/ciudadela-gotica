@@ -5995,6 +5995,8 @@ public final class ClientCiTest {
         t = molinera(t);
         // la Arboleda de los Ahorcados, en el Bosque Muerto (parte 7g)
         t = arboleda(t);
+        // Maese Odran, el Verdugo de la Arboleda (parte 7h)
+        t = verdugo(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -6675,6 +6677,267 @@ public final class ClientCiTest {
             });
         });
         return t + 30;
+    }
+
+    // ------------------------------------------------------------------ Maese Odran, el Verdugo de la Arboleda (parte 7h)
+
+    private static com.darkcraft.enemigos.Verdugo verdugoE() {
+        var e = com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.PATIBULO, com.darkcraft.morvain.MorvainEnemigos.verdugo());
+        return e instanceof com.darkcraft.enemigos.Verdugo v ? v : null;
+    }
+
+    /**
+     * El Verdugo de la Arboleda: en su patibulo apoyado en el hacha (desde el claro y de cerca); en supervivencia se yergue
+     * mientras habla, ruge al acabar (su barra y su musica) y salta del patibulo sobre el jugador; sus golpes de cerca (el
+     * hachazo con su onda, el barrido, el doble, el pisoton y el salto de lado); el lazo que engancha y arrastra, y la
+     * ejecucion; a media vida despierta a los colgados; cae (el cartel y la hazana), las sogas de la arboleda con el lazo
+     * vacio y el bestiario. Al acabar vuelve a estar en pie y los colgados en sus sogas.
+     */
+    private static int verdugo(int T) {
+        final var A = com.darkcraft.morvain.Arboleda.get();
+        final int GX = com.darkcraft.morvain.Arboleda.GX, GZ = com.darkcraft.morvain.Arboleda.GZ;
+        final int PX = com.darkcraft.morvain.Arboleda.PX, PZ = com.darkcraft.morvain.Arboleda.PZ, FY = A.fy;
+        final var Q = com.darkcraft.morvain.MorvainEnemigos.patibulo().get(com.darkcraft.morvain.MorvainEnemigos.verdugo());
+        final int suelo = com.darkcraft.morvain.Arboleda.pie(PX, PZ + 14);
+        int t = T;
+        atTicks(t, "El Verdugo: el patibulo desde el claro", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft verdugo volver");
+                comando(sp, "darkcraft arboleda enemigos volver");
+                irMirando(sp, PX + 7.5, suelo + 3, PZ + 15.5, PX + 0.5, FY + 3, PZ + 1.5, true);
+            });
+        });
+        t += 140;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv87_verdugo_patibulo");
+            server(m, sp -> log("  el Verdugo: " + com.darkcraft.morvain.MorvainEnemigos.estadoVerdugo(sp.server)));
+        });
+        t += 10;
+        atTicks(t, "El Verdugo: de cerca, apoyado en el hacha", m -> server(m, sp -> irMirando(sp, PX + 3.5, FY + 1.5, PZ + 6.5, PX + 0.5, FY + 3.5, PZ + 1.5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv88_verdugo_cerca");
+            server(m, sp -> log("  de cerca: " + estadoE(verdugoE())));
+        });
+        t += 6;
+        // ---- en supervivencia, en el claro delante del patibulo: se yergue mientras habla, ruge al acabar y salta
+        final int F = t;
+        final int dura = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Verdugo.VOZ_BASE + 1);
+        atTicks(F, "El Verdugo: en supervivencia ante el patibulo", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                irMirando(sp, PX + 0.5, suelo, PZ + 14.5, PX + 0.5, FY + 3, PZ + 1.5, false);
+                var e = verdugoE();
+                if (e != null) e.setTarget(sp);
+            });
+        });
+        atTicks(F + 40, "captura: se yergue (y habla)", m -> {
+            server(m, sp -> log("  el Verdugo al verle: " + estadoE(verdugoE()) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv89_verdugo_habla");
+        });
+        atTicks(F + dura + 4, "captura: ruge (su barra)", m -> {
+            server(m, sp -> log("  el Verdugo ruge: " + estadoE(verdugoE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())));
+            log("  verdugo: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv90_verdugo_ruge");
+        });
+        // (el grito dura 48 ticks y tras el 6 de pausa: salta; despega a los 9 y cae a los 20)
+        final int S = F + dura - 12 + 48 + 7;
+        atTicks(S + 14, "captura: salta del patibulo", m -> {
+            server(m, sp -> log("  el Verdugo salta: " + estadoE(verdugoE()) + " volando " + (verdugoE() != null && verdugoE().volando()) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv91_verdugo_salta");
+        });
+        atTicks(S + 30, "captura: cae delante", m -> {
+            server(m, sp -> log("  el Verdugo cae del salto: " + estadoE(verdugoE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())
+                    + " | " + (verdugoE() == null ? "" : verdugoE().estado())));
+            shot(m, "cliente_mv92_verdugo_cae_del_salto");
+        });
+        t = S + 36;
+        // ---- sus golpes de cerca (en creativo, con la camara de observador)
+        atTicks(t, "El Verdugo: sus golpes de cerca (creativo)", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                irMirando(sp, PX + 10.5, suelo + 1, PZ + 22.5, PX, FY, PZ + 8, false);
+            });
+        });
+        t += 4;
+        final int gx = PX, gz = PZ + 9;
+        // {accion, camara: a su derecha, arriba, delante; mira delante; tick de la captura, nombre}
+        Object[][] golpes = {
+                {com.darkcraft.enemigos.VerdugoAnims.HACHAZO, 5.5, 2.4, 4.5, 2.5, 25, "cliente_mv93_hachazo"},
+                {com.darkcraft.enemigos.VerdugoAnims.BARRIDO, 5.5, 2.2, 4.0, 1.5, 21, "cliente_mv94_barrido"},
+                {com.darkcraft.enemigos.VerdugoAnims.DOBLE, 6.0, 2.4, 3.5, 1.5, 17, "cliente_mv95_doble"},
+                {com.darkcraft.enemigos.VerdugoAnims.PISOTON, 4.5, 2.4, -4.0, 0.0, 12, "cliente_mv96_pisoton"},
+                {com.darkcraft.enemigos.VerdugoAnims.SALTO, 9.0, 2.8, 3.5, 3.5, 14, "cliente_mv97_salto_lado"}};
+        for (Object[] gp : golpes) {
+            final int accion = (int) gp[0], c1 = (int) gp[5];
+            final double cdx = (double) gp[1], cdy = (double) gp[2], cdz = (double) gp[3], delante = (double) gp[4];
+            final String n1 = (String) gp[6];
+            final int G = t;
+            atTicks(G, "El Verdugo: " + n1, m -> server(m, sp -> {
+                var e = verdugoE();
+                if (e == null) return;
+                float g = 0f;
+                double y = com.darkcraft.enemigos.Puestos.suelo(sp.serverLevel(), gx, com.darkcraft.morvain.Arboleda.pie(gx, gz), gz);
+                e.setTarget(null);
+                e.moveTo(gx + 0.5, y, gz + 0.5, g, 0f);
+                e.setYRot(g);
+                e.yBodyRot = e.yHeadRot = g;
+                e.empezar(accion);
+                double fx = -Math.sin(Math.toRadians(g)), fz = Math.cos(Math.toRadians(g));
+                verDesdeServidor = new Vec3(e.getX() - fz * cdx + fx * cdz, e.getY() + cdy, e.getZ() + fx * cdx + fz * cdz);
+                miraServidor = new Vec3(e.getX() + fx * delante, e.getY() + 1.8, e.getZ() + fz * delante);
+            }));
+            atTicks(G + 2, "camara de cerca", m -> {
+                if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+            });
+            atTicks(G + c1, "captura: " + n1, m -> {
+                server(m, sp -> log("  el Verdugo, " + n1 + ": " + estadoE(verdugoE()) + " | " + (verdugoE() == null ? "" : verdugoE().estado())));
+                shot(m, n1);
+            });
+            t = G + Math.max(c1, com.darkcraft.enemigos.VerdugoAnims.TICKS[accion]) + 14;
+        }
+        // ---- el lazo, en supervivencia: lo echa desde ocho bloques, engancha, arrastra y la ejecucion
+        final int L = t;
+        atTicks(L, "El Verdugo: el lazo (supervivencia)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                var e = verdugoE();
+                if (e == null) return;
+                aPelear(sp, true);
+                double y = com.darkcraft.enemigos.Puestos.suelo(lvl, gx, com.darkcraft.morvain.Arboleda.pie(gx, gz), gz);
+                double py = com.darkcraft.enemigos.Puestos.suelo(lvl, gx, com.darkcraft.morvain.Arboleda.pie(gx, gz + 8), gz + 8);
+                e.moveTo(gx + 0.5, y, gz + 0.5, 0f, 0f);
+                e.setYRot(0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                irMirando(sp, gx + 0.5, py, gz + 8.5, gx + 0.5, y + 2, gz + 0.5, false);
+                e.setTarget(sp);
+                e.empezar(com.darkcraft.enemigos.VerdugoAnims.LAZO);
+                verDesdeServidor = new Vec3(gx + 9.5, y + 3.0, gz + 4.5);
+                miraServidor = new Vec3(gx + 0.5, y + 1.8, gz + 4.5);
+            });
+        });
+        atTicks(L + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(L + 24, "captura: el lazo arrastra", m -> {
+            server(m, sp -> log("  el lazo del Verdugo: " + estadoE(verdugoE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())
+                    + " | " + (verdugoE() == null ? "" : verdugoE().estado())));
+            shot(m, "cliente_mv98_verdugo_lazo");
+        });
+        atTicks(L + 44, "captura: la ejecucion", m -> {
+            server(m, sp -> log("  la ejecucion: " + estadoE(verdugoE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())
+                    + " | " + (verdugoE() == null ? "" : verdugoE().estado())));
+            shot(m, "cliente_mv99_verdugo_ejecucion");
+        });
+        // ---- a media vida, en supervivencia: grita y despierta a los colgados (los del patibulo y los de alrededor)
+        t = L + 80;
+        final int H = t;
+        atTicks(H, "El Verdugo: los colgados vuelven", m -> server(m, sp -> {
+            sp.setGameMode(GameType.CREATIVE);
+            comando(sp, "darkcraft arboleda enemigos volver");
+            irMirando(sp, PX + 0.5, suelo, PZ + 14.5, PX + 0.5, FY + 3, PZ + 1.5, false);
+        }));
+        atTicks(H + 60, "El Verdugo: a media vida (supervivencia)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                var e = verdugoE();
+                if (e == null) return;
+                aPelear(sp, true);
+                double y = com.darkcraft.enemigos.Puestos.suelo(lvl, PX, com.darkcraft.morvain.Arboleda.pie(PX, PZ + 7), PZ + 7);
+                e.moveTo(PX + 0.5, y, PZ + 7.5, 0f, 0f);
+                irMirando(sp, PX + 0.5, suelo, PZ + 14.5, PX + 0.5, FY + 3, PZ + 1.5, false);
+                e.setTarget(sp);
+                log("  antes de media vida: " + com.darkcraft.morvain.MorvainEnemigos.estadoArboleda(sp.server));
+                e.mediaVida();
+            });
+        });
+        atTicks(H + 60 + 26, "a los 26 ticks", m -> server(m, sp -> log("  el Verdugo a media vida, a los 26 ticks: " + estadoE(verdugoE()))));
+        atTicks(H + 60 + 40, "captura: despierta a los colgados", m -> {
+            server(m, sp -> log("  el Verdugo despierta a los colgados: " + (verdugoE() == null ? "" : verdugoE().estado()) + " | "
+                    + com.darkcraft.morvain.MorvainEnemigos.estadoArboleda(sp.server)));
+            log("  verdugo: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv100_verdugo_colgados");
+        });
+        // ---- cae: el cartel, la hazana y la cuenta cerrada
+        final int C = H + 60 + 46;
+        atTicks(C, "El Verdugo: cae", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var e = verdugoE();
+                if (e == null) return;
+                log("  antes de caer el Verdugo: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "verdugo"));
+                double fx = -Math.sin(Math.toRadians(e.getYRot())), fz = Math.cos(Math.toRadians(e.getYRot()));
+                verDesdeServidor = new Vec3(e.getX() + fx * 7 + fz * 3, e.getY() + 3.0, e.getZ() + fz * 7 - fx * 3);
+                miraServidor = new Vec3(e.getX(), e.getY() + 1.4, e.getZ());
+                e.hurt(sp.damageSources().playerAttack(sp), 99999f);
+            });
+        });
+        atTicks(C + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 40, "captura: cae", m -> shot(m, "cliente_mv101_verdugo_cae"));
+        atTicks(C + 44, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 124, "captura: JEFE ABATIDO", m -> {
+            log("  verdugo: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  tras caer el Verdugo: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "verdugo")
+                    + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoVerdugo(sp.server)));
+            shot(m, "cliente_mv102_verdugo_abatido");
+        });
+        atTicks(C + 128, "Los lazos vacios del Arbol de la Horca", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                int g = com.darkcraft.morvain.Arboleda.pie(GX + 9, GZ + 6);
+                irMirando(sp, GX + 14.5, g + 3, GZ + 9.5, GX, g + 6, GZ, true);
+            });
+        });
+        atTicks(C + 180, "captura: los lazos vacios", m -> {
+            server(m, sp -> log("  la arboleda tras caer el Verdugo: " + com.darkcraft.morvain.Arboleda.sogasColgados(sp.serverLevel()) + " | "
+                    + com.darkcraft.morvain.MorvainEnemigos.estadoArboleda(sp.server)));
+            shot(m, "cliente_mv103_lazos_vacios");
+        });
+        atTicks(C + 184, "el bestiario: el Verdugo", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("verdugo")));
+        });
+        atTicks(C + 202, "captura: el Verdugo en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv104_bestiario_verdugo");
+        });
+        atTicks(C + 206, "El Verdugo: fin (vuelve, los colgados en sus sogas, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Ahorcado.class, sp.getBoundingBox().inflate(80)))
+                    if (e.esEfimero()) e.discard();
+                comando(sp, "darkcraft verdugo volver");
+                comando(sp, "darkcraft arboleda enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return C + 236;
     }
 
     // ------------------------------------------------------------------ el molino y la Molinera de Velmor (parte 7f)

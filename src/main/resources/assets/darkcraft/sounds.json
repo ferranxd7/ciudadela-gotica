@@ -3047,5 +3047,138 @@
         "stream": true
       }
     ]
+  },
+  "verdugo.voz.1": {
+    "subtitle": "subtitles.darkcraft.verdugo.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:verdugo/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "verdugo.voz.2": {
+    "subtitle": "subtitles.darkcraft.verdugo.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:verdugo/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "verdugo.voz.3": {
+    "subtitle": "subtitles.darkcraft.verdugo.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:verdugo/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "verdugo.voz.4": {
+    "subtitle": "subtitles.darkcraft.verdugo.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:verdugo/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "verdugo.voz.5": {
+    "subtitle": "subtitles.darkcraft.verdugo.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:verdugo/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "musica.verdugo": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/verdugo",
+        "stream": true
+      }
+    ]
+  },
+  "sfx.verdugo_grito": {
+    "subtitle": "subtitles.darkcraft.sfx.verdugo_grito",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/verdugo_grito_1"
+      },
+      {
+        "name": "darkcraft:sfx/verdugo_grito_2"
+      }
+    ]
+  },
+  "sfx.verdugo_hachazo": {
+    "subtitle": "subtitles.darkcraft.sfx.verdugo_hachazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/verdugo_hachazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/verdugo_hachazo_2"
+      }
+    ]
+  },
+  "sfx.verdugo_barrido": {
+    "subtitle": "subtitles.darkcraft.sfx.verdugo_barrido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/verdugo_barrido_1"
+      },
+      {
+        "name": "darkcraft:sfx/verdugo_barrido_2"
+      }
+    ]
+  },
+  "sfx.verdugo_lazo": {
+    "subtitle": "subtitles.darkcraft.sfx.verdugo_lazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/verdugo_lazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/verdugo_lazo_2"
+      }
+    ]
+  },
+  "sfx.verdugo_salto": {
+    "subtitle": "subtitles.darkcraft.sfx.verdugo_salto",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/verdugo_salto_1"
+      },
+      {
+        "name": "darkcraft:sfx/verdugo_salto_2"
+      }
+    ]
+  },
+  "sfx.verdugo_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.verdugo_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/verdugo_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/verdugo_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/verdugo_dolor_3"
+      }
+    ]
+  },
+  "sfx.verdugo_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.verdugo_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/verdugo_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/verdugo_muerte_2"
+      }
+    ]
   }
 }

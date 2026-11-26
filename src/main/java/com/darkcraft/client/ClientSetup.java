@@ -87,6 +87,8 @@ public final class ClientSetup {
         // la Molinera de Velmor (parte 7f)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.MOLINERA.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
                 new com.darkcraft.client.enemigos.MolineraModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.MolineraModelo.CAPA)), "molinera", 1, 1.0f, 1.9f));
+        // Maese Odran, el Verdugo de la Arboleda (parte 7h): con la soga de su lazo hasta quien engancha
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.VERDUGO.get(), com.darkcraft.client.enemigos.VerdugoRenderer::new);
         // La Garza Gris volando en las cinematicas del viaje (solo existe en el cliente)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BARCO_VOLADOR.get(), com.darkcraft.client.cine.BarcoVoladorRenderer::new);
     }
@@ -111,5 +113,6 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.MarchitoModelo.CAPA, com.darkcraft.client.enemigos.MarchitoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.AhorcadoModelo.CAPA, com.darkcraft.client.enemigos.AhorcadoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.MolineraModelo.CAPA, com.darkcraft.client.enemigos.MolineraGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.VerdugoModelo.CAPA, com.darkcraft.client.enemigos.VerdugoGeometria::crear);
     }
 }

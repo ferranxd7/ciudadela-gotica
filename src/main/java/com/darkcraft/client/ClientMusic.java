@@ -133,9 +133,10 @@ public final class ClientMusic {
             case 31 -> DarkCraftMod.MUSICA_BRANDT.get();
             case 32 -> DarkCraftMod.MUSICA_VARETH.get();
             case 33 -> DarkCraftMod.MUSICA_MOLINERA.get();
+            case 34 -> DarkCraftMod.MUSICA_VERDUGO.get();
             default -> DarkCraftMod.MUSICA_REY_3.get();
         };
-        boss = new Track(ev, phase == 21 ? "capitan" : phase == 31 ? "brandt" : phase == 32 ? "vareth" : phase == 33 ? "molinera" : phase >= 11 ? "gavran" + (phase - 10) : "rey" + phase, true);
+        boss = new Track(ev, phase == 21 ? "capitan" : phase == 31 ? "brandt" : phase == 32 ? "vareth" : phase == 33 ? "molinera" : phase == 34 ? "verdugo" : phase >= 11 ? "gavran" + (phase - 10) : "rey" + phase, true);
         bossTicks = 0;
         Minecraft.getInstance().getSoundManager().play(boss);
         boss.fadeTo(soft ? 0.3f : 0.85f, phase == 1 ? 3.0f : 2.2f);
