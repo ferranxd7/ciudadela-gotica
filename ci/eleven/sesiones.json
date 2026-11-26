@@ -4096,5 +4096,177 @@
     ]
    }
   }
+ },
+ "sfx_capital": {
+  "flow": "ztrM0NNznpPby1X4ViYn",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7m: los Calcinados de la Puerta Oeste de la Capital (gemido, alerta, dolor, muerte, alzarse de la ceniza, tajo de espada al rojo, golpe de escudo, cantaro de brea que revienta, la brea ardiendo, el estallido de ceniza) y el ambiente de la capital quemada. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "calcinado_gemido": {
+    "prompt": "A charred undead groans: a raspy, dry moan through a burnt throat, with crackling embers and a faint hiss of fire, dark fantasy, no music, 2 seconds",
+    "sesiones": [
+     "cFQ2dQIiGTaryFo02ROK",
+     "5Q4sOzesietPwbHLYQyH",
+     "6Sf9Srf5eJbmSaz0r9Hv",
+     "4I6BwHyfbS6Dkit4g8Wy"
+    ],
+    "generaciones": [
+     "wATIGx1MptLGYoDLBpNR",
+     "0PZy3OQ53dfbSi7q1ehq",
+     "WkHoIVQADRqFCSv8eFWS",
+     "qSVOoT6Ay0Zh0UYNeJb5"
+    ]
+   },
+   "calcinado_alerta": {
+    "prompt": "A burnt undead soldier spots its prey: a harsh rasping shriek with a sudden burst of crackling fire, monster alert, no music, 1.5 seconds",
+    "sesiones": [
+     "aCZlQxrTQjss4lZWKMIf",
+     "0YeuvVzfJwNuFH62RjHe",
+     "HOvqUj7XrKjtJ1K51OY1",
+     "HBfkm99Jy5tSG53ph1qz"
+    ],
+    "generaciones": [
+     "QY7zl8ZMNqoboQPjlqeV",
+     "X4pJqYk9PJApusCUaEY2",
+     "B1nstbAo4Wwrzt76Wpbz",
+     "ABi3PkvPRvHBfFx3pQ47"
+    ]
+   },
+   "calcinado_dolor": {
+    "prompt": "A charred undead is hit: a short pained rasp, crumbling charcoal and a spray of sparks, no music, 0.7 seconds",
+    "sesiones": [
+     "cJ4WKWGg82ZJ5H7sZEHU",
+     "4Kxc5VoucliJyF8T8Bn7",
+     "gqFHyIhQPgtQQowNVngp",
+     "LEPCdvq3m2KynJ6dZvgZ"
+    ],
+    "generaciones": [
+     "KhiZW3q9kRTm3s83mN91",
+     "dGYuBKrVGudMh9aito7y",
+     "OTDHUgZ44r81oLOFcimP",
+     "A7C0bX4XbwlBVOSXOLKR"
+    ]
+   },
+   "calcinado_muerte": {
+    "prompt": "A charred undead dies: a last rasping breath, the body collapses and crumbles into ash and embers, a final soft hiss, no music, 2 seconds",
+    "sesiones": [
+     "bz5p2iZygByDCEHwCdIC",
+     "JUV5fptZikaags2cIgIb",
+     "AUCIUHciYgpeIe4ibHeQ",
+     "a3HgoElXAjscFzpO22s8"
+    ],
+    "generaciones": [
+     "ac3JSwH5cJKn2UmetxFS",
+     "lz5iH7uD00qRAj3HXJCZ",
+     "wUyJRoeRsfzrDAe92qrr",
+     "D0RdgP4J9kwCqI2OcU2Z"
+    ]
+   },
+   "calcinado_alzarse": {
+    "prompt": "A burnt corpse bursts up out of a heap of ash: shifting ash and cinders, embers crackling, a raspy gasping breath, no music, 1.5 seconds",
+    "sesiones": [
+     "0MhuhjKFdGerw6kWP1AY",
+     "mPIinynpo67mNgWfflS4",
+     "K8XvxxXW6TQ1FpdXGJWo",
+     "56dHbHKnVsFOXi49vI3w"
+    ],
+    "generaciones": [
+     "zg4kD5LR7ni8hS5tStbx",
+     "8gvhowbntPSPwgahhnSp",
+     "Bg4SlMMCK6EnVkER8uoH",
+     "pjumymjuQxSiSh0jTYFO"
+    ]
+   },
+   "calcinado_tajo": {
+    "prompt": "A red-hot sword slash: a fast fiery whoosh with sizzling sparks trailing the blade, medieval combat, no music, 1 second",
+    "sesiones": [
+     "kkl8vfjQdcSGp8uTOeTE",
+     "GvKDZSp5NgJdDiYYq7HR",
+     "zhL8np9pPXfZ4gUIsEDf",
+     "gem3W77yvpnWBZ71IKNU"
+    ],
+    "generaciones": [
+     "TpI0YGuj8BmHhtA1vFRu",
+     "569a6vYOR1zOBYkT919h",
+     "2I3RnrbPHGBgshfKxLnw",
+     "s2vDM7kD2iN0nSEkLIdq"
+    ]
+   },
+   "calcinado_escudo": {
+    "prompt": "A heavy iron tower shield bash: a deep metallic clang and thud with rattling burnt armor, medieval combat, no music, 1 second",
+    "sesiones": [
+     "tjLbDWGxV7djG1Rg4GNv",
+     "sFz4EMxt7MoOI1HqeOBu",
+     "5ax1TgeEE2S04qZN50na",
+     "98V4vUYpMrr6uLZH0YNQ"
+    ],
+    "generaciones": [
+     "MZlMQRyTUhFTa2CDCTOc",
+     "8HUdHbzJfqZu1xGBS5fk",
+     "bMPGafNo4WxQ8aw58AF2",
+     "THCKj9ZMWJjJRgDODInu"
+    ]
+   },
+   "calcinado_cantaro": {
+    "prompt": "A thrown clay pot full of burning pitch shatters on stone and bursts into flames with a whoomp, no music, 1.5 seconds",
+    "sesiones": [
+     "vhAm8IdPqs75t6ZhMq5r",
+     "vtD4bd4ntZPJbrfVIyzF",
+     "A5x7GPCmI91zczzZKA3t",
+     "jWTKLDMHG33LB6yazlib"
+    ],
+    "generaciones": [
+     "6YB8HzmJnzyu9NGXIbTj",
+     "rr1ZtToR0g9sp5zQLLPD",
+     "PPutQkOUgx8doIwKRuat",
+     "aurk0ci6ikUQrkI4PrIb"
+    ]
+   },
+   "calcinado_fuego": {
+    "prompt": "A pool of burning pitch on the ground: steady crackling and hissing flames, close and dry, no music, 3 seconds",
+    "sesiones": [
+     "lqZJicIFhxMKK1lZLqLQ",
+     "DjIqy1TuSWT13qNnelRF",
+     "fpv6JdMHGlmcTZhp3quz",
+     "6yQaWIt1IRuyMczyXdC1"
+    ],
+    "generaciones": [
+     "adLMxqCJNAd3Quo0bdNo",
+     "eW1XNt7nDO9IGSGzYGYg",
+     "lWWMRk4xfSAnlpxDfGWv",
+     "tFrdx0ut6vpLUsGZYb02"
+    ]
+   },
+   "calcinado_ceniza": {
+    "prompt": "A charred body bursts into a cloud of ash: a soft dusty explosion, cinders scattering, a fading hiss, no music, 1.5 seconds",
+    "sesiones": [
+     "IVbD6Z2aD55xUhtlinYF",
+     "GJZVKAN82XO9MvNEGacL",
+     "YaiRGh9Qq6bN7xk4V05w",
+     "doqh4q7S1LT690gOlPXb"
+    ],
+    "generaciones": [
+     "Pw9052d6CHF7D4bxteU7",
+     "IFAvj7uVZcL7SpTUpf1f",
+     "dO6SyLFlpjocdnANr761",
+     "jSfE3IQbPIJV1fwUQzEl"
+    ]
+   },
+   "capital_ambiente": {
+    "prompt": "Ambience of a ruined, burnt medieval city at dusk: low mournful wind through empty streets, distant smouldering embers crackling, creaking charred timber, a faraway collapse of rubble, no music, no voices, 22 seconds",
+    "sesiones": [
+     "WTJ7lWRdMhpzvWDLUbU3",
+     "S68rXWPLXpw3rqSN2uK9",
+     "xbb6ehwV9Q4uTKfNIwnd",
+     "wmdbdITBk9lT9XYmHfML"
+    ],
+    "generaciones": [
+     "CqMTIdUAApAfb4rgCZiC",
+     "JMRoCIeMnTirU6pjNmfP",
+     "1zMlBWLtHQjXmHekrknM",
+     "obLktNhgxokwfYnpy9yf"
+    ]
+   }
+  }
  }
 }
