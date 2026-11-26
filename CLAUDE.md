@@ -1370,7 +1370,8 @@ doble salto, se ataca montado, si lo hieren mucho se deshace un rato").
   del galope—; en el aire, el salto; el brillo se apaga al deshacerse). Vida 40, armadura 4, sin dano al caer, inmune al
   fuego, no se empuja, vadea el agua poco honda como si fuera tierra (`isAffectedByFluids` solo con mas de 1,1 de agua).
 - **Montado** (como un caballo: lo mueve el cliente del jinete): mira a donde mira el jinete (`tickRidden`), al trote
-  (velocidad 0,24, unos 7 bloques por segundo) y con la tecla de correr al galope (x1,75, unos 13; `Corcel.galopeCliente`,
+  (velocidad 0,24, unos 10 bloques por segundo) y con la tecla de correr al galope (x1,75: en la build 131 iba a 0,89
+  bloques por tick, unos 18 por segundo; `Corcel.galopeCliente`,
   que pone `client/montura/ClientCorcel`); hacia atras despacio. **Salto y doble salto**: la tecla de saltar (flanco, en
   `ClientCorcel`) pide el salto y el corcel lo hace en su tick: en el suelo 0,62 (unos 2,6 bloques), en el aire otro de
   0,70 (hasta unos 5,6 en total; si cae de un borde, solo el segundo); el cliente avisa al servidor (`Net.CorcelSalto`)

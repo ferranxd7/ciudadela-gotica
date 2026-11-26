@@ -88,10 +88,11 @@ public final class Fijar {
         enPantalla = false;
     }
 
-    /** A quien se puede fijar: criaturas vivas que se ven; los enemigos antes que los animales (y nunca jugadores ni aldeanos). */
+    /** A quien se puede fijar: criaturas vivas que se ven; los enemigos antes que los animales (nunca jugadores, aldeanos, los personajes del mod ni el corcel). */
     private static boolean valido(LocalPlayer p, LivingEntity e) {
         return e != p && e.isAlive() && !e.isInvisible() && !e.isSpectator() && !(e instanceof ArmorStand) && !(e instanceof Player)
-                && !(e instanceof AbstractVillager) && (e instanceof Enemy || e instanceof Mob);
+                && !(e instanceof AbstractVillager) && !(e instanceof com.darkcraft.montura.Corcel) && !(e instanceof com.darkcraft.personajes.PersonajeBase)
+                && (e instanceof Enemy || e instanceof Mob);
     }
 
     /**
