@@ -7069,6 +7069,10 @@ public final class ClientCiTest {
             atTicks(G + 2, "camara de cerca", m -> {
                 if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
             });
+            // (otra vez: la primera vez la camara salia mirando al cielo, con la de antes)
+            atTicks(G + 7, "camara de cerca", m -> {
+                if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+            });
             atTicks(G + c1, "captura: " + n1, m -> {
                 server(m, sp -> log("  el Barquero, " + n1 + ": " + estadoE(barqueroE()) + " | " + (barqueroE() == null ? "" : barqueroE().estado())));
                 shot(m, n1);

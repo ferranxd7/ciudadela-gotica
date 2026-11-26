@@ -1241,11 +1241,14 @@ public final class CiTest {
                     sb.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " -%.1f", antes - victima.getHealth()))
                             .append(ba.ondas() > ondas ? " (ola)" : "").append(victima.isOnFire() ? " (arde)" : "").append(';');
                 }
-                // ---- el bichero: a cinco bloques y medio delante; engancha, tira y el golpe de linterna
+                // ---- el bichero: a cinco bloques y medio delante; engancha, tira y el golpe de linterna (sin lo que le quedaba del
+                // empujon del golpe de linterna: si no, se iba resbalando fuera de su alcance antes de que el garfio llegara)
                 victima.setHealth(victima.getMaxHealth());
                 victima.invulnerableTime = 0;
                 victima.hurtTime = 0;
                 victima.clearFire();
+                victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                victima.setTarget(null);
                 double px = x0 + fx * 5.5, pz = z0 + fz * 5.5;
                 victima.moveTo(px, y, pz, giro + 180f, 0f);
                 ba.moveTo(x0, y, z0, giro, 0f);
@@ -1260,7 +1263,10 @@ public final class CiTest {
                 for (int k = 0; k < 110 && ba.accion() != 0; k++) {
                     ba.tickCount++;
                     ba.tick();
-                    victima.tick();
+                    if (ba.accion() == com.darkcraft.enemigos.BarqueroAnims.BICHERO && ba.enganches() == eng) {
+                        victima.moveTo(px, y, pz, giro + 180f, 0f);
+                        victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    } else victima.tick();
                     cerca = Math.min(cerca, Math.hypot(victima.getX() - ba.getX(), victima.getZ() - ba.getZ()));
                 }
                 sb.append(String.format(java.util.Locale.ROOT, " el bichero: engancha %s, la presa de %.1f a %.1f, golpe de linterna %s, la presa -%.1f%s;",
