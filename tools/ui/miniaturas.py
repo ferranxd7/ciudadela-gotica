@@ -795,8 +795,69 @@ def perdidos_brumavela():
     return M
 
 
+def perdidos_morvain():
+    """Morvain al ponerse el sol: el Arbol de la Horca con un lazo vacio, arboles muertos y, lejos en el cielo, la ciudadela
+    encadenada; la tierra marchita delante (los libros perdidos 18 y 19, los de Morvain)."""
+    M = Mini()
+    M.degradado(["#1a0a14", "#3a1018", "#6a2018", "#a04a1a", "#d08a2a", "#f0c050"], 0, 58)
+    # el sol, bajo y grande, tras la bruma
+    M.elipse(84, 50, 13, 13, "#f0b040")
+    M.elipse(84, 50, 10, 10, "#f8d070")
+    for x0, x1, y in ((64, 104, 44), (70, 100, 48), (60, 96, 53)):
+        M.hline(x0, y, x1 - x0, "#c87a2a")
+    # la ciudadela encadenada, lejos, arriba a la derecha (con dos cadenas que bajan)
+    fig = capa()
+    fig.poli([(102, 22), (124, 22), (119, 27), (113, 31), (107, 27)], "#2a1a22")
+    fig.rect(108, 14, 3, 8, "#2a1a22")
+    fig.rect(113, 10, 3, 12, "#2a1a22")
+    fig.rect(118, 15, 3, 7, "#2a1a22")
+    fig.poli([(112, 10), (114.5, 5), (117, 10)], "#2a1a22")
+    for k in range(6):
+        fig.px(104 - k * 2, 27 + k * 2, "#3a2430")
+        fig.px(121 + k, 27 + k * 2, "#3a2430")
+    pegar_con_tinta(M, fig, "#14080e")
+    M.px(114, 14, FUEGO[3]).px(109, 17, FUEGO[2]).px(119, 18, FUEGO[2])
+    # la tierra marchita
+    M.degradado(["#2a1a12", "#1e120c", "#140c08", "#0c0806"], 58, H)
+    r = np.random.default_rng(19)
+    for _ in range(40):
+        x, y = int(r.integers(0, W)), int(r.integers(60, H))
+        M.px(x, y, "#3a2416" if y < 68 else "#24160e")
+    # arboles muertos lejos (siluetas)
+    fig = capa()
+    for x, alto in ((30, 16), (44, 12), (58, 18), (100, 14), (118, 11)):
+        fig.rect(x, 60 - alto, 2, alto, "#1a0e0c")
+        fig.linea(x + 1, 60 - alto + 4, x + 5, 60 - alto, "#1a0e0c")
+        fig.linea(x, 60 - alto + 6, x - 4, 60 - alto + 2, "#1a0e0c")
+    pegar_con_tinta(M, fig, "#0c0606")
+    # el Arbol de la Horca, delante a la izquierda: tronco grueso, ramas torcidas y el lazo vacio
+    fig = capa()
+    fig.poli([(6, 80), (8, 40), (6, 22), (10, 22), (13, 38), (16, 40), (18, 80)], MADERA[1])
+    fig.vline(9, 24, 54, MADERA[2])
+    fig.poli([(10, 24), (40, 14), (42, 16), (12, 28)], MADERA[1])
+    fig.poli([(8, 30), (0, 22), (1, 20), (10, 27)], MADERA[1])
+    fig.poli([(14, 36), (30, 30), (31, 32), (15, 39)], MADERA[1])
+    fig.linea(40, 15, 46, 10, MADERA[1])
+    fig.linea(26, 19, 28, 12, MADERA[1])
+    # raices al aire
+    fig.poli([(6, 76), (0, 80), (4, 80)], MADERA[1])
+    fig.poli([(18, 76), (26, 80), (20, 80)], MADERA[1])
+    pegar_con_tinta(M, fig)
+    # las sogas: el lazo vacio que cuelga de la rama larga y un cabo cortado
+    for y in range(17, 38):
+        M.px(36, y, "#8a7046" if y % 3 else "#6a5434")
+    M.aro(36, 42, 3.4, 4.6, "#8a7046", 1.2)
+    for y in range(21, 31):
+        M.px(24, y, "#8a7046" if y % 3 else "#6a5434")
+    M.px(23, 31, "#6a5434").px(25, 32, "#6a5434")
+    # unos cuervos en el cielo
+    for x, y in ((56, 18), (62, 14), (70, 20)):
+        M.px(x - 1, y - 1, NEGRO).px(x, y, NEGRO).px(x + 1, y - 1, NEGRO)
+    return M
+
+
 ESCENAS = [corona_rota, fuente, trono, catedral, juramento, portal, perdidos_valdrenn, perdidos_fortaleza, diario, acertijo,
-           perdidos_brumavela]
+           perdidos_brumavela, perdidos_morvain]
 
 
 def montar():
