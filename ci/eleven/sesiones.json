@@ -975,7 +975,7 @@
   "flow": "FNZWSYJq2nK8zd5QwV5m",
   "modelo": "eleven_v4",
   "voz": "Autumn Veil (KoVIHoyLDrQyd4pGalbs)",
-  "nota": "Parte 2e-1: Maelis, la guia de los santuarios (voz de mujer serena). Frases 1-10, tomas a y b.",
+  "nota": "Parte 2e-1: Maelis, la guia de los santuarios (voz de mujer serena). Frases 1-10, tomas a y b. Parte 7b: frases 11-14 (Morvain: la bienvenida, el silbato del corcel, como es el corcel y el saludo de alli).",
   "frases": {
    "1": {
     "prompt": "[softly] Another soul the Shadow has dragged back from the dark... [pause] You should be dead, marked one. And yet... the fire still answers to you.",
@@ -1045,6 +1045,34 @@
     "sesiones": [
      "2r2p9J4s6TQ0hlpcNbT4",
      "IxQLPvx6jRkyDrRz5PsF"
+    ]
+   },
+   "11": {
+    "prompt": "[softly] So the door let you through... [pause] Welcome to Morvain, marked one. The Withered Lands. [whispers] Everything here remembers the Shadow.",
+    "sesiones": [
+     "Tse2McvOMWiJiVk8fd8C",
+     "DZ7WJqFWmzxr3X8LgGdY"
+    ]
+   },
+   "12": {
+    "prompt": "[calm] These lands are vast... too vast for tired feet. [warmly] Take this whistle. It was carved from the bones of my sisters' steed. [softly] Blow it, and it will come to you... out of the mist.",
+    "sesiones": [
+     "2V0FbHBwf1xWI04aiUt9",
+     "fzInSvMLFfgMLo4tSxVm"
+    ]
+   },
+   "13": {
+    "prompt": "[calm] It runs like the wind, and leaps where no horse could. And if it falls... it returns to the mist for a while. [softly] But it always comes back.",
+    "sesiones": [
+     "bRTd5EQYHsaA2uXVqFNx",
+     "smF4evZGXzth7HofAe16"
+    ]
+   },
+   "14": {
+    "prompt": "[softly] The fires of Morvain are few, and far apart. [pause] Rest while you can, marked one.",
+    "sesiones": [
+     "xOGp3D8IPrRjCRcRkTKx",
+     "bJa1d49GcwupvTSL1O6T"
     ]
    }
   }
@@ -2648,6 +2676,76 @@
      "CzBWQQ0xuguJj5lPcsoq",
      "K63tmvKbkhC81wANnOqe",
      "O1KKVpl8eGLOZeqKG2OL"
+    ]
+   }
+  }
+ },
+ "sfx_corcel": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7b: el corcel de hueso y niebla (el silbato, la niebla al llegar, el relincho, los cascos, el salto, deshacerse y el dolor). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "corcel_llamada": {
+    "prompt": "A haunting whistle blown on a carved bone flute: a single long eerie rising note with a ghostly breathy tone and a soft echo fading into mist, dark fantasy, no music, 2 seconds",
+    "sesiones": [
+     "bVr6RmQKz1QCp6JmCA0R",
+     "rjJVgMLs1YpfSadqN7yG",
+     "Faj0hCLn1PF1ltuz8pna",
+     "QzEQtYPm8rTv34IoBlZt"
+    ]
+   },
+   "corcel_aparece": {
+    "prompt": "A spectral horse materializing out of swirling mist: a rushing ghostly whoosh that gathers into a soft deep thump of hooves landing, faint ethereal shimmer, dark fantasy cinematic, no music, 2 seconds",
+    "sesiones": [
+     "0kUTeBmUWa7LsQRX1ZTB",
+     "igiEYNbdqX5AC9WAGfeH",
+     "dk3dywzUBbg0BVuJF5W7",
+     "j6H4afgvycFtX8DUQNiB"
+    ]
+   },
+   "corcel_relincho": {
+    "prompt": "A ghostly undead horse neighing: a hollow, echoing whinny with a breathy otherworldly reverb and a low rattle of bones, dark fantasy, no music, 2 seconds",
+    "sesiones": [
+     "aHH0qT8sH24H3CBBHXk4",
+     "jLUzbApZppmREO4fSapu",
+     "lH8RaOgArpKHd3xAWWtv",
+     "Slqrp4MZIeu7nwPLgGRI"
+    ]
+   },
+   "corcel_paso": {
+    "prompt": "A single heavy hoofbeat of an iron-shod horse striking hard dry earth, with a faint hollow bony knock, close and dry, no music, 0.5 seconds",
+    "sesiones": [
+     "2NO61j72iN4a7Ejvud1H",
+     "3WrjCtZ1ZwhyJfeq9ZjA",
+     "koPIqWEOVF2nMDEXh57x",
+     "vrgKQnLSb0aS1PF09kus"
+    ]
+   },
+   "corcel_salto": {
+    "prompt": "A spectral horse leaping high into the air: a powerful gust of misty wind whooshing upward with a faint ethereal chime, dark fantasy, no music, 1 second",
+    "sesiones": [
+     "70qMOY5iJfs9qGhDEpRJ",
+     "TmInK8O4ZKDYXRYRtbYV",
+     "Qeblx4Tl2dz61TBLzn7K",
+     "NOelYna4qbIMrounAvok"
+    ]
+   },
+   "corcel_deshace": {
+    "prompt": "A ghostly horse dissolving into mist: a long breathy fading whoosh, scattering whispers and a soft sigh trailing away into silence, dark fantasy, no music, 2.5 seconds",
+    "sesiones": [
+     "wpDximrgmSt9Gd5feMBN",
+     "QtzxjOyrOJtVwR8w9oLj",
+     "Cn3ziHZ3xuPeYyEk4Pzo",
+     "2QfNpNV4iP2x2kxqj0Gp"
+    ]
+   },
+   "corcel_dolor": {
+    "prompt": "A spectral undead horse crying out in pain: a short sharp hollow whinny with a crack of bone, dark fantasy, no music, 0.8 seconds",
+    "sesiones": [
+     "oO9ce1JT4zbpllO8i9Qe",
+     "Cce86g6dH82LjXTchVMj",
+     "oNEKhqQhK9974ryBNT23",
+     "QeTz9OOLQNTyuTqvqqre"
     ]
    }
   }
