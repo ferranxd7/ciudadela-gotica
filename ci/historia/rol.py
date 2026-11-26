@@ -1834,7 +1834,7 @@ SANTUARIOS_MORVAIN_ES = {
     "puerta_capital": "Puerta de la Capital", "juramento": "Plaza del Juramento",
     "faro_huesos": "Faro de los Huesos", "costillar": "Costillar de la Ballena",
     "grieta": "Grieta de los Apóstatas", "altar": "Altar Profanado", "mirador": "Mirador del Cráter",
-    "ancla_sur": "Ancla del Sur",
+    "ancla_sur": "Ancla del Sur", "molino": "Camino del Molino",
 }
 SANTUARIOS_MORVAIN_EN = {
     "encrucijada": "Pilgrims' Crossroads", "vado": "Ashen Ford",
@@ -1845,7 +1845,7 @@ SANTUARIOS_MORVAIN_EN = {
     "puerta_capital": "Capital Gate", "juramento": "Square of the Oath",
     "faro_huesos": "Lighthouse of Bones", "costillar": "The Whale's Ribcage",
     "grieta": "Apostates' Rift", "altar": "Desecrated Altar", "mirador": "Crater Overlook",
-    "ancla_sur": "The Southern Anchor",
+    "ancla_sur": "The Southern Anchor", "molino": "Mill Road",
 }
 ES.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_ES.items()})
 EN.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_EN.items()})
@@ -1968,6 +1968,55 @@ EN.update({
     "darkcraft.diario.marchito": "Out on the plains the people did not die: they dried out. What is left of them is ash in the shape of a person, still gripping whatever they held.",
     "darkcraft.diario.velmor": "Velmor: a broken bridge, a roofless chapel and a bell tower that still has its bell. Its folk are still in the streets, the fields, the tavern... waiting.",
     "darkcraft.ayuda.velmor": "Velmor, the withered village: go to one of its places, bring its Withered back or remove them",
+})
+
+
+# ---------------------------------------------------------------- parte 7f: la Molinera de Velmor (el jefe de las Llanuras)
+ES.update({
+    "entity.darkcraft.molinera": "La Molinera de Velmor",
+    "darkcraft.molinera.nombre_corto": "La Molinera",
+    "darkcraft.molinera.voz.1": "¿Quién pisa mi trigo...? Aquí ya no crece nada. Nada... salvo yo.",
+    "darkcraft.molinera.voz.2": "¡Muele, rueda, muele! Venid, hijos de Velmor... ¡ya es la siega!",
+    "darkcraft.molinera.voz.3": "Al saco contigo... como todos los demás.",
+    "darkcraft.molinera.voz.4": "¡Vueltas y vueltas da la piedra del molino!",
+    "darkcraft.molinera.voz.5": "La rueda... se ha parado... por fin.",
+    "subtitles.darkcraft.molinera.voz": "Habla la Molinera",
+    "darkcraft.bestiario.molinera.desc": "La molinera de Velmor sigue en su era, segando lo que ya no crece, y la Sombra la hizo crecer hasta el doble de alto. Su siega barre a ras de suelo casi todo lo de delante: sáltala o rueda. El tajo se clava en la era y levanta una onda. A quien se le pone detrás lo aparta de un pisotón. Herida, llama a los marchitos de Velmor y gira con la guadaña abierta.",
+    "subtitles.darkcraft.sfx.molinera_grito": "La Molinera grita",
+    "subtitles.darkcraft.sfx.molinera_siega": "Una guadaña enorme siega el aire",
+    "subtitles.darkcraft.sfx.molinera_golpe": "Una guadaña se clava en la tierra",
+    "subtitles.darkcraft.sfx.molinera_giro": "La Molinera gira con su guadaña",
+    "subtitles.darkcraft.sfx.molinera_dolor": "La Molinera se queja",
+    "subtitles.darkcraft.sfx.molinera_muerte": "La Molinera se deshace en ceniza",
+    "subtitles.darkcraft.sfx.molino_viento": "Cruje el molino",
+    "darkcraft.morvain.lugar.molino": "El Molino de Velmor",
+    "advancements.darkcraft.molinera.title": "La rueda se ha parado",
+    "advancements.darkcraft.molinera.description": "Vence a la Molinera de Velmor en la era de su molino",
+    "darkcraft.diario.molinera": "En la era del molino, al este de Velmor, la molinera seguía de rodillas ante su piedra. Se levantó el doble de alta que nadie, con una guadaña como un aspa. Cuando cayó, el molino dejó de crujir y su reja se abrió.",
+    "darkcraft.ayuda.molinera": "La Molinera de Velmor: cómo está, llevarte a la era, vencerla o que vuelva",
+})
+EN.update({
+    "entity.darkcraft.molinera": "The Miller of Velmor",
+    "darkcraft.molinera.nombre_corto": "The Miller",
+    "darkcraft.molinera.voz.1": "Who treads upon my wheat...? Nothing grows here anymore. Nothing... but me.",
+    "darkcraft.molinera.voz.2": "Grind, wheel, grind! Come, children of Velmor... the harvest is here!",
+    "darkcraft.molinera.voz.3": "Into the sack with you... like all the others.",
+    "darkcraft.molinera.voz.4": "Round and round the millstone goes!",
+    "darkcraft.molinera.voz.5": "The wheel... has stopped... at last.",
+    "subtitles.darkcraft.molinera.voz": "The Miller speaks",
+    "darkcraft.bestiario.molinera.desc": "Velmor's miller is still on her threshing floor, reaping what no longer grows, and the Shadow made her grow twice as tall. Her sweep skims the ground and covers almost everything in front of her: jump it or roll. Her overhead cut bites into the floor and sends out a shockwave. Whoever gets behind her is kicked away with a stomp. Wounded, she calls Velmor's Withered and spins with her scythe held wide.",
+    "subtitles.darkcraft.sfx.molinera_grito": "The Miller screams",
+    "subtitles.darkcraft.sfx.molinera_siega": "A huge scythe sweeps the air",
+    "subtitles.darkcraft.sfx.molinera_golpe": "A scythe bites into the earth",
+    "subtitles.darkcraft.sfx.molinera_giro": "The Miller spins her scythe",
+    "subtitles.darkcraft.sfx.molinera_dolor": "The Miller hurts",
+    "subtitles.darkcraft.sfx.molinera_muerte": "The Miller crumbles to ash",
+    "subtitles.darkcraft.sfx.molino_viento": "The mill creaks",
+    "darkcraft.morvain.lugar.molino": "The Mill of Velmor",
+    "advancements.darkcraft.molinera.title": "The Wheel Has Stopped",
+    "advancements.darkcraft.molinera.description": "Defeat the Miller of Velmor on her mill's threshing floor",
+    "darkcraft.diario.molinera": "On the threshing floor of the mill, east of Velmor, the miller was still kneeling before her stone. She rose twice as tall as anyone, with a scythe like a windmill sail. When she fell, the mill stopped creaking and its gate swung open.",
+    "darkcraft.ayuda.molinera": "The Miller of Velmor: how she is, take you to the threshing floor, defeat her or bring her back",
 })
 
 

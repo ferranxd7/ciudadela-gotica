@@ -21,6 +21,8 @@ public final class Voces {
     public static final int BASE_GAVRAN = 100;
     /** Las del Capitan de Brumavela: 40 + N (1..5). */
     public static final int BASE_CAPITAN = 40;
+    /** Las de la Molinera de Velmor (parte 7f): 60 + N (1..5). */
+    public static final int BASE_MOLINERA = 60;
     /** Pausa entre dos frases seguidas (ticks): 0,3 s. */
     public static final int PAUSA = 6;
     /** Lo que se queda el subtitulo despues de acabar de hablar (ticks): 0,8 s. */
@@ -31,6 +33,7 @@ public final class Voces {
     private static final float[] GAVRAN = {0, 6.63f, 7.26f, 5.9f, 4.67f, 1.34f, 1.02f, 4.46f, 2.98f, 3.29f, 2.66f, 4.85f, 2.21f,
             3.04f, 4.7f, 4.92f, 3.27f, 4.36f, 6.44f};
     private static final float[] CAPITAN = {0, 7.15f, 3.74f, 2.7f, 2.95f, 4.06f};
+    private static final float[] MOLINERA = {0, 9.0f, 6.43f, 3.86f, 4.39f, 4.67f};
     // la Sombra en las cinematicas (1..6 la de inicio, 7..9 el viaje a Valdrenn)
     private static final float[] SOMBRA = {0, 2.26f, 4.23f, 3.56f, 6.57f, 5.44f, 3.17f, 6.06f, 5.98f, 4.63f};
 
@@ -39,6 +42,7 @@ public final class Voces {
             if (in != null) {
                 JsonObject o = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
                 leer(o, "habla_capitan", CAPITAN);
+                leer(o, "habla_molinera", MOLINERA);
                 leer(o, "habla_sombra", SOMBRA);
                 if (o.has("habla")) {
                     leer(o, "habla", REY);
@@ -69,12 +73,17 @@ public final class Voces {
     }
 
     public static boolean esCapitan(int linea) {
-        return linea > BASE_CAPITAN && linea < BASE_GAVRAN;
+        return linea > BASE_CAPITAN && linea < BASE_MOLINERA;
     }
 
-    /** Si la linea existe (1..13 el Rey, 41..45 el Capitan, 101..118 Gavran). */
+    public static boolean esMolinera(int linea) {
+        return linea > BASE_MOLINERA && linea < BASE_GAVRAN;
+    }
+
+    /** Si la linea existe (1..13 el Rey, 41..45 el Capitan, 61..65 la Molinera, 101..118 Gavran). */
     public static boolean valida(int linea) {
         if (esCapitan(linea)) return linea - BASE_CAPITAN < CAPITAN.length;
+        if (esMolinera(linea)) return linea - BASE_MOLINERA < MOLINERA.length;
         return esGavran(linea) ? linea - BASE_GAVRAN < GAVRAN.length : linea > 0 && linea < REY.length;
     }
 
@@ -83,6 +92,10 @@ public final class Voces {
         if (esCapitan(linea)) {
             int n = linea - BASE_CAPITAN;
             return n > 0 && n < CAPITAN.length ? CAPITAN[n] : 4f;
+        }
+        if (esMolinera(linea)) {
+            int n = linea - BASE_MOLINERA;
+            return n > 0 && n < MOLINERA.length ? MOLINERA[n] : 4f;
         }
         if (esGavran(linea)) {
             int n = linea - BASE_GAVRAN;
@@ -107,6 +120,10 @@ public final class Voces {
     public static boolean deRelleno(int linea) {
         if (esCapitan(linea)) {
             int n = linea - BASE_CAPITAN;
+            return n == 3 || n == 4;
+        }
+        if (esMolinera(linea)) {
+            int n = linea - BASE_MOLINERA;
             return n == 3 || n == 4;
         }
         if (esGavran(linea)) {

@@ -64,6 +64,8 @@ VOZ_MERCADER = ("highpass=f=75,equalizer=f=3000:t=q:w=1.2:g=1.5,aecho=0.8:0.25:2
 # el Capitan de Brumavela (voz "Matthew Schmitz - Old Pirate Captain"): un ahogado. La misma voz algo mas grave, con una
 # segunda voz sorda y temblona por debajo (como oida bajo el agua) y el eco corto del penon del faro
 TOMAS_CAPITAN = {n: "a" for n in range(1, 6)}
+# la Molinera de Velmor (parte 7f): las tomas a (las b de la 1, la 2 y la 4 se cortan sin acabar)
+TOMAS_MOLINERA = {n: "a" for n in range(1, 6)}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -172,10 +174,15 @@ SFX = {
     # los Marchitos de Velmor (parte 7e): el gemido, la alerta, el dolor, la muerte en ceniza, una campanada y el farol
     "marchito_gemido": (1.8, 0.5, -21), "marchito_alerta": (1.4, 0.3, -16), "marchito_dolor": (0.6, 0.15, -17),
     "marchito_muerte": (2.3, 0.6, -17), "marchito_campana": (1.3, 0.5, -15), "marchito_farol": (0.9, 0.35, -15),
+    # la Molinera de Velmor (parte 7f): el grito, la siega, la guadana contra el suelo, el giro, el dolor, la muerte; y el
+    # molino roto que cruje con el viento (suena en bucle mientras ella vive)
+    "molinera_grito": (2.4, 0.6, -13), "molinera_siega": (1.0, 0.3, -14), "molinera_golpe": (2.4, 0.8, -13),
+    "molinera_giro": (1.4, 0.4, -14), "molinera_dolor": (0.7, 0.2, -15), "molinera_muerte": (3.4, 0.9, -14),
+    "molino_viento": (5.5, 1.2, -21),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
-           "barco_vuelo": 3.0}
+           "barco_vuelo": 3.0, "molino_viento": 1.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
@@ -297,6 +304,11 @@ TOMAS_SFX = {
     # tres veces y cada vez suena una); los dos farolazos con golpe seco y uno con mas cola
     "marchito_gemido": (1, 3, 2), "marchito_alerta": (1, 3), "marchito_dolor": (3, 1, 4), "marchito_muerte": (2, 3),
     "marchito_campana": (4, 3, 1, 2), "marchito_farol": (1, 4, 2),
+    # la Molinera: los dos gritos mas largos y sostenidos; las tres siegas cortas (la 2 es un soplo de dos segundos); los
+    # dos golpes con piedras que caen despues; los dos giros mas llenos; tres quejidos; las dos muertes mas graves; el
+    # molino: el que mas cruje y el mas parejo (para el bucle)
+    "molinera_grito": (3, 1), "molinera_siega": (4, 1, 3), "molinera_golpe": (3, 4), "molinera_giro": (2, 4),
+    "molinera_dolor": (1, 3, 2), "molinera_muerte": (4, 2), "molino_viento": (4, 1),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -407,6 +419,25 @@ def voz_capitan(src, dst):
         "[baja][agua]amix=inputs=2:weights=1 0.6:normalize=0,"
         "equalizer=f=110:t=q:w=1.0:g=4,equalizer=f=3000:t=q:w=1.4:g=-1.5,"
         "aecho=0.8:0.5:60|135|220:0.20|0.12|0.06,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA
+
+
+def voz_molinera(src, dst):
+    """
+    La Molinera de Velmor: una vieja enorme. Algo mas grave y ronca (sin alargarla), una segunda voz una octava y media por
+    debajo, sorda, que le da el tamano, y el eco abierto de las llanuras (lejos y poco: no hay sala).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=2[v1][v2];"
+        "[v1]asetrate=44100*0.90,aresample=44100,atempo=1.1111[baja];"
+        "[v2]asetrate=44100*0.62,aresample=44100,atempo=1.6129,lowpass=f=900,volume=0.42[honda];"
+        "[baja][honda]amix=inputs=2:weights=1 0.55:normalize=0,"
+        "asoftclip=type=atan:threshold=0.75,equalizer=f=140:t=q:w=1.0:g=3,equalizer=f=3200:t=q:w=1.2:g=-1.5,"
+        "aecho=0.8:0.35:240|520:0.16|0.08,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
@@ -597,6 +628,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO capitan {n}: {e}")
+    # la Molinera de Velmor (parte 7f)
+    mol = os.path.join(ASSETS, "sounds", "molinera")
+    os.makedirs(mol, exist_ok=True)
+    dur_m, hab_m = {}, {}
+    for n, toma in sorted(TOMAS_MOLINERA.items()):
+        src = os.path.join(MASTER, "molinera", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(mol, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_molinera(src, dst)
+            dur_m[n] = round(duracion(dst), 2)
+            hab_m[n] = round(min(h, dur_m[n]), 2)
+            print(f"molinera {n:2d}: {dur_m[n]} s (habla hasta {hab_m[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO molinera {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -626,7 +676,7 @@ def main():
         print(f"FALLO capitulo 6: {e}")
     with open(os.path.join(ASSETS, "rey_voces.json"), "w") as fh:
         json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g, "capitan": dur_c, "habla_capitan": hab_c,
-                   "sombra": dur_s, "habla_sombra": hab_s}, fh)
+                   "sombra": dur_s, "habla_sombra": hab_s, "molinera": dur_m, "habla_molinera": hab_m}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

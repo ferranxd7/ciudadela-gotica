@@ -191,6 +191,14 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_MARCHITO_MUERTE = sound("sfx.marchito_muerte");
     public static final RegistryObject<SoundEvent> SFX_MARCHITO_CAMPANA = sound("sfx.marchito_campana");
     public static final RegistryObject<SoundEvent> SFX_MARCHITO_FAROL = sound("sfx.marchito_farol");
+    // la Molinera de Velmor (parte 7f) y su molino
+    public static final RegistryObject<SoundEvent> SFX_MOLINERA_GRITO = sound("sfx.molinera_grito");
+    public static final RegistryObject<SoundEvent> SFX_MOLINERA_SIEGA = sound("sfx.molinera_siega");
+    public static final RegistryObject<SoundEvent> SFX_MOLINERA_GOLPE = sound("sfx.molinera_golpe");
+    public static final RegistryObject<SoundEvent> SFX_MOLINERA_GIRO = sound("sfx.molinera_giro");
+    public static final RegistryObject<SoundEvent> SFX_MOLINERA_DOLOR = sound("sfx.molinera_dolor");
+    public static final RegistryObject<SoundEvent> SFX_MOLINERA_MUERTE = sound("sfx.molinera_muerte");
+    public static final RegistryObject<SoundEvent> SFX_MOLINO_VIENTO = sound("sfx.molino_viento");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -265,6 +273,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_CAPITAN = sound("musica.capitan");
     public static final RegistryObject<SoundEvent> MUSICA_BRANDT = sound("musica.brandt");
     public static final RegistryObject<SoundEvent> MUSICA_VARETH = sound("musica.vareth");
+    public static final RegistryObject<SoundEvent> MUSICA_MOLINERA = sound("musica.molinera");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -294,6 +303,10 @@ public class DarkCraftMod {
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] CAPITAN_VOZ = new RegistryObject[6];
 
+    /** Frases de la Molinera de Velmor (1..5, parte 7f). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] MOLINERA_VOZ = new RegistryObject[6];
+
     /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[10];
@@ -302,6 +315,7 @@ public class DarkCraftMod {
         for (int i = 1; i < REY_VOZ.length; i++) REY_VOZ[i] = sound("rey.voz." + i);
         for (int i = 1; i < GAVRAN_VOZ.length; i++) GAVRAN_VOZ[i] = sound("gavran.voz." + i);
         for (int i = 1; i < CAPITAN_VOZ.length; i++) CAPITAN_VOZ[i] = sound("capitan.voz." + i);
+        for (int i = 1; i < MOLINERA_VOZ.length; i++) MOLINERA_VOZ[i] = sound("molinera.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -447,6 +461,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Marchito>> MARCHITO = ENTITIES.register("marchito",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Marchito>of(com.darkcraft.enemigos.Marchito::new, MobCategory.MONSTER)
                     .sized(0.6f, 2.05f).clientTrackingRange(8).build(MODID + ":marchito"));
+    // ---- la Molinera de Velmor, el jefe de las Llanuras Palidas (parte 7f)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Molinera>> MOLINERA = ENTITIES.register("molinera",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Molinera>of(com.darkcraft.enemigos.Molinera::new, MobCategory.MONSTER)
+                    .sized(1.3f, 3.7f).fireImmune().clientTrackingRange(10).build(MODID + ":molinera"));
     // ---- la guardia de Valdrenn (parte 4a)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Guardia>> GUARDIA = ENTITIES.register("guardia",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Guardia>of(com.darkcraft.enemigos.Guardia::new, MobCategory.MONSTER)
@@ -617,6 +635,7 @@ public class DarkCraftMod {
         e.put(ELITE.get(), com.darkcraft.enemigos.Elite.atributos().build());
         e.put(BRANDT.get(), com.darkcraft.enemigos.Brandt.atributos().build());
         e.put(CORTEZA.get(), com.darkcraft.enemigos.Corteza.atributos().build());
+        e.put(MOLINERA.get(), com.darkcraft.enemigos.Molinera.atributos().build());
         e.put(CORCEL.get(), com.darkcraft.montura.Corcel.atributos().build());
         e.put(GUIA.get(), com.darkcraft.personajes.Guia.atributos().build());
         e.put(HERRERO.get(), com.darkcraft.personajes.Herrero.atributos().build());

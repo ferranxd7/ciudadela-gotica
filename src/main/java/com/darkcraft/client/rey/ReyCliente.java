@@ -253,9 +253,11 @@ public final class ReyCliente {
 
     private static void sonar(int linea) {
         Minecraft mc = Minecraft.getInstance();
-        boolean gavran = com.darkcraft.rey.Voces.esGavran(linea), capitan = com.darkcraft.rey.Voces.esCapitan(linea);
-        int n = gavran ? linea - com.darkcraft.rey.Voces.BASE_GAVRAN : capitan ? linea - com.darkcraft.rey.Voces.BASE_CAPITAN : linea;
-        var tabla = gavran ? DarkCraftMod.GAVRAN_VOZ : capitan ? DarkCraftMod.CAPITAN_VOZ : DarkCraftMod.REY_VOZ;
+        boolean gavran = com.darkcraft.rey.Voces.esGavran(linea), capitan = com.darkcraft.rey.Voces.esCapitan(linea),
+                molinera = com.darkcraft.rey.Voces.esMolinera(linea);
+        int n = gavran ? linea - com.darkcraft.rey.Voces.BASE_GAVRAN : capitan ? linea - com.darkcraft.rey.Voces.BASE_CAPITAN
+                : molinera ? linea - com.darkcraft.rey.Voces.BASE_MOLINERA : linea;
+        var tabla = gavran ? DarkCraftMod.GAVRAN_VOZ : capitan ? DarkCraftMod.CAPITAN_VOZ : molinera ? DarkCraftMod.MOLINERA_VOZ : DarkCraftMod.REY_VOZ;
         if (n < 1 || n >= tabla.length) return;
         // la anterior ya ha acabado de hablar: se deja sonar la cola de su eco (solo se corta si aun estaba hablando)
         if (voz != null && ticks < vozHasta) mc.getSoundManager().stop(voz);
@@ -361,10 +363,13 @@ public final class ReyCliente {
         int alpha = Math.round(a * 255);
         if (alpha <= 8) return;
         Font font = mc.font;
-        boolean gavran = subLinea > com.darkcraft.gavran.Gavran.VOZ_BASE, capitan = com.darkcraft.rey.Voces.esCapitan(subLinea);
-        Component name = Component.translatable(gavran ? "darkcraft.gavran.nombre_corto" : capitan ? "darkcraft.capitan.nombre_corto" : "darkcraft.rey.nombre_corto");
+        boolean gavran = subLinea > com.darkcraft.gavran.Gavran.VOZ_BASE, capitan = com.darkcraft.rey.Voces.esCapitan(subLinea),
+                molinera = com.darkcraft.rey.Voces.esMolinera(subLinea);
+        Component name = Component.translatable(gavran ? "darkcraft.gavran.nombre_corto" : capitan ? "darkcraft.capitan.nombre_corto"
+                : molinera ? "darkcraft.molinera.nombre_corto" : "darkcraft.rey.nombre_corto");
         Component line = Component.translatable(gavran ? "darkcraft.gavran.voz." + (subLinea - com.darkcraft.gavran.Gavran.VOZ_BASE)
-                : capitan ? "darkcraft.capitan.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_CAPITAN) : "darkcraft.rey.voz." + subLinea);
+                : capitan ? "darkcraft.capitan.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_CAPITAN)
+                : molinera ? "darkcraft.molinera.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_MOLINERA) : "darkcraft.rey.voz." + subLinea);
         int band = cine ? Math.round(h * 0.12f) : (enFoco() ? Math.round(h * 0.11f) : 0);
         // tamano: grande, pero que quepa en la franja (o en la parte de abajo de la pantalla)
         float sc = 1.6f;
@@ -407,7 +412,7 @@ public final class ReyCliente {
             com.darkcraft.client.enemigos.CapitanCliente.barra(e, ticks);
             return;
         }
-        if (tc.getKey().equals("entity.darkcraft.brandt") || tc.getKey().equals("entity.darkcraft.corteza")) {
+        if (tc.getKey().equals("entity.darkcraft.brandt") || tc.getKey().equals("entity.darkcraft.corteza") || tc.getKey().equals("entity.darkcraft.molinera")) {
             com.darkcraft.client.enemigos.GuardianCliente.barra(e, ticks, tc.getKey().substring("entity.darkcraft.".length()));
             return;
         }
