@@ -5987,6 +5987,8 @@ public final class ClientCiTest {
         t = corcel(t);
         // los santuarios de Morvain y el viaje entre ellos (parte 7c)
         t = viaje(t);
+        // los fragmentos del mapa y el mapa de la M en Morvain (parte 7d)
+        t = mapaMorvain(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -6211,6 +6213,127 @@ public final class ClientCiTest {
             sp.getAbilities().flying = false;
             sp.onUpdateAbilities();
             sp.teleportTo(sp.serverLevel(), UMBRAL.x() + 0.5, UMBRAL.y() + 1, UMBRAL.z() + 10.5, 180f, 0f);
+        }));
+        return t + 20;
+    }
+
+    // ------------------------------------------------------------------ los fragmentos del mapa de Morvain (parte 7d)
+
+    private static String estadoMapa(Minecraft m) {
+        return com.darkcraft.client.morvain.ClientMapa.resumen() + " | " + com.darkcraft.client.morvain.MapaMorvain.resumen()
+                + " | pantalla " + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()) + " | cartel " + com.darkcraft.client.ui.Carteles.resumen();
+    }
+
+    /**
+     * Parte 7d: los fragmentos del mapa. La estela de las Llanuras en la plaza del arco (el aviso de la E y las runas), la
+     * E copia el mapa (cartel), el mapa de la M con solo las Llanuras y el mar, con todos los mapas y santuarios, de cerca
+     * (nombres, santuarios, el arco y la ciudadela) y viajar desde el mapa (la pregunta y el viaje).
+     */
+    private static int mapaMorvain(int T) {
+        final var UMBRAL = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+        final var ESTELA = com.darkcraft.morvain.Fragmentos.de(com.darkcraft.morvain.Region.LLANURAS);
+        final var VADO = com.darkcraft.morvain.SantuariosMorvain.porId("vado");
+        final com.darkcraft.client.espejo.LibroScreen[] libroM = new com.darkcraft.client.espejo.LibroScreen[1];
+        int t = T;
+        atTicks(t, "Mapa: ante la estela de las Llanuras", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                int n = com.darkcraft.rol.Ficha.olvidarMapas(sp);
+                com.darkcraft.morvain.Fragmentos.avisar(sp);
+                var st = sp.serverLevel().getBlockState(ESTELA.pos());
+                log("  mapa: olvidados " + n + "; la estela de las Llanuras en " + ESTELA.pos().toShortString() + ": "
+                        + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(st.getBlock()));
+                sp.teleportTo(sp.serverLevel(), ESTELA.x() + 0.5, ESTELA.y(), ESTELA.z() + 2.6, 180f, 18f);
+            });
+        });
+        t += 40;
+        atTicks(t, "captura", m -> {
+            log("  ante la estela: " + estadoMapa(m) + " | aviso " + com.darkcraft.client.ui.ClientRol.aMano());
+            shot(m, "cliente_mv39_estela");
+        });
+        t += 4;
+        atTicks(t, "Mapa: la E copia el mapa", m -> pulsar(m.options.keyInventory));
+        t += 24;
+        atTicks(t, "captura", m -> {
+            String cli = estadoMapa(m);
+            server(m, sp -> log("  tras la E: " + com.darkcraft.morvain.Fragmentos.resumen(sp) + "; logro fragmento "
+                    + com.darkcraft.story.Logros.tiene(sp, "fragmento") + " | cliente: " + cli));
+            shot(m, "cliente_mv40_fragmento");
+        });
+        t += 60;
+        atTicks(t, "Mapa: la M (solo las Llanuras)", m -> {
+            com.darkcraft.client.espejo.LibroScreen.abrir();
+            if (m.screen instanceof com.darkcraft.client.espejo.LibroScreen l) {
+                libroM[0] = l;
+                l.probarCentro(0, 0, 0.034f);
+            } else log("  NO se abre el libro de la M: " + estadoMapa(m));
+        });
+        t += 16;
+        atTicks(t, "captura", m -> {
+            log("  la M: " + estadoMapa(m));
+            shot(m, "cliente_mv41_mapa_llanuras");
+        });
+        t += 4;
+        atTicks(t, "Mapa: todos los mapas y santuarios", m -> server(m, sp -> {
+            for (var e : com.darkcraft.morvain.Fragmentos.ESTELAS) com.darkcraft.rol.Ficha.mapaNuevo(sp, e.region().id);
+            for (var s : com.darkcraft.morvain.SantuariosMorvain.todos()) com.darkcraft.rol.Ficha.santuarioNuevo(sp, com.darkcraft.morvain.Morvain.NIVEL, s.pos());
+            com.darkcraft.morvain.Fragmentos.avisar(sp);
+            com.darkcraft.morvain.Viaje.avisar(sp);
+        }));
+        t += 16;
+        atTicks(t, "captura", m -> {
+            log("  con todo: " + estadoMapa(m));
+            shot(m, "cliente_mv42_mapa_entero");
+        });
+        t += 4;
+        atTicks(t, "Mapa: de cerca, entre el arco y el vado", m -> {
+            if (libroM[0] != null) libroM[0].probarCentro(500, 3700, 0.2f);
+        });
+        t += 10;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv43_mapa_cerca"));
+        t += 4;
+        atTicks(t, "Mapa: viajar al vado (la pregunta)", m -> {
+            if (libroM[0] != null) libroM[0].probarViaje("vado", false);
+        });
+        t += 8;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv44_mapa_viajar"));
+        t += 4;
+        atTicks(t, "Mapa: viajar", m -> {
+            if (libroM[0] != null) libroM[0].probarViaje("vado", true);
+            libroM[0] = null;
+        });
+        t += 70;
+        atTicks(t, "Mapa: ha llegado al vado?", m -> {
+            String cli = estadoMapa(m);
+            server(m, sp -> {
+                double d = Math.sqrt(sp.distanceToSqr(VADO.x() + 0.5, VADO.y() + 1, VADO.z() + 0.5));
+                log(String.format(java.util.Locale.ROOT, "  tras viajar desde el mapa: %s a %.1f bloques del santuario del vado; viajes %d | cliente: %s",
+                        fpos(sp), d, com.darkcraft.morvain.Viaje.HECHOS, cli));
+            });
+            shot(m, "cliente_mv45_tras_viaje_mapa");
+        });
+        t += 10;
+        atTicks(t, "Mapa: en combate no se viaja desde el mapa", m -> server(m, sp -> {
+            sp.setGameMode(GameType.SURVIVAL);
+            com.darkcraft.rol.Rol.guardia(sp, 0f);
+            boolean antes = com.darkcraft.rol.Rol.enCombate(sp);
+            com.darkcraft.morvain.Viaje.desdeMapa(sp, "llegada");
+            log("  desde el mapa en combate (" + antes + "): viaje en marcha " + com.darkcraft.morvain.Viaje.pendiente(sp));
+            com.darkcraft.rol.Rol.sinCombate(sp);
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        t += 50;
+        atTicks(t, "Mapa: fin (vuelta al arco)", m -> server(m, sp -> {
+            log("  fin del mapa: " + fpos(sp) + " | " + com.darkcraft.morvain.Fragmentos.resumen(sp));
+            sp.getAbilities().flying = false;
+            sp.onUpdateAbilities();
+            sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), UMBRAL.x() + 0.5, UMBRAL.y() + 1, UMBRAL.z() + 10.5, 180f, 0f);
         }));
         return t + 20;
     }

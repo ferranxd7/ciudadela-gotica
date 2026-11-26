@@ -361,6 +361,14 @@ public class DarkCraftMod {
             true));
     public static final RegistryObject<Item> SANTUARIO_ITEM = ITEMS.register("santuario",
             () -> new net.minecraft.world.item.BlockItem(SANTUARIO.get(), new Item.Properties().rarity(Rarity.EPIC)));
+    /** La estela del mapa de Morvain (parte 7d): irrompible, con un rescoldo de luz en el pergamino. */
+    public static final RegistryObject<Block> ESTELA_MAPA = BLOCKS.register("estela_mapa", () -> new com.darkcraft.morvain.EstelaBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).strength(-1.0F, 3600000.0F).noLootTable().noOcclusion()
+                    .lightLevel(st -> 4).sound(SoundType.DEEPSLATE_BRICKS).pushReaction(PushReaction.BLOCK)
+                    .isValidSpawn((st, l, p, t) -> false).isRedstoneConductor((st, l, p) -> false)
+                    .isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false)));
+    public static final RegistryObject<Item> ESTELA_MAPA_ITEM = ITEMS.register("estela_mapa",
+            () -> new net.minecraft.world.item.BlockItem(ESTELA_MAPA.get(), new Item.Properties().rarity(Rarity.EPIC)));
     /** Los frascos no son objetos que se lleven en el inventario (van en la ficha): estos solo sirven para dibujarlos en la mano al beber. */
     public static final RegistryObject<Item> FRASCO_VIDA = ITEMS.register("frasco_vida",
             () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
@@ -614,6 +622,7 @@ public class DarkCraftMod {
             e.accept(AMULETO_HUESO);
             e.accept(LIBRO_ACERTIJO);
             e.accept(SANTUARIO_ITEM);
+            e.accept(ESTELA_MAPA_ITEM);
             e.accept(PIEDRA_FORJA_1);
             e.accept(PIEDRA_FORJA_2);
             e.accept(PIEDRA_FORJA_3);

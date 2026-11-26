@@ -194,6 +194,34 @@ public final class Ficha {
         return leer(p).getList("santuarios", Tag.TAG_STRING).size();
     }
 
+    // ------------------------------------------------------------------ los mapas de Morvain (parte 7d)
+
+    /** Las regiones de Morvain cuyo mapa ha copiado de su estela (ids de {@code morvain.Region}). */
+    public static java.util.Set<String> mapas(Player p) {
+        ListTag l = leer(p).getList("mapas", Tag.TAG_STRING);
+        java.util.Set<String> r = new java.util.HashSet<>();
+        for (int i = 0; i < l.size(); i++) r.add(l.getString(i));
+        return r;
+    }
+
+    /** Apunta el mapa de esa region y dice si no lo tenia. */
+    public static boolean mapaNuevo(Player p, String region) {
+        CompoundTag f = abrir(p);
+        ListTag l = f.getList("mapas", Tag.TAG_STRING);
+        for (int i = 0; i < l.size(); i++) if (l.getString(i).equals(region)) return false;
+        l.add(StringTag.valueOf(region));
+        f.put("mapas", l);
+        return true;
+    }
+
+    /** Le quita todos los mapas (el comando de las pruebas); dice cuantos tenia. */
+    public static int olvidarMapas(Player p) {
+        CompoundTag f = abrir(p);
+        int n = f.getList("mapas", Tag.TAG_STRING).size();
+        f.remove("mapas");
+        return n;
+    }
+
     // ------------------------------------------------------------------ zonas descubiertas
 
     /** Apunta la zona (clave de su nombre) y dice si es la primera vez que el jugador entra en ella. */

@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "19";
+    private static final String V = "20";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -145,6 +145,13 @@ public final class Net {
                 .encoder(Fundido::write).decoder(Fundido::read).consumerMainThread(Fundido::handle).add();
         CH.messageBuilder(Conocidos.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(Conocidos::write).decoder(Conocidos::read).consumerMainThread(Conocidos::handle).add();
+        // los fragmentos del mapa de Morvain y viajar desde el mapa (parte 7d)
+        CH.messageBuilder(Mapas.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Mapas::write).decoder(Mapas::read).consumerMainThread(Mapas::handle).add();
+        CH.messageBuilder(EstelaUsar.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(EstelaUsar::write).decoder(EstelaUsar::read).consumerMainThread(EstelaUsar::handle).add();
+        CH.messageBuilder(ViajarMapa.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ViajarMapa::write).decoder(ViajarMapa::read).consumerMainThread(ViajarMapa::handle).add();
         // el corcel de Morvain (parte 7b)
         CH.messageBuilder(CorcelLlamar.class, id++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder((m, b) -> {}).decoder(b -> new CorcelLlamar()).consumerMainThread(CorcelLlamar::handle).add();
@@ -203,6 +210,62 @@ public final class Net {
 
         void handle(Supplier<NetworkEvent.Context> ctx) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.morvain.ClientViaje.conocidos(ids));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    // ------------------------------------------------------------------ los fragmentos del mapa de Morvain (parte 7d)
+
+    /** Las regiones de Morvain cuyo mapa tiene (sus ids): el mapa de la M las ensena dibujadas. */
+    public record Mapas(List<String> ids) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(ids.size());
+            for (String s : ids) b.writeUtf(s, 32);
+        }
+
+        static Mapas read(FriendlyByteBuf b) {
+            int k = Math.min(b.readVarInt(), 32);
+            List<String> l = new ArrayList<>();
+            for (int i = 0; i < k; i++) l.add(b.readUtf(32));
+            return new Mapas(l);
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.morvain.ClientMapa.mapas(ids));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Usar la estela del mapa de pos (la tecla del aviso). */
+    public record EstelaUsar(net.minecraft.core.BlockPos pos) {
+        void write(FriendlyByteBuf b) {
+            b.writeBlockPos(pos);
+        }
+
+        static EstelaUsar read(FriendlyByteBuf b) {
+            return new EstelaUsar(b.readBlockPos());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.morvain.Fragmentos.usar(p, pos);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Viajar desde el mapa de la M al santuario de Morvain {@code id} (sin estar descansando). */
+    public record ViajarMapa(String id) {
+        void write(FriendlyByteBuf b) {
+            b.writeUtf(id, 48);
+        }
+
+        static ViajarMapa read(FriendlyByteBuf b) {
+            return new ViajarMapa(b.readUtf(48));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.morvain.Viaje.desdeMapa(p, id);
             ctx.get().setPacketHandled(true);
         }
     }
@@ -912,6 +975,8 @@ public final class Net {
         public static final int MUERTE = 0, JEFE = 1, ZONA = 2, ECOS = 3, GUARDIA = 4, SANTUARIO = 6, AVISO = 7;
         /** Una pieza del barco encontrada (la clave es su nombre; n, cuantas van) y el barco reparado. */
         public static final int PIEZA = 8, BARCO = 9;
+        /** Un fragmento del mapa de Morvain (la clave es el nombre de la region; n, cuantos van). */
+        public static final int FRAGMENTO = 10;
 
         void write(FriendlyByteBuf b) {
             b.writeByte(tipo);

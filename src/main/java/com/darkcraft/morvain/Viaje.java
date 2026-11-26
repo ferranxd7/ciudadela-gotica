@@ -72,13 +72,33 @@ public final class Viaje {
             return;
         }
         if (!conocidos(sp).contains(id) && !sp.isCreative()) return;
+        empezar(sp, desde.id(), id);
+    }
+
+    /**
+     * Lo pide el cliente desde el mapa de la M (parte 7d, como en Elden Ring): desde cualquier sitio de Morvain, sin
+     * estar descansando, a uno que conoce; no con enemigos encima.
+     */
+    public static void desdeMapa(ServerPlayer sp, String id) {
+        SantuariosMorvain.Sitio hacia = SantuariosMorvain.porId(id);
+        if (!sp.isAlive() || sp.isSpectator() || hacia == null || !Morvain.es(sp.level()) || PENDIENTES.containsKey(sp.getUUID())) return;
+        if (!sp.isCreative() && com.darkcraft.rol.Rol.enCombate(sp)) {
+            Net.to(sp, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.viaje.enemigos", 0));
+            return;
+        }
+        if (!conocidos(sp).contains(id) && !sp.isCreative()) return;
+        if (hacia.pos().distToCenterSqr(sp.position()) < 8 * 8) return;
+        empezar(sp, "mapa", id);
+    }
+
+    private static void empezar(ServerPlayer sp, String desde, String id) {
         ServerLevel m = sp.serverLevel();
         m.playSound(null, sp.getX(), sp.getY(), sp.getZ(), DarkCraftMod.SFX_SANTUARIO_DESCANSO.get(), SoundSource.PLAYERS, 0.9f, 0.8f);
         // a los pies (a la altura de los ojos tapaban la camara de quien viaja)
         m.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, sp.getX(), sp.getY() + 0.2, sp.getZ(), 26, 0.7, 0.12, 0.7, 0.02);
         Net.to(sp, new Net.Fundido(FUNDIDO));
         PENDIENTES.put(sp.getUUID(), new Pendiente(id, sp.server.getTickCount() + CORTE));
-        DarkCraftMod.LOGGER.info("[DarkCraft] viaje: {} de {} a {}", sp.getGameProfile().getName(), desde.id(), id);
+        DarkCraftMod.LOGGER.info("[DarkCraft] viaje: {} de {} a {}", sp.getGameProfile().getName(), desde, id);
     }
 
     @SubscribeEvent

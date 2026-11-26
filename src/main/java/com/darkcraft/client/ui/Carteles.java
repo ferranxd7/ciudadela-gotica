@@ -51,6 +51,8 @@ public final class Carteles {
             case Net.Cartel.PIEZA -> COLA.add(new Cartel(Net.Cartel.PIEZA, Component.translatable(m.clave()),
                     Component.translatable("darkcraft.cartel.pieza", m.n(), 5)));
             case Net.Cartel.BARCO -> COLA.add(new Cartel(Net.Cartel.BARCO, Component.translatable("darkcraft.cartel.barco"), Component.translatable(m.clave())));
+            case Net.Cartel.FRAGMENTO -> COLA.add(new Cartel(Net.Cartel.PIEZA, Component.translatable(m.clave()),
+                    Component.translatable("darkcraft.cartel.fragmento", m.n(), com.darkcraft.morvain.Fragmentos.ESTELAS.length)));
             case Net.Cartel.AVISO -> {
                 aviso = m.n() > 0 ? Component.translatable(m.clave(), m.n()) : Component.translatable(m.clave());
                 avisoInicio = ClientRol.ticks;

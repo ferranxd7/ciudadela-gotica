@@ -1543,5 +1543,21 @@
   "advancements.darkcraft.viaje.title": "From Fire to Fire",
   "advancements.darkcraft.viaje.description": "Travel between two sanctuaries of Morvain",
   "darkcraft.diario.viaje": "I rested by the fire and thought of another I had already kindled. When I opened my eyes, I was there. The sanctuaries of Morvain remember one another.",
-  "darkcraft.ayuda.viaje": "travel between the sanctuaries of Morvain: the ones you know, mark them as known, forget them or take you to one"
+  "darkcraft.ayuda.viaje": "travel between the sanctuaries of Morvain: the ones you know, mark them as known, forget them or take you to one",
+  "block.darkcraft.estela_mapa": "Map Stele",
+  "darkcraft.aviso.estela": "to copy the stele's map",
+  "darkcraft.estela.ya": "You already have the map of this region.",
+  "darkcraft.cartel.fragmento": "Map fragment · %s of %s",
+  "darkcraft.viaje.enemigos": "You cannot travel with enemies nearby.",
+  "darkcraft.viaje.clic": "Click: travel here",
+  "darkcraft.viaje.pregunta": "Travel to “%s”?",
+  "darkcraft.viaje.si": "Travel",
+  "darkcraft.viaje.no": "Stay",
+  "darkcraft.morvain.lugar.ciudadela": "The Chained Citadel",
+  "advancements.darkcraft.fragmento.title": "The Map in the Stone",
+  "advancements.darkcraft.fragmento.description": "Copy the map from a stele of Morvain",
+  "advancements.darkcraft.mapa_morvain.title": "Cartographer of the Withered Lands",
+  "advancements.darkcraft.mapa_morvain.description": "Copy all nine map fragments of Morvain",
+  "darkcraft.diario.fragmento": "Beside the fire stood a stele with the region's map carved into the stone and a parchment nailed to it. I copied it into the Shadow's book: now I know where I am.",
+  "darkcraft.diario.mapa_morvain": "Nine steles, nine fragments. The map of Morvain is whole in my book... and every road leads to the chained castle."
 }

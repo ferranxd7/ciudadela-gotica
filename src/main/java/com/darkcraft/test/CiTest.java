@@ -707,6 +707,25 @@ public final class CiTest {
         } catch (Throwable t) {
             log.println("Morvain, los santuarios: ERROR " + t);
         }
+        // las estelas del mapa (parte 7d): una por region, cada una con su bloque mirando al sur
+        try {
+            StringBuilder se = new StringBuilder("Morvain, las estelas del mapa:");
+            int bienE = 0;
+            for (com.darkcraft.morvain.Fragmentos.Estela es : com.darkcraft.morvain.Fragmentos.ESTELAS) {
+                m.getChunk(es.x() >> 4, es.z() >> 4);
+                var st = m.getBlockState(es.pos());
+                boolean hay = st.is(DarkCraftMod.ESTELA_MAPA.get());
+                boolean sur = hay && st.getValue(com.darkcraft.morvain.EstelaBlock.FACING) == net.minecraft.core.Direction.SOUTH;
+                boolean libre = m.getBlockState(es.pos().south()).isAir() && m.getBlockState(es.pos().south().above()).isAir();
+                if (hay && sur && libre) bienE++;
+                else se.append(' ').append(es.region().id).append(" (").append(es.pos().toShortString()).append(": ")
+                        .append(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(st.getBlock()).getPath())
+                        .append(sur ? "" : ", no mira al sur").append(libre ? "" : ", delante no hay hueco").append(");");
+            }
+            log.println(se + " " + bienE + " de " + com.darkcraft.morvain.Fragmentos.ESTELAS.length + " en su sitio, mirando al sur y con hueco delante");
+        } catch (Throwable t) {
+            log.println("Morvain, las estelas del mapa: ERROR " + t);
+        }
     }
 
     /** Las celdas del hueco del arco del portal (las de bloque de portal). */

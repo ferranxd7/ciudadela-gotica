@@ -246,6 +246,8 @@ public final class ClientRol {
                     else if (que == SANTUARIO && ClientSantuario.aMano != null) Net.CH.sendToServer(new Net.SantuarioUsar(ClientSantuario.aMano));
                     else if (que == PERSONAJE) Net.CH.sendToServer(new Net.Hablar(com.darkcraft.client.personajes.ClientPersonajes.aMano));
                     else if (que == COSA) Net.CH.sendToServer(new Net.CosaUsar(ClientPueblo.aMano));
+                    else if (que == ESTELA && com.darkcraft.client.morvain.ClientMapa.aMano != null)
+                        Net.CH.sendToServer(new Net.EstelaUsar(com.darkcraft.client.morvain.ClientMapa.aMano));
                     enfriamiento = 12;
                 }
             }
@@ -257,6 +259,7 @@ public final class ClientRol {
         if (enfriamientoFrasco > 0) enfriamientoFrasco--;
         frascos(mc);
         ClientSantuario.tick(mc);
+        com.darkcraft.client.morvain.ClientMapa.tick(mc);
         com.darkcraft.client.personajes.ClientPersonajes.tick(mc);
         ClientPueblo.tick(mc);
         Bebida.tick(mc);
@@ -275,11 +278,12 @@ public final class ClientRol {
     }
 
     /** Lo que el jugador tiene a mano para la tecla del aviso. */
-    public static final int NADA = 0, ESPADA = 1, SANTUARIO = 2, PERSONAJE = 3, COSA = 4;
+    public static final int NADA = 0, ESPADA = 1, SANTUARIO = 2, PERSONAJE = 3, COSA = 4, ESTELA = 5;
 
     public static int aMano() {
         if (juntoAEspada()) return ESPADA;
         if (ClientSantuario.aMano != null) return SANTUARIO;
+        if (com.darkcraft.client.morvain.ClientMapa.aMano != null) return ESTELA;
         if (com.darkcraft.client.personajes.ClientPersonajes.aMano >= 0) return PERSONAJE;
         return ClientPueblo.aMano >= 0 ? COSA : NADA;
     }
