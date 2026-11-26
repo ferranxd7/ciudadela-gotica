@@ -5991,6 +5991,8 @@ public final class ClientCiTest {
         t = mapaMorvain(t);
         // Velmor y los Marchitos (parte 7e)
         t = velmor(t);
+        // el molino y la Molinera de Velmor (parte 7f)
+        t = molinera(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -6404,6 +6406,200 @@ public final class ClientCiTest {
             });
         });
         return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el molino y la Molinera de Velmor (parte 7f)
+
+    private static com.darkcraft.enemigos.Molinera molinera() {
+        var e = com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.MOLINO, com.darkcraft.morvain.MorvainEnemigos.molinera());
+        return e instanceof com.darkcraft.enemigos.Molinera mo ? mo : null;
+    }
+
+    /**
+     * El molino y la Molinera: el molino desde el camino, la era con ella de rodillas, en supervivencia se levanta mientras
+     * habla y grita al acabar (su barra y su musica), sus golpes de cerca (la siega, el tajo con su onda, el giro, la
+     * estocada y el pisoton), a media vida llama a los suyos, cae (el cartel y la hazana), la reja del molino abierta y el
+     * bestiario. Al acabar vuelve a estar en pie (lo de despues es de antes).
+     */
+    private static int molinera(int T) {
+        final var Q = com.darkcraft.morvain.MorvainEnemigos.molino().get(com.darkcraft.morvain.MorvainEnemigos.molinera());
+        final int EX = com.darkcraft.morvain.Molino.EX, EZ = com.darkcraft.morvain.Molino.EZ, Y = com.darkcraft.morvain.Molino.Y;
+        int t = T;
+        atTicks(t, "El molino: desde el camino", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft molinera volver");
+                irMirando(sp, 1072.5, 86, 4057.5, com.darkcraft.morvain.Molino.MX, Y + 16, EZ, true);
+            });
+        });
+        t += 260;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv59_molino_camino");
+            server(m, sp -> log("  molino: " + com.darkcraft.morvain.MorvainEnemigos.estadoMolinera(sp.server)));
+        });
+        t += 10;
+        atTicks(t, "El molino: la era y la Molinera de rodillas", m -> server(m, sp -> irMirando(sp, EX - 13.5, Y + 4, EZ - 6.5, EX + 1, Y + 2, EZ, true)));
+        t += 90;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv60_molinera_rodillas");
+            server(m, sp -> log("  en la era: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + " | " + estadoE(molinera())));
+        });
+        t += 4;
+        // ---- en supervivencia, por detras (como se llega por el camino): se levanta mientras habla y grita al acabar
+        final int F = t;
+        atTicks(F, "La Molinera: en supervivencia por detras", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                irMirando(sp, EX - 11.5, Y + 1, EZ + 0.5, EX + 0.5, Y + 3, EZ + 0.5, false);
+            });
+        });
+        atTicks(F + 46, "captura: se levanta (y habla)", m -> {
+            server(m, sp -> log("  la Molinera al verle: " + estadoE(molinera()) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv61_molinera_se_alza");
+        });
+        final int grito = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Molinera.VOZ_BASE + 1) - 24;
+        atTicks(F + grito + 12, "captura: grita (su barra)", m -> {
+            server(m, sp -> log("  la Molinera grita: " + estadoE(molinera()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())));
+            log("  molinera: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv62_molinera_grito");
+        });
+        t = F + grito + 16;
+        // ---- sus golpes de cerca (en creativo, con la camara de observador)
+        atTicks(t, "La Molinera: sus golpes de cerca (creativo)", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                irMirando(sp, EX - 8.5, Y + 1, EZ + 12.5, EX, Y + 2, EZ, false);
+            });
+        });
+        t += 4;
+        // {accion, camara: a su derecha, arriba, delante; mira delante; tick de la captura, nombre}
+        Object[][] golpes = {
+                {com.darkcraft.enemigos.MolineraAnims.SIEGA, 6.5, 2.6, 5.0, 2.0, 20, "cliente_mv63_siega"},
+                {com.darkcraft.enemigos.MolineraAnims.TAJO, 6.0, 3.0, 4.0, 3.0, 24, "cliente_mv64_tajo_onda"},
+                {com.darkcraft.enemigos.MolineraAnims.GIRO, 7.0, 3.4, 3.0, 1.0, 22, "cliente_mv65_giro"},
+                {com.darkcraft.enemigos.MolineraAnims.ESTOCADA, 5.5, 2.4, 6.5, 4.0, 17, "cliente_mv66_estocada"},
+                {com.darkcraft.enemigos.MolineraAnims.PISOTON, 4.5, 2.6, -4.5, 0.0, 12, "cliente_mv67_pisoton"}};
+        for (Object[] gp : golpes) {
+            final int accion = (int) gp[0], c1 = (int) gp[5];
+            final double cdx = (double) gp[1], cdy = (double) gp[2], cdz = (double) gp[3], delante = (double) gp[4];
+            final String n1 = (String) gp[6];
+            final int G = t;
+            atTicks(G, "La Molinera: " + n1, m -> server(m, sp -> {
+                var e = molinera();
+                if (e == null) return;
+                float g = Q.giro() + 180f;
+                e.setTarget(null);
+                e.moveTo(Q.x() + 0.5, Q.y(), Q.z() + 0.5, g, 0f);
+                e.setYRot(g);
+                e.yBodyRot = e.yHeadRot = g;
+                e.empezar(accion);
+                double fx = -Math.sin(Math.toRadians(g)), fz = Math.cos(Math.toRadians(g));
+                verDesdeServidor = new Vec3(e.getX() - fz * cdx + fx * cdz, e.getY() + cdy, e.getZ() + fx * cdx + fz * cdz);
+                miraServidor = new Vec3(e.getX() + fx * delante, e.getY() + 1.6, e.getZ() + fz * delante);
+            }));
+            atTicks(G + 2, "camara de cerca", m -> {
+                if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+            });
+            atTicks(G + c1, "captura: " + n1, m -> {
+                server(m, sp -> log("  la Molinera, " + n1 + ": " + estadoE(molinera()) + " ondas " + (molinera() == null ? -1 : molinera().ondas())));
+                shot(m, n1);
+            });
+            t = G + Math.max(c1, com.darkcraft.enemigos.MolineraAnims.TICKS[accion]) + 14;
+        }
+        // ---- a media vida, en supervivencia: grita y salen los suyos de la ceniza de la era
+        final int H = t;
+        atTicks(H, "La Molinera: a media vida (supervivencia)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                var e = molinera();
+                if (e == null) return;
+                e.moveTo(Q.x() + 0.5, Q.y(), Q.z() + 0.5, Q.giro() + 180f, 0f);
+                irMirando(sp, EX - 9.5, Y + 1, EZ + 0.5, EX + 0.5, Y + 3, EZ + 0.5, false);
+                e.setTarget(sp);
+                e.setHealth(e.getMaxHealth() * 0.45f);
+            });
+        });
+        atTicks(H + 40, "a los 2 s", m -> server(m, sp -> log("  la Molinera a media vida, a los 2 s: " + estadoE(molinera()))));
+        atTicks(H + 92, "captura: llama a los suyos", m -> {
+            server(m, sp -> log("  la Molinera llama: " + com.darkcraft.morvain.MorvainEnemigos.estadoMolinera(sp.server)));
+            log("  molinera: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv68_molinera_llama");
+        });
+        // ---- cae: el cartel, la hazana y la reja del molino abierta
+        final int C = H + 96;
+        atTicks(C, "La Molinera: cae", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var e = molinera();
+                if (e == null) return;
+                log("  antes de caer la Molinera: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "molinera"));
+                double fx = -Math.sin(Math.toRadians(e.getYRot())), fz = Math.cos(Math.toRadians(e.getYRot()));
+                verDesdeServidor = new Vec3(e.getX() + fx * 7 + fz * 3, e.getY() + 3.0, e.getZ() + fz * 7 - fx * 3);
+                miraServidor = new Vec3(e.getX(), e.getY() + 1.4, e.getZ());
+                e.hurt(sp.damageSources().playerAttack(sp), 99999f);
+            });
+        });
+        atTicks(C + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 36, "captura: cae", m -> shot(m, "cliente_mv69_molinera_cae"));
+        atTicks(C + 40, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 120, "captura: JEFE ABATIDO", m -> {
+            log("  molinera: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  tras caer la Molinera: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "molinera")
+                    + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoMolinera(sp.server)));
+            shot(m, "cliente_mv70_jefe_abatido");
+        });
+        atTicks(C + 124, "La reja del molino, abierta", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                int[] p = com.darkcraft.morvain.Molino.get().sitio("puerta_molino");
+                irMirando(sp, p[0] - 6.5, p[1] + 0.5, p[2] + 3.5, p[0] + 3, p[1] + 1.5, p[2], false);
+            });
+        });
+        atTicks(C + 160, "captura: la reja abierta", m -> {
+            server(m, sp -> log("  el molino tras caer: " + com.darkcraft.morvain.Molino.resumen(sp.serverLevel())));
+            shot(m, "cliente_mv71_molino_abierto");
+        });
+        atTicks(C + 162, "el bestiario: la Molinera", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("molinera")));
+        });
+        atTicks(C + 180, "captura: la Molinera en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv72_bestiario_molinera");
+        });
+        atTicks(C + 184, "El molino: fin (la Molinera vuelve, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Marchito.class, sp.getBoundingBox().inflate(60)))
+                    if (e.esEfimero()) e.discard();
+                comando(sp, "darkcraft molinera volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return C + 214;
     }
 
     private static int mapaMorvain(int T) {

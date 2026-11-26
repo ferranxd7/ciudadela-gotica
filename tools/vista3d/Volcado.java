@@ -381,6 +381,36 @@ public class Volcado {
                     if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
                 }
             }
+            case "morvain_molino" -> {
+                // el molino de la Molinera, al este de Velmor (parte 7f): la loma, la era, el molino, las aspas y el camino
+                // (-Dcaja=x0,z0,x1,z1 para un trozo; por defecto la loma y lo de alrededor)
+                String[] k = System.getProperty("caja", "1060,4020,1186,4126").split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 58);
+                com.darkcraft.morvain.Molino v = com.darkcraft.morvain.Molino.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("El molino: " + v.elementos().size() + " piezas, " + hechos + " chunks; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                // y se recorre a pie: del camino a la era, a la puerta del molino y (con la reja abierta) al arcon de arriba
+                andarMolino(lvl, v);
+            }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);
@@ -388,6 +418,40 @@ public class Volcado {
         System.out.println(que + ": " + MUNDO.size() + " bloques en " + (System.currentTimeMillis() - t0) + " ms; caja " + minX + "," + minY + "," + minZ
                 + " .. " + maxX + "," + maxY + "," + maxZ + "; entidades " + ENTIDADES.size());
         escribir(salida, marcas);
+    }
+
+    /** El molino (parte 7f): se llega a pie del camino a la era y a la puerta; con la reja quitada, al arcon de arriba. */
+    static void andarMolino(WorldGenLevel lvl, com.darkcraft.morvain.Molino v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+        int[] c = v.sitio("camino"), era = v.sitio("era"), puerta = v.sitio("puerta_molino"), cofre = v.sitio("cofre_molino");
+        int X = com.darkcraft.morvain.Molino.MX, Z = com.darkcraft.morvain.Molino.MZ;
+        var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, c[0], c[1], c[2], 990, 4000, 1200, 4140, 900_000);
+        System.out.println("a pie desde el camino: " + z0.celdas() + " celdas; la era " + z0.alcanza(era[0], era[1], era[2], 2) + ", la puerta del molino "
+                + z0.alcanza(puerta[0], puerta[1], puerta[2], 2) + ", dentro (reja cerrada) " + z0.alcanza(X, com.darkcraft.morvain.Molino.Y + 1, Z + 2, 1.5)
+                + ", el arcon " + z0.alcanza(cofre[0], cofre[1], cofre[2], 2));
+        if (Boolean.getBoolean("debugMolino"))
+            for (int y = com.darkcraft.morvain.Molino.Y; y <= com.darkcraft.morvain.Molino.Y + 4; y++) {
+                StringBuilder f = new StringBuilder("  y " + y + ":");
+                for (int x = X - 7; x <= X + 1; x++) f.append(' ').append(mundo.en(x, y, Z).getBlock().getDescriptionId().replace("block.minecraft.", ""));
+                System.out.println(f);
+            }
+        for (int[] r : com.darkcraft.morvain.Molino.reja()) MUNDO.remove(BlockPos.asLong(r[0], r[1], r[2]));
+        var z1 = com.darkcraft.pueblo.gen.Andar.desde(mundo, c[0], c[1], c[2], 990, 4000, 1200, 4140, 900_000);
+        System.out.println("con la reja abierta: dentro " + z1.alcanza(X, com.darkcraft.morvain.Molino.Y + 1, Z + 2, 1.5) + ", el arcon de arriba "
+                + z1.alcanza(cofre[0], cofre[1], cofre[2], 2));
+        if (Boolean.getBoolean("debugMolino")) {
+            StringBuilder f = new StringBuilder("  escalera:");
+            for (int y = com.darkcraft.morvain.Molino.Y; y <= com.darkcraft.morvain.Molino.Y + 13; y++)
+                f.append(' ').append(y).append('=').append(mundo.en(X + 1, y, Z).getBlock().getDescriptionId().replace("block.minecraft.", ""))
+                        .append(z1.pisa(X + 1, y, Z) ? "[pisa]" : "");
+            System.out.println(f);
+            StringBuilder g = new StringBuilder("  al lado:");
+            for (int y = com.darkcraft.morvain.Molino.Y + 8; y <= com.darkcraft.morvain.Molino.Y + 13; y++)
+                g.append(' ').append(y).append('=').append(mundo.en(X + 2, y, Z).getBlock().getDescriptionId().replace("block.minecraft.", ""))
+                        .append(z1.pisa(X + 2, y, Z) ? "[pisa]" : "");
+            System.out.println(g);
+        }
     }
 
     /** El volcado: caja, paleta de estados y un indice de 16 bits por bloque (x, z, y), comprimido. */

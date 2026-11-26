@@ -62,7 +62,8 @@ public final class Guardianes {
     private static final Map<UUID, Integer> AVISADO = new HashMap<>();
 
     /** Lo que queda por repartir cuando ha caido un guardian: (tick del servidor, quien, los que pelearon, donde). */
-    private record Reparto(int cuando, String tipo, int ecos, String logro, Set<UUID> quienes, double x, double y, double z) {}
+    private record Reparto(int cuando, String tipo, int ecos, String logro, Set<UUID> quienes,
+                           net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dim, double x, double y, double z) {}
 
     private static final List<Reparto> REPARTOS = new ArrayList<>();
 
@@ -187,7 +188,7 @@ public final class Guardianes {
         if (!(e instanceof Guardian g) || !(e.level() instanceof ServerLevel lvl)) return;
         Set<UUID> quienes = new HashSet<>(g.rivales());
         if (quien != null) quienes.add(quien.getUUID());
-        REPARTOS.add(new Reparto(lvl.getServer().getTickCount() + 80, g.tipo(), g.ecos(), g.logro(), quienes, e.getX(), e.getY(), e.getZ()));
+        REPARTOS.add(new Reparto(lvl.getServer().getTickCount() + 80, g.tipo(), g.ecos(), g.logro(), quienes, lvl.dimension(), e.getX(), e.getY(), e.getZ()));
         // el sello se rompe en cuanto cae
         List<Sello> l = SELLOS.get(e.sitio());
         if (l != null) for (Sello v : l) if (v.puesto == e.puesto() && v.cerrado) abrir(lvl, v, true);
@@ -195,7 +196,8 @@ public final class Guardianes {
     }
 
     private static void repartir(MinecraftServer srv, Reparto r) {
-        ServerLevel lvl = srv.overworld();
+        // (en el mundo donde cayo: los de Valdrenn en el de las nubes; la Molinera, en Morvain)
+        ServerLevel lvl = srv.getLevel(r.dim());
         for (ServerPlayer p : srv.getPlayerList().getPlayers()) {
             boolean cerca = p.level() == lvl && p.distanceToSqr(r.x(), r.y(), r.z()) < 48 * 48;
             if (!r.quienes().contains(p.getUUID()) && !cerca) continue;

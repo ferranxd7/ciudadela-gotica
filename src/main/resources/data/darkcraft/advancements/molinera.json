@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:velmor",
+  "display": {
+    "icon": {
+      "item": "minecraft:wheat"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.molinera.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.molinera.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 400
+  }
+}

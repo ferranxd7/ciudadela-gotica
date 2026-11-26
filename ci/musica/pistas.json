@@ -147,5 +147,16 @@
     "aviso": "http://cynicmusic.com http://pixelsphere.org",
     "uso": "Vareth, el Guardian de Corteza (el guardian de la torre del arbol)",
     "lufs": -16
+  },
+  {
+    "id": "molinera",
+    "pagina": "https://opengameart.org/node/70512",
+    "busca": "final_boss_lair",
+    "titulo": "Final_Boss_Lair",
+    "autor": "HitCtrl",
+    "licencia": "CC-BY 3.0",
+    "aviso": "HitCtrl",
+    "uso": "La Molinera de Velmor (el jefe de las Llanuras Pálidas de Morvain)",
+    "lufs": -16
   }
 ]

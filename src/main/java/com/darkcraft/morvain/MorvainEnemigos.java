@@ -18,20 +18,22 @@ import java.util.List;
  * cementerio, en la taberna, la herreria y la casa del alguacil, por los campos; y dos <b>campaneros</b>: a la puerta de la
  * capilla y en los campos del este. Si un campanero te ve, toca y acuden los de alrededor ({@link Marchito#LLAMADA}).</li>
  * <li><b>Las llanuras</b> (sitio {@value #LLANURAS}): tres que vagan solos entre el Arco del Umbral y Velmor.</li>
+ * <li><b>El molino</b> (sitio {@value #MOLINO}, parte 7f): la Molinera de rodillas en medio de la era (un jefe: cae una
+ * vez) y dos marchitos por el camino que va de Velmor al molino.</li>
  * </ul>
  * Nadie a menos de 18 bloques del arco ni de 14 de un santuario.
  */
 public final class MorvainEnemigos {
     private MorvainEnemigos() {}
 
-    public static final String VELMOR = "velmor", LLANURAS = "llanuras";
-    static final String MARCHITO = "marchito";
+    public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino";
+    static final String MARCHITO = "marchito", MOLINERA = "molinera";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
     private static final int G = Marchito.GUADANA, F = Marchito.FAROL, C = Marchito.CAMPANA;
 
-    private static final List<Puesto> VELMOR_P = new ArrayList<>(), LLANURAS_P = new ArrayList<>();
+    private static final List<Puesto> VELMOR_P = new ArrayList<>(), LLANURAS_P = new ArrayList<>(), MOLINO_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -96,14 +98,36 @@ public final class MorvainEnemigos {
             int x = s[0], z = s[1];
             LLANURAS_P.add(new Puesto(MARCHITO, G, x, (int) Math.floor(Terreno.columna(x, z).altura()) + 1, z, NORTE, DE_PIE, 8, "llanuras"));
         }
+        // ---- el molino (parte 7f): la Molinera de rodillas ante la piedra de moler, mirando al molino (el puesto 0); y
+        // por el camino desde Velmor, uno con su farol que mira hacia el pueblo y otro de rodillas mirando al molino
+        MOLINO_P.add(new Puesto(MOLINERA, 0, Molino.EX, Molino.Y + 1, Molino.EZ, ESTE, REZA, 0, Puestos.JEFE));
+        MOLINO_P.add(new Puesto(MARCHITO, F, 1030, Molino.pie(1030, 4055), 4055, OESTE, DE_PIE, 4, "camino_molino"));
+        MOLINO_P.add(new Puesto(MARCHITO, G, 1062, Molino.pie(1062, 4059), 4059, ESTE, REZA, 0, "camino_molino"));
+    }
+
+    /** El numero del puesto de la Molinera en el sitio del molino. */
+    public static int molinera() {
+        return 0;
     }
 
     /** Lo apunta el mod al arrancar. */
     public static void registrar() {
         Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
+        Puestos.tipo(MOLINERA, DarkCraftMod.MOLINERA);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
+        Puestos.registrar(MOLINO, MOLINO_P, Morvain::es);
+        // al caer la Molinera se abre la reja del molino
+        Puestos.alCaer((e, quien) -> {
+            if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
+                Molino.puerta(sl, true, true);
+        });
+    }
+
+    public static List<Puesto> molino() {
+        preparar();
+        return List.copyOf(MOLINO_P);
     }
 
     public static List<Puesto> velmor() {
@@ -172,7 +196,58 @@ public final class MorvainEnemigos {
     /** Cuantos quedan en pie y cuantos andan fuera. */
     public static String estado(net.minecraft.server.MinecraftServer srv) {
         return "Velmor: quedan " + Puestos.quedan(srv, VELMOR) + " de " + VELMOR_P.size() + " (fuera " + Puestos.fuera(VELMOR) + "); llanuras: quedan "
-                + Puestos.quedan(srv, LLANURAS) + " de " + LLANURAS_P.size();
+                + Puestos.quedan(srv, LLANURAS) + " de " + LLANURAS_P.size() + "; molino: quedan " + Puestos.quedan(srv, MOLINO) + " de " + MOLINO_P.size()
+                + " (la Molinera " + (Molino.vencida(srv) ? "caida" : Puestos.enemigo(MOLINO, molinera()) != null ? "fuera" : "esperando") + ")";
+    }
+
+    /** {@code /darkcraft molinera [ir | vencer | volver]}: como esta la Molinera, llevar ante la era, vencerla o que vuelva. */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoMolinera() {
+        return net.minecraft.commands.Commands.literal("molinera")
+                .executes(c -> decir(c, estadoMolinera(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> {
+                    var sp = c.getSource().getPlayerOrException();
+                    var m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    int[] e = Molino.get().sitio("entrada");
+                    sp.teleportTo(m, e[0] + 0.5, e[1] + 0.05, e[2] + 0.5, -90f, 8f);
+                    return decir(c, estadoMolinera(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(MOLINO, molinera());
+                    if (e != null) e.kill();
+                    else {
+                        Puestos.marcar(srv, MOLINO, molinera(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "molinera");
+                    }
+                    var m = Morvain.nivel(srv);
+                    if (m != null) Molino.puerta(m, true, true);
+                    return decir(c, estadoMolinera(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, MOLINO, molinera(), false);
+                    var m = Morvain.nivel(srv);
+                    if (m != null) Molino.puerta(m, false, false);
+                    return decir(c, estadoMolinera(srv));
+                }));
+    }
+
+    private static int decir(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, String s) {
+        c.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal(s), false);
+        return 1;
+    }
+
+    /** Como esta la Molinera (para el comando y las pruebas). */
+    public static String estadoMolinera(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(MOLINO, molinera());
+        String s = "la Molinera: " + (Molino.vencida(srv) ? "caida" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Molinera mo)
+            s += String.format(java.util.Locale.ROOT, ", vida %.0f/%.0f, postura %d, accion %d, pelea %s, segunda %s, suyos %d, en %.1f %.1f %.1f",
+                    mo.getHealth(), mo.getMaxHealth(), mo.postura(), mo.accion(), mo.enPelea(), mo.segunda(), mo.suyos(), mo.getX(), mo.getY(), mo.getZ());
+        var m = Morvain.nivel(srv);
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(Molino.MX, Molino.Y, Molino.MZ))) s += "; " + Molino.resumen(m);
+        return s;
     }
 
     /** Para la prueba: que ningun puesto quede cerca del arco ni de un santuario. */
@@ -181,13 +256,14 @@ public final class MorvainEnemigos {
         int cerca = 0;
         List<Puesto> todos = new ArrayList<>(VELMOR_P);
         todos.addAll(LLANURAS_P);
+        todos.addAll(MOLINO_P);
         for (Puesto p : todos) {
             if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
             for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
         }
         int camp = 0;
         for (Puesto p : VELMOR_P) if (p.variante() == C) camp++;
-        return VELMOR_P.size() + " en Velmor (" + camp + " campaneros) y " + LLANURAS_P.size() + " por las llanuras; cerca del arco o de un santuario "
-                + cerca;
+        return VELMOR_P.size() + " en Velmor (" + camp + " campaneros), " + LLANURAS_P.size() + " por las llanuras y " + MOLINO_P.size()
+                + " en el molino; cerca del arco o de un santuario " + cerca;
     }
 }

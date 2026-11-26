@@ -286,6 +286,8 @@ public final class Morvain {
                 }
             }
         }
+        // el molino de la Molinera (parte 7f): la reja de su puerta y su crujido con el viento
+        if (m != null && srv.getTickCount() % 100 == 13) Molino.crujir(m);
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
             if (Llegada.cerca(p.getX(), p.getZ(), 160)) {
@@ -345,6 +347,8 @@ public final class Morvain {
         if (Llegada.cerca(p.getX(), p.getZ(), 34) && Math.abs(p.getY() - Llegada.Y) < 30) return "darkcraft.morvain.lugar.umbral";
         // Velmor, el pueblo marchito (parte 7e)
         if (Velmor.dentro(p.getX(), p.getZ()) && p.getY() < 140) return "darkcraft.morvain.lugar.velmor";
+        // el molino de la Molinera (parte 7f)
+        if (Molino.dentro(p.getX(), p.getZ()) && p.getY() < 140) return "darkcraft.morvain.lugar.molino";
         return "darkcraft.zona.morvain." + Terreno.region(p.getX(), p.getZ()).id;
     }
 

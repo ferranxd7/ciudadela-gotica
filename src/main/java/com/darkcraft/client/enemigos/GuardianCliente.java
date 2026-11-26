@@ -16,7 +16,8 @@ import java.util.Random;
 /**
  * Las barras de vida de los dos guardianes de Valdrenn (parte 4d), como la del Capitan: Ser Brandt (hierro negro con
  * filos rojos, el paves con la corona; sangre que corre y chispas al recibir dano) y Vareth (corteza con musgo y raices,
- * el corazon verde; savia que corre y hojas que caen). Las texturas las pinta tools/hud/barra_guardianes.py.
+ * el corazon verde; savia que corre y hojas que caen); y la de la Molinera de Velmor (parte 7f: la viga del molino con
+ * espigas y la piedra de moler; brasas que corren y ceniza que cae). Las texturas las pinta tools/hud/barra_guardianes.py.
  */
 public final class GuardianCliente {
     private GuardianCliente() {}
@@ -35,7 +36,7 @@ public final class GuardianCliente {
 
     private static final List<Gota> GOTAS = new ArrayList<>();
 
-    /** {@code nombre}: "brandt" o "corteza" (el de la clave de su nombre). */
+    /** {@code nombre}: "brandt", "corteza" o "molinera" (el de la clave de su nombre). */
     public static void barra(CustomizeGuiOverlayEvent.BossEventProgress e, int ticks, String nombre) {
         if (!e.isCancelable()) return;
         if (!nombre.equals(actual)) {
@@ -43,7 +44,7 @@ public final class GuardianCliente {
             BARRA = new ResourceLocation(DarkCraftMod.MODID, "textures/gui/" + nombre + "_barra.png");
             ultimo = ticks - 100;
         }
-        boolean hojas = nombre.equals("corteza");
+        boolean hojas = nombre.equals("corteza"), ceniza = nombre.equals("molinera");
         e.setCanceled(true);
         GuiGraphics g = e.getGuiGraphics();
         Minecraft mc = Minecraft.getInstance();
@@ -78,7 +79,7 @@ public final class GuardianCliente {
             while (it.hasNext()) {
                 Gota h = it.next();
                 h.edad++;
-                if (actual.equals("corteza")) {
+                if (actual.equals("corteza") || actual.equals("molinera")) {
                     h.vy = Math.min(0.9f, h.vy + 0.05f);
                     h.x += h.vx + (float) Math.sin((h.edad + h.tipo * 7) * 0.35) * 0.45f;
                 } else {
@@ -96,7 +97,7 @@ public final class GuardianCliente {
         g.pose().translate(sw / 2f, y0, 0);
         g.pose().scale(sc, sc, 1f);
         g.pose().translate(-128, 0, 0);
-        g.drawCenteredString(mc.font, Component.translatable("entity.darkcraft." + nombre), 128, -8, hojas ? 0xFFB9F0C4 : 0xFFF0C8B8);
+        g.drawCenteredString(mc.font, Component.translatable("entity.darkcraft." + nombre), 128, -8, hojas ? 0xFFB9F0C4 : ceniza ? 0xFFF2DDB8 : 0xFFF0C8B8);
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         // hueco, rastro y relleno (la bruma corre)
         g.blit(BARRA, 8, 19, 0, 80, 240, 7, 256, 128);
@@ -105,7 +106,7 @@ public final class GuardianCliente {
         int cuadro = (ticks / 5) & 3;
         if (wf > 0) g.blit(BARRA, 8, 19, 0, 48 + 8 * cuadro, wf, 7, 256, 128);
         // destello al recibir un golpe
-        if (ticks - golpe < 4 && wf > 0) g.fill(8 + Math.max(0, wf - 6), 19, 8 + wf, 26, hojas ? 0x80E6FFF0 : 0x80FFE4DA);
+        if (ticks - golpe < 4 && wf > 0) g.fill(8 + Math.max(0, wf - 6), 19, 8 + wf, 26, hojas ? 0x80E6FFF0 : ceniza ? 0x80FFF4E0 : 0x80FFE4DA);
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         g.blit(BARRA, 0, 0, 0, 0, 256, 40, 256, 128);
         // las gotas que caen

@@ -82,6 +82,9 @@ public final class ClientSetup {
         // los marchitos de Morvain (parte 7e)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.MARCHITO.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
                 new com.darkcraft.client.enemigos.MarchitoModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.MarchitoModelo.CAPA)), "marchito", 3, 0.5f, 1.08f));
+        // la Molinera de Velmor (parte 7f)
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.MOLINERA.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
+                new com.darkcraft.client.enemigos.MolineraModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.MolineraModelo.CAPA)), "molinera", 1, 1.0f, 1.9f));
         // La Garza Gris volando en las cinematicas del viaje (solo existe en el cliente)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BARCO_VOLADOR.get(), com.darkcraft.client.cine.BarcoVoladorRenderer::new);
     }
@@ -104,5 +107,6 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CortezaModelo.CAPA, com.darkcraft.client.enemigos.CortezaGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.montura.CorcelModelo.CAPA, com.darkcraft.client.enemigos.CorcelGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.MarchitoModelo.CAPA, com.darkcraft.client.enemigos.MarchitoGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.MolineraModelo.CAPA, com.darkcraft.client.enemigos.MolineraGeometria::crear);
     }
 }
