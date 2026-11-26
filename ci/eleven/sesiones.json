@@ -2608,5 +2608,48 @@
     ]
    }
   }
+ },
+ "sfx_portal_sombra": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 5e: la cinematica del portal (capitulo 6): las nubes que se arremolinan, el rayo rojo, la columna de luz roja y el cielo que se vuelve rojo. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "cielo_remolino": {
+    "prompt": "A massive storm gathering overhead: deep rumbling thunder rolling continuously, howling wind swirling and rising into a vortex, an ominous low drone building in intensity, dark fantasy cinematic, no music, 7 seconds",
+    "sesiones": [
+     "hmNrPbiRQn2MIXrmpUCw",
+     "02Pt3UegN88TdsackZ0n",
+     "CAmDBLFrxml1tYPonc5x",
+     "I0i7iWTuqjT4NTYPCnSK"
+    ]
+   },
+   "rayo_rojo": {
+    "prompt": "A colossal supernatural lightning bolt strikes right next to you: an ear-splitting electric crack and sizzle, then an enormous deep thunder boom that shakes the ground and rolls away for several seconds, dark fantasy cinematic, no music, 6 seconds",
+    "sesiones": [
+     "UbbzyxiPhHbEubq6ZHQt",
+     "fGWlwr7oteHNx5HKpNXV",
+     "eCqIJVTH0o2NAEe6jeK5",
+     "EV7usSOPnWbKsFfSgoGM"
+    ]
+   },
+   "columna_roja": {
+    "prompt": "A towering column of crimson magical energy roaring up into the sky: a deep sustained throbbing roar of power with crackling energy and a faint eerie shimmer, ominous and steady, dark fantasy, no music, 6 seconds",
+    "sesiones": [
+     "wolGLvspXkRsaX5HbTWV",
+     "3VUSiIRMYEURvifXbzoi",
+     "KULvsVrW3AFN2TTaBdRr",
+     "X6JnCrtTKDA7tLQ51bfx"
+    ]
+   },
+   "cielo_rojo": {
+    "prompt": "The whole sky turning blood red: a slow ominous swelling low drone rising, distant rolling thunder and a faint chorus of ghostly whispers, dread, dark fantasy cinematic, no music, 7 seconds",
+    "sesiones": [
+     "dMrrdPSJyqdYqehfiKVO",
+     "CzBWQQ0xuguJj5lPcsoq",
+     "K63tmvKbkhC81wANnOqe",
+     "O1KKVpl8eGLOZeqKG2OL"
+    ]
+   }
+  }
  }
 }
