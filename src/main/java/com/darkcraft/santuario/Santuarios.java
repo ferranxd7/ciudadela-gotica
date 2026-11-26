@@ -62,6 +62,11 @@ public final class Santuarios {
     /** En que santuario esta descansando cada uno (hasta que se aleja). */
     private static final Map<UUID, GlobalPos> DESCANSO = new HashMap<>();
 
+    /** El santuario en el que descanso por ultima vez (o null). */
+    public static GlobalPos descansoEn(ServerPlayer sp) {
+        return DESCANSO.get(sp.getUUID());
+    }
+
     /** Si el jugador sigue junto al santuario encendido en el que descanso (alli se sube de nivel y se reparten los frascos). */
     public static boolean junto(ServerPlayer sp) {
         GlobalPos g = DESCANSO.get(sp.getUUID());
@@ -121,6 +126,8 @@ public final class Santuarios {
         lvl.sendParticles(ParticleTypes.SCULK_SOUL, x, y + 0.3, z, 8, 0.2, 0.2, 0.2, 0.04);
         lvl.sendParticles(ParticleTypes.END_ROD, x, y + 0.4, z, 14, 0.3, 0.5, 0.3, 0.03);
         Net.to(sp, new Net.Cartel(Net.Cartel.SANTUARIO, nombre(lvl, pos), 0));
+        com.darkcraft.rol.Ficha.santuarioNuevo(sp, lvl.dimension(), pos);
+        if (com.darkcraft.morvain.Morvain.es(lvl)) com.darkcraft.morvain.Viaje.avisar(sp);
         Logros.dar(sp, "santuario");
         DarkCraftMod.LOGGER.info("[DarkCraft] {} enciende el santuario de {}", sp.getGameProfile().getName(), pos.toShortString());
     }
@@ -135,7 +142,12 @@ public final class Santuarios {
         DESCANSO.put(sp.getUUID(), GlobalPos.of(lvl.dimension(), pos.immutable()));
         lvl.playSound(null, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, DarkCraftMod.SFX_SANTUARIO_DESCANSO.get(), SoundSource.BLOCKS, 0.9f, 1.0f);
         lvl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, sp.getX(), sp.getY() + 0.9, sp.getZ(), 12, 0.3, 0.5, 0.3, 0.01);
-        Net.to(sp, new Net.Santuario(pos, nombre(lvl, pos)));
+        com.darkcraft.rol.Ficha.santuarioNuevo(sp, lvl.dimension(), pos);
+        // en Morvain, a donde se puede viajar desde aqui (parte 7c)
+        java.util.List<String> destinos = com.darkcraft.morvain.Morvain.es(lvl) && com.darkcraft.morvain.SantuariosMorvain.en(pos) != null
+                ? com.darkcraft.morvain.Viaje.conocidos(sp) : java.util.List.of();
+        var aqui = com.darkcraft.morvain.Morvain.es(lvl) ? com.darkcraft.morvain.SantuariosMorvain.en(pos) : null;
+        Net.to(sp, new Net.Santuario(pos, nombre(lvl, pos), destinos, aqui == null ? "" : aqui.id()));
     }
 
     /** Lo que da descansar: la vida entera, fuera los males, y los frascos, el mana y la estamina llenos. */
@@ -214,6 +226,11 @@ public final class Santuarios {
 
     /** La clave del nombre del santuario de {@code pos} (uno puesto a mano no tiene: "Santuario"). */
     public static String nombre(ServerLevel lvl, BlockPos pos) {
+        // los de Morvain (parte 7c) llevan su nombre en su sitio
+        if (com.darkcraft.morvain.Morvain.es(lvl)) {
+            var s = com.darkcraft.morvain.SantuariosMorvain.en(pos);
+            if (s != null) return s.nombre();
+        }
         return Datos.get(lvl.getServer()).nombres.getOrDefault(clave(lvl, pos), SIN_NOMBRE);
     }
 

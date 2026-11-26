@@ -5985,6 +5985,8 @@ public final class ClientCiTest {
         t += 10;
         // el corcel (parte 7b): Maelis da el silbato, se llama, galopa, salta dos veces, se pelea montado y se deshace
         t = corcel(t);
+        // los santuarios de Morvain y el viaje entre ellos (parte 7c)
+        t = viaje(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -6055,6 +6057,161 @@ public final class ClientCiTest {
                 + (fplan != null ? String.format(java.util.Locale.ROOT, " (el portal en %d %d %d)", fplan.cx, fplan.f.portal()[1], fplan.f.portal()[2]) : ""))));
         t += 20;
         atTicks(t, "captura", m -> shot(m, "cliente_mv18_vuelta"));
+        return t + 20;
+    }
+
+    // ------------------------------------------------------------------ los santuarios de Morvain (parte 7c)
+
+    private static String estadoViaje(Minecraft m) {
+        String pantalla = m.screen instanceof com.darkcraft.client.ui.SantuarioScreen s ? s.resumen()
+                : m.screen instanceof com.darkcraft.client.ui.ViajeScreen v ? v.resumen() : m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName();
+        return "pantalla " + pantalla + "; conocidos en el cliente " + com.darkcraft.client.morvain.ClientViaje.CONOCIDOS.size()
+                + "; negro " + String.format(java.util.Locale.ROOT, "%.2f", com.darkcraft.client.morvain.ClientViaje.negro(0f));
+    }
+
+    /**
+     * Parte 7c: los santuarios de Morvain. Se enciende el de la Encrucijada de los Peregrinos (su tarima, su nombre en el
+     * cartel), se apuntan unos cuantos mas como si ya los hubiera visto, se descansa en el del Arco del Umbral (el menu
+     * tiene "Viajar"), el mapa de los conocidos, se viaja a la Encrucijada (fundido a negro y delante del santuario,
+     * mirandolo), no se puede viajar sin descansar ni a uno que no conoce, y la brujula marca los santuarios cercanos.
+     */
+    private static int viaje(int T) {
+        final var ENCRUCIJADA = com.darkcraft.morvain.SantuariosMorvain.porId("encrucijada");
+        final var UMBRAL = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+        int t = T;
+        atTicks(t, "Viaje: a la Encrucijada de los Peregrinos", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                int n = com.darkcraft.rol.Ficha.olvidarSantuarios(sp, com.darkcraft.morvain.Morvain.NIVEL.location() + "@");
+                com.darkcraft.morvain.Viaje.avisar(sp);
+                log("  viaje: olvidados " + n + "; conocidos " + com.darkcraft.morvain.Viaje.conocidos(sp));
+                irMirando(sp, ENCRUCIJADA.x() + 7.5, ENCRUCIJADA.y() + 4, ENCRUCIJADA.z() + 8.5, ENCRUCIJADA.x() + 0.5, ENCRUCIJADA.y() + 1, ENCRUCIJADA.z() + 0.5, true);
+            });
+        });
+        t += 140;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv31_santuario_encrucijada");
+            server(m, sp -> {
+                BlockPos p = ENCRUCIJADA.pos();
+                var st = sp.serverLevel().getBlockState(p);
+                log("  la Encrucijada: " + p.toShortString() + " " + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(st.getBlock())
+                        + " | se llama " + com.darkcraft.santuario.Santuarios.nombre(sp.serverLevel(), p));
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), ENCRUCIJADA.x() + 0.5, ENCRUCIJADA.y() + 1, ENCRUCIJADA.z() + 2.5, 180f, 20f);
+            });
+        });
+        t += 20;
+        atTicks(t, "Viaje: encender la Encrucijada", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                com.darkcraft.santuario.Santuarios.usar(sp, ENCRUCIJADA.pos());
+                log("  encendida: " + sp.serverLevel().getBlockState(ENCRUCIJADA.pos()) + " | conoce " + com.darkcraft.morvain.Viaje.conocidos(sp));
+            });
+        });
+        t += 30;
+        atTicks(t, "captura", m -> {
+            log("  cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | " + estadoViaje(m));
+            shot(m, "cliente_mv32_encrucijada_encendida");
+        });
+        t += 10;
+        atTicks(t, "Viaje: unos cuantos mas, como si ya los hubiera visto; al Arco del Umbral", m -> server(m, sp -> {
+            for (String id : new String[]{"vado", "ahorcados", "juncos", "colmillo", "puerta_academia", "puerta_capital", "faro_huesos", "grieta", "mirador"}) {
+                var s = com.darkcraft.morvain.SantuariosMorvain.porId(id);
+                com.darkcraft.rol.Ficha.santuarioNuevo(sp, com.darkcraft.morvain.Morvain.NIVEL, s.pos());
+            }
+            com.darkcraft.morvain.Viaje.avisar(sp);
+            sp.teleportTo(sp.serverLevel(), UMBRAL.x() + 0.5, UMBRAL.y() + 1, UMBRAL.z() + 2.5, 180f, 20f);
+        }));
+        t += 40;
+        atTicks(t, "Viaje: viajar sin descansar no se puede", m -> server(m, sp -> {
+            com.darkcraft.morvain.Viaje.viajar(sp, "encrucijada");
+            log("  sin descansar: viaje en marcha " + com.darkcraft.morvain.Viaje.pendiente(sp));
+            var st = sp.serverLevel().getBlockState(UMBRAL.pos());
+            if (st.getBlock() instanceof com.darkcraft.santuario.SantuarioBlock && !st.getValue(com.darkcraft.santuario.SantuarioBlock.ENCENDIDO))
+                com.darkcraft.santuario.Santuarios.usar(sp, UMBRAL.pos());
+        }));
+        t += 20;
+        atTicks(t, "Viaje: descansar en el Arco del Umbral", m -> server(m, sp -> com.darkcraft.santuario.Santuarios.usar(sp, UMBRAL.pos())));
+        t += 15;
+        atTicks(t, "Viaje: a uno que no conoce no", m -> {
+            log("  menu: " + estadoViaje(m));
+            if (m.screen instanceof com.darkcraft.client.ui.SantuarioScreen s) s.senalar("viajar");
+            server(m, sp -> {
+                sp.setGameMode(GameType.SURVIVAL);
+                com.darkcraft.morvain.Viaje.viajar(sp, "helada");
+                log("  a la Cumbre Helada (no la conoce): viaje en marcha " + com.darkcraft.morvain.Viaje.pendiente(sp) + " | descansa en "
+                        + com.darkcraft.morvain.Viaje.aqui(sp) + " | en combate " + com.darkcraft.rol.Rol.enCombate(sp));
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        t += 10;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv33_menu_viajar"));
+        t += 4;
+        atTicks(t, "Viaje: el mapa", m -> {
+            if (m.screen instanceof com.darkcraft.client.ui.SantuarioScreen s) s.elegirOpcion("viajar");
+        });
+        t += 14;
+        atTicks(t, "captura", m -> {
+            log("  mapa: " + estadoViaje(m));
+            shot(m, "cliente_mv34_mapa_viaje");
+        });
+        t += 4;
+        atTicks(t, "Viaje: a la Encrucijada", m -> {
+            if (m.screen instanceof com.darkcraft.client.ui.ViajeScreen v) v.elegirYViajar("encrucijada");
+            else log("  NO esta la pantalla del viaje: " + estadoViaje(m));
+        });
+        t += 4;
+        atTicks(t, "captura", m -> {
+            log("  fundido: " + estadoViaje(m));
+            shot(m, "cliente_mv35_fundido");
+        });
+        t += 54;
+        atTicks(t, "Viaje: ha llegado?", m -> {
+            String cli = estadoViaje(m);
+            server(m, sp -> {
+                double d = Math.sqrt(sp.distanceToSqr(ENCRUCIJADA.x() + 0.5, ENCRUCIJADA.y() + 1, ENCRUCIJADA.z() + 0.5));
+                log(String.format(java.util.Locale.ROOT, "  tras el viaje: %s a %.1f bloques del santuario de la Encrucijada; viajes %d; logro %s | cliente: %s",
+                        fpos(sp), d, com.darkcraft.morvain.Viaje.HECHOS, com.darkcraft.story.Logros.tiene(sp, "viaje"), cli));
+            });
+            shot(m, "cliente_mv36_tras_el_viaje");
+        });
+        t += 10;
+        atTicks(t, "Viaje: la brujula entre el vado y el arco", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                double x = 850.5, z = 3750.5, y = com.darkcraft.morvain.Terreno.columna(850, 3750).altura() + 3;
+                // mirando a 55 grados (entre el vado, al sur, y el arco, al noroeste)
+                irMirando(sp, x, y, z, x - 80 * Math.sin(Math.toRadians(55)), y + 1.62, z + 80 * Math.cos(Math.toRadians(55)), true);
+            });
+        });
+        t += 100;
+        atTicks(t, "captura", m -> {
+            log("  brujula: " + estadoViaje(m) + " (el vado aun no lo ha encendido ni descansado en el: se apunta en la prueba como visto)");
+            shot(m, "cliente_mv37_brujula_santuarios");
+        });
+        t += 10;
+        atTicks(t, "Viaje: olvida el vado (sale apagado en la brujula)", m -> server(m, sp -> {
+            com.darkcraft.rol.Ficha.olvidarSantuarios(sp, com.darkcraft.morvain.Morvain.NIVEL.location() + "@" + com.darkcraft.morvain.SantuariosMorvain.porId("vado").pos().getX() + ",");
+            com.darkcraft.morvain.Viaje.avisar(sp);
+        }));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            log("  brujula sin el vado: " + estadoViaje(m));
+            shot(m, "cliente_mv38_brujula_vado_apagado");
+        });
+        t += 10;
+        atTicks(t, "Viaje: fin (vuelta al arco)", m -> server(m, sp -> {
+            sp.getAbilities().flying = false;
+            sp.onUpdateAbilities();
+            sp.teleportTo(sp.serverLevel(), UMBRAL.x() + 0.5, UMBRAL.y() + 1, UMBRAL.z() + 10.5, 180f, 0f);
+        }));
         return t + 20;
     }
 

@@ -24,7 +24,7 @@ final class Adorno {
     static void chunk(WorldGenLevel nivel, ChunkAccess c) {
         int x0 = c.getPos().getMinBlockX(), z0 = c.getPos().getMinBlockZ();
         // en la plaza del Arco del Umbral, nada
-        if (Llegada.plaza(x0, z0)) return;
+        if (Llegada.plaza(x0, z0) || SantuariosMorvain.libre(x0, z0)) return;
         Random r = new Random(c.getPos().toLong() * 0x9E3779B97F4A7C15L + 0x4D6F72L);
         Region reg = Terreno.region(x0 + 8, z0 + 8);
         switch (reg) {

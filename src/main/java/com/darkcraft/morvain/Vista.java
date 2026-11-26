@@ -38,6 +38,7 @@ public final class Vista {
                         for (int y = top + 1; y <= Terreno.AGUA; y++) es.poner(x, y, z, agua);
                     }
                 if (Llegada.toca(bx, bz)) Llegada.chunk(es, bx, bz, tops);
+                if (SantuariosMorvain.toca(bx, bz)) SantuariosMorvain.chunk(es, bx, bz, tops);
                 if (Ciudadela.toca(bx, bz)) Ciudadela.chunk(es, bx, bz);
             }
     }

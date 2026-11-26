@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "18";
+    private static final String V = "19";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -138,11 +138,73 @@ public final class Net {
                 .encoder(CosaUsar::write).decoder(CosaUsar::read).consumerMainThread(CosaUsar::handle).add();
         CH.messageBuilder(CineFase.class, id++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(CineFase::write).decoder(CineFase::read).consumerMainThread(CineFase::handle).add();
+        // el viaje entre santuarios de Morvain (parte 7c)
+        CH.messageBuilder(Viajar.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(Viajar::write).decoder(Viajar::read).consumerMainThread(Viajar::handle).add();
+        CH.messageBuilder(Fundido.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Fundido::write).decoder(Fundido::read).consumerMainThread(Fundido::handle).add();
+        CH.messageBuilder(Conocidos.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Conocidos::write).decoder(Conocidos::read).consumerMainThread(Conocidos::handle).add();
         // el corcel de Morvain (parte 7b)
         CH.messageBuilder(CorcelLlamar.class, id++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder((m, b) -> {}).decoder(b -> new CorcelLlamar()).consumerMainThread(CorcelLlamar::handle).add();
         CH.messageBuilder(CorcelSalto.class, id++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(CorcelSalto::write).decoder(CorcelSalto::read).consumerMainThread(CorcelSalto::handle).add();
+    }
+
+    // ------------------------------------------------------------------ el viaje entre santuarios (parte 7c)
+
+    /** Viajar desde el santuario en el que se descansa al de Morvain {@code id}. */
+    public record Viajar(String id) {
+        void write(FriendlyByteBuf b) {
+            b.writeUtf(id, 48);
+        }
+
+        static Viajar read(FriendlyByteBuf b) {
+            return new Viajar(b.readUtf(48));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.morvain.Viaje.viajar(p, id);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** La pantalla se funde a negro y vuelve en {@code ticks} (el viaje entre santuarios). */
+    public record Fundido(int ticks) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(ticks);
+        }
+
+        static Fundido read(FriendlyByteBuf b) {
+            return new Fundido(Math.min(b.readVarInt(), 400));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.morvain.ClientViaje.fundido(ticks));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Los santuarios de Morvain que conoce (sus ids): para sus marcas en la brujula. */
+    public record Conocidos(List<String> ids) {
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(ids.size());
+            for (String s : ids) b.writeUtf(s, 48);
+        }
+
+        static Conocidos read(FriendlyByteBuf b) {
+            int k = Math.min(b.readVarInt(), 64);
+            List<String> l = new ArrayList<>();
+            for (int i = 0; i < k; i++) l.add(b.readUtf(48));
+            return new Conocidos(l);
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.morvain.ClientViaje.conocidos(ids));
+            ctx.get().setPacketHandled(true);
+        }
     }
 
     // ------------------------------------------------------------------ el corcel (parte 7b)
@@ -744,14 +806,26 @@ public final class Net {
     }
 
     /** El jugador descansa en un santuario: se abre su menu (con el nombre del santuario). */
-    public record Santuario(net.minecraft.core.BlockPos pos, String nombre) {
+    /**
+     * Se ha descansado en un santuario: abre su menu. En Morvain (parte 7c) lleva tambien a cuales se puede viajar (los ids
+     * de los santuarios de Morvain que conoce) y en cual esta ({@code aqui}, "" fuera de Morvain).
+     */
+    public record Santuario(net.minecraft.core.BlockPos pos, String nombre, List<String> destinos, String aqui) {
         void write(FriendlyByteBuf b) {
             b.writeBlockPos(pos);
             b.writeUtf(nombre, 96);
+            b.writeVarInt(destinos.size());
+            for (String d : destinos) b.writeUtf(d, 48);
+            b.writeUtf(aqui, 48);
         }
 
         static Santuario read(FriendlyByteBuf b) {
-            return new Santuario(b.readBlockPos(), b.readUtf(96));
+            net.minecraft.core.BlockPos p = b.readBlockPos();
+            String n = b.readUtf(96);
+            int k = Math.min(b.readVarInt(), 64);
+            List<String> l = new ArrayList<>();
+            for (int i = 0; i < k; i++) l.add(b.readUtf(48));
+            return new Santuario(p, n, l, b.readUtf(48));
         }
 
         void handle(Supplier<NetworkEvent.Context> ctx) {

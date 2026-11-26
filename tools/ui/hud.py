@@ -13,7 +13,7 @@ Las texturas del HUD nuevo, en pixel art (assets/darkcraft/textures/gui/hud.png)
   cine_*                      la cenefa de las cinematicas (en vez de las bandas negras con la linea roja)
   brujula_*                   la brujula de arriba
   boton_* / boton_luz_*       un boton de piedra con filo de oro (normal y con el raton encima), en tres trozos
-  marca_*                     las marcas de la brujula (el objetivo y la espada de luz)
+  marca_*                     las marcas de la brujula (el objetivo, la espada de luz y los santuarios de Morvain)
   banda                       la piedra casi negra de las bandas de las cinematicas (se repite)
 
     python3 tools/ui/hud.py [--vista carpeta]
@@ -578,6 +578,29 @@ def corcel_icono():
     return L
 
 
+# ---------------------------------------------------------------- los santuarios de Morvain en la brujula (parte 7c)
+SANTUARIO_MARCA = [
+    "...f...",
+    "..fFf..",
+    ".fFWFf.",
+    ".fFWFf.",
+    "..fFf..",
+    ".kPPPk.",
+    "kPpPpPk",
+    "kPPPPPk",
+    ".kkkkk.",
+]
+
+
+def marca_santuario(encendido):
+    """Un santuario en pequeno (7x9): el altar de piedra con su llama de almas (o, si aun no lo conoce, apagado)."""
+    if encendido:
+        col = {"f": NIEBLA[4], "F": NIEBLA[5], "W": NIEBLA[6], "k": TINTA, "P": PIEDRA[6], "p": PIEDRA[4]}
+    else:
+        col = {"f": "#3c3a42", "F": "#5c5862", "W": "#7c7882", "k": TINTA, "P": PIEDRA[5], "p": PIEDRA[3]}
+    return Lienzo(7, 9).sprite(SANTUARIO_MARCA, col)
+
+
 def montar():
     A = Atlas(256, 128)
     A.poner("emblema", emblema())
@@ -614,6 +637,8 @@ def montar():
     A.poner("banda", banda())
     A.poner("corcel", relleno(NIEBLA, 14))
     A.poner("corcel_icono", corcel_icono())
+    A.poner("marca_santuario", marca_santuario(True))
+    A.poner("marca_santuario_apagado", marca_santuario(False))
     A.L.guardar(os.path.join(GUI, "hud.png"))
     ruta = os.path.join(REPO, "src/main/java/com/darkcraft/client/ui/HudTex.java")
     os.makedirs(os.path.dirname(ruta), exist_ok=True)

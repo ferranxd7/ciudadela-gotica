@@ -343,6 +343,14 @@ public class Volcado {
                         l[1] - 8);
                 marcas.put("santuario", new int[]{l[0], l[1] + 2, l[2]});
             }
+            case "morvain_santuario" -> {
+                // un santuario de Morvain (-Dsitio=<id>; por defecto el primero) con lo que lo rodea
+                String id = System.getProperty("sitio", "encrucijada");
+                com.darkcraft.morvain.SantuariosMorvain.Sitio s = com.darkcraft.morvain.SantuariosMorvain.porId(id);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), s.x() - 18, s.z() - 18, s.x() + 18,
+                        s.z() + 18, s.y() - 10);
+                marcas.put("santuario", new int[]{s.x(), s.y() + 2, s.z()});
+            }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);

@@ -1824,6 +1824,59 @@ EN.update({
 })
 
 
+# ---------------------------------------------------------------- parte 7c: los santuarios de Morvain y el viaje entre ellos
+SANTUARIOS_MORVAIN_ES = {
+    "encrucijada": "Encrucijada de los Peregrinos", "vado": "Vado de las Cenizas",
+    "ahorcados": "Arboleda de los Ahorcados", "raiz_hueca": "La Raíz Hueca",
+    "juncos": "Islote de los Juncos", "embarcadero": "Embarcadero Podrido",
+    "colmillo": "Paso del Colmillo", "coloso": "Rodilla del Coloso", "helada": "La Cumbre Helada",
+    "puerta_academia": "Puerta de la Academia", "observatorio": "El Observatorio Roto",
+    "puerta_capital": "Puerta de la Capital", "juramento": "Plaza del Juramento",
+    "faro_huesos": "Faro de los Huesos", "costillar": "Costillar de la Ballena",
+    "grieta": "Grieta de los Apóstatas", "altar": "Altar Profanado", "mirador": "Mirador del Cráter",
+    "ancla_sur": "Ancla del Sur",
+}
+SANTUARIOS_MORVAIN_EN = {
+    "encrucijada": "Pilgrims' Crossroads", "vado": "Ashen Ford",
+    "ahorcados": "Grove of the Hanged", "raiz_hueca": "The Hollow Root",
+    "juncos": "Reed Islet", "embarcadero": "Rotting Jetty",
+    "colmillo": "Fang Pass", "coloso": "Colossus's Knee", "helada": "The Frozen Summit",
+    "puerta_academia": "Academy Gate", "observatorio": "The Broken Observatory",
+    "puerta_capital": "Capital Gate", "juramento": "Square of the Oath",
+    "faro_huesos": "Lighthouse of Bones", "costillar": "The Whale's Ribcage",
+    "grieta": "Apostates' Rift", "altar": "Desecrated Altar", "mirador": "Crater Overlook",
+    "ancla_sur": "The Southern Anchor",
+}
+ES.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_ES.items()})
+EN.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_EN.items()})
+ES.update({
+    "darkcraft.menu.santuario.viajar": "Viajar",
+    "darkcraft.menu.santuario.viajar.desc": "Viaja a otro santuario de Morvain en el que ya hayas descansado o que hayas encendido.",
+    "darkcraft.viaje.titulo": "Viajar a otro santuario",
+    "darkcraft.viaje.aqui": "aquí",
+    "darkcraft.viaje.lejos": "a %s bloques de aquí",
+    "darkcraft.viaje.tecla": "Viajar",
+    "darkcraft.viaje.volver": "Volver",
+    "advancements.darkcraft.viaje.title": "De fuego en fuego",
+    "advancements.darkcraft.viaje.description": "Viaja entre dos santuarios de Morvain",
+    "darkcraft.diario.viaje": "Descansé junto al fuego y pensé en otro que ya había encendido. Cuando abrí los ojos, estaba allí. Los santuarios de Morvain se recuerdan unos a otros.",
+    "darkcraft.ayuda.viaje": "el viaje entre santuarios de Morvain: los que conoces, darlos por conocidos, olvidarlos o llevarte delante de uno",
+})
+EN.update({
+    "darkcraft.menu.santuario.viajar": "Travel",
+    "darkcraft.menu.santuario.viajar.desc": "Travel to another shrine of Morvain where you have rested or that you have lit.",
+    "darkcraft.viaje.titulo": "Travel to another shrine",
+    "darkcraft.viaje.aqui": "here",
+    "darkcraft.viaje.lejos": "%s blocks from here",
+    "darkcraft.viaje.tecla": "Travel",
+    "darkcraft.viaje.volver": "Back",
+    "advancements.darkcraft.viaje.title": "From Fire to Fire",
+    "advancements.darkcraft.viaje.description": "Travel between two shrines of Morvain",
+    "darkcraft.diario.viaje": "I rested by the fire and thought of another I had already lit. When I opened my eyes, I was there. The shrines of Morvain remember one another.",
+    "darkcraft.ayuda.viaje": "travel between the shrines of Morvain: the ones you know, mark them as known, forget them or take you to one",
+})
+
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

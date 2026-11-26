@@ -162,8 +162,16 @@ public final class Ficha {
 
     // ------------------------------------------------------------------ santuarios
 
+    /** Los santuarios que conoce (los que ha encendido o en los que ha descansado): "dimension@x,y,z". */
+    public static java.util.Set<String> santuariosVistos(Player p) {
+        ListTag l = leer(p).getList("santuarios", Tag.TAG_STRING);
+        java.util.Set<String> r = new java.util.HashSet<>();
+        for (int i = 0; i < l.size(); i++) r.add(l.getString(i));
+        return r;
+    }
+
     /** Apunta el santuario (dimension y sitio) y dice si es la primera vez que este jugador descansa en el. */
-    static boolean santuarioNuevo(Player p, ResourceKey<Level> dim, net.minecraft.core.BlockPos pos) {
+    public static boolean santuarioNuevo(Player p, ResourceKey<Level> dim, net.minecraft.core.BlockPos pos) {
         String clave = dim.location() + "@" + pos.getX() + "," + pos.getY() + "," + pos.getZ();
         CompoundTag f = abrir(p);
         ListTag l = f.getList("santuarios", Tag.TAG_STRING);
@@ -171,6 +179,15 @@ public final class Ficha {
         l.add(StringTag.valueOf(clave));
         f.put("santuarios", l);
         return true;
+    }
+
+    /** Olvida los santuarios cuya clave empieza por {@code prefijo} (el comando de las pruebas); dice cuantos. */
+    public static int olvidarSantuarios(Player p, String prefijo) {
+        CompoundTag f = abrir(p);
+        ListTag l = f.getList("santuarios", Tag.TAG_STRING), r = new ListTag();
+        for (int i = 0; i < l.size(); i++) if (!l.getString(i).startsWith(prefijo)) r.add(StringTag.valueOf(l.getString(i)));
+        f.put("santuarios", r);
+        return l.size() - r.size();
     }
 
     public static int santuarios(Player p) {

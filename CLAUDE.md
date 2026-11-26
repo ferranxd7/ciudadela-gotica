@@ -1415,6 +1415,37 @@ doble salto, se ataca montado, si lo hieren mucho se deshace un rato"). Publicad
   doble subio ...`), un golpe montado (`mv27`), deshacerse (`mv28`), el aviso de la espera (`mv29`), encabritarse
   esperando (`mv30`), montar con clic derecho y despedirlo con la H (lineas `corcel, ...` con `Montura.resumen`).
 
+### Plan grande, parte 7c: los santuarios de Morvain y el viaje entre ellos
+
+Respuesta 92 del plan ("santuarios con teletransporte").
+- **Diecinueve santuarios** mas el del Arco del Umbral (`morvain/SantuariosMorvain`: `SITIOS`, `UMBRAL`, `todos()`), dos o
+  tres por region y uno junto al crater: sitios elegidos sin abrir el juego (con `Terreno`: lo mas llano y seco cerca de
+  donde se queria, en su region; en el pantano, un islote). Cada uno es una tarima redonda (radio 4, fundida con el
+  terreno hasta 10) de la piedra de su region, con el santuario (apagado) en el centro, dos pilares rotos y dos farolas de
+  almas; se escribe al generar el chunk (`MorvainGenerador` → `SantuariosMorvain.chunk`; el `Adorno` no pone nada encima;
+  lo ve Distant Horizons). Nombre de cada uno `darkcraft.santuario.morvain_<id>` (`Santuarios.nombre` lo saca del sitio).
+  Vista sin juego: `tools/vista3d` caso `morvain_santuario` (`-Dsitio=<id>`).
+- **Encender y descansar** como siempre; la ficha apunta cada santuario (`Ficha.santuarioNuevo`, "dimension@x,y,z") y
+  esos son los que **conoce** (`Viaje.conocidos`). Descansando en uno de Morvain, con otro conocido, el menu del santuario
+  tiene **Viajar** (`SantuarioScreen`: `Net.Santuario` lleva los destinos y en cual esta) → `client/ui/ViajeScreen`: la
+  lista de los conocidos (el de aqui marcado) y el **mapa de Morvain en pergamino** (`textures/gui/mapa_morvain.png`,
+  1024 x 1024, de `tools/morvain/Pergamino.java` con el `Terreno`: si cambia el terreno, rehacerla) con una marca por
+  santuario conocido; abajo, la region y lo lejos que esta. Al elegir uno (`Net.Viajar` → `Viaje.viajar`: tiene que estar
+  descansando junto a uno de Morvain, no en combate, y conocer el destino): fundido a negro en su cliente (`Net.Fundido`
+  → `client/morvain/ClientViaje`, 34 ticks), a los 12 se le lleva delante del santuario mirandolo (`Viaje.llevar`; el
+  corcel, si iba montado, se deshace) y logro `viaje`.
+- **La brujula** marca los santuarios de Morvain cercanos (`Hud.santuarios`): los que conoce con su llama de almas hasta
+  1600 bloques; los que no, apagados y solo a menos de 480 (`HudTex.MARCA_SANTUARIO` / `MARCA_SANTUARIO_APAGADO`, de
+  `tools/ui/hud.py`). El cliente sabe cuales conoce por `Net.Conocidos` (al entrar en Morvain, al conectarse alli, al
+  encender uno y con los comandos).
+- Comandos `/darkcraft viaje [lista | conocer <id>|todos | olvidar | ir <id>]` (`ir` lleva delante de uno desde donde sea).
+- Pruebas: servidor, linea `Morvain, los santuarios: ...` (cada uno con su bloque en su sitio y con su nombre) y vistas
+  `morvain_santuario_{encrucijada,juncos,helada}.png`; cliente, tramo `viaje()` dentro del de Morvain (despues del corcel):
+  la Encrucijada de los Peregrinos (`cliente_mv31`), encenderla (`mv32`, cartel con su nombre), descansar en el Arco
+  (sin descansar y a uno que no conoce no se viaja), el menu con Viajar (`mv33`), el mapa (`mv34`), el fundido (`mv35`),
+  delante de la Encrucijada (`mv36`, linea `tras el viaje: ...`) y la brujula con un santuario conocido y otro no
+  (`mv37`, `mv38`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1425,7 +1456,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a y la 7b arriba; despues, los santuarios con teletransporte y los fragmentos de mapa).
+  `PLAN.md`), por sub-partes (la 7a, la 7b y la 7c arriba; despues, los fragmentos de mapa y el mapa de la M en Morvain).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

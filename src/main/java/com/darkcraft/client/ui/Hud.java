@@ -538,8 +538,26 @@ public final class Hud {
         if (obj != null) marca(g, HudTex.MARCA_OBJETIVO, cx, y + 3, medio, rumbo(obj[0] + 0.5 - px, obj[1] + 0.5 - pz) - yaw);
         if (ClientRol.hayEspada && mc.level.dimension().location().toString().equals(ClientRol.espadaDim))
             marca(g, HudTex.MARCA_ESPADA, cx, y + 1, medio, rumbo(ClientRol.ex - px, ClientRol.ez - pz) - yaw);
+        if (mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL) santuarios(g, cx, y, medio, px, pz, yaw);
         Pix.blanco();
         Pix.t(g, HudTex.BRUJULA_AGUJA, cx - 4, y - 2);
+    }
+
+    /** Hasta donde se ven en la brujula los santuarios de Morvain que conoce y los que no (bloques). */
+    private static final double SANTUARIO_CONOCIDO = 1600, SANTUARIO_NUEVO = 480;
+
+    /**
+     * Los santuarios de Morvain cerca (parte 7c): los que ya conoce, con su llama de almas, hasta 1600 bloques; los que no,
+     * apagados y solo a menos de 480 (para que se busquen). El de al lado no se marca.
+     */
+    private static void santuarios(GuiGraphics g, int cx, int y, float medio, double px, double pz, float yaw) {
+        for (com.darkcraft.morvain.SantuariosMorvain.Sitio s : com.darkcraft.morvain.SantuariosMorvain.todos()) {
+            double dx = s.x() + 0.5 - px, dz = s.z() + 0.5 - pz, d2 = dx * dx + dz * dz;
+            boolean conocido = com.darkcraft.client.morvain.ClientViaje.CONOCIDOS.contains(s.id());
+            double lejos = conocido ? SANTUARIO_CONOCIDO : SANTUARIO_NUEVO;
+            if (d2 < 64 || d2 > lejos * lejos) continue;
+            marca(g, conocido ? HudTex.MARCA_SANTUARIO : HudTex.MARCA_SANTUARIO_APAGADO, cx, y + 2, medio, rumbo(dx, dz) - yaw);
+        }
     }
 
     /** Hacia donde queda algo (en grados de los de Minecraft: 0 el sur, 90 el oeste). */

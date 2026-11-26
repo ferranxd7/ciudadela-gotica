@@ -52,4 +52,6 @@ public final class HudTex {
     public static final T BANDA = new T(220, 48, 32, 16);
     public static final T CORCEL = new T(0, 69, 32, 5);
     public static final T CORCEL_ICONO = new T(33, 69, 9, 9);
+    public static final T MARCA_SANTUARIO = new T(43, 69, 7, 9);
+    public static final T MARCA_SANTUARIO_APAGADO = new T(51, 69, 7, 9);
 }

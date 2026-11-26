@@ -20,8 +20,9 @@ import java.util.List;
  */
 public class SantuarioScreen extends Screen {
     private static final int FILA = 18, CABECERA = 54, PIE = 40;
-    private static final String[] OPCIONES = {"nivel", "frascos", "memoria", "salir"};
-    private static final int NIVEL = 0, FRASCOS = 1, MEMORIA = 2, SALIR = 3;
+    /** Las opciones; en Morvain, con algun otro santuario conocido, tambien "viajar" (parte 7c). */
+    private final String[] OPCIONES;
+    private static final int NIVEL = 0, FRASCOS = 1, MEMORIA = 2;
 
     private final BlockPos pos;
     private final Component nombre;
@@ -30,14 +31,17 @@ public class SantuarioScreen extends Screen {
     public static void abrir(Net.Santuario m) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
-        mc.setScreen(new SantuarioScreen(m.pos(), Component.translatable(m.nombre())));
+        com.darkcraft.client.morvain.ClientViaje.santuario(m.destinos(), m.aqui());
+        boolean viajar = !m.aqui().isEmpty() && m.destinos().size() >= 2;
+        mc.setScreen(new SantuarioScreen(m.pos(), Component.translatable(m.nombre()), viajar));
         Panel.abre();
     }
 
-    SantuarioScreen(BlockPos pos, Component nombre) {
+    SantuarioScreen(BlockPos pos, Component nombre, boolean viajar) {
         super(nombre);
         this.pos = pos;
         this.nombre = nombre;
+        this.OPCIONES = viajar ? new String[]{"nivel", "frascos", "memoria", "viajar", "salir"} : new String[]{"nivel", "frascos", "memoria", "salir"};
     }
 
     @Override
@@ -191,7 +195,12 @@ public class SantuarioScreen extends Screen {
                 Panel.acepta();
                 minecraft.setScreen(new MemoriaScreen(this));
             }
-            default -> onClose();
+            default -> {
+                if ("viajar".equals(OPCIONES[i])) {
+                    Panel.acepta();
+                    minecraft.setScreen(new ViajeScreen(this, com.darkcraft.client.morvain.ClientViaje.destinos, com.darkcraft.client.morvain.ClientViaje.aqui));
+                } else onClose();
+            }
         }
     }
 
@@ -261,6 +270,21 @@ public class SantuarioScreen extends Screen {
 
     /** Para la prueba de la CI. */
     public String resumen() {
-        return "santuario '" + nombre.getString() + "' opcion " + OPCIONES[sel];
+        return "santuario '" + nombre.getString() + "' opcion " + OPCIONES[sel] + " (" + String.join(", ", OPCIONES) + ")";
+    }
+
+    /** Para la prueba de la CI: deja marcada una opcion por su nombre (si esta), sin elegirla. */
+    public void senalar(String o) {
+        for (int i = 0; i < OPCIONES.length; i++) if (OPCIONES[i].equals(o)) sel = i;
+    }
+
+    /** Para la prueba de la CI: elige una opcion por su nombre (si esta). */
+    public void elegirOpcion(String o) {
+        for (int i = 0; i < OPCIONES.length; i++)
+            if (OPCIONES[i].equals(o)) {
+                sel = i;
+                elegir(i);
+                return;
+            }
     }
 }
