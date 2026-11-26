@@ -1359,7 +1359,7 @@ mapa (respuestas 92 y 129), y region a region su contenido (ruinas, mazmorras, e
 ### Plan grande, parte 7b: el corcel de hueso y niebla (la montura de Morvain)
 
 Respuesta 129 del plan ("corcel de hueso y niebla; la guia te da el silbato en el primer santuario de Morvain; corre,
-doble salto, se ataca montado, si lo hieren mucho se deshace un rato").
+doble salto, se ataca montado, si lo hieren mucho se deshace un rato"). Publicada con la build de prueba 131 bien.
 - **El corcel** (`montura/Corcel`, entidad `darkcraft:corcel`, `MobCategory.MISC`, 1,3 x 1,6, no se guarda con el mundo):
   modelo de `tools/enemigos/corcel.py` (caballo de hueso palido con las costillas al aire, silla negra con remaches de oro
   y manta roja; la crin, la cola, los ojos y el fuego de los cascos van en la capa de brillo; patas sin cinematica
