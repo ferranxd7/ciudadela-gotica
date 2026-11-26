@@ -62,6 +62,8 @@ public final class Net {
                 .encoder(EspejoAccion::write).decoder(EspejoAccion::read).consumerMainThread(EspejoAccion::handle).add();
         CH.messageBuilder(Fortaleza.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(Fortaleza::write).decoder(Fortaleza::read).consumerMainThread(Fortaleza::handle).add();
+        CH.messageBuilder(CieloRojo.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(CieloRojo::write).decoder(CieloRojo::read).consumerMainThread(CieloRojo::handle).add();
         CH.messageBuilder(RolEstado.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(RolEstado::write).decoder(RolEstado::read).consumerMainThread(RolEstado::handle).add();
         CH.messageBuilder(Estamina.class, id++, NetworkDirection.PLAY_TO_CLIENT)
@@ -860,6 +862,24 @@ public final class Net {
 
         void handle(Supplier<NetworkEvent.Context> ctx) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ClientMusic.fortaleza(dentro));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El cielo rojo (parte 5e): si esta, desde que tick del mundo y las columnas de luz ({x, y, z} seguidos). */
+    public record CieloRojo(boolean activo, long desde, int[] columnas) {
+        void write(FriendlyByteBuf b) {
+            b.writeBoolean(activo);
+            b.writeLong(desde);
+            b.writeVarIntArray(columnas);
+        }
+
+        static CieloRojo read(FriendlyByteBuf b) {
+            return new CieloRojo(b.readBoolean(), b.readLong(), b.readVarIntArray());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.fortaleza.CieloRojoCliente.recibir(activo, desde, columnas));
             ctx.get().setPacketHandled(true);
         }
     }

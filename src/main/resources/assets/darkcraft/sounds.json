@@ -845,7 +845,7 @@
     ]
   },
   "narracion.cap6": {
-    "subtitle": "subtitles.darkcraft.narracion",
+    "subtitle": "subtitles.darkcraft.sombra",
     "sounds": [
       {
         "name": "darkcraft:narracion/cap6",
@@ -2561,6 +2561,38 @@
       {
         "name": "darkcraft:musica/vareth",
         "stream": true
+      }
+    ]
+  },
+  "sfx.cielo_remolino": {
+    "subtitle": "subtitles.darkcraft.sfx.cielo_remolino",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/cielo_remolino_1"
+      }
+    ]
+  },
+  "sfx.rayo_rojo": {
+    "subtitle": "subtitles.darkcraft.sfx.rayo_rojo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rayo_rojo_1"
+      }
+    ]
+  },
+  "sfx.columna_roja": {
+    "subtitle": "subtitles.darkcraft.sfx.columna_roja",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/columna_roja_1"
+      }
+    ]
+  },
+  "sfx.cielo_rojo": {
+    "subtitle": "subtitles.darkcraft.sfx.cielo_rojo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/cielo_rojo_1"
       }
     ]
   }

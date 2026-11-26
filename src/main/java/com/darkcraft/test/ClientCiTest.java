@@ -6542,7 +6542,7 @@ public final class ClientCiTest {
                 int top = fplan.Y + com.darkcraft.gen.TorreCupula.TERRAZA;
                 sp.serverLevel().setBlock(BlockPos.containing(fplan.cx + 0.5, top, fplan.cz + 8.5), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
                 int[] al = fplan.f.altar();
-                sp.teleportTo(sp.serverLevel(), al[0] + 0.5, al[1], al[2] + 2.5, 180f, -8f);
+                sp.teleportTo(sp.serverLevel(), al[0] + 3.5, al[1], al[2] + 3.5, 155f, -12f);
                 log("  altar: " + sp.serverLevel().getBlockState(new BlockPos(al[0], al[1] + 1, al[2])).getBlock());
             });
         });
@@ -6557,15 +6557,29 @@ public final class ClientCiTest {
                     + " logro portal=" + com.darkcraft.story.Logros.tiene(sp, "portal") + " amuleto gastado=" + sp.getMainHandItem().isEmpty());
         }));
         float tot6 = Timeline.total(6);
-        float[] t6 = {1.6f, 9f, Timeline.cut(6, 0) + 2f, Timeline.cut(6, 1) + 2f, Timeline.cut(6, 2) + 3.5f, Timeline.cut(6, 3) + 2f,
-                Timeline.cut(6, 4) + 2f, tot6 - 1.5f};
+        // (parte 5e: la voz de la Sombra; se abre el portal, las nubes se arremolinan, cae el rayo rojo y el cielo enrojece)
+        float[] t6 = {1.6f, 9f, Timeline.cut(6, 0) + 2f, Timeline.abrePortal6() + 1.6f, Timeline.abrePortal6() + 4.6f, Math.min(Timeline.nubes6() + 2.4f, Timeline.rayo6() - 1.3f),
+                Timeline.rayo6() + 0.2f, Timeline.cut(6, 3) + 3f, Timeline.cut(6, 4) + 2f, tot6 - 1.5f};
+        String[] n6 = {"titulo", "fortaleza", "jardin", "gemas", "pilares", "nubes", "rayo", "cielo_rojo", "remolino", "final"};
         int C6 = T + 34;
         for (int k = 0; k < t6.length; k++) {
             final int kk = k;
             atTicks(C6 + Math.round(t6[k] * 20), "captura del capitulo 6", m -> {
-                shot(m, "cliente_f3" + (kk + 1) + "_capitulo6_" + kk);
-                log(String.format(java.util.Locale.ROOT, "  capitulo 6 t=%.1f s: activa=%s capitulo=%d voz=%s (audio en el mod %s)", ClientCine.time(),
-                        ClientCine.active(), ClientCine.chapter(), ClientCine.narrationPlaying(), Timeline.hasAudio(6)));
+                shot(m, String.format(java.util.Locale.ROOT, "cliente_f3%02d_capitulo6_%s", kk + 1, n6[kk]));
+                log(String.format(java.util.Locale.ROOT, "  capitulo 6 t=%.1f s: activa=%s capitulo=%d voz=%s (audio en el mod %s); cielo rojo %s (%.2f), columnas %d",
+                        ClientCine.time(), ClientCine.active(), ClientCine.chapter(), ClientCine.narrationPlaying(), Timeline.hasAudio(6),
+                        com.darkcraft.client.fortaleza.CieloRojoCliente.activo(), com.darkcraft.client.fortaleza.CieloRojoCliente.k(0f),
+                        com.darkcraft.client.fortaleza.CieloRojoCliente.columnas()));
+                if (kk == 6) server(m, sp -> log("  tras el rayo: " + com.darkcraft.fortaleza.CieloRojo.resumen(sp.server) + "; portal: "
+                        + com.darkcraft.fortaleza.FortalezaEventos.resumenPortal(sp.serverLevel(), fplan)));
+                if ((kk == 5 || kk == 6) && m.level != null) {
+                    // (el remolino del portal en el cliente: desde cuando se arremolinan las nubes y cuando cayo el rayo)
+                    StringBuilder b = new StringBuilder("  remolinos en el cliente (tick " + m.level.getGameTime() + "):");
+                    for (net.minecraft.world.entity.Entity e : m.level.entitiesForRendering())
+                        if (e instanceof com.darkcraft.fortaleza.Remolino r)
+                            b.append(" [abierto ").append(r.abierto()).append(", nubes ").append(r.tormenta()).append(", rayo ").append(r.rayo()).append(']');
+                    log(b.toString());
+                }
             });
         }
         // parte 5e: el portal abierto de noche (las runas, las gemas y el remolino brillan) y las estatuas encapuchadas
@@ -6592,17 +6606,37 @@ public final class ClientCiTest {
             sp.teleportTo(sp.serverLevel(), fplan.cx + 0.5, top + 3.0, fplan.cz - 5.5, 0f, -18f);
         }));
         atTicks(Qa + 60, "captura", m -> shot(m, "cliente_f40b_estatuas"));
-        atTicks(Qa + 62, "El portal abierto: de dia otra vez", m -> {
+        atTicks(Qa + 62, "La luna de sangre (a medianoche, arriba)", m -> server(m, sp -> {
+            int top = fplan.Y + com.darkcraft.gen.TorreCupula.TERRAZA;
+            sp.teleportTo(sp.serverLevel(), fplan.cx + 6.5, top + 3.0, fplan.cz - 2.5, 90f, -88f);
+        }));
+        atTicks(Qa + 90, "captura", m -> shot(m, "cliente_f40c_luna_sangre"));
+        atTicks(Qa + 92, "El cielo rojo, de dia: la columna de luz", m -> server(m, sp -> {
+            sp.serverLevel().setDayTime(6000);
+            int top = fplan.Y + com.darkcraft.gen.TorreCupula.TERRAZA;
+            sp.teleportTo(sp.serverLevel(), fplan.cx + 26.5, top + 8.0, fplan.cz + 22.5, 135f, -18f);
+        }));
+        atTicks(Qa + 122, "captura", m -> {
+            shot(m, "cliente_f40d_cielo_rojo");
+            log("  el cielo rojo (cliente): " + com.darkcraft.client.fortaleza.CieloRojoCliente.activo() + ", rojo "
+                    + com.darkcraft.client.fortaleza.CieloRojoCliente.k(0f) + ", columnas " + com.darkcraft.client.fortaleza.CieloRojoCliente.columnas());
+        });
+        atTicks(Qa + 124, "El mar de nubes rojo", m -> server(m, sp -> {
+            int top = fplan.Y + com.darkcraft.gen.TorreCupula.TERRAZA;
+            sp.teleportTo(sp.serverLevel(), fplan.cx + 70.5, fplan.Y + 30, fplan.cz + 40.5, -60f, 28f);
+        }));
+        atTicks(Qa + 164, "captura", m -> shot(m, "cliente_f40e_mar_rojo"));
+        atTicks(Qa + 166, "El portal abierto: de dia otra vez", m -> {
             m.options.hideGui = false;
             server(m, sp -> {
                 sp.serverLevel().setDayTime(hora[0]);
                 sp.getAbilities().flying = false;
                 sp.onUpdateAbilities();
                 int[] al = fplan.f.altar();
-                sp.teleportTo(sp.serverLevel(), al[0] + 0.5, al[1], al[2] + 2.5, 180f, -8f);
+                sp.teleportTo(sp.serverLevel(), al[0] + 3.5, al[1], al[2] + 3.5, 155f, -12f);
             });
         });
-        int Q = Qa + 80;
+        int Q = Qa + 184;
         atTicks(Q, "El portal abierto", m -> {
             enPrimeraPersona(m);
             server(m, sp -> {
@@ -6637,7 +6671,7 @@ public final class ClientCiTest {
             enPrimeraPersona(m);
             server(m, sp -> {
                 int[] al = fplan.f.altar();
-                sp.teleportTo(sp.serverLevel(), al[0] + 0.5, al[1], al[2] + 2.5, 0f, 18f);
+                sp.teleportTo(sp.serverLevel(), al[0] + 3.5, al[1], al[2] + 3.5, 0f, 18f);
             });
             log("  espejo en la fortaleza: " + com.darkcraft.client.espejo.EspejoCliente.resumen());
         });
@@ -6701,7 +6735,8 @@ public final class ClientCiTest {
         }));
         for (int k = 0; k < 6; k++) {
             final int kk = k;
-            int T = C + 10 + k * 120;
+            // (cada parada esta a 300-400 bloques de la anterior: tiempo para que lleguen y se dibujen sus chunks)
+            int T = C + 10 + k * 170;
             atTicks(T, "Camino de nubes: a la parada " + k, m -> {
                 enPrimeraPersona(m);
                 m.options.hideGui = true;
@@ -6729,12 +6764,12 @@ public final class ClientCiTest {
                 int[] o = p.en(-(p.r + 10), -(p.r + 4));
                 verDesde(m, new Vec3(o[0] + 0.5, com.darkcraft.gen.Parada.Y + 16, o[1] + 0.5), new Vec3(p.cx + 0.5, com.darkcraft.gen.Parada.Y + 2, p.cz + 0.5));
             });
-            atTicks(T + 70, "captura", m -> {
+            atTicks(T + 120, "captura", m -> {
                 if (ps[0] == null || kk >= ps[0].size()) return;
                 var s = (com.darkcraft.camino.Paradas.Sitio) ps[0].get(kk);
                 shot(m, String.format(java.util.Locale.ROOT, "cliente_cn%02d_%s", kk + 1, s.nombre()));
             });
-            atTicks(T + 76, "Camino de nubes: en la parada", m -> {
+            atTicks(T + 126, "Camino de nubes: en la parada", m -> {
                 m.smartCull = true;
                 server(m, sp -> {
                     if (ps[0] == null || kk >= ps[0].size()) return;
@@ -6749,7 +6784,7 @@ public final class ClientCiTest {
                 });
             });
         }
-        int F = C + 10 + 6 * 120;
+        int F = C + 10 + 6 * 170;
         atTicks(F, "Camino de nubes: fin (sus enemigos, por caidos)", m -> server(m, sp ->
                 com.darkcraft.enemigos.Puestos.todos(sp.server, com.darkcraft.camino.Paradas.clave(castle[0], castle[1]), true)));
         return F + 6;

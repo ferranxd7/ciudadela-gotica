@@ -8,6 +8,8 @@ El portal de la Sombra nuevo (parte 5e, respuestas 51-56 del plan): los bloques 
   hierro_negro             planchas de hierro negro con remaches
   gema_roja / gema_roja_luz  la gema en su engaste: apagada, y encendida (con luz propia) al abrirse el portal
   entity/remolino.png      el remolino rojo y negro del portal (256 x 256): un solo dibujo que el juego hace girar
+  entity/nubes_remolino.png  las nubes que se arremolinan sobre el portal en el capitulo 6
+  environment/luna_sangre.png  la luna de sangre (desde el rayo rojo)
 
 Pixel art procedural, siempre igual (semilla fija). Uso: python3 tools/fortaleza/portal.py
 """
@@ -41,7 +43,7 @@ def mezcla(a, b, t):
 
 PIEDRA = [(18, 14, 24), (28, 22, 36), (40, 31, 50), (55, 44, 66)]
 SURCO = (9, 6, 12)
-RUNA = [(120, 16, 12), (200, 34, 22), (255, 70, 40), (255, 150, 90)]
+RUNA = [(100, 8, 8), (170, 18, 14), (225, 36, 24), (250, 84, 56)]
 
 # tres runas (de 16 x 16; '#' surco con luz, '.' nada) con el marco tallado aparte
 RUNAS = [
@@ -287,6 +289,57 @@ def remolino(n=256):
     return img
 
 
+def nubes_remolino(n=256):
+    """Las nubes que se arremolinan sobre el portal (capitulo 6): brazos de nube gris en espiral, mas densos hacia el
+    centro, con el borde transparente (el juego lo usa con "clamp" y lo tine de rojo despues del rayo)."""
+    img = np.zeros((n, n, 4))
+    c = (n - 1) / 2.0
+    ruido = R.random((32, 32))
+    for y in range(n):
+        for x in range(n):
+            dx, dy = (x - c) / c, (y - c) / c
+            r = math.hypot(dx, dy)
+            a = math.atan2(dy, dx)
+            brazo = (math.sin(4 * a + 9.0 * math.log(r + 0.04)) + 1) / 2
+            # (ruido suave: interpolado entre los puntos de la rejilla)
+            fy, fx = y / n * 31, x / n * 31
+            iy, ix = int(fy), int(fx)
+            ty, tx = fy - iy, fx - ix
+            gr = (ruido[iy, ix] * (1 - tx) * (1 - ty) + ruido[iy, ix + 1] * tx * (1 - ty)
+                  + ruido[iy + 1, ix] * (1 - tx) * ty + ruido[iy + 1, ix + 1] * tx * ty)
+            dens = min(1.0, brazo * 0.8 + gr * 0.35 + max(0.0, 0.35 - r) * 1.6)
+            gris = mezcla((60, 56, 62), (205, 200, 210), dens ** 1.2)
+            img[y, x, :3] = gris
+            borde = 1.0 if r < 0.7 else max(0.0, 1 - (r - 0.7) / 0.16)
+            img[y, x, 3] = 255 * borde * (0.35 + 0.65 * dens)
+    return img
+
+
+def luna_sangre(n=64):
+    """La luna de sangre: un disco rojo oscuro con mares y crateres (tapa la luna de siempre) y un halo rojo alrededor."""
+    img = np.zeros((n, n, 4))
+    c = (n - 1) / 2.0
+    for y in range(n):
+        for x in range(n):
+            dx, dy = (x - c) / c, (y - c) / c
+            r = math.hypot(dx, dy)
+            if r < 0.78:
+                mar = 0.5 + 0.5 * math.sin(dx * 7.1 + 1.3) * math.cos(dy * 5.3 - 0.4)
+                crater = sum(max(0.0, 1 - math.hypot(dx - cx, dy - cy) / cr) for cx, cy, cr in
+                             ((-0.3, -0.2, 0.18), (0.25, 0.3, 0.14), (0.1, -0.45, 0.1), (-0.4, 0.35, 0.12), (0.45, -0.1, 0.09)))
+                t = min(1.0, 0.35 * mar + 0.6 * crater)
+                col = mezcla((196, 34, 22), (108, 10, 12), t)
+                # el borde, mas oscuro (como una esfera)
+                col = mezcla(col, (70, 6, 8), max(0.0, (r - 0.55) / 0.23) ** 1.5)
+                img[y, x, :3] = col
+                img[y, x, 3] = 255
+            else:
+                halo = max(0.0, 1 - (r - 0.78) / 0.22)
+                img[y, x, :3] = (200, 30, 20)
+                img[y, x, 3] = 150 * halo ** 2
+    return img
+
+
 def main():
     b = os.path.join(TEX, "block")
     for k in range(3):
@@ -299,6 +352,8 @@ def main():
     guardar(gema(True), os.path.join(b, "gema_roja_luz.png"))
     guardar(gema_brillo(), os.path.join(b, "gema_roja_brillo.png"))
     guardar(remolino(), os.path.join(TEX, "entity", "remolino.png"), {"texture": {"clamp": True}})
+    guardar(nubes_remolino(), os.path.join(TEX, "entity", "nubes_remolino.png"), {"texture": {"clamp": True}})
+    guardar(luna_sangre(), os.path.join(TEX, "environment", "luna_sangre.png"))
 
 
 if __name__ == "__main__":

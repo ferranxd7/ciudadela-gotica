@@ -28,8 +28,12 @@ public final class Timeline {
     public static final int[][] GROUPS = {{0, 1}, {2, 4}, {5, 5}, {6, 7}, {8, 9}};
     /** Los del capitulo 5: la sala, el arbol en flor, la tormenta, la llave, el cielo y la despedida. */
     public static final int[][] GROUPS5 = {{0, 0}, {1, 2}, {3, 4}, {5, 5}, {6, 7}, {8, 10}};
-    /** Los del capitulo 6 (habla la Sombra): la fortaleza, el patio, la torre, el arco, el portal y el jugador. */
-    public static final int[][] GROUPS6 = {{0, 1}, {2, 4}, {5, 5}, {6, 7}, {8, 9}, {10, 11}};
+    /**
+     * Los del capitulo 6 (parte 5e, habla la Sombra): la fortaleza, el jardin bajo la cupula, la terraza (se abre el
+     * portal), el cielo sobre el portal (las nubes y el rayo), la fortaleza de lejos (la columna y el cielo rojo), el
+     * remolino de cerca y el jugador.
+     */
+    public static final int[][] GROUPS6 = {{0, 0}, {1, 2}, {3, 4}, {5, 5}, {6, 7}, {8, 9}, {10, 10}};
 
     private record Datos(float duracion, float[][] lineas, boolean audio) {}
 
@@ -58,7 +62,7 @@ public final class Timeline {
             }
             d = new Datos(o.get("duracion").getAsFloat(), l, o.has("audio") && o.get("audio").getAsBoolean());
         } catch (Exception e) {
-            int n = ch == 5 ? 11 : ch == 6 ? 12 : 10;
+            int n = ch == 5 ? 11 : ch == 6 ? 11 : 10;
             float[][] l = new float[n][2];
             for (int i = 0; i < n; i++) {
                 l[i][0] = 0.3f + i * 6f;
@@ -107,6 +111,21 @@ public final class Timeline {
         int[][] gr = groups(ch);
         int last = Math.min(gr[g][1], l.length - 1), first = Math.min(gr[g + 1][0], l.length - 1);
         return NARR_START + (l[last][1] + l[first][0]) / 2f;
+    }
+
+    /** Capitulo 6 (s desde el principio): se abre el portal (antes de "Forjaste el amuleto..."). */
+    public static float abrePortal6() {
+        return NARR_START + lines(6)[3][0] - 0.5f;
+    }
+
+    /** Capitulo 6: las nubes empiezan a arremolinarse sobre el portal ("Ahora... mira arriba"). */
+    public static float nubes6() {
+        return NARR_START + lines(6)[5][0];
+    }
+
+    /** Capitulo 6: cae el rayo rojo (un segundo despues de "mira arriba") y empieza el cielo rojo. */
+    public static float rayo6() {
+        return NARR_START + lines(6)[5][1] + 1.0f;
     }
 
     /** Momento en que un capitulo narrado vuelve al jugador (en negro). */

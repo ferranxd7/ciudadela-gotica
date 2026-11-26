@@ -40,6 +40,35 @@ public final class ClientNubes {
         public boolean isFoggyAt(int x, int y) {
             return false;
         }
+
+        /** Dentro de la llamada de abajo (las dibuja Minecraft). */
+        private boolean dibujando;
+
+        /**
+         * Con el cielo rojo (parte 5e) las nubes de Minecraft salen rojas: se le pide a Minecraft que las dibuje con ese color
+         * (Minecraft no lo pone ni lo quita al dibujarlas) y luego se deja el color como estaba.
+         */
+        @Override
+        public boolean renderClouds(net.minecraft.client.multiplayer.ClientLevel level, int ticks, float pt, com.mojang.blaze3d.vertex.PoseStack ps,
+                                    double x, double y, double z, org.joml.Matrix4f proj) {
+            if (dibujando || com.darkcraft.client.fortaleza.CieloRojoCliente.k(pt) <= 0) return false;
+            dibujando = true;
+            try {
+                com.darkcraft.client.fortaleza.CieloRojoCliente.tenirNubes(pt);
+                net.minecraft.client.Minecraft.getInstance().levelRenderer.renderClouds(ps, proj, pt, x, y, z);
+            } finally {
+                com.mojang.blaze3d.systems.RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+                dibujando = false;
+            }
+            return true;
+        }
+
+        /** Y la luz del cielo tira a rojo. */
+        @Override
+        public void adjustLightmapColors(net.minecraft.client.multiplayer.ClientLevel level, float pt, float skyDarken, float blockFlicker,
+                                         float skyLight, int px, int py, org.joml.Vector3f colors) {
+            com.darkcraft.client.fortaleza.CieloRojoCliente.luz(pt, py, colors);
+        }
     }
 
     private static boolean dentro(Camera c) {

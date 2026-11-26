@@ -21,6 +21,14 @@ import net.minecraft.world.level.Level;
  */
 public class Remolino extends Entity {
     private static final EntityDataAccessor<Float> ABIERTO = SynchedEntityData.defineId(Remolino.class, EntityDataSerializers.FLOAT);
+    /**
+     * El capitulo 6 (parte 5e): cuando empezaron a arremolinarse las nubes sobre el portal y cuando cayo el rayo rojo (el
+     * tick del mundo; 0, nada). Solo durante la cinematica: no se guarda.
+     */
+    private static final EntityDataAccessor<Long> TORMENTA = SynchedEntityData.defineId(Remolino.class, EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<Long> RAYO = SynchedEntityData.defineId(Remolino.class, EntityDataSerializers.LONG);
+    /** Lo alto de las nubes que se arremolinan (sobre el pie del hueco) y lo que dura todo (s desde el rayo). */
+    public static final float ALTO_NUBES = 72f, DURA_TORMENTA = 24f;
     /** Lo abierto en el tick anterior (en el cliente, para suavizar). */
     public float abiertoO;
 
@@ -33,6 +41,26 @@ public class Remolino extends Entity {
     @Override
     protected void defineSynchedData() {
         entityData.define(ABIERTO, 1f);
+        entityData.define(TORMENTA, 0L);
+        entityData.define(RAYO, 0L);
+    }
+
+    public long tormenta() {
+        return entityData.get(TORMENTA);
+    }
+
+    public long rayo() {
+        return entityData.get(RAYO);
+    }
+
+    /** Empiezan a arremolinarse las nubes (ahora). */
+    public void tormenta(long tick) {
+        entityData.set(TORMENTA, tick);
+    }
+
+    /** Cae el rayo rojo (ahora). */
+    public void rayo(long tick) {
+        entityData.set(RAYO, tick);
     }
 
     public float abierto() {
@@ -77,7 +105,8 @@ public class Remolino extends Entity {
 
     @Override
     public boolean shouldRenderAtSqrDistance(double d) {
-        return d < 320 * 320;
+        // (las nubes que se arremolinan y el rayo se ven de lejos)
+        return d < 400 * 400;
     }
 
     @Override

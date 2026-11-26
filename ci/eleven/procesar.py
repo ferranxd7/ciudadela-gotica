@@ -97,6 +97,8 @@ SFX = {
     # la Fortaleza de Hueso
     "llave_rastro": (2.0, 0.5, -19), "puente_hueso": (5.5, 1.2, -15), "puerta_hueso": (8.0, 1.8, -13),
     "amuleto_forja": (5.0, 1.5, -14), "portal_abre": (7.0, 2.0, -13),
+    # el capitulo 6 (parte 5e): las nubes que se arremolinan, el rayo rojo, la columna de luz y el cielo que enrojece
+    "cielo_remolino": (7.0, 2.0, -14), "rayo_rojo": (6.0, 2.5, -11), "columna_roja": (6.0, 2.0, -15), "cielo_rojo": (7.0, 2.5, -15),
     # el HUD nuevo y el rol: carteles, ecos, espada de luz y guardia rota
     "has_muerto": (5.0, 2.2, -13), "jefe_abatido": (5.0, 2.0, -13), "zona_descubierta": (4.0, 1.6, -16),
     "ecos_recuperados": (2.6, 0.8, -15), "ecos_ganados": (0.7, 0.3, -22), "espada_luz": (3.8, 0.9, -21),
@@ -185,6 +187,10 @@ TOMAS_SFX = {
     "puerta_hueso": (1,),        # la mas larga: el cuerpo pesado dura lo que sube la reja
     "amuleto_forja": (1,),       # golpe y brillo que se sostiene antes de apagarse
     "portal_abre": (1,),         # crece y se mantiene cinco segundos
+    "cielo_remolino": (1,),      # el retumbar que se mantiene cuatro segundos (con mas graves)
+    "rayo_rojo": (3,),           # el chasquido y el trueno que tarda mas en irse
+    "columna_roja": (2,),        # crece desde nada hasta un rugido grave a los 2,5 s
+    "cielo_rojo": (3,),          # el que sube despacio y se sostiene
     "has_muerto": (3,),          # el golpe mas fuerte y con mas graves, que se apaga despacio
     "jefe_abatido": (1,),        # el mas largo (3,5 s de cola) y con mas cuerpo
     "zona_descubierta": (3,),    # una campanada clara al principio que se va apagando
@@ -446,6 +452,53 @@ def voz_sombra(src, sus, dst, lufs=-15.0):
     return hablado + COLA
 
 
+# el capitulo 6 (parte 5e): lo dice la Sombra (frases 10-20 de voz_sombra). Por frase: la toma de la voz, la del susurro
+# y lo que se calla despues (s; las de ci/historia/perdidos.py PAUSAS6: tras "mira arriba", las nubes y el rayo)
+CAPITULO6 = [(10, "a", "a", 1.4), (11, "b", "a", 0.9), (12, "b", "a", 1.5), (13, "b", "a", 2.2), (14, "a", "a", 1.6),
+             (15, "a", "a", 4.6), (16, "b", "a", 1.2), (17, "a", "a", 1.8), (18, "b", "a", 1.4), (19, "b", "a", 2.2),
+             (20, "b", "a", 0.0)]
+LEAD6 = 0.3
+
+
+def capitulo6():
+    """Las frases de la Sombra del capitulo 6, cada una con sus susurros y su eco (que se solapa con el silencio de
+    detras), juntas en sounds/narracion/cap6.ogg; y sus tiempos en cinematica/cap6.json, como los de los capitulos que
+    narra Aldous (asi la cinematica corta los planos y pone los subtitulos igual). Devuelve si salio."""
+    ogg = os.path.join(ASSETS, "sounds", "narracion", "cap6.ogg")
+    jsn = os.path.join(ASSETS, "cinematica", "cap6.json")
+    with tempfile.TemporaryDirectory() as tmp:
+        partes, lineas, t, fin = [], [], LEAD6, 0.0
+        for n, toma, ts, pausa in CAPITULO6:
+            src = os.path.join(MASTER, "sombra", f"voz_{n}{toma}.mp3")
+            sus = os.path.join(MASTER, "sombra", f"susurro_{n}{ts}.mp3")
+            if not os.path.exists(src) or not os.path.exists(sus):
+                print("capitulo 6: falta", src if not os.path.exists(src) else sus)
+                return False
+            dst = os.path.join(tmp, f"frase_{n}.ogg")
+            h = voz_sombra(src, sus, dst)
+            d = duracion(dst)
+            partes.append((dst, t))
+            lineas.append([round(t, 3), round(t + h, 3)])
+            fin = max(fin, t + d)
+            print(f"capitulo 6, frase {n}: empieza a los {t:.2f} s, habla {h:.2f} s (con el eco {d:.2f} s)")
+            t += h + pausa
+        args, grafo = [], ""
+        for i, (f, ti) in enumerate(partes):
+            args += ["-i", f]
+            grafo += f"[{i}:a]adelay={int(ti * 1000)}:all=1[d{i}];"
+        grafo += "".join(f"[d{i}]" for i in range(len(partes)))
+        grafo += (f"amix=inputs={len(partes)}:normalize=0:duration=longest,"
+                  "alimiter=level_in=1:level_out=1:limit=0.9:attack=4:release=80:level=false[out]")
+        os.makedirs(os.path.dirname(ogg), exist_ok=True)
+        ff(args + ["-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "2", "-c:a", "libvorbis", "-q:a", "6", ogg])
+    dur = duracion(ogg)
+    os.makedirs(os.path.dirname(jsn), exist_ok=True)
+    with open(jsn, "w") as fh:
+        json.dump({"voz": "sombra", "audio": True, "duracion": round(max(dur, lineas[-1][1] + 1.0), 3), "lineas": lineas}, fh)
+    print(f"capitulo 6: {len(lineas)} frases, {dur:.1f} s")
+    return True
+
+
 def efecto(src, dst, maxs, fade, lufs, entrada=0.0, graves=False, extra="", inicio=0.0):
     filtro = ((f"atrim=start={inicio},asetpts=PTS-STARTPTS," if inicio > 0 else "")
               + f"silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.02,atrim=0:{maxs},"
@@ -547,6 +600,13 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO sombra {n}: {e}")
+    # el capitulo 6, con la voz de la Sombra
+    try:
+        if not capitulo6():
+            fallos += 1
+    except Exception as e:  # noqa: BLE001
+        fallos += 1
+        print(f"FALLO capitulo 6: {e}")
     with open(os.path.join(ASSETS, "rey_voces.json"), "w") as fh:
         json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g, "capitan": dur_c, "habla_capitan": hab_c,
                    "sombra": dur_s, "habla_sombra": hab_s}, fh)

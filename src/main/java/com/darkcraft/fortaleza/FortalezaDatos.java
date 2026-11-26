@@ -22,7 +22,7 @@ public final class FortalezaDatos extends SavedData {
     /**
      * La fortaleza que se levanta ahora: 1 la de antes (murallas cuadradas), 2 la torre bajo la cupula (parte 5a, con la
      * escalera de caracol delante), 3 la misma a la que se sube por la montana y su puente largo (parte 5b), 4 con sus
-     * trampas, la cripta bajo la fuente y la sala secreta (parte 5c).
+     * trampas, la cripta bajo la fuente y la sala secreta (parte 5c), 5 con el portal nuevo de lo alto (parte 5e).
      */
     public static final int VERSION = 5;
 
@@ -47,6 +47,8 @@ public final class FortalezaDatos extends SavedData {
         public int[] puenteViejo;
         /** El muro falso del sotano ya se deshizo (la sala secreta queda abierta). */
         public boolean muro;
+        /** Ya cayo el rayo rojo sobre el portal abierto (parte 5e: desde entonces, el cielo rojo y su columna de luz). */
+        public boolean rayo;
     }
 
     final Map<String, Estado> fortalezas = new HashMap<>();
@@ -84,6 +86,7 @@ public final class FortalezaDatos extends SavedData {
             for (Tag x : c.getList("llaves", Tag.TAG_STRING)) e.llaves.add(x.getAsString());
             if (c.contains("puente_viejo")) e.puenteViejo = c.getIntArray("puente_viejo");
             e.muro = c.getBoolean("muro");
+            e.rayo = c.getBoolean("rayo");
         }
         for (Tag x : t.getList("libros", Tag.TAG_STRING)) d.libros.add(x.getAsString());
         return d;
@@ -110,6 +113,7 @@ public final class FortalezaDatos extends SavedData {
             c.put("llaves", ll);
             if (e.puenteViejo != null) c.putIntArray("puente_viejo", e.puenteViejo);
             c.putBoolean("muro", e.muro);
+            c.putBoolean("rayo", e.rayo);
             fs.put(en.getKey(), c);
         }
         t.put("fortalezas", fs);

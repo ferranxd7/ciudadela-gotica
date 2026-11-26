@@ -297,6 +297,13 @@ public final class CiTest {
                     var fp = com.darkcraft.fortaleza.Fortalezas.plan(seed, fs);
                     montanaDeLaFortaleza(log, lvl, fp);
                     paradasDelCamino(log, lvl, s);
+                    // parte 5e: el capitulo 6 con la voz de la Sombra (su audio y sus tiempos los monta procesar.py)
+                    float[][] l6 = com.darkcraft.cine.Timeline.lines(6);
+                    log.println(String.format(java.util.Locale.ROOT,
+                            "Capitulo 6 (la Sombra): audio %s, %d frases, %.1f s de voz; se abre el portal a los %.1f s, las nubes a los %.1f, el rayo a los %.1f; dura %.1f s; %s",
+                            com.darkcraft.cine.Timeline.hasAudio(6), l6.length, com.darkcraft.cine.Timeline.narration(6), com.darkcraft.cine.Timeline.abrePortal6(),
+                            com.darkcraft.cine.Timeline.nubes6(), com.darkcraft.cine.Timeline.rayo6(), com.darkcraft.cine.Timeline.total(6),
+                            com.darkcraft.fortaleza.CieloRojo.resumen(server)));
                 }
                 int x = s[0] + 900, z = s[1] + 900;
                 lvl.getChunk(x >> 4, z >> 4);

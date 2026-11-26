@@ -167,24 +167,58 @@ public final class Cinematics {
     }
 
     /**
-     * Capitulo 6 (habla la Sombra) en lo alto de la Fortaleza de Hueso: para quien abre el portal y los que esten a menos
-     * de 100 bloques. Sin cofre: al acabar, el libro del capitulo (FortalezaEventos.finCapitulo6).
+     * Capitulo 6 (habla la Sombra) en lo alto de la Fortaleza de Hueso. Si abre el portal ({@code todos}: respuesta 67 del
+     * plan), la ven entera todos los jugadores del mundo, esten donde esten: a los que estan lejos (a mas de 100 bloques)
+     * se les lleva de plano en plano sin que se les vea, como en el capitulo 1, y vuelven a su sitio al acabar. Si no (se
+     * vuelve a ver en el altar), solo quien la pide y los de alrededor. Sin cofre: al acabar, el libro del capitulo
+     * (FortalezaEventos.finCapitulo6). Devuelve los jugadores que la ven.
      */
-    public static void playCapitulo6(ServerPlayer opener, com.darkcraft.gen.FortalezaPlan f) {
+    public static List<ServerPlayer> playCapitulo6(ServerPlayer opener, com.darkcraft.gen.FortalezaPlan f, boolean todos) {
         ServerLevel lvl = opener.serverLevel();
         List<ServerPlayer> who = new ArrayList<>();
         who.add(opener);
-        for (ServerPlayer p : lvl.players())
-            if (p != opener && !active(p) && !p.isSpectator() && p.distanceToSqr(opener) <= 100 * 100) who.add(p);
+        for (ServerPlayer p : lvl.players()) {
+            if (p == opener || active(p) || p.isSpectator() || !p.isAlive()) continue;
+            if (todos || p.distanceToSqr(opener) <= 100 * 100) who.add(p);
+        }
         for (ServerPlayer p : who) {
+            boolean lejos = p != opener && p.distanceToSqr(opener) > 100 * 100;
             Session s = new Session();
             s.chapter = 6;
             s.startTick = lvl.getServer().getTickCount();
             s.total = Timeline.total(6);
-            s.shots = CineShots.chapter6(f, lvl, p.getEyePosition(), p.getYRot());
+            s.shots = CineShots.chapter6(f, lvl, p.getEyePosition(), p.getYRot(), lejos);
+            if (lejos) {
+                // como en el capitulo 1: flota sin verse y va al sitio de cada plano (para que le lleguen sus chunks)
+                s.rx = p.getX();
+                s.ry = p.getY();
+                s.rz = p.getZ();
+                s.ryaw = p.getYRot();
+                s.rpitch = p.getXRot();
+                s.flying = p.getAbilities().flying;
+                s.mayfly = p.getAbilities().mayfly;
+                s.invisible = p.isInvisible();
+                CompoundTag b = new CompoundTag();
+                b.putDouble("x", s.rx);
+                b.putDouble("y", s.ry);
+                b.putDouble("z", s.rz);
+                b.putFloat("yaw", s.ryaw);
+                b.putFloat("pitch", s.rpitch);
+                p.getPersistentData().put(BACK, b);
+                p.stopRiding();
+                p.getAbilities().mayfly = true;
+                p.getAbilities().flying = true;
+                p.onUpdateAbilities();
+                p.setInvisible(true);
+                s.moved = true;
+                double[] a = s.shots.get(0).at((s.shots.get(0).t0 + s.shots.get(0).t1) / 2);
+                float[] ang = Shot.angles(a);
+                p.teleportTo(lvl, a[0], a[1] - 1.62, a[2], ang[0], ang[1]);
+            }
             ACTIVE.put(p.getUUID(), s);
             Net.to(p, new Net.CineStart(6, s.shots, new double[0]));
         }
+        return who;
     }
 
     /**

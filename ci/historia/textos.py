@@ -299,7 +299,7 @@ GAVRAN_UI = {
   "darkcraft.dir.o": "oeste",
   "darkcraft.dir.no": "noroeste",
   "darkcraft.corriente": "La corriente de nubes te sube  ·  Agáchate para bajar despacio",
-  "darkcraft.portal.aun_no": "El umbral aún no te conoce.",
+  "darkcraft.portal.aun_no": "Al otro lado, las Tierras Marchitas aún no se han alzado… (Morvain llegará en una próxima actualización)",
   "darkcraft.portal.ya": "El portal ya está abierto.",
   "darkcraft.amuleto.lejos": "El amuleto solo despierta en la Fortaleza de Hueso.",
   "darkcraft.amuleto.altar": "Llévalo al altar de lo más alto de la torre.",
@@ -335,6 +335,11 @@ GAVRAN_UI = {
   "subtitles.darkcraft.sfx.puerta_hueso": "Sube la reja de hueso",
   "subtitles.darkcraft.sfx.amuleto_forja": "Se forja el amuleto",
   "subtitles.darkcraft.sfx.portal_abre": "Se abre el portal de la Sombra",
+  "subtitles.darkcraft.sfx.cielo_remolino": "Las nubes se arremolinan",
+  "subtitles.darkcraft.sfx.rayo_rojo": "Cae un rayo rojo",
+  "subtitles.darkcraft.sfx.columna_roja": "Ruge la columna de luz roja",
+  "subtitles.darkcraft.sfx.cielo_rojo": "El cielo se tiñe de sangre",
+  "subtitles.darkcraft.sombra": "La Sombra habla",
   "advancements.darkcraft.fortaleza.title": "Sobre las nubes",
   "advancements.darkcraft.fortaleza.description": "Ve la Fortaleza de Hueso",
   "advancements.darkcraft.puente.title": "Un puente de hueso y nubes",
@@ -458,7 +463,7 @@ GAVRAN_UI = {
   "darkcraft.dir.o": "west",
   "darkcraft.dir.no": "northwest",
   "darkcraft.corriente": "The cloud current lifts you  ·  Sneak to drift down",
-  "darkcraft.portal.aun_no": "The threshold does not know you yet.",
+  "darkcraft.portal.aun_no": "Beyond, the Withered Lands have not yet risen… (Morvain arrives in a future update)",
   "darkcraft.portal.ya": "The portal is already open.",
   "darkcraft.amuleto.lejos": "The amulet only wakes in the Bone Fortress.",
   "darkcraft.amuleto.altar": "Take it to the altar at the top of the tower.",
@@ -494,6 +499,11 @@ GAVRAN_UI = {
   "subtitles.darkcraft.sfx.puerta_hueso": "Bone portcullis rises",
   "subtitles.darkcraft.sfx.amuleto_forja": "The amulet is forged",
   "subtitles.darkcraft.sfx.portal_abre": "The Shadow's portal opens",
+  "subtitles.darkcraft.sfx.cielo_remolino": "Clouds swirl",
+  "subtitles.darkcraft.sfx.rayo_rojo": "Red lightning strikes",
+  "subtitles.darkcraft.sfx.columna_roja": "The red pillar of light roars",
+  "subtitles.darkcraft.sfx.cielo_rojo": "The sky bleeds red",
+  "subtitles.darkcraft.sombra": "The Shadow speaks",
   "advancements.darkcraft.fortaleza.title": "Above the Clouds",
   "advancements.darkcraft.fortaleza.description": "See the Bone Fortress",
   "advancements.darkcraft.puente.title": "A Bridge of Bone and Cloud",
@@ -1300,7 +1310,8 @@ if __name__ == "__main__":
             with open(os.path.join(root, fname), "w", encoding="utf-8") as f:
                 json.dump(d, f, ensure_ascii=False, indent=2)
     # texto para el narrador, un fichero por capitulo narrado (lo usa ci/narracion/generar.sh)
-    for cap, lineas, pausas in ((1, NARRACION, PAUSAS), (5, NARRACION5, PAUSAS5), (6, perdidos.NARRACION6, perdidos.PAUSAS6)):
+    # (el capitulo 6 lo dice la Sombra con su voz de ElevenLabs: lo monta ci/eleven/procesar.py)
+    for cap, lineas, pausas in ((1, NARRACION, PAUSAS), (5, NARRACION5, PAUSAS5)):
         assert len(lineas) == len(pausas), f"capitulo {cap}: {len(lineas)} frases y {len(pausas)} pausas"
         nar = os.path.join(os.path.dirname(__file__), "..", "narracion", f"cap{cap}.txt")
         os.makedirs(os.path.dirname(nar), exist_ok=True)

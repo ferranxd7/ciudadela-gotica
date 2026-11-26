@@ -152,7 +152,7 @@ public final class ComandosFortaleza {
                     if (e.puente) Puente.quitar(lvl, f);
                     if (e.portal) FortalezaEventos.cerrarPortal(lvl, f);
                     Trampas.reiniciar(lvl, f, e);
-                    e.puerta = e.portal = e.puente = false;
+                    e.puerta = e.portal = e.puente = e.rayo = false;
                     e.baseEscalera = Integer.MIN_VALUE;
                     d.setDirty();
                     c.getSource().sendSuccess(() -> Component.translatable("darkcraft.fortaleza.reiniciada"), false);

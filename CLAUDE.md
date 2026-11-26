@@ -1201,6 +1201,41 @@ Respuestas 48-56 del plan. En la terraza de lo alto de la torre (`TorreCupula.te
   en el pedestal 1`, de `FortalezaEventos.resumenPortal`) y `cliente_f40b_estatuas`. Sin abrir el juego: `Volcado torre`
   (`-Dabierto=true`: abierto) y `montana -Dtodo=true` (se llega ante el pedestal, ante el portal y al atril de la terraza).
 
+### Plan grande, parte 5e-2: el capitulo 6 con la voz de la Sombra, el rayo rojo y el cielo rojo
+
+Respuestas 57-67 del plan.
+- **La voz**: el capitulo 6 lo dice la Sombra (ElevenLabs, la voz de la parte 3d, flow `AqkIj7OE07LCh5cMIoZU`): frases
+  10-20 de `voz_sombra` (tomas a/b y su susurro), texto en `ci/historia/perdidos.py` `NARRACION6` (11 frases, en ingles
+  en el audio y subtitulos en cada idioma; el libro del capitulo, en 4 paginas). `ci/eleven/procesar.py` `capitulo6()`
+  monta cada frase con `voz_sombra` (susurros y eco de vacio) y las junta con sus pausas (`CAPITULO6`, la de tras "mira
+  arriba" es la del rayo) en `sounds/narracion/cap6.ogg` (estereo) y `cinematica/cap6.json` (como los de Aldous: asi la
+  cinematica corta planos y pone subtitulos igual). Piper ya no hace el capitulo 6 (no hay `ci/narracion/cap6.txt`).
+- **La cinematica** (~80 s, `CineShots.chapter6`, grupos `Timeline.GROUPS6`): la fortaleza de fuera, el jardin bajo la
+  cupula, la terraza (se abre el portal, `Timeline.abrePortal6`), el cielo sobre el portal desde la terraza (las nubes se
+  arremolinan, `nubes6`; cae el rayo, `rayo6`), la fortaleza de lejos con la columna y el cielo enrojeciendo, el remolino
+  de cerca y el jugador. **La ven todos los jugadores** (`Cinematics.playCapitulo6(..., todos)`): a los que estan a mas
+  de 100 bloques se les lleva de plano en plano sin verse (como en el capitulo 1) y vuelven a su sitio; su ultimo plano
+  es el amuleto en el pedestal.
+- **Las nubes y el rayo** (`FortalezaEventos.nubes` / `rayo`; el `Remolino` lleva `tormenta` y `rayo`, el tick del mundo):
+  `RemolinoRenderer` dibuja un disco de nubes en espiral 72 bloques por encima del hueco (`entity/nubes_remolino.png`)
+  que crece, gira y desde el rayo se enrojece (se deshace a los 24 s); el rayo es un zigzag con ramas en tres capas
+  (`RenderType.lightning`) que parpadea 1,5 s, con el destello del cielo. Sonidos para cada uno de los que la ven:
+  `sfx.cielo_remolino`, `sfx.rayo_rojo` (+ trueno), `sfx.columna_roja` y `sfx.cielo_rojo` (ElevenLabs, flow de efectos).
+  Si el portal se abrio antes (o se corto la cinematica), el rayo cae al llegar alguien (`asegurarPortal`, `Estado.rayo`).
+- **El cielo rojo** (`fortaleza/CieloRojo`, SavedData `darkcraft_cielo_rojo`: activo, desde, columnas, vencida; se
+  manda al entrar con `Net.CieloRojo`): en el cliente (`client/fortaleza/CieloRojoCliente`) en 8 s: la niebla roja
+  (`ComputeFogColor`), un velo rojo sobre el cielo (`AFTER_SKY`, una caja sin profundidad alrededor de la camara), la luz
+  del cielo tira a rojo (`ClientNubes.Efectos.adjustLightmapColors`), las nubes de Minecraft rojas (`renderClouds`: se
+  dibujan con otro color y se deja como estaba), las del mar de nubes rojas (los modelos de `nube` llevan `tintindex` y un
+  `BlockColor`; al cambiar se rehacen los chunks), la luna de sangre (`environment/luna_sangre.png`, encima de la luna y
+  mas grande, de noche) y la columna de luz roja de cada portal (el haz de un faro, `BeaconRenderer.renderBeaconBeam`,
+  1024 de alto, se ve de lejos). Dura hasta vencer a la Sombra (`CieloRojo.apagar(srv, true)`, parte 7); el comando
+  reiniciar de la fortaleza lo apaga.
+- El portal aun no se cruza (Morvain es la parte 7): al tocarlo empuja con "las Tierras Marchitas aun no se han alzado".
+- Pruebas: servidor, linea `Capitulo 6 (la Sombra): audio true, 11 frases ...`; cliente, capturas
+  `cliente_f301_capitulo6_titulo` ... `f310_..._final` (las gemas, los pilares, las nubes, el rayo, el cielo rojo),
+  `cliente_f40c_luna_sangre`, `cliente_f40d_cielo_rojo` y las lineas `tras el rayo: cielo rojo SI ... columnas 1`.
+
 ### Lo siguiente: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1208,9 +1243,8 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5b, la montana y el puente largo**: hecha (arriba). Los enemigos del sendero van con los de dentro (5c).
 - **5c, dentro de la fortaleza y en la montana**: hecha (arriba).
 - **5d, el camino de nubes**: hecha (arriba).
-- **5e, el portal** (48-68): 5e-1 hecha (arriba: marco, remolino, pilares, estatuas y pedestal). Falta 5e-2: la voz de la
-  Sombra (ElevenLabs), el capitulo 6 reescrito y su cinematica de un minuto con el rayo rojo, las nubes, el cielo y la
-  niebla rojos y la luna de sangre (hasta vencer a la Sombra), para todos los jugadores.
+- **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
+  rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

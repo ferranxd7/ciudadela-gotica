@@ -118,6 +118,11 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_PUERTA_HUESO = sound("sfx.puerta_hueso");
     public static final RegistryObject<SoundEvent> SFX_AMULETO_FORJA = sound("sfx.amuleto_forja");
     public static final RegistryObject<SoundEvent> SFX_PORTAL_ABRE = sound("sfx.portal_abre");
+    /** El capitulo 6 (parte 5e): las nubes que se arremolinan, el rayo rojo, la columna de luz y el cielo que enrojece. */
+    public static final RegistryObject<SoundEvent> SFX_CIELO_REMOLINO = sound("sfx.cielo_remolino");
+    public static final RegistryObject<SoundEvent> SFX_RAYO_ROJO = sound("sfx.rayo_rojo");
+    public static final RegistryObject<SoundEvent> SFX_COLUMNA_ROJA = sound("sfx.columna_roja");
+    public static final RegistryObject<SoundEvent> SFX_CIELO_ROJO = sound("sfx.cielo_rojo");
     // el HUD nuevo y el rol: carteles, ecos, espada de luz y guardia rota
     public static final RegistryObject<SoundEvent> SFX_HAS_MUERTO = sound("sfx.has_muerto");
     public static final RegistryObject<SoundEvent> SFX_JEFE_ABATIDO = sound("sfx.jefe_abatido");

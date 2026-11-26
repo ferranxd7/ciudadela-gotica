@@ -182,22 +182,25 @@ public final class CineShots {
     }
 
     /**
-     * Capitulo 6 (habla la Sombra): la fortaleza sobre las nubes desde fuera, el jardin muerto bajo la cupula, la torre
-     * subiendo hacia la cupula, el arco del portal en la terraza (se abre en este plano), el portal de cerca y, al final,
-     * el jugador junto al altar. Todo cerca: no se mueve al jugador.
+     * Capitulo 6 (parte 5e, habla la Sombra): la fortaleza sobre las nubes desde fuera; el jardin muerto bajo la cupula; la
+     * terraza, donde se abre el portal (las gemas, las cadenas, los pilares); desde abajo, el cielo sobre el portal, donde se
+     * arremolinan las nubes y cae el rayo rojo; la fortaleza de lejos con la columna de luz y el cielo enrojeciendo; el
+     * remolino de cerca; y al final el jugador junto al altar. Quien la ve desde lejos ({@code lejos}: se le lleva de plano
+     * en plano) acaba en el pedestal, con el amuleto.
      */
-    public static List<Shot> chapter6(com.darkcraft.gen.FortalezaPlan f, ServerLevel sl, Vec3 eye, float yaw) {
+    public static List<Shot> chapter6(com.darkcraft.gen.FortalezaPlan f, ServerLevel sl, Vec3 eye, float yaw, boolean lejos) {
         float t0 = Timeline.NARR_START - 0.6f, back = Timeline.back(6);
-        float c1 = Timeline.cut(6, 0), c2 = Timeline.cut(6, 1), c3 = Timeline.cut(6, 2), c4 = Timeline.cut(6, 3), c5 = Timeline.cut(6, 4);
+        float c1 = Timeline.cut(6, 0), c2 = Timeline.cut(6, 1), c3 = Timeline.cut(6, 2), c4 = Timeline.cut(6, 3), c5 = Timeline.cut(6, 4),
+                c6 = Timeline.cut(6, 5);
         double cx = f.cx + 0.5, cz = f.cz + 0.5, Y = f.Y;
         double top = Y + com.darkcraft.gen.TorreCupula.TERRAZA;
         double az = f.cz + com.darkcraft.gen.TorreCupula.AZ + 0.5;
         List<Shot> l = new ArrayList<>();
-        // 1) "...hasta aqui, sobre las nubes": la fortaleza entera desde fuera, la camara gira despacio
+        // 1) "Asi que... el marcado ha subido hasta mi puerta": la fortaleza entera desde fuera, la camara gira despacio
         l.add(new Shot(t0, c1, 66, 0, 1,
                 p(cx + 100, Y + 24, cz + 66, cx + 88, Y + 30, cz + 86, cx + 68, Y + 36, cz + 100),
                 p(cx, Y + 26, cz - 4, cx, Y + 28, cz - 4, cx, Y + 30, cz - 4)));
-        // 2) "...me llamaron la Sombra": por el camino del jardin muerto, bajo la cupula, mirando arriba
+        // 2) "Un rey me suplico... Ellos fallaron. Tu no.": por el camino del jardin muerto, bajo la cupula, mirando arriba
         l.add(primero(sl,
                 new Shot(c1, c2, 70, 0, 1,
                         p(cx + 1.5, Y + 2.6, cz + 36, cx + 0.5, Y + 3.2, cz + 31, cx - 0.5, Y + 3.6, cz + 26),
@@ -205,24 +208,31 @@ public final class CineShots {
                 new Shot(c1, c2, 70, 0, 1,
                         p(cx + 1.5, Y + 2.2, cz + 34, cx + 0.5, Y + 2.4, cz + 30, cx - 0.5, Y + 2.6, cz + 26),
                         p(cx, Y + 22, cz + 6, cx, Y + 30, cz + 3, cx, Y + 38, cz))));
-        // 3) "Has vencido a su rey...": sube junto a la cara sur de la torre, de la puerta hacia la cupula
-        l.add(primero(sl,
-                new Shot(c2, c3, 64, 0, 0,
-                        p(cx - 6, Y + 3, cz + 19, cx - 5, Y + 12, cz + 18, cx - 4, Y + 21, cz + 17),
-                        p(cx, Y + 8, cz + 10, cx, Y + 26, cz + 8, cx, Y + 44, cz + 4)),
-                new Shot(c2, c3, 64, 0, 0,
-                        p(cx + 1, Y + 3, cz + 21, cx + 1, Y + 11, cz + 20, cx + 1, Y + 19, cz + 19),
-                        p(cx, Y + 8, cz + 10, cx, Y + 26, cz + 8, cx, Y + 44, cz + 4))));
-        // 4) "...abres mi puerta con el amuleto": el arco del portal en la terraza (aqui se abre)
-        l.add(new Shot(c3, c4, 60, 0, 1,
-                p(cx + 6, top + 3.2, cz + 9, cx + 5, top + 3.0, cz + 6.5, cx + 4.5, top + 2.8, cz + 4.5),
-                p(cx, top + 6, az, cx, top + 6, az, cx, top + 6, az)));
-        // 5) "Todavia no puedes cruzar...": el remolino de cerca
-        l.add(new Shot(c4, c5, 50, 0, 1,
-                p(cx - 1.4, top + 5.2, az + 3.6, cx, top + 5.6, az + 2.8, cx + 1.4, top + 6.0, az + 2.4),
-                p(cx, top + 5.6, az, cx, top + 5.8, az, cx, top + 6, az)));
-        // 6) "Vuelve cuando estes preparado...": el jugador junto al altar
-        l.add(jugador(sl, eye, yaw, c5, back + 0.05f));
+        // 3) "Forjaste el amuleto... Gracias.": la terraza, detras del pedestal; aqui se abre el portal
+        l.add(new Shot(c2, c3, 62, 0, 1,
+                p(cx + 4.5, top + 3.4, az + 10.5, cx + 3.6, top + 3.1, az + 9.0, cx + 2.6, top + 2.9, az + 7.6),
+                p(cx, top + 6.5, az, cx, top + 6.5, az, cx, top + 6.8, az)));
+        // 4) "Ahora... mira arriba.": desde la terraza, el cielo sobre el portal: las nubes se arremolinan y cae el rayo
+        l.add(new Shot(c3, c4, 74, 0, 1,
+                p(cx - 5.5, top + 1.9, az + 8.5, cx - 5.0, top + 1.9, az + 8.0, cx - 4.6, top + 2.0, az + 7.6),
+                p(cx, top + 40, az - 6, cx, top + 46, az - 5, cx, top + 50, az - 4)));
+        // 5) "El cielo recuerda mi nombre... arderan rojas": la fortaleza de lejos, la columna de luz y el cielo enrojeciendo
+        l.add(new Shot(c4, c5, 70, 0, 1,
+                p(cx - 74, Y + 30, cz + 52, cx - 70, Y + 34, cz + 58, cx - 64, Y + 38, cz + 64),
+                p(cx, Y + 62, cz - 8, cx, Y + 66, cz - 8, cx, Y + 70, cz - 8)));
+        // 6) "Tras esta puerta... Cruza, marcado.": el remolino de cerca
+        l.add(new Shot(c5, c6, 52, 0, 1,
+                p(cx - 1.6, top + 5.4, az + 5.2, cx - 0.2, top + 5.8, az + 4.2, cx + 1.2, top + 6.1, az + 3.4),
+                p(cx, top + 5.8, az, cx, top + 6, az, cx, top + 6.2, az)));
+        // 7) "Yo siempre espero.": el jugador junto al altar (o, quien lo ve desde lejos, el amuleto en su pedestal)
+        if (!lejos) l.add(jugador(sl, eye, yaw, c6, back + 0.05f));
+        else {
+            int[] al = f.f.altar();
+            double ax = al[0] + 0.5, ay = al[1] + 2.6, azz = al[2] + 0.5;
+            l.add(new Shot(c6, back + 0.05f, 56, 0, 1,
+                    p(ax + 2.6, ay + 0.9, azz + 3.0, ax + 2.1, ay + 0.7, azz + 2.5, ax + 1.7, ay + 0.6, azz + 2.1),
+                    p(ax, ay, azz, ax, ay, azz, ax, ay + 0.1, azz)));
+        }
         return l;
     }
 

@@ -182,9 +182,9 @@ public final class TorreCupula extends Element {
         return new int[]{cx + 6, Y, cz - 3};
     }
 
-    /** El pedestal del amuleto, delante del portal en la terraza. */
+    /** El pedestal del amuleto, delante del portal en la terraza (con dos de paso hasta el barandal del ascensor). */
     public int[] altar() {
-        return new int[]{cx, Y + TERRAZA, cz + AZ + 5};
+        return new int[]{cx, Y + TERRAZA, cz + AZ + 4};
     }
 
     /** El hueco del portal: {x0, y0, z, x1, y1} (con su arco: {@link #arcoPortal}). */

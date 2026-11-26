@@ -298,7 +298,7 @@ public final class FortalezaEventos {
         est.hechos.clear();
         est.completa = false;
         est.rehecha = est.rehecha || !est.porLimpiar.isEmpty();
-        est.puerta = est.puente = est.portal = false;
+        est.puerta = est.puente = est.portal = est.rayo = false;
         est.baseEscalera = Integer.MIN_VALUE;
         est.parche = 0;
         est.version = FortalezaDatos.VERSION;
@@ -647,14 +647,27 @@ public final class FortalezaEventos {
         return true;
     }
 
-    /** El capitulo 6: la cinematica narrada en lo alto de la fortaleza; si abre, el portal se abre a mitad. */
+    /** Las fortalezas cuyo capitulo 6 esta en marcha (hasta el rayo): asegurarPortal no les adelanta el rayo. */
+    private static final Set<String> EN_CURSO = new HashSet<>();
+
+    /**
+     * El capitulo 6: la cinematica en lo alto de la fortaleza, con la voz de la Sombra. Si abre (respuestas 60-67 del
+     * plan), la ven todos los jugadores; a mitad se abre el portal, despues las nubes se arremolinan sobre el, cae el rayo
+     * rojo y el cielo de todo el mundo se vuelve rojo.
+     */
     public static void capitulo6(ServerPlayer p, FortalezaPlan f, boolean abre) {
         ServerLevel lvl = p.serverLevel();
         despejarAzotea(lvl, f);
-        Cinematics.playCapitulo6(p, f);
+        List<ServerPlayer> ven = Cinematics.playCapitulo6(p, f, abre);
         if (!abre) return;
-        int t = Math.round((Timeline.cut(6, 2) + 1.2f) * 20);
-        despues(p.server, t, () -> abrirPortal(lvl, f));
+        String clave = clave(f);
+        EN_CURSO.add(clave);
+        despues(p.server, Math.round(Timeline.abrePortal6() * 20), () -> abrirPortal(lvl, f));
+        despues(p.server, Math.round(Timeline.nubes6() * 20), () -> nubes(lvl, f, ven));
+        despues(p.server, Math.round(Timeline.rayo6() * 20), () -> {
+            EN_CURSO.remove(clave);
+            rayo(lvl, f, ven);
+        });
         int[] al = f.f.altar();
         // el amuleto se deshace en el altar
         lvl.sendParticles(ParticleTypes.END_ROD, al[0] + 0.5, al[1] + 1.6, al[2] + 0.5, 30, 0.3, 0.4, 0.3, 0.08);
@@ -743,8 +756,64 @@ public final class FortalezaEventos {
         despues(lvl.getServer(), 10, () -> ponerAmuleto(lvl, f));
     }
 
+    private static String clave(FortalezaPlan f) {
+        return f.cx + "," + f.cz;
+    }
+
+    /** El remolino del portal de esa fortaleza (el que haya; si no, uno nuevo ya abierto). */
+    private static Remolino remolino(ServerLevel lvl, FortalezaPlan f) {
+        List<Remolino> rs = lvl.getEntitiesOfClass(Remolino.class, cajaRemolino(f));
+        return rs.isEmpty() ? ponerRemolino(lvl, f, 1f) : rs.get(0);
+    }
+
+    /** Lo alto del arco del portal: el pie de su columna de luz. */
+    public static int[] columna(FortalezaPlan f) {
+        int[] q = f.f.portal();
+        return new int[]{f.cx, q[1] + TorreCupula.AALTO + 3, q[2]};
+    }
+
+    /** Un sonido para cada uno de los que ven la cinematica (donde esten: suena junto a ellos). */
+    private static void suena(List<ServerPlayer> ven, net.minecraft.sounds.SoundEvent ev, float vol, float tono) {
+        for (ServerPlayer p : ven) if (p.isAlive() && !p.hasDisconnected()) p.playNotifySound(ev, SoundSource.AMBIENT, vol, tono);
+    }
+
+    /** Capitulo 6, "Ahora... mira arriba": las nubes empiezan a arremolinarse sobre el portal. */
+    private static void nubes(ServerLevel lvl, FortalezaPlan f, List<ServerPlayer> ven) {
+        Remolino r = remolino(lvl, f);
+        if (r != null) r.tormenta(lvl.getGameTime());
+        suena(ven, DarkCraftMod.SFX_CIELO_REMOLINO.get(), 1.0f, 1.0f);
+    }
+
+    /**
+     * El rayo rojo (respuesta 63): cae sobre el portal, queda la columna de luz roja y el cielo de todo el mundo se vuelve
+     * rojo (CieloRojo, respuestas 64-66). {@code ven}: a quienes suena (los que ven la cinematica; si no la hay, los de la
+     * zona).
+     */
+    public static void rayo(ServerLevel lvl, FortalezaPlan f, List<ServerPlayer> ven) {
+        Fortalezas.Sitio s = Fortalezas.cercana(lvl.getSeed(), f.cx, f.cz, 64);
+        FortalezaDatos d = FortalezaDatos.get(lvl.getServer());
+        if (s != null) {
+            d.de(s).rayo = true;
+            d.setDirty();
+        }
+        Remolino r = remolino(lvl, f);
+        if (r != null) {
+            if (r.tormenta() <= 0) r.tormenta(lvl.getGameTime() - 60);
+            r.rayo(lvl.getGameTime());
+        }
+        int[] c = columna(f);
+        suena(ven, DarkCraftMod.SFX_RAYO_ROJO.get(), 1.2f, 1.0f);
+        suena(ven, SoundEvents.LIGHTNING_BOLT_THUNDER, 0.7f, 0.6f);
+        lvl.sendParticles(ParticleTypes.EXPLOSION_EMITTER, c[0] + 0.5, c[1], c[2] + 0.5, 2, 0.5, 0.5, 0.5, 0);
+        lvl.sendParticles(ParticleTypes.FLASH, c[0] + 0.5, c[1], c[2] + 0.5, 3, 0.5, 0.5, 0.5, 0);
+        CieloRojo.encender(lvl.getServer(), c);
+        despues(lvl.getServer(), 20, () -> suena(ven, DarkCraftMod.SFX_COLUMNA_ROJA.get(), 1.0f, 1.0f));
+        despues(lvl.getServer(), 44, () -> suena(ven, DarkCraftMod.SFX_CIELO_ROJO.get(), 1.0f, 1.0f));
+    }
+
     /** Para el comando de reiniciar: el portal cerrado y todo lo suyo como antes de abrirse. */
     public static void cerrarPortal(ServerLevel lvl, FortalezaPlan f) {
+        CieloRojo.apagar(lvl.getServer(), false);
         int[] q = f.f.portal();
         for (int x = q[0]; x <= q[3]; x++)
             for (int y = q[1]; y <= q[4]; y++)
@@ -815,6 +884,8 @@ public final class FortalezaEventos {
         FortalezaDatos.Estado est = FortalezaDatos.get(lvl.getServer()).de(s);
         if (!est.portal || !est.completa) return;
         FortalezaPlan f = Fortalezas.plan(lvl.getSeed(), s);
+        // (durante el capitulo 6 el remolino, el amuleto y el rayo los pone la cinematica, a su hora)
+        if (EN_CURSO.contains(clave(f))) return;
         int[] q = f.f.portal(), al = f.f.altar();
         if (!lvl.isPositionEntityTicking(new BlockPos(f.cx, q[1], q[2])) || !lvl.isPositionEntityTicking(new BlockPos(al[0], al[1], al[2]))) return;
         List<Remolino> rs = lvl.getEntitiesOfClass(Remolino.class, cajaRemolino(f));
@@ -826,6 +897,15 @@ public final class FortalezaEventos {
         else if (!AMULETOS.contains(ds.get(0))) AMULETOS.add(ds.get(0));
         if (lvl.random.nextInt(2) == 0)
             lvl.sendParticles(ParticleTypes.ENCHANT, al[0] + 0.5, al[1] + 2.9, al[2] + 0.5, 6, 0.4, 0.4, 0.4, 0.4);
+        // el portal se abrio antes de la parte 5e (o se corto el capitulo 6 antes del rayo): el rayo cae ahora
+        if (!est.rayo) {
+            List<ServerPlayer> zona = new ArrayList<>();
+            for (ServerPlayer p : lvl.players()) if (s.equals(ZONA.get(p.getUUID()))) zona.add(p);
+            nubes(lvl, f, zona);
+            despues(lvl.getServer(), 70, () -> rayo(lvl, f, zona));
+            EN_CURSO.add(clave(f));
+            despues(lvl.getServer(), 71, () -> EN_CURSO.remove(clave(f)));
+        }
     }
 
     /** Para las pruebas y el comando: como esta el portal (lo que cambia al abrirse, el remolino y el amuleto). */

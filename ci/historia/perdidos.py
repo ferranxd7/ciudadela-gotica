@@ -343,47 +343,46 @@ ACERTIJO = {
   "インクが手強ければ、下の封蝋を押すがよい。本が描かれた炉を見せてくれる。"], "炉を見る", "護符の鍛造"),
 }
 
-# capitulo 6: habla la Sombra (en ingles para la voz; los subtitulos en cada idioma)
+# capitulo 6 (parte 5e): habla la Sombra con su voz de ElevenLabs (frases 10-20 de voz_sombra; en ingles en el audio,
+# los subtitulos en cada idioma). Lo monta ci/eleven/procesar.py (capitulo6) con sus pausas: las del rayo van aqui.
 NARRACION6 = [
- ("So the bone key has brought you here, above the clouds.", "Así que la llave de hueso te ha traído hasta aquí, sobre las nubes."),
- ("Aldous writes no more. From now on, I write this chronicle.", "Aldous ya no escribe. Desde ahora, esta crónica la escribo yo."),
- ("Those who dared not speak my name called me the Shadow.", "Los que no se atrevían a decir mi nombre me llamaron la Sombra."),
- ("I gave a king what he asked for. I gave him back his queen.", "Le di a un rey lo que pidió. Le devolví a su reina."),
- ("That he did not recognize her was not my fault.", "Que no la reconociera no fue culpa mía."),
- ("You have defeated his king. You have defeated his knight. You have read his secrets.", "Has vencido a su rey. Has vencido a su caballero. Has leído sus secretos."),
- ("And now you open my door with the amulet you forged with your own hands.", "Y ahora abres mi puerta con el amuleto que forjaste con tus propias manos."),
- ("Look closely at what lies on the other side.", "Mira bien lo que hay al otro lado."),
- ("You cannot cross yet. The threshold does not know you.", "Todavía no puedes cruzar. El umbral aún no te conoce."),
- ("But I know you. I have seen you in every reflection of my mirror.", "Pero yo sí te conozco. Te he visto en cada reflejo de mi espejo."),
- ("Come back when you are ready. I will be waiting.", "Vuelve cuando estés preparado. Te estaré esperando."),
+ ("So... the marked one has climbed all the way to my door.", "Así que... el marcado ha subido hasta mi puerta."),
+ ("A king begged me for his queen. A knight gave his soul to keep me out.", "Un rey me suplicó por su reina. Un caballero dio su alma para dejarme fuera."),
+ ("They failed. You did not.", "Ellos fallaron. Tú no."),
+ ("You forged the amulet with your own hands... and you opened my door.", "Forjaste el amuleto con tus propias manos... y abriste mi puerta."),
+ ("Thank you. I have waited a thousand winters for those hands.", "Gracias. He esperado mil inviernos a esas manos."),
+ ("Now... look up.", "Ahora... mira arriba."),
+ ("The sky remembers my name.", "El cielo recuerda mi nombre."),
+ ("Every cloud in this world will burn red... until you stand before me.", "Todas las nubes de este mundo arderán rojas... hasta que estés ante mí."),
+ ("Beyond this door lie the Withered Lands. Morvain. My lands.", "Tras esta puerta están las Tierras Marchitas. Morvain. Mis tierras."),
+ ("Cross, marked one. I will be waiting at the heart of it all.", "Cruza, marcado. Te esperaré en el corazón de todo."),
  ("I always wait.", "Yo siempre espero."),
 ]
-PAUSAS6 = [1.2, 1.4, 1.0, 0.9, 1.6, 1.2, 1.4, 1.8, 1.2, 1.6, 1.2, 0.0]
+# lo que se calla despues de cada frase (s): tras "mira arriba", las nubes y el rayo
+PAUSAS6 = [1.4, 0.9, 1.5, 2.2, 1.6, 4.6, 1.2, 1.8, 1.4, 2.2, 0.0]
 NARRACION6_OTROS = {
- "fr": ["Ainsi, la clé d'os t'a mené jusqu'ici, au-dessus des nuages.", "Aldous n'écrit plus. Désormais, c'est moi qui écris cette chronique.",
-        "Ceux qui n'osaient dire mon nom m'ont appelée l'Ombre.", "J'ai donné à un roi ce qu'il demandait. Je lui ai rendu sa reine.",
-        "Qu'il ne l'ait pas reconnue n'était pas ma faute.", "Tu as vaincu son roi. Tu as vaincu son chevalier. Tu as lu ses secrets.",
-        "Et maintenant tu ouvres ma porte avec l'amulette que tu as forgée de tes mains.", "Regarde bien ce qui se trouve de l'autre côté.",
-        "Tu ne peux pas encore passer. Le seuil ne te connaît pas.", "Mais moi, je te connais. Je t'ai vu dans chaque reflet de mon miroir.",
-        "Reviens quand tu seras prêt. Je t'attendrai.", "J'attends toujours."],
- "de": ["So hat dich der Knochenschlüssel hierher gebracht, über die Wolken.", "Aldous schreibt nicht mehr. Von nun an schreibe ich diese Chronik.",
-        "Die meinen Namen nicht auszusprechen wagten, nannten mich den Schatten.", "Ich gab einem König, worum er bat. Ich gab ihm seine Königin zurück.",
-        "Dass er sie nicht erkannte, war nicht meine Schuld.", "Du hast seinen König besiegt. Du hast seinen Ritter besiegt. Du hast seine Geheimnisse gelesen.",
-        "Und nun öffnest du meine Tür mit dem Amulett, das du mit eigenen Händen geschmiedet hast.", "Sieh genau hin, was auf der anderen Seite liegt.",
-        "Du kannst noch nicht hindurch. Die Schwelle kennt dich nicht.", "Aber ich kenne dich. Ich habe dich in jedem Spiegelbild meines Spiegels gesehen.",
-        "Komm zurück, wenn du bereit bist. Ich werde warten.", "Ich warte immer."],
- "pt": ["Então a chave de osso trouxe você até aqui, acima das nuvens.", "Aldous não escreve mais. De agora em diante, esta crônica quem escreve sou eu.",
-        "Os que não ousavam dizer meu nome me chamaram de Sombra.", "Dei a um rei o que ele pediu. Devolvi-lhe a sua rainha.",
-        "Que ele não a reconhecesse não foi culpa minha.", "Você venceu o rei dele. Venceu o cavaleiro dele. Leu os segredos dele.",
-        "E agora abre minha porta com o amuleto que forjou com suas próprias mãos.", "Olhe bem o que há do outro lado.",
-        "Você ainda não pode atravessar. O limiar ainda não o conhece.", "Mas eu conheço você. Eu o vi em cada reflexo do meu espelho.",
-        "Volte quando estiver pronto. Estarei esperando.", "Eu sempre espero."],
- "ja": ["骨の鍵が、お前をここへ、雲の上へと導いたのだな。", "アルダスはもう書かない。これからは、この年代記は私が書く。",
-        "私の名を口にできぬ者たちは、私を影と呼んだ。", "私は王の望みを叶えた。王妃を返してやったのだ。",
-        "王が彼女を見分けられなかったのは、私のせいではない。", "お前は王を倒した。騎士を倒した。秘密を読んだ。",
-        "そして今、自らの手で鍛えた護符で、私の扉を開く。", "向こう側にあるものを、よく見るがいい。",
-        "まだ渡ることはできぬ。門はまだお前を知らない。", "だが私は知っている。我が鏡に映るたび、お前を見てきた。",
-        "覚悟ができたら戻ってこい。待っている。", "私はいつも待っている。"],
+ "fr": ["Ainsi... le marqué a gravi tout le chemin jusqu'à ma porte.", "Un roi m'a supplié pour sa reine. Un chevalier a donné son âme pour me tenir dehors.",
+        "Ils ont échoué. Pas toi.", "Tu as forgé l'amulette de tes propres mains... et tu as ouvert ma porte.",
+        "Merci. J'ai attendu ces mains pendant mille hivers.", "Maintenant... lève les yeux.", "Le ciel se souvient de mon nom.",
+        "Chaque nuage de ce monde brûlera rouge... jusqu'à ce que tu te tiennes devant moi.",
+        "Derrière cette porte s'étendent les Terres Flétries. Morvain. Mes terres.", "Traverse, marqué. Je t'attendrai au cœur de tout.",
+        "J'attends toujours."],
+ "de": ["So... der Gezeichnete ist den ganzen Weg bis zu meiner Tür gestiegen.", "Ein König flehte mich um seine Königin an. Ein Ritter gab seine Seele, um mich draußen zu halten.",
+        "Sie sind gescheitert. Du nicht.", "Du hast das Amulett mit eigenen Händen geschmiedet... und meine Tür geöffnet.",
+        "Danke. Tausend Winter habe ich auf diese Hände gewartet.", "Und jetzt... sieh nach oben.", "Der Himmel erinnert sich an meinen Namen.",
+        "Jede Wolke dieser Welt wird rot brennen... bis du vor mir stehst.", "Hinter dieser Tür liegen die Welken Lande. Morvain. Mein Land.",
+        "Tritt hindurch, Gezeichneter. Ich werde im Herzen von allem warten.", "Ich warte immer."],
+ "pt": ["Então... o marcado subiu até a minha porta.", "Um rei me implorou pela sua rainha. Um cavaleiro deu a alma para me manter do lado de fora.",
+        "Eles falharam. Você não.", "Você forjou o amuleto com as próprias mãos... e abriu a minha porta.",
+        "Obrigado. Esperei mil invernos por essas mãos.", "Agora... olhe para cima.", "O céu se lembra do meu nome.",
+        "Cada nuvem deste mundo vai arder em vermelho... até que você esteja diante de mim.",
+        "Além desta porta ficam as Terras Murchas. Morvain. Minhas terras.", "Atravesse, marcado. Estarei esperando no coração de tudo.",
+        "Eu sempre espero."],
+ "ja": ["そうか……刻印の者よ、ついに我が扉まで登ってきたか。", "王は王妃を求めて私に縋った。騎士は私を締め出すために魂を捧げた。",
+        "奴らは失敗した。だが、お前は違う。", "お前は自らの手で護符を鍛え……そして私の扉を開いた。",
+        "礼を言おう。千の冬を、私はその手を待っていた。", "さあ……空を見よ。", "空は私の名を覚えている。",
+        "この世界の雲はすべて赤く燃える……お前が私の前に立つまで。", "この扉の向こうには枯れた地、モルヴェインがある。我が地だ。",
+        "渡れ、刻印の者よ。すべての中心で待っている。", "私はいつも待っている。"],
 }
 TITULO6 = {"es": "La puerta sobre las nubes", "en": "The Door Above the Clouds", "fr": "La porte au-dessus des nuages",
            "de": "Die Tür über den Wolken", "pt": "A porta acima das nuvens", "ja": "雲の上の扉"}
@@ -420,7 +419,7 @@ def claves(lang):
     d["darkcraft.cap.6.titulo"] = TITULO6[lang]
     # el libro del capitulo 6: lo que dijo la Sombra en cuatro paginas (lo escribe ella: ya no Aldous)
     sep = "" if lang == "ja" else " "
-    for k, (a, b) in enumerate(((0, 2), (2, 5), (5, 8), (8, 12))):
+    for k, (a, b) in enumerate(((0, 3), (3, 5), (5, 8), (8, 11))):
         d[f"darkcraft.cap.6.p{k + 1}"] = sep.join(lineas[a:b])
     d["darkcraft.cap.6.paginas"] = "4"
     d["darkcraft.cap.6.cartel1"] = TITULO6[lang]
