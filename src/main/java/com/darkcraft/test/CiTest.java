@@ -730,6 +730,188 @@ public final class CiTest {
         molinera(server, m, log, out);
         arboleda(server, m, log, out);
         verdugo(server, m, log);
+        pilotes(server, m, log, out);
+    }
+
+    /**
+     * Parte 7i: la Aldea de los Pilotes (la laguna, el atril con el libro 20, el arcon, el fuego, el embarcadero) y los
+     * podridos: los que esperan en el agua salen flotando, los demas en el suelo y ninguno metido en un bloque; cada accion
+     * acaba; el vomito, el eructo y el fuego fatuo dejan su nube; el del agua se alza al acercarse su presa; el hinchado
+     * revienta al morir; a ellos su veneno no les hace nada. Al acabar todo vuelve a estar como antes.
+     */
+    private static void pilotes(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.PILOTES;
+        var v = com.darkcraft.morvain.Pilotes.get();
+        int CX = com.darkcraft.morvain.Pilotes.CX, CZ = com.darkcraft.morvain.Pilotes.CZ, PASO = com.darkcraft.morvain.Pilotes.PASO;
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : v.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            log.println("Morvain, la aldea de los pilotes: " + nch + " chunks en " + (System.currentTimeMillis() - t0) + " ms; "
+                    + com.darkcraft.morvain.Pilotes.resumen(m) + "; santuario " + com.darkcraft.santuario.Santuarios.nombre(m,
+                    com.darkcraft.morvain.SantuariosMorvain.porId("juncos").pos()));
+            topView(m, CX, CZ - 6, 58, new File(out, "morvain_pilotes.png"));
+            topView(m, CX, CZ - 32, 14, new File(out, "morvain_pilotes_capilla.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, la aldea de los pilotes: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] pilotes", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            int enAgua = 0, flotan = 0, enSuelo = 0, otros = 0, chocan = 0;
+            StringBuilder mal = new StringBuilder();
+            com.darkcraft.enemigos.Podrido flotando = null;
+            // (unos ticks para que los del agua suban a flote)
+            for (int k = 0; k < 30; k++)
+                for (var e : fuera) if (e.isAlive()) e.tick();
+            for (var e : fuera) {
+                if (!(e instanceof com.darkcraft.enemigos.Podrido a)) continue;
+                if (!m.noCollision(a)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(a.blockPosition().toShortString()).append(';');
+                }
+                if (a.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) {
+                    enAgua++;
+                    if (a.isInWater()) flotan++;
+                    else if (mal.length() < 400) mal.append(" ").append(a.tipo()).append(" fuera del agua en ").append(a.blockPosition().toShortString()).append(';');
+                    if (flotando == null && a.variante() == com.darkcraft.enemigos.Podrido.PODRIDO) flotando = a;
+                } else {
+                    otros++;
+                    if (!m.getBlockState(BlockPos.containing(a.getX(), a.getY() - 0.2, a.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty() || a.isInWater()) enSuelo++;
+                    else if (mal.length() < 400) mal.append(' ').append(a.tipo()).append(" en el aire en ").append(a.blockPosition().toShortString()).append(';');
+                }
+            }
+            log.println("Morvain, los podridos: " + com.darkcraft.morvain.MorvainEnemigos.comprobar() + "; fuera " + fuera.size() + " de "
+                    + com.darkcraft.morvain.MorvainEnemigos.pilotes().size() + ": en el agua " + enAgua + " (a flote " + flotan + "), los demas " + otros
+                    + " (en su suelo " + enSuelo + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("7a3c9d2e-4b5f-4c6d-8e9f-0a1b2c3d4e5f"), "[DarkCraftCI4]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            StringBuilder sb = new StringBuilder("Morvain, los podridos en accion:");
+            // ---- el del agua se alza: una presa a su lado
+            if (flotando != null) {
+                var presa = DarkCraftMod.MARCHITO.get().create(m);
+                if (presa != null) {
+                    BlockPos h = flotando.hogar();
+                    presa.moveTo(CX + 0.5, PASO + 1, CZ + 3.5, 0f, 0f);
+                    m.addFreshEntity(presa);
+                    quitar.add(presa);
+                    flotando.setTarget(presa);
+                    int alza = -1;
+                    for (int k = 0; k < 80; k++) {
+                        flotando.tickCount++;
+                        flotando.tick();
+                        if (alza < 0 && flotando.accion() == com.darkcraft.enemigos.PodridoAnims.ALZARSE) alza = k;
+                        if (alza >= 0 && flotando.accion() == 0) break;
+                    }
+                    sb.append(String.format(java.util.Locale.ROOT, " el del agua (en %s) se alza en el tick %d y queda de pie %s;", h.toShortString(), alza,
+                            flotando.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE));
+                }
+            } else sb.append(" NO HAY NINGUNO FLOTANDO;");
+            // ---- uno de cada en la plaza: cada accion acaba
+            int gx = CX + 3, gz = CZ + 3;
+            for (int v2 = 0; v2 < 3; v2++) {
+                var a = DarkCraftMod.PODRIDO.get().create(m);
+                if (a == null) continue;
+                a.variante(v2);
+                a.moveTo(gx + 0.5 - v2 * 3, PASO + 1, gz + 0.5, 0f, 0f);
+                m.addFreshEntity(a);
+                quitar.add(a);
+                StringBuilder no = new StringBuilder();
+                for (int ac = 1; ac < com.darkcraft.enemigos.PodridoAnims.TICKS.length; ac++) {
+                    String nombre = com.darkcraft.enemigos.PodridoAnims.NOMBRES[ac];
+                    if (nombre.equals("morir")) continue;
+                    a.empezar(ac);
+                    for (int k = 0; k < 90 && a.accion() == ac; k++) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    if (a.accion() == ac) no.append(' ').append(nombre);
+                    for (int k = 0; k < 10; k++) a.tick();
+                }
+                sb.append(' ').append(a.tipo()).append(String.format(java.util.Locale.ROOT, " (vida %.0f)", a.getMaxHealth())).append(": acciones que no acaban")
+                        .append(no.length() == 0 ? " ninguna" : no).append(';');
+            }
+            // ---- el vomito, el fuego fatuo y el eructo contra un marchito: sus nubes envenenan
+            int vom = com.darkcraft.enemigos.Podrido.VOMITOS, fat = com.darkcraft.enemigos.Podrido.FATUOS, nub = com.darkcraft.enemigos.Podrido.NUBES;
+            String[] nombres = {"vomito", "fuego fatuo", "eructo"};
+            int[] acciones = {com.darkcraft.enemigos.PodridoAnims.VOMITO, com.darkcraft.enemigos.PodridoAnims.LANZAR_FATUO, com.darkcraft.enemigos.PodridoAnims.ERUCTO};
+            int[] variantes = {com.darkcraft.enemigos.Podrido.PODRIDO, com.darkcraft.enemigos.Podrido.FATUO, com.darkcraft.enemigos.Podrido.HINCHADO};
+            double[] lejos = {4.0, 8.0, 2.0};
+            for (int i = 0; i < 3; i++) {
+                var a = DarkCraftMod.PODRIDO.get().create(m);
+                var presa = DarkCraftMod.MARCHITO.get().create(m);
+                if (a == null || presa == null) continue;
+                a.variante(variantes[i]);
+                // por el embarcadero, mirando al sur
+                double ay = PASO + 1, az = CZ + 9 + i * 0.0;
+                a.moveTo(CX + 0.5, ay, CZ + 8.5, 0f, 0f);
+                presa.moveTo(CX + 0.5, ay, CZ + 8.5 + lejos[i], 180f, 0f);
+                m.addFreshEntity(a);
+                m.addFreshEntity(presa);
+                quitar.add(a);
+                quitar.add(presa);
+                a.setTarget(presa);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(acciones[i]);
+                float vida = presa.getHealth();
+                for (int k = 0; k < 110; k++) {
+                    if (a.accion() != 0) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    presa.tick();
+                    for (var n : m.getEntitiesOfClass(net.minecraft.world.entity.AreaEffectCloud.class, presa.getBoundingBox().inflate(6))) {
+                        if (!quitar.contains(n)) quitar.add(n);
+                        n.tick();
+                    }
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.FuegoFatuo.class, presa.getBoundingBox().inflate(12))) {
+                        if (!quitar.contains(f)) quitar.add(f);
+                        f.tick();
+                    }
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " %s a %.0f: la presa -%.1f, envenenada %s;", nombres[i], lejos[i], vida - presa.getHealth(),
+                        presa.hasEffect(net.minecraft.world.effect.MobEffects.POISON)));
+                for (var e2 : m.getEntitiesOfClass(net.minecraft.world.entity.AreaEffectCloud.class, presa.getBoundingBox().inflate(8))) e2.discard();
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " vomitos +%d, fuegos +%d, nubes +%d;", com.darkcraft.enemigos.Podrido.VOMITOS - vom,
+                    com.darkcraft.enemigos.Podrido.FATUOS - fat, com.darkcraft.enemigos.Podrido.NUBES - nub));
+            // ---- a ellos su veneno no les hace nada
+            var inmune = DarkCraftMod.PODRIDO.get().create(m);
+            if (inmune != null) sb.append(" su veneno a un podrido: ").append(inmune.canBeAffected(new net.minecraft.world.effect.MobEffectInstance(
+                    net.minecraft.world.effect.MobEffects.POISON, 100)) ? "LE AFECTA" : "nada").append(';');
+            // ---- el hinchado revienta: una nube grande y un golpe a quien este pegado
+            var h = DarkCraftMod.PODRIDO.get().create(m);
+            var pegada = DarkCraftMod.MARCHITO.get().create(m);
+            if (h != null && pegada != null) {
+                h.variante(com.darkcraft.enemigos.Podrido.HINCHADO);
+                h.moveTo(CX - 3.5, PASO + 1, CZ - 2.5, 0f, 0f);
+                pegada.moveTo(CX - 3.5, PASO + 1, CZ - 1.0, 180f, 0f);
+                m.addFreshEntity(h);
+                m.addFreshEntity(pegada);
+                quitar.add(h);
+                quitar.add(pegada);
+                int rev = com.darkcraft.enemigos.Podrido.REVENTONES;
+                h.hurt(m.damageSources().playerAttack(fp), 9999f);
+                for (int k = 0; k < 80 && !h.isRemoved(); k++) h.tick();
+                int nubes = m.getEntitiesOfClass(net.minecraft.world.entity.AreaEffectCloud.class, new net.minecraft.world.phys.AABB(h.blockPosition()).inflate(4)).size();
+                sb.append(String.format(java.util.Locale.ROOT, " el hinchado cae: revienta %s, nubes alrededor %d, quitado %s", com.darkcraft.enemigos.Podrido.REVENTONES > rev,
+                        nubes, h.isRemoved()));
+                for (var e2 : m.getEntitiesOfClass(net.minecraft.world.entity.AreaEffectCloud.class, new net.minecraft.world.phys.AABB(h.blockPosition()).inflate(6))) e2.discard();
+            }
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println("Morvain, los podridos: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] podridos", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
     }
 
     /**

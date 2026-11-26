@@ -29,7 +29,7 @@ public final class Coleccion {
     public static final String[] BESTIARIO = {"hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon", "capitan",
             "escudero", "caballero_espada", "caballero_alabarda", "caballero_ballesta", "arquero", "perro", "espectro_cortesano",
             "espectro_dama", "espectro_vigia", "capitan_elite", "brandt", "corteza", "rey", "gavran", "marchito_guadana", "marchito_farol",
-            "marchito_campana", "molinera", "ahorcado_garras", "ahorcado_soga", "verdugo"};
+            "marchito_campana", "molinera", "ahorcado_garras", "ahorcado_soga", "verdugo", "podrido", "podrido_fatuo", "podrido_hinchado"};
 
     /** El objeto de una clave de la coleccion (los libros de la cronica, con su texto). */
     public static ItemStack objeto(String clave) {
@@ -56,7 +56,7 @@ public final class Coleccion {
             case "gavran" -> "entity.darkcraft.gavran";
             case "escudero" -> "darkcraft.gavran.escudero";
             case "hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon", "marchito_guadana", "marchito_farol",
-                 "marchito_campana", "ahorcado_garras", "ahorcado_soga" -> "darkcraft.bestiario." + c;
+                 "marchito_campana", "ahorcado_garras", "ahorcado_soga", "podrido_fatuo", "podrido_hinchado" -> "darkcraft.bestiario." + c;
             default -> "entity.darkcraft." + c;
         };
     }
@@ -96,6 +96,12 @@ public final class Coleccion {
                     var a = DarkCraftMod.AHORCADO.get().create(lvl);
                     if (a != null) a.variante(c.endsWith("soga") ? com.darkcraft.enemigos.Ahorcado.SOGA : com.darkcraft.enemigos.Ahorcado.GARRAS);
                     yield a;
+                }
+                case "podrido", "podrido_fatuo", "podrido_hinchado" -> {
+                    var p = DarkCraftMod.PODRIDO.get().create(lvl);
+                    if (p != null) p.variante(c.endsWith("fatuo") ? com.darkcraft.enemigos.Podrido.FATUO
+                            : c.endsWith("hinchado") ? com.darkcraft.enemigos.Podrido.HINCHADO : com.darkcraft.enemigos.Podrido.PODRIDO);
+                    yield p;
                 }
                 case "rey" -> DarkCraftMod.REY.get().create(lvl);
                 case "gavran" -> DarkCraftMod.GAVRAN.get().create(lvl);

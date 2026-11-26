@@ -1693,6 +1693,64 @@ Respuestas 125 y 131 del plan; el segundo jefe de Morvain (el del libro perdido 
   ejecucion (`mv98`, `mv99`), despierta a los colgados (`mv100`), cae (`mv101`), el cartel (`mv102`), los lazos vacios del
   Arbol de la Horca (`mv103`) y el bestiario (`mv104`).
 
+### Plan grande, parte 7i: el Pantano Podrido — los Podridos y la Aldea de los Pilotes
+
+Respuestas 125, 131 ("pueblos derrumbados") y 132 del plan; la tercera region con su contenido (despues, la **7j**: el jefe
+del pantano, el Barquero —el del libro 20—).
+- **El podrido** (`enemigos/Podrido`, entidad `darkcraft:podrido`, 0,7 x 1,95; modelo de `tools/enemigos/podrido.py`: un ahogado
+  hinchado de piel gris verdosa palida con venas moradas, manchas de podredumbre y sanguijuelas, barro hasta la cintura, algas
+  colgando de la cabeza y los hombros, la boca abierta y los ojos amarillos en la capa de brillo; `PodridoGeometria/Animaciones`,
+  `PodridoAnims`, `client/enemigos/PodridoModelo` y `PodridoRenderer`, escala 1,12; el hinchado, un 12 % mas). 34 de vida (el
+  hinchado +65 %), golpe 5, lento. Tres: **podrido** (zarpazo, mordisco a la carrera que envenena y el **vomito**: un chorro de
+  agua negra de 5 bloques delante que envenena y frena y deja un charco), **fatuo** (un fuego verde en la palma izquierda —pieza
+  `fatuo` con su halo en la capa de brillo—: golpe con el y, de 4 a 18 bloques, lo **lanza**: `enemigos/FuegoFatuo`, un
+  proyectil en arco sin modelo —particulas verdes, con shaders igual—, magia y veneno al dar y una nube donde cae; el modelo
+  esconde el fuego desde que sale hasta que acaba la accion) e **hinchado** (la panza enorme con una raja que brilla: se **deja
+  caer** de panza encima —charco que frena—, **eructa** una nube de gas alrededor —veneno y debilidad— y al morir **revienta**:
+  golpe a quien este pegado y una nube grande). Las nubes son la nube de efectos de Minecraft (`AreaEffectCloud`, con
+  particulas de polvo de color: `Podrido.nube`); a los podridos no les hace nada su veneno (`canBeAffected`). Posturas:
+  **flotando boca abajo** en el agua (`TUMBADO`: la entidad flota como todos los enemigos —`FloatGoal`— y el dibujante sube el
+  cuerpo hasta que asoma la espalda, `PodridoRenderer.subida`; al alzarse vuelve a bajar mientras se da la vuelta; sin agua, el
+  bucle `tendido`), de rodillas (`REZA`) o de pie. Bestiario `podrido` / `podrido_fatuo` / `podrido_hinchado`, logro `podrido`;
+  a veces una piedra de forja I. Contadores para las pruebas: `VOMITOS`, `FATUOS`, `NUBES`, `REVENTONES`.
+- **La Aldea de los Pilotes** (`morvain/Pilotes`, en el Pantano Podrido, al noroeste del santuario de los Juncos; el centro de la
+  plaza en (-5650, -770); se dibuja como la arboleda, chunk a chunk al adornar; en su caja `Adorno` no pone nada): **cava una
+  laguna** en el pantano (radio 34 con un lobulo al norte para la capilla, `orilla`/`suelo`: fondo a 60-61, dos o tres de agua,
+  se funde con el pantano en 12; islotes de barro con juncos y mangles muertos), la **plaza** (tablado de 13 x 13 a `PASO` = 64,
+  un bloque por encima del agua: la hoguera de almas en su cerco de barro, la campana colgada, las redes, barriles), **ocho
+  chozas** (`CHOZAS`: de las redes, el ahumadero, la del barquero —con arcon—, la curandera, el pescador, la viuda, el cestero, el
+  calafate) sobre sus pilotes un escalon por encima (`CHOZA` = 65): paredes de mangle con troncos en las esquinas, puerta hacia
+  su pasarela y ventanas, tejado a cuatro aguas de roble oscuro, alguna medio hundida o sin tejado (`ruina`), farol colgado de una
+  cadena, barril con botin; las **pasarelas** (`PASARELAS`, dos de ancho, pilotes cada tres y postes de amarre con farol a los
+  lados; escalones a las chozas, `ESCALONES`), la **capilla hundida** al norte (zocalo de piedra en la laguna, la nave con un
+  palmo de agua y los bancos sumergidos, el presbiterio seco al norte con el altar y sus velas, el **atril con el libro perdido
+  20** —"Lo que trae el agua negra", de la hermana Ilse; `Perdidos.TOTAL` = 20— y un arcon; muros con ventanas y huecos, medio
+  tejado y su hastial, vigas sueltas y cascotes; el campanario partido y su campana en el fondo de la laguna), el
+  **embarcadero** largo al sur con el muelle y la pasarela que sigue hasta el santuario, y barcas varadas o hundidas. Sitios
+  (`Pilotes.sitio`): `plaza`, `fuego`, `pasarela`, `muelle`, `entrada`, `capilla`, `puerta_capilla`, `presbiterio`, `atril`,
+  `arcon`, `campana` y `choza_<nombre>`. El Espejo: "La Aldea de los Pilotes" (`Morvain.lugar`); logro `pilotes` al entrar.
+- **Los puestos** (`MorvainEnemigos`, sitio `pilotes`, 24, de `Pilotes.esperas`): ocho flotando a tres de las pasarelas (se alzan
+  al pasar), en la plaza un hinchado, uno de rodillas ante el fuego y un fatuo, uno en cada choza, dos rezando en el
+  presbiterio y un hinchado en el agua de la nave, un fatuo en el muelle y uno que ronda por la pasarela del santuario.
+- **El pantano suena** (`ClientMusic.tickPantano`): en toda la region del pantano, `ambiente.pantano` (borbotea, croan las ranas,
+  zumban los insectos; una de dos tomas cada vez).
+- Sonidos (ElevenLabs, flow `um9O1CHUekivKrw70cJm`, `TOMAS_SFX`): `podrido_gemido` (3, 2 y 1), `podrido_alerta` (1 y 4),
+  `podrido_dolor` (1 y 3), `podrido_muerte` (2 y 3), `podrido_alzarse` (2 y 4), `podrido_vomito` (3 y 1), `podrido_fatuo` (2, 3
+  y 1), `podrido_gas` (1 y 4), `podrido_aplastar` (4 y 2), `pantano_ambiente` (2 y 3).
+- Comandos `/darkcraft pilotes [ir <sitio> | enemigos [volver | fuera | sacar]]` (sin mas: como esta).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_pilotes carpeta` (`-Dcaja=...`): la laguna, la aldea y la capilla con
+  las marcas de los podridos (P) y si se llega a pie desde la entrada (junto al santuario) a cada sitio y a cada podrido, y que
+  ninguno esta metido en un bloque.
+- Pruebas: servidor, lineas `Morvain, la aldea de los pilotes: ...` (el atril con el libro 20, el arcon, el fuego, el agua de la
+  laguna, las tablas del embarcadero; vistas `morvain_pilotes*.png`), `Morvain, los podridos: ...` (los del agua a flote, los
+  demas en su suelo, ninguno metido en un bloque) y `Morvain, los podridos en accion: ...` (el del agua se alza; cada accion
+  acaba; el vomito, el fuego fatuo y el eructo envenenan; su veneno no les hace nada; el hinchado revienta); cliente, tramo
+  `pilotes()` despues del Verdugo: desde el santuario de los Juncos (`cliente_mv105`), entrar por el embarcadero con el cartel y
+  el logro (`mv106`), la plaza (`mv107`), las chozas desde lo alto (`mv108`), los que flotan (`mv109`), la capilla hundida y su
+  presbiterio (`mv110`, `mv111`), en supervivencia uno se alza del agua (`mv112`), el vomito (`mv113`), el fuego fatuo y su nube
+  (`mv114`, `mv115`), el hinchado se deja caer, eructa y revienta (`mv116..mv118`), el libro de la hermana Ilse (`mv119`) y el
+  bestiario (`mv120`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1703,7 +1761,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g y la 7h arriba; despues, region a region su contenido).
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h y la 7i arriba; despues, region a region su contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

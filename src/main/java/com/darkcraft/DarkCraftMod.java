@@ -217,6 +217,17 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_VERDUGO_SALTO = sound("sfx.verdugo_salto");
     public static final RegistryObject<SoundEvent> SFX_VERDUGO_DOLOR = sound("sfx.verdugo_dolor");
     public static final RegistryObject<SoundEvent> SFX_VERDUGO_MUERTE = sound("sfx.verdugo_muerte");
+    // los podridos del Pantano Podrido y el ambiente del pantano (parte 7i)
+    public static final RegistryObject<SoundEvent> SFX_PODRIDO_GEMIDO = sound("sfx.podrido_gemido");
+    public static final RegistryObject<SoundEvent> SFX_PODRIDO_ALERTA = sound("sfx.podrido_alerta");
+    public static final RegistryObject<SoundEvent> SFX_PODRIDO_DOLOR = sound("sfx.podrido_dolor");
+    public static final RegistryObject<SoundEvent> SFX_PODRIDO_MUERTE = sound("sfx.podrido_muerte");
+    public static final RegistryObject<SoundEvent> SFX_PODRIDO_ALZARSE = sound("sfx.podrido_alzarse");
+    public static final RegistryObject<SoundEvent> SFX_PODRIDO_VOMITO = sound("sfx.podrido_vomito");
+    public static final RegistryObject<SoundEvent> SFX_PODRIDO_FATUO = sound("sfx.podrido_fatuo");
+    public static final RegistryObject<SoundEvent> SFX_PODRIDO_GAS = sound("sfx.podrido_gas");
+    public static final RegistryObject<SoundEvent> SFX_PODRIDO_APLASTAR = sound("sfx.podrido_aplastar");
+    public static final RegistryObject<SoundEvent> AMBIENTE_PANTANO = sound("ambiente.pantano");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -494,6 +505,13 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Ahorcado>> AHORCADO = ENTITIES.register("ahorcado",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Ahorcado>of(com.darkcraft.enemigos.Ahorcado::new, MobCategory.MONSTER)
                     .sized(0.6f, 2.4f).clientTrackingRange(8).build(MODID + ":ahorcado"));
+    // ---- los podridos del Pantano Podrido y el fuego fatuo que lanzan (parte 7i)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Podrido>> PODRIDO = ENTITIES.register("podrido",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Podrido>of(com.darkcraft.enemigos.Podrido::new, MobCategory.MONSTER)
+                    .sized(0.7f, 1.95f).clientTrackingRange(8).build(MODID + ":podrido"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.FuegoFatuo>> FUEGO_FATUO = ENTITIES.register("fuego_fatuo",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.FuegoFatuo>of(com.darkcraft.enemigos.FuegoFatuo::new, MobCategory.MISC)
+                    .sized(0.35f, 0.35f).noSave().clientTrackingRange(8).updateInterval(2).build(MODID + ":fuego_fatuo"));
     // ---- la Molinera de Velmor, el jefe de las Llanuras Palidas (parte 7f)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Molinera>> MOLINERA = ENTITIES.register("molinera",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Molinera>of(com.darkcraft.enemigos.Molinera::new, MobCategory.MONSTER)
@@ -664,6 +682,7 @@ public class DarkCraftMod {
         e.put(HUECO.get(), com.darkcraft.enemigos.Hueco.atributos().build());
         e.put(MARCHITO.get(), com.darkcraft.enemigos.Marchito.atributos().build());
         e.put(AHORCADO.get(), com.darkcraft.enemigos.Ahorcado.atributos().build());
+        e.put(PODRIDO.get(), com.darkcraft.enemigos.Podrido.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());

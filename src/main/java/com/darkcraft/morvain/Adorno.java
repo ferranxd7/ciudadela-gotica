@@ -32,6 +32,8 @@ final class Adorno {
             hierba(nivel, c, r, 40, Blocks.GRASS.defaultBlockState(), Blocks.DEAD_BUSH.defaultBlockState());
             return;
         }
+        // en la Aldea de los Pilotes (parte 7i), nada: la laguna pone sus juncos, sus nenufares y sus mangles
+        if (Pilotes.cerca(x0, z0)) return;
         // en la Arboleda de los Ahorcados (parte 7g) solo setas y helechos: los arboles son los suyos
         if (Arboleda.cerca(x0, z0)) {
             hierba(nivel, c, r, 20, Blocks.BROWN_MUSHROOM.defaultBlockState(), Blocks.FERN.defaultBlockState());

@@ -192,9 +192,15 @@ SFX = {
     "verdugo_grito": (2.4, 0.6, -13), "verdugo_hachazo": (1.4, 0.5, -13), "verdugo_barrido": (0.9, 0.3, -14),
     "verdugo_lazo": (1.3, 0.3, -15), "verdugo_salto": (1.4, 0.5, -13), "verdugo_dolor": (0.75, 0.2, -15),
     "verdugo_muerte": (3.4, 0.9, -14),
+    # los podridos del Pantano Podrido (parte 7i): el gorgoteo, el rugido ahogado, el dolor, la muerte (se hunde), alzarse del
+    # agua, el vomito de agua negra, el fuego fatuo que vuela, el reventon del gas, la panza contra el barro; y el pantano
+    "podrido_gemido": (2.2, 0.5, -20), "podrido_alerta": (1.7, 0.3, -15), "podrido_dolor": (0.6, 0.15, -17),
+    "podrido_muerte": (2.6, 0.7, -16), "podrido_alzarse": (1.8, 0.5, -16), "podrido_vomito": (1.6, 0.4, -15),
+    "podrido_fatuo": (1.3, 0.4, -15), "podrido_gas": (2.0, 0.8, -17), "podrido_aplastar": (1.0, 0.3, -14),
+    "pantano_ambiente": (20.0, 2.0, -27),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
-ENTRADA = {"arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
+ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
            "barco_vuelo": 3.0, "molino_viento": 1.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8}
@@ -333,6 +339,13 @@ TOMAS_SFX = {
     # chasquido); tres quejidos; las dos muertes enteras
     "verdugo_grito": (3, 1), "verdugo_hachazo": (4, 2), "verdugo_barrido": (4, 1), "verdugo_lazo": (1, 4),
     "verdugo_salto": (4, 2), "verdugo_dolor": (1, 4, 3), "verdugo_muerte": (1, 2),
+    # los podridos: los tres gorgoteos que antes empiezan; los dos rugidos que mas crecen; los dos quejidos que se oyen (2 y 4
+    # casi no suenan); las dos muertes mas largas; las dos salidas del agua con mas chapoteo al principio; los dos vomitos mas
+    # llenos; los tres fuegos con mas cuerpo; los dos reventones con su golpe (la 3 es solo un siseo); las dos caidas con mas
+    # golpe; y dos tomas del pantano (las que tienen algo de principio a fin)
+    "podrido_gemido": (3, 2, 1), "podrido_alerta": (1, 4), "podrido_dolor": (1, 3), "podrido_muerte": (2, 3),
+    "podrido_alzarse": (2, 4), "podrido_vomito": (3, 1), "podrido_fatuo": (2, 3, 1), "podrido_gas": (1, 4),
+    "podrido_aplastar": (4, 2), "pantano_ambiente": (2, 3),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
