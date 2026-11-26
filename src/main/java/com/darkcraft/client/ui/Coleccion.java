@@ -28,7 +28,8 @@ public final class Coleccion {
             "llave_arbol", "mandoble_juramento", "llave_hueso", "libro5", "alabarda", "libro_acertijo", "amuleto_hueso", "libro6"};
     public static final String[] BESTIARIO = {"hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon", "capitan",
             "escudero", "caballero_espada", "caballero_alabarda", "caballero_ballesta", "arquero", "perro", "espectro_cortesano",
-            "espectro_dama", "espectro_vigia", "capitan_elite", "brandt", "corteza", "rey", "gavran"};
+            "espectro_dama", "espectro_vigia", "capitan_elite", "brandt", "corteza", "rey", "gavran", "marchito_guadana", "marchito_farol",
+            "marchito_campana"};
 
     /** El objeto de una clave de la coleccion (los libros de la cronica, con su texto). */
     public static ItemStack objeto(String clave) {
@@ -54,7 +55,8 @@ public final class Coleccion {
             case "rey" -> "entity.darkcraft.rey";
             case "gavran" -> "entity.darkcraft.gavran";
             case "escudero" -> "darkcraft.gavran.escudero";
-            case "hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon" -> "darkcraft.bestiario." + c;
+            case "hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon", "marchito_guadana", "marchito_farol",
+                 "marchito_campana" -> "darkcraft.bestiario." + c;
             default -> "entity.darkcraft." + c;
         };
     }
@@ -84,6 +86,12 @@ public final class Coleccion {
                     yield m;
                 }
                 case "capitan" -> DarkCraftMod.CAPITAN.get().create(lvl);
+                case "marchito_guadana", "marchito_farol", "marchito_campana" -> {
+                    var w = DarkCraftMod.MARCHITO.get().create(lvl);
+                    if (w != null) w.variante(c.endsWith("guadana") ? com.darkcraft.enemigos.Marchito.GUADANA
+                            : c.endsWith("farol") ? com.darkcraft.enemigos.Marchito.FAROL : com.darkcraft.enemigos.Marchito.CAMPANA);
+                    yield w;
+                }
                 case "rey" -> DarkCraftMod.REY.get().create(lvl);
                 case "gavran" -> DarkCraftMod.GAVRAN.get().create(lvl);
                 case "caballero_espada", "caballero_alabarda", "caballero_ballesta" -> {

@@ -64,7 +64,7 @@ public final class Espejo {
     public static final String[] ORDEN_LOGROS = {"clase", "encontrar", "libro_sombra", "primera_marca", "capitulo1", "capitulo2",
             "brandt", "rey", "golpe_final", "capitulo3", "capitulo4", "vareth", "arbol", "gavran_guardia", "gavran_fase1", "gavran_corazon",
             "gavran_juicio", "gavran_fase2", "gavran", "capitulo5", "cartografo", "caballero", "caballeros_50", "capitan_elite", "emboscada", "fortaleza", "puente",
-            "puerta_hueso", "acertijo", "amuleto", "portal", "capitulo6", "morvain", "silbato", "corcel", "viaje", "fragmento", "mapa_morvain", "libro_perdido",
+            "puerta_hueso", "acertijo", "amuleto", "portal", "capitulo6", "morvain", "silbato", "corcel", "viaje", "fragmento", "mapa_morvain", "velmor", "marchito", "libro_perdido",
             "libros_perdidos"};
 
     /** Un sitio del mapa: id unico ("x,z:nombre"), tipo, icono, posicion, clave del nombre, radio para descubrirlo. */

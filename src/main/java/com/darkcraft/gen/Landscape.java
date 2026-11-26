@@ -15,7 +15,8 @@ public final class Landscape {
     // ------------------------------------------------------------------ arbol muerto
     public static final class DeadTree extends Element {
         private final int x, y, z, h;
-        private final boolean leaves, thick;
+        private final boolean thick;
+        private boolean leaves;
         private final List<int[]> branches = new ArrayList<>(); // {dx, dz, startY, len, rise}
 
         public DeadTree(long seed, int x, int y, int z, boolean thick) {
@@ -35,6 +36,12 @@ public final class Landscape {
                 branches.add(new int[]{dirs[dir][0], dirs[dir][1], y + h / 2 + r.nextInt(h / 2), r.range(2, thick ? 7 : 4), r.range(1, 3)});
             }
             bounds(x - 9, y - 2, z - 9, x + 10, y + h + 8, z + 10);
+        }
+
+        /** Sin una hoja (Morvain, las Tierras Marchitas: parte 7e). */
+        public DeadTree sinHojas() {
+            this.leaves = false;
+            return this;
         }
 
         @Override

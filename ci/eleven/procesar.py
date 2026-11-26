@@ -169,6 +169,9 @@ SFX = {
     "corcel_llamada": (2.2, 0.7, -15), "corcel_aparece": (1.8, 0.5, -16), "corcel_relincho": (2.0, 0.5, -14),
     "corcel_paso": (0.5, 0.15, -19), "corcel_salto": (1.0, 0.35, -17), "corcel_deshace": (2.3, 0.9, -15),
     "corcel_dolor": (0.8, 0.2, -15),
+    # los Marchitos de Velmor (parte 7e): el gemido, la alerta, el dolor, la muerte en ceniza, una campanada y el farol
+    "marchito_gemido": (1.8, 0.5, -21), "marchito_alerta": (1.4, 0.3, -16), "marchito_dolor": (0.6, 0.15, -17),
+    "marchito_muerte": (2.3, 0.6, -17), "marchito_campana": (1.3, 0.5, -15), "marchito_farol": (0.9, 0.35, -15),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -289,6 +292,11 @@ TOMAS_SFX = {
     # quejidos que se cortan antes
     "corcel_llamada": (4, 2), "corcel_aparece": (2,), "corcel_relincho": (2, 3), "corcel_paso": (1, 2, 3, 4),
     "corcel_salto": (2, 4), "corcel_deshace": (2, 3), "corcel_dolor": (3, 1, 4),
+    # los Marchitos: los tres gemidos mas llenos; el chillido agudo (la 1) y el mas fuerte de los graves; tres quejidos;
+    # las dos muertes que se deshacen mas despacio; las cuatro campanadas (cada una es un solo golpe: el campanero toca
+    # tres veces y cada vez suena una); los dos farolazos con golpe seco y uno con mas cola
+    "marchito_gemido": (1, 3, 2), "marchito_alerta": (1, 3), "marchito_dolor": (3, 1, 4), "marchito_muerte": (2, 3),
+    "marchito_campana": (4, 3, 1, 2), "marchito_farol": (1, 4, 2),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

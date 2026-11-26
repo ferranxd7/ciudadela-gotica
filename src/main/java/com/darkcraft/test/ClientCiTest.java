@@ -5989,6 +5989,8 @@ public final class ClientCiTest {
         t = viaje(t);
         // los fragmentos del mapa y el mapa de la M en Morvain (parte 7d)
         t = mapaMorvain(t);
+        // Velmor y los Marchitos (parte 7e)
+        t = velmor(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -6229,6 +6231,181 @@ public final class ClientCiTest {
      * E copia el mapa (cartel), el mapa de la M con solo las Llanuras y el mar, con todos los mapas y santuarios, de cerca
      * (nombres, santuarios, el arco y la ciudadela) y viajar desde el mapa (la pregunta y el viaje).
      */
+    // ------------------------------------------------------------------ Velmor y los Marchitos (parte 7e)
+
+    private static final com.darkcraft.enemigos.Marchito[] MARCHITOS = new com.darkcraft.enemigos.Marchito[3];
+
+    private static String estadoMarchitos() {
+        StringBuilder b = new StringBuilder();
+        for (var e : MARCHITOS)
+            b.append(e == null ? " -" : String.format(java.util.Locale.ROOT, " %s accion %d postura %d vida %.0f%s", e.tipo(), e.accion(), e.postura(),
+                    e.getHealth(), e.isRemoved() ? " (quitado)" : ""));
+        return b.toString();
+    }
+
+    /**
+     * Velmor: el puente roto desde la otra orilla, el pueblo desde lo alto, la plaza (el pozo y la horca), la capilla, el
+     * altar con el atril, la campana del campanario; los tres marchitos de cerca, el campanero tocando, el farol que estalla,
+     * la siega y uno que cae en ceniza; el libro del campanero en el codice; y entrar a pie (el cartel y el logro).
+     */
+    private static int velmor(int T) {
+        final var V = com.darkcraft.morvain.Velmor.get();
+        final int g = V.capillaY;
+        int t = T;
+        atTicks(t, "Velmor: el puente roto desde la otra orilla", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                irMirando(sp, 626.5, 84, 4052.5, 760, 78, 4030, true);
+                log("  Velmor: " + com.darkcraft.morvain.MorvainEnemigos.comprobar());
+            });
+        });
+        t += 260;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv46_velmor_puente");
+            server(m, sp -> log("  " + com.darkcraft.morvain.Velmor.resumen(sp.serverLevel()) + " | " + com.darkcraft.morvain.MorvainEnemigos.estado(sp.server)));
+        });
+        t += 10;
+        atTicks(t, "Velmor: el pueblo desde lo alto", m -> server(m, sp -> irMirando(sp, 912.5, 128, 4150.5, 846, 74, 4010, true)));
+        t += 220;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv47_velmor"));
+        t += 10;
+        atTicks(t, "Velmor: la plaza, el pozo y la horca", m -> server(m, sp -> irMirando(sp, 840.5, 77.5, 4057.5, 855, 76, 4031, true)));
+        t += 120;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv48_velmor_plaza");
+            server(m, sp -> log("  en la plaza: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + " | " + com.darkcraft.morvain.MorvainEnemigos.estado(sp.server)));
+        });
+        t += 10;
+        atTicks(t, "Velmor: la capilla y su campanario", m -> server(m, sp -> irMirando(sp, 857.5, g + 3, 3946.5, 843, g + 9, 3922, true)));
+        t += 100;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv49_velmor_capilla"));
+        t += 10;
+        atTicks(t, "Velmor: dentro, el altar y el atril", m -> server(m, sp -> irMirando(sp, 850.5, g + 0.2, 3921.5, 849, g + 2, 3903, true)));
+        t += 80;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv50_velmor_altar");
+            server(m, sp -> {
+                int[] a = V.sitio("atril");
+                var be = sp.serverLevel().getBlockEntity(new BlockPos(a[0], a[1], a[2]));
+                log("  el atril: " + (be instanceof net.minecraft.world.level.block.entity.LecternBlockEntity le
+                        ? "libro perdido " + com.darkcraft.fortaleza.Perdidos.de(le.getBook()) : "NO HAY ATRIL (" + be + ")"));
+            });
+        });
+        t += 10;
+        atTicks(t, "Velmor: la campana del campanario", m -> server(m, sp -> {
+            int[] c = V.sitio("campana");
+            irMirando(sp, 835.5, c[1] - 2, 3923.5, c[0] + 0.5, c[1] + 0.3, c[2] + 0.5, true);
+        }));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv51_velmor_campana"));
+        t += 10;
+        // ---- los marchitos de cerca (en creativo no hacen caso): uno de cada clase delante, en la calle del puente
+        atTicks(t, "Velmor: los tres marchitos", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            comando(sp, "darkcraft velmor enemigos fuera");
+            int x = 820, z = 4040;
+            int[] vs = {com.darkcraft.enemigos.Marchito.GUADANA, com.darkcraft.enemigos.Marchito.FAROL, com.darkcraft.enemigos.Marchito.CAMPANA};
+            for (int i = 0; i < 3; i++) {
+                if (MARCHITOS[i] != null && !MARCHITOS[i].isRemoved()) MARCHITOS[i].discard();
+                var e = DarkCraftMod.MARCHITO.get().create(lvl);
+                if (e == null) continue;
+                e.variante(vs[i]);
+                double y = com.darkcraft.enemigos.Puestos.suelo(lvl, x - 3 + i * 3, com.darkcraft.morvain.Velmor.alto(x - 3 + i * 3, z) + 1, z);
+                e.moveTo(x - 3 + i * 3 + 0.5, y, z + 0.5, 0f, 0f);
+                e.setYHeadRot(0f);
+                e.yBodyRot = 0f;
+                lvl.addFreshEntity(e);
+                MARCHITOS[i] = e;
+            }
+            irMirando(sp, x + 0.5, com.darkcraft.morvain.Velmor.alto(x, z + 6) + 1.2, z + 6.5, x + 0.5, com.darkcraft.morvain.Velmor.alto(x, z) + 2.2, z + 0.5, true);
+        }));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            log("  marchitos:" + estadoMarchitos());
+            shot(m, "cliente_mv52_marchitos");
+        });
+        t += 4;
+        atTicks(t, "Velmor: el campanero toca", m -> server(m, sp -> {
+            if (MARCHITOS[2] != null) MARCHITOS[2].empezar(com.darkcraft.enemigos.MarchitoAnims.CAMPANA_TOCAR);
+        }));
+        t += 12;
+        atTicks(t, "captura", m -> {
+            log("  campana:" + estadoMarchitos() + " | campanadas " + com.darkcraft.enemigos.Marchito.CAMPANADAS);
+            shot(m, "cliente_mv53_campanero");
+        });
+        t += 30;
+        atTicks(t, "Velmor: el farol estalla", m -> server(m, sp -> {
+            if (MARCHITOS[1] != null) MARCHITOS[1].empezar(com.darkcraft.enemigos.MarchitoAnims.FAROL_GOLPE);
+        }));
+        t += 22;
+        atTicks(t, "captura", m -> {
+            log("  farol:" + estadoMarchitos());
+            shot(m, "cliente_mv54_farol");
+        });
+        t += 30;
+        atTicks(t, "Velmor: la siega", m -> server(m, sp -> {
+            if (MARCHITOS[0] != null) MARCHITOS[0].empezar(com.darkcraft.enemigos.MarchitoAnims.GUADANA_SIEGA);
+        }));
+        t += 18;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv55_siega"));
+        t += 30;
+        atTicks(t, "Velmor: uno cae en ceniza", m -> server(m, sp -> {
+            sp.setGameMode(GameType.SURVIVAL);
+            if (MARCHITOS[0] != null) MARCHITOS[0].hurt(sp.damageSources().playerAttack(sp), 9999f);
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        t += 16;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv56_ceniza");
+            var est = com.darkcraft.client.espejo.EspejoCliente.estado();
+            log("  tras caer: bestiario " + (est == null ? "?" : est.bestiario()));
+            server(m, sp -> log("  logro marchito " + com.darkcraft.story.Logros.tiene(sp, "marchito") + ";" + estadoMarchitos()));
+        });
+        t += 10;
+        atTicks(t, "Velmor: el libro del campanero", m -> {
+            for (var e : MARCHITOS) if (e != null) server(m, sp -> { if (!e.isRemoved()) e.discard(); });
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(18));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv57_libro_campanero"));
+        t += 6;
+        // ---- entrar a pie por la puerta del sur, en aventura: el cartel con el nombre y el logro
+        atTicks(t, "Velmor: entrar a pie por la puerta del sur", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                int[] p = V.sitio("puerta_sur");
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), p[0] + 0.5, p[1], p[2] - 4.5, 180f, 4f);
+            });
+        });
+        t += 60;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv58_velmor_cartel");
+            server(m, sp -> log("  al entrar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + ", logro velmor " + com.darkcraft.story.Logros.tiene(sp, "velmor")
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+        });
+        t += 10;
+        atTicks(t, "Velmor: fin (los marchitos vuelven, vuelta al arco)", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft velmor enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
     private static int mapaMorvain(int T) {
         final var UMBRAL = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
         final var ESTELA = com.darkcraft.morvain.Fragmentos.de(com.darkcraft.morvain.Region.LLANURAS);

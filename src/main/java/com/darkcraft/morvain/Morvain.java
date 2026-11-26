@@ -292,6 +292,9 @@ public final class Morvain {
                 remolino(m);
                 break;
             }
+        // quien entra en Velmor (parte 7e): su logro
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Velmor.dentro(p.getX(), p.getZ()) && p.getY() < 140) com.darkcraft.story.Logros.dar(p, "velmor");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -340,6 +343,8 @@ public final class Morvain {
     /** La clave del nombre del sitio de Morvain donde esta el jugador (el arco o la region). */
     public static String lugar(ServerPlayer p) {
         if (Llegada.cerca(p.getX(), p.getZ(), 34) && Math.abs(p.getY() - Llegada.Y) < 30) return "darkcraft.morvain.lugar.umbral";
+        // Velmor, el pueblo marchito (parte 7e)
+        if (Velmor.dentro(p.getX(), p.getZ()) && p.getY() < 140) return "darkcraft.morvain.lugar.velmor";
         return "darkcraft.zona.morvain." + Terreno.region(p.getX(), p.getZ()).id;
     }
 

@@ -39,7 +39,7 @@ public class Casa extends Element {
     public final Estilo estilo;
     public final Tipo tipo;
     protected final int tejado;
-    protected final Terreno terreno;
+    protected final Alturas terreno;
     /** La cumbrera va a lo largo de X (el tejado cae hacia el norte y el sur). */
     protected final boolean cumbreraX;
     /** Hasta donde llegan los muros, y el lado de dentro (de izquierda a derecha y de fondo). */
@@ -50,8 +50,16 @@ public class Casa extends Element {
 
     public static final ResourceLocation BOTIN = new ResourceLocation("darkcraft", "chests/pueblo");
     public static final ResourceLocation BOTIN_BUENO = new ResourceLocation("darkcraft", "chests/pueblo_bueno");
+    /** Lo que llevan sus arcones (null: no hay arcon; en Velmor, parte 7e, otras tablas y menos arcones). */
+    protected ResourceLocation botin = BOTIN, botinBueno = BOTIN_BUENO;
 
-    public Casa(long seed, Terreno terreno, Rect fp, Direction frente, int plantas, int ruina, Estilo estilo, int tejado, Tipo tipo) {
+    public Casa botin(ResourceLocation normal, ResourceLocation bueno) {
+        this.botin = normal;
+        this.botinBueno = bueno;
+        return this;
+    }
+
+    public Casa(long seed, Alturas terreno, Rect fp, Direction frente, int plantas, int ruina, Estilo estilo, int tejado, Tipo tipo) {
         super(seed);
         this.layer = 3;
         this.terreno = terreno;
@@ -405,6 +413,7 @@ public class Casa extends Element {
     }
 
     protected void arcon(Canvas c, int a, int b, int dy, ResourceLocation botin) {
+        if (botin == null) return;
         c.chest(lx(a, b), y + dy, lz(a, b), frente, botin);
     }
 
@@ -468,7 +477,7 @@ public class Casa extends Element {
         // al fondo: la cama (abajo si no hay planta alta) y el arcon
         if (!arriba) cama(c, 0, B - 1, 0, r.chance(0.5) ? Blocks.RED_BED : Blocks.BROWN_BED);
         else pon(c, 0, B - 1, 0, Pal.BOOKSHELF);
-        arcon(c, A - 1, B - 1, 0, BOTIN);
+        arcon(c, A - 1, B - 1, 0, botin);
         // la mesa en medio con dos sillas
         int ma = Math.max(2, A / 2), mb = Math.max(1, B / 2);
         if (ma == puertaA() && mb <= 1) mb = 2;
@@ -482,7 +491,7 @@ public class Casa extends Element {
         if (B > 4) pon(c, A - 1, B / 2, 0, r.chance(0.5) ? Pal.facing(Blocks.SMOKER, izquierda()) : Pal.b(Blocks.CAULDRON));
         if (arriba) {
             cama(c, 0, B - 1, 4, r.chance(0.5) ? Blocks.RED_BED : Blocks.GRAY_BED);
-            if (A > 4) arcon(c, A - 1, B - 1, 4, BOTIN);
+            if (A > 4) arcon(c, A - 1, B - 1, 4, botin);
             pon(c, 0, 0, 4, Pal.BOOKSHELF);
             pon(c, 0, 0, 6, Pal.COBWEB);
         }
@@ -506,11 +515,11 @@ public class Casa extends Element {
             if (r.chance(0.7)) silla(c, m[0] + 1, m[1], derecha());
             if (r.chance(0.4)) pon(c, m[0], m[1] + 1, 0, Pal.stairs(Blocks.SPRUCE_STAIRS, dentro(), false));
         }
-        arcon(c, 0, B - 1, 0, BOTIN_BUENO);
+        arcon(c, 0, B - 1, 0, botinBueno);
         if (plantas == 2) {
             // arriba, los cuartos: camas a lo largo del muro izquierdo
             for (int b = 1; b < B - 1; b += 4) cama(c, 0, b, 4, Blocks.RED_BED);
-            arcon(c, A - 1, B - 1, 4, BOTIN);
+            arcon(c, A - 1, B - 1, 4, botin);
         }
     }
 
@@ -548,10 +557,10 @@ public class Casa extends Element {
             }
         pon(c, 0, 0, 0, Blocks.BARREL.defaultBlockState().setValue(net.minecraft.world.level.block.BarrelBlock.FACING, Direction.UP));
         pon(c, 0, 2, 0, Pal.b(Blocks.LOOM));
-        arcon(c, 0, B / 2, 0, BOTIN_BUENO);
+        arcon(c, 0, B / 2, 0, botinBueno);
         if (plantas == 2) {
             cama(c, 0, B - 1, 4, Blocks.BLUE_BED);
-            arcon(c, A - 1, B - 1, 4, BOTIN);
+            arcon(c, A - 1, B - 1, 4, botin);
             pon(c, A / 2, B - 1, 4, Pal.BOOKSHELF);
         }
     }
@@ -565,6 +574,6 @@ public class Casa extends Element {
         pon(c, 0, 0, 0, Pal.b(Blocks.SMITHING_TABLE));
         pon(c, A - 1, 1, 0, Pal.b(Blocks.GRINDSTONE));
         pon(c, A / 2, B - 1, 0, Pal.b(Blocks.COAL_BLOCK));
-        arcon(c, 0, B - 1, 0, BOTIN_BUENO);
+        arcon(c, 0, B - 1, 0, botinBueno);
     }
 }

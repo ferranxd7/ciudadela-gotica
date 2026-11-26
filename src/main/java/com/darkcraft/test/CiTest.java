@@ -726,6 +726,123 @@ public final class CiTest {
         } catch (Throwable t) {
             log.println("Morvain, las estelas del mapa: ERROR " + t);
         }
+        velmor(server, m, log, out);
+    }
+
+    /**
+     * Velmor y los Marchitos (parte 7e): el pueblo levantado (casas, el atril de la capilla con el libro 18, la campana del
+     * campanario, los arcones), vistas desde arriba; los puestos de los marchitos, todos fuera y en el suelo, todas sus
+     * acciones; la campanada que llama a los de alrededor; el farol que estalla; y que caen en ceniza con su logro.
+     */
+    private static void velmor(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        try {
+            com.darkcraft.morvain.Velmor v = com.darkcraft.morvain.Velmor.get();
+            long t2 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : v.chunks()) {
+                int cx = (int) (k >> 32), cz = (int) k;
+                // (el pueblo, el puente y el vado; los caminos de fuera no hacen falta)
+                if ((cx << 4) + 15 < 636 || (cz << 4) > 4200) continue;
+                m.getChunk(cx, cz);
+                nch++;
+            }
+            log.println("Morvain, Velmor: " + nch + " chunks en " + (System.currentTimeMillis() - t2) + " ms; " + com.darkcraft.morvain.Velmor.resumen(m));
+            topView(m, 852, 4026, 140, new File(out, "morvain_velmor.png"));
+            topView(m, 846, 3916, 30, new File(out, "morvain_velmor_capilla.png"));
+            topView(m, 690, 4040, 52, new File(out, "morvain_velmor_puente.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, Velmor: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] Velmor", t);
+        }
+        try {
+            String sitio = com.darkcraft.morvain.MorvainEnemigos.VELMOR;
+            log.println("Morvain, los marchitos: " + com.darkcraft.morvain.MorvainEnemigos.comprobar() + " | dificultad " + m.getDifficulty());
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            int enSuelo = 0, chocan = 0, fallos = 0;
+            java.util.Map<String, Integer> tipos = new java.util.TreeMap<>();
+            StringBuilder mal = new StringBuilder();
+            for (var e : fuera) {
+                tipos.merge(e.tipo() + (e.postura() == 1 ? " (reza)" : e.postura() == 2 ? " (tumbado)" : ""), 1, Integer::sum);
+                boolean suelo = !m.getBlockState(BlockPos.containing(e.getX(), e.getY() - 0.2, e.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty();
+                if (suelo) enSuelo++;
+                else if (mal.length() < 300) mal.append(' ').append(e.tipo()).append(" en el aire en ").append(e.blockPosition().toShortString()).append(';');
+                if (!m.noCollision(e)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(' ').append(e.tipo()).append(" metido en un bloque en ").append(e.blockPosition().toShortString()).append(';');
+                }
+            }
+            // cada uno hace todas sus acciones (sin presa): que ninguna rompa nada
+            for (var e : fuera) {
+                try {
+                    e.postura(0);
+                    for (int a = 1; a < com.darkcraft.enemigos.MarchitoAnims.TICKS.length; a++) {
+                        String nombre = com.darkcraft.enemigos.MarchitoAnims.NOMBRES[a];
+                        if (nombre.equals("morir")) continue;
+                        e.empezar(a);
+                        for (int k = 0; k < 90 && e.accion() == a; k++) e.tick();
+                        if (e.accion() == a) {
+                            fallos++;
+                            if (mal.length() < 500) mal.append(' ').append(e.tipo()).append(": la accion ").append(nombre).append(" no acaba;");
+                        }
+                    }
+                    for (int k = 0; k < 20; k++) e.tick();
+                } catch (Throwable t) {
+                    fallos++;
+                    if (mal.length() < 700) mal.append(' ').append(e.tipo()).append(": ").append(t).append(';');
+                    DarkCraftMod.LOGGER.error("[CI] marchito " + e.tipo(), t);
+                }
+            }
+            log.println("Morvain, los marchitos fuera: " + fuera.size() + " de " + com.darkcraft.morvain.MorvainEnemigos.velmor().size() + " " + tipos
+                    + "; en el suelo " + enSuelo + ", metidos en un bloque " + chocan + " (tiene que ser 0), acciones que fallan " + fallos
+                    + " (tiene que ser 0)" + mal);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            // la campanada: un campanero con presa toca y los de alrededor van a por ella; el farol estalla y deja fuego de almas
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5f2b8c1e-3d4a-4e6b-9a7c-1b2d3e4f5a6b"), "[DarkCraftCI]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            int x = com.darkcraft.morvain.Velmor.X, z = com.darkcraft.morvain.Velmor.Z + 4;
+            double y = com.darkcraft.enemigos.Puestos.suelo(m, x, m.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z);
+            var camp = DarkCraftMod.MARCHITO.get().create(m);
+            var a1 = DarkCraftMod.MARCHITO.get().create(m);
+            var a2 = DarkCraftMod.MARCHITO.get().create(m);
+            var lejos = DarkCraftMod.MARCHITO.get().create(m);
+            String campana = "no se crean";
+            if (camp != null && a1 != null && a2 != null && lejos != null) {
+                camp.variante(com.darkcraft.enemigos.Marchito.CAMPANA);
+                a1.variante(com.darkcraft.enemigos.Marchito.GUADANA);
+                a2.variante(com.darkcraft.enemigos.Marchito.FAROL);
+                lejos.variante(com.darkcraft.enemigos.Marchito.GUADANA);
+                camp.moveTo(x + 0.5, y, z + 0.5, 0f, 0f);
+                a1.moveTo(x + 8.5, y, z + 0.5, 0f, 0f);
+                a2.moveTo(x - 12.5, y, z + 3.5, 0f, 0f);
+                lejos.moveTo(x + 0.5, y, z + 40.5, 0f, 0f);
+                for (var e : new com.darkcraft.enemigos.Marchito[]{camp, a1, a2, lejos}) m.addFreshEntity(e);
+                fp.moveTo(x + 0.5, y, z + 12.5, 180f, 0f);
+                camp.setTarget(fp);
+                int antes = com.darkcraft.enemigos.Marchito.CAMPANADAS;
+                camp.empezar(com.darkcraft.enemigos.MarchitoAnims.CAMPANA_TOCAR);
+                for (int k = 0; k < 40 && camp.accion() == com.darkcraft.enemigos.MarchitoAnims.CAMPANA_TOCAR; k++) camp.tick();
+                campana = "campanadas " + (com.darkcraft.enemigos.Marchito.CAMPANADAS - antes) + "; acuden: el de 8 bloques " + (a1.getTarget() == fp)
+                        + ", el de 12 " + (a2.getTarget() == fp) + ", el de 40 " + (lejos.getTarget() == fp) + " (tiene que ser false)";
+                // el farol: estalla delante
+                a2.setTarget(null);
+                a2.moveTo(x - 12.5, y, z + 3.5, 0f, 0f);
+                a2.empezar(com.darkcraft.enemigos.MarchitoAnims.FAROL_GOLPE);
+                for (int k = 0; k < 40 && a2.accion() != 0; k++) a2.tick();
+                campana += "; el farol deja fuego de almas " + a2.fuegoArde();
+                // caer: en ceniza, sin quedarse el cuerpo
+                fp.moveTo(x + 2.5, y, z + 0.5, 90f, 0f);
+                a1.hurt(m.damageSources().playerAttack(fp), 9999f);
+                for (int k = 0; k < 60 && !a1.isRemoved(); k++) a1.tick();
+                campana += "; uno cae: vivo " + a1.isAlive() + ", quitado " + a1.isRemoved();
+                for (var e : new com.darkcraft.enemigos.Marchito[]{camp, a1, a2, lejos}) if (!e.isRemoved()) e.discard();
+            }
+            log.println("Morvain, la campana de los marchitos: " + campana);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        } catch (Throwable t) {
+            log.println("Morvain, los marchitos: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] marchitos", t);
+        }
     }
 
     /** Las celdas del hueco del arco del portal (las de bloque de portal). */

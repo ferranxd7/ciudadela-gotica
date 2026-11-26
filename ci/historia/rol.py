@@ -1922,6 +1922,55 @@ EN.update({
 })
 
 
+# ---------------------------------------------------------------- parte 7e: los Marchitos y Velmor (las Llanuras Palidas)
+ES.update({
+    "entity.darkcraft.marchito": "Marchito",
+    "darkcraft.bestiario.marchito_guadana": "Marchito (guadaña)",
+    "darkcraft.bestiario.marchito_farol": "Marchito (farol)",
+    "darkcraft.bestiario.marchito_campana": "Marchito campanero",
+    "darkcraft.bestiario.marchito_guadana.desc": "La gente de Velmor, secada por dentro hasta quedar en ceniza que anda. La guadaña barre todo lo que tiene delante: da un paso atrás y entra cuando acabe el barrido; su tajo de arriba abajo se ve venir.",
+    "darkcraft.bestiario.marchito_farol.desc": "Lleva uno de los faroles de las calles de Velmor, aún encendido con fuego de almas. Si lo estrella contra el suelo, el fuego se queda ardiendo un momento: no te quedes encima. Sus golpes prenden.",
+    "darkcraft.bestiario.marchito_campana.desc": "El campanero no pelea si puede evitarlo: si te ve de lejos, toca su campana y acuden todos los de alrededor. Ve a por él el primero, o que no te vea.",
+    "subtitles.darkcraft.sfx.marchito_gemido": "Un marchito gime",
+    "subtitles.darkcraft.sfx.marchito_alerta": "Un marchito te ha visto",
+    "subtitles.darkcraft.sfx.marchito_dolor": "Un marchito se queja",
+    "subtitles.darkcraft.sfx.marchito_muerte": "Un marchito se deshace en ceniza",
+    "subtitles.darkcraft.sfx.marchito_campana": "Suena la campana de un marchito",
+    "subtitles.darkcraft.sfx.marchito_farol": "Un farol estalla en fuego de almas",
+    "darkcraft.morvain.lugar.velmor": "Velmor",
+    "advancements.darkcraft.marchito.title": "Ceniza que anda",
+    "advancements.darkcraft.marchito.description": "Vence a un Marchito de las Llanuras Pálidas",
+    "advancements.darkcraft.velmor.title": "Las campanas de Velmor",
+    "advancements.darkcraft.velmor.description": "Entra en Velmor, el pueblo marchito",
+    "darkcraft.diario.marchito": "En las llanuras la gente no murió: se secó. Lo que queda de ellos es ceniza con forma de persona, y todavía empuña lo que tenía en las manos.",
+    "darkcraft.diario.velmor": "Velmor: un puente roto, una capilla sin techo y un campanario que todavía tiene campana. Sus vecinos siguen en las calles, en los campos, en la taberna... esperando.",
+    "darkcraft.ayuda.velmor": "Velmor, el pueblo marchito: ir a uno de sus sitios, que vuelvan sus marchitos o quitarlos",
+})
+EN.update({
+    "entity.darkcraft.marchito": "Withered",
+    "darkcraft.bestiario.marchito_guadana": "Withered (scythe)",
+    "darkcraft.bestiario.marchito_farol": "Withered (lantern)",
+    "darkcraft.bestiario.marchito_campana": "Withered Bell-Ringer",
+    "darkcraft.bestiario.marchito_guadana.desc": "The people of Velmor, dried from within until only walking ash remains. The scythe sweeps everything in front of it: step back and move in when the sweep ends; its overhead cut is easy to read.",
+    "darkcraft.bestiario.marchito_farol.desc": "Carries one of Velmor's street lanterns, still burning with soul fire. If it smashes it on the ground, the fire keeps burning for a moment: do not stand in it. Its blows set you alight.",
+    "darkcraft.bestiario.marchito_campana.desc": "The bell-ringer avoids a fight if it can: if it sees you from afar, it rings its bell and everyone nearby comes running. Go for it first, or stay out of its sight.",
+    "subtitles.darkcraft.sfx.marchito_gemido": "Withered moans",
+    "subtitles.darkcraft.sfx.marchito_alerta": "Withered notices you",
+    "subtitles.darkcraft.sfx.marchito_dolor": "Withered hurts",
+    "subtitles.darkcraft.sfx.marchito_muerte": "Withered crumbles to ash",
+    "subtitles.darkcraft.sfx.marchito_campana": "A Withered rings its bell",
+    "subtitles.darkcraft.sfx.marchito_farol": "A lantern bursts into soul fire",
+    "darkcraft.morvain.lugar.velmor": "Velmor",
+    "advancements.darkcraft.marchito.title": "Walking Ash",
+    "advancements.darkcraft.marchito.description": "Defeat a Withered of the Pale Plains",
+    "advancements.darkcraft.velmor.title": "The Bells of Velmor",
+    "advancements.darkcraft.velmor.description": "Enter Velmor, the withered village",
+    "darkcraft.diario.marchito": "Out on the plains the people did not die: they dried out. What is left of them is ash in the shape of a person, still gripping whatever they held.",
+    "darkcraft.diario.velmor": "Velmor: a broken bridge, a roofless chapel and a bell tower that still has its bell. Its folk are still in the streets, the fields, the tavern... waiting.",
+    "darkcraft.ayuda.velmor": "Velmor, the withered village: go to one of its places, bring its Withered back or remove them",
+})
+
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

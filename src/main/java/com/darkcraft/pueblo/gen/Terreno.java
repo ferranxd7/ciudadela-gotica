@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.properties.DripstoneThickness;
  * estalactitas que se hunde en las nubes. Todo sale de {@link #alto} (lo que se pisa en cada columna, o
  * {@link #NADA}): los edificios y los caminos lo consultan.
  */
-public final class Terreno extends Element {
+public final class Terreno extends Element implements Alturas {
     /** La meseta y el muelle (el bloque de arriba: se pisa uno mas arriba). */
     public static final int P = 266, Q = 250;
     public static final int NADA = Integer.MIN_VALUE;

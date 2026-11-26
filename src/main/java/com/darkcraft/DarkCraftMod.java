@@ -184,6 +184,13 @@ public class DarkCraftMod {
     // el aviso de los logros (parte 2f-1)
     public static final RegistryObject<SoundEvent> SFX_LOGRO = sound("sfx.logro");
     public static final RegistryObject<SoundEvent> SFX_PIEZA = sound("sfx.pieza_barco");
+    // los marchitos de Morvain (parte 7e)
+    public static final RegistryObject<SoundEvent> SFX_MARCHITO_GEMIDO = sound("sfx.marchito_gemido");
+    public static final RegistryObject<SoundEvent> SFX_MARCHITO_ALERTA = sound("sfx.marchito_alerta");
+    public static final RegistryObject<SoundEvent> SFX_MARCHITO_DOLOR = sound("sfx.marchito_dolor");
+    public static final RegistryObject<SoundEvent> SFX_MARCHITO_MUERTE = sound("sfx.marchito_muerte");
+    public static final RegistryObject<SoundEvent> SFX_MARCHITO_CAMPANA = sound("sfx.marchito_campana");
+    public static final RegistryObject<SoundEvent> SFX_MARCHITO_FAROL = sound("sfx.marchito_farol");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -436,6 +443,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Capitan>> CAPITAN = ENTITIES.register("capitan",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Capitan>of(com.darkcraft.enemigos.Capitan::new, MobCategory.MONSTER)
                     .sized(0.85f, 2.35f).fireImmune().clientTrackingRange(10).build(MODID + ":capitan"));
+    // ---- los marchitos de Morvain (parte 7e)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Marchito>> MARCHITO = ENTITIES.register("marchito",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Marchito>of(com.darkcraft.enemigos.Marchito::new, MobCategory.MONSTER)
+                    .sized(0.6f, 2.05f).clientTrackingRange(8).build(MODID + ":marchito"));
     // ---- la guardia de Valdrenn (parte 4a)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Guardia>> GUARDIA = ENTITIES.register("guardia",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Guardia>of(com.darkcraft.enemigos.Guardia::new, MobCategory.MONSTER)
@@ -570,6 +581,7 @@ public class DarkCraftMod {
         com.darkcraft.valdrenn.ValdrennEnemigos.registrar();
         com.darkcraft.fortaleza.FortalezaEnemigos.registrar();
         com.darkcraft.camino.Paradas.registrar();
+        com.darkcraft.morvain.MorvainEnemigos.registrar();
         com.darkcraft.fortaleza.Localizar.registrar(modBus);
         modBus.addListener(this::attributes);
         modBus.addListener(this::setup);
@@ -595,6 +607,7 @@ public class DarkCraftMod {
         e.put(CABALLERO_ALABARDA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
         e.put(CABALLERO_BALLESTA.get(), com.darkcraft.caballeros.CaballeroZombi.atributos().build());
         e.put(HUECO.get(), com.darkcraft.enemigos.Hueco.atributos().build());
+        e.put(MARCHITO.get(), com.darkcraft.enemigos.Marchito.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());

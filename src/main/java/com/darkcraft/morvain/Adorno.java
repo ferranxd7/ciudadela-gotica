@@ -27,6 +27,11 @@ final class Adorno {
         if (Llegada.plaza(x0, z0) || SantuariosMorvain.libre(x0, z0)) return;
         Random r = new Random(c.getPos().toLong() * 0x9E3779B97F4A7C15L + 0x4D6F72L);
         Region reg = Terreno.region(x0 + 8, z0 + 8);
+        // en Velmor (parte 7e) solo la hierba: los arboles y lo demas los pone el pueblo donde no estorban
+        if (Velmor.cerca(x0, z0)) {
+            hierba(nivel, c, r, 40, Blocks.GRASS.defaultBlockState(), Blocks.DEAD_BUSH.defaultBlockState());
+            return;
+        }
         switch (reg) {
             case LLANURAS -> {
                 if (r.nextInt(3) == 0) arbol(nivel, c, r, Blocks.OAK_LOG.defaultBlockState(), 4, 4, 1);

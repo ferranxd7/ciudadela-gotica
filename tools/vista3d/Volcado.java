@@ -351,6 +351,36 @@ public class Volcado {
                         s.z() + 18, s.y() - 10);
                 marcas.put("santuario", new int[]{s.x(), s.y() + 2, s.z()});
             }
+            case "morvain_velmor" -> {
+                // Velmor, el pueblo marchito de las Llanuras (parte 7e): el terreno y el pueblo encima, chunk a chunk
+                // (-Dcaja=x0,z0,x1,z1 para un trozo; por defecto todo, del puente a la puerta del este)
+                String[] k = System.getProperty("caja", "636,3884,990,4200").split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 58);
+                com.darkcraft.morvain.Velmor v = com.darkcraft.morvain.Velmor.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                // lo que se sale de la caja, fuera (las piezas se dibujan enteras en sus chunks)
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("Velmor: " + v.casas.size() + " casas, " + v.elementos().size() + " piezas, " + hechos + " chunks; sitios "
+                        + v.sitios().size() + "; la capilla a Y " + v.capillaY);
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+            }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);
