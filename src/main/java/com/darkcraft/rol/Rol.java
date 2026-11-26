@@ -222,6 +222,11 @@ public final class Rol {
         de(sp).combate = 0;
     }
 
+    /** Para la prueba de la CI: en combate (como si acabara de pelear; sirve tambien sin limite de estamina). */
+    public static void conCombate(ServerPlayer sp) {
+        de(sp).combate = COMBATE;
+    }
+
     /** La estamina entera y fuera el agotamiento (al descansar en un santuario). */
     public static void recuperado(ServerPlayer sp) {
         Estado s = de(sp);
