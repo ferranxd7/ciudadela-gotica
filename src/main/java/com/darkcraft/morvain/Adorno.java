@@ -46,6 +46,8 @@ final class Adorno {
         if (Juramento.cerca(x0, z0)) return;
         // ni en la Academia Espectral (parte 7o): sus arboles secos, su hierba y sus escombros los pone ella
         if (Academia.cerca(x0, z0)) return;
+        // ni en el Observatorio (parte 7p)
+        if (Observatorio.cerca(x0, z0)) return;
         // en la Arboleda de los Ahorcados (parte 7g) solo setas y helechos: los arboles son los suyos
         if (Arboleda.cerca(x0, z0)) {
             hierba(nivel, c, r, 20, Blocks.BROWN_MUSHROOM.defaultBlockState(), Blocks.FERN.defaultBlockState());

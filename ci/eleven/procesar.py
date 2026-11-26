@@ -75,6 +75,9 @@ TOMAS_BARQUERO = {n: "a" for n in range(1, 6)}
 TOMAS_ABAD = {n: "a" for n in range(1, 6)}
 # el Condestable del Juramento (parte 7n; voz "Jerry B. - Military Commander"): las tomas a (las b dicen lo mismo)
 TOMAS_CONDESTABLE = {n: "a" for n in range(1, 6)}
+# Ysolde, la Rectora de la Academia (parte 7p; voz "Enchantress - mysterious, witchy, villain character"): las tomas a, salvo
+# la 2 (la 2a acaba de hablar justo al final del fichero: la b deja su cola)
+TOMAS_RECTORA = {1: "a", 2: "b", 3: "a", 4: "a", 5: "a"}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -252,11 +255,22 @@ SFX = {
     "erudito_orbe": (2.6, 0.8, -15), "erudito_runas": (2.4, 0.6, -14), "erudito_parpadeo": (1.6, 0.5, -15),
     "erudito_tomazo": (2.8, 0.8, -13), "erudito_cadena": (2.0, 0.6, -14), "erudito_alzarse": (3.5, 1.0, -16),
     "academia_ambiente": (20.0, 2.0, -25),
+    # Ysolde, la Rectora de la Academia (parte 7p): el grito con su coro de susurros, el baculo que barre y da, los tres orbes
+    # que se cargan y salen, la llamada de la lluvia de estrellas (larga: se corta), cada estrella que cae, la constelacion que
+    # se enciende, el parpadeo, alzarse a media vida, el dolor, la muerte (un suspiro y las estrellas que se apagan) y su
+    # espera leyendo el cielo (el zumbido de la cupula, campanillas y susurros; floja); el sello del Observatorio que cierra la
+    # puerta (un golpe y el muro de luz) y el que se rompe al caer ella
+    "rectora_grito": (3.6, 1.0, -14), "rectora_baculo": (2.2, 0.6, -14), "rectora_orbes": (2.6, 0.8, -15),
+    "rectora_estrellas": (7.0, 2.0, -15), "rectora_estrella_cae": (2.6, 0.8, -15), "rectora_constelacion": (2.4, 0.8, -15),
+    "rectora_parpadeo": (1.6, 0.5, -15), "rectora_alzarse": (6.0, 1.6, -15), "rectora_dolor": (1.0, 0.3, -15),
+    "rectora_muerte": (6.0, 1.8, -15), "rectora_espera": (14.0, 2.0, -23),
+    "observatorio_sello": (4.0, 1.0, -13), "observatorio_abre": (4.0, 1.2, -15),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
            "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0, "abad_ventisca": 1.5, "abad_rezo": 0.4,
-           "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6, "academia_ambiente": 2.0, "erudito_susurro": 0.8}
+           "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6, "academia_ambiente": 2.0, "erudito_susurro": 0.8,
+           "rectora_espera": 1.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
@@ -447,6 +461,16 @@ TOMAS_SFX = {
     "erudito_pluma": (1, 3), "erudito_tinta": (4, 3), "erudito_orbe": (2, 4), "erudito_runas": (1, 3),
     "erudito_parpadeo": (1, 2), "erudito_tomazo": (1, 4), "erudito_cadena": (2, 3), "erudito_alzarse": (1, 2),
     "academia_ambiente": (3, 4),
+    # la Rectora: los dos gritos mas llenos (la 4 y la 2), los dos golpes de baculo mas secos (la 4 y la 3), los orbes que
+    # suenan de verdad (la 3 y la 2; la 1 y la 4 casi no se oyen), las dos llamadas de estrellas mas fuertes (la 1 y la 4),
+    # las estrellas que caen mas largas (la 3 y la 2), las constelaciones con el golpe de luz claro (la 2 y la 4), los
+    # parpadeos mas llenos (la 2 y la 4), las dos alzadas (la 1, con mas graves, y la 4), tres quejidos (4, 1 y 3), las dos
+    # muertes que mas se oyen (la 4 y la 1) y las dos esperas de susurros y campanillas (la 2 y la 3; la 4 es casi todo un
+    # zumbido grave); el sello, los dos golpes con mas cuerpo (la 1 y la 4), y al abrirse las dos que suenan mas (la 1 y la 3)
+    "rectora_grito": (4, 2), "rectora_baculo": (4, 3), "rectora_orbes": (3, 2), "rectora_estrellas": (1, 4),
+    "rectora_estrella_cae": (3, 2), "rectora_constelacion": (2, 4), "rectora_parpadeo": (2, 4), "rectora_alzarse": (1, 4),
+    "rectora_dolor": (4, 1, 3), "rectora_muerte": (4, 1), "rectora_espera": (2, 3),
+    "observatorio_sello": (1, 4), "observatorio_abre": (1, 3),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -660,6 +684,27 @@ def voz_condestable(src, dst):
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA + 0.1
+
+
+def voz_rectora(src, dst):
+    """
+    Ysolde, la Rectora de la Academia: un espectro que lee el cielo bajo la cupula del Observatorio. Algo mas grave (mas
+    autoridad), una segunda voz una quinta por encima, fina y muy baja (el eco de las estrellas), un coro lento que la hace
+    temblar como una aparicion, algo de brillo y el eco largo y claro de la cupula de cobre.
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=2[v1][v2];"
+        "[v1]asetrate=44100*0.97,aresample=44100,atempo=1.0309[baja];"
+        "[v2]asetrate=44100*1.5,aresample=44100,atempo=0.6667,highpass=f=1800,volume=0.16[alta];"
+        "[baja][alta]amix=inputs=2:weights=1 0.5:normalize=0,"
+        "chorus=0.6:0.9:45|62:0.30|0.24:0.25|0.32:2.0|1.4,"
+        "highshelf=f=6500:g=2,equalizer=f=220:t=q:w=1.0:g=1.5,"
+        "aecho=0.8:0.45:150|330|570|880:0.26|0.18|0.11|0.06,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.15
 
 
 def sonoridad(f):
@@ -941,6 +986,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO condestable {n}: {e}")
+    # Ysolde, la Rectora de la Academia (parte 7p)
+    rec = os.path.join(ASSETS, "sounds", "rectora")
+    os.makedirs(rec, exist_ok=True)
+    dur_r, hab_r = {}, {}
+    for n, toma in sorted(TOMAS_RECTORA.items()):
+        src = os.path.join(MASTER, "rectora", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(rec, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_rectora(src, dst)
+            dur_r[n] = round(duracion(dst), 2)
+            hab_r[n] = round(min(h, dur_r[n]), 2)
+            print(f"rectora {n:2d}: {dur_r[n]} s (habla hasta {hab_r[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO rectora {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -972,7 +1036,8 @@ def main():
         json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g, "capitan": dur_c, "habla_capitan": hab_c,
                    "sombra": dur_s, "habla_sombra": hab_s, "molinera": dur_m, "habla_molinera": hab_m,
                    "verdugo": dur_v, "habla_verdugo": hab_v, "barquero": dur_b, "habla_barquero": hab_b,
-                   "abad": dur_a, "habla_abad": hab_a, "condestable": dur_k, "habla_condestable": hab_k}, fh)
+                   "abad": dur_a, "habla_abad": hab_a, "condestable": dur_k, "habla_condestable": hab_k,
+                   "rectora": dur_r, "habla_rectora": hab_r}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

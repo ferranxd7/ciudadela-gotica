@@ -202,5 +202,16 @@
     "aviso": "Music by Eldritch Grim (OpenGameArt, CC0)",
     "uso": "El Condestable del Juramento (el jefe de la Capital en ruinas de Morvain)",
     "lufs": -16
+  },
+  {
+    "id": "rectora",
+    "pagina": "https://opengameart.org/content/boss-battle-music",
+    "busca": "epic boss battle",
+    "titulo": "Boss Battle Music (Epic Boss Battle)",
+    "autor": "SubspaceAudio (Juhani Junkala)",
+    "licencia": "CC0",
+    "aviso": "Music by SubspaceAudio / Juhani Junkala (OpenGameArt, CC0)",
+    "uso": "Ysolde, la Rectora de la Academia (el jefe de la Academia Espectral de Morvain)",
+    "lufs": -16
   }
 ]

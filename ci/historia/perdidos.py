@@ -11,7 +11,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza",
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
-         22: "morvain", 23: "morvain", 24: "morvain"}
+         22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -383,6 +383,16 @@ LIBROS = {
    "Night of the red sky. Rector Ysolde has gone up to the observatory with her masters to read the fire that falls. She says it is not fire: it is writing. Those of us below she has bidden to keep studying and not go out. The custodians have chained the tomes.",
    "The apprentices sleep no more. They read without turning the page; if you speak to them, they answer with the line in front of them. The vein sings beneath the cloister. No one comes down from the observatory, but the Rector's light still burns.",
    "If you are reading this, do not read it aloud: what they read stays with you. To the east, in the observatory, the Rector is still reading the sky... and the sky is reading her.\n\nMaster Orlen, Keeper of the Great Library"]),
+ },
+ 25: {
+  "es": ("Las últimas observaciones", "Ysolde, Rectora de la Academia", [
+   "Noche del cielo rojo, hora tercia. El fuego que cae sobre la capital no es fuego: son líneas. Unen estrellas que no estaban en ninguna carta. He mandado a mis maestros a sus atriles y he cerrado la puerta con el sello. Nadie baja hasta que lo hayamos leído entero.",
+   "Hora sexta. Ya sé leerlo. Es un nombre, escrito con las estrellas de todo el cielo, y no es el nombre de nadie que haya nacido. Cuanto más lo leo, más claro se ve. Mis maestros ya no hablan: copian. Yo no puedo apartar el ojo del telescopio.",
+   "No sé qué hora es. Esta noche no acaba. Ya no leo yo: algo me lee a mí, línea a línea, desde arriba. Si alguien encuentra estas hojas, que no mire por el telescopio. Y si me ve aún de pie ante él, que me haga bajar la vista. Por favor.\n\nYsolde"]),
+  "en": ("The Last Observations", "Ysolde, Rector of the Academy", [
+   "Night of the red sky, third hour. The fire falling on the capital is not fire: it is lines. They join stars that were on no chart. I have sent my masters to their lecterns and closed the door with the seal. No one goes down until we have read it all.",
+   "Sixth hour. I can read it now. It is a name, written with the stars of the whole sky, and it is no one's name who was ever born. The more I read it, the clearer it shows. My masters no longer speak: they copy. I cannot take my eye from the telescope.",
+   "I do not know the hour. This night does not end. It is no longer I who read: something reads me, line by line, from above. If anyone finds these pages, do not look through the telescope. And if you see me still standing before it, make me lower my eyes. Please.\n\nYsolde"]),
  },
 }
 

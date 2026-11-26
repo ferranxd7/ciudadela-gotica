@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 70 * 60 * 20;
+    private static final int LIMIT = 78 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -6011,6 +6011,8 @@ public final class ClientCiTest {
         t = juramento(t);
         // la Academia Espectral y los eruditos (parte 7o)
         t = academia(t);
+        // el Observatorio y Ysolde, la Rectora, la jefa de la Academia Espectral (parte 7p)
+        t = observatorio(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -8768,6 +8770,339 @@ public final class ClientCiTest {
                 sp.clearFire();
                 sp.setHealth(sp.getMaxHealth());
                 comando(sp, "darkcraft academia enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el Observatorio y la Rectora (parte 7p)
+
+    private static com.darkcraft.enemigos.Rectora rectoraE() {
+        var e = com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.OBSERVATORIO, com.darkcraft.morvain.MorvainEnemigos.rectora());
+        return e instanceof com.darkcraft.enemigos.Rectora r ? r : null;
+    }
+
+    /** Lo que deja la Rectora en la rotonda (sus orbes) y los maestros que ha llamado. */
+    private static void limpiarObservatorio(ServerLevel lvl) {
+        int x = com.darkcraft.morvain.Observatorio.CX, z = com.darkcraft.morvain.Observatorio.CZ, y = com.darkcraft.morvain.Observatorio.PISO;
+        var caja = new net.minecraft.world.phys.AABB(x - 40, y - 20, z - 40, x + 40, y + 40, z + 40);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Orbe.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Erudito.class, caja)) if (e.esEfimero()) e.discard();
+    }
+
+    /**
+     * Un golpe de la Rectora visto desde un lado: ella en el centro de la rotonda mirando al sur (quieta: solo hace lo que se le
+     * manda), el jugador delante, en supervivencia y aguantando, y la camara donde diga {@code desde} (relativo a ella).
+     */
+    private static int golpeRectora(int t, String nombre, int accion, double dist, int[] capturas, String[] nombres, Vec3 desde, Vec3 mira) {
+        final int CX = com.darkcraft.morvain.Observatorio.CX, CZ = com.darkcraft.morvain.Observatorio.CZ, PISO = com.darkcraft.morvain.Observatorio.PISO;
+        final double ex = CX + 0.5, ez = CZ - 2.5;
+        atTicks(t, "La Rectora: " + nombre, m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                var e = rectoraE();
+                if (e == null) return;
+                limpiarObservatorio(sp.serverLevel());
+                aPelear(sp, true);
+                e.quieta = true;
+                e.postura(com.darkcraft.enemigos.Enemigo.DE_PIE);
+                e.moveTo(ex, PISO, ez, 0f, 0f);
+                e.setDeltaMovement(Vec3.ZERO);
+                irMirando(sp, ex, PISO, ez + dist, ex, PISO + 2.4, ez, false);
+                e.setTarget(sp);
+                e.setYRot(0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                e.empezar(accion);
+                verDesdeServidor = new Vec3(ex + desde.x, PISO + desde.y, ez + desde.z);
+                miraServidor = new Vec3(ex + mira.x, PISO + mira.y, ez + mira.z);
+            });
+        });
+        atTicks(t + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        for (int i = 0; i < capturas.length; i++) {
+            final String cap = nombres[i];
+            atTicks(t + capturas[i], "captura: " + cap, m -> {
+                server(m, sp -> log("  " + cap + ": " + estadoE(rectoraE()) + " | " + (rectoraE() == null ? "" : rectoraE().estado()) + " | jugador " + fpos(sp)
+                        + " frenado " + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)));
+                shot(m, cap);
+            });
+        }
+        return t + capturas[capturas.length - 1];
+    }
+
+    /**
+     * El Observatorio de la Academia y Ysolde, la Rectora: desde su santuario, el camino con los custodios leyendo a la puerta,
+     * entrar a pie en la rotonda (el cartel con su nombre y el logro), la rotonda por dentro (la carta del cielo, el telescopio,
+     * las hornacinas), la cupula con el planetario y la rendija, la Rectora leyendo el cielo, la reja de su celda, la sala de los
+     * instrumentos y todo desde lo alto; en supervivencia habla mientras se levanta, el sello de luz cierra la puerta y grita (su
+     * barra); sus golpes (el baculo, los orbes, la lluvia de estrellas por la rendija con sus marcas, la constelacion y sus lineas
+     * encendidas, el parpadeo); a media vida se alza y salen sus maestros de las hornacinas; cae (se hunde, el sello se rompe, se
+     * deshace en estrellas que suben; el cartel), su celda abierta, su libro y el bestiario. Al acabar vuelve todo como estaba.
+     */
+    private static int observatorio(int T) {
+        final int CX = com.darkcraft.morvain.Observatorio.CX, CZ = com.darkcraft.morvain.Observatorio.CZ, PISO = com.darkcraft.morvain.Observatorio.PISO;
+        final String SITIO = com.darkcraft.morvain.MorvainEnemigos.OBSERVATORIO;
+        final var SO = com.darkcraft.morvain.SantuariosMorvain.porId("observatorio");
+        final int[] EN = com.darkcraft.morvain.Observatorio.get().sitio("entrada");
+        // la camara de la puerta: dentro de la rotonda, mirando el hueco del sello
+        final Vec3 puertaDesde = new Vec3(CX + 0.5, PISO + 2.2, CZ + 9.5), puertaMira = new Vec3(CX + 0.5, PISO + 2.0, CZ + 16.0);
+        int t = T;
+        atTicks(t, "El Observatorio: desde su santuario", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft rectora volver");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                irMirando(sp, SO.x() + 7.5, SO.y() + 5, SO.z() + 9.5, CX, PISO + 14, CZ, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv252_observatorio_santuario");
+            server(m, sp -> log("  el observatorio: " + com.darkcraft.morvain.MorvainEnemigos.estadoRectora(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "El Observatorio: el camino y los custodios leyendo a la puerta", m -> server(m, sp -> irMirando(sp, CX - 5.5, EN[1] + 2.5, CZ + 40.5, CX, PISO + 2, CZ + 27, true)));
+        t += 60;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv253_observatorio_camino");
+            server(m, sp -> {
+                StringBuilder s = new StringBuilder();
+                for (int i = 0; i < com.darkcraft.morvain.MorvainEnemigos.observatorio().size(); i++)
+                    s.append(i == 0 ? "" : " | ").append(estadoE(com.darkcraft.enemigos.Puestos.enemigo(SITIO, i)));
+                log("  el camino del observatorio: " + s + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp));
+            });
+        });
+        t += 10;
+        // ---- entrar a pie en la rotonda, en aventura: el cartel con el nombre y el logro (los de la puerta y el camino, fuera)
+        atTicks(t, "El Observatorio: entrar en la rotonda", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                for (int i = 0; i < com.darkcraft.morvain.MorvainEnemigos.observatorio().size(); i++)
+                    if (i != com.darkcraft.morvain.MorvainEnemigos.rectora()) com.darkcraft.enemigos.Puestos.marcar(sp.server, SITIO, i, true);
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), CX + 0.5, PISO, CZ + 13.5, 180f, 2f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv254_observatorio_entrar");
+            server(m, sp -> log("  al entrar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + ", logro observatorio " + com.darkcraft.story.Logros.tiene(sp, "observatorio")
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoRectora(sp.server)));
+        });
+        t += 10;
+        atTicks(t, "El Observatorio: la rotonda por dentro", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                irMirando(sp, CX + 0.5, PISO + 2.5, CZ + 12.5, CX + 0.5, PISO + 5, CZ - 10, true);
+            });
+        });
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv255_observatorio_rotonda"));
+        t += 10;
+        atTicks(t, "El Observatorio: la cupula, el planetario y la rendija", m -> server(m, sp -> irMirando(sp, CX + 7.5, PISO + 1.2, CZ + 7.5, CX - 1, PISO + 17, CZ - 3, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv256_observatorio_cupula"));
+        t += 10;
+        atTicks(t, "La Rectora, leyendo el cielo ante el telescopio", m -> server(m, sp -> irMirando(sp, CX + 4.5, PISO + 1.5, CZ - 3.5, CX + 0.5, PISO + 3.6, CZ - 8.5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv257_rectora_lee");
+            server(m, sp -> log("  la Rectora leyendo el cielo: " + estadoE(rectoraE()) + " | " + (rectoraE() == null ? "" : rectoraE().estado())));
+        });
+        t += 10;
+        atTicks(t, "El Observatorio: la reja de la celda de la Rectora", m -> server(m, sp -> irMirando(sp, CX + 10.5, PISO + 0.2, CZ + 2.5, CX + 24, PISO + 1.4, CZ - 0.5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv258_observatorio_reja"));
+        t += 10;
+        atTicks(t, "El Observatorio: la sala de los instrumentos", m -> server(m, sp -> irMirando(sp, CX - 17.5, PISO + 0.8, CZ + 4.5, CX - 24, PISO + 1.2, CZ - 3, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv259_observatorio_instrumentos"));
+        t += 10;
+        atTicks(t, "El Observatorio: todo desde lo alto", m -> server(m, sp -> irMirando(sp, CX + 44.5, PISO + 38, CZ + 58.5, CX, PISO + 4, CZ, true)));
+        t += 90;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv260_observatorio_alto");
+            server(m, sp -> log("  desde lo alto: " + com.darkcraft.morvain.MorvainEnemigos.estadoRectora(sp.server)));
+        });
+        t += 10;
+        // ---- en supervivencia, en la rotonda: habla mientras se levanta, el sello cierra la puerta a la espalda y grita al acabar
+        final int F = t;
+        final int dura = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Rectora.VOZ_BASE + 1);
+        atTicks(F, "La Rectora: en supervivencia en la rotonda", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                irMirando(sp, CX + 0.5, PISO, CZ + 4.5, CX + 0.5, PISO + 3.6, CZ - 9, false);
+                log("  antes de la pelea: " + com.darkcraft.morvain.Observatorio.resumen(sp.serverLevel()));
+                var e = rectoraE();
+                if (e != null) e.setTarget(sp);
+            });
+        });
+        atTicks(F + 40, "captura: se levanta (y habla)", m -> {
+            server(m, sp -> log("  la Rectora al verle: " + estadoE(rectoraE()) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv261_rectora_habla");
+        });
+        atTicks(F + 50, "camara: el sello, a la espalda", m -> verDesde(m, puertaDesde, puertaMira));
+        atTicks(F + 54, "captura: el sello cerrado", m -> {
+            server(m, sp -> log("  el sello: " + com.darkcraft.morvain.Observatorio.resumen(sp.serverLevel()) + " (sellados " + com.darkcraft.morvain.Observatorio.SELLADOS + ")"));
+            shot(m, "cliente_mv262_observatorio_sello");
+        });
+        atTicks(F + 56, "camara: la del jugador", ClientCiTest::enPrimeraPersona);
+        atTicks(F + dura + 8, "captura: grita (su barra)", m -> {
+            server(m, sp -> log("  la Rectora grita: " + estadoE(rectoraE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())));
+            log("  rectora: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv263_rectora_grita");
+        });
+        t = F + dura + 60;
+        // ---- sus golpes, de lado (quieta: solo lo que se le manda); la camara relativa a ella, que mira al sur
+        t = golpeRectora(t, "el baculo", com.darkcraft.enemigos.RectoraAnims.BACULO, 3.0, new int[]{15}, new String[]{"cliente_mv264_rectora_baculo"},
+                new Vec3(6.5, 2.6, 2.0), new Vec3(0, 2.0, 1.5)) + 30;
+        t = golpeRectora(t, "los orbes", com.darkcraft.enemigos.RectoraAnims.ORBES, 9.0, new int[]{25}, new String[]{"cliente_mv265_rectora_orbes"},
+                new Vec3(7.5, 3.0, 4.5), new Vec3(0, 2.0, 4.5)) + 30;
+        t = golpeRectora(t, "la lluvia de estrellas", com.darkcraft.enemigos.RectoraAnims.ESTRELLAS, 8.0, new int[]{32, 46},
+                new String[]{"cliente_mv266_rectora_estrellas_marcas", "cliente_mv267_rectora_estrellas_caen"}, new Vec3(8.5, 4.5, 13.0), new Vec3(0, 6.0, -1.0)) + 40;
+        t = golpeRectora(t, "la constelacion", com.darkcraft.enemigos.RectoraAnims.CONSTELACION, 7.0, new int[]{32, 53},
+                new String[]{"cliente_mv268_rectora_constelacion", "cliente_mv269_rectora_constelacion_arde"}, new Vec3(5.5, 8.5, 12.5), new Vec3(0, 0.5, 7.0)) + 30;
+        t = golpeRectora(t, "el parpadeo", com.darkcraft.enemigos.RectoraAnims.PARPADEO, 2.0, new int[]{16}, new String[]{"cliente_mv270_rectora_parpadeo"},
+                new Vec3(0.0, 12.0, 13.0), new Vec3(0, 0.5, -1.0)) + 20;
+        // ---- a media vida: se alza y de las hornacinas salen sus maestros
+        final int H = t;
+        atTicks(H, "La Rectora: a media vida", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                var e = rectoraE();
+                if (e == null) return;
+                limpiarObservatorio(sp.serverLevel());
+                aPelear(sp, true);
+                e.quieta = false;
+                e.moveTo(CX + 0.5, PISO + 1, CZ + com.darkcraft.morvain.Observatorio.RECTORA_V + 0.5, 0f, 0f);
+                e.setYRot(0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                irMirando(sp, CX + 0.5, PISO, CZ + 4.5, CX + 0.5, PISO + 3.0, CZ - 9, false);
+                e.setTarget(sp);
+                e.mediaVida();
+            });
+        });
+        atTicks(H + 2, "camara: la rotonda desde el sur, en alto", m -> verDesde(m, new Vec3(CX + 0.5, PISO + 7.5, CZ + 12.5), new Vec3(CX + 0.5, PISO + 1.0, CZ - 3.0)));
+        atTicks(H + 42, "captura: se alza y salen sus maestros", m -> {
+            server(m, sp -> log("  la Rectora a media vida: " + (rectoraE() == null ? "" : rectoraE().estado()) + " | maestros en pie "
+                    + (rectoraE() == null ? 0 : rectoraE().suyos()) + " | jugador " + fpos(sp)));
+            log("  rectora: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv271_rectora_alzarse");
+        });
+        // ---- cae: se hunde (su ultima frase), el sello se rompe y se deshace en estrellas que suben por la rendija; el cartel
+        final int C = H + 60;
+        atTicks(C, "La Rectora: cae", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var e = rectoraE();
+                if (e == null) return;
+                sp.setGameMode(GameType.CREATIVE);
+                sp.clearFire();
+                log("  antes de caer la Rectora: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "rectora")
+                        + " | " + e.estado() + " | " + com.darkcraft.morvain.Observatorio.resumen(sp.serverLevel()));
+                e.quieta = true;
+                e.moveTo(CX + 0.5, PISO, CZ - 2.5, 0f, 0f);
+                e.setYRot(0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                verDesdeServidor = new Vec3(e.getX() + 5.5, e.getY() + 3.0, e.getZ() + 6.5);
+                miraServidor = new Vec3(e.getX(), e.getY() + 2.2, e.getZ());
+                e.invulnerableTime = 0;
+                e.hurt(sp.damageSources().playerAttack(sp), 99999f);
+                log("  la Rectora cae: viva " + e.isAlive() + ", en paz " + com.darkcraft.morvain.Observatorio.enPaz(sp.server));
+            });
+        });
+        atTicks(C + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 40, "captura: se hunde", m -> shot(m, "cliente_mv272_rectora_cae"));
+        atTicks(C + 56, "camara: la puerta", m -> verDesde(m, puertaDesde, puertaMira));
+        atTicks(C + 70, "captura: el sello se rompe", m -> {
+            server(m, sp -> log("  el sello, al caer la Rectora: " + com.darkcraft.morvain.Observatorio.resumen(sp.serverLevel()) + " (abiertos "
+                    + com.darkcraft.morvain.Observatorio.ABIERTOS + ", descansan " + com.darkcraft.morvain.Observatorio.DESCANSAN + ")"));
+            shot(m, "cliente_mv273_observatorio_sello_roto");
+        });
+        atTicks(C + 72, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 119, "captura: se deshace en estrellas", m -> shot(m, "cliente_mv274_rectora_estrellas"));
+        atTicks(C + 124, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 194, "captura: JEFE ABATIDO", m -> {
+            log("  rectora: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  tras caer la Rectora: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "rectora")
+                    + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoRectora(sp.server)));
+            shot(m, "cliente_mv275_rectora_abatida");
+        });
+        // ---- su celda, ya sin reja: la mesa, el globo, el arcon y el atril con su libro
+        t = C + 200;
+        atTicks(t, "La celda de la Rectora, abierta", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                limpiarObservatorio(sp.serverLevel());
+                irMirando(sp, CX + 17.5, PISO + 0.6, CZ + 4.5, CX + 24, PISO + 1, CZ - 2.5, true);
+            });
+        });
+        t += 60;
+        atTicks(t, "captura", m -> {
+            server(m, sp -> log("  la celda: " + com.darkcraft.morvain.Observatorio.resumen(sp.serverLevel()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+            shot(m, "cliente_mv276_observatorio_celda");
+        });
+        t += 6;
+        atTicks(t, "El libro de la Rectora", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(25));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv277_libro_rectora"));
+        t += 6;
+        atTicks(t, "el bestiario: la Rectora", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("rectora")));
+        });
+        t += 18;
+        atTicks(t, "captura: la Rectora en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv278_bestiario_rectora");
+        });
+        t += 4;
+        atTicks(t, "La Rectora: fin (vuelve a su estrado, la academia como estaba, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                limpiarObservatorio(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                var e = rectoraE();
+                if (e != null) e.quieta = false;
+                comando(sp, "darkcraft rectora volver");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoRectora(sp.server));
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

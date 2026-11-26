@@ -45,6 +45,10 @@ import java.util.List;
  * aprendices leyendo en las galerias del claustro, a las mesas de la biblioteca, en los pupitres del scriptorium y en los bancos
  * del aula, o tumbados entre los libros; maestros de ronda (por el claustro y el altillo), en la catedra y en el archivo de la
  * torre; custodios en la puerta, entre los estantes, ante el grimorio y en la veta.</li>
+ * <li><b>El Observatorio</b> (sitio {@value #OBSERVATORIO}, parte 7p): la Rectora leyendo el cielo en el estrado del telescopio (el
+ * puesto 0, grupo de los jefes), dos custodios a la puerta del vestibulo, un maestro entre los instrumentos y dos aprendices en
+ * el camino ({@link Observatorio#esperas}). Con la Rectora caida, los eruditos que esperaban leyendo (aqui y en la Academia)
+ * descansan: ya no vuelven.</li>
  * </ul>
  * Nadie a menos de 18 bloques del arco ni de 14 de un santuario.
  */
@@ -53,10 +57,10 @@ public final class MorvainEnemigos {
 
     public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo",
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
-            CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia";
+            CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
-            ERUDITO = "erudito";
+            ERUDITO = "erudito", RECTORA = "rectora";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
@@ -65,7 +69,7 @@ public final class MorvainEnemigos {
     private static final List<Puesto> VELMOR_P = new ArrayList<>(), LLANURAS_P = new ArrayList<>(), MOLINO_P = new ArrayList<>(),
             ARBOLEDA_P = new ArrayList<>(), PATIBULO_P = new ArrayList<>(), PILOTES_P = new ArrayList<>(), LAGUNA_P = new ArrayList<>(),
             BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>(), ERMITA_P = new ArrayList<>(), CUMBRE_P = new ArrayList<>(),
-            CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>();
+            CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -175,6 +179,10 @@ public final class MorvainEnemigos {
         // ---- la Academia Espectral (parte 7o): los eruditos que apunta el plano
         for (Academia.Espera e : Academia.get().esperas())
             ACADEMIA_P.add(new Puesto(ERUDITO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
+        // ---- el Observatorio (parte 7p): la Rectora ante el telescopio (el puesto 0) y los eruditos de su puerta y su camino
+        for (Observatorio.Espera e : Observatorio.get().esperas())
+            OBSERVATORIO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? RECTORA : ERUDITO, e.variante(), e.x(), e.y(), e.z(), e.giro(),
+                    e.postura(), e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -202,6 +210,11 @@ public final class MorvainEnemigos {
         return 0;
     }
 
+    /** El numero del puesto de la Rectora en el sitio del Observatorio. */
+    public static int rectora() {
+        return 0;
+    }
+
     /** Lo apunta el mod al arrancar. */
     public static void registrar() {
         Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
@@ -215,6 +228,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(CALCINADO, DarkCraftMod.CALCINADO);
         Puestos.tipo(CONDESTABLE, DarkCraftMod.CONDESTABLE);
         Puestos.tipo(ERUDITO, DarkCraftMod.ERUDITO);
+        Puestos.tipo(RECTORA, DarkCraftMod.RECTORA);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -233,7 +247,10 @@ public final class MorvainEnemigos {
         // la guardia de la Puerta Oeste y los que querian salir solo mientras vive el Condestable (vencido, descansan)
         Puestos.registrar(CAPITAL, CAPITAL_P, Morvain::es, (l, p) -> !Juramento.DESCANSAN.contains(p.grupo()) || !Juramento.enPaz(l.getServer()));
         Puestos.registrar(JURAMENTO, JURAMENTO_P, Morvain::es);
-        Puestos.registrar(ACADEMIA, ACADEMIA_P, Morvain::es);
+        // los eruditos que esperan leyendo solo mientras vive la Rectora (vencida, el cielo deja de leerlos: descansan)
+        Puestos.registrar(ACADEMIA, ACADEMIA_P, Morvain::es, (l, p) -> p.postura() != REZA || !Observatorio.enPaz(l.getServer()));
+        Puestos.registrar(OBSERVATORIO, OBSERVATORIO_P, Morvain::es,
+                (l, p) -> Puestos.JEFE.equals(p.grupo()) || p.postura() != REZA || !Observatorio.enPaz(l.getServer()));
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -250,6 +267,9 @@ public final class MorvainEnemigos {
             // y al caer el Condestable, la capital deja de guardar sus puertas (lo hace Juramento.paz cada segundo; aqui, el aviso)
             if (e instanceof com.darkcraft.enemigos.Condestable && JURAMENTO.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] El Condestable del Juramento cae: se abren las puertas de la capital");
+            // y al caer la Rectora, los que leian en la academia descansan (lo hace Observatorio.paz cada segundo; aqui, el aviso)
+            if (e instanceof com.darkcraft.enemigos.Rectora && OBSERVATORIO.equals(e.sitio()))
+                DarkCraftMod.LOGGER.info("[DarkCraft] La Rectora cae: el cielo deja de leer la academia");
         });
     }
 
@@ -311,6 +331,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> academia() {
         preparar();
         return List.copyOf(ACADEMIA_P);
+    }
+
+    public static List<Puesto> observatorio() {
+        preparar();
+        return List.copyOf(OBSERVATORIO_P);
     }
 
     public static List<Puesto> velmor() {
@@ -912,6 +937,81 @@ public final class MorvainEnemigos {
     }
 
     /**
+     * {@code /darkcraft rectora [ir | vencer | volver | observatorio <sitio> | sello [abrir]]} (parte 7p): como esta la Rectora,
+     * llevar ante ella (a la puerta de la rotonda), vencerla, que vuelva (y la academia como estaba), ir a un sitio del
+     * observatorio o abrir el sello a mano.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoRectora() {
+        return net.minecraft.commands.Commands.literal("rectora")
+                .executes(c -> decir(c, estadoRectora(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irObservatorio(c.getSource(), "puerta")))
+                .then(net.minecraft.commands.Commands.literal("observatorio")
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Observatorio.get().sitios().keySet(), b))
+                                .executes(c -> irObservatorio(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(OBSERVATORIO, rectora());
+                    if (e instanceof com.darkcraft.enemigos.Rectora r) r.vencer();
+                    else {
+                        Puestos.marcar(srv, OBSERVATORIO, rectora(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "rectora");
+                    }
+                    return decir(c, estadoRectora(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, OBSERVATORIO, rectora(), false);
+                    var m = Morvain.nivel(srv);
+                    if (m != null) Observatorio.deshacerPaz(m);
+                    // los que leian en la academia y a su puerta vuelven a su sitio en cuanto salgan
+                    Puestos.todos(srv, ACADEMIA, false);
+                    return decir(c, estadoRectora(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("sello")
+                        .executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            return m == null ? 0 : decir(c, Observatorio.resumen(m));
+                        })
+                        .then(net.minecraft.commands.Commands.literal("abrir").executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            Observatorio.abrir(m, true);
+                            return decir(c, Observatorio.resumen(m));
+                        })));
+    }
+
+    private static int irObservatorio(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Observatorio.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Observatorio.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando al telescopio (al norte); en las salas de los lados, al centro de la rotonda
+        double tx = Observatorio.CX, tz = Observatorio.CZ - 12;
+        if (Math.abs(s[0] - Observatorio.CX) > 15) {
+            tx = Observatorio.CX;
+            tz = Observatorio.CZ;
+        }
+        if (Math.hypot(tx - s[0], tz - s[2]) < 3) tz = s[2] - 10;
+        float giro = (float) (Math.toDegrees(Math.atan2(tz - s[2], tx - s[0])) - 90.0);
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
+        return decir(src, estadoRectora(src.getServer()));
+    }
+
+    /** Como esta la Rectora (y su observatorio, si esta cargado): para el comando y las pruebas. */
+    public static String estadoRectora(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(OBSERVATORIO, rectora());
+        String s = "la Rectora: " + (Observatorio.enPaz(srv) ? "caida (el cielo ya no la lee)" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Rectora r) s += ", " + r.estado();
+        var m = Morvain.nivel(srv);
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(Observatorio.CX, Observatorio.PISO, Observatorio.CZ))) s += "; " + Observatorio.resumen(m);
+        return s;
+    }
+
+    /**
      * {@code /darkcraft condestable [ir | vencer | volver | patio <sitio> | rastrillo [bajar | subir]]} (parte 7n): como esta el
      * Condestable, llevar ante el (a la puerta del patio), vencerle, que vuelva (y la capital como estaba), ir a un sitio del patio
      * o mover el rastrillo a mano.
@@ -1023,6 +1123,7 @@ public final class MorvainEnemigos {
         todos.addAll(CAPITAL_P);
         todos.addAll(JURAMENTO_P);
         todos.addAll(ACADEMIA_P);
+        todos.addAll(OBSERVATORIO_P);
         for (Puesto p : todos) {
             if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
             for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
@@ -1036,6 +1137,7 @@ public final class MorvainEnemigos {
                 + " en el patibulo, " + PILOTES_P.size() + " en la aldea de los pilotes, " + LAGUNA_P.size() + " en la laguna negra y "
                 + BARCA_P.size() + " en la barca, " + MONASTERIO_P.size() + " en el monasterio, " + ERMITA_P.size() + " en la escalera de la ermita y "
                 + CUMBRE_P.size() + " en la cumbre, " + CAPITAL_P.size() + " en la puerta oeste de la capital, " + JURAMENTO_P.size()
-                + " en el patio del Juramento, " + ACADEMIA_P.size() + " en la academia espectral; cerca del arco o de un santuario " + cerca;
+                + " en el patio del Juramento, " + ACADEMIA_P.size() + " en la academia espectral, " + OBSERVATORIO_P.size()
+                + " en el observatorio; cerca del arco o de un santuario " + cerca;
     }
 }

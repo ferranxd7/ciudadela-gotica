@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:academia",
+  "display": {
+    "icon": {
+      "item": "minecraft:spyglass"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.observatorio.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.observatorio.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 40
+  }
+}

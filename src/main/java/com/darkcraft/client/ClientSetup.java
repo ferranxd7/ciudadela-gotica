@@ -106,6 +106,8 @@ public final class ClientSetup {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ABAD.get(), com.darkcraft.client.enemigos.AbadRenderer::new);
         // el Condestable del Juramento (parte 7n)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CONDESTABLE.get(), com.darkcraft.client.enemigos.CondestableRenderer::new);
+        // Ysolde, la Rectora de la Academia (parte 7p)
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.RECTORA.get(), com.darkcraft.client.enemigos.RectoraRenderer::new);
         // La Garza Gris volando en las cinematicas del viaje (solo existe en el cliente)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BARCO_VOLADOR.get(), com.darkcraft.client.cine.BarcoVoladorRenderer::new);
     }
@@ -138,5 +140,6 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.BarqueroModelo.CAPA, com.darkcraft.client.enemigos.BarqueroGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.AbadModelo.CAPA, com.darkcraft.client.enemigos.AbadGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CondestableModelo.CAPA, com.darkcraft.client.enemigos.CondestableGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.RectoraModelo.CAPA, com.darkcraft.client.enemigos.RectoraGeometria::crear);
     }
 }

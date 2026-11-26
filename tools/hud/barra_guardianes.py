@@ -28,8 +28,12 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   y el pomo a la izquierda, la punta a la derecha), dos manos alzadas de oro y en el centro el gran yelmo cerrado con la
   rendija encendida y la cimera en ascuas; relleno de fuego que corre; brasas y chispas que suben al recibir dano.
 
+  Ysolde, la Rectora de la Academia (parte 7p): el baculo de plata tumbado con anillos de oro y, a la derecha, la estrella de
+  cristal entre sus dos puntas; estrellas sueltas por encima y en el centro la aureola de estrellas (el aro de oro con sus
+  doce puntos de luz y la estrella grande); relleno de un cielo de noche que corre; estrellas que caen titilando.
+
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
-abad_barra.png y condestable_barra.png (256x128):
+abad_barra.png, condestable_barra.png y rectora_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -941,6 +945,141 @@ def brasas():
     return img
 
 
+# ---------------------------------------------------------------- la Rectora de la Academia (parte 7p)
+
+N_DD, N_D, N, N_L = hexc("05060f"), hexc("0d1230"), hexc("1a2660"), hexc("33459a")
+L_D, L, L_L, L_H = hexc("7f8fd8"), hexc("b6c6ff"), hexc("dde6ff"), hexc("ffffff")
+PL_DD, PL_D, PL, PL_L, PL_H = hexc("2a2f40"), hexc("4a5168"), hexc("7a849e"), hexc("aab3cc"), hexc("e4e9f6")
+V_D, V = hexc("3b2466"), hexc("6a46a8")
+
+
+def estrella(img, cx, cy, r, c_centro, c_rayo):
+    """Una estrella de cuatro puntas de radio r (pixeles), con su contorno."""
+    for d in range(-r - 1, r + 2):
+        for (x, y) in ((cx + d, cy), (cx, cy + d)):
+            put(img, x, y, OUT)
+    for (x, y) in ((cx - 1, cy - 1), (cx + 1, cy - 1), (cx - 1, cy + 1), (cx + 1, cy + 1)):
+        put(img, x, y, OUT)
+    for d in range(-r, r + 1):
+        c = c_centro if abs(d) <= 1 else c_rayo
+        put(img, cx + d, cy, c)
+        put(img, cx, cy + d, c)
+
+
+def marco_rectora():
+    """El baculo de plata tumbado con sus anillos de oro: a la derecha la estrella de cristal entre sus dos puntas, a la
+    izquierda el regaton; estrellas sueltas por encima y, en el centro, la aureola de estrellas (un astrolabio de oro con
+    sus doce puntos de luz y la estrella grande en medio)."""
+    rnd = random.Random(191)
+    n = noise2(193)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 4, FX1 + 3, FY0 - 4, FY1 + 3
+    rect(img, x0, y0, x1, y1, OUT)
+    # la vara: plata con vetas, luz arriba, sombra abajo
+    for y in range(y0 + 1, y1):
+        for x in range(x0 + 1, x1):
+            v = n(x * 0.07, y * 0.8)
+            c = PL_D if v < 0.38 else PL if v < 0.8 else PL_L
+            if y == y0 + 1:
+                c = mix(c, PL_H, 0.5)
+            if y == y1 - 1:
+                c = mix(c, PL_DD, 0.5)
+            put(img, x, y, c)
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, PL_DD)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # los anillos de oro a lo largo
+    for x in range(x0 + 22, x1 - 26, 34):
+        if abs(x - FW // 2) < 26:
+            continue
+        for y in range(y0 - 1, y1 + 2):
+            if FY0 - 1 <= y <= FY1:
+                continue
+            for k in range(3):
+                put(img, x + k, y, G_L if k == 0 else G if k == 1 else G_D)
+        for k in range(-1, 4):
+            put(img, x + k, y0 - 2, OUT)
+            put(img, x + k, y1 + 2, OUT)
+    # el regaton (punta izquierda)
+    for x in range(0, 6):
+        for y in range(y0 + 1, y1):
+            if abs(y - (y0 + y1) / 2) <= (x + 1) * 0.7:
+                put(img, x, y, PL_L if y < (y0 + y1) / 2 else PL_D)
+    # la cabeza del baculo (derecha): dos puntas de plata y la estrella de cristal entre ellas
+    sx = FW - 9
+    for x in range(sx - 6, FW):
+        for yy in (y0 - 5, y1 + 5):
+            pass
+    for y in range(y0 - 7, y1 + 8):
+        for dx in (-6, 6):
+            if y0 - 7 <= y <= y0 - 1 or y1 + 1 <= y <= y1 + 7:
+                put(img, sx + dx, y, PL_L)
+                put(img, sx + dx - 1, y, OUT)
+                put(img, sx + dx + 1, y, OUT)
+    estrella(img, sx, (y0 + y1) // 2, 7, L_H, L_L)
+    # estrellas sueltas por encima de la vara
+    for xx, yy in ((x0 + 30, y0 - 6), (x0 + 62, y0 - 9), (x0 + 88, y0 - 5), (x1 - 92, y0 - 8), (x1 - 60, y0 - 5), (x1 - 34, y0 - 9)):
+        put(img, xx, yy, L_H)
+        for (ax, ay) in ((xx - 1, yy), (xx + 1, yy), (xx, yy - 1), (xx, yy + 1)):
+            put(img, ax, ay, L if rnd.random() < 0.6 else L_D)
+    # en el centro: la aureola (un aro de oro con doce puntos de luz) y la estrella grande en medio
+    cx, cy, ra = FW // 2, 10, 9
+    for k in range(360):
+        a = math.radians(k)
+        x, y = cx + ra * math.cos(a), cy + ra * math.sin(a)
+        put(img, int(round(x)), int(round(y)), G)
+    for k in range(360):
+        a = math.radians(k)
+        for rr, c in ((ra + 1, OUT), (ra - 1, G_D)):
+            put(img, int(round(cx + rr * math.cos(a))), int(round(cy + rr * math.sin(a))), c)
+    for k in range(12):
+        a = math.radians(k * 30)
+        x, y = int(round(cx + ra * math.cos(a))), int(round(cy + ra * math.sin(a)))
+        put(img, x, y, L_H if k % 3 == 0 else L_L)
+    for y in range(cy - ra + 2, cy + ra - 1):
+        for x in range(cx - ra + 2, cx + ra - 1):
+            if (x - cx) ** 2 + (y - cy) ** 2 < (ra - 1.5) ** 2:
+                put(img, x, y, mix(N_D, V_D, 0.4 + 0.3 * math.sin(x * 0.7 + y)))
+    estrella(img, cx, cy, 5, L_H, L)
+    return img
+
+
+def relleno_rectora(k):
+    """Un cielo de noche que corre: azul profundo con nubes moradas, y estrellas que pasan."""
+    n = noise2(197)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            v = n((x - k * 2) * 0.07, y * 0.5)
+            t = 0.3 + 0.45 * mid + 0.45 * (v - 0.5)
+            c = mix(N_D, N, max(0.0, min(1.0, t * 1.4)))
+            if v > 0.7:
+                c = mix(c, V, min(1.0, (v - 0.7) * 2.5))
+            if y == 0:
+                c = mix(c, N_L, 0.45)
+            if y == 6:
+                c = mix(c, N_DD, 0.6)
+            if (x * 11 + y * 7 - k * 23) % 53 == 0 and 1 <= y <= 5:
+                c = L_H
+            elif (x * 5 + y * 17 - k * 13) % 61 == 0 and 1 <= y <= 5:
+                c = L
+            img.putpixel((x, y), c)
+    return img
+
+
+def estrellitas():
+    """Lo que cae al recibir dano: estrellas pequenas (caen despacio, titilando: lo hace el cliente)."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = ([".l.", "lHl", ".l."], ["l.l", ".H.", "l.l"], [".h", "hL"], ["H"])
+    col = {"l": L_L, "L": L, "h": L_D, "H": L_H}
+    for kk, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, kk * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 # ---------------------------------------------------------------- comun
 
 
@@ -982,6 +1121,7 @@ if __name__ == "__main__":
         "barquero": atlas(marco_barquero(), relleno_barquero, hueco("040607", "0f1a1e"), rastro("eefcff", "a9dbe6"), gotas()),
         "abad": atlas(marco_abad(), relleno_abad, hueco("05090c", "121c24"), rastro("f6fcff", "c4e2ef"), copos()),
         "condestable": atlas(marco_condestable(), relleno_condestable, hueco("0a0605", "1c1210"), rastro("fff2e0", "f0b88a"), brasas()),
+        "rectora": atlas(marco_rectora(), relleno_rectora, hueco("05060c", "10142a"), rastro("f2f6ff", "b8c6ff"), estrellitas()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

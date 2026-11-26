@@ -697,6 +697,41 @@ public class Volcado {
                 for (var o : v.esperas()) marcas.put("E" + (n++), new int[]{o.x(), o.y() + 1, o.z()});
                 andarAcademia(lvl, v);
             }
+            case "morvain_observatorio" -> {
+                // el Observatorio de la Rectora (parte 7p): la terraza con su escalinata, la rotonda con la cupula y su rendija, el
+                // estrado con el gran telescopio, el planetario, el vestibulo, la celda, la sala de los instrumentos, el camino y el
+                // circulo de piedras (-Dcaja=x0,z0,x1,z1 para un trozo)
+                int OX = com.darkcraft.morvain.Observatorio.CX, OZ = com.darkcraft.morvain.Observatorio.CZ;
+                String[] k = System.getProperty("caja", (OX - 52) + "," + (OZ - 52) + "," + (OX + 52) + "," + (OZ + 62)).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 225);
+                com.darkcraft.morvain.Observatorio v = com.darkcraft.morvain.Observatorio.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("El observatorio: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " que esperan; "
+                        + v.lancetas + " lancetas, " + v.planetas + " planetas, " + v.menhires + " menhires, " + v.estantes + " estantes, " + v.faroles
+                        + " faroles; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas()) marcas.put((n == 0 ? "Y" : "E") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarObservatorio(lvl, v);
+            }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);
@@ -1037,6 +1072,76 @@ public class Volcado {
             }
         }
         System.out.println("eruditos: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
+    }
+
+    /**
+     * El observatorio (parte 7p): de la entrada del camino se llega a pie a cada sitio (la celda, su atril y su arcon solo con la
+     * reja quitada; la azotea por su escala) y a cada uno de los que esperan; ninguno metido en un bloque (la Rectora mide 3,3)
+     * y todos con suelo. Con el sello cerrado no se pasa del vestibulo a la rotonda.
+     */
+    static void andarObservatorio(WorldGenLevel lvl, com.darkcraft.morvain.Observatorio v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+            BlockState s = MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+            return s.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock ? aire : s;
+        };
+        int[] e = v.sitio("entrada");
+        int X = com.darkcraft.morvain.Observatorio.CX, Z = com.darkcraft.morvain.Observatorio.CZ;
+        var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], X - 50, Z - 50, X + 50, Z + 54, 4_000_000);
+        StringBuilder sb = new StringBuilder("a pie desde la entrada (reja bajada): " + z0.celdas() + " celdas;");
+        for (String s : v.sitios().keySet()) {
+            int[] q = v.sitio(s);
+            sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+        }
+        System.out.println(sb);
+        int malos = 0, chocan = 0, sinSuelo = 0, k = 0;
+        for (var o : v.esperas()) {
+            boolean rectora = k++ == 0;
+            if (!z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                malos++;
+                System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z());
+            }
+            for (int dy = 0; dy < (rectora ? 4 : 3); dy++) {
+                BlockState st = mundo.en(o.x(), o.y() + dy, o.z());
+                if (choca(st)) {
+                    chocan++;
+                    System.out.println("  " + o.grupo() + " metido en un bloque: " + o.x() + "," + (o.y() + dy) + "," + o.z() + " " + st);
+                }
+            }
+            if (!choca(mundo.en(o.x(), o.y() - 1, o.z()))) {
+                sinSuelo++;
+                System.out.println("  " + o.grupo() + " sin suelo: " + o.x() + "," + o.y() + "," + o.z() + " " + mundo.en(o.x(), o.y() - 1, o.z()));
+            }
+        }
+        System.out.println("los que esperan: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan
+                + ", sin suelo " + sinSuelo);
+        // las hornacinas de los maestros: de pie y libres (3 de alto)
+        int hl = 0;
+        for (int[] q : com.darkcraft.morvain.Observatorio.hornacinas())
+            if (choca(mundo.en(q[0], q[1] - 1, q[2])) && !choca(mundo.en(q[0], q[1], q[2])) && !choca(mundo.en(q[0], q[1] + 1, q[2]))
+                    && !choca(mundo.en(q[0], q[1] + 2, q[2]))) hl++;
+        System.out.println("hornacinas libres para los maestros: " + hl + "/4");
+        // con la reja de la celda quitada
+        for (BlockPos p : MUNDO.keySet().stream().map(BlockPos::of).toList())
+            if (p.getX() == X + com.darkcraft.morvain.Observatorio.REJA_U && Math.abs(p.getZ() - Z) <= 1 && MUNDO.get(p.asLong()).is(Blocks.IRON_BARS))
+                MUNDO.remove(p.asLong());
+        var z1 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], X - 50, Z - 50, X + 50, Z + 54, 4_000_000);
+        int[] ce = v.sitio("celda"), at = v.sitio("atril"), ar = v.sitio("arcon");
+        System.out.println("con la reja quitada: la celda " + z1.alcanza(ce[0], ce[1], ce[2], 2) + ", el atril " + z1.alcanza(at[0], at[1], at[2], 1.5)
+                + ", el arcon " + z1.alcanza(ar[0], ar[1], ar[2], 1.5));
+        // con el sello cerrado no se pasa a la rotonda
+        for (int u = -1; u <= 1; u++)
+            for (int y = com.darkcraft.morvain.Observatorio.PISO; y < com.darkcraft.morvain.Observatorio.PISO + 4; y++)
+                MUNDO.put(BlockPos.asLong(X + u, y, Z + com.darkcraft.morvain.Observatorio.SELLO_V), Blocks.PURPLE_STAINED_GLASS.defaultBlockState());
+        MUNDO.put(BlockPos.asLong(X, com.darkcraft.morvain.Observatorio.PISO + 4, Z + com.darkcraft.morvain.Observatorio.SELLO_V),
+                Blocks.PURPLE_STAINED_GLASS.defaultBlockState());
+        var z2 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], X - 50, Z - 50, X + 50, Z + 54, 4_000_000);
+        int[] ce2 = v.sitio("centro"), ve = v.sitio("vestibulo");
+        System.out.println("con el sello cerrado: el vestibulo " + z2.alcanza(ve[0], ve[1], ve[2], 2) + ", el centro de la rotonda "
+                + z2.alcanza(ce2[0], ce2[1], ce2[2], 2));
+        for (int u = -1; u <= 1; u++)
+            for (int y = com.darkcraft.morvain.Observatorio.PISO; y <= com.darkcraft.morvain.Observatorio.PISO + 4; y++)
+                MUNDO.remove(BlockPos.asLong(X + u, y, Z + com.darkcraft.morvain.Observatorio.SELLO_V));
     }
 
     /** Si un bloque tiene caja de choque (sin la cache de formas del juego, que fuera de el no esta hecha). */

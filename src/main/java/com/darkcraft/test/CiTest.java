@@ -737,6 +737,7 @@ public final class CiTest {
         capital(server, m, log, out);
         juramento(server, m, log, out);
         academia(server, m, log, out);
+        observatorio(server, m, log, out);
     }
 
     /**
@@ -1218,6 +1219,370 @@ public final class CiTest {
             DarkCraftMod.LOGGER.error("[CI] eruditos", t);
         } finally {
             for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /**
+     * Parte 7p: el Observatorio de la Academia (a pie desde el camino del santuario —la escalinata, el porche, el vestibulo y la
+     * puerta de la rotonda— a todos sus sitios; a la celda de la Rectora, con el atril del libro 25 y el arcon, no mientras su
+     * reja este bajada; la cupula con su rendija abierta, el planetario y el telescopio) y la Rectora: leyendo el cielo en el
+     * estrado; al ver a alguien en la rotonda habla mientras se levanta, el sello de luz cierra la puerta (y pasa a la rotonda a
+     * quien estaba en el hueco) y grita al acabar la frase; cada accion acaba; sus golpes a una presa (el baculo, que frena y no
+     * llega lejos; los orbes; la lluvia de estrellas por la rendija, con sus marcas en el suelo de la rotonda; la constelacion,
+     * que quema a quien esta de pie en una linea y no a quien salta; el parpadeo, que la aparta); a media vida se alza y de las
+     * hornacinas salen sus maestros; la magia le hace la mitad y el fuego mas; y al caer: el sello se rompe, la reja de su celda
+     * se alza y los que leian en la academia y a su puerta descansan y ya no vuelven. Al acabar, todo como estaba.
+     */
+    private static void observatorio(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.OBSERVATORIO, academia = com.darkcraft.morvain.MorvainEnemigos.ACADEMIA;
+        var O = com.darkcraft.morvain.Observatorio.get();
+        final int CX = com.darkcraft.morvain.Observatorio.CX, CZ = com.darkcraft.morvain.Observatorio.CZ, PISO = com.darkcraft.morvain.Observatorio.PISO;
+        final int REJA = CX + com.darkcraft.morvain.Observatorio.REJA_U;
+        final BlockPos rejaPos = new BlockPos(REJA, PISO + 1, CZ);
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : O.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            // a pie desde el camino del santuario (las alfombras no estorban): con la reja de la celda bajada y sin ella
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock ? aire : st;
+            };
+            com.darkcraft.pueblo.gen.Andar.Mundo sinReja = (x, y, z) -> {
+                var st = mundo.en(x, y, z);
+                return x == REJA && st.is(net.minecraft.world.level.block.Blocks.IRON_BARS) ? aire : st;
+            };
+            int[] en = O.sitio("entrada");
+            int ax0 = com.darkcraft.morvain.Observatorio.X0, az0 = com.darkcraft.morvain.Observatorio.Z0, ax1 = com.darkcraft.morvain.Observatorio.X1,
+                    az1 = com.darkcraft.morvain.Observatorio.Z1;
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, en[0], en[1], en[2], ax0, az0, ax1, az1, 4_000_000);
+            var zona2 = com.darkcraft.pueblo.gen.Andar.desde(sinReja, en[0], en[1], en[2], ax0, az0, ax1, az1, 4_000_000);
+            StringBuilder no = new StringBuilder(), no2 = new StringBuilder();
+            int llega = 0, sitios = 0;
+            for (var e : O.sitios().entrySet()) {
+                sitios++;
+                int[] q = e.getValue();
+                if (zona.alcanza(q[0], q[1], q[2], 2)) llega++;
+                else no.append(' ').append(e.getKey());
+                if (!zona2.alcanza(q[0], q[1], q[2], 2)) no2.append(' ').append(e.getKey());
+            }
+            int lejos = 0;
+            for (var o : O.esperas()) if (!zona.alcanza(o.x(), o.y(), o.z(), 2)) lejos++;
+            int hornacinas = 0;
+            for (int[] h : com.darkcraft.morvain.Observatorio.hornacinas()) {
+                BlockPos p = new BlockPos(h[0], h[1], h[2]);
+                if (m.getBlockState(p).getCollisionShape(m, p).isEmpty() && m.getBlockState(p.above()).getCollisionShape(m, p.above()).isEmpty()
+                        && !m.getBlockState(p.below()).getCollisionShape(m, p.below()).isEmpty()) hornacinas++;
+            }
+            var sc = com.darkcraft.morvain.SantuariosMorvain.porId("observatorio");
+            log.println("Morvain, el observatorio: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Observatorio.resumen(m) + "; lancetas " + O.lancetas
+                    + ", estrellas del suelo " + O.estrellas + ", planetas " + O.planetas + ", menhires " + O.menhires + ", estantes " + O.estantes + ", faroles "
+                    + O.faroles + "; santuario " + com.darkcraft.santuario.Santuarios.nombre(m, sc.pos()) + " a " + Math.round(Math.hypot(sc.x() - en[0], sc.z() - en[2]))
+                    + " de la entrada; a pie desde el camino (" + zona.celdas() + " celdas) a " + llega + " de " + sitios + " sitios" + (no.length() == 0 ? "" : ", no a:" + no)
+                    + " (la reja de la celda esta bajada); sin la reja, no a:" + (no2.length() == 0 ? " ninguno" : no2) + "; eruditos a los que no se llega " + lejos
+                    + " de " + O.esperas().size() + "; hornacinas libres " + hornacinas + " de " + com.darkcraft.morvain.Observatorio.hornacinas().size());
+            topView(m, CX, CZ - 2, 54, new File(out, "morvain_observatorio.png"));
+            topView(m, CX, CZ, 17, new File(out, "morvain_observatorio_rotonda.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, el observatorio: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] observatorio", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        com.darkcraft.enemigos.Rectora re = null;
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            int suyos = 0, leyendo = 0, enSuelo = 0, chocan = 0;
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 6; k++)
+                for (var e : fuera) if (e.isAlive() && !(e instanceof com.darkcraft.enemigos.Rectora)) e.tick();
+            for (var e : fuera) {
+                if (e instanceof com.darkcraft.enemigos.Rectora x) re = x;
+                else {
+                    suyos++;
+                    if (e.postura() == com.darkcraft.enemigos.Enemigo.REZA) leyendo++;
+                }
+                if (!m.noCollision(e)) chocan++;
+                if (!m.getBlockState(BlockPos.containing(e.getX(), e.getY() - 0.2, e.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+            }
+            if (re == null) {
+                log.println("Morvain, la Rectora: NO SALE");
+                return;
+            }
+            for (var e : fuera) if (e != re) e.discard();
+            StringBuilder sb = new StringBuilder("Morvain, la Rectora: en " + re.blockPosition().toShortString() + " postura " + re.postura()
+                    + " (1 leyendo el cielo), giro " + Math.round(re.getYRot()) + ", vida " + Math.round(re.getMaxHealth()) + ", caja " + re.getBbWidth() + " x "
+                    + re.getBbHeight() + "; los suyos " + suyos + " (leyendo " + leyendo + "); en su suelo " + enSuelo + " de " + fuera.size()
+                    + ", metidos en un bloque " + chocan + " (tiene que ser 0)");
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("4a6b8c0d-2e3f-4a5b-9c7d-1e2f3a4b5c89"), "[DarkCraftCI9]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- la ve desde la rotonda: habla mientras se levanta, el sello cierra la puerta (y pasa dentro a quien esta en el hueco) y grita
+            final double fxx = CX + 0.5, fyy = PISO, fzz = CZ + 4.5;
+            fp.moveTo(fxx, fyy, fzz, 180f, 0f);
+            fp.setOnGround(true);
+            var enLaPuerta = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            final double zPuerta = CZ + com.darkcraft.morvain.Observatorio.SELLO_V + 0.5;
+            if (enLaPuerta != null) {
+                enLaPuerta.moveTo(CX + 0.5, PISO, zPuerta, 180f, 0f);
+                enLaPuerta.setNoAi(true);
+                m.addFreshEntity(enLaPuerta);
+                quitar.add(enLaPuerta);
+            }
+            com.darkcraft.morvain.Observatorio.abrir(m, false);
+            int sellados = com.darkcraft.morvain.Observatorio.SELLADOS;
+            boolean selladoAntes = com.darkcraft.morvain.Observatorio.sellado(m);
+            re.setTarget(fp);
+            int levanta = -1, grita = -1, ataca = -1, quien = 0, sella = -1;
+            for (int k = 0; k < 400; k++) {
+                re.tickCount++;
+                re.tick();
+                com.darkcraft.morvain.Observatorio.tick(m);
+                fp.moveTo(fxx, fyy, fzz, 180f, 0f);
+                if (sella < 0 && com.darkcraft.morvain.Observatorio.sellado(m)) sella = k;
+                int a = re.accion();
+                if (levanta < 0 && a == com.darkcraft.enemigos.RectoraAnims.LEVANTARSE) levanta = k;
+                if (grita < 0 && a == com.darkcraft.enemigos.RectoraAnims.GRITO) grita = k;
+                if (grita >= 0 && ataca < 0 && a != 0 && a != com.darkcraft.enemigos.RectoraAnims.GRITO) {
+                    ataca = k;
+                    quien = a;
+                    break;
+                }
+            }
+            sb.append("; al verla: pelea ").append(re.enPelea()).append(", se levanta en el tick ").append(levanta).append(", el sello (cerrado antes ")
+                    .append(selladoAntes).append(") se cierra en el ").append(sella).append(" (sellados +").append(com.darkcraft.morvain.Observatorio.SELLADOS - sellados)
+                    .append("), el que estaba en la puerta ")
+                    .append(enLaPuerta == null ? "?" : enLaPuerta.getZ() < zPuerta - 1.0 ? "pasa a la rotonda" : "SIGUE EN LA PUERTA en z " + enLaPuerta.getZ())
+                    .append(", grita en el ").append(grita).append(" (la frase 1 dura ").append(com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Rectora.VOZ_BASE + 1))
+                    .append("), y luego ").append(quien == 0 ? "nada" : com.darkcraft.enemigos.RectoraAnims.NOMBRES[quien]).append(" en el ").append(ataca)
+                    .append(String.format(java.util.Locale.ROOT, ", de pie %s a %.1f de su presa", re.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE,
+                            Math.hypot(re.getX() - fp.getX(), re.getZ() - fp.getZ())));
+            if (enLaPuerta != null) enLaPuerta.discard();
+            // ---- cada accion acaba (sin presa y quieta: no elige ni grita por su cuenta; el alzarse va a media vida)
+            re.quieta = true;
+            re.setTarget(null);
+            StringBuilder nn = new StringBuilder();
+            for (int a = 1; a < com.darkcraft.enemigos.RectoraAnims.TICKS.length; a++) {
+                String nombre = com.darkcraft.enemigos.RectoraAnims.NOMBRES[a];
+                if (nombre.equals("morir") || nombre.equals("alzarse")) continue;
+                re.moveTo(CX + 0.5, PISO, CZ - 2.5, 0f, 0f);
+                re.empezar(a);
+                for (int k = 0; k < 140 && re.accion() == a; k++) {
+                    re.tickCount++;
+                    re.tick();
+                }
+                if (re.accion() == a) nn.append(' ').append(nombre);
+            }
+            for (int k = 0; k < 60 && re.pendientes() > 0; k++) {
+                re.tickCount++;
+                re.tick();
+            }
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Orbe.class, re.getBoundingBox().inflate(48))) f.discard();
+            sb.append("; acciones que no acaban:").append(nn.length() == 0 ? " ninguna" : nn).append(" (por caer ").append(re.pendientes()).append(')');
+            log.println(sb);
+            // ---- sus golpes a una presa (un aldeano quieto y duro), en la rotonda: ella mirando al sur y la presa delante
+            StringBuilder sg = new StringBuilder("Morvain, los golpes de la Rectora a una presa:");
+            final double x0 = CX + 0.5, y0 = PISO, z0 = CZ - 2.5;
+            var victima = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            if (victima != null) {
+                victima.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(900.0);
+                victima.setHealth(900f);
+                victima.setNoAi(true);
+                victima.moveTo(x0, y0, z0 + 3, 180f, 0f);
+                m.addFreshEntity(victima);
+                quitar.add(victima);
+                String[] golpes = {"baculo de cerca", "baculo de lejos", "orbes", "estrellas", "constelacion de pie", "constelacion saltando", "parpadeo"};
+                int[] acc = {com.darkcraft.enemigos.RectoraAnims.BACULO, com.darkcraft.enemigos.RectoraAnims.BACULO, com.darkcraft.enemigos.RectoraAnims.ORBES,
+                        com.darkcraft.enemigos.RectoraAnims.ESTRELLAS, com.darkcraft.enemigos.RectoraAnims.CONSTELACION,
+                        com.darkcraft.enemigos.RectoraAnims.CONSTELACION, com.darkcraft.enemigos.RectoraAnims.PARPADEO};
+                double[] lejos = {3.0, 6.5, 9.0, 8.0, 7.0, 7.0, 2.0};
+                for (int i = 0; i < golpes.length; i++) {
+                    final boolean salta = i == 5;
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    victima.hurtTime = 0;
+                    victima.removeAllEffects();
+                    final double pz = z0 + lejos[i], py = y0 + (salta ? 1.2 : 0.0);
+                    victima.moveTo(x0, py, pz, 180f, 0f);
+                    int orbDan = com.darkcraft.enemigos.Orbe.DAN, est = re.estrellasQueDan(), lin = re.lineasQueDan(), par = re.parpadeos(), orb = re.orbes();
+                    re.moveTo(x0, y0, z0, 0f, 0f);
+                    re.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    re.setTarget(victima);
+                    re.setYRot(0f);
+                    re.yBodyRot = re.yHeadRot = 0f;
+                    re.empezar(acc[i]);
+                    float antes = victima.getHealth();
+                    boolean frenada = false;
+                    int marcas = -1, marcasDentro = 0, nodos = -1;
+                    double aparta = 0;
+                    for (int k = 0; k < 160; k++) {
+                        boolean ella = re.accion() == acc[i] || re.pendientes() > 0;
+                        if (ella) {
+                            re.tickCount++;
+                            re.tick();
+                            if (acc[i] != com.darkcraft.enemigos.RectoraAnims.PARPADEO) re.moveTo(x0, y0, z0, 0f, 0f);
+                            else aparta = Math.max(aparta, Math.hypot(re.getX() - x0, re.getZ() - z0));
+                            if (marcas < 0 && !re.marcas().isEmpty()) {
+                                marcas = re.marcas().size();
+                                for (double[] q : re.marcas())
+                                    if (com.darkcraft.morvain.Observatorio.enRotonda(q[0], q[2]) && Math.abs(q[1] - PISO) <= 1.1) marcasDentro++;
+                            }
+                            if (nodos < 0 && !re.nodos().isEmpty()) nodos = re.nodos().size();
+                        }
+                        boolean orbes = false;
+                        for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Orbe.class, re.getBoundingBox().inflate(48))) {
+                            if (!quitar.contains(f)) quitar.add(f);
+                            if (!f.isRemoved()) {
+                                f.tick();
+                                orbes = true;
+                            }
+                        }
+                        victima.moveTo(x0, py, pz, 180f, 0f);
+                        victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                        victima.setOnGround(!salta);
+                        victima.invulnerableTime = 0;
+                        frenada |= victima.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                        if (!ella && !orbes) break;
+                    }
+                    sg.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " a %.1f: -%.1f", lejos[i], antes - victima.getHealth()))
+                            .append(frenada ? ", frenada" : "")
+                            .append(acc[i] == com.darkcraft.enemigos.RectoraAnims.ORBES ? ", orbes " + (re.orbes() - orb) + " (dan " + (com.darkcraft.enemigos.Orbe.DAN - orbDan) + ")" : "")
+                            .append(acc[i] == com.darkcraft.enemigos.RectoraAnims.ESTRELLAS ? ", estrellas " + marcas + " (sus marcas en el suelo de la rotonda " + marcasDentro
+                                    + ", le dan " + (re.estrellasQueDan() - est) + ")" : "")
+                            .append(acc[i] == com.darkcraft.enemigos.RectoraAnims.CONSTELACION ? ", estrellas de la constelacion " + nodos + " (le queman "
+                                    + (re.lineasQueDan() - lin) + ")" : "")
+                            .append(acc[i] == com.darkcraft.enemigos.RectoraAnims.PARPADEO ? String.format(java.util.Locale.ROOT, ", se aparta a %.1f (parpadeos +%d, en la rotonda %s)",
+                                    aparta, re.parpadeos() - par, com.darkcraft.morvain.Observatorio.enRotonda(re.getX(), re.getZ())) : "")
+                            .append(';');
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Orbe.class, re.getBoundingBox().inflate(48))) f.discard();
+                }
+                sg.append(" en total: baculos ").append(re.baculos()).append(", orbes ").append(re.orbes()).append(", lluvias ").append(re.lluvias())
+                        .append(" (estrellas ").append(re.estrellasCaidas()).append(", dan ").append(re.estrellasQueDan()).append("), constelaciones ")
+                        .append(re.constelaciones()).append(" (dan ").append(re.lineasQueDan()).append("), parpadeos ").append(re.parpadeos());
+                victima.discard();
+            }
+            log.println(sg);
+            // ---- a media vida: se alza y de las hornacinas salen sus maestros (efimeros, con su presa)
+            StringBuilder sm = new StringBuilder("Morvain, la Rectora a media vida:");
+            re.quieta = false;
+            re.moveTo(CX + 0.5, PISO + 1, CZ + com.darkcraft.morvain.Observatorio.RECTORA_V + 0.5, 0f, 0f);
+            fp.moveTo(fxx, fyy, fzz, 180f, 0f);
+            re.setTarget(fp);
+            re.mediaVida();
+            boolean alzarse = re.accion() == com.darkcraft.enemigos.RectoraAnims.ALZARSE;
+            int k = 0;
+            for (; k < 60 && re.maestrosAlzados() == 0; k++) {
+                re.tickCount++;
+                re.tick();
+                fp.moveTo(fxx, fyy, fzz, 180f, 0f);
+            }
+            int bien = 0, conPresa = 0, maestros = 0, enHornacina = 0;
+            for (var c : m.getEntitiesOfClass(com.darkcraft.enemigos.Erudito.class, new net.minecraft.world.phys.AABB(CX - 20, PISO - 4, CZ - 20, CX + 21, PISO + 8, CZ + 21))) {
+                if (!c.esEfimero()) continue;
+                quitar.add(c);
+                if (c.variante() == com.darkcraft.enemigos.Erudito.MAESTRO) maestros++;
+                boolean pisa = !m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty();
+                if (pisa && m.noCollision(c)) bien++;
+                if (c.getTarget() == fp) conPresa++;
+                for (int[] h : com.darkcraft.morvain.Observatorio.hornacinas())
+                    if (Math.hypot(c.getX() - (h[0] + 0.5), c.getZ() - (h[2] + 0.5)) < 1.2) enHornacina++;
+            }
+            int acaba = 0;
+            for (; acaba < 80 && re.accion() == com.darkcraft.enemigos.RectoraAnims.ALZARSE; acaba++) {
+                re.tickCount++;
+                re.tick();
+                fp.moveTo(fxx, fyy, fzz, 180f, 0f);
+            }
+            sm.append(" segunda ").append(re.segunda()).append(", se alza ").append(alzarse).append(" (y acaba ").append(re.accion() != com.darkcraft.enemigos.RectoraAnims.ALZARSE)
+                    .append("), salen en el tick ").append(k).append(' ').append(re.maestrosAlzados()).append(" (maestros ").append(maestros).append(", ante su hornacina ")
+                    .append(enHornacina).append(", en su suelo y sin meterse en nada ").append(bien).append(", con presa ").append(conPresa).append("), en pie ").append(re.suyos());
+            // ---- la magia le hace la mitad; el fuego, un 40 % mas que un golpe igual
+            re.quieta = true;
+            re.invulnerableTime = 0;
+            float v0 = re.getHealth();
+            re.hurt(m.damageSources().magic(), 10f);
+            re.invulnerableTime = 0;
+            float v1 = re.getHealth();
+            re.hurt(m.damageSources().generic(), 10f);
+            re.invulnerableTime = 0;
+            float v2 = re.getHealth();
+            re.hurt(m.damageSources().onFire(), 10f);
+            re.invulnerableTime = 0;
+            re.clearFire();
+            sm.append(String.format(java.util.Locale.ROOT, "; la magia de 10, -%.1f; un golpe de 10, -%.1f; el fuego de 10, -%.1f", v0 - v1, v1 - v2, v2 - re.getHealth()));
+            log.println(sm);
+            // ---- cae: el sello se rompe, la reja de su celda se alza y los que leian (en la academia y a su puerta) descansan
+            com.darkcraft.enemigos.Puestos.todos(server, academia, false);
+            java.util.List<com.darkcraft.enemigos.Enemigo> lectores = new java.util.ArrayList<>();
+            int deLaAcademia = 0;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, academia))
+                if (com.darkcraft.morvain.MorvainEnemigos.academia().get(e.puesto()).postura() == com.darkcraft.enemigos.Enemigo.REZA) {
+                    deLaAcademia++;
+                    lectores.add(e);
+                }
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio))
+                if (e != re && com.darkcraft.morvain.MorvainEnemigos.observatorio().get(e.puesto()).postura() == com.darkcraft.enemigos.Enemigo.REZA) lectores.add(e);
+            for (int j = 0; j < 3; j++) com.darkcraft.morvain.Observatorio.tick(m);
+            boolean selladoAlCaer = com.darkcraft.morvain.Observatorio.sellado(m), rejaAlCaer = m.getBlockState(rejaPos).is(net.minecraft.world.level.block.Blocks.IRON_BARS);
+            int abiertos = com.darkcraft.morvain.Observatorio.ABIERTOS, desc = com.darkcraft.morvain.Observatorio.DESCANSAN;
+            re.invulnerableTime = 0;
+            re.hurt(m.damageSources().playerAttack(fp), 99999f);
+            boolean muere = !re.isAlive();
+            int abre = -1, alza = -1, seVa = -1;
+            for (int fin = 0; fin < 320; fin++) {
+                if (!re.isRemoved()) {
+                    re.tickCount++;
+                    re.tick();
+                }
+                com.darkcraft.morvain.Observatorio.tick(m);
+                if (abre < 0 && !com.darkcraft.morvain.Observatorio.sellado(m)) abre = fin;
+                if (alza < 0 && !m.getBlockState(rejaPos).is(net.minecraft.world.level.block.Blocks.IRON_BARS)) alza = fin;
+                if (seVa < 0 && re.isRemoved()) seVa = fin;
+                if (abre >= 0 && alza >= 0 && seVa >= 0) break;
+            }
+            com.darkcraft.morvain.Observatorio.paz(m);
+            int descansan = 0;
+            for (var e : lectores) if (e.isRemoved()) descansan++;
+            int objetos = m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, re.getBoundingBox().inflate(6)).size();
+            com.darkcraft.enemigos.Puestos.todos(server, academia, false);
+            int salen = 0, vuelven = 0;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, academia)) {
+                salen++;
+                if (com.darkcraft.morvain.MorvainEnemigos.academia().get(e.puesto()).postura() == com.darkcraft.enemigos.Enemigo.REZA) vuelven++;
+            }
+            com.darkcraft.enemigos.Puestos.todos(server, academia, false);
+            log.println("Morvain, la Rectora cae: muere " + muere + "; al caer el sello cerrado " + selladoAlCaer + " y la reja bajada " + rejaAlCaer
+                    + "; el sello se rompe en " + abre + " ticks (abiertos +" + (com.darkcraft.morvain.Observatorio.ABIERTOS - abiertos) + "), la reja de su celda se alza en "
+                    + alza + ", se deshace en estrellas en " + seVa + "; vivo " + re.isAlive() + ", objetos " + objetos + ", en paz "
+                    + com.darkcraft.morvain.Observatorio.enPaz(server) + ", sus maestros en pie " + re.suyos() + "; de los " + lectores.size() + " que leian ("
+                    + deLaAcademia + " en la academia) descansan " + descansan + " (deshechos +" + (com.darkcraft.morvain.Observatorio.DESCANSAN - desc)
+                    + "); despues en la academia salen " + salen + " y de los que leian vuelven " + vuelven + " (tiene que ser 0); "
+                    + com.darkcraft.morvain.MorvainEnemigos.estadoRectora(server));
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, re.getBoundingBox().inflate(8))) it.discard();
+        } catch (Throwable t) {
+            log.println("Morvain, la Rectora: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] rectora", t);
+        } finally {
+            if (re != null) re.quieta = false;
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            var caja = new net.minecraft.world.phys.AABB(CX - 60, PISO - 20, CZ - 60, CX + 60, PISO + 40, CZ + 60);
+            for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.Erudito.class, caja)) if (e.esEfimero()) e.discard();
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Orbe.class, caja)) f.discard();
+            // todo como antes: la Rectora leyendo el cielo, el sello abierto y la reja de su celda bajada; la academia, con sus lectores
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, com.darkcraft.morvain.MorvainEnemigos.rectora(), false);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Puestos.todos(server, academia, false);
+            try {
+                com.darkcraft.morvain.Observatorio.deshacerPaz(m);
+                com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+                log.println("Morvain, la Rectora vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoRectora(server));
+            } catch (Throwable t) {
+                log.println("Morvain, la Rectora vuelve: ERROR " + t);
+            }
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
         }
     }

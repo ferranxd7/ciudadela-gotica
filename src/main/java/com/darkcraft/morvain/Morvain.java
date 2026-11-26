@@ -266,8 +266,8 @@ public final class Morvain {
         m.addFreshEntity(r);
     }
 
-    /** Si hay alguien cerca del Patio del Juramento (se mira cada segundo). */
-    private static boolean cercaJuramento;
+    /** Si hay alguien cerca del Patio del Juramento o del Observatorio (se mira cada segundo). */
+    private static boolean cercaJuramento, cercaObservatorio;
 
     /** Al acabar cada tick, los que entraron en un portal; y cada segundo, con alguien cerca del arco, su remolino. */
     @SubscribeEvent
@@ -314,6 +314,14 @@ public final class Morvain {
                 if (cercaPuerta && !cercaJuramento) Juramento.paz(m);
             }
             if (cercaJuramento) Juramento.tick(m);
+            // el Observatorio (parte 7p): su sello (se cierra al empezar la pelea con la Rectora y se rompe al acabar) y, con
+            // ella caida, la reja de su celda; cada tick con alguien cerca
+            if (srv.getTickCount() % 20 == 13) {
+                cercaObservatorio = false;
+                for (ServerPlayer p : m.players())
+                    if (Observatorio.distancia(p.getX(), p.getZ()) < 120) cercaObservatorio = true;
+            }
+            if (cercaObservatorio) Observatorio.tick(m);
         }
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
@@ -349,6 +357,10 @@ public final class Morvain {
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Academia.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Academia.PISO) < 40)
                 com.darkcraft.story.Logros.dar(p, "academia");
+        // y quien entra en la rotonda del Observatorio (parte 7p)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Observatorio.enRotonda(p.getX(), p.getZ()) && Math.abs(p.getY() - Observatorio.PISO) < 12)
+                com.darkcraft.story.Logros.dar(p, "observatorio");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -417,6 +429,8 @@ public final class Morvain {
         if (Juramento.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Juramento.PISO) < 40) return "darkcraft.morvain.lugar.juramento";
         // la Puerta Oeste de la Capital (parte 7m)
         if (Capital.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Capital.PISO) < 40) return "darkcraft.morvain.lugar.capital_puerta";
+        // el Observatorio de la Rectora (parte 7p)
+        if (Observatorio.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Observatorio.PISO) < 40) return "darkcraft.morvain.lugar.observatorio";
         // la Academia Espectral y su Gran Biblioteca (parte 7o)
         if (Academia.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Academia.PISO) < 50)
             return Academia.enBiblioteca(p.getX(), p.getZ()) && p.getY() < Academia.PISO + 30 ? "darkcraft.morvain.lugar.biblioteca"

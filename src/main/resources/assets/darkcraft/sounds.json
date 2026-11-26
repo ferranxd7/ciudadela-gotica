@@ -4209,5 +4209,206 @@
         "stream": true
       }
     ]
+  },
+  "sfx.rectora_grito": {
+    "subtitle": "subtitles.darkcraft.sfx.rectora_grito",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rectora_grito_1"
+      },
+      {
+        "name": "darkcraft:sfx/rectora_grito_2"
+      }
+    ]
+  },
+  "sfx.rectora_baculo": {
+    "subtitle": "subtitles.darkcraft.sfx.rectora_baculo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rectora_baculo_1"
+      },
+      {
+        "name": "darkcraft:sfx/rectora_baculo_2"
+      }
+    ]
+  },
+  "sfx.rectora_orbes": {
+    "subtitle": "subtitles.darkcraft.sfx.rectora_orbes",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rectora_orbes_1"
+      },
+      {
+        "name": "darkcraft:sfx/rectora_orbes_2"
+      }
+    ]
+  },
+  "sfx.rectora_estrellas": {
+    "subtitle": "subtitles.darkcraft.sfx.rectora_estrellas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rectora_estrellas_1"
+      },
+      {
+        "name": "darkcraft:sfx/rectora_estrellas_2"
+      }
+    ]
+  },
+  "sfx.rectora_estrella_cae": {
+    "subtitle": "subtitles.darkcraft.sfx.rectora_estrella_cae",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rectora_estrella_cae_1"
+      },
+      {
+        "name": "darkcraft:sfx/rectora_estrella_cae_2"
+      }
+    ]
+  },
+  "sfx.rectora_constelacion": {
+    "subtitle": "subtitles.darkcraft.sfx.rectora_constelacion",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rectora_constelacion_1"
+      },
+      {
+        "name": "darkcraft:sfx/rectora_constelacion_2"
+      }
+    ]
+  },
+  "sfx.rectora_parpadeo": {
+    "subtitle": "subtitles.darkcraft.sfx.rectora_parpadeo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rectora_parpadeo_1"
+      },
+      {
+        "name": "darkcraft:sfx/rectora_parpadeo_2"
+      }
+    ]
+  },
+  "sfx.rectora_alzarse": {
+    "subtitle": "subtitles.darkcraft.sfx.rectora_alzarse",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rectora_alzarse_1"
+      },
+      {
+        "name": "darkcraft:sfx/rectora_alzarse_2"
+      }
+    ]
+  },
+  "sfx.rectora_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.rectora_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rectora_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/rectora_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/rectora_dolor_3"
+      }
+    ]
+  },
+  "sfx.rectora_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.rectora_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rectora_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/rectora_muerte_2"
+      }
+    ]
+  },
+  "sfx.rectora_espera": {
+    "subtitle": "subtitles.darkcraft.sfx.rectora_espera",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/rectora_espera_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/rectora_espera_2",
+        "stream": true
+      }
+    ]
+  },
+  "sfx.observatorio_sello": {
+    "subtitle": "subtitles.darkcraft.sfx.observatorio_sello",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/observatorio_sello_1"
+      },
+      {
+        "name": "darkcraft:sfx/observatorio_sello_2"
+      }
+    ]
+  },
+  "sfx.observatorio_abre": {
+    "subtitle": "subtitles.darkcraft.sfx.observatorio_abre",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/observatorio_abre_1"
+      },
+      {
+        "name": "darkcraft:sfx/observatorio_abre_2"
+      }
+    ]
+  },
+  "rectora.voz.1": {
+    "subtitle": "subtitles.darkcraft.rectora.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rectora/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "rectora.voz.2": {
+    "subtitle": "subtitles.darkcraft.rectora.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rectora/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "rectora.voz.3": {
+    "subtitle": "subtitles.darkcraft.rectora.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rectora/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "rectora.voz.4": {
+    "subtitle": "subtitles.darkcraft.rectora.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rectora/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "rectora.voz.5": {
+    "subtitle": "subtitles.darkcraft.rectora.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:rectora/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "musica.rectora": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/rectora",
+        "stream": true
+      }
+    ]
   }
 }

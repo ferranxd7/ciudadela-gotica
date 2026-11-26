@@ -31,6 +31,8 @@ public final class Voces {
     public static final int BASE_ABAD = 90;
     /** Las del Condestable del Juramento (parte 7n): 20 + N (1..5; entre las del Rey, 1..13, y las del Capitan). */
     public static final int BASE_CONDESTABLE = 20;
+    /** Las de Ysolde, la Rectora de la Academia (parte 7p): 30 + N (1..5; entre las del Condestable y las del Capitan). */
+    public static final int BASE_RECTORA = 30;
     /** Pausa entre dos frases seguidas (ticks): 0,3 s. */
     public static final int PAUSA = 6;
     /** Lo que se queda el subtitulo despues de acabar de hablar (ticks): 0,8 s. */
@@ -46,6 +48,7 @@ public final class Voces {
     private static final float[] BARQUERO = {0, 5.2f, 3.9f, 2.4f, 1.4f, 4.1f};
     private static final float[] ABAD = {0, 8.25f, 5.2f, 3.5f, 2.7f, 5.3f};
     private static final float[] CONDESTABLE = {0, 7.21f, 2.68f, 1.39f, 3.2f, 4.15f};
+    private static final float[] RECTORA = {0, 5.63f, 5.08f, 1.93f, 3.3f, 3.98f};
     // la Sombra en las cinematicas (1..6 la de inicio, 7..9 el viaje a Valdrenn)
     private static final float[] SOMBRA = {0, 2.26f, 4.23f, 3.56f, 6.57f, 5.44f, 3.17f, 6.06f, 5.98f, 4.63f};
 
@@ -59,6 +62,7 @@ public final class Voces {
                 leer(o, "habla_barquero", BARQUERO);
                 leer(o, "habla_abad", ABAD);
                 leer(o, "habla_condestable", CONDESTABLE);
+                leer(o, "habla_rectora", RECTORA);
                 leer(o, "habla_sombra", SOMBRA);
                 if (o.has("habla")) {
                     leer(o, "habla", REY);
@@ -109,15 +113,20 @@ public final class Voces {
     }
 
     public static boolean esCondestable(int linea) {
-        return linea > BASE_CONDESTABLE && linea < BASE_CAPITAN;
+        return linea > BASE_CONDESTABLE && linea < BASE_RECTORA;
+    }
+
+    public static boolean esRectora(int linea) {
+        return linea > BASE_RECTORA && linea < BASE_CAPITAN;
     }
 
     /**
-     * Si la linea existe (1..13 el Rey, 21..25 el Condestable, 41..45 el Capitan, 61..65 la Molinera, 71..75 el Verdugo, 81..85
+     * Si la linea existe (1..13 el Rey, 21..25 el Condestable, 31..35 la Rectora, 41..45 el Capitan, 61..65 la Molinera, 71..75 el Verdugo, 81..85
      * el Barquero, 91..95 el Abad, 101..118 Gavran).
      */
     public static boolean valida(int linea) {
         if (esCondestable(linea)) return linea - BASE_CONDESTABLE < CONDESTABLE.length;
+        if (esRectora(linea)) return linea - BASE_RECTORA < RECTORA.length;
         if (esCapitan(linea)) return linea - BASE_CAPITAN < CAPITAN.length;
         if (esMolinera(linea)) return linea - BASE_MOLINERA < MOLINERA.length;
         if (esVerdugo(linea)) return linea - BASE_VERDUGO < VERDUGO.length;
@@ -131,6 +140,10 @@ public final class Voces {
         if (esCondestable(linea)) {
             int n = linea - BASE_CONDESTABLE;
             return n > 0 && n < CONDESTABLE.length ? CONDESTABLE[n] : 4f;
+        }
+        if (esRectora(linea)) {
+            int n = linea - BASE_RECTORA;
+            return n > 0 && n < RECTORA.length ? RECTORA[n] : 4f;
         }
         if (esCapitan(linea)) {
             int n = linea - BASE_CAPITAN;
@@ -176,6 +189,10 @@ public final class Voces {
         if (esCondestable(linea)) {
             int n = linea - BASE_CONDESTABLE;
             return n == 3;
+        }
+        if (esRectora(linea)) {
+            int n = linea - BASE_RECTORA;
+            return n == 3 || n == 4;
         }
         if (esCapitan(linea)) {
             int n = linea - BASE_CAPITAN;

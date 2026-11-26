@@ -287,6 +287,21 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_DOLOR = sound("sfx.condestable_dolor");
     public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_MUERTE = sound("sfx.condestable_muerte");
     public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_ESPERA = sound("sfx.condestable_espera");
+    // Ysolde, la Rectora de la Academia (parte 7p): el grito, el baculo, los orbes, la lluvia de estrellas y cada estrella que
+    // cae, la constelacion, el parpadeo, alzarse, el dolor, la muerte y su espera leyendo el cielo; el sello del Observatorio
+    public static final RegistryObject<SoundEvent> SFX_RECTORA_GRITO = sound("sfx.rectora_grito");
+    public static final RegistryObject<SoundEvent> SFX_RECTORA_BACULO = sound("sfx.rectora_baculo");
+    public static final RegistryObject<SoundEvent> SFX_RECTORA_ORBES = sound("sfx.rectora_orbes");
+    public static final RegistryObject<SoundEvent> SFX_RECTORA_ESTRELLAS = sound("sfx.rectora_estrellas");
+    public static final RegistryObject<SoundEvent> SFX_RECTORA_ESTRELLA = sound("sfx.rectora_estrella_cae");
+    public static final RegistryObject<SoundEvent> SFX_RECTORA_CONSTELACION = sound("sfx.rectora_constelacion");
+    public static final RegistryObject<SoundEvent> SFX_RECTORA_PARPADEO = sound("sfx.rectora_parpadeo");
+    public static final RegistryObject<SoundEvent> SFX_RECTORA_ALZARSE = sound("sfx.rectora_alzarse");
+    public static final RegistryObject<SoundEvent> SFX_RECTORA_DOLOR = sound("sfx.rectora_dolor");
+    public static final RegistryObject<SoundEvent> SFX_RECTORA_MUERTE = sound("sfx.rectora_muerte");
+    public static final RegistryObject<SoundEvent> SFX_RECTORA_ESPERA = sound("sfx.rectora_espera");
+    public static final RegistryObject<SoundEvent> SFX_OBSERVATORIO_SELLO = sound("sfx.observatorio_sello");
+    public static final RegistryObject<SoundEvent> SFX_OBSERVATORIO_ABRE = sound("sfx.observatorio_abre");
     // los eruditos de la Academia Espectral (parte 7o): el susurro de la leccion, el respingo, el quejido, la muerte, el
     // plumazo del calamo, el tintero que revienta, el orbe, el circulo de runas, el parpadeo, el tomazo, la cadena y alzarse
     // de entre los libros; y el ambiente de la academia
@@ -382,6 +397,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_BARQUERO = sound("musica.barquero");
     public static final RegistryObject<SoundEvent> MUSICA_ABAD = sound("musica.abad");
     public static final RegistryObject<SoundEvent> MUSICA_CONDESTABLE = sound("musica.condestable");
+    public static final RegistryObject<SoundEvent> MUSICA_RECTORA = sound("musica.rectora");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -431,6 +447,10 @@ public class DarkCraftMod {
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] CONDESTABLE_VOZ = new RegistryObject[6];
 
+    /** Frases de Ysolde, la Rectora de la Academia (1..5, parte 7p). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] RECTORA_VOZ = new RegistryObject[6];
+
     /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[10];
@@ -444,6 +464,7 @@ public class DarkCraftMod {
         for (int i = 1; i < BARQUERO_VOZ.length; i++) BARQUERO_VOZ[i] = sound("barquero.voz." + i);
         for (int i = 1; i < ABAD_VOZ.length; i++) ABAD_VOZ[i] = sound("abad.voz." + i);
         for (int i = 1; i < CONDESTABLE_VOZ.length; i++) CONDESTABLE_VOZ[i] = sound("condestable.voz." + i);
+        for (int i = 1; i < RECTORA_VOZ.length; i++) RECTORA_VOZ[i] = sound("rectora.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -637,6 +658,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Condestable>> CONDESTABLE = ENTITIES.register("condestable",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Condestable>of(com.darkcraft.enemigos.Condestable::new, MobCategory.MONSTER)
                     .sized(1.6f, 4.6f).fireImmune().clientTrackingRange(10).build(MODID + ":condestable"));
+    // ---- Ysolde, la Rectora de la Academia, el jefe de la Academia Espectral (parte 7p): flota; el fuego si le hace dano
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Rectora>> RECTORA = ENTITIES.register("rectora",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Rectora>of(com.darkcraft.enemigos.Rectora::new, MobCategory.MONSTER)
+                    .sized(0.95f, 3.3f).clientTrackingRange(10).build(MODID + ":rectora"));
     // ---- la Molinera de Velmor, el jefe de las Llanuras Palidas (parte 7f)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Molinera>> MOLINERA = ENTITIES.register("molinera",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Molinera>of(com.darkcraft.enemigos.Molinera::new, MobCategory.MONSTER)
@@ -816,6 +841,7 @@ public class DarkCraftMod {
         e.put(ABAD.get(), com.darkcraft.enemigos.Abad.atributos().build());
         e.put(CALCINADO.get(), com.darkcraft.enemigos.Calcinado.atributos().build());
         e.put(CONDESTABLE.get(), com.darkcraft.enemigos.Condestable.atributos().build());
+        e.put(RECTORA.get(), com.darkcraft.enemigos.Rectora.atributos().build());
         e.put(ERUDITO.get(), com.darkcraft.enemigos.Erudito.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());

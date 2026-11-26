@@ -201,6 +201,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la academia en el chunk {}", c.getPos(), t);
         }
+        // el Observatorio, al este de la academia, a la puerta de su santuario, donde espera la Rectora (parte 7p)
+        try {
+            if (Observatorio.toca(c.getPos().x, c.getPos().z)) Observatorio.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el observatorio en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

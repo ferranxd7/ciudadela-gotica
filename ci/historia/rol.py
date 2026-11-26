@@ -2547,6 +2547,73 @@ EN.update({
 })
 
 
+# ---------------------------------------------------------------- parte 7p: Ysolde, la Rectora de la Academia, y el Observatorio
+ES.update({
+    "entity.darkcraft.rectora": "Ysolde, la Rectora de la Academia",
+    "darkcraft.rectora.nombre_corto": "La Rectora",
+    "darkcraft.rectora.voz.1": "¿Otro lector? Acércate, pues... esta noche el cielo ha escrito tu nombre.",
+    "darkcraft.rectora.voz.2": "¡Maestros! ¡A vuestros puestos! La lección no ha terminado.",
+    "darkcraft.rectora.voz.3": "Se pasó tu página.",
+    "darkcraft.rectora.voz.4": "Lee las estrellas... si puedes.",
+    "darkcraft.rectora.voz.5": "Por fin... el cielo ha dejado de leerme.",
+    "subtitles.darkcraft.rectora.voz": "Habla la Rectora",
+    "darkcraft.bestiario.rectora.desc": "La noche del cielo rojo, Ysolde, Rectora de la Academia, subió al observatorio a leer el fuego que caía. Dijo que no era fuego, sino escritura, y no apartó el ojo del telescopio. Flota ante él, y el cielo la lee a ella. Barre con su báculo a quien se le acerca y se esfuma si te pones a su espalda; de lejos suelta tres orbes que te siguen. Alza el báculo y las estrellas caen por la rendija de la cúpula: sal del círculo de luz. Clava estrellas en el suelo a tu alrededor y las une con líneas: cuando se encienden, quema estar encima. Herida, llama a sus maestros a sus atriles. La magia le hace la mitad; el fuego, más.",
+    "subtitles.darkcraft.sfx.rectora_grito": "La Rectora grita con mil voces",
+    "subtitles.darkcraft.sfx.rectora_baculo": "Un báculo de plata barre el aire",
+    "subtitles.darkcraft.sfx.rectora_orbes": "Se encienden tres orbes de luz",
+    "subtitles.darkcraft.sfx.rectora_estrellas": "Las estrellas empiezan a caer",
+    "subtitles.darkcraft.sfx.rectora_estrella_cae": "Cae una estrella",
+    "subtitles.darkcraft.sfx.rectora_constelacion": "Se enciende una constelación",
+    "subtitles.darkcraft.sfx.rectora_parpadeo": "La Rectora se esfuma",
+    "subtitles.darkcraft.sfx.rectora_alzarse": "La Rectora se alza",
+    "subtitles.darkcraft.sfx.rectora_dolor": "La Rectora se estremece",
+    "subtitles.darkcraft.sfx.rectora_muerte": "Las estrellas se apagan",
+    "subtitles.darkcraft.sfx.rectora_espera": "Zumba la cúpula del observatorio",
+    "subtitles.darkcraft.sfx.observatorio_sello": "Un sello de luz cierra la puerta",
+    "subtitles.darkcraft.sfx.observatorio_abre": "Se rompe el sello de luz",
+    "darkcraft.morvain.lugar.observatorio": "El Observatorio",
+    "advancements.darkcraft.observatorio.title": "Bajo la rendija",
+    "advancements.darkcraft.observatorio.description": "Entra en la rotonda del Observatorio",
+    "advancements.darkcraft.rectora.title": "El cielo deja de leer",
+    "advancements.darkcraft.rectora.description": "Vence a Ysolde, la Rectora de la Academia",
+    "darkcraft.diario.observatorio": "Al este de la academia, el observatorio: una rotonda blanca con la cúpula de cobre abierta al cielo, el suelo pintado de estrellas y, al fondo, el gran telescopio. Ante él flotaba la Rectora, con la mano alzada hacia las estrellas. Cuando entré, un sello de luz cerró la puerta.",
+    "darkcraft.diario.rectora": "Ysolde, la Rectora, leyó el cielo hasta que el cielo la leyó a ella. Cuando cayó, miró arriba una vez más y se deshizo en estrellas que subieron por la rendija. Se rompió el sello y se abrió su celda, y los que leían en la academia por fin pasaron la página.",
+    "darkcraft.ayuda.rectora": "La Rectora de la Academia: cómo está, llevarte a su observatorio, vencerla, que vuelva o abrir el sello",
+})
+EN.update({
+    "entity.darkcraft.rectora": "Ysolde, Rector of the Academy",
+    "darkcraft.rectora.nombre_corto": "The Rector",
+    "darkcraft.rectora.voz.1": "Another reader? Come, then... the sky has written your name tonight.",
+    "darkcraft.rectora.voz.2": "Masters! To your places! The lesson is not over.",
+    "darkcraft.rectora.voz.3": "Your page is turned.",
+    "darkcraft.rectora.voz.4": "Read the stars... if you can.",
+    "darkcraft.rectora.voz.5": "At last... the sky has stopped reading me.",
+    "subtitles.darkcraft.rectora.voz": "The Rector speaks",
+    "darkcraft.bestiario.rectora.desc": "On the night of the red sky, Ysolde, Rector of the Academy, climbed to the observatory to read the fire that fell. She said it was not fire but writing, and she never took her eye from the telescope. She floats before it, and the sky reads her. She sweeps her staff at whoever comes near and fades away if you get behind her; from afar she releases three orbs that follow you. She raises her staff and stars fall through the slit in the dome: get out of the circle of light. She plants stars in the floor around you and joins them with lines: when they ignite, standing on one burns. Wounded, she calls her masters to their lecterns. Magic does her half; fire, more.",
+    "subtitles.darkcraft.sfx.rectora_grito": "The Rector screams with a thousand voices",
+    "subtitles.darkcraft.sfx.rectora_baculo": "A silver staff sweeps the air",
+    "subtitles.darkcraft.sfx.rectora_orbes": "Three orbs of light kindle",
+    "subtitles.darkcraft.sfx.rectora_estrellas": "Stars begin to fall",
+    "subtitles.darkcraft.sfx.rectora_estrella_cae": "A star falls",
+    "subtitles.darkcraft.sfx.rectora_constelacion": "A constellation ignites",
+    "subtitles.darkcraft.sfx.rectora_parpadeo": "The Rector fades away",
+    "subtitles.darkcraft.sfx.rectora_alzarse": "The Rector rises",
+    "subtitles.darkcraft.sfx.rectora_dolor": "The Rector shudders",
+    "subtitles.darkcraft.sfx.rectora_muerte": "The stars go out",
+    "subtitles.darkcraft.sfx.rectora_espera": "The observatory dome hums",
+    "subtitles.darkcraft.sfx.observatorio_sello": "A seal of light closes the door",
+    "subtitles.darkcraft.sfx.observatorio_abre": "The seal of light breaks",
+    "darkcraft.morvain.lugar.observatorio": "The Observatory",
+    "advancements.darkcraft.observatorio.title": "Beneath the Slit",
+    "advancements.darkcraft.observatorio.description": "Enter the rotunda of the Observatory",
+    "advancements.darkcraft.rectora.title": "The Sky Stops Reading",
+    "advancements.darkcraft.rectora.description": "Defeat Ysolde, Rector of the Academy",
+    "darkcraft.diario.observatorio": "East of the academy, the observatory: a white rotunda with its copper dome open to the sky, the floor painted with stars and, at the far end, the great telescope. Before it floated the Rector, her hand raised to the stars. When I walked in, a seal of light closed the door.",
+    "darkcraft.diario.rectora": "Ysolde, the Rector, read the sky until the sky read her. When she fell, she looked up one last time and came apart into stars that rose through the slit. The seal broke and her cell opened, and those who read in the academy at last turned the page.",
+    "darkcraft.ayuda.rectora": "The Rector of the Academy: how she is, take you to her observatory, defeat her, bring her back or open the seal",
+})
+
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

@@ -2220,6 +2220,102 @@ Ysolde en el observatorio —"subio a leer el fuego que caia... y el cielo la le
   aprendiz tumbado (`mv247`) que se levanta (`mv248`) y cae (`mv249`), el libro de Maese Orlen (`mv250`) y el bestiario (`mv251`).
   `LIMIT` 70 min (`lanzar.sh` 76 y 74 min).
 
+### Plan grande, parte 7p: Ysolde, la Rectora de la Academia (el jefe de la Academia Espectral) y el Observatorio
+
+Respuestas 125 y 131 del plan; el sexto jefe de Morvain (el del libro 24: "subio a leer el fuego que caia... y el cielo la lee a
+ella").
+- **El Observatorio** (`morvain/Observatorio`, en la meseta al este de la academia, a la puerta del santuario del Observatorio
+  —(5577, -3543), 57 al sur—; `CX` 5577, `CZ` -3600, `SUELO` 240 y `PISO` 241; u = x - CX, v = z - CZ; se dibuja chunk a chunk al
+  adornar y en su caja `Adorno` no pone nada): una **terraza** de caliza (|u| <= 30, v -24..31, dos sobre la meseta, balaustrada,
+  obeliscos en las esquinas y la escalinata del sur), la **rotonda** (lo que se pisa hasta `R_DENTRO` 14,5; el muro hasta `R_FUERA`
+  16,5 y `MURO_ALTO` = PISO + 12: zocalo y cornisa de pizarra, ocho lancetas moradas) con la **cupula de cobre** (semiesfera de radio
+  15 / 16,5 sobre el muro, nervios de pizarra) y su **rendija** abierta del cenit al norte (|u| <= 1, v -16..-1). Dentro: el suelo es
+  una **carta del cielo** (el disco de lapislazuli con estrellas de luz, las cuatro constelaciones de cuarzo, el anillo de las horas
+  y el de los doce signos), el **planetario** colgado de la cupula (el sol —una luz de hongo en PISO + 16— y cuatro planetas en sus
+  brazos de cadena), al norte el **estrado** (un escalon, v <= -7) con el **gran telescopio** de cobre que sale por la rendija (el
+  ocular en v -11, el objetivo de cristal azul en PISO + 21) y cuatro **hornacinas** en el muro con los atriles de los maestros
+  (`hornacinas()`, a 45, 135, 225 y 315 grados). Al sur el **vestibulo** (estantes, atriles, la alfombra morada) con la puerta de la
+  rotonda (|u| <= 1, cuatro de alto y su punta: el **sello** va en v 15, la cara de dentro del muro); al este la **celda de la
+  Rectora** (su mesa, el globo celeste, el arcon `chests/observatorio` y el **atril con el libro perdido 25** —"Las ultimas
+  observaciones", de Ysolde; `Perdidos.TOTAL` = 25—), cerrada con una **reja** en el muro de la rotonda (u 15, 13 celdas con la punta
+  del arco) mientras ella viva; al oeste la **sala de los instrumentos** (el globo grande, mesas con instrumentos y una escala a la
+  **azotea** con su anteojo). En la terraza el **reloj de sol**; fuera el **camino** con faroles y el **circulo de piedras** (diez
+  menhires a 46). Sitios (`Observatorio.sitio`): `entrada`, `camino`, `escalinata`, `porche`, `vestibulo`, `puerta`, `rotonda`,
+  `centro`, `estrado`, `rectora`, `telescopio`, `hornacina_0..3`, `celda`, `atril`, `arcon`, `instrumentos`, `azotea`, `reloj`,
+  `circulo`. El Espejo: "El Observatorio" (`Observatorio.dentro`, la terraza); logro `observatorio` ("Bajo la rendija") al entrar en
+  la rotonda (`enRotonda`).
+- **El sello** (`Observatorio.tick`, cada tick con alguien a 120, desde `Morvain.onTick`, con su propio reloj): en cuanto la
+  Rectora empieza a pelear, un muro de luz (cristal morado, `sfx.observatorio_sello`) cierra la puerta de la rotonda —antes pasa
+  dentro a quien este en el hueco— y se rompe (`sfx.observatorio_abre`) al acabar la pelea o 60 ticks despues de caer ella
+  (`ABRIR_TRAS`, mientras dice su ultima frase; `cerrar` guarda a la ultima Rectora vista). Lo cerrado se mira en el mundo (si el
+  servidor se para a media pelea, al volver se abre solo). `SELLADOS` / `ABIERTOS`, `sellado` (pruebas).
+- **Al caer la Rectora** (`Observatorio.paz`, cada segundo): se alza la reja de su celda y los eruditos que seguian **leyendo** (los
+  `REZA` de la academia y de la puerta del observatorio; no los que pelean) se deshacen en letras de luz (`descansar`, `DESCANSAN`) y
+  **ya no vuelven** (los sitios `academia` y `observatorio` se registran con `activo`). `deshacerPaz` (comando y pruebas) lo deja
+  como estaba.
+- **Los puestos** (`MorvainEnemigos`, sitio `observatorio`, de `Observatorio.esperas`): la Rectora (puesto 0, grupo `Puestos.JEFE`,
+  en el estrado bajo el ocular, mirando al telescopio), dos custodios leyendo a la puerta del vestibulo, un maestro de ronda entre los
+  instrumentos y dos aprendices en el camino (uno leyendo junto a un farol y otro tumbado).
+- **La Rectora** (`enemigos/Rectora`, entidad `darkcraft:rectora`, 0,95 x 3,3; hereda de `Guardian`): modelo de
+  `tools/enemigos/rectora.py` (un espectro alto sin piernas: el vestido azul de noche con estrellas bordadas acaba en jirones, el
+  cuello alto, el manto con constelaciones que lucen, melena blanca, diadema con su gema, la **aureola de estrellas** detras de la
+  cabeza, un astrolabio al cinto y el **baculo de plata** con la estrella de cristal; escala 1,6; se dibuja medio transparente como
+  los eruditos: `client/enemigos/RectoraModelo` y `RectoraRenderer`). 960 de vida, golpe 12, armadura 6 (dureza 2), casi no se la
+  empuja. **La magia le hace la mitad; el fuego, un 40 % mas** (los libros y la tinta arden). Espera **leyendo el cielo** (`REZA`:
+  flotando ante el ocular con la mano alzada; letras que suben al telescopio y `sfx.rectora_espera` de vez en cuando).
+- **La pelea** (solo con quien esta en la rotonda: `percibe` y `objetivoValido`): al verle dice la frase 1 mientras baja la vista
+  y se levanta, y grita al acabarla. El **baculo** (barre de su derecha a su izquierda: llega a 4,4, empuja y frena) a quien se le
+  acerca; si se le pega o se le pone **a la espalda** (o a veces tras un golpe) **parpadea**: se apaga y aparece a 6-10 bloques,
+  dentro de la rotonda, mirandole. De lejos, los **orbes** (tres `Orbe` en abanico que siguen a su presa, x0,55 del golpe). La
+  **lluvia de estrellas** (alza el baculo y la mano al cielo): una estrella sobre cada uno de los que pelean y otras sueltas por la
+  rotonda, cada una con su **circulo de luz** en el suelo que se cierra; caen por la rendija y a los 24 ticks revientan (radio 2,1,
+  dano magico x1,25 y lanza hacia arriba): hay que salir del circulo; a media vida cae una segunda tanda. La **constelacion**: clava
+  estrellas en el suelo (una bajo su presa; 5, o 7 a media vida) unidas en cadena y con una linea que cruza; a los 30 ticks se
+  encienden 10 ticks y **queman a quien este de pie sobre una linea** (a 0,75; dano x1,1 y frena; saltandola, no: la altura de la
+  linea sube con el escalon del estrado). A **media vida** no grita: **se alza** ("¡Maestros! ¡A vuestros puestos!") y de las
+  hornacinas salen sus **maestros** (eruditos efimeros, de los atriles, leyendo, y se alzan de golpe con su presa; dos, uno mas por
+  amigo, hasta cuatro; las hornacinas mas lejos de los jugadores primero) y desde entonces lee mas deprisa. `Rectora.mediaVida()`,
+  `vencer()`, `quieta` (pruebas: no elige golpes ni grita por su cuenta) y contadores (`baculos`, `orbes`, `lluvias`,
+  `estrellasCaidas` / `estrellasQueDan`, `constelaciones` / `lineasQueDan`, `parpadeos`, `maestrosAlzados`, `marcas`, `nodos`).
+- **Voz** (ElevenLabs, `eleven_v4`, **"Enchantress - mysterious, witchy, villain character"** `sssn4wp3AspuK2kvy3Ym`, flow
+  `L04DwwrYLk66HudZzb1F`; 5 frases, tomas a salvo la 2b; en `procesar.py` `voz_rectora`: algo mas grave, una segunda voz una quinta
+  por encima muy baja, un coro lento que la hace temblar, brillo y el eco largo de la cupula): linea **30 + N**
+  (`Voces.BASE_RECTORA`, `esRectora`; `habla_rectora` en `rey_voces.json`; subtitulos `darkcraft.rectora.voz.N`): 1 al empezar (no
+  la repite en 4 min), 2 al alzarse, 3 si cae su presa, 4 la primera vez que hace caer las estrellas o dibuja la constelacion ("Lee
+  las estrellas... si puedes") y 5 al caer ("Por fin... el cielo ha dejado de leerme").
+- **Barra** (`GuardianCliente`, arte de `tools/hud/barra_guardianes.py` "rectora": el baculo de plata con anillos de oro y la
+  estrella de cristal, estrellas sueltas y en el centro la aureola; relleno de cielo de noche; estrellas que caen). **Musica**: "Boss
+  Battle Music (Epic Boss Battle)" de SubspaceAudio / Juhani Junkala (CC0, id `rectora`, tema 38 de `ClientMusic.boss`).
+- **Al caer** se hunde (el baculo cae a su lado y baja la cabeza), dice su ultima frase, mira arriba una vez mas y **se deshace en
+  estrellas que suben por la rendija** (`tickDeath` propio, 120 ticks); lo demas lo reparte `valdrenn/Guardianes`: el cartel de JEFE
+  ABATIDO con 14000 ecos, la hazana `rectora` ("El cielo deja de leer", con su entrada del diario) y el bestiario; deja tres piedras
+  de forja III, dos II y la ceniza del relampago.
+- Sonidos (ElevenLabs, flow `L04DwwrYLk66HudZzb1F`, `TOMAS_SFX`): `rectora_grito` (4 y 2), `rectora_baculo` (4 y 3),
+  `rectora_orbes` (3 y 2), `rectora_estrellas` (1 y 4), `rectora_estrella_cae` (3 y 2), `rectora_constelacion` (2 y 4),
+  `rectora_parpadeo` (2 y 4), `rectora_alzarse` (1 y 4), `rectora_dolor` (4, 1 y 3), `rectora_muerte` (4 y 1), `rectora_espera` (2 y
+  3), `observatorio_sello` (1 y 4), `observatorio_abre` (1 y 3).
+- Comandos `/darkcraft rectora [ir | observatorio <sitio> | vencer | volver | sello [abrir]]` (sin mas: como esta; `volver` la pone
+  otra vez a leer el cielo, baja la reja de su celda, abre el sello y vuelven los lectores de la academia).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_observatorio carpeta` (con `--techo Y` para ver dentro): la terraza, la
+  rotonda y las salas con las marcas de los puestos; si se llega a pie desde la entrada a cada sitio (la celda, solo sin la reja), a
+  cada erudito y a las cuatro hornacinas, y que con el sello cerrado no se entra en la rotonda desde el vestibulo.
+- Pruebas: servidor, lineas `Morvain, el observatorio: ...` (el atril con el libro 25, el arcon, la reja, el sello, el cobre de la
+  cupula, la rendija, el sol del planetario, el objetivo del telescopio, el suelo de la rotonda; a pie desde el camino con la reja y
+  sin ella; las hornacinas libres; vistas `morvain_observatorio.png` y `morvain_observatorio_rotonda.png`), `Morvain, la Rectora:
+  ...` (leyendo el cielo; al verla habla, se levanta, el sello cierra la puerta —y pasa a la rotonda al que estaba en el hueco— y
+  grita al acabar la frase; cada accion acaba), `Morvain, los golpes de la Rectora a una presa: ...` (el baculo de cerca y de lejos,
+  los orbes, las estrellas y sus marcas en el suelo de la rotonda, la constelacion de pie y saltando, el parpadeo), `Morvain, la
+  Rectora a media vida: ...` (se alza, los maestros ante sus hornacinas; la magia la mitad, el fuego mas), `Morvain, la Rectora cae:
+  ...` (el sello se rompe, la reja se alza, los que leian descansan y no vuelven) y `Morvain, la Rectora vuelve: ...`; cliente, tramo
+  `observatorio()` despues de la academia: desde el santuario (`cliente_mv252`), el camino y los custodios (`mv253`), entrar en la
+  rotonda con el cartel y el logro (`mv254`), la rotonda por dentro (`mv255`), la cupula con el planetario y la rendija (`mv256`), la
+  Rectora leyendo el cielo (`mv257`), la reja de su celda (`mv258`), los instrumentos (`mv259`), todo desde lo alto (`mv260`); en
+  supervivencia habla (`mv261`), el sello a la espalda (`mv262`) y grita con su barra (`mv263`); sus golpes (`mv264..mv270`: el
+  baculo, los orbes, las marcas de las estrellas y las estrellas cayendo, la constelacion y sus lineas encendidas, el parpadeo), se
+  alza con sus maestros (`mv271`), se hunde (`mv272`), el sello se rompe (`mv273`), se deshace en estrellas (`mv274`), el cartel
+  (`mv275`), su celda abierta (`mv276`), su libro (`mv277`) y el bestiario (`mv278`). `LIMIT` 78 min (`lanzar.sh` 84 y 82 min, el
+  paso 115, el trabajo 160).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -2230,7 +2326,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j, la 7k, la 7l, la 7m, la 7n y la 7o arriba; despues, region a region su
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j, la 7k, la 7l, la 7m, la 7n, la 7o y la 7p arriba; despues, region a region su
   contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
