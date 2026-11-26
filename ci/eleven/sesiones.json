@@ -3860,5 +3860,241 @@
     ]
    }
   }
+ },
+ "abad": {
+  "flow": "jCsDZ5HeBZc9gQNRbklp",
+  "voz": "N8jsIhEtPnj3PWFmH8hZ",
+  "nombre_voz": "Elder Rowan",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7l: Hrodric, el Abad de la Cumbre (el jefe de las Montanas Nevadas). Tomas a y b de cada frase como abad/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[slow, solemn, cold] You climbed to the summit... as I once did. [softly] Kneel, child. [cold whisper] The cold will answer you too.",
+    "sesiones": [
+     "Cgqd4epcu696TzKk0JOm",
+     "ug6ckrJXOz7J4uvzGQzg"
+    ],
+    "generaciones": [
+     "SgRY3nUphPgFvjzinqex",
+     "wGoQXt167b03cxAnF6Ba"
+    ]
+   },
+   "2": {
+    "texto": "[roaring, furious] Brothers! Rise from the snow! [shouting] Let the frost take them all!",
+    "sesiones": [
+     "tm51QbSMouiitXKjfjxf",
+     "N4Giol7I5So4Zmx03P8R"
+    ],
+    "generaciones": [
+     "vBpHbTR4tkA1LD6L63QR",
+     "RaTYhhYkuJ0BikgJgXNR"
+    ]
+   },
+   "3": {
+    "texto": "[quiet, almost tender] Rest now. The cold forgives everything.",
+    "sesiones": [
+     "cgt088PnLlpv56hmitOH",
+     "cDxYYBsgs0YcJBcLdONv"
+    ],
+    "generaciones": [
+     "elNy3EIYJXadxTr89Mbc",
+     "RH2O9Nzuu5JLnelYATqf"
+    ]
+   },
+   "4": {
+    "texto": "[cold whisper] Be still... be still now.",
+    "sesiones": [
+     "4qg8MVQrWsflb50S0jav",
+     "YGp961xomgFaPxiHkJLB"
+    ],
+    "generaciones": [
+     "1qvznkm5ACUKa7T3h1yh",
+     "6C8WnSXjChnFeaetzXnY"
+    ]
+   },
+   "5": {
+    "texto": "[weak, fading, relieved] Warm... it is so warm... [whispering] Forgive me, brothers.",
+    "sesiones": [
+     "JCz10GGQjfo3fGCwfXG2",
+     "EQHVkUbQgdX3xqpyU1KV"
+    ],
+    "generaciones": [
+     "7nbpifdxTPA1mifLeyd0",
+     "p000Pj8EQW95J2LMhjyv"
+    ]
+   }
+  }
+ },
+ "sfx_abad": {
+  "flow": "GbVjOICP5JrNCshfCnzi",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7l: el Abad de la Cumbre (grito, baculazo, barrido, pisoton con sus puas, aliento, los carambanos que llama y los que caen, la ventisca, dolor, muerte y su rezo mientras espera). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "abad_grito": {
+    "prompt": "A colossal frozen giant abbot roaring: a deep old man's furious howl blended with a howling blizzard wind and cracking ice, huge cathedral reverb, dark fantasy boss roar",
+    "sesiones": [
+     "PX0omZba8mMbDiAnWWUK",
+     "ausfGHPxf5tW9gAsRxoX",
+     "VvyPBPGuusyj9LxWIINO",
+     "wA7fqEAVFfzBsEN5Ib6j"
+    ],
+    "generaciones": [
+     "5M4KnLDba5lPLRmfjV6x",
+     "gLqmq9WZ18wYYZoujGYu",
+     "09NwPezVClXisVInZlZh",
+     "4B1eAGFi1Xgfn4nShqvp"
+    ]
+   },
+   "abad_baculazo": {
+    "prompt": "A giant's heavy ice crozier slamming down onto frozen stone: massive deep impact thud, ice cracking and shattering outward, shards of ice scattering, dark fantasy",
+    "sesiones": [
+     "LMX3k96Kz2gci5f92d2b",
+     "ZhGY7JzRAkoFX8aMhXc6",
+     "1z2rohJguTqL66kdpjdq",
+     "Y1Wmni3WYuhdAKSZdsfQ"
+    ],
+    "generaciones": [
+     "VOZXRlaEFx4OmKkOrwFD",
+     "KuXj5Kvm6xYenYBoISbK",
+     "PFCBPgP8ucDhBDaExSOF",
+     "mEEFUz6qprFsvUsV3SFh"
+    ]
+   },
+   "abad_barrido": {
+    "prompt": "A huge heavy staff swung fast through cold air: one deep powerful whoosh with tinkling ice crystals and a frosty crackle",
+    "sesiones": [
+     "xUftaL1eWM3O19I3ujPZ",
+     "2hxt5gtWQTBXSRaH4o6d",
+     "Z9OnIU9hhdhGZyj4hVzy",
+     "xM79uJqasmNsOgLVpoJr"
+    ],
+    "generaciones": [
+     "AqUAj2DNOn6SLQX9iMSe",
+     "lVW6hpn07wlCiFbAdLxH",
+     "xdrE6RiLNmZ2S6OfTFWb",
+     "REjaEmylEYvEPfRhoGB5"
+    ]
+   },
+   "abad_pisoton": {
+    "prompt": "A giant stomps on a frozen mountain plateau: deep heavy thud, then sharp ice spikes bursting up out of the ground all around, crystalline cracking",
+    "sesiones": [
+     "MjtXlmtAEruk5VopB3Xe",
+     "bTVJSruF0P2AP3KkvjB1",
+     "aCqzk2jbI3P3m8vnxgLa",
+     "jgfvO8NGIr31SykAEY2Y"
+    ],
+    "generaciones": [
+     "QUjONaYxfPtPI9BjpCyl",
+     "7QBoM9Xy7VrNUWJDzxqL",
+     "ySvLyQD8D97DHyy1t4Ki",
+     "StNGStnDvM9GFINzf7Ip"
+    ]
+   },
+   "abad_aliento": {
+    "prompt": "A giant's long freezing breath: a powerful hissing gust of icy wind with crackling frost spreading over stone, dark fantasy",
+    "sesiones": [
+     "KQehdejgNJZ3efam1dii",
+     "A4mx35FsRYRhwYIZXDEY",
+     "mk62czkyCzw91XswlBrH",
+     "KzMt1B0bVxI08YcnEqfZ"
+    ],
+    "generaciones": [
+     "VhYNbiO9vrNZLuIuvFGF",
+     "K6C92GHnCHYJCu3ThDMe",
+     "QRvGgbzooNklWkLLGqEJ",
+     "R7nTN7az1a7pQvZ4TGOc"
+    ]
+   },
+   "abad_invocar": {
+    "prompt": "Magical ice forming high in the sky: a rising crystalline shimmer with creaking, growing icicles and cold wind, ominous",
+    "sesiones": [
+     "SIncVbbt7NEHXqdaDk6M",
+     "FS5dZaFctieGwX7lA2m0",
+     "9o4Yz7n49nMznq6cPnyw",
+     "5c6Jcp28mgpFDHrhMPET"
+    ],
+    "generaciones": [
+     "aJN90kkB3COiwGdXK1Vm",
+     "3AtboQVNz55uutTOOHTh",
+     "SeG6fiZhu60SWVxw1103",
+     "bR8fCHX37TuQ77KoeKqP"
+    ]
+   },
+   "abad_carambano": {
+    "prompt": "A huge icicle falling from the sky with a short whistle and crashing onto stone: loud ice shattering impact with tinkling shards",
+    "sesiones": [
+     "8musth3RkjGr9bU4tySN",
+     "Ct7cBjr6cNX04ODWZwuW",
+     "SYNy9QUUJka8jkGQ1HfM",
+     "Gj9ACgDsAhkzV4j5OwRm"
+    ],
+    "generaciones": [
+     "UJ6kruQT3k8vTCqdhJEX",
+     "uE8WH1Le00aydqllZd30",
+     "J2x63jOb4vNUwfSxGAZy",
+     "GraKvLzAnnycxuLgfJsZ"
+    ]
+   },
+   "abad_ventisca": {
+    "prompt": "A sudden violent mountain blizzard: howling wind rising into a roaring gust with blowing snow and ice, ominous",
+    "sesiones": [
+     "loWCrFqT81r15Ba82IEu",
+     "t3fBYzDN7cAVPRwUqAYS",
+     "qTAXeoYg6qp9IjUMJWlv",
+     "OSS9wOegQaQiUDx4FUfZ"
+    ],
+    "generaciones": [
+     "8A78S9JnG37f9FA8VG8a",
+     "ohGsfbyaZNPs8hWZj8iR",
+     "YK7MtP8dL8MIDzqKYHbh",
+     "1IG3VUU57l80gdxkL7Ak"
+    ]
+   },
+   "abad_dolor": {
+    "prompt": "A giant old man's pained groan, deep and hoarse, with ice crackling, dark fantasy creature hurt sound",
+    "sesiones": [
+     "Wv4Wwzff2rQm21cvOvBZ",
+     "U2fc1OfnqpjV5HRw1g7J",
+     "3hJ5WiM9i4jPj79OF5VW",
+     "kn0FkWcAyuMqYctRLSvL"
+    ],
+    "generaciones": [
+     "CGGSX0hFPuHI3SVxc8Zu",
+     "WgXWPkTPRcFxyBtZxqHZ",
+     "chWde09sqKHqlvoccGFF",
+     "NVK7biHtGRNty0I8eGGy"
+    ]
+   },
+   "abad_muerte": {
+    "prompt": "A giant frozen abbot's dying moan fading away, then a huge ice statue cracking and shattering, collapsing into ice shards",
+    "sesiones": [
+     "J29hP9nQ2Sfa5U5mFhFA",
+     "JXBFweWyrtKKtaE4JZk1",
+     "822RyTYOa27W4KAY5mL9",
+     "WQbJrayBfPLiyNtSLOAw"
+    ],
+    "generaciones": [
+     "EPOMblWjsmMnTeW447V0",
+     "32775adHGpqMJdOcWDb6",
+     "CJ34okqlLhdLbEK4VxWy",
+     "FQeGIpE7I8TBSzjjgopV"
+    ]
+   },
+   "abad_rezo": {
+    "prompt": "A deep old male voice slowly murmuring a solemn prayer chant in an unknown ancient language, distant and echoing, cold mountain wind in the background",
+    "sesiones": [
+     "32cCGYyaiOycfcUbyt39",
+     "OEZDu1UDjyP4MHb7gdFq",
+     "SpwHeNBHYeLvNlJeFrTz",
+     "66PnoEAeMV40m2FeDMij"
+    ],
+    "generaciones": [
+     "Qj5l26c0iiEiHVtDRTo3",
+     "LiIVF4VTPdJFOrprvxbk",
+     "Q1izHz9TLBCfI3zDmPbC",
+     "gjCbIthD6zHSCV5H2rv3"
+    ]
+   }
+  }
  }
 }
