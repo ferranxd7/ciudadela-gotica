@@ -1534,14 +1534,14 @@
   "darkcraft.santuario.morvain_mirador": "Crater Overlook",
   "darkcraft.santuario.morvain_ancla_sur": "The Southern Anchor",
   "darkcraft.menu.santuario.viajar": "Travel",
-  "darkcraft.menu.santuario.viajar.desc": "Travel to another shrine of Morvain where you have rested or that you have lit.",
-  "darkcraft.viaje.titulo": "Travel to another shrine",
+  "darkcraft.menu.santuario.viajar.desc": "Travel to another sanctuary of Morvain where you have rested or that you have kindled.",
+  "darkcraft.viaje.titulo": "Travel to another sanctuary",
   "darkcraft.viaje.aqui": "here",
   "darkcraft.viaje.lejos": "%s blocks from here",
   "darkcraft.viaje.tecla": "Travel",
   "darkcraft.viaje.volver": "Back",
   "advancements.darkcraft.viaje.title": "From Fire to Fire",
-  "advancements.darkcraft.viaje.description": "Travel between two shrines of Morvain",
-  "darkcraft.diario.viaje": "I rested by the fire and thought of another I had already lit. When I opened my eyes, I was there. The shrines of Morvain remember one another.",
-  "darkcraft.ayuda.viaje": "travel between the shrines of Morvain: the ones you know, mark them as known, forget them or take you to one"
+  "advancements.darkcraft.viaje.description": "Travel between two sanctuaries of Morvain",
+  "darkcraft.diario.viaje": "I rested by the fire and thought of another I had already kindled. When I opened my eyes, I was there. The sanctuaries of Morvain remember one another.",
+  "darkcraft.ayuda.viaje": "travel between the sanctuaries of Morvain: the ones you know, mark them as known, forget them or take you to one"
 }
