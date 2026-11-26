@@ -1697,7 +1697,7 @@ Respuestas 125 y 131 del plan; el segundo jefe de Morvain (el del libro perdido 
 ### Plan grande, parte 7i: el Pantano Podrido — los Podridos y la Aldea de los Pilotes
 
 Respuestas 125, 131 ("pueblos derrumbados") y 132 del plan; la tercera region con su contenido (despues, la **7j**: el jefe
-del pantano, el Barquero —el del libro 20—).
+del pantano, el Barquero —el del libro 20—: hecha, arriba).
 - **El podrido** (`enemigos/Podrido`, entidad `darkcraft:podrido`, 0,7 x 1,95; modelo de `tools/enemigos/podrido.py`: un ahogado
   hinchado de piel gris verdosa palida con venas moradas, manchas de podredumbre y sanguijuelas, barro hasta la cintura, algas
   colgando de la cabeza y los hombros, la boca abierta y los ojos amarillos en la capa de brillo; `PodridoGeometria/Animaciones`,
@@ -1752,6 +1752,82 @@ del pantano, el Barquero —el del libro 20—).
   (`mv114`, `mv115`), el hinchado se deja caer, eructa y revienta (`mv116..mv118`), el libro de la hermana Ilse (`mv119`) y el
   bestiario (`mv120`).
 
+### Plan grande, parte 7j: el Barquero de la Laguna Negra (el jefe del Pantano Podrido)
+
+Respuestas 125 y 131 del plan; el tercer jefe de Morvain (el del libro perdido 20: "le oigo remar bajo la capilla... no subas
+a su barca").
+- **La Laguna Negra** (`morvain/LagunaNegra`, en el Pantano Podrido, al este del santuario del Embarcadero Podrido; el centro
+  del embarcadero en (-3955, -1880); se dibuja como la aldea de los pilotes, chunk a chunk al adornar; en su caja `Adorno` no
+  pone nada): **cava una laguna** honda (radio 30, fondo a 59-60: tres o cuatro de agua, `orilla`/`suelo`, se funde con el
+  pantano en 12) con islotes de barro, juncos, mangles muertos, barcas hundidas y **estacas con calaveras** (los que no
+  pagaron); en medio, **el embarcadero**: un octogono de tablas (radio `R_PLATAFORMA` 11) a `PASO` = 64 (un bloque por encima
+  del agua) sobre pilotes, con dos anillos de roble oscuro, los ocho postes de amarre de las esquinas con su farol de almas, la
+  barandilla rota (abierta donde llegan el muelle y la barca), rollos de cabo, barriles, cadenas y velas; desde la orilla del
+  oeste el **muelle** (tres de ancho, postes con farol a los lados) y hasta el un camino de tierra pisada desde el santuario
+  (`CAMINO`, con faroles); al este, amarrada, **la barca del Barquero** (cinco por once, la proa al norte, el suelo a ras de
+  agua —`BARCA_SUELO`—, la borda de medias losas, el farol de proa colgando y el **arcon del peaje** en la popa) y la estaca
+  de amarre; en la otra orilla, un arco de piedra medio caido. Sitios (`LagunaNegra.sitio`): `barquero`, `embarcadero`,
+  `ante_embarcadero`, `muelle`, `orilla`, `entrada`, `barca`, `arco`. El Espejo: "La Laguna Negra" (`Morvain.lugar`).
+- **El Barquero** (`enemigos/Barquero`, entidad `darkcraft:barquero`, 1,2 x 3,6, se manda cada 2 ticks —el salto—; hereda de
+  `Guardian`): modelo de `tools/enemigos/barquero.py` (un muerto alto y descarnado: el habito empapado hasta los pies, roto
+  por abajo y con algas, manto y capa, la capucha honda con la calavera en sombra y los ojos de fuego de almas —capa de
+  brillo—, el cordel con la bolsa y la sarta de monedas; en la derecha el remo largo con un garfio de hierro atado a la pala;
+  en la izquierda, colgando de su cadena, la linterna de almas —el vidrio luce—; escala 1,55, `BarqueroAnims.ESCALA`;
+  `client/enemigos/BarqueroModelo` y `BarqueroRenderer`, que apaga el brillo mientras muere). 900 de vida, golpe 12,5,
+  armadura 9; no se ahoga. Espera **de pie en su barca con la linterna en alto** (postura `REZA` = el bucle `vigia`; el puesto
+  0 del sitio `barca` de `MorvainEnemigos`, grupo `Puestos.JEFE`) y de vez en cuando **rema** (`sfx.barquero_remo`, se le oye
+  desde el muelle).
+- **La pelea**: al verle (16 bloques, con linea de vista) se yergue y dice la frase 1; mientras la dice no se mueve de la barca
+  (`distanciaDeseada` 99) ni ataca; al acabarla ruge y **salta** de la barca a las tablas (`SALTO`, como el del Verdugo:
+  despega en el tick 9 y cae en el 20 en un arco que no choca con nada, donde quepa y no haya agua; golpe alrededor al caer y
+  una ola por las tablas); sube de un salto siempre que esta mas abajo que su presa (en el agua, en la barca). Despues:
+  **remazo** (el remo de plano delante: ola de agua negra; saltando o rodando se libra), **barrido** a media altura (no se
+  salta), **golpe de linterna** (de cerca o a quien se le pone detras: quema 4 s), el **bichero** a quien esta a 4-6,8 bloques
+  (lo que llega el remo: si le entra —rodar o cubrirse libran— el garfio engancha, tira de el hasta sus pies y enseguida el
+  golpe de linterna), la **linterna** (la alza y el fuego de almas se abre en un **anillo** por el suelo, de 1 a 9 bloques en
+  ~20 ticks: a quien pilla de pie en su borde le quema; saltando se libra; a media vida, dos anillos seguidos) y un **salto** a
+  quien se aleja. A **media vida** grita y **llama a sus pasajeros**: los podridos que siguen flotando en la laguna a 30
+  bloques se alzan y van a por el jugador que tengan mas cerca; si no hay bastantes (dos, uno mas por amigo, hasta cuatro),
+  suben otros del agua a las tablas alrededor de el (efimeros; podrido, fatuo y, el cuarto, hinchado). `Barquero.mediaVida()`
+  (pruebas) lo hace ya. Acabada la pelea lejos de su barca, vuelve a ella de un salto.
+- **Voz** (ElevenLabs, `eleven_v4`, **"Gravel Midnight - Deep Character Voice"** `M5E055lOUxMi0kJpGyE9`, flow
+  `MwR3v95olYFzccpu1TzZ`; 5 frases, tomas a; en `procesar.py` `voz_barquero`: algo mas grave, una segunda voz una octava por
+  debajo muy baja, un poco de raspa y el eco largo y apagado sobre el agua): linea **80 + N** (`Voces.BASE_BARQUERO`,
+  `esBarquero`; `habla_barquero` en `rey_voces.json`; subtitulos `darkcraft.barquero.voz.N`): 1 al empezar (no la repite en 4
+  min), 2 al llamar a sus pasajeros, 3 si cae su presa, 4 la primera vez que engancha a alguien con el bichero y 5 al morir.
+- **Barra** (`GuardianCliente`, arte de `tools/hud/barra_guardianes.py` "barquero": el remo tumbado con anillas de hierro, la
+  pala en la punta derecha y el garfio en la izquierda, cadenitas con monedas colgando y la linterna de almas en el centro;
+  relleno de agua negra con ondas y destellos de almas; gotas, una moneda y chispas de almas). **Musica**: "Demon Lord" de
+  Scrabbit (CC-BY 4.0, id `barquero`, tema 35 de `ClientMusic.boss`).
+- **Al caer** (lo reparte `valdrenn/Guardianes`): el cartel de JEFE ABATIDO con 9500 ecos, la hazana `barquero` ("La ultima
+  travesia", con su entrada del diario) y el bestiario; deja dos piedras de forja II, una III y la ceniza de las llamas.
+  **La laguna queda en paz** (`LagunaNegra.liberar`, desde `Puestos.alCaer`): los pasajeros que siguen flotando se deshacen en
+  almas y los **faroles de almas** de la laguna (`faroles`: postes, muelle, camino, la proa) **se vuelven faroles de verdad**
+  (`LagunaNegra.paz` lo repasa cada 5 s con alguien cerca); los pasajeros **ya no vuelven**: el sitio `laguna` se registra con
+  `activo` = los del grupo `pasajeros` solo mientras el Barquero no este muerto (`LagunaNegra.enPaz`). Los dos del muelle siguen.
+- **Los puestos de la laguna** (`MorvainEnemigos`, sitio `laguna`, 7, de `LagunaNegra.esperas`): dos flotando junto al muelle
+  (se alzan al pasar) y sus pasajeros: cuatro flotando alrededor del embarcadero, a seis o siete de sus tablas (no se alzan con
+  la pelea: los llama el), y el del fuego fatuo de pie en el islote del norte, entre las estacas.
+- Sonidos (ElevenLabs, flow `hDtV8BlS51uvJUsEJk6K`, `TOMAS_SFX`): `barquero_grito` (3 y 4), `barquero_remazo` (3 y 1),
+  `barquero_barrido` (4 y 1), `barquero_bichero` (4 y 2), `barquero_linterna` (1 y 4), `barquero_dolor` (2, 3 y 1),
+  `barquero_muerte` (4 y 2), `barquero_remo` (2 y 4; empieza en el segundo 0,8 de la toma: `INICIO`).
+- Comandos `/darkcraft laguna [ir <sitio> | enemigos [volver | fuera | sacar]]` y `/darkcraft barquero [ir | vencer | volver]`
+  (sin mas: como esta y los faroles; `volver` le pone en su barca, vuelven sus pasajeros y los faroles de almas).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_laguna carpeta` (`-Dcaja=...`): la laguna, el embarcadero, el muelle, la
+  barca y el camino con las marcas de los podridos (P); si se llega a pie desde la entrada (junto al santuario), cuantas tablas
+  del embarcadero se pisan, que el Barquero cabe en su barca y que ningun podrido esta metido en un bloque.
+- Pruebas: servidor, lineas `Morvain, la laguna negra: ...` (el arcon de la barca, el agua, las tablas del embarcadero, los
+  faroles; vistas `morvain_laguna*.png`), `Morvain, la laguna negra, sus podridos: ...`, `Morvain, el Barquero: ...` (sale de
+  vigia en su barca; al verle se yergue, ruge al acabar la frase y salta a las tablas sin meterse en nada; cada accion acaba;
+  los golpes a un marchito; el bichero engancha, arrastra y quema; el anillo llega de pie y saltando no), `Morvain, el
+  Barquero a media vida: ...` (se alzan los que flotan; sin ellos suben del agua a las tablas), `Morvain, el Barquero cae: ...`
+  (la laguna en paz, los faroles de verdad, ya no salen pasajeros) y `Morvain, el Barquero vuelve: ...`; cliente, tramo
+  `barquero()` despues de la aldea de los pilotes: la laguna desde el santuario (`cliente_mv121`), el embarcadero desde el muelle
+  (`mv122`), el Barquero de vigia (`mv123`), en supervivencia habla (`mv124`), ruge con su barra (`mv125`), salta (`mv126`) y
+  cae en las tablas (`mv127`), sus golpes (`mv128..mv131`: remazo, barrido, golpe de linterna, el anillo), el bichero y la
+  linterna (`mv132`, `mv133`), llama a sus pasajeros (`mv134`), cae (`mv135`), el cartel (`mv136`), los faroles en paz (`mv137`)
+  y el bestiario (`mv138`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1762,7 +1838,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h y la 7i arriba; despues, region a region su contenido).
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i y la 7j arriba; despues, region a region su contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

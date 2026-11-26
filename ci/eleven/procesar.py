@@ -69,6 +69,8 @@ TOMAS_MOLINERA = {n: "a" for n in range(1, 6)}
 # Maese Odran, el Verdugo de la Arboleda (parte 7h; voz "Declan Graves - Haunted Rasps and Old World Dread"): las tomas a
 # (la 3b dice la frase en tres trozos, con un silencio delante)
 TOMAS_VERDUGO = {n: "a" for n in range(1, 6)}
+# el Barquero de la Laguna Negra (parte 7j; voz "Gravel Midnight - Deep Character Voice"): las tomas a
+TOMAS_BARQUERO = {n: "a" for n in range(1, 6)}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -198,12 +200,18 @@ SFX = {
     "podrido_muerte": (2.6, 0.7, -16), "podrido_alzarse": (1.8, 0.5, -16), "podrido_vomito": (1.6, 0.4, -15),
     "podrido_fatuo": (1.3, 0.4, -15), "podrido_gas": (2.0, 0.8, -17), "podrido_aplastar": (1.0, 0.3, -14),
     "pantano_ambiente": (20.0, 2.0, -27),
+    # el Barquero de la Laguna Negra (parte 7j): el grito sobre el agua, el remo de plano contra el agua, el barrido, el
+    # garfio que se clava, la linterna que estalla en llamas de almas, el dolor, la muerte (se hunde y la llama se apaga) y
+    # el remo en el agua negra (mientras espera en su barca)
+    "barquero_grito": (2.4, 0.6, -13), "barquero_remazo": (1.4, 0.5, -13), "barquero_barrido": (0.9, 0.3, -14),
+    "barquero_bichero": (1.2, 0.3, -15), "barquero_linterna": (1.9, 0.6, -14), "barquero_dolor": (0.75, 0.2, -15),
+    "barquero_muerte": (3.4, 0.9, -14), "barquero_remo": (4.4, 1.0, -21),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
            "barco_vuelo": 3.0, "molino_viento": 1.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
-INICIO = {"barco_atraca": 3.8}
+INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
 GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
@@ -346,6 +354,11 @@ TOMAS_SFX = {
     "podrido_gemido": (3, 2, 1), "podrido_alerta": (1, 4), "podrido_dolor": (1, 3), "podrido_muerte": (2, 3),
     "podrido_alzarse": (2, 4), "podrido_vomito": (3, 1), "podrido_fatuo": (2, 3, 1), "podrido_gas": (1, 4),
     "podrido_aplastar": (4, 2), "pantano_ambiente": (2, 3),
+    # el Barquero: los dos gritos que se oyen (la 3, la mas fuerte, y la 4, que crece; la 1 y la 2 apenas suenan); los dos
+    # remazos con mas golpe; los dos barridos mas fuertes; los dos garfios que antes pegan; las dos llamaradas mas largas;
+    # tres quejidos; las dos muertes con mas cola; y los dos remos que reman de verdad (la 2, varias paladas; la 4, una)
+    "barquero_grito": (3, 4), "barquero_remazo": (3, 1), "barquero_barrido": (4, 1), "barquero_bichero": (4, 2),
+    "barquero_linterna": (1, 4), "barquero_dolor": (2, 3, 1), "barquero_muerte": (4, 2), "barquero_remo": (2, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -499,6 +512,25 @@ def voz_verdugo(src, dst):
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA
+
+
+def voz_barquero(src, dst):
+    """
+    El Barquero de la Laguna Negra: un muerto hueco que habla desde el agua. Algo mas grave, una segunda voz una octava por
+    debajo muy baja (el hueco del pecho), un poco de raspa y el eco sobre el agua de la laguna (largo y apagado: sin paredes).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=2[v1][v2];"
+        "[v1]asetrate=44100*0.93,aresample=44100,atempo=1.0753[baja];"
+        "[v2]asetrate=44100*0.5,aresample=44100,atempo=2.0,lowpass=f=600,volume=0.3[honda];"
+        "[baja][honda]amix=inputs=2:weights=1 0.45:normalize=0,"
+        "asoftclip=type=atan:threshold=0.8,equalizer=f=140:t=q:w=1.0:g=2.5,highshelf=f=6000:g=-3,"
+        "aecho=0.8:0.35:120|260|480:0.20|0.12|0.07,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.1
 
 
 def sonoridad(f):
@@ -723,6 +755,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO verdugo {n}: {e}")
+    # el Barquero de la Laguna Negra (parte 7j)
+    bar = os.path.join(ASSETS, "sounds", "barquero")
+    os.makedirs(bar, exist_ok=True)
+    dur_b, hab_b = {}, {}
+    for n, toma in sorted(TOMAS_BARQUERO.items()):
+        src = os.path.join(MASTER, "barquero", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(bar, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_barquero(src, dst)
+            dur_b[n] = round(duracion(dst), 2)
+            hab_b[n] = round(min(h, dur_b[n]), 2)
+            print(f"barquero {n:2d}: {dur_b[n]} s (habla hasta {hab_b[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO barquero {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -753,7 +804,7 @@ def main():
     with open(os.path.join(ASSETS, "rey_voces.json"), "w") as fh:
         json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g, "capitan": dur_c, "habla_capitan": hab_c,
                    "sombra": dur_s, "habla_sombra": hab_s, "molinera": dur_m, "habla_molinera": hab_m,
-                   "verdugo": dur_v, "habla_verdugo": hab_v}, fh)
+                   "verdugo": dur_v, "habla_verdugo": hab_v, "barquero": dur_b, "habla_barquero": hab_b}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

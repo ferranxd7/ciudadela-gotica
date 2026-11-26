@@ -16,7 +16,11 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   tornapuntas en las puntas y, en el centro, el lazo que cuelga con la capucha del verdugo y sus ojos encendidos dentro;
   relleno de una soga empapada de sangre que gira; hebras de canamo y hojas secas que caen al recibir dano.
 
-Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png y verdugo_barra.png (256x128):
+  El Barquero de la Laguna Negra (parte 7j): el remo tumbado (la pertiga mojada con anillas de hierro, la pala en la punta
+  derecha y el garfio en la izquierda), cadenitas con monedas viejas colgando y la linterna de almas en el centro; relleno
+  de agua negra con ondas y destellos de almas; gotas, una moneda y chispas de almas que caen al recibir dano.
+
+Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png y barquero_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -503,6 +507,162 @@ def fibras():
     return img
 
 
+# ---------------------------------------------------------------- el Barquero de la Laguna Negra (parte 7j)
+
+W_DD, W_D, W, W_L = hexc("0e0b09"), hexc("1f1812"), hexc("352a1f"), hexc("4f4030")
+I_DD, I_D, I, I_L = hexc("101013"), hexc("26262c"), hexc("3c3c45"), hexc("63636e")
+A_D, A, A_L, A_H = hexc("0f4d5e"), hexc("2aa3b8"), hexc("7fe3f2"), hexc("e6fdff")
+B_DD, B_D, B, B_L = hexc("030607"), hexc("0a1317"), hexc("122228"), hexc("1f3a44")
+G_D, G, G_L = hexc("6b5420"), hexc("a07d28"), hexc("e0bf4a")
+
+
+def marco_barquero():
+    """El remo tumbado: la pertiga de madera mojada con anillas de hierro, la pala ancha en la punta derecha y el garfio de
+    hierro en la izquierda; de la pertiga cuelgan cadenitas con monedas viejas (el peaje); en el centro, la linterna de
+    almas con su asa, la reja de hierro y el fuego azul palido dentro."""
+    rnd = random.Random(97)
+    n = noise2(67)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 4, FX1 + 3, FY0 - 4, FY1 + 3
+    rect(img, x0, y0, x1, y1, OUT)
+    # la pertiga: vetas a lo largo, oscura y mojada (mas clara arriba, donde brilla el agua)
+    for y in range(y0 + 1, y1):
+        for x in range(x0 + 1, x1):
+            v = n(x * 0.06, y * 0.9)
+            c = W_D if v < 0.4 else W if v < 0.82 else W_L
+            if y == y0 + 1:
+                c = mix(c, B_L, 0.35)
+            if (x * 7 + y * 5) % 67 == 0:
+                c = W_DD
+            put(img, x, y, c)
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, W_DD)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # las anillas de hierro
+    for x in range(x0 + 22, x1 - 20, 34):
+        if abs(x - FW // 2) < 22:
+            continue
+        for y in range(y0, y1 + 1):
+            if FY0 - 1 <= y <= FY1:
+                continue
+            for k in range(3):
+                put(img, x + k, y, I_L if k == 0 else I if k == 1 else I_D)
+        put(img, x - 1, y0, OUT)
+        put(img, x + 3, y1, OUT)
+    # la pala (punta derecha): ancha, de arriba abajo, con su banda de hierro y el borde comido
+    px0 = FW - 14
+    for y in range(y0 - 7, y1 + 8):
+        ancho = 12 - (abs(y - (y0 + y1) // 2) // 4)
+        for dx in range(ancho):
+            c = W if dx > 2 else W_L if dx == 1 else W_D
+            if dx == 0:
+                c = I_L
+            if (y * 3 + dx * 5) % 17 == 0:
+                c = W_DD
+            put(img, px0 + dx, y, c)
+        put(img, px0 - 1, y, OUT)
+        put(img, px0 + ancho, y, OUT)
+    for dx in range(-1, 13):
+        put(img, px0 + dx, y0 - 8, OUT)
+        put(img, px0 + dx, y1 + 8, OUT)
+    # el garfio (punta izquierda): la punta hacia fuera y el gancho que sube y vuelve
+    for x in range(0, 9):
+        for y in (y0 + 3, y0 + 4):
+            put(img, x, y, I_L if y == y0 + 3 else I_D)
+        put(img, x, y0 + 2, OUT)
+        put(img, x, y0 + 5, OUT)
+    put(img, 0, y0 + 3, I_DD)
+    for y in range(y0 - 6, y0 + 3):
+        put(img, 5, y, I)
+        put(img, 6, y, I_D)
+        put(img, 4, y, OUT)
+        put(img, 7, y, OUT)
+    for x in range(6, 11):
+        put(img, x, y0 - 6, I_L)
+        put(img, x, y0 - 7, OUT)
+        put(img, x, y0 - 5, I_D if x > 7 else I)
+    put(img, 10, y0 - 4, I)
+    put(img, 11, y0 - 5, OUT)
+    # las cadenitas con monedas que cuelgan bajo la pertiga
+    for xx in (x0 + 40, x0 + 64, x1 - 70, x1 - 46, x1 - 30):
+        largo = rnd.randint(3, 5)
+        for i in range(largo):
+            put(img, xx, y1 + 1 + i, I if i % 2 == 0 else I_D)
+        cy = y1 + 1 + largo
+        for dx in (-1, 0, 1):
+            for dy in (0, 1, 2):
+                if abs(dx) + abs(dy - 1) <= 1:
+                    put(img, xx + dx, cy + dy, G_L if dx < 0 or dy == 0 else G)
+        put(img, xx + 1, cy + 2, G_D)
+    # en el centro: la linterna de almas (el asa, la tapa, la reja y el fuego)
+    cx = FW // 2
+    # el asa (un aro) que asoma por encima de la pertiga
+    for dx in range(-3, 4):
+        put(img, cx + dx, 0, OUT)
+    for y in range(1, 4):
+        put(img, cx - 3, y, I)
+        put(img, cx + 3, y, I_D)
+        put(img, cx - 4, y, OUT)
+        put(img, cx + 4, y, OUT)
+    for dx in range(-2, 3):
+        put(img, cx + dx, 1, I_L)
+    # el cuerpo: de y 4 a y 17 (sobre la pertiga), 15 de ancho
+    for y in range(4, 18):
+        for dx in range(-7, 8):
+            borde = abs(dx) == 7 or y in (4, 17)
+            tapa = y in (5, 6, 15, 16)
+            barra = dx in (-6, 0, 6)
+            if borde:
+                c = OUT
+            elif tapa:
+                c = I_L if y in (5, 15) else I_D
+            elif barra:
+                c = I if dx != 6 else I_D
+            else:
+                # el fuego de almas: blanco en el centro abajo, azul por los bordes
+                d = math.hypot(dx * 0.9, (y - 12) * 0.8)
+                c = A_H if d < 1.6 else A_L if d < 3.0 else A if d < 4.6 else A_D
+            put(img, cx + dx, y, c)
+    return img
+
+
+def relleno_barquero(k):
+    """Agua negra que corre, con ondas y destellos de almas azules que pasan."""
+    n = noise2(151)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            t = 0.2 + 0.45 * mid + 0.4 * (n((x - k * 4) * 0.09, y * 0.5) - 0.5)
+            c = mix(B_D, B, max(0.0, min(1.0, t * 1.4)))
+            onda = (x - k * 4 + int(3 * math.sin((x + y * 3) * 0.2))) % 23
+            if onda in (0, 1) and 1 <= y <= 5:
+                c = mix(c, B_L, 0.7)
+            if y == 0:
+                c = mix(c, B_L, 0.35)
+            if y == 6:
+                c = mix(c, B_DD, 0.6)
+            # los destellos de almas
+            if (x * 11 + y * 7 - k * 29) % 97 == 0 and 1 <= y <= 5:
+                c = A_L
+            elif (x * 11 + y * 7 - k * 29) % 97 == 1 and 1 <= y <= 5:
+                c = A
+            img.putpixel((x, y), c)
+    return img
+
+
+def gotas():
+    """Lo que cae al recibir dano: gotas de agua negra, una moneda y una chispa de almas."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = ([".b.", "bBb", ".b."], ["b.", "B.", "b."], [".g.", "gGg", ".g."], [".a.", "aAa", ".a."])
+    col = {"b": B_L, "B": A_D, "g": G, "G": G_L, "a": A, "A": A_H}
+    for k, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, k * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 # ---------------------------------------------------------------- comun
 
 
@@ -541,6 +701,7 @@ if __name__ == "__main__":
         "corteza": atlas(marco_corteza(), relleno_corteza, hueco("050a06", "121c14"), rastro("f2fff6", "b9f0c8"), hojas()),
         "molinera": atlas(marco_molinera(), relleno_molinera, hueco("0b0908", "1c1815"), rastro("f6f2e6", "d6cdb6"), ceniza()),
         "verdugo": atlas(marco_verdugo(), relleno_verdugo, hueco("0a0606", "1a1110"), rastro("f6ece2", "d8b9a6"), fibras()),
+        "barquero": atlas(marco_barquero(), relleno_barquero, hueco("040607", "0f1a1e"), rastro("eefcff", "a9dbe6"), gotas()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

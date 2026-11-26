@@ -169,5 +169,16 @@
     "aviso": "Philémon Weber (Helmet)",
     "uso": "Maese Odran, el Verdugo de la Arboleda (el jefe del Bosque Muerto de Morvain)",
     "lufs": -16
+  },
+  {
+    "id": "barquero",
+    "pagina": "https://opengameart.org/content/demon-lord",
+    "busca": "demon",
+    "titulo": "Demon Lord",
+    "autor": "Scrabbit",
+    "licencia": "CC-BY 4.0",
+    "aviso": "Music by Scrabbit (OpenGameArt)",
+    "uso": "El Barquero de la Laguna Negra (el jefe del Pantano Podrido de Morvain)",
+    "lufs": -16
   }
 ]

@@ -803,7 +803,7 @@ public final class Pilotes {
     // ------------------------------------------------------------------ piezas ya decididas
 
     /** Una lista de bloques ya decididos: cada chunk escribe lo que le cae. */
-    private static final class Lista {
+    static final class Lista {
         final LinkedHashMap<Long, BlockState> b = new LinkedHashMap<>();
         final Set<Long> une = new HashSet<>();
 

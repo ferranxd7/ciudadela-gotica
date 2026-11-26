@@ -3298,5 +3298,149 @@
         "stream": true
       }
     ]
+  },
+  "sfx.barquero_grito": {
+    "subtitle": "subtitles.darkcraft.sfx.barquero_grito",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barquero_grito_1"
+      },
+      {
+        "name": "darkcraft:sfx/barquero_grito_2"
+      }
+    ]
+  },
+  "sfx.barquero_remazo": {
+    "subtitle": "subtitles.darkcraft.sfx.barquero_remazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barquero_remazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/barquero_remazo_2"
+      }
+    ]
+  },
+  "sfx.barquero_barrido": {
+    "subtitle": "subtitles.darkcraft.sfx.barquero_barrido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barquero_barrido_1"
+      },
+      {
+        "name": "darkcraft:sfx/barquero_barrido_2"
+      }
+    ]
+  },
+  "sfx.barquero_bichero": {
+    "subtitle": "subtitles.darkcraft.sfx.barquero_bichero",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barquero_bichero_1"
+      },
+      {
+        "name": "darkcraft:sfx/barquero_bichero_2"
+      }
+    ]
+  },
+  "sfx.barquero_linterna": {
+    "subtitle": "subtitles.darkcraft.sfx.barquero_linterna",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barquero_linterna_1"
+      },
+      {
+        "name": "darkcraft:sfx/barquero_linterna_2"
+      }
+    ]
+  },
+  "sfx.barquero_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.barquero_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barquero_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/barquero_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/barquero_dolor_3"
+      }
+    ]
+  },
+  "sfx.barquero_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.barquero_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barquero_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/barquero_muerte_2"
+      }
+    ]
+  },
+  "sfx.barquero_remo": {
+    "subtitle": "subtitles.darkcraft.sfx.barquero_remo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/barquero_remo_1"
+      },
+      {
+        "name": "darkcraft:sfx/barquero_remo_2"
+      }
+    ]
+  },
+  "musica.barquero": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/barquero",
+        "stream": true
+      }
+    ]
+  },
+  "barquero.voz.1": {
+    "subtitle": "subtitles.darkcraft.barquero.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:barquero/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "barquero.voz.2": {
+    "subtitle": "subtitles.darkcraft.barquero.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:barquero/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "barquero.voz.3": {
+    "subtitle": "subtitles.darkcraft.barquero.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:barquero/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "barquero.voz.4": {
+    "subtitle": "subtitles.darkcraft.barquero.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:barquero/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "barquero.voz.5": {
+    "subtitle": "subtitles.darkcraft.barquero.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:barquero/voz_5",
+        "stream": false
+      }
+    ]
   }
 }

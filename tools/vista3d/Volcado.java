@@ -480,6 +480,39 @@ public class Volcado {
                 for (var o : v.esperas()) marcas.put("P" + (n++), new int[]{o.x(), o.y() + 1, o.z()});
                 andarPilotes(lvl, v);
             }
+            case "morvain_laguna" -> {
+                // la Laguna Negra, en el Pantano Podrido (parte 7j): la laguna, el embarcadero, el muelle, la barca del Barquero,
+                // el camino desde el santuario del Embarcadero Podrido y el arco de la otra orilla (-Dcaja=x0,z0,x1,z1 para un trozo)
+                int LX = com.darkcraft.morvain.LagunaNegra.CX, LZ = com.darkcraft.morvain.LagunaNegra.CZ;
+                String[] k = System.getProperty("caja", (LX - 72) + "," + (LZ - 46) + "," + (LX + 48) + "," + (LZ + 46)).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 50);
+                com.darkcraft.morvain.LagunaNegra v = com.darkcraft.morvain.LagunaNegra.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("La laguna negra: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " podridos; "
+                        + v.tablas + " tablas, " + v.pilotes + " pilotes, " + v.postes + " postes; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas()) marcas.put("P" + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarLaguna(lvl, v);
+            }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);
@@ -510,6 +543,61 @@ public class Volcado {
                 System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z());
             }
             // de pie cabe (dos de alto: 1,95); flotando, el fondo bajo sus pies
+            for (int dy = 0; dy < 2; dy++)
+                if (choca(mundo.en(o.x(), o.y() + dy, o.z()))) {
+                    chocan++;
+                    System.out.println("  " + o.grupo() + " metido en un bloque: " + o.x() + "," + (o.y() + dy) + "," + o.z() + " " + mundo.en(o.x(), o.y() + dy, o.z()));
+                }
+            if (!choca(mundo.en(o.x(), o.y() - 1, o.z()))) System.out.println("  " + o.grupo() + " sin suelo: " + o.x() + "," + o.y() + "," + o.z());
+        }
+        System.out.println("podridos: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan);
+    }
+
+    /**
+     * La Laguna Negra (parte 7j): se llega a pie desde la entrada (junto al santuario) al muelle y al embarcadero; la barca no
+     * (esta en el agua: el Barquero salta); el Barquero cabe en su barca (1,2 x 3,6) y cada podrido en su sitio.
+     */
+    static void andarLaguna(WorldGenLevel lvl, com.darkcraft.morvain.LagunaNegra v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+        int[] e = v.sitio("entrada");
+        int X = com.darkcraft.morvain.LagunaNegra.CX, Z = com.darkcraft.morvain.LagunaNegra.CZ;
+        var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], X - 70, Z - 46, X + 48, Z + 46, 1_500_000);
+        StringBuilder sb = new StringBuilder("a pie desde la entrada: " + z0.celdas() + " celdas;");
+        for (String s : v.sitios().keySet()) {
+            int[] q = v.sitio(s);
+            sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+        }
+        System.out.println(sb);
+        // el embarcadero entero: cuantas de sus tablas se pisan a pie
+        int pisa = 0, tablas = 0;
+        for (int u = -com.darkcraft.morvain.LagunaNegra.R_PLATAFORMA; u <= com.darkcraft.morvain.LagunaNegra.R_PLATAFORMA; u++)
+            for (int w = -com.darkcraft.morvain.LagunaNegra.R_PLATAFORMA; w <= com.darkcraft.morvain.LagunaNegra.R_PLATAFORMA; w++) {
+                if (!choca(mundo.en(X + u, com.darkcraft.morvain.LagunaNegra.PASO, Z + w))) continue;
+                tablas++;
+                if (z0.alcanza(X + u, com.darkcraft.morvain.LagunaNegra.PASO + 1, Z + w, 0.6)) pisa++;
+            }
+        System.out.println("el embarcadero: " + tablas + " tablas, se pisan a pie " + pisa);
+        // el Barquero en su barca: el suelo bajo sus pies y nada en su caja (1,2 x 3,6: cuatro de alto)
+        int[] b = v.sitio("barquero");
+        int dentro = 0;
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dz = -1; dz <= 1; dz++)
+                for (int dy = 0; dy < 4; dy++)
+                    if ((dx == 0 || dz == 0) && choca(mundo.en(b[0] + dx, b[1] + dy, b[2] + dz))) {
+                        dentro++;
+                        System.out.println("  el Barquero choca con " + mundo.en(b[0] + dx, b[1] + dy, b[2] + dz) + " en " + (b[0] + dx) + "," + (b[1] + dy) + "," + (b[2] + dz));
+                    }
+        System.out.println("el Barquero: en " + b[0] + "," + b[1] + "," + b[2] + ", suelo " + mundo.en(b[0], b[1] - 1, b[2]) + ", bloques en su caja " + dentro);
+        int malos = 0, chocan = 0;
+        for (var o : v.esperas()) {
+            boolean agua = o.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO;
+            if (agua && !mundo.en(o.x(), o.y(), o.z()).is(Blocks.WATER))
+                System.out.println("  " + o.grupo() + " flotando sin agua: " + o.x() + "," + o.y() + "," + o.z() + " " + mundo.en(o.x(), o.y(), o.z()));
+            if (!agua && !z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                malos++;
+                System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z());
+            }
             for (int dy = 0; dy < 2; dy++)
                 if (choca(mundo.en(o.x(), o.y() + dy, o.z()))) {
                     chocan++;

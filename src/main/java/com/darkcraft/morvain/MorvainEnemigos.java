@@ -29,6 +29,11 @@ import java.util.List;
  * <li><b>La Aldea de los Pilotes</b> (sitio {@value #PILOTES}, parte 7i, en el Pantano Podrido): los podridos que apunta el plano
  * ({@link Pilotes#esperas}): flotando boca abajo junto a las pasarelas, en la plaza, dentro de cada choza, rezando en la
  * capilla hundida y en el embarcadero.</li>
+ * <li><b>La Laguna Negra</b> (sitio {@value #LAGUNA}, parte 7j): los podridos de la laguna ({@link LagunaNegra#esperas}): dos
+ * flotando junto al muelle (se alzan al pasar) y los <b>pasajeros</b> del Barquero (cuatro flotando alrededor del embarcadero
+ * y el del fuego fatuo en el islote del norte), que solo vuelven mientras el Barquero sigue en pie.</li>
+ * <li><b>La barca</b> (sitio {@value #BARCA}, parte 7j): el Barquero, de pie en su barca con la linterna en alto (un jefe:
+ * cae una vez). Vencido, la laguna queda en paz ({@link LagunaNegra#liberar}).</li>
  * </ul>
  * Nadie a menos de 18 bloques del arco ni de 14 de un santuario.
  */
@@ -36,15 +41,17 @@ public final class MorvainEnemigos {
     private MorvainEnemigos() {}
 
     public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo",
-            PILOTES = "pilotes";
-    static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido";
+            PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca";
+    static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
+            BARQUERO = "barquero";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
     private static final int G = Marchito.GUADANA, F = Marchito.FAROL, C = Marchito.CAMPANA;
 
     private static final List<Puesto> VELMOR_P = new ArrayList<>(), LLANURAS_P = new ArrayList<>(), MOLINO_P = new ArrayList<>(),
-            ARBOLEDA_P = new ArrayList<>(), PATIBULO_P = new ArrayList<>(), PILOTES_P = new ArrayList<>();
+            ARBOLEDA_P = new ArrayList<>(), PATIBULO_P = new ArrayList<>(), PILOTES_P = new ArrayList<>(), LAGUNA_P = new ArrayList<>(),
+            BARCA_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -126,6 +133,13 @@ public final class MorvainEnemigos {
         // ---- la Aldea de los Pilotes (parte 7i): los podridos que apunta el plano
         for (Pilotes.Espera e : Pilotes.get().esperas())
             PILOTES_P.add(new Puesto(PODRIDO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
+        // ---- la Laguna Negra (parte 7j): los podridos de la laguna (los del muelle y los pasajeros del Barquero)
+        LagunaNegra ln = LagunaNegra.get();
+        for (LagunaNegra.Espera e : ln.esperas())
+            LAGUNA_P.add(new Puesto(PODRIDO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
+        // ---- la barca (parte 7j): el Barquero de pie en ella, la linterna en alto, mirando al embarcadero (al oeste)
+        int[] bq = ln.sitio("barquero");
+        BARCA_P.add(new Puesto(BARQUERO, 0, bq[0], bq[1], bq[2], OESTE, REZA, 0, Puestos.JEFE));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -138,6 +152,11 @@ public final class MorvainEnemigos {
         return 0;
     }
 
+    /** El numero del puesto del Barquero en el sitio de la barca. */
+    public static int barquero() {
+        return 0;
+    }
+
     /** Lo apunta el mod al arrancar. */
     public static void registrar() {
         Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
@@ -145,6 +164,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(AHORCADO, DarkCraftMod.AHORCADO);
         Puestos.tipo(VERDUGO, DarkCraftMod.VERDUGO);
         Puestos.tipo(PODRIDO, DarkCraftMod.PODRIDO);
+        Puestos.tipo(BARQUERO, DarkCraftMod.BARQUERO);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -153,6 +173,9 @@ public final class MorvainEnemigos {
         Puestos.registrar(ARBOLEDA, ARBOLEDA_P, Morvain::es, (l, p) -> !"colgados".equals(p.grupo()) || !Arboleda.cuentaCerrada(l.getServer()));
         Puestos.registrar(PATIBULO, PATIBULO_P, Morvain::es);
         Puestos.registrar(PILOTES, PILOTES_P, Morvain::es);
+        // los pasajeros del Barquero solo mientras vive el (vencido, la laguna queda en paz: ya no vuelven)
+        Puestos.registrar(LAGUNA, LAGUNA_P, Morvain::es, (l, p) -> !"pasajeros".equals(p.grupo()) || !LagunaNegra.enPaz(l.getServer()));
+        Puestos.registrar(BARCA, BARCA_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -160,6 +183,9 @@ public final class MorvainEnemigos {
             // y al caer el Verdugo, los colgados de la arboleda descansan
             if (e instanceof com.darkcraft.enemigos.Verdugo && PATIBULO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
                 Arboleda.liberar(sl);
+            // y al caer el Barquero, la laguna queda en paz
+            if (e instanceof com.darkcraft.enemigos.Barquero && BARCA.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
+                LagunaNegra.liberar(sl);
         });
     }
 
@@ -181,6 +207,16 @@ public final class MorvainEnemigos {
     public static List<Puesto> pilotes() {
         preparar();
         return List.copyOf(PILOTES_P);
+    }
+
+    public static List<Puesto> laguna() {
+        preparar();
+        return List.copyOf(LAGUNA_P);
+    }
+
+    public static List<Puesto> barca() {
+        preparar();
+        return List.copyOf(BARCA_P);
     }
 
     public static List<Puesto> velmor() {
@@ -355,6 +391,103 @@ public final class MorvainEnemigos {
         return s;
     }
 
+    /** {@code /darkcraft laguna [ir <sitio> | enemigos [volver | fuera | sacar]]} (parte 7j). */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoLaguna() {
+        return net.minecraft.commands.Commands.literal("laguna")
+                .executes(c -> decir(c, estadoLaguna(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irLaguna(c.getSource(), "entrada"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(LagunaNegra.get().sitios().keySet(), b))
+                                .executes(c -> irLaguna(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoLaguna(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), LAGUNA, false);
+                            return decir(c, "vuelven todos los podridos de la laguna");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), LAGUNA, true);
+                            return decir(c, "fuera todos los podridos de la laguna");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            net.minecraft.server.level.ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, LAGUNA).size();
+                            return decir(c, "fuera " + n);
+                        })));
+    }
+
+    private static int irLaguna(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = LagunaNegra.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + LagunaNegra.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando al embarcadero (desde el embarcadero, a la barca)
+        double tx = LagunaNegra.CX, tz = LagunaNegra.CZ;
+        if (Math.hypot(s[0] - tx, s[2] - tz) < 3) tx += LagunaNegra.BARCA_U;
+        float giro = (float) (Math.toDegrees(Math.atan2(tz - s[2], tx - s[0])) - 90.0);
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 8f);
+        return 1;
+    }
+
+    /** Cuantos podridos de la laguna quedan y cuantos andan fuera (y como esta la laguna, si esta cargada). */
+    public static String estadoLaguna(net.minecraft.server.MinecraftServer srv) {
+        String s = "laguna negra: quedan " + Puestos.quedan(srv, LAGUNA) + " de " + LAGUNA_P.size() + " (fuera " + Puestos.fuera(LAGUNA) + ")";
+        var m = Morvain.nivel(srv);
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(LagunaNegra.CX + LagunaNegra.BARCA_U, LagunaNegra.PASO, LagunaNegra.CZ)))
+            s += "; " + LagunaNegra.resumen(m);
+        return s;
+    }
+
+    /** {@code /darkcraft barquero [ir | vencer | volver]}: como esta el Barquero, llevar al embarcadero, vencerle o que vuelva. */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoBarquero() {
+        return net.minecraft.commands.Commands.literal("barquero")
+                .executes(c -> decir(c, estadoBarquero(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> {
+                    var sp = c.getSource().getPlayerOrException();
+                    var m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    // al embarcadero, junto al muelle, mirando a la barca (al este)
+                    int[] e = LagunaNegra.get().sitio("ante_embarcadero");
+                    sp.teleportTo(m, e[0] + 0.5, e[1] + 0.05, e[2] + 0.5, -90f, 5f);
+                    return decir(c, estadoBarquero(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(BARCA, barquero());
+                    if (e != null) e.kill();
+                    else {
+                        Puestos.marcar(srv, BARCA, barquero(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "barquero");
+                        var m = Morvain.nivel(srv);
+                        if (m != null) LagunaNegra.liberar(m);
+                    }
+                    return decir(c, estadoBarquero(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, BARCA, barquero(), false);
+                    // los pasajeros vuelven a flotar en cuanto salgan (y los faroles, de almas: los vuelve a poner la laguna al generarse)
+                    Puestos.todos(srv, LAGUNA, false);
+                    var m = Morvain.nivel(srv);
+                    if (m != null) LagunaNegra.almas(m);
+                    return decir(c, estadoBarquero(srv));
+                }));
+    }
+
+    /** Como esta el Barquero (para el comando y las pruebas). */
+    public static String estadoBarquero(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(BARCA, barquero());
+        String s = "el Barquero: " + (LagunaNegra.enPaz(srv) ? "caido (la laguna esta en paz)" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Barquero b) s += ", " + b.estado();
+        var m = Morvain.nivel(srv);
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(LagunaNegra.CX, LagunaNegra.PASO, LagunaNegra.CZ))) s += "; " + LagunaNegra.faroles(m);
+        return s;
+    }
+
     /** {@code /darkcraft molinera [ir | vencer | volver]}: como esta la Molinera, llevar ante la era, vencerla o que vuelva. */
     public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoMolinera() {
         return net.minecraft.commands.Commands.literal("molinera")
@@ -459,6 +592,8 @@ public final class MorvainEnemigos {
         todos.addAll(ARBOLEDA_P);
         todos.addAll(PATIBULO_P);
         todos.addAll(PILOTES_P);
+        todos.addAll(LAGUNA_P);
+        todos.addAll(BARCA_P);
         for (Puesto p : todos) {
             if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
             for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
@@ -469,6 +604,7 @@ public final class MorvainEnemigos {
         for (Puesto p : ARBOLEDA_P) if (p.postura() == Enemigo.COLGADO) colg++;
         return VELMOR_P.size() + " en Velmor (" + camp + " campaneros), " + LLANURAS_P.size() + " por las llanuras, " + MOLINO_P.size()
                 + " en el molino, " + ARBOLEDA_P.size() + " en la arboleda (" + colg + " colgados) y " + PATIBULO_P.size()
-                + " en el patibulo, " + PILOTES_P.size() + " en la aldea de los pilotes; cerca del arco o de un santuario " + cerca;
+                + " en el patibulo, " + PILOTES_P.size() + " en la aldea de los pilotes, " + LAGUNA_P.size() + " en la laguna negra y "
+                + BARCA_P.size() + " en la barca; cerca del arco o de un santuario " + cerca;
     }
 }

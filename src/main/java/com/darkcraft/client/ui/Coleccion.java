@@ -29,7 +29,7 @@ public final class Coleccion {
     public static final String[] BESTIARIO = {"hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon", "capitan",
             "escudero", "caballero_espada", "caballero_alabarda", "caballero_ballesta", "arquero", "perro", "espectro_cortesano",
             "espectro_dama", "espectro_vigia", "capitan_elite", "brandt", "corteza", "rey", "gavran", "marchito_guadana", "marchito_farol",
-            "marchito_campana", "molinera", "ahorcado_garras", "ahorcado_soga", "verdugo", "podrido", "podrido_fatuo", "podrido_hinchado"};
+            "marchito_campana", "molinera", "ahorcado_garras", "ahorcado_soga", "verdugo", "podrido", "podrido_fatuo", "podrido_hinchado", "barquero"};
 
     /** El objeto de una clave de la coleccion (los libros de la cronica, con su texto). */
     public static ItemStack objeto(String clave) {
@@ -118,6 +118,7 @@ public final class Coleccion {
                 case "brandt" -> DarkCraftMod.BRANDT.get().create(lvl);
                 case "molinera" -> DarkCraftMod.MOLINERA.get().create(lvl);
                 case "verdugo" -> DarkCraftMod.VERDUGO.get().create(lvl);
+                case "barquero" -> DarkCraftMod.BARQUERO.get().create(lvl);
                 case "corteza" -> DarkCraftMod.CORTEZA.get().create(lvl);
                 case "espectro_cortesano", "espectro_dama", "espectro_vigia" -> {
                     var s = DarkCraftMod.ESPECTRO.get().create(lvl);

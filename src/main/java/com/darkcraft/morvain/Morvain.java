@@ -290,6 +290,8 @@ public final class Morvain {
         if (m != null && srv.getTickCount() % 100 == 13) Molino.crujir(m);
         // la arboleda (parte 7h): con el Verdugo vencido, las sogas de los colgados se quedan con el lazo vacio
         if (m != null && srv.getTickCount() % 100 == 37) Arboleda.cuenta(m);
+        // la laguna negra (parte 7j): con el Barquero vencido, sus faroles de almas se vuelven faroles de verdad
+        if (m != null && srv.getTickCount() % 100 == 61) LagunaNegra.paz(m);
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
             if (Llegada.cerca(p.getX(), p.getZ(), 160)) {
@@ -361,6 +363,8 @@ public final class Morvain {
         if (Arboleda.dentro(p.getX(), p.getZ()) && p.getY() < 160) return "darkcraft.morvain.lugar.arboleda";
         // la Aldea de los Pilotes (parte 7i)
         if (Pilotes.dentro(p.getX(), p.getZ()) && p.getY() < 120) return "darkcraft.morvain.lugar.pilotes";
+        // la Laguna Negra (parte 7j)
+        if (LagunaNegra.dentro(p.getX(), p.getZ()) && p.getY() < 120) return "darkcraft.morvain.lugar.laguna";
         return "darkcraft.zona.morvain." + Terreno.region(p.getX(), p.getZ()).id;
     }
 
