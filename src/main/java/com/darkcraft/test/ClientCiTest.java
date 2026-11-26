@@ -8289,8 +8289,9 @@ public final class ClientCiTest {
             a.setYRot(90f);
             a.yBodyRot = a.yHeadRot = 90f;
             a.empezar(com.darkcraft.enemigos.CalcinadoAnims.TAJO);
-            verDesdeServidor = new Vec3(CX + 21.0, PISO + 1.8, CZ + 5.5);
-            miraServidor = new Vec3(CX + 21.0, PISO + 1.2, CZ + 0.5);
+            // (desde la calle, detras del jugador y a un lado: la calle mayor tiene 7 de ancho, a los lados hay casas)
+            verDesdeServidor = new Vec3(CX + 17.0, PISO + 2.6, CZ - 2.4);
+            miraServidor = new Vec3(CX + 21.5, PISO + 1.3, CZ + 0.5);
         }));
         t += 2;
         atTicks(t, "camara de lado", m -> {
@@ -8316,8 +8317,8 @@ public final class ClientCiTest {
                 if (a == null) return;
                 a.setTarget(sp);
                 a.empezar(com.darkcraft.enemigos.CalcinadoAnims.LANZAR);
-                verDesdeServidor = new Vec3(CX + 26.0, PISO + 2.4, CZ + 9.5);
-                miraServidor = new Vec3(CX + 26.0, PISO + 2.0, CZ + 0.5);
+                verDesdeServidor = new Vec3(CX + 18.5, PISO + 3.2, CZ - 2.5);
+                miraServidor = new Vec3(CX + 27.0, PISO + 2.2, CZ + 0.5);
             });
         });
         t += 2;
@@ -8370,8 +8371,8 @@ public final class ClientCiTest {
             a.setYRot(90f);
             a.yBodyRot = a.yHeadRot = 90f;
             a.empezar(com.darkcraft.enemigos.CalcinadoAnims.AGARRON);
-            verDesdeServidor = new Vec3(CX + 26.5, PISO + 1.8, CZ + 6.5);
-            miraServidor = new Vec3(CX + 26.5, PISO + 1.0, CZ + 0.5);
+            verDesdeServidor = new Vec3(CX + 26.5, PISO + 1.9, CZ - 2.6);
+            miraServidor = new Vec3(CX + 26.8, PISO + 1.0, CZ + 0.5);
         }));
         t += 2;
         atTicks(t, "camara de lado", m -> {
@@ -8394,6 +8395,8 @@ public final class ClientCiTest {
                 // a dos bloques: la nube le ciega
                 irMirando(sp, a.getX() - 2.0, PISO, a.getZ(), a.getX(), PISO + 1.0, a.getZ(), false);
                 a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+                // sin el empujon del golpe (se alejaria del jugador y la nube no le llegaria)
+                a.setDeltaMovement(Vec3.ZERO);
             });
         });
         t += 44;
