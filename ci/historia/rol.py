@@ -1723,6 +1723,38 @@ EN.update({
 })
 
 
+# ---------------------------------------------------------------- parte 7a: Morvain, las Tierras Marchitas
+REGIONES_ES = {
+    "mar": "El Mar Muerto", "llanuras": "Las Llanuras Pálidas", "bosque": "El Bosque Muerto", "pantano": "El Pantano Podrido",
+    "montanas": "Las Montañas Nevadas", "capital": "La Capital en Ruinas", "academia": "La Academia Espectral",
+    "costa": "La Costa de los Huesos", "sin_fe": "La Tierra sin Fe", "centro": "El Cráter de Sangre",
+}
+REGIONES_EN = {
+    "mar": "The Dead Sea", "llanuras": "The Pale Plains", "bosque": "The Dead Forest", "pantano": "The Rotting Marsh",
+    "montanas": "The Snowbound Mountains", "capital": "The Ruined Capital", "academia": "The Spectral Academy",
+    "costa": "The Coast of Bones", "sin_fe": "The Faithless Land", "centro": "The Blood Crater",
+}
+ES.update({f"darkcraft.zona.morvain.{k}": v for k, v in REGIONES_ES.items()})
+EN.update({f"darkcraft.zona.morvain.{k}": v for k, v in REGIONES_EN.items()})
+ES.update({f"biome.darkcraft.morvain_{k}": v for k, v in REGIONES_ES.items()})
+EN.update({f"biome.darkcraft.morvain_{k}": v for k, v in REGIONES_EN.items()})
+ES.update({
+    "darkcraft.zona.morvain": "Morvain, las Tierras Marchitas",
+    "darkcraft.morvain.lugar.umbral": "El Arco del Umbral",
+    "darkcraft.santuario.morvain_llegada": "Arco del Umbral",
+    "advancements.darkcraft.morvain.title": "Las Tierras Marchitas",
+    "advancements.darkcraft.morvain.description": "Cruza el portal de la Sombra y pisa Morvain",
+    "darkcraft.diario.morvain": "Crucé el portal. Al otro lado, una tierra marchita bajo un cielo que nunca acaba de oscurecer... y en lo alto, un castillo sujeto con cadenas.",
+})
+EN.update({
+    "darkcraft.zona.morvain": "Morvain, the Withered Lands",
+    "darkcraft.morvain.lugar.umbral": "The Threshold Arch",
+    "darkcraft.santuario.morvain_llegada": "Threshold Arch",
+    "advancements.darkcraft.morvain.title": "The Withered Lands",
+    "advancements.darkcraft.morvain.description": "Cross the Shadow's portal and set foot in Morvain",
+    "darkcraft.diario.morvain": "I crossed the portal. On the other side, a withered land beneath a sky that never quite grows dark... and high above, a castle held by chains.",
+})
+
 
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""

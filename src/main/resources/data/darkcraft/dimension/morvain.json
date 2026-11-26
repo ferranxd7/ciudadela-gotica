@@ -1,0 +1,9 @@
+{
+  "type": "darkcraft:morvain",
+  "generator": {
+    "type": "darkcraft:morvain",
+    "biome_source": {
+      "type": "darkcraft:morvain"
+    }
+  }
+}

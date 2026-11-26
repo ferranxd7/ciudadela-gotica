@@ -541,6 +541,7 @@ public class DarkCraftMod {
         com.darkcraft.rol.Efectos.registrar(modBus);
         com.darkcraft.world.Valdrenn.registrar(modBus);
         com.darkcraft.world.MundoNubes.registrar(modBus);
+        com.darkcraft.morvain.Morvain.registrar(modBus);
         com.darkcraft.pueblo.PuebloEnemigos.registrar();
         com.darkcraft.valdrenn.ValdrennEnemigos.registrar();
         com.darkcraft.fortaleza.FortalezaEnemigos.registrar();

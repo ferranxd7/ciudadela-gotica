@@ -535,6 +535,13 @@ public final class CiTest {
                     log.println("La Garza Gris: ERROR al reiniciar " + t2);
                 }
             }
+            // ---- Morvain, las Tierras Marchitas (parte 7a): la dimension, cada region, el Arco del Umbral y la ciudadela
+            try {
+                morvain(server, log, out);
+            } catch (Throwable t) {
+                log.println("Morvain: ERROR " + t);
+                DarkCraftMod.LOGGER.error("[CI] Morvain", t);
+            }
             // la cinematica de inicio (parte 3d): sobre donde se despierta no hay nada con lo que tropezar al caer, y los dos
             // planos (la caida y el despertar) acaban donde tienen que acabar
             try {
@@ -570,6 +577,120 @@ public final class CiTest {
         } finally {
             server.halt(false);
         }
+    }
+
+    // ------------------------------------------------------------ Morvain (parte 7a)
+
+    /**
+     * Morvain: la dimension, una muestra de cada region (su bioma, su suelo y lo que tarda el chunk), los bloques del Arco
+     * del Umbral (el santuario y el portal de vuelta; la guia y el remolino los pone la primera llegada de verdad: la
+     * prueba del cliente) y la ciudadela con sus cadenas y anclas. Vistas: el arco y la ciudadela desde arriba y la
+     * ciudadela de frente.
+     */
+    private static void morvain(MinecraftServer server, PrintWriter log, File out) throws Exception {
+        ServerLevel m = com.darkcraft.morvain.Morvain.nivel(server);
+        if (m == null) {
+            log.println("Morvain: NO EXISTE la dimension darkcraft:morvain");
+            return;
+        }
+        var gen = m.getChunkSource().getGenerator();
+        log.println("Morvain: alto " + m.getMinBuildHeight() + ".." + m.getMaxBuildHeight() + ", generador " + gen.getClass().getSimpleName()
+                + ", biomas " + gen.getBiomeSource().getClass().getSimpleName() + ", hora fija " + m.dimensionType().fixedTime().orElse(-1L)
+                + ", efectos " + m.dimensionType().effectsLocation());
+        Object[][] muestras = {{"llanuras", 0, 5600}, {"bosque", -4700, 4300}, {"pantano", -5900, 300}, {"montanas", -2200, -6600},
+                {"capital", 4900, 600}, {"academia", 4700, -4100}, {"costa", 6900, 4300}, {"sin_fe", 0, 2100}, {"centro", 500, 500}, {"mar", 0, 7900}};
+        StringBuilder sb = new StringBuilder("Morvain, regiones:");
+        int bien = 0;
+        long total = 0;
+        for (Object[] q : muestras) {
+            int x = (Integer) q[1], z = (Integer) q[2];
+            long t = System.nanoTime();
+            m.getChunk(x >> 4, z >> 4);
+            long ms = (System.nanoTime() - t) / 1_000_000;
+            total += ms;
+            int y = m.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, x, z);
+            BlockPos p = new BlockPos(x, y - 1, z);
+            String bioma = m.getBiome(p).unwrapKey().map(k -> k.location().getPath()).orElse("?");
+            boolean ok = bioma.equals("morvain_" + q[0]);
+            if (ok) bien++;
+            sb.append(' ').append(q[0]).append(ok ? "" : " (bioma " + bioma + ")").append(" Y ").append(y).append(' ')
+                    .append(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(m.getBlockState(p).getBlock()).getPath()).append(' ')
+                    .append(ms).append(" ms;");
+        }
+        log.println(sb + " " + bien + " de " + muestras.length + " con su bioma; " + total + " ms");
+        // el Arco del Umbral
+        int[] ll = com.darkcraft.morvain.Vista.llegada();
+        long t0 = System.currentTimeMillis();
+        for (int cx = (ll[0] - 30) >> 4; cx <= (ll[0] + 30) >> 4; cx++)
+            for (int cz = (ll[2] - 30) >> 4; cz <= (ll[3] + 6) >> 4; cz++) m.getChunk(cx, cz);
+        BlockPos sant = new BlockPos(ll[0], ll[1] + 1, ll[2]);
+        int portal = 0;
+        for (int dx = -4; dx <= 4; dx++)
+            for (int h = 0; h < 13; h++) if (m.getBlockState(new BlockPos(ll[0] + dx, ll[1] + 1 + h, ll[3])).is(DarkCraftMod.PORTAL_SOMBRA.get())) portal++;
+        boolean pies = m.getBlockState(new BlockPos(ll[0], ll[1] + 1, ll[2] + 10)).isAir() && m.getBlockState(new BlockPos(ll[0], ll[1] + 2, ll[2] + 10)).isAir()
+                && !m.getBlockState(new BlockPos(ll[0], ll[1], ll[2] + 10)).isAir();
+        log.println("Morvain, el Arco del Umbral: suelo Y " + ll[1] + ", santuario " + (m.getBlockState(sant).is(DarkCraftMod.SANTUARIO.get()) ? "SI" : "NO")
+                + ", portal de vuelta " + portal + " bloques (tiene que ser " + portalCeldas() + "), donde se llega libre " + (pies ? "SI" : "NO")
+                + " (" + (System.currentTimeMillis() - t0) + " ms)");
+        topView(m, ll[0], ll[2] + 2, 46, new File(out, "morvain_llegada.png"));
+        // la ciudadela y sus cadenas
+        t0 = System.currentTimeMillis();
+        int n = 0;
+        for (int cx = -8; cx <= 7; cx++)
+            for (int cz = -8; cz <= 7; cz++) {
+                m.getChunk(cx, cz);
+                n++;
+            }
+        long ms = System.currentTimeMillis() - t0;
+        int cima = com.darkcraft.morvain.Vista.cima();
+        String punta = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(m.getBlockState(new BlockPos(0, cima, 0)).getBlock()).getPath();
+        int[] e = com.darkcraft.morvain.Vista.eslabon(0, 10);
+        m.getChunk(e[0] >> 4, e[2] >> 4);
+        int hierro = 0;
+        for (int dx = -12; dx <= 12; dx++)
+            for (int dy = -12; dy <= 12; dy++)
+                for (int dz = -12; dz <= 12; dz++)
+                    if (m.getBlockState(new BlockPos(e[0] + dx, e[1] + dy, e[2] + dz)).is(DarkCraftMod.HIERRO_NEGRO.get())) hierro++;
+        StringBuilder anclas = new StringBuilder();
+        for (int[] a : com.darkcraft.morvain.Vista.anclas()) {
+            m.getChunk(a[0] >> 4, a[2] >> 4);
+            anclas.append(' ').append(a[0]).append(',').append(a[1]).append(',').append(a[2]).append('=')
+                    .append(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(m.getBlockState(new BlockPos(a[0], a[1] + 8, a[2])).getBlock()).getPath());
+        }
+        log.println(String.format(java.util.Locale.ROOT, "Morvain, la ciudadela: %d chunks en %d ms (%.1f ms cada uno); en la punta de la aguja (Y %d) %s; "
+                        + "el eslabon 10 de %d de la cadena del este (en %d %d %d): %d bloques de hierro negro alrededor; anclas:%s", n, ms, ms / (double) n, cima,
+                punta, com.darkcraft.morvain.Vista.eslabones(0), e[0], e[1], e[2], hierro, anclas));
+        topView(m, 0, 0, 132, new File(out, "morvain_ciudadela.png"));
+        alzado(m, -132, 132, 330, Math.min(m.getMaxBuildHeight() - 1, cima + 6), 132, -132, new File(out, "morvain_ciudadela_alzado.png"));
+    }
+
+    /** Las celdas del hueco del arco del portal (las de bloque de portal). */
+    private static int portalCeldas() {
+        int n = 0;
+        for (int h = 0; h < com.darkcraft.gen.TorreCupula.AALTO; h++) {
+            int w = com.darkcraft.gen.TorreCupula.arcoPortal(h);
+            if (w >= 0) n += 2 * w + 1;
+        }
+        return n;
+    }
+
+    /** De frente (desde el sur, mirando al norte): lo primero que se ve en cada (x, y), mas oscuro cuanto mas lejos. */
+    private static void alzado(ServerLevel lvl, int x0, int x1, int y0, int y1, int zCerca, int zLejos, File f) throws Exception {
+        int w = x1 - x0 + 1, h = y1 - y0 + 1;
+        BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
+        for (int x = x0; x <= x1; x++)
+            for (int y = y0; y <= y1; y++) {
+                int rgb = 0x5A4A60;
+                for (int z = zCerca; z >= zLejos; z--) {
+                    BlockState st = lvl.getBlockState(m.set(x, y, z));
+                    if (st.isAir()) continue;
+                    rgb = shade(color(lvl, m, st), 1.0 - 0.5 * (zCerca - z) / (double) (zCerca - zLejos));
+                    break;
+                }
+                img.setRGB(x - x0, y1 - y, rgb);
+            }
+        ImageIO.write(img, "png", f);
     }
 
     // ------------------------------------------------------------ prueba de "se puede subir andando"

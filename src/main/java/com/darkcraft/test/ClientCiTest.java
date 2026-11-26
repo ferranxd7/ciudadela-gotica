@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 46 * 60 * 20;
+    private static final int LIMIT = 56 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -5773,7 +5773,7 @@ public final class ClientCiTest {
         });
         atTicks(S + 130 + 166, "captura de los logros", m -> shot(m, "cliente_99_logros"));
         atTicks(S + 130 + 170, "cerrar", m -> m.setScreen(null));
-        int finT = titulo(lejania(S + 130 + 175));
+        int finT = titulo(morvain(lejania(S + 130 + 175)));
         atTicks(finT, "Fin de la prueba", ClientCiTest::finish);
     }
 
@@ -5916,6 +5916,140 @@ public final class ClientCiTest {
                 if (santuarioVitrina != null) sp.serverLevel().removeBlock(santuarioVitrina, false);
             });
         });
+        return t + 20;
+    }
+
+    /**
+     * Parte 7a: Morvain, las Tierras Marchitas. Se entra en el portal de la fortaleza y se llega al Arco del Umbral (con el
+     * cartel de la zona, el santuario, la guia y el remolino del portal de vuelta); con la lejania (Distant Horizons sigue
+     * encendida del tramo anterior), cada region y la ciudadela encadenada con sus cadenas; con shaders, la llegada y la
+     * ciudadela; y se vuelve por el portal del arco a la fortaleza.
+     */
+    private static int morvain(int T) {
+        final ServerLevel[] mv = new ServerLevel[1];
+        int t = T;
+        atTicks(t, "Morvain: ante el portal de la fortaleza", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                mv[0] = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                log("  Morvain: " + (mv[0] == null ? "NO EXISTE" : "dimension " + mv[0].dimension().location() + ", alto " + mv[0].getMinBuildHeight()
+                        + ".." + mv[0].getMaxBuildHeight()));
+                sp.setGameMode(GameType.CREATIVE);
+                if (fplan == null) return;
+                int[] q = fplan.f.portal();
+                boolean abierto = sp.server.overworld().getBlockState(new BlockPos(fplan.cx, q[1] + 2, q[2])).is(DarkCraftMod.PORTAL_SOMBRA.get());
+                log("  portal de la fortaleza abierto: " + abierto);
+                irMirando(sp, fplan.cx + 0.5, q[1], q[2] + 3.5, fplan.cx + 0.5, q[1] + 3, q[2] + 0.5, false);
+            });
+        });
+        t += 60;
+        atTicks(t, "Morvain: entra en el portal", m -> server(m, sp -> {
+            if (fplan == null || mv[0] == null) return;
+            int[] q = fplan.f.portal();
+            BlockPos hueco = new BlockPos(fplan.cx, q[1], q[2]);
+            if (sp.serverLevel().getBlockState(hueco).is(DarkCraftMod.PORTAL_SOMBRA.get()))
+                sp.teleportTo(sp.serverLevel(), fplan.cx + 0.5, q[1], q[2] + 0.5, 180f, 0f);
+            else {
+                log("  (el portal no esta abierto: se cruza a mano)");
+                com.darkcraft.morvain.Morvain.cruzar(sp, hueco, mv[0]);
+            }
+        }));
+        t += 60;
+        atTicks(t, "Morvain: ha cruzado?", m -> server(m, sp -> {
+            if (sp.level().dimension() == com.darkcraft.morvain.Morvain.NIVEL) {
+                log("  ha cruzado al entrar en el hueco del portal");
+                return;
+            }
+            log("  NO ha cruzado al entrar en el hueco (" + fpos(sp) + "): se cruza a mano");
+            if (fplan != null && mv[0] != null) com.darkcraft.morvain.Morvain.cruzar(sp, new BlockPos(fplan.cx, fplan.f.portal()[1], fplan.f.portal()[2]), mv[0]);
+        }));
+        t += 80;
+        atTicks(t, "Morvain: la llegada", m -> server(m, sp -> {
+            boolean alli = sp.level().dimension() == com.darkcraft.morvain.Morvain.NIVEL;
+            log("  en " + sp.level().dimension().location() + " " + fpos(sp) + (alli ? " | " + com.darkcraft.morvain.Morvain.resumen(sp.serverLevel())
+                    + " | lugar " + com.darkcraft.morvain.Morvain.lugar(sp) : " | NO HA CRUZADO") + " | cartel " + com.darkcraft.client.ui.Carteles.resumen());
+        }));
+        t += 20;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv01_llegada");
+            log("  cliente en " + (m.level == null ? "?" : m.level.dimension().location()) + ", bioma "
+                    + (m.level == null || m.player == null ? "?" : m.level.getBiome(m.player.blockPosition()).unwrapKey().map(k -> k.location().toString()).orElse("?")));
+        });
+        t += 120;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv02_llegada_cartel"));
+        t += 10;
+        // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
+        final int[] ll = com.darkcraft.morvain.Vista.llegada();
+        final double[][] v = {
+                {ll[0] + 0.5, ll[1] + 3, ll[2] - 5, ll[0] + 0.5, ll[1] + 7, ll[3] + 0.5},          // el arco y su remolino, desde la plaza
+                {ll[0] + 9.5, ll[1] + 4, ll[2] + 9, ll[0] - 2, ll[1] + 1, ll[2] - 3},              // la plaza, el santuario y la guia
+                {ll[0] + 0.5, ll[1] + 60, ll[2] + 120, 0, 420, 0},                                // las llanuras hacia el norte (la ciudadela al fondo)
+                {170, 600, 230, 0, 590, 0},                                                         // la ciudadela
+                {420, 190, 260, 0, 470, 0},                                                         // las cadenas, desde el crater
+                {0, 150, 2600, 0, 80, 1900},                                                        // la Tierra sin Fe
+                {-2200, 420, -4300, -2200, 600, -6600},                                             // las montanas (un coloso)
+                {-5450, 110, 950, -5900, 64, 150},                                                  // el pantano
+                {-4300, 140, 4900, -4700, 100, 4250},                                               // el bosque muerto
+                {4250, 160, 1300, 4900, 100, 500},                                                  // la capital (aun sin ruinas)
+                {4100, 210, -3000, 4700, 250, -4100},                                               // la meseta de la academia
+                {6200, 100, 4700, 7300, 64, 4200},                                                  // la costa de los huesos
+        };
+        String[] nombres = {"arco", "plaza", "llanuras", "ciudadela", "cadenas", "sin_fe", "montanas", "pantano", "bosque", "capital", "academia", "costa"};
+        int[] espera = {80, 60, 500, 700, 500, 400, 500, 400, 400, 400, 400, 400};
+        for (int i = 0; i < v.length; i++) {
+            final int k = i;
+            atTicks(t, "Morvain: " + nombres[k], m -> {
+                m.setScreen(null);
+                enPrimeraPersona(m);
+                m.options.hideGui = true;
+                server(m, sp -> {
+                    if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                    irMirando(sp, v[k][0], v[k][1], v[k][2], v[k][3], v[k][4], v[k][5], true);
+                });
+            });
+            t += espera[i];
+            atTicks(t, "captura", m -> {
+                shot(m, "cliente_mv" + String.format("%02d", k + 3) + "_" + nombres[k]);
+                log("  " + Lejania.resumenDH() + "; fps " + fps);
+            });
+            t += 10;
+        }
+        atTicks(t, "Morvain: shaders encendidos", m -> {
+            log("  " + Lejania.shaders(true) + " -> " + Lejania.resumenOculus());
+            server(m, sp -> irMirando(sp, v[3][0], v[3][1], v[3][2], v[3][3], v[3][4], v[3][5], true));
+        });
+        t += 600;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv15_shaders_ciudadela"));
+        t += 10;
+        atTicks(t, "Morvain: shaders, la llegada", m -> server(m, sp -> {
+            BlockPos p = new BlockPos(ll[0], ll[1] + 1, ll[2] + 10);
+            irMirando(sp, p.getX() + 0.5, p.getY() + 0.2, p.getZ() + 0.5, ll[0] + 0.5, ll[1] + 30, ll[2] - 200, false);
+        }));
+        t += 300;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv16_shaders_llegada"));
+        t += 10;
+        atTicks(t, "Morvain: shaders, el arco", m -> server(m, sp -> irMirando(sp, v[0][0], v[0][1], v[0][2], v[0][3], v[0][4], v[0][5], true)));
+        t += 200;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv17_shaders_arco"));
+        t += 10;
+        atTicks(t, "Morvain: shaders apagados; se vuelve por el portal del arco", m -> {
+            log("  " + Lejania.shaders(false));
+            m.options.hideGui = false;
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), ll[0] + 0.5, ll[1] + 1, ll[3] + 0.5, 0f, 0f);
+            });
+        });
+        t += 140;
+        atTicks(t, "Morvain: de vuelta", m -> server(m, sp -> log("  de vuelta en " + sp.level().dimension().location() + " " + fpos(sp)
+                + (fplan != null ? String.format(java.util.Locale.ROOT, " (el portal en %d %d %d)", fplan.cx, fplan.f.portal()[1], fplan.f.portal()[2]) : ""))));
+        t += 20;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv18_vuelta"));
         return t + 20;
     }
 

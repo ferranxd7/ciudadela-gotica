@@ -606,6 +606,8 @@ public final class FortalezaEventos {
 
     /** Alguien toca el portal: todavia no se puede cruzar (sale despedido hacia atras). */
     public static void tocarPortal(Level lvl, BlockPos pos, Entity e) {
+        // un jugador cruza a Morvain, o vuelve de alli por el arco (parte 7a)
+        if (e instanceof ServerPlayer p && !p.isSpectator() && com.darkcraft.morvain.Morvain.portal(p, pos)) return;
         double dir = e.getZ() >= pos.getZ() + 0.5 ? 1 : -1;
         e.setDeltaMovement(0, 0.42, dir * 0.95);
         e.hurtMarked = true;

@@ -1231,7 +1231,7 @@ Respuestas 57-67 del plan.
   mas grande, de noche) y la columna de luz roja de cada portal (el haz de un faro, `BeaconRenderer.renderBeaconBeam`,
   1024 de alto, se ve de lejos). Dura hasta vencer a la Sombra (`CieloRojo.apagar(srv, true)`, parte 7); el comando
   reiniciar de la fortaleza lo apaga.
-- El portal aun no se cruza (Morvain es la parte 7): al tocarlo empuja con "las Tierras Marchitas aun no se han alzado".
+- Desde la parte 7a el portal lleva a Morvain (si la dimension no existiera, empuja como antes con "aun no se han alzado").
 - Pruebas: servidor, linea `Capitulo 6 (la Sombra): audio true, 11 frases ...`; cliente, capturas
   `cliente_f301_capitulo6_titulo` ... `f310_..._final` (las gemas, los pilares, las nubes, el rayo, el cielo rojo),
   `cliente_f40c_luna_sangre`, `cliente_f40d_cielo_rojo` y las lineas `tras el rayo: cielo rojo SI ... columnas 1`.
@@ -1294,6 +1294,67 @@ Respuestas 71, 72, 82-84, 131, 134 y 135 del plan.
 - Las capturas de los demas tramos salen iguales que en desarrollo (Embeddium dibuja los bloques, los brillos y las
   runas igual).
 
+### Plan grande, parte 7a: Morvain se alza (la dimension, el Arco del Umbral y la ciudadela encadenada)
+
+Respuestas 85-91 del plan. Morvain va por sub-partes: **7a** la dimension entera (terreno de todas las regiones, cruzar y
+volver, la llegada y la ciudadela del cielo); despues la montura, los santuarios con teletransporte y los fragmentos de
+mapa (respuestas 92 y 129), y region a region su contenido (ruinas, mazmorras, enemigos, jefes: 125, 131, 132).
+- **La dimension** `darkcraft:morvain` (`data/darkcraft/dimension*/morvain.json`): de 0 a 767 (`Morvain.ALTO`), hora fija
+  12500 (el sol a punto de ponerse: cielo oscuro con un poco de dorado y rojo, respuesta 91), sin camas. Generador
+  `darkcraft:morvain` (`morvain/MorvainGenerador`) y fuente de biomas `darkcraft:morvain` (`MorvainBiomas`), registrados
+  en `Morvain.registrar`. **El mapa es el mismo para todos y no depende de la semilla** (`morvain/Terreno`, solo Java y
+  sin estado: lo usan el generador, Distant Horizons desde sus hilos y la vista sin juego): 16.000 x 16.000
+  (`MITAD` 8000) con un continente de costa irregular y bahias rodeado del Mar Muerto; regiones por semillas con las
+  fronteras torcidas y pesos suaves (`temple`: la meseta de la academia casi de golpe, acantilados): al sur las Llanuras
+  Palidas (la llegada), al suroeste el Bosque Muerto, al oeste el Pantano Podrido, al norte de lado a lado las Montanas
+  Nevadas (crestas de 550-650 y cuatro colosos de mas de 700, `COLOSOS`), al noreste la Academia Espectral en su meseta,
+  al este la Capital en ruinas (aun sin ruinas), al sureste la Costa de los Huesos (costillas de gigante), alrededor del
+  centro la Tierra sin Fe (grietas que bajan hasta la sangre) y en el centro el Crater de Sangre con el lago y el peñon de
+  la Sombra (hasta Y 340). Tres rios (`RIOS`) cavan hasta el agua (63). El suelo de cada region: `Suelo`; lo de encima
+  (arboles muertos, rocas, setas, nenufares, costillas): `Adorno`, dentro del propio chunk. El agua es roja en la Tierra
+  sin Fe y el crater por el color de su bioma.
+- **Los biomas** (`worldgen/biome/morvain_<region>.json`, `Region`): cielo, niebla (dorada en las llanuras, fria en las
+  montanas, verdosa en el pantano, violeta en la academia, roja en la Tierra sin Fe y el crater), agua, hierba, particulas
+  (ceniza, copos, esporas...) y sin bichos ni lluvia. `MorvainBiomas` guarda por hilo la region de las ultimas 64 columnas
+  (el juego pide el bioma 192 veces por columna). Nombres: `biome.darkcraft.morvain_*` y `darkcraft.zona.morvain.*`.
+- **El cielo** (`client/morvain/MorvainCliente`, efectos `darkcraft:morvain`): sin nubes de Minecraft, el resplandor del
+  ocaso dorado con algo de rojo (`getSunriseColor`) y nunca llueve (el tiempo de las dimensiones es el del mundo de las
+  nubes: el cliente le quita la lluvia). El cielo rojo del portal es solo del mundo de las nubes.
+- **Cruzar** (`Morvain.portal`, desde `FortalezaEventos.tocarPortal`; los que no son jugadores siguen saliendo
+  despedidos): al entrar en el hueco del portal de la fortaleza se apunta la vuelta en el jugador (`darkcraft_vuelta`:
+  dimension, delante del portal del lado por el que entro, de espaldas a el) y se le lleva al **Arco del Umbral**
+  (logro `morvain`, hazana, con su entrada del diario; cartel grande "Morvain, las Tierras Marchitas"). El portal del
+  arco devuelve alli. 3 s sin volver a cruzar (`ESPERA`).
+- **El Arco del Umbral** (`morvain/Llegada`, en (0, 3400) a la altura del terreno; se escribe al generar): plaza
+  redonda de piedra vieja (radio 15, se funde con el terreno hasta 27) con seis pilares rotos, el santuario en el centro
+  ("Arco del Umbral"), al sur el arco del portal de vuelta (el mismo arco apuntado de la fortaleza, `TorreCupula.anillo`,
+  con las gemas encendidas y bloques `portal_sombra`), dos farolas de almas y un camino de tierra hacia el norte (120).
+  Se llega a 10 al norte del santuario mirando al norte (`Llegada.pies`). La primera vez que llega alguien
+  (`Morvain.preparar`): el nombre del santuario (`Santuarios.ponerEn`, `morvain:llegada`) y Maelis sentada al lado
+  (una vez, SavedData `darkcraft_morvain`); el remolino del portal (no se guarda) lo pone `Morvain.onTick` con alguien a
+  160. `Adorno` no pone nada en sus chunks.
+- **La ciudadela encadenada** (`morvain/Ciudadela`, respuesta 88; se escribe al generar, la ve Distant Horizons): una isla
+  de roca negra (radio ~102, el patio en Y 540, cono colgante con picos hasta ~Y 365) sobre el peñon de la Sombra, con
+  muralla octogonal (apotema 78, 24 de alto, almenas), ocho torres de chapitel con troneras rojas, la torre del homenaje
+  (52 de lado con las esquinas cortadas, 84 de alto, contrafuertes escalonados, ventanas rojas y gemas encendidas, suelos
+  por dentro), cuatro torreones con chapitel y la aguja del centro (gema en la punta en Y 719, `Vista.cima`). **Ocho
+  cadenas** de eslabones de hierro negro (41 x 21, grueso 2,5, uno tumbado y otro de pie) de la isla a sus anclas
+  (piramides escalonadas con puas) a 860 del centro, en la ladera de dentro del crater. De momento no se entra.
+- **Morir en Morvain** sin haber descansado en un santuario de alli: se reaparece en el arco (`Morvain.onMuerte` pone ese
+  punto y guarda el de antes, que se devuelve al volver por el portal si sigue siendo el del arco).
+- **El Espejo**: `Morvain.lugar` (el arco, "El Arco del Umbral", o la region: cartel grande la primera vez de cada una).
+- Sin abrir el juego: `java -cp /tmp/mv Mapa salida.png [paso] [x0 z0 lado]` (`tools/morvain/Mapa.java`: el mapa entero
+  por regiones con relieve y curvas de nivel; compilar `Ruido`, `Region`, `Terreno` y `Mapa`) y
+  `tools/vista3d/vista.sh morvain_ciudadela|morvain_cadena|morvain_llegada carpeta` (`morvain/Vista`: el terreno con su
+  suelo, el arco y la ciudadela, chunk a chunk como el generador; en las vistas los bloques del mod salen como bloques de
+  Minecraft).
+- Pruebas: servidor, `morvain()` (lineas `Morvain: ...` —alto, generador, hora—, `Morvain, regiones: ...` —una muestra de
+  cada una con su bioma, su suelo y lo que tarda el chunk—, `Morvain, el Arco del Umbral: ...` y `Morvain, la ciudadela:
+  ...`; vistas `morvain_llegada.png`, `morvain_ciudadela.png` y `morvain_ciudadela_alzado.png`); cliente, tramo
+  `morvain()` despues de la lejania (con Distant Horizons): entra en el portal de la fortaleza, la llegada
+  (`cliente_mv01`, `mv02` con el cartel), el arco, la plaza, cada region y la ciudadela (`mv03..mv14`), con shaders
+  (`mv15..mv17`) y la vuelta por el arco (`mv18`). `LIMIT` 56 min (`lanzar.sh` 62 min, el paso 90, el trabajo 130).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1303,8 +1364,8 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5d, el camino de nubes**: hecha (arriba).
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
-- Despues, la **parte 6** (arriba) y lo siguiente: la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y
-  125-132 de `PLAN.md`), por regiones.
+- Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
+  `PLAN.md`), por sub-partes (la 7a arriba).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

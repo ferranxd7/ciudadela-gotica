@@ -64,7 +64,7 @@ public final class Espejo {
     public static final String[] ORDEN_LOGROS = {"clase", "encontrar", "libro_sombra", "primera_marca", "capitulo1", "capitulo2",
             "brandt", "rey", "golpe_final", "capitulo3", "capitulo4", "vareth", "arbol", "gavran_guardia", "gavran_fase1", "gavran_corazon",
             "gavran_juicio", "gavran_fase2", "gavran", "capitulo5", "cartografo", "caballero", "caballeros_50", "capitan_elite", "emboscada", "fortaleza", "puente",
-            "puerta_hueso", "acertijo", "amuleto", "portal", "capitulo6", "libro_perdido", "libros_perdidos"};
+            "puerta_hueso", "acertijo", "amuleto", "portal", "capitulo6", "morvain", "libro_perdido", "libros_perdidos"};
 
     /** Un sitio del mapa: id unico ("x,z:nombre"), tipo, icono, posicion, clave del nombre, radio para descubrirlo. */
     public record Lugar(String id, int tipo, int icono, int x, int y, int z, String nombre, int radio, int cap) {}
@@ -464,6 +464,8 @@ public final class Espejo {
 
     /** Nombre del sitio donde esta el jugador (clave de idioma) o "" (el cliente pone el bioma). */
     private static String lugarActual(ServerPlayer p) {
+        // en Morvain (parte 7a): su region, o el Arco del Umbral
+        if (p.level().dimension() == com.darkcraft.morvain.Morvain.NIVEL) return com.darkcraft.morvain.Morvain.lugar(p);
         if (p.level().dimension() != Level.OVERWORLD) return "";
         String f = com.darkcraft.fortaleza.FortalezaEventos.lugar(p);
         if (f != null) return f;

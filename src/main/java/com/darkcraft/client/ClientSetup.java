@@ -36,6 +36,7 @@ public final class ClientSetup {
     public static void dimensiones(net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent e) {
         e.register(com.darkcraft.client.rey.VolcanCliente.EFECTOS, new com.darkcraft.client.rey.VolcanCliente.Efectos());
         e.register(ClientNubes.EFECTOS, new ClientNubes.Efectos());
+        e.register(com.darkcraft.client.morvain.MorvainCliente.EFECTOS, new com.darkcraft.client.morvain.MorvainCliente.Efectos());
     }
 
     @SubscribeEvent

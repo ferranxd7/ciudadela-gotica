@@ -327,6 +327,22 @@ public class Volcado {
                     System.out.println("sello del " + n + ": " + l.size() + " bloques " + hay + " |" + donde);
                 }
             }
+            case "morvain_ciudadela" -> {
+                // la isla de la ciudadela (sin las cadenas lejos ni el terreno de debajo)
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), -124, -124, 124, 124, 330);
+            }
+            case "morvain_cadena" -> {
+                // la cadena del este con su ancla y el crater de debajo
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), 60, -40, 900, 40, 30);
+                int[] an = com.darkcraft.morvain.Vista.anclas()[0];
+                marcas.put("ancla", new int[]{an[0], an[1] + 12, an[2]});
+            }
+            case "morvain_llegada" -> {
+                int[] l = com.darkcraft.morvain.Vista.llegada();
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), l[0] - 40, l[2] - 130, l[0] + 40, l[2] + 40,
+                        l[1] - 8);
+                marcas.put("santuario", new int[]{l[0], l[1] + 2, l[2]});
+            }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);
