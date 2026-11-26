@@ -2120,6 +2120,65 @@ EN.update({
 })
 
 
+# ---------------------------------------------------------------- parte 7i: los Podridos y la Aldea de los Pilotes (el Pantano Podrido)
+ES.update({
+    "entity.darkcraft.podrido": "Podrido",
+    "entity.darkcraft.fuego_fatuo": "Fuego fatuo",
+    "darkcraft.bestiario.podrido": "Podrido",
+    "darkcraft.bestiario.podrido_fatuo": "Podrido del fuego fatuo",
+    "darkcraft.bestiario.podrido_hinchado": "Podrido hinchado",
+    "darkcraft.bestiario.podrido.desc": "Se ahogaron en el pantano y la Sombra los hinchó de agua negra. Esperan flotando boca abajo entre los juncos, como un tronco más, y se ponen en pie cuando pasas cerca. Lentos pero tozudos: un zarpazo, un mordisco que envenena y, de un poco lejos, un vómito de agua negra que envenena y deja un charco que frena.",
+    "darkcraft.bestiario.podrido_fatuo.desc": "Lleva en la mano una de las luces verdes del pantano, las que llevaban a los niños al agua. Te la lanza desde lejos y, donde cae, queda una nube que envenena: no te quedes quieto. De cerca golpea con ella.",
+    "darkcraft.bestiario.podrido_hinchado.desc": "La panza a punto de reventar, rajada y con el gas asomando. Se deja caer encima de quien tiene delante y eructa una nube que envenena y quita fuerzas. Cuando muere, revienta: apártate.",
+    "subtitles.darkcraft.sfx.podrido_gemido": "Un podrido gorgotea",
+    "subtitles.darkcraft.sfx.podrido_alerta": "Un podrido ruge ahogándose",
+    "subtitles.darkcraft.sfx.podrido_dolor": "Un podrido se queja",
+    "subtitles.darkcraft.sfx.podrido_muerte": "Un podrido se hunde",
+    "subtitles.darkcraft.sfx.podrido_alzarse": "Algo se alza del agua",
+    "subtitles.darkcraft.sfx.podrido_vomito": "Un podrido vomita agua negra",
+    "subtitles.darkcraft.sfx.podrido_fatuo": "Silba un fuego fatuo",
+    "subtitles.darkcraft.sfx.podrido_gas": "Revienta un podrido",
+    "subtitles.darkcraft.sfx.podrido_aplastar": "Un podrido se deja caer",
+    "subtitles.darkcraft.ambiente.pantano": "El pantano borbotea",
+    "darkcraft.morvain.lugar.pilotes": "La Aldea de los Pilotes",
+    "advancements.darkcraft.podrido.title": "Agua negra",
+    "advancements.darkcraft.podrido.description": "Vence a un podrido del Pantano Podrido",
+    "advancements.darkcraft.pilotes.title": "Sobre los pilotes",
+    "advancements.darkcraft.pilotes.description": "Entra en la Aldea de los Pilotes",
+    "darkcraft.diario.podrido": "En el Pantano Podrido los ahogados no se quedan en el fondo: flotan boca abajo entre los juncos y se ponen en pie cuando pasas. Huelen a lo que son.",
+    "darkcraft.diario.pilotes": "La Aldea de los Pilotes: chozas sobre la laguna, pasarelas de tablas y una capilla medio hundida. Hay luces verdes entre los juncos. No las sigo.",
+    "darkcraft.ayuda.pilotes": "La Aldea de los Pilotes: ir a uno de sus sitios, que vuelvan sus podridos o quitarlos",
+})
+EN.update({
+    "entity.darkcraft.podrido": "Rotten One",
+    "entity.darkcraft.fuego_fatuo": "Will-o'-the-wisp",
+    "darkcraft.bestiario.podrido": "Rotten One",
+    "darkcraft.bestiario.podrido_fatuo": "Wisp-bearer Rotten One",
+    "darkcraft.bestiario.podrido_hinchado": "Bloated Rotten One",
+    "darkcraft.bestiario.podrido.desc": "They drowned in the swamp and the Shadow swelled them with black water. They wait floating face down among the reeds, like one more log, and stand up when you pass close. Slow but stubborn: a swipe, a poisoned bite and, from a little further away, a gush of black water that poisons and leaves a puddle that slows.",
+    "darkcraft.bestiario.podrido_fatuo.desc": "It carries one of the swamp's green lights, the ones that led the children into the water. It throws it from afar and, where it lands, a poisonous cloud lingers: do not stand still. Up close it strikes with it.",
+    "darkcraft.bestiario.podrido_hinchado.desc": "Its belly is about to burst, split open with gas seeping out. It throws itself onto whoever stands in front of it and belches a cloud that poisons and saps strength. When it dies, it bursts: get away.",
+    "subtitles.darkcraft.sfx.podrido_gemido": "Rotten One gurgles",
+    "subtitles.darkcraft.sfx.podrido_alerta": "Rotten One roars, choking",
+    "subtitles.darkcraft.sfx.podrido_dolor": "Rotten One hurts",
+    "subtitles.darkcraft.sfx.podrido_muerte": "Rotten One sinks",
+    "subtitles.darkcraft.sfx.podrido_alzarse": "Something rises from the water",
+    "subtitles.darkcraft.sfx.podrido_vomito": "Rotten One spews black water",
+    "subtitles.darkcraft.sfx.podrido_fatuo": "A will-o'-the-wisp hisses",
+    "subtitles.darkcraft.sfx.podrido_gas": "Rotten One bursts",
+    "subtitles.darkcraft.sfx.podrido_aplastar": "Rotten One flops down",
+    "subtitles.darkcraft.ambiente.pantano": "The swamp bubbles",
+    "darkcraft.morvain.lugar.pilotes": "The Stilt Village",
+    "advancements.darkcraft.podrido.title": "Black Water",
+    "advancements.darkcraft.podrido.description": "Defeat a Rotten One of the Rotting Marsh",
+    "advancements.darkcraft.pilotes.title": "On the Stilts",
+    "advancements.darkcraft.pilotes.description": "Enter the Stilt Village",
+    "darkcraft.diario.podrido": "In the Rotting Marsh the drowned do not stay at the bottom: they float face down among the reeds and stand up when you pass. They smell of what they are.",
+    "darkcraft.diario.pilotes": "The Stilt Village: huts over the lagoon, plank walkways and a half-sunken chapel. There are green lights among the reeds. I do not follow them.",
+    "darkcraft.ayuda.pilotes": "The Stilt Village: go to one of its places, bring its Rotten Ones back or remove them",
+})
+
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

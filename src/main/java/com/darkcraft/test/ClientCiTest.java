@@ -5997,6 +5997,8 @@ public final class ClientCiTest {
         t = arboleda(t);
         // Maese Odran, el Verdugo de la Arboleda (parte 7h)
         t = verdugo(t);
+        // la Aldea de los Pilotes y los podridos, en el Pantano Podrido (parte 7i)
+        t = pilotes(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -6939,6 +6941,293 @@ public final class ClientCiTest {
             });
         });
         return C + 236;
+    }
+
+    // ------------------------------------------------------------------ la Aldea de los Pilotes y los podridos (parte 7i)
+
+    private static final com.darkcraft.enemigos.Podrido[] PODRIDOS = new com.darkcraft.enemigos.Podrido[3];
+
+    /** El podrido del puesto de la aldea cuyo sitio es (x, z) (o null si no esta fuera). */
+    private static com.darkcraft.enemigos.Podrido podridoEn(int x, int z) {
+        var l = com.darkcraft.morvain.MorvainEnemigos.pilotes();
+        for (int i = 0; i < l.size(); i++)
+            if (l.get(i).x() == x && l.get(i).z() == z
+                    && com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.PILOTES, i) instanceof com.darkcraft.enemigos.Podrido a) return a;
+        return null;
+    }
+
+    private static String estadoPodridos() {
+        StringBuilder sb = new StringBuilder();
+        for (var a : PODRIDOS) sb.append(' ').append(a == null ? "-" : estadoE(a));
+        return sb + String.format(java.util.Locale.ROOT, " | vomitos %d, fuegos %d, nubes %d, reventones %d", com.darkcraft.enemigos.Podrido.VOMITOS,
+                com.darkcraft.enemigos.Podrido.FATUOS, com.darkcraft.enemigos.Podrido.NUBES, com.darkcraft.enemigos.Podrido.REVENTONES);
+    }
+
+    /** Un podrido nuevo (sin puesto) en (x, y, z) mirando a {@code giro}. */
+    private static com.darkcraft.enemigos.Podrido podridoNuevo(ServerLevel lvl, int variante, double x, double y, double z, float giro) {
+        var a = DarkCraftMod.PODRIDO.get().create(lvl);
+        if (a == null) return null;
+        a.variante(variante);
+        a.moveTo(x, y, z, giro, 0f);
+        a.yBodyRot = a.yHeadRot = giro;
+        lvl.addFreshEntity(a);
+        return a;
+    }
+
+    private static void quitarPodridos() {
+        for (int i = 0; i < PODRIDOS.length; i++) {
+            if (PODRIDOS[i] != null && !PODRIDOS[i].isRemoved()) PODRIDOS[i].discard();
+            PODRIDOS[i] = null;
+        }
+    }
+
+    /**
+     * La Aldea de los Pilotes: desde el santuario de los Juncos, entrar a pie por el embarcadero (el cartel, el logro y el
+     * pantano que borbotea), la plaza, las chozas, los que flotan junto a las pasarelas, la capilla hundida y su presbiterio; en
+     * supervivencia uno se alza del agua al pasar; el vomito, el fuego fatuo con su nube, el hinchado (se deja caer, eructa y
+     * revienta al morir); el libro de la hermana Ilse y el bestiario. Al acabar vuelven todos.
+     */
+    private static int pilotes(int T) {
+        final var V = com.darkcraft.morvain.Pilotes.get();
+        final int CX = com.darkcraft.morvain.Pilotes.CX, CZ = com.darkcraft.morvain.Pilotes.CZ, PASO = com.darkcraft.morvain.Pilotes.PASO;
+        final var SJ = com.darkcraft.morvain.SantuariosMorvain.porId("juncos");
+        int t = T;
+        atTicks(t, "Los pilotes: desde el santuario de los Juncos", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft pilotes enemigos volver");
+                irMirando(sp, SJ.x() + 0.5, SJ.y() + 7, SJ.z() + 6.5, CX, PASO + 4, CZ, true);
+                log("  pilotes: " + com.darkcraft.morvain.MorvainEnemigos.comprobar());
+            });
+        });
+        t += 320;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv105_pilotes_santuario");
+            server(m, sp -> log("  " + com.darkcraft.morvain.MorvainEnemigos.estadoPilotes(sp.server)));
+        });
+        t += 10;
+        // ---- entrar a pie por el embarcadero, en aventura: el cartel con el nombre, el logro y el pantano
+        atTicks(t, "Los pilotes: entrar por el embarcadero", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft pilotes enemigos fuera");
+                int[] q = V.sitio("muelle");
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), q[0] + 0.5, q[1], q[2] + 0.5, 90f, 4f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura", m -> {
+            log("  pilotes: " + ClientMusic.pantano());
+            shot(m, "cliente_mv106_pilotes_cartel");
+            server(m, sp -> log("  al entrar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + ", logro pilotes " + com.darkcraft.story.Logros.tiene(sp, "pilotes")
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+        });
+        t += 10;
+        atTicks(t, "Los pilotes: vuelven los podridos", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft pilotes enemigos volver");
+            });
+        });
+        t += 4;
+        atTicks(t, "Los pilotes: la plaza", m -> server(m, sp -> irMirando(sp, CX + 9.5, PASO + 7, CZ + 10.5, CX, PASO + 1, CZ, true)));
+        t += 90;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv107_pilotes_plaza");
+            server(m, sp -> log("  la plaza: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoPilotes(sp.server)));
+        });
+        t += 10;
+        atTicks(t, "Los pilotes: las chozas desde lo alto", m -> server(m, sp -> irMirando(sp, CX - 30.5, PASO + 22, CZ + 26.5, CX - 2, PASO + 2, CZ - 4, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv108_pilotes_chozas"));
+        t += 10;
+        atTicks(t, "Los pilotes: los que flotan", m -> server(m, sp -> {
+            int x = CX + 4, z = CZ + 12;
+            irMirando(sp, x + 4.5, PASO + 2.5, z + 3.5, x + 0.5, PASO - 0.5, z + 0.5, true);
+            var a = podridoEn(x, z);
+            log("  el que flota: " + estadoE(a) + (a == null ? "" : " en el agua " + a.isInWater()));
+        }));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv109_pilotes_flotan"));
+        t += 10;
+        atTicks(t, "Los pilotes: la capilla hundida", m -> server(m, sp -> irMirando(sp, CX + 12.5, PASO + 8, CZ - 14.5, CX, PASO + 3, CZ - 32, true)));
+        t += 70;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv110_capilla_hundida");
+            server(m, sp -> log("  la capilla: " + com.darkcraft.morvain.Pilotes.resumen(sp.serverLevel())));
+        });
+        t += 10;
+        atTicks(t, "Los pilotes: el presbiterio", m -> server(m, sp -> irMirando(sp, CX + 0.5, com.darkcraft.morvain.Pilotes.CAP_SUELO + 2.6, CZ - 27.5, CX + 0.5,
+                com.darkcraft.morvain.Pilotes.CAP_ALTAR + 1.5, CZ - 37.5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv111_presbiterio"));
+        t += 10;
+        // ---- en supervivencia: pasar junto a uno que flota se alza del agua
+        final int D = t;
+        atTicks(D, "Los pilotes: pasar junto a uno que flota (supervivencia)", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                irMirando(sp, CX + 1.5, PASO + 1, CZ + 17.5, CX + 4.5, PASO, CZ + 12.5, false);
+                PODRIDOS[0] = podridoEn(CX + 4, CZ + 12);
+                log("  antes: " + estadoPodridos());
+            });
+        });
+        atTicks(D + 20, "un paso: mas cerca", m -> server(m, sp -> irMirando(sp, CX + 1.5, PASO + 1, CZ + 12.5, CX + 4.5, PASO, CZ + 12.5, false)));
+        atTicks(D + 46, "captura: se alza", m -> {
+            server(m, sp -> log("  se alza: " + estadoPodridos() + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())));
+            shot(m, "cliente_mv112_se_alza");
+        });
+        // ---- el vomito (de lado)
+        t = D + 60;
+        final int W = t;
+        atTicks(W, "Los pilotes: el vomito", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarPodridos();
+                comando(sp, "darkcraft pilotes enemigos fuera");
+                aPelear(sp, true);
+                // en el embarcadero: el podrido al norte, el jugador cuatro mas al sur
+                var a = podridoNuevo(lvl, com.darkcraft.enemigos.Podrido.PODRIDO, CX + 0.5, PASO + 1, CZ + 9.5, 0f);
+                PODRIDOS[0] = a;
+                irMirando(sp, CX + 0.5, PASO + 1, CZ + 14.5, CX + 0.5, PASO + 2, CZ + 9.5, false);
+                if (a == null) return;
+                a.setTarget(sp);
+                a.empezar(com.darkcraft.enemigos.PodridoAnims.VOMITO);
+                verDesdeServidor = new Vec3(CX + 6.5, PASO + 3, CZ + 12);
+                miraServidor = new Vec3(CX + 0.5, PASO + 1.6, CZ + 12);
+            });
+        });
+        atTicks(W + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(W + 19, "captura: el vomito", m -> {
+            server(m, sp -> log("  el vomito: " + estadoPodridos() + " | jugador " + fpos(sp) + " veneno " + sp.hasEffect(net.minecraft.world.effect.MobEffects.POISON)));
+            shot(m, "cliente_mv113_vomito");
+        });
+        // ---- el fuego fatuo: lo lanza desde ocho bloques y deja su nube
+        t = W + 40;
+        final int F = t;
+        atTicks(F, "Los pilotes: el fuego fatuo", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            quitarPodridos();
+            aPelear(sp, true);
+            sp.removeAllEffects();
+            var a = podridoNuevo(lvl, com.darkcraft.enemigos.Podrido.FATUO, CX + 0.5, PASO + 1, CZ + 9.5, 0f);
+            PODRIDOS[1] = a;
+            irMirando(sp, CX + 0.5, PASO + 1, CZ + 17.5, CX + 0.5, PASO + 2, CZ + 9.5, false);
+            if (a == null) return;
+            a.setTarget(sp);
+            a.empezar(com.darkcraft.enemigos.PodridoAnims.LANZAR_FATUO);
+            verDesdeServidor = new Vec3(CX + 7.5, PASO + 3.5, CZ + 13.5);
+            miraServidor = new Vec3(CX + 0.5, PASO + 2, CZ + 13.5);
+        }));
+        atTicks(F + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(F + 21, "captura: el fuego vuela", m -> {
+            server(m, sp -> log("  el fuego fatuo: " + estadoPodridos() + " | fuegos en el aire "
+                    + sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.FuegoFatuo.class, sp.getBoundingBox().inflate(16)).size()));
+            shot(m, "cliente_mv114_fuego_fatuo");
+        });
+        atTicks(F + 36, "captura: la nube", m -> {
+            server(m, sp -> log("  la nube: nubes " + sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.AreaEffectCloud.class, sp.getBoundingBox().inflate(8)).size()
+                    + " | jugador " + fpos(sp) + " veneno " + sp.hasEffect(net.minecraft.world.effect.MobEffects.POISON)));
+            shot(m, "cliente_mv115_nube");
+        });
+        // ---- el hinchado: se deja caer, eructa y revienta al morir
+        t = F + 46;
+        final int H = t;
+        atTicks(H, "Los pilotes: el hinchado se deja caer", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            quitarPodridos();
+            for (var n : lvl.getEntitiesOfClass(net.minecraft.world.entity.AreaEffectCloud.class, sp.getBoundingBox().inflate(16))) n.discard();
+            aPelear(sp, true);
+            sp.removeAllEffects();
+            var a = podridoNuevo(lvl, com.darkcraft.enemigos.Podrido.HINCHADO, CX + 0.5, PASO + 1, CZ + 10.5, 0f);
+            PODRIDOS[2] = a;
+            irMirando(sp, CX + 0.5, PASO + 1, CZ + 12.8, CX + 0.5, PASO + 1.6, CZ + 10.5, false);
+            if (a == null) return;
+            a.setTarget(sp);
+            a.empezar(com.darkcraft.enemigos.PodridoAnims.APLASTAR);
+            verDesdeServidor = new Vec3(CX + 6.5, PASO + 2.5, CZ + 11.5);
+            miraServidor = new Vec3(CX + 0.5, PASO + 1.2, CZ + 11.5);
+        }));
+        atTicks(H + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(H + 22, "captura: se deja caer", m -> {
+            server(m, sp -> log("  el hinchado cae encima: " + estadoPodridos() + " | jugador vida " + Math.round(sp.getHealth())));
+            shot(m, "cliente_mv116_aplastar");
+        });
+        atTicks(H + 52, "el eructo", m -> server(m, sp -> {
+            var a = PODRIDOS[2];
+            if (a != null) a.empezar(com.darkcraft.enemigos.PodridoAnims.ERUCTO);
+        }));
+        atTicks(H + 74, "captura: el eructo", m -> {
+            server(m, sp -> log("  el eructo: " + estadoPodridos() + " | jugador veneno " + sp.hasEffect(net.minecraft.world.effect.MobEffects.POISON)));
+            shot(m, "cliente_mv117_eructo");
+        });
+        atTicks(H + 96, "revienta", m -> server(m, sp -> {
+            var a = PODRIDOS[2];
+            if (a == null) return;
+            sp.setGameMode(GameType.SURVIVAL);
+            a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+        }));
+        atTicks(H + 104, "captura: revienta", m -> {
+            server(m, sp -> log("  revienta: " + estadoPodridos() + " | logro podrido " + com.darkcraft.story.Logros.tiene(sp, "podrido")));
+            shot(m, "cliente_mv118_revienta");
+        });
+        t = H + 112;
+        atTicks(t, "Los pilotes: el libro de la hermana Ilse", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(20));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv119_libro_ilse"));
+        t += 6;
+        atTicks(t, "el bestiario: el podrido hinchado", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("podrido_hinchado")));
+        });
+        t += 18;
+        atTicks(t, "captura: el hinchado en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv120_bestiario_podrido");
+        });
+        t += 4;
+        atTicks(t, "Los pilotes: fin (vuelven los podridos, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                quitarPodridos();
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                for (var n : sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.AreaEffectCloud.class, sp.getBoundingBox().inflate(40))) n.discard();
+                comando(sp, "darkcraft pilotes enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
     }
 
     // ------------------------------------------------------------------ el molino y la Molinera de Velmor (parte 7f)

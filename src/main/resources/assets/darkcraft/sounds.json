@@ -3180,5 +3180,123 @@
         "name": "darkcraft:sfx/verdugo_muerte_2"
       }
     ]
+  },
+  "sfx.podrido_gemido": {
+    "subtitle": "subtitles.darkcraft.sfx.podrido_gemido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/podrido_gemido_1"
+      },
+      {
+        "name": "darkcraft:sfx/podrido_gemido_2"
+      },
+      {
+        "name": "darkcraft:sfx/podrido_gemido_3"
+      }
+    ]
+  },
+  "sfx.podrido_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.podrido_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/podrido_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/podrido_alerta_2"
+      }
+    ]
+  },
+  "sfx.podrido_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.podrido_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/podrido_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/podrido_dolor_2"
+      }
+    ]
+  },
+  "sfx.podrido_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.podrido_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/podrido_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/podrido_muerte_2"
+      }
+    ]
+  },
+  "sfx.podrido_alzarse": {
+    "subtitle": "subtitles.darkcraft.sfx.podrido_alzarse",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/podrido_alzarse_1"
+      },
+      {
+        "name": "darkcraft:sfx/podrido_alzarse_2"
+      }
+    ]
+  },
+  "sfx.podrido_vomito": {
+    "subtitle": "subtitles.darkcraft.sfx.podrido_vomito",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/podrido_vomito_1"
+      },
+      {
+        "name": "darkcraft:sfx/podrido_vomito_2"
+      }
+    ]
+  },
+  "sfx.podrido_fatuo": {
+    "subtitle": "subtitles.darkcraft.sfx.podrido_fatuo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/podrido_fatuo_1"
+      },
+      {
+        "name": "darkcraft:sfx/podrido_fatuo_2"
+      },
+      {
+        "name": "darkcraft:sfx/podrido_fatuo_3"
+      }
+    ]
+  },
+  "sfx.podrido_gas": {
+    "subtitle": "subtitles.darkcraft.sfx.podrido_gas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/podrido_gas_1"
+      },
+      {
+        "name": "darkcraft:sfx/podrido_gas_2"
+      }
+    ]
+  },
+  "sfx.podrido_aplastar": {
+    "subtitle": "subtitles.darkcraft.sfx.podrido_aplastar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/podrido_aplastar_1"
+      },
+      {
+        "name": "darkcraft:sfx/podrido_aplastar_2"
+      }
+    ]
+  },
+  "ambiente.pantano": {
+    "subtitle": "subtitles.darkcraft.ambiente.pantano",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pantano_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/pantano_ambiente_2",
+        "stream": true
+      }
+    ]
   }
 }
