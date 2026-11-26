@@ -1296,8 +1296,9 @@ Respuestas 71, 72, 82-84, 131, 134 y 135 del plan.
 
 ### Plan grande, parte 7a: Morvain se alza (la dimension, el Arco del Umbral y la ciudadela encadenada)
 
-Respuestas 85-91 del plan. Morvain va por sub-partes: **7a** la dimension entera (terreno de todas las regiones, cruzar y
-volver, la llegada y la ciudadela del cielo); despues la montura, los santuarios con teletransporte y los fragmentos de
+Respuestas 85-91 del plan (publicada con la build de prueba 130 bien: la llegada, las regiones con Distant Horizons solo
+con chunks de verdad, la ciudadela y la vuelta). Morvain va por sub-partes: **7a** la dimension entera (terreno de todas
+las regiones, cruzar y volver, la llegada y la ciudadela del cielo); despues la montura, los santuarios con teletransporte y los fragmentos de
 mapa (respuestas 92 y 129), y region a region su contenido (ruinas, mazmorras, enemigos, jefes: 125, 131, 132).
 - **La dimension** `darkcraft:morvain` (`data/darkcraft/dimension*/morvain.json`): de 0 a 767 (`Morvain.ALTO`), hora fija
   12500 (el sol a punto de ponerse: cielo oscuro con un poco de dorado y rojo, respuesta 91), sin camas. Generador
