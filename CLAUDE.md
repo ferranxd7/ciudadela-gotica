@@ -1446,6 +1446,36 @@ Respuesta 92 del plan ("santuarios con teletransporte").
   delante de la Encrucijada (`mv36`, linea `tras el viaje: ...`) y la brujula con un santuario conocido y otro no
   (`mv37`, `mv38`).
 
+### Plan grande, parte 7d: los fragmentos del mapa y el mapa de la M en Morvain
+
+Respuesta 92 del plan ("fragmentos de mapa"), como en Elden Ring.
+- **Las estelas del mapa** (`morvain/EstelaBlock`, bloque `darkcraft:estela_mapa`, irrompible, `facing`; modelo y
+  texturas de `tools/morvain/estela.py`: obelisco bajo de piedra negra, el mapa de la region tallado con filete de oro,
+  runas azules en los costados y un pergamino clavado arriba). Una por region de tierra (`morvain/Fragmentos.ESTELAS`): la
+  de las Llanuras en la plaza del Arco del Umbral, donde empieza el camino del norte (`Llegada`, 11 al norte del
+  santuario); las demas en la tarima de uno de sus santuarios, 3 al norte del fuego, mirandolo (`Fragmentos.JUNTO`:
+  ahorcados, embarcadero, colmillo, puerta_academia, puerta_capital, costillar, grieta, ancla_sur). Se escriben al
+  generar el chunk.
+- **Copiar el mapa**: clic derecho o la E mirandola (`client/morvain/ClientMapa`: el aviso "para copiar el mapa de la
+  estela" solo en las de regiones que aun no tiene; runas del encantamiento que vuelan hacia ellas) → `Net.EstelaUsar` →
+  `Fragmentos.usar`: se apunta en la ficha (`Ficha.mapaNuevo`, lista `mapas`), cartel "<region> / Fragmento de mapa · n de
+  9" (`Net.Cartel.FRAGMENTO`), logros `fragmento` y `mapa_morvain` (hazana, los nueve) y `Net.Mapas` al cliente (tambien al
+  conectarse y al entrar en Morvain).
+- **El mapa de la M en Morvain** (`LibroScreen.Vista`, `morvain()`): se abre de lejos (`ppb` 0,12); encima de lo explorado
+  (la tinta de siempre), el pergamino de `mapa_morvain.png` **solo en las regiones cuyo mapa tiene** y el Mar Muerto
+  (`client/morvain/MapaMorvain`: compone una textura de 1024 con la mascara de `mapa_morvain_regiones.png` —un gris por
+  region, su orden x 25; lo escribe tambien `tools/morvain/Pergamino.java`—, bordes fundidos y quemados; se rehace al
+  cambiar los mapas; de cerca se transparenta para ver lo andado). Encima: el nombre de cada region que tiene (en su
+  punto mas metido, `MapaMorvain.nombre`), la ciudadela, el Arco del Umbral y los santuarios que conoce (iconos
+  `EspejoHud.I_SANTUARIO`, `I_CIUDADELA`, `I_ESTELA` de `tools/espejo/iconos.py`).
+- **Viajar desde el mapa**: clic en un santuario que conoce (estando en Morvain) → "¿Viajar a «...»?" → `Net.ViajarMapa`
+  → `Viaje.desdeMapa` (sin estar descansando; no en combate: aviso `darkcraft.viaje.enemigos`; el mismo fundido).
+- Comandos `/darkcraft mapa [lista | dar <region>|todos | quitar | ir <region>]`. `Net.V` = "20".
+- Pruebas: servidor, linea `Morvain, las estelas del mapa: ...` (cada una en su sitio, mirando al sur y con hueco
+  delante); cliente, tramo `mapaMorvain()` despues del viaje: la estela de las Llanuras con su aviso (`cliente_mv39`), la E
+  (`mv40`, cartel), la M con solo las Llanuras (`mv41`), con todo (`mv42`), de cerca (`mv43`), la pregunta del viaje
+  (`mv44`) y despues del viaje al vado (`mv45`, linea `tras viajar desde el mapa: ...`); en combate no se viaja.
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1456,7 +1486,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b y la 7c arriba; despues, los fragmentos de mapa y el mapa de la M en Morvain).
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c y la 7d arriba; despues, region a region su contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

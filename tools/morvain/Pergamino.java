@@ -14,6 +14,7 @@ import java.io.File;
  *
  * <pre>javac -d /tmp/mv src/main/java/com/darkcraft/morvain/{Ruido,Region,Terreno}.java tools/morvain/Pergamino.java
  * java -cp /tmp/mv Pergamino src/main/resources/assets/darkcraft/textures/gui/mapa_morvain.png</pre>
+ * (escribe tambien {@code mapa_morvain_regiones.png}: la region de cada pixel, para el mapa de la M, parte 7d)
  */
 public class Pergamino {
     static final int N = 1024;
@@ -138,6 +139,12 @@ public class Pergamino {
         File f = new File(args.length > 0 ? args[0] : "mapa_morvain.png");
         f.getAbsoluteFile().getParentFile().mkdirs();
         ImageIO.write(img, "png", f);
-        System.out.println("mapa de Morvain: " + N + " x " + N + " en " + (System.currentTimeMillis() - t0) + " ms -> " + f);
+        // las regiones (parte 7d): un gris por region (su orden * 25), para que el mapa de la M ensene solo las que tiene
+        BufferedImage reg2 = new BufferedImage(N, N, BufferedImage.TYPE_BYTE_GRAY);
+        for (int y = 0; y < N; y++)
+            for (int x = 0; x < N; x++) reg2.getRaster().setSample(x, y, 0, reg[y + 1][x + 1].ordinal() * 25);
+        File g = new File(f.getAbsoluteFile().getParentFile(), f.getName().replace(".png", "_regiones.png"));
+        ImageIO.write(reg2, "png", g);
+        System.out.println("mapa de Morvain: " + N + " x " + N + " en " + (System.currentTimeMillis() - t0) + " ms -> " + f + " y " + g);
     }
 }

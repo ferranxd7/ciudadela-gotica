@@ -109,6 +109,8 @@ final class Llegada {
         arco(e);
         // el santuario (apagado; su nombre lo apunta Morvain la primera vez que llega alguien) y las farolas del arco
         e.poner(X, Y + 1, Z, santuarioBloque());
+        // la estela del mapa de las Llanuras (parte 7d): donde empieza el camino del norte, mirando al santuario
+        e.poner(X, Y + 1, Z - 11, Fragmentos.bloque());
         for (int s = -1; s <= 1; s += 2) {
             int fx = X + s * 9, fz = PZ - 2;
             e.poner(fx, Y + 1, fz, b(Blocks.POLISHED_BLACKSTONE));

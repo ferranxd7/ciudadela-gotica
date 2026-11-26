@@ -628,11 +628,63 @@ I['flecha'] = [
     "................",
     "................"]
 
+I['santuario_m'] = [
+    "................",
+    ".......U........",
+    "......UUU.......",
+    ".....UUsUU......",
+    ".....UsssU......",
+    "....UUsssUU.....",
+    "....uUUsUUu.....",
+    "...kkkkkkkkk....",
+    "...kgGGGGGgk....",
+    "....kgggggk.....",
+    ".....kdddk......",
+    "......kgk.......",
+    "......kgk.......",
+    ".....kdddk......",
+    "....kkkkkkk.....",
+    "................"]
+I['ciudadela'] = [
+    ".......R........",
+    ".......k........",
+    "......kdk.......",
+    "...k..kdk..k....",
+    "..kdk.kdk.kdk...",
+    "..kdkkkdkkkdk...",
+    "..kdddddddddk...",
+    "..kddddRddddk...",
+    "..kdddddddddk...",
+    "...kgggggggk....",
+    "....kgggggk.....",
+    "..g..kgggk..g...",
+    ".g....kgk....g..",
+    "g......k......g.",
+    "................",
+    "................"]
+I['estela'] = [
+    "................",
+    ".....kkkkkk.....",
+    "....kddddddk....",
+    ".....kyyyyk.....",
+    ".....kcCcck.....",
+    ".....kcbcck.....",
+    ".....kcccCk.....",
+    ".....kCcRck.....",
+    ".....kcccck.....",
+    ".....kyyyyk.....",
+    ".....kdddgk.....",
+    ".....kddddk.....",
+    "....kkkkkkkk....",
+    "...kgggggggggk..",
+    "...kkkkkkkkkkk..",
+    "................"]
+
 ORDEN = ['jugador', 'torre', 'catedral', 'arbol', 'fuente', 'cofre', 'cofre_leido', 'calavera', 'corona', 'espada',
          'puerta', 'casa', 'fortaleza', 'portal', 'libro', 'pluma',
          'm_bandera', 'm_estrella', 'm_casa', 'm_calavera', 'm_corazon', 'm_equis', 'm_diamante', 'm_ojo', 'm_pico',
          'm_cama', 'm_espadas', 'm_pregunta', 'sello', 'sello_gris', 'candado', 'pergamino',
-         'mapa', 'trofeo', 'bestia', 'punto', 'flecha']
+         'mapa', 'trofeo', 'bestia', 'punto', 'flecha', 'santuario_m', 'ciudadela', 'estela']
 
 
 def main(salida):

@@ -1877,6 +1877,47 @@ EN.update({
 })
 
 
+# ---------------------------------------------------------------- parte 7d: los fragmentos del mapa de Morvain
+ES.update({
+    "block.darkcraft.estela_mapa": "Estela del mapa",
+    "darkcraft.aviso.estela": "para copiar el mapa de la estela",
+    "darkcraft.estela.ya": "Ya tienes el mapa de esta región.",
+    "darkcraft.cartel.fragmento": "Fragmento de mapa · %s de %s",
+    "darkcraft.viaje.enemigos": "No puedes viajar con enemigos cerca.",
+    "darkcraft.viaje.clic": "Clic: viajar aquí",
+    "darkcraft.viaje.pregunta": "¿Viajar a «%s»?",
+    "darkcraft.viaje.si": "Viajar",
+    "darkcraft.viaje.no": "Quedarse",
+    "darkcraft.morvain.lugar.ciudadela": "La ciudadela encadenada",
+    "advancements.darkcraft.fragmento.title": "El mapa en la piedra",
+    "advancements.darkcraft.fragmento.description": "Copia el mapa de una estela de Morvain",
+    "advancements.darkcraft.mapa_morvain.title": "Cartógrafo de las Tierras Marchitas",
+    "advancements.darkcraft.mapa_morvain.description": "Copia los nueve fragmentos del mapa de Morvain",
+    "darkcraft.diario.fragmento": "Junto al fuego había una estela con el mapa de la región tallado en la piedra y un pergamino clavado. Lo copié en el libro de la Sombra: ahora sé dónde estoy.",
+    "darkcraft.diario.mapa_morvain": "Nueve estelas, nueve fragmentos. El mapa de Morvain está entero en mi libro... y todos los caminos llevan al castillo encadenado.",
+    "darkcraft.ayuda.mapa": "los fragmentos del mapa de Morvain: los que tienes, dártelos, quitártelos o llevarte ante una estela",
+})
+EN.update({
+    "block.darkcraft.estela_mapa": "Map Stele",
+    "darkcraft.aviso.estela": "to copy the stele's map",
+    "darkcraft.estela.ya": "You already have the map of this region.",
+    "darkcraft.cartel.fragmento": "Map fragment · %s of %s",
+    "darkcraft.viaje.enemigos": "You cannot travel with enemies nearby.",
+    "darkcraft.viaje.clic": "Click: travel here",
+    "darkcraft.viaje.pregunta": "Travel to “%s”?",
+    "darkcraft.viaje.si": "Travel",
+    "darkcraft.viaje.no": "Stay",
+    "darkcraft.morvain.lugar.ciudadela": "The Chained Citadel",
+    "advancements.darkcraft.fragmento.title": "The Map in the Stone",
+    "advancements.darkcraft.fragmento.description": "Copy the map from a stele of Morvain",
+    "advancements.darkcraft.mapa_morvain.title": "Cartographer of the Withered Lands",
+    "advancements.darkcraft.mapa_morvain.description": "Copy all nine map fragments of Morvain",
+    "darkcraft.diario.fragmento": "Beside the fire stood a stele with the region's map carved into the stone and a parchment nailed to it. I copied it into the Shadow's book: now I know where I am.",
+    "darkcraft.diario.mapa_morvain": "Nine steles, nine fragments. The map of Morvain is whole in my book... and every road leads to the chained castle.",
+    "darkcraft.ayuda.mapa": "the map fragments of Morvain: the ones you have, give them to you, take them away or take you to a stele",
+})
+
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

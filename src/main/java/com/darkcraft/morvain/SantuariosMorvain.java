@@ -199,6 +199,9 @@ public final class SantuariosMorvain {
                 e.poner(px, s.y + 3, pz, b(Blocks.SOUL_LANTERN));
             }
         }
+        // la estela del mapa de la region, si es este santuario (parte 7d): tres al norte del fuego, mirandolo
+        Fragmentos.Estela es = Fragmentos.de(s);
+        if (es != null) e.poner(es.x(), es.y(), es.z(), Fragmentos.bloque());
     }
 
     /** Sube o baja la columna hasta h (relleno con la tierra de su region). */

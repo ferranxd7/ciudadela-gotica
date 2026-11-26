@@ -1,0 +1,309 @@
+{
+ "credit": "Dark Craft: la estela del mapa (tools/morvain/estela.py)",
+ "render_type": "minecraft:cutout",
+ "textures": {
+  "piedra": "darkcraft:block/estela_piedra",
+  "frente": "darkcraft:block/estela_frente",
+  "lado": "darkcraft:block/estela_lado",
+  "pergamino": "darkcraft:block/estela_pergamino",
+  "particle": "darkcraft:block/estela_piedra"
+ },
+ "elements": [
+  {
+   "from": [
+    2,
+    0,
+    2
+   ],
+   "to": [
+    14,
+    2,
+    14
+   ],
+   "faces": {
+    "north": {
+     "texture": "#piedra"
+    },
+    "south": {
+     "texture": "#piedra"
+    },
+    "east": {
+     "texture": "#piedra"
+    },
+    "west": {
+     "texture": "#piedra"
+    },
+    "up": {
+     "texture": "#piedra"
+    },
+    "down": {
+     "texture": "#piedra",
+     "cullface": "down"
+    }
+   }
+  },
+  {
+   "from": [
+    3,
+    2,
+    3
+   ],
+   "to": [
+    13,
+    3,
+    13
+   ],
+   "faces": {
+    "north": {
+     "texture": "#piedra"
+    },
+    "south": {
+     "texture": "#piedra"
+    },
+    "east": {
+     "texture": "#piedra"
+    },
+    "west": {
+     "texture": "#piedra"
+    },
+    "up": {
+     "texture": "#piedra"
+    },
+    "down": {
+     "texture": "#piedra"
+    }
+   }
+  },
+  {
+   "from": [
+    4,
+    3,
+    5
+   ],
+   "to": [
+    12,
+    19,
+    11
+   ],
+   "faces": {
+    "north": {
+     "texture": "#frente",
+     "uv": [
+      4,
+      0,
+      12,
+      16
+     ]
+    },
+    "south": {
+     "texture": "#piedra",
+     "uv": [
+      4,
+      0,
+      12,
+      16
+     ]
+    },
+    "east": {
+     "texture": "#lado",
+     "uv": [
+      5,
+      0,
+      11,
+      16
+     ]
+    },
+    "west": {
+     "texture": "#lado",
+     "uv": [
+      5,
+      0,
+      11,
+      16
+     ]
+    },
+    "up": {
+     "texture": "#piedra"
+    },
+    "down": {
+     "texture": "#piedra"
+    }
+   }
+  },
+  {
+   "from": [
+    3,
+    19,
+    4
+   ],
+   "to": [
+    13,
+    21,
+    12
+   ],
+   "faces": {
+    "north": {
+     "texture": "#piedra"
+    },
+    "south": {
+     "texture": "#piedra"
+    },
+    "east": {
+     "texture": "#piedra"
+    },
+    "west": {
+     "texture": "#piedra"
+    },
+    "up": {
+     "texture": "#piedra"
+    },
+    "down": {
+     "texture": "#piedra"
+    }
+   }
+  },
+  {
+   "from": [
+    5,
+    21,
+    6
+   ],
+   "to": [
+    11,
+    23,
+    10
+   ],
+   "faces": {
+    "north": {
+     "texture": "#piedra"
+    },
+    "south": {
+     "texture": "#piedra"
+    },
+    "east": {
+     "texture": "#piedra"
+    },
+    "west": {
+     "texture": "#piedra"
+    },
+    "up": {
+     "texture": "#piedra"
+    },
+    "down": {
+     "texture": "#piedra"
+    }
+   }
+  },
+  {
+   "from": [
+    5,
+    10,
+    4.9
+   ],
+   "to": [
+    11,
+    17,
+    4.9
+   ],
+   "faces": {
+    "north": {
+     "texture": "#pergamino",
+     "uv": [
+      5,
+      2,
+      11,
+      9
+     ]
+    }
+   },
+   "shade": false
+  }
+ ],
+ "display": {
+  "gui": {
+   "rotation": [
+    30,
+    225,
+    0
+   ],
+   "translation": [
+    0,
+    -2.5,
+    0
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ]
+  },
+  "ground": {
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "translation": [
+    0,
+    3,
+    0
+   ],
+   "scale": [
+    0.3,
+    0.3,
+    0.3
+   ]
+  },
+  "fixed": {
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "translation": [
+    0,
+    -2,
+    0
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ]
+  },
+  "thirdperson_righthand": {
+   "rotation": [
+    75,
+    45,
+    0
+   ],
+   "translation": [
+    0,
+    2.5,
+    0
+   ],
+   "scale": [
+    0.3,
+    0.3,
+    0.3
+   ]
+  },
+  "firstperson_righthand": {
+   "rotation": [
+    0,
+    45,
+    0
+   ],
+   "translation": [
+    0,
+    0,
+    0
+   ],
+   "scale": [
+    0.35,
+    0.35,
+    0.35
+   ]
+  }
+ }
+}

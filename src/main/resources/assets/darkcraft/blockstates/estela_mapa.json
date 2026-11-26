@@ -1,0 +1,19 @@
+{
+ "variants": {
+  "facing=north": {
+   "model": "darkcraft:block/estela_mapa"
+  },
+  "facing=east": {
+   "model": "darkcraft:block/estela_mapa",
+   "y": 90
+  },
+  "facing=south": {
+   "model": "darkcraft:block/estela_mapa",
+   "y": 180
+  },
+  "facing=west": {
+   "model": "darkcraft:block/estela_mapa",
+   "y": 270
+  }
+ }
+}

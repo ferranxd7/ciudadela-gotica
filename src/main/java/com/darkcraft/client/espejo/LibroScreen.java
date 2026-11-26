@@ -326,6 +326,13 @@ public final class LibroScreen extends Screen {
             dim = d;
             ex = EspejoCliente.otra(d);
             marcas = (EspejoCliente.exploracion() == ex && EspejoCliente.marcas() != null) ? EspejoCliente.marcas() : new Marcas(ex.carpeta());
+            // Morvain es enorme (16.000 bloques): se abre de lejos
+            if (morvain() && ppb > 0.5f) ppb = 0.12f;
+        }
+
+        /** Si se esta viendo Morvain (parte 7d: su pergamino, sus santuarios y viajar desde el mapa). */
+        boolean morvain() {
+            return com.darkcraft.morvain.Morvain.NIVEL.location().toString().equals(dim);
         }
 
         boolean esLaDelJugador() {
@@ -508,6 +515,18 @@ public final class LibroScreen extends Screen {
                                 sx((rx + 1) * (double) Exploracion.R), sy((rz + 1) * (double) Exploracion.R));
                     }
             }
+            // Morvain: el pergamino con las regiones cuyo mapa tiene (de cerca se transparenta: se ve lo andado)
+            if (morvain()) {
+                ResourceLocation mt = com.darkcraft.client.morvain.MapaMorvain.textura();
+                if (mt != null) {
+                    float al = Mth.clamp(1f - (ppb - 0.5f) * 0.33f, 0.35f, 1f);
+                    EspejoHud.mezcla();
+                    RenderSystem.setShaderColor(1, 1, 1, al);
+                    double mm = com.darkcraft.client.morvain.MapaMorvain.MITAD;
+                    EspejoHud.cuadro(g, mt, sx(-mm), sy(-mm), sx(mm), sy(mm));
+                    RenderSystem.setShaderColor(1, 1, 1, 1);
+                }
+            }
             // sombra del lomo del libro por encima del mapa
             int gx = X(256);
             for (int i = 0; i < 10; i++) {
@@ -528,8 +547,9 @@ public final class LibroScreen extends Screen {
             Component ay = Component.translatable("darkcraft.sombra.mapa.ayuda");
             g.drawString(font, ay, -font.width(ay), 0, GRIS, false);
             g.pose().popPose();
-            if (!hover.isEmpty() && marca == null && borrar == null) tooltip(hover);
+            if (!hover.isEmpty() && marca == null && borrar == null && viajeA == null) tooltip(hover);
             if (borrar != null) confirmarBorrar(g, mx, my);
+            if (viajeA != null) confirmarViaje(g, mx, my);
         }
 
         final int[] selector = new int[3];
@@ -595,6 +615,7 @@ public final class LibroScreen extends Screen {
                     }
                 }
             }
+            if (morvain()) morvainMarcas(g, mx, my, l, t, hover);
             // marcas propias
             for (Marcas.Marca m : marcas.lista) {
                 float x = sx(m.x + 0.5), y = sy(m.z + 0.5);
@@ -660,6 +681,11 @@ public final class LibroScreen extends Screen {
         }
 
         boolean clic(double mx, double my, int b) {
+            if (viajeA != null) {
+                if (siNoViaje != null && en(new int[]{siNoViaje[0], siNoViaje[1], siNoViaje[2], siNoViaje[3]}, mx, my)) viajar(viajeA);
+                viajeA = null;
+                return true;
+            }
             if (borrar != null) {
                 if (siNo != null && en(new int[]{siNo[0], siNo[1], siNo[2], siNo[3]}, mx, my)) {
                     marcas.quitar(borrar);
@@ -710,10 +736,109 @@ public final class LibroScreen extends Screen {
                 return true;
             }
             if (b == 0) {
+                // Morvain: un santuario que conoce = viajar a el (con pregunta)
+                var s = santuarioEn(mx, my);
+                if (s != null) {
+                    viajeA = s;
+                    pasarPagina();
+                    return true;
+                }
                 arrastrando = true;
                 return true;
             }
             return false;
+        }
+
+        // ------------------------------------------------------------------ Morvain (parte 7d)
+
+        com.darkcraft.morvain.SantuariosMorvain.Sitio viajeA;
+        int[] siNoViaje;
+
+        /** El santuario de Morvain que conoce bajo el raton (si se puede viajar desde aqui: estando alli). */
+        com.darkcraft.morvain.SantuariosMorvain.Sitio santuarioEn(double mx, double my) {
+            if (!morvain() || !esLaDelJugador()) return null;
+            float l = Mth.clamp(10 + ppb * 2.5f, 10, 16);
+            com.darkcraft.morvain.SantuariosMorvain.Sitio mejor = null;
+            double d = (l / 2 + 2) * (l / 2 + 2);
+            for (var s : com.darkcraft.morvain.SantuariosMorvain.todos()) {
+                if (!com.darkcraft.client.morvain.ClientViaje.CONOCIDOS.contains(s.id())) continue;
+                double dx = mx - sx(s.x() + 0.5), dy = my - sy(s.z() + 0.5), dd = dx * dx + dy * dy;
+                if (dd <= d) {
+                    d = dd;
+                    mejor = s;
+                }
+            }
+            return mejor;
+        }
+
+        void viajar(com.darkcraft.morvain.SantuariosMorvain.Sitio s) {
+            Net.CH.sendToServer(new Net.ViajarMapa(s.id()));
+            Minecraft.getInstance().setScreen(null);
+        }
+
+        private void morvainMarcas(GuiGraphics g, int mx, int my, float l, float t, List<Component> hover) {
+            // los nombres de las regiones cuyo mapa tiene
+            float esc = Mth.clamp(0.55f + ppb * 1.6f, 0.6f, 1.15f);
+            for (com.darkcraft.morvain.Region r : com.darkcraft.morvain.Region.values()) {
+                if (r == com.darkcraft.morvain.Region.MAR || !com.darkcraft.client.morvain.ClientMapa.tiene(r.id)) continue;
+                int[] p = com.darkcraft.client.morvain.MapaMorvain.nombre(r);
+                if (p == null) continue;
+                float x = sx(p[0]), y = sy(p[1]);
+                if (x < x0() - 120 || x > x1() + 120 || y < y0() - 20 || y > y1() + 20) continue;
+                Component n = Component.translatable("darkcraft.zona.morvain." + r.id);
+                g.pose().pushPose();
+                g.pose().translate(x, y, 0);
+                g.pose().scale(esc, esc, 1);
+                int w = font.width(n);
+                g.drawString(font, n, -w / 2 + 1, -3, 0x70F0E2BC, false);
+                g.drawString(font, n, -w / 2, -4, 0xFF3A2414, false);
+                g.pose().popPose();
+            }
+            EspejoHud.mezcla();
+            // la ciudadela encadenada y el Arco del Umbral
+            float cx = sx(0.5), cy = sy(0.5);
+            EspejoHud.icono(g, EspejoHud.I_CIUDADELA, cx, cy, l * 1.6f);
+            if (Math.abs(mx - cx) <= l * 0.8f && Math.abs(my - cy) <= l * 0.8f)
+                hover.add(Component.translatable("darkcraft.morvain.lugar.ciudadela").withStyle(ChatFormatting.DARK_RED));
+            var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+            float ux = sx(u.x() + 0.5), uy = sy(u.z() + 15.5);
+            EspejoHud.icono(g, EspejoHud.I_PORTAL, ux, uy, l);
+            if (Math.abs(mx - ux) <= l / 2 && Math.abs(my - uy) <= l / 2)
+                hover.add(Component.translatable("darkcraft.morvain.lugar.umbral").withStyle(ChatFormatting.GOLD));
+            // los santuarios que conoce (con el raton encima: su nombre y "clic: viajar")
+            var sobre = santuarioEn(mx, my);
+            for (var s : com.darkcraft.morvain.SantuariosMorvain.todos()) {
+                if (!com.darkcraft.client.morvain.ClientViaje.CONOCIDOS.contains(s.id())) continue;
+                float x = sx(s.x() + 0.5), y = sy(s.z() + 0.5);
+                if (x < x0() - 20 || x > x1() + 20 || y < y0() - 20 || y > y1() + 20) continue;
+                boolean este = s == sobre || s == viajeA;
+                if (este) {
+                    float lat = 0.6f + 0.4f * (float) Math.sin(t * 5);
+                    EspejoHud.suma();
+                    RenderSystem.setShaderColor(0.35f, 0.75f, 1f, 0.8f * lat);
+                    float r = l * 1.4f;
+                    g.blit(EspejoHud.BRILLO, Math.round(x - r), Math.round(y - r), Math.round(r * 2), Math.round(r * 2), 0, 0, 64, 64, 64, 64);
+                    EspejoHud.mezcla();
+                    RenderSystem.setShaderColor(1, 1, 1, 1);
+                }
+                EspejoHud.icono(g, EspejoHud.I_SANTUARIO, x, y, este ? l * 1.25f : l);
+                if (s == sobre && viajeA == null) {
+                    hover.add(Component.translatable(s.nombre()).withStyle(ChatFormatting.AQUA));
+                    hover.add(Component.translatable("darkcraft.viaje.clic").withStyle(ChatFormatting.GRAY));
+                }
+            }
+        }
+
+        private void confirmarViaje(GuiGraphics g, int mx, int my) {
+            int cx = (x0() + x1()) / 2, cy = (y0() + y1()) / 2;
+            Component q = Component.translatable("darkcraft.viaje.pregunta", Component.translatable(viajeA.nombre()));
+            int w = Math.max(150, font.width(q) + 24);
+            g.fill(cx - w / 2 - 2, cy - 24, cx + w / 2 + 2, cy + 24, 0xF0201008);
+            g.fill(cx - w / 2, cy - 22, cx + w / 2, cy + 22, 0xF0E6D3A8);
+            centro(g, q, cx, cy - 14, TINTA);
+            int[] si = boton(g, cx - 56, cy + 6, Component.translatable("darkcraft.viaje.si"), mx, my);
+            int[] no = boton(g, cx + 14, cy + 6, Component.translatable("darkcraft.viaje.no"), mx, my);
+            siNoViaje = new int[]{si[0], si[1], si[2], si[3], no[0], no[1], no[2], no[3]};
         }
 
         void cambiarDim(int d) {
@@ -912,6 +1037,23 @@ public final class LibroScreen extends Screen {
     }
 
     /** Para las pruebas: el mapa del libro centrado en el jugador con este zoom (px por bloque). */
+    /** Para la prueba de la CI (parte 7d): deja preguntando el viaje a ese santuario y, si {@code ir}, viaja. */
+    public void probarViaje(String id, boolean ir) {
+        if (vista == null) return;
+        var s = com.darkcraft.morvain.SantuariosMorvain.porId(id);
+        if (s == null) return;
+        if (ir) vista.viajar(s);
+        else vista.viajeA = s;
+    }
+
+    /** Para la prueba de la CI: centra el mapa en (x, z) con ese zoom. */
+    public void probarCentro(double x, double z, float ppb) {
+        if (vista == null) return;
+        vista.vx = x;
+        vista.vz = z;
+        vista.ppb = ppb;
+    }
+
     public void probarZoom(float ppb) {
         if (vista != null) {
             vista.ppb = ppb;
