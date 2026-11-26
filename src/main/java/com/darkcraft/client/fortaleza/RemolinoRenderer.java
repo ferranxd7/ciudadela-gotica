@@ -116,15 +116,18 @@ public class RemolinoRenderer extends EntityRenderer<Remolino> {
         if (fin <= 0.01f) return;
         float crece = suave(tor / 4f), rojo = desde < 0 ? 0f : suave(desde / 3f);
         float H = Remolino.ALTO_NUBES, R = 22f + 104f * crece;
-        VertexConsumer vc = buf.getBuffer(RenderType.entityTranslucentEmissive(NUBES));
         ps.pushPose();
         ps.translate(0, H, 0);
         Matrix4f m = ps.last().pose();
         Matrix3f n = ps.last().normal();
         // (de color: gris de tormenta; desde el rayo, rojo encendido)
         float cr = Mth.lerp(rojo, 0.42f, 0.95f), cg = Mth.lerp(rojo, 0.38f, 0.22f), cb = Mth.lerp(rojo, 0.42f, 0.16f);
-        disco(vc, m, n, R, tor * 0.32f, 0.43f, cr, cg, cb, 0.9f * fin * Math.min(1f, tor / 1.5f), 0f);
-        disco(vc, m, n, R * 0.8f, -tor * 0.18f + 1.3f, 0.43f, cr * 0.8f, cg * 0.8f, cb * 0.8f, 0.6f * fin * Math.min(1f, tor / 2f), -3f);
+        // cada disco con su tipo de dibujo (dos tandas): en la misma, el juego ordena los cuadros de los dos por distancia
+        // y donde se cruzaba el orden se veia una raya recta desde el centro (build-124)
+        disco(buf.getBuffer(RenderType.entityTranslucentEmissive(NUBES)), m, n, R, tor * 0.32f, 0.43f, cr, cg, cb,
+                0.9f * fin * Math.min(1f, tor / 1.5f), 0f);
+        disco(buf.getBuffer(RenderType.entityTranslucentEmissive(NUBES, false)), m, n, R * 0.8f, -tor * 0.18f + 1.3f, 0.43f,
+                cr * 0.8f, cg * 0.8f, cb * 0.8f, 0.6f * fin * Math.min(1f, tor / 2f), -3f);
         ps.popPose();
         if (desde >= 0 && desde < 1.5f) {
             // el destello en el cielo (como el de un rayo de verdad) y el rayo
