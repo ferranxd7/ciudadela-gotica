@@ -284,9 +284,14 @@ public final class Arboleda {
 
     // ------------------------------------------------------------------ piezas ya decididas
 
-    /** Una lista de bloques ya decididos (un arbol, el patibulo...): cada chunk escribe lo que le cae. */
+    /**
+     * Una lista de bloques ya decididos (un arbol, el patibulo...): cada chunk escribe lo que le cae. Las sogas se apuntan
+     * por su parte y se convierten en el bloque al escribirse: el plano se hace al arrancar el mod (los puestos), antes de que
+     * existan los bloques del mod.
+     */
     private static final class Lista {
         final LinkedHashMap<Long, BlockState> b = new LinkedHashMap<>();
+        final LinkedHashMap<Long, SogaBlock.Parte> sogas = new LinkedHashMap<>();
         final Set<Long> une = new HashSet<>();
 
         void put(int x, int y, int z, BlockState s) {
@@ -294,6 +299,14 @@ public final class Arboleda {
             b.remove(k);
             b.put(k, s);
             une.remove(k);
+            sogas.remove(k);
+        }
+
+        void soga(int x, int y, int z, SogaBlock.Parte p) {
+            long k = BlockPos.asLong(x, y, z);
+            b.remove(k);
+            une.remove(k);
+            sogas.put(k, p);
         }
 
         void une(int x, int y, int z, BlockState s) {
@@ -302,19 +315,30 @@ public final class Arboleda {
         }
 
         boolean hay(int x, int y, int z) {
-            return b.containsKey(BlockPos.asLong(x, y, z));
+            long k = BlockPos.asLong(x, y, z);
+            return b.containsKey(k) || sogas.containsKey(k);
         }
 
         Element pieza(int capa) {
-            long[] pos = new long[b.size()];
-            BlockState[] st = new BlockState[b.size()];
-            boolean[] u = new boolean[b.size()];
-            int i = 0, x0 = Integer.MAX_VALUE, y0 = Integer.MAX_VALUE, z0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, y1 = Integer.MIN_VALUE, z1 = Integer.MIN_VALUE;
+            int n = b.size(), ns = sogas.size();
+            long[] pos = new long[n + ns];
+            BlockState[] st = new BlockState[n];
+            SogaBlock.Parte[] partes = new SogaBlock.Parte[ns];
+            boolean[] u = new boolean[n];
+            int i = 0;
             for (Map.Entry<Long, BlockState> e : b.entrySet()) {
-                long k = e.getKey();
-                pos[i] = k;
+                pos[i] = e.getKey();
                 st[i] = e.getValue();
-                u[i] = une.contains(k);
+                u[i] = une.contains(e.getKey());
+                i++;
+            }
+            for (Map.Entry<Long, SogaBlock.Parte> e : sogas.entrySet()) {
+                pos[i] = e.getKey();
+                partes[i - n] = e.getValue();
+                i++;
+            }
+            int x0 = Integer.MAX_VALUE, y0 = Integer.MAX_VALUE, z0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, y1 = Integer.MIN_VALUE, z1 = Integer.MIN_VALUE;
+            for (long k : pos) {
                 int x = BlockPos.getX(k), y = BlockPos.getY(k), z = BlockPos.getZ(k);
                 x0 = Math.min(x0, x);
                 y0 = Math.min(y0, y);
@@ -322,15 +346,14 @@ public final class Arboleda {
                 x1 = Math.max(x1, x);
                 y1 = Math.max(y1, y);
                 z1 = Math.max(z1, z);
-                i++;
             }
-            int fx0 = x0, fy0 = y0, fz0 = z0, fx1 = x1, fy1 = y1, fz1 = z1;
-            return new Trozo(capa, fx0, fy0, fz0, fx1, fy1, fz1, c -> {
+            return new Trozo(capa, x0, y0, z0, x1, y1, z1, c -> {
                 for (int j = 0; j < pos.length; j++) {
                     long k = pos[j];
                     int x = BlockPos.getX(k), z = BlockPos.getZ(k);
                     if (!c.inXZ(x, z)) continue;
-                    if (u[j]) c.unir(x, BlockPos.getY(k), z, st[j]);
+                    if (j >= n) c.set(x, BlockPos.getY(k), z, Arboleda.soga(partes[j - n]));
+                    else if (u[j]) c.unir(x, BlockPos.getY(k), z, st[j]);
                     else c.set(x, BlockPos.getY(k), z, st[j]);
                 }
             });
@@ -417,14 +440,14 @@ public final class Arboleda {
                 DarkCraftMod.LOGGER.warn("[DarkCraft] arboleda: la rama de {},{} esta baja para colgar (soga {}, fondo {})", x, z, ytop, fondo);
                 return;
             }
-            for (int y = ytop; y >= fondo; y--) L.put(x, y, z, soga(SogaBlock.Parte.CUERDA));
+            for (int y = ytop; y >= fondo; y--) L.soga(x, y, z, SogaBlock.Parte.CUERDA);
             colgados.add(new Colgado(x, suelo, z, giro, s.variante));
             sogas++;
             return;
         }
         int fondo = Math.max(suelo + 1, ytop - Math.max(1, s.largo) + 1);
-        for (int y = ytop; y > fondo; y--) L.put(x, y, z, soga(SogaBlock.Parte.CUERDA));
-        L.put(x, fondo, z, soga(s.tipo == LAZO ? SogaBlock.Parte.LAZO : SogaBlock.Parte.CABO));
+        for (int y = ytop; y > fondo; y--) L.soga(x, y, z, SogaBlock.Parte.CUERDA);
+        L.soga(x, fondo, z, s.tipo == LAZO ? SogaBlock.Parte.LAZO : SogaBlock.Parte.CABO);
         if (s.tipo == LAZO) lazos++;
         else cabos++;
     }
@@ -569,11 +592,11 @@ public final class Arboleda {
         }
         for (int x = PX - 4; x <= PX + 4; x++) L.put(x, viga, PZ - 1, log(Pal.DO_LOG, Direction.Axis.X));
         // las sogas: el lazo, la del ahorcado (sobre la trampilla) y el cabo
-        L.put(PX - 2, viga - 1, PZ - 1, soga(SogaBlock.Parte.CUERDA));
-        L.put(PX - 2, viga - 2, PZ - 1, soga(SogaBlock.Parte.LAZO));
+        L.soga(PX - 2, viga - 1, PZ - 1, SogaBlock.Parte.CUERDA);
+        L.soga(PX - 2, viga - 2, PZ - 1, SogaBlock.Parte.LAZO);
         lazos++;
         soga(L, PX, viga - 1, PZ - 1, new Soga(0, COLGADO, 0, Ahorcado.SOGA), 0f, f + 1);
-        L.put(PX + 2, viga - 1, PZ - 1, soga(SogaBlock.Parte.CABO));
+        L.soga(PX + 2, viga - 1, PZ - 1, SogaBlock.Parte.CABO);
         cabos++;
         // el atril con el registro del verdugo, el arcon y el tajo
         libre(PX - 3, PZ + 1);
