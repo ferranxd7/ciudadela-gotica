@@ -550,6 +550,34 @@ def banda():
 
 
 # ---------------------------------------------------------------- montar la textura
+# ---------------------------------------------------------------- la barra del corcel (parte 7b)
+# niebla de almas: de casi negro azulado a casi blanco
+NIEBLA = ["#0a1418", "#12262e", "#1e3c48", "#2e5a66", "#4a8890", "#86c4c8", "#d4f4f2"]
+
+CORCEL_ICONO = [
+    ".f.....f.",
+    "fNf...fNf",
+    "oHo...oHo",
+    "oHo...oHo",
+    "oho...oho",
+    "oHHo.oHHo",
+    ".oHHoHHo.",
+    "..ohHho..",
+    "...ooo...",
+]
+
+
+def corcel_icono():
+    """Una herradura de hueso con fuego de almas en las puntas, junto a la barra de la vida del corcel."""
+    L = Lienzo(9, 9)
+    col = {"o": TINTA, "H": HUESO[4], "h": HUESO[2], "N": NIEBLA[6], "f": NIEBLA[4]}
+    for y, fila in enumerate(CORCEL_ICONO):
+        for x, ch in enumerate(fila):
+            if ch in col:
+                L.px(x, y, col[ch])
+    return L
+
+
 def montar():
     A = Atlas(256, 128)
     A.poner("emblema", emblema())
@@ -584,6 +612,8 @@ def montar():
     for p in ("izq", "med", "der"):
         A.poner("boton_luz_" + p, boton(p, True))
     A.poner("banda", banda())
+    A.poner("corcel", relleno(NIEBLA, 14))
+    A.poner("corcel_icono", corcel_icono())
     A.L.guardar(os.path.join(GUI, "hud.png"))
     ruta = os.path.join(REPO, "src/main/java/com/darkcraft/client/ui/HudTex.java")
     os.makedirs(os.path.dirname(ruta), exist_ok=True)

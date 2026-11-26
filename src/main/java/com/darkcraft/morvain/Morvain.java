@@ -101,7 +101,10 @@ public final class Morvain {
      */
     public static boolean portal(ServerPlayer p, BlockPos pos) {
         ServerLevel m = nivel(p.server);
-        if (m == null || p.isPassenger()) return false;
+        if (m == null) return false;
+        // montado en el corcel: se va en niebla y se cruza a pie
+        if (p.getVehicle() instanceof com.darkcraft.montura.Corcel c) c.quitar();
+        if (p.isPassenger()) return false;
         int ahora = p.server.getTickCount();
         Integer hasta = ESPERA.get(p.getUUID());
         if (hasta != null && ahora < hasta) return true;

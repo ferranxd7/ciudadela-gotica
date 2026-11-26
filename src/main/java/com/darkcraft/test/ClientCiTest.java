@@ -5983,6 +5983,8 @@ public final class ClientCiTest {
         t += 30;
         atTicks(t, "captura", m -> shot(m, "cliente_mv02_llegada_cartel"));
         t += 10;
+        // el corcel (parte 7b): Maelis da el silbato, se llama, galopa, salta dos veces, se pelea montado y se deshace
+        t = corcel(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -6054,6 +6056,228 @@ public final class ClientCiTest {
         t += 20;
         atTicks(t, "captura", m -> shot(m, "cliente_mv18_vuelta"));
         return t + 20;
+    }
+
+    // ------------------------------------------------------------------ el corcel de Morvain (parte 7b)
+
+    private static String estadoCorcel(Minecraft m) {
+        String cli = "-";
+        if (m.player != null && m.player.getVehicle() instanceof com.darkcraft.montura.Corcel c)
+            cli = String.format(java.util.Locale.ROOT, "montado: el jinete a %.2f sobre el corcel, %.2f bloques/tick, en el aire %d, accion %d, vida %.0f, galope %s",
+                    m.player.getY() - c.getY(), c.velocidad, c.enAire, c.accionVista(), c.getHealth(), com.darkcraft.montura.Corcel.galopeCliente);
+        else if (m.player != null) cli = "sin montar";
+        return cli + "; saltos pedidos " + com.darkcraft.client.montura.ClientCorcel.saltosPedidos;
+    }
+
+    private static void logCorcel(Minecraft m, String que) {
+        String cli = estadoCorcel(m);
+        server(m, sp -> log("  corcel, " + que + ": " + com.darkcraft.montura.Montura.resumen(sp) + " | cliente: " + cli + " | cartel "
+                + com.darkcraft.client.ui.Carteles.resumen()));
+    }
+
+    private static void teclas(Minecraft m, boolean adelante, boolean galope) {
+        m.options.keyUp.setDown(adelante);
+        m.options.keySprint.setDown(galope);
+    }
+
+    /**
+     * Parte 7b: el corcel. En el Arco del Umbral, Maelis (la primera vez en Morvain) dice sus frases nuevas y da el silbato;
+     * se llama al corcel con la H (ya montado), se le ve de lado, galopa por el camino, salta y vuelve a saltar en el aire, se
+     * pega montado, herido de muerte se deshace (y no vuelve hasta pasado un rato: aviso), descansar lo deja listo, se
+     * encabrita esperando y, montado, la H lo despide.
+     */
+    private static int corcel(int T) {
+        final int[] ll = com.darkcraft.morvain.Vista.llegada();
+        final com.darkcraft.personajes.Guia[] guia = new com.darkcraft.personajes.Guia[1];
+        final double[] alto = {0, 0};
+        int t = T;
+        atTicks(t, "Corcel: Maelis en el Arco del Umbral", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) {
+                    log("  (no esta en Morvain: sin corcel)");
+                    return;
+                }
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.setHealth(sp.getMaxHealth());
+                com.darkcraft.rol.Rol.sinCombate(sp);
+                var gs = sp.serverLevel().getEntitiesOfClass(com.darkcraft.personajes.Guia.class, new net.minecraft.world.phys.AABB(new BlockPos(ll[0], ll[1], ll[2])).inflate(14));
+                guia[0] = gs.isEmpty() ? null : gs.get(0);
+                log("  la guia en el arco: " + (guia[0] == null ? "NO ESTA" : String.format(java.util.Locale.ROOT, "%.1f %.1f %.1f", guia[0].getX(), guia[0].getY(), guia[0].getZ()))
+                        + "; silbato antes " + com.darkcraft.montura.Montura.tieneSilbato(sp));
+                irMirando(sp, ll[0] + 2.5, ll[1] + 1, ll[2] + 4.2, ll[0] + 2.5, ll[1] + 1.8, ll[2] + 1.5, false);
+            });
+        });
+        t += 30;
+        atTicks(t, "Corcel: hablar con Maelis", m -> server(m, sp -> {
+            if (guia[0] != null) com.darkcraft.dialogo.Conversaciones.hablar(sp, guia[0]);
+        }));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            log("  dialogo: " + (m.screen instanceof com.darkcraft.client.ui.DialogoScreen d ? d.resumen() : "NO (" + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()) + ")"));
+            shot(m, "cliente_mv20_maelis_morvain");
+        });
+        t += 2;
+        atTicks(t, "E, E: la frase 12", m -> dialogo(m, d -> {
+            d.pulsarSeguir();
+            d.pulsarSeguir();
+        }));
+        t += 60;
+        atTicks(t, "E: entera", m -> dialogo(m, com.darkcraft.client.ui.DialogoScreen::pulsarSeguir));
+        t += 4;
+        atTicks(t, "captura", m -> {
+            log("  dialogo: " + (m.screen instanceof com.darkcraft.client.ui.DialogoScreen d ? d.resumen() : "-"));
+            shot(m, "cliente_mv21_maelis_silbato");
+        });
+        t += 2;
+        atTicks(t, "E: da el silbato (y la 13)", m -> dialogo(m, com.darkcraft.client.ui.DialogoScreen::pulsarSeguir));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            log("  dialogo: " + (m.screen instanceof com.darkcraft.client.ui.DialogoScreen d ? d.resumen() : "-"));
+            shot(m, "cliente_mv22_silbato_conseguido");
+        });
+        t += 2;
+        atTicks(t, "fuera el dialogo", m -> {
+            m.setScreen(null);
+            server(m, sp -> log("  silbato: " + com.darkcraft.montura.Montura.tieneSilbato(sp) + " (logro " + com.darkcraft.story.Logros.tiene(sp, "silbato") + ")"));
+        });
+        t += 6;
+        atTicks(t, "Corcel: en la plaza mirando al norte, la H", m -> {
+            server(m, sp -> irMirando(sp, ll[0] + 0.5, ll[1] + 1, ll[2] + 10.5, ll[0] + 0.5, ll[1] + 2.4, ll[2] - 60, false));
+        });
+        t += 10;
+        atTicks(t, "pulsar H", m -> pulsar(com.darkcraft.client.ui.Teclas.CORCEL));
+        t += 12;
+        atTicks(t, "tercera persona", m -> m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK));
+        t += 18;
+        atTicks(t, "captura", m -> {
+            logCorcel(m, "llamado");
+            shot(m, "cliente_mv23_corcel");
+        });
+        t += 2;
+        atTicks(t, "de lado", m -> {
+            if (m.player == null) return;
+            Vec3 p = m.player.position();
+            verDesde(m, new Vec3(p.x + 4.6, p.y + 1.2, p.z - 0.6), new Vec3(p.x, p.y + 0.2, p.z - 0.2));
+        });
+        t += 14;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv24_corcel_lado"));
+        t += 2;
+        atTicks(t, "al galope por el camino", m -> {
+            m.setCameraEntity(m.player);
+            m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            teclas(m, true, true);
+        });
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logCorcel(m, "al galope");
+            shot(m, "cliente_mv25_galope");
+        });
+        t += 2;
+        atTicks(t, "salta", m -> {
+            m.options.keyJump.setDown(true);
+            if (m.player != null) alto[0] = m.player.getVehicle() != null ? m.player.getVehicle().getY() : m.player.getY();
+            alto[1] = alto[0];
+        });
+        for (int i = 1; i <= 26; i++) {
+            final int k = i;
+            atTicks(t + i, "salto " + i, m -> {
+                if (k == 2) m.options.keyJump.setDown(false);
+                if (k == 8) m.options.keyJump.setDown(true);
+                if (k == 10) m.options.keyJump.setDown(false);
+                if (m.player != null && m.player.getVehicle() != null) alto[1] = Math.max(alto[1], m.player.getVehicle().getY());
+                if (k == 15) shot(m, "cliente_mv26_doble_salto");
+            });
+        }
+        t += 28;
+        atTicks(t, "tras el salto", m -> {
+            log(String.format(java.util.Locale.ROOT, "  el salto doble subio %.2f bloques", alto[1] - alto[0]));
+            logCorcel(m, "tras el salto");
+        });
+        t += 10;
+        atTicks(t, "al paso, con la espada", m -> {
+            teclas(m, false, false);
+            server(m, sp -> {
+                sp.getInventory().setItem(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                sp.getInventory().selected = 0;
+            });
+        });
+        t += 20;
+        atTicks(t, "pega montado", m -> pulsar(m.options.keyAttack));
+        t += 5;
+        atTicks(t, "captura", m -> {
+            log("  combate montado: " + com.darkcraft.client.combate.ClientCombate.resumen());
+            shot(m, "cliente_mv27_ataque_montado");
+        });
+        t += 25;
+        atTicks(t, "herido de muerte", m -> server(m, sp -> {
+            com.darkcraft.montura.Corcel c = com.darkcraft.montura.Montura.de(sp);
+            if (c != null) c.recibir(c.getHealth() + 5f);
+            else log("  (no hay corcel)");
+        }));
+        t += 12;
+        atTicks(t, "captura", m -> {
+            logCorcel(m, "deshaciendose");
+            shot(m, "cliente_mv28_deshacerse");
+        });
+        t += 40;
+        atTicks(t, "la H otra vez (aun no puede volver)", m -> pulsar(com.darkcraft.client.ui.Teclas.CORCEL));
+        t += 8;
+        atTicks(t, "captura", m -> {
+            logCorcel(m, "espera");
+            shot(m, "cliente_mv29_espera");
+        });
+        t += 4;
+        atTicks(t, "descansar (lo deja listo) y la H", m -> {
+            server(m, com.darkcraft.santuario.Santuarios::descanso);
+        });
+        t += 4;
+        atTicks(t, "pulsar H", m -> pulsar(com.darkcraft.client.ui.Teclas.CORCEL));
+        t += 16;
+        atTicks(t, "se baja: espera y se encabrita", m -> server(m, sp -> {
+            com.darkcraft.montura.Corcel c = com.darkcraft.montura.Montura.de(sp);
+            log("  tras descansar: " + com.darkcraft.montura.Montura.resumen(sp));
+            sp.stopRiding();
+            if (c != null) {
+                c.empezar(com.darkcraft.enemigos.CorcelAnims.ENCABRITARSE);
+                sp.teleportTo(sp.serverLevel(), c.getX() + 3.5, c.getY(), c.getZ() + 0.5, 90f, 10f);
+            }
+        }));
+        t += 6;
+        atTicks(t, "de lado", m -> {
+            m.options.hideGui = true;
+            for (var e : m.level.entitiesForRendering())
+                if (e instanceof com.darkcraft.montura.Corcel c) {
+                    Vec3 p = c.position();
+                    verDesde(m, new Vec3(p.x + 5.0, p.y + 1.6, p.z + 1.2), new Vec3(p.x, p.y + 1.4, p.z));
+                }
+        });
+        t += 12;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv30_encabritarse"));
+        // (tras bajarse, el juego no deja volver a montar en 3 s)
+        t += 50;
+        atTicks(t, "montado otra vez (clic derecho) y la H lo despide", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                com.darkcraft.montura.Corcel c = com.darkcraft.montura.Montura.de(sp);
+                if (c != null) log("  montar con clic derecho: " + c.mobInteract(sp, net.minecraft.world.InteractionHand.MAIN_HAND) + " -> " + sp.isPassenger());
+            });
+        });
+        t += 10;
+        atTicks(t, "pulsar H (montado: se va)", m -> pulsar(com.darkcraft.client.ui.Teclas.CORCEL));
+        t += 40;
+        atTicks(t, "Corcel: fin", m -> {
+            logCorcel(m, "despedido");
+            teclas(m, false, false);
+            m.options.keyJump.setDown(false);
+            server(m, sp -> {
+                sp.getInventory().setItem(0, ItemStack.EMPTY);
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 10;
     }
 
     /** Delante de la camara (que mira al norte desde q): un santuario encendido, tres enemigos quietos y avisos de jefe. */

@@ -287,7 +287,8 @@ public final class ClientEquipo {
                     || it instanceof ArrowItem)
                 return ARMAS;
             if (it == DarkCraftMod.LLAVE_HUESO.get() || it == DarkCraftMod.LLAVE_ARBOL.get() || it == DarkCraftMod.AMULETO_HUESO.get()
-                    || it == DarkCraftMod.LIBRO_ACERTIJO.get() || it == DarkCraftMod.MAPA.get() || it instanceof WrittenBookItem
+                    || it == DarkCraftMod.LIBRO_ACERTIJO.get() || it == DarkCraftMod.MAPA.get() || it == DarkCraftMod.SILBATO_CORCEL.get()
+                    || it instanceof WrittenBookItem
                     || it instanceof MapItem || it == Items.WRITABLE_BOOK)
                 return CLAVE;
             if (st.isEdible() || it instanceof PotionItem || it instanceof EnderpearlItem || it instanceof SnowballItem || it instanceof EggItem

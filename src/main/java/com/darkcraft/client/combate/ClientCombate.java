@@ -108,9 +108,21 @@ public final class ClientCombate {
                 && !p.isFallFlying() && !ClientCine.active();
     }
 
+    /** Si va montado en el corcel de Morvain (parte 7b): se pelea y se lanza igual, pero sin rodar. */
+    private static boolean montado(Minecraft mc) {
+        LocalPlayer p = mc.player;
+        return p != null && mc.level != null && p.getVehicle() instanceof com.darkcraft.montura.Corcel && ClientEquipo.activo() && p.isAlive()
+                && !p.isSpectator() && !ClientCine.active();
+    }
+
+    /** Si puede pelear: suelto, o montado en el corcel. */
+    private static boolean pelea(Minecraft mc) {
+        return suelto(mc) || montado(mc);
+    }
+
     /** El arma de la mano derecha si se pelea con el combate propio, o null. */
     public static Armas.Tipo armado(Minecraft mc) {
-        if (!suelto(mc)) return null;
+        if (!pelea(mc)) return null;
         if (mc.player.getInventory().selected > 2) return null;
         return Armas.de(mc.player.getMainHandItem());
     }
@@ -172,7 +184,7 @@ public final class ClientCombate {
         while (Teclas.HABILIDAD.consumeClick()) hab = true;
         if (hab && juego && tipo != null) habilidad(mc, tipo);
         // con el baston o el sello en la mano, el clic lanza el hechizo elegido
-        com.darkcraft.hechizos.Hechizo.Escuela esc = suelto(mc) && p.getInventory().selected <= 2
+        com.darkcraft.hechizos.Hechizo.Escuela esc = pelea(mc) && p.getInventory().selected <= 2
                 ? com.darkcraft.hechizos.Catalizador.de(p.getMainHandItem()) : null;
         if (esc != null && juego) {
             lanzar(mc, esc);
@@ -193,7 +205,12 @@ public final class ClientCombate {
                 return;
             }
             // corriendo o en el aire, el golpe sale al momento; si no, se espera a ver si se mantiene la tecla
-            if (p.isSprinting() && p.onGround() && !p.isInWater()) pedir(mc, tipo, Armas.CORRIENDO, 0);
+            if (p.isPassenger()) {
+                // montado: el ligero (al galope sale el de correr) o, si se mantiene, el fuerte; nunca el del salto
+                if (com.darkcraft.montura.Corcel.galopeCliente && p.zza > 0f) pedir(mc, tipo, Armas.CORRIENDO, 0);
+                else if (!abajo) pedir(mc, tipo, Armas.LIGERO, 0);
+                else pulsada = 0;
+            } else if (p.isSprinting() && p.onGround() && !p.isInWater()) pedir(mc, tipo, Armas.CORRIENDO, 0);
             else if (!p.onGround() && !p.isInWater() && !p.onClimbable() && !p.getAbilities().flying) pedir(mc, tipo, Armas.SALTO, 0);
             else if (!abajo) pedir(mc, tipo, Armas.LIGERO, 0);
             else pulsada = 0;
@@ -643,6 +660,8 @@ public final class ClientCombate {
     public static void onInput(MovementInputUpdateEvent e) {
         Poses.Anim_ a = actual;
         if (a == null || e.getEntity() != Minecraft.getInstance().player) return;
+        // montado en el corcel no se frena: el que corre es el
+        if (e.getEntity().isPassenger()) return;
         Input in = e.getInput();
         int t = ClientRol.ticks - a.inicio;
         float k = switch (a.accion) {
@@ -669,7 +688,7 @@ public final class ClientCombate {
     public static void onClic(InputEvent.InteractionKeyMappingTriggered e) {
         if (preguntando) return;
         Minecraft mc = Minecraft.getInstance();
-        boolean catalizador = suelto(mc) && com.darkcraft.hechizos.Catalizador.de(mc.player.getMainHandItem()) != null;
+        boolean catalizador = pelea(mc) && com.darkcraft.hechizos.Catalizador.de(mc.player.getMainHandItem()) != null;
         if (catalizador && e.isAttack()) {
             // con el baston o el sello, el clic es para los hechizos (nunca picar bloques)
             e.setCanceled(true);

@@ -1756,6 +1756,74 @@ EN.update({
 })
 
 
+
+# ---------------------------------------------------------------- parte 7b: el corcel de hueso y niebla
+ES.update({
+    "entity.darkcraft.corcel": "Corcel de hueso y niebla",
+    "item.darkcraft.silbato_corcel": "Silbato del corcel",
+    "item.darkcraft.silbato_corcel.desc": "Hueso tallado de las hermanas de Maelis. Sóplalo en Morvain y el corcel acudirá desde la niebla.",
+    "key.darkcraft.corcel": "Llamar al corcel",
+    "darkcraft.corcel.como": "Usa el silbato o pulsa la tecla del corcel (H) para llamarlo",
+    "darkcraft.corcel.sin_silbato": "No llevas el silbato del corcel",
+    "darkcraft.corcel.solo_morvain": "Tu silbato no suena aquí: el corcel solo acude en Morvain",
+    "darkcraft.corcel.montado": "Ya vas montado",
+    "darkcraft.corcel.espera": "Tu corcel aún no ha vuelto de la niebla (%s s)",
+    "darkcraft.corcel.deshecho": "Tu corcel se ha deshecho en la niebla. Volverá dentro de %s s",
+    "darkcraft.corcel.sitio": "Aquí no cabe tu corcel",
+    "darkcraft.corcel.agua": "El corcel no pisa el agua honda",
+    "darkcraft.dialogo.guia.11": "Así que la puerta te ha dejado pasar... Bienvenido a Morvain, marcado. Las Tierras Marchitas. Aquí todo recuerda a la Sombra.",
+    "darkcraft.dialogo.guia.12": "Estas tierras son inmensas... demasiado para unos pies cansados. Toma este silbato. Lo tallaron con los huesos del corcel de mis hermanas. Sóplalo, y vendrá a ti desde la niebla.",
+    "darkcraft.dialogo.guia.13": "Corre como el viento y salta donde ningún caballo podría. Y si cae... vuelve a la niebla un rato. Pero siempre regresa.",
+    "darkcraft.dialogo.guia.14": "Los fuegos de Morvain son pocos, y están lejos unos de otros. Descansa mientras puedas, marcado.",
+    "advancements.darkcraft.silbato.title": "Un silbato de hueso",
+    "advancements.darkcraft.silbato.description": "Recibe de Maelis el silbato del corcel en el Arco del Umbral",
+    "advancements.darkcraft.corcel.title": "Corcel de hueso y niebla",
+    "advancements.darkcraft.corcel.description": "Llama a tu corcel en Morvain",
+    "darkcraft.diario.silbato": "Maelis me dio un silbato tallado en hueso. Dice que lo que responde a su llamada sale de la niebla... y que vuelve a ella cuando cae.",
+    "darkcraft.diario.corcel": "Soplé el silbato y la niebla tomó forma: un caballo de hueso, con los ojos encendidos de azul. Galopa sin cansarse y salta dos veces en el aire.",
+    "subtitles.darkcraft.sfx.corcel_llamada": "Suena un silbato de hueso",
+    "subtitles.darkcraft.sfx.corcel_aparece": "La niebla toma forma",
+    "subtitles.darkcraft.sfx.corcel_relincho": "Relincha el corcel",
+    "subtitles.darkcraft.sfx.corcel_paso": "Cascos de hierro",
+    "subtitles.darkcraft.sfx.corcel_salto": "El corcel salta en la niebla",
+    "subtitles.darkcraft.sfx.corcel_deshace": "El corcel se deshace en niebla",
+    "subtitles.darkcraft.sfx.corcel_dolor": "El corcel se queja",
+    "darkcraft.ayuda.corcel": "el corcel: llamarlo, darte el silbato, que se vaya, herirlo o quitarle la espera",
+})
+EN.update({
+    "entity.darkcraft.corcel": "Steed of Bone and Mist",
+    "item.darkcraft.silbato_corcel": "Steed Whistle",
+    "item.darkcraft.silbato_corcel.desc": "Carved bone from Maelis's sisters. Blow it in Morvain and the steed will come out of the mist.",
+    "key.darkcraft.corcel": "Call the steed",
+    "darkcraft.corcel.como": "Use the whistle or press the steed key (H) to call it",
+    "darkcraft.corcel.sin_silbato": "You are not carrying the steed whistle",
+    "darkcraft.corcel.solo_morvain": "Your whistle makes no sound here: the steed only comes in Morvain",
+    "darkcraft.corcel.montado": "You are already riding",
+    "darkcraft.corcel.espera": "Your steed has not yet returned from the mist (%s s)",
+    "darkcraft.corcel.deshecho": "Your steed has dissolved into the mist. It will return in %s s",
+    "darkcraft.corcel.sitio": "There is no room for your steed here",
+    "darkcraft.corcel.agua": "The steed will not tread deep water",
+    "darkcraft.dialogo.guia.11": "So the door let you through... Welcome to Morvain, marked one. The Withered Lands. Everything here remembers the Shadow.",
+    "darkcraft.dialogo.guia.12": "These lands are vast... too vast for tired feet. Take this whistle. It was carved from the bones of my sisters' steed. Blow it, and it will come to you, out of the mist.",
+    "darkcraft.dialogo.guia.13": "It runs like the wind and leaps where no horse could. And if it falls... it returns to the mist for a while. But it always comes back.",
+    "darkcraft.dialogo.guia.14": "The fires of Morvain are few, and far apart. Rest while you can, marked one.",
+    "advancements.darkcraft.silbato.title": "A Whistle of Bone",
+    "advancements.darkcraft.silbato.description": "Receive the steed whistle from Maelis at the Threshold Arch",
+    "advancements.darkcraft.corcel.title": "Steed of Bone and Mist",
+    "advancements.darkcraft.corcel.description": "Call your steed in Morvain",
+    "darkcraft.diario.silbato": "Maelis gave me a whistle carved from bone. She says what answers its call comes out of the mist... and returns to it when it falls.",
+    "darkcraft.diario.corcel": "I blew the whistle and the mist took shape: a horse of bone, its eyes burning blue. It gallops without tiring and leaps twice in the air.",
+    "subtitles.darkcraft.sfx.corcel_llamada": "A bone whistle sounds",
+    "subtitles.darkcraft.sfx.corcel_aparece": "The mist takes shape",
+    "subtitles.darkcraft.sfx.corcel_relincho": "The steed neighs",
+    "subtitles.darkcraft.sfx.corcel_paso": "Iron hooves",
+    "subtitles.darkcraft.sfx.corcel_salto": "The steed leaps through the mist",
+    "subtitles.darkcraft.sfx.corcel_deshace": "The steed dissolves into mist",
+    "subtitles.darkcraft.sfx.corcel_dolor": "The steed cries out",
+    "darkcraft.ayuda.corcel": "the steed: call it, give yourself the whistle, send it away, hurt it or clear its wait",
+})
+
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

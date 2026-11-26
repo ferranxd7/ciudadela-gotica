@@ -50,4 +50,6 @@ public final class HudTex {
     public static final T BOTON_LUZ_MED = new T(194, 48, 16, 20);
     public static final T BOTON_LUZ_DER = new T(211, 48, 8, 20);
     public static final T BANDA = new T(220, 48, 32, 16);
+    public static final T CORCEL = new T(0, 69, 32, 5);
+    public static final T CORCEL_ICONO = new T(33, 69, 9, 9);
 }

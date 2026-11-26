@@ -69,6 +69,8 @@ public final class Hud {
     static void tick(Minecraft mc) {
         LocalPlayer p = mc.player;
         int t = ClientRol.ticks;
+        com.darkcraft.montura.Corcel montado = corcel(p);
+        if (montado != null && corcelRastro > montado.getHealth()) corcelRastro = Math.max(montado.getHealth(), corcelRastro - 0.6f);
         float vida = p.getHealth(), max = Math.max(1f, p.getMaxHealth());
         if (vidaAnt < 0 || !p.isAlive()) {
             vidaAnt = vida;
@@ -113,7 +115,8 @@ public final class Hud {
         var o = e.getOverlay();
         if (o == VanillaGuiOverlay.PLAYER_HEALTH.type() || o == VanillaGuiOverlay.FOOD_LEVEL.type()
                 || o == VanillaGuiOverlay.ARMOR_LEVEL.type() || o == VanillaGuiOverlay.EXPERIENCE_BAR.type()
-                || o == VanillaGuiOverlay.POTION_ICONS.type())
+                || o == VanillaGuiOverlay.POTION_ICONS.type() || o == VanillaGuiOverlay.MOUNT_HEALTH.type()
+                || o == VanillaGuiOverlay.JUMP_BAR.type())
             e.setCanceled(true);
     }
 
@@ -172,7 +175,7 @@ public final class Hud {
         l.sort((a, b) -> a.getEffect().isBeneficial() != b.getEffect().isBeneficial() ? (a.getEffect().isBeneficial() ? -1 : 1)
                 : Integer.compare(a.isInfiniteDuration() ? Integer.MAX_VALUE : a.getDuration(), b.isInfiniteDuration() ? Integer.MAX_VALUE : b.getDuration()));
         var tex = mc.getMobEffectTextures();
-        int x = X0 + 22, y = Y0 + 27;
+        int x = X0 + 22, y = Y0 + 27 + (corcel(p) != null ? 10 : 0);
         for (int i = 0; i < Math.min(8, l.size()); i++) {
             var m = l.get(i);
             int dur = m.getDuration();
@@ -260,6 +263,19 @@ public final class Hud {
         if (ClientRol.agotado) sin = Math.max(sin, 0.3f + 0.25f * Mth.sin(t * 0.6f));
         if (sin > 0.02f) g.fill(x + 2, Y0 + 18, x + 3 + largoEst, Y0 + 23, (Math.round(150 * Math.min(1f, sin)) << 24) | 0xB81C26);
 
+        // --- montado en el corcel (parte 7b): su vida, con una herradura delante
+        int largoCorcel = 0;
+        com.darkcraft.montura.Corcel corcel = corcel(p);
+        if (corcel != null) {
+            largoCorcel = 64;
+            float cm = Math.max(1f, corcel.getMaxHealth()), cv = Mth.clamp(corcel.getHealth(), 0f, cm);
+            if (corcelRastro < cv) corcelRastro = cv;
+            Pix.blanco();
+            Pix.t(g, HudTex.CORCEL_ICONO, x + 1, Y0 + 24);
+            barra(g, x + 11, Y0 + 24, largoCorcel, cv / cm, corcelRastro / cm, HudTex.CORCEL, 1f, 1f, 1f);
+            largoCorcel += 11;
+        } else corcelRastro = 0f;
+
         // --- el emblema, encima del arranque de las barras; con poca vida, el ojo late
         Pix.blanco();
         Pix.t(g, HudTex.EMBLEMA, X0, Y0);
@@ -271,7 +287,15 @@ public final class Hud {
             Pix.blanco();
             Pix.mezcla();
         }
-        return x + 3 + Math.max(largoVida, Math.max(largoMana, largoEst)) + 8;
+        return x + 3 + Math.max(Math.max(largoVida, largoCorcel), Math.max(largoMana, largoEst)) + 8;
+    }
+
+    /** Lo que queda del rastro del dano en la barra del corcel (baja poco a poco, como el de la vida). */
+    private static float corcelRastro;
+
+    /** El corcel en el que se va montado (o null). */
+    static com.darkcraft.montura.Corcel corcel(LocalPlayer p) {
+        return p.getVehicle() instanceof com.darkcraft.montura.Corcel c && !c.isRemoved() ? c : null;
     }
 
     /** Una barra: marco de oro con punta, hueco oscuro, rastro del dano y relleno. */

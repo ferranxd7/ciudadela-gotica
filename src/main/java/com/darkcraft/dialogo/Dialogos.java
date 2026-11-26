@@ -17,11 +17,12 @@ public final class Dialogos {
     private Dialogos() {}
 
     /**
-     * Lo que puede pasar al acabar una frase o al elegir una respuesta: subir de nivel (la guia), la forja (el herrero) o
-     * la tienda (el mercader). Su nombre en minusculas es lo que manda el cliente ({@code Net.DialogoAccion}).
+     * Lo que puede pasar al acabar una frase o al elegir una respuesta: subir de nivel (la guia), la forja (el herrero),
+     * la tienda (el mercader) o el silbato del corcel (la guia, en Morvain). Su nombre en minusculas es lo que manda el
+     * cliente ({@code Net.DialogoAccion}).
      */
     public enum Accion {
-        NADA, NIVEL, FORJA, TIENDA;
+        NADA, NIVEL, FORJA, TIENDA, SILBATO;
 
         public String id() {
             return name().toLowerCase(java.util.Locale.ROOT);
@@ -109,14 +110,16 @@ public final class Dialogos {
 
     /**
      * Maelis, la guia de los santuarios. La primera vez: 1 → 2 → 3 → menu. Despues: 8 (o 9 tras vencer al Rey, 10 tras
-     * vencer a Ser Gavran, una vez cada una) → menu. El menu: la Sombra (4), por que sigo vivo (5), hacerme mas fuerte
-     * (6, y se abre subir de nivel) y despedirse (7).
+     * vencer a Ser Gavran, una vez cada una) → menu. En Morvain (parte 7b), la primera vez: 11 → 12 (al acabarla da el
+     * silbato del corcel) → 13 → menu; si se ha perdido el silbato, 12 → 13 otra vez; las demas, 14. El menu: la Sombra
+     * (4), por que sigo vivo (5), hacerme mas fuerte (6, y se abre subir de nivel) y despedirse (7).
      */
     public static final Personaje GUIA = new Hacer("guia")
             .frase(1, 2).frase(2, 3).frase(3, MENU)
             .frase(4, MENU).frase(5, MENU)
             .frase(6, FIN, Accion.NIVEL).frase(7, FIN)
             .frase(8, MENU).frase(9, MENU).frase(10, MENU)
+            .frase(11, 12).frase(12, 13, Accion.SILBATO).frase(13, MENU).frase(14, MENU)
             .menu(r("guia", "sombra", 4), r("guia", "vivo", 5), r("guia", "fuerte", 6), r("guia", "adios", 7))
             .hecho();
 

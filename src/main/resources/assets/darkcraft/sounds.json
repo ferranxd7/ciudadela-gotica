@@ -2595,5 +2595,124 @@
         "name": "darkcraft:sfx/cielo_rojo_1"
       }
     ]
+  },
+  "voz.guia.11": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_11",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.12": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_12",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.13": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_13",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.14": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_14",
+        "stream": true
+      }
+    ]
+  },
+  "sfx.corcel_llamada": {
+    "subtitle": "subtitles.darkcraft.sfx.corcel_llamada",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corcel_llamada_1"
+      },
+      {
+        "name": "darkcraft:sfx/corcel_llamada_2"
+      }
+    ]
+  },
+  "sfx.corcel_aparece": {
+    "subtitle": "subtitles.darkcraft.sfx.corcel_aparece",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corcel_aparece_1"
+      }
+    ]
+  },
+  "sfx.corcel_relincho": {
+    "subtitle": "subtitles.darkcraft.sfx.corcel_relincho",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corcel_relincho_1"
+      },
+      {
+        "name": "darkcraft:sfx/corcel_relincho_2"
+      }
+    ]
+  },
+  "sfx.corcel_paso": {
+    "subtitle": "subtitles.darkcraft.sfx.corcel_paso",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corcel_paso_1"
+      },
+      {
+        "name": "darkcraft:sfx/corcel_paso_2"
+      },
+      {
+        "name": "darkcraft:sfx/corcel_paso_3"
+      },
+      {
+        "name": "darkcraft:sfx/corcel_paso_4"
+      }
+    ]
+  },
+  "sfx.corcel_salto": {
+    "subtitle": "subtitles.darkcraft.sfx.corcel_salto",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corcel_salto_1"
+      },
+      {
+        "name": "darkcraft:sfx/corcel_salto_2"
+      }
+    ]
+  },
+  "sfx.corcel_deshace": {
+    "subtitle": "subtitles.darkcraft.sfx.corcel_deshace",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corcel_deshace_1"
+      },
+      {
+        "name": "darkcraft:sfx/corcel_deshace_2"
+      }
+    ]
+  },
+  "sfx.corcel_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.corcel_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corcel_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/corcel_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/corcel_dolor_3"
+      }
+    ]
   }
 }

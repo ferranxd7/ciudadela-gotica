@@ -48,7 +48,7 @@ VOZ = ("highpass=f=65," + ECO_SALA + ",acompressor=threshold=-20dB:ratio=2.5:att
        "loudnorm=I=-15:TP=-1.5:LRA=9")
 
 # Maelis, la guia de los santuarios (voz "Autumn Veil"): serena y cerca, con un poco de aire de piedra
-TOMAS_GUIA = {n: "a" for n in range(1, 11)}
+TOMAS_GUIA = {n: "a" for n in range(1, 15)}
 VOZ_GUIA = ("highpass=f=70,equalizer=f=3200:t=q:w=1.2:g=1.5,aecho=0.8:0.35:38|85:0.10|0.05,"
             "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=160,loudnorm=I=-16:TP=-1.5:LRA=9")
 # Dorvan, el herrero (voz "Fjalar - Gruff Scottish Dwarf Warrior"): ronco, con algo de graves y el eco corto de la
@@ -165,6 +165,10 @@ SFX = {
     "corteza_rugido": (2.2, 0.5, -13), "corteza_zarpazo": (0.7, 0.15, -15), "corteza_raices": (1.6, 0.4, -14),
     "corteza_espinas": (1.3, 0.3, -14), "corteza_dolor": (0.7, 0.2, -15), "corteza_muerte": (3.4, 0.8, -15),
     "sello_rompe": (2.0, 0.6, -14),
+    # el corcel de Morvain (parte 7b): el silbato, la niebla al llegar, el relincho, los cascos, el salto, deshacerse y el dolor
+    "corcel_llamada": (2.2, 0.7, -15), "corcel_aparece": (1.8, 0.5, -16), "corcel_relincho": (2.0, 0.5, -14),
+    "corcel_paso": (0.5, 0.15, -19), "corcel_salto": (1.0, 0.35, -17), "corcel_deshace": (2.3, 0.9, -15),
+    "corcel_dolor": (0.8, 0.2, -15),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -280,6 +284,11 @@ TOMAS_SFX = {
     "brandt_rugido": (1, 2), "brandt_martillazo": (2, 1), "brandt_escudo": (2, 1), "brandt_dolor": (2, 1),
     "brandt_muerte": (1, 2), "corteza_rugido": (2, 1), "corteza_zarpazo": (2, 1), "corteza_raices": (2, 1),
     "corteza_espinas": (1, 2), "corteza_dolor": (2, 1), "corteza_muerte": (2, 1), "sello_rompe": (2, 1),
+    # el corcel: el silbido que se sostiene; la niebla que crece hasta el golpe de los cascos; los dos relinchos mas
+    # largos; los cuatro cascos (uno cada paso, al azar); los dos soplos mas cortos; las dos colas mas largas; los tres
+    # quejidos que se cortan antes
+    "corcel_llamada": (4, 2), "corcel_aparece": (2,), "corcel_relincho": (2, 3), "corcel_paso": (1, 2, 3, 4),
+    "corcel_salto": (2, 4), "corcel_deshace": (2, 3), "corcel_dolor": (3, 1, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

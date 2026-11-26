@@ -12,7 +12,7 @@ import org.lwjgl.glfw.GLFW;
 /**
  * Las teclas del rol (se pueden cambiar en los controles, en el apartado Dark Craft): el menu del mod, los dos frascos,
  * la cruz del equipo (cambiar de arma en cada mano, cambiar de objeto rapido y usarlo) y las del combate (rodar y fijar
- * el objetivo).
+ * el objetivo) y la del corcel.
  */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class Teclas {
@@ -59,6 +59,9 @@ public final class Teclas {
     public static final KeyMapping FIJAR = new KeyMapping("key.darkcraft.fijar", SIN_CHOQUE, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Q,
             "key.categories.darkcraft");
 
+    /** Llamar al corcel de Morvain (con el silbato encima) o, montado, bajarse y que se vaya (parte 7b). */
+    public static final KeyMapping CORCEL = tecla("corcel", GLFW.GLFW_KEY_H);
+
     @SubscribeEvent
     public static void registrar(RegisterKeyMappingsEvent e) {
         e.register(MENU);
@@ -72,5 +75,6 @@ public final class Teclas {
         e.register(RODAR);
         e.register(HABILIDAD);
         e.register(FIJAR);
+        e.register(CORCEL);
     }
 }

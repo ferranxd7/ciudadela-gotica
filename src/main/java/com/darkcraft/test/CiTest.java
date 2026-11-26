@@ -662,6 +662,26 @@ public final class CiTest {
                 punta, com.darkcraft.morvain.Vista.eslabones(0), e[0], e[1], e[2], hierro, anclas));
         topView(m, 0, 0, 132, new File(out, "morvain_ciudadela.png"));
         alzado(m, -132, 132, 330, Math.min(m.getMaxBuildHeight() - 1, cima + 6), 132, -132, new File(out, "morvain_ciudadela_alzado.png"));
+        // el corcel (parte 7b): sus atributos y que herido de muerte no muere, se deshace
+        try {
+            com.darkcraft.montura.Corcel c = DarkCraftMod.CORCEL.get().create(m);
+            if (c == null) log.println("Morvain, el corcel: NO SE CREA");
+            else {
+                c.moveTo(ll[0] + 0.5, ll[1] + 1, ll[2] + 10.5, 180f, 0f);
+                m.addFreshEntity(c);
+                String antes = String.format(java.util.Locale.ROOT, "vida %.0f, paso %.2f (galope %.2f), salta %.2f y %.2f, asiento %.2f, cabe %.2f x %.2f",
+                        c.getMaxHealth(), c.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED),
+                        c.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED) * com.darkcraft.montura.Corcel.GALOPE,
+                        com.darkcraft.montura.Corcel.SALTO, com.darkcraft.montura.Corcel.SALTO_DOBLE, c.getPassengersRidingOffset(), c.getBbWidth(), c.getBbHeight());
+                boolean caida = c.causeFallDamage(30f, 1f, m.damageSources().fall());
+                boolean golpe = c.hurt(m.damageSources().generic(), 500f);
+                log.println("Morvain, el corcel: " + antes + "; dano al caer " + caida + "; herido de muerte (" + golpe + "): vivo " + c.isAlive()
+                        + ", se deshace " + c.deshaciendo() + ", accion " + c.accion() + " (deshacerse = " + com.darkcraft.enemigos.CorcelAnims.DESHACERSE + ")");
+                c.discard();
+            }
+        } catch (Throwable t) {
+            log.println("Morvain, el corcel: ERROR " + t);
+        }
     }
 
     /** Las celdas del hueco del arco del portal (las de bloque de portal). */

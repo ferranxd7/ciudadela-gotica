@@ -25,8 +25,8 @@ public final class Conversaciones {
     /** Hasta donde se puede hablar con alguien (bloques). */
     public static final double ALCANCE = 4.5;
 
-    // marcas de lo hablado con la guia
-    private static final int GUIA_CONOCIDA = 1, GUIA_REY = 2, GUIA_GAVRAN = 4;
+    // marcas de lo hablado con la guia (8: ya hablo con ella en Morvain y le dio el silbato)
+    private static final int GUIA_CONOCIDA = 1, GUIA_REY = 2, GUIA_GAVRAN = 4, GUIA_MORVAIN = 8;
     // con los demas: ya se presento
     private static final int CONOCIDO = 1;
 
@@ -53,11 +53,20 @@ public final class Conversaciones {
         DarkCraftMod.LOGGER.info("[DarkCraft] {} habla con {} (nodo {})", sp.getGameProfile().getName(), d.id(), nodo);
     }
 
-    /** Por donde empieza la guia: la primera vez se presenta; luego saluda (y una vez, habla del Rey y de Gavran). */
+    /**
+     * Por donde empieza la guia: la primera vez se presenta; luego saluda (y una vez, habla del Rey y de Gavran). En Morvain,
+     * la primera vez le da el silbato del corcel (y otra vez si lo ha perdido) y despues saluda a su manera.
+     */
     private static int inicioGuia(ServerPlayer sp) {
         int m = Ficha.dialogo(sp, "guia");
         int nodo;
-        if ((m & GUIA_CONOCIDA) == 0) {
+        boolean morvain = com.darkcraft.morvain.Morvain.es(sp.level());
+        if (morvain && (m & GUIA_MORVAIN) == 0) {
+            m |= GUIA_MORVAIN | GUIA_CONOCIDA;
+            nodo = 11;
+        } else if (morvain && !com.darkcraft.montura.Montura.tieneSilbato(sp)) {
+            nodo = 12;
+        } else if ((m & GUIA_CONOCIDA) == 0) {
             m |= GUIA_CONOCIDA;
             nodo = 1;
         } else if ((m & GUIA_GAVRAN) == 0 && Logros.tiene(sp, Logros.GAVRAN)) {
@@ -66,7 +75,7 @@ public final class Conversaciones {
         } else if ((m & GUIA_REY) == 0 && Logros.tiene(sp, Logros.REY)) {
             m |= GUIA_REY;
             nodo = 9;
-        } else nodo = 8;
+        } else nodo = morvain ? 14 : 8;
         Ficha.dialogo(sp, "guia", m);
         return nodo;
     }
@@ -98,7 +107,18 @@ public final class Conversaciones {
             Net.to(sp, new Net.AbrirForja(entidad));
         } else if ("tienda".equals(accion) && e instanceof Mercader) {
             Net.to(sp, new Net.AbrirTienda(entidad, com.darkcraft.tienda.Tienda.comprados(sp)));
+        } else if ("silbato".equals(accion) && e instanceof Guia) {
+            darSilbato(sp);
         }
+    }
+
+    /** El silbato del corcel (de la guia, en Morvain): si no lo lleva ya. */
+    public static void darSilbato(ServerPlayer sp) {
+        if (com.darkcraft.montura.Montura.tieneSilbato(sp) && !sp.isCreative()) return;
+        com.darkcraft.rol.Equipo.dar(sp, new net.minecraft.world.item.ItemStack(DarkCraftMod.SILBATO_CORCEL.get()));
+        Net.to(sp, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.corcel.como", 0));
+        Logros.dar(sp, "silbato");
+        DarkCraftMod.LOGGER.info("[DarkCraft] {} recibe el silbato del corcel", sp.getGameProfile().getName());
     }
 
     /** Para el comando y la prueba: olvida lo hablado con un personaje ("guia", "herrero", "mercader"). */

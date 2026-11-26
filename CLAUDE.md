@@ -1356,6 +1356,64 @@ mapa (respuestas 92 y 129), y region a region su contenido (ruinas, mazmorras, e
   (`cliente_mv01`, `mv02` con el cartel), el arco, la plaza, cada region y la ciudadela (`mv03..mv14`), con shaders
   (`mv15..mv17`) y la vuelta por el arco (`mv18`). `LIMIT` 56 min (`lanzar.sh` 62 min, el paso 90, el trabajo 130).
 
+### Plan grande, parte 7b: el corcel de hueso y niebla (la montura de Morvain)
+
+Respuesta 129 del plan ("corcel de hueso y niebla; la guia te da el silbato en el primer santuario de Morvain; corre,
+doble salto, se ataca montado, si lo hieren mucho se deshace un rato").
+- **El corcel** (`montura/Corcel`, entidad `darkcraft:corcel`, `MobCategory.MISC`, 1,3 x 1,6, no se guarda con el mundo):
+  modelo de `tools/enemigos/corcel.py` (caballo de hueso palido con las costillas al aire, silla negra con remaches de oro
+  y manta roja; la crin, la cola, los ojos y el fuego de los cascos van en la capa de brillo; patas sin cinematica
+  inversa, con los nombres de las del perro) → `CorcelGeometria`, `CorcelAnimaciones` (bucles QUIETO, ANDAR, CORRER y
+  SALTO; acciones ENCABRITARSE y DESHACERSE) y `enemigos/CorcelAnims`. Lo dibuja `client/montura/CorcelRenderer` con
+  `CorcelModelo` (parado, quieto; andando, el paso y el galope mezclados segun lo que corre, cada ciclo al ritmo de lo que
+  avanza —`fasePaso`, `faseGalope`: el `walkAnimation` del juego se satura a 0,25 bloques por tick y no distingue el trote
+  del galope—; en el aire, el salto; el brillo se apaga al deshacerse). Vida 40, armadura 4, sin dano al caer, inmune al
+  fuego, no se empuja, vadea el agua poco honda como si fuera tierra (`isAffectedByFluids` solo con mas de 1,1 de agua).
+- **Montado** (como un caballo: lo mueve el cliente del jinete): mira a donde mira el jinete (`tickRidden`), al trote
+  (velocidad 0,24, unos 7 bloques por segundo) y con la tecla de correr al galope (x1,75, unos 13; `Corcel.galopeCliente`,
+  que pone `client/montura/ClientCorcel`); hacia atras despacio. **Salto y doble salto**: la tecla de saltar (flanco, en
+  `ClientCorcel`) pide el salto y el corcel lo hace en su tick: en el suelo 0,62 (unos 2,6 bloques), en el aire otro de
+  0,70 (hasta unos 5,6 en total; si cae de un borde, solo el segundo); el cliente avisa al servidor (`Net.CorcelSalto`)
+  para el sonido y la niebla. Escalones de 1,1. El jinete va sentado en `ASIENTO` 1,30 (con el -0,35 del jugador, los
+  muslos sobre la silla) y 0,14 adelante; se baja por un lado (Shift) como de un caballo.
+- **Se pelea montado** (`ClientCombate.pelea` = suelto o montado en el corcel): los golpes y los hechizos van igual (al
+  galope sale el golpe de correr; nunca el del salto) y el corcel no frena mientras se pega; no se rueda. Los golpes del
+  combate no le tocan (`Combos.valido`) ni le hace dano su dueno.
+- **El silbato** (`montura/SilbatoCorcel`, objeto `darkcraft:silbato_corcel`, objeto clave; arte de
+  `tools/montura/silbato.py`, 32 x 32: hueso curvo con agujeros, cuero negro, cordon rojo y una voluta de niebla) y la tecla
+  **H** (`Teclas.CORCEL` → `Net.CorcelLlamar`) llaman al corcel (`montura/Montura.llamar`): solo en Morvain, con el
+  silbato encima (en creativo no hace falta) y donde quepa (hasta 2 bloques al lado, sin agua honda); aparece debajo de
+  quien silba ya montado (a la fuerza: justo despues de bajarse el juego no deja montar en 3 s), con el silbido, la niebla y
+  su relincho; montado, la H lo despide. Cada jugador tiene uno (`Montura.ACTIVOS`): si tenia otro, se va. Se monta tambien
+  con clic derecho (solo su dueno). Avisos cortos `darkcraft.corcel.*` (los avisos llevan ya un numero: `Cartel.AVISO` con
+  `n` > 0 lo pasa a la clave).
+- **Se deshace en niebla** (`Corcel.deshacer`, su animacion de 32 ticks, sin morir: `die` no llega a morir) si se queda
+  solo 30 s, si su dueno se aleja 64 bloques, se va de la dimension o muere, si entra en agua honda o si lo hieren mucho.
+  **La vida** se apunta en la ficha (`darkcraft_rol` → `corcel`: vida, cuando, vuelve) y se recupera sola (una cada 2 s
+  sin el, una cada 5 s con el). Herido de muerte no vuelve hasta pasado `Montura.VUELTA` (60 s, con media vida; aviso con
+  lo que falta). Descansar en un santuario lo deja entero y sin espera (`Montura.descanso`, desde `Santuarios.descanso`).
+  **Los golpes al jinete** se reparten (`Montura.onHerido`, lo que tiene quien pega y las explosiones): el jinete se lleva
+  el 65 % y el corcel pierde el 60 % del golpe (`Corcel.recibir`); lo que le da a el (flechas...), entero. Al irse del
+  servidor montado se va antes de guardarse el jugador. Por el portal: el corcel se deshace y su jinete cruza.
+- **El HUD**: montado, la barra de vida del corcel bajo la estamina (herradura de hueso con fuego de almas y relleno de
+  niebla: `HudTex.CORCEL` / `CORCEL_ICONO`, de `tools/ui/hud.py`), con su rastro del dano; las barras de montura de
+  Minecraft no salen.
+- **Maelis en Morvain** (`Dialogos.GUIA`, `Conversaciones.inicioGuia`, marca `GUIA_MORVAIN` = 8): la primera vez que se
+  habla con ella alli, 11 (bienvenida) → 12 (el silbato; al acabarla `Accion.SILBATO` → `Conversaciones.darSilbato`: el
+  silbato a la bolsa, aviso de la H y logro `silbato`) → 13 (como es el corcel) → menu; si lo ha perdido, 12 → 13 otra vez;
+  despues, 14 ("los fuegos de Morvain son pocos"). Voz (la de siempre, "Autumn Veil", flow `FNZWSYJq2nK8zd5QwV5m`):
+  frases 11-14, tomas a.
+- Logros `silbato` (de Maelis) y `corcel` (llamarlo la primera vez), con su entrada del diario.
+- Sonidos (ElevenLabs, `TOMAS_SFX`): `corcel_llamada` (4 y 2), `corcel_aparece` (2), `corcel_relincho` (2 y 3),
+  `corcel_paso` (las cuatro; un casco cada 1,6 de `moveDist`, mas fuerte al galope), `corcel_salto` (2 y 4),
+  `corcel_deshace` (2 y 3), `corcel_dolor` (3, 1 y 4).
+- Comandos `/darkcraft corcel [llamar | silbato | deshacer | herir <n> | espera]` (sin mas: como esta).
+- Pruebas: servidor, linea `Morvain, el corcel: ...` (atributos; sin dano al caer; herido de muerte no muere, se deshace);
+  cliente, tramo `corcel()` dentro del de Morvain, en el Arco del Umbral: Maelis y el silbato (`cliente_mv20..22`), la H
+  (`mv23` en tercera persona con su barra, `mv24` de lado), al galope (`mv25`), el doble salto (`mv26`, linea `el salto
+  doble subio ...`), un golpe montado (`mv27`), deshacerse (`mv28`), el aviso de la espera (`mv29`), encabritarse
+  esperando (`mv30`), montar con clic derecho y despedirlo con la H (lineas `corcel, ...` con `Montura.resumen`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1366,7 +1424,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a arriba).
+  `PLAN.md`), por sub-partes (la 7a y la 7b arriba; despues, los santuarios con teletransporte y los fragmentos de mapa).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 

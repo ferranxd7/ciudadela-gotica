@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:silbato",
+  "display": {
+    "icon": {
+      "item": "minecraft:saddle"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.corcel.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.corcel.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 50
+  }
+}

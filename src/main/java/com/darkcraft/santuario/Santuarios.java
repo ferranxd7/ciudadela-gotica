@@ -150,6 +150,8 @@ public final class Santuarios {
         Frascos.rellenar(sp);
         Combos.llenar(sp);
         Rol.recuperado(sp);
+        // el corcel de Morvain, entero y sin espera (parte 7b)
+        com.darkcraft.montura.Montura.descanso(sp);
         // y los enemigos caidos vuelven a sus puestos (como en Dark Souls)
         com.darkcraft.enemigos.Puestos.reaparecer(sp);
     }

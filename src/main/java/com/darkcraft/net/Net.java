@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "17";
+    private static final String V = "18";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -138,6 +138,39 @@ public final class Net {
                 .encoder(CosaUsar::write).decoder(CosaUsar::read).consumerMainThread(CosaUsar::handle).add();
         CH.messageBuilder(CineFase.class, id++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(CineFase::write).decoder(CineFase::read).consumerMainThread(CineFase::handle).add();
+        // el corcel de Morvain (parte 7b)
+        CH.messageBuilder(CorcelLlamar.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder((m, b) -> {}).decoder(b -> new CorcelLlamar()).consumerMainThread(CorcelLlamar::handle).add();
+        CH.messageBuilder(CorcelSalto.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(CorcelSalto::write).decoder(CorcelSalto::read).consumerMainThread(CorcelSalto::handle).add();
+    }
+
+    // ------------------------------------------------------------------ el corcel (parte 7b)
+
+    /** La tecla del corcel: que venga (o, montado, que se vaya). */
+    public record CorcelLlamar() {
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.montura.Montura.llamar(p);
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El corcel ha saltado (lo mueve el cliente del jinete): que suene y eche niebla para todos. */
+    public record CorcelSalto(boolean doble) {
+        void write(FriendlyByteBuf b) {
+            b.writeBoolean(doble);
+        }
+
+        static CorcelSalto read(FriendlyByteBuf b) {
+            return new CorcelSalto(b.readBoolean());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.montura.Montura.salto(p, doble);
+            ctx.get().setPacketHandled(true);
+        }
     }
 
     // ------------------------------------------------------------------ Brumavela (parte 3b)

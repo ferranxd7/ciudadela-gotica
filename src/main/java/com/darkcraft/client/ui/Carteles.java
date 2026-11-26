@@ -52,7 +52,7 @@ public final class Carteles {
                     Component.translatable("darkcraft.cartel.pieza", m.n(), 5)));
             case Net.Cartel.BARCO -> COLA.add(new Cartel(Net.Cartel.BARCO, Component.translatable("darkcraft.cartel.barco"), Component.translatable(m.clave())));
             case Net.Cartel.AVISO -> {
-                aviso = Component.translatable(m.clave());
+                aviso = m.n() > 0 ? Component.translatable(m.clave(), m.n()) : Component.translatable(m.clave());
                 avisoInicio = ClientRol.ticks;
                 Panel.nada();
             }

@@ -1,0 +1,23 @@
+{
+  "parent": "darkcraft:morvain",
+  "display": {
+    "icon": {
+      "item": "darkcraft:silbato_corcel"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.silbato.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.silbato.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

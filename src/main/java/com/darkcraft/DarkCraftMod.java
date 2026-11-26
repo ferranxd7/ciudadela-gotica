@@ -236,6 +236,14 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_CORTEZA_DOLOR = sound("sfx.corteza_dolor");
     public static final RegistryObject<SoundEvent> SFX_CORTEZA_MUERTE = sound("sfx.corteza_muerte");
     public static final RegistryObject<SoundEvent> SFX_SELLO_ROMPE = sound("sfx.sello_rompe");
+    // el corcel de Morvain (parte 7b): el silbido, la niebla al llegar, el relincho, los cascos, el salto, deshacerse, el dolor
+    public static final RegistryObject<SoundEvent> SFX_CORCEL_LLAMADA = sound("sfx.corcel_llamada");
+    public static final RegistryObject<SoundEvent> SFX_CORCEL_APARECE = sound("sfx.corcel_aparece");
+    public static final RegistryObject<SoundEvent> SFX_CORCEL_RELINCHO = sound("sfx.corcel_relincho");
+    public static final RegistryObject<SoundEvent> SFX_CORCEL_PASO = sound("sfx.corcel_paso");
+    public static final RegistryObject<SoundEvent> SFX_CORCEL_SALTO = sound("sfx.corcel_salto");
+    public static final RegistryObject<SoundEvent> SFX_CORCEL_DESHACE = sound("sfx.corcel_deshace");
+    public static final RegistryObject<SoundEvent> SFX_CORCEL_DOLOR = sound("sfx.corcel_dolor");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_GORGOTEO = sound("sfx.ahogado_gorgoteo");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_ALERTA = sound("sfx.ahogado_alerta");
     public static final RegistryObject<SoundEvent> SFX_AHOGADO_DOLOR = sound("sfx.ahogado_dolor");
@@ -386,6 +394,9 @@ public class DarkCraftMod {
             () -> new Item(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> LLAVE_ARBOL = ITEMS.register("llave_arbol",
             () -> new com.darkcraft.armas.LlaveArbol(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+    /** El silbato del corcel de Morvain (parte 7b): lo da Maelis en el Arco del Umbral. */
+    public static final RegistryObject<Item> SILBATO_CORCEL = ITEMS.register("silbato_corcel",
+            () -> new com.darkcraft.montura.SilbatoCorcel(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.RARE)));
 
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MODID);
     public static final RegistryObject<EntityType<Rey>> REY = ENTITIES.register("rey", () -> EntityType.Builder.<Rey>of(Rey::new, MobCategory.MONSTER)
@@ -466,6 +477,11 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.arbol.PuertaArbol>> PUERTA_ARBOL = ENTITIES.register("puerta_arbol",
             () -> EntityType.Builder.<com.darkcraft.arbol.PuertaArbol>of(com.darkcraft.arbol.PuertaArbol::new, MobCategory.MISC).sized(7f, 10f)
                     .fireImmune().noSave().noSummon().clientTrackingRange(12).updateInterval(40).build(MODID + ":puerta_arbol"));
+
+    /** El corcel de hueso y niebla de Morvain (parte 7b): no se guarda; lo llama el silbato. */
+    public static final RegistryObject<EntityType<com.darkcraft.montura.Corcel>> CORCEL = ENTITIES.register("corcel",
+            () -> EntityType.Builder.<com.darkcraft.montura.Corcel>of(com.darkcraft.montura.Corcel::new, MobCategory.MISC)
+                    .sized(1.3f, 1.6f).fireImmune().clientTrackingRange(10).build(MODID + ":corcel"));
 
     /** Maelis, la guia de los santuarios (sentada junto a los santuarios importantes). */
     public static final RegistryObject<EntityType<com.darkcraft.personajes.Guia>> GUIA = ENTITIES.register("guia",
@@ -580,6 +596,7 @@ public class DarkCraftMod {
         e.put(ELITE.get(), com.darkcraft.enemigos.Elite.atributos().build());
         e.put(BRANDT.get(), com.darkcraft.enemigos.Brandt.atributos().build());
         e.put(CORTEZA.get(), com.darkcraft.enemigos.Corteza.atributos().build());
+        e.put(CORCEL.get(), com.darkcraft.montura.Corcel.atributos().build());
         e.put(GUIA.get(), com.darkcraft.personajes.Guia.atributos().build());
         e.put(HERRERO.get(), com.darkcraft.personajes.Herrero.atributos().build());
         e.put(MERCADER.get(), com.darkcraft.personajes.Mercader.atributos().build());

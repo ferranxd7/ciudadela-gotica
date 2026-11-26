@@ -364,7 +364,7 @@ public final class Combos {
     /** A quien pueden dar los combos: nunca a jugadores, aldeanos, mascotas propias ni soportes de armadura. */
     public static boolean valido(Player owner, Entity x) {
         if (!(x instanceof LivingEntity le) || !le.isAlive() || x == owner) return false;
-        if (x instanceof Player || x instanceof ArmorStand || x instanceof AbstractVillager) return false;
+        if (x instanceof Player || x instanceof ArmorStand || x instanceof AbstractVillager || x instanceof com.darkcraft.montura.Corcel) return false;
         return !(x instanceof TamableAnimal ta && ta.isOwnedBy(owner));
     }
 
