@@ -158,5 +158,16 @@
     "aviso": "HitCtrl",
     "uso": "La Molinera de Velmor (el jefe de las Llanuras Pálidas de Morvain)",
     "lufs": -16
+  },
+  {
+    "id": "verdugo",
+    "pagina": "https://opengameart.org/content/dark-souls-type-boss-theme",
+    "busca": "arcanos",
+    "titulo": "Dark souls type boss theme (Arcanos, Sorcerer of the Old Banished Woods)",
+    "autor": "ProjectHelmet (Philémon Weber)",
+    "licencia": "CC-BY 4.0",
+    "aviso": "Philémon Weber (Helmet)",
+    "uso": "Maese Odran, el Verdugo de la Arboleda (el jefe del Bosque Muerto de Morvain)",
+    "lufs": -16
   }
 ]

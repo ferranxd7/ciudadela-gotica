@@ -1,4 +1,5 @@
-"""Barras de vida de los dos guardianes de Valdrenn (parte 4d) y de la Molinera de Velmor (parte 7f), pixel a pixel, con
+"""Barras de vida de los dos guardianes de Valdrenn (parte 4d), de la Molinera de Velmor (parte 7f) y del Verdugo de la
+Arboleda (parte 7h), pixel a pixel, con
 la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianCliente):
 
   Ser Brandt, el Muro del Rey: un marco de hierro negro remachado con filos rojos, el paves con la corona del Rey en el
@@ -11,7 +12,11 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
 
   python3 tools/hud/barra_guardianes.py [carpeta_de_vistas]
 
-Salen textures/gui/brandt_barra.png, corteza_barra.png y molinera_barra.png (256x128):
+  El Verdugo de la Arboleda (parte 7h): la viga de la horca de roble oscuro con vueltas de soga, los postes con sus
+  tornapuntas en las puntas y, en el centro, el lazo que cuelga con la capucha del verdugo y sus ojos encendidos dentro;
+  relleno de una soga empapada de sangre que gira; hebras de canamo y hojas secas que caen al recibir dano.
+
+Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png y verdugo_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -352,6 +357,152 @@ def ceniza():
     return img
 
 
+# ---------------------------------------------------------------- el Verdugo de la Arboleda (parte 7h)
+
+O_DD, O_D, O, O_L = hexc("150e09"), hexc("2c1f15"), hexc("45311f"), hexc("624a31")
+S_DD, S_D, S, S_L = hexc("3e3020"), hexc("56442c"), hexc("876e46"), hexc("b39a6a")
+C_DD, C_D, C_L = hexc("070606"), hexc("141212"), hexc("2a2624")
+J_D, J, J_L, J_H = hexc("5a1806"), hexc("a03a0c"), hexc("e0701a"), hexc("ffd070")
+X_DD, X_D, X, X_L = hexc("1e0404"), hexc("420a08"), hexc("6e1610"), hexc("9c2a1c")
+
+
+def marco_verdugo():
+    """La viga de la horca de roble oscuro, con vueltas de soga; en las puntas los postes con sus tornapuntas; en el centro
+    el lazo que cuelga de la viga, y dentro la capucha del verdugo con sus ojos encendidos."""
+    rnd = random.Random(73)
+    n = noise2(61)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 4, FX1 + 3, FY0 - 4, FY1 + 3
+    rect(img, x0, y0, x1, y1, OUT)
+    # la viga: vetas a lo largo, nudos y alguna mancha oscura
+    for y in range(y0 + 1, y1):
+        for x in range(x0 + 1, x1):
+            v = n(x * 0.07, y * 0.8)
+            c = O_D if v < 0.36 else O if v < 0.8 else O_L
+            if (x * 5 + y * 9) % 61 == 0:
+                c = O_DD
+            if n(x * 0.3 + 40, y * 0.3) > 0.86:
+                c = mix(c, X_D, 0.55)
+            put(img, x, y, c)
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, O_DD)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # vueltas de soga alrededor de la viga (en diagonal, como se enrollan)
+    for x in range(x0 + 18, x1 - 14, 30):
+        if abs(x - FW // 2) < 20:
+            continue
+        for y in range(y0 + 1, y1):
+            if FY0 - 1 <= y <= FY1:
+                continue
+            for k in range(3):
+                put(img, x + k + (y % 2), y, S_L if k == 0 else S if k == 1 else S_D)
+        put(img, x - 1, y0, S_D)
+        put(img, x + 3, y1, S_D)
+    # en las puntas: los postes de la horca (de arriba abajo) con la tornapunta hacia el centro
+    for side in (0, 1):
+        bx = 1 if side == 0 else FW - 6
+        for y in range(y0 - 6, y1 + 7):
+            for dx in range(5):
+                c = O_L if dx == 1 else O if dx < 4 else O_D
+                if (y * 3 + dx) % 13 == 0:
+                    c = O_DD
+                put(img, bx + dx, y, c)
+            put(img, bx - 1, y, OUT)
+            put(img, bx + 5, y, OUT)
+        for dx in range(-1, 6):
+            put(img, bx + dx, y0 - 7, OUT)
+            put(img, bx + dx, y1 + 7, OUT)
+        # la tornapunta: de lo alto del poste a la viga
+        sx = 1 if side == 0 else -1
+        x_ini = bx + (5 if side == 0 else -1)
+        for i in range(7):
+            xx = x_ini + sx * i
+            yy = y0 - 6 + i
+            if yy >= y0:
+                break
+            put(img, xx, yy, O_L)
+            put(img, xx, yy + 1, O_D)
+            put(img, xx, yy - 1, OUT)
+    # unas hebras sueltas que cuelgan bajo la viga
+    for _ in range(14):
+        xx = rnd.randint(x0 + 8, x1 - 8)
+        if abs(xx - FW // 2) < 16:
+            continue
+        for i in range(rnd.randint(1, 3)):
+            put(img, xx, y1 + i, S_D if i else S)
+    # en el centro: el lazo que cuelga de la viga, y dentro la capucha con los ojos
+    cx, cy = FW // 2, 8
+    # la soga de arriba (desde la viga) y el nudo
+    for y in range(0, 3):
+        put(img, cx - 1, y, OUT)
+        put(img, cx, y, S)
+        put(img, cx + 1, y, S_D)
+        put(img, cx + 2, y, OUT)
+    for dy in range(-10, 11):
+        for dx in range(-10, 11):
+            d = math.hypot(dx * 0.95, dy)
+            if cy + dy >= FY0 - 1 or cy + dy < 2:
+                continue
+            if 7.0 <= d < 9.6:
+                # el lazo: canamo trenzado (en diagonal)
+                t = (dx + dy * 2) % 4
+                c = S_L if t == 0 else S if t < 3 else S_D
+                if d >= 9.0:
+                    c = OUT
+                put(img, cx + dx, cy + dy, c)
+            elif d < 7.0:
+                # la capucha (negra, con algo de brillo arriba a la izquierda) y su pico
+                c = C_L if dx + dy < -7 else C_D if dx + dy < 4 else C_DD
+                if d > 6.2:
+                    c = OUT
+                put(img, cx + dx, cy + dy, c)
+    # los ojos encendidos
+    for ex in (-3, 2):
+        put(img, cx + ex, cy, J_L)
+        put(img, cx + ex + 1, cy, J_H)
+        put(img, cx + ex, cy + 1, J)
+        put(img, cx + ex + 1, cy + 1, J_L)
+        put(img, cx + ex - 1, cy, J_D)
+    return img
+
+
+def relleno_verdugo(k):
+    """Una soga empapada de sangre que gira: franjas en diagonal que corren con el cuadro."""
+    n = noise2(131)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            fase = (x + y * 2 - k * 2) % 8
+            t = 0.25 + 0.5 * mid + 0.35 * (n((x - k * 3) * 0.12, y * 0.6) - 0.5)
+            c = mix(X_D, X, max(0.0, min(1.0, t * 1.3)))
+            if fase < 2:
+                c = mix(c, X_L, 0.45 + 0.3 * mid)
+            elif fase == 7:
+                c = mix(c, X_DD, 0.5)
+            if y == 0:
+                c = mix(c, X_L, 0.3)
+            if y == 6:
+                c = mix(c, X_DD, 0.6)
+            # hebras de canamo que asoman
+            if (x * 7 + y * 13 - k * 17) % 83 == 0 and 1 <= y <= 5:
+                c = S
+            img.putpixel((x, y), c)
+    return img
+
+
+def fibras():
+    """Lo que cae al recibir dano: hebras de canamo, una hoja seca y gotas oscuras."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = (["s..", ".s.", "..S"], ["S.", "s.", ".s"], [".h.", "hHh", ".h."], ["x.", "x.", ".X"])
+    col = {"s": S, "S": S_L, "h": O_L, "H": O, "x": X, "X": X_L}
+    for k, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, k * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 # ---------------------------------------------------------------- comun
 
 
@@ -389,6 +540,7 @@ if __name__ == "__main__":
         "brandt": atlas(marco_brandt(), relleno_brandt, hueco("080809", "17181b"), rastro("fff2ea", "e8b0a0"), chispas()),
         "corteza": atlas(marco_corteza(), relleno_corteza, hueco("050a06", "121c14"), rastro("f2fff6", "b9f0c8"), hojas()),
         "molinera": atlas(marco_molinera(), relleno_molinera, hueco("0b0908", "1c1815"), rastro("f6f2e6", "d6cdb6"), ceniza()),
+        "verdugo": atlas(marco_verdugo(), relleno_verdugo, hueco("0a0606", "1a1110"), rastro("f6ece2", "d8b9a6"), fibras()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

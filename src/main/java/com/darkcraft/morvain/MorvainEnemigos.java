@@ -23,21 +23,24 @@ import java.util.List;
  * <li><b>La Arboleda de los Ahorcados</b> (sitio {@value #ARBOLEDA}, parte 7g, en el Bosque Muerto): los ahorcados que cuelgan
  * de las sogas del Arbol de la Horca, de los arboles de alrededor, de la puerta y del patibulo ({@link Arboleda#colgados}),
  * tres de rodillas al pie del arbol, tres tumbados entre las tumbas, uno junto al patibulo y otro por el camino.</li>
+ * <li><b>El patibulo</b> (sitio {@value #PATIBULO}, parte 7h): Maese Odran, el Verdugo, de pie en el tablado apoyado en su hacha
+ * (un jefe: cae una vez). Mientras vive, los colgados de la arboleda vuelven a colgar; vencido, la cuenta se cierra y ya no
+ * vuelven ({@link Arboleda#liberar}).</li>
  * </ul>
  * Nadie a menos de 18 bloques del arco ni de 14 de un santuario.
  */
 public final class MorvainEnemigos {
     private MorvainEnemigos() {}
 
-    public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda";
-    static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado";
+    public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo";
+    static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
     private static final int G = Marchito.GUADANA, F = Marchito.FAROL, C = Marchito.CAMPANA;
 
     private static final List<Puesto> VELMOR_P = new ArrayList<>(), LLANURAS_P = new ArrayList<>(), MOLINO_P = new ArrayList<>(),
-            ARBOLEDA_P = new ArrayList<>();
+            ARBOLEDA_P = new ArrayList<>(), PATIBULO_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -113,10 +116,18 @@ public final class MorvainEnemigos {
             ARBOLEDA_P.add(new Puesto(AHORCADO, c.variante(), c.x(), c.y(), c.z(), c.giro(), Enemigo.COLGADO, 0, "colgados"));
         for (Arboleda.Otro o : a.otros())
             ARBOLEDA_P.add(new Puesto(AHORCADO, o.variante(), o.x(), o.y(), o.z(), o.giro(), o.postura(), o.ronda(), o.grupo()));
+        // ---- el patibulo (parte 7h): el Verdugo de pie en el tablado, apoyado en el hacha, mirando al Arbol de la Horca
+        int[] ve = a.sitio("verdugo");
+        PATIBULO_P.add(new Puesto(VERDUGO, 0, ve[0], ve[1], ve[2], SUR, REZA, 0, Puestos.JEFE));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
     public static int molinera() {
+        return 0;
+    }
+
+    /** El numero del puesto del Verdugo en el sitio del patibulo. */
+    public static int verdugo() {
         return 0;
     }
 
@@ -125,15 +136,21 @@ public final class MorvainEnemigos {
         Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
         Puestos.tipo(MOLINERA, DarkCraftMod.MOLINERA);
         Puestos.tipo(AHORCADO, DarkCraftMod.AHORCADO);
+        Puestos.tipo(VERDUGO, DarkCraftMod.VERDUGO);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
         Puestos.registrar(MOLINO, MOLINO_P, Morvain::es);
-        Puestos.registrar(ARBOLEDA, ARBOLEDA_P, Morvain::es);
+        // los colgados solo mientras vive el Verdugo (vencido, la cuenta se cierra: ya no vuelven a colgar)
+        Puestos.registrar(ARBOLEDA, ARBOLEDA_P, Morvain::es, (l, p) -> !"colgados".equals(p.grupo()) || !Arboleda.cuentaCerrada(l.getServer()));
+        Puestos.registrar(PATIBULO, PATIBULO_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
                 Molino.puerta(sl, true, true);
+            // y al caer el Verdugo, los colgados de la arboleda descansan
+            if (e instanceof com.darkcraft.enemigos.Verdugo && PATIBULO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
+                Arboleda.liberar(sl);
         });
     }
 
@@ -145,6 +162,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> arboleda() {
         preparar();
         return List.copyOf(ARBOLEDA_P);
+    }
+
+    public static List<Puesto> patibulo() {
+        preparar();
+        return List.copyOf(PATIBULO_P);
     }
 
     public static List<Puesto> velmor() {
@@ -304,6 +326,50 @@ public final class MorvainEnemigos {
                 }));
     }
 
+    /** {@code /darkcraft verdugo [ir | vencer | volver]}: como esta el Verdugo, llevar ante el patibulo, vencerle o que vuelva. */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoVerdugo() {
+        return net.minecraft.commands.Commands.literal("verdugo")
+                .executes(c -> decir(c, estadoVerdugo(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> {
+                    var sp = c.getSource().getPlayerOrException();
+                    var m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    // al claro, entre el arbol y el patibulo, mirando al patibulo
+                    int[] e = Arboleda.get().sitio("ante_patibulo");
+                    sp.teleportTo(m, e[0] + 0.5, e[1] + 0.05, e[2] + 0.5, 180f, -8f);
+                    return decir(c, estadoVerdugo(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(PATIBULO, verdugo());
+                    if (e != null) e.kill();
+                    else {
+                        Puestos.marcar(srv, PATIBULO, verdugo(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "verdugo");
+                        var m = Morvain.nivel(srv);
+                        if (m != null) Arboleda.liberar(m);
+                    }
+                    return decir(c, estadoVerdugo(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, PATIBULO, verdugo(), false);
+                    // los colgados vuelven a su sitio (y a colgar) en cuanto salgan
+                    Puestos.todos(srv, ARBOLEDA, false);
+                    return decir(c, estadoVerdugo(srv));
+                }));
+    }
+
+    /** Como esta el Verdugo (para el comando y las pruebas). */
+    public static String estadoVerdugo(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(PATIBULO, verdugo());
+        String s = "el Verdugo: " + (Arboleda.cuentaCerrada(srv) ? "caido (la cuenta esta cerrada)" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Verdugo v) s += ", " + v.estado();
+        var m = Morvain.nivel(srv);
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(Arboleda.PX, 80, Arboleda.PZ))) s += "; " + Arboleda.sogasColgados(m);
+        return s;
+    }
+
     private static int decir(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, String s) {
         c.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal(s), false);
         return 1;
@@ -329,6 +395,7 @@ public final class MorvainEnemigos {
         todos.addAll(LLANURAS_P);
         todos.addAll(MOLINO_P);
         todos.addAll(ARBOLEDA_P);
+        todos.addAll(PATIBULO_P);
         for (Puesto p : todos) {
             if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
             for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
@@ -338,6 +405,7 @@ public final class MorvainEnemigos {
         int colg = 0;
         for (Puesto p : ARBOLEDA_P) if (p.postura() == Enemigo.COLGADO) colg++;
         return VELMOR_P.size() + " en Velmor (" + camp + " campaneros), " + LLANURAS_P.size() + " por las llanuras, " + MOLINO_P.size()
-                + " en el molino y " + ARBOLEDA_P.size() + " en la arboleda (" + colg + " colgados); cerca del arco o de un santuario " + cerca;
+                + " en el molino, " + ARBOLEDA_P.size() + " en la arboleda (" + colg + " colgados) y " + PATIBULO_P.size()
+                + " en el patibulo; cerca del arco o de un santuario " + cerca;
     }
 }
