@@ -871,7 +871,7 @@ public final class CiTest {
                     if (a.accion() == ac) no.append(' ').append(nombre);
                     for (int k = 0; k < 10; k++) a.tick();
                 }
-                sb.append(' ').append(a.tipo()).append(String.format(java.util.Locale.ROOT, " (vida %.0f, armadura %.0f)", a.getMaxHealth(), a.getArmorValue()))
+                sb.append(' ').append(a.tipo()).append(String.format(java.util.Locale.ROOT, " (vida %.0f, armadura %d)", a.getMaxHealth(), a.getArmorValue()))
                         .append(": acciones que no acaban").append(no.length() == 0 ? " ninguna" : no).append(';');
                 for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.class, a.getBoundingBox().inflate(20))) f.discard();
                 a.discard();
