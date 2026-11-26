@@ -1525,6 +1525,65 @@ prueba 136 bien.
   (`mv53`), el farol (`mv54`), la siega (`mv55`), la ceniza (`mv56`), el libro del campanero (`mv57`) y entrar a pie por la
   puerta del sur (`mv58`, el cartel y el logro).
 
+### Plan grande, parte 7f: la Molinera de Velmor (el jefe de las Llanuras Palidas) y su molino
+
+Respuestas 125 ("mas de 10 jefes principales, varios por region") y 131 del plan; el primer jefe de Morvain.
+- **La Molinera** (`enemigos/Molinera`, entidad `darkcraft:molinera`, 1,3 x 3,7; hereda de `Guardian`: barra, musica, rugido
+  al empezar y a media vida, vuelve a su puesto con la vida entera si todos caen o se van). La molinera del libro del
+  campanero, crecida por la Sombra hasta el doble de alto: modelo de `tools/enemigos/molinera.py` (vieja enorme y encorvada
+  de ceniza agrietada con brasas, saya y delantal blanqueados de harina, chal rojo, panuelo negro y una guadana del doble de
+  larga; `MolineraGeometria/Animaciones`, `MolineraAnims`, `client/enemigos/MolineraModelo`, el `EnemigoRenderer` de siempre
+  a escala 1,9). 700 de vida, golpe 11, armadura 8. **Siega** (5,6 de alcance, 210 grados, a ras de suelo: no pilla a quien
+  la salta —`Enemigo.pilla`, los pies a mas de 0,55—; nunca tres seguidas), **tajo** (la hoja se clava y levanta una
+  **onda** a 4,6 delante, radio 2,7: saltando o rodando se libra), **estocada** (se lanza a quien esta entre 5,4 y 9,5),
+  **pisoton** (a quien se le pone detras o pegado: lo aparta, con su onda); a **media vida** grita y **llama a los suyos**
+  (dos marchitos de guadana y farol, uno mas por amigo hasta cuatro, que se alzan de la ceniza de la era: efimeros, sin
+  puesto; se deshacen si la pelea se acaba) y empieza el **giro** (dos vueltas avanzando hacia su presa, 360 grados).
+  `Guardian` tiene ahora `alEmpezarPelea`, `alAcabarPelea` y `puedeRugir`.
+- **Voz** (ElevenLabs, `eleven_v4`, **"Kayla - Evil Witch Villian Storyteller"** `5PWbsfogbLtky5sxqtBz`, flow
+  `eDmyp1z5phPwszhGJdPA`; 5 frases, tomas a; en `procesar.py` `voz_molinera`: algo mas grave y ronca, una segunda voz
+  octava y media por debajo, sorda, y el eco abierto de las llanuras): `Net.ReyHabla` con linea **60 + N**
+  (`Voces.BASE_MOLINERA`, `esMolinera`; `habla_molinera` en `rey_voces.json`; subtitulos `darkcraft.molinera.voz.N`):
+  1 al empezar (no la repite en 4 min; **hasta acabarla no grita ni ataca**: se levanta y se acerca despacio), 2 al llamar a
+  los suyos, 3 si cae su presa, 4 la primera vez que gira y 5 al morir.
+- **Barra** (`GuardianCliente`, arte de `tools/hud/barra_guardianes.py` "molinera": la viga del molino con flejes y
+  espigas secas, el extremo de un aspa en cada punta y la piedra de moler en el centro; relleno de brasas que corren;
+  ceniza y harina que caen). **Musica**: "Final_Boss_Lair" de HitCtrl (CC-BY 3.0, id `molinera`, tema 33 de
+  `ClientMusic.boss`).
+- **Al caer** (lo reparte `valdrenn/Guardianes`, ahora en el mundo donde cae: `Reparto.dim`): el cartel de JEFE ABATIDO con
+  7000 ecos, la hazana `molinera` ("La rueda se ha parado", con su entrada del diario) y el bestiario; deja dos piedras de
+  forja II, una III y la ceniza del torbellino. **El molino deja de crujir y se abre su reja.**
+- **El molino** (`morvain/Molino`, al este de Velmor, al final del camino que sale por la puerta del este; se dibuja como
+  Velmor, chunk a chunk al adornar, despues del pueblo; `Adorno` solo pone hierba en su caja): una **loma** (`loma(x, z)`:
+  llana a Y 76 alrededor de la era y del molino, baja en 9 bloques; el camino sube con medias losas), la **era** (radio 17,
+  losas en anillos, un murete roto con entradas al oeste —el camino—, al este —la puerta del molino—, al norte y al sur,
+  cuatro farolas de almas, la piedra de moler en el centro ante la que espera ella de rodillas mirando al molino, de
+  espaldas a quien llega, sacos, gavillas), la **torre** (radio 6, 13 de piedra con la puerta al oeste, el cuerpo de madera
+  hasta 22 y el tejado a dos aguas de este a oeste; dentro las muelas, sacos, la escalera de mano pegada al arbol hasta el
+  piso de arriba con el **arcon** `velmor_bueno`), las **aspas** (cuatro en cruz desde el cubo del hastial del oeste, 19
+  de largo, con su armazon de listones y jirones de lona; la de abajo partida, su armazon caido al norte), la **reja** de la
+  puerta (barrotes: cerrada mientras vive la Molinera; `Molino.puerta`, la pone como toca `Molino.crujir` cada 5 s y la
+  abre al caer ella), el **crujido** del molino con el viento (`sfx.molino_viento` cada 5 s desde el cubo, mientras vive),
+  campos secos, carros, arboles muertos y farolas por el camino. Sitios: `molinera`, `era`, `entrada`, `puerta_molino`,
+  `cofre_molino`, `camino`, `aspas`. El Espejo: "El Molino de Velmor" (`Morvain.lugar`).
+- **El santuario del Camino del Molino** (`SantuariosMorvain` "molino", en (1086, 4048), a la orilla del camino, a 47 de
+  la era): ya son veinte, mas el del arco.
+- **Los puestos** (`MorvainEnemigos`, sitio `molino`): la Molinera (puesto 0, grupo `Puestos.JEFE`: cae una vez) y dos
+  marchitos por el camino (uno con farol que mira hacia Velmor, otro de rodillas mirando al molino).
+- Sonidos (ElevenLabs, `TOMAS_SFX`): `molinera_grito` (3 y 1), `molinera_siega` (4, 1 y 3), `molinera_golpe` (3 y 4),
+  `molinera_giro` (2 y 4), `molinera_dolor` (1, 3 y 2), `molinera_muerte` (4 y 2), `molino_viento` (4 y 1, en bucle).
+- Comandos `/darkcraft molinera [ir | vencer | volver]` (sin mas: como esta; `volver` tambien cierra la reja).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_molino carpeta` (`-Dcaja=...`): la loma, la era, el molino y el
+  camino, y si se llega a pie (del camino a la era y a la puerta; dentro y al arcon de arriba solo con la reja quitada).
+- Pruebas: servidor, lineas `Morvain, el molino: ...` (la era despejada, la muela, el cubo de las aspas, el arcon, la reja
+  y el nombre del santuario; vista `morvain_molino.png`), `Morvain, la Molinera: ...` (sale de rodillas en su sitio; al
+  verle se levanta y grita al acabar la frase 1; todas sus acciones acaban; la siega pilla de pie y no saltando; el tajo y
+  el pisoton con onda; a media vida salen los suyos) y `Morvain, la Molinera cae: ...` (la reja abierta); cliente, tramo
+  `molinera()` despues de Velmor: el molino desde el camino (`cliente_mv59`), ella de rodillas (`mv60`), se alza hablando
+  (`mv61`), grita con su barra (`mv62`), la siega, el tajo con su onda, el giro, la estocada y el pisoton de cerca
+  (`mv63..mv67`), a media vida llama a los suyos (`mv68`), cae (`mv69`), el cartel (`mv70`), la reja abierta (`mv71`) y el
+  bestiario (`mv72`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -1535,7 +1594,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d y la 7e arriba; despues, region a region su contenido).
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e y la 7f arriba; despues, region a region su contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes
 
