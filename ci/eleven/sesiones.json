@@ -2910,5 +2910,117 @@
     ]
    }
   }
+ },
+ "sfx_molinera": {
+  "flow": "JYf2tnYdLwluhbLBj6Nh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7f: la Molinera de Velmor (el grito, la siega, el golpe en el suelo, el giro, el dolor, la muerte) y el molino roto. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "molinera_grito": {
+    "prompt": "A giant withered old hag lets out a horrifying shriek that tears into a deep raspy roar, echoing across empty dead fields, crackling embers, dark fantasy, no music, 2.5 seconds",
+    "sesiones": [
+     "pOrxDH3glLAVjIdr3UCZ",
+     "ZREvGFIJl3j119y2429h",
+     "FaQEquqwbnWhstwmmv6u",
+     "4z7SeJwktq8iWWiwZLvT"
+    ],
+    "generaciones": [
+     "sX1qJYVKeZjOGwfXASL9",
+     "FY6vZsumnZe87hCztyRL",
+     "wf2M5NWvmBUtJx6ZQ4sH",
+     "68mJnSO3GKW9UsInxIGn"
+    ]
+   },
+   "molinera_siega": {
+    "prompt": "A giant rusted scythe swept through the air in a wide low arc: a deep heavy whoosh with a ringing metallic edge, dark fantasy, no music, 1.2 seconds",
+    "sesiones": [
+     "Kp9UUACLyNacOxuGh8fM",
+     "JqbFyHE6rhdSstgCeGTO",
+     "VAPPgQfyuNs970uUVRWW",
+     "MyJGeJcn7m3yvelTX6oB"
+    ],
+    "generaciones": [
+     "h9HU8ox0VDB1LYXjIYTg",
+     "Qbxkmq23XzJ9YLdmAO0b",
+     "3yRSMPL84XVoCZW235hj",
+     "qagAMYDTaLAQIcO8XcaR"
+    ]
+   },
+   "molinera_golpe": {
+    "prompt": "A giant scythe blade slammed down into hard dry earth: a deep booming thud, the ground cracking, dust and pebbles scattering outward, dark fantasy, no music, 1.6 seconds",
+    "sesiones": [
+     "1jDrcp1RSWv745PTH9oJ",
+     "iQxUKHsRrTM07iUmPJUQ",
+     "s6vuxqxDx6ZZWovS8pJb",
+     "xmy0inDpd2IgI2NO0Yh7"
+    ],
+    "generaciones": [
+     "odAQOJPPK4QrNzELtBjJ",
+     "jbkDT0T85f4kPxLG2EBR",
+     "mWmfKCmLINTKjBi6ZJrB",
+     "EHNkXqH7olrRJN5qNZxI"
+    ]
+   },
+   "molinera_giro": {
+    "prompt": "A giant scythe spun around twice in quick succession: two heavy whooshing swings with a whirling metallic hum, dark fantasy, no music, 1.6 seconds",
+    "sesiones": [
+     "X31hA5Tw3WX2IKXw0H6H",
+     "Mu1nODMkTPFOoPgFfi3D",
+     "iEGs9Ecf7mUIxGVHJ6t9",
+     "K2xAMIoNC5Hq4dzmoh6R"
+    ],
+    "generaciones": [
+     "4uxomZpOxczqOEkhPkSi",
+     "VJCSbmm20YwLoCSDIFwF",
+     "Osw0rjw4s0Va6c1zR07e",
+     "DD0wjGxrQRHoxBn197c9"
+    ]
+   },
+   "molinera_dolor": {
+    "prompt": "A giant withered old woman struck hard: a deep raspy pained grunt and a puff of crumbling ash, dark fantasy, no music, 1 second",
+    "sesiones": [
+     "CjY3g4iCuaN6lD9CvGmQ",
+     "30yZO6j1TyacNHSP7ARR",
+     "s9sSHD8egeUHEYL6eiws",
+     "zahe1TWR2MHix6jOHTca"
+    ],
+    "generaciones": [
+     "lFRHbINPsdrY4ta62vEb",
+     "t4g5mBBi3E3yzayS3Mux",
+     "ME7vdEdrti3fgivsTklW",
+     "MF1gTrUj2zoMnhJoJYqb"
+    ]
+   },
+   "molinera_muerte": {
+    "prompt": "A giant withered hag dying: a long fading rasping wail that breaks apart into crumbling ash and a heavy dusty collapse, embers fizzling out, dark fantasy, no music, 3.5 seconds",
+    "sesiones": [
+     "ENqgZn4hZfLH2zIWIvB3",
+     "gAXv0yxv9RcqXdmWTHpi",
+     "zPA4bSo0RnvpAVP3uCxu",
+     "8misRJ4sQadgL5wXu6c9"
+    ],
+    "generaciones": [
+     "vDqNjkaR16DdBtTblVwZ",
+     "5ZrcKoGQzX1ujcJRiqH0",
+     "OTpp4wMcYXMuCAhjwlXz",
+     "ytfnGDeviukRcLM8NigI"
+    ]
+   },
+   "molino_viento": {
+    "prompt": "An old broken wooden windmill creaking slowly in a dry wind: groaning timber, a heavy millstone grinding, rattling torn sails, distant hollow wind, dark fantasy ambience, no music, 6 seconds",
+    "sesiones": [
+     "n0nEY3VEegnGYCXZiiRd",
+     "4vNVh0EjaxPHXLYEbPBl",
+     "OtXouBh1McfIys68olk0",
+     "PkoiiRw0CeEqA8aiBzAh"
+    ],
+    "generaciones": [
+     "eBUrcHfDeqJJftImCQmV",
+     "1m0Nnkdd8fEYeVOwie9l",
+     "Fe8L6Rmm534xCAl3RnVQ",
+     "0Ibtjpe7d8xOj1Dc9Pn6"
+    ]
+   }
+  }
  }
 }
