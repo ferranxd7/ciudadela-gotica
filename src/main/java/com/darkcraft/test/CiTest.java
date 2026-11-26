@@ -727,6 +727,7 @@ public final class CiTest {
             log.println("Morvain, las estelas del mapa: ERROR " + t);
         }
         velmor(server, m, log, out);
+        molinera(server, m, log, out);
     }
 
     /**
@@ -842,6 +843,135 @@ public final class CiTest {
         } catch (Throwable t) {
             log.println("Morvain, los marchitos: ERROR " + t);
             DarkCraftMod.LOGGER.error("[CI] marchitos", t);
+        }
+    }
+
+    /**
+     * Parte 7f: el molino (la era despejada, la muela, las aspas, el arcon y la reja) y la Molinera: sale de rodillas en su
+     * sitio, al ver a alguien se levanta y no grita ni ataca hasta acabar de hablar; cada accion acaba; la siega pilla a quien
+     * esta de pie y no a quien salta; el tajo y el pisoton levantan su onda; a media vida grita y llama a los suyos; al caer
+     * se abre la reja del molino.
+     */
+    private static void molinera(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.MOLINO;
+        try {
+            var v = com.darkcraft.morvain.Molino.get();
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : v.chunks()) {
+                int cx = (int) (k >> 32), cz = (int) k;
+                if ((cx << 4) + 15 < 1090) continue;
+                m.getChunk(cx, cz);
+                nch++;
+            }
+            log.println("Morvain, el molino: " + nch + " chunks en " + (System.currentTimeMillis() - t0) + " ms; " + com.darkcraft.morvain.Molino.resumen(m)
+                    + "; santuario del camino " + com.darkcraft.santuario.Santuarios.nombre(m, com.darkcraft.morvain.SantuariosMorvain.porId("molino").pos()));
+            topView(m, com.darkcraft.morvain.Molino.EX + 10, com.darkcraft.morvain.Molino.EZ, 40, new File(out, "morvain_molino.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, el molino: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] molino", t);
+        }
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            com.darkcraft.enemigos.Molinera mo = null;
+            for (var e : fuera) if (e instanceof com.darkcraft.enemigos.Molinera x) mo = x;
+            if (mo == null) {
+                log.println("Morvain, la Molinera: NO SALE (" + fuera.size() + " fuera)");
+                return;
+            }
+            boolean suelo = !m.getBlockState(BlockPos.containing(mo.getX(), mo.getY() - 0.2, mo.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty();
+            StringBuilder sb = new StringBuilder("Morvain, la Molinera: fuera " + fuera.size() + " del molino; ella en " + mo.blockPosition().toShortString()
+                    + " postura " + mo.postura() + " (1 de rodillas), en el suelo " + suelo + ", metida en un bloque " + !m.noCollision(mo)
+                    + ", vida " + Math.round(mo.getMaxHealth()) + ", escala de su caja " + mo.getBbWidth() + " x " + mo.getBbHeight());
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5f2b8c1e-3d4a-4e6b-9a7c-1b2d3e4f5a6c"), "[DarkCraftCI2]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            double y = mo.getY();
+            // la ve a 10 bloques: se levanta mientras habla y no grita hasta acabar
+            fp.moveTo(mo.getX() - 10, y, mo.getZ(), -90f, 0f);
+            mo.setTarget(fp);
+            int levanta = -1, grita = -1;
+            for (int k = 0; k < 260; k++) {
+                mo.tick();
+                if (levanta < 0 && mo.accion() == com.darkcraft.enemigos.MolineraAnims.LEVANTARSE) levanta = k;
+                if (grita < 0 && mo.accion() == com.darkcraft.enemigos.MolineraAnims.GRITO) grita = k;
+                if (grita >= 0 && k > grita + 4) break;
+            }
+            sb.append("; al verle: pelea ").append(mo.enPelea()).append(", se levanta en el tick ").append(levanta).append(", grita en el ")
+                    .append(grita).append(" (la frase 1 dura ").append(com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Molinera.VOZ_BASE + 1)).append(")");
+            for (int k = 0; k < 60 && mo.accion() != 0; k++) mo.tick();
+            // cada accion acaba (sin presa); la siega, con uno de pie delante y luego saltando
+            mo.setTarget(null);
+            StringBuilder mal = new StringBuilder();
+            for (int a = 1; a < com.darkcraft.enemigos.MolineraAnims.TICKS.length; a++) {
+                String nombre = com.darkcraft.enemigos.MolineraAnims.NOMBRES[a];
+                if (nombre.equals("morir")) continue;
+                mo.empezar(a);
+                for (int k = 0; k < 120 && mo.accion() == a; k++) mo.tick();
+                if (mo.accion() == a) mal.append(' ').append(nombre).append(" no acaba;");
+            }
+            sb.append("; acciones que no acaban:").append(mal.length() == 0 ? " ninguna" : mal);
+            float giro = mo.getYRot();
+            double fx = -Math.sin(Math.toRadians(giro)), fz = Math.cos(Math.toRadians(giro));
+            String[] golpes = {"siega de pie", "siega saltando", "tajo", "estocada a 6", "pisoton detras"};
+            int[] acc = {com.darkcraft.enemigos.MolineraAnims.SIEGA, com.darkcraft.enemigos.MolineraAnims.SIEGA, com.darkcraft.enemigos.MolineraAnims.TAJO,
+                    com.darkcraft.enemigos.MolineraAnims.ESTOCADA, com.darkcraft.enemigos.MolineraAnims.PISOTON};
+            double[] lejos = {3.0, 3.0, 3.5, 6.0, -2.4};
+            double[] alto = {0, 1.1, 0, 0, 0};
+            sb.append("; golpes:");
+            for (int i = 0; i < golpes.length; i++) {
+                fp.setHealth(fp.getMaxHealth());
+                fp.invulnerableTime = 0;
+                fp.hurtTime = 0;
+                double px = mo.getX() + fx * lejos[i], pz = mo.getZ() + fz * lejos[i];
+                fp.moveTo(px, y + alto[i], pz, giro + 180f, 0f);
+                fp.setOnGround(alto[i] == 0);
+                int ondas = mo.ondas();
+                mo.setYRot(giro);
+                mo.yBodyRot = mo.yHeadRot = giro;
+                mo.empezar(acc[i]);
+                float antes = fp.getHealth();
+                for (int k = 0; k < 120 && mo.accion() == acc[i]; k++) {
+                    mo.tick();
+                    fp.moveTo(px, y + alto[i], pz, giro + 180f, 0f);
+                    fp.setOnGround(alto[i] == 0);
+                }
+                sb.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " -%.1f", antes - fp.getHealth()))
+                        .append(mo.ondas() > ondas ? " (onda)" : "").append(';');
+                mo.moveTo(mo.hogar().getX() + 0.5, mo.hogar().getY(), mo.hogar().getZ() + 0.5, giro, 0f);
+            }
+            fp.setHealth(fp.getMaxHealth());
+            // a media vida: grita y salen los suyos
+            fp.moveTo(mo.getX() - fx * -8, y, mo.getZ() - fz * -8, giro + 180f, 0f);
+            mo.setTarget(fp);
+            mo.setHealth(mo.getMaxHealth() * 0.45f);
+            int llamaron = -1;
+            for (int k = 0; k < 120; k++) {
+                mo.tick();
+                if (mo.suyos() > 0) {
+                    llamaron = k;
+                    break;
+                }
+            }
+            sb.append(" a media vida: segunda ").append(mo.segunda()).append(", salen ").append(mo.suyos()).append(" marchitos (en el tick ").append(llamaron)
+                    .append(")");
+            log.println(sb);
+            // cae: se abre la reja del molino
+            int[] cofre = com.darkcraft.morvain.Molino.get().sitio("cofre_molino");
+            mo.setTarget(null);
+            mo.hurt(m.damageSources().playerAttack(fp), 99999f);
+            for (int k = 0; k < 80 && !mo.isRemoved(); k++) mo.tick();
+            int objetos = m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, mo.getBoundingBox().inflate(4)).size();
+            log.println("Morvain, la Molinera cae: viva " + mo.isAlive() + ", caida " + com.darkcraft.morvain.Molino.vencida(server) + ", suyos en pie "
+                    + mo.suyos() + ", objetos " + objetos + "; " + com.darkcraft.morvain.Molino.resumen(m) + " (arcon en " + cofre[0] + "," + cofre[1] + "," + cofre[2] + ")");
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, mo.getBoundingBox().inflate(6))) it.discard();
+            for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.Marchito.class, mo.getBoundingBox().inflate(30))) if (e.esEfimero()) e.discard();
+        } catch (Throwable t) {
+            log.println("Morvain, la Molinera: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] molinera", t);
+        } finally {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.morvain.Molino.puerta(m, false, false);
         }
     }
 

@@ -21,7 +21,8 @@ import java.util.UUID;
 
 /**
  * Lo comun de los dos guardianes de Valdrenn (parte 4d; respuesta 15 del plan: "un mini-jefe guardian antes de CADA jefe,
- * con barra de vida y logro"): Ser Brandt ante el salon del trono y Vareth en la torre del arbol.
+ * con barra de vida y logro"): Ser Brandt ante el salon del trono y Vareth en la torre del arbol; y de los jefes de Morvain
+ * que pelean igual (la Molinera de Velmor, parte 7f).
  * <ul>
  * <li>esperan de rodillas en su puesto; la pelea empieza cuando ven a alguien (se levantan y rugen);</li>
  * <li>su <b>barra de vida</b> (la dibuja el cliente con su arte: {@code client/enemigos/GuardianCliente}) y su
@@ -85,6 +86,19 @@ public abstract class Guardian extends Enemigo {
     protected void alSegundaMitad() {
     }
 
+    /** Lo que hace al empezar la pelea (la Molinera habla). */
+    protected void alEmpezarPelea() {
+    }
+
+    /** Lo que hace cuando la pelea se acaba sin caer (la Molinera despide a los suyos). */
+    protected void alAcabarPelea() {
+    }
+
+    /** Si puede rugir ya (la Molinera espera a acabar de hablar). */
+    protected boolean puedeRugir() {
+        return true;
+    }
+
     @Override
     protected double correa() {
         return 40.0;
@@ -113,6 +127,7 @@ public abstract class Guardian extends Enemigo {
         if (level() instanceof ServerLevel sl) for (ServerPlayer p : sl.players()) if (p.isAlive() && !p.isSpectator() && p.distanceToSqr(this) < 48 * 48) cerca++;
         paraGrupo(cerca);
         DarkCraftMod.LOGGER.info("[DarkCraft] {}: empieza la pelea ({} jugadores, {} de vida)", tipo(), cerca, Math.round(getMaxHealth()));
+        alEmpezarPelea();
     }
 
     /** Todos han caido o se han ido: vuelve a lo suyo con la vida entera. */
@@ -122,6 +137,7 @@ public abstract class Guardian extends Enemigo {
         rivales.clear();
         setHealth(getMaxHealth());
         barra.removeAllPlayers();
+        alAcabarPelea();
         DarkCraftMod.LOGGER.info("[DarkCraft] {} vuelve a su puesto", tipo());
     }
 
@@ -133,7 +149,7 @@ public abstract class Guardian extends Enemigo {
         if (!isAlive()) return;
         if (enPelea()) {
             // en cuanto esta en pie, el rugido (una vez por pelea)
-            if (!rugio && postura() == DE_PIE && accion() == 0) {
+            if (!rugio && postura() == DE_PIE && accion() == 0 && puedeRugir()) {
                 rugio = true;
                 empezar(accionRugido());
                 pausa = Math.max(pausa, 10);

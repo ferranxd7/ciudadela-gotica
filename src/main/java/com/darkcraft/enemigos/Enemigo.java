@@ -182,6 +182,11 @@ public abstract class Enemigo extends Monster {
     protected void alAvanzar(int accion, int t) {
     }
 
+    /** Si ese golpe le alcanza (ademas del alcance y el arco): la siega de la Molinera va a ras de suelo y se salta. */
+    protected boolean pilla(int accion, int n, LivingEntity le) {
+        return true;
+    }
+
     protected void alGolpear(LivingEntity le, int accion) {
     }
 
@@ -653,7 +658,7 @@ public abstract class Enemigo extends Monster {
             if (d > g.alcance() + le.getBbWidth() * 0.5) continue;
             if (le.getY() > getY() + getBbHeight() + 0.6 || le.getY() + le.getBbHeight() < getY() - 0.6) continue;
             if (d > 0.8 && (dx * dir.x + dz * dir.z) / d < cosMin) continue;
-            if (!hasLineOfSight(le)) continue;
+            if (!hasLineOfSight(le) || !pilla(a, n, le)) continue;
             tocados.add(le.getId());
             float dano = (float) getAttributeValue(Attributes.ATTACK_DAMAGE) * g.dano();
             if (!le.hurt(damageSources().mobAttack(this), dano)) continue;

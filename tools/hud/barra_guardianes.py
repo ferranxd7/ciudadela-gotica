@@ -1,14 +1,17 @@
-"""Barras de vida de los dos guardianes de Valdrenn (parte 4d), pixel a pixel, con la misma disposicion que la del
-Capitan (la dibuja client/enemigos/GuardianCliente):
+"""Barras de vida de los dos guardianes de Valdrenn (parte 4d) y de la Molinera de Velmor (parte 7f), pixel a pixel, con
+la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianCliente):
 
   Ser Brandt, el Muro del Rey: un marco de hierro negro remachado con filos rojos, el paves con la corona del Rey en el
   centro y dos puas en los extremos; relleno de sangre oscura que corre; chispas de hierro al recibir dano.
   Vareth, el Guardian de Corteza: un marco de corteza con musgo y raices que cuelgan, el corazon verde latiendo en el
   centro entre dos ramas; relleno de savia verde que corre; hojas que caen al recibir dano.
+  La Molinera de Velmor: una viga de madera vieja del molino con flejes de hierro y espigas secas por encima, un aspa rota
+  en cada punta y la piedra de moler en el centro; relleno de brasas que corren (las de sus grietas); ceniza y harina que
+  caen al recibir dano.
 
   python3 tools/hud/barra_guardianes.py [carpeta_de_vistas]
 
-Salen textures/gui/brandt_barra.png y corteza_barra.png (256x128):
+Salen textures/gui/brandt_barra.png, corteza_barra.png y molinera_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -214,6 +217,141 @@ def hojas():
     return img
 
 
+# ---------------------------------------------------------------- la Molinera de Velmor
+
+W_DD, W_D, W, W_L = hexc("120c08"), hexc("2a1d13"), hexc("45321f"), hexc("66503a")
+F_D, F, F_L = hexc("26262b"), hexc("44444c"), hexc("6c6c76")
+T_D, T, T_L = hexc("5e5136"), hexc("8a7a52"), hexc("b9a877")
+P_DD, P_D, P, P_L = hexc("1e1d1c"), hexc("4a4846"), hexc("6f6c68"), hexc("98948e")
+B_DD, B_D, B, B_L, B_H = hexc("3a0c04"), hexc("7a2008"), hexc("c0401a"), hexc("f07a2a"), hexc("ffc070")
+H_ = hexc("dcd7c8")
+
+
+def marco_molinera():
+    rnd = random.Random(41)
+    n = noise2(59)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 4, FX1 + 3, FY0 - 4, FY1 + 3
+    rect(img, x0, y0, x1, y1, OUT)
+    # la viga: vetas a lo largo, nudos y grietas
+    for y in range(y0 + 1, y1):
+        for x in range(x0 + 1, x1):
+            v = n(x * 0.08, y * 0.9)
+            c = W_D if v < 0.38 else W if v < 0.82 else W_L
+            if (x * 7 + y * 3) % 53 == 0:
+                c = W_DD
+            put(img, x, y, c)
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, W_DD)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # flejes de hierro con sus clavos
+    for x in range(x0 + 14, x1 - 10, 26):
+        if abs(x - FW // 2) < 18:
+            continue
+        for y in range(y0 + 1, y1):
+            if FY0 - 1 <= y <= FY1:
+                continue
+            put(img, x, y, F)
+            put(img, x + 1, y, F_D)
+        put(img, x, y0 + 2, F_L)
+        put(img, x, y1 - 2, F_L)
+    # espigas secas que asoman por arriba (y alguna caida)
+    for _ in range(26):
+        xx = rnd.randint(x0 + 4, x1 - 4)
+        if abs(xx - FW // 2) < 15:
+            continue
+        alto = rnd.randint(3, 7)
+        inclina = rnd.choice((-1, 0, 0, 1))
+        for i in range(alto):
+            px = xx + (inclina if i > alto // 2 else 0)
+            put(img, px, y0 - 1 - i, T_D if i < alto - 3 else T)
+        cab = y0 - alto
+        put(img, xx + inclina, cab, T_L)
+        put(img, xx + inclina - 1, cab + 1, T)
+        put(img, xx + inclina + 1, cab + 1, T)
+        put(img, xx + inclina, cab - 1, T_L)
+    # en las puntas: el extremo de un aspa (el armazon de listones), de pie sobre la viga
+    for side in (0, 1):
+        bx = 1 if side == 0 else FW - 5
+        for y in range(y0 - 7, y1 + 6):
+            for dx in range(4):
+                borde = dx in (0, 3)
+                liston = (y - y0) % 3 == 0
+                if borde or liston:
+                    put(img, bx + dx, y, W_L if borde and dx == 0 else W)
+                elif y < y0 or y > y1:
+                    put(img, bx + dx, y, (0, 0, 0, 0))
+            put(img, bx - 1, y, OUT)
+            put(img, bx + 4, y, OUT)
+        for dx in range(-1, 5):
+            put(img, bx + dx, y0 - 8, OUT)
+            put(img, bx + dx, y1 + 6, OUT)
+    # en el centro: la piedra de moler, con su ojo y sus surcos (encima de la viga, sin tapar el relleno)
+    cx, cy = FW // 2, 8
+    for dy in range(-10, 11):
+        for dx in range(-10, 11):
+            d = math.hypot(dx, dy)
+            if d > 9.9 or cy + dy >= FY0 - 1:
+                continue
+            if d > 8.9 or cy + dy == FY0 - 2:
+                put(img, cx + dx, cy + dy, OUT)
+                continue
+            a = math.atan2(dy, dx)
+            surco = 3.6 < d < 8.2 and abs(((a + math.pi) * 10 / (2 * math.pi)) % 1 - 0.5) < 0.1
+            c = P_L if dx + dy < -6 else P if dx + dy < 6 else P_D
+            if surco:
+                c = P_DD
+            if n(dx * 0.4 + 30, dy * 0.4) > 0.8:
+                c = mix(c, P_DD, 0.5)
+            put(img, cx + dx, cy + dy, c)
+    # el ojo de la piedra: un hueco con brasas dentro
+    for dy in range(-3, 4):
+        for dx in range(-3, 4):
+            if abs(dx) == 3 and abs(dy) == 3:
+                continue
+            put(img, cx + dx, cy + dy, OUT if max(abs(dx), abs(dy)) == 3 else (B_H if dx == 0 and dy == 0 else B_L if abs(dx) + abs(dy) < 2 else B))
+    # harina en el borde de abajo de la piedra
+    for dx in range(-7, 8):
+        if rnd.random() < 0.6:
+            put(img, cx + dx, FY0 - 3, H_)
+    return img
+
+
+def relleno_molinera(k):
+    n = noise2(127)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            v = n((x - k * 6) * 0.09, y * 0.55)
+            t = 0.2 + 0.55 * mid + 0.45 * (v - 0.5)
+            c = mix(B_D, B, max(0.0, min(1.0, t * 1.4)))
+            if t > 0.66:
+                c = mix(c, B_L, min(1.0, (t - 0.66) * 3))
+            if y == 0:
+                c = mix(c, B_L, 0.35)
+            if y == 6:
+                c = mix(c, B_DD, 0.6)
+            # grietas de ceniza que corren por las brasas
+            if (x * 5 + y * 11 - k * 23) % 97 == 0:
+                c = P_D
+            elif (x * 3 + 7 * y - k * 19) % 89 == 0 and 1 <= y <= 5:
+                c = B_H
+            img.putpixel((x, y), c)
+    return img
+
+
+def ceniza():
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = (["..h", ".c.", "c.."], ["h.", "cc"], [".h.", "hcH", ".c."], ["H.", ".c", "c."])
+    col = {"h": H_, "c": P_L, "H": B_L}
+    for k, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, k * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 # ---------------------------------------------------------------- comun
 
 
@@ -250,6 +388,7 @@ if __name__ == "__main__":
     barras = {
         "brandt": atlas(marco_brandt(), relleno_brandt, hueco("080809", "17181b"), rastro("fff2ea", "e8b0a0"), chispas()),
         "corteza": atlas(marco_corteza(), relleno_corteza, hueco("050a06", "121c14"), rastro("f2fff6", "b9f0c8"), hojas()),
+        "molinera": atlas(marco_molinera(), relleno_molinera, hueco("0b0908", "1c1815"), rastro("f6f2e6", "d6cdb6"), ceniza()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

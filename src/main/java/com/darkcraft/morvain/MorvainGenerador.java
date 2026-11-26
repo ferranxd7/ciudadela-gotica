@@ -149,6 +149,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar Velmor en el chunk {}", c.getPos(), t);
         }
+        // el molino de la Molinera, al este de Velmor (parte 7f)
+        try {
+            if (Molino.toca(c.getPos().x, c.getPos().z)) Molino.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el molino en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

@@ -41,7 +41,7 @@ public final class SantuariosMorvain {
 
     /** Los demas (los sitios salen de tools/morvain: llanos y secos, en su region). */
     public static final Sitio[] SITIOS = {
-            s("encrucijada", -1132, 5099), s("vado", 868, 4181),
+            s("encrucijada", -1132, 5099), s("vado", 868, 4181), s("molino", 1086, 4048),
             s("ahorcados", -4832, 3200), s("raiz_hueca", -5674, 5712),
             s("juncos", -5600, -720), s("embarcadero", -4023, -1897),
             s("colmillo", -3132, -3588), s("coloso", 886, -4922), s("helada", 3352, -5400),

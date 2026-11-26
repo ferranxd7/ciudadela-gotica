@@ -2795,5 +2795,141 @@
         "name": "darkcraft:sfx/marchito_farol_3"
       }
     ]
+  },
+  "sfx.molinera_grito": {
+    "subtitle": "subtitles.darkcraft.sfx.molinera_grito",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/molinera_grito_1"
+      },
+      {
+        "name": "darkcraft:sfx/molinera_grito_2"
+      }
+    ]
+  },
+  "sfx.molinera_siega": {
+    "subtitle": "subtitles.darkcraft.sfx.molinera_siega",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/molinera_siega_1"
+      },
+      {
+        "name": "darkcraft:sfx/molinera_siega_2"
+      },
+      {
+        "name": "darkcraft:sfx/molinera_siega_3"
+      }
+    ]
+  },
+  "sfx.molinera_golpe": {
+    "subtitle": "subtitles.darkcraft.sfx.molinera_golpe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/molinera_golpe_1"
+      },
+      {
+        "name": "darkcraft:sfx/molinera_golpe_2"
+      }
+    ]
+  },
+  "sfx.molinera_giro": {
+    "subtitle": "subtitles.darkcraft.sfx.molinera_giro",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/molinera_giro_1"
+      },
+      {
+        "name": "darkcraft:sfx/molinera_giro_2"
+      }
+    ]
+  },
+  "sfx.molinera_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.molinera_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/molinera_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/molinera_dolor_2"
+      },
+      {
+        "name": "darkcraft:sfx/molinera_dolor_3"
+      }
+    ]
+  },
+  "sfx.molinera_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.molinera_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/molinera_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/molinera_muerte_2"
+      }
+    ]
+  },
+  "sfx.molino_viento": {
+    "subtitle": "subtitles.darkcraft.sfx.molino_viento",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/molino_viento_1"
+      },
+      {
+        "name": "darkcraft:sfx/molino_viento_2"
+      }
+    ]
+  },
+  "molinera.voz.1": {
+    "subtitle": "subtitles.darkcraft.molinera.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:molinera/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "molinera.voz.2": {
+    "subtitle": "subtitles.darkcraft.molinera.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:molinera/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "molinera.voz.3": {
+    "subtitle": "subtitles.darkcraft.molinera.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:molinera/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "molinera.voz.4": {
+    "subtitle": "subtitles.darkcraft.molinera.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:molinera/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "molinera.voz.5": {
+    "subtitle": "subtitles.darkcraft.molinera.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:molinera/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "musica.molinera": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/molinera",
+        "stream": true
+      }
+    ]
   }
 }
