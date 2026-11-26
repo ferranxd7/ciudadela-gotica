@@ -731,6 +731,7 @@ public final class CiTest {
         arboleda(server, m, log, out);
         verdugo(server, m, log);
         pilotes(server, m, log, out);
+        barquero(server, m, log, out);
     }
 
     /**
@@ -1098,6 +1099,296 @@ public final class CiTest {
      * colgados de cerca y, sin colgados, se alzan otros de la tierra; al caer, la cuenta se cierra: los colgados descansan, sus
      * sogas se quedan con el lazo vacio y ya no vuelven a colgar. Al acabar todo vuelve a estar como antes.
      */
+    /**
+     * La Laguna Negra y el Barquero (parte 7j): la laguna levantada (el agua, el embarcadero, la barca con su arcon, los faroles
+     * de almas), vistas desde arriba; sus podridos (a flote los del agua); el Barquero en su barca: al ver a alguien en el
+     * embarcadero habla, ruge y salta de la barca a las tablas; cada accion acaba; sus golpes a un marchito (el remazo con su ola,
+     * el barrido, el golpe de linterna que quema), el bichero que engancha y tira, el anillo de fuego (de pie le llega, saltando
+     * no); a media vida se alzan sus pasajeros (o suben otros del agua); y al caer, la laguna en paz.
+     */
+    private static void barquero(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String barca = com.darkcraft.morvain.MorvainEnemigos.BARCA, laguna = com.darkcraft.morvain.MorvainEnemigos.LAGUNA;
+        var L = com.darkcraft.morvain.LagunaNegra.get();
+        final int CX = com.darkcraft.morvain.LagunaNegra.CX, CZ = com.darkcraft.morvain.LagunaNegra.CZ, PASO = com.darkcraft.morvain.LagunaNegra.PASO;
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : L.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            log.println("Morvain, la laguna negra: " + nch + " chunks en " + (System.currentTimeMillis() - t0) + " ms; " + com.darkcraft.morvain.LagunaNegra.resumen(m)
+                    + "; santuario " + com.darkcraft.santuario.Santuarios.nombre(m, com.darkcraft.morvain.SantuariosMorvain.porId("embarcadero").pos()));
+            topView(m, CX - 12, CZ, 50, new File(out, "morvain_laguna.png"));
+            topView(m, CX + 4, CZ, 16, new File(out, "morvain_laguna_embarcadero.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, la laguna negra: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] laguna", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            // ---- sus podridos: los del agua, a flote
+            com.darkcraft.enemigos.Puestos.todos(server, laguna, false);
+            var podridos = com.darkcraft.enemigos.Puestos.sacarTodos(m, laguna);
+            for (int k = 0; k < 30; k++)
+                for (var e : podridos) if (e.isAlive()) e.tick();
+            int flotan = 0, enAgua = 0, chocan = 0;
+            for (var e : podridos) {
+                if (!m.noCollision(e)) chocan++;
+                if (e.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) {
+                    enAgua++;
+                    if (e.isInWater()) flotan++;
+                }
+            }
+            log.println("Morvain, la laguna negra, sus podridos: fuera " + podridos.size() + " de " + com.darkcraft.morvain.MorvainEnemigos.laguna().size()
+                    + ", en el agua " + enAgua + " (a flote " + flotan + "), metidos en un bloque " + chocan + " (tiene que ser 0)");
+            // ---- el Barquero en su barca
+            com.darkcraft.enemigos.Puestos.todos(server, barca, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, barca);
+            com.darkcraft.enemigos.Barquero ba = null;
+            for (var e : fuera) if (e instanceof com.darkcraft.enemigos.Barquero x) ba = x;
+            if (ba == null) {
+                log.println("Morvain, el Barquero: NO SALE (" + fuera.size() + " fuera)");
+                return;
+            }
+            boolean suelo = !m.getBlockState(BlockPos.containing(ba.getX(), ba.getY() - 0.2, ba.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty();
+            StringBuilder sb = new StringBuilder("Morvain, el Barquero: en " + ba.blockPosition().toShortString() + " postura " + ba.postura()
+                    + " (1 de vigia en su barca), en la barca " + (Math.abs(ba.getY() - (com.darkcraft.morvain.LagunaNegra.BARCA_SUELO + 1)) < 0.05) + ", en el suelo " + suelo
+                    + ", metido en un bloque " + !m.noCollision(ba) + ", en el agua " + ba.isInWater() + ", vida " + Math.round(ba.getMaxHealth())
+                    + ", caja " + ba.getBbWidth() + " x " + ba.getBbHeight());
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("9c4d2e1f-5a6b-4c7d-8e9f-1a2b3c4d5e70"), "[DarkCraftCI4]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- le ve desde el embarcadero (a unos once bloques de la barca): habla, ruge al acabar y salta a las tablas
+            final double fxx = CX + 4.5, fzz = CZ + 0.5, fyy = PASO + 1;
+            fp.moveTo(fxx, fyy, fzz, -90f, 0f);
+            fp.setOnGround(true);
+            double yAntes = ba.getY();
+            ba.setTarget(fp);
+            int levanta = -1, ruge = -1, salta = -1, cae = -1;
+            for (int k = 0; k < 400; k++) {
+                ba.tickCount++;
+                ba.tick();
+                fp.moveTo(fxx, fyy, fzz, -90f, 0f);
+                if (levanta < 0 && ba.accion() == com.darkcraft.enemigos.BarqueroAnims.LEVANTARSE) levanta = k;
+                if (ruge < 0 && ba.accion() == com.darkcraft.enemigos.BarqueroAnims.GRITO) ruge = k;
+                if (salta < 0 && ba.accion() == com.darkcraft.enemigos.BarqueroAnims.SALTO) salta = k;
+                if (salta >= 0 && ba.accion() != com.darkcraft.enemigos.BarqueroAnims.SALTO) {
+                    cae = k;
+                    break;
+                }
+            }
+            for (int k = 0; k < 6; k++) ba.tick();
+            boolean sueloTras = !m.getBlockState(BlockPos.containing(ba.getX(), ba.getY() - 0.2, ba.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty();
+            sb.append("; al verle: pelea ").append(ba.enPelea()).append(", se yergue en el tick ").append(levanta).append(", ruge en el ").append(ruge)
+                    .append(" (la frase 1 dura ").append(com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Barquero.VOZ_BASE + 1)).append("), salta en el ")
+                    .append(salta).append(" y acaba en el ").append(cae).append(String.format(java.util.Locale.ROOT,
+                            ": de Y %.1f a %.1f (las tablas, %d), a %.1f de su presa, en el suelo %s, metido en un bloque %s, en el agua %s, saltos %d", yAntes,
+                            ba.getY(), PASO + 1, Math.hypot(ba.getX() - fp.getX(), ba.getZ() - fp.getZ()), sueloTras, !m.noCollision(ba), ba.isInWater(), ba.saltos()));
+            // ---- cada accion acaba (sin presa)
+            ba.setTarget(null);
+            StringBuilder mal = new StringBuilder();
+            for (int a = 1; a < com.darkcraft.enemigos.BarqueroAnims.TICKS.length; a++) {
+                String nombre = com.darkcraft.enemigos.BarqueroAnims.NOMBRES[a];
+                if (nombre.equals("morir")) continue;
+                ba.empezar(a);
+                for (int k = 0; k < 120 && ba.accion() == a; k++) {
+                    ba.tickCount++;
+                    ba.tick();
+                }
+                if (ba.accion() == a) mal.append(' ').append(nombre).append(" no acaba;");
+                if (ba.volando()) mal.append(' ').append(nombre).append(": sigue volando;");
+            }
+            for (int k = 0; k < 40 && ba.anilloActivo(); k++) {
+                ba.tickCount++;
+                ba.tick();
+            }
+            sb.append("; acciones que no acaban:").append(mal.length() == 0 ? " ninguna" : mal);
+            // ---- sus golpes, a un marchito (al jugador de mentira no le entra nada), en medio del embarcadero
+            float giro = -90f;
+            double fx = -Math.sin(Math.toRadians(giro)), fz = Math.cos(Math.toRadians(giro));
+            double y = PASO + 1, x0 = CX - 3.5, z0 = CZ + 0.5;
+            String[] golpes = {"remazo", "barrido de pie", "barrido saltando", "golpe de linterna"};
+            int[] acc = {com.darkcraft.enemigos.BarqueroAnims.REMAZO, com.darkcraft.enemigos.BarqueroAnims.BARRIDO, com.darkcraft.enemigos.BarqueroAnims.BARRIDO,
+                    com.darkcraft.enemigos.BarqueroAnims.GOLPE_LINTERNA};
+            double[] lejos = {3.0, 3.0, 3.0, 2.4};
+            double[] alto = {0, 0, 1.1, 0};
+            sb.append("; golpes a un marchito:");
+            var victima = DarkCraftMod.MARCHITO.get().create(m);
+            if (victima != null) {
+                victima.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(400.0);
+                victima.moveTo(x0 + fx * 3, y, z0 + fz * 3, giro + 180f, 0f);
+                m.addFreshEntity(victima);
+                quitar.add(victima);
+                for (int i = 0; i < golpes.length; i++) {
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    victima.hurtTime = 0;
+                    victima.clearFire();
+                    double px = x0 + fx * lejos[i], pz = z0 + fz * lejos[i];
+                    victima.moveTo(px, y + alto[i], pz, giro + 180f, 0f);
+                    int ondas = ba.ondas();
+                    ba.moveTo(x0, y, z0, giro, 0f);
+                    ba.setTarget(victima);
+                    ba.setYRot(giro);
+                    ba.yBodyRot = ba.yHeadRot = giro;
+                    ba.empezar(acc[i]);
+                    float antes = victima.getHealth();
+                    for (int k = 0; k < 120 && ba.accion() == acc[i]; k++) {
+                        ba.tickCount++;
+                        ba.tick();
+                        victima.moveTo(px, y + alto[i], pz, giro + 180f, 0f);
+                    }
+                    sb.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " -%.1f", antes - victima.getHealth()))
+                            .append(ba.ondas() > ondas ? " (ola)" : "").append(victima.isOnFire() ? " (arde)" : "").append(';');
+                }
+                // ---- el bichero: a cinco bloques y medio delante; engancha, tira y el golpe de linterna
+                victima.setHealth(victima.getMaxHealth());
+                victima.invulnerableTime = 0;
+                victima.hurtTime = 0;
+                victima.clearFire();
+                double px = x0 + fx * 5.5, pz = z0 + fz * 5.5;
+                victima.moveTo(px, y, pz, giro + 180f, 0f);
+                ba.moveTo(x0, y, z0, giro, 0f);
+                ba.setTarget(victima);
+                ba.setYRot(giro);
+                ba.yBodyRot = ba.yHeadRot = giro;
+                int eng = ba.enganches(), rem = ba.rematados();
+                double antes = Math.hypot(victima.getX() - ba.getX(), victima.getZ() - ba.getZ());
+                float vida = victima.getHealth();
+                ba.empezar(com.darkcraft.enemigos.BarqueroAnims.BICHERO);
+                double cerca = antes;
+                for (int k = 0; k < 110 && ba.accion() != 0; k++) {
+                    ba.tickCount++;
+                    ba.tick();
+                    victima.tick();
+                    cerca = Math.min(cerca, Math.hypot(victima.getX() - ba.getX(), victima.getZ() - ba.getZ()));
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " el bichero: engancha %s, la presa de %.1f a %.1f, golpe de linterna %s, la presa -%.1f%s;",
+                        ba.enganches() > eng, antes, cerca, ba.rematados() > rem, vida - victima.getHealth(), victima.isOnFire() ? " (arde)" : ""));
+                // ---- el anillo de fuego: a la presa de pie a cuatro bloques le llega; a la que salta, no
+                victima.setHealth(victima.getMaxHealth());
+                victima.invulnerableTime = 0;
+                victima.hurtTime = 0;
+                victima.clearFire();
+                StringBuilder an = new StringBuilder(" el anillo:");
+                for (boolean salta2 : new boolean[]{false, true}) {
+                    double qx = x0 + fx * 4, qz = z0 + fz * 4;
+                    victima.moveTo(qx, y + (salta2 ? 1.2 : 0), qz, giro + 180f, 0f);
+                    victima.setOnGround(!salta2);
+                    victima.setNoGravity(salta2);
+                    ba.moveTo(x0, y, z0, giro, 0f);
+                    ba.setTarget(victima);
+                    int alc = ba.alcanzados();
+                    float v0 = victima.getHealth();
+                    ba.empezar(com.darkcraft.enemigos.BarqueroAnims.LINTERNA);
+                    for (int k = 0; k < 120 && (ba.accion() != 0 || ba.anilloActivo()); k++) {
+                        ba.tickCount++;
+                        ba.tick();
+                        victima.moveTo(qx, y + (salta2 ? 1.2 : 0), qz, giro + 180f, 0f);
+                        victima.setOnGround(!salta2);
+                    }
+                    victima.setNoGravity(false);
+                    an.append(salta2 ? " saltando" : " de pie").append(" le llega ").append(ba.alcanzados() > alc)
+                            .append(String.format(java.util.Locale.ROOT, " (-%.1f%s)", v0 - victima.getHealth(), victima.isOnFire() ? ", arde" : "")).append(';');
+                    victima.clearFire();
+                    victima.invulnerableTime = 0;
+                }
+                sb.append(an).append(" anillos ").append(ba.anillos()).append(';');
+                victima.discard();
+            }
+            log.println(sb);
+            // ---- a media vida: se alzan sus pasajeros (los de la laguna, fuera y flotando)
+            StringBuilder sm = new StringBuilder("Morvain, el Barquero a media vida:");
+            com.darkcraft.enemigos.Puestos.todos(server, laguna, false);
+            var pasajeros = com.darkcraft.enemigos.Puestos.sacarTodos(m, laguna);
+            for (int k = 0; k < 20; k++)
+                for (var e : pasajeros) if (e.isAlive()) e.tick();
+            int flotandoAntes = 0;
+            for (var e : pasajeros) if (e.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) flotandoAntes++;
+            ba.moveTo(CX + 2.5, y, CZ + 0.5, -90f, 0f);
+            fp.moveTo(fxx + 2, fyy, fzz, -90f, 0f);
+            ba.setTarget(fp);
+            ba.setHealth(ba.getMaxHealth() * 0.45f);
+            for (int k = 0; k < 160 && ba.despertados() + ba.subidos() == 0; k++) {
+                ba.tickCount++;
+                ba.tick();
+                fp.moveTo(fxx + 2, fyy, fzz, -90f, 0f);
+            }
+            int conPresa = 0;
+            for (var e : pasajeros) if (e.getTarget() == fp) conPresa++;
+            sm.append(" segunda ").append(ba.segunda()).append(", flotando en la laguna ").append(flotandoAntes).append(", se alzan ").append(ba.despertados())
+                    .append(" (con presa ").append(conPresa).append("), suben del agua ").append(ba.subidos()).append(';');
+            // ---- otra pelea, sin nadie flotando: suben del agua al embarcadero
+            ba.setTarget(null);
+            for (int k = 0; k < 130 && ba.enPelea(); k++) {
+                ba.tickCount++;
+                ba.tick();
+            }
+            com.darkcraft.enemigos.Puestos.todos(server, laguna, true);
+            for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.Podrido.class, ba.getBoundingBox().inflate(40))) if (e.esEfimero()) e.discard();
+            boolean acabo = !ba.enPelea();
+            int subidos = ba.subidos();
+            ba.setTarget(fp);
+            for (int k = 0; k < 80; k++) {
+                ba.tickCount++;
+                ba.tick();
+                fp.moveTo(fxx + 2, fyy, fzz, -90f, 0f);
+            }
+            ba.setHealth(ba.getMaxHealth() * 0.45f);
+            for (int k = 0; k < 200 && ba.subidos() == subidos; k++) {
+                ba.tickCount++;
+                ba.tick();
+                fp.moveTo(fxx + 2, fyy, fzz, -90f, 0f);
+            }
+            int enTablas = 0;
+            for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.Podrido.class, ba.getBoundingBox().inflate(16)))
+                if (e.esEfimero() && Math.abs(e.getY() - (PASO + 1)) < 0.6 && m.noCollision(e)) enTablas++;
+            sm.append(" otra pelea (la anterior acabo ").append(acabo).append(") sin nadie flotando: suben ").append(ba.subidos() - subidos)
+                    .append(" (en las tablas y sin meterse en nada ").append(enTablas).append("), en pie ").append(ba.suyos());
+            log.println(sm);
+            // ---- cae: la laguna en paz
+            com.darkcraft.enemigos.Puestos.todos(server, laguna, false);
+            com.darkcraft.enemigos.Puestos.sacarTodos(m, laguna);
+            ba.setTarget(null);
+            ba.hurt(m.damageSources().playerAttack(fp), 99999f);
+            for (int k = 0; k < 90 && !ba.isRemoved(); k++) {
+                ba.tickCount++;
+                ba.tick();
+            }
+            int objetos = m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, ba.getBoundingBox().inflate(4)).size();
+            String faroles = com.darkcraft.morvain.LagunaNegra.faroles(m);
+            // ya no salen los pasajeros (los del muelle, si)
+            com.darkcraft.enemigos.Puestos.todos(server, laguna, false);
+            int pasajerosDespues = 0, otrosDespues = 0;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, laguna)) {
+                if ("pasajeros".equals(com.darkcraft.morvain.MorvainEnemigos.laguna().get(e.puesto()).grupo())) pasajerosDespues++;
+                else otrosDespues++;
+            }
+            log.println("Morvain, el Barquero cae: vivo " + ba.isAlive() + ", la laguna en paz " + com.darkcraft.morvain.LagunaNegra.enPaz(server) + ", subidos en pie "
+                    + ba.suyos() + ", objetos " + objetos + "; " + faroles + "; despues salen " + pasajerosDespues + " pasajeros (tiene que ser 0) y "
+                    + otrosDespues + " de los del muelle");
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, ba.getBoundingBox().inflate(6))) it.discard();
+            for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.Podrido.class, ba.getBoundingBox().inflate(40))) if (e.esEfimero()) e.discard();
+        } catch (Throwable t) {
+            log.println("Morvain, el Barquero: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] barquero", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            // todo como antes: el Barquero en su barca, sus pasajeros flotando y los faroles de almas
+            com.darkcraft.enemigos.Puestos.todos(server, barca, false);
+            com.darkcraft.enemigos.Puestos.todos(server, laguna, false);
+            try {
+                com.darkcraft.morvain.LagunaNegra.almas(m);
+                com.darkcraft.enemigos.Puestos.sacarTodos(m, laguna);
+                log.println("Morvain, el Barquero vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoBarquero(server));
+            } catch (Throwable t) {
+                log.println("Morvain, el Barquero vuelve: ERROR " + t);
+            }
+            com.darkcraft.enemigos.Puestos.todos(server, laguna, false);
+            com.darkcraft.enemigos.Puestos.todos(server, barca, false);
+        }
+    }
+
     private static void verdugo(MinecraftServer server, ServerLevel m, PrintWriter log) {
         String sitio = com.darkcraft.morvain.MorvainEnemigos.PATIBULO, arb = com.darkcraft.morvain.MorvainEnemigos.ARBOLEDA;
         var A = com.darkcraft.morvain.Arboleda.get();

@@ -228,6 +228,15 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_PODRIDO_GAS = sound("sfx.podrido_gas");
     public static final RegistryObject<SoundEvent> SFX_PODRIDO_APLASTAR = sound("sfx.podrido_aplastar");
     public static final RegistryObject<SoundEvent> AMBIENTE_PANTANO = sound("ambiente.pantano");
+    // el Barquero de la Laguna Negra (parte 7j)
+    public static final RegistryObject<SoundEvent> SFX_BARQUERO_GRITO = sound("sfx.barquero_grito");
+    public static final RegistryObject<SoundEvent> SFX_BARQUERO_REMAZO = sound("sfx.barquero_remazo");
+    public static final RegistryObject<SoundEvent> SFX_BARQUERO_BARRIDO = sound("sfx.barquero_barrido");
+    public static final RegistryObject<SoundEvent> SFX_BARQUERO_BICHERO = sound("sfx.barquero_bichero");
+    public static final RegistryObject<SoundEvent> SFX_BARQUERO_LINTERNA = sound("sfx.barquero_linterna");
+    public static final RegistryObject<SoundEvent> SFX_BARQUERO_DOLOR = sound("sfx.barquero_dolor");
+    public static final RegistryObject<SoundEvent> SFX_BARQUERO_MUERTE = sound("sfx.barquero_muerte");
+    public static final RegistryObject<SoundEvent> SFX_BARQUERO_REMO = sound("sfx.barquero_remo");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -304,6 +313,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_VARETH = sound("musica.vareth");
     public static final RegistryObject<SoundEvent> MUSICA_MOLINERA = sound("musica.molinera");
     public static final RegistryObject<SoundEvent> MUSICA_VERDUGO = sound("musica.verdugo");
+    public static final RegistryObject<SoundEvent> MUSICA_BARQUERO = sound("musica.barquero");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -341,6 +351,10 @@ public class DarkCraftMod {
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] VERDUGO_VOZ = new RegistryObject[6];
 
+    /** Frases del Barquero de la Laguna Negra (1..5, parte 7j). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] BARQUERO_VOZ = new RegistryObject[6];
+
     /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[10];
@@ -351,6 +365,7 @@ public class DarkCraftMod {
         for (int i = 1; i < CAPITAN_VOZ.length; i++) CAPITAN_VOZ[i] = sound("capitan.voz." + i);
         for (int i = 1; i < MOLINERA_VOZ.length; i++) MOLINERA_VOZ[i] = sound("molinera.voz." + i);
         for (int i = 1; i < VERDUGO_VOZ.length; i++) VERDUGO_VOZ[i] = sound("verdugo.voz." + i);
+        for (int i = 1; i < BARQUERO_VOZ.length; i++) BARQUERO_VOZ[i] = sound("barquero.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -520,6 +535,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Verdugo>> VERDUGO = ENTITIES.register("verdugo",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Verdugo>of(com.darkcraft.enemigos.Verdugo::new, MobCategory.MONSTER)
                     .sized(1.2f, 3.4f).fireImmune().clientTrackingRange(10).updateInterval(2).build(MODID + ":verdugo"));
+    // ---- el Barquero de la Laguna Negra, el jefe del Pantano Podrido (parte 7j): se manda cada 2 ticks (el salto)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Barquero>> BARQUERO = ENTITIES.register("barquero",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Barquero>of(com.darkcraft.enemigos.Barquero::new, MobCategory.MONSTER)
+                    .sized(1.2f, 3.6f).fireImmune().clientTrackingRange(10).updateInterval(2).build(MODID + ":barquero"));
     // ---- la guardia de Valdrenn (parte 4a)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Guardia>> GUARDIA = ENTITIES.register("guardia",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Guardia>of(com.darkcraft.enemigos.Guardia::new, MobCategory.MONSTER)
@@ -694,6 +713,7 @@ public class DarkCraftMod {
         e.put(CORTEZA.get(), com.darkcraft.enemigos.Corteza.atributos().build());
         e.put(MOLINERA.get(), com.darkcraft.enemigos.Molinera.atributos().build());
         e.put(VERDUGO.get(), com.darkcraft.enemigos.Verdugo.atributos().build());
+        e.put(BARQUERO.get(), com.darkcraft.enemigos.Barquero.atributos().build());
         e.put(CORCEL.get(), com.darkcraft.montura.Corcel.atributos().build());
         e.put(GUIA.get(), com.darkcraft.personajes.Guia.atributos().build());
         e.put(HERRERO.get(), com.darkcraft.personajes.Herrero.atributos().build());

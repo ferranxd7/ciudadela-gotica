@@ -2179,6 +2179,58 @@ EN.update({
 })
 
 
+# ---------------------------------------------------------------- parte 7j: el Barquero de la Laguna Negra (el jefe del Pantano Podrido)
+ES.update({
+    "entity.darkcraft.barquero": "El Barquero de la Laguna Negra",
+    "darkcraft.barquero.nombre_corto": "El Barquero",
+    "darkcraft.barquero.voz.1": "Otra alma para la travesía... Paga el peaje... o nada.",
+    "darkcraft.barquero.voz.2": "¡Arriba, mis pasajeros! ¡La barca aún no está llena!",
+    "darkcraft.barquero.voz.3": "El agua siempre se cobra lo suyo.",
+    "darkcraft.barquero.voz.4": "Sube a bordo...",
+    "darkcraft.barquero.voz.5": "La orilla... por fin... veo la orilla.",
+    "subtitles.darkcraft.barquero.voz": "Habla el Barquero",
+    "darkcraft.bestiario.barquero.desc": "Nadie sabe cuánto tiempo lleva cruzando la laguna. Ya no queda a quién llevar, pero sigue remando con la linterna en alto y cobra el peaje a quien se acerca a su embarcadero. Salta de su barca con el remo por delante; su remazo levanta una ola que se esquiva saltando o rodando, y su barrido va a media altura. Clava el garfio del remo en quien está a unos pasos y tira de él hasta sus pies para quemarlo con la linterna. Cuando la alza, el fuego de almas se abre en un anillo por las tablas: salta por encima. Herido, llama a sus pasajeros.",
+    "subtitles.darkcraft.sfx.barquero_grito": "El Barquero grita sobre el agua",
+    "subtitles.darkcraft.sfx.barquero_remazo": "Un remo golpea el agua",
+    "subtitles.darkcraft.sfx.barquero_barrido": "Un remo corta el aire",
+    "subtitles.darkcraft.sfx.barquero_bichero": "Un garfio se clava",
+    "subtitles.darkcraft.sfx.barquero_linterna": "Una linterna estalla en llamas de almas",
+    "subtitles.darkcraft.sfx.barquero_dolor": "El Barquero se queja",
+    "subtitles.darkcraft.sfx.barquero_muerte": "El Barquero se hunde",
+    "subtitles.darkcraft.sfx.barquero_remo": "Alguien rema en la laguna",
+    "darkcraft.morvain.lugar.laguna": "La Laguna Negra",
+    "advancements.darkcraft.barquero.title": "La última travesía",
+    "advancements.darkcraft.barquero.description": "Vence al Barquero de la Laguna Negra",
+    "darkcraft.diario.barquero": "El Barquero de la Laguna Negra seguía esperando en su barca, con la linterna en alto. Le pagué el peaje con acero. Cuando cayó, sus pasajeros dejaron de flotar y los faroles del embarcadero se encendieron con luz de verdad. Dijo que veía la orilla.",
+    "darkcraft.ayuda.laguna": "La Laguna Negra: ir a uno de sus sitios, que vuelvan sus podridos o quitarlos",
+    "darkcraft.ayuda.barquero": "El Barquero: cómo está, llevarte al embarcadero, vencerle o que vuelva",
+})
+EN.update({
+    "entity.darkcraft.barquero": "The Ferryman of the Black Lagoon",
+    "darkcraft.barquero.nombre_corto": "The Ferryman",
+    "darkcraft.barquero.voz.1": "Another soul for the crossing... Pay the toll... or swim.",
+    "darkcraft.barquero.voz.2": "Rise, my passengers! The boat is not yet full!",
+    "darkcraft.barquero.voz.3": "The water always takes its due.",
+    "darkcraft.barquero.voz.4": "Come aboard...",
+    "darkcraft.barquero.voz.5": "The shore... at last... I can see the shore.",
+    "subtitles.darkcraft.barquero.voz": "The Ferryman speaks",
+    "darkcraft.bestiario.barquero.desc": "No one knows how long he has been crossing the lagoon. There is no one left to carry, yet he keeps rowing with his lantern raised and takes his toll from whoever comes near his landing. He leaps from his boat oar first; his oar slam raises a wave you dodge by jumping or rolling, and his sweep comes at waist height. He hooks whoever stands a few steps away with the oar's gaff and drags them to his feet to burn them with his lantern. When he raises it, soul fire spreads in a ring across the planks: jump over it. Wounded, he calls his passengers.",
+    "subtitles.darkcraft.sfx.barquero_grito": "The Ferryman wails over the water",
+    "subtitles.darkcraft.sfx.barquero_remazo": "An oar slams the water",
+    "subtitles.darkcraft.sfx.barquero_barrido": "An oar cleaves the air",
+    "subtitles.darkcraft.sfx.barquero_bichero": "A gaff hook bites",
+    "subtitles.darkcraft.sfx.barquero_linterna": "A lantern bursts into soul fire",
+    "subtitles.darkcraft.sfx.barquero_dolor": "The Ferryman groans",
+    "subtitles.darkcraft.sfx.barquero_muerte": "The Ferryman sinks",
+    "subtitles.darkcraft.sfx.barquero_remo": "Someone rows on the lagoon",
+    "darkcraft.morvain.lugar.laguna": "The Black Lagoon",
+    "advancements.darkcraft.barquero.title": "The Last Crossing",
+    "advancements.darkcraft.barquero.description": "Defeat the Ferryman of the Black Lagoon",
+    "darkcraft.diario.barquero": "The Ferryman of the Black Lagoon was still waiting in his boat, lantern raised. I paid his toll in steel. When he fell, his passengers stopped floating and the lanterns of the landing lit with true light. He said he could see the shore.",
+    "darkcraft.ayuda.laguna": "The Black Lagoon: go to one of its places, bring its Rotten Ones back or remove them",
+    "darkcraft.ayuda.barquero": "The Ferryman: how he is, take you to the landing, defeat him or bring him back",
+})
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

@@ -5999,6 +5999,8 @@ public final class ClientCiTest {
         t = verdugo(t);
         // la Aldea de los Pilotes y los podridos, en el Pantano Podrido (parte 7i)
         t = pilotes(t);
+        // la Laguna Negra y el Barquero, el jefe del Pantano Podrido (parte 7j)
+        t = barquero(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -6941,6 +6943,273 @@ public final class ClientCiTest {
             });
         });
         return C + 236;
+    }
+
+    // ------------------------------------------------------------------ la Laguna Negra y el Barquero (parte 7j)
+
+    private static com.darkcraft.enemigos.Barquero barqueroE() {
+        var e = com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.BARCA, com.darkcraft.morvain.MorvainEnemigos.barquero());
+        return e instanceof com.darkcraft.enemigos.Barquero b ? b : null;
+    }
+
+    /**
+     * La Laguna Negra y el Barquero: la laguna desde el santuario del Embarcadero Podrido, el embarcadero desde el muelle, el
+     * Barquero de vigia en su barca; en supervivencia, en el embarcadero: habla, ruge con su barra, salta de la barca y cae en
+     * las tablas; sus golpes (el remazo con su ola, el barrido, el golpe de linterna y el anillo de fuego); el bichero que
+     * engancha y arrastra y el golpe de linterna; a media vida llama a sus pasajeros; cae (el cartel), los faroles del
+     * embarcadero con luz de verdad y el bestiario. Al acabar vuelve todo como estaba.
+     */
+    private static int barquero(int T) {
+        final var V = com.darkcraft.morvain.LagunaNegra.get();
+        final int CX = com.darkcraft.morvain.LagunaNegra.CX, CZ = com.darkcraft.morvain.LagunaNegra.CZ, PASO = com.darkcraft.morvain.LagunaNegra.PASO;
+        final int BX = CX + com.darkcraft.morvain.LagunaNegra.BARCA_U, BY = com.darkcraft.morvain.LagunaNegra.BARCA_SUELO + 1;
+        final int[] EN = V.sitio("entrada");
+        int t = T;
+        atTicks(t, "La laguna negra: desde el santuario del Embarcadero Podrido", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft barquero volver");
+                comando(sp, "darkcraft laguna enemigos volver");
+                irMirando(sp, EN[0] + 0.5, EN[1] + 4, EN[2] + 0.5, CX + 4, PASO + 1, CZ, true);
+            });
+        });
+        t += 160;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv121_laguna_santuario");
+            server(m, sp -> log("  la laguna: " + com.darkcraft.morvain.MorvainEnemigos.estadoLaguna(sp.server) + " | "
+                    + com.darkcraft.morvain.MorvainEnemigos.estadoBarquero(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 6;
+        atTicks(t, "La laguna negra: el embarcadero desde el muelle", m -> server(m, sp -> irMirando(sp, CX - 24.5, PASO + 2.5, CZ + 0.5, BX, BY + 2, CZ, true)));
+        t += 60;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv122_laguna_muelle");
+            server(m, sp -> log("  en el muelle: sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 6;
+        atTicks(t, "El Barquero: de vigia en su barca", m -> server(m, sp -> irMirando(sp, CX + 9.5, PASO + 2.5, CZ + 6.5, BX + 0.5, BY + 2.6, CZ + 1, true)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv123_barquero_vigia");
+            server(m, sp -> log("  de cerca: " + estadoE(barqueroE())));
+        });
+        t += 6;
+        // ---- en supervivencia, en el embarcadero de cara a la barca: habla, ruge al acabar y salta de la barca a las tablas
+        final int F = t;
+        final int dura = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Barquero.VOZ_BASE + 1);
+        atTicks(F, "El Barquero: en supervivencia en el embarcadero", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                irMirando(sp, CX + 4.5, PASO + 1, CZ + 0.5, BX + 0.5, BY + 2.5, CZ + 1, false);
+                var e = barqueroE();
+                if (e != null) e.setTarget(sp);
+            });
+        });
+        atTicks(F + 40, "captura: se yergue (y habla)", m -> {
+            server(m, sp -> log("  el Barquero al verle: " + estadoE(barqueroE()) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv124_barquero_habla");
+        });
+        atTicks(F + dura + 4, "captura: ruge (su barra)", m -> {
+            server(m, sp -> log("  el Barquero ruge: " + estadoE(barqueroE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())));
+            log("  barquero: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv125_barquero_ruge");
+        });
+        // (el grito dura 48 ticks y tras el 6 de pausa: salta; despega a los 9 y cae a los 20)
+        final int S = F + dura - 12 + 48 + 7;
+        atTicks(S + 14, "captura: salta de la barca", m -> {
+            server(m, sp -> log("  el Barquero salta: " + estadoE(barqueroE()) + " volando " + (barqueroE() != null && barqueroE().volando()) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv126_barquero_salta");
+        });
+        atTicks(S + 30, "captura: cae en las tablas", m -> {
+            server(m, sp -> log("  el Barquero cae del salto: " + estadoE(barqueroE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())
+                    + " | " + (barqueroE() == null ? "" : barqueroE().estado())));
+            shot(m, "cliente_mv127_barquero_cae_del_salto");
+        });
+        t = S + 36;
+        // ---- sus golpes (en creativo, con la camara de observador), en medio del embarcadero
+        atTicks(t, "El Barquero: sus golpes (creativo)", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                irMirando(sp, CX + 8.5, PASO + 4, CZ + 9.5, CX, PASO + 1, CZ, true);
+            });
+        });
+        t += 4;
+        // {accion, camara: a su derecha, arriba, delante; mira delante; tick de la captura, nombre}
+        Object[][] golpes = {
+                {com.darkcraft.enemigos.BarqueroAnims.REMAZO, 5.5, 2.6, 4.5, 3.0, 23, "cliente_mv128_remazo"},
+                {com.darkcraft.enemigos.BarqueroAnims.BARRIDO, 5.5, 2.4, 4.0, 1.5, 20, "cliente_mv129_barrido"},
+                {com.darkcraft.enemigos.BarqueroAnims.GOLPE_LINTERNA, 4.5, 2.4, 3.5, 1.5, 14, "cliente_mv130_golpe_linterna"},
+                {com.darkcraft.enemigos.BarqueroAnims.LINTERNA, 7.5, 5.0, 2.0, 0.0, 30, "cliente_mv131_anillo"}};
+        for (Object[] gp : golpes) {
+            final int accion = (int) gp[0], c1 = (int) gp[5];
+            final double cdx = (double) gp[1], cdy = (double) gp[2], cdz = (double) gp[3], delante = (double) gp[4];
+            final String n1 = (String) gp[6];
+            final int G = t;
+            atTicks(G, "El Barquero: " + n1, m -> server(m, sp -> {
+                var e = barqueroE();
+                if (e == null) return;
+                float g = 0f;
+                e.setTarget(null);
+                e.moveTo(CX + 0.5, PASO + 1, CZ - 2.5, g, 0f);
+                e.setYRot(g);
+                e.yBodyRot = e.yHeadRot = g;
+                e.empezar(accion);
+                double fx = -Math.sin(Math.toRadians(g)), fz = Math.cos(Math.toRadians(g));
+                verDesdeServidor = new Vec3(e.getX() - fz * cdx + fx * cdz, e.getY() + cdy, e.getZ() + fx * cdx + fz * cdz);
+                miraServidor = new Vec3(e.getX() + fx * delante, e.getY() + 1.6, e.getZ() + fz * delante);
+            }));
+            atTicks(G + 2, "camara de cerca", m -> {
+                if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+            });
+            atTicks(G + c1, "captura: " + n1, m -> {
+                server(m, sp -> log("  el Barquero, " + n1 + ": " + estadoE(barqueroE()) + " | " + (barqueroE() == null ? "" : barqueroE().estado())));
+                shot(m, n1);
+            });
+            t = G + Math.max(c1, com.darkcraft.enemigos.BarqueroAnims.TICKS[accion]) + 14;
+        }
+        // ---- el bichero, en supervivencia: lo clava desde cinco bloques y medio, engancha, arrastra y el golpe de linterna
+        final int L = t;
+        atTicks(L, "El Barquero: el bichero (supervivencia)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var e = barqueroE();
+                if (e == null) return;
+                aPelear(sp, true);
+                e.moveTo(CX - 1.5, PASO + 1, CZ + 0.5, 90f, 0f);
+                e.setYRot(90f);
+                e.yBodyRot = e.yHeadRot = 90f;
+                irMirando(sp, CX - 7.0, PASO + 1, CZ + 0.5, CX - 1.5, PASO + 2.5, CZ + 0.5, false);
+                e.setTarget(sp);
+                e.empezar(com.darkcraft.enemigos.BarqueroAnims.BICHERO);
+                // (de lado, desde el norte)
+                verDesdeServidor = new Vec3(CX - 4.5, PASO + 4.5, CZ - 7.5);
+                miraServidor = new Vec3(CX - 4.5, PASO + 2, CZ + 0.5);
+            });
+        });
+        atTicks(L + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(L + 21, "captura: el garfio engancha", m -> {
+            server(m, sp -> log("  el bichero del Barquero: " + estadoE(barqueroE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())
+                    + " | " + (barqueroE() == null ? "" : barqueroE().estado())));
+            shot(m, "cliente_mv132_bichero");
+        });
+        atTicks(L + 44, "captura: el golpe de linterna", m -> {
+            server(m, sp -> log("  tras el bichero: " + estadoE(barqueroE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth()) + " arde " + sp.isOnFire()
+                    + " | " + (barqueroE() == null ? "" : barqueroE().estado())));
+            shot(m, "cliente_mv133_bichero_linterna");
+        });
+        // ---- a media vida, en supervivencia: grita y llama a sus pasajeros (los de la laguna se alzan)
+        t = L + 80;
+        final int H = t;
+        atTicks(H, "El Barquero: los pasajeros vuelven", m -> server(m, sp -> {
+            sp.setGameMode(GameType.CREATIVE);
+            sp.clearFire();
+            comando(sp, "darkcraft laguna enemigos volver");
+            irMirando(sp, CX - 6.5, PASO + 1, CZ + 0.5, CX + 2, PASO + 2.5, CZ, false);
+        }));
+        atTicks(H + 60, "El Barquero: a media vida (supervivencia)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                var e = barqueroE();
+                if (e == null) return;
+                aPelear(sp, true);
+                e.moveTo(CX + 1.5, PASO + 1, CZ + 0.5, 90f, 0f);
+                irMirando(sp, CX - 6.5, PASO + 1, CZ + 0.5, CX + 1.5, PASO + 2.5, CZ + 0.5, false);
+                e.setTarget(sp);
+                log("  antes de media vida: " + com.darkcraft.morvain.MorvainEnemigos.estadoLaguna(sp.server));
+                e.mediaVida();
+            });
+        });
+        atTicks(H + 60 + 26, "a los 26 ticks", m -> server(m, sp -> log("  el Barquero a media vida, a los 26 ticks: " + estadoE(barqueroE()))));
+        atTicks(H + 60 + 44, "captura: llama a sus pasajeros", m -> {
+            server(m, sp -> log("  el Barquero llama a sus pasajeros: " + (barqueroE() == null ? "" : barqueroE().estado()) + " | "
+                    + com.darkcraft.morvain.MorvainEnemigos.estadoLaguna(sp.server)));
+            log("  barquero: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv134_barquero_pasajeros");
+        });
+        // ---- cae: el cartel, la hazana y la laguna en paz
+        final int C = H + 60 + 50;
+        atTicks(C, "El Barquero: cae", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var e = barqueroE();
+                if (e == null) return;
+                sp.setGameMode(GameType.CREATIVE);
+                for (var p : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Podrido.class, sp.getBoundingBox().inflate(60))) p.setTarget(null);
+                log("  antes de caer el Barquero: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "barquero"));
+                double fx = -Math.sin(Math.toRadians(e.getYRot())), fz = Math.cos(Math.toRadians(e.getYRot()));
+                verDesdeServidor = new Vec3(e.getX() + fx * 7 + fz * 3, e.getY() + 3.0, e.getZ() + fz * 7 - fx * 3);
+                miraServidor = new Vec3(e.getX(), e.getY() + 1.2, e.getZ());
+                e.hurt(sp.damageSources().playerAttack(sp), 99999f);
+            });
+        });
+        atTicks(C + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 46, "captura: cae", m -> shot(m, "cliente_mv135_barquero_cae"));
+        atTicks(C + 50, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 130, "captura: JEFE ABATIDO", m -> {
+            log("  barquero: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  tras caer el Barquero: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "barquero")
+                    + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoBarquero(sp.server)));
+            shot(m, "cliente_mv136_barquero_abatido");
+        });
+        atTicks(C + 134, "La laguna en paz: los faroles del embarcadero", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Podrido.class, sp.getBoundingBox().inflate(80)))
+                    if (e.esEfimero()) e.discard();
+                irMirando(sp, CX - 16.5, PASO + 3, CZ + 9.5, CX + 6, PASO + 1, CZ - 4, true);
+            });
+        });
+        atTicks(C + 190, "captura: los faroles", m -> {
+            server(m, sp -> log("  la laguna tras caer el Barquero: " + com.darkcraft.morvain.LagunaNegra.faroles(sp.serverLevel()) + " | "
+                    + com.darkcraft.morvain.MorvainEnemigos.estadoLaguna(sp.server) + " | podridos que han salido del agua de un impulso "
+                    + com.darkcraft.enemigos.Podrido.SALIDAS));
+            shot(m, "cliente_mv137_laguna_en_paz");
+        });
+        atTicks(C + 194, "el bestiario: el Barquero", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("barquero")));
+        });
+        atTicks(C + 212, "captura: el Barquero en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv138_bestiario_barquero");
+        });
+        atTicks(C + 216, "El Barquero: fin (vuelve, sus pasajeros flotando, los faroles de almas, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Podrido.class, sp.getBoundingBox().inflate(80)))
+                    if (e.esEfimero()) e.discard();
+                comando(sp, "darkcraft barquero volver");
+                comando(sp, "darkcraft laguna enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return C + 246;
     }
 
     // ------------------------------------------------------------------ la Aldea de los Pilotes y los podridos (parte 7i)

@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:pilotes",
+  "display": {
+    "icon": {
+      "item": "minecraft:soul_lantern"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.barquero.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.barquero.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 500
+  }
+}

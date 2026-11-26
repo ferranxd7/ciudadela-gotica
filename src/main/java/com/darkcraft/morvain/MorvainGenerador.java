@@ -164,6 +164,8 @@ public class MorvainGenerador extends ChunkGenerator {
         // la Aldea de los Pilotes, en el Pantano Podrido (parte 7i)
         try {
             if (Pilotes.toca(c.getPos().x, c.getPos().z)) Pilotes.chunk(nivel, c);
+            // la Laguna Negra, donde espera el Barquero (parte 7j)
+            if (LagunaNegra.toca(c.getPos().x, c.getPos().z)) LagunaNegra.chunk(nivel, c);
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la aldea de los pilotes en el chunk {}", c.getPos(), t);
         }

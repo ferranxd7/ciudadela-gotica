@@ -44,6 +44,9 @@ public class Podrido extends Enemigo {
     public static final int PODRIDO = 0, FATUO = 1, HINCHADO = 2;
     /** Lo que esperan entre un vomito, un fuego o un eructo y el siguiente (ticks). */
     public static final int ESPERA_VOMITO = 20 * 7, ESPERA_FATUO = 20 * 4, ESPERA_ERUCTO = 20 * 9;
+    /** Para las pruebas: las veces que uno ha salido del agua de un impulso (parte 7j). */
+    public static int SALIDAS;
+    private int salirEspera;
     /** La nube del eructo y la del reventon: radio y lo que dura. */
     public static final float R_ERUCTO = 3.0f, R_REVIENTA = 3.4f;
     private static final UUID MOD_HINCHADO = UUID.fromString("2f6b9d14-8c3e-4a75-b1d2-7e0c5a9f3b48");
@@ -345,7 +348,24 @@ public class Podrido extends Enemigo {
     @Override
     public void aiStep() {
         super.aiStep();
-        if (!level().isClientSide || !isAlive()) return;
+        if (!level().isClientSide) {
+            // en el agua contra un borde mas alto (las tablas de un embarcadero o de una pasarela, a un bloque del agua): sale
+            // de un impulso hacia su presa (nadando no llega a subir un bloque entero)
+            if (salirEspera > 0) salirEspera--;
+            LivingEntity t = getTarget();
+            if (isAlive() && postura() == DE_PIE && accion() == 0 && isInWater() && horizontalCollision && t != null && t.getY() > getY() + 0.4
+                    && salirEspera <= 0) {
+                double dx = t.getX() - getX(), dz = t.getZ() - getZ(), l = Math.sqrt(dx * dx + dz * dz);
+                if (l > 0.01) {
+                    setDeltaMovement(dx / l * 0.3, 0.62, dz / l * 0.3);
+                    hasImpulse = true;
+                    salirEspera = 12;
+                    SALIDAS++;
+                }
+            }
+            return;
+        }
+        if (!isAlive()) return;
         // chorrean; el del fuego lo lleva en la mano; al hinchado se le escapa el gas por la raja
         if (tickCount % 7 == 0 && postura() != TUMBADO)
             level().addParticle(ParticleTypes.DRIPPING_WATER, getX() + (random.nextDouble() - 0.5) * 0.6, getY() + 0.8 + random.nextDouble() * 1.0,

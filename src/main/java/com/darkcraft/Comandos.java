@@ -50,6 +50,8 @@ public final class Comandos {
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoArboleda())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoVerdugo())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoPilotes())
+                .then(com.darkcraft.morvain.MorvainEnemigos.comandoLaguna())
+                .then(com.darkcraft.morvain.MorvainEnemigos.comandoBarquero())
                 .then(com.darkcraft.rol.Rol.comando())
                 .then(com.darkcraft.rol.Rol.comandoRol()));
     }
@@ -112,6 +114,8 @@ public final class Comandos {
         src.sendSuccess(() -> linea(new Linea("/darkcraft arboleda ", "/darkcraft arboleda [ir <sitio> | enemigos [volver | fuera | sacar]]", "arboleda")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft verdugo ", "/darkcraft verdugo [ir | vencer | volver]", "verdugo")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft pilotes ", "/darkcraft pilotes [ir <sitio> | enemigos [volver | fuera | sacar]]", "pilotes")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft laguna ", "/darkcraft laguna [ir <sitio> | enemigos [volver | fuera | sacar]]", "laguna")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft barquero ", "/darkcraft barquero [ir | vencer | volver]", "barquero")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ecos ", "/darkcraft ecos / ecos dar <n> / ecos quitar", "ecos")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft rol ", "/darkcraft rol clase [<nombre> | elegir | olvidar | ninguna] / santuario / frascos [<n>] / nivel [reiniciar] / atributo <nombre> <valor> / talisman <nombre> [poner <hueco>] / fruto <nombre> [<n>] / hechizo <nombre>|memorizar|olvidar|baston|sello / guia [olvidar] / herrero [olvidar] / mercader [olvidar] / mejora <0-9> / piedras / ceniza <nombre> [poner] | quitar / resistencias", "rol")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ayuda", "/darkcraft ayuda", "ayuda")), false);
