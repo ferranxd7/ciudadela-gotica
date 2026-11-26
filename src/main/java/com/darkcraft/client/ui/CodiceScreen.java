@@ -44,13 +44,15 @@ public class CodiceScreen extends Screen {
     /** Estilos: la cronica de Aldous (capital roja), la Sombra (negra y roja, tinta roja), libros perdidos (azul), diario (verde). */
     public static final int CRONICA = 0, SOMBRA = 1, PERDIDO = 2, DIARIO = 3;
     /** Las miniaturas de miniaturas.png: 0-5 los capitulos, y estas. */
-    public static final int MIN_PERDIDO_VALDRENN = 6, MIN_PERDIDO_FORTALEZA = 7, MIN_DIARIO = 8, MIN_ACERTIJO = 9, MIN_PERDIDO_BRUMAVELA = 10;
+    public static final int MIN_PERDIDO_VALDRENN = 6, MIN_PERDIDO_FORTALEZA = 7, MIN_DIARIO = 8, MIN_ACERTIJO = 9, MIN_PERDIDO_BRUMAVELA = 10,
+            MIN_PERDIDO_MORVAIN = 11;
 
-    /** La miniatura de un libro perdido: los de Valdrenn (1-5), los de la fortaleza (6-11) y las notas de Brumavela (12-16). */
+    /** La miniatura de un libro perdido: los de Valdrenn (1-5), los de la fortaleza (6-11), las notas de Brumavela (12-16) y
+     * los de Morvain (18 en adelante). */
     public static int miniaturaPerdido(int n) {
-        // (1-5 Valdrenn, 6-11 la fortaleza, 12-16 Brumavela, 17 la fortaleza otra vez: la cripta de la parte 5c; 18 Velmor,
-        // en Morvain: la del pueblo; 19 el registro del verdugo de la Arboleda de los Ahorcados: tambien)
-        return n <= 5 ? MIN_PERDIDO_VALDRENN : n <= 11 || n == 17 ? MIN_PERDIDO_FORTALEZA : MIN_PERDIDO_BRUMAVELA;
+        // (1-5 Valdrenn, 6-11 la fortaleza, 12-16 Brumavela, 17 la fortaleza otra vez: la cripta de la parte 5c; 18 Velmor y
+        // 19 el registro del verdugo de la Arboleda: la de Morvain, desde la parte 7h —el Arbol de la Horca y la ciudadela—)
+        return n <= 5 ? MIN_PERDIDO_VALDRENN : n <= 11 || n == 17 ? MIN_PERDIDO_FORTALEZA : n <= 16 ? MIN_PERDIDO_BRUMAVELA : MIN_PERDIDO_MORVAIN;
     }
     static final int TINTA = 0xFF24170C, TINTA_SOMBRA = 0xFF3C0A0E, RUBRICA = 0xFF801212, AZUL_T = 0xFF1C2E78, PALIDA = 0xFF5E4A30;
     private static final int LINEA = 10, CAPITAL = 30, MIN_W = 128, MIN_H = 80, MARCO = 6, GIRO_MS = 380;

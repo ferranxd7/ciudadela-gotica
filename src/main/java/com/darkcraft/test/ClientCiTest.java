@@ -6823,7 +6823,8 @@ public final class ClientCiTest {
                 irMirando(sp, gx + 0.5, py, gz + 8.5, gx + 0.5, y + 2, gz + 0.5, false);
                 e.setTarget(sp);
                 e.empezar(com.darkcraft.enemigos.VerdugoAnims.LAZO);
-                verDesdeServidor = new Vec3(gx + 9.5, y + 3.0, gz + 4.5);
+                // (de lado, desde el oeste: al este, la rama de un arbol con su colgado taparia)
+                verDesdeServidor = new Vec3(gx - 8.5, y + 3.0, gz + 4.5);
                 miraServidor = new Vec3(gx + 0.5, y + 1.8, gz + 4.5);
             });
         });
