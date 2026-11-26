@@ -696,7 +696,7 @@ public final class Capital {
                 if (u + w > PLAZA_U - PLAZA_R - 2) break;
                 int fondo = 9 + r.nextInt(3);
                 int va = lado < 0 ? -5 - fondo : 5, vb = lado < 0 ? -5 : 5 + fondo;
-                casa(r, u, va, u + w - 1, vb, lado < 0 ? Direction.SOUTH : Direction.NORTH, r.chance(0.35) ? 1 : 0);
+                casa(r, u, va, u + w - 1, vb, lado < 0 ? Direction.SOUTH : Direction.NORTH, ruina(r));
                 u += w + 1 + r.nextInt(2);
             }
         }
@@ -710,7 +710,7 @@ public final class Capital {
                     int fondo = 8 + r.nextInt(2);
                     int ua = lado < 0 ? CRUCE_U - 3 - fondo : CRUCE_U + 3, ub = lado < 0 ? CRUCE_U - 3 : CRUCE_U + 3 + fondo;
                     int va = sv < 0 ? -(v + w - 1) : v, vb = sv < 0 ? -v : v + w - 1;
-                    casa(r, ua, va, ub, vb, lado < 0 ? Direction.EAST : Direction.WEST, r.chance(0.3) ? 1 : 0);
+                    casa(r, ua, va, ub, vb, lado < 0 ? Direction.EAST : Direction.WEST, ruina(r));
                     v += w + 1 + r.nextInt(2);
                 }
             }
@@ -724,6 +724,12 @@ public final class Capital {
                 u += w + 2;
             }
         }
+    }
+
+    /** Lo que dejo el fuego de cada casa: casi todas con el tejado hundido (1), alguna en pie (0) y alguna en ruinas (2). */
+    private static int ruina(Rng r) {
+        double p = r.nextDouble();
+        return p < 0.22 ? 0 : p < 0.82 ? 1 : 2;
     }
 
     // ------------------------------------------------------------------ los solares quemados
