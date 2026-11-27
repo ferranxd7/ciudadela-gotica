@@ -78,15 +78,15 @@ public final class ModelosArmadura {
         return HECHOS.size();
     }
 
-    public static IClientItemExtensions extension(String conjunto, int pieza) {
-        return new IClientItemExtensions() {
-            @Override
-            public HumanoidModel<?> getHumanoidArmorModel(LivingEntity quien, ItemStack st, EquipmentSlot hueco, HumanoidModel<?> original) {
-                HumanoidModel<?> m = de(conjunto, pieza);
-                return m != null ? m : original;
-            }
-        };
-    }
+    /** La de todas las piezas: el modelo del conjunto y la pieza del objeto que se dibuja. */
+    public static final IClientItemExtensions EXTENSION = new IClientItemExtensions() {
+        @Override
+        public HumanoidModel<?> getHumanoidArmorModel(LivingEntity quien, ItemStack st, EquipmentSlot hueco, HumanoidModel<?> original) {
+            if (!(st.getItem() instanceof com.darkcraft.armadura.PiezaArmadura pa) || pa.conjunto == null) return original;
+            HumanoidModel<?> m = de(pa.conjunto.id, pa.pieza);
+            return m != null ? m : original;
+        }
+    };
 
     /**
      * El modelo de una pieza: un {@link HumanoidModel} con las siete piezas del jugador y las cajas de la armadura. La capa de

@@ -88,6 +88,8 @@ public class PiezaArmadura extends ArmorItem {
 
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(com.darkcraft.client.armadura.ModelosArmadura.extension(conjunto.id, pieza));
+        // ojo: Forge llama a esto desde el constructor de Item, antes de que se pongan conjunto y pieza (en la build 199 el
+        // cliente no arrancaba): la extension los mira en el objeto al dibujar
+        consumer.accept(com.darkcraft.client.armadura.ModelosArmadura.EXTENSION);
     }
 }
