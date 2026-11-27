@@ -11247,5 +11247,75 @@
     ]
    }
   }
+ },
+ "sfx_sigrun_duelo": {
+  "flow": "JhLKcOKadUHHH8IC94uf",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7ap: lo que suena de Sigrun en el duelo (el esfuerzo de cada golpe, el dolor y el salto con el golpe en la nieve). Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "sigrun_esfuerzo": {
+    "prompt": "A single short fierce battle grunt of a female knight swinging a heavy longsword, one sharp exhale of effort, no words, close and dry, one second long, cinematic dark fantasy, no music",
+    "sesiones": [
+     "V51rZwJPUIpkyZv9SexG",
+     "awBU652VW5rLNprL044Z",
+     "4bDj1UYnvwHEr4Nh7UeT",
+     "75LAPtcSpipeOAgh9hvN"
+    ],
+    "generaciones": [
+     "8niRvVIT4H8vLzCXcnHR",
+     "EyI75GyEIWHq5ddhknBC",
+     "RzG61BqshvWN5dyGPCJu",
+     "eZqgx1IkrLa0wkW8qbcx"
+    ],
+    "duraciones": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "sigrun_dolor": {
+    "prompt": "A female knight in plate armor grunting in pain as a blow strikes her armor, a short pained gasp through clenched teeth and a metallic clank, no words, close, one second long, cinematic dark fantasy, no music",
+    "sesiones": [
+     "JwmIM4Qxs4ZQqHE5TleR",
+     "6Tl1vgepySLHfhYj4ash",
+     "AxSIrCAvgwr8z5MYm5RC",
+     "9wnl6d3zyXq6nDOmRGHN"
+    ],
+    "generaciones": [
+     "WwLOoJ74HTf4MLMaA9xi",
+     "is7MJwhLAGRwMvddicYO",
+     "xk7oUMYXUBt7zKTCjFmm",
+     "aZv7UbzJRe18UR48swiy"
+    ],
+    "duraciones": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "sigrun_salto": {
+    "prompt": "An armored warrior leaps and crashes down into deep snow with a two-handed sword slam, a heavy impact, a burst of shattering ice shards and a whoosh of powder snow, three seconds, cinematic dark fantasy, no music",
+    "sesiones": [
+     "7mznUOVvYDh1PHela0db",
+     "6BhL3MgZtD285QOU7Ufc",
+     "M7oLdMsBTZC0NQeipX2c",
+     "yDYOu25hg9DhAoMnhCQf"
+    ],
+    "generaciones": [
+     "WV9dARfwb75DrkMGuwsN",
+     "UztlFmIB672cxEf1CSme",
+     "DWnuzJowzAFmjO5VyNgd",
+     "cFGYLCpiWfeolb5khhAa"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   }
+  }
  }
 }
