@@ -7158,5 +7158,271 @@
     ]
    }
   }
+ },
+ "dragon": {
+  "flow": "yj2HeJUSKF4WFJfanGJL",
+  "voz": "ysswSXp8U9dFpzPJqFje",
+  "nombre_voz": "Malvoryx The Monster - Villain. Demon. Dragon.",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7z: Vorthak, el Dragon de Ceniza (el jefe del Nido, en las Montanas Nevadas). Tomas a y b de cada frase como dragon/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[deep, ancient, rumbling] Another little spark of the Shadow... climbing my mountain. [growls] I have burned kings for less.",
+    "sesiones": [
+     "8AdG6sM9KSdVmxVDXHvN",
+     "WaH10IMYCm02zjr2CzUK"
+    ],
+    "generaciones": [
+     "leVqucyddYmbtoSyMFax",
+     "yjyZFQu41uxeepy6tpUi"
+    ]
+   },
+   "2": {
+    "texto": "[enraged] You dare wound me? I was old when your Shadow was a whisper in the dark!",
+    "sesiones": [
+     "2YDvwmLnwlxaq7A0wAVB",
+     "MMqVh4vVyLq7YzSZZd38"
+    ],
+    "generaciones": [
+     "unIqku2eCavBaXgfwE5A",
+     "MRDI86TxsrYq10Bk2CH5"
+    ]
+   },
+   "3": {
+    "texto": "[contemptuous] Ash... like all the others.",
+    "sesiones": [
+     "WhHF5Or2dp54hgHU4V5a",
+     "B509g28SKwbD9e8Hna7E"
+    ],
+    "generaciones": [
+     "hbaqSSDvvoBXOgk7AFL9",
+     "La2aRuhVbLamlbvQVcIQ"
+    ]
+   },
+   "4": {
+    "texto": "[roaring] Burn!",
+    "sesiones": [
+     "gMpTyzYpLfb9O5RZqitP",
+     "uwplq9VYH26z51beDn0Y"
+    ],
+    "generaciones": [
+     "g94R4X3kVZuzFj6GGV8t",
+     "6x4gOcZid1piarZABJJW"
+    ]
+   },
+   "5": {
+    "texto": "[fading, breathless] The sky... the sky was mine... before it turned red...",
+    "sesiones": [
+     "qBPvqIn3xVuj4gpUtdHG",
+     "HSeqI81RmNoBc7JysHWA"
+    ],
+    "generaciones": [
+     "AjncKc5W0lJo126ADqEk",
+     "5SetUwrOgek3LpC5Ql9A"
+    ]
+   }
+  }
+ },
+ "sfx_dragon": {
+  "flow": "LTdZckFRfg5JWcBJqnkH",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7z: el dragon (rugido, aleteo en bucle, aliento de fuego, mordisco, coletazo, pisoton, aterriza, despega, picado, dolor, muerte, respiracion en bucle y la lluvia de ascuas). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "dragon_rugido": {
+    "prompt": "An enormous ancient dragon roaring: a deep, guttural, rumbling bellow that rises into a terrifying roar and echoes across snowy mountain peaks, dark fantasy, 4 seconds",
+    "sesiones": [
+     "WTTxLkjJgDeBm2PKBKIE",
+     "JZ8JxAKgEEzbPn6pZOgo",
+     "SQDJh7aEsShNs88Bnl7Y",
+     "OLvFiRYOTscEVWgNoIZA"
+    ],
+    "generaciones": [
+     "u7vR4K1SoHjaH8JVHETk",
+     "gSt2qtppJSADI8AZZcXM",
+     "j8jD6yilAmI3Rs4BlvKb",
+     "nxJcTje8YkdlG5AFQzt9"
+    ]
+   },
+   "dragon_aleteo": {
+    "prompt": "Huge leathery dragon wings flapping slowly in flight: heavy rhythmic whooshing wing beats pushing air, steady and even, high in the windy sky, seamless loop, 4 seconds",
+    "sesiones": [
+     "MHXsoro0eARSgRtqtWjq",
+     "goQQ6RyQRQuMUYphWW1S",
+     "0mIXvjpG0SsP0n2rrAww",
+     "SJeq1rBiS9JHVL0Tf9Bb"
+    ],
+    "generaciones": [
+     "gtCyHLo8FmDGux5807ZO",
+     "KYsvl7DdIFynCZhSWcZt",
+     "ghqgHsNZT0GMmqUV7R8G",
+     "gaVrCbSXrRsdC1VBiTUL"
+    ]
+   },
+   "dragon_fuego": {
+    "prompt": "A dragon breathing a long continuous jet of fire: a roaring furnace blast of flame with crackling and a deep whoosh, powerful and sustained, 4 seconds",
+    "sesiones": [
+     "S2dgkf0wBQQNOMJwz1aq",
+     "NIRem0o4oexxBdStzL2n",
+     "iQRmyD5UBFOdQ7RH6dbN",
+     "FlIXkrmOcPo595VGVWkj"
+    ],
+    "generaciones": [
+     "Ve48a6MOCISHlJvXmXkV",
+     "w2iOrjpMnkTygWDA75MB",
+     "zIisQIHfSydsfJaI6hZu",
+     "Ny0UCMFxMHKsg6uPk7K1"
+    ]
+   },
+   "dragon_mordisco": {
+    "prompt": "A giant dragon's jaws snapping shut: a heavy bite with sharp teeth clacking together and a short growl, 1 second",
+    "sesiones": [
+     "qkQnCkrSFJbWHnNGaZ3Z",
+     "2jrK2t9vUl9wvVeope0l",
+     "0wlGNQrCjdbf0JXmERHv",
+     "HPWRuqyHH9whwME3SJ2Z"
+    ],
+    "generaciones": [
+     "IMWeYwp2QC4QRxF4g8OQ",
+     "FqeDuyxe1Rc2UkPorZWB",
+     "jD5vaMYxWdSZ6tGvlsmj",
+     "hwvIY7hr5VtvhFebGw0F"
+    ]
+   },
+   "dragon_cola": {
+    "prompt": "A massive dragon tail sweeping through the air with a heavy whoosh and smashing into stone, rocks cracking, 1.5 seconds",
+    "sesiones": [
+     "3z90XOzwmNQeXgBx5t2h",
+     "LHSWwxFAoEXcYCbsS7Xk",
+     "yknLFrL018Xljgv8ko3i",
+     "xuzmjZMWWm0VCOV4d8nc"
+    ],
+    "generaciones": [
+     "koUhnFMhlhFkzhrU3jJV",
+     "jNhp0gnViGxZ0FDW5rmQ",
+     "1kycqCzNZ2osFS8H9Yzd",
+     "59t9A6EnrjP4CIddjCSz"
+    ]
+   },
+   "dragon_pisoton": {
+    "prompt": "A huge clawed dragon foot stomping on rocky ground: a deep booming thud that shakes the earth, small stones rattling, 1.5 seconds",
+    "sesiones": [
+     "8kiEKprCwlA45VMEV860",
+     "PkJPunk5NK15BNRjNNiu",
+     "GKAzc8TooAIdYQuKuAZJ",
+     "avoy0IWXNZfTXT35WsHy"
+    ],
+    "generaciones": [
+     "eDQtAny5Nr8qheSAwi3q",
+     "znS3Zvh5Tr4babGHHx6m",
+     "wAjfwz7MLSCuRNZ62yqQ",
+     "VIkXRQI2jyh8Rq3JtrqZ"
+    ]
+   },
+   "dragon_aterriza": {
+    "prompt": "An enormous dragon landing heavily on a rocky mountain ledge: wings beating twice, a ground-shaking impact, rocks tumbling and snow scattering, 3 seconds",
+    "sesiones": [
+     "l3sAsn1K85tDjHqbNzgr",
+     "Syym91gKUJon7yfjndqX",
+     "sSDDkirSK0m0DftYIX2k",
+     "aGFt4XrK6sZkm1LK8ryl"
+    ],
+    "generaciones": [
+     "OgixRs6FepYEe5IZQ8Qy",
+     "ZqJBUqHQOZmcK6QycgcQ",
+     "4MjpOpKh28EQOjfM2oqU",
+     "9VGdulmACO9HHjRdhDHC"
+    ]
+   },
+   "dragon_despega": {
+    "prompt": "A huge dragon taking off from the ground: a deep growl, powerful heavy wing beats and a strong gust of wind lifting into the sky, 3 seconds",
+    "sesiones": [
+     "NyMJeGV6DaZUdHjEPiyY",
+     "FgSDa50hpF0tie1ubxa4",
+     "b99d5apun41YCEJNwK4F",
+     "9S1tf9M7mQAS4USmbJ24"
+    ],
+    "generaciones": [
+     "z0Yj43q85jc6V8Tq8hfF",
+     "9Siqjfdz4BMufsPEIEHs",
+     "x6KtAPEoZLBHoLU23Prl",
+     "A0U7BNN0OkS3JZgKhI9b"
+    ]
+   },
+   "dragon_picado": {
+    "prompt": "A dragon diving fast from the sky: a rising roar of rushing wind and a screaming whoosh that gets closer, 2.5 seconds",
+    "sesiones": [
+     "Jwlrf29yE36g9nkHngKA",
+     "4O2cEC5ijHQRW4zZPwkk",
+     "qhaqGMoLBatQ5YWWbLwU",
+     "YceTSDux4qVp0z5rspXB"
+    ],
+    "generaciones": [
+     "myiDnGateTpL68Mq3NnY",
+     "VLXd1oUyULPWN4yxE4mI",
+     "fKkUMhInj3wJr4CmPNaG",
+     "H7QVQ0FZoFuLk2XJ8iIa"
+    ]
+   },
+   "dragon_dolor": {
+    "prompt": "A giant dragon hurt: a short pained snarl and shriek, deep and angry, 1.2 seconds",
+    "sesiones": [
+     "YU3fIbyn18Lb08nJedLJ",
+     "nWq3uE4VyZr4ScacNa8r",
+     "C3ANvpTGDNMLGdV03m69",
+     "phV33J0Em7qBdbMm6jOc"
+    ],
+    "generaciones": [
+     "IFCDZmN8fhynAZrozEJR",
+     "vDUlaGv5MYbAIsI8mO8s",
+     "NkQ0UdnpBp5clLBsx33U",
+     "nn5c1ny8roOX4pTRKMfm"
+    ]
+   },
+   "dragon_muerte": {
+    "prompt": "An ancient dragon dying: a long fading groan that turns into a rattling last breath, the huge body collapsing on stone, embers crackling and dying out, 6 seconds",
+    "sesiones": [
+     "lL9eGglHXUO2nWGh1HlN",
+     "ryeUUWSG5FcyJ16pyrqT",
+     "wbzRzDJs74ckqpOxtiO2",
+     "Z4YX0XQI1gg4qmo36D3h"
+    ],
+    "generaciones": [
+     "BuWPR5E7W3XCE6g2U815",
+     "10iKOQNg1D0GdNf5N35D",
+     "rVOOJPlG4JzBpNNeoxH2",
+     "eMEhHMsq1S0SdXin8sYC"
+    ]
+   },
+   "dragon_respira": {
+    "prompt": "Slow heavy breathing of a giant dragon resting: a deep rumbling inhale and a long smoky exhale with faint crackling embers in its throat, calm and menacing, seamless loop, 5 seconds",
+    "sesiones": [
+     "etU2lrSv98ihzi7VAGyY",
+     "GE9A3Bqu83SEGm7UM7HU",
+     "4YE2sfFU00LECOkHm3fu",
+     "5uOOtXzVH4lYCgubGRIp"
+    ],
+    "generaciones": [
+     "y3GznN05SGGFtx0mBfz5",
+     "DL0qwlFfk3U0uLPuALY5",
+     "asdA59AkgeNNmPcZVGV4",
+     "KAyv6gLZmOpRUEaAcXIb"
+    ]
+   },
+   "dragon_ascuas": {
+    "prompt": "A rain of burning embers falling from the sky: crackling sparks and small fireballs hissing as they hit snow and stone, 3 seconds",
+    "sesiones": [
+     "xPE2h4at1NvblNynGbUw",
+     "Vzwnngv7KSlcLc0kP2WZ",
+     "7gi14sbXHVz0zflLAbE9",
+     "ShvLxCdfhrNY5rrZAiAe"
+    ],
+    "generaciones": [
+     "t4eBiN9wNZvppQrbwIex",
+     "1EMLGokORe5z9Icb1lIi",
+     "QEUERN95ZE9DDJustQqD",
+     "q9LVkADF3EUTDLCzE84W"
+    ]
+   }
+  }
  }
 }
