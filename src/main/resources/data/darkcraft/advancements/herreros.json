@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:hagen",
+  "display": {
+    "icon": {
+      "item": "darkcraft:martillo_herrero"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.herreros.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.herreros.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 80
+  }
+}

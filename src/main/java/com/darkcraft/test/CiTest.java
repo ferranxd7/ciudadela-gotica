@@ -758,6 +758,7 @@ public final class CiTest {
         sombra(server, m, log, out);
         desenlace(server, m, log);
         cronicaMorvain(server, m, log);
+        herrerosMorvain(server, m, log);
     }
 
     /**
@@ -4850,6 +4851,130 @@ public final class CiTest {
             DarkCraftMod.LOGGER.error("[DarkCraft] la cronica de Morvain, la camara", e);
         }
         log.println(sc);
+        log.flush();
+    }
+
+    /**
+     * Parte 7af: los herreros de Morvain y Silas. Las cuatro herrerias generadas (cada herrero puesto una vez, con su variante, de
+     * pie delante de su yunque y mirandolo, con su fuego al lado), lo que dicen la primera vez y despues, el logro de los cuatro, la
+     * forja con Hagen (+1), el barril con botin y el nombre del refugio; Silas: cada santuario de su ruta (donde se le pone, de pie),
+     * que se va de donde no le toca, su tienda (lo que vende; lo comprado se apunta aparte del de Kerrick) y adonde ira.
+     */
+    private static void herrerosMorvain(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        StringBuilder sb = new StringBuilder("Morvain, los herreros:");
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ae1"), "[DarkCraftCI23]"));
+        try {
+            for (long k : com.darkcraft.morvain.Herrerias.chunks()) m.getChunk((int) (k >> 32), (int) k);
+            com.darkcraft.morvain.Herrerias.olvidar(m);
+            int n = com.darkcraft.morvain.Herrerias.ponerTodos(m), n2 = com.darkcraft.morvain.Herrerias.ponerTodos(m);
+            sb.append(' ').append(n).append(" de 4 puestos, otra vez ").append(n2).append(" | ").append(com.darkcraft.morvain.Herrerias.resumen(m));
+            fp.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+            for (var s : com.darkcraft.morvain.Herrerias.TODOS) com.darkcraft.dialogo.Conversaciones.olvidar(fp, s.id());
+            for (var s : com.darkcraft.morvain.Herrerias.TODOS) {
+                var h = com.darkcraft.morvain.Herrerias.buscar(m, s);
+                if (h == null) {
+                    sb.append(" | ").append(s.id()).append(": NO ESTA");
+                    continue;
+                }
+                BlockPos y = s.yunque();
+                int fuegos = 0;
+                for (BlockPos q : BlockPos.betweenClosed(h.blockPosition().offset(-4, -1, -4), h.blockPosition().offset(4, 2, 4))) {
+                    var st = m.getBlockState(q);
+                    if (st.is(net.minecraft.world.level.block.Blocks.CAMPFIRE) || st.is(net.minecraft.world.level.block.Blocks.BLAST_FURNACE)
+                            || st.is(net.minecraft.world.level.block.Blocks.FURNACE)) fuegos++;
+                }
+                double giro = Math.toDegrees(Math.atan2(y.getZ() - h.getBlockZ(), y.getX() - h.getBlockX())) - 90;
+                double dif = net.minecraft.util.Mth.wrapDegrees(giro - h.getYRot());
+                BlockPos pies = h.blockPosition();
+                boolean pisa = !m.getBlockState(pies.below()).getCollisionShape(m, pies.below()).isEmpty();
+                BlockPos de = s.pos(s.hu(), 1, s.hv() + 2);
+                fp.moveTo(de.getX() + 0.5, de.getY(), de.getZ() + 0.5, 0f, 0f);
+                int n1 = com.darkcraft.dialogo.Conversaciones.nodoInicio(fp, s.id()), nn = com.darkcraft.dialogo.Conversaciones.nodoInicio(fp, s.id());
+                com.darkcraft.dialogo.Conversaciones.hablar(fp, h);
+                sb.append(String.format(java.util.Locale.ROOT, " | %s (%s): en %s, pisa %s, al yunque %.0f grados, %d fuegos, el yunque %s, empieza en %d y despues %d, dialogo %s",
+                        s.id(), h.quien().id, pies.toShortString(), pisa, dif, fuegos,
+                        m.getBlockState(y).getBlock() instanceof net.minecraft.world.level.block.AnvilBlock, n1, nn,
+                        com.darkcraft.dialogo.Dialogos.de(s.id()) != null));
+            }
+            sb.append(" | habla con ").append(com.darkcraft.dialogo.Conversaciones.herrerosMorvain(fp)).append(" de 4, logro de los cuatro ")
+                    .append(com.darkcraft.story.Logros.tiene(fp, "herreros"));
+            // ---- la forja con Hagen: una espada de hierro a +1 (en creativo no cobra)
+            var hagen = com.darkcraft.morvain.Herrerias.buscar(m, com.darkcraft.morvain.Herrerias.REFUGIO);
+            if (hagen != null) {
+                BlockPos de = com.darkcraft.morvain.Herrerias.REFUGIO.pos(1, 1, 1);
+                fp.moveTo(de.getX() + 0.5, de.getY(), de.getZ() + 0.5, 0f, 0f);
+                fp.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                com.darkcraft.forja.Forja.mejorar(fp, hagen.getId(), 0);
+                sb.append(" | forja de Hagen: la espada a +").append(com.darkcraft.forja.Forja.nivel(fp.getInventory().getItem(0)));
+                fp.getInventory().setItem(0, net.minecraft.world.item.ItemStack.EMPTY);
+            }
+            // ---- el barril con botin y el nombre del refugio
+            BlockPos ba = com.darkcraft.morvain.Herrerias.REFUGIO.pos(-5, 1, -4);
+            var be = m.getBlockEntity(ba);
+            sb.append(" | el barril del refugio: ").append(be == null ? "NO" : be.saveWithoutMetadata().getString("LootTable"));
+            BlockPos dentro = com.darkcraft.morvain.Herrerias.REFUGIO.pos(0, 1, 2);
+            fp.moveTo(dentro.getX() + 0.5, dentro.getY(), dentro.getZ() + 0.5, 0f, 0f);
+            sb.append(", dentro el sitio se llama ").append(com.darkcraft.morvain.Morvain.lugar(fp));
+        } catch (Throwable t) {
+            sb.append(" ERROR ").append(t);
+            DarkCraftMod.LOGGER.error("[CI] los herreros de Morvain", t);
+        }
+        log.println(sb);
+        log.flush();
+        StringBuilder ss = new StringBuilder("Morvain, Silas:");
+        java.util.List<com.darkcraft.personajes.Mercader> puestos = new java.util.ArrayList<>();
+        try {
+            ss.append(' ').append(com.darkcraft.morvain.Ambulante.resumen(m));
+            for (int i = 0; i < com.darkcraft.morvain.Ambulante.RUTA.length; i++) {
+                com.darkcraft.morvain.Ambulante.mover(server, i);
+                String donde = com.darkcraft.morvain.Ambulante.donde(server);
+                var s = com.darkcraft.morvain.SantuariosMorvain.porId(donde);
+                BlockPos f = s.pos();
+                for (int dx = -1; dx <= 1; dx++)
+                    for (int dz = -1; dz <= 1; dz++) m.getChunk((f.getX() >> 4) + dx, (f.getZ() >> 4) + dz);
+                var e = com.darkcraft.morvain.Ambulante.silas(m, s);
+                if (e == null) e = com.darkcraft.morvain.Ambulante.poner(m, s);
+                if (e == null) {
+                    ss.append(String.format(java.util.Locale.ROOT, " | %d %s: NO SE PUDO PONER", i, donde));
+                    continue;
+                }
+                puestos.add(e);
+                BlockPos q = e.blockPosition();
+                boolean pisa = !m.getBlockState(q.below()).getCollisionShape(m, q.below()).isEmpty();
+                boolean libre = m.getBlockState(q).getCollisionShape(m, q).isEmpty() && m.getBlockState(q.above()).getCollisionShape(m, q.above()).isEmpty();
+                ss.append(String.format(java.util.Locale.ROOT, " | %d %s: en %s a %.1f del fuego, pisa %s, libre %s, sitio %s", i, donde, q.toShortString(),
+                        Math.sqrt(q.distSqr(f)), pisa, libre, e.sitio()));
+            }
+            // se va de donde no le toca (sin nadie delante): en la ruta, el ultimo sitio; los demas se van
+            int fueron = com.darkcraft.morvain.Ambulante.repasar(m, puestos);
+            ss.append(" | ahora en ").append(com.darkcraft.morvain.Ambulante.donde(server)).append(": se van ").append(fueron).append(" de ")
+                    .append(puestos.size()).append(" (").append(puestos.size() - 1).append(")");
+            // su tienda: una piedra III (con limite) se apunta aparte de lo de Kerrick
+            com.darkcraft.personajes.Mercader e = null;
+            for (var x : puestos) if (!x.isRemoved()) e = x;
+            if (e != null) {
+                fp.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+                fp.moveTo(e.getX() + 1.5, e.getY(), e.getZ(), 0f, 0f);
+                com.darkcraft.tienda.Tienda.olvidar(fp);
+                var o = com.darkcraft.tienda.Tienda.SILAS.get(1);
+                int antes = fp.getInventory().countItem(o.item());
+                com.darkcraft.tienda.Tienda.comprar(fp, e.getId(), 1, 1);
+                ss.append(String.format(java.util.Locale.ROOT, " | tienda: %d cosas, compra %s: lleva %d (antes %d), apuntado %d (Kerrick %d), logro %s",
+                        com.darkcraft.tienda.Tienda.SILAS.size(), o.id(), fp.getInventory().countItem(o.item()), antes,
+                        com.darkcraft.rol.Ficha.comprado(fp, com.darkcraft.tienda.Tienda.clave("silas", o)),
+                        com.darkcraft.rol.Ficha.comprado(fp, o.id()), com.darkcraft.story.Logros.tiene(fp, "silas_compra")));
+                com.darkcraft.tienda.Tienda.olvidar(fp);
+            }
+            ss.append(" | adonde ira: ").append(com.darkcraft.morvain.Ambulante.siguiente(server)).append(", su frase 5 acaba en ")
+                    .append(com.darkcraft.dialogo.Dialogos.SILAS.nodo(5).accion());
+        } catch (Throwable t) {
+            ss.append(" ERROR ").append(t);
+            DarkCraftMod.LOGGER.error("[CI] Silas", t);
+        } finally {
+            for (var x : puestos) if (!x.isRemoved()) x.discard();
+            com.darkcraft.morvain.Ambulante.desfase(server, 0);
+        }
+        log.println(ss);
         log.flush();
     }
 

@@ -19,9 +19,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.List;
 
 /**
- * La tienda de Kerrick: lo que vende (igual en el servidor y en el cliente), con su precio en ecos y, algunas cosas, un
- * limite por jugador (lo comprado va en la ficha, {@link Ficha#comprado}). El servidor cobra y da lo comprado (lo que no
- * quepa, al suelo).
+ * Las tiendas de los mercaderes: lo que vende cada uno (igual en el servidor y en el cliente), con su precio en ecos y,
+ * algunas cosas, un limite por jugador (lo comprado va en la ficha, {@link Ficha#comprado}; lo de Silas con su prefijo, para
+ * que sus limites no se mezclen con los de Kerrick). El servidor cobra y da lo comprado (lo que no quepa, al suelo).
  */
 public final class Tienda {
     private Tienda() {}
@@ -69,10 +69,49 @@ public final class Tienda {
             new Oferta("darkcraft:ceniza_llamas", 1, 2800, 1),
             new Oferta("darkcraft:ceniza_escarcha", 1, 2800, 1));
 
-    /** Lo ya comprado de cada oferta (para mandarlo al cliente al abrir la tienda). */
+    /**
+     * La mercancia de Silas (parte 7af), el mercader ambulante de Morvain: lo de alli, mas caro (piedras II sin limite y III,
+     * los frutos que faltaban, hechizos, talismanes y cenizas que Kerrick no tiene).
+     */
+    public static final List<Oferta> SILAS = List.of(
+            new Oferta("darkcraft:piedra_forja_2", 1, 820, 0),
+            new Oferta("darkcraft:piedra_forja_3", 1, 2600, 6),
+            new Oferta("darkcraft:fruto_tormenta", 1, 450, 0),
+            new Oferta("darkcraft:fruto_lunar", 1, 450, 0),
+            new Oferta("darkcraft:fruto_hueso", 1, 400, 0),
+            new Oferta("darkcraft:fruto_sombra", 1, 500, 0),
+            new Oferta("minecraft:arrow", 10, 90, 0),
+            new Oferta("darkcraft:hechizo_esquirlas", 1, 2400, 1),
+            new Oferta("darkcraft:hechizo_lanza", 1, 3200, 1),
+            new Oferta("darkcraft:hechizo_rayo", 1, 3600, 1),
+            new Oferta("darkcraft:hechizo_bendicion", 1, 3000, 1),
+            new Oferta("darkcraft:talisman_aliento", 1, 4200, 1),
+            new Oferta("darkcraft:talisman_mente", 1, 4200, 1),
+            new Oferta("darkcraft:talisman_codicia", 1, 6000, 1),
+            new Oferta("darkcraft:ceniza_paso", 1, 3000, 1),
+            new Oferta("darkcraft:ceniza_relampago", 1, 3400, 1),
+            new Oferta("darkcraft:ceniza_sangre", 1, 3400, 1));
+
+    /** Lo que vende el mercader {@code id} ("mercader" Kerrick, "silas" Silas). */
+    public static List<Oferta> de(String id) {
+        return "silas".equals(id) ? SILAS : KERRICK;
+    }
+
+    /** Donde se apunta lo comprado de una oferta en la ficha (lo de Kerrick, con su id de siempre). */
+    public static String clave(String mercader, Oferta o) {
+        return "silas".equals(mercader) ? "silas:" + o.id() : o.id();
+    }
+
+    /** Lo ya comprado de cada oferta de Kerrick (para mandarlo al cliente al abrir la tienda). */
     public static int[] comprados(ServerPlayer sp) {
-        int[] r = new int[KERRICK.size()];
-        for (int i = 0; i < r.length; i++) r[i] = Ficha.comprado(sp, KERRICK.get(i).id());
+        return comprados(sp, "mercader");
+    }
+
+    /** Lo ya comprado de cada oferta del mercader {@code id}. */
+    public static int[] comprados(ServerPlayer sp, String id) {
+        List<Oferta> l = de(id);
+        int[] r = new int[l.size()];
+        for (int i = 0; i < r.length; i++) r[i] = Ficha.comprado(sp, clave(id, l.get(i)));
         return r;
     }
 
@@ -81,14 +120,17 @@ public final class Tienda {
         return o.limitada() ? Math.max(0, o.limite() - comprado) : Integer.MAX_VALUE;
     }
 
-    /** El jugador compra {@code veces} la oferta {@code i} a Kerrick ({@code entidad}). */
+    /** El jugador compra {@code veces} la oferta {@code i} al mercader {@code entidad} (Kerrick o Silas). */
     public static void comprar(ServerPlayer sp, int entidad, int i, int veces) {
         int codigo = NO, comprado = 0;
         Entity e = sp.level().getEntity(entidad);
+        String quien = e instanceof Mercader m ? m.dialogo() : "mercader";
+        List<Oferta> lista = de(quien);
         if (e instanceof Mercader && sp.distanceToSqr(e) <= (Conversaciones.ALCANCE + 3) * (Conversaciones.ALCANCE + 3)
-                && i >= 0 && i < KERRICK.size() && veces >= 1 && veces <= TANDA) {
-            Oferta o = KERRICK.get(i);
-            comprado = Ficha.comprado(sp, o.id());
+                && i >= 0 && i < lista.size() && veces >= 1 && veces <= TANDA) {
+            Oferta o = lista.get(i);
+            String clave = clave(quien, o);
+            comprado = Ficha.comprado(sp, clave);
             if (o.item() == Items.AIR) codigo = NO;
             else if (quedan(o, comprado) < veces) codigo = AGOTADO;
             else {
@@ -104,21 +146,23 @@ public final class Tienda {
                     }
                     if (o.limitada()) {
                         comprado += veces;
-                        Ficha.comprado(sp, o.id(), comprado);
+                        Ficha.comprado(sp, clave, comprado);
                     }
                     codigo = HECHO;
                     sp.level().playSound(null, e.getX(), e.getY() + 1, e.getZ(), DarkCraftMod.SFX_TIENDA_COMPRA.get(), SoundSource.NEUTRAL, 0.8f, 1.0f);
                     Logros.dar(sp, "compra");
-                    DarkCraftMod.LOGGER.info("[DarkCraft] {} compra {} x {} a Kerrick por {} ecos", sp.getGameProfile().getName(), veces, o.id(),
-                            gasta ? precio : 0);
+                    if ("silas".equals(quien)) Logros.dar(sp, "silas_compra");
+                    DarkCraftMod.LOGGER.info("[DarkCraft] {} compra {} x {} a {} por {} ecos", sp.getGameProfile().getName(), veces, o.id(),
+                            "silas".equals(quien) ? "Silas" : "Kerrick", gasta ? precio : 0);
                 }
             }
         }
         Net.to(sp, new Net.TiendaHecho(entidad, i, comprado, codigo));
     }
 
-    /** Para el comando y la prueba: olvida lo comprado. */
+    /** Para el comando y la prueba: olvida lo comprado (a los dos). */
     public static void olvidar(ServerPlayer sp) {
-        for (Oferta o : KERRICK) Ficha.comprado(sp, o.id(), 0);
+        for (Oferta o : KERRICK) Ficha.comprado(sp, clave("mercader", o), 0);
+        for (Oferta o : SILAS) Ficha.comprado(sp, clave("silas", o), 0);
     }
 }

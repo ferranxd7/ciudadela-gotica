@@ -6045,6 +6045,8 @@ public final class ClientCiTest {
         t = aguja(t);
         // la cronica de Morvain: los cofres de los capitulos 7-10, sus cinematicas con la voz de Maelis y sus libros (parte 7ae)
         t = cronica(t);
+        // los herreros de Morvain y Silas, el mercader ambulante (parte 7af)
+        t = herreros(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -11991,6 +11993,245 @@ public final class ClientCiTest {
             m.setScreen(null);
         });
         return t + 20;
+    }
+
+    // ------------------------------------------------------------------ los herreros de Morvain y Silas (parte 7af)
+
+    /** Lo de una herreria en el mundo: el bloque (u, dy, v) de su marco, con medio bloque de mas. */
+    private static Vec3 hr(com.darkcraft.morvain.Herrerias.Sitio s, double u, double dy, double v) {
+        int iu = (int) Math.floor(u), iv = (int) Math.floor(v);
+        BlockPos b = s.pos(iu, 0, iv);
+        double fu = u - iu, fv = v - iv;
+        // el desplazamiento de dentro del bloque, girado como el marco
+        BlockPos e = s.pos(iu + 1, 0, iv), n = s.pos(iu, 0, iv + 1);
+        double x = b.getX() + 0.5 + (e.getX() - b.getX()) * (fu - 0.5) + (n.getX() - b.getX()) * (fv - 0.5);
+        double z = b.getZ() + 0.5 + (e.getZ() - b.getZ()) * (fu - 0.5) + (n.getZ() - b.getZ()) * (fv - 0.5);
+        return new Vec3(x, s.y() + dy, z);
+    }
+
+    /** Un sitio para la camara volando: si el terreno de esa columna sube mas, por encima de el. */
+    private static Vec3 libre(ServerLevel l, Vec3 p) {
+        int h = l.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, net.minecraft.util.Mth.floor(p.x),
+                net.minecraft.util.Mth.floor(p.z));
+        return p.y < h + 0.3 ? new Vec3(p.x, h + 0.3, p.z) : p;
+    }
+
+    /** Pasar las frases (acabando de escribirlas) hasta el menu, sin elegir nada en el. */
+    private static void alMenu(com.darkcraft.client.ui.DialogoScreen d) {
+        for (int i = 0; i < 4 && !d.resumen().contains("(menu"); i++) d.pulsarSeguir();
+        log("  dialogo: " + d.resumen());
+    }
+
+    /**
+     * Los herreros de Morvain y Silas (parte 7af): el Refugio de la Fragua por fuera (el humo de la chimenea), Hagen martilleando
+     * (dos momentos del martillazo) y, de cerca, dejando el martillo y mirando; hablar con el (su retrato y su frase 1), su menu y su
+     * forja (con su voz). Los tres campamentos (Brenna, Ulrik y Tobin) desde delante y hablando con cada uno. Silas: llega junto al
+     * santuario de su ruta, de cerca, hablando, su tienda y adonde ira (el aviso).
+     */
+    private static int herreros(int T) {
+        int t = T;
+        final var R = com.darkcraft.morvain.Herrerias.REFUGIO;
+        atTicks(t, "Herreros de Morvain: el Refugio de la Fragua por fuera", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                if (mv == null) return;
+                sp.setGameMode(GameType.CREATIVE);
+                com.darkcraft.rol.Rol.sinCombate(sp);
+                for (var s : com.darkcraft.morvain.Herrerias.TODOS) com.darkcraft.dialogo.Conversaciones.olvidar(sp, s.id());
+                com.darkcraft.dialogo.Conversaciones.olvidar(sp, "silas");
+                Vec3 de = libre(mv, hr(R, 3.5, 4.5, 17.5)), a = hr(R, 0.5, 5, 0.5);
+                irMirando(sp, de.x, de.y, de.z, a.x, a.y, a.z, true);
+            });
+        });
+        t += 100;
+        atTicks(t, "Herreros: los herreros puestos", m -> server(m, sp -> {
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            if (mv == null) return;
+            int n = com.darkcraft.morvain.Herrerias.ponerTodos(mv);
+            log("  herreros de Morvain: puestos ahora " + n + " | " + com.darkcraft.morvain.Herrerias.resumen(mv) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp));
+        }));
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_hr01_refugio"));
+        t += 4;
+        atTicks(t, "Herreros: Hagen martilleando, desde la puerta", m -> server(m, sp -> {
+            Vec3 de = hr(R, -0.5, 1, 4.5), a = hr(R, R.hu() + 0.5, 2.3, R.hv() + 0.5);
+            irMirando(sp, de.x, de.y, de.z, a.x, a.y, a.z, false);
+        }));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logForja(m, "hagen martillea");
+            shot(m, "cliente_hr02_hagen_martillo");
+        });
+        t += 14;
+        atTicks(t, "captura", m -> shot(m, "cliente_hr03_hagen_martillo"));
+        t += 4;
+        atTicks(t, "Herreros: delante del yunque de Hagen (deja el martillo y mira)", m -> server(m, sp -> {
+            Vec3 de = hr(R, R.hu() + 0.5, 1, R.hv() + 2.5), a = hr(R, R.hu() + 0.5, 2.5, R.hv() + 0.5);
+            irMirando(sp, de.x, de.y, de.z, a.x, a.y, a.z, false);
+            com.darkcraft.rol.Rol.sinCombate(sp);
+        }));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logForja(m, "hagen mira");
+            shot(m, "cliente_hr04_hagen_mira");
+        });
+        t += 2;
+        atTicks(t, "la E: hablar con Hagen", m -> pulsar(m.options.keyInventory));
+        t += 26;
+        atTicks(t, "captura", m -> {
+            logForja(m, "hagen se presenta");
+            shot(m, "cliente_hr05_hagen_habla");
+        });
+        t += 4;
+        atTicks(t, "E, E: el menu de Hagen", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 12;
+        atTicks(t, "captura", m -> {
+            logForja(m, "hagen menu");
+            shot(m, "cliente_hr06_hagen_menu");
+        });
+        t += 4;
+        atTicks(t, "quiero mejorar mi arma", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        t += 28;
+        atTicks(t, "captura", m -> {
+            logForja(m, "forja de hagen");
+            shot(m, "cliente_hr07_forja_hagen");
+        });
+        t += 4;
+        atTicks(t, "ESC", m -> {
+            m.setScreen(null);
+            server(m, sp -> log("  hagen: logros refugio " + com.darkcraft.story.Logros.tiene(sp, "refugio") + " hagen " + com.darkcraft.story.Logros.tiene(sp, "hagen")
+                    + " | dialogo " + com.darkcraft.rol.Ficha.dialogo(sp, "hagen")));
+        });
+        t += 6;
+        // ---- los tres campamentos
+        int k = 0;
+        for (var s : new com.darkcraft.morvain.Herrerias.Sitio[]{com.darkcraft.morvain.Herrerias.FARO, com.darkcraft.morvain.Herrerias.COLMILLO,
+                com.darkcraft.morvain.Herrerias.CAPITAL}) {
+            final int K = 10 + 2 * (k++);
+            atTicks(t, "Herreros: el campamento de " + s.id(), m -> server(m, sp -> {
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                if (mv == null) return;
+                Vec3 de = libre(mv, hr(s, 4.5, 4.0, 12.5)), a = hr(s, 0.5, 1.5, -0.5);
+                irMirando(sp, de.x, de.y, de.z, a.x, a.y, a.z, true);
+            }));
+            t += 100;
+            atTicks(t, "captura", m -> {
+                logForja(m, "campamento de " + s.id());
+                shot(m, String.format("cliente_hr%02d_%s", K, s.id()));
+            });
+            t += 4;
+            atTicks(t, "Herreros: hablar con " + s.id(), m -> server(m, sp -> {
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                if (mv != null && com.darkcraft.morvain.Herrerias.buscar(mv, s) == null) com.darkcraft.morvain.Herrerias.ponerTodos(mv);
+                Vec3 de = hr(s, s.hu() + 0.5, 1, s.hv() + 2.5), a = hr(s, s.hu() + 0.5, 2.5, s.hv() + 0.5);
+                sp.getAbilities().flying = false;
+                irMirando(sp, de.x, de.y, de.z, a.x, a.y, a.z, false);
+                com.darkcraft.rol.Rol.sinCombate(sp);
+            }));
+            t += 30;
+            atTicks(t, "la E: hablar", m -> pulsar(m.options.keyInventory));
+            t += 26;
+            atTicks(t, "captura", m -> {
+                logForja(m, s.id() + " se presenta");
+                shot(m, String.format("cliente_hr%02d_%s_habla", K + 1, s.id()));
+            });
+            t += 4;
+            atTicks(t, "ESC", m -> m.setScreen(null));
+            t += 6;
+        }
+        atTicks(t, "Herreros: los cuatro", m -> server(m, sp -> log("  herreros: habla con " + com.darkcraft.dialogo.Conversaciones.herrerosMorvain(sp)
+                + " de 4, logro herreros " + com.darkcraft.story.Logros.tiene(sp, "herreros"))));
+        // ---- Silas, en el primer santuario de su ruta
+        atTicks(t, "Silas: al santuario de su ruta", m -> server(m, sp -> {
+            comando(sp, "darkcraft silas mover 0");
+            comando(sp, "darkcraft silas ir");
+            comando(sp, "darkcraft ecos dar 6000");
+            sp.getAbilities().flying = false;
+            sp.onUpdateAbilities();
+        }));
+        t += 110;
+        atTicks(t, "Silas: de cerca", m -> server(m, sp -> {
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            if (mv == null) return;
+            var st = com.darkcraft.morvain.SantuariosMorvain.porId(com.darkcraft.morvain.Ambulante.donde(sp.server));
+            var e = st == null ? null : com.darkcraft.morvain.Ambulante.silas(mv, st);
+            log("  silas: " + com.darkcraft.morvain.Ambulante.resumen(mv) + " | jugador " + fpos(sp) + " | " + (e == null ? "FALLO: no esta" : "en " + e.blockPosition().toShortString()));
+            if (e == null) return;
+            // delante de el (mira hacia fuera del santuario), en el primer hueco libre de entre unos cuantos
+            Vec3 p = e.position(), f = Vec3.atBottomCenterOf(st.pos());
+            Vec3 dir = new Vec3(p.x - f.x, 0, p.z - f.z).normalize(), de = null;
+            for (int g : new int[]{0, 30, -30, 60, -60, 100, -100, 150}) {
+                Vec3 c = p.add(dir.yRot((float) Math.toRadians(g)).scale(3.0));
+                BlockPos b = BlockPos.containing(c.x, p.y + 0.2, c.z);
+                if (mv.getBlockState(b).getCollisionShape(mv, b).isEmpty() && mv.getBlockState(b.above()).getCollisionShape(mv, b.above()).isEmpty()) {
+                    de = c;
+                    break;
+                }
+            }
+            if (de == null) de = p.add(dir.scale(3.0));
+            irMirando(sp, de.x, p.y, de.z, p.x, p.y + 1.45, p.z, true);
+            com.darkcraft.rol.Rol.sinCombate(sp);
+        }));
+        t += 24;
+        atTicks(t, "captura", m -> shot(m, "cliente_hr20_silas"));
+        t += 2;
+        atTicks(t, "la E: hablar con Silas", m -> {
+            server(m, com.darkcraft.rol.Rol::sinCombate);
+            pulsar(m.options.keyInventory);
+        });
+        t += 26;
+        atTicks(t, "captura", m -> {
+            logForja(m, "silas se presenta");
+            shot(m, "cliente_hr21_silas_habla");
+        });
+        t += 4;
+        atTicks(t, "E, E: el menu de Silas", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "ensename tu mercancia", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        t += 26;
+        atTicks(t, "captura", m -> {
+            logForja(m, "tienda de silas");
+            shot(m, "cliente_hr22_tienda_silas");
+        });
+        t += 4;
+        atTicks(t, "una piedra III (2600)", m -> tiendaP(m, ti -> {
+            ti.pulsar(1, 1);
+            ti.pulsarComprar();
+        }));
+        t += 24;
+        atTicks(t, "captura", m -> {
+            logForja(m, "silas comprado");
+            shot(m, "cliente_hr23_silas_comprado");
+            server(m, sp -> log("  silas: piedras III " + sp.getInventory().countItem(com.darkcraft.forja.Forja.piedra(3)) + ", apuntado "
+                    + com.darkcraft.rol.Ficha.comprado(sp, "silas:darkcraft:piedra_forja_3") + ", logros silas " + com.darkcraft.story.Logros.tiene(sp, "silas")
+                    + " silas_compra " + com.darkcraft.story.Logros.tiene(sp, "silas_compra")));
+        });
+        t += 4;
+        atTicks(t, "ESC y otra vez a hablar", m -> m.setScreen(null));
+        t += 6;
+        atTicks(t, "la E", m -> {
+            server(m, com.darkcraft.rol.Rol::sinCombate);
+            pulsar(m.options.keyInventory);
+        });
+        t += 26;
+        atTicks(t, "E: el menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "adonde iras despues", m -> dialogo(m, d -> d.pulsarRespuesta(1)));
+        float dura = com.darkcraft.dialogo.Dialogos.habla("silas", 5);
+        t += Math.round((dura > 0.3f ? dura : 7.5f) * 20) + 24;
+        atTicks(t, "E: acaba la frase 5 (el aviso de adonde ira)", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 6;
+        atTicks(t, "ESC", m -> m.setScreen(null));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            logForja(m, "silas adonde");
+            shot(m, "cliente_hr24_silas_rumbo");
+            log("  silas: aviso " + com.darkcraft.client.ui.Carteles.resumen());
+        });
+        return t + 10;
     }
 
     private static int aguja(int T) {

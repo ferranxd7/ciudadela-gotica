@@ -261,6 +261,13 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la torre del homenaje en el chunk {}", c.getPos(), t);
         }
+        // las herrerias (parte 7af): el Refugio de la Fragua y los campamentos de Brenna, Ulrik y Tobin (las ultimas: el de Brenna
+        // va en el llano del Puerto Varado y el de Tobin junto a la Puerta Oeste de la Capital)
+        try {
+            if (Herrerias.toca(c.getPos().x, c.getPos().z)) Herrerias.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar una herreria en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

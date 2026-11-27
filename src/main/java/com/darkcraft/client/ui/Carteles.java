@@ -54,7 +54,13 @@ public final class Carteles {
             case Net.Cartel.FRAGMENTO -> COLA.add(new Cartel(Net.Cartel.PIEZA, Component.translatable(m.clave()),
                     Component.translatable("darkcraft.cartel.fragmento", m.n(), com.darkcraft.morvain.Fragmentos.ESTELAS.length)));
             case Net.Cartel.AVISO -> {
-                aviso = m.n() > 0 ? Component.translatable(m.clave(), m.n()) : Component.translatable(m.clave());
+                // "clave|otra|..." : las de detras son los argumentos (traducidos) de la primera (adonde ira Silas, parte 7af)
+                String[] k = m.clave().split("\\|");
+                if (k.length > 1) {
+                    Object[] args = new Object[k.length - 1];
+                    for (int i = 1; i < k.length; i++) args[i - 1] = Component.translatable(k[i]);
+                    aviso = Component.translatable(k[0], args);
+                } else aviso = m.n() > 0 ? Component.translatable(m.clave(), m.n()) : Component.translatable(m.clave());
                 avisoInicio = ClientRol.ticks;
                 Panel.nada();
             }

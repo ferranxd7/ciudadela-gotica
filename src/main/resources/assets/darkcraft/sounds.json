@@ -7297,5 +7297,356 @@
         "stream": true
       }
     ]
+  },
+  "voz.hagen.1": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hagen/voz_1",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hagen.2": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hagen/voz_2",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hagen.3": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hagen/voz_3",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hagen.4": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hagen/voz_4",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hagen.5": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hagen/voz_5",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hagen.6": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hagen/voz_6",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hagen.7": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hagen/voz_7",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hagen.8": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hagen/voz_8",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hagen.9": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hagen/voz_9",
+        "stream": true
+      }
+    ]
+  },
+  "voz.brenna.1": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:brenna/voz_1",
+        "stream": true
+      }
+    ]
+  },
+  "voz.brenna.2": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:brenna/voz_2",
+        "stream": true
+      }
+    ]
+  },
+  "voz.brenna.3": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:brenna/voz_3",
+        "stream": true
+      }
+    ]
+  },
+  "voz.brenna.4": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:brenna/voz_4",
+        "stream": true
+      }
+    ]
+  },
+  "voz.brenna.5": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:brenna/voz_5",
+        "stream": true
+      }
+    ]
+  },
+  "voz.brenna.6": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:brenna/voz_6",
+        "stream": true
+      }
+    ]
+  },
+  "voz.brenna.7": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:brenna/voz_7",
+        "stream": true
+      }
+    ]
+  },
+  "voz.brenna.8": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:brenna/voz_8",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ulrik.1": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ulrik/voz_1",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ulrik.2": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ulrik/voz_2",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ulrik.3": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ulrik/voz_3",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ulrik.4": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ulrik/voz_4",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ulrik.5": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ulrik/voz_5",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ulrik.6": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ulrik/voz_6",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ulrik.7": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ulrik/voz_7",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ulrik.8": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ulrik/voz_8",
+        "stream": true
+      }
+    ]
+  },
+  "voz.tobin.1": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:tobin/voz_1",
+        "stream": true
+      }
+    ]
+  },
+  "voz.tobin.2": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:tobin/voz_2",
+        "stream": true
+      }
+    ]
+  },
+  "voz.tobin.3": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:tobin/voz_3",
+        "stream": true
+      }
+    ]
+  },
+  "voz.tobin.4": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:tobin/voz_4",
+        "stream": true
+      }
+    ]
+  },
+  "voz.tobin.5": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:tobin/voz_5",
+        "stream": true
+      }
+    ]
+  },
+  "voz.tobin.6": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:tobin/voz_6",
+        "stream": true
+      }
+    ]
+  },
+  "voz.tobin.7": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:tobin/voz_7",
+        "stream": true
+      }
+    ]
+  },
+  "voz.tobin.8": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:tobin/voz_8",
+        "stream": true
+      }
+    ]
+  },
+  "voz.silas.1": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:silas/voz_1",
+        "stream": true
+      }
+    ]
+  },
+  "voz.silas.2": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:silas/voz_2",
+        "stream": true
+      }
+    ]
+  },
+  "voz.silas.3": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:silas/voz_3",
+        "stream": true
+      }
+    ]
+  },
+  "voz.silas.4": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:silas/voz_4",
+        "stream": true
+      }
+    ]
+  },
+  "voz.silas.5": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:silas/voz_5",
+        "stream": true
+      }
+    ]
+  },
+  "voz.silas.6": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:silas/voz_6",
+        "stream": true
+      }
+    ]
   }
 }
