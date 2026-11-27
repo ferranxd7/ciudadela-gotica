@@ -67,10 +67,10 @@ public final class MorvainEnemigos {
     public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo",
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
             CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio",
-            PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar";
+            PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar", CERCO = "cerco";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
-            ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente",
+            ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
             PONTIFICE = "pontifice";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
@@ -81,7 +81,8 @@ public final class MorvainEnemigos {
             ARBOLEDA_P = new ArrayList<>(), PATIBULO_P = new ArrayList<>(), PILOTES_P = new ArrayList<>(), LAGUNA_P = new ArrayList<>(),
             BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>(), ERMITA_P = new ArrayList<>(), CUMBRE_P = new ArrayList<>(),
             CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>(),
-            PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>(), GRIETA_P = new ArrayList<>(), ALTAR_P = new ArrayList<>();
+            PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>(), GRIETA_P = new ArrayList<>(), ALTAR_P = new ArrayList<>(),
+            CERCO_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -209,6 +210,9 @@ public final class MorvainEnemigos {
         for (Altar.Espera e : Altar.get().esperas())
             ALTAR_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? PONTIFICE : PENITENTE, e.variante(), e.x(), e.y(), e.z(), e.giro(),
                     e.postura(), e.ronda(), e.grupo()));
+        // ---- el Cerco del Ancla (parte 7u): los marcados que apunta el plano
+        for (Cerco.Espera e : Cerco.get().esperas())
+            CERCO_P.add(new Puesto(MARCADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -268,6 +272,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(SALOBRE, DarkCraftMod.SALOBRE);
         Puestos.tipo(BALLENERO, DarkCraftMod.BALLENERO);
         Puestos.tipo(PENITENTE, DarkCraftMod.PENITENTE);
+        Puestos.tipo(MARCADO, DarkCraftMod.MARCADO);
         Puestos.tipo(PONTIFICE, DarkCraftMod.PONTIFICE);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
@@ -299,6 +304,7 @@ public final class MorvainEnemigos {
         Puestos.registrar(GRIETA, GRIETA_P, Morvain::es, (l, p) -> p.postura() != REZA || !Altar.enPaz(l.getServer()));
         Puestos.registrar(ALTAR, ALTAR_P, Morvain::es,
                 (l, p) -> Puestos.JEFE.equals(p.grupo()) || p.postura() != REZA || !Altar.enPaz(l.getServer()));
+        Puestos.registrar(CERCO, CERCO_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -400,6 +406,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> altar() {
         preparar();
         return List.copyOf(ALTAR_P);
+    }
+
+    public static List<Puesto> cerco() {
+        preparar();
+        return List.copyOf(CERCO_P);
     }
 
     public static List<Puesto> puerto() {
@@ -1062,6 +1073,58 @@ public final class MorvainEnemigos {
         return s;
     }
 
+    /** {@code /darkcraft cerco [ir <sitio> | enemigos [volver | fuera | sacar]]} (parte 7u): el Cerco del Ancla. */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoCerco() {
+        return net.minecraft.commands.Commands.literal("cerco")
+                .executes(c -> decir(c, estadoCerco(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irCerco(c.getSource(), "puerta"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Cerco.get().sitios().keySet(), b))
+                                .executes(c -> irCerco(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoCerco(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), CERCO, false);
+                            return decir(c, "vuelven todos los marcados");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), CERCO, true);
+                            return decir(c, "fuera todos los marcados");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            net.minecraft.server.level.ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, CERCO).size();
+                            return decir(c, "fuera " + n);
+                        })));
+    }
+
+    private static int irCerco(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Cerco.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Cerco.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando al ancla (desde el ancla, hacia la puerta)
+        double tx = Cerco.CX + 0.5, tz = Cerco.CZ + 0.5;
+        if (Math.hypot(tx - s[0], tz - s[2]) < 6) tz = Cerco.CZ + 40;
+        float giro = (float) (Math.toDegrees(Math.atan2(tz - s[2], tx - s[0])) - 90.0);
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
+        return 1;
+    }
+
+    /** Cuantos marcados quedan y cuantos andan fuera (y como esta el cerco, si esta cargado). */
+    public static String estadoCerco(net.minecraft.server.MinecraftServer srv) {
+        String s = "cerco del ancla: quedan " + Puestos.quedan(srv, CERCO) + " de " + CERCO_P.size() + " (fuera " + Puestos.fuera(CERCO) + ")";
+        var m = Morvain.nivel(srv);
+        int[] at = Cerco.get().sitio("atril");
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(at[0], at[1], at[2])) && m.isLoaded(new net.minecraft.core.BlockPos(Cerco.CX, Cerco.PISO, Cerco.CZ)))
+            s += "; " + Cerco.resumen(m);
+        return s;
+    }
+
     /** {@code /darkcraft puerto [ir <sitio> | enemigos [volver | fuera | sacar]]} (parte 7q): el Puerto Varado. */
     public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoPuerto() {
         return net.minecraft.commands.Commands.literal("puerto")
@@ -1443,6 +1506,7 @@ public final class MorvainEnemigos {
         todos.addAll(COSTILLAR_P);
         todos.addAll(GRIETA_P);
         todos.addAll(ALTAR_P);
+        todos.addAll(CERCO_P);
         for (Puesto p : todos) {
             if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
             for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
@@ -1459,6 +1523,6 @@ public final class MorvainEnemigos {
                 + " en el patio del Juramento, " + ACADEMIA_P.size() + " en la academia espectral, " + OBSERVATORIO_P.size()
                 + " en el observatorio, " + PUERTO_P.size() + " en el puerto varado, " + COSTILLAR_P.size()
                 + " en el costillar, " + GRIETA_P.size() + " en el puente de la grieta, " + ALTAR_P.size()
-                + " en el altar profanado; cerca del arco o de un santuario " + cerca;
+                + " en el altar profanado, " + CERCO_P.size() + " en el cerco del ancla; cerca del arco o de un santuario " + cerca;
     }
 }

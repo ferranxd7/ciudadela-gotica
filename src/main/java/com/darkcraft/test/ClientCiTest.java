@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 101 * 60 * 20;
+    private static final int LIMIT = 105 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -6021,6 +6021,8 @@ public final class ClientCiTest {
         t = grieta(t);
         // el Altar Profanado y Anselmo, el Pontifice Sangrante, el jefe de la Tierra sin Fe (parte 7t)
         t = altar(t);
+        // el Cerco del Ancla y los marcados del Crater de Sangre (parte 7u)
+        t = cerco(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -9432,6 +9434,386 @@ public final class ClientCiTest {
                 sp.clearFire();
                 sp.setHealth(sp.getMaxHealth());
                 comando(sp, "darkcraft puerto enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el Cerco del Ancla y los marcados (parte 7u)
+
+    private static final com.darkcraft.enemigos.Marcado[] MARCADOS = new com.darkcraft.enemigos.Marcado[3];
+
+    private static com.darkcraft.enemigos.Marcado marcadoNuevo(ServerLevel lvl, int variante, double x, double y, double z, float giro, int postura) {
+        var a = DarkCraftMod.MARCADO.get().create(lvl);
+        if (a == null) return null;
+        a.variante(variante);
+        a.moveTo(x, y, z, giro, 0f);
+        a.yBodyRot = a.yHeadRot = giro;
+        if (postura != com.darkcraft.enemigos.Enemigo.DE_PIE) a.asignar("", -1, a.blockPosition(), giro, postura, 0);
+        lvl.addFreshEntity(a);
+        return a;
+    }
+
+    /** Quita los marcados de la prueba, sus reflejos y sus flechas. */
+    private static void quitarMarcados(ServerLevel lvl) {
+        for (int i = 0; i < MARCADOS.length; i++) {
+            if (MARCADOS[i] != null && !MARCADOS[i].isRemoved()) MARCADOS[i].discard();
+            MARCADOS[i] = null;
+        }
+        if (lvl == null) return;
+        int x = com.darkcraft.morvain.Cerco.CX, z = com.darkcraft.morvain.Cerco.CZ, y = com.darkcraft.morvain.Cerco.PISO;
+        var caja = new net.minecraft.world.phys.AABB(x - 60, y - 20, z - 60, x + 60, y + 40, z + 80);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Marcado.class, caja)) if (e.reflejo()) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Flecha.class, caja)) e.discard();
+    }
+
+    private static String estadoMarcados() {
+        StringBuilder sb = new StringBuilder();
+        for (var a : MARCADOS) sb.append(a == null ? "-" : estadoE(a) + (a.arde() ? " (le arde la marca)" : "")).append(" | ");
+        return sb + String.format(java.util.Locale.ROOT, "mazazos %d (ondas %d), barridos %d, tajos %d, estocadas %d, escudazos %d, parados %d, disparos %d,"
+                        + " negras %d (nublan %d), punzadas %d, deslices %d, reflejos %d (dan %d), alzados %d, deshechos %d",
+                com.darkcraft.enemigos.Marcado.MAZAZOS, com.darkcraft.enemigos.Marcado.ONDAS, com.darkcraft.enemigos.Marcado.BARRIDOS,
+                com.darkcraft.enemigos.Marcado.TAJOS, com.darkcraft.enemigos.Marcado.ESTOCADAS, com.darkcraft.enemigos.Marcado.ESCUDAZOS,
+                com.darkcraft.enemigos.Marcado.PARADOS, com.darkcraft.enemigos.Marcado.DISPAROS, com.darkcraft.enemigos.Marcado.NEGRAS,
+                com.darkcraft.enemigos.Marcado.NUBLADOS, com.darkcraft.enemigos.Marcado.PUNZADAS, com.darkcraft.enemigos.Marcado.DESLICES,
+                com.darkcraft.enemigos.Marcado.REFLEJOS, com.darkcraft.enemigos.Marcado.REFLEJOS_DAN, com.darkcraft.enemigos.Marcado.ALZADOS,
+                com.darkcraft.enemigos.Marcado.DESHECHOS);
+    }
+
+    /**
+     * Un golpe de un marcado visto de lado: el marcado en (x, z) mirando al sur, el jugador delante (al sur) y la camara al este (mas
+     * lejos y mas alta si el jugador esta lejos). Con {@code arde}, le arde la marca: su reflejo repetira el golpe.
+     */
+    private static int golpeMarcado(int t, String nombre, int variante, int accion, double dist, int captura, double ex, double ez, int PISO, boolean arde) {
+        atTicks(t, "El cerco: " + nombre, m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarMarcados(lvl);
+                aPelear(sp, true);
+                MARCADOS[0] = marcadoNuevo(lvl, variante, ex, PISO, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+                irMirando(sp, ex, PISO, ez + dist, ex, PISO + 1.4, ez, false);
+                var a = MARCADOS[0];
+                if (a == null) return;
+                if (arde) a.encenderMarca();
+                a.setTarget(sp);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(accion);
+                double lado = dist > 5 ? 7.5 : 4.6, alto = dist > 5 ? 3.4 : 2.4;
+                verDesdeServidor = new Vec3(ex + lado, PISO + alto, ez + dist * 0.5 + 0.8);
+                miraServidor = new Vec3(ex, PISO + 1.2, ez + dist * 0.5);
+            });
+        });
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += captura - 2;
+        final String cap = "cliente_" + nombre;
+        atTicks(t, "captura: " + nombre, m -> {
+            server(m, sp -> log("  " + nombre + ": " + estadoMarcados() + " | jugador vida " + Math.round(sp.getHealth()) + ", frenado "
+                    + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) + ", a oscuras " + sp.hasEffect(net.minecraft.world.effect.MobEffects.DARKNESS)
+                    + ", estamina " + Math.round(com.darkcraft.rol.Rol.estamina(sp)) + String.format(java.util.Locale.ROOT, " en %.1f, %.1f, %.1f", sp.getX(), sp.getY(), sp.getZ())));
+            shot(m, cap);
+        });
+        return t;
+    }
+
+    /**
+     * El Cerco del Ancla: desde el santuario del Ancla del Sur, el camino de los marcados con sus estelas y sus jaulas, entrar a pie (el
+     * cartel con su nombre, el logro y el aire del crater), la puerta entre sus torres, el patio con los rompedores de rodillas ante el
+     * ancla, la escalera tallada, lo alto del ancla con la cadena que sube a la ciudadela, la fragua, el campamento, la choza del primero
+     * con su atril y todo desde lo alto; en supervivencia, en el patio: el mazazo y su onda, el barrido, el tajo, la estocada, el
+     * escudazo, el escudo que para, el disparo, la flecha negra y la vista nublada, la punzada, el desliz; la marca que arde y el
+     * reflejo que repite el golpe; uno caido de bruces que se alza; uno que cae y se deshace en sombra; el diario del primero y el
+     * bestiario. Al acabar vuelven los marcados.
+     */
+    private static int cerco(int T) {
+        final int CX = com.darkcraft.morvain.Cerco.CX, CZ = com.darkcraft.morvain.Cerco.CZ, PISO = com.darkcraft.morvain.Cerco.PISO;
+        final var SA = com.darkcraft.morvain.SantuariosMorvain.porId("ancla_sur");
+        int t = T;
+        atTicks(t, "El cerco: desde el santuario del Ancla del Sur", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                quitarMarcados(sp.serverLevel());
+                comando(sp, "darkcraft cerco enemigos volver");
+                irMirando(sp, SA.x() - 4.5, SA.y() + 7, SA.z() + 9.5, CX, PISO + 8, CZ + 20, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv397_cerco_santuario");
+            server(m, sp -> log("  " + com.darkcraft.morvain.MorvainEnemigos.estadoCerco(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "El cerco: el camino de los marcados", m -> server(m, sp -> {
+            int[] c = com.darkcraft.morvain.Cerco.get().sitio("camino");
+            irMirando(sp, c[0] + 5.5, c[1] + 3.5, c[2] + 14.5, CX + 2, PISO + 4, CZ + 40, true);
+        }));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv398_cerco_camino"));
+        t += 10;
+        // ---- entrar a pie, en aventura: el cartel con el nombre, el logro y el aire del crater
+        atTicks(t, "El cerco: entrar", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft cerco enemigos fuera");
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), CX + 0.5, PISO, CZ + 29.5, 180f, -8f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura", m -> {
+            log("  crater: " + ClientMusic.crater());
+            shot(m, "cliente_mv399_cerco_entrar");
+            server(m, sp -> log("  al entrar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + ", logro cerco " + com.darkcraft.story.Logros.tiene(sp, "cerco")
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+        });
+        t += 10;
+        atTicks(t, "El cerco: vuelven los marcados", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft cerco enemigos volver");
+            });
+        });
+        t += 4;
+        atTicks(t, "El cerco: la puerta entre sus torres", m -> server(m, sp -> irMirando(sp, CX + 9.5, PISO + 4, CZ + 51.5, CX, PISO + 5, CZ + 34, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv400_cerco_puerta"));
+        t += 10;
+        atTicks(t, "El cerco: el patio y los rompedores ante el ancla", m -> server(m, sp -> irMirando(sp, CX - 15.5, PISO + 6, CZ + 25.5, CX, PISO + 3, CZ, true)));
+        t += 60;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv401_cerco_patio");
+            server(m, sp -> log("  el patio: " + com.darkcraft.morvain.MorvainEnemigos.estadoCerco(sp.server)));
+        });
+        t += 10;
+        atTicks(t, "El cerco: la escalera del ancla", m -> server(m, sp -> irMirando(sp, CX + 0.5, PISO + 1, CZ + 18.5, CX + 0.5, PISO + 8, CZ + 4, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv402_cerco_escalera"));
+        t += 10;
+        atTicks(t, "El cerco: desde lo alto del ancla, la cadena", m -> server(m, sp -> irMirando(sp, CX - 1.5, PISO + 8.6, CZ + 6.5, CX, PISO + 70, CZ - 110, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv403_cerco_cadena"));
+        t += 10;
+        atTicks(t, "El cerco: la fragua", m -> server(m, sp -> irMirando(sp, CX + 12.5, PISO + 3, CZ + 5.5, CX + 22, PISO + 1.5, CZ - 5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv404_cerco_fragua"));
+        t += 10;
+        atTicks(t, "El cerco: el campamento", m -> server(m, sp -> irMirando(sp, CX - 12.5, PISO + 3, CZ + 7.5, CX - 22, PISO + 0.5, CZ - 1, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv405_cerco_campamento"));
+        t += 10;
+        atTicks(t, "El cerco: la choza del primero y su atril", m -> server(m, sp -> irMirando(sp, CX + 17.5, PISO + 0.4, CZ + 20.5, CX + 21.5, PISO + 1, CZ + 18.5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv406_cerco_choza"));
+        t += 10;
+        atTicks(t, "El cerco: todo desde lo alto", m -> server(m, sp -> {
+            int[] a = com.darkcraft.morvain.Cerco.get().sitio("alto");
+            irMirando(sp, a[0] + 0.5, a[1], a[2] + 0.5, CX, PISO, CZ + 8, true);
+        }));
+        t += 90;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv407_cerco_alto");
+            server(m, sp -> log("  desde lo alto: " + com.darkcraft.morvain.MorvainEnemigos.estadoCerco(sp.server)));
+        });
+        t += 10;
+        // ---- en supervivencia, en el patio (al sur del ancla): los golpes de los marcados, de lado
+        atTicks(t, "El cerco: a pelear (supervivencia)", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> comando(sp, "darkcraft cerco enemigos fuera"));
+        });
+        t += 4;
+        final double ex = CX + 0.5, ez = CZ + 15.5;
+        final int R = com.darkcraft.enemigos.Marcado.ROMPEDOR, C = com.darkcraft.enemigos.Marcado.CABALLERO, Z = com.darkcraft.enemigos.Marcado.CAZADOR;
+        t = golpeMarcado(t, "mv408_marcado_mazazo", R, com.darkcraft.enemigos.MarcadoAnims.MAZAZO, 2.6, 20, ex, ez, PISO, false) + 30;
+        t = golpeMarcado(t, "mv409_marcado_barrido", R, com.darkcraft.enemigos.MarcadoAnims.BARRIDO, 2.6, 16, ex, ez, PISO, false) + 30;
+        t = golpeMarcado(t, "mv410_marcado_tajo", C, com.darkcraft.enemigos.MarcadoAnims.TAJO, 2.2, 11, ex, ez, PISO, false) + 30;
+        t = golpeMarcado(t, "mv411_marcado_estocada", C, com.darkcraft.enemigos.MarcadoAnims.ESTOCADA, 6.0, 13, ex, ez, PISO, false) + 30;
+        t = golpeMarcado(t, "mv412_marcado_escudazo", C, com.darkcraft.enemigos.MarcadoAnims.ESCUDAZO, 2.0, 8, ex, ez, PISO, false) + 30;
+        // ---- el escudo: el jugador le pega de frente y el caballero se cubre (el golpe casi no le entra)
+        atTicks(t, "El cerco: el escudo del caballero", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarMarcados(lvl);
+                aPelear(sp, true);
+                MARCADOS[0] = marcadoNuevo(lvl, C, ex, PISO, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+                irMirando(sp, ex, PISO, ez + 2.4, ex, PISO + 1.4, ez, false);
+                verDesdeServidor = new Vec3(ex + 3.8, PISO + 2.2, ez + 2.4);
+                miraServidor = new Vec3(ex, PISO + 1.2, ez + 0.9);
+            });
+        });
+        atTicks(t + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(t + 6, "El cerco: el jugador le pega de frente", m -> server(m, sp -> {
+            var a = MARCADOS[0];
+            if (a == null) return;
+            float antes = a.getHealth();
+            a.invulnerableTime = 0;
+            a.hurt(sp.damageSources().playerAttack(sp), 8f);
+            log(String.format(java.util.Locale.ROOT, "  el escudo: un golpe de 8 de frente le quita %.1f", antes - a.getHealth()));
+        }));
+        atTicks(t + 10, "captura: el escudo", m -> {
+            server(m, sp -> log("  el escudo: " + estadoMarcados()));
+            shot(m, "cliente_mv413_marcado_escudo");
+        });
+        t += 40;
+        t = golpeMarcado(t, "mv414_marcado_disparo", Z, com.darkcraft.enemigos.MarcadoAnims.DISPARO, 9.0, 15, ex, ez, PISO, false) + 30;
+        t = golpeMarcado(t, "mv415_marcado_flecha_negra", Z, com.darkcraft.enemigos.MarcadoAnims.FLECHA_NEGRA, 10.0, 24, ex, ez, PISO, false);
+        // la flecha negra llega: la vista se nubla (en primera persona)
+        t += 18;
+        atTicks(t, "El cerco: la vista nublada", m -> enPrimeraPersona(m));
+        t += 8;
+        atTicks(t, "captura: nublado", m -> {
+            server(m, sp -> log("  nublado: " + estadoMarcados() + " | jugador a oscuras " + sp.hasEffect(net.minecraft.world.effect.MobEffects.DARKNESS) + ", debil "
+                    + sp.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS)));
+            shot(m, "cliente_mv416_marcado_nublado");
+        });
+        t += 30;
+        t = golpeMarcado(t, "mv417_marcado_punzada", Z, com.darkcraft.enemigos.MarcadoAnims.PUNZADA, 2.2, 8, ex, ez, PISO, false) + 30;
+        // el desliz: se deshace en sombra y aparece unos bloques mas alla (visto desde arriba)
+        atTicks(t, "El cerco: el desliz", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarMarcados(lvl);
+                aPelear(sp, true);
+                MARCADOS[0] = marcadoNuevo(lvl, Z, ex, PISO, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+                irMirando(sp, ex, PISO, ez + 2.0, ex, PISO + 1.4, ez, false);
+                var a = MARCADOS[0];
+                if (a == null) return;
+                a.setTarget(sp);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(com.darkcraft.enemigos.MarcadoAnims.DESLIZ);
+                verDesdeServidor = new Vec3(ex + 7.5, PISO + 7.5, ez + 3.0);
+                miraServidor = new Vec3(ex, PISO + 0.5, ez + 0.5);
+            });
+        });
+        atTicks(t + 2, "camara desde arriba", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(t + 10, "captura: el desliz", m -> {
+            server(m, sp -> log("  el desliz: " + estadoMarcados()));
+            shot(m, "cliente_mv418_marcado_desliz");
+        });
+        t += 40;
+        // ---- la marca que arde: el reflejo repite el mazazo un instante despues
+        t = golpeMarcado(t, "mv419_marcado_marca_arde", R, com.darkcraft.enemigos.MarcadoAnims.MAZAZO, 2.6, 16, ex, ez, PISO, true);
+        t += 17;
+        atTicks(t, "captura: el reflejo", m -> {
+            server(m, sp -> {
+                StringBuilder r = new StringBuilder();
+                for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Marcado.class, new net.minecraft.world.phys.AABB(ex - 10, PISO - 2, ez - 10, ex + 10, PISO + 6, ez + 14)))
+                    if (e.reflejo()) r.append(' ').append(estadoE(e)).append(';');
+                log("  el reflejo:" + (r.length() == 0 ? " NINGUNO" : r) + " | " + estadoMarcados());
+            });
+            shot(m, "cliente_mv420_marcado_reflejo");
+        });
+        t += 40;
+        // ---- uno caido de bruces (en la ladera de dentro) que se alza al llegar el jugador
+        atTicks(t, "El cerco: un caballero caido de bruces", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarMarcados(lvl);
+                sp.removeAllEffects();
+                aPelear(sp, true);
+                MARCADOS[1] = marcadoNuevo(lvl, C, ex, PISO, ez, 0f, com.darkcraft.enemigos.Enemigo.TUMBADO);
+                irMirando(sp, ex + 0.5, PISO, ez + 7.0, ex, PISO + 0.3, ez, false);
+            });
+        });
+        t += 6;
+        atTicks(t, "captura: caido", m -> {
+            server(m, sp -> log("  caido: " + estadoMarcados()));
+            shot(m, "cliente_mv421_marcado_caido");
+        });
+        t += 4;
+        atTicks(t, "El cerco: el jugador se acerca", m -> server(m, sp -> irMirando(sp, ex + 0.5, PISO, ez + 2.8, ex, PISO + 1.0, ez, false)));
+        t += 24;
+        atTicks(t, "captura: se alza", m -> {
+            server(m, sp -> log("  se alza: " + estadoMarcados()));
+            shot(m, "cliente_mv422_marcado_se_alza");
+        });
+        t += 10;
+        // ---- uno que cae: se lleva la mano a la marca, cae de bruces y se deshace en sombra
+        atTicks(t, "El cerco: el caballero cae", m -> server(m, sp -> {
+            var a = MARCADOS[1];
+            if (a == null) return;
+            sp.setGameMode(GameType.CREATIVE);
+            a.setTarget(null);
+            verDesdeServidor = new Vec3(a.getX() + 3.8, a.getY() + 2.0, a.getZ() + 3.0);
+            miraServidor = new Vec3(a.getX(), a.getY() + 0.6, a.getZ() + 0.4);
+            a.invulnerableTime = 0;
+            a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+            a.setDeltaMovement(Vec3.ZERO);
+        }));
+        atTicks(t + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(t + 22, "captura: cae de bruces", m -> {
+            server(m, sp -> log("  cae: " + estadoMarcados()));
+            shot(m, "cliente_mv423_marcado_cae");
+        });
+        atTicks(t + 35, "captura: se deshace en sombra", m -> {
+            server(m, sp -> log("  se deshace: " + estadoMarcados() + " | logro marcado " + com.darkcraft.story.Logros.tiene(sp, "marcado")));
+            shot(m, "cliente_mv424_marcado_sombra");
+        });
+        t += 45;
+        atTicks(t, "El cerco: sin marcados (para el libro y el bestiario)", m -> server(m, sp -> {
+            quitarMarcados(sp.serverLevel());
+            sp.removeAllEffects();
+            sp.clearFire();
+            sp.setHealth(sp.getMaxHealth());
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        t += 6;
+        atTicks(t, "El cerco: el diario del primero", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(30));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv425_libro_primero"));
+        t += 6;
+        atTicks(t, "el bestiario: el caballero marcado (el que acaba de caer)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("marcado_caballero")));
+        });
+        t += 18;
+        atTicks(t, "captura: el caballero marcado en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv426_bestiario_marcado");
+        });
+        t += 4;
+        atTicks(t, "El cerco: fin (vuelven los marcados, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                quitarMarcados(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft cerco enemigos volver");
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

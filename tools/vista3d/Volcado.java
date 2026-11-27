@@ -838,6 +838,42 @@ public class Volcado {
                 for (var o : v.esperas()) marcas.put((n == 0 ? "J" : "P") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
                 andarAltar(lvl, v);
             }
+            case "morvain_cerco" -> {
+                // el Cerco del Ancla (parte 7u): la muralla redonda con sus torres y su puerta, el ancla del sur con la escalera
+                // tallada, la fragua, el campamento, la choza del primero con el libro 30 y el camino de los marcados desde el
+                // santuario del Ancla del Sur (-Dcaja=x0,z0,x1,z1 para un trozo)
+                String[] k = System.getProperty("caja", com.darkcraft.morvain.Cerco.X0 + "," + com.darkcraft.morvain.Cerco.Z0 + ","
+                        + com.darkcraft.morvain.Cerco.X1 + "," + com.darkcraft.morvain.Cerco.Z1).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 50);
+                Map<Long, BlockState> antes = new HashMap<>(MUNDO);
+                com.darkcraft.morvain.Cerco v = com.darkcraft.morvain.Cerco.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("El cerco: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " que esperan; "
+                        + v.estelas + " estelas, " + v.jaulas + " jaulas, " + v.yunques + " yunques, " + v.petates + " petates, " + v.farolas
+                        + " farolas; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas()) marcas.put((o.variante() == 0 ? "R" : o.variante() == 1 ? "C" : "Z") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarCerco(lvl, v, antes);
+            }
             case "morvain_grieta" -> {
                 // el Puente de la Grieta (parte 7s): la grieta con su sangre, el puente con su espadana, la puerta del norte, el paso,
                 // el cementerio, el humilladero, la hospederia con el libro 28 y el campamento de los penitentes
@@ -1363,6 +1399,89 @@ public class Volcado {
             }
         System.out.println("Anselmo y los penitentes: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan
                 + ", sin suelo " + sinSuelo + "; en la nave " + celdas + " celdas, con algo que estorba " + estorban);
+    }
+
+    /**
+     * El Cerco del Ancla (parte 7u): se llega a pie desde la entrada (junto al santuario del Ancla del Sur) a cada sitio (menos lo
+     * alto de las torres y el sitio para mirar) y a cada marcado (menos los cazadores de lo alto de las torres, que estan para
+     * dispararte); ninguno metido en un bloque y todos con suelo; la escalera sube a lo alto del ancla; y el cerco no toca ni la
+     * cadena (el hierro negro) ni la piramide del ancla (salvo la escalera), que son de la ciudadela.
+     */
+    static void andarCerco(WorldGenLevel lvl, com.darkcraft.morvain.Cerco v, Map<Long, BlockState> antes) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+            BlockState s = MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+            return s.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || s.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                    ? aire : s;
+        };
+        int[] e = v.sitio("entrada");
+        var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], com.darkcraft.morvain.Cerco.X0, com.darkcraft.morvain.Cerco.Z0,
+                com.darkcraft.morvain.Cerco.X1, com.darkcraft.morvain.Cerco.Z1, 6_000_000);
+        StringBuilder sb = new StringBuilder("a pie desde la entrada: " + z0.celdas() + " celdas;");
+        java.util.Set<String> mirar = java.util.Set.of("alto", "torre_este", "torre_oeste");
+        for (String s : v.sitios().keySet()) {
+            if (mirar.contains(s)) continue;
+            int[] q = v.sitio(s);
+            sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+        }
+        System.out.println(sb);
+        int malos = 0, chocan = 0, sinSuelo = 0, enAlto = 0;
+        for (var o : v.esperas()) {
+            boolean alto = o.grupo().equals("en_alto");
+            if (alto) enAlto++;
+            else if (!z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                malos++;
+                System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z());
+            }
+            for (int dy = 0; dy < 2; dy++) {
+                BlockState st = mundo.en(o.x(), o.y() + dy, o.z());
+                if (choca(st)) {
+                    chocan++;
+                    System.out.println("  " + o.grupo() + " metido en un bloque: " + o.x() + "," + (o.y() + dy) + "," + o.z() + " " + st);
+                }
+            }
+            BlockState abajo = mundo.en(o.x(), o.y() - 1, o.z());
+            if (!choca(abajo)) {
+                sinSuelo++;
+                System.out.println("  " + o.grupo() + " sin suelo: " + o.x() + "," + o.y() + "," + o.z() + " " + abajo);
+            }
+        }
+        // lo de la ciudadela: el hierro negro de la cadena (y el aro y las puas del ancla) y la piramide, salvo la escalera
+        int X = com.darkcraft.morvain.Cerco.CX, Z = com.darkcraft.morvain.Cerco.CZ, P = com.darkcraft.morvain.Cerco.PISO;
+        BlockState hierro = com.darkcraft.gen.TorreCupula.hierroNegro();
+        int hierros = 0, hierroTocado = 0, piramide = 0, piramideTocada = 0, escalera = 0;
+        for (var en : antes.entrySet()) {
+            long q = en.getKey();
+            int x = BlockPos.getX(q), y = BlockPos.getY(q), z = BlockPos.getZ(q);
+            BlockState ahora = MUNDO.getOrDefault(q, aire), era = en.getValue();
+            boolean esHierro = era.getBlock() == hierro.getBlock();
+            // la piramide de Ciudadela.ancla: lado 10 - (y - suelo) * 3 / 4 hasta suelo + 8, y las puas de las esquinas
+            int du = Math.abs(x - X), dw = Math.abs(z - Z), lado = 10 - Math.max(0, y - (P - 1)) * 3 / 4;
+            boolean enAncla = y >= P && !era.isAir() && (y <= P + 7 && Math.max(du, dw) <= lado || du == 11 && dw == 11 && y <= P + 6);
+            if (!esHierro && !enAncla) continue;
+            boolean deLaEscalera = Math.abs(x - X) <= 1 && z - Z >= 4 && z - Z <= 11 && y >= P && y <= P + 9;
+            if (esHierro) {
+                hierros++;
+                if (ahora != era) {
+                    hierroTocado++;
+                    if (hierroTocado <= 5) System.out.println("  la cadena tocada en " + x + "," + y + "," + z + ": " + ahora);
+                }
+            } else {
+                piramide++;
+                if (ahora != era) {
+                    if (deLaEscalera) escalera++;
+                    else {
+                        piramideTocada++;
+                        if (piramideTocada <= 5) System.out.println("  el ancla tocada en " + x + "," + y + "," + z + ": " + era + " -> " + ahora);
+                    }
+                }
+            }
+        }
+        // la escalera: de lo alto de cada peldano al siguiente, y desde el patio a la cima
+        boolean cima = z0.alcanza(X, P + 8, Z + 3, 1.5);
+        System.out.println("Los marcados: " + v.esperas().size() + " (en lo alto de las torres " + enAlto + "), a los que no se llega " + malos
+                + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo + "; la cima del ancla a pie " + cima + "; la ciudadela: hierro "
+                + hierros + " (tocado " + hierroTocado + "), piramide " + piramide + " (tocada " + piramideTocada + ", la escalera " + escalera + ")");
     }
 
     /**

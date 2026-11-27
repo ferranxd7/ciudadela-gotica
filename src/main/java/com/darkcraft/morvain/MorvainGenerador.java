@@ -231,6 +231,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el altar en el chunk {}", c.getPos(), t);
         }
+        // el Cerco del Ancla, en la ladera del crater, al pie del ancla del sur (parte 7u)
+        try {
+            if (Cerco.toca(c.getPos().x, c.getPos().z)) Cerco.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el cerco del ancla en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

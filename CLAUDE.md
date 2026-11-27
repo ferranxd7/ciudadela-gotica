@@ -2697,6 +2697,83 @@ Despues, el crater con la Sombra.
   (`mv393`), el cartel (`mv394`), su ultimo sermon (`mv395`) y el bestiario (`mv396`). `LIMIT` 101 min (`lanzar.sh` 107 y 105 min, el
   paso 135, el trabajo 183).
 
+### Plan grande, parte 7u: el Crater de Sangre — los Marcados y el Cerco del Ancla
+
+Respuestas 125, 131 y 132 del plan; la novena region con su contenido: el crater, al pie de la cadena del sur (despues, la **7v**:
+Aldric, el Primer Marcado, el jefe del crater, que abre la subida por la cadena; luego los especiales y la Sombra).
+- **El marcado** (`enemigos/Marcado`, entidad `darkcraft:marcado`, 0,65 x 1,95; modelo de `tools/enemigos/marcado.py`, escala 1,04;
+  `MarcadoGeometria/Animaciones`, `MarcadoAnims`, `client/enemigos/MarcadoModelo` y `MarcadoRenderer` —el rompedor a escala 1,12—).
+  Los de Morvain a los que la Sombra saco de la muerte ANTES que al jugador, con la misma marca (el ojo en el aro roto con tres
+  espinas, en la capa de brillo con los ojos), para que rompieran sus cadenas; no pudieron. Tres: **rompedor** (58 de vida, 7,5 de
+  golpe, 5 de armadura; desnudo bajo el delantal de herrero, grilletes y la marca a fuego en la frente, el mazo de forja: el
+  **mazazo** —lo alza sobre la cabeza y lo estrella: la **onda**, a `ONDA_DELANTE` 2,9 y radio `R_ONDA` 2,7, x0,6 del golpe a quien
+  este de pie, lo levanta y le frena— y el **barrido**; de rodillas golpea el suelo al pie del ancla al ritmo de su bucle, con el
+  golpe de la cadena —`sfx.marcado_cadena`— y chispas, todo en el cliente), **caballero** (48, 6, 8; armadura negra con la marca en
+  la coraza, yelmo con espina, escudo con el ojo pintado: el **tajo**, la **estocada** a fondo —de 3,8 a 7,5 bloques, cada 5 s— y el
+  **escudazo**, que se lleva 32 de estamina y frena; **se cubre** de frente —70 grados a cada lado, quieto o en su `BLOQUEO`—: el
+  golpe x0,25 (`ESCUDO`), las flechas nada; ni fuego ni explosiones ni lo que salta la armadura) y **cazador** (34, 5, 2; capucha,
+  embozo y gaban, el arco y la aljaba: el **disparo** —`Flecha`, con `tiro`— desde lejos y desde lo alto —16 de desnivel—, la **flecha
+  negra** —`enemigos/FlechaNegra`: tensa 29 ticks con la sombra enroscandose; a quien da, `DARKNESS` 130 y `WEAKNESS` 90; cada 9 s—, la
+  **punzada** con la flecha de la mano y el **desliz** —si se le acercan: se deshace en sombra y aparece de 4,5 a 7,5 bloques, de lado o
+  hacia atras, donde haya suelo; cada 5 s—). **La marca arde** a media vida (fogonazo rojo, brasas del pecho; sincronizado `ARDE`):
+  desde entonces cada golpe y cada disparo lo repite su **reflejo** `RETRASO` 12 ticks despues desde donde lo dio (otro `Marcado` con
+  `REFLEJO`: medio transparente y oscuro —`MarcadoModelo` translucido—, sin gravedad, no se le apunta, no se le empuja ni se le puede
+  pegar, no se guarda; hace ese golpe hacia donde se dio y se deshace al acabar). Esperan **de rodillas** (`REZA`: se levantan),
+  **caidos de bruces** como un muerto mas (`TUMBADO`: se alzan de golpe, `ALZADOS`) o de guardia. Al morir se llevan la mano a la
+  marca, caen de bruces y **se deshacen en sombra** (`tickDeath` propio, `DESHECHOS`). Deja piedra de forja I (8 %) y II (7 % el
+  rompedor, 4 %). Bestiario `marcado_rompedor` / `_caballero` / `_cazador`; logro `marcado` ("Lo que pudiste ser"). Contadores para las
+  pruebas: `MAZAZOS`, `ONDAS`, `BARRIDOS`, `TAJOS`, `ESTOCADAS`, `ESCUDAZOS`, `PARADOS`, `DISPAROS`, `NEGRAS`, `NUBLADOS`, `PUNZADAS`,
+  `DESLICES`, `REFLEJOS`, `REFLEJOS_DAN`; `reflejoDe(accion)` y `encenderMarca()`.
+- **El Cerco del Ancla** (`morvain/Cerco`, en la ladera de dentro del crater, al pie del ancla del sur —la de la cadena
+  `Ciudadela.CADENAS[2]`— y a la puerta del santuario del Ancla del Sur —(50, 1080), 220 al sur, su tarima no se toca: `SANT_R` 6—;
+  `CX` 0, `CZ` 860, `SUELO` el del ancla y `PISO` uno mas; u = x - CX, v = z - CZ, el norte —v negativa— hacia el lago y la ciudadela;
+  se dibuja chunk a chunk al adornar y en su caja —`X0..Z1`— `Adorno` no pone nada). La **terraza** allanada (radio `R_LLANO` 39, se
+  funde en `FUNDE` 10; corta como mucho hasta `PISO + 5`: la cadena pasa por encima) con el suelo roto a golpes; la **muralla**
+  redonda (de `R_MURO0` 32,5 a `R_MURO1` 34,5, 6 de alto, almenas y la banda de piedra de sombra con sus runas) con la **puerta**
+  apuntada al sur entre dos **torres** y cuatro mas en las esquinas (macizas, 10 de alto, merlones); el **ancla** (la piramide de la
+  ciudadela: no se toca —`piramide`—, salvo la **escalera** tallada en su cara del sur, tres de ancho, hasta lo alto donde empieza
+  la cadena, con sus velas rojas); alrededor, los golpes (cadenas rotas, piedra suelta y velas); la **fragua** al este (el hogar con
+  las brasas y su chimenea, dos yunques rotos, dos altos hornos, el pilon de sangre, la piedra de afilar, los mazos rotos y montones de
+  cadena y carbon), el **campamento** al oeste (cuatro petates, la hoguera fria con sus troncos, barriles y el arcon `chests/cerco`) y
+  la **choza del primero** al sureste (la cama, la mesa con velas, el **atril con el libro perdido 30** —"El diario del primero", de
+  Aldric; `Perdidos.TOTAL` = 30— y el arcon `chests/cerco_bueno`), ocho farolas de almas; y del santuario a la puerta el **camino de
+  los marcados** (losas negras rotas por la ladera, nueve **estelas** —poste de piedra negra con su remate, una calavera o una vela al
+  pie— y dos **jaulas** colgadas de su horca con sus huesos). Botin: `chests/cerco` (cadena, pepitas y lingotes de hierro, carbon,
+  huesos, frutos, piedras de forja) y `cerco_bueno`. Sitios (`Cerco.sitio`): `entrada`, `camino`, `puerta`, `patio`, `ancla`, `cima`,
+  `fragua`, `campamento`, `choza`, `atril`, `arcon`, `torre_este`, `torre_oeste` y `alto` (estos tres, solo para mirar). El Espejo:
+  "El Cerco del Ancla" (`Cerco.dentro`: lo allanado y el camino); logro `cerco` ("Al pie de la cadena") al entrar en la muralla
+  (`enCerco`, y no muy por encima).
+- **Los puestos** (`MorvainEnemigos`, sitio `cerco`, 25, de `Cerco.esperas`): por el camino tres de rodillas mirando a la cadena y dos
+  caidos de bruces; a la puerta dos caballeros de guardia y en lo alto de las torres los **cazadores** (las dos de la puerta y las dos
+  del norte: `en_alto`, no se llega a ellos: estan para disparar); al pie del ancla cinco **rompedores de rodillas** golpeandola; en el
+  patio dos caballeros de ronda, uno a la puerta de la choza y un cazador en lo alto del ancla; en la fragua un rompedor de rodillas ante
+  el yunque y otro de pie; en el campamento dos caidos en los petates y uno de rodillas junto a la hoguera.
+- **El crater suena** (`ClientMusic.tickCrater`): en su region (`Region.CENTRO`) entre Y 40 y 330, `ambiente.crater` (las cadenas
+  que crujen arriba, golpes de hierro lejanos, un zumbido grave y viento seco).
+- Sonidos (ElevenLabs, flow `sjsGv1UGBLAnN0YbBhO1`, `TOMAS_SFX`): `marcado_alerta` (1 y 3), `marcado_dolor` (2 y 4), `marcado_muerte`
+  (1 y 2), `marcado_mazazo` (3 y 1), `marcado_cadena` (1 y 3), `marcado_reflejo` (2 y 3), `marcado_desliz` (4 y 3), `marcado_flecha`
+  (1 y 4), `marcado_susurro` (2 y 3, el sonido de estar), `marcado_esfuerzo` (3 y 1) y `crater_ambiente` (3 y 1, `stream`).
+- Comandos `/darkcraft cerco [ir <sitio> | enemigos [volver | fuera | sacar]]` (sin mas: como esta).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_cerco carpeta` (marcas R rompedor, C caballero, Z cazador): si se llega a pie
+  desde la entrada a cada sitio (menos lo alto de las torres y `alto`) y a cada marcado (menos los de lo alto de las torres), que
+  ninguno esta metido en un bloque, que todos tienen suelo, que se sube a lo alto del ancla y que el cerco no toca ni el hierro de la
+  cadena ni la piramide (salvo la escalera).
+- Pruebas: servidor, lineas `Morvain, el cerco del ancla: ...` (el atril con el libro 30, el arcon, la escalera 8/8, la puerta, el
+  ancla, el pilon, el suelo del patio; a pie desde la entrada; vistas `morvain_cerco.png` y `morvain_cerco_patio.png`), `Morvain, los
+  marcados: ...`, `Morvain, los marcados en accion: ...` (el de rodillas se levanta y el caido se alza; cada accion de cada uno acaba),
+  `Morvain, los marcados contra una presa: ...` (el mazazo y su onda, el barrido, el tajo, la estocada que se tira, el escudazo, el
+  disparo, la flecha negra que nubla y debilita, la punzada y el desliz), `Morvain, el escudo del caballero: ...` (de frente, por la
+  espalda, una flecha; la marca arde a media vida), `Morvain, el reflejo de los marcados: ...` (el mazazo, el tajo y el disparo
+  repetidos; no se le puede pegar; se deshace) y `Morvain, un marcado que cae: ...`; cliente, tramo `cerco()` despues del altar: desde
+  el santuario (`cliente_mv397`), el camino (`mv398`), entrar a pie con el cartel, el logro y el aire del crater (`mv399`), la puerta
+  (`mv400`), el patio con los rompedores (`mv401`), la escalera (`mv402`), la cadena desde lo alto del ancla (`mv403`), la fragua
+  (`mv404`), el campamento (`mv405`), la choza y su atril (`mv406`), todo desde lo alto (`mv407`); en supervivencia, en el patio: el
+  mazazo (`mv408`), el barrido (`mv409`), el tajo (`mv410`), la estocada (`mv411`), el escudazo (`mv412`), el escudo (`mv413`), el
+  disparo (`mv414`), la flecha negra (`mv415`) y la vista nublada (`mv416`), la punzada (`mv417`), el desliz (`mv418`), la marca que arde
+  (`mv419`) y su reflejo (`mv420`), uno caido de bruces (`mv421`) que se alza (`mv422`), uno que cae (`mv423`) y se deshace en sombra
+  (`mv424`), el diario del primero (`mv425`) y el bestiario (`mv426`). `LIMIT` 105 min (`lanzar.sh` 111 y 109 min, el paso 139, el
+  trabajo 187).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

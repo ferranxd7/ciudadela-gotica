@@ -390,6 +390,10 @@ public final class Morvain {
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Altar.enNave(p.getX(), p.getZ()) && Math.abs(p.getY() - Altar.PISO) < 8)
                 com.darkcraft.story.Logros.dar(p, "altar");
+        // y quien entra en el Cerco del Ancla, al pie de la cadena (parte 7u)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Cerco.enCerco(p.getX(), p.getZ()) && Math.abs(p.getY() - Cerco.PISO) < 12)
+                com.darkcraft.story.Logros.dar(p, "cerco");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -476,6 +480,7 @@ public final class Morvain {
         if (Costillar.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Costillar.PISO) < 40) return "darkcraft.morvain.lugar.costillar";
         // el Altar Profanado, donde reza Anselmo (parte 7t)
         if (Altar.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Altar.PISO) < 40) return "darkcraft.morvain.lugar.altar";
+        if (Cerco.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Cerco.PISO) < 40) return "darkcraft.morvain.lugar.cerco";
         // el Puente de la Grieta (parte 7s): tambien en el fondo de la grieta
         if (Grieta.dentro(p.getX(), p.getZ()) && p.getY() > Grieta.FONDO - 4 && p.getY() < Grieta.PISO + 40) return "darkcraft.morvain.lugar.grieta";
         // el Observatorio de la Rectora (parte 7p)

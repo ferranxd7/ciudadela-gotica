@@ -61,6 +61,7 @@ public final class Comandos {
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoAcademia())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoPuerto())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoGrieta())
+                .then(com.darkcraft.morvain.MorvainEnemigos.comandoCerco())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoBallenero())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoPontifice())
                 .then(com.darkcraft.rol.Rol.comando())
@@ -138,6 +139,7 @@ public final class Comandos {
         src.sendSuccess(() -> linea(new Linea("/darkcraft academia ", "/darkcraft academia [ir <sitio> | enemigos [volver | fuera | sacar]]", "academia")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft puerto ", "/darkcraft puerto [ir <sitio> | enemigos [volver | fuera | sacar]]", "puerto")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft grieta ", "/darkcraft grieta [ir <sitio> | campana | enemigos [volver | fuera | sacar]]", "grieta")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft cerco ", "/darkcraft cerco [ir <sitio> | enemigos [volver | fuera | sacar]]", "cerco")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ballenero ", "/darkcraft ballenero [ir | vencer | volver | costillar <sitio>]", "ballenero")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft pontifice ", "/darkcraft pontifice [ir | vencer | volver | altar <sitio>]", "pontifice")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ecos ", "/darkcraft ecos / ecos dar <n> / ecos quitar", "ecos")), false);

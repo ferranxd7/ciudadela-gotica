@@ -742,6 +742,7 @@ public final class CiTest {
         costillar(server, m, log, out);
         grieta(server, m, log, out);
         altar(server, m, log, out);
+        cerco(server, m, log, out);
     }
 
     /**
@@ -2035,6 +2036,8 @@ public final class CiTest {
                         presa.move(net.minecraft.world.entity.MoverType.SELF, dv);
                         presa.setDeltaMovement(dv.x * 0.55, presa.onGround() ? 0 : dv.y - 0.08, dv.z * 0.55);
                     }
+                    // pisa el suelo (para la onda del cruzazo: sin IA ni mundo que se mueva, el juego no lo apunta)
+                    if (Math.abs(presa.getY() - PISO) < 0.05) presa.setOnGround(true);
                     sangre = Math.max(sangre, com.darkcraft.enemigos.Sangrado.nivel(presa));
                     frenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
                     ardiendo |= presa.isOnFire();
@@ -2851,6 +2854,386 @@ public final class CiTest {
             } catch (Throwable t) {
                 log.println("Morvain, el Pontifice vuelve: ERROR " + t);
             }
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /** Lo que dejan los marcados (las flechas y los reflejos): un tick, a mano (la prueba no mueve el mundo). */
+    private static void tickMarcados(ServerLevel m, net.minecraft.world.phys.AABB caja, java.util.List<net.minecraft.world.entity.Entity> quitar) {
+        java.util.List<net.minecraft.world.entity.Entity> l = new java.util.ArrayList<>();
+        l.addAll(m.getEntitiesOfClass(com.darkcraft.enemigos.Flecha.class, caja));
+        for (var r : m.getEntitiesOfClass(com.darkcraft.enemigos.Marcado.class, caja)) if (r.reflejo()) l.add(r);
+        for (var e : l) {
+            if (e.isRemoved()) continue;
+            if (!quitar.contains(e)) quitar.add(e);
+            e.tickCount++;
+            e.tick();
+        }
+    }
+
+    /**
+     * Parte 7u: el Cerco del Ancla (a pie desde el santuario del Ancla del Sur a todos sus sitios —menos lo alto de las torres— y a
+     * cada marcado —menos los cazadores de lo alto de las torres—; el atril con el libro 30, el arcon, la escalera del ancla, la
+     * puerta, el pilon y el suelo del patio) y los marcados: en sus puestos (de rodillas golpeando el ancla, caidos de bruces o de
+     * guardia), uno de rodillas que se levanta y uno de bruces que se alza; cada accion de cada uno acaba; sus golpes a una presa (el
+     * mazazo con su onda, el barrido, el tajo, la estocada que se tira a fondo, el escudazo, el disparo, la flecha negra que nubla, la
+     * punzada y el desliz); el escudo del caballero (de frente, por la espalda y una flecha); la marca que arde a media vida y el
+     * reflejo que repite el golpe (no se le puede pegar y se deshace); y uno que cae y se deshace en sombra. Al acabar, como estaba.
+     */
+    private static void cerco(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.CERCO;
+        var A = com.darkcraft.morvain.Cerco.get();
+        final int CX = com.darkcraft.morvain.Cerco.CX, CZ = com.darkcraft.morvain.Cerco.CZ, PISO = com.darkcraft.morvain.Cerco.PISO;
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : A.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || st.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                        ? aire : st;
+            };
+            int[] en = A.sitio("entrada");
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, en[0], en[1], en[2], com.darkcraft.morvain.Cerco.X0, com.darkcraft.morvain.Cerco.Z0,
+                    com.darkcraft.morvain.Cerco.X1, com.darkcraft.morvain.Cerco.Z1, 6_000_000);
+            StringBuilder ap = new StringBuilder();
+            int llega = 0, sitios = 0;
+            java.util.Set<String> mirar = java.util.Set.of("alto", "torre_este", "torre_oeste");
+            for (var e : A.sitios().entrySet()) {
+                if (mirar.contains(e.getKey())) continue;
+                sitios++;
+                int[] q = e.getValue();
+                if (zona.alcanza(q[0], q[1], q[2], 2)) llega++;
+                else ap.append(' ').append(e.getKey());
+            }
+            int lejos = 0, enAlto = 0;
+            for (var o : A.esperas()) {
+                if (o.grupo().equals("en_alto")) enAlto++;
+                else if (!zona.alcanza(o.x(), o.y(), o.z(), 2)) lejos++;
+            }
+            var sc = com.darkcraft.morvain.SantuariosMorvain.porId("ancla_sur");
+            log.println("Morvain, el cerco del ancla: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Cerco.resumen(m) + "; santuario "
+                    + com.darkcraft.santuario.Santuarios.nombre(m, sc.pos()) + " (" + m.getBlockState(sc.pos()).getBlock().getDescriptionId() + ") a "
+                    + Math.round(com.darkcraft.morvain.Cerco.distancia(sc.x(), sc.z())) + " del ancla; a pie desde la entrada (" + zona.celdas() + " celdas) a "
+                    + llega + " de " + sitios + " sitios" + (ap.length() == 0 ? "" : ", no a:" + ap) + "; marcados a los que no se llega " + lejos + " de "
+                    + (A.esperas().size() - enAlto) + " (y " + enAlto + " en lo alto de las torres); estelas " + A.estelas + ", jaulas " + A.jaulas + ", farolas "
+                    + A.farolas + "; lugar en el patio " + (com.darkcraft.morvain.Cerco.dentro(CX + 0.5, CZ + 22.5) ? "cerco" : "NO") + " (dentro de la muralla "
+                    + com.darkcraft.morvain.Cerco.enCerco(CX + 0.5, CZ + 22.5) + "), en el camino " + com.darkcraft.morvain.Cerco.dentro(A.sitio("camino")[0] + 0.5,
+                    A.sitio("camino")[2] + 0.5) + ", en el santuario " + com.darkcraft.morvain.Cerco.dentro(sc.x() + 0.5, sc.z() + 0.5) + " (tiene que ser false)");
+            topView(m, CX + 10, CZ + 70, 130, new File(out, "morvain_cerco.png"));
+            topView(m, CX, CZ, 40, new File(out, "morvain_cerco_patio.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, el cerco del ancla: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] cerco", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        final double gx = CX - 5.5, gz = CZ + 20.5;
+        final var caja = new net.minecraft.world.phys.AABB(gx - 30, PISO - 6, gz - 30, gx + 30, PISO + 20, gz + 30);
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 10; k++)
+                for (var e : fuera) if (e.isAlive()) e.tick();
+            int rezando = 0, caidos = 0, dePie = 0, enSuelo = 0, chocan = 0;
+            int[] porVariante = new int[3];
+            StringBuilder mal = new StringBuilder();
+            com.darkcraft.enemigos.Marcado rodillas = null, caido = null;
+            for (var e : fuera) {
+                if (!(e instanceof com.darkcraft.enemigos.Marcado c)) continue;
+                porVariante[Math.max(0, Math.min(2, c.variante()))]++;
+                if (!m.noCollision(c)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(c.blockPosition().toShortString()).append(';');
+                }
+                if (c.postura() == com.darkcraft.enemigos.Enemigo.REZA) {
+                    rezando++;
+                    if (rodillas == null) rodillas = c;
+                } else if (c.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) {
+                    caidos++;
+                    if (caido == null) caido = c;
+                } else dePie++;
+                var abajo = m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ()));
+                if (!abajo.getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+                else if (mal.length() < 400) mal.append(' ').append(c.tipo()).append(" en el aire en ").append(c.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, los marcados: " + com.darkcraft.morvain.MorvainEnemigos.comprobar() + "; fuera " + fuera.size() + " de "
+                    + com.darkcraft.morvain.MorvainEnemigos.cerco().size() + " (rompedores " + porVariante[0] + ", caballeros " + porVariante[1] + ", cazadores "
+                    + porVariante[2] + "): de rodillas " + rezando + ", caidos de bruces " + caidos + ", de pie " + dePie + " (en su suelo " + enSuelo
+                    + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+            StringBuilder sb = new StringBuilder("Morvain, los marcados en accion:");
+            // ---- el de rodillas se levanta y el caido de bruces se alza (una presa a su lado)
+            int alz = com.darkcraft.enemigos.Marcado.ALZADOS;
+            for (var c : new com.darkcraft.enemigos.Marcado[]{rodillas, caido}) {
+                if (c == null) {
+                    sb.append(" NO HAY ").append(c == rodillas ? "NINGUNO DE RODILLAS;" : "NINGUNO CAIDO;");
+                    continue;
+                }
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (presa == null) continue;
+                presa.moveTo(c.getX() + 1.5, c.getY(), c.getZ() + 0.5, 0f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(presa);
+                quitar.add(presa);
+                int antes = c.postura();
+                c.setTarget(presa);
+                int sale = -1;
+                for (int k = 0; k < 80; k++) {
+                    c.tickCount++;
+                    c.tick();
+                    int a = c.accion();
+                    if (sale < 0 && (a == com.darkcraft.enemigos.MarcadoAnims.LEVANTARSE || a == com.darkcraft.enemigos.MarcadoAnims.ALZARSE)) sale = k;
+                    if (sale >= 0 && a == 0) break;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " el %s (%s, en %s) se %s en el tick %d y queda de pie %s;", c.tipo(),
+                        antes == com.darkcraft.enemigos.Enemigo.REZA ? "de rodillas" : "de bruces", c.blockPosition().toShortString(),
+                        antes == com.darkcraft.enemigos.Enemigo.REZA ? "levanta" : "alza", sale, c.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE));
+                c.setTarget(null);
+            }
+            sb.append(" alzados de bruces +").append(com.darkcraft.enemigos.Marcado.ALZADOS - alz).append(';');
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
+            // ---- en el patio (de cara al este): uno de cada, cada accion suya acaba
+            int[][] suyas = {
+                    {com.darkcraft.enemigos.MarcadoAnims.MAZAZO, com.darkcraft.enemigos.MarcadoAnims.BARRIDO},
+                    {com.darkcraft.enemigos.MarcadoAnims.TAJO, com.darkcraft.enemigos.MarcadoAnims.ESTOCADA, com.darkcraft.enemigos.MarcadoAnims.ESCUDAZO,
+                            com.darkcraft.enemigos.MarcadoAnims.BLOQUEO},
+                    {com.darkcraft.enemigos.MarcadoAnims.DISPARO, com.darkcraft.enemigos.MarcadoAnims.FLECHA_NEGRA, com.darkcraft.enemigos.MarcadoAnims.PUNZADA,
+                            com.darkcraft.enemigos.MarcadoAnims.DESLIZ}};
+            int[] comunes = {com.darkcraft.enemigos.MarcadoAnims.ATURDIDO, com.darkcraft.enemigos.MarcadoAnims.LEVANTARSE, com.darkcraft.enemigos.MarcadoAnims.ALZARSE};
+            for (int v2 = 0; v2 < 3; v2++) {
+                var a = DarkCraftMod.MARCADO.get().create(m);
+                if (a == null) continue;
+                a.variante(v2);
+                a.moveTo(gx, PISO, gz, -90f, 0f);
+                m.addFreshEntity(a);
+                quitar.add(a);
+                StringBuilder no = new StringBuilder();
+                java.util.List<Integer> lista = new java.util.ArrayList<>();
+                for (int ac : suyas[v2]) lista.add(ac);
+                for (int ac : comunes) lista.add(ac);
+                for (int ac : lista) {
+                    String nombre = com.darkcraft.enemigos.MarcadoAnims.NOMBRES[ac];
+                    a.moveTo(gx, PISO, gz, -90f, 0f);
+                    a.empezar(ac);
+                    for (int k = 0; k < 90 && a.accion() == ac; k++) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    if (a.accion() == ac) no.append(' ').append(nombre);
+                    for (int k = 0; k < 10; k++) a.tick();
+                }
+                sb.append(' ').append(a.tipo()).append(String.format(java.util.Locale.ROOT, " (vida %.0f, golpe %.1f, armadura %d)", a.getMaxHealth(),
+                        a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), a.getArmorValue()))
+                        .append(": acciones que no acaban").append(no.length() == 0 ? " ninguna" : no).append(';');
+                a.discard();
+            }
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Flecha.class, caja)) f.discard();
+            log.println(sb);
+            // ---- contra una presa (un aldeano quieto en el patio, al este del marcado)
+            sb = new StringBuilder("Morvain, los marcados contra una presa:");
+            int maz = com.darkcraft.enemigos.Marcado.MAZAZOS, ond = com.darkcraft.enemigos.Marcado.ONDAS, bar = com.darkcraft.enemigos.Marcado.BARRIDOS,
+                    taj = com.darkcraft.enemigos.Marcado.TAJOS, est = com.darkcraft.enemigos.Marcado.ESTOCADAS, esc = com.darkcraft.enemigos.Marcado.ESCUDAZOS,
+                    dis = com.darkcraft.enemigos.Marcado.DISPAROS, neg = com.darkcraft.enemigos.Marcado.NEGRAS, nub = com.darkcraft.enemigos.Marcado.NUBLADOS,
+                    pun = com.darkcraft.enemigos.Marcado.PUNZADAS, des = com.darkcraft.enemigos.Marcado.DESLICES;
+            String[] nombres = {"mazazo", "barrido", "tajo", "estocada", "escudazo", "disparo", "flecha negra", "punzada", "desliz"};
+            int[] acciones = {com.darkcraft.enemigos.MarcadoAnims.MAZAZO, com.darkcraft.enemigos.MarcadoAnims.BARRIDO, com.darkcraft.enemigos.MarcadoAnims.TAJO,
+                    com.darkcraft.enemigos.MarcadoAnims.ESTOCADA, com.darkcraft.enemigos.MarcadoAnims.ESCUDAZO, com.darkcraft.enemigos.MarcadoAnims.DISPARO,
+                    com.darkcraft.enemigos.MarcadoAnims.FLECHA_NEGRA, com.darkcraft.enemigos.MarcadoAnims.PUNZADA, com.darkcraft.enemigos.MarcadoAnims.DESLIZ};
+            int R = com.darkcraft.enemigos.Marcado.ROMPEDOR, C = com.darkcraft.enemigos.Marcado.CABALLERO, Z = com.darkcraft.enemigos.Marcado.CAZADOR;
+            int[] variantes = {R, R, C, C, C, Z, Z, Z, Z};
+            double[] dist = {2.6, 2.6, 2.2, 6.0, 2.0, 9.0, 10.0, 2.2, 2.0};
+            int[] dura = {50, 45, 35, 40, 30, 60, 70, 30, 30};
+            for (int i = 0; i < nombres.length; i++) {
+                var a = DarkCraftMod.MARCADO.get().create(m);
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (a == null || presa == null) continue;
+                a.variante(variantes[i]);
+                a.moveTo(gx, PISO, gz, -90f, 0f);
+                presa.moveTo(gx + dist[i], PISO, gz, 90f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(a);
+                m.addFreshEntity(presa);
+                quitar.add(a);
+                quitar.add(presa);
+                a.setTarget(presa);
+                a.setYRot(-90f);
+                a.yBodyRot = a.yHeadRot = -90f;
+                a.empezar(acciones[i]);
+                float vida = presa.getHealth();
+                double x0 = a.getX(), z0 = a.getZ(), lejos = 0;
+                boolean nublada = false, debil = false, frenada = false;
+                for (int k = 0; k < dura[i]; k++) {
+                    if (!a.isRemoved()) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    tickMarcados(m, caja, quitar);
+                    // la presa se mueve con lo que le den (los empujones): a mano, que sin IA no anda; y pisa el suelo (para la onda)
+                    net.minecraft.world.phys.Vec3 dv = presa.getDeltaMovement();
+                    if (dv.lengthSqr() > 1e-4) {
+                        presa.move(net.minecraft.world.entity.MoverType.SELF, dv);
+                        presa.setDeltaMovement(dv.x * 0.55, presa.onGround() ? 0 : dv.y - 0.08, dv.z * 0.55);
+                    }
+                    if (Math.abs(presa.getY() - PISO) < 0.05) presa.setOnGround(true);
+                    nublada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.DARKNESS);
+                    debil |= presa.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS);
+                    frenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                    lejos = Math.max(lejos, Math.hypot(a.getX() - x0, a.getZ() - z0));
+                    presa.invulnerableTime = 0;
+                }
+                String extra = switch (nombres[i]) {
+                    case "mazazo", "escudazo" -> ", frenada " + frenada;
+                    case "estocada" -> String.format(java.util.Locale.ROOT, ", se tira %.1f", lejos);
+                    case "flecha negra" -> ", nublada " + nublada + ", debil " + debil;
+                    case "desliz" -> String.format(java.util.Locale.ROOT, ", aparece a %.1f de donde estaba y a %.1f de la presa", lejos, a.distanceTo(presa));
+                    default -> "";
+                };
+                sb.append(String.format(java.util.Locale.ROOT, " %s (%s) a %.1f: la presa -%.1f%s;", nombres[i], a.tipo(), dist[i], vida - presa.getHealth(), extra));
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Flecha.class, caja)) f.discard();
+                a.discard();
+                presa.discard();
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " mazazos +%d (ondas +%d), barridos +%d, tajos +%d, estocadas +%d, escudazos +%d, disparos +%d,"
+                            + " flechas negras +%d (nublan +%d), punzadas +%d, deslices +%d",
+                    com.darkcraft.enemigos.Marcado.MAZAZOS - maz, com.darkcraft.enemigos.Marcado.ONDAS - ond, com.darkcraft.enemigos.Marcado.BARRIDOS - bar,
+                    com.darkcraft.enemigos.Marcado.TAJOS - taj, com.darkcraft.enemigos.Marcado.ESTOCADAS - est, com.darkcraft.enemigos.Marcado.ESCUDAZOS - esc,
+                    com.darkcraft.enemigos.Marcado.DISPAROS - dis, com.darkcraft.enemigos.Marcado.NEGRAS - neg, com.darkcraft.enemigos.Marcado.NUBLADOS - nub,
+                    com.darkcraft.enemigos.Marcado.PUNZADAS - pun, com.darkcraft.enemigos.Marcado.DESLICES - des));
+            log.println(sb);
+            // ---- el escudo del caballero: de frente, por la espalda y una flecha de frente
+            sb = new StringBuilder("Morvain, el escudo del caballero:");
+            var cab = DarkCraftMod.MARCADO.get().create(m);
+            var otro = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            if (cab != null && otro != null) {
+                cab.variante(C);
+                cab.moveTo(gx, PISO, gz, -90f, 0f);
+                cab.yBodyRot = cab.yHeadRot = -90f;
+                otro.setNoAi(true);
+                m.addFreshEntity(cab);
+                m.addFreshEntity(otro);
+                quitar.add(cab);
+                quitar.add(otro);
+                int par = com.darkcraft.enemigos.Marcado.PARADOS;
+                float[] quita = new float[3];
+                for (int vez = 0; vez < 3; vez++) {
+                    cab.setHealth(cab.getMaxHealth());
+                    cab.invulnerableTime = 0;
+                    cab.moveTo(gx, PISO, gz, -90f, 0f);
+                    cab.yBodyRot = cab.yHeadRot = -90f;
+                    boolean frente = vez != 1;
+                    otro.moveTo(gx + (frente ? 2.0 : -2.0), PISO, gz, 0f, 0f);
+                    float antes = cab.getHealth();
+                    if (vez == 2) {
+                        var fl = new net.minecraft.world.entity.projectile.Arrow(m, otro);
+                        fl.setPos(gx + 1.2, PISO + 1.4, gz);
+                        cab.hurt(m.damageSources().arrow(fl, otro), 8f);
+                    } else cab.hurt(m.damageSources().mobAttack(otro), 8f);
+                    quita[vez] = antes - cab.getHealth();
+                    for (int k = 0; k < 20; k++) cab.tick();
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " un golpe de 8 de frente le quita %.1f, por la espalda %.1f, una flecha de frente %.1f; parados +%d;"
+                        + " la marca arde %s", quita[0], quita[1], quita[2], com.darkcraft.enemigos.Marcado.PARADOS - par, cab.arde()));
+                // por la espalda hasta media vida: le arde la marca
+                cab.setHealth(cab.getMaxHealth() * 0.55f);
+                cab.invulnerableTime = 0;
+                otro.moveTo(gx - 2.0, PISO, gz, 0f, 0f);
+                cab.hurt(m.damageSources().mobAttack(otro), 6f);
+                sb.append(String.format(java.util.Locale.ROOT, "; herido hasta %.0f de %.0f: la marca arde %s", cab.getHealth(), cab.getMaxHealth(), cab.arde()));
+                cab.discard();
+                otro.discard();
+            }
+            log.println(sb);
+            // ---- la marca que arde: el reflejo repite el golpe un instante despues desde donde se dio (y no se le puede pegar)
+            sb = new StringBuilder("Morvain, el reflejo de los marcados:");
+            int[] repiten = {com.darkcraft.enemigos.MarcadoAnims.MAZAZO, com.darkcraft.enemigos.MarcadoAnims.TAJO, com.darkcraft.enemigos.MarcadoAnims.DISPARO};
+            int[] deQuien = {R, C, Z};
+            double[] aDist = {2.6, 2.2, 9.0};
+            for (int i = 0; i < repiten.length; i++) {
+                var a = DarkCraftMod.MARCADO.get().create(m);
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (a == null || presa == null) continue;
+                a.variante(deQuien[i]);
+                a.moveTo(gx, PISO, gz, -90f, 0f);
+                presa.moveTo(gx + aDist[i], PISO, gz, 90f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(a);
+                m.addFreshEntity(presa);
+                quitar.add(a);
+                quitar.add(presa);
+                a.encenderMarca();
+                a.setTarget(presa);
+                a.setYRot(-90f);
+                a.yBodyRot = a.yHeadRot = -90f;
+                int ref = com.darkcraft.enemigos.Marcado.REFLEJOS, dan = com.darkcraft.enemigos.Marcado.REFLEJOS_DAN;
+                a.empezar(repiten[i]);
+                int sale = -1, seVa = -1;
+                boolean pegable = false, golpeado = false;
+                float golpe = 0f, deLaSombra = 0f;
+                com.darkcraft.enemigos.Marcado sombra = null;
+                for (int k = 0; k < 90; k++) {
+                    float h = presa.getHealth();
+                    if (!a.isRemoved()) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    if (sombra == null)
+                        for (var r : m.getEntitiesOfClass(com.darkcraft.enemigos.Marcado.class, caja))
+                            if (r.reflejo() && !r.isRemoved()) {
+                                sombra = r;
+                                sale = k;
+                                pegable = r.isPickable();
+                                golpeado = r.hurt(m.damageSources().mobAttack(presa), 10f);
+                            }
+                    tickMarcados(m, caja, quitar);
+                    // lo que le quitan: antes de salir el reflejo, el golpe de verdad; despues, el del reflejo
+                    if (sombra == null) golpe += Math.max(0f, h - presa.getHealth());
+                    else deLaSombra += Math.max(0f, h - presa.getHealth());
+                    // la presa quieta en su sitio (que el reflejo la encuentre donde estaba)
+                    presa.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    presa.moveTo(gx + aDist[i], PISO, gz, 90f, 0f);
+                    presa.setOnGround(true);
+                    presa.invulnerableTime = 0;
+                    if (presa.getHealth() < 8f) presa.setHealth(presa.getMaxHealth());
+                    if (sombra != null && seVa < 0 && sombra.isRemoved()) seVa = k;
+                    if (seVa >= 0 && a.accion() == 0) break;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " %s (%s): el golpe le quita %.1f; sale el reflejo en el tick %d (+%d) y le quita %.1f (golpes +%d);"
+                                + " se puede apuntar %s, se le puede pegar %s; se deshace en el tick %d;", com.darkcraft.enemigos.MarcadoAnims.NOMBRES[repiten[i]],
+                        a.tipo(), golpe, sale, com.darkcraft.enemigos.Marcado.REFLEJOS - ref, deLaSombra, com.darkcraft.enemigos.Marcado.REFLEJOS_DAN - dan, pegable,
+                        golpeado, seVa));
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Flecha.class, caja)) f.discard();
+                for (var r : m.getEntitiesOfClass(com.darkcraft.enemigos.Marcado.class, caja)) if (r.reflejo()) r.discard();
+                a.discard();
+                presa.discard();
+            }
+            sb.append(" (el reflejo sale ").append(com.darkcraft.enemigos.Marcado.RETRASO).append(" ticks despues del golpe)");
+            log.println(sb);
+            // ---- uno que cae: se lleva la mano a la marca, cae de bruces y se deshace en sombra
+            var c = DarkCraftMod.MARCADO.get().create(m);
+            if (c != null) {
+                c.variante(R);
+                c.moveTo(gx, PISO, gz, 0f, 0f);
+                m.addFreshEntity(c);
+                quitar.add(c);
+                int d0 = com.darkcraft.enemigos.Marcado.DESHECHOS;
+                c.hurt(m.damageSources().generic(), 9999f);
+                int k = 0;
+                for (; k < 80 && !c.isRemoved(); k++) c.tick();
+                log.println(String.format(java.util.Locale.ROOT, "Morvain, un marcado que cae: se deshace en sombra +%d y se va en %d ticks",
+                        com.darkcraft.enemigos.Marcado.DESHECHOS - d0, k));
+            }
+        } catch (Throwable t) {
+            log.println("Morvain, los marcados: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] marcados", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Flecha.class, caja)) f.discard();
+            for (var r : m.getEntitiesOfClass(com.darkcraft.enemigos.Marcado.class, caja)) if (r.reflejo()) r.discard();
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
         }
     }

@@ -5101,5 +5101,128 @@
         "stream": true
       }
     ]
+  },
+  "sfx.marcado_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.marcado_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marcado_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/marcado_alerta_2"
+      }
+    ]
+  },
+  "sfx.marcado_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.marcado_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marcado_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/marcado_dolor_2"
+      }
+    ]
+  },
+  "sfx.marcado_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.marcado_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marcado_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/marcado_muerte_2"
+      }
+    ]
+  },
+  "sfx.marcado_mazazo": {
+    "subtitle": "subtitles.darkcraft.sfx.marcado_mazazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marcado_mazazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/marcado_mazazo_2"
+      }
+    ]
+  },
+  "sfx.marcado_cadena": {
+    "subtitle": "subtitles.darkcraft.sfx.marcado_cadena",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marcado_cadena_1"
+      },
+      {
+        "name": "darkcraft:sfx/marcado_cadena_2"
+      }
+    ]
+  },
+  "sfx.marcado_reflejo": {
+    "subtitle": "subtitles.darkcraft.sfx.marcado_reflejo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marcado_reflejo_1"
+      },
+      {
+        "name": "darkcraft:sfx/marcado_reflejo_2"
+      }
+    ]
+  },
+  "sfx.marcado_desliz": {
+    "subtitle": "subtitles.darkcraft.sfx.marcado_desliz",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marcado_desliz_1"
+      },
+      {
+        "name": "darkcraft:sfx/marcado_desliz_2"
+      }
+    ]
+  },
+  "sfx.marcado_flecha": {
+    "subtitle": "subtitles.darkcraft.sfx.marcado_flecha",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marcado_flecha_1"
+      },
+      {
+        "name": "darkcraft:sfx/marcado_flecha_2"
+      }
+    ]
+  },
+  "sfx.marcado_susurro": {
+    "subtitle": "subtitles.darkcraft.sfx.marcado_susurro",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marcado_susurro_1"
+      },
+      {
+        "name": "darkcraft:sfx/marcado_susurro_2"
+      }
+    ]
+  },
+  "sfx.marcado_esfuerzo": {
+    "subtitle": "subtitles.darkcraft.sfx.marcado_esfuerzo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/marcado_esfuerzo_1"
+      },
+      {
+        "name": "darkcraft:sfx/marcado_esfuerzo_2"
+      }
+    ]
+  },
+  "ambiente.crater": {
+    "subtitle": "subtitles.darkcraft.ambiente.crater",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/crater_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/crater_ambiente_2",
+        "stream": true
+      }
+    ]
   }
 }

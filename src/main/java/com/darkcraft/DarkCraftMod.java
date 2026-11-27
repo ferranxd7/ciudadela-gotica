@@ -361,6 +361,20 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_PENITENTE_HUMO = sound("sfx.penitente_humo");
     public static final RegistryObject<SoundEvent> SFX_PENITENTE_CANTICO = sound("sfx.penitente_cantico");
     public static final RegistryObject<SoundEvent> SFX_PENITENTE_ALZARSE = sound("sfx.penitente_alzarse");
+    // los marcados del Crater de Sangre (parte 7u): la marca que arde, el dolor, deshacerse en sombra, el mazo contra el suelo
+    // y contra la cadena, el reflejo que repite el golpe, el desliz, la flecha negra, los susurros y el esfuerzo del mazazo;
+    // y el aire del crater (las cadenas que crujen, el viento y un rumor hondo)
+    public static final RegistryObject<SoundEvent> SFX_MARCADO_ALERTA = sound("sfx.marcado_alerta");
+    public static final RegistryObject<SoundEvent> SFX_MARCADO_DOLOR = sound("sfx.marcado_dolor");
+    public static final RegistryObject<SoundEvent> SFX_MARCADO_MUERTE = sound("sfx.marcado_muerte");
+    public static final RegistryObject<SoundEvent> SFX_MARCADO_MAZAZO = sound("sfx.marcado_mazazo");
+    public static final RegistryObject<SoundEvent> SFX_MARCADO_CADENA = sound("sfx.marcado_cadena");
+    public static final RegistryObject<SoundEvent> SFX_MARCADO_REFLEJO = sound("sfx.marcado_reflejo");
+    public static final RegistryObject<SoundEvent> SFX_MARCADO_DESLIZ = sound("sfx.marcado_desliz");
+    public static final RegistryObject<SoundEvent> SFX_MARCADO_FLECHA = sound("sfx.marcado_flecha");
+    public static final RegistryObject<SoundEvent> SFX_MARCADO_SUSURRO = sound("sfx.marcado_susurro");
+    public static final RegistryObject<SoundEvent> SFX_MARCADO_ESFUERZO = sound("sfx.marcado_esfuerzo");
+    public static final RegistryObject<SoundEvent> AMBIENTE_CRATER = sound("ambiente.crater");
     public static final RegistryObject<SoundEvent> SFX_GRIETA_CAMPANA = sound("sfx.grieta_campana");
     public static final RegistryObject<SoundEvent> AMBIENTE_SINFE = sound("ambiente.sinfe");
     // Anselmo, el Pontifice Sangrante (parte 7t): el sermon, la ferula que silba y el golpe de su cruz, la aspersion del caliz, la
@@ -735,6 +749,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Penitente>> PENITENTE = ENTITIES.register("penitente",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Penitente>of(com.darkcraft.enemigos.Penitente::new, MobCategory.MONSTER)
                     .sized(0.65f, 1.95f).clientTrackingRange(8).build(MODID + ":penitente"));
+    // ---- los marcados del Crater de Sangre (parte 7u); sus reflejos son marcados tambien (no se guardan)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Marcado>> MARCADO = ENTITIES.register("marcado",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Marcado>of(com.darkcraft.enemigos.Marcado::new, MobCategory.MONSTER)
+                    .sized(0.65f, 1.95f).clientTrackingRange(8).build(MODID + ":marcado"));
     // ---- Anselmo, el Pontifice Sangrante, el jefe de la Tierra sin Fe (parte 7t)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Pontifice>> PONTIFICE = ENTITIES.register("pontifice",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Pontifice>of(com.darkcraft.enemigos.Pontifice::new, MobCategory.MONSTER)
@@ -949,6 +967,7 @@ public class DarkCraftMod {
         e.put(BALLENERO.get(), com.darkcraft.enemigos.Ballenero.atributos().build());
         e.put(PENITENTE.get(), com.darkcraft.enemigos.Penitente.atributos().build());
         e.put(PONTIFICE.get(), com.darkcraft.enemigos.Pontifice.atributos().build());
+        e.put(MARCADO.get(), com.darkcraft.enemigos.Marcado.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());

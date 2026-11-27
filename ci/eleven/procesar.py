@@ -303,13 +303,23 @@ SFX = {
     "penitente_incensario": (1.6, 0.5, -14), "penitente_humo": (3.0, 1.0, -16), "penitente_cantico": (6.5, 2.0, -16),
     "penitente_alzarse": (2.6, 0.8, -15), "grieta_campana": (9.0, 3.0, -15),
     "sinfe_ambiente": (20.0, 2.0, -25),
+    # los Marcados del Cerco del Ancla (parte 7u): la marca que prende (el grito al ver a alguien), el gruñido dentro del
+    # yelmo, la muerte (cae de rodillas y se deshace en sombra), el mazazo contra el suelo, el golpe contra la cadena (el que
+    # da el rompedor que reza ante el ancla; con su cola larga), el reflejo de sombra que repite el golpe, el desliz del
+    # cazador, la flecha negra, el susurro de los que rezan (el sonido de estar) y el esfuerzo al alzar el mazo; y el aire
+    # del crater (las cadenas que crujen arriba)
+    "marcado_alerta": (1.8, 0.5, -15), "marcado_dolor": (0.9, 0.3, -16), "marcado_muerte": (2.8, 1.0, -16),
+    "marcado_mazazo": (2.0, 0.7, -13), "marcado_cadena": (2.0, 0.9, -14), "marcado_reflejo": (1.0, 0.3, -15),
+    "marcado_desliz": (1.0, 0.3, -15), "marcado_flecha": (1.2, 0.5, -14), "marcado_susurro": (3.5, 1.0, -21),
+    "marcado_esfuerzo": (1.5, 0.4, -15),
+    "crater_ambiente": (20.0, 2.0, -25),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
            "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0, "abad_ventisca": 1.5, "abad_rezo": 0.4,
            "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6, "academia_ambiente": 2.0, "erudito_susurro": 0.8,
            "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0, "sinfe_ambiente": 2.0,
-           "altar_ambiente": 2.0, "pontifice_rezo": 1.0}
+           "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
@@ -550,6 +560,15 @@ TOMAS_SFX = {
     "penitente_azote": (4, 2), "penitente_penitencia": (1, 2), "penitente_hemorragia": (2, 4), "penitente_cruz": (4, 3),
     "penitente_arrastre": (3, 1), "penitente_incensario": (4, 2), "penitente_humo": (3, 4), "penitente_cantico": (1, 4),
     "penitente_alzarse": (3, 4), "grieta_campana": (1, 2), "sinfe_ambiente": (3, 1),
+    # los marcados: las dos marcas que prenden y duran (la 1 y la 3, con mas cuerpo); los dos quejidos mas llenos (la 2 y
+    # la 4); las dos muertes con el golpe al caer y el humo (la 1, y la 2, la de mas graves); los dos mazazos mas fuertes
+    # (la 3 y la 1); los golpes a la cadena con la cola mas larga (la 1) y el mas grave (la 3); los reflejos que se oyen
+    # enteros (la 2 y la 3; la 4 se corta al final); los deslices mas largos (la 4) y el mas grave (la 3); las flechas con
+    # su zumbido (la 1 y la 4); los susurros que se oyen de seguido (la 2 y la 3); los esfuerzos que empiezan en seguida
+    # (la 3 y la 1); y del aire del crater, el mas grave y continuo (la 3) y la 1 (la 2 sube de golpe: no vale de bucle)
+    "marcado_alerta": (1, 3), "marcado_dolor": (2, 4), "marcado_muerte": (1, 2), "marcado_mazazo": (3, 1),
+    "marcado_cadena": (1, 3), "marcado_reflejo": (2, 3), "marcado_desliz": (4, 3), "marcado_flecha": (1, 4),
+    "marcado_susurro": (2, 3), "marcado_esfuerzo": (3, 1), "crater_ambiente": (3, 1),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

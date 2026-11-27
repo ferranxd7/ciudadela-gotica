@@ -435,6 +435,39 @@ public final class ClientMusic {
         }
     }
 
+    // ------------------------------------------------------------------ el Crater de Sangre (parte 7u): las cadenas que crujen arriba
+
+    private static Track crater;
+    private static int craterTicks;
+    private static boolean enCrater;
+
+    private static void tickCrater(Minecraft mc) {
+        if (mc.player == null || mc.level == null) enCrater = false;
+        else if (mc.player.tickCount % 20 == 19)
+            enCrater = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() > 40 && mc.player.getY() < 330
+                    && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.CENTRO;
+        boolean quiere = enCrater && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        if (quiere) {
+            if (crater == null || crater.dying() || !mc.getSoundManager().isActive(crater) && craterTicks > 20) {
+                if (crater != null && !crater.dying()) mc.getSoundManager().stop(crater);
+                crater = new Track(DarkCraftMod.AMBIENTE_CRATER.get(), "crater", false);
+                craterTicks = 0;
+                mc.getSoundManager().play(crater);
+                crater.fadeTo(0.85f, 2.5f);
+            }
+        } else if (crater != null && !crater.dying()) crater.kill(3.0f);
+        if (crater != null) {
+            craterTicks++;
+            if (crater.dying() && !mc.getSoundManager().isActive(crater) && craterTicks > 20) crater = null;
+        }
+    }
+
+    /** Para la prueba de la CI: si suena el aire del crater. */
+    public static String crater() {
+        Minecraft mc = Minecraft.getInstance();
+        return crater == null ? "sin el crater" : String.format("el crater %.2f%s", crater.level(), mc.getSoundManager().isActive(crater) ? "" : " (parado)");
+    }
+
     /** Para la prueba de la CI: si suena el viento de la Tierra sin Fe. */
     public static String sinFe() {
         Minecraft mc = Minecraft.getInstance();
@@ -579,6 +612,8 @@ public final class ClientMusic {
         if (costa != null && !costa.dying()) any = true;
         tickSinFe(mc);
         if (sinFe != null && !sinFe.dying()) any = true;
+        tickCrater(mc);
+        if (crater != null && !crater.dying()) any = true;
         tickTitulo(mc);
         if (titulo != null && !titulo.dying()) any = true;
         if (viaje != null) {
@@ -603,8 +638,10 @@ public final class ClientMusic {
         if (capital != null) mc.getSoundManager().stop(capital);
         if (academia != null) mc.getSoundManager().stop(academia);
         if (costa != null) mc.getSoundManager().stop(costa);
-        story = boss = zona = bruma = viaje = arboleda = pantano = montana = capital = academia = costa = null;
-        enFortaleza = enBruma = enArboleda = enPantano = enMontana = enCapital = enAcademia = enCosta = false;
+        if (sinFe != null) mc.getSoundManager().stop(sinFe);
+        if (crater != null) mc.getSoundManager().stop(crater);
+        story = boss = zona = bruma = viaje = arboleda = pantano = montana = capital = academia = costa = sinFe = crater = null;
+        enFortaleza = enBruma = enArboleda = enPantano = enMontana = enCapital = enAcademia = enCosta = enSinFe = enCrater = false;
         bossPhase = 0;
     }
 

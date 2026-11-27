@@ -12,7 +12,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
          22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain", 27: "morvain",
-         28: "morvain", 29: "morvain"}
+         28: "morvain", 29: "morvain", 30: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -434,6 +434,16 @@ LIBROS = {
    "Brothers: we went to the crater to beg forgiveness and no one answered. For years we prayed to the empty sky. And on the night of the red sky, at last, something answered. It did not say forgiven. It said: give.",
    "So we give. Our backs, so that the sky sees we keep nothing back. Our blood, for the altar, which is always thirsty. Those who doubted left by the southern road; I no longer name them. Those who stayed are no longer afraid: they no longer have anything.",
    "(in another hand, shaking) Blood is not enough. It is never enough. The altar drinks it and the voice of the crater asks for more. If anyone reads this: the voice does not forgive. It collects. And what it collects it carries to the centre, to the red lake, where it waits.\n\nAnselm"]),
+ },
+ 30: {
+  "es": ("El diario del primero", "Aldric, el primer marcado", [
+   "Me desperté en el fondo del cráter con la marca ardiéndome en el pecho y una voz en la cabeza. «Estabas muerto», dijo. «Rompe mis cadenas y descansarás». Busqué la cadena más cercana y empecé a golpearla. No sabía cuánto pesa el hierro de la Sombra.",
+   "Después vinieron otros, uno a uno, con la misma marca y la misma promesa. Ya somos muchos y la cadena es una sola. Golpeamos por turnos, día y noche, aunque aquí nunca es de noche. El ancla no se ha movido ni un dedo. Las manos ya no nos duelen: ya no son nuestras.",
+   "Hoy he subido por la cadena, eslabón a eslabón, hasta ver la ciudadela de cerca. Allí arriba no hay puerta: hay una boca que espera. He bajado. No volveré a subir, y no dejaré subir a nadie que lleve la marca. La voz se equivocaba. No era para descansar.\n\nAldric"]),
+  "en": ("The First One's Diary", "Aldric, the first marked", [
+   "I woke at the bottom of the crater with the mark burning on my chest and a voice in my head. 'You were dead,' it said. 'Break my chains and you shall rest.' I found the nearest chain and began to strike it. I did not know how much the Shadow's iron weighs.",
+   "Then others came, one by one, with the same mark and the same promise. We are many now, and the chain is only one. We strike in turns, day and night, though here it is never night. The anchor has not moved a finger's breadth. Our hands no longer hurt: they are no longer ours.",
+   "Today I climbed the chain, link by link, until I saw the citadel up close. There is no door up there: there is a mouth that waits. I came down. I will not climb again, and I will let no one who bears the mark climb it. The voice was wrong. It was never about rest.\n\nAldric"]),
  },
 }
 
