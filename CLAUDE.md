@@ -3148,6 +3148,105 @@ puerta real con el detras y siguio actuando. Mil anos despues aun espera publico
   ilusion que se deshace (`mv484`); cae (`mv485`), el cartel (`mv486`) y el confeti (`mv487`); el camerino tras el muro del trono
   (`mv488`) y el bestiario (`mv489`). `LIMIT` 123 min (`lanzar.sh` 129 y 127 min, el paso 157, el trabajo 205).
 
+### Plan grande, parte 7z: el Nido de Ceniza y Vorthak, el Dragon de Ceniza (el ultimo de los especiales)
+
+Respuesta 132 del plan, la ultima tanda de los especiales ("dragon"). Lore: Vorthak guardo siglos los pasos de las Montanas Nevadas
+para los reyes de Morvain, a cambio de una carreta de oro cada invierno; la noche del cielo rojo se volvio loco (algo le quemaba por
+dentro), quemo la Atalaya del Cuervo con su guarnicion y desde entonces duerme sobre el oro de los que suben a matarlo.
+- **El Nido de Ceniza** (`morvain/Nido`, en (-5040, -4200), una repisa cortada en la ladera; la montana sube al noroeste y el valle
+  baja al este; u = x - CX, v = z - CZ): la **repisa** (radio `R_ARENA` 30, suelo `SUELO` 285 —se pisa en `PISO`—, se funde con la
+  ladera hasta `R_MEZCLA` 46) de suelo quemado (piedra negra, basalto, carbon, toba, grava, tierra de almas y alguna brasa de magma),
+  el corte de roca al noroeste y la nieve en el borde; cuatro **penascos** (`PENASCOS`: detras de ellos no llega el aliento), siete
+  troncos quemados con ramas de valla y 64 restos (calaveras, montones de hueso y lanzas de barrotes); al fondo (noroeste, `TESORO_U/V`
+  -13, -13) el **tesoro**: un monticulo de oro (radio 7,5, alto 2) con velas, calaveras, dos campanas y el arcon `chests/nido_tesoro`;
+  al este, al borde, la **Atalaya del Cuervo** (`ATALAYA_U/V` 32, -4): torre redonda (radio 4,5, 14 de alto) quemada, con el lado
+  oeste caido, el atril con el **libro perdido 33**, el arcon `chests/nido`, la escalera de mano al piso de arriba (de tablas, medio
+  hundido) con la hoguera apagada; y al sur el camino que sube del santuario. Todo en una `Obra` (columna a columna) mas lo pequeno en
+  una `Pilotes.Lista` y los cofres con `Trozo`; `Adorno` no pone nada en su caja. Santuario nuevo "Senda del Nido" (`SantuariosMorvain`,
+  id `nido`, al pie del camino). Logro `nido` (subir a la repisa, con su entrada del diario). El Espejo: "El Nido de Ceniza" y "La
+  Atalaya del Cuervo" (`Nido.dentro`, `enAtalaya`). `Nido.apartar` (lo que el dragon no pisa andando: penascos, troncos, la torre).
+- **Los de alli** (`MorvainEnemigos`, sitio `nido`, 6): Vorthak (el puesto 0, grupo `JEFE`) y los calcinados de la guarnicion: dos
+  cenicientos enterrados en el camino, la guardia a la puerta de la atalaya, uno agazapado dentro y un incendiario arriba.
+- **Vorthak** (`enemigos/Dragon`, entidad `darkcraft:dragon`, 5,2 x 4,4 —la caja es el cuerpo: el cuello, la cola y las alas quedan
+  fuera; `getBoundingBoxForCulling` ancho—, hereda de `Guardian`; tipo y logro `dragon`): 2400 de vida, golpe 15, armadura 10 (+3),
+  22000 ecos; deja tres piedras III, tres II y la ceniza de las llamas. **Sin fisica** (`noPhysics`, como el Jinete: `Puestos.libre`
+  ya no mira si choca quien no tiene fisica); todo lo mueve el (`mover`, antes de `super.aiStep`): en tierra los pies en lo que pisa
+  (`pisable`: el primer bloque entero de debajo), anda a 0,17 y gira despacio (si tiene que girar mucho, gira antes de andar); en el
+  aire va hacia un punto girando como mucho 4,5 grados por tick y nunca a menos de 6 del terreno (`sobreTerreno`, el mapa de alturas
+  aqui y delante). Sin objetivos del juego: a quien ve lo busca el (`buscarPresa`, `ve`).
+  - **Dormido** (postura `REZA`, sobre su oro): le despierta quien se le acerca a 24 y le ve (agachado, a 6,5), quien le pega o quien
+    abre un cofre a 14 (el oro suena). Al despertar dice su frase 1 (no la repite en 4 min) mientras se levanta y mira; al acabarla,
+    **ruge** (a 16: lentitud y debilidad) y empieza.
+  - **En tierra**: el **mordisco** (la cabeza a 4-10 delante; nada bajo el pecho), el **zarpazo** (barre por delante y echa a su
+    izquierda), el **coletazo** (a quien se le pone detras, a 13,5), el **aletazo** (todos los de delante, poco dano y los echa lejos),
+    el **pisoton** (se alza y cae: la onda de 6 a 4,5 delante; quien salta se libra) y el **aliento** (`ALIENTO_DESDE`-`HASTA`: cono de
+    17 de su derecha a su izquierda —`giroAliento`, `bocaAliento`—; quema cada 5 ticks y prende; lo que lo tapa —un penasco— lo para;
+    a media vida deja el suelo ardiendo). Si en 5 s recibe el 7 % de su vida cae de lado aturdido (+30 %; cada 25 s como mucho). A los 20
+    s en tierra (15 a media vida), o si su presa esta en alto o lejos, **despega** (deja el suelo en el tick 15: el viento aparta).
+  - **En el aire** (maniobras, `maniobraActual`): sube y da vueltas (radio 26, 20 sobre la repisa) y ataca dos veces (tres a media
+    vida): el **vuelo rasante** (`planRasante`: una linea que pasa por su presa y nunca viene de la montana; baja a ras de suelo y
+    echa fuego: el fuego da en el suelo delante, `sueloRasante`, un disco de 3,2 que avanza y deja llamas), las **bolas de fuego** (se
+    queda en el aire a 16 de su presa y escupe tres: `ProyectilDragon`, en arco; revientan en 3,2 y dejan el suelo ardiendo) o el
+    **picado** (sube a 28, marca en el suelo un corro de fuego de 7 donde esta su presa, se lanza y al tocar el suelo la onda); despues
+    **baja** a tierra cerca de su presa (la onda del aterrizaje). Si en el aire recibe el 3,5 % de su vida en 5 s, **cae** y queda
+    aturdido. Sin presa vuelve volando a su tesoro y, pasado un rato, se vuelve a dormir.
+  - **A media vida** (frase 2): ruge (si vuela, al cielo) y la **lluvia de ascuas**: se queda sobre el centro de la repisa y durante
+    6,5 s caen ascuas (unas junto a los jugadores, otras por toda la repisa; una marca avisa 1,3 s antes; queman en 2,4 y dejan
+    llamas; caen en lo mas alto de cada columna: bajo techo no llegan); despues baja a tierra.
+  - Habla (frase 3 si cae su presa, 4 "Burn!" de vez en cuando al echar fuego) y al caer (si vuela, cae del cielo) se desploma, dice su
+    frase 5, las brasas de sus grietas se apagan (`DragonRenderer`: la capa de brillo) y queda en ceniza; lo demas lo reparte
+    `valdrenn/Guardianes` (el cartel, la hazana `dragon` "Ceniza a la ceniza" y el bestiario). Pruebas y comando: `quieta`, `vencer()`,
+    `mediaVida()`, `despegar()`, `maniobra(que)`, `derribar()` y contadores (`estado()`).
+- **El modelo** (`tools/enemigos/dragon.py`, escala 1,75: unos 21 bloques de largo y 16 de alas): escamas de carbon con grietas de
+  brasa (en la capa de brillo, con los ojos, los ollares, la boca y los cantos de la hoja de la cola), tripa de placas, cuello en tres
+  trozos, cabeza con cejas de hueso y cuatro cuernos, alas de murcielago en tres trozos (`ala`/`alas` con `orientar`: hacia donde va
+  cada hueso y donde cae su membrana; la izquierda con sus membranas pintadas en espejo), cola en seis trozos con la punta en hoja.
+  Bucles `quieto`, `listo`, `andar` (al ritmo de lo que anda: `DragonModelo.CICLO_ANDAR` 5 bloques), `dormido`, `vuelo` (aleteo) y
+  `planeo`; acciones (`DragonAnims`): despierta (64), rugido (52), mordisco (28), zarpazo (26), coletazo (36), aletazo (30), pisoton
+  (40), aliento (76), despega (40), aterriza (32), rasante (60, solo el cuello: va sobre el vuelo), escupe (24, igual), picado (48),
+  ascuas (60), aturdido (60), morir (100). `DragonRenderer`: volando se inclina con lo que sube o baja y se ladea en los giros
+  (`cabeceo`, `alabeo`, alrededor del centro del cuerpo).
+- **En el cliente** (`client/enemigos/DragonCliente`, sin paquetes): el fuego del aliento, del rasante y de escupir (llamas desde la
+  boca, lo que da en el suelo), el aleteo en bucle mientras bate las alas y su respiracion dormido (pegados a el), el humo de los
+  ollares dormido y las brasas que se le escapan, y los temblores de camara (pasos, pisoton, aterrizar, despegar, rugir, caer).
+- **La bola de fuego** (`ProyectilDragon`, `darkcraft:proyectil_dragon`, su objeto `bola_dragon` dibujado grande y a plena luz:
+  `ThrownItemRenderer` a 3,2; arte de `tools/rol/dragon_objetos.py`).
+- **Voz** (ElevenLabs, `eleven_v4`, **"Malvoryx The Monster - Villain. Demon. Dragon."** `ysswSXp8U9dFpzPJqFje`, flow
+  `yj2HeJUSKF4WFJfanGJL`; 5 frases, tomas a; en `procesar.py` `voz_dragon`: mas grave, una segunda voz aun mas grave y retrasada —el
+  pecho—, el chisporroteo de las brasas, distorsion suave y el eco de la montana): linea **160 + N** (`Voces.BASE_DRAGON`, `esDragon`;
+  `habla_dragon` en `rey_voces.json`; subtitulos `darkcraft.dragon.voz.1..5` con `darkcraft.dragon.nombre_corto`): 1 "Otra chispita
+  de la Sombra... subiendo a mi montana. He quemado reyes por menos.", 2 "¿Te atreves a herirme? ¡Yo ya era viejo cuando tu Sombra
+  era un susurro en la oscuridad!", 3 "Ceniza... como todos los demas." (de relleno), 4 "¡Arde!" (de relleno), 5 "El cielo... el
+  cielo era mio... antes de volverse rojo...".
+- **Barra** (`GuardianCliente`, "dragon": ascuas que suben, nombre de oro viejo; arte de `tools/hud/barra_guardianes.py`: su lomo de
+  escamas con grietas de brasa y las puas, la hoja de la cola a la izquierda, una garra a la derecha y su cabeza de frente con los
+  ojos de oro; relleno de brasas entre escamas). **Musica**: "The Fire Dragon" de Umplix (OpenGameArt, CC0, id `dragon`, el bucle
+  "the_fire_dragon_loopv2"; tema 45 de `ClientMusic.boss`).
+- Sonidos (ElevenLabs, flow `LTdZckFRfg5JWcBJqnkH`, `TOMAS_SFX` elegidas midiendo las tomas): `dragon_rugido` (2 y 1), `dragon_aleteo`
+  (1, en bucle), `dragon_fuego` (3 y 2), `dragon_mordisco` (3 y 1), `dragon_cola` (1 y 3), `dragon_pisoton` (3 y 4; tambien sus
+  pasos), `dragon_aterriza` (1 y 3), `dragon_despega` (2 y 4), `dragon_picado` (1 y 3), `dragon_dolor` (3 y 4), `dragon_muerte` (2),
+  `dragon_respira` (2, en bucle) y `dragon_ascuas` (2 y 1).
+- **El libro perdido 33**, "El cuaderno del vigia" (Odo, el vigia de la atalaya: treinta anos con Vorthak, la noche del cielo rojo,
+  y que detras de las rocas no llega su fuego y cuando le pesan las alas baja a tierra). `Perdidos.TOTAL` = 33.
+- El bestiario dibuja al dragon por lo que mide de verdad (`Coleccion.tamano`, 22 bloques), no por su caja.
+- Comandos `/darkcraft nido [ir <sitio> | enemigos [volver | fuera | sacar]]` y `/darkcraft dragon [ir | vencer | volver | media |
+  despegar | rasante | bolas | picado | ascuas | bajar | derribar]`.
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_nido carpeta` (a que se llega a pie desde el santuario, cada uno de los del
+  nido se pisa y se llega, y que la repisa queda despejada por encima); el dragon: `python3 tools/enemigos/generar.py --solo dragon
+  --vistas carpeta`.
+- Pruebas: servidor, `nido()` (`Morvain, el nido de ceniza: ...` —el atril con el libro 33, los arcones, el oro, la repisa llana y
+  despejada, a pie desde el santuario a todos los sitios, el santuario— y `Morvain, los del nido: ...`) y `dragon()` (`Morvain,
+  Vorthak: ...` —dormido sobre su oro, a quien ve dormido, despierta y ruge al acabar la frase, las acciones de tierra acaban—, `... los
+  golpes de Vorthak en tierra: ...` —mordisco, zarpazo, coletazo, aletazo, pisoton (y saltando se libra), aliento (y tras un muro no
+  quema)—, `Vorthak en el aire: ...` —despega, rasante, bolas, picado, media vida y las ascuas, derribado— y `Vorthak cae: ...`).
+  Cliente, tramo `nido()` despues del teatro: el nido desde el camino (`cliente_mv490`), la repisa desde lo alto (`mv491`), la atalaya
+  (`mv492`), Vorthak dormido (`mv493`); en supervivencia despierta (`mv494`) y ruge (`mv495`); sus golpes de lado (`mv496` mordisco,
+  `mv497` zarpazo, `mv498`-`mv499` aliento, `mv500` coletazo, `mv501`-`mv502` pisoton, `mv503` aletazo); en el aire (capturas que
+  esperan a que pase: `esperarDragon` / `dragonTick`) despega (`mv504`), vuela (`mv505`), rasante (`mv506`), bolas (`mv507`), la marca
+  del picado (`mv508`), el picado (`mv509`), aterriza (`mv510`), las ascuas (`mv511`-`mv512`); cae del cielo (`mv513`), muerto
+  (`mv514`), el cartel (`mv515`), en ceniza (`mv516`) y el bestiario (`mv517`). `LIMIT` 128 min (`lanzar.sh` 134 y 132 min, el paso
+  162, el trabajo 210).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

@@ -748,6 +748,8 @@ public final class CiTest {
         gigantes(server, m, log, out);
         teatro(server, m, log, out);
         bufon(server, m, log, out);
+        nido(server, m, log, out);
+        dragon(server, m, log, out);
     }
 
     /**
@@ -3648,6 +3650,442 @@ public final class CiTest {
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
             com.darkcraft.morvain.MurosIlusorios.cerrar(m, com.darkcraft.morvain.Teatro.MURO_PUERTA);
             com.darkcraft.morvain.MurosIlusorios.cerrar(m, com.darkcraft.morvain.Teatro.MURO_TRONO);
+        }
+    }
+
+    // ------------------------------------------------------------------ parte 7z: el Nido de Ceniza y Vorthak, el Dragon de Ceniza
+
+    /**
+     * Parte 7z: el Nido de Ceniza. Se levantan sus chunks; a pie desde el santuario del Nido se llega a todos sus sitios (el camino,
+     * la repisa, el tesoro, la atalaya, lo alto de su escalera, el atril y los arcones); lo que hay (el atril con el libro 33, los
+     * arcones, el oro, la repisa llana y despejada, el muro de la torre); el santuario con su nombre; y los del nido en su sitio
+     * (Vorthak dormido sobre su oro y los calcinados de la guarnicion).
+     */
+    private static void nido(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.NIDO;
+        var N = com.darkcraft.morvain.Nido.get();
+        final int CX = com.darkcraft.morvain.Nido.CX, CZ = com.darkcraft.morvain.Nido.CZ;
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : N.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || st.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                        || st.getBlock() instanceof net.minecraft.world.level.block.SnowLayerBlock ? aire : st;
+            };
+            int[] sa = N.sitio("santuario");
+            StringBuilder sb = new StringBuilder("Morvain, el nido de ceniza: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Nido.resumen(m));
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, sa[0], sa[1], sa[2], com.darkcraft.morvain.Nido.X0, com.darkcraft.morvain.Nido.Z0,
+                    com.darkcraft.morvain.Nido.X1, com.darkcraft.morvain.Nido.Z1 + 20, 6_000_000);
+            sb.append("; a pie desde el santuario (").append(zona.celdas()).append(" celdas):");
+            for (var e : N.sitios().entrySet()) {
+                if (e.getKey().equals("alto") || e.getKey().equals("dragon")) continue;
+                int[] q = e.getValue();
+                sb.append(' ').append(e.getKey()).append(zona.alcanza(q[0], q[1], q[2], 2) ? "+" : "-");
+            }
+            int lejos = 0;
+            for (var o : N.esperas()) if (!com.darkcraft.enemigos.Puestos.JEFE.equals(o.grupo()) && !zona.alcanza(o.x(), o.y(), o.z(), 2)) lejos++;
+            sb.append("; de los ").append(N.esperas().size() - 1).append(" calcinados del nido, a los que no se llega ").append(lejos);
+            var st = com.darkcraft.morvain.SantuariosMorvain.porId("nido");
+            int[] at = N.sitio("atalaya"), ce = N.sitio("centro");
+            sb.append("; santuario ").append(com.darkcraft.santuario.Santuarios.nombre(m, st.pos())).append(" (").append(m.getBlockState(st.pos()).getBlock().getDescriptionId())
+                    .append(") a ").append(Math.round(com.darkcraft.morvain.Nido.distancia(st.x(), st.z()))).append(" del centro; el sitio: repisa ")
+                    .append(com.darkcraft.morvain.Nido.dentro(ce[0] + 0.5, ce[2] + 0.5)).append(", atalaya ")
+                    .append(com.darkcraft.morvain.Nido.enAtalaya(at[0] + 7.5, at[1], at[2] + 0.5)).append(", el santuario no es la repisa ")
+                    .append(!com.darkcraft.morvain.Nido.dentro(st.x() + 0.5, st.z() + 0.5));
+            log.println(sb);
+            topView(m, CX, CZ + 6, 64, new File(out, "morvain_nido.png"));
+            // ---- los del nido: en su sitio, en su suelo y ninguno metido en un bloque (Vorthak no tiene fisica: duerme encima del oro)
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 8; k++)
+                for (var e : fuera) if (e.isAlive() && !(e instanceof com.darkcraft.enemigos.Dragon)) e.tick();
+            int calcinados = 0, enSuelo = 0, chocan = 0, tumbados = 0, agazapados = 0;
+            String dragon = "no sale";
+            StringBuilder mal = new StringBuilder();
+            for (var e : fuera) {
+                if (e instanceof com.darkcraft.enemigos.Dragon d) {
+                    int[] q = N.sitio("dragon");
+                    dragon = String.format(java.util.Locale.ROOT, "en %s (su sitio %d,%d,%d; a %.1f), postura %d (1 dormido), sin fisica %s", d.blockPosition().toShortString(),
+                            q[0], q[1], q[2], Math.hypot(d.getX() - q[0] - 0.5, d.getZ() - q[2] - 0.5), d.postura(), d.noPhysics);
+                    continue;
+                }
+                if (!(e instanceof com.darkcraft.enemigos.Calcinado c)) continue;
+                calcinados++;
+                if (!m.noCollision(c)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(c.blockPosition().toShortString()).append(';');
+                }
+                if (c.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) tumbados++;
+                if (c.postura() == com.darkcraft.enemigos.Enemigo.REZA) agazapados++;
+                var abajo = m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ()));
+                if (!abajo.getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+                else if (mal.length() < 400) mal.append(" en el aire en ").append(c.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, los del nido: fuera " + fuera.size() + " de " + com.darkcraft.morvain.MorvainEnemigos.nido().size() + " (Vorthak " + dragon
+                    + "; calcinados " + calcinados + ": enterrados en la ceniza " + tumbados + ", agazapados " + agazapados + ", en su suelo " + enSuelo
+                    + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+        } catch (Throwable t) {
+            log.println("Morvain, el nido de ceniza: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] nido", t);
+        } finally {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /** Hace andar lo que deja Vorthak (las bolas de fuego y las llamas del suelo) en la caja. */
+    private static void tickDragon(ServerLevel m, net.minecraft.world.phys.AABB caja, java.util.List<net.minecraft.world.entity.Entity> quitar) {
+        for (var e : m.getEntitiesOfClass(net.minecraft.world.entity.Entity.class, caja,
+                q -> q instanceof com.darkcraft.enemigos.ProyectilDragon || q instanceof com.darkcraft.enemigos.Cantaro.Llamas)) {
+            if (e.isRemoved()) continue;
+            if (!quitar.contains(e)) quitar.add(e);
+            e.tickCount++;
+            e.tick();
+        }
+    }
+
+    /** Un tick de Vorthak (y de lo que deja), con su presa quieta en su sitio y con la vida entera. */
+    private static void pasoDragon(com.darkcraft.enemigos.Dragon d, ServerLevel m, net.minecraft.world.phys.AABB caja, java.util.List<net.minecraft.world.entity.Entity> quitar,
+                                   net.minecraft.world.entity.LivingEntity presa, double px, double py, double pz) {
+        d.tickCount++;
+        d.tick();
+        tickDragon(m, caja, quitar);
+        if (presa != null) {
+            presa.moveTo(px, py, pz, 180f, 0f);
+            presa.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+            presa.setOnGround(true);
+            presa.invulnerableTime = 0;
+        }
+    }
+
+    /**
+     * Parte 7z: Vorthak, el Dragon de Ceniza. Duerme sobre su oro (de rodillas, sin fisica); no le despierta quien esta lejos ni quien
+     * se acerca agachado, si quien llega de pie; al despertar habla, se levanta y ruge al acabar la frase; cada accion de tierra acaba;
+     * sus golpes de tierra a una presa (el mordisco delante, el zarpazo, el coletazo detras, el aletazo que la echa lejos, el pisoton
+     * y su onda —quien salta se libra—, el aliento que quema y que un muro en medio para). En el aire: despega (deja el suelo), el
+     * vuelo rasante (quema en linea y el suelo queda ardiendo), las bolas de fuego (revientan), el picado (cae donde marco: la onda),
+     * a media vida la lluvia de ascuas, y baja a tierra; derribado en el aire cae y queda aturdido. Al caer (volando, cae del cielo)
+     * se tumba, se apaga y no vuelve. Al acabar, otra vez dormido en su oro.
+     */
+    private static void dragon(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.NIDO;
+        var N = com.darkcraft.morvain.Nido.get();
+        final int CX = com.darkcraft.morvain.Nido.CX, CZ = com.darkcraft.morvain.Nido.CZ, PISO = com.darkcraft.morvain.Nido.PISO;
+        final var caja = new net.minecraft.world.phys.AABB(CX - 80, PISO - 20, CZ - 80, CX + 80, PISO + 60, CZ + 80);
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        java.util.List<Object[]> bloques = new java.util.ArrayList<>();
+        com.darkcraft.enemigos.Dragon d = null;
+        try {
+            for (long k : N.chunks()) m.getChunk((int) (k >> 32), (int) k);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) {
+                if (e instanceof com.darkcraft.enemigos.Dragon g) d = g;
+                // (los calcinados, fuera: aqui solo cuenta el)
+                else e.discard();
+            }
+            if (d == null) {
+                log.println("Morvain, Vorthak: NO SALE");
+                return;
+            }
+            final double cx = CX + 0.5, cz = CZ + 0.5, cy = PISO;
+            int[] q = N.sitio("dragon");
+            var abajo = m.getBlockState(BlockPos.containing(d.getX(), d.getY() - 0.3, d.getZ()));
+            StringBuilder sb = new StringBuilder(String.format(java.util.Locale.ROOT, "Morvain, Vorthak: en %s (sobre el oro: %s), postura %d (1 dormido),"
+                            + " giro %d, vida %.0f, golpe %.1f, armadura %d, caja %.1f x %.1f, musica %d, sin fisica %s",
+                    d.blockPosition().toShortString(), abajo.getBlock().getDescriptionId(), d.postura(), Math.round(d.getYRot()), d.getMaxHealth(),
+                    d.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), d.getArmorValue(), d.getBbWidth(), d.getBbHeight(),
+                    d.musica(), d.noPhysics));
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("9f102152-7d84-4fa0-81c2-6d7e8f90a1ef"), "[DarkCraftCI16]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- dormido: lejos no, agachado cerca no, de pie a veinte si
+            String ve = "";
+            try {
+                java.lang.reflect.Method mt = com.darkcraft.enemigos.Dragon.class.getDeclaredMethod("ve", net.minecraft.world.entity.player.Player.class);
+                mt.setAccessible(true);
+                double yaw = Math.toRadians(d.getYRot());
+                double fx = -Math.sin(yaw), fz = Math.cos(yaw);
+                double[][] pruebas = {{30, 0}, {10, 1}, {20, 0}};
+                for (double[] pr : pruebas) {
+                    double x = d.getX() + fx * pr[0], z = d.getZ() + fz * pr[0];
+                    fp.moveTo(x, m.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, (int) Math.floor(x), (int) Math.floor(z)), z, 0f, 0f);
+                    fp.setPose(pr[1] > 0 ? net.minecraft.world.entity.Pose.CROUCHING : net.minecraft.world.entity.Pose.STANDING);
+                    ve += String.format(java.util.Locale.ROOT, " %s a %.0f: %s;", pr[1] > 0 ? "agachado" : "de pie", pr[0], mt.invoke(d, fp));
+                }
+                fp.setPose(net.minecraft.world.entity.Pose.STANDING);
+            } catch (Throwable t) {
+                ve = " ERROR " + t;
+            }
+            sb.append("; dormido le ve:").append(ve);
+            // ---- se despierta: habla, se levanta y ruge al acabar la frase
+            d.setTarget(fp);
+            final double fx0 = fp.getX(), fy0 = fp.getY(), fz0 = fp.getZ();
+            int despierta = -1, dePie = -1, ruge = -1;
+            for (int k = 0; k < 420; k++) {
+                pasoDragon(d, m, caja, quitar, fp, fx0, fy0, fz0);
+                fp.setHealth(fp.getMaxHealth());
+                int a = d.accion();
+                if (despierta < 0 && a == com.darkcraft.enemigos.DragonAnims.DESPIERTA) despierta = k;
+                if (dePie < 0 && d.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE) dePie = k;
+                if (ruge < 0 && a == com.darkcraft.enemigos.DragonAnims.RUGIDO) {
+                    ruge = k;
+                    break;
+                }
+            }
+            sb.append("; despierta: pelea ").append(d.enPelea()).append(", se levanta en el tick ").append(despierta).append(" (de pie en el ").append(dePie)
+                    .append("), ruge en el ").append(ruge).append(" (la frase 1 dura ").append(com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Dragon.VOZ_BASE + 1))
+                    .append(')');
+            // ---- cada accion de tierra acaba (sin presa y quieto, en medio de la repisa)
+            d.quieta = true;
+            d.setTarget(null);
+            for (int k = 0; k < 120 && d.accion() != 0; k++) pasoDragon(d, m, caja, quitar, null, 0, 0, 0);
+            StringBuilder nn = new StringBuilder();
+            int vistas = 0;
+            int[] tierra = {com.darkcraft.enemigos.DragonAnims.RUGIDO, com.darkcraft.enemigos.DragonAnims.MORDISCO, com.darkcraft.enemigos.DragonAnims.ZARPAZO,
+                    com.darkcraft.enemigos.DragonAnims.COLETAZO, com.darkcraft.enemigos.DragonAnims.ALETAZO, com.darkcraft.enemigos.DragonAnims.PISOTON,
+                    com.darkcraft.enemigos.DragonAnims.ALIENTO, com.darkcraft.enemigos.DragonAnims.ATURDIDO};
+            for (int a : tierra) {
+                d.moveTo(cx, cy, cz, 0f, 0f);
+                d.empezar(a);
+                vistas++;
+                for (int k = 0; k < 200 && d.accion() == a; k++) pasoDragon(d, m, caja, quitar, null, 0, 0, 0);
+                if (d.accion() == a) nn.append(' ').append(com.darkcraft.enemigos.DragonAnims.NOMBRES[a]);
+            }
+            sb.append("; de ").append(vistas).append(" acciones de tierra no acaban:").append(nn.length() == 0 ? " ninguna" : nn);
+            log.println(sb);
+            // ---- sus golpes de tierra a una presa (un aldeano quieto y duro), con el mirando al sur desde el centro de la repisa
+            StringBuilder sg = new StringBuilder("Morvain, los golpes de Vorthak en tierra:");
+            var victima = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            if (victima != null) {
+                victima.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(2000.0);
+                victima.setHealth(2000f);
+                victima.setNoAi(true);
+                m.addFreshEntity(victima);
+                quitar.add(victima);
+                String[] golpes = {"mordisco", "zarpazo", "coletazo", "aletazo", "pisoton", "pisoton saltando", "aliento", "aliento tras un muro"};
+                int[] acc = {com.darkcraft.enemigos.DragonAnims.MORDISCO, com.darkcraft.enemigos.DragonAnims.ZARPAZO, com.darkcraft.enemigos.DragonAnims.COLETAZO,
+                        com.darkcraft.enemigos.DragonAnims.ALETAZO, com.darkcraft.enemigos.DragonAnims.PISOTON, com.darkcraft.enemigos.DragonAnims.PISOTON,
+                        com.darkcraft.enemigos.DragonAnims.ALIENTO, com.darkcraft.enemigos.DragonAnims.ALIENTO};
+                // (delante = al sur: +z; detras: -z)
+                double[] dz = {7.0, 4.0, -8.0, 6.0, 4.5, 4.5, 13.0, 13.0};
+                double[] dx = {0, 1.0, 0, 0, 0, 0, 0, 0};
+                for (int i = 0; i < golpes.length; i++) {
+                    boolean salta = golpes[i].endsWith("saltando"), muro = golpes[i].endsWith("muro");
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    victima.hurtTime = 0;
+                    victima.removeAllEffects();
+                    victima.clearFire();
+                    d.moveTo(cx, cy, cz, 0f, 0f);
+                    d.setYRot(0f);
+                    d.yBodyRot = d.yHeadRot = 0f;
+                    double sueloV = cy;
+                    double vx = cx + dx[i], vy = sueloV + (salta ? 1.4 : 0), vz = cz + dz[i];
+                    if (muro) {
+                        // un muro de piedra de por medio (entre su boca, a ocho bloques y medio, y la presa: siete de ancho y cinco de alto)
+                        for (int wx = -3; wx <= 3; wx++)
+                            for (int wy = 0; wy < 5; wy++) {
+                                BlockPos b = BlockPos.containing(cx + wx, cy + wy, cz + 10.5);
+                                bloques.add(new Object[]{b, m.getBlockState(b)});
+                                m.setBlock(b, net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), 2);
+                            }
+                    }
+                    victima.moveTo(vx, vy, vz, 180f, 0f);
+                    victima.setOnGround(!salta);
+                    int mo = d.mordiscos(), za = d.zarpazos(), co = d.golpesCola(), al = d.tirados(), pi = d.ondas(), qu = d.quemados(), ta = d.tapados();
+                    d.setTarget(victima);
+                    d.empezar(acc[i]);
+                    float antes = victima.getHealth();
+                    double lejos = 0;
+                    for (int k = 0; k < com.darkcraft.enemigos.DragonAnims.TICKS[acc[i]] + 4 && d.accion() == acc[i]; k++) {
+                        d.tickCount++;
+                        d.tick();
+                        tickDragon(m, caja, quitar);
+                        if (acc[i] == com.darkcraft.enemigos.DragonAnims.ALETAZO) {
+                            // (el aletazo la echa: se mide cuanto)
+                            moverPresa(victima);
+                            lejos = Math.max(lejos, Math.hypot(victima.getX() - vx, victima.getZ() - vz));
+                        } else victima.moveTo(vx, vy, vz, 180f, 0f);
+                        victima.setOnGround(!salta);
+                        victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                        victima.invulnerableTime = 0;
+                    }
+                    sg.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " a %.1f: -%.1f", Math.hypot(dx[i], dz[i]), antes - victima.getHealth()));
+                    switch (i) {
+                        case 0 -> sg.append(", muerde +").append(d.mordiscos() - mo);
+                        case 1 -> sg.append(", zarpazos +").append(d.zarpazos() - za);
+                        case 2 -> sg.append(", la cola da +").append(d.golpesCola() - co);
+                        case 3 -> sg.append(String.format(java.util.Locale.ROOT, ", tira +%d (la echa %.1f)", d.tirados() - al, lejos));
+                        case 4, 5 -> sg.append(", la onda da +").append(d.ondas() - pi);
+                        case 6 -> sg.append(", quema +").append(d.quemados() - qu).append(" (arde ").append(victima.getRemainingFireTicks() > 0).append(')');
+                        case 7 -> sg.append(", quema +").append(d.quemados() - qu).append(", tapado +").append(d.tapados() - ta);
+                        default -> {
+                        }
+                    }
+                    sg.append(';');
+                    victima.clearFire();
+                    for (int k = bloques.size() - 1; k >= 0; k--) m.setBlock((BlockPos) bloques.get(k)[0], (net.minecraft.world.level.block.state.BlockState) bloques.get(k)[1], 2);
+                    bloques.clear();
+                    for (int k = 0; k < 40 && d.accion() != 0; k++) pasoDragon(d, m, caja, quitar, null, 0, 0, 0);
+                }
+            }
+            log.println(sg);
+            // ---- en el aire: despega, el rasante, las bolas, el picado, las ascuas (a media vida) y derribado
+            StringBuilder sv = new StringBuilder("Morvain, Vorthak en el aire:");
+            if (victima != null) {
+                final double vx = cx + 3, vy = cy, vz = cz + 2;
+                victima.setHealth(victima.getMaxHealth());
+                victima.moveTo(vx, vy, vz, 180f, 0f);
+                d.moveTo(cx - 8, cy, cz - 6, 0f, 0f);
+                d.setTarget(victima);
+                double y0 = d.getY();
+                d.despegar();
+                double alto = 0;
+                for (int k = 0; k < 120; k++) {
+                    pasoDragon(d, m, caja, quitar, victima, vx, vy, vz);
+                    alto = Math.max(alto, d.getY() - y0);
+                }
+                sv.append(String.format(java.util.Locale.ROOT, " despega %s (despegues %d, sube %.1f, maniobra %s)", d.vuela(), d.despegues(), alto, d.maniobraActual()));
+                String[] mans = {"rasante", "bolas", "picado"};
+                for (String man : mans) {
+                    if (!d.vuela()) {
+                        d.despegar();
+                        for (int k = 0; k < 90; k++) pasoDragon(d, m, caja, quitar, victima, vx, vy, vz);
+                    }
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.clearFire();
+                    int ra = d.rasantes(), qr = d.quemadosRasante(), fu = d.fuegos(), bo = d.bolas(), pc = d.picados(), gp = d.golpesPicado(), at = d.aterrizajes();
+                    int rev = com.darkcraft.enemigos.ProyectilDragon.REVIENTAN, dan = com.darkcraft.enemigos.ProyectilDragon.DAN + com.darkcraft.enemigos.ProyectilDragon.QUEMAN;
+                    float antes = victima.getHealth();
+                    boolean ok = d.maniobra(man);
+                    int hecho = -1;
+                    double bajo = 999;
+                    for (int k = 0; k < 600; k++) {
+                        pasoDragon(d, m, caja, quitar, victima, vx, vy, vz);
+                        bajo = Math.min(bajo, d.getY() - cy);
+                        boolean fin = switch (man) {
+                            case "rasante" -> d.rasantes() > ra && d.accion() == 0;
+                            case "bolas" -> d.bolas() >= bo + 3 && com.darkcraft.enemigos.ProyectilDragon.REVIENTAN >= rev + 3;
+                            default -> d.aterrizajes() > at && d.accion() == 0;
+                        };
+                        if (fin) {
+                            hecho = k;
+                            break;
+                        }
+                    }
+                    // (las llamas y las bolas que quedan, un rato)
+                    for (int k = 0; k < 30; k++) tickDragon(m, caja, quitar);
+                    sv.append(String.format(java.util.Locale.ROOT, "; %s (empieza %s, hecho en el tick %d, lo mas bajo a %.1f del suelo): -%.1f", man, ok, hecho, bajo,
+                            antes - victima.getHealth()));
+                    switch (man) {
+                        case "rasante" -> sv.append(", rasantes +").append(d.rasantes() - ra).append(", quema +").append(d.quemadosRasante() - qr).append(", fuegos en el suelo +")
+                                .append(d.fuegos() - fu);
+                        case "bolas" -> sv.append(", bolas +").append(d.bolas() - bo).append(" (revientan +").append(com.darkcraft.enemigos.ProyectilDragon.REVIENTAN - rev)
+                                .append(", dan +").append(com.darkcraft.enemigos.ProyectilDragon.DAN + com.darkcraft.enemigos.ProyectilDragon.QUEMAN - dan).append(')');
+                        default -> sv.append(", picados +").append(d.picados() - pc).append(", la onda da +").append(d.golpesPicado() - gp).append(", en tierra ")
+                                .append(!d.vuela());
+                    }
+                }
+                // a media vida: ruge, y al volar, la lluvia de ascuas; luego baja a tierra
+                for (int k = 0; k < 60 && d.accion() != 0; k++) pasoDragon(d, m, caja, quitar, victima, vx, vy, vz);
+                d.mediaVida();
+                int rg = d.rugidos(), ll = d.lluvias(), as = d.ascuasCaidas(), qa = d.quemadosAscuas(), at = d.aterrizajes();
+                for (int k = 0; k < 80; k++) pasoDragon(d, m, caja, quitar, victima, vx, vy, vz);
+                boolean segunda = d.segunda();
+                d.maniobra("ascuas");
+                int hecho = -1;
+                for (int k = 0; k < 900; k++) {
+                    pasoDragon(d, m, caja, quitar, victima, vx, vy, vz);
+                    if (d.lluvias() > ll && d.aterrizajes() > at && d.accion() == 0) {
+                        hecho = k;
+                        break;
+                    }
+                }
+                for (int k = 0; k < 30; k++) tickDragon(m, caja, quitar);
+                sv.append("; media vida: segunda ").append(segunda).append(", ruge +").append(d.rugidos() - rg).append("; ascuas (hecho en el tick ").append(hecho)
+                        .append("): lluvias +").append(d.lluvias() - ll).append(", caen +").append(d.ascuasCaidas() - as).append(", queman +")
+                        .append(d.quemadosAscuas() - qa).append(", baja a tierra ").append(!d.vuela());
+                // derribado en el aire: cae y queda aturdido
+                if (!d.vuela()) {
+                    d.despegar();
+                    for (int k = 0; k < 90; k++) pasoDragon(d, m, caja, quitar, victima, vx, vy, vz);
+                }
+                int ca = d.caidas(), au = d.aturdidos();
+                boolean volaba = d.vuela();
+                d.derribar();
+                int cae = -1;
+                for (int k = 0; k < 200; k++) {
+                    pasoDragon(d, m, caja, quitar, victima, vx, vy, vz);
+                    if (cae < 0 && !d.vuela()) cae = k;
+                    if (cae >= 0 && d.accion() == com.darkcraft.enemigos.DragonAnims.ATURDIDO) break;
+                }
+                sv.append("; derribado (volaba ").append(volaba).append("): cae +").append(d.caidas() - ca).append(" (al suelo en el tick ").append(cae)
+                        .append("), aturdido +").append(d.aturdidos() - au).append(" (").append(com.darkcraft.enemigos.DragonAnims.NOMBRES[d.accion()]).append(')');
+                sv.append("; en total: ").append(d.estado());
+            }
+            log.println(sv);
+            // ---- cae (volando: cae del cielo), se tumba, se apaga y no vuelve
+            for (int k = 0; k < 120 && d.accion() != 0; k++) pasoDragon(d, m, caja, quitar, null, 0, 0, 0);
+            d.setHealth(d.getMaxHealth());
+            if (!d.vuela()) {
+                d.despegar();
+                for (int k = 0; k < 90; k++) pasoDragon(d, m, caja, quitar, null, 0, 0, 0);
+            }
+            boolean volaba = d.vuela();
+            double altoAlMorir = d.getY() - cy;
+            d.setTarget(fp);
+            d.invulnerableTime = 0;
+            d.hurt(m.damageSources().playerAttack(fp), 99999f);
+            boolean muere = !d.isAlive();
+            int alSuelo = -1, seVa = -1;
+            for (int fin = 0; fin < 600; fin++) {
+                if (!d.isRemoved()) {
+                    d.tickCount++;
+                    d.tick();
+                }
+                if (alSuelo < 0 && !d.vuela()) alSuelo = fin;
+                if (seVa < 0 && d.isRemoved()) {
+                    seVa = fin;
+                    break;
+                }
+            }
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, com.darkcraft.morvain.MorvainEnemigos.dragon(), true);
+            int objetos = m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, caja).size();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, com.darkcraft.morvain.MorvainEnemigos.dragon(), true);
+            boolean vuelve = false;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) {
+                if (e instanceof com.darkcraft.enemigos.Dragon) vuelve = true;
+                else e.discard();
+            }
+            log.println(String.format(java.util.Locale.ROOT, "Morvain, Vorthak cae: muere %s volando %s (a %.1f del suelo), llega al suelo en el tick %d, se deshace en el"
+                            + " tick %d (la frase 5 dura %d), objetos %d, vuelve al descansar %s (tiene que ser false); %s", muere, volaba, altoAlMorir, alSuelo, seVa,
+                    com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Dragon.VOZ_BASE + 5), objetos, vuelve, com.darkcraft.morvain.MorvainEnemigos.estadoDragon(server)));
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, caja)) it.discard();
+        } catch (Throwable t) {
+            log.println("Morvain, Vorthak: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] dragon", t);
+        } finally {
+            if (d != null) d.quieta = false;
+            for (int k = bloques.size() - 1; k >= 0; k--) m.setBlock((BlockPos) bloques.get(k)[0], (net.minecraft.world.level.block.state.BlockState) bloques.get(k)[1], 2);
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            for (var e : m.getEntitiesOfClass(net.minecraft.world.entity.Entity.class, caja,
+                    q -> q instanceof com.darkcraft.enemigos.ProyectilDragon || q instanceof com.darkcraft.enemigos.Cantaro.Llamas)) e.discard();
+            // todo como antes: Vorthak dormido en su oro y los calcinados en su sitio
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, com.darkcraft.morvain.MorvainEnemigos.dragon(), false);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            try {
+                com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+                log.println("Morvain, Vorthak vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoDragon(server));
+            } catch (Throwable t) {
+                log.println("Morvain, Vorthak vuelve: ERROR " + t);
+            }
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
         }
     }
 

@@ -419,6 +419,10 @@ public final class Morvain {
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Teatro.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Teatro.PISO) < 14)
                 com.darkcraft.story.Logros.dar(p, "teatro");
+        // y quien sube a la repisa del Nido de Ceniza (parte 7z)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Nido.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Nido.PISO) < 14)
+                com.darkcraft.story.Logros.dar(p, "nido");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -509,6 +513,9 @@ public final class Morvain {
         // el Teatro Hundido y, bajo la llanura, la Sala de las Mascaras de Pell (parte 7y)
         if (Teatro.enSala(p.getX(), p.getY(), p.getZ())) return "darkcraft.morvain.lugar.mascaras";
         if (Teatro.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Teatro.PISO) < 30) return "darkcraft.morvain.lugar.teatro";
+        // el Nido de Ceniza y la Atalaya del Cuervo (parte 7z)
+        if (Nido.enAtalaya(p.getX(), p.getY(), p.getZ())) return "darkcraft.morvain.lugar.atalaya";
+        if (Nido.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Nido.PISO) < 40) return "darkcraft.morvain.lugar.nido";
         // el Puente de la Grieta (parte 7s): tambien en el fondo de la grieta
         if (Grieta.dentro(p.getX(), p.getZ()) && p.getY() > Grieta.FONDO - 4 && p.getY() < Grieta.PISO + 40) return "darkcraft.morvain.lugar.grieta";
         // el Observatorio de la Rectora (parte 7p)

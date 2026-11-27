@@ -91,6 +91,9 @@ TOMAS_GIGANTE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a", 6: "a", 7: "a", 8: "a",
 TOMAS_JINETE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 # Pell, el Bufon del Rey (parte 7y): las frases 1..5 (tomas a)
 TOMAS_BUFON = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
+# Vorthak, el Dragon de Ceniza (parte 7z; voz "Malvoryx The Monster", flow yj2HeJUSKF4WFJfanGJL): las frases 1..5 (tomas a; la
+# 4b, "Burn!", se alarga con un rugido de mas)
+TOMAS_DRAGON = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -353,6 +356,14 @@ SFX = {
     "bufon_humo": (1.4, 0.5, -14), "bufon_ilusion": (2.0, 0.6, -14), "bufon_pirueta": (1.0, 0.3, -15),
     "bufon_dolor": (0.9, 0.2, -15), "bufon_muerte": (4.0, 1.2, -15), "muro_ilusorio": (3.0, 0.9, -14),
     "teatro_aplauso": (3.0, 1.0, -16),
+    # Vorthak, el Dragon de Ceniza (parte 7z): el rugido, el aleteo (en bucle mientras vuela), el aliento de fuego, el mordisco,
+    # el coletazo, el pisoton (y sus pasos), el aterrizaje, el despegue, el picado, el quejido, la muerte, su respiracion dormido
+    # (en bucle) y la lluvia de ascuas
+    "dragon_rugido": (4.0, 1.0, -11), "dragon_aleteo": (4.0, 0.3, -14), "dragon_fuego": (4.0, 1.0, -12),
+    "dragon_mordisco": (1.0, 0.3, -12), "dragon_cola": (1.5, 0.4, -13), "dragon_pisoton": (1.5, 0.6, -11),
+    "dragon_aterriza": (3.0, 1.0, -11), "dragon_despega": (3.0, 0.8, -12), "dragon_picado": (2.5, 0.6, -12),
+    "dragon_dolor": (1.2, 0.3, -14), "dragon_muerte": (6.0, 2.0, -13), "dragon_respira": (5.0, 0.6, -18),
+    "dragon_ascuas": (3.0, 1.0, -14),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -360,7 +371,7 @@ ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0
            "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6, "academia_ambiente": 2.0, "erudito_susurro": 0.8,
            "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0, "sinfe_ambiente": 2.0,
            "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0,
-           "aldric_rezo": 1.0, "aldric_arrastre": 0.3, "jinete_galope": 0.3}
+           "aldric_rezo": 1.0, "aldric_arrastre": 0.3, "jinete_galope": 0.3, "dragon_aleteo": 0.3, "dragon_respira": 0.6}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
@@ -644,6 +655,14 @@ TOMAS_SFX = {
     "bufon_malabar": (2, 1), "bufon_bola": (2, 3), "bufon_humo": (2, 4), "bufon_ilusion": (4, 2),
     "bufon_pirueta": (3, 2), "bufon_dolor": (2, 1), "bufon_muerte": (4, 1), "muro_ilusorio": (1, 4),
     "teatro_aplauso": (3, 4),
+    # Vorthak (elegidas midiendo las tomas): los rugidos con mas graves (la 2 y la 1), el aleteo mas parejo (la 1, para el
+    # bucle), los alientos mas seguidos (la 3 y la 2), los mordiscos mas secos (la 3 y la 1), los coletazos con el golpe al
+    # principio (la 1 y la 3), los pisotones con mas graves (la 3 y la 4), los aterrizajes mas fuertes (la 1 y la 3), los despegues
+    # con mas cuerpo (la 2 y la 4), los picados que mas silban (la 1 y la 3), los quejidos mas fuertes (la 3 y la 4), la muerte mas
+    # larga (la 2), la respiracion mas grave y pareja (la 2) y las ascuas que mas crepitan (la 2 y la 1)
+    "dragon_rugido": (2, 1), "dragon_aleteo": (1,), "dragon_fuego": (3, 2), "dragon_mordisco": (3, 1), "dragon_cola": (1, 3),
+    "dragon_pisoton": (3, 4), "dragon_aterriza": (1, 3), "dragon_despega": (2, 4), "dragon_picado": (1, 3), "dragon_dolor": (3, 4),
+    "dragon_muerte": (2,), "dragon_respira": (2,), "dragon_ascuas": (2, 1),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -985,6 +1004,28 @@ def voz_jinete(src, dst):
         "asoftclip=type=atan:threshold=0.82,"
         "aecho=0.85:0.5:280|640|1100:0.2|0.12|0.07,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=150,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.2
+
+
+def voz_dragon(src, dst):
+    """
+    Vorthak, el Dragon de Ceniza: la voz (ya es de monstruo) mas grave, una segunda voz aun mas grave y retrasada (el pecho
+    enorme que retumba), el gruñido de la garganta (una distorsion suave con graves), un chisporroteo de brasas por debajo (ruido
+    filtrado que sigue a la voz) y el eco abierto de la montana (largo, con dos rebotes en las rocas).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=3[v1][v2][v3];"
+        "[v1]asetrate=44100*0.9,aresample=44100,atempo=1.1111[baja];"
+        "[v2]asetrate=44100*0.8,aresample=44100,atempo=1.25,adelay=35:all=1,lowpass=f=900,volume=0.45[pecho];"
+        "[v3]highpass=f=2500,volume=0.12,aecho=0.6:0.3:12:0.4[brasa];"
+        "[baja][pecho][brasa]amix=inputs=3:weights=1 0.6 0.5:normalize=0,"
+        "equalizer=f=90:t=q:w=1.0:g=4,equalizer=f=1400:t=q:w=1.2:g=1.5,highshelf=f=6500:g=-3,"
+        "asoftclip=type=tanh:threshold=0.75,"
+        "aecho=0.85:0.5:420|900:0.22|0.1,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=160,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA + 0.2
@@ -1422,6 +1463,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO bufon {n}: {e}")
+    # Vorthak, el Dragon de Ceniza (parte 7z)
+    dra = os.path.join(ASSETS, "sounds", "dragon")
+    os.makedirs(dra, exist_ok=True)
+    dur_d, hab_d = {}, {}
+    for n, toma in sorted(TOMAS_DRAGON.items()):
+        src = os.path.join(MASTER, "dragon", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(dra, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_dragon(src, dst)
+            dur_d[n] = round(duracion(dst), 2)
+            hab_d[n] = round(min(h, dur_d[n]), 2)
+            print(f"dragon {n:2d}: {dur_d[n]} s (habla hasta {hab_d[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO dragon {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -1457,7 +1517,7 @@ def main():
                    "rectora": dur_r, "habla_rectora": hab_r, "ballenero": dur_w, "habla_ballenero": hab_w,
                    "pontifice": dur_p, "habla_pontifice": hab_p, "aldric": dur_l, "habla_aldric": hab_l,
                    "gigante": dur_t, "habla_gigante": hab_t, "jinete": dur_j, "habla_jinete": hab_j,
-                   "bufon": dur_u, "habla_bufon": hab_u}, fh)
+                   "bufon": dur_u, "habla_bufon": hab_u, "dragon": dur_d, "habla_dragon": hab_d}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

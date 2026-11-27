@@ -90,6 +90,9 @@ public final class ClientSetup {
         // Pell, el Bufon del Rey, y lo que tira (parte 7y)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BUFON.get(), com.darkcraft.client.enemigos.BufonRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PROYECTIL_BUFON.get(), ctx -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(ctx, 1.1f, true));
+        // Vorthak, el Dragon de Ceniza, y su bola de fuego (grande y a plena luz) (parte 7z)
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.DRAGON.get(), com.darkcraft.client.enemigos.DragonRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PROYECTIL_DRAGON.get(), ctx -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(ctx, 3.2f, true));
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BALLENERO.get(), com.darkcraft.client.enemigos.BalleneroRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ARPON_BALLENERO.get(), com.darkcraft.client.enemigos.ArponBalleneroRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.FAROL_ACEITE.get(), ctx -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(ctx, 1.4f, true));
@@ -170,6 +173,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.GiganteModelo.CAPA, com.darkcraft.client.enemigos.GiganteGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.JineteModelo.CAPA, com.darkcraft.client.enemigos.JineteGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.BufonModelo.CAPA, com.darkcraft.client.enemigos.BufonGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.DragonModelo.CAPA, com.darkcraft.client.enemigos.DragonGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.ViejaModelo.CAPA, com.darkcraft.client.enemigos.ViejaGeometria::crear);
     }
 }

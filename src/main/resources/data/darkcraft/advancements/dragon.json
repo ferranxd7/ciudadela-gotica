@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:nido",
+  "display": {
+    "icon": {
+      "item": "darkcraft:bola_dragon"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.dragon.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.dragon.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 600
+  }
+}

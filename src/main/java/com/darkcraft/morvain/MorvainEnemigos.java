@@ -67,11 +67,11 @@ public final class MorvainEnemigos {
     public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo",
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
             CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio",
-            PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar", CERCO = "cerco", TEATRO = "teatro";
+            PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar", CERCO = "cerco", TEATRO = "teatro", NIDO = "nido";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
             ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
-            PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon";
+            PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon", DRAGON = "dragon";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
@@ -82,7 +82,7 @@ public final class MorvainEnemigos {
             BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>(), ERMITA_P = new ArrayList<>(), CUMBRE_P = new ArrayList<>(),
             CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>(),
             PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>(), GRIETA_P = new ArrayList<>(), ALTAR_P = new ArrayList<>(),
-            CERCO_P = new ArrayList<>(), TEATRO_P = new ArrayList<>();
+            CERCO_P = new ArrayList<>(), TEATRO_P = new ArrayList<>(), NIDO_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -219,6 +219,11 @@ public final class MorvainEnemigos {
         for (Teatro.Espera e : Teatro.get().esperas())
             TEATRO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? BUFON : CALCINADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
                     e.ronda(), e.grupo()));
+        // ---- el Nido de Ceniza (parte 7z): Vorthak, el Dragon de Ceniza, dormido sobre su oro (el puesto 0) y los calcinados de la
+        // guarnicion de la Atalaya del Cuervo
+        for (Nido.Espera e : Nido.get().esperas())
+            NIDO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? DRAGON : CALCINADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
+                    e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -271,6 +276,11 @@ public final class MorvainEnemigos {
         return 0;
     }
 
+    /** El numero del puesto de Vorthak, el Dragon de Ceniza, en el sitio del Nido. */
+    public static int dragon() {
+        return 0;
+    }
+
     /** Lo apunta el mod al arrancar. */
     public static void registrar() {
         Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
@@ -292,6 +302,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(PONTIFICE, DarkCraftMod.PONTIFICE);
         Puestos.tipo(ALDRIC, DarkCraftMod.ALDRIC);
         Puestos.tipo(BUFON, DarkCraftMod.BUFON);
+        Puestos.tipo(DRAGON, DarkCraftMod.DRAGON);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -327,6 +338,8 @@ public final class MorvainEnemigos {
                 (l, p) -> Puestos.JEFE.equals(p.grupo()) || p.postura() != REZA || !Cerco.enPaz(l.getServer()));
         // el Teatro Hundido: los calcinados del teatro y Pell en su sala
         Puestos.registrar(TEATRO, TEATRO_P, Morvain::es);
+        // el Nido de Ceniza: los calcinados de la atalaya y del camino, y Vorthak sobre su oro
+        Puestos.registrar(NIDO, NIDO_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -358,6 +371,9 @@ public final class MorvainEnemigos {
             // y al caer Pell, el teatro vacio aplaude (lo hace su muerte; aqui, el aviso)
             if (e instanceof com.darkcraft.enemigos.Bufon && TEATRO.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] Pell, el Bufon del Rey, cae: la ultima funcion se acaba");
+            // y al caer Vorthak el nido queda en silencio (su oro, para quien suba)
+            if (e instanceof com.darkcraft.enemigos.Dragon && NIDO.equals(e.sitio()))
+                DarkCraftMod.LOGGER.info("[DarkCraft] Vorthak, el Dragon de Ceniza, cae: el Nido de Ceniza queda en silencio");
         });
     }
 
@@ -444,6 +460,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> teatro() {
         preparar();
         return List.copyOf(TEATRO_P);
+    }
+
+    public static List<Puesto> nido() {
+        preparar();
+        return List.copyOf(NIDO_P);
     }
 
     public static List<Puesto> puerto() {
@@ -1532,6 +1553,118 @@ public final class MorvainEnemigos {
         int[] at = Teatro.get().sitio("atril");
         if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(at[0], at[1], at[2])) && m.isLoaded(new net.minecraft.core.BlockPos(Teatro.CX, Teatro.SALA, Teatro.CZ + Teatro.SALA_V)))
             s += "; " + Teatro.resumen(m) + "; muros: " + MurosIlusorios.estado(m);
+        return s;
+    }
+
+    /**
+     * {@code /darkcraft nido [ir <sitio> | enemigos [volver | fuera | sacar]]} (parte 7z): el Nido de Ceniza: ir a uno de sus sitios
+     * y sus calcinados.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoNido() {
+        return net.minecraft.commands.Commands.literal("nido")
+                .executes(c -> decir(c, estadoNido(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irNido(c.getSource(), "entrada"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Nido.get().sitios().keySet(), b))
+                                .executes(c -> irNido(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoNido(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), NIDO, false);
+                            return decir(c, "vuelven todos los del nido");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), NIDO, true);
+                            return decir(c, "fuera todos los del nido");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, NIDO).size();
+                            return decir(c, "fuera " + n);
+                        })));
+    }
+
+    private static int irNido(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Nido.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Nido.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando al centro de la repisa (desde el centro, al tesoro)
+        double dx = Nido.CX + 0.5 - (s[0] + 0.5), dz = Nido.CZ + 0.5 - (s[2] + 0.5);
+        if ("centro".equals(sitio)) {
+            dx = Nido.TESORO_U;
+            dz = Nido.TESORO_V;
+        }
+        float giro = (float) (Math.toDegrees(Math.atan2(dz, dx)) - 90.0);
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
+        return 1;
+    }
+
+    /** Cuantos calcinados del nido quedan y lo que hay (si esta cargado). */
+    public static String estadoNido(net.minecraft.server.MinecraftServer srv) {
+        String s = "nido de ceniza: quedan " + Puestos.quedan(srv, NIDO) + " de " + NIDO_P.size() + " (fuera " + Puestos.fuera(NIDO) + ")";
+        var m = Morvain.nivel(srv);
+        int[] at = Nido.get().sitio("atril"), te = Nido.get().sitio("arcon_tesoro");
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(at[0], at[1], at[2])) && m.isLoaded(new net.minecraft.core.BlockPos(te[0], te[1], te[2])))
+            s += "; " + Nido.resumen(m);
+        return s;
+    }
+
+    /**
+     * {@code /darkcraft dragon [ir | vencer | volver | media | despegar | rasante | bolas | picado | ascuas | bajar | derribar]}
+     * (parte 7z): como esta Vorthak, llevar ante el (al centro de la repisa), vencerle, que vuelva, y que haga ya lo que se le diga.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoDragon() {
+        var raiz = net.minecraft.commands.Commands.literal("dragon")
+                .executes(c -> decir(c, estadoDragon(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> {
+                    irNido(c.getSource(), "centro");
+                    return decir(c, estadoDragon(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(NIDO, dragon());
+                    if (e instanceof com.darkcraft.enemigos.Dragon d) d.vencer();
+                    else {
+                        Puestos.marcar(srv, NIDO, dragon(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "dragon");
+                    }
+                    return decir(c, estadoDragon(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, NIDO, dragon(), false);
+                    return decir(c, estadoDragon(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("media").executes(c -> {
+                    if (Puestos.enemigo(NIDO, dragon()) instanceof com.darkcraft.enemigos.Dragon d) d.mediaVida();
+                    return decir(c, estadoDragon(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("despegar").executes(c -> {
+                    if (Puestos.enemigo(NIDO, dragon()) instanceof com.darkcraft.enemigos.Dragon d) d.despegar();
+                    return decir(c, estadoDragon(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("derribar").executes(c -> {
+                    if (Puestos.enemigo(NIDO, dragon()) instanceof com.darkcraft.enemigos.Dragon d) d.derribar();
+                    return decir(c, estadoDragon(c.getSource().getServer()));
+                }));
+        for (String m : List.of("rasante", "bolas", "picado", "ascuas", "bajar"))
+            raiz.then(net.minecraft.commands.Commands.literal(m).executes(c -> {
+                if (Puestos.enemigo(NIDO, dragon()) instanceof com.darkcraft.enemigos.Dragon d) d.maniobra(m);
+                return decir(c, estadoDragon(c.getSource().getServer()));
+            }));
+        return raiz;
+    }
+
+    /** Como esta Vorthak: para el comando y las pruebas. */
+    public static String estadoDragon(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(NIDO, dragon());
+        String s = "Vorthak: " + (Puestos.muerto(srv, NIDO, dragon()) ? "caido" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Dragon d) s += ", " + d.estado();
         return s;
     }
 
