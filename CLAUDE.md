@@ -3809,8 +3809,10 @@ Respuesta 111 del plan ("conjuntos con modelo 3D propio: yelmo, pecho, guantes, 
   `textures/models/armor/<conjunto>.png`.
 - **El modelo** (`client/armadura/ModelosArmadura`): una capa por conjunto y pieza (`darkcraft:armadura_<conjunto>#<pieza>`), la
   geometria de `ArmaduraGeometria` (GENERADA), horneada la primera vez que se dibuja (se vuelve a hornear al recargar los recursos:
-  `EntityRenderersEvent.AddLayers`). `PiezaArmadura.initializeClient` da un `IClientItemExtensions` cuyo `getHumanoidArmorModel`
-  devuelve el `Modelo` (un `HumanoidModel` con las siete piezas del jugador y las cajas de la armadura colgadas de ellas, con piezas
+  `EntityRenderersEvent.AddLayers`). `PiezaArmadura.initializeClient` da `ModelosArmadura.EXTENSION`, cuyo `getHumanoidArmorModel`
+  mira el conjunto y la pieza en el objeto que se dibuja (**ojo: Forge llama a `initializeClient` desde el constructor de `Item`,
+  antes de que se pongan los campos de la subclase**: en la build 199, con `conjunto.id` ahi, el cliente no arrancaba) y devuelve el
+  `Modelo` (un `HumanoidModel` con las siete piezas del jugador y las cajas de la armadura colgadas de ellas, con piezas
   hijas con giro para cuernos, plumas, la punta del sombrero...). La capa de armadura de Minecraft le copia la postura del jugador (las
   poses del combate, beber, rodar...) y enciende solo las piezas del hueco (Forge copia esa visibilidad): `Modelo.renderToBuffer`
   las enciende todas (asi los guantes, en el hueco de los pies, se ven en los brazos, y el yelmo del confesor y el del vagabundo
@@ -3835,7 +3837,8 @@ Respuesta 111 del plan ("conjuntos con modelo 3D propio: yelmo, pecho, guantes, 
   `tools/ui/menu.py`) y grebas; su ficha es la de la pieza. Comando `/darkcraft armadura [<conjunto> [poner] | quitar]` (sin mas:
   los conjuntos y lo que se lleva puesto).
 - Efectos (ElevenLabs, flow `HcCgofcQ0l53Gsm2ZI50`): `armadura_placas` (tomas 1 y 2), `armadura_malla` (2 y 1; la 3 es casi toda
-  silencio), `armadura_cuero` (1 y 2), `armadura_tela` (1 y 4).
+  silencio), `armadura_cuero` (1 y 2), `armadura_tela` (1 y 4). **`procesar.py` numera las salidas por orden** (`_1`, `_2`...), no
+  con el numero de la toma: en `sounds.json` van `armadura_tela_1` y `_2` (en la build 199 ponia `_4`, que no existe).
 - Pruebas: servidor, `armaduras()` (linea `Armaduras: ...`: las 36 piezas bien —hueco, sin romperse, defensa, peso, sonido—, cada
   conjunto entero con su defensa, su peso y su fuego y su magia iguales al total, la armadura de cada clase y cuantas piezas dan 40
   cofres de la armeria y de las casas de Brumavela); cliente, tramo `armaduras()` despues de `clases()`: cada conjunto puesto en
