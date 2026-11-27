@@ -128,6 +128,11 @@ public class Volcado {
     public static void main(String[] a) throws Exception {
         net.minecraft.SharedConstants.tryDetectVersion();
         net.minecraft.server.Bootstrap.bootStrap();
+        // con Forge, lo que cada estado sabe de si (si es macizo, si para el paso: blocksMotion) no se calcula hasta que se
+        // cierran los registros (y Blocks.rebuildCache no sirve: la lista de estados aun esta vacia); sin esto, fuera del juego
+        // ningun bloque "tapa" ni "choca" (las cuentas de la camara y de lo que toca la ciudadela salian 0)
+        for (var b : net.minecraft.core.registries.BuiltInRegistries.BLOCK)
+            for (var s : b.getStateDefinition().getPossibleStates()) s.initCache();
         String que = a[0], salida = a[1];
         WorldGenLevel lvl = nivel();
         long t0 = System.currentTimeMillis();

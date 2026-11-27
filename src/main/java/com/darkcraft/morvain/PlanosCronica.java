@@ -295,10 +295,13 @@ public final class PlanosCronica {
         l.add(buscar(w, eye, 0, 2.5, 0.9, a -> new Shot(c[0], c[1], 64, 0, 1,
                 p(X - 3 + a, F + 3, Z + 32, X - 2 + a, F + 3.8, Z + 28.5, X - 1 + a, F + 4.6, Z + 25),
                 p(X, F + 9, cimaZ, X, F + 14, Z - 5, X, F + 20, Z - 15))));
-        // 2) "Otros llegaron despues... golpeaban la cadena por turnos...": a ras de suelo, alrededor del pie del ancla
-        l.add(buscar(w, eye, 25, 10, 0.6, a -> new Shot(c[1], c[2], 60, 0, 1,
-                cat(anillo(X, cimaZ, a, 17, F + 1.8), anillo(X, cimaZ, a + 15, 16.5, F + 2.0), anillo(X, cimaZ, a + 30, 16, F + 2.2)),
-                p(X, F + 3, cimaZ, X, F + 3.4, cimaZ, X, F + 3.8, cimaZ))));
+        // 2) "Otros llegaron despues... golpeaban la cadena por turnos...": el ancla entera desde el lado del campamento (al
+        //    oeste-noroeste, de espaldas al jugador), algo por encima de las cabezas de los marcados, rodeandola despacio y
+        //    mirando a lo alto de su cara de este lado (la cadena sale de la cima; mirar a la cima misma da en el primer eslabon,
+        //    que la tapa siempre); en la build 192, a ras de suelo y a 17, solo se veia la pared de la piramide (tapada 25 de 25)
+        l.add(buscar(w, eye, 215, 10, 0.6, a -> new Shot(c[1], c[2], 60, 0, 1,
+                cat(anillo(X, cimaZ, a, 26, F + 3.2), anillo(X, cimaZ, a + 9, 25.5, F + 3.8), anillo(X, cimaZ, a + 18, 25, F + 4.4)),
+                cat(anillo(X, cimaZ, a, 6, F + 5.5), anillo(X, cimaZ, a + 9, 6, F + 6.0), anillo(X, cimaZ, a + 18, 6, F + 6.5)))));
         // 3) "El hierro que forjaron mis hermanas no se rompe...": el primer eslabon, de cerca y de lado
         l.add(buscar(w, eye, 0, 2, 0.8, a -> new Shot(c[2], c[3], 55, 0, 1,
                 p(X + 15 + a, F + 6, Z + 6, X + 14 + a, F + 7.5, Z + 3, X + 13 + a, F + 9, Z),

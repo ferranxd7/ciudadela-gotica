@@ -3606,7 +3606,8 @@ Respuestas 61 y 126 del plan: los capitulos de Morvain los narra la guia de los 
   del portal desde abajo; el camino del norte con la estela; el horizonte donde cuelga la ciudadela (con la lejania se ve); Maelis de
   cara con el santuario detras. VIII: la Puerta Oeste desde la calle mayor; la camara sube en el cruce sobre los tejados quemados; las
   fachadas de la calle; la plaza alrededor de la estatua (por el este); la estatua de cerca; el jugador. IX: el ancla y la cadena desde
-  el patio; los que la golpean, a ras de suelo; el primer eslabon de lado; la camara sube junto a la cadena; la cima del ancla (Aldric);
+  el patio; el ancla entera desde el lado del campamento (a 26, con el primer eslabon encima: a ras de suelo y a 17 solo se veia la
+  pared de la piramide); el primer eslabon de lado; la camara sube junto a la cadena; la cima del ancla (Aldric);
   el Cerco entero desde lo alto. X: la nave hacia el retablo; la isla colgada de sus cadenas desde fuera; los candelabros; el trono de
   la reina (un piso mas arriba); la Ultima Llama de cerca; la aguja contra el cielo; Maelis junto al fuego. Cada plano se busca libre
   (`buscar`: si choca con algo o se tapa lo que mira, prueba al lado; nunca pasa a menos de 1,3 del jugador); en estos capitulos se ve
@@ -3614,8 +3615,10 @@ Respuestas 61 y 126 del plan: los capitulos de Morvain los narra la guia de los 
 - **Sin abrir el juego**: `VOLCADO_OPTS="-Dcronica=N" tools/vista3d/vista.sh morvain_llegada|morvain_capital|morvain_cerco|morvain_homenaje
   carpeta` escribe por plano si la camara se mete en algo o se tapa lo que mira y `volcado.bin.planos.txt`; **`tools/vista3d/camara.py
   volcado.bin planos.txt carpeta`** dibuja lo que ve la camara en tres momentos de cada plano (perspectiva con el campo de vision de
-  Minecraft, los colores de vista.py, el jugador como una columna roja). Ojo: en el volcado del Cerco el terreno de encima del patio
-  sale mal (piedra por encima): alli vale la prueba de la CI.
+  Minecraft, los colores de vista.py, el jugador como una columna roja). **Ojo: con Forge, fuera del juego cada estado de bloque no
+  sabe si es macizo (`blocksMotion`, `isSolid`) hasta que se le llama `initCache()`** (`Blocks.rebuildCache` no sirve: la lista de
+  estados esta vacia): `Volcado.main` lo hace con todos al empezar; antes las cuentas de "tapada" y "metida" (y lo que toca la
+  ciudadela) salian 0 siempre. Ahora salen como en la CI (los planos del 9 de la build 192: 15, 25, 0... en la CI y 13, 25, 0... aqui).
 - **El menu y el codice**: la Historia tiene su apartado "Cronica de Morvain" (desde que se abrio el portal o se leyo alguno); las
   miniaturas 12-15 (`CodiceScreen.miniaturaCapitulo`; el atlas `miniaturas.png` pasa a 512 x 320: las tierras marchitas con el molino y
   el campanario, la puerta de la Capital con la estatua y los calcinados, la cadena que sube del ancla con Aldric arriba, las ocho
