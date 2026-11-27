@@ -492,6 +492,25 @@ ICONOS = {
         "................",
         "................",
     ],
+    # el guantelete (la parte 7ai: los guantes van en el hueco de los pies de Minecraft)
+    "guantes": [
+        "................",
+        "....kkkkkkk.....",
+        "....kUTTTSk.....",
+        "....kqQQQqk.....",
+        "....kTSSSsk.....",
+        "....kTSSSsk.....",
+        "...kkTSSSskk....",
+        "...kUTSSSSsk....",
+        "...kTSSSSSsk.kk.",
+        "...kTSSSSSskkSk.",
+        "...kTSSSSSsSSk..",
+        "...kTkSkSkSsk...",
+        "...kTkSkSkSk....",
+        "...kTkSkSkSk....",
+        "....kkkkkkkk....",
+        "................",
+    ],
     "talisman": [
         "................",
         "....kk....kk....",
@@ -699,9 +718,10 @@ def montar():
     A.poner("santuario", santuario())
     for i, n in enumerate(("", "_luz", "_cerrada")):
         A.poner("ranura" + n, ranura(i))
-    for n in ("espada", "escudo", "yelmo", "pecho", "piernas", "botas", "talisman", "hechizo", "objeto", "material", "llave", "todo"):
+    for n in ("espada", "escudo", "yelmo", "pecho", "piernas", "botas", "talisman", "hechizo", "objeto", "material", "llave", "todo",
+              "guantes"):
         A.poner("ico_" + n, icono(n))
-    for n in ("espada", "escudo", "yelmo", "pecho", "piernas", "botas", "talisman", "hechizo", "objeto"):
+    for n in ("espada", "escudo", "yelmo", "pecho", "piernas", "botas", "talisman", "hechizo", "objeto", "guantes"):
         A.poner("sil_" + n, silueta(n))
     for n, t in piezas().items():
         A.poner(n, t)

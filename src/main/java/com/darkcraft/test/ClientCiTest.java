@@ -2979,6 +2979,64 @@ public final class ClientCiTest {
         return t + 100;
     }
 
+    // ------------------------------------------------------------------ las armaduras con modelo propio (parte 7ai)
+
+    /**
+     * Cada conjunto puesto, visto de frente en tercera persona (y el caballero tambien de espaldas), y el menu con el caballero:
+     * los cuatro huecos (yelmo, peto, guantes y grebas) y la ficha de una pieza. Lineas {@code armadura ...} con lo que lleva
+     * (defensa, peso, conjunto), lo que resiste y cuantos modelos de armadura hay horneados.
+     */
+    private static int armaduras(int t0) {
+        base = 0;
+        int t = t0;
+        final String[] conjuntos = {"caballero", "confesor", "vagabundo", "guerrero", "barbaro", "bandido", "hechicero", "profeta", "prisionero"};
+        atTicks(t, "Armaduras: tercera persona, de frente", m -> {
+            m.setScreen(null);
+            m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.connection.teleport(sp.getX(), sp.getY(), sp.getZ(), sp.getYRot(), 0f);
+            });
+        });
+        t += 4;
+        for (int i = 0; i < conjuntos.length; i++) {
+            final String c = conjuntos[i];
+            final int n = i + 1;
+            atTicks(t, "ponerse " + c, m -> server(m, sp -> comando(sp, "darkcraft armadura " + c + " poner")));
+            atTicks(t + 10, "captura: " + c, m -> {
+                shot(m, String.format(java.util.Locale.ROOT, "cliente_ar%02d_%s", n, c));
+                server(m, sp -> log("  armadura " + c + ": " + com.darkcraft.armadura.Armaduras.resumen(sp) + " | resiste "
+                        + java.util.Arrays.toString(com.darkcraft.rol.Resistencias.todas(sp)) + " | modelos horneados "
+                        + com.darkcraft.client.armadura.ModelosArmadura.horneados()));
+            });
+            t += 12;
+        }
+        atTicks(t, "el caballero, de espaldas", m -> {
+            m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            server(m, sp -> comando(sp, "darkcraft armadura caballero poner"));
+        });
+        atTicks(t + 10, "captura: el caballero de espaldas", m -> shot(m, "cliente_ar10_caballero_espalda"));
+        atTicks(t + 12, "el menu: el equipo del caballero", m -> {
+            m.options.hideGui = false;
+            m.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.EQUIPO);
+        });
+        atTicks(t + 22, "captura: el equipo del caballero", m -> shot(m, "cliente_ar11_menu"));
+        atTicks(t + 24, "el menu: el estado (resistencias)", m -> com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.ESTADO));
+        atTicks(t + 32, "captura: el estado con el caballero", m -> shot(m, "cliente_ar12_estado"));
+        atTicks(t + 34, "Fin de las armaduras", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                comando(sp, "darkcraft armadura quitar");
+                sp.getInventory().clearContent();
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 40;
+    }
+
     // ------------------------------------------------------------------ el mundo de nubes (parte 3a)
 
     private static net.minecraft.world.entity.decoration.ArmorStand nubesMuneco;
@@ -5230,6 +5288,8 @@ public final class ClientCiTest {
         fin = codice(fin);
         fin = pausa(fin);
         fin = clases(fin);
+        // las armaduras con modelo propio (parte 7ai)
+        fin = armaduras(fin);
         fin = nubes(fin);
         fin = pueblo(fin);
         fin = enemigos(fin);

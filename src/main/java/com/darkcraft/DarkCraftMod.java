@@ -23,6 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
@@ -176,6 +177,11 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_AGUJAS = sound("sfx.agujas");
     public static final RegistryObject<SoundEvent> SFX_HEDDA_DESCANSA = sound("sfx.hedda_descansa");
     public static final RegistryObject<SoundEvent> SFX_LANZA_SACAR = sound("sfx.lanza_sacar");
+    /** Ponerse una pieza de armadura (parte 7ai): de placas, de malla, de cuero y pieles o de tela. */
+    public static final RegistryObject<SoundEvent> SFX_ARMADURA_PLACAS = sound("sfx.armadura_placas");
+    public static final RegistryObject<SoundEvent> SFX_ARMADURA_MALLA = sound("sfx.armadura_malla");
+    public static final RegistryObject<SoundEvent> SFX_ARMADURA_CUERO = sound("sfx.armadura_cuero");
+    public static final RegistryObject<SoundEvent> SFX_ARMADURA_TELA = sound("sfx.armadura_tela");
     public static final RegistryObject<SoundEvent> SFX_FORJA_MEJORA = sound("sfx.forja_mejora");
     public static final RegistryObject<SoundEvent> SFX_TIENDA_COMPRA = sound("sfx.tienda_compra");
     // las habilidades de las armas (cenizas de guerra) y ponerle una ceniza a un arma
@@ -1185,6 +1191,28 @@ public class DarkCraftMod {
             TALISMANES.put(c, ITEMS.register("talisman_" + c.id, () -> new com.darkcraft.rol.Talisman(c, new Item.Properties().stacksTo(1).rarity(Rarity.RARE))));
     }
 
+    /**
+     * Las piezas de los conjuntos de armadura con modelo propio (parte 7ai): {@code <conjunto>_<pieza>} (yelmo, peto, guantes,
+     * grebas), en el orden de {@link com.darkcraft.armadura.Conjunto}.
+     */
+    public static final java.util.Map<String, RegistryObject<Item>> ARMADURAS = new java.util.LinkedHashMap<>();
+
+    static {
+        for (com.darkcraft.armadura.Conjunto c : com.darkcraft.armadura.Conjunto.values())
+            for (int i = 0; i < 4; i++) {
+                final int pieza = i;
+                String id = c.objeto(pieza);
+                ARMADURAS.put(id, ITEMS.register(id, () -> new com.darkcraft.armadura.PiezaArmadura(c, pieza,
+                        new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.UNCOMMON))));
+            }
+    }
+
+    /** Una pieza de armadura (conjunto y pieza: 0 yelmo, 1 peto, 2 guantes, 3 grebas). */
+    public static ItemStack armadura(com.darkcraft.armadura.Conjunto c, int pieza) {
+        RegistryObject<Item> r = ARMADURAS.get(c.objeto(pieza));
+        return r == null ? ItemStack.EMPTY : new ItemStack(r.get());
+    }
+
     private static RegistryObject<SoundEvent> sound(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(MODID, name)));
     }
@@ -1305,6 +1333,7 @@ public class DarkCraftMod {
             e.accept(SELLO_SAGRADO);
             for (RegistryObject<Item> h : HECHIZOS.values()) e.accept(h);
             for (RegistryObject<Item> c : CENIZAS.values()) e.accept(c);
+            for (RegistryObject<Item> a : ARMADURAS.values()) e.accept(a);
         }
         if (e.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
             for (RegistryObject<Item> f : FRUTOS.values()) e.accept(f);

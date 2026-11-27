@@ -3792,6 +3792,57 @@ La segunda mision (respuestas 95 y 117 del plan), con tres finales y con **cada 
   (`hd12`), volver con ella (`hd13`, `hd14`), la verdad (`hd15`), se va (`hd16`, `hd17`), de rodillas junto a Tam (`hd18`, `hd19`), la
   lanza (`hd20`, `hd21`, `hd22` en la mano), la mentira y se apaga (`hd23..hd25`) y callar (`hd26`, `hd27`).
 
+### Plan grande, parte 7ai: las armaduras con modelo propio (los conjuntos de las clases)
+
+Respuesta 111 del plan ("conjuntos con modelo 3D propio: yelmo, pecho, guantes, piernas"). Primera tanda: un conjunto por clase.
+- **Conjuntos** (`armadura/Conjunto`, enum): `caballero`, `confesor`, `vagabundo`, `guerrero`, `barbaro`, `bandido`, `hechicero`,
+  `profeta` y `prisionero` (el desdichado, nada). Cada uno: su defensa por pieza (puntos de armadura de Minecraft; el caballero 17 en
+  total, el hechicero 7), su dureza y lo que aguanta los empujones (los de placas), lo que pesa entero (repartido 20/40/13/27 %:
+  `REPARTO`) y lo que resiste entero de fuego, hielo, rayo, magia, veneno y sombra (cada pieza `1 - (1 - total)^reparto`: con las
+  cuatro puestas, multiplicadas, da justo el total; lo fisico lo para la defensa). Su `ArmorMaterial`: no se rompe (durabilidad 0),
+  no se encanta ni se repara; el sonido de ponerse es uno de los cuatro de ElevenLabs (placas, malla, cuero y pieles, tela).
+- **Las piezas** (`armadura/PiezaArmadura`, un `ArmorItem`; objetos `darkcraft:<conjunto>_<yelmo|peto|guantes|grebas>`, 36, en
+  `DarkCraftMod.ARMADURAS`; `DarkCraftMod.armadura(conjunto, pieza)`). **Los guantes van en el hueco de los PIES de Minecraft** (no
+  hay hueco de manos; su modelo pone las cajas en los brazos) y las grebas llevan tambien las botas. La ficha (`lineas()`: el menu y el
+  recuadro) dice "Defensa N · Peso N", lo que resiste y el conjunto y la descripcion; los "+N de armadura" de Minecraft no salen
+  (`getDefaultTooltipHideFlags`: dirian "en los pies" para los guantes). Su textura: `getArmorTexture` →
+  `textures/models/armor/<conjunto>.png`.
+- **El modelo** (`client/armadura/ModelosArmadura`): una capa por conjunto y pieza (`darkcraft:armadura_<conjunto>#<pieza>`), la
+  geometria de `ArmaduraGeometria` (GENERADA), horneada la primera vez que se dibuja (se vuelve a hornear al recargar los recursos:
+  `EntityRenderersEvent.AddLayers`). `PiezaArmadura.initializeClient` da un `IClientItemExtensions` cuyo `getHumanoidArmorModel`
+  devuelve el `Modelo` (un `HumanoidModel` con las siete piezas del jugador y las cajas de la armadura colgadas de ellas, con piezas
+  hijas con giro para cuernos, plumas, la punta del sombrero...). La capa de armadura de Minecraft le copia la postura del jugador (las
+  poses del combate, beber, rodar...) y enciende solo las piezas del hueco (Forge copia esa visibilidad): `Modelo.renderToBuffer`
+  las enciende todas (asi los guantes, en el hueco de los pies, se ven en los brazos, y el yelmo del confesor y el del vagabundo
+  llevan su esclavina / camal en el cuerpo).
+- **Hacerlos sin abrir el juego** (`tools/armaduras/armaduras.py [--vistas carpeta] [--solo conjunto]`): cada conjunto es una
+  funcion que pone cajas (`Conjunto.caja(pieza, parte, x, y, z, w, h, d, material, crecer)`, medidas enteras; `lados(...)` la misma en
+  los dos brazos o las dos piernas; `hija(...)` una pieza con giro) en el espacio de cada parte del jugador (la cabeza con el cuello en
+  0, el brazo derecho de -2 a 10 en Y colgado de (-5, 2, 0), la pierna de 0 a 12) y sus pintores por material (los de
+  `tools/enemigos/pinta.py` y los de aqui: `Pintor.placa` —acero con la luz de arriba a la izquierda y contornos, como el hierro de
+  Minecraft—, `malla`, `cuero`, `tela`, `pelo`; lo transparente deja ver al jugador: la cara bajo la cofia, los ojos del bandido, el
+  pecho del barbaro, la cabeza en la jaula). Para no pelearse con la piel del jugador: los yelmos crecen 0,6 o mas (la capa del
+  sombrero de la piel crece 0,5), lo del cuerpo 0,5 o mas (la chaqueta, 0,25). Saca la textura, el icono de cada pieza (sus cajas
+  dibujadas de tres cuartos y encajadas en 32 x 32 con contorno; el de los guantes, el derecho solo en diagonal), el modelo de objeto y
+  `ArmaduraGeometria.java`; con `--vistas`, cada conjunto puesto en un maniqui con la piel de Steve (de frente, de espaldas, de lado
+  y andando) con sus iconos, la textura en grande y `todos.png`.
+- **Las clases empiezan con el suyo** (`Clase.kit`; la armadura del kit va en el orden cabeza, pecho, piernas, pies: el peto, las
+  grebas y los guantes) y la pantalla de elegir clase los ensena puestos. Botin: la armeria de Valdrenn da piezas del caballero (y el
+  peto del confesor y el del guerrero), las casas de Brumavela las del bandido y las buenas las del vagabundo (en vez de las de hierro,
+  malla y cuero de Minecraft, que siguen existiendo).
+- **Lo demas**: `Peso.item` (lo suyo), `Resistencias.de` (cada pieza puesta multiplica lo que queda), el menu (R) ensena los huecos
+  como en Elden Ring: yelmo, peto, **guantes** (el hueco de los pies, con su silueta: `MenuTex.SIL_GUANTES` / `ICO_GUANTES` de
+  `tools/ui/menu.py`) y grebas; su ficha es la de la pieza. Comando `/darkcraft armadura [<conjunto> [poner] | quitar]` (sin mas:
+  los conjuntos y lo que se lleva puesto).
+- Efectos (ElevenLabs, flow `HcCgofcQ0l53Gsm2ZI50`): `armadura_placas` (tomas 1 y 2), `armadura_malla` (2 y 1; la 3 es casi toda
+  silencio), `armadura_cuero` (1 y 2), `armadura_tela` (1 y 4).
+- Pruebas: servidor, `armaduras()` (linea `Armaduras: ...`: las 36 piezas bien —hueco, sin romperse, defensa, peso, sonido—, cada
+  conjunto entero con su defensa, su peso y su fuego y su magia iguales al total, la armadura de cada clase y cuantas piezas dan 40
+  cofres de la armeria y de las casas de Brumavela); cliente, tramo `armaduras()` despues de `clases()`: cada conjunto puesto en
+  tercera persona de frente (`cliente_ar01_caballero` ... `ar09_prisionero`, lineas `armadura <conjunto>: ...` con lo que lleva, lo
+  que resiste y los modelos horneados), el caballero de espaldas (`ar10`), el menu con sus cuatro huecos (`ar11`) y el estado con sus
+  resistencias (`ar12`); y las de las clases (`cliente_cl01`, `cl02`, `cl05`, `cl06`) ya salen con su armadura.
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

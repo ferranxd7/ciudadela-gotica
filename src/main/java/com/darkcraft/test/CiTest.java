@@ -761,6 +761,96 @@ public final class CiTest {
         herrerosMorvain(server, m, log);
         misionOswin(server, m, log);
         misionHedda(server, m, log);
+        armaduras(server, m, log);
+    }
+
+    /**
+     * Parte 7ai: las armaduras con modelo propio. Cada pieza registrada es de su conjunto, va en su hueco (los guantes en el de
+     * los pies), no se rompe, tiene su defensa, su peso y su sonido; cada conjunto entero puesto da su defensa, su peso y sus
+     * resistencias (las de las piezas, multiplicadas, dan las del conjunto); cada clase empieza con el suyo; y la armeria de
+     * Valdrenn y las casas de Brumavela los dan.
+     */
+    private static void armaduras(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        StringBuilder sb = new StringBuilder("Armaduras:");
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07a11"), "[DarkCraftCI24]"));
+        try {
+            int piezas = 0, malas = 0;
+            for (var e : DarkCraftMod.ARMADURAS.entrySet()) {
+                net.minecraft.world.item.Item it = e.getValue().get();
+                if (!(it instanceof com.darkcraft.armadura.PiezaArmadura pa)) {
+                    malas++;
+                    sb.append(" NO-ES-PIEZA ").append(e.getKey());
+                    continue;
+                }
+                piezas++;
+                net.minecraft.world.item.ItemStack st = new net.minecraft.world.item.ItemStack(it);
+                boolean bien = pa.getEquipmentSlot() == com.darkcraft.armadura.Armaduras.HUECOS[pa.pieza] && !st.isDamageableItem()
+                        && pa.getDefense() == pa.conjunto.defensa(pa.pieza) && pa.getDefense() > 0
+                        && com.darkcraft.combate.Peso.item(st) > 0f && pa.getEquipSound() != null
+                        && e.getKey().equals(pa.conjunto.objeto(pa.pieza));
+                if (!bien) {
+                    malas++;
+                    sb.append(" MAL ").append(e.getKey());
+                }
+            }
+            sb.append(' ').append(piezas).append(" piezas de ").append(com.darkcraft.armadura.Conjunto.values().length).append(" conjuntos, mal ").append(malas);
+            // cada conjunto entero: defensa, peso y resistencias
+            int resMal = 0;
+            for (com.darkcraft.armadura.Conjunto c : com.darkcraft.armadura.Conjunto.values()) {
+                for (int i = 0; i < 4; i++) fp.setItemSlot(com.darkcraft.armadura.Armaduras.HUECOS[i], DarkCraftMod.armadura(c, i));
+                int def = 0;
+                float peso = 0f;
+                for (int i = 0; i < 4; i++) {
+                    net.minecraft.world.item.ItemStack st = fp.getItemBySlot(com.darkcraft.armadura.Armaduras.HUECOS[i]);
+                    if (st.getItem() instanceof com.darkcraft.armadura.PiezaArmadura pa) def += pa.getDefense();
+                    peso += com.darkcraft.combate.Peso.item(st);
+                }
+                float fuego = com.darkcraft.rol.Resistencias.de(new net.minecraft.world.item.ItemStack[0], fp, com.darkcraft.rol.Resistencias.Tipo.FUEGO);
+                float magia = com.darkcraft.rol.Resistencias.de(new net.minecraft.world.item.ItemStack[0], fp, com.darkcraft.rol.Resistencias.Tipo.MAGIA);
+                if (Math.abs(fuego - c.resistenciaTotal(com.darkcraft.rol.Resistencias.Tipo.FUEGO)) > 0.005f
+                        || Math.abs(magia - c.resistenciaTotal(com.darkcraft.rol.Resistencias.Tipo.MAGIA)) > 0.005f) resMal++;
+                com.darkcraft.armadura.Conjunto entero = com.darkcraft.armadura.Armaduras.entero(fp);
+                sb.append(String.format(java.util.Locale.ROOT, " | %s: defensa %d, peso %.1f, fuego %.2f, magia %.2f%s", c.id, def, peso, fuego, magia,
+                        entero == c ? "" : " (NO ENTERO)"));
+            }
+            sb.append(" | resistencias que no dan el total ").append(resMal);
+            // las clases
+            StringBuilder cl = new StringBuilder();
+            int clMal = 0;
+            for (com.darkcraft.rol.Clase k : com.darkcraft.rol.Clase.values()) {
+                var arm = k.kit().armadura();
+                String conj = "-";
+                boolean igual = true;
+                for (var st : arm) {
+                    if (st.getItem() instanceof com.darkcraft.armadura.PiezaArmadura pa) {
+                        if (conj.equals("-")) conj = pa.conjunto.id;
+                        else if (!conj.equals(pa.conjunto.id)) igual = false;
+                    } else if (!st.isEmpty()) igual = false;
+                }
+                if (!igual || (k != com.darkcraft.rol.Clase.DESDICHADO && conj.equals("-"))) clMal++;
+                cl.append(' ').append(k.id).append('=').append(conj);
+            }
+            sb.append(" | clases:").append(cl).append(" (mal ").append(clMal).append(')');
+            // el botin: la armeria de Valdrenn y las casas de Brumavela
+            for (String tabla : new String[]{"armeria", "pueblo", "pueblo_bueno"}) {
+                var lt = server.getLootData().getLootTable(new net.minecraft.resources.ResourceLocation(DarkCraftMod.MODID, "chests/" + tabla));
+                int n = 0;
+                for (int r = 0; r < 40; r++) {
+                    var params = new net.minecraft.world.level.storage.loot.LootParams.Builder(m)
+                            .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN, net.minecraft.world.phys.Vec3.ZERO)
+                            .create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CHEST);
+                    for (var st : lt.getRandomItems(params)) if (st.getItem() instanceof com.darkcraft.armadura.PiezaArmadura) n++;
+                }
+                sb.append(" | ").append(tabla).append(": ").append(n).append(" piezas en 40 cofres");
+            }
+        } catch (Exception e) {
+            sb.append(" ERROR ").append(e);
+            DarkCraftMod.LOGGER.error("[DarkCraft] las armaduras", e);
+        } finally {
+            for (var s : com.darkcraft.armadura.Armaduras.HUECOS) fp.setItemSlot(s, net.minecraft.world.item.ItemStack.EMPTY);
+        }
+        log.println(sb);
+        log.flush();
     }
 
     /**

@@ -81,6 +81,7 @@ public final class Comandos {
                 .then(com.darkcraft.mision.Misiones.comando())
                 .then(com.darkcraft.mision.Misiones.comandoOswin())
                 .then(com.darkcraft.mision.Misiones.comandoHedda())
+                .then(com.darkcraft.armadura.Armaduras.comando())
                 .then(com.darkcraft.morvain.Gigantes.comando())
                 .then(com.darkcraft.camino.Jinetes.comando())
                 .then(com.darkcraft.rol.Rol.comando())
@@ -180,6 +181,7 @@ public final class Comandos {
         src.sendSuccess(() -> linea(new Linea("/darkcraft misiones ", "/darkcraft misiones [olvidar | marcar <n> | hedda <n>]", "misiones")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft oswin ", "/darkcraft oswin [ir | campana | poner | olvidar]", "oswin")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft hedda ", "/darkcraft hedda [ir | tam | poner | olvidar]", "hedda")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft armadura ", "/darkcraft armadura [<conjunto> [poner] | quitar]", "armadura")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ecos ", "/darkcraft ecos / ecos dar <n> / ecos quitar", "ecos")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft rol ", "/darkcraft rol clase [<nombre> | elegir | olvidar | ninguna] / santuario / frascos [<n>] / nivel [reiniciar] / atributo <nombre> <valor> / talisman <nombre> [poner <hueco>] / fruto <nombre> [<n>] / hechizo <nombre>|memorizar|olvidar|baston|sello / guia [olvidar] / herrero [olvidar] / mercader [olvidar] / mejora <0-9> / piedras / ceniza <nombre> [poner] | quitar / resistencias", "rol")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ayuda", "/darkcraft ayuda", "ayuda")), false);

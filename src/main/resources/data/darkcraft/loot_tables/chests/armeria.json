@@ -82,67 +82,23 @@
     },
     {
      "type": "minecraft:item",
-     "name": "minecraft:iron_helmet",
-     "weight": 4,
-     "functions": [
-      {
-       "function": "minecraft:enchant_with_levels",
-       "levels": {
-        "type": "minecraft:uniform",
-        "min": 10,
-        "max": 25
-       },
-       "treasure": true
-      }
-     ]
+     "name": "darkcraft:caballero_yelmo",
+     "weight": 3
     },
     {
      "type": "minecraft:item",
-     "name": "minecraft:iron_chestplate",
-     "weight": 3,
-     "functions": [
-      {
-       "function": "minecraft:enchant_with_levels",
-       "levels": {
-        "type": "minecraft:uniform",
-        "min": 10,
-        "max": 25
-       },
-       "treasure": true
-      }
-     ]
+     "name": "darkcraft:caballero_peto",
+     "weight": 2
     },
     {
      "type": "minecraft:item",
-     "name": "minecraft:iron_leggings",
-     "weight": 3,
-     "functions": [
-      {
-       "function": "minecraft:enchant_with_levels",
-       "levels": {
-        "type": "minecraft:uniform",
-        "min": 10,
-        "max": 25
-       },
-       "treasure": true
-      }
-     ]
+     "name": "darkcraft:caballero_grebas",
+     "weight": 2
     },
     {
      "type": "minecraft:item",
-     "name": "minecraft:iron_boots",
-     "weight": 4,
-     "functions": [
-      {
-       "function": "minecraft:enchant_with_levels",
-       "levels": {
-        "type": "minecraft:uniform",
-        "min": 10,
-        "max": 25
-       },
-       "treasure": true
-      }
-     ]
+     "name": "darkcraft:caballero_guantes",
+     "weight": 3
     },
     {
      "type": "minecraft:item",
@@ -162,24 +118,13 @@
     },
     {
      "type": "minecraft:item",
-     "name": "minecraft:diamond_chestplate",
-     "weight": 1,
-     "functions": [
-      {
-       "function": "minecraft:enchant_with_levels",
-       "levels": {
-        "type": "minecraft:uniform",
-        "min": 25,
-        "max": 39
-       },
-       "treasure": true
-      }
-     ]
+     "name": "darkcraft:confesor_peto",
+     "weight": 1
     },
     {
      "type": "minecraft:item",
-     "name": "minecraft:chainmail_chestplate",
-     "weight": 3
+     "name": "darkcraft:guerrero_peto",
+     "weight": 2
     },
     {
      "type": "minecraft:item",

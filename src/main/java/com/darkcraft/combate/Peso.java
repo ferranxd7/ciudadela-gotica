@@ -51,6 +51,8 @@ public final class Peso {
     /** Lo que pesa una cosa (las armas por su tipo; la armadura por su material y su pieza). */
     public static float item(ItemStack st) {
         if (st.isEmpty()) return 0f;
+        // las armaduras con modelo propio (parte 7ai): lo suyo
+        if (st.getItem() instanceof com.darkcraft.armadura.PiezaArmadura pa) return pa.conjunto.peso(pa.pieza);
         if (st.getItem() instanceof ArmorItem a) {
             float base;
             if (a.getMaterial() == ArmorMaterials.LEATHER) base = 1.5f;
