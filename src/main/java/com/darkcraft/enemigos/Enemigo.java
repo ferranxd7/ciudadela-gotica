@@ -601,6 +601,11 @@ public abstract class Enemigo extends Monster {
         return y;
     }
 
+    /** Cambia hacia donde se queda mirando durante la accion (tras aparecer en otro sitio: la niebla de la Sombra). */
+    protected void fijarRumbo(float y) {
+        rumbo = y;
+    }
+
     private void fijar() {
         setYRot(rumbo);
         yBodyRot = yHeadRot = rumbo;

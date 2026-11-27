@@ -135,6 +135,12 @@ public abstract class Guardian extends Enemigo {
         alEmpezarPelea();
     }
 
+    /** Deja de pelear sin curarse ni volver a lo suyo (la Sombra, de rodillas ofreciendo su corazon: parte 7ac). */
+    protected void rendirPelea() {
+        entityData.set(EN_PELEA, false);
+        barra.removeAllPlayers();
+    }
+
     /** Todos han caido o se han ido: vuelve a lo suyo con la vida entera. */
     private void acabarPelea() {
         entityData.set(EN_PELEA, false);

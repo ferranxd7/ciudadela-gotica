@@ -296,6 +296,8 @@ public final class Morvain {
         // la casa de la Sombra (parte 7ab): el rastrillo, la Sombra al entrar, Maelis en la capilla, el sello del salon del trono
         // mientras pelea la reina y la reja de la azotea
         if (m != null) CasaSombra.tick(m);
+        // el Corazon de la Aguja (parte 7ac): la puerta, el sello mientras pelea la Sombra y su corazon
+        if (m != null) Aguja.tick(m);
         // el molino de la Molinera (parte 7f): la reja de su puerta y su crujido con el viento
         if (m != null && srv.getTickCount() % 100 == 13) Molino.crujir(m);
         // la arboleda (parte 7h): con el Verdugo vencido, las sogas de los colgados se quedan con el lazo vacio
@@ -491,6 +493,7 @@ public final class Morvain {
         ESPERA.clear();
         PENDIENTES.clear();
         CasaSombra.parar();
+        Aguja.parar();
     }
 
     // ------------------------------------------------------------------ el nombre del sitio
@@ -530,6 +533,8 @@ public final class Morvain {
         // la subida por la cadena del sur (parte 7aa): la Boca y la Garganta, el Descansillo, la cadena y, arriba, la ciudadela
         if (Cadena.cerca(p.getX(), p.getZ()) || Subida.enCiudadela(p.getX(), p.getY(), p.getZ())) {
             if (Subida.enBoca(p.getX(), p.getY(), p.getZ())) return "darkcraft.morvain.lugar.boca";
+            // la sala de la Sombra, dentro de la aguja (parte 7ac)
+            if (Homenaje.enAguja(p.getX(), p.getY() + 0.1, p.getZ())) return "darkcraft.morvain.lugar.aguja";
             // la torre del homenaje por dentro (parte 7ab): cada planta su sala, y la azotea
             if (Homenaje.enHomenaje(p.getX(), p.getY(), p.getZ())) return Homenaje.sala(Homenaje.planta(p.getY()));
             if (Homenaje.enAzotea(p.getX(), p.getY(), p.getZ())) return Homenaje.sala(Homenaje.AZOTEA);

@@ -33,9 +33,12 @@ final class Ciudadela {
     static final int TT = 21;
     static final double RTO = 6;
     static final int TORREON = 104, CHAPITEL_T = 30;
-    /** La aguja del centro, sobre el homenaje: radio, el cuerpo y la punta. */
-    static final double RAG = 11;
-    static final int CUERPO = 42, PUNTA = 46;
+    /**
+     * La aguja del centro, sobre el homenaje: radio, el cuerpo y la punta. Desde la parte 7ac es mas ancha (16; antes 11) y su cuerpo
+     * mas alto: dentro esta la sala de la Sombra (el corazon de la aguja, {@link Homenaje#enAguja}).
+     */
+    static final double RAG = 16;
+    static final int CUERPO = 48, PUNTA = 54;
     /** Lo mas alto (la gema de la punta de la aguja). */
     static final int CIMA = TOP + K + CUERPO + 2 + PUNTA + 5;
 
@@ -365,22 +368,30 @@ final class Ciudadela {
         chapitel(e, x, z, d, v, cima + 1, RTO - 0.6, CHAPITEL_T);
     }
 
-    /** La aguja del centro, encima del homenaje: un cuerpo con ventanas rojas y la punta altisima con nervios. */
+    /**
+     * La aguja del centro, encima del homenaje: un cuerpo hueco (la sala de la Sombra: la amuebla {@link Homenaje}) con ocho ventanales
+     * rojos altos y apuntados, una franja de gemas y la punta altisima con nervios.
+     */
     private static void aguja(MorvainGenerador.Escritor e, int x, int z, double d, double v) {
         int y0 = TOP + K + 1, cima = y0 + CUERPO;
         if (d <= RAG) {
             boolean pared = d > RAG - 2;
+            // por donde va a lo ancho del ventanal (0 en medio, 0,5 en el borde) y lo alto que llega su arco apuntado
+            double w = Math.abs(((v * 8) % 1) - 0.5);
+            boolean enVentanal = w > 0.42;
+            int arco = 34 - (int) Math.round((0.5 - w) / 0.08 * 3);
             for (int y = y0; y <= cima; y++) {
                 int fila = y - y0;
                 if (pared) {
-                    boolean ventana = fila >= 14 && fila <= 26 && Math.abs(((v * 8) % 1) - 0.5) > 0.4;
-                    e.poner(x, y, z, ventana ? (fila >= 18 && fila <= 22 ? gema() : b(Blocks.RED_STAINED_GLASS)) : negro(x, y, z));
+                    boolean ventana = enVentanal && fila >= 8 && fila <= arco;
+                    boolean franja = fila == 20 || fila == 40;
+                    e.poner(x, y, z, ventana ? (fila == arco ? gema() : b(Blocks.RED_STAINED_GLASS)) : franja && w > 0.3 ? gema() : negro(x, y, z));
                 } else e.poner(x, y, z, y == cima ? b(Blocks.DEEPSLATE_TILES) : b(Blocks.AIR));
             }
         }
         if (d > RAG - 0.6) {
             e.poner(x, cima + 1, z, negro(x, cima + 1, z));
-            if (almena(v, 16)) e.poner(x, cima + 2, z, negro(x, cima + 2, z));
+            if (almena(v, 24)) e.poner(x, cima + 2, z, negro(x, cima + 2, z));
         }
         int p0 = cima + 2;
         for (int y = p0; y <= p0 + PUNTA; y++) {

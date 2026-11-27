@@ -755,6 +755,7 @@ public final class CiTest {
         homenaje(server, m, log, out);
         centinelas(server, m, log, out);
         isolde(server, m, log, out);
+        sombra(server, m, log, out);
     }
 
     /**
@@ -4503,6 +4504,288 @@ public final class CiTest {
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
             com.darkcraft.morvain.CasaSombra.revisar(m);
             if (com.darkcraft.morvain.CasaSombra.sellado()) com.darkcraft.morvain.CasaSombra.sellar(m, false);
+        }
+    }
+
+    /**
+     * Parte 7ac: el Corazon de la Aguja. La puerta (con la reina en pie no cede; caida, el sello se deshace y queda abierta); la Sombra
+     * colgada de sus cadenas (no se le puede pegar) y lo que ve; la pelea: despierta (la corta: rompe las cadenas enseguida) y ruge, y la
+     * puerta se sella; la larga (el discurso: rompe a los 16,6 s); los zarpazos, el giro, el latigazo de la cadena (arrastra), las
+     * manos (pillan), las lanzas (dan), la niebla (no se le puede pegar, aparece detras y le echa los zarpazos); a media vida la furia
+     * (mas ojos, el otro tema), la mirada (de cerca pasa por encima; de lejos pilla), el grito y los caidos (dentro de la sala,
+     * efimeros); sin presa la pelea se acaba, la puerta se abre y vuelve a colgar de sus cadenas; y no muere: se rinde, le sale el
+     * corazon, golpearlo antes de que acabe de ofrecerlo no cuenta, golpearlo (su ultima frase, cae, el cielo rojo se apaga, el final
+     * "alba") y, otra vez, tomarlo (el final "sombra").
+     */
+    private static void sombra(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.AGUJA;
+        String casa = com.darkcraft.morvain.MorvainEnemigos.HOMENAJE;
+        var H = com.darkcraft.morvain.Homenaje.get();
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        net.minecraft.nbt.CompoundTag cielo = com.darkcraft.fortaleza.CieloRojo.copia(server);
+        StringBuilder sb = new StringBuilder("Morvain, la aguja:");
+        try {
+            for (long k : H.chunks()) m.getChunk((int) (k >> 32), (int) k);
+            final double y0 = com.darkcraft.morvain.Homenaje.pisa(com.darkcraft.morvain.Homenaje.AZOTEA);
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ac1"), "[DarkCraftCI21]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- la puerta: con la reina en pie no cede; caida, se abre
+            com.darkcraft.morvain.Aguja.cerrar(m);
+            com.darkcraft.enemigos.Puestos.marcar(server, casa, com.darkcraft.morvain.MorvainEnemigos.isolde(), false);
+            var pu = com.darkcraft.morvain.Aguja.puerta();
+            fp.moveTo(pu.x, y0, pu.z + 1.6, 180f, 0f);
+            int ab0 = com.darkcraft.morvain.Aguja.ABIERTAS;
+            com.darkcraft.morvain.Aguja.tocar(fp);
+            sb.append(" con la reina en pie, la puerta se abre ").append(com.darkcraft.morvain.Aguja.ABIERTAS > ab0).append(" (false)");
+            com.darkcraft.enemigos.Puestos.marcar(server, casa, com.darkcraft.morvain.MorvainEnemigos.isolde(), true);
+            com.darkcraft.morvain.Aguja.tocar(fp);
+            for (int k = 0; k < 220; k++) com.darkcraft.morvain.Aguja.tick(m);
+            sb.append("; con ella caida: ").append(com.darkcraft.morvain.Aguja.resumen(m)).append(" (abierta, 0/N del sello, 0 barreras)");
+            // ---- la Sombra colgada
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Sombra r = null;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) {
+                if (r == null && e instanceof com.darkcraft.enemigos.Sombra s) r = s;
+                else e.discard();
+            }
+            if (r == null) {
+                log.println(sb.append("; la Sombra NO SALE"));
+                return;
+            }
+            final com.darkcraft.enemigos.Sombra som = r;
+            float h0 = r.getHealth();
+            r.invulnerableTime = 0;
+            boolean colgadaLeDan = r.hurt(m.damageSources().generic(), 50f) || r.getHealth() < h0;
+            sb.append(String.format(java.util.Locale.ROOT, "; la Sombra en %s (postura %d, encadenada %s, vida %.0f, golpe %.1f, armadura %d, %.1f x %.1f, metida en un bloque %s),"
+                            + " colgada le pegan %s (false)", r.blockPosition().toShortString(), r.postura(), r.encadenada(), r.getMaxHealth(),
+                    r.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), r.getArmorValue(), r.getBbWidth(), r.getBbHeight(), !m.noCollision(r),
+                    colgadaLeDan));
+            String ve = "";
+            try {
+                java.lang.reflect.Method mt = com.darkcraft.enemigos.Sombra.class.getDeclaredMethod("percibe", net.minecraft.world.entity.LivingEntity.class);
+                mt.setAccessible(true);
+                fp.moveTo(0.5, y0, 8.5, 180f, 0f);
+                ve += " en la sala " + mt.invoke(r, fp) + ";";
+                fp.moveTo(pu.x, y0, pu.z + 2.5, 180f, 0f);
+                ve += " ante la puerta " + mt.invoke(r, fp);
+            } catch (Throwable t) {
+                ve = " ERROR " + t;
+            }
+            sb.append("; ve:").append(ve).append(" (true, false)");
+            // ---- la pelea: despierta (la corta), rompe las cadenas, ruge; la puerta se sella
+            double vx = 0.5, vz = 6.5;
+            var v = victima(m, vx, y0, vz, 180f, quitar);
+            if (v == null) {
+                log.println(sb.append(" (sin presa)"));
+                return;
+            }
+            r.setTarget(v);
+            int corta = -1, rompe = -1, ruge = -1, k;
+            boolean leDanAtada = false;
+            for (k = 0; k < 300 && ruge < 0; k++) {
+                pasoE(r, v, vx, y0, vz);
+                if (corta < 0 && r.accion() == com.darkcraft.enemigos.SombraAnims.DESPIERTA_CORTA) corta = k;
+                if (rompe < 0 && corta >= 0 && !r.encadenada()) rompe = k;
+                if (r.accion() == com.darkcraft.enemigos.SombraAnims.DESPIERTA_CORTA && r.accionTicks() == 20) {
+                    float h = r.getHealth();
+                    r.invulnerableTime = 0;
+                    leDanAtada = r.hurt(m.damageSources().generic(), 5f) || r.getHealth() < h;
+                }
+                if (ruge < 0 && r.accion() == com.darkcraft.enemigos.SombraAnims.RUGIDO) ruge = k;
+                if (k % 3 == 0) com.darkcraft.morvain.Aguja.tick(m);
+            }
+            com.darkcraft.morvain.Aguja.tick(m);
+            sb.append(String.format(java.util.Locale.ROOT, "; en pelea %s (musica %d): despierta (la corta) en el tick %d, rompe las cadenas en el %d, atada le pegan %s,"
+                            + " ruge en el %d; la puerta %s", r.enPelea(), r.musica(), corta, rompe, leDanAtada, ruge,
+                    com.darkcraft.morvain.Aguja.sellado() ? "sellada" : "SIN SELLAR"));
+            for (k = 0; k < 60 && r.accion() != 0; k++) pasoE(r, v, vx, y0, vz);
+            // la larga (el discurso): encadenada hasta su golpe
+            int larga0 = com.darkcraft.enemigos.Sombra.DESPIERTA;
+            r.probar(com.darkcraft.enemigos.SombraAnims.DESPIERTA);
+            int rompeLarga = -1;
+            for (k = 0; k < 400 && r.accion() == com.darkcraft.enemigos.SombraAnims.DESPIERTA; k++) {
+                pasoE(r, v, vx, y0, vz);
+                if (rompeLarga < 0 && !r.encadenada()) rompeLarga = r.accionTicks();
+            }
+            sb.append(String.format(java.util.Locale.ROOT, "; la larga +%d: rompe en su tick %d (%d), acaba en %d", com.darkcraft.enemigos.Sombra.DESPIERTA - larga0, rompeLarga,
+                    com.darkcraft.enemigos.SombraAnims.GOLPES[com.darkcraft.enemigos.SombraAnims.DESPIERTA][0], k));
+            // ---- los golpes (en medio de la sala, mirando al sur)
+            java.util.function.BiFunction<Integer, Double, Float> golpe = (accion, d) -> {
+                som.moveTo(0.5, y0, 0.5, 0f, 0f);
+                som.setYRot(0f);
+                som.yBodyRot = som.yHeadRot = 0f;
+                double pz = 0.5 + d;
+                v.setHealth(v.getMaxHealth());
+                v.moveTo(0.5, y0, pz, 180f, 0f);
+                som.setTarget(v);
+                som.empezar(accion);
+                for (int j = 0; j < com.darkcraft.enemigos.SombraAnims.TICKS[accion] + 2 && som.accion() == accion; j++) {
+                    som.moveTo(0.5, y0, 0.5, som.getYRot(), 0f);
+                    pasoE(som, v, 0.5, y0, pz);
+                    // las lanzas que van por el aire
+                    for (var l : m.getEntitiesOfClass(com.darkcraft.enemigos.LanzaSombra.class, som.getBoundingBox().inflate(30))) l.tick();
+                }
+                for (int j = 0; j < 30; j++)
+                    for (var l : m.getEntitiesOfClass(com.darkcraft.enemigos.LanzaSombra.class, som.getBoundingBox().inflate(30))) {
+                        l.tick();
+                        v.moveTo(0.5, y0, pz, 180f, 0f);
+                    }
+                return v.getMaxHealth() - v.getHealth();
+            };
+            int arr0 = com.darkcraft.enemigos.Sombra.ARRASTRA, man0 = com.darkcraft.enemigos.Sombra.MANOS_PILLAN, lan0 = com.darkcraft.enemigos.LanzaSombra.DAN;
+            sb.append(String.format(java.util.Locale.ROOT, "; los zarpazos: -%.1f; el giro por la espalda: -%.1f; la cadena a 10: -%.1f (arrastra +%d); las manos a 6: -%.1f (pillan +%d);"
+                            + " las lanzas a 10: -%.1f (dan +%d)", golpe.apply(com.darkcraft.enemigos.SombraAnims.ZARPAZOS, 3.2),
+                    golpe.apply(com.darkcraft.enemigos.SombraAnims.GIRO, -3.8), golpe.apply(com.darkcraft.enemigos.SombraAnims.CADENA, 10.0),
+                    com.darkcraft.enemigos.Sombra.ARRASTRA - arr0, golpe.apply(com.darkcraft.enemigos.SombraAnims.MANOS, 6.0),
+                    com.darkcraft.enemigos.Sombra.MANOS_PILLAN - man0, golpe.apply(com.darkcraft.enemigos.SombraAnims.LANZAS, 10.0),
+                    com.darkcraft.enemigos.LanzaSombra.DAN - lan0));
+            // la niebla: la presa mira al norte; no se le puede pegar mientras esta apagada, aparece detras (al sur, a 2,8) y zarpazos
+            v.moveTo(0.5, y0, 4.5, 180f, 0f);
+            v.setYRot(180f);
+            v.setYHeadRot(180f);
+            v.yBodyRot = 180f;
+            r.moveTo(0.5, y0, -4.5, 0f, 0f);
+            r.setTarget(v);
+            int det0 = com.darkcraft.enemigos.Sombra.DETRAS_SALE;
+            r.probar(com.darkcraft.enemigos.SombraAnims.NIEBLA);
+            boolean leDanNiebla = true, zarpa = false;
+            double dx = 99, dz = 99;
+            for (k = 0; k < 60; k++) {
+                pasoE(r, v, 0.5, y0, 4.5);
+                if (r.accion() == com.darkcraft.enemigos.SombraAnims.NIEBLA && r.accionTicks() == 10) {
+                    float h = r.getHealth();
+                    r.invulnerableTime = 0;
+                    leDanNiebla = r.hurt(m.damageSources().generic(), 5f) || r.getHealth() < h;
+                }
+                if (r.accion() == com.darkcraft.enemigos.SombraAnims.NIEBLA && r.accionTicks() == com.darkcraft.enemigos.Sombra.APARECE + 1) {
+                    dx = r.getX() - 0.5;
+                    dz = r.getZ() - 4.5;
+                }
+                if (r.accion() == com.darkcraft.enemigos.SombraAnims.ZARPAZOS) {
+                    zarpa = true;
+                    break;
+                }
+            }
+            sb.append(String.format(java.util.Locale.ROOT, "; la niebla: apagada le pegan %s, aparece detras +%d (a %.1f, %.1f de la presa: 0, 2,8), zarpazos despues %s",
+                    leDanNiebla, com.darkcraft.enemigos.Sombra.DETRAS_SALE - det0, dx, dz, zarpa));
+            for (k = 0; k < 40 && r.accion() != 0; k++) pasoE(r, v, 0.5, y0, 4.5);
+            log.println(sb);
+            // ---- a media vida: la furia, la mirada, el grito, los caidos
+            StringBuilder f = new StringBuilder("Morvain, la Sombra a media vida:");
+            int fu0 = com.darkcraft.enemigos.Sombra.FURIAS;
+            r.mediaVida();
+            for (k = 0; k < 80 && r.accion() == com.darkcraft.enemigos.SombraAnims.FURIA; k++) pasoE(r, v, 0.5, y0, 4.5);
+            f.append(String.format(java.util.Locale.ROOT, " furia +%d (vida %.0f), con mas ojos %s, musica %d", com.darkcraft.enemigos.Sombra.FURIAS - fu0, r.getHealth(), r.furia(), r.musica()));
+            int mp0 = com.darkcraft.enemigos.Sombra.MIRADA_PILLA;
+            float cerca = golpe.apply(com.darkcraft.enemigos.SombraAnims.MIRADA, 2.0);
+            int mp1 = com.darkcraft.enemigos.Sombra.MIRADA_PILLA;
+            v.clearFire();
+            float lejos = golpe.apply(com.darkcraft.enemigos.SombraAnims.MIRADA, 9.0);
+            f.append(String.format(java.util.Locale.ROOT, "; la mirada: de cerca (a 2) -%.1f pilla +%d (0: pasa por encima); de lejos (a 9) -%.1f pilla +%d, arde %s", cerca, mp1 - mp0,
+                    lejos, com.darkcraft.enemigos.Sombra.MIRADA_PILLA - mp1, v.isOnFire()));
+            v.clearFire();
+            int gp0 = com.darkcraft.enemigos.Sombra.GRITO_PILLA;
+            float grito = golpe.apply(com.darkcraft.enemigos.SombraAnims.GRITO, 4.0);
+            f.append(String.format(java.util.Locale.ROOT, "; el grito a 4: -%.1f pilla +%d, oscuridad %s", grito, com.darkcraft.enemigos.Sombra.GRITO_PILLA - gp0,
+                    v.hasEffect(net.minecraft.world.effect.MobEffects.DARKNESS)));
+            v.removeAllEffects();
+            int lv0 = com.darkcraft.enemigos.Sombra.LEVANTADOS;
+            golpe.apply(com.darkcraft.enemigos.SombraAnims.CAIDOS, 4.0);
+            var caidos = new java.util.ArrayList<>(r.caidos());
+            int enSala = 0;
+            for (var e : caidos) if (com.darkcraft.morvain.Homenaje.enAguja(e.getX(), e.getY() + 0.5, e.getZ())) enSala++;
+            f.append("; los caidos: +").append(com.darkcraft.enemigos.Sombra.LEVANTADOS - lv0).append(" marcados (en la sala ").append(enSala).append(", efimeros ")
+                    .append(caidos.stream().filter(com.darkcraft.enemigos.Enemigo::esEfimero).count()).append(')');
+            // ---- sin presa: se acaba la pelea, se deshacen los caidos, la puerta se abre y vuelve a colgar de sus cadenas
+            r.setTarget(null);
+            v.discard();
+            r.moveTo(0.5, y0, 0.5, 0f, 0f);
+            int acaba = -1, cuelga = -1;
+            for (k = 0; k < 420 && cuelga < 0; k++) {
+                pasoE(r, null, 0, 0, 0);
+                if (acaba < 0 && !r.enPelea()) acaba = k;
+                if (cuelga < 0 && r.postura() == com.darkcraft.enemigos.Enemigo.REZA) cuelga = k;
+                if (k % 5 == 0) com.darkcraft.morvain.Aguja.tick(m);
+            }
+            com.darkcraft.morvain.Aguja.tick(m);
+            int quedan = 0;
+            for (var e : caidos) if (!e.isRemoved()) quedan++;
+            f.append(String.format(java.util.Locale.ROOT, "; sin presa: acaba la pelea en %d ticks, quedan %d caidos, con sus dos ojos %s, vida %.0f/%.0f, la puerta %s, vuelve a colgar en %d (encadenada %s)",
+                    acaba, quedan, !r.furia(), r.getHealth(), r.getMaxHealth(), com.darkcraft.morvain.Aguja.sellado() ? "SELLADA" : "abierta", cuelga, r.encadenada()));
+            log.println(f);
+            // ---- se rinde: el corazon; golpearlo antes de tiempo no cuenta; golpearlo de verdad
+            StringBuilder c = new StringBuilder("Morvain, la Sombra se rinde:");
+            int[] finales = {1, 2};
+            for (int fin : finales) {
+                if (fin == 2) {
+                    com.darkcraft.morvain.Aguja.reiniciar(m);
+                    com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+                    r = null;
+                    for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) {
+                        if (r == null && e instanceof com.darkcraft.enemigos.Sombra s) r = s;
+                        else e.discard();
+                    }
+                    if (r == null) {
+                        c.append(" (la segunda vez NO SALE)");
+                        break;
+                    }
+                }
+                var v2 = victima(m, 0.5, y0, 6.5, 180f, quitar);
+                r.postura(com.darkcraft.enemigos.Enemigo.DE_PIE);
+                r.setTarget(v2);
+                float vidaAntes = r.getHealth();
+                r.setHealth(30f);
+                r.invulnerableTime = 0;
+                r.hurt(m.damageSources().generic(), 500f);
+                c.append(String.format(java.util.Locale.ROOT, "%s con un golpe de 500 (vida 30): viva %s, rendida %s, en pelea %s", fin == 1 ? "" : " | otra vez:", r.isAlive(),
+                        r.rendida(), r.enPelea()));
+                com.darkcraft.morvain.Corazon cz = null;
+                for (k = 0; k < 140 && cz == null; k++) {
+                    pasoE(r, null, 0, 0, 0);
+                    com.darkcraft.morvain.Aguja.tick(m);
+                    for (var e : m.getEntitiesOfClass(com.darkcraft.morvain.Corazon.class, r.getBoundingBox().inflate(10))) cz = e;
+                }
+                if (cz == null) {
+                    c.append("; el corazon NO SALE");
+                    break;
+                }
+                c.append(String.format(java.util.Locale.ROOT, "; el corazon sale en %d ticks (a %.1f de su pecho), apuntada rendida %s", k,
+                        cz.position().distanceTo(r.position().add(0, 1.35, 0)), com.darkcraft.morvain.Aguja.rendida(server)));
+                int el0 = com.darkcraft.morvain.Aguja.ELECCIONES;
+                fp.moveTo(cz.getX(), y0, cz.getZ() + 1.5, 180f, 0f);
+                cz.hurt(m.damageSources().playerAttack(fp), 5f);
+                c.append("; golpeado antes de tiempo cuenta ").append(com.darkcraft.morvain.Aguja.ELECCIONES > el0).append(" (false), su dialogo empieza en ")
+                        .append(com.darkcraft.morvain.Aguja.inicio(fp));
+                com.darkcraft.morvain.Aguja.elegir(fp, cz, fin == 1);
+                c.append(String.format(java.util.Locale.ROOT, "; %s: elegido %d, el corazon fuera %s", fin == 1 ? "golpeado" : "tomado", r.finalElegido(), cz.isRemoved()));
+                int muere = -1;
+                for (k = 0; k < 400 && !r.isRemoved(); k++) {
+                    r.tickCount++;
+                    r.tick();
+                    if (muere < 0 && !r.isAlive()) muere = k;
+                }
+                int drops = 0;
+                for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, r.getBoundingBox().inflate(6)))
+                    if (it.getItem().is(DarkCraftMod.PIEDRA_FORJA_3.get())) {
+                        drops += it.getItem().getCount();
+                        quitar.add(it);
+                    }
+                c.append(String.format(java.util.Locale.ROOT, "; muere en %d ticks (su ultima frase %.1f s), se va en %d, su puesto caido %s, deja %d piedras III, final %s, cielo rojo %s",
+                        muere, com.darkcraft.rey.Voces.sombra(fin == 1 ? 31 : 32), k, com.darkcraft.enemigos.Puestos.muerto(server, sitio, com.darkcraft.morvain.Homenaje.SOMBRA), drops,
+                        com.darkcraft.morvain.Aguja.final_(server), com.darkcraft.fortaleza.CieloRojo.activo(server) ? "SI" : "NO"));
+            }
+            log.println(c);
+        } catch (Throwable t) {
+            log.println(sb + " ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] sombra", t);
+        } finally {
+            for (var e : quitar) e.discard();
+            com.darkcraft.morvain.Aguja.reiniciar(m);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Puestos.todos(server, casa, false);
+            if (com.darkcraft.morvain.Aguja.sellado()) com.darkcraft.morvain.Aguja.sellar(m, false);
+            com.darkcraft.morvain.Aguja.cerrar(m);
+            com.darkcraft.fortaleza.CieloRojo.restaurar(server, cielo);
         }
     }
 

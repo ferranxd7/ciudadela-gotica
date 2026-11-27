@@ -68,12 +68,12 @@ public final class MorvainEnemigos {
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
             CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio",
             PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar", CERCO = "cerco", TEATRO = "teatro", NIDO = "nido",
-            CADENA = "cadena", HOMENAJE = "homenaje";
+            CADENA = "cadena", HOMENAJE = "homenaje", AGUJA = "aguja";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
             ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
             PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon", DRAGON = "dragon", GARGOLA = "gargola", CENTINELA = "centinela",
-            ISOLDE = "isolde", ESPECTRO = "espectro", PERRO = "perro";
+            ISOLDE = "isolde", ESPECTRO = "espectro", PERRO = "perro", SOMBRA = "sombra";
     /** El tipo de puesto de las gargolas (para las pruebas). */
     public static final String GARGOLA_TIPO = GARGOLA;
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
@@ -87,7 +87,7 @@ public final class MorvainEnemigos {
             CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>(),
             PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>(), GRIETA_P = new ArrayList<>(), ALTAR_P = new ArrayList<>(),
             CERCO_P = new ArrayList<>(), TEATRO_P = new ArrayList<>(), NIDO_P = new ArrayList<>(), CADENA_P = new ArrayList<>(),
-            HOMENAJE_P = new ArrayList<>();
+            HOMENAJE_P = new ArrayList<>(), AGUJA_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -238,6 +238,9 @@ public final class MorvainEnemigos {
         // centinelas, los espectros del archivo, los marcados de la prision y sus perros); el tipo de cada uno lo dice el plano
         for (Homenaje.Espera e : Homenaje.get().esperas())
             HOMENAJE_P.add(new Puesto(e.tipo(), e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
+        // ---- el Corazon de la Aguja (parte 7ac): la Sombra sin Nombre, colgada de sus cadenas en medio de la sala (el puesto 0)
+        for (Homenaje.Espera e : Homenaje.get().esperasAguja())
+            AGUJA_P.add(new Puesto(e.tipo(), e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -325,6 +328,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(GARGOLA, DarkCraftMod.GARGOLA);
         Puestos.tipo(CENTINELA, DarkCraftMod.CENTINELA);
         Puestos.tipo(ISOLDE, DarkCraftMod.ISOLDE);
+        Puestos.tipo(SOMBRA, DarkCraftMod.SOMBRA);
         Puestos.tipo(ESPECTRO, DarkCraftMod.ESPECTRO);
         Puestos.tipo(PERRO, DarkCraftMod.PERRO);
         preparar();
@@ -368,6 +372,8 @@ public final class MorvainEnemigos {
         Puestos.registrar(CADENA, CADENA_P, Morvain::es);
         // la torre del homenaje: los centinelas, los del archivo y la prision, y la reina en su trono
         Puestos.registrar(HOMENAJE, HOMENAJE_P, Morvain::es);
+        // la aguja: la Sombra (cae una vez y no vuelve: es del grupo de los jefes)
+        Puestos.registrar(AGUJA, AGUJA_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -405,6 +411,9 @@ public final class MorvainEnemigos {
             // y al caer la reina Isolde se abre el salon y la reja de la escalera de la azotea (lo hace CasaSombra cada segundo)
             if (e instanceof com.darkcraft.enemigos.Isolde && HOMENAJE.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] La reina Isolde cae: se abre la escalera de la azotea");
+            // y al caer la Sombra (despues de responder) se acaba: lo apunta Aguja.alMorir; aqui, el aviso
+            if (e instanceof com.darkcraft.enemigos.Sombra && AGUJA.equals(e.sitio()))
+                DarkCraftMod.LOGGER.info("[DarkCraft] La Sombra sin Nombre cae: se acaba");
         });
     }
 
@@ -506,6 +515,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> homenaje() {
         preparar();
         return List.copyOf(HOMENAJE_P);
+    }
+
+    public static List<Puesto> aguja() {
+        preparar();
+        return List.copyOf(AGUJA_P);
     }
 
     public static List<Puesto> puerto() {
@@ -1905,6 +1919,97 @@ public final class MorvainEnemigos {
             }));
         }
         return raiz;
+    }
+
+    /**
+     * {@code /darkcraft sombra [ir | vencer | volver | media | golpear | tomar | zarpazos | giro | cadena | manos | lanzas | niebla |
+     * mirada | grito | caidos]} (parte 7ac): como esta la Sombra, llevar ante ella (a la entrada de su sala), que se rinda ya, que vuelva
+     * (y se olvide todo: sin rendir ni final), pasarla a media vida, responder ya (golpear o tomar su corazon) y que haga ya lo que se le
+     * diga.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoSombra() {
+        var raiz = net.minecraft.commands.Commands.literal("sombra")
+                .executes(c -> decir(c, estadoSombra(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> {
+                    irHomenaje(c.getSource(), "aguja");
+                    return decir(c, estadoSombra(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    if (Aguja.sombra() != null) Aguja.sombra().vencer();
+                    return decir(c, estadoSombra(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var m = Morvain.nivel(c.getSource().getServer());
+                    if (m != null) Aguja.reiniciar(m);
+                    return decir(c, estadoSombra(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("media").executes(c -> {
+                    if (Aguja.sombra() != null) Aguja.sombra().mediaVida();
+                    return decir(c, estadoSombra(c.getSource().getServer()));
+                }));
+        for (String r : new String[]{"golpear", "tomar"})
+            raiz.then(net.minecraft.commands.Commands.literal(r).executes(c -> {
+                if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp && sp.level() instanceof net.minecraft.server.level.ServerLevel m)
+                    for (Corazon k : m.getEntitiesOfClass(Corazon.class, sp.getBoundingBox().inflate(40))) {
+                        sp.teleportTo(k.getX(), sp.getY(), k.getZ() + 1.5);
+                        Aguja.elegir(sp, k, "golpear".equals(r));
+                        break;
+                    }
+                return decir(c, estadoSombra(c.getSource().getServer()));
+            }));
+        String[] nombres = {"zarpazos", "giro", "cadena", "manos", "lanzas", "niebla", "mirada", "grito", "caidos"};
+        int[] acciones = {com.darkcraft.enemigos.SombraAnims.ZARPAZOS, com.darkcraft.enemigos.SombraAnims.GIRO, com.darkcraft.enemigos.SombraAnims.CADENA,
+                com.darkcraft.enemigos.SombraAnims.MANOS, com.darkcraft.enemigos.SombraAnims.LANZAS, com.darkcraft.enemigos.SombraAnims.NIEBLA,
+                com.darkcraft.enemigos.SombraAnims.MIRADA, com.darkcraft.enemigos.SombraAnims.GRITO, com.darkcraft.enemigos.SombraAnims.CAIDOS};
+        for (int k = 0; k < nombres.length; k++) {
+            int a = acciones[k];
+            raiz.then(net.minecraft.commands.Commands.literal(nombres[k]).executes(c -> {
+                com.darkcraft.enemigos.Sombra s = Aguja.sombra();
+                if (s != null) {
+                    if (s.getTarget() == null && c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) s.setTarget(sp);
+                    s.probar(a);
+                }
+                return decir(c, estadoSombra(c.getSource().getServer()));
+            }));
+        }
+        return raiz;
+    }
+
+    /** Como esta la Sombra y su sala: para el comando y las pruebas. */
+    public static String estadoSombra(net.minecraft.server.MinecraftServer srv) {
+        com.darkcraft.enemigos.Sombra e = Aguja.sombra();
+        String s = "la Sombra: " + (Puestos.muerto(srv, AGUJA, Homenaje.SOMBRA) ? "caida" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e != null) s += ", " + e.estado();
+        var m = Morvain.nivel(srv);
+        if (m != null && m.isLoaded(net.minecraft.core.BlockPos.containing(Aguja.puerta()))) s += "; " + Aguja.resumen(m);
+        return s;
+    }
+
+    /**
+     * {@code /darkcraft aguja [abrir | cerrar | olvidar]} (parte 7ac): como esta la sala de la Sombra, abrir ya su puerta (de golpe),
+     * volver a cerrarla y que la Sombra vuelva a decir sus frases de la aguja a quien lo pide.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoAguja() {
+        return net.minecraft.commands.Commands.literal("aguja")
+                .executes(c -> decir(c, estadoSombra(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> {
+                    irHomenaje(c.getSource(), "puerta_sombra");
+                    return decir(c, estadoSombra(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("abrir").executes(c -> {
+                    var m = Morvain.nivel(c.getSource().getServer());
+                    if (m != null) Aguja.abrir(m, true);
+                    return decir(c, estadoSombra(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("cerrar").executes(c -> {
+                    var m = Morvain.nivel(c.getSource().getServer());
+                    if (m != null) Aguja.cerrar(m);
+                    return decir(c, estadoSombra(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("olvidar").executes(c -> {
+                    if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) Aguja.olvidar(sp);
+                    return decir(c, estadoSombra(c.getSource().getServer()));
+                }));
     }
 
     /** Como esta la reina Isolde: para el comando y las pruebas. */

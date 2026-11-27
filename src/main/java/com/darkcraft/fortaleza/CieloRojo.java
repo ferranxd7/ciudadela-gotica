@@ -60,6 +60,23 @@ public final class CieloRojo extends SavedData {
         return t;
     }
 
+    /** Para las pruebas: como esta ahora (para dejarlo igual despues con {@link #restaurar}). */
+    public static CompoundTag copia(MinecraftServer srv) {
+        return get(srv).save(new CompoundTag());
+    }
+
+    /** Para las pruebas: lo deja como estaba en la copia (y lo manda a todos). */
+    public static void restaurar(MinecraftServer srv, CompoundTag t) {
+        CieloRojo c = get(srv), d = load(t);
+        c.activo = d.activo;
+        c.vencida = d.vencida;
+        c.desde = d.desde;
+        c.columnas.clear();
+        c.columnas.addAll(d.columnas);
+        c.setDirty();
+        enviarATodos(srv);
+    }
+
     /** Lo que se manda a los clientes. */
     public Net.CieloRojo paquete() {
         int[] c = new int[columnas.size() * 3];

@@ -77,6 +77,16 @@ public final class ClientCadena {
         if (COLA.size() < 4) COLA.add(n);
     }
 
+    /** La frase n ya: corta la que estuviera diciendo (y las que esperaban) y empieza esta (la pelea de la aguja, parte 7ac). */
+    public static void sombraYa(int n) {
+        if (n <= 0 || n >= DarkCraftMod.SOMBRA_VOZ.length || DarkCraftMod.SOMBRA_VOZ[n] == null) return;
+        COLA.clear();
+        if (voz != null) Minecraft.getInstance().getSoundManager().stop(voz);
+        voz = null;
+        vozN = 0;
+        COLA.add(n);
+    }
+
     /** Si sopla ahora (o se oye venir). */
     public static boolean sopla() {
         return t >= 0;

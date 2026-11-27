@@ -6816,5 +6816,371 @@
         "stream": true
       }
     ]
+  },
+  "sfx.sombra_cadenas": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_cadenas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_cadenas_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/sombra_cadenas_2",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "sfx.sombra_rompe": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_rompe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_rompe_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "darkcraft:sfx/sombra_rompe_2",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "sfx.sombra_rugido": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_rugido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_rugido_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "darkcraft:sfx/sombra_rugido_2",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "sfx.sombra_zarpazo": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_zarpazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_zarpazo_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/sombra_zarpazo_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.sombra_cadena": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_cadena",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_cadena_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/sombra_cadena_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.sombra_manos": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_manos",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_manos_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/sombra_manos_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.sombra_lanzas": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_lanzas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_lanzas_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/sombra_lanzas_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.sombra_giro": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_giro",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_giro_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/sombra_giro_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.sombra_niebla": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_niebla",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_niebla_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/sombra_niebla_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.sombra_mirada_carga": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_mirada_carga",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_mirada_carga_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/sombra_mirada_carga_2",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "sfx.sombra_mirada": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_mirada",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_mirada_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/sombra_mirada_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.sombra_grito": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_grito",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_grito_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "darkcraft:sfx/sombra_grito_2",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "sfx.sombra_caidos": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_caidos",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_caidos_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/sombra_caidos_2",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "sfx.sombra_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_dolor_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/sombra_dolor_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.sombra_cae": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_cae",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_cae_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/sombra_cae_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.sombra_latido": {
+    "subtitle": "subtitles.darkcraft.sfx.sombra_latido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sombra_latido_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "darkcraft:sfx/sombra_latido_2",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "sfx.puerta_aguja": {
+    "subtitle": "subtitles.darkcraft.sfx.puerta_aguja",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/puerta_aguja_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/puerta_aguja_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.corazon_rompe": {
+    "subtitle": "subtitles.darkcraft.sfx.corazon_rompe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corazon_rompe_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/corazon_rompe_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.corazon_toma": {
+    "subtitle": "subtitles.darkcraft.sfx.corazon_toma",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corazon_toma_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/corazon_toma_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ambiente.aguja": {
+    "subtitle": "subtitles.darkcraft.ambiente.aguja",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aguja_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/aguja_ambiente_2",
+        "stream": true
+      }
+    ]
+  },
+  "musica.sombra1": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/sombra1",
+        "stream": true
+      }
+    ]
+  },
+  "musica.sombra2": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/sombra2",
+        "stream": true
+      }
+    ]
+  },
+  "sombra.voz.25": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_25",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.26": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_26",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.27": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_27",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.28": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_28",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.29": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_29",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.30": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_30",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.31": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_31",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.32": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_32",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.33": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_33",
+        "stream": false
+      }
+    ]
+  },
+  "voz.sombra.30": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_30",
+        "stream": true
+      }
+    ]
   }
 }

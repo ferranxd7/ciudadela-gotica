@@ -49,7 +49,7 @@ VOZ = ("highpass=f=65," + ECO_SALA + ",acompressor=threshold=-20dB:ratio=2.5:att
 
 # Maelis, la guia de los santuarios (voz "Autumn Veil"): serena y cerca, con un poco de aire de piedra
 # (15 y 16: en la capilla negra de la torre del homenaje, parte 7ab)
-TOMAS_GUIA = {n: "a" for n in range(1, 17)}
+TOMAS_GUIA = {n: "a" for n in range(1, 24)}
 VOZ_GUIA = ("highpass=f=70,equalizer=f=3200:t=q:w=1.2:g=1.5,aecho=0.8:0.35:38|85:0.10|0.05,"
             "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=160,loudnorm=I=-16:TP=-1.5:LRA=9")
 # Dorvan, el herrero (voz "Fjalar - Gruff Scottish Dwarf Warrior"): ronco, con algo de graves y el eco corto de la
@@ -104,8 +104,12 @@ TOMAS_SOMBRA = {1: "b", 2: "b", 3: "a", 4: "a", 5: "b", 6: "b", 7: "a", 8: "a", 
                 # la subida por la cadena del sur (parte 7aa): al pisar el camino, en el Descansillo y en la Boca
                 21: "a", 22: "b", 23: "a",
                 # al entrar en la torre del homenaje (parte 7ab)
-                24: "a"}
-SUSURROS_SOMBRA = {1: "b", 2: "b", 3: "b", 4: "a", 5: "b", 6: "a", 7: "a", 8: "a", 9: "a", 21: "a", 22: "b", 23: "a", 24: "a"}
+                24: "a",
+                # la aguja (parte 7ac): ante su puerta (25), al despertar encadenada (26), a media vida (27), si cae su presa (28), al
+                # llamar a los que le fallaron (29), su oferta al caer (30), el corazon roto (31) o tomado (32) y si se vuelve (33)
+                25: "a", 26: "b", 27: "a", 28: "a", 29: "b", 30: "b", 31: "a", 32: "b", 33: "b"}
+SUSURROS_SOMBRA = {1: "b", 2: "b", 3: "b", 4: "a", 5: "b", 6: "a", 7: "a", 8: "a", 9: "a", 21: "a", 22: "b", 23: "a", 24: "a",
+                   25: "a", 26: "b", 27: "a", 28: "a", 29: "b", 30: "b", 31: "a", 32: "b", 33: "b"}
 # lo que resuena el eco de vacio tras la ultima palabra (s)
 COLA_SOMBRA = 3.4
 # los personajes con dialogo: id -> (tomas, filtro)
@@ -392,6 +396,17 @@ SFX = {
     "isolde_grito": (2.0, 0.6, -12), "isolde_velo_arde": (2.5, 0.8, -12), "isolde_lagrimas": (1.5, 0.4, -14),
     "isolde_dolor": (0.7, 0.2, -15), "isolde_muerte": (3.5, 1.2, -14),
     "homenaje_ambiente": (20.0, 2.0, -24), "puerta_homenaje": (3.0, 0.8, -14),
+    # la aguja (parte 7ac): la Sombra sin Nombre (las cadenas que tiran y se rompen, el rugido, el zarpazo, el latigazo de la cadena,
+    # las manos que salen del suelo, las lanzas, el giro de la capa, la niebla, la mirada que se carga y el rayo, el grito, los que le
+    # fallaron, el quejido, su caida y el latido de su corazon), la puerta de la aguja, el aire de la aguja (en bucle) y el corazon
+    # que se rompe o se toma
+    "sombra_cadenas": (4.0, 1.0, -14), "sombra_rompe": (3.0, 1.0, -11), "sombra_rugido": (3.0, 0.9, -11),
+    "sombra_zarpazo": (1.0, 0.3, -12), "sombra_cadena": (1.5, 0.4, -13), "sombra_manos": (1.5, 0.4, -12),
+    "sombra_lanzas": (1.5, 0.4, -13), "sombra_giro": (1.2, 0.4, -12), "sombra_niebla": (1.5, 0.4, -14),
+    "sombra_mirada_carga": (2.0, 0.3, -14), "sombra_mirada": (3.0, 0.6, -13), "sombra_grito": (2.5, 0.8, -11),
+    "sombra_caidos": (2.5, 0.8, -14), "sombra_dolor": (0.8, 0.2, -14), "sombra_cae": (4.0, 1.4, -12),
+    "sombra_latido": (1.5, 0.5, -15), "puerta_aguja": (3.5, 1.0, -13), "aguja_ambiente": (20.0, 2.0, -24),
+    "corazon_rompe": (3.0, 1.0, -12), "corazon_toma": (3.0, 1.0, -12),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -400,13 +415,13 @@ ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0
            "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0, "sinfe_ambiente": 2.0,
            "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0,
            "aldric_rezo": 1.0, "aldric_arrastre": 0.3, "jinete_galope": 0.3, "dragon_aleteo": 0.3, "dragon_respira": 0.6,
-           "cadena_ambiente": 2.0, "isolde_tarareo": 1.2, "homenaje_ambiente": 2.0}
+           "cadena_ambiente": 2.0, "isolde_tarareo": 1.2, "homenaje_ambiente": 2.0, "aguja_ambiente": 2.0, "sombra_mirada": 0.15}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
           "penitente_humo": 1.0, "penitente_alzarse": 2.3}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
-GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca", "boca_latido"}
+GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca", "boca_latido", "sombra_latido"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
 EXTRA = {"intro_marca": "highshelf=f=2500:g=8,"}
 # de estos se bajaron 4 tomas (NOMBRE_1..4.mp3): las elegidas salen como NOMBRE_1.ogg, NOMBRE_2.ogg...
@@ -715,6 +730,16 @@ TOMAS_SFX = {
     "isolde_tarareo": (4, 1), "isolde_canto": (1, 3), "isolde_garras": (4, 2), "isolde_velo": (2, 1), "isolde_abrazo": (2, 4),
     "isolde_desvanece": (2, 3), "isolde_grito": (3, 4), "isolde_velo_arde": (1, 4), "isolde_lagrimas": (1, 2),
     "isolde_dolor": (1, 3), "isolde_muerte": (3, 1), "homenaje_ambiente": (1, 3), "puerta_homenaje": (3, 1),
+    # la aguja (parte 7ac; elegidas midiendo las tomas: las de mas cuerpo y menos silencio): las cadenas que tiran (la 2, seguida, y
+    # la 1), las que se rompen (la 4 y la 1), los rugidos (la 4 y la 2), los zarpazos (la 3 y la 4), los latigazos (la 1 y la 2), las
+    # manos (la 3 y la 2), las lanzas (la 3 y la 1), los giros (la 3 y la 1), la niebla (la 1 y la 3), la carga de la mirada (la 1 y
+    # la 2), el rayo (la 1 y la 2), los gritos mas seguidos (la 4 y la 2), los caidos (todos flojos: la 2 y la 4), los quejidos (la 1
+    # y la 2), las caidas (la 4, la mas seguida, y la 3), los latidos (la 3 y la 1), la puerta (la 1 y la 3), el aire (la 3 y la 4),
+    # el corazon que se rompe (la 4 y la 1; la 3 satura) y el que se toma (la 3 y la 4)
+    "sombra_cadenas": (2, 1), "sombra_rompe": (4, 1), "sombra_rugido": (4, 2), "sombra_zarpazo": (3, 4), "sombra_cadena": (1, 2),
+    "sombra_manos": (3, 2), "sombra_lanzas": (3, 1), "sombra_giro": (3, 1), "sombra_niebla": (1, 3), "sombra_mirada_carga": (1, 2),
+    "sombra_mirada": (1, 2), "sombra_grito": (4, 2), "sombra_caidos": (2, 4), "sombra_dolor": (1, 2), "sombra_cae": (4, 3),
+    "sombra_latido": (3, 1), "puerta_aguja": (1, 3), "aguja_ambiente": (3, 4), "corazon_rompe": (4, 1), "corazon_toma": (3, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -1631,6 +1656,8 @@ def main():
             except Exception as e:  # noqa: BLE001
                 fallos += 1
                 print(f"FALLO {pj} {n}: {e}")
+    # la Sombra en el dialogo de su corazon (parte 7ac): la oferta (30), con su voz de siempre (sombra/voz_30.ogg)
+    voces["sombra"] = {str(n): hab_s[n] for n in (30,) if n in hab_s}
     with open(os.path.join(ASSETS, "voces.json"), "w") as fh:
         json.dump(voces, fh)
     for nombre, (maxs, fade, lufs) in SFX.items():
