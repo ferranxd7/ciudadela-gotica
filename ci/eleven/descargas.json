@@ -7823,6 +7823,54 @@
     {
       "archivo": "sfx/armadura_tela_4.mp3",
       "url": "https://elevenlabsusercontent.com/database/workspace/832d0c68a4454c0bba90b8209d624bfa/content_generation/6LDODuMuxbbbvLIhZLpl/J7Qwx1tZE09Ryc4WtldZ/content.mp3?Expires=1795820400&KeyName=assets-cdn-key-1&Signature=WqLNJqb5QR-X1U5V5uHOoFgmg6s="
+    },
+    {
+      "archivo": "sfx/martillo_golpe_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/580399847ed44b70a3ed8ae5c2c7aff4/content_generation/NjxGk82POiKK2oxdIprV/aCngyoNwXjrazxW0RVWX/content.mp3?Expires=1795820400&KeyName=assets-cdn-key-1&Signature=I6ONcBSz_voL35-uf720K-feUyM="
+    },
+    {
+      "archivo": "sfx/martillo_golpe_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/580399847ed44b70a3ed8ae5c2c7aff4/content_generation/Q2Mi8T6yCSbn0ywU1eVQ/n65R4tqF6hogsmzaEOnt/content.mp3?Expires=1795820400&KeyName=assets-cdn-key-1&Signature=aDr-NYH1wv0lQzUdoEKh3A6XeZs="
+    },
+    {
+      "archivo": "sfx/martillo_golpe_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/580399847ed44b70a3ed8ae5c2c7aff4/content_generation/MM3Fd2iajK7pCoRrLBBJ/uP654Drr6xT45Bn2yv1w/content.mp3?Expires=1795820400&KeyName=assets-cdn-key-1&Signature=7p2RnWQgdb5C-rbfhARMTYo9Ti4="
+    },
+    {
+      "archivo": "sfx/martillo_golpe_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/580399847ed44b70a3ed8ae5c2c7aff4/content_generation/WjUhRhV2hbaZZGsHITNK/f7ASDnobuFikECOUebBZ/content.mp3?Expires=1795820400&KeyName=assets-cdn-key-1&Signature=UXKUAwUpD0aChA3tmYJrmktapG4="
+    },
+    {
+      "archivo": "sfx/flecha_fuego_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/580399847ed44b70a3ed8ae5c2c7aff4/content_generation/qzbfVy59uMFOO5CCgk4n/EhryZwihuy4LlfEzyEhn/content.mp3?Expires=1795820400&KeyName=assets-cdn-key-1&Signature=s7WRK1xBzhtp8QDd1eOJl_wRMHg="
+    },
+    {
+      "archivo": "sfx/flecha_fuego_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/580399847ed44b70a3ed8ae5c2c7aff4/content_generation/yQGGjmTTUHlceFuTCNFU/Pyu07Pom79BzNUr6Bhe5/content.mp3?Expires=1795820400&KeyName=assets-cdn-key-1&Signature=4SvbOWdffP5SKR6EARXJVMC8MxM="
+    },
+    {
+      "archivo": "sfx/flecha_fuego_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/580399847ed44b70a3ed8ae5c2c7aff4/content_generation/vW3TLqqGxO2Vd7FrbHEr/HuQic8URMU5lRs5spmus/content.mp3?Expires=1795820400&KeyName=assets-cdn-key-1&Signature=fvQM4HhCTZbrGPSu5smydp8D5YY="
+    },
+    {
+      "archivo": "sfx/flecha_fuego_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/580399847ed44b70a3ed8ae5c2c7aff4/content_generation/pP8gpgovPBZ0lzE3ujPD/j2VS2OO8QpjKQnXzZ2gR/content.mp3?Expires=1795820400&KeyName=assets-cdn-key-1&Signature=eKcXbJpSt_m3L1AIF4-cWUh0mcA="
+    },
+    {
+      "archivo": "sfx/congelacion_1.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/580399847ed44b70a3ed8ae5c2c7aff4/content_generation/KVQTNdCNvoDaVCX2X3Yh/b1x8EDGWA0aDdEeTbRk6/content.mp3?Expires=1795820400&KeyName=assets-cdn-key-1&Signature=xjNAHCFGatrrtVC1NfIvSz8G1oE="
+    },
+    {
+      "archivo": "sfx/congelacion_2.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/580399847ed44b70a3ed8ae5c2c7aff4/content_generation/YVYjRB7JOT2J9m8O2Okh/6Ol6xQfqMcRZsf3cmu4p/content.mp3?Expires=1795820400&KeyName=assets-cdn-key-1&Signature=0YHATtxdnxL5TdfYgBycJ7lOXzU="
+    },
+    {
+      "archivo": "sfx/congelacion_3.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/580399847ed44b70a3ed8ae5c2c7aff4/content_generation/ou6v3H2cJ1giC1fazuVX/P6uIF3ymLBqTO7d67T97/content.mp3?Expires=1795820400&KeyName=assets-cdn-key-1&Signature=UvNUZgIjYOttq4ej-gF-O9LcoVs="
+    },
+    {
+      "archivo": "sfx/congelacion_4.mp3",
+      "url": "https://elevenlabsusercontent.com/database/workspace/580399847ed44b70a3ed8ae5c2c7aff4/content_generation/t5OEpIL9LnWR5z1imyvA/JEFp9iOW94aYbdRM9bIe/content.mp3?Expires=1795820400&KeyName=assets-cdn-key-1&Signature=Wyq_JNYWfl7W9OogkC7ptifo0QE="
     }
   ]
 }

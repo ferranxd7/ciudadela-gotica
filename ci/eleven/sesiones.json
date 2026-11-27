@@ -10370,5 +10370,75 @@
     ]
    }
   }
+ },
+ "sfx_martillos": {
+  "flow": "XeqoCBgCDlv3wBHDJFd8",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7aj: el golpe de martillo, la flecha de fuego que prende y la congelacion. Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "martillo_golpe": {
+    "prompt": "A heavy war hammer smashing into an armored body: a deep blunt thud with a crunching metal dent and a short low rumble. Dark fantasy film foley, close and punchy, about 1 second.",
+    "sesiones": [
+     "NjxGk82POiKK2oxdIprV",
+     "Q2Mi8T6yCSbn0ywU1eVQ",
+     "MM3Fd2iajK7pCoRrLBBJ",
+     "WjUhRhV2hbaZZGsHITNK"
+    ],
+    "generaciones": [
+     "aCngyoNwXjrazxW0RVWX",
+     "n65R4tqF6hogsmzaEOnt",
+     "uP654Drr6xT45Bn2yv1w",
+     "f7ASDnobuFikECOUebBZ"
+    ],
+    "duraciones": [
+     1.0,
+     1.0,
+     2.0,
+     1.0
+    ]
+   },
+   "flecha_fuego": {
+    "prompt": "A burning arrow striking flesh and setting it alight: a sharp arrow thunk followed by a sudden fiery whoosh and crackling flames. Dark fantasy film foley, close and dry, about 1.5 seconds.",
+    "sesiones": [
+     "qzbfVy59uMFOO5CCgk4n",
+     "yQGGjmTTUHlceFuTCNFU",
+     "vW3TLqqGxO2Vd7FrbHEr",
+     "pP8gpgovPBZ0lzE3ujPD"
+    ],
+    "generaciones": [
+     "EhryZwihuy4LlfEzyEhn",
+     "Pyu07Pom79BzNUr6Bhe5",
+     "HuQic8URMU5lRs5spmus",
+     "j2VS2OO8QpjKQnXzZ2gR"
+    ],
+    "duraciones": [
+     1.48,
+     5.0,
+     1.48,
+     1.48
+    ]
+   },
+   "congelacion": {
+    "prompt": "Ice suddenly freezing around a body and shattering: a sharp crackling freeze, splintering ice crystals and a glassy burst with a cold shimmering tail. Dark fantasy film foley, close, about 1.5 seconds.",
+    "sesiones": [
+     "KVQTNdCNvoDaVCX2X3Yh",
+     "YVYjRB7JOT2J9m8O2Okh",
+     "ou6v3H2cJ1giC1fazuVX",
+     "t5OEpIL9LnWR5z1imyvA"
+    ],
+    "generaciones": [
+     "b1x8EDGWA0aDdEeTbRk6",
+     "6Ol6xQfqMcRZsf3cmu4p",
+     "P6uIF3ymLBqTO7d67T97",
+     "JEFp9iOW94aYbdRM9bIe"
+    ],
+    "duraciones": [
+     1.48,
+     1.48,
+     1.48,
+     1.48
+    ]
+   }
+  }
  }
 }
