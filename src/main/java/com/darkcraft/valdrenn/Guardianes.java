@@ -204,6 +204,8 @@ public final class Guardianes {
             Rol.jefe(p, "entity.darkcraft." + r.tipo(), r.ecos());
             Logros.dar(p, r.logro());
             com.darkcraft.espejo.Espejo.bestia(p, r.tipo());
+            // la armadura de Ser Brandt y la de corteza de Vareth (parte 7al; una vez a cada uno)
+            com.darkcraft.armadura.Armaduras.premioDeJefe(p, r.tipo());
         }
     }
 

@@ -62,7 +62,7 @@ public final class Espejo {
 
     /** Logros del mod en el orden de la historia (los que no esten aqui van al final). */
     public static final String[] ORDEN_LOGROS = {"clase", "encontrar", "libro_sombra", "primera_marca", "capitulo1", "capitulo2",
-            "brandt", "rey", "golpe_final", "capitulo3", "capitulo4", "vareth", "arbol", "gavran_guardia", "gavran_fase1", "gavran_corazon",
+            "brandt", "armadura_jefe", "rey", "golpe_final", "capitulo3", "capitulo4", "vareth", "arbol", "gavran_guardia", "gavran_fase1", "gavran_corazon",
             "gavran_juicio", "gavran_fase2", "gavran", "capitulo5", "cartografo", "caballero", "caballeros_50", "capitan_elite", "emboscada", "fortaleza", "puente",
             "puerta_hueso", "acertijo", "amuleto", "portal", "capitulo6", "morvain", "capitulo7", "silbato", "corcel", "viaje", "fragmento", "mapa_morvain", "refugio", "hagen", "herreros", "silas", "silas_compra", "campana_peregrino", "campana_difuntos", "hedda_verdad", "hedda_mentira", "hedda_callar", "velmor", "marchito", "molinera", "arboleda", "ahorcado", "verdugo", "pilotes", "podrido", "barquero", "monasterio", "helado", "abad", "capital", "calcinado", "capitulo8", "juramento", "condestable", "academia", "erudito", "observatorio", "rectora", "puerto", "salobre", "faro", "costillar", "ballenero", "grieta", "penitente", "altar", "pontifice", "cerco", "capitulo9", "marcado", "aldric", "gigante_campana", "gigante_costilla", "gigante_columna", "jinete", "teatro", "bufon", "nido", "dragon", "cadena", "gargola", "descansillo", "boca", "ciudadela", "homenaje", "centinela", "ultima_llama", "capitulo10", "isolde", "aguja", "sombra", "alba", "nueva_sombra", "epilogo", "libro_perdido",
             "libros_perdidos"};

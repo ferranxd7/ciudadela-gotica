@@ -156,5 +156,8 @@ public final class VictoriaGavran {
         items.set(15, new ItemStack(DarkCraftMod.CENIZAS.get(com.darkcraft.combate.Habilidad.SANGRE).get()));
         for (int slot : new int[]{20, 21, 23, 24})
             items.set(slot, EnchantmentHelper.enchantItem(lvl.random, new ItemStack(Items.BOOK), 30, true));
+        // y su armadura, la del Juramento (parte 7al): a los lados del mandoble
+        int[] huecos = {2, 3, 5, 6};
+        for (int i = 0; i < 4; i++) items.set(huecos[i], DarkCraftMod.armadura(com.darkcraft.armadura.Conjunto.GAVRAN, i));
     }
 }

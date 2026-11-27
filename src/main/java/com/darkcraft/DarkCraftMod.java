@@ -1240,7 +1240,7 @@ public class DarkCraftMod {
                 final int pieza = i;
                 String id = c.objeto(pieza);
                 ARMADURAS.put(id, ITEMS.register(id, () -> new com.darkcraft.armadura.PiezaArmadura(c, pieza,
-                        new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.UNCOMMON))));
+                        new Item.Properties().stacksTo(1).fireResistant().rarity(c.esDeJefe() ? Rarity.EPIC : Rarity.UNCOMMON))));
             }
     }
 

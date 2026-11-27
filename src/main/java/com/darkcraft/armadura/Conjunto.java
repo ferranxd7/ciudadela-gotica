@@ -17,8 +17,10 @@ import net.minecraft.world.item.crafting.Ingredient;
  * manos): su modelo pone las cajas en los brazos y las grebas llevan tambien las botas. El modelo y la textura los hace
  * {@code tools/armaduras/armaduras.py}.
  * <p>
- * Los de las clases (de momento todos): el caballero, el confesor, el vagabundo, el guerrero, el barbaro, el bandido, el
- * hechicero, el profeta y el prisionero; el desdichado no lleva nada.
+ * Los de las clases: el caballero, el confesor, el vagabundo, el guerrero, el barbaro, el bandido, el hechicero, el profeta y
+ * el prisionero; el desdichado no lleva nada. Los de los jefes (parte 7al; {@link #jefe}): la ropa del Capitan de Brumavela,
+ * la armadura de Ser Brandt y la de corteza de Vareth (se dan al vencerlos, una vez a cada jugador:
+ * {@link Armaduras#premio}), la del Rey Corvin y la del Juramento de Ser Gavran (en el cofre de su capitulo).
  */
 public enum Conjunto {
     //            id            sonido            defensa (yelmo, peto, guantes, grebas)   dureza  empuje  peso   fuego  hielo  rayo  magia veneno sombra
@@ -30,7 +32,13 @@ public enum Conjunto {
     BANDIDO("bandido", Sonido.CUERO, new int[]{1, 4, 1, 3}, 0f, 0f, 8.5f, new float[]{0.06f, 0.08f, 0.06f, 0.06f, 0.14f, 0.10f}),
     HECHICERO("hechicero", Sonido.TELA, new int[]{1, 3, 1, 2}, 0f, 0f, 6.5f, new float[]{0.08f, 0.08f, 0.12f, 0.22f, 0.06f, 0.12f}),
     PROFETA("profeta", Sonido.TELA, new int[]{1, 3, 1, 2}, 0f, 0f, 6.5f, new float[]{0.20f, 0.06f, 0.06f, 0.12f, 0.06f, 0.14f}),
-    PRISIONERO("prisionero", Sonido.MALLA, new int[]{3, 3, 2, 2}, 0f, 0.02f, 11.0f, new float[]{0.06f, 0.08f, 0.04f, 0.16f, 0.08f, 0.08f});
+    PRISIONERO("prisionero", Sonido.MALLA, new int[]{3, 3, 2, 2}, 0f, 0.02f, 11.0f, new float[]{0.06f, 0.08f, 0.04f, 0.16f, 0.08f, 0.08f}),
+    // los de los jefes (parte 7al): el ultimo dato es el jefe (su id de entidad) que lo llevaba
+    CAPITAN("capitan", Sonido.CUERO, new int[]{2, 5, 2, 3}, 0f, 0.02f, 9.5f, new float[]{0.06f, 0.16f, 0.04f, 0.08f, 0.12f, 0.08f}, "capitan"),
+    BRANDT("brandt", Sonido.PLACAS, new int[]{4, 8, 3, 6}, 2.0f, 0.12f, 29.0f, new float[]{0.14f, 0.14f, 0.04f, 0.06f, 0.06f, 0.10f}, "brandt"),
+    VARETH("vareth", Sonido.CUERO, new int[]{3, 6, 2, 5}, 0.5f, 0.04f, 16.5f, new float[]{0f, 0.12f, 0.10f, 0.12f, 0.25f, 0.10f}, "corteza"),
+    REY("rey", Sonido.PLACAS, new int[]{4, 8, 3, 6}, 2.5f, 0.08f, 25.0f, new float[]{0.30f, 0.06f, 0.06f, 0.12f, 0.06f, 0.14f}, "rey"),
+    GAVRAN("gavran", Sonido.PLACAS, new int[]{4, 9, 3, 6}, 3.0f, 0.10f, 24.0f, new float[]{0.12f, 0.12f, 0.10f, 0.16f, 0.20f, 0.18f}, "gavran");
 
     /** Las piezas, en el orden de sus numeros (y de los objetos {@code <conjunto>_<pieza>}). */
     public static final String[] PIEZAS = {"yelmo", "peto", "guantes", "grebas"};
@@ -47,9 +55,17 @@ public enum Conjunto {
     private final int[] defensa;
     public final float dureza, empuje, peso;
     private final float[] resistencias;
+    /** El id de entidad del jefe que lo llevaba (los de los jefes, parte 7al), o null (los de las clases). */
+    @org.jetbrains.annotations.Nullable
+    public final String jefe;
     private final Material material = new Material();
 
     Conjunto(String id, Sonido sonido, int[] defensa, float dureza, float empuje, float peso, float[] resistencias) {
+        this(id, sonido, defensa, dureza, empuje, peso, resistencias, null);
+    }
+
+    Conjunto(String id, Sonido sonido, int[] defensa, float dureza, float empuje, float peso, float[] resistencias, String jefe) {
+        this.jefe = jefe;
         this.id = id;
         this.sonido = sonido;
         this.defensa = defensa;
@@ -62,6 +78,16 @@ public enum Conjunto {
     public static Conjunto de(String id) {
         for (Conjunto c : values()) if (c.id.equals(id)) return c;
         return null;
+    }
+
+    /** El conjunto de un jefe (por su id de entidad: "capitan", "brandt", "corteza", "rey", "gavran"), o null. */
+    public static Conjunto deJefe(String jefe) {
+        for (Conjunto c : values()) if (jefe != null && jefe.equals(c.jefe)) return c;
+        return null;
+    }
+
+    public boolean esDeJefe() {
+        return jefe != null;
     }
 
     /** El numero de pieza (0-3) de un tipo de armadura de Minecraft (los guantes son las botas). */

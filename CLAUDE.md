@@ -3932,6 +3932,39 @@ Respuesta 109 del plan ("... bastones, sellos y escudos (pequeno, mediano, grand
   instante: ... PARADA` y `rodela cubierto: -1,5 de vida`), el paves de cara y en primera persona (`es04`, `es05`) y los tres
   en el menu (`es06`).
 
+### Plan grande, parte 7al: los conjuntos de los jefes
+
+Respuesta 111 del plan (los conjuntos con modelo propio), segunda tanda: los de los jefes, que se ganan al vencerlos.
+- **Los conjuntos** (en `armadura/Conjunto`, con su jefe: el ultimo dato, el id de entidad; `esDeJefe()`, `deJefe(id)`):
+  `capitan` (la ropa del Capitan de Brumavela, Edrik Maroll: tricornio azul con galon de oro, casaca con botones y charreteras,
+  faja roja, faldones, guantes y botas de vuelta, algo de alga; cuero, defensa 12, peso 9,5, hielo y veneno), `brandt` (la de Ser
+  Brandt, el Muro del Rey: placas negras con filos de oro, yelmo con aro de clavos y puas y rendija roja, tabardo rojo con la torre
+  negra, hombreras de dos lamas; defensa 21, dureza 2, la mas pesada: 29), `vareth` (la de corteza de Vareth: corteza con surcos y
+  musgo, yelmo con astas de ramas y rendija verde, corazon verde en el pecho, garras de raiz, raices enroscadas; defensa 16,
+  peso 16,5, nada de fuego —el fuego le hacia el doble— y mucho veneno), `rey` (la del Rey Corvin: placas negras con filos de oro,
+  la corona de ocho puntas con su piedra, rendija de brasas, esclavina de armino, tabardo y capa carmesi; defensa 21, mucho fuego) y
+  `gavran` (la del Juramento de Ser Gavran: acero negro viejo con musgo, corona de raices con espinas, rendija verde, tabardo con la
+  espada del juramento, raices en las grebas; defensa 22, dureza 3, la mejor de todo). Sus piezas son epicas (rareza) y su ficha
+  dice "Se la ganaste a <jefe>" (`darkcraft.armadura.jefe`). Las placas de los tres de placas las pone `_placa_fuerte` en
+  `tools/armaduras/armaduras.py` (coraza, hombreras de dos lamas, brazales, guanteletes con su puno, escarcela, quijotes,
+  rodilleras y grebas; cada uno sus colores y su yelmo).
+- **Donde se ganan**: el Capitan y los guardianes de Valdrenn (Brandt y Vareth) las dan al repartir lo del jefe a los que
+  pelearon y a los que estaban cerca (`PuebloEnemigos.repartir`, `Guardianes.repartir` → `Armaduras.premio` / `premioDeJefe`):
+  las cuatro piezas a la bolsa con sus avisos de "conseguido", **una sola vez a cada jugador** (la ficha guarda
+  `premios.armadura_<conjunto>`: `Ficha.premio`). El Rey y Ser Gavran, en el cofre de su capitulo (cada jugador su copia): la del
+  Rey en la fila del medio (huecos 9, 11, 15 y 17) y la del Juramento a los lados del mandoble (2, 3, 5 y 6), sin pisar lo que ya
+  habia.
+- **Logro** `armadura_jefe` ("Ropa de Muerto": ponerse entero el conjunto de un jefe; `Armaduras.onEquipo`, con
+  `LivingEquipmentChangeEvent`, que salta en el tick del jugador: los FakePlayer de las pruebas no lo tienen).
+- Comando `/darkcraft armadura jefes [olvidar]` (los que se le han dado ya; olvidarlos para probar otra vez).
+- Pruebas: servidor, `armaduras7al()` (linea `Armaduras de jefe 7al: ...`: cada uno con su jefe, su defensa, su dureza, su peso,
+  su fuego y su veneno, entero; el premio del Capitan la primera vez si y la segunda no, Brandt y Vareth por su id, la guardia
+  nada, lo que queda en la bolsa; los cofres del Rey y de Ser Gavran con sus cuatro piezas y cuantas cosas); cliente, tramo
+  `armaduras7al()` despues del de los escudos: cada uno de frente en tercera persona (`cliente_al01_capitan` ... `al05_gavran`,
+  lineas `armadura 7al <conjunto>: ...`), el Rey y el Capitan de espaldas (`al06`, `al07`), el premio del Capitan con sus avisos
+  (`al08`; linea `armadura 7al premio del Capitan: primera true, segunda false, piezas en la bolsa 4 | logro armadura_jefe true`) y el
+  menu con el equipo del Rey (`al09`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

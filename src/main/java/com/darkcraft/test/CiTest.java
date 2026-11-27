@@ -764,6 +764,98 @@ public final class CiTest {
         armaduras(server, m, log);
         armas7aj(server, m, log);
         escudos7ak(server, m, log);
+        armaduras7al(server, m, log);
+    }
+
+    /**
+     * Parte 7al: los conjuntos de los jefes. Que estan los cinco (con sus cuatro piezas, epicos y de su jefe), lo que da cada uno
+     * entero; el premio (las cuatro piezas a la bolsa una sola vez: la segunda ya no; Brandt y Vareth por el id de su jefe, la
+     * guardia normal nada) y los cofres del Rey y de Ser Gavran con su armadura (sin pisar nada de lo que ya llevaban).
+     */
+    private static void armaduras7al(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        StringBuilder sb = new StringBuilder("Armaduras de jefe 7al:");
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07a1c"), "[DarkCraftCI28]"));
+        try {
+            int jefes = 0, piezasMal = 0;
+            for (com.darkcraft.armadura.Conjunto c : com.darkcraft.armadura.Conjunto.values()) {
+                if (!c.esDeJefe()) continue;
+                jefes++;
+                for (int i = 0; i < 4; i++) {
+                    var st = DarkCraftMod.armadura(c, i);
+                    if (st.isEmpty() || st.getRarity() != net.minecraft.world.item.Rarity.EPIC) piezasMal++;
+                }
+                for (int i = 0; i < 4; i++) fp.setItemSlot(com.darkcraft.armadura.Armaduras.HUECOS[i], DarkCraftMod.armadura(c, i));
+                float fuego = com.darkcraft.rol.Resistencias.de(new net.minecraft.world.item.ItemStack[0], fp, com.darkcraft.rol.Resistencias.Tipo.FUEGO);
+                float veneno = com.darkcraft.rol.Resistencias.de(new net.minecraft.world.item.ItemStack[0], fp, com.darkcraft.rol.Resistencias.Tipo.VENENO);
+                sb.append(String.format(java.util.Locale.ROOT, " %s (de %s -> %s): defensa %d, dureza %.1f, peso %.1f, fuego %.2f, veneno %.2f%s;", c.id, c.jefe,
+                        com.darkcraft.armadura.Conjunto.deJefe(c.jefe) == c ? "bien" : "MAL", fp.getArmorValue(), c.dureza, c.peso, fuego, veneno,
+                        com.darkcraft.armadura.Armaduras.entero(fp) == c ? "" : " (NO ENTERO)"));
+            }
+            for (var s : com.darkcraft.armadura.Armaduras.HUECOS) fp.setItemSlot(s, net.minecraft.world.item.ItemStack.EMPTY);
+            sb.append(" | ").append(jefes).append(" conjuntos de jefe, piezas mal ").append(piezasMal);
+            // el premio: una vez
+            fp.getInventory().clearContent();
+            for (var k : com.darkcraft.armadura.Conjunto.values()) com.darkcraft.rol.Ficha.premio(fp, "armadura_" + k.id, false);
+            boolean p1 = com.darkcraft.armadura.Armaduras.premio(fp, com.darkcraft.armadura.Conjunto.CAPITAN);
+            boolean p2 = com.darkcraft.armadura.Armaduras.premio(fp, com.darkcraft.armadura.Conjunto.CAPITAN);
+            boolean pb = com.darkcraft.armadura.Armaduras.premioDeJefe(fp, com.darkcraft.valdrenn.ValdrennEnemigos.BRANDT);
+            boolean pv = com.darkcraft.armadura.Armaduras.premioDeJefe(fp, com.darkcraft.valdrenn.ValdrennEnemigos.CORTEZA);
+            boolean pg = com.darkcraft.armadura.Armaduras.premioDeJefe(fp, com.darkcraft.valdrenn.ValdrennEnemigos.GUARDIA);
+            java.util.Map<String, Integer> bolsa = new java.util.TreeMap<>();
+            for (int i = 0; i < fp.getInventory().getContainerSize(); i++) {
+                var st = fp.getInventory().getItem(i);
+                if (st.getItem() instanceof com.darkcraft.armadura.PiezaArmadura pa) bolsa.merge(pa.conjunto.id, st.getCount(), Integer::sum);
+            }
+            sb.append(" | premio del Capitan: primera ").append(p1).append(", segunda ").append(p2).append("; Brandt ").append(pb)
+                    .append(", Vareth ").append(pv).append(", guardia ").append(pg).append("; en la bolsa ").append(bolsa)
+                    .append("; marcado ").append(com.darkcraft.rol.Ficha.premio(fp, "armadura_capitan"));
+            // los cofres del Rey y de Ser Gavran (cada uno su copia: el que gano)
+            ServerLevel ow = server.overworld();
+            int[] sitio = CastleSites.nearest(ow.getSeed(), 0, 0, 3);
+            if (sitio == null) sb.append(" | sin reino para los cofres");
+            else {
+                var sala = com.darkcraft.rey.Sala.near(ow, sitio[0], sitio[1]);
+                var arbol = com.darkcraft.gavran.SalaArbol.cerca(ow, sitio[0], sitio[1]);
+                BlockPos pos = new BlockPos(sitio[0], 80, sitio[1]);
+                if (sala != null) {
+                    com.darkcraft.rey.ReyEstado.get(server).ganadores(sala.key(), java.util.List.of(fp.getUUID()));
+                    var items = net.minecraft.core.NonNullList.withSize(27, net.minecraft.world.item.ItemStack.EMPTY);
+                    com.darkcraft.rey.Recompensa.llenar(fp, ow, pos, items);
+                    sb.append(" | cofre del Rey: ").append(cofre7al(items, com.darkcraft.armadura.Conjunto.REY));
+                } else sb.append(" | sin sala del Rey");
+                if (arbol != null) {
+                    com.darkcraft.rey.ReyEstado.get(server).ganadores(arbol.key(), java.util.List.of(fp.getUUID()));
+                    var items = net.minecraft.core.NonNullList.withSize(27, net.minecraft.world.item.ItemStack.EMPTY);
+                    com.darkcraft.gavran.VictoriaGavran.llenar(fp, ow, pos, items);
+                    sb.append(" | cofre de Ser Gavran: ").append(cofre7al(items, com.darkcraft.armadura.Conjunto.GAVRAN));
+                } else sb.append(" | sin sala del Arbol");
+            }
+        } catch (Exception e) {
+            sb.append(" ERROR ").append(e);
+            DarkCraftMod.LOGGER.error("[DarkCraft] las armaduras de jefe", e);
+        } finally {
+            for (var s : com.darkcraft.armadura.Armaduras.HUECOS) fp.setItemSlot(s, net.minecraft.world.item.ItemStack.EMPTY);
+            fp.getInventory().clearContent();
+        }
+        log.println(sb);
+        log.flush();
+    }
+
+    /** Lo de un cofre de capitulo: cuantas cosas, cuantas piezas del conjunto (y en que huecos) y si estan las cuatro. */
+    private static String cofre7al(net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> items, com.darkcraft.armadura.Conjunto c) {
+        int cosas = 0, piezas = 0, mask = 0;
+        StringBuilder huecos = new StringBuilder();
+        for (int i = 0; i < items.size(); i++) {
+            var st = items.get(i);
+            if (st.isEmpty()) continue;
+            cosas++;
+            if (st.getItem() instanceof com.darkcraft.armadura.PiezaArmadura pa && pa.conjunto == c) {
+                piezas++;
+                mask |= 1 << pa.pieza;
+                huecos.append(huecos.length() == 0 ? "" : ",").append(i);
+            }
+        }
+        return cosas + " cosas, " + piezas + " piezas de " + c.id + " (huecos " + huecos + ")" + (mask == 15 ? " enteras" : " FALTAN");
     }
 
     /**
