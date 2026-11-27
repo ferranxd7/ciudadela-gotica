@@ -548,8 +548,14 @@ public class Gigante extends Guardian {
                 }
             }
             getLookControl().setLookAt(t, 20f, 20f);
-            if (d > distanciaDeseada()) andarHacia(t.getX(), t.getZ(), PASO_PELEA, GIRO_PELEA);
-            else girarHacia(t, GIRO_PELEA);
+            // a quien esta lejos de su vuelta no le sigue (le tira rocas si llega): vuelve a ella y le mira
+            int r = Mth.clamp(variante(), 0, 2);
+            boolean sigue = !Morvain.es(level()) || RutasGigantes.distancia(r, t.getX(), t.getZ()) <= CORREA;
+            if (sigue && d > distanciaDeseada()) andarHacia(t.getX(), t.getZ(), PASO_PELEA, GIRO_PELEA);
+            else if (!sigue && RutasGigantes.distancia(r, getX(), getZ()) > 6) {
+                double[] p = RutasGigantes.punto(r, RutasGigantes.donde(r, getX(), getZ()));
+                andarHacia(p[0], p[1], PASO_PELEA, GIRO_PELEA);
+            } else girarHacia(t, GIRO_PELEA);
         } else if (!parado) {
             int r = Mth.clamp(variante(), 0, 2);
             // por su camino: hacia un punto un poco mas adelante (asi dobla las esquinas en curva)
@@ -561,12 +567,16 @@ public class Gigante extends Guardian {
         pies();
     }
 
-    /** Si deja a su presa: lejos de su camino (o el, demasiado lejos) o muy lejos de el. */
+    /** Si deja a su presa: muy lejos de el (a la que se aleja de su vuelta no la sigue, pero la tiene: ver mover). */
     private boolean suelta(LivingEntity t) {
-        if (distanceToSqr(t) > 64 * 64) return true;
-        if (!Morvain.es(level())) return false;
-        int r = Mth.clamp(variante(), 0, 2);
-        return RutasGigantes.distancia(r, t.getX(), t.getZ()) > CORREA || RutasGigantes.distancia(r, getX(), getZ()) > CORREA + 16;
+        return distanceToSqr(t) > 64 * 64;
+    }
+
+    /** No repara en quien anda lejos de su vuelta (mas de la correa y 16): asi no la deja y la vuelve a ver a cada momento. */
+    @Override
+    protected boolean percibe(LivingEntity p) {
+        if (Morvain.es(level()) && RutasGigantes.distancia(Mth.clamp(variante(), 0, 2), p.getX(), p.getZ()) > CORREA + 16) return false;
+        return super.percibe(p);
     }
 
     /** Un paso hacia (x, z): gira como mucho {@code giro} grados y, si tiene que girar mucho, casi en el sitio. */
