@@ -49,7 +49,7 @@ public final class GuardianCliente {
 
     /**
      * {@code nombre}: "brandt", "corteza", "molinera", "verdugo", "barquero", "abad", "condestable", "rectora", "ballenero",
-     * "pontifice", "aldric" o "gigante_*" (el de la clave de su nombre; los tres gigantes, con la misma barra).
+     * "pontifice", "aldric", "gigante_*" (el de la clave de su nombre; los tres gigantes, con la misma barra) o "jinete".
      */
     public static void barra(CustomizeGuiOverlayEvent.BossEventProgress e, int ticks, String nombre) {
         if (!e.isCancelable()) return;
@@ -61,7 +61,8 @@ public final class GuardianCliente {
         }
         boolean hojas = nombre.equals("corteza"), ceniza = nombre.equals("molinera"), soga = nombre.equals("verdugo"), agua = nombre.equals("barquero"),
                 nieve = nombre.equals("abad"), fuego = nombre.equals("condestable"), cielo = nombre.equals("rectora"), mar = nombre.equals("ballenero"),
-                sangre = nombre.equals("pontifice"), cadena = nombre.equals("aldric"), piedra = nombre.startsWith("gigante");
+                sangre = nombre.equals("pontifice"), cadena = nombre.equals("aldric"), piedra = nombre.startsWith("gigante"),
+                almas = nombre.equals("jinete");
         e.setCanceled(true);
         GuiGraphics g = e.getGuiGraphics();
         Minecraft mc = Minecraft.getInstance();
@@ -84,7 +85,7 @@ public final class GuardianCliente {
                     h.x = 8 + 240 * np + R.nextFloat() * Math.max(2, (p - np) * 240);
                     h.y = 22 + R.nextFloat() * 4;
                     h.vx = (R.nextFloat() - 0.5f) * 0.5f;
-                    h.vy = nombre.equals("condestable") ? -0.3f - R.nextFloat() * 0.5f : 0.2f + R.nextFloat() * 0.5f;
+                    h.vy = nombre.equals("condestable") || nombre.equals("jinete") ? -0.3f - R.nextFloat() * 0.5f : 0.2f + R.nextFloat() * 0.5f;
                     h.tipo = R.nextInt(4);
                     GOTAS.add(h);
                 }
@@ -100,8 +101,8 @@ public final class GuardianCliente {
                     // estrellas: caen muy despacio, de lado, titilando (lo hace el dibujo)
                     h.vy = Math.min(0.35f, h.vy + 0.01f);
                     h.x += h.vx * 0.5f;
-                } else if (actual.equals("condestable")) {
-                    // brasas: suben, frenando, y se mecen
+                } else if (actual.equals("condestable") || actual.equals("jinete")) {
+                    // brasas (y las llamas de almas del Jinete Nocturno): suben, frenando, y se mecen
                     h.vy = Math.min(-0.15f, h.vy + 0.02f);
                     h.x += h.vx * 0.8f + (float) Math.sin((h.edad + h.tipo * 5) * 0.3) * 0.5f;
                 } else if (actual.equals("abad")) {
@@ -129,7 +130,7 @@ public final class GuardianCliente {
         g.pose().translate(-128, 0, 0);
         g.drawCenteredString(mc.font, Component.translatable("entity.darkcraft." + nombre), 128, -8,
                 hojas ? 0xFFB9F0C4 : ceniza ? 0xFFF2DDB8 : soga ? 0xFFE6D2B0 : agua ? 0xFFBFEAF2 : nieve ? 0xFFE4F4FF : fuego ? 0xFFFFD2A0 : cielo ? 0xFFDCE4FF
-                        : mar ? 0xFFCFEEE6 : sangre ? 0xFFF4CDBE : cadena ? 0xFFE6D8CC : piedra ? 0xFFE8E0CC : 0xFFF0C8B8);
+                        : mar ? 0xFFCFEEE6 : sangre ? 0xFFF4CDBE : cadena ? 0xFFE6D8CC : piedra ? 0xFFE8E0CC : almas ? 0xFFCDE8FF : 0xFFF0C8B8);
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         // hueco, rastro y relleno (la bruma corre)
         g.blit(BARRA, 8, 19, 0, 80, 240, 7, 256, 128);
@@ -141,7 +142,7 @@ public final class GuardianCliente {
         if (ticks - golpe < 4 && wf > 0)
             g.fill(8 + Math.max(0, wf - 6), 19, 8 + wf, 26, hojas ? 0x80E6FFF0 : ceniza ? 0x80FFF4E0 : soga ? 0x80FFE8D8 : agua ? 0x80E0FAFF
                     : nieve ? 0x90F4FCFF : fuego ? 0x90FFE6B0 : cielo ? 0x90EEF2FF : mar ? 0x90E6FFF8 : sangre ? 0x90FFD6CC
-                    : cadena ? 0x90FFD8C8 : 0x80FFE4DA);
+                    : cadena ? 0x90FFD8C8 : almas ? 0x90D8F0FF : 0x80FFE4DA);
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         g.blit(BARRA, 0, 0, 0, 0, 256, 40, 256, 128);
         // las gotas que caen

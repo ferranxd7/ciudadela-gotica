@@ -257,5 +257,16 @@
     "aviso": "Music by Ronhul Maggot (OpenGameArt, CC-BY 4.0)",
     "uso": "Los gigantes errantes de Morvain (Ogmund, Ulfgar y Haldor)",
     "lufs": -16
+  },
+  {
+    "id": "jinete",
+    "pagina": "https://opengameart.org/node/70268",
+    "busca": "determined_pursuit_loop",
+    "titulo": "Determined Pursuit (epic orchestra loop)",
+    "autor": "Emma_MA (Emma Andersson)",
+    "licencia": "CC0",
+    "aviso": "Music by Emma_MA (OpenGameArt, CC0)",
+    "uso": "Ser Lucan, el Jinete Nocturno (el camino de nubes, de noche)",
+    "lufs": -16
   }
 ]

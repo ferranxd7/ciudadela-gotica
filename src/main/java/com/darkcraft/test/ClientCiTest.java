@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 114 * 60 * 20;
+    private static final int LIMIT = 119 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -5204,6 +5204,8 @@ public final class ClientCiTest {
         steps.clear();
         next = 0;
         com.darkcraft.rol.Rol.sinLimite = true;
+        // el Jinete Nocturno no sale solo en las demas pruebas (van por el camino de nubes a cualquier hora): su tramo lo suelta
+        com.darkcraft.camino.Jinetes.quietos = true;
         com.darkcraft.client.ui.Carteles.callados = true;
         atTicks(12, "Al entrar por primera vez sale la eleccion de clase (no se puede cerrar)", m -> {
             log("  al entrar: " + (m.screen instanceof com.darkcraft.client.ui.ClaseScreen c ? c.resumen()
@@ -5773,7 +5775,7 @@ public final class ClientCiTest {
         });
         atTicks(S + 130 + 166, "captura de los logros", m -> shot(m, "cliente_99_logros"));
         atTicks(S + 130 + 170, "cerrar", m -> m.setScreen(null));
-        int finT = titulo(morvain(lejania(S + 130 + 175)));
+        int finT = titulo(jinete(morvain(lejania(S + 130 + 175))));
         atTicks(finT, "Fin de la prueba", ClientCiTest::finish);
     }
 
@@ -10489,6 +10491,403 @@ public final class ClientCiTest {
         return t + 30;
     }
 
+    // ------------------------------------------------------------------ Ser Lucan, el Jinete Nocturno (parte 7x)
+
+    private static String jineteK;
+    private static com.darkcraft.world.CaminoNubes.Ruta jineteR;
+    private static double jineteS;
+
+    private static com.darkcraft.enemigos.Jinete jineteE() {
+        return jineteK == null ? null : com.darkcraft.camino.Jinetes.fuera(jineteK);
+    }
+
+    private static String estadoJinete(com.darkcraft.enemigos.Jinete j) {
+        if (j == null) return "(no esta fuera)";
+        return estadoE(j) + String.format(java.util.Locale.ROOT, ", en pelea %s, segunda %s, andando %s, lo andado %.0f, cargas %d (le pillan %d), tajos %d, barridos %d,"
+                        + " pisotones %d (onda %d), cuernos %d (helados %d), llamas %d (arden %d, queman %d), aturdidos %d, enderezados al camino %d, amanece %s",
+                j.enPelea(), j.segunda(), j.andando(), j.s(), j.cargas(), j.golpesCarga(), j.tajos(), j.barridos(), j.pisotones(), j.ondasPisoton(), j.cuernos(),
+                j.helados(), j.fuegosPuestos(), j.fuegos(), j.quemados(), j.aturdidos(), j.fueraDelCamino(), j.amanece());
+    }
+
+    /** Lo que se ve del jinete en el cliente: lo que corre, el galope que suena y si se le dibuja. */
+    private static String jineteCliente(Minecraft m) {
+        if (m.level == null) return "cliente: sin mundo";
+        for (net.minecraft.world.entity.Entity e : m.level.entitiesForRendering())
+            if (e instanceof com.darkcraft.enemigos.Jinete j)
+                return String.format(java.util.Locale.ROOT, "cliente: jinete a %.1f, corre %.2f, accion %d, en pelea %s, galope sonando %s", m.player == null ? -1 : j.distanceTo(m.player),
+                        j.velocidad, j.accion(), j.enPelea(), com.darkcraft.client.enemigos.JineteCliente.galopeSonando());
+        return "cliente: no se ve ningun jinete";
+    }
+
+    /** La camara a {@code delante} por delante del jinete, {@code derecha} a un lado y {@code alto} de alto, mirando a un punto suyo (en el servidor). */
+    private static void camaraJinete(com.darkcraft.enemigos.Jinete j, double delante, double derecha, double alto, double miraDelante, double miraAlto) {
+        Vec3 f = Vec3.directionFromRotation(0, j.getYRot());
+        verDesdeServidor = new Vec3(j.getX() + f.x * delante - f.z * derecha, j.getY() + alto, j.getZ() + f.z * delante + f.x * derecha);
+        miraServidor = new Vec3(j.getX() + f.x * miraDelante, j.getY() + miraAlto, j.getZ() + f.z * miraDelante);
+    }
+
+    /** Para ver de noche sin que la imagen salga negra (el mar de nubes y el jinete) y para que los golpes no le saquen del camino. */
+    private static void jinetePrepara(ServerPlayer sp) {
+        sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 120, 0, false, false, false));
+        var kb = sp.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE);
+        if (kb != null) kb.setBaseValue(1.0);
+        sp.clearFire();
+    }
+
+    /** El jinete en su sitio del camino ({@code jineteS}), mirando hacia la fortaleza; devuelve hacia donde mira. */
+    private static float jineteEnSuSitio(com.darkcraft.enemigos.Jinete j) {
+        double[] q = jineteR.punto(jineteS), tg = com.darkcraft.camino.Jinetes.tangente(jineteR, jineteS);
+        float giro = (float) (Math.atan2(tg[1], tg[0]) * 180 / Math.PI) - 90f;
+        j.moveTo(q[0], com.darkcraft.world.NubesGenerador.SUELO, q[1], giro, 0f);
+        j.setYRot(giro);
+        j.yBodyRot = j.yHeadRot = giro;
+        return giro;
+    }
+
+    /**
+     * Un golpe del jinete (quieto: solo lo que se le manda) en su sitio del camino, con el jugador en supervivencia a {@code delante}
+     * bloques por el camino (negativo: detras) y la camara de lado: {delante, a un lado, alto, mira delante, mira alto}.
+     */
+    private static int golpeJinete(int t, String nombre, int accion, double delante, int[] capturas, String[] nombres, double[] cam) {
+        atTicks(t, "jinete: " + nombre, m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var j = jineteE();
+                if (j == null) return;
+                aPelear(sp, true);
+                jinetePrepara(sp);
+                j.quieta = true;
+                jineteEnSuSitio(j);
+                double[] q = jineteR.punto(jineteS), p = jineteR.punto(jineteS + delante);
+                double y = com.darkcraft.world.NubesGenerador.SUELO;
+                irMirando(sp, p[0], y, p[1], q[0], y + 2.2, q[1], false);
+                j.setTarget(sp);
+                if (accion == com.darkcraft.enemigos.JineteAnims.ATURDIDO) j.derribar();
+                else j.empezar(accion);
+                camaraJinete(j, cam[0], cam[1], cam[2], cam[3], cam[4]);
+            });
+        });
+        atTicks(t + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        for (int i = 0; i < capturas.length; i++) {
+            final String cap = nombres[i];
+            atTicks(t + capturas[i], "captura: " + cap, m -> {
+                server(m, sp -> log("  " + cap + ": " + estadoJinete(jineteE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())));
+                log("  " + jineteCliente(m));
+                shot(m, cap);
+            });
+        }
+        return t + capturas[capturas.length - 1];
+    }
+
+    /**
+     * Ser Lucan, el Jinete Nocturno, en el camino de nubes del reino de la prueba, de noche, lejos de las paradas: sale solo cuando
+     * alguien esta cerca de por donde va; se alza de la niebla y cabalga (el galope suena); en supervivencia delante de el: habla
+     * (su barra, su musica, el subtitulo) y toca el cuerno al acabar (hiela la sangre); sus golpes de lado (la carga, el tajo, el
+     * barrido, el pisoton) y el caballo que tropieza; a media vida (la frase y el cuerno) y el rastro de fuego de almas de la
+     * carga; cae (el cartel, la hazana y la carta del Rey, que se lee en el codice) y el bestiario; y otro que, al amanecer, dice su
+     * frase y se deshace. Al acabar, otra vez vivo, sin nadie fuera, de dia y sin que salga solo en lo que queda de prueba.
+     */
+    private static int jinete(int T) {
+        int t = T;
+        final double Y = com.darkcraft.world.NubesGenerador.SUELO;
+        atTicks(t, "Jinete Nocturno: al camino de nubes, de noche, lejos de las paradas", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                ServerLevel ow = sp.server.overworld();
+                long seed = ow.getSeed();
+                int[] c = castle != null ? castle : CastleSites.nearest(seed, 0, 0, 3);
+                jineteR = com.darkcraft.world.CaminoNubes.ruta(seed, c[0], c[1]);
+                if (jineteR == null) {
+                    log("  jinete: SIN CAMINO");
+                    return;
+                }
+                jineteK = com.darkcraft.camino.Jinetes.clave(c[0], c[1]);
+                jineteS = com.darkcraft.camino.Jinetes.libre(seed, c[0], c[1], jineteR);
+                com.darkcraft.camino.Jinetes.recoger(jineteK);
+                com.darkcraft.camino.Jinetes.revivir(sp.server, jineteK);
+                com.darkcraft.camino.Jinetes.quietos = false;
+                ow.setDayTime(com.darkcraft.camino.Jinetes.hora(jineteR, jineteS - 14));
+                ow.setWeatherParameters(6000, 0, false, false);
+                if (sp.getVehicle() != null) sp.stopRiding();
+                sp.setGameMode(GameType.CREATIVE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                jinetePrepara(sp);
+                double[] p = jineteR.punto(jineteS + 12), q = jineteR.punto(jineteS - 14);
+                float yaw = (float) Math.toDegrees(Math.atan2(-(q[0] - p[0]), q[1] - p[1]));
+                sp.teleportTo(ow, p[0], Y, p[1], yaw, 4f);
+                log("  jinete: camino " + jineteK + " de " + Math.round(jineteR.largo()) + " bloques, el sitio a " + Math.round(jineteS) + " | "
+                        + com.darkcraft.camino.Jinetes.estado(ow, p[0], p[1]) + " | jugador " + fpos(sp));
+            });
+        });
+        t += 60;
+        atTicks(t, "Jinete Nocturno: ha salido solo?", m -> server(m, sp -> {
+            var j = jineteE();
+            ServerLevel ow = sp.server.overworld();
+            log("  jinete al acercarse alguien: " + (j != null ? "SALE SOLO" : "NO HA SALIDO") + " | " + estadoJinete(j) + " | "
+                    + com.darkcraft.camino.Jinetes.estado(ow, sp.getX(), sp.getZ()));
+            // otra vez, para verle alzarse de la niebla (a 26 bloques por delante, de cara al jugador)
+            if (jineteR == null) return;
+            var n = com.darkcraft.camino.Jinetes.crear(ow, jineteK, jineteR, jineteS - 14, true);
+            if (n != null) camaraJinete(n, 4, 9, 2.6, 0, 1.9);
+        }));
+        atTicks(t + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(t + 14, "captura: se alza de la niebla", m -> {
+            server(m, sp -> log("  se alza: " + estadoJinete(jineteE())));
+            log("  " + jineteCliente(m));
+            shot(m, "cliente_jn01_jinete_aparece");
+        });
+        t += 44;
+        atTicks(t, "camara: cabalga por el camino", m -> server(m, sp -> {
+            var j = jineteE();
+            if (j != null) camaraJinete(j, 9, -7, 2.2, 0, 1.7);
+        }));
+        atTicks(t + 2, "camara", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(t + 6, "captura: cabalga", m -> {
+            server(m, sp -> log("  cabalga: " + estadoJinete(jineteE()) + " | lejos del camino "
+                    + (jineteE() == null ? "?" : String.format(java.util.Locale.ROOT, "%.2f", com.darkcraft.camino.Jinetes.distancia(jineteR, jineteE().getX(), jineteE().getZ())))));
+            log("  " + jineteCliente(m));
+            shot(m, "cliente_jn02_jinete_cabalga");
+        });
+        t += 10;
+        // ---- en supervivencia delante de el: habla (la barra, la musica, el subtitulo) y toca el cuerno al acabar la frase
+        final int F = t;
+        final int dura = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Jinete.VOZ_BASE + 1);
+        atTicks(F, "Jinete Nocturno: en supervivencia delante de el", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                var j = jineteE();
+                if (j == null) {
+                    log("  jinete: NO ESTA FUERA | " + com.darkcraft.camino.Jinetes.estado(sp.server.overworld(), sp.getX(), sp.getZ()));
+                    return;
+                }
+                aPelear(sp, true);
+                jinetePrepara(sp);
+                double sj = com.darkcraft.camino.Jinetes.donde(jineteR, j.getX(), j.getZ());
+                double[] p = jineteR.punto(Math.min(jineteR.largo() - 5, sj + 14));
+                irMirando(sp, p[0], Y, p[1], j.getX(), Y + 2.2, j.getZ(), false);
+                j.setTarget(sp);
+            });
+        });
+        atTicks(F + 40, "captura: habla (la barra y el subtitulo)", m -> {
+            server(m, sp -> log("  al verle: " + estadoJinete(jineteE()) + " | jugador " + fpos(sp)));
+            log("  jinete: musica " + ClientMusic.debug() + " | " + jineteCliente(m));
+            shot(m, "cliente_jn03_jinete_habla");
+        });
+        atTicks(F + dura + 4, "Jinete Nocturno: quieto tras el cuerno; camara de lado", m -> server(m, sp -> {
+            var j = jineteE();
+            if (j == null) return;
+            j.quieta = true;
+            camaraJinete(j, 5, 6.5, 2.4, 0, 2.3);
+        }));
+        atTicks(F + dura + 6, "camara", m -> {
+            m.options.hideGui = true;
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(F + dura + 14, "captura: el cuerno", m -> {
+            server(m, sp -> log("  el cuerno: " + estadoJinete(jineteE()) + " | al jugador: lentitud "
+                    + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) + ", debilidad " + sp.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS)));
+            shot(m, "cliente_jn04_jinete_cuerno");
+        });
+        t = F + dura + 60;
+        // ---- sus golpes, de lado (quieto: solo lo que se le manda)
+        t = golpeJinete(t, "la carga", com.darkcraft.enemigos.JineteAnims.CARGA, 20, new int[]{27}, new String[]{"cliente_jn05_jinete_carga"},
+                new double[]{11, -10, 2.4, 11, 1.6}) + 45;
+        t = golpeJinete(t, "el tajo", com.darkcraft.enemigos.JineteAnims.TAJO, 4.0, new int[]{13}, new String[]{"cliente_jn06_jinete_tajo"},
+                new double[]{2, 7.5, 2.4, 1.5, 2.1}) + 30;
+        t = golpeJinete(t, "el barrido", com.darkcraft.enemigos.JineteAnims.BARRIDO, -4.0, new int[]{17}, new String[]{"cliente_jn07_jinete_barrido"},
+                new double[]{0, 8.5, 2.8, 0, 1.9}) + 35;
+        t = golpeJinete(t, "el pisoton", com.darkcraft.enemigos.JineteAnims.PISOTEA, 2.6, new int[]{16, 25}, new String[]{"cliente_jn08_jinete_pisotea",
+                "cliente_jn09_jinete_pisoton"}, new double[]{1, 8.5, 2.2, 1, 2.6}) + 35;
+        t = golpeJinete(t, "tropieza", com.darkcraft.enemigos.JineteAnims.ATURDIDO, 7.0, new int[]{24}, new String[]{"cliente_jn10_jinete_tropieza"},
+                new double[]{3, 7.5, 2.0, 0, 1.2}) + 50;
+        // ---- a media vida: su frase y el cuerno otra vez; despues, el rastro de fuego de almas de la carga
+        final int H = t;
+        atTicks(H, "Jinete Nocturno: a media vida", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                var j = jineteE();
+                if (j == null) return;
+                aPelear(sp, true);
+                jinetePrepara(sp);
+                j.quieta = true;
+                jineteEnSuSitio(j);
+                double[] p = jineteR.punto(jineteS + 11);
+                irMirando(sp, p[0], Y, p[1], j.getX(), Y + 2.2, j.getZ(), false);
+                j.setTarget(sp);
+                j.mediaVida();
+            });
+        });
+        atTicks(H + 30, "captura: a media vida", m -> {
+            server(m, sp -> log("  a media vida: " + estadoJinete(jineteE())));
+            shot(m, "cliente_jn11_jinete_media_vida");
+        });
+        atTicks(H + 70, "Jinete Nocturno: la carga con el fuego de almas", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var j = jineteE();
+                if (j == null) return;
+                aPelear(sp, true);
+                jinetePrepara(sp);
+                j.quieta = true;
+                jineteEnSuSitio(j);
+                double[] p = jineteR.punto(jineteS + 22);
+                irMirando(sp, p[0], Y, p[1], j.getX(), Y + 2.2, j.getZ(), false);
+                j.setTarget(sp);
+                j.empezar(com.darkcraft.enemigos.JineteAnims.CARGA);
+                camaraJinete(j, 19, -13, 7.5, 19, 0);
+            });
+        });
+        atTicks(H + 72, "camara desde arriba", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(H + 70 + 62, "captura: el rastro de fuego", m -> {
+            server(m, sp -> log("  el rastro de fuego: " + estadoJinete(jineteE())));
+            shot(m, "cliente_jn12_jinete_fuego");
+        });
+        // ---- cae: la ultima frase, el cartel, la hazana y la carta del Rey
+        final int C = H + 150;
+        atTicks(C, "Jinete Nocturno: cae", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var j = jineteE();
+                if (j == null) return;
+                aPelear(sp, true);
+                jinetePrepara(sp);
+                j.quieta = true;
+                jineteEnSuSitio(j);
+                double[] p = jineteR.punto(jineteS + 9);
+                irMirando(sp, p[0], Y, p[1], j.getX(), Y + 2.2, j.getZ(), false);
+                j.setTarget(sp);
+                log("  antes de caer: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "jinete"));
+                camaraJinete(j, 6, 8.5, 2.6, 0, 1.5);
+                j.invulnerableTime = 0;
+                j.hurt(sp.damageSources().playerAttack(sp), 99999f);
+            });
+        });
+        atTicks(C + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 34, "captura: cae", m -> {
+            server(m, sp -> log("  cae: " + estadoJinete(jineteE()) + " | " + com.darkcraft.camino.Jinetes.estado(sp.server.overworld(), sp.getX(), sp.getZ())));
+            shot(m, "cliente_jn13_jinete_cae");
+        });
+        atTicks(C + 70, "captura: se deshace", m -> shot(m, "cliente_jn14_jinete_se_deshace"));
+        atTicks(C + 96, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 112, "captura: JEFE ABATIDO", m -> {
+            log("  jinete: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> {
+                int cartas = 0;
+                for (int i = 0; i < sp.getInventory().getContainerSize(); i++)
+                    if (com.darkcraft.fortaleza.Perdidos.de(sp.getInventory().getItem(i)) == com.darkcraft.camino.Jinetes.CARTA) cartas++;
+                log("  tras caer: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "jinete") + ", la carta en la bolsa "
+                        + cartas + ", libro perdido apuntado " + ((com.darkcraft.espejo.Espejo.perdidos(sp) & (1 << com.darkcraft.camino.Jinetes.CARTA)) != 0)
+                        + " | " + com.darkcraft.camino.Jinetes.estado(sp.server.overworld(), sp.getX(), sp.getZ()));
+            });
+            shot(m, "cliente_jn15_jinete_abatido");
+        });
+        atTicks(C + 116, "la carta del Rey en el codice", m -> com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(com.darkcraft.camino.Jinetes.CARTA)));
+        atTicks(C + 146, "captura: la carta", m -> shot(m, "cliente_jn16_carta"));
+        atTicks(C + 148, "la carta: el dorso", m -> {
+            if (m.screen instanceof com.darkcraft.client.ui.CodiceScreen cs) cs.probar(99, false);
+        });
+        atTicks(C + 156, "captura: el dorso de la carta", m -> shot(m, "cliente_jn17_carta_dorso"));
+        atTicks(C + 160, "el bestiario: Ser Lucan", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("jinete")));
+        });
+        atTicks(C + 178, "captura: Ser Lucan en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_jn18_bestiario_jinete");
+        });
+        // ---- otro (vuelve a la vida): al amanecer dice su frase y se deshace
+        final int D = C + 184;
+        final int dura3 = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Jinete.VOZ_BASE + 3);
+        atTicks(D, "Jinete Nocturno: otro, y amanece", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                if (jineteR == null) return;
+                ServerLevel ow = sp.server.overworld();
+                sp.removeAllEffects();
+                sp.setGameMode(GameType.CREATIVE);
+                jinetePrepara(sp);
+                com.darkcraft.camino.Jinetes.revivir(sp.server, jineteK);
+                ow.setDayTime(com.darkcraft.camino.Jinetes.hora(jineteR, jineteS));
+                var j = com.darkcraft.camino.Jinetes.crear(ow, jineteK, jineteR, jineteS, false);
+                if (j == null) return;
+                double[] p = jineteR.punto(jineteS + 9);
+                irMirando(sp, p[0], Y, p[1], j.getX(), Y + 2.2, j.getZ(), false);
+                ow.setDayTime(23000);
+                log("  amanece: " + com.darkcraft.camino.Jinetes.estado(ow, sp.getX(), sp.getZ()));
+            });
+        });
+        atTicks(D + 30, "captura: al alba (su frase)", m -> {
+            server(m, sp -> log("  al alba: " + estadoJinete(jineteE())));
+            shot(m, "cliente_jn19_jinete_alba");
+        });
+        final int DD = D + Math.max(40, dura3 - 30) + 12;
+        atTicks(DD - 4, "camara de lado: se deshace", m -> server(m, sp -> {
+            var j = jineteE();
+            if (j != null) camaraJinete(j, 4, 8, 2.4, 0, 1.8);
+        }));
+        atTicks(DD - 2, "camara", m -> {
+            m.options.hideGui = true;
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(DD + 14, "captura: se deshace al amanecer", m -> {
+            server(m, sp -> log("  se deshace al amanecer: " + estadoJinete(jineteE())));
+            log("  " + jineteCliente(m));
+            shot(m, "cliente_jn20_jinete_amanece");
+        });
+        atTicks(DD + 60, "Jinete Nocturno: fin (vivo, sin nadie fuera, de dia; ya no sale solo)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                ServerLevel ow = sp.server.overworld();
+                log("  al amanecer, despues: " + (jineteK == null ? "?" : com.darkcraft.camino.Jinetes.fuera(jineteK) == null ? "ya no esta fuera" : "SIGUE FUERA")
+                        + " | " + com.darkcraft.camino.Jinetes.estado(ow, sp.getX(), sp.getZ()));
+                com.darkcraft.camino.Jinetes.quietos = true;
+                if (jineteK != null) {
+                    com.darkcraft.camino.Jinetes.recoger(jineteK);
+                    com.darkcraft.camino.Jinetes.revivir(sp.server, jineteK);
+                }
+                ow.setDayTime(6000);
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                var kb = sp.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE);
+                if (kb != null) kb.setBaseValue(0.0);
+                sp.setGameMode(GameType.CREATIVE);
+                if (fplan != null) {
+                    int[] q = fplan.f.portal();
+                    sp.teleportTo(ow, fplan.cx + 0.5, q[1], q[2] + 4.5, 0f, 0f);
+                }
+            });
+        });
+        return DD + 80;
+    }
+
     // ------------------------------------------------------------------ el Puente de la Grieta y los penitentes (parte 7s)
 
     private static final com.darkcraft.enemigos.Penitente[] PENITENTES = new com.darkcraft.enemigos.Penitente[3];
@@ -13625,7 +14024,7 @@ public final class ClientCiTest {
             com.darkcraft.enemigos.Puestos.todos(sp.server, com.darkcraft.fortaleza.FortalezaEnemigos.clave(fsit), true);
             StringBuilder b = new StringBuilder("  logros de la 5c:");
             for (String id : new String[]{"secreto", "libro_perdido"}) b.append(' ').append(id).append('=').append(com.darkcraft.story.Logros.tiene(sp, id) ? "SI" : "no");
-            log(b + "; libros perdidos apuntados " + Integer.bitCount(com.darkcraft.espejo.Espejo.perdidos(sp) >> 1));
+            log(b + "; libros perdidos apuntados " + Integer.bitCount(com.darkcraft.espejo.Espejo.perdidos(sp) >>> 1));
         }));
         return S + 392;
     }

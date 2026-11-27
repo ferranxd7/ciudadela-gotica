@@ -3096,6 +3096,60 @@ EN.update({
     "darkcraft.ayuda.gigante": "The wandering giants of Morvain: how they are, take you to one, bring one out in front of you, defeat it, knock it to one knee or bring it back",
 })
 
+# ---------------------------------------------------------------- parte 7x: Ser Lucan, el Jinete Nocturno
+ES.update({
+    "entity.darkcraft.jinete": "Ser Lucan, el Jinete Nocturno",
+    "darkcraft.jinete.nombre_corto": "Ser Lucan",
+    "darkcraft.jinete.voz.1": "¿Quién cabalga de noche por el camino del Rey? Apártate, forastero... o caerás bajo mis cascos.",
+    "darkcraft.jinete.voz.2": "¡Llevo la palabra del Rey! ¡Nada... detiene la palabra del Rey!",
+    "darkcraft.jinete.voz.3": "Otra vez el alba... y la escalera aún tan lejos.",
+    "darkcraft.jinete.voz.4": "¡Por el Rey! ¡Despejad el camino!",
+    "darkcraft.jinete.voz.5": "La carta... llévala a la fortaleza. Diles... que cabalgué todas las noches. Todas las noches.",
+    "subtitles.darkcraft.jinete.voz": "Habla Ser Lucan",
+    "darkcraft.bestiario.jinete.desc": "Ser Lucan era el heraldo del rey Corvin. La noche en que el reino subió al cielo salió de la Torre de Ascenso con la última carta del Rey para la Fortaleza de Hueso, y algo lo alcanzó en el camino. Desde entonces, cada noche, sale de la niebla y cabalga por el camino de nubes hacia la fortaleza, y al alba se deshace sin haber llegado a la escalera. A quien se le cruza le hace sonar el cuerno, que hiela la sangre y te hace ir más despacio. De lejos baja la guja como una lanza y carga al galope: sal de su línea de lado, rodando o saltando. De cerca tira tajos desde la silla, da la vuelta entera con la guja si te le pones detrás, y su caballo se alza y cae con las manos delante. Lo que derriba lo empuja a lo largo del camino, nunca fuera; pero el que se sale de las piedras cae al vacío. A media vida deja llamas azules por donde galopa. Si se le pega mucho en poco tiempo, el caballo tropieza y cae de rodillas. El fuego no le hace nada.",
+    "subtitles.darkcraft.sfx.jinete_galope": "Galopa un caballo fantasma",
+    "subtitles.darkcraft.sfx.jinete_relincho": "Relincha un caballo fantasma",
+    "subtitles.darkcraft.sfx.jinete_cuerno": "Suena un cuerno de guerra",
+    "subtitles.darkcraft.sfx.jinete_tajo": "Corta una guja",
+    "subtitles.darkcraft.sfx.jinete_carga": "Carga un jinete",
+    "subtitles.darkcraft.sfx.jinete_pisotea": "Un caballo pisotea",
+    "subtitles.darkcraft.sfx.jinete_fuego": "Arde el fuego de almas",
+    "subtitles.darkcraft.sfx.jinete_dolor": "Ser Lucan gruñe",
+    "subtitles.darkcraft.sfx.jinete_muerte": "El jinete se deshace en humo",
+    "subtitles.darkcraft.sfx.jinete_aparece": "Algo se alza de la niebla",
+    "subtitles.darkcraft.sfx.jinete_arnes": "Tintinea un arnés",
+    "advancements.darkcraft.jinete.title": "Todas las noches",
+    "advancements.darkcraft.jinete.description": "Vence a Ser Lucan, el Jinete Nocturno",
+    "darkcraft.diario.jinete": "Ser Lucan, el Jinete Nocturno, era el heraldo del rey Corvin. Salió una noche por el camino de nubes con la última carta del Rey para la Fortaleza de Hueso y no llegó: desde entonces cabalgaba cada noche, y el alba lo deshacía antes de ver la escalera. Al caer me dio la carta. Me pidió que la llevara a la fortaleza... y que dijera que cabalgó todas las noches.",
+    "darkcraft.ayuda.jinete": "Ser Lucan, el Jinete Nocturno: cómo va, llevarte delante de él, traerlo aquí, vencerlo, que tropiece, que vuelva, o hacer de noche o de día",
+})
+EN.update({
+    "entity.darkcraft.jinete": "Ser Lucan, the Night Rider",
+    "darkcraft.jinete.nombre_corto": "Ser Lucan",
+    "darkcraft.jinete.voz.1": "Who rides the King's road by night? Stand aside, stranger... or fall beneath my hooves.",
+    "darkcraft.jinete.voz.2": "I carry the King's word! Nothing... stops the King's word!",
+    "darkcraft.jinete.voz.3": "Dawn again... and the stair is still so far.",
+    "darkcraft.jinete.voz.4": "For the King! Clear the road!",
+    "darkcraft.jinete.voz.5": "The letter... take it to the fortress. Tell them... I rode every night. Every night.",
+    "subtitles.darkcraft.jinete.voz": "Ser Lucan speaks",
+    "darkcraft.bestiario.jinete.desc": "Ser Lucan was King Corvin's herald. On the night the kingdom rose into the sky he left the Ascent Tower with the King's last letter for the Bone Fortress, and something caught him on the road. Ever since, every night, he rises from the mist and rides the cloud road towards the fortress, and at dawn he fades away without ever reaching the stair. Whoever crosses his path hears his horn, which chills the blood and slows you down. From afar he lowers his glaive like a lance and charges at a gallop: get out of his line to the side, rolling or jumping. Up close he slashes from the saddle, swings the glaive all the way around if you get behind him, and his horse rears and crashes down with its forelegs. Whatever he knocks down he pushes along the road, never off it; but whoever steps off the stones falls into the void. At half health he leaves blue flames wherever he gallops. Hit him hard enough in a short time and the horse stumbles and falls to its knees. Fire does nothing to him.",
+    "subtitles.darkcraft.sfx.jinete_galope": "A ghostly horse gallops",
+    "subtitles.darkcraft.sfx.jinete_relincho": "A ghostly horse neighs",
+    "subtitles.darkcraft.sfx.jinete_cuerno": "A war horn sounds",
+    "subtitles.darkcraft.sfx.jinete_tajo": "A glaive slashes",
+    "subtitles.darkcraft.sfx.jinete_carga": "A rider charges",
+    "subtitles.darkcraft.sfx.jinete_pisotea": "A horse stomps",
+    "subtitles.darkcraft.sfx.jinete_fuego": "Soul fire burns",
+    "subtitles.darkcraft.sfx.jinete_dolor": "Ser Lucan grunts",
+    "subtitles.darkcraft.sfx.jinete_muerte": "The rider fades into smoke",
+    "subtitles.darkcraft.sfx.jinete_aparece": "Something rises from the mist",
+    "subtitles.darkcraft.sfx.jinete_arnes": "A harness jingles",
+    "advancements.darkcraft.jinete.title": "Every Night",
+    "advancements.darkcraft.jinete.description": "Defeat Ser Lucan, the Night Rider",
+    "darkcraft.diario.jinete": "Ser Lucan, the Night Rider, was King Corvin's herald. One night he set out along the cloud road with the King's last letter for the Bone Fortress and never arrived: ever since he rode every night, and the dawn undid him before he could see the stair. As he fell he gave me the letter. He asked me to carry it to the fortress... and to tell them he rode every night.",
+    "darkcraft.ayuda.jinete": "Ser Lucan, the Night Rider: how he is, take you in front of him, bring him here, defeat him, make him stumble, bring him back, or make it night or day",
+})
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

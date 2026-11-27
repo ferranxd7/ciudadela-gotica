@@ -87,6 +87,8 @@ TOMAS_PONTIFICE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 TOMAS_ALDRIC = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 # los gigantes errantes de Morvain (parte 7w; "Mossbeard", flow de la parte): 1-3 Ogmund, 4-6 Ulfgar, 7-9 Haldor
 TOMAS_GIGANTE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a", 6: "a", 7: "a", 8: "a", 9: "a"}
+# Ser Lucan, el Jinete Nocturno (parte 7x): las a (las dos tomas de cada frase salieron parecidas)
+TOMAS_JINETE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -333,6 +335,14 @@ SFX = {
     "gigante_barrido": (1.6, 0.5, -14), "gigante_pisoton": (1.9, 0.7, -11), "gigante_patada": (1.1, 0.4, -13),
     "gigante_arranca": (2.2, 0.7, -14), "gigante_roca": (1.8, 0.7, -12), "gigante_dolor": (1.0, 0.3, -14),
     "gigante_muerte": (4.6, 1.4, -13), "gigante_campana": (4.0, 1.6, -15), "gigante_cadena": (1.4, 0.5, -17),
+    # Ser Lucan, el Jinete Nocturno (parte 7x): el galope sobre las nubes (en bucle mientras corre), el relincho, el cuerno de
+    # guerra (largo, con su cola), el tajo de la guja, la carga (el estruendo que se echa encima), el pisoton de las patas
+    # delanteras, el fuego de las almas que deja la carga, el quejido, la muerte (el caballo que se deshace en humo), la
+    # aparicion y el tintineo del arnes
+    "jinete_galope": (4.0, 0.3, -16), "jinete_relincho": (2.6, 0.5, -14), "jinete_cuerno": (3.4, 0.9, -13),
+    "jinete_tajo": (1.0, 0.3, -14), "jinete_carga": (2.4, 0.6, -13), "jinete_pisotea": (1.8, 0.5, -12),
+    "jinete_fuego": (1.8, 0.5, -15), "jinete_dolor": (0.9, 0.2, -15), "jinete_muerte": (3.6, 1.0, -14),
+    "jinete_aparece": (2.4, 0.7, -15), "jinete_arnes": (1.6, 0.4, -18),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -340,7 +350,7 @@ ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0
            "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6, "academia_ambiente": 2.0, "erudito_susurro": 0.8,
            "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0, "sinfe_ambiente": 2.0,
            "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0,
-           "aldric_rezo": 1.0, "aldric_arrastre": 0.3}
+           "aldric_rezo": 1.0, "aldric_arrastre": 0.3, "jinete_galope": 0.3}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
@@ -607,6 +617,13 @@ TOMAS_SFX = {
     "gigante_paso": (1, 4), "gigante_rugido": (2, 4), "gigante_mazazo": (2, 1), "gigante_barrido": (2, 3),
     "gigante_pisoton": (4, 1), "gigante_patada": (3, 2), "gigante_arranca": (4, 3), "gigante_roca": (4, 1),
     "gigante_dolor": (1, 4), "gigante_muerte": (3, 1), "gigante_campana": (1, 4), "gigante_cadena": (1, 4),
+    # el jinete: los galopes mas regulares (la 1 y la 2), los relinchos mas fantasmales (la 3 y la 4), los cuernos con la cola
+    # mas larga (la 3 y la 1), los tajos mas secos (la 2 y la 3), las cargas con mas graves (la 1 y la 3), los pisotones con el
+    # golpe al principio (la 2 y la 1), los fuegos que suenan enseguida (la 3 y la 1), los quejidos con eco (la 2 y la 4), las
+    # muertes mas largas (la 4 y la 3), las apariciones que crecen (la 1 y la 4) y los arneses que mas se oyen (la 4 y la 3)
+    "jinete_galope": (1, 2), "jinete_relincho": (3, 4), "jinete_cuerno": (3, 1), "jinete_tajo": (2, 3),
+    "jinete_carga": (1, 3), "jinete_pisotea": (2, 1), "jinete_fuego": (3, 1), "jinete_dolor": (2, 4),
+    "jinete_muerte": (4, 3), "jinete_aparece": (1, 4), "jinete_arnes": (4, 3),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -925,6 +942,29 @@ def voz_gigante(src, dst):
         "asoftclip=type=tanh:threshold=0.78,"
         "aecho=0.85:0.45:320|760|1300:0.17|0.09|0.05,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=160,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.2
+
+
+
+def voz_jinete(src, dst):
+    """
+    Ser Lucan, el Jinete Nocturno: el heraldo del rey Corvin, muerto a caballo y que aun cabalga cada noche. Un poco mas
+    grave, la resonancia del yelmo cerrado (dos ecos cortisimos y un pico en los medios: habla desde dentro del hierro), una
+    segunda voz un pelin mas grave y retrasada, baja (el fantasma que se dobla) y el eco abierto del cielo (largo y espaciado:
+    alli no hay muros, solo nubes).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=2[v1][v2];"
+        "[v1]asetrate=44100*0.95,aresample=44100,atempo=1.0526[baja];"
+        "[v2]asetrate=44100*0.935,aresample=44100,atempo=1.0695,adelay=28:all=1,highpass=f=300,volume=0.32[doble];"
+        "[baja][doble]amix=inputs=2:weights=1 0.5:normalize=0,"
+        "aecho=0.9:0.6:5|9:0.3|0.18,equalizer=f=1000:t=q:w=1.4:g=3,equalizer=f=150:t=q:w=1.0:g=1.5,highshelf=f=6500:g=-2,"
+        "asoftclip=type=atan:threshold=0.82,"
+        "aecho=0.85:0.5:280|640|1100:0.2|0.12|0.07,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=150,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA + 0.2
@@ -1304,6 +1344,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO gigante {n}: {e}")
+    # Ser Lucan, el Jinete Nocturno (parte 7x)
+    jin = os.path.join(ASSETS, "sounds", "jinete")
+    os.makedirs(jin, exist_ok=True)
+    dur_j, hab_j = {}, {}
+    for n, toma in sorted(TOMAS_JINETE.items()):
+        src = os.path.join(MASTER, "jinete", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(jin, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_jinete(src, dst)
+            dur_j[n] = round(duracion(dst), 2)
+            hab_j[n] = round(min(h, dur_j[n]), 2)
+            print(f"jinete {n:2d}: {dur_j[n]} s (habla hasta {hab_j[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO jinete {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -1338,7 +1397,7 @@ def main():
                    "abad": dur_a, "habla_abad": hab_a, "condestable": dur_k, "habla_condestable": hab_k,
                    "rectora": dur_r, "habla_rectora": hab_r, "ballenero": dur_w, "habla_ballenero": hab_w,
                    "pontifice": dur_p, "habla_pontifice": hab_p, "aldric": dur_l, "habla_aldric": hab_l,
-                   "gigante": dur_t, "habla_gigante": hab_t}, fh)
+                   "gigante": dur_t, "habla_gigante": hab_t, "jinete": dur_j, "habla_jinete": hab_j}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}
