@@ -97,8 +97,10 @@ TOMAS_DRAGON = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
-TOMAS_SOMBRA = {1: "b", 2: "b", 3: "a", 4: "a", 5: "b", 6: "b", 7: "a", 8: "a", 9: "a"}
-SUSURROS_SOMBRA = {1: "b", 2: "b", 3: "b", 4: "a", 5: "b", 6: "a", 7: "a", 8: "a", 9: "a"}
+TOMAS_SOMBRA = {1: "b", 2: "b", 3: "a", 4: "a", 5: "b", 6: "b", 7: "a", 8: "a", 9: "a",
+                # la subida por la cadena del sur (parte 7aa): al pisar el camino, en el Descansillo y en la Boca
+                21: "a", 22: "b", 23: "a"}
+SUSURROS_SOMBRA = {1: "b", 2: "b", 3: "b", 4: "a", 5: "b", 6: "a", 7: "a", 8: "a", 9: "a", 21: "a", 22: "b", 23: "a"}
 # lo que resuena el eco de vacio tras la ultima palabra (s)
 COLA_SOMBRA = 3.4
 # los personajes con dialogo: id -> (tomas, filtro)
@@ -364,6 +366,15 @@ SFX = {
     "dragon_aterriza": (3.0, 1.0, -11), "dragon_despega": (3.0, 0.8, -12), "dragon_picado": (2.5, 0.6, -12),
     "dragon_dolor": (1.2, 0.3, -14), "dragon_muerte": (6.0, 2.0, -13), "dragon_respira": (5.0, 0.6, -18),
     "dragon_ascuas": (3.0, 1.0, -14),
+    # la subida por la cadena del sur (parte 7aa): las gargolas (la piedra que se agrieta al despertar, el grito, el aleteo —se
+    # repite mientras vuelan—, el picado, las garras, el coletazo, posarse en los tablones, el quejido y la piedra que se parte),
+    # las rafagas de viento, el crujido de los eslabones, el aire de lo alto de la cadena (en bucle) y la Boca de la ciudadela
+    # (su aliento y su latido)
+    "gargola_despierta": (2.6, 0.8, -13), "gargola_grito": (1.6, 0.4, -12), "gargola_aleteo": (3.0, 0.3, -16),
+    "gargola_picado": (1.6, 0.4, -13), "gargola_garras": (1.0, 0.3, -14), "gargola_cola": (1.1, 0.3, -13),
+    "gargola_aterriza": (1.1, 0.4, -13), "gargola_dolor": (0.9, 0.2, -15), "gargola_muerte": (2.6, 0.9, -14),
+    "cadena_rafaga": (3.2, 0.9, -13), "cadena_crujido": (3.0, 1.0, -16), "cadena_ambiente": (20.0, 2.0, -24),
+    "boca_aliento": (4.0, 1.2, -15), "boca_latido": (2.6, 1.0, -14),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -371,13 +382,14 @@ ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0
            "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6, "academia_ambiente": 2.0, "erudito_susurro": 0.8,
            "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0, "sinfe_ambiente": 2.0,
            "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0,
-           "aldric_rezo": 1.0, "aldric_arrastre": 0.3, "jinete_galope": 0.3, "dragon_aleteo": 0.3, "dragon_respira": 0.6}
+           "aldric_rezo": 1.0, "aldric_arrastre": 0.3, "jinete_galope": 0.3, "dragon_aleteo": 0.3, "dragon_respira": 0.6,
+           "cadena_ambiente": 2.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
           "penitente_humo": 1.0, "penitente_alzarse": 2.3}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
-GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca"}
+GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca", "boca_latido"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
 EXTRA = {"intro_marca": "highshelf=f=2500:g=8,"}
 # de estos se bajaron 4 tomas (NOMBRE_1..4.mp3): las elegidas salen como NOMBRE_1.ogg, NOMBRE_2.ogg...
@@ -663,6 +675,16 @@ TOMAS_SFX = {
     "dragon_rugido": (2, 1), "dragon_aleteo": (1,), "dragon_fuego": (3, 2), "dragon_mordisco": (3, 1), "dragon_cola": (1, 3),
     "dragon_pisoton": (3, 4), "dragon_aterriza": (1, 3), "dragon_despega": (2, 4), "dragon_picado": (1, 3), "dragon_dolor": (3, 4),
     "dragon_muerte": (2,), "dragon_respira": (2,), "dragon_ascuas": (2, 1),
+    # la cadena del sur (elegidas midiendo las tomas): los despertares con mas piedra que cruje (la 3 y la 4), los gritos mas
+    # agudos (la 1 y la 3), los aleteos mas parejos (la 1 y la 2), los picados que mas silban (la 1 y la 4), las garras mas secas
+    # (la 3 y la 4), los coletazos con el golpe al principio (la 4 y la 2), los aterrizajes mas fuertes (la 1 y la 4), los quejidos
+    # mas cortos (la 3 y la 1), las muertes con mas piedra que cae (la 1 y la 3), las rafagas que mas crecen (la 3 y la 1), los
+    # crujidos mas graves (la 2 y la 3), el aire mas parejo (la 2 y la 4, para el bucle), los alientos mas largos (la 3 y la 2) y
+    # los latidos mas hondos (la 4 y la 3)
+    "gargola_despierta": (3, 4), "gargola_grito": (1, 3), "gargola_aleteo": (1, 2), "gargola_picado": (1, 4),
+    "gargola_garras": (3, 4), "gargola_cola": (4, 2), "gargola_aterriza": (1, 4), "gargola_dolor": (3, 1),
+    "gargola_muerte": (1, 3), "cadena_rafaga": (3, 1), "cadena_crujido": (2, 3), "cadena_ambiente": (2, 4),
+    "boca_aliento": (3, 2), "boca_latido": (4, 3),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

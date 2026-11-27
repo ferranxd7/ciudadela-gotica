@@ -6241,5 +6241,214 @@
         "stream": true
       }
     ]
+  },
+  "sfx.gargola_despierta": {
+    "subtitle": "subtitles.darkcraft.sfx.gargola_despierta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gargola_despierta_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/gargola_despierta_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.gargola_grito": {
+    "subtitle": "subtitles.darkcraft.sfx.gargola_grito",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gargola_grito_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "darkcraft:sfx/gargola_grito_2",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "sfx.gargola_aleteo": {
+    "subtitle": "subtitles.darkcraft.sfx.gargola_aleteo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gargola_aleteo_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/gargola_aleteo_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.gargola_picado": {
+    "subtitle": "subtitles.darkcraft.sfx.gargola_picado",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gargola_picado_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/gargola_picado_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.gargola_garras": {
+    "subtitle": "subtitles.darkcraft.sfx.gargola_garras",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gargola_garras_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/gargola_garras_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.gargola_cola": {
+    "subtitle": "subtitles.darkcraft.sfx.gargola_cola",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gargola_cola_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/gargola_cola_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.gargola_aterriza": {
+    "subtitle": "subtitles.darkcraft.sfx.gargola_aterriza",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gargola_aterriza_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/gargola_aterriza_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.gargola_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.gargola_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gargola_dolor_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/gargola_dolor_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.gargola_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.gargola_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gargola_muerte_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/gargola_muerte_2",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "sfx.cadena_rafaga": {
+    "subtitle": "subtitles.darkcraft.sfx.cadena_rafaga",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/cadena_rafaga_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/cadena_rafaga_2",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "sfx.cadena_crujido": {
+    "subtitle": "subtitles.darkcraft.sfx.cadena_crujido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/cadena_crujido_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/cadena_crujido_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.boca_aliento": {
+    "subtitle": "subtitles.darkcraft.sfx.boca_aliento",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/boca_aliento_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "darkcraft:sfx/boca_aliento_2",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "sfx.boca_latido": {
+    "subtitle": "subtitles.darkcraft.sfx.boca_latido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/boca_latido_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "darkcraft:sfx/boca_latido_2",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "ambiente.cadena": {
+    "subtitle": "subtitles.darkcraft.ambiente.cadena",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/cadena_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/cadena_ambiente_2",
+        "stream": true
+      }
+    ]
+  },
+  "sombra.voz.21": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_21",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.22": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_22",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.23": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_23",
+        "stream": false
+      }
+    ]
   }
 }

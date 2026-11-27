@@ -3247,6 +3247,110 @@ dentro), quemo la Atalaya del Cuervo con su guarnicion y desde entonces duerme s
   (`mv514`), el cartel (`mv515`), en ceniza (`mv516`) y el bestiario (`mv517`). `LIMIT` 128 min (`lanzar.sh` 134 y 132 min, el paso
   162, el trabajo 210).
 
+### Plan grande, parte 7aa: la subida por la cadena del sur (las gargolas, el viento, el Descansillo y la Boca)
+
+Respuestas 88, 122 y 125 del plan (el castillo encadenado en el cielo; el marcado que la Sombra trajo de vuelta para que le abra
+la puerta; la Sombra en el centro del mapa como jefe final), primera de las tres partes del final: **7aa** la
+subida, **7ab** la ciudadela por dentro (la guardia, un mini-jefe y el ultimo santuario), **7ac** la Sombra (la pelea, los finales, el
+cielo rojo que se apaga con `CieloRojo.apagar`, el epilogo de Maelis y los creditos). Se sube por la cadena del sur
+(`Ciudadela.CADENAS[2]`), desde lo alto del ancla del Cerco (donde rezaba Aldric: hay que pasar por el) hasta la isla.
+- **El camino** (`morvain/Subida`, singleton; lo escribe `MorvainGenerador` despues del Nido, chunk a chunk; lo ve Distant Horizons):
+  cuatro de ancho (x `X0` -2 a `X1` 1; la cadena va por x = 0), `OFF` 12,6 por encima del eje de la cadena (un bloque mas que lo alto
+  de los eslabones de pie) y sube como ella (`PENDIENTE` 0,4756: medias losas y escalones de roble oscuro y algo de abeto); sobre los
+  eslabones tumbados es un puente con travesanos, caballetes y barandilla de cuerda (cadenas entre postes, faroles). Donde el camino
+  daria con el hierro de la cadena (`hierro(x,y,z)`) no se pone nada (`hierroPisado` lo cuenta). Al pie, peldanos tallados en el lazo
+  del ultimo eslabon (`Z_PELDANOS` 856; la caja de Aldric queda libre) y una escalera hasta lo alto de la cadena. **Rotos**: siete
+  **huecos** (`HUECOS`, dos tablones de todo el ancho: se saltan), cinco trozos **estrechos** (`ESTRECHOS`, solo x -1 y 0, sin
+  barandilla) y barandillas caidas. El perfil (`perfil`: lo que se pisa en cada z en medios bloques, `pisa(z)`, `superficie(z)`,
+  `hayCamino(z)`) va de 157 en el ancla a 541 en la torre.
+- **Los rellanos** (`RELLANOS` {z, medio largo, medio ancho, tipo}: 764, 652, la tarima rota 568, **el Descansillo** 484, 372, 260 y
+  el de la Boca 150): tarimas llanas (`alturaDeRellano`: a su lado mas alto y por encima del hierro de debajo) con su escalera por el
+  lado de abajo, barandilla, barriles, velas, calaveras, faroles y **pedestales** de piedra negra (`pedestal(k, n)`: lo alto, donde
+  tiene los pies la gargola; cuatro en el de la Boca). El poste de la cadena va a `zl + 3` (antes los de alli quedaban dentro).
+- **El Descansillo** (a media cadena): la tarima grande con el **santuario de la Mitad de la Cadena** (`SANT_X` -5, `SANT_Z`; corro de
+  losas y dos farolas de almas; en `SantuariosMorvain.CADENA`, id `cadena`: en `todos()` pero NO en `SITIOS`, que no lleva tarima; su
+  suelo `Subida.santuarioY()` sale sin levantar la subida entera), la choza de tablones del campamento de los que subieron con Aldric
+  (petates, mesa con velas, el atril con el **libro perdido 34** y el arcon `chests/cadena`).
+- **La Boca** (`Z_BOCA` 101: la cara de la isla): mandibulas de roca con dientes (estalactitas de piedra puntiaguda arriba y abajo,
+  `BOCA_SALE` 5 hacia fuera, `BOCA_W` 7) y dos ojos rojos encima; dentro, **la Garganta** (`Z_GARGANTA` 96; 7 de ancho, `GARGANTA_ALTO`
+  5, nunca por encima de `TECHO_ROCA` = TOP - 2: lo de encima de la isla no se toca) de carne (verrugas, nilio carmesi, setas que
+  alumbran, roca negra, magma); de `Z_SUBE` 89 a `Z_TORRE` 85 peldanos de piedra negra que suben a la planta baja de la torre del sur de
+  la muralla (`Y_TORRE` 541, el hueco solo dentro de la torre) y su puerta del norte (`Z_PUERTA` 77) da al **patio** de la ciudadela.
+- Sitios con nombre (`sitio(n)`, `sitios()`): ancla, inicio, rellano1, rellano2, tarima, descansillo, rellano4, rellano5, rellano_boca,
+  santuario, atril, arcon, choza, puente, hueco, estrecho, alto_cadena, medio, arriba, boca, garganta, torre, puerta, patio y, para mirar
+  de lejos, lado y lado_boca. Donde se esta: `enCadena`, `sobreCadena` (y no abajo en el Cerco: `y > Y_ANCLA - 2`), `enCamino`,
+  `enDescansillo`, `enBoca` (y la Garganta), `enCiudadela`, `suelo(z)`. El Espejo: "La Cadena del Sur", "El Descansillo", "La Boca", "La
+  Ciudadela Encadenada" (`Morvain.lugar`, antes que el Cerco).
+- **Lo que pasa en la cadena** (`morvain/Cadena`, desde `Morvain.onTick`, cada tick a cada jugador cerca, `cerca(x, z)`):
+  - **La Sombra le habla** una vez a cada jugador (marca `sombra_cadena` de `Ficha.dialogo`: bits 1, 2, 4): al pisar el camino su
+    frase **21** ("Si... sube, marcado. Cada eslabon te acerca a mi."), al llegar al Descansillo la **22** ("El primero tambien descanso
+    aqui... y luego echo a correr. ¿Correras tu?") y al entrar en la Boca la **23** ("No hay puerta, marcado... solo mi boca. Entra.").
+    `Net.SombraDice` → `client/morvain/ClientCadena.sombra`: suena sin sitio (`SOMBRA_VOZ[21..23]`, que ya tiene 24 huecos: las 10-20
+    son del capitulo 6 y no se registran) y su subtitulo lila abajo (`darkcraft.sombra.voz.N`, `Voces.sombra(n)` + 0,9 s); si ya habla,
+    la siguiente espera.
+  - **Las rafagas**: por el camino (no en el Descansillo ni en la Boca, ni volando) cada 22-40 s (`RAFAGA_MIN/MAX`; la primera a los
+    10-20 s) una de lado (`Net.Rafaga`: lado, `AVISO` 22 ticks en que se oye venir —`sfx.cadena_rafaga` desde ese lado— y se ven jirones
+    de nube cruzando, y `EMPUJA` 30 ticks en que empuja; `FUERZA` 0,075 a la velocidad cada tick en lo mas fuerte, crece y se apaga). La
+    lleva el cliente (`ClientCadena.viento`, en el START de cada tick); **agachado, una quinta parte** (y con el borde del juego no se
+    cae); saltando, en el aire, mucho mas. `calma(sp, ticks)` y `rafagaYa(sp)` para las pruebas.
+  - **Caer**: quien cae de la cadena (en el aire, habiendo pisado el camino en los ultimos 20 s) y pasa `CAIDA` 28 bloques por debajo
+    del camino muere (dano de caer del mundo: la espada de luz va al ultimo suelo firme). Con el fruto de la pluma, no (cae despacio).
+  - **Sin corcel**: `Montura.llamar` no lo llama sobre la cadena ni en la Boca (aviso `darkcraft.corcel.cadena`) y si se entra montado
+    se deshace.
+  - Logros `cadena` (pisar el camino), `descansillo`, `boca` y `ciudadela` (llegar al patio; meta), con su entrada del diario.
+- **Los de la cadena** (`MorvainEnemigos`, sitio `cadena`, 30, de `Subida.esperas()`): en los rellanos los marcados que subieron y se
+  quedaron (rompedores de rodillas golpeando la cadena, caballeros de guardia, cazadores que tiran escaleras abajo; tipo `marcado`) y
+  las **gargolas** (tipo `gargola`): de piedra en los pedestales (de rodillas, `REZA`) y en ronda por el aire sobre el camino (de pie,
+  ronda 6, 5-7 por encima del camino); cuatro en los pedestales del rellano de la Boca.
+- **La gargola** (`enemigos/Gargola`, entidad `darkcraft:gargola`, 1 x 1,9, la posicion se manda cada tick; tipo, bestiario y logro
+  `gargola`): 56 de vida, golpe 7, armadura 10. **De piedra** (`REZA`, sin fisica: no se cae ni se empuja, `postura(int)` lo pone) ve a
+  14 (agachado 7) con linea de vista; al despertar (`DESPIERTA`, 44 ticks: se agrieta —particulas de piedra—, `sfx.gargola_despierta`,
+  grita) alza el vuelo. **En el aire** sin fisica (`vuela()`, sincronizado; `travel` no hace nada en el servidor y `knockback` suma a lo
+  que vuela): da vueltas alrededor de su presa (`R_ORBITA` 6,5, `ALTO_ORBITA` 4,5 por encima, `GIRO_ORBITA` 0,035 rad/tick, a
+  `V_VUELO` 0,42; si da con algo, sube) y cada `ESPERA_AIRE` (70 + algo) ataca: el **picado** (55 %: se para, chilla y en el tick
+  `PICADO_DESDE` 12 se lanza en linea recta a `V_PICADO` 1,05 contra el pecho de su presa —con lo que anda—; a quien pille, x1,1 del
+  golpe y un empujon de lado `EMPUJE_PICADO` 1,5 + 0,32 hacia arriba: fuera de la cadena; **agachado, el empujon es 0,3 y sin
+  levantarle**; nunca baja de la altura de su presa; si da con algo, se acaba), **posarse** (25 %, si hay suelo firme a 2,5-3,5 de su
+  presa: `ATERRIZA`) o las **garras** (se cierne delante de su presa a dos bloques y a la altura de su cabeza y lanza las patas).
+  Aturdida en el aire baja un poco. La que vuela grita al ver a alguien (`GRITO`). **En tierra** (con fisica, anda): el **zarpazo**
+  (dos garrazos) y el **coletazo** (vuelta entera; a quien se le pone detras); a las dos o tres, si su presa se aleja (8,5) o sube o baja
+  mucho (2,5), **despega** (deja el suelo en `DESPEGA_SALTO` 9); si la echan del camino (sin suelo), alza el vuelo. Sin presa las de
+  piedra vuelven volando a su pedestal y al rato vuelven a ser estatua; las de ronda dan vueltas a su puesto. **Al morir** se le parte la
+  piedra: si volaba cae (con fisica) y se va. `Enemigo.anda()` (nuevo): los que se mueven solos en el aire no vuelven, rondan ni
+  persiguen con el camino del juego. Para las pruebas: `quieta`, `probarVuelo`, `probarPicado`, `probarGarras`, `probarPosarse`,
+  `estado()` y contadores.
+- **El modelo** (`tools/enemigos/gargola.py`, escala 1,05: piedra de granito con grietas y liquen, cabeza de perro con cuernos,
+  brazos largos con tres garras, piernas de garra, puas por el espinazo, alas de murcielago en tres trozos —las cuentas de las del
+  dragon girandolas al torso— y cola con la punta en pala; ojos y grietas rojas en la capa de brillo): bucles `posada` (la estatua),
+  `quieto`, `listo`, `andar`, `vuelo` (tendida) y `cerne` (en el sitio); acciones (`GargolaAnims`) despierta (44), grito (28), zarpazo
+  (26), coletazo (24), despega (18), aterriza (16), picado (32), garras (20), aturdido (30), morir (40). `GargolaModelo`: en el aire
+  mezcla `vuelo` y `cerne` segun lo que avanza (el paso del juego que calcula el cliente). `GargolaRenderer`: **de piedra, sin brillo**;
+  al despertar se le encienden los ojos poco a poco y al morir se apagan.
+- **En el cliente** (`ClientCadena`): las rafagas, la Sombra, los eslabones que crujen bajo los pies de vez en cuando
+  (`sfx.cadena_crujido`, en el eje de la cadena) y, cerca de la Boca, su aliento y su latido. **El aire de la cadena**
+  (`ambiente.cadena`, en bucle) lo pone `ClientMusic.tickCrater` sobre la cadena y en la Boca (en lugar del del crater).
+- Sonidos (ElevenLabs, flow `T96XJh7q5bh21jnYDQgI`, `TOMAS_SFX` elegidas midiendo las tomas): `gargola_despierta` (3 y 4),
+  `gargola_grito` (1 y 3), `gargola_aleteo` (1 y 2; cada 2,5 s mientras vuela), `gargola_picado` (1 y 4), `gargola_garras` (3 y 4),
+  `gargola_cola` (4 y 2), `gargola_aterriza` (1 y 4), `gargola_dolor` (3 y 1), `gargola_muerte` (1 y 3), `cadena_rafaga` (3 y 1),
+  `cadena_crujido` (2 y 3), `cadena_ambiente` (2 y 4, bucle), `boca_aliento` (3 y 2) y `boca_latido` (4 y 3, con los graves de mas).
+  La Sombra (voz Grav, flow `Mm0FdcLcpVa1l39aUIC2`): `TOMAS_SOMBRA` / `SUSURROS_SOMBRA` 21 a/a, 22 b/b, 23 a/a.
+- **El libro perdido 34**, "El diario del Descansillo" (Ivo, el ultimo de la cuerda: el campamento, el viento que se llevo a Mattis,
+  Aldric que subio solo a la Boca y bajo corriendo hasta el ancla, y "descansa junto al fuego; luego decide tu si corres").
+  `Perdidos.TOTAL` = 34. Botin `chests/cadena` (frutos de la pluma, piedras de forja II y alguna III, y a veces un talisman o una ceniza).
+- Comandos `/darkcraft cadena [ir <sitio> | enemigos [volver | fuera | sacar] | rafaga | sombra olvidar | gargola [vuelo | tierra |
+  picado | garras | posarse]]` (sin mas: como esta; `gargola` = la mas cercana a 48 bloques).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_subida carpeta` (`Volcado.andarSubida`: a pie desde lo alto del ancla a todos
+  los sitios —los huecos se ven con tablon—, cada uno de los de la cadena se pisa y se llega y ninguno metido en un bloque; el perfil);
+  la gargola: `python3 tools/enemigos/generar.py --solo gargola --vistas carpeta`; un trozo en texto: `herr/corte.py`.
+- Pruebas: servidor, `cadena()` (`Morvain, la cadena del sur: ...` —el resumen, a pie a todos los sitios, el santuario, donde se esta y
+  el corcel que no viene— y `Morvain, los de la cadena: ...`) y `gargolas()` (`Morvain, la gargola: ...` —de piedra, lo que ve, despierta
+  y vuela, sus vueltas, el picado que pilla y echa, las garras, se posa, el zarpazo y el coletazo, despega y muere en el aire—).
+  Cliente, tramo `cadena()` despues del nido: el camino desde el ancla (`cliente_mv520`), la cadena de lado (`mv521`), la gargola de
+  piedra (`mv522`), el Descansillo (`mv523`) y su atril (`mv524`), la Boca (`mv525`), la Garganta (`mv526`), el patio (`mv527`); en
+  supervivencia la Sombra (`mv528`, con su subtitulo), una rafaga (`mv529`; lineas de lo que mueve de pie y agachado), el corcel que no
+  viene, la gargola (capturas que esperan: `esperarA` / `esperaTick`): despierta (`mv530`), vuela (`mv531`), el picado (`mv532`), las
+  garras (`mv533`), posada (`mv534`), cae (`mv535`), el bestiario (`mv536`) y caer de la cadena (`mv537`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

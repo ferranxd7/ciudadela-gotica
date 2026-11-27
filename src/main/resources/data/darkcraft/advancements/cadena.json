@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:aldric",
+  "display": {
+    "icon": {
+      "item": "minecraft:chain"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.cadena.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.cadena.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 30
+  }
+}

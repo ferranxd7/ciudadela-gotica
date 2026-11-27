@@ -946,6 +946,46 @@ public class Volcado {
                 for (var o : v.esperas()) marcas.put((n == 0 ? "D" : o.variante() == 0 ? "G" : o.variante() == 1 ? "I" : "C") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
                 andarNido(lvl, v);
             }
+            case "morvain_subida" -> {
+                // la subida por la cadena del sur (parte 7aa): el camino de tablones de lo alto del ancla a la isla, los rellanos,
+                // el Descansillo con su santuario, la Boca y la Garganta hasta la torre (-Dcaja=x0,z0,x1,z1 para un trozo; -Dsuelo=Y:
+                // lo mas bajo que se vuelca)
+                com.darkcraft.morvain.Subida v = com.darkcraft.morvain.Subida.get();
+                String[] k = System.getProperty("caja", com.darkcraft.morvain.Subida.BX0 + "," + com.darkcraft.morvain.Subida.BZ0 + ","
+                        + com.darkcraft.morvain.Subida.BX1 + "," + com.darkcraft.morvain.Subida.BZ1).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                int ymin = Integer.parseInt(System.getProperty("suelo", "140"));
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, ymin);
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("La subida: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " que esperan; "
+                        + v.tablones + " tablones, " + v.peldanos + " peldanos, " + v.tallados + " tallados, " + v.postes + " postes, " + v.cuerdas
+                        + " cuerdas, " + v.faroles + " faroles, " + v.velas + " velas, " + v.calaveras + " calaveras, " + v.barriles + " barriles, "
+                        + v.dientes + " dientes, " + v.pedestales + " pedestales; sobre el hierro (no se pusieron) " + v.hierroPisado
+                        + "; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas())
+                    if (o.z() >= z0 && o.z() <= z1)
+                        marcas.put((o.tipo().equals("gargola") ? "G" : o.variante() == 0 ? "R" : o.variante() == 1 ? "C" : "Z") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                if (System.getProperty("caja") == null) andarSubida(lvl, v);
+            }
             case "morvain_grieta" -> {
                 // el Puente de la Grieta (parte 7s): la grieta con su sangre, el puente con su espadana, la puerta del norte, el paso,
                 // el cementerio, el humilladero, la hospederia con el libro 28 y el campamento de los penitentes
@@ -1581,6 +1621,66 @@ public class Volcado {
                     if (choca(mundo.en(com.darkcraft.morvain.Nido.CX + du, y, com.darkcraft.morvain.Nido.CZ + dv))) altos++;
             }
         System.out.println("por encima de la repisa (6 a 40 sobre el suelo, radio 26): " + altos + " bloques");
+    }
+
+    static void andarSubida(WorldGenLevel lvl, com.darkcraft.morvain.Subida v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        BlockState losa = Blocks.DARK_OAK_SLAB.defaultBlockState();
+        // (los huecos se saltan: Andar no sabe saltar, asi que se ven como si tuvieran tablon)
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+            BlockState s = MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+            if (s.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || s.getBlock() instanceof net.minecraft.world.level.block.CandleBlock) return aire;
+            if (s.isAir() && x >= com.darkcraft.morvain.Subida.X0 && x <= com.darkcraft.morvain.Subida.X1 && v.hayCamino(z)) {
+                double sup = v.superficie(z);
+                int yb = sup == Math.floor(sup) ? (int) sup - 1 : (int) Math.floor(sup);
+                if (y == yb) return losa;
+            }
+            return s;
+        };
+        int[] e = v.sitio("ancla");
+        var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], com.darkcraft.morvain.Subida.BX0, com.darkcraft.morvain.Subida.BZ0,
+                com.darkcraft.morvain.Subida.BX1, com.darkcraft.morvain.Subida.BZ1, 8_000_000);
+        StringBuilder sb = new StringBuilder("a pie desde lo alto del ancla: " + z0.celdas() + " celdas;");
+        for (String s : v.sitios().keySet()) {
+            if (s.startsWith("lado")) continue;
+            int[] q = v.sitio(s);
+            sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+        }
+        System.out.println(sb);
+        int malos = 0, chocan = 0, sinSuelo = 0;
+        for (var o : v.esperas()) {
+            boolean vuela = o.tipo().equals("gargola") && o.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE;
+            if (!vuela && !z0.alcanza(o.x(), o.y(), o.z(), 2.5)) {
+                malos++;
+                System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.tipo() + " " + o.x() + "," + o.y() + "," + o.z());
+            }
+            for (int dy = 0; dy < 2; dy++) {
+                BlockState st = mundo.en(o.x(), o.y() + dy, o.z());
+                if (choca(st)) {
+                    chocan++;
+                    System.out.println("  " + o.grupo() + " metido en un bloque: " + o.tipo() + " " + o.x() + "," + (o.y() + dy) + "," + o.z() + " " + st);
+                }
+            }
+            if (vuela) continue;
+            BlockState abajo = mundo.en(o.x(), o.y() - 1, o.z());
+            if (!choca(abajo)) {
+                sinSuelo++;
+                System.out.println("  " + o.grupo() + " sin suelo: " + o.tipo() + " " + o.x() + "," + o.y() + "," + o.z() + " " + abajo);
+            }
+        }
+        System.out.println("los de la cadena: " + v.esperas().size() + ", sin llegar " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
+        // el perfil: cada 40 z, lo que se pisa y lo alto del hierro de debajo
+        StringBuilder pf = new StringBuilder("perfil (z: pisa / hierro):");
+        for (int z = com.darkcraft.morvain.Subida.Z_TORRE; z <= com.darkcraft.morvain.Subida.Z_ANCLA; z += 40) {
+            int h = Integer.MIN_VALUE;
+            for (int y = (int) v.superficie(z) + 2; y > (int) v.superficie(z) - 30; y--)
+                if (com.darkcraft.morvain.Subida.hierro(0, y, z) || com.darkcraft.morvain.Subida.hierro(-1, y, z)) {
+                    h = y;
+                    break;
+                }
+            pf.append(' ').append(z).append(':').append(v.superficie(z)).append('/').append(h == Integer.MIN_VALUE ? "-" : String.valueOf(h));
+        }
+        System.out.println(pf);
     }
 
     static void andarCerco(WorldGenLevel lvl, com.darkcraft.morvain.Cerco v, Map<Long, BlockState> antes) {

@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "21";
+    private static final String V = "22";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -157,6 +157,52 @@ public final class Net {
                 .encoder((m, b) -> {}).decoder(b -> new CorcelLlamar()).consumerMainThread(CorcelLlamar::handle).add();
         CH.messageBuilder(CorcelSalto.class, id++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(CorcelSalto::write).decoder(CorcelSalto::read).consumerMainThread(CorcelSalto::handle).add();
+        // la subida por la cadena del sur (parte 7aa): las rafagas de viento y lo que dice la Sombra
+        CH.messageBuilder(Rafaga.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Rafaga::write).decoder(Rafaga::read).consumerMainThread(Rafaga::handle).add();
+        CH.messageBuilder(SombraDice.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(SombraDice::write).decoder(SombraDice::read).consumerMainThread(SombraDice::handle).add();
+    }
+
+    // ------------------------------------------------------------------ la cadena del sur (parte 7aa)
+
+    /**
+     * Una rafaga de viento en la cadena: hacia {@code lado} (x: +1 o -1), primero {@code aviso} ticks en que se oye y se ve venir y
+     * luego {@code empuja} ticks en que empuja ({@code fuerza}, lo que suma cada tick en lo mas fuerte). La lleva el cliente (el
+     * jugador lo mueve el).
+     */
+    public record Rafaga(int lado, int aviso, int empuja, float fuerza) {
+        void write(FriendlyByteBuf b) {
+            b.writeByte(lado);
+            b.writeVarInt(aviso);
+            b.writeVarInt(empuja);
+            b.writeFloat(fuerza);
+        }
+
+        static Rafaga read(FriendlyByteBuf b) {
+            return new Rafaga(b.readByte() < 0 ? -1 : 1, Math.min(b.readVarInt(), 200), Math.min(b.readVarInt(), 200), Math.min(b.readFloat(), 0.5f));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.morvain.ClientCadena.rafaga(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** La Sombra le dice a ese jugador su frase {@code n} (sin sitio, con su subtitulo). */
+    public record SombraDice(int n) {
+        void write(FriendlyByteBuf b) {
+            b.writeByte(n);
+        }
+
+        static SombraDice read(FriendlyByteBuf b) {
+            return new SombraDice(b.readByte());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.morvain.ClientCadena.sombra(n));
+            ctx.get().setPacketHandled(true);
+        }
     }
 
     // ------------------------------------------------------------------ el viaje entre santuarios (parte 7c)

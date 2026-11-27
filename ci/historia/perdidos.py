@@ -12,7 +12,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
          22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain", 27: "morvain",
-         28: "morvain", 29: "morvain", 30: "morvain", 31: "valdrenn", 32: "morvain", 33: "morvain"}
+         28: "morvain", 29: "morvain", 30: "morvain", 31: "valdrenn", 32: "morvain", 33: "morvain", 34: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -477,6 +477,17 @@ LIBROS = {
    "Thirty years guarding the pass alongside Vorthak. He flies over the peaks at dawn and we light the beacon as he passes. The kings pay him in gold, a cartload every winter, and he sleeps on it. He says the gold is warm like the sun used to be. He has never harmed a hair on our heads.",
    "On the night of the red sky Vorthak did not return to his ledge: he circled and circled, looking up, roaring at the sky, as if something had been stolen from him. At dawn he came down upon the tower. He was not looking at us. Something was burning inside him, and he poured it out of his mouth.",
    "The tower burned with the garrison inside. I was at the beacon and hid beneath the flagstones. Those who climb up to kill him end up in his gold. If anyone reads this: his fire does not reach behind the rocks, and when his wings grow heavy he comes down to earth. Do not look him in the eye.\n\nOdo"]),
+ },
+ # parte 7aa: el diario del campamento de los que subieron con Aldric, en el atril de la choza del Descansillo (la cadena del sur)
+ 34: {
+  "es": ("El diario del Descansillo", "Ivo, el último de la cuerda", [
+   "Día doce de la subida. Hemos clavado la última tabla del Descansillo. Aldric dice que desde aquí ya se oye respirar a la ciudadela. Las gárgolas de los pedestales nos dejan en paz si pasamos agachados; las que vuelan son otra cosa. El viento se llevó a Mattis por el lado del este. Ahora vamos agachados.",
+   "Día catorce. Aldric ha subido solo hasta la Boca. Ha vuelto corriendo, sin la espada y sin decir nada. Ha pasado junto a la choza sin mirarnos y ha seguido bajando, todo el camino, hasta el ancla. Desde aquí se le ve allá abajo, de rodillas. No se mueve.",
+   "Día veinte. Nadie quiere subir. Nadie quiere bajar. La marca quema cuando miramos arriba, y quema más cuando miramos abajo. Esta noche he soñado con la Boca: no hay puerta, solo dientes. Si llegas hasta aquí, descansa junto al fuego. Luego decide tú si corres.\n\nIvo"]),
+  "en": ("The Landing Diary", "Ivo, the last on the rope", [
+   "Day twelve of the climb. We have nailed down the last plank of the Landing. Aldric says that from here you can already hear the citadel breathing. The gargoyles on the pedestals leave us alone if we crouch as we pass; the flying ones are another matter. The wind took Mattis over the east side. Now we go crouching.",
+   "Day fourteen. Aldric climbed alone up to the Maw. He came back running, without his sword and without a word. He passed the hut without looking at us and kept going down, all the way, to the anchor. From here you can see him far below, on his knees. He does not move.",
+   "Day twenty. No one wants to go up. No one wants to go down. The mark burns when we look up, and burns more when we look down. Tonight I dreamed of the Maw: there is no door, only teeth. If you make it this far, rest by the fire. Then decide for yourself whether you run.\n\nIvo"]),
  },
 }
 

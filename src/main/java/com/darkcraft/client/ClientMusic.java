@@ -444,18 +444,26 @@ public final class ClientMusic {
 
     private static Track crater;
     private static int craterTicks;
-    private static boolean enCrater;
+    private static boolean enCrater, enCadena, craterEsCadena;
 
     private static void tickCrater(Minecraft mc) {
-        if (mc.player == null || mc.level == null) enCrater = false;
-        else if (mc.player.tickCount % 20 == 19)
-            enCrater = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() > 40 && mc.player.getY() < 330
-                    && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.CENTRO;
+        if (mc.player == null || mc.level == null) enCrater = enCadena = false;
+        else if (mc.player.tickCount % 20 == 19) {
+            boolean morvain = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL;
+            double x = mc.player.getX(), y = mc.player.getY(), z = mc.player.getZ();
+            // sobre la cadena del sur (parte 7aa), y en su Boca: su aire (el viento de lo alto y los eslabones que crujen)
+            enCadena = morvain && (com.darkcraft.morvain.Subida.sobreCadena(x, y, z) || com.darkcraft.morvain.Subida.enBoca(x, y, z));
+            enCrater = enCadena || morvain && y > 40 && y < 330
+                    && com.darkcraft.morvain.Terreno.region(x, z) == com.darkcraft.morvain.Region.CENTRO;
+        }
         boolean quiere = enCrater && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        // si cambia de uno a otro, el que sonaba se va despacio y entra el otro
+        if (quiere && crater != null && !crater.dying() && craterEsCadena != enCadena) crater.kill(2.5f);
         if (quiere) {
             if (crater == null || crater.dying() || !mc.getSoundManager().isActive(crater) && craterTicks > 20) {
                 if (crater != null && !crater.dying()) mc.getSoundManager().stop(crater);
-                crater = new Track(DarkCraftMod.AMBIENTE_CRATER.get(), "crater", false);
+                craterEsCadena = enCadena;
+                crater = new Track(enCadena ? DarkCraftMod.AMBIENTE_CADENA.get() : DarkCraftMod.AMBIENTE_CRATER.get(), enCadena ? "cadena" : "crater", false);
                 craterTicks = 0;
                 mc.getSoundManager().play(crater);
                 crater.fadeTo(0.85f, 2.5f);
@@ -467,10 +475,11 @@ public final class ClientMusic {
         }
     }
 
-    /** Para la prueba de la CI: si suena el aire del crater. */
+    /** Para la prueba de la CI: si suena el aire del crater (o el de la cadena). */
     public static String crater() {
         Minecraft mc = Minecraft.getInstance();
-        return crater == null ? "sin el crater" : String.format("el crater %.2f%s", crater.level(), mc.getSoundManager().isActive(crater) ? "" : " (parado)");
+        return crater == null ? "sin el crater" : String.format("%s %.2f%s", craterEsCadena ? "la cadena" : "el crater", crater.level(),
+                mc.getSoundManager().isActive(crater) ? "" : " (parado)");
     }
 
     /** Para la prueba de la CI: si suena el viento de la Tierra sin Fe. */

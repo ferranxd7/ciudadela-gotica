@@ -466,6 +466,23 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_DRAGON_RESPIRA = sound("sfx.dragon_respira");
     public static final RegistryObject<SoundEvent> SFX_DRAGON_ASCUAS = sound("sfx.dragon_ascuas");
     public static final RegistryObject<SoundEvent> SFX_TEATRO_APLAUSO = sound("sfx.teatro_aplauso");
+    // ---- la subida por la cadena del sur (parte 7aa): las gargolas (despertar, grito, aleteo, picado, garras, cola, posarse,
+    // quejido y la piedra que se parte), las rafagas de viento, el crujido de los eslabones, el aire de la cadena (en bucle) y
+    // la Boca de la ciudadela (su aliento y su latido)
+    public static final RegistryObject<SoundEvent> SFX_GARGOLA_DESPIERTA = sound("sfx.gargola_despierta");
+    public static final RegistryObject<SoundEvent> SFX_GARGOLA_GRITO = sound("sfx.gargola_grito");
+    public static final RegistryObject<SoundEvent> SFX_GARGOLA_ALETEO = sound("sfx.gargola_aleteo");
+    public static final RegistryObject<SoundEvent> SFX_GARGOLA_PICADO = sound("sfx.gargola_picado");
+    public static final RegistryObject<SoundEvent> SFX_GARGOLA_GARRAS = sound("sfx.gargola_garras");
+    public static final RegistryObject<SoundEvent> SFX_GARGOLA_COLA = sound("sfx.gargola_cola");
+    public static final RegistryObject<SoundEvent> SFX_GARGOLA_ATERRIZA = sound("sfx.gargola_aterriza");
+    public static final RegistryObject<SoundEvent> SFX_GARGOLA_DOLOR = sound("sfx.gargola_dolor");
+    public static final RegistryObject<SoundEvent> SFX_GARGOLA_MUERTE = sound("sfx.gargola_muerte");
+    public static final RegistryObject<SoundEvent> SFX_CADENA_RAFAGA = sound("sfx.cadena_rafaga");
+    public static final RegistryObject<SoundEvent> SFX_CADENA_CRUJIDO = sound("sfx.cadena_crujido");
+    public static final RegistryObject<SoundEvent> AMBIENTE_CADENA = sound("ambiente.cadena");
+    public static final RegistryObject<SoundEvent> SFX_BOCA_ALIENTO = sound("sfx.boca_aliento");
+    public static final RegistryObject<SoundEvent> SFX_BOCA_LATIDO = sound("sfx.boca_latido");
     public static final RegistryObject<SoundEvent> AMBIENTE_ALTAR = sound("ambiente.altar");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
@@ -630,9 +647,12 @@ public class DarkCraftMod {
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] DRAGON_VOZ = new RegistryObject[6];
 
-    /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
+    /**
+     * Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn, 21..23 la subida por la cadena del sur;
+     * las 10..20 van juntas en la narracion del capitulo 6): en estereo, suenan sin sitio.
+     */
     @SuppressWarnings("unchecked")
-    public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[10];
+    public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[24];
 
     static {
         for (int i = 1; i < REY_VOZ.length; i++) REY_VOZ[i] = sound("rey.voz." + i);
@@ -651,7 +671,7 @@ public class DarkCraftMod {
         for (int i = 1; i < JINETE_VOZ.length; i++) JINETE_VOZ[i] = sound("jinete.voz." + i);
         for (int i = 1; i < BUFON_VOZ.length; i++) BUFON_VOZ[i] = sound("bufon.voz." + i);
         for (int i = 1; i < DRAGON_VOZ.length; i++) DRAGON_VOZ[i] = sound("dragon.voz." + i);
-        for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
+        for (int i = 1; i < SOMBRA_VOZ.length; i++) if (i < 10 || i > 20) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
@@ -885,6 +905,11 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.ProyectilDragon>> PROYECTIL_DRAGON = ENTITIES.register("proyectil_dragon",
             () -> EntityType.Builder.<com.darkcraft.enemigos.ProyectilDragon>of(com.darkcraft.enemigos.ProyectilDragon::new, MobCategory.MISC)
                     .sized(0.8f, 0.8f).noSave().clientTrackingRange(12).updateInterval(1).build(MODID + ":proyectil_dragon"));
+    // ---- las gargolas de la cadena del sur (parte 7aa): de piedra, con alas; vuelan sin fisica (la posicion se manda cada tick)
+    // y se las ve de lejos
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Gargola>> GARGOLA = ENTITIES.register("gargola",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Gargola>of(com.darkcraft.enemigos.Gargola::new, MobCategory.MONSTER)
+                    .sized(1.0f, 1.9f).clientTrackingRange(10).updateInterval(1).build(MODID + ":gargola"));
     // ---- Ser Lucan, el Jinete Nocturno del camino de nubes (parte 7x): el caballo y su jinete, una sola entidad (va deprisa:
     // la posicion se manda cada tick para que el galope se vea suave)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Jinete>> JINETE = ENTITIES.register("jinete",
@@ -1107,6 +1132,7 @@ public class DarkCraftMod {
         e.put(JINETE.get(), com.darkcraft.enemigos.Jinete.atributos().build());
         e.put(BUFON.get(), com.darkcraft.enemigos.Bufon.atributos().build());
         e.put(DRAGON.get(), com.darkcraft.enemigos.Dragon.atributos().build());
+        e.put(GARGOLA.get(), com.darkcraft.enemigos.Gargola.atributos().build());
         e.put(MARCADO.get(), com.darkcraft.enemigos.Marcado.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
