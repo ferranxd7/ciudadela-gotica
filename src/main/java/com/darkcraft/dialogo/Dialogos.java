@@ -22,7 +22,7 @@ public final class Dialogos {
      * cliente ({@code Net.DialogoAccion}).
      */
     public enum Accion {
-        NADA, NIVEL, FORJA, TIENDA, SILBATO;
+        NADA, NIVEL, FORJA, TIENDA, SILBATO, GOLPEAR, TOMAR;
 
         public String id() {
             return name().toLowerCase(java.util.Locale.ROOT);
@@ -141,6 +141,15 @@ public final class Dialogos {
     public static final Personaje MERCADER = new Hacer("mercader")
             .frase(1, MENU).frase(2, MENU).frase(5, MENU).frase(6, FIN)
             .menu(r("mercader", "comprar", Accion.TIENDA), r("mercader", "aqui", 5), r("mercader", "adios", 6))
+            .hecho();
+
+    /**
+     * La Sombra sin Nombre, rendida (parte 7ac): se habla con su corazon, que flota delante de ella. Quien no la oyo ofrecerlo empieza
+     * por su frase 30 ("Espera... espera, marcado. Toma mi corazon..."); quien la oyo, por las respuestas: golpearlo, tomarlo o callar.
+     */
+    public static final Personaje SOMBRA = new Hacer("sombra")
+            .frase(30, MENU)
+            .menu(r("sombra", "golpear", Accion.GOLPEAR), r("sombra", "tomar", Accion.TOMAR), r("sombra", "callar", FIN))
             .hecho();
 
     // ------------------------------------------------------------------ lo que dura cada frase

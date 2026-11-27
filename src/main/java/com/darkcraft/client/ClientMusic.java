@@ -146,9 +146,11 @@ public final class ClientMusic {
             case 44 -> DarkCraftMod.MUSICA_BUFON.get();
             case 45 -> DarkCraftMod.MUSICA_DRAGON.get();
             case 46 -> DarkCraftMod.MUSICA_ISOLDE.get();
+            case 47 -> DarkCraftMod.MUSICA_SOMBRA_1.get();
+            case 48 -> DarkCraftMod.MUSICA_SOMBRA_2.get();
             default -> DarkCraftMod.MUSICA_REY_3.get();
         };
-        boss = new Track(ev, phase == 21 ? "capitan" : phase == 31 ? "brandt" : phase == 32 ? "vareth" : phase == 33 ? "molinera" : phase == 34 ? "verdugo" : phase == 35 ? "barquero" : phase == 36 ? "abad" : phase == 37 ? "condestable" : phase == 38 ? "rectora" : phase == 39 ? "ballenero" : phase == 40 ? "pontifice" : phase == 41 ? "aldric" : phase == 42 ? "gigante" : phase == 43 ? "jinete" : phase == 44 ? "bufon" : phase == 45 ? "dragon" : phase == 46 ? "isolde" : phase >= 11 ? "gavran" + (phase - 10) : "rey" + phase, true);
+        boss = new Track(ev, phase == 21 ? "capitan" : phase == 31 ? "brandt" : phase == 32 ? "vareth" : phase == 33 ? "molinera" : phase == 34 ? "verdugo" : phase == 35 ? "barquero" : phase == 36 ? "abad" : phase == 37 ? "condestable" : phase == 38 ? "rectora" : phase == 39 ? "ballenero" : phase == 40 ? "pontifice" : phase == 41 ? "aldric" : phase == 42 ? "gigante" : phase == 43 ? "jinete" : phase == 44 ? "bufon" : phase == 45 ? "dragon" : phase == 46 ? "isolde" : phase == 47 ? "sombra1" : phase == 48 ? "sombra2" : phase >= 11 ? "gavran" + (phase - 10) : "rey" + phase, true);
         bossTicks = 0;
         Minecraft.getInstance().getSoundManager().play(boss);
         boss.fadeTo(soft ? 0.3f : 0.85f, phase == 1 ? 3.0f : 2.2f);
@@ -458,8 +460,10 @@ public final class ClientMusic {
             boolean enCadena = morvain && (com.darkcraft.morvain.Subida.sobreCadena(x, y, z) || com.darkcraft.morvain.Subida.enBoca(x, y, z));
             // dentro de la torre del homenaje (parte 7ab): su aire (el viento por las ventanas rotas, las cadenas, el coro lejano)
             boolean enHomenaje = morvain && com.darkcraft.morvain.Homenaje.enHomenaje(x, y, z);
-            quiereCual = enHomenaje ? 2 : enCadena ? 1 : 0;
-            enCrater = enCadena || enHomenaje || morvain && y > 40 && y < 330
+            // en la sala de la Sombra (parte 7ac): su aire (el latido, las cadenas, los susurros)
+            boolean enAguja = morvain && com.darkcraft.morvain.Homenaje.enAguja(x, y + 0.1, z);
+            quiereCual = enAguja ? 3 : enHomenaje ? 2 : enCadena ? 1 : 0;
+            enCrater = enCadena || enHomenaje || enAguja || morvain && y > 40 && y < 330
                     && com.darkcraft.morvain.Terreno.region(x, z) == com.darkcraft.morvain.Region.CENTRO;
         }
         boolean quiere = enCrater && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
@@ -469,8 +473,9 @@ public final class ClientMusic {
             if (crater == null || crater.dying() || !mc.getSoundManager().isActive(crater) && craterTicks > 20) {
                 if (crater != null && !crater.dying()) mc.getSoundManager().stop(crater);
                 craterCual = quiereCual;
-                crater = new Track(craterCual == 2 ? DarkCraftMod.AMBIENTE_HOMENAJE.get() : craterCual == 1 ? DarkCraftMod.AMBIENTE_CADENA.get()
-                        : DarkCraftMod.AMBIENTE_CRATER.get(), craterCual == 2 ? "homenaje" : craterCual == 1 ? "cadena" : "crater", false);
+                crater = new Track(craterCual == 3 ? DarkCraftMod.AMBIENTE_AGUJA.get() : craterCual == 2 ? DarkCraftMod.AMBIENTE_HOMENAJE.get()
+                        : craterCual == 1 ? DarkCraftMod.AMBIENTE_CADENA.get() : DarkCraftMod.AMBIENTE_CRATER.get(),
+                        craterCual == 3 ? "aguja" : craterCual == 2 ? "homenaje" : craterCual == 1 ? "cadena" : "crater", false);
                 craterTicks = 0;
                 mc.getSoundManager().play(crater);
                 crater.fadeTo(0.85f, 2.5f);
@@ -485,7 +490,7 @@ public final class ClientMusic {
     /** Para la prueba de la CI: si suena el aire del crater (o el de la cadena). */
     public static String crater() {
         Minecraft mc = Minecraft.getInstance();
-        return crater == null ? "sin el crater" : String.format("%s %.2f%s", craterCual == 2 ? "la torre del homenaje" : craterCual == 1 ? "la cadena" : "el crater", crater.level(),
+        return crater == null ? "sin el crater" : String.format("%s %.2f%s", craterCual == 3 ? "la aguja" : craterCual == 2 ? "la torre del homenaje" : craterCual == 1 ? "la cadena" : "el crater", crater.level(),
                 mc.getSoundManager().isActive(crater) ? "" : " (parado)");
     }
 

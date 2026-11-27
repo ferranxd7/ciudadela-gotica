@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 128 * 60 * 20;
+    private static final int LIMIT = 132 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -6041,6 +6041,8 @@ public final class ClientCiTest {
         t = cadena(t);
         // la ciudadela por dentro: la torre del homenaje, sus centinelas, Maelis en la capilla y la reina Isolde (parte 7ab)
         t = homenaje(t);
+        // el Corazon de la Aguja: la puerta, la Sombra sin Nombre y su corazon (parte 7ac)
+        t = aguja(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -11813,6 +11815,296 @@ public final class ClientCiTest {
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
                 log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoHomenaje(sp.server));
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el Corazon de la Aguja (parte 7ac)
+
+    /** La Sombra en el cliente (a 80 bloques), o null. */
+    private static com.darkcraft.enemigos.Sombra sombraC(Minecraft mc) {
+        if (mc.level == null || mc.player == null) return null;
+        for (var e : mc.level.getEntitiesOfClass(com.darkcraft.enemigos.Sombra.class, mc.player.getBoundingBox().inflate(80))) return e;
+        return null;
+    }
+
+    private static com.darkcraft.enemigos.Sombra sombraE() {
+        return com.darkcraft.morvain.Aguja.sombra();
+    }
+
+    /** La accion que se ve de la Sombra y cuanto lleva (-1 si no es esa). */
+    private static int tSombra(Minecraft mc, int accion) {
+        var r = sombraC(mc);
+        return r != null && r.accionVista() == accion && r.accionDesde >= 0 ? r.tickCount - r.accionDesde : -1;
+    }
+
+    private static String estadoSombraC(Minecraft mc) {
+        var r = sombraC(mc);
+        if (r == null) return "no se ve a la Sombra";
+        int a = r.accionVista();
+        float tA = r.accionDesde < 0 ? -1 : r.tickCount - r.accionDesde;
+        return String.format(java.util.Locale.ROOT, "la Sombra en el cliente: %.1f, %.1f, %.1f giro %.0f, postura %d, %s%s, accion %s (t %.0f), encadenada %s, muerte %d, alfa %.2f"
+                        + " | voz %d | aguja %s | jugador a %.1f",
+                r.getX(), r.getY(), r.getZ(), r.getYRot(), r.postura(), r.furia() ? "con la furia" : "con dos ojos", r.rendida() ? ", rendida" : "",
+                com.darkcraft.enemigos.SombraAnims.NOMBRES[Math.max(0, Math.min(a, com.darkcraft.enemigos.SombraAnims.NOMBRES.length - 1))], tA,
+                r.encadenada(tA, a), r.deathTime, com.darkcraft.client.enemigos.SombraRenderer.alfa(r, 0f), com.darkcraft.client.morvain.ClientCadena.hablando(),
+                com.darkcraft.client.morvain.ClientAguja.aMano ? "a mano" : "-", mc.player == null ? -1 : r.distanceTo(mc.player));
+    }
+
+    /** La camara a {@code delante} bloques por delante de la Sombra (y {@code lado} a su derecha), a {@code alto}, mirando a su pecho. */
+    private static void camaraSombra(Minecraft mc, double delante, double lado, double alto) {
+        var r = sombraC(mc);
+        if (r == null) return;
+        Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
+        verDesde(mc, new Vec3(r.getX() + f.x * delante - f.z * lado, r.getY() + alto, r.getZ() + f.z * delante + f.x * lado), new Vec3(r.getX(), r.getY() + 3.6, r.getZ()));
+    }
+
+    private static String estadoAguja(ServerPlayer sp) {
+        var r = sombraE();
+        return fpos(sp) + " vida " + Math.round(sp.getHealth()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp) + " | "
+                + com.darkcraft.morvain.Aguja.resumen(sp.serverLevel()) + " | " + (r == null ? "la Sombra no esta fuera" : r.estado());
+    }
+
+    /**
+     * El Corazon de la Aguja: ante la puerta de la aguja en la azotea (la Sombra dice su frase 25 y el aviso de la tecla), poner la mano
+     * (la tecla: el sello que se deshace), la Sombra colgada de sus cadenas en su sala; en supervivencia: despierta con su discurso (los
+     * tirones y las cadenas que se rompen), ruge (su barra y su musica); los zarpazos, el giro, el latigazo de la cadena, las manos, las
+     * lanzas y la niebla; a media vida la furia (mas ojos), la mirada (el rayo que barre), el grito y los caidos; se rinde: de rodillas y
+     * el corazon delante; hablar con el corazon (las respuestas); golpearlo (su ultima frase y se deshace); los logros y el bestiario.
+     */
+    private static int aguja(int T) {
+        final var H = com.darkcraft.morvain.Homenaje.get();
+        final int Y = com.darkcraft.morvain.Homenaje.pisa(com.darkcraft.morvain.Homenaje.AZOTEA);
+        final net.minecraft.nbt.CompoundTag[] cielo = new net.minecraft.nbt.CompoundTag[1];
+        int t = T;
+        atTicks(t, "Aguja: ante la puerta", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_ESPERA.clear();
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                cielo[0] = com.darkcraft.fortaleza.CieloRojo.copia(sp.server);
+                comando(sp, "darkcraft sombra volver");
+                comando(sp, "darkcraft aguja cerrar");
+                comando(sp, "darkcraft aguja olvidar");
+                comando(sp, "darkcraft isolde vencer");
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                var pu = com.darkcraft.morvain.Aguja.puerta();
+                irMirando(sp, pu.x + 0.3, Y, pu.z + 2.2, pu.x, Y + 1.6, pu.z - 1.0, false);
+            });
+        });
+        t += 90;
+        atTicks(t, "captura: la puerta de la aguja (la Sombra y el aviso)", m -> {
+            log("  ante la puerta: " + estadoSombraC(m) + " | " + com.darkcraft.client.morvain.ClientCadena.hablando());
+            server(m, sp -> log("  " + estadoAguja(sp)));
+            shot(m, "cliente_mv570_puerta_aguja");
+        });
+        t += 4;
+        atTicks(t, "Aguja: poner la mano en la puerta (la tecla)", m -> {
+            log("  la puerta a mano: " + com.darkcraft.client.morvain.ClientAguja.aMano + " (que " + com.darkcraft.client.ui.ClientRol.aMano() + ")");
+            com.darkcraft.net.Net.CH.sendToServer(new com.darkcraft.net.Net.PuertaAguja());
+        });
+        t += 58;
+        atTicks(t, "captura: el sello que se deshace", m -> {
+            server(m, sp -> log("  abriendose: " + com.darkcraft.morvain.Aguja.resumen(sp.serverLevel())));
+            shot(m, "cliente_mv571_sello_se_deshace");
+        });
+        t += 70;
+        // ---- dentro: la Sombra colgada de sus cadenas (en creativo: no la despierta)
+        atTicks(t, "Aguja: la sala de la Sombra", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                log("  la puerta: " + com.darkcraft.morvain.Aguja.resumen(sp.serverLevel()));
+                sp.setGameMode(GameType.CREATIVE);
+                irMirando(sp, 0.5, Y + 2, com.darkcraft.morvain.Homenaje.R_AGUJA - 1.5, 0.5, Y + 6, 0.5, true);
+            });
+        });
+        t += 120;
+        atTicks(t, "captura: la Sombra encadenada", m -> {
+            log("  colgada: " + estadoSombraC(m));
+            shot(m, "cliente_mv572_sombra_encadenada");
+        });
+        t += 4;
+        // ---- la pelea (en supervivencia): el discurso, los tirones, las cadenas que se rompen y el rugido
+        atTicks(t, "Aguja: la Sombra despierta", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                irMirando(sp, 0.5, Y, 7.5, 0.5, Y + 5, 0.5, false);
+            });
+        });
+        esperarA("cliente_mv573_sombra_tira", m -> tSombra(m, com.darkcraft.enemigos.SombraAnims.DESPIERTA) >= 236, m -> camaraSombra(m, 9, 4, 3.0),
+                ClientCiTest::estadoSombraC, 400);
+        esperarA("cliente_mv574_cadenas_rotas", m -> tSombra(m, com.darkcraft.enemigos.SombraAnims.DESPIERTA) >= 335, m -> camaraSombra(m, 10, -5, 4.0),
+                ClientCiTest::estadoSombraC, 200);
+        esperarA("cliente_mv575_sombra_ruge", m -> tSombra(m, com.darkcraft.enemigos.SombraAnims.RUGIDO) >= 14, m -> camaraSombra(m, 7, 3, 2.6),
+                ClientCiTest::estadoSombraC, 160);
+        t += 470;
+        String[][] ataques = {{"zarpazos", "cliente_mv576_sombra_zarpazos", "12", "3.2"}, {"giro", "cliente_mv577_sombra_giro", "14", "3.5"},
+                {"cadena", "cliente_mv578_sombra_cadena", "16", "9"}, {"manos", "cliente_mv579_sombra_manos", "38", "6"},
+                {"lanzas", "cliente_mv580_sombra_lanzas", "18", "11"}, {"niebla", "cliente_mv581_sombra_niebla", "20", "8"}};
+        int[] acc = {com.darkcraft.enemigos.SombraAnims.ZARPAZOS, com.darkcraft.enemigos.SombraAnims.GIRO, com.darkcraft.enemigos.SombraAnims.CADENA,
+                com.darkcraft.enemigos.SombraAnims.MANOS, com.darkcraft.enemigos.SombraAnims.LANZAS, com.darkcraft.enemigos.SombraAnims.NIEBLA};
+        for (int i = 0; i < ataques.length; i++) {
+            final String[] at = ataques[i];
+            final int a = acc[i];
+            atTicks(t, "Aguja: " + at[0], m -> server(m, sp -> {
+                sp.setHealth(sp.getMaxHealth());
+                var r = sombraE();
+                if (r != null) {
+                    r.quieta = true;
+                    Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
+                    double d = Double.parseDouble(at[3]);
+                    double x = r.getX() + f.x * d, z = r.getZ() + f.z * d;
+                    // (dentro de la sala)
+                    double rr = Math.hypot(x, z), tope = com.darkcraft.morvain.Homenaje.R_AGUJA - 2.0;
+                    if (rr > tope) {
+                        x *= tope / rr;
+                        z *= tope / rr;
+                    }
+                    irMirando(sp, x, r.getY(), z, r.getX(), r.getY() + 4, r.getZ(), false);
+                }
+                comando(sp, "darkcraft sombra " + at[0]);
+            }));
+            esperarA(at[1], m -> tSombra(m, a) >= Integer.parseInt(at[2]), m -> {
+                if (a == com.darkcraft.enemigos.SombraAnims.NIEBLA || a == com.darkcraft.enemigos.SombraAnims.MANOS || a == com.darkcraft.enemigos.SombraAnims.CADENA) {
+                    if (m.player != null) verDesde(m, m.player.getEyePosition().add(5, 3, 5), m.player.position().add(0, 1, 0));
+                } else camaraSombra(m, 8, -5, 3.0);
+            }, ClientCiTest::estadoSombraC, 140);
+            t += 70;
+        }
+        // ---- a media vida: la furia, la mirada, el grito y los caidos
+        atTicks(t, "Aguja: a media vida", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            comando(sp, "darkcraft sombra media");
+        }));
+        esperarA("cliente_mv582_sombra_furia", m -> tSombra(m, com.darkcraft.enemigos.SombraAnims.FURIA) >= 40, m -> camaraSombra(m, 7, 2, 4.0),
+                ClientCiTest::estadoSombraC, 160);
+        t += 90;
+        String[][] ataques2 = {{"mirada", "cliente_mv583_sombra_mirada", "44", "8"}, {"grito", "cliente_mv584_sombra_grito", "18", "4"},
+                {"caidos", "cliente_mv585_sombra_caidos", "34", "6"}};
+        int[] acc2 = {com.darkcraft.enemigos.SombraAnims.MIRADA, com.darkcraft.enemigos.SombraAnims.GRITO, com.darkcraft.enemigos.SombraAnims.CAIDOS};
+        for (int i = 0; i < ataques2.length; i++) {
+            final String[] at = ataques2[i];
+            final int a = acc2[i];
+            atTicks(t, "Aguja: " + at[0], m -> server(m, sp -> {
+                sp.setHealth(sp.getMaxHealth());
+                var r = sombraE();
+                if (r != null) {
+                    Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
+                    double d = Double.parseDouble(at[3]);
+                    double x = r.getX() + f.x * d, z = r.getZ() + f.z * d;
+                    double rr = Math.hypot(x, z), tope = com.darkcraft.morvain.Homenaje.R_AGUJA - 2.0;
+                    if (rr > tope) {
+                        x *= tope / rr;
+                        z *= tope / rr;
+                    }
+                    irMirando(sp, x, r.getY(), z, r.getX(), r.getY() + 4, r.getZ(), false);
+                }
+                comando(sp, "darkcraft sombra " + at[0]);
+            }));
+            esperarA(at[1], m -> tSombra(m, a) >= Integer.parseInt(at[2]), m -> {
+                if (a == com.darkcraft.enemigos.SombraAnims.MIRADA) camaraSombra(m, 2, 12, 7.0);
+                else camaraSombra(m, 10, -6, 4.0);
+            }, ClientCiTest::estadoSombraC, 160);
+            t += a == com.darkcraft.enemigos.SombraAnims.MIRADA ? 100 : 80;
+        }
+        // ---- se rinde: de rodillas y el corazon delante
+        atTicks(t, "Aguja: la Sombra se rinde", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            var r = sombraE();
+            if (r != null) {
+                for (var e : r.caidos()) e.disolver();
+                r.quieta = false;
+                Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
+                irMirando(sp, r.getX() + f.x * 4.5, r.getY(), r.getZ() + f.z * 4.5, r.getX(), r.getY() + 2, r.getZ(), false);
+            }
+            comando(sp, "darkcraft sombra vencer");
+        }));
+        t += 130;
+        atTicks(t, "captura: rendida, el corazon fuera", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                log("  rendida: " + estadoAguja(sp));
+                var r = sombraE();
+                if (r != null) {
+                    Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
+                    irMirando(sp, r.getX() + f.x * 5.2 + f.z * 1.5, r.getY(), r.getZ() + f.z * 5.2 - f.x * 1.5, r.getX(), r.getY() + 1.6, r.getZ(), false);
+                }
+            });
+            log("  en el cliente: " + estadoSombraC(m));
+        });
+        t += 10;
+        atTicks(t, "captura: la Sombra de rodillas y su corazon", m -> shot(m, "cliente_mv586_sombra_rendida"));
+        t += 4;
+        // ---- hablar con el corazon: las respuestas
+        atTicks(t, "Aguja: hablar con el corazon", m -> server(m, sp -> {
+            com.darkcraft.rol.Rol.sinCombate(sp);
+            for (var c : sp.serverLevel().getEntitiesOfClass(com.darkcraft.morvain.Corazon.class, sp.getBoundingBox().inflate(12))) {
+                com.darkcraft.dialogo.Conversaciones.hablar(sp, c);
+                break;
+            }
+        }));
+        t += 40;
+        atTicks(t, "captura: las respuestas", m -> {
+            log("  dialogo: " + (m.screen instanceof com.darkcraft.client.ui.DialogoScreen d ? d.resumen() : "NO (" + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()) + ")"));
+            shot(m, "cliente_mv587_corazon_respuestas");
+        });
+        t += 4;
+        atTicks(t, "Aguja: golpear el corazon", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        esperarA("cliente_mv588_sombra_ultima_frase", m -> com.darkcraft.client.morvain.ClientCadena.hablando() == 31, m -> camaraSombra(m, 5, 2, 2.2),
+                ClientCiTest::estadoSombraC, 200);
+        esperarA("cliente_mv589_sombra_se_deshace", m -> {
+            var r = sombraC(m);
+            return r != null && r.deathTime >= 14;
+        }, m -> camaraSombra(m, 6, 3, 2.6), ClientCiTest::estadoSombraC, 400);
+        t += 260;
+        atTicks(t, "Aguja: despues", m -> {
+            CAPTURAS_ESPERA.clear();
+            m.setScreen(null);
+            server(m, sp -> {
+                log("  al caer: " + estadoAguja(sp) + " | logros sombra " + com.darkcraft.story.Logros.tiene(sp, "sombra") + ", alba "
+                        + com.darkcraft.story.Logros.tiene(sp, "alba") + ", aguja " + com.darkcraft.story.Logros.tiene(sp, "aguja") + " | "
+                        + com.darkcraft.fortaleza.CieloRojo.resumen(sp.server));
+                irMirando(sp, 0.5, Y, 4.5, 0.5, Y + 8, -6.5, false);
+            });
+        });
+        t += 40;
+        atTicks(t, "captura: la sala vacia", m -> shot(m, "cliente_mv590_sala_vacia"));
+        t += 4;
+        atTicks(t, "el bestiario: la Sombra", m -> {
+            m.setScreen(null);
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("sombra")));
+        });
+        t += 18;
+        atTicks(t, "captura: la Sombra en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv591_bestiario_sombra");
+        });
+        t += 4;
+        atTicks(t, "Aguja: fin (todo como estaba; vuelta al arco)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_ESPERA.clear();
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft sombra volver");
+                comando(sp, "darkcraft aguja cerrar");
+                comando(sp, "darkcraft isolde volver");
+                if (cielo[0] != null) com.darkcraft.fortaleza.CieloRojo.restaurar(sp.server, cielo[0]);
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+                log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoSombra(sp.server));
             });
         });
         return t + 30;

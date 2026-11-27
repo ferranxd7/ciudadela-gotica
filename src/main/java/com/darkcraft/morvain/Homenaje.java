@@ -97,6 +97,8 @@ public final class Homenaje {
     private final Map<Long, List<Element>> indice = new HashMap<>();
     private final Map<String, int[]> sitios = new LinkedHashMap<>();
     private final List<Espera> esperas = new ArrayList<>();
+    /** La de la aguja (parte 7ac): la Sombra, encadenada en medio de su sala (su propio sitio, {@code MorvainEnemigos.AGUJA}). */
+    private final List<Espera> esperasAguja = new ArrayList<>();
     /** Lo que hay (para las pruebas y las vistas). */
     public int pilares, braseros, faroles, velas, estanterias, celdas, bancos, espejos, estatuas, peldanos;
 
@@ -110,6 +112,7 @@ public final class Homenaje {
         capilla();
         trono();
         azotea();
+        aguja();
         for (int k = 0; k <= 5; k++) escalera(k);
         for (Pilotes.Lista l : listas.values()) elementos.add(l.pieza(5));
         trozos();
@@ -956,26 +959,138 @@ public final class Homenaje {
 
     // ------------------------------------------------------------------ la azotea
 
-    /** La puerta de la aguja (cerrada hasta la parte 7ac): en su cara del sur. */
-    public static final int AGUJA_Z = 10;
+    /** La puerta de la aguja: en su cara del sur, en medio del muro (desde la parte 7ac la aguja es mas ancha). */
+    public static final int AGUJA_Z = (int) Ciudadela.RAG - 1;
+    /** El radio de la sala de la Sombra por dentro (lo hueco de la aguja) y lo alto de su techo. */
+    public static final int R_AGUJA = (int) Ciudadela.RAG - 2;
+    public static final int TECHO_AGUJA = SUELO[AZOTEA] + 1 + Ciudadela.CUERPO - 1;
 
     private void azotea() {
         int y0 = pisa(AZOTEA);
-        // la puerta de la aguja: un arco cegado de piedra negra con las runas rojas (cerrada: la Sombra, parte 7ac)
+        // la puerta de la aguja: un arco de piedra negra con su marco dorado; el hueco, cegado con el sello de las runas rojas (lo
+        // abre la mano de un marcado: Aguja), cara adentro la obsidiana que llora
         for (int x = -2; x <= 1; x++)
-            for (int z = 9; z <= 11; z++)
+            for (int z = R_AGUJA - 1; z <= (int) Ciudadela.RAG + 1; z++)
                 for (int y = y0; y <= y0 + 5; y++) {
                     double rho = Math.hypot(x + 0.5, z + 0.5);
                     if (rho <= Ciudadela.RAG - 2 || rho > Ciudadela.RAG + 0.5) continue;
                     boolean hueco = x >= -1 && x <= 0 && y <= y0 + 3;
                     boolean marco = !hueco && (x == -2 || x == 1 || y == y0 + 4);
-                    if (hueco) put(x, y, z, z == 9 ? b(Blocks.CRYING_OBSIDIAN) : y == y0 + 2 ? gema() : Pal.PB_CHISELED);
+                    if (hueco) put(x, y, z, sello(x, y, z));
                     else if (marco) put(x, y, z, Pal.GILDED);
                 }
-        // dos braseros a los lados de la puerta
-        brasero(-4, y0, 13);
-        brasero(3, y0, 13);
+        // dos braseros a los lados de la puerta (fuera de la aguja)
+        brasero(-5, y0, (int) Ciudadela.RAG + 3);
+        brasero(4, y0, (int) Ciudadela.RAG + 3);
         // la barandilla del hueco de la escalera ya la pone escalera(5)
+    }
+
+    /** Lo que ciega el hueco de la puerta de la aguja (la cara de dentro, la obsidiana que llora; en medio, una gema; el resto, piedra labrada). */
+    public static BlockState sello(int x, int y, int z) {
+        int y0 = pisa(AZOTEA);
+        return z == R_AGUJA ? b(Blocks.CRYING_OBSIDIAN) : y == y0 + 2 ? gema() : Pal.PB_CHISELED;
+    }
+
+    /** Los bloques del hueco de la puerta de la aguja (dos de ancho, cuatro de alto, lo que mide el muro). */
+    public static List<BlockPos> puertaAguja() {
+        List<BlockPos> l = new ArrayList<>();
+        int y0 = pisa(AZOTEA);
+        for (int x = -1; x <= 0; x++)
+            for (int z = R_AGUJA - 1; z <= (int) Ciudadela.RAG + 1; z++) {
+                double rho = Math.hypot(x + 0.5, z + 0.5);
+                if (rho <= Ciudadela.RAG - 2 || rho > Ciudadela.RAG + 0.5) continue;
+                for (int y = y0; y <= y0 + 3; y++) l.add(new BlockPos(x, y, z));
+            }
+        return l;
+    }
+
+    /** Si (x, y, z) esta en la sala de la Sombra (dentro de la aguja). */
+    public static boolean enAguja(double x, double y, double z) {
+        return Math.hypot(x, z) < R_AGUJA + 0.3 && y >= SUELO[AZOTEA] + 0.5 && y < TECHO_AGUJA + 1;
+    }
+
+    // ------------------------------------------------------------------ la sala de la Sombra (parte 7ac)
+
+    /** Los seis pilares de la sala: angulo (grados, 0 al sur, hacia la puerta) y su radio. */
+    public static final double[] PILARES_AGUJA = {30, 90, 150, 210, 270, 330};
+    public static final double R_PILAR = 11.5;
+    /** Lo alto del grillete de cada pilar (de donde salian las cadenas que sujetaban a la Sombra). */
+    public static final int GRILLETE = 14;
+
+    /** El centro (x, z) del pilar k de la sala (la esquina de abajo de su dos por dos es este centro menos uno). */
+    public static double[] pilarAguja(int k) {
+        double a = Math.toRadians(PILARES_AGUJA[k]);
+        return new double[]{Math.sin(a) * R_PILAR, Math.cos(a) * R_PILAR};
+    }
+
+    /**
+     * La sala de la Sombra, dentro de la aguja: el suelo es su marca (el circulo roto con sus puas, el ojo con la pupila de rendija y
+     * los tres goterones hacia la puerta) en gemas sobre losas oscuras, con un anillo dorado; seis pilares con su grillete y su cadena
+     * rota; faroles colgados del techo, una corona de cadenas en medio y dos braseros junto a la puerta.
+     */
+    private void aguja() {
+        int y = SUELO[AZOTEA], y0 = pisa(AZOTEA), techo = TECHO_AGUJA;
+        int R = R_AGUJA;
+        for (int x = -R - 1; x <= R; x++)
+            for (int z = -R - 1; z <= R; z++) {
+                double px = x + 0.5, pz = z + 0.5, rho = Math.hypot(px, pz);
+                if (rho >= R) continue;
+                put(x, y, z, sueloAguja(px, pz, rho, x, z));
+            }
+        // los pilares, con su grillete (hierro negro y la cadena rota colgando hacia el centro)
+        for (int k = 0; k < PILARES_AGUJA.length; k++) {
+            double[] c = pilarAguja(k);
+            int x0 = (int) Math.round(c[0]) - 1, z0 = (int) Math.round(c[1]) - 1;
+            pilar(x0, z0, y0, techo);
+            // el grillete, en la cara que mira al centro
+            double ux = -c[0] / R_PILAR, uz = -c[1] / R_PILAR;
+            int gx = (int) Math.floor(c[0] + ux * 1.6), gz = (int) Math.floor(c[1] + uz * 1.6);
+            put(gx, y0 + GRILLETE, gz, hierroNegro());
+            for (int d = 1; d <= 3; d++) put(gx, y0 + GRILLETE - d, gz, b(Blocks.CHAIN));
+            put(gx, y0 + GRILLETE + 1, gz, b(Blocks.SOUL_LANTERN));
+            // una vela roja al pie de cada pilar
+            put((int) Math.floor(c[0] + ux * 1.6), y0, (int) Math.floor(c[1] + uz * 1.6), vela(Blocks.RED_CANDLE, 3));
+        }
+        // los faroles colgados del techo (seis, entre los pilares) y la corona de cadenas del centro
+        for (int k = 0; k < 6; k++) {
+            double a = Math.toRadians(k * 60);
+            lampara((int) Math.floor(Math.sin(a) * 7.5), (int) Math.floor(Math.cos(a) * 7.5), techo, 9 + (k % 2) * 4);
+        }
+        for (int k = 0; k < 8; k++) {
+            double a = Math.toRadians(k * 45 + 22.5);
+            int cx = (int) Math.floor(Math.sin(a) * 3.2), cz = (int) Math.floor(Math.cos(a) * 3.2);
+            for (int d = 0; d < 5; d++) put(cx, techo - d, cz, b(Blocks.CHAIN));
+            put(cx, techo - 5, cz, gema());
+        }
+        // dos braseros dentro, junto a la puerta
+        brasero(-3, y0, R - 2);
+        brasero(2, y0, R - 2);
+    }
+
+    /** El suelo de la sala de la Sombra en (px, pz): su marca en gemas, el anillo dorado y las losas. */
+    private static BlockState sueloAguja(double px, double pz, double rho, int x, int z) {
+        // el borde: piedra negra pulida y un anillo dorado
+        if (rho >= R_AGUJA - 1.2) return Pal.PB_BRICKS;
+        if (rho >= R_AGUJA - 2.2) return Pal.GILDED;
+        // el ojo (de este a oeste): el borde en gemas, dentro la obsidiana que llora y la pupila de rendija
+        double e = (px / 6.2) * (px / 6.2) + (pz / 2.9) * (pz / 2.9);
+        if (Math.abs(px) < 0.7 && Math.abs(pz) < 2.4) return Math.abs(pz) < 0.6 ? gema() : b(Blocks.OBSIDIAN);
+        if (e >= 0.72 && e <= 1.12) return gema();
+        if (e < 0.72) return b(Blocks.CRYING_OBSIDIAN);
+        // el arco de encima del ojo (al norte)
+        if (pz < -3.6 && pz > -5.0 && Math.abs(px) < 3.6) return gema();
+        // el circulo roto: las gemas entre 9 y 10 de radio, salvo por donde caen los goterones (al sur) y dos huecos al norte
+        double ang = Math.toDegrees(Math.atan2(px, pz));   // 0 al sur, 180 al norte
+        if (rho >= 9.0 && rho < 10.0) {
+            boolean hueco = Math.abs(ang) < 14 || Math.abs(Math.abs(ang) - 150) < 6;
+            return hueco ? b(Blocks.POLISHED_DEEPSLATE) : gema();
+        }
+        // las puas del circulo (cuatro, hacia fuera) y los tres goterones hacia la puerta
+        for (double pa : new double[]{-120, -60, 60, 120})
+            if (rho >= 10.0 && rho < 11.2 && Math.abs(ang - pa) < 4.5) return gema();
+        if (pz > 8.4 && pz < (Math.abs(px) < 0.8 ? 12.0 : 10.8) && (Math.abs(px) < 0.8 || Math.abs(Math.abs(px) - 2.2) < 0.6)) return gema();
+        // las losas: a cuadros de baldosa de pizarra y pizarra pulida, mas oscuras hacia el centro
+        return ((x + z) & 1) == 0 ? Pal.DS_TILES : b(Blocks.POLISHED_DEEPSLATE);
     }
 
     // ------------------------------------------------------------------ el atril y los arcones
@@ -1029,7 +1144,11 @@ public final class Homenaje {
         sitio("tesoro", 3, pisa(TRONO) + 1, TRONO_Z + 1);
         sitio("reja_azotea", 20, pisa(TRONO), 15);
         sitio("azotea", 20, pisa(AZOTEA), -3);
-        sitio("puerta_sombra", -1, pisa(AZOTEA), 13);
+        sitio("puerta_sombra", -1, pisa(AZOTEA), (int) Ciudadela.RAG + 3);
+        // la sala de la Sombra (parte 7ac): junto a la puerta por dentro, el centro y el fondo
+        sitio("aguja", -1, pisa(AZOTEA), R_AGUJA - 3);
+        sitio("corazon", 0, pisa(AZOTEA), 0);
+        sitio("aguja_fondo", 0, pisa(AZOTEA), -R_AGUJA + 3);
         // para mirar de lejos
         sitio("frente", 0, pisa(BAJA) + 6, 62);
     }
@@ -1047,6 +1166,10 @@ public final class Homenaje {
         return esperas;
     }
 
+    public List<Espera> esperasAguja() {
+        return esperasAguja;
+    }
+
     public List<Element> elementos() {
         return elementos;
     }
@@ -1060,12 +1183,16 @@ public final class Homenaje {
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     /** El puesto de la reina (el primero: el 0). */
     public static final int ISOLDE = 0;
+    /** El puesto de la Sombra en el sitio de la aguja (el unico). */
+    public static final int SOMBRA = 0;
 
     private void ponerEsperas() {
         int Re = com.darkcraft.enemigos.Enemigo.REZA, D = com.darkcraft.enemigos.Enemigo.DE_PIE, T = com.darkcraft.enemigos.Enemigo.TUMBADO;
         int b = pisa(BAJA);
         // la reina en su trono (sentada, de cara a quien sube): el puesto 0
         esperas.add(new Espera("isolde", 0, TRONO_X, pisa(TRONO) + 1, TRONO_Z, NORTE, Re, 0, com.darkcraft.enemigos.Puestos.JEFE));
+        // la Sombra, encadenada en medio de su sala, de cara a la puerta (parte 7ac)
+        esperasAguja.add(new Espera("sombra", 0, 0, pisa(AZOTEA), 0, SUR, Re, 0, com.darkcraft.enemigos.Puestos.JEFE));
         // el patio: dos armaduras a los lados de la puerta (de pie, quietas) y dos de ronda por el camino
         centinela(0, -6, b, PZ_FUERA + 3, SUR, Re, 0, "patio");
         centinela(1, 5, b, PZ_FUERA + 3, SUR, Re, 0, "patio");

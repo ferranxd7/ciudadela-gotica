@@ -74,10 +74,12 @@ public final class Voces {
     private static final float[] BUFON = {0, 8.0f, 5.6f, 6.2f, 1.6f, 7.8f};
     private static final float[] DRAGON = {0, 9.18f, 5.88f, 2.82f, 1.66f, 4.59f};
     private static final float[] ISOLDE = {0, 8.98f, 2.33f, 4.6f, 3.42f, 3.74f, 4.74f};
-    // la Sombra en las cinematicas (1..6 la de inicio, 7..9 el viaje a Valdrenn), en la cadena del sur (21..23, parte 7aa) y al
-    // entrar en la torre del homenaje (24, parte 7ab); las 10..20 son las del capitulo 6 (van en su narracion)
+    // la Sombra en las cinematicas (1..6 la de inicio, 7..9 el viaje a Valdrenn), en la cadena del sur (21..23, parte 7aa), al
+    // entrar en la torre del homenaje (24, parte 7ab) y en la aguja (25..33, parte 7ac: ante la puerta, al despertar, a media vida, si
+    // cae su presa, al llamar a los caidos, al rendirse, golpeado o tomado su corazon, y al despertar otra vez); las 10..20 son las del
+    // capitulo 6 (van en su narracion)
     private static final float[] SOMBRA = {0, 2.26f, 4.23f, 3.56f, 6.57f, 5.44f, 3.17f, 6.06f, 5.98f, 4.63f,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.2f, 6.6f, 5.4f, 7.19f};
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.2f, 6.6f, 5.4f, 7.19f, 7.6f, 16.4f, 6.4f, 5.4f, 2.9f, 14.2f, 5.2f, 5.7f, 2.1f};
 
     static {
         try (InputStream in = Voces.class.getResourceAsStream("/assets/darkcraft/rey_voces.json")) {

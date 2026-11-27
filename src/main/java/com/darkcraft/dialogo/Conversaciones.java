@@ -39,17 +39,19 @@ public final class Conversaciones {
         if (!sp.isAlive() || sp.isSpectator() || sp.distanceToSqr(p) > (ALCANCE + 1) * (ALCANCE + 1)) return;
         Dialogos.Personaje d = Dialogos.de(p.dialogo());
         if (d == null) return;
-        if (!sp.isCreative() && Rol.enCombate(sp)) {
+        if (!sp.isCreative() && Rol.enCombate(sp) && !(p instanceof com.darkcraft.morvain.Corazon)) {
             Net.to(sp, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.dialogo.combate", 0));
             return;
         }
-        int nodo = p instanceof Guia g ? inicioGuia(sp, g) : inicio(sp, d.id());
+        int nodo = p instanceof Guia g ? inicioGuia(sp, g) : p instanceof com.darkcraft.morvain.Corazon ? com.darkcraft.morvain.Aguja.inicio(sp) : inicio(sp, d.id());
         Net.to(sp, new Net.Dialogo(p.getId(), d.id(), nodo));
-        Logros.dar(sp, switch (d.id()) {
+        String logro = switch (d.id()) {
             case "herrero" -> "dorvan";
             case "mercader" -> "kerrick";
+            case "sombra" -> null;
             default -> "maelis";
-        });
+        };
+        if (logro != null) Logros.dar(sp, logro);
         DarkCraftMod.LOGGER.info("[DarkCraft] {} habla con {} (nodo {})", sp.getGameProfile().getName(), d.id(), nodo);
     }
 
@@ -116,6 +118,9 @@ public final class Conversaciones {
             Net.to(sp, new Net.AbrirTienda(entidad, com.darkcraft.tienda.Tienda.comprados(sp)));
         } else if ("silbato".equals(accion) && e instanceof Guia) {
             darSilbato(sp);
+        } else if (("golpear".equals(accion) || "tomar".equals(accion)) && e instanceof com.darkcraft.morvain.Corazon c) {
+            // la respuesta a la Sombra (parte 7ac)
+            com.darkcraft.morvain.Aguja.elegir(sp, c, "golpear".equals(accion));
         }
     }
 

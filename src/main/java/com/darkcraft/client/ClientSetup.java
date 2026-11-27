@@ -95,6 +95,10 @@ public final class ClientSetup {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.GARGOLA.get(), com.darkcraft.client.enemigos.GargolaRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CENTINELA.get(), com.darkcraft.client.enemigos.CentinelaRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ISOLDE.get(), com.darkcraft.client.enemigos.IsoldeRenderer::new);
+        // la Sombra sin Nombre, sus lanzas y su corazon (parte 7ac)
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.SOMBRA.get(), com.darkcraft.client.enemigos.SombraRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.LANZA_SOMBRA.get(), ctx -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(ctx, 1.6f, true));
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CORAZON_SOMBRA.get(), com.darkcraft.client.morvain.CorazonRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PROYECTIL_DRAGON.get(), ctx -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(ctx, 3.2f, true));
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BALLENERO.get(), com.darkcraft.client.enemigos.BalleneroRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ARPON_BALLENERO.get(), com.darkcraft.client.enemigos.ArponBalleneroRenderer::new);
@@ -180,6 +184,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.GargolaModelo.CAPA, com.darkcraft.client.enemigos.GargolaGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CentinelaModelo.CAPA, com.darkcraft.client.enemigos.CentinelaGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.IsoldeModelo.CAPA, com.darkcraft.client.enemigos.IsoldeGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.SombraModelo.CAPA, com.darkcraft.client.enemigos.SombraGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.ViejaModelo.CAPA, com.darkcraft.client.enemigos.ViejaGeometria::crear);
     }
 }

@@ -508,6 +508,30 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_ISOLDE_MUERTE = sound("sfx.isolde_muerte");
     public static final RegistryObject<SoundEvent> AMBIENTE_HOMENAJE = sound("ambiente.homenaje");
     public static final RegistryObject<SoundEvent> SFX_PUERTA_HOMENAJE = sound("sfx.puerta_homenaje");
+    // la Sombra sin Nombre, en el Corazon de la Aguja (parte 7ac): sus cadenas (los tirones y como se rompen), el rugido, los
+    // zarpazos, el latigazo de la cadena, las manos del suelo, las lanzas, el giro, la niebla, la mirada (la carga y el rayo), el
+    // grito, los que le fallaron, el dolor, la caida y el latido de su corazon; la puerta de la aguja, el aire de la sala y el
+    // corazon (golpeado o tomado)
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_CADENAS = sound("sfx.sombra_cadenas");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_ROMPE = sound("sfx.sombra_rompe");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_RUGIDO = sound("sfx.sombra_rugido");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_ZARPAZO = sound("sfx.sombra_zarpazo");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_CADENA = sound("sfx.sombra_cadena");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_MANOS = sound("sfx.sombra_manos");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_LANZAS = sound("sfx.sombra_lanzas");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_GIRO = sound("sfx.sombra_giro");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_NIEBLA = sound("sfx.sombra_niebla");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_MIRADA_CARGA = sound("sfx.sombra_mirada_carga");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_MIRADA = sound("sfx.sombra_mirada");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_GRITO = sound("sfx.sombra_grito");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_CAIDOS = sound("sfx.sombra_caidos");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_DOLOR = sound("sfx.sombra_dolor");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_CAE = sound("sfx.sombra_cae");
+    public static final RegistryObject<SoundEvent> SFX_SOMBRA_LATIDO = sound("sfx.sombra_latido");
+    public static final RegistryObject<SoundEvent> SFX_PUERTA_AGUJA = sound("sfx.puerta_aguja");
+    public static final RegistryObject<SoundEvent> AMBIENTE_AGUJA = sound("ambiente.aguja");
+    public static final RegistryObject<SoundEvent> SFX_CORAZON_ROMPE = sound("sfx.corazon_rompe");
+    public static final RegistryObject<SoundEvent> SFX_CORAZON_TOMA = sound("sfx.corazon_toma");
     public static final RegistryObject<SoundEvent> AMBIENTE_ALTAR = sound("ambiente.altar");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
@@ -597,6 +621,8 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_BUFON = sound("musica.bufon");
     public static final RegistryObject<SoundEvent> MUSICA_DRAGON = sound("musica.dragon");
     public static final RegistryObject<SoundEvent> MUSICA_ISOLDE = sound("musica.isolde");
+    public static final RegistryObject<SoundEvent> MUSICA_SOMBRA_1 = sound("musica.sombra1");
+    public static final RegistryObject<SoundEvent> MUSICA_SOMBRA_2 = sound("musica.sombra2");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -681,7 +707,7 @@ public class DarkCraftMod {
      * entrar en la torre del homenaje; las 10..20 van juntas en la narracion del capitulo 6): en estereo, suenan sin sitio.
      */
     @SuppressWarnings("unchecked")
-    public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[25];
+    public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[34];
 
     static {
         for (int i = 1; i < REY_VOZ.length; i++) REY_VOZ[i] = sound("rey.voz." + i);
@@ -789,6 +815,9 @@ public class DarkCraftMod {
     public static final RegistryObject<Item> CUCHILLO_BUFON = ITEMS.register("cuchillo_bufon", () -> new Item(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> BOLA_BUFON = ITEMS.register("bola_bufon", () -> new Item(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> BOLA_DRAGON = ITEMS.register("bola_dragon", () -> new Item(new Item.Properties().stacksTo(16)));
+    /** Lo que se ve de la lanza de sombra y del corazon de la Sombra (parte 7ac): solo sirven para dibujarlos. */
+    public static final RegistryObject<Item> LANZA_SOMBRA_OBJETO = ITEMS.register("lanza_sombra", () -> new Item(new Item.Properties().stacksTo(16)));
+    public static final RegistryObject<Item> CORAZON_SOMBRA_OBJETO = ITEMS.register("corazon_sombra", () -> new Item(new Item.Properties().stacksTo(1)));
 
     /** Las piezas de La Garza Gris (parte 3b): no se llevan en el inventario; se dibujan en el mundo y en los carteles. */
     public static final RegistryObject<Item> PIEZA_VELA = ITEMS.register("pieza_vela", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
@@ -948,6 +977,17 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Isolde>> ISOLDE = ENTITIES.register("isolde",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Isolde>of(com.darkcraft.enemigos.Isolde::new, MobCategory.MONSTER)
                     .sized(0.9f, 2.9f).fireImmune().clientTrackingRange(12).updateInterval(1).build(MODID + ":isolde"));
+    // ---- la Sombra sin Nombre, el jefe final, en el Corazon de la Aguja (parte 7ac): muy alta (el modelo va a 2,4), flota; sus
+    // lanzas de sombra y su corazon (sale de su pecho cuando se rinde: se habla con el como con un personaje)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Sombra>> SOMBRA = ENTITIES.register("sombra",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Sombra>of(com.darkcraft.enemigos.Sombra::new, MobCategory.MONSTER)
+                    .sized(1.8f, 6.0f).fireImmune().clientTrackingRange(14).updateInterval(1).build(MODID + ":sombra"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.LanzaSombra>> LANZA_SOMBRA = ENTITIES.register("lanza_sombra",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.LanzaSombra>of(com.darkcraft.enemigos.LanzaSombra::new, MobCategory.MISC)
+                    .sized(0.4f, 0.4f).noSave().clientTrackingRange(10).updateInterval(1).build(MODID + ":lanza_sombra"));
+    public static final RegistryObject<EntityType<com.darkcraft.morvain.Corazon>> CORAZON_SOMBRA = ENTITIES.register("corazon_sombra",
+            () -> EntityType.Builder.<com.darkcraft.morvain.Corazon>of(com.darkcraft.morvain.Corazon::new, MobCategory.MISC)
+                    .sized(0.8f, 0.9f).fireImmune().noSave().clientTrackingRange(10).build(MODID + ":corazon_sombra"));
     // ---- Ser Lucan, el Jinete Nocturno del camino de nubes (parte 7x): el caballo y su jinete, una sola entidad (va deprisa:
     // la posicion se manda cada tick para que el galope se vea suave)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Jinete>> JINETE = ENTITIES.register("jinete",
@@ -1173,6 +1213,8 @@ public class DarkCraftMod {
         e.put(GARGOLA.get(), com.darkcraft.enemigos.Gargola.atributos().build());
         e.put(CENTINELA.get(), com.darkcraft.enemigos.Centinela.atributos().build());
         e.put(ISOLDE.get(), com.darkcraft.enemigos.Isolde.atributos().build());
+        e.put(SOMBRA.get(), com.darkcraft.enemigos.Sombra.atributos().build());
+        e.put(CORAZON_SOMBRA.get(), com.darkcraft.morvain.Corazon.atributos().build());
         e.put(MARCADO.get(), com.darkcraft.enemigos.Marcado.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());

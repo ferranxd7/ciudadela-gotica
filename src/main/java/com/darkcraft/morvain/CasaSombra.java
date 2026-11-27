@@ -107,8 +107,6 @@ public final class CasaSombra {
             int[] rj = Homenaje.get().sitio("reja_azotea");
             if (Homenaje.planta(y) == Homenaje.TRONO && p.distanceToSqr(rj[0] + 0.5, rj[1], rj[2] + 0.5) < 3.5 * 3.5 && !reinaCaida(m))
                 avisar(p, t, "darkcraft.homenaje.reja");
-            int[] ps = Homenaje.get().sitio("puerta_sombra");
-            if (Homenaje.enAzotea(x, y, z) && p.distanceToSqr(ps[0] + 0.5, ps[1], ps[2] + 0.5) < 4 * 4) avisar(p, t, "darkcraft.homenaje.aguja");
         }
         if (!alguien) return;
         if (t % 20 == 3) {

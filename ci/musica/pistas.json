@@ -301,5 +301,27 @@
     "aviso": "Music by ProjectHelmet (OpenGameArt, CC-BY 4.0)",
     "uso": "La reina Isolde (el salon del trono de la ciudadela de Morvain)",
     "lufs": -16
+  },
+  {
+    "id": "sombra1",
+    "pagina": "https://opengameart.org/node/73591",
+    "busca": "the_final_battle",
+    "titulo": "The Final Battle",
+    "autor": "skrjablin",
+    "licencia": "CC0",
+    "aviso": "Music by skrjablin (OpenGameArt, public domain)",
+    "uso": "La Sombra sin Nombre, primera mitad (el Corazon de la Aguja de la ciudadela de Morvain)",
+    "lufs": -16
+  },
+  {
+    "id": "sombra2",
+    "pagina": "https://opengameart.org/content/epic-endgame-cinematic",
+    "busca": "endgame",
+    "titulo": "Epic Endgame Cinematic",
+    "autor": "cynicmusic",
+    "licencia": "CC0",
+    "aviso": "Music by cynicmusic (OpenGameArt, CC0)",
+    "uso": "La Sombra sin Nombre, segunda mitad (cuando rompe la ultima cadena)",
+    "lufs": -16
   }
 ]

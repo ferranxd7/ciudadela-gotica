@@ -459,7 +459,8 @@ public final class ReyCliente {
                 || tc.getKey().equals("entity.darkcraft.ballenero") || tc.getKey().equals("entity.darkcraft.pontifice")
                 || tc.getKey().equals("entity.darkcraft.aldric") || tc.getKey().startsWith("entity.darkcraft.gigante_")
                 || tc.getKey().equals("entity.darkcraft.jinete") || tc.getKey().equals("entity.darkcraft.bufon")
-                || tc.getKey().equals("entity.darkcraft.dragon") || tc.getKey().equals("entity.darkcraft.isolde")) {
+                || tc.getKey().equals("entity.darkcraft.dragon") || tc.getKey().equals("entity.darkcraft.isolde")
+                || tc.getKey().equals("entity.darkcraft.sombra")) {
             com.darkcraft.client.enemigos.GuardianCliente.barra(e, ticks, tc.getKey().substring("entity.darkcraft.".length()));
             return;
         }

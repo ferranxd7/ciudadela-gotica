@@ -3385,7 +3385,7 @@ los ratos en que era ella, escribio un diario (el libro perdido 35).
   mientras la reina pelea (barreras sobre lo alto de la escalera que sube de la capilla, `sello()`: x `SX0` -6 a `SX1` -1, z -23 a
   -20, tres de alto; quien este en medio pasa al salon; cortina de chispas; un sello que se quedo puesto al cerrar el servidor se quita);
   la **reja de la azotea**, abierta con el puesto de la reina caido (y cerrada si vuelve: `revisar`). Avisos `darkcraft.homenaje.sello`,
-  `.reja` y `.aguja`. `resumen`, `cerrarRastrillo`, `abrirRastrilloYa`, `olvidar` para las pruebas y los comandos.
+  `.reja` (y `.aguja`, que desde la 7ac ya no sale). `resumen`, `cerrarRastrillo`, `abrirRastrilloYa`, `olvidar` para las pruebas y los comandos.
 - **La Ultima Llama** (`SantuariosMorvain.ULTIMA`, id `ultima_llama`: en `todos()`, sin tarima; la escribe `Homenaje`).
 - **Maelis en la capilla** (`Dialogos.GUIA` 15 → 16 → menu; `Conversaciones.inicioGuia(sp, guia)`: con la guia en la capilla, la
   primera vez 15 —bit 16, `GUIA_CAPILLA`—, despues 16, y con la reina ya caida 14). Voz "Autumn Veil", frases 15 y 16 (tomas a).
@@ -3442,6 +3442,88 @@ los ratos en que era ella, escribio un diario (el libro perdido 35).
   se levanta (`mv553`), grita (`mv554`), las garras (`mv555`), el abrazo (`mv556`) y el aprieto (`mv557`), la nana (`mv558`) y los ojos
   cerrados (`mv559`), desvanecerse (`mv560`), el velo que arde (`mv561`), las lagrimas (`mv562`), su corte (`mv563`), cae (`mv564`), la
   reja abierta (`mv565`), la azotea (`mv566`) y el bestiario (`mv567`).
+
+### Plan grande, parte 7ac: el Corazon de la Aguja (la Sombra sin Nombre, el jefe final)
+
+Tercera de las partes del final (respuestas 57, 65, 88, 122 y 125 del plan). La Sombra espera encadenada en la aguja de lo alto de la
+ciudadela desde hace mil inviernos; trajo de vuelta a cada marcado para que alguien le abriera la puerta. El final (las cinematicas, el
+epilogo de Maelis con sus frases 17-23 ya montadas, los creditos y el cielo de Morvain segun como acabo) es la parte 7ad.
+- **La sala de la aguja** (`Ciudadela.aguja` y `Homenaje.aguja`): la aguja (`Ciudadela.RAG` 16 de radio, cuerpo de `CUERPO` 48, punta
+  `PUNTA` 54) con ventanales rojos en arco y franjas de gemas; dentro (`Homenaje.R_AGUJA` 14, techo `TECHO_AGUJA`) el suelo es la marca
+  de la Sombra en gemas (el ojo con la pupila de rendija, el aro roto con sus puas, los goterones hacia la puerta) con un anillo dorado;
+  seis pilares (`PILARES_AGUJA`, a `R_PILAR` 11,5; angulo 0 = el sur) con su **grillete** a `GRILLETE` 14 de alto (hierro negro, la
+  cadena rota colgando y un farol de almas encima), seis faroles colgados, la corona de cadenas del centro y dos braseros junto a la
+  puerta. **La puerta** (en la azotea, al norte: `puertaAguja()`, 2 de ancho, 4 de alto, el grueso del muro; `sello(x, y, z)`: obsidiana
+  que llora por dentro, gemas en medio, piedra negra cincelada) con su marco dorado y dos braseros. `enAguja(x, y, z)`; sitios
+  `puerta_sombra`, `aguja`, `corazon`, `aguja_fondo`; la espera de la Sombra en `esperasAguja()` (el puesto `SOMBRA` 0, en su propio
+  sitio `MorvainEnemigos.AGUJA`, grupo `Puestos.JEFE`, colgada: `REZA`). El Espejo: "El Corazon de la Aguja" (`darkcraft.morvain.lugar.aguja`).
+- **Lo que pasa** (`morvain/Aguja`, desde `Morvain.onTick`, con su propio contador de ticks: las pruebas lo llaman sin que pase el tiempo
+  del mundo): ante la puerta cerrada la Sombra dice su frase **25** ("Ahi esta... la puerta que nunca pude abrir. Pon la mano en ella,
+  marcado. Dejame salir."; bit 16 de la marca `sombra_cadena`); **poner la mano** (la tecla del aviso: `client/morvain/ClientAguja` →
+  `ClientRol.PUERTA` → `Net.PuertaAguja`; o clic derecho en ella) con la reina Isolde caida (si no: `darkcraft.aguja.no_cede`): el sello
+  tiembla 1,5 s y se deshace bloque a bloque de abajo arriba (`sfx.puerta_aguja`); queda abierta para siempre (`aguja_puerta` en los
+  datos de Morvain; si un chunk la trae cerrada, se quita una vez por sesion). **El sello** mientras pelea la Sombra (barreras en el hueco,
+  cortina de chispas; quien este en medio pasa dentro). Dentro, el logro `aguja`. El aviso viejo de la 7ab (`darkcraft.homenaje.aguja`)
+  ya no sale.
+- **La Sombra sin Nombre** (`enemigos/Sombra`, `Guardian`, entidad `darkcraft:sombra`, 1,8 x 6; 2800 de vida, golpe 15, armadura 8; el
+  modelo de `tools/enemigos/sombra.py` a 2,4: capucha sin cara con los ojos rojos, la corona rota de Corvin flotando encima, el manto de
+  placas de hueso con puas, el pecho abierto con el corazon que late, brazos largos con grilletes y garras, la tunica en jirones que acaba
+  en humo; variante 1 = la furia: seis ojos, grietas rojas y el bajo de la tunica ardiendo). Espera **colgada de sus cadenas** (el
+  dibujante, `client/enemigos/SombraRenderer`, dibuja cuatro cadenas con la textura del juego desde donde estan de verdad sus munecas y su
+  espalda en la animacion hasta los grilletes de los pilares del este, oeste y de detras: `Sombra.anclas()`); colgada no se le puede pegar.
+  Ve a quien entra en la sala. **Despierta**: si alguno de los de la sala no la ha oido (bit 32), la **larga** (`DESPIERTA`, 17,6 s: su
+  frase **26** —el discurso— mientras tira tres veces de las cadenas y en el tick 332 las rompe: `sfx.sombra_rompe`, eslabones por el
+  aire); si no, la **corta** (`DESPIERTA_CORTA`, frase **33** "¿Otra vez aqui? Bien.", rompe en el 52). Ruge (la onda empuja). Sus
+  frases suenan sin sitio con subtitulo (`Net.SombraDice`, `+ YA` corta la que sonaba: `ClientCadena.sombraYa`). **Zarpazos** (dos),
+  **giro** (todo alrededor, empuja), el **latigazo de la cadena** (de 4 a 15: apunta en el tick 12 y el eslabon vuela en linea; a quien
+  pilla —a 1,1 de la linea— lo arrastra hacia ella), las **manos** (golpea el suelo: bajo los pies de cada uno sale a los 26 ticks una
+  mano de cinco dedos de piedra de sombra —`EfectosRaiz.estaca`— que agarra y frena), las **lanzas** (`enemigos/LanzaSombra`, tres en
+  abanico, cinco con la furia; dano de sombra y debilidad) y la **niebla** (del tick 6 al 17 no se le puede pegar; aparece a la espalda
+  de su presa —`Enemigo.fijarRumbo`— y le echa los zarpazos). **A media vida rompe la ultima cadena** (frase **27** "¡Basta! Eres
+  MIO...": `FURIA`, la variante 1 en su tick 32; otro tema de musica): la **mirada** (sube, carga y el rayo rojo de sus ojos al suelo, a
+  12 bloques, barre 140 grados del tick 31 al 61: `Sombra.rumboMirada`/`rayoSuelo`, lo dibuja el cliente con la misma cuenta; de cerca
+  pasa por encima), el **grito** (radio 10: empuja, dana y oscurece) y **los que le fallaron** (frase **29** la primera vez: marcados
+  efimeros que se alzan del suelo, 2 + 1 por jugador de mas, hasta 4). Si cae su presa, la frase **28**. Sin presa 110 ticks: vuelve a lo
+  suyo, se cura, sus dos ojos, y al rato **vuelve a colgar de sus cadenas**.
+- **No muere de un golpe** (`Sombra.setHealth`: la vida que fuera a quedar a cero se queda en 1): **se rinde** (`rendirse`: deja de
+  pelear sin curarse —`Guardian.rendirPelea`—, se apunta `sombra_rendida` en los datos de Morvain —si el servidor se cierra vuelve a
+  salir de rodillas: `yaRendida`—, no se mueve, `CAE` de rodillas en el aire y despues el bucle `RODILLAS`); a los 18 ticks ofrece su
+  corazon (frase **30**: "Espera... espera, marcado. Toma mi corazon. Lleva mi corona... y la muerte no volvera a tocarte. O golpea... y
+  vuelve a morir como todos los demas. Contestame.") y a los 62 sale **el corazon** (`morvain/Corazon`, un `PersonajeBase` sin guardar:
+  flota delante de su pecho latiendo —`client/morvain/CorazonRenderer`, el objeto `corazon_sombra` en cubos a plena luz—). Se habla con el
+  (la tecla del aviso o clic derecho): su dialogo `Dialogos.SOMBRA` (retrato `retratos/sombra.png`): quien oyo la oferta empieza por
+  las respuestas, quien no por la 30 (`Aguja.inicio`): **golpear el corazon** (`Accion.GOLPEAR`), **tomarlo** (`Accion.TOMAR`) o no decir
+  nada. Golpearlo con el arma tambien es responder "golpear" (cuando ya ha acabado de ofrecerlo). Al responder (`Aguja.elegir`): el
+  corazon se rompe (`sfx.corazon_rompe`) o vuela al pecho de quien lo toma (`sfx.corazon_toma`, oscuridad); la Sombra dice su ultima
+  frase (**31** "No... yo esperaba... siempre esperaba... que frio..." o **32** "Si... Ahora esperaras tu... como espere yo.") y al
+  acabarla muere de verdad y se deshace subiendo: el reparto de `Guardianes` (JEFE ABATIDO, 60000 ecos, logro `sombra` —hazana— y el
+  bestiario) y `Aguja.alMorir`: se apunta como acabo para todos (`final_alba` / `final_sombra`; y en la ficha de quien respondio,
+  `sombra_final` 1 o 2), **el cielo rojo se apaga** (`CieloRojo.apagar(srv, true)`) y los logros del final a los de la sala: `alba` (o
+  `nueva_sombra` a quien tomo el corazon). Deja cuatro piedras de forja III.
+- **Barra, musica, voz**: barra propia (`tools/hud/barra_guardianes.py` "sombra": sus cadenas rotas por tres sitios con las puntas al
+  rojo, la capucha sin cara con los ojos y la corona rota; oscuridad con venas rojas que laten; jirones y chispas que suben); musica
+  "The Final Battle" de skrjablin (dominio publico, id `sombra1`, tema 47) hasta media vida y "Epic Endgame Cinematic" de cynicmusic
+  (CC0, id `sombra2`, tema 48) despues (`Sombra.musica()` segun la variante); el aire de la sala (`ambiente.aguja`, master
+  `aguja_ambiente`, en `ClientMusic.tickCrater`, `craterCual` 3). Voz: la de siempre de la Sombra ("Grav"), frases 25-33 con su susurro
+  (`TOMAS_SOMBRA`/`SUSURROS_SOMBRA`; la 30 tambien como voz de dialogo, `voz.sombra.30`). Efectos (ElevenLabs, `TOMAS_SFX`):
+  `sombra_cadenas`, `_rompe`, `_rugido`, `_zarpazo`, `_cadena`, `_manos`, `_lanzas`, `_giro`, `_niebla`, `_mirada_carga`, `_mirada`,
+  `_grito`, `_caidos`, `_dolor`, `_cae`, `_latido`, `puerta_aguja`, `aguja_ambiente`, `corazon_rompe`, `corazon_toma`. Las frases de
+  Maelis del epilogo (17-23) ya se montan (`TOMAS_GUIA`), para la 7ad.
+- Arte: `tools/morvain/aguja_arte.py` (la lanza, el corazon —textura y modelo en cubos— y el retrato). Logros `aguja`, `sombra`
+  (hazana), `alba` y `nueva_sombra` (hazanas ocultas), con su entrada del diario (`Espejo.ORDEN_LOGROS`).
+- Comandos `/darkcraft aguja [ir | abrir | cerrar | olvidar]` y `/darkcraft sombra [ir | vencer | volver | media | golpear | tomar |
+  zarpazos | giro | cadena | manos | lanzas | niebla | mirada | grito | caidos]` (`vencer` = que se rinda ya; `volver` = todo como al
+  principio: sin rendir ni final, su puesto en pie).
+- Para las pruebas: `CieloRojo.copia` / `restaurar` (lo dejan como estaba), `Sombra.quieta`, `probar`, `mediaVida`, `vencer`, `estado` y
+  contadores; `Aguja.resumen`, `reiniciar`, `cerrar`, `abrir(m, true)`.
+- Pruebas: servidor, `sombra()` (`Morvain, la aguja: ...` —la puerta con la reina en pie y caida, la Sombra colgada, lo que ve, despierta
+  (la corta y la larga), rompe, la puerta sellada, los golpes, la niebla—, `Morvain, la Sombra a media vida: ...` y `Morvain, la Sombra se
+  rinde: ...` —un golpe de muerte la rinde, el corazon, golpearlo antes de tiempo no cuenta, golpearlo y, otra vez, tomarlo: muere, su
+  puesto caido, el final, el cielo rojo apagado; despues todo como estaba—). Cliente, tramo `aguja()` despues del homenaje: la puerta con
+  la Sombra y el aviso (`cliente_mv570`), el sello que se deshace (`mv571`), la Sombra encadenada (`mv572`), los tirones (`mv573`), las
+  cadenas rotas (`mv574`), el rugido (`mv575`), zarpazos, giro, cadena, manos, lanzas y niebla (`mv576..581`), la furia (`mv582`), la
+  mirada (`mv583`), el grito (`mv584`), los caidos (`mv585`), rendida con el corazon (`mv586`), las respuestas (`mv587`), su ultima frase
+  (`mv588`), se deshace (`mv589`), la sala vacia (`mv590`) y el bestiario (`mv591`). `LIMIT` 132 min (`lanzar.sh` 138, el paso 166, el trabajo 214).
 
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 

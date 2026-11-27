@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "22";
+    private static final String V = "23";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -162,6 +162,9 @@ public final class Net {
                 .encoder(Rafaga::write).decoder(Rafaga::read).consumerMainThread(Rafaga::handle).add();
         CH.messageBuilder(SombraDice.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(SombraDice::write).decoder(SombraDice::read).consumerMainThread(SombraDice::handle).add();
+        // el Corazon de la Aguja (parte 7ac): poner la mano en la puerta
+        CH.messageBuilder(PuertaAguja.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder((m, b) -> {}).decoder(b -> new PuertaAguja()).consumerMainThread(PuertaAguja::handle).add();
     }
 
     // ------------------------------------------------------------------ la cadena del sur (parte 7aa)
@@ -189,8 +192,13 @@ public final class Net {
         }
     }
 
-    /** La Sombra le dice a ese jugador su frase {@code n} (sin sitio, con su subtitulo). */
+    /**
+     * La Sombra le dice a ese jugador su frase {@code n} (sin sitio, con su subtitulo). Con {@link #YA} sumado, corta lo que estuviera
+     * diciendo y la dice ya (la pelea de la aguja, parte 7ac).
+     */
     public record SombraDice(int n) {
+        public static final int YA = 64;
+
         void write(FriendlyByteBuf b) {
             b.writeByte(n);
         }
@@ -200,7 +208,19 @@ public final class Net {
         }
 
         void handle(Supplier<NetworkEvent.Context> ctx) {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.morvain.ClientCadena.sombra(n));
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+                if (n >= YA) com.darkcraft.client.morvain.ClientCadena.sombraYa(n - YA);
+                else com.darkcraft.client.morvain.ClientCadena.sombra(n);
+            });
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El jugador pone la mano en la puerta de la aguja (la tecla del aviso, parte 7ac). */
+    public record PuertaAguja() {
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.morvain.Aguja.tocar(p);
             ctx.get().setPacketHandled(true);
         }
     }

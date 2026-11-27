@@ -69,9 +69,13 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   caen por debajo; relleno de seda carmesi con pliegues que corren y un hilo de plata; petalos negros y rojos, lagrimas y chispas
   de plata que caen meciendose al recibir dano.
 
+  La Sombra sin Nombre (parte 7ac): sus cadenas de hierro negro de punta a punta, rotas por tres sitios (las puntas al rojo), y en
+  el centro la capucha sin cara (la oscuridad y dos ojos rojos) con la corona rota de Corvin flotando encima; relleno de oscuridad
+  con venas rojas que laten; jirones de sombra y chispas rojas que suben al recibir dano.
+
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
 abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png, pontifice_barra.png, aldric_barra.png,
-gigante_barra.png, jinete_barra.png, bufon_barra.png, dragon_barra.png e isolde_barra.png (256x128):
+gigante_barra.png, jinete_barra.png, bufon_barra.png, dragon_barra.png, isolde_barra.png y sombra_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -2391,6 +2395,104 @@ def petalos():
     return img
 
 
+# ---------------------------------------------------------------- la Sombra sin Nombre (parte 7ac)
+
+SB_K = [hexc(c) for c in ("020103", "07040a", "0e0812", "17101e", "21172b")]
+
+
+def marco_sombra():
+    """Las cadenas de la Sombra de punta a punta, rotas por tres sitios (las puntas de los eslabones partidos, al rojo), y en el centro
+    la capucha sin cara: la oscuridad, sus dos ojos rojos y, flotando encima, la corona rota de Corvin (el oro viejo, partido)."""
+    img = marco_aldric()
+    mx = FW // 2
+    # fuera la marca del centro (y lo que le caia): ahi va la capucha
+    rect(img, mx - 16, 0, mx + 16, FY0 - 2, (0, 0, 0, 0))
+    # tres roturas en la cadena: se quita un trozo de un aro y las puntas quedan al rojo
+    for bx in (52, 172, 214):
+        rect(img, bx, FY0 - 5, bx + 2, FY0 - 2, (0, 0, 0, 0))
+        put(img, bx - 1, FY0 - 4, MR_L)
+        put(img, bx - 1, FY0 - 3, MR)
+        put(img, bx + 3, FY0 - 4, MR_L)
+        put(img, bx + 3, FY0 - 3, MR_H)
+    # la capucha: un arco apuntado de tela negra que cae hasta la banda, con su filo algo mas claro
+    for y in range(4, FY0 - 1):
+        for x in range(mx - 14, mx + 15):
+            h = (y - 4) / (FY0 - 5)
+            medio = 4.0 + 9.5 * min(1.0, h * 1.35)
+            if abs(x + 0.5 - mx) > medio:
+                continue
+            borde = abs(x + 0.5 - mx) > medio - 1.6
+            c = SB_K[3] if borde else SB_K[2]
+            if borde and y < 8:
+                c = SB_K[4]
+            put(img, x, y, c)
+    # dentro, la oscuridad (un ovalo negro) y los ojos
+    for y in range(7, FY0 - 1):
+        for x in range(mx - 8, mx + 9):
+            e = ((x + 0.5 - mx) / 6.4) ** 2 + ((y + 0.5 - 12.5) / 6.0) ** 2
+            if e <= 1.0:
+                put(img, x, y, SB_K[0] if e < 0.7 else SB_K[1])
+    for ex in (mx - 4, mx + 3):
+        put(img, ex, 12, MR_L)
+        put(img, ex + (1 if ex < mx else -1), 12, MR)
+        put(img, ex, 11, MR_D)
+    # la corona rota, flotando encima (ladeada: mas alta a la izquierda) y partida en medio
+    for x in range(mx - 7, mx + 8):
+        if x in (mx, mx + 1):
+            continue
+        yy = 2 + (1 if x > mx + 2 else 0)
+        put(img, x, yy, IS_O[2] if x % 3 else IS_O[3])
+        put(img, x, yy + 1, IS_O[1])
+    for px, alto in ((mx - 6, 2), (mx - 2, 3), (mx + 3, 2), (mx + 6, 1)):
+        base = 2 + (1 if px > mx + 2 else 0)
+        for k in range(alto):
+            put(img, px, base - 1 - k, IS_O[3] if k < alto - 1 else IS_O[4])
+    put(img, mx - 2, 2, MR_L)
+    # contorno de la capucha y la corona
+    antes = img.copy()
+    for y in range(0, FY0 - 1):
+        for x in range(mx - 17, mx + 18):
+            if antes.getpixel((x, y))[3] == 0 and any(0 <= x + a < FW and 0 <= y + b < 40 and antes.getpixel((x + a, y + b))[3] > 0
+                                                       for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                put(img, x, y, OUT)
+    return img
+
+
+def relleno_sombra(k):
+    """La vida de la Sombra: la oscuridad que corre con venas rojas que laten."""
+    n = noise2(733)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            t = 0.1 + 0.25 * mid + 0.4 * (n((x - k * 3) * 0.08, y * 0.6) - 0.5)
+            c = mix(SB_K[0], SB_K[4], max(0.0, min(1.0, t)))
+            vena = (x - k * 3 + int(4 * math.sin((x * 0.13) + y * 0.9))) % 23
+            if vena in (0, 1) and 1 <= y <= 5:
+                c = mix(c, MR if vena == 0 else MR_L, 0.75)
+            if y == 3 and (x - k * 3) % 37 < 3:
+                c = mix(c, MR_H, 0.4)
+            if y == 0:
+                c = mix(c, MR_D, 0.25)
+            if y == 6:
+                c = mix(c, SB_K[0], 0.6)
+            img.putpixel((x, y), c)
+    return img
+
+
+def jirones():
+    """Lo que salta al recibir dano (sube: lo hace el cliente): jirones de sombra y chispas rojas."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = ([".k.", "kKk", ".k."], ["k.", "kk", ".k"], [".r.", "rRr", ".r."], ["r", "R"])
+    col = {"k": SB_K[3], "K": SB_K[4], "r": MR, "R": MR_H}
+    for i, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, i * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 def hueco(a, b):
     n = noise2(113)
     img = Image.new("RGBA", (240, 7))
@@ -2438,6 +2540,7 @@ if __name__ == "__main__":
         "bufon": atlas(marco_bufon(), relleno_bufon, hueco("0a0506", "1c0d10"), rastro("fff4e8", "f0c8a0"), confeti()),
         "dragon": atlas(marco_dragon(), relleno_dragon, hueco("070505", "180e0b"), rastro("fff2e0", "f0b080"), ascuas_dragon()),
         "isolde": atlas(marco_isolde(), relleno_isolde, hueco("060407", "140d16"), rastro("fff0f2", "e8b0bc"), petalos()),
+        "sombra": atlas(marco_sombra(), relleno_sombra, hueco("030204", "0e0a12"), rastro("ffe8e8", "e8a0a0"), jirones()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

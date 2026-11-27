@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:sombra",
+  "display": {
+    "icon": {
+      "item": "minecraft:sunflower"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.alba.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.alba.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 1000
+  }
+}
