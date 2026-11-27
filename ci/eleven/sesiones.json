@@ -1899,6 +1899,48 @@
      "lpaWJ5AckIHgcqtOYExT",
      "s24g8i6apmu6mkz74MJl"
     ]
+   },
+   "21": {
+    "prompt": "[very low, slow, cold, pleased] Yes... climb, marked one. [pause] Every link brings you closer to me.",
+    "prompt_susurro": "[whispers] Yes... climb, marked one. Every link brings you closer to me.",
+    "voz": [
+     "rcS1e4cuOVxiODSfM3Zq",
+     "Bz0JXhgxmH9PR953rycU"
+    ],
+    "susurro": [
+     "iTjIxH88CDSjqa9UWrMl",
+     "mT7incDq6anWe9lKUGux"
+    ],
+    "flow": "Mm0FdcLcpVa1l39aUIC2",
+    "nota": "Parte 7aa: la Sombra habla en la subida por la cadena del sur"
+   },
+   "22": {
+    "prompt": "[very low, slow, cold, amused] The first one rested here too... [pause] and then he ran. [pause] Will you run?",
+    "prompt_susurro": "[whispers] The first one rested here too... and then he ran. Will you run?",
+    "voz": [
+     "lVbpmEyzmFfzUcCOcOUG",
+     "LwWBfJp8NSsnYbIVJYYT"
+    ],
+    "susurro": [
+     "yxdGzifTbRqXGwwOpoag",
+     "OncCiUgjiK5jvHzjk3kz"
+    ],
+    "flow": "Mm0FdcLcpVa1l39aUIC2",
+    "nota": "Parte 7aa: la Sombra habla en la subida por la cadena del sur"
+   },
+   "23": {
+    "prompt": "[very low, slow, cold, hungry] There is no door, marked one... [pause] only my mouth. [pause] Come in.",
+    "prompt_susurro": "[whispers] There is no door, marked one... only my mouth. Come in.",
+    "voz": [
+     "DCCenqBwVq8E5S9kgnQ8",
+     "HayiXJs9e6vpfxvCbcjU"
+    ],
+    "susurro": [
+     "YDQ2SUfoqtANGQFWNEWA",
+     "pJMdijzMzrB7o2Qa5tMS"
+    ],
+    "flow": "Mm0FdcLcpVa1l39aUIC2",
+    "nota": "Parte 7aa: la Sombra habla en la subida por la cadena del sur"
    }
   }
  },
@@ -7421,6 +7463,223 @@
      "1EMLGokORe5z9Icb1lIi",
      "QEUERN95ZE9DDJustQqD",
      "q9LVkADF3EUTDLCzE84W"
+    ]
+   }
+  }
+ },
+ "sfx_cadena": {
+  "flow": "T96XJh7q5bh21jnYDQgI",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7aa: la subida por la cadena del sur (las gargolas, la rafaga, el crujido de la cadena, el aire de la cadena en bucle, la Boca y su latido). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "gargola_despierta": {
+    "prompt": "A stone gargoyle statue coming to life: cracking and grinding stone, small pebbles and dust falling, a low stony growl at the end, dark fantasy, 2.5 seconds",
+    "sesiones": [
+     "ncXwGbnZM4WEG4FxzL7V",
+     "c7ny2M1CuoecuNOrITQ9",
+     "9POc9M5nzMGJRl3saNDs",
+     "Nm6h9OtRUmwlTCw07RCT"
+    ],
+    "generaciones": [
+     "eru4MHmgQ0lgNJnM2S4a",
+     "OnPnuoB17fqsjBV4CZaa",
+     "BSo5s42kp7ACovkrhgHW",
+     "Vh0fNZ9tRAffdRzXJlep"
+    ]
+   },
+   "gargola_grito": {
+    "prompt": "A gargoyle screeching: a harsh, raspy, piercing monster shriek with a gravelly stone texture, echoing in the open sky, 1.5 seconds",
+    "sesiones": [
+     "gmQNoEYsQWMn7xA2yvbg",
+     "0Abrhn1tRiLXBgOYO184",
+     "s8FM0p1clhNy3qGbUZOM",
+     "xkRsuTTApGYfjt9ilgfh"
+    ],
+    "generaciones": [
+     "N1xVetMVy6C9uoI2MVU3",
+     "P7b5n7JXRnZPUkDcYcoI",
+     "4no9APoF4pNVc31jcypg",
+     "ZgI1Jml3qsi1owygvIFx"
+    ]
+   },
+   "gargola_aleteo": {
+    "prompt": "A stone-winged creature hovering in place: heavy rhythmic leathery wing beats with a faint grinding creak of stone joints, windy sky, seamless loop, 3 seconds",
+    "sesiones": [
+     "EkhE3WAgyip3kSGHPgfP",
+     "3vsid2abSWmlFFWqeoGo",
+     "lnEFwOpIXTS8APhuIv3e",
+     "xN1Gv4DoUszOBhSMZTEq"
+    ],
+    "generaciones": [
+     "YFosYubGTkO0tQKkHeqS",
+     "lIftckjPYnrn1r1IbUBs",
+     "tmOwQJPdbq0EaVSydNi5",
+     "9UwjhQodkkPmeTE7caOh"
+    ]
+   },
+   "gargola_picado": {
+    "prompt": "A winged monster diving fast through the air: a rising whoosh of rushing wind and a short screech as it swoops past, 1.5 seconds",
+    "sesiones": [
+     "GXsi86cDQcwQKGQzbx58",
+     "Z5ZAMJnmjYSa5TefO0PP",
+     "Ozxmon3Upki8A8pvOX6H",
+     "cZOSjDdjcSOSv3EnT43x"
+    ],
+    "generaciones": [
+     "tm1rI2I9pQeKt3ce8cJX",
+     "hqRrPFdRHx4KoV6MJQov",
+     "lmZGqVfN2JQS82uvItCv",
+     "SMrGvqWZ6GyeNs6GbfFW"
+    ]
+   },
+   "gargola_garras": {
+    "prompt": "Stone claws slashing quickly: two sharp scraping swipes and a hard grating hit, 1 second",
+    "sesiones": [
+     "UAnYO0gtW0l0vTrBCAqj",
+     "VN6YPQa0awUrZXGz9ClR",
+     "eJl1q3nEtQF6ZUk6Bj20",
+     "5zoghDZAjnNawfVPrbI7"
+    ],
+    "generaciones": [
+     "K0zXjmuUO41SgdfPy0UN",
+     "phmv0tgkB076ae9Bv3Sz",
+     "LSLNrtiCN5B7BVjCoWaE",
+     "0QezMgrkUS6ZX81CjIjh"
+    ]
+   },
+   "gargola_cola": {
+    "prompt": "A heavy stone tail sweeping through the air and smashing against wooden planks, a crack and a thud, 1 second",
+    "sesiones": [
+     "VwvRBMz0e0jWTbDGUH9r",
+     "6Mln8USzaWZwHsxhPOLe",
+     "Vj7oVbDGbAnGNSxKjAph",
+     "vgxjij1gnxHlyF2S4Udx"
+    ],
+    "generaciones": [
+     "BOFSU3jxyE3lXkK2CAWB",
+     "LYTvQvp0Zilo0l9sbjPQ",
+     "slHmwnmFsGRgLd2KeLbm",
+     "qtsDrwUw3G9V2p2jrukc"
+    ]
+   },
+   "gargola_aterriza": {
+    "prompt": "A heavy stone creature landing on old wooden planks: a hard thud, wood creaking and groaning, a little gravel scattering, 1 second",
+    "sesiones": [
+     "usWYFkFRJ1UqHkYwGkoe",
+     "Pf9RpXsMzwLA35zgPzqv",
+     "T0TJ4gSfZDDC0VCpgRqi",
+     "lWeBsYkcdnR6DTsplK5A"
+    ],
+    "generaciones": [
+     "OBe7TcP8oPngKcF68ftz",
+     "hpXGhdQxXXC1VWiH4Wv0",
+     "VDaC5fo06OO8f2HK5nRt",
+     "vOrNYqLBpvcxgxWGvbkK"
+    ]
+   },
+   "gargola_dolor": {
+    "prompt": "A stone gargoyle hurt: a short pained snarl with cracking stone, 0.8 seconds",
+    "sesiones": [
+     "MglSEKczoaMacZMOvZ2u",
+     "Az2dVF84CbnxNOCW5wxd",
+     "rXNFEBZ9iXyNczPiIflp",
+     "Bze1XQP3eBtjaOOSqWT3"
+    ],
+    "generaciones": [
+     "7BKuQyeLvTUxATFJO8IW",
+     "UUIfkHb4TrsbZO5Jmu9g",
+     "dxjlK0TiJw051uHZSXQ6",
+     "8gUkL9QOXXXLuT9bFlqS"
+    ]
+   },
+   "gargola_muerte": {
+    "prompt": "A gargoyle crumbling to pieces: stone cracking apart, chunks of rock breaking and tumbling down, a fading growl, settling dust, 2.5 seconds",
+    "sesiones": [
+     "eLUtcxhthGiK4jF4ebgm",
+     "zcjATcs2uA5ndPLohQ4b",
+     "M6IoxpeX7ZPkhxnvYYUM",
+     "QHz43P1SFVZ5MtOlxG6h"
+    ],
+    "generaciones": [
+     "Nam66sek3hxTx6PVwjLB",
+     "FBTom2xZALyHfnAwF8fZ",
+     "l61EFrRf0IT7KisRm1uo",
+     "pckTjCdwZr9iBaC6BsFk"
+    ]
+   },
+   "cadena_rafaga": {
+    "prompt": "A powerful gust of wind at a great height: a howl that builds up for a second and then rushes past violently with a roaring whoosh, then dies away, 3 seconds",
+    "sesiones": [
+     "aNQt8uSqgq7SXGEHsXgE",
+     "dlw0mCNl0V9XdBi2bmac",
+     "HVwjwY1D7D9Tl8d6Xigc",
+     "0CKrClwhg7k7Q7pdv5WC"
+    ],
+    "generaciones": [
+     "DaWcTasUjz9vADjHE1zd",
+     "wmdDEeIglAQzfFb3RJZ0",
+     "M20778vljF7vHXbVWK9F",
+     "aU7n7TH4O1ucpvkX13E8"
+    ]
+   },
+   "cadena_crujido": {
+    "prompt": "A colossal iron chain creaking under enormous tension: deep metallic groaning and grinding of huge links, distant and heavy, 3 seconds",
+    "sesiones": [
+     "YPuH2nJhcEeOk77Qr0un",
+     "YO9UOMkHkYDAHkZRHQSE",
+     "8o3JOxVz1So5yOcO91le",
+     "ZYY9Uyxh1DtVxBpUnpe0"
+    ],
+    "generaciones": [
+     "gEWm1HxJjB3hORm2YanF",
+     "hn3RuIigpCwzXhk3LZky",
+     "9FeGugGdQKoDAcD40gnd",
+     "z3QDPLuOsmUuLUQYUzIf"
+    ]
+   },
+   "cadena_ambiente": {
+    "prompt": "High-altitude ambience on a giant iron chain under a red sky: constant cold wind with soft gusts, distant deep creaking of huge iron links, faint ghostly whispers far away, seamless loop, 20 seconds",
+    "sesiones": [
+     "yHWbOiCMS4sPP6hn4uwG",
+     "gZSt3J2ouOVkzEo8ZCpG",
+     "FDBop0ZbyPLPPQF65vAT",
+     "QQawilTzWQzqtPVUMcdc"
+    ],
+    "generaciones": [
+     "JtTrea81ZDMTgFtl0qQK",
+     "fsqJfYutNaASReMdoVCg",
+     "7yRh6v2Ikz7Ys6yDbHGv",
+     "j1YRe8CcrbgRDC1RGyEZ"
+    ]
+   },
+   "boca_aliento": {
+    "prompt": "A colossal cavernous maw breathing out: a long, deep, warm exhale of wind from a huge cave mouth with a low rumbling growl underneath, 4 seconds",
+    "sesiones": [
+     "kxR5PretRV9zhR4UAvWd",
+     "yWBexb9eqExXHsT5wnWs",
+     "2uenvlyxVO7j8mARL0NI",
+     "8QKIbbcbOxgOG8yaRzeF"
+    ],
+    "generaciones": [
+     "ZDhgUMHmjSbdeFaxW7mg",
+     "XxNz1aTSNvxRvYhxqbHe",
+     "hP0OZhR4KtzeyGhsQ8Zy",
+     "iAHxgo0kUJNztAFQjRCQ"
+    ]
+   },
+   "boca_latido": {
+    "prompt": "A huge slow heartbeat echoing deep inside a stone cavern: two deep heavy thumps with a long reverberating tail, 2.5 seconds",
+    "sesiones": [
+     "QHme5DJEzWGN7s5nA7FH",
+     "agnHM2Zpj7aMrDnA1Yr3",
+     "tcGhqgC6EaZONvQvhwVa",
+     "mC8IWH4F0PaoAvx2tByc"
+    ],
+    "generaciones": [
+     "pO0r0VE3ZvFGKKiGlBes",
+     "RglixN8OsFP9n4YDlvlC",
+     "22Tqwyk85L8pzU2Y55uw",
+     "iF6X9LkHKUMr0Zc6pvfP"
     ]
    }
   }
