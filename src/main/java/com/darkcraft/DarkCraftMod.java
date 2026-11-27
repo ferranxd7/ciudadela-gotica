@@ -332,6 +332,21 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_SALOBRE_SAL = sound("sfx.salobre_sal");
     public static final RegistryObject<SoundEvent> SFX_SALOBRE_ALZARSE = sound("sfx.salobre_alzarse");
     public static final RegistryObject<SoundEvent> AMBIENTE_COSTA = sound("ambiente.costa");
+    // Brann, el Ballenero (parte 7r): el grito, el arpon que vuela, el tiron del cabo, el arponazo, el tajo (el cuchillo de
+    // descarnar), el farol de aceite que revienta, la Vieja que sale y su embestida, el dolor, la muerte y su espera de vigia;
+    // y el viento del Costillar
+    public static final RegistryObject<SoundEvent> SFX_BALLENERO_GRITO = sound("sfx.ballenero_grito");
+    public static final RegistryObject<SoundEvent> SFX_BALLENERO_ARPON = sound("sfx.ballenero_arpon");
+    public static final RegistryObject<SoundEvent> SFX_BALLENERO_TIRON = sound("sfx.ballenero_tiron");
+    public static final RegistryObject<SoundEvent> SFX_BALLENERO_ARPONAZO = sound("sfx.ballenero_arponazo");
+    public static final RegistryObject<SoundEvent> SFX_BALLENERO_CUCHILLO = sound("sfx.ballenero_cuchillo");
+    public static final RegistryObject<SoundEvent> SFX_BALLENERO_ACEITE = sound("sfx.ballenero_aceite");
+    public static final RegistryObject<SoundEvent> SFX_BALLENERO_VIEJA = sound("sfx.ballenero_vieja");
+    public static final RegistryObject<SoundEvent> SFX_BALLENERO_EMBESTIDA = sound("sfx.ballenero_embestida");
+    public static final RegistryObject<SoundEvent> SFX_BALLENERO_DOLOR = sound("sfx.ballenero_dolor");
+    public static final RegistryObject<SoundEvent> SFX_BALLENERO_MUERTE = sound("sfx.ballenero_muerte");
+    public static final RegistryObject<SoundEvent> SFX_BALLENERO_ESPERA = sound("sfx.ballenero_espera");
+    public static final RegistryObject<SoundEvent> AMBIENTE_COSTILLAR = sound("ambiente.costillar");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -412,6 +427,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_ABAD = sound("musica.abad");
     public static final RegistryObject<SoundEvent> MUSICA_CONDESTABLE = sound("musica.condestable");
     public static final RegistryObject<SoundEvent> MUSICA_RECTORA = sound("musica.rectora");
+    public static final RegistryObject<SoundEvent> MUSICA_BALLENERO = sound("musica.ballenero");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -465,6 +481,10 @@ public class DarkCraftMod {
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] RECTORA_VOZ = new RegistryObject[6];
 
+    /** Frases de Brann, el Ballenero (1..5, parte 7r). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] BALLENERO_VOZ = new RegistryObject[6];
+
     /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[10];
@@ -479,6 +499,7 @@ public class DarkCraftMod {
         for (int i = 1; i < ABAD_VOZ.length; i++) ABAD_VOZ[i] = sound("abad.voz." + i);
         for (int i = 1; i < CONDESTABLE_VOZ.length; i++) CONDESTABLE_VOZ[i] = sound("condestable.voz." + i);
         for (int i = 1; i < RECTORA_VOZ.length; i++) RECTORA_VOZ[i] = sound("rectora.voz." + i);
+        for (int i = 1; i < BALLENERO_VOZ.length; i++) BALLENERO_VOZ[i] = sound("ballenero.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -671,6 +692,19 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Red>> RED = ENTITIES.register("red",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Red>of(com.darkcraft.enemigos.Red::new, MobCategory.MISC)
                     .sized(0.5f, 0.5f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":red"));
+    // ---- Brann, el Ballenero, el jefe de la Costa de los Huesos (parte 7r): su arpon con su cabo, el farol de aceite y la Vieja
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Ballenero>> BALLENERO = ENTITIES.register("ballenero",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Ballenero>of(com.darkcraft.enemigos.Ballenero::new, MobCategory.MONSTER)
+                    .sized(1.2f, 3.1f).fireImmune().clientTrackingRange(10).build(MODID + ":ballenero"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.ArponBallenero>> ARPON_BALLENERO = ENTITIES.register("arpon_ballenero",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.ArponBallenero>of(com.darkcraft.enemigos.ArponBallenero::new, MobCategory.MISC)
+                    .sized(0.5f, 0.5f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":arpon_ballenero"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.FarolAceite>> FAROL_ACEITE = ENTITIES.register("farol_aceite",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.FarolAceite>of(com.darkcraft.enemigos.FarolAceite::new, MobCategory.MISC)
+                    .sized(0.4f, 0.4f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":farol_aceite"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Vieja>> VIEJA = ENTITIES.register("vieja",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Vieja>of(com.darkcraft.enemigos.Vieja::new, MobCategory.MISC)
+                    .sized(3.4f, 3.4f).fireImmune().noSave().noSummon().clientTrackingRange(12).updateInterval(1).build(MODID + ":vieja"));
     // ---- Hrodric, el Abad de la Cumbre, el jefe de las Montanas Nevadas (parte 7l)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Abad>> ABAD = ENTITIES.register("abad",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Abad>of(com.darkcraft.enemigos.Abad::new, MobCategory.MONSTER)
@@ -865,6 +899,7 @@ public class DarkCraftMod {
         e.put(RECTORA.get(), com.darkcraft.enemigos.Rectora.atributos().build());
         e.put(ERUDITO.get(), com.darkcraft.enemigos.Erudito.atributos().build());
         e.put(SALOBRE.get(), com.darkcraft.enemigos.Salobre.atributos().build());
+        e.put(BALLENERO.get(), com.darkcraft.enemigos.Ballenero.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());

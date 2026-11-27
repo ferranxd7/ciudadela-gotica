@@ -53,6 +53,11 @@ import java.util.List;
  * rederos remendando de rodillas en la plaza, en la lonja, en el muelle y en el espigon; bicheros de ronda o mirando al mar que no
  * esta (en el muelle, a la puerta y en lo alto del faro); salineros faenando en las salinas y enterrados en las costras de sal de
  * la bahia, junto a las barcas y dentro de la ballena.</li>
+ * <li><b>El Costillar de la Ballena</b> (sitio {@value #COSTILLAR}, parte 7r): Brann, el Ballenero, de rodilla bajo las costillas
+ * mirando al mar que no esta (el puesto 0, grupo de los jefes), y fuera dos rederos remendando junto a su choza, dos bicheros de
+ * ronda (por la cola y junto a la calavera) y un salinero enterrado en la sal junto a la aleta ({@link Costillar#esperas}). Con
+ * Brann caido, "vuelve la marea": los salobres que seguian faenando de rodillas (aqui y en el Puerto Varado) se deshacen en sal y
+ * ya no vuelven.</li>
  * </ul>
  * Nadie a menos de 18 bloques del arco ni de 14 de un santuario.
  */
@@ -62,10 +67,10 @@ public final class MorvainEnemigos {
     public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo",
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
             CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio",
-            PUERTO = "puerto";
+            PUERTO = "puerto", COSTILLAR = "costillar";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
-            ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre";
+            ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
@@ -75,7 +80,7 @@ public final class MorvainEnemigos {
             ARBOLEDA_P = new ArrayList<>(), PATIBULO_P = new ArrayList<>(), PILOTES_P = new ArrayList<>(), LAGUNA_P = new ArrayList<>(),
             BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>(), ERMITA_P = new ArrayList<>(), CUMBRE_P = new ArrayList<>(),
             CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>(),
-            PUERTO_P = new ArrayList<>();
+            PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -192,6 +197,10 @@ public final class MorvainEnemigos {
         // ---- el Puerto Varado (parte 7q): los salobres que apunta el plano
         for (Varadero.Espera e : Varadero.get().esperas())
             PUERTO_P.add(new Puesto(SALOBRE, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
+        // ---- el Costillar de la Ballena (parte 7r): Brann bajo las costillas (el puesto 0) y los salobres de alrededor
+        for (Costillar.Espera e : Costillar.get().esperas())
+            COSTILLAR_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? BALLENERO : SALOBRE, e.variante(), e.x(), e.y(), e.z(), e.giro(),
+                    e.postura(), e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -224,6 +233,11 @@ public final class MorvainEnemigos {
         return 0;
     }
 
+    /** El numero del puesto de Brann, el Ballenero, en el sitio del Costillar. */
+    public static int ballenero() {
+        return 0;
+    }
+
     /** Lo apunta el mod al arrancar. */
     public static void registrar() {
         Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
@@ -239,6 +253,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(ERUDITO, DarkCraftMod.ERUDITO);
         Puestos.tipo(RECTORA, DarkCraftMod.RECTORA);
         Puestos.tipo(SALOBRE, DarkCraftMod.SALOBRE);
+        Puestos.tipo(BALLENERO, DarkCraftMod.BALLENERO);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -261,7 +276,10 @@ public final class MorvainEnemigos {
         Puestos.registrar(ACADEMIA, ACADEMIA_P, Morvain::es, (l, p) -> p.postura() != REZA || !Observatorio.enPaz(l.getServer()));
         Puestos.registrar(OBSERVATORIO, OBSERVATORIO_P, Morvain::es,
                 (l, p) -> Puestos.JEFE.equals(p.grupo()) || p.postura() != REZA || !Observatorio.enPaz(l.getServer()));
-        Puestos.registrar(PUERTO, PUERTO_P, Morvain::es);
+        // los salobres que faenan de rodillas solo mientras vive Brann (vencido, vuelve la marea: se deshacen en sal)
+        Puestos.registrar(PUERTO, PUERTO_P, Morvain::es, (l, p) -> p.postura() != REZA || !Costillar.enPaz(l.getServer()));
+        Puestos.registrar(COSTILLAR, COSTILLAR_P, Morvain::es,
+                (l, p) -> Puestos.JEFE.equals(p.grupo()) || p.postura() != REZA || !Costillar.enPaz(l.getServer()));
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -281,6 +299,9 @@ public final class MorvainEnemigos {
             // y al caer la Rectora, los que leian en la academia descansan (lo hace Observatorio.paz cada segundo; aqui, el aviso)
             if (e instanceof com.darkcraft.enemigos.Rectora && OBSERVATORIO.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] La Rectora cae: el cielo deja de leer la academia");
+            // y al caer Brann vuelve la marea: los salobres que faenaban descansan (lo hace Costillar.paz cada segundo; aqui, el aviso)
+            if (e instanceof com.darkcraft.enemigos.Ballenero && COSTILLAR.equals(e.sitio()))
+                DarkCraftMod.LOGGER.info("[DarkCraft] Brann, el Ballenero, cae: vuelve la marea a la Costa de los Huesos");
         });
     }
 
@@ -352,6 +373,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> puerto() {
         preparar();
         return List.copyOf(PUERTO_P);
+    }
+
+    public static List<Puesto> costillar() {
+        preparar();
+        return List.copyOf(COSTILLAR_P);
     }
 
     public static List<Puesto> velmor() {
@@ -1082,6 +1108,69 @@ public final class MorvainEnemigos {
     }
 
     /**
+     * {@code /darkcraft ballenero [ir | vencer | volver | costillar <sitio>]} (parte 7r): como esta Brann, llevar ante el (a la
+     * entrada de la sala, entre las costillas de la cola), vencerle, que vuelva (y los salobres que faenaban, como estaban) o ir a
+     * un sitio del costillar.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoBallenero() {
+        return net.minecraft.commands.Commands.literal("ballenero")
+                .executes(c -> decir(c, estadoBallenero(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irCostillar(c.getSource(), "entrada")))
+                .then(net.minecraft.commands.Commands.literal("costillar")
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Costillar.get().sitios().keySet(), b))
+                                .executes(c -> irCostillar(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(COSTILLAR, ballenero());
+                    if (e instanceof com.darkcraft.enemigos.Ballenero b) b.vencer();
+                    else {
+                        Puestos.marcar(srv, COSTILLAR, ballenero(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "ballenero");
+                    }
+                    return decir(c, estadoBallenero(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, COSTILLAR, ballenero(), false);
+                    // los salobres que faenaban en el puerto y en el costillar vuelven a su sitio en cuanto salgan
+                    Puestos.todos(srv, PUERTO, false);
+                    Puestos.todos(srv, COSTILLAR, false);
+                    return decir(c, estadoBallenero(srv));
+                }));
+    }
+
+    private static int irCostillar(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Costillar.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Costillar.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando a Brann (al centro de la sala); desde la sala, hacia la calavera
+        double tx = Costillar.CX, tz = Costillar.CZ;
+        if (Math.hypot(tx - s[0], tz - s[2]) < 8) tx = Costillar.CX + Costillar.CRANEO_U0;
+        float giro = (float) (Math.toDegrees(Math.atan2(tz - s[2], tx - s[0])) - 90.0);
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
+        return decir(src, estadoBallenero(src.getServer()));
+    }
+
+    /** Como esta Brann (y su costillar, si esta cargado): para el comando y las pruebas. */
+    public static String estadoBallenero(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(COSTILLAR, ballenero());
+        String s = "el Ballenero: " + (Costillar.enPaz(srv) ? "caido (vuelve la marea)" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Ballenero b) s += ", " + b.estado();
+        s += "; salobres del costillar: quedan " + Puestos.quedan(srv, COSTILLAR) + " de " + COSTILLAR_P.size() + " (fuera " + Puestos.fuera(COSTILLAR)
+                + "), descansan " + Costillar.DESCANSAN;
+        var m = Morvain.nivel(srv);
+        int[] at = Costillar.get().sitio("atril");
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(at[0], at[1], at[2])) && m.isLoaded(new net.minecraft.core.BlockPos(Costillar.CX, Costillar.PISO, Costillar.CZ)))
+            s += "; " + Costillar.resumen(m);
+        return s;
+    }
+
+    /**
      * {@code /darkcraft condestable [ir | vencer | volver | patio <sitio> | rastrillo [bajar | subir]]} (parte 7n): como esta el
      * Condestable, llevar ante el (a la puerta del patio), vencerle, que vuelva (y la capital como estaba), ir a un sitio del patio
      * o mover el rastrillo a mano.
@@ -1195,6 +1284,7 @@ public final class MorvainEnemigos {
         todos.addAll(ACADEMIA_P);
         todos.addAll(OBSERVATORIO_P);
         todos.addAll(PUERTO_P);
+        todos.addAll(COSTILLAR_P);
         for (Puesto p : todos) {
             if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
             for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
@@ -1209,6 +1299,7 @@ public final class MorvainEnemigos {
                 + BARCA_P.size() + " en la barca, " + MONASTERIO_P.size() + " en el monasterio, " + ERMITA_P.size() + " en la escalera de la ermita y "
                 + CUMBRE_P.size() + " en la cumbre, " + CAPITAL_P.size() + " en la puerta oeste de la capital, " + JURAMENTO_P.size()
                 + " en el patio del Juramento, " + ACADEMIA_P.size() + " en la academia espectral, " + OBSERVATORIO_P.size()
-                + " en el observatorio, " + PUERTO_P.size() + " en el puerto varado; cerca del arco o de un santuario " + cerca;
+                + " en el observatorio, " + PUERTO_P.size() + " en el puerto varado, " + COSTILLAR_P.size()
+                + " en el costillar; cerca del arco o de un santuario " + cerca;
     }
 }

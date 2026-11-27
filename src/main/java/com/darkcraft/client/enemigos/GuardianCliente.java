@@ -24,7 +24,8 @@ import java.util.Random;
  * copos que caen meciendose) y la del Condestable del Juramento (parte 7n: el montante tumbado con los filos al rojo, el
  * gran yelmo y las manos alzadas de oro; fuego que corre y brasas que suben) y la de la Rectora de la Academia (parte 7p: el
  * baculo con su estrella, la aureola de estrellas y el telescopio; un cielo de noche que corre y estrellas que caen despacio,
- * titilando).
+ * titilando) y la de Brann, el Ballenero (parte 7r: el arpon tumbado con su cabo enrollado y la cola de la Vieja que sale del
+ * agua; un mar verde oscuro con olas de espuma; gotas de agua y cristales de sal que caen).
  * Las texturas las pinta tools/hud/barra_guardianes.py.
  */
 public final class GuardianCliente {
@@ -44,7 +45,10 @@ public final class GuardianCliente {
 
     private static final List<Gota> GOTAS = new ArrayList<>();
 
-    /** {@code nombre}: "brandt", "corteza", "molinera", "verdugo", "barquero", "abad", "condestable" o "rectora" (el de la clave de su nombre). */
+    /**
+     * {@code nombre}: "brandt", "corteza", "molinera", "verdugo", "barquero", "abad", "condestable", "rectora" o "ballenero" (el de la
+     * clave de su nombre).
+     */
     public static void barra(CustomizeGuiOverlayEvent.BossEventProgress e, int ticks, String nombre) {
         if (!e.isCancelable()) return;
         if (!nombre.equals(actual)) {
@@ -53,7 +57,7 @@ public final class GuardianCliente {
             ultimo = ticks - 100;
         }
         boolean hojas = nombre.equals("corteza"), ceniza = nombre.equals("molinera"), soga = nombre.equals("verdugo"), agua = nombre.equals("barquero"),
-                nieve = nombre.equals("abad"), fuego = nombre.equals("condestable"), cielo = nombre.equals("rectora");
+                nieve = nombre.equals("abad"), fuego = nombre.equals("condestable"), cielo = nombre.equals("rectora"), mar = nombre.equals("ballenero");
         e.setCanceled(true);
         GuiGraphics g = e.getGuiGraphics();
         Minecraft mc = Minecraft.getInstance();
@@ -100,7 +104,8 @@ public final class GuardianCliente {
                     // copos: caen despacio y se mecen
                     h.vy = Math.min(0.55f, h.vy + 0.03f);
                     h.x += h.vx * 0.6f + (float) Math.sin((h.edad + h.tipo * 9) * 0.25) * 0.6f;
-                } else if (actual.equals("corteza") || actual.equals("molinera") || actual.equals("verdugo") || actual.equals("barquero")) {
+                } else if (actual.equals("corteza") || actual.equals("molinera") || actual.equals("verdugo") || actual.equals("barquero")
+                        || actual.equals("ballenero")) {
                     h.vy = Math.min(0.9f, h.vy + 0.05f);
                     h.x += h.vx + (float) Math.sin((h.edad + h.tipo * 7) * 0.35) * 0.45f;
                 } else {
@@ -119,7 +124,8 @@ public final class GuardianCliente {
         g.pose().scale(sc, sc, 1f);
         g.pose().translate(-128, 0, 0);
         g.drawCenteredString(mc.font, Component.translatable("entity.darkcraft." + nombre), 128, -8,
-                hojas ? 0xFFB9F0C4 : ceniza ? 0xFFF2DDB8 : soga ? 0xFFE6D2B0 : agua ? 0xFFBFEAF2 : nieve ? 0xFFE4F4FF : fuego ? 0xFFFFD2A0 : cielo ? 0xFFDCE4FF : 0xFFF0C8B8);
+                hojas ? 0xFFB9F0C4 : ceniza ? 0xFFF2DDB8 : soga ? 0xFFE6D2B0 : agua ? 0xFFBFEAF2 : nieve ? 0xFFE4F4FF : fuego ? 0xFFFFD2A0 : cielo ? 0xFFDCE4FF
+                        : mar ? 0xFFCFEEE6 : 0xFFF0C8B8);
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         // hueco, rastro y relleno (la bruma corre)
         g.blit(BARRA, 8, 19, 0, 80, 240, 7, 256, 128);
@@ -130,7 +136,7 @@ public final class GuardianCliente {
         // destello al recibir un golpe
         if (ticks - golpe < 4 && wf > 0)
             g.fill(8 + Math.max(0, wf - 6), 19, 8 + wf, 26, hojas ? 0x80E6FFF0 : ceniza ? 0x80FFF4E0 : soga ? 0x80FFE8D8 : agua ? 0x80E0FAFF
-                    : nieve ? 0x90F4FCFF : fuego ? 0x90FFE6B0 : cielo ? 0x90EEF2FF : 0x80FFE4DA);
+                    : nieve ? 0x90F4FCFF : fuego ? 0x90FFE6B0 : cielo ? 0x90EEF2FF : mar ? 0x90E6FFF8 : 0x80FFE4DA);
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         g.blit(BARRA, 0, 0, 0, 0, 256, 40, 256, 128);
         // las gotas que caen

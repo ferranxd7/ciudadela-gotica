@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 82 * 60 * 20;
+    private static final int LIMIT = 88 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -6015,6 +6015,8 @@ public final class ClientCiTest {
         t = observatorio(t);
         // el Puerto Varado y los salobres de la Costa de los Huesos (parte 7q)
         t = puerto(t);
+        // el Costillar de la Ballena y Brann, el Ballenero, el jefe de la Costa de los Huesos (parte 7r)
+        t = costillar(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -9426,6 +9428,329 @@ public final class ClientCiTest {
                 sp.clearFire();
                 sp.setHealth(sp.getMaxHealth());
                 comando(sp, "darkcraft puerto enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el Costillar de la Ballena y Brann, el Ballenero (parte 7r)
+
+    private static com.darkcraft.enemigos.Ballenero balleneroE() {
+        var e = com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.COSTILLAR, com.darkcraft.morvain.MorvainEnemigos.ballenero());
+        return e instanceof com.darkcraft.enemigos.Ballenero b ? b : null;
+    }
+
+    /** Lo que deja Brann bajo las costillas: el arpon, los faroles, sus charcos ardiendo y la Vieja. */
+    private static void limpiarCostillar(ServerLevel lvl) {
+        var caja = com.darkcraft.enemigos.Ballenero.caja().inflate(20, 60, 20);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.ArponBallenero.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.FarolAceite.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.Llamas.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Vieja.class, caja)) e.discard();
+    }
+
+    /**
+     * Un golpe de Brann visto desde un lado: el bajo las costillas mirando al este, hacia la calavera (quieto: solo hace lo que se
+     * le manda), el jugador delante, en supervivencia y aguantando, y la camara donde diga {@code desde} (relativo a el).
+     */
+    private static int golpeBallenero(int t, String nombre, int accion, double dist, int[] capturas, String[] nombres, Vec3 desde, Vec3 mira) {
+        final int CX = com.darkcraft.morvain.Costillar.CX, CZ = com.darkcraft.morvain.Costillar.CZ, PISO = com.darkcraft.morvain.Costillar.PISO;
+        final double ex = CX - 10.5, ez = CZ + 0.5;
+        atTicks(t, "Brann: " + nombre, m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                var e = balleneroE();
+                if (e == null) return;
+                limpiarCostillar(sp.serverLevel());
+                aPelear(sp, true);
+                e.quieta = true;
+                e.postura(com.darkcraft.enemigos.Enemigo.DE_PIE);
+                e.moveTo(ex, PISO, ez, -90f, 0f);
+                e.setDeltaMovement(Vec3.ZERO);
+                irMirando(sp, ex + dist, PISO, ez, ex, PISO + 2.4, ez, false);
+                e.setTarget(sp);
+                e.setYRot(-90f);
+                e.yBodyRot = e.yHeadRot = -90f;
+                e.empezar(accion);
+                verDesdeServidor = new Vec3(ex + desde.x, PISO + desde.y, ez + desde.z);
+                miraServidor = new Vec3(ex + mira.x, PISO + mira.y, ez + mira.z);
+            });
+        });
+        atTicks(t + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        for (int i = 0; i < capturas.length; i++) {
+            final String cap = nombres[i];
+            atTicks(t + capturas[i], "captura: " + cap, m -> {
+                server(m, sp -> log("  " + cap + ": " + estadoE(balleneroE()) + " | " + (balleneroE() == null ? "" : balleneroE().estado()) + " | jugador " + fpos(sp)
+                        + " vida " + Math.round(sp.getHealth()) + (sp.isOnFire() ? " ardiendo" : "") + " | vieja salen " + com.darkcraft.enemigos.Vieja.SALEN
+                        + ", embisten " + com.darkcraft.enemigos.Vieja.EMBISTEN + ", dan " + com.darkcraft.enemigos.Vieja.DAN));
+                shot(m, cap);
+            });
+        }
+        return t + capturas[capturas.length - 1];
+    }
+
+    /**
+     * El Costillar de la Ballena y Brann, el Ballenero: desde su santuario, la cola torcida al sur, entrar a pie bajo las costillas
+     * (el cartel con el nombre, el logro y el viento entre los huesos), la sala por dentro, Brann de vigia, la fundidora, la barca
+     * volcada, la calavera, el hocico y las quijadas, la choza y todo desde lo alto; en supervivencia habla mientras se levanta y
+     * grita (su barra y su musica); sus golpes (el arponazo, el tajo, el arpon con su cabo y el tiron, el farol de aceite y su
+     * charco ardiendo, el salto y su onda, y la Vieja: el chorro, sale de la arena y embiste a lo largo de la sala); a media vida
+     * la vuelve a llamar; cae (de rodillas sobre el arpon, la Vieja sube al cielo, se deshace en sal; el cartel), su bitacora y el
+     * bestiario. Al acabar vuelve todo como estaba.
+     */
+    private static int costillar(int T) {
+        final int CX = com.darkcraft.morvain.Costillar.CX, CZ = com.darkcraft.morvain.Costillar.CZ, PISO = com.darkcraft.morvain.Costillar.PISO;
+        final String SITIO = com.darkcraft.morvain.MorvainEnemigos.COSTILLAR;
+        final var SC = com.darkcraft.morvain.SantuariosMorvain.porId("costillar");
+        int t = T;
+        atTicks(t, "El Costillar: desde su santuario", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft ballenero volver");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                irMirando(sp, SC.x() + 4.5, SC.y() + 5, SC.z() + 9.5, CX - 6, PISO + 9, CZ, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv308_costillar_santuario");
+            server(m, sp -> log("  el costillar: " + com.darkcraft.morvain.MorvainEnemigos.estadoBallenero(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "El Costillar: la cola, desde el sur", m -> server(m, sp -> irMirando(sp, CX - 40.5, PISO + 9, CZ - 44.5, CX - 18, PISO + 6, CZ - 2, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv309_costillar_cola"));
+        t += 10;
+        // ---- entrar a pie bajo las costillas, en aventura: el cartel con el nombre, el logro y el viento entre los huesos (los
+        // salobres de fuera, fuera; Brann, de vigia y lejos, no le ve)
+        atTicks(t, "El Costillar: entrar bajo las costillas", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                for (int i = 0; i < com.darkcraft.morvain.MorvainEnemigos.costillar().size(); i++)
+                    if (i != com.darkcraft.morvain.MorvainEnemigos.ballenero()) com.darkcraft.enemigos.Puestos.marcar(sp.server, SITIO, i, true);
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), CX - 24.5, PISO, CZ + 1.5, -90f, 2f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura", m -> {
+            log("  costa: " + ClientMusic.costa());
+            shot(m, "cliente_mv310_costillar_entrar");
+            server(m, sp -> log("  al entrar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + ", logro costillar " + com.darkcraft.story.Logros.tiene(sp, "costillar")
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoBallenero(sp.server)));
+        });
+        t += 10;
+        atTicks(t, "El Costillar: bajo las costillas, hacia la calavera", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                irMirando(sp, CX - 21.5, PISO + 2.5, CZ + 7.5, CX + 18, PISO + 7, CZ - 1, true);
+            });
+        });
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv311_costillar_dentro"));
+        t += 10;
+        atTicks(t, "Brann, de vigia bajo las costillas", m -> server(m, sp -> irMirando(sp, CX + 9.5, PISO + 1.0, CZ + 4.5, CX + 3.5, PISO + 1.5, CZ + 0.5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv312_brann_vigia");
+            server(m, sp -> log("  Brann de vigia: " + estadoE(balleneroE()) + " | " + (balleneroE() == null ? "" : balleneroE().estado())));
+        });
+        t += 10;
+        atTicks(t, "El Costillar: la fundidora", m -> server(m, sp -> irMirando(sp, CX - 7.5, PISO + 2.2, CZ + 2.5, CX - 13.5, PISO + 1.5, CZ + 8.5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv313_costillar_fundidora"));
+        t += 10;
+        atTicks(t, "El Costillar: la barca volcada", m -> server(m, sp -> irMirando(sp, CX - 2.5, PISO + 2.2, CZ - 3.5, CX - 8, PISO + 1, CZ - 10, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv314_costillar_barca"));
+        t += 10;
+        atTicks(t, "El Costillar: la calavera", m -> server(m, sp -> irMirando(sp, CX + 44.5, PISO + 8, CZ - 21.5, CX + 30, PISO + 5, CZ, true)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv315_costillar_calavera");
+            server(m, sp -> log("  la calavera: lugar " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "El Costillar: el hocico y las quijadas", m -> server(m, sp -> irMirando(sp, CX + 68.5, PISO + 3, CZ + 9.5, CX + 46, PISO + 2, CZ, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv316_costillar_hocico"));
+        t += 10;
+        atTicks(t, "El Costillar: la choza de Brann", m -> server(m, sp -> irMirando(sp, CX - 39.5, PISO + 1.0, CZ + 16.5, CX - 39.5, PISO + 0.8, CZ + 21, true)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv317_costillar_choza");
+            server(m, sp -> log("  la choza: " + com.darkcraft.morvain.Costillar.resumen(sp.serverLevel()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "El Costillar: todo desde lo alto", m -> server(m, sp -> irMirando(sp, CX + 34.5, PISO + 40, CZ + 58.5, CX + 2, PISO + 4, CZ, true)));
+        t += 90;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv318_costillar_alto");
+            server(m, sp -> log("  desde lo alto: " + com.darkcraft.morvain.MorvainEnemigos.estadoBallenero(sp.server)));
+        });
+        t += 10;
+        // ---- en supervivencia, bajo las costillas: habla mientras se levanta y grita al acabar (su barra y su musica)
+        final int F = t;
+        final int dura = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Ballenero.VOZ_BASE + 1);
+        atTicks(F, "Brann: en supervivencia bajo las costillas", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                irMirando(sp, CX - 7.5, PISO, CZ + 2.5, CX + 3.5, PISO + 1.8, CZ + 0.5, false);
+                var e = balleneroE();
+                if (e != null) e.setTarget(sp);
+            });
+        });
+        atTicks(F + 40, "captura: se levanta (y habla)", m -> {
+            server(m, sp -> log("  Brann al verle: " + estadoE(balleneroE()) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv319_brann_habla");
+        });
+        atTicks(F + dura + 10, "captura: grita (su barra)", m -> {
+            server(m, sp -> log("  Brann grita: " + estadoE(balleneroE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())));
+            log("  ballenero: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv320_brann_grita");
+        });
+        t = F + dura + 60;
+        // ---- sus golpes, de lado (quieto: solo lo que se le manda); la camara relativa a el, que mira al este
+        t = golpeBallenero(t, "el arponazo", com.darkcraft.enemigos.BalleneroAnims.ARPONAZO, 3.6, new int[]{17}, new String[]{"cliente_mv321_brann_arponazo"},
+                new Vec3(1.8, 2.4, -6.5), new Vec3(1.8, 1.6, 0)) + 30;
+        t = golpeBallenero(t, "el tajo", com.darkcraft.enemigos.BalleneroAnims.TAJO, 2.8, new int[]{26}, new String[]{"cliente_mv322_brann_tajo"},
+                new Vec3(1.4, 2.4, -6.0), new Vec3(1.4, 1.6, 0)) + 30;
+        t = golpeBallenero(t, "el arpon y el tiron", com.darkcraft.enemigos.BalleneroAnims.ARPON, 11.0, new int[]{22, 40},
+                new String[]{"cliente_mv323_brann_arpon", "cliente_mv324_brann_tiron"}, new Vec3(5.5, 3.0, -9.5), new Vec3(5.5, 1.6, 0)) + 40;
+        t = golpeBallenero(t, "el farol de aceite", com.darkcraft.enemigos.BalleneroAnims.FAROL, 8.0, new int[]{50}, new String[]{"cliente_mv325_brann_farol"},
+                new Vec3(4.0, 3.5, -8.5), new Vec3(5.0, 0.6, 0)) + 30;
+        t = golpeBallenero(t, "el salto", com.darkcraft.enemigos.BalleneroAnims.SALTO, 6.5, new int[]{16, 26},
+                new String[]{"cliente_mv326_brann_salto", "cliente_mv327_brann_onda"}, new Vec3(3.2, 3.0, -9.0), new Vec3(3.4, 2.0, 0)) + 30;
+        t = golpeBallenero(t, "la Vieja", com.darkcraft.enemigos.BalleneroAnims.LLAMAR, 7.0, new int[]{46, 72, 99},
+                new String[]{"cliente_mv328_vieja_aviso", "cliente_mv329_vieja_sale", "cliente_mv330_vieja_embiste"}, new Vec3(6.0, 6.5, -12.5),
+                new Vec3(-2.0, 1.5, 2.0)) + 60;
+        // ---- a media vida: vuelve a llamar a la Vieja (y salta)
+        final int H = t;
+        atTicks(H, "Brann: a media vida", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                var e = balleneroE();
+                if (e == null) return;
+                limpiarCostillar(sp.serverLevel());
+                aPelear(sp, true);
+                e.quieta = false;
+                e.moveTo(CX + 3.5, PISO, CZ + 0.5, 90f, 0f);
+                e.yBodyRot = e.yHeadRot = 90f;
+                irMirando(sp, CX - 8.5, PISO, CZ + 4.5, CX + 3.5, PISO + 2.0, CZ + 0.5, false);
+                e.setTarget(sp);
+                e.mediaVida();
+            });
+        });
+        atTicks(H + 2, "camara: la sala desde lo alto", m -> verDesde(m, new Vec3(CX - 2.5, PISO + 11.5, CZ - 11.5), new Vec3(CX - 2.0, PISO + 0.5, CZ + 3.0)));
+        atTicks(H + 34, "captura: llama a la Vieja", m -> {
+            server(m, sp -> log("  Brann a media vida: " + (balleneroE() == null ? "" : balleneroE().estado()) + " | jugador " + fpos(sp)));
+            log("  ballenero: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv331_brann_media_vida");
+        });
+        // ---- cae: de rodillas sobre el arpon (su ultima frase), la Vieja sube al cielo y el se deshace en sal; el cartel
+        final int C = H + 130;
+        atTicks(C, "Brann: cae", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var e = balleneroE();
+                if (e == null) return;
+                limpiarCostillar(sp.serverLevel());
+                sp.setGameMode(GameType.CREATIVE);
+                sp.clearFire();
+                log("  antes de caer Brann: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "ballenero") + " | " + e.estado());
+                e.quieta = true;
+                e.moveTo(CX + 3.5, PISO, CZ + 0.5, -90f, 0f);
+                e.setYRot(-90f);
+                e.yBodyRot = e.yHeadRot = -90f;
+                verDesdeServidor = new Vec3(e.getX() + 4.5, e.getY() + 2.6, e.getZ() + 6.0);
+                miraServidor = new Vec3(e.getX(), e.getY() + 1.4, e.getZ());
+                e.invulnerableTime = 0;
+                e.hurt(sp.damageSources().playerAttack(sp), 99999f);
+                log("  Brann cae: vivo " + e.isAlive() + ", en paz " + com.darkcraft.morvain.Costillar.enPaz(sp.server));
+            });
+        });
+        atTicks(C + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 30, "captura: de rodillas sobre el arpon", m -> shot(m, "cliente_mv332_brann_cae"));
+        atTicks(C + 50, "camara: de lejos, hacia el cielo", m -> verDesde(m, new Vec3(CX - 18.5, PISO + 4.0, CZ - 11.5), new Vec3(CX + 2.0, PISO + 12.0, CZ + 0.5)));
+        atTicks(C + 76, "captura: la Vieja sube al cielo", m -> {
+            server(m, sp -> {
+                StringBuilder v = new StringBuilder();
+                for (var x : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Vieja.class, com.darkcraft.enemigos.Ballenero.caja().inflate(10, 80, 10)))
+                    v.append(String.format(java.util.Locale.ROOT, " estado %d a %.1f sobre la arena;", x.estado(), x.getY() - PISO));
+                log("  la Vieja al caer Brann:" + (v.length() == 0 ? " NO ESTA" : v));
+            });
+            shot(m, "cliente_mv333_vieja_sube");
+        });
+        atTicks(C + 80, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 112, "captura: se deshace en sal", m -> shot(m, "cliente_mv334_brann_sal"));
+        atTicks(C + 126, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 196, "captura: JEFE ABATIDO", m -> {
+            log("  ballenero: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  tras caer Brann: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "ballenero")
+                    + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoBallenero(sp.server)));
+            shot(m, "cliente_mv335_brann_abatido");
+        });
+        t = C + 202;
+        atTicks(t, "La bitacora de Brann", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(27));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv336_libro_ballenero"));
+        t += 6;
+        atTicks(t, "el bestiario: Brann", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("ballenero")));
+        });
+        t += 18;
+        atTicks(t, "captura: Brann en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv337_bestiario_ballenero");
+        });
+        t += 4;
+        atTicks(t, "Brann: fin (vuelve a su vigia, los salobres como estaban, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                limpiarCostillar(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                var e = balleneroE();
+                if (e != null) e.quieta = false;
+                comando(sp, "darkcraft ballenero volver");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoBallenero(sp.server));
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

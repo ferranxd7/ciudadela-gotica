@@ -2402,6 +2402,107 @@ viejo Brann sigue arponeando una ballena que hace mucho que no esta", libro 26�
   rastrillazo y su costra (`mv301`), la sal (`mv302`), un salinero enterrado (`mv303`) que se alza (`mv304`) y cae (`mv305`), el
   cuaderno del farero (`mv306`) y el bestiario (`mv307`). `LIMIT` 82 min (`lanzar.sh` 88 y 86 min).
 
+### Plan grande, parte 7r: Brann, el Ballenero (el jefe de la Costa de los Huesos) y el Costillar de la Ballena
+
+Respuestas 125 y 131 del plan; el septimo jefe de Morvain (el del libro 26: "el viejo Brann sigue arponeando una ballena que hace
+mucho que no esta"). Despues, la Tierra sin Fe (dos partes) y el crater con la Sombra.
+- **El Costillar de la Ballena** (`morvain/Costillar`, en la Costa de los Huesos, a la puerta del santuario del Costillar —(5244,
+  3000), 62 al oeste; su tarima no se toca: radio 11—; `CX` 5306, `CZ` 3000, `SUELO` 70 y `PISO` 71; u = x - CX, v = z - CZ; se dibuja
+  chunk a chunk al adornar y en su caja `Adorno` no pone nada): la arena allanada (u -48..66, |v| <= 32, se funde en 8: arena gris,
+  costras de sal, grava, algun hueso suelto, matas secas y sal fuera de la sala) y el **esqueleto** de una ballena colosal mirando al
+  mar que ya no esta (al este): el **espinazo** (`lomo(u)`: PISO + 21 en el centro; vertebras de tres con su apofisis cada dos) de la
+  cola a la nuca; trece pares de **costillas** (`COSTILLA_U0` -26 a `COSTILLA_U1` 22, cada 4; en arco del espinazo a la arena,
+  `radio(u)` 16 en el centro; dos gruesas, alguna rota con su trozo caido) que cierran la **sala** (`enSala`: u -27..24 y |v| <=
+  radio - 1,6) donde se pelea; la **cola** (baja del lomo a la arena entre u -30 y -50 y se tuerce al sur, lejos del santuario); la
+  **pelvis**; las **aletas** (la escapula contra las costillas y los dedos tirados en la arena) y la **calavera** al este
+  (`CRANEO_U0` 25: el craneo como un escudo, hueco, con sus cuencas; el **hocico** largo hasta `HOCICO_U1` 62, las dos **quijadas**
+  tiradas en la arena y dientes sueltos). Dentro, lo de Brann: la **fundidora** (el hogar de ladrillo con dos calderos del aceite,
+  las brasas y la chimenea), barriles de aceite, su **barca** volcada contra las costillas del sur con un remo roto, arpones de
+  repuesto clavados (pararrayos), rollos de cuerda, sal y huesos. Fuera, al suroeste, su **choza** (tablas de barcas, el tejado de un
+  casco del reves, la puerta al norte): la cama, la mesa con el farol, un barril, el arcon `chests/costillar_bueno` y el **atril con
+  el libro perdido 27** (los dos de cara a la puerta) —"La bitacora del ballenero", de Brann; `Perdidos.TOTAL` = 27—. Botin:
+  `chests/costillar` (cuerda, huesos, polvo de hueso, algas secas, oro, una correa, prismarina, tinta, frutos) y `costillar_bueno`.
+  Sitios (`Costillar.sitio`): `entrada`, `costillar`, `centro`, `brann`, `fundidora`, `barca`, `craneo`, `hocico`, `aleta`, `cola`,
+  `choza`, `atril`, `arcon` y `alto` (lo alto de la calavera: solo para mirar). El Espejo: "El Costillar de la Ballena"
+  (`Costillar.dentro`); logro `costillar` ("Bajo las costillas") al entrar en la sala.
+- **Los puestos** (`MorvainEnemigos`, sitio `costillar`, de `Costillar.esperas`): Brann (puesto 0, grupo `Puestos.JEFE`, de rodilla
+  en medio de la sala, mirando al este), dos rederos remendando junto a la choza, dos bicheros de ronda (por la cola y junto a la
+  calavera) y un salinero enterrado en la sal junto a la aleta del norte.
+- **Brann** (`enemigos/Ballenero`, entidad `darkcraft:ballenero`, 1,2 x 3,1; hereda de `Guardian`): modelo de
+  `tools/enemigos/ballenero.py` (un viejo gigante comido por la sal: calvo, la piel blanca y agrietada, melena y barba blancas, ojos
+  con luz fria de agua; chaqueton largo de hule con costras de sal y su cuello alto, faldones; la cuerda en bandolera y un rollo a la
+  cadera; cristales de sal en los hombros; la **pata de palo** de hueso de ballena y una bota alta; un arpon de repuesto a la
+  espalda; en la derecha el **arpon** —asta, cana de hierro, la punta con sus dos barbas y el cabo atado— y en la izquierda el
+  **farol de aceite**; escala 1,55: `client/enemigos/BalleneroModelo` —de vigia mientras no esta de pie; no dibuja el arpon mientras
+  esta fuera ni el farol desde que lo suelta— y `BalleneroRenderer`, con la luz de los ojos y la sal que parpadea). 1000 de vida,
+  golpe 12,5, armadura 6 (dureza 2), casi no se le empuja, **el fuego no le hace nada**. Espera **de vigia** (`REZA`: de rodilla
+  sobre la buena, la pata de palo delante, el arpon de pie como un baston y el farol en alto; `sfx.ballenero_espera` de vez en
+  cuando).
+- **La pelea** (solo con quien esta bajo las costillas: `percibe` y `objetivoValido`): al verle dice la frase 1 mientras se levanta
+  y grita al acabarla ("¡Alli resopla!": agua y sal). El **arponazo** (lo echa atras y lo clava a fondo, tirandose hacia delante:
+  llega a 4,9 y deja sangrando —frena un poco—) y el **tajo** doble (barre con la punta a un lado y al otro: 4,2, 150 grados) de
+  cerca; de lejos (5-22, viendole) el **arpon** con su cabo (`ArponBallenero`, una flecha pesada: x0,9 del golpe; **se queda
+  clavado** en quien pilla —no si rueda o para— y entonces Brann **tira del cabo**: el **tiron** le arrastra hacia el, `TIRON` 1,05,
+  mas cuanto mas lejos y menos lo que aguante el empujon; despues el arpon vuelve volando a la mano; el dibujante pinta el cabo de
+  la mano a la cola) y el **farol** (`FarolAceite`, en arco: revienta en cristales y aceite y deja un **charco ardiendo**,
+  `Cantaro.Llamas` de radio 2,6 y 110 ticks); el **grito** al empezar. A **media vida** no grita: **llama a la Vieja** (apunta con el
+  arpon y alza el farol; la frase 2) y desde entonces la vuelve a llamar cada `VIEJA_CADA` 300 ticks (mas un poco) y **salta**
+  (3,5-10 de su presa: cae clavando el arpon y la **onda** —radio `R_ONDA` 5,2— tumba a quien este de pie cerca; saltando o
+  rodando se libra). `Ballenero.mediaVida()`, `vencer()`, `quieta` (pruebas) y contadores (`arponazos`, `tajos`, `lanzados`,
+  `tirones`, `arrastrados` / `arrastre`, `faroles`, `saltos`, `ondasQueDan`, `llamadas`; `ArponBallenero.CLAVAN` / `AL_SUELO`,
+  `FarolAceite.REVIENTAN` / `DAN`).
+- **La Vieja** (`enemigos/Vieja`, entidad `darkcraft:vieja`, no se guarda): la cachalote blanca que se le escapo hace cuarenta anos,
+  hecha espectro (modelo de `tools/enemigos/vieja.py`: cuerpo con su joroba, la cabeza enorme, la mandibula, las aletas, la cola con
+  su aleta; gris azulada palida con surcos, cicatrices y percebes, tres arpones clavados con su cabo; `client/enemigos/ViejaModelo` y
+  `ViejaRenderer`, a escala 3, medio transparente, con los ojos y las cicatrices que lucen). **Embiste a lo largo de la sala** (en el
+  costillar, de una punta a otra —u -33 a 25, alternando el sentido— por la v de la presa; fuera, por la linea de Brann a su presa):
+  primero el **aviso** (`AVISO_TICKS` 30: su **chorro** de agua donde va a salir y una linea de espuma por donde va a pasar), sale de
+  la arena (22 ticks), cruza a `VELOCIDAD` 1,05 bloques por tick a ras de arena y se hunde (18); a quien pilla a lo largo de su cuerpo
+  (`LARGO` 17, `RADIO` 3,1) le da x1,35 del golpe de Brann y lo lanza de lado y hacia arriba (una vez por embestida). Solo da a los
+  jugadores y a la presa de Brann. `SALEN`, `EMBISTEN`, `DAN` (pruebas).
+- **Al caer Brann** cae de rodillas agarrado al arpon y dice su ultima frase; a los 40 ticks **la Vieja sale de la arena por ultima
+  vez y sube al cielo** (`Vieja.subir`, 110 ticks) y el **se deshace en sal** (`tickDeath` propio, 122 ticks); lo demas lo reparte
+  `valdrenn/Guardianes`: el cartel de JEFE ABATIDO con 15000 ecos, la hazana `ballenero` ("Vuelve la marea", con su entrada del
+  diario) y el bestiario; deja tres piedras de forja III, dos II y la ceniza de la estocada. Y **vuelve la marea** (`Costillar.paz`,
+  cada segundo desde `Morvain.onTick`): los salobres que seguian **faenando de rodillas** (los `REZA` del Puerto Varado y del
+  costillar; no los que pelean) se deshacen en sal (`DESCANSAN`) y **ya no vuelven** (los sitios `puerto` y `costillar` se registran
+  con `activo`).
+- **Voz** (ElevenLabs, `eleven_v4`, **"Declan Graves - Haunted Rasps and Old World Dread"** `1BfrkuYXmEwp8AWqSLWk` —la del Verdugo—,
+  flow `yIxYNc9wejnQYo6s9uh8`; 5 frases, tomas a salvo la 1b; en `procesar.py` `voz_ballenero`: algo mas grave pero menos que el
+  Verdugo, una segunda voz una octava por debajo muy baja, raspa, un vaiven lento y el eco corto y hueco de las costillas): linea
+  **50 + N** (`Voces.BASE_BALLENERO`, `esBallenero`; `habla_ballenero` en `rey_voces.json`; subtitulos `darkcraft.ballenero.voz.N`): 1
+  al empezar ("¿Otra mano para las barcas?..."; no la repite en 4 min), 2 al llamar a la Vieja ("¡Alli resopla!"), 3 si cae su
+  presa, 4 la primera vez que se le clava el arpon a alguien ("Cuarenta anos detras de ella...") y 5 al caer ("La marea... oigo la
+  marea que vuelve...").
+- **Barra** (`GuardianCliente`, estilo "mar": letras verde agua y gotas que caen; arte de `tools/hud/barra_guardianes.py`
+  "ballenero": el arpon con su cuerda enrollada y la aleta de la cola de una ballena; relleno de mar; salpicaduras). **Musica**: "The
+  Kraken" del Ocean Music Pack de Leonardo Paz (leohpaz, CC-BY 4.0, id `ballenero`, tema 39 de `ClientMusic.boss`).
+- **El costillar suena** (`ClientMusic.tickCosta`): a menos de 75 del centro de la sala, en vez del viento de la costa,
+  `ambiente.costillar` (el viento que silba entre los huesos).
+- Sonidos (ElevenLabs, flow `yIxYNc9wejnQYo6s9uh8`, `TOMAS_SFX`): `ballenero_grito` (4 y 1), `ballenero_arpon` (3 y 1),
+  `ballenero_tiron` (4 y 2, `INICIO` 1,1), `ballenero_arponazo` (1 y 4), `ballenero_cuchillo` (3 y 2, `INICIO` 0,4),
+  `ballenero_aceite` (3 y 4), `ballenero_vieja` (4 y 1), `ballenero_embestida` (4 y 1), `ballenero_dolor` (3 y 4),
+  `ballenero_muerte` (1 y 3), `ballenero_espera` (4 y 3, `stream`) y `costillar_ambiente` (3 y 1, `stream`).
+- Comandos `/darkcraft ballenero [ir | costillar <sitio> | vencer | volver]` (sin mas: como esta; `volver` le pone otra vez de vigia y
+  vuelven los salobres que faenaban, aqui y en el puerto).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_costillar carpeta`: el esqueleto, la fundidora, la barca y la choza con las
+  marcas de Brann (B0) y los salobres (Sn); si se llega a pie desde la entrada a cada sitio (menos `alto`) y a cada uno de los que
+  esperan, que ninguno esta metido en un bloque, que todos tienen suelo y lo que estorba a ras de suelo en la sala.
+- Pruebas: servidor, lineas `Morvain, el costillar: ...` (el atril con el libro 27, el arcon, el espinazo, las costillas en la arena,
+  la calavera, el suelo de la sala; a pie desde la entrada; vistas `morvain_costillar.png` y `morvain_costillar_sala.png`), `Morvain,
+  el Ballenero: ...` (de vigia; al verle habla, se levanta y grita; cada accion acaba y el arpon vuelve a la mano), `Morvain, los
+  golpes del Ballenero a una presa: ...` (el arponazo, el tajo, el arpon que se clava y el tiron que arrastra, el farol y su charco,
+  el salto y su onda, la Vieja: sale, embiste por la sala y da), `Morvain, el Ballenero a media vida: ...` (llama a la Vieja y la
+  vuelve a llamar), `Morvain, el Ballenero cae: ...` (la Vieja sube al cielo, se deshace en sal, los salobres que faenaban descansan y
+  no vuelven) y `Morvain, el Ballenero vuelve: ...`; cliente, tramo `costillar()` despues del puerto: desde el santuario
+  (`cliente_mv308`), la cola (`mv309`), entrar bajo las costillas con el cartel, el logro y el viento (`mv310`), la sala por dentro
+  (`mv311`), Brann de vigia (`mv312`), la fundidora (`mv313`), la barca (`mv314`), la calavera (`mv315`), el hocico (`mv316`), la
+  choza (`mv317`), todo desde lo alto (`mv318`); en supervivencia habla (`mv319`) y grita con su barra (`mv320`); sus golpes
+  (`mv321..mv327`: el arponazo, el tajo, el arpon en el aire, el tiron, el farol y su charco, el salto y la onda), la Vieja (`mv328`
+  el chorro, `mv329` sale, `mv330` embiste), a media vida la vuelve a llamar (`mv331`), cae de rodillas (`mv332`), la Vieja sube al
+  cielo (`mv333`), se deshace en sal (`mv334`), el cartel (`mv335`), su bitacora (`mv336`) y el bestiario (`mv337`). `LIMIT` 88 min
+  (`lanzar.sh` 94 y 92 min, el paso 122, el trabajo 170).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
@@ -2412,7 +2513,7 @@ Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
 - **5e, el portal** (48-68): hecha (arriba: 5e-1 el portal nuevo; 5e-2 el capitulo 6 con la voz de la Sombra, el rayo
   rojo y el cielo rojo). Cruzar el portal llega con Morvain (parte 7).
 - Despues, la **parte 6** (arriba) y la **parte 7**, Morvain, las Tierras Marchitas (respuestas 85-96 y 125-132 de
-  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j, la 7k, la 7l, la 7m, la 7n, la 7o, la 7p y la 7q arriba; despues, region a region su
+  `PLAN.md`), por sub-partes (la 7a, la 7b, la 7c, la 7d, la 7e, la 7f, la 7g, la 7h, la 7i, la 7j, la 7k, la 7l, la 7m, la 7n, la 7o, la 7p, la 7q y la 7r arriba; despues, region a region su
   contenido).
 
 ### Lo anterior: parte 3 (mundo de nubes, isla del pueblo y barco) — por sub-partes

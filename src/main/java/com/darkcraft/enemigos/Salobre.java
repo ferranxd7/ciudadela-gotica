@@ -56,10 +56,10 @@ public class Salobre extends Enemigo {
     /** La costra de sal del rastrillazo: su radio y lo que dura (ticks). */
     public static final double R_COSTRA = 2.3;
     public static final int COSTRA_TICKS = 80;
-    static final DustParticleOptions SAL = new DustParticleOptions(new Vector3f(0.96f, 0.97f, 0.95f), 1.0f),
+    public static final DustParticleOptions SAL = new DustParticleOptions(new Vector3f(0.96f, 0.97f, 0.95f), 1.0f),
             SAL_GRUESA = new DustParticleOptions(new Vector3f(0.88f, 0.92f, 0.92f), 1.7f),
             AGUA = new DustParticleOptions(new Vector3f(0.62f, 0.9f, 1f), 0.8f);
-    static final BlockParticleOption COSTRA = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.CALCITE.defaultBlockState()),
+    public static final BlockParticleOption COSTRA = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.CALCITE.defaultBlockState()),
             ARENA = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SAND.defaultBlockState()),
             POLVO = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.WHITE_CONCRETE_POWDER.defaultBlockState());
 

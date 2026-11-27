@@ -213,6 +213,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el puerto varado en el chunk {}", c.getPos(), t);
         }
+        // el Costillar de la Ballena, al norte de la Costa de los Huesos, a la puerta de su santuario, donde espera Brann (parte 7r)
+        try {
+            if (Costillar.toca(c.getPos().x, c.getPos().z)) Costillar.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el costillar en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

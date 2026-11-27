@@ -322,6 +322,9 @@ public final class Morvain {
                     if (Observatorio.distancia(p.getX(), p.getZ()) < 120) cercaObservatorio = true;
             }
             if (cercaObservatorio) Observatorio.tick(m);
+            // el Costillar de la Ballena (parte 7r): con Brann caido vuelve la marea y los salobres que faenaban de rodillas (alli y
+            // en el Puerto Varado) se deshacen en sal; cada segundo
+            if (srv.getTickCount() % 20 == 17) Costillar.paz(m);
         }
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
@@ -367,6 +370,10 @@ public final class Morvain {
             if (Varadero.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Varadero.PISO) < 30) com.darkcraft.story.Logros.dar(p, "puerto");
             if (Varadero.arribaDelFaro(p.getX(), p.getY(), p.getZ())) com.darkcraft.story.Logros.dar(p, "faro");
         }
+        // y quien entra bajo las costillas del Costillar de la Ballena (parte 7r)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Costillar.enSala(p.getX(), p.getZ()) && Math.abs(p.getY() - Costillar.PISO) < 12)
+                com.darkcraft.story.Logros.dar(p, "costillar");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -440,6 +447,8 @@ public final class Morvain {
             if (Varadero.enFaro(p.getX(), p.getZ()) && Math.abs(p.getY() - Varadero.PISO) < 60) return "darkcraft.morvain.lugar.faro";
             if (Varadero.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Varadero.PISO) < 40) return "darkcraft.morvain.lugar.puerto";
         }
+        // el Costillar de la Ballena, donde espera Brann (parte 7r)
+        if (Costillar.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Costillar.PISO) < 40) return "darkcraft.morvain.lugar.costillar";
         // el Observatorio de la Rectora (parte 7p)
         if (Observatorio.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Observatorio.PISO) < 40) return "darkcraft.morvain.lugar.observatorio";
         // la Academia Espectral y su Gran Biblioteca (parte 7o)

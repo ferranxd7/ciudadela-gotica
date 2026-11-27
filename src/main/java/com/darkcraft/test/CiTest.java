@@ -739,6 +739,7 @@ public final class CiTest {
         academia(server, m, log, out);
         observatorio(server, m, log, out);
         puerto(server, m, log, out);
+        costillar(server, m, log, out);
     }
 
     /**
@@ -1813,6 +1814,387 @@ public final class CiTest {
             DarkCraftMod.LOGGER.error("[CI] salobres", t);
         } finally {
             for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /** Lo que deja Brann (el arpon, los faroles, sus charcos ardiendo y la Vieja): un tick, a mano (la prueba no mueve el mundo). */
+    private static boolean tickBallenero(ServerLevel m, net.minecraft.world.phys.AABB caja, java.util.List<net.minecraft.world.entity.Entity> quitar) {
+        java.util.List<net.minecraft.world.entity.Entity> l = new java.util.ArrayList<>();
+        l.addAll(m.getEntitiesOfClass(com.darkcraft.enemigos.ArponBallenero.class, caja));
+        l.addAll(m.getEntitiesOfClass(com.darkcraft.enemigos.FarolAceite.class, caja));
+        l.addAll(m.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.Llamas.class, caja));
+        l.addAll(m.getEntitiesOfClass(com.darkcraft.enemigos.Vieja.class, caja));
+        boolean hay = false;
+        for (var e : l) {
+            if (e.isRemoved()) continue;
+            if (!quitar.contains(e)) quitar.add(e);
+            e.tickCount++;
+            e.tick();
+            hay = true;
+        }
+        return hay;
+    }
+
+    private static void limpiarBallenero(ServerLevel m, net.minecraft.world.phys.AABB caja) {
+        var grande = caja.inflate(20, 60, 20);
+        for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.ArponBallenero.class, grande)) e.discard();
+        for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.FarolAceite.class, grande)) e.discard();
+        for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.Llamas.class, grande)) e.discard();
+        for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.Vieja.class, grande)) e.discard();
+    }
+
+    /**
+     * Parte 7r: el Costillar de la Ballena (a pie desde el santuario a todos sus sitios; el atril con el libro 27, el arcon, el
+     * espinazo, las costillas en la arena, la calavera y el suelo de la sala libre) y Brann, el Ballenero: de vigia en su sitio con
+     * los salobres de alrededor; al ver a alguien bajo las costillas habla mientras se levanta y grita; cada accion acaba; sus
+     * golpes a una presa (el arponazo, el tajo doble, el arpon que se clava y el tiron que la arrastra, el farol que revienta y deja
+     * el suelo ardiendo, el salto con su onda y la Vieja que sale de la arena y embiste a lo largo de la sala); a media vida llama a
+     * la Vieja y la vuelve a llamar; y al caer, la Vieja sube al cielo, el se deshace en sal y vuelve la marea: los salobres que
+     * faenaban de rodillas (aqui y en el Puerto Varado) se deshacen en sal y ya no vuelven. Al acabar, todo como estaba.
+     */
+    private static void costillar(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.COSTILLAR, puerto = com.darkcraft.morvain.MorvainEnemigos.PUERTO;
+        var A = com.darkcraft.morvain.Costillar.get();
+        final int CX = com.darkcraft.morvain.Costillar.CX, CZ = com.darkcraft.morvain.Costillar.CZ, PISO = com.darkcraft.morvain.Costillar.PISO;
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : A.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            // a pie desde la entrada, junto al santuario (las capas finas de nieve —la sal— no estorban)
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || st.getBlock() instanceof net.minecraft.world.level.block.SnowLayerBlock
+                        && st.getValue(net.minecraft.world.level.block.SnowLayerBlock.LAYERS) <= 4 ? aire : st;
+            };
+            int[] en = A.sitio("entrada");
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, en[0], en[1], en[2], com.darkcraft.morvain.Costillar.X0, com.darkcraft.morvain.Costillar.Z0,
+                    com.darkcraft.morvain.Costillar.X1, com.darkcraft.morvain.Costillar.Z1, 4_000_000);
+            StringBuilder no = new StringBuilder();
+            int llega = 0, sitios = 0;
+            for (var e : A.sitios().entrySet()) {
+                // lo alto de la calavera es solo para mirar
+                if (e.getKey().equals("alto")) continue;
+                sitios++;
+                int[] q = e.getValue();
+                if (zona.alcanza(q[0], q[1], q[2], 2)) llega++;
+                else no.append(' ').append(e.getKey());
+            }
+            int lejos = 0;
+            for (var o : A.esperas()) if (!zona.alcanza(o.x(), o.y(), o.z(), 2)) lejos++;
+            var sc = com.darkcraft.morvain.SantuariosMorvain.porId("costillar");
+            log.println("Morvain, el costillar: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Costillar.resumen(m) + "; costillas " + A.costillas
+                    + " (rotas " + A.rotas + "), vertebras " + A.vertebras + ", huesos de la cola " + A.huesosCola + ", dedos " + A.dedos + ", barriles " + A.barriles
+                    + ", arpones " + A.arpones + "; santuario " + com.darkcraft.santuario.Santuarios.nombre(m, sc.pos()) + " ("
+                    + m.getBlockState(sc.pos()).getBlock().getDescriptionId() + ") a " + Math.round(Math.hypot(sc.x() - en[0], sc.z() - en[2]))
+                    + " de la entrada; a pie desde la entrada (" + zona.celdas() + " celdas) a " + llega + " de " + sitios + " sitios" + (no.length() == 0 ? "" : ", no a:" + no)
+                    + "; los que esperan a los que no se llega " + lejos + " de " + A.esperas().size() + "; lugar en la sala "
+                    + (com.darkcraft.morvain.Costillar.dentro(CX, CZ) ? "costillar" : "NO") + ", bajo las costillas " + com.darkcraft.morvain.Costillar.enSala(CX + 0.5, CZ + 0.5)
+                    + ", en el santuario " + com.darkcraft.morvain.Costillar.dentro(sc.x(), sc.z()) + " (tiene que ser false)");
+            topView(m, CX + 9, CZ, 70, new File(out, "morvain_costillar.png"));
+            topView(m, CX - 2, CZ, 30, new File(out, "morvain_costillar_sala.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, el costillar: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] costillar", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        final net.minecraft.world.phys.AABB caja = com.darkcraft.enemigos.Ballenero.caja();
+        com.darkcraft.enemigos.Ballenero br = null;
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            int suyos = 0, rodillas = 0, enSuelo = 0, chocan = 0;
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 6; k++)
+                for (var e : fuera) if (e.isAlive() && !(e instanceof com.darkcraft.enemigos.Ballenero)) e.tick();
+            for (var e : fuera) {
+                if (e instanceof com.darkcraft.enemigos.Ballenero x) br = x;
+                else {
+                    suyos++;
+                    if (e.postura() == com.darkcraft.enemigos.Enemigo.REZA) rodillas++;
+                }
+                if (!m.noCollision(e)) chocan++;
+                if (!m.getBlockState(BlockPos.containing(e.getX(), e.getY() - 0.2, e.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+            }
+            if (br == null) {
+                log.println("Morvain, el Ballenero: NO SALE");
+                return;
+            }
+            for (var e : fuera) if (e != br) e.discard();
+            StringBuilder sb = new StringBuilder("Morvain, el Ballenero: en " + br.blockPosition().toShortString() + " postura " + br.postura() + " (1 de vigia), giro "
+                    + Math.round(br.getYRot()) + ", vida " + Math.round(br.getMaxHealth()) + ", caja " + br.getBbWidth() + " x " + br.getBbHeight() + ", bajo las costillas "
+                    + com.darkcraft.morvain.Costillar.enSala(br.getX(), br.getZ()) + ", musica " + br.musica() + "; los suyos " + suyos + " (de rodillas " + rodillas
+                    + "); en su suelo " + enSuelo + " de " + fuera.size() + ", metidos en un bloque " + chocan + " (tiene que ser 0)");
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b7c9d1e-3f40-4b6c-8d8e-2f3a4b5c6d9a"), "[DarkCraftCI10]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- le ve bajo las costillas (a su espalda): habla mientras se levanta y grita al acabar
+            final double fxx = CX - 9.5, fyy = PISO, fzz = CZ + 0.5;
+            fp.moveTo(fxx, fyy, fzz, -90f, 0f);
+            fp.setOnGround(true);
+            br.setTarget(fp);
+            int levanta = -1, grita = -1, ataca = -1, quien = 0;
+            for (int k = 0; k < 400; k++) {
+                br.tickCount++;
+                br.tick();
+                tickBallenero(m, caja, quitar);
+                fp.moveTo(fxx, fyy, fzz, -90f, 0f);
+                fp.setHealth(fp.getMaxHealth());
+                int a = br.accion();
+                if (levanta < 0 && a == com.darkcraft.enemigos.BalleneroAnims.LEVANTARSE) levanta = k;
+                if (grita < 0 && a == com.darkcraft.enemigos.BalleneroAnims.GRITO) grita = k;
+                if (grita >= 0 && ataca < 0 && a != 0 && a != com.darkcraft.enemigos.BalleneroAnims.GRITO) {
+                    ataca = k;
+                    quien = a;
+                    break;
+                }
+            }
+            sb.append("; al verle: pelea ").append(br.enPelea()).append(", se levanta en el tick ").append(levanta).append(", grita en el ").append(grita)
+                    .append(" (la frase 1 dura ").append(com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Ballenero.VOZ_BASE + 1)).append("), y luego ")
+                    .append(quien == 0 ? "nada" : com.darkcraft.enemigos.BalleneroAnims.NOMBRES[quien]).append(" en el ").append(ataca)
+                    .append(String.format(java.util.Locale.ROOT, ", de pie %s a %.1f de su presa", br.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE,
+                            Math.hypot(br.getX() - fp.getX(), br.getZ() - fp.getZ())));
+            // ---- cada accion acaba (sin presa y quieto: no elige ni grita por su cuenta; el tiron va tras el arpon)
+            br.quieta = true;
+            br.setTarget(null);
+            for (int k = 0; k < 120 && (br.accion() != 0 || br.arponFuera()); k++) {
+                br.tickCount++;
+                br.tick();
+                tickBallenero(m, caja, quitar);
+            }
+            limpiarBallenero(m, caja);
+            StringBuilder nn = new StringBuilder();
+            int vistas = 0;
+            for (int a = 1; a < com.darkcraft.enemigos.BalleneroAnims.TICKS.length; a++) {
+                String nombre = com.darkcraft.enemigos.BalleneroAnims.NOMBRES[a];
+                if (nombre.equals("morir") || nombre.equals("levantarse")) continue;
+                br.moveTo(CX + 0.5, PISO, CZ + 0.5, -90f, 0f);
+                br.empezar(a);
+                vistas++;
+                for (int k = 0; k < 160 && br.accion() == a; k++) {
+                    br.tickCount++;
+                    br.tick();
+                    tickBallenero(m, caja, quitar);
+                }
+                if (br.accion() == a) nn.append(' ').append(nombre);
+            }
+            int vuelve = 0;
+            for (; vuelve < 120 && (br.accion() != 0 || br.arponFuera()); vuelve++) {
+                br.tickCount++;
+                br.tick();
+                tickBallenero(m, caja, quitar);
+            }
+            for (int k = 0; k < 200 && tickBallenero(m, caja, quitar); k++) {
+            }
+            limpiarBallenero(m, caja);
+            sb.append("; de ").append(vistas).append(" acciones no acaban:").append(nn.length() == 0 ? " ninguna" : nn).append(" (y el arpon vuelve a la mano en ")
+                    .append(vuelve).append(" ticks: ").append(!br.arponFuera()).append(')');
+            log.println(sb);
+            // ---- sus golpes a una presa (un aldeano quieto y duro) bajo las costillas: el mirando al este, hacia la calavera
+            StringBuilder sg = new StringBuilder("Morvain, los golpes del Ballenero a una presa:");
+            final double x0 = CX - 12.5, y0 = PISO, z0 = CZ + 0.5;
+            var victima = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            if (victima != null) {
+                victima.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(900.0);
+                victima.setHealth(900f);
+                victima.setNoAi(true);
+                victima.moveTo(x0 + 3, y0, z0, 90f, 0f);
+                m.addFreshEntity(victima);
+                quitar.add(victima);
+                String[] golpes = {"arponazo", "tajo", "arpon", "farol", "salto", "la Vieja"};
+                int[] acc = {com.darkcraft.enemigos.BalleneroAnims.ARPONAZO, com.darkcraft.enemigos.BalleneroAnims.TAJO, com.darkcraft.enemigos.BalleneroAnims.ARPON,
+                        com.darkcraft.enemigos.BalleneroAnims.FAROL, com.darkcraft.enemigos.BalleneroAnims.SALTO, com.darkcraft.enemigos.BalleneroAnims.LLAMAR};
+                double[] lejos = {3.6, 2.8, 12.0, 9.0, 6.5, 8.0};
+                int[] dura = {70, 80, 160, 200, 100, 240};
+                for (int i = 0; i < golpes.length; i++) {
+                    final boolean salta = acc[i] == com.darkcraft.enemigos.BalleneroAnims.SALTO;
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    victima.hurtTime = 0;
+                    victima.removeAllEffects();
+                    victima.clearFire();
+                    victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    victima.moveTo(x0 + lejos[i], y0, z0, 90f, 0f);
+                    victima.setOnGround(true);
+                    int arp = br.lanzados(), cla = com.darkcraft.enemigos.ArponBallenero.CLAVAN, tir = br.arrastrados(), far = br.faroles(),
+                            rev = com.darkcraft.enemigos.FarolAceite.REVIENTAN, fdan = com.darkcraft.enemigos.FarolAceite.DAN,
+                            que = com.darkcraft.enemigos.Cantaro.LLAMAS_QUEMAN, sal = br.saltos(), ond = br.ondasQueDan(), vsal = com.darkcraft.enemigos.Vieja.SALEN,
+                            vemb = com.darkcraft.enemigos.Vieja.EMBISTEN, vdan = com.darkcraft.enemigos.Vieja.DAN, lla = br.llamadas(), apz = br.arponazos(), taj = br.tajos();
+                    br.moveTo(x0, y0, z0, -90f, 0f);
+                    br.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    br.setTarget(victima);
+                    br.setYRot(-90f);
+                    br.yBodyRot = br.yHeadRot = -90f;
+                    br.empezar(acc[i]);
+                    float antes = victima.getHealth();
+                    double cerca = lejos[i], alto = 0, cae = 0;
+                    boolean ardiendo = false;
+                    String camino = "";
+                    for (int k = 0; k < dura[i]; k++) {
+                        boolean el = br.accion() != 0 || br.arponFuera();
+                        if (el) {
+                            br.setTarget(victima);
+                            br.tickCount++;
+                            br.tick();
+                            if (!salta) br.moveTo(x0, y0, z0, -90f, 0f);
+                            else alto = Math.max(alto, br.getY() - y0);
+                        }
+                        if (salta) victima.setOnGround(true);
+                        boolean otros = tickBallenero(m, caja, quitar);
+                        if (camino.isEmpty())
+                            for (var v : m.getEntitiesOfClass(com.darkcraft.enemigos.Vieja.class, caja)) {
+                                var c = v.camino();
+                                camino = String.format(java.util.Locale.ROOT, " (de u %.0f a u %.0f, en v %.1f)", c[0].x - CX, c[1].x - CX, c[0].z - CZ - 0.5);
+                            }
+                        // la presa se mueve con lo que le den (el tiron, la onda, la Vieja): a mano, que sin IA no anda
+                        net.minecraft.world.phys.Vec3 dv = victima.getDeltaMovement();
+                        if (dv.lengthSqr() > 1e-4) {
+                            victima.move(net.minecraft.world.entity.MoverType.SELF, dv);
+                            victima.setDeltaMovement(dv.x * 0.55, victima.onGround() ? 0 : dv.y - 0.08, dv.z * 0.55);
+                        }
+                        victima.invulnerableTime = 0;
+                        ardiendo |= victima.isOnFire();
+                        cerca = Math.min(cerca, Math.hypot(victima.getX() - br.getX(), victima.getZ() - br.getZ()));
+                        if (salta && br.onGround() && k > 12) cae = Math.hypot(br.getX() - victima.getX(), br.getZ() - victima.getZ());
+                        if (!el && !otros && k > 2) break;
+                    }
+                    sg.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " a %.1f: -%.1f", lejos[i], antes - victima.getHealth()));
+                    switch (i) {
+                        case 0 -> sg.append(", arponazos +").append(br.arponazos() - apz).append(victima.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) ? ", sangrando" : "");
+                        case 1 -> sg.append(", tajos +").append(br.tajos() - taj);
+                        case 2 -> sg.append(", arpones +").append(br.lanzados() - arp).append(" (se clavan +").append(com.darkcraft.enemigos.ArponBallenero.CLAVAN - cla)
+                                .append("), tirones que arrastran +").append(br.arrastrados() - tir)
+                                .append(String.format(java.util.Locale.ROOT, " (hasta %.1f de el; tiron %.2f), el arpon en la mano %s", cerca, br.arrastre(), !br.arponFuera()));
+                        case 3 -> sg.append(", faroles +").append(br.faroles() - far).append(" (revientan +").append(com.darkcraft.enemigos.FarolAceite.REVIENTAN - rev)
+                                .append(", dan +").append(com.darkcraft.enemigos.FarolAceite.DAN - fdan).append("), el charco quema +")
+                                .append(com.darkcraft.enemigos.Cantaro.LLAMAS_QUEMAN - que).append(ardiendo ? ", ardiendo" : "");
+                        case 4 -> sg.append(", saltos +").append(br.saltos() - sal).append(String.format(java.util.Locale.ROOT, " (sube %.1f, cae a %.1f de la presa)", alto, cae))
+                                .append(", la onda da +").append(br.ondasQueDan() - ond);
+                        case 5 -> sg.append(", llamadas +").append(br.llamadas() - lla).append(", la Vieja sale +").append(com.darkcraft.enemigos.Vieja.SALEN - vsal)
+                                .append(camino).append(", embiste +").append(com.darkcraft.enemigos.Vieja.EMBISTEN - vemb).append(", da +")
+                                .append(com.darkcraft.enemigos.Vieja.DAN - vdan);
+                        default -> {
+                        }
+                    }
+                    sg.append(';');
+                    limpiarBallenero(m, caja);
+                    if (salta) br.moveTo(x0, y0, z0, -90f, 0f);
+                }
+                sg.append(" en total: ").append(br.estado());
+            }
+            log.println(sg);
+            // ---- a media vida: llama a la Vieja, y la vuelve a llamar (con una presa lejos, bajo las costillas)
+            StringBuilder sm = new StringBuilder("Morvain, el Ballenero a media vida:");
+            br.quieta = false;
+            br.moveTo(x0, y0, z0, -90f, 0f);
+            final double vx = x0 + 18;
+            if (victima != null) {
+                victima.moveTo(vx, y0, z0, 90f, 0f);
+                br.setTarget(victima);
+            }
+            int ll0 = br.llamadas(), vs0 = com.darkcraft.enemigos.Vieja.SALEN, segunda = -1;
+            br.mediaVida();
+            boolean llama = br.accion() == com.darkcraft.enemigos.BalleneroAnims.LLAMAR;
+            for (int k = 0; k < 560; k++) {
+                if (victima != null) {
+                    victima.moveTo(vx, y0, z0, 90f, 0f);
+                    victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    if (br.getTarget() == null) br.setTarget(victima);
+                }
+                br.tickCount++;
+                br.tick();
+                tickBallenero(m, caja, quitar);
+                if (segunda < 0 && br.llamadas() >= ll0 + 2) segunda = k;
+            }
+            sm.append(" segunda ").append(br.segunda()).append(", llama a la Vieja ").append(llama).append(" (llamadas +").append(br.llamadas() - ll0)
+                    .append(", salen +").append(com.darkcraft.enemigos.Vieja.SALEN - vs0).append(", la vuelve a llamar en el tick ").append(segunda)
+                    .append(", cada ").append(com.darkcraft.enemigos.Ballenero.VIEJA_CADA).append("); ").append(br.estado());
+            br.quieta = true;
+            for (int k = 0; k < 160 && (br.accion() != 0 || br.arponFuera()); k++) {
+                br.tickCount++;
+                br.tick();
+                tickBallenero(m, caja, quitar);
+            }
+            limpiarBallenero(m, caja);
+            log.println(sm);
+            // ---- cae: de rodillas sobre el arpon, la Vieja sale y sube al cielo, se deshace en sal y vuelve la marea
+            com.darkcraft.enemigos.Puestos.todos(server, puerto, false);
+            java.util.List<com.darkcraft.enemigos.Enemigo> faenan = new java.util.ArrayList<>();
+            int delPuerto = 0;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, puerto))
+                if (com.darkcraft.morvain.MorvainEnemigos.puerto().get(e.puesto()).postura() == com.darkcraft.enemigos.Enemigo.REZA) {
+                    delPuerto++;
+                    faenan.add(e);
+                }
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio))
+                if (e != br && com.darkcraft.morvain.MorvainEnemigos.costillar().get(e.puesto()).postura() == com.darkcraft.enemigos.Enemigo.REZA) faenan.add(e);
+            int desc = com.darkcraft.morvain.Costillar.DESCANSAN;
+            boolean pazAntes = com.darkcraft.morvain.Costillar.enPaz(server);
+            br.moveTo(CX + 3.5, PISO, CZ + 0.5, -90f, 0f);
+            br.invulnerableTime = 0;
+            br.hurt(m.damageSources().playerAttack(fp), 99999f);
+            boolean muere = !br.isAlive();
+            int sube = -1, seVa = -1;
+            double arriba = 0;
+            for (int fin = 0; fin < 260; fin++) {
+                if (!br.isRemoved()) {
+                    br.tickCount++;
+                    br.tick();
+                }
+                for (var v : m.getEntitiesOfClass(com.darkcraft.enemigos.Vieja.class, caja.inflate(0, 60, 0))) {
+                    if (!quitar.contains(v)) quitar.add(v);
+                    if (v.isRemoved()) continue;
+                    if (sube < 0 && v.estado() == com.darkcraft.enemigos.Vieja.SUBE) sube = fin;
+                    v.tickCount++;
+                    v.tick();
+                    arriba = Math.max(arriba, v.getY() - PISO);
+                }
+                if (seVa < 0 && br.isRemoved()) seVa = fin;
+                if (seVa >= 0 && sube >= 0 && fin > seVa + 5) break;
+            }
+            com.darkcraft.morvain.Costillar.paz(m);
+            int descansan = 0;
+            for (var e : faenan) if (e.isRemoved()) descansan++;
+            int objetos = m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, br.getBoundingBox().inflate(6)).size();
+            // despues: los que faenaban ya no vuelven (ni en el puerto ni aqui)
+            com.darkcraft.enemigos.Puestos.todos(server, puerto, false);
+            int salen = 0, vuelven = 0, vuelvenAqui = 0;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, puerto)) {
+                salen++;
+                if (com.darkcraft.morvain.MorvainEnemigos.puerto().get(e.puesto()).postura() == com.darkcraft.enemigos.Enemigo.REZA) vuelven++;
+            }
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio))
+                if (com.darkcraft.morvain.MorvainEnemigos.costillar().get(e.puesto()).postura() == com.darkcraft.enemigos.Enemigo.REZA) vuelvenAqui++;
+            com.darkcraft.enemigos.Puestos.todos(server, puerto, false);
+            log.println("Morvain, el Ballenero cae: muere " + muere + " (en paz antes " + pazAntes + "); la Vieja sale y sube al cielo en el tick " + sube
+                    + String.format(java.util.Locale.ROOT, " (hasta %.0f sobre la arena)", arriba) + ", el se deshace en sal en " + seVa + "; vivo " + br.isAlive()
+                    + ", objetos " + objetos + ", en paz " + com.darkcraft.morvain.Costillar.enPaz(server) + "; de los " + faenan.size() + " salobres que faenaban ("
+                    + delPuerto + " en el puerto) descansan " + descansan + " (deshechos +" + (com.darkcraft.morvain.Costillar.DESCANSAN - desc)
+                    + "); despues en el puerto salen " + salen + " y de los que faenaban vuelven " + vuelven + ", y en el costillar " + vuelvenAqui
+                    + " (tienen que ser 0); " + com.darkcraft.morvain.MorvainEnemigos.estadoBallenero(server));
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, br.getBoundingBox().inflate(8))) it.discard();
+        } catch (Throwable t) {
+            log.println("Morvain, el Ballenero: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] ballenero", t);
+        } finally {
+            if (br != null) br.quieta = false;
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            limpiarBallenero(m, caja);
+            // todo como antes: Brann de vigia bajo las costillas y los salobres que faenaban, en su sitio
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, com.darkcraft.morvain.MorvainEnemigos.ballenero(), false);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Puestos.todos(server, puerto, false);
+            try {
+                com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+                log.println("Morvain, el Ballenero vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoBallenero(server));
+            } catch (Throwable t) {
+                log.println("Morvain, el Ballenero vuelve: ERROR " + t);
+            }
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
         }
     }

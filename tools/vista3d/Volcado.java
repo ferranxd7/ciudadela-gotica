@@ -768,6 +768,41 @@ public class Volcado {
                 for (var o : v.esperas()) marcas.put("S" + (n++), new int[]{o.x(), o.y() + 1, o.z()});
                 andarPuerto(lvl, v);
             }
+            case "morvain_costillar" -> {
+                // el Costillar de la Ballena (parte 7r): el esqueleto (el espinazo, las costillas, la cola torcida al sur, la pelvis,
+                // las aletas y la calavera con su hocico y sus quijadas), la fundidora, la barca volcada, los arpones, la sal y la
+                // choza de Brann con el libro 27 (-Dcaja=x0,z0,x1,z1 para un trozo)
+                String[] k = System.getProperty("caja", com.darkcraft.morvain.Costillar.X0 + "," + com.darkcraft.morvain.Costillar.Z0 + ","
+                        + com.darkcraft.morvain.Costillar.X1 + "," + com.darkcraft.morvain.Costillar.Z1).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 50);
+                com.darkcraft.morvain.Costillar v = com.darkcraft.morvain.Costillar.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("El costillar: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " que esperan; "
+                        + v.costillas + " costillas (" + v.rotas + " rotas), " + v.vertebras + " vertebras, " + v.huesosCola + " huesos de la cola, "
+                        + v.dedos + " dedos, " + v.barriles + " barriles, " + v.arpones + " arpones; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas()) marcas.put((n == 0 ? "B" : "S") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarCostillar(lvl, v);
+            }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);
@@ -1156,6 +1191,55 @@ public class Volcado {
             }
         }
         System.out.println("salobres: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
+    }
+
+    /** El Costillar (parte 7r): se llega a pie desde la entrada (junto al santuario) a todo (menos a lo alto de la calavera). */
+    static void andarCostillar(WorldGenLevel lvl, com.darkcraft.morvain.Costillar v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+            BlockState s = MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+            return s.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || s.getBlock() instanceof net.minecraft.world.level.block.SnowLayerBlock
+                    && s.getValue(net.minecraft.world.level.block.SnowLayerBlock.LAYERS) <= 4 ? aire : s;
+        };
+        int[] e = v.sitio("entrada");
+        var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], com.darkcraft.morvain.Costillar.X0, com.darkcraft.morvain.Costillar.Z0,
+                com.darkcraft.morvain.Costillar.X1, com.darkcraft.morvain.Costillar.Z1, 4_000_000);
+        StringBuilder sb = new StringBuilder("a pie desde la entrada: " + z0.celdas() + " celdas;");
+        for (String s : v.sitios().keySet()) {
+            int[] q = v.sitio(s);
+            sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+        }
+        System.out.println(sb);
+        int malos = 0, chocan = 0, sinSuelo = 0;
+        for (var o : v.esperas()) {
+            if (!z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                malos++;
+                System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z());
+            }
+            for (int dy = 0; dy < 2; dy++) {
+                BlockState st = mundo.en(o.x(), o.y() + dy, o.z());
+                if (choca(st)) {
+                    chocan++;
+                    System.out.println("  " + o.grupo() + " metido en un bloque: " + o.x() + "," + (o.y() + dy) + "," + o.z() + " " + st);
+                }
+            }
+            BlockState abajo = mundo.en(o.x(), o.y() - 1, o.z());
+            if (!choca(abajo)) {
+                sinSuelo++;
+                System.out.println("  " + o.grupo() + " sin suelo: " + o.x() + "," + o.y() + "," + o.z() + " " + abajo);
+            }
+        }
+        // la sala: lo que se pisa dentro de las costillas (que la Vieja pase y Brann pelee): bloques que estorban a ras de suelo
+        int estorban = 0, celdas = 0;
+        int X = com.darkcraft.morvain.Costillar.CX, Z = com.darkcraft.morvain.Costillar.CZ, P = com.darkcraft.morvain.Costillar.PISO;
+        for (int x = X + com.darkcraft.morvain.Costillar.SALA_U0; x <= X + com.darkcraft.morvain.Costillar.SALA_U1; x++)
+            for (int z = Z - 16; z <= Z + 16; z++) {
+                if (!com.darkcraft.morvain.Costillar.enSala(x + 0.5, z + 0.5)) continue;
+                celdas++;
+                if (choca(mundo.en(x, P, z)) || choca(mundo.en(x, P + 1, z))) estorban++;
+            }
+        System.out.println("Brann y los salobres: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan + ", sin suelo "
+                + sinSuelo + "; en la sala " + celdas + " celdas, con algo que estorba " + estorban);
     }
 
     static void andarObservatorio(WorldGenLevel lvl, com.darkcraft.morvain.Observatorio v) {

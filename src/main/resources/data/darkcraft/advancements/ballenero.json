@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:costillar",
+  "display": {
+    "icon": {
+      "item": "minecraft:trident"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.ballenero.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.ballenero.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 500
+  }
+}

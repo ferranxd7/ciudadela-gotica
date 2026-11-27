@@ -138,9 +138,10 @@ public final class ClientMusic {
             case 36 -> DarkCraftMod.MUSICA_ABAD.get();
             case 37 -> DarkCraftMod.MUSICA_CONDESTABLE.get();
             case 38 -> DarkCraftMod.MUSICA_RECTORA.get();
+            case 39 -> DarkCraftMod.MUSICA_BALLENERO.get();
             default -> DarkCraftMod.MUSICA_REY_3.get();
         };
-        boss = new Track(ev, phase == 21 ? "capitan" : phase == 31 ? "brandt" : phase == 32 ? "vareth" : phase == 33 ? "molinera" : phase == 34 ? "verdugo" : phase == 35 ? "barquero" : phase == 36 ? "abad" : phase == 37 ? "condestable" : phase == 38 ? "rectora" : phase >= 11 ? "gavran" + (phase - 10) : "rey" + phase, true);
+        boss = new Track(ev, phase == 21 ? "capitan" : phase == 31 ? "brandt" : phase == 32 ? "vareth" : phase == 33 ? "molinera" : phase == 34 ? "verdugo" : phase == 35 ? "barquero" : phase == 36 ? "abad" : phase == 37 ? "condestable" : phase == 38 ? "rectora" : phase == 39 ? "ballenero" : phase >= 11 ? "gavran" + (phase - 10) : "rey" + phase, true);
         bossTicks = 0;
         Minecraft.getInstance().getSoundManager().play(boss);
         boss.fadeTo(soft ? 0.3f : 0.85f, phase == 1 ? 3.0f : 2.2f);
@@ -371,18 +372,24 @@ public final class ClientMusic {
 
     private static Track costa;
     private static int costaTicks;
-    private static boolean enCosta;
+    private static boolean enCosta, enCostillar, costaEsCostillar;
 
     private static void tickCosta(Minecraft mc) {
-        if (mc.player == null || mc.level == null) enCosta = false;
-        else if (mc.player.tickCount % 20 == 17)
+        if (mc.player == null || mc.level == null) enCosta = enCostillar = false;
+        else if (mc.player.tickCount % 20 == 17) {
             enCosta = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() > 30 && mc.player.getY() < 160
                     && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.COSTA;
+            // en el Costillar de la Ballena (parte 7r), su viento: el que silba entre los huesos
+            enCostillar = enCosta && com.darkcraft.morvain.Costillar.distancia(mc.player.getX(), mc.player.getZ()) < 75;
+        }
         boolean quiere = enCosta && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        // si cambia de uno a otro, el que sonaba se va despacio y entra el otro
+        if (quiere && costa != null && !costa.dying() && costaEsCostillar != enCostillar) costa.kill(2.5f);
         if (quiere) {
             if (costa == null || costa.dying() || !mc.getSoundManager().isActive(costa) && costaTicks > 20) {
                 if (costa != null && !costa.dying()) mc.getSoundManager().stop(costa);
-                costa = new Track(DarkCraftMod.AMBIENTE_COSTA.get(), "costa", false);
+                costaEsCostillar = enCostillar;
+                costa = new Track(enCostillar ? DarkCraftMod.AMBIENTE_COSTILLAR.get() : DarkCraftMod.AMBIENTE_COSTA.get(), enCostillar ? "costillar" : "costa", false);
                 costaTicks = 0;
                 mc.getSoundManager().play(costa);
                 costa.fadeTo(0.85f, 2.5f);
@@ -397,7 +404,8 @@ public final class ClientMusic {
     /** Para la prueba de la CI: si suena el viento de la costa. */
     public static String costa() {
         Minecraft mc = Minecraft.getInstance();
-        return costa == null ? "sin la costa" : String.format("la costa %.2f%s", costa.level(), mc.getSoundManager().isActive(costa) ? "" : " (parada)");
+        return costa == null ? "sin la costa" : String.format("%s %.2f%s", costaEsCostillar ? "el costillar" : "la costa", costa.level(),
+                mc.getSoundManager().isActive(costa) ? "" : " (parada)");
     }
 
     /** Para la prueba de la CI: si suena el viento de la academia. */

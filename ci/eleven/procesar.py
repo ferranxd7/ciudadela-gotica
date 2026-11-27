@@ -78,6 +78,9 @@ TOMAS_CONDESTABLE = {n: "a" for n in range(1, 6)}
 # Ysolde, la Rectora de la Academia (parte 7p; voz "Enchantress - mysterious, witchy, villain character"): las tomas a, salvo
 # la 2 (la 2a acaba de hablar justo al final del fichero: la b deja su cola)
 TOMAS_RECTORA = {1: "a", 2: "b", 3: "a", 4: "a", 5: "a"}
+# Brann, el Ballenero (parte 7r; voz "Declan Graves", la del Verdugo, pero sin bajarla tanto): las tomas a, salvo la 1 (la
+# 1a acaba de hablar pegada al final del fichero: la b deja su cola)
+TOMAS_BALLENERO = {1: "b", 2: "a", 3: "a", 4: "a", 5: "a"}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -273,15 +276,25 @@ SFX = {
     "salobre_garfio": (2.0, 0.6, -14), "salobre_rastrillo": (1.4, 0.5, -13), "salobre_sal": (1.6, 0.5, -15),
     "salobre_alzarse": (2.6, 0.8, -16),
     "costa_ambiente": (20.0, 2.0, -25),
+    # Brann, el Ballenero (parte 7r): el grito de "alli resopla", el arpon que sale con su cabo, el tiron de la cuerda (se
+    # salta el principio, hasta que se tensa), el arponazo, el cuchillo de descarnar (se salta el silbido), el farol de
+    # aceite que revienta y prende, la Vieja que resopla y sale de la arena (larga: se corta), su embestida, el dolor, la
+    # muerte (el ultimo aliento y la marea que vuelve) y su espera de vigia (el mar que no esta, las cuerdas; floja); y el
+    # viento entre las costillas del Costillar
+    "ballenero_grito": (4.5, 1.0, -14), "ballenero_arpon": (2.6, 0.7, -14), "ballenero_tiron": (3.0, 0.8, -16),
+    "ballenero_arponazo": (1.8, 0.5, -13), "ballenero_cuchillo": (1.2, 0.4, -14), "ballenero_aceite": (4.0, 1.4, -14),
+    "ballenero_vieja": (8.0, 2.5, -14), "ballenero_embestida": (5.0, 1.5, -13), "ballenero_dolor": (1.3, 0.4, -15),
+    "ballenero_muerte": (7.0, 2.0, -15), "ballenero_espera": (7.0, 2.0, -22),
+    "costillar_ambiente": (20.0, 2.0, -25),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
            "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0, "abad_ventisca": 1.5, "abad_rezo": 0.4,
            "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6, "academia_ambiente": 2.0, "erudito_susurro": 0.8,
-           "rectora_espera": 1.0, "costa_ambiente": 2.0}
+           "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
-          "salobre_alzarse": 4.2}
+          "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
 GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
@@ -488,6 +501,15 @@ TOMAS_SFX = {
     "salobre_gemido": (2, 3), "salobre_alerta": (3, 4), "salobre_dolor": (2, 4, 3), "salobre_muerte": (2, 1),
     "salobre_plomo": (2, 4), "salobre_red": (2, 1), "salobre_garfio": (4, 2), "salobre_rastrillo": (4, 1),
     "salobre_sal": (2, 3), "salobre_alzarse": (3, 4), "costa_ambiente": (1, 3),
+    # Brann: los dos gritos mas llenos (la 4 y la 1); los dos arpones con el silbido y el golpe (la 3 y la 1); los dos
+    # tirones que crujen (la 4 y la 2); los arponazos secos (la 1 y la 4); los dos cuchillos (la 3 y la 2); los faroles
+    # que revientan y prenden (la 3 y la 4); las dos Viejas que resoplan de verdad (la 4 y la 1); las dos embestidas con
+    # mas cuerpo (la 4 y la 1); dos quejidos (la 3 y la 4); las muertes con el aliento al principio (la 1 y la 3; la 2 casi
+    # no se oye); las dos esperas (la 4 y la 3); y del viento del Costillar, el que silba entre los huesos (la 3) y el mas
+    # lleno (la 1)
+    "ballenero_grito": (4, 1), "ballenero_arpon": (3, 1), "ballenero_tiron": (4, 2), "ballenero_arponazo": (1, 4),
+    "ballenero_cuchillo": (3, 2), "ballenero_aceite": (3, 4), "ballenero_vieja": (4, 1), "ballenero_embestida": (4, 1),
+    "ballenero_dolor": (3, 4), "ballenero_muerte": (1, 3), "ballenero_espera": (4, 3), "costillar_ambiente": (3, 1),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -722,6 +744,29 @@ def voz_rectora(src, dst):
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA + 0.15
+
+
+def voz_ballenero(src, dst):
+    """
+    Brann, el Ballenero: un arponero viejo del Puerto Varado, comido por la sal, que vigila el costillar de una ballena. La
+    misma voz rasposa del Verdugo pero sin bajarla tanto (un viejo, no un gigante), una segunda voz una octava por debajo,
+    muy baja (el pecho de barril), algo de raspa (la sal en la garganta), un vaiven lento (la marea) y el eco corto y hueco
+    de las costillas de la ballena.
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=2[v1][v2];"
+        "[v1]asetrate=44100*0.96,aresample=44100,atempo=1.0417[baja];"
+        "[v2]asetrate=44100*0.5,aresample=44100,atempo=2.0,lowpass=f=520,volume=0.22[honda];"
+        "[baja][honda]amix=inputs=2:weights=1 0.4:normalize=0,"
+        "equalizer=f=780:t=q:w=1.3:g=3,equalizer=f=150:t=q:w=1.0:g=2,highshelf=f=7000:g=-3,"
+        "asoftclip=type=tanh:threshold=0.72,"
+        "tremolo=f=0.7:d=0.10,"
+        "aecho=0.85:0.4:21|37|120|260:0.20|0.14|0.12|0.06,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.1
 
 
 def sonoridad(f):
@@ -1022,6 +1067,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO rectora {n}: {e}")
+    # Brann, el Ballenero (parte 7r)
+    bal = os.path.join(ASSETS, "sounds", "ballenero")
+    os.makedirs(bal, exist_ok=True)
+    dur_w, hab_w = {}, {}
+    for n, toma in sorted(TOMAS_BALLENERO.items()):
+        src = os.path.join(MASTER, "ballenero", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(bal, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_ballenero(src, dst)
+            dur_w[n] = round(duracion(dst), 2)
+            hab_w[n] = round(min(h, dur_w[n]), 2)
+            print(f"ballenero {n:2d}: {dur_w[n]} s (habla hasta {hab_w[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO ballenero {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -1054,7 +1118,7 @@ def main():
                    "sombra": dur_s, "habla_sombra": hab_s, "molinera": dur_m, "habla_molinera": hab_m,
                    "verdugo": dur_v, "habla_verdugo": hab_v, "barquero": dur_b, "habla_barquero": hab_b,
                    "abad": dur_a, "habla_abad": hab_a, "condestable": dur_k, "habla_condestable": hab_k,
-                   "rectora": dur_r, "habla_rectora": hab_r}, fh)
+                   "rectora": dur_r, "habla_rectora": hab_r, "ballenero": dur_w, "habla_ballenero": hab_w}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

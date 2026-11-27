@@ -4536,5 +4536,194 @@
         "stream": true
       }
     ]
+  },
+  "sfx.ballenero_grito": {
+    "subtitle": "subtitles.darkcraft.sfx.ballenero_grito",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ballenero_grito_1"
+      },
+      {
+        "name": "darkcraft:sfx/ballenero_grito_2"
+      }
+    ]
+  },
+  "sfx.ballenero_arpon": {
+    "subtitle": "subtitles.darkcraft.sfx.ballenero_arpon",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ballenero_arpon_1"
+      },
+      {
+        "name": "darkcraft:sfx/ballenero_arpon_2"
+      }
+    ]
+  },
+  "sfx.ballenero_tiron": {
+    "subtitle": "subtitles.darkcraft.sfx.ballenero_tiron",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ballenero_tiron_1"
+      },
+      {
+        "name": "darkcraft:sfx/ballenero_tiron_2"
+      }
+    ]
+  },
+  "sfx.ballenero_arponazo": {
+    "subtitle": "subtitles.darkcraft.sfx.ballenero_arponazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ballenero_arponazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/ballenero_arponazo_2"
+      }
+    ]
+  },
+  "sfx.ballenero_cuchillo": {
+    "subtitle": "subtitles.darkcraft.sfx.ballenero_cuchillo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ballenero_cuchillo_1"
+      },
+      {
+        "name": "darkcraft:sfx/ballenero_cuchillo_2"
+      }
+    ]
+  },
+  "sfx.ballenero_aceite": {
+    "subtitle": "subtitles.darkcraft.sfx.ballenero_aceite",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ballenero_aceite_1"
+      },
+      {
+        "name": "darkcraft:sfx/ballenero_aceite_2"
+      }
+    ]
+  },
+  "sfx.ballenero_vieja": {
+    "subtitle": "subtitles.darkcraft.sfx.ballenero_vieja",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ballenero_vieja_1"
+      },
+      {
+        "name": "darkcraft:sfx/ballenero_vieja_2"
+      }
+    ]
+  },
+  "sfx.ballenero_embestida": {
+    "subtitle": "subtitles.darkcraft.sfx.ballenero_embestida",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ballenero_embestida_1"
+      },
+      {
+        "name": "darkcraft:sfx/ballenero_embestida_2"
+      }
+    ]
+  },
+  "sfx.ballenero_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.ballenero_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ballenero_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/ballenero_dolor_2"
+      }
+    ]
+  },
+  "sfx.ballenero_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.ballenero_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ballenero_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/ballenero_muerte_2"
+      }
+    ]
+  },
+  "sfx.ballenero_espera": {
+    "subtitle": "subtitles.darkcraft.sfx.ballenero_espera",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ballenero_espera_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/ballenero_espera_2",
+        "stream": true
+      }
+    ]
+  },
+  "ambiente.costillar": {
+    "subtitle": "subtitles.darkcraft.ambiente.costillar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/costillar_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/costillar_ambiente_2",
+        "stream": true
+      }
+    ]
+  },
+  "ballenero.voz.1": {
+    "subtitle": "subtitles.darkcraft.ballenero.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:ballenero/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "ballenero.voz.2": {
+    "subtitle": "subtitles.darkcraft.ballenero.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:ballenero/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "ballenero.voz.3": {
+    "subtitle": "subtitles.darkcraft.ballenero.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:ballenero/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "ballenero.voz.4": {
+    "subtitle": "subtitles.darkcraft.ballenero.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:ballenero/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "ballenero.voz.5": {
+    "subtitle": "subtitles.darkcraft.ballenero.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:ballenero/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "musica.ballenero": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/ballenero",
+        "stream": true
+      }
+    ]
   }
 }

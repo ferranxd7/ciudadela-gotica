@@ -32,8 +32,13 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   cristal entre sus dos puntas; estrellas sueltas por encima y en el centro la aureola de estrellas (el aro de oro con sus
   doce puntos de luz y la estrella grande); relleno de un cielo de noche que corre; estrellas que caen titilando.
 
+  Brann, el Ballenero (parte 7r): el arpon tumbado (el asta de fresno con vueltas de cuerda, la cana y la punta de hierro
+  con sus dos barbas a la derecha y el cabo atado que se enrolla a la izquierda), costras de sal y percebes, y en el centro
+  la cola de la Vieja que sale del agua (la aleta ancha, palida, con su muesca y el agua que le chorrea); relleno de mar
+  verde oscuro con olas de espuma; gotas de agua y cristales de sal que caen al recibir dano.
+
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
-abad_barra.png, condestable_barra.png y rectora_barra.png (256x128):
+abad_barra.png, condestable_barra.png, rectora_barra.png y ballenero_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -1083,6 +1088,155 @@ def estrellitas():
 # ---------------------------------------------------------------- comun
 
 
+# ---------------------------------------------------------------- Brann, el Ballenero (parte 7r)
+
+F_DD, F_D, F, F_L = hexc("1d150d"), hexc("3a2b1c"), hexc("5f4a32"), hexc("8a7150")      # el fresno del asta
+C_D, C, C_L = hexc("4a3f2c"), hexc("6c5d3c"), hexc("9c8b66")                             # la cuerda
+K_DD, K_D, K, K_L = hexc("16171a"), hexc("34373d"), hexc("5b6068"), hexc("9aa1aa")      # el hierro de la punta
+X_D, X = hexc("5f3d31"), hexc("93604a")                                                   # el oxido
+S_D, S, S_L = hexc("b9c0bd"), hexc("dce2df"), hexc("ffffff")                             # la sal
+V_D, V, V_L, V_H = hexc("5d6d78"), hexc("8a9ba6"), hexc("bccad2"), hexc("e9f1f4")      # la Vieja (palida)
+M_DD, M_D, M, M_L, M_H = hexc("03100f"), hexc("0a2622"), hexc("124038"), hexc("2a6a5c"), hexc("cfeee6")  # el mar
+
+
+def marco_ballenero():
+    """El arpon tumbado: el asta de fresno con vueltas de cuerda, a la derecha la cana y la punta de hierro con sus dos barbas,
+    a la izquierda el cabo atado que se enrolla y cuelga; costras de sal y percebes; en el centro, la cola de la Vieja que
+    sale del agua, con la muesca y el agua que le chorrea."""
+    rnd = random.Random(173)
+    n = noise2(79)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 4, FX1 + 3, FY0 - 4, FY1 + 3
+    rect(img, x0, y0, x1, y1, OUT)
+    # el asta: vetas a lo largo, gastada (mas clara arriba)
+    for y in range(y0 + 1, y1):
+        for x in range(x0 + 1, x1):
+            v = n(x * 0.05, y * 0.8)
+            c = F_D if v < 0.38 else F if v < 0.8 else F_L
+            if y == y0 + 1:
+                c = mix(c, F_L, 0.3)
+            if (x * 7 + y * 5) % 59 == 0:
+                c = F_DD
+            put(img, x, y, c)
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, F_DD)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # vueltas de cuerda por el asta (rayas en diagonal)
+    for xc in (x0 + 26, x0 + 70, x1 - 72, x1 - 30):
+        if abs(xc - FW // 2) < 24:
+            continue
+        for y in range(y0 - 1, y1 + 2):
+            if FY0 - 1 <= y <= FY1:
+                continue
+            for k in range(5):
+                c = C_L if (k + y) % 3 == 0 else C if (k + y) % 3 == 1 else C_D
+                put(img, xc + k, y, c)
+            put(img, xc - 1, y, OUT)
+            put(img, xc + 5, y, OUT)
+    # costras de sal y percebes por los cantos
+    for _ in range(26):
+        x = rnd.randint(x0 + 4, x1 - 4)
+        if abs(x - FW // 2) < 22:
+            continue
+        y = rnd.choice((y0, y0 + 1, y1, y1 - 1))
+        put(img, x, y, S if rnd.random() < 0.7 else S_D)
+        if rnd.random() < 0.4:
+            put(img, x + 1, y, S_L)
+    # la punta (derecha): la cana de hierro, la hoja en punta y las dos barbas hacia atras
+    cy = (y0 + y1) // 2
+    for x in range(x1, x1 + 3):
+        for y in range(cy - 1, cy + 2):
+            put(img, x, y, K if y == cy else K_D)
+    puntas = FW - (x1 + 3)
+    for i in range(puntas):
+        x = x1 + 3 + i
+        alto = max(0, 5 - i // 2)
+        for y in range(cy - alto, cy + alto + 1):
+            c = K_L if y < cy else K if y == cy else K_D
+            if (x + y) % 6 == 0:
+                c = X
+            put(img, x, y, c)
+        put(img, x, cy - alto - 1, OUT)
+        put(img, x, cy + alto + 1, OUT)
+    for k in range(6):
+        put(img, x1 + 2 - k, cy - 6 - k // 2, K_L if k < 4 else K)
+        put(img, x1 + 2 - k, cy + 6 + k // 2, K_D if k < 4 else K_DD)
+    # el cabo atado (izquierda): un rollo de vueltas y el extremo que cuelga
+    for dx in range(-5, 6):
+        for dy in range(-5, 6):
+            d = math.hypot(dx, dy)
+            if 2.2 <= d <= 5.2:
+                c = C_L if (dx + dy) % 3 == 0 else C if (dx + dy) % 3 == 1 else C_D
+                put(img, 6 + dx, cy + dy, c)
+            elif 5.2 < d <= 6.0:
+                put(img, 6 + dx, cy + dy, OUT)
+    for i in range(10):
+        put(img, 6 + i // 4, cy + 6 + i, C if i % 2 == 0 else C_D)
+        put(img, 7 + i // 4, cy + 6 + i, OUT)
+    # en el centro: la cola de la Vieja saliendo del agua (la aleta ancha en V, la muesca, el tallo y las gotas)
+    cx = FW // 2
+    for y in range(0, 18):
+        # la aleta: dos lobulos que se abren hacia arriba
+        for dx in range(-15, 16):
+            ax = abs(dx)
+            arriba = 2 + int((ax / 15.0) ** 1.6 * 2) if ax > 1 else 5
+            abajo = 7 + int((1 - ax / 15.0) * 5)
+            if ax <= 15 and arriba <= y <= abajo and not (ax <= 1 and y < 6):
+                c = V_L if y <= arriba + 1 else V if y < abajo - 1 else V_D
+                if (dx * 3 + y * 5) % 17 == 0:
+                    c = V_H
+                put(img, cx + dx, y, c)
+        # el tallo de la cola, que baja al agua
+        if 10 <= y <= 17:
+            for dx in range(-3, 4):
+                put(img, cx + dx, y, V_D if abs(dx) == 3 else V)
+    # el contorno de la cola
+    for y in range(0, 18):
+        for dx in range(-17, 18):
+            if img.getpixel((cx + dx, y))[3] == 0:
+                vecinos = [(cx + dx + a, y + b) for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1))]
+                if any(0 <= vx < FW and 0 <= vy < 40 and img.getpixel((vx, vy))[3] and img.getpixel((vx, vy))[:3] in (V_D[:3], V[:3], V_L[:3], V_H[:3])
+                       for vx, vy in vecinos):
+                    put(img, cx + dx, y, OUT)
+    # el agua que le chorrea de la aleta
+    for gx, gy in ((cx - 12, 11), (cx - 7, 13), (cx + 9, 12), (cx + 13, 10)):
+        put(img, gx, gy, M_H)
+        put(img, gx, gy + 2, M_L)
+    return img
+
+
+def relleno_ballenero(k):
+    """El mar verde oscuro que corre, con olas de espuma que pasan."""
+    n = noise2(167)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            t = 0.25 + 0.4 * mid + 0.4 * (n((x - k * 4) * 0.08, y * 0.5) - 0.5)
+            c = mix(M_D, M_L, max(0.0, min(1.0, t * 1.3)))
+            ola = (x - k * 4 + int(3 * math.sin((x + y * 2) * 0.17))) % 29
+            if ola in (0, 1, 2) and y <= 2:
+                c = mix(c, M_H, 0.75 - 0.2 * ola)
+            if y == 0:
+                c = mix(c, M_H, 0.3)
+            if y == 6:
+                c = mix(c, M_DD, 0.6)
+            img.putpixel((x, y), c)
+    return img
+
+
+def salpicaduras():
+    """Lo que cae al recibir dano: gotas de agua de mar y cristales de sal."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = ([".m.", "mMm", ".m."], ["m.", "M.", "m."], [".s.", "sSs", ".s."], ["s.", "Ss", ".s"])
+    col = {"m": M_L, "M": M_H, "s": S, "S": S_L}
+    for k, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, k * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 def hueco(a, b):
     n = noise2(113)
     img = Image.new("RGBA", (240, 7))
@@ -1122,6 +1276,7 @@ if __name__ == "__main__":
         "abad": atlas(marco_abad(), relleno_abad, hueco("05090c", "121c24"), rastro("f6fcff", "c4e2ef"), copos()),
         "condestable": atlas(marco_condestable(), relleno_condestable, hueco("0a0605", "1c1210"), rastro("fff2e0", "f0b88a"), brasas()),
         "rectora": atlas(marco_rectora(), relleno_rectora, hueco("05060c", "10142a"), rastro("f2f6ff", "b8c6ff"), estrellitas()),
+        "ballenero": atlas(marco_ballenero(), relleno_ballenero, hueco("030807", "0d1c19"), rastro("effcf8", "a9d8cc"), salpicaduras()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

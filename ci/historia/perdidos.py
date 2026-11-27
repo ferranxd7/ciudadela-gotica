@@ -11,7 +11,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza",
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
-         22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain"}
+         22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain", 27: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -403,6 +403,16 @@ LIBROS = {
    "Night of the red sky. At high tide the sea went away. It did not ebb: it went, all at once, as if someone had drunk it. The boats were left lying on the sand, and the whale that followed the fleet was stranded in the middle of the bay.",
    "At dawn everyone went down onto the sand to gather the fish, the shells, whatever the sea had left. I shouted from the gallery for them to come up. They did not. The sea did not come back, and the salt began to creep up their legs. Now they are still down there, at work.",
    "I have lit the lighthouse with cold fire: it is the only thing that still burns. If anyone reads this, do not go down into the bay. And do not go north, to the Ribcage: old Brann the whaler is still there, harpooning a whale that has long been gone.\n\nTomé, keeper of the Stranded Harbour's light"]),
+ },
+ 27: {
+  "es": ("La bitácora del ballenero", "Brann, arponero del Puerto Varado", [
+   "Día primero sin mar. La Vieja estaba a tiro cuando el agua se fue: la vi hundirse en la arena como si la arena fuera el mar. Cuarenta años detrás de ella y se me escapa así. Su ballena hermana quedó aquí varada; le he hecho casa con sus costillas.",
+   "No sé ya qué día es. La sal me ha subido hasta el pecho y ya no tengo hambre. Cada noche la oigo cantar bajo la arena, y por la mañana veo su chorro allí, al este. He afilado el arpón y he puesto aceite en el farol. Cuando salga, estaré despierto.",
+   "Si alguien lee esto: no te acerques a las costillas. Mi barca está volcada y mis hombres se fueron al puerto a remendar redes que ya no sirven. Yo me quedo. La Vieja va a salir, y esta vez no se me escapa. Después, que vuelva la marea.\n\nBrann"]),
+  "en": ("The Whaler's Log", "Brann, harpooner of the Stranded Harbour", [
+   "First day without the sea. The Old One was in range when the water went: I saw her sink into the sand as if the sand were the sea. Forty years after her, and she slips me like that. Her sister whale was stranded here; I have made my home in her ribs.",
+   "I no longer know the day. The salt has climbed to my chest and I am no longer hungry. Every night I hear her singing under the sand, and in the morning I see her spout out there, to the east. I have sharpened the harpoon and filled the lantern with oil. When she surfaces, I will be awake.",
+   "If anyone reads this: keep away from the ribs. My boat lies overturned and my men went back to the harbour to mend nets that are no use anymore. I stay. The Old One will surface, and this time she will not slip me. After that, let the tide come back.\n\nBrann"]),
  },
 }
 

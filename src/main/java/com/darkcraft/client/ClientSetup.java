@@ -76,6 +76,11 @@ public final class ClientSetup {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ORBE.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.SALOBRE.get(), com.darkcraft.client.enemigos.SalobreRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.RED.get(), ctx -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(ctx, 2.2f, false));
+        // Brann, el Ballenero (parte 7r): el, su arpon con el cabo, el farol de aceite que lanza y la Vieja
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BALLENERO.get(), com.darkcraft.client.enemigos.BalleneroRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ARPON_BALLENERO.get(), com.darkcraft.client.enemigos.ArponBalleneroRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.FAROL_ACEITE.get(), ctx -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(ctx, 1.4f, true));
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.VIEJA.get(), com.darkcraft.client.enemigos.ViejaRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ELITE.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
                 new com.darkcraft.client.enemigos.EliteModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.EliteModelo.CAPA)), "elite", 1, 0.6f, 1.15f));
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BRANDT.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
@@ -144,5 +149,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.AbadModelo.CAPA, com.darkcraft.client.enemigos.AbadGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CondestableModelo.CAPA, com.darkcraft.client.enemigos.CondestableGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.RectoraModelo.CAPA, com.darkcraft.client.enemigos.RectoraGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.BalleneroModelo.CAPA, com.darkcraft.client.enemigos.BalleneroGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.ViejaModelo.CAPA, com.darkcraft.client.enemigos.ViejaGeometria::crear);
     }
 }

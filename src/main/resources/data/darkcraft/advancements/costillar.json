@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:puerto",
+  "display": {
+    "icon": {
+      "item": "minecraft:bone"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.costillar.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.costillar.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 40
+  }
+}

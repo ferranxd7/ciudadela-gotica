@@ -213,5 +213,16 @@
     "aviso": "Music by SubspaceAudio / Juhani Junkala (OpenGameArt, CC0)",
     "uso": "Ysolde, la Rectora de la Academia (el jefe de la Academia Espectral de Morvain)",
     "lufs": -16
+  },
+  {
+    "id": "ballenero",
+    "pagina": "https://opengameart.org/content/ocean-music-pack",
+    "busca": "06_the_kraken_loop",
+    "titulo": "The Kraken (Ocean Music Pack)",
+    "autor": "Leonardo Paz (leohpaz)",
+    "licencia": "CC-BY 4.0",
+    "aviso": "Music by Leonardo Paz (leohpaz, OpenGameArt, CC-BY 4.0)",
+    "uso": "Brann, el Ballenero (el jefe de la Costa de los Huesos de Morvain)",
+    "lufs": -16
   }
 ]
