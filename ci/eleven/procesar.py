@@ -48,7 +48,8 @@ VOZ = ("highpass=f=65," + ECO_SALA + ",acompressor=threshold=-20dB:ratio=2.5:att
        "loudnorm=I=-15:TP=-1.5:LRA=9")
 
 # Maelis, la guia de los santuarios (voz "Autumn Veil"): serena y cerca, con un poco de aire de piedra
-TOMAS_GUIA = {n: "a" for n in range(1, 15)}
+# (15 y 16: en la capilla negra de la torre del homenaje, parte 7ab)
+TOMAS_GUIA = {n: "a" for n in range(1, 17)}
 VOZ_GUIA = ("highpass=f=70,equalizer=f=3200:t=q:w=1.2:g=1.5,aecho=0.8:0.35:38|85:0.10|0.05,"
             "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=160,loudnorm=I=-16:TP=-1.5:LRA=9")
 # Dorvan, el herrero (voz "Fjalar - Gruff Scottish Dwarf Warrior"): ronco, con algo de graves y el eco corto de la
@@ -94,13 +95,17 @@ TOMAS_BUFON = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 # Vorthak, el Dragon de Ceniza (parte 7z; voz "Malvoryx The Monster", flow yj2HeJUSKF4WFJfanGJL): las frases 1..5 (tomas a; la
 # 4b, "Burn!", se alarga con un rugido de mas)
 TOMAS_DRAGON = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
+# la reina Isolde (parte 7ab; voz "Elariel X - Epic Ethereal Queen", flow dAtA9WXZ451rqHwQNb2f): las frases 1..6 (tomas a)
+TOMAS_ISOLDE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a", 6: "a"}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
 TOMAS_SOMBRA = {1: "b", 2: "b", 3: "a", 4: "a", 5: "b", 6: "b", 7: "a", 8: "a", 9: "a",
                 # la subida por la cadena del sur (parte 7aa): al pisar el camino, en el Descansillo y en la Boca
-                21: "a", 22: "b", 23: "a"}
-SUSURROS_SOMBRA = {1: "b", 2: "b", 3: "b", 4: "a", 5: "b", 6: "a", 7: "a", 8: "a", 9: "a", 21: "a", 22: "b", 23: "a"}
+                21: "a", 22: "b", 23: "a",
+                # al entrar en la torre del homenaje (parte 7ab)
+                24: "a"}
+SUSURROS_SOMBRA = {1: "b", 2: "b", 3: "b", 4: "a", 5: "b", 6: "a", 7: "a", 8: "a", 9: "a", 21: "a", 22: "b", 23: "a", 24: "a"}
 # lo que resuena el eco de vacio tras la ultima palabra (s)
 COLA_SOMBRA = 3.4
 # los personajes con dialogo: id -> (tomas, filtro)
@@ -375,6 +380,18 @@ SFX = {
     "gargola_aterriza": (1.1, 0.4, -13), "gargola_dolor": (0.9, 0.2, -15), "gargola_muerte": (2.6, 0.9, -14),
     "cadena_rafaga": (3.2, 0.9, -13), "cadena_crujido": (3.0, 1.0, -16), "cadena_ambiente": (20.0, 2.0, -24),
     "boca_aliento": (4.0, 1.2, -15), "boca_latido": (2.6, 1.0, -14),
+    # la ciudadela por dentro (parte 7ab): los centinelas (la armadura que despierta, sus pasos, el tajo del espadon, el golpe en el
+    # suelo, el barrido de la alabarda, el humo en que se deshacen y vuelven, el quejido y la armadura que se desploma), la reina
+    # Isolde (su tarareo en el trono —en bucle—, la nana, las garras, el velo, el abrazo, desvanecerse, el grito, el velo que arde,
+    # las lagrimas negras, el quejido y su muerte), el aire de la torre del homenaje (en bucle) y su puerta
+    "centinela_alerta": (2.0, 0.6, -13), "centinela_paso": (0.8, 0.2, -18), "centinela_tajo": (1.0, 0.3, -12),
+    "centinela_golpe": (1.2, 0.4, -11), "centinela_alabarda": (1.2, 0.4, -12), "centinela_humo": (1.5, 0.4, -15),
+    "centinela_dolor": (0.8, 0.2, -14), "centinela_muerte": (2.5, 0.8, -13),
+    "isolde_tarareo": (15.0, 1.5, -22), "isolde_canto": (3.0, 0.8, -14), "isolde_garras": (1.0, 0.3, -14),
+    "isolde_velo": (1.2, 0.3, -13), "isolde_abrazo": (1.5, 0.4, -13), "isolde_desvanece": (1.5, 0.4, -14),
+    "isolde_grito": (2.0, 0.6, -12), "isolde_velo_arde": (2.5, 0.8, -12), "isolde_lagrimas": (1.5, 0.4, -14),
+    "isolde_dolor": (0.7, 0.2, -15), "isolde_muerte": (3.5, 1.2, -14),
+    "homenaje_ambiente": (20.0, 2.0, -24), "puerta_homenaje": (3.0, 0.8, -14),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -383,7 +400,7 @@ ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0
            "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0, "sinfe_ambiente": 2.0,
            "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0,
            "aldric_rezo": 1.0, "aldric_arrastre": 0.3, "jinete_galope": 0.3, "dragon_aleteo": 0.3, "dragon_respira": 0.6,
-           "cadena_ambiente": 2.0}
+           "cadena_ambiente": 2.0, "isolde_tarareo": 1.2, "homenaje_ambiente": 2.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
@@ -685,6 +702,19 @@ TOMAS_SFX = {
     "gargola_garras": (3, 4), "gargola_cola": (4, 2), "gargola_aterriza": (1, 4), "gargola_dolor": (3, 1),
     "gargola_muerte": (1, 3), "cadena_rafaga": (3, 1), "cadena_crujido": (2, 3), "cadena_ambiente": (2, 4),
     "boca_aliento": (3, 2), "boca_latido": (4, 3),
+    # la ciudadela por dentro (parte 7ab; elegidas midiendo las tomas): los despertares mas fuertes (la 4 y la 2), tres pasos, los
+    # tajos con mas cuerpo (la 4 y la 1), los golpes con el crujido al principio (la 2 y la 4), los barridos mas largos (la 3 y la
+    # 1), los humos (todos flojos: la 2 y la 1), los quejidos (la 3 y la 4), las armaduras que caen en dos golpes (la 3 y la 2); de
+    # Isolde los tarareos mas seguidos (la 4 y la 1, para el bucle), los cantos que mas suben (la 1 y la 3), las garras con dos
+    # cortes (la 4 y la 2), los velos (la 2 y la 1), los abrazos con el jadeo al final (la 2 y la 4), los desvanecerse (la 2 y la
+    # 3), los gritos mas largos (la 3 y la 4), el velo que arde con el chillido (la 1 y la 4), las lagrimas que mas chisporrotean
+    # (la 1 y la 2), los quejidos (la 1 y la 3), las muertes con el cristal (la 3 y la 1), el aire mas parejo (la 1 y la 3) y las
+    # puertas mas fuertes (la 3 y la 1)
+    "centinela_alerta": (4, 2), "centinela_paso": (1, 2, 4), "centinela_tajo": (4, 1), "centinela_golpe": (2, 4),
+    "centinela_alabarda": (3, 1), "centinela_humo": (2, 1), "centinela_dolor": (3, 4), "centinela_muerte": (3, 2),
+    "isolde_tarareo": (4, 1), "isolde_canto": (1, 3), "isolde_garras": (4, 2), "isolde_velo": (2, 1), "isolde_abrazo": (2, 4),
+    "isolde_desvanece": (2, 3), "isolde_grito": (3, 4), "isolde_velo_arde": (1, 4), "isolde_lagrimas": (1, 2),
+    "isolde_dolor": (1, 3), "isolde_muerte": (3, 1), "homenaje_ambiente": (1, 3), "puerta_homenaje": (3, 1),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -1068,6 +1098,25 @@ def voz_bufon(src, dst):
         "equalizer=f=2500:t=q:w=1.2:g=2,highshelf=f=7000:g=-2,"
         "aecho=0.85:0.45:90|210|380:0.25|0.15|0.08,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=150,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.2
+
+
+def voz_isolde(src, dst):
+    """
+    La reina Isolde: la voz (eterea, de reina) con una segunda voz un poco mas grave, retrasada y muy baja (lo que la Sombra
+    devolvio con su cara: algo que habla por debajo de ella), un brillo frio en los agudos y el eco largo y alto del salon del
+    trono (piedra, una boveda enorme: tres rebotes y una cola).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=2[v1][v2];"
+        "[v2]asetrate=44100*0.88,aresample=44100,atempo=1.1364,adelay=60:all=1,lowpass=f=1800,volume=0.28[sombra];"
+        "[v1][sombra]amix=inputs=2:weights=1 0.6:normalize=0,"
+        "highpass=f=90,equalizer=f=3600:t=q:w=1.2:g=2,highshelf=f=8000:g=-2,"
+        "aecho=0.85:0.55:120|260|430:0.3|0.18|0.1,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=160,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA + 0.2
@@ -1504,6 +1553,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO dragon {n}: {e}")
+    # la reina Isolde (parte 7ab)
+    iso = os.path.join(ASSETS, "sounds", "isolde")
+    os.makedirs(iso, exist_ok=True)
+    dur_i, hab_i = {}, {}
+    for n, toma in sorted(TOMAS_ISOLDE.items()):
+        src = os.path.join(MASTER, "isolde", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(iso, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_isolde(src, dst)
+            dur_i[n] = round(duracion(dst), 2)
+            hab_i[n] = round(min(h, dur_i[n]), 2)
+            print(f"isolde {n:2d}: {dur_i[n]} s (habla hasta {hab_i[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO isolde {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -1539,7 +1607,8 @@ def main():
                    "rectora": dur_r, "habla_rectora": hab_r, "ballenero": dur_w, "habla_ballenero": hab_w,
                    "pontifice": dur_p, "habla_pontifice": hab_p, "aldric": dur_l, "habla_aldric": hab_l,
                    "gigante": dur_t, "habla_gigante": hab_t, "jinete": dur_j, "habla_jinete": hab_j,
-                   "bufon": dur_u, "habla_bufon": hab_u, "dragon": dur_d, "habla_dragon": hab_d}, fh)
+                   "bufon": dur_u, "habla_bufon": hab_u, "dragon": dur_d, "habla_dragon": hab_d,
+                   "isolde": dur_i, "habla_isolde": hab_i}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

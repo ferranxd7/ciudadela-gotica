@@ -3356,6 +3356,93 @@ cielo rojo que se apaga con `CieloRojo.apagar`, el epilogo de Maelis y los credi
   viene, la gargola (capturas que esperan: `esperarA` / `esperaTick`): despierta (`mv530`), vuela (`mv531`), el picado (`mv532`), las
   garras (`mv533`), posada (`mv534`), cae (`mv535`), el bestiario (`mv536`) y caer de la cadena (`mv537`).
 
+### Plan grande, parte 7ab: la ciudadela por dentro (la casa de la Sombra, los centinelas, la Ultima Llama y la reina Isolde)
+
+Segunda de las tres partes del final (respuestas 88, 122 y 125 del plan). Lore: cuando el rey Corvin suplico a la Sombra por su reina
+muerta, lo que volvio tenia su cara, su voz y su corona, pero no era ella; espera en el trono de la ciudadela. La reina de verdad, en
+los ratos en que era ella, escribio un diario (el libro perdido 35).
+- **La torre del homenaje por dentro** (`morvain/Homenaje`, singleton; lo escribe `MorvainGenerador` despues de la subida, chunk a
+  chunk, sobre lo que `Ciudadela` dejo hueco; coordenadas del mundo, la ciudadela esta en 0,0): la **puerta** en la cara del sur (x
+  `PX0` -3 a `PX1` 2, arco apuntado con su portico, la gema encima) con el **rastrillo** de barrotes (`rastrillo()`, en `PZ_MURO` 25:
+  cerrado al generarse); en el patio, el camino desde la torre del sur, braseros y cuatro estatuas. Seis plantas (`SUELO`: TOP, +15,
+  +29, +43, +57, +71; `pisa(k)` = lo que se pisa): 0 el **Salon de la Guardia** (pilares, la alfombra, armaduras), 1 la **Armeria**, 2
+  el **Archivo** (estanterias, mesas y el atril con el **libro perdido 35**), 3 la **Prision** (celdas, jaulas), 4 la **Capilla Negra**
+  (bancos, el altar y la **Ultima Llama** en el centro, `SANT_X` -1, `SANT_Z` 1; Maelis en `GUIA_X` 2, `GUIA_Z` 3) y 5 el **Salon del
+  Trono** (el estrado al sur con el trono —`TRONO_X` 0, `TRONO_Z` 17: el asiento es aire, la reina flota sentada— la cortina roja,
+  braseros, espejos rotos y lamparas). Las **escaleras** van pegadas a los muros, cada una al lado contrario de la anterior (`lado(k)`:
+  las de las plantas 0, 2 y 4 por el norte subiendo al oeste; las de 1 y 3 por el sur subiendo al este; `peldano`, `filas`, `enTramo`,
+  `enHueco`); de la sala del trono a la **azotea**, la del muro del este tras una **reja** (`rejaAzotea()`) que no se abre hasta que cae
+  la reina; en la azotea, la puerta de la aguja cegada (la Sombra: parte 7ac). Sitios (`sitio(n)`): patio, camino, puerta, vestibulo,
+  salon, armeria, archivo, atril, prision, celda, capilla, santuario, altar, trono_entrada, sala_trono, trono, tesoro, reja_azotea,
+  azotea, puerta_sombra, frente (y los arcones y escaleras). Donde se esta: `enHomenaje`, `planta(y)`, `enSalaTrono`, `enCapilla`,
+  `enAzotea`; el Espejo dice cada sala (`sala(k)`: `darkcraft.morvain.lugar.homenaje_*`, en `Morvain.lugar` antes que la ciudadela).
+  Arcones `chests/homenaje` (armeria y archivo) y `chests/homenaje_tesoro` (junto al trono).
+- **La casa de la Sombra** (`morvain/CasaSombra`, desde `Morvain.onTick`): el **rastrillo** sube solo la primera vez que alguien llega
+  ante la puerta (`LLEGA` 10; una fila de barrotes cada cuatro ticks, `sfx.puerta_homenaje`; se apunta en los datos de Morvain:
+  `homenaje_rastrillo`); al entrar, **la Sombra** dice su frase **24** ("Bienvenido a mi casa, marcado. Cuidado con mi guardia... nunca
+  aprendieron a morir": bit 8 de la marca `sombra_cadena`, por `Cadena.decir`) y el logro `homenaje`; junto a la Ultima Llama
+  encendida, el logro `ultima_llama`; **Maelis** se sienta una vez en la capilla (`homenaje_guia`); el **sello del salon del trono**
+  mientras la reina pelea (barreras sobre lo alto de la escalera que sube de la capilla, `sello()`: x `SX0` -6 a `SX1` -1, z -23 a
+  -20, tres de alto; quien este en medio pasa al salon; cortina de chispas; un sello que se quedo puesto al cerrar el servidor se quita);
+  la **reja de la azotea**, abierta con el puesto de la reina caido (y cerrada si vuelve: `revisar`). Avisos `darkcraft.homenaje.sello`,
+  `.reja` y `.aguja`. `resumen`, `cerrarRastrillo`, `abrirRastrilloYa`, `olvidar` para las pruebas y los comandos.
+- **La Ultima Llama** (`SantuariosMorvain.ULTIMA`, id `ultima_llama`: en `todos()`, sin tarima; la escribe `Homenaje`).
+- **Maelis en la capilla** (`Dialogos.GUIA` 15 → 16 → menu; `Conversaciones.inicioGuia(sp, guia)`: con la guia en la capilla, la
+  primera vez 15 —bit 16, `GUIA_CAPILLA`—, despues 16, y con la reina ya caida 14). Voz "Autumn Veil", frases 15 y 16 (tomas a).
+- **Los de la casa** (`MorvainEnemigos`, sitio `homenaje`, 30, de `Homenaje.esperas()`, el tipo de cada uno lo dice el plano): la
+  reina (puesto 0, `Puestos.JEFE`), centinelas de pie y quietos (`REZA`) o tirados (`TUMBADO`) o de ronda en el patio, el salon, la
+  armeria, el archivo y la prision; espectros en el archivo; marcados de rodillas en las celdas y perros dormidos en la prision.
+- **El centinela** (`enemigos/Centinela`, entidad `darkcraft:centinela`, 0,9 x 2,5; bestiario `centinela_espadon` / `centinela_alabarda`,
+  logro `centinela`): una armadura vacia con humo dentro. 72 de vida, golpe 8, armadura 12. Quieto (`REZA`) despierta a 6 bloques (3
+  agachado); tirado se levanta juntando las piezas. Espadon (variante 0): **tajo** (de lado a lado) y **golpe** (de arriba abajo, con
+  onda: saltando o rodando se libra); alabarda (1): **estocada** (llega a 5,3), **barrido** (vuelta entera; a quien se le pone al lado o
+  detras) y **hachazo**. Los dos, el **humo** (de 4,5 a 10 bloques; se deshace —el dibujante no lo dibuja—, cruza y sale con una
+  estocada). Al morir se desploma y se le escapa el humo. Modelo `tools/enemigos/centinela.py` (escala 1,3; brasas en el yelmo y la marca
+  en la capa de brillo, apagadas mientras duerme). Comando `/darkcraft homenaje centinela [despertar | tajo | golpe | humo | estocada |
+  barrido | hachazo]` (el mas cercano).
+- **La reina Isolde** (`enemigos/Isolde`, `Guardian`, entidad `darkcraft:isolde`, 0,9 x 2,9; 1800 de vida, golpe 13, armadura 6;
+  barra propia —`tools/hud/barra_guardianes.py`: el velo de encaje con rosas negras, la cara velada y la corona; seda carmesi; petalos y
+  lagrimas que caen—, musica "Dark souls type boss theme" de ProjectHelmet, CC-BY 4.0, id `isolde`, tema 46; voz ElevenLabs "Elariel X
+  - Epic Ethereal Queen" `ksryVoNAGZT8GxWCTiVm`, flow `dAtA9WXZ451rqHwQNb2f`, `voz_isolde` en `procesar.py`: una segunda voz grave y
+  baja por debajo y el eco alto del salon; lineas `Voces.BASE_ISOLDE` 170 + N; logro `isolde`, hazana). Espera **sentada tarareando**
+  (`client/morvain/ClientHomenaje`: el tarareo sigue a la reina y se calla al levantarse); ve a quien entra en el salon (a la vista, a
+  44). Al empezar: frase 1 mientras se levanta y grita al acabarla (no repite la frase en 4 min). **Garras** (dos cortes), **velo**
+  (vuelta entera), **abrazo** (de 4,5 a 12: cruza del tick 10 al 16 y a quien pilla lo coge: **aprieta** —le arrastra delante, le chupa
+  la vida en los ticks 8 y 16 y se cura, y le suelta de un empujon en el 26—), **nana** (frase 5 la primera vez; a quien la este
+  mirando a la cara —`laMira`: 44 grados, sin nada en medio— la mitad del canto, al acabar se le cierran los ojos: `dormir`, ceguera,
+  lentitud, debilidad y cansancio 3,5 s, aviso `darkcraft.isolde.dormido`) y **desvanecerse** (del tick 6 al 13 no se le puede pegar;
+  en el 12 aparece detras de su presa —segun hacia donde mira— y le echa las garras). **A media vida le arde el velo** (frase 3; la
+  variante 1 desde el tick 26: se le ve la cara): el velo quema, **lagrimas** (marcas bajo cada uno —y por donde va— y a los 28 ticks
+  la lluvia negra: dano y marchitamiento) y **su corte** (frase 2 la primera vez; 2 espectros efimeros, uno mas por jugador, hasta 4).
+  Si cae su presa, la frase 4. Al caer, frase 6 de rodillas en el aire y se va al acabarla subiendo y apagandose (`fin()`); deja tres
+  piedras de forja III, dos II y la ceniza de la sangre. Modelo `tools/enemigos/isolde.py` (escala 1,5; sentada, quieto, listo, andar
+  —se desliza—; translucida: `IsoldeRenderer.alfa`). Para las pruebas: `quieta`, `probar`, `mediaVida`, `vencer`, `estado` y contadores.
+- Sonidos (ElevenLabs, flow `08HSxlBxAnMWii5NxHHr`, `TOMAS_SFX` elegidas midiendo las tomas): `centinela_alerta` (4, 2), `_paso` (1, 2,
+  4), `_tajo` (4, 1), `_golpe` (2, 4), `_alabarda` (3, 1), `_humo` (2, 1), `_dolor` (3, 4), `_muerte` (3, 2); `isolde_tarareo` (4, 1;
+  bucle), `_canto` (1, 3), `_garras` (4, 2), `_velo` (2, 1), `_abrazo` (2, 4), `_desvanece` (2, 3), `_grito` (3, 4), `_velo_arde` (1,
+  4), `_lagrimas` (1, 2), `_dolor` (1, 3), `_muerte` (3, 1); `homenaje_ambiente` (1, 3; el aire de la torre, `ambiente.homenaje`, lo
+  pone `ClientMusic.tickCrater` dentro de la torre) y `puerta_homenaje` (3, 1). La Sombra 24: voz y susurro a/a.
+- **El libro perdido 35**, "El diario de la reina Isolde" (la fuente, Corvin que lloraba, la guardia que nunca aprendio a morir, "cuando
+  cante, no la mires", "nunca fui yo la que volvio"). `Perdidos.TOTAL` = 35.
+- Comandos `/darkcraft homenaje [ir <sitio> | enemigos [volver | fuera | sacar] | rastrillo [abrir | cerrar] | sombra olvidar |
+  centinela ...]` y `/darkcraft isolde [ir | vencer | volver | media | garras | velo | abrazo | nana | desvanece | lagrimas | corte]`.
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_homenaje carpeta` (`Volcado.andarHomenaje`: a pie desde el patio cerrado, con
+  el rastrillo abierto y con todo abierto; cada uno de la casa se pisa, se llega y no esta metido en un bloque); los modelos:
+  `python3 tools/enemigos/generar.py --solo centinela|isolde --vistas carpeta`.
+- **Las capturas que esperan** (`ClientCiTest.esperarA`): llamadas mientras se apuntan los pasos (`planificando`) se ponen en cola al
+  llegar el ultimo paso apuntado; antes se ponian ya y el primer paso del tramo, que vacia la cola, se las llevaba (en la build de la 7aa
+  no salieron las de la gargola).
+- Pruebas: servidor, `homenaje()` (`Morvain, la torre del homenaje: ...` —el resumen, a pie cerrado / con el rastrillo / con todo, la
+  Ultima Llama, donde se esta—, `Morvain, la casa de la Sombra: ...` —el rastrillo que sube, Maelis, la reja con la reina caida y si
+  vuelve— y `Morvain, los de la torre del homenaje: ...`), `centinelas()` (`Morvain, los centinelas: ...`: lo que ve quieto, despierta,
+  tajo, golpe, el humo, la estocada, el barrido por la espalda, el hachazo, se desploma) e `isolde()` (`Morvain, la reina Isolde: ...` y
+  `... cae: ...`). Cliente, tramo `homenaje()` despues de la cadena: la torre desde el patio (`cliente_mv540`), el rastrillo (`mv541`),
+  la Sombra al entrar (`mv542`), el salon (`mv543`), un centinela despierta (`mv544`), su estocada (`mv545`) y su humo (`mv546`), la
+  armeria (`mv547`), el archivo (`mv548`), la prision (`mv549`), la capilla (`mv550`), Maelis (`mv551`), la reina en su trono (`mv552`),
+  se levanta (`mv553`), grita (`mv554`), las garras (`mv555`), el abrazo (`mv556`) y el aprieto (`mv557`), la nana (`mv558`) y los ojos
+  cerrados (`mv559`), desvanecerse (`mv560`), el velo que arde (`mv561`), las lagrimas (`mv562`), su corte (`mv563`), cae (`mv564`), la
+  reja abierta (`mv565`), la azotea (`mv566`) y el bestiario (`mv567`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

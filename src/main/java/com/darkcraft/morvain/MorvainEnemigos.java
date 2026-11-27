@@ -68,11 +68,12 @@ public final class MorvainEnemigos {
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
             CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio",
             PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar", CERCO = "cerco", TEATRO = "teatro", NIDO = "nido",
-            CADENA = "cadena";
+            CADENA = "cadena", HOMENAJE = "homenaje";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
             ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
-            PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon", DRAGON = "dragon", GARGOLA = "gargola";
+            PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon", DRAGON = "dragon", GARGOLA = "gargola", CENTINELA = "centinela",
+            ISOLDE = "isolde", ESPECTRO = "espectro", PERRO = "perro";
     /** El tipo de puesto de las gargolas (para las pruebas). */
     public static final String GARGOLA_TIPO = GARGOLA;
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
@@ -85,7 +86,8 @@ public final class MorvainEnemigos {
             BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>(), ERMITA_P = new ArrayList<>(), CUMBRE_P = new ArrayList<>(),
             CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>(),
             PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>(), GRIETA_P = new ArrayList<>(), ALTAR_P = new ArrayList<>(),
-            CERCO_P = new ArrayList<>(), TEATRO_P = new ArrayList<>(), NIDO_P = new ArrayList<>(), CADENA_P = new ArrayList<>();
+            CERCO_P = new ArrayList<>(), TEATRO_P = new ArrayList<>(), NIDO_P = new ArrayList<>(), CADENA_P = new ArrayList<>(),
+            HOMENAJE_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -232,6 +234,10 @@ public final class MorvainEnemigos {
         for (Subida.Espera e : Subida.get().esperas())
             CADENA_P.add(new Puesto(GARGOLA.equals(e.tipo()) ? GARGOLA : MARCADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
                     e.ronda(), e.grupo()));
+        // ---- la casa de la Sombra (parte 7ab): la reina Isolde en su trono (el puesto 0) y los de la torre del homenaje (los
+        // centinelas, los espectros del archivo, los marcados de la prision y sus perros); el tipo de cada uno lo dice el plano
+        for (Homenaje.Espera e : Homenaje.get().esperas())
+            HOMENAJE_P.add(new Puesto(e.tipo(), e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -289,6 +295,11 @@ public final class MorvainEnemigos {
         return 0;
     }
 
+    /** El numero del puesto de la reina Isolde en el sitio de la torre del homenaje. */
+    public static int isolde() {
+        return Homenaje.ISOLDE;
+    }
+
     /** Lo apunta el mod al arrancar. */
     public static void registrar() {
         Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
@@ -312,6 +323,10 @@ public final class MorvainEnemigos {
         Puestos.tipo(BUFON, DarkCraftMod.BUFON);
         Puestos.tipo(DRAGON, DarkCraftMod.DRAGON);
         Puestos.tipo(GARGOLA, DarkCraftMod.GARGOLA);
+        Puestos.tipo(CENTINELA, DarkCraftMod.CENTINELA);
+        Puestos.tipo(ISOLDE, DarkCraftMod.ISOLDE);
+        Puestos.tipo(ESPECTRO, DarkCraftMod.ESPECTRO);
+        Puestos.tipo(PERRO, DarkCraftMod.PERRO);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -351,6 +366,8 @@ public final class MorvainEnemigos {
         Puestos.registrar(NIDO, NIDO_P, Morvain::es);
         // la cadena del sur: los marcados de los rellanos y las gargolas
         Puestos.registrar(CADENA, CADENA_P, Morvain::es);
+        // la torre del homenaje: los centinelas, los del archivo y la prision, y la reina en su trono
+        Puestos.registrar(HOMENAJE, HOMENAJE_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -385,6 +402,9 @@ public final class MorvainEnemigos {
             // y al caer Vorthak el nido queda en silencio (su oro, para quien suba)
             if (e instanceof com.darkcraft.enemigos.Dragon && NIDO.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] Vorthak, el Dragon de Ceniza, cae: el Nido de Ceniza queda en silencio");
+            // y al caer la reina Isolde se abre el salon y la reja de la escalera de la azotea (lo hace CasaSombra cada segundo)
+            if (e instanceof com.darkcraft.enemigos.Isolde && HOMENAJE.equals(e.sitio()))
+                DarkCraftMod.LOGGER.info("[DarkCraft] La reina Isolde cae: se abre la escalera de la azotea");
         });
     }
 
@@ -481,6 +501,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> cadena() {
         preparar();
         return List.copyOf(CADENA_P);
+    }
+
+    public static List<Puesto> homenaje() {
+        preparar();
+        return List.copyOf(HOMENAJE_P);
     }
 
     public static List<Puesto> puerto() {
@@ -1722,6 +1747,171 @@ public final class MorvainEnemigos {
         if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(at[0], at[1], at[2])) && m.isLoaded(new net.minecraft.core.BlockPos(bo[0], bo[1], bo[2])))
             s += "; " + Subida.resumen(m);
         if (src.getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) s += "; " + Cadena.resumen(sp);
+        return s;
+    }
+
+    /**
+     * {@code /darkcraft homenaje [ir <sitio> | enemigos [volver | fuera | sacar] | rastrillo [abrir | cerrar] | sombra olvidar]}
+     * (parte 7ab): la torre del homenaje de la ciudadela: ir a uno de sus sitios, los de la casa, el rastrillo de la puerta y que la
+     * Sombra vuelva a hablar al entrar.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoHomenaje() {
+        return net.minecraft.commands.Commands.literal("homenaje")
+                .executes(c -> decir(c, estadoHomenaje(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irHomenaje(c.getSource(), "patio"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Homenaje.get().sitios().keySet(), b))
+                                .executes(c -> irHomenaje(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoHomenaje(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), HOMENAJE, false);
+                            return decir(c, "vuelven todos los de la torre del homenaje");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), HOMENAJE, true);
+                            return decir(c, "fuera todos los de la torre del homenaje");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, HOMENAJE).size();
+                            return decir(c, "fuera " + n);
+                        })))
+                .then(net.minecraft.commands.Commands.literal("rastrillo")
+                        .then(net.minecraft.commands.Commands.literal("abrir").executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            CasaSombra.abrirRastrilloYa(m);
+                            return decir(c, estadoHomenaje(c.getSource().getServer()));
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("cerrar").executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            CasaSombra.cerrarRastrillo(m);
+                            return decir(c, estadoHomenaje(c.getSource().getServer()));
+                        })))
+                .then(net.minecraft.commands.Commands.literal("sombra").then(net.minecraft.commands.Commands.literal("olvidar").executes(c -> {
+                    CasaSombra.olvidar(c.getSource().getPlayerOrException());
+                    return decir(c, "la Sombra volvera a hablar al entrar en la torre del homenaje");
+                })))
+                .then(comandoCentinela());
+    }
+
+    /** {@code centinela [despertar | tajo | golpe | humo | estocada | barrido | hachazo]}: el centinela mas cercano (a 32 bloques). */
+    private static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoCentinela() {
+        var raiz = net.minecraft.commands.Commands.literal("centinela").executes(c -> decir(c, centinela(c.getSource(), -1)));
+        String[] nombres = {"despertar", "tajo", "golpe", "humo", "estocada", "barrido", "hachazo"};
+        int[] acciones = {0, com.darkcraft.enemigos.CentinelaAnims.TAJO, com.darkcraft.enemigos.CentinelaAnims.GOLPE, -2,
+                com.darkcraft.enemigos.CentinelaAnims.ESTOCADA, com.darkcraft.enemigos.CentinelaAnims.BARRIDO, com.darkcraft.enemigos.CentinelaAnims.HACHAZO};
+        for (int k = 0; k < nombres.length; k++) {
+            int a = acciones[k];
+            raiz.then(net.minecraft.commands.Commands.literal(nombres[k]).executes(c -> decir(c, centinela(c.getSource(), a))));
+        }
+        return raiz;
+    }
+
+    /** El centinela mas cercano: como esta, o que haga esa accion ya (0 despertar, -2 el humo de su arma). */
+    private static String centinela(net.minecraft.commands.CommandSourceStack src, int accion) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        var sp = src.getPlayerOrException();
+        com.darkcraft.enemigos.Centinela c = null;
+        double mejor = 32 * 32;
+        for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Centinela.class, sp.getBoundingBox().inflate(32), x -> x.isAlive())) {
+            double d = e.distanceToSqr(sp);
+            if (d < mejor) {
+                mejor = d;
+                c = e;
+            }
+        }
+        if (c == null) return "no hay ningun centinela a 32 bloques";
+        if (accion == 0) c.despertar();
+        else if (accion != -1) {
+            if (c.postura() != Enemigo.DE_PIE) c.postura(Enemigo.DE_PIE);
+            c.setTarget(sp);
+            c.probar(accion == -2 ? (c.variante() == com.darkcraft.enemigos.Centinela.ALABARDA ? com.darkcraft.enemigos.CentinelaAnims.HUMO_ALABARDA
+                    : com.darkcraft.enemigos.CentinelaAnims.HUMO_ESPADON) : accion);
+        }
+        return String.format(java.util.Locale.ROOT, "centinela a %.0f bloques: %s, postura %d, accion %d, vida %.0f/%.0f", Math.sqrt(mejor), c.tipo(), c.postura(),
+                c.accion(), c.getHealth(), c.getMaxHealth());
+    }
+
+    private static int irHomenaje(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Homenaje.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Homenaje.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando al norte (la puerta del homenaje desde el patio; dentro, a lo largo de cada sala); ante el trono, a la reina
+        float giro = sitio.equals("trono") || sitio.equals("sala_trono") || sitio.equals("tesoro") ? 0f : 180f;
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
+        return 1;
+    }
+
+    /** Cuantos de la torre del homenaje quedan y como esta (si esta cargada). */
+    public static String estadoHomenaje(net.minecraft.server.MinecraftServer srv) {
+        String s = "torre del homenaje: quedan " + Puestos.quedan(srv, HOMENAJE) + " de " + HOMENAJE_P.size() + " (fuera " + Puestos.fuera(HOMENAJE) + ")";
+        var m = Morvain.nivel(srv);
+        int[] at = Homenaje.get().sitio("atril"), tr = Homenaje.get().sitio("trono");
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(at[0], at[1], at[2])) && m.isLoaded(new net.minecraft.core.BlockPos(tr[0], tr[1], tr[2])))
+            s += "; " + Homenaje.resumen(m) + "; " + CasaSombra.resumen(m);
+        return s;
+    }
+
+    /**
+     * {@code /darkcraft isolde [ir | vencer | volver | media | garras | velo | abrazo | nana | desvanece | lagrimas | corte]} (parte 7ab):
+     * como esta la reina, llevar ante ella (al pie del estrado), vencerla, que vuelva, pasarla a media vida y que haga ya lo que se le
+     * diga.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoIsolde() {
+        var raiz = net.minecraft.commands.Commands.literal("isolde")
+                .executes(c -> decir(c, estadoIsolde(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> {
+                    irHomenaje(c.getSource(), "sala_trono");
+                    return decir(c, estadoIsolde(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(HOMENAJE, isolde());
+                    if (e instanceof com.darkcraft.enemigos.Isolde i) i.vencer();
+                    else {
+                        Puestos.marcar(srv, HOMENAJE, isolde(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "isolde");
+                    }
+                    return decir(c, estadoIsolde(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, HOMENAJE, isolde(), false);
+                    return decir(c, estadoIsolde(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("media").executes(c -> {
+                    if (Puestos.enemigo(HOMENAJE, isolde()) instanceof com.darkcraft.enemigos.Isolde i) i.mediaVida();
+                    return decir(c, estadoIsolde(c.getSource().getServer()));
+                }));
+        String[] nombres = {"garras", "velo", "abrazo", "nana", "desvanece", "lagrimas", "corte"};
+        int[] acciones = {com.darkcraft.enemigos.IsoldeAnims.GARRAS, com.darkcraft.enemigos.IsoldeAnims.VELO, com.darkcraft.enemigos.IsoldeAnims.ABRAZO,
+                com.darkcraft.enemigos.IsoldeAnims.NANA, com.darkcraft.enemigos.IsoldeAnims.DESVANECE, com.darkcraft.enemigos.IsoldeAnims.LAGRIMAS,
+                com.darkcraft.enemigos.IsoldeAnims.GRITO};
+        for (int k = 0; k < nombres.length; k++) {
+            int a = acciones[k];
+            raiz.then(net.minecraft.commands.Commands.literal(nombres[k]).executes(c -> {
+                if (Puestos.enemigo(HOMENAJE, isolde()) instanceof com.darkcraft.enemigos.Isolde i) {
+                    if (i.getTarget() == null && c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) i.setTarget(sp);
+                    i.probar(a);
+                }
+                return decir(c, estadoIsolde(c.getSource().getServer()));
+            }));
+        }
+        return raiz;
+    }
+
+    /** Como esta la reina Isolde: para el comando y las pruebas. */
+    public static String estadoIsolde(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(HOMENAJE, isolde());
+        String s = "la reina Isolde: " + (Puestos.muerto(srv, HOMENAJE, isolde()) ? "caida" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Isolde i) s += ", " + i.estado();
         return s;
     }
 

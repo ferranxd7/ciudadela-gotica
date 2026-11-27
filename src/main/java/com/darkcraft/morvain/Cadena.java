@@ -38,7 +38,8 @@ public final class Cadena {
     public static final int AVISO = 30, EMPUJA = 30;
     /** (0,075 en la build 185: de pie echaba de la cadena desde el centro del camino; ahora unos dos bloques de pie en el suelo) */
     public static final float FUERZA = 0.05f;
-    /** La marca de la ficha: lo que ya le ha dicho la Sombra en la cadena (bit 1 la 21, 2 la 22, 4 la 23). */
+    /** La marca de la ficha: lo que ya le ha dicho la Sombra en la cadena (bit 1 la 21, 2 la 22, 4 la 23; y 8 la 24, al entrar en la torre
+     * del homenaje: {@link CasaSombra}). */
     public static final String MARCA = "sombra_cadena";
 
     /** Para la prueba: las rafagas que han soplado, los que han caido, los corceles que se han deshecho y las frases dichas. */
@@ -121,7 +122,7 @@ public final class Cadena {
     }
 
     /** La frase {@code n} de la Sombra, si a ese jugador aun no se la ha dicho. */
-    private static void decir(ServerPlayer p, int n, int bit) {
+    static void decir(ServerPlayer p, int n, int bit) {
         int ya = Ficha.dialogo(p, MARCA);
         if ((ya & bit) != 0) return;
         Ficha.dialogo(p, MARCA, ya | bit);

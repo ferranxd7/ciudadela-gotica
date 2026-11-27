@@ -48,6 +48,8 @@ public final class Voces {
     public static final int BASE_BUFON = 150;
     /** Las de Vorthak, el Dragon de Ceniza (parte 7z): 160 + N (1..5). */
     public static final int BASE_DRAGON = 160;
+    /** Las de la reina Isolde, en el salon del trono de la ciudadela (parte 7ab): 170 + N (1..6). */
+    public static final int BASE_ISOLDE = 170;
     /** Pausa entre dos frases seguidas (ticks): 0,3 s. */
     public static final int PAUSA = 6;
     /** Lo que se queda el subtitulo despues de acabar de hablar (ticks): 0,8 s. */
@@ -71,10 +73,11 @@ public final class Voces {
     private static final float[] JINETE = {0, 7.5f, 4.2f, 4.1f, 2.5f, 8.0f};
     private static final float[] BUFON = {0, 8.0f, 5.6f, 6.2f, 1.6f, 7.8f};
     private static final float[] DRAGON = {0, 9.18f, 5.88f, 2.82f, 1.66f, 4.59f};
-    // la Sombra en las cinematicas (1..6 la de inicio, 7..9 el viaje a Valdrenn) y en la cadena del sur (21..23, parte 7aa);
-    // las 10..20 son las del capitulo 6 (van en su narracion)
+    private static final float[] ISOLDE = {0, 8.98f, 2.33f, 4.6f, 3.42f, 3.74f, 4.74f};
+    // la Sombra en las cinematicas (1..6 la de inicio, 7..9 el viaje a Valdrenn), en la cadena del sur (21..23, parte 7aa) y al
+    // entrar en la torre del homenaje (24, parte 7ab); las 10..20 son las del capitulo 6 (van en su narracion)
     private static final float[] SOMBRA = {0, 2.26f, 4.23f, 3.56f, 6.57f, 5.44f, 3.17f, 6.06f, 5.98f, 4.63f,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.2f, 6.6f, 5.4f};
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.2f, 6.6f, 5.4f, 7.19f};
 
     static {
         try (InputStream in = Voces.class.getResourceAsStream("/assets/darkcraft/rey_voces.json")) {
@@ -94,6 +97,7 @@ public final class Voces {
                 leer(o, "habla_jinete", JINETE);
                 leer(o, "habla_bufon", BUFON);
                 leer(o, "habla_dragon", DRAGON);
+                leer(o, "habla_isolde", ISOLDE);
                 leer(o, "habla_sombra", SOMBRA);
                 if (o.has("habla")) {
                     leer(o, "habla", REY);
@@ -147,6 +151,11 @@ public final class Voces {
         return linea > BASE_DRAGON && linea < BASE_DRAGON + 10;
     }
 
+    /** Las de la reina Isolde (171..176). */
+    public static boolean esIsolde(int linea) {
+        return linea > BASE_ISOLDE && linea < BASE_ISOLDE + 10;
+    }
+
     /** De que gigante es una linea suya (0 Ogmund, 1 Ulfgar, 2 Haldor). */
     public static int gigante(int linea) {
         return Math.max(0, Math.min(2, (linea - BASE_GIGANTE - 1) / 3));
@@ -196,6 +205,7 @@ public final class Voces {
         if (esJinete(linea)) return linea - BASE_JINETE < JINETE.length;
         if (esBufon(linea)) return linea - BASE_BUFON < BUFON.length;
         if (esDragon(linea)) return linea - BASE_DRAGON < DRAGON.length;
+        if (esIsolde(linea)) return linea - BASE_ISOLDE < ISOLDE.length;
         if (esGigante(linea)) return linea - BASE_GIGANTE < GIGANTE.length;
         if (esAldric(linea)) return linea - BASE_ALDRIC < ALDRIC.length;
         if (esCondestable(linea)) return linea - BASE_CONDESTABLE < CONDESTABLE.length;
@@ -223,6 +233,10 @@ public final class Voces {
         if (esDragon(linea)) {
             int n = linea - BASE_DRAGON;
             return n > 0 && n < DRAGON.length ? DRAGON[n] : 4f;
+        }
+        if (esIsolde(linea)) {
+            int n = linea - BASE_ISOLDE;
+            return n > 0 && n < ISOLDE.length ? ISOLDE[n] : 4f;
         }
         if (esGigante(linea)) {
             int n = linea - BASE_GIGANTE;
@@ -293,6 +307,10 @@ public final class Voces {
         if (esDragon(linea)) {
             int n = linea - BASE_DRAGON;
             return n == 3 || n == 4;
+        }
+        if (esIsolde(linea)) {
+            int n = linea - BASE_ISOLDE;
+            return n == 2 || n == 4;
         }
         if (esBufon(linea)) {
             int n = linea - BASE_BUFON;

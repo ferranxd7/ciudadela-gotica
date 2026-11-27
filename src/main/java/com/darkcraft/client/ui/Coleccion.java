@@ -34,7 +34,7 @@ public final class Coleccion {
             "condestable", "erudito_aprendiz", "erudito_maestro", "erudito_custodio", "rectora", "salobre_redero", "salobre_bichero",
             "salobre_salinero", "ballenero", "penitente_flagelante", "penitente_portador", "penitente_turiferario",
             "pontifice", "marcado_rompedor", "marcado_caballero", "marcado_cazador", "aldric", "gigante_campana", "gigante_costilla",
-            "gigante_columna", "jinete", "bufon", "dragon", "gargola"};
+            "gigante_columna", "jinete", "bufon", "dragon", "gargola", "centinela_espadon", "centinela_alabarda", "isolde"};
 
     /** El objeto de una clave de la coleccion (los libros de la cronica, con su texto). */
     public static ItemStack objeto(String clave) {
@@ -64,7 +64,8 @@ public final class Coleccion {
                  "marchito_campana", "ahorcado_garras", "ahorcado_soga", "podrido_fatuo", "podrido_hinchado", "helado_monje", "helado_penitente",
                  "helado_peregrino", "calcinado_guardia", "calcinado_incendiario", "calcinado_ceniciento", "erudito_aprendiz", "erudito_maestro",
                  "erudito_custodio", "salobre_redero", "salobre_bichero", "salobre_salinero", "penitente_flagelante", "penitente_portador",
-                 "penitente_turiferario", "marcado_rompedor", "marcado_caballero", "marcado_cazador" -> "darkcraft.bestiario." + c;
+                 "penitente_turiferario", "marcado_rompedor", "marcado_caballero", "marcado_cazador", "centinela_espadon",
+                 "centinela_alabarda" -> "darkcraft.bestiario." + c;
             default -> "entity.darkcraft." + c;
         };
     }
@@ -178,6 +179,12 @@ public final class Coleccion {
                 case "bufon" -> DarkCraftMod.BUFON.get().create(lvl);
                 case "dragon" -> DarkCraftMod.DRAGON.get().create(lvl);
                 case "gargola" -> DarkCraftMod.GARGOLA.get().create(lvl);
+                case "centinela_espadon", "centinela_alabarda" -> {
+                    var k = DarkCraftMod.CENTINELA.get().create(lvl);
+                    if (k != null) k.variante(c.endsWith("alabarda") ? com.darkcraft.enemigos.Centinela.ALABARDA : com.darkcraft.enemigos.Centinela.ESPADON);
+                    yield k;
+                }
+                case "isolde" -> DarkCraftMod.ISOLDE.get().create(lvl);
                 case "gigante_campana", "gigante_costilla", "gigante_columna" -> {
                     var k = DarkCraftMod.GIGANTE.get().create(lvl);
                     if (k != null) k.variante(c.endsWith("costilla") ? com.darkcraft.enemigos.Gigante.ULFGAR

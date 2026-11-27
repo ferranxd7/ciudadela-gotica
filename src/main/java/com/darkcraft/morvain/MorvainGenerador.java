@@ -255,6 +255,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la subida por la cadena en el chunk {}", c.getPos(), t);
         }
+        // la torre del homenaje de la ciudadela por dentro: la puerta, las seis plantas, sus escaleras y el patio (parte 7ab)
+        try {
+            if (Homenaje.toca(c.getPos().x, c.getPos().z)) Homenaje.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la torre del homenaje en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

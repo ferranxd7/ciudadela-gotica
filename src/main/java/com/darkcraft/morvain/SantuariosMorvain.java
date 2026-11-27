@@ -59,20 +59,27 @@ public final class SantuariosMorvain {
      */
     public static final Sitio CADENA = new Sitio("cadena", Subida.SANT_X, Subida.SANT_Z, Subida.santuarioY(), Region.CENTRO);
 
+    /**
+     * La Ultima Llama (parte 7ab): en la capilla negra de la torre del homenaje de la ciudadela, con Maelis al lado; la escribe
+     * {@link Homenaje} (no lleva tarima).
+     */
+    public static final Sitio ULTIMA = new Sitio("ultima_llama", Homenaje.SANT_X, Homenaje.SANT_Z, Homenaje.SANT_Y, Region.CENTRO);
+
     /** El radio de la tarima y hasta donde se funde con el terreno. */
     static final int R = 4, MEZCLA = 10;
 
-    /** Todos, el del arco el primero (y el de la cadena el ultimo). */
+    /** Todos, el del arco el primero (y los de la cadena y la ciudadela los ultimos). */
     public static Sitio[] todos() {
         return TODOS;
     }
 
-    private static final Sitio[] TODOS = new Sitio[SITIOS.length + 2];
+    private static final Sitio[] TODOS = new Sitio[SITIOS.length + 3];
 
     static {
         TODOS[0] = UMBRAL;
         System.arraycopy(SITIOS, 0, TODOS, 1, SITIOS.length);
-        TODOS[TODOS.length - 1] = CADENA;
+        TODOS[TODOS.length - 2] = CADENA;
+        TODOS[TODOS.length - 1] = ULTIMA;
     }
 
     public static Sitio porId(String id) {

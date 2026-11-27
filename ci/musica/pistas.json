@@ -290,5 +290,16 @@
     "aviso": "Music by Umplix (OpenGameArt, CC0)",
     "uso": "Vorthak, el Dragon de Ceniza (el Nido de Ceniza, en las Montanas Nevadas de Morvain)",
     "lufs": -16
+  },
+  {
+    "id": "isolde",
+    "pagina": "https://opengameart.org/node/155832",
+    "busca": "boss-theme-arcanos",
+    "titulo": "Dark souls type boss theme",
+    "autor": "ProjectHelmet",
+    "licencia": "CC-BY 4.0",
+    "aviso": "Music by ProjectHelmet (OpenGameArt, CC-BY 4.0)",
+    "uso": "La reina Isolde (el salon del trono de la ciudadela de Morvain)",
+    "lufs": -16
   }
 ]

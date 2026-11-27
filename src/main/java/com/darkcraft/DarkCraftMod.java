@@ -483,6 +483,31 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> AMBIENTE_CADENA = sound("ambiente.cadena");
     public static final RegistryObject<SoundEvent> SFX_BOCA_ALIENTO = sound("sfx.boca_aliento");
     public static final RegistryObject<SoundEvent> SFX_BOCA_LATIDO = sound("sfx.boca_latido");
+    // ---- la ciudadela por dentro (parte 7ab): los centinelas (la armadura que despierta, el paso, el tajo, el golpe en el suelo, la
+    // alabarda, el humo, el quejido y el desplome), la reina Isolde (el tarareo en su trono —en bucle—, la nana, las garras, el velo,
+    // el abrazo, desvanecerse, el grito, el velo que arde, las lagrimas, el quejido y su muerte), el aire de la torre del homenaje
+    // (en bucle), su puerta y la musica de la reina
+    public static final RegistryObject<SoundEvent> SFX_CENTINELA_ALERTA = sound("sfx.centinela_alerta");
+    public static final RegistryObject<SoundEvent> SFX_CENTINELA_PASO = sound("sfx.centinela_paso");
+    public static final RegistryObject<SoundEvent> SFX_CENTINELA_TAJO = sound("sfx.centinela_tajo");
+    public static final RegistryObject<SoundEvent> SFX_CENTINELA_GOLPE = sound("sfx.centinela_golpe");
+    public static final RegistryObject<SoundEvent> SFX_CENTINELA_ALABARDA = sound("sfx.centinela_alabarda");
+    public static final RegistryObject<SoundEvent> SFX_CENTINELA_HUMO = sound("sfx.centinela_humo");
+    public static final RegistryObject<SoundEvent> SFX_CENTINELA_DOLOR = sound("sfx.centinela_dolor");
+    public static final RegistryObject<SoundEvent> SFX_CENTINELA_MUERTE = sound("sfx.centinela_muerte");
+    public static final RegistryObject<SoundEvent> SFX_ISOLDE_TARAREO = sound("sfx.isolde_tarareo");
+    public static final RegistryObject<SoundEvent> SFX_ISOLDE_CANTO = sound("sfx.isolde_canto");
+    public static final RegistryObject<SoundEvent> SFX_ISOLDE_GARRAS = sound("sfx.isolde_garras");
+    public static final RegistryObject<SoundEvent> SFX_ISOLDE_VELO = sound("sfx.isolde_velo");
+    public static final RegistryObject<SoundEvent> SFX_ISOLDE_ABRAZO = sound("sfx.isolde_abrazo");
+    public static final RegistryObject<SoundEvent> SFX_ISOLDE_DESVANECE = sound("sfx.isolde_desvanece");
+    public static final RegistryObject<SoundEvent> SFX_ISOLDE_GRITO = sound("sfx.isolde_grito");
+    public static final RegistryObject<SoundEvent> SFX_ISOLDE_VELO_ARDE = sound("sfx.isolde_velo_arde");
+    public static final RegistryObject<SoundEvent> SFX_ISOLDE_LAGRIMAS = sound("sfx.isolde_lagrimas");
+    public static final RegistryObject<SoundEvent> SFX_ISOLDE_DOLOR = sound("sfx.isolde_dolor");
+    public static final RegistryObject<SoundEvent> SFX_ISOLDE_MUERTE = sound("sfx.isolde_muerte");
+    public static final RegistryObject<SoundEvent> AMBIENTE_HOMENAJE = sound("ambiente.homenaje");
+    public static final RegistryObject<SoundEvent> SFX_PUERTA_HOMENAJE = sound("sfx.puerta_homenaje");
     public static final RegistryObject<SoundEvent> AMBIENTE_ALTAR = sound("ambiente.altar");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
@@ -571,6 +596,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_JINETE = sound("musica.jinete");
     public static final RegistryObject<SoundEvent> MUSICA_BUFON = sound("musica.bufon");
     public static final RegistryObject<SoundEvent> MUSICA_DRAGON = sound("musica.dragon");
+    public static final RegistryObject<SoundEvent> MUSICA_ISOLDE = sound("musica.isolde");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -646,13 +672,16 @@ public class DarkCraftMod {
     /** Frases de Vorthak, el Dragon de Ceniza (1..5, parte 7z). */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] DRAGON_VOZ = new RegistryObject[6];
+    /** Frases de la reina Isolde (1..6, parte 7ab). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] ISOLDE_VOZ = new RegistryObject[7];
 
     /**
-     * Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn, 21..23 la subida por la cadena del sur;
-     * las 10..20 van juntas en la narracion del capitulo 6): en estereo, suenan sin sitio.
+     * Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn, 21..23 la subida por la cadena del sur, 24 al
+     * entrar en la torre del homenaje; las 10..20 van juntas en la narracion del capitulo 6): en estereo, suenan sin sitio.
      */
     @SuppressWarnings("unchecked")
-    public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[24];
+    public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[25];
 
     static {
         for (int i = 1; i < REY_VOZ.length; i++) REY_VOZ[i] = sound("rey.voz." + i);
@@ -671,6 +700,7 @@ public class DarkCraftMod {
         for (int i = 1; i < JINETE_VOZ.length; i++) JINETE_VOZ[i] = sound("jinete.voz." + i);
         for (int i = 1; i < BUFON_VOZ.length; i++) BUFON_VOZ[i] = sound("bufon.voz." + i);
         for (int i = 1; i < DRAGON_VOZ.length; i++) DRAGON_VOZ[i] = sound("dragon.voz." + i);
+        for (int i = 1; i < ISOLDE_VOZ.length; i++) ISOLDE_VOZ[i] = sound("isolde.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) if (i < 10 || i > 20) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -910,6 +940,14 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Gargola>> GARGOLA = ENTITIES.register("gargola",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Gargola>of(com.darkcraft.enemigos.Gargola::new, MobCategory.MONSTER)
                     .sized(1.0f, 1.9f).clientTrackingRange(10).updateInterval(1).build(MODID + ":gargola"));
+    // ---- la ciudadela por dentro (parte 7ab): los centinelas (armaduras vacias, grandes: el modelo va a 1,3) y la reina Isolde (flota
+    // sobre el suelo con su vestido; el humo y el desvanecerse van deprisa: la posicion se manda cada tick)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Centinela>> CENTINELA = ENTITIES.register("centinela",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Centinela>of(com.darkcraft.enemigos.Centinela::new, MobCategory.MONSTER)
+                    .sized(0.9f, 2.5f).clientTrackingRange(10).updateInterval(1).build(MODID + ":centinela"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Isolde>> ISOLDE = ENTITIES.register("isolde",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Isolde>of(com.darkcraft.enemigos.Isolde::new, MobCategory.MONSTER)
+                    .sized(0.9f, 2.9f).fireImmune().clientTrackingRange(12).updateInterval(1).build(MODID + ":isolde"));
     // ---- Ser Lucan, el Jinete Nocturno del camino de nubes (parte 7x): el caballo y su jinete, una sola entidad (va deprisa:
     // la posicion se manda cada tick para que el galope se vea suave)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Jinete>> JINETE = ENTITIES.register("jinete",
@@ -1133,6 +1171,8 @@ public class DarkCraftMod {
         e.put(BUFON.get(), com.darkcraft.enemigos.Bufon.atributos().build());
         e.put(DRAGON.get(), com.darkcraft.enemigos.Dragon.atributos().build());
         e.put(GARGOLA.get(), com.darkcraft.enemigos.Gargola.atributos().build());
+        e.put(CENTINELA.get(), com.darkcraft.enemigos.Centinela.atributos().build());
+        e.put(ISOLDE.get(), com.darkcraft.enemigos.Isolde.atributos().build());
         e.put(MARCADO.get(), com.darkcraft.enemigos.Marcado.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
