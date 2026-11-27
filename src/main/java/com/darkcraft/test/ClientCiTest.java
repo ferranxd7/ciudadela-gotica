@@ -3508,6 +3508,114 @@ public final class ClientCiTest {
         return t + 58;
     }
 
+    // ------------------------------------------------------------------ las armaduras en la forja (parte 7am)
+
+    private static com.darkcraft.personajes.Herrero amHerrero;
+
+    private static void logAm(Minecraft m, String que) {
+        String pantalla = m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName();
+        if (m.screen instanceof com.darkcraft.client.ui.ForjaScreen f) pantalla += " [" + f.resumen() + "]";
+        log("  armadura 7am " + que + " (cliente): " + pantalla + " | ecos " + com.darkcraft.client.ui.ClientRol.ecos + " | defensa "
+                + m.player.getArmorValue());
+        server(m, sp -> {
+            var inv = sp.getInventory();
+            log("  armadura 7am " + que + " (servidor): " + com.darkcraft.armadura.Armaduras.resumen(sp) + " | piedras I/II "
+                    + inv.countItem(com.darkcraft.forja.Forja.piedra(1)) + "/" + inv.countItem(com.darkcraft.forja.Forja.piedra(2))
+                    + " | ecos " + com.darkcraft.rol.Ficha.ecos(sp) + " | fuego " + String.format(java.util.Locale.ROOT, "%.3f",
+                    com.darkcraft.rol.Resistencias.de(sp, com.darkcraft.rol.Resistencias.Tipo.FUEGO)) + " | logro mejora_armadura "
+                    + com.darkcraft.story.Logros.tiene(sp, "mejora_armadura"));
+        });
+    }
+
+    /**
+     * Parte 7am: la armadura puesta en la forja de Dorvan (en la plataforma). El peto del caballero elegido (lo de ahora y con la
+     * mejora), mejorado a +1 y a +2 (tres piedras I), los guantes sin piedras (falta), todo a +5 por comando (el yelmo al maximo) y
+     * el menu con la ficha del peto a +5. Lineas {@code armadura 7am ...}.
+     */
+    private static int armaduras7am(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Armaduras en la forja: Dorvan en la plataforma, el caballero puesto, tres piedras I y 1500 ecos", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.rol.Rol.sinLimite = false;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                plataforma(lvl);
+                lvl.setDayTime(6000);
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.getInventory().clearContent();
+                sp.removeAllEffects();
+                // (clearContent vacia tambien la armadura puesta: primero vaciar y luego vestir)
+                comando(sp, "darkcraft armadura caballero poner");
+                comando(sp, "darkcraft ecos quitar");
+                comando(sp, "darkcraft ecos dar 1500");
+                BlockPos yunque = new BlockPos(bx() - 3, by(), bz() - 3), el = new BlockPos(bx() - 2, by(), bz() - 3);
+                lvl.setBlock(yunque, net.minecraft.world.level.block.Blocks.ANVIL.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.AnvilBlock.FACING, net.minecraft.core.Direction.NORTH), 3);
+                amHerrero = com.darkcraft.personajes.Herrero.poner(lvl, el, yunque);
+                sp.getInventory().setItem(9, new ItemStack(DarkCraftMod.PIEDRA_FORJA_1.get(), 3));
+                sp.setHealth(sp.getMaxHealth());
+                sp.teleportTo(lvl, ex - 2.0, ey, ez, 180f, 9f);
+                sp.setDeltaMovement(Vec3.ZERO);
+                com.darkcraft.rol.Rol.sinCombate(sp);
+            });
+        });
+        atTicks(t + 24, "la forja de Dorvan", m -> {
+            if (amHerrero != null) com.darkcraft.client.ui.ForjaScreen.abrir(new com.darkcraft.net.Net.AbrirForja(amHerrero.getId()));
+        });
+        atTicks(t + 32, "el peto puesto", m -> forjaP(m, f -> f.pulsarHueco(com.darkcraft.rol.Equipo.PECHO)));
+        atTicks(t + 42, "captura: el peto en la forja", m -> {
+            logAm(m, "el peto");
+            shot(m, "cliente_am01_forja_peto");
+        });
+        atTicks(t + 44, "mejorar el peto (+1: una piedra I y 275 ecos)", m -> forjaP(m, com.darkcraft.client.ui.ForjaScreen::pulsarMejorar));
+        atTicks(t + 66, "captura: el peto a +1", m -> {
+            logAm(m, "+1");
+            shot(m, "cliente_am02_peto_mas1");
+        });
+        atTicks(t + 68, "otra vez (+2: dos piedras I y 450)", m -> forjaP(m, com.darkcraft.client.ui.ForjaScreen::pulsarMejorar));
+        atTicks(t + 90, "tras +2", m -> logAm(m, "+2"));
+        atTicks(t + 92, "los guantes, sin piedras", m -> forjaP(m, f -> {
+            f.pulsarHueco(com.darkcraft.rol.Equipo.BOTAS);
+            f.pulsarMejorar();
+        }));
+        atTicks(t + 106, "captura: falta algo", m -> {
+            logAm(m, "falta");
+            shot(m, "cliente_am03_falta");
+        });
+        atTicks(t + 108, "toda la armadura a +5 (comando)", m -> server(m, sp -> comando(sp, "darkcraft armadura mejora 5")));
+        atTicks(t + 116, "el yelmo", m -> forjaP(m, f -> f.pulsarHueco(com.darkcraft.rol.Equipo.YELMO)));
+        atTicks(t + 126, "captura: al maximo", m -> {
+            logAm(m, "tope");
+            shot(m, "cliente_am04_tope");
+        });
+        atTicks(t + 128, "el menu: el peto a +5", m -> {
+            m.setScreen(null);
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.EQUIPO);
+            if (m.screen instanceof com.darkcraft.client.ui.MenuScreen ms) ms.enfocarEquipo(com.darkcraft.rol.Equipo.PECHO);
+        });
+        atTicks(t + 140, "captura: la ficha del peto a +5", m -> {
+            logAm(m, "menu");
+            shot(m, "cliente_am05_menu");
+        });
+        atTicks(t + 142, "Fin de las armaduras en la forja", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                if (amHerrero != null) amHerrero.discard();
+                amHerrero = null;
+                sp.serverLevel().setBlock(new BlockPos(bx() - 3, by(), bz() - 3), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+                comando(sp, "darkcraft armadura quitar");
+                sp.getInventory().clearContent();
+                comando(sp, "darkcraft ecos quitar");
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 148;
+    }
+
     // ------------------------------------------------------------------ el mundo de nubes (parte 3a)
 
     private static net.minecraft.world.entity.decoration.ArmorStand nubesMuneco;
@@ -5767,6 +5875,8 @@ public final class ClientCiTest {
         fin = escudos7ak(fin);
         // los conjuntos de los jefes (parte 7al)
         fin = armaduras7al(fin);
+        // las armaduras en la forja (parte 7am)
+        fin = armaduras7am(fin);
         fin = nubes(fin);
         fin = pueblo(fin);
         fin = enemigos(fin);

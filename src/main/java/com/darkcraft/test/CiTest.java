@@ -765,6 +765,87 @@ public final class CiTest {
         armas7aj(server, m, log);
         escudos7ak(server, m, log);
         armaduras7al(server, m, log);
+        armaduras7am(server, m, log);
+    }
+
+    /**
+     * Parte 7am: las armaduras en la forja. Lo que piden de +1 a +5; con Hagen (el herrero del Refugio de la Fragua): un peto de
+     * Ser Brandt a +1 cobrando (una piedra I y 275 ecos), otra vez sin piedras (FALTA: sigue en +1), en creativo hasta +5 y no
+     * mas; el yelmo puesto (hueco 39) tambien se mejora; lo que suman sus atributos (defensa y dureza), su ficha y su linea; lo
+     * que resiste el conjunto entero a +0 y a +5; y que las armas siguen llegando a +9.
+     */
+    private static void armaduras7am(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        StringBuilder sb = new StringBuilder("Armaduras en la forja 7am:");
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07a1d"), "[DarkCraftCI29]"));
+        try {
+            var muestra = DarkCraftMod.armadura(com.darkcraft.armadura.Conjunto.BRANDT, 1);
+            sb.append(" pide:");
+            for (int d = 1; d <= com.darkcraft.forja.Forja.MAX_ARMADURA; d++)
+                sb.append(" +").append(d).append(' ').append(com.darkcraft.forja.Forja.piedras(muestra, d)).append('x')
+                        .append(new String[]{"", "I", "II", "III"}[com.darkcraft.forja.Forja.grado(muestra, d)]).append(' ')
+                        .append(com.darkcraft.forja.Forja.ecos(muestra, d));
+            sb.append(" | mejorable ").append(com.darkcraft.forja.Forja.mejorable(muestra)).append(", hasta +").append(com.darkcraft.forja.Forja.max(muestra));
+            var hagen = com.darkcraft.morvain.Herrerias.buscar(m, com.darkcraft.morvain.Herrerias.REFUGIO);
+            if (hagen == null) {
+                for (long k : com.darkcraft.morvain.Herrerias.chunks()) m.getChunk((int) (k >> 32), (int) k);
+                com.darkcraft.morvain.Herrerias.ponerTodos(m);
+                hagen = com.darkcraft.morvain.Herrerias.buscar(m, com.darkcraft.morvain.Herrerias.REFUGIO);
+            }
+            if (hagen == null) sb.append(" | SIN HAGEN");
+            else {
+                BlockPos de = com.darkcraft.morvain.Herrerias.REFUGIO.pos(1, 1, 1);
+                fp.moveTo(de.getX() + 0.5, de.getY(), de.getZ() + 0.5, 0f, 0f);
+                fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+                var inv = fp.getInventory();
+                inv.clearContent();
+                inv.setItem(0, muestra);
+                inv.setItem(9, new net.minecraft.world.item.ItemStack(DarkCraftMod.PIEDRA_FORJA_1.get(), 1));
+                com.darkcraft.rol.Rol.pagar(fp, com.darkcraft.rol.Ficha.ecos(fp));
+                com.darkcraft.rol.Rol.dar(fp, 300, null);
+                int e0 = com.darkcraft.rol.Ficha.ecos(fp);
+                com.darkcraft.forja.Forja.mejorar(fp, hagen.getId(), 0);
+                sb.append(" | con Hagen, cobrando: +").append(com.darkcraft.forja.Forja.nivel(inv.getItem(0))).append(", piedras I ")
+                        .append(inv.countItem(DarkCraftMod.PIEDRA_FORJA_1.get())).append(", ecos ").append(e0).append(" -> ").append(com.darkcraft.rol.Ficha.ecos(fp));
+                com.darkcraft.forja.Forja.mejorar(fp, hagen.getId(), 0);
+                sb.append("; sin piedras sigue en +").append(com.darkcraft.forja.Forja.nivel(inv.getItem(0)));
+                fp.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+                for (int k = 0; k < 6; k++) com.darkcraft.forja.Forja.mejorar(fp, hagen.getId(), 0);
+                var peto = inv.getItem(0);
+                sb.append("; en creativo +").append(com.darkcraft.forja.Forja.nivel(peto)).append(" (tope +").append(com.darkcraft.forja.Forja.max(peto)).append(')');
+                double arm = 0, dur = 0;
+                for (var e : peto.getAttributeModifiers(net.minecraft.world.entity.EquipmentSlot.CHEST).entries()) {
+                    if (e.getKey() == net.minecraft.world.entity.ai.attributes.Attributes.ARMOR) arm += e.getValue().getAmount();
+                    if (e.getKey() == net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS) dur += e.getValue().getAmount();
+                }
+                double armMano = 0;
+                for (var e : peto.getAttributeModifiers(net.minecraft.world.entity.EquipmentSlot.MAINHAND).entries())
+                    if (e.getKey() == net.minecraft.world.entity.ai.attributes.Attributes.ARMOR) armMano += e.getValue().getAmount();
+                var pa = (com.darkcraft.armadura.PiezaArmadura) peto.getItem();
+                sb.append(String.format(java.util.Locale.ROOT, " | el peto a +5: defensa %.1f (sin mejorar %d; en la mano %.1f), dureza %.2f, ficha \"%s\", linea \"%s\"",
+                        arm, com.darkcraft.armadura.Conjunto.BRANDT.defensa(1), armMano, dur, pa.defensaTexto(peto),
+                        com.darkcraft.forja.Forja.linea(peto).getString()));
+                fp.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, DarkCraftMod.armadura(com.darkcraft.armadura.Conjunto.BRANDT, 0));
+                com.darkcraft.forja.Forja.mejorar(fp, hagen.getId(), com.darkcraft.rol.Equipo.YELMO);
+                sb.append(" | el yelmo puesto: +").append(com.darkcraft.forja.Forja.nivel(fp.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD)));
+                for (int i = 0; i < 4; i++) fp.setItemSlot(com.darkcraft.armadura.Armaduras.HUECOS[i], DarkCraftMod.armadura(com.darkcraft.armadura.Conjunto.BRANDT, i));
+                float f0 = com.darkcraft.rol.Resistencias.de(new net.minecraft.world.item.ItemStack[0], fp, com.darkcraft.rol.Resistencias.Tipo.FUEGO);
+                for (int i = 0; i < 4; i++) com.darkcraft.forja.Forja.nivel(fp.getItemBySlot(com.darkcraft.armadura.Armaduras.HUECOS[i]), 5);
+                float f5 = com.darkcraft.rol.Resistencias.de(new net.minecraft.world.item.ItemStack[0], fp, com.darkcraft.rol.Resistencias.Tipo.FUEGO);
+                sb.append(String.format(java.util.Locale.ROOT, " | fuego del conjunto: +0 %.3f, +5 %.3f", f0, f5));
+            }
+            var espada = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD);
+            com.darkcraft.forja.Forja.nivel(espada, 12);
+            sb.append(" | la espada sigue hasta +").append(com.darkcraft.forja.Forja.nivel(espada)).append(" (tope +").append(com.darkcraft.forja.Forja.max(espada)).append(')');
+        } catch (Exception e) {
+            sb.append(" ERROR ").append(e);
+            DarkCraftMod.LOGGER.error("[DarkCraft] las armaduras en la forja", e);
+        } finally {
+            for (var s : com.darkcraft.armadura.Armaduras.HUECOS) fp.setItemSlot(s, net.minecraft.world.item.ItemStack.EMPTY);
+            fp.getInventory().clearContent();
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        }
+        log.println(sb);
+        log.flush();
     }
 
     /**
