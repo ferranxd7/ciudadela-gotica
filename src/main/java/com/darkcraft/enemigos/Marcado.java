@@ -76,6 +76,9 @@ public class Marcado extends Enemigo {
     private LivingEntity presaDelReflejo;
     /** (en el cliente) por donde iba el bucle de rodillas del rompedor, para el golpe contra el suelo. */
     private long faseAntes = -1;
+    /** Aldric rugio (parte 7v): se ha arrodillado y no pelea mientras dure su pelea (salvo que se le pegue); como estaba antes. */
+    private boolean rendido;
+    private int posturaAntes;
 
     /**
      * Para la prueba: los mazazos y sus ondas que dan, los barridos, tajos, estocadas y escudazos, lo que para el escudo,
@@ -137,6 +140,36 @@ public class Marcado extends Enemigo {
     /** Si la marca le arde (media vida: sus golpes los repite su reflejo). */
     public boolean arde() {
         return entityData.get(ARDE);
+    }
+
+    /** Si se ha rendido al rugido de Aldric (de rodillas, sin pelear). */
+    public boolean rendido() {
+        return rendido;
+    }
+
+    /**
+     * Aldric ruge (parte 7v): con {@code si}, se arrodilla donde esta (en cuanto acabe lo que hace) y deja de pelear mientras dure
+     * la pelea, salvo que un jugador le pegue; sin {@code si} (la pelea se acaba sin caer Aldric), vuelve a lo suyo: si estaba de
+     * pie, se levanta. Devuelve si ha cambiado.
+     */
+    public boolean rendir(boolean si, LivingEntity quien) {
+        if (level().isClientSide || reflejo() || si == rendido) return false;
+        if (si) {
+            if (!isAlive() || muriendo()) return false;
+            rendido = true;
+            posturaAntes = postura();
+            super.setTarget(null);
+            getNavigation().stop();
+            if (postura() == DE_PIE && accion() == 0) postura(REZA);
+            if (level() instanceof ServerLevel sl) sl.sendParticles(SOMBRA, getX(), getY() + 0.4, getZ(), 10, 0.4, 0.15, 0.4, 0.01);
+            return true;
+        }
+        rendido = false;
+        if (posturaAntes == DE_PIE && postura() != DE_PIE && isAlive() && !muriendo()) {
+            postura(DE_PIE);
+            empezar(MarcadoAnims.LEVANTARSE);
+        }
+        return true;
     }
 
     @Override
@@ -307,6 +340,18 @@ public class Marcado extends Enemigo {
         }
     }
 
+    /** Rendido al rugido de Aldric no toma presa (salvo que le peguen: entonces deja de estar rendido). */
+    @Override
+    public void setTarget(LivingEntity t) {
+        if (t != null && rendido) return;
+        super.setTarget(t);
+    }
+
+    @Override
+    protected boolean percibe(LivingEntity p) {
+        return !rendido && super.percibe(p);
+    }
+
     /** A quien puede pegar: lo de siempre; un reflejo, solo a los jugadores y a la presa del que lo echo. */
     @Override
     protected boolean objetivoValido(LivingEntity e) {
@@ -432,6 +477,8 @@ public class Marcado extends Enemigo {
     public boolean hurt(DamageSource s, float cuanto) {
         // al reflejo no se le puede pegar: es una sombra
         if (reflejo()) return false;
+        // rendido, si le pega un jugador deja de estarlo (y pelea)
+        if (!level().isClientSide && rendido && s.getEntity() instanceof Player) rendido = false;
         if (!level().isClientSide && cubre(s)) {
             boolean flecha = s.getDirectEntity() instanceof net.minecraft.world.entity.projectile.Projectile;
             level().playSound(null, getX(), getY() + 1, getZ(), DarkCraftMod.SFX_ESCUDO_GOLPE.get(), SoundSource.HOSTILE, 1.0f, 0.75f + random.nextFloat() * 0.2f);
@@ -540,6 +587,11 @@ public class Marcado extends Enemigo {
         }
         if (recarga > 0) recarga--;
         if (reflejoAccion != 0 && tickCount >= reflejoCuando) echarReflejo();
+        // rendido: en cuanto acaba lo que hacia, de rodillas
+        if (rendido && postura() == DE_PIE && accion() == 0 && onGround()) {
+            getNavigation().stop();
+            postura(REZA);
+        }
     }
 
     /** (cliente) El rompedor de rodillas golpea el suelo al ritmo de su bucle: el golpe, las chispas y el polvo. */

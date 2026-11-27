@@ -267,7 +267,7 @@ public final class Morvain {
     }
 
     /** Si hay alguien cerca del Patio del Juramento o del Observatorio (se mira cada segundo). */
-    private static boolean cercaJuramento, cercaObservatorio;
+    private static boolean cercaJuramento, cercaObservatorio, cercaCerco;
 
     /** Al acabar cada tick, los que entraron en un portal; y cada segundo, con alguien cerca del arco, su remolino. */
     @SubscribeEvent
@@ -330,6 +330,15 @@ public final class Morvain {
             // el Altar Profanado (parte 7t): con Anselmo caido la Tierra sin Fe descansa y los penitentes que rezaban de rodillas
             // (alli y en el Puente de la Grieta) se deshacen en sangre; cada segundo
             if (srv.getTickCount() % 20 == 13) Altar.paz(m);
+            // el Cerco del Ancla (parte 7v): la cadena que cierra su puerta mientras se pelea con Aldric (cada tick con alguien cerca)
+            // y, con Aldric caido, los marcados que seguian de rodillas descansan (cada segundo)
+            if (srv.getTickCount() % 20 == 3) {
+                cercaCerco = false;
+                for (ServerPlayer p : m.players())
+                    if (Cerco.distancia(p.getX(), p.getZ()) < 120) cercaCerco = true;
+            }
+            if (cercaCerco) Cerco.tick(m);
+            if (srv.getTickCount() % 20 == 9) Cerco.paz(m);
         }
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())

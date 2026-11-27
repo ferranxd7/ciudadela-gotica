@@ -1477,6 +1477,22 @@ public class Volcado {
                 }
             }
         }
+        // Aldric (parte 7v): su caja (1,2 x 3,0) en lo alto del ancla, libre (de la cadena tambien)
+        for (var o : v.esperas()) {
+            if (!o.grupo().equals(com.darkcraft.enemigos.Puestos.JEFE)) continue;
+            StringBuilder al = new StringBuilder("Aldric en " + o.x() + "," + o.y() + "," + o.z() + ":");
+            int llenos = 0;
+            for (int dx = -1; dx <= 1; dx++)
+                for (int dz = -1; dz <= 1; dz++)
+                    for (int dy = 0; dy <= 2; dy++) {
+                        BlockState st = mundo.en(o.x() + dx, o.y() + dy, o.z() + dz);
+                        if (choca(st)) {
+                            llenos++;
+                            al.append(' ').append(dx).append('/').append(dy).append('/').append(dz).append('=').append(st.getBlock().getDescriptionId());
+                        }
+                    }
+            System.out.println(al + (llenos == 0 ? " libre" : " (" + llenos + " llenos alrededor)") + "; suelo " + mundo.en(o.x(), o.y() - 1, o.z()));
+        }
         // la escalera: de lo alto de cada peldano al siguiente, y desde el patio a la cima
         boolean cima = z0.alcanza(X, P + 8, Z + 3, 1.5);
         System.out.println("Los marcados: " + v.esperas().size() + " (en lo alto de las torres " + enAlto + "), a los que no se llega " + malos

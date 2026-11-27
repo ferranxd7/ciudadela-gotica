@@ -235,5 +235,16 @@
     "aviso": "Music by Insydnis (OpenGameArt, CC-BY 3.0)",
     "uso": "Anselmo, el Pontifice Sangrante (el jefe de la Tierra sin Fe de Morvain)",
     "lufs": -16
+  },
+  {
+    "id": "aldric",
+    "pagina": "https://opengameart.org/node/141442",
+    "busca": "a_champions_will",
+    "titulo": "A Champion's Will",
+    "autor": "ATMANAN",
+    "licencia": "CC-BY 4.0",
+    "aviso": "Music by ATMANAN (OpenGameArt, CC-BY 4.0)",
+    "uso": "Aldric, el Primer Marcado (el jefe del Crater de Sangre de Morvain)",
+    "lufs": -16
   }
 ]

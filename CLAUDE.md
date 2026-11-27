@@ -2746,8 +2746,9 @@ Aldric, el Primer Marcado, el jefe del crater, que abre la subida por la cadena;
 - **Los puestos** (`MorvainEnemigos`, sitio `cerco`, 25, de `Cerco.esperas`): por el camino tres de rodillas mirando a la cadena y dos
   caidos de bruces; a la puerta dos caballeros de guardia y en lo alto de las torres los **cazadores** (las dos de la puerta y las dos
   del norte: `en_alto`, no se llega a ellos: estan para disparar); al pie del ancla cinco **rompedores de rodillas** golpeandola; en el
-  patio dos caballeros de ronda, uno a la puerta de la choza y un cazador en lo alto del ancla; en la fragua un rompedor de rodillas ante
-  el yunque y otro de pie; en el campamento dos caidos en los petates y uno de rodillas junto a la hoguera.
+  patio dos caballeros de ronda y uno a la puerta de la choza; en lo alto del ancla, desde la 7v, **Aldric** (el puesto 0; en la 7u
+  habia alli un cazador); en la fragua un rompedor de rodillas ante el yunque y otro de pie; en el campamento dos caidos en los
+  petates y uno de rodillas junto a la hoguera.
 - **El crater suena** (`ClientMusic.tickCrater`): en su region (`Region.CENTRO`) entre Y 40 y 330, `ambiente.crater` (las cadenas
   que crujen arriba, golpes de hierro lejanos, un zumbido grave y viento seco).
 - Sonidos (ElevenLabs, flow `sjsGv1UGBLAnN0YbBhO1`, `TOMAS_SFX`): `marcado_alerta` (1 y 3), `marcado_dolor` (2 y 4), `marcado_muerte`
@@ -2773,6 +2774,89 @@ Aldric, el Primer Marcado, el jefe del crater, que abre la subida por la cadena;
   (`mv419`) y su reflejo (`mv420`), uno caido de bruces (`mv421`) que se alza (`mv422`), uno que cae (`mv423`) y se deshace en sombra
   (`mv424`), el diario del primero (`mv425`) y el bestiario (`mv426`). `LIMIT` 105 min (`lanzar.sh` 111 y 109 min, el paso 139, el
   trabajo 187).
+
+### Plan grande, parte 7v: Aldric, el Primer Marcado (el jefe del Crater de Sangre)
+
+Respuestas 125 y 131 del plan; el noveno jefe de Morvain, el del libro 30 ("El diario del primero"), en lo alto del ancla del
+Cerco (parte 7u). Despues, los especiales (el dragon, el jinete nocturno, los gigantes errantes, los jefes secretos) y la subida
+por la cadena a la ciudadela y la Sombra.
+- **Aldric** (`enemigos/Aldric`, entidad `darkcraft:aldric`, 1,2 x 3,0, inmune al fuego; hereda de `Guardian`): el primero al que
+  la Sombra saco de la muerte y le puso su marca; golpeo la cadena del sur mil inviernos, subio por ella hasta ver la ciudadela de
+  cerca y bajo para no dejar subir a nadie con la marca. Modelo de `tools/enemigos/aldric.py` (escala 1,42: un viejo enorme y
+  consumido con la piel agrietada de los marcados, pelo y barba cenicientos, la coraza negra con el agujero quemado por donde luce la
+  marca, la hombrera de placas, el collar de un grillete roto, la capa roja quemada; en el brazo derecho la cadena enrollada y en la
+  mano un trozo de la cadena de la Sombra —cuatro tramos— que acaba en el eslabon roto: su arma). **La cadena se anima con su propia
+  cuenta**: `anim.py` tiene un gancho `posproceso` y `aldric.py` resuelve `_cadena` despues de los brazos (colgando con su peso y lo
+  que sobra tendido en el suelo, en linea hacia donde se diga o tramo a tramo). `AldricGeometria/Animaciones`, `AldricAnims`
+  (cadenazo, latigazo, estrella, torbellino, salto, encadenar, rugido, marca, aturdido, morir, levantarse; bucles quieto, arrastra,
+  andar, listo y rezando), `client/enemigos/AldricModelo` (de rodillas rezando mientras no esta de pie; andando en pelea arrastra la
+  cadena) y `AldricRenderer` (1,42; la luz de la marca late mas fuerte cuando le arde y se apaga al morir; el reflejo, translucido y
+  rojo oscuro como el de los marcados). 1300 de vida, golpe 13, armadura 8 (dureza 3), casi no se le empuja (0,95). Espera **de
+  rodillas** en lo alto del ancla (`REZA`, de cara a la puerta, con su `sfx.aldric_rezo` de vez en cuando).
+- **La pelea** (solo con quien esta dentro del cerco: `percibe` —de rodillas ve a `VE` 20, a la vista— y `objetivoValido`; a los
+  marcados no les hace nada): al verle dice la frase 1 mientras se levanta (no ataca ni se mueve hasta acabarla) y al acabarla
+  **ruge**: los marcados del cerco a menos de `Cerco.R_RENDIR` (42) del ancla se **rinden** (`Marcado.rendir`: se arrodillan donde
+  estan —los que estaban golpeando, al acabar—, sueltan a su presa y no toman otra; si un jugador les pega dejan de estar rendidos y
+  pelean; `sfx.cerco_arrodillan`) y **la cadena cierra la puerta** del cerco (`Cerco.tick`, desde `Morvain.onTick` con alguien a 120:
+  barrera en la cara de dentro del hueco y cadenas de pie en la de fuera, chispas rojas; antes saca hacia dentro a quien este en el
+  hueco; se abre sola si la pelea acaba, y 120 ticks despues de caer el —mientras dice su ultima frase—; lo cerrado se mira en el
+  mundo: si el servidor se para a media pelea, al volver se abre). Desde lo alto del ancla (o desde donde este mas alto que su presa
+  —3—) **salta** sobre ella: se agacha, en el tick `DESPEGA` 12 sale con la velocidad justa para caer a un paso (`subida`: la que con
+  la gravedad del juego llega a esa altura en `CAE - DESPEGA` ticks; hacia abajo sale igual hacia arriba —0,35— y el vuelo dura lo que
+  diga `vuelo`, con lo de lado repartido en eso) y al caer la **onda** (`R_SALTO` 4,2). De cerca el **cadenazo** (de lado a lado:
+  5,2, 150 grados, frena un poco), la **estrella** (la alza al cielo y la estrella delante: la onda a `ESTRELLA_DELANTE` 3,9, radio
+  3,1, a quien este de pie) y el **torbellino** (dos vueltas: pega dos veces todo alrededor); de 4 a 8,2 el **latigazo** (recto hasta
+  8,4: a quien alcanza **lo arrastra** hacia el); de 7 a 18, a veces, otro salto. A **media vida** (`alSegundaMitad`, la frase 2) le
+  **arde la marca** (`ARDE`, sincronizado: el **estallido** —brasas alrededor, x0,55 del golpe y fuego a `R_MARCA` 4,4—) y desde
+  entonces su **reflejo** repite cada golpe de cadena `RETRASO` 12 ticks despues desde donde lo dio (otro `Aldric` con `REFLEJO`: no se
+  le apunta ni se le empuja ni se le puede pegar, no se guarda, se deshace al acabar; pega a los jugadores y a la presa del de verdad)
+  y **encadena** (golpea el suelo con el puno —la frase 4 la primera vez—: bajo los pies de cada jugador a 24, y de su presa, una
+  **marca** —un aro de brasas que se cierra— y otra delante de por donde va; a los `CADENA_T` 22 ticks brotan tres **cadenas** del
+  suelo —`EfectosRaiz.estaca` con cadenas—: x0,7 del golpe y **sujeta** `SUJETA` 50 ticks —lentitud 5: casi no se anda ni se salta—).
+  Si cae su presa, la frase 3. `Aldric.mediaVida()`, `vencer()`, `reflejoDe(accion)`, `quieta` (pruebas) y contadores (`cadenazos`,
+  `latigazos` / `arrastrados`, `estrellas` / `ondas`, `torbellinos`, `saltos` / `caidas` / `ondasSalto`, `encadenados` / `marcadas` /
+  `brotes` / `sujetos`, `reflejos`, `rendidos`, `estallidos`; `REFLEJOS_DAN`).
+- **Al caer** se queda de rodillas mirando a la ciudadela, dice su ultima frase y **se deshace en sombra** (`tickDeath` propio, 160
+  ticks: la marca que se apaga, la sombra que sube y al final el estallido de sombra y almas); lo demas lo reparte
+  `valdrenn/Guardianes`: el cartel de JEFE ABATIDO con 20000 ecos, la hazana `aldric` ("El primero", con su entrada del diario) y el
+  bestiario; deja tres piedras de forja III, dos II y la ceniza del torbellino. Y **el cerco queda en paz** (`Cerco.enPaz`: su puesto
+  caido; `Cerco.paz`, cada segundo desde `Morvain.onTick`): los marcados que seguian **de rodillas** y los **rendidos** (sin presa y
+  sin hacer nada) se deshacen en sombra (`DESCANSAN`); los de rodillas **ya no vuelven** (el sitio `cerco` se registra con `activo`:
+  los `REZA` solo mientras Aldric vive) y los rendidos cuentan como caidos (vuelven al descansar, como cualquiera). La cadena del sur
+  queda libre (la subida, mas adelante). Si la pelea acaba sin caer el (todos caen o se van), los rendidos se levantan
+  (`soltar`) y la puerta se abre.
+- **Voz** (ElevenLabs, `eleven_v4`, **"Frederick - Old Gnarly Narrator"** `uVKHymY7OYMd6OailpG5`, flow `i8PApavQwvirt3cERg4n`; 5
+  frases, tomas a; en `procesar.py` `voz_aldric`: un poco mas grave, una segunda voz una octava por debajo sorda y muy baja —la marca
+  que le arde dentro—, algo de raspa y el eco seco y espaciado del crater): linea **120 + N** (`Voces.BASE_ALDRIC`, `esAldric`;
+  `habla_aldric` en `rey_voces.json`; subtitulos `darkcraft.aldric.voz.N`): 1 al empezar ("Otro mas... con la marca. Vuelve abajo,
+  muchacho. Alli arriba no hay descanso."; no la repite en 4 min), 2 al arderle la marca ("¡Yo tambien subi! Vi lo que espera
+  arriba... ¡No dejare que te tenga!"), 3 si cae su presa ("Descansa. Mejor aqui... que alli arriba."), 4 la primera vez que encadena
+  ("La cadena sujeta todo lo que toca.") y 5 al caer ("Ve, entonces... sube. Y cuando abra la boca... no le contestes.").
+- **Barra** (`GuardianCliente`, estilo "cadena": letras de hierro al rojo y brasas que caen; arte de `tools/hud/barra_guardianes.py`
+  "aldric": la cadena de hierro negro de punta a punta —eslabones tumbados y de pie—, el gancho a la izquierda, el eslabon roto que
+  cuelga a la derecha y la marca al rojo en medio; relleno de hierro al rojo con vetas de fuego). **Musica**: "A Champion's Will" de
+  ATMANAN (OpenGameArt, CC-BY 4.0, id `aldric`, tema 41 de `ClientMusic.boss`).
+- Sonidos (ElevenLabs, flow `GnQ7JmflqS52oHTbj1uG`, `TOMAS_SFX`): `aldric_cadenazo` (4 y 2), `aldric_latigazo` (4 y 3),
+  `aldric_estrella` (3 y 1), `aldric_torbellino` (1 y 3), `aldric_salto` (1 y 3), `aldric_encadenar` (1 y 4), `aldric_marca` (2 y 4),
+  `aldric_rugido` (2 y 3), `aldric_dolor` (1 y 4), `aldric_muerte` (4 y 2), `aldric_rezo` (1 y 2), `aldric_arrastre` (2 y 4; la cadena
+  que arrastra al andar en pelea) y `cerco_arrodillan` (3 y 1; los rendidos que se arrodillan).
+- Comandos `/darkcraft aldric [ir | vencer | volver | puerta [abrir]]` (sin mas: como esta; `volver` le pone otra vez de rodillas y
+  vuelven los marcados del cerco como estaban; `puerta abrir` rompe a mano la cadena de la puerta).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_cerco carpeta` escribe si la caja de Aldric en lo alto del ancla esta libre
+  (`Aldric en ...: libre`, tambien de la cadena) y su suelo; la cima del ancla a pie ya la miraba (la 7u).
+- Pruebas: servidor, lineas `Morvain, Aldric: ...` (de rodillas en lo alto del ancla y en su suelo; al verle habla, se levanta, ruge
+  —los marcados del cerco se rinden y uno rendido no toma presa; la puerta cerrada: barreras y cadenas— y salta desde lo alto hasta
+  su presa, en el suelo del patio; cada accion acaba), `Morvain, los golpes de Aldric a una presa: ...` (el cadenazo, el latigazo que
+  arrastra, la estrella con su onda, el torbellino que pega dos veces, el salto con su onda y encadenar: las marcas, las cadenas que
+  brotan y sujetan), `Morvain, Aldric a media vida: ...` (la marca que estalla; el reflejo que repite el cadenazo, no se le puede pegar
+  ni apuntar y se deshace), `Morvain, Aldric cae: ...` (la puerta cerrada mientras pelea y mientras dice su ultima frase y abierta
+  despues, se deshace en sombra, los de rodillas y los rendidos descansan y los de rodillas ya no vuelven) y `Morvain, Aldric vuelve:
+  ...`; cliente, tramo `aldric()` despues del cerco: de rodillas en lo alto del ancla (`cliente_mv427`); en supervivencia en el patio
+  habla mientras se levanta (`mv428`), ruge y los marcados se arrodillan (`mv429`), la cadena cierra la puerta (`mv430`), salta desde
+  lo alto (`mv431`) y cae con su onda (`mv432`); sus golpes de lado (`mv433..mv436`: el cadenazo, el latigazo, la estrella, el
+  torbellino), le arde la marca (`mv437`), su reflejo (`mv438`), encadena: las marcas (`mv439`) y las cadenas (`mv440`); cae de rodillas
+  (`mv441`), el cartel (`mv442`), se deshace en sombra (`mv443`), el cerco en paz (`mv444`), la puerta abierta (`mv445`) y el bestiario
+  (`mv446`). `LIMIT` 109 min (`lanzar.sh` 115 y 113 min, el paso 143, el trabajo 191).
 
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 

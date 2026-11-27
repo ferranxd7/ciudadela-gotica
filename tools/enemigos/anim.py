@@ -165,9 +165,15 @@ class Anim:
             self._canales(lista, solo=solo)
             return self
         specs = lista
+        # lo que el modelo resuelve despues de los brazos (una cadena que cuelga de la mano: `rig.posproceso(q, spec,
+        # prev)` y sus piezas en `rig.posproceso_piezas`, con la clave `rig.posproceso_clave`)
+        post = getattr(rig, "posproceso", None)
+        pclave = getattr(rig, "posproceso_clave", None)
         res, prev = [], None
         for t, pose in specs:
             q = resolver(rig, pose, prev) if any(k.startswith("_") for k in pose) else dict(pose)
+            if post is not None and pclave in pose:
+                q = post(q, pose, prev)
             res.append((t, q))
             prev = q
         self.resueltas = res
@@ -180,6 +186,8 @@ class Anim:
         piezas_densas = set()
         for lado in densos:
             piezas_densas.update(BRAZOS[lado])
+        if post is not None and any(pclave in specs[k][1] and pclave in specs[k + 1][1] for k in range(len(specs) - 1)):
+            piezas_densas.update(rig.posproceso_piezas)
         self._canales(res, solo=None if solo is None else [p for p in solo if p not in piezas_densas])
         if solo is not None:
             piezas_densas = {p for p in piezas_densas if p in solo}
@@ -217,7 +225,11 @@ class Anim:
             for c in ("_codo_d", "_codo_i"):
                 if c in s0 or c in s1:
                     spec[c] = (s1 if d > 0.5 and c in s1 else s0 if c in s0 else s1)[c]
+            if post is not None and (pclave in s0 or pclave in s1):
+                spec[pclave] = rig.posproceso_mezcla(s0.get(pclave), s1.get(pclave), d)
             q = resolver(rig, spec, prev) if any(k.startswith("_") for k in spec) else spec
+            if post is not None and pclave in spec:
+                q = post(q, spec, prev)
             ticks.append((tt, q))
             prev = q
         self._canales(ticks, modo="l", solo=sorted(piezas_densas))

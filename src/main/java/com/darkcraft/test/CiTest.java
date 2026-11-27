@@ -743,6 +743,7 @@ public final class CiTest {
         grieta(server, m, log, out);
         altar(server, m, log, out);
         cerco(server, m, log, out);
+        aldric(server, m, log, out);
     }
 
     /**
@@ -3234,6 +3235,381 @@ public final class CiTest {
             for (var e : quitar) if (!e.isRemoved()) e.discard();
             for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Flecha.class, caja)) f.discard();
             for (var r : m.getEntitiesOfClass(com.darkcraft.enemigos.Marcado.class, caja)) if (r.reflejo()) r.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /** Lo que deja Aldric (sus reflejos): un tick, a mano (la prueba no mueve el mundo). */
+    private static void tickAldric(ServerLevel m, net.minecraft.world.phys.AABB caja, java.util.List<net.minecraft.world.entity.Entity> quitar) {
+        for (var r : m.getEntitiesOfClass(com.darkcraft.enemigos.Aldric.class, caja)) {
+            if (!r.reflejo() || r.isRemoved()) continue;
+            if (!quitar.contains(r)) quitar.add(r);
+            r.tickCount++;
+            r.tick();
+        }
+    }
+
+    /** Mueve a la presa con lo que la empujan (la prueba no mueve el mundo): el arrastre del latigazo, las ondas. */
+    private static void moverPresa(net.minecraft.world.entity.LivingEntity v) {
+        net.minecraft.world.phys.Vec3 dv = v.getDeltaMovement();
+        if (dv.lengthSqr() > 1e-4) {
+            v.move(net.minecraft.world.entity.MoverType.SELF, dv);
+            v.setDeltaMovement(dv.x * 0.6, v.onGround() ? 0 : dv.y - 0.08, dv.z * 0.6);
+        }
+    }
+
+    /**
+     * Parte 7v: Aldric, el Primer Marcado, en lo alto del ancla del Cerco: de rodillas en su puesto (y en su suelo); al verle
+     * habla mientras se levanta, ruge al acabar la frase (los marcados del cerco se arrodillan, rendidos, y no toman presa; la
+     * cadena cierra la puerta) y salta desde lo alto sobre su presa; cada accion acaba; sus golpes a una presa (el cadenazo, el
+     * latigazo que la arrastra, la estrella y su onda, el torbellino que pega dos veces y el salto con su onda); a media vida le
+     * arde la marca (el estallido), su reflejo repite el golpe (no se le puede pegar y se deshace) y encadena (las marcas y las
+     * cadenas que brotan y sujetan); y al caer: se deshace en sombra, la puerta se abre, los marcados de rodillas y los rendidos
+     * descansan y los de rodillas ya no vuelven. Al acabar, todo como estaba.
+     */
+    private static void aldric(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.CERCO;
+        final int CX = com.darkcraft.morvain.Cerco.CX, CZ = com.darkcraft.morvain.Cerco.CZ, PISO = com.darkcraft.morvain.Cerco.PISO;
+        final var caja = new net.minecraft.world.phys.AABB(CX - 50, PISO - 10, CZ - 50, CX + 50, PISO + 30, CZ + 60);
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        com.darkcraft.enemigos.Aldric al = null;
+        try {
+            for (long k : com.darkcraft.morvain.Cerco.get().chunks()) m.getChunk((int) (k >> 32), (int) k);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            java.util.List<com.darkcraft.enemigos.Marcado> marcados = new java.util.ArrayList<>();
+            for (int k = 0; k < 6; k++)
+                for (var e : fuera) if (e.isAlive() && !(e instanceof com.darkcraft.enemigos.Aldric)) e.tick();
+            for (var e : fuera) {
+                if (e instanceof com.darkcraft.enemigos.Aldric x) al = x;
+                else if (e instanceof com.darkcraft.enemigos.Marcado mk) marcados.add(mk);
+            }
+            if (al == null) {
+                log.println("Morvain, Aldric: NO SALE");
+                return;
+            }
+            boolean enSuSuelo = !m.getBlockState(BlockPos.containing(al.getX(), al.getY() - 0.2, al.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty();
+            StringBuilder sb = new StringBuilder(String.format(java.util.Locale.ROOT, "Morvain, Aldric: en %s postura %d (1 de rodillas), giro %d, vida %.0f, golpe %.1f,"
+                            + " armadura %d, caja %.1f x %.1f, en lo alto del ancla %s (a %d del suelo del patio), en su suelo %s, metido en un bloque %s (tiene que ser false),"
+                            + " musica %d; marcados del cerco %d", al.blockPosition().toShortString(), al.postura(), Math.round(al.getYRot()), al.getMaxHealth(),
+                    al.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), al.getArmorValue(), al.getBbWidth(), al.getBbHeight(),
+                    Math.abs(al.getX() - CX - 0.5) < 5 && Math.abs(al.getZ() - CZ - 0.5) < 5, Math.round(al.getY() - PISO), enSuSuelo, !m.noCollision(al), al.musica(),
+                    marcados.size()));
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("6c8d0e2f-4a51-4c7d-9e9f-3a4b5c6d7ebc"), "[DarkCraftCI13]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- le ve en el patio: habla mientras se levanta, ruge al acabar (se arrodillan los marcados y la cadena cierra la puerta) y
+            // salta desde lo alto sobre su presa
+            final double fxx = CX + 4.5, fyy = PISO, fzz = CZ + 16.5;
+            fp.moveTo(fxx, fyy, fzz, 180f, 0f);
+            fp.setOnGround(true);
+            int sell0 = com.darkcraft.morvain.Cerco.SELLADOS;
+            al.setTarget(fp);
+            int levanta = -1, ruge = -1, salta = -1, cae = -1, rindenEn = -1;
+            boolean selloAlRugir = false;
+            double alto = 0;
+            for (int k = 0; k < 520; k++) {
+                al.tickCount++;
+                al.tick();
+                tickAldric(m, caja, quitar);
+                com.darkcraft.morvain.Cerco.tick(m);
+                fp.moveTo(fxx, fyy, fzz, 180f, 0f);
+                fp.setOnGround(true);
+                fp.setHealth(fp.getMaxHealth());
+                int a = al.accion();
+                if (levanta < 0 && a == com.darkcraft.enemigos.AldricAnims.LEVANTARSE) levanta = k;
+                if (ruge < 0 && a == com.darkcraft.enemigos.AldricAnims.RUGIDO) ruge = k;
+                if (rindenEn < 0 && al.rendidos() > 0) {
+                    rindenEn = k;
+                    selloAlRugir = com.darkcraft.morvain.Cerco.sellado(m);
+                }
+                if (salta < 0 && a == com.darkcraft.enemigos.AldricAnims.SALTO) salta = k;
+                if (salta >= 0) alto = Math.max(alto, al.getY() - PISO);
+                if (salta >= 0 && al.caidas() > 0) {
+                    cae = k;
+                    break;
+                }
+            }
+            int deRodillas = 0, rendidos = 0;
+            for (var mk : marcados) {
+                if (mk.isRemoved()) continue;
+                if (mk.rendido()) rendidos++;
+                if (mk.postura() == com.darkcraft.enemigos.Enemigo.REZA) deRodillas++;
+            }
+            // uno rendido no toma presa
+            com.darkcraft.enemigos.Marcado unRendido = null;
+            for (var mk : marcados) if (!mk.isRemoved() && mk.rendido()) unRendido = mk;
+            boolean tomaPresa = false;
+            if (unRendido != null) {
+                unRendido.setTarget(fp);
+                tomaPresa = unRendido.getTarget() != null;
+            }
+            int barreras = 0, cadenas = 0;
+            for (int u = -2; u <= 2; u++)
+                for (int y = PISO; y <= PISO + 6; y++) {
+                    if (m.getBlockState(new BlockPos(CX + u, y, CZ + 33)).is(net.minecraft.world.level.block.Blocks.BARRIER)) barreras++;
+                    if (m.getBlockState(new BlockPos(CX + u, y, CZ + 34)).is(net.minecraft.world.level.block.Blocks.CHAIN)) cadenas++;
+                }
+            sb.append("; al verle: pelea ").append(al.enPelea()).append(", se levanta en el tick ").append(levanta).append(", ruge en el ").append(ruge)
+                    .append(" (la frase 1 dura ").append(com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Aldric.VOZ_BASE + 1)).append("), se rinden ")
+                    .append(al.rendidos()).append(" en el ").append(rindenEn).append(" (de los ").append(marcados.size()).append(": rendidos ").append(rendidos)
+                    .append(", de rodillas ").append(deRodillas).append("; uno rendido toma presa ").append(tomaPresa).append(", tiene que ser false), la puerta cerrada ")
+                    .append(selloAlRugir).append(" (se cierra +").append(com.darkcraft.morvain.Cerco.SELLADOS - sell0).append(", barreras ").append(barreras)
+                    .append(", cadenas ").append(cadenas).append("), salta en el ").append(salta).append(" y cae en el ").append(cae)
+                    .append(String.format(java.util.Locale.ROOT, " (subio hasta %.1f sobre el patio) a %.1f de su presa, en el suelo del patio %s", alto,
+                            Math.hypot(al.getX() - fxx, al.getZ() - fzz), Math.abs(al.getY() - PISO) < 0.6));
+            // ---- cada accion acaba (sin presa y quieto: no elige por su cuenta)
+            al.quieta = true;
+            al.setTarget(null);
+            for (int k = 0; k < 120 && al.accion() != 0; k++) {
+                al.tickCount++;
+                al.tick();
+                tickAldric(m, caja, quitar);
+            }
+            StringBuilder nn = new StringBuilder();
+            int vistas = 0;
+            for (int a = 1; a < com.darkcraft.enemigos.AldricAnims.TICKS.length; a++) {
+                String nombre = com.darkcraft.enemigos.AldricAnims.NOMBRES[a];
+                if (nombre.equals("morir")) continue;
+                al.moveTo(CX + 0.5, PISO, CZ + 20.5, 0f, 0f);
+                al.empezar(a);
+                vistas++;
+                for (int k = 0; k < 160 && al.accion() == a; k++) {
+                    al.tickCount++;
+                    al.tick();
+                    tickAldric(m, caja, quitar);
+                }
+                if (al.accion() == a) nn.append(' ').append(nombre);
+            }
+            for (int k = 0; k < 60 && al.marcasPendientes() > 0; k++) {
+                al.tickCount++;
+                al.tick();
+            }
+            sb.append("; de ").append(vistas).append(" acciones no acaban:").append(nn.length() == 0 ? " ninguna" : nn);
+            log.println(sb);
+            // ---- sus golpes a una presa (un aldeano quieto y duro) en el patio, al sur del ancla: el mirando al sur
+            StringBuilder sg = new StringBuilder("Morvain, los golpes de Aldric a una presa:");
+            final double x0 = CX + 0.5, y0 = PISO, z0 = CZ + 17.5;
+            var victima = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            if (victima != null) {
+                victima.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(900.0);
+                victima.setHealth(900f);
+                victima.setNoAi(true);
+                victima.moveTo(x0, y0, z0 + 3, 180f, 0f);
+                m.addFreshEntity(victima);
+                quitar.add(victima);
+                String[] golpes = {"cadenazo", "latigazo", "estrella", "torbellino", "salto", "encadenar"};
+                int[] acc = {com.darkcraft.enemigos.AldricAnims.CADENAZO, com.darkcraft.enemigos.AldricAnims.LATIGAZO, com.darkcraft.enemigos.AldricAnims.ESTRELLA,
+                        com.darkcraft.enemigos.AldricAnims.TORBELLINO, com.darkcraft.enemigos.AldricAnims.SALTO, com.darkcraft.enemigos.AldricAnims.ENCADENAR};
+                double[] lejos = {3.5, 6.5, 3.9, 3.0, 9.0, 7.0};
+                int[] dura = {50, 50, 60, 60, 70, 90};
+                for (int i = 0; i < golpes.length; i++) {
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    victima.hurtTime = 0;
+                    victima.removeAllEffects();
+                    victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    victima.moveTo(x0, y0, z0 + lejos[i], 180f, 0f);
+                    victima.setOnGround(true);
+                    int cad = al.cadenazos(), lat = al.latigazos(), arr = al.arrastrados(), est = al.estrellas(), ond = al.ondas(), tor = al.torbellinos(),
+                            sal = al.saltos(), cai = al.caidas(), ons = al.ondasSalto(), enc = al.encadenados(), mar = al.marcadas(), bro = al.brotes(),
+                            suj = al.sujetos();
+                    al.moveTo(x0, y0, z0, 0f, 0f);
+                    al.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    al.setTarget(victima);
+                    al.setYRot(0f);
+                    al.yBodyRot = al.yHeadRot = 0f;
+                    al.empezar(acc[i]);
+                    float antes = victima.getHealth();
+                    boolean frenado = false;
+                    for (int k = 0; k < dura[i]; k++) {
+                        boolean el = al.accion() != 0 || al.marcasPendientes() > 0;
+                        if (el) {
+                            al.setTarget(victima);
+                            al.tickCount++;
+                            al.tick();
+                            // (el salto le lleva: no se le devuelve a su sitio)
+                            if (acc[i] != com.darkcraft.enemigos.AldricAnims.SALTO) al.moveTo(x0, y0, z0, 0f, 0f);
+                        }
+                        moverPresa(victima);
+                        victima.setOnGround(true);
+                        victima.invulnerableTime = 0;
+                        var lento = victima.getEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                        if (lento != null && lento.getAmplifier() >= 5) frenado = true;
+                        if (!el && k > 2) break;
+                    }
+                    sg.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " a %.1f: -%.1f", lejos[i], antes - victima.getHealth()));
+                    switch (i) {
+                        case 0 -> sg.append(", cadenazos +").append(al.cadenazos() - cad);
+                        case 1 -> sg.append(", latigazos +").append(al.latigazos() - lat).append(" (arrastra +").append(al.arrastrados() - arr)
+                                .append(String.format(java.util.Locale.ROOT, ": la presa queda a %.1f)", Math.hypot(victima.getX() - x0, victima.getZ() - z0)));
+                        case 2 -> sg.append(", estrellas +").append(al.estrellas() - est).append(" (ondas que dan +").append(al.ondas() - ond).append(')');
+                        case 3 -> sg.append(", torbellinos +").append(al.torbellinos() - tor).append(" (dos vueltas)");
+                        case 4 -> sg.append(", saltos +").append(al.saltos() - sal).append(" (cae +").append(al.caidas() - cai).append(", ondas que dan +")
+                                .append(al.ondasSalto() - ons).append(String.format(java.util.Locale.ROOT, ", queda a %.1f de la presa)",
+                                        Math.hypot(al.getX() - victima.getX(), al.getZ() - victima.getZ())));
+                        case 5 -> sg.append(", encadena +").append(al.encadenados() - enc).append(" (marcas +").append(al.marcadas() - mar).append(", brotan +")
+                                .append(al.brotes() - bro).append(", sujetan +").append(al.sujetos() - suj).append(", la presa sujeta ").append(frenado).append(')');
+                        default -> {
+                        }
+                    }
+                    sg.append(';');
+                }
+                sg.append(" en total: ").append(al.estado());
+            }
+            log.println(sg);
+            // ---- a media vida: le arde la marca (el estallido) y su reflejo repite el golpe
+            StringBuilder sm = new StringBuilder("Morvain, Aldric a media vida:");
+            al.setHealth(al.getMaxHealth());
+            al.moveTo(x0, y0, z0, 0f, 0f);
+            if (victima != null) {
+                victima.moveTo(x0, y0, z0 + 3.2, 180f, 0f);
+                victima.setHealth(victima.getMaxHealth());
+                al.setTarget(victima);
+            }
+            int est0 = al.estallidos();
+            al.mediaVida();
+            boolean marca = al.accion() == com.darkcraft.enemigos.AldricAnims.MARCA;
+            for (int k = 0; k < 70 && al.accion() != 0; k++) {
+                al.tickCount++;
+                al.tick();
+                al.moveTo(x0, y0, z0, 0f, 0f);
+                if (victima != null) {
+                    victima.moveTo(x0, y0, z0 + 3.2, 180f, 0f);
+                    victima.setOnGround(true);
+                    victima.invulnerableTime = 0;
+                    victima.clearFire();
+                }
+            }
+            sm.append(" segunda ").append(al.segunda()).append(", la marca ").append(marca).append(" (estalla +").append(al.estallidos() - est0)
+                    .append("), le arde ").append(al.arde());
+            // el reflejo: el cadenazo, repetido desde donde lo dio
+            int ref0 = al.reflejos(), dan0 = com.darkcraft.enemigos.Aldric.REFLEJOS_DAN;
+            com.darkcraft.enemigos.Aldric sombra = null;
+            boolean seLePega = true, seCoge = true;
+            int seVaEn = -1;
+            if (victima != null) {
+                al.setTarget(victima);
+                al.setYRot(0f);
+                al.yBodyRot = al.yHeadRot = 0f;
+                al.empezar(com.darkcraft.enemigos.AldricAnims.CADENAZO);
+                for (int k = 0; k < 140; k++) {
+                    if (al.accion() != 0) {
+                        al.tickCount++;
+                        al.tick();
+                        al.moveTo(x0, y0, z0, 0f, 0f);
+                    } else {
+                        // (sin presa: el reflejo sale igual, a su hora)
+                        al.tickCount++;
+                        al.tick();
+                    }
+                    victima.moveTo(x0, y0, z0 + 3.2, 180f, 0f);
+                    victima.setOnGround(true);
+                    victima.invulnerableTime = 0;
+                    tickAldric(m, caja, quitar);
+                    if (sombra == null)
+                        for (var r : m.getEntitiesOfClass(com.darkcraft.enemigos.Aldric.class, caja)) if (r.reflejo()) sombra = r;
+                    if (sombra != null && seLePega) {
+                        seLePega = sombra.hurt(m.damageSources().playerAttack(fp), 10f);
+                        seCoge = sombra.isPickable();
+                    }
+                    if (sombra != null && sombra.isRemoved() && seVaEn < 0) {
+                        seVaEn = k;
+                        break;
+                    }
+                }
+            }
+            sm.append("; reflejos +").append(al.reflejos() - ref0).append(" (dan +").append(com.darkcraft.enemigos.Aldric.REFLEJOS_DAN - dan0).append(", se le pega ")
+                    .append(seLePega).append(", se le apunta ").append(seCoge).append(", tienen que ser false; se deshace en el tick ").append(seVaEn).append("); ")
+                    .append(al.estado());
+            log.println(sm);
+            // ---- cae: de rodillas, mira a la ciudadela, se deshace en sombra; la puerta se abre; los marcados de rodillas y los rendidos
+            // descansan y los de rodillas ya no vuelven
+            al.quieta = true;
+            for (int k = 0; k < 120 && al.accion() != 0; k++) {
+                al.tickCount++;
+                al.tick();
+            }
+            // los marcados del principio (siguen fuera): los de rodillas en su puesto y tres de pie, rendidos (al acabar la pelea de
+            // antes sin caer, los solto: se rinden otra vez y acaban de arrodillarse)
+            java.util.List<com.darkcraft.enemigos.Marcado> rezan = new java.util.ArrayList<>(), rinden = new java.util.ArrayList<>();
+            for (var mk : marcados) {
+                if (mk.isRemoved() || !mk.isAlive()) continue;
+                if (com.darkcraft.morvain.MorvainEnemigos.cerco().get(mk.puesto()).postura() == com.darkcraft.enemigos.Enemigo.REZA) rezan.add(mk);
+                else if (rinden.size() < 3 && com.darkcraft.morvain.MorvainEnemigos.cerco().get(mk.puesto()).postura() == com.darkcraft.enemigos.Enemigo.DE_PIE
+                        && !"en_alto".equals(com.darkcraft.morvain.MorvainEnemigos.cerco().get(mk.puesto()).grupo())) rinden.add(mk);
+            }
+            for (var mk : rinden) {
+                mk.rendir(true, al);
+                for (int k = 0; k < 80 && (mk.accion() != 0 || mk.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE); k++) {
+                    mk.tickCount++;
+                    mk.tick();
+                }
+            }
+            for (var mk : rezan) mk.setTarget(null);
+            int desc = com.darkcraft.morvain.Cerco.DESCANSAN, abiertas0 = com.darkcraft.morvain.Cerco.ABIERTOS;
+            boolean pazAntes = com.darkcraft.morvain.Cerco.enPaz(server);
+            // la puerta, cerrada mientras pelea y mientras dice su ultima frase
+            al.setTarget(fp);
+            com.darkcraft.morvain.Cerco.tick(m);
+            boolean cerradaAntes = com.darkcraft.morvain.Cerco.sellado(m);
+            al.moveTo(CX + 0.5, PISO, CZ + 18.5, 180f, 0f);
+            al.invulnerableTime = 0;
+            al.hurt(m.damageSources().playerAttack(fp), 99999f);
+            boolean muere = !al.isAlive();
+            int seVa = -1;
+            boolean cerradaHablando = false;
+            for (int fin = 0; fin < 300; fin++) {
+                if (!al.isRemoved()) {
+                    al.tickCount++;
+                    al.tick();
+                }
+                com.darkcraft.morvain.Cerco.tick(m);
+                if (fin == 60) cerradaHablando = com.darkcraft.morvain.Cerco.sellado(m);
+                if (seVa < 0 && al.isRemoved()) {
+                    seVa = fin;
+                    break;
+                }
+            }
+            // (el puesto se da por caido al morir: lo hace Puestos; aqui, por si la prueba no lo vio)
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, com.darkcraft.morvain.MorvainEnemigos.aldric(), true);
+            com.darkcraft.morvain.Cerco.tick(m);
+            boolean abierta = !com.darkcraft.morvain.Cerco.sellado(m);
+            com.darkcraft.morvain.Cerco.paz(m);
+            int descansan = 0, descansanRendidos = 0;
+            for (var e : rezan) if (e.isRemoved()) descansan++;
+            for (var e : rinden) if (e.isRemoved()) descansanRendidos++;
+            int objetos = m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, al.getBoundingBox().inflate(6)).size();
+            // despues: los que rezaban ya no vuelven
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, com.darkcraft.morvain.MorvainEnemigos.aldric(), true);
+            int salen = 0, vuelven = 0;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) {
+                salen++;
+                if (com.darkcraft.morvain.MorvainEnemigos.cerco().get(e.puesto()).postura() == com.darkcraft.enemigos.Enemigo.REZA) vuelven++;
+            }
+            log.println("Morvain, Aldric cae: muere " + muere + " (en paz antes " + pazAntes + "); la puerta cerrada al pelear " + cerradaAntes + " y mientras habla "
+                    + cerradaHablando + ", se deshace en sombra en " + seVa + ", y despues abierta " + abierta + " (se abre +" + (com.darkcraft.morvain.Cerco.ABIERTOS - abiertas0)
+                    + "); objetos " + objetos + ", en paz " + com.darkcraft.morvain.Cerco.enPaz(server) + "; de los " + rezan.size() + " marcados que estaban de rodillas descansan "
+                    + descansan + " y de los " + rinden.size() + " rendidos " + descansanRendidos + " (deshechos +" + (com.darkcraft.morvain.Cerco.DESCANSAN - desc)
+                    + "); despues salen " + salen + " y de los de rodillas vuelven " + vuelven + " (tiene que ser 0); " + com.darkcraft.morvain.MorvainEnemigos.estadoAldric(server));
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, al.getBoundingBox().inflate(8))) it.discard();
+        } catch (Throwable t) {
+            log.println("Morvain, Aldric: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] aldric", t);
+        } finally {
+            if (al != null) al.quieta = false;
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            for (var r : m.getEntitiesOfClass(com.darkcraft.enemigos.Aldric.class, caja)) if (r.reflejo()) r.discard();
+            com.darkcraft.morvain.Cerco.abrir(m, false);
+            // todo como antes: Aldric de rodillas en lo alto del ancla y los marcados del cerco, en su sitio
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, com.darkcraft.morvain.MorvainEnemigos.aldric(), false);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            try {
+                com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+                log.println("Morvain, Aldric vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoAldric(server));
+            } catch (Throwable t) {
+                log.println("Morvain, Aldric vuelve: ERROR " + t);
+            }
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
         }
     }

@@ -83,6 +83,8 @@ TOMAS_RECTORA = {1: "a", 2: "b", 3: "a", 4: "a", 5: "a"}
 TOMAS_BALLENERO = {1: "b", 2: "a", 3: "a", 4: "a", 5: "a"}
 # Anselmo, el Pontifice Sangrante (parte 7t)
 TOMAS_PONTIFICE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
+# Aldric, el Primer Marcado (parte 7v): las dos tomas de cada frase salieron casi iguales; las a
+TOMAS_ALDRIC = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -313,13 +315,23 @@ SFX = {
     "marcado_desliz": (1.0, 0.3, -15), "marcado_flecha": (1.2, 0.5, -14), "marcado_susurro": (3.5, 1.0, -21),
     "marcado_esfuerzo": (1.5, 0.4, -15),
     "crater_ambiente": (20.0, 2.0, -25),
+    # Aldric, el Primer Marcado (parte 7v): el cadenazo (la cadena por encima de la cabeza contra el suelo), el latigazo de
+    # lado, la estrella (la cadena que revienta el suelo y su onda), el torbellino, la caida del salto, las cadenas que
+    # brotan del suelo, la marca que le arde a media vida, el rugido, el quejido, la muerte (de rodillas y en sombra), su
+    # rezo en lo alto del ancla y la cadena que arrastra al andar; y los marcados del cerco que se arrodillan a la vez
+    "aldric_cadenazo": (1.8, 0.6, -12), "aldric_latigazo": (1.2, 0.4, -14), "aldric_estrella": (2.4, 0.8, -12),
+    "aldric_torbellino": (2.2, 0.6, -13), "aldric_salto": (1.8, 0.7, -12), "aldric_encadenar": (2.2, 0.8, -13),
+    "aldric_marca": (3.0, 1.0, -13), "aldric_rugido": (2.4, 0.6, -13), "aldric_dolor": (0.9, 0.3, -15),
+    "aldric_muerte": (3.6, 1.2, -14), "aldric_rezo": (3.5, 1.0, -22), "aldric_arrastre": (2.8, 0.8, -18),
+    "cerco_arrodillan": (2.6, 0.8, -15),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
            "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0, "abad_ventisca": 1.5, "abad_rezo": 0.4,
            "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6, "academia_ambiente": 2.0, "erudito_susurro": 0.8,
            "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0, "sinfe_ambiente": 2.0,
-           "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0}
+           "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0,
+           "aldric_rezo": 1.0, "aldric_arrastre": 0.3}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
@@ -569,6 +581,15 @@ TOMAS_SFX = {
     "marcado_alerta": (1, 3), "marcado_dolor": (2, 4), "marcado_muerte": (1, 2), "marcado_mazazo": (3, 1),
     "marcado_cadena": (1, 3), "marcado_reflejo": (2, 3), "marcado_desliz": (4, 3), "marcado_flecha": (1, 4),
     "marcado_susurro": (2, 3), "marcado_esfuerzo": (3, 1), "crater_ambiente": (3, 1),
+    # Aldric: los cadenazos con mas graves (la 4 y la 2; la 1 no se bajo), los latigazos mas fuertes (la 4 y la 3), las
+    # estrellas con el golpe al principio (la 3 y la 1), los torbellinos mas largos (la 1 y la 3), las caidas que dan el golpe
+    # en seguida (la 1 y la 3), las cadenas que brotan con mas cuerpo (la 1 y la 4), las marcas mas graves (la 2 y la 4), el
+    # rugido sostenido (la 2) y la 3, los quejidos mas secos (la 1 y la 4), las muertes con la caida mas larga (la 4 y la 2),
+    # los rezos que mas se oyen (la 1 y la 2), los arrastres de seguido (la 2 y la 4) y las rodillas con mas hierro (la 3 y la 1)
+    "aldric_cadenazo": (4, 2), "aldric_latigazo": (4, 3), "aldric_estrella": (3, 1), "aldric_torbellino": (1, 3),
+    "aldric_salto": (1, 3), "aldric_encadenar": (1, 4), "aldric_marca": (2, 4), "aldric_rugido": (2, 3),
+    "aldric_dolor": (1, 4), "aldric_muerte": (4, 2), "aldric_rezo": (1, 2), "aldric_arrastre": (2, 4),
+    "cerco_arrodillan": (3, 1),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -848,6 +869,27 @@ def voz_pontifice(src, dst):
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA + 0.2
+
+
+def voz_aldric(src, dst):
+    """
+    Aldric, el Primer Marcado: un caballero viejo y cansado al que la Sombra saco de la muerte el primero. Un poco mas grave,
+    una segunda voz una octava por debajo, sorda y muy baja (la marca que le arde dentro), algo de raspa (mil inviernos
+    golpeando hierro) y el eco abierto y seco del crater (largo y espaciado: rebota en la muralla y en la ladera).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=2[v1][v2];"
+        "[v1]asetrate=44100*0.96,aresample=44100,atempo=1.0417[baja];"
+        "[v2]asetrate=44100*0.5,aresample=44100,atempo=2.0,lowpass=f=460,volume=0.20[honda];"
+        "[baja][honda]amix=inputs=2:weights=1 0.4:normalize=0,"
+        "equalizer=f=140:t=q:w=1.0:g=2,equalizer=f=1900:t=q:w=1.1:g=1.5,highshelf=f=7000:g=-2,"
+        "asoftclip=type=tanh:threshold=0.75,"
+        "aecho=0.85:0.4:230|520|910:0.20|0.11|0.06,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.15
 
 
 def sonoridad(f):
@@ -1186,6 +1228,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO pontifice {n}: {e}")
+    # Aldric, el Primer Marcado (parte 7v)
+    ald = os.path.join(ASSETS, "sounds", "aldric")
+    os.makedirs(ald, exist_ok=True)
+    dur_l, hab_l = {}, {}
+    for n, toma in sorted(TOMAS_ALDRIC.items()):
+        src = os.path.join(MASTER, "aldric", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(ald, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_aldric(src, dst)
+            dur_l[n] = round(duracion(dst), 2)
+            hab_l[n] = round(min(h, dur_l[n]), 2)
+            print(f"aldric {n:2d}: {dur_l[n]} s (habla hasta {hab_l[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO aldric {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -1219,7 +1280,7 @@ def main():
                    "verdugo": dur_v, "habla_verdugo": hab_v, "barquero": dur_b, "habla_barquero": hab_b,
                    "abad": dur_a, "habla_abad": hab_a, "condestable": dur_k, "habla_condestable": hab_k,
                    "rectora": dur_r, "habla_rectora": hab_r, "ballenero": dur_w, "habla_ballenero": hab_w,
-                   "pontifice": dur_p, "habla_pontifice": hab_p}, fh)
+                   "pontifice": dur_p, "habla_pontifice": hab_p, "aldric": dur_l, "habla_aldric": hab_l}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

@@ -393,6 +393,22 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_PONTIFICE_DOLOR = sound("sfx.pontifice_dolor");
     public static final RegistryObject<SoundEvent> SFX_PONTIFICE_MUERTE = sound("sfx.pontifice_muerte");
     public static final RegistryObject<SoundEvent> SFX_PONTIFICE_REZO = sound("sfx.pontifice_rezo");
+    // Aldric, el Primer Marcado (parte 7v): el cadenazo, el latigazo, la estrella con su onda, el torbellino, la caida del salto,
+    // las cadenas que brotan del suelo, la marca que le arde, el rugido, el quejido, la muerte, su rezo en lo alto del ancla y la
+    // cadena que arrastra; y los marcados del cerco que se arrodillan a su rugido
+    public static final RegistryObject<SoundEvent> SFX_ALDRIC_CADENAZO = sound("sfx.aldric_cadenazo");
+    public static final RegistryObject<SoundEvent> SFX_ALDRIC_LATIGAZO = sound("sfx.aldric_latigazo");
+    public static final RegistryObject<SoundEvent> SFX_ALDRIC_ESTRELLA = sound("sfx.aldric_estrella");
+    public static final RegistryObject<SoundEvent> SFX_ALDRIC_TORBELLINO = sound("sfx.aldric_torbellino");
+    public static final RegistryObject<SoundEvent> SFX_ALDRIC_SALTO = sound("sfx.aldric_salto");
+    public static final RegistryObject<SoundEvent> SFX_ALDRIC_ENCADENAR = sound("sfx.aldric_encadenar");
+    public static final RegistryObject<SoundEvent> SFX_ALDRIC_MARCA = sound("sfx.aldric_marca");
+    public static final RegistryObject<SoundEvent> SFX_ALDRIC_RUGIDO = sound("sfx.aldric_rugido");
+    public static final RegistryObject<SoundEvent> SFX_ALDRIC_DOLOR = sound("sfx.aldric_dolor");
+    public static final RegistryObject<SoundEvent> SFX_ALDRIC_MUERTE = sound("sfx.aldric_muerte");
+    public static final RegistryObject<SoundEvent> SFX_ALDRIC_REZO = sound("sfx.aldric_rezo");
+    public static final RegistryObject<SoundEvent> SFX_ALDRIC_ARRASTRE = sound("sfx.aldric_arrastre");
+    public static final RegistryObject<SoundEvent> SFX_CERCO_ARRODILLAN = sound("sfx.cerco_arrodillan");
     public static final RegistryObject<SoundEvent> AMBIENTE_ALTAR = sound("ambiente.altar");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
@@ -476,6 +492,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_RECTORA = sound("musica.rectora");
     public static final RegistryObject<SoundEvent> MUSICA_BALLENERO = sound("musica.ballenero");
     public static final RegistryObject<SoundEvent> MUSICA_PONTIFICE = sound("musica.pontifice");
+    public static final RegistryObject<SoundEvent> MUSICA_ALDRIC = sound("musica.aldric");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -536,6 +553,9 @@ public class DarkCraftMod {
     /** Frases de Anselmo, el Pontifice Sangrante (1..5, parte 7t). */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] PONTIFICE_VOZ = new RegistryObject[6];
+    /** Frases de Aldric, el Primer Marcado (1..5, parte 7v). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] ALDRIC_VOZ = new RegistryObject[6];
 
     /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
     @SuppressWarnings("unchecked")
@@ -553,6 +573,7 @@ public class DarkCraftMod {
         for (int i = 1; i < RECTORA_VOZ.length; i++) RECTORA_VOZ[i] = sound("rectora.voz." + i);
         for (int i = 1; i < BALLENERO_VOZ.length; i++) BALLENERO_VOZ[i] = sound("ballenero.voz." + i);
         for (int i = 1; i < PONTIFICE_VOZ.length; i++) PONTIFICE_VOZ[i] = sound("pontifice.voz." + i);
+        for (int i = 1; i < ALDRIC_VOZ.length; i++) ALDRIC_VOZ[i] = sound("aldric.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -757,6 +778,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Pontifice>> PONTIFICE = ENTITIES.register("pontifice",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Pontifice>of(com.darkcraft.enemigos.Pontifice::new, MobCategory.MONSTER)
                     .sized(1.1f, 3.1f).fireImmune().clientTrackingRange(10).build(MODID + ":pontifice"));
+    // ---- Aldric, el Primer Marcado, el jefe del Crater de Sangre (parte 7v)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Aldric>> ALDRIC = ENTITIES.register("aldric",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Aldric>of(com.darkcraft.enemigos.Aldric::new, MobCategory.MONSTER)
+                    .sized(1.2f, 3.0f).fireImmune().clientTrackingRange(10).build(MODID + ":aldric"));
     // ---- Brann, el Ballenero, el jefe de la Costa de los Huesos (parte 7r): su arpon con su cabo, el farol de aceite y la Vieja
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Ballenero>> BALLENERO = ENTITIES.register("ballenero",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Ballenero>of(com.darkcraft.enemigos.Ballenero::new, MobCategory.MONSTER)
@@ -967,6 +992,7 @@ public class DarkCraftMod {
         e.put(BALLENERO.get(), com.darkcraft.enemigos.Ballenero.atributos().build());
         e.put(PENITENTE.get(), com.darkcraft.enemigos.Penitente.atributos().build());
         e.put(PONTIFICE.get(), com.darkcraft.enemigos.Pontifice.atributos().build());
+        e.put(ALDRIC.get(), com.darkcraft.enemigos.Aldric.atributos().build());
         e.put(MARCADO.get(), com.darkcraft.enemigos.Marcado.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
