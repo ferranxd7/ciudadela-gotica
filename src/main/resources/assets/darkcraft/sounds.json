@@ -4725,5 +4725,172 @@
         "stream": true
       }
     ]
+  },
+  "sfx.penitente_rezo": {
+    "subtitle": "subtitles.darkcraft.sfx.penitente_rezo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/penitente_rezo_1"
+      },
+      {
+        "name": "darkcraft:sfx/penitente_rezo_2"
+      }
+    ]
+  },
+  "sfx.penitente_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.penitente_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/penitente_alerta_1"
+      },
+      {
+        "name": "darkcraft:sfx/penitente_alerta_2"
+      }
+    ]
+  },
+  "sfx.penitente_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.penitente_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/penitente_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/penitente_dolor_2"
+      }
+    ]
+  },
+  "sfx.penitente_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.penitente_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/penitente_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/penitente_muerte_2"
+      }
+    ]
+  },
+  "sfx.penitente_azote": {
+    "subtitle": "subtitles.darkcraft.sfx.penitente_azote",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/penitente_azote_1"
+      },
+      {
+        "name": "darkcraft:sfx/penitente_azote_2"
+      }
+    ]
+  },
+  "sfx.penitente_penitencia": {
+    "subtitle": "subtitles.darkcraft.sfx.penitente_penitencia",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/penitente_penitencia_1"
+      },
+      {
+        "name": "darkcraft:sfx/penitente_penitencia_2"
+      }
+    ]
+  },
+  "sfx.penitente_hemorragia": {
+    "subtitle": "subtitles.darkcraft.sfx.penitente_hemorragia",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/penitente_hemorragia_1"
+      },
+      {
+        "name": "darkcraft:sfx/penitente_hemorragia_2"
+      }
+    ]
+  },
+  "sfx.penitente_cruz": {
+    "subtitle": "subtitles.darkcraft.sfx.penitente_cruz",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/penitente_cruz_1"
+      },
+      {
+        "name": "darkcraft:sfx/penitente_cruz_2"
+      }
+    ]
+  },
+  "sfx.penitente_arrastre": {
+    "subtitle": "subtitles.darkcraft.sfx.penitente_arrastre",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/penitente_arrastre_1"
+      },
+      {
+        "name": "darkcraft:sfx/penitente_arrastre_2"
+      }
+    ]
+  },
+  "sfx.penitente_incensario": {
+    "subtitle": "subtitles.darkcraft.sfx.penitente_incensario",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/penitente_incensario_1"
+      },
+      {
+        "name": "darkcraft:sfx/penitente_incensario_2"
+      }
+    ]
+  },
+  "sfx.penitente_humo": {
+    "subtitle": "subtitles.darkcraft.sfx.penitente_humo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/penitente_humo_1"
+      },
+      {
+        "name": "darkcraft:sfx/penitente_humo_2"
+      }
+    ]
+  },
+  "sfx.penitente_cantico": {
+    "subtitle": "subtitles.darkcraft.sfx.penitente_cantico",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/penitente_cantico_1"
+      },
+      {
+        "name": "darkcraft:sfx/penitente_cantico_2"
+      }
+    ]
+  },
+  "sfx.penitente_alzarse": {
+    "subtitle": "subtitles.darkcraft.sfx.penitente_alzarse",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/penitente_alzarse_1"
+      },
+      {
+        "name": "darkcraft:sfx/penitente_alzarse_2"
+      }
+    ]
+  },
+  "sfx.grieta_campana": {
+    "subtitle": "subtitles.darkcraft.sfx.grieta_campana",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/grieta_campana_1"
+      },
+      {
+        "name": "darkcraft:sfx/grieta_campana_2"
+      }
+    ]
+  },
+  "ambiente.sinfe": {
+    "subtitle": "subtitles.darkcraft.ambiente.sinfe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sinfe_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/sinfe_ambiente_2",
+        "stream": true
+      }
+    ]
   }
 }

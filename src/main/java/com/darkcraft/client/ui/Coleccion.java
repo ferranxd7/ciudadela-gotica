@@ -32,7 +32,7 @@ public final class Coleccion {
             "marchito_campana", "molinera", "ahorcado_garras", "ahorcado_soga", "verdugo", "podrido", "podrido_fatuo", "podrido_hinchado", "barquero",
             "helado_monje", "helado_penitente", "helado_peregrino", "abad", "calcinado_guardia", "calcinado_incendiario", "calcinado_ceniciento",
             "condestable", "erudito_aprendiz", "erudito_maestro", "erudito_custodio", "rectora", "salobre_redero", "salobre_bichero",
-            "salobre_salinero", "ballenero"};
+            "salobre_salinero", "ballenero", "penitente_flagelante", "penitente_portador", "penitente_turiferario"};
 
     /** El objeto de una clave de la coleccion (los libros de la cronica, con su texto). */
     public static ItemStack objeto(String clave) {
@@ -61,7 +61,8 @@ public final class Coleccion {
             case "hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon", "marchito_guadana", "marchito_farol",
                  "marchito_campana", "ahorcado_garras", "ahorcado_soga", "podrido_fatuo", "podrido_hinchado", "helado_monje", "helado_penitente",
                  "helado_peregrino", "calcinado_guardia", "calcinado_incendiario", "calcinado_ceniciento", "erudito_aprendiz", "erudito_maestro",
-                 "erudito_custodio", "salobre_redero", "salobre_bichero", "salobre_salinero" -> "darkcraft.bestiario." + c;
+                 "erudito_custodio", "salobre_redero", "salobre_bichero", "salobre_salinero", "penitente_flagelante", "penitente_portador",
+                 "penitente_turiferario" -> "darkcraft.bestiario." + c;
             default -> "entity.darkcraft." + c;
         };
     }
@@ -118,6 +119,12 @@ public final class Coleccion {
                     var k = DarkCraftMod.CALCINADO.get().create(lvl);
                     if (k != null) k.variante(c.endsWith("incendiario") ? com.darkcraft.enemigos.Calcinado.INCENDIARIO
                             : c.endsWith("ceniciento") ? com.darkcraft.enemigos.Calcinado.CENICIENTO : com.darkcraft.enemigos.Calcinado.GUARDIA);
+                    yield k;
+                }
+                case "penitente_flagelante", "penitente_portador", "penitente_turiferario" -> {
+                    var k = DarkCraftMod.PENITENTE.get().create(lvl);
+                    if (k != null) k.variante(c.endsWith("portador") ? com.darkcraft.enemigos.Penitente.PORTADOR
+                            : c.endsWith("turiferario") ? com.darkcraft.enemigos.Penitente.TURIFERARIO : com.darkcraft.enemigos.Penitente.FLAGELANTE);
                     yield k;
                 }
                 case "salobre_redero", "salobre_bichero", "salobre_salinero" -> {

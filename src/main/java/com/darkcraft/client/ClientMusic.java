@@ -401,6 +401,39 @@ public final class ClientMusic {
         }
     }
 
+    // ------------------------------------------------------------------ la Tierra sin Fe (parte 7s): viento sobre la tierra agrietada
+
+    private static Track sinFe;
+    private static int sinFeTicks;
+    private static boolean enSinFe;
+
+    private static void tickSinFe(Minecraft mc) {
+        if (mc.player == null || mc.level == null) enSinFe = false;
+        else if (mc.player.tickCount % 20 == 17)
+            enSinFe = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() > 40 && mc.player.getY() < 190
+                    && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.SIN_FE;
+        boolean quiere = enSinFe && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        if (quiere) {
+            if (sinFe == null || sinFe.dying() || !mc.getSoundManager().isActive(sinFe) && sinFeTicks > 20) {
+                if (sinFe != null && !sinFe.dying()) mc.getSoundManager().stop(sinFe);
+                sinFe = new Track(DarkCraftMod.AMBIENTE_SINFE.get(), "sinfe", false);
+                sinFeTicks = 0;
+                mc.getSoundManager().play(sinFe);
+                sinFe.fadeTo(0.85f, 2.5f);
+            }
+        } else if (sinFe != null && !sinFe.dying()) sinFe.kill(3.0f);
+        if (sinFe != null) {
+            sinFeTicks++;
+            if (sinFe.dying() && !mc.getSoundManager().isActive(sinFe) && sinFeTicks > 20) sinFe = null;
+        }
+    }
+
+    /** Para la prueba de la CI: si suena el viento de la Tierra sin Fe. */
+    public static String sinFe() {
+        Minecraft mc = Minecraft.getInstance();
+        return sinFe == null ? "sin la tierra sin fe" : String.format("la tierra sin fe %.2f%s", sinFe.level(), mc.getSoundManager().isActive(sinFe) ? "" : " (parada)");
+    }
+
     /** Para la prueba de la CI: si suena el viento de la costa. */
     public static String costa() {
         Minecraft mc = Minecraft.getInstance();
@@ -536,6 +569,8 @@ public final class ClientMusic {
         if (academia != null && !academia.dying()) any = true;
         tickCosta(mc);
         if (costa != null && !costa.dying()) any = true;
+        tickSinFe(mc);
+        if (sinFe != null && !sinFe.dying()) any = true;
         tickTitulo(mc);
         if (titulo != null && !titulo.dying()) any = true;
         if (viaje != null) {

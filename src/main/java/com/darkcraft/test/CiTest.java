@@ -740,6 +740,7 @@ public final class CiTest {
         observatorio(server, m, log, out);
         puerto(server, m, log, out);
         costillar(server, m, log, out);
+        grieta(server, m, log, out);
     }
 
     /**
@@ -1812,6 +1813,301 @@ public final class CiTest {
         } catch (Throwable t) {
             log.println("Morvain, los salobres: ERROR " + t);
             DarkCraftMod.LOGGER.error("[CI] salobres", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /** Lo que dejan los penitentes (las nubes de incienso): un tick, a mano (la prueba no mueve el mundo). */
+    private static void tickIncienso(ServerLevel m, net.minecraft.world.phys.AABB caja, java.util.List<net.minecraft.world.entity.Entity> quitar) {
+        for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.Incienso.class, caja)) {
+            if (e.isRemoved()) continue;
+            if (!quitar.contains(e)) quitar.add(e);
+            e.tickCount++;
+            e.tick();
+        }
+    }
+
+    /**
+     * Parte 7s: el Puente de la Grieta (a pie desde la entrada, junto al santuario, a todos sus sitios y a cada penitente; el atril con
+     * el libro 28, el arcon, la campana, el tablero del puente, el hueco y la sangre de la grieta, el arco de la puerta y la imagen del
+     * paso) y los penitentes: en sus puestos (rezando, postrados o de pie), uno de rodillas que se levanta y uno postrado que se alza;
+     * cada accion de cada uno acaba; sus golpes a una presa (el azote y los tres azotes que hacen sangrar hasta la hemorragia, la
+     * penitencia y el fervor, el cruzazo con su onda, el barrido, la embestida, el incensario que quema, el humo que hace sangrar y el
+     * cantico que cura a los suyos) y uno que cae y se desangra. Al acabar, todo como estaba.
+     */
+    private static void grieta(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.GRIETA;
+        var A = com.darkcraft.morvain.Grieta.get();
+        final int CX = com.darkcraft.morvain.Grieta.CX, CZ = com.darkcraft.morvain.Grieta.CZ, PISO = com.darkcraft.morvain.Grieta.PISO;
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : A.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock ? aire : st;
+            };
+            int[] en = A.sitio("entrada");
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, en[0], en[1], en[2], CX - 125, CZ - 76, CX + 108, CZ + 92, 6_000_000);
+            StringBuilder ap = new StringBuilder();
+            int llega = 0, sitios = 0;
+            java.util.Set<String> mirar = java.util.Set.of("campana", "alto", "fondo");
+            for (var e : A.sitios().entrySet()) {
+                if (mirar.contains(e.getKey())) continue;
+                sitios++;
+                int[] q = e.getValue();
+                if (zona.alcanza(q[0], q[1], q[2], 2)) llega++;
+                else ap.append(' ').append(e.getKey());
+            }
+            int lejos = 0;
+            for (var o : A.esperas()) if (!zona.alcanza(o.x(), o.y(), o.z(), 2)) lejos++;
+            var sc = com.darkcraft.morvain.SantuariosMorvain.porId("grieta");
+            log.println("Morvain, el puente de la grieta: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Grieta.resumen(m)
+                    + "; santuario " + com.darkcraft.santuario.Santuarios.nombre(m, sc.pos()) + " (" + m.getBlockState(sc.pos()).getBlock().getDescriptionId()
+                    + ") a " + Math.round(com.darkcraft.morvain.Grieta.distancia(sc.x(), sc.z())) + " del puente; a pie desde la entrada (" + zona.celdas()
+                    + " celdas) a " + llega + " de " + sitios + " sitios" + (ap.length() == 0 ? "" : ", no a:" + ap) + "; penitentes a los que no se llega "
+                    + lejos + " de " + A.esperas().size() + "; lugar en el puente " + (com.darkcraft.morvain.Grieta.dentro(CX, CZ) ? "grieta" : "NO")
+                    + ", en medio del puente " + com.darkcraft.morvain.Grieta.enPuente(CX + 0.5, CZ + 0.5) + ", en la cabeza del sur "
+                    + com.darkcraft.morvain.Grieta.enPuente(CX + 0.5, CZ + 18.5) + " (tiene que ser false)");
+            topView(m, CX + 10, CZ, 100, new File(out, "morvain_grieta.png"));
+            topView(m, CX, CZ - 4, 30, new File(out, "morvain_grieta_puente.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, el puente de la grieta: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] grieta", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 10; k++)
+                for (var e : fuera) if (e.isAlive()) e.tick();
+            int rezando = 0, postrados = 0, dePie = 0, enSuelo = 0, chocan = 0;
+            int[] porVariante = new int[3];
+            StringBuilder mal = new StringBuilder();
+            com.darkcraft.enemigos.Penitente rodillas = null, postrado = null;
+            for (var e : fuera) {
+                if (!(e instanceof com.darkcraft.enemigos.Penitente c)) continue;
+                porVariante[Math.max(0, Math.min(2, c.variante()))]++;
+                if (!m.noCollision(c)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(c.blockPosition().toShortString()).append(';');
+                }
+                if (c.postura() == com.darkcraft.enemigos.Enemigo.REZA) {
+                    rezando++;
+                    if (rodillas == null) rodillas = c;
+                } else if (c.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) {
+                    postrados++;
+                    if (postrado == null) postrado = c;
+                } else dePie++;
+                var abajo = m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ()));
+                if (!abajo.getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+                else if (mal.length() < 400) mal.append(' ').append(c.tipo()).append(" en el aire en ").append(c.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, los penitentes: " + com.darkcraft.morvain.MorvainEnemigos.comprobar() + "; fuera " + fuera.size() + " de "
+                    + com.darkcraft.morvain.MorvainEnemigos.grieta().size() + " (flagelantes " + porVariante[0] + ", portadores " + porVariante[1]
+                    + ", turiferarios " + porVariante[2] + "): rezando " + rezando + ", postrados " + postrados + ", de pie " + dePie
+                    + " (en su suelo " + enSuelo + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+            StringBuilder sb = new StringBuilder("Morvain, los penitentes en accion:");
+            // ---- el de rodillas se levanta y el postrado se alza (una presa a su lado)
+            int alz = com.darkcraft.enemigos.Penitente.ALZADOS;
+            for (var c : new com.darkcraft.enemigos.Penitente[]{rodillas, postrado}) {
+                if (c == null) {
+                    sb.append(" NO HAY ").append(c == rodillas ? "NINGUNO DE RODILLAS;" : "NINGUNO POSTRADO;");
+                    continue;
+                }
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (presa == null) continue;
+                presa.moveTo(c.getX() + 1.5, c.getY(), c.getZ() + 0.5, 0f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(presa);
+                quitar.add(presa);
+                int antes = c.postura();
+                c.setTarget(presa);
+                int sale = -1;
+                for (int k = 0; k < 80; k++) {
+                    c.tickCount++;
+                    c.tick();
+                    int a = c.accion();
+                    if (sale < 0 && (a == com.darkcraft.enemigos.PenitenteAnims.LEVANTARSE || a == com.darkcraft.enemigos.PenitenteAnims.ALZARSE)) sale = k;
+                    if (sale >= 0 && a == 0) break;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " el %s (%s, en %s) se %s en el tick %d y queda de pie %s;", c.tipo(),
+                        antes == com.darkcraft.enemigos.Enemigo.REZA ? "de rodillas" : "postrado", c.blockPosition().toShortString(),
+                        antes == com.darkcraft.enemigos.Enemigo.REZA ? "levanta" : "alza", sale, c.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE));
+                c.setTarget(null);
+            }
+            sb.append(" alzados de la postracion +").append(com.darkcraft.enemigos.Penitente.ALZADOS - alz).append(';');
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
+            // ---- en el campamento (de cara al sur): uno de cada, cada accion acaba
+            for (int v2 = 0; v2 < 3; v2++) {
+                var a = DarkCraftMod.PENITENTE.get().create(m);
+                if (a == null) continue;
+                a.variante(v2);
+                a.moveTo(CX + 24.5 + v2 * 5, PISO, CZ + 27.5, 0f, 0f);
+                m.addFreshEntity(a);
+                quitar.add(a);
+                StringBuilder no = new StringBuilder();
+                for (int ac = 1; ac < com.darkcraft.enemigos.PenitenteAnims.TICKS.length; ac++) {
+                    String nombre = com.darkcraft.enemigos.PenitenteAnims.NOMBRES[ac];
+                    if (nombre.equals("morir")) continue;
+                    a.empezar(ac);
+                    for (int k = 0; k < 90 && a.accion() == ac; k++) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    if (a.accion() == ac) no.append(' ').append(nombre);
+                    for (int k = 0; k < 10; k++) a.tick();
+                }
+                sb.append(' ').append(a.tipo()).append(String.format(java.util.Locale.ROOT, " (vida %.0f, golpe %.1f, armadura %d)", a.getMaxHealth(),
+                        a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), a.getArmorValue()))
+                        .append(": acciones que no acaban").append(no.length() == 0 ? " ninguna" : no).append(';');
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Incienso.class, a.getBoundingBox().inflate(24))) f.discard();
+                a.discard();
+            }
+            log.println(sb);
+            // ---- contra una presa (un aldeano quieto en el campamento, al este del penitente)
+            sb = new StringBuilder("Morvain, los penitentes contra una presa:");
+            int azo = com.darkcraft.enemigos.Penitente.AZOTES, hem = com.darkcraft.enemigos.Sangrado.HEMORRAGIAS, pen = com.darkcraft.enemigos.Penitente.PENITENCIAS,
+                    fer = com.darkcraft.enemigos.Penitente.ENFERVORIZADOS, ond = com.darkcraft.enemigos.Penitente.ONDAS, emb = com.darkcraft.enemigos.Penitente.EMBESTIDAS,
+                    hum = com.darkcraft.enemigos.Penitente.HUMOS, san = com.darkcraft.enemigos.Incienso.SANGRAN, can = com.darkcraft.enemigos.Penitente.CANTICOS,
+                    cur = com.darkcraft.enemigos.Penitente.CURADOS;
+            String[] nombres = {"azote", "azotes", "penitencia", "cruzazo", "barrido", "embestida", "incensario", "humo", "cantico"};
+            int[] acciones = {com.darkcraft.enemigos.PenitenteAnims.AZOTE, com.darkcraft.enemigos.PenitenteAnims.AZOTES, com.darkcraft.enemigos.PenitenteAnims.PENITENCIA,
+                    com.darkcraft.enemigos.PenitenteAnims.CRUZAZO, com.darkcraft.enemigos.PenitenteAnims.BARRIDO, com.darkcraft.enemigos.PenitenteAnims.EMBESTIDA,
+                    com.darkcraft.enemigos.PenitenteAnims.INCENSARIO, com.darkcraft.enemigos.PenitenteAnims.HUMO, com.darkcraft.enemigos.PenitenteAnims.CANTICO};
+            int F = com.darkcraft.enemigos.Penitente.FLAGELANTE, P = com.darkcraft.enemigos.Penitente.PORTADOR, T = com.darkcraft.enemigos.Penitente.TURIFERARIO;
+            int[] variantes = {F, F, F, P, P, P, T, T, T};
+            double[] dist = {2.2, 2.2, 6.0, 2.6, 2.4, 6.5, 2.4, 4.0, 5.0};
+            int[] dura = {40, 60, 70, 50, 50, 60, 50, 140, 70};
+            final double gx = CX + 20.5, gz = CZ + 33.5;
+            for (int i = 0; i < nombres.length; i++) {
+                var a = DarkCraftMod.PENITENTE.get().create(m);
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (a == null || presa == null) continue;
+                a.variante(variantes[i]);
+                a.moveTo(gx, PISO, gz, -90f, 0f);
+                presa.moveTo(gx + dist[i], PISO, gz, 90f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(a);
+                m.addFreshEntity(presa);
+                quitar.add(a);
+                quitar.add(presa);
+                com.darkcraft.enemigos.Sangrado.limpiar(presa);
+                // el cantico: un flagelante herido al lado
+                com.darkcraft.enemigos.Penitente herido = null;
+                if (acciones[i] == com.darkcraft.enemigos.PenitenteAnims.CANTICO) {
+                    herido = DarkCraftMod.PENITENTE.get().create(m);
+                    if (herido != null) {
+                        herido.variante(F);
+                        herido.moveTo(gx - 2.5, PISO, gz + 1.5, 0f, 0f);
+                        m.addFreshEntity(herido);
+                        quitar.add(herido);
+                        herido.setHealth(herido.getMaxHealth() * 0.4f);
+                    }
+                }
+                if (acciones[i] == com.darkcraft.enemigos.PenitenteAnims.PENITENCIA) a.setHealth(a.getMaxHealth() * 0.5f);
+                a.setTarget(presa);
+                a.setYRot(-90f);
+                a.yBodyRot = a.yHeadRot = -90f;
+                a.empezar(acciones[i]);
+                float vida = presa.getHealth(), vidaA = a.getHealth(), vidaH = herido != null ? herido.getHealth() : 0f;
+                float sangre = 0f;
+                boolean frenada = false, ardiendo = false;
+                for (int k = 0; k < dura[i]; k++) {
+                    if (!a.isRemoved()) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    if (herido != null && !herido.isRemoved()) herido.tick();
+                    tickIncienso(m, presa.getBoundingBox().inflate(16), quitar);
+                    // la presa se mueve con lo que le den (los empujones): a mano, que sin IA no anda
+                    net.minecraft.world.phys.Vec3 dv = presa.getDeltaMovement();
+                    if (dv.lengthSqr() > 1e-4) {
+                        presa.move(net.minecraft.world.entity.MoverType.SELF, dv);
+                        presa.setDeltaMovement(dv.x * 0.55, presa.onGround() ? 0 : dv.y - 0.08, dv.z * 0.55);
+                    }
+                    sangre = Math.max(sangre, com.darkcraft.enemigos.Sangrado.nivel(presa));
+                    frenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                    ardiendo |= presa.isOnFire();
+                    presa.invulnerableTime = 0;
+                }
+                String extra = switch (nombres[i]) {
+                    case "azote", "azotes" -> String.format(java.util.Locale.ROOT, ", sangre %.0f", sangre);
+                    case "penitencia" -> String.format(java.util.Locale.ROOT, ", el penitente -%.1f, enfervorizado %s", vidaA - a.getHealth(), a.animo() > 0);
+                    case "incensario" -> ", ardiendo " + ardiendo;
+                    case "humo" -> String.format(java.util.Locale.ROOT, ", sangre %.0f, frenada %s", sangre, frenada);
+                    case "cantico" -> String.format(java.util.Locale.ROOT, ", el herido +%.1f", herido != null ? herido.getHealth() - vidaH : 0f);
+                    default -> "";
+                };
+                sb.append(String.format(java.util.Locale.ROOT, " %s (%s) a %.1f: la presa -%.1f%s;", nombres[i], a.tipo(), dist[i], vida - presa.getHealth(), extra));
+                if (herido != null) herido.discard();
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Incienso.class, presa.getBoundingBox().inflate(24))) f.discard();
+                a.discard();
+                presa.discard();
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " azotes +%d, hemorragias +%d, penitencias +%d (enfervorizados +%d), ondas del cruzazo +%d, embestidas +%d,"
+                            + " humos +%d (hacen sangrar +%d), canticos +%d (curan +%d)",
+                    com.darkcraft.enemigos.Penitente.AZOTES - azo, com.darkcraft.enemigos.Sangrado.HEMORRAGIAS - hem, com.darkcraft.enemigos.Penitente.PENITENCIAS - pen,
+                    com.darkcraft.enemigos.Penitente.ENFERVORIZADOS - fer, com.darkcraft.enemigos.Penitente.ONDAS - ond, com.darkcraft.enemigos.Penitente.EMBESTIDAS - emb,
+                    com.darkcraft.enemigos.Penitente.HUMOS - hum, com.darkcraft.enemigos.Incienso.SANGRAN - san, com.darkcraft.enemigos.Penitente.CANTICOS - can,
+                    com.darkcraft.enemigos.Penitente.CURADOS - cur));
+            // ---- tres azotes seguidos: la hemorragia
+            var fl = DarkCraftMod.PENITENTE.get().create(m);
+            var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            if (fl != null && presa != null) {
+                fl.variante(F);
+                fl.moveTo(gx, PISO, gz, -90f, 0f);
+                presa.moveTo(gx + 2.2, PISO, gz, 90f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(fl);
+                m.addFreshEntity(presa);
+                quitar.add(fl);
+                quitar.add(presa);
+                com.darkcraft.enemigos.Sangrado.limpiar(presa);
+                int h0 = com.darkcraft.enemigos.Sangrado.HEMORRAGIAS;
+                fl.setTarget(presa);
+                for (int vez = 0; vez < 3; vez++) {
+                    fl.setYRot(-90f);
+                    fl.yBodyRot = fl.yHeadRot = -90f;
+                    fl.empezar(com.darkcraft.enemigos.PenitenteAnims.AZOTES);
+                    for (int k = 0; k < 46; k++) {
+                        fl.tickCount++;
+                        fl.tick();
+                        presa.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                        presa.moveTo(gx + 2.2, PISO, gz, 90f, 0f);
+                        presa.invulnerableTime = 0;
+                        presa.setHealth(presa.getMaxHealth());
+                    }
+                }
+                sb.append(String.format(java.util.Locale.ROOT, "; tres tandas de azotes: hemorragias +%d", com.darkcraft.enemigos.Sangrado.HEMORRAGIAS - h0));
+                fl.discard();
+                presa.discard();
+            }
+            // ---- uno que cae: se desangra
+            var c = DarkCraftMod.PENITENTE.get().create(m);
+            if (c != null) {
+                c.variante(P);
+                c.moveTo(gx, PISO, gz, 0f, 0f);
+                m.addFreshEntity(c);
+                quitar.add(c);
+                int des = com.darkcraft.enemigos.Penitente.DESANGRADOS;
+                c.hurt(m.damageSources().generic(), 9999f);
+                int k = 0;
+                for (; k < 80 && !c.isRemoved(); k++) c.tick();
+                sb.append(String.format(java.util.Locale.ROOT, "; uno que cae se desangra +%d y se va en %d ticks", com.darkcraft.enemigos.Penitente.DESANGRADOS - des, k));
+            }
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println("Morvain, los penitentes: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] penitentes", t);
         } finally {
             for (var e : quitar) if (!e.isRemoved()) e.discard();
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);

@@ -11,7 +11,8 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          6: "fortaleza", 7: "fortaleza", 8: "fortaleza", 9: "fortaleza", 10: "fortaleza", 11: "fortaleza",
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
-         22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain", 27: "morvain"}
+         22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain", 27: "morvain",
+         28: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -413,6 +414,16 @@ LIBROS = {
    "First day without the sea. The Old One was in range when the water went: I saw her sink into the sand as if the sand were the sea. Forty years after her, and she slips me like that. Her sister whale was stranded here; I have made my home in her ribs.",
    "I no longer know the day. The salt has climbed to my chest and I am no longer hungry. Every night I hear her singing under the sand, and in the morning I see her spout out there, to the east. I have sharpened the harpoon and filled the lantern with oil. When she surfaces, I will be awake.",
    "If anyone reads this: keep away from the ribs. My boat lies overturned and my men went back to the harbour to mend nets that are no use anymore. I stay. The Old One will surface, and this time she will not slip me. After that, let the tide come back.\n\nBrann"]),
+ },
+ 28: {
+  "es": ("El registro de la hospedería", "Hermano Ulric, hospitalero del Puente de la Grieta", [
+   "Desde la noche del cielo rojo no dejan de llegar peregrinos. Vienen del sur, descalzos, a pedir perdón al cráter. Les doy pan y un jergón, y por la mañana toco la campana del puente por cada uno que cruza. Antes cruzaban cantando.",
+   "Hoy ha llegado él, al frente de la última procesión: Anselmo, el que se hace llamar Pontífice. Dice que el cielo nos quitó la fe y que solo la sangre la compra de vuelta. Los peregrinos le escuchan con los ojos vacíos. Esta noche nadie ha dormido: solo se oían los azotes.",
+   "Se los lleva al noroeste, al Altar de la Sangre, más allá de las grietas, donde la tierra está más roja. Vuelven de allí con la cara tapada y la espalda abierta, y ya no cruzan: rezan. Si alguien lee esto, que no toque la campana. Ellos acuden.\n\nHermano Ulric"]),
+  "en": ("The Hostel Register", "Brother Ulric, hospitaller of the Bridge of the Rift", [
+   "Since the night of the red sky the pilgrims have not stopped coming. They come from the south, barefoot, to beg forgiveness of the crater. I give them bread and a straw bed, and in the morning I ring the bridge bell for each one who crosses. They used to cross singing.",
+   "Today he arrived, at the head of the last procession: Anselm, who calls himself Pontiff. He says the sky took our faith and only blood can buy it back. The pilgrims listen to him with empty eyes. No one slept tonight: all one could hear was the lash.",
+   "He leads them northwest, to the Altar of Blood, beyond the rifts, where the earth is reddest. They come back from there with their faces hooded and their backs laid open, and they no longer cross: they pray. If anyone reads this, do not ring the bell. They come.\n\nBrother Ulric"]),
  },
 }
 

@@ -325,6 +325,8 @@ public final class Morvain {
             // el Costillar de la Ballena (parte 7r): con Brann caido vuelve la marea y los salobres que faenaban de rodillas (alli y
             // en el Puerto Varado) se deshacen en sal; cada segundo
             if (srv.getTickCount() % 20 == 17) Costillar.paz(m);
+            // el Puente de la Grieta (parte 7s): de vez en cuando su campana tañe sola
+            if (srv.getTickCount() % 100 == 47) Grieta.campana(m);
         }
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
@@ -374,6 +376,13 @@ public final class Morvain {
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Costillar.enSala(p.getX(), p.getZ()) && Math.abs(p.getY() - Costillar.PISO) < 12)
                 com.darkcraft.story.Logros.dar(p, "costillar");
+        // y quien cruza el Puente de la Grieta (parte 7s): la campana le recibe la primera vez
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Grieta.enPuente(p.getX(), p.getZ()) && Math.abs(p.getY() - Grieta.PISO) < 4
+                    && !com.darkcraft.story.Logros.tiene(p, "grieta")) {
+                com.darkcraft.story.Logros.dar(p, "grieta");
+                p.playNotifySound(DarkCraftMod.SFX_GRIETA_CAMPANA.get(), SoundSource.AMBIENT, 1.4f, 0.95f);
+            }
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -404,6 +413,15 @@ public final class Morvain {
             guardar(p, d);
         }
         p.setRespawnPosition(NIVEL, Llegada.pies(), 180f, true, false);
+    }
+
+    /** Quien toca la campana del Puente de la Grieta (parte 7s): los penitentes de alrededor acuden (libro 28: "ellos acuden"). */
+    @SubscribeEvent
+    public static void onCampana(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock e) {
+        if (!(e.getEntity() instanceof ServerPlayer p) || p.level().dimension() != NIVEL || !(p.level() instanceof ServerLevel m)) return;
+        if (Math.abs(e.getPos().getX() - Grieta.CX) > 4 || Math.abs(e.getPos().getZ() - Grieta.CZ) > 4) return;
+        if (!m.getBlockState(e.getPos()).is(net.minecraft.world.level.block.Blocks.BELL)) return;
+        Grieta.llamar(m, p);
     }
 
     @SubscribeEvent
@@ -449,6 +467,8 @@ public final class Morvain {
         }
         // el Costillar de la Ballena, donde espera Brann (parte 7r)
         if (Costillar.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Costillar.PISO) < 40) return "darkcraft.morvain.lugar.costillar";
+        // el Puente de la Grieta (parte 7s): tambien en el fondo de la grieta
+        if (Grieta.dentro(p.getX(), p.getZ()) && p.getY() > Grieta.FONDO - 4 && p.getY() < Grieta.PISO + 40) return "darkcraft.morvain.lugar.grieta";
         // el Observatorio de la Rectora (parte 7p)
         if (Observatorio.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Observatorio.PISO) < 40) return "darkcraft.morvain.lugar.observatorio";
         // la Academia Espectral y su Gran Biblioteca (parte 7o)

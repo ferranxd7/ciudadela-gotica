@@ -347,6 +347,22 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_BALLENERO_MUERTE = sound("sfx.ballenero_muerte");
     public static final RegistryObject<SoundEvent> SFX_BALLENERO_ESPERA = sound("sfx.ballenero_espera");
     public static final RegistryObject<SoundEvent> AMBIENTE_COSTILLAR = sound("ambiente.costillar");
+    // los penitentes de la Tierra sin Fe (parte 7s), el Puente de la Grieta y el viento de la Tierra sin Fe
+    public static final RegistryObject<SoundEvent> SFX_PENITENTE_REZO = sound("sfx.penitente_rezo");
+    public static final RegistryObject<SoundEvent> SFX_PENITENTE_ALERTA = sound("sfx.penitente_alerta");
+    public static final RegistryObject<SoundEvent> SFX_PENITENTE_DOLOR = sound("sfx.penitente_dolor");
+    public static final RegistryObject<SoundEvent> SFX_PENITENTE_MUERTE = sound("sfx.penitente_muerte");
+    public static final RegistryObject<SoundEvent> SFX_PENITENTE_AZOTE = sound("sfx.penitente_azote");
+    public static final RegistryObject<SoundEvent> SFX_PENITENTE_PENITENCIA = sound("sfx.penitente_penitencia");
+    public static final RegistryObject<SoundEvent> SFX_PENITENTE_HEMORRAGIA = sound("sfx.penitente_hemorragia");
+    public static final RegistryObject<SoundEvent> SFX_PENITENTE_CRUZ = sound("sfx.penitente_cruz");
+    public static final RegistryObject<SoundEvent> SFX_PENITENTE_ARRASTRE = sound("sfx.penitente_arrastre");
+    public static final RegistryObject<SoundEvent> SFX_PENITENTE_INCENSARIO = sound("sfx.penitente_incensario");
+    public static final RegistryObject<SoundEvent> SFX_PENITENTE_HUMO = sound("sfx.penitente_humo");
+    public static final RegistryObject<SoundEvent> SFX_PENITENTE_CANTICO = sound("sfx.penitente_cantico");
+    public static final RegistryObject<SoundEvent> SFX_PENITENTE_ALZARSE = sound("sfx.penitente_alzarse");
+    public static final RegistryObject<SoundEvent> SFX_GRIETA_CAMPANA = sound("sfx.grieta_campana");
+    public static final RegistryObject<SoundEvent> AMBIENTE_SINFE = sound("ambiente.sinfe");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -692,6 +708,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Red>> RED = ENTITIES.register("red",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Red>of(com.darkcraft.enemigos.Red::new, MobCategory.MISC)
                     .sized(0.5f, 0.5f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":red"));
+    // ---- los penitentes de la Tierra sin Fe (parte 7s)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Penitente>> PENITENTE = ENTITIES.register("penitente",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Penitente>of(com.darkcraft.enemigos.Penitente::new, MobCategory.MONSTER)
+                    .sized(0.65f, 1.95f).clientTrackingRange(8).build(MODID + ":penitente"));
     // ---- Brann, el Ballenero, el jefe de la Costa de los Huesos (parte 7r): su arpon con su cabo, el farol de aceite y la Vieja
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Ballenero>> BALLENERO = ENTITIES.register("ballenero",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Ballenero>of(com.darkcraft.enemigos.Ballenero::new, MobCategory.MONSTER)
@@ -900,6 +920,7 @@ public class DarkCraftMod {
         e.put(ERUDITO.get(), com.darkcraft.enemigos.Erudito.atributos().build());
         e.put(SALOBRE.get(), com.darkcraft.enemigos.Salobre.atributos().build());
         e.put(BALLENERO.get(), com.darkcraft.enemigos.Ballenero.atributos().build());
+        e.put(PENITENTE.get(), com.darkcraft.enemigos.Penitente.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());

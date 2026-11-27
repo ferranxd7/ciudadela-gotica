@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 88 * 60 * 20;
+    private static final int LIMIT = 94 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -6017,6 +6017,8 @@ public final class ClientCiTest {
         t = puerto(t);
         // el Costillar de la Ballena y Brann, el Ballenero, el jefe de la Costa de los Huesos (parte 7r)
         t = costillar(t);
+        // el Puente de la Grieta y los penitentes de la Tierra sin Fe (parte 7s)
+        t = grieta(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -9428,6 +9430,375 @@ public final class ClientCiTest {
                 sp.clearFire();
                 sp.setHealth(sp.getMaxHealth());
                 comando(sp, "darkcraft puerto enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el Puente de la Grieta y los penitentes (parte 7s)
+
+    private static final com.darkcraft.enemigos.Penitente[] PENITENTES = new com.darkcraft.enemigos.Penitente[3];
+
+    private static com.darkcraft.enemigos.Penitente penitenteNuevo(ServerLevel lvl, int variante, double x, double y, double z, float giro, int postura) {
+        var a = DarkCraftMod.PENITENTE.get().create(lvl);
+        if (a == null) return null;
+        a.variante(variante);
+        a.moveTo(x, y, z, giro, 0f);
+        a.yBodyRot = a.yHeadRot = giro;
+        if (postura != com.darkcraft.enemigos.Enemigo.DE_PIE) a.asignar("", -1, a.blockPosition(), giro, postura, 0);
+        lvl.addFreshEntity(a);
+        return a;
+    }
+
+    private static void quitarPenitentes(ServerLevel lvl) {
+        for (int i = 0; i < PENITENTES.length; i++) {
+            if (PENITENTES[i] != null && !PENITENTES[i].isRemoved()) PENITENTES[i].discard();
+            PENITENTES[i] = null;
+        }
+        if (lvl == null) return;
+        int x = com.darkcraft.morvain.Grieta.CX, z = com.darkcraft.morvain.Grieta.CZ;
+        var caja = new net.minecraft.world.phys.AABB(x - 130, 40, z - 90, x + 120, 170, z + 100);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Incienso.class, caja)) e.discard();
+    }
+
+    private static String estadoPenitentes() {
+        StringBuilder sb = new StringBuilder();
+        for (var a : PENITENTES) sb.append(a == null ? "-" : estadoE(a)).append(" | ");
+        return sb + String.format(java.util.Locale.ROOT, "azotes %d, hemorragias %d, penitencias %d (enfervorizados %d), ondas %d, embestidas %d, humos %d"
+                        + " (sangran %d, amparan %d), canticos %d (curados %d), alzados %d, desangrados %d",
+                com.darkcraft.enemigos.Penitente.AZOTES, com.darkcraft.enemigos.Sangrado.HEMORRAGIAS, com.darkcraft.enemigos.Penitente.PENITENCIAS,
+                com.darkcraft.enemigos.Penitente.ENFERVORIZADOS, com.darkcraft.enemigos.Penitente.ONDAS, com.darkcraft.enemigos.Penitente.EMBESTIDAS,
+                com.darkcraft.enemigos.Penitente.HUMOS, com.darkcraft.enemigos.Incienso.SANGRAN, com.darkcraft.enemigos.Incienso.AMPARA,
+                com.darkcraft.enemigos.Penitente.CANTICOS, com.darkcraft.enemigos.Penitente.CURADOS, com.darkcraft.enemigos.Penitente.ALZADOS,
+                com.darkcraft.enemigos.Penitente.DESANGRADOS);
+    }
+
+    /** Un golpe de un penitente visto de lado: el penitente en (x, z) mirando al sur, el jugador delante (al sur) y la camara al este. */
+    private static int golpePenitente(int t, String nombre, int variante, int accion, double dist, int captura, double ex, double ez, int PISO) {
+        atTicks(t, "La grieta: " + nombre, m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarPenitentes(lvl);
+                aPelear(sp, true);
+                com.darkcraft.enemigos.Sangrado.limpiar(sp);
+                PENITENTES[0] = penitenteNuevo(lvl, variante, ex, PISO, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+                // el cantico: un flagelante herido a su lado
+                if (accion == com.darkcraft.enemigos.PenitenteAnims.CANTICO) {
+                    PENITENTES[1] = penitenteNuevo(lvl, com.darkcraft.enemigos.Penitente.FLAGELANTE, ex - 2.5, PISO, ez + 0.5, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+                    if (PENITENTES[1] != null) PENITENTES[1].setHealth(PENITENTES[1].getMaxHealth() * 0.4f);
+                }
+                irMirando(sp, ex, PISO, ez + dist, ex, PISO + 1.4, ez, false);
+                var a = PENITENTES[0];
+                if (a == null) return;
+                if (accion == com.darkcraft.enemigos.PenitenteAnims.PENITENCIA) a.setHealth(a.getMaxHealth() * 0.5f);
+                a.setTarget(sp);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(accion);
+                verDesdeServidor = new Vec3(ex + 4.6, PISO + 2.4, ez + dist * 0.5 + 0.8);
+                miraServidor = new Vec3(ex, PISO + 1.2, ez + dist * 0.5);
+            });
+        });
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += captura - 2;
+        final String cap = "cliente_" + nombre;
+        atTicks(t, "captura: " + nombre, m -> {
+            server(m, sp -> log("  " + nombre + ": " + estadoPenitentes() + " | jugador vida " + Math.round(sp.getHealth()) + ", sangre "
+                    + Math.round(com.darkcraft.enemigos.Sangrado.nivel(sp)) + ", frenado " + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)
+                    + (sp.isOnFire() ? ", ardiendo" : "") + String.format(java.util.Locale.ROOT, " en %.1f, %.1f, %.1f", sp.getX(), sp.getY(), sp.getZ())));
+            shot(m, cap);
+        });
+        return t;
+    }
+
+    /**
+     * El Puente de la Grieta: desde el santuario de la Grieta, la cruz de termino del camino, entrar a pie (el cartel con su nombre y el
+     * viento de la Tierra sin Fe), la hospederia por fuera, el refectorio y la capilla, el campamento y los postes de los azotes, el
+     * puente desde el sur, en medio del puente (el logro y la campana), la grieta desde el puente y desde el fondo, la puerta del norte,
+     * el paso abandonado, el cementerio, el humilladero, el puente viejo y todo desde lo alto, con los penitentes en sus puestos; en
+     * supervivencia, en la orilla del norte: el azote, los azotes y la sangre, la penitencia, el cruzazo con su onda, el barrido, la
+     * embestida, el incensario, el humo y el cantico; uno postrado que se alza; la campana que los llama; uno que cae y se desangra;
+     * el registro de la hospederia y el bestiario. Al acabar vuelven los penitentes.
+     */
+    private static int grieta(int T) {
+        final int CX = com.darkcraft.morvain.Grieta.CX, CZ = com.darkcraft.morvain.Grieta.CZ, PISO = com.darkcraft.morvain.Grieta.PISO;
+        final int SANGRE = com.darkcraft.morvain.Grieta.SANGRE, SUELO = com.darkcraft.morvain.Grieta.SUELO;
+        final String SITIO = com.darkcraft.morvain.MorvainEnemigos.GRIETA;
+        final var SG = com.darkcraft.morvain.SantuariosMorvain.porId("grieta");
+        int t = T;
+        atTicks(t, "La grieta: desde el santuario de la Grieta", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft grieta enemigos volver");
+                irMirando(sp, SG.x() + 7.5, SG.y() + 6, SG.z() - 8.5, CX - 10, PISO + 4, CZ + 22, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv338_grieta_santuario");
+            server(m, sp -> log("  " + com.darkcraft.morvain.MorvainEnemigos.estadoGrieta(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "La grieta: la cruz de termino del camino", m -> server(m, sp -> irMirando(sp, CX - 59.5, PISO + 2.5, CZ + 48.5, CX - 66, PISO + 1.5, CZ + 43, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv339_grieta_cruz_termino"));
+        t += 10;
+        // ---- entrar a pie, en aventura: el cartel con el nombre y el viento de la Tierra sin Fe
+        atTicks(t, "La grieta: entrar", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft grieta enemigos fuera");
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), CX - 30.5, PISO, CZ + 39.5, 150f, 2f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura", m -> {
+            log("  tierra sin fe: " + ClientMusic.sinFe());
+            shot(m, "cliente_mv340_grieta_entrar");
+            server(m, sp -> log("  al entrar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + " | cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+        });
+        t += 10;
+        atTicks(t, "La grieta: vuelven los penitentes", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft grieta enemigos volver");
+            });
+        });
+        t += 4;
+        atTicks(t, "La grieta: la hospederia por fuera", m -> server(m, sp -> irMirando(sp, CX - 21.5, PISO + 4, CZ + 41.5, CX - 33, PISO + 4, CZ + 22, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv341_hospederia"));
+        t += 10;
+        atTicks(t, "La grieta: el refectorio", m -> server(m, sp -> irMirando(sp, CX - 29.5, PISO + 2.2, CZ + 25.5, CX - 44, PISO + 1, CZ + 21, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv342_refectorio"));
+        t += 10;
+        atTicks(t, "La grieta: la capilla", m -> server(m, sp -> irMirando(sp, CX - 25.5, PISO + 1.4, CZ + 22.5, CX - 18, PISO + 3, CZ + 22.5, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv343_capilla"));
+        t += 10;
+        atTicks(t, "La grieta: el campamento", m -> server(m, sp -> irMirando(sp, CX + 7.5, PISO + 6, CZ + 47.5, CX + 32, PISO + 1, CZ + 29, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv344_campamento"));
+        t += 10;
+        atTicks(t, "La grieta: los postes de los azotes", m -> server(m, sp -> irMirando(sp, CX + 21.5, PISO + 2.6, CZ + 32.5, CX + 12, PISO + 1, CZ + 32, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv345_postes"));
+        t += 10;
+        atTicks(t, "La grieta: el puente desde el sur", m -> server(m, sp -> irMirando(sp, CX + 1.5, PISO + 3, CZ + 25.5, CX + 0.5, PISO + 4, CZ - 12, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv346_puente"));
+        t += 10;
+        // ---- en medio del puente, en aventura: el logro y la campana que recibe
+        atTicks(t, "La grieta: en medio del puente", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft grieta enemigos fuera");
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), CX + 0.5, PISO, CZ + 3.5, 180f, -12f);
+            });
+        });
+        t += 60;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv347_puente_medio");
+            server(m, sp -> log("  en medio del puente: logro grieta " + com.darkcraft.story.Logros.tiene(sp, "grieta") + ", lugar " + com.darkcraft.morvain.Morvain.lugar(sp)
+                    + " " + fpos(sp)));
+        });
+        t += 10;
+        atTicks(t, "La grieta: la sima desde el puente", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft grieta enemigos volver");
+                irMirando(sp, CX + 2.5, PISO + 1.5, CZ + 8.5, CX + 16, PISO - 42, CZ + 10, true);
+            });
+        });
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv348_sima"));
+        t += 10;
+        atTicks(t, "La grieta: desde el fondo, el arco del puente", m -> server(m, sp -> {
+            int u = 26;
+            irMirando(sp, CX + u + 0.5, SANGRE + 2, CZ + Math.floor(com.darkcraft.morvain.Grieta.centro(u + 0.5)) + 0.5, CX, SUELO - 6, CZ + 0.5, true);
+        }));
+        t += 60;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv349_fondo");
+            server(m, sp -> log("  en el fondo: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + " " + fpos(sp)));
+        });
+        t += 10;
+        atTicks(t, "La grieta: la puerta del norte", m -> server(m, sp -> irMirando(sp, CX + 1.5, PISO + 2, CZ - 14.5, CX + 0.5, PISO + 6, CZ - 26, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv350_puerta"));
+        t += 10;
+        atTicks(t, "La grieta: el paso abandonado", m -> server(m, sp -> irMirando(sp, CX + 6.5, PISO + 3, CZ - 29.5, CX + 0.5, PISO + 2, CZ - 39, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv351_paso"));
+        t += 10;
+        atTicks(t, "La grieta: el cementerio", m -> server(m, sp -> irMirando(sp, CX - 8.5, PISO + 5, CZ - 38.5, CX - 30, PISO, CZ - 47, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv352_cementerio"));
+        t += 10;
+        atTicks(t, "La grieta: el humilladero", m -> server(m, sp -> irMirando(sp, CX + 23.5, PISO + 3, CZ - 30.5, CX + 19, PISO + 3, CZ - 40, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv353_humilladero"));
+        t += 10;
+        atTicks(t, "La grieta: el puente viejo", m -> server(m, sp -> {
+            int[] q = com.darkcraft.morvain.Grieta.get().sitio("puente_viejo");
+            irMirando(sp, q[0] - 8.5, PISO + 3, q[2] - 3.5, q[0], PISO - 6, CZ + com.darkcraft.morvain.Grieta.centro(60), true);
+        }));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv354_puente_viejo"));
+        t += 10;
+        atTicks(t, "La grieta: todo desde lo alto", m -> server(m, sp -> irMirando(sp, CX + 44.5, PISO + 34, CZ + 52.5, CX - 2, PISO - 10, CZ - 6, true)));
+        t += 90;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv355_grieta_alto");
+            server(m, sp -> log("  desde lo alto: " + com.darkcraft.morvain.MorvainEnemigos.estadoGrieta(sp.server)));
+        });
+        t += 10;
+        // ---- en supervivencia, en la orilla del norte (al este del humilladero): los golpes de los penitentes, de lado
+        atTicks(t, "La grieta: a pelear (supervivencia)", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> comando(sp, "darkcraft grieta enemigos fuera"));
+        });
+        t += 4;
+        final double ex = CX + 50.5, ez = CZ - 40.5;
+        final int FL = com.darkcraft.enemigos.Penitente.FLAGELANTE, PO = com.darkcraft.enemigos.Penitente.PORTADOR, TU = com.darkcraft.enemigos.Penitente.TURIFERARIO;
+        t = golpePenitente(t, "mv356_azote", FL, com.darkcraft.enemigos.PenitenteAnims.AZOTE, 2.2, 13, ex, ez, PISO) + 26;
+        t = golpePenitente(t, "mv357_azotes", FL, com.darkcraft.enemigos.PenitenteAnims.AZOTES, 2.2, 30, ex, ez, PISO) + 20;
+        t = golpePenitente(t, "mv358_penitencia", FL, com.darkcraft.enemigos.PenitenteAnims.PENITENCIA, 5.0, 40, ex, ez, PISO) + 20;
+        t = golpePenitente(t, "mv359_cruzazo", PO, com.darkcraft.enemigos.PenitenteAnims.CRUZAZO, 2.6, 21, ex, ez, PISO) + 30;
+        t = golpePenitente(t, "mv360_barrido", PO, com.darkcraft.enemigos.PenitenteAnims.BARRIDO, 2.4, 18, ex, ez, PISO) + 30;
+        t = golpePenitente(t, "mv361_embestida", PO, com.darkcraft.enemigos.PenitenteAnims.EMBESTIDA, 6.5, 14, ex, ez, PISO) + 30;
+        t = golpePenitente(t, "mv362_incensario", TU, com.darkcraft.enemigos.PenitenteAnims.INCENSARIO, 2.4, 14, ex, ez, PISO) + 30;
+        t = golpePenitente(t, "mv363_humo", TU, com.darkcraft.enemigos.PenitenteAnims.HUMO, 4.0, 34, ex, ez, PISO) + 30;
+        t = golpePenitente(t, "mv364_cantico", TU, com.darkcraft.enemigos.PenitenteAnims.CANTICO, 5.0, 26, ex, ez, PISO) + 30;
+        // ---- uno postrado (en la orilla) que se alza al llegar el jugador
+        atTicks(t, "La grieta: un penitente postrado", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarPenitentes(lvl);
+                sp.removeAllEffects();
+                aPelear(sp, true);
+                PENITENTES[1] = penitenteNuevo(lvl, PO, ex, PISO, ez, 0f, com.darkcraft.enemigos.Enemigo.TUMBADO);
+                irMirando(sp, ex, PISO, ez + 6.0, ex, PISO + 0.3, ez, false);
+            });
+        });
+        t += 6;
+        atTicks(t, "captura: postrado", m -> server(m, sp -> log("  postrado: " + estadoPenitentes())));
+        t += 4;
+        atTicks(t, "La grieta: el jugador se acerca", m -> server(m, sp -> irMirando(sp, ex, PISO, ez + 2.4, ex, PISO + 1.0, ez, false)));
+        t += 22;
+        atTicks(t, "captura: se alza", m -> {
+            server(m, sp -> log("  se alza: " + estadoPenitentes()));
+            shot(m, "cliente_mv365_se_alza");
+        });
+        t += 10;
+        // ---- la campana que los llama: el jugador la toca desde la cabeza del sur del puente y acuden los del campamento
+        atTicks(t, "La grieta: vuelven los penitentes (para la campana)", m -> server(m, sp -> {
+            quitarPenitentes(sp.serverLevel());
+            sp.removeAllEffects();
+            sp.setGameMode(GameType.CREATIVE);
+            comando(sp, "darkcraft grieta enemigos volver");
+            irMirando(sp, CX + 0.5, PISO + 1, CZ + 15.5, CX + 20, PISO + 1, CZ + 32, true);
+        }));
+        t += 60;
+        atTicks(t, "La grieta: tocar la campana", m -> server(m, sp -> {
+            aPelear(sp, true);
+            sp.getAbilities().flying = false;
+            sp.onUpdateAbilities();
+            irMirando(sp, CX + 0.5, PISO, CZ + 15.5, CX + 22, PISO + 1, CZ + 32, false);
+            comando(sp, "darkcraft grieta campana");
+        }));
+        t += 50;
+        atTicks(t, "captura: acuden", m -> {
+            server(m, sp -> log("  la campana: " + com.darkcraft.morvain.MorvainEnemigos.estadoGrieta(sp.server)));
+            shot(m, "cliente_mv366_campana_acuden");
+        });
+        t += 10;
+        // ---- uno que cae y se desangra (el logro)
+        atTicks(t, "La grieta: un flagelante cae", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            quitarPenitentes(lvl);
+            comando(sp, "darkcraft grieta enemigos fuera");
+            sp.setGameMode(GameType.CREATIVE);
+            irMirando(sp, ex + 3.5, PISO + 1.2, ez + 3.5, ex, PISO + 0.6, ez, false);
+            sp.setGameMode(GameType.SURVIVAL);
+            PENITENTES[2] = penitenteNuevo(lvl, FL, ex, PISO, ez, 45f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+            var a = PENITENTES[2];
+            if (a == null) return;
+            a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+            a.setDeltaMovement(Vec3.ZERO);
+        }));
+        t += 36;
+        atTicks(t, "captura: se desangra", m -> {
+            server(m, sp -> log("  cae: " + estadoPenitentes() + " | logro penitente " + com.darkcraft.story.Logros.tiene(sp, "penitente")));
+            shot(m, "cliente_mv367_penitente_cae");
+        });
+        t += 40;
+        atTicks(t, "La grieta: sin penitentes (para el libro y el bestiario)", m -> server(m, sp -> {
+            quitarPenitentes(sp.serverLevel());
+            sp.removeAllEffects();
+            sp.clearFire();
+            com.darkcraft.enemigos.Sangrado.limpiar(sp);
+            sp.setHealth(sp.getMaxHealth());
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        t += 6;
+        atTicks(t, "La grieta: el registro de la hospederia", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(28));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv368_libro_hospederia"));
+        t += 6;
+        atTicks(t, "el bestiario: el flagelante (el que acaba de caer)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("penitente_flagelante")));
+        });
+        t += 18;
+        atTicks(t, "captura: el flagelante en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv369_bestiario_penitente");
+        });
+        t += 4;
+        atTicks(t, "La grieta: fin (vuelven los penitentes, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                quitarPenitentes(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                com.darkcraft.enemigos.Sangrado.limpiar(sp);
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft grieta enemigos volver");
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

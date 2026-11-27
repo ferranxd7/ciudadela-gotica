@@ -286,15 +286,26 @@ SFX = {
     "ballenero_vieja": (8.0, 2.5, -14), "ballenero_embestida": (5.0, 1.5, -13), "ballenero_dolor": (1.3, 0.4, -15),
     "ballenero_muerte": (7.0, 2.0, -15), "ballenero_espera": (7.0, 2.0, -22),
     "costillar_ambiente": (20.0, 2.0, -25),
+    # los Penitentes de la Tierra sin Fe (parte 7s): el rezo entre dientes (el sonido de estar), el grito al ver a alguien, el
+    # quejido, la muerte (cae y se desangra), el azote (el chasquido), la penitencia (se azota tres veces), la hemorragia (el
+    # golpe de sangre), la cruz contra el suelo, el arrastre de la cruz (la embestida), el incensario que silba, el humo del
+    # incienso, el cantico y alzarse; la campana del Puente de la Grieta (larga, con su cola) y el viento de la Tierra sin Fe
+    "penitente_rezo": (4.5, 1.2, -20), "penitente_alerta": (2.6, 0.7, -15), "penitente_dolor": (1.3, 0.4, -16),
+    "penitente_muerte": (4.5, 1.4, -16), "penitente_azote": (1.2, 0.4, -13), "penitente_penitencia": (1.1, 0.4, -14),
+    "penitente_hemorragia": (2.2, 0.7, -13), "penitente_cruz": (2.6, 0.9, -12), "penitente_arrastre": (2.8, 0.8, -16),
+    "penitente_incensario": (1.6, 0.5, -14), "penitente_humo": (3.0, 1.0, -16), "penitente_cantico": (6.5, 2.0, -16),
+    "penitente_alzarse": (2.6, 0.8, -15), "grieta_campana": (9.0, 3.0, -15),
+    "sinfe_ambiente": (20.0, 2.0, -25),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
            "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0, "abad_ventisca": 1.5, "abad_rezo": 0.4,
            "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6, "academia_ambiente": 2.0, "erudito_susurro": 0.8,
-           "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0}
+           "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0, "sinfe_ambiente": 2.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
-          "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4}
+          "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
+          "penitente_humo": 1.0, "penitente_alzarse": 2.3}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
 GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
@@ -510,6 +521,17 @@ TOMAS_SFX = {
     "ballenero_grito": (4, 1), "ballenero_arpon": (3, 1), "ballenero_tiron": (4, 2), "ballenero_arponazo": (1, 4),
     "ballenero_cuchillo": (3, 2), "ballenero_aceite": (3, 4), "ballenero_vieja": (4, 1), "ballenero_embestida": (4, 1),
     "ballenero_dolor": (3, 4), "ballenero_muerte": (1, 3), "ballenero_espera": (4, 3), "costillar_ambiente": (3, 1),
+    # los penitentes: los dos rezos que se oyen de seguido desde el principio (la 2 y la 3); los dos gritos que empiezan en seguida (la
+    # 1 y la 4); los quejidos cortos (la 2 y la 4); las muertes con el golpe al caer (la 4, la de mas graves, y la 1); los azotes que
+    # chasquean nada mas empezar (la 4 y la 2); de la penitencia un solo azote con su jadeo (se salta hasta el primero: la 1 y la 2);
+    # las hemorragias de golpe (la 2 y la 4); las cruces mas graves (la 4 y la 3); los arrastres que suenan desde el principio (la 3
+    # y la 1); los incensarios con el silbido a los 0,25 s (la 4 y la 2); los humos con el soplo pronto (la 3 y la 4); los canticos
+    # mas llenos (la 1 y la 4, mas grave); los alzarse que se levantan de golpe (la 3 y la 4); de la campana, los dos toques sueltos
+    # con su cola larga (la 1, la mas grave, y la 2); y del viento de la Tierra sin Fe, el mas grave y continuo (la 3) y la 1
+    "penitente_rezo": (2, 3), "penitente_alerta": (1, 4), "penitente_dolor": (2, 4), "penitente_muerte": (4, 1),
+    "penitente_azote": (4, 2), "penitente_penitencia": (1, 2), "penitente_hemorragia": (2, 4), "penitente_cruz": (4, 3),
+    "penitente_arrastre": (3, 1), "penitente_incensario": (4, 2), "penitente_humo": (3, 4), "penitente_cantico": (1, 4),
+    "penitente_alzarse": (3, 4), "grieta_campana": (1, 2), "sinfe_ambiente": (3, 1),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

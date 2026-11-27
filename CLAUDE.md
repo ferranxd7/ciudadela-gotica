@@ -2503,6 +2503,97 @@ mucho que no esta"). Despues, la Tierra sin Fe (dos partes) y el crater con la S
   cielo (`mv333`), se deshace en sal (`mv334`), el cartel (`mv335`), su bitacora (`mv336`) y el bestiario (`mv337`). `LIMIT` 88 min
   (`lanzar.sh` 94 y 92 min, el paso 122, el trabajo 170).
 
+### Plan grande, parte 7s: la Tierra sin Fe — los Penitentes y el Puente de la Grieta
+
+Respuestas 125, 131 y 132 del plan; la octava region con su contenido (despues, la **7t**: el jefe de la Tierra sin Fe, Anselmo, el
+Pontifice Sangrante, en el santuario del Altar Profanado —(-1864, -1600)—; lo anuncia el libro 28: "se los lleva al noroeste, al
+Altar de la Sangre"). Despues, el crater y la Sombra.
+- **El penitente** (`enemigos/Penitente`, entidad `darkcraft:penitente`, 0,65 x 1,95; modelo de `tools/enemigos/penitente.py`: tunica y
+  capirote de su cofradia, el antifaz con la luz roja de los ojos en la capa de brillo; `PenitenteGeometria/Animaciones`,
+  `PenitenteAnims`, `client/enemigos/PenitenteModelo` —`REZA` reza a su manera cada variante, `TUMBADO` = postrado en cruz— y
+  `PenitenteRenderer`, el portador a escala 1,25). Los peregrinos que iban al crater a pedir perdon. Tres: **flagelante** (32 de vida,
+  5 de golpe; rojo sangre, la espalda en carne viva: el **azote** y los tres **azotes** con la disciplina, que suman **sangre**; herido
+  —por debajo del 60 %—, la **penitencia**: se azota a si mismo —el 6 % de su vida cada azote— y se **enfervoriza** 200 ticks: animo
+  +0,4 y Velocidad II), **portador** (70, 8,5 y 4 de armadura; negro, la cruz de madera a rastras: el **cruzazo** —la estrella en el
+  suelo; la **onda**, a 2,8 delante y radio 2,6, da x0,6 del golpe y lanza a quien este de pie: saltando o rodando se libra—, el
+  **barrido** a una mano y la **embestida** —de 4,5 a 9,5
+  bloques, con la cruz por delante—) y **turiferario** (36, 4,5 y 1; morado y oro, el incensario de laton: lo voltea alrededor y
+  **quema**; el **humo** —`enemigos/Incienso`, una nube de efectos del juego sin efectos con su propio tick: radio 3, 120 ticks; a quien
+  este dentro le suma 12 de sangre cada medio segundo y le frena; a los penitentes les da Resistencia— y, con los suyos heridos, el
+  **cantico**: los penitentes a 10 bloques se curan el 15 % y llevan Regeneracion y Resistencia). Esperan **rezando de rodillas** (se
+  levantan si te acercas), **postrados** (se alzan de golpe) o de pie. Al morir caen de rodillas, de bruces, y **se desangran**.
+  Bestiario `penitente_flagelante` / `_portador` / `_turiferario`, logro `penitente` ("Sin absolucion").
+- **La sangre** (`enemigos/Sangrado`): lo que suman los azotes y el humo se apunta en el jugador (`darkcraft_sangre` en sus datos) y
+  baja 2 por tick tras 60 ticks sin sumar; al llegar a 100 (`TOPE`) **revienta la hemorragia**: el 15 % de su vida maxima de golpe (3
+  como poco), lentitud, chorro de sangre y `sfx.penitente_hemorragia`. Ni creativo ni espectador; los penitentes tampoco sangran.
+  `HEMORRAGIAS` (pruebas).
+- **El Puente de la Grieta** (`morvain/Grieta`, en la Tierra sin Fe, junto al santuario de la Grieta —(24, 2181), "Grieta de los
+  Apostatas", al suroeste: el camino sale de su tarima—; `CX` 135, `CZ` 2095, `SUELO` 122, `PISO` 123; u = x - CX, v = z - CZ, el norte
+  es el lado del crater; se dibuja chunk a chunk al adornar; `Adorno` no pone nada en lo allanado —u -52..92, v -62..50, se funde en
+  8— ni en la grieta; en el camino del santuario si, y el camino quita lo que le caiga encima). La **grieta** (`Sima`, sin plano:
+  cada columna se calcula con `centro(u)`, `ancho(u)` y `media(u, y, lado)`): de oeste a este (`G_U0` -62 a `G_U1` 102), 22 de ancho
+  arriba, se estrecha al bajar (0,12 por bloque, con salientes de ruido) hasta la **sangre** (el agua roja de la region, `SANGRE` =
+  63, sobre el fondo en 56); paredes en **vetas** de terracota roja, naranja, parda y normal, piedra negra y basalto (sangre y roca del
+  infierno abajo), huesos de los que cayeron y **enredaderas rojas** colgando de los salientes; se cierra poco a poco en sus dos
+  puntas (se puede rodear). El **puente** (`PUENTE_V0` -19 a `PUENTE_V1` 19, siete de ancho): tablero de ladrillo de piedra negra, el
+  **arco** por debajo (`bajo(v)`: dovelas lisas, enjuta de sillar y los estribos pegados a las paredes), la cornisa sobre mensulas, los
+  pretiles de muro con pilares y **velas rojas** (faroles en las puntas), la **espadana** en medio con la **campana** (dos pilares, el
+  dintel sobre el paso, el muro con su hueco, tejadillo y cruz de hierro; dos faroles colgados) y una **jaula** colgada bajo el arco.
+  Al sur: el **camino** del santuario (`CAMINO`, tierra pisada fuera, losas dentro) con la **cruz de termino**, la **hospederia**
+  (`HOSP_*`: zocalo de piedra negra, adobe con entramado de roble oscuro, tejado a dos aguas hundido sobre el refectorio, chimenea y
+  cruz; el **refectorio** con la mesa larga, bancos, velas, el hogar, la olla, barriles —uno con `chests/grieta`—, jergones de paja y
+  la lampara; tras el tabique, la **capilla**: el altar con su caliz —una rosa marchita—, la cruz ante la vidriera roja, bancos, el
+  **arcon** `chests/grieta_bueno` y el **atril con el libro perdido 28** —"El registro de la hospederia", del hermano Ulric;
+  `Perdidos.TOTAL` = 28—; fuera, el pozo) y el **campamento** de los penitentes (la hoguera, cinco tiendas de lana, los **postes de
+  los azotes** con la tierra empapada, la olla sobre el fuego, la **cruz de guia** con su sudario y velas, braseros, sacos, barriles con
+  `chests/grieta` y dos estandartes). Al norte: la **puerta** (dos torres con almenas y cornisa, el arco apuntado con la reja medio
+  alzada, la cruz labrada y los estandartes), el **paso** abandonado en mitad del camino (la parihuela con su canasto de velas, los
+  faroles, los varales tirados y la imagen tapada con su manto morado ante la cruz), el **cementerio** de los peregrinos (tapia rota,
+  tumbas con cruces de madera, de piedra, rotas o caidas, alguna abierta con su calavera, velas y un arbol seco) y el **humilladero**
+  (grada, cuatro pilares, tejadillo en piramide y la cruz de piedra); al este, lo que queda del **puente viejo** de cuerdas colgando de
+  las dos orillas. Sitios (`Grieta.sitio`): `entrada`, `camino`, `hospederia`, `refectorio`, `capilla`, `atril`, `arcon`,
+  `campamento`, `hoguera`, `postes`, `cruz`, `puente_sur`, `puente`, `campana`, `puente_norte`, `puerta`, `paso`, `cementerio`,
+  `humilladero`, `puente_viejo`, `alto` y `fondo` (estos tres, la campana, lo alto y el fondo de la grieta, solo para mirar). El Espejo:
+  "El Puente de la Grieta" (`Grieta.dentro`, tambien en el fondo); logro `grieta` ("Sobre el abismo") al pasar por el medio del puente
+  (`enPuente`): la campana le recibe.
+- **La campana** (`Grieta.campana`, cada 5 s desde `Morvain.onTick`: de vez en cuando tañe sola, `sfx.grieta_campana`, para quien
+  este a 150) y **tocarla llama** (`Morvain.onCampana` → `Grieta.llamar`: quien la toca —clic derecho, como cualquier campana— hace
+  que los penitentes de la grieta a menos de `LLAMA` 72 bloques sin presa vayan a por el —`Enemigo.acudir`—; como mucho una vez cada
+  8 s; `LLAMADAS`, `ACUDEN`). El libro 28 lo avisa: "que no toque la campana. Ellos acuden".
+- **Los puestos** (`MorvainEnemigos`, sitio `grieta`, 30, de `Grieta.esperas`): en el puente dos flagelantes de rodillas y el
+  turiferario bajo la espadana, un portador en la cabeza del sur; en el camino uno que va y viene y un portador rezando ante la cruz de
+  termino; en el campamento tres flagelantes en los postes, el turiferario de la olla, dos postrados ante la cruz de guia, un portador
+  a la puerta de una tienda y uno de ronda; en la hospederia dos rezando en el refectorio y uno echado en la paja, y en la capilla un
+  turiferario de rodillas ante el altar y uno postrado en el pasillo; dos portadores de guardia tras la puerta del norte; los cuatro
+  portadores de rodillas junto a los varales del paso y el turiferario que lo guia; dos rezando en el cementerio y uno postrado sobre
+  una tumba; un turiferario en el humilladero.
+- **La Tierra sin Fe suena** (`ClientMusic.tickSinFe`): en su region entre Y 40 y 190, `ambiente.sinfe` (viento caliente sobre la
+  tierra agrietada, polvo, el rumor de las grietas y lamentos lejanos).
+- Sonidos (ElevenLabs, flow `rA0LWiSNDaEcajA8osLQ`, `TOMAS_SFX`): `penitente_rezo`, `penitente_alerta`, `penitente_dolor`,
+  `penitente_muerte`, `penitente_azote`, `penitente_penitencia`, `penitente_hemorragia`, `penitente_cruz`, `penitente_arrastre`,
+  `penitente_incensario`, `penitente_humo`, `penitente_cantico`, `penitente_alzarse`, `grieta_campana` y `sinfe_ambiente`
+  (`stream`).
+- Comandos `/darkcraft grieta [ir <sitio> | campana | enemigos [volver | fuera | sacar]]` (sin mas: como esta; `campana` la toca como
+  quien la usa).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_grieta carpeta` (los cortes `x=135` —el arco del puente— y `x=160` —la
+  grieta— la ensenan bien): la grieta, el puente, la puerta, el paso, el cementerio, el humilladero, la hospederia y el campamento con
+  las marcas de los penitentes (Pn); si se llega a pie desde la entrada a cada sitio (menos la campana, lo alto y el fondo) y a cada
+  penitente, que ninguno esta metido en un bloque, que todos tienen suelo y si sin el puente se llega al otro lado (rodeando).
+- Pruebas: servidor, lineas `Morvain, el puente de la grieta: ...` (el atril con el libro 28, el arcon, la campana, el tablero, el
+  hueco y la sangre de la grieta, el arco de la puerta, la imagen del paso; a pie desde la entrada; vistas `morvain_grieta.png` y
+  `morvain_grieta_puente.png`), `Morvain, los penitentes: ...`, `Morvain, los penitentes en accion: ...` (el de rodillas se levanta y
+  el postrado se alza; cada accion acaba) y `Morvain, los penitentes contra una presa: ...` (el azote y los azotes con su sangre, la
+  penitencia y el fervor, el cruzazo y su onda, el barrido, la embestida, el incensario que quema, el humo, el cantico que cura; tres
+  tandas de azotes hasta la hemorragia; uno que cae se desangra); cliente, tramo `grieta()` despues del costillar: desde el santuario
+  (`cliente_mv338`), la cruz de termino (`mv339`), entrar a pie con el cartel y el viento (`mv340`), la hospederia (`mv341`), el
+  refectorio (`mv342`), la capilla (`mv343`), el campamento (`mv344`), los postes (`mv345`), el puente desde el sur (`mv346`), en medio
+  del puente con el logro (`mv347`), la sima desde el puente (`mv348`), el arco desde el fondo (`mv349`), la puerta (`mv350`), el paso
+  (`mv351`), el cementerio (`mv352`), el humilladero (`mv353`), el puente viejo (`mv354`), todo desde lo alto (`mv355`); en
+  supervivencia, en la orilla del norte: el azote (`mv356`), los azotes (`mv357`), la penitencia (`mv358`), el cruzazo (`mv359`), el
+  barrido (`mv360`), la embestida (`mv361`), el incensario (`mv362`), el humo (`mv363`), el cantico (`mv364`), un postrado que se alza
+  (`mv365`), la campana que los llama (`mv366`), uno que cae y se desangra (`mv367`), el registro de la hospederia (`mv368`) y el
+  bestiario (`mv369`). `LIMIT` 94 min (`lanzar.sh` 100 y 98 min, el paso 128, el trabajo 176).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

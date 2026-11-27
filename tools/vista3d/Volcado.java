@@ -803,6 +803,41 @@ public class Volcado {
                 for (var o : v.esperas()) marcas.put((n == 0 ? "B" : "S") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
                 andarCostillar(lvl, v);
             }
+            case "morvain_grieta" -> {
+                // el Puente de la Grieta (parte 7s): la grieta con su sangre, el puente con su espadana, la puerta del norte, el paso,
+                // el cementerio, el humilladero, la hospederia con el libro 28 y el campamento de los penitentes
+                // (-Dcaja=x0,z0,x1,z1 para un trozo)
+                String[] k = System.getProperty("caja", (com.darkcraft.morvain.Grieta.CX - 125) + "," + (com.darkcraft.morvain.Grieta.CZ - 76) + ","
+                        + (com.darkcraft.morvain.Grieta.CX + 108) + "," + (com.darkcraft.morvain.Grieta.CZ + 92)).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 50);
+                com.darkcraft.morvain.Grieta v = com.darkcraft.morvain.Grieta.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("La grieta: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " que esperan; "
+                        + v.tumbas + " tumbas (" + v.cruces + " cruces), " + v.tiendas + " tiendas, " + v.postes + " postes, " + v.velas + " velas; sitios "
+                        + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas()) marcas.put("P" + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarGrieta(lvl, v);
+            }
             case "barco" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, true)));
             case "barco_roto" -> construir(lvl, List.of(new com.darkcraft.pueblo.gen.Barco(77, false)));
             default -> throw new IllegalArgumentException("plano desconocido: " + que);
@@ -1240,6 +1275,61 @@ public class Volcado {
             }
         System.out.println("Brann y los salobres: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan + ", sin suelo "
                 + sinSuelo + "; en la sala " + celdas + " celdas, con algo que estorba " + estorban);
+    }
+
+    /**
+     * El Puente de la Grieta (parte 7s): se llega a pie desde la entrada (junto al santuario) a cada sitio (menos la campana, lo alto y el
+     * fondo, que son para mirar) y a cada penitente; ninguno metido en un bloque y todos con suelo; y que sin el
+     * puente solo se llega al otro lado rodeandola por una punta.
+     */
+    static void andarGrieta(WorldGenLevel lvl, com.darkcraft.morvain.Grieta v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+            BlockState s = MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+            return s.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock ? aire : s;
+        };
+        int[] e = v.sitio("entrada");
+        int X = com.darkcraft.morvain.Grieta.CX, Z = com.darkcraft.morvain.Grieta.CZ;
+        var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], X - 125, Z - 76, X + 108, Z + 92, 6_000_000);
+        StringBuilder sb = new StringBuilder("a pie desde la entrada: " + z0.celdas() + " celdas;");
+        java.util.Set<String> mirar = java.util.Set.of("campana", "alto", "fondo");
+        for (String s : v.sitios().keySet()) {
+            if (mirar.contains(s)) continue;
+            int[] q = v.sitio(s);
+            sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+        }
+        System.out.println(sb);
+        int malos = 0, chocan = 0, sinSuelo = 0;
+        for (var o : v.esperas()) {
+            if (!z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                malos++;
+                System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z());
+            }
+            for (int dy = 0; dy < 2; dy++) {
+                BlockState st = mundo.en(o.x(), o.y() + dy, o.z());
+                if (choca(st)) {
+                    chocan++;
+                    System.out.println("  " + o.grupo() + " metido en un bloque: " + o.x() + "," + (o.y() + dy) + "," + o.z() + " " + st);
+                }
+            }
+            BlockState abajo = mundo.en(o.x(), o.y() - 1, o.z());
+            if (!choca(abajo)) {
+                sinSuelo++;
+                System.out.println("  " + o.grupo() + " sin suelo: " + o.x() + "," + o.y() + "," + o.z() + " " + abajo);
+            }
+        }
+        // sin el tablero del puente, de la orilla del sur no se llega a la del norte (la grieta no se salta)
+        int P = com.darkcraft.morvain.Grieta.PISO, S = com.darkcraft.morvain.Grieta.SUELO;
+        com.darkcraft.pueblo.gen.Andar.Mundo sinPuente = (x, y, z) -> {
+            int u = x - X, w = z - Z;
+            if (Math.abs(u) <= 4 && w >= com.darkcraft.morvain.Grieta.PUENTE_V0 && w <= com.darkcraft.morvain.Grieta.PUENTE_V1 && y >= S - 40) return aire;
+            return mundo.en(x, y, z);
+        };
+        int[] ps = v.sitio("puente_sur"), pn = v.sitio("puente_norte"), pu = v.sitio("puerta");
+        var z1 = com.darkcraft.pueblo.gen.Andar.desde(sinPuente, ps[0], ps[1], ps[2] + 4, X - 125, Z - 76, X + 108, Z + 92, 6_000_000);
+        System.out.println("Penitentes: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan + ", sin suelo "
+                + sinSuelo + "; sin el puente, de la orilla del sur a la puerta del norte (rodeando la grieta por una punta) " + z1.alcanza(pu[0], pu[1], pu[2], 2)
+                + ", celdas " + z1.celdas());
     }
 
     static void andarObservatorio(WorldGenLevel lvl, com.darkcraft.morvain.Observatorio v) {

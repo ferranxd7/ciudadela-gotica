@@ -219,6 +219,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el costillar en el chunk {}", c.getPos(), t);
         }
+        // el Puente de la Grieta, en la Tierra sin Fe, a la puerta del santuario de la Grieta (parte 7s)
+        try {
+            if (Grieta.toca(c.getPos().x, c.getPos().z)) Grieta.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la grieta en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

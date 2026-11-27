@@ -75,6 +75,7 @@ public final class ClientSetup {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.TINTA.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ORBE.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.SALOBRE.get(), com.darkcraft.client.enemigos.SalobreRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PENITENTE.get(), com.darkcraft.client.enemigos.PenitenteRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.RED.get(), ctx -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(ctx, 2.2f, false));
         // Brann, el Ballenero (parte 7r): el, su arpon con el cabo, el farol de aceite que lanza y la Vieja
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BALLENERO.get(), com.darkcraft.client.enemigos.BalleneroRenderer::new);
@@ -134,6 +135,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.EspectroModelo.CAPA, com.darkcraft.client.enemigos.EspectroGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.EruditoModelo.CAPA, com.darkcraft.client.enemigos.EruditoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.SalobreModelo.CAPA, com.darkcraft.client.enemigos.SalobreGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.PenitenteModelo.CAPA, com.darkcraft.client.enemigos.PenitenteGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.EliteModelo.CAPA, com.darkcraft.client.enemigos.EliteGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.BrandtModelo.CAPA, com.darkcraft.client.enemigos.BrandtGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CortezaModelo.CAPA, com.darkcraft.client.enemigos.CortezaGeometria::crear);
