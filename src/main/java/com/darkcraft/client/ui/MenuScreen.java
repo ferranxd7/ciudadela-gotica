@@ -305,6 +305,11 @@ public class MenuScreen extends Screen {
             if (!com.darkcraft.combate.Escalado.cumple(d, at))
                 l.addAll(font.split(Component.translatable("darkcraft.arma.sin_requisitos").withStyle(net.minecraft.ChatFormatting.RED), ancho));
         } else if (com.darkcraft.forja.Forja.mejorable(st)) l.addAll(font.split(com.darkcraft.forja.Forja.linea(st), ancho));
+        // una pieza de armadura con modelo propio (parte 7ai): su defensa, su peso, lo que resiste y de quien era
+        if (st.getItem() instanceof com.darkcraft.armadura.PiezaArmadura pa) {
+            for (Component c : pa.lineas()) l.addAll(font.split(c, ancho));
+            return l;
+        }
         List<Component> t = st.getTooltipLines(yo(), TooltipFlag.Default.NORMAL);
         for (int i = 1; i < t.size(); i++) {
             if (t.get(i).getString().isBlank()) continue;
@@ -473,8 +478,10 @@ public class MenuScreen extends Screen {
             zonas.clear();
             for (int i = 0; i < 3; i++) zonas.add(new Zona(Equipo.DERECHA[i], x0() + i * PASO, fila(0), MenuTex.SIL_ESPADA));
             for (int i = 0; i < 3; i++) zonas.add(new Zona(Equipo.IZQUIERDA[i], x0() + 90 + i * PASO, fila(0), MenuTex.SIL_ESCUDO));
-            MenuTex.T[] sil = {MenuTex.SIL_YELMO, MenuTex.SIL_PECHO, MenuTex.SIL_PIERNAS, MenuTex.SIL_BOTAS};
-            for (int i = 0; i < 4; i++) zonas.add(new Zona(Equipo.ARMADURA[i], x0() + i * PASO, fila(1), sil[i]));
+            // como en Elden Ring: yelmo, peto, guantes (en el hueco de los pies de Minecraft) y grebas (parte 7ai)
+            int[] orden = {Equipo.YELMO, Equipo.PECHO, Equipo.BOTAS, Equipo.PIERNAS};
+            MenuTex.T[] sil = {MenuTex.SIL_YELMO, MenuTex.SIL_PECHO, MenuTex.SIL_GUANTES, MenuTex.SIL_PIERNAS};
+            for (int i = 0; i < 4; i++) zonas.add(new Zona(orden[i], x0() + i * PASO, fila(1), sil[i]));
             for (int i = 0; i < com.darkcraft.rol.Talismanes.MAX; i++) zonas.add(new Zona(TALISMAN + i, x0() + 110 + i * PASO, fila(1), MenuTex.SIL_TALISMAN));
             zonas.add(new Zona(FRASCO_VIDA, x0(), fila(2), null));
             zonas.add(new Zona(FRASCO_MANA, x0() + PASO, fila(2), null));

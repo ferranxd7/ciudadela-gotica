@@ -205,63 +205,23 @@
     },
     {
      "type": "minecraft:item",
-     "name": "minecraft:leather_boots",
-     "weight": 2,
-     "functions": [
-      {
-       "function": "minecraft:set_damage",
-       "damage": {
-        "type": "minecraft:uniform",
-        "min": 0.35,
-        "max": 0.85
-       }
-      }
-     ]
+     "name": "darkcraft:bandido_guantes",
+     "weight": 2
     },
     {
      "type": "minecraft:item",
-     "name": "minecraft:leather_helmet",
-     "weight": 2,
-     "functions": [
-      {
-       "function": "minecraft:set_damage",
-       "damage": {
-        "type": "minecraft:uniform",
-        "min": 0.35,
-        "max": 0.85
-       }
-      }
-     ]
+     "name": "darkcraft:bandido_yelmo",
+     "weight": 2
     },
     {
      "type": "minecraft:item",
-     "name": "minecraft:leather_chestplate",
-     "weight": 2,
-     "functions": [
-      {
-       "function": "minecraft:set_damage",
-       "damage": {
-        "type": "minecraft:uniform",
-        "min": 0.35,
-        "max": 0.85
-       }
-      }
-     ]
+     "name": "darkcraft:bandido_peto",
+     "weight": 2
     },
     {
      "type": "minecraft:item",
-     "name": "minecraft:leather_leggings",
-     "weight": 2,
-     "functions": [
-      {
-       "function": "minecraft:set_damage",
-       "damage": {
-        "type": "minecraft:uniform",
-        "min": 0.35,
-        "max": 0.85
-       }
-      }
-     ]
+     "name": "darkcraft:bandido_grebas",
+     "weight": 2
     },
     {
      "type": "minecraft:item",

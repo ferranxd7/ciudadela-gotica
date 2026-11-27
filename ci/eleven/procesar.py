@@ -443,6 +443,9 @@ SFX = {
     "campana_viento": (3.0, 0.9, -19), "campana_toque": (3.0, 1.0, -15), "peregrinos": (7.0, 2.0, -18),
     # la bufanda roja (parte 7ah): las agujas de Hedda, su descanso y la lanza de Tam que se saca del torno
     "agujas": (6.0, 1.2, -26), "hedda_descansa": (6.0, 2.0, -17), "lanza_sacar": (4.0, 0.8, -15),
+    # las armaduras (parte 7ai): ponerse una pieza de placas, de malla, de cuero y pieles o de tela
+    "armadura_placas": (2.0, 0.3, -17), "armadura_malla": (1.5, 0.3, -18), "armadura_cuero": (1.5, 0.3, -19),
+    "armadura_tela": (1.5, 0.3, -20),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -780,6 +783,9 @@ TOMAS_SFX = {
     # (la 4 dura 5 s y satura) y los peregrinos las dos (la 2, algo mas fuerte, primero)
     "campana_viento": (1, 2, 3), "campana_toque": (1, 2, 3), "peregrinos": (2, 1),
     "agujas": (1, 4), "hedda_descansa": (4, 2), "lanza_sacar": (1, 2),
+    # las armaduras (parte 7ai): de la malla la 3 no (casi todo silencio: el golpe llega al final); de la tela, las dos
+    # que mas se oyen (la 1 y la 4)
+    "armadura_placas": (1, 2), "armadura_malla": (2, 1), "armadura_cuero": (1, 2), "armadura_tela": (1, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

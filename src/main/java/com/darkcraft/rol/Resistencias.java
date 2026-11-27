@@ -19,7 +19,8 @@ import net.minecraftforge.fml.common.Mod;
 
 /**
  * Las resistencias del jugador (como las defensas de Elden Ring): cuanto menos dano le hace cada clase de golpe. Salen
- * de los talismanes ({@link Talisman}) y de los frutos ({@link Efectos}); se suman multiplicando (dos del 40 % = 64 %) y
+ * de los talismanes ({@link Talisman}), de los frutos ({@link Efectos}) y de las piezas de armadura con modelo propio
+ * ({@code armadura/Conjunto}, desde la parte 7ai); se suman multiplicando (dos del 40 % = 64 %) y
  * nunca pasan del 90 %. Con el fruto de ceniza el veneno ni entra (y el que se tenia se cura al comerlo).
  */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID)
@@ -76,6 +77,9 @@ public final class Resistencias {
             case FISICO -> Efectos.HUESO.get();
         };
         if (p.hasEffect(fruto)) queda *= 1f - (t == Tipo.FISICO ? 0.15f : t == Tipo.VENENO ? 1f : 0.50f);
+        // las armaduras con modelo propio (parte 7ai): cada pieza puesta lo suyo de cada elemento (lo fisico, su defensa)
+        for (net.minecraft.world.item.ItemStack st : p.getArmorSlots())
+            if (st.getItem() instanceof com.darkcraft.armadura.PiezaArmadura pa) queda *= 1f - pa.conjunto.resistencia(pa.pieza, t);
         return Math.min(TOPE, 1f - queda);
     }
 

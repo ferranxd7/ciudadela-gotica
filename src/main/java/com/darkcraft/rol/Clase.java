@@ -10,7 +10,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -96,16 +95,13 @@ public enum Clase {
         return new ItemStack(i, n);
     }
 
-    /** Una pieza de cuero tenida de un color. */
-    private static ItemStack cuero(Item i, int rgb) {
-        ItemStack s = new ItemStack(i);
-        if (i instanceof DyeableLeatherItem d) d.setColor(s, rgb);
-        return s;
-    }
-
-    private static ItemStack[] cuero(int rgb) {
-        return new ItemStack[]{cuero(Items.LEATHER_HELMET, rgb), cuero(Items.LEATHER_CHESTPLATE, rgb), cuero(Items.LEATHER_LEGGINGS, rgb),
-                cuero(Items.LEATHER_BOOTS, rgb)};
+    /**
+     * Un conjunto de armadura con modelo propio (parte 7ai) en el orden del kit: cabeza, pecho, piernas y pies (los guantes
+     * van en el hueco de los pies).
+     */
+    private static ItemStack[] conjunto(com.darkcraft.armadura.Conjunto c) {
+        return new ItemStack[]{DarkCraftMod.armadura(c, 0), DarkCraftMod.armadura(c, 1), DarkCraftMod.armadura(c, 3),
+                DarkCraftMod.armadura(c, 2)};
     }
 
     private static ItemStack[] nada() {
@@ -120,32 +116,28 @@ public enum Clase {
         ItemStack vacio = ItemStack.EMPTY;
         return switch (this) {
             case CABALLERO -> new Kit(new ItemStack[]{st(Items.IRON_SWORD), vacio, vacio}, st(Items.SHIELD),
-                    new ItemStack[]{st(Items.IRON_HELMET), st(Items.IRON_CHESTPLATE), st(Items.IRON_LEGGINGS), st(Items.IRON_BOOTS)},
-                    List.of(), List.of());
+                    conjunto(com.darkcraft.armadura.Conjunto.CABALLERO), List.of(), List.of());
             case VAGABUNDO -> new Kit(new ItemStack[]{st(Items.IRON_SWORD), st(Items.BOW), vacio}, vacio,
-                    new ItemStack[]{st(Items.CHAINMAIL_HELMET), cuero(Items.LEATHER_CHESTPLATE, 0x5A4632), cuero(Items.LEATHER_LEGGINGS, 0x5A4632),
-                            cuero(Items.LEATHER_BOOTS, 0x3A2A1E)},
-                    List.of(st(Items.ARROW, 32)), List.of());
+                    conjunto(com.darkcraft.armadura.Conjunto.VAGABUNDO), List.of(st(Items.ARROW, 32)), List.of());
             case BARBARO -> new Kit(new ItemStack[]{st(Items.IRON_AXE), vacio, vacio}, st(Items.SHIELD),
-                    new ItemStack[]{vacio, st(Items.CHAINMAIL_CHESTPLATE), cuero(Items.LEATHER_LEGGINGS, 0x4A3A2A), cuero(Items.LEATHER_BOOTS, 0x4A3A2A)},
-                    List.of(), List.of());
+                    conjunto(com.darkcraft.armadura.Conjunto.BARBARO), List.of(), List.of());
             case GUERRERO -> new Kit(new ItemStack[]{st(Items.IRON_SWORD), vacio, vacio}, st(Items.IRON_SWORD),
-                    new ItemStack[]{cuero(Items.LEATHER_HELMET, 0x6A1A1A), st(Items.CHAINMAIL_CHESTPLATE), st(Items.CHAINMAIL_LEGGINGS),
-                            cuero(Items.LEATHER_BOOTS, 0x2A1E1A)},
-                    List.of(), List.of());
-            case BANDIDO -> new Kit(new ItemStack[]{st(DarkCraftMod.DAGA.get()), st(Items.BOW), vacio}, vacio, cuero(0x24201E),
-                    List.of(st(Items.ARROW, 24)), List.of());
-            case HECHICERO -> new Kit(new ItemStack[]{st(DarkCraftMod.BASTON.get()), st(Items.STONE_SWORD), vacio}, vacio, cuero(0x1E2A5A),
+                    conjunto(com.darkcraft.armadura.Conjunto.GUERRERO), List.of(), List.of());
+            case BANDIDO -> new Kit(new ItemStack[]{st(DarkCraftMod.DAGA.get()), st(Items.BOW), vacio}, vacio,
+                    conjunto(com.darkcraft.armadura.Conjunto.BANDIDO), List.of(st(Items.ARROW, 24)), List.of());
+            case HECHICERO -> new Kit(new ItemStack[]{st(DarkCraftMod.BASTON.get()), st(Items.STONE_SWORD), vacio}, vacio,
+                    conjunto(com.darkcraft.armadura.Conjunto.HECHICERO),
                     List.of(hechizo(Hechizo.GUIJARRO), hechizo(Hechizo.ESPADA), hechizo(Hechizo.ESQUIRLAS)),
                     List.of(Hechizo.GUIJARRO, Hechizo.ESQUIRLAS, Hechizo.ESPADA));
-            case PROFETA -> new Kit(new ItemStack[]{st(DarkCraftMod.SELLO_SAGRADO.get()), st(Items.TRIDENT), vacio}, vacio, cuero(0x6A1E1A),
+            case PROFETA -> new Kit(new ItemStack[]{st(DarkCraftMod.SELLO_SAGRADO.get()), st(Items.TRIDENT), vacio}, vacio,
+                    conjunto(com.darkcraft.armadura.Conjunto.PROFETA),
                     List.of(hechizo(Hechizo.CURAR), hechizo(Hechizo.LLAMA), hechizo(Hechizo.BENDICION)),
                     List.of(Hechizo.CURAR, Hechizo.LLAMA, Hechizo.BENDICION));
             case CONFESOR -> new Kit(new ItemStack[]{st(Items.IRON_SWORD), st(DarkCraftMod.SELLO_SAGRADO.get()), vacio}, st(Items.SHIELD),
-                    new ItemStack[]{st(Items.CHAINMAIL_HELMET), st(Items.CHAINMAIL_CHESTPLATE), st(Items.CHAINMAIL_LEGGINGS), st(Items.CHAINMAIL_BOOTS)},
+                    conjunto(com.darkcraft.armadura.Conjunto.CONFESOR),
                     List.of(hechizo(Hechizo.CURAR), hechizo(Hechizo.BENDICION)), List.of(Hechizo.CURAR, Hechizo.BENDICION));
             case PRISIONERO -> new Kit(new ItemStack[]{st(Items.IRON_SWORD), st(DarkCraftMod.BASTON.get()), vacio}, vacio,
-                    new ItemStack[]{st(Items.IRON_HELMET), cuero(Items.LEATHER_CHESTPLATE, 0x3A3A3A), cuero(Items.LEATHER_LEGGINGS, 0x3A3A3A), vacio},
+                    conjunto(com.darkcraft.armadura.Conjunto.PRISIONERO),
                     List.of(hechizo(Hechizo.GUIJARRO), hechizo(Hechizo.ESPADA)), List.of(Hechizo.GUIJARRO, Hechizo.ESPADA));
             case DESDICHADO -> new Kit(new ItemStack[]{st(Items.WOODEN_SWORD), vacio, vacio}, vacio, nada(), List.of(), List.of());
         };

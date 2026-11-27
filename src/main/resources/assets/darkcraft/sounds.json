@@ -7968,5 +7968,57 @@
         "attenuation_distance": 20
       }
     ]
+  },
+  "sfx.armadura_placas": {
+    "subtitle": "subtitles.darkcraft.sfx.armadura_placas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/armadura_placas_1",
+        "attenuation_distance": 12
+      },
+      {
+        "name": "darkcraft:sfx/armadura_placas_2",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "sfx.armadura_malla": {
+    "subtitle": "subtitles.darkcraft.sfx.armadura_malla",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/armadura_malla_2",
+        "attenuation_distance": 12
+      },
+      {
+        "name": "darkcraft:sfx/armadura_malla_1",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "sfx.armadura_cuero": {
+    "subtitle": "subtitles.darkcraft.sfx.armadura_cuero",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/armadura_cuero_1",
+        "attenuation_distance": 12
+      },
+      {
+        "name": "darkcraft:sfx/armadura_cuero_2",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "sfx.armadura_tela": {
+    "subtitle": "subtitles.darkcraft.sfx.armadura_tela",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/armadura_tela_1",
+        "attenuation_distance": 12
+      },
+      {
+        "name": "darkcraft:sfx/armadura_tela_4",
+        "attenuation_distance": 12
+      }
+    ]
   }
 }
