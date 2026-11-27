@@ -5205,6 +5205,7 @@ public final class ClientCiTest {
     private static void plan(Minecraft mc) {
         steps.clear();
         next = 0;
+        planificando = true;
         com.darkcraft.rol.Rol.sinLimite = true;
         // el Jinete Nocturno no sale solo en las demas pruebas (van por el camino de nubes a cualquier hora): su tramo lo suelta
         com.darkcraft.camino.Jinetes.quietos = true;
@@ -5328,6 +5329,7 @@ public final class ClientCiTest {
         int finEspejo = espejo(after + 40);
         rey(finEspejo + 20);
         // por orden de tiempo (cada parte apunta sus pasos a su manera); el orden de los empates se conserva
+        planificando = false;
         steps.sort(java.util.Comparator.comparingInt(Step::at));
     }
 
@@ -10988,9 +10990,22 @@ public final class ClientCiTest {
 
     private static final List<CapturaEspera> CAPTURAS_ESPERA = new ArrayList<>();
 
-    /** Pone en cola una captura que espera (como mucho {@code espera} ticks) a que se cumpla {@code cuando}. */
+    /** Mientras se apuntan los pasos ({@link #plan}): las capturas que esperan se ponen en cola al llegar su paso, no ya. */
+    private static boolean planificando;
+
+    /**
+     * Pone en cola una captura que espera (como mucho {@code espera} ticks) a que se cumpla {@code cuando}. Si se llama mientras se
+     * apuntan los pasos, se pone en cola al llegar el ultimo paso apuntado (antes se ponia ya y el primer paso del tramo, que vacia la
+     * cola, se la llevaba: en la build de la parte 7aa no salian las capturas de la gargola).
+     */
     private static void esperarA(String nombre, java.util.function.Predicate<Minecraft> cuando, Consumer<Minecraft> camara,
                                  java.util.function.Function<Minecraft, String> estado, int espera) {
+        if (planificando && !steps.isEmpty()) {
+            int at = steps.get(steps.size() - 1).at();
+            steps.add(new Step(at, "espera la captura " + nombre, m -> CAPTURAS_ESPERA.add(new CapturaEspera(nombre, cuando, camara, estado,
+                    new int[]{-1, ticks + espera}))));
+            return;
+        }
         CAPTURAS_ESPERA.add(new CapturaEspera(nombre, cuando, camara, estado, new int[]{-1, ticks + espera}));
     }
 
