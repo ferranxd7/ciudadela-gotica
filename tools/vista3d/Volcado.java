@@ -912,6 +912,40 @@ public class Volcado {
                     for (String id : new String[]{com.darkcraft.morvain.Teatro.MURO_PUERTA, com.darkcraft.morvain.Teatro.MURO_TRONO})
                         for (BlockPos q : com.darkcraft.morvain.Teatro.muro(id)) MUNDO.remove(q.asLong());
             }
+            case "morvain_nido" -> {
+                // el Nido de Ceniza (parte 7z): la repisa quemada con sus penascos, el tesoro, la Atalaya del Cuervo y el camino del
+                // santuario (-Dcaja=x0,z0,x1,z1 para un trozo)
+                String[] k = System.getProperty("caja", com.darkcraft.morvain.Nido.X0 + "," + com.darkcraft.morvain.Nido.Z0 + ","
+                        + com.darkcraft.morvain.Nido.X1 + "," + (com.darkcraft.morvain.Nido.Z1 + 22)).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 50);
+                com.darkcraft.morvain.Nido v = com.darkcraft.morvain.Nido.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("El nido: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " que esperan; "
+                        + v.calaveras + " calaveras, " + v.huesos + " huesos, " + v.lanzas + " lanzas, " + v.campanas + " campanas, " + v.velas
+                        + " velas; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas()) marcas.put((n == 0 ? "D" : o.variante() == 0 ? "G" : o.variante() == 1 ? "I" : "C") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarNido(lvl, v);
+            }
             case "morvain_grieta" -> {
                 // el Puente de la Grieta (parte 7s): la grieta con su sangre, el puente con su espadana, la puerta del norte, el paso,
                 // el cementerio, el humilladero, la hospederia con el libro 28 y el campamento de los penitentes
@@ -1495,6 +1529,58 @@ public class Volcado {
             }
             System.out.println("los del teatro: " + v.esperas().size() + ", sin llegar " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
         }
+    }
+
+    /**
+     * El Nido de Ceniza (parte 7z): desde el camino del santuario se llega a pie a la repisa, al tesoro, a la atalaya (al atril y al
+     * arcon) y, por la escalera de mano, a lo alto de la torre. Cada uno de los de alli con suelo y sin estar metido en un bloque.
+     */
+    static void andarNido(WorldGenLevel lvl, com.darkcraft.morvain.Nido v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+            BlockState s = MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+            return s.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || s.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                    || s.getBlock() instanceof net.minecraft.world.level.block.SnowLayerBlock ? aire : s;
+        };
+        int[] e = v.sitio("santuario");
+        var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], com.darkcraft.morvain.Nido.X0, com.darkcraft.morvain.Nido.Z0,
+                com.darkcraft.morvain.Nido.X1, com.darkcraft.morvain.Nido.Z1 + 20, 6_000_000);
+        StringBuilder sb = new StringBuilder("a pie desde el santuario: " + z0.celdas() + " celdas;");
+        for (String s : v.sitios().keySet()) {
+            if (s.equals("alto")) continue;
+            int[] q = v.sitio(s);
+            sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+        }
+        System.out.println(sb);
+        int malos = 0, chocan = 0, sinSuelo = 0;
+        for (var o : v.esperas()) {
+            if (!z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                malos++;
+                System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z());
+            }
+            for (int dy = 0; dy < 2; dy++) {
+                BlockState st = mundo.en(o.x(), o.y() + dy, o.z());
+                if (choca(st)) {
+                    chocan++;
+                    System.out.println("  " + o.grupo() + " metido en un bloque: " + o.x() + "," + (o.y() + dy) + "," + o.z() + " " + st);
+                }
+            }
+            BlockState abajo = mundo.en(o.x(), o.y() - 1, o.z());
+            if (!choca(abajo)) {
+                sinSuelo++;
+                System.out.println("  " + o.grupo() + " sin suelo: " + o.x() + "," + o.y() + "," + o.z() + " " + abajo);
+            }
+        }
+        System.out.println("los del nido: " + v.esperas().size() + ", sin llegar " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
+        // la repisa, despejada para el dragon: lo que hay por encima del suelo en un circulo de radio 26
+        int altos = 0;
+        for (int du = -26; du <= 26; du++)
+            for (int dv = -26; dv <= 26; dv++) {
+                if (du * du + dv * dv > 26 * 26) continue;
+                for (int y = com.darkcraft.morvain.Nido.SUELO + 6; y < com.darkcraft.morvain.Nido.SUELO + 40; y++)
+                    if (choca(mundo.en(com.darkcraft.morvain.Nido.CX + du, y, com.darkcraft.morvain.Nido.CZ + dv))) altos++;
+            }
+        System.out.println("por encima de la repisa (6 a 40 sobre el suelo, radio 26): " + altos + " bloques");
     }
 
     static void andarCerco(WorldGenLevel lvl, com.darkcraft.morvain.Cerco v, Map<Long, BlockState> antes) {

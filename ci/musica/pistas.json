@@ -279,5 +279,16 @@
     "aviso": "Music by Bobjt (OpenGameArt, CC0)",
     "uso": "Pell, el Bufon del Rey (la Sala de las Mascaras del Teatro Hundido)",
     "lufs": -16
+  },
+  {
+    "id": "dragon",
+    "pagina": "https://opengameart.org/content/the-fire-dragon",
+    "busca": "the_fire_dragon_loopv2",
+    "titulo": "The Fire Dragon",
+    "autor": "Umplix",
+    "licencia": "CC0",
+    "aviso": "Music by Umplix (OpenGameArt, CC0)",
+    "uso": "Vorthak, el Dragon de Ceniza (el Nido de Ceniza, en las Montanas Nevadas de Morvain)",
+    "lufs": -16
   }
 ]

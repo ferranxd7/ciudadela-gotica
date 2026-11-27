@@ -50,6 +50,7 @@ public final class SantuariosMorvain {
             s("faro_huesos", 5612, 4779), s("costillar", 5244, 3000),
             s("grieta", 24, 2181), s("altar", -1864, -1600), s("mirador", 2120, -480),
             s("ancla_sur", 50, 1080), s("teatro", Teatro.CX, Teatro.CZ + Teatro.SANT_V),
+            s("nido", Nido.CX + Nido.SANT_U, Nido.CZ + Nido.SANT_V),
     };
 
     /** El radio de la tarima y hasta donde se funde con el terreno. */

@@ -34,7 +34,7 @@ public final class Coleccion {
             "condestable", "erudito_aprendiz", "erudito_maestro", "erudito_custodio", "rectora", "salobre_redero", "salobre_bichero",
             "salobre_salinero", "ballenero", "penitente_flagelante", "penitente_portador", "penitente_turiferario",
             "pontifice", "marcado_rompedor", "marcado_caballero", "marcado_cazador", "aldric", "gigante_campana", "gigante_costilla",
-            "gigante_columna", "jinete", "bufon"};
+            "gigante_columna", "jinete", "bufon", "dragon"};
 
     /** El objeto de una clave de la coleccion (los libros de la cronica, con su texto). */
     public static ItemStack objeto(String clave) {
@@ -71,6 +71,11 @@ public final class Coleccion {
 
     private static final Map<String, LivingEntity> CRIATURAS = new HashMap<>();
     private static Level nivel;
+
+    /** Lo que mide de verdad (bloques) una criatura mucho mayor que su caja (el dragon: el cuello y la cola), o 0. */
+    public static float tamano(String clave) {
+        return "dragon".equals(clave) ? 22f : 0f;
+    }
 
     /** La criatura del bestiario para dibujarla (una por clave y por mundo). */
     public static LivingEntity criatura(String clave) {
@@ -171,6 +176,7 @@ public final class Coleccion {
                 case "aldric" -> DarkCraftMod.ALDRIC.get().create(lvl);
                 case "jinete" -> DarkCraftMod.JINETE.get().create(lvl);
                 case "bufon" -> DarkCraftMod.BUFON.get().create(lvl);
+                case "dragon" -> DarkCraftMod.DRAGON.get().create(lvl);
                 case "gigante_campana", "gigante_costilla", "gigante_columna" -> {
                     var k = DarkCraftMod.GIGANTE.get().create(lvl);
                     if (k != null) k.variante(c.endsWith("costilla") ? com.darkcraft.enemigos.Gigante.ULFGAR

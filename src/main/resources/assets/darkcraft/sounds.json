@@ -6031,5 +6031,215 @@
         "stream": true
       }
     ]
+  },
+  "sfx.dragon_rugido": {
+    "subtitle": "subtitles.darkcraft.sfx.dragon_rugido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/dragon_rugido_1",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "darkcraft:sfx/dragon_rugido_2",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "sfx.dragon_aleteo": {
+    "subtitle": "subtitles.darkcraft.sfx.dragon_aleteo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/dragon_aleteo_1",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "sfx.dragon_fuego": {
+    "subtitle": "subtitles.darkcraft.sfx.dragon_fuego",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/dragon_fuego_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "darkcraft:sfx/dragon_fuego_2",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "sfx.dragon_mordisco": {
+    "subtitle": "subtitles.darkcraft.sfx.dragon_mordisco",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/dragon_mordisco_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/dragon_mordisco_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.dragon_cola": {
+    "subtitle": "subtitles.darkcraft.sfx.dragon_cola",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/dragon_cola_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/dragon_cola_2",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "sfx.dragon_pisoton": {
+    "subtitle": "subtitles.darkcraft.sfx.dragon_pisoton",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/dragon_pisoton_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "darkcraft:sfx/dragon_pisoton_2",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "sfx.dragon_aterriza": {
+    "subtitle": "subtitles.darkcraft.sfx.dragon_aterriza",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/dragon_aterriza_1",
+        "attenuation_distance": 80
+      },
+      {
+        "name": "darkcraft:sfx/dragon_aterriza_2",
+        "attenuation_distance": 80
+      }
+    ]
+  },
+  "sfx.dragon_despega": {
+    "subtitle": "subtitles.darkcraft.sfx.dragon_despega",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/dragon_despega_1",
+        "attenuation_distance": 80
+      },
+      {
+        "name": "darkcraft:sfx/dragon_despega_2",
+        "attenuation_distance": 80
+      }
+    ]
+  },
+  "sfx.dragon_picado": {
+    "subtitle": "subtitles.darkcraft.sfx.dragon_picado",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/dragon_picado_1",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "darkcraft:sfx/dragon_picado_2",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "sfx.dragon_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.dragon_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/dragon_dolor_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/dragon_dolor_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.dragon_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.dragon_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/dragon_muerte_1",
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "sfx.dragon_respira": {
+    "subtitle": "subtitles.darkcraft.sfx.dragon_respira",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/dragon_respira_1",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.dragon_ascuas": {
+    "subtitle": "subtitles.darkcraft.sfx.dragon_ascuas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/dragon_ascuas_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "darkcraft:sfx/dragon_ascuas_2",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "dragon.voz.1": {
+    "subtitle": "subtitles.darkcraft.dragon.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:dragon/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "dragon.voz.2": {
+    "subtitle": "subtitles.darkcraft.dragon.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:dragon/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "dragon.voz.3": {
+    "subtitle": "subtitles.darkcraft.dragon.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:dragon/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "dragon.voz.4": {
+    "subtitle": "subtitles.darkcraft.dragon.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:dragon/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "dragon.voz.5": {
+    "subtitle": "subtitles.darkcraft.dragon.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:dragon/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "musica.dragon": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/dragon",
+        "stream": true
+      }
+    ]
   }
 }

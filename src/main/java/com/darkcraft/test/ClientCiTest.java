@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 123 * 60 * 20;
+    private static final int LIMIT = 128 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -122,6 +122,7 @@ public final class ClientCiTest {
             reyTick(mc);
             gavranTick(mc);
             escTick(mc);
+            dragonTick(mc);
             if (cineStart >= 0 && (ticks - cineStart) % 40 == 0 && ticks - cineStart < 20 * 90) {
                 log("  cinematica t=" + (ticks - cineStart) / 20 + " s: activa=" + ClientCine.active() + " voz=" + ClientCine.narrationPlaying()
                         + " musica=" + ClientMusic.debug());
@@ -6031,6 +6032,8 @@ public final class ClientCiTest {
         t = gigantes(t);
         // el Teatro Hundido y Pell, el Bufon del Rey, tras la puerta real tapiada (parte 7y)
         t = teatro(t);
+        // el Nido de Ceniza y Vorthak, el Dragon de Ceniza (parte 7z)
+        t = nido(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -10548,6 +10551,424 @@ public final class ClientCiTest {
                 comando(sp, "darkcraft teatro muro trono cerrar");
                 com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
                 log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoBufon(sp.server) + " | " + com.darkcraft.morvain.MurosIlusorios.estado(sp.serverLevel()));
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el Nido de Ceniza y Vorthak, el Dragon de Ceniza (parte 7z)
+
+    private static com.darkcraft.enemigos.Dragon dragonE() {
+        var e = com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.NIDO, com.darkcraft.morvain.MorvainEnemigos.dragon());
+        return e instanceof com.darkcraft.enemigos.Dragon d ? d : null;
+    }
+
+    /** El dragon que se ve en el cliente (el mas cercano). */
+    private static com.darkcraft.enemigos.Dragon dragonC(Minecraft mc) {
+        if (mc.level == null || mc.player == null) return null;
+        com.darkcraft.enemigos.Dragon mejor = null;
+        for (net.minecraft.world.entity.Entity e : mc.level.entitiesForRendering())
+            if (e instanceof com.darkcraft.enemigos.Dragon d && (mejor == null || d.distanceToSqr(mc.player) < mejor.distanceToSqr(mc.player))) mejor = d;
+        return mejor;
+    }
+
+    /** Lo que deja el dragon en su repisa: las bolas de fuego y las llamas del suelo. */
+    private static void limpiarDragon(ServerLevel lvl) {
+        int x = com.darkcraft.morvain.Nido.CX, z = com.darkcraft.morvain.Nido.CZ, y = com.darkcraft.morvain.Nido.PISO;
+        var caja = new net.minecraft.world.phys.AABB(x - 90, y - 30, z - 90, x + 90, y + 70, z + 90);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.ProyectilDragon.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.Llamas.class, caja)) e.discard();
+    }
+
+    /** Una captura que espera a que pase algo del dragon (lo que se ve en el cliente): pone la camara y saca la foto dos ticks despues. */
+    private record CapturaDragon(String nombre, java.util.function.Predicate<com.darkcraft.enemigos.Dragon> cuando,
+                                 java.util.function.BiConsumer<Minecraft, com.darkcraft.enemigos.Dragon> camara, int[] estado) {}
+
+    private static final List<CapturaDragon> CAPTURAS_DRAGON = new ArrayList<>();
+
+    /** Pone en cola una captura del dragon (espera como mucho {@code espera} ticks a que se cumpla). */
+    private static void esperarDragon(String nombre, java.util.function.Predicate<com.darkcraft.enemigos.Dragon> cuando,
+                                      java.util.function.BiConsumer<Minecraft, com.darkcraft.enemigos.Dragon> camara, int espera) {
+        CAPTURAS_DRAGON.add(new CapturaDragon(nombre, cuando, camara, new int[]{-1, ticks + espera}));
+    }
+
+    /** Cada tick: la primera captura del dragon que espera (sin pasos ni lineas del registro mientras espera). */
+    private static void dragonTick(Minecraft mc) {
+        if (CAPTURAS_DRAGON.isEmpty()) return;
+        CapturaDragon c = CAPTURAS_DRAGON.get(0);
+        var d = dragonC(mc);
+        if (c.estado()[0] >= 0) {
+            if (d != null) c.camara().accept(mc, d);
+            if (ticks - c.estado()[0] >= 2) {
+                log("  " + c.nombre() + ": " + estadoDragonC(d) + " | aleteo " + com.darkcraft.client.enemigos.DragonCliente.aleteoSonando() + " | musica "
+                        + ClientMusic.debug());
+                shot(mc, c.nombre());
+                CAPTURAS_DRAGON.remove(0);
+            }
+            return;
+        }
+        if (d != null && c.cuando().test(d)) {
+            c.camara().accept(mc, d);
+            c.estado()[0] = ticks;
+        } else if (ticks > c.estado()[1]) {
+            log("  " + c.nombre() + ": NO LLEGO (" + estadoDragonC(d) + ")");
+            CAPTURAS_DRAGON.remove(0);
+        }
+    }
+
+    private static String estadoDragonC(com.darkcraft.enemigos.Dragon d) {
+        if (d == null) return "no se ve el dragon";
+        int a = d.accionVista();
+        return String.format(java.util.Locale.ROOT, "en el cliente: %.1f, %.1f, %.1f giro %.0f, %s, accion %s (t %d), muerte %d", d.getX(), d.getY(), d.getZ(), d.getYRot(),
+                d.vuela() ? "volando" : "en tierra", com.darkcraft.enemigos.DragonAnims.NOMBRES[Math.max(0, Math.min(a, com.darkcraft.enemigos.DragonAnims.NOMBRES.length - 1))],
+                d.accionDesde < 0 ? -1 : d.tickCount - d.accionDesde, d.deathTime);
+    }
+
+    /** La accion que se ve del dragon y cuanto lleva (-1 si ninguna). */
+    private static int tAccion(com.darkcraft.enemigos.Dragon d, int accion) {
+        return d.accionVista() == accion && d.accionDesde >= 0 ? d.tickCount - d.accionDesde : -1;
+    }
+
+    /** La camara de lado al dragon: a {@code lado} a su derecha, {@code atras} por detras y {@code alto} por encima, mirando a su cuerpo. */
+    private static void camaraLadoDragon(Minecraft m, com.darkcraft.enemigos.Dragon d, double lado, double atras, double alto) {
+        Vec3 f = Vec3.directionFromRotation(0, d.getYRot());
+        Vec3 pos = new Vec3(d.getX() - f.z * lado - f.x * atras, d.getY() + alto, d.getZ() + f.x * lado - f.z * atras);
+        verDesde(m, pos, new Vec3(d.getX() + f.x * 3, d.getY() + 3, d.getZ() + f.z * 3));
+    }
+
+    /** La camara desde los ojos del jugador mirando al dragon (para verle volar desde la repisa). */
+    private static void camaraJugadorDragon(Minecraft m, com.darkcraft.enemigos.Dragon d) {
+        if (m.player == null) return;
+        Vec3 ojo = m.player.getEyePosition();
+        Vec3 dd = d.position().add(0, 3, 0).subtract(ojo);
+        Vec3 atras = new Vec3(dd.x, 0, dd.z).normalize().scale(-3);
+        verDesde(m, ojo.add(atras).add(0, 1.0, 0), d.position().add(0, 2.5, 0));
+    }
+
+    /** Un golpe del dragon visto de lado: el en el centro de la repisa mirando al sur (quieto: solo lo que se le manda), el jugador a {@code dist}. */
+    private static int golpeDragon(int t, String nombre, int accion, double dist, int[] capturas, String[] nombres) {
+        final double cx = com.darkcraft.morvain.Nido.CX + 0.5, cz = com.darkcraft.morvain.Nido.CZ + 0.5;
+        final int Y = com.darkcraft.morvain.Nido.PISO;
+        atTicks(t, "Vorthak: " + nombre, m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var d = dragonE();
+                if (d == null) return;
+                limpiarDragon(sp.serverLevel());
+                aPelear(sp, true);
+                d.quieta = true;
+                d.moveTo(cx, Y, cz, 0f, 0f);
+                d.setYRot(0f);
+                d.yBodyRot = d.yHeadRot = 0f;
+                // (detras: dist negativa)
+                irMirando(sp, cx, Y, cz + dist, cx, Y + 3, cz, false);
+                d.setTarget(sp);
+                d.empezar(accion);
+                verDesdeServidor = new Vec3(cx - 24, Y + 8, cz + 4);
+                miraServidor = new Vec3(cx, Y + 3, cz + 3);
+            });
+        });
+        atTicks(t + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        for (int i = 0; i < capturas.length; i++) {
+            final String cap = nombres[i];
+            atTicks(t + capturas[i], "captura: " + cap, m -> {
+                server(m, sp -> log("  " + cap + ": " + estadoE(dragonE()) + " | " + (dragonE() == null ? "" : dragonE().estado()) + " | jugador " + fpos(sp)
+                        + " vida " + Math.round(sp.getHealth()) + (sp.isOnFire() ? ", ardiendo" : "") + " | temblor "
+                        + String.format(java.util.Locale.ROOT, "%.2f", com.darkcraft.client.enemigos.GiganteCliente.temblor())));
+                shot(m, cap);
+            });
+        }
+        return t + capturas[capturas.length - 1];
+    }
+
+    /**
+     * El Nido de Ceniza y Vorthak, el Dragon de Ceniza: el nido desde el camino del santuario, la repisa desde lo alto (el tesoro con
+     * el dragon dormido encima), la Atalaya del Cuervo por dentro (el atril con el libro 33) y el dragon dormido de cerca; en
+     * supervivencia: se despierta, habla (su barra, su musica) y ruge; sus golpes de lado (el mordisco, el zarpazo, el aliento de
+     * fuego, el coletazo, el pisoton, el aletazo); en el aire: despega, vuela sobre la repisa, el vuelo rasante echando fuego, las
+     * bolas de fuego, el picado (la marca, la caida y la onda) y, a media vida, la lluvia de ascuas; cae del cielo (el cartel y las
+     * brasas que se apagan); y el bestiario. Al acabar, otra vez dormido en su oro.
+     */
+    private static int nido(int T) {
+        final int CX = com.darkcraft.morvain.Nido.CX, CZ = com.darkcraft.morvain.Nido.CZ, PISO = com.darkcraft.morvain.Nido.PISO;
+        final double TX = CX + com.darkcraft.morvain.Nido.TESORO_U + 0.5, TZ = CZ + com.darkcraft.morvain.Nido.TESORO_V + 0.5;
+        final String SITIO = com.darkcraft.morvain.MorvainEnemigos.NIDO;
+        final double cx = CX + 0.5, cz = CZ + 0.5;
+        int t = T;
+        atTicks(t, "Nido: el camino desde el santuario", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_DRAGON.clear();
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft dragon volver");
+                comando(sp, "darkcraft nido enemigos volver");
+                int[] q = com.darkcraft.morvain.Nido.get().sitio("camino");
+                irMirando(sp, q[0] + 0.5, q[1] + 1, q[2] + 0.5, TX, PISO + 4, TZ, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura: el nido desde el camino", m -> {
+            shot(m, "cliente_mv490_nido_camino");
+            server(m, sp -> log("  el nido: " + com.darkcraft.morvain.MorvainEnemigos.estadoNido(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 4;
+        atTicks(t, "Nido: la repisa desde lo alto", m -> server(m, sp -> {
+            int[] q = com.darkcraft.morvain.Nido.get().sitio("alto");
+            irMirando(sp, q[0] + 0.5, q[1], q[2] + 0.5, TX, PISO + 2, TZ, true);
+        }));
+        t += 60;
+        atTicks(t, "captura: la repisa, el tesoro y el dragon dormido", m -> {
+            shot(m, "cliente_mv491_nido_repisa");
+            server(m, sp -> log("  la repisa: " + com.darkcraft.morvain.MorvainEnemigos.estadoDragon(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 4;
+        atTicks(t, "Nido: la Atalaya del Cuervo por dentro", m -> server(m, sp -> {
+            sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false));
+            int[] at = com.darkcraft.morvain.Nido.get().sitio("atril");
+            irMirando(sp, at[0] + 0.5, at[1], at[2] + 3.6, at[0] + 0.5, at[1] + 0.8, at[2] + 0.5, false);
+        }));
+        t += 40;
+        atTicks(t, "captura: la atalaya y el atril", m -> {
+            shot(m, "cliente_mv492_atalaya");
+            server(m, sp -> log("  la atalaya: " + com.darkcraft.morvain.Nido.resumen(sp.serverLevel()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)
+                    + " | logro nido " + com.darkcraft.story.Logros.tiene(sp, "nido")));
+        });
+        t += 4;
+        atTicks(t, "Nido: el dragon dormido de cerca", m -> server(m, sp -> {
+            sp.removeAllEffects();
+            var d = dragonE();
+            double x = d != null ? d.getX() : TX, z = d != null ? d.getZ() : TZ;
+            irMirando(sp, x + 13, PISO + 4, z + 9, x, PISO + 2.5, z, true);
+        }));
+        t += 50;
+        atTicks(t, "captura: Vorthak dormido", m -> {
+            shot(m, "cliente_mv493_vorthak_dormido");
+            server(m, sp -> log("  dormido: " + estadoE(dragonE()) + " | " + (dragonE() == null ? "" : dragonE().estado())));
+        });
+        t += 4;
+        // ---- en supervivencia, en medio de la repisa: se despierta, habla, se levanta y ruge (su barra y su musica)
+        final int W = t;
+        final int dura = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Dragon.VOZ_BASE + 1);
+        atTicks(W, "Vorthak: en supervivencia en medio de su repisa", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                irMirando(sp, cx, PISO, cz, TX, PISO + 3, TZ, false);
+                var d = dragonE();
+                if (d != null) d.setTarget(sp);
+            });
+        });
+        atTicks(W + 2, "camara: de lado", m -> verDesde(m, new Vec3(TX + 16, PISO + 6, TZ + 14), new Vec3(TX, PISO + 3, TZ)));
+        atTicks(W + 46, "captura: se despierta (y habla)", m -> {
+            server(m, sp -> log("  al despertar: " + estadoE(dragonE()) + " | " + (dragonE() == null ? "" : dragonE().estado())));
+            log("  dragon: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv494_vorthak_despierta");
+        });
+        atTicks(W + dura + 20, "captura: ruge", m -> {
+            server(m, sp -> log("  ruge: " + estadoE(dragonE()) + " | jugador " + fpos(sp) + (sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) ? ", lento" : "")));
+            shot(m, "cliente_mv495_vorthak_ruge");
+        });
+        atTicks(W + dura + 60, "Vorthak: quieto (solo lo que se le manda)", m -> server(m, sp -> {
+            var d = dragonE();
+            if (d != null) d.quieta = true;
+        }));
+        t = W + dura + 70;
+        // ---- sus golpes en tierra, de lado
+        t = golpeDragon(t, "el mordisco", com.darkcraft.enemigos.DragonAnims.MORDISCO, 7.5, new int[]{15}, new String[]{"cliente_mv496_vorthak_mordisco"}) + 30;
+        t = golpeDragon(t, "el zarpazo", com.darkcraft.enemigos.DragonAnims.ZARPAZO, 4.5, new int[]{14}, new String[]{"cliente_mv497_vorthak_zarpazo"}) + 30;
+        t = golpeDragon(t, "el aliento", com.darkcraft.enemigos.DragonAnims.ALIENTO, 12, new int[]{30, 48}, new String[]{"cliente_mv498_vorthak_aliento",
+                "cliente_mv499_vorthak_aliento_barre"}) + 40;
+        t = golpeDragon(t, "el coletazo", com.darkcraft.enemigos.DragonAnims.COLETAZO, -8, new int[]{19}, new String[]{"cliente_mv500_vorthak_coletazo"}) + 30;
+        t = golpeDragon(t, "el pisoton", com.darkcraft.enemigos.DragonAnims.PISOTON, 4.5, new int[]{16, 25}, new String[]{"cliente_mv501_vorthak_alzado",
+                "cliente_mv502_vorthak_pisoton"}) + 30;
+        t = golpeDragon(t, "el aletazo", com.darkcraft.enemigos.DragonAnims.ALETAZO, 6, new int[]{17}, new String[]{"cliente_mv503_vorthak_aletazo"}) + 40;
+        // ---- en el aire
+        final int A = t;
+        atTicks(A, "Vorthak: despega", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var d = dragonE();
+                if (d == null) return;
+                limpiarDragon(sp.serverLevel());
+                aPelear(sp, true);
+                d.quieta = true;
+                d.moveTo(cx - 6, PISO, cz - 6, 0f, 0f);
+                irMirando(sp, cx + 4, PISO, cz + 6, cx - 6, PISO + 3, cz - 6, false);
+                d.setTarget(sp);
+                d.despegar();
+            });
+            esperarDragon("cliente_mv504_vorthak_despega", d -> tAccion(d, com.darkcraft.enemigos.DragonAnims.DESPEGA) >= 20,
+                    (mm, d) -> camaraLadoDragon(mm, d, 26, 4, 3), 200);
+            esperarDragon("cliente_mv505_vorthak_vuela", d -> d.vuela() && d.accionVista() == 0 && d.getY() > PISO + 14,
+                    (mm, d) -> camaraJugadorDragon(mm, d), 400);
+        });
+        t = A + 260;
+        atTicks(t, "Vorthak: el vuelo rasante", m -> {
+            server(m, sp -> {
+                var d = dragonE();
+                if (d == null) return;
+                sp.setHealth(sp.getMaxHealth());
+                log("  rasante: empieza " + d.maniobra("rasante") + " | " + d.estado());
+            });
+            esperarDragon("cliente_mv506_vorthak_rasante", d -> tAccion(d, com.darkcraft.enemigos.DragonAnims.RASANTE) >= com.darkcraft.enemigos.DragonAnims.RASANTE_DESDE + 10,
+                    (mm, d) -> camaraLadoDragon(mm, d, 30, -10, 4), 600);
+        });
+        t += 640;
+        atTicks(t, "Vorthak: las bolas de fuego", m -> {
+            server(m, sp -> {
+                var d = dragonE();
+                if (d == null) return;
+                limpiarDragon(sp.serverLevel());
+                sp.setHealth(sp.getMaxHealth());
+                sp.clearFire();
+                irMirando(sp, cx + 4, PISO, cz + 6, cx, PISO + 10, cz, false);
+                log("  bolas: empieza " + d.maniobra("bolas") + " | " + d.estado());
+            });
+            esperarDragon("cliente_mv507_vorthak_bolas", d -> {
+                Minecraft mc = Minecraft.getInstance();
+                return mc.level != null && !mc.level.getEntitiesOfClass(com.darkcraft.enemigos.ProyectilDragon.class, d.getBoundingBox().inflate(70)).isEmpty();
+            }, (mm, d) -> {
+                var bolas = mm.level.getEntitiesOfClass(com.darkcraft.enemigos.ProyectilDragon.class, d.getBoundingBox().inflate(70));
+                Vec3 b = bolas.isEmpty() ? d.position() : bolas.get(0).position();
+                Vec3 p = mm.player.position();
+                Vec3 medio = b.add(p).scale(0.5);
+                Vec3 dir = new Vec3(p.x - b.x, 0, p.z - b.z);
+                Vec3 lado = dir.lengthSqr() < 1e-3 ? new Vec3(1, 0, 0) : new Vec3(-dir.z, 0, dir.x).normalize();
+                verDesde(mm, medio.add(lado.scale(22)).add(0, 4, 0), medio);
+            }, 500);
+        });
+        t += 420;
+        atTicks(t, "Vorthak: el picado", m -> {
+            server(m, sp -> {
+                var d = dragonE();
+                if (d == null) return;
+                limpiarDragon(sp.serverLevel());
+                sp.setHealth(sp.getMaxHealth());
+                sp.clearFire();
+                irMirando(sp, cx + 4, PISO, cz + 6, cx, PISO + 10, cz, false);
+                log("  picado: empieza " + d.maniobra("picado") + " | " + d.estado());
+            });
+            esperarDragon("cliente_mv508_vorthak_marca", d -> {
+                var s = dragonE();
+                return s != null && s.maniobraActual().equals("picado (marca)");
+            }, (mm, d) -> verDesde(mm, mm.player.position().add(14, 7, 10), mm.player.position().add(0, 1, 0)), 500);
+            esperarDragon("cliente_mv509_vorthak_picado", d -> tAccion(d, com.darkcraft.enemigos.DragonAnims.PICADO) >= 10,
+                    (mm, d) -> verDesde(mm, mm.player.position().add(18, 5, 12), d.position().add(0, 2, 0)), 300);
+            esperarDragon("cliente_mv510_vorthak_aterriza", d -> tAccion(d, com.darkcraft.enemigos.DragonAnims.ATERRIZA) >= 6,
+                    (mm, d) -> camaraLadoDragon(mm, d, 22, 2, 6), 200);
+        });
+        t += 520;
+        atTicks(t, "Vorthak: a media vida, la lluvia de ascuas", m -> {
+            server(m, sp -> {
+                var d = dragonE();
+                if (d == null) return;
+                limpiarDragon(sp.serverLevel());
+                sp.setHealth(sp.getMaxHealth());
+                sp.clearFire();
+                irMirando(sp, cx + 18, PISO, cz + 16, cx, PISO + 14, cz, false);
+                d.mediaVida();
+                log("  media vida: " + d.estado());
+            });
+        });
+        atTicks(t + 70, "Vorthak: las ascuas", m -> {
+            server(m, sp -> {
+                var d = dragonE();
+                if (d == null) return;
+                log("  ascuas: empieza " + d.maniobra("ascuas") + " | segunda " + d.segunda() + " | " + d.estado());
+            });
+            esperarDragon("cliente_mv511_vorthak_ascuas", d -> tAccion(d, com.darkcraft.enemigos.DragonAnims.ASCUAS) >= 22,
+                    (mm, d) -> verDesde(mm, mm.player.getEyePosition().add(0, 1, 0), d.position().add(0, 4, 0)), 500);
+            esperarDragon("cliente_mv512_vorthak_lluvia", d -> d.vuela() && d.accionVista() == 0 && dragonE() != null && dragonE().ascuasEnCamino() > 4,
+                    (mm, d) -> verDesde(mm, mm.player.getEyePosition().add(0, 2, 0), new Vec3(cx, PISO + 1, cz)), 300);
+        });
+        t += 70 + 700;
+        // ---- cae del cielo: se desploma; el cartel; las brasas se apagan
+        final int C = t;
+        atTicks(C, "Vorthak: alza el vuelo para caer", m -> server(m, sp -> {
+            var d = dragonE();
+            if (d == null) return;
+            limpiarDragon(sp.serverLevel());
+            sp.removeAllEffects();
+            sp.clearFire();
+            sp.setGameMode(GameType.CREATIVE);
+            log("  antes de caer: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "dragon") + " | " + d.estado());
+            irMirando(sp, cx + 20, PISO + 1, cz + 18, cx, PISO + 8, cz, false);
+            if (!d.vuela()) d.despegar();
+        }));
+        atTicks(C + 110, "Vorthak: cae", m -> {
+            server(m, sp -> {
+                var d = dragonE();
+                if (d == null) return;
+                d.setTarget(sp);
+                d.invulnerableTime = 0;
+                d.hurt(sp.damageSources().playerAttack(sp), 99999f);
+                log("  Vorthak cae: vivo " + d.isAlive() + ", volando " + d.vuela());
+            });
+            esperarDragon("cliente_mv513_vorthak_cae", d -> d.deathTime >= 8,
+                    (mm, d) -> camaraLadoDragon(mm, d, 28, 6, 2), 200);
+            esperarDragon("cliente_mv514_vorthak_muerto", d -> d.deathTime >= 95 && !d.vuela(),
+                    (mm, d) -> camaraLadoDragon(mm, d, 20, -4, 7), 300);
+        });
+        atTicks(C + 110 + 84, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 110 + 116, "captura: JEFE ABATIDO", m -> {
+            log("  dragon: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  tras caer Vorthak: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "dragon")
+                    + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoDragon(sp.server)));
+            shot(m, "cliente_mv515_vorthak_abatido");
+        });
+        final int fin = Math.max(com.darkcraft.enemigos.DragonAnims.TICKS[com.darkcraft.enemigos.DragonAnims.MORIR] + 40,
+                com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Dragon.VOZ_BASE + 5) + 110);
+        atTicks(C + 110 + 120, "las brasas que se apagan", m -> {
+            m.options.hideGui = true;
+            esperarDragon("cliente_mv516_vorthak_ceniza", d -> d.deathTime >= fin - 14, (mm, d) -> camaraLadoDragon(mm, d, 18, -6, 6), 300);
+        });
+        t = C + 110 + Math.max(200, fin + 40);
+        atTicks(t, "el bestiario: Vorthak", m -> {
+            CAPTURAS_DRAGON.clear();
+            enPrimeraPersona(m);
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("dragon")));
+        });
+        t += 18;
+        atTicks(t, "captura: Vorthak en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv517_bestiario_dragon");
+        });
+        t += 4;
+        atTicks(t, "Nido: fin (Vorthak vuelve a dormir en su oro, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_DRAGON.clear();
+            server(m, sp -> {
+                limpiarDragon(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                var d = dragonE();
+                if (d != null) d.quieta = false;
+                comando(sp, "darkcraft dragon volver");
+                comando(sp, "darkcraft nido enemigos volver");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoDragon(sp.server));
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

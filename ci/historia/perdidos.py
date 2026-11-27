@@ -12,7 +12,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
          22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain", 27: "morvain",
-         28: "morvain", 29: "morvain", 30: "morvain", 31: "valdrenn", 32: "morvain"}
+         28: "morvain", 29: "morvain", 30: "morvain", 31: "valdrenn", 32: "morvain", 33: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -466,6 +466,17 @@ LIBROS = {
    "ROYAL THEATER OF MORVAIN. Tonight, before His Majesty and the whole court: 'The Paper Crown', a comedy in three acts. With Pell, the King's jester, in every part no one else wanted. Music by the drums of the guard. No swords allowed in the stands.",
    "Act one: the king who could not laugh. Act two: the three Pells (let no one know which one is real). Act three: the royal door, through which the King comes out...\n\n(In another ink) Rehearsed a thousand times. The King has promised to come. The King always comes.",
    "(On the back, in a shaking hand) The sky turned red in the middle of the second act. Everyone ran. They bricked up the royal door with me behind it, and the orchestra burned. I am still waiting for the third act. If anyone reads this: the door is not made of stone. It never was. Strike it and come in.\n\nPell"]),
+ },
+ # parte 7z: el cuaderno del vigia de la Atalaya del Cuervo, en el atril de lo que queda de la torre (el Nido de Ceniza)
+ 33: {
+  "es": ("El cuaderno del vigía", "Odo, vigía de la Atalaya del Cuervo", [
+   "Treinta años guardando el paso con Vorthak. Él vuela al amanecer sobre las cumbres y nosotros encendemos la almenara cuando pasa. Los reyes le pagan en oro, una carreta cada invierno, y él duerme encima. Dice que el oro está caliente como el sol de antes. Nunca nos ha tocado un pelo.",
+   "La noche del cielo rojo Vorthak no volvió a su repisa: daba vueltas y vueltas mirando arriba, rugiendo al cielo, como si le hubieran robado algo. Al amanecer bajó sobre la torre. No nos miraba a nosotros. Le quemaba algo por dentro y lo echaba por la boca.",
+   "La torre ardió con la guarnición dentro. Yo estaba en la almenara y me escondí bajo las losas. Los que suben a matarlo acaban en su oro. Si alguien lee esto: detrás de las rocas no llega su fuego, y cuando le pesan las alas baja a tierra. No le mires a los ojos.\n\nOdo"]),
+  "en": ("The Watchman's Notebook", "Odo, watchman of the Raven's Watchtower", [
+   "Thirty years guarding the pass alongside Vorthak. He flies over the peaks at dawn and we light the beacon as he passes. The kings pay him in gold, a cartload every winter, and he sleeps on it. He says the gold is warm like the sun used to be. He has never harmed a hair on our heads.",
+   "On the night of the red sky Vorthak did not return to his ledge: he circled and circled, looking up, roaring at the sky, as if something had been stolen from him. At dawn he came down upon the tower. He was not looking at us. Something was burning inside him, and he poured it out of his mouth.",
+   "The tower burned with the garrison inside. I was at the beacon and hid beneath the flagstones. Those who climb up to kill him end up in his gold. If anyone reads this: his fire does not reach behind the rocks, and when his wings grow heavy he comes down to earth. Do not look him in the eye.\n\nOdo"]),
  },
 }
 

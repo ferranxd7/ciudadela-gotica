@@ -450,6 +450,21 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_BUFON_DOLOR = sound("sfx.bufon_dolor");
     public static final RegistryObject<SoundEvent> SFX_BUFON_MUERTE = sound("sfx.bufon_muerte");
     public static final RegistryObject<SoundEvent> SFX_MURO_ILUSORIO = sound("sfx.muro_ilusorio");
+    // ---- Vorthak, el Dragon de Ceniza (parte 7z): el rugido, el aleteo (en bucle), el aliento, el mordisco, la cola, el pisoton,
+    // aterrizar, despegar, el picado, el quejido, la muerte, la respiracion dormido (en bucle) y la lluvia de ascuas
+    public static final RegistryObject<SoundEvent> SFX_DRAGON_RUGIDO = sound("sfx.dragon_rugido");
+    public static final RegistryObject<SoundEvent> SFX_DRAGON_ALETEO = sound("sfx.dragon_aleteo");
+    public static final RegistryObject<SoundEvent> SFX_DRAGON_FUEGO = sound("sfx.dragon_fuego");
+    public static final RegistryObject<SoundEvent> SFX_DRAGON_MORDISCO = sound("sfx.dragon_mordisco");
+    public static final RegistryObject<SoundEvent> SFX_DRAGON_COLA = sound("sfx.dragon_cola");
+    public static final RegistryObject<SoundEvent> SFX_DRAGON_PISOTON = sound("sfx.dragon_pisoton");
+    public static final RegistryObject<SoundEvent> SFX_DRAGON_ATERRIZA = sound("sfx.dragon_aterriza");
+    public static final RegistryObject<SoundEvent> SFX_DRAGON_DESPEGA = sound("sfx.dragon_despega");
+    public static final RegistryObject<SoundEvent> SFX_DRAGON_PICADO = sound("sfx.dragon_picado");
+    public static final RegistryObject<SoundEvent> SFX_DRAGON_DOLOR = sound("sfx.dragon_dolor");
+    public static final RegistryObject<SoundEvent> SFX_DRAGON_MUERTE = sound("sfx.dragon_muerte");
+    public static final RegistryObject<SoundEvent> SFX_DRAGON_RESPIRA = sound("sfx.dragon_respira");
+    public static final RegistryObject<SoundEvent> SFX_DRAGON_ASCUAS = sound("sfx.dragon_ascuas");
     public static final RegistryObject<SoundEvent> SFX_TEATRO_APLAUSO = sound("sfx.teatro_aplauso");
     public static final RegistryObject<SoundEvent> AMBIENTE_ALTAR = sound("ambiente.altar");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
@@ -538,6 +553,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_GIGANTE = sound("musica.gigante");
     public static final RegistryObject<SoundEvent> MUSICA_JINETE = sound("musica.jinete");
     public static final RegistryObject<SoundEvent> MUSICA_BUFON = sound("musica.bufon");
+    public static final RegistryObject<SoundEvent> MUSICA_DRAGON = sound("musica.dragon");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -610,6 +626,9 @@ public class DarkCraftMod {
     /** Frases de Pell, el Bufon del Rey (1..5, parte 7y). */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] BUFON_VOZ = new RegistryObject[6];
+    /** Frases de Vorthak, el Dragon de Ceniza (1..5, parte 7z). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] DRAGON_VOZ = new RegistryObject[6];
 
     /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
     @SuppressWarnings("unchecked")
@@ -631,6 +650,7 @@ public class DarkCraftMod {
         for (int i = 1; i < GIGANTE_VOZ.length; i++) GIGANTE_VOZ[i] = sound("gigante.voz." + i);
         for (int i = 1; i < JINETE_VOZ.length; i++) JINETE_VOZ[i] = sound("jinete.voz." + i);
         for (int i = 1; i < BUFON_VOZ.length; i++) BUFON_VOZ[i] = sound("bufon.voz." + i);
+        for (int i = 1; i < DRAGON_VOZ.length; i++) DRAGON_VOZ[i] = sound("dragon.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -718,6 +738,7 @@ public class DarkCraftMod {
     /** Lo que tira Pell, el Bufon del Rey (parte 7y): solo sirven para dibujar sus cuchillos y sus bolas de fuego. */
     public static final RegistryObject<Item> CUCHILLO_BUFON = ITEMS.register("cuchillo_bufon", () -> new Item(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> BOLA_BUFON = ITEMS.register("bola_bufon", () -> new Item(new Item.Properties().stacksTo(16)));
+    public static final RegistryObject<Item> BOLA_DRAGON = ITEMS.register("bola_dragon", () -> new Item(new Item.Properties().stacksTo(16)));
 
     /** Las piezas de La Garza Gris (parte 3b): no se llevan en el inventario; se dibujan en el mundo y en los carteles. */
     public static final RegistryObject<Item> PIEZA_VELA = ITEMS.register("pieza_vela", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
@@ -856,6 +877,14 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.ProyectilBufon>> PROYECTIL_BUFON = ENTITIES.register("proyectil_bufon",
             () -> EntityType.Builder.<com.darkcraft.enemigos.ProyectilBufon>of(com.darkcraft.enemigos.ProyectilBufon::new, MobCategory.MISC)
                     .sized(0.3f, 0.3f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":proyectil_bufon"));
+    // ---- Vorthak, el Dragon de Ceniza, el jefe del Nido de Ceniza (parte 7z): grande (la caja es el cuerpo: el cuello, la cola y
+    // las alas quedan fuera) y va deprisa por el aire (la posicion se manda cada tick); y su bola de fuego
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Dragon>> DRAGON = ENTITIES.register("dragon",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Dragon>of(com.darkcraft.enemigos.Dragon::new, MobCategory.MONSTER)
+                    .sized(5.2f, 4.4f).fireImmune().clientTrackingRange(16).updateInterval(1).build(MODID + ":dragon"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.ProyectilDragon>> PROYECTIL_DRAGON = ENTITIES.register("proyectil_dragon",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.ProyectilDragon>of(com.darkcraft.enemigos.ProyectilDragon::new, MobCategory.MISC)
+                    .sized(0.8f, 0.8f).noSave().clientTrackingRange(12).updateInterval(1).build(MODID + ":proyectil_dragon"));
     // ---- Ser Lucan, el Jinete Nocturno del camino de nubes (parte 7x): el caballo y su jinete, una sola entidad (va deprisa:
     // la posicion se manda cada tick para que el galope se vea suave)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Jinete>> JINETE = ENTITIES.register("jinete",
@@ -1077,6 +1106,7 @@ public class DarkCraftMod {
         e.put(GIGANTE.get(), com.darkcraft.enemigos.Gigante.atributos().build());
         e.put(JINETE.get(), com.darkcraft.enemigos.Jinete.atributos().build());
         e.put(BUFON.get(), com.darkcraft.enemigos.Bufon.atributos().build());
+        e.put(DRAGON.get(), com.darkcraft.enemigos.Dragon.atributos().build());
         e.put(MARCADO.get(), com.darkcraft.enemigos.Marcado.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());

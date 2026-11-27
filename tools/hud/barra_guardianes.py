@@ -58,9 +58,14 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   cada punta; en el centro su mascara (mitad blanca, mitad negra, los ojos encendidos y la sonrisa) bajo el gorro de tres puntas
   con cascabeles, y debajo dos dagas cruzadas; relleno de rombos rojos que corren; confeti que cae al recibir dano.
 
+  Vorthak, el Dragon de Ceniza (parte 7z): su lomo de punta a punta (escamas de carbon con grietas de brasa y la fila de puas de
+  hueso por encima), la hoja de la punta de la cola a la izquierda y una garra a la derecha; en el centro su cabeza de frente, con
+  los cuernos hacia atras, las cejas de hueso, los ojos de oro fundido y brasas en los ollares; relleno de brasas que corren entre
+  escamas negras; ascuas y ceniza que suben al recibir dano.
+
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
 abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png, pontifice_barra.png, aldric_barra.png,
-gigante_barra.png, jinete_barra.png y bufon_barra.png (256x128):
+gigante_barra.png, jinete_barra.png, bufon_barra.png y dragon_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -2045,6 +2050,181 @@ def confeti():
     return img
 
 
+# ---------------------------------------------------------------- Vorthak, el Dragon de Ceniza (parte 7z)
+
+DR_E = [hexc(c) for c in ("0b0a0a", "131111", "1b1817", "24201e", "2e2926", "3a3430", "48413b")]
+DR_C = [hexc(c) for c in ("4e4944", "67615a", "827a71", "9d948a", "b6ada2")]
+DR_H = [hexc(c) for c in ("3a332b", "5c5345", "82765f", "a89b80", "c9bea3", "e2d9c2")]
+DR_B = [hexc(c) for c in ("4a0e02", "8a2204", "d24c0c", "ff8a26", "ffc35a", "fff0b0")]
+DR_O = [hexc(c) for c in ("7a3a06", "ff9a20", "ffd24a", "fff4b8")]
+
+
+def escama_dragon(x, y, n):
+    """El color de las escamas del lomo en (x, y): filas de escamas redondas (la de arriba de cada una, con brillo de ceniza) y
+    grietas de brasa que las cruzan."""
+    fila = y // 3
+    sx = (x + (fila % 2) * 3) % 6
+    sy = y % 3
+    c = DR_E[3]
+    if sy == 0 and 1 <= sx <= 4:
+        c = DR_C[0] if sx in (2, 3) else DR_E[5]
+    elif sy == 2 or sx == 0:
+        c = DR_E[1]
+    v = n(x * 0.12, y * 0.9)
+    if v > 0.86:
+        c = DR_B[3] if v > 0.93 else DR_B[2]
+    elif v > 0.8:
+        c = DR_B[1]
+    return c
+
+
+def marco_dragon():
+    """El lomo de Vorthak de punta a punta (escamas de carbon con grietas de brasa y su fila de puas de hueso por encima), la
+    hoja de la punta de la cola a la izquierda y una garra a la derecha; en el centro su cabeza de frente, con los cuernos hacia
+    atras, las cejas de hueso, los ojos de oro fundido y brasas en los ollares."""
+    n = noise2(331)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    ya0, ya1 = FY0 - 4, FY1 + 3
+    x0, x1 = 13, FW - 13
+    for y in range(ya0, ya1 + 1):
+        for x in range(x0, x1 + 1):
+            c = escama_dragon(x, y, n)
+            if y == ya0:
+                c = mix(c, DR_C[1], 0.4)
+            if y == ya1:
+                c = mix(c, DR_E[0], 0.6)
+            put(img, x, y, c)
+    for x in range(x0, x1 + 1):
+        put(img, x, ya0 - 1, OUT)
+        put(img, x, ya1 + 1, OUT)
+    # las puas del espinazo, inclinadas hacia la cola (a la izquierda)
+    for px in range(x0 + 6, x1 - 4, 9):
+        if abs(px - FW // 2) < 22:
+            continue
+        for k in range(4):
+            for w in range(max(1, 3 - k)):
+                put(img, px - k + w, ya0 - 2 - k, DR_H[4] if w == 0 else DR_H[2])
+        put(img, px - 4, ya0 - 5, DR_H[5])
+    # el hueco del relleno, limpio
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, OUT)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # la punta de la cola (izquierda): una hoja de hueso negro con los cantos de brasa
+    my = (ya0 + ya1) / 2
+    for x in range(0, x0 + 1):
+        semi = 6.5 * math.sin(math.pi * min(1.0, (x + 1) / (x0 + 2))) + 0.5
+        for y in range(int(my - semi) - 1, int(my + semi) + 2):
+            d = abs(y + 0.5 - my)
+            if d > semi + 0.6:
+                continue
+            c = DR_E[2] if d < semi - 1.2 else (DR_B[3] if d < semi else DR_B[1])
+            if abs(y + 0.5 - my) < 0.8:
+                c = DR_E[5]
+            put(img, x, y, c)
+    # la garra (derecha): tres unas curvas de hueso sobre los dedos negros
+    for y in range(ya0, ya1 + 1):
+        for x in range(x1 + 1, x1 + 5):
+            put(img, x, y, DR_E[4] if (y + x) % 3 else DR_E[2])
+    for i, gy in enumerate((ya0 + 1, int(my), ya1 - 1)):
+        for k in range(6):
+            gx = x1 + 5 + k
+            yy = gy + (k * k) // 9
+            put(img, gx, yy, DR_H[4] if k < 4 else DR_H[5])
+            put(img, gx, yy - 1, DR_H[2] if k < 5 else (0, 0, 0, 0))
+    # en el centro, la cabeza de frente (de y 0 a 22): el craneo, el hocico y la mandibula
+    cx = FW // 2
+    def ancho(y):
+        if y < 3:
+            return 3 + y
+        if y < 11:
+            return 9
+        if y < 16:
+            return 9 - (y - 10)
+        return max(1, 4 - (y - 16) // 2)
+    for y in range(0, 23):
+        a = ancho(y)
+        for dx in range(-a - 1, a + 1):
+            put(img, cx + dx, y, OUT)
+    for y in range(1, 22):
+        a = ancho(y) - 1
+        for dx in range(-a, a):
+            v = n((cx + dx) * 0.4 + 40, y * 0.4)
+            c = DR_E[4] if dx < -a // 3 else DR_E[3] if dx < a // 3 else DR_E[2]
+            if v > 0.84:
+                c = DR_B[2]
+            if y == 1 or (y < 3 and abs(dx) < 2):
+                c = DR_C[1]
+            put(img, cx + dx, y, c)
+    # las cejas de hueso y los ojos de oro fundido
+    for dx in range(-8, 8):
+        if abs(dx + 0.5) > 1.5:
+            put(img, cx + dx, 6, DR_H[3] if dx < 0 else DR_H[2])
+    for s in (-1, 1):
+        ex = cx + (-5 if s < 0 else 4)
+        for (a, b, c) in ((0, 0, DR_O[3]), (1, 0, DR_O[2]), (-1, 0, DR_O[1]), (0, 1, DR_O[1]), (1, 1, DR_O[0])):
+            put(img, ex + a, 8 + b, c)
+    # los ollares con brasas y la boca entreabierta con dientes
+    for s in (-1, 1):
+        put(img, cx + (-3 if s < 0 else 2), 15, DR_B[4])
+        put(img, cx + (-3 if s < 0 else 2), 16, DR_B[2])
+    for dx in range(-3, 3):
+        put(img, cx + dx, 19, DR_B[1] if dx % 2 else DR_B[2])
+        if dx % 2 == 0:
+            put(img, cx + dx, 18, DR_H[5])
+    # los cuernos: del craneo hacia atras y arriba, a cada lado (dos trozos)
+    for s in (-1, 1):
+        bx = cx + (-9 if s < 0 else 8)
+        for k in range(10):
+            x = bx + s * (k + 1)
+            y = 5 - (k * 2) // 3
+            put(img, x, y, DR_H[4] if k < 7 else DR_H[5])
+            put(img, x, y + 1, DR_H[2])
+            put(img, x, y - 1, OUT)
+            put(img, x, y + 2, OUT)
+        # el cuerno de la mejilla, hacia abajo y atras
+        for k in range(5):
+            put(img, bx + s * (k + 1), 13 + k // 2, DR_H[3])
+            put(img, bx + s * (k + 1), 14 + k // 2, OUT)
+    return img
+
+
+def relleno_dragon(k):
+    """La vida de Vorthak: brasas que corren entre escamas negras (las grietas de su lomo), con lenguas amarillas que pasan."""
+    n = noise2(337)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            v = n((x - k * 4) * 0.13, y * 0.7 + k * 0.2)
+            t = 0.2 + 0.55 * mid + 0.55 * (v - 0.5)
+            c = mix(DR_B[0], DR_B[2], max(0.0, min(1.0, t * 1.4)))
+            if t > 0.6:
+                c = mix(c, DR_B[3], min(1.0, (t - 0.6) * 3))
+            if t > 0.84:
+                c = mix(c, DR_B[4], min(1.0, (t - 0.84) * 4))
+            # las escamas negras que asoman entre las brasas
+            if ((x - k * 4 + (y // 3) * 3) % 6 == 0) and t < 0.5:
+                c = mix(c, DR_E[2], 0.6)
+            if y == 0:
+                c = mix(c, DR_B[3], 0.35)
+            if y == 6:
+                c = mix(c, DR_E[1], 0.6)
+            img.putpixel((x, y), c)
+    return img
+
+
+def ascuas_dragon():
+    """Lo que salta al recibir dano: ascuas y copos de ceniza (suben, no caen: lo hace el cliente)."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = ([".e.", "eHe", ".e."], ["h.", ".E"], ["cC", "C."], [".c", "c."])
+    col = {"e": DR_B[3], "E": DR_B[2], "h": DR_B[5], "H": DR_B[4], "c": DR_C[2], "C": DR_C[4]}
+    for kk, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, kk * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 def hueco(a, b):
     n = noise2(113)
     img = Image.new("RGBA", (240, 7))
@@ -2090,6 +2270,7 @@ if __name__ == "__main__":
         "gigante": atlas(marco_gigante(), relleno_gigante, hueco("0a0907", "1b1813"), rastro("fff6e6", "e0caa0"), piedrecitas()),
         "jinete": atlas(marco_jinete(), relleno_jinete, hueco("04070b", "0e1822"), rastro("eefaff", "a8d8ee"), chispas_almas()),
         "bufon": atlas(marco_bufon(), relleno_bufon, hueco("0a0506", "1c0d10"), rastro("fff4e8", "f0c8a0"), confeti()),
+        "dragon": atlas(marco_dragon(), relleno_dragon, hueco("070505", "180e0b"), rastro("fff2e0", "f0b080"), ascuas_dragon()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

@@ -1613,7 +1613,9 @@ public class MenuScreen extends Screen {
                     le.yHeadRot = le.getYRot();
                     le.yHeadRotO = le.yHeadRot;
                     le.setXRot(0);
-                    int esc = Math.max(8, Math.round(caja * 0.8f / Math.max(1f, Math.max(le.getBbHeight(), le.getBbWidth() * 1.3f))));
+                    // (las criaturas mas grandes que su caja, como el dragon, por lo que miden de verdad)
+                    float mide = Math.max(Coleccion.tamano(c), Math.max(le.getBbHeight(), le.getBbWidth() * 1.3f));
+                    int esc = Math.max(Coleccion.tamano(c) > 0 ? 3 : 8, Math.round(caja * 0.8f / Math.max(1f, mide)));
                     if (hecho) Pix.color(1f, 0.95f, 0.88f, 1f);
                     else Pix.color(0f, 0f, 0f, 1f);
                     g.enableScissor(x2 + 2, y2 + 2, x2 + w2 - 2, y2 + h2 - 2);

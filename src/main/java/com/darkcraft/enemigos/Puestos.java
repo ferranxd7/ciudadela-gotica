@@ -292,6 +292,8 @@ public final class Puestos {
 
     /** Si el enemigo cabe donde esta y tiene suelo bajo los pies (a menos de un bloque y medio). */
     private static boolean libre(ServerLevel lvl, Enemigo e) {
+        // los que no chocan con nada (el dragon de la parte 7z, que duerme sobre su oro entre velas y calaveras), siempre
+        if (e.noPhysics) return true;
         if (!lvl.noCollision(e, e.getBoundingBox().deflate(0.02))) return false;
         return !lvl.noCollision(e, e.getBoundingBox().move(0, -1.5, 0).deflate(0.02));
     }
