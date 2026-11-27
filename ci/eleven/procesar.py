@@ -446,6 +446,8 @@ SFX = {
     # las armaduras (parte 7ai): ponerse una pieza de placas, de malla, de cuero y pieles o de tela
     "armadura_placas": (2.0, 0.3, -17), "armadura_malla": (1.5, 0.3, -18), "armadura_cuero": (1.5, 0.3, -19),
     "armadura_tela": (1.5, 0.3, -20),
+    # los martillos y las flechas (parte 7aj): el golpe de martillo, la flecha de fuego que prende y la congelacion
+    "martillo_golpe": (1.2, 0.3, -14), "flecha_fuego": (1.4, 0.4, -16), "congelacion": (1.4, 0.4, -15),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -786,6 +788,9 @@ TOMAS_SFX = {
     # las armaduras (parte 7ai): de la malla la 3 no (casi todo silencio: el golpe llega al final); de la tela, las dos
     # que mas se oyen (la 1 y la 4)
     "armadura_placas": (1, 2), "armadura_malla": (2, 1), "armadura_cuero": (1, 2), "armadura_tela": (1, 4),
+    # los martillos y las flechas (parte 7aj): del martillo las dos con mas graves (la 3 con su cola); de la flecha de fuego
+    # la 3 y la 1 (la 2 dura 5 s, la 4 casi no se oye); de la congelacion las dos mas fuertes
+    "martillo_golpe": (2, 3), "flecha_fuego": (3, 1), "congelacion": (2, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

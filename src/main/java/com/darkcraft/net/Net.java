@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "25";
+    private static final String V = "26";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -174,6 +174,41 @@ public final class Net {
                 .encoder(Misiones::write).decoder(Misiones::read).consumerMainThread(Misiones::handle).add();
         CH.messageBuilder(Creditos.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(Creditos::write).decoder(Creditos::read).consumerMainThread(Creditos::handle).add();
+        // las flechas de sangre y de escarcha (parte 7aj): lo sumado de sangrado y de congelacion
+        CH.messageBuilder(Acumula.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Acumula::write).decoder(Acumula::read).consumerMainThread(Acumula::handle).add();
+    }
+
+    // ------------------------------------------------------------------ el sangrado y la congelacion (parte 7aj)
+
+    /**
+     * Lo sumado de sangrado ({@link #SANGRE}) o de congelacion ({@link #FRIO}) en una entidad: el cliente lo dibuja en una barrita
+     * encima de ella (y la suya, bajo las barras) y lo va bajando como el servidor; {@code estalla}: acaba de reventar.
+     */
+    public record Acumula(int entidad, byte clase, float nivel, boolean estalla) {
+        public static final byte SANGRE = 0, FRIO = 1;
+
+        void write(FriendlyByteBuf b) {
+            b.writeVarInt(entidad);
+            b.writeByte(clase);
+            b.writeFloat(nivel);
+            b.writeBoolean(estalla);
+        }
+
+        static Acumula read(FriendlyByteBuf b) {
+            return new Acumula(b.readVarInt(), b.readByte(), b.readFloat(), b.readBoolean());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.combate.Acumulados.recibir(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** A los jugadores que ven esa entidad (y a ella, si es un jugador). */
+    public static void cerca(net.minecraft.world.entity.Entity e, Object msg) {
+        if (e.level().isClientSide) return;
+        CH.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e), msg);
     }
 
     // ------------------------------------------------------------------ el final (parte 7ad)

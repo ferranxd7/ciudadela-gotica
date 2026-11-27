@@ -187,6 +187,21 @@
               }
             }
           ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "darkcraft:flecha_fuego",
+          "weight": 2,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 3,
+                "max": 6
+              }
+            }
+          ]
         }
       ]
     },

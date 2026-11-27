@@ -244,6 +244,13 @@ public class Guardia extends Enemigo {
         if (s.getEntity() instanceof Enemigo && s.getDirectEntity() instanceof net.minecraft.world.entity.projectile.Projectile) return false;
         if (!level().isClientSide && cubre(s)) {
             boolean flecha = s.getDirectEntity() instanceof net.minecraft.world.entity.projectile.Projectile;
+            // un martillo le rompe la guardia (parte 7aj): el golpe entra entero y se queda aturdido
+            if (!flecha && com.darkcraft.armas.Martillo.rompe(s)) {
+                level().playSound(null, getX(), getY() + 1, getZ(), DarkCraftMod.SFX_GUARDIA_ROTA.get(), SoundSource.HOSTILE, 1.0f, 0.9f + random.nextFloat() * 0.15f);
+                boolean ok = super.hurt(s, cuanto);
+                if (ok && isAlive()) aturdir();
+                return ok;
+            }
             level().playSound(null, getX(), getY() + 1, getZ(), DarkCraftMod.SFX_ESCUDO_GOLPE.get(), SoundSource.HOSTILE, 1.0f, 0.85f + random.nextFloat() * 0.2f);
             if (accion() == 0) empezar(GuardiaAnims.ESPADA_BLOQUEA);
             if (flecha) return false;

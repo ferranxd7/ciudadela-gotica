@@ -182,6 +182,10 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_ARMADURA_MALLA = sound("sfx.armadura_malla");
     public static final RegistryObject<SoundEvent> SFX_ARMADURA_CUERO = sound("sfx.armadura_cuero");
     public static final RegistryObject<SoundEvent> SFX_ARMADURA_TELA = sound("sfx.armadura_tela");
+    /** Los martillos y las flechas (parte 7aj): el golpe del martillo, la flecha de fuego que prende y la congelacion. */
+    public static final RegistryObject<SoundEvent> SFX_MARTILLO_GOLPE = sound("sfx.martillo_golpe");
+    public static final RegistryObject<SoundEvent> SFX_FLECHA_FUEGO = sound("sfx.flecha_fuego");
+    public static final RegistryObject<SoundEvent> SFX_CONGELACION = sound("sfx.congelacion");
     public static final RegistryObject<SoundEvent> SFX_FORJA_MEJORA = sound("sfx.forja_mejora");
     public static final RegistryObject<SoundEvent> SFX_TIENDA_COMPRA = sound("sfx.tienda_compra");
     // las habilidades de las armas (cenizas de guerra) y ponerle una ceniza a un arma
@@ -1169,6 +1173,29 @@ public class DarkCraftMod {
     /** La daga de los bandidos (parte 2f-3): el combate la trata como daga por su nombre. */
     public static final RegistryObject<Item> DAGA = ITEMS.register("daga",
             () -> new net.minecraft.world.item.SwordItem(net.minecraft.world.item.Tiers.IRON, 1, -1.6f, new Item.Properties()));
+    /**
+     * Los martillos (parte 7aj): la maza de clerigo y el martillo de guerra (de una mano) y el gran martillo de piedra (a dos
+     * manos). 1 + 2 (hierro) + lo suyo de dano: 7, 8 y 11.
+     */
+    public static final RegistryObject<Item> MAZA = ITEMS.register("maza",
+            () -> new com.darkcraft.armas.Martillo("maza", com.darkcraft.combate.Armas.Tipo.MARTILLO, 4, -2.7f, new Item.Properties()));
+    public static final RegistryObject<Item> MARTILLO_GUERRA = ITEMS.register("martillo_guerra",
+            () -> new com.darkcraft.armas.Martillo("martillo_guerra", com.darkcraft.combate.Armas.Tipo.MARTILLO, 5, -2.9f, new Item.Properties()));
+    public static final RegistryObject<Item> GRAN_MARTILLO = ITEMS.register("gran_martillo",
+            () -> new com.darkcraft.armas.Martillo("gran_martillo", com.darkcraft.combate.Armas.Tipo.GRAN_MARTILLO, 8, -3.3f,
+                    new Item.Properties().rarity(Rarity.UNCOMMON)));
+    /** Las flechas de fuego, de sangre y de escarcha (parte 7aj) y la flecha que vuela (una entidad para las tres). */
+    public static final java.util.EnumMap<com.darkcraft.armas.FlechaEspecial.Clase, RegistryObject<Item>> FLECHAS =
+            new java.util.EnumMap<>(com.darkcraft.armas.FlechaEspecial.Clase.class);
+
+    static {
+        for (com.darkcraft.armas.FlechaEspecial.Clase c : com.darkcraft.armas.FlechaEspecial.Clase.values())
+            FLECHAS.put(c, ITEMS.register("flecha_" + c.id, () -> new com.darkcraft.armas.FlechaItem(c, new Item.Properties())));
+    }
+
+    public static final RegistryObject<EntityType<com.darkcraft.armas.FlechaEspecial>> FLECHA_ESPECIAL = ENTITIES.register("flecha_especial",
+            () -> EntityType.Builder.<com.darkcraft.armas.FlechaEspecial>of(com.darkcraft.armas.FlechaEspecial::new, MobCategory.MISC)
+                    .sized(0.5f, 0.5f).clientTrackingRange(4).updateInterval(20).build(MODID + ":flecha_especial"));
     public static final RegistryObject<Item> BASTON = ITEMS.register("baston",
             () -> new com.darkcraft.hechizos.Catalizador(com.darkcraft.hechizos.Hechizo.Escuela.HECHICERIA, new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
     public static final RegistryObject<Item> SELLO_SAGRADO = ITEMS.register("sello",
@@ -1327,6 +1354,10 @@ public class DarkCraftMod {
             e.accept(ESPADA_SINIESTRA);
             e.accept(ALABARDA);
             e.accept(LANZA_TAM);
+            e.accept(MAZA);
+            e.accept(MARTILLO_GUERRA);
+            e.accept(GRAN_MARTILLO);
+            for (RegistryObject<Item> f : FLECHAS.values()) e.accept(f);
             for (RegistryObject<Item> t : TALISMANES.values()) e.accept(t);
             e.accept(DAGA);
             e.accept(BASTON);

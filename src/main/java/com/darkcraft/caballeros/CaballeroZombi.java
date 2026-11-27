@@ -170,6 +170,10 @@ public abstract class CaballeroZombi extends Zombie {
         return 0.9f;
     }
 
+    /** Le han roto la guardia (un martillo, parte 7aj): no se vuelve a cubrir en {@code ticks}. Solo el de espada y escudo se cubre. */
+    public void guardiaRota(int ticks) {
+    }
+
     // ------------------------------------------------------------------ los tres tipos
 
     /** Espada y escudo: se cubre cuando le atacan de frente. */
@@ -189,6 +193,13 @@ public abstract class CaballeroZombi extends Zombie {
         protected void equipar(RandomSource r) {
             setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
             setItemSlot(EquipmentSlot.OFFHAND, Caballeros.escudo());
+        }
+
+        @Override
+        public void guardiaRota(int ticks) {
+            stopUsingItem();
+            cubierto = 0;
+            espera = Math.max(espera, ticks);
         }
 
         @Override

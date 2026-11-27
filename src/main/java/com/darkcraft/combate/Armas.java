@@ -89,7 +89,24 @@ public final class Armas {
                 new Mov[]{m(Anim.BARRIDO_DI, 16, 6, 8, 1.0f, 0.2f, 10, 13, 0.4f), m(Anim.ESTOCADA, 14, 5, 7, 1.0f, 0.25f, 9, 12, 0.35f),
                         m(Anim.MAZAZO, 18, 8, 10, 1.2f, 0.25f, 15, 14, 0.5f)},
                 m(Anim.MAZAZO, 22, 10, 12, 1.8f, 0.3f, 30, 20, 0.75f), m(Anim.ESTOCADA, 15, 4, 7, 1.3f, 0.6f, 14, 14, 0.55f),
-                m(Anim.SALTO, 18, 0, 0, 1.5f, 0f, 24, 15, 0.6f));
+                m(Anim.SALTO, 18, 0, 0, 1.5f, 0f, 24, 15, 0.6f)),
+        /**
+         * El martillo de una mano (parte 7aj: la maza y el martillo de guerra): lento para una mano, pero cada golpe desequilibra
+         * mucho (rompe guardias); de arriba abajo, de lado y otra vez de arriba.
+         */
+        MARTILLO(2.9f, 45f, false, 5.5f, "golpe_pesado",
+                new Mov[]{m(Anim.VERTICAL, 14, 6, 7, 1.0f, 0.15f, 16, 11, 0.4f), m(Anim.TAJO_DI, 13, 5, 6, 1.0f, 0.15f, 14, 10, 0.35f),
+                        m(Anim.VERTICAL, 15, 6, 8, 1.15f, 0.2f, 18, 12, 0.45f)},
+                m(Anim.MAZAZO, 22, 10, 12, 1.8f, 0.3f, 40, 18, 0.8f), m(Anim.VERTICAL, 15, 5, 7, 1.3f, 0.55f, 20, 13, 0.55f),
+                m(Anim.SALTO, 18, 0, 0, 1.5f, 0f, 28, 14, 0.65f)),
+        /**
+         * El gran martillo a dos manos (parte 7aj): barridos y mazazos lentisimos que tiran al suelo a casi cualquiera; el golpe
+         * fuerte y el del salto, los que mas desequilibran de todas las armas.
+         */
+        GRAN_MARTILLO(3.5f, 60f, true, 14f, "golpe_pesado",
+                new Mov[]{m(Anim.BARRIDO_DI, 20, 9, 11, 1.0f, 0.2f, 22, 17, 0.6f), m(Anim.MAZAZO, 23, 11, 13, 1.25f, 0.25f, 30, 18, 0.75f)},
+                m(Anim.MAZAZO, 28, 13, 15, 2.1f, 0.3f, 50, 26, 1.0f), m(Anim.BARRIDO_DI, 20, 7, 10, 1.35f, 0.55f, 26, 19, 0.75f),
+                m(Anim.SALTO, 22, 0, 0, 1.75f, 0f, 40, 19, 0.85f));
 
         /** Alcance (bloques), arco (grados a cada lado), si se lleva a dos manos, peso y el sonido de sus golpes ligeros. */
         public final float alcance, arco, peso;
@@ -171,6 +188,8 @@ public final class Armas {
         // la lanza de Tam (parte 7ah): una lanza, aunque no sea un tridente
         if (st.is(DarkCraftMod.LANZA_TAM.get())) return Tipo.LANZA;
         if (st.getItem() instanceof TridentItem) return Tipo.LANZA;
+        // los martillos (parte 7aj): la maza, el martillo de guerra y el gran martillo
+        if (st.getItem() instanceof com.darkcraft.armas.Martillo mt) return mt.tipo;
         if (st.getItem() instanceof AxeItem) return Tipo.HACHA;
         if (st.getItem() instanceof SwordItem) {
             String id = String.valueOf(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(st.getItem()));

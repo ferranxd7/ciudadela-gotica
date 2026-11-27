@@ -762,6 +762,196 @@ public final class CiTest {
         misionOswin(server, m, log);
         misionHedda(server, m, log);
         armaduras(server, m, log);
+        armas7aj(server, m, log);
+    }
+
+    /** Una flecha especial que sale a 1,6 bloques de su blanco hacia su pecho; se mueve hasta que da (o 12 ticks). */
+    private static boolean flechaA(ServerLevel m, net.minecraft.world.entity.player.Player de, net.minecraft.world.entity.LivingEntity a,
+                                   com.darkcraft.armas.FlechaEspecial.Clase c) {
+        var f = new com.darkcraft.armas.FlechaEspecial(m, de, c);
+        net.minecraft.world.phys.Vec3 o = a.position().add(0, a.getBbHeight() * 0.6, -1.6);
+        f.setPos(o.x, o.y, o.z);
+        f.shoot(0, 0, 1, 2.5f, 0f);
+        m.addFreshEntity(f);
+        a.invulnerableTime = 0;
+        float antes = a.getHealth();
+        for (int k = 0; k < 12 && !f.isRemoved(); k++) f.tick();
+        if (!f.isRemoved()) f.discard();
+        return a.getHealth() < antes;
+    }
+
+    /**
+     * Parte 7aj: los martillos (tipo, letras, peso, habilidad; el escudo de la guardia de Valdrenn y el paves de Ser Brandt contra
+     * el martillo), las flechas de fuego, de sangre y de escarcha (el arco tira las de la mano izquierda; cada clase hace lo suyo
+     * en una diana: arde, a la tercera hemorragia, a la tercera se congela y recibe mas), los jefes (la mitad) y los que no sangran
+     * ni se congelan, la tienda y el botin.
+     */
+    private static void armas7aj(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        StringBuilder sb = new StringBuilder("Armas 7aj:");
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07a1a"), "[DarkCraftCI26]"));
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            // ---- los martillos
+            int mal = 0;
+            Object[][] esperado = {{DarkCraftMod.MAZA.get(), com.darkcraft.combate.Armas.Tipo.MARTILLO, "CD-C-", 4.5f, 7f, com.darkcraft.combate.Habilidad.GRITO},
+                    {DarkCraftMod.MARTILLO_GUERRA.get(), com.darkcraft.combate.Armas.Tipo.MARTILLO, "BE---", 5.5f, 8f, com.darkcraft.combate.Habilidad.GRITO},
+                    {DarkCraftMod.GRAN_MARTILLO.get(), com.darkcraft.combate.Armas.Tipo.GRAN_MARTILLO, "AE---", 14f, 11f, com.darkcraft.combate.Habilidad.SISMO}};
+            for (Object[] e : esperado) {
+                var st = new net.minecraft.world.item.ItemStack((net.minecraft.world.item.Item) e[0]);
+                var tipo = com.darkcraft.combate.Armas.de(st);
+                var d = com.darkcraft.combate.Escalado.de(st);
+                float peso = com.darkcraft.combate.Peso.item(st), base = com.darkcraft.combate.Escalado.base(st);
+                var h = com.darkcraft.combate.Habilidad.de(st);
+                boolean bien = tipo == e[1] && d != null && d.letras().equals(e[2]) && Math.abs(peso - (Float) e[3]) < 0.01f
+                        && Math.abs(base - (Float) e[4]) < 0.01f && h == e[5];
+                if (!bien) mal++;
+                sb.append(String.format(java.util.Locale.ROOT, " %s: %s %s peso %.1f ataque %.1f %s%s;", st.getItem(), tipo, d == null ? "-" : d.letras(),
+                        peso, base, h == null ? "-" : h.id, bien ? "" : " MAL"));
+            }
+            sb.append(" el gran martillo a dos manos ").append(com.darkcraft.combate.Armas.Tipo.GRAN_MARTILLO.dosManos).append(", mal ").append(mal).append(';');
+            // un sitio en el aire, sobre la Capital (sus chunks ya estan hechos por las pruebas de antes)
+            double x0 = com.darkcraft.morvain.Capital.CX + 0.5, y0 = 700, z0 = com.darkcraft.morvain.Capital.CZ + 40.5;
+            m.getChunk(net.minecraft.util.Mth.floor(x0) >> 4, net.minecraft.util.Mth.floor(z0) >> 4);
+            // ---- el escudo de la guardia: la espada entra x0,2; el martillo le rompe la guardia (entra entero y se queda aturdido)
+            var g = DarkCraftMod.GUARDIA.get().create(m);
+            if (g != null) {
+                g.variante(com.darkcraft.enemigos.Guardia.ESPADA);
+                g.moveTo(x0, y0, z0, 0f, 0f);
+                g.yBodyRot = g.yHeadRot = 0f;
+                g.setNoGravity(true);
+                m.addFreshEntity(g);
+                quitar.add(g);
+                fp.moveTo(x0, y0, z0 + 2.0, 180f, 0f);
+                fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                float v0 = g.getHealth();
+                g.invulnerableTime = 0;
+                g.hurt(fp.damageSources().playerAttack(fp), 10f);
+                float conEspada = v0 - g.getHealth();
+                fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(DarkCraftMod.MARTILLO_GUERRA.get()));
+                float v1 = g.getHealth();
+                g.invulnerableTime = 0;
+                g.hurt(fp.damageSources().playerAttack(fp), 10f);
+                float conMartillo = v1 - g.getHealth();
+                sb.append(String.format(java.util.Locale.ROOT, " la guardia con escudo: la espada le quita %.1f, el martillo %.1f%s;", conEspada, conMartillo,
+                        g.aturdido() ? " (aturdido)" : " (NO aturdido)"));
+            }
+            // ---- el paves de Ser Brandt: el martillo pasa la mitad (la espada el 15 %)
+            var b = DarkCraftMod.BRANDT.get().create(m);
+            if (b != null) {
+                b.moveTo(x0 + 6, y0, z0, 0f, 0f);
+                b.yBodyRot = b.yHeadRot = 0f;
+                b.setNoGravity(true);
+                m.addFreshEntity(b);
+                quitar.add(b);
+                fp.moveTo(x0 + 6, y0, z0 + 2.5, 180f, 0f);
+                fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                float v0 = b.getHealth();
+                b.invulnerableTime = 0;
+                b.hurt(fp.damageSources().playerAttack(fp), 20f);
+                float conEspada = v0 - b.getHealth();
+                fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(DarkCraftMod.GRAN_MARTILLO.get()));
+                float v1 = b.getHealth();
+                b.invulnerableTime = 0;
+                b.hurt(fp.damageSources().playerAttack(fp), 20f);
+                float conMartillo = v1 - b.getHealth();
+                sb.append(String.format(java.util.Locale.ROOT, " el paves de Brandt: la espada %.1f, el gran martillo %.1f;", conEspada, conMartillo));
+                // un jefe: le entra la mitad del sangrado
+                com.darkcraft.enemigos.Sangrado.limpiar(b);
+                com.darkcraft.enemigos.Sangrado.sumar(b, 34f, fp);
+                sb.append(String.format(java.util.Locale.ROOT, " Brandt es jefe %s, 34 de sangre le suman %.0f;", com.darkcraft.enemigos.Sangrado.jefe(b),
+                        com.darkcraft.enemigos.Sangrado.nivel(b)));
+            }
+            fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
+            // ---- el arco tira las de la mano izquierda
+            var arco = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BOW);
+            fp.getInventory().clearContent();
+            fp.getInventory().items.set(9, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW, 8));
+            fp.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND, new net.minecraft.world.item.ItemStack(DarkCraftMod.FLECHAS.get(com.darkcraft.armas.FlechaEspecial.Clase.SANGRE).get(), 8));
+            var tira = fp.getProjectile(arco);
+            var ballesta = fp.getProjectile(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CROSSBOW));
+            sb.append(" el arco tira ").append(tira.getItem()).append(", la ballesta ").append(ballesta.getItem());
+            var hecha = tira.getItem() instanceof net.minecraft.world.item.ArrowItem ai ? ai.createArrow(m, tira, fp) : null;
+            sb.append(", sale ").append(hecha instanceof com.darkcraft.armas.FlechaEspecial fe ? "flecha de " + fe.clase().id + " (se recoge "
+                    + fe.getPickupItem().getItem() + ")" : String.valueOf(hecha)).append(';');
+            fp.getInventory().clearContent();
+            // ---- las tres flechas en dianas (aldeanos quietos)
+            String[] clases = {"fuego", "sangre", "escarcha"};
+            for (int c = 0; c < 3; c++) {
+                var cl = com.darkcraft.armas.FlechaEspecial.Clase.values()[c];
+                var d = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (d == null) continue;
+                d.moveTo(x0 + 12 + c * 4, y0, z0, 0f, 0f);
+                d.setNoAi(true);
+                d.setNoGravity(true);
+                // con 100 de vida (que aguante las tres flechas, lo que revienta y el golpe de despues)
+                var vidaMax = d.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
+                if (vidaMax != null) vidaMax.setBaseValue(100);
+                d.setHealth(100f);
+                m.addFreshEntity(d);
+                quitar.add(d);
+                int hem = com.darkcraft.enemigos.Sangrado.HEMORRAGIAS, con = com.darkcraft.enemigos.Congelacion.CONGELACIONES;
+                StringBuilder r = new StringBuilder();
+                float vida0 = d.getHealth();
+                for (int k = 0; k < 3; k++) {
+                    boolean dio = flechaA(m, fp, d, cl);
+                    r.append(String.format(java.util.Locale.ROOT, " %s(sangre %.0f frio %.0f vida %.1f)", dio ? "da" : "NO-DA", com.darkcraft.enemigos.Sangrado.nivel(d),
+                            com.darkcraft.enemigos.Congelacion.nivel(d), d.getHealth()));
+                    if (!d.isAlive()) break;
+                }
+                sb.append(" flechas de ").append(clases[c]).append(':').append(r);
+                if (cl == com.darkcraft.armas.FlechaEspecial.Clase.FUEGO) sb.append(" arde ").append(d.getRemainingFireTicks() > 0);
+                if (cl == com.darkcraft.armas.FlechaEspecial.Clase.SANGRE) sb.append(" hemorragias +").append(com.darkcraft.enemigos.Sangrado.HEMORRAGIAS - hem);
+                if (cl == com.darkcraft.armas.FlechaEspecial.Clase.ESCARCHA) {
+                    sb.append(" congelaciones +").append(com.darkcraft.enemigos.Congelacion.CONGELACIONES - con).append(" helado ").append(d.getTicksFrozen())
+                            .append(" debil ").append(com.darkcraft.enemigos.Congelacion.debil(d));
+                    float v = d.getHealth();
+                    d.invulnerableTime = 0;
+                    d.hurt(m.damageSources().generic(), 5f);
+                    sb.append(String.format(java.util.Locale.ROOT, " (un golpe de 5 le quita %.1f)", v - d.getHealth()));
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " (vida %.1f de %.1f);", d.getHealth(), vida0));
+            }
+            // ---- los que no sangran ni se congelan
+            var arq = DarkCraftMod.ARQUERO.get().create(m);
+            var hel = DarkCraftMod.HELADO.get().create(m);
+            if (arq != null && hel != null) {
+                arq.moveTo(x0 - 6, y0, z0, 0f, 0f);
+                hel.moveTo(x0 - 10, y0, z0, 0f, 0f);
+                boolean sangraArq = com.darkcraft.enemigos.Sangrado.sumar(arq, 120f, fp) || com.darkcraft.enemigos.Sangrado.nivel(arq) > 0;
+                boolean heladoFrio = com.darkcraft.enemigos.Congelacion.sumar(hel, 120f, fp) || com.darkcraft.enemigos.Congelacion.nivel(hel) > 0;
+                sb.append(" el arquero esqueleto sangra ").append(sangraArq).append(", el helado se congela ").append(heladoFrio).append(';');
+            }
+            // ---- la tienda y el botin
+            int enTienda = 0;
+            for (var o : com.darkcraft.tienda.Tienda.KERRICK) if (o.id().contains("martillo") || o.id().contains("maza") || o.id().contains("flecha_") || o.id().contains("crossbow")) enTienda++;
+            for (var o : com.darkcraft.tienda.Tienda.SILAS) if (o.id().contains("martillo") || o.id().contains("flecha_")) enTienda++;
+            sb.append(" en las tiendas ").append(enTienda).append(" (Kerrick ").append(com.darkcraft.tienda.Tienda.KERRICK.size()).append(", Silas ")
+                    .append(com.darkcraft.tienda.Tienda.SILAS.size()).append(')');
+            for (String tabla : new String[]{"armeria", "capital_bueno", "grieta", "monasterio"}) {
+                var lt = server.getLootData().getLootTable(new net.minecraft.resources.ResourceLocation(DarkCraftMod.MODID, "chests/" + tabla));
+                int martillos = 0, flechas = 0;
+                for (int r = 0; r < 40; r++) {
+                    var params = new net.minecraft.world.level.storage.loot.LootParams.Builder(m)
+                            .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN, net.minecraft.world.phys.Vec3.ZERO)
+                            .create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CHEST);
+                    for (var st : lt.getRandomItems(params)) {
+                        if (st.getItem() instanceof com.darkcraft.armas.Martillo) martillos++;
+                        if (st.getItem() instanceof com.darkcraft.armas.FlechaItem) flechas += st.getCount();
+                    }
+                }
+                sb.append(" | ").append(tabla).append(": ").append(martillos).append(" martillos y ").append(flechas).append(" flechas en 40 cofres");
+            }
+        } catch (Exception e) {
+            sb.append(" ERROR ").append(e);
+            DarkCraftMod.LOGGER.error("[DarkCraft] las armas de la 7aj", e);
+        } finally {
+            for (var e : quitar) e.discard();
+            fp.getInventory().clearContent();
+            fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
+            fp.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND, net.minecraft.world.item.ItemStack.EMPTY);
+        }
+        log.println(sb);
+        log.flush();
     }
 
     /**

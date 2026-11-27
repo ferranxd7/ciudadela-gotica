@@ -73,6 +73,8 @@ public final class Peso {
         if (st.getItem() instanceof BowItem) return 3f;
         Armas.Tipo t = Armas.de(st);
         if (t == Armas.Tipo.ESPADA && com.darkcraft.armas.EspadaRey.es(st)) return 5.5f;
+        // la maza (parte 7aj): un martillo de una mano mas ligero
+        if (st.is(com.darkcraft.DarkCraftMod.MAZA.get())) return 4.5f;
         if (t != null) return t.peso;
         if (st.getItem() instanceof TieredItem) return 2.5f;
         return 0.5f;

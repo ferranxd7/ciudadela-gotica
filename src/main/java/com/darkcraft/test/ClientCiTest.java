@@ -3037,6 +3037,277 @@ public final class ClientCiTest {
         return t + 40;
     }
 
+    // ------------------------------------------------------------------ los martillos y las flechas (parte 7aj)
+
+    private static net.minecraft.world.entity.monster.Husk ajSangre, ajFrio, ajFuego;
+    private static com.darkcraft.caballeros.CaballeroZombi ajEscudo;
+    private static float ajAntes;
+
+    private static String ajVida(String n, net.minecraft.world.entity.LivingEntity e) {
+        if (e == null) return "";
+        return String.format(java.util.Locale.ROOT, " | %s %.1f%s%s%s sangre %.0f frio %.0f%s", n, e.getHealth(), e.isBlocking() ? " CUBIERTO" : "",
+                e.isOnFire() ? " ARDE" : "", e.isFullyFrozen() ? " HELADO" : "", com.darkcraft.enemigos.Sangrado.nivel(e),
+                com.darkcraft.enemigos.Congelacion.nivel(e), com.darkcraft.enemigos.Congelacion.debil(e) ? " DEBIL" : "");
+    }
+
+    private static void logAj(Minecraft m, String que) {
+        log("  armas 7aj " + que + " (cliente): " + com.darkcraft.client.combate.ClientCombate.resumen() + " | acumulados "
+                + com.darkcraft.client.combate.Acumulados.resumen() + (ajSangre != null ? " | barra sangre " + java.util.Arrays.toString(
+                com.darkcraft.client.combate.Acumulados.de(ajSangre.getId())) : ""));
+        server(m, sp -> log("  armas 7aj " + que + " (servidor): " + com.darkcraft.combate.Combate.resumen(sp) + " | en la mano "
+                + sp.getMainHandItem().getHoverName().getString() + " / " + sp.getOffhandItem().getHoverName().getString() + " x" + sp.getOffhandItem().getCount()
+                + " | guardias rotas " + com.darkcraft.combate.Combate.GUARDIAS_ROTAS + " | hemorragias " + com.darkcraft.enemigos.Sangrado.HEMORRAGIAS
+                + " congelaciones " + com.darkcraft.enemigos.Congelacion.CONGELACIONES + ajVida("escudo", ajEscudo) + ajVida("sangre", ajSangre)
+                + ajVida("frio", ajFrio) + ajVida("fuego", ajFuego) + ajVida("diana", dianaA)));
+    }
+
+    /** Elige el hueco de la mano derecha en el servidor y se lo dice al cliente. */
+    private static void ajHueco(ServerPlayer sp, int h) {
+        sp.getInventory().selected = h;
+        sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(h));
+    }
+
+    /** Una diana para las flechas: sin moverse, con mucha vida y de cara al jugador. */
+    private static net.minecraft.world.entity.monster.Husk ajDiana(ServerLevel lvl, double x, double z) {
+        var h = diana(lvl, x, z, 180f);
+        if (h != null) {
+            h.getPersistentData().remove("darkcraft_sangre");
+            h.clearFire();
+        }
+        return h;
+    }
+
+    /** Una flecha especial disparada desde los ojos del jugador hacia el pecho de una diana (como la soltaria el arco tenso). */
+    private static void ajDisparar(ServerPlayer sp, com.darkcraft.armas.FlechaEspecial.Clase c, net.minecraft.world.entity.LivingEntity a) {
+        if (a == null) return;
+        var f = new com.darkcraft.armas.FlechaEspecial(sp.serverLevel(), sp, c);
+        Vec3 o = sp.getEyePosition();
+        Vec3 d = a.position().add(0, a.getBbHeight() * 0.62, 0).subtract(o);
+        f.setPos(o.x, o.y - 0.1, o.z);
+        f.shoot(d.x, d.y + d.horizontalDistance() * 0.02, d.z, 3.0f, 0f);
+        f.setCritArrow(true);
+        sp.serverLevel().addFreshEntity(f);
+    }
+
+    /**
+     * Parte 7aj: el gran martillo (carga y mazazo en primera persona), el martillo de guerra de lado, un caballero que se cubre con
+     * el escudo (la espada no entra; el martillo le rompe la guardia), una flecha de fuego disparada con el arco de verdad (las de la
+     * mano izquierda), tres de sangre (la barrita encima y la hemorragia), tres de escarcha (se congela y recibe mas), las barritas
+     * del propio jugador y el menu con los martillos y las flechas.
+     */
+    private static int armas7aj(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Martillos: la plataforma, el gran martillo en la mano y una diana delante", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                plataforma(lvl);
+                lvl.setDayTime(6000);
+                for (var e : lvl.getEntitiesOfClass(net.minecraft.world.entity.monster.Husk.class, new net.minecraft.world.phys.AABB(ex - 12, ey - 3, ez - 14, ex + 12, ey + 6, ez + 10)))
+                    e.discard();
+                sp.setInvisible(false);
+                sp.setGameMode(GameType.SURVIVAL);
+                var inv = sp.getInventory();
+                inv.clearContent();
+                inv.items.set(0, new ItemStack(DarkCraftMod.GRAN_MARTILLO.get()));
+                inv.items.set(1, new ItemStack(DarkCraftMod.MARTILLO_GUERRA.get()));
+                inv.items.set(2, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                inv.items.set(9, new ItemStack(DarkCraftMod.MAZA.get()));
+                ajHueco(sp, 0);
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                com.darkcraft.enemigos.Sangrado.limpiar(sp);
+                com.darkcraft.enemigos.Congelacion.limpiar(sp);
+                dianaA = diana(lvl, ex, ez, 180f);
+                enCombate(sp);
+            });
+        });
+        atTicks(t + 28, "el gran martillo: antes", m -> logAj(m, "gran martillo antes"));
+        atTicks(t + 30, "mantener el clic: el mazazo del gran martillo", m -> {
+            net.minecraft.client.KeyMapping.set(m.options.keyAttack.getKey(), true);
+            atacar(m);
+        });
+        atTicks(t + 50, "captura: cargando el gran martillo", m -> {
+            logAj(m, "cargando");
+            shot(m, "cliente_aj01_gran_martillo_carga");
+        });
+        atTicks(t + 56, "soltar el clic", m -> net.minecraft.client.KeyMapping.set(m.options.keyAttack.getKey(), false));
+        atTicks(t + 70, "captura: el mazazo", m -> {
+            logAj(m, "mazazo");
+            shot(m, "cliente_aj02_mazazo");
+        });
+        atTicks(t + 92, "el martillo de guerra, visto de lado", m -> {
+            server(m, sp -> ajHueco(sp, 1));
+            verCombate(m);
+        });
+        atTicks(t + 100, "clic: el martillo de guerra", m -> atacar(m));
+        atTicks(t + 106, "captura: el martillo de guerra de lado", m -> {
+            logAj(m, "martillo de guerra");
+            shot(m, "cliente_aj03_martillo_guerra");
+        });
+        // ---- un caballero que se cubre: la espada no entra; el martillo le rompe la guardia
+        atTicks(t + 126, "un caballero con escudo delante, cubriendose", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                if (dianaA != null) dianaA.discard();
+                dianaA = null;
+                ajEscudo = DarkCraftMod.CABALLERO_ESPADA.get().create(lvl);
+                if (ajEscudo == null) return;
+                ajEscudo.moveTo(ex, ey, ez - 0.6, 180f, 0f);
+                ajEscudo.setYHeadRot(180f);
+                ajEscudo.setYBodyRot(180f);
+                ajEscudo.setNoAi(true);
+                ajEscudo.setPersistenceRequired();
+                ajEscudo.addTag("darkcraft_ci");
+                ajEscudo.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                ajEscudo.setItemSlot(net.minecraft.world.entity.EquipmentSlot.OFFHAND, new ItemStack(net.minecraft.world.item.Items.SHIELD));
+                lvl.addFreshEntity(ajEscudo);
+                ajEscudo.startUsingItem(InteractionHand.OFF_HAND);
+                ajHueco(sp, 2);
+                enCombate(sp);
+            });
+        });
+        atTicks(t + 140, "la espada contra el escudo", m -> {
+            server(m, sp -> ajAntes = ajEscudo == null ? 0f : ajEscudo.getHealth());
+            logAj(m, "antes de la espada");
+            atacar(m);
+        });
+        atTicks(t + 156, "tras la espada (el escudo lo para)", m -> {
+            logAj(m, "tras la espada");
+            server(m, sp -> {
+                if (ajEscudo != null && !ajEscudo.isUsingItem()) ajEscudo.startUsingItem(InteractionHand.OFF_HAND);
+                ajHueco(sp, 1);
+            });
+        });
+        atTicks(t + 168, "el martillo contra el escudo", m -> {
+            server(m, sp -> ajAntes = ajEscudo == null ? 0f : ajEscudo.getHealth());
+            logAj(m, "antes del martillo");
+            atacar(m);
+        });
+        atTicks(t + 176, "captura: la guardia rota", m -> {
+            logAj(m, "guardia rota");
+            shot(m, "cliente_aj04_guardia_rota");
+        });
+        atTicks(t + 190, "tras el martillo", m -> {
+            server(m, sp -> log("  armas 7aj el martillo le quito " + String.format(java.util.Locale.ROOT, "%.1f", ajEscudo == null ? 0f : ajAntes - ajEscudo.getHealth())
+                    + (ajEscudo != null && ajEscudo.isBlocking() ? " (sigue cubierto)" : " (sin guardia)")));
+        });
+        // ---- las flechas: tres dianas; la de fuego con el arco de verdad (las de la mano izquierda)
+        atTicks(t + 196, "Flechas: tres dianas, el arco en la mano y las de fuego en la izquierda", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            if (ajEscudo != null) ajEscudo.discard();
+            ajEscudo = null;
+            ajSangre = ajDiana(lvl, ex - 2.5, ez + 5.0);
+            ajFrio = ajDiana(lvl, ex, ez + 5.0);
+            ajFuego = ajDiana(lvl, ex + 2.5, ez + 5.0);
+            var inv = sp.getInventory();
+            inv.items.set(0, new ItemStack(net.minecraft.world.item.Items.BOW));
+            inv.items.set(10, new ItemStack(DarkCraftMod.FLECHAS.get(com.darkcraft.armas.FlechaEspecial.Clase.SANGRE).get(), 16));
+            inv.items.set(11, new ItemStack(DarkCraftMod.FLECHAS.get(com.darkcraft.armas.FlechaEspecial.Clase.ESCARCHA).get(), 16));
+            inv.items.set(12, new ItemStack(net.minecraft.world.item.Items.ARROW, 16));
+            sp.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(DarkCraftMod.FLECHAS.get(com.darkcraft.armas.FlechaEspecial.Clase.FUEGO).get(), 16));
+            ajHueco(sp, 0);
+            // mirando a la diana del fuego (2,5 a la derecha y 8 delante), un poco hacia arriba
+            float giro = (float) -Math.toDegrees(Math.atan2(2.5, 8.0));
+            sp.teleportTo(lvl, ex, ey, ez - 3.0, giro, -3f);
+            sp.connection.teleport(ex, ey, ez - 3.0, giro, -3f);
+        }));
+        atTicks(t + 206, "tensar el arco (la tecla de usar)", m -> {
+            net.minecraft.client.KeyMapping.set(m.options.keyUse.getKey(), true);
+            net.minecraft.client.KeyMapping.click(m.options.keyUse.getKey());
+        });
+        atTicks(t + 228, "captura: el arco tenso con la flecha de fuego", m -> {
+            logAj(m, "arco tenso");
+            shot(m, "cliente_aj05_arco_fuego");
+        });
+        atTicks(t + 230, "soltar", m -> net.minecraft.client.KeyMapping.set(m.options.keyUse.getKey(), false));
+        atTicks(t + 232, "captura: la flecha de fuego volando", m -> shot(m, "cliente_aj06_flecha_fuego"));
+        atTicks(t + 248, "la diana del fuego", m -> logAj(m, "flecha de fuego"));
+        // ---- tres de sangre (de lado, para ver la barrita)
+        atTicks(t + 250, "flechas de sangre: vista de lado", m -> verDesde(m, new Vec3(ex - 7.5, ey + 2.4, ez + 1.0), new Vec3(ex - 1.5, ey + 1.3, ez + 5.0)));
+        for (int i = 0; i < 3; i++) {
+            final int n = i + 1;
+            atTicks(t + 252 + i * 14, "flecha de sangre " + n, m -> server(m, sp -> ajDisparar(sp, com.darkcraft.armas.FlechaEspecial.Clase.SANGRE, ajSangre)));
+        }
+        atTicks(t + 276, "captura: dos de sangre clavadas y la barrita", m -> {
+            m.options.hideGui = false;
+            logAj(m, "dos de sangre");
+            shot(m, "cliente_aj07_sangre_barra");
+        });
+        atTicks(t + 283, "captura: la hemorragia", m -> {
+            logAj(m, "hemorragia");
+            shot(m, "cliente_aj08_hemorragia");
+        });
+        // ---- tres de escarcha
+        atTicks(t + 300, "flechas de escarcha", m -> verDesde(m, new Vec3(ex - 5.5, ey + 2.4, ez + 1.0), new Vec3(ex + 0.5, ey + 1.3, ez + 5.0)));
+        for (int i = 0; i < 3; i++) {
+            final int n = i + 1;
+            atTicks(t + 302 + i * 14, "flecha de escarcha " + n, m -> server(m, sp -> ajDisparar(sp, com.darkcraft.armas.FlechaEspecial.Clase.ESCARCHA, ajFrio)));
+        }
+        atTicks(t + 326, "captura: dos de escarcha y la barrita", m -> {
+            logAj(m, "dos de escarcha");
+            shot(m, "cliente_aj09_escarcha_barra");
+        });
+        atTicks(t + 333, "captura: la congelacion", m -> {
+            logAj(m, "congelacion");
+            shot(m, "cliente_aj10_congelacion");
+        });
+        atTicks(t + 340, "congelado recibe mas: un golpe de 10", m -> server(m, sp -> {
+            if (ajFrio == null) return;
+            float antes = ajFrio.getHealth();
+            ajFrio.invulnerableTime = 0;
+            ajFrio.hurt(sp.damageSources().generic(), 10f);
+            log(String.format(java.util.Locale.ROOT, "  armas 7aj congelado: un golpe de 10 le quita %.1f (debil %s)", antes - ajFrio.getHealth(),
+                    com.darkcraft.enemigos.Congelacion.debil(ajFrio)));
+        }));
+        // ---- lo del propio jugador: las barritas bajo sus barras
+        atTicks(t + 344, "lo del jugador: sangre y frio sumados", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                com.darkcraft.enemigos.Sangrado.sumar(sp, 60f, null);
+                com.darkcraft.enemigos.Congelacion.sumar(sp, 45f, null);
+            });
+        });
+        atTicks(t + 354, "captura: las barritas del jugador", m -> {
+            logAj(m, "el jugador");
+            shot(m, "cliente_aj11_jugador");
+        });
+        atTicks(t + 356, "el menu: las armas (martillos y flechas)", m -> com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.INVENTARIO));
+        atTicks(t + 366, "captura: el inventario con las armas", m -> shot(m, "cliente_aj12_menu"));
+        atTicks(t + 368, "el menu: el equipo con el gran martillo en la mano", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                sp.getInventory().items.set(0, new ItemStack(DarkCraftMod.GRAN_MARTILLO.get()));
+                ajHueco(sp, 0);
+            });
+        });
+        atTicks(t + 372, "abrir el equipo", m -> com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.EQUIPO));
+        atTicks(t + 382, "captura: la ficha del gran martillo", m -> shot(m, "cliente_aj13_ficha"));
+        atTicks(t + 384, "Fin de los martillos y las flechas", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = false;
+            server(m, sp -> {
+                for (var e : new net.minecraft.world.entity.LivingEntity[]{ajSangre, ajFrio, ajFuego, ajEscudo, dianaA}) if (e != null) e.discard();
+                for (var f : sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.projectile.AbstractArrow.class, sp.getBoundingBox().inflate(40)))
+                    f.discard();
+                ajSangre = ajFrio = ajFuego = null;
+                ajEscudo = null;
+                dianaA = null;
+                com.darkcraft.enemigos.Sangrado.limpiar(sp);
+                com.darkcraft.enemigos.Congelacion.limpiar(sp);
+                sp.getInventory().clearContent();
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 390;
+    }
+
     // ------------------------------------------------------------------ el mundo de nubes (parte 3a)
 
     private static net.minecraft.world.entity.decoration.ArmorStand nubesMuneco;
@@ -5290,6 +5561,8 @@ public final class ClientCiTest {
         fin = clases(fin);
         // las armaduras con modelo propio (parte 7ai)
         fin = armaduras(fin);
+        // los martillos y las flechas de fuego, de sangre y de escarcha (parte 7aj)
+        fin = armas7aj(fin);
         fin = nubes(fin);
         fin = pueblo(fin);
         fin = enemigos(fin);

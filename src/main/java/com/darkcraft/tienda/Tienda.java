@@ -67,7 +67,13 @@ public final class Tienda {
             new Oferta("darkcraft:talisman_porteador", 1, 3500, 1),
             new Oferta("darkcraft:ceniza_parada", 1, 2200, 1),
             new Oferta("darkcraft:ceniza_llamas", 1, 2800, 1),
-            new Oferta("darkcraft:ceniza_escarcha", 1, 2800, 1));
+            new Oferta("darkcraft:ceniza_escarcha", 1, 2800, 1),
+            // los martillos, la ballesta y las flechas de fuego y de escarcha (parte 7aj)
+            new Oferta("darkcraft:maza", 1, 1300, 1),
+            new Oferta("darkcraft:martillo_guerra", 1, 1500, 1),
+            new Oferta("minecraft:crossbow", 1, 1100, 1),
+            new Oferta("darkcraft:flecha_fuego", 5, 150, 0),
+            new Oferta("darkcraft:flecha_escarcha", 5, 180, 0));
 
     /**
      * La mercancia de Silas (parte 7af), el mercader ambulante de Morvain: lo de alli, mas caro (piedras II sin limite y III,
@@ -90,7 +96,12 @@ public final class Tienda {
             new Oferta("darkcraft:talisman_codicia", 1, 6000, 1),
             new Oferta("darkcraft:ceniza_paso", 1, 3000, 1),
             new Oferta("darkcraft:ceniza_relampago", 1, 3400, 1),
-            new Oferta("darkcraft:ceniza_sangre", 1, 3400, 1));
+            new Oferta("darkcraft:ceniza_sangre", 1, 3400, 1),
+            // el gran martillo y las tres flechas (parte 7aj)
+            new Oferta("darkcraft:gran_martillo", 1, 4200, 1),
+            new Oferta("darkcraft:flecha_sangre", 5, 240, 0),
+            new Oferta("darkcraft:flecha_fuego", 5, 170, 0),
+            new Oferta("darkcraft:flecha_escarcha", 5, 200, 0));
 
     /** Lo que vende el mercader {@code id} ("mercader" Kerrick, "silas" Silas). */
     public static List<Oferta> de(String id) {
