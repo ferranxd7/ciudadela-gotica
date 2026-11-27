@@ -5923,5 +5923,177 @@
     ]
    }
   }
+ },
+ "sfx_marcado": {
+  "flow": "sjsGv1UGBLAnN0YbBhO1",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7u: los Marcados del Cerco del Ancla (alerta de la marca, dolor, muerte deshaciendose en sombra, el mazazo con su onda, el golpe contra la cadena, el reflejo de sombra que repite el golpe, el desliz, la flecha negra, el susurro de los que rezan y el esfuerzo del rompedor) y el aire del crater (crater_ambiente). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "marcado_alerta": {
+    "prompt": "Dark fantasy enemy alert: a cursed undead warrior's brand on his chest ignites with a sharp hiss of red fire and a distorted metallic shriek that echoes, Dark Souls style, cinematic, 2 seconds",
+    "sesiones": [
+     "F8TsZGvpwY9Wx1zoelv6",
+     "uK2WQa7MBE8uc5V46Rhc",
+     "ROcwwAlWvuNM58x9bPUB",
+     "K0dDHHsx5cwX7TpJDPKy"
+    ],
+    "generaciones": [
+     "Uxwn1uMMI0sv7eTwTkHn",
+     "GxSc05U3REMBZkGBXD9X",
+     "Cn5VhOSKvYpAfsKTUvDN",
+     "HHi4XtjBTXt572wvZEfj"
+    ]
+   },
+   "marcado_dolor": {
+    "prompt": "Pained grunt of a hollow undead knight inside his armor, raspy and slightly echoing, dark fantasy game enemy hurt sound, 1 second",
+    "sesiones": [
+     "NBIXHTnGgLfFV1a8SFMW",
+     "cxU7VlTLrXaHq1OJjPXr",
+     "nu3ITuQyfOyryumsgt5r",
+     "f9mOhfgrSXptQDlvRmAz"
+    ],
+    "generaciones": [
+     "roVT9YpXzwj5SvqxcX6d",
+     "6NVEu7rZV0i7gnUOCbXl",
+     "NslHosKm4Y6eVF03VAtl",
+     "lCqOdKzoJNr014sg1olq"
+    ]
+   },
+   "marcado_muerte": {
+    "prompt": "An undead warrior collapses to his knees and dissolves into shadow: armor clatter, a deep whoosh of black smoke, fading embers crackling and a last faint whisper, dark fantasy, cinematic, 3 seconds",
+    "sesiones": [
+     "ld5QLpxvxZwOB6q3BXZV",
+     "rogAImBLCEmK65pXKntK",
+     "CrSdENrtaP7CBNBVz56i",
+     "T3lJkOtk2uK0ayW0zOsg"
+    ],
+    "generaciones": [
+     "acOh5LNxWlFsr9p1T9lw",
+     "tmAC6nKelWMsg5RBALQQ",
+     "W1SeXKqpcxB1AS4n3IZu",
+     "OMKKvjVfDy1NoYrsfEvN"
+    ]
+   },
+   "marcado_mazazo": {
+    "prompt": "A massive forge maul slams into stone ground: deep heavy boom, cracking rock and scattering rubble, dark fantasy boss attack impact, cinematic, 2 seconds",
+    "sesiones": [
+     "rzrZKQIhKKOH98zJTjLe",
+     "Iylucm3JVYO86sc6TbnD",
+     "OfTcGh3AH2ozYeVVFbtS",
+     "VrStom5V7RGARNHAvpZt"
+    ],
+    "generaciones": [
+     "q7oI0ZvGJWR0D1l2LyO4",
+     "0U4IhNt1ukt2HrM6JSwX",
+     "DnCXvHeqgZqDtT0ZrDRe",
+     "6YyI3RaEVExjtv5kKZ7H"
+    ]
+   },
+   "marcado_cadena": {
+    "prompt": "A heavy smith hammer strikes a giant iron chain anchor once: a single loud ringing metallic clang with a long deep reverberation, dark fantasy, 2 seconds",
+    "sesiones": [
+     "wkbKskf3LkJ88JaGDdBp",
+     "BzQ29wedHP2AWeKG8DkT",
+     "WeCgieS1NdvOa2h1MceK",
+     "LR9q0Ez28lQCklvadRCw"
+    ],
+    "generaciones": [
+     "iZEmPvpmyLFXYtoQSiTB",
+     "KY97AF7o5IywLSYaAYGl",
+     "q0IFfvPcLKuPXtmR20DT",
+     "nc4RhzxFD4bWh2ICKqjx"
+    ]
+   },
+   "marcado_reflejo": {
+    "prompt": "Ghostly shadow echo of a weapon swing: a reversed dark whoosh with a distorted whisper and a faint metallic ring, eerie, dark fantasy, 1.5 seconds",
+    "sesiones": [
+     "R5MPSFpZJmBdiWWrjgKB",
+     "OA5hiASb6fDyRtyfEF5q",
+     "i9OPAWm6JPLgp7v9o1Rc",
+     "KGyTw4F66g17noRKl99f"
+    ],
+    "generaciones": [
+     "rVFxvDX8Z1CpYd94YYhr",
+     "ErxWaEOnYgQNKcuUrPnr",
+     "Ft4q8jBd0vBQOcNg2Kz7",
+     "yKhGzUz0nNgTF5DG0oiN"
+    ]
+   },
+   "marcado_desliz": {
+    "prompt": "Shadow step teleport: a quick dark whoosh, a burst of smoke and a crackle of embers, dark fantasy magic, 1 second",
+    "sesiones": [
+     "L6nzVPavBak1hVINJs7X",
+     "2K32p8wD6gXVYQ4NUULB",
+     "7KGtXcXA3UdBxjJBb1Gs",
+     "fVxluaHMcjL486og7JmB"
+    ],
+    "generaciones": [
+     "liFmVvuIEas5rFIxhmRP",
+     "J2hQ7YmUJ91zNvTw7SPn",
+     "gpzbyJcjqSdXca9u36S1",
+     "UiAL1th7JO2KKSiq701J"
+    ]
+   },
+   "marcado_flecha": {
+    "prompt": "A cursed black arrow released from a longbow: bowstring snap followed by a deep ominous humming whistle as it flies away, dark magic, dark fantasy, 2 seconds",
+    "sesiones": [
+     "omAlziZY3uzx3YfLXqN4",
+     "7TiVUQCqLAiIFkzRIrys",
+     "ZfNfMUmp3hNLnZHr9jBi",
+     "IJTv7eDXFtuCbCdQ7lGy"
+    ],
+    "generaciones": [
+     "z6faSn2Qd89dHXuGRbDI",
+     "x8M32WdufalO7Ca0W1oq",
+     "yVs4IJTfdndKwJu6hkvP",
+     "nqo2hVhwkmSwskcp1oqs"
+    ]
+   },
+   "marcado_susurro": {
+    "prompt": "Many hollow voices whispering unintelligible prayers in a vast stone crater, eerie overlapping murmurs that rise and fade, dark fantasy enemy idle sound, 4 seconds",
+    "sesiones": [
+     "B82HU3CbgFtY79VT5PVV",
+     "3g5mGC1VtiBWwJ5ofUwZ",
+     "1iAIOBIHtWr21lMTzavu",
+     "9PPO1PZBpmQWzb958y8m"
+    ],
+    "generaciones": [
+     "LdNANRT0j8o4TyL8zFvj",
+     "HXhT8ptBXUtP8h3nwIsJ",
+     "ROuaEQHWhg65JQaUqnbV",
+     "WcwLBl3ZpvL2ehxW839w"
+    ]
+   },
+   "marcado_esfuerzo": {
+    "prompt": "Heavy strained breath and deep grunt of a huge undead smith lifting a massive hammer over his head, raspy, dark fantasy, 1.5 seconds",
+    "sesiones": [
+     "V9VRSU6MZ6mSobbrGoHM",
+     "80VZJlq7HjgD9iak6xO4",
+     "RRTGwL1k57liVRQE70jJ",
+     "wOIK7ZKid5S1UHOPoRQ0"
+    ],
+    "generaciones": [
+     "oWBy9NoqZQiMLuzYBrwS",
+     "9QpvPtXQBlz7QF2y6aur",
+     "WDE0owiVyUMrbJopAsqP",
+     "N4DAaDXgHtWTie5JzwyE"
+    ]
+   },
+   "crater_ambiente": {
+    "prompt": "Ambience of a vast blood crater: colossal iron chains creaking and groaning in the wind high above, distant metallic clangs, a low ominous drone and a dry wind, seamless dark fantasy atmosphere, 20 seconds",
+    "sesiones": [
+     "aLdqVXwnLSBqFfw6zOO4",
+     "rml8FHFUHDJucWV48iDO",
+     "ddUOK6Y8fRxc5aDiQ5C8",
+     "LnsASsR4NpNBDvkYG7WL"
+    ],
+    "generaciones": [
+     "9BbUSQ0VCRDWkFGQHLfe",
+     "ExKPmlu27V2DisnBxVzi",
+     "eovowCl4CaKPauZ9cWt7",
+     "AXIXJ9ayQYfbxl2BGuyA"
+    ]
+   }
+  }
  }
 }
