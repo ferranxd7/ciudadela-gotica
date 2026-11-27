@@ -647,8 +647,13 @@ public final class Combate {
      */
     private static void romperGuardia(ServerPlayer sp, LivingEntity le) {
         GUARDIAS_ROTAS++;
-        if (le instanceof Player p) p.disableShield(true);
-        else {
+        if (le instanceof Player p) {
+            // como el hacha del juego, pero con el escudo que lleve (los del mod tambien)
+            ItemStack escudo = p.getUseItem();
+            if (!escudo.isEmpty()) p.getCooldowns().addCooldown(escudo.getItem(), 100);
+            p.stopUsingItem();
+            p.level().broadcastEntityEvent(p, (byte) 30);
+        } else {
             ItemStack escudo = le.getUseItem();
             le.stopUsingItem();
             if (le instanceof com.darkcraft.caballeros.CaballeroZombi cz) cz.guardiaRota(60);
