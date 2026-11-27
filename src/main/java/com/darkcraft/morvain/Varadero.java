@@ -1417,15 +1417,22 @@ public final class Varadero {
     /** Lo que hay en el puerto ya generado (para la prueba): el atril con el libro, el arcon, el muelle, el fondo, la ballena y el faro. */
     public static String resumen(ServerLevel m) {
         Varadero a = get();
+        // los sitios del atril y del arcon son donde se pisa, delante (al sur) de cada uno
         int[] at = a.sitio("atril"), ar = a.sitio("arcon");
-        boolean libro = m.getBlockEntity(new BlockPos(at[0], at[1], at[2])) instanceof net.minecraft.world.level.block.entity.LecternBlockEntity le
+        boolean libro = m.getBlockEntity(new BlockPos(at[0], at[1], at[2] - 1)) instanceof net.minecraft.world.level.block.entity.LecternBlockEntity le
                 && Perdidos.de(le.getBook()) == 26;
-        boolean arcon = m.getBlockState(new BlockPos(ar[0], ar[1], ar[2])).is(Blocks.CHEST);
+        boolean arcon = m.getBlockState(new BlockPos(ar[0], ar[1], ar[2] - 1)).is(Blocks.CHEST);
         boolean fuego = m.getBlockState(new BlockPos(CX + FARO_U, LINTERNA + 1, CZ + FARO_V)).is(Blocks.SOUL_CAMPFIRE);
         boolean muro = m.getBlockState(new BlockPos(CX + MUELLE_U + 1, SUELO, CZ)).is(Blocks.POLISHED_ANDESITE);
         boolean fondo = m.getBlockState(new BlockPos(CX + 40, FONDO + 1, CZ - 4)).isAir() && !m.getBlockState(new BlockPos(CX + 40, FONDO, CZ - 4)).isAir();
         int huesos = 0;
-        for (int u = 50; u <= 68; u += 3) if (m.getBlockState(new BlockPos(CX + u, FONDO + 1, CZ + BALLENA_V + 7)).is(Blocks.BONE_BLOCK)) huesos++;
+        // el pie de cada costilla del lado del sur (a 7 del espinazo: tres por encima del fondo)
+        for (int u = 50; u <= 68; u += 3)
+            for (int y = FONDO + 1; y <= FONDO + 6; y++)
+                if (m.getBlockState(new BlockPos(CX + u, y, CZ + BALLENA_V + 7)).is(Blocks.BONE_BLOCK)) {
+                    huesos++;
+                    break;
+                }
         return "atril con el libro 26 " + (libro ? "SI" : "NO") + ", arcon " + (arcon ? "SI" : "NO") + ", fuego del faro " + (fuego ? "SI" : "NO")
                 + ", muelle " + (muro ? "SI" : "NO") + ", fondo seco " + (fondo ? "SI" : "NO") + ", costillas de la ballena " + huesos + "/7";
     }
