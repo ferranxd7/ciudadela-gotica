@@ -408,6 +408,8 @@ public final class Combate {
                 le.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 70, 2, false, true, true));
                 le.setTicksFrozen(Math.max(le.getTicksFrozen(), 180));
                 sl.sendParticles(ParticleTypes.SNOWFLAKE, c.x, c.y, c.z, 16, 0.3, 0.4, 0.3, 0.03);
+                // (parte 7aj) y suma congelacion, como una flecha de escarcha
+                com.darkcraft.enemigos.Congelacion.sumar(le, ESCARCHA_SUMA, sp);
             }
             case RELAMPAGO -> {
                 // un rayo de mas (dano de rayo: lo frenan las resistencias al rayo)
@@ -416,12 +418,19 @@ public final class Combate {
                         .getHolderOrThrow(net.minecraft.world.damagesource.DamageTypes.LIGHTNING_BOLT), sp, sp), dano * 0.35f);
                 sl.sendParticles(ParticleTypes.ELECTRIC_SPARK, c.x, c.y, c.z, 20, 0.3, 0.5, 0.3, 0.15);
             }
-            case SANGRE -> sl.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(0.7f, 0.0f, 0.04f), 1.8f),
-                    c.x, c.y, c.z, 24, 0.3, 0.4, 0.3, 0.0);
+            case SANGRE -> {
+                sl.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(0.7f, 0.0f, 0.04f), 1.8f),
+                        c.x, c.y, c.z, 24, 0.3, 0.4, 0.3, 0.0);
+                // (parte 7aj) y suma sangrado, como una flecha de sangre
+                com.darkcraft.enemigos.Sangrado.sumar(le, SANGRE_SUMA, sp);
+            }
             default -> {
             }
         }
     }
+
+    /** Lo que suman de sangrado el tajo sangriento y de congelacion el tajo helado (parte 7aj; de los 100 que hacen falta). */
+    public static final float SANGRE_SUMA = 40f, ESCARCHA_SUMA = 30f;
 
     /** Si el jugador esta en el instante de la parada. */
     public static boolean parando(Player p) {
@@ -585,6 +594,14 @@ public final class Combate {
         if (sp.hasEffect(com.darkcraft.rol.Efectos.BENDICION.get())) mult *= 1.15f;
         if (sp.hasEffect(com.darkcraft.rol.Efectos.FURIA.get())) mult *= 1f + Habilidad.FURIA_EXTRA;
         float dano = (base + encanto) * mult;
+        boolean metal = le.getArmorValue() >= 8 || le instanceof com.darkcraft.caballeros.CaballeroZombi || le instanceof com.darkcraft.rey.Rey
+                || le instanceof com.darkcraft.gavran.Gavran;
+        // los martillos (parte 7aj): pegan mas a los que llevan armadura y a quien se cubre con un escudo le rompen la guardia
+        boolean martillo = arma.getItem() instanceof com.darkcraft.armas.Martillo;
+        if (martillo) {
+            if (metal) dano *= com.darkcraft.armas.Martillo.CONTRA_ARMADURA;
+            if (le.isBlocking()) romperGuardia(sp, le);
+        }
         DamageSource fuente = sp.damageSources().playerAttack(sp);
         float antes = le.getHealth();
         le.invulnerableTime = 0;
@@ -613,12 +630,34 @@ public final class Combate {
         Vec3 c = le.position().add(0, le.getBbHeight() * 0.6, 0);
         sl.sendParticles(ParticleTypes.CRIT, c.x, c.y, c.z, 8, 0.25, 0.3, 0.25, 0.25);
         if (e.accion == Armas.PESADO || e.tipo.dosManos) sl.sendParticles(ParticleTypes.SWEEP_ATTACK, c.x, c.y, c.z, 1, 0, 0, 0, 0);
-        boolean metal = le.getArmorValue() >= 8 || le instanceof com.darkcraft.caballeros.CaballeroZombi || le instanceof com.darkcraft.rey.Rey
-                || le instanceof com.darkcraft.gavran.Gavran;
-        sl.playSound(null, c.x, c.y, c.z, metal ? DarkCraftMod.SFX_IMPACTO_ARMADURA.get() : DarkCraftMod.SFX_IMPACTO_CARNE.get(), SoundSource.PLAYERS,
-                0.9f, 0.9f + sp.getRandom().nextFloat() * 0.2f);
+        sl.playSound(null, c.x, c.y, c.z, martillo ? DarkCraftMod.SFX_MARTILLO_GOLPE.get() : metal ? DarkCraftMod.SFX_IMPACTO_ARMADURA.get()
+                : DarkCraftMod.SFX_IMPACTO_CARNE.get(), SoundSource.PLAYERS, martillo ? 1.0f : 0.9f, 0.9f + sp.getRandom().nextFloat() * 0.2f);
+        if (martillo && (e.accion == Armas.PESADO || e.tipo == Armas.Tipo.GRAN_MARTILLO))
+            sl.sendParticles(ParticleTypes.EXPLOSION, c.x, c.y - 0.2, c.z, 1, 0, 0, 0, 0);
         desequilibrar(sp, le, m.aturde() * (1f + e.carga));
         return true;
+    }
+
+    /** Para las pruebas: las guardias que han roto los martillos. */
+    public static int GUARDIAS_ROTAS;
+
+    /**
+     * Un martillo da en un escudo levantado (parte 7aj): baja el escudo (un jugador no puede volver a cubrirse en 5 s, como con el
+     * hacha del juego; un enemigo, un rato) y el golpe entra entero; suena la guardia rota y saltan chispas.
+     */
+    private static void romperGuardia(ServerPlayer sp, LivingEntity le) {
+        GUARDIAS_ROTAS++;
+        if (le instanceof Player p) p.disableShield(true);
+        else {
+            ItemStack escudo = le.getUseItem();
+            le.stopUsingItem();
+            if (le instanceof com.darkcraft.caballeros.CaballeroZombi cz) cz.guardiaRota(60);
+            if (!escudo.isEmpty()) le.level().broadcastEntityEvent(le, (byte) 30);
+        }
+        ServerLevel sl = sp.serverLevel();
+        Vec3 c = le.position().add(0, le.getBbHeight() * 0.6, 0);
+        sl.sendParticles(ParticleTypes.CRIT, c.x, c.y, c.z, 18, 0.3, 0.3, 0.3, 0.35);
+        sl.playSound(null, c.x, c.y, c.z, DarkCraftMod.SFX_GUARDIA_ROTA.get(), SoundSource.PLAYERS, 1.0f, 0.9f + sp.getRandom().nextFloat() * 0.15f);
     }
 
     /** Lo que desequilibra cada golpe: a un enemigo normal, si se le acumula bastante, se queda aturdido (los jefes llevan lo suyo). */

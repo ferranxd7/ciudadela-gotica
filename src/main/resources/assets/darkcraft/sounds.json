@@ -8020,5 +8020,38 @@
         "attenuation_distance": 12
       }
     ]
+  },
+  "sfx.martillo_golpe": {
+    "subtitle": "subtitles.darkcraft.sfx.martillo_golpe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/martillo_golpe_1"
+      },
+      {
+        "name": "darkcraft:sfx/martillo_golpe_2"
+      }
+    ]
+  },
+  "sfx.flecha_fuego": {
+    "subtitle": "subtitles.darkcraft.sfx.flecha_fuego",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/flecha_fuego_1"
+      },
+      {
+        "name": "darkcraft:sfx/flecha_fuego_2"
+      }
+    ]
+  },
+  "sfx.congelacion": {
+    "subtitle": "subtitles.darkcraft.sfx.congelacion",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/congelacion_1"
+      },
+      {
+        "name": "darkcraft:sfx/congelacion_2"
+      }
+    ]
   }
 }

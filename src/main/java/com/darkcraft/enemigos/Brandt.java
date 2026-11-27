@@ -39,6 +39,8 @@ public class Brandt extends Guardian {
     public static final int ECOS = 3500;
     /** Lo que deja pasar el pavés de lo que le llega de frente (en el muro, nada). */
     static final float PAVES = 0.15f;
+    /** Lo que deja pasar el pavés de un martillo (parte 7aj): de frente y en el muro. */
+    static final float PAVES_MARTILLO = 0.5f, PAVES_MURO_MARTILLO = 0.25f;
 
     private int embestidaEspera = 60, terremotoEspera, muroEspera = 80, golpesRecibidos, ultimoGolpe;
     private boolean pegadoEnMuro, contestar;
@@ -235,12 +237,16 @@ public class Brandt extends Guardian {
         if (!level().isClientSide && cubre(s)) {
             boolean flecha = s.getDirectEntity() instanceof net.minecraft.world.entity.projectile.Projectile;
             level().playSound(null, getX(), getY() + 1.5, getZ(), DarkCraftMod.SFX_BRANDT_ESCUDO.get(), SoundSource.HOSTILE, 1.1f, 0.9f + random.nextFloat() * 0.2f);
+            // un martillo (parte 7aj) hace temblar el paves: pasa la mitad (en el muro, una cuarta parte)
+            boolean martillo = !flecha && com.darkcraft.armas.Martillo.rompe(s);
             if (accion() == BrandtAnims.MURO) {
                 pegadoEnMuro = true;
-                return false;
+                if (!martillo) return false;
+                cuanto *= PAVES_MURO_MARTILLO;
+            } else {
+                if (flecha) return false;
+                cuanto *= martillo ? PAVES_MARTILLO : PAVES;
             }
-            if (flecha) return false;
-            cuanto *= PAVES;
         }
         boolean ok = super.hurt(s, cuanto);
         if (ok && !level().isClientSide) {

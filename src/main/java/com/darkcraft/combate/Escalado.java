@@ -44,6 +44,9 @@ public final class Escalado {
             case HACHA -> d("CE---", 12, 8, 0, 0, 0);
             case LANZA -> d("DB---", 10, 12, 0, 0, 0);
             case ALABARDA -> d("CC---", 14, 12, 0, 0, 0);
+            // los martillos (parte 7aj): de Fuerza
+            case MARTILLO -> d("BE---", 14, 8, 0, 0, 0);
+            case GRAN_MARTILLO -> d("AE---", 22, 8, 0, 0, 0);
         };
     }
 
@@ -54,6 +57,8 @@ public final class Escalado {
         if (st.is(DarkCraftMod.ALABARDA.get())) return d("CC---", 14, 12, 0, 0, 0);
         // la Lanza de la Puerta Oeste (parte 7ah): mejor que una lanza cualquiera con la Fuerza y la Destreza
         if (st.is(DarkCraftMod.LANZA_TAM.get())) return d("CB---", 11, 13, 0, 0, 0);
+        // la maza de clerigo (parte 7aj): un martillo que escala tambien con la Fe
+        if (st.is(DarkCraftMod.MAZA.get())) return d("CD-C-", 12, 8, 0, 12, 0);
         Armas.Tipo t = Armas.de(st);
         return t == null ? null : deTipo(t);
     }

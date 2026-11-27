@@ -142,9 +142,13 @@ public final class Hud {
         int fin = X0 + 24;
         // la marca del objetivo fijado, debajo de todo lo demas
         com.darkcraft.client.combate.Fijar.dibujar(g, w, h, pt);
+        // el sangrado y la congelacion de los de alrededor (parte 7aj)
+        com.darkcraft.client.combate.Acumulados.dibujar(g, w, h, pt);
         if (gui.shouldDrawSurvivalElements()) {
             fin = barras(mc, g, p, t, w);
-            efectos(mc, g, p, t);
+            boolean hay = efectos(mc, g, p, t);
+            // los suyos, bajo las barras y los efectos
+            com.darkcraft.client.combate.Acumulados.dibujarPropio(g, X0 + 22, Y0 + 28 + (corcel(p) != null ? 10 : 0) + (hay ? 24 : 0), pt);
             // abajo a la izquierda, la cruz del equipo (lleva los frascos en su hueco de abajo)
             if (!(mc.screen instanceof net.minecraft.client.gui.screens.ChatScreen) && !(mc.screen instanceof MenuScreen) && ClientEquipo.activo())
                 Cruz.dibujar(mc, g, t, h);
@@ -163,11 +167,12 @@ public final class Hud {
     /** Lo que duraba cada efecto al ponerse (para la rayita de lo que le queda). */
     private static final java.util.Map<net.minecraft.world.effect.MobEffect, Integer> DURA = new java.util.HashMap<>();
 
-    private static void efectos(Minecraft mc, GuiGraphics g, LocalPlayer p, float t) {
+    /** Devuelve si ha dibujado alguno. */
+    private static boolean efectos(Minecraft mc, GuiGraphics g, LocalPlayer p, float t) {
         var activos = p.getActiveEffects();
         if (activos.isEmpty()) {
             DURA.clear();
-            return;
+            return false;
         }
         java.util.List<net.minecraft.world.effect.MobEffectInstance> l = new java.util.ArrayList<>(activos);
         l.removeIf(m -> !m.showIcon());
@@ -195,6 +200,7 @@ public final class Hud {
             x += 22;
         }
         DURA.keySet().removeIf(e -> !p.hasEffect(e));
+        return !l.isEmpty();
     }
 
     // ---- las barras

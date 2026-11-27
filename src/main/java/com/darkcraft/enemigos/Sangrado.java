@@ -1,6 +1,7 @@
 package com.darkcraft.enemigos;
 
 import com.darkcraft.DarkCraftMod;
+import com.darkcraft.net.Net;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -20,14 +21,20 @@ import org.joml.Vector3f;
  * vida maxima (3 como poco), un chorro de sangre y frena un momento. Lo sumado se va solo si en 3 s no se suma mas (2 por
  * tick). Se guarda en los datos de la entidad (solo en el servidor). A los jugadores en creativo o espectador, nada; a los
  * penitentes tampoco (ya no les queda sangre).
+ * <p>
+ * Desde la parte 7aj tambien lo hacen las flechas de sangre y la ceniza del tajo sangriento: a los jefes les entra la mitad y
+ * su hemorragia es del 5 %; los que no tienen sangre (esqueletos, perros de hueso, espectros, gargolas, calcinados, la Sombra)
+ * no sangran. Lo sumado se manda a los clientes que lo ven ({@link Net.Acumula}: la barra encima de cada uno).
  */
 public final class Sangrado {
     private Sangrado() {}
 
     /** Lo que hay que sumar para la hemorragia. */
     public static final float TOPE = 100f;
-    /** Lo que se lleva la hemorragia (de la vida maxima) y lo menos que quita. */
-    public static final float PARTE = 0.15f, MINIMO = 3f;
+    /** Lo que se lleva la hemorragia (de la vida maxima; a un jefe, {@code PARTE_JEFE}) y lo menos que quita. */
+    public static final float PARTE = 0.15f, PARTE_JEFE = 0.05f, MINIMO = 3f;
+    /** A los jefes les entra esta parte de lo que se suma. */
+    public static final float JEFE = 0.5f;
     private static final String CLAVE = "darkcraft_sangre", CUANDO = "darkcraft_sangre_t";
     public static final DustParticleOptions GOTA = new DustParticleOptions(new Vector3f(0.55f, 0.03f, 0.05f), 1.1f),
             CHORRO = new DustParticleOptions(new Vector3f(0.7f, 0.04f, 0.06f), 1.8f);
@@ -47,11 +54,25 @@ public final class Sangrado {
         return quieto > 60 ? (quieto - 60) * 2f : 0f;
     }
 
+    /** Si es un jefe (los que llevan barra: los guardianes, el Capitan, el Rey, Ser Gavran y los del juego). */
+    public static boolean jefe(LivingEntity le) {
+        return le instanceof Guardian || le instanceof Capitan || le instanceof com.darkcraft.rey.Rey || le instanceof com.darkcraft.gavran.Gavran
+                || le instanceof net.minecraft.world.entity.boss.wither.WitherBoss || le instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+    }
+
+    /** Los que no sangran: no les queda sangre o nunca la tuvieron. */
+    public static boolean sinSangre(LivingEntity le) {
+        return le instanceof Penitente || le instanceof Arquero || le instanceof Perro || le instanceof Espectro || le instanceof Gargola
+                || le instanceof Calcinado || le instanceof Sombra || le instanceof net.minecraft.world.entity.monster.AbstractSkeleton
+                || le instanceof com.darkcraft.montura.Corcel;
+    }
+
     /** Suma {@code n} de sangre perdida; devuelve si ha habido hemorragia. */
     public static boolean sumar(LivingEntity le, float n, LivingEntity causa) {
         if (le.level().isClientSide || !le.isAlive() || n <= 0) return false;
         if (le instanceof Player p && (p.isCreative() || p.isSpectator())) return false;
-        if (le instanceof Penitente) return false;
+        if (sinSangre(le)) return false;
+        if (jefe(le)) n *= JEFE;
         CompoundTag d = le.getPersistentData();
         float v = nivel(le) + n;
         d.putLong(CUANDO, le.level().getGameTime());
@@ -60,22 +81,27 @@ public final class Sangrado {
                     le.getBbHeight() * 0.25, le.getBbWidth() * 0.3, 0.0);
         if (v < TOPE) {
             d.putFloat(CLAVE, v);
+            Net.cerca(le, new Net.Acumula(le.getId(), Net.Acumula.SANGRE, v, false));
             return false;
         }
         d.putFloat(CLAVE, 0f);
+        Net.cerca(le, new Net.Acumula(le.getId(), Net.Acumula.SANGRE, 0f, true));
         hemorragia(le, causa);
         return true;
     }
 
     /** Lo sumado vuelve a 0 (al descansar, en las pruebas). */
     public static void limpiar(LivingEntity le) {
+        boolean habia = le.getPersistentData().contains(CLAVE);
         le.getPersistentData().remove(CLAVE);
         le.getPersistentData().remove(CUANDO);
+        if (habia && !le.level().isClientSide)
+            Net.cerca(le, new Net.Acumula(le.getId(), Net.Acumula.SANGRE, 0f, false));
     }
 
     private static void hemorragia(LivingEntity le, LivingEntity causa) {
         HEMORRAGIAS++;
-        float dano = Math.max(MINIMO, le.getMaxHealth() * PARTE);
+        float dano = Math.max(MINIMO, le.getMaxHealth() * (jefe(le) ? PARTE_JEFE : PARTE));
         le.invulnerableTime = 0;
         le.hurt(causa != null && causa.isAlive() ? le.damageSources().mobAttack(causa) : le.damageSources().generic(), dano);
         le.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 30, 1));

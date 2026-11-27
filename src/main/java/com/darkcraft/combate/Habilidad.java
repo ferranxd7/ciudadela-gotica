@@ -20,16 +20,16 @@ import java.util.Set;
 public enum Habilidad {
     /** Una vuelta entera con el arma: dos golpes alrededor. */
     TORBELLINO("torbellino", m(Anim.GIRO, 22, 7, 13, 1.25f, 0.15f, 1.15f, 180f, false, 16, 18, 0.6f), 14,
-            Tipo.ESPADA, Tipo.HACHA, Tipo.ALABARDA, Tipo.MANDOBLE),
+            Tipo.ESPADA, Tipo.HACHA, Tipo.ALABARDA, Tipo.MANDOBLE, Tipo.MARTILLO, Tipo.GRAN_MARTILLO),
     /** Se lanza hacia delante y atraviesa: lo que haya en la linea. */
     ESTOCADA("estocada", m(Anim.ESTOCADA, 22, 9, 12, 2.0f, 0f, 1.35f, 0f, true, 22, 20, 0.9f), 14,
             Tipo.LANZA, Tipo.ESPADA, Tipo.DAGA, Tipo.ALABARDA),
     /** Un grito de guerra: un rato pegando mas fuerte ({@code rol.Efectos.FURIA}). */
     GRITO("grito", m(Anim.GRITO, 26, 10, 10, 0f, 0f, 0f, 0f, false, 0, 12, 0f), 18,
-            Tipo.MANDOBLE, Tipo.HACHA, Tipo.ALABARDA),
+            Tipo.MANDOBLE, Tipo.HACHA, Tipo.ALABARDA, Tipo.MARTILLO, Tipo.GRAN_MARTILLO),
     /** Salta y golpea el suelo: una onda alrededor de donde cae. */
     SISMO("sismo", m(Anim.SALTO, 26, 0, 0, 1.8f, 0f, 1.0f, 0f, false, 30, 24, 1.0f), 20,
-            Tipo.HACHA, Tipo.MANDOBLE, Tipo.ALABARDA),
+            Tipo.HACHA, Tipo.MANDOBLE, Tipo.ALABARDA, Tipo.MARTILLO, Tipo.GRAN_MARTILLO),
     /** Un paso rapido de sombra hacia donde se vaya, sin que llegue nada mientras. */
     PASO("paso", m(Anim.PASO, 9, 0, 0, 0f, 0f, 0f, 0f, false, 0, 10, 0f), 6,
             Tipo.DAGA, Tipo.ESPADA),
@@ -72,7 +72,7 @@ public enum Habilidad {
     }
 
     private static Tipo[] todas() {
-        return new Tipo[]{Tipo.DAGA, Tipo.ESPADA, Tipo.MANDOBLE, Tipo.HACHA, Tipo.LANZA, Tipo.ALABARDA};
+        return new Tipo[]{Tipo.DAGA, Tipo.ESPADA, Tipo.MANDOBLE, Tipo.HACHA, Tipo.LANZA, Tipo.ALABARDA, Tipo.MARTILLO, Tipo.GRAN_MARTILLO};
     }
 
     /** Si esta habilidad se le puede poner a ese tipo de arma. */
@@ -106,6 +106,9 @@ public enum Habilidad {
             case MANDOBLE -> GRITO;
             case HACHA -> SISMO;
             case LANZA -> ESTOCADA;
+            // los martillos (parte 7aj): el de una mano grita, el grande golpea el suelo
+            case MARTILLO -> GRITO;
+            case GRAN_MARTILLO -> SISMO;
             default -> null;
         };
     }

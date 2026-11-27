@@ -3843,6 +3843,59 @@ Respuesta 111 del plan ("conjuntos con modelo 3D propio: yelmo, pecho, guantes, 
   que resiste y los modelos horneados), el caballero de espaldas (`ar10`), el menu con sus cuatro huecos (`ar11`) y el estado con sus
   resistencias (`ar12`); y las de las clases (`cliente_cl01`, `cl02`, `cl05`, `cl06`) ya salen con su armadura.
 
+### Plan grande, parte 7aj: los martillos y las flechas de fuego, de sangre y de escarcha
+
+Respuesta 109 del plan ("armas: ... hachas (y martillos); arcos y ballestas (flechas de fuego, sangre, escarcha) ..."), primera
+tanda (los escudos pequeno, mediano y grande van en la 7ak).
+- **Los martillos** (`armas/Martillo`, un `SwordItem` de hierro con su `Armas.Tipo`): la **Maza de Clerigo** (`darkcraft:maza`,
+  7 de ataque, una mano, escala C/D y **Fe C**, pesa 4,5), el **Martillo de Guerra** (`martillo_guerra`, 8, una mano, B/E, 5,5) y el
+  **Gran Martillo de Piedra** (`gran_martillo`, 11, a dos manos, A/E, 14). Tipos nuevos del combate `MARTILLO` (golpes de arriba
+  abajo y en diagonal, mazazo cargado, desequilibran mucho) y `GRAN_MARTILLO` (barridos y mazazos lentos y muy fuertes); su habilidad:
+  el grito (una mano) y el sismo (el grande); valen el torbellino, el grito, el sismo y las de todas. Lo suyo (`Combate.pegar`):
+  **+15 % a los que llevan armadura** (`Martillo.CONTRA_ARMADURA`, los mismos que suenan a metal) y **a quien se cubre con un escudo
+  le rompen la guardia** (`romperGuardia`: un jugador no se puede volver a cubrir en 5 s —`disableShield`, como el hacha del juego—;
+  un caballero zombi baja el escudo y no se cubre en 3 s —`CaballeroZombi.guardiaRota`—; el golpe entra entero; suena la guardia
+  rota). Los escudos de los enemigos del mod tambien (`Martillo.rompe(fuente)`): el caballero de la guardia de Valdrenn recibe el
+  golpe entero y se queda aturdido; el paves de Ser Brandt deja pasar la mitad (en el muro, la cuarta parte: `PAVES_MARTILLO`). Su
+  golpe suena a martillo (`sfx.martillo_golpe`) y el fuerte levanta polvo. Sprites de 32 x 32: `tools/rol/martillos.py [--vista
+  carpeta]`; el gran martillo y el de guerra, mas grandes en la mano (sus modelos).
+- **Las flechas** (`armas/FlechaItem`, un `ArrowItem` en `#minecraft:arrows`: `darkcraft:flecha_fuego`, `flecha_sangre`,
+  `flecha_escarcha`, en `DarkCraftMod.FLECHAS`) y la que vuela (`armas/FlechaEspecial`, una `AbstractArrow`, entidad
+  `darkcraft:flecha_especial` con su clase sincronizada; `client/armas/FlechaEspecialRenderer` con
+  `textures/entity/flecha_<clase>.png`, el reparto de la flecha del juego; rastro de llamitas, gotas o escarcha). Las tiran el arco y
+  la ballesta de siempre; **el arco tira primero las de la mano izquierda** (como en Minecraft: se eligen poniendolas en uno de los
+  tres huecos de la izquierda; lo dice su ficha). De fuego: va ardiendo y prende 6 s a quien da (`sfx.flecha_fuego`). De sangre: suma
+  34 de **sangrado**. De escarcha: suma 34 de **congelacion**. Se recogen del suelo (las que dan en alguien se pierden). Sprites:
+  `tools/rol/flechas.py [--vista carpeta]` (objeto 16 x 16 y entidad).
+- **El sangrado** (`enemigos/Sangrado`, el de los penitentes de la 7s, para todos): 100 = hemorragia (15 % de la vida; **a los jefes
+  —`Sangrado.jefe`: los guardianes, el Capitan, el Rey, Ser Gavran y los del juego— les entra la mitad y les quita el 5 %**); no
+  sangran (`sinSangre`) los penitentes, los esqueletos (los arqueros y los del juego), los perros de hueso, los espectros, las
+  gargolas, los calcinados, la Sombra ni el corcel. **La congelacion** (`enemigos/Congelacion`, igual): 100 = se congela (golpe de
+  frio del 10 %, a los jefes la mitad de lo sumado y el 4 %; queda helado —`Helado.helar`—, lento 5 s y **6 s recibiendo un 20 % mas
+  de todo**, `DEBIL`; `sfx.congelacion`); no se congelan los helados, la Sombra ni lo que el juego no deja (`canFreeze`). Lo sumado
+  baja solo (a los 3 s, 2 por tick); descansar lo quita. El tajo sangriento suma 40 de sangrado y el tajo helado 30 de congelacion
+  (`Combate.SANGRE_SUMA`, `ESCARCHA_SUMA`).
+- **Las barritas** (`Net.Acumula` → `client/combate/Acumulados`, a los que ven a esa entidad): encima de cada uno con algo sumado
+  (a menos de 22 bloques y a la vista) una barrita roja o azul palido con las esquinas de oro que baja sola como en el servidor y al
+  reventar se llena y destella; las del propio jugador van bajo sus barras (y sus efectos) con una gota o un copo. Se proyectan como
+  la marca de `Fijar` (`RenderLevelStageEvent`; con shaders tambien). `Net.V` = "26".
+- **Donde salen**: Kerrick (la maza 1300, el martillo de guerra 1500, la ballesta 1100 —una de cada—, 5 de fuego 150, 5 de escarcha
+  180), Silas (el gran martillo 4200; 5 de sangre 240, de fuego 170, de escarcha 200), la armeria de Valdrenn (los tres martillos y las
+  tres flechas), el monasterio (escarcha; el bueno, la maza), la Tierra sin Fe (sangre; la buena, la maza), la Capital (fuego; la buena,
+  el de guerra y el grande) y las paradas del camino de nubes (alguna de fuego).
+- Comando `/darkcraft armas [martillos | flechas | sangre <n> | frio <n> | limpiar]` (`armas/Arsenal`; `sangre` y `frio` a lo que se
+  tiene delante o a uno mismo). Efectos (ElevenLabs, flow `XeqoCBgCDlv3wBHDJFd8`): `martillo_golpe` (tomas 2 y 3), `flecha_fuego`
+  (3 y 1; la 2 dura 5 s), `congelacion` (2 y 4).
+- Pruebas: servidor, `armas7aj()` (linea `Armas 7aj: ...`: los tres martillos —tipo, letras, peso, ataque, habilidad—, la guardia con
+  escudo contra la espada y el martillo, el paves de Brandt, Brandt es jefe y le entra la mitad, el arco y la ballesta tiran la de la
+  mano izquierda, tres flechas de cada clase en un aldeano —arde; hemorragia a la tercera; congelacion a la tercera y un golpe de 5 le
+  quita 6—, el arquero no sangra y el helado no se congela, las tiendas y el botin); cliente, tramo `armas7aj()` despues de las
+  armaduras: el gran martillo cargando y su mazazo (`cliente_aj01`, `aj02`), el de guerra de lado (`aj03`), un caballero cubierto con
+  el escudo (la espada no entra, el martillo le rompe la guardia: `aj04`), el arco tenso con la flecha de fuego de la mano izquierda
+  y la flecha ardiendo (`aj05`, `aj06`), dos de sangre con su barrita y la hemorragia (`aj07`, `aj08`), dos de escarcha y la
+  congelacion (`aj09`, `aj10`; linea `congelado: un golpe de 10 le quita 12`), las barritas del jugador (`aj11`), el inventario con las
+  armas (`aj12`) y la ficha del gran martillo (`aj13`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

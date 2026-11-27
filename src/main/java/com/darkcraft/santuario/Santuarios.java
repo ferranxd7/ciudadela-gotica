@@ -166,6 +166,8 @@ public final class Santuarios {
         com.darkcraft.montura.Montura.descanso(sp);
         // y la sangre que habian sumado los penitentes, fuera (parte 7s)
         com.darkcraft.enemigos.Sangrado.limpiar(sp);
+        // y el frio que se llevaba encima (parte 7aj)
+        com.darkcraft.enemigos.Congelacion.limpiar(sp);
         // y los enemigos caidos vuelven a sus puestos (como en Dark Souls)
         com.darkcraft.enemigos.Puestos.reaparecer(sp);
     }

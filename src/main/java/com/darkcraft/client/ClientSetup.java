@@ -68,6 +68,8 @@ public final class ClientSetup {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CAPITAN.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
                 new com.darkcraft.client.enemigos.CapitanModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.CapitanModelo.CAPA)), "capitan", 1, 0.7f, 1.22f));
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ARPON.get(), com.darkcraft.client.enemigos.ArponRenderer::new);
+        // las flechas de fuego, de sangre y de escarcha (parte 7aj)
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.FLECHA_ESPECIAL.get(), com.darkcraft.client.armas.FlechaEspecialRenderer::new);
         // la guardia de Valdrenn y el arquero esqueleto (parte 4a)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.GUARDIA.get(), ctx -> new com.darkcraft.client.enemigos.EnemigoRenderer<>(ctx,
                 new com.darkcraft.client.enemigos.GuardiaModelo(ctx.bakeLayer(com.darkcraft.client.enemigos.GuardiaModelo.CAPA)), "guardia", 3, 0.5f, 1.08f));

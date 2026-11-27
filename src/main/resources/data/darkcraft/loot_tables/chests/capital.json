@@ -167,6 +167,21 @@
      "type": "minecraft:item",
      "name": "darkcraft:fruto_hueso",
      "weight": 2
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:flecha_fuego",
+     "weight": 4,
+     "functions": [
+      {
+       "function": "minecraft:set_count",
+       "count": {
+        "type": "minecraft:uniform",
+        "min": 3,
+        "max": 8
+       }
+      }
+     ]
     }
    ]
   },

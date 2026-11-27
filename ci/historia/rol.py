@@ -4393,6 +4393,54 @@ EN.update({
     "darkcraft.ayuda.armadura": "Armor: the list, give yourself a set or a piece, put on a whole set",
 })
 
+# ---- parte 7aj: los martillos y las flechas de fuego, de sangre y de escarcha
+ES.update({
+    "item.darkcraft.maza": "Maza de Clérigo",
+    "item.darkcraft.maza.desc": "Cabeza de acero con seis aletas y el cuello de latón. Los clérigos de Valdrenn decían que no derramaba sangre; rompía huesos. Escala con la Fe.",
+    "item.darkcraft.martillo_guerra": "Martillo de Guerra",
+    "item.darkcraft.martillo_guerra.desc": "Una cabeza cuadrada a un lado y un pico al otro, sobre un mango largo con anillas de hierro. Lo inventaron para los que llevaban placas.",
+    "item.darkcraft.gran_martillo": "Gran Martillo de Piedra",
+    "item.darkcraft.gran_martillo.desc": "Un bloque de piedra tallada con bandas de hierro y una runa roja. Hacen falta las dos manos y toda la espalda; lo que alcanza no se vuelve a levantar.",
+    "darkcraft.martillo.guardia": "Rompe la guardia de los escudos y pega más a los que llevan armadura.",
+    "darkcraft.arma.tipo.martillo": "martillos",
+    "darkcraft.arma.tipo.gran_martillo": "grandes martillos",
+    "item.darkcraft.flecha_fuego": "Flecha de Fuego",
+    "item.darkcraft.flecha_fuego.desc": "Un trapo untado de pez tras la punta: arde al soltarla y prende a quien alcanza.",
+    "item.darkcraft.flecha_sangre": "Flecha de Sangre",
+    "item.darkcraft.flecha_sangre.desc": "Punta de hueso dentada. Cada una abre una herida: a la tercera, la hemorragia se lleva un buen trozo de vida.",
+    "item.darkcraft.flecha_escarcha": "Flecha de Escarcha",
+    "item.darkcraft.flecha_escarcha.desc": "Punta de un hielo que no se derrite. Cada una suma frío: a la tercera revienta, frena y quien lo sufre recibe más daño un rato.",
+    "darkcraft.flecha.mano": "Equípalas en la mano izquierda para dispararlas con el arco o la ballesta.",
+    "entity.darkcraft.flecha_especial": "Flecha",
+    "subtitles.darkcraft.sfx.martillo_golpe": "Golpe de martillo",
+    "subtitles.darkcraft.sfx.flecha_fuego": "Una flecha prende",
+    "subtitles.darkcraft.sfx.congelacion": "El frío revienta",
+    "darkcraft.ayuda.armas": "Armas: los martillos, las flechas especiales con arco y ballesta, sumar sangrado o congelación a lo que tienes delante",
+})
+EN.update({
+    "item.darkcraft.maza": "Cleric's Mace",
+    "item.darkcraft.maza.desc": "A steel head with six flanges and a brass neck. The clerics of Valdrenn said it shed no blood; it broke bones. Scales with Faith.",
+    "item.darkcraft.martillo_guerra": "Warhammer",
+    "item.darkcraft.martillo_guerra.desc": "A square head on one side and a spike on the other, on a long haft with iron rings. It was made for those who wore plate.",
+    "item.darkcraft.gran_martillo": "Great Stone Hammer",
+    "item.darkcraft.gran_martillo.desc": "A block of carved stone with iron bands and a red rune. It takes both hands and your whole back; what it hits does not get up again.",
+    "darkcraft.martillo.guardia": "Breaks shield guards and hits armored foes harder.",
+    "darkcraft.arma.tipo.martillo": "hammers",
+    "darkcraft.arma.tipo.gran_martillo": "great hammers",
+    "item.darkcraft.flecha_fuego": "Fire Arrow",
+    "item.darkcraft.flecha_fuego.desc": "A pitch-soaked rag behind the head: it catches fire as it flies and sets its target ablaze.",
+    "item.darkcraft.flecha_sangre": "Blood Arrow",
+    "item.darkcraft.flecha_sangre.desc": "A serrated bone head. Each one opens a wound: at the third, the hemorrhage tears away a good share of life.",
+    "item.darkcraft.flecha_escarcha": "Frost Arrow",
+    "item.darkcraft.flecha_escarcha.desc": "A head of ice that never melts. Each one builds up cold: at the third it bursts, slows, and the victim takes more damage for a while.",
+    "darkcraft.flecha.mano": "Equip them in your left hand to shoot them with a bow or crossbow.",
+    "entity.darkcraft.flecha_especial": "Arrow",
+    "subtitles.darkcraft.sfx.martillo_golpe": "Hammer strikes",
+    "subtitles.darkcraft.sfx.flecha_fuego": "An arrow ignites",
+    "subtitles.darkcraft.sfx.congelacion": "Frost shatters",
+    "darkcraft.ayuda.armas": "Weapons: the hammers, the special arrows with bow and crossbow, add bleed or frost to what is in front of you",
+})
+
 
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
