@@ -10440,5 +10440,318 @@
     ]
    }
   }
+ },
+ "voz_ylva": {
+  "voz": "Sinéad — Warm Northern Irish Storyteller",
+  "voice_id": "6fUdApmsddaaPpXSYlh1",
+  "flow": "NgWvAcWuQteGoqmpSsmA",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7an: Ylva, la hija del ballenero (la luz del muelle). Por frase, tomas a y b; se bajan como ylva/voz_Na.mp3 y ylva/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[quietly, without turning] You came along the pier... and the salt didn't take you. [a small, tired smile] I'm Ylva. My father is Brann, the whaler. [looking north, aching] He's up at the Costillar, still hunting the Old One. From up there he can't see the harbour... he's forgotten the way home.",
+    "sesiones": [
+     "LqOOwq6YBv4oQVlYwkyB",
+     "U21g4RhKe4O18iIwCn35"
+    ],
+    "generaciones": [
+     "B9bCfNT1XdmgDpqxcyjd",
+     "g0MkzGg4mMrSpCIfitxF"
+    ],
+    "duraciones": [
+     14.96,
+     14.64
+    ]
+   },
+   "2": {
+    "prompt": "[relieved, holding out the lantern] Take my lantern. Tomé lit it from the lighthouse... cold fire, the only fire left in Varado. [earnest] Carry it close when you go up. If he sees this light, he'll know it's the pier.",
+    "sesiones": [
+     "YfCtmRX7Gdbyluy0PTIl",
+     "3TsC4Im3bIKIq5OS5k7s"
+    ],
+    "generaciones": [
+     "8wctK0J1RaRihvDmnzRM",
+     "sRLSxmqZeQMJxXTr7xW3"
+    ],
+    "duraciones": [
+     11.76,
+     11.92
+    ]
+   },
+   "3": {
+    "prompt": "[distant] The sea left all at once, like someone drank it. Everyone ran down to the sand to pick up what it left behind. [pause] I was up in the lighthouse with Tomé. He wouldn't let me go down. [quietly] He saved me... and I've been sitting here ever since.",
+    "sesiones": [
+     "qcOBYzwthF2fDO4aOqsq",
+     "C4jg5RmYZ67TmWBj9Mq7"
+    ],
+    "generaciones": [
+     "GfSw6A8I8RtdZpfEg1xw",
+     "K7izNslIFSawSdNV3Wp6"
+    ],
+    "duraciones": [
+     16.24,
+     15.44
+    ]
+   },
+   "4": {
+    "prompt": "[softly] Then I'll keep the light burning a while longer. [a faint, sad laugh] Someone has to.",
+    "sesiones": [
+     "H0Y6z2oaIOEe6WgFPUtx",
+     "xHZXLEEtW2toioLW13F4"
+    ],
+    "generaciones": [
+     "dJMjXd3CuYqhngId1qaD",
+     "RZFy5dMy8WUHL7SPPQuP"
+    ],
+    "duraciones": [
+     4.8,
+     4.88
+    ]
+   },
+   "5": {
+    "prompt": "[hopeful] Is the light still burning? [gently] Show it to him, up on the bones. He'll lower that harpoon. I know he will.",
+    "sesiones": [
+     "xapVpjioe84O0FEimS6d",
+     "L1TNR4200UEcEj7G6JuC"
+    ],
+    "generaciones": [
+     "pt3BB3c5o3e8FLfBcWni",
+     "1hQoaBWj2GbBRdAeSDka"
+    ],
+    "duraciones": [
+     7.84,
+     7.52
+    ]
+   },
+   "6": {
+    "prompt": "[quietly] You came back. [hopeful] Will you go up to the Costillar now?",
+    "sesiones": [
+     "dUtywH5GeouWPGUAy67w",
+     "4SIKwfAFtSblmP8uUQfc"
+    ],
+    "generaciones": [
+     "2AuYmt8RQu1TYEkv601U",
+     "89f7gk4ava8UWUWncJzu"
+    ],
+    "duraciones": [
+     3.68,
+     3.76
+    ]
+   },
+   "7": {
+    "prompt": "[catching her breath] That's... that's his lantern. [long pause, trembling] Then he's gone. [barely a whisper] Did he... did he even see the light?",
+    "sesiones": [
+     "L63L6zNVOqpUZtwxVQlf",
+     "huVLZABooEolvg8rIk3k"
+    ],
+    "generaciones": [
+     "nXGEaxyGaD3qAyThM0B5",
+     "x0sgRQiRtLFWVJ9qesk1"
+    ],
+    "duraciones": [
+     8.4,
+     9.76
+    ]
+   },
+   "8": {
+    "prompt": "[wonder, tearful] I saw it. Up on the bones, a light answered mine... [softly] and then it went out, slowly, like a lamp at dawn. [breaking into a smile] He saw it. He saw it.",
+    "sesiones": [
+     "nip9GJsxwLv7ud7STDuH",
+     "tkdjDozAY64WfejJylQk"
+    ],
+    "generaciones": [
+     "GuqbcQS6dSvEQqaR3X4U",
+     "YYk0b8Nse27aXmw6fful"
+    ],
+    "duraciones": [
+     11.36,
+     11.76
+    ]
+   },
+   "9": {
+    "prompt": "[tender] Give it here. [pause] I'll hang them together at the end of the pier, his and mine. [peaceful] Now the boats will know the way home.",
+    "sesiones": [
+     "Cl3mPHcPAP0Wl2K8znnN",
+     "VMfFHFh1sQm56EurHpKM"
+    ],
+    "generaciones": [
+     "ZNlOFaM2tJljCvkxuX9K",
+     "fPBtd5utLJgrui5ktdhf"
+    ],
+    "duraciones": [
+     8.88,
+     8.72
+    ]
+   },
+   "10": {
+    "prompt": "[gently] Keep my lantern. It still holds Tomé's cold fire. [warm] When you fall, let it bring you back.",
+    "sesiones": [
+     "0llktrkCXhRogEHFM882",
+     "2FC8ixd8iCWvpIIZP9Yd"
+    ],
+    "generaciones": [
+     "X6QOQXYjtVyFLQCNRAAR",
+     "PsWbvR41zLBzJaADOADr"
+    ],
+    "duraciones": [
+     7.2,
+     7.36
+    ]
+   },
+   "11": {
+    "prompt": "[hurt, then resigned] You'd keep it? [pause] Then give me back my light. [quiet] His side of the pier stays dark... and I'll keep waiting.",
+    "sesiones": [
+     "AKNKYm54E4CQiyAnONoA",
+     "c5W8xe99ZP5Y5lIOQPbY"
+    ],
+    "generaciones": [
+     "TSu3h3Pyhb7B8MWdzFla",
+     "LhwPv04ELQaxc1NvWjoE"
+    ],
+    "duraciones": [
+     7.92,
+     8.0
+    ]
+   },
+   "12": {
+    "prompt": "[not looking up] The pier is still dark on his side. [softly] But mine is burning.",
+    "sesiones": [
+     "aez3BJu7ikg2cJi0wOt0",
+     "AUpT1zpjv22KRp1SFmhx"
+    ],
+    "generaciones": [
+     "TjA9UIZwFuqRNk5Wjmki",
+     "bSEWCDuUAsIBMIqxIE4P"
+    ],
+    "duraciones": [
+     4.72,
+     4.48
+    ]
+   },
+   "13": {
+    "prompt": "[startled] Where did you find that lantern? [trembling] That's my father's. [desperate] Tell me... did he see the light?",
+    "sesiones": [
+     "5inRoZ0sEpmA5iLEXlWx",
+     "o9vNBgFYUkmap2ou4hi1"
+    ],
+    "generaciones": [
+     "6JSQmb6HwrVVYjNBy1sM",
+     "L0mSeReEbQkyBqvgc7Sd"
+    ],
+    "duraciones": [
+     6.32,
+     6.32
+    ]
+   }
+  }
+ },
+ "voz_ballenero_7an": {
+  "voz": "Declan Graves - Haunted Rasps and Old World Dread",
+  "voice_id": "1BfrkuYXmEwp8AWqSLWk",
+  "flow": "NgWvAcWuQteGoqmpSsmA",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7an: Brann ve la luz del muelle (frases 6 y 7). Tomas a y b; se bajan como ballenero/voz_Na.mp3 y _Nb",
+  "frases": {
+   "6": {
+    "prompt": "[stopping, hoarse] ...That light. [disbelief] That's the pier light. [a cracked whisper] Ylva? Is that you, girl?",
+    "sesiones": [
+     "a9zX3qIzGAfXJNsJy5rt",
+     "HVvhEfK0mpcKeB06kjsn"
+    ],
+    "generaciones": [
+     "g1tbVlnlFjbET7ODqD7j",
+     "VVAcdTFmqAZKqBpXorty"
+    ],
+    "duraciones": [
+     6.08,
+     6.08
+    ]
+   },
+   "7": {
+    "prompt": "[letting go, gentle and broken] Forty years... and you kept it burning. [softly] Put the kettle on, lass. I'm coming home.",
+    "sesiones": [
+     "yXEYGyfI6o7lJ4N26Px5",
+     "Hwzr5eQMKgJSDgK9ua6r"
+    ],
+    "generaciones": [
+     "oUPKNIoCNE8592hU2dFx",
+     "NjGHxxRqI8dE2nd1uq7R"
+    ],
+    "duraciones": [
+     7.28,
+     7.28
+    ]
+   }
+  }
+ },
+ "sfx_ylva": {
+  "flow": "NgWvAcWuQteGoqmpSsmA",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7an: el farol de fuego frio, Brann que ve la luz (el mar que vuelve) y Ylva que descansa. Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "farol_frio": {
+    "prompt": "A ghostly cold-fire lantern flaring up: a soft crystalline chime, a breathy whoosh of pale blue flame, a faint airy shimmering hum that fades, eerie and gentle, cinematic dark fantasy, no music",
+    "sesiones": [
+     "zjTn967EhPlq0Aj9dbLn",
+     "SCjy6XuTA8YfRJVSear9",
+     "uXuKZMyobCZEd49itwd8",
+     "LXoFJDTzntUf3rLKrfhd"
+    ],
+    "generaciones": [
+     "JrftxsTHHdkWtTTnfQOa",
+     "zG2l63yxFMgMt6PKN5IR",
+     "1n42g0TDpvyeb0fJi14a",
+     "7O6E5rRSsjbud0EEhkkP"
+    ],
+    "duraciones": [
+     5.0,
+     5.0,
+     5.0,
+     5.0
+    ]
+   },
+   "brann_calma": {
+    "prompt": "A vast empty dry bay at dusk: a distant mournful whale song echoing between giant bones, then the slow hush of sea waves returning over sand for the first time in years, deep and melancholic, cinematic dark fantasy, no music",
+    "sesiones": [
+     "o6P0IGxFihHvRTaF53Q7",
+     "UoNwNKr3v1cgTo58uX3A",
+     "q2LJ7d87vHQf5yO6B2Dc",
+     "DnE9uRnlq2qxrobEembI"
+    ],
+    "generaciones": [
+     "21j30jRjNjSLcJUAGugR",
+     "PPlsZkjUyymfjCR9M3hH",
+     "nmfITYFsKjMYyGnVqeK1",
+     "rGFOq64qApfGXDINa9MI"
+    ],
+    "duraciones": [
+     30.0,
+     30.0,
+     30.0,
+     30.0
+    ]
+   },
+   "ylva_descansa": {
+    "prompt": "Calm sea waves lapping against an old stone pier at dusk, a soft sea wind, two old iron lanterns creaking gently on a chain, a peaceful slow exhale of the sea fading to silence, cinematic and quiet, no music",
+    "sesiones": [
+     "ligM4SIHqYMEyX04cEP0",
+     "Z28F23nHi5LalLS7ecyr",
+     "fyoaX0Pbwih8iwlZF5N4",
+     "hmwB7lgMMIZJtceVujU3"
+    ],
+    "generaciones": [
+     "Xo8MIcez9ueVN4kr8l3D",
+     "O9WYPSWIkFZvVjUbnQGE",
+     "y4e4HBMNE0YNT2ta84Ji",
+     "Q2Y99jfW9vzOICjrChdX"
+    ],
+    "duraciones": [
+     25.0,
+     30.0,
+     30.0,
+     30.0
+    ]
+   }
+  }
  }
 }
