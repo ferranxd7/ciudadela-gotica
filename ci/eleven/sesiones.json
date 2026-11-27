@@ -6656,5 +6656,241 @@
     ]
    }
   }
+ },
+ "jinete": {
+  "flow": "tUkP1qh0LtTTd2tsgMDM",
+  "voz": "mfxPGiKweaQEsXJix2Ve",
+  "nombre_voz": "Zane - Deep Dramatic Late Night Voice (Neutral Accent)",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7x: Ser Corwen, el Jinete Nocturno (el heraldo del Rey que cabalga de noche por el camino de nubes). Tomas a y b de cada frase como jinete/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[cold, commanding, echoing] Who rides the King's road by night? [pause] Stand aside, stranger... or fall beneath my hooves.",
+    "sesiones": [
+     "Fe3RMNuFMDr9U8o5ZNMy",
+     "730SDqrZlc3STov47OqM"
+    ],
+    "generaciones": [
+     "HiQeioRY864dJEOR8HPP",
+     "pwqx2MA861bHFxq14H59"
+    ]
+   },
+   "2": {
+    "texto": "[furious, shouting] I carry the King's word! Nothing... stops the King's word!",
+    "sesiones": [
+     "sNzQhGnVgPDB0XIspuia",
+     "uUSbn2FenTUv7XWcGyBA"
+    ],
+    "generaciones": [
+     "wAWZYfjlOjLnLJWQD6i6",
+     "k96JvXAT1OfE0PmDpGoT"
+    ]
+   },
+   "3": {
+    "texto": "[quiet, weary, sorrowful] Dawn again... and the stair is still so far.",
+    "sesiones": [
+     "fTLgypWwk9P00KB3s2cf",
+     "36PVF6rvdI2WMMFfqFMl"
+    ],
+    "generaciones": [
+     "WBWhzJehoAKyvneWkHV7",
+     "GOZKpdNsLJdDZLbHE9b7"
+    ]
+   },
+   "4": {
+    "texto": "[battle cry, shouting] For the King! Clear the road!",
+    "sesiones": [
+     "kKtA4Q6RKhXdwOdzEhYU",
+     "i94FYAIAFZVPJbST5uvF"
+    ],
+    "generaciones": [
+     "Ufhq1pAyXPniNqBno2kA",
+     "9cyOpqFRrEZtJtckQARX"
+    ]
+   },
+   "5": {
+    "texto": "[dying, breathless, relieved] The letter... take it to the fortress. [exhales] Tell them... I rode every night. Every night.",
+    "sesiones": [
+     "mDgcldnUDeXwnRvdJZMP",
+     "USf8cZsOBySXkXe1G0cn"
+    ],
+    "generaciones": [
+     "5utJAbzvlcI9AzHiY1yp",
+     "gp0IsdW91ICZXxGhfJQv"
+    ]
+   }
+  }
+ },
+ "sfx_jinete": {
+  "flow": "AyxqnFBiZuJQngB0Knnu",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7x: el Jinete Nocturno (el galope, el relincho, el cuerno, el tajo de la guja, la carga, el pisoton del caballo, el fuego de almas, dolor, muerte, aparecer y el arnes). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "jinete_galope": {
+    "prompt": "A spectral armored warhorse galloping at full speed on hard stone, heavy rhythmic hoofbeats with a hollow ghostly echo, chainmail barding jingling, a cold wind howling behind it, dark fantasy, cinematic, seamless loop, 4 seconds",
+    "sesiones": [
+     "8pIQ4c304E9swZDcKqD1",
+     "aO0se5wi9XoQG2dCGEfd",
+     "rfUxYBUNxO2XDQgcohRC",
+     "SeF0sqqasMBHVFgOYKya"
+    ],
+    "generaciones": [
+     "nTDM4us4uHsC3UAWHrmt",
+     "9SwkszTQOXRVPPzB2uLg",
+     "q79gyf5RBa7LYTYShaPj",
+     "n4lnISJxbTWNjbgHpgN6"
+    ]
+   },
+   "jinete_relincho": {
+    "prompt": "The neigh of a ghostly nightmare warhorse: a long, unearthly, distorted whinny with a hollow echo and a deep breathy snort at the end, dark fantasy horror, cinematic, 3 seconds",
+    "sesiones": [
+     "qJb5kWP4eZ964SkEKCfM",
+     "AyofGZXxLz49ScLdFkwd",
+     "pfykWy275E1H43AcIqHB",
+     "uXzuxLw8UCTxz74K4iVp"
+    ],
+    "generaciones": [
+     "FgiuWiCpFLSEWCnGzlax",
+     "7TSTmRl8mrYU1jSMIlr4",
+     "3p9FxviAhigRtbehr84U",
+     "jHrDqfGXXXeCRncRUI0F"
+    ]
+   },
+   "jinete_cuerno": {
+    "prompt": "A distant war horn blown once at night above the clouds, a long low mournful note with a cold echo fading over a vast empty sky, dark fantasy, cinematic, 4 seconds",
+    "sesiones": [
+     "g84zGH7yN2C3t4UZn1sE",
+     "Rpv9S0PpRTeo7C3g40eH",
+     "qacB2xm5t9yhRqnNpUEV",
+     "M0Wq4Dh9OOJmUFi3fFsz"
+    ],
+    "generaciones": [
+     "gZ6fAmQtHvmjpyCIgaxN",
+     "NXb35SfudD6Ykc61YTIN",
+     "4z8XOK1uWSVZ6Of6BL4O",
+     "9fRkkTrEfvCDUfdWeS5o"
+    ]
+   },
+   "jinete_tajo": {
+    "prompt": "A heavy glaive polearm swung in a wide arc from horseback: a deep powerful whoosh cutting the air with a metallic ring, epic dark fantasy combat, cinematic, 1.5 seconds",
+    "sesiones": [
+     "xgCgQrU4ZMrYvw6hmno5",
+     "EAhgQExgGyCoa1r94HEG",
+     "l9JPi7Zqb61y7jDFJOJy",
+     "JPMi9ADAYd0gL7rtFksy"
+    ],
+    "generaciones": [
+     "rLe3LIFxXKpo84n9vEWZ",
+     "cHiLbJCz8ksFiSvUch10",
+     "dUJJPNZPmlO5reL3CgIX",
+     "yCbQdmC3AN7zOl4benbP"
+    ]
+   },
+   "jinete_carga": {
+    "prompt": "A mounted knight's lance charge hitting: a galloping rush, then a brutal heavy impact of steel against armor with a deep thud and metal clang, epic dark fantasy, cinematic, 2 seconds",
+    "sesiones": [
+     "hLFNutw0gDUxiJBPBnRz",
+     "858nVxFICd2In0ztjKuT",
+     "Qj7UWKWFNSpWsHNbFSSP",
+     "shsxXg5JsmoCaT5T5bG0"
+    ],
+    "generaciones": [
+     "W31Wgi3nSFo5Hm1CdRTJ",
+     "2HpBIy94MBKw38HycwB3",
+     "G0xYlNAFHkmTUUUv6Flx",
+     "6KDUH2Rw8XfHJG6qQ4ki"
+    ]
+   },
+   "jinete_pisotea": {
+    "prompt": "A huge warhorse rearing up and slamming both front hooves down on stone: a short scream of the horse, then two heavy crushing stomps that crack the ground, dust and debris, dark fantasy, cinematic, 2 seconds",
+    "sesiones": [
+     "FkYxnEhSLqIOMV87xxXV",
+     "6U38UoM7bOSNQUy2yiUv",
+     "ccUsYmviG2WpBb5xlxQ2",
+     "A84UC8nWpPBWiygSU0ym"
+    ],
+    "generaciones": [
+     "VNJ9MO204EurBbYHAgj1",
+     "Q9H45s7sCVOyIh4LWSLp",
+     "DAIivjAfPhhyw3cm2FRv",
+     "EjSOn8jUHpCUab20j7dt"
+    ]
+   },
+   "jinete_fuego": {
+    "prompt": "Pale blue soul fire bursting from the hooves of a galloping ghost horse: a sudden whoosh of cold eerie flames igniting along a stone road, crackling and hissing with a ghostly whisper, dark fantasy, cinematic, 2 seconds",
+    "sesiones": [
+     "1MlMIZrky0yKV1ZDR2rt",
+     "L3O4tnPZtd94TGtiibVz",
+     "scdS3usm5kjs1cFLjTRR",
+     "a6GrmpmAyev5GpgGmA4R"
+    ],
+    "generaciones": [
+     "i2SOiF6hOg3l6hjgy7HA",
+     "4bueXoOBrJzhVZbTuVWD",
+     "kP591kVau9W6xUS0HbGS",
+     "rGQq6KjZeeNtu7Bas6D8"
+    ]
+   },
+   "jinete_dolor": {
+    "prompt": "An armored undead knight grunting in pain inside a closed steel helmet: a short hollow metallic groan with a faint ghostly echo, armor plates rattling, dark fantasy, 1 second",
+    "sesiones": [
+     "JTaUIltwXAsRhqQ8TYiP",
+     "SEdYoTg89mZQHUZiVZrF",
+     "b72LbsawWXrkLiVVBLtu",
+     "8ex0vfXvwDnbkrIZL68H"
+    ],
+    "generaciones": [
+     "GbVTTABAHbtUROpG0CUZ",
+     "uXyb9Q4zgbnoWFFvcE4L",
+     "bugySfA4tSobwoJm8UVn",
+     "uRtyjQ4THwrvuQNycSSu"
+    ]
+   },
+   "jinete_muerte": {
+    "prompt": "A ghostly knight and his horse falling for the last time: the horse collapses with a long fading neigh, heavy armor crashing onto stone, then a soft ghostly exhale and a cold wind dissolving into silence, dark fantasy, cinematic, 5 seconds",
+    "sesiones": [
+     "80gAbtnfoMDawpVVyQcp",
+     "ku4VrUElei2vIAzFzDs8",
+     "cK5Sp2neUb2ncIENpc9t",
+     "wTxIadz7aQAsCEhpvXIw"
+    ],
+    "generaciones": [
+     "b2PGqoPDNQytzbZPb60Y",
+     "IOlRQVF71Q0NSuMrQTKj",
+     "l3XmPKkPkKjqEBzQgdrv",
+     "1rKAmQajyAopxJv2dgbM"
+    ]
+   },
+   "jinete_aparece": {
+    "prompt": "A spectral horseman materializing out of mist at night: a rising cold wind, distant ghostly whispers, a low eerie swell and a sharp final chime of armor, dark fantasy horror, cinematic, 3 seconds",
+    "sesiones": [
+     "hZ1pwi1cTLOdbS3SQMy0",
+     "lj8tGv9EXWLacx5wD9Gj",
+     "HFeETFmb2ZnpCxwW8y2J",
+     "obEELAzEhkREf23Nfr3Y"
+    ],
+    "generaciones": [
+     "g15riMbEkwIx29GV3JS6",
+     "M7MPvDtGIE2ewnmw9MJ1",
+     "Hp3VbNMVjtgyQtCX2NDh",
+     "jIfzuliqLCE8bcVDA6wa"
+    ]
+   },
+   "jinete_arnes": {
+    "prompt": "A heavy knight on a warhorse turning in place: armor plates and chainmail barding clinking and creaking, leather harness straps, the horse snorting and stamping twice, dark fantasy, 2 seconds",
+    "sesiones": [
+     "jTl2AHUr7uKudxu1y9jJ",
+     "VZ27ylBmq4ohn7i36Zcj",
+     "vTnWvzlHpOE9sD1vDMxN",
+     "wan6DRICLy1YFGObZ0Cw"
+    ],
+    "generaciones": [
+     "PLCbwmsl0lvWvaDglsG8",
+     "l8kCFWQyij7NGWwEbws0",
+     "8Ym7o5M8Gao5nOOE4D5y",
+     "KwRRmGCEHfEcq6TQHYI8"
+    ]
+   }
+  }
  }
 }
