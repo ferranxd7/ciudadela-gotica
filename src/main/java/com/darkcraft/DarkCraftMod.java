@@ -55,6 +55,11 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> NARRACION_1 = sound("narracion.cap1");
     public static final RegistryObject<SoundEvent> NARRACION_5 = sound("narracion.cap5");
     public static final RegistryObject<SoundEvent> NARRACION_6 = sound("narracion.cap6");
+    /** La cronica de Morvain (parte 7ae): los capitulos 7-10 con la voz de Maelis (los monta ci/eleven/procesar.py). */
+    public static final RegistryObject<SoundEvent> NARRACION_7 = sound("narracion.cap7");
+    public static final RegistryObject<SoundEvent> NARRACION_8 = sound("narracion.cap8");
+    public static final RegistryObject<SoundEvent> NARRACION_9 = sound("narracion.cap9");
+    public static final RegistryObject<SoundEvent> NARRACION_10 = sound("narracion.cap10");
     public static final RegistryObject<SoundEvent> MUSICA_FORTALEZA = sound("musica.fortaleza");
     public static final RegistryObject<SoundEvent> MUSICA_TITULO = sound("musica.titulo");
     public static final RegistryObject<SoundEvent> MUSICA_COFRE = sound("musica.cofre");

@@ -1132,6 +1132,15 @@ def check():
         ok &= check_cap(lang, {n: (c[lang + "_t"], c[lang + "_s"], c[lang]) for n, c in CAP.items()})
     for code, mod in otros_idiomas().items():
         ok &= check_cap(code, mod.T["cap"], mod.T.get("sin_espacios", False))
+    # la cronica de Morvain (parte 7ae, ci/historia/perdidos.py): las paginas de los libros 7-10 tambien tienen que caber
+    for lang in ("es", "en"):
+        for cap, (titulo, lineas) in perdidos.cronica_morvain(lang).items():
+            for k, (a, b) in enumerate(perdidos.PAGINAS_MORVAIN[cap]):
+                page = " ".join(lineas[a:b])
+                lines = len(wrap(page)) + (3 + max(0, len(wrap(titulo)) - 1) if k == 0 else 0)
+                if lines > 13:
+                    ok = False
+                print(f"cap {cap} {lang} p{k + 1}: {lines:2d} lineas {'OK ' if lines <= 13 else 'LARGA'}")
     return ok
 
 

@@ -1072,7 +1072,35 @@ public class Volcado {
         }
         System.out.println(que + ": " + MUNDO.size() + " bloques en " + (System.currentTimeMillis() - t0) + " ms; caja " + minX + "," + minY + "," + minZ
                 + " .. " + maxX + "," + maxY + "," + maxZ + "; entidades " + ENTIDADES.size());
+        if (System.getProperty("cronica") != null) planosCronica(Integer.parseInt(System.getProperty("cronica")), salida, marcas);
         escribir(salida, marcas);
+    }
+
+    /**
+     * Los planos de la cronica de Morvain (parte 7ae) del capitulo ch en el plano volcado: por cada uno, si la camara se mete en
+     * algo o se tapa lo que mira, y tres momentos (camara y a donde mira) en {@code salida}.planos.txt para dibujarlos con
+     * tools/vista3d/camara.py. El jugador, delante de su cofre.
+     */
+    static void planosCronica(int ch, String salida, Map<String, int[]> marcas) throws Exception {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        com.darkcraft.morvain.PlanosCronica.Mundo w = (x, y, z) -> MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+        double[] q = com.darkcraft.morvain.CronicaMorvain.delante(ch);
+        BlockPos c = com.darkcraft.morvain.CronicaMorvain.sitio(ch);
+        marcas.put("cofre", new int[]{c.getX(), c.getY() + 1, c.getZ()});
+        net.minecraft.world.phys.Vec3 eye = new net.minecraft.world.phys.Vec3(q[0], q[1] + 1.62, q[2]);
+        List<com.darkcraft.cine.Shot> l = com.darkcraft.morvain.PlanosCronica.capitulo(ch, w, eye, (float) q[3]);
+        StringBuilder b = new StringBuilder();
+        b.append("jugador ").append(q[0]).append(' ').append(q[1]).append(' ').append(q[2]).append(' ').append(q[3]).append('\n');
+        for (int i = 0; i < l.size(); i++) {
+            com.darkcraft.cine.Shot sh = l.get(i);
+            System.out.println("capitulo " + ch + " plano " + (i + 1) + ": " + String.format(java.util.Locale.ROOT, "%.1f-%.1f s", sh.t0, sh.t1)
+                    + ", metida " + com.darkcraft.morvain.PlanosCronica.metidas(w, sh) + "/25, tapada " + com.darkcraft.morvain.PlanosCronica.tapadas(w, sh) + "/25");
+            for (double u : new double[]{0.02, 0.5, 0.98}) {
+                double[] a = sh.at(sh.t0 + (sh.t1 - sh.t0) * u);
+                b.append(String.format(java.util.Locale.ROOT, "plano %d %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.1f%n", i + 1, u, a[0], a[1], a[2], a[3], a[4], a[5], sh.fov));
+            }
+        }
+        java.nio.file.Files.writeString(java.nio.file.Path.of(salida + ".planos.txt"), b.toString());
     }
 
     /** La aldea de los pilotes (parte 7i): se llega a pie desde la entrada (junto al santuario) a todo, y cada podrido cabe en su sitio. */

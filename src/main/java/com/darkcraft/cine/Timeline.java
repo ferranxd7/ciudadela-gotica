@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  * Tiempos de la cinematica, iguales en el servidor y en el cliente. Los de la narracion de los capitulos narrados
- * (el 1 y el 5) salen del fichero que genera la CI junto al audio (cinematica/capN.json).
+ * (el 1, el 5, el 6 y los 7-10 de Morvain) salen del fichero que genera la CI junto al audio (cinematica/capN.json).
  */
 public final class Timeline {
     private Timeline() {}
@@ -34,6 +34,17 @@ public final class Timeline {
      * remolino de cerca y el jugador.
      */
     public static final int[][] GROUPS6 = {{0, 0}, {1, 2}, {3, 4}, {5, 5}, {6, 7}, {8, 9}, {10, 10}};
+    /**
+     * Los de la cronica de Morvain (parte 7ae, la cuenta Maelis; {@link CineMorvain}). El 7, en el Arco del Umbral: la plaza
+     * desde lo alto del arco, los pilares rotos, el cielo, el camino del norte, el horizonte de la ciudadela y el santuario.
+     */
+    public static final int[][] GROUPS7 = {{0, 0}, {1, 1}, {2, 3}, {4, 5}, {6, 7}, {8, 8}};
+    /** El 8, en la plaza del Juramento de la Capital: la puerta, la calle mayor, las casas quemadas, la estatua y el jugador. */
+    public static final int[][] GROUPS8 = {{0, 0}, {1, 2}, {3, 4}, {5, 5}, {6, 6}, {7, 7}};
+    /** El 9, en el Cerco del Ancla: el ancla, la fragua, los eslabones, la cadena hacia el cielo, la cima y el jugador. */
+    public static final int[][] GROUPS9 = {{0, 0}, {1, 1}, {2, 2}, {3, 4}, {5, 5}, {6, 7}};
+    /** El 10, en la capilla negra: el altar, la isla y sus cadenas, las velas, el trono, la Ultima Llama, la aguja y Maelis. */
+    public static final int[][] GROUPS10 = {{0, 0}, {1, 1}, {2, 2}, {3, 4}, {5, 5}, {6, 6}, {7, 7}};
 
     private record Datos(float duracion, float[][] lineas, boolean audio) {}
 
@@ -41,11 +52,29 @@ public final class Timeline {
 
     /** Si el capitulo tiene narrador (voz, subtitulos y planos de camara). */
     public static boolean narrated(int ch) {
-        return ch == 1 || ch == 5 || ch == 6;
+        return ch == 1 || ch >= 5 && ch <= 10;
     }
 
     public static int[][] groups(int ch) {
-        return ch == 5 ? GROUPS5 : ch == 6 ? GROUPS6 : GROUPS;
+        return switch (ch) {
+            case 5 -> GROUPS5;
+            case 6 -> GROUPS6;
+            case 7 -> GROUPS7;
+            case 8 -> GROUPS8;
+            case 9 -> GROUPS9;
+            case 10 -> GROUPS10;
+            default -> GROUPS;
+        };
+    }
+
+    /** Frases de la narracion de cada capitulo narrado (por si no esta su fichero de tiempos). */
+    private static int frases(int ch) {
+        return switch (ch) {
+            case 5, 6 -> 11;
+            case 7 -> 9;
+            case 8, 9, 10 -> 8;
+            default -> 10;
+        };
     }
 
     private static synchronized Datos load(int ch) {
@@ -62,7 +91,7 @@ public final class Timeline {
             }
             d = new Datos(o.get("duracion").getAsFloat(), l, o.has("audio") && o.get("audio").getAsBoolean());
         } catch (Exception e) {
-            int n = ch == 5 ? 11 : ch == 6 ? 11 : 10;
+            int n = frases(ch);
             float[][] l = new float[n][2];
             for (int i = 0; i < n; i++) {
                 l[i][0] = 0.3f + i * 6f;

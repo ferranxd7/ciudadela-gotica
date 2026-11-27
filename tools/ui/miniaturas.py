@@ -2,7 +2,8 @@
 """
 Las miniaturas del codice (parte 2e-4): una escena pintada para cada capitulo de la cronica y para los libros
 perdidos, el diario y el acertijo, como las de los manuscritos iluminados pero en la paleta del mod (noche azul, rojo
-y oro). Cada una mide 128 x 80 y van juntas en textures/gui/miniaturas.png (4 x 3 huecos de 128 x 80).
+y oro). Cada una mide 128 x 80 y van juntas en textures/gui/miniaturas.png (4 x 4 huecos de 128 x 80: la fila de abajo, los
+capitulos de Morvain, parte 7ae).
 
     python3 tools/ui/miniaturas.py [--vista carpeta]
 """
@@ -856,13 +857,214 @@ def perdidos_morvain():
     return M
 
 
+# ================================================================= 7-10. La cronica de Morvain (parte 7ae)
+def _ciudadela(M, cx, cy, esc=1.0, c="#2a1a22", cadenas=True):
+    """La ciudadela encadenada, pequena y lejos: la isla con sus torres y dos cadenas que bajan."""
+    fig = capa()
+    w = 11 * esc
+    fig.poli([(cx - w, cy), (cx + w, cy), (cx + w * 0.55, cy + 4 * esc), (cx, cy + 8 * esc), (cx - w * 0.55, cy + 4 * esc)], c)
+    for dx, h in ((-6, 6), (-2, 10), (3, 8), (7, 5)):
+        fig.rect(int(cx + dx * esc), int(cy - h * esc), max(2, int(2 * esc)), int(h * esc), c)
+    fig.poli([(cx - 2 * esc, cy - 10 * esc), (cx - 1 * esc + 0.5, cy - 14 * esc), (cx + 0.5, cy - 10 * esc)], c)
+    if cadenas:
+        for k in range(int(9 * esc)):
+            fig.px(int(cx - w + 2 - k * 1.6), int(cy + 3 + k * 1.4), "#3a2430")
+            fig.px(int(cx + w - 2 + k * 1.6), int(cy + 3 + k * 1.4), "#3a2430")
+    pegar_con_tinta(M, fig, "#14080e")
+    M.px(int(cx - 1 * esc), int(cy - 6 * esc), FUEGO[3]).px(int(cx + 3 * esc), int(cy - 4 * esc), FUEGO[2])
+    return M
+
+
+def morvain_tierras():
+    """VII, Las Tierras Marchitas: el ocaso dorado y rojo, el molino de aspas rotas en su loma, el campanario con su campana,
+    el campo seco y, lejos en el cielo, la ciudadela colgada de sus cadenas."""
+    M = Mini()
+    M.degradado(["#1a0a14", "#3a1018", "#6a2018", "#a04a1a", "#d08a2a", "#f0c050"], 0, 60)
+    M.elipse(64, 56, 12, 12, "#f0b040")
+    M.elipse(64, 56, 9, 9, "#f8d070")
+    _ciudadela(M, 64, 18, 1.0)
+    # la loma del molino (izquierda) y la del campanario (derecha)
+    M.poli([(0, 80), (0, 52), (14, 48), (34, 52), (48, 60), (56, 80)], "#1e120c")
+    M.poli([(70, 80), (80, 58), (100, 54), (128, 56), (128, 80)], "#1a100a")
+    M.degradado(["#2a1a12", "#1a100a", "#0c0806"], 62, H)
+    fig = capa()
+    # el molino: torre que se estrecha, tejadillo y tres aspas (una rota)
+    fig.poli([(14, 50), (26, 50), (24, 26), (16, 26)], MADERA[1])
+    fig.poli([(14, 26), (26, 26), (20, 19)], MADERA[0])
+    for ang, largo in ((-60, 15), (30, 14), (120, 15), (210, 6)):
+        a = math.radians(ang)
+        x1, y1 = 20 + math.cos(a) * largo, 24 + math.sin(a) * largo
+        fig.linea(20, 24, x1, y1, MADERA[2])
+        fig.linea(20 + 1, 24, x1 + 1, y1, MADERA[1])
+        if largo > 10:
+            # el entramado de la aspa (a un lado)
+            for k in range(4, int(largo), 3):
+                px, py = 20 + math.cos(a) * k, 24 + math.sin(a) * k
+                fig.linea(px, py, px + math.cos(a + 1.57) * 3, py + math.sin(a + 1.57) * 3, MADERA[1])
+    fig.rect(18, 42, 4, 8, NEGRO)
+    # el campanario: torre cuadrada, el hueco con la campana, el chapitel
+    fig.rect(96, 26, 14, 30, "#241a1e")
+    fig.rect(99, 30, 8, 9, NEGRO)
+    fig.poli([(94, 26), (112, 26), (103, 12)], "#1a1216")
+    pegar_con_tinta(M, fig)
+    M.elipse(103, 34, 2.6, 2.4, ORO[3])
+    M.px(103, 37, ORO[4])
+    # el campo seco: espigas muertas
+    r = np.random.default_rng(71)
+    for _ in range(70):
+        x, y = int(r.integers(30, 98)), int(r.integers(62, 79))
+        M.vline(x, y - 3, 3, "#5a3e22" if r.random() < 0.6 else "#3a2614")
+        M.px(x + (1 if r.random() < 0.5 else -1), y - 3, "#7a5a30")
+    # brasas que suben
+    for _ in range(26):
+        x, y = int(r.integers(0, W)), int(r.integers(20, 70))
+        M.px(x, y, FUEGO[2] if r.random() < 0.6 else FUEGO[3])
+    return M
+
+
+def morvain_quedaron():
+    """VIII, Los que se quedaron: la puerta de la Capital cerrada con su rastrillo, el fuego detras de la muralla, la ceniza
+    que cae y, delante, la estatua del caballero de la mano alzada y dos que siguen en pie, ardiendo por dentro."""
+    M = Mini()
+    M.degradado(["#120608", "#2a0a0c", "#5a1410", "#9a3a14", "#d0701c"], 0, 58)
+    # el resplandor del fuego tras la muralla
+    r = np.random.default_rng(83)
+    for _ in range(160):
+        x, y = int(r.integers(0, W)), int(r.normal(46, 7))
+        if 0 <= y < 58:
+            M.px(x, y, FUEGO[2] if r.random() < 0.5 else FUEGO[1])
+    # la muralla con almenas y la puerta en medio (dos torres y el rastrillo)
+    M.rect(0, 40, W, 26, "#1e1418")
+    almenas(M, 40, 0, W, "#1e1418", alto=3, ancho=4, hueco=3)
+    M.rect(44, 26, 14, 40, "#241a1e")
+    M.rect(70, 26, 14, 40, "#241a1e")
+    almenas(M, 26, 44, 58, "#241a1e", alto=3, ancho=3, hueco=2)
+    almenas(M, 26, 70, 84, "#241a1e", alto=3, ancho=3, hueco=2)
+    M.poli([(58, 66), (58, 46), (64, 40), (70, 46), (70, 66)], "#0e0808")
+    for x in range(59, 70, 2):
+        M.vline(x, 44, 22, "#4a4048")
+    for y in range(48, 66, 3):
+        M.hline(58, y, 12, "#3a3038")
+    M.degradado(["#1a1012", "#0c0808"], 66, H)
+    # la estatua: el pedestal y el caballero con la mano alzada (la cabeza rota)
+    fig = capa()
+    fig.rect(14, 64, 18, 6, "#3a3440")
+    fig.rect(16, 60, 14, 4, "#4c4558")
+    fig.poli([(19, 60), (27, 60), (26, 46), (20, 46)], "#5a5468")
+    fig.poli([(20, 46), (26, 46), (27, 36), (19, 36)], "#625a70")
+    fig.poli([(26, 38), (29, 37), (31, 24), (29, 23), (27, 34)], "#625a70")
+    fig.rect(28, 21, 3, 3, "#625a70")
+    fig.rect(21, 32, 4, 4, "#5a5468")
+    # dos calcinados de pie, con el fuego por dentro
+    for x0 in (92, 106):
+        fig.poli([(x0, 70), (x0 + 6, 70), (x0 + 5, 56), (x0 + 1, 56)], "#1a0e0a")
+        fig.elipse(x0 + 3, 53, 2.6, 2.8, "#1a0e0a")
+    pegar_con_tinta(M, fig)
+    for x0 in (92, 106):
+        M.px(x0 + 2, 53, FUEGO[3]).px(x0 + 4, 53, FUEGO[3])
+        M.vline(x0 + 3, 59, 6, FUEGO[1])
+        M.px(x0 + 3, 61, FUEGO[2])
+    # la ceniza que cae
+    for _ in range(55):
+        x, y = int(r.integers(0, W)), int(r.integers(0, H))
+        M.px(x, y, "#9a8a86" if r.random() < 0.5 else "#6a5c58")
+    return M
+
+
+def morvain_marcado():
+    """IX, El primer marcado: la cadena enorme que sube del ancla escalonada al cielo rojo, Aldric de rodillas en lo alto del
+    ancla y, en el cielo, la marca de la Sombra apenas dibujada."""
+    M = Mini()
+    M.degradado(["#16060a", "#2e0a10", "#4e1014", "#7a1a16", "#a42e18"], 0, 64)
+    # la marca, muy tenue en el cielo (un ojo en un aro roto)
+    M.aro(96, 18, 11, 11, "#6a1a1a", 1.2)
+    for k in range(12):
+        if k in (2, 3):
+            continue
+        a = math.radians(k * 30)
+        M.px(int(96 + math.cos(a) * 11), int(18 + math.sin(a) * 11), "#3a0c10")
+    M.elipse(96, 18, 5, 2.2, "#8a2420")
+    M.elipse(96, 18, 1, 2, "#16060a")
+    # el ancla: piramide escalonada
+    M.degradado(["#1e1012", "#120a0a", "#0a0606"], 64, H)
+    fig = capa()
+    for k, (w, y) in enumerate(((44, 72), (36, 66), (28, 60), (20, 54), (12, 48))):
+        fig.rect(22 - w // 2 + 10, y, w, 6, PIEDRA_C[k % 2])
+        fig.hline(22 - w // 2 + 10, y, w, PIEDRA_C[2])
+    # la cadena: eslabones grandes que suben en diagonal hacia arriba a la derecha
+    for i in range(8):
+        cx, cy = 34 + i * 12, 44 - i * 7
+        if i % 2 == 0:
+            fig.aro(cx, cy, 6.5, 3.6, "#2a2830", 2.0)
+        else:
+            fig.rect(cx - 1, cy - 4, 3, 8, "#2a2830")
+    pegar_con_tinta(M, fig)
+    for i in range(0, 8, 2):
+        cx, cy = 34 + i * 12, 44 - i * 7
+        M.px(cx - 4, cy - 2, "#6a6470").px(cx - 3, cy - 3, "#6a6470")
+    # Aldric de rodillas en lo alto, de espaldas, con la marca ardiendole
+    fig = capa()
+    fig.poli([(27, 48), (35, 48), (34, 42), (28, 42)], "#14100e")
+    fig.poli([(28, 42), (34, 42), (33, 34), (29, 34)], "#1e1814")
+    fig.elipse(31, 32, 2.4, 2.6, "#1e1814")
+    pegar_con_tinta(M, fig)
+    M.px(31, 38, FUEGO[3]).px(32, 38, FUEGO[2])
+    # chispas de los que golpeaban la cadena
+    r = np.random.default_rng(97)
+    for _ in range(24):
+        x, y = int(r.integers(8, 60)), int(r.integers(50, 78))
+        M.px(x, y, FUEGO[3] if r.random() < 0.5 else FUEGO[2])
+    return M
+
+
+def morvain_hermanas():
+    """X, Las hermanas del fuego: ocho llamas en corro alrededor de la Sombra atada en el cielo, y abajo la ultima llama (el
+    fuego de almas de la capilla) con Maelis sentada a su lado."""
+    M = Mini()
+    M.degradado(["#05040c", "#0c0a1e", "#16123a", "#221a4e", "#2e1e52"], 0, 62)
+    M.estrellas(30, 101, y1=50)
+    # la Sombra atada: una mancha negra con ojos rojos y las ocho cadenas de las llamas
+    cx, cy = 64, 26
+    for k in range(8):
+        a = math.radians(k * 45 + 22.5)
+        x1, y1 = cx + math.cos(a) * 30, cy + math.sin(a) * 17
+        M.linea(cx, cy, x1, y1, "#3a3448")
+    fig = capa()
+    fig.elipse(cx, cy, 9, 7, "#05030a")
+    fig.poli([(cx - 6, cy - 4), (cx - 2, cy - 12), (cx, cy - 5), (cx + 3, cy - 13), (cx + 6, cy - 4)], "#05030a")
+    pegar_con_tinta(M, fig, "#1a1030")
+    M.px(cx - 3, cy - 1, ROJO[4]).px(cx + 2, cy - 1, ROJO[4])
+    # las ocho hermanas: llamitas en corro (una sigue encendida en azul)
+    for k in range(8):
+        a = math.radians(k * 45 + 22.5)
+        x, y = int(cx + math.cos(a) * 30), int(cy + math.sin(a) * 17)
+        azul = k == 2
+        cs = ("#5aa0d8", "#a0e0f8", "#e0f8ff") if azul else (FUEGO[1], FUEGO[2], FUEGO[4])
+        for dx, dy in ((-1, 0), (1, 0), (0, 1), (-1, -1), (1, -1)):
+            M.px(x + dx, y + dy, mezcla(M.leer(x + dx, y + dy), cs[0], 0.55))
+        M.px(x, y, cs[1]).px(x, y - 1, cs[2]).px(x, y - 2, cs[1]).px(x, y - 3, cs[0])
+    # abajo: la capilla oscura, el brasero con el fuego de almas y Maelis sentada
+    M.degradado(["#120e18", "#0a0810"], 62, H)
+    fig = capa()
+    fig.poli([(54, 78), (74, 78), (70, 70), (58, 70)], PIEDRA_C[1])
+    fig.rect(56, 68, 16, 3, PIEDRA_C[2])
+    fig.poli([(84, 78), (96, 78), (95, 70), (93, 64), (89, 62), (86, 64), (85, 70)], "#1c1626")
+    fig.elipse(90, 60, 2.8, 3.0, "#241c30")
+    pegar_con_tinta(M, fig)
+    for i, (dx, alto) in enumerate(((-4, 6), (0, 10), (4, 7))):
+        for h in range(alto):
+            M.px(64 + dx + (1 if h % 3 == 1 else 0), 67 - h, "#e0f8ff" if h < 2 else "#a0e0f8" if h < 5 else "#5aa0d8")
+    M.px(93, 66, "#a0e0f8").px(93, 65, "#5aa0d8")
+    return M
+
+
 ESCENAS = [corona_rota, fuente, trono, catedral, juramento, portal, perdidos_valdrenn, perdidos_fortaleza, diario, acertijo,
-           perdidos_brumavela, perdidos_morvain]
+           perdidos_brumavela, perdidos_morvain, morvain_tierras, morvain_quedaron, morvain_marcado, morvain_hermanas]
 
 
 def montar():
-    """Las miniaturas en un atlas de 512 x 256 (cuatro por fila)."""
-    A = Lienzo(512, 256)
+    """Las miniaturas en un atlas de 512 x 320 (cuatro por fila, cuatro filas)."""
+    A = Lienzo(512, 320)
     for i, f in enumerate(ESCENAS):
         m = f()
         A.pegar(m, (i % 4) * W, (i // 4) * H)
@@ -876,5 +1078,5 @@ if __name__ == "__main__":
         d = sys.argv[sys.argv.index("--vista") + 1]
         os.makedirs(d, exist_ok=True)
         from PIL import Image
-        A.imagen().resize((512 * 3, 256 * 3), Image.NEAREST).save(os.path.join(d, "miniaturas.png"))
+        A.imagen().resize((512 * 3, 320 * 3), Image.NEAREST).save(os.path.join(d, "miniaturas.png"))
     print("miniaturas: hecho")

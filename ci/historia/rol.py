@@ -3754,6 +3754,49 @@ EN.update({
     "darkcraft.ayuda.final": "The ending: how it is, watch the dawn or the new Shadow cinematic (with its credits and Maelis), the credits, Maelis's epilogue, see it all again or remove the ending from the world",
 })
 
+# ---------------------------------------------------------------- parte 7ae: la cronica de Morvain (capitulos 7-10, los cuenta Maelis)
+ES.update({
+    "darkcraft.libro.morvain": "Crónica de Morvain · Capítulo %s",
+    "darkcraft.libro.lore.morvain": "Contada por Maelis, la última llama",
+    "darkcraft.menu.historia.cronica_morvain": "Crónica de Morvain",
+    "advancements.darkcraft.capitulo7.title": "Las Tierras Marchitas",
+    "advancements.darkcraft.capitulo7.description": "Escucha el capítulo VII de la crónica junto al Arco del Umbral",
+    "advancements.darkcraft.capitulo8.title": "Los que se quedaron",
+    "advancements.darkcraft.capitulo8.description": "Escucha el capítulo VIII ante la estatua caída de la Capital",
+    "advancements.darkcraft.capitulo9.title": "El primer marcado",
+    "advancements.darkcraft.capitulo9.description": "Escucha el capítulo IX en la choza de Aldric",
+    "advancements.darkcraft.capitulo10.title": "Las hermanas del fuego",
+    "advancements.darkcraft.capitulo10.description": "Escucha el capítulo X junto a la Última Llama",
+    "darkcraft.diario.capitulo7": "Junto al Arco del Umbral, Maelis me contó lo que era Morvain antes del cielo rojo: campanas, molinos, puertos. Su gente no murió: se quedó, atada a lo último que juró.",
+    "darkcraft.diario.capitulo8": "Ante la estatua caída de la Capital, Maelis me habló de los que se quedaron: el Condestable que cerró las puertas, la Rectora, el Abad, el barquero, Brann, Anselmo. Me pidió que recuerde sus nombres.",
+    "darkcraft.diario.capitulo9": "En la choza de Aldric supe que él fue el primer marcado. Subió por la cadena del sur y arriba no había puerta: solo una boca esperando. La Sombra no quiere sus cadenas rotas: quiere que una mano viva le abra una puerta.",
+    "darkcraft.diario.capitulo10": "Junto a la Última Llama, Maelis me contó que sus hermanas forjaron las ocho cadenas con el fuego de sus almas y que cada santuario es una de ellas. Ella es la última. No puede elegir por mí.",
+    "darkcraft.ayuda.cronica": "La crónica de Morvain: dónde están los cofres de los capítulos 7-10, llevarte a uno, ponerlos ya u olvidarlos (para volver a ponerlos)",
+    "darkcraft.cronica.ir": "Cofre del capítulo %s",
+    "subtitles.darkcraft.voz.guia": "Maelis cuenta",
+})
+EN.update({
+    "darkcraft.libro.morvain": "Chronicle of Morvain · Chapter %s",
+    "darkcraft.libro.lore.morvain": "Told by Maelis, the last flame",
+    "darkcraft.menu.historia.cronica_morvain": "Chronicle of Morvain",
+    "advancements.darkcraft.capitulo7.title": "The Withered Lands",
+    "advancements.darkcraft.capitulo7.description": "Hear chapter VII of the chronicle by the Arch of the Threshold",
+    "advancements.darkcraft.capitulo8.title": "Those Who Stayed",
+    "advancements.darkcraft.capitulo8.description": "Hear chapter VIII before the fallen statue of the Capital",
+    "advancements.darkcraft.capitulo9.title": "The First Marked",
+    "advancements.darkcraft.capitulo9.description": "Hear chapter IX in Aldric's hut",
+    "advancements.darkcraft.capitulo10.title": "The Sisters of the Fire",
+    "advancements.darkcraft.capitulo10.description": "Hear chapter X beside the Last Flame",
+    "darkcraft.diario.capitulo7": "By the Arch of the Threshold, Maelis told me what Morvain was before the red sky: bells, mills, harbours. Its people did not die: they stayed, bound to the last thing they swore.",
+    "darkcraft.diario.capitulo8": "Before the fallen statue of the Capital, Maelis told me of those who stayed: the Constable who shut the gates, the Rector, the Abbot, the ferryman, Brann, Anselmo. She asked me to remember their names.",
+    "darkcraft.diario.capitulo9": "In Aldric's hut I learned he was the first marked one. He climbed the southern chain and there was no door at the top: only a mouth, waiting. The Shadow does not want its chains broken: it wants a living hand to open a door.",
+    "darkcraft.diario.capitulo10": "Beside the Last Flame, Maelis told me her sisters forged the eight chains with the fire of their souls, and that every shrine is one of them. She is the last. She cannot choose for me.",
+    "darkcraft.ayuda.cronica": "The chronicle of Morvain: where the chests of chapters 7-10 are, take you to one, place them now or forget them (to place them again)",
+    "darkcraft.cronica.ir": "Chest of chapter %s",
+    "subtitles.darkcraft.voz.guia": "Maelis tells",
+})
+
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

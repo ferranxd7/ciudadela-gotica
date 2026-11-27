@@ -1250,6 +1250,61 @@ def capitulo6():
     return True
 
 
+# la cronica de Morvain (parte 7ae): los capitulos 7-10 los cuenta Maelis (voz_guia.cronica en sesiones.json; masters
+# guia/capC_N{a,b}.mp3). Por capitulo, de cada frase la toma y lo que se calla despues (s); las de ci/historia/perdidos.py
+# (PAUSAS_MORVAIN, las mismas). Todas las tomas a: las dos de cada frase salieron parecidas (la 10.7b se dice sin pausas)
+CAPITULOS_GUIA = {
+    7: [("a", 1.2), ("a", 1.5), ("a", 1.3), ("a", 1.9), ("a", 1.2), ("a", 1.6), ("a", 1.3), ("a", 1.8), ("a", 0.0)],
+    8: [("a", 1.6), ("a", 1.2), ("a", 1.3), ("a", 1.2), ("a", 1.7), ("a", 1.3), ("a", 1.8), ("a", 0.0)],
+    9: [("a", 1.4), ("a", 1.3), ("a", 1.7), ("a", 1.2), ("a", 1.9), ("a", 1.4), ("a", 1.6), ("a", 0.0)],
+    10: [("a", 1.3), ("a", 1.4), ("a", 1.6), ("a", 1.3), ("a", 1.8), ("a", 1.7), ("a", 1.5), ("a", 0.0)],
+}
+# la voz de la cronica: la de Maelis (VOZ_GUIA) con algo mas de sala, como si leyera en la capilla
+VOZ_CRONICA = ("highpass=f=70,equalizer=f=3200:t=q:w=1.2:g=1.5,aecho=0.8:0.42:46|97|163:0.12|0.07|0.04,"
+               "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=160,loudnorm=I=-16:TP=-1.5:LRA=9")
+LEAD_GUIA = 0.3
+
+
+def capitulo_guia(cap):
+    """Un capitulo de la cronica de Morvain que cuenta Maelis: sus frases seguidas, con sus silencios, en
+    sounds/narracion/capC.ogg; y sus tiempos en cinematica/capC.json (como los demas capitulos narrados: la cinematica corta los
+    planos y pone los subtitulos con ellos). Devuelve si salio."""
+    ogg = os.path.join(ASSETS, "sounds", "narracion", f"cap{cap}.ogg")
+    jsn = os.path.join(ASSETS, "cinematica", f"cap{cap}.json")
+    with tempfile.TemporaryDirectory() as tmp:
+        partes, lineas, t, fin = [], [], LEAD_GUIA, 0.0
+        for n, (toma, pausa) in enumerate(CAPITULOS_GUIA[cap], 1):
+            src = os.path.join(MASTER, "guia", f"cap{cap}_{n}{toma}.mp3")
+            if not os.path.exists(src):
+                print(f"capitulo {cap}: falta", src)
+                return False
+            dst = os.path.join(tmp, f"frase_{n}.wav")
+            pre, _, hablado = recorte(src)
+            ff(["-i", src, "-af", pre + VOZ_CRONICA, "-ar", "44100", "-ac", "2", "-c:a", "pcm_s16le", dst])
+            d = duracion(dst)
+            h = min(hablado + COLA, d)
+            partes.append((dst, t))
+            lineas.append([round(t, 3), round(t + h, 3)])
+            fin = max(fin, t + d)
+            print(f"capitulo {cap}, frase {n} (toma {toma}): empieza a los {t:.2f} s, habla {h:.2f} s")
+            t += h + pausa
+        args, grafo = [], ""
+        for i, (f, ti) in enumerate(partes):
+            args += ["-i", f]
+            grafo += f"[{i}:a]adelay={int(ti * 1000)}:all=1[d{i}];"
+        grafo += "".join(f"[d{i}]" for i in range(len(partes)))
+        grafo += (f"amix=inputs={len(partes)}:normalize=0:duration=longest,"
+                  "alimiter=level_in=1:level_out=1:limit=0.9:attack=4:release=80:level=false[out]")
+        os.makedirs(os.path.dirname(ogg), exist_ok=True)
+        ff(args + ["-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "2", "-c:a", "libvorbis", "-q:a", "6", ogg])
+    dur = duracion(ogg)
+    os.makedirs(os.path.dirname(jsn), exist_ok=True)
+    with open(jsn, "w") as fh:
+        json.dump({"voz": "guia", "audio": True, "duracion": round(max(dur, lineas[-1][1] + 1.0), 3), "lineas": lineas}, fh)
+    print(f"capitulo {cap}: {len(lineas)} frases, {dur:.1f} s")
+    return True
+
+
 def efecto(src, dst, maxs, fade, lufs, entrada=0.0, graves=False, extra="", inicio=0.0):
     filtro = ((f"atrim=start={inicio},asetpts=PTS-STARTPTS," if inicio > 0 else "")
               + f"silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.02,atrim=0:{maxs},"
@@ -1624,6 +1679,14 @@ def main():
     except Exception as e:  # noqa: BLE001
         fallos += 1
         print(f"FALLO capitulo 6: {e}")
+    # la cronica de Morvain (parte 7ae): los capitulos 7-10, con la voz de Maelis
+    for cap in sorted(CAPITULOS_GUIA):
+        try:
+            if not capitulo_guia(cap):
+                fallos += 1
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO capitulo {cap}: {e}")
     with open(os.path.join(ASSETS, "rey_voces.json"), "w") as fh:
         json.dump({"duraciones": dur, "gavran": dur_g, "habla": hab, "habla_gavran": hab_g, "capitan": dur_c, "habla_capitan": hab_c,
                    "sombra": dur_s, "habla_sombra": hab_s, "molinera": dur_m, "habla_molinera": hab_m,

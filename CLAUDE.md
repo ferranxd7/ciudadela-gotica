@@ -3581,6 +3581,53 @@ La ultima de las partes del final (respuestas 57, 65 y 125 del plan). Cuando la 
   creditos `mv617..mv619`, el epilogo `mv620` y `mv621`, el cielo gris `mv622` y el fuego frio de la Ultima Llama `mv623`); al acabar,
   todo como estaba. `LIMIT` 136 min (`lanzar.sh` 142, el paso 170, el trabajo 218).
 
+### Plan grande, parte 7ae: la cronica de Morvain (los capitulos 7-10, que cuenta Maelis)
+
+Respuestas 61 y 126 del plan: los capitulos de Morvain los narra la guia de los santuarios (la voz de Aldous queda para el 1-5).
+- **Cuatro capitulos** (`Story.CHAPTERS` = 10, `Story.MORVAIN` = 7, `Story.morvain(ch)`): VII **Las Tierras Marchitas** (lo que era
+  Morvain, la noche del cielo rojo, los que se quedaron atados a su juramento, la ciudadela de las ocho cadenas), VIII **Los que se
+  quedaron** (Halvard, la Rectora, el Abad, el barquero, Brann, Anselmo: "recuerda sus nombres"), IX **El primer marcado** (Aldric,
+  los que golpeaban la cadena, la subida y la boca sin puerta: la Sombra necesita una mano viva que le abra una puerta) y X **Las
+  hermanas del fuego** (las ocho cadenas forjadas con el fuego de sus almas, cada santuario una hermana, el juramento roto de Corvin,
+  la ultima llama, "no puedo elegir por ti"). Textos en `ci/historia/perdidos.py` (`NARRACION_MORVAIN`: ingles del audio y espanol;
+  titulos `TITULOS_MORVAIN`; las paginas del libro `PAGINAS_MORVAIN`: `Story.PAGES` 6, 5, 5 y 6; los demas idiomas, en ingles hasta su
+  tanda); `textos.py` comprueba que caben. El libro: "Cronica de Morvain N", de Maelis (`darkcraft.libro.morvain`, `...lore.morvain`).
+- **La voz** (ElevenLabs, "Autumn Veil", flow `hempVQvOuj9vp33JKP9I`; `voz_guia.cronica` en `sesiones.json`): 33 frases con dos
+  tomas (masters `guia/capC_N{a,b}.mp3`). `ci/eleven/procesar.py` `capitulo_guia` monta cada capitulo con `VOZ_CRONICA` (la de
+  Maelis con algo mas de sala) y sus pausas (`CAPITULOS_GUIA`, todas tomas a) en `sounds/narracion/capC.ogg` (estereo, en streaming) y
+  `cinematica/capC.json`, como el 6. `narracion.cap7..10` (`DarkCraftMod.NARRACION_7..10`), subtitulo `darkcraft.narracion.C.N`.
+- **Los cofres** (`morvain/CronicaMorvain`): el generador de Morvain no escribe datos de bloque, asi que se ponen una vez en tiempo de
+  juego (`Morvain.Datos` "cronica7"...) la primera vez que alguien pasa a menos de 64 con su chunk cargado (`tick`, cada segundo desde
+  `Morvain.onTick`): el 7 junto al santuario del Arco del Umbral (al noroeste, al otro lado de Maelis), el 8 ante la estatua caida de la
+  plaza del Juramento de la Capital (al oeste del pedestal), el 9 dentro de la choza de Aldric en el Cerco del Ancla (a la izquierda de
+  la puerta) y el 10 en la capilla negra, en la nave ante el altar. Brillan y se abren como los de siempre (`StoryEvents`).
+- **Las cinematicas** (`morvain/PlanosCronica`, desde `Cinematics.play` si se esta en Morvain; grupos `Timeline.GROUPS7..10`): todo
+  cerca del cofre, sin mover a nadie. VII: sube por encima del arco mirando a las llanuras; los pilares rotos a ras de suelo; el arco
+  del portal desde abajo; el camino del norte con la estela; el horizonte donde cuelga la ciudadela (con la lejania se ve); Maelis de
+  cara con el santuario detras. VIII: la Puerta Oeste desde la calle mayor; la camara sube en el cruce sobre los tejados quemados; las
+  fachadas de la calle; la plaza alrededor de la estatua (por el este); la estatua de cerca; el jugador. IX: el ancla y la cadena desde
+  el patio; los que la golpean, a ras de suelo; el primer eslabon de lado; la camara sube junto a la cadena; la cima del ancla (Aldric);
+  el Cerco entero desde lo alto. X: la nave hacia el retablo; la isla colgada de sus cadenas desde fuera; los candelabros; el trono de
+  la reina (un piso mas arriba); la Ultima Llama de cerca; la aguja contra el cielo; Maelis junto al fuego. Cada plano se busca libre
+  (`buscar`: si choca con algo o se tapa lo que mira, prueba al lado; nunca pasa a menos de 1,3 del jugador); en estos capitulos se ve
+  a los jugadores (`ClientCine.onPlayerRender`). Preguntan a un `PlanosCronica.Mundo` (el de verdad o el de mentira).
+- **Sin abrir el juego**: `VOLCADO_OPTS="-Dcronica=N" tools/vista3d/vista.sh morvain_llegada|morvain_capital|morvain_cerco|morvain_homenaje
+  carpeta` escribe por plano si la camara se mete en algo o se tapa lo que mira y `volcado.bin.planos.txt`; **`tools/vista3d/camara.py
+  volcado.bin planos.txt carpeta`** dibuja lo que ve la camara en tres momentos de cada plano (perspectiva con el campo de vision de
+  Minecraft, los colores de vista.py, el jugador como una columna roja). Ojo: en el volcado del Cerco el terreno de encima del patio
+  sale mal (piedra por encima): alli vale la prueba de la CI.
+- **El menu y el codice**: la Historia tiene su apartado "Cronica de Morvain" (desde que se abrio el portal o se leyo alguno); las
+  miniaturas 12-15 (`CodiceScreen.miniaturaCapitulo`; el atlas `miniaturas.png` pasa a 512 x 320: las tierras marchitas con el molino y
+  el campanario, la puerta de la Capital con la estatua y los calcinados, la cadena que sube del ancla con Aldric arriba, las ocho
+  llamas alrededor de la Sombra y la ultima llama con Maelis).
+- **Logros** `capitulo7..10` (de la llegada, la capital, el cerco y la ultima llama; con su entrada del diario). Comandos
+  `/darkcraft cronica [ir <7-10> | poner | olvidar]` (sin mas: como estan).
+- Pruebas: servidor, `cronicaMorvain()` (`Morvain, la cronica: ...` —los cuatro cofres puestos con su marca, una sola vez, y sus
+  libros— y `Morvain, la cronica, la camara: ...` —audio, frases y duracion de cada capitulo y por plano si la camara se mete o se tapa
+  lo que mira—). Cliente, tramo `cronica()` despues de `aguja()`: en cada cofre un clic derecho de verdad, la cinematica (`cliente_crCC_0`
+  el titulo y `crCC_1..` un plano cada una, con el estado de la voz) y el cofre con el libro (`crCC_cofre`); la Historia del menu
+  (`cr90`) y los capitulos 7 y 10 en el codice (`cr91`, `cr92`). `LIMIT` 144 min (`lanzar.sh` 150, el paso 178, el trabajo 226).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

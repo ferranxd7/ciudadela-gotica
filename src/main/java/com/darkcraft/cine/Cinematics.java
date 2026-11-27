@@ -278,6 +278,9 @@ public final class Cinematics {
                 p.onUpdateAbilities();
                 p.setInvisible(true);
                 s.moved = true;
+            } else if (Story.morvain(chapter) && lvl.dimension() == com.darkcraft.morvain.Morvain.NIVEL) {
+                // la cronica de Morvain (parte 7ae): el sitio de su cofre, sin mover a nadie (los planos de cada uno acaban en el)
+                s.shots = com.darkcraft.morvain.PlanosCronica.capitulo(chapter, com.darkcraft.morvain.PlanosCronica.de(lvl), p.getEyePosition(), p.getYRot());
             } else if (sala != null) {
                 s.shots = CineShots.chapter5(sala, lvl, p.getEyePosition(), p.getYRot());
                 if (!despejado) {

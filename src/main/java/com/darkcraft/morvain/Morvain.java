@@ -298,6 +298,8 @@ public final class Morvain {
         if (m != null) CasaSombra.tick(m);
         // el Corazon de la Aguja (parte 7ac): la puerta, el sello mientras pelea la Sombra y su corazon
         if (m != null) Aguja.tick(m);
+        // la cronica de Morvain (parte 7ae): los cofres de los capitulos 7-10, una vez, al pasar alguien cerca
+        if (m != null && srv.getTickCount() % 20 == 17) CronicaMorvain.tick(m);
         // el molino de la Molinera (parte 7f): la reja de su puerta y su crujido con el viento
         if (m != null && srv.getTickCount() % 100 == 13) Molino.crujir(m);
         // la arboleda (parte 7h): con el Verdugo vencido, las sogas de los colgados se quedan con el lazo vacio

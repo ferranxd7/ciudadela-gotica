@@ -975,7 +975,7 @@
   "flow": "FNZWSYJq2nK8zd5QwV5m",
   "modelo": "eleven_v4",
   "voz": "Autumn Veil (KoVIHoyLDrQyd4pGalbs)",
-  "nota": "Parte 2e-1: Maelis, la guia de los santuarios (voz de mujer serena). Frases 1-10, tomas a y b. Parte 7b: frases 11-14 (Morvain: la bienvenida, el silbato del corcel, como es el corcel y el saludo de alli). Parte 7ab: frases 15-16 (la Ultima Llama, en la capilla negra de la ciudadela).",
+  "nota": "Parte 2e-1: Maelis, la guia de los santuarios (voz de mujer serena). Frases 1-10, tomas a y b. Parte 7b: frases 11-14 (Morvain: la bienvenida, el silbato del corcel, como es el corcel y el saludo de alli). Parte 7ab: frases 15-16 (la Ultima Llama, en la capilla negra de la ciudadela). Parte 7ac: frases 17-23 (el epilogo: 17-20 el final del alba, 21-23 el de la Sombra). Parte 7ae: la cronica de Morvain (capitulos 7-10), en \"cronica\".",
   "frases": {
    "1": {
     "prompt": "[softly] Another soul the Shadow has dragged back from the dark... [pause] You should be dead, marked one. And yet... the fire still answers to you.",
@@ -1088,6 +1088,572 @@
      "oLP0AkGI6flo6efEXbB1",
      "NrUcYPWYYjxAggELlYG1"
     ]
+   },
+   "17": {
+    "prompt": "[softly, in awe] The red is leaving the clouds... Do you see it, marked one? [pause] The first dawn in a thousand winters.",
+    "sesiones": [
+     "uUipH0oVvKJ0RCdMLapU",
+     "MgNkJWvbe3gQJXdDDHcy"
+    ],
+    "flow": "9PNaQB6OZhftDB88JZYO"
+   },
+   "18": {
+    "prompt": "[gentle, tired, relieved] The fires are going out, one by one. My sisters can rest at last... [softly] and so can I.",
+    "sesiones": [
+     "QpPSCWQ7oSjx45TH4V27",
+     "y4LpbSYNmcNk5DuIJQso"
+    ],
+    "flow": "9PNaQB6OZhftDB88JZYO"
+   },
+   "19": {
+    "prompt": "[serious, tender] Your mark is fading. The next time you fall... you may not rise again. [pause] Live as if that were true.",
+    "sesiones": [
+     "BIlRqOZChgz6r1fN0Hb7",
+     "d2eWsqOiTp3yf3lt32EH"
+    ],
+    "flow": "9PNaQB6OZhftDB88JZYO"
+   },
+   "20": {
+    "prompt": "[warm, a quiet smile in her voice] Thank you... for not answering it.",
+    "sesiones": [
+     "2R2DsqLKzFjowoADlyvi",
+     "xZOXvumZitOgIgNPEXSk"
+    ],
+    "flow": "9PNaQB6OZhftDB88JZYO"
+   },
+   "21": {
+    "prompt": "[quiet, cold, sad] The clouds are grey again... but the fires know what you did. [pause] They burn cold now.",
+    "sesiones": [
+     "kNpQBProbTzfgVIT0EGS",
+     "gp6KJB0SYwjiAUGB93P3"
+    ],
+    "flow": "9PNaQB6OZhftDB88JZYO"
+   },
+   "22": {
+    "prompt": "[sorrowful, slow] You took its heart. Its hunger will wake in you, slowly... and one day you will call it your own.",
+    "sesiones": [
+     "9Bcd1ATYTCNKGcwiQVvS",
+     "VIV56uoeXlEJhgHw9tNT"
+    ],
+    "flow": "9PNaQB6OZhftDB88JZYO"
+   },
+   "23": {
+    "prompt": "[almost a whisper] Someday another marked one will climb the chain... and you will be waiting. [pause, softly] You always wait.",
+    "sesiones": [
+     "KWsuco0HKfIH1e4UiDUf",
+     "gSO9ghTUP8XKs4Oi3Sbf"
+    ],
+    "flow": "9PNaQB6OZhftDB88JZYO"
+   }
+  },
+  "cronica": {
+   "flow": "hempVQvOuj9vp33JKP9I",
+   "modelo": "eleven_v4",
+   "nota": "Parte 7ae: la cronica de Morvain que cuenta Maelis (capitulos 7-10). Por capitulo y frase, tomas a y b; se bajan como guia/capC_Na.mp3 y guia/capC_Nb.mp3",
+   "capitulos": {
+    "7": {
+     "1": {
+      "prompt": "[softly, remembering] Before the Shadow, this was Morvain... a kingdom of bells and mills and harbours, of scholars who read the stars.",
+      "sesiones": [
+       "XotQkkOTVq388vBLq4yh",
+       "IHpgOgpAsHZRtPjwP1Z9"
+      ],
+      "generaciones": [
+       "HVt1YRZ15nYX6ixMdpJQ",
+       "zxnxgdkgDjmJDBtrt4Mi"
+      ],
+      "duraciones": [
+       9.04,
+       9.2
+      ]
+     },
+     "2": {
+      "prompt": "[warm, a little proud] Its people swore oaths the way others breathe. The Constable swore to guard the gate. The Abbot swore to keep the faith.",
+      "sesiones": [
+       "wiozt6rSGiROmkIh5M30",
+       "8x4E3k4k6WZ3lXf6a2xZ"
+      ],
+      "generaciones": [
+       "BZwnwtK14i7fT1WfuRlA",
+       "0uTHxNudeopiDOqCNht4"
+      ],
+      "duraciones": [
+       8.64,
+       8.72
+      ]
+     },
+     "3": {
+      "prompt": "[darker, slow] Then came the night of the red sky. Fire fell on the palace... and the sea was drunk in a single breath.",
+      "sesiones": [
+       "UqJ9PhN8uYWFE2W9RuzV",
+       "GYhdQ4zRyo82PGUfGhkq"
+      ],
+      "generaciones": [
+       "sQpr3Tk7Psh2GhUHubFk",
+       "qiSzb2MkWg9w7Z8FLgOh"
+      ],
+      "duraciones": [
+       8.88,
+       8.88
+      ]
+     },
+     "4": {
+      "prompt": "[quiet] The bell of Velmor rang for fire. [pause] No one came.",
+      "sesiones": [
+       "vnWzJM9hgyZbKaYiWPL6",
+       "MWcPqLqDFVkWd80atvER"
+      ],
+      "generaciones": [
+       "NqNZaAShPOUAreDrIous",
+       "Zv3FkaV7jid3PLNtLObH"
+      ],
+      "duraciones": [
+       4.48,
+       4.48
+      ]
+     },
+     "5": {
+      "prompt": "[sorrowful] They did not die, marked one. They stayed. Each of them bound to the last thing they swore.",
+      "sesiones": [
+       "iOhzxAC6Ubzpq0EWgZ6b",
+       "0YCMvl1ImlQ8zxzdPy5K"
+      ],
+      "generaciones": [
+       "T6IRc1UXWwwI2isRiHWf",
+       "miS9D56OUtcZhp7sKSF6"
+      ],
+      "duraciones": [
+       7.76,
+       7.68
+      ]
+     },
+     "6": {
+      "prompt": "[softly] The miller still reaps a field that will not grow. The hangman still waits beneath his tree.",
+      "sesiones": [
+       "pYM0mR85E9PrRZEaLCI8",
+       "sp9vdkQ9VMbq1BmAiooH"
+      ],
+      "generaciones": [
+       "ssen7CHGAM9VZvvp6Avz",
+       "nKCfJzRg31l3uRtlff5j"
+      ],
+      "duraciones": [
+       6.48,
+       6.64
+      ]
+     },
+     "7": {
+      "prompt": "[low, ominous] And at the heart of it all, above the crater of blood, the citadel hangs from its eight chains.",
+      "sesiones": [
+       "GN1VzuPxdbfo9VuQdOHk",
+       "38B9wkYlhP8BsBMbRcbE"
+      ],
+      "generaciones": [
+       "jWrGstZJkMlmf03eXJGk",
+       "tyg9J4FxGjq4f0n3H2hc"
+      ],
+      "duraciones": [
+       7.04,
+       6.56
+      ]
+     },
+     "8": {
+      "prompt": "[very quiet] That is where it waits. That is where it brought you back to go.",
+      "sesiones": [
+       "adFEOOrD1CNO1JZZaB5P",
+       "9PsgDNCQbxHWvfrMh94D"
+      ],
+      "generaciones": [
+       "Vdn9AxWagSCKxkVnxF81",
+       "OPW30wLqUvKcc9T85Jl9"
+      ],
+      "duraciones": [
+       4.32,
+       4.32
+      ]
+     },
+     "9": {
+      "prompt": "[gentle] Rest when you can. Every fire you light is one more step towards it.",
+      "sesiones": [
+       "aidVh5vEawowoCalKJU4",
+       "Mehw07sILlcEdqCJ7EIx"
+      ],
+      "generaciones": [
+       "J87FLu00RFfsVTlvNJdr",
+       "sICit8uK2p6jpqCHHg2Y"
+      ],
+      "duraciones": [
+       5.6,
+       5.68
+      ]
+     }
+    },
+    "8": {
+     "1": {
+      "prompt": "[solemn] Ser Halvard closed the gates of the capital so the fire would not spread. [pause] He closed them on his own people.",
+      "sesiones": [
+       "7miEjlzCyPBZpYm6pzjw",
+       "0W2Ad36y9Cptx52GUk6d"
+      ],
+      "generaciones": [
+       "38gPEcWz8oMtKmSbmZjx",
+       "dzPd7haV4BlyqvEbl3Ni"
+      ],
+      "duraciones": [
+       7.68,
+       7.68
+      ]
+     },
+     "2": {
+      "prompt": "[quiet, uneasy] The Rector climbed her tower to read the falling fire... and the stars read her instead.",
+      "sesiones": [
+       "KpR9JNRRxh8COwLJ6wLZ",
+       "SmUxcgceKYtQENtRq7xm"
+      ],
+      "generaciones": [
+       "PI3thH9CPMNfYIpYh1oV",
+       "DDIPMbs5CuXk6j3EOadY"
+      ],
+      "duraciones": [
+       6.0,
+       6.0
+      ]
+     },
+     "3": {
+      "prompt": "[cold, slow] The Abbot climbed the summit to beg the cold for mercy. [pause] The cold answered him.",
+      "sesiones": [
+       "E3IGpM5IqZLdmKJ8iMvo",
+       "I5VEwHnWyAYI6RC21Nyt"
+      ],
+      "generaciones": [
+       "6tQAt9Mcre7nWyXgtRHK",
+       "EZMcLds7uDbYUPoHUqlT"
+      ],
+      "duraciones": [
+       7.2,
+       7.44
+      ]
+     },
+     "4": {
+      "prompt": "[sad] The ferryman still rows the black lagoon for the drowned, though there is no one left to carry.",
+      "sesiones": [
+       "6HB91qrd6Y0FPSFl3oBS",
+       "XYN1uZfQOSbPyh2yGygi"
+      ],
+      "generaciones": [
+       "VD23mQZLEzcNNBd9MZbr",
+       "NuDjFEMbmSZrKfUF67Xk"
+      ],
+      "duraciones": [
+       6.16,
+       6.24
+      ]
+     },
+     "5": {
+      "prompt": "[weary] Brann waits for a sea that will never return. Anselmo bleeds for a god that only ever answered: give.",
+      "sesiones": [
+       "jYX6GIeijztWD33R6ZEh",
+       "Eg0BVUPSY271SPyvRQ3B"
+      ],
+      "generaciones": [
+       "xdGSzq1D3b6quaD2owtI",
+       "CIwLPY8GBtaQLffo4kNv"
+      ],
+      "duraciones": [
+       8.32,
+       8.16
+      ]
+     },
+     "6": {
+      "prompt": "[gentle, sorrowful] None of them chose to stay. The Shadow took their oaths and left the rest of them behind.",
+      "sesiones": [
+       "1z14zkIB23xQDmmP7ITr",
+       "ZFv3RQBEzXMGDI2B5lG6"
+      ],
+      "generaciones": [
+       "Xd1Trh9C5gi9uTIMKBXC",
+       "XzPGiDukl3nIIH5e9WKq"
+      ],
+      "duraciones": [
+       6.0,
+       6.0
+      ]
+     },
+     "7": {
+      "prompt": "[tender] When you strike them down, you do not kill them. You let them keep their word... one last time.",
+      "sesiones": [
+       "u0Y5GZsbpEbTk2U7xzuu",
+       "s79KDMHRGQ2rzE1BTO6U"
+      ],
+      "generaciones": [
+       "8GWHIl4a0i3GlGDu9SHn",
+       "ajDbeKuIiwrwTUCJY2xH"
+      ],
+      "duraciones": [
+       7.2,
+       7.36
+      ]
+     },
+     "8": {
+      "prompt": "[softly] Remember their names, marked one. In Morvain, no one else does.",
+      "sesiones": [
+       "xLcaVXZs4fU8J4nbw2ea",
+       "eJsugtZVmkbTUcYCfTak"
+      ],
+      "generaciones": [
+       "4XwyKCPGXA8MQz9Hv1jp",
+       "E7QRv1wrNoT4AP9MVgNd"
+      ],
+      "duraciones": [
+       5.68,
+       5.52
+      ]
+     }
+    },
+    "9": {
+     "1": {
+      "prompt": "[quiet, grave] Aldric was the first. He woke at the bottom of the crater with the mark burning in his chest... and a voice that said: break my chains.",
+      "sesiones": [
+       "9NXlUiLNPwjHiYzovXoe",
+       "QjcWWtiineCrKNf74AAO"
+      ],
+      "generaciones": [
+       "zJdw9RUeb0fpMlfvFTe0",
+       "cwAWyJUX0EQwXgHMG1Xy"
+      ],
+      "duraciones": [
+       9.28,
+       9.52
+      ]
+     },
+     "2": {
+      "prompt": "[sad] Others came after him, one by one. They struck the chain in turns, day and night, until their hands were no longer their own.",
+      "sesiones": [
+       "vW5f0BAOhnaXa580Dvob",
+       "KCgI5cVcn61octfzHd5h"
+      ],
+      "generaciones": [
+       "hUa6gw5MACi9wSUySlFg",
+       "VkfY2hx38S8b0dJwfEzT"
+      ],
+      "duraciones": [
+       10.24,
+       10.0
+      ]
+     },
+     "3": {
+      "prompt": "[firm, quiet] The iron my sisters forged does not break, marked one. [pause] It was never meant to.",
+      "sesiones": [
+       "hWaNyQGumls4pi9ZOqzj",
+       "eM5m6aZGBqbaF7s7wFhc"
+      ],
+      "generaciones": [
+       "RnLwSPX1kDM6rT3XWzfj",
+       "rkbuTJxYfmAl4M59ojdC"
+      ],
+      "duraciones": [
+       6.08,
+       6.24
+      ]
+     },
+     "4": {
+      "prompt": "[softly] So Aldric climbed. Link by link, up the southern chain, to see the citadel with his own eyes.",
+      "sesiones": [
+       "e5ZyBLw7Z0I9SvyUTPpg",
+       "Ej0ma8wtuDrQWrEgjVeC"
+      ],
+      "generaciones": [
+       "jhjs8gpmBqKmKFhzunZu",
+       "DQKlJdSux0SPKEUa1ftF"
+      ],
+      "duraciones": [
+       7.92,
+       7.84
+      ]
+     },
+     "5": {
+      "prompt": "[whispering] There was no door at the top. Only a mouth... waiting.",
+      "sesiones": [
+       "oElRgrGqP0NNhGbdvFeR",
+       "ztRgXgDceaLxumFjKnOI"
+      ],
+      "generaciones": [
+       "Kdmsu0JvAr8FMtw4HG9k",
+       "DjJbou6H7T26XchuQ8wP"
+      ],
+      "duraciones": [
+       4.8,
+       4.8
+      ]
+     },
+     "6": {
+      "prompt": "[sorrowful] He came down running, and he never climbed again. He knelt by the anchor so that no one else would.",
+      "sesiones": [
+       "AQTmpD1xjrwMGUs0f33d",
+       "cF4apH02dWkgJPvQiNSu"
+      ],
+      "generaciones": [
+       "TFV0UDhEJOEirMmitqkc",
+       "8yLk2N54CY606rEuxySs"
+      ],
+      "duraciones": [
+       7.2,
+       7.12
+      ]
+     },
+     "7": {
+      "prompt": "[low, serious] The Shadow does not need its chains broken. It needs a door opened... by a living hand.",
+      "sesiones": [
+       "8efMYXH2XGjOoiEFQSDL",
+       "rtvlYHKH1YodOJvidgQ5"
+      ],
+      "generaciones": [
+       "cMpSfjhDNEd73AgsoPAo",
+       "ZOeoKUUgQZopow48Wdq6"
+      ],
+      "duraciones": [
+       6.56,
+       6.56
+      ]
+     },
+     "8": {
+      "prompt": "[uncertain, gentle] Yours is the first hand to come this far. [pause] I do not know whether to be glad.",
+      "sesiones": [
+       "Mrq0Z4Y9ONWLNlinqxqs",
+       "3xjJ0iNUDxi9UZcg5s6G"
+      ],
+      "generaciones": [
+       "eKhUsM8xE02Se39lLXB6",
+       "ZMYaJURuCAyjweIM3BK1"
+      ],
+      "duraciones": [
+       5.84,
+       5.6
+      ]
+     }
+    },
+    "10": {
+     "1": {
+      "prompt": "[softly, ancient] A thousand winters ago, the Shadow came to Morvain hungry... and my sisters met it with fire.",
+      "sesiones": [
+       "J2orzdv8yv7gvSuEzdnw",
+       "CUrWw2UvlKoTkypA27r1"
+      ],
+      "generaciones": [
+       "T9Md1oeJLbivtHYE22QB",
+       "jfvQirQLY2Lz5imIQvyt"
+      ],
+      "duraciones": [
+       7.44,
+       7.84
+      ]
+     },
+     "2": {
+      "prompt": "[solemn] They forged eight chains in the fire of their own souls, and bound it in the sky, above the crater, where nothing could reach it.",
+      "sesiones": [
+       "axwo5CGr9L2LOzntFG3z",
+       "MKXBuG3DDCjrMqcNwN5f"
+      ],
+      "generaciones": [
+       "aUvQMkPRlPpFzKjsGOt3",
+       "dhCg8a3UFdHb5PDkf3VQ"
+      ],
+      "duraciones": [
+       8.64,
+       8.96
+      ]
+     },
+     "3": {
+      "prompt": "[tender] Then they scattered across the land and lit the fires you rest beside. Each fire is a sister... keeping watch.",
+      "sesiones": [
+       "Kqbc89sP6Lnvpgcdob6J",
+       "thXsrtSGMAoavwsxHaPR"
+      ],
+      "generaciones": [
+       "856y6w642vRO6PQARzCv",
+       "AFR2Afm7WN7hRvLGSdoL"
+      ],
+      "duraciones": [
+       8.24,
+       8.56
+      ]
+     },
+     "4": {
+      "prompt": "[grave] But a chain is only as strong as the oaths around it. King Corvin of Valdrenn broke his... for a queen.",
+      "sesiones": [
+       "uWxeQ61zhhg4dJvZJHgM",
+       "QiA3cIueiDtJ5xxjA7lX"
+      ],
+      "generaciones": [
+       "dvwsRkgXcPqif9LaluzP",
+       "coXiGFyojBteV49HM6nU"
+      ],
+      "duraciones": [
+       8.08,
+       8.16
+      ]
+     },
+     "5": {
+      "prompt": "[dark] Through that broken oath the Shadow reached out, and the sky of Morvain turned red.",
+      "sesiones": [
+       "3RFsUnlZNPGcY7ThNnyq",
+       "4n3UbpwXeJNs6OSqogYi"
+      ],
+      "generaciones": [
+       "NNl9nqLJgvtugFewugHc",
+       "6kGT3vLr9cGslOwR7KCc"
+      ],
+      "duraciones": [
+       6.4,
+       6.24
+      ]
+     },
+     "6": {
+      "prompt": "[sad, quiet] One by one, my sisters went out. [pause] I am the last. This is the last flame.",
+      "sesiones": [
+       "PrEgMXMmAWf7ghNuI3Rc",
+       "CHFHGXpKQSVwxNFsOZHm"
+      ],
+      "generaciones": [
+       "HH68ziGgsMHgnrvKki7n",
+       "E2vozbGIKhdAqceMTMjl"
+      ],
+      "duraciones": [
+       7.68,
+       7.44
+      ]
+     },
+     "7": {
+      "prompt": "[warning, soft] Above us, the Shadow will offer you everything. Its heart. Its crown. A life that death can never touch.",
+      "sesiones": [
+       "Rq7Y72poabtllwr3Q3Pl",
+       "xpqi5TFiQ346dS9ai6Dl"
+      ],
+      "generaciones": [
+       "M0hTnsi1OrlsJ9kgh3Ij",
+       "wY6bqeMBbW1BbMc8t911"
+      ],
+      "duraciones": [
+       8.72,
+       8.64
+      ]
+     },
+     "8": {
+      "prompt": "[gentle, resigned] I cannot choose for you, marked one. I can only keep the fire lit... until you come back.",
+      "sesiones": [
+       "tFE8G2jWB3JguTw5pUnl",
+       "PFobt7y9RhKxbF4hXya2"
+      ],
+      "generaciones": [
+       "xDYpEuWoRoxdlARpGCFT",
+       "uYK2s77jZ9Q5jYkJWl1s"
+      ],
+      "duraciones": [
+       6.64,
+       6.8
+      ]
+     }
+    }
    }
   }
  },
@@ -1969,6 +2535,132 @@
     ],
     "flow": "Mm0FdcLcpVa1l39aUIC2",
     "nota": "Parte 7ab: la Sombra habla al entrar en la torre del homenaje"
+   },
+   "25": {
+    "prompt": "[very low, slow, hungry, intimate] There it is... the door I could never open. [pause] Put your hand on it, marked one. [whispering] Let me out.",
+    "prompt_susurro": "[whispers] There it is... the door I could never open. Put your hand on it, marked one. Let me out.",
+    "voz": [
+     "GRcSjKbrcqtl1xhcvS0V",
+     "RZnTp2KC0DtCDGcWEQ8o"
+    ],
+    "susurro": [
+     "zTgsCcqME22qgLlaZeLR",
+     "AM9oI9SI1cc4tmPX23BL"
+    ],
+    "flow": "J0wRJKSIlAmB8VYZJA4A",
+    "nota": "Parte 7ac: la Sombra en la aguja (la puerta, la pelea final, su oferta y los finales)"
+   },
+   "26": {
+    "prompt": "[very low, slow, amused, ancient] A thousand winters. Kings... knights... queens... every marked one I dragged back from the dark. [pause] All of it, to bring you here. [cold] Now... come closer. [whispering] Let me wear your face.",
+    "prompt_susurro": "[whispers] A thousand winters. Kings... knights... queens... every marked one I dragged back from the dark. All of it, to bring you here. Now... come closer. Let me wear your face.",
+    "voz": [
+     "67P1XsuhSyxub6Kd408Y",
+     "tcSRIG7t2hynoQ4hPg98"
+    ],
+    "susurro": [
+     "Zz7OdWVN2Bg91DLyJUHD",
+     "albG9x87002Prae277Hp"
+    ],
+    "flow": "J0wRJKSIlAmB8VYZJA4A",
+    "nota": "Parte 7ac: la Sombra en la aguja (la puerta, la pelea final, su oferta y los finales)"
+   },
+   "27": {
+    "prompt": "[enraged, roaring] Enough! [deep, furious] You are MINE. I dragged you out of the dark... [cold, menacing] and I can drag you back.",
+    "prompt_susurro": "[whispers] Enough! You are mine. I dragged you out of the dark... and I can drag you back.",
+    "voz": [
+     "phqiQNDw9UYIQQgFUoEd",
+     "RSSZlKQOyC9z4G1oObnD"
+    ],
+    "susurro": [
+     "zBEb2wtfCXiG38xufmC7",
+     "dSokRanKPfPvhosfD275"
+    ],
+    "flow": "J0wRJKSIlAmB8VYZJA4A",
+    "nota": "Parte 7ac: la Sombra en la aguja (la puerta, la pelea final, su oferta y los finales)"
+   },
+   "28": {
+    "prompt": "[cold, mocking] Get up, marked one. [whispering] Death is mine... and I am not finished with you.",
+    "prompt_susurro": "[whispers] Get up, marked one. Death is mine... and I am not finished with you.",
+    "voz": [
+     "738sZejc90iFJRMDovhU",
+     "RelhTcPM1t2AJeKpNzzi"
+    ],
+    "susurro": [
+     "O5cQ9AvZqQGwog5jD7jq",
+     "KHkWHGOqZkuKJKBiF7il"
+    ],
+    "flow": "J0wRJKSIlAmB8VYZJA4A",
+    "nota": "Parte 7ac: la Sombra en la aguja (la puerta, la pelea final, su oferta y los finales)"
+   },
+   "29": {
+    "prompt": "[commanding, echoing, slow] Rise... all of you who failed me.",
+    "prompt_susurro": "[whispers] Rise... all of you who failed me.",
+    "voz": [
+     "8mGIYIqn2jEVB8AGodfM",
+     "t8LZJG53utyhsyp3XgyA"
+    ],
+    "susurro": [
+     "7Z7kZbpcLG2zamORhL85",
+     "7KJEneK7QWSa9PGcRNFh"
+    ],
+    "flow": "J0wRJKSIlAmB8VYZJA4A",
+    "nota": "Parte 7ac: la Sombra en la aguja (la puerta, la pelea final, su oferta y los finales)"
+   },
+   "30": {
+    "prompt": "[weak, desperate] Wait... wait, marked one. [pause] [seductive, slow] Take my heart. Wear my crown... and death will never touch you again. [pause] [cold] Or strike... and go back to dying like all the rest. [whispering] Answer me.",
+    "prompt_susurro": "[whispers] Wait... wait, marked one. Take my heart. Wear my crown... and death will never touch you again. Or strike... and go back to dying like all the rest. Answer me.",
+    "voz": [
+     "QVCKEyIbw9Nqv6uocoM7",
+     "aoBdB6l6JQ1uYGK8Sui7"
+    ],
+    "susurro": [
+     "cPabZnZSJlVxoadbIZh0",
+     "5loCMjS52oWgoQPItmTe"
+    ],
+    "flow": "J0wRJKSIlAmB8VYZJA4A",
+    "nota": "Parte 7ac: la Sombra en la aguja (la puerta, la pelea final, su oferta y los finales)"
+   },
+   "31": {
+    "prompt": "[fading, broken, almost childlike] No... I waited... I always waited... [whispering] so cold...",
+    "prompt_susurro": "[whispers] No... I waited... I always waited... so cold...",
+    "voz": [
+     "u5KDDZiSQYfFu0V6sJlt",
+     "HyKAnQtpUwrJOerLBnv6"
+    ],
+    "susurro": [
+     "BFVhEg03lASeWFRQrxZs",
+     "sR3MZabw4sSFlVCqnrGw"
+    ],
+    "flow": "J0wRJKSIlAmB8VYZJA4A",
+    "nota": "Parte 7ac: la Sombra en la aguja (la puerta, la pelea final, su oferta y los finales)"
+   },
+   "32": {
+    "prompt": "[soft, satisfied, a low laugh] Yes... [whispering] Now you will wait... [pause] as I waited.",
+    "prompt_susurro": "[whispers] Yes... Now you will wait... as I waited.",
+    "voz": [
+     "FUeTIJZ6MXwnFRqs8ZFE",
+     "4ZLYqFavE7vj4eJrggKr"
+    ],
+    "susurro": [
+     "CCEqTxtVaS1VJnSeXl5j",
+     "tFctsqkPt1ddVvJaIj0Y"
+    ],
+    "flow": "J0wRJKSIlAmB8VYZJA4A",
+    "nota": "Parte 7ac: la Sombra en la aguja (la puerta, la pelea final, su oferta y los finales)"
+   },
+   "33": {
+    "prompt": "[amused, low] Back again? [whispering] Good.",
+    "prompt_susurro": "[whispers] Back again? Good.",
+    "voz": [
+     "LaoU4GTu6iw9XJkBkYGN",
+     "YWLL3D6RC3q2cpv23YhV"
+    ],
+    "susurro": [
+     "j4Q6Li6uG26IYx6ipqqz",
+     "kRkJd7sulZXG24xr02lC"
+    ],
+    "flow": "J0wRJKSIlAmB8VYZJA4A",
+    "nota": "Parte 7ac: la Sombra en la aguja (la puerta, la pelea final, su oferta y los finales)"
    }
   }
  },
@@ -8105,6 +8797,313 @@
      "eZ7qNG83p1zLgPxzVZMw",
      "bkMDP4EB3UO7Anbc9eaE",
      "Bx0cT6PLy1exhRz7aWw7"
+    ]
+   }
+  }
+ },
+ "sfx_sombra": {
+  "flow": "EGM9mAfMc93fpwSezd6h",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7ac: la Sombra sin Nombre (sus golpes, las cadenas, la mirada, el corazon), la puerta de la aguja y el aire de la aguja en bucle. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "sombra_cadenas": {
+    "prompt": "Enormous iron chains straining and groaning under immense tension inside a vast stone tower, metal creaking and grinding, slowly building, dark fantasy, 4 seconds",
+    "sesiones": [
+     "V9epZIu8kYD8QwKMHgwN",
+     "3Hs679NraBeAVOS4cTF0",
+     "8xgaB64uiNsEtoIHN1BI",
+     "4U33TQGJNhe9Z9Lwfn0N"
+    ],
+    "generaciones": [
+     "fzBfmYdDFnIcyGBTU3Ai",
+     "uAcLg0J6Ag2fPCzvE9Y1",
+     "49hoziayxu8OdDbLYATE",
+     "ZcyuvH2aWVmCKdIog0nH"
+    ]
+   },
+   "sombra_rompe": {
+    "prompt": "Gigantic iron chains snapping apart one after another with violent metallic cracks, shards ringing off stone, followed by a rush of dark wind, epic dark fantasy, 3 seconds",
+    "sesiones": [
+     "GMoOVruLkVxaX7AF1yyt",
+     "En2qw6cSkF317v5O6KIu",
+     "efd5T7U0x75tw3smraEY",
+     "TkWaEsGzrtjuR90hev7R"
+    ],
+    "generaciones": [
+     "Ywvd9sz7XjMjCiRjPUIi",
+     "51grzWDvuF9ZThY9Z0pn",
+     "fojct8NmDKmbQoRLXuKN",
+     "8Rh0XNDfoKN1f0qw0C0R"
+    ]
+   },
+   "sombra_rugido": {
+    "prompt": "An ancient shadow god roaring awake: a deep, layered, inhuman roar from the void with a chorus of whispers underneath, echoing in a huge stone tower, 3 seconds",
+    "sesiones": [
+     "YMw7w5o9fw89pQ3T0V77",
+     "0jrbQTmv6ctsuftXzp7W",
+     "SDLBRIUhxxu2fhuwCRcY",
+     "yGShK0FShDqCreDGcgrP"
+    ],
+    "generaciones": [
+     "aiRJZls4PP4Rm1EDSra8",
+     "CaRCsfmsPXA8ftbeiwzh",
+     "PmftZI73k7jaxsHtZO5x",
+     "dSTuJzbpsbk3T3bsjxdU"
+    ]
+   },
+   "sombra_zarpazo": {
+    "prompt": "A colossal claw made of shadow slashing through the air, a deep heavy whoosh with a dark tearing sound, 1 second",
+    "sesiones": [
+     "gEuKB6ajF2SEtXpzdKi4",
+     "SPz1X8CbdoQsCBUEaxp9",
+     "vdRvfaZCz52VR0ezvbuI",
+     "W3htFtcEQMX0kPlxtvif"
+    ],
+    "generaciones": [
+     "y9cUivQHVXyzxVWkVYiQ",
+     "3mxKEvQUWADq9cBffaJK",
+     "hZurVVNoDm2MBypO48uE",
+     "42ScLwDlXptFSWOaP48i"
+    ]
+   },
+   "sombra_cadena": {
+    "prompt": "A heavy iron chain lashed like a whip: a whistling swing and a sharp metallic crack, then the chain dragging back over stone, 1.5 seconds",
+    "sesiones": [
+     "jEQ0oIwSaRGoxcr5MKeP",
+     "VX3s2AMbZaqYJtWWg5di",
+     "u4z2bUlyr5BKigclQdtP",
+     "tWIVp42Jq5M72xZ9xk78"
+    ],
+    "generaciones": [
+     "hCleUUx1Lxm8QjCqWrsd",
+     "MdUS2b5EBH77Fs2QQwI5",
+     "6d5y1OOKRXfr2blhXBHx",
+     "81jerelY2bfFy0owSvdz"
+    ]
+   },
+   "sombra_manos": {
+    "prompt": "Giant hands of shadow bursting up out of a stone floor: stone cracking, a dark rushing whoosh and huge fingers clenching with a crunch, 1.5 seconds",
+    "sesiones": [
+     "o50V6sauSqzbv4kUKgzD",
+     "XWAKWifuGIigYhxhSt2J",
+     "r1tbhu0SPu6QdRURakWJ",
+     "f3pJ0vMicFjVjY5ODd2H"
+    ],
+    "generaciones": [
+     "Y3WDoib6tc6OYpM3Mhtq",
+     "OYRZfBhlR4ce50PC22TH",
+     "kbi79xKssZ7KPdJqZ2aH",
+     "zSNW1sCGIOG59ivCJHka"
+    ]
+   },
+   "sombra_lanzas": {
+    "prompt": "Spears of dark energy conjured with a rising hiss and hurled through the air, sharp swooshes and sizzling, 1.5 seconds",
+    "sesiones": [
+     "DDanhLWRuOf7Ccx6mXeN",
+     "njdHDa0dbPTmblj3Vv1z",
+     "IXUydN5OTgvHDASDYCJa",
+     "sL0XLTWbSvhjHjQBTs23"
+    ],
+    "generaciones": [
+     "xosjMGvn3B8MYejHGUYf",
+     "jYlMF08SZy6ZbGBvrLbf",
+     "1LYTnKhsdsNh9iEtdPfT",
+     "7WOWPDgFLig6qocZPP8W"
+    ]
+   },
+   "sombra_giro": {
+    "prompt": "A huge tattered cloak whipped around in a full circle by a giant, a powerful whooshing sweep of cloth and smoke, 1.2 seconds",
+    "sesiones": [
+     "jlz6NHz3MHw9JYdXuO4p",
+     "kQOAN8EjAhGPy6YRSBTk",
+     "tZqCbcFQftnfkyQTJaHC",
+     "Hv5kAoDENvRirrqXOHyy"
+    ],
+    "generaciones": [
+     "QRavtLDgQjPjDATPAVTz",
+     "30o2kqcgl7jfyOC0ZtyD",
+     "UzeypLxDH52WzIvaJOS1",
+     "0xlEPuzAnoh8rHokZewa"
+    ]
+   },
+   "sombra_niebla": {
+    "prompt": "A giant dark figure dissolving into black smoke with a deep breathy rush, then reforming nearby with a sudden low thump, 1.5 seconds",
+    "sesiones": [
+     "5f3LmbHmxMqJCnnNrw9r",
+     "qxLLfCayeUdw9wNSqGsJ",
+     "u780oyWlE6oAxWZeBMEA",
+     "cM8g66OJajQSVbVKZEUd"
+    ],
+    "generaciones": [
+     "x5849NYJUYnP2Aow865y",
+     "2DdcfPG2ovVjQUnh9Vw2",
+     "oWS6Vq31s49Vo1CfQ4n3",
+     "U286Ab41G2LH8p7JOm37"
+    ]
+   },
+   "sombra_mirada_carga": {
+    "prompt": "A monstrous eye charging dark red energy: a rising ominous hum building in pitch and intensity with a distorted heartbeat, 2 seconds",
+    "sesiones": [
+     "jWCpUICIktY0JFn6ogbu",
+     "hVKfR6Qt25ilIpdSwb0E",
+     "jdX19j0YBN6xVfK18nIc",
+     "E0kID1i0baGZ5JFhBe3i"
+    ],
+    "generaciones": [
+     "YJbgnIJuA7RAv5WXCjib",
+     "IHrGG597nvRWYmCQtOCk",
+     "THQVs5iqkow5q9LLaKgR",
+     "RPAqYskQQ2tMDyRhnh8a"
+    ]
+   },
+   "sombra_mirada": {
+    "prompt": "A searing beam of dark red energy: a sustained crackling roaring hum with sizzling, dark fantasy, 3 seconds",
+    "sesiones": [
+     "mBClobROOvPJO5a9wbdh",
+     "ZSl1xzd7dCM1Q57kW7UM",
+     "UYRbpCsIh6vPy61VIkBz",
+     "9RnSyR1HGrmKymKDbQb6"
+    ],
+    "generaciones": [
+     "iQihHVx7G2TxdCLwVUSx",
+     "69ALObPdrVANmY6wMifv",
+     "6ip4F64cRmYuR6Derihr",
+     "dignYv94TS8YKxsphwf4"
+    ]
+   },
+   "sombra_grito": {
+    "prompt": "A shadow god screaming with many voices at once, a deafening otherworldly shriek with a shockwave, echoing in a stone hall, 2.5 seconds",
+    "sesiones": [
+     "XuybiGD433Zval5GqSnS",
+     "JNJ1SAh8ntKR0ghLamA8",
+     "PqCjeahBweszpoNsZaCf",
+     "9FyJBbFRuF6sFZwsVyyC"
+    ],
+    "generaciones": [
+     "iaba42RSvPG8CorI9VfJ",
+     "RlkyGp42P2pplHTxwdyf",
+     "umWUmOTMyGuvijAP6CGd",
+     "uFYUVjmibq2cU0hdHfdH"
+    ]
+   },
+   "sombra_caidos": {
+    "prompt": "The dead rising from a stone floor: low moans and groans from many throats, whispers and dragging chains, dark and eerie, 2.5 seconds",
+    "sesiones": [
+     "3fGEixDh2FBqvVVGMbUU",
+     "EB9KDrDKlbDJgMK0XOlK",
+     "twBWWEypWImQKuurb2Tq",
+     "6BwfVZSwcJH6T6Z7jtTK"
+    ],
+    "generaciones": [
+     "IFhMVOgERXMTjUShAjmF",
+     "71d2H1pUCj1qCHCB9Dvs",
+     "7xWubvmhJuPCwSvzSQFw",
+     "CINxahULknET0fs9xESN"
+    ]
+   },
+   "sombra_dolor": {
+    "prompt": "A huge shadow creature hurt: a short deep distorted grunt with a hiss of smoke, 0.8 seconds",
+    "sesiones": [
+     "oF8PmDpxyHj4nwG1wZOa",
+     "zX04UeY5EyilLzgmgdYX",
+     "x37U1aYCXCHtOF8DBkmN",
+     "xOnxBPI32Ogy1NamPmGT"
+    ],
+    "generaciones": [
+     "R49PGd79uT9g65sWEsJL",
+     "06td5Zu0eTUyZIUiVowy",
+     "jXMenApnoGsmUhMPxSBe",
+     "NrryK1GppZkaW1Olt51w"
+    ]
+   },
+   "sombra_cae": {
+    "prompt": "A colossal dark god collapsing to its knees: a long anguished groan fading into whispers, heavy chains clattering down, smoke hissing, 4 seconds",
+    "sesiones": [
+     "2WZWDvkKUV4l7ZzLS2AT",
+     "9p0Z7i5q1xhbHtwze9lv",
+     "ufYt3lgBbWGJcnnBEfC0",
+     "VMI8ldmgYk1WiakG3oCz"
+    ],
+    "generaciones": [
+     "JOnTDUaZmq5DBiO7xmR4",
+     "o7U7WWEBS0T2p3K7zdMJ",
+     "KrujZRHqdS7rR9ihmn78",
+     "TFime16yw1h4k9PMRH5F"
+    ]
+   },
+   "sombra_latido": {
+    "prompt": "A single enormous slow heartbeat, deep and wet, echoing in a vast stone hall, 1.5 seconds",
+    "sesiones": [
+     "KCxtafCox2PPy3xCduw2",
+     "kitFffwfEocUFMBYVNiP",
+     "4h99RgakDcfjPPrzAefr",
+     "6ZkKnXqdMqGZC4kTh7T3"
+    ],
+    "generaciones": [
+     "QoGvG4XHBNj1UYv4VG75",
+     "NiOeP3lS7fsPKfYFpFAf",
+     "D9RJO7fxN4sSMFSC7xOP",
+     "PtthUcdFutBIfIZiL973"
+    ]
+   },
+   "puerta_aguja": {
+    "prompt": "An ancient sealed stone door unsealing: glowing runes cracking with a high crystalline ring, stone grinding open, then a deep exhale of cold air from inside, 3.5 seconds",
+    "sesiones": [
+     "h6gzqFzeY7TuSw7YhjBz",
+     "SBYU7lq7C7S46qWOnOJK",
+     "WhDWvfdjSonUqtvGhiFv",
+     "KXl8DU7RvGaQOL5fanee"
+    ],
+    "generaciones": [
+     "7BYW8alwCaes7EIK4qtv",
+     "kHTH3q8ywsAjGDC50dug",
+     "p8WggfmNOQ5LOsb1ZFFa",
+     "imr3PEc5Jx2U333yIhDd"
+    ]
+   },
+   "aguja_ambiente": {
+    "prompt": "Ambience inside a vast dark stone spire high above the clouds: a slow giant heartbeat under a low ominous drone, cold wind howling through tall windows, faint whispers, seamless loop, 20 seconds",
+    "sesiones": [
+     "Eu6Gn6wOYoqVo0sA5TQU",
+     "UPIGAdTGuBAilo12WsGG",
+     "ejEl6FNQ2PJ7tAFBzLsb",
+     "l75QM2BLOJYZX6lhXP9R"
+    ],
+    "generaciones": [
+     "QKyUIVj2tIN14enciycD",
+     "rTP8DqvLqi1sBbSohSwa",
+     "brBkES7S3Bd7Jce787fl",
+     "wnOV8SD4xsWbuKsBK9Yk"
+    ]
+   },
+   "corazon_rompe": {
+    "prompt": "A dark crystal heart shattering: a deep crack, glassy shards bursting apart, a final heartbeat cut short and a soft rush of light, 3 seconds",
+    "sesiones": [
+     "dEFiSrpcTwTLvX0FH1U0",
+     "PrAI78tWPEy4UvQ5QxTh",
+     "mJkHZ6rHt7wcdQt0roKW",
+     "KkElRZJ4K2xlDJP0cQfh"
+    ],
+    "generaciones": [
+     "df4J5EI6kmBCcR1Rak8F",
+     "jwKGfIykZhHqeKQb4MXy",
+     "6KEJyXavwY9AaM5FFGDw",
+     "wHUknTzcF4X94TdJyYpn"
+    ]
+   },
+   "corazon_toma": {
+    "prompt": "Dark power flowing into a living body: a rushing whoosh of shadow, a chorus of whispers swelling, and a deep heartbeat that suddenly stops, 3 seconds",
+    "sesiones": [
+     "GUbEQ7l5BU8HMdVM3G5c",
+     "HmNpFDArFUhZlqwsH1JX",
+     "zZdArIQd8mtnGymDlg2e",
+     "VkmtkxpfLeU8Xxhbzjep"
+    ],
+    "generaciones": [
+     "jssUPwrqrzttgM0Cvm2n",
+     "KWpvztDpHIn6aRqm4UTV",
+     "Zlc3r6JaSrvz5jNI6nLh",
+     "prRSJAxp9rMzHmYePDYf"
     ]
    }
   }

@@ -1211,7 +1211,12 @@ public class MenuScreen extends Screen {
             int leidos = e == null ? 0 : e.leidos();
             long perdidos = e == null ? 0 : e.perdidos();
             filas.add(new FilaH(0, Component.translatable("darkcraft.menu.historia.cronica"), true, true));
-            for (int ch = 1; ch <= com.darkcraft.story.Story.CHAPTERS; ch++) {
+            // la cronica de Morvain (parte 7ae, capitulos 7-10, los cuenta Maelis): su apartado, desde que se abrio el portal
+            boolean morvain = (leidos & (0xF << com.darkcraft.story.Story.MORVAIN | 1 << 6)) != 0;
+            int hasta = morvain ? com.darkcraft.story.Story.CHAPTERS : com.darkcraft.story.Story.MORVAIN - 1;
+            for (int ch = 1; ch <= hasta; ch++) {
+                if (ch == com.darkcraft.story.Story.MORVAIN)
+                    filas.add(new FilaH(0, Component.translatable("darkcraft.menu.historia.cronica_morvain"), true, true));
                 boolean ok = (leidos & (1 << ch)) != 0;
                 filas.add(new FilaH(ch, Component.literal(CodiceScreen.romano(ch) + ". ").append(ok ? Component.translatable("darkcraft.cap." + ch + ".titulo")
                         : Component.translatable("darkcraft.menu.historia.sin_leer")), false, ok));
@@ -1278,7 +1283,7 @@ public class MenuScreen extends Screen {
                     Pix.blanco();
                     Panel.fila(g, x - 2, fy - 2, w + 4);
                 }
-                int icono = f.id() >= 1 && f.id() <= 6 ? (f.abierto() ? com.darkcraft.client.espejo.EspejoHud.I_PERGAMINO : com.darkcraft.client.espejo.EspejoHud.I_CANDADO)
+                int icono = f.id() >= 1 && f.id() <= com.darkcraft.story.Story.CHAPTERS ? (f.abierto() ? com.darkcraft.client.espejo.EspejoHud.I_PERGAMINO : com.darkcraft.client.espejo.EspejoHud.I_CANDADO)
                         : f.id() > 100 && f.id() < 200 ? com.darkcraft.client.espejo.EspejoHud.I_LIBRO : f.id() == 200 ? com.darkcraft.client.espejo.EspejoHud.I_PLUMA : -1;
                 if (icono >= 0) {
                     Pix.mezcla();
@@ -1307,7 +1312,8 @@ public class MenuScreen extends Screen {
             Panel.hueco(g, x2, y2, w2, h2);
             FilaH f = filas.get(sel);
             int id = f.id();
-            int mini = id >= 1 && id <= 6 ? id - 1 : id > 100 && id < 200 ? CodiceScreen.miniaturaPerdido(id - 100)
+            int mini = id >= 1 && id <= com.darkcraft.story.Story.CHAPTERS ? CodiceScreen.miniaturaCapitulo(id)
+                    : id > 100 && id < 200 ? CodiceScreen.miniaturaPerdido(id - 100)
                     : CodiceScreen.MIN_DIARIO;
             int y = y2 + 8;
             boolean conMini = w2 >= CodiceScreen.MINI_W + 2 * CodiceScreen.MINI_MARCO + 12 && h2 >= CodiceScreen.MINI_H + 90;
@@ -1325,7 +1331,7 @@ public class MenuScreen extends Screen {
             }
             Component titulo, sub;
             String inicio;
-            if (id >= 1 && id <= 6) {
+            if (id >= 1 && id <= com.darkcraft.story.Story.CHAPTERS) {
                 titulo = f.abierto() ? Component.translatable("darkcraft.cap." + id + ".titulo") : Component.literal("???");
                 sub = Component.translatable("darkcraft.capitulo", CodiceScreen.romano(id));
                 inicio = f.abierto() ? net.minecraft.client.resources.language.I18n.get("darkcraft.cap." + id + ".p1")
@@ -1386,7 +1392,7 @@ public class MenuScreen extends Screen {
             Panel.acepta();
             int id = f.id();
             CodiceScreen.Libro l;
-            if (id <= 6) l = CodiceScreen.capitulo(id);
+            if (id <= com.darkcraft.story.Story.CHAPTERS) l = CodiceScreen.capitulo(id);
             else if (id < 200) l = CodiceScreen.perdido(id - 100);
             else {
                 Net.EspejoEstado e = com.darkcraft.client.espejo.EspejoCliente.estado();
