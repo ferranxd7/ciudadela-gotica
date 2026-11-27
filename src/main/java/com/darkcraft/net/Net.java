@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "20";
+    private static final String V = "21";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -1072,12 +1072,12 @@ public final class Net {
 
     /** Todo lo que sabe el espejo de este jugador (aviso: se acaba de despertar). */
     public record EspejoEstado(boolean activo, boolean aviso, int leidos, List<String> coleccion, List<String> bestiario,
-                               List<LugarE> lugares, List<LogroE> logros, List<DiarioE> diario, int perdidos) {
+                               List<LugarE> lugares, List<LogroE> logros, List<DiarioE> diario, long perdidos) {
         void write(FriendlyByteBuf b) {
             b.writeBoolean(activo);
             b.writeBoolean(aviso);
             b.writeVarInt(leidos);
-            b.writeVarInt(perdidos);
+            b.writeVarLong(perdidos);
             b.writeCollection(coleccion, (bb, s) -> bb.writeUtf(s, 64));
             b.writeCollection(bestiario, (bb, s) -> bb.writeUtf(s, 64));
             b.writeCollection(lugares, (bb, l) -> {
@@ -1108,7 +1108,8 @@ public final class Net {
 
         static EspejoEstado read(FriendlyByteBuf b) {
             boolean activo = b.readBoolean(), aviso = b.readBoolean();
-            int leidos = b.readVarInt(), perdidos = b.readVarInt();
+            int leidos = b.readVarInt();
+            long perdidos = b.readVarLong();
             List<String> col = b.readList(bb -> bb.readUtf(64));
             List<String> bes = b.readList(bb -> bb.readUtf(64));
             List<LugarE> ls = b.readList(bb -> new LugarE(bb.readUtf(96), bb.readVarInt(), bb.readVarInt(), bb.readInt(), bb.readInt(),

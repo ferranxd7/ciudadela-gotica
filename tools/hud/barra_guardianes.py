@@ -54,9 +54,13 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   yelmo cerrado del heraldo con la corona del Rey y la rendija azul, y debajo la banderola roja con la corona de oro; relleno
   de fuego de almas que corre; chispas de almas y esquirlas de hierro que caen al recibir dano.
 
+  Pell, el Bufon del Rey (parte 7y): una banda de arlequin (rombos rojos y negros entre dos filetes de oro) con un cascabel en
+  cada punta; en el centro su mascara (mitad blanca, mitad negra, los ojos encendidos y la sonrisa) bajo el gorro de tres puntas
+  con cascabeles, y debajo dos dagas cruzadas; relleno de rombos rojos que corren; confeti que cae al recibir dano.
+
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
 abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png, pontifice_barra.png, aldric_barra.png,
-gigante_barra.png y jinete_barra.png (256x128):
+gigante_barra.png, jinete_barra.png y bufon_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -1906,6 +1910,141 @@ def chispas_almas():
     return img
 
 
+# ---------------------------------------------------------------- Pell, el Bufon del Rey (parte 7y)
+
+BU_R_D, BU_R, BU_R_L = hexc("5a0a10"), hexc("a8141c"), hexc("d8404a")
+BU_K_D, BU_K, BU_K_L = hexc("0c080c"), hexc("221a22"), hexc("3e3440")
+BU_O_D, BU_O, BU_O_L, BU_O_H = hexc("6e4a10"), hexc("b8862a"), hexc("e6be52"), hexc("fff0b0")
+BU_W_D, BU_W, BU_W_L = hexc("9c968c"), hexc("dcd6cc"), hexc("fbf8f2")
+
+
+def rombo_bufon(x, y, lado=4):
+    """Los rombos de arlequin: 0 rojo, 1 negro."""
+    return ((x + y) // lado + (x - y + 400) // lado) % 2
+
+
+def cascabel(img, cx, cy, r):
+    """Un cascabel dorado con su ranura y su brillo."""
+    for y in range(int(cy - r - 1), int(cy + r + 2)):
+        for x in range(int(cx - r - 1), int(cx + r + 2)):
+            d = ((x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2) ** 0.5
+            if d <= r:
+                luz = ((x + 0.5 - cx + r * 0.4) ** 2 + (y + 0.5 - cy + r * 0.4) ** 2) ** 0.5 / (r * 1.6)
+                c = BU_O_L if luz < 0.35 else BU_O if luz < 0.75 else BU_O_D
+                if abs(y + 0.5 - cy - r * 0.25) < 0.6 and abs(x + 0.5 - cx) < r * 0.7:
+                    c = BU_K_D
+                put(img, x, y, c)
+            elif d <= r + 1.0:
+                put(img, x, y, OUT)
+    put(img, int(cx - r * 0.35), int(cy - r * 0.4), BU_O_H)
+
+
+def marco_bufon():
+    """La banda de arlequin de Pell (rombos rojos y negros entre dos filetes de oro) con un cascabel en cada punta y, en el
+    centro, su mascara (mitad blanca y mitad negra, los ojos encendidos y la sonrisa) bajo el gorro de tres puntas con sus
+    cascabeles; debajo, dos dagas cruzadas."""
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    ya0, ya1 = FY0 - 3, FY1 + 2                       # 16..28
+    x0, x1 = 10, FW - 11
+    # la banda
+    for y in range(ya0, ya1 + 1):
+        for x in range(x0, x1 + 1):
+            k = rombo_bufon(x, y)
+            c = (BU_R if k == 0 else BU_K)
+            if y == ya0:
+                c = mix(c, BU_R_L if k == 0 else BU_K_L, 0.5)
+            if y == ya1:
+                c = mix(c, BU_K_D, 0.5)
+            put(img, x, y, c)
+    for x in range(x0, x1 + 1):
+        put(img, x, ya0 - 1, BU_O_L if x % 6 else BU_O_H)
+        put(img, x, ya1 + 1, BU_O if x % 6 else BU_O_L)
+        put(img, x, ya0 - 2, OUT)
+        put(img, x, ya1 + 2, OUT)
+    # los cascabeles de las puntas
+    cascabel(img, 6.5, (ya0 + ya1) / 2 + 0.5, 5.2)
+    cascabel(img, FW - 6.5, (ya0 + ya1) / 2 + 0.5, 5.2)
+    # el hueco del relleno, limpio
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, OUT)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    mx = FW // 2
+    # debajo del centro, dos dagas cruzadas (la punta hacia abajo)
+    for k in range(0, 9):
+        for s in (-1, 1):
+            x, y = mx + s * (5 - k), ya1 + 3 + k
+            if 0 <= y < 40:
+                put(img, x, y, BU_W_L if k < 6 else BU_W_D)
+    for s in (-1, 1):
+        put(img, mx + s * 6, ya1 + 2, BU_O)
+        put(img, mx + s * 4, ya1 + 2, BU_O)
+    # en el centro, la mascara: mitad blanca (a la izquierda) y mitad negra, con los ojos en rombo encendidos y la sonrisa
+    for y in range(5, FY0 - 2):
+        for x in range(mx - 8, mx + 8):
+            dx = abs(x + 0.5 - mx)
+            ancho = 7.6 if y < 13 else 7.6 - (y - 12) * 1.4
+            if dx > ancho:
+                continue
+            blanca = x < mx
+            c = (BU_W if dx < 5 else BU_W_D) if blanca else (BU_K_L if dx < 5 else BU_K)
+            put(img, x, y, c)
+    for (ex, ey) in ((mx - 4, 9), (mx + 3, 9)):
+        for (a, b) in ((0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)):
+            put(img, ex + a, ey + b, hexc("ff5a3c") if (a, b) == (0, 0) else hexc("b01818"))
+    for x in range(mx - 4, mx + 4):
+        y = 13 + (0 if abs(x + 0.5 - mx) > 2.5 else 1)
+        put(img, x, y, BU_R if x < mx else BU_R_L)
+    # el gorro: tres puntas (izquierda, derecha y en medio, hacia arriba) rojas y negras, con su cascabel en cada una
+    for y in range(2, 6):
+        for x in range(mx - 8, mx + 8):
+            put(img, x, y, BU_R if (x < mx) == (y % 2 == 0) else BU_K)
+    for k in range(0, 5):
+        put(img, mx - 9 - k, 4 - k // 2, BU_R)
+        put(img, mx + 8 + k, 4 - k // 2, BU_K)
+    put(img, mx, 1, BU_R)
+    put(img, mx - 1, 1, BU_K)
+    cascabel(img, mx - 14.5, 3.0, 2.4)
+    cascabel(img, mx + 13.5, 3.0, 2.4)
+    cascabel(img, mx - 0.5, 0.5, 1.2)
+    # contorno de la mascara y el gorro
+    antes = img.copy()
+    for y in range(0, FY0 - 1):
+        for x in range(mx - 18, mx + 18):
+            if antes.getpixel((x, y))[3] == 0 and any(0 <= x + a < FW and 0 <= y + b < 40 and antes.getpixel((x + a, y + b))[3] > 0
+                                                       for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                put(img, x, y, OUT)
+    return img
+
+
+def relleno_bufon(k):
+    """La vida de Pell: rombos rojos que corren, con un filo dorado que brilla."""
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            r = rombo_bufon(x - k * 3, y, 3)
+            c = BU_R_L if r == 0 else BU_R
+            if y == 0:
+                c = mix(c, BU_O_L, 0.45)
+            if y == 6:
+                c = mix(c, BU_R_D, 0.6)
+            if (x - k * 3) % 29 == 0 and 1 <= y <= 5:
+                c = mix(c, BU_O_H, 0.5)
+            img.putpixel((x, y), c)
+    return img
+
+
+def confeti():
+    """Lo que cae al recibir dano: confeti rojo, dorado, negro y blanco."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = (["rr", "rR"], ["o.", "oO", ".o"], ["kK", "k."], ["w", "W", "w"])
+    col = {"r": BU_R, "R": BU_R_L, "o": BU_O, "O": BU_O_H, "k": BU_K_L, "K": BU_K, "w": BU_W, "W": BU_W_L}
+    for i, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, i * 8 + 3 + x, 3 + y, col[ch])
+    return img
+
+
 def hueco(a, b):
     n = noise2(113)
     img = Image.new("RGBA", (240, 7))
@@ -1950,6 +2089,7 @@ if __name__ == "__main__":
         "aldric": atlas(marco_aldric(), relleno_aldric, hueco("050505", "151417"), rastro("fff2ea", "e8b0a0"), esquirlas()),
         "gigante": atlas(marco_gigante(), relleno_gigante, hueco("0a0907", "1b1813"), rastro("fff6e6", "e0caa0"), piedrecitas()),
         "jinete": atlas(marco_jinete(), relleno_jinete, hueco("04070b", "0e1822"), rastro("eefaff", "a8d8ee"), chispas_almas()),
+        "bufon": atlas(marco_bufon(), relleno_bufon, hueco("0a0506", "1c0d10"), rastro("fff4e8", "f0c8a0"), confeti()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

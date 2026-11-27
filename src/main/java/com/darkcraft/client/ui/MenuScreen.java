@@ -1208,17 +1208,18 @@ public class MenuScreen extends Screen {
             int antes = sel >= 0 && sel < filas.size() ? filas.get(sel).id() : 1;
             filas.clear();
             Net.EspejoEstado e = com.darkcraft.client.espejo.EspejoCliente.estado();
-            int leidos = e == null ? 0 : e.leidos(), perdidos = e == null ? 0 : e.perdidos();
+            int leidos = e == null ? 0 : e.leidos();
+            long perdidos = e == null ? 0 : e.perdidos();
             filas.add(new FilaH(0, Component.translatable("darkcraft.menu.historia.cronica"), true, true));
             for (int ch = 1; ch <= com.darkcraft.story.Story.CHAPTERS; ch++) {
                 boolean ok = (leidos & (1 << ch)) != 0;
                 filas.add(new FilaH(ch, Component.literal(CodiceScreen.romano(ch) + ". ").append(ok ? Component.translatable("darkcraft.cap." + ch + ".titulo")
                         : Component.translatable("darkcraft.menu.historia.sin_leer")), false, ok));
             }
-            int total = com.darkcraft.fortaleza.Perdidos.TOTAL, n = Integer.bitCount(perdidos >>> 1);
+            int total = com.darkcraft.fortaleza.Perdidos.TOTAL, n = Long.bitCount(perdidos >>> 1);
             filas.add(new FilaH(0, Component.translatable("darkcraft.menu.historia.perdidos").append(" (" + n + "/" + total + ")"), true, true));
             for (int k = 1; k <= total; k++)
-                if ((perdidos & (1 << k)) != 0) filas.add(new FilaH(100 + k, Component.translatable("darkcraft.perdido." + k + ".titulo"), false, true));
+                if ((perdidos & (1L << k)) != 0) filas.add(new FilaH(100 + k, Component.translatable("darkcraft.perdido." + k + ".titulo"), false, true));
             if (n == 0) filas.add(new FilaH(-1, Component.translatable("darkcraft.menu.historia.ninguno"), false, false));
             filas.add(new FilaH(0, Component.translatable("darkcraft.menu.historia.diario"), true, true));
             filas.add(new FilaH(200, Component.translatable("darkcraft.menu.historia.diario.entradas", e == null ? 0 : e.diario().size()), false, true));

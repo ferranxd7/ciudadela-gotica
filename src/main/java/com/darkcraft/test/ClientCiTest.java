@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 119 * 60 * 20;
+    private static final int LIMIT = 123 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -6029,6 +6029,8 @@ public final class ClientCiTest {
         t = aldric(t);
         // los gigantes errantes de Morvain (parte 7w)
         t = gigantes(t);
+        // el Teatro Hundido y Pell, el Bufon del Rey, tras la puerta real tapiada (parte 7y)
+        t = teatro(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -10202,6 +10204,358 @@ public final class ClientCiTest {
         return t + 30;
     }
 
+    // ------------------------------------------------------------------ el Teatro Hundido y Pell, el Bufon del Rey (parte 7y)
+
+    private static com.darkcraft.enemigos.Bufon bufonE() {
+        var e = com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.TEATRO, com.darkcraft.morvain.MorvainEnemigos.bufon());
+        return e instanceof com.darkcraft.enemigos.Bufon b ? b : null;
+    }
+
+    /** Lo que deja Pell en su sala: sus ilusiones, sus cuchillos y sus bolas (y el fuego). */
+    private static void limpiarBufon(ServerLevel lvl) {
+        int x = com.darkcraft.morvain.Teatro.CX, z = com.darkcraft.morvain.Teatro.CZ, y = com.darkcraft.morvain.Teatro.SALA;
+        var caja = new net.minecraft.world.phys.AABB(x - 40, y - 10, z - 80, x + 40, y + 30, z + 40);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Bufon.class, caja)) if (e.ilusion()) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.ProyectilBufon.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Cantaro.Llamas.class, caja)) e.discard();
+        var b = bufonE();
+        if (b != null) b.setInvisible(false);
+    }
+
+    /** Los de Pell que hay fuera en su sala: el y sus ilusiones. */
+    private static String pellsEnLaSala(ServerLevel lvl) {
+        int x = com.darkcraft.morvain.Teatro.CX, z = com.darkcraft.morvain.Teatro.CZ + com.darkcraft.morvain.Teatro.SALA_V, y = com.darkcraft.morvain.Teatro.SALA;
+        int n = 0, ilu = 0;
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Bufon.class, new net.minecraft.world.phys.AABB(x - 20, y - 4, z - 20, x + 20, y + 14, z + 20))) {
+            if (!e.isAlive()) continue;
+            if (e.ilusion()) ilu++;
+            else n++;
+        }
+        return "Pell en la sala " + n + ", ilusiones " + ilu;
+    }
+
+    /**
+     * Un golpe de Pell visto desde un lado: el en medio de su sala, mirando al sur (quieto: solo hace lo que se le manda), el jugador
+     * delante, en supervivencia y aguantando, y la camara donde diga {@code desde} (relativo a el).
+     */
+    private static int golpeBufon(int t, String nombre, int accion, double dist, int[] capturas, String[] nombres, Vec3 desde, Vec3 mira) {
+        final int CX = com.darkcraft.morvain.Teatro.CX, CZ = com.darkcraft.morvain.Teatro.CZ, Y = com.darkcraft.morvain.Teatro.SALA + 1;
+        final double ex = CX + 0.5, ez = CZ + com.darkcraft.morvain.Teatro.SALA_V + 0.5;
+        atTicks(t, "Pell: " + nombre, m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                var e = bufonE();
+                if (e == null) return;
+                limpiarBufon(sp.serverLevel());
+                aPelear(sp, true);
+                sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false));
+                e.quieta = true;
+                e.moveTo(ex, Y, ez, 0f, 0f);
+                e.setDeltaMovement(Vec3.ZERO);
+                irMirando(sp, ex, Y, ez + dist, ex, Y + 1.6, ez, false);
+                e.setTarget(sp);
+                e.setYRot(0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                e.empezar(accion);
+                verDesdeServidor = new Vec3(ex + desde.x, Y + desde.y, ez + desde.z);
+                miraServidor = new Vec3(ex + mira.x, Y + mira.y, ez + mira.z);
+            });
+        });
+        atTicks(t + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        for (int i = 0; i < capturas.length; i++) {
+            final String cap = nombres[i];
+            atTicks(t + capturas[i], "captura: " + cap, m -> {
+                server(m, sp -> log("  " + cap + ": " + estadoE(bufonE()) + " | " + (bufonE() == null ? "" : bufonE().estado()) + " | jugador " + fpos(sp)
+                        + " vida " + Math.round(sp.getHealth()) + (sp.isOnFire() ? ", ardiendo" : "")
+                        + (sp.hasEffect(net.minecraft.world.effect.MobEffects.BLINDNESS) ? ", ciego" : "")));
+                shot(m, cap);
+            });
+        }
+        return t + capturas[capturas.length - 1];
+    }
+
+    /**
+     * El Teatro Hundido y Pell, el Bufon del Rey: el teatro desde el santuario (el muro de la escena que asoma de la llanura), la
+     * grada, la orquesta, el muro de la escena de cerca (las mascaras, la corona y la puerta real tapiada) y el atril de los
+     * bastidores; en aventura, un golpe al tapiado lo deshace (el muro ilusorio); el pasillo y la Sala de las Mascaras con Pell; en
+     * supervivencia: le ve, habla y hace la reverencia (su barra y su musica); sus golpes (el tajo, la pirueta, los cuchillos, los
+     * malabares, el humo); a media vida se parte en tres; cae (tumbado; el cartel) y el teatro aplaude; el muro del trono y el
+     * camerino; y el bestiario. Al acabar vuelve todo como estaba (los dos muros tapiados otra vez).
+     */
+    private static int teatro(int T) {
+        final int CX = com.darkcraft.morvain.Teatro.CX, CZ = com.darkcraft.morvain.Teatro.CZ, PISO = com.darkcraft.morvain.Teatro.PISO;
+        final int ESC = com.darkcraft.morvain.Teatro.ESC, ORQ = com.darkcraft.morvain.Teatro.ORQ, SALA = com.darkcraft.morvain.Teatro.SALA;
+        final int SV = com.darkcraft.morvain.Teatro.SALA_V;
+        final String SITIO = com.darkcraft.morvain.MorvainEnemigos.TEATRO;
+        int t = T;
+        atTicks(t, "Teatro: desde el santuario", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft teatro muro puerta cerrar");
+                comando(sp, "darkcraft teatro muro trono cerrar");
+                comando(sp, "darkcraft bufon volver");
+                comando(sp, "darkcraft teatro enemigos volver");
+                irMirando(sp, CX + 0.5, PISO + 2, CZ + 54.5, CX + 0.5, PISO + 1, CZ - 16, true);
+            });
+        });
+        t += 300;
+        atTicks(t, "captura: el teatro desde el santuario", m -> {
+            shot(m, "cliente_mv466_teatro_lejos");
+            server(m, sp -> log("  el teatro: " + com.darkcraft.morvain.MorvainEnemigos.estadoTeatro(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 4;
+        atTicks(t, "Teatro: la grada desde arriba", m -> server(m, sp -> irMirando(sp, CX + 9.5, PISO + 3, CZ + 30.5, CX + 0.5, ORQ + 2, CZ - 8, true)));
+        t += 40;
+        atTicks(t, "captura: la grada", m -> {
+            shot(m, "cliente_mv467_teatro_grada");
+            server(m, sp -> log("  la grada: sitio " + com.darkcraft.morvain.Morvain.lugar(sp) + ", logro teatro " + com.darkcraft.story.Logros.tiene(sp, "teatro")));
+        });
+        t += 4;
+        atTicks(t, "Teatro: el escenario desde la orquesta", m -> server(m, sp -> irMirando(sp, CX + 0.5, ORQ + 1, CZ + 5.5, CX + 0.5, ESC + 6, CZ - 15, true)));
+        t += 30;
+        atTicks(t, "captura: el escenario", m -> shot(m, "cliente_mv468_teatro_escena"));
+        t += 4;
+        atTicks(t, "Teatro: el muro de la escena de cerca", m -> server(m, sp -> irMirando(sp, CX + 0.5, ESC + 1, CZ - 9.5, CX + 0.5, ESC + 6.5, CZ - 15, true)));
+        t += 30;
+        atTicks(t, "captura: las mascaras, la corona y la puerta tapiada", m -> {
+            shot(m, "cliente_mv469_teatro_mascaras");
+            server(m, sp -> log("  el muro de la escena: " + com.darkcraft.morvain.MurosIlusorios.estado(sp.serverLevel())));
+        });
+        t += 4;
+        atTicks(t, "Teatro: los bastidores (el atril con el libro 32)", m -> server(m, sp -> {
+            sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false));
+            irMirando(sp, CX + 9.5, ESC + 1, CZ - 18.2, CX + 9.5, ESC + 1.4, CZ - 20.5, false);
+        }));
+        t += 30;
+        atTicks(t, "captura: el atril", m -> {
+            shot(m, "cliente_mv470_teatro_atril");
+            server(m, sp -> log("  los bastidores: " + com.darkcraft.morvain.Teatro.resumen(sp.serverLevel())));
+        });
+        t += 4;
+        // ---- en aventura, ante el tapiado: un golpe (el ataque del combate) lo deshace
+        final int P = t;
+        atTicks(P, "Teatro: ante la puerta real, en aventura", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.setHealth(sp.getMaxHealth());
+                sp.getInventory().selected = 0;
+                sp.getInventory().items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
+                // los dos de la guardia del escenario, fuera de la foto
+                var lista = com.darkcraft.morvain.MorvainEnemigos.teatro();
+                for (int i = 0; i < lista.size(); i++)
+                    if ("escena".equals(lista.get(i).grupo())) com.darkcraft.enemigos.Puestos.marcar(sp.server, SITIO, i, true);
+                irMirando(sp, CX + 0.5, ESC + 1, CZ - 13.2, CX + 0.5, ESC + 2.5, CZ - 15, false);
+            });
+        });
+        atTicks(P + 30, "captura: ante la puerta tapiada", m -> shot(m, "cliente_mv471_teatro_tapiado"));
+        atTicks(P + 34, "Teatro: un golpe al tapiado (el ataque del combate)", m -> server(m, sp -> {
+            com.darkcraft.combate.Combate.pedir(sp, com.darkcraft.combate.Armas.LIGERO, 0, false, 0);
+            log("  tras el golpe: " + com.darkcraft.morvain.MurosIlusorios.estado(sp.serverLevel()) + "; logro secreto=" + com.darkcraft.story.Logros.tiene(sp, "secreto"));
+        }));
+        atTicks(P + 40, "captura: el muro se deshace", m -> shot(m, "cliente_mv472_teatro_muro_ilusorio"));
+        t = P + 50;
+        atTicks(t, "Teatro: el pasillo que baja a la sala", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false));
+                irMirando(sp, CX + 0.5, ESC + 1, CZ - 16.5, CX + 0.5, SALA + 2, CZ - 30, false);
+            });
+        });
+        t += 30;
+        atTicks(t, "captura: el pasillo", m -> shot(m, "cliente_mv473_teatro_pasillo"));
+        t += 4;
+        atTicks(t, "Teatro: la Sala de las Mascaras desde la puerta", m -> server(m, sp -> irMirando(sp, CX + 0.5, SALA + 1, CZ - 30.5, CX + 0.5, SALA + 2.5, CZ + SV - 6, false)));
+        t += 40;
+        atTicks(t, "captura: la sala y Pell", m -> {
+            shot(m, "cliente_mv474_sala_mascaras");
+            server(m, sp -> log("  la sala: " + com.darkcraft.morvain.MorvainEnemigos.estadoBufon(sp.server) + " | " + pellsEnLaSala(sp.serverLevel()) + " | sitio "
+                    + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 4;
+        // ---- en supervivencia, a la entrada de la sala: le ve, habla y hace la reverencia (su barra y su musica)
+        final int F = t;
+        final int dura = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Bufon.VOZ_BASE + 1);
+        atTicks(F, "Pell: en supervivencia a la entrada de su sala", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false));
+                irMirando(sp, CX + 0.5, SALA + 1, CZ - 33.5, CX + 0.5, SALA + 2.2, CZ + SV, false);
+                var e = bufonE();
+                if (e != null) e.setTarget(sp);
+            });
+        });
+        atTicks(F + 36, "captura: la reverencia (y habla)", m -> {
+            server(m, sp -> log("  Pell al verle: " + estadoE(bufonE()) + " | " + (bufonE() == null ? "" : bufonE().estado()) + " | jugador " + fpos(sp)));
+            log("  bufon: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv475_pell_reverencia");
+        });
+        atTicks(F + dura - 10, "Pell: quieto tras su frase", m -> server(m, sp -> {
+            var e = bufonE();
+            if (e != null) e.quieta = true;
+        }));
+        t = F + dura + 10;
+        // ---- sus golpes, de lado (quieto: solo lo que se le manda); la camara relativa a el, que mira al sur
+        t = golpeBufon(t, "el tajo", com.darkcraft.enemigos.BufonAnims.TAJO, 2.4, new int[]{10}, new String[]{"cliente_mv476_pell_tajo"},
+                new Vec3(5.0, 2.0, 1.4), new Vec3(0, 1.3, 1.2)) + 25;
+        t = golpeBufon(t, "la pirueta", com.darkcraft.enemigos.BufonAnims.PIRUETA, 2.4, new int[]{13}, new String[]{"cliente_mv477_pell_pirueta"},
+                new Vec3(5.0, 2.0, 1.4), new Vec3(0, 1.3, 1.2)) + 25;
+        t = golpeBufon(t, "los cuchillos", com.darkcraft.enemigos.BufonAnims.CUCHILLOS, 7.0, new int[]{16}, new String[]{"cliente_mv478_pell_cuchillos"},
+                new Vec3(6.5, 2.4, 3.5), new Vec3(0, 1.4, 3.5)) + 30;
+        t = golpeBufon(t, "los malabares", com.darkcraft.enemigos.BufonAnims.MALABARES, 7.0, new int[]{26, 42}, new String[]{"cliente_mv479_pell_malabares",
+                "cliente_mv480_pell_bolas"}, new Vec3(6.5, 2.6, 3.0), new Vec3(0, 1.4, 3.0)) + 40;
+        t = golpeBufon(t, "el humo", com.darkcraft.enemigos.BufonAnims.HUMO, 2.6, new int[]{10, 26}, new String[]{"cliente_mv481_pell_humo",
+                "cliente_mv482_pell_sale"}, new Vec3(6.0, 2.6, 2.5), new Vec3(0, 1.2, 2.5)) + 30;
+        // ---- a media vida se parte en tres (camara alta, de lado)
+        final int H = t;
+        final double ex = CX + 0.5, ez = CZ + SV + 0.5;
+        atTicks(H, "Pell: a media vida se parte en tres", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                var e = bufonE();
+                if (e == null) return;
+                limpiarBufon(sp.serverLevel());
+                aPelear(sp, true);
+                sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false));
+                e.quieta = true;
+                e.moveTo(ex, SALA + 1, ez, 0f, 0f);
+                e.setDeltaMovement(Vec3.ZERO);
+                e.yBodyRot = e.yHeadRot = 0f;
+                irMirando(sp, ex, SALA + 1, ez + 5.5, ex, SALA + 2.4, ez, false);
+                e.setTarget(sp);
+                e.mediaVida();
+            });
+        });
+        atTicks(H + 2, "camara: alta, de frente", m -> verDesde(m, new Vec3(ex + 1.5, SALA + 6.0, ez + 9.5), new Vec3(ex, SALA + 1.5, ez)));
+        atTicks(H + 36, "captura: los tres Pell", m -> {
+            server(m, sp -> log("  se parte en tres: " + pellsEnLaSala(sp.serverLevel()) + " | " + (bufonE() == null ? "" : bufonE().estado())));
+            shot(m, "cliente_mv483_pell_ilusiones");
+        });
+        atTicks(H + 40, "Pell: un golpe a una ilusion", m -> server(m, sp -> {
+            var e = bufonE();
+            if (e == null || e.ilusiones().isEmpty()) return;
+            var c = e.ilusiones().get(0);
+            c.hurt(sp.damageSources().playerAttack(sp), 4f);
+            log("  una ilusion se deshace: " + c.isRemoved() + " | " + pellsEnLaSala(sp.serverLevel()));
+        }));
+        atTicks(H + 46, "captura: una ilusion se deshace", m -> shot(m, "cliente_mv484_pell_ilusion_deshecha"));
+        t = H + 60;
+        // ---- cae: tumbado; el cartel; el teatro aplaude y se deshace en confeti
+        final int C = t;
+        atTicks(C, "Pell: cae", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var e = bufonE();
+                if (e == null) return;
+                limpiarBufon(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false));
+                sp.setGameMode(GameType.CREATIVE);
+                log("  antes de caer Pell: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "bufon") + " | " + e.estado());
+                e.quieta = true;
+                e.moveTo(ex, SALA + 1, ez, 0f, 0f);
+                e.setYRot(0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                irMirando(sp, ex + 1.5, SALA + 1, ez + 5.5, ex, SALA + 1.6, ez, false);
+                verDesdeServidor = new Vec3(e.getX() + 4.0, e.getY() + 2.4, e.getZ() + 3.2);
+                miraServidor = new Vec3(e.getX(), e.getY() + 0.6, e.getZ() + 0.4);
+                e.invulnerableTime = 0;
+                e.hurt(sp.damageSources().playerAttack(sp), 99999f);
+                log("  Pell cae: vivo " + e.isAlive());
+            });
+        });
+        atTicks(C + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 70, "captura: tumbado", m -> shot(m, "cliente_mv485_pell_cae"));
+        atTicks(C + 92, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 114, "captura: JEFE ABATIDO", m -> {
+            log("  bufon: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  tras caer Pell: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "bufon")
+                    + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoBufon(sp.server)));
+            shot(m, "cliente_mv486_pell_abatido");
+        });
+        atTicks(C + 140, "camara de lado otra vez", m -> {
+            m.options.hideGui = true;
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        final int fin = Math.max(com.darkcraft.enemigos.BufonAnims.TICKS[com.darkcraft.enemigos.BufonAnims.MORIR] + 30,
+                com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Bufon.VOZ_BASE + 5) + 70);
+        atTicks(C + fin - 8, "captura: el confeti (el teatro aplaude)", m -> {
+            server(m, sp -> log("  Pell se deshace: " + com.darkcraft.morvain.MorvainEnemigos.estadoBufon(sp.server)));
+            shot(m, "cliente_mv487_pell_confeti");
+        });
+        t = C + fin + 20;
+        // ---- el muro del trono: detras, el camerino con el arcon bueno
+        atTicks(t, "Teatro: el muro del trono y el camerino", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                comando(sp, "darkcraft teatro muro trono abrir");
+                int[] q = com.darkcraft.morvain.Teatro.get().sitio("trono");
+                irMirando(sp, q[0] + 0.5, q[1], q[2] + 0.5, CX + 0.5, q[1] + 1.2, CZ - 63, false);
+            });
+        });
+        t += 30;
+        atTicks(t, "captura: el camerino", m -> {
+            shot(m, "cliente_mv488_camerino");
+            server(m, sp -> log("  el camerino: " + com.darkcraft.morvain.MurosIlusorios.estado(sp.serverLevel()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 6;
+        atTicks(t, "el bestiario: Pell", m -> {
+            enPrimeraPersona(m);
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("bufon")));
+        });
+        t += 18;
+        atTicks(t, "captura: Pell en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv489_bestiario_bufon");
+        });
+        t += 4;
+        atTicks(t, "Teatro: fin (Pell vuelve, los muros tapiados otra vez, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                limpiarBufon(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                var e = bufonE();
+                if (e != null) e.quieta = false;
+                comando(sp, "darkcraft bufon volver");
+                comando(sp, "darkcraft teatro enemigos volver");
+                comando(sp, "darkcraft teatro muro puerta cerrar");
+                comando(sp, "darkcraft teatro muro trono cerrar");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoBufon(sp.server) + " | " + com.darkcraft.morvain.MurosIlusorios.estado(sp.serverLevel()));
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
     // ------------------------------------------------------------------ los gigantes errantes de Morvain (parte 7w)
 
     private static com.darkcraft.enemigos.Gigante giganteE(int i) {
@@ -10797,7 +11151,7 @@ public final class ClientCiTest {
                 for (int i = 0; i < sp.getInventory().getContainerSize(); i++)
                     if (com.darkcraft.fortaleza.Perdidos.de(sp.getInventory().getItem(i)) == com.darkcraft.camino.Jinetes.CARTA) cartas++;
                 log("  tras caer: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "jinete") + ", la carta en la bolsa "
-                        + cartas + ", libro perdido apuntado " + ((com.darkcraft.espejo.Espejo.perdidos(sp) & (1 << com.darkcraft.camino.Jinetes.CARTA)) != 0)
+                        + cartas + ", libro perdido apuntado " + ((com.darkcraft.espejo.Espejo.perdidos(sp) & (1L << com.darkcraft.camino.Jinetes.CARTA)) != 0)
                         + " | " + com.darkcraft.camino.Jinetes.estado(sp.server.overworld(), sp.getX(), sp.getZ()));
             });
             shot(m, "cliente_jn15_jinete_abatido");
@@ -13569,7 +13923,7 @@ public final class ClientCiTest {
         });
         atTicks(H + 150, "captura", m -> {
             shot(m, "cliente_f17_atril");
-            server(m, sp -> log("  libros perdidos: " + Integer.toBinaryString(com.darkcraft.espejo.Espejo.perdidos(sp))
+            server(m, sp -> log("  libros perdidos: " + Long.toBinaryString(com.darkcraft.espejo.Espejo.perdidos(sp))
                     + " logro libro_perdido=" + com.darkcraft.story.Logros.tiene(sp, "libro_perdido")));
         });
         // la forja del amuleto (como si se acabara de craftear en la mesa)
@@ -14024,7 +14378,7 @@ public final class ClientCiTest {
             com.darkcraft.enemigos.Puestos.todos(sp.server, com.darkcraft.fortaleza.FortalezaEnemigos.clave(fsit), true);
             StringBuilder b = new StringBuilder("  logros de la 5c:");
             for (String id : new String[]{"secreto", "libro_perdido"}) b.append(' ').append(id).append('=').append(com.darkcraft.story.Logros.tiene(sp, id) ? "SI" : "no");
-            log(b + "; libros perdidos apuntados " + Integer.bitCount(com.darkcraft.espejo.Espejo.perdidos(sp) >>> 1));
+            log(b + "; libros perdidos apuntados " + Long.bitCount(com.darkcraft.espejo.Espejo.perdidos(sp) >>> 1));
         }));
         return S + 392;
     }

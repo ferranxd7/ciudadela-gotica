@@ -268,5 +268,16 @@
     "aviso": "Music by Emma_MA (OpenGameArt, CC0)",
     "uso": "Ser Lucan, el Jinete Nocturno (el camino de nubes, de noche)",
     "lufs": -16
+  },
+  {
+    "id": "bufon",
+    "pagina": "https://opengameart.org/content/ring-master",
+    "busca": "black build",
+    "titulo": "Ring Master",
+    "autor": "Bobjt",
+    "licencia": "CC0",
+    "aviso": "Music by Bobjt (OpenGameArt, CC0)",
+    "uso": "Pell, el Bufon del Rey (la Sala de las Mascaras del Teatro Hundido)",
+    "lufs": -16
   }
 ]

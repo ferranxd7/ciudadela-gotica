@@ -437,6 +437,20 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_JINETE_MUERTE = sound("sfx.jinete_muerte");
     public static final RegistryObject<SoundEvent> SFX_JINETE_APARECE = sound("sfx.jinete_aparece");
     public static final RegistryObject<SoundEvent> SFX_JINETE_ARNES = sound("sfx.jinete_arnes");
+    // ---- Pell, el Bufon del Rey, y el Teatro Hundido (parte 7y)
+    public static final RegistryObject<SoundEvent> SFX_BUFON_RISA = sound("sfx.bufon_risa");
+    public static final RegistryObject<SoundEvent> SFX_BUFON_CASCABELES = sound("sfx.bufon_cascabeles");
+    public static final RegistryObject<SoundEvent> SFX_BUFON_TAJO = sound("sfx.bufon_tajo");
+    public static final RegistryObject<SoundEvent> SFX_BUFON_CUCHILLOS = sound("sfx.bufon_cuchillos");
+    public static final RegistryObject<SoundEvent> SFX_BUFON_MALABAR = sound("sfx.bufon_malabar");
+    public static final RegistryObject<SoundEvent> SFX_BUFON_BOLA = sound("sfx.bufon_bola");
+    public static final RegistryObject<SoundEvent> SFX_BUFON_HUMO = sound("sfx.bufon_humo");
+    public static final RegistryObject<SoundEvent> SFX_BUFON_ILUSION = sound("sfx.bufon_ilusion");
+    public static final RegistryObject<SoundEvent> SFX_BUFON_PIRUETA = sound("sfx.bufon_pirueta");
+    public static final RegistryObject<SoundEvent> SFX_BUFON_DOLOR = sound("sfx.bufon_dolor");
+    public static final RegistryObject<SoundEvent> SFX_BUFON_MUERTE = sound("sfx.bufon_muerte");
+    public static final RegistryObject<SoundEvent> SFX_MURO_ILUSORIO = sound("sfx.muro_ilusorio");
+    public static final RegistryObject<SoundEvent> SFX_TEATRO_APLAUSO = sound("sfx.teatro_aplauso");
     public static final RegistryObject<SoundEvent> AMBIENTE_ALTAR = sound("ambiente.altar");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
@@ -523,6 +537,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_ALDRIC = sound("musica.aldric");
     public static final RegistryObject<SoundEvent> MUSICA_GIGANTE = sound("musica.gigante");
     public static final RegistryObject<SoundEvent> MUSICA_JINETE = sound("musica.jinete");
+    public static final RegistryObject<SoundEvent> MUSICA_BUFON = sound("musica.bufon");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -592,6 +607,9 @@ public class DarkCraftMod {
     /** Frases de Ser Lucan, el Jinete Nocturno (1..5, parte 7x). */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] JINETE_VOZ = new RegistryObject[6];
+    /** Frases de Pell, el Bufon del Rey (1..5, parte 7y). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] BUFON_VOZ = new RegistryObject[6];
 
     /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
     @SuppressWarnings("unchecked")
@@ -612,6 +630,7 @@ public class DarkCraftMod {
         for (int i = 1; i < ALDRIC_VOZ.length; i++) ALDRIC_VOZ[i] = sound("aldric.voz." + i);
         for (int i = 1; i < GIGANTE_VOZ.length; i++) GIGANTE_VOZ[i] = sound("gigante.voz." + i);
         for (int i = 1; i < JINETE_VOZ.length; i++) JINETE_VOZ[i] = sound("jinete.voz." + i);
+        for (int i = 1; i < BUFON_VOZ.length; i++) BUFON_VOZ[i] = sound("bufon.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -696,6 +715,9 @@ public class DarkCraftMod {
             () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
     public static final RegistryObject<Item> FRASCO_MANA = ITEMS.register("frasco_mana",
             () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    /** Lo que tira Pell, el Bufon del Rey (parte 7y): solo sirven para dibujar sus cuchillos y sus bolas de fuego. */
+    public static final RegistryObject<Item> CUCHILLO_BUFON = ITEMS.register("cuchillo_bufon", () -> new Item(new Item.Properties().stacksTo(16)));
+    public static final RegistryObject<Item> BOLA_BUFON = ITEMS.register("bola_bufon", () -> new Item(new Item.Properties().stacksTo(16)));
 
     /** Las piezas de La Garza Gris (parte 3b): no se llevan en el inventario; se dibujan en el mundo y en los carteles. */
     public static final RegistryObject<Item> PIEZA_VELA = ITEMS.register("pieza_vela", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
@@ -827,6 +849,13 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.RocaGigante>> ROCA_GIGANTE = ENTITIES.register("roca_gigante",
             () -> EntityType.Builder.<com.darkcraft.enemigos.RocaGigante>of(com.darkcraft.enemigos.RocaGigante::new, MobCategory.MISC)
                     .sized(1.4f, 1.4f).noSave().clientTrackingRange(10).updateInterval(1).build(MODID + ":roca_gigante"));
+    // ---- Pell, el Bufon del Rey, el jefe secreto del Teatro Hundido (parte 7y), y lo que tira
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Bufon>> BUFON = ENTITIES.register("bufon",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Bufon>of(com.darkcraft.enemigos.Bufon::new, MobCategory.MONSTER)
+                    .sized(0.7f, 2.2f).fireImmune().clientTrackingRange(10).updateInterval(2).build(MODID + ":bufon"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.ProyectilBufon>> PROYECTIL_BUFON = ENTITIES.register("proyectil_bufon",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.ProyectilBufon>of(com.darkcraft.enemigos.ProyectilBufon::new, MobCategory.MISC)
+                    .sized(0.3f, 0.3f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":proyectil_bufon"));
     // ---- Ser Lucan, el Jinete Nocturno del camino de nubes (parte 7x): el caballo y su jinete, una sola entidad (va deprisa:
     // la posicion se manda cada tick para que el galope se vea suave)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Jinete>> JINETE = ENTITIES.register("jinete",
@@ -1047,6 +1076,7 @@ public class DarkCraftMod {
         e.put(ALDRIC.get(), com.darkcraft.enemigos.Aldric.atributos().build());
         e.put(GIGANTE.get(), com.darkcraft.enemigos.Gigante.atributos().build());
         e.put(JINETE.get(), com.darkcraft.enemigos.Jinete.atributos().build());
+        e.put(BUFON.get(), com.darkcraft.enemigos.Bufon.atributos().build());
         e.put(MARCADO.get(), com.darkcraft.enemigos.Marcado.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());

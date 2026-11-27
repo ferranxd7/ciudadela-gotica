@@ -237,6 +237,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el cerco del ancla en el chunk {}", c.getPos(), t);
         }
+        // el Teatro Hundido, al este de la Capital, con la Sala de las Mascaras de Pell bajo la llanura (parte 7y)
+        try {
+            if (Teatro.toca(c.getPos().x, c.getPos().z)) Teatro.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el teatro hundido en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

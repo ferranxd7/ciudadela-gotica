@@ -57,6 +57,8 @@ final class Adorno {
         // ni en el Altar Profanado (parte 7t): sus matas, sus huesos y sus piedras los pone el
         if (Altar.cerca(x0, z0)) return;
         if (Cerco.cerca(x0, z0)) return;
+        // ni en el Teatro Hundido (parte 7y)
+        if (Teatro.cerca(x0, z0)) return;
         // en la Arboleda de los Ahorcados (parte 7g) solo setas y helechos: los arboles son los suyos
         if (Arboleda.cerca(x0, z0)) {
             hierba(nivel, c, r, 20, Blocks.BROWN_MUSHROOM.defaultBlockState(), Blocks.FERN.defaultBlockState());

@@ -44,6 +44,8 @@ public final class Voces {
     public static final int BASE_GIGANTE = 130;
     /** Las de Ser Lucan, el Jinete Nocturno (parte 7x): 140 + N (1..5). */
     public static final int BASE_JINETE = 140;
+    /** Las de Pell, el Bufon del Rey (parte 7y): 150 + N (1..5). */
+    public static final int BASE_BUFON = 150;
     /** Pausa entre dos frases seguidas (ticks): 0,3 s. */
     public static final int PAUSA = 6;
     /** Lo que se queda el subtitulo despues de acabar de hablar (ticks): 0,8 s. */
@@ -65,6 +67,7 @@ public final class Voces {
     private static final float[] ALDRIC = {0, 7.0f, 5.4f, 3.6f, 3.9f, 6.6f};
     private static final float[] GIGANTE = {0, 7.4f, 6.8f, 7.0f, 6.8f, 4.8f, 7.6f, 8.2f, 6.8f, 4.2f};
     private static final float[] JINETE = {0, 7.5f, 4.2f, 4.1f, 2.5f, 8.0f};
+    private static final float[] BUFON = {0, 8.0f, 5.6f, 6.2f, 1.6f, 7.8f};
     // la Sombra en las cinematicas (1..6 la de inicio, 7..9 el viaje a Valdrenn)
     private static final float[] SOMBRA = {0, 2.26f, 4.23f, 3.56f, 6.57f, 5.44f, 3.17f, 6.06f, 5.98f, 4.63f};
 
@@ -84,6 +87,7 @@ public final class Voces {
                 leer(o, "habla_aldric", ALDRIC);
                 leer(o, "habla_gigante", GIGANTE);
                 leer(o, "habla_jinete", JINETE);
+                leer(o, "habla_bufon", BUFON);
                 leer(o, "habla_sombra", SOMBRA);
                 if (o.has("habla")) {
                     leer(o, "habla", REY);
@@ -125,6 +129,11 @@ public final class Voces {
     /** Las del Jinete Nocturno (141..145). */
     public static boolean esJinete(int linea) {
         return linea > BASE_JINETE && linea < BASE_JINETE + 10;
+    }
+
+    /** Las de Pell, el Bufon del Rey (151..155). */
+    public static boolean esBufon(int linea) {
+        return linea > BASE_BUFON && linea < BASE_BUFON + 10;
     }
 
     /** De que gigante es una linea suya (0 Ogmund, 1 Ulfgar, 2 Haldor). */
@@ -174,6 +183,7 @@ public final class Voces {
      */
     public static boolean valida(int linea) {
         if (esJinete(linea)) return linea - BASE_JINETE < JINETE.length;
+        if (esBufon(linea)) return linea - BASE_BUFON < BUFON.length;
         if (esGigante(linea)) return linea - BASE_GIGANTE < GIGANTE.length;
         if (esAldric(linea)) return linea - BASE_ALDRIC < ALDRIC.length;
         if (esCondestable(linea)) return linea - BASE_CONDESTABLE < CONDESTABLE.length;
@@ -193,6 +203,10 @@ public final class Voces {
         if (esJinete(linea)) {
             int n = linea - BASE_JINETE;
             return n > 0 && n < JINETE.length ? JINETE[n] : 4f;
+        }
+        if (esBufon(linea)) {
+            int n = linea - BASE_BUFON;
+            return n > 0 && n < BUFON.length ? BUFON[n] : 4f;
         }
         if (esGigante(linea)) {
             int n = linea - BASE_GIGANTE;
@@ -260,6 +274,10 @@ public final class Voces {
      */
     public static boolean deRelleno(int linea) {
         if (esJinete(linea)) return linea - BASE_JINETE == 4;
+        if (esBufon(linea)) {
+            int n = linea - BASE_BUFON;
+            return n == 3 || n == 4;
+        }
         if (esAldric(linea)) {
             int n = linea - BASE_ALDRIC;
             return n == 3 || n == 4;

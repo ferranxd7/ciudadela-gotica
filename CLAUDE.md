@@ -3042,6 +3042,112 @@ voz") y algo le alcanzo en el camino. Desde entonces cabalga cada noche y el alb
   `TOPE_VIDA`). Hasta la 7w los de mas de 1024 (el Abad, el Pontifice, Aldric, los gigantes —2200—) se quedaban en 1024 y con
   amigos casi ninguno ganaba la vida de mas (`paraGrupo`: con dos jugadores la Molinera ya pasaba de 1024).
 
+### Plan grande, parte 7y: el Teatro Hundido y Pell, el Bufon del Rey (el jefe secreto tras el muro ilusorio)
+
+Respuesta 132 del plan, la tercera tanda de los especiales ("jefes secretos detras de muros ilusorios"). Lore: Pell hacia reir al
+ultimo rey de Morvain; la noche del cielo rojo estaba en escena, a mitad de "La corona de papel": todos corrieron, tapiaron la
+puerta real con el detras y siguio actuando. Mil anos despues aun espera publico bajo el escenario.
+- **El Teatro Hundido** (`morvain/Teatro`, en (3670, 712), al este de la Capital, a 430 de su Puerta Oeste; llanura a 96: la
+  terraza es casi nada). u = x - CX, v = z - CZ (el norte, v negativa, es el escenario). Se ve de lejos solo el muro de la escena,
+  que asoma seis bloques. Todo se hace **columna a columna** (`Obra`, la funcion `columna`: zonas que no se pisan) mas lo pequeno en
+  una `Pilotes.Lista` y los cofres con `Trozo`:
+  - la **grada** (cavea, v >= -1): diez filas (`fila(r)`: de `R_ORQ` 9,5 a `R_GRADA1` 27,5, 1,8 de hondo, de 87 a 96), cada una con
+    su escalon delante (un asiento que mira al escenario: `unir`, para que se unan las esquinas) y la piedra detras; cinco escaleras
+    (`escaleraGrada`, a -62, -26, 0, 26 y 62 grados del sur); el trozo hundido en escombros (38-53 grados, filas 3+); arriba el
+    paseo (summa, hasta 31,5) con las columnas rotas del portico y el murete con la entrada al sur; el camino al santuario.
+  - la **orquesta** (r < 9,5, suelo `ORQ` 86: anillos claros y oscuros y el centro dorado) y los **pasos** de los lados (|u| 10-31, v
+    -7..-3: suben un bloque cada dos hasta la llanura, con sus muros; ojo: los rincones entre el circulo y los pasos van a la altura
+    de la orquesta, si no salian columnas de tierra).
+  - el **escenario** (|u| <= 20, v -14..-9, suelo `ESC` 88, de tablas quemadas; escalones desde la orquesta en u = ±4/5; las
+    **candilejas**, velas encendidas en v = -10) y el **muro de la escena** (v -17..-15, de 88 a 101-103, roto arriba): columnas de
+    dos pisos (u ±4, 12, 16, 20) con su cornisa, las dos **mascaras** (5 x 5 de calcita y piedra negra: la que rie al oeste, la que
+    llora al este, sobre las puertas de los lados), la **corona del rey** sobre la puerta real, dos hornacinas con busto, colgaduras
+    rojas; tres puertas: las de los lados (u ±8-9) dan a los **bastidores** (salas bajo la llanura: al este el atril con el **libro
+    perdido 32**, al oeste el arcon `chests/teatro` y trastos; la puerta del oeste medio cegada de cascotes) y la del centro, la
+    **puerta real, tapiada** (3 x 4 en la cara de fuera): el primer **muro ilusorio**.
+  - detras, el **pasillo** (3 de ancho, baja por una escalera de v -20 a -25) a la **Sala de las Mascaras** (redonda, centro v
+    `SALA_V` -44, radio 13, suelo `SALA` 82, techo 92 de tablas con vigas, bajo la llanura): suelo y paredes en **rombos de
+    arlequin** (calcita y piedra negra; ladrillo rojo del Nether y piedra negra, con la cenefa dorada), mascaras por las paredes
+    (calaveras blancas y negras), velas, cuatro lamparas y la del centro, el publico (calaveras en estacas mirando al tablado) y al
+    norte el **tablado** (suelo 84) con el telon rojo y el **trono de Pell**; detras del trono el segundo **muro ilusorio** (3 x 3) y
+    el **camerino** (madera, el tocador con su espejo, los trajes, la alfombra a cuadros rojos y amarillos y el arcon
+    `chests/teatro_bueno`).
+  Santuario nuevo "El Teatro Hundido" (`SantuariosMorvain`, id `teatro`, 48 al sur de la orquesta). Logro `teatro` (bajar al teatro,
+  con su entrada del diario). El Espejo: "El Teatro Hundido" y, bajo la llanura, "La Sala de las Mascaras" (`Teatro.dentro`,
+  `enSala`). Mientras la puerta real siga tapiada, a quien esta en el escenario le llega de vez en cuando detras del muro una risa
+  ahogada o unos cascabeles (`Teatro.tick`): la pista. `Adorno` no pone nada en su caja.
+- **Los muros ilusorios** (`morvain/MurosIlusorios`, de momento los dos del teatro: `Teatro.muro(id)` y `bloqueMuro`): parecen de
+  verdad; **se deshacen al golpearlos** (el combate: `Combate.pedir` llama a `MurosIlusorios.golpe`, que mira 4,5 bloques delante de
+  los ojos, como el muro falso de la fortaleza; en creativo, el clic izquierdo) en polvo de almas y ceniza con `sfx.muro_ilusorio`,
+  el aviso "El muro no era mas que una ilusion" y el logro `secreto`; quedan abiertos para siempre (SavedData `darkcraft_muros`; si un
+  chunk vuelve a tener sus bloques, se quitan al pasar alguien: `tick`). `cerrar` (pruebas y comando) los vuelve a poner.
+- **Los de alli** (`MorvainEnemigos`, sitio `teatro`, 16): Pell (el puesto 0, grupo `JEFE`) y los calcinados de la parte 7m —la
+  gente que ardio en la grada—: seis cenicientos enterrados en la ceniza por las filas, uno en la orquesta, la guardia a los lados
+  de la puerta real, dos incendiarios en lo alto de la grada (tiran cantaros a la orquesta), uno en cada paso y uno en cada
+  bastidor.
+- **Pell** (`enemigos/Bufon`, entidad `darkcraft:bufon`, 0,7 x 2,2, hereda de `Guardian`; tipo y logro `bufon`): 1000 de vida, golpe
+  11, armadura 4, rapido (prisa 1,25; a media vida 1,35); 16000 ecos; deja dos piedras III, tres II y la ceniza del paso. Espera
+  **de pie** en medio de su sala dando saltitos (sin nadie, a ratos se rie solo); repara en quien entra en su sala (a 20, a la
+  vista); al empezar dice su frase 1 y hace la **reverencia** (su "rugido") y no ataca hasta acabar la frase. El **tajo** doble (3,3,
+  110 grados), la **pirueta** (dos vueltas con los brazos abiertos: 360 grados, frena), los **cuchillos** (tres, uno tras otro, rectos
+  y deprisa: `ProyectilBufon`), los **malabares** (tres bolas de fuego en arco, a la izquierda, a su presa y a la derecha de por
+  donde va: revientan en llamas —radio 1,7, prenden— y dejan fuego en el suelo; la primera vez su frase 4), el **humo** (estrella la
+  bomba: ciega 2 s a quien este a 3,8; se esfuma —invisible— y sale de un salto por la espalda de su presa, `APARECE`) y la
+  **voltereta** hacia atras (si se le pega seguido; mientras gira, 13 ticks, no le entra nada; luego cuchillos). **A media vida**
+  (frase 2) **se parte en tres**: dos **ilusiones** (la misma entidad con `ILUSION` sincronizado: no empiezan peleas —
+  `Guardian.empiezaPeleas`—, sin barra, no se guardan, pegan la mitad, duran 18 s y se deshacen de un golpe con su risa) y el de verdad
+  cambia de sitio con una de ellas; **pegarle al de verdad deshace las que queden**; lo repite cada 16-22 s cuando no le queda
+  ninguna. Las ilusiones brillan un poco y no tienen sombra (lo que las delata). Al caer: se sienta, se tumba, dice su frase 5,
+  su ultima risa, **el teatro vacio aplaude** (`sfx.teatro_aplauso`) y se deshace en confeti; lo demas lo reparte
+  `valdrenn/Guardianes` (el cartel, la hazana `bufon` "La ultima funcion" y el bestiario). Pruebas: `quieta`, `vencer()`,
+  `mediaVida()` y contadores (`tajos`, `piruetas`, `cuchillos`, `bolas`, `malabares`, `humos` / `cegados` / `apariciones`,
+  `volteretas` / `esquivados`, `partidas` / `deshechas`).
+- **El modelo** (`tools/enemigos/bufon.py`, variante "pell", escala 1,1): mascara mitad blanca y mitad negra, gorro de tres puntas
+  con cascabeles, gorguera, traje de rombos rojos y negros, zapatos de punta, una daga en cada mano y las tres bolas de los malabares
+  (`malabar`, oculta salvo en los malabares: `BufonModelo` la ensena hasta la ultima bola). Bucles `quieto` (saltitos), `andar`, `listo`;
+  acciones (`BufonAnims`): reverencia (52), tajo (22), pirueta (28), cuchillos (26), malabares (52), humo (18), aparece (14),
+  voltereta (18), ilusion (32), risa (36), aturdido (28), morir (80). `BufonRenderer`: las ilusiones con el modelo translucido
+  (`alfa` ~0,8) y sin sombra; invisible (en el humo), nada.
+- **Lo que tira** (`enemigos/ProyectilBufon`, `darkcraft:proyectil_bufon`, una sola entidad: es cuchillo o bola segun su objeto,
+  `cuchillo_bufon` / `bola_bufon`, que solo sirven para dibujarlos con `ThrownItemRenderer`; arte de `tools/rol/bufon_objetos.py`).
+- **Voz** (ElevenLabs, `eleven_v4`, **"Creepy Liminal Entity"** `chQx45TGebwefgePtdqT`, flow `ZE8N58Gx76xf2dc2HiBY`; 5 frases, tomas
+  a; en `procesar.py` `voz_bufon`: un poco mas aguda, una segunda voz mas aguda y retrasada, muy baja —sus ilusiones— y el eco corto
+  de la sala de piedra): linea **150 + N** (`Voces.BASE_BUFON`, `esBufon`; `habla_bufon` en `rey_voces.json`; subtitulos
+  `darkcraft.bufon.voz.1..5` con `darkcraft.bufon.nombre_corto`): 1 "¡Oh! ¡Publico! Nadie ha venido a verme en mil anos... ¿Te reiras
+  con Pell?", 2 "¿Cual es Pell? ¿Cual es el de verdad? ¡Hasta yo lo olvide, hace mucho!", 3 "El Rey se reia con todos mis chistes...
+  hasta la noche en que el cielo se puso rojo." (si cae su presa), 4 "¡Hop! ¡Atrapala!" (de relleno), 5 "Bravo... bravo... El ultimo
+  acto... y nadie... aplaude."
+- **Barra** (`GuardianCliente`, "bufon": confeti que cae meciendose, nombre dorado; arte de `tools/hud/barra_guardianes.py`: la banda
+  de arlequin entre dos filetes de oro con un cascabel en cada punta, la mascara bajo el gorro de tres puntas y dos dagas cruzadas;
+  relleno de rombos rojos que corren). **Musica**: "Ring Master" de Bobjt (OpenGameArt, CC0, id `bufon`, el fichero "ring master
+  black build III"; tema 44 de `ClientMusic.boss`).
+- Sonidos (ElevenLabs, flow `XMf8CEcsVPO7sIucWQt0`, `TOMAS_SFX` elegidas midiendo las tomas): `bufon_risa` (2 y 4), `bufon_cascabeles`
+  (2 y 3; los pasos), `bufon_tajo` (2 y 1), `bufon_cuchillos` (4 y 3), `bufon_malabar` (2 y 1), `bufon_bola` (2 y 3), `bufon_humo` (2 y
+  4), `bufon_ilusion` (4 y 2), `bufon_pirueta` (3 y 2), `bufon_dolor` (2 y 1), `bufon_muerte` (4 y 1), `muro_ilusorio` (1 y 4) y
+  `teatro_aplauso` (3 y 4).
+- **El libro perdido 32**, "El programa de la ultima funcion" (la compania del Teatro Real: el programa de "La corona de papel", los
+  tres actos, y al dorso la nota de Pell: "la puerta no es de piedra. Nunca lo fue. Golpeala y entra"). `Perdidos.TOTAL` = 32: **la
+  mascara de libros perdidos ya no cabe en un int** (bit n = libro n): va en un long (`Espejo.perdidos` lee lo de antes, un int,
+  sin el signo; `Net.EspejoEstado` con `writeVarLong`; `MenuScreen`, `ClientCiTest`). `Net.V` = "21".
+- Comandos `/darkcraft teatro [ir <sitio> | enemigos [volver | fuera | sacar] | muro <puerta | trono> [abrir | cerrar]]` y
+  `/darkcraft bufon [ir | vencer | volver | partir]` (`ir` abre la puerta real y lleva a la entrada de la sala).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_teatro carpeta` (con `-Dabierto=true` los dos muros abiertos): escribe a
+  que se llega a pie desde la entrada con todo cerrado (no al pasillo ni a la sala), con la puerta real abierta (a la sala y a Pell) y
+  con los dos abiertos (al camerino), y si cada uno de los del teatro se pisa, se llega y no esta metido en un bloque. Pell:
+  `python3 tools/enemigos/generar.py --solo bufon --vistas carpeta`.
+- Pruebas: servidor, `teatro()` (lineas `Morvain, el teatro hundido: ...` —el atril, los arcones, el tapiado, el trono, a pie con
+  todo cerrado / la puerta real abierta (con un golpe de un jugador mirandolo) / los dos abiertos, el santuario, los sitios— y
+  `Morvain, los del teatro: ...`) y `bufon()` (`Morvain, Pell: ...` —le ve entrar, la reverencia, el primer golpe despues de la
+  frase, las acciones acaban—, `... los golpes de Pell a una presa: ...` —tajo, pirueta, cuchillos, malabares, humo (se esfuma y sale
+  a su espalda), voltereta (esquiva) y el humo que ciega—, `Pell a media vida: ...` —se parte en tres, una ilusion se deshace de un
+  golpe y pegarle a el deshace la otra— y `Pell cae: ...`); deja los dos muros tapiados (la prueba del cliente juega en ese mundo).
+  Cliente, tramo `teatro()` despues de los gigantes: el teatro desde el santuario (`cliente_mv466`), la grada (`mv467`), el escenario
+  (`mv468`), las mascaras y el tapiado (`mv469`), el atril (`mv470`); en aventura un golpe al tapiado (`mv471`, `mv472`); el pasillo
+  (`mv473`) y la sala con Pell (`mv474`); en supervivencia la reverencia con su barra (`mv475`); sus golpes de lado (`mv476` el tajo,
+  `mv477` la pirueta, `mv478` los cuchillos, `mv479`-`mv480` los malabares, `mv481`-`mv482` el humo); los tres Pell (`mv483`) y una
+  ilusion que se deshace (`mv484`); cae (`mv485`), el cartel (`mv486`) y el confeti (`mv487`); el camerino tras el muro del trono
+  (`mv488`) y el bestiario (`mv489`). `LIMIT` 123 min (`lanzar.sh` 129 y 127 min, el paso 157, el trabajo 205).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
