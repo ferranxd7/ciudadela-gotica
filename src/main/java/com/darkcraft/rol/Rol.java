@@ -398,7 +398,8 @@ public final class Rol {
         if (libre(sp)) return;
         Estado s = de(sp);
         s.combate = COMBATE;
-        gastar(s, 6f + 2.2f * Math.max(0f, golpe), PAUSA + 6);
+        // la Bufanda de Tam (parte 7ah): cubrirse cuesta un 30 % menos
+        gastar(s, (6f + 2.2f * Math.max(0f, golpe)) * (Talismanes.lleva(sp, Talisman.Clase.BUFANDA) ? 0.7f : 1f), PAUSA + 6);
         if (s.estamina > 0f) return;
         ItemStack con = sp.getUseItem();
         if (!con.isEmpty()) sp.getCooldowns().addCooldown(con.getItem(), 70);

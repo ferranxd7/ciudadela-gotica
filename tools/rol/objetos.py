@@ -180,6 +180,10 @@ TALISMANES = {
     "furia": ("cuadrado", "hierro", ["R.....R", "RR...RR", ".RRRRR.", ".RkRkR.", ".RRRRR.", "..RkR..", "...R..."]),
     # el Rosario del peregrino (parte 7ag, de Oswin): cuentas de hueso en su vuelta y la crucecita
     "peregrino": ("redondo", "bronce", ["..hHh..", ".h...h.", ".h...h.", "..hHh..", "...H...", "..HHH..", "...H..."]),
+    # la Bendicion de Hedda (parte 7ah): un corazon de lana roja tejida sobre plata
+    "madre": ("redondo", "plata", [".......", ".rR.Rr.", "rRPRPRr", "rPRPRPr", ".rPRPr.", "..rPr..", "...r..."]),
+    # la Bufanda de Tam (parte 7ah): la bufanda roja anudada, con sus dos cabos, sobre bronce
+    "bufanda": ("cuadrado", "bronce", [".......", "rRrRrRr", "PrRrRrP", "..rPr..", ".rP.Pr.", ".Rr.rR.", ".r...r."]),
 }
 
 

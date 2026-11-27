@@ -136,10 +136,16 @@ VOZ_SILAS = VOZ_MERCADER
 TOMAS_OSWIN = {n: "a" for n in range(1, 13)}
 VOZ_OSWIN = ("highpass=f=70,equalizer=f=2600:t=q:w=1.2:g=1,aecho=0.8:0.22:38|92:0.06|0.03,"
              "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=150,loudnorm=I=-16:TP=-1.5:LRA=9")
+# Hedda, la madre de la Puerta Oeste (parte 7ah; voz "Harriet- Mature British Actress", flow qTrFGBVJb5W5tYckIrim): al aire libre
+# en el camino de la capital quemada, cerca, la voz algo mas fina y cansada, con el aire de la ciudad en ruinas
+TOMAS_HEDDA = {n: "a" for n in range(1, 15)}
+VOZ_HEDDA = ("highpass=f=85,equalizer=f=3000:t=q:w=1.2:g=1,aecho=0.8:0.2:44|101:0.06|0.03,"
+             "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=150,loudnorm=I=-16:TP=-1.5:LRA=9")
 # los personajes con dialogo: id -> (tomas, filtro)
 PERSONAJES = {"guia": (TOMAS_GUIA, VOZ_GUIA), "herrero": (TOMAS_HERRERO, VOZ_HERRERO), "mercader": (TOMAS_MERCADER, VOZ_MERCADER),
               "hagen": (TOMAS_HAGEN, VOZ_HAGEN), "brenna": (TOMAS_BRENNA, VOZ_BRENNA), "ulrik": (TOMAS_ULRIK, VOZ_ULRIK),
-              "tobin": (TOMAS_TOBIN, VOZ_TOBIN), "silas": (TOMAS_SILAS, VOZ_SILAS), "oswin": (TOMAS_OSWIN, VOZ_OSWIN)}
+              "tobin": (TOMAS_TOBIN, VOZ_TOBIN), "silas": (TOMAS_SILAS, VOZ_SILAS), "oswin": (TOMAS_OSWIN, VOZ_OSWIN),
+              "hedda": (TOMAS_HEDDA, VOZ_HEDDA)}
 
 # efectos: nombre -> (segundos como mucho, fundido final en s, volumen integrado LUFS)
 SFX = {
@@ -435,6 +441,8 @@ SFX = {
     "corazon_rompe": (3.0, 1.0, -12), "corazon_toma": (3.0, 1.0, -12),
     # la campana del peregrino (parte 7ag)
     "campana_viento": (3.0, 0.9, -19), "campana_toque": (3.0, 1.0, -15), "peregrinos": (7.0, 2.0, -18),
+    # la bufanda roja (parte 7ah): las agujas de Hedda, su descanso y la lanza de Tam que se saca del torno
+    "agujas": (6.0, 1.2, -26), "hedda_descansa": (6.0, 2.0, -17), "lanza_sacar": (4.0, 0.8, -15),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -771,6 +779,7 @@ TOMAS_SFX = {
     # la campana del peregrino (parte 7ag): al viento las tres que suenan desde el principio (la 4 tarda), tocada las tres de 2,5-3 s
     # (la 4 dura 5 s y satura) y los peregrinos las dos (la 2, algo mas fuerte, primero)
     "campana_viento": (1, 2, 3), "campana_toque": (1, 2, 3), "peregrinos": (2, 1),
+    "agujas": (1, 4), "hedda_descansa": (4, 2), "lanza_sacar": (1, 2),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

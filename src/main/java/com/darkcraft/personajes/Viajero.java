@@ -14,9 +14,12 @@ import net.minecraft.world.level.Level;
 /**
  * Los que dan misiones por Morvain (parte 7ag, respuestas 95 y 117 del plan: "personajes con misiones" y "a veces 2-3 respuestas
  * que cambian la mision"). Estan quietos en su sitio como los demas personajes; lo que se habla con ellos y la mision que dan lo
- * lleva {@code mision.Misiones}. Por ahora uno ({@link Quien}, sincronizado y guardado): <b>Oswin</b>, el peregrino ciego de la
- * Encrucijada de los Peregrinos, de pie apoyado en su bordon, con su sombrero de ala ancha y la concha de peregrino; cuando le
- * devuelven su campana, la alza y la toca ({@link #tocar}).
+ * lleva {@code mision.Misiones}. Quien es ({@link Quien}, sincronizado y guardado): <b>Oswin</b>, el peregrino ciego de la
+ * Encrucijada de los Peregrinos, de pie apoyado en su bordon (cuando le devuelven su campana, la alza y la toca: {@link #tocar}), y
+ * <b>Hedda</b> (parte 7ah), la madre que teje en el camino de la Puerta Oeste de la Capital, sentada en su taburete; la misma Hedda
+ * de rodillas junto a los huesos de su hijo, en la sala de la guardia, es la {@link #variante} 1 (la que solo ve quien le dijo la
+ * verdad). <b>Cada jugador lleva su mision</b>: a quien ya no le toca ver a uno, su cliente no lo dibuja ni lo deja mirar
+ * ({@link #OCULTO}, lo pone el cliente) y el servidor no le deja hablar con el ({@code Misiones.visible}).
  */
 public class Viajero extends PersonajeBase {
     /** Lo que dura alzar y tocar la campana (ticks). */
@@ -26,7 +29,7 @@ public class Viajero extends PersonajeBase {
 
     /** Quien es: el id de su dialogo (y de sus voces, sus textos, su piel y su retrato). */
     public enum Quien {
-        OSWIN("oswin");
+        OSWIN("oswin"), HEDDA("hedda");
 
         public final String id;
 
@@ -46,6 +49,14 @@ public class Viajero extends PersonajeBase {
     }
 
     private static final EntityDataAccessor<Integer> QUIEN = SynchedEntityData.defineId(Viajero.class, EntityDataSerializers.INT);
+    /** Su postura o su sitio: 0 el de siempre; 1 la otra (Hedda de rodillas junto a Tam). */
+    private static final EntityDataAccessor<Integer> VARIANTE = SynchedEntityData.defineId(Viajero.class, EntityDataSerializers.INT);
+
+    /**
+     * En el cliente: si a quien juega ya no le toca ver a este (lo pone {@code client.mision.ClientMisiones}; en el servidor no se
+     * mira: en un mundo de un jugador comparten la JVM).
+     */
+    public static volatile java.util.function.Predicate<Viajero> OCULTO = v -> false;
 
     /** En el cliente: desde cuando toca la campana (-1 si no). */
     public int tocaDesde = -1000;
@@ -58,6 +69,7 @@ public class Viajero extends PersonajeBase {
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(QUIEN, 0);
+        entityData.define(VARIANTE, 0);
     }
 
     public Quien quien() {
@@ -68,10 +80,25 @@ public class Viajero extends PersonajeBase {
         entityData.set(QUIEN, q.ordinal());
     }
 
+    public int variante() {
+        return entityData.get(VARIANTE);
+    }
+
+    public void variante(int n) {
+        entityData.set(VARIANTE, n);
+    }
+
+    /** A quien ya no le toca verle, su cliente no le deja mirarle (ni hablarle). */
+    @Override
+    public boolean isPickable() {
+        return !(level().isClientSide && OCULTO.test(this)) && super.isPickable();
+    }
+
     @Override
     public void addAdditionalSaveData(CompoundTag t) {
         super.addAdditionalSaveData(t);
         t.putString("quien", quien().id);
+        t.putInt("variante", variante());
     }
 
     @Override
@@ -79,6 +106,7 @@ public class Viajero extends PersonajeBase {
         super.readAdditionalSaveData(t);
         Quien q = Quien.porId(t.getString("quien"));
         quien(q == null ? Quien.OSWIN : q);
+        variante(t.getInt("variante"));
     }
 
     @Override
@@ -108,6 +136,14 @@ public class Viajero extends PersonajeBase {
 
     /** Pone a uno en {@code pos} mirando hacia {@code mira} (su etiqueta: darkcraft_viajero_oswin...). */
     public static Viajero poner(ServerLevel lvl, BlockPos pos, BlockPos mira, Quien q) {
-        return poner(DarkCraftMod.VIAJERO.get(), lvl, pos, mira, "darkcraft_viajero_" + q.id, v -> v.quien(q));
+        return poner(lvl, pos, mira, q, 0);
+    }
+
+    /** Lo mismo con su variante (la etiqueta lleva el numero detras si no es la 0: darkcraft_viajero_hedda_1). */
+    public static Viajero poner(ServerLevel lvl, BlockPos pos, BlockPos mira, Quien q, int variante) {
+        return poner(DarkCraftMod.VIAJERO.get(), lvl, pos, mira, "darkcraft_viajero_" + q.id + (variante == 0 ? "" : "_" + variante), v -> {
+            v.quien(q);
+            v.variante(variante);
+        });
     }
 }

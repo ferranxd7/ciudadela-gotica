@@ -39,6 +39,8 @@ public final class Conversaciones {
         if (!sp.isAlive() || sp.isSpectator() || sp.distanceToSqr(p) > (ALCANCE + 1) * (ALCANCE + 1)) return;
         Dialogos.Personaje d = Dialogos.de(p.dialogo());
         if (d == null) return;
+        // a quien ya no le toca ver a quien da una mision (cada uno lleva la suya: parte 7ah), no se le habla
+        if (p instanceof com.darkcraft.personajes.Viajero v && !com.darkcraft.mision.Misiones.visible(sp, v)) return;
         if (!sp.isCreative() && Rol.enCombate(sp) && !(p instanceof com.darkcraft.morvain.Corazon)
                 && !(p instanceof Guia && com.darkcraft.morvain.Epilogo.pendiente(sp))) {
             Net.to(sp, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.dialogo.combate", 0));
@@ -53,7 +55,7 @@ public final class Conversaciones {
             case "mercader" -> "kerrick";
             // los de Morvain (parte 7af): Hagen y Silas, el suyo; los cuatro herreros, el de todos
             case "hagen", "silas" -> d.id();
-            case "brenna", "ulrik", "tobin", "sombra", "oswin" -> null;
+            case "brenna", "ulrik", "tobin", "sombra", "oswin", "hedda" -> null;
             default -> "maelis";
         };
         if (logro != null) Logros.dar(sp, logro);

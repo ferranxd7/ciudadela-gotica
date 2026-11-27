@@ -760,6 +760,7 @@ public final class CiTest {
         cronicaMorvain(server, m, log);
         herrerosMorvain(server, m, log);
         misionOswin(server, m, log);
+        misionHedda(server, m, log);
     }
 
     /**
@@ -5009,6 +5010,162 @@ public final class CiTest {
         } catch (Throwable t) {
             sb.append(" ERROR ").append(t);
             DarkCraftMod.LOGGER.error("[CI] la campana del peregrino", t);
+        }
+        log.println(sb);
+        log.flush();
+    }
+
+    /**
+     * La bufanda roja (parte 7ah): Hedda, Tam y la Hedda de rodillas puestos una vez (Hedda en el suelo del camino, mirando a la
+     * Puerta Oeste, con su farol; Tam en la sala de la guardia, en el suelo, de espaldas al torno; la de rodillas a su lado), el
+     * dialogo sin nodos que lleven a nada y la mision con un jugador de mentira por sus cuatro caminos: la verdad (se va, la de rodillas
+     * le habla y la lanza), la mentira (su bendicion, que salva una vez y espera), callar (la Bufanda de Tam: menos dano de fuego) y
+     * coger la bufanda sin conocerla; rechazar y cambiar de idea; quien ve a quien; los logros.
+     */
+    private static void misionHedda(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        StringBuilder sb = new StringBuilder("Morvain, la bufanda roja:");
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ae3"), "[DarkCraftCI25]"));
+        try {
+            BlockPos hs = com.darkcraft.mision.Hedda.sitio(), ts = com.darkcraft.mision.Hedda.tam();
+            for (BlockPos p : new BlockPos[]{hs, ts})
+                for (int dx = -1; dx <= 1; dx++)
+                    for (int dz = -1; dz <= 1; dz++) m.getChunk((p.getX() >> 4) + dx, (p.getZ() >> 4) + dz);
+            com.darkcraft.mision.Hedda.olvidar(m);
+            var h = com.darkcraft.mision.Hedda.ponerHedda(m);
+            var t = com.darkcraft.mision.Hedda.ponerTam(m);
+            var l = com.darkcraft.mision.Hedda.ponerLuto(m);
+            if (h == null || t == null || l == null) sb.append(" FALLO: hedda ").append(h != null).append(", tam ").append(t != null).append(", de rodillas ").append(l != null);
+            if (h != null) {
+                BlockPos pies = h.blockPosition(), g = com.darkcraft.mision.Hedda.puerta();
+                boolean pisa = !m.getBlockState(pies.below()).getCollisionShape(m, pies.below()).isEmpty();
+                double giro = Math.toDegrees(Math.atan2(g.getZ() - pies.getZ(), g.getX() - pies.getX())) - 90;
+                boolean farol = false;
+                for (int dy = -1; dy <= 1; dy++) farol |= m.getBlockState(pies.north().above(dy)).is(net.minecraft.world.level.block.Blocks.LANTERN);
+                sb.append(String.format(java.util.Locale.ROOT, " Hedda en %s, pisa %s, a la puerta %.0f grados, su farol %s, libre %s",
+                        pies.toShortString(), pisa, net.minecraft.util.Mth.wrapDegrees(giro - h.getYRot()), farol,
+                        m.getBlockState(pies).getCollisionShape(m, pies).isEmpty() && m.getBlockState(pies.above()).getCollisionShape(m, pies.above()).isEmpty()));
+            }
+            if (t != null) {
+                BlockPos tp = t.blockPosition();
+                sb.append(String.format(java.util.Locale.ROOT, " | Tam en %s (giro %.0f), el suelo %s, a su espalda %s, sobre el %s",
+                        tp.toShortString(), t.getYRot(), m.getBlockState(tp.below()).getBlock().getDescriptionId().replace("block.minecraft.", ""),
+                        m.getBlockState(tp.west()).getBlock().getDescriptionId().replace("block.minecraft.", ""),
+                        m.getBlockState(tp).getBlock().getDescriptionId().replace("block.minecraft.", "")));
+            }
+            if (l != null) {
+                BlockPos lp = l.blockPosition();
+                sb.append(String.format(java.util.Locale.ROOT, " | de rodillas en %s, variante %d, pisa %s", lp.toShortString(), l.variante(),
+                        !m.getBlockState(lp.below()).getCollisionShape(m, lp.below()).isEmpty()));
+            }
+            sb.append(", se encuentran ").append(com.darkcraft.mision.Hedda.buscarHedda(m, 0) == h && com.darkcraft.mision.Hedda.buscarTam(m) == t
+                    && com.darkcraft.mision.Hedda.buscarHedda(m, 1) == l);
+            // ---- el dialogo: todos los nodos y respuestas llevan a algo que existe
+            var d = com.darkcraft.dialogo.Dialogos.de("hedda");
+            int malos = 0;
+            for (var n : d.nodos().values()) {
+                if (n.menu()) {
+                    for (var r : n.respuestas()) if (r.destino() != 0 && d.nodo(r.destino()) == null) malos++;
+                } else if (n.siguiente() != 0 && d.nodo(n.siguiente()) == null) malos++;
+            }
+            sb.append(" | dialogo: ").append(d.nodos().size()).append(" nodos, ").append(malos).append(" que llevan a nada");
+            if (h == null || t == null || l == null) throw new IllegalStateException("sin Hedda o sin Tam");
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- 1) la verdad: rechazar, cambiar de idea, aceptar, coger la bufanda, la verdad; la de rodillas y la lanza
+            com.darkcraft.mision.Misiones.olvidar(fp, "hedda");
+            fp.moveTo(hs.getX() + 2.5, h.getY(), hs.getZ() + 0.5, 0f, 0f);
+            int n1 = com.darkcraft.mision.Hedda.inicio(fp, h), n2 = com.darkcraft.mision.Hedda.inicio(fp, h);
+            com.darkcraft.mision.Hedda.accion(fp, h, "rechazar");
+            int n3 = com.darkcraft.mision.Hedda.inicio(fp, h);
+            com.darkcraft.mision.Hedda.accion(fp, h, "precio");
+            com.darkcraft.mision.Hedda.accion(fp, h, "aceptar");
+            int n4 = com.darkcraft.mision.Hedda.inicio(fp, h);
+            BlockPos obj = com.darkcraft.mision.Hedda.objetivo(fp);
+            sb.append(String.format(java.util.Locale.ROOT, " | 1) empieza %d, %d; rechaza: %d; la noche y acepta: %d (%s), ir a %s", n1, n2, n3, n4,
+                    com.darkcraft.mision.Misiones.resumenHedda(fp), obj == null ? "-" : obj.toShortString()));
+            fp.moveTo(ts.getX() + 2.5, ts.getY(), ts.getZ() + 0.5, 90f, 0f);
+            com.darkcraft.mision.Hedda.tomar(fp, t);
+            com.darkcraft.mision.Hedda.tomar(fp, t);
+            int bufandas = fp.getInventory().countItem(DarkCraftMod.BUFANDA_ROJA.get());
+            BlockPos obj2 = com.darkcraft.mision.Hedda.objetivo(fp);
+            fp.moveTo(hs.getX() + 2.5, h.getY(), hs.getZ() + 0.5, 0f, 0f);
+            int n5 = com.darkcraft.mision.Hedda.inicio(fp, h);
+            boolean veAntes = com.darkcraft.mision.Misiones.visible(fp, h), veRodillasAntes = com.darkcraft.mision.Misiones.visible(fp, l);
+            com.darkcraft.mision.Hedda.accion(fp, h, "verdad");
+            BlockPos obj3 = com.darkcraft.mision.Hedda.objetivo(fp);
+            sb.append(String.format(java.util.Locale.ROOT, " | cogida %d bufanda(s), ir a %s; con ella empieza %d; la verdad: %s, la bufanda %d, logro %s;"
+                            + " la ve antes %s/%s (camino/rodillas), despues %s/%s; la de rodillas empieza %d; ir a %s",
+                    bufandas, obj2 == null ? "-" : obj2.toShortString(), n5, com.darkcraft.mision.Misiones.resumenHedda(fp),
+                    fp.getInventory().countItem(DarkCraftMod.BUFANDA_ROJA.get()), com.darkcraft.story.Logros.tiene(fp, "hedda_verdad"),
+                    veAntes, veRodillasAntes, com.darkcraft.mision.Misiones.visible(fp, h), com.darkcraft.mision.Misiones.visible(fp, l),
+                    com.darkcraft.mision.Hedda.inicio(fp, l), obj3 == null ? "-" : obj3.toShortString()));
+            fp.moveTo(ts.getX() + 2.5, ts.getY(), ts.getZ() + 0.5, 90f, 0f);
+            com.darkcraft.mision.Hedda.tomar(fp, t);
+            com.darkcraft.mision.Hedda.tomar(fp, t);
+            var lanza = new net.minecraft.world.item.ItemStack(DarkCraftMod.LANZA_TAM.get());
+            var esc = com.darkcraft.combate.Escalado.de(lanza);
+            sb.append(String.format(java.util.Locale.ROOT, " | la lanza: %d, %s, tipo %s, letras %s, base %.1f, ir a %s",
+                    fp.getInventory().countItem(DarkCraftMod.LANZA_TAM.get()), com.darkcraft.mision.Misiones.resumenHedda(fp),
+                    com.darkcraft.combate.Armas.de(lanza), esc == null ? "-" : esc.letras(), com.darkcraft.combate.Escalado.base(lanza),
+                    com.darkcraft.mision.Hedda.objetivo(fp) == null ? "-" : com.darkcraft.mision.Hedda.objetivo(fp).toShortString()));
+            // ---- 2) la mentira: su bendicion (salva una vez y espera)
+            com.darkcraft.mision.Misiones.olvidar(fp, "hedda");
+            com.darkcraft.mision.Hedda.inicio(fp, h);
+            com.darkcraft.mision.Hedda.accion(fp, h, "aceptar");
+            fp.moveTo(ts.getX() + 2.5, ts.getY(), ts.getZ() + 0.5, 90f, 0f);
+            com.darkcraft.mision.Hedda.tomar(fp, t);
+            fp.moveTo(hs.getX() + 2.5, h.getY(), hs.getZ() + 0.5, 0f, 0f);
+            int n6 = com.darkcraft.mision.Hedda.inicio(fp, h);
+            com.darkcraft.mision.Hedda.accion(fp, h, "mentira");
+            int madre = fp.getInventory().countItem(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.MADRE).get());
+            com.darkcraft.rol.Talismanes.ponerDirecto(fp, 0, new net.minecraft.world.item.ItemStack(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.MADRE).get()));
+            com.darkcraft.mision.Hedda.bendicionLista(fp);
+            float max = fp.getMaxHealth();
+            int antes = com.darkcraft.mision.Hedda.BENDICIONES;
+            fp.setHealth(max);
+            com.darkcraft.mision.Misiones.onDano(new net.minecraftforge.event.entity.living.LivingDamageEvent(fp, m.damageSources().generic(), max * 0.85f));
+            fp.setHealth(max * 0.15f);
+            com.darkcraft.mision.Hedda.curarParaPrueba(fp);
+            float trasBendicion = fp.getHealth();
+            com.darkcraft.mision.Misiones.onDano(new net.minecraftforge.event.entity.living.LivingDamageEvent(fp, m.damageSources().generic(), fp.getHealth() * 0.9f));
+            com.darkcraft.mision.Hedda.curarParaPrueba(fp);
+            int salvadas = com.darkcraft.mision.Hedda.BENDICIONES - antes;
+            sb.append(String.format(java.util.Locale.ROOT, " | 2) con ella empieza %d; la mentira: %s, bendicion %d, logro %s, la ve %s/%s;"
+                            + " un golpe deja %.0f de %.0f y la bendicion la sube a %.1f; otra vez enseguida: salvado %d vez",
+                    n6, com.darkcraft.mision.Misiones.resumenHedda(fp), madre, com.darkcraft.story.Logros.tiene(fp, "hedda_mentira"),
+                    com.darkcraft.mision.Misiones.visible(fp, h), com.darkcraft.mision.Misiones.visible(fp, l), max * 0.15f, max, trasBendicion, salvadas));
+            com.darkcraft.rol.Talismanes.ponerDirecto(fp, 0, net.minecraft.world.item.ItemStack.EMPTY);
+            fp.setHealth(fp.getMaxHealth());
+            // ---- 3) callar: la Bufanda de Tam (menos dano de fuego)
+            com.darkcraft.mision.Misiones.olvidar(fp, "hedda");
+            com.darkcraft.mision.Hedda.inicio(fp, h);
+            com.darkcraft.mision.Hedda.accion(fp, h, "aceptar");
+            fp.moveTo(ts.getX() + 2.5, ts.getY(), ts.getZ() + 0.5, 90f, 0f);
+            com.darkcraft.mision.Hedda.tomar(fp, t);
+            fp.moveTo(hs.getX() + 2.5, h.getY(), hs.getZ() + 0.5, 0f, 0f);
+            com.darkcraft.mision.Hedda.inicio(fp, h);
+            float fuegoAntes = com.darkcraft.rol.Resistencias.de(fp, com.darkcraft.rol.Resistencias.Tipo.FUEGO);
+            com.darkcraft.mision.Hedda.accion(fp, h, "callar");
+            int talBufanda = fp.getInventory().countItem(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.BUFANDA).get());
+            com.darkcraft.rol.Talismanes.ponerDirecto(fp, 0, new net.minecraft.world.item.ItemStack(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.BUFANDA).get()));
+            float fuego = com.darkcraft.rol.Resistencias.de(fp, com.darkcraft.rol.Resistencias.Tipo.FUEGO);
+            com.darkcraft.rol.Talismanes.ponerDirecto(fp, 0, net.minecraft.world.item.ItemStack.EMPTY);
+            sb.append(String.format(java.util.Locale.ROOT, " | 3) callar: %s, la bufanda %d, la Bufanda de Tam %d, logro %s, despues empieza %d, la ve %s;"
+                            + " resistencia al fuego %.2f -> %.2f",
+                    com.darkcraft.mision.Misiones.resumenHedda(fp), fp.getInventory().countItem(DarkCraftMod.BUFANDA_ROJA.get()), talBufanda,
+                    com.darkcraft.story.Logros.tiene(fp, "hedda_callar"), com.darkcraft.mision.Hedda.inicio(fp, h),
+                    com.darkcraft.mision.Misiones.visible(fp, h), fuegoAntes, fuego));
+            // ---- 4) cogerla sin conocerla
+            com.darkcraft.mision.Misiones.olvidar(fp, "hedda");
+            fp.moveTo(ts.getX() + 2.5, ts.getY(), ts.getZ() + 0.5, 90f, 0f);
+            com.darkcraft.mision.Hedda.tomar(fp, t);
+            BlockPos obj4 = com.darkcraft.mision.Hedda.objetivo(fp);
+            fp.moveTo(hs.getX() + 2.5, h.getY(), hs.getZ() + 0.5, 0f, 0f);
+            sb.append(String.format(java.util.Locale.ROOT, " | 4) sin conocerla: %s, ir a %s, empieza %d", com.darkcraft.mision.Misiones.resumenHedda(fp),
+                    obj4 == null ? "-" : obj4.toShortString(), com.darkcraft.mision.Hedda.inicio(fp, h)));
+            com.darkcraft.mision.Misiones.olvidar(fp, "hedda");
+        } catch (Throwable e) {
+            sb.append(" ERROR ").append(e);
+            DarkCraftMod.LOGGER.error("[CI] la bufanda roja", e);
         }
         log.println(sb);
         log.flush();

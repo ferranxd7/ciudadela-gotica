@@ -41,7 +41,14 @@ public final class Talisman extends Item {
         /** +12 % de dano de los golpes fuertes (cargados). */
         FURIA,
         /** Los frascos de vida curan un 25 % mas (el Rosario del peregrino, de Oswin: parte 7ag). */
-        PEREGRINO;
+        PEREGRINO,
+        /**
+         * La Bendicion de Hedda (parte 7ah, a quien le dice que su hijo murio intentando abrir la puerta): un golpe que deja por
+         * debajo de un cuarto de la vida, sin matar, cura un 30 % (una vez cada dos minutos; {@code mision.Hedda}).
+         */
+        MADRE,
+        /** La Bufanda de Tam (parte 7ah, a quien calla): cubrirse cuesta un 30 % menos de estamina y el fuego hace un 20 % menos. */
+        BUFANDA;
 
         /** "vigor", "aliento"... (el objeto es darkcraft:talisman_ + esto). */
         public final String id = name().toLowerCase(java.util.Locale.ROOT);

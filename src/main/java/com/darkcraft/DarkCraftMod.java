@@ -172,6 +172,10 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_CAMPANA_VIENTO = sound("sfx.campana_viento");
     public static final RegistryObject<SoundEvent> SFX_CAMPANA_TOQUE = sound("sfx.campana_toque");
     public static final RegistryObject<SoundEvent> SFX_PEREGRINOS = sound("sfx.peregrinos");
+    /** La bufanda roja (parte 7ah): las agujas de Hedda, su descanso (cuando deja de esperar) y la lanza de Tam que se saca del torno. */
+    public static final RegistryObject<SoundEvent> SFX_AGUJAS = sound("sfx.agujas");
+    public static final RegistryObject<SoundEvent> SFX_HEDDA_DESCANSA = sound("sfx.hedda_descansa");
+    public static final RegistryObject<SoundEvent> SFX_LANZA_SACAR = sound("sfx.lanza_sacar");
     public static final RegistryObject<SoundEvent> SFX_FORJA_MEJORA = sound("sfx.forja_mejora");
     public static final RegistryObject<SoundEvent> SFX_TIENDA_COMPRA = sound("sfx.tienda_compra");
     // las habilidades de las armas (cenizas de guerra) y ponerle una ceniza a un arma
@@ -1124,6 +1128,15 @@ public class DarkCraftMod {
             () -> new com.darkcraft.mision.CampanaPeregrino(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.RARE)));
     public static final RegistryObject<Item> CAMPANA_DIFUNTOS = ITEMS.register("campana_difuntos",
             () -> new com.darkcraft.mision.CampanaDifuntos(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
+    /** Lo que queda de Tam en la sala de la guardia de la Puerta Oeste (parte 7ah, la mision de Hedda). */
+    public static final RegistryObject<EntityType<com.darkcraft.mision.RestosTam>> RESTOS_TAM = ENTITIES.register("restos_tam",
+            () -> EntityType.Builder.<com.darkcraft.mision.RestosTam>of(com.darkcraft.mision.RestosTam::new, MobCategory.MISC)
+                    .sized(0.8f, 1.0f).fireImmune().clientTrackingRange(8).updateInterval(20).build(MODID + ":restos_tam"));
+    /** La bufanda roja de Tam (objeto clave) y su lanza, la de la Puerta Oeste (para quien le dice la verdad a Hedda). */
+    public static final RegistryObject<Item> BUFANDA_ROJA = ITEMS.register("bufanda_roja",
+            () -> new com.darkcraft.mision.ObjetoMision("bufanda_roja", new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.RARE)));
+    public static final RegistryObject<Item> LANZA_TAM = ITEMS.register("lanza_tam",
+            () -> new com.darkcraft.mision.LanzaTam(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     /** El martillo de Dorvan (solo para que lo lleve en la mano) y las piedras de forja (I, II y III: mejoran las armas). */
     public static final RegistryObject<Item> MARTILLO_HERRERO = ITEMS.register("martillo_herrero",
             () -> new Item(new Item.Properties().stacksTo(1)));
@@ -1285,6 +1298,7 @@ public class DarkCraftMod {
             e.accept(ESPADA_DIESTRA);
             e.accept(ESPADA_SINIESTRA);
             e.accept(ALABARDA);
+            e.accept(LANZA_TAM);
             for (RegistryObject<Item> t : TALISMANES.values()) e.accept(t);
             e.accept(DAGA);
             e.accept(BASTON);

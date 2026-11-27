@@ -626,6 +626,21 @@ public class Volcado {
                 int n = 0;
                 for (var o : v.esperas()) marcas.put("C" + (n++), new int[]{o.x(), o.y() + 1, o.z()});
                 andarCapital(lvl, v);
+                // la bufanda roja (parte 7ah): donde se sienta Hedda (en el suelo del camino), Tam junto al torno y Hedda de rodillas
+                for (var e : java.util.Map.of("Hd", com.darkcraft.mision.Hedda.sitio(), "Tm", com.darkcraft.mision.Hedda.tam(),
+                        "Hl", com.darkcraft.mision.Hedda.luto()).entrySet()) {
+                    BlockPos q = e.getValue();
+                    int y = q.getY();
+                    if (e.getKey().equals("Hd")) {
+                        y = lvl.getMaxBuildHeight() - 1;
+                        while (y > lvl.getMinBuildHeight() && lvl.getBlockState(new BlockPos(q.getX(), y - 1, q.getZ())).isAir()) y--;
+                    }
+                    BlockPos b = new BlockPos(q.getX(), y, q.getZ());
+                    marcas.put(e.getKey(), new int[]{q.getX(), y + 1, q.getZ()});
+                    System.out.println("  " + e.getKey() + " en " + b.toShortString() + ": debajo " + lvl.getBlockState(b.below()).getBlock()
+                            + ", aqui " + lvl.getBlockState(b).getBlock() + ", encima " + lvl.getBlockState(b.above()).getBlock()
+                            + ", al oeste " + lvl.getBlockState(b.west()).getBlock() + ", al norte " + lvl.getBlockState(b.north()).getBlock());
+                }
             }
             case "morvain_juramento" -> {
                 // el Patio del Juramento (parte 7n): la plaza de la capital, la calle del Juramento, la puerta con su rastrillo, el

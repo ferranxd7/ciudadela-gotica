@@ -1114,13 +1114,78 @@ def campana_peregrino():
     return M
 
 
+def bufanda_roja():
+    """La bufanda roja (parte 7ah, la mision de Hedda): al ocaso, la Puerta Oeste de la capital quemada al fondo, con el rastrillo
+    medio bajado y el humo; en el camino, una vieja sentada en su taburete junto a su farol, tejiendo, y la labor roja que le cae
+    al suelo: lo unico con color."""
+    M = Mini()
+    M.degradado(["#0c0810", "#1e0e14", "#3e1618", "#6a2a1a", "#9a4a1e", "#c47428"], 0, 60)
+    r = np.random.default_rng(131)
+    # el humo que sube de la ciudad
+    for k in range(5):
+        x0 = 70 + k * 12 + int(r.integers(-3, 4))
+        for y in range(2, 40):
+            ancho = 2 + (40 - y) // 6
+            for x in range(x0 - ancho + int(math.sin(y * 0.3 + k) * 3), x0 + ancho + int(math.sin(y * 0.3 + k) * 3)):
+                if 0 <= x < W and r.random() < 0.5:
+                    M.px(x, y, mezcla(M.leer(x, y), "#2a1c1e", 0.35))
+    M.degradado(["#1e1210", "#140c0a", "#0a0606"], 60, H)
+    # el camino de tierra hacia la puerta
+    M.poli([(20, 80), (60, 80), (86, 58), (78, 58)], "#2e2016")
+    fig = capa()
+    # la muralla y la puerta, dos torres con almenas y el arco con el rastrillo
+    fig.rect(56, 34, 72, 26, "#120a0c")
+    for x in range(56, 128, 4):
+        fig.rect(x, 31, 2, 3, "#120a0c")
+    fig.rect(70, 20, 12, 40, "#120a0c")
+    fig.rect(92, 20, 12, 40, "#120a0c")
+    for x in (70, 74, 78, 92, 96, 100):
+        fig.rect(x, 17, 2, 3, "#120a0c")
+    # un carro quemado volcado en el camino
+    fig.poli([(44, 64), (58, 62), (60, 66), (46, 68)], "#1a100c")
+    fig.elipse(47, 68, 3, 3, "#1a100c")
+    # la vieja en su taburete, de perfil, encorvada sobre la labor
+    fig.poli([(18, 70), (20, 58), (24, 55), (28, 56), (30, 62), (31, 70)], "#14100e")  # el cuerpo con el chal
+    fig.elipse(25, 53, 3.2, 3.4, "#14100e")  # la cabeza con el panuelo
+    fig.poli([(17, 70), (33, 70), (33, 72), (17, 72)], "#1a120c")  # el taburete
+    fig.rect(18, 72, 1, 6, "#1a120c")
+    fig.rect(31, 72, 1, 6, "#1a120c")
+    fig.poli([(28, 62), (34, 63), (35, 66), (29, 66)], "#14100e")  # los brazos tejiendo
+    pegar_con_tinta(M, fig)
+    # la puerta: el arco por dentro con el resplandor del fuego y los barrotes del rastrillo
+    for y in range(36, 60):
+        for x in range(82, 92):
+            M.px(x, y, mezcla("#6a2a12", "#c86a20", (y - 36) / 24 * 0.6) if (x + y) % 5 else "#3a1a10")
+    for x in range(83, 92, 2):
+        for y in range(36, 50):
+            M.px(x, y, "#1a1014")
+    # el farol en el suelo, con su luz
+    for y in range(66, 76):
+        for x in range(4, 16):
+            d = math.hypot(x - 10, y - 72)
+            if d < 6:
+                M.px(x, y, mezcla(M.leer(x, y), "#e8a440", (1 - d / 6) * 0.5))
+    M.rect(9, 70, 3, 4, "#f6cc6a").rect(9, 69, 3, 1, "#3a2a1a").rect(10, 68, 1, 1, "#3a2a1a")
+    # la labor roja: en sus manos y cayendo al suelo, y el ovillo
+    for (x, y) in ((33, 64), (34, 65), (34, 66), (35, 67), (35, 68), (36, 69), (36, 70), (37, 71), (37, 72), (38, 73), (39, 74)):
+        M.px(x, y, "#c43a34").px(x + 1, y, "#82191b")
+    M.elipse(42, 75, 2.0, 1.8, "#a52626")
+    M.px(41, 74, "#de5c4c")
+    # las agujas, un destello
+    M.px(32, 62, "#d8b070").px(33, 61, "#d8b070")
+    for _ in range(18):
+        x, y = int(r.integers(0, W)), int(r.integers(4, 58))
+        M.px(x, y, "#c86a2a" if r.random() < 0.3 else "#6a5a52")
+    return M
+
+
 ESCENAS = [corona_rota, fuente, trono, catedral, juramento, portal, perdidos_valdrenn, perdidos_fortaleza, diario, acertijo,
            perdidos_brumavela, perdidos_morvain, morvain_tierras, morvain_quedaron, morvain_marcado, morvain_hermanas,
-           campana_peregrino]
+           campana_peregrino, bufanda_roja]
 
 
 def montar():
-    """Las miniaturas en un atlas de 512 x 400 (cuatro por fila; la quinta fila, las misiones de la parte 7ag)."""
+    """Las miniaturas en un atlas de 512 x 400 (cuatro por fila; la quinta fila, las misiones: 7ag, 7ah)."""
     A = Lienzo(512, 400)
     for i, f in enumerate(ESCENAS):
         m = f()
