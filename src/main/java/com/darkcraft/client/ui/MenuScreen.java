@@ -307,7 +307,7 @@ public class MenuScreen extends Screen {
         } else if (com.darkcraft.forja.Forja.mejorable(st)) l.addAll(font.split(com.darkcraft.forja.Forja.linea(st), ancho));
         // una pieza de armadura con modelo propio (parte 7ai): su defensa, su peso, lo que resiste y de quien era
         if (st.getItem() instanceof com.darkcraft.armadura.PiezaArmadura pa) {
-            for (Component c : pa.lineas()) l.addAll(font.split(c, ancho));
+            for (Component c : pa.lineas(st)) l.addAll(font.split(c, ancho));
             return l;
         }
         List<Component> t = st.getTooltipLines(yo(), TooltipFlag.Default.NORMAL);
@@ -1922,6 +1922,11 @@ public class MenuScreen extends Screen {
     }
 
     /** Para la prueba de la CI. */
+    /** Para la prueba de la CI (parte 7am): en el equipo, elige el hueco {@code id} (el del inventario: 38 el peto...). */
+    public void enfocarEquipo(int id) {
+        if (paginas[EQUIPO] instanceof PEquipo pe) pe.foco = id;
+    }
+
     public String resumen() {
         String s = "menu pestana " + PESTANAS[pestana];
         if (paginas[pestana] instanceof PEquipo e) s += " foco " + e.foco + (e.lista != null ? " lista " + e.lista + " sel " + e.listaSel : "");

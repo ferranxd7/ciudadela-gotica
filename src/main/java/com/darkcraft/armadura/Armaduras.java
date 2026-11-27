@@ -91,10 +91,13 @@ public final class Armaduras {
             ItemStack st = p.getItemBySlot(HUECOS[i]);
             sb.append(i == 0 ? "" : ", ").append(Conjunto.PIEZAS[i]).append(' ')
                     .append(st.isEmpty() ? "-" : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(st.getItem()).getPath());
+            int n = com.darkcraft.forja.Forja.nivel(st);
+            if (n > 0 && st.getItem() instanceof PiezaArmadura) sb.append(" +").append(n);
         }
         float peso = 0f;
         for (EquipmentSlot s : HUECOS) peso += com.darkcraft.combate.Peso.item(p.getItemBySlot(s));
-        sb.append(String.format(Locale.ROOT, " | defensa %d, peso %.1f", p.getArmorValue(), peso));
+        sb.append(String.format(Locale.ROOT, " | defensa %d, dureza %.2f, peso %.1f", p.getArmorValue(),
+                p.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS), peso));
         Conjunto c = entero(p);
         if (c != null) sb.append(", conjunto ").append(c.id);
         return sb.toString();
@@ -121,6 +124,13 @@ public final class Armaduras {
                     quitar(sp);
                     return decir(c.getSource(), resumen(sp));
                 }))
+                .then(Commands.literal("mejora").then(Commands.argument("n", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0,
+                        com.darkcraft.forja.Forja.MAX_ARMADURA)).executes(c -> {
+                    // la armadura puesta a +n (parte 7am)
+                    ServerPlayer sp = c.getSource().getPlayerOrException();
+                    int k = com.darkcraft.forja.Forja.ponerArmadura(sp, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "n"));
+                    return decir(c.getSource(), k + " piezas | " + resumen(sp));
+                })))
                 .then(Commands.literal("jefes").executes(c -> {
                     // los de los jefes: cuales se le han dado ya (y olvidarlos con "jefes olvidar", para probar otra vez)
                     ServerPlayer sp = c.getSource().getPlayerOrException();

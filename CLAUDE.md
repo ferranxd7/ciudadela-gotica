@@ -3966,6 +3966,32 @@ Respuesta 111 del plan (los conjuntos con modelo propio), segunda tanda: los de 
   (`al08`; linea `armadura 7al premio del Capitan: primera true, segunda false, piezas en la bolsa 4 | logro armadura_jefe true`) y el
   menu con el equipo del Rey (`al09`).
 
+### Plan grande, parte 7am: las armaduras en la forja
+
+Respuesta 24 del plan (los ecos sirven para "mejorar armas y armaduras"): las piezas de armadura con modelo propio se mejoran
+en la forja de cualquier herrero (Dorvan y los cuatro de Morvain), como las armas.
+- **Hasta +5** (`Forja.MAX_ARMADURA`; las armas y los catalizadores siguen hasta +9: `Forja.max(st)`, y `nivel`, `linea` y la
+  pantalla lo miran por objeto). Cada mejora: **+10 % de defensa** de la pieza, **+0,25 de dureza** y **+8 % de lo que resiste**
+  de cada elemento (`PiezaArmadura.defensa(st)`, `dureza(st)`, `resistencia(st, tipo)`; `Resistencias.de` ya lo usa). La
+  defensa y la dureza las suma `PiezaArmadura.getAttributeModifiers(hueco, objeto)` (el de Forge que mira el objeto: lo de
+  Minecraft mas un modificador "Mejora de la armadura" con un UUID por pieza; el juego lo vuelve a mirar cuando cambia el
+  NBT de lo puesto). Lo que piden (`Forja.grado/piedras/ecos(st, destino)`): +1 una piedra I, +2 dos I, +3 una II, +4 dos
+  II, +5 una III, y los ecos de siempre (275, 450, 675, 950, 1275: 3625 una pieza). Logro `mejora_armadura` ("A Medida",
+  con su entrada del diario); las armas siguen dando `mejora` y `mejora_maxima`.
+- **La pantalla** (`ForjaScreen`): la armadura puesta sale en la lista despues de las manos (huecos 39, 38, 36 y 37: yelmo,
+  peto, guantes y grebas) y la de la bolsa con lo demas; el detalle dice "Defensa 7 → 7,7" (`PiezaArmadura.defensaTexto`:
+  entera sin mejorar, con un decimal mejorada). La ficha del menu y el recuadro dicen la defensa y lo que resiste ya
+  mejorados (`lineas(st)`) y "Mejora +2 de +5"; el nombre lleva el "+2" donde las armas (`Forja.nombre`). Los herreros
+  dicen ahora "Quiero mejorar mi arma o mi armadura".
+- Comando `/darkcraft armadura mejora <0-5>` (lo puesto a +n); `Armaduras.resumen` dice el "+n" de cada pieza y la dureza.
+- Pruebas: servidor, `armaduras7am()` (linea `Armaduras en la forja 7am: ...`: lo que pide cada nivel, con Hagen el peto de
+  Brandt a +1 cobrando —una piedra I y 275 ecos—, sin piedras sigue en +1, en creativo hasta +5 y no mas, la defensa y la
+  dureza de sus atributos —8 → 12, 2 → 3,25— y nada en la mano, su ficha "12.0" y su linea, el yelmo puesto mejorado, el fuego
+  del conjunto entero a +0 y a +5 y la espada que sigue hasta +9); cliente, tramo `armaduras7am()` despues del de los
+  conjuntos de jefe: la forja de Dorvan en la plataforma con el caballero puesto (`cliente_am01_forja_peto`, `am02` a +1,
+  `am03` los guantes sin piedras, `am04` el yelmo al maximo) y la ficha del peto a +5 en el menu (`am05`; el menu tiene
+  `enfocarEquipo(hueco)` para la prueba). Lineas `armadura 7am ...`.
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

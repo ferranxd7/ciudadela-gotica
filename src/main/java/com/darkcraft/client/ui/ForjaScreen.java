@@ -35,12 +35,15 @@ import java.util.Locale;
 public class ForjaScreen extends Screen {
     private static final int ANCHO = 396, ALTO = 182, FILA = 20, FILAS = 6, IZQ = 186, LISTA_Y = 40;
     private static final int CLARO = 0xFFEADBC4, ORO = 0xFFE2BF62, LUZ = 0xFFFFF2C4, APAGADO = 0xFFB8A888, VERDE = 0xFF9BE08A, ROJO = 0xFFE0564E;
-    /** El orden en que salen los huecos: mano derecha, mano izquierda, bolsa y objetos rapidos. */
+    /**
+     * El orden en que salen los huecos: mano derecha, mano izquierda, la armadura puesta (yelmo, peto, guantes y grebas: parte
+     * 7am), bolsa y objetos rapidos.
+     */
     private static final int[] ORDEN;
     public static final int MEJORAR = 0, CENIZAS = 1;
 
     static {
-        List<Integer> o = new ArrayList<>(List.of(0, 1, 2, 40, 3, 4));
+        List<Integer> o = new ArrayList<>(List.of(0, 1, 2, 40, 3, 4, 39, 38, 36, 37));
         for (int i = 9; i <= 35; i++) o.add(i);
         for (int i = 5; i <= 8; i++) o.add(i);
         ORDEN = o.stream().mapToInt(Integer::intValue).toArray();
@@ -167,13 +170,13 @@ public class ForjaScreen extends Screen {
         }
         ItemStack st = elegido();
         int n = Forja.nivel(st);
-        if (n >= Forja.MAX) {
+        if (n >= Forja.max(st)) {
             dorvan.decirSiHaceRato(8, 60);
             Panel.nada();
             return;
         }
         int d = n + 1;
-        if (gasta() && (minecraft.player.getInventory().countItem(Forja.piedra(Forja.grado(d))) < Forja.piedras(d) || ClientRol.ecos < Forja.ecos(d))) {
+        if (gasta() && (minecraft.player.getInventory().countItem(Forja.piedra(Forja.grado(st, d))) < Forja.piedras(st, d) || ClientRol.ecos < Forja.ecos(st, d))) {
             dorvan.decirSiHaceRato(5, 60);
             Panel.nada();
             return;
@@ -332,7 +335,7 @@ public class ForjaScreen extends Screen {
             if (modo == MEJORAR) {
                 int n = Forja.nivel(st);
                 derecha = n > 0 ? "+" + n : "";
-                colorDer = n >= Forja.MAX ? 0xFFFFD866 : ORO;
+                colorDer = n >= Forja.max(st) ? 0xFFFFD866 : ORO;
             } else {
                 derecha = Habilidad.puesta(st) != null ? "◆" : "";
                 colorDer = 0xFFE2BF62;
@@ -366,7 +369,7 @@ public class ForjaScreen extends Screen {
         }
 
         // ---- abajo: botones y teclas
-        boolean puede = esperando <= 0 && (modo == MEJORAR ? !huecos.isEmpty() && Forja.nivel(elegido()) < Forja.MAX : aplicable());
+        boolean puede = esperando <= 0 && (modo == MEJORAR ? !huecos.isEmpty() && Forja.nivel(elegido()) < Forja.max(elegido()) : aplicable());
         Component accion = Component.translatable(modo == MEJORAR ? "darkcraft.forja.mejorar"
                 : !opciones.isEmpty() && opciones.get(opcion) < 0 ? "darkcraft.forja.quitar" : "darkcraft.forja.aplicar");
         boton(g, 0, accion, puede, enBoton(mx, my, 0));
@@ -397,31 +400,36 @@ public class ForjaScreen extends Screen {
     private void detalle(GuiGraphics g, int x, int y, int w) {
         ItemStack st = elegido();
         Inventory inv = minecraft.player.getInventory();
-        int n = Forja.nivel(st);
+        int n = Forja.nivel(st), max = Forja.max(st);
         cabecera(g, st, x, y, w);
-        String paso = n >= Forja.MAX ? "+" + n : "+" + n + "  →  +" + (n + 1);
-        g.drawString(font, paso, x + 46, y + 27, n >= Forja.MAX ? 0xFFFFD866 : LUZ, true);
+        String paso = n >= max ? "+" + n : "+" + n + "  →  +" + (n + 1);
+        g.drawString(font, paso, x + 46, y + 27, n >= max ? 0xFFFFD866 : LUZ, true);
         Panel.raya(g, x + 6, x + w - 6, y + 42);
         int ly = y + 48;
         boolean catalizador = com.darkcraft.hechizos.Catalizador.de(st) != null;
-        if (catalizador) {
+        if (st.getItem() instanceof com.darkcraft.armadura.PiezaArmadura pa) {
+            // una pieza de armadura (parte 7am): su defensa ahora y con la mejora
+            ItemStack luego = st.copy();
+            Forja.nivel(luego, n + 1);
+            stat(g, x, w, ly, "darkcraft.menu.defensa", pa.defensaTexto(st), n >= max ? null : pa.defensaTexto(luego));
+        } else if (catalizador) {
             stat(g, x, w, ly, "darkcraft.forja.potencia", String.format(Locale.ROOT, "× %.2f", Forja.mult(n)),
-                    n >= Forja.MAX ? null : String.format(Locale.ROOT, "× %.2f", Forja.mult(n + 1)));
+                    n >= max ? null : String.format(Locale.ROOT, "× %.2f", Forja.mult(n + 1)));
         } else {
             float base = com.darkcraft.combate.Escalado.base(st);
             float ahora = com.darkcraft.combate.Escalado.total(st, base, ClientRol.atributos);
             float luego = ahora / Forja.mult(n) * Forja.mult(n + 1);
             stat(g, x, w, ly, "darkcraft.menu.ataque", String.format(Locale.ROOT, "%.1f", ahora),
-                    n >= Forja.MAX ? null : String.format(Locale.ROOT, "%.1f", luego));
+                    n >= max ? null : String.format(Locale.ROOT, "%.1f", luego));
         }
-        if (n >= Forja.MAX) {
+        if (n >= max) {
             List<FormattedCharSequence> l = font.split(Component.translatable("darkcraft.forja.tope"), w - 14);
             for (int i = 0; i < l.size(); i++) g.drawString(font, l.get(i), x + 7, ly + 20 + i * 10, 0xFFFFD866, true);
             return;
         }
         int d = n + 1;
-        Item piedra = Forja.piedra(Forja.grado(d));
-        int tiene = inv.countItem(piedra), pide = Forja.piedras(d);
+        Item piedra = Forja.piedra(Forja.grado(st, d));
+        int tiene = inv.countItem(piedra), pide = Forja.piedras(st, d);
         boolean libre = !gasta();
         g.drawString(font, Component.translatable("darkcraft.forja.piedras"), x + 7, ly + 20, CLARO, true);
         String sp = pide + " / " + tiene;
@@ -429,9 +437,9 @@ public class ForjaScreen extends Screen {
         g.drawString(font, sp, x + w - 7 - spw, ly + 20, tiene >= pide || libre ? ORO : ROJO, true);
         g.renderItem(new ItemStack(piedra), x + w - 7 - spw - 19, ly + 16);
         g.drawString(font, Component.translatable("darkcraft.forja.ecos"), x + 7, ly + 40, CLARO, true);
-        String se = Hud.numero(Forja.ecos(d));
+        String se = Hud.numero(Forja.ecos(st, d));
         int sew = font.width(se);
-        g.drawString(font, se, x + w - 7 - sew, ly + 40, ClientRol.ecos >= Forja.ecos(d) || libre ? ORO : ROJO, true);
+        g.drawString(font, se, x + w - 7 - sew, ly + 40, ClientRol.ecos >= Forja.ecos(st, d) || libre ? ORO : ROJO, true);
         Pix.mezcla();
         Pix.t(g, HudTex.ECO_0, x + w - 7 - sew - 18, ly + 36);
         Pix.blanco();

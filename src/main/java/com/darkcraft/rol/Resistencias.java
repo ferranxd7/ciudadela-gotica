@@ -77,9 +77,10 @@ public final class Resistencias {
             case FISICO -> Efectos.HUESO.get();
         };
         if (p.hasEffect(fruto)) queda *= 1f - (t == Tipo.FISICO ? 0.15f : t == Tipo.VENENO ? 1f : 0.50f);
-        // las armaduras con modelo propio (parte 7ai): cada pieza puesta lo suyo de cada elemento (lo fisico, su defensa)
+        // las armaduras con modelo propio (parte 7ai): cada pieza puesta lo suyo de cada elemento (lo fisico, su defensa), con su
+        // mejora de la forja (parte 7am)
         for (net.minecraft.world.item.ItemStack st : p.getArmorSlots())
-            if (st.getItem() instanceof com.darkcraft.armadura.PiezaArmadura pa) queda *= 1f - pa.conjunto.resistencia(pa.pieza, t);
+            if (st.getItem() instanceof com.darkcraft.armadura.PiezaArmadura pa) queda *= 1f - pa.resistencia(st, t);
         return Math.min(TOPE, 1f - queda);
     }
 
