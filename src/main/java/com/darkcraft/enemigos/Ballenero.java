@@ -57,6 +57,12 @@ import org.joml.Vector3f;
  * ella... ahora no se me escapa") y 5 al caer ("la marea... oigo la marea que vuelve"). Al caer se queda de rodillas agarrado
  * al arpon, la Vieja sube al cielo y el se deshace en sal; lo demas (el cartel con sus ecos, la hazana {@code ballenero} y el
  * bestiario) lo reparte {@code valdrenn/Guardianes}; los salobres que seguian faenando descansan ({@code morvain/Costillar}).
+ * <p>
+ * <b>La luz del muelle</b> (parte 7an, la mision de su hija Ylva, {@code mision.Ylva}): por debajo del 30 % de la vida, si alguien
+ * lleva el farol de fuego frio de Ylva a 16 bloques, Brann lo ve: deja de pelear ({@link #calmado}), dice su frase 6 ("...Esa luz.
+ * Es la luz del muelle. ¿Ylva?") con el canto de la Vieja y el mar que vuelve ({@code sfx.brann_calma}) y se va en paz: cae de
+ * rodillas como siempre, pero dice la 7 ("Cuarenta anos... y la mantuviste encendida. Pon la tetera, chiquilla. Vuelvo a casa")
+ * en vez de la 5. Lo que deja y la hazana, igual.
  */
 public class Ballenero extends Guardian {
     public static final int ECOS = 15000;
@@ -86,6 +92,9 @@ public class Ballenero extends Guardian {
     private double arrastre;
     /** Para las pruebas: no elige golpes ni grita por su cuenta (lo que se le manda hacer, si; y lo ya lanzado sigue). */
     public boolean quieta;
+    /** Los ticks desde que vio la luz del muelle (parte 7an; -1: no la ha visto) y quien la llevaba. */
+    private int calma = -1;
+    private java.util.UUID luz;
 
     public Ballenero(EntityType<? extends Ballenero> t, Level l) {
         super(t, l, "ballenero", BossEvent.BossBarColor.BLUE);
@@ -218,6 +227,17 @@ public class Ballenero extends Guardian {
     public void vencer() {
         if (level().isClientSide || !isAlive()) return;
         kill();
+    }
+
+    /** Si ha visto la luz del muelle y se va en paz (parte 7an). */
+    public boolean calmado() {
+        return calma >= 0;
+    }
+
+    /** Para el comando y las pruebas: que vea ya la luz que lleva ese jugador (sin mirar su vida ni lo lejos que este). */
+    public void verLuz(ServerPlayer p) {
+        if (level().isClientSide || !isAlive() || calma >= 0) return;
+        calmar(p);
     }
 
     // ------------------------------------------------------------------ que hace
@@ -579,6 +599,8 @@ public class Ballenero extends Guardian {
 
     @Override
     public void setTarget(LivingEntity t) {
+        // habiendo visto la luz ya no tiene presa
+        if (calma >= 0) t = null;
         super.setTarget(t);
         if (t != null && !level().isClientSide) ultimaPresa = t;
     }
@@ -586,8 +608,65 @@ public class Ballenero extends Guardian {
     /** Solo repara en quien esta dentro de las costillas (los de fuera no le importan), si espera en su costillar. */
     @Override
     protected boolean percibe(LivingEntity p) {
+        if (calma >= 0) return false;
         if (Costillar.enSala(getX(), getZ()) && !Costillar.enSala(p.getX(), p.getZ())) return false;
         return super.percibe(p);
+    }
+
+    /** Habiendo visto la luz no le entra nada (salvo lo que salta la invulnerabilidad: asi cae cuando le toca). */
+    @Override
+    public boolean hurt(DamageSource s, float cuanto) {
+        if (calma >= 0 && !s.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) return false;
+        return super.hurt(s, cuanto);
+    }
+
+    /** Habiendo visto la luz no anda: se queda mirandola. */
+    @Override
+    protected boolean anda() {
+        return calma < 0 && super.anda();
+    }
+
+    // ------------------------------------------------------------------ la luz del muelle (parte 7an)
+
+    /** Ve la luz del muelle: baja el arpon, deja de pelear y lo dice. */
+    private void calmar(ServerPlayer p) {
+        if (!(level() instanceof ServerLevel sl)) return;
+        calma = 0;
+        luz = p.getUUID();
+        quieta = true;
+        devolver();
+        cortarAccion();
+        setTarget(null);
+        rendirPelea();
+        girarHacia(p, 360f);
+        hablaHasta = 0;
+        habla(6);
+        playSound(DarkCraftMod.SFX_BRANN_CALMA.get(), 3.0f, 1.0f);
+        // la luz fria del farol que le llega
+        Vec3 a = p.position().add(0, 1.2, 0), b = position().add(0, 2.3, 0);
+        for (int k = 0; k <= 16; k++) {
+            Vec3 q = a.lerp(b, k / 16.0);
+            sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, q.x, q.y, q.z, 1, 0.05, 0.05, 0.05, 0.0);
+        }
+        sl.sendParticles(ParticleTypes.END_ROD, getX(), getY() + 2.4, getZ(), 24, 0.7, 1.0, 0.7, 0.02);
+        com.darkcraft.mision.Ylva.calmado(sl, this, p);
+    }
+
+    /** Mientras lo dice se queda quieto mirando la luz; al acabar cae de rodillas y se va en paz (dira la 7). */
+    private void tickCalma(ServerLevel sl) {
+        calma++;
+        getNavigation().stop();
+        setDeltaMovement(0, getDeltaMovement().y, 0);
+        net.minecraft.world.entity.player.Player p = luz == null ? null : sl.getPlayerByUUID(luz);
+        if (p != null && p.isAlive()) {
+            getLookControl().setLookAt(p, 10f, 10f);
+            girarHacia(p, 6f);
+        }
+        if (calma % 3 == 0) {
+            sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, getX(), getY() + 2.2, getZ(), 2, 0.6, 0.9, 0.6, 0.01);
+            sl.sendParticles(SAL, getX(), getY() + 1.8, getZ(), 2, 0.6, 0.9, 0.6, 0.0);
+        }
+        if (calma >= Voces.ticks(VOZ_BASE + 6) + Voces.PAUSA + 6) kill();
     }
 
     @Override
@@ -608,6 +687,15 @@ public class Ballenero extends Guardian {
             return;
         }
         if (!isAlive()) return;
+        // la luz del muelle (parte 7an): por debajo del 30 % y con el farol de Ylva cerca, baja el arpon
+        if (calma < 0 && enPelea() && getHealth() < getMaxHealth() * com.darkcraft.mision.Ylva.CALMA_VIDA && level() instanceof ServerLevel sl0) {
+            ServerPlayer p = com.darkcraft.mision.Ylva.luzCerca(sl0, this);
+            if (p != null) calmar(p);
+        }
+        if (calma >= 0) {
+            if (level() instanceof ServerLevel sl0) tickCalma(sl0);
+            return;
+        }
         if (arponEspera > 0) arponEspera--;
         if (farolEspera > 0) farolEspera--;
         if (saltoEspera > 0) saltoEspera--;
@@ -648,7 +736,8 @@ public class Ballenero extends Guardian {
         super.die(s);
         if (level().isClientSide || ya) return;
         hablaHasta = 0;
-        habla(5);
+        // habiendo visto la luz del muelle, se va a casa (parte 7an)
+        habla(calma >= 0 ? 7 : 5);
         if (level() instanceof ServerLevel sl) sl.sendParticles(SAL, getX(), getY() + 2.4, getZ(), 50, 1.0, 1.4, 1.0, 0.0);
     }
 
@@ -658,6 +747,8 @@ public class Ballenero extends Guardian {
         ++deathTime;
         if (level().isClientSide() || isRemoved()) return;
         int fin = BalleneroAnims.TICKS[BalleneroAnims.MORIR] + 50;
+        // si se va en paz, hasta que acaba de decir la 7 (es mas larga que la 5)
+        if (calma >= 0) fin = Math.max(fin, Voces.ticks(VOZ_BASE + 7) + 30);
         if (level() instanceof ServerLevel sl) {
             if (deathTime == 40) {
                 // la Vieja sale de la arena por ultima vez y se va al cielo
@@ -757,7 +848,7 @@ public class Ballenero extends Guardian {
                         + "faroles %d, saltos %d (la onda da a %d), la Vieja %d%s",
                 getHealth(), getMaxHealth(), enPelea() ? "peleando" : "esperando", postura() == DE_PIE ? "de pie" : "de vigia",
                 getX(), getY(), getZ(), arponazos, tajos, lanzados, tirones, arrastrados, arrastre, faroles, saltos, ondasQueDan, llamadas,
-                segunda ? " (a media vida)" : "");
+                (segunda ? " (a media vida)" : "") + (calma >= 0 ? " (ha visto la luz del muelle)" : ""));
     }
 
     /** Que todo el mundo pueda ver el aviso de la Vieja: lo de alrededor de la sala, para las pruebas. */

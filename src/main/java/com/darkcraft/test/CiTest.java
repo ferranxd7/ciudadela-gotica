@@ -761,6 +761,7 @@ public final class CiTest {
         herrerosMorvain(server, m, log);
         misionOswin(server, m, log);
         misionHedda(server, m, log);
+        misionYlva(server, m, log);
         armaduras(server, m, log);
         armas7aj(server, m, log);
         escudos7ak(server, m, log);
@@ -5710,6 +5711,167 @@ public final class CiTest {
         } catch (Throwable e) {
             sb.append(" ERROR ").append(e);
             DarkCraftMod.LOGGER.error("[CI] la bufanda roja", e);
+        }
+        log.println(sb);
+        log.flush();
+    }
+
+    /**
+     * Parte 7an, la luz del muelle: Ylva en su noray al final del espigon (pisa, mira al Costillar, el farol de almas del pretil), los dos
+     * faroles de Brann (el de la arena y el del muelle sobre el pretil), el dialogo sin nodos rotos y los caminos: aceptar (su farol),
+     * Brann que ve la luz (deja de pelear, no le entra nada, se arrodilla y cae diciendo la 7), coger su farol, darselo (el Fuego frio de
+     * Ylva y lo que guarda al morir), quedartelo (el Farol del ballenero) y cogerlo sin conocerla.
+     */
+    private static void misionYlva(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        StringBuilder sb = new StringBuilder("Morvain, la luz del muelle:");
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ae4"), "[DarkCraftCI26]"));
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            BlockPos ys = com.darkcraft.mision.Ylva.sitio(), fa = com.darkcraft.mision.Ylva.farolArena(), fm = com.darkcraft.mision.Ylva.farolMuelle();
+            for (BlockPos p : new BlockPos[]{ys, fa, fm})
+                for (int dx = -1; dx <= 1; dx++)
+                    for (int dz = -1; dz <= 1; dz++) m.getChunk((p.getX() >> 4) + dx, (p.getZ() >> 4) + dz);
+            com.darkcraft.mision.Ylva.olvidar(m);
+            var y = com.darkcraft.mision.Ylva.ponerYlva(m);
+            var f0 = com.darkcraft.mision.Ylva.ponerFarol(m, 0);
+            var f1 = com.darkcraft.mision.Ylva.ponerFarol(m, 1);
+            if (y == null || f0 == null || f1 == null) sb.append(" FALLO: ylva ").append(y != null).append(", farol de la arena ").append(f0 != null)
+                    .append(", del muelle ").append(f1 != null);
+            if (y != null) {
+                BlockPos pies = y.blockPosition(), c = com.darkcraft.mision.Ylva.mira();
+                boolean pisa = !m.getBlockState(pies.below()).getCollisionShape(m, pies.below()).isEmpty();
+                double giro = Math.toDegrees(Math.atan2(c.getZ() - pies.getZ(), c.getX() - pies.getX())) - 90;
+                BlockPos almas = new BlockPos(com.darkcraft.morvain.Varadero.CX + 78, com.darkcraft.morvain.Varadero.PISO + 1, com.darkcraft.morvain.Varadero.CZ
+                        + com.darkcraft.morvain.Varadero.ESPIGON_V - 3);
+                sb.append(String.format(java.util.Locale.ROOT, " Ylva en %s, pisa %s (%s), al Costillar %.0f grados (giro %.0f), libre %s, el farol de almas del pretil %s",
+                        pies.toShortString(), pisa, m.getBlockState(pies.below()).getBlock().getDescriptionId().replace("block.minecraft.", ""),
+                        net.minecraft.util.Mth.wrapDegrees(giro - y.getYRot()), y.getYRot(),
+                        m.getBlockState(pies).getCollisionShape(m, pies).isEmpty() && m.getBlockState(pies.above()).getCollisionShape(m, pies.above()).isEmpty(),
+                        m.getBlockState(almas).is(net.minecraft.world.level.block.Blocks.SOUL_LANTERN)));
+            }
+            if (f0 != null) {
+                BlockPos q = f0.blockPosition();
+                sb.append(String.format(java.util.Locale.ROOT, " | el farol en la arena en %s (%.2f), debajo %s, dentro %s", q.toShortString(), f0.getY(),
+                        m.getBlockState(q.below()).getBlock().getDescriptionId().replace("block.minecraft.", ""),
+                        m.getBlockState(q).getBlock().getDescriptionId().replace("block.minecraft.", "")));
+            }
+            if (f1 != null) {
+                BlockPos q = f1.blockPosition();
+                sb.append(String.format(java.util.Locale.ROOT, " | el del muelle en %s, debajo %s, al lado %s", q.toShortString(),
+                        m.getBlockState(q.below()).getBlock().getDescriptionId().replace("block.minecraft.", ""),
+                        m.getBlockState(q.east()).getBlock().getDescriptionId().replace("block.minecraft.", "")));
+            }
+            sb.append(", se encuentran ").append(com.darkcraft.mision.Ylva.buscarYlva(m) == y && com.darkcraft.mision.Ylva.buscarFarol(m, 0) == f0
+                    && com.darkcraft.mision.Ylva.buscarFarol(m, 1) == f1);
+            // ---- el dialogo: todos los nodos y respuestas llevan a algo que existe
+            var d = com.darkcraft.dialogo.Dialogos.de("ylva");
+            int malos = 0;
+            for (var n : d.nodos().values()) {
+                if (n.menu()) {
+                    for (var r : n.respuestas()) if (r.destino() != 0 && d.nodo(r.destino()) == null) malos++;
+                } else if (n.siguiente() != 0 && d.nodo(n.siguiente()) == null) malos++;
+            }
+            sb.append(" | dialogo: ").append(d.nodos().size()).append(" nodos, ").append(malos).append(" que llevan a nada");
+            if (y == null || f0 == null || f1 == null) throw new IllegalStateException("sin Ylva o sin los faroles");
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- 1) aceptar, Brann ve la luz, coger su farol y darselo
+            com.darkcraft.mision.Misiones.olvidar(fp, "ylva");
+            fp.moveTo(ys.getX() + 2.5, y.getY(), ys.getZ() + 1.5, 0f, 0f);
+            int n1 = com.darkcraft.mision.Ylva.inicio(fp), n2 = com.darkcraft.mision.Ylva.inicio(fp);
+            com.darkcraft.mision.Ylva.accion(fp, y, "rechazar");
+            int n3 = com.darkcraft.mision.Ylva.inicio(fp);
+            com.darkcraft.mision.Ylva.accion(fp, y, "precio");
+            com.darkcraft.mision.Ylva.accion(fp, y, "aceptar");
+            com.darkcraft.mision.Ylva.accion(fp, y, "aceptar");
+            int luces = fp.getInventory().countItem(DarkCraftMod.FAROL_YLVA.get());
+            int n4 = com.darkcraft.mision.Ylva.inicio(fp);
+            BlockPos obj = com.darkcraft.mision.Ylva.objetivo(fp);
+            sb.append(String.format(java.util.Locale.ROOT, " | 1) empieza %d, %d; rechaza: %d; la noche y acepta (dos veces): %d farol(es) de Ylva, empieza %d (%s), ir a %s",
+                    n1, n2, n3, luces, n4, com.darkcraft.mision.Misiones.resumenYlva(fp), obj == null ? "-" : obj.toShortString()));
+            // Brann (uno suelto, en el espigon): a menos del 30 % y con la luz cerca, la ve
+            var b = DarkCraftMod.BALLENERO.get().create(m);
+            if (b == null) throw new IllegalStateException("sin Brann");
+            b.moveTo(ys.getX() - 14.5, y.getY(), ys.getZ() + 1.5, 90f, 0f);
+            m.addFreshEntity(b);
+            quitar.add(b);
+            fp.moveTo(ys.getX() - 6.5, y.getY(), ys.getZ() + 1.5, 90f, 0f);
+            b.setTarget(fp);
+            boolean peleaAntes = b.enPelea();
+            b.setHealth(b.getMaxHealth() * 0.6f);
+            b.tickCount++;
+            b.tick();
+            boolean calmaAlto = b.calmado();
+            b.setHealth(b.getMaxHealth() * 0.25f);
+            int calmas = com.darkcraft.mision.Ylva.CALMAS;
+            b.verLuz(fp);
+            float vida = b.getHealth();
+            b.invulnerableTime = 0;
+            boolean entra = b.hurt(m.damageSources().playerAttack(fp), 50f);
+            int kCae = -1, kSeVa = -1, voz7 = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Ballenero.VOZ_BASE + 7);
+            for (int k = 0; k < 520 && !b.isRemoved(); k++) {
+                b.tickCount++;
+                b.tick();
+                if (kCae < 0 && !b.isAlive()) kCae = k;
+                for (var v : m.getEntitiesOfClass(com.darkcraft.enemigos.Vieja.class, b.getBoundingBox().inflate(40, 80, 40))) if (!quitar.contains(v)) quitar.add(v);
+            }
+            if (b.isRemoved()) kSeVa = 1;
+            sb.append(String.format(java.util.Locale.ROOT, " | Brann: pelea %s, a media vida la ve %s; a un cuarto la ve %s (+%d), pelea %s, quieto %s, un golpe %s (vida %.0f -> %.0f);"
+                            + " cae en el tick %d (la 6 dura %d), se va %s; marcas %s, logro %s",
+                    peleaAntes, calmaAlto, b.calmado(), com.darkcraft.mision.Ylva.CALMAS - calmas, b.enPelea(), b.quieta, entra ? "ENTRA" : "no entra", vida, b.getHealth(),
+                    kCae, com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Ballenero.VOZ_BASE + 6), kSeVa > 0 ? "si (la 7 dura " + voz7 + ")" : "NO",
+                    com.darkcraft.mision.Misiones.resumenYlva(fp), com.darkcraft.story.Logros.tiene(fp, "brann_calma")));
+            // su farol en la arena
+            fp.moveTo(fa.getX() + 0.5, fa.getY(), fa.getZ() + 2.5, 180f, 0f);
+            int cogidos = com.darkcraft.mision.Ylva.COGIDOS;
+            com.darkcraft.mision.Ylva.tomar(fp, f0);
+            com.darkcraft.mision.Ylva.tomar(fp, f0);
+            int farolesB = fp.getInventory().countItem(DarkCraftMod.FAROL_BALLENERO.get());
+            BlockPos obj2 = com.darkcraft.mision.Ylva.objetivo(fp);
+            fp.moveTo(ys.getX() + 2.5, y.getY(), ys.getZ() + 1.5, 0f, 0f);
+            int n5 = com.darkcraft.mision.Ylva.inicio(fp);
+            boolean veAntes = com.darkcraft.mision.Misiones.visible(fp, y);
+            com.darkcraft.mision.Ylva.accion(fp, y, "devolver");
+            int fuego = fp.getInventory().countItem(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.YLVA).get());
+            sb.append(String.format(java.util.Locale.ROOT, " | cogido %d (+%d), ir a %s; con el empieza %d; darselo: %s, faroles %d/%d, el Fuego frio %d, logro %s, la ve antes %s y despues %s, ir a %s",
+                    farolesB, com.darkcraft.mision.Ylva.COGIDOS - cogidos, obj2 == null ? "-" : obj2.toShortString(), n5, com.darkcraft.mision.Misiones.resumenYlva(fp),
+                    fp.getInventory().countItem(DarkCraftMod.FAROL_YLVA.get()), fp.getInventory().countItem(DarkCraftMod.FAROL_BALLENERO.get()), fuego,
+                    com.darkcraft.story.Logros.tiene(fp, "ylva_luz"), veAntes, com.darkcraft.mision.Misiones.visible(fp, y),
+                    com.darkcraft.mision.Ylva.objetivo(fp) == null ? "-" : com.darkcraft.mision.Ylva.objetivo(fp).toShortString()));
+            // lo que guarda el Fuego frio: 300 ecos encima y una espada sin recoger de 500
+            int sin = com.darkcraft.rol.Rol.ecosEspadaNueva(fp, 500, 300);
+            com.darkcraft.rol.Talismanes.ponerDirecto(fp, 0, new net.minecraft.world.item.ItemStack(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.YLVA).get()));
+            int con = com.darkcraft.rol.Rol.ecosEspadaNueva(fp, 500, 300), sinVieja = com.darkcraft.rol.Rol.ecosEspadaNueva(fp, 0, 300);
+            com.darkcraft.rol.Talismanes.ponerDirecto(fp, 0, net.minecraft.world.item.ItemStack.EMPTY);
+            sb.append(" | al morir otra vez (500 en la espada, 300 encima): sin el farol ").append(sin).append(", con el ").append(con)
+                    .append(" (sin espada vieja ").append(sinVieja).append(')');
+            // ---- 2) quedartelo (cayo peleando)
+            com.darkcraft.mision.Misiones.olvidar(fp, "ylva");
+            com.darkcraft.mision.Ylva.inicio(fp);
+            com.darkcraft.mision.Ylva.accion(fp, y, "aceptar");
+            fp.moveTo(fa.getX() + 0.5, fa.getY(), fa.getZ() + 2.5, 180f, 0f);
+            com.darkcraft.mision.Ylva.tomar(fp, f0);
+            fp.moveTo(ys.getX() + 2.5, y.getY(), ys.getZ() + 1.5, 0f, 0f);
+            int n6 = com.darkcraft.mision.Ylva.inicio(fp);
+            com.darkcraft.mision.Ylva.accion(fp, y, "quedar");
+            sb.append(String.format(java.util.Locale.ROOT, " | 2) con el empieza %d; quedartelo: %s, faroles %d/%d, el Farol del ballenero %d, logro %s, despues empieza %d, la ve %s",
+                    n6, com.darkcraft.mision.Misiones.resumenYlva(fp), fp.getInventory().countItem(DarkCraftMod.FAROL_YLVA.get()),
+                    fp.getInventory().countItem(DarkCraftMod.FAROL_BALLENERO.get()),
+                    fp.getInventory().countItem(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.BALLENERO).get()),
+                    com.darkcraft.story.Logros.tiene(fp, "ylva_farol"), com.darkcraft.mision.Ylva.inicio(fp), com.darkcraft.mision.Misiones.visible(fp, y)));
+            // ---- 3) cogerlo sin conocerla
+            com.darkcraft.mision.Misiones.olvidar(fp, "ylva");
+            fp.moveTo(fa.getX() + 0.5, fa.getY(), fa.getZ() + 2.5, 180f, 0f);
+            com.darkcraft.mision.Ylva.tomar(fp, f0);
+            BlockPos obj4 = com.darkcraft.mision.Ylva.objetivo(fp);
+            fp.moveTo(ys.getX() + 2.5, y.getY(), ys.getZ() + 1.5, 0f, 0f);
+            sb.append(String.format(java.util.Locale.ROOT, " | 3) sin conocerla: %s, ir a %s, empieza %d", com.darkcraft.mision.Misiones.resumenYlva(fp),
+                    obj4 == null ? "-" : obj4.toShortString(), com.darkcraft.mision.Ylva.inicio(fp)));
+            com.darkcraft.mision.Misiones.olvidar(fp, "ylva");
+        } catch (Throwable e) {
+            sb.append(" ERROR ").append(e);
+            DarkCraftMod.LOGGER.error("[CI] la luz del muelle", e);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
         }
         log.println(sb);
         log.flush();

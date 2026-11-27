@@ -81,7 +81,9 @@ TOMAS_CONDESTABLE = {n: "a" for n in range(1, 6)}
 TOMAS_RECTORA = {1: "a", 2: "b", 3: "a", 4: "a", 5: "a"}
 # Brann, el Ballenero (parte 7r; voz "Declan Graves", la del Verdugo, pero sin bajarla tanto): las tomas a, salvo la 1 (la
 # 1a acaba de hablar pegada al final del fichero: la b deja su cola)
-TOMAS_BALLENERO = {1: "b", 2: "a", 3: "a", 4: "a", 5: "a"}
+TOMAS_BALLENERO = {1: "b", 2: "a", 3: "a", 4: "a", 5: "a",
+                   # la luz del muelle (parte 7an): ve la luz de Ylva (6) y se va a casa (7)
+                   6: "a", 7: "a"}
 # Anselmo, el Pontifice Sangrante (parte 7t)
 TOMAS_PONTIFICE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 # Aldric, el Primer Marcado (parte 7v): las dos tomas de cada frase salieron casi iguales; las a
@@ -141,11 +143,16 @@ VOZ_OSWIN = ("highpass=f=70,equalizer=f=2600:t=q:w=1.2:g=1,aecho=0.8:0.22:38|92:
 TOMAS_HEDDA = {n: "a" for n in range(1, 15)}
 VOZ_HEDDA = ("highpass=f=85,equalizer=f=3000:t=q:w=1.2:g=1,aecho=0.8:0.2:44|101:0.06|0.03,"
              "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=150,loudnorm=I=-16:TP=-1.5:LRA=9")
+# Ylva, la hija del ballenero (parte 7an; voz "Sinead - Warm Northern Irish Storyteller", flow de la parte 7an): al final del
+# espigon del Puerto Varado, al aire libre, cerca, con un rebote corto en el pretil de piedra
+TOMAS_YLVA = {n: "a" for n in range(1, 14)}
+VOZ_YLVA = ("highpass=f=80,equalizer=f=3100:t=q:w=1.2:g=1,aecho=0.8:0.18:34|81:0.06|0.03,"
+            "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=150,loudnorm=I=-16:TP=-1.5:LRA=9")
 # los personajes con dialogo: id -> (tomas, filtro)
 PERSONAJES = {"guia": (TOMAS_GUIA, VOZ_GUIA), "herrero": (TOMAS_HERRERO, VOZ_HERRERO), "mercader": (TOMAS_MERCADER, VOZ_MERCADER),
               "hagen": (TOMAS_HAGEN, VOZ_HAGEN), "brenna": (TOMAS_BRENNA, VOZ_BRENNA), "ulrik": (TOMAS_ULRIK, VOZ_ULRIK),
               "tobin": (TOMAS_TOBIN, VOZ_TOBIN), "silas": (TOMAS_SILAS, VOZ_SILAS), "oswin": (TOMAS_OSWIN, VOZ_OSWIN),
-              "hedda": (TOMAS_HEDDA, VOZ_HEDDA)}
+              "hedda": (TOMAS_HEDDA, VOZ_HEDDA), "ylva": (TOMAS_YLVA, VOZ_YLVA)}
 
 # efectos: nombre -> (segundos como mucho, fundido final en s, volumen integrado LUFS)
 SFX = {
@@ -448,6 +455,9 @@ SFX = {
     "armadura_tela": (1.5, 0.3, -20),
     # los martillos y las flechas (parte 7aj): el golpe de martillo, la flecha de fuego que prende y la congelacion
     "martillo_golpe": (1.2, 0.3, -14), "flecha_fuego": (1.4, 0.4, -16), "congelacion": (1.4, 0.4, -15),
+    # la luz del muelle (parte 7an): el farol de fuego frio, Brann que ve la luz (el canto de la Vieja y el mar que vuelve) y el
+    # descanso de Ylva (el mar en calma y los dos faroles en su cadena)
+    "farol_frio": (3.0, 1.0, -16), "brann_calma": (12.0, 3.5, -16), "ylva_descansa": (8.0, 2.5, -19),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -791,6 +801,9 @@ TOMAS_SFX = {
     # los martillos y las flechas (parte 7aj): del martillo las dos con mas graves (la 3 con su cola); de la flecha de fuego
     # la 3 y la 1 (la 2 dura 5 s, la 4 casi no se oye); de la congelacion las dos mas fuertes
     "martillo_golpe": (2, 3), "flecha_fuego": (3, 1), "congelacion": (2, 4),
+    # la luz del muelle (parte 7an): del farol las dos claras con su chispazo y su zumbido (la 3 es casi todo graves); de Brann la 1
+    # (el canto de la Vieja enseguida y luego la calma) y la 3; del descanso de Ylva la 1 (la que mas se oye) y la 3
+    "farol_frio": (1, 4), "brann_calma": (1, 3), "ylva_descansa": (1, 3),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

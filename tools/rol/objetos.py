@@ -184,6 +184,10 @@ TALISMANES = {
     "madre": ("redondo", "plata", [".......", ".rR.Rr.", "rRPRPRr", "rPRPRPr", ".rPRPr.", "..rPr..", "...r..."]),
     # la Bufanda de Tam (parte 7ah): la bufanda roja anudada, con sus dos cabos, sobre bronce
     "bufanda": ("cuadrado", "bronce", [".......", "rRrRrRr", "PrRrRrP", "..rPr..", ".rP.Pr.", ".Rr.rR.", ".r...r."]),
+    # el Farol de Ylva (parte 7an): el farolillo con el fuego frio del faro (azul palido), sobre plata
+    "ylva": ("redondo", "plata", ["...k...", "..kkk..", ".kcCck.", ".kCSCk.", ".kcCck.", "..kkk..", "......."]),
+    # el Farol del ballenero (parte 7an): el viejo farol de aceite de Brann, con su llama ambar, sobre bronce con sal
+    "ballenero": ("escudo", "bronce", ["...k...", "..kkk..", ".kfFfk.", ".kFyFk.", ".kfFfk.", ".kkkkk.", "..s.s.."]),
 }
 
 

@@ -6697,6 +6697,8 @@ public final class ClientCiTest {
         // la campana del peregrino: Oswin, el peregrino ciego, y su mision (parte 7ag)
         t = oswin(t);
         t = hedda(t);
+        // la luz del muelle: Ylva, la hija del ballenero, y Brann que ve la luz (parte 7an)
+        t = ylva(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -13308,6 +13310,365 @@ public final class ClientCiTest {
         atTicks(t, "fin de la bufanda roja", m -> {
             m.setScreen(null);
             server(m, sp -> com.darkcraft.mision.Misiones.olvidar(sp, "hedda"));
+        });
+        return t + 10;
+    }
+
+    // ------------------------------------------------------------------ la luz del muelle (parte 7an)
+
+    private static void logYlva(Minecraft m, String que) {
+        StringBuilder cli = new StringBuilder();
+        for (var e : com.darkcraft.client.mision.ClientMisiones.LISTA)
+            if (e.id().equals("ylva"))
+                cli.append(e.marcas()).append(" (").append(com.darkcraft.client.mision.ClientMisiones.estado(e)).append(')')
+                        .append(e.hay() ? " ir a " + e.x() + "," + e.z() : "").append("; ");
+        StringBuilder ve = new StringBuilder();
+        if (m.level != null && m.player != null) {
+            for (var v : m.level.getEntitiesOfClass(com.darkcraft.personajes.Viajero.class, m.player.getBoundingBox().inflate(64)))
+                if (v.quien() == com.darkcraft.personajes.Viajero.Quien.YLVA)
+                    ve.append("ylva").append(com.darkcraft.personajes.Viajero.OCULTO.test(v) ? " oculta" : " se ve")
+                            .append(String.format(java.util.Locale.ROOT, " (%.2f)", com.darkcraft.client.mision.ClientMisiones.alfa(v, 0f)))
+                            .append(com.darkcraft.client.mision.ClientMisiones.ylvaSinFarol ? " sin su farol" : " con su farol").append(", ");
+            for (var f : m.level.getEntitiesOfClass(com.darkcraft.mision.FarolBrann.class, m.player.getBoundingBox().inflate(64)))
+                ve.append("farol de Brann ").append(f.variante()).append(f.visto() ? " se ve" : " no se ve").append(", ");
+        }
+        String dlg = m.screen instanceof com.darkcraft.client.ui.DialogoScreen d ? d.resumen() : m.screen == null ? "-" : m.screen.getClass().getSimpleName();
+        String rest = "a mano " + com.darkcraft.client.mision.ClientMisiones.farol + ", aviso " + com.darkcraft.client.ui.ClientRol.aMano() + ", cartel "
+                + com.darkcraft.client.ui.Carteles.resumen();
+        server(m, sp -> log("  ylva " + que + ": " + com.darkcraft.mision.Misiones.resumenYlva(sp) + " | cliente: " + cli + ve + " | " + dlg + " | " + rest));
+    }
+
+    /** Delante de Ylva (dos bloques al este y uno al sur, en el espigon), mirandola, de pie. */
+    private static void anteYlva(ServerPlayer sp) {
+        ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+        var y = mv == null ? null : com.darkcraft.mision.Ylva.buscarYlva(mv);
+        if (y == null) return;
+        Vec3 p = y.position();
+        irMirando(sp, p.x + 2.2, p.y, p.z + 0.9, p.x, p.y + 0.75, p.z, false);
+        com.darkcraft.rol.Rol.sinCombate(sp);
+    }
+
+    /**
+     * La luz del muelle (parte 7an): Ylva al final del espigon (de lejos, con el faro; de frente, su farol en el regazo), hablar con ella
+     * (su frase 1 y el menu), aquella noche (la 3), llevarle su luz (la 2, el cartel, su farol en la bolsa, la Historia y la brujula; ella
+     * ya sin el farol); Brann en el Costillar que ve la luz (a un cuarto de la vida, con la luz cerca: su frase 6, la 7 al caer, la
+     * Vieja, el logro); su farol en la arena y cogerlo con la E; volver con Ylva (la 8 y el segundo menu), darselo (la 9 y la 10; descansa y
+     * los dos faroles en el pretil); otra vez, quedartelo (la 11; despues, la 12) y el Farol del ballenero (los enemigos brillan).
+     */
+    private static int ylva(int T) {
+        final int CX = com.darkcraft.morvain.Costillar.CX, CZ = com.darkcraft.morvain.Costillar.CZ, PISO = com.darkcraft.morvain.Costillar.PISO;
+        final String SITIO = com.darkcraft.morvain.MorvainEnemigos.COSTILLAR;
+        int t = T;
+        atTicks(t, "Ylva: al Puerto Varado", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                if (mv == null) return;
+                sp.setGameMode(GameType.CREATIVE);
+                com.darkcraft.rol.Rol.sinCombate(sp);
+                com.darkcraft.mision.Misiones.olvidar(sp, "ylva");
+                com.darkcraft.mision.Ylva.olvidar(mv);
+                BlockPos y = com.darkcraft.mision.Ylva.sitio();
+                irMirando(sp, y.getX() - 8.5, y.getY() + 3, y.getZ() + 3.5, y.getX() + 0.5, y.getY() + 1, y.getZ() + 0.5, true);
+            });
+        });
+        t += 100;
+        atTicks(t, "Ylva: puesta", m -> server(m, sp -> {
+            comando(sp, "darkcraft ylva poner");
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            var y = mv == null ? null : com.darkcraft.mision.Ylva.buscarYlva(mv);
+            log("  ylva: " + (y == null ? "FALLO: no esta" : "en " + y.blockPosition().toShortString() + String.format(java.util.Locale.ROOT, " giro %.0f", y.getYRot()))
+                    + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp));
+            if (y != null) {
+                Vec3 p = y.position();
+                irMirando(sp, p.x - 9.5, p.y + 0.2, p.z + 2.6, p.x + 4, p.y + 2.0, p.z, true);
+            }
+        }));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "de lejos");
+            shot(m, "cliente_yl01_ylva_espigon");
+        });
+        t += 4;
+        atTicks(t, "Ylva: de frente (desde fuera del pretil)", m -> server(m, sp -> {
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            var y = mv == null ? null : com.darkcraft.mision.Ylva.buscarYlva(mv);
+            if (y == null) return;
+            Vec3 p = y.position(), d = Vec3.directionFromRotation(0, y.getYRot());
+            irMirando(sp, p.x + d.x * 2.6 + 0.4, p.y - 0.2, p.z + d.z * 2.6, p.x, p.y + 0.7, p.z, true);
+        }));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "de frente");
+            shot(m, "cliente_yl02_ylva_farol");
+        });
+        t += 4;
+        atTicks(t, "Ylva: delante", m -> server(m, ClientCiTest::anteYlva));
+        t += 24;
+        atTicks(t, "la E: hablar con Ylva", m -> pulsar(m.options.keyInventory));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "se presenta");
+            shot(m, "cliente_yl03_ylva_habla");
+        });
+        t += 4;
+        atTicks(t, "E: el menu de Ylva", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "menu");
+            shot(m, "cliente_yl04_ylva_menu");
+        });
+        t += 4;
+        atTicks(t, "que paso aquella noche", m -> dialogo(m, d -> d.pulsarRespuesta(1)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "aquella noche");
+            shot(m, "cliente_yl05_ylva_noche");
+        });
+        t += 4;
+        atTicks(t, "E: otra vez el menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 6;
+        atTicks(t, "le llevare tu luz", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "acepta");
+            shot(m, "cliente_yl06_ylva_acepta");
+        });
+        t += 4;
+        atTicks(t, "ESC: el cartel de la mision", m -> m.setScreen(null));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "nueva mision");
+            shot(m, "cliente_yl07_nueva_mision");
+            server(m, sp -> log("  ylva: su farol en la bolsa " + sp.getInventory().countItem(DarkCraftMod.FAROL_YLVA.get())));
+        });
+        t += 80;
+        atTicks(t, "la Historia: la mision", m -> {
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.HISTORIA);
+            menuP(m, mm -> mm.probarHistoria(300));
+        });
+        t += 16;
+        atTicks(t, "captura", m -> {
+            menuP(m, mm -> log("  ylva, la historia: " + mm.resumen()));
+            shot(m, "cliente_yl08_historia_mision");
+        });
+        t += 4;
+        atTicks(t, "Ylva sin su farol, la brujula al Costillar", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                var y = mv == null ? null : com.darkcraft.mision.Ylva.buscarYlva(mv);
+                if (y == null) return;
+                Vec3 p = y.position(), d = Vec3.directionFromRotation(0, y.getYRot());
+                irMirando(sp, p.x + d.x * 2.6 + 0.4, p.y - 0.2, p.z + d.z * 2.6, p.x, p.y + 0.7, p.z, true);
+            });
+        });
+        t += 20;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "sin su farol");
+            shot(m, "cliente_yl09_ylva_sin_farol");
+        });
+        t += 4;
+        atTicks(t, "la brujula: mirando al norte", m -> server(m, sp -> {
+            BlockPos c = com.darkcraft.mision.Ylva.farolArena();
+            irMirando(sp, sp.getX(), sp.getY(), sp.getZ(), c.getX() + 0.5, sp.getY() + 1.6, c.getZ() + 0.5, true);
+        }));
+        t += 12;
+        atTicks(t, "captura", m -> shot(m, "cliente_yl10_brujula_costillar"));
+        t += 4;
+        // ---- Brann ve la luz: en el Costillar, a un cuarto de la vida y con el farol de Ylva cerca
+        atTicks(t, "al Costillar: Brann de vigia", m -> server(m, sp -> {
+            comando(sp, "darkcraft ballenero volver");
+            com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+            irMirando(sp, CX - 7.5, PISO, CZ + 0.5, CX + 3.5, PISO + 2.2, CZ + 0.5, false);
+            com.darkcraft.rol.Rol.sinCombate(sp);
+        }));
+        t += 120;
+        atTicks(t, "Brann: a un cuarto de la vida, con la luz delante", m -> server(m, sp -> {
+            var e = balleneroE();
+            if (e == null) {
+                log("  ylva: FALLO: Brann no esta | " + com.darkcraft.morvain.MorvainEnemigos.estadoBallenero(sp.server));
+                return;
+            }
+            e.moveTo(CX + 3.5, PISO, CZ + 0.5, 90f, 0f);
+            e.setTarget(sp);
+            e.setHealth(e.getMaxHealth() * 0.25f);
+            log("  ylva, Brann antes de la luz: " + e.estado() + " | luz cerca " + (com.darkcraft.mision.Ylva.luzCerca(sp.serverLevel(), e) != null)
+                    + " | jugador " + fpos(sp));
+            verDesdeServidor = new Vec3(e.getX() - 6.0, e.getY() + 2.2, e.getZ() + 4.5);
+            miraServidor = new Vec3(e.getX(), e.getY() + 2.2, e.getZ());
+        }));
+        atTicks(t + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += 40;
+        atTicks(t, "captura: ve la luz", m -> {
+            server(m, sp -> {
+                var e = balleneroE();
+                log("  ylva, Brann ve la luz: " + (e == null ? "NO ESTA" : e.estado() + " | calmado " + e.calmado() + ", pelea " + e.enPelea()));
+            });
+            logYlva(m, "Brann ve la luz");
+            shot(m, "cliente_yl11_brann_ve_la_luz");
+        });
+        t += com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Ballenero.VOZ_BASE + 6);
+        atTicks(t, "captura: se va a casa", m -> {
+            server(m, sp -> {
+                var e = balleneroE();
+                log("  ylva, Brann se va: " + (e == null ? "ya no esta" : "vivo " + e.isAlive() + ", " + e.estado()));
+            });
+            shot(m, "cliente_yl12_brann_se_va");
+        });
+        t += 60;
+        atTicks(t, "captura: la Vieja sube", m -> shot(m, "cliente_yl13_brann_vieja"));
+        t += 100;
+        atTicks(t, "tras Brann", m -> {
+            enPrimeraPersona(m);
+            m.setCameraEntity(m.player);
+            logYlva(m, "tras caer Brann");
+            server(m, sp -> log("  ylva: logro brann_calma " + com.darkcraft.story.Logros.tiene(sp, "brann_calma") + ", ballenero "
+                    + com.darkcraft.story.Logros.tiene(sp, "ballenero") + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoBallenero(sp.server)));
+        });
+        t += 4;
+        // ---- su farol en la arena
+        atTicks(t, "el farol de Brann en la arena", m -> server(m, sp -> {
+            for (var x : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Vieja.class, com.darkcraft.enemigos.Ballenero.caja().inflate(10, 80, 10))) x.discard();
+            BlockPos f = com.darkcraft.mision.Ylva.farolArena();
+            irMirando(sp, f.getX() + 0.5, f.getY(), f.getZ() + 2.6, f.getX() + 0.5, f.getY() + 0.2, f.getZ() + 0.5, false);
+            com.darkcraft.rol.Rol.sinCombate(sp);
+        }));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "ante el farol");
+            shot(m, "cliente_yl14_farol_arena");
+        });
+        t += 2;
+        atTicks(t, "la E: coger el farol", m -> pulsar(m.options.keyInventory));
+        t += 24;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "farol cogido");
+            shot(m, "cliente_yl15_farol_cogido");
+        });
+        t += 4;
+        // ---- de vuelta con Ylva: darselo
+        atTicks(t, "de vuelta con Ylva", m -> server(m, sp -> comando(sp, "darkcraft ylva ir")));
+        t += 80;
+        atTicks(t, "delante de Ylva", m -> server(m, ClientCiTest::anteYlva));
+        t += 20;
+        atTicks(t, "la E: hablar con Ylva (con el farol de su padre)", m -> pulsar(m.options.keyInventory));
+        t += 34;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "con el farol (vio la luz)");
+            shot(m, "cliente_yl16_ylva_la_vio");
+        });
+        t += 4;
+        atTicks(t, "E: el segundo menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "darselo o quedartelo");
+            shot(m, "cliente_yl17_ylva_menu_farol");
+        });
+        t += 4;
+        atTicks(t, "darselo", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "se lo da");
+            shot(m, "cliente_yl18_ylva_dar");
+        });
+        t += 4;
+        atTicks(t, "E: la 10", m -> dialogo(m, d -> d.pulsarSeguir()));
+        t += 40;
+        atTicks(t, "ESC: descansa", m -> m.setScreen(null));
+        t += 24;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "descansa");
+            shot(m, "cliente_yl19_ylva_descansa");
+        });
+        t += 60;
+        atTicks(t, "los dos faroles en el pretil", m -> server(m, sp -> {
+            BlockPos f = com.darkcraft.mision.Ylva.farolMuelle();
+            irMirando(sp, f.getX() - 1.5, f.getY() - 1, f.getZ() + 2.8, f.getX() + 1.0, f.getY() + 0.4, f.getZ() + 0.5, false);
+        }));
+        t += 24;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "ya no esta");
+            shot(m, "cliente_yl20_dos_faroles");
+            server(m, sp -> log("  ylva: el Fuego frio " + sp.getInventory().countItem(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.YLVA).get())
+                    + ", sus faroles " + sp.getInventory().countItem(DarkCraftMod.FAROL_YLVA.get()) + "/" + sp.getInventory().countItem(DarkCraftMod.FAROL_BALLENERO.get())
+                    + ", logro " + com.darkcraft.story.Logros.tiene(sp, "ylva_luz")));
+        });
+        t += 4;
+        // ---- otra vez: quedartelo
+        atTicks(t, "otra vez, con el farol de Brann: quedartelo", m -> server(m, sp -> {
+            com.darkcraft.mision.Misiones.olvidar(sp, "ylva");
+            com.darkcraft.rol.Ficha.mision(sp, "ylva", com.darkcraft.mision.Ylva.CONOCIDA | com.darkcraft.mision.Ylva.ACEPTADA | com.darkcraft.mision.Ylva.TOMADA);
+            com.darkcraft.rol.Equipo.dar(sp, new net.minecraft.world.item.ItemStack(DarkCraftMod.FAROL_YLVA.get()));
+            com.darkcraft.rol.Equipo.dar(sp, new net.minecraft.world.item.ItemStack(DarkCraftMod.FAROL_BALLENERO.get()));
+            com.darkcraft.mision.Misiones.enviar(sp);
+            anteYlva(sp);
+        }));
+        t += 30;
+        atTicks(t, "la E", m -> pulsar(m.options.keyInventory));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "con el farol (cayo peleando)");
+            shot(m, "cliente_yl21_ylva_su_farol");
+        });
+        t += 4;
+        atTicks(t, "E: el segundo menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "quedartelo", m -> dialogo(m, d -> d.pulsarRespuesta(1)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "se lo queda");
+            shot(m, "cliente_yl22_ylva_quedar");
+        });
+        t += 4;
+        atTicks(t, "ESC y otra vez la E", m -> m.setScreen(null));
+        t += 40;
+        atTicks(t, "la E", m -> pulsar(m.options.keyInventory));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logYlva(m, "sigue esperando");
+            shot(m, "cliente_yl23_ylva_sigue_esperando");
+            server(m, sp -> log("  ylva: el Farol del ballenero " + sp.getInventory().countItem(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.BALLENERO).get())
+                    + ", logro " + com.darkcraft.story.Logros.tiene(sp, "ylva_farol")));
+        });
+        t += 4;
+        // ---- el Farol del ballenero: los enemigos de alrededor brillan (el bichero de la puerta del faro, a traves de lo que haya)
+        atTicks(t, "con el Farol del ballenero puesto", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                com.darkcraft.rol.Talismanes.ponerDirecto(sp, 0, new net.minecraft.world.item.ItemStack(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.BALLENERO).get()));
+                com.darkcraft.enemigos.Puestos.todos(sp.server, com.darkcraft.morvain.MorvainEnemigos.PUERTO, false);
+                BlockPos y = com.darkcraft.mision.Ylva.sitio();
+                irMirando(sp, y.getX() - 10.5, y.getY() + 1.5, y.getZ() + 6.5, y.getX() + 8.5, y.getY() + 1.0, y.getZ() + 0.5, true);
+            });
+        });
+        t += 60;
+        atTicks(t, "captura", m -> {
+            int brillan = 0, cerca = 0;
+            if (m.level != null && m.player != null)
+                for (var e : m.level.getEntitiesOfClass(com.darkcraft.enemigos.Enemigo.class, m.player.getBoundingBox().inflate(30))) {
+                    if (e.distanceTo(m.player) < com.darkcraft.client.mision.ClientMisiones.VIGIA_R) cerca++;
+                    if (e.isCurrentlyGlowing()) brillan++;
+                }
+            log("  ylva, el Farol del ballenero: lo lleva " + com.darkcraft.client.ui.ClientRol.lleva(com.darkcraft.rol.Talisman.Clase.BALLENERO)
+                    + ", enemigos a menos de 24: " + cerca + ", brillan " + brillan);
+            shot(m, "cliente_yl24_farol_ballenero_brillan");
+        });
+        t += 4;
+        atTicks(t, "fin de la luz del muelle", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                com.darkcraft.rol.Talismanes.ponerDirecto(sp, 0, net.minecraft.world.item.ItemStack.EMPTY);
+                com.darkcraft.mision.Misiones.olvidar(sp, "ylva");
+                comando(sp, "darkcraft ballenero volver");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                com.darkcraft.enemigos.Puestos.todos(sp.server, com.darkcraft.morvain.MorvainEnemigos.PUERTO, false);
+            });
         });
         return t + 10;
     }

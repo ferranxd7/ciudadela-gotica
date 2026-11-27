@@ -40,13 +40,20 @@ import net.minecraft.world.entity.LivingEntity;
  * los zapatos que asoman, su taburete y el ovillo en el suelo; teje sin parar (las agujas y la labor roja en las manos), la cabeza
  * inclinada sobre la labor. La variante 1 (la que ve quien le dijo la verdad) esta de rodillas junto a su hijo, con la mano
  * tendida hacia el.</li>
+ * <li><b>Ylva</b> ({@link ModeloYlva}, {@code ylva.py}; parte 7an): el de brazos finos con la esclavina de hule mostaza sobre el jersey de
+ * pescador, la trenza cobriza, los muslos y las espinillas con sus botas de goma (sentada), el noray de hierro en que se sienta y, en el
+ * regazo, su farol de fuego frio (lo que luce va en otra capa con luz propia, {@link BrilloYlva}); mientras te lo ha prestado, las
+ * manos en las rodillas.</li>
  * </ul>
  * A quien ya no le toca ver a uno no se le dibuja ({@link Viajero#OCULTO}); Hedda se apaga poco a poco cuando acaba su mision con la
  * verdad o la mentira ({@code ClientMisiones.alfa}).
  */
 public class ViajeroRenderer extends LivingEntityRenderer<Viajero, ViajeroRenderer.Base<Viajero>> {
     public static final ModelLayerLocation CAPA = new ModelLayerLocation(new ResourceLocation(DarkCraftMod.MODID, "viajero"), "main"),
-            CAPA_HEDDA = new ModelLayerLocation(new ResourceLocation(DarkCraftMod.MODID, "viajero_hedda"), "main");
+            CAPA_HEDDA = new ModelLayerLocation(new ResourceLocation(DarkCraftMod.MODID, "viajero_hedda"), "main"),
+            CAPA_YLVA = new ModelLayerLocation(new ResourceLocation(DarkCraftMod.MODID, "viajero_ylva"), "main");
+    /** Lo que luce de Ylva: el cristal de su farol. */
+    public static final ResourceLocation BRILLO_YLVA = new ResourceLocation(DarkCraftMod.MODID, "textures/entity/ylva_brillo.png");
     private static final ResourceLocation[] PIELES = new ResourceLocation[Viajero.Quien.values().length];
 
     static {
@@ -61,7 +68,9 @@ public class ViajeroRenderer extends LivingEntityRenderer<Viajero, ViajeroRender
         modelos = new Base[Viajero.Quien.values().length];
         modelos[Viajero.Quien.OSWIN.ordinal()] = model;
         modelos[Viajero.Quien.HEDDA.ordinal()] = new ModeloHedda(ctx.bakeLayer(CAPA_HEDDA));
+        modelos[Viajero.Quien.YLVA.ordinal()] = new ModeloYlva(ctx.bakeLayer(CAPA_YLVA));
         addLayer(new Campanilla(this, new CampanaRenderer.Modelo(ctx.bakeLayer(CampanaRenderer.CAPA))));
+        addLayer(new BrilloYlva(this));
     }
 
     /** Oswin: el de brazos anchos con el sombrero, la esclavina, el zurron y el bordon. */
@@ -104,6 +113,30 @@ public class ViajeroRenderer extends LivingEntityRenderer<Viajero, ViajeroRender
         bd.addOrReplaceChild("labor", CubeListBuilder.create().texOffs(64, 38).addBox(-0.5f, 10f, -3.5f, 4, 5, 1), PartPose.ZERO);
         PartDefinition bi = raiz.getChild("left_arm");
         bi.addOrReplaceChild("aguja_i", CubeListBuilder.create().texOffs(114, 26).addBox(-0.5f, 9.2f, -5.5f, 1, 1, 6), PartPose.ZERO);
+        return LayerDefinition.create(m, 128, 64);
+    }
+
+    /**
+     * Ylva (parte 7an): el de brazos finos con la esclavina (en el cuerpo, algo mas grande) y la trenza (en la cabeza, a la espalda);
+     * sentada en el noray: los muslos hacia delante (con la textura de las piernas: su mitad de arriba), las espinillas de la rodilla al
+     * suelo con las botas, la tapa y el poste del noray debajo, y el farol en el regazo con su asa. Medidas de {@code ylva.py}.
+     */
+    public static LayerDefinition crearYlva() {
+        MeshDefinition m = PlayerModel.createMesh(CubeDeformation.NONE, true);
+        PartDefinition raiz = m.getRoot();
+        raiz.getChild("body").addOrReplaceChild("capa", CubeListBuilder.create().texOffs(64, 0).addBox(-4.5f, -0.3f, -2.5f, 9, 6, 5,
+                new CubeDeformation(0.3f)), PartPose.ZERO);
+        raiz.getChild("head").addOrReplaceChild("trenza", CubeListBuilder.create().texOffs(96, 0).addBox(-1f, -5f, 4.1f, 2, 8, 2), PartPose.ZERO);
+        raiz.addOrReplaceChild("muslo_d", CubeListBuilder.create().texOffs(0, 16).addBox(-2f, 0f, -2f, 4, 6, 4),
+                PartPose.offsetAndRotation(-1.9f, 12f, 0f, -Mth.HALF_PI, 0f, 0f));
+        raiz.addOrReplaceChild("muslo_i", CubeListBuilder.create().texOffs(16, 48).addBox(-2f, 0f, -2f, 4, 6, 4),
+                PartPose.offsetAndRotation(1.9f, 12f, 0f, -Mth.HALF_PI, 0f, 0f));
+        raiz.addOrReplaceChild("espinilla_d", CubeListBuilder.create().texOffs(64, 12).addBox(-3.9f, 14f, -7f, 4, 7, 4), PartPose.ZERO);
+        raiz.addOrReplaceChild("espinilla_i", CubeListBuilder.create().texOffs(64, 12).mirror().addBox(-0.1f, 14f, -7f, 4, 7, 4), PartPose.ZERO);
+        raiz.addOrReplaceChild("tapa", CubeListBuilder.create().texOffs(64, 24).addBox(-3.5f, 14f, -4.5f, 7, 2, 7), PartPose.ZERO);
+        raiz.addOrReplaceChild("poste", CubeListBuilder.create().texOffs(92, 24).addBox(-2.5f, 16f, -2.5f, 5, 6, 5), PartPose.ZERO);
+        raiz.addOrReplaceChild("farol", CubeListBuilder.create().texOffs(64, 36).addBox(-2f, 5f, -9.5f, 4, 5, 4), PartPose.ZERO);
+        raiz.addOrReplaceChild("asa", CubeListBuilder.create().texOffs(80, 36).addBox(-0.5f, 4f, -8f, 1, 1, 1), PartPose.ZERO);
         return LayerDefinition.create(m, 128, 64);
     }
 
@@ -273,6 +306,77 @@ public class ViajeroRenderer extends LivingEntityRenderer<Viajero, ViajeroRender
         }
     }
 
+    /**
+     * Ylva (parte 7an). Sentada en su noray mirando lejos, al norte (algo menos si mira a alguien), las dos manos en el farol de su
+     * regazo; mientras te lo ha prestado, las manos en las rodillas. Las piernas del modelo de jugador no se dibujan: van los muslos y las
+     * espinillas.
+     */
+    public static class ModeloYlva extends Base<Viajero> {
+        private final ModelPart musloD, musloI, espinillaD, espinillaI, tapa, poste;
+        final ModelPart farol, asa;
+
+        public ModeloYlva(ModelPart raiz) {
+            super(raiz, true);
+            musloD = raiz.getChild("muslo_d");
+            musloI = raiz.getChild("muslo_i");
+            espinillaD = raiz.getChild("espinilla_d");
+            espinillaI = raiz.getChild("espinilla_i");
+            tapa = raiz.getChild("tapa");
+            poste = raiz.getChild("poste");
+            farol = raiz.getChild("farol");
+            asa = raiz.getChild("asa");
+        }
+
+        @Override
+        public float bajar(Viajero v) {
+            // la tapa del noray a la altura de la cadera: el poste entra un pixel en el suelo
+            return 0.1875f;
+        }
+
+        @Override
+        public void setupAnim(Viajero v, float paso, float rapidez, float edad, float cabezaY, float cabezaX) {
+            riding = false;
+            super.setupAnim(v, 0f, 0f, edad, cabezaY, cabezaX);
+            float respira = Mth.sin(edad * 0.06f) * 0.02f;
+            boolean conFarol = !ClientMisiones.ylvaSinFarol;
+            if (conFarol) {
+                // las manos en el farol del regazo
+                rightArm.xRot = -0.92f + respira;
+                rightArm.yRot = -0.32f;
+                leftArm.xRot = -0.92f + respira;
+                leftArm.yRot = 0.32f;
+            } else {
+                // te lo ha prestado: las manos en las rodillas, esperando
+                rightArm.xRot = -0.62f + respira;
+                rightArm.yRot = -0.12f;
+                leftArm.xRot = -0.62f + respira;
+                leftArm.yRot = 0.12f;
+            }
+            rightArm.zRot = leftArm.zRot = 0f;
+            head.xRot = head.xRot * 0.6f - 0.04f;
+            body.xRot = 0.05f;
+            farol.visible = asa.visible = conFarol;
+            capas();
+            rightLeg.visible = leftLeg.visible = rightPants.visible = leftPants.visible = false;
+        }
+
+        @Override
+        public void renderToBuffer(PoseStack ps, VertexConsumer vc, int luz, int capa, float r, float g, float b, float a) {
+            super.renderToBuffer(ps, vc, luz, capa, r, g, b, a * alfa);
+            float al = a * alfa;
+            musloD.render(ps, vc, luz, capa, r, g, b, al);
+            musloI.render(ps, vc, luz, capa, r, g, b, al);
+            espinillaD.render(ps, vc, luz, capa, r, g, b, al);
+            espinillaI.render(ps, vc, luz, capa, r, g, b, al);
+            tapa.render(ps, vc, luz, capa, r, g, b, al);
+            poste.render(ps, vc, luz, capa, r, g, b, al);
+            if (farol.visible) {
+                farol.render(ps, vc, luz, capa, r, g, b, al);
+                asa.render(ps, vc, luz, capa, r, g, b, al);
+            }
+        }
+    }
+
     @Override
     public void render(Viajero v, float giro, float pt, PoseStack ps, MultiBufferSource buf, int luz) {
         if (Viajero.OCULTO.test(v)) return;
@@ -285,6 +389,26 @@ public class ViajeroRenderer extends LivingEntityRenderer<Viajero, ViajeroRender
         if (baja != 0f) ps.translate(0, -baja, 0);
         super.render(v, giro, pt, ps, buf, luz);
         ps.popPose();
+    }
+
+    /**
+     * Lo que luce de Ylva (parte 7an): el modelo otra vez con la textura del brillo (solo el cristal del farol tiene algo) y luz propia;
+     * la llama tiembla un poco y se apaga con ella.
+     */
+    static final class BrilloYlva extends RenderLayer<Viajero, Base<Viajero>> {
+        private static final RenderType TIPO = RenderType.eyes(BRILLO_YLVA);
+
+        BrilloYlva(RenderLayerParent<Viajero, Base<Viajero>> padre) {
+            super(padre);
+        }
+
+        @Override
+        public void render(PoseStack ps, MultiBufferSource buf, int luz, Viajero v, float paso, float rapidez, float pt, float edad, float cabezaY,
+                           float cabezaX) {
+            if (v.quien() != Viajero.Quien.YLVA || !(getParentModel() instanceof ModeloYlva m) || !m.farol.visible) return;
+            float k = (0.82f + 0.18f * Mth.sin(edad * 0.23f) * Mth.sin(edad * 0.11f + 1.3f)) * m.alfa;
+            m.renderToBuffer(ps, buf.getBuffer(TIPO), 0xF000F0, OverlayTexture.NO_OVERLAY, k, k, k, 1f);
+        }
     }
 
     /** La campana en la mano derecha de Oswin mientras la toca (colgando: se le quita el giro del brazo). */

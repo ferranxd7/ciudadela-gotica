@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:morvain",
+  "display": {
+    "icon": {
+      "item": "darkcraft:talisman_ballenero"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.ylva_farol.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.ylva_farol.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 150
+  }
+}

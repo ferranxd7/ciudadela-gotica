@@ -289,6 +289,7 @@ public final class ClientEquipo {
             if (it == DarkCraftMod.LLAVE_HUESO.get() || it == DarkCraftMod.LLAVE_ARBOL.get() || it == DarkCraftMod.AMULETO_HUESO.get()
                     || it == DarkCraftMod.LIBRO_ACERTIJO.get() || it == DarkCraftMod.MAPA.get() || it == DarkCraftMod.SILBATO_CORCEL.get()
                     || it == DarkCraftMod.CAMPANA_PEREGRINO.get() || it == DarkCraftMod.BUFANDA_ROJA.get()
+                    || it == DarkCraftMod.FAROL_YLVA.get() || it == DarkCraftMod.FAROL_BALLENERO.get()
                     || it instanceof WrittenBookItem
                     || it instanceof MapItem || it == Items.WRITABLE_BOOK)
                 return CLAVE;

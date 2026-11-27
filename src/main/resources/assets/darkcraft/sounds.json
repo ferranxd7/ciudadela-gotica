@@ -4718,6 +4718,24 @@
       }
     ]
   },
+  "ballenero.voz.6": {
+    "subtitle": "subtitles.darkcraft.ballenero.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:ballenero/voz_6",
+        "stream": false
+      }
+    ]
+  },
+  "ballenero.voz.7": {
+    "subtitle": "subtitles.darkcraft.ballenero.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:ballenero/voz_7",
+        "stream": false
+      }
+    ]
+  },
   "musica.ballenero": {
     "sounds": [
       {
@@ -8051,6 +8069,164 @@
       },
       {
         "name": "darkcraft:sfx/congelacion_2"
+      }
+    ]
+  },
+  "voz.ylva.1": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ylva/voz_1",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ylva.2": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ylva/voz_2",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ylva.3": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ylva/voz_3",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ylva.4": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ylva/voz_4",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ylva.5": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ylva/voz_5",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ylva.6": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ylva/voz_6",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ylva.7": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ylva/voz_7",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ylva.8": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ylva/voz_8",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ylva.9": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ylva/voz_9",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ylva.10": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ylva/voz_10",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ylva.11": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ylva/voz_11",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ylva.12": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ylva/voz_12",
+        "stream": true
+      }
+    ]
+  },
+  "voz.ylva.13": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:ylva/voz_13",
+        "stream": true
+      }
+    ]
+  },
+  "sfx.farol_frio": {
+    "subtitle": "subtitles.darkcraft.sfx.farol_frio",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/farol_frio_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "darkcraft:sfx/farol_frio_2",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "sfx.brann_calma": {
+    "subtitle": "subtitles.darkcraft.sfx.brann_calma",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/brann_calma_1",
+        "attenuation_distance": 20,
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/brann_calma_2",
+        "attenuation_distance": 20,
+        "stream": true
+      }
+    ]
+  },
+  "sfx.ylva_descansa": {
+    "subtitle": "subtitles.darkcraft.sfx.ylva_descansa",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/ylva_descansa_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/ylva_descansa_2",
+        "attenuation_distance": 24
       }
     ]
   }

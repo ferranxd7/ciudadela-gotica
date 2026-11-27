@@ -18,7 +18,8 @@ import net.minecraft.world.level.Level;
  * Encrucijada de los Peregrinos, de pie apoyado en su bordon (cuando le devuelven su campana, la alza y la toca: {@link #tocar}), y
  * <b>Hedda</b> (parte 7ah), la madre que teje en el camino de la Puerta Oeste de la Capital, sentada en su taburete; la misma Hedda
  * de rodillas junto a los huesos de su hijo, en la sala de la guardia, es la {@link #variante} 1 (la que solo ve quien le dijo la
- * verdad). <b>Cada jugador lleva su mision</b>: a quien ya no le toca ver a uno, su cliente no lo dibuja ni lo deja mirar
+ * verdad). <b>Ylva</b> (parte 7an), la hija del ballenero, sentada en un noray al final del espigon del Puerto Varado con su farol de
+ * fuego frio en el regazo. <b>Cada jugador lleva su mision</b>: a quien ya no le toca ver a uno, su cliente no lo dibuja ni lo deja mirar
  * ({@link #OCULTO}, lo pone el cliente) y el servidor no le deja hablar con el ({@code Misiones.visible}).
  */
 public class Viajero extends PersonajeBase {
@@ -29,7 +30,7 @@ public class Viajero extends PersonajeBase {
 
     /** Quien es: el id de su dialogo (y de sus voces, sus textos, su piel y su retrato). */
     public enum Quien {
-        OSWIN("oswin"), HEDDA("hedda");
+        OSWIN("oswin"), HEDDA("hedda"), YLVA("ylva");
 
         public final String id;
 

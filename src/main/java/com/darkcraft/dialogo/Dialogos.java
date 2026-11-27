@@ -236,6 +236,21 @@ public final class Dialogos {
             .hecho();
 
     /**
+     * Ylva, la hija del ballenero (parte 7an, la mision de la luz del muelle; {@code mision.Ylva}). La primera vez se presenta (1); si se
+     * le dejo con la palabra en la boca, 6. Su menu: llevarle su luz (2, la mision empieza y te da su farol), aquella noche (3, y otra vez
+     * el menu) o no (4). Con la mision en marcha y sin el farol de Brann, 5. Con el: 7 (cayo peleando), 8 (vio la luz) o 13 (si no la
+     * conocia) y el segundo menu (101), que acaba la mision: darselo (9 y 10) o quedartelo (11). Despues de quedartelo, 12.
+     */
+    public static final Personaje YLVA = new Hacer("ylva")
+            .frase(1, MENU).frase(6, MENU).frase(3, MENU)
+            .frase(2, FIN).frase(4, FIN).frase(5, FIN)
+            .frase(7, MENU + 1).frase(8, MENU + 1).frase(13, MENU + 1)
+            .frase(9, 10).frase(10, FIN).frase(11, FIN).frase(12, FIN)
+            .menu(r("ylva", "buscar", 2, Accion.ACEPTAR), r("ylva", "noche", 3, Accion.PRECIO), r("ylva", "no", 4, Accion.RECHAZAR))
+            .menu(MENU + 1, r("ylva", "dar", 9, Accion.DEVOLVER), r("ylva", "quedar", 11, Accion.QUEDAR))
+            .hecho();
+
+    /**
      * La Sombra sin Nombre, rendida (parte 7ac): se habla con su corazon, que flota delante de ella. Quien no la oyo ofrecerlo empieza
      * por su frase 30 ("Espera... espera, marcado. Toma mi corazon..."); quien la oyo, por las respuestas: golpearlo, tomarlo o callar.
      */
