@@ -1193,6 +1193,16 @@ public class DarkCraftMod {
             FLECHAS.put(c, ITEMS.register("flecha_" + c.id, () -> new com.darkcraft.armas.FlechaItem(c, new Item.Properties())));
     }
 
+    /** Los escudos (parte 7ak): la rodela (pequena), el escudo de caballero (mediano) y el paves (grande); no se rompen. */
+    public static final java.util.EnumMap<com.darkcraft.armas.Escudo.Tamano, RegistryObject<Item>> ESCUDOS =
+            new java.util.EnumMap<>(com.darkcraft.armas.Escudo.Tamano.class);
+
+    static {
+        for (com.darkcraft.armas.Escudo.Tamano t : com.darkcraft.armas.Escudo.Tamano.values())
+            ESCUDOS.put(t, ITEMS.register(t.id, () -> new com.darkcraft.armas.Escudo(t, new Item.Properties().stacksTo(1)
+                    .rarity(t == com.darkcraft.armas.Escudo.Tamano.GRANDE ? Rarity.UNCOMMON : Rarity.COMMON))));
+    }
+
     public static final RegistryObject<EntityType<com.darkcraft.armas.FlechaEspecial>> FLECHA_ESPECIAL = ENTITIES.register("flecha_especial",
             () -> EntityType.Builder.<com.darkcraft.armas.FlechaEspecial>of(com.darkcraft.armas.FlechaEspecial::new, MobCategory.MISC)
                     .sized(0.5f, 0.5f).clientTrackingRange(4).updateInterval(20).build(MODID + ":flecha_especial"));
@@ -1358,6 +1368,7 @@ public class DarkCraftMod {
             e.accept(MARTILLO_GUERRA);
             e.accept(GRAN_MARTILLO);
             for (RegistryObject<Item> f : FLECHAS.values()) e.accept(f);
+            for (RegistryObject<Item> f : ESCUDOS.values()) e.accept(f);
             for (RegistryObject<Item> t : TALISMANES.values()) e.accept(t);
             e.accept(DAGA);
             e.accept(BASTON);

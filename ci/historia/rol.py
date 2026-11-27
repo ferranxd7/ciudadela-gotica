@@ -4441,6 +4441,30 @@ EN.update({
     "darkcraft.ayuda.armas": "Weapons: the hammers, the special arrows with bow and crossbow, add bleed or frost to what is in front of you",
 })
 
+# ---- parte 7ak: los escudos pequeno, mediano y grande
+ES.update({
+    "item.darkcraft.rodela": "Rodela de Hierro",
+    "item.darkcraft.rodela.desc": "Un escudo redondo y pequeño de nogal con aro y cuenco de hierro. No lo para todo, pero se alza en un parpadeo.",
+    "item.darkcraft.escudo_caballero": "Escudo de Caballero",
+    "item.darkcraft.escudo_caballero.desc": "El escudo de punta de los caballeros de Valdrenn, con la corona de oro sobre el rojo. Lo detiene todo.",
+    "item.darkcraft.paves": "Pavés de la Guardia",
+    "item.darkcraft.paves.desc": "Un muro de madera granate con bandas de hierro negro, del alto de un hombre. Los arqueros de la guardia se escondían detrás.",
+    "darkcraft.escudo.para": "Para el %s%% · Cubrirse cuesta el %s%% · Peso %s",
+    "darkcraft.escudo.parada": "En el instante de alzarla para el golpe entero y deja aturdido a quien lo dio. Cubierto, se anda más rápido.",
+    "darkcraft.escudo.paves": "Cubrirse con él apenas cansa, pero pesa como una puerta.",
+})
+EN.update({
+    "item.darkcraft.rodela": "Iron Buckler",
+    "item.darkcraft.rodela.desc": "A small round walnut shield with an iron rim and boss. It does not stop everything, but it rises in the blink of an eye.",
+    "item.darkcraft.escudo_caballero": "Knight's Shield",
+    "item.darkcraft.escudo_caballero.desc": "The heater shield of the knights of Valdrenn, the golden crown upon red. It stops everything.",
+    "item.darkcraft.paves": "Guard's Pavise",
+    "item.darkcraft.paves.desc": "A wall of crimson wood with black iron bands, as tall as a man. The archers of the guard hid behind it.",
+    "darkcraft.escudo.para": "Blocks %s%% · Guard cost %s%% · Weight %s",
+    "darkcraft.escudo.parada": "Raised at the right instant it stops the whole blow and staggers the attacker. You move faster while guarding.",
+    "darkcraft.escudo.paves": "Guarding with it barely tires you, but it weighs like a door.",
+})
+
 
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""

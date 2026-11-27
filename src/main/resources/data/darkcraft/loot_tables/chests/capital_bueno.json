@@ -215,6 +215,11 @@
      "type": "minecraft:item",
      "name": "darkcraft:gran_martillo",
      "weight": 1
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:paves",
+     "weight": 1
     }
    ]
   }

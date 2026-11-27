@@ -73,7 +73,10 @@ public final class Tienda {
             new Oferta("darkcraft:martillo_guerra", 1, 1500, 1),
             new Oferta("minecraft:crossbow", 1, 1100, 1),
             new Oferta("darkcraft:flecha_fuego", 5, 150, 0),
-            new Oferta("darkcraft:flecha_escarcha", 5, 180, 0));
+            new Oferta("darkcraft:flecha_escarcha", 5, 180, 0),
+            // la rodela y el escudo de caballero (parte 7ak)
+            new Oferta("darkcraft:rodela", 1, 800, 1),
+            new Oferta("darkcraft:escudo_caballero", 1, 1200, 1));
 
     /**
      * La mercancia de Silas (parte 7af), el mercader ambulante de Morvain: lo de alli, mas caro (piedras II sin limite y III,
@@ -101,7 +104,9 @@ public final class Tienda {
             new Oferta("darkcraft:gran_martillo", 1, 4200, 1),
             new Oferta("darkcraft:flecha_sangre", 5, 240, 0),
             new Oferta("darkcraft:flecha_fuego", 5, 170, 0),
-            new Oferta("darkcraft:flecha_escarcha", 5, 200, 0));
+            new Oferta("darkcraft:flecha_escarcha", 5, 200, 0),
+            // el paves de la guardia (parte 7ak)
+            new Oferta("darkcraft:paves", 1, 3000, 1));
 
     /** Lo que vende el mercader {@code id} ("mercader" Kerrick, "silas" Silas). */
     public static List<Oferta> de(String id) {

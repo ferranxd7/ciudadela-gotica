@@ -108,6 +108,11 @@ public enum Clase {
         return new ItemStack[]{ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY};
     }
 
+    /** Los escudos de las clases (parte 7ak): el caballero y el confesor el de caballero, el barbaro la rodela. */
+    private static ItemStack escudo(com.darkcraft.armas.Escudo.Tamano t) {
+        return new ItemStack(DarkCraftMod.ESCUDOS.get(t).get());
+    }
+
     private static ItemStack hechizo(Hechizo h) {
         return new ItemStack(DarkCraftMod.HECHIZOS.get(h).get());
     }
@@ -115,11 +120,11 @@ public enum Clase {
     public Kit kit() {
         ItemStack vacio = ItemStack.EMPTY;
         return switch (this) {
-            case CABALLERO -> new Kit(new ItemStack[]{st(Items.IRON_SWORD), vacio, vacio}, st(Items.SHIELD),
+            case CABALLERO -> new Kit(new ItemStack[]{st(Items.IRON_SWORD), vacio, vacio}, escudo(com.darkcraft.armas.Escudo.Tamano.MEDIANO),
                     conjunto(com.darkcraft.armadura.Conjunto.CABALLERO), List.of(), List.of());
             case VAGABUNDO -> new Kit(new ItemStack[]{st(Items.IRON_SWORD), st(Items.BOW), vacio}, vacio,
                     conjunto(com.darkcraft.armadura.Conjunto.VAGABUNDO), List.of(st(Items.ARROW, 32)), List.of());
-            case BARBARO -> new Kit(new ItemStack[]{st(Items.IRON_AXE), vacio, vacio}, st(Items.SHIELD),
+            case BARBARO -> new Kit(new ItemStack[]{st(Items.IRON_AXE), vacio, vacio}, escudo(com.darkcraft.armas.Escudo.Tamano.PEQUENO),
                     conjunto(com.darkcraft.armadura.Conjunto.BARBARO), List.of(), List.of());
             case GUERRERO -> new Kit(new ItemStack[]{st(Items.IRON_SWORD), vacio, vacio}, st(Items.IRON_SWORD),
                     conjunto(com.darkcraft.armadura.Conjunto.GUERRERO), List.of(), List.of());
@@ -133,7 +138,7 @@ public enum Clase {
                     conjunto(com.darkcraft.armadura.Conjunto.PROFETA),
                     List.of(hechizo(Hechizo.CURAR), hechizo(Hechizo.LLAMA), hechizo(Hechizo.BENDICION)),
                     List.of(Hechizo.CURAR, Hechizo.LLAMA, Hechizo.BENDICION));
-            case CONFESOR -> new Kit(new ItemStack[]{st(Items.IRON_SWORD), st(DarkCraftMod.SELLO_SAGRADO.get()), vacio}, st(Items.SHIELD),
+            case CONFESOR -> new Kit(new ItemStack[]{st(Items.IRON_SWORD), st(DarkCraftMod.SELLO_SAGRADO.get()), vacio}, escudo(com.darkcraft.armas.Escudo.Tamano.MEDIANO),
                     conjunto(com.darkcraft.armadura.Conjunto.CONFESOR),
                     List.of(hechizo(Hechizo.CURAR), hechizo(Hechizo.BENDICION)), List.of(Hechizo.CURAR, Hechizo.BENDICION));
             case PRISIONERO -> new Kit(new ItemStack[]{st(Items.IRON_SWORD), st(DarkCraftMod.BASTON.get()), vacio}, vacio,

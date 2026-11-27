@@ -68,7 +68,8 @@ public final class Peso {
             return Math.round(base * pieza * 10f) / 10f;
         }
         if (st.getItem() instanceof ElytraItem) return 2f;
-        if (st.getItem() instanceof ShieldItem) return 4f;
+        // los escudos de la parte 7ak, lo suyo (la rodela 2, el de caballero 4,5, el paves 9)
+        if (st.getItem() instanceof ShieldItem) return com.darkcraft.armas.Escudo.peso(st);
         if (st.getItem() instanceof CrossbowItem) return 4.5f;
         if (st.getItem() instanceof BowItem) return 3f;
         Armas.Tipo t = Armas.de(st);
