@@ -251,6 +251,22 @@ public final class Dialogos {
             .hecho();
 
     /**
+     * Corwen, el farolero de los Pilotes (parte 7ao, la mision de las balizas de la niebla; {@code mision.Corwen}). La primera vez se
+     * presenta (1); si se le dejo con la palabra en la boca, 6. Su menu: encender las balizas (2, la mision empieza y te da su
+     * yesquero), aquella noche (3, y otra vez el menu) o ahora no (4). Con la mision en marcha y alguna apagada, 5. Con las tres
+     * encendidas, 7 y el segundo menu (101), que acaba la mision: que vaya a recibir las barcas (8) o que se quede a guardar la luz
+     * (9). Despues de quedarse, 10.
+     */
+    public static final Personaje CORWEN = new Hacer("corwen")
+            .frase(1, MENU).frase(6, MENU).frase(3, MENU)
+            .frase(2, FIN).frase(4, FIN).frase(5, FIN)
+            .frase(7, MENU + 1)
+            .frase(8, FIN).frase(9, FIN).frase(10, FIN)
+            .menu(r("corwen", "buscar", 2, Accion.ACEPTAR), r("corwen", "noche", 3, Accion.PRECIO), r("corwen", "no", 4, Accion.RECHAZAR))
+            .menu(MENU + 1, r("corwen", "ir", 8, Accion.DEVOLVER), r("corwen", "quedar", 9, Accion.QUEDAR))
+            .hecho();
+
+    /**
      * La Sombra sin Nombre, rendida (parte 7ac): se habla con su corazon, que flota delante de ella. Quien no la oyo ofrecerlo empieza
      * por su frase 30 ("Espera... espera, marcado. Toma mi corazon..."); quien la oyo, por las respuestas: golpearlo, tomarlo o callar.
      */

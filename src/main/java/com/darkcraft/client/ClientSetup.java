@@ -53,6 +53,7 @@ public final class ClientSetup {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CAMPANA_ARBOL.get(), com.darkcraft.client.mision.CampanaRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.RESTOS_TAM.get(), com.darkcraft.client.mision.RestosRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.FAROL_BRANN.get(), com.darkcraft.client.mision.FarolBrannRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BALIZA.get(), com.darkcraft.client.mision.BalizaRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PEREGRINO.get(), com.darkcraft.client.mision.PeregrinoRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ASCENSOR.get(), com.darkcraft.client.arbol.AscensorRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.REMOLINO.get(), com.darkcraft.client.fortaleza.RemolinoRenderer::new);
@@ -162,6 +163,8 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.mision.RestosRenderer.CAPA, com.darkcraft.client.mision.RestosRenderer::crear);
         e.registerLayerDefinition(com.darkcraft.client.personajes.ViajeroRenderer.CAPA_YLVA, com.darkcraft.client.personajes.ViajeroRenderer::crearYlva);
         e.registerLayerDefinition(com.darkcraft.client.mision.FarolBrannRenderer.CAPA, com.darkcraft.client.mision.FarolBrannRenderer::crear);
+        e.registerLayerDefinition(com.darkcraft.client.personajes.ViajeroRenderer.CAPA_CORWEN, com.darkcraft.client.personajes.ViajeroRenderer::crearCorwen);
+        e.registerLayerDefinition(com.darkcraft.client.mision.BalizaRenderer.CAPA, com.darkcraft.client.mision.BalizaRenderer::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.HuecoModelo.CAPA, com.darkcraft.client.enemigos.HuecoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.AhogadoModelo.CAPA, com.darkcraft.client.enemigos.AhogadoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CapitanModelo.CAPA, com.darkcraft.client.enemigos.CapitanGeometria::crear);

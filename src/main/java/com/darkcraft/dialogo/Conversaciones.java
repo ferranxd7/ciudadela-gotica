@@ -55,7 +55,7 @@ public final class Conversaciones {
             case "mercader" -> "kerrick";
             // los de Morvain (parte 7af): Hagen y Silas, el suyo; los cuatro herreros, el de todos
             case "hagen", "silas" -> d.id();
-            case "brenna", "ulrik", "tobin", "sombra", "oswin", "hedda", "ylva" -> null;
+            case "brenna", "ulrik", "tobin", "sombra", "oswin", "hedda", "ylva", "corwen" -> null;
             default -> "maelis";
         };
         if (logro != null) Logros.dar(sp, logro);

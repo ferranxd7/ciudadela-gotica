@@ -8189,6 +8189,96 @@
       }
     ]
   },
+  "voz.corwen.1": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:corwen/voz_1",
+        "stream": true
+      }
+    ]
+  },
+  "voz.corwen.2": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:corwen/voz_2",
+        "stream": true
+      }
+    ]
+  },
+  "voz.corwen.3": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:corwen/voz_3",
+        "stream": true
+      }
+    ]
+  },
+  "voz.corwen.4": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:corwen/voz_4",
+        "stream": true
+      }
+    ]
+  },
+  "voz.corwen.5": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:corwen/voz_5",
+        "stream": true
+      }
+    ]
+  },
+  "voz.corwen.6": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:corwen/voz_6",
+        "stream": true
+      }
+    ]
+  },
+  "voz.corwen.7": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:corwen/voz_7",
+        "stream": true
+      }
+    ]
+  },
+  "voz.corwen.8": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:corwen/voz_8",
+        "stream": true
+      }
+    ]
+  },
+  "voz.corwen.9": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:corwen/voz_9",
+        "stream": true
+      }
+    ]
+  },
+  "voz.corwen.10": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:corwen/voz_10",
+        "stream": true
+      }
+    ]
+  },
   "sfx.farol_frio": {
     "subtitle": "subtitles.darkcraft.sfx.farol_frio",
     "sounds": [
@@ -8227,6 +8317,49 @@
       {
         "name": "darkcraft:sfx/ylva_descansa_2",
         "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.baliza_enciende": {
+    "subtitle": "subtitles.darkcraft.sfx.baliza_enciende",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/baliza_enciende_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/baliza_enciende_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.campanas_niebla": {
+    "subtitle": "subtitles.darkcraft.sfx.campanas_niebla",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/campanas_niebla_1",
+        "attenuation_distance": 64,
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/campanas_niebla_2",
+        "attenuation_distance": 64,
+        "stream": true
+      }
+    ]
+  },
+  "sfx.corwen_se_va": {
+    "subtitle": "subtitles.darkcraft.sfx.corwen_se_va",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/corwen_se_va_1",
+        "attenuation_distance": 24,
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/corwen_se_va_2",
+        "attenuation_distance": 24,
+        "stream": true
       }
     ]
   }

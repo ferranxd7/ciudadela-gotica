@@ -28,14 +28,14 @@ import java.util.UUID;
  * Las misiones de Morvain (parte 7ag, respuestas 95 y 117 del plan): quien las da ({@code personajes.Viajero}), lo que cada jugador
  * lleva hecho de cada una (en su ficha, {@code Ficha.mision}: marcas de bits) y lo que sabe su cliente (la lista de las que conoce,
  * con adonde ir ahora: el diario de la Historia, la brujula y el mapa). {@link Oswin}, la campana del peregrino (7ag), {@link Hedda},
- * la bufanda roja (7ah), y {@link Ylva}, la luz del muelle (7an).
+ * la bufanda roja (7ah), {@link Ylva}, la luz del muelle (7an), y {@link Corwen}, las balizas de la niebla (7ao).
  */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID)
 public final class Misiones {
     private Misiones() {}
 
     /** Todas, en el orden del menu. */
-    public static final String[] TODAS = {Oswin.ID, Hedda.ID, Ylva.ID};
+    public static final String[] TODAS = {Oswin.ID, Hedda.ID, Ylva.ID, Corwen.ID};
 
     /** Lo ultimo que se le mando a cada uno (si cambia —coge o suelta la campana o la bufanda—, se le vuelve a mandar). */
     private static final Map<UUID, Long> MANDADO = new HashMap<>();
@@ -45,15 +45,20 @@ public final class Misiones {
         Oswin.tick(m);
         Hedda.tick(m);
         Ylva.tick(m);
+        Corwen.tick(m);
         for (ServerPlayer p : m.players()) {
             Long antes = MANDADO.get(p.getUUID());
             if (antes == null || antes != huella(p)) enviar(p);
         }
     }
 
-    /** Lo que lleva de cada una (con lo que lleva encima), para no mandarlo dos veces igual (cada una cabe en 21 bits). */
+    /**
+     * Lo que lleva de cada una (con lo que lleva encima), para no mandarlo dos veces igual (las tres primeras caben en 21 bits cada una;
+     * la de Corwen, parte 7ao, ya no: se mezcla con lo demas).
+     */
     private static long huella(ServerPlayer p) {
-        return (oswin(p) & 0x1FFFFFL) | ((heda(p) & 0x1FFFFFL) << 21) | ((ylva(p) & 0x1FFFFFL) << 42);
+        long h = (oswin(p) & 0x1FFFFFL) | ((heda(p) & 0x1FFFFFL) << 21) | ((ylva(p) & 0x1FFFFFL) << 42);
+        return h ^ ((Corwen.marcas(p) + 1L) * 0x9E3779B97F4A7C15L);
     }
 
     private static int oswin(ServerPlayer p) {
@@ -77,6 +82,8 @@ public final class Misiones {
         if (h != 0) l.add(entrada(Hedda.ID, h, Hedda.objetivo(p)));
         int y = ylva(p);
         if (y != 0) l.add(entrada(Ylva.ID, y, Ylva.objetivo(p)));
+        int c = Corwen.marcas(p);
+        if (c != 0) l.add(entrada(Corwen.ID, c, Corwen.objetivo(p)));
         Net.to(p, new Net.Misiones(l));
         MANDADO.put(p.getUUID(), huella(p));
     }
@@ -126,6 +133,7 @@ public final class Misiones {
             case OSWIN -> Oswin.inicio(sp);
             case HEDDA -> Hedda.inicio(sp, v);
             case YLVA -> Ylva.inicio(sp);
+            case CORWEN -> Corwen.inicio(sp);
         };
     }
 
@@ -135,6 +143,7 @@ public final class Misiones {
             case OSWIN -> Oswin.accion(sp, v, accion);
             case HEDDA -> Hedda.accion(sp, v, accion);
             case YLVA -> Ylva.accion(sp, v, accion);
+            case CORWEN -> Corwen.accion(sp, v, accion);
         }
     }
 
@@ -143,6 +152,7 @@ public final class Misiones {
         return switch (v.quien()) {
             case HEDDA -> Hedda.visible(sp, v);
             case YLVA -> Ylva.visible(sp);
+            case CORWEN -> Corwen.visible(sp);
             default -> true;
         };
     }
@@ -156,7 +166,19 @@ public final class Misiones {
         b.append(" ]").append(Oswin.lleva(sp) ? " lleva la campana" : "");
         BlockPos o = Oswin.objetivo(sp);
         if (o != null) b.append(", ir a ").append(o.toShortString());
-        return b.append("; ").append(resumenHedda(sp)).append("; ").append(resumenYlva(sp)).toString();
+        return b.append("; ").append(resumenHedda(sp)).append("; ").append(resumenYlva(sp)).append("; ").append(resumenCorwen(sp)).toString();
+    }
+
+    /** Como va la de Corwen. */
+    public static String resumenCorwen(ServerPlayer sp) {
+        int k = Corwen.marcas(sp);
+        StringBuilder b = new StringBuilder("corwen ").append(k).append(" [");
+        String[] n = {"conocida", "aceptada", "rechazada", "noche", "muelle", "islote", "capilla", "ida", "queda"};
+        for (int i = 0; i < n.length; i++) if ((k & (1 << i)) != 0) b.append(' ').append(n[i]);
+        b.append(" ]").append(Corwen.lleva(sp) ? " lleva el yesquero" : "");
+        BlockPos o = Corwen.objetivo(sp);
+        if (o != null) b.append(", ir a ").append(o.toShortString());
+        return b.toString();
     }
 
     /** Como va la de Ylva. */
@@ -193,6 +215,8 @@ public final class Misiones {
                 DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.MADRE).get(), DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.BUFANDA).get())
                 : Ylva.ID.equals(id) ? java.util.List.of(DarkCraftMod.FAROL_YLVA.get(), DarkCraftMod.FAROL_BALLENERO.get(),
                 DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.YLVA).get(), DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.BALLENERO).get())
+                : Corwen.ID.equals(id) ? java.util.List.of(DarkCraftMod.YESQUERO.get(), DarkCraftMod.PERTIGA_FAROLERO.get(),
+                DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.FAROLERO).get())
                 : java.util.List.of();
         for (int i = 0; i < inv.getContainerSize(); i++)
             if (fuera.contains(inv.getItem(i).getItem())) inv.setItem(i, net.minecraft.world.item.ItemStack.EMPTY);
@@ -233,7 +257,83 @@ public final class Misiones {
                     Ficha.mision(sp, Ylva.ID, IntegerArgumentType.getInteger(c, "n"));
                     enviar(sp);
                     return decir(c.getSource(), resumenYlva(sp));
+                })))
+                .then(Commands.literal("corwen").then(Commands.argument("n", IntegerArgumentType.integer(0, 511)).executes(c -> {
+                    ServerPlayer sp = c.getSource().getPlayerOrException();
+                    Ficha.mision(sp, Corwen.ID, IntegerArgumentType.getInteger(c, "n"));
+                    enviar(sp);
+                    return decir(c.getSource(), resumenCorwen(sp));
                 })));
+    }
+
+    /** /darkcraft corwen [ir | baliza &lt;0-2&gt; | poner | olvidar] (sin mas: donde estan Corwen y las balizas). */
+    public static LiteralArgumentBuilder<CommandSourceStack> comandoCorwen() {
+        return Commands.literal("corwen")
+                .executes(c -> {
+                    ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    var srv = m.getServer();
+                    StringBuilder b = new StringBuilder("Corwen ").append(Corwen.sitio().toShortString())
+                            .append(Morvain.hecho(srv, "corwen") ? " (puesto)" : "");
+                    String[] nombres = {"el muelle", "el islote del oeste", "el islote de la capilla"};
+                    for (int i = 0; i < Corwen.BALIZAS.length; i++)
+                        b.append(", la baliza de ").append(nombres[i]).append(' ').append(Corwen.baliza(i).toShortString())
+                                .append(Morvain.hecho(srv, "baliza_" + i) ? " (puesta)" : "");
+                    return decir(c.getSource(), b.toString());
+                })
+                .then(Commands.literal("ir").executes(c -> {
+                    ServerPlayer sp = c.getSource().getPlayerOrException();
+                    ServerLevel m = Morvain.nivel(sp.server);
+                    if (m == null) return 0;
+                    llevarCorwen(sp, m, -1);
+                    return decir(c.getSource(), resumenCorwen(sp));
+                }))
+                .then(Commands.literal("baliza").then(Commands.argument("n", IntegerArgumentType.integer(0, 2)).executes(c -> {
+                    ServerPlayer sp = c.getSource().getPlayerOrException();
+                    ServerLevel m = Morvain.nivel(sp.server);
+                    if (m == null) return 0;
+                    llevarCorwen(sp, m, IntegerArgumentType.getInteger(c, "n"));
+                    return decir(c.getSource(), resumenCorwen(sp));
+                })))
+                .then(Commands.literal("poner").executes(c -> {
+                    ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    if (Corwen.buscarCorwen(m) == null) Corwen.ponerCorwen(m);
+                    for (int i = 0; i < Corwen.BALIZAS.length; i++) if (Corwen.buscarBaliza(m, i) == null) Corwen.ponerBaliza(m, i);
+                    return decir(c.getSource(), "Corwen y las tres balizas puestos");
+                }))
+                .then(Commands.literal("olvidar").executes(c -> {
+                    ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    Corwen.olvidar(m);
+                    return decir(c.getSource(), "Corwen y las balizas quitados");
+                }));
+    }
+
+    /**
+     * Lleva al jugador a Morvain: delante de Corwen (tres bloques al noroeste, mirandole) o, con {@code baliza} 0-2, junto a esa baliza
+     * (dos bloques por detras del poste, en lo que se pisa, mirando el farol).
+     */
+    public static void llevarCorwen(ServerPlayer sp, ServerLevel m, int baliza) {
+        BlockPos a, de;
+        if (baliza >= 0) {
+            BlockPos b = Corwen.baliza(baliza);
+            m.getChunk(b.getX() >> 4, b.getZ() >> 4);
+            // por detras del poste (del lado contrario a la laguna), en el mismo suelo
+            double dx = b.getX() - com.darkcraft.morvain.Pilotes.CX, dz = b.getZ() - com.darkcraft.morvain.Pilotes.CZ, l = Math.max(1e-3, Math.hypot(dx, dz));
+            de = new BlockPos((int) Math.round(b.getX() + dx / l * 2), b.getY(), (int) Math.round(b.getZ() + dz / l * 2));
+            a = b.above(2);
+        } else {
+            BlockPos s = Corwen.sitio();
+            m.getChunk(s.getX() >> 4, s.getZ() >> 4);
+            int y = m.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, s.getX() - 2, s.getZ() - 2);
+            de = new BlockPos(s.getX() - 2, y, s.getZ() - 2);
+            a = s.above();
+        }
+        double dx = a.getX() + 0.5 - (de.getX() + 0.5), dz = a.getZ() + 0.5 - (de.getZ() + 0.5);
+        double dy = a.getY() + 0.3 - (de.getY() + 1.62);
+        float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz)), pitch = (float) -Math.toDegrees(Math.atan2(dy, Math.hypot(dx, dz)));
+        sp.teleportTo(m, de.getX() + 0.5, de.getY(), de.getZ() + 0.5, yaw, pitch);
     }
 
     /** /darkcraft ylva [ir | farol | poner | olvidar] (sin mas: donde estan Ylva y los faroles). */

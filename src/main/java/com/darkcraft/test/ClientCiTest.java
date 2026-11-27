@@ -6699,6 +6699,8 @@ public final class ClientCiTest {
         t = hedda(t);
         // la luz del muelle: Ylva, la hija del ballenero, y Brann que ve la luz (parte 7an)
         t = ylva(t);
+        // las balizas de la niebla: Corwen, el farolero de los Pilotes (parte 7ao)
+        t = corwen(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -13668,6 +13670,311 @@ public final class ClientCiTest {
                 comando(sp, "darkcraft ballenero volver");
                 com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
                 com.darkcraft.enemigos.Puestos.todos(sp.server, com.darkcraft.morvain.MorvainEnemigos.PUERTO, false);
+            });
+        });
+        return t + 10;
+    }
+
+    // ------------------------------------------------------------------ las balizas de la niebla (parte 7ao)
+
+    private static void logCorwen(Minecraft m, String que) {
+        StringBuilder cli = new StringBuilder();
+        for (var e : com.darkcraft.client.mision.ClientMisiones.LISTA)
+            if (e.id().equals("corwen"))
+                cli.append(e.marcas()).append(" (").append(com.darkcraft.client.mision.ClientMisiones.estado(e)).append(')')
+                        .append(e.hay() ? " ir a " + e.x() + "," + e.z() : "").append("; ");
+        StringBuilder ve = new StringBuilder();
+        if (m.level != null && m.player != null) {
+            for (var v : m.level.getEntitiesOfClass(com.darkcraft.personajes.Viajero.class, m.player.getBoundingBox().inflate(96)))
+                if (v.quien() == com.darkcraft.personajes.Viajero.Quien.CORWEN)
+                    ve.append("corwen").append(com.darkcraft.personajes.Viajero.OCULTO.test(v) ? " oculto" : " se ve")
+                            .append(String.format(java.util.Locale.ROOT, " (%.2f)", com.darkcraft.client.mision.ClientMisiones.alfa(v, 0f)))
+                            .append(com.darkcraft.client.mision.ClientMisiones.corwenSinPertiga ? " sin pertiga" : " con su pertiga")
+                            .append(com.darkcraft.client.mision.ClientMisiones.corwenLuz ? ", el farol luce" : ", el farol apagado").append("; ");
+            for (var b : m.level.getEntitiesOfClass(com.darkcraft.mision.Baliza.class, m.player.getBoundingBox().inflate(128)))
+                ve.append("baliza ").append(b.variante()).append(b.encendida() ? " encendida" : " apagada")
+                        .append(String.format(java.util.Locale.ROOT, " a %.0f", b.distanceTo(m.player))).append(", ");
+        }
+        String dlg = m.screen instanceof com.darkcraft.client.ui.DialogoScreen d ? d.resumen() : m.screen == null ? "-" : m.screen.getClass().getSimpleName();
+        String rest = "a mano baliza " + com.darkcraft.client.mision.ClientMisiones.baliza + ", aviso " + com.darkcraft.client.ui.ClientRol.aMano() + ", cartel "
+                + com.darkcraft.client.ui.Carteles.resumen();
+        server(m, sp -> log("  corwen " + que + ": " + com.darkcraft.mision.Misiones.resumenCorwen(sp) + " | cliente: " + cli + ve + " | " + dlg + " | " + rest));
+    }
+
+    /** Delante de Corwen (a dos bloques, hacia donde mira, un poco a su izquierda), mirandole a la cara, de pie. */
+    private static void anteCorwen(ServerPlayer sp) {
+        ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+        var c = mv == null ? null : com.darkcraft.mision.Corwen.buscarCorwen(mv);
+        if (c == null) return;
+        Vec3 p = c.position(), d = Vec3.directionFromRotation(0, c.getYRot());
+        irMirando(sp, p.x + d.x * 2.3 - d.z * 0.5, p.y, p.z + d.z * 2.3 + d.x * 0.5, p.x, p.y + 1.25, p.z, false);
+        com.darkcraft.rol.Rol.sinCombate(sp);
+    }
+
+    /** Detras de la baliza n (del lado de tierra), mirando su farol, de pie (con el comando de la prueba). */
+    private static void anteBaliza(ServerPlayer sp, int n) {
+        comando(sp, "darkcraft corwen baliza " + n);
+        com.darkcraft.rol.Rol.sinCombate(sp);
+    }
+
+    /**
+     * Las balizas de la niebla (parte 7ao): Corwen en su caja al final de la pasarela del santuario de los Juncos (de lejos y de frente,
+     * con la pertiga y el farol apagado), hablar con el (la 1 y el menu), aquella noche (la 3), encenderlas (la 2: el cartel, el yesquero,
+     * la Historia y la brujula); las tres balizas, cada una apagada y encendida con la E (el muelle, el islote del oeste y el de la capilla:
+     * el aviso de cuantas van, las campanas y el logro), la laguna con las tres encendidas; de vuelta con el (la 7 con su farol encendido)
+     * y dejarle ir (la 8: se pierde en la niebla); otra vez, que se quede (la 9; despues la 10, sin pertiga y con el farol en el suelo) y
+     * la Pertiga del farolero en la mano.
+     */
+    private static int corwen(int T) {
+        final int CX = com.darkcraft.morvain.Pilotes.CX, CZ = com.darkcraft.morvain.Pilotes.CZ, PASO = com.darkcraft.morvain.Pilotes.PASO;
+        int t = T;
+        atTicks(t, "Corwen: a los Pilotes", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                if (mv == null) return;
+                sp.setGameMode(GameType.CREATIVE);
+                com.darkcraft.rol.Rol.sinCombate(sp);
+                com.darkcraft.mision.Misiones.olvidar(sp, "corwen");
+                com.darkcraft.mision.Corwen.olvidar(mv);
+                comando(sp, "darkcraft pilotes enemigos volver");
+                BlockPos c = com.darkcraft.mision.Corwen.sitio();
+                irMirando(sp, c.getX() + 6.5, c.getY() + 3, c.getZ() + 5.5, c.getX() + 0.5, c.getY() + 1, c.getZ() + 0.5, true);
+            });
+        });
+        t += 100;
+        atTicks(t, "Corwen: puesto", m -> server(m, sp -> {
+            comando(sp, "darkcraft corwen poner");
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            var c = mv == null ? null : com.darkcraft.mision.Corwen.buscarCorwen(mv);
+            StringBuilder b = new StringBuilder();
+            for (int i = 0; i < 3; i++) {
+                var bz = mv == null ? null : com.darkcraft.mision.Corwen.buscarBaliza(mv, i);
+                b.append(", baliza ").append(i).append(bz == null ? " (no cargada)" : " en " + bz.blockPosition().toShortString());
+            }
+            log("  corwen: " + (c == null ? "FALLO: no esta" : "en " + c.blockPosition().toShortString() + String.format(java.util.Locale.ROOT, " giro %.0f", c.getYRot()))
+                    + b + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp));
+            if (c != null) {
+                Vec3 p = c.position(), d = Vec3.directionFromRotation(0, c.getYRot());
+                // de lado y algo por detras: la pasarela y la laguna delante de el
+                irMirando(sp, p.x - d.z * 6.5 - d.x * 3.0, p.y + 1.4, p.z + d.x * 6.5 - d.z * 3.0, p.x + d.x * 6, p.y + 1.0, p.z + d.z * 6, true);
+            }
+        }));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "de lejos");
+            shot(m, "cliente_cw01_corwen_pasarela");
+        });
+        t += 4;
+        atTicks(t, "Corwen: de frente", m -> server(m, sp -> {
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            var c = mv == null ? null : com.darkcraft.mision.Corwen.buscarCorwen(mv);
+            if (c == null) return;
+            Vec3 p = c.position(), d = Vec3.directionFromRotation(0, c.getYRot());
+            irMirando(sp, p.x + d.x * 3.4 - d.z * 1.2, p.y + 0.4, p.z + d.z * 3.4 + d.x * 1.2, p.x, p.y + 1.3, p.z, true);
+        }));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "de frente");
+            shot(m, "cliente_cw02_corwen_pertiga");
+        });
+        t += 4;
+        atTicks(t, "Corwen: delante", m -> server(m, ClientCiTest::anteCorwen));
+        t += 24;
+        atTicks(t, "la E: hablar con Corwen", m -> pulsar(m.options.keyInventory));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "se presenta");
+            shot(m, "cliente_cw03_corwen_habla");
+        });
+        t += 4;
+        atTicks(t, "E: el menu de Corwen", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "menu");
+            shot(m, "cliente_cw04_corwen_menu");
+        });
+        t += 4;
+        atTicks(t, "que paso aquella noche", m -> dialogo(m, d -> d.pulsarRespuesta(1)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "aquella noche");
+            shot(m, "cliente_cw05_corwen_noche");
+        });
+        t += 4;
+        atTicks(t, "E: otra vez el menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 6;
+        atTicks(t, "encendere las balizas", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "acepta");
+            shot(m, "cliente_cw06_corwen_acepta");
+        });
+        t += 4;
+        atTicks(t, "ESC: el cartel de la mision", m -> m.setScreen(null));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "nueva mision");
+            shot(m, "cliente_cw07_nueva_mision");
+            server(m, sp -> log("  corwen: el yesquero en la bolsa " + sp.getInventory().countItem(DarkCraftMod.YESQUERO.get())));
+        });
+        t += 80;
+        atTicks(t, "la Historia: la mision", m -> {
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.HISTORIA);
+            menuP(m, mm -> mm.probarHistoria(300));
+        });
+        t += 16;
+        atTicks(t, "captura", m -> {
+            menuP(m, mm -> log("  corwen, la historia: " + mm.resumen()));
+            shot(m, "cliente_cw08_historia_mision");
+        });
+        t += 4;
+        atTicks(t, "la brujula: hacia el muelle", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                BlockPos b = com.darkcraft.mision.Corwen.baliza(0);
+                anteCorwen(sp);
+                irMirando(sp, sp.getX(), sp.getY(), sp.getZ(), b.getX() + 0.5, sp.getY() + 1.6, b.getZ() + 0.5, false);
+            });
+        });
+        t += 16;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "la brujula");
+            shot(m, "cliente_cw09_brujula_baliza");
+        });
+        t += 4;
+        // ---- las tres balizas: cada una apagada, la E y encendida
+        String[] nombres = {"muelle", "islote_oeste", "islote_capilla"};
+        for (int i = 0; i < 3; i++) {
+            final int n = i;
+            atTicks(t, "la baliza " + n, m -> server(m, sp -> anteBaliza(sp, n)));
+            t += 50;
+            atTicks(t, "captura", m -> {
+                logCorwen(m, "ante la baliza " + n);
+                shot(m, "cliente_cw" + (10 + n * 2) + "_baliza_" + nombres[n] + "_apagada");
+            });
+            t += 2;
+            atTicks(t, "la E: encenderla", m -> pulsar(m.options.keyInventory));
+            t += 30;
+            atTicks(t, "captura", m -> {
+                logCorwen(m, "baliza " + n + " encendida");
+                shot(m, "cliente_cw" + (11 + n * 2) + "_baliza_" + nombres[n] + "_encendida");
+            });
+            t += 4;
+        }
+        atTicks(t, "la laguna con las tres balizas", m -> server(m, sp -> {
+            log("  corwen: logro balizas " + com.darkcraft.story.Logros.tiene(sp, "balizas"));
+            irMirando(sp, CX + 30.5, PASO + 22, CZ + 38.5, CX - 4.5, PASO + 1, CZ - 6.5, true);
+        }));
+        t += 60;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "la laguna");
+            shot(m, "cliente_cw16_laguna_tres_luces");
+        });
+        t += 4;
+        // ---- de vuelta con Corwen: dejarle ir
+        atTicks(t, "de vuelta con Corwen", m -> server(m, sp -> comando(sp, "darkcraft corwen ir")));
+        t += 40;
+        atTicks(t, "delante de Corwen", m -> server(m, ClientCiTest::anteCorwen));
+        t += 20;
+        atTicks(t, "la E: hablar con Corwen (las tres encendidas)", m -> pulsar(m.options.keyInventory));
+        t += 34;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "las ve");
+            shot(m, "cliente_cw17_corwen_las_ve");
+        });
+        t += 4;
+        atTicks(t, "E: el segundo menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "ir o quedarse");
+            shot(m, "cliente_cw18_corwen_menu");
+        });
+        t += 4;
+        atTicks(t, "ve a recibirlas", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "se va");
+            shot(m, "cliente_cw19_corwen_ir");
+        });
+        t += 4;
+        atTicks(t, "ESC: se mete en el agua", m -> m.setScreen(null));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "se pierde en la niebla");
+            shot(m, "cliente_cw20_corwen_se_va");
+        });
+        t += 90;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "ya no esta");
+            shot(m, "cliente_cw21_corwen_ya_no_esta");
+            server(m, sp -> log("  corwen: el Farol de Corwen " + sp.getInventory().countItem(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.FAROLERO).get())
+                    + ", yesqueros " + sp.getInventory().countItem(DarkCraftMod.YESQUERO.get()) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "corwen_barcas")));
+        });
+        t += 4;
+        // ---- otra vez: que se quede
+        atTicks(t, "otra vez, con las tres encendidas: que se quede", m -> server(m, sp -> {
+            com.darkcraft.mision.Misiones.olvidar(sp, "corwen");
+            com.darkcraft.rol.Ficha.mision(sp, "corwen", com.darkcraft.mision.Corwen.CONOCIDA | com.darkcraft.mision.Corwen.ACEPTADA | com.darkcraft.mision.Corwen.TODAS);
+            com.darkcraft.rol.Equipo.dar(sp, new net.minecraft.world.item.ItemStack(DarkCraftMod.YESQUERO.get()));
+            com.darkcraft.mision.Misiones.enviar(sp);
+            anteCorwen(sp);
+        }));
+        t += 30;
+        atTicks(t, "la E", m -> pulsar(m.options.keyInventory));
+        t += 30;
+        atTicks(t, "E: el segundo menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "que se quede", m -> dialogo(m, d -> d.pulsarRespuesta(1)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "se queda");
+            shot(m, "cliente_cw22_corwen_quedar");
+        });
+        t += 4;
+        atTicks(t, "ESC y otra vez la E", m -> m.setScreen(null));
+        t += 40;
+        atTicks(t, "la E", m -> pulsar(m.options.keyInventory));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logCorwen(m, "guarda la luz");
+            shot(m, "cliente_cw23_corwen_guarda_la_luz");
+            server(m, sp -> log("  corwen: la pertiga " + sp.getInventory().countItem(DarkCraftMod.PERTIGA_FAROLERO.get())
+                    + ", logro " + com.darkcraft.story.Logros.tiene(sp, "corwen_luz")));
+        });
+        t += 4;
+        // ---- la Pertiga del farolero en la mano (en tercera persona, de lado)
+        atTicks(t, "la pertiga en la mano", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                sp.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(DarkCraftMod.PERTIGA_FAROLERO.get()));
+                sp.getInventory().selected = 0;
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                var c = mv == null ? null : com.darkcraft.mision.Corwen.buscarCorwen(mv);
+                if (c != null) {
+                    Vec3 p = c.position(), d = Vec3.directionFromRotation(0, c.getYRot());
+                    irMirando(sp, p.x + d.x * 3.0, p.y, p.z + d.z * 3.0, p.x + d.x * 8.0, p.y + 1.5, p.z + d.z * 8.0, false);
+                }
+            });
+        });
+        t += 10;
+        atTicks(t, "tercera persona", m -> m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT));
+        t += 20;
+        atTicks(t, "captura", m -> {
+            log("  corwen: en la mano " + (m.player == null ? "-" : m.player.getMainHandItem().getItem()) + ", tipo "
+                    + (m.player == null ? "-" : com.darkcraft.combate.Armas.de(m.player.getMainHandItem())));
+            shot(m, "cliente_cw24_pertiga_mano");
+        });
+        t += 4;
+        atTicks(t, "fin de las balizas de la niebla", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                sp.getInventory().setItem(0, net.minecraft.world.item.ItemStack.EMPTY);
+                com.darkcraft.mision.Misiones.olvidar(sp, "corwen");
             });
         });
         return t + 10;

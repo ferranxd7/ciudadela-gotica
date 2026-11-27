@@ -181,6 +181,10 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_FAROL_FRIO = sound("sfx.farol_frio");
     public static final RegistryObject<SoundEvent> SFX_BRANN_CALMA = sound("sfx.brann_calma");
     public static final RegistryObject<SoundEvent> SFX_YLVA_DESCANSA = sound("sfx.ylva_descansa");
+    /** Las balizas de la niebla (parte 7ao): el yesquero que prende una baliza, las campanas de las barcas en la niebla y Corwen que se mete en el agua. */
+    public static final RegistryObject<SoundEvent> SFX_BALIZA_ENCIENDE = sound("sfx.baliza_enciende");
+    public static final RegistryObject<SoundEvent> SFX_CAMPANAS_NIEBLA = sound("sfx.campanas_niebla");
+    public static final RegistryObject<SoundEvent> SFX_CORWEN_SE_VA = sound("sfx.corwen_se_va");
     /** Ponerse una pieza de armadura (parte 7ai): de placas, de malla, de cuero y pieles o de tela. */
     public static final RegistryObject<SoundEvent> SFX_ARMADURA_PLACAS = sound("sfx.armadura_placas");
     public static final RegistryObject<SoundEvent> SFX_ARMADURA_MALLA = sound("sfx.armadura_malla");
@@ -1160,6 +1164,15 @@ public class DarkCraftMod {
             () -> new com.darkcraft.mision.ObjetoMision("farol_ylva", new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.RARE)));
     public static final RegistryObject<Item> FAROL_BALLENERO = ITEMS.register("farol_ballenero",
             () -> new com.darkcraft.mision.ObjetoMision("farol_ballenero", new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.RARE)));
+    /** Las tres balizas de la niebla de la Aldea de los Pilotes (parte 7ao, la mision de Corwen): un poste con su farol, cada una con su variante. */
+    public static final RegistryObject<EntityType<com.darkcraft.mision.Baliza>> BALIZA = ENTITIES.register("baliza",
+            () -> EntityType.Builder.<com.darkcraft.mision.Baliza>of(com.darkcraft.mision.Baliza::new, MobCategory.MISC)
+                    .sized(0.6f, 2.7f).fireImmune().clientTrackingRange(10).updateInterval(20).build(MODID + ":baliza"));
+    /** El yesquero de Corwen (objeto clave: enciende las balizas) y su pertiga de farolero (para quien le pide que se quede). */
+    public static final RegistryObject<Item> YESQUERO = ITEMS.register("yesquero",
+            () -> new com.darkcraft.mision.ObjetoMision("yesquero", new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.RARE)));
+    public static final RegistryObject<Item> PERTIGA_FAROLERO = ITEMS.register("pertiga_farolero",
+            () -> new com.darkcraft.mision.Pertiga(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     /** El martillo de Dorvan (solo para que lo lleve en la mano) y las piedras de forja (I, II y III: mejoran las armas). */
     public static final RegistryObject<Item> MARTILLO_HERRERO = ITEMS.register("martillo_herrero",
             () -> new Item(new Item.Properties().stacksTo(1)));
@@ -1377,6 +1390,7 @@ public class DarkCraftMod {
             e.accept(ESPADA_SINIESTRA);
             e.accept(ALABARDA);
             e.accept(LANZA_TAM);
+            e.accept(PERTIGA_FAROLERO);
             e.accept(MAZA);
             e.accept(MARTILLO_GUERRA);
             e.accept(GRAN_MARTILLO);

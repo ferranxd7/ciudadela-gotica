@@ -4048,6 +4048,69 @@ La tercera mision (respuestas 95 y 117 del plan), que cambia como acaba un jefe.
   (`yl18`, `yl19`), los dos faroles en el pretil (`yl20`), otra vez quedartelo (`yl21..yl23`) y el Farol del ballenero (`yl24`, linea
   `brillan`). Lineas `ylva ...`.
 
+### Plan grande, parte 7ao: las balizas de la niebla (Corwen, el farolero de los Pilotes)
+
+La cuarta mision (respuestas 95 y 117 del plan), en la Aldea de los Pilotes del Pantano Podrido.
+- **Corwen** (`personajes/Viajero`, `Quien.CORWEN`): el viejo farolero, sentado en una caja de pescado al final de la pasarela que sale
+  del santuario de los Juncos (u 47, v 40 de `Pilotes`, en tierra, a 10 del santuario: lejos de donde se pone Silas), mirando a la
+  laguna. Modelo (`ViajeroRenderer.ModeloCorwen`, capa `darkcraft:viajero_corwen`, textura de 128 x 64 de `tools/personajes/corwen.py`,
+  con su retrato y su brillo; brazos anchos): el sombrero de hule ocre (copa, ala ancha mas larga por detras y el faldon de atras), la
+  barba blanca hasta el pecho (una caja delante de la cara), el chaqueton de hule verde negruzco con cazonetes (en el cuerpo, 0,25 mas
+  grande), los muslos y las espinillas aparte (como Ylva), la caja debajo y, de pie en el suelo a su derecha, **la pertiga** (vara de 40,
+  un poco inclinada hacia fuera) con el gancho de laton y el farol colgado de su anilla; la derecha agarrada a la vara, la izquierda en la
+  rodilla, la espalda cargada. El farol luce (`BrilloCorwen`, `corwen_brillo.png`, y alguna llamita) cuando quien juega tiene las tres
+  balizas encendidas (`ClientMisiones.corwenLuz`); si se quedo a guardar la luz, sin pertiga, las manos en las rodillas y el farol en el
+  suelo a su izquierda (`corwenSinPertiga`). Se pone una vez (`Morvain.Datos` "corwen"). Vista del modelo sin juego (aproximada):
+  `herr/vista_corwen.py` (fuera del repo).
+- **Las balizas** (`mision/Baliza`, entidad `darkcraft:baliza` 0,6 x 2,7 con `variante`; `client/mision/BalizaRenderer`, texturas de
+  `tools/mision/baliza.py`): poste de roble negro (podrido y con musgo abajo) en una base de piedras, un brazo arriba hacia la laguna y,
+  de una cadena, un farol grande de hierro (tejadillo, jaula de cuatro cristales de hollin, suelo y mecha) que se mece con el viento.
+  Tres (`Corwen.BALIZAS`, se ponen una vez cada una, "baliza_0..2", con alguien a 64): **0** en las tablas del muelle del embarcadero
+  (u 36, v 22, junto al agua; el fuego fatuo de su puesto esta al lado), **1** en el islote del oeste (-26, 10, junto al arbol muerto) y
+  **2** en el islote de la capilla ahogada (12, -33); en los islotes hay que cruzar el agua entre los podridos que flotan. Lo que pisan,
+  con `sueloEn` (la hierba y los juncos de alrededor se quitan). **Cada jugador ve las suyas** (`Baliza.ENCENDIDAS`, bits que pone su
+  cliente con las marcas): encendida, la llama y los cristales con luz propia (`RenderType.eyes` con `baliza_brillo.png`), la baliza
+  entera con luz de bloque 12 (`getBlockLightLevel`) y llamitas; se ve a 160 bloques.
+- **La mision** (`mision/Corwen`, marcas CONOCIDA, ACEPTADA, RECHAZADA, NOCHE, B1, B2, B3 —una por baliza—, IDA, QUEDA): se presenta (1:
+  cada noche encendia las tres balizas para que las barcas encontraran el camino a casa) y su menu: **encenderlas** (2: te da su
+  **yesquero**, objeto clave `yesquero`; cartel "Nueva mision"; si lo pierde, al volver a hablar le da otro), **aquella noche** (3: la
+  niebla con olor a sangre, el viento le apago la primera, le temblaban las manos y oyo las campanas toda la noche) o **ahora no** (4).
+  Despues 6 (y el menu) o 5 ("¿sigue todo a oscuras?... aléjate de los que flotan en el agua").
+- **Encender** (`Corwen.encender`, clic derecho o la E mirando el poste o el farol a menos de 4: "Pulsa [E] para encender la baliza",
+  `ClientMisiones.baliza`, `ClientRol.BALIZA` = 10): con la mision y el yesquero, la suya (`sfx.baliza_enciende`, chispas, llamas y humo
+  solo para el; aviso "La baliza arde en la niebla (n de 3)"); sin la mision, "una baliza apagada... hace falta algo con que
+  encenderla"; ya encendida, "ya arde". Con las tres: **las campanas de las barcas** (`sfx.campanas_niebla`, solo para el, desde el centro
+  de la laguna), el aviso y el logro `balizas` ("Tres luces en la niebla"). La brujula lleva a la apagada mas cercana y, con las tres, a
+  Corwen (`objetivo`).
+- **De vuelta con Corwen** (7: las ve, oye las campanas, "¿debería bajar a recibirlas?") y el segundo menu (101):
+  - **ve a recibirlas** (8): al cerrar la conversacion se mete en el agua y se pierde en la niebla (en el cliente de quien se lo dijo:
+    90 ticks con salpicaduras, luces que suben y `sfx.corwen_se_va`; despues ya no se le ve); te deja **su farol**, el talisman
+    `Talisman.Clase.FAROLERO` ("Farol de Corwen": los que esperan tumbados, flotando o rezando reparan en quien lo lleva a la mitad de
+    distancia —`Enemigo.percibe`; `Enemigo.reparaEn` para las pruebas—); logro `corwen_barcas` ("Las barcas vuelven a casa").
+  - **quedate y guarda la luz** (9): te da su **Pertiga del farolero** (`mision/Pertiga`, `darkcraft:pertiga_farolero`: una lanza
+    —`Armas.de`— que escala D/C/-/C con requisitos 10/12/-/12 —`Escalado.de`— y prende 4 s uno de cada cuatro golpes, `hurtEnemy`);
+    se queda en su caja con el farol encendido en el suelo (despues, 10: "tres luces, cada noche"); logro `corwen_luz` ("Alguien tiene
+    que guardar la luz").
+  Las tres balizas quedan encendidas para siempre para quien acabo la mision (de una manera o de otra).
+- **`Misiones` lleva las cuatro** (`TODAS`; la huella de lo mandado mezcla la de Corwen: ya no caben 4 x 21 bits); estados del diario
+  `darkcraft.mision.corwen.<pendiente | buscar | una | dos | volver | ida | queda>` (y `.ir.*`). Miniatura nueva (`CodiceScreen.MIN_MISION_CORWEN`
+  = 19, `miniaturas.py` `balizas_niebla`: la laguna de noche con niebla, las chozas y la torre de la capilla, dos balizas lejanas, la de
+  delante en su islote con el arbol muerto, dos barcas fantasma y Corwen en su caja con la pertiga). Talisman nuevo en `tools/rol/objetos.py`
+  ("farolero": el farol colgado del gancho sobre hierro negro).
+- **Voces** (ElevenLabs, `eleven_v4`): Corwen **"Arkadius - Old Storyteller"** `O4uxPTtvgxrA0QCLHI1J`, flow `5aWXscqwkLiHZubfdVBI`, 10 frases
+  (tomas a; `VOZ_CORWEN`: vieja y grave, al aire libre en el pantano, los agudos algo bajos por la niebla). Efectos: `baliza_enciende`
+  (3 y 1), `campanas_niebla` (2 y 4; 12 s, en streaming), `corwen_se_va` (4 y 1; 10 s). Prompts y firmas en `herr` (fuera del repo).
+- Comandos `/darkcraft corwen [ir | baliza <0-2> | poner | olvidar]` y `/darkcraft misiones corwen <n>`.
+- Pruebas: servidor, `misionCorwen()` (linea `Morvain, las balizas de la niebla: ...`: Corwen y las tres balizas en su sitio —lo que
+  pisan, que no haya nada encima, el farol sobre el agua o el barro, hacia donde miran—, el dialogo sin nodos rotos, sin la mision no se
+  enciende, aceptar dos veces da un yesquero, dejarle ir antes de tiempo no hace nada, encender cada una —dos veces la primera— con la
+  brujula a la siguiente, el logro, dejarle ir —el Farol de Corwen; un podrido tumbado a 3 repara en uno sin el y no en quien lo lleva—, y
+  que se quede —la pertiga: lanza, escalado y de 200 golpes prenden unos 50—); cliente, tramo `corwen()` despues de `ylva()`: Corwen en
+  su caja y de frente (`cliente_cw01`, `cw02`), hablar, el menu, aquella noche, aceptar y su cartel (`cw03..cw07`), la Historia (`cw08`),
+  la brujula (`cw09`), cada baliza apagada y encendida con la E (`cw10..cw15`), la laguna con las tres (`cw16`), volver (la 7 con el farol
+  encendido, `cw17`, `cw18`), dejarle ir y se pierde en la niebla (`cw19..cw21`), otra vez que se quede (`cw22`, `cw23`) y la pertiga en
+  la mano (`cw24`). Lineas `corwen ...`.
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

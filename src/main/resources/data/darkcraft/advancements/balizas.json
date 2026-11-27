@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:pilotes",
+  "display": {
+    "icon": {
+      "item": "darkcraft:yesquero"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.balizas.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.balizas.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}
