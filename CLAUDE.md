@@ -3289,8 +3289,9 @@ cielo rojo que se apaga con `CieloRojo.apagar`, el epilogo de Maelis y los credi
     son del capitulo 6 y no se registran) y su subtitulo lila abajo (`darkcraft.sombra.voz.N`, `Voces.sombra(n)` + 0,9 s); si ya habla,
     la siguiente espera.
   - **Las rafagas**: por el camino (no en el Descansillo ni en la Boca, ni volando) cada 22-40 s (`RAFAGA_MIN/MAX`; la primera a los
-    10-20 s) una de lado (`Net.Rafaga`: lado, `AVISO` 22 ticks en que se oye venir —`sfx.cadena_rafaga` desde ese lado— y se ven jirones
-    de nube cruzando, y `EMPUJA` 30 ticks en que empuja; `FUERZA` 0,075 a la velocidad cada tick en lo mas fuerte, crece y se apaga). La
+    10-20 s) una de lado (`Net.Rafaga`: lado, `AVISO` 30 ticks en que se oye venir —`sfx.cadena_rafaga` desde ese lado— y se ven jirones
+    de nube cruzando, y `EMPUJA` 30 ticks en que empuja; `FUERZA` 0,05 a la velocidad cada tick en lo mas fuerte, crece y se apaga: de pie
+    en el suelo, unos dos bloques; con 0,075, en la build 185, echaba de la cadena desde el centro del camino). La
     lleva el cliente (`ClientCadena.viento`, en el START de cada tick); **agachado, una quinta parte** (y con el borde del juego no se
     cae); saltando, en el aire, mucho mas. `calma(sp, ticks)` y `rafagaYa(sp)` para las pruebas.
   - **Caer**: quien cae de la cadena (en el aire, habiendo pisado el camino en los ultimos 20 s) y pasa `CAIDA` 28 bloques por debajo
@@ -3339,6 +3340,10 @@ cielo rojo que se apaga con `CieloRojo.apagar`, el epilogo de Maelis y los credi
   `Perdidos.TOTAL` = 34. Botin `chests/cadena` (frutos de la pluma, piedras de forja II y alguna III, y a veces un talisman o una ceniza).
 - Comandos `/darkcraft cadena [ir <sitio> | enemigos [volver | fuera | sacar] | rafaga | sombra olvidar | gargola [vuelo | tierra |
   picado | garras | posarse]]` (sin mas: como esta; `gargola` = la mas cercana a 48 bloques).
+- **Los planos que se hacen al construir el mod** (`Subida`, `Cerco` y, desde la 7ab, `Homenaje`: `MorvainEnemigos.preparar` apunta sus
+  puestos al arrancar el mod) se vuelven a hacer en `Morvain.onArranque` (`ServerAboutToStartEvent`, `rehacer()`): hechos antes de que
+  esten registrados los bloques del mod, el santuario de la cadena salia como piedra iman, las gemas como redstone y la piedra de sombra
+  y el hierro negro del Cerco como obsidiana y netherita (los sustitutos de las vistas sin juego).
 - **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_subida carpeta` (`Volcado.andarSubida`: a pie desde lo alto del ancla a todos
   los sitios —los huecos se ven con tablon—, cada uno de los de la cadena se pisa y se llega y ninguno metido en un bloque; el perfil);
   la gargola: `python3 tools/enemigos/generar.py --solo gargola --vistas carpeta`; un trozo en texto: `herr/corte.py`.

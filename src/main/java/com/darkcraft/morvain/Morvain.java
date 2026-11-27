@@ -474,6 +474,18 @@ public final class Morvain {
         ESPERA.remove(e.getEntity().getUUID());
     }
 
+    /**
+     * Antes de que arranque el servidor (y se genere nada): los planos que se hicieron al construir el mod, para apuntar los puestos de
+     * sus enemigos, se vuelven a hacer con los bloques del mod ya registrados (si no, el santuario de la cadena, las gemas, la piedra
+     * de sombra y el hierro negro salian como los bloques que los sustituyen en las vistas sin juego).
+     */
+    @SubscribeEvent
+    public static void onArranque(net.minecraftforge.event.server.ServerAboutToStartEvent e) {
+        Subida.rehacer();
+        Cerco.rehacer();
+        Homenaje.rehacer();
+    }
+
     @SubscribeEvent
     public static void onParada(ServerStoppedEvent e) {
         ESPERA.clear();

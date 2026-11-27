@@ -11211,12 +11211,16 @@ public final class ClientCiTest {
         });
         t += 140;
         // ---- una rafaga de pie y otra agachado, en medio del camino
-        atTicks(t, "Cadena: una rafaga de pie", m -> server(m, sp -> {
-            int[] q = S.sitio("medio");
-            irMirando(sp, q[0] + 0.5, q[1], q[2] + 0.5, 0.5, q[1] + 6, q[2] - 30, false);
-            com.darkcraft.morvain.Cadena.rafagaYa(sp);
+        // (en el Descansillo, que es ancho: en el camino, de pie, una rafaga puede echarle de la cadena y la prueba seguiria muerta)
+        final int[] DES = S.sitio("descansillo");
+        final int ZR = com.darkcraft.morvain.Subida.RELLANOS[com.darkcraft.morvain.Subida.DESCANSILLO][0] - 7;
+        atTicks(t, "Cadena: una rafaga de pie (en el Descansillo)", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            irMirando(sp, -1.5, DES[1], ZR + 0.5, -1.5, DES[1] + 6, ZR - 30, false);
         }));
-        t += 34;
+        t += 6;
+        atTicks(t, "la rafaga, ya", m -> server(m, sp -> com.darkcraft.morvain.Cadena.rafaga(sp.serverLevel(), sp, -1)));
+        t += com.darkcraft.morvain.Cadena.AVISO + 12;
         atTicks(t, "captura: la rafaga", m -> {
             shot(m, "cliente_mv529_rafaga");
             log("  la rafaga: sopla " + com.darkcraft.client.morvain.ClientCadena.sopla() + ", rafagas " + com.darkcraft.client.morvain.ClientCadena.RAFAGAS);
@@ -11224,13 +11228,12 @@ public final class ClientCiTest {
         t += 60;
         atTicks(t, "la rafaga, lo que ha movido", m -> server(m, sp -> {
             log("  de pie la rafaga le mueve " + String.format(java.util.Locale.ROOT, "%.2f", com.darkcraft.client.morvain.ClientCadena.MOVIDO) + " bloques | " + estadoCadena(sp));
-            int[] q = S.sitio("medio");
-            irMirando(sp, q[0] + 0.5, q[1], q[2] + 0.5, 0.5, q[1] + 6, q[2] - 30, false);
+            irMirando(sp, -1.5, DES[1], ZR + 0.5, -1.5, DES[1] + 6, ZR - 30, false);
         }));
         t += 10;
         atTicks(t, "Cadena: una rafaga agachado", m -> {
             m.options.keyShift.setDown(true);
-            server(m, sp -> com.darkcraft.morvain.Cadena.rafagaYa(sp));
+            server(m, sp -> com.darkcraft.morvain.Cadena.rafaga(sp.serverLevel(), sp, -1));
         });
         t += 90;
         atTicks(t, "la rafaga agachado, lo que ha movido", m -> {

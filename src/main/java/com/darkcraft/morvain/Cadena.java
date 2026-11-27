@@ -35,8 +35,9 @@ public final class Cadena {
     /** Cada cuanto sopla (ticks): de RAFAGA_MIN a RAFAGA_MAX; la primera, entre PRIMERA y el doble. */
     public static final int RAFAGA_MIN = 440, RAFAGA_MAX = 800, PRIMERA = 200;
     /** La rafaga: lo que se oye venir, lo que empuja y lo fuerte (lo que suma a la velocidad cada tick, en lo mas fuerte). */
-    public static final int AVISO = 22, EMPUJA = 30;
-    public static final float FUERZA = 0.075f;
+    public static final int AVISO = 30, EMPUJA = 30;
+    /** (0,075 en la build 185: de pie echaba de la cadena desde el centro del camino; ahora unos dos bloques de pie en el suelo) */
+    public static final float FUERZA = 0.05f;
     /** La marca de la ficha: lo que ya le ha dicho la Sombra en la cadena (bit 1 la 21, 2 la 22, 4 la 23; y 8 la 24, al entrar en la torre
      * del homenaje: {@link CasaSombra}). */
     public static final String MARCA = "sombra_cadena";
