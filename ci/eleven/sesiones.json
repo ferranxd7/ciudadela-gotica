@@ -975,7 +975,7 @@
   "flow": "FNZWSYJq2nK8zd5QwV5m",
   "modelo": "eleven_v4",
   "voz": "Autumn Veil (KoVIHoyLDrQyd4pGalbs)",
-  "nota": "Parte 2e-1: Maelis, la guia de los santuarios (voz de mujer serena). Frases 1-10, tomas a y b. Parte 7b: frases 11-14 (Morvain: la bienvenida, el silbato del corcel, como es el corcel y el saludo de alli).",
+  "nota": "Parte 2e-1: Maelis, la guia de los santuarios (voz de mujer serena). Frases 1-10, tomas a y b. Parte 7b: frases 11-14 (Morvain: la bienvenida, el silbato del corcel, como es el corcel y el saludo de alli). Parte 7ab: frases 15-16 (la Ultima Llama, en la capilla negra de la ciudadela).",
   "frases": {
    "1": {
     "prompt": "[softly] Another soul the Shadow has dragged back from the dark... [pause] You should be dead, marked one. And yet... the fire still answers to you.",
@@ -1073,6 +1073,20 @@
     "sesiones": [
      "xOGp3D8IPrRjCRcRkTKx",
      "bJa1d49GcwupvTSL1O6T"
+    ]
+   },
+   "15": {
+    "prompt": "[calm, warm, a little tired] You climbed the chain and walked through the Shadow's own house... I lit this fire long ago, for whoever came this far. [softly] I had almost stopped hoping.",
+    "sesiones": [
+     "TH9lqhEuDxiCvzhgcagx",
+     "bGZtTBH0cmjOW7jVz68A"
+    ]
+   },
+   "16": {
+    "prompt": "[quiet, serious] Above us sits the thing that wears Queen Isolde's face. Above her, the Shadow waits. [gently] Rest first. This fire will be here when you come back.",
+    "sesiones": [
+     "oLP0AkGI6flo6efEXbB1",
+     "NrUcYPWYYjxAggELlYG1"
     ]
    }
   }
@@ -1941,6 +1955,20 @@
     ],
     "flow": "Mm0FdcLcpVa1l39aUIC2",
     "nota": "Parte 7aa: la Sombra habla en la subida por la cadena del sur"
+   },
+   "24": {
+    "prompt": "[very low, slow, cold, amused] Welcome to my house, marked one. [pause] Mind my guards... they never learned how to die.",
+    "prompt_susurro": "[whispers] Welcome to my house, marked one. Mind my guards... they never learned how to die.",
+    "voz": [
+     "AqV5VNeV1wcjJ2BBC557",
+     "nhny6c48z2JQF29W3UwP"
+    ],
+    "susurro": [
+     "LYGTyMAvoBlnaAFYZWoH",
+     "DH6blj0x43PmZ2b06WuK"
+    ],
+    "flow": "Mm0FdcLcpVa1l39aUIC2",
+    "nota": "Parte 7ab: la Sombra habla al entrar en la torre del homenaje"
    }
   }
  },
@@ -7680,6 +7708,403 @@
      "RglixN8OsFP9n4YDlvlC",
      "22Tqwyk85L8pzU2Y55uw",
      "iF6X9LkHKUMr0Zc6pvfP"
+    ]
+   }
+  }
+ },
+ "isolde": {
+  "flow": "dAtA9WXZ451rqHwQNb2f",
+  "voz": "ksryVoNAGZT8GxWCTiVm",
+  "nombre_voz": "Elariel X - Epic Ethereal Queen",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7ab: la reina Isolde (lo que lleva su cara), la jefa del salon del trono de la ciudadela. Tomas a y b de cada frase como isolde/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[softly, dreamy, regal] Corvin...? Is that you at the door? [pause] [cold] No... Corvin is dead. [sweetly, eerie] You killed him for me. How kind.",
+    "sesiones": [
+     "ozIQmJCnaleRjnvTwPSH",
+     "ANkfO6FRrMcR54bmaHP1"
+    ],
+    "generaciones": [
+     "IH91CNnl3Fu38f7eEIlK",
+     "qfFrBK7RUmF3SJ542Sfc"
+    ]
+   },
+   "2": {
+    "texto": "[regal, cold, commanding] Kneel before your queen.",
+    "sesiones": [
+     "ETA8eTP1ys5tT7eK19Do",
+     "myphItuOwwUHXoGcsYX8"
+    ],
+    "generaciones": [
+     "0QGyGumcfdppJPqUjneP",
+     "cMUsBijlMyOgNSO3PNiW"
+    ]
+   },
+   "3": {
+    "texto": "[pained, then cold] You want to see my face? [whispering] He never wanted to see it either.",
+    "sesiones": [
+     "QtFNLyfARyuNN83BKoY3",
+     "T7LAx00h7d1OSoUjA4nO"
+    ],
+    "generaciones": [
+     "TIyUhLlTf7R631cytW04",
+     "o0YoGTT0w2vDTm028iKz"
+    ]
+   },
+   "4": {
+    "texto": "[softly, almost singing] Hush now... the Shadow will wake you again.",
+    "sesiones": [
+     "9SOCd1aHxkmpyVT4dpSZ",
+     "sMbHsP0rG1aU2Mlq9lL4"
+    ],
+    "generaciones": [
+     "p2iFo9usCdtAvP1x5zo3",
+     "XMSUHmVpInsuifKjP77b"
+    ]
+   },
+   "5": {
+    "texto": "[singing softly, a slow lullaby] Sleep... sleep, little marked one...",
+    "sesiones": [
+     "tAiYpQiY7nusa1b95IHz",
+     "rDJpo4rJuavwgHltRASG"
+    ],
+    "generaciones": [
+     "xQEm1b7S6HNYMWp4LUZT",
+     "4GL7GNyBiyoxeFJgFyyH"
+    ]
+   },
+   "6": {
+    "texto": "[fading, suddenly human and tender] Corvin... I can hear the fountain again... [whispering] It was never me.",
+    "sesiones": [
+     "ZmD1sfcemweJscAPD424",
+     "lIKaqY1viiIqwYSfAq4T"
+    ],
+    "generaciones": [
+     "PqMvKaRqNNpsTTh4kUdb",
+     "APWUo3GEIgcAtzx9qKFN"
+    ]
+   }
+  }
+ },
+ "sfx_homenaje": {
+  "flow": "08HSxlBxAnMWii5NxHHr",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7ab: la ciudadela por dentro (los centinelas de armadura hueca, la reina Isolde, el aire de la torre del homenaje en bucle y la puerta). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "centinela_alerta": {
+    "prompt": "A hollow suit of black armor comes alive: a deep metallic groan echoing from inside an empty helmet, dark smoke hissing out of the gaps, dark fantasy, 2 seconds",
+    "sesiones": [
+     "jkdf4v7RqfNrMXUIrDvz",
+     "swxBtfJamWYYKEVpenQ5",
+     "4ZhBhwNsosWwRtd8YBXE",
+     "i0WOaKxUWVRlncPeWAXL"
+    ],
+    "generaciones": [
+     "miX2MZVyWrKqnOF9W8mF",
+     "wRuggeoAWablVH4DUvn6",
+     "C8TQNYMPt9ZFCMJMrXkF",
+     "m7Nchg0NjEqniqvnUQ1I"
+    ]
+   },
+   "centinela_paso": {
+    "prompt": "A single heavy armored footstep on a stone floor, metal plates clanking, with a faint hiss of smoke, 0.8 seconds",
+    "sesiones": [
+     "Tf9DfxruBRBfQPw3h4kb",
+     "XHxlnoK3H5RzzYoM09rY",
+     "0HtAyXobP2LrfaWZnTq0",
+     "rl3JQLwjgPpTBvfWs7Sm"
+    ],
+    "generaciones": [
+     "orUI6Owq8TSsBpx17VSM",
+     "UGHKyHaZeAcSkLAL1IbJ",
+     "5XKggvZY9bg4uAxIQT0m",
+     "WlkCy7QDjAUHMWCXZ3bg"
+    ]
+   },
+   "centinela_tajo": {
+    "prompt": "A huge greatsword swung hard through the air by a giant knight, a deep heavy whoosh of steel, 1 second",
+    "sesiones": [
+     "UrNvtepHD1eCS2xSGdsE",
+     "uNMXRVZGB67QdJnXGal5",
+     "G7t5hXDiJpcWK6yCOQXx",
+     "ViYYhhbRoeX3OtGo0uQo"
+    ],
+    "generaciones": [
+     "TgtecmfWhrpy6YOc2H2I",
+     "n4HuY8VbEPs2NU4vasTP",
+     "be5nlwxL54ix6l6iEJ0W",
+     "NpI0PpAX4rTVWRVqvOtm"
+    ]
+   },
+   "centinela_golpe": {
+    "prompt": "A massive blade slamming into a stone floor, a heavy metallic crash and cracking stone debris, 1.2 seconds",
+    "sesiones": [
+     "86DUsfVckrDO1LKU1ByQ",
+     "kyiVzdG14E14myp65ZLy",
+     "QPJG8ra7hg1EQq5Gip74",
+     "JnWaUpRttaHVQiAlQUOS"
+    ],
+    "generaciones": [
+     "xeHdpsQbCSpyFyTULDrx",
+     "QuCWGTiKPjpWP58lHIMC",
+     "eN37ayzgj81TxQhpEq9b",
+     "okd4jom2ZM3i4uxzJ9no"
+    ]
+   },
+   "centinela_alabarda": {
+    "prompt": "A heavy halberd spun in a full circle by an armored knight, a long whooshing sweep of steel, 1.2 seconds",
+    "sesiones": [
+     "IxulyE3xMR1tYFYElaMC",
+     "DfAkydRN0sdSPkOWxdsp",
+     "IZtEmj6ttXOp5VMr8Apx",
+     "oYxxCM1FuDnShlZWg2Xp"
+    ],
+    "generaciones": [
+     "fwcJo3vyJK00PYInGVhR",
+     "7dolCLQLxBsItqLS6Nk5",
+     "3diRJxSCk7LZybAxmBgL",
+     "F22u0ylQAvTvGDOr6kMq"
+    ]
+   },
+   "centinela_humo": {
+    "prompt": "A knight dissolving into dark smoke and reforming a few steps away: a rushing whoosh, a sharp hiss and a soft metallic clank, 1.5 seconds",
+    "sesiones": [
+     "N9calco1lZq444dc9oTj",
+     "ZnYtwPb9D0N80MWqPZXF",
+     "uhsqhEdz0cg0zRrO2XfC",
+     "YmedNqi21xst7rVG1A50"
+    ],
+    "generaciones": [
+     "Q03za7IIAIaBUhVP68Uq",
+     "EBaWGhkKi53Rbnzvvtal",
+     "CuXbpZFqNii1Wg7W63Z2",
+     "GXx2EUJqsXVoqAkcUlQU"
+    ]
+   },
+   "centinela_dolor": {
+    "prompt": "A hollow armor struck by a sword: a resonant metallic clang and a distant pained groan from inside the helmet, 0.8 seconds",
+    "sesiones": [
+     "zRM97EBhVlJwLYuL3FGR",
+     "RwUjvoL0uzQjkI2hoHVf",
+     "feGJx04yPOGJhcRrnFXi",
+     "bE7OJCpDwKv8imcicP1w"
+    ],
+    "generaciones": [
+     "ybtZSgPboZ0M16SD0kOU",
+     "vSszyRx1uCDyBJLUE9Lb",
+     "4cmGwwJbsz4SYlkWUQmH",
+     "sHGH7on5GoAjJdukoaQp"
+    ]
+   },
+   "centinela_muerte": {
+    "prompt": "An empty suit of armor collapsing onto a stone floor, plates and helmet clattering apart, dark smoke escaping with a long fading hiss, 2.5 seconds",
+    "sesiones": [
+     "LmD37U7DSHEBDx1ZNowc",
+     "zNpN15dstF21jWmO7NM8",
+     "CXvNVgQVZ5aKIOZgnpSw",
+     "EkGK7QJB9JU9hZxdPRzT"
+    ],
+    "generaciones": [
+     "oeir4OjvwdKvRYeJ0x6o",
+     "8R0fXcrcUdcgvbzuRDbj",
+     "86IJAxDnp6KQgUX6Ln3h",
+     "7U4giQyCvTa1gtriAxI7"
+    ]
+   },
+   "isolde_tarareo": {
+    "prompt": "A woman softly humming a sad, slow lullaby alone in a vast empty stone throne room, distant and echoing, eerie and beautiful, seamless loop, 15 seconds",
+    "sesiones": [
+     "pXHxkn59xuIO1zZtQm7O",
+     "eVfZrdMaN1EaPORHrdhd",
+     "1lDfn8gurNb5O9pfFYSk",
+     "DSZGBht74caIhWl8azgk"
+    ],
+    "generaciones": [
+     "VQxKsp8buPeZX37IWT4J",
+     "mPxTIexmI5X9xxbvueKI",
+     "uce1WW6gGfoIneBdF1EY",
+     "IQ5O6QmRL83RKu31tJE0"
+    ]
+   },
+   "isolde_canto": {
+    "prompt": "A ghostly female voice singing a high wordless lament, eerie and beautiful, echoing in a stone hall, rising then fading away, 3 seconds",
+    "sesiones": [
+     "LalACc4zQncW35hf9mcU",
+     "dTiscqJc76jVOLDXL1F2",
+     "IioYec5An02hIHCU88oz",
+     "FC8ozk7whDOROoorz6SF"
+    ],
+    "generaciones": [
+     "bxodFyKWFxQTgYlmcIN8",
+     "OlOZ1UmiNU6m0uNwl5JQ",
+     "EM733p7DVhAjP1PxUw7r",
+     "C7LLBJfdLLk7I0GUBlf0"
+    ]
+   },
+   "isolde_garras": {
+    "prompt": "Long sharp fingernails slashing through the air twice, quick cold swishes with a faint metallic ring, 1 second",
+    "sesiones": [
+     "9BSUQolMa95YaNUhIfgH",
+     "H8rXg8xnrr3gRCkAOEK8",
+     "Iscst6FixLcWqpFd1plf",
+     "rk8e43fsWf1m3IzBQFW7"
+    ],
+    "generaciones": [
+     "j5UjaE8jRR8X9PT1uEZu",
+     "I7kzBeIGQmNlvySiKYHI",
+     "NpYYfqjZv7KJTG6fQDtP",
+     "bVn3RUOKiKuk6a4WwOca"
+    ]
+   },
+   "isolde_velo": {
+    "prompt": "A long silk veil and royal gown whipping around in a full circle, a soft but powerful whoosh of fabric, 1.2 seconds",
+    "sesiones": [
+     "n4XO95TEyJnpgdObv9mo",
+     "ty5eD04Wnh5vMeJ7FDOI",
+     "h4UnSsTvsyqDmb43I2Dw",
+     "KPPx5VVH0STkNNCFnY1u"
+    ],
+    "generaciones": [
+     "5QOgpddsmreeq0osERpx",
+     "pXIqqNagmsZ3bCcR0soL",
+     "hz3to44bngXiX6r6tp5n",
+     "6Q2nsiHq2yApk339b3gm"
+    ]
+   },
+   "isolde_abrazo": {
+    "prompt": "A ghostly woman lunging forward with a rush of cold air and fluttering fabric, ending in a sharp gasp, 1.5 seconds",
+    "sesiones": [
+     "JJnczJfSvPqmwlZuI2vp",
+     "IZjEXnhzsJqmGHOgdwGI",
+     "NgOiHUjRGCQcRQz3RTYf",
+     "DwvCKcKm0oA7h0nkYXSh"
+    ],
+    "generaciones": [
+     "tot5bTkEAz8SAUKLCmJ2",
+     "S18VDHiRverlbnNd1UbU",
+     "dyeYn29Vi4PGxqYH83uZ",
+     "3wG3Zuva57mktzC1QAX7"
+    ]
+   },
+   "isolde_desvanece": {
+    "prompt": "A ghost vanishing into thin air: a shimmering breathy whisper that fades into silence, then reappearing with a soft eerie chime, 1.5 seconds",
+    "sesiones": [
+     "EAG9kegIB9breRYueRZV",
+     "i10ZaxPBnCRm3KoWjO28",
+     "3bv82eB9oDJrgxjDkBOe",
+     "iUHViR9Str14DX3bxhuV"
+    ],
+    "generaciones": [
+     "YedSVSEVOOfrfs34fxfp",
+     "zeYcNqLxoeoP5lpbHY16",
+     "JKKBVGllPqcJyHrl3xPZ",
+     "nH2Ptgn85WcSryag5UDh"
+    ]
+   },
+   "isolde_grito": {
+    "prompt": "A banshee-like female scream, piercing and sorrowful, echoing in a cathedral, 2 seconds",
+    "sesiones": [
+     "DngPsPpd8kJNmouCyTna",
+     "kFVgxOgiLNBzaAwgjCs8",
+     "WsqYonB3oNC7wnckfakI",
+     "MIn4rFF5Yv5C2DfMW0aw"
+    ],
+    "generaciones": [
+     "d5BqFmH7FhgAbeO6J1oM",
+     "vxu4JFWuqyOHzyItaRk1",
+     "fiZlI9td38nc1xAeUFVB",
+     "bRxAW48e146YxV5KnGqr"
+    ]
+   },
+   "isolde_velo_arde": {
+    "prompt": "A lace veil bursting into flames with a whoosh and crackle, and a woman's furious shriek beneath it, 2.5 seconds",
+    "sesiones": [
+     "mSTq8ZF58T1uZdk2K6YU",
+     "o2lyAZW4J7jKA8NHOc7k",
+     "fmNCaGv2wjxmW18Myu8J",
+     "2pC7z16C0gXi7clMCYeC"
+    ],
+    "generaciones": [
+     "iRs4FhGEga3QKEqhmeh0",
+     "tPtIVD4xp1qzSzChTKpn",
+     "El7bkbuBxtG3RBHh1R3g",
+     "mXCW364vs6eZyFytJ5hA"
+    ]
+   },
+   "isolde_lagrimas": {
+    "prompt": "Dark droplets raining onto a stone floor and hissing like black acid tears, a cluster of sizzling drips, 1.5 seconds",
+    "sesiones": [
+     "6sd1w6GtRD90PjbZj6gc",
+     "NTKx6K9sBE4CuepehNrq",
+     "G6cKaPrUnz6i3PjdEWJJ",
+     "HAZFOlM7LFPEToFJCVbA"
+    ],
+    "generaciones": [
+     "PS42T8gJ5v8Wb13f6Enf",
+     "dbB9jrrhLJFXvMzAP1J8",
+     "OSrYbWY5ZjNJCrhyVVgB",
+     "7NY4nTkaIl2J20pfgzzM"
+    ]
+   },
+   "isolde_dolor": {
+    "prompt": "A ghostly woman hurt: a short sharp gasp with an eerie echo, 0.7 seconds",
+    "sesiones": [
+     "LzvOnxoUssUfvRVBbGkE",
+     "DvfpDtLdVsubo82ZVKq1",
+     "2wqUH5VsTprke1OQry3c",
+     "qHxXOeC1tRnFQPVjA2CR"
+    ],
+    "generaciones": [
+     "M4ZQzdUkWpfdGVQ64jPn",
+     "z9sI8fe9wDoGY5WxMP8M",
+     "tk5wdfW9rCPQqU2bWuIL",
+     "pOAbp9D64BCKlZZDfJgd"
+    ]
+   },
+   "isolde_muerte": {
+    "prompt": "A ghost queen fading away: a long sorrowful sigh, a crown and glass cracking and shattering softly, dust settling into silence, 3.5 seconds",
+    "sesiones": [
+     "gioVdIys77AP7m3t1z65",
+     "PEMKGLuYtDksJbtXbJAW",
+     "vPX3dQBFuaJGDa9yejxP",
+     "i5AggwiTTxt3kkoKrSAW"
+    ],
+    "generaciones": [
+     "gCEAx0nsW1J5QR3gtgYk",
+     "tsrEqZpGXZdcs2yP8zyy",
+     "dpF3ABFEWPx2bIDhTBez",
+     "yCT32ChoOIqamzMxL9cl"
+    ]
+   },
+   "homenaje_ambiente": {
+    "prompt": "Ambience inside a vast dark castle keep high in the sky: cold wind moaning through broken windows, distant creaking of enormous iron chains, a faint ghostly choir far away, seamless loop, 20 seconds",
+    "sesiones": [
+     "Qn2x5GV3pxccTneQw9rY",
+     "40emmitxCWKMIUTkqWp3",
+     "qzMw1GSYsDTT24U6EDEs",
+     "fJb1lkgSqexhewCdoWiB"
+    ],
+    "generaciones": [
+     "twL47NECUHfqfbs5DnBl",
+     "LWDUzPZuXpOsPHPIYRW4",
+     "BPIUs6mFbtfYw5Ds7vDo",
+     "Ct7iPIxRaDQ9j94TCtov"
+    ]
+   },
+   "puerta_homenaje": {
+    "prompt": "A colossal iron-bound door slowly grinding open inside a stone keep, a deep rumble and heavy chains rattling, 3 seconds",
+    "sesiones": [
+     "VT039HUfNqhHsQxawclg",
+     "W8zhOnSC7rfSlOKZwH8d",
+     "xFuqps5OK2pFoRqb6CxR",
+     "dpMKgHbxtlrgXCAQd3dc"
+    ],
+    "generaciones": [
+     "uQ2yWdpynYhP4nAitaW3",
+     "eZ7qNG83p1zLgPxzVZMw",
+     "bkMDP4EB3UO7Anbc9eaE",
+     "Bx0cT6PLy1exhRz7aWw7"
     ]
    }
   }
