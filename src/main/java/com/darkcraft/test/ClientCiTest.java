@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 136 * 60 * 20;
+    private static final int LIMIT = 144 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -6043,6 +6043,8 @@ public final class ClientCiTest {
         t = homenaje(t);
         // el Corazon de la Aguja: la puerta, la Sombra sin Nombre y su corazon (parte 7ac)
         t = aguja(t);
+        // la cronica de Morvain: los cofres de los capitulos 7-10, sus cinematicas con la voz de Maelis y sus libros (parte 7ae)
+        t = cronica(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -11884,6 +11886,113 @@ public final class ClientCiTest {
      * final (parte 7ad): al deshacerse, la cinematica del alba, los creditos, el epilogo de Maelis en la capilla y el cielo del alba;
      * despues, con el comando, el de la nueva Sombra (la cinematica, los creditos, el epilogo, el cielo gris y el fuego frio).
      */
+    // ------------------------------------------------------------------ la cronica de Morvain (parte 7ae)
+
+    /**
+     * La cronica de Morvain (parte 7ae): los cuatro cofres puestos (los que falten), y en cada uno (capitulos 7-10) un clic
+     * derecho de verdad, la cinematica con la voz de Maelis (el titulo y una captura por plano, con el estado de la voz) y el
+     * cofre abierto con el libro; al final, la Historia del menu con su apartado de Morvain y el capitulo 7 en el codice.
+     */
+    private static int cronica(int T) {
+        int t = T;
+        atTicks(t, "Cronica de Morvain: los cofres de los capitulos 7-10", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                if (mv == null) return;
+                int n = com.darkcraft.morvain.CronicaMorvain.ponerTodos(mv);
+                log("  cronica de Morvain: " + n + " de 4 cofres | " + com.darkcraft.morvain.CronicaMorvain.resumen(mv) + " | leidos "
+                        + Integer.toBinaryString(com.darkcraft.story.Story.read(sp)));
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        t += 40;
+        for (int ch = com.darkcraft.story.Story.MORVAIN; ch <= com.darkcraft.story.Story.CHAPTERS; ch++) t = capituloMorvain(t, ch);
+        atTicks(t, "Cronica de Morvain: la Historia del menu", m -> {
+            m.setScreen(null);
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.HISTORIA);
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_cr90_historia"));
+        t += 10;
+        atTicks(t, "Cronica de Morvain: el capitulo 7 en el codice", m -> {
+            m.setScreen(null);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.capitulo(7));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_cr91_codice7"));
+        t += 10;
+        atTicks(t, "Cronica de Morvain: el capitulo 10 en el codice", m -> {
+            m.setScreen(null);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.capitulo(10));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_cr92_codice10");
+            m.setScreen(null);
+        });
+        return t + 20;
+    }
+
+    /** Un capitulo de la cronica de Morvain: delante de su cofre, el clic, la cinematica plano a plano y el cofre con el libro. */
+    private static int capituloMorvain(int T, int ch) {
+        int t = T;
+        final BlockPos cofre = com.darkcraft.morvain.CronicaMorvain.sitio(ch);
+        atTicks(t, "Cronica: al cofre del capitulo " + ch, m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            server(m, sp -> comando(sp, "darkcraft cronica ir " + ch));
+        });
+        t += 80;
+        atTicks(t, "Cronica: clic derecho en el cofre del capitulo " + ch, m -> {
+            server(m, sp -> log("  capitulo " + ch + ": jugador en " + fpos(sp) + " | " + com.darkcraft.morvain.CronicaMorvain.resumen(sp.serverLevel())));
+            Direction cara = com.darkcraft.morvain.CronicaMorvain.mira(ch);
+            var r = m.gameMode.useItemOn(m.player, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(cofre), cara, cofre, false));
+            log("  clic en el cofre del capitulo " + ch + ": " + r);
+        });
+        final int C = t;
+        int n = com.darkcraft.cine.Timeline.groups(ch).length;
+        float[] cortes = new float[n + 1];
+        cortes[0] = com.darkcraft.cine.Timeline.NARR_START - 0.6f;
+        for (int g = 0; g < n - 1; g++) cortes[g + 1] = com.darkcraft.cine.Timeline.cut(ch, g);
+        cortes[n] = com.darkcraft.cine.Timeline.back(ch);
+        float[] cuando = new float[n + 1];
+        cuando[0] = 4.0f;
+        for (int g = 0; g < n; g++) cuando[g + 1] = mitad(cortes, g, 0.5f);
+        for (int i = 0; i < cuando.length; i++) {
+            final int k = i;
+            atTicks(C + Math.round(cuando[i] * 20) + 3, "Captura de la cinematica del capitulo " + ch, m -> {
+                m.options.hideGui = false;
+                shot(m, String.format("cliente_cr%02d_%d", ch, k));
+                log(String.format(java.util.Locale.ROOT, "  capitulo %d t=%.1f s: activa=%s capitulo=%d voz=%s (audio en el mod %s, %.1f s)", ch,
+                        ClientCine.time(), ClientCine.active(), ClientCine.chapter(), ClientCine.narrationPlaying(), com.darkcraft.cine.Timeline.hasAudio(ch),
+                        com.darkcraft.cine.Timeline.narration(ch)));
+            });
+        }
+        t = C + Math.round(com.darkcraft.cine.Timeline.total(ch) * 20) + 40;
+        atTicks(t, "Captura: el cofre del capitulo " + ch, m -> {
+            m.options.hideGui = false;
+            shot(m, String.format("cliente_cr%02d_cofre", ch));
+            StringBuilder b = new StringBuilder("  cofre del capitulo " + ch + " abierto: " + (m.screen == null ? "NO" : m.screen.getClass().getSimpleName()) + " |");
+            if (m.player.containerMenu instanceof net.minecraft.world.inventory.ChestMenu cm)
+                for (int i = 0; i < 27; i++) {
+                    ItemStack it = cm.getContainer().getItem(i);
+                    if (!it.isEmpty()) b.append(' ').append(i).append('=').append(it.getHoverName().getString());
+                }
+            log(b.toString());
+            server(m, sp -> log("  capitulo " + ch + ": leidos " + Integer.toBinaryString(com.darkcraft.story.Story.read(sp)) + ", visto "
+                    + com.darkcraft.story.Story.seenCine(sp, ch) + ", logro " + com.darkcraft.story.Logros.tiene(sp, com.darkcraft.story.Logros.capitulo(ch))));
+        });
+        t += 20;
+        atTicks(t, "Cronica: cerrar el cofre", m -> {
+            if (m.player != null) m.player.closeContainer();
+            m.setScreen(null);
+        });
+        return t + 20;
+    }
+
     private static int aguja(int T) {
         final var H = com.darkcraft.morvain.Homenaje.get();
         final int Y = com.darkcraft.morvain.Homenaje.pisa(com.darkcraft.morvain.Homenaje.AZOTEA);

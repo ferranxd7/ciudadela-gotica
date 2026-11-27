@@ -263,12 +263,20 @@ public final class ClientCine {
             bellDone[i] = true;
             mc.getSoundManager().play(SimpleSoundInstance.forUI(DarkCraftMod.CAMPANA.get(), 1.0f, 1.0f - i * 0.15f));
         }
-        // la voz del narrador (capitulos 1 y 5)
+        // la voz del narrador (capitulos 1 y 5; el 6, la Sombra; los 7-10, Maelis)
         if (Timeline.narrated(chapter) && !narrStarted && t >= Timeline.NARR_START) {
             narrStarted = true;
             // en la categoria general (MASTER): suena aunque la barra de "Voz" este bajada
-            ResourceLocation loc = (chapter == 5 ? DarkCraftMod.NARRACION_5 : chapter == 6 ? DarkCraftMod.NARRACION_6
-                    : DarkCraftMod.NARRACION_1).get().getLocation();
+            ResourceLocation loc = (switch (chapter) {
+                case 5 -> DarkCraftMod.NARRACION_5;
+                case 6 -> DarkCraftMod.NARRACION_6;
+                // la cronica de Morvain (parte 7ae): la cuenta Maelis
+                case 7 -> DarkCraftMod.NARRACION_7;
+                case 8 -> DarkCraftMod.NARRACION_8;
+                case 9 -> DarkCraftMod.NARRACION_9;
+                case 10 -> DarkCraftMod.NARRACION_10;
+                default -> DarkCraftMod.NARRACION_1;
+            }).get().getLocation();
             narr = new SimpleSoundInstance(loc, SoundSource.MASTER, 1.0f, 1.0f,
                     SoundInstance.createUnseededRandom(), false, 0, SoundInstance.Attenuation.NONE, 0, 0, 0, true);
             mc.getSoundManager().play(narr);
@@ -396,8 +404,10 @@ public final class ClientCine {
 
     @SubscribeEvent
     public static void onPlayerRender(RenderPlayerEvent.Pre e) {
-        // en el capitulo 5 si se ve a los jugadores: el ultimo plano es el suyo (y en algunas de guion, a ratos)
-        if (active && camOn && chapter != 5 && !(chapter >= GUION && Guion.jugadores(chapter, time()))) e.setCanceled(true);
+        // en el capitulo 5 y en los de Morvain (7-10) si se ve a los jugadores: el ultimo plano es el suyo (y en algunas de guion,
+        // a ratos)
+        if (active && camOn && chapter != 5 && !com.darkcraft.story.Story.morvain(chapter) && !(chapter >= GUION && Guion.jugadores(chapter, time())))
+            e.setCanceled(true);
     }
 
     /** Sin nombres flotando encima de los jugadores mientras la camara de cine esta puesta. */

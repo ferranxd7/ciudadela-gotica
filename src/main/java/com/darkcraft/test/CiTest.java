@@ -757,6 +757,7 @@ public final class CiTest {
         isolde(server, m, log, out);
         sombra(server, m, log, out);
         desenlace(server, m, log);
+        cronicaMorvain(server, m, log);
     }
 
     /**
@@ -4790,17 +4791,74 @@ public final class CiTest {
         }
     }
 
-    /**
-     * El final (parte 7ad): por donde empieza Maelis segun el final y si se vio la cinematica (18/22 tras verla, 17/21 sin verla; una
-     * vez), los creditos que acaban (a la capilla, delante de ella, y a los 30 ticks habla con el epilogo), lo que se manda del cielo y
-     * que la camara de cada plano de las dos cinematicas no se meta en nada (y que se vea lo que mira en la sala).
-     */
     /** Si en ese bloque se puede estar de pie (aire, o algo de menos de 0,1 de alto como una alfombra). */
     private static boolean pisable(ServerLevel m, BlockPos p) {
         var sh = m.getBlockState(p).getCollisionShape(m, p);
         return sh.isEmpty() || sh.max(net.minecraft.core.Direction.Axis.Y) <= 0.1;
     }
 
+    /**
+     * Parte 7ae: la cronica de Morvain. Los cuatro cofres (capitulos 7-10) se ponen en su sitio con su marca y no se rompen; el
+     * libro de cada capitulo (paginas, titulo y autor); los tiempos de la narracion de Maelis (audio, frases, duracion) y los planos
+     * de su cinematica en el mundo de verdad (cuantos, y si la camara se mete en algo o se tapa lo que mira).
+     */
+    private static void cronicaMorvain(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        StringBuilder sb = new StringBuilder("Morvain, la cronica:");
+        try {
+            com.darkcraft.morvain.CronicaMorvain.olvidar(m);
+            int n = com.darkcraft.morvain.CronicaMorvain.ponerTodos(m);
+            sb.append(' ').append(n).append(" de 4 puestos | ").append(com.darkcraft.morvain.CronicaMorvain.resumen(m));
+            // otra vez: no se ponen dos
+            int n2 = com.darkcraft.morvain.CronicaMorvain.ponerTodos(m);
+            sb.append(" | otra vez ").append(n2);
+            for (int ch = com.darkcraft.story.Story.MORVAIN; ch <= com.darkcraft.story.Story.CHAPTERS; ch++) {
+                BlockPos p = com.darkcraft.morvain.CronicaMorvain.sitio(ch);
+                int marca = com.darkcraft.story.StoryEvents.chapterAt(m, p);
+                net.minecraft.world.item.ItemStack libro = com.darkcraft.story.Story.book(ch);
+                var tag = libro.getTag();
+                int paginas = tag == null ? 0 : tag.getList("pages", net.minecraft.nbt.Tag.TAG_STRING).size();
+                sb.append(String.format(java.util.Locale.ROOT, " | %d: marca %d, libro \"%s\" de %s, %d paginas, debajo %s", ch, marca,
+                        tag == null ? "?" : tag.getString("title"), tag == null ? "?" : tag.getString("author"), paginas,
+                        net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(m.getBlockState(p.below()).getBlock()).getPath()));
+            }
+        } catch (Exception e) {
+            sb.append(" ERROR ").append(e);
+            DarkCraftMod.LOGGER.error("[DarkCraft] la cronica de Morvain", e);
+        }
+        log.println(sb);
+        log.flush();
+        StringBuilder sc = new StringBuilder("Morvain, la cronica, la camara:");
+        try {
+            var w = com.darkcraft.morvain.PlanosCronica.de(m);
+            for (int ch = com.darkcraft.story.Story.MORVAIN; ch <= com.darkcraft.story.Story.CHAPTERS; ch++) {
+                double[] q = com.darkcraft.morvain.CronicaMorvain.delante(ch);
+                var eye = new net.minecraft.world.phys.Vec3(q[0], q[1] + 1.62, q[2]);
+                var planos = com.darkcraft.morvain.PlanosCronica.capitulo(ch, w, eye, (float) q[3]);
+                int metidas = 0, tapadas = 0;
+                StringBuilder det = new StringBuilder();
+                for (var sh : planos) {
+                    int me = com.darkcraft.morvain.PlanosCronica.metidas(w, sh), ta = com.darkcraft.morvain.PlanosCronica.tapadas(w, sh);
+                    metidas += me;
+                    tapadas += ta;
+                    det.append(' ').append(me).append('/').append(ta);
+                }
+                sc.append(String.format(java.util.Locale.ROOT, " | %d: audio %s, %d frases, %.1f s (cinematica %.1f s), %d planos de %d, metida %d, tapada %d (%s)",
+                        ch, com.darkcraft.cine.Timeline.hasAudio(ch), com.darkcraft.cine.Timeline.lines(ch).length, com.darkcraft.cine.Timeline.narration(ch),
+                        com.darkcraft.cine.Timeline.total(ch), planos.size(), com.darkcraft.cine.Timeline.groups(ch).length, metidas, tapadas, det.toString().trim()));
+            }
+        } catch (Exception e) {
+            sc.append(" ERROR ").append(e);
+            DarkCraftMod.LOGGER.error("[DarkCraft] la cronica de Morvain, la camara", e);
+        }
+        log.println(sc);
+        log.flush();
+    }
+
+    /**
+     * El final (parte 7ad): por donde empieza Maelis segun el final y si se vio la cinematica (18/22 tras verla, 17/21 sin verla; una
+     * vez), los creditos que acaban (a la capilla, delante de ella, y a los 30 ticks habla con el epilogo), lo que se manda del cielo y
+     * que la camara de cada plano de las dos cinematicas no se meta en nada (y que se vea lo que mira en la sala).
+     */
     private static void desenlace(MinecraftServer server, ServerLevel m, PrintWriter log) {
         StringBuilder sb = new StringBuilder("Morvain, el final:");
         var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ad1"), "[DarkCraftCI22]"));

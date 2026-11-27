@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:morvain",
+  "display": {
+    "icon": {
+      "item": "minecraft:writable_book"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.capitulo7.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.capitulo7.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}

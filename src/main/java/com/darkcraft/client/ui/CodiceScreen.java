@@ -43,9 +43,16 @@ public class CodiceScreen extends Screen {
             VINIETA = new ResourceLocation(DarkCraftMod.MODID, "textures/gui/vinieta.png");
     /** Estilos: la cronica de Aldous (capital roja), la Sombra (negra y roja, tinta roja), libros perdidos (azul), diario (verde). */
     public static final int CRONICA = 0, SOMBRA = 1, PERDIDO = 2, DIARIO = 3;
-    /** Las miniaturas de miniaturas.png: 0-5 los capitulos, y estas. */
+    /** Las miniaturas de miniaturas.png: 0-5 los capitulos, y estas; 12-15 los capitulos de Morvain (7-10, parte 7ae). */
     public static final int MIN_PERDIDO_VALDRENN = 6, MIN_PERDIDO_FORTALEZA = 7, MIN_DIARIO = 8, MIN_ACERTIJO = 9, MIN_PERDIDO_BRUMAVELA = 10,
-            MIN_PERDIDO_MORVAIN = 11;
+            MIN_PERDIDO_MORVAIN = 11, MIN_MORVAIN = 12;
+    /** Lo alto del atlas de las miniaturas (cuatro filas de cuatro). */
+    private static final int MINI_ATLAS_H = 320;
+
+    /** La miniatura de un capitulo de la cronica: 0-5 los de Valdrenn y el de la Sombra; 12-15 los de Morvain. */
+    public static int miniaturaCapitulo(int ch) {
+        return ch >= 7 ? MIN_MORVAIN + Mth.clamp(ch - 7, 0, 3) : Mth.clamp(ch - 1, 0, 5);
+    }
 
     /** La miniatura de un libro perdido: los de Valdrenn (1-5), los de la fortaleza (6-11), las notas de Brumavela (12-16) y
      * los de Morvain (18 en adelante). */
@@ -102,12 +109,12 @@ public class CodiceScreen extends Screen {
         };
     }
 
-    /** Un capitulo de la cronica de Valdrenn (el 6 lo escribe la Sombra). */
+    /** Un capitulo de la cronica (el 6 lo escribe la Sombra; los 7-10, la cronica de Morvain, los cuenta Maelis). */
     public static Libro capitulo(int ch) {
         Libro l = new Libro("cap" + ch);
         l.cabecera = Component.translatable("darkcraft.capitulo", romano(ch));
         l.titulo = Component.translatable("darkcraft.cap." + ch + ".titulo");
-        l.miniatura = Mth.clamp(ch - 1, 0, 5);
+        l.miniatura = miniaturaCapitulo(ch);
         l.estilo = ch == 6 ? SOMBRA : CRONICA;
         for (int p = 1; p <= 40; p++) {
             String k = "darkcraft.cap." + ch + ".p" + p;
@@ -168,7 +175,8 @@ public class CodiceScreen extends Screen {
 
     /** Un libro escrito: los del mod con su texto del idioma del juego; cualquier otro, con lo que lleve escrito. */
     public static Libro escrito(ItemStack st) {
-        if (st.hasTag() && st.getTag().contains("darkcraft_libro")) return capitulo(Mth.clamp(st.getTag().getInt("darkcraft_libro"), 1, 6));
+        if (st.hasTag() && st.getTag().contains("darkcraft_libro"))
+            return capitulo(Mth.clamp(st.getTag().getInt("darkcraft_libro"), 1, com.darkcraft.story.Story.CHAPTERS));
         int perdido = com.darkcraft.fortaleza.Perdidos.de(st);
         if (perdido > 0) return perdido(perdido);
         Libro l = new Libro("escrito");
@@ -781,7 +789,7 @@ public class CodiceScreen extends Screen {
             case E_MINIATURA -> {
                 Pix.mezcla();
                 int i = e.extra();
-                g.blit(MINIATURAS, x, y, (i % 4) * MIN_W, (i / 4) * MIN_H, MIN_W, MIN_H, 512, 256);
+                g.blit(MINIATURAS, x, y, (i % 4) * MIN_W, (i / 4) * MIN_H, MIN_W, MIN_H, 512, MINI_ATLAS_H);
                 marco(g, x - MARCO, y - MARCO, MIN_W + 2 * MARCO, MIN_H + 2 * MARCO);
             }
             case E_CABECERA -> {
@@ -838,7 +846,7 @@ public class CodiceScreen extends Screen {
     /** Una miniatura con su marco de oro (x, y: donde empieza la pintura, sin el marco). */
     public static void miniatura(GuiGraphics g, int i, int x, int y) {
         Pix.mezcla();
-        g.blit(MINIATURAS, x, y, (i % 4) * MIN_W, (i / 4) * MIN_H, MIN_W, MIN_H, 512, 256);
+        g.blit(MINIATURAS, x, y, (i % 4) * MIN_W, (i / 4) * MIN_H, MIN_W, MIN_H, 512, MINI_ATLAS_H);
         marco(g, x - MARCO, y - MARCO, MIN_W + 2 * MARCO, MIN_H + 2 * MARCO);
     }
 

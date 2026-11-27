@@ -18,15 +18,26 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 /**
- * La cronica de Valdrenn: cinco capitulos escritos por Aldous, el cronista del rey. Los textos estan
- * en los ficheros de idioma (cada jugador los lee en el idioma de su juego).
+ * La cronica: los capitulos 1-5 los escribio Aldous, el cronista del rey (la cronica de Valdrenn); el 6 lo dice la Sombra; los
+ * 7-10 (la cronica de Morvain, parte 7ae) los cuenta Maelis, la guia de los santuarios. Los textos estan en los ficheros de
+ * idioma (cada jugador los lee en el idioma de su juego).
  */
 public final class Story {
     private Story() {}
 
-    public static final int CHAPTERS = 6;
-    /** Paginas de cada libro (capitulos 1..6; el 6 lo escribe la Sombra: son las frases de su narracion). */
-    private static final int[] PAGES = {0, 8, 7, 7, 7, 7, 4};
+    public static final int CHAPTERS = 10;
+    /**
+     * Paginas de cada libro (capitulos 1..10; el 6 lo escribe la Sombra: son las frases de su narracion; los 7-10, las de
+     * Maelis: {@code PAGINAS_MORVAIN} de ci/historia/perdidos.py).
+     */
+    private static final int[] PAGES = {0, 8, 7, 7, 7, 7, 4, 6, 5, 5, 6};
+    /** El primer capitulo de la cronica de Morvain (los cuenta Maelis; sus cofres estan en Morvain). */
+    public static final int MORVAIN = 7;
+
+    /** Si el capitulo es de la cronica de Morvain (7-10). */
+    public static boolean morvain(int ch) {
+        return ch >= MORVAIN && ch <= CHAPTERS;
+    }
     private static final String KEY = "darkcraft";
 
     // ------------------------------------------------------------------ libros
@@ -34,8 +45,9 @@ public final class Story {
     public static ItemStack book(int ch) {
         ItemStack b = new ItemStack(Items.WRITTEN_BOOK);
         CompoundTag t = b.getOrCreateTag();
-        t.putString("title", "Cronica de Valdrenn " + ch);
-        t.putString("author", ch == 6 ? "?" : "Aldous");
+        boolean mv = morvain(ch);
+        t.putString("title", (mv ? "Cronica de Morvain " : "Cronica de Valdrenn ") + ch);
+        t.putString("author", mv ? "Maelis" : ch == 6 ? "?" : "Aldous");
         t.putInt("generation", 0);
         ListTag pages = new ListTag();
         for (int p = 1; p <= PAGES[ch]; p++) {
@@ -52,12 +64,13 @@ public final class Story {
         }
         t.put("pages", pages);
         t.putBoolean("resolved", true);
-        b.setHoverName(Component.translatable("darkcraft.libro", ch).withStyle(s -> s.withItalic(false).withColor(ChatFormatting.DARK_RED)));
+        b.setHoverName(Component.translatable(mv ? "darkcraft.libro.morvain" : "darkcraft.libro", ch)
+                .withStyle(s -> s.withItalic(false).withColor(ChatFormatting.DARK_RED)));
         CompoundTag display = t.getCompound("display");
         ListTag lore = new ListTag();
         lore.add(StringTag.valueOf(Component.Serializer.toJson(Component.translatable("darkcraft.cap." + ch + ".titulo")
                 .withStyle(s -> s.withItalic(true).withColor(ChatFormatting.GOLD)))));
-        lore.add(StringTag.valueOf(Component.Serializer.toJson(Component.translatable("darkcraft.libro.lore")
+        lore.add(StringTag.valueOf(Component.Serializer.toJson(Component.translatable(mv ? "darkcraft.libro.lore.morvain" : "darkcraft.libro.lore")
                 .withStyle(s -> s.withItalic(true).withColor(ChatFormatting.DARK_GRAY)))));
         display.put("Lore", lore);
         t.put("display", display);
@@ -110,7 +123,7 @@ public final class Story {
         d.putInt("cine", 0);
     }
 
-    /** Siguiente capitulo por leer (1..5) o 6 si ya se han leido todos. */
+    /** Siguiente capitulo por leer (1..10) o 11 si ya se han leido todos. */
     public static int next(int readMask) {
         for (int c = 1; c <= CHAPTERS; c++) if ((readMask & (1 << c)) == 0) return c;
         return CHAPTERS + 1;

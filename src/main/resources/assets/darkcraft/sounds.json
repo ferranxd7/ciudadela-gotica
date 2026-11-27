@@ -7261,5 +7261,41 @@
         "stream": true
       }
     ]
+  },
+  "narracion.cap7": {
+    "subtitle": "subtitles.darkcraft.voz.guia",
+    "sounds": [
+      {
+        "name": "darkcraft:narracion/cap7",
+        "stream": true
+      }
+    ]
+  },
+  "narracion.cap8": {
+    "subtitle": "subtitles.darkcraft.voz.guia",
+    "sounds": [
+      {
+        "name": "darkcraft:narracion/cap8",
+        "stream": true
+      }
+    ]
+  },
+  "narracion.cap9": {
+    "subtitle": "subtitles.darkcraft.voz.guia",
+    "sounds": [
+      {
+        "name": "darkcraft:narracion/cap9",
+        "stream": true
+      }
+    ]
+  },
+  "narracion.cap10": {
+    "subtitle": "subtitles.darkcraft.voz.guia",
+    "sounds": [
+      {
+        "name": "darkcraft:narracion/cap10",
+        "stream": true
+      }
+    ]
   }
 }

@@ -576,6 +576,118 @@ TITULO6 = {"es": "La puerta sobre las nubes", "en": "The Door Above the Clouds",
            "de": "Die Tür über den Wolken", "pt": "A porta acima das nuvens", "ja": "雲の上の扉"}
 
 
+# la cronica de Morvain (parte 7ae): los capitulos 7-10 los cuenta Maelis, la guia de los santuarios, con su voz de
+# ElevenLabs ("Autumn Veil": voz_guia.cronica en ci/eleven/sesiones.json; en ingles en el audio, los subtitulos en cada
+# idioma). Lo monta ci/eleven/procesar.py (capitulo_guia, con las pausas de CAPITULOS_GUIA: las mismas que PAUSAS_MORVAIN).
+# Los demas idiomas, en ingles hasta su tanda.
+NARRACION_MORVAIN = {
+ 7: [
+  ("Before the Shadow, this was Morvain... a kingdom of bells and mills and harbours, of scholars who read the stars.",
+   "Antes de la Sombra, esto era Morvain... un reino de campanas, de molinos y de puertos, de sabios que leían las estrellas."),
+  ("Its people swore oaths the way others breathe. The Constable swore to guard the gate. The Abbot swore to keep the faith.",
+   "Su gente juraba como otros respiran. El Condestable juró guardar la puerta. El Abad juró guardar la fe."),
+  ("Then came the night of the red sky. Fire fell on the palace... and the sea was drunk in a single breath.",
+   "Entonces llegó la noche del cielo rojo. El fuego cayó sobre el palacio... y el mar desapareció de un solo trago."),
+  ("The bell of Velmor rang for fire. No one came.",
+   "La campana de Velmor tocó a fuego. Nadie acudió."),
+  ("They did not die, marked one. They stayed. Each of them bound to the last thing they swore.",
+   "No murieron, marcado. Se quedaron. Cada uno atado a lo último que juró."),
+  ("The miller still reaps a field that will not grow. The hangman still waits beneath his tree.",
+   "La molinera aún siega un campo que no crece. El verdugo aún espera bajo su árbol."),
+  ("And at the heart of it all, above the crater of blood, the citadel hangs from its eight chains.",
+   "Y en el corazón de todo, sobre el cráter de sangre, la ciudadela cuelga de sus ocho cadenas."),
+  ("That is where it waits. That is where it brought you back to go.",
+   "Allí espera. Para ir allí te trajo de vuelta."),
+  ("Rest when you can. Every fire you light is one more step towards it.",
+   "Descansa cuando puedas. Cada fuego que enciendes es un paso más hacia allí."),
+ ],
+ 8: [
+  ("Ser Halvard closed the gates of the capital so the fire would not spread. He closed them on his own people.",
+   "Ser Halvard cerró las puertas de la capital para que el fuego no se extendiera. Las cerró sobre su propia gente."),
+  ("The Rector climbed her tower to read the falling fire... and the stars read her instead.",
+   "La Rectora subió a su torre a leer el fuego que caía... y fueron las estrellas las que la leyeron a ella."),
+  ("The Abbot climbed the summit to beg the cold for mercy. The cold answered him.",
+   "El Abad subió a la cumbre a suplicarle clemencia al frío. El frío le respondió."),
+  ("The ferryman still rows the black lagoon for the drowned, though there is no one left to carry.",
+   "El barquero aún rema por la laguna negra buscando a los ahogados, aunque ya no queda nadie a quien llevar."),
+  ("Brann waits for a sea that will never return. Anselmo bleeds for a god that only ever answered: give.",
+   "Brann espera a un mar que no volverá. Anselmo sangra por un dios que solo respondió una cosa: da."),
+  ("None of them chose to stay. The Shadow took their oaths and left the rest of them behind.",
+   "Ninguno eligió quedarse. La Sombra se llevó sus juramentos y dejó atrás todo lo demás."),
+  ("When you strike them down, you do not kill them. You let them keep their word... one last time.",
+   "Cuando los derribas, no los matas. Les dejas cumplir su palabra... una última vez."),
+  ("Remember their names, marked one. In Morvain, no one else does.",
+   "Recuerda sus nombres, marcado. En Morvain ya nadie lo hace."),
+ ],
+ 9: [
+  ("Aldric was the first. He woke at the bottom of the crater with the mark burning in his chest... and a voice that said: break my chains.",
+   "Aldric fue el primero. Despertó en el fondo del cráter con la marca ardiéndole en el pecho... y una voz que decía: rompe mis cadenas."),
+  ("Others came after him, one by one. They struck the chain in turns, day and night, until their hands were no longer their own.",
+   "Otros llegaron después, uno a uno. Golpeaban la cadena por turnos, día y noche, hasta que sus manos dejaron de ser suyas."),
+  ("The iron my sisters forged does not break, marked one. It was never meant to.",
+   "El hierro que forjaron mis hermanas no se rompe, marcado. Nunca se hizo para romperse."),
+  ("So Aldric climbed. Link by link, up the southern chain, to see the citadel with his own eyes.",
+   "Así que Aldric subió. Eslabón a eslabón, por la cadena del sur, para ver la ciudadela con sus propios ojos."),
+  ("There was no door at the top. Only a mouth... waiting.",
+   "Arriba no había ninguna puerta. Solo una boca... esperando."),
+  ("He came down running, and he never climbed again. He knelt by the anchor so that no one else would.",
+   "Bajó corriendo y nunca volvió a subir. Se arrodilló junto al ancla para que nadie más lo hiciera."),
+  ("The Shadow does not need its chains broken. It needs a door opened... by a living hand.",
+   "La Sombra no necesita que rompan sus cadenas. Necesita que una mano viva... le abra una puerta."),
+  ("Yours is the first hand to come this far. I do not know whether to be glad.",
+   "La tuya es la primera mano que llega tan lejos. No sé si alegrarme."),
+ ],
+ 10: [
+  ("A thousand winters ago, the Shadow came to Morvain hungry... and my sisters met it with fire.",
+   "Hace mil inviernos, la Sombra llegó hambrienta a Morvain... y mis hermanas la recibieron con fuego."),
+  ("They forged eight chains in the fire of their own souls, and bound it in the sky, above the crater, where nothing could reach it.",
+   "Forjaron ocho cadenas en el fuego de sus propias almas y la ataron en el cielo, sobre el cráter, donde nada pudiera alcanzarla."),
+  ("Then they scattered across the land and lit the fires you rest beside. Each fire is a sister... keeping watch.",
+   "Después se repartieron por la tierra y encendieron los fuegos junto a los que descansas. Cada fuego es una hermana... que vigila."),
+  ("But a chain is only as strong as the oaths around it. King Corvin of Valdrenn broke his... for a queen.",
+   "Pero una cadena solo es tan fuerte como los juramentos que la rodean. El rey Corvin de Valdrenn rompió el suyo... por una reina."),
+  ("Through that broken oath the Shadow reached out, and the sky of Morvain turned red.",
+   "Por ese juramento roto la Sombra alargó la mano, y el cielo de Morvain se volvió rojo."),
+  ("One by one, my sisters went out. I am the last. This is the last flame.",
+   "Una a una, mis hermanas se apagaron. Yo soy la última. Esta es la última llama."),
+  ("Above us, the Shadow will offer you everything. Its heart. Its crown. A life that death can never touch.",
+   "Ahí arriba, la Sombra te lo ofrecerá todo. Su corazón. Su corona. Una vida que la muerte no podrá tocar."),
+  ("I cannot choose for you, marked one. I can only keep the fire lit... until you come back.",
+   "No puedo elegir por ti, marcado. Solo puedo mantener el fuego encendido... hasta que vuelvas."),
+ ],
+}
+TITULOS_MORVAIN = {
+ 7: {"es": "Las Tierras Marchitas", "en": "The Withered Lands"},
+ 8: {"es": "Los que se quedaron", "en": "Those Who Stayed"},
+ 9: {"es": "El primer marcado", "en": "The First Marked"},
+ 10: {"es": "Las hermanas del fuego", "en": "The Sisters of the Fire"},
+}
+# lo que se calla despues de cada frase (s): igual que CAPITULOS_GUIA en ci/eleven/procesar.py
+PAUSAS_MORVAIN = {
+ 7: [1.2, 1.5, 1.3, 1.9, 1.2, 1.6, 1.3, 1.8, 0.0],
+ 8: [1.6, 1.2, 1.3, 1.2, 1.7, 1.3, 1.8, 0.0],
+ 9: [1.4, 1.3, 1.7, 1.2, 1.9, 1.4, 1.6, 0.0],
+ 10: [1.3, 1.4, 1.6, 1.3, 1.8, 1.7, 1.5, 0.0],
+}
+# las paginas de cada libro: las frases que van en cada una (las mismas en todos los idiomas: Story.PAGES)
+PAGINAS_MORVAIN = {
+ 7: ((0, 1), (1, 2), (2, 4), (4, 6), (6, 8), (8, 9)),
+ 8: ((0, 1), (1, 3), (3, 5), (5, 7), (7, 8)),
+ 9: ((0, 1), (1, 2), (2, 4), (4, 6), (6, 8)),
+ 10: ((0, 1), (1, 2), (2, 3), (3, 5), (5, 7), (7, 8)),
+}
+
+
+def cronica_morvain(lang):
+    """Las frases y el titulo de cada capitulo de Morvain en un idioma (los que aun no estan traducidos, en ingles)."""
+    out = {}
+    for cap, lineas in NARRACION_MORVAIN.items():
+        idx = 1 if lang == "es" else 0
+        titulo = TITULOS_MORVAIN[cap].get(lang) or TITULOS_MORVAIN[cap]["en"]
+        out[cap] = (titulo, [l[idx] for l in lineas])
+    return out
+
+
 def claves(lang):
     """Las claves de idioma de todo lo de este fichero para un idioma."""
     d = {}
@@ -612,4 +724,15 @@ def claves(lang):
     d["darkcraft.cap.6.paginas"] = "4"
     d["darkcraft.cap.6.cartel1"] = TITULO6[lang]
     d["darkcraft.cap.6.cartel2"] = ""
+    # la cronica de Morvain (parte 7ae): los capitulos 7-10, que cuenta Maelis
+    for cap, (titulo, lineas) in cronica_morvain(lang).items():
+        assert len(lineas) == len(PAUSAS_MORVAIN[cap]), (cap, lang)
+        for i, l in enumerate(lineas):
+            d[f"darkcraft.narracion.{cap}.{i + 1}"] = l
+        d[f"darkcraft.cap.{cap}.titulo"] = titulo
+        for k, (a, b) in enumerate(PAGINAS_MORVAIN[cap]):
+            d[f"darkcraft.cap.{cap}.p{k + 1}"] = sep.join(lineas[a:b])
+        d[f"darkcraft.cap.{cap}.paginas"] = str(len(PAGINAS_MORVAIN[cap]))
+        d[f"darkcraft.cap.{cap}.cartel1"] = titulo
+        d[f"darkcraft.cap.{cap}.cartel2"] = ""
     return d

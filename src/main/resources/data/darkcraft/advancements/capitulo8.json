@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:capital",
+  "display": {
+    "icon": {
+      "item": "minecraft:writable_book"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.capitulo8.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.capitulo8.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}
