@@ -49,9 +49,14 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   munon de una columna a la izquierda y la punta partida a la derecha, y en el centro la cabeza de piedra de un gigante con
   los ojos cerrados (una rendija de luz); relleno de tierra que corre; lascas de piedra y polvo que caen al recibir dano.
 
+  Ser Lucan, el Jinete Nocturno (parte 7x): la guja tumbada (el asta de fresno negro con anillas de hierro y el regaton a la
+  izquierda; a la derecha el cubo y la hoja, con el espolon, la punta que se alza y el filo encendido de almas), en el centro el
+  yelmo cerrado del heraldo con la corona del Rey y la rendija azul, y debajo la banderola roja con la corona de oro; relleno
+  de fuego de almas que corre; chispas de almas y esquirlas de hierro que caen al recibir dano.
+
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
-abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png, pontifice_barra.png, aldric_barra.png y
-gigante_barra.png (256x128):
+abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png, pontifice_barra.png, aldric_barra.png,
+gigante_barra.png y jinete_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -1683,6 +1688,224 @@ def piedrecitas():
     return img
 
 
+# ---------------------------------------------------------------- Ser Lucan, el Jinete Nocturno (parte 7x)
+
+AS_DD, AS_D, AS, AS_L = hexc("100b09"), hexc("231812"), hexc("3a2a1f"), hexc("5a4334")
+HJ_DD, HJ_D, HJ, HJ_L, HJ_H = hexc("0b0d11"), hexc("20242c"), hexc("3d434e"), hexc("68707d"), hexc("a9b2bf")
+GU_D, GU, GU_L = hexc("3e0a11"), hexc("6e1621"), hexc("9c2b35")
+OJ_D, OJ, OJ_L = hexc("6b4a12"), hexc("b8892a"), hexc("ecc860")
+AL_DD, AL_D, AL, AL_L, AL_H = hexc("06141e"), hexc("10364c"), hexc("2a7299"), hexc("78c2e6"), hexc("e4f7ff")
+
+
+def dentro(px, py, pol):
+    """Si el punto esta dentro del poligono (par-impar)."""
+    d = False
+    j = len(pol) - 1
+    for i in range(len(pol)):
+        xi, yi = pol[i]
+        xj, yj = pol[j]
+        if (yi > py) != (yj > py) and px < (xj - xi) * (py - yi) / (yj - yi) + xi:
+            d = not d
+        j = i
+    return d
+
+
+def marco_jinete():
+    """La guja de Ser Lucan tumbada: el asta de fresno negro con anillas de hierro y el regaton a la izquierda; a la derecha el
+    cubo y la hoja de hierro (con el espolon por arriba, la punta que se alza y el filo encendido de almas); en el centro el
+    yelmo cerrado del heraldo con la corona del Rey y la rendija azul, y debajo la banderola roja con la corona de oro."""
+    rnd = random.Random(1307)
+    n = noise2(173)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    cy = (FY0 + FY1 - 1) / 2.0                       # 22: el centro del hueco
+    xa0, xa1 = 2, 176                                 # el asta
+    ya0, ya1 = FY0 - 3, FY1 + 2                       # 16..28
+
+    def madera(x, y):
+        v = n(x * 0.05, y * 0.9)
+        c = AS_D if v < 0.3 else AS if v < 0.78 else AS_L
+        if (y - ya0) in (0,):
+            c = mix(c, AS_L, 0.5)
+        if y == ya1:
+            c = mix(c, AS_DD, 0.6)
+        return c
+
+    def hierro(x, y, base):
+        v = n(x * 0.3 + 40, y * 0.5)
+        return mix(base, HJ_D, 0.35) if v < 0.3 else base if v < 0.75 else mix(base, HJ_L, 0.35)
+
+    # el asta
+    for y in range(ya0, ya1 + 1):
+        for x in range(xa0, xa1 + 1):
+            put(img, x, y, madera(x, y))
+    for x in range(xa0, xa1 + 1):
+        put(img, x, ya0 - 1, OUT)
+        put(img, x, ya1 + 1, OUT)
+    # la hoja (un poligono: el lomo con el espolon, la punta que se alza a la derecha y el filo por abajo)
+    hoja = [(184, 14.5), (200, 13.5), (214, 13.0), (217, 12.5), (222, 3.5), (225.5, 12.5), (236, 12.0), (243, 9.5),
+            (248, 6.0), (252, 2.5), (255.6, 0.4), (255.6, 7.0), (255.2, 15.0), (254.6, 22.0), (253.0, 28.0),
+            (249.5, 32.2), (240, 33.6), (225, 33.2), (210, 32.6), (196, 31.6), (184, 30.2)]
+    for y in range(0, 40):
+        for x in range(178, FW):
+            if dentro(x + 0.5, y + 0.5, hoja):
+                c = hierro(x, y, HJ)
+                # el lomo con su luz, el vaceo (la acanaladura) y el filo encendido
+                if not dentro(x + 0.5, y - 0.5, hoja):
+                    c = mix(c, HJ_H, 0.6)
+                elif not dentro(x + 0.5, y - 1.5, hoja):
+                    c = mix(c, HJ_L, 0.4)
+                if y == 16 and 188 <= x <= 238:
+                    c = mix(c, HJ_DD, 0.5)
+                filo = not dentro(x + 1.5, y + 1.5, hoja) or not dentro(x + 0.5, y + 1.5, hoja)
+                if filo and (y > 26 or x > 248):
+                    c = AL_L if (x + y) % 5 else AL_H
+                elif filo:
+                    c = mix(c, AL, 0.5)
+                put(img, x, y, c)
+    # contorno de la hoja
+    antes = img.copy()
+    for y in range(0, 40):
+        for x in range(176, FW):
+            if antes.getpixel((x, y))[3] == 0 and any(0 <= x + a < FW and 0 <= y + b < 40 and antes.getpixel((x + a, y + b))[3] > 0
+                                                       for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                put(img, x, y, OUT)
+    # el cubo de hierro (donde la hoja abraza el asta) con sus remaches
+    for y in range(ya0 - 3, ya1 + 4):
+        for x in range(172, 185):
+            c = hierro(x, y, HJ)
+            if y == ya0 - 3:
+                c = mix(c, HJ_H, 0.55)
+            elif y == ya1 + 3:
+                c = mix(c, HJ_DD, 0.6)
+            if x in (172, 184):
+                c = OUT
+            put(img, x, y, c)
+        put(img, 171, y, OUT)
+    for x in range(171, 186):
+        put(img, x, ya0 - 4, OUT)
+        put(img, x, ya1 + 4, OUT)
+    for ry in (ya0 - 1, ya1 + 1):
+        put(img, 176, ry, HJ_H)
+        put(img, 180, ry, HJ_H)
+    # las anillas de hierro del asta
+    for ax in (24, 58, 92, 150):
+        for y in range(ya0 - 2, ya1 + 3):
+            for k in range(4):
+                c = hierro(ax + k, y, HJ_L if k == 0 else HJ if k < 3 else HJ_D)
+                if y in (ya0 - 2, ya1 + 2):
+                    c = OUT
+                put(img, ax + k, y, c)
+            put(img, ax - 1, y, OUT)
+            put(img, ax + 4, y, OUT)
+    # el regaton (la contera de hierro de la izquierda), en punta
+    for x in range(0, 12):
+        h = 1.2 + x * 0.55
+        for y in range(int(cy - h), int(cy + h) + 2):
+            c = hierro(x, y, HJ if abs(y - cy) < h - 1 else HJ_D)
+            if y < cy - h + 1.2:
+                c = mix(c, HJ_H, 0.5)
+            put(img, x, y, c)
+        put(img, x, int(cy - h) - 1, OUT)
+        put(img, x, int(cy + h) + 2, OUT)
+    # el hueco del relleno, limpio
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, OUT)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # debajo del centro, la banderola roja con la corona de oro (la gualdrapa del caballo), de dos puntas
+    mx = FW // 2
+    for y in range(ya1 + 2, 40):
+        for x in range(mx - 12, mx + 13):
+            corte = y > 34 and abs(x - mx) < (y - 34) * 1.6
+            if corte:
+                continue
+            c = GU if n(x * 0.2 + 9, y * 0.3) < 0.7 else GU_L
+            if abs(x - mx) >= 11:
+                c = OJ if (y % 2) else OJ_D
+            elif y == 39 or (y > 34 and abs(abs(x - mx) - (y - 34) * 1.6) < 1.2):
+                c = OJ_D
+            put(img, x, y, c)
+        put(img, mx - 13, y, OUT)
+        put(img, mx + 13, y, OUT)
+    for k, (dx, dy) in enumerate(((-3, 33), (-3, 32), (-1, 32), (0, 31), (1, 32), (3, 32), (3, 33), (-2, 33), (-1, 33), (0, 33),
+                                   (1, 33), (2, 33), (-2, 34), (-1, 34), (0, 34), (1, 34), (2, 34))):
+        put(img, mx + dx, dy, OJ_L if dy < 33 else OJ)
+    # en el centro, el yelmo cerrado del heraldo con la corona y la rendija azul
+    for y in range(2, FY0 - 2):
+        for x in range(mx - 9, mx + 10):
+            dx = abs(x - mx + 0.5)
+            ancho = 8.6 if y >= 6 else 8.6 - (6 - y) * 0.6
+            if dx <= ancho:
+                c = hierro(x, y, HJ)
+                if x < mx - 5:
+                    c = mix(c, HJ_L, 0.35)
+                elif x > mx + 5:
+                    c = mix(c, HJ_DD, 0.35)
+                put(img, x, y, c)
+    antes = img.copy()
+    for y in range(0, FY0 - 1):
+        for x in range(mx - 11, mx + 12):
+            if antes.getpixel((x, y))[3] == 0 and any(0 <= x + a < FW and 0 <= y + b < 40 and antes.getpixel((x + a, y + b))[3] > 0
+                                                       for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                put(img, x, y, OUT)
+    # la rendija (encendida de almas) y los respiraderos
+    for x in range(mx - 7, mx + 8):
+        if abs(x - mx + 0.5) > 1:
+            put(img, x, 8, AL_H if abs(x - mx + 0.5) < 5 else AL_L)
+            put(img, x, 9, AL)
+    for y in range(4, FY0 - 2):
+        put(img, mx, y, OJ if y != 8 and y != 9 else OJ_L)
+    for yy in (12, 14):
+        for xx in (mx - 5, mx - 3, mx + 3, mx + 5):
+            put(img, xx, yy, HJ_DD)
+    # la corona del Rey sobre el yelmo
+    for x in range(mx - 6, mx + 7):
+        put(img, x, 2, OJ_D)
+        put(img, x, 1, OJ)
+    for px_ in (mx - 6, mx - 3, mx, mx + 3, mx + 6):
+        put(img, px_, 0, OJ_L)
+    # unas chispas de almas alrededor del yelmo
+    for _ in range(8):
+        x = mx + rnd.choice((-1, 1)) * rnd.randint(11, 16)
+        y = rnd.randint(1, 15)
+        if img.getpixel((x, y))[3] == 0:
+            put(img, x, y, AL_L if rnd.random() < 0.6 else AL_H)
+    return img
+
+
+def relleno_jinete(k):
+    """El fuego de almas que corre: una niebla azul oscura con jirones palidos que pasan deprisa."""
+    n = noise2(353)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            t = 0.12 + 0.55 * mid + 0.5 * (n((x - k * 5) * 0.07, y * 0.6) - 0.5)
+            c = mix(AL_DD, AL, max(0.0, min(1.0, t * 1.35)))
+            jiron = (x - k * 5 + int(3 * math.sin((x * 0.6 + y * 9) * 0.1))) % 37
+            if jiron in (0, 1, 2, 3) and 1 <= y <= 5:
+                c = mix(c, AL_L if jiron in (1, 2) else AL, 0.6)
+            if jiron == 2 and y == 3:
+                c = mix(c, AL_H, 0.7)
+            if y == 0:
+                c = mix(c, AL_L, 0.18)
+            if y == 6:
+                c = mix(c, AL_DD, 0.7)
+            img.putpixel((x, y), c)
+    return img
+
+
+def chispas_almas():
+    """Lo que cae al recibir dano: chispas de almas y esquirlas de hierro."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = ([".a.", "aAa", ".a."], ["h.", "Hh", ".h"], ["a", "A", "a"], ["Aa", ".a"])
+    col = {"a": AL_L, "A": AL_H, "h": HJ_L, "H": HJ_H}
+    for k, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, k * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 def hueco(a, b):
     n = noise2(113)
     img = Image.new("RGBA", (240, 7))
@@ -1726,6 +1949,7 @@ if __name__ == "__main__":
         "pontifice": atlas(marco_pontifice(), relleno_pontifice, hueco("0a0405", "1e0c0d"), rastro("fff0e6", "e8b8a8"), gotas_sangre()),
         "aldric": atlas(marco_aldric(), relleno_aldric, hueco("050505", "151417"), rastro("fff2ea", "e8b0a0"), esquirlas()),
         "gigante": atlas(marco_gigante(), relleno_gigante, hueco("0a0907", "1b1813"), rastro("fff6e6", "e0caa0"), piedrecitas()),
+        "jinete": atlas(marco_jinete(), relleno_jinete, hueco("04070b", "0e1822"), rastro("eefaff", "a8d8ee"), chispas_almas()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

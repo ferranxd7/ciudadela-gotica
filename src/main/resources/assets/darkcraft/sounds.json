@@ -5641,5 +5641,183 @@
         "stream": true
       }
     ]
+  },
+  "sfx.jinete_galope": {
+    "subtitle": "subtitles.darkcraft.sfx.jinete_galope",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/jinete_galope_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/jinete_galope_2",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "sfx.jinete_relincho": {
+    "subtitle": "subtitles.darkcraft.sfx.jinete_relincho",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/jinete_relincho_1"
+      },
+      {
+        "name": "darkcraft:sfx/jinete_relincho_2"
+      }
+    ]
+  },
+  "sfx.jinete_cuerno": {
+    "subtitle": "subtitles.darkcraft.sfx.jinete_cuerno",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/jinete_cuerno_1",
+        "attenuation_distance": 128
+      },
+      {
+        "name": "darkcraft:sfx/jinete_cuerno_2",
+        "attenuation_distance": 128
+      }
+    ]
+  },
+  "sfx.jinete_tajo": {
+    "subtitle": "subtitles.darkcraft.sfx.jinete_tajo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/jinete_tajo_1"
+      },
+      {
+        "name": "darkcraft:sfx/jinete_tajo_2"
+      }
+    ]
+  },
+  "sfx.jinete_carga": {
+    "subtitle": "subtitles.darkcraft.sfx.jinete_carga",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/jinete_carga_1"
+      },
+      {
+        "name": "darkcraft:sfx/jinete_carga_2"
+      }
+    ]
+  },
+  "sfx.jinete_pisotea": {
+    "subtitle": "subtitles.darkcraft.sfx.jinete_pisotea",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/jinete_pisotea_1"
+      },
+      {
+        "name": "darkcraft:sfx/jinete_pisotea_2"
+      }
+    ]
+  },
+  "sfx.jinete_fuego": {
+    "subtitle": "subtitles.darkcraft.sfx.jinete_fuego",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/jinete_fuego_1"
+      },
+      {
+        "name": "darkcraft:sfx/jinete_fuego_2"
+      }
+    ]
+  },
+  "sfx.jinete_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.jinete_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/jinete_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/jinete_dolor_2"
+      }
+    ]
+  },
+  "sfx.jinete_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.jinete_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/jinete_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/jinete_muerte_2"
+      }
+    ]
+  },
+  "sfx.jinete_aparece": {
+    "subtitle": "subtitles.darkcraft.sfx.jinete_aparece",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/jinete_aparece_1"
+      },
+      {
+        "name": "darkcraft:sfx/jinete_aparece_2"
+      }
+    ]
+  },
+  "sfx.jinete_arnes": {
+    "subtitle": "subtitles.darkcraft.sfx.jinete_arnes",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/jinete_arnes_1"
+      },
+      {
+        "name": "darkcraft:sfx/jinete_arnes_2"
+      }
+    ]
+  },
+  "musica.jinete": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/jinete",
+        "stream": true
+      }
+    ]
+  },
+  "jinete.voz.1": {
+    "subtitle": "subtitles.darkcraft.jinete.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:jinete/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "jinete.voz.2": {
+    "subtitle": "subtitles.darkcraft.jinete.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:jinete/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "jinete.voz.3": {
+    "subtitle": "subtitles.darkcraft.jinete.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:jinete/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "jinete.voz.4": {
+    "subtitle": "subtitles.darkcraft.jinete.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:jinete/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "jinete.voz.5": {
+    "subtitle": "subtitles.darkcraft.jinete.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:jinete/voz_5",
+        "stream": false
+      }
+    ]
   }
 }

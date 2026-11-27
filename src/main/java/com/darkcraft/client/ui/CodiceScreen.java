@@ -53,7 +53,8 @@ public class CodiceScreen extends Screen {
         // (1-5 Valdrenn, 6-11 la fortaleza, 12-16 Brumavela, 17 la fortaleza otra vez: la cripta de la parte 5c; 18 Velmor y
         // 19 el registro del verdugo de la Arboleda (y 20, la hermana de la capilla de los pilotes, parte 7i; y 21, el portero del
         // Monasterio de la Helada, parte 7k): la de Morvain, desde la parte 7h —el Arbol de la Horca y la ciudadela—)
-        return n <= 5 ? MIN_PERDIDO_VALDRENN : n <= 11 || n == 17 ? MIN_PERDIDO_FORTALEZA : n <= 16 ? MIN_PERDIDO_BRUMAVELA : MIN_PERDIDO_MORVAIN;
+        // (31, la carta del Rey que llevaba el Jinete Nocturno por el camino de nubes, parte 7x: la de Valdrenn)
+        return n <= 5 || n == 31 ? MIN_PERDIDO_VALDRENN : n <= 11 || n == 17 ? MIN_PERDIDO_FORTALEZA : n <= 16 ? MIN_PERDIDO_BRUMAVELA : MIN_PERDIDO_MORVAIN;
     }
     static final int TINTA = 0xFF24170C, TINTA_SOMBRA = 0xFF3C0A0E, RUBRICA = 0xFF801212, AZUL_T = 0xFF1C2E78, PALIDA = 0xFF5E4A30;
     private static final int LINEA = 10, CAPITAL = 30, MIN_W = 128, MIN_H = 80, MARCO = 6, GIRO_MS = 380;

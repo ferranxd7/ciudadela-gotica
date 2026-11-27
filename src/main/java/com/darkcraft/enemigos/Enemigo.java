@@ -258,6 +258,31 @@ public abstract class Enemigo extends Monster {
     }
 
     /** Con amigos, los mismos enemigos pero con mas vida: la mitad mas por cada jugador de mas (hasta el triple y medio). */
+    /** El maximo de vida que se le deja a cualquiera (antes de {@link #sinTopeDeVida}, 1024). */
+    public static final double TOPE_VIDA = 1.0e6;
+
+    /**
+     * Quita el tope de 1024 de la vida maxima del juego: con el, los jefes de mas de 1024 (el Abad, el Pontifice, Aldric, los
+     * gigantes, el Jinete...) se quedaban en 1024 y con amigos casi ninguno ganaba la vida de mas ({@link #paraGrupo}). El maximo
+     * es un double final de {@code RangedAttribute}: se busca por su valor (los nombres cambian fuera del entorno de desarrollo).
+     * Se hace al construir el mod, en el servidor y en el cliente (asi los dos calculan igual la vida maxima).
+     */
+    public static void sinTopeDeVida() {
+        try {
+            if (!(Attributes.MAX_HEALTH instanceof net.minecraft.world.entity.ai.attributes.RangedAttribute r)) return;
+            for (java.lang.reflect.Field f : net.minecraft.world.entity.ai.attributes.RangedAttribute.class.getDeclaredFields()) {
+                if (f.getType() != double.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                f.setAccessible(true);
+                if (f.getDouble(r) == 1024.0) {
+                    f.setDouble(r, TOPE_VIDA);
+                    com.darkcraft.DarkCraftMod.LOGGER.info("[DarkCraft] la vida maxima ya no se queda en 1024 (ahora {})", r.sanitizeValue(5000.0));
+                }
+            }
+        } catch (Throwable t) {
+            com.darkcraft.DarkCraftMod.LOGGER.warn("[DarkCraft] no se ha podido quitar el tope de la vida maxima: {}", t.toString());
+        }
+    }
+
     public void paraGrupo(int jugadores) {
         var vida = getAttribute(Attributes.MAX_HEALTH);
         if (vida == null) return;

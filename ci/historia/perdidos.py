@@ -445,6 +445,17 @@ LIBROS = {
    "Then others came, one by one, with the same mark and the same promise. We are many now, and the chain is only one. We strike in turns, day and night, though here it is never night. The anchor has not moved a finger's breadth. Our hands no longer hurt: they are no longer ours.",
    "Today I climbed the chain, link by link, until I saw the citadel up close. There is no door up there: there is a mouth that waits. I came down. I will not climb again, and I will let no one who bears the mark climb it. The voice was wrong. It was never about rest.\n\nAldric"]),
  },
+ # parte 7x: la carta que llevaba Ser Lucan, el Jinete Nocturno, por el camino de nubes (la deja al caer)
+ 31: {
+  "es": ("La carta sin entregar", "El rey Corvin, por mano de Ser Lucan, su heraldo", [
+   "(En el sobre, bajo el lacre del Rey) Al Alcaide de la Fortaleza de Hueso. Que la lleve mi heraldo por el camino de nubes y que no se detenga hasta la escalera.\n\n(Dentro, con la letra del Rey) Alcaide: la reina ha vuelto, y no es ella. Hice un trato que no debí hacer.",
+   "Lo que me contestó aguarda al otro lado de la puerta de lo alto de vuestra torre. Cerradla y no la abráis a nadie: ni a quien lleve mi corona, ni a quien hable con mi voz. Si os llega otra carta con mi sello y otra letra, quemadla. Si yo mismo subo y llamo, no me abráis.\n\nCorvin",
+   "(Al dorso, con otra letra, temblorosa) No llegué. Algo me alcanzó en el camino aquella noche, y desde entonces cabalgo y no llego: cada vez que veo la escalera, amanece. Si alguien lee esto, que la lleve él. Y que les diga que cabalgué todas las noches.\n\nLucan"]),
+  "en": ("The Undelivered Letter", "King Corvin, by the hand of Ser Lucan, his herald", [
+   "(On the envelope, under the King's seal) To the Warden of the Bone Fortress. Let my herald carry it along the cloud road, and let him not stop until he reaches the stair.\n\n(Inside, in the King's hand) Warden: the queen has come back, and she is not herself. I made a bargain I should never have made.",
+   "Whatever answered me waits on the other side of the door at the top of your tower. Close it and open it to no one: not to whoever wears my crown, not to whoever speaks with my voice. If another letter reaches you with my seal and another hand, burn it. If I myself climb up and knock, do not open.\n\nCorvin",
+   "(On the back, in another hand, shaking) I did not arrive. Something caught me on the road that night, and ever since I ride and never arrive: every time I see the stair, the dawn comes. If anyone reads this, let them carry it. And tell them I rode every night.\n\nLucan"]),
+ },
 }
 
 # el libro del acertijo del amuleto (con el boton que dibuja la receta)

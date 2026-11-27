@@ -424,6 +424,19 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_GIGANTE_MUERTE = sound("sfx.gigante_muerte");
     public static final RegistryObject<SoundEvent> SFX_GIGANTE_CAMPANA = sound("sfx.gigante_campana");
     public static final RegistryObject<SoundEvent> SFX_GIGANTE_CADENA = sound("sfx.gigante_cadena");
+    // Ser Lucan, el Jinete Nocturno (parte 7x): el galope, el relincho, el cuerno de guerra, el tajo de la guja, la carga con su
+    // golpe, el pisoton del caballo, el fuego de almas de los cascos, el quejido, la muerte, aparecer de la niebla y el arnes
+    public static final RegistryObject<SoundEvent> SFX_JINETE_GALOPE = sound("sfx.jinete_galope");
+    public static final RegistryObject<SoundEvent> SFX_JINETE_RELINCHO = sound("sfx.jinete_relincho");
+    public static final RegistryObject<SoundEvent> SFX_JINETE_CUERNO = sound("sfx.jinete_cuerno");
+    public static final RegistryObject<SoundEvent> SFX_JINETE_TAJO = sound("sfx.jinete_tajo");
+    public static final RegistryObject<SoundEvent> SFX_JINETE_CARGA = sound("sfx.jinete_carga");
+    public static final RegistryObject<SoundEvent> SFX_JINETE_PISOTEA = sound("sfx.jinete_pisotea");
+    public static final RegistryObject<SoundEvent> SFX_JINETE_FUEGO = sound("sfx.jinete_fuego");
+    public static final RegistryObject<SoundEvent> SFX_JINETE_DOLOR = sound("sfx.jinete_dolor");
+    public static final RegistryObject<SoundEvent> SFX_JINETE_MUERTE = sound("sfx.jinete_muerte");
+    public static final RegistryObject<SoundEvent> SFX_JINETE_APARECE = sound("sfx.jinete_aparece");
+    public static final RegistryObject<SoundEvent> SFX_JINETE_ARNES = sound("sfx.jinete_arnes");
     public static final RegistryObject<SoundEvent> AMBIENTE_ALTAR = sound("ambiente.altar");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
@@ -509,6 +522,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_PONTIFICE = sound("musica.pontifice");
     public static final RegistryObject<SoundEvent> MUSICA_ALDRIC = sound("musica.aldric");
     public static final RegistryObject<SoundEvent> MUSICA_GIGANTE = sound("musica.gigante");
+    public static final RegistryObject<SoundEvent> MUSICA_JINETE = sound("musica.jinete");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -575,6 +589,9 @@ public class DarkCraftMod {
     /** Frases de los gigantes errantes (1..9: Ogmund 1..3, Ulfgar 4..6, Haldor 7..9; parte 7w). */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] GIGANTE_VOZ = new RegistryObject[10];
+    /** Frases de Ser Lucan, el Jinete Nocturno (1..5, parte 7x). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] JINETE_VOZ = new RegistryObject[6];
 
     /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
     @SuppressWarnings("unchecked")
@@ -594,6 +611,7 @@ public class DarkCraftMod {
         for (int i = 1; i < PONTIFICE_VOZ.length; i++) PONTIFICE_VOZ[i] = sound("pontifice.voz." + i);
         for (int i = 1; i < ALDRIC_VOZ.length; i++) ALDRIC_VOZ[i] = sound("aldric.voz." + i);
         for (int i = 1; i < GIGANTE_VOZ.length; i++) GIGANTE_VOZ[i] = sound("gigante.voz." + i);
+        for (int i = 1; i < JINETE_VOZ.length; i++) JINETE_VOZ[i] = sound("jinete.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -809,6 +827,11 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.RocaGigante>> ROCA_GIGANTE = ENTITIES.register("roca_gigante",
             () -> EntityType.Builder.<com.darkcraft.enemigos.RocaGigante>of(com.darkcraft.enemigos.RocaGigante::new, MobCategory.MISC)
                     .sized(1.4f, 1.4f).noSave().clientTrackingRange(10).updateInterval(1).build(MODID + ":roca_gigante"));
+    // ---- Ser Lucan, el Jinete Nocturno del camino de nubes (parte 7x): el caballo y su jinete, una sola entidad (va deprisa:
+    // la posicion se manda cada tick para que el galope se vea suave)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Jinete>> JINETE = ENTITIES.register("jinete",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Jinete>of(com.darkcraft.enemigos.Jinete::new, MobCategory.MONSTER)
+                    .sized(1.6f, 3.3f).fireImmune().noSave().clientTrackingRange(12).updateInterval(1).build(MODID + ":jinete"));
     // ---- Brann, el Ballenero, el jefe de la Costa de los Huesos (parte 7r): su arpon con su cabo, el farol de aceite y la Vieja
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Ballenero>> BALLENERO = ENTITIES.register("ballenero",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Ballenero>of(com.darkcraft.enemigos.Ballenero::new, MobCategory.MONSTER)
@@ -967,6 +990,8 @@ public class DarkCraftMod {
 
     public DarkCraftMod() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        // la vida de los jefes grandes (y la que se les suma con amigos) pasa de 1024, el tope del juego
+        com.darkcraft.enemigos.Enemigo.sinTopeDeVida();
         FEATURES.register(modBus);
         ITEMS.register(modBus);
         SOUNDS.register(modBus);
@@ -1021,6 +1046,7 @@ public class DarkCraftMod {
         e.put(PONTIFICE.get(), com.darkcraft.enemigos.Pontifice.atributos().build());
         e.put(ALDRIC.get(), com.darkcraft.enemigos.Aldric.atributos().build());
         e.put(GIGANTE.get(), com.darkcraft.enemigos.Gigante.atributos().build());
+        e.put(JINETE.get(), com.darkcraft.enemigos.Jinete.atributos().build());
         e.put(MARCADO.get(), com.darkcraft.enemigos.Marcado.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
