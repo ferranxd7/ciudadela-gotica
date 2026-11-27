@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:gavran",
+  "display": {
+    "icon": {
+      "item": "minecraft:goat_horn"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.jinete.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.jinete.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 300
+  }
+}

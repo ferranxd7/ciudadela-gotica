@@ -2953,6 +2953,95 @@ muros ilusorios"); la primera tanda: los gigantes. Despues el jinete nocturno, l
   de bruces (`mv462`), su campana en el suelo (`mv463`) y suena al tocarla (`mv464`); y el bestiario (`mv465`). `LIMIT` 114 min
   (`lanzar.sh` 120 y 118 min, el paso 148, el trabajo 196).
 
+### Plan grande, parte 7x: Ser Lucan, el Jinete Nocturno (el camino de nubes, de noche)
+
+Respuesta 132 del plan, la segunda tanda de los especiales ("jinete nocturno, solo de noche, en caminos"). Lore: Ser Lucan era el
+heraldo del rey Corvin; la noche en que el reino subio al cielo salio de la Torre de Ascenso con la ultima carta del Rey para la
+Fortaleza de Hueso ("cierra la puerta de lo alto de tu torre y no la abras a nadie: ni al que lleve mi corona ni al que hable con mi
+voz") y algo le alcanzo en el camino. Desde entonces cabalga cada noche y el alba lo deshace antes de ver la escalera. (Se llamo
+"Ser Corwen" al principio: se cambio por Lucan, que se parecia demasiado a Corvin; en `sesiones.json` sigue el nombre viejo.)
+- **El jinete** (`enemigos/Jinete`, entidad `darkcraft:jinete`, 1,6 x 3,3, inmune al fuego, `noSave`, `clientTrackingRange` 12,
+  `updateInterval` 1; hereda de `Guardian`, tipo y logro `jinete`): un fantasma montado, **sin fisica** (`noPhysics`, sin gravedad) y
+  con los cascos siempre a la altura del camino de nubes (`pies`, `NubesGenerador.SUELO`): galopa por el camino y, peleando, tambien
+  por encima de la nube (donde nadie mas puede ir). 1100 de vida, golpe 12, armadura 10 (dureza 3), no se le empuja; 8000 ecos.
+  Barra azul (`BossBarColor.BLUE`), musica tema 43.
+- **El modelo** (`tools/enemigos/jinete.py`, variante "lucan", escala 1,15): el caballo (piezas `c_*`: cadera, torso, cuello, cabeza
+  y mandibula, las patas como las del perro —brazo / antebrazo / mano delante, muslo / pierna / pata detras—, la cola en dos) con
+  gualdrapa roja con la corona de oro, peto, crinera y testera con pua; el jinete (la cadera hija del torso del caballo, las piernas
+  abiertas a los lados, tabardo, gola, yelmo con corona y penacho, capa en dos, el tubo de la carta con su lacre al costado, el cuerno
+  al cinto y en la mano —`cuerno_mano`, que solo se ve tocandolo—) y la **guja** (pieza tumbada, `rot` 90: asta, regaton, anilla,
+  hoja, punta y espolon). Bucles separados del caballo (`quieto`, `andar`, `galope`) y del jinete (`jinete_quieto`, `jinete_galope`):
+  `client/enemigos/JineteModelo` los mezcla segun lo que corre (`CICLO_PASO` 2,6 y `CICLO_GALOPE` 4,6: el paso al ritmo de lo
+  avanzado) y pone las acciones del jinete (tajo, barrido, cuerno) sobre el caballo que sigue andando (`base_de` en el generador).
+  Acciones (`JineteAnims`): tajo (24 ticks, golpe 13), barrido (34, 18), carga (60), pisotea (40, 24), cuerno (48, 20), aturdido (60),
+  aparece (30), desaparece (40) y morir (90). Se dibuja **translucido** (`JineteRenderer`: el alfa sube al alzarse, baja al
+  deshacerse y al morir); capa de brillo (los ojos, el fuego de los cascos, el filo de la guja).
+- **Por donde va** (`camino/Jinetes`; uno por camino de nubes de cada reino, clave "x,z" del reino; SavedData `darkcraft_jinetes`
+  con los caidos): de noche (13000 a 23000) va del principio del camino hacia la fortaleza; **lo que lleva andado lo dice la hora**
+  (`andado`: de 0 al caer la noche al 93 % del camino al amanecer —`FRACCION`—: nunca llega a la escalera); de dia no sale. **Sale**
+  la entidad cuando un jugador del mundo de nubes (Y >= 200) esta a `SALE` 128 de por donde va y ese sitio procesa entidades: se alza
+  de la niebla (`APARECE`) y el cuerno se oye de lejos; se **recoge** (sin guardarse) cuando no queda nadie a `SE_VA` 176 y no pelea.
+  Por su camino va al trote (`TROTE` 0,32 bloques por tick) hacia un punto 9 bloques mas adelante; si se sale del camino (peleando),
+  vuelve. **Al amanecer** (`amanecer`, desde `Jinetes.tick`): si hay alguien a 48 dice su frase 3 y se deshace (`DESAPARECE`); si
+  no, se deshace sin mas. **El que cae no vuelve nunca a ese camino.**
+- **La pelea**: ve a quien tiene delante a 40 (no repara en los que estan 12 bloques por encima o por debajo); si su presa se va a
+  mas de `CORREA` 72, la deja. Al empezar dice su frase 1 (no la repite en 4 min por camino) y al acabarla **toca el cuerno** (su
+  rugido: a 10 bloques lentitud II y debilidad 3,5 s, aro de almas y copos). De lejos (8,5 a 34, de cara) la **carga**: baja la guja
+  como una lanza y cruza al galope (`CARGA` 0,95 por tick de los ticks 15 a 51) en linea recta por donde estaba su presa, llevandose a
+  todo lo que pilla en una franja de 1,7 a cada lado (una vez por carga, x1,5, empuja fuerte); a veces grita "¡Por el Rey!" (frase 4).
+  De cerca el **tajo** (5,4, 150 grados), el **barrido** (la guja da la vuelta entera mientras el caballo gira; a quien se le pone
+  detras o si son varios) y el **pisoton** (el caballo se alza y cae con las manos: onda de 3,4 a 2,4 por delante, x1,3). Tras
+  pegar a veces se aleja al galope para volver a cargar. **Lo que empuja en el camino lo empuja a lo largo del camino** (si la
+  victima esta a menos de 3,5 de el: el empujon se endereza a la tangente; `fueraDelCamino` cuenta los enderezados): caer del camino
+  es caer al vacio. Si se le pega mucho en poco tiempo (el 8 % de su vida en 5 s) **el caballo tropieza** y cae de rodillas 3 s (una
+  vez cada 25 s; le entra un 30 % mas). **A media vida** el cuerno otra vez, la frase 2 y el **fuego de almas**: por donde galopa (y
+  en la carga) quedan llamas azules 5,5 s que queman a quien las pisa (3 cada medio segundo y prenden). Pruebas: `quieta`, `parado`,
+  `vencer()`, `mediaVida()`, `derribar()` y contadores (`cargas` / `golpesCarga`, `tajos`, `barridos`, `pisotones` / `ondasPisoton`,
+  `cuernos` / `helados`, `fuegosPuestos` / `fuegos` / `quemados`, `aturdidos`, `fueraDelCamino`).
+- **Al caer** (`die` → `Jinetes.caido`): su frase 5, el caballo cae y se deshace en almas; **la carta que llevaba** (el **libro
+  perdido 31**, "La carta sin entregar", del rey Corvin por mano de Ser Lucan: el sobre y la carta del Rey, y al dorso la nota del
+  heraldo; `Perdidos.TOTAL` = 31; en el codice con la miniatura de Valdrenn) a cada uno de los que le plantaron cara (y a los que
+  esten a 48), con `Equipo.dar` y `Perdidos.encontrado`; lo demas lo reparte `valdrenn/Guardianes` (el cartel de JEFE ABATIDO con sus
+  ecos, la hazana `jinete` "Todas las noches", con su entrada del diario, y el bestiario). Ojo: con el libro 31 la mascara de libros
+  perdidos usa el bit de signo: las cuentas van con `>>> 1` (`Perdidos`, `MenuScreen`, `ClientCiTest`).
+- **En el cliente** (`client/enemigos/JineteCliente`): el galope suena pegado a el (`EntityBoundSoundInstance`, relanzado cada 72
+  ticks mientras corre), llamitas de almas en los cascos, el rastro de almas de la carga y la camara tiembla un poco con la carga y
+  el pisoton (`GiganteCliente.sacudir`).
+- **Voz** (ElevenLabs, `eleven_v4`, **"Zane - Deep Dramatic Late Night Voice (Neutral Accent)"** `mfxPGiKweaQEsXJix2Ve`, flow
+  `tUkP1qh0LtTTd2tsgMDM`; 5 frases, tomas a; en `procesar.py` `voz_jinete`: un poco mas grave, la resonancia del yelmo, una segunda voz
+  algo mas grave y retrasada —el fantasma que se dobla— y el eco abierto del cielo): linea **140 + N** (`Voces.BASE_JINETE`,
+  `esJinete`; `habla_jinete` en `rey_voces.json`; subtitulos `darkcraft.jinete.voz.1..5` con el nombre `darkcraft.jinete.nombre_corto`):
+  1 "¿Quien cabalga de noche por el camino del Rey? Apartate, forastero... o caeras bajo mis cascos.", 2 "¡Llevo la palabra del Rey!
+  ¡Nada... detiene la palabra del Rey!", 3 "Otra vez el alba... y la escalera aun tan lejos.", 4 "¡Por el Rey! ¡Despejad el camino!"
+  (de relleno), 5 "La carta... llevala a la fortaleza. Diles... que cabalgue todas las noches. Todas las noches."
+- **Barra** (`GuardianCliente`, estilo de almas: motas que suben, nombre azul palido; arte de `tools/hud/barra_guardianes.py`
+  "jinete": la guja tumbada —el asta de fresno negro con anillas y el regaton, el cubo y la hoja con el espolon, la punta que se alza y
+  el filo encendido de almas—, el yelmo del heraldo con la corona y la rendija azul, y debajo la banderola roja con la corona; relleno
+  de fuego de almas que corre; chispas de almas y esquirlas que caen). **Musica**: "Determined Pursuit (epic orchestra loop)" de
+  Emma_MA (OpenGameArt, CC0, id `jinete`; tema 43 de `ClientMusic.boss`).
+- Sonidos (ElevenLabs, flow `AyxqnFBiZuJQngB0Knnu`, `TOMAS_SFX`): `jinete_galope` (1 y 2; en bucle, entra en 0,3 s), `jinete_relincho`
+  (3 y 4), `jinete_cuerno` (3 y 1; se oye a 128), `jinete_tajo` (2 y 3), `jinete_carga` (1 y 3), `jinete_pisotea` (2 y 1),
+  `jinete_fuego` (3 y 1), `jinete_dolor` (2 y 4), `jinete_muerte` (4 y 3), `jinete_aparece` (1 y 4) y `jinete_arnes` (4 y 3).
+- Comandos `/darkcraft jinete [ir | aqui | vencer | derribar | volver | noche | dia]` (sin mas: como esta el del camino de alrededor;
+  `ir` lleva 30 bloques por delante de por donde va, de cara a el —asi sale—; `aqui` lo saca en el camino 18 bloques mas atras —hacia la torre—, de cara a quien lo pide;
+  `volver`: si habia caido ya no lo esta; `noche` pone la hora 13500 y `dia` la 1000).
+- **Sin abrir el juego**: `python3 tools/enemigos/generar.py --solo jinete --vistas carpeta`.
+- Pruebas: servidor, `jinete()` (lineas `Jinete Nocturno, el camino ...` —lo andado a cada hora, lo que le falta al amanecer, un sitio
+  lejos de las paradas: `Jinetes.libre`—, `Jinete Nocturno fuera: ...` —se alza, cabalga hacia la fortaleza con los cascos a ras del
+  camino—, `... al ver a alguien: ...` —el cuerno al acabar la frase, hiela—, `..., sus golpes a una presa en el camino: ...` —el tajo,
+  el barrido por detras, el pisoton, la carga y un tajo de lado: el empujon siempre a lo largo del camino—, `..., el caballo tropieza:
+  ...`, `... a media vida: ...` —el cuerno y el fuego de almas que quema—, `... al amanecer: ...` y `... cae: ...` —ya no vuelve, la
+  carta—); cliente, tramo `jinete()` despues de Morvain, en el camino de nubes del reino de la prueba, de noche (en el resto de la
+  prueba no sale solo: `Jinetes.quietos`): sale solo al acercarse el jugador, se alza de la niebla (`cliente_jn01`), cabalga (`jn02`),
+  en supervivencia habla con su barra (`jn03`) y toca el cuerno (`jn04`); sus golpes de lado (`jn05` la carga, `jn06` el tajo, `jn07`
+  el barrido, `jn08` y `jn09` el pisoton), tropieza (`jn10`), a media vida (`jn11`), el rastro de fuego (`jn12`); cae (`jn13`, `jn14`),
+  el cartel (`jn15`), la carta en el codice (`jn16`, `jn17`) y el bestiario (`jn18`); otro al amanecer dice su frase (`jn19`) y se
+  deshace (`jn20`). `LIMIT` 119 min (`lanzar.sh` 125 y 123 min, el paso 153, el trabajo 201).
+- **Arreglo (para todos los jefes): la vida maxima ya no se queda en 1024**, el tope del juego (`Enemigo.sinTopeDeVida`, al
+  construir el mod en el servidor y en el cliente: sube el maximo de `RangedAttribute` de la vida, buscado por su valor, a
+  `TOPE_VIDA`). Hasta la 7w los de mas de 1024 (el Abad, el Pontifice, Aldric, los gigantes —2200—) se quedaban en 1024 y con
+  amigos casi ninguno ganaba la vida de mas (`paraGrupo`: con dos jugadores la Molinera ya pasaba de 1024).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

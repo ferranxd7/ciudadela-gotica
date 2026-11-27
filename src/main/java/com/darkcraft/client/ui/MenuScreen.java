@@ -1215,7 +1215,7 @@ public class MenuScreen extends Screen {
                 filas.add(new FilaH(ch, Component.literal(CodiceScreen.romano(ch) + ". ").append(ok ? Component.translatable("darkcraft.cap." + ch + ".titulo")
                         : Component.translatable("darkcraft.menu.historia.sin_leer")), false, ok));
             }
-            int total = com.darkcraft.fortaleza.Perdidos.TOTAL, n = Integer.bitCount(perdidos >> 1);
+            int total = com.darkcraft.fortaleza.Perdidos.TOTAL, n = Integer.bitCount(perdidos >>> 1);
             filas.add(new FilaH(0, Component.translatable("darkcraft.menu.historia.perdidos").append(" (" + n + "/" + total + ")"), true, true));
             for (int k = 1; k <= total; k++)
                 if ((perdidos & (1 << k)) != 0) filas.add(new FilaH(100 + k, Component.translatable("darkcraft.perdido." + k + ".titulo"), false, true));

@@ -297,6 +297,7 @@ public final class CiTest {
                     var fp = com.darkcraft.fortaleza.Fortalezas.plan(seed, fs);
                     montanaDeLaFortaleza(log, lvl, fp);
                     paradasDelCamino(log, lvl, s);
+                    jinete(server, lvl, log, s);
                     // parte 5e: el capitulo 6 con la voz de la Sombra (su audio y sus tiempos los monta procesar.py)
                     float[][] l6 = com.darkcraft.cine.Timeline.lines(6);
                     log.println(String.format(java.util.Locale.ROOT,
@@ -3479,6 +3480,292 @@ public final class CiTest {
             com.darkcraft.morvain.Gigantes.recoger(I);
             com.darkcraft.morvain.Gigantes.revivir(server, I);
             com.darkcraft.morvain.Gigantes.poner(server, I, s0);
+        }
+    }
+
+    /**
+     * Parte 7x: Ser Lucan, el Jinete Nocturno, en el camino de nubes del reino. Por donde va cada noche (lo andado a cada hora: de
+     * dia no sale y al amanecer aun no ha llegado a la escalera); uno fuera: se alza de la niebla y cabalga por su camino hacia la
+     * fortaleza con los cascos a ras del camino; al ver a alguien habla y toca el cuerno al acabar la frase (hiela a los de
+     * cerca); sus golpes a una presa en el camino (el tajo, el barrido por detras, el pisoton con su onda, la carga que se lleva
+     * por delante a quien pilla, y un tajo de lado): el empujon va siempre a lo largo del camino, tambien el que lo echaria fuera;
+     * el caballo tropieza si se le pega mucho en poco tiempo (y entonces le entra mas); a media vida, el cuerno otra vez y el
+     * fuego de almas que deja la carga (quema a quien lo pisa); al amanecer se deshace; y al caer ya no vuelve a ese camino. Al
+     * acabar, todo como estaba (vivo, sin nadie fuera y a la hora de antes).
+     */
+    private static void jinete(MinecraftServer server, ServerLevel lvl, PrintWriter log, int[] reino) {
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        long hora0 = lvl.getDayTime();
+        String k = com.darkcraft.camino.Jinetes.clave(reino[0], reino[1]);
+        final java.util.Locale L = java.util.Locale.ROOT;
+        try {
+            var r = com.darkcraft.world.CaminoNubes.ruta(lvl.getSeed(), reino[0], reino[1]);
+            if (r == null) {
+                log.println("Jinete Nocturno: SIN CAMINO");
+                return;
+            }
+            final double Y = com.darkcraft.world.NubesGenerador.SUELO;
+            // ---- por donde va cada noche
+            StringBuilder sb = new StringBuilder(String.format(L, "Jinete Nocturno, el camino %s: %d bloques; lo andado a cada hora:", k, Math.round(r.largo())));
+            for (long h : new long[]{6000, 12999, 13000, 15500, 18000, 20500, 22999, 23000}) {
+                lvl.setDayTime(h);
+                sb.append(String.format(L, " %d=%.0f%s", h, com.darkcraft.camino.Jinetes.andado(lvl, r), com.darkcraft.camino.Jinetes.noche(lvl) ? "" : " (de dia)"));
+            }
+            lvl.setDayTime(22999);
+            sb.append(String.format(L, " | al amanecer le faltan %.0f bloques para la escalera", r.largo() - com.darkcraft.camino.Jinetes.andado(lvl, r)));
+            double s0 = com.darkcraft.camino.Jinetes.libre(lvl.getSeed(), reino[0], reino[1], r);
+            double[] p0 = r.punto(s0);
+            for (int cx = -5; cx <= 5; cx++)
+                for (int cz = -5; cz <= 5; cz++) lvl.getChunk(((int) Math.floor(p0[0]) >> 4) + cx, ((int) Math.floor(p0[1]) >> 4) + cz);
+            boolean suyo = false;
+            for (int[] o : com.darkcraft.camino.Jinetes.reinos(lvl.getSeed(), p0[0], p0[1])) if (o[0] == reino[0] && o[1] == reino[1]) suyo = true;
+            var bajo = lvl.getBlockState(BlockPos.containing(p0[0], Y - 1, p0[1]));
+            sb.append(String.format(L, " | lejos de las paradas: a %.0f del principio (%d %d), su camino pasa por alli %s, bajo los cascos %s",
+                    s0, Math.round(p0[0]), Math.round(p0[1]), suyo, net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(bajo.getBlock()).getPath()));
+            log.println(sb);
+            // ---- uno fuera: se alza de la niebla y cabalga por su camino
+            lvl.setDayTime(com.darkcraft.camino.Jinetes.hora(r, s0));
+            com.darkcraft.camino.Jinetes.revivir(server, k);
+            com.darkcraft.enemigos.Jinete j = com.darkcraft.camino.Jinetes.crear(lvl, k, r, s0, true);
+            if (j == null) {
+                log.println("Jinete Nocturno: NO SALE");
+                return;
+            }
+            quitar.add(j);
+            boolean aparece = j.accion() == com.darkcraft.enemigos.JineteAnims.APARECE;
+            for (int t = 0; t < 34; t++) {
+                j.tickCount++;
+                j.tick();
+            }
+            double sIni = com.darkcraft.camino.Jinetes.donde(r, j.getX(), j.getZ()), lejosMax = 0, piesMax = 0;
+            int andando = 0;
+            for (int t = 0; t < 200; t++) {
+                j.tickCount++;
+                j.tick();
+                if (j.andando()) andando++;
+                lejosMax = Math.max(lejosMax, com.darkcraft.camino.Jinetes.distancia(r, j.getX(), j.getZ()));
+                piesMax = Math.max(piesMax, Math.abs(j.getY() - Y));
+            }
+            double sFin = com.darkcraft.camino.Jinetes.donde(r, j.getX(), j.getZ());
+            log.println(String.format(L, "Jinete Nocturno fuera: se alza de la niebla %s, vida %.0f, golpe %.1f, armadura %d, caja %.1f x %.1f, sin fisica %s, musica %d,"
+                            + " barra '%s'; en 10 s cabalga %.1f bloques del camino hacia la fortaleza (unos 64), andando %d de 200 ticks, lejos del camino %.2f como mucho,"
+                            + " los cascos a %.2f del camino como mucho | %s",
+                    aparece, j.getMaxHealth(), j.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), j.getArmorValue(),
+                    j.getBbWidth(), j.getBbHeight(), j.noPhysics, j.musica(), j.getDisplayName().getString(), sFin - sIni, andando, lejosMax, piesMax,
+                    com.darkcraft.camino.Jinetes.estado(lvl, j.getX(), j.getZ())));
+            // ---- al ver a alguien: habla y toca el cuerno al acabar la frase (hiela a los de cerca)
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(lvl, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("7d9e1f30-5b62-4d8e-8fa0-4b5c6d7e8fce"), "[DarkCraftCI15]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            fp.removeAllEffects();
+            double[] pf = r.punto(Math.min(r.largo() - 10, com.darkcraft.camino.Jinetes.donde(r, j.getX(), j.getZ()) + 8));
+            final double px = pf[0], pz = pf[1];
+            fp.moveTo(px, Y, pz, 0f, 0f);
+            fp.setOnGround(true);
+            j.setTarget(fp);
+            int cuerno = -1;
+            for (int t = 0; t < 300 && cuerno < 0; t++) {
+                j.tickCount++;
+                j.tick();
+                fp.moveTo(px, Y, pz, 0f, 0f);
+                fp.setHealth(fp.getMaxHealth());
+                if (j.accion() == com.darkcraft.enemigos.JineteAnims.CUERNO) cuerno = t;
+            }
+            for (int t = 0; t < 50; t++) {
+                j.tickCount++;
+                j.tick();
+                fp.moveTo(px, Y, pz, 0f, 0f);
+                fp.setHealth(fp.getMaxHealth());
+            }
+            log.println(String.format(L, "Jinete Nocturno al ver a alguien: en pelea %s, toca el cuerno en el tick %d (la frase dura %d), cuernos %d, helados %d,"
+                            + " al de delante: lentitud %s, debilidad %s; se le acerca: a %.1f",
+                    j.enPelea(), cuerno, com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Jinete.VOZ_BASE + 1), j.cuernos(), j.helados(),
+                    fp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN), fp.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS),
+                    Math.hypot(j.getX() - px, j.getZ() - pz)));
+            // ---- sus golpes a una presa en el camino (quieto: solo lo que se le manda)
+            j.quieta = true;
+            for (int t = 0; t < 80 && j.accion() != 0; t++) {
+                j.tickCount++;
+                j.tick();
+            }
+            var victima = net.minecraft.world.entity.EntityType.VILLAGER.create(lvl);
+            double s1 = Math.min(r.largo() - 80, s0 + 40);
+            double[] q1 = r.punto(s1), tg = com.darkcraft.camino.Jinetes.tangente(r, s1);
+            float giro = (float) (Math.atan2(tg[1], tg[0]) * 180 / Math.PI) - 90f;
+            StringBuilder sv = new StringBuilder("Jinete Nocturno, sus golpes a una presa en el camino:");
+            if (victima != null) {
+                victima.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(900.0);
+                victima.setHealth(900f);
+                victima.setNoAi(true);
+                victima.moveTo(q1[0], Y, q1[1], 0f, 0f);
+                lvl.addFreshEntity(victima);
+                quitar.add(victima);
+                String[] golpes = {"tajo", "barrido (por detras)", "pisoton", "carga", "tajo de lado (el empujon iria fuera del camino)"};
+                int[] acc = {com.darkcraft.enemigos.JineteAnims.TAJO, com.darkcraft.enemigos.JineteAnims.BARRIDO, com.darkcraft.enemigos.JineteAnims.PISOTEA,
+                        com.darkcraft.enemigos.JineteAnims.CARGA, com.darkcraft.enemigos.JineteAnims.TAJO};
+                // donde queda la presa: {delante (a lo largo del camino), a un lado}, y hacia donde mira el jinete (grados de mas)
+                double[][] donde = {{4.0, 0}, {-4.0, 0}, {2.6, 0}, {20.0, 0}, {0, 1.3}};
+                float[] mira = {0, 0, 0, 0, 90};
+                for (int i = 0; i < golpes.length; i++) {
+                    double vx = q1[0] + tg[0] * donde[i][0] - tg[1] * donde[i][1], vz = q1[1] + tg[1] * donde[i][0] + tg[0] * donde[i][1];
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    victima.hurtTime = 0;
+                    victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    victima.moveTo(vx, Y, vz, 0f, 0f);
+                    float g = giro + mira[i];
+                    j.moveTo(q1[0], Y, q1[1], g, 0f);
+                    j.setYRot(g);
+                    j.yBodyRot = j.yHeadRot = g;
+                    j.setTarget(victima);
+                    int ta = j.tajos(), ba = j.barridos(), on = j.ondasPisoton(), gc = j.golpesCarga(), fu = j.fueraDelCamino();
+                    float antes = victima.getHealth();
+                    net.minecraft.world.phys.Vec3 empujon = null;
+                    j.empezar(acc[i]);
+                    for (int t = 0; t < 100; t++) {
+                        if (j.accion() != 0) {
+                            j.setTarget(victima);
+                            j.tickCount++;
+                            j.tick();
+                        }
+                        if (empujon == null && victima.getHealth() < antes) empujon = victima.getDeltaMovement();
+                        victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                        victima.moveTo(vx, Y, vz, 0f, 0f);
+                        victima.invulnerableTime = 0;
+                        victima.hurtTime = 0;
+                        if (j.accion() == 0 && t > 4) break;
+                    }
+                    double[] tv = com.darkcraft.camino.Jinetes.tangente(r, com.darkcraft.camino.Jinetes.donde(r, vx, vz));
+                    double l = empujon == null ? 0 : Math.hypot(empujon.x, empujon.z);
+                    double desvio = l < 1e-4 ? -1 : Math.toDegrees(Math.acos(Math.min(1.0, Math.abs(empujon.x * tv[0] + empujon.z * tv[1]) / l)));
+                    sv.append(String.format(L, " | %s: le quita %.1f, empujon %.2f a %.0f grados del camino", golpes[i], antes - victima.getHealth(), l, desvio));
+                    switch (i) {
+                        case 0, 4 -> sv.append(", tajos ").append(j.tajos() - ta);
+                        case 1 -> sv.append(", barridos ").append(j.barridos() - ba);
+                        case 2 -> sv.append(", onda ").append(j.ondasPisoton() - on);
+                        default -> sv.append(", la carga le pilla ").append(j.golpesCarga() - gc);
+                    }
+                    sv.append(", enderezados al camino ").append(j.fueraDelCamino() - fu);
+                }
+            }
+            log.println(sv);
+            // ---- se le pega mucho en poco tiempo: el caballo tropieza (y entonces le entra un 30 % mas)
+            j.setTarget(fp);
+            for (int t = 0; t < 60 && j.accion() != 0; t++) {
+                j.tickCount++;
+                j.tick();
+            }
+            float h0 = j.getHealth();
+            j.invulnerableTime = 0;
+            j.hurt(lvl.damageSources().playerAttack(fp), 20f);
+            float dePie = h0 - j.getHealth();
+            int at0 = j.aturdidos();
+            for (int i = 0; i < 12 && j.aturdidos() == at0; i++) {
+                j.invulnerableTime = 0;
+                j.hurt(lvl.damageSources().playerAttack(fp), 18f);
+            }
+            boolean tropieza = j.accion() == com.darkcraft.enemigos.JineteAnims.ATURDIDO;
+            float h1 = j.getHealth();
+            j.invulnerableTime = 0;
+            j.hurt(lvl.damageSources().playerAttack(fp), 20f);
+            float deRodillas = h1 - j.getHealth();
+            log.println(String.format(L, "Jinete Nocturno, el caballo tropieza: tras %.0f de dano en un momento %s (aturdidos %d); un golpe de 20 le quita %.1f de pie y %.1f de rodillas",
+                    h0 - h1, tropieza, j.aturdidos() - at0, dePie, deRodillas));
+            for (int t = 0; t < 80; t++) {
+                j.tickCount++;
+                j.tick();
+            }
+            // ---- a media vida: el cuerno otra vez y el fuego de almas que deja la carga (quema a quien lo pisa)
+            j.mediaVida();
+            int cu0 = j.cuernos(), cuernoMedia = -1;
+            for (int t = 0; t < 80 && cuernoMedia < 0; t++) {
+                j.tickCount++;
+                j.tick();
+                if (j.accion() == com.darkcraft.enemigos.JineteAnims.CUERNO) cuernoMedia = t;
+            }
+            for (int t = 0; t < 70 && j.accion() != 0; t++) {
+                j.tickCount++;
+                j.tick();
+            }
+            String fuego = "sin presa";
+            if (victima != null) {
+                double vx = q1[0] + tg[0] * 20, vz = q1[1] + tg[1] * 20;
+                victima.setHealth(victima.getMaxHealth());
+                victima.moveTo(vx, Y, vz, 0f, 0f);
+                j.moveTo(q1[0], Y, q1[1], giro, 0f);
+                j.setYRot(giro);
+                j.yBodyRot = j.yHeadRot = giro;
+                j.setTarget(victima);
+                int f0 = j.fuegosPuestos();
+                double x0 = j.getX(), z0 = j.getZ();
+                j.empezar(com.darkcraft.enemigos.JineteAnims.CARGA);
+                for (int t = 0; t < 90 && j.accion() != 0; t++) {
+                    j.setTarget(victima);
+                    j.tickCount++;
+                    j.tick();
+                    victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    victima.moveTo(vx, Y, vz, 0f, 0f);
+                    victima.invulnerableTime = 0;
+                }
+                double mx = (x0 + j.getX()) / 2, mz = (z0 + j.getZ()) / 2;
+                int puestas = j.fuegosPuestos() - f0, qu0 = j.quemados();
+                j.setTarget(null);
+                j.parado = true;
+                for (int t = 0; t < 25; t++) {
+                    victima.moveTo(mx, Y, mz, 0f, 0f);
+                    victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    victima.invulnerableTime = 0;
+                    j.tickCount++;
+                    j.tick();
+                }
+                fuego = String.format(L, "la carga deja %d llamas (arden %d), a la presa en medio del rastro la queman %d veces en 25 ticks (ardiendo %s)", puestas, j.fuegos(),
+                        j.quemados() - qu0, victima.isOnFire());
+                j.parado = false;
+            }
+            log.println(String.format(L, "Jinete Nocturno a media vida: segunda %s, el cuerno otra vez en el tick %d (cuernos %d -> %d); %s", j.segunda(), cuernoMedia, cu0, j.cuernos(), fuego));
+            // ---- al amanecer: se deshace (sin nadie cerca, sin decir nada)
+            lvl.setDayTime(23000);
+            com.darkcraft.camino.Jinetes.tick(lvl, false);
+            boolean amanece = j.amanece();
+            int deshace = 0;
+            for (; deshace < 90 && !j.isRemoved(); deshace++) {
+                j.tickCount++;
+                j.tick();
+            }
+            log.println(String.format(L, "Jinete Nocturno al amanecer: amanece %s, se deshace %s en %d ticks (la animacion dura %d), sigue fuera %s",
+                    amanece, j.isRemoved(), deshace, com.darkcraft.enemigos.JineteAnims.TICKS[com.darkcraft.enemigos.JineteAnims.DESAPARECE],
+                    com.darkcraft.camino.Jinetes.fuera(k) != null));
+            // ---- cae: ya no vuelve a ese camino (y la carta)
+            lvl.setDayTime(com.darkcraft.camino.Jinetes.hora(r, s1));
+            com.darkcraft.enemigos.Jinete j2 = com.darkcraft.camino.Jinetes.crear(lvl, k, r, s1, false);
+            if (j2 != null) {
+                quitar.add(j2);
+                j2.setTarget(fp);
+                int rep = com.darkcraft.valdrenn.Guardianes.repartosPendientes();
+                j2.invulnerableTime = 0;
+                j2.hurt(lvl.damageSources().playerAttack(fp), 99999f);
+                boolean muriendo = j2.muriendo();
+                int t = 0;
+                for (; t < 220 && !j2.isRemoved(); t++) {
+                    j2.tickCount++;
+                    j2.tick();
+                }
+                var carta = com.darkcraft.fortaleza.Perdidos.libro(com.darkcraft.camino.Jinetes.CARTA);
+                var tag = carta.getTag();
+                log.println(String.format(L, "Jinete Nocturno cae: muriendo %s, se deshace en %d ticks (la animacion dura %d), caido %s, sigue fuera %s, repartos %d -> %d;"
+                                + " la carta: %s, %d paginas, libro perdido %d de %d", muriendo, t,
+                        com.darkcraft.enemigos.JineteAnims.TICKS[com.darkcraft.enemigos.JineteAnims.MORIR], com.darkcraft.camino.Jinetes.caido(server, k),
+                        com.darkcraft.camino.Jinetes.fuera(k) != null, rep, com.darkcraft.valdrenn.Guardianes.repartosPendientes(),
+                        net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(carta.getItem()).getPath(), tag == null ? 0 : tag.getList("pages", 8).size(),
+                        com.darkcraft.camino.Jinetes.CARTA, com.darkcraft.fortaleza.Perdidos.TOTAL));
+            }
+        } catch (Exception e) {
+            log.println("Jinete Nocturno: FALLO " + e);
+            e.printStackTrace(log);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.camino.Jinetes.recoger(k);
+            com.darkcraft.camino.Jinetes.revivir(server, k);
+            lvl.setDayTime(hora0);
         }
     }
 
