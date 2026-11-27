@@ -996,9 +996,11 @@ public class Dragon extends Guardian {
                 } else pegarAlSuelo();
             }
             case DragonAnims.RASANTE -> {
-                // recto por su linea, a ras de suelo
-                float yaw = (float) (Mth.atan2(rdz, rdx) * Mth.RAD_TO_DEG) - 90f;
-                setYRot(Mth.approachDegrees(getYRot(), yaw, 2f));
+                // recto por su linea, a ras de suelo (hacia un punto de ella 25 bloques mas alla: si se aparto, vuelve)
+                double h = (getX() - sx) * rdx + (getZ() - sz) * rdz;
+                double lx = sx + rdx * (h + 25), lz = sz + rdz * (h + 25);
+                float yaw = (float) (Mth.atan2(lz - getZ(), lx - getX()) * Mth.RAD_TO_DEG) - 90f;
+                setYRot(Mth.approachDegrees(getYRot(), yaw, 2.5f));
                 yBodyRot = yHeadRot = getYRot();
                 velocidad += Mth.clamp(V_RASANTE - velocidad, -0.04, 0.04);
                 Vec3 f = Vec3.directionFromRotation(0, getYRot());
@@ -1350,7 +1352,8 @@ public class Dragon extends Guardian {
                 // de cara a su linea, bajando hasta ras de suelo; el fuego empieza con la accion (en su tick, el fuego da en el
                 // suelo 16 bloques antes de su presa: lo que tiene por delante el fuego depende de lo alto que va)
                 double hacia = (getX() - sx) * rdx + (getZ() - sz) * rdz;
-                volarHacia(getX() + rdx * 30, my, getZ() + rdz * 30, V_RASANTE, 3f, 4.5);
+                // (hacia un punto de su linea 30 bloques mas alla: si llego apartado de ella, vuelve; asi el fuego pasa por su presa)
+                volarHacia(sx + rdx * (hacia + 30), my, sz + rdz * (hacia + 30), V_RASANTE, 3f, 4.5);
                 Vec3 g = sueloRasante(this);
                 double llega = g == null ? 24 : Math.hypot(g.x - getX(), g.z - getZ());
                 if (hacia >= -(16 + llega + DragonAnims.RASANTE_DESDE * V_RASANTE) || maniobraT > 160) {
