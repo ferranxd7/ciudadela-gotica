@@ -11860,6 +11860,15 @@ public final class ClientCiTest {
         verDesde(mc, new Vec3(r.getX() + f.x * delante - f.z * lado, r.getY() + alto, r.getZ() + f.z * delante + f.x * lado), new Vec3(r.getX(), r.getY() + 3.6, r.getZ()));
     }
 
+    /** Lo mas lejos del centro de la sala de la aguja que se pone al jugador en la prueba (los pilares estan a 11,5 y los braseros a 12). */
+    private static final double DENTRO_AGUJA = 9.0;
+
+    /** (x, z) dentro de la sala, a {@link #DENTRO_AGUJA} del centro como mucho. */
+    private static double[] enSalaAguja(double x, double z) {
+        double rr = Math.hypot(x, z);
+        return rr <= DENTRO_AGUJA ? new double[]{x, z} : new double[]{x * DENTRO_AGUJA / rr, z * DENTRO_AGUJA / rr};
+    }
+
     private static String estadoAguja(ServerPlayer sp) {
         var r = sombraE();
         return fpos(sp) + " vida " + Math.round(sp.getHealth()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp) + " | "
@@ -11940,13 +11949,14 @@ public final class ClientCiTest {
         });
         esperarA("cliente_mv573_sombra_tira", m -> tSombra(m, com.darkcraft.enemigos.SombraAnims.DESPIERTA) >= 236, m -> camaraSombra(m, 9, 4, 3.0),
                 ClientCiTest::estadoSombraC, 400);
+        // (las esperas cuentan desde este paso: la larga dura 352 ticks y despues ruge)
         esperarA("cliente_mv574_cadenas_rotas", m -> tSombra(m, com.darkcraft.enemigos.SombraAnims.DESPIERTA) >= 335, m -> camaraSombra(m, 10, -5, 4.0),
-                ClientCiTest::estadoSombraC, 200);
+                ClientCiTest::estadoSombraC, 460);
         esperarA("cliente_mv575_sombra_ruge", m -> tSombra(m, com.darkcraft.enemigos.SombraAnims.RUGIDO) >= 14, m -> camaraSombra(m, 7, 3, 2.6),
-                ClientCiTest::estadoSombraC, 160);
+                ClientCiTest::estadoSombraC, 540);
         t += 470;
         String[][] ataques = {{"zarpazos", "cliente_mv576_sombra_zarpazos", "12", "3.2"}, {"giro", "cliente_mv577_sombra_giro", "14", "3.5"},
-                {"cadena", "cliente_mv578_sombra_cadena", "16", "9"}, {"manos", "cliente_mv579_sombra_manos", "38", "6"},
+                {"cadena", "cliente_mv578_sombra_cadena", "16", "9"}, {"manos", "cliente_mv579_sombra_manos", "24", "6"},
                 {"lanzas", "cliente_mv580_sombra_lanzas", "18", "11"}, {"niebla", "cliente_mv581_sombra_niebla", "20", "8"}};
         int[] acc = {com.darkcraft.enemigos.SombraAnims.ZARPAZOS, com.darkcraft.enemigos.SombraAnims.GIRO, com.darkcraft.enemigos.SombraAnims.CADENA,
                 com.darkcraft.enemigos.SombraAnims.MANOS, com.darkcraft.enemigos.SombraAnims.LANZAS, com.darkcraft.enemigos.SombraAnims.NIEBLA};
@@ -11962,7 +11972,7 @@ public final class ClientCiTest {
                     double d = Double.parseDouble(at[3]);
                     double x = r.getX() + f.x * d, z = r.getZ() + f.z * d;
                     // (dentro de la sala)
-                    double rr = Math.hypot(x, z), tope = com.darkcraft.morvain.Homenaje.R_AGUJA - 2.0;
+                    double rr = Math.hypot(x, z), tope = DENTRO_AGUJA;
                     if (rr > tope) {
                         x *= tope / rr;
                         z *= tope / rr;
@@ -11999,7 +12009,7 @@ public final class ClientCiTest {
                     Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
                     double d = Double.parseDouble(at[3]);
                     double x = r.getX() + f.x * d, z = r.getZ() + f.z * d;
-                    double rr = Math.hypot(x, z), tope = com.darkcraft.morvain.Homenaje.R_AGUJA - 2.0;
+                    double rr = Math.hypot(x, z), tope = DENTRO_AGUJA;
                     if (rr > tope) {
                         x *= tope / rr;
                         z *= tope / rr;
@@ -12021,6 +12031,9 @@ public final class ClientCiTest {
             if (r != null) {
                 for (var e : r.caidos()) e.disolver();
                 r.quieta = false;
+                r.moveTo(0.5, Y, 0.5, 0f, 0f);
+                r.setYHeadRot(0f);
+                r.setYBodyRot(0f);
                 Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
                 irMirando(sp, r.getX() + f.x * 4.5, r.getY(), r.getZ() + f.z * 4.5, r.getX(), r.getY() + 2, r.getZ(), false);
             }
@@ -12034,7 +12047,8 @@ public final class ClientCiTest {
                 var r = sombraE();
                 if (r != null) {
                     Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
-                    irMirando(sp, r.getX() + f.x * 5.2 + f.z * 1.5, r.getY(), r.getZ() + f.z * 5.2 - f.x * 1.5, r.getX(), r.getY() + 1.6, r.getZ(), false);
+                    double[] q = enSalaAguja(r.getX() + f.x * 5.2 + f.z * 1.5, r.getZ() + f.z * 5.2 - f.x * 1.5);
+                    irMirando(sp, q[0], r.getY(), q[1], r.getX(), r.getY() + 1.6, r.getZ(), false);
                 }
             });
             log("  en el cliente: " + estadoSombraC(m));
