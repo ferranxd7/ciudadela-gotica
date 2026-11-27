@@ -385,9 +385,25 @@ public final class Rol {
         if (s.combate > 0) gastar(s, GASTO_SALTO, PAUSA);
     }
 
+    /**
+     * Un golpe en el escudo. Con los de la parte 7ak, lo suyo: la rodela para el 75 % (el resto entra) y lo que llega en el
+     * instante de alzarla se para entero (cuesta casi nada y aturde al que pego: {@code Escudo.parar}); el paves cuesta casi
+     * la mitad de estamina.
+     */
     @SubscribeEvent
     public static void onEscudo(ShieldBlockEvent e) {
-        if (e.getEntity() instanceof ServerPlayer sp) guardia(sp, e.getBlockedDamage());
+        float coste = 1f;
+        com.darkcraft.armas.Escudo.Tamano t = com.darkcraft.armas.Escudo.alzado(e.getEntity());
+        if (t != null) {
+            if (com.darkcraft.armas.Escudo.parar(e.getEntity(), e.getDamageSource())) {
+                e.setBlockedDamage(e.getOriginalBlockedDamage());
+                coste = 0.25f;
+            } else {
+                e.setBlockedDamage(e.getOriginalBlockedDamage() * t.para);
+                coste = t.estamina;
+            }
+        }
+        if (e.getEntity() instanceof ServerPlayer sp) guardia(sp, e.getBlockedDamage(), coste);
     }
 
     /**
@@ -395,11 +411,16 @@ public final class Rol {
      * rompe la guardia (baja el arma, no puede volver a cubrirse en unos segundos y se queda un momento lento).
      */
     public static void guardia(ServerPlayer sp, float golpe) {
+        guardia(sp, golpe, 1f);
+    }
+
+    /** Lo mismo, con lo que cuesta de mas o de menos el escudo que se lleva (parte 7ak: la rodela 1,15, el paves 0,55). */
+    public static void guardia(ServerPlayer sp, float golpe, float mult) {
         if (libre(sp)) return;
         Estado s = de(sp);
         s.combate = COMBATE;
         // la Bufanda de Tam (parte 7ah): cubrirse cuesta un 30 % menos
-        gastar(s, (6f + 2.2f * Math.max(0f, golpe)) * (Talismanes.lleva(sp, Talisman.Clase.BUFANDA) ? 0.7f : 1f), PAUSA + 6);
+        gastar(s, (6f + 2.2f * Math.max(0f, golpe)) * mult * (Talismanes.lleva(sp, Talisman.Clase.BUFANDA) ? 0.7f : 1f), PAUSA + 6);
         if (s.estamina > 0f) return;
         ItemStack con = sp.getUseItem();
         if (!con.isEmpty()) sp.getCooldowns().addCooldown(con.getItem(), 70);

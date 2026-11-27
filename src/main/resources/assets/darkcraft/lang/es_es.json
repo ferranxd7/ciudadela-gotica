@@ -2920,5 +2920,14 @@
   "subtitles.darkcraft.sfx.martillo_golpe": "Golpe de martillo",
   "subtitles.darkcraft.sfx.flecha_fuego": "Una flecha prende",
   "subtitles.darkcraft.sfx.congelacion": "El frío revienta",
-  "darkcraft.ayuda.armas": "Armas: los martillos, las flechas especiales con arco y ballesta, sumar sangrado o congelación a lo que tienes delante"
+  "darkcraft.ayuda.armas": "Armas: los martillos, las flechas especiales con arco y ballesta, sumar sangrado o congelación a lo que tienes delante",
+  "item.darkcraft.rodela": "Rodela de Hierro",
+  "item.darkcraft.rodela.desc": "Un escudo redondo y pequeño de nogal con aro y cuenco de hierro. No lo para todo, pero se alza en un parpadeo.",
+  "item.darkcraft.escudo_caballero": "Escudo de Caballero",
+  "item.darkcraft.escudo_caballero.desc": "El escudo de punta de los caballeros de Valdrenn, con la corona de oro sobre el rojo. Lo detiene todo.",
+  "item.darkcraft.paves": "Pavés de la Guardia",
+  "item.darkcraft.paves.desc": "Un muro de madera granate con bandas de hierro negro, del alto de un hombre. Los arqueros de la guardia se escondían detrás.",
+  "darkcraft.escudo.para": "Para el %s%% · Cubrirse cuesta el %s%% · Peso %s",
+  "darkcraft.escudo.parada": "En el instante de alzarla para el golpe entero y deja aturdido a quien lo dio. Cubierto, se anda más rápido.",
+  "darkcraft.escudo.paves": "Cubrirse con él apenas cansa, pero pesa como una puerta."
 }

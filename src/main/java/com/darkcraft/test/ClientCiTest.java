@@ -3308,6 +3308,129 @@ public final class ClientCiTest {
         return t + 390;
     }
 
+    // ------------------------------------------------------------------ los escudos (parte 7ak)
+
+    private static net.minecraft.world.entity.monster.Husk esAtacante;
+    private static float esVida, esEstamina;
+
+    private static void logEs(Minecraft m, String que) {
+        log("  escudos " + que + " (cliente): usando " + (m.player != null && m.player.isUsingItem()) + ", cubierto " + (m.player != null && m.player.isBlocking())
+                + ", modelos horneados " + com.darkcraft.client.escudos.EscudoRenderer.horneados());
+        server(m, sp -> log("  escudos " + que + " (servidor): " + com.darkcraft.armas.Escudo.resumen(sp) + " | izquierda "
+                + sp.getOffhandItem().getHoverName().getString() + String.format(java.util.Locale.ROOT, " | vida %.1f, estamina %.1f, paradas %d, peso %.1f",
+                sp.getHealth(), com.darkcraft.rol.Rol.estamina(sp), com.darkcraft.armas.Escudo.PARADAS, com.darkcraft.combate.Peso.de(sp.getInventory()))));
+    }
+
+    /** El atacante le da un golpe de 6 de frente (el escudo decide): apunta lo que le quito de vida y de estamina. */
+    private static void esGolpe(Minecraft m, String que) {
+        server(m, sp -> {
+            if (esAtacante == null) return;
+            float v = sp.getHealth(), e = com.darkcraft.rol.Rol.estamina(sp);
+            int par = com.darkcraft.armas.Escudo.PARADAS;
+            sp.invulnerableTime = 0;
+            sp.hurt(sp.damageSources().mobAttack(esAtacante), 6f);
+            log(String.format(java.util.Locale.ROOT, "  escudos golpe %s: -%.1f de vida, -%.1f de estamina%s (%s)", que, v - sp.getHealth(),
+                    e - com.darkcraft.rol.Rol.estamina(sp), com.darkcraft.armas.Escudo.PARADAS > par ? ", PARADA"
+                            + (esAtacante.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) ? " (el atacante aturdido)" : "") : "",
+                    com.darkcraft.armas.Escudo.resumen(sp)));
+            sp.setHealth(sp.getMaxHealth());
+            com.darkcraft.rol.Rol.recuperado(sp);
+            esAtacante.removeAllEffects();
+        });
+    }
+
+    private static void esPoner(Minecraft m, com.darkcraft.armas.Escudo.Tamano t) {
+        server(m, sp -> sp.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(DarkCraftMod.ESCUDOS.get(t).get())));
+    }
+
+    private static void esAlzar(Minecraft m, boolean si) {
+        net.minecraft.client.KeyMapping.set(m.options.keyUse.getKey(), si);
+        if (si) net.minecraft.client.KeyMapping.click(m.options.keyUse.getKey());
+    }
+
+    /**
+     * Parte 7ak: el escudo de caballero alzado en primera y tercera persona (un golpe de frente: nada de vida, la estamina de
+     * siempre), la rodela (al instante, parada; ya cubierto deja pasar el 25 %), el paves (cuesta la mitad) y el menu con los tres.
+     */
+    private static int escudos7ak(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Escudos: la plataforma, espada y el escudo de caballero, alguien delante", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            com.darkcraft.rol.Rol.sinLimite = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                plataforma(lvl);
+                lvl.setDayTime(6000);
+                sp.setInvisible(false);
+                sp.setGameMode(GameType.SURVIVAL);
+                var inv = sp.getInventory();
+                inv.clearContent();
+                inv.items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                inv.items.set(9, new ItemStack(DarkCraftMod.ESCUDOS.get(com.darkcraft.armas.Escudo.Tamano.PEQUENO).get()));
+                inv.items.set(10, new ItemStack(DarkCraftMod.ESCUDOS.get(com.darkcraft.armas.Escudo.Tamano.GRANDE).get()));
+                sp.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(DarkCraftMod.ESCUDOS.get(com.darkcraft.armas.Escudo.Tamano.MEDIANO).get()));
+                ajHueco(sp, 0);
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                com.darkcraft.rol.Rol.recuperado(sp);
+                esAtacante = diana(lvl, ex, ez - 1.0, 180f);
+                enCombate(sp);
+            });
+        });
+        atTicks(t + 20, "alzar el escudo de caballero", m -> esAlzar(m, true));
+        atTicks(t + 34, "captura: el escudo de caballero alzado", m -> {
+            logEs(m, "caballero alzado");
+            shot(m, "cliente_es01_caballero_alzado");
+        });
+        atTicks(t + 36, "un golpe de frente", m -> esGolpe(m, "caballero"));
+        atTicks(t + 40, "de cara, en tercera persona", m -> verDesde(m, new Vec3(ex + 1.6, ey + 1.8, ez - 0.2), new Vec3(ex, ey + 1.1, ez - 3.0)));
+        atTicks(t + 44, "captura: el escudo de caballero de cara", m -> shot(m, "cliente_es02_caballero_cara"));
+        atTicks(t + 46, "bajarlo y ponerse la rodela", m -> {
+            esAlzar(m, false);
+            esPoner(m, com.darkcraft.armas.Escudo.Tamano.PEQUENO);
+        });
+        atTicks(t + 56, "alzar la rodela", m -> esAlzar(m, true));
+        atTicks(t + 65, "un golpe al instante de alzarla (parada)", m -> esGolpe(m, "rodela al instante"));
+        atTicks(t + 70, "captura: la rodela alzada", m -> {
+            logEs(m, "rodela alzada");
+            shot(m, "cliente_es03_rodela");
+        });
+        atTicks(t + 96, "un golpe ya cubierto (pasa algo)", m -> esGolpe(m, "rodela cubierto"));
+        atTicks(t + 98, "bajarla y ponerse el paves", m -> {
+            esAlzar(m, false);
+            esPoner(m, com.darkcraft.armas.Escudo.Tamano.GRANDE);
+        });
+        atTicks(t + 108, "alzar el paves", m -> esAlzar(m, true));
+        atTicks(t + 122, "captura: el paves de cara", m -> {
+            logEs(m, "paves alzado");
+            shot(m, "cliente_es04_paves_cara");
+        });
+        atTicks(t + 124, "un golpe en el paves", m -> esGolpe(m, "paves"));
+        atTicks(t + 126, "en primera persona", m -> enPrimeraPersona(m));
+        atTicks(t + 132, "captura: el paves en primera persona", m -> shot(m, "cliente_es05_paves_primera"));
+        atTicks(t + 134, "bajarlo; el menu con los tres", m -> {
+            esAlzar(m, false);
+            server(m, sp -> sp.getInventory().items.set(11, new ItemStack(DarkCraftMod.ESCUDOS.get(com.darkcraft.armas.Escudo.Tamano.MEDIANO).get())));
+        });
+        atTicks(t + 138, "abrir el inventario", m -> com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.INVENTARIO));
+        atTicks(t + 148, "captura: los escudos en el menu", m -> shot(m, "cliente_es06_menu"));
+        atTicks(t + 150, "Fin de los escudos", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                if (esAtacante != null) esAtacante.discard();
+                esAtacante = null;
+                sp.getInventory().clearContent();
+                sp.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 156;
+    }
+
     // ------------------------------------------------------------------ el mundo de nubes (parte 3a)
 
     private static net.minecraft.world.entity.decoration.ArmorStand nubesMuneco;
@@ -5563,6 +5686,8 @@ public final class ClientCiTest {
         fin = armaduras(fin);
         // los martillos y las flechas de fuego, de sangre y de escarcha (parte 7aj)
         fin = armas7aj(fin);
+        // los escudos pequeno, mediano y grande (parte 7ak)
+        fin = escudos7ak(fin);
         fin = nubes(fin);
         fin = pueblo(fin);
         fin = enemigos(fin);

@@ -3896,6 +3896,39 @@ tanda (los escudos pequeno, mediano y grande van en la 7ak).
   congelacion (`aj09`, `aj10`; linea `congelado: un golpe de 10 le quita 12`), las barritas del jugador (`aj11`), el inventario con las
   armas (`aj12`) y la ficha del gran martillo (`aj13`).
 
+### Plan grande, parte 7ak: los escudos pequeno, mediano y grande
+
+Respuesta 109 del plan ("... bastones, sellos y escudos (pequeno, mediano, grande)"); con la 7aj, la variedad de armas.
+- **Los escudos** (`armas/Escudo`, un `ShieldItem` del juego: se alzan con el clic derecho y paran como el del juego; objetos
+  `darkcraft:rodela`, `escudo_caballero`, `paves`, en `DarkCraftMod.ESCUDOS`; no se rompen) con su `Tamano`: **la Rodela de
+  Hierro** (pequena y redonda: para el 75 % de cada golpe —el resto entra—, cubrirse cuesta el 115 %, pesa 2; **parada**: el
+  golpe de cuerpo a cuerpo que llega en los primeros 9 ticks de estar cubierto se para entero, cuesta la cuarta parte y deja
+  aturdido al que lo dio —los jefes no—, con el sonido y las chispas de la parada y el logro `parada`: `Escudo.parar`; cubierto
+  con ella se anda a la mitad en vez de a la quinta parte: `EscudoCliente.Juego.andar`, `MovementInputUpdateEvent`), **el
+  Escudo de Caballero** (de punta, rojo con la corona de oro: lo para todo, cuesta lo de siempre, pesa 4,5) y **el Paves de
+  la Guardia** (hasta el suelo, granate con bandas de hierro negro y lomo de hierro: lo para todo y cuesta el 55 %, pesa 9).
+  Lo hace `Rol.onEscudo` (`ShieldBlockEvent`: lo que para y la estamina, `Rol.guardia(jugador, golpe, mult)`); el peso,
+  `Peso.item` (el escudo del juego sigue pesando 4). Un martillo (7aj) les rompe la guardia a todos (la espera es la del
+  escudo que se lleve). El caballero y el confesor empiezan con el escudo de caballero y el barbaro con la rodela.
+- **El modelo** (`tools/escudos/escudos.py [--vista carpeta]`): cada uno, cajas como el escudo del juego (la placa de un
+  pixel de grueso en z -2..-1, hecha de franjas sin solaparse, y el asa en el mismo sitio que la del juego; la rodela con su
+  cuenco y su punta, el paves con su lomo y el pincho del pie); el frente se pinta con coordenadas de todo el escudo (el aro,
+  el filo, las bandas siguen la forma entera). Saca `textures/entity/escudos/<id>.png`, `client/escudos/<Nombre>Geometria.java`
+  (GENERADO) y los modelos de objeto `<id>.json` / `<id>_blocking.json` (`builtin/entity`, las posturas del escudo del juego
+  con su escala en la mano y en el menu). Lo dibuja `client/escudos/EscudoRenderer` (un `BlockEntityWithoutLevelRenderer` como
+  el del juego: dado la vuelta en Y y en Z, `entityCutoutNoCull`, el brillo si esta encantado; los modelos se hornean la
+  primera vez y al recargar los recursos), que da `EscudoCliente.EXTENSION` (la pide el objeto desde su constructor: no mira
+  sus campos); la propiedad `blocking` (el modelo de cubierto) la registra `EscudoCliente.setup`.
+- **Donde salen**: Kerrick (la rodela 800 y el escudo de caballero 1200, uno de cada), Silas (el paves 3000), la armeria de
+  Valdrenn (los tres; el escudo del juego sale menos), la Capital buena (el paves) y las paradas del camino (alguna rodela).
+- Pruebas: servidor, `escudos7ak()` (linea `Escudos 7ak: ...`: cada uno su peso, lo que para y lo que cuesta, que cubre y que
+  no se rompe; un caballero zombi con cada uno, cubriendose: un golpe de 10 al instante —la rodela, PARADA y el que pega
+  aturdido— y otro ya cubierto —la rodela deja pasar algo, los otros nada—; lo que cuesta cubrirse de un golpe de 6 con cada
+  uno; los escudos de las clases; tiendas y botin); cliente, tramo `escudos7ak()` despues del de las armas: el escudo de
+  caballero alzado en primera persona y de cara (`cliente_es01`, `es02`), la rodela (`es03`; lineas `escudos golpe rodela al
+  instante: ... PARADA` y `rodela cubierto: -1,5 de vida`), el paves de cara y en primera persona (`es04`, `es05`) y los tres
+  en el menu (`es06`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

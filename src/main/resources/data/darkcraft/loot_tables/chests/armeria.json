@@ -78,7 +78,7 @@
     {
      "type": "minecraft:item",
      "name": "minecraft:shield",
-     "weight": 5
+     "weight": 2
     },
     {
      "type": "minecraft:item",
@@ -200,6 +200,21 @@
        }
       }
      ]
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:rodela",
+     "weight": 3
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:escudo_caballero",
+     "weight": 2
+    },
+    {
+     "type": "minecraft:item",
+     "name": "darkcraft:paves",
+     "weight": 1
     }
    ]
   },

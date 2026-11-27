@@ -763,6 +763,97 @@ public final class CiTest {
         misionHedda(server, m, log);
         armaduras(server, m, log);
         armas7aj(server, m, log);
+        escudos7ak(server, m, log);
+    }
+
+    /**
+     * Parte 7ak: los escudos pequeno, mediano y grande. Cada uno: su peso, lo que para, lo que cuesta, que cubre (es un escudo) y
+     * que no se rompe; un caballero zombi con cada uno, cubriendose: un golpe de 10 en el instante de alzarlo (la rodela lo para
+     * entero: parada) y otro ya cubierto (la rodela deja pasar algo; los otros dos, nada); lo que cuesta de estamina cubrirse de
+     * un golpe con cada uno; los escudos de las clases; las tiendas y el botin.
+     */
+    private static void escudos7ak(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        StringBuilder sb = new StringBuilder("Escudos 7ak:");
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07a1b"), "[DarkCraftCI27]"));
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            for (var t : com.darkcraft.armas.Escudo.Tamano.values()) {
+                var st = new net.minecraft.world.item.ItemStack(DarkCraftMod.ESCUDOS.get(t).get());
+                sb.append(String.format(java.util.Locale.ROOT, " %s: peso %.1f, para %.0f%%, estamina x%.2f, cubre %s, se rompe %s;", t.id,
+                        com.darkcraft.combate.Peso.item(st), t.para * 100, t.estamina,
+                        st.canPerformAction(net.minecraftforge.common.ToolActions.SHIELD_BLOCK), st.isDamageableItem()));
+            }
+            double x0 = com.darkcraft.morvain.Capital.CX + 0.5, y0 = 705, z0 = com.darkcraft.morvain.Capital.CZ + 60.5;
+            m.getChunk(net.minecraft.util.Mth.floor(x0) >> 4, net.minecraft.util.Mth.floor(z0) >> 4);
+            for (var t : com.darkcraft.armas.Escudo.Tamano.values()) {
+                var cz = DarkCraftMod.CABALLERO_ESPADA.get().create(m);
+                if (cz == null) continue;
+                double x = x0 + t.ordinal() * 4;
+                cz.moveTo(x, y0, z0, 0f, 0f);
+                cz.yBodyRot = cz.yHeadRot = 0f;
+                cz.setNoAi(true);
+                cz.setNoGravity(true);
+                cz.addTag("darkcraft_ci");
+                cz.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                cz.setItemSlot(net.minecraft.world.entity.EquipmentSlot.OFFHAND, new net.minecraft.world.item.ItemStack(DarkCraftMod.ESCUDOS.get(t).get()));
+                m.addFreshEntity(cz);
+                quitar.add(cz);
+                cz.startUsingItem(net.minecraft.world.InteractionHand.OFF_HAND);
+                for (int k = 0; k < 8; k++) cz.tick();
+                fp.moveTo(x, y0, z0 + 2.0, 180f, 0f);
+                int par0 = com.darkcraft.armas.Escudo.PARADAS;
+                float v0 = cz.getHealth();
+                cz.invulnerableTime = 0;
+                cz.hurt(fp.damageSources().playerAttack(fp), 10f);
+                float pronto = v0 - cz.getHealth();
+                boolean paro = com.darkcraft.armas.Escudo.PARADAS > par0;
+                boolean aturdido = fp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                fp.removeAllEffects();
+                for (int k = 0; k < 24; k++) cz.tick();
+                float v1 = cz.getHealth();
+                cz.invulnerableTime = 0;
+                cz.hurt(fp.damageSources().playerAttack(fp), 10f);
+                float tarde = v1 - cz.getHealth();
+                sb.append(String.format(java.util.Locale.ROOT, " %s alzado: al instante -%.1f%s, cubierto -%.1f (%s);", t.id, pronto,
+                        paro ? " PARADA" + (aturdido ? " (el que pega, aturdido)" : "") : "", tarde, cz.isBlocking() ? "sigue cubierto" : "SIN CUBRIRSE"));
+            }
+            // lo que cuesta cubrirse de un golpe de 6 con cada uno
+            StringBuilder cuesta = new StringBuilder();
+            for (var t : com.darkcraft.armas.Escudo.Tamano.values()) {
+                com.darkcraft.rol.Rol.recuperado(fp);
+                float e0 = com.darkcraft.rol.Rol.estamina(fp);
+                com.darkcraft.rol.Rol.guardia(fp, 6f, t.estamina);
+                cuesta.append(String.format(java.util.Locale.ROOT, " %s %.1f", t.id, e0 - com.darkcraft.rol.Rol.estamina(fp)));
+            }
+            sb.append(" estamina por un golpe de 6:").append(cuesta).append(';');
+            // los escudos de las clases
+            sb.append(" clases: caballero ").append(com.darkcraft.rol.Clase.CABALLERO.kit().izquierda().getItem())
+                    .append(", barbaro ").append(com.darkcraft.rol.Clase.BARBARO.kit().izquierda().getItem())
+                    .append(", confesor ").append(com.darkcraft.rol.Clase.CONFESOR.kit().izquierda().getItem()).append(';');
+            int enTienda = 0;
+            for (var o : com.darkcraft.tienda.Tienda.KERRICK) if (o.item() instanceof com.darkcraft.armas.Escudo) enTienda++;
+            for (var o : com.darkcraft.tienda.Tienda.SILAS) if (o.item() instanceof com.darkcraft.armas.Escudo) enTienda++;
+            sb.append(" en las tiendas ").append(enTienda);
+            for (String tabla : new String[]{"armeria", "capital_bueno"}) {
+                var lt = server.getLootData().getLootTable(new net.minecraft.resources.ResourceLocation(DarkCraftMod.MODID, "chests/" + tabla));
+                int n = 0;
+                for (int r = 0; r < 40; r++) {
+                    var params = new net.minecraft.world.level.storage.loot.LootParams.Builder(m)
+                            .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN, net.minecraft.world.phys.Vec3.ZERO)
+                            .create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CHEST);
+                    for (var st : lt.getRandomItems(params)) if (st.getItem() instanceof com.darkcraft.armas.Escudo) n++;
+                }
+                sb.append(" | ").append(tabla).append(": ").append(n).append(" escudos en 40 cofres");
+            }
+        } catch (Exception e) {
+            sb.append(" ERROR ").append(e);
+            DarkCraftMod.LOGGER.error("[DarkCraft] los escudos de la 7ak", e);
+        } finally {
+            for (var e : quitar) e.discard();
+            fp.removeAllEffects();
+        }
+        log.println(sb);
+        log.flush();
     }
 
     /** Una flecha especial que sale a 1,6 bloques de su blanco hacia su pecho; se mueve hasta que da (o 12 ticks). */
