@@ -9107,5 +9107,635 @@
     ]
    }
   }
+ },
+ "voz_hagen": {
+  "voz": "Daniel - The Gruff Old British Wizard",
+  "voice_id": "htZQqY7WtacRNV7s62Iy",
+  "flow": "axmpHbUFmXhAI6aMSFpC",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7af: los herreros de Morvain y Silas, el mercader ambulante. Por frase, tomas a y b; se bajan como hagen/voz_Na.mp3 y hagen/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[gruff, tired] Another marked one, still breathing. [warmer] Sit by the fire, if you like. I'm Hagen. I shod the Constable's horses... back when there were horses.",
+    "sesiones": [
+     "C5qIh8YmYQ3AuAbGQeuv",
+     "MgJU2lnFhmByF5Y7coCV"
+    ],
+    "generaciones": [
+     "EwkwETLB8iBP64tF63dv",
+     "VCN5jXS87R1lYNij9eCr"
+    ],
+    "duraciones": [
+     10.48,
+     10.24
+    ]
+   },
+   "2": {
+    "prompt": "[gruff, a hint of a smile] Back again? The fire's still going. So am I.",
+    "sesiones": [
+     "rtsbr4WbHpCFSznBcuvE",
+     "Aqy95rvTE1h7R9rLmUzO"
+    ],
+    "generaciones": [
+     "6p2GkKKEHkHfA3IeCiyM",
+     "QU3iUWYJxA2LNcUlAqUL"
+    ],
+    "duraciones": [
+     4.8,
+     4.64
+    ]
+   },
+   "3": {
+    "prompt": "[grunts] Let's see what you've been swinging.",
+    "sesiones": [
+     "kz14RNq08kEkk128gw3y",
+     "Xrz8wpJJ1bkkdXYMzoiv"
+    ],
+    "generaciones": [
+     "9fJM8jYNy9Un61TMbi5M",
+     "FGzC2sXgisLRMtmCarAQ"
+    ],
+    "duraciones": [
+     3.6,
+     3.6
+    ]
+   },
+   "4": {
+    "prompt": "[satisfied] There. It'll bite deeper now.",
+    "sesiones": [
+     "MQ8bZDrlPaQ3ISAyipad",
+     "oAMJ7Ha8ysqtMzqb6Qq5"
+    ],
+    "generaciones": [
+     "ZCGJ6XI3iUlsO7VWmdpT",
+     "CFeHmfeR3Boi5IoJig2y"
+    ],
+    "duraciones": [
+     2.96,
+     2.96
+    ]
+   },
+   "5": {
+    "prompt": "[flatly] Not enough. Stones for the steel, echoes for the fire. Come back when you've got both.",
+    "sesiones": [
+     "AbZMHICbZpAZddFGKWJ9",
+     "rLgKymwfGVaLu7F7g130"
+    ],
+    "generaciones": [
+     "0pwq7oSCaXlh5F6iXaNt",
+     "wOU3dekpduKNCg7dPnII"
+    ],
+    "duraciones": [
+     6.32,
+     6.16
+    ]
+   },
+   "6": {
+    "prompt": "[quiet, remembering] When the Shadow came, I ran. Hammer on my back, anvil on a cart. Left everything else behind... even my apprentice, Tobin. [gruff] Useless boy. [softer] I hope he's still alive.",
+    "sesiones": [
+     "marp0m8uGwwl4MGQcvQN",
+     "3AVEwjhjjwiRMwFupO4U"
+    ],
+    "generaciones": [
+     "uT4VIsYSVgjYxuowOBPR",
+     "lZT99WjQV3cMGqMxzuWM"
+    ],
+    "duraciones": [
+     14.16,
+     14.08
+    ]
+   },
+   "7": {
+    "prompt": "[gruff, kind] Go on, then. Try not to come back in pieces.",
+    "sesiones": [
+     "rRUSc9yKrxG1bFiwBOmI",
+     "RkxdKJHa56P2PQgUENYZ"
+    ],
+    "generaciones": [
+     "QljO2lqnYvXSSjbrgr0s",
+     "yXp8NXvQZC7BtgerSFxI"
+    ],
+    "duraciones": [
+     3.68,
+     3.6
+    ]
+   },
+   "8": {
+    "prompt": "[proud, quiet] That blade has nothing left to learn from me.",
+    "sesiones": [
+     "UyozLbZZ5x2QpzOGBwib",
+     "DLve2WhpePfuiGguofsO"
+    ],
+    "generaciones": [
+     "lA54nI00plaq2uUURb1a",
+     "Pt5V1n5ynZQ3SU1R08MN"
+    ],
+    "duraciones": [
+     3.2,
+     3.12
+    ]
+   },
+   "9": {
+    "prompt": "[thoughtful] Ashes of war? Bring them to me. Steel remembers how its old masters fought... I only remind it.",
+    "sesiones": [
+     "UseKFsrNCgv5w8dy22jn",
+     "NlH9FSBpA9wfKtrT2Z9z"
+    ],
+    "generaciones": [
+     "RnQYPzuOfqtzgmHU7wZ1",
+     "NowRQYZGBdKXvAIfyrfn"
+    ],
+    "duraciones": [
+     8.0,
+     8.0
+    ]
+   }
+  }
+ },
+ "voz_brenna": {
+  "voz": "Emma - Wry, Gritty Hero",
+  "voice_id": "dmWfLQZJq7wNPv9WmtiM",
+  "flow": "axmpHbUFmXhAI6aMSFpC",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7af: los herreros de Morvain y Silas, el mercader ambulante. Por frase, tomas a y b; se bajan como brenna/voz_Na.mp3 y brenna/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[wry] Careful where you step, that's my good anvil. I'm Brenna. I mend what the sea spits back... hooks, chains, swords. Mostly swords, these days.",
+    "sesiones": [
+     "ynDq9xHzAs61e5qt3JiK",
+     "gcwu7VbUzOuAKbOqITzk"
+    ],
+    "generaciones": [
+     "sYrg9x9jWQ9yr4hjjaxB",
+     "nAVcK5RwzAu2q1xTUJ3g"
+    ],
+    "duraciones": [
+     10.64,
+     10.4
+    ]
+   },
+   "2": {
+    "prompt": "[wry] Still in one piece? The tide's been kinder to you than to most.",
+    "sesiones": [
+     "onM1cXQVx9wcaTuxmHhT",
+     "H53tCYlDpTW142APWYvN"
+    ],
+    "generaciones": [
+     "gWE65yHIfuJ9Dqsj7i8o",
+     "rcGhwILf8nZicTOhjiZY"
+    ],
+    "duraciones": [
+     4.72,
+     4.64
+    ]
+   },
+   "3": {
+    "prompt": "Right. Let's have a look at it.",
+    "sesiones": [
+     "IEz0tNqYFJSeY7RrRf3i",
+     "FcrNX18j8zfwcmY3jS93"
+    ],
+    "generaciones": [
+     "EGpjh4C8zr1nWwwuz010",
+     "4Lz8nNVxH30EMVuM0x8k"
+    ],
+    "duraciones": [
+     2.0,
+     2.08
+    ]
+   },
+   "4": {
+    "prompt": "[satisfied] Salt-tempered. It won't rust, and it won't forgive.",
+    "sesiones": [
+     "a0VXiS7PCdKTEhsqe1Nq",
+     "DMRRyVXykh2HEqPaK1bY"
+    ],
+    "generaciones": [
+     "4Ufn5qWvAtXHApw7cQ3P",
+     "9bHpMHhWTO5QC9FQarMo"
+    ],
+    "duraciones": [
+     4.56,
+     4.16
+    ]
+   },
+   "5": {
+    "prompt": "[dry] I can't forge with good intentions. Stones and echoes, love.",
+    "sesiones": [
+     "SoKp48w0ekv9872Yg1lK",
+     "KKbqhGRwHyjsbfIxpsB9"
+    ],
+    "generaciones": [
+     "oT1aEwHbrEv1rHbX6vg5",
+     "Do7jpqo7osY718kl8St3"
+    ],
+    "duraciones": [
+     4.96,
+     5.12
+    ]
+   },
+   "6": {
+    "prompt": "[wry, then sober] My father built ships in the old port, before the whaler lost his mind and the harbour drowned. [pause] Now I mend whatever keeps the next fool alive.",
+    "sesiones": [
+     "ihzudqRqFrXtuMLp7iPA",
+     "qVDeYruIhpBoK6gQImrB"
+    ],
+    "generaciones": [
+     "CafHwIUFDXYEs0B4wq6E",
+     "oyKNTKSwPTKPsbtWMzTV"
+    ],
+    "duraciones": [
+     9.68,
+     9.36
+    ]
+   },
+   "7": {
+    "prompt": "[dry] Mind the gulls. They've developed a taste for people.",
+    "sesiones": [
+     "o4sOClIp8bqVHsDAYwiK",
+     "hbbn4VOqAXShhlOGfgid"
+    ],
+    "generaciones": [
+     "UVCVEqgN9yiypTDCItGm",
+     "O8LoZZMCWmG6ftN2NeME"
+    ],
+    "duraciones": [
+     3.52,
+     3.44
+    ]
+   },
+   "8": {
+    "prompt": "[impressed] That's as good as steel gets. Even out here.",
+    "sesiones": [
+     "kQxKCuk2OYimDivtQyTL",
+     "OLnSYKnJoenS1w4VgHIZ"
+    ],
+    "generaciones": [
+     "rpPCx9rEV8RwSfYqSY3i",
+     "rhvfsyIxGfw8gdxJ82nc"
+    ],
+    "duraciones": [
+     3.52,
+     3.52
+    ]
+   }
+  }
+ },
+ "voz_ulrik": {
+  "voz": "Bjorn The Viking",
+  "voice_id": "ljo9gAlSqKOvF6D8sOsX",
+  "flow": "axmpHbUFmXhAI6aMSFpC",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7af: los herreros de Morvain y Silas, el mercader ambulante. Por frase, tomas a y b; se bajan como ulrik/voz_Na.mp3 y ulrik/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[booming, cheerful] Ha! A traveller, up here, in this cold! Come, warm your hands at my forge. I am Ulrik. The mountain took my toes, but not my arms!",
+    "sesiones": [
+     "82kCDZQK0XoF4rjFcrIY",
+     "Fc6YBvRj7AAWzF9p4tIy"
+    ],
+    "generaciones": [
+     "jHvDSeY50D9avrzAk9KT",
+     "LRTjcq5uyYjcutnnDzHl"
+    ],
+    "duraciones": [
+     10.8,
+     11.2
+    ]
+   },
+   "2": {
+    "prompt": "[booming] Back from the snow! Good. Fewer frozen corpses for me to bury.",
+    "sesiones": [
+     "W2Nr4wu31lchwvrKcJNv",
+     "MS9xqbRz1L1Kj8snomrI"
+    ],
+    "generaciones": [
+     "ZL49kFOrJzye9gK5LVeh",
+     "ua8iJhTQCjBelfChg3Ns"
+    ],
+    "duraciones": [
+     5.36,
+     5.28
+    ]
+   },
+   "3": {
+    "prompt": "[eager] Show me the steel!",
+    "sesiones": [
+     "gNbc9Sf0vQJ8Me9Y4622",
+     "pqfCAGTMsVbtfvTyW9cK"
+    ],
+    "generaciones": [
+     "7INSDXaMbiyRS5BU2rev",
+     "Kyw1BVxTOzgCf0LOBZIZ"
+    ],
+    "duraciones": [
+     1.44,
+     1.44
+    ]
+   },
+   "4": {
+    "prompt": "[laughs] Ha! Forged in snow and fire. Now it sings!",
+    "sesiones": [
+     "NTZf5C1OzgmItJqnAM6i",
+     "NC4R6XxwXlAUccPj8hYm"
+    ],
+    "generaciones": [
+     "EZIV0x3UknTU8Xcaxl7x",
+     "4LQvBQbZiIJjqlsa2FJH"
+    ],
+    "duraciones": [
+     5.52,
+     5.36
+    ]
+   },
+   "5": {
+    "prompt": "[gruff] No, no. The forge eats echoes, friend, and stones. You have not enough of either.",
+    "sesiones": [
+     "fy8fxc30ijeBEi751do7",
+     "ZnYy0fkRqW9zydEFM5Cn"
+    ],
+    "generaciones": [
+     "MQUmTFZPFOiqTcLQTvgg",
+     "VeP8JG30TM4jQhN6KzJO"
+    ],
+    "duraciones": [
+     7.12,
+     7.36
+    ]
+   },
+   "6": {
+    "prompt": "[lowering his voice] Up there, past the fang, sleeps the ash dragon. When it roars, the whole mountain shakes. [laughs] I've lost two anvils to the avalanches already!",
+    "sesiones": [
+     "ME5qagMIyTLPxCJhV2X2",
+     "5dzqZwY5RmfIgTGGhug4"
+    ],
+    "generaciones": [
+     "1tNBj8deK3WLWPSlr2tH",
+     "OvraD42o9kekYt9eQSKN"
+    ],
+    "duraciones": [
+     11.12,
+     11.12
+    ]
+   },
+   "7": {
+    "prompt": "[booming] Go! And if you see the dragon... run faster than I did!",
+    "sesiones": [
+     "mlRiWikwGMxMtcGhWA2D",
+     "6tSrkWGzyKwg5JxyqSs4"
+    ],
+    "generaciones": [
+     "rCm1K2ocRcjmCIUNLZNp",
+     "lsvjwQiSSOoCOgorgYul"
+    ],
+    "duraciones": [
+     4.96,
+     4.88
+    ]
+   },
+   "8": {
+    "prompt": "[proud] Nothing more to give it. Not even the mountain could make it better!",
+    "sesiones": [
+     "YdbP4UPbUzyflUNWVMDT",
+     "aFf5zqW9gMxkRzxL8Dqs"
+    ],
+    "generaciones": [
+     "lLjvQQr1FLJAmmqlIbFy",
+     "Rs89Ghqf5mOBFib6fh26"
+    ],
+    "duraciones": [
+     4.24,
+     4.4
+    ]
+   }
+  }
+ },
+ "voz_tobin": {
+  "voz": "Alfwyn - Excitable & Squeaky",
+  "voice_id": "o7bn7T3k6h58H9hn9j3y",
+  "flow": "axmpHbUFmXhAI6aMSFpC",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7af: los herreros de Morvain y Silas, el mercader ambulante. Por frase, tomas a y b; se bajan como tobin/voz_Na.mp3 y tobin/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[excited, nervous] Oh! A customer! A real one! I'm Tobin, I'm a smith! Well, an apprentice. Well, I was. Master Hagen said I was hopeless, but he's not here, so... [nervous laugh]",
+    "sesiones": [
+     "ixFLqVwZpZTCVRPLojwf",
+     "wcS2kaJbSsp80AnSds55"
+    ],
+    "generaciones": [
+     "RZaNAEWpGLbYFd8zhHIh",
+     "Eol8FnGKc3Qe6err23FI"
+    ],
+    "duraciones": [
+     12.32,
+     12.08
+    ]
+   },
+   "2": {
+    "prompt": "[excited] You came back! Nobody comes back!",
+    "sesiones": [
+     "RnFcT4jGuklCbAkxmRri",
+     "1fqbqoSRa82dzid6Vhug"
+    ],
+    "generaciones": [
+     "VbeMGB1F8oFfVNWjppu0",
+     "ARsC2YiS1yf221UgosGr"
+    ],
+    "duraciones": [
+     3.12,
+     3.2
+    ]
+   },
+   "3": {
+    "prompt": "[eager] Okay, okay, let me see it! I'll be careful, I promise!",
+    "sesiones": [
+     "7YAhhA7nvk6Kbc6nVwtS",
+     "dNvr9fO6ChMGz3TXgn15"
+    ],
+    "generaciones": [
+     "pv5IydBwsK0qe0G8rfgP",
+     "gOAJj0qmeKqW8sHpBiZF"
+    ],
+    "duraciones": [
+     4.16,
+     4.0
+    ]
+   },
+   "4": {
+    "prompt": "[amazed] It worked! I mean, of course it worked. [whispering] It worked!",
+    "sesiones": [
+     "Gs4gcK2z8Tg6JOjU5rIl",
+     "1zpoBxkdUfrncF3cOqOL"
+    ],
+    "generaciones": [
+     "Cs1O91m9uAfNfI8biiK1",
+     "ONicJhrjKGje0jNtKFz3"
+    ],
+    "duraciones": [
+     5.12,
+     5.04
+    ]
+   },
+   "5": {
+    "prompt": "[apologetic] Sorry, sorry! I need more stones... and echoes. Master Hagen never forged for free, so neither do I.",
+    "sesiones": [
+     "hWlCV7pmbK4X2qdiBhLN",
+     "hEc5dykRG4ZJlWj6xsxc"
+    ],
+    "generaciones": [
+     "rDxy2h8A4vMVR47Ugj5g",
+     "FDS1asCj9s2wTSoOGb8I"
+    ],
+    "duraciones": [
+     8.96,
+     9.36
+    ]
+   },
+   "6": {
+    "prompt": "[quieter, scared] I was in the Capital when the Constable shut the gates. I hid in a chimney for three days. [beat] I'm still a bit sooty, actually.",
+    "sesiones": [
+     "yJlJ1ie0D5ayfyWidTJW",
+     "Nq5JIFgfQCDl0O3D17a9"
+    ],
+    "generaciones": [
+     "yxeZEp41wLVp1uHcV4K3",
+     "ECcxRqKRWCHGenPjhwPf"
+    ],
+    "duraciones": [
+     8.0,
+     8.16
+    ]
+   },
+   "7": {
+    "prompt": "[cheerful] Bye! Don't die! Please don't die!",
+    "sesiones": [
+     "ChMnSzkFrXVUMjCxZB88",
+     "jE5FcYFdA9gbgyLNckVk"
+    ],
+    "generaciones": [
+     "C9SJE435AVAb957gSZrh",
+     "SSO0hC4ORpidxhhPqaG2"
+    ],
+    "duraciones": [
+     3.6,
+     3.68
+    ]
+   },
+   "8": {
+    "prompt": "[awed] That's... that's the best thing I've ever made. Don't tell Master Hagen I said that.",
+    "sesiones": [
+     "XPA4RAREgR5WyTEtAEpY",
+     "jwgU6JXcGS5UKpOAV6Zb"
+    ],
+    "generaciones": [
+     "22gpxK54vEXuXK1k9DeG",
+     "Rj3ftiguAXpJdTRwbLUL"
+    ],
+    "duraciones": [
+     6.32,
+     6.4
+    ]
+   }
+  }
+ },
+ "voz_silas": {
+  "voz": "Callum - Husky Trickster",
+  "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+  "flow": "axmpHbUFmXhAI6aMSFpC",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7af: los herreros de Morvain y Silas, el mercader ambulante. Por frase, tomas a y b; se bajan como silas/voz_Na.mp3 y silas/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[delighted, theatrical] Ah! A customer, in Morvain! Silas, at your service. Whatever the dead left behind, I sell... [sly] at a very fair price.",
+    "sesiones": [
+     "ITUlJGcBNl2quV8bTA8U",
+     "DGUxA0SkR8Eg1ODNOM9K"
+    ],
+    "generaciones": [
+     "EWokpgPP9qlbbAiXFMRm",
+     "gSxk21PWy22b6ofXXpYM"
+    ],
+    "duraciones": [
+     10.32,
+     10.24
+    ]
+   },
+   "2": {
+    "prompt": "[cheerful] Still alive? Good, good. The crows are terrible customers.",
+    "sesiones": [
+     "YriIbToHu2zCs28bfuyp",
+     "2KE2j6hzR5TuqoakwlZ4"
+    ],
+    "generaciones": [
+     "72mZ3gz1Nje0LdQQHZkY",
+     "BIhTj50PT3ojqFmyo0Ma"
+    ],
+    "duraciones": [
+     5.04,
+     5.12
+    ]
+   },
+   "3": {
+    "prompt": "[pleased] A pleasure doing business.",
+    "sesiones": [
+     "iU1iJkaIzi8sRkhoLUNP",
+     "gGa8nJ51MG53YE79aq7K"
+    ],
+    "generaciones": [
+     "xjpv8JEihaLRfl8mQ73o",
+     "tepZqsvZ2qkSxSWzMNox"
+    ],
+    "duraciones": [
+     2.08,
+     2.08
+    ]
+   },
+   "4": {
+    "prompt": "[dry] Echoes, friend. I don't take promises... [beat] or teeth.",
+    "sesiones": [
+     "HyX5pwrczHtZq1OqYNok",
+     "SrYQ4tMgMvDk5a5z4Vl0"
+    ],
+    "generaciones": [
+     "iLLJy1miiyo4vklmmoSC",
+     "fYaCclyUUYtQWoQ7gvdH"
+    ],
+    "duraciones": [
+     4.96,
+     4.96
+    ]
+   },
+   "5": {
+    "prompt": "[conspiratorial] Where next? Wherever the road is quiet. I never stay long in one place. Look for me by the shrines.",
+    "sesiones": [
+     "KdaUuRSzv8uiVVNKAWdJ",
+     "Jre1YbzHtnl3cOgkFj3Q"
+    ],
+    "generaciones": [
+     "gt6XuLUMTb5S88pY1arP",
+     "qsKiCBQZiqsnDbD82Wj5"
+    ],
+    "duraciones": [
+     7.68,
+     7.52
+    ]
+   },
+   "6": {
+    "prompt": "[cheerful, mysterious] They say the Shadow can't see a man who keeps moving. [chuckles] So far, so good.",
+    "sesiones": [
+     "BbBTJFjdUTNdLXbis5yZ",
+     "sJk0igktdgCHV4otCDzK"
+    ],
+    "generaciones": [
+     "gwJDM615GzyPD5sVe7r4",
+     "xL7nAcjYEVQW5dAvsqRk"
+    ],
+    "duraciones": [
+     6.0,
+     6.24
+    ]
+   }
+  }
  }
 }
