@@ -11317,5 +11317,179 @@
     ]
    }
   }
+ },
+ "voz_sigrun_kaisa": {
+  "voz": "Kaisa - Strong and authoritative",
+  "voice_id": "2Yg0KQ858zsEJOsoPmT2",
+  "flow": "JhLKcOKadUHHH8IC94uf",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7ap: Sigrun con otra voz (la de Elariel X ya es la de la reina Isolde). Por frase, tomas c y d; se bajan como sigrun/voz_Nc.mp3 y sigrun/voz_Nd.mp3 (las a y b son las de Elariel X, que no se usan)",
+  "frases": {
+   "1": {
+    "prompt": "[firm] Halt. No one passes the Fang while I stand. [pause] [softer] ...You're not one of them. Marked... I can see it on you. [weary] I am Sigrun, Warden of the Pass. My oath holds me here... until someone strikes me down.",
+    "sesiones": [
+     "GcmF9eQH1TCu0Bj0q336",
+     "Wy7VCZISIhynfec0Ukmp"
+    ],
+    "generaciones": [
+     "C8txBMY6s5WfjgrKOvp5",
+     "6vlPwMqzzTOfa2CCTPXk"
+    ],
+    "duraciones": [
+     14.64,
+     14.56
+    ]
+   },
+   "2": {
+    "prompt": "[fierce] Then draw your blade. Fight me with everything you have... [intense] and don't you dare hold back.",
+    "sesiones": [
+     "1J8G1WYMU13435yTfzFS",
+     "LjfWRCrTzgOzNKUDHRca"
+    ],
+    "generaciones": [
+     "DQc4QE3NNheUhPUJCM5b",
+     "gnrMeC8JD5MpDo8hfuPl"
+    ],
+    "duraciones": [
+     5.68,
+     5.6
+    ]
+   },
+   "3": {
+    "prompt": "[quiet, remembering] When the Capital burned, my captain sent us to hold this pass, so the people could flee to the monastery. We held it. Nine days. My brothers fell one by one... [firm] I swore no one would pass while I stood. [bitter laugh] I'm still standing.",
+    "sesiones": [
+     "KuYeRQnKiROUlXrwUTXZ",
+     "JOHg5jmtR6bMxiGWjJJV"
+    ],
+    "generaciones": [
+     "oDMRdUVDSyVRnmOqHFkc",
+     "haw8MxQ88MzpUFFqejFJ"
+    ],
+    "duraciones": [
+     15.52,
+     15.12
+    ]
+   },
+   "4": {
+    "prompt": "[cold] Then go back the way you came. The pass stays closed.",
+    "sesiones": [
+     "eSfQSUnCtl8uLV9IL3JF",
+     "fG66fvVeUgSJFEFXoOrk"
+    ],
+    "generaciones": [
+     "Vpg8tsIa8G3DvYltYbao",
+     "I69ui552tpjRiGF3i4gg"
+    ],
+    "duraciones": [
+     3.36,
+     3.2
+    ]
+   },
+   "5": {
+    "prompt": "[dry] You again. Have you found your courage?",
+    "sesiones": [
+     "naHUgzTe2oAvVGITllkz",
+     "0oifvfu4X9LrRZ57jCyD"
+    ],
+    "generaciones": [
+     "dATV3rGCVtAXPT3AKENg",
+     "BpPqtt94YR4CvfKOzwvh"
+    ],
+    "duraciones": [
+     2.96,
+     2.96
+    ]
+   },
+   "6": {
+    "prompt": "[breathing hard] Enough... enough. [pained] You've beaten me. The oath... is broken.",
+    "sesiones": [
+     "w25GvQCuhu1mpHgB54t7",
+     "OkIommFf4tO96UecfIaK"
+    ],
+    "generaciones": [
+     "t5rNcROJ8ZqzLZUX8srl",
+     "3SH1g8UOSK39X0XPdg0J"
+    ],
+    "duraciones": [
+     7.04,
+     6.56
+    ]
+   },
+   "7": {
+    "prompt": "[exhausted, relieved] Nine days and a lifetime... and you finally put me on my knees. My oath is fulfilled. [steady] Now finish it... or let me go. The choice is yours.",
+    "sesiones": [
+     "dPP3vmETAqQycKoeBosd",
+     "fs75RPByWUqAH9HUwjru"
+    ],
+    "generaciones": [
+     "56MC7zRseSAUzfbZZqSO",
+     "39u2NjIr6yTnZRxnqduN"
+    ],
+    "duraciones": [
+     10.48,
+     10.32
+    ]
+   },
+   "8": {
+    "prompt": "[softly] Thank you. [whispering] Tell them... the pass held.",
+    "sesiones": [
+     "BFIiD3UyhLPWcjMy5Nq5",
+     "sBvwjtZs9k4jHtpqHjsQ"
+    ],
+    "generaciones": [
+     "u7q9AvrLFfpfE4WUhM5T",
+     "4udj7wL7jZwcj3UpeC3r"
+    ],
+    "duraciones": [
+     3.44,
+     3.28
+    ]
+   },
+   "9": {
+    "prompt": "[surprised, then warm] Let me go? [pause] Then I'll go down to the monastery and find their names. All nine of them. Take my shield. I won't need it where I'm going.",
+    "sesiones": [
+     "vX3xJKD6IQa3a03POcXW",
+     "VlVazmh6DQ17TtvJsAU5"
+    ],
+    "generaciones": [
+     "8l0xkefgSmgTKw1Vhc7G",
+     "GQ1x5K8Mci8HYuLdsWu6"
+    ],
+    "duraciones": [
+     8.16,
+     8.16
+    ]
+   },
+   "10": {
+    "prompt": "[not unkind] You fell. There's no shame in that. When you're ready... I'll be here. I'm always here.",
+    "sesiones": [
+     "KUCjwfBQxWLSdr4ZjeKc",
+     "cMU75tyc66ygVM6QKjQo"
+    ],
+    "generaciones": [
+     "aHrGqTLmvzORZLA27UJY",
+     "3y9Pwqh0DwqTVxKgaykk"
+    ],
+    "duraciones": [
+     6.24,
+     6.16
+    ]
+   },
+   "11": {
+    "prompt": "[breathing hard, grinning] Good... Again!",
+    "sesiones": [
+     "cwXm7SQgJoVIQA9bWYsO",
+     "5BLKEGKqjBDFqzIT0jPX"
+    ],
+    "generaciones": [
+     "1SSM5Sdxo3h61NwB9252",
+     "a9LhiFxlUWwxLtIc5y7h"
+    ],
+    "duraciones": [
+     2.8,
+     3.44
+    ]
+   }
+  }
  }
 }
