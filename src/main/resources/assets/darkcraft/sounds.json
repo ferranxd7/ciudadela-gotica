@@ -6450,5 +6450,371 @@
         "stream": false
       }
     ]
+  },
+  "sfx.centinela_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.centinela_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/centinela_alerta_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/centinela_alerta_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.centinela_paso": {
+    "subtitle": "subtitles.darkcraft.sfx.centinela_paso",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/centinela_paso_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/centinela_paso_2",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/centinela_paso_3",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "sfx.centinela_tajo": {
+    "subtitle": "subtitles.darkcraft.sfx.centinela_tajo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/centinela_tajo_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/centinela_tajo_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.centinela_golpe": {
+    "subtitle": "subtitles.darkcraft.sfx.centinela_golpe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/centinela_golpe_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/centinela_golpe_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.centinela_alabarda": {
+    "subtitle": "subtitles.darkcraft.sfx.centinela_alabarda",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/centinela_alabarda_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/centinela_alabarda_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.centinela_humo": {
+    "subtitle": "subtitles.darkcraft.sfx.centinela_humo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/centinela_humo_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/centinela_humo_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.centinela_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.centinela_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/centinela_dolor_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/centinela_dolor_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "sfx.centinela_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.centinela_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/centinela_muerte_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/centinela_muerte_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.isolde_tarareo": {
+    "subtitle": "subtitles.darkcraft.sfx.isolde_tarareo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/isolde_tarareo_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/isolde_tarareo_2",
+        "stream": true
+      }
+    ]
+  },
+  "sfx.isolde_canto": {
+    "subtitle": "subtitles.darkcraft.sfx.isolde_canto",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/isolde_canto_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/isolde_canto_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.isolde_garras": {
+    "subtitle": "subtitles.darkcraft.sfx.isolde_garras",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/isolde_garras_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/isolde_garras_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "sfx.isolde_velo": {
+    "subtitle": "subtitles.darkcraft.sfx.isolde_velo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/isolde_velo_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/isolde_velo_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.isolde_abrazo": {
+    "subtitle": "subtitles.darkcraft.sfx.isolde_abrazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/isolde_abrazo_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/isolde_abrazo_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.isolde_desvanece": {
+    "subtitle": "subtitles.darkcraft.sfx.isolde_desvanece",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/isolde_desvanece_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/isolde_desvanece_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.isolde_grito": {
+    "subtitle": "subtitles.darkcraft.sfx.isolde_grito",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/isolde_grito_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "darkcraft:sfx/isolde_grito_2",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "sfx.isolde_velo_arde": {
+    "subtitle": "subtitles.darkcraft.sfx.isolde_velo_arde",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/isolde_velo_arde_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/isolde_velo_arde_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.isolde_lagrimas": {
+    "subtitle": "subtitles.darkcraft.sfx.isolde_lagrimas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/isolde_lagrimas_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/isolde_lagrimas_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.isolde_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.isolde_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/isolde_dolor_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/isolde_dolor_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.isolde_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.isolde_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/isolde_muerte_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/isolde_muerte_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ambiente.homenaje": {
+    "subtitle": "subtitles.darkcraft.ambiente.homenaje",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/homenaje_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/homenaje_ambiente_2",
+        "stream": true
+      }
+    ]
+  },
+  "sfx.puerta_homenaje": {
+    "subtitle": "subtitles.darkcraft.sfx.puerta_homenaje",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/puerta_homenaje_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "darkcraft:sfx/puerta_homenaje_2",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "musica.isolde": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/isolde",
+        "stream": true
+      }
+    ]
+  },
+  "isolde.voz.1": {
+    "subtitle": "subtitles.darkcraft.isolde.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:isolde/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "isolde.voz.2": {
+    "subtitle": "subtitles.darkcraft.isolde.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:isolde/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "isolde.voz.3": {
+    "subtitle": "subtitles.darkcraft.isolde.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:isolde/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "isolde.voz.4": {
+    "subtitle": "subtitles.darkcraft.isolde.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:isolde/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "isolde.voz.5": {
+    "subtitle": "subtitles.darkcraft.isolde.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:isolde/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "isolde.voz.6": {
+    "subtitle": "subtitles.darkcraft.isolde.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:isolde/voz_6",
+        "stream": false
+      }
+    ]
+  },
+  "sombra.voz.24": {
+    "subtitle": "subtitles.darkcraft.sombra.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:sombra/voz_24",
+        "stream": false
+      }
+    ]
+  },
+  "voz.guia.15": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_15",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.16": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_16",
+        "stream": true
+      }
+    ]
   }
 }

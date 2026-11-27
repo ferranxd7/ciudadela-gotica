@@ -293,6 +293,9 @@ public final class Morvain {
         if (m != null) Gigantes.tick(m);
         // la subida por la cadena del sur (parte 7aa): la Sombra, el viento, las caidas y el corcel que no sube
         if (m != null) Cadena.tick(m);
+        // la casa de la Sombra (parte 7ab): el rastrillo, la Sombra al entrar, Maelis en la capilla, el sello del salon del trono
+        // mientras pelea la reina y la reja de la azotea
+        if (m != null) CasaSombra.tick(m);
         // el molino de la Molinera (parte 7f): la reja de su puerta y su crujido con el viento
         if (m != null && srv.getTickCount() % 100 == 13) Molino.crujir(m);
         // la arboleda (parte 7h): con el Verdugo vencido, las sogas de los colgados se quedan con el lazo vacio
@@ -475,6 +478,7 @@ public final class Morvain {
     public static void onParada(ServerStoppedEvent e) {
         ESPERA.clear();
         PENDIENTES.clear();
+        CasaSombra.parar();
     }
 
     // ------------------------------------------------------------------ el nombre del sitio
@@ -514,6 +518,9 @@ public final class Morvain {
         // la subida por la cadena del sur (parte 7aa): la Boca y la Garganta, el Descansillo, la cadena y, arriba, la ciudadela
         if (Cadena.cerca(p.getX(), p.getZ()) || Subida.enCiudadela(p.getX(), p.getY(), p.getZ())) {
             if (Subida.enBoca(p.getX(), p.getY(), p.getZ())) return "darkcraft.morvain.lugar.boca";
+            // la torre del homenaje por dentro (parte 7ab): cada planta su sala, y la azotea
+            if (Homenaje.enHomenaje(p.getX(), p.getY(), p.getZ())) return Homenaje.sala(Homenaje.planta(p.getY()));
+            if (Homenaje.enAzotea(p.getX(), p.getY(), p.getZ())) return Homenaje.sala(Homenaje.AZOTEA);
             if (Subida.enCiudadela(p.getX(), p.getY(), p.getZ())) return "darkcraft.morvain.lugar.ciudadela";
             if (Subida.enCamino(p.getX(), p.getY(), p.getZ()) && Subida.enDescansillo(p.getX(), p.getY(), p.getZ()))
                 return "darkcraft.morvain.lugar.descansillo";
@@ -568,6 +575,11 @@ public final class Morvain {
 
         void marcar(String k) {
             if (hechos.add(k)) setDirty();
+        }
+
+        /** Lo olvida (para las pruebas y los comandos). */
+        void quitar(String k) {
+            if (hechos.remove(k)) setDirty();
         }
 
         static Datos load(CompoundTag t) {

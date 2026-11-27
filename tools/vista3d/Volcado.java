@@ -986,6 +986,51 @@ public class Volcado {
                         marcas.put((o.tipo().equals("gargola") ? "G" : o.variante() == 0 ? "R" : o.variante() == 1 ? "C" : "Z") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
                 if (System.getProperty("caja") == null) andarSubida(lvl, v);
             }
+            case "morvain_homenaje" -> {
+                // la torre del homenaje por dentro (parte 7ab): la puerta, las seis plantas, las escaleras y el patio (-Dcaja=x0,z0,x1,z1 para
+                // un trozo; -Dsuelo=Y: lo mas bajo que se vuelca; -Dabierta=true: el rastrillo y la reja de la azotea abiertos)
+                com.darkcraft.morvain.Homenaje v = com.darkcraft.morvain.Homenaje.get();
+                String[] k = System.getProperty("caja", (com.darkcraft.morvain.Homenaje.BX0 - 6) + "," + (com.darkcraft.morvain.Homenaje.BZ0 - 6) + ","
+                        + (com.darkcraft.morvain.Homenaje.BX1 + 6) + "," + (com.darkcraft.morvain.Homenaje.BZ1 + 4)).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                int ymin = Integer.parseInt(System.getProperty("suelo", "536"));
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, ymin);
+                com.darkcraft.morvain.Subida sb = com.darkcraft.morvain.Subida.get();
+                int hechos = 0;
+                for (long c : sb.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    sb.construir(lvl, cx, cz, RandomSource.create(c));
+                }
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), y = BlockPos.getY(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1 || y < ymin;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                minY = Math.max(minY, ymin);
+                System.out.println("El homenaje: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " que esperan; "
+                        + v.pilares + " pilares, " + v.braseros + " braseros, " + v.faroles + " faroles, " + v.velas + " velas, " + v.estanterias
+                        + " estanterias, " + v.celdas + " celdas, " + v.bancos + " bancos, " + v.espejos + " espejos, " + v.estatuas + " estatuas, "
+                        + v.peldanos + " peldanos; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas())
+                    marcas.put((o.tipo().equals("isolde") ? "Q" : o.tipo().equals("centinela") ? (o.variante() == 0 ? "S" : "H") : o.tipo().substring(0, 1).toUpperCase())
+                            + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                if (System.getProperty("caja") == null) andarHomenaje(lvl, v);
+            }
             case "morvain_grieta" -> {
                 // el Puente de la Grieta (parte 7s): la grieta con su sangre, el puente con su espadana, la puerta del norte, el paso,
                 // el cementerio, el humilladero, la hospederia con el libro 28 y el campamento de los penitentes
@@ -1681,6 +1726,55 @@ public class Volcado {
             pf.append(' ').append(z).append(':').append(v.superficie(z)).append('/').append(h == Integer.MIN_VALUE ? "-" : String.valueOf(h));
         }
         System.out.println(pf);
+    }
+
+    /** El homenaje (parte 7ab): a pie del patio a todos los sitios, con el rastrillo y la reja de la azotea cerrados y abiertos. */
+    static void andarHomenaje(WorldGenLevel lvl, com.darkcraft.morvain.Homenaje v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        for (int vez = 0; vez < 3; vez++) {
+            final boolean rastrillo = vez >= 1, reja = vez >= 2;
+            java.util.Set<Long> quitar = new java.util.HashSet<>();
+            if (rastrillo) for (BlockPos b : com.darkcraft.morvain.Homenaje.rastrillo()) quitar.add(b.asLong());
+            if (reja) for (BlockPos b : com.darkcraft.morvain.Homenaje.rejaAzotea()) quitar.add(b.asLong());
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                long q = BlockPos.asLong(x, y, z);
+                if (quitar.contains(q)) return aire;
+                BlockState s = MUNDO.getOrDefault(q, aire);
+                return s.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || s.getBlock() instanceof net.minecraft.world.level.block.CandleBlock ? aire : s;
+            };
+            int[] e = v.sitio("patio");
+            var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], com.darkcraft.morvain.Homenaje.BX0 - 4, com.darkcraft.morvain.Homenaje.BZ0 - 4,
+                    com.darkcraft.morvain.Homenaje.BX1 + 4, com.darkcraft.morvain.Homenaje.BZ1 + 4, 8_000_000);
+            StringBuilder sb = new StringBuilder((reja ? "con todo abierto" : rastrillo ? "con el rastrillo abierto" : "cerrado") + ", a pie desde el patio: "
+                    + z0.celdas() + " celdas;");
+            for (String s : v.sitios().keySet()) {
+                if (s.equals("frente")) continue;
+                int[] q = v.sitio(s);
+                sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+            }
+            System.out.println(sb);
+            if (!reja) continue;
+            int malos = 0, chocan = 0, sinSuelo = 0;
+            for (var o : v.esperas()) {
+                if (!z0.alcanza(o.x(), o.y(), o.z(), 2.5)) {
+                    malos++;
+                    System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.tipo() + " " + o.x() + "," + o.y() + "," + o.z());
+                }
+                for (int dy = 0; dy < (o.tipo().equals("isolde") || o.tipo().equals("centinela") ? 3 : 2); dy++) {
+                    BlockState st = mundo.en(o.x(), o.y() + dy, o.z());
+                    if (choca(st)) {
+                        chocan++;
+                        System.out.println("  " + o.grupo() + " metido en un bloque: " + o.tipo() + " " + o.x() + "," + (o.y() + dy) + "," + o.z() + " " + st);
+                    }
+                }
+                BlockState abajo = mundo.en(o.x(), o.y() - 1, o.z());
+                if (!choca(abajo)) {
+                    sinSuelo++;
+                    System.out.println("  " + o.grupo() + " sin suelo: " + o.tipo() + " " + o.x() + "," + o.y() + "," + o.z() + " " + abajo);
+                }
+            }
+            System.out.println("los de la casa: " + v.esperas().size() + ", sin llegar " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
+        }
     }
 
     static void andarCerco(WorldGenLevel lvl, com.darkcraft.morvain.Cerco v, Map<Long, BlockState> antes) {

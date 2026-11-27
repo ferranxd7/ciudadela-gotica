@@ -63,9 +63,15 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   los cuernos hacia atras, las cejas de hueso, los ojos de oro fundido y brasas en los ollares; relleno de brasas que corren entre
   escamas negras; ascuas y ceniza que suben al recibir dano.
 
+  La reina Isolde (parte 7ab): su velo de encaje negro tendido de punta a punta (seda negra con el encaje en rombos y florecitas,
+  el ribete de plata arriba y las ondas del encaje colgando abajo), una rosa negra marchita en cada punta y, en el centro, la cara
+  palida tras el velo con dos ojos rojos que apenas se ven, la corona de oro viejo con sus gemas encima y dos lagrimas negras que le
+  caen por debajo; relleno de seda carmesi con pliegues que corren y un hilo de plata; petalos negros y rojos, lagrimas y chispas
+  de plata que caen meciendose al recibir dano.
+
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
 abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png, pontifice_barra.png, aldric_barra.png,
-gigante_barra.png, jinete_barra.png, bufon_barra.png y dragon_barra.png (256x128):
+gigante_barra.png, jinete_barra.png, bufon_barra.png, dragon_barra.png e isolde_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -2225,6 +2231,166 @@ def ascuas_dragon():
     return img
 
 
+# ---------------------------------------------------------------- la reina Isolde (parte 7ab)
+
+IS_K = [hexc(c) for c in ("070508", "100c12", "1a141e", "261e2c", "33293b")]
+IS_P = [hexc(c) for c in ("55515e", "7d7888", "a7a2b2", "d2cddb", "f4f0fa")]
+IS_R = [hexc(c) for c in ("240307", "4a0810", "780f1a", "a81a28", "d83444", "f47a86")]
+IS_O = [hexc(c) for c in ("4a320e", "7c5a1c", "b08632", "dcb658", "f6e29a")]
+IS_F = [hexc(c) for c in ("8e8690", "b6aeb8", "d6ced6", "ece6ec")]
+
+
+def encaje(x, y):
+    """El encaje del velo: 0 seda, 1 hilo, 2 florecita (cada 8 px, en los cruces)."""
+    if (x % 8 == 4) and (y % 8 == 4 or y % 8 == 0):
+        return 2
+    return 1 if (x + y) % 4 == 0 or (x - y) % 4 == 0 else 0
+
+
+def rosa_negra(img, cx, cy, r):
+    """Una rosa negra marchita: petalos en espiral (negros con el filo rojo oscuro) y una espina."""
+    for y in range(int(cy - r - 1), int(cy + r + 2)):
+        for x in range(int(cx - r - 1), int(cx + r + 2)):
+            dx, dy = x + 0.5 - cx, y + 0.5 - cy
+            d = (dx * dx + dy * dy) ** 0.5
+            if d <= r:
+                ang = math.atan2(dy, dx)
+                # la espiral de los petalos
+                v = (ang / (2 * math.pi) + d / r * 1.6) % 1.0
+                c = IS_K[3] if v < 0.45 else IS_K[1]
+                if 0.42 < v < 0.52:
+                    c = IS_R[2] if d > r * 0.35 else IS_R[3]
+                if d < r * 0.22:
+                    c = IS_R[1]
+                put(img, x, y, c)
+            elif d <= r + 1.0:
+                put(img, x, y, OUT)
+
+
+def lagrima(img, x, y, largo):
+    """Una lagrima negra que cae (la punta arriba), con su brillo."""
+    for k in range(largo):
+        w = 0 if k < largo - 3 else 1
+        for a in range(-w, w + 1):
+            put(img, x + a, y + k, IS_K[0] if a == 0 else IS_K[2])
+        put(img, x - w - 1, y + k, OUT)
+        put(img, x + w + 1, y + k, OUT)
+    put(img, x, y + largo, OUT)
+    put(img, x, y - 1, OUT)
+    put(img, x, y + largo - 2, IS_P[2])
+
+
+def marco_isolde():
+    """El velo de Isolde tendido de punta a punta (encaje negro con su ribete de plata y las ondas colgando), las rosas negras de
+    las puntas y, en el centro, la cara tras el velo, la corona y las lagrimas."""
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    ya0, ya1 = FY0 - 3, FY1 + 1
+    x0, x1 = 11, FW - 12
+    for y in range(ya0, ya1 + 1):
+        for x in range(x0, x1 + 1):
+            k = encaje(x, y)
+            c = IS_K[1] if k == 0 else IS_K[3] if k == 1 else IS_P[1]
+            if y == ya1:
+                c = mix(c, IS_K[0], 0.5)
+            put(img, x, y, c)
+    # el ribete de plata de arriba (con una perla cada 6) y las ondas del encaje colgando abajo
+    for x in range(x0, x1 + 1):
+        put(img, x, ya0 - 1, IS_P[3] if x % 6 else IS_P[4])
+        put(img, x, ya0 - 2, OUT)
+        put(img, x, ya1 + 1, IS_K[3])
+        onda = ya1 + 2 + (1 if (x % 6) in (2, 3) else 0)
+        for y in range(ya1 + 2, onda + 1):
+            put(img, x, y, IS_K[2] if (x % 6) not in (0, 5) else IS_P[0])
+        put(img, x, onda + 1, OUT)
+    # el hueco del relleno, limpio
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, OUT)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # las rosas negras de las puntas, con una hoja seca
+    my = (ya0 + ya1) / 2 + 0.5
+    for cx in (6.0, FW - 6.0):
+        rosa_negra(img, cx, my, 5.4)
+        s = -1 if cx < FW / 2 else 1
+        for k in range(4):
+            put(img, int(cx) + s * (3 + k), int(my + 5 + k // 2), IS_K[3] if k < 3 else OUT)
+    mx = FW // 2
+    # la cara tras el velo: un ovalo palido que asoma por los huecos del encaje, con los ojos rojos
+    for y in range(4, FY0 - 1):
+        for x in range(mx - 8, mx + 8):
+            dx, dy = (x + 0.5 - mx) / 6.6, (y + 0.5 - 10.5) / 7.2
+            if dx * dx + dy * dy > 1.0:
+                continue
+            k = encaje(x, y)
+            luz = 1.0 - (dx * 0.7 + 0.3) ** 2 * 0.5
+            c = (IS_F[2] if luz > 0.7 else IS_F[1]) if k == 0 else IS_K[3] if k == 1 else IS_P[2]
+            put(img, x, y, c)
+    for ex in (mx - 3, mx + 2):
+        put(img, ex, 10, IS_R[4])
+        put(img, ex + (1 if ex < mx else -1), 10, IS_R[2])
+    # el velo cae a los lados de la cara hasta la banda
+    for y in range(4, FY0 - 1):
+        for s in (-1, 1):
+            for w in range(2):
+                x = mx + s * (7 + w + (y - 4) // 5)
+                put(img, x if s > 0 else x - 1, y, IS_K[2] if w == 0 else IS_K[1])
+    # la corona: la banda de oro viejo y tres puntas con gemas rojas
+    for x in range(mx - 6, mx + 6):
+        put(img, x, 4, IS_O[2] if x % 3 else IS_O[3])
+        put(img, x, 5, IS_O[1])
+    for px, alto in ((mx - 5, 3), (mx - 1, 4), (mx + 4, 3)):
+        for k in range(alto):
+            put(img, px, 3 - k, IS_O[3] if k < alto - 1 else IS_O[4])
+            put(img, px + 1, 3 - k, IS_O[1])
+    put(img, mx - 1, 4, IS_R[4])
+    put(img, mx, 4, IS_R[3])
+    put(img, mx - 5, 4, IS_R[3])
+    put(img, mx + 4, 4, IS_R[3])
+    # contorno de la cara, el velo y la corona
+    antes = img.copy()
+    for y in range(0, FY0 - 2):
+        for x in range(mx - 14, mx + 14):
+            if antes.getpixel((x, y))[3] == 0 and any(0 <= x + a < FW and 0 <= y + b < 40 and antes.getpixel((x + a, y + b))[3] > 0
+                                                       for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                put(img, x, y, OUT)
+    # dos lagrimas negras que caen bajo el centro
+    lagrima(img, mx - 3, ya1 + 4, 5)
+    lagrima(img, mx + 2, ya1 + 5, 6)
+    return img
+
+
+def relleno_isolde(k):
+    """La vida de Isolde: seda carmesi con sus pliegues, que corren despacio, y un hilo de plata."""
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            f = 0.5 + 0.5 * math.sin((x - k * 3) * 0.21 + y * 0.35)
+            g = 0.5 + 0.5 * math.sin((x - k * 3) * 0.067 + 1.3)
+            t = 0.25 + 0.5 * f * 0.7 + 0.3 * g
+            c = mix(IS_R[1], IS_R[3], max(0.0, min(1.0, t)))
+            if f > 0.93:
+                c = mix(c, IS_R[4], 0.5)
+            if y == 0:
+                c = mix(c, IS_R[5], 0.35)
+            if y == 6:
+                c = mix(c, IS_R[0], 0.6)
+            if y == 3 and (x - k * 3) % 11 < 6:
+                c = mix(c, IS_P[3], 0.35)
+            img.putpixel((x, y), c)
+    return img
+
+
+def petalos():
+    """Lo que cae al recibir dano: un petalo negro, uno rojo, una lagrima negra y una chispa de plata."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = ([".kk", "kKk", "kk."], [".r", "rR", "r."], ["t", "t", "T", "T"], ["s.s", ".S.", "s.s"])
+    col = {"k": IS_K[2], "K": IS_K[4], "r": IS_R[2], "R": IS_R[4], "t": IS_K[1], "T": IS_K[0], "s": IS_P[2], "S": IS_P[4]}
+    for i, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, i * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 def hueco(a, b):
     n = noise2(113)
     img = Image.new("RGBA", (240, 7))
@@ -2271,6 +2437,7 @@ if __name__ == "__main__":
         "jinete": atlas(marco_jinete(), relleno_jinete, hueco("04070b", "0e1822"), rastro("eefaff", "a8d8ee"), chispas_almas()),
         "bufon": atlas(marco_bufon(), relleno_bufon, hueco("0a0506", "1c0d10"), rastro("fff4e8", "f0c8a0"), confeti()),
         "dragon": atlas(marco_dragon(), relleno_dragon, hueco("070505", "180e0b"), rastro("fff2e0", "f0b080"), ascuas_dragon()),
+        "isolde": atlas(marco_isolde(), relleno_isolde, hueco("060407", "140d16"), rastro("fff0f2", "e8b0bc"), petalos()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

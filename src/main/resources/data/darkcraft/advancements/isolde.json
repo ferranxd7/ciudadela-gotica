@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:ultima_llama",
+  "display": {
+    "icon": {
+      "item": "minecraft:wither_rose"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.isolde.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.isolde.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 800
+  }
+}

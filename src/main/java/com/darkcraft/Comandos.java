@@ -70,6 +70,8 @@ public final class Comandos {
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoNido())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoCadena())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoDragon())
+                .then(com.darkcraft.morvain.MorvainEnemigos.comandoHomenaje())
+                .then(com.darkcraft.morvain.MorvainEnemigos.comandoIsolde())
                 .then(com.darkcraft.morvain.Gigantes.comando())
                 .then(com.darkcraft.camino.Jinetes.comando())
                 .then(com.darkcraft.rol.Rol.comando())
@@ -158,6 +160,8 @@ public final class Comandos {
         src.sendSuccess(() -> linea(new Linea("/darkcraft nido ", "/darkcraft nido [ir <sitio> | enemigos [volver | fuera | sacar]]", "nido")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft cadena ", "/darkcraft cadena [ir <sitio> | enemigos [volver | fuera | sacar] | rafaga | sombra olvidar | gargola [vuelo | tierra | picado | garras | posarse]]", "cadena")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft dragon ", "/darkcraft dragon [ir | vencer | volver | media | despegar | rasante | bolas | picado | ascuas | bajar | derribar]", "dragon")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft homenaje ", "/darkcraft homenaje [ir <sitio> | enemigos [volver | fuera | sacar] | rastrillo [abrir | cerrar] | sombra olvidar | centinela [despertar | tajo | golpe | humo | estocada | barrido | hachazo]]", "homenaje")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft isolde ", "/darkcraft isolde [ir | vencer | volver | media | garras | velo | abrazo | nana | desvanece | lagrimas | corte]", "isolde")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ecos ", "/darkcraft ecos / ecos dar <n> / ecos quitar", "ecos")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft rol ", "/darkcraft rol clase [<nombre> | elegir | olvidar | ninguna] / santuario / frascos [<n>] / nivel [reiniciar] / atributo <nombre> <valor> / talisman <nombre> [poner <hueco>] / fruto <nombre> [<n>] / hechizo <nombre>|memorizar|olvidar|baston|sello / guia [olvidar] / herrero [olvidar] / mercader [olvidar] / mejora <0-9> / piedras / ceniza <nombre> [poner] | quitar / resistencias", "rol")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ayuda", "/darkcraft ayuda", "ayuda")), false);

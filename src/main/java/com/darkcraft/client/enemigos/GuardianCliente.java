@@ -27,7 +27,9 @@ import java.util.Random;
  * titilando) y la de Brann, el Ballenero (parte 7r: el arpon tumbado con su cabo enrollado y la cola de la Vieja que sale del
  * agua; un mar verde oscuro con olas de espuma; gotas de agua y cristales de sal que caen) y la de
  * Anselmo, el Pontifice (parte 7t) y la de Aldric, el Primer Marcado (parte 7v: la cadena de hierro negro de punta a punta con el
- * eslabon roto colgando y la marca en medio; brasas rojas que corren por el hierro; esquirlas de hierro y brasas que caen a plomo).
+ * eslabon roto colgando y la marca en medio; brasas rojas que corren por el hierro; esquirlas de hierro y brasas que caen a plomo)
+ * y la de la reina Isolde (parte 7ab: su velo de encaje negro con las rosas marchitas, la cara velada y la corona; seda carmesi que
+ * corre; petalos negros y rojos, lagrimas y chispas de plata que caen meciendose).
  * Las texturas las pinta tools/hud/barra_guardianes.py.
  */
 public final class GuardianCliente {
@@ -49,8 +51,8 @@ public final class GuardianCliente {
 
     /**
      * {@code nombre}: "brandt", "corteza", "molinera", "verdugo", "barquero", "abad", "condestable", "rectora", "ballenero",
-     * "pontifice", "aldric", "gigante_*" (el de la clave de su nombre; los tres gigantes, con la misma barra), "jinete", "bufon" o
-     * "dragon".
+     * "pontifice", "aldric", "gigante_*" (el de la clave de su nombre; los tres gigantes, con la misma barra), "jinete", "bufon",
+     * "dragon" o "isolde".
      */
     public static void barra(CustomizeGuiOverlayEvent.BossEventProgress e, int ticks, String nombre) {
         if (!e.isCancelable()) return;
@@ -63,7 +65,8 @@ public final class GuardianCliente {
         boolean hojas = nombre.equals("corteza"), ceniza = nombre.equals("molinera"), soga = nombre.equals("verdugo"), agua = nombre.equals("barquero"),
                 nieve = nombre.equals("abad"), fuego = nombre.equals("condestable"), cielo = nombre.equals("rectora"), mar = nombre.equals("ballenero"),
                 sangre = nombre.equals("pontifice"), cadena = nombre.equals("aldric"), piedra = nombre.startsWith("gigante"),
-                almas = nombre.equals("jinete"), confeti = nombre.equals("bufon"), dragon = nombre.equals("dragon");
+                almas = nombre.equals("jinete"), confeti = nombre.equals("bufon"), dragon = nombre.equals("dragon"),
+                isolde = nombre.equals("isolde");
         e.setCanceled(true);
         GuiGraphics g = e.getGuiGraphics();
         Minecraft mc = Minecraft.getInstance();
@@ -112,7 +115,7 @@ public final class GuardianCliente {
                     h.vy = Math.min(0.55f, h.vy + 0.03f);
                     h.x += h.vx * 0.6f + (float) Math.sin((h.edad + h.tipo * 9) * 0.25) * 0.6f;
                 } else if (actual.equals("corteza") || actual.equals("molinera") || actual.equals("verdugo") || actual.equals("barquero")
-                        || actual.equals("ballenero") || actual.equals("pontifice") || actual.equals("bufon")) {
+                        || actual.equals("ballenero") || actual.equals("pontifice") || actual.equals("bufon") || actual.equals("isolde")) {
                     h.vy = Math.min(0.9f, h.vy + 0.05f);
                     h.x += h.vx + (float) Math.sin((h.edad + h.tipo * 7) * 0.35) * 0.45f;
                 } else {
@@ -133,7 +136,7 @@ public final class GuardianCliente {
         g.drawCenteredString(mc.font, Component.translatable("entity.darkcraft." + nombre), 128, -8,
                 hojas ? 0xFFB9F0C4 : ceniza ? 0xFFF2DDB8 : soga ? 0xFFE6D2B0 : agua ? 0xFFBFEAF2 : nieve ? 0xFFE4F4FF : fuego ? 0xFFFFD2A0 : cielo ? 0xFFDCE4FF
                         : mar ? 0xFFCFEEE6 : sangre ? 0xFFF4CDBE : cadena ? 0xFFE6D8CC : piedra ? 0xFFE8E0CC : almas ? 0xFFCDE8FF : confeti ? 0xFFF6E0A8
-                        : dragon ? 0xFFFFC890 : 0xFFF0C8B8);
+                        : dragon ? 0xFFFFC890 : isolde ? 0xFFF0D2DA : 0xFFF0C8B8);
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         // hueco, rastro y relleno (la bruma corre)
         g.blit(BARRA, 8, 19, 0, 80, 240, 7, 256, 128);
@@ -145,7 +148,7 @@ public final class GuardianCliente {
         if (ticks - golpe < 4 && wf > 0)
             g.fill(8 + Math.max(0, wf - 6), 19, 8 + wf, 26, hojas ? 0x80E6FFF0 : ceniza ? 0x80FFF4E0 : soga ? 0x80FFE8D8 : agua ? 0x80E0FAFF
                     : nieve ? 0x90F4FCFF : fuego ? 0x90FFE6B0 : cielo ? 0x90EEF2FF : mar ? 0x90E6FFF8 : sangre ? 0x90FFD6CC
-                    : cadena ? 0x90FFD8C8 : almas ? 0x90D8F0FF : confeti ? 0x90FFE8C0 : dragon ? 0x90FFD8A0 : 0x80FFE4DA);
+                    : cadena ? 0x90FFD8C8 : almas ? 0x90D8F0FF : confeti ? 0x90FFE8C0 : dragon ? 0x90FFD8A0 : isolde ? 0x90FFE0E8 : 0x80FFE4DA);
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         g.blit(BARRA, 0, 0, 0, 0, 256, 40, 256, 128);
         // las gotas que caen

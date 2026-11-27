@@ -37,7 +37,8 @@ public final class Cadena {
     /** La rafaga: lo que se oye venir, lo que empuja y lo fuerte (lo que suma a la velocidad cada tick, en lo mas fuerte). */
     public static final int AVISO = 22, EMPUJA = 30;
     public static final float FUERZA = 0.075f;
-    /** La marca de la ficha: lo que ya le ha dicho la Sombra en la cadena (bit 1 la 21, 2 la 22, 4 la 23). */
+    /** La marca de la ficha: lo que ya le ha dicho la Sombra en la cadena (bit 1 la 21, 2 la 22, 4 la 23; y 8 la 24, al entrar en la torre
+     * del homenaje: {@link CasaSombra}). */
     public static final String MARCA = "sombra_cadena";
 
     /** Para la prueba: las rafagas que han soplado, los que han caido, los corceles que se han deshecho y las frases dichas. */
@@ -120,7 +121,7 @@ public final class Cadena {
     }
 
     /** La frase {@code n} de la Sombra, si a ese jugador aun no se la ha dicho. */
-    private static void decir(ServerPlayer p, int n, int bit) {
+    static void decir(ServerPlayer p, int n, int bit) {
         int ya = Ficha.dialogo(p, MARCA);
         if ((ya & bit) != 0) return;
         Ficha.dialogo(p, MARCA, ya | bit);

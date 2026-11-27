@@ -752,6 +752,9 @@ public final class CiTest {
         dragon(server, m, log, out);
         cadena(server, m, log, out);
         gargolas(server, m, log, out);
+        homenaje(server, m, log, out);
+        centinelas(server, m, log, out);
+        isolde(server, m, log, out);
     }
 
     /**
@@ -3995,6 +3998,511 @@ public final class CiTest {
         } finally {
             for (var e : quitar) e.discard();
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /**
+     * Parte 7ab: la torre del homenaje por dentro. Levanta sus chunks; el resumen (el atril con el libro 35, la Ultima Llama, los
+     * arcones, el rastrillo y la reja de la azotea cerrados); a pie desde el patio: con el rastrillo cerrado no se entra; abierto, a
+     * todo menos a la azotea; con la reja abierta, tambien; la Ultima Llama y su nombre; donde se esta; el rastrillo que sube solo
+     * (CasaSombra); la reja que se abre con la reina caida y se cierra si vuelve; Maelis en la capilla; y los de la casa en su sitio.
+     */
+    private static void homenaje(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.HOMENAJE;
+        var H = com.darkcraft.morvain.Homenaje.get();
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : H.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            StringBuilder sb = new StringBuilder("Morvain, la torre del homenaje: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Homenaje.resumen(m));
+            // a pie desde el patio, cerrado, con el rastrillo abierto y con todo abierto (sin tocar el mundo: se ven como aire)
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            for (int vez = 0; vez < 3; vez++) {
+                java.util.Set<Long> quitar = new java.util.HashSet<>();
+                if (vez >= 1) for (BlockPos b : com.darkcraft.morvain.Homenaje.rastrillo()) quitar.add(b.asLong());
+                if (vez >= 2) for (BlockPos b : com.darkcraft.morvain.Homenaje.rejaAzotea()) quitar.add(b.asLong());
+                com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                    if (quitar.contains(BlockPos.asLong(x, y, z))) return aire;
+                    var st = m.getBlockState(new BlockPos(x, y, z));
+                    return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || st.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                            || st.is(net.minecraft.world.level.block.Blocks.BARRIER) ? aire : st;
+                };
+                int[] pa = H.sitio("patio");
+                var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, pa[0], pa[1], pa[2], com.darkcraft.morvain.Homenaje.BX0 - 4, com.darkcraft.morvain.Homenaje.BZ0 - 4,
+                        com.darkcraft.morvain.Homenaje.BX1 + 4, com.darkcraft.morvain.Homenaje.BZ1 + 4, 8_000_000);
+                int llega = 0, total = 0;
+                StringBuilder no = new StringBuilder();
+                for (var e : H.sitios().entrySet()) {
+                    if (e.getKey().equals("frente")) continue;
+                    int[] q = e.getValue();
+                    total++;
+                    if (zona.alcanza(q[0], q[1], q[2], 2)) llega++;
+                    else no.append(' ').append(e.getKey());
+                }
+                sb.append("; ").append(vez == 0 ? "cerrado" : vez == 1 ? "con el rastrillo abierto" : "con todo abierto").append(", a pie desde el patio ")
+                        .append(llega).append(" de ").append(total).append(" sitios (no:").append(no.length() == 0 ? " ninguno" : no).append(')');
+            }
+            sb.append(" (cerrado solo el patio, el camino y la puerta; con el rastrillo abierto todos menos azotea y puerta_sombra)");
+            // la Ultima Llama
+            var st = com.darkcraft.morvain.SantuariosMorvain.porId("ultima_llama");
+            sb.append("; la Ultima Llama ").append(st == null ? "NO EN LA LISTA" : com.darkcraft.santuario.Santuarios.nombre(m, st.pos()) + " ("
+                    + m.getBlockState(st.pos()).getBlock().getDescriptionId() + " en " + st.pos().toShortString() + ")");
+            // donde se esta
+            String[] salas = {"salon", "armeria", "archivo", "prision", "capilla", "sala_trono", "azotea", "patio"};
+            sb.append("; donde se esta:");
+            for (String n : salas) {
+                int[] q = H.sitio(n);
+                double x = q[0] + 0.5, y = q[1], z = q[2] + 0.5;
+                String k = com.darkcraft.morvain.Homenaje.enHomenaje(x, y, z) ? com.darkcraft.morvain.Homenaje.sala(com.darkcraft.morvain.Homenaje.planta(y))
+                        : com.darkcraft.morvain.Homenaje.enAzotea(x, y, z) ? "azotea" : "fuera";
+                sb.append(' ').append(n).append('=').append(k.substring(k.lastIndexOf('.') + 1));
+            }
+            log.println(sb);
+            // ---- la casa: el rastrillo que sube solo, la reja de la azotea con la reina caida (y si vuelve), Maelis en la capilla
+            StringBuilder c = new StringBuilder("Morvain, la casa de la Sombra:");
+            com.darkcraft.morvain.CasaSombra.cerrarRastrillo(m);
+            c.append(" al empezar ").append(com.darkcraft.morvain.CasaSombra.resumen(m));
+            com.darkcraft.morvain.CasaSombra.abrirRastrillo(m);
+            int ticks = 0;
+            for (; ticks < 80; ticks++) com.darkcraft.morvain.CasaSombra.tick(m);
+            int barrotes = 0;
+            for (BlockPos q : com.darkcraft.morvain.Homenaje.rastrillo()) if (m.getBlockState(q).is(net.minecraft.world.level.block.Blocks.IRON_BARS)) barrotes++;
+            c.append("; el rastrillo sube: quedan ").append(barrotes).append(" barrotes (tiene que ser 0)");
+            com.darkcraft.morvain.CasaSombra.revisar(m);
+            c.append("; Maelis en la capilla: ").append(m.getEntitiesOfClass(com.darkcraft.personajes.Guia.class,
+                    new net.minecraft.world.phys.AABB(com.darkcraft.morvain.Homenaje.GUIA_X - 3, com.darkcraft.morvain.Homenaje.SANT_Y - 1,
+                            com.darkcraft.morvain.Homenaje.GUIA_Z - 3, com.darkcraft.morvain.Homenaje.GUIA_X + 4, com.darkcraft.morvain.Homenaje.SANT_Y + 4,
+                            com.darkcraft.morvain.Homenaje.GUIA_Z + 4)).size());
+            int reina = com.darkcraft.morvain.MorvainEnemigos.isolde();
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, reina, true);
+            com.darkcraft.morvain.CasaSombra.revisar(m);
+            int reja = 0;
+            for (BlockPos q : com.darkcraft.morvain.Homenaje.rejaAzotea()) if (m.getBlockState(q).is(net.minecraft.world.level.block.Blocks.IRON_BARS)) reja++;
+            c.append("; con la reina caida, la reja de la azotea ").append(reja).append(" barrotes (tiene que ser 0)");
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, reina, false);
+            com.darkcraft.morvain.CasaSombra.revisar(m);
+            reja = 0;
+            for (BlockPos q : com.darkcraft.morvain.Homenaje.rejaAzotea()) if (m.getBlockState(q).is(net.minecraft.world.level.block.Blocks.IRON_BARS)) reja++;
+            c.append(", y si vuelve ").append(reja).append(" de ").append(com.darkcraft.morvain.Homenaje.rejaAzotea().size());
+            c.append("; al acabar ").append(com.darkcraft.morvain.CasaSombra.resumen(m));
+            log.println(c);
+            // ---- los de la casa: en su sitio, en su suelo y ninguno metido en un bloque
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 8; k++)
+                for (var e : fuera) if (e.isAlive()) {
+                    e.tickCount++;
+                    e.tick();
+                }
+            java.util.Map<String, Integer> tipos = new java.util.TreeMap<>();
+            int enSuelo = 0, chocan = 0;
+            StringBuilder mal = new StringBuilder();
+            for (var e : fuera) {
+                tipos.merge(e.tipo(), 1, Integer::sum);
+                if (!m.noCollision(e)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(' ').append(e.tipo()).append(" metido en un bloque en ").append(e.blockPosition().toShortString()).append(';');
+                }
+                var abajo = m.getBlockState(BlockPos.containing(e.getX(), e.getY() - 0.2, e.getZ()));
+                if (!abajo.getCollisionShape(m, BlockPos.ZERO).isEmpty() || e instanceof com.darkcraft.enemigos.Isolde) enSuelo++;
+                else if (mal.length() < 400) mal.append(' ').append(e.tipo()).append(" en el aire en ").append(e.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, los de la torre del homenaje: fuera " + fuera.size() + " de " + com.darkcraft.morvain.MorvainEnemigos.homenaje().size() + " " + tipos
+                    + ", en su suelo " + enSuelo + "; metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+        } catch (Throwable t) {
+            log.println("Morvain, la torre del homenaje: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] homenaje", t);
+        } finally {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    private static void pasoE(com.darkcraft.enemigos.Enemigo e, net.minecraft.world.entity.LivingEntity presa, double px, double py, double pz) {
+        e.setOldPosAndRot();
+        e.tickCount++;
+        e.tick();
+        if (presa != null) {
+            presa.moveTo(px, py, pz, presa.getYRot(), 0f);
+            presa.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+            presa.setOnGround(true);
+            presa.invulnerableTime = 0;
+        }
+    }
+
+    /** Una victima: un aldeano quieto con mucha vida en (x, y, z) mirando a {@code giro}. */
+    private static net.minecraft.world.entity.npc.Villager victima(ServerLevel m, double x, double y, double z, float giro, java.util.List<net.minecraft.world.entity.Entity> quitar) {
+        var v = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+        if (v == null) return null;
+        v.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(4000.0);
+        v.setHealth(4000f);
+        v.setNoAi(true);
+        v.moveTo(x, y, z, giro, 0f);
+        v.setYHeadRot(giro);
+        v.yBodyRot = giro;
+        m.addFreshEntity(v);
+        quitar.add(v);
+        return v;
+    }
+
+    /**
+     * Parte 7ab: los centinelas. Todos fuera en su sitio; uno del espadon que espera de pie quieto: lo que ve (de lejos no, de cerca
+     * si, agachado no), despierta, el tajo, el golpe, el humo (cruza hasta su presa y le pega); uno de la alabarda: la estocada, el
+     * barrido por la espalda y el hachazo; y al morir se desploma y se va.
+     */
+    private static void centinelas(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.HOMENAJE;
+        var H = com.darkcraft.morvain.Homenaje.get();
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        StringBuilder sb = new StringBuilder("Morvain, los centinelas:");
+        try {
+            for (long k : H.chunks()) m.getChunk((int) (k >> 32), (int) k);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Centinela esp = null, ala = null;
+            int n = 0;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) {
+                if (e instanceof com.darkcraft.enemigos.Centinela q) {
+                    n++;
+                    if (esp == null && q.variante() == com.darkcraft.enemigos.Centinela.ESPADON && q.postura() == com.darkcraft.enemigos.Enemigo.REZA
+                            && com.darkcraft.morvain.Homenaje.planta(q.getY()) == com.darkcraft.morvain.Homenaje.BAJA && q.getZ() < 30) {
+                        esp = q;
+                        continue;
+                    }
+                    if (ala == null && q.variante() == com.darkcraft.enemigos.Centinela.ALABARDA && q.postura() == com.darkcraft.enemigos.Enemigo.REZA
+                            && com.darkcraft.morvain.Homenaje.planta(q.getY()) == com.darkcraft.morvain.Homenaje.ARMERIA) {
+                        ala = q;
+                        continue;
+                    }
+                }
+                e.discard();
+            }
+            if (esp == null || ala == null) {
+                log.println(sb.append(" NO SALEN (centinelas ").append(n).append(')'));
+                return;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " %d en la casa; el del espadon en %s (vida %.0f, golpe %.1f, armadura %d), el de la alabarda en %s", n,
+                    esp.blockPosition().toShortString(), esp.getMaxHealth(), esp.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE),
+                    esp.getArmorValue(), ala.blockPosition().toShortString()));
+            // ---- lo que ve quieto (de pie, como una armadura mas)
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ab1"), "[DarkCraftCI19]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            String ve = "";
+            try {
+                java.lang.reflect.Method mt = com.darkcraft.enemigos.Enemigo.class.getDeclaredMethod("percibe", net.minecraft.world.entity.LivingEntity.class);
+                mt.setAccessible(true);
+                net.minecraft.world.phys.Vec3 f = net.minecraft.world.phys.Vec3.directionFromRotation(0, esp.getYRot());
+                double[][] pruebas = {{10, 0}, {5, 0}, {5, 1}};
+                for (double[] pr : pruebas) {
+                    fp.moveTo(esp.getX() + f.x * pr[0], esp.getY(), esp.getZ() + f.z * pr[0], esp.getYRot() + 180f, 0f);
+                    fp.setPose(pr[1] > 0 ? net.minecraft.world.entity.Pose.CROUCHING : net.minecraft.world.entity.Pose.STANDING);
+                    ve += String.format(java.util.Locale.ROOT, " %s a %.0f: %s;", pr[1] > 0 ? "agachado" : "de pie", pr[0], mt.invoke(esp, fp));
+                }
+                fp.setPose(net.minecraft.world.entity.Pose.STANDING);
+            } catch (Throwable t) {
+                ve = " ERROR " + t;
+            }
+            sb.append("; quieto ve:").append(ve).append(" (tiene que ser false, true, false)");
+            // ---- despierta y sus golpes (la presa delante, a dos bloques y medio)
+            net.minecraft.world.phys.Vec3 f = net.minecraft.world.phys.Vec3.directionFromRotation(0, esp.getYRot());
+            double vx = esp.getX() + f.x * 2.5, vy = esp.getY(), vz = esp.getZ() + f.z * 2.5;
+            var v = victima(m, vx, vy, vz, esp.getYRot() + 180f, quitar);
+            if (v == null) {
+                log.println(sb.append(" (sin presa)"));
+                return;
+            }
+            int desp0 = com.darkcraft.enemigos.Centinela.DESPIERTAN;
+            esp.setTarget(v);
+            int despierta = -1;
+            for (int k = 0; k < 80; k++) {
+                pasoE(esp, v, vx, vy, vz);
+                if (despierta < 0 && esp.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE) despierta = k;
+            }
+            sb.append("; despierta (+").append(com.darkcraft.enemigos.Centinela.DESPIERTAN - desp0).append(") y queda de pie en el tick ").append(despierta);
+            int[] golpes = {com.darkcraft.enemigos.CentinelaAnims.TAJO, com.darkcraft.enemigos.CentinelaAnims.GOLPE};
+            String[] nombres = {"tajo", "golpe"};
+            for (int i = 0; i < golpes.length; i++) {
+                esp.moveTo(vx - f.x * 2.5, vy, vz - f.z * 2.5, esp.getYRot(), 0f);
+                v.setHealth(v.getMaxHealth());
+                esp.probar(golpes[i]);
+                for (int k = 0; k < com.darkcraft.enemigos.CentinelaAnims.TICKS[golpes[i]] + 2 && esp.accion() == golpes[i]; k++) pasoE(esp, v, vx, vy, vz);
+                sb.append(String.format(java.util.Locale.ROOT, "; %s: -%.1f", nombres[i], v.getMaxHealth() - v.getHealth()));
+            }
+            // el humo: la presa a ocho bloques, cruza hasta ella y le pega
+            double hx = esp.getX() + f.x * 8, hz = esp.getZ() + f.z * 8;
+            esp.moveTo(vx - f.x * 2.5, vy, vz - f.z * 2.5, esp.getYRot(), 0f);
+            v.setHealth(v.getMaxHealth());
+            int humos0 = com.darkcraft.enemigos.Centinela.HUMOS, llegan0 = com.darkcraft.enemigos.Centinela.HUMOS_LLEGAN;
+            double antes = esp.distanceToSqr(hx, vy, hz);
+            esp.probar(com.darkcraft.enemigos.CentinelaAnims.HUMO_ESPADON);
+            for (int k = 0; k < com.darkcraft.enemigos.CentinelaAnims.TICKS[com.darkcraft.enemigos.CentinelaAnims.HUMO_ESPADON] + 2
+                    && esp.accion() == com.darkcraft.enemigos.CentinelaAnims.HUMO_ESPADON; k++)
+                pasoE(esp, v, hx, vy, hz);
+            sb.append(String.format(java.util.Locale.ROOT, "; el humo: de %.1f a %.1f de su presa (humos +%d, llegan +%d), le quita %.1f", Math.sqrt(antes),
+                    Math.sqrt(esp.distanceToSqr(hx, vy, hz)), com.darkcraft.enemigos.Centinela.HUMOS - humos0, com.darkcraft.enemigos.Centinela.HUMOS_LLEGAN - llegan0,
+                    v.getMaxHealth() - v.getHealth()));
+            // ---- la alabarda: la estocada (a cuatro y medio), el barrido (la presa a su espalda) y el hachazo
+            net.minecraft.world.phys.Vec3 g = net.minecraft.world.phys.Vec3.directionFromRotation(0, ala.getYRot());
+            double ax = ala.getX(), ay = ala.getY(), az = ala.getZ();
+            ala.postura(com.darkcraft.enemigos.Enemigo.DE_PIE);
+            ala.setTarget(v);
+            double[] dist = {4.5, -2.5, 2.5};
+            int[] acc = {com.darkcraft.enemigos.CentinelaAnims.ESTOCADA, com.darkcraft.enemigos.CentinelaAnims.BARRIDO, com.darkcraft.enemigos.CentinelaAnims.HACHAZO};
+            String[] nom = {"estocada a 4,5", "barrido por la espalda", "hachazo"};
+            for (int i = 0; i < acc.length; i++) {
+                float giro = (float) (Math.toDegrees(Math.atan2(-g.x, g.z)));
+                ala.moveTo(ax, ay, az, giro, 0f);
+                ala.setYRot(giro);
+                ala.yBodyRot = ala.yHeadRot = giro;
+                double px = ax + g.x * dist[i], pz = az + g.z * dist[i];
+                v.setHealth(v.getMaxHealth());
+                v.moveTo(px, ay, pz, giro + 180f, 0f);
+                ala.empezar(acc[i]);
+                for (int k = 0; k < com.darkcraft.enemigos.CentinelaAnims.TICKS[acc[i]] + 2 && ala.accion() == acc[i]; k++) {
+                    ala.moveTo(ax, ay, az, ala.getYRot(), 0f);
+                    pasoE(ala, v, px, ay, pz);
+                }
+                sb.append(String.format(java.util.Locale.ROOT, "; %s: -%.1f", nom[i], v.getMaxHealth() - v.getHealth()));
+            }
+            // ---- muere: se desploma y se va
+            int des0 = com.darkcraft.enemigos.Centinela.DESPLOMAN;
+            esp.hurt(m.damageSources().genericKill(), 10000f);
+            int k;
+            for (k = 0; k < 120 && !esp.isRemoved(); k++) {
+                esp.tickCount++;
+                esp.tick();
+            }
+            sb.append(String.format(java.util.Locale.ROOT, "; muere: se desploma (+%d) y se va en %d ticks", com.darkcraft.enemigos.Centinela.DESPLOMAN - des0, k));
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println(sb + " ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] centinelas", t);
+        } finally {
+            for (var e : quitar) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /**
+     * Parte 7ab: la reina Isolde. Sentada en su trono: ve a quien entra en el salon, no a quien esta en la capilla de abajo; la pelea
+     * (su presa delante del estrado): se levanta mientras dice su frase 1 y grita al acabarla; el salon se sella; las garras, el velo
+     * (alrededor), el abrazo (cruza, coge y aprieta dos veces), la nana (quien la mira se duerme; quien no, no), desvanecerse (no se
+     * le puede pegar, aparece detras y le echa las garras); a media vida le arde el velo (se le ve la cara) y el velo quema; las
+     * lagrimas pillan a su presa; llama a su corte (dos espectros que se deshacen al acabar la pelea); sin presa la pelea se acaba y
+     * el salon se abre; y al caer dice su ultima frase, se va al acabarla, su puesto queda caido y la reja de la azotea se abre.
+     */
+    private static void isolde(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.HOMENAJE;
+        var H = com.darkcraft.morvain.Homenaje.get();
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        StringBuilder sb = new StringBuilder("Morvain, la reina Isolde:");
+        try {
+            for (long k : H.chunks()) m.getChunk((int) (k >> 32), (int) k);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Isolde r = null;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) {
+                if (r == null && e instanceof com.darkcraft.enemigos.Isolde i) r = i;
+                else e.discard();
+            }
+            if (r == null) {
+                log.println(sb.append(" NO SALE"));
+                return;
+            }
+            final com.darkcraft.enemigos.Isolde reina = r;
+            sb.append(String.format(java.util.Locale.ROOT, " en %s (postura %d, vida %.0f, golpe %.1f, armadura %d, %.1f x %.1f, metida en un bloque %s)",
+                    r.blockPosition().toShortString(), r.postura(), r.getMaxHealth(), r.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE),
+                    r.getArmorValue(), r.getBbWidth(), r.getBbHeight(), !m.noCollision(r)));
+            // ---- lo que ve sentada: a quien entra en el salon (a 21 bloques), no a quien esta en la capilla, debajo
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ab2"), "[DarkCraftCI20]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            String ve = "";
+            try {
+                java.lang.reflect.Method mt = com.darkcraft.enemigos.Isolde.class.getDeclaredMethod("percibe", net.minecraft.world.entity.LivingEntity.class);
+                mt.setAccessible(true);
+                for (String n : new String[]{"sala_trono", "trono_entrada", "capilla"}) {
+                    int[] q = H.sitio(n);
+                    fp.moveTo(q[0] + 0.5, q[1], q[2] + 0.5, 0f, 0f);
+                    ve += " " + n + ": " + mt.invoke(r, fp) + ";";
+                }
+            } catch (Throwable t) {
+                ve = " ERROR " + t;
+            }
+            sb.append("; sentada ve:").append(ve).append(" (true, true, false)");
+            // ---- la pelea: la presa delante del estrado
+            int[] tr = H.sitio("sala_trono");
+            double vx = 0.5, vy = tr[1], vz = 8.5;
+            var v = victima(m, vx, vy, vz, 0f, quitar);
+            if (v == null) {
+                log.println(sb.append(" (sin presa)"));
+                return;
+            }
+            r.setTarget(v);
+            int levanta = -1, grita = -1, k;
+            for (k = 0; k < 420 && grita < 0; k++) {
+                pasoE(r, v, vx, vy, vz);
+                if (levanta < 0 && r.accion() == com.darkcraft.enemigos.IsoldeAnims.LEVANTARSE) levanta = k;
+                if (grita < 0 && r.accion() == com.darkcraft.enemigos.IsoldeAnims.GRITO) grita = k;
+                if (k % 5 == 0) com.darkcraft.morvain.CasaSombra.tick(m);
+            }
+            com.darkcraft.morvain.CasaSombra.tick(m);
+            sb.append(String.format(java.util.Locale.ROOT, "; en pelea %s: se levanta en el tick %d, grita en el %d (su frase 1 dura %d ticks); el salon %s",
+                    r.enPelea(), levanta, grita, com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Isolde.VOZ_BASE + 1),
+                    com.darkcraft.morvain.CasaSombra.sellado() ? "sellado" : "SIN SELLAR"));
+            for (k = 0; k < 60 && r.accion() != 0; k++) pasoE(r, v, vx, vy, vz);
+            // los golpes: el de cada accion a la presa delante (las garras), detras (el velo); en el suelo del salon (no en el estrado)
+            final double ry = com.darkcraft.morvain.Homenaje.pisa(com.darkcraft.morvain.Homenaje.TRONO);
+            java.util.function.BiFunction<Integer, Double, Float> golpe = (accion, d) -> {
+                reina.moveTo(0.5, ry, 5.5, 0f, 0f);
+                reina.setYRot(0f);
+                reina.yBodyRot = reina.yHeadRot = 0f;
+                double px = 0.5, pz = 5.5 + d;
+                v.setHealth(v.getMaxHealth());
+                v.moveTo(px, ry, pz, 180f, 0f);
+                reina.empezar(accion);
+                for (int j = 0; j < com.darkcraft.enemigos.IsoldeAnims.TICKS[accion] + 2 && reina.accion() == accion; j++) {
+                    reina.moveTo(0.5, ry, 5.5, reina.getYRot(), 0f);
+                    pasoE(reina, v, px, ry, pz);
+                }
+                return v.getMaxHealth() - v.getHealth();
+            };
+            sb.append(String.format(java.util.Locale.ROOT, "; las garras: -%.1f; el velo por la espalda: -%.1f", golpe.apply(com.darkcraft.enemigos.IsoldeAnims.GARRAS, 2.4),
+                    golpe.apply(com.darkcraft.enemigos.IsoldeAnims.VELO, -2.8)));
+            // el abrazo: la presa a ocho bloques; cruza, la coge y la aprieta (dos veces) y la suelta
+            int ag0 = com.darkcraft.enemigos.Isolde.AGARRA, ap0 = com.darkcraft.enemigos.Isolde.APRIETOS;
+            r.moveTo(0.5, ry, -2.5, 180f, 0f);
+            v.setHealth(v.getMaxHealth());
+            v.moveTo(0.5, ry, -10.5, 0f, 0f);
+            r.setTarget(v);
+            r.probar(com.darkcraft.enemigos.IsoldeAnims.ABRAZO);
+            double cruza0 = r.getZ();
+            boolean aprieta = false;
+            for (k = 0; k < 90; k++) {
+                pasoE(r, v, 0.5, ry, -10.5);
+                if (r.accion() == com.darkcraft.enemigos.IsoldeAnims.APRIETA) aprieta = true;
+                if (aprieta && r.accion() != com.darkcraft.enemigos.IsoldeAnims.APRIETA) break;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, "; el abrazo: cruza %.1f, coge +%d, aprieta %s (+%d), la suelta %s, le quita %.1f", cruza0 - r.getZ(),
+                    com.darkcraft.enemigos.Isolde.AGARRA - ag0, aprieta, com.darkcraft.enemigos.Isolde.APRIETOS - ap0, r.agarrado() == null, v.getMaxHealth() - v.getHealth()));
+            // la nana: quien la mira de frente, si; de espaldas, no; y al dormirse, los ojos cerrados
+            r.moveTo(0.5, ry, 5.5, 0f, 0f);
+            fp.moveTo(0.5, ry, 12.5, 180f, 0f);
+            fp.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, new net.minecraft.world.phys.Vec3(0.5, ry + r.getBbHeight() * 0.88, 5.5));
+            boolean mira = r.laMira(fp);
+            fp.setYRot(0f);
+            fp.setXRot(0f);
+            fp.setYHeadRot(0f);
+            boolean deEspaldas = r.laMira(fp);
+            r.dormir(fp);
+            sb.append("; la nana: de frente la mira ").append(mira).append(", de espaldas ").append(deEspaldas).append(", dormido: ciego ")
+                    .append(fp.hasEffect(net.minecraft.world.effect.MobEffects.BLINDNESS)).append(", quieto ").append(fp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN));
+            fp.removeAllEffects();
+            int nanas0 = com.darkcraft.enemigos.Isolde.NANAS;
+            r.probar(com.darkcraft.enemigos.IsoldeAnims.NANA);
+            for (k = 0; k < 80 && r.accion() == com.darkcraft.enemigos.IsoldeAnims.NANA; k++) pasoE(r, v, 0.5, ry, -10.5);
+            sb.append(" (canta +").append(com.darkcraft.enemigos.Isolde.NANAS - nanas0).append(", acaba en ").append(k).append(')');
+            // desvanecerse: la presa mira al norte (fuera de la alfombra); ella al sur, a seis; no se le puede pegar y aparece detras de la
+            // presa (al sur, a 2,4) y le echa las garras
+            v.moveTo(6.5, ry, 0.5, 180f, 0f);
+            v.setYRot(180f);
+            v.setYHeadRot(180f);
+            v.yBodyRot = 180f;
+            r.moveTo(6.5, ry, 7.5, 180f, 0f);
+            int det0 = com.darkcraft.enemigos.Isolde.DETRAS_SALE;
+            r.probar(com.darkcraft.enemigos.IsoldeAnims.DESVANECE);
+            boolean leDan = true, garras = false;
+            for (k = 0; k < 60; k++) {
+                pasoE(r, v, 6.5, ry, 0.5);
+                if (r.accion() == com.darkcraft.enemigos.IsoldeAnims.DESVANECE && r.accionTicks() == 9) {
+                    float h = r.getHealth();
+                    r.invulnerableTime = 0;
+                    leDan = r.hurt(m.damageSources().generic(), 5f) || r.getHealth() < h;
+                }
+                if (r.accion() == com.darkcraft.enemigos.IsoldeAnims.GARRAS) {
+                    garras = true;
+                    break;
+                }
+            }
+            sb.append(String.format(java.util.Locale.ROOT, "; desvanecerse: apagada le pegan %s, aparece detras +%d (a %.1f, %.1f de la presa: tiene que ser 0, 2,4), y le echa las garras %s",
+                    leDan, com.darkcraft.enemigos.Isolde.DETRAS_SALE - det0, r.getX() - 6.5, r.getZ() - 0.5, garras));
+            for (k = 0; k < 40 && r.accion() != 0; k++) pasoE(r, v, 6.5, ry, 0.5);
+            // ---- a media vida: le arde el velo; el velo quema; las lagrimas; su corte
+            int arde0 = com.darkcraft.enemigos.Isolde.VELO_ARDE;
+            r.mediaVida();
+            for (k = 0; k < 70 && r.accion() == com.darkcraft.enemigos.IsoldeAnims.VELO_ARDE; k++) pasoE(r, v, 0.5, ry, 0.5);
+            sb.append(String.format(java.util.Locale.ROOT, "; a media vida (%.0f): le arde el velo +%d, se le ve la cara %s", r.getHealth(),
+                    com.darkcraft.enemigos.Isolde.VELO_ARDE - arde0, r.sinVelo()));
+            int q0 = com.darkcraft.enemigos.Isolde.VELOS_QUEMAN;
+            v.clearFire();
+            sb.append(String.format(java.util.Locale.ROOT, "; el velo que arde: -%.1f", golpe.apply(com.darkcraft.enemigos.IsoldeAnims.VELO, -2.8)));
+            sb.append(", quema +").append(com.darkcraft.enemigos.Isolde.VELOS_QUEMAN - q0).append(" (presa ardiendo ").append(v.isOnFire()).append(')');
+            v.clearFire();
+            int lp0 = com.darkcraft.enemigos.Isolde.LAGRIMAS_PILLAN;
+            r.moveTo(0.5, ry, 8.5, 180f, 0f);
+            v.moveTo(0.5, ry, 0.5, 0f, 0f);
+            v.setHealth(v.getMaxHealth());
+            r.setTarget(v);
+            r.probar(com.darkcraft.enemigos.IsoldeAnims.LAGRIMAS);
+            for (k = 0; k < 60 && r.accion() == com.darkcraft.enemigos.IsoldeAnims.LAGRIMAS; k++) {
+                r.moveTo(0.5, ry, 8.5, r.getYRot(), 0f);
+                pasoE(r, v, 0.5, ry, 0.5);
+            }
+            sb.append(String.format(java.util.Locale.ROOT, "; las lagrimas: pillan +%d, -%.1f, pudre %s", com.darkcraft.enemigos.Isolde.LAGRIMAS_PILLAN - lp0,
+                    v.getMaxHealth() - v.getHealth(), v.hasEffect(net.minecraft.world.effect.MobEffects.WITHER)));
+            int co0 = com.darkcraft.enemigos.Isolde.CORTESANOS;
+            r.probar(com.darkcraft.enemigos.IsoldeAnims.GRITO);
+            for (k = 0; k < 50 && r.accion() == com.darkcraft.enemigos.IsoldeAnims.GRITO; k++) pasoE(r, v, 0.5, ry, 0.5);
+            var corte = new java.util.ArrayList<>(r.corte());
+            int enSala = 0;
+            for (var e : corte) if (com.darkcraft.morvain.Homenaje.enSalaTrono(e.getX(), e.getY() + 0.5, e.getZ())) enSala++;
+            sb.append("; su corte: +").append(com.darkcraft.enemigos.Isolde.CORTESANOS - co0).append(" espectros (en el salon ").append(enSala).append(", efimeros ")
+                    .append(corte.stream().filter(com.darkcraft.enemigos.Enemigo::esEfimero).count()).append(')');
+            // ---- sin presa: la pelea se acaba, la corte se deshace, vuelve el velo y el salon se abre
+            r.setTarget(null);
+            v.discard();
+            for (k = 0; k < 140 && r.enPelea(); k++) {
+                pasoE(r, null, 0, 0, 0);
+                if (k % 5 == 0) com.darkcraft.morvain.CasaSombra.tick(m);
+            }
+            com.darkcraft.morvain.CasaSombra.tick(m);
+            int quedan = 0;
+            for (var e : corte) if (!e.isRemoved()) quedan++;
+            sb.append(String.format(java.util.Locale.ROOT, "; sin presa: acaba la pelea en %d ticks (en pelea %s), quedan %d espectros, con el velo %s, vida %.0f/%.0f, el salon %s",
+                    k, r.enPelea(), quedan, !r.sinVelo(), r.getHealth(), r.getMaxHealth(), com.darkcraft.morvain.CasaSombra.sellado() ? "SELLADO" : "abierto"));
+            log.println(sb);
+            // ---- cae: su ultima frase, se va al acabarla, el puesto queda caido y la reja se abre
+            StringBuilder c = new StringBuilder("Morvain, la reina Isolde cae:");
+            var v2 = victima(m, 0.5, ry, 8.5, 0f, quitar);
+            r.setTarget(v2);
+            int cae0 = com.darkcraft.enemigos.Isolde.CAE;
+            r.vencer();
+            int fin = r.fin();
+            for (k = 0; k < fin + 40 && !r.isRemoved(); k++) {
+                r.tickCount++;
+                r.tick();
+            }
+            int drops = 0;
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, r.getBoundingBox().inflate(6)))
+                if (it.getItem().is(DarkCraftMod.PIEDRA_FORJA_3.get())) {
+                    drops += it.getItem().getCount();
+                    quitar.add(it);
+                }
+            com.darkcraft.morvain.CasaSombra.revisar(m);
+            int reja = 0;
+            for (BlockPos q : com.darkcraft.morvain.Homenaje.rejaAzotea()) if (m.getBlockState(q).is(net.minecraft.world.level.block.Blocks.IRON_BARS)) reja++;
+            c.append(String.format(java.util.Locale.ROOT, " cae +%d, se va en %d ticks (su ultima frase %d + 50), su puesto caido %s, deja %d piedras de forja III; la reja de la azotea %d barrotes (tiene que ser 0); %s",
+                    com.darkcraft.enemigos.Isolde.CAE - cae0, k, com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Isolde.VOZ_BASE + 6),
+                    com.darkcraft.enemigos.Puestos.muerto(server, sitio, com.darkcraft.morvain.MorvainEnemigos.isolde()), drops, reja, com.darkcraft.morvain.CasaSombra.resumen(m)));
+            log.println(c);
+        } catch (Throwable t) {
+            log.println(sb + " ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] isolde", t);
+        } finally {
+            for (var e : quitar) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.morvain.CasaSombra.revisar(m);
+            if (com.darkcraft.morvain.CasaSombra.sellado()) com.darkcraft.morvain.CasaSombra.sellar(m, false);
         }
     }
 

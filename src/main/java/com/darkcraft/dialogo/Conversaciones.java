@@ -26,7 +26,7 @@ public final class Conversaciones {
     public static final double ALCANCE = 4.5;
 
     // marcas de lo hablado con la guia (8: ya hablo con ella en Morvain y le dio el silbato)
-    private static final int GUIA_CONOCIDA = 1, GUIA_REY = 2, GUIA_GAVRAN = 4, GUIA_MORVAIN = 8;
+    private static final int GUIA_CONOCIDA = 1, GUIA_REY = 2, GUIA_GAVRAN = 4, GUIA_MORVAIN = 8, GUIA_CAPILLA = 16;
     // con los demas: ya se presento
     private static final int CONOCIDO = 1;
 
@@ -43,7 +43,7 @@ public final class Conversaciones {
             Net.to(sp, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.dialogo.combate", 0));
             return;
         }
-        int nodo = p instanceof Guia ? inicioGuia(sp) : inicio(sp, d.id());
+        int nodo = p instanceof Guia g ? inicioGuia(sp, g) : inicio(sp, d.id());
         Net.to(sp, new Net.Dialogo(p.getId(), d.id(), nodo));
         Logros.dar(sp, switch (d.id()) {
             case "herrero" -> "dorvan";
@@ -55,13 +55,20 @@ public final class Conversaciones {
 
     /**
      * Por donde empieza la guia: la primera vez se presenta; luego saluda (y una vez, habla del Rey y de Gavran). En Morvain,
-     * la primera vez le da el silbato del corcel (y otra vez si lo ha perdido) y despues saluda a su manera.
+     * la primera vez le da el silbato del corcel (y otra vez si lo ha perdido) y despues saluda a su manera. En la capilla de la
+     * torre del homenaje (parte 7ab), la primera vez 15 (y 16); despues 16, o 14 con la reina ya caida.
      */
-    private static int inicioGuia(ServerPlayer sp) {
+    private static int inicioGuia(ServerPlayer sp, Guia guia) {
         int m = Ficha.dialogo(sp, "guia");
         int nodo;
         boolean morvain = com.darkcraft.morvain.Morvain.es(sp.level());
-        if (morvain && (m & GUIA_MORVAIN) == 0) {
+        boolean capilla = morvain && com.darkcraft.morvain.Homenaje.enCapilla(guia.getX(), guia.getY() + 0.5, guia.getZ());
+        if (capilla) {
+            if ((m & GUIA_CAPILLA) == 0) {
+                m |= GUIA_CAPILLA | GUIA_CONOCIDA;
+                nodo = 15;
+            } else nodo = com.darkcraft.morvain.CasaSombra.reinaCaida(sp.serverLevel()) ? 14 : 16;
+        } else if (morvain && (m & GUIA_MORVAIN) == 0) {
             m |= GUIA_MORVAIN | GUIA_CONOCIDA;
             nodo = 11;
         } else if (morvain && !com.darkcraft.montura.Montura.tieneSilbato(sp)) {

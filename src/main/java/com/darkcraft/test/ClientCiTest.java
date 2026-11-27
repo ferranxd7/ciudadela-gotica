@@ -5205,6 +5205,7 @@ public final class ClientCiTest {
     private static void plan(Minecraft mc) {
         steps.clear();
         next = 0;
+        planificando = true;
         com.darkcraft.rol.Rol.sinLimite = true;
         // el Jinete Nocturno no sale solo en las demas pruebas (van por el camino de nubes a cualquier hora): su tramo lo suelta
         com.darkcraft.camino.Jinetes.quietos = true;
@@ -5328,6 +5329,7 @@ public final class ClientCiTest {
         int finEspejo = espejo(after + 40);
         rey(finEspejo + 20);
         // por orden de tiempo (cada parte apunta sus pasos a su manera); el orden de los empates se conserva
+        planificando = false;
         steps.sort(java.util.Comparator.comparingInt(Step::at));
     }
 
@@ -6037,6 +6039,8 @@ public final class ClientCiTest {
         t = nido(t);
         // la subida por la cadena del sur: las gargolas, el viento, la Sombra, el Descansillo, la Boca y el patio (parte 7aa)
         t = cadena(t);
+        // la ciudadela por dentro: la torre del homenaje, sus centinelas, Maelis en la capilla y la reina Isolde (parte 7ab)
+        t = homenaje(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -10988,9 +10992,22 @@ public final class ClientCiTest {
 
     private static final List<CapturaEspera> CAPTURAS_ESPERA = new ArrayList<>();
 
-    /** Pone en cola una captura que espera (como mucho {@code espera} ticks) a que se cumpla {@code cuando}. */
+    /** Mientras se apuntan los pasos ({@link #plan}): las capturas que esperan se ponen en cola al llegar su paso, no ya. */
+    private static boolean planificando;
+
+    /**
+     * Pone en cola una captura que espera (como mucho {@code espera} ticks) a que se cumpla {@code cuando}. Si se llama mientras se
+     * apuntan los pasos, se pone en cola al llegar el ultimo paso apuntado (antes se ponia ya y el primer paso del tramo, que vacia la
+     * cola, se la llevaba: en la build de la parte 7aa no salian las capturas de la gargola).
+     */
     private static void esperarA(String nombre, java.util.function.Predicate<Minecraft> cuando, Consumer<Minecraft> camara,
                                  java.util.function.Function<Minecraft, String> estado, int espera) {
+        if (planificando && !steps.isEmpty()) {
+            int at = steps.get(steps.size() - 1).at();
+            steps.add(new Step(at, "espera la captura " + nombre, m -> CAPTURAS_ESPERA.add(new CapturaEspera(nombre, cuando, camara, estado,
+                    new int[]{-1, ticks + espera}))));
+            return;
+        }
         CAPTURAS_ESPERA.add(new CapturaEspera(nombre, cuando, camara, estado, new int[]{-1, ticks + espera}));
     }
 
@@ -11349,6 +11366,450 @@ public final class ClientCiTest {
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
                 log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoCadena(sp.createCommandSourceStack()));
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ la ciudadela por dentro (parte 7ab)
+
+    /** La reina Isolde en el cliente (a 80 bloques), o null. */
+    private static com.darkcraft.enemigos.Isolde isoldeC(Minecraft mc) {
+        if (mc.level == null || mc.player == null) return null;
+        for (var e : mc.level.getEntitiesOfClass(com.darkcraft.enemigos.Isolde.class, mc.player.getBoundingBox().inflate(80))) return e;
+        return null;
+    }
+
+    private static com.darkcraft.enemigos.Isolde isoldeE() {
+        return com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.HOMENAJE, com.darkcraft.morvain.MorvainEnemigos.isolde())
+                instanceof com.darkcraft.enemigos.Isolde i ? i : null;
+    }
+
+    /** La accion que se ve de la reina y cuanto lleva (-1 si no es esa). */
+    private static int tIsolde(Minecraft mc, int accion) {
+        var r = isoldeC(mc);
+        return r != null && r.accionVista() == accion && r.accionDesde >= 0 ? r.tickCount - r.accionDesde : -1;
+    }
+
+    private static String estadoIsoldeC(Minecraft mc) {
+        var r = isoldeC(mc);
+        if (r == null) return "no se ve a la reina";
+        int a = r.accionVista();
+        return String.format(java.util.Locale.ROOT, "la reina en el cliente: %.1f, %.1f, %.1f giro %.0f, postura %d, %s, accion %s (t %d), muerte %d, alfa %.2f | %s | voz %s | jugador a %.1f",
+                r.getX(), r.getY(), r.getZ(), r.getYRot(), r.postura(), r.sinVelo() ? "sin velo" : "con velo",
+                com.darkcraft.enemigos.IsoldeAnims.NOMBRES[Math.max(0, Math.min(a, com.darkcraft.enemigos.IsoldeAnims.NOMBRES.length - 1))],
+                r.accionDesde < 0 ? -1 : r.tickCount - r.accionDesde, r.deathTime, com.darkcraft.client.enemigos.IsoldeRenderer.alfa(r, 0f),
+                com.darkcraft.client.morvain.ClientHomenaje.estado(), com.darkcraft.client.rey.ReyCliente.subtitulo(), mc.player == null ? -1 : r.distanceTo(mc.player));
+    }
+
+    /** La camara a {@code delante} bloques por delante de la reina (y {@code lado} a su derecha), a {@code alto}, mirando a su pecho. */
+    private static void camaraIsolde(Minecraft mc, double delante, double lado, double alto) {
+        var r = isoldeC(mc);
+        if (r == null) return;
+        Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
+        verDesde(mc, new Vec3(r.getX() + f.x * delante - f.z * lado, r.getY() + alto, r.getZ() + f.z * delante + f.x * lado), new Vec3(r.getX(), r.getY() + 1.8, r.getZ()));
+    }
+
+    /** El centinela mas cercano al jugador en el cliente (a 40 bloques), o null. */
+    private static com.darkcraft.enemigos.Centinela centinelaC(Minecraft mc) {
+        if (mc.level == null || mc.player == null) return null;
+        com.darkcraft.enemigos.Centinela mejor = null;
+        double d = 40 * 40;
+        for (var e : mc.level.getEntitiesOfClass(com.darkcraft.enemigos.Centinela.class, mc.player.getBoundingBox().inflate(40))) {
+            double dd = e.distanceToSqr(mc.player);
+            if (dd < d && e.isAlive()) {
+                d = dd;
+                mejor = e;
+            }
+        }
+        return mejor;
+    }
+
+    private static int tCentinela(Minecraft mc, int accion) {
+        var c = centinelaC(mc);
+        return c != null && c.accionVista() == accion && c.accionDesde >= 0 ? c.tickCount - c.accionDesde : -1;
+    }
+
+    private static String estadoCentinelaC(Minecraft mc) {
+        var c = centinelaC(mc);
+        if (c == null) return "no se ve ningun centinela";
+        int a = c.accionVista();
+        return String.format(java.util.Locale.ROOT, "centinela en el cliente: %s en %.1f, %.1f, %.1f giro %.0f, postura %d, accion %s (t %d), brillo %.2f, en el humo %s | jugador a %.1f",
+                c.variante() == com.darkcraft.enemigos.Centinela.ALABARDA ? "alabarda" : "espadon", c.getX(), c.getY(), c.getZ(), c.getYRot(), c.postura(),
+                com.darkcraft.enemigos.CentinelaAnims.NOMBRES[Math.max(0, Math.min(a, com.darkcraft.enemigos.CentinelaAnims.NOMBRES.length - 1))],
+                c.accionDesde < 0 ? -1 : c.tickCount - c.accionDesde, com.darkcraft.client.enemigos.CentinelaRenderer.brillo(c, 0f),
+                com.darkcraft.client.enemigos.CentinelaRenderer.enHumo(c), mc.player == null ? -1 : c.distanceTo(mc.player));
+    }
+
+    private static void camaraCentinela(Minecraft mc, double lado, double alto) {
+        var c = centinelaC(mc);
+        if (c == null) return;
+        Vec3 f = Vec3.directionFromRotation(0, c.getYRot());
+        verDesde(mc, new Vec3(c.getX() + f.x * 3.5 - f.z * lado, c.getY() + alto, c.getZ() + f.z * 3.5 + f.x * lado), new Vec3(c.getX(), c.getY() + 1.5, c.getZ()));
+    }
+
+    private static String estadoHomenaje(ServerPlayer sp) {
+        var r = isoldeE();
+        return fpos(sp) + " vida " + Math.round(sp.getHealth()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp) + " | "
+                + com.darkcraft.morvain.CasaSombra.resumen(sp.serverLevel()) + " | " + (r == null ? "la reina no esta fuera" : r.estado());
+    }
+
+    /** Pone al jugador (y la camara, la suya) en el sitio {@code n} del homenaje, mirando a (tx, ty, tz). */
+    private static void irHomenajeMirando(ServerPlayer sp, String n, double dx, double dy, double dz, double tx, double ty, double tz, boolean volando) {
+        int[] q = com.darkcraft.morvain.Homenaje.get().sitio(n);
+        irMirando(sp, q[0] + 0.5 + dx, q[1] + dy, q[2] + 0.5 + dz, tx, ty, tz, volando);
+    }
+
+    /**
+     * La ciudadela por dentro: la torre del homenaje desde el patio (el rastrillo cerrado), el rastrillo que sube al llegar, la Sombra al
+     * entrar (su subtitulo), el Salon de la Guardia; un centinela que despierta, su tajo y su humo; la armeria, el archivo con el atril
+     * del libro 35, la prision, la capilla negra con la Ultima Llama y Maelis (su frase 15); el salon del trono con la reina sentada
+     * (tararea); la pelea en supervivencia: se levanta mientras habla (su subtitulo), grita (su barra), las garras, el abrazo (aprieta),
+     * la nana (quien la mira se duerme), desvanecerse, a media vida el velo que arde, las lagrimas, su corte; cae (su ultima frase) y
+     * se abre la reja de la azotea; la azotea con la puerta de la aguja; y el bestiario.
+     */
+    private static int homenaje(int T) {
+        final var H = com.darkcraft.morvain.Homenaje.get();
+        final String SITIO = com.darkcraft.morvain.MorvainEnemigos.HOMENAJE;
+        final int B = com.darkcraft.morvain.Homenaje.pisa(com.darkcraft.morvain.Homenaje.BAJA);
+        int t = T;
+        atTicks(t, "Homenaje: la torre desde el patio", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_ESPERA.clear();
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft homenaje enemigos volver");
+                comando(sp, "darkcraft isolde volver");
+                comando(sp, "darkcraft homenaje rastrillo cerrar");
+                int[] q = H.sitio("frente");
+                irMirando(sp, q[0] + 0.5, q[1], q[2] + 0.5, -0.5, B + 9, com.darkcraft.morvain.Homenaje.PZ_MURO, true);
+            });
+        });
+        t += 260;
+        atTicks(t, "captura: la torre del homenaje desde el patio", m -> {
+            shot(m, "cliente_mv540_homenaje_frente");
+            server(m, sp -> log("  el patio: " + com.darkcraft.morvain.MorvainEnemigos.estadoHomenaje(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 4;
+        // ---- el rastrillo sube al llegar alguien (en supervivencia)
+        atTicks(t, "Homenaje: llega a la puerta", m -> server(m, sp -> {
+            aPelear(sp, true);
+            irMirando(sp, -0.5, B, com.darkcraft.morvain.Homenaje.PZ_FUERA + 9.5, -0.5, B + 4, com.darkcraft.morvain.Homenaje.PZ_MURO, false);
+        }));
+        t += 34;
+        atTicks(t, "captura: el rastrillo sube", m -> {
+            shot(m, "cliente_mv541_rastrillo");
+            server(m, sp -> log("  el rastrillo: " + com.darkcraft.morvain.CasaSombra.resumen(sp.serverLevel())));
+        });
+        t += 40;
+        // ---- dentro: la Sombra
+        atTicks(t, "Homenaje: entra (la Sombra)", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft homenaje sombra olvidar");
+                irHomenajeMirando(sp, "vestibulo", 0, 0, 0, -0.5, B + 3, -15, false);
+            });
+        });
+        t += 70;
+        atTicks(t, "captura: la Sombra al entrar", m -> {
+            log("  la Sombra: ultima frase " + com.darkcraft.client.morvain.ClientCadena.ULTIMA + ", hablando " + com.darkcraft.client.morvain.ClientCadena.hablando()
+                    + " | " + ClientMusic.crater());
+            server(m, sp -> log("  dentro: " + estadoHomenaje(sp) + " | logro homenaje " + com.darkcraft.story.Logros.tiene(sp, "homenaje")));
+            shot(m, "cliente_mv542_sombra_homenaje");
+        });
+        t += 140;
+        atTicks(t, "Homenaje: el Salon de la Guardia", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                irHomenajeMirando(sp, "vestibulo", 0, 4, 0, -0.5, B + 2, -18, true);
+            });
+        });
+        t += 60;
+        atTicks(t, "captura: el Salon de la Guardia", m -> shot(m, "cliente_mv543_salon"));
+        t += 4;
+        // ---- un centinela: despierta, el tajo y el humo
+        atTicks(t, "Homenaje: un centinela despierta", m -> server(m, sp -> {
+            aPelear(sp, true);
+            // junto al de la alfombra del este (5, -7), mirandolo
+            irMirando(sp, 1.5, B, -7.5, 5.5, B + 1.5, -6.5, false);
+            comando(sp, "darkcraft homenaje centinela despertar");
+        }));
+        esperarA("cliente_mv544_centinela_despierta", m -> tCentinela(m, com.darkcraft.enemigos.CentinelaAnims.DESPERTAR_ALABARDA) >= 16
+                        || tCentinela(m, com.darkcraft.enemigos.CentinelaAnims.DESPERTAR_ESPADON) >= 16, m -> camaraCentinela(m, -2.5, 1.8),
+                ClientCiTest::estadoCentinelaC, 200);
+        t += 80;
+        atTicks(t, "Homenaje: el centinela pega", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            comando(sp, "darkcraft homenaje centinela estocada");
+        }));
+        esperarA("cliente_mv545_centinela_golpe", m -> tCentinela(m, com.darkcraft.enemigos.CentinelaAnims.ESTOCADA) >= 16, m -> camaraCentinela(m, -3.5, 1.6),
+                ClientCiTest::estadoCentinelaC, 160);
+        t += 70;
+        atTicks(t, "Homenaje: el humo (de lejos)", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            irMirando(sp, -3.5, B, -7.5, 5.5, B + 1.5, -6.5, false);
+            comando(sp, "darkcraft homenaje centinela humo");
+        }));
+        esperarA("cliente_mv546_centinela_humo", m -> tCentinela(m, com.darkcraft.enemigos.CentinelaAnims.HUMO_ALABARDA) >= 11
+                        || tCentinela(m, com.darkcraft.enemigos.CentinelaAnims.HUMO_ESPADON) >= 11, m -> {
+                    if (m.player != null) verDesde(m, m.player.getEyePosition().add(-1.5, 1.5, 4.5), m.player.position().add(4, 1, 0));
+                }, ClientCiTest::estadoCentinelaC, 160);
+        t += 80;
+        // ---- las demas salas (en creativo, volando)
+        int[][] salas = {
+                {com.darkcraft.morvain.Homenaje.ARMERIA, 0, 3, 8, 0, -12},
+                {com.darkcraft.morvain.Homenaje.ARCHIVO, 0, 1, -3, 0, -8},
+                {com.darkcraft.morvain.Homenaje.PRISION, 6, 3, 6, -19, 2},
+                {com.darkcraft.morvain.Homenaje.CAPILLA, 0, 3, 12, -1, 1},
+        };
+        String[] nomSalas = {"cliente_mv547_armeria", "cliente_mv548_archivo_atril", "cliente_mv549_prision", "cliente_mv550_capilla"};
+        for (int i = 0; i < salas.length; i++) {
+            final int[] sa = salas[i];
+            final String cap = nomSalas[i];
+            atTicks(t, "Homenaje: " + cap, m -> {
+                m.setCameraEntity(m.player);
+                m.options.hideGui = true;
+                server(m, sp -> {
+                    sp.setGameMode(GameType.CREATIVE);
+                    sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 30, 0, false, false));
+                    int y = com.darkcraft.morvain.Homenaje.pisa(sa[0]);
+                    irMirando(sp, sa[1] - 0.5, y + sa[2], sa[3] + 0.5, sa[4] + 0.5, y + 1, sa[5] + 0.5, true);
+                });
+            });
+            t += 70;
+            atTicks(t, "captura: " + cap, m -> {
+                shot(m, cap);
+                server(m, sp -> log("  " + cap + ": sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+            });
+            t += 4;
+        }
+        // ---- Maelis en la capilla (su frase 15)
+        final com.darkcraft.personajes.Guia[] guia = new com.darkcraft.personajes.Guia[1];
+        atTicks(t, "Homenaje: Maelis en la capilla", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setGameMode(GameType.SURVIVAL);
+                com.darkcraft.rol.Rol.sinCombate(sp);
+                com.darkcraft.morvain.CasaSombra.revisar(sp.serverLevel());
+                var gs = sp.serverLevel().getEntitiesOfClass(com.darkcraft.personajes.Guia.class, new net.minecraft.world.phys.AABB(
+                        new BlockPos(com.darkcraft.morvain.Homenaje.GUIA_X, com.darkcraft.morvain.Homenaje.SANT_Y, com.darkcraft.morvain.Homenaje.GUIA_Z)).inflate(6));
+                guia[0] = gs.isEmpty() ? null : gs.get(0);
+                log("  la guia en la capilla: " + (guia[0] == null ? "NO ESTA" : String.format(java.util.Locale.ROOT, "%.1f %.1f %.1f", guia[0].getX(), guia[0].getY(), guia[0].getZ())));
+                int y = com.darkcraft.morvain.Homenaje.pisa(com.darkcraft.morvain.Homenaje.CAPILLA);
+                irMirando(sp, com.darkcraft.morvain.Homenaje.GUIA_X + 1.5, y, com.darkcraft.morvain.Homenaje.GUIA_Z + 3.2, com.darkcraft.morvain.Homenaje.GUIA_X + 0.5, y + 0.8,
+                        com.darkcraft.morvain.Homenaje.GUIA_Z + 0.5, false);
+                // (los avisos de la Ultima Llama: el logro al llegar)
+                log("  la Ultima Llama: " + com.darkcraft.morvain.CasaSombra.resumen(sp.serverLevel()));
+            });
+        });
+        t += 30;
+        atTicks(t, "Homenaje: hablar con Maelis", m -> server(m, sp -> {
+            com.darkcraft.dialogo.Conversaciones.olvidar(sp);
+            if (guia[0] != null) com.darkcraft.dialogo.Conversaciones.hablar(sp, guia[0]);
+        }));
+        t += 60;
+        atTicks(t, "captura: Maelis junto a la Ultima Llama", m -> {
+            log("  dialogo: " + (m.screen instanceof com.darkcraft.client.ui.DialogoScreen d ? d.resumen() : "NO (" + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()) + ")"));
+            shot(m, "cliente_mv551_maelis_capilla");
+        });
+        t += 4;
+        atTicks(t, "cerrar el dialogo", m -> m.setScreen(null));
+        t += 6;
+        // ---- el salon del trono: la reina sentada, tarareando
+        atTicks(t, "Homenaje: el salon del trono", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                // (los de la casa, fuera: aqui solo la reina)
+                var lista = com.darkcraft.morvain.MorvainEnemigos.homenaje();
+                for (int i = 0; i < lista.size(); i++)
+                    if (i != com.darkcraft.morvain.MorvainEnemigos.isolde()) com.darkcraft.enemigos.Puestos.marcar(sp.server, SITIO, i, true);
+                int y = com.darkcraft.morvain.Homenaje.pisa(com.darkcraft.morvain.Homenaje.TRONO);
+                irMirando(sp, 0.5, y + 3, -6.5, 0.5, y + 3, com.darkcraft.morvain.Homenaje.TRONO_Z + 0.5, true);
+            });
+        });
+        t += 140;
+        atTicks(t, "captura: la reina en su trono", m -> {
+            log("  sentada: " + estadoIsoldeC(m));
+            shot(m, "cliente_mv552_isolde_trono");
+        });
+        t += 4;
+        // ---- la pelea (en supervivencia)
+        atTicks(t, "Homenaje: la reina despierta", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                int y = com.darkcraft.morvain.Homenaje.pisa(com.darkcraft.morvain.Homenaje.TRONO);
+                irMirando(sp, 0.5, y, 1.5, 0.5, y + 3, com.darkcraft.morvain.Homenaje.TRONO_Z + 0.5, false);
+            });
+        });
+        esperarA("cliente_mv553_isolde_se_levanta", m -> tIsolde(m, com.darkcraft.enemigos.IsoldeAnims.LEVANTARSE) >= 30, m -> camaraIsolde(m, 5, 2.5, 2.4),
+                ClientCiTest::estadoIsoldeC, 300);
+        esperarA("cliente_mv554_isolde_grito", m -> tIsolde(m, com.darkcraft.enemigos.IsoldeAnims.GRITO) >= 12, m -> camaraIsolde(m, 6, -2, 2.2),
+                ClientCiTest::estadoIsoldeC, 500);
+        t += 420;
+        String[][] ataques = {{"garras", "cliente_mv555_isolde_garras", "12"}, {"abrazo", "cliente_mv556_isolde_abrazo", "14"}};
+        int[] accAtaques = {com.darkcraft.enemigos.IsoldeAnims.GARRAS, com.darkcraft.enemigos.IsoldeAnims.ABRAZO};
+        for (int i = 0; i < ataques.length; i++) {
+            final String[] at = ataques[i];
+            final int acc = accAtaques[i];
+            final boolean lejos = at[0].equals("abrazo");
+            atTicks(t, "Homenaje: " + at[0], m -> server(m, sp -> {
+                sp.setHealth(sp.getMaxHealth());
+                var r = isoldeE();
+                if (r != null) {
+                    Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
+                    double d = lejos ? 8 : 2.6;
+                    irMirando(sp, r.getX() + f.x * d, r.getY(), r.getZ() + f.z * d, r.getX(), r.getY() + 2, r.getZ(), false);
+                }
+                comando(sp, "darkcraft isolde " + at[0]);
+            }));
+            esperarA(at[1], m -> tIsolde(m, acc) >= Integer.parseInt(at[2]), m -> camaraIsolde(m, 4, -5, 2.4), ClientCiTest::estadoIsoldeC, 160);
+            t += lejos ? 80 : 50;
+        }
+        esperarA("cliente_mv557_isolde_aprieta", m -> tIsolde(m, com.darkcraft.enemigos.IsoldeAnims.APRIETA) >= 10, m -> camaraIsolde(m, 3, -4.5, 2.2),
+                ClientCiTest::estadoIsoldeC, 120);
+        t += 60;
+        // la nana: mirandola de frente (se le cierran los ojos)
+        atTicks(t, "Homenaje: la nana", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            sp.removeAllEffects();
+            sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE, 4000, 4, false, false, false));
+            var r = isoldeE();
+            if (r != null) {
+                Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
+                irMirando(sp, r.getX() + f.x * 7, r.getY(), r.getZ() + f.z * 7, r.getX(), r.getY() + r.getBbHeight() * 0.88, r.getZ(), false);
+                r.quieta = true;
+            }
+            comando(sp, "darkcraft isolde nana");
+        }));
+        esperarA("cliente_mv558_isolde_nana", m -> tIsolde(m, com.darkcraft.enemigos.IsoldeAnims.NANA) >= 36, m -> camaraIsolde(m, 6, -3, 2.0),
+                ClientCiTest::estadoIsoldeC, 140);
+        t += 64;
+        atTicks(t, "captura: se le cierran los ojos", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> log("  tras la nana: ciego " + sp.hasEffect(net.minecraft.world.effect.MobEffects.BLINDNESS) + ", dormidos "
+                    + com.darkcraft.enemigos.Isolde.DORMIDOS + ", despiertos " + com.darkcraft.enemigos.Isolde.DESPIERTOS));
+            shot(m, "cliente_mv559_dormido");
+        });
+        t += 60;
+        atTicks(t, "Homenaje: desvanecerse", m -> server(m, sp -> {
+            sp.removeAllEffects();
+            sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE, 4000, 4, false, false, false));
+            sp.setHealth(sp.getMaxHealth());
+            var r = isoldeE();
+            if (r != null) r.quieta = false;
+            comando(sp, "darkcraft isolde desvanece");
+        }));
+        esperarA("cliente_mv560_isolde_desvanece", m -> tIsolde(m, com.darkcraft.enemigos.IsoldeAnims.DESVANECE) >= 15, m -> {
+            if (m.player != null) verDesde(m, m.player.getEyePosition().add(3, 1.5, 3), m.player.position().add(0, 1, 0));
+        }, ClientCiTest::estadoIsoldeC, 120);
+        t += 70;
+        atTicks(t, "Homenaje: a media vida", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            comando(sp, "darkcraft isolde media");
+        }));
+        esperarA("cliente_mv561_isolde_velo_arde", m -> tIsolde(m, com.darkcraft.enemigos.IsoldeAnims.VELO_ARDE) >= 32, m -> camaraIsolde(m, 4, -1.5, 2.6),
+                ClientCiTest::estadoIsoldeC, 160);
+        t += 90;
+        atTicks(t, "Homenaje: las lagrimas", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            var r = isoldeE();
+            if (r != null) {
+                Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
+                irMirando(sp, r.getX() + f.x * 6, r.getY(), r.getZ() + f.z * 6, r.getX(), r.getY() + 2, r.getZ(), false);
+            }
+            comando(sp, "darkcraft isolde lagrimas");
+        }));
+        esperarA("cliente_mv562_isolde_lagrimas", m -> tIsolde(m, com.darkcraft.enemigos.IsoldeAnims.LAGRIMAS) >= 22, m -> {
+            if (m.player != null) verDesde(m, m.player.getEyePosition().add(4, 3, -3), m.player.position());
+        }, ClientCiTest::estadoIsoldeC, 140);
+        t += 70;
+        atTicks(t, "Homenaje: su corte", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            comando(sp, "darkcraft isolde corte");
+        }));
+        esperarA("cliente_mv563_isolde_corte", m -> tIsolde(m, com.darkcraft.enemigos.IsoldeAnims.GRITO) >= 22, m -> camaraIsolde(m, 7, -5, 3.0),
+                ClientCiTest::estadoIsoldeC, 140);
+        t += 80;
+        // ---- cae: su ultima frase; la reja de la azotea se abre
+        atTicks(t, "Homenaje: la reina cae", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            log("  antes de caer: " + estadoHomenaje(sp));
+            var r = isoldeE();
+            if (r != null) {
+                for (var e : r.corte()) e.disolver();
+                r.invulnerableTime = 0;
+                r.hurt(sp.damageSources().playerAttack(sp), 100000f);
+            }
+        }));
+        esperarA("cliente_mv564_isolde_cae", m -> {
+            var r = isoldeC(m);
+            return r != null && r.deathTime >= 40;
+        }, m -> camaraIsolde(m, 4, -2, 2.4), ClientCiTest::estadoIsoldeC, 200);
+        t += com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Isolde.VOZ_BASE + 6) + 140;
+        atTicks(t, "Homenaje: la reja de la azotea", m -> {
+            CAPTURAS_ESPERA.clear();
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                log("  al caer: " + estadoHomenaje(sp) + " | logro isolde " + com.darkcraft.story.Logros.tiene(sp, "isolde"));
+                int[] q = H.sitio("reja_azotea");
+                irMirando(sp, q[0] - 4.5, q[1], q[2] - 4.5, q[0] + 0.5, q[1] + 1.5, q[2] + 2.5, false);
+            });
+        });
+        t += 50;
+        atTicks(t, "captura: la reja abierta", m -> {
+            shot(m, "cliente_mv565_reja_abierta");
+            server(m, sp -> log("  la reja: " + com.darkcraft.morvain.CasaSombra.resumen(sp.serverLevel())));
+        });
+        t += 4;
+        atTicks(t, "Homenaje: la azotea y la puerta de la aguja", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                int[] ps = H.sitio("puerta_sombra");
+                irMirando(sp, ps[0] + 0.5, ps[1], ps[2] - 5.5, ps[0] + 0.5, ps[1] + 3, ps[2] + 1.5, false);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura: la azotea", m -> {
+            shot(m, "cliente_mv566_azotea");
+            server(m, sp -> log("  la azotea: sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 4;
+        atTicks(t, "el bestiario: la reina Isolde", m -> {
+            m.setScreen(null);
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("isolde")));
+        });
+        t += 18;
+        atTicks(t, "captura: la reina en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv567_bestiario_isolde");
+        });
+        t += 4;
+        atTicks(t, "Homenaje: fin (vuelta al arco)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_ESPERA.clear();
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft isolde volver");
+                comando(sp, "darkcraft homenaje enemigos volver");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+                log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoHomenaje(sp.server));
             });
         });
         return t + 30;
