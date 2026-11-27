@@ -12202,6 +12202,9 @@ public final class ClientCiTest {
      * Los creditos (ya abiertos): a la mitad (la musica) y al final ("Gracias por jugar"); se cierran solos y Maelis habla en la capilla
      * (su epilogo desde {@code primera}: 18-19-20 o 22-23), cada frase entera; despues el cielo de Morvain desde lo alto de la ciudadela.
      */
+    /** El tick en que se salto a otro momento de los creditos (para capturarlos unos ticks despues). */
+    private static int saltoCreditos;
+
     private static int creditosYEpilogo(int T, int primera, String fin, int Y) {
         int t = T;
         atTicks(t, "Creditos (" + fin + "): a la mitad", m -> {
@@ -12209,14 +12212,19 @@ public final class ClientCiTest {
             var c = creditos(m);
             if (c != null) c.saltarA(0.45f);
             else log("  FALLO: no estan los creditos");
+            saltoCreditos = ticks;
         });
-        esperarA("cliente_mv6" + (fin.equals("alba") ? "07" : "18") + "_creditos_" + fin + "_mitad", m -> creditos(m) != null, m -> {}, ClientCiTest::estadoFinalC, 40);
+        // (la captura es del ultimo fotograma dibujado: unos ticks despues del salto, que ya se vea donde salto)
+        esperarA("cliente_mv6" + (fin.equals("alba") ? "07" : "18") + "_creditos_" + fin + "_mitad", m -> creditos(m) != null && ticks >= saltoCreditos + 6,
+                m -> {}, ClientCiTest::estadoFinalC, 40);
         t += 30;
         atTicks(t, "Creditos (" + fin + "): al final", m -> {
             var c = creditos(m);
             if (c != null) c.saltarA(1f);
+            saltoCreditos = ticks;
         });
-        esperarA("cliente_mv6" + (fin.equals("alba") ? "08" : "19") + "_creditos_" + fin + "_gracias", m -> creditos(m) != null, m -> {}, ClientCiTest::estadoFinalC, 40);
+        esperarA("cliente_mv6" + (fin.equals("alba") ? "08" : "19") + "_creditos_" + fin + "_gracias", m -> creditos(m) != null && ticks >= saltoCreditos + 6,
+                m -> {}, ClientCiTest::estadoFinalC, 40);
         // (se cierran solos a los ~9 s; Maelis habla 30 ticks despues de llegar a la capilla)
         int n = primera == 18 ? 3 : 2;
         String[] caps = primera == 18 ? new String[]{"cliente_mv609_epilogo_18", "cliente_mv610_epilogo_19", "cliente_mv611_epilogo_20"}

@@ -4795,6 +4795,12 @@ public final class CiTest {
      * vez), los creditos que acaban (a la capilla, delante de ella, y a los 30 ticks habla con el epilogo), lo que se manda del cielo y
      * que la camara de cada plano de las dos cinematicas no se meta en nada (y que se vea lo que mira en la sala).
      */
+    /** Si en ese bloque se puede estar de pie (aire, o algo de menos de 0,1 de alto como una alfombra). */
+    private static boolean pisable(ServerLevel m, BlockPos p) {
+        var sh = m.getBlockState(p).getCollisionShape(m, p);
+        return sh.isEmpty() || sh.max(net.minecraft.core.Direction.Axis.Y) <= 0.1;
+    }
+
     private static void desenlace(MinecraftServer server, ServerLevel m, PrintWriter log) {
         StringBuilder sb = new StringBuilder("Morvain, el final:");
         var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ad1"), "[DarkCraftCI22]"));
@@ -4844,7 +4850,8 @@ public final class CiTest {
             sb.append(String.format(java.util.Locale.ROOT, "; Maelis habla en el tick %d (30), epilogo oido %s, su marca %d (2); el sitio %s esta libre %s",
                     habla, com.darkcraft.morvain.Epilogo.EPILOGOS > ep0, com.darkcraft.rol.Ficha.dialogo(fp, com.darkcraft.morvain.Epilogo.FICHA),
                     net.minecraft.core.BlockPos.containing(cap[0], cap[1], cap[2]).toShortString(),
-                    m.getBlockState(net.minecraft.core.BlockPos.containing(cap[0], cap[1], cap[2])).getCollisionShape(m, net.minecraft.core.BlockPos.containing(cap[0], cap[1], cap[2])).isEmpty()
+                    // (la alfombra de la nave se pisa: lo que mide menos de 0,1 de alto no cuenta)
+                    pisable(m, net.minecraft.core.BlockPos.containing(cap[0], cap[1], cap[2]))
                             && m.getBlockState(net.minecraft.core.BlockPos.containing(cap[0], cap[1] + 1, cap[2])).getCollisionShape(m, net.minecraft.core.BlockPos.containing(cap[0], cap[1] + 1, cap[2])).isEmpty()));
             log.println(sb);
             // ---- la camara de las dos cinematicas
