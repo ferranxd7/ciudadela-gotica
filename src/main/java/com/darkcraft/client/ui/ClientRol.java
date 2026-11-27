@@ -249,6 +249,7 @@ public final class ClientRol {
                     else if (que == PUERTA) Net.CH.sendToServer(new Net.PuertaAguja());
                     else if (que == CAMPANA) com.darkcraft.client.mision.ClientMisiones.coger(mc);
                     else if (que == RESTOS) com.darkcraft.client.mision.ClientMisiones.cogerRestos(mc);
+                    else if (que == FAROL) com.darkcraft.client.mision.ClientMisiones.cogerFarol(mc);
                     else if (que == ESTELA && com.darkcraft.client.morvain.ClientMapa.aMano != null)
                         Net.CH.sendToServer(new Net.EstelaUsar(com.darkcraft.client.morvain.ClientMapa.aMano));
                     enfriamiento = 12;
@@ -283,7 +284,7 @@ public final class ClientRol {
     }
 
     /** Lo que el jugador tiene a mano para la tecla del aviso. */
-    public static final int NADA = 0, ESPADA = 1, SANTUARIO = 2, PERSONAJE = 3, COSA = 4, ESTELA = 5, PUERTA = 6, CAMPANA = 7, RESTOS = 8;
+    public static final int NADA = 0, ESPADA = 1, SANTUARIO = 2, PERSONAJE = 3, COSA = 4, ESTELA = 5, PUERTA = 6, CAMPANA = 7, RESTOS = 8, FAROL = 9;
 
     public static int aMano() {
         if (juntoAEspada()) return ESPADA;
@@ -296,6 +297,8 @@ public final class ClientRol {
         if (com.darkcraft.client.personajes.ClientPersonajes.aMano >= 0) return PERSONAJE;
         // la campana del peregrino (parte 7ag), colgada del Arbol de la Horca
         if (com.darkcraft.client.mision.ClientMisiones.campana >= 0) return CAMPANA;
+        // el farol de Brann, en la arena del Costillar (parte 7an)
+        if (com.darkcraft.client.mision.ClientMisiones.farol >= 0) return FAROL;
         return ClientPueblo.aMano >= 0 ? COSA : NADA;
     }
 

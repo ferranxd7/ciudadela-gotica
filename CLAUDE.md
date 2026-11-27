@@ -3989,6 +3989,62 @@ en la forja de cualquier herrero (Dorvan y los cuatro de Morvain), como las arma
   `am03` los guantes sin piedras, `am04` el yelmo al maximo) y la ficha del peto a +5 en el menu (`am05`; el menu tiene
   `enfocarEquipo(hueco)` para la prueba). Lineas `armadura 7am ...`.
 
+### Plan grande, parte 7an: la luz del muelle (Ylva, la hija del ballenero)
+
+La tercera mision (respuestas 95 y 117 del plan), que cambia como acaba un jefe.
+- **Ylva** (`personajes/Viajero`, `Quien.YLVA`): sentada en un noray al final del espigon del Puerto Varado (u 75, v -21: junto al
+  pretil del norte, a tres bloques del farol de almas del final), mirando al norte, al Costillar, con su farol de fuego frio en el
+  regazo. Modelo (`ViajeroRenderer.ModeloYlva`, capa `darkcraft:viajero_ylva`, textura de 128 x 64 de `tools/personajes/ylva.py`, con
+  su retrato y su brillo): el de brazos finos con la esclavina de hule mostaza sobre el jersey de pescador, la trenza cobriza, **los
+  muslos y las espinillas aparte** (las piernas del modelo de jugador no se dibujan: muslos de 6 con la textura de las piernas, de la
+  cadera a la rodilla, y espinillas con las botas de la rodilla al suelo), el noray (tapa y poste) y el farol con su asa; lo que luce
+  (el cristal del farol) va en otra capa con luz propia (`BrilloYlva`, `RenderType.eyes` con `ylva_brillo.png`). Mientras te ha prestado
+  su farol, las manos en las rodillas (`ClientMisiones.ylvaSinFarol`). Se pone una vez (`Morvain.Datos` "ylva").
+- **La mision** (`mision/Ylva`, marcas CONOCIDA, ACEPTADA, RECHAZADA, NOCHE, TOMADA, CALMA, DADA, QUEDADA; `LLEVA` = lleva el farol de
+  Brann): se presenta (1: su padre sigue en el Costillar y ha olvidado el camino a casa) y su menu: **llevarle su luz** (2: te da su
+  farol, objeto clave `farol_ylva`, con `sfx.farol_frio`; cartel "Nueva mision"), **aquella noche** (3: el mar se fue de golpe y Tome,
+  el farero, no la dejo bajar) o **no** (4). Despues, 6 (y el menu) o 5.
+- **Brann ve la luz** (`enemigos/Ballenero`): peleando, por debajo del 30 % de la vida (`Ylva.CALMA_VIDA`) y con alguien que lleve el
+  farol de Ylva a 16 bloques (`Ylva.luzCerca`), **deja de pelear** (`calmar`: corta lo que hacia —`Enemigo.cortarAccion`, nuevo—,
+  `rendirPelea`, sin presa, no anda, no le entra nada salvo lo que salta la invulnerabilidad), mira la luz y dice su **frase 6** ("...Esa
+  luz. Es la luz del muelle. ¿Ylva?") con `sfx.brann_calma` (el canto de la Vieja y el mar que vuelve); al acabarla cae (`kill`): de
+  rodillas como siempre, la Vieja sube al cielo y se deshace en sal, pero dice la **7** ("Cuarenta anos... y la mantuviste encendida. Pon
+  la tetera, chiquilla. Vuelvo a casa"; la muerte dura hasta que acaba). Lo que deja y la hazana `ballenero`, igual (`Guardianes`). A
+  quien lleva la luz y a los de la mision a 48: la marca CALMA y el logro `brann_calma` (desafio, "Vuelvo a casa"). `Voces.BALLENERO`
+  llega a la 7 (para las pruebas: `Ballenero.verLuz(jugador)`).
+- **El farol de Brann** (`mision/FarolBrann`, entidad `darkcraft:farol_brann` con `variante`; `client/mision/FarolBrannRenderer`:
+  farol de aceite grande de laton con cardenillo y sal, el cristal ahumado, tejadillo y asa, escala 1,4; texturas de
+  `tools/mision/farol.py`): la 0, **tumbado en la arena del Costillar** donde velaba Brann (sitio "brann"), apagado, en cuanto Brann ha
+  caido y se ha deshecho ("farol_brann"); se coge con clic derecho o la E ("Pulsa [E] para coger el farol": `ClientMisiones.farol`,
+  `ClientRol.FAROL` = 9), cada jugador el suyo, tambien sin conocer a Ylva (objeto clave `farol_ballenero`). La 1, **encendido sobre el
+  pretil del final del espigon** (u 77), junto al farol de almas de ella (la llama ambar con luz propia y alguna llamita): solo lo ve
+  quien se lo dio ("farol_muelle", se pone cuando llega alguien asi). `FarolBrann.sinFarol` / `enMuelle` los pone el cliente.
+- **Con el farol de su padre** (7 si cayo peleando, 8 si vio la luz, 13 si no la conocia) y el segundo menu (101):
+  - **darselo** ("Tomalo. Es de tu padre."; 9 y 10): los colgara juntos al final del muelle; te deja su **Fuego frio**
+    (`Talisman.Clase.YLVA`: si caes otra vez antes de recuperar tu espada de luz, sus ecos no se pierden, pasan a la nueva —`Rol.muerte`
+    con `Rol.ecosEspadaNueva`, aviso `darkcraft.talisman.ylva.guarda`—); al cerrar la conversacion **descansa** (en el cliente de quien
+    se lo dio: 70 ticks con almas, luz y `sfx.ylva_descansa`) y el farol de Brann aparece en el pretil; logro `ylva_luz` ("Dos faroles").
+  - **quedartelo** ("Me lo quedo."; 11): le devuelves su luz y su lado del muelle sigue a oscuras (despues, 12); el **Farol del
+    ballenero** (`Talisman.Clase.BALLENERO`: los enemigos a 24 bloques se ven a traves de las paredes —`Enemigo.isCurrentlyGlowing` con
+    `Enemigo.BRILLA`, que pone `ClientMisiones` solo para quien lo lleva—); logro `ylva_farol` ("Su lado, a oscuras").
+- **`Misiones` lleva las tres** (`TODAS`; la huella de lo mandado: 21 bits por mision); estados del diario `darkcraft.mision.ylva.<pendiente
+  | buscar | calma | volver | volver_luz | encontrada | dada | quedada>` (y `.ir.*` para el mapa). Miniatura nueva (`CodiceScreen.MIN_MISION_YLVA`
+  = 18, `miniaturas.py` `luz_muelle`: el espigon al ocaso hasta el faro con su fuego frio, Ylva con el farol azul y, en el horizonte, las
+  costillas de la ballena con una lucecita ambar).
+- **Voces** (ElevenLabs, `eleven_v4`): Ylva **"Sinéad — Warm Northern Irish Storyteller"** `6fUdApmsddaaPpXSYlh1`, 13 frases (tomas a;
+  `VOZ_YLVA`: al aire libre, con un rebote corto en el pretil); Brann 6 y 7 con su voz de siempre ("Declan Graves", tomas a). Efectos:
+  `farol_frio` (1 y 4), `brann_calma` (1 y 3; 12 s, en streaming), `ylva_descansa` (1 y 3). Prompts y firmas en `herr` (fuera del repo).
+- Comandos `/darkcraft ylva [ir | farol | poner | olvidar]` y `/darkcraft misiones ylva <n>`.
+- Pruebas: servidor, `misionYlva()` (linea `Morvain, la luz del muelle: ...`: Ylva y los dos faroles puestos —pisa, mira al Costillar, el
+  farol de almas, el de la arena sobre lo que se pisa, el del muelle sobre el pretil—, el dialogo sin nodos rotos y los caminos: aceptar
+  dos veces da un farol, Brann que ve la luz —no a media vida; deja de pelear, no le entra un golpe, cae al acabar la 6 y se va—,
+  cogerlo y darselo —el Fuego frio y lo que guarda: 500 en la espada y 300 encima dan 800—, quedartelo y cogerlo sin conocerla);
+  cliente, tramo `ylva()` despues de `hedda()`: Ylva en el espigon y de frente (`cliente_yl01`, `yl02`), hablar, el menu, aquella
+  noche, aceptar y su cartel (`yl03..yl07`), la Historia (`yl08`), sin su farol (`yl09`), la brujula (`yl10`), Brann que ve la luz, se va
+  y la Vieja (`yl11..yl13`), el farol en la arena y cogido (`yl14`, `yl15`), volver (la 8, `yl16`, `yl17`), darselo y descansa
+  (`yl18`, `yl19`), los dos faroles en el pretil (`yl20`), otra vez quedartelo (`yl21..yl23`) y el Farol del ballenero (`yl24`, linea
+  `brillan`). Lineas `ylva ...`.
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

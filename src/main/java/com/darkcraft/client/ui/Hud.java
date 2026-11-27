@@ -421,6 +421,8 @@ public final class Hud {
                     == com.darkcraft.client.mision.ClientMisiones.LANZA ? "darkcraft.aviso.lanza" : "darkcraft.aviso.bufanda"), null);
         else if (avisoQue == ClientRol.PUERTA)
             aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable("darkcraft.aviso.puerta_aguja"), null);
+        else if (avisoQue == ClientRol.FAROL)
+            aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable("darkcraft.aviso.farol"), null);
         else
             aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla,
                     Component.translatable(avisoEncendido ? "darkcraft.aviso.descansar" : "darkcraft.aviso.encender"), null);

@@ -46,8 +46,8 @@ public class CodiceScreen extends Screen {
     /** Las miniaturas de miniaturas.png: 0-5 los capitulos, y estas; 12-15 los capitulos de Morvain (7-10, parte 7ae). */
     public static final int MIN_PERDIDO_VALDRENN = 6, MIN_PERDIDO_FORTALEZA = 7, MIN_DIARIO = 8, MIN_ACERTIJO = 9, MIN_PERDIDO_BRUMAVELA = 10,
             MIN_PERDIDO_MORVAIN = 11, MIN_MORVAIN = 12;
-    /** Las de las misiones (la quinta fila): la campana del peregrino (parte 7ag) y la bufanda roja (7ah). */
-    public static final int MIN_MISION_OSWIN = 16, MIN_MISION_HEDDA = 17;
+    /** Las de las misiones (la quinta fila): la campana del peregrino (parte 7ag), la bufanda roja (7ah) y la luz del muelle (7an). */
+    public static final int MIN_MISION_OSWIN = 16, MIN_MISION_HEDDA = 17, MIN_MISION_YLVA = 18;
     /** Lo alto del atlas de las miniaturas (cinco filas de cuatro). */
     private static final int MINI_ATLAS_H = 400;
 

@@ -48,7 +48,17 @@ public final class Talisman extends Item {
          */
         MADRE,
         /** La Bufanda de Tam (parte 7ah, a quien calla): cubrirse cuesta un 30 % menos de estamina y el fuego hace un 20 % menos. */
-        BUFANDA;
+        BUFANDA,
+        /**
+         * El Farol de Ylva (parte 7an, a quien le devuelve el farol de su padre): el fuego frio del faro te trae de vuelta; si caes otra
+         * vez antes de recuperar tu espada de luz, sus ecos no se pierden: pasan a la nueva ({@code Rol.muerte}).
+         */
+        YLVA,
+        /**
+         * El Farol del ballenero (parte 7an, a quien se queda el farol de Brann): la luz del vigia; los enemigos a 24 bloques se ven a
+         * traves de las paredes (solo quien lo lleva: {@code Enemigo.BRILLA}, lo pone el cliente).
+         */
+        BALLENERO;
 
         /** "vigor", "aliento"... (el objeto es darkcraft:talisman_ + esto). */
         public final String id = name().toLowerCase(java.util.Locale.ROOT);

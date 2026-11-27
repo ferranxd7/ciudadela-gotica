@@ -59,6 +59,17 @@ public abstract class Enemigo extends Monster {
     /** Un golpe: hasta donde llega (bloques), el arco que barre (grados), por cuanto multiplica el ataque y lo que empuja de mas. */
     public record Golpe(float alcance, float arco, float dano, float empuje) {}
 
+    /**
+     * En el cliente (parte 7an, el Farol del ballenero): si quien juega lo ve brillar a traves de las paredes. Lo pone
+     * {@code client.mision.ClientMisiones}; en el servidor no se mira (en un mundo de un jugador comparten la JVM).
+     */
+    public static volatile java.util.function.Predicate<Enemigo> BRILLA = e -> false;
+
+    @Override
+    public boolean isCurrentlyGlowing() {
+        return super.isCurrentlyGlowing() || level().isClientSide && BRILLA.test(this);
+    }
+
     // ---- en el cliente: el reloj de los bucles y el de cada accion
     public final AnimationState reloj = new AnimationState();
     public final AnimationState[] acciones;
@@ -357,6 +368,15 @@ public abstract class Enemigo extends Monster {
         accionT = 0;
         tocados.clear();
         rumbo = getYRot();
+        getNavigation().stop();
+    }
+
+    /** Corta lo que estuviera haciendo, sin pausa ni nada despues (Brann, al ver la luz del muelle: parte 7an). */
+    public void cortarAccion() {
+        if (level().isClientSide) return;
+        entityData.set(ACCION, (byte) 0);
+        accionT = 0;
+        tocados.clear();
         getNavigation().stop();
     }
 

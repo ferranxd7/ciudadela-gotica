@@ -33,7 +33,7 @@ public final class Voces {
     public static final int BASE_CONDESTABLE = 20;
     /** Las de Ysolde, la Rectora de la Academia (parte 7p): 30 + N (1..5; entre las del Condestable y las del Capitan). */
     public static final int BASE_RECTORA = 30;
-    /** Las de Brann, el Ballenero (parte 7r): 50 + N (1..5; entre las del Capitan y las de la Molinera). */
+    /** Las de Brann, el Ballenero (parte 7r): 50 + N (1..5; la 6 y la 7, la luz del muelle, parte 7an; entre las del Capitan y las de la Molinera). */
     public static final int BASE_BALLENERO = 50;
     /** Las de Anselmo, el Pontifice Sangrante (parte 7t): 14 + N (1..5; entre las del Rey, 1..13, y las del Condestable). */
     public static final int BASE_PONTIFICE = 14;
@@ -66,7 +66,8 @@ public final class Voces {
     private static final float[] ABAD = {0, 8.25f, 5.2f, 3.5f, 2.7f, 5.3f};
     private static final float[] CONDESTABLE = {0, 7.21f, 2.68f, 1.39f, 3.2f, 4.15f};
     private static final float[] RECTORA = {0, 5.63f, 5.08f, 1.93f, 3.3f, 3.98f};
-    private static final float[] BALLENERO = {0, 6.03f, 4.92f, 4.27f, 5.11f, 5.09f};
+    // (la 6 y la 7: Brann ve la luz del muelle y se va a casa; parte 7an)
+    private static final float[] BALLENERO = {0, 6.03f, 4.92f, 4.27f, 5.11f, 5.09f, 5.95f, 7.2f};
     private static final float[] PONTIFICE = {0, 6.5f, 5.5f, 3.0f, 4.0f, 5.5f};
     private static final float[] ALDRIC = {0, 7.0f, 5.4f, 3.6f, 3.9f, 6.6f};
     private static final float[] GIGANTE = {0, 7.4f, 6.8f, 7.0f, 6.8f, 4.8f, 7.6f, 8.2f, 6.8f, 4.2f};

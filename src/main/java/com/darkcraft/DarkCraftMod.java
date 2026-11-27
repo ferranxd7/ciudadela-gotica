@@ -177,6 +177,10 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_AGUJAS = sound("sfx.agujas");
     public static final RegistryObject<SoundEvent> SFX_HEDDA_DESCANSA = sound("sfx.hedda_descansa");
     public static final RegistryObject<SoundEvent> SFX_LANZA_SACAR = sound("sfx.lanza_sacar");
+    /** La luz del muelle (parte 7an): el farol de fuego frio de Ylva, Brann que ve la luz (el canto de la Vieja y el mar que vuelve) y el descanso de Ylva. */
+    public static final RegistryObject<SoundEvent> SFX_FAROL_FRIO = sound("sfx.farol_frio");
+    public static final RegistryObject<SoundEvent> SFX_BRANN_CALMA = sound("sfx.brann_calma");
+    public static final RegistryObject<SoundEvent> SFX_YLVA_DESCANSA = sound("sfx.ylva_descansa");
     /** Ponerse una pieza de armadura (parte 7ai): de placas, de malla, de cuero y pieles o de tela. */
     public static final RegistryObject<SoundEvent> SFX_ARMADURA_PLACAS = sound("sfx.armadura_placas");
     public static final RegistryObject<SoundEvent> SFX_ARMADURA_MALLA = sound("sfx.armadura_malla");
@@ -704,7 +708,7 @@ public class DarkCraftMod {
 
     /** Frases de Brann, el Ballenero (1..5, parte 7r). */
     @SuppressWarnings("unchecked")
-    public static final RegistryObject<SoundEvent>[] BALLENERO_VOZ = new RegistryObject[6];
+    public static final RegistryObject<SoundEvent>[] BALLENERO_VOZ = new RegistryObject[8];
 
     /** Frases de Anselmo, el Pontifice Sangrante (1..5, parte 7t). */
     @SuppressWarnings("unchecked")
@@ -1147,6 +1151,15 @@ public class DarkCraftMod {
             () -> new com.darkcraft.mision.ObjetoMision("bufanda_roja", new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.RARE)));
     public static final RegistryObject<Item> LANZA_TAM = ITEMS.register("lanza_tam",
             () -> new com.darkcraft.mision.LanzaTam(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
+    /** El farol de Brann que queda en la arena del Costillar (parte 7an, la mision de Ylva) y, en el muelle, junto al de ella. */
+    public static final RegistryObject<EntityType<com.darkcraft.mision.FarolBrann>> FAROL_BRANN = ENTITIES.register("farol_brann",
+            () -> EntityType.Builder.<com.darkcraft.mision.FarolBrann>of(com.darkcraft.mision.FarolBrann::new, MobCategory.MISC)
+                    .sized(0.5f, 0.6f).fireImmune().clientTrackingRange(8).updateInterval(20).build(MODID + ":farol_brann"));
+    /** El farol de fuego frio de Ylva (objeto clave: se lleva al Costillar) y el de aceite de su padre, Brann (objeto clave). */
+    public static final RegistryObject<Item> FAROL_YLVA = ITEMS.register("farol_ylva",
+            () -> new com.darkcraft.mision.ObjetoMision("farol_ylva", new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.RARE)));
+    public static final RegistryObject<Item> FAROL_BALLENERO = ITEMS.register("farol_ballenero",
+            () -> new com.darkcraft.mision.ObjetoMision("farol_ballenero", new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.RARE)));
     /** El martillo de Dorvan (solo para que lo lleve en la mano) y las piedras de forja (I, II y III: mejoran las armas). */
     public static final RegistryObject<Item> MARTILLO_HERRERO = ITEMS.register("martillo_herrero",
             () -> new Item(new Item.Properties().stacksTo(1)));

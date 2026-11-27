@@ -1179,13 +1179,90 @@ def bufanda_roja():
     return M
 
 
+def luz_muelle():
+    """La luz del muelle (parte 7an, la mision de Ylva): el ocaso sobre la bahia seca del Puerto Varado; el espigon de piedra que
+    se va hasta el faro de hueso con su fuego frio; al final del espigon, Ylva sentada en su noray con el farol azul en el regazo;
+    lejos, en el horizonte del norte, las costillas de la ballena y una lucecita ambar que le contesta."""
+    M = Mini()
+    M.degradado(["#080a18", "#10162c", "#1c2440", "#2e3048", "#4e3c44", "#7a5440", "#a87444"], 0, 46)
+    M.estrellas(18, 211, y1=22)
+    r = np.random.default_rng(139)
+    # el horizonte: la bahia seca hasta donde alcanza la vista
+    M.degradado(["#3a3026", "#2e261e", "#241e18", "#1a1612", "#110e0c"], 46, H)
+    # la sal y las grietas del fondo del mar
+    for _ in range(70):
+        x, y = int(r.integers(0, W)), int(r.integers(47, H))
+        M.px(x, y, mezcla(M.leer(x, y), "#d8dcd6", 0.25 + 0.25 * (y - 46) / 34))
+    for k in range(6):
+        x, y = int(r.integers(4, 120)), int(r.integers(56, 78))
+        for i in range(int(r.integers(4, 9))):
+            M.px(x + i, y + int(math.sin(i * 1.3 + k) * 1.2), "#0e0b09")
+    # las costillas de la ballena en el horizonte (el Costillar) y su lucecita ambar: alguien que ve la luz
+    for k in range(7):
+        cx = 24 + k * 4
+        alto = 7 - abs(k - 3) * 1.2
+        medio_aro(M, cx, 46, 2.2, alto, "#1a1414", 1.0)
+    M.hline(20, 46, 30, "#1a1414")
+    for d, a in ((3, 0.18), (2, 0.35), (1, 0.6)):
+        for y in range(43 - d, 43 + d + 1):
+            for x in range(36 - d, 36 + d + 1):
+                if math.hypot(x - 36, y - 43) <= d:
+                    M.px(x, y, mezcla(M.leer(x, y), "#f0a030", a))
+    M.px(36, 43, "#ffe0a0")
+    fig = capa()
+    # dos barcas varadas en la arena, de lado
+    fig.poli([(10, 66), (26, 66), (23, 70), (13, 70)], "#16100c")
+    fig.poli([(50, 58), (60, 57), (58, 60), (52, 60)], "#16100c")
+    fig.linea(55, 57, 57, 50, "#16100c")
+    # el espigon: la cara de piedra que cae a la bahia (mas alta cerca) y lo de arriba
+    fig.poli([(0, 60), (94, 51), (94, 54), (0, 68)], "#1e1a1c")
+    # el faro de hueso en su penon, con la galeria y la linterna
+    fig.poli([(92, 56), (100, 50), (118, 50), (124, 56)], "#1a1618")
+    fig.poli([(102, 50), (104, 18), (112, 18), (114, 50)], "#4a4440")
+    fig.rect(101, 16, 15, 2, "#2a2624")
+    fig.rect(104, 10, 9, 6, "#2a2624")
+    fig.poli([(103, 10), (108.5, 5), (114, 10)], "#2a2624")
+    # Ylva al final del espigon, sentada en su noray, de perfil mirando al norte (a la izquierda)
+    fig.rect(87, 48, 3, 3, "#16131a")  # el noray
+    fig.poli([(85, 48), (86, 42), (89, 41), (90, 48)], "#14101a")  # la espalda con la esclavina
+    fig.elipse(87.5, 39.5, 1.8, 2.0, "#14101a")  # la cabeza
+    fig.poli([(83, 46), (86, 45), (86, 48), (83, 48)], "#14101a")  # las rodillas
+    fig.rect(83, 48, 2, 3, "#14101a")  # las piernas
+    pegar_con_tinta(M, fig)
+    # las costillas del faro y sus bandas
+    for y in range(20, 50, 5):
+        M.hline(103 + (50 - y) // 16, y, 10 - 2 * ((50 - y) // 16), "#6a625a")
+    # el pretil y sus faroles de almas a lo largo del espigon
+    for x in range(0, 94, 1):
+        y = 60 - x * 9 / 94
+        if x % 9 != 0:
+            M.px(x, int(round(y)) - 1, "#2c2628")
+    for x in (14, 38, 62):
+        y = int(round(60 - x * 9 / 94)) - 2
+        M.px(x, y, "#6ac8e6").px(x, y - 1, "#d6f6ff")
+    # la luz fria del faro y la del farol de Ylva (con su halo)
+    for (cx, cy, rr, fuerte) in ((108.5, 13, 11, 0.55), (84, 45, 8, 0.6)):
+        for y in range(int(cy - rr), int(cy + rr) + 1):
+            for x in range(int(cx - rr), int(cx + rr) + 1):
+                d = math.hypot(x - cx, y - cy)
+                if d < rr and 0 <= x < W and 0 <= y < H:
+                    M.px(x, y, mezcla(M.leer(x, y), "#94d6f0", (1 - d / rr) ** 1.6 * fuerte))
+    M.rect(105, 11, 7, 4, "#d6f6ff")
+    M.rect(107, 12, 3, 2, "#ffffff")
+    M.rect(83, 44, 2, 2, "#d6f6ff")
+    M.px(83, 44, "#ffffff")
+    # la trenza cobriza, lo unico calido junto a ella
+    M.px(89, 40, "#a84e22").px(89, 41, "#843818").px(90, 42, "#a84e22")
+    return M
+
+
 ESCENAS = [corona_rota, fuente, trono, catedral, juramento, portal, perdidos_valdrenn, perdidos_fortaleza, diario, acertijo,
            perdidos_brumavela, perdidos_morvain, morvain_tierras, morvain_quedaron, morvain_marcado, morvain_hermanas,
-           campana_peregrino, bufanda_roja]
+           campana_peregrino, bufanda_roja, luz_muelle]
 
 
 def montar():
-    """Las miniaturas en un atlas de 512 x 400 (cuatro por fila; la quinta fila, las misiones: 7ag, 7ah)."""
+    """Las miniaturas en un atlas de 512 x 400 (cuatro por fila; la quinta fila, las misiones: 7ag, 7ah, 7an)."""
     A = Lienzo(512, 400)
     for i, f in enumerate(ESCENAS):
         m = f()

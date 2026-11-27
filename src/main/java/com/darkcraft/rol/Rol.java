@@ -550,10 +550,28 @@ public final class Rol {
 
     // ------------------------------------------------------------------ morir: la espada de luz
 
+    /** Para las pruebas: las veces que el Farol de Ylva ha guardado los ecos de una espada de luz al caer otra vez (parte 7an). */
+    public static int FAROL_YLVA;
+
+    /**
+     * Los ecos que se quedan en la espada de luz nueva al morir con {@code ecos} encima y otra espada sin recoger de {@code viejos}: los
+     * de encima; con el Farol de Ylva (parte 7an), tambien los de la vieja.
+     */
+    public static int ecosEspadaNueva(ServerPlayer sp, int viejos, int ecos) {
+        return viejos > 0 && Talismanes.lleva(sp, Talisman.Clase.YLVA) ? ecos + viejos : ecos;
+    }
+
     private static void muerte(ServerPlayer sp, DamageSource causa) {
         Estado s = de(sp);
         Ficha.Espada vieja = Ficha.espada(sp);
         int ecos = Ficha.ecos(sp);
+        // el Farol de Ylva (parte 7an): su fuego frio te trae de vuelta; los ecos de la espada que no recuperaste no se pierden
+        if (vieja != null && ecosEspadaNueva(sp, vieja.ecos(), ecos) != ecos) {
+            ecos = ecosEspadaNueva(sp, vieja.ecos(), ecos);
+            vieja = null;
+            FAROL_YLVA++;
+            Net.to(sp, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.talisman.ylva.guarda", 0));
+        }
         Espadas.quitar(sp);
         if (ecos > 0) {
             Vec3 p = dondeClavar(sp, causa, s);

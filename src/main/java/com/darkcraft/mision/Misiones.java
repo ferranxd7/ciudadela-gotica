@@ -27,15 +27,15 @@ import java.util.UUID;
 /**
  * Las misiones de Morvain (parte 7ag, respuestas 95 y 117 del plan): quien las da ({@code personajes.Viajero}), lo que cada jugador
  * lleva hecho de cada una (en su ficha, {@code Ficha.mision}: marcas de bits) y lo que sabe su cliente (la lista de las que conoce,
- * con adonde ir ahora: el diario de la Historia, la brujula y el mapa). {@link Oswin}, la campana del peregrino (7ag), y {@link Hedda},
- * la bufanda roja (7ah).
+ * con adonde ir ahora: el diario de la Historia, la brujula y el mapa). {@link Oswin}, la campana del peregrino (7ag), {@link Hedda},
+ * la bufanda roja (7ah), y {@link Ylva}, la luz del muelle (7an).
  */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID)
 public final class Misiones {
     private Misiones() {}
 
     /** Todas, en el orden del menu. */
-    public static final String[] TODAS = {Oswin.ID, Hedda.ID};
+    public static final String[] TODAS = {Oswin.ID, Hedda.ID, Ylva.ID};
 
     /** Lo ultimo que se le mando a cada uno (si cambia —coge o suelta la campana o la bufanda—, se le vuelve a mandar). */
     private static final Map<UUID, Long> MANDADO = new HashMap<>();
@@ -44,15 +44,16 @@ public final class Misiones {
     public static void tick(ServerLevel m) {
         Oswin.tick(m);
         Hedda.tick(m);
+        Ylva.tick(m);
         for (ServerPlayer p : m.players()) {
             Long antes = MANDADO.get(p.getUUID());
             if (antes == null || antes != huella(p)) enviar(p);
         }
     }
 
-    /** Lo que lleva de cada una (con lo que lleva encima), para no mandarlo dos veces igual. */
+    /** Lo que lleva de cada una (con lo que lleva encima), para no mandarlo dos veces igual (cada una cabe en 21 bits). */
     private static long huella(ServerPlayer p) {
-        return ((long) oswin(p) << 32) | (heda(p) & 0xFFFFFFFFL);
+        return (oswin(p) & 0x1FFFFFL) | ((heda(p) & 0x1FFFFFL) << 21) | ((ylva(p) & 0x1FFFFFL) << 42);
     }
 
     private static int oswin(ServerPlayer p) {
@@ -63,6 +64,10 @@ public final class Misiones {
         return Hedda.marcas(p) | (Hedda.lleva(p) ? Hedda.LLEVA : 0);
     }
 
+    private static int ylva(ServerPlayer p) {
+        return Ylva.marcas(p) | (Ylva.lleva(p) ? Ylva.LLEVA : 0);
+    }
+
     /** Le manda las misiones que conoce (las de marcas 0 no; tambien si lleva lo que se busca sin conocer a quien lo busca). */
     public static void enviar(ServerPlayer p) {
         List<Net.MisionE> l = new ArrayList<>();
@@ -70,6 +75,8 @@ public final class Misiones {
         if (k != 0) l.add(entrada(Oswin.ID, k, Oswin.objetivo(p)));
         int h = heda(p);
         if (h != 0) l.add(entrada(Hedda.ID, h, Hedda.objetivo(p)));
+        int y = ylva(p);
+        if (y != 0) l.add(entrada(Ylva.ID, y, Ylva.objetivo(p)));
         Net.to(p, new Net.Misiones(l));
         MANDADO.put(p.getUUID(), huella(p));
     }
@@ -118,6 +125,7 @@ public final class Misiones {
         return switch (v.quien()) {
             case OSWIN -> Oswin.inicio(sp);
             case HEDDA -> Hedda.inicio(sp, v);
+            case YLVA -> Ylva.inicio(sp);
         };
     }
 
@@ -126,12 +134,17 @@ public final class Misiones {
         switch (v.quien()) {
             case OSWIN -> Oswin.accion(sp, v, accion);
             case HEDDA -> Hedda.accion(sp, v, accion);
+            case YLVA -> Ylva.accion(sp, v, accion);
         }
     }
 
     /** Si a este jugador le toca ver (y hablar con) quien da la mision: cada uno lleva la suya (parte 7ah). */
     public static boolean visible(ServerPlayer sp, Viajero v) {
-        return v.quien() != Viajero.Quien.HEDDA || Hedda.visible(sp, v);
+        return switch (v.quien()) {
+            case HEDDA -> Hedda.visible(sp, v);
+            case YLVA -> Ylva.visible(sp);
+            default -> true;
+        };
     }
 
     /** Para las pruebas y el comando: como va la mision de cada uno. */
@@ -143,7 +156,19 @@ public final class Misiones {
         b.append(" ]").append(Oswin.lleva(sp) ? " lleva la campana" : "");
         BlockPos o = Oswin.objetivo(sp);
         if (o != null) b.append(", ir a ").append(o.toShortString());
-        return b.append("; ").append(resumenHedda(sp)).toString();
+        return b.append("; ").append(resumenHedda(sp)).append("; ").append(resumenYlva(sp)).toString();
+    }
+
+    /** Como va la de Ylva. */
+    public static String resumenYlva(ServerPlayer sp) {
+        int k = Ylva.marcas(sp);
+        StringBuilder b = new StringBuilder("ylva ").append(k).append(" [");
+        String[] n = {"conocida", "aceptada", "rechazada", "noche", "tomada", "calma", "dada", "quedada"};
+        for (int i = 0; i < n.length; i++) if ((k & (1 << i)) != 0) b.append(' ').append(n[i]);
+        b.append(" ]").append(Ylva.conLuz(sp) ? " lleva la luz de Ylva" : "").append(Ylva.lleva(sp) ? " lleva el farol de Brann" : "");
+        BlockPos o = Ylva.objetivo(sp);
+        if (o != null) b.append(", ir a ").append(o.toShortString());
+        return b.toString();
     }
 
     /** Como va la de Hedda. */
@@ -166,6 +191,8 @@ public final class Misiones {
                 ? java.util.List.of(DarkCraftMod.CAMPANA_PEREGRINO.get(), DarkCraftMod.CAMPANA_DIFUNTOS.get())
                 : Hedda.ID.equals(id) ? java.util.List.of(DarkCraftMod.BUFANDA_ROJA.get(), DarkCraftMod.LANZA_TAM.get(),
                 DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.MADRE).get(), DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.BUFANDA).get())
+                : Ylva.ID.equals(id) ? java.util.List.of(DarkCraftMod.FAROL_YLVA.get(), DarkCraftMod.FAROL_BALLENERO.get(),
+                DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.YLVA).get(), DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.BALLENERO).get())
                 : java.util.List.of();
         for (int i = 0; i < inv.getContainerSize(); i++)
             if (fuera.contains(inv.getItem(i).getItem())) inv.setItem(i, net.minecraft.world.item.ItemStack.EMPTY);
@@ -200,7 +227,79 @@ public final class Misiones {
                     Ficha.mision(sp, Hedda.ID, IntegerArgumentType.getInteger(c, "n"));
                     enviar(sp);
                     return decir(c.getSource(), resumen(sp));
+                })))
+                .then(Commands.literal("ylva").then(Commands.argument("n", IntegerArgumentType.integer(0, 255)).executes(c -> {
+                    ServerPlayer sp = c.getSource().getPlayerOrException();
+                    Ficha.mision(sp, Ylva.ID, IntegerArgumentType.getInteger(c, "n"));
+                    enviar(sp);
+                    return decir(c.getSource(), resumenYlva(sp));
                 })));
+    }
+
+    /** /darkcraft ylva [ir | farol | poner | olvidar] (sin mas: donde estan Ylva y los faroles). */
+    public static LiteralArgumentBuilder<CommandSourceStack> comandoYlva() {
+        return Commands.literal("ylva")
+                .executes(c -> {
+                    ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    var srv = m.getServer();
+                    return decir(c.getSource(), "Ylva " + Ylva.sitio().toShortString() + (Morvain.hecho(srv, "ylva") ? " (puesta)" : "")
+                            + ", el farol de Brann " + Ylva.farolArena().toShortString() + (Morvain.hecho(srv, "farol_brann") ? " (puesto)" : "")
+                            + (com.darkcraft.morvain.Costillar.enPaz(srv) ? " (Brann ha caido)" : " (Brann sigue en pie)")
+                            + ", en el muelle " + Ylva.farolMuelle().toShortString() + (Morvain.hecho(srv, "farol_muelle") ? " (puesto)" : ""));
+                })
+                .then(Commands.literal("ir").executes(c -> {
+                    ServerPlayer sp = c.getSource().getPlayerOrException();
+                    ServerLevel m = Morvain.nivel(sp.server);
+                    if (m == null) return 0;
+                    llevarYlva(sp, m, false);
+                    return decir(c.getSource(), resumenYlva(sp));
+                }))
+                .then(Commands.literal("farol").executes(c -> {
+                    ServerPlayer sp = c.getSource().getPlayerOrException();
+                    ServerLevel m = Morvain.nivel(sp.server);
+                    if (m == null) return 0;
+                    llevarYlva(sp, m, true);
+                    return decir(c.getSource(), resumenYlva(sp));
+                }))
+                .then(Commands.literal("poner").executes(c -> {
+                    ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    if (Ylva.buscarYlva(m) == null) Ylva.ponerYlva(m);
+                    if (Ylva.buscarFarol(m, 0) == null) Ylva.ponerFarol(m, 0);
+                    if (Ylva.buscarFarol(m, 1) == null) Ylva.ponerFarol(m, 1);
+                    return decir(c.getSource(), "Ylva y los dos faroles de Brann puestos");
+                }))
+                .then(Commands.literal("olvidar").executes(c -> {
+                    ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    Ylva.olvidar(m);
+                    return decir(c.getSource(), "Ylva y los faroles quitados");
+                }));
+    }
+
+    /**
+     * Lleva al jugador a Morvain: delante de Ylva (en el espigon, dos bloques al este y uno al sur, mirandola) o a la arena del Costillar,
+     * delante del farol de Brann (dos bloques al sur, mirandolo).
+     */
+    public static void llevarYlva(ServerPlayer sp, ServerLevel m, boolean farol) {
+        BlockPos a, de;
+        if (farol) {
+            BlockPos f = Ylva.farolArena();
+            m.getChunk(f.getX() >> 4, f.getZ() >> 4);
+            int y = m.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, f.getX(), f.getZ() + 2);
+            de = new BlockPos(f.getX(), y, f.getZ() + 2);
+            a = f;
+        } else {
+            BlockPos s = Ylva.sitio();
+            m.getChunk(s.getX() >> 4, s.getZ() >> 4);
+            de = new BlockPos(s.getX() + 2, s.getY(), s.getZ() + 1);
+            a = s.above();
+        }
+        double dx = a.getX() + 0.5 - (de.getX() + 0.5), dz = a.getZ() + 0.5 - (de.getZ() + 0.5);
+        double dy = a.getY() + 0.3 - (de.getY() + 1.62);
+        float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz)), pitch = (float) -Math.toDegrees(Math.atan2(dy, Math.hypot(dx, dz)));
+        sp.teleportTo(m, de.getX() + 0.5, de.getY(), de.getZ() + 0.5, yaw, pitch);
     }
 
     /** /darkcraft hedda [ir | tam | poner | olvidar] (sin mas: donde estan Hedda y Tam). */
