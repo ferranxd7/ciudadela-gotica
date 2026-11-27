@@ -10279,5 +10279,96 @@
     ]
    }
   }
+ },
+ "sfx_armaduras": {
+  "flow": "HcCgofcQ0l53Gsm2ZI50",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7ai: ponerse una pieza de armadura (placas, malla, cuero y pieles, tela). Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "armadura_placas": {
+    "prompt": "Putting on heavy steel plate armor: metal plates clanking and sliding against each other, a leather strap pulled tight, then one final heavy armored shoulder clank. Dark fantasy film foley, close and dry, about 2 seconds.",
+    "sesiones": [
+     "gjGDEfUocqR3mxNFn5oy",
+     "riqNKY5spEJzADrxhCc0",
+     "ZabWyOuDQsioinAVuIme",
+     "7GHAFcTlARzdonmv7DUh"
+    ],
+    "generaciones": [
+     "v1jpdekx8QJc7XLMJzS2",
+     "F2sL0Q7row1k5okbzf8D",
+     "BP1MiyrYEvbmbxoqMZWP",
+     "IoPdHQ3rf2ygM6g3KNpq"
+    ],
+    "duraciones": [
+     2.0,
+     2.0,
+     2.0,
+     2.0
+    ]
+   },
+   "armadura_malla": {
+    "prompt": "A chainmail hauberk being pulled on and settling over a padded gambeson: rattling metal rings, cloth rustle and a small buckle clink. Dark fantasy film foley, close and dry, about 1.5 seconds.",
+    "sesiones": [
+     "FKrfbiwppuSIHPC9EiA4",
+     "Pqpk3XC912qBLJ9azc4p",
+     "ezWihvGo5e5JM47ZH52j",
+     "T8WqLcJKMcKl5x2vJxeA"
+    ],
+    "generaciones": [
+     "NJVIiYygCLsstvi5p5un",
+     "rv4HlaBdEpqIjHZPnEhH",
+     "qF1TK8Y5Ci0effQxDBq4",
+     "K1YiAAcjcLMpV1RyB12y"
+    ],
+    "duraciones": [
+     1.48,
+     1.48,
+     1.48,
+     1.48
+    ]
+   },
+   "armadura_cuero": {
+    "prompt": "Putting on rough leather and fur armor: creaking thick leather, straps cinched tight, a soft fur rustle and a small iron buckle snapping shut. Dark fantasy film foley, close and dry, about 1.5 seconds.",
+    "sesiones": [
+     "1N0xqp74GLSgMCWZU8aj",
+     "EIH5SaibTxCwFSvJqf1D",
+     "YKB2EBhSZ9KxwHurpHgq",
+     "LtI2a033ZZfyOyVctKES"
+    ],
+    "generaciones": [
+     "amTnxwAlvbhsSPz3CksN",
+     "h3Nk2orQ2GDe6B7yYAHW",
+     "vdK8rFtGTEu4tnU6AwZs",
+     "NihoAKtmE9d1zz1jBmrR"
+    ],
+    "duraciones": [
+     1.48,
+     1.48,
+     1.48,
+     1.48
+    ]
+   },
+   "armadura_tela": {
+    "prompt": "A heavy wool robe being draped over the shoulders: a deep fabric swish, thick cloth settling with a soft thump, and a faint jingle of small beads. Dark fantasy film foley, close and dry, about 1.5 seconds.",
+    "sesiones": [
+     "aKORhoEb6xbXLPnRCASP",
+     "jtC2kaNlhrVMIx3ZmRyK",
+     "buwnheap9ObDnT9I5iVd",
+     "6LDODuMuxbbbvLIhZLpl"
+    ],
+    "generaciones": [
+     "ENyeR4C19fS69KVniwBk",
+     "FOOLrLxruNGmUNDA8iTj",
+     "MU6diWSU800rGLB5MPsj",
+     "J7Qwx1tZE09Ryc4WtldZ"
+    ],
+    "duraciones": [
+     1.48,
+     1.48,
+     1.48,
+     1.48
+    ]
+   }
+  }
  }
 }
