@@ -6361,5 +6361,300 @@
     ]
    }
   }
+ },
+ "gigantes": {
+  "flow": "MO9WC12B0DMR0NNuRERt",
+  "voz": "bFrjFL4nlpeYNwNRhXxq",
+  "nombre_voz": "Mossbeard | The God of the Wild",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7w: los gigantes errantes de Morvain (1-3 Ogmund, el de la Campana; 4-6 Ulfgar, el de las Costillas; 7-9 Haldor, el de la Columna). Tomas a y b de cada frase como gigante/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[slow, deep, sorrowful] Little one... you should not be here. [sighs] The bell... rings for you.",
+    "sesiones": [
+     "dk5WOyVEMvWVntvyW5WF",
+     "ak8jDPVPi1hRQp7zpLSE"
+    ],
+    "generaciones": [
+     "lTRo1PafCOiXpgfBk9JJ",
+     "x7EHMsGvjyxPXHoCg7nN"
+    ]
+   },
+   "2": {
+    "texto": "[groaning, pained] Every toll... is a name... [angry rumble] a name I could not save!",
+    "sesiones": [
+     "YymVefKttyEXY73wK3N1",
+     "LnYCm1dnHqdTuUsXFoyC"
+    ],
+    "generaciones": [
+     "p9pa0Ru5UptQD0INvfTc",
+     "uU8znHgDxBMefAJeMexA"
+    ]
+   },
+   "3": {
+    "texto": "[weak, dying, slow] Ring it... for me, little one. [breathes] Ring it... once.",
+    "sesiones": [
+     "R85zQc0RWZIZxVSkcNwz",
+     "wxuWW78jpCTgEtZMf92p"
+    ],
+    "generaciones": [
+     "x5APJhrt6J2AqlNw3vTm",
+     "lldBcfiI0HvBK5ZQOXDk"
+    ]
+   },
+   "4": {
+    "texto": "[slow, deep, mournful] These bones... were my brothers. [low rumble] And you... walk on them.",
+    "sesiones": [
+     "PWUJgUd6U04Pcl6X1tCV",
+     "yxTjrSQg8XofBnnT58YF"
+    ],
+    "generaciones": [
+     "eHmYR5iojwKeJPh0Rhej",
+     "nLjjYipBadESc50EmdCn"
+    ]
+   },
+   "5": {
+    "texto": "[angry, roaring] The Shadow took them all... [shouting] You will not take the last!",
+    "sesiones": [
+     "IYFyHIAWLRAfOAv69nre",
+     "PaVfEP7lkmmt8Mw6PaOq"
+    ],
+    "generaciones": [
+     "4pqxxQXRNDVyGLoAqxZj",
+     "7WoYULLXmy3Nw8XOFjvD"
+    ]
+   },
+   "6": {
+    "texto": "[weak, peaceful, dying] Lay me... with them. [sighs] By the sea... by the sea.",
+    "sesiones": [
+     "VWvUustm6LAGmWnon8SM",
+     "hsfaqiTKSg486lbkM0xV"
+    ],
+    "generaciones": [
+     "7QriVsIN11edGZsRSDX6",
+     "nKBIaL7qlmRW2RNn3Eno"
+    ]
+   },
+   "7": {
+    "texto": "[deep, slow, proud] I raised these walls... stone by stone. [heavy breath] Nothing... comes in.",
+    "sesiones": [
+     "l7LmljR5S8D0VV79Zve4",
+     "xbKChQNiksVAoqWfSyHV"
+    ],
+    "generaciones": [
+     "qxCTQrA6DOAIXdYnDSlt",
+     "psniutx73czNSTDZRNuC"
+    ]
+   },
+   "8": {
+    "texto": "[roaring, furious] The king is gone! The city is gone! [shouting] But the stone... REMEMBERS!",
+    "sesiones": [
+     "9tBfjRhMROeSIpkJ26Hj",
+     "0yhegyzHB8QqFhKdMs77"
+    ],
+    "generaciones": [
+     "GcNIp2gPOuCviJ4UBES0",
+     "wBlASlhOpP7EV70pjfU7"
+    ]
+   },
+   "9": {
+    "texto": "[slow, fading, gentle] Build... something better... little one.",
+    "sesiones": [
+     "cNc7O4SF15WzqgWRYeGK",
+     "0JILnLjCMMffSUt35fbx"
+    ],
+    "generaciones": [
+     "78QTkH78iMK6Mdx6buA2",
+     "bS5wDrThkY6QGRRLjzGq"
+    ]
+   }
+  }
+ },
+ "sfx_gigantes": {
+  "flow": "lu5d15B0nhsALspXT3Bi",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7w: los gigantes errantes (el paso, el rugido, el mazazo, el barrido, el pisoton, la patada, arrancar la roca y su golpe, dolor, muerte, la campana de Ogmund y los grilletes). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "gigante_paso": {
+    "prompt": "A colossal giant's single footstep on hard dry earth: one deep heavy thud that shakes the ground, a low sub-bass rumble and a little falling dust and pebbles, epic dark fantasy, cinematic, 1.5 seconds",
+    "sesiones": [
+     "UAO2VMGh9jxRj5Klvja4",
+     "YGwksO32rSMhGr4rmU5I",
+     "EdkRqaCxUS0V2oTvxXr2",
+     "jA0sK8fcpITiMak5x3G4"
+    ],
+    "generaciones": [
+     "Lq8PDum0TnvEaP60gj9x",
+     "BDktwwRaumlnorml25as",
+     "qexm6Q9goxPH3d2IggSS",
+     "Rmng5tdeg99uTGyQC9eJ"
+    ]
+   },
+   "gigante_rugido": {
+    "prompt": "The roar of an enormous ancient sorrowful giant: a slow, deep, guttural bellow from a huge chest, with a rumbling tail that echoes over open plains, dark fantasy creature, cinematic, 3 seconds",
+    "sesiones": [
+     "pWJIlC5M7sLsNvbQDbeV",
+     "AGNWe0IsmkmSQAl26Fgd",
+     "AwBxvHUjm8htj5KPcSQK",
+     "RcE8BsI96tIjhnYwfNEj"
+    ],
+    "generaciones": [
+     "utCsVvbCsfcGxAPor8yC",
+     "WgbQlx067mFueKzNJRum",
+     "x8gU9QEQZSH9QS6MRlub",
+     "oYxaAEB1hZztUMIo1ByM"
+    ]
+   },
+   "gigante_mazazo": {
+    "prompt": "A gigantic heavy club slammed down into the ground by a giant: a massive crushing impact, earth cracking open, rocks flying and a deep booming shockwave, epic dark fantasy boss, cinematic, 2.5 seconds",
+    "sesiones": [
+     "zGNgNGF8isjZUQc1NbvV",
+     "Xxiv2iAa5uyUwjcjxx1a",
+     "hGKRTaGT73d0UJ8TS4aR",
+     "R4NcOlAX3CBqfawDW5Vo"
+    ],
+    "generaciones": [
+     "t9ZCeIdASg05tncvZOZt",
+     "v4uhlpY06ZgF54CP8xlH",
+     "OO6UtrfOdmp92ToAKZm4",
+     "L91GWybmFBd09vVz7N5M"
+    ]
+   },
+   "gigante_barrido": {
+    "prompt": "A giant swings an enormous heavy club sideways just above the ground: a long, deep, powerful whoosh with wind turbulence, then dirt and gravel swept along the ground, dark fantasy, 2 seconds",
+    "sesiones": [
+     "PNj23ZtCgSpht1JAEDFV",
+     "9n73eH6YjTs6f3LXNzjc",
+     "7QJwq8zSgrECNl4qWoFa",
+     "B4Vhd6ccTk3YyaPthKye"
+    ],
+    "generaciones": [
+     "kSqZRhaHaD4VzlqhHuSc",
+     "mNJMXf2FupmVk3p2mayi",
+     "FRDjqMAlfrtugasx3TVZ",
+     "2SxnZB9vekzbrQ3Zeg7h"
+    ]
+   },
+   "gigante_pisoton": {
+    "prompt": "A giant raises his foot high and stamps the ground with full force: a huge thunderous stomp, the ground shaking and cracking, a low frequency boom and rolling rumble, epic, 2 seconds",
+    "sesiones": [
+     "1uMflEXqaEc0MAw0bvWo",
+     "Gia5s41ME99EFTiw6ZB7",
+     "hz2JaGmQXh3haZeEOZTW",
+     "ncHm2LggxPucobZQaJOT"
+    ],
+    "generaciones": [
+     "j8GOIf9gLMHxM9IQR4yk",
+     "mlBu7sShPwOWG5c8ehZA",
+     "ebaEUqMuR8FI8s8KZLz2",
+     "Eh721Lo3648HZ2zLAVEy"
+    ]
+   },
+   "gigante_patada": {
+    "prompt": "A giant kicks: a heavy enormous leg swinging through the air with a deep whoosh, then a dull powerful thump of the impact, dark fantasy, 1.2 seconds",
+    "sesiones": [
+     "3EwUEpsJNXsgPG6wgI4V",
+     "b0p032cbTpW15bH4hsxh",
+     "8FeE0UGDL0zShRZHsHqb",
+     "erq87iA8WXPn2kExgxEk"
+    ],
+    "generaciones": [
+     "BXvDuA8HOcRsilqMsd3B",
+     "AyOxSk5vQigiAZ2vkMDo",
+     "1DUWVEboiZrsmVQUZVmK",
+     "L5Lcbnqt5Xzn9XPlzjKv"
+    ]
+   },
+   "gigante_arranca": {
+    "prompt": "A giant tears a huge boulder out of the earth with his bare hands: rock cracking and grinding, soil and dead roots ripping, stones falling, a deep strained grunt, dark fantasy, 2.5 seconds",
+    "sesiones": [
+     "0uCIHn5jKnAXHqBarMGU",
+     "3y7IhpHAzfxGAxCsFEZr",
+     "k0KEEILO0V5JIq1jHPtH",
+     "34MOat4uBVqQXMRxGyuN"
+    ],
+    "generaciones": [
+     "0BqJY8bAcgAjlW4NlLBk",
+     "879J2KN5VHK3kbaorr8Z",
+     "zL7SWVWtY4piKJcclIaP",
+     "KA0iYpYT1o8jgGSRqAdG"
+    ]
+   },
+   "gigante_roca": {
+    "prompt": "A huge boulder thrown by a giant crashes into the ground: an explosive rock impact, stone shattering into pieces, gravel raining down and a deep boom, cinematic, 2 seconds",
+    "sesiones": [
+     "jZ9kyCKGJJApYJBXEepq",
+     "CLD35OiNeXFyfc5xCWx0",
+     "DgLuqsNhKhTNxlXfITkq",
+     "j4YuaLXjJhCh4CbrxGJ4"
+    ],
+    "generaciones": [
+     "74CCeW5zHt00RMfvTaRU",
+     "08jYqBNmjS4ghNbpgucM",
+     "hm0fV9PF3sz4k6U4L3re",
+     "z7aEwkPK6429L7ce9qt4"
+    ]
+   },
+   "gigante_dolor": {
+    "prompt": "An enormous giant grunts in pain: a short, deep, rumbling groan from a huge chest, dark fantasy creature, 1.2 seconds",
+    "sesiones": [
+     "LVJsI5Fud6uShIUxwikC",
+     "iCGj9LpUHZqL6LS42SjN",
+     "G5RDtHdkwxhjxwjHx2Qf",
+     "vA5dbp1XgwlK96NZS60V"
+    ],
+    "generaciones": [
+     "l0Dp68a5IHUXWEMQCl6E",
+     "Ly9WR4apgZ6jJDKgdsPg",
+     "1euRYkoOwYJWdoxKFWoa",
+     "PhQ0WEpAoVMLX7OvZXHi"
+    ]
+   },
+   "gigante_muerte": {
+    "prompt": "An enormous giant collapses and dies: a long falling exhausted groan, then a gigantic body crashing face down onto the earth with a deep earth-shaking thud, rumble and settling dust and debris, cinematic, 5 seconds",
+    "sesiones": [
+     "VzukHNADS1kBysxA47pY",
+     "uxE0MLGIsz4aa5zdeRJI",
+     "q2jiplmWts8cPlzKHmaP",
+     "9Yjl24TxHxqJvSsjeRtg"
+    ],
+    "generaciones": [
+     "FsxIUSIK0lvWl3dn8dJZ",
+     "6Vn7Vtlaa4IeopZd8zpf",
+     "GBSRmUwBdUNJA8zrqUfN",
+     "jiLyhEa9aiupL4fRZOLL"
+    ]
+   },
+   "gigante_campana": {
+    "prompt": "A huge old cracked bronze church bell swung once and tolling: a single deep, dissonant, mournful bong with a long shimmering decay, dark fantasy, 4 seconds",
+    "sesiones": [
+     "9Qq0H7s4hjdGwLBKdr2h",
+     "o6jrFJWODRkI7mMdNKCg",
+     "adYclDszgZH3pLB79ng1",
+     "oBf5fhDXnr99fQeRm3ww"
+    ],
+    "generaciones": [
+     "z8B4reZkWD69uDulDWzh",
+     "58HtM6zMP3dOTQCTisiQ",
+     "wBkiRzzIMXE9geARCJZw",
+     "FAQPGW2xWWl7eI3fMubT"
+    ]
+   },
+   "gigante_cadena": {
+    "prompt": "Heavy iron shackles and broken thick chain links clanking and rattling as an enormous giant takes a slow step, metallic rattles and a heavy drag, 2 seconds",
+    "sesiones": [
+     "EKIRcQLigqXVEaaS4GVD",
+     "3WjHAli8i9YqIEICuhcd",
+     "p8rzc9aMQXihE3Y46GKK",
+     "wGOwkdnUewueMvQGFkdh"
+    ],
+    "generaciones": [
+     "zCMA0Kjn6jUGW4I35sQb",
+     "8zBFVCvteSmUT4rNJXAB",
+     "hno6hZVM6yH1SRS1y2lc",
+     "nMb2pYHOC4suJmZnGV6V"
+    ]
+   }
+  }
  }
 }
