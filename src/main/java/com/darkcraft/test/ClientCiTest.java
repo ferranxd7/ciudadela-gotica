@@ -9592,7 +9592,11 @@ public final class ClientCiTest {
             });
         });
         t += 4;
-        atTicks(t, "El cerco: la puerta entre sus torres", m -> server(m, sp -> irMirando(sp, CX + 9.5, PISO + 4, CZ + 51.5, CX, PISO + 5, CZ + 34, true)));
+        // (fuera de la muralla la ladera sube: la camara, por encima de lo que haya; en build-170 quedo dentro de la ladera y salio negra)
+        atTicks(t, "El cerco: la puerta entre sus torres", m -> server(m, sp -> {
+            int y = Math.max(PISO + 4, sp.serverLevel().getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, CX + 9, CZ + 51) + 3);
+            irMirando(sp, CX + 9.5, y, CZ + 51.5, CX, PISO + 5, CZ + 34, true);
+        }));
         t += 60;
         atTicks(t, "captura", m -> shot(m, "cliente_mv400_cerco_puerta"));
         t += 10;
@@ -9653,6 +9657,8 @@ public final class ClientCiTest {
                 ServerLevel lvl = sp.serverLevel();
                 quitarMarcados(lvl);
                 aPelear(sp, true);
+                // (en creativo no le toma por presa: quieto, se cubre; en build-170 estaba a medio tajo y el golpe le entro entero)
+                sp.setGameMode(GameType.CREATIVE);
                 MARCADOS[0] = marcadoNuevo(lvl, C, ex, PISO, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
                 irMirando(sp, ex, PISO, ez + 2.4, ex, PISO + 1.4, ez, false);
                 verDesdeServidor = new Vec3(ex + 3.8, PISO + 2.2, ez + 2.4);
