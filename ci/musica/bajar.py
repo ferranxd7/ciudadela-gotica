@@ -181,6 +181,10 @@ def main():
         fh.write(texto)
     with open(os.path.join(base, "musica.json"), "w", encoding="utf-8") as fh:
         json.dump(info, fh, ensure_ascii=False)
+    # los creditos del final (parte 7ad, client/ui/CreditosScreen): cada pista con su autor y su licencia, en orden
+    lista = [{"titulo": p["titulo"], "autor": p["autor"], "licencia": p["licencia"]} for p in pistas]
+    with open(os.path.join(base, "creditos_musica.json"), "w", encoding="utf-8") as fh:
+        json.dump(lista, fh, ensure_ascii=False)
 
 
 if __name__ == "__main__":

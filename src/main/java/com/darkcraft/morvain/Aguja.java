@@ -366,6 +366,9 @@ public final class Aguja {
         }
         OYERON.clear();
         DarkCraftMod.LOGGER.info("[DarkCraft] La Sombra sin Nombre ha caido ({}): el cielo rojo se apaga", final_ == 2 ? "le tomaron el corazon" : "le golpearon el corazon");
+        // el final (parte 7ad): la cinematica para los de la sala, el cielo de Morvain para todos
+        java.util.UUID u = s.quienEligio();
+        Epilogo.empezar(m, s.position(), final_ == 2 ? 2 : 1, u == null ? null : m.getServer().getPlayerList().getPlayer(u));
     }
 
     // ------------------------------------------------------------------ para las pruebas y los comandos
@@ -377,6 +380,8 @@ public final class Aguja {
         d.quitar(FINAL_ALBA);
         d.quitar(FINAL_SOMBRA);
         OYERON.clear();
+        // (el cielo de Morvain vuelve a ser el de antes del final)
+        Epilogo.enviarATodos(m.getServer(), -1);
         Sombra s = sombra();
         if (s != null) s.discard();
         Puestos.marcar(m.getServer(), MorvainEnemigos.AGUJA, Homenaje.SOMBRA, false);

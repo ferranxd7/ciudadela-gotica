@@ -19,7 +19,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 214
+    timeout-minutes: 218
     steps:
       - uses: actions/checkout@v4
 
@@ -135,7 +135,7 @@ jobs:
           key: pmc-${{ env.FORGE }}-v1
 
       - name: Prueba del cliente (capturas y sonido grabado)
-        timeout-minutes: 166
+        timeout-minutes: 170
         run: |
           sudo apt-get install -y -qq xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils python3-numpy python3-pil python3-venv > /dev/null 2>&1 || true
           # el juego de verdad con el jar de la release (DH, Oculus y Embeddium dentro); si no entra, en desarrollo

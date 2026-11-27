@@ -31,6 +31,9 @@ public final class ClientSantuario {
     private static int rumor;
     private static final DustColorTransitionOptions MOTA = new DustColorTransitionOptions(new Vector3f(0.72f, 0.93f, 1.0f),
             new Vector3f(0.12f, 0.3f, 0.85f), 0.7f);
+    /** Las motas de los fuegos frios (despues del final de la nueva Sombra, parte 7ad): blancas que se vuelven grises. */
+    private static final DustColorTransitionOptions MOTA_FRIA = new DustColorTransitionOptions(new Vector3f(0.92f, 0.95f, 1.0f),
+            new Vector3f(0.55f, 0.58f, 0.64f), 0.7f);
 
     static void olvidar() {
         aMano = null;
@@ -53,9 +56,14 @@ public final class ClientSantuario {
             if (r.nextInt(3) == 0)
                 lvl.addParticle(ParticleTypes.SOUL_FIRE_FLAME, x + (r.nextDouble() - 0.5) * 0.5, y + 0.1 + r.nextDouble() * 0.5,
                         z + (r.nextDouble() - 0.5) * 0.5, 0, 0.012 + r.nextDouble() * 0.02, 0);
+            boolean frio = com.darkcraft.client.morvain.CieloFinal.frio();
             if (r.nextInt(6) == 0)
-                lvl.addParticle(MOTA, x + (r.nextDouble() - 0.5) * 0.7, y + 0.5 + r.nextDouble() * 0.9, z + (r.nextDouble() - 0.5) * 0.7,
+                lvl.addParticle(frio ? MOTA_FRIA : MOTA, x + (r.nextDouble() - 0.5) * 0.7, y + 0.5 + r.nextDouble() * 0.9, z + (r.nextDouble() - 0.5) * 0.7,
                         (r.nextDouble() - 0.5) * 0.02, 0.03 + r.nextDouble() * 0.03, (r.nextDouble() - 0.5) * 0.02);
+            // los fuegos saben lo que hiciste: arden frios (copos que suben de la llama)
+            if (frio && r.nextInt(3) == 0)
+                lvl.addParticle(ParticleTypes.SNOWFLAKE, x + (r.nextDouble() - 0.5) * 0.6, y + 0.2 + r.nextDouble() * 0.6, z + (r.nextDouble() - 0.5) * 0.6,
+                        (r.nextDouble() - 0.5) * 0.02, 0.02 + r.nextDouble() * 0.03, (r.nextDouble() - 0.5) * 0.02);
             double d = mc.player.distanceToSqr(x, y, z);
             if (d < mejor) {
                 mejor = d;

@@ -113,7 +113,9 @@ public final class Dialogos {
      * vencer a Ser Gavran, una vez cada una) → menu. En Morvain (parte 7b), la primera vez: 11 → 12 (al acabarla da el
      * silbato del corcel) → 13 → menu; si se ha perdido el silbato, 12 → 13 otra vez; las demas, 14. En la capilla negra de la
      * torre del homenaje (parte 7ab), junto a la Ultima Llama: la primera vez 15 → 16 → menu; despues 16 (con la reina ya caida,
-     * 14). El menu: la Sombra (4), por que sigo vivo (5), hacerme mas fuerte (6, y se abre subir de nivel) y despedirse (7).
+     * 14). El menu: la Sombra (4), por que sigo vivo (5), hacerme mas fuerte (6, y se abre subir de nivel) y despedirse (7). Despues
+     * del final (parte 7ad), su epilogo: el alba 17 → 18 → 19 → 20; la nueva Sombra 21 → 22 → 23 (la 17 y la 21 las dice en la
+     * cinematica del final: quien la vio empieza por la 18 o la 22).
      */
     public static final Personaje GUIA = new Hacer("guia")
             .frase(1, 2).frase(2, 3).frase(3, MENU)
@@ -122,6 +124,8 @@ public final class Dialogos {
             .frase(8, MENU).frase(9, MENU).frase(10, MENU)
             .frase(11, 12).frase(12, 13, Accion.SILBATO).frase(13, MENU).frase(14, MENU)
             .frase(15, 16).frase(16, MENU)
+            .frase(17, 18).frase(18, 19).frase(19, 20).frase(20, FIN)
+            .frase(21, 22).frase(22, 23).frase(23, FIN)
             .menu(r("guia", "sombra", 4), r("guia", "vivo", 5), r("guia", "fuerte", 6), r("guia", "adios", 7))
             .hecho();
 

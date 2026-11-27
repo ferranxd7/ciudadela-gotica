@@ -26,7 +26,7 @@ public final class Conversaciones {
     public static final double ALCANCE = 4.5;
 
     // marcas de lo hablado con la guia (8: ya hablo con ella en Morvain y le dio el silbato)
-    private static final int GUIA_CONOCIDA = 1, GUIA_REY = 2, GUIA_GAVRAN = 4, GUIA_MORVAIN = 8, GUIA_CAPILLA = 16;
+    private static final int GUIA_CONOCIDA = 1, GUIA_REY = 2, GUIA_GAVRAN = 4, GUIA_MORVAIN = 8, GUIA_CAPILLA = 16, GUIA_EPILOGO = 32;
     // con los demas: ya se presento
     private static final int CONOCIDO = 1;
 
@@ -39,7 +39,8 @@ public final class Conversaciones {
         if (!sp.isAlive() || sp.isSpectator() || sp.distanceToSqr(p) > (ALCANCE + 1) * (ALCANCE + 1)) return;
         Dialogos.Personaje d = Dialogos.de(p.dialogo());
         if (d == null) return;
-        if (!sp.isCreative() && Rol.enCombate(sp) && !(p instanceof com.darkcraft.morvain.Corazon)) {
+        if (!sp.isCreative() && Rol.enCombate(sp) && !(p instanceof com.darkcraft.morvain.Corazon)
+                && !(p instanceof Guia && com.darkcraft.morvain.Epilogo.pendiente(sp))) {
             Net.to(sp, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.dialogo.combate", 0));
             return;
         }
@@ -58,11 +59,20 @@ public final class Conversaciones {
     /**
      * Por donde empieza la guia: la primera vez se presenta; luego saluda (y una vez, habla del Rey y de Gavran). En Morvain,
      * la primera vez le da el silbato del corcel (y otra vez si lo ha perdido) y despues saluda a su manera. En la capilla de la
-     * torre del homenaje (parte 7ab), la primera vez 15 (y 16); despues 16, o 14 con la reina ya caida.
+     * torre del homenaje (parte 7ab), la primera vez 15 (y 16); despues 16, o 14 con la reina ya caida. Despues del final (parte 7ad),
+     * una vez, su epilogo: el alba 18-19-20, la nueva Sombra 22-23 (quien no vio la cinematica, desde la 17 o la 21).
      */
     private static int inicioGuia(ServerPlayer sp, Guia guia) {
         int m = Ficha.dialogo(sp, "guia");
         int nodo;
+        // despues del final (parte 7ad), una vez: su epilogo (quien vio la cinematica ya oyo la 17 o la 21 en ella)
+        String fin = com.darkcraft.morvain.Aguja.final_(sp.server);
+        boolean vio = com.darkcraft.morvain.Epilogo.pendiente(sp);
+        if (fin != null && ((m & GUIA_EPILOGO) == 0 || vio)) {
+            Ficha.dialogo(sp, "guia", m | GUIA_EPILOGO | GUIA_CONOCIDA);
+            com.darkcraft.morvain.Epilogo.alHablar(sp, fin);
+            return fin.equals("sombra") ? (vio ? 22 : 21) : (vio ? 18 : 17);
+        }
         boolean morvain = com.darkcraft.morvain.Morvain.es(sp.level());
         boolean capilla = morvain && com.darkcraft.morvain.Homenaje.enCapilla(guia.getX(), guia.getY() + 0.5, guia.getZ());
         if (capilla) {
@@ -140,5 +150,15 @@ public final class Conversaciones {
 
     public static void olvidar(ServerPlayer sp) {
         olvidar(sp, "guia");
+    }
+
+    /** Para la prueba: por donde empezaria Maelis con ese jugador (y lo apunta, como al hablar con ella). */
+    public static int nodoGuia(ServerPlayer sp, Guia g) {
+        return inicioGuia(sp, g);
+    }
+
+    /** Que Maelis le vuelva a decir su epilogo (parte 7ad). */
+    public static void olvidarEpilogo(ServerPlayer sp) {
+        Ficha.dialogo(sp, "guia", Ficha.dialogo(sp, "guia") & ~GUIA_EPILOGO);
     }
 }

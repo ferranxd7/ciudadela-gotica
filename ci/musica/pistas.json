@@ -323,5 +323,29 @@
     "aviso": "Music by cynicmusic (OpenGameArt, CC0)",
     "uso": "La Sombra sin Nombre, segunda mitad (cuando rompe la ultima cadena)",
     "lufs": -16
+  },
+  {
+    "id": "final_alba",
+    "pagina": "https://opengameart.org/content/new-sunrise",
+    "pagina2": "https://opengameart.org/node/69912",
+    "busca": "v2",
+    "titulo": "New Sunrise",
+    "autor": "nene",
+    "licencia": "CC0",
+    "aviso": "nene (opengameart.org)",
+    "uso": "El final del alba: la cinematica del final y los creditos",
+    "lufs": -16
+  },
+  {
+    "id": "final_sombra",
+    "pagina": "https://opengameart.org/content/fantasy-lament-for-a-warriors-soul",
+    "pagina2": "https://opengameart.org/comment/65956",
+    "busca": "reupload",
+    "titulo": "Fantasy: Lament for a Warrior's Soul",
+    "autor": "RandomMind",
+    "licencia": "CC0",
+    "aviso": "RandomMind (opengameart.org)",
+    "uso": "El final de la nueva Sombra: la cinematica del final y los creditos",
+    "lufs": -17
   }
 ]

@@ -7182,5 +7182,84 @@
         "stream": true
       }
     ]
+  },
+  "voz.guia.17": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_17",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.18": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_18",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.19": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_19",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.20": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_20",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.21": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_21",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.22": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_22",
+        "stream": true
+      }
+    ]
+  },
+  "voz.guia.23": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:guia/voz_23",
+        "stream": true
+      }
+    ]
+  },
+  "musica.final_alba": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/final_alba",
+        "stream": true
+      }
+    ]
+  },
+  "musica.final_sombra": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/final_sombra",
+        "stream": true
+      }
+    ]
   }
 }

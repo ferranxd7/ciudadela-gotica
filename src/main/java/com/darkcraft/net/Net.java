@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "23";
+    private static final String V = "24";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -165,6 +165,60 @@ public final class Net {
         // el Corazon de la Aguja (parte 7ac): poner la mano en la puerta
         CH.messageBuilder(PuertaAguja.class, id++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder((m, b) -> {}).decoder(b -> new PuertaAguja()).consumerMainThread(PuertaAguja::handle).add();
+        // el final (parte 7ad): como acabo (el cielo de Morvain, los fuegos) y el aviso de que se acabaron los creditos
+        CH.messageBuilder(Final.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Final::write).decoder(Final::read).consumerMainThread(Final::handle).add();
+        CH.messageBuilder(CreditosFin.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder((m, b) -> {}).decoder(b -> new CreditosFin()).consumerMainThread(CreditosFin::handle).add();
+        CH.messageBuilder(Creditos.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Creditos::write).decoder(Creditos::read).consumerMainThread(Creditos::handle).add();
+    }
+
+    // ------------------------------------------------------------------ el final (parte 7ad)
+
+    /**
+     * Como acabo la historia: {@code cual} 0 aun no, 1 el alba (se golpeo el corazon de la Sombra), 2 la nueva Sombra (se tomo); y
+     * desde que tick del mundo cambia el cielo de Morvain ({@code desde}; -1: ya cambiado del todo).
+     */
+    public record Final(int cual, long desde) {
+        void write(FriendlyByteBuf b) {
+            b.writeByte(cual);
+            b.writeLong(desde);
+        }
+
+        static Final read(FriendlyByteBuf b) {
+            return new Final(Math.max(0, Math.min(2, b.readByte())), b.readLong());
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.morvain.CieloFinal.recibir(cual, desde));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Que abra los creditos del final (1 el alba, 2 la nueva Sombra): el comando {@code /darkcraft final creditos}. */
+    public record Creditos(int cual) {
+        void write(FriendlyByteBuf b) {
+            b.writeByte(cual);
+        }
+
+        static Creditos read(FriendlyByteBuf b) {
+            return new Creditos(b.readByte() == 2 ? 2 : 1);
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.CreditosScreen.abrir(cual));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El cliente ha acabado de ver los creditos del final (o los ha saltado). */
+    public record CreditosFin() {
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) com.darkcraft.morvain.Epilogo.creditosFin(p);
+            ctx.get().setPacketHandled(true);
+        }
     }
 
     // ------------------------------------------------------------------ la cadena del sur (parte 7aa)

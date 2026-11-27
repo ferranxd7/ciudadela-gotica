@@ -173,7 +173,7 @@ public final class ClientMusic {
     }
 
     private static void tickZona(Minecraft mc) {
-        boolean quiere = enFortaleza && mc.player != null && (boss == null || boss.dying()) && (story == null || story.dying())
+        boolean quiere = enFortaleza && mc.player != null && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal()
                 && !ClientCine.active();
         if (quiere) {
             if (zona == null || zona.dying() || !mc.getSoundManager().isActive(zona) && zonaTicks > 40) {
@@ -222,7 +222,7 @@ public final class ClientMusic {
     private static void tickBruma(Minecraft mc) {
         if (mc.player == null || mc.level == null) enBruma = false;
         else if (mc.player.tickCount % 20 == 0) enBruma = mc.level.getBiome(mc.player.blockPosition()).is(com.darkcraft.world.PuebloFeature.BIOMA);
-        boolean quiere = enBruma && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        boolean quiere = enBruma && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
         if (quiere) {
             if (bruma == null || bruma.dying() || !mc.getSoundManager().isActive(bruma) && brumaTicks > 40) {
                 if (bruma != null && !bruma.dying()) mc.getSoundManager().stop(bruma);
@@ -253,7 +253,7 @@ public final class ClientMusic {
         else if (mc.player.tickCount % 20 == 3)
             enArboleda = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && com.darkcraft.morvain.Arboleda.dentro(mc.player.getX(), mc.player.getZ())
                     && mc.player.getY() < 160;
-        boolean quiere = enArboleda && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        boolean quiere = enArboleda && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
         if (quiere) {
             if (arboleda == null || arboleda.dying() || !mc.getSoundManager().isActive(arboleda) && arboledaTicks > 20) {
                 if (arboleda != null && !arboleda.dying()) mc.getSoundManager().stop(arboleda);
@@ -280,7 +280,7 @@ public final class ClientMusic {
         else if (mc.player.tickCount % 20 == 11)
             enPantano = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() < 120
                     && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.PANTANO;
-        boolean quiere = enPantano && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        boolean quiere = enPantano && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
         if (quiere) {
             if (pantano == null || pantano.dying() || !mc.getSoundManager().isActive(pantano) && pantanoTicks > 20) {
                 if (pantano != null && !pantano.dying()) mc.getSoundManager().stop(pantano);
@@ -307,7 +307,7 @@ public final class ClientMusic {
         else if (mc.player.tickCount % 20 == 13)
             enMontana = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() > 150
                     && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.MONTANAS;
-        boolean quiere = enMontana && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        boolean quiere = enMontana && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
         if (quiere) {
             if (montana == null || montana.dying() || !mc.getSoundManager().isActive(montana) && montanaTicks > 20) {
                 if (montana != null && !montana.dying()) mc.getSoundManager().stop(montana);
@@ -334,7 +334,7 @@ public final class ClientMusic {
         else if (mc.player.tickCount % 20 == 17)
             enCapital = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() < 170
                     && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.CAPITAL;
-        boolean quiere = enCapital && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        boolean quiere = enCapital && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
         if (quiere) {
             if (capital == null || capital.dying() || !mc.getSoundManager().isActive(capital) && capitalTicks > 20) {
                 if (capital != null && !capital.dying()) mc.getSoundManager().stop(capital);
@@ -361,7 +361,7 @@ public final class ClientMusic {
         else if (mc.player.tickCount % 20 == 13)
             enAcademia = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() > 200 && mc.player.getY() < 330
                     && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.ACADEMIA;
-        boolean quiere = enAcademia && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        boolean quiere = enAcademia && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
         if (quiere) {
             if (academia == null || academia.dying() || !mc.getSoundManager().isActive(academia) && academiaTicks > 20) {
                 if (academia != null && !academia.dying()) mc.getSoundManager().stop(academia);
@@ -391,7 +391,7 @@ public final class ClientMusic {
             // en el Costillar de la Ballena (parte 7r), su viento: el que silba entre los huesos
             enCostillar = enCosta && com.darkcraft.morvain.Costillar.distancia(mc.player.getX(), mc.player.getZ()) < 75;
         }
-        boolean quiere = enCosta && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        boolean quiere = enCosta && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
         // si cambia de uno a otro, el que sonaba se va despacio y entra el otro
         if (quiere && costa != null && !costa.dying() && costaEsCostillar != enCostillar) costa.kill(2.5f);
         if (quiere) {
@@ -424,7 +424,7 @@ public final class ClientMusic {
             // en el Altar Profanado (parte 7t), su aire: el viento por las vidrieras rotas, el goteo y un coro que no esta
             enAltar = enSinFe && com.darkcraft.morvain.Altar.distancia(mc.player.getX(), mc.player.getZ()) < 70;
         }
-        boolean quiere = enSinFe && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        boolean quiere = enSinFe && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
         // si cambia de uno a otro, el que sonaba se va despacio y entra el otro
         if (quiere && sinFe != null && !sinFe.dying() && sinFeEsAltar != enAltar) sinFe.kill(2.5f);
         if (quiere) {
@@ -466,7 +466,10 @@ public final class ClientMusic {
             enCrater = enCadena || enHomenaje || enAguja || morvain && y > 40 && y < 330
                     && com.darkcraft.morvain.Terreno.region(x, z) == com.darkcraft.morvain.Region.CENTRO;
         }
-        boolean quiere = enCrater && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        boolean quiere = enCrater && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying())
+                // (despues del final la sala de la aguja se queda en silencio: ya no late nada; y en la cinematica del final, nada)
+                && !(quiereCual == 3 && com.darkcraft.client.morvain.CieloFinal.cual() != 0)
+                && !(ClientCine.active() && com.darkcraft.cine.Desenlace.es(ClientCine.chapter()));
         // si cambia de uno a otro, el que sonaba se va despacio y entra el otro
         if (quiere && crater != null && !crater.dying() && craterCual != quiereCual) crater.kill(2.5f);
         if (quiere) {
@@ -537,6 +540,57 @@ public final class ClientMusic {
         Minecraft mc = Minecraft.getInstance();
         return arboleda == null ? "sin viento de la arboleda" : String.format("viento de la arboleda %.2f%s", arboleda.level(),
                 mc.getSoundManager().isActive(arboleda) ? "" : " (parado)");
+    }
+
+    // ------------------------------------------------------------------ el final (parte 7ad)
+
+    private static Track fin;
+    private static int finCual, finTicks;
+    /** El volumen de la musica del final. */
+    public static final float FINAL = 0.85f;
+
+    /**
+     * La musica del final: entra en la cinematica (cuando sale la isla de la ciudadela) y sigue en los creditos. 1 el alba ("New
+     * Sunrise"), 2 la nueva Sombra; 0 la apaga en esos segundos. Si ya suena la misma, nada. Mientras suena callan las demas.
+     */
+    public static void final_(int cual, float segundos) {
+        Minecraft mc = Minecraft.getInstance();
+        if (cual > 0) {
+            if (fin != null && !fin.dying() && finCual == cual && mc.getSoundManager().isActive(fin)) return;
+            if (fin != null && !fin.dying()) fin.kill(1.5f);
+            finCual = cual;
+            finTicks = 0;
+            fin = new Track(cual == 2 ? DarkCraftMod.MUSICA_FINAL_SOMBRA.get() : DarkCraftMod.MUSICA_FINAL_ALBA.get(), cual == 2 ? "final_sombra" : "final_alba", false);
+            mc.getSoundManager().play(fin);
+            fin.fadeTo(FINAL, segundos);
+            if (boss != null && !boss.dying()) {
+                boss.kill(2.0f);
+                bossPhase = 0;
+            }
+            if (story != null && !story.dying()) story.kill(2.0f);
+        } else if (fin != null && !fin.dying()) fin.kill(segundos);
+    }
+
+    /** La musica del final, a ese volumen en esos segundos (baja mientras habla Maelis en la cinematica). */
+    public static void finalNivel(float nivel, float segundos) {
+        if (fin != null && !fin.dying()) fin.fadeTo(nivel, segundos);
+    }
+
+    /** Los segundos que lleva sonando la musica del final (-1 si no suena). */
+    public static float finalSegundos() {
+        return fin == null || fin.dying() ? -1f : finTicks / 20f;
+    }
+
+    /** Si no suena la musica del final (las demas pueden sonar). */
+    static boolean sinFinal() {
+        return fin == null || fin.dying();
+    }
+
+    /** Para la prueba de la CI: si suena la musica del final. */
+    public static String final_() {
+        Minecraft mc = Minecraft.getInstance();
+        return fin == null ? "sin musica del final" : String.format(java.util.Locale.ROOT, "%s %.2f, %.1f s%s", fin.name, fin.level(), finTicks / 20f,
+                mc.getSoundManager().isActive(fin) ? "" : " (parada)");
     }
 
     // ------------------------------------------------------------------ la pantalla de titulo (parte 2f-2)
@@ -642,6 +696,11 @@ public final class ClientMusic {
         if (crater != null && !crater.dying()) any = true;
         tickTitulo(mc);
         if (titulo != null && !titulo.dying()) any = true;
+        if (fin != null) {
+            finTicks++;
+            if (!mc.getSoundManager().isActive(fin) && (fin.dying() || finTicks > 40)) fin = null;
+            else if (!fin.dying()) any = true;
+        }
         if (viaje != null) {
             if (!mc.getSoundManager().isActive(viaje) && viaje.dying()) viaje = null;
             else any = true;
@@ -666,7 +725,8 @@ public final class ClientMusic {
         if (costa != null) mc.getSoundManager().stop(costa);
         if (sinFe != null) mc.getSoundManager().stop(sinFe);
         if (crater != null) mc.getSoundManager().stop(crater);
-        story = boss = zona = bruma = viaje = arboleda = pantano = montana = capital = academia = costa = sinFe = crater = null;
+        if (fin != null) mc.getSoundManager().stop(fin);
+        story = boss = zona = bruma = viaje = arboleda = pantano = montana = capital = academia = costa = sinFe = crater = fin = null;
         enFortaleza = enBruma = enArboleda = enPantano = enMontana = enCapital = enAcademia = enCosta = enSinFe = enCrater = false;
         bossPhase = 0;
     }

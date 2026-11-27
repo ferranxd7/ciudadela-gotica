@@ -3525,6 +3525,62 @@ epilogo de Maelis con sus frases 17-23 ya montadas, los creditos y el cielo de M
   mirada (`mv583`), el grito (`mv584`), los caidos (`mv585`), rendida con el corazon (`mv586`), las respuestas (`mv587`), su ultima frase
   (`mv588`), se deshace (`mv589`), la sala vacia (`mv590`) y el bestiario (`mv591`). `LIMIT` 132 min (`lanzar.sh` 138, el paso 166, el trabajo 214).
 
+### Plan grande, parte 7ad: el final (la cinematica, los creditos, el epilogo de Maelis y el cielo de Morvain)
+
+La ultima de las partes del final (respuestas 57, 65 y 125 del plan). Cuando la Sombra sin Nombre se deshace (`Sombra.die` ->
+`Aguja.alMorir`, que ya apunta el final y apaga el cielo rojo) empieza **el final** (`morvain/Epilogo.empezar`):
+- **La cinematica del final** (`cine/Desenlace`: los tiempos y los planos, para servidor y cliente; cinematicas con guion **43** el alba
+  —se golpeo el corazon— y **44** la nueva Sombra —se tomo—; la ven los que estan a 64 de la Sombra, `Cinematics.playGuion`; 39 s; se
+  salta con ESPACIO). Cuatro planos con un corte en negro entre uno y otro (`P` / `Q`): 1) la sala de la aguja, de lado entre la Sombra
+  y quien eligio (dentro de la sala y lejos de los pilares, `dentro` 9,2): en el alba sube luz (motas de luz, `Guion.tick`) de donde se
+  deshace y la camara la sigue hacia arriba; en la otra acaba en quien tomo el corazon, con la oscuridad que le entra (tinta), dos
+  latidos y las brasas; 2) fuera, la aguja contra el ocaso (el sol se pone al oeste, detras de la aguja), subiendo y alejandose: ahi
+  **cambia el cielo de Morvain** (desde `CIELO` 8 s, en `FUNDIDO` 9 s); 3) la isla colgada de sus cadenas desde el sudeste: entra la
+  musica de los creditos (`MUSICA` 16,1 s) y **habla Maelis en off** (`VOZ` 17 s: su frase 17 en el alba, la 21 en la otra; voz
+  `voz.guia.N`, subtitulo `darkcraft.dialogo.guia.N` en la banda de abajo, la musica baja mientras); 4) por encima de todo: el alba mira
+  al horizonte y acaba en una luz calida (`LUZ` 33,6 s) que lo llena todo; la nueva Sombra mira abajo, a la ciudadela que ahora es suya,
+  girando. A negro desde `NEGRO` 36,9 s. Todo lo de cada final esta en `Guion.desenlace` (pasos, el aire de lo alto —`ambiente.cadena`—,
+  la musica y la voz), `negro`, `jugadores` (en la sala se ve a los jugadores), `brasas`, `bajoNegro` (la luz) y `subtitulos`.
+- **Los creditos** (`client/ui/CreditosScreen`): al acabar la cinematica sola o saltada (`ClientCine.creditos`; si la corta el servidor,
+  no: la musica se va). A pantalla completa sobre negro: "Dark Craft" en gotica a doble tamano, como acabo ("El alba" / "La nueva
+  Sombra") y una frase; quien lo hizo; las voces (cada personaje con su voz de ElevenLabs, `VOCES`); el narrador; **la musica** (la
+  lista que escribe la CI, `creditos_musica.json`, de `ci/musica/pistas.json`: titulo, autor y licencia de cada pista); los sonidos; lo
+  que va dentro (DH, Oculus, Embeddium, el shader); la letra; Forge; y al final "Gracias por jugar" con la ultima frase. Suben en lo que
+  le queda a la musica (70-170 s, con la duracion de `musica.json`); ESPACIO seis veces mas deprisa, ESC los acaba; al llegar al final
+  esperan unos segundos y se apagan. Con el alba, motas doradas que suben y un resplandor calido abajo; con la nueva Sombra, ceniza gris
+  que cae y frio arriba. Al cerrarse avisan al servidor (`Net.CreditosFin`). Mientras se mira la cinematica o los creditos no le pasa
+  nada al jugador (`Epilogo.VIENDO`, hasta 6 min).
+- **La musica del final** (`ClientMusic.final_`, entra en la cinematica y sigue en los creditos; mientras suena callan las demas:
+  `sinFinal()` en cada zona): el alba "New Sunrise" de nene (CC0, id `final_alba`, OpenGameArt node 69912, la version V2); la nueva
+  Sombra "Fantasy: Lament for a Warrior's Soul" de RandomMind (CC0, id `final_sombra`, la que se volvio a subir).
+- **El epilogo de Maelis**: al acabar los creditos, a quien vio la cinematica (`Ficha.dialogo(p, "epilogo")` 1) y esta en Morvain se le
+  lleva a la nave de la capilla de la torre del homenaje, a unos tres bloques de Maelis y mirandola (`Epilogo.sitioCapilla`); a los 30
+  ticks (`ESPERA_MAELIS`) habla ella sola (`Conversaciones.hablar`; si no estaba, se la sienta: `Epilogo.maelis`). `Conversaciones.
+  inicioGuia`: despues del final, una vez (marca `GUIA_EPILOGO` = 32), su epilogo: el alba **18 → 19 → 20** ("los fuegos se apagan...",
+  "tu marca se apaga...", "gracias... por no contestarle"), la nueva Sombra **22 → 23** ("su hambre despertara en ti...", "...tu siempre
+  esperas"); quien no vio la cinematica (un amigo en otro sitio) empieza por la 17 o la 21 la primera vez que hable con ella, este donde
+  este. Despues, lo de siempre. Logro `epilogo` ("Lo que queda") con su entrada del diario segun el final (`epilogo_alba` /
+  `epilogo_sombra`, `Espejo.logroHecho`). Voz de Maelis (la de siempre), frases 17-23 (tomas a; masters de la 7ac).
+- **El cielo de Morvain despues** (`client/morvain/CieloFinal`; el servidor lo manda con `Net.Final(cual, desde)` al acabar, al entrar
+  y al cambiar de dimension; `Epilogo.cual`): con el alba el ocaso dorado y rojo se vuelve un amanecer (velo azul palido arriba y rosado
+  en el horizonte —la caja sin profundidad de `AFTER_SKY`, como el cielo rojo—, la niebla melocoton clara, el resplandor del sol rosa y
+  dorado —`MorvainCliente.Efectos.getSunriseColor` -> `CieloFinal.ocaso`— y la luz del cielo mas viva —`adjustLightmapColors` ->
+  `luz`—); con la nueva Sombra, gris y frio (velo y niebla grises, sin resplandor, la luz sin color). Con shaders, el velo no se
+  dibuja. **Los fuegos arden frios** con la nueva Sombra, en todas partes: los santuarios echan copos de nieve y motas blancas
+  (`ClientSantuario`, `CieloFinal.frio`). `Aguja.reiniciar` quita el final y lo manda.
+- Comandos `/darkcraft final [alba | sombra | creditos | epilogo | olvidar | deshacer]` (`alba` / `sombra`: lo apunta, lleva a la sala de
+  la aguja y pone su cinematica, con sus creditos y Maelis; `creditos`: solo los creditos, `Net.Creditos`; `epilogo`: a la capilla y
+  habla Maelis; `olvidar`: que ese jugador lo vuelva a ver todo; `deshacer`: quita el final del mundo). `Net.V` = "24".
+- Pruebas: servidor, `desenlace()` (`Morvain, el final: ...` —por donde empieza Maelis en cada final, viendo o sin ver la cinematica, y
+  despues ya no; al acabar los creditos se le lleva a la capilla y Maelis habla a los 30 ticks con el epilogo— y `Morvain, el final, la
+  camara: ...` —la camara de los cuatro planos de las dos cinematicas no se mete en nada y en la sala se ve a la Sombra—). Cliente, en el
+  tramo `aguja()`: al golpear el corazon, la cinematica del alba (`cliente_mv589` la sala con la Sombra que se deshace, `mv600` la luz,
+  `mv601` y `mv602` la aguja con el cielo que cambia, `mv603` la isla con Maelis, `mv604` el horizonte, `mv605` la luz), los creditos
+  (`mv606` el titulo, `mv607` a la mitad, `mv608` "Gracias por jugar"), el epilogo en la capilla (`mv609..mv611`, frases 18-20) y el
+  cielo del alba (`mv612`); despues de la sala vacia y el bestiario, el final de la nueva Sombra con el comando (`mv613..mv616`, los
+  creditos `mv617..mv619`, el epilogo `mv620` y `mv621`, el cielo gris `mv622` y el fuego frio de la Ultima Llama `mv623`); al acabar,
+  todo como estaba. `LIMIT` 136 min (`lanzar.sh` 142, el paso 170, el trabajo 218).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

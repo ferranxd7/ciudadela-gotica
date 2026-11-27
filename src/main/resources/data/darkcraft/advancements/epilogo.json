@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:sombra",
+  "display": {
+    "icon": {
+      "item": "minecraft:soul_lantern"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.epilogo.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.epilogo.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}

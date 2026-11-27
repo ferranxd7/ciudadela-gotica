@@ -2,6 +2,7 @@ package com.darkcraft.client;
 
 import com.darkcraft.DarkCraftMod;
 import com.darkcraft.cine.BarcoVolador;
+import com.darkcraft.cine.Desenlace;
 import com.darkcraft.cine.Intro;
 import com.darkcraft.cine.Reparacion;
 import com.darkcraft.cine.Shot;
@@ -91,6 +92,12 @@ public final class Guion {
     private static boolean[] hecho = new boolean[0];
     /** Las frases de la Sombra de esta cinematica: {numero, segundo en que empieza}. */
     private static float[][] frases = new float[0][];
+    /** Las de Maelis (la del final, parte 7ad): {numero, segundo en que empieza}. */
+    private static float[][] frasesGuia = new float[0][];
+    /** El final que se esta viendo (0 si la cinematica no es la del final; 1 el alba, 2 la nueva Sombra) y su primer plano (la sala). */
+    private static int finalCual, ultimaGuia;
+    private static Shot primerPlano;
+    private static Sonido aireFinal;
     private static Sonido abismo, viento;
     private static int ultimaFrase;
 
@@ -117,11 +124,64 @@ public final class Guion {
         ultimoPlano = planos.isEmpty() ? null : planos.get(planos.size() - 1);
         pasos.clear();
         frases = new float[0][];
-        ultimaFrase = 0;
+        frasesGuia = new float[0][];
+        ultimaFrase = ultimaGuia = 0;
+        finalCual = 0;
+        primerPlano = planos.isEmpty() ? null : planos.get(0);
         if (capitulo == Intro.ID) intro();
         else if (capitulo == Reparacion.ID) reparacion();
         else if (Viaje.es(capitulo)) viaje(capitulo, datos);
+        else if (Desenlace.es(capitulo)) desenlace(capitulo);
         hecho = new boolean[pasos.size()];
+    }
+
+    /**
+     * El final (parte 7ad, {@link Desenlace}): con la nueva Sombra dos latidos en la sala (el corazon que se ha tomado); fuera, el aire
+     * de lo alto; al salir la isla entra la musica de los creditos ({@link ClientMusic#final_}, que sigue en ellos) y habla Maelis (la
+     * 17 o la 21, en off: la musica baja mientras).
+     */
+    private static void desenlace(int capitulo) {
+        finalCual = Desenlace.cual(capitulo);
+        int voz = Desenlace.voz(capitulo);
+        float dura = duraGuia(voz);
+        frasesGuia = new float[][]{{voz, Desenlace.VOZ}};
+        if (finalCual == 2) {
+            pasos.add(new Paso(0.7f, () -> suena(DarkCraftMod.SFX_INTRO_LATIDO.get(), 0.9f)));
+            pasos.add(new Paso(3.9f, () -> suena(DarkCraftMod.SFX_INTRO_LATIDO.get(), 1f)));
+        }
+        pasos.add(new Paso(Desenlace.P[1] - 0.3f, () -> {
+            aireFinal = suena(DarkCraftMod.AMBIENTE_CADENA.get(), 0.15f);
+            aireFinal.nivel(0.6f, 2.5f);
+        }));
+        pasos.add(new Paso(Desenlace.MUSICA, () -> ClientMusic.final_(finalCual, 4.5f)));
+        pasos.add(new Paso(Desenlace.VOZ - 0.5f, () -> {
+            ClientMusic.finalNivel(0.42f, 0.6f);
+            if (aireFinal != null) aireFinal.nivel(0.3f, 0.6f);
+        }));
+        pasos.add(new Paso(Desenlace.VOZ, () -> fraseGuia(voz)));
+        pasos.add(new Paso(Desenlace.VOZ + dura + 0.3f, () -> {
+            ClientMusic.finalNivel(ClientMusic.FINAL, 1.8f);
+            if (aireFinal != null) aireFinal.nivel(0.6f, 1.8f);
+        }));
+        pasos.add(new Paso(Desenlace.NEGRO - 0.5f, () -> {
+            if (aireFinal != null) aireFinal.apagar(1.8f);
+        }));
+    }
+
+    /** Lo que dura una frase de Maelis (de {@code voces.json}; si no se sabe, lo de {@link Desenlace}). */
+    private static float duraGuia(int voz) {
+        float s = com.darkcraft.dialogo.Dialogos.habla("guia", voz);
+        return s > 0.3f ? s : voz == Desenlace.VOZ_SOMBRA ? Desenlace.DURA_SOMBRA : Desenlace.DURA_ALBA;
+    }
+
+    private static void fraseGuia(int n) {
+        ultimaGuia = n;
+        suena(SoundEvent.createVariableRangeEvent(new ResourceLocation(DarkCraftMod.MODID, "voz.guia." + n)), 1f);
+    }
+
+    /** La ultima frase de Maelis que ha empezado a sonar en una cinematica (para las pruebas). */
+    public static int ultimaGuia() {
+        return ultimaGuia;
     }
 
     /** La reparacion: el martilleo mientras se cierra el casco y crece el palo, y las velas al caer (la fanfarria la pone el servidor). */
@@ -239,6 +299,22 @@ public final class Guion {
             if (t - pasos.get(i).t() < 1.0f) pasos.get(i).que().run();
         }
         sonando.removeIf(s -> s.isStopped());
+        // el final, en la sala: con el alba sube luz de donde estaba la Sombra; con la nueva Sombra la oscuridad entra en quien la tomo
+        if (finalCual > 0 && t < Desenlace.Q[0] && mc.level != null && primerPlano != null && primerPlano.look.length >= 3) {
+            RandomSource r = mc.level.random;
+            double sx = primerPlano.look[0], sy = primerPlano.look[1] - 3.0, sz = primerPlano.look[2];
+            if (finalCual == 1) {
+                for (int i = 0; i < 3; i++)
+                    mc.level.addParticle(ParticleTypes.END_ROD, sx + (r.nextDouble() - 0.5) * 2.6, sy + 0.8 + r.nextDouble() * 5.5,
+                            sz + (r.nextDouble() - 0.5) * 2.6, (r.nextDouble() - 0.5) * 0.01, 0.035 + r.nextDouble() * 0.05, (r.nextDouble() - 0.5) * 0.01);
+            } else if (mc.player != null) {
+                for (int i = 0; i < 4; i++) {
+                    double a = r.nextDouble() * Math.PI * 2, d = 0.7 + r.nextDouble() * 1.2;
+                    mc.level.addParticle(ParticleTypes.SQUID_INK, mc.player.getX() + Math.cos(a) * d, mc.player.getY() + 0.2 + r.nextDouble() * 1.7,
+                            mc.player.getZ() + Math.sin(a) * d, -Math.cos(a) * 0.06, 0.01, -Math.sin(a) * 0.06);
+                }
+            }
+        }
         if (viaje != null) {
             moverBarco(mc, t);
             // en Valdrenn siempre hay tormenta: al llegar, la lluvia entra en el ultimo plano (despues la manda el servidor)
@@ -356,7 +432,8 @@ public final class Guion {
     public static void acabar() {
         for (Sonido s : sonando) s.apagar(0.25f);
         sonando.clear();
-        abismo = viento = null;
+        abismo = viento = aireFinal = null;
+        finalCual = 0;
         vuelo.clear();
         quejidos.clear();
         if (viaje != null) {
@@ -405,6 +482,18 @@ public final class Guion {
             return 0f;                                                        // (los parpados van aparte)
         }
         if (viaje != null) return Viaje.negro(viaje, t);
+        if (Desenlace.es(capitulo)) {
+            // sale de negro, un corte en negro entre plano y plano y, al final, a negro (en la del alba, despues de la luz)
+            float a = t < 0.7f ? 1f - suave(t / 0.7f) : 0f;
+            for (int i = 0; i + 1 < Desenlace.P.length; i++) {
+                float q = Desenlace.Q[i], p = Desenlace.P[i + 1];
+                if (t >= q - 0.35f && t < q) a = Math.max(a, suave(1f - (q - t) / 0.35f));
+                else if (t >= q && t < p) a = 1f;
+                else if (t >= p && t < p + 0.5f) a = Math.max(a, 1f - suave((t - p) / 0.5f));
+            }
+            if (t >= Desenlace.NEGRO) a = Math.max(a, suave((t - Desenlace.NEGRO) / (Desenlace.Q[3] - 0.1f - Desenlace.NEGRO)));
+            return a;
+        }
         if (capitulo == Reparacion.ID) {
             // la entrada, un corte corto en cada cambio de plano y el fundido de vuelta a los ojos del jugador
             float a = t < 0.6f ? 1f - suave(t / 0.6f) : 0f;
@@ -434,6 +523,8 @@ public final class Guion {
     /** Si en ese momento se dibuja a los jugadores: reparando el barco y esperandolo en el muelle, si; a bordo, hasta que despega. */
     public static boolean jugadores(int capitulo, float t) {
         if (capitulo == Reparacion.ID || capitulo == Viaje.LLAMADA) return true;
+        // el final: en la sala se ve a los que estaban
+        if (Desenlace.es(capitulo)) return t < Desenlace.Q[0] + 0.2f;
         return viaje != null && viaje.cambioA >= 0 && t < viaje.cambioA - 0.1f;
     }
 
@@ -458,6 +549,8 @@ public final class Guion {
 
     /** Si en esta cinematica salen las brasas que suben (las de las de los jefes). */
     public static boolean brasas(int capitulo, float t) {
+        // (y en la sala, en el final de la nueva Sombra)
+        if (capitulo == Desenlace.SOMBRA) return t < Desenlace.Q[0];
         return capitulo == Intro.ID && (t < Intro.CAIDA + 0.3f || (t >= Intro.ATRAPA && t < Intro.OJOS + 0.4f));
     }
 
@@ -465,6 +558,12 @@ public final class Guion {
 
     /** Debajo del negro (encima de la imagen del mundo): las rayas de la caida y los parpados. */
     public static void bajoNegro(GuiGraphics g, int w, int h, int capitulo, float t) {
+        if (capitulo == Desenlace.ALBA && t >= Desenlace.LUZ) {
+            // el alba acaba en una luz calida que lo llena todo (y despues, negro)
+            float k = suave((t - Desenlace.LUZ) / (Desenlace.NEGRO + 0.6f - Desenlace.LUZ));
+            if (k * 255 >= 4) g.fill(0, 0, w, h, argb(0.62f * k, 255, 216, 168));
+            return;
+        }
         if (capitulo != Intro.ID) return;
         if (t >= Intro.CAIDA && t < Intro.ATRAPA) rayas(g, w, h, t);
         if (t >= Intro.OJOS) parpados(g, w, h, t - Intro.OJOS);
@@ -597,8 +696,23 @@ public final class Guion {
         pose.popPose();
     }
 
-    /** Los subtitulos de la Sombra, en la banda de abajo. */
+    /** Los subtitulos de la Sombra (y de Maelis, en el final), en la banda de abajo. */
     public static void subtitulos(GuiGraphics g, Font font, int w, int h, float t, int bh) {
+        for (float[] f : frasesGuia) {
+            int n = (int) f[0];
+            float desde = f[1] - 0.1f, hasta = f[1] + duraGuia(n) + 0.9f;
+            if (t < desde || t > hasta) continue;
+            float a = Math.min(tope((t - desde) / 0.3f), tope((hasta - t) / 0.4f));
+            if (a * 255 < 4) continue;
+            List<FormattedCharSequence> partes = font.split(Component.translatable("darkcraft.dialogo.guia." + n), (int) (w * 0.8f));
+            int lh = 10, y0 = h - Math.max(bh, 24) / 2 - partes.size() * lh / 2 + 1;
+            for (int k = 0; k < partes.size(); k++) {
+                FormattedCharSequence p = partes.get(k);
+                int x = (w - font.width(p)) / 2;
+                g.drawString(font, p, x + 1, y0 + k * lh + 1, argb(a * 0.85f, 30, 18, 6), false);
+                g.drawString(font, p, x, y0 + k * lh, argb(a, 240, 224, 196), false);
+            }
+        }
         for (float[] f : frases) {
             int n = (int) f[0];
             float desde = f[1] - 0.1f, hasta = f[1] + Voces.sombra(n) + 0.9f;

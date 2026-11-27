@@ -134,6 +134,7 @@ public final class ClientCine {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return;
         if (active) stop(false);
+        creditos = false;
         active = true;
         chapter = m.chapter();
         shots = m.shots();
@@ -162,11 +163,17 @@ public final class ClientCine {
         if (chapter < 30) ClientMusic.storyStart(chapter);
     }
 
+    /** Si al acabar la del final (parte 7ad) salen los creditos: al acabar sola o al saltarla; no si la corta el servidor. */
+    private static boolean creditos;
+
     /** Termina la cinematica (al acabar, al saltarla o porque lo dice el servidor). */
     public static void stop(boolean skipped) {
         if (!active) return;
         Minecraft mc = Minecraft.getInstance();
         active = false;
+        int ch = chapter;
+        boolean conCreditos = creditos;
+        creditos = false;
         if (narr != null) mc.getSoundManager().stop(narr);
         narr = null;
         Guion.acabar();
@@ -178,6 +185,11 @@ public final class ClientCine {
         savedCam = null;
         if (chapter < 30) ClientMusic.storyCineEnd();
         if (skipped) Net.CH.sendToServer(new Net.CineSkip());
+        // el final: los creditos (si la corta el servidor, la musica se va)
+        if (com.darkcraft.cine.Desenlace.es(ch)) {
+            if (conCreditos) com.darkcraft.client.ui.CreditosScreen.abrir(com.darkcraft.cine.Desenlace.cual(ch));
+            else ClientMusic.final_(0, 2.0f);
+        }
     }
 
     private static float time(float pt) {
@@ -215,7 +227,10 @@ public final class ClientCine {
         if (chapter >= GUION && Guion.espera(mc, chapter, ticks / 20f)) {
             // un viaje del barco, parado en negro hasta que el servidor cambie el mundo (el reloj no corre); se puede saltar
             if (mc.screen == null && mc.options.keyJump.isDown()) {
-                if (++skipHold >= SKIP_TICKS) stop(true);
+                if (++skipHold >= SKIP_TICKS) {
+                    creditos = true;
+                    stop(true);
+                }
             } else skipHold = Math.max(0, skipHold - 2);
             return;
         }
@@ -224,6 +239,7 @@ public final class ClientCine {
         // saltar: mantener ESPACIO un momento
         if (mc.screen == null && mc.options.keyJump.isDown() && t > 0.5f) {
             if (++skipHold >= SKIP_TICKS) {
+                creditos = true;
                 stop(true);
                 return;
             }
@@ -282,6 +298,7 @@ public final class ClientCine {
         if (t >= total) {
             // (los viajes del barco: el servidor espera a que se acabe de ver)
             boolean avisar = com.darkcraft.cine.Viaje.es(chapter);
+            creditos = true;
             stop(false);
             if (avisar) Net.CH.sendToServer(new Net.CineFase(com.darkcraft.cine.Cinematics.FIN_CLIENTE));
         }
