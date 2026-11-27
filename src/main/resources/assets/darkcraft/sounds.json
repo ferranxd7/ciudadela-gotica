@@ -5224,5 +5224,201 @@
         "stream": true
       }
     ]
+  },
+  "sfx.aldric_cadenazo": {
+    "subtitle": "subtitles.darkcraft.sfx.aldric_cadenazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aldric_cadenazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/aldric_cadenazo_2"
+      }
+    ]
+  },
+  "sfx.aldric_latigazo": {
+    "subtitle": "subtitles.darkcraft.sfx.aldric_latigazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aldric_latigazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/aldric_latigazo_2"
+      }
+    ]
+  },
+  "sfx.aldric_estrella": {
+    "subtitle": "subtitles.darkcraft.sfx.aldric_estrella",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aldric_estrella_1"
+      },
+      {
+        "name": "darkcraft:sfx/aldric_estrella_2"
+      }
+    ]
+  },
+  "sfx.aldric_torbellino": {
+    "subtitle": "subtitles.darkcraft.sfx.aldric_torbellino",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aldric_torbellino_1"
+      },
+      {
+        "name": "darkcraft:sfx/aldric_torbellino_2"
+      }
+    ]
+  },
+  "sfx.aldric_salto": {
+    "subtitle": "subtitles.darkcraft.sfx.aldric_salto",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aldric_salto_1"
+      },
+      {
+        "name": "darkcraft:sfx/aldric_salto_2"
+      }
+    ]
+  },
+  "sfx.aldric_encadenar": {
+    "subtitle": "subtitles.darkcraft.sfx.aldric_encadenar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aldric_encadenar_1"
+      },
+      {
+        "name": "darkcraft:sfx/aldric_encadenar_2"
+      }
+    ]
+  },
+  "sfx.aldric_marca": {
+    "subtitle": "subtitles.darkcraft.sfx.aldric_marca",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aldric_marca_1"
+      },
+      {
+        "name": "darkcraft:sfx/aldric_marca_2"
+      }
+    ]
+  },
+  "sfx.aldric_rugido": {
+    "subtitle": "subtitles.darkcraft.sfx.aldric_rugido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aldric_rugido_1"
+      },
+      {
+        "name": "darkcraft:sfx/aldric_rugido_2"
+      }
+    ]
+  },
+  "sfx.aldric_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.aldric_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aldric_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/aldric_dolor_2"
+      }
+    ]
+  },
+  "sfx.aldric_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.aldric_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aldric_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/aldric_muerte_2"
+      }
+    ]
+  },
+  "sfx.aldric_rezo": {
+    "subtitle": "subtitles.darkcraft.sfx.aldric_rezo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aldric_rezo_1"
+      },
+      {
+        "name": "darkcraft:sfx/aldric_rezo_2"
+      }
+    ]
+  },
+  "sfx.aldric_arrastre": {
+    "subtitle": "subtitles.darkcraft.sfx.aldric_arrastre",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/aldric_arrastre_1"
+      },
+      {
+        "name": "darkcraft:sfx/aldric_arrastre_2"
+      }
+    ]
+  },
+  "sfx.cerco_arrodillan": {
+    "subtitle": "subtitles.darkcraft.sfx.cerco_arrodillan",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/cerco_arrodillan_1"
+      },
+      {
+        "name": "darkcraft:sfx/cerco_arrodillan_2"
+      }
+    ]
+  },
+  "aldric.voz.1": {
+    "subtitle": "subtitles.darkcraft.aldric.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:aldric/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "aldric.voz.2": {
+    "subtitle": "subtitles.darkcraft.aldric.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:aldric/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "aldric.voz.3": {
+    "subtitle": "subtitles.darkcraft.aldric.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:aldric/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "aldric.voz.4": {
+    "subtitle": "subtitles.darkcraft.aldric.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:aldric/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "aldric.voz.5": {
+    "subtitle": "subtitles.darkcraft.aldric.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:aldric/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "musica.aldric": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/aldric",
+        "stream": true
+      }
+    ]
   }
 }

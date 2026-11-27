@@ -41,8 +41,12 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   la derecha y el regaton a la izquierda; gotas de sangre que cuelgan) y en el centro la tiara de tres coronas, con la sangre
   que le chorrea; relleno de sangre espesa que corre; gotas de sangre y chispas de oro que caen al recibir dano.
 
+  Aldric, el Primer Marcado (parte 7v): la cadena de hierro negro de punta a punta (eslabones tumbados y de canto), el gancho
+  a la izquierda y el eslabon roto que cuelga a la derecha, y en el centro la marca (el ojo en el aro roto con sus tres
+  espinas) al rojo; relleno de hierro al rojo que corre; esquirlas de hierro y brasas que caen al recibir dano.
+
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
-abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png y pontifice_barra.png (256x128):
+abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png, pontifice_barra.png y aldric_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -1392,6 +1396,149 @@ def gotas_sangre():
     return img
 
 
+# ---------------------------------------------------------------- Aldric, el Primer Marcado (parte 7v)
+
+HN_DD, HN_D, HN, HN_L, HN_H = hexc("08080a"), hexc("18181d"), hexc("2c2d33"), hexc("4b4d56"), hexc("7b7e89")
+OX_D, OX = hexc("3a1c10"), hexc("6a3418")
+MR_DD, MR_D, MR, MR_L, MR_H = hexc("2a0403"), hexc("6a0b07"), hexc("b81a10"), hexc("ff5a2e"), hexc("ffd2a8")
+
+
+def marco_aldric():
+    """La cadena de hierro negro de punta a punta: eslabones tumbados (el aro, con su luz arriba y el oxido) y de pie (de
+    canto: una barra gruesa que pasa por encima y por debajo del hueco); a la izquierda el gancho, a la derecha el eslabon
+    roto que cuelga; en el centro la marca (el ojo en el aro roto con sus tres espinas) al rojo, con brasas que le caen."""
+    rnd = random.Random(907)
+    n = noise2(97)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 4, FX1 + 3, FY0 - 4, FY1 + 3
+    cy = (y0 + y1) / 2.0
+
+    def hierro(x, y, base):
+        v = n(x * 0.3, y * 0.5)
+        c = mix(base, HN_D, 0.35) if v < 0.3 else base if v < 0.75 else mix(base, HN_L, 0.4)
+        if n(x * 0.17 + 5, y * 0.33) > 0.78:
+            c = mix(c, OX, 0.55)
+        return c
+
+    # los eslabones tumbados: aros de 2 y pico de grueso que asoman por encima y por debajo del hueco, cada 24 px
+    paso = 24
+    centros = list(range(x0 + 12, x1 - 6, paso))
+    for cx in centros:
+        rx, ry = 11.8, 8.6
+        for y in range(0, 40):
+            for x in range(cx - 14, cx + 15):
+                d = math.hypot((x - cx) / rx, (y - cy) / ry)
+                if 0.74 <= d <= 1.0:
+                    c = hierro(x, y, HN)
+                    if y < cy - 4:
+                        c = mix(c, HN_H, 0.55 if d < 0.86 else 0.3)
+                    elif y > cy + 4:
+                        c = mix(c, HN_DD, 0.35)
+                    put(img, x, y, c)
+                elif 1.0 < d <= 1.13 or 0.64 <= d < 0.74:
+                    if img.getpixel((x, y))[3] == 0:
+                        put(img, x, y, OUT)
+    # los eslabones de pie (de canto) en las juntas: una barra que pasa por los dos aros
+    for cx in centros[:-1]:
+        bx = cx + paso // 2 - 1
+        for y in range(int(cy) - 8, int(cy) + 9):
+            for k in range(3):
+                c = hierro(bx + k, y, HN_L if k == 0 else HN if k == 1 else HN_D)
+                if abs(y - cy) > 7:
+                    c = OUT
+                put(img, bx + k, y, c)
+            put(img, bx - 1, y, OUT)
+            put(img, bx + 3, y, OUT)
+    # el hueco del relleno, limpio
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, OUT)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # el gancho de la izquierda
+    gy = int(cy)
+    for x in range(0, x0 + 1):
+        for y in range(gy - 2, gy + 3):
+            put(img, x, y, hierro(x, y, HN if abs(y - gy) < 2 else HN_D))
+        put(img, x, gy - 3, OUT)
+        put(img, x, gy + 3, OUT)
+    for k, (dx, dy) in enumerate(((0, 4), (0, 5), (1, 6), (2, 7), (3, 7), (4, 6), (4, 5))):
+        put(img, 1 + dx, gy + dy, HN_L if k < 3 else HN)
+    # el eslabon roto de la derecha: cuelga del ultimo, abierto (la grieta al rojo)
+    ex = x1 + 1
+    for y in range(gy, 40):
+        for x in range(ex - 3, FW):
+            d = math.hypot((x - (ex + 1)) / 3.2, (y - 31) / 7.5)
+            if 0.7 <= d <= 1.08 and not (y > 34 and x > ex + 1):
+                put(img, x, y, hierro(x, y, HN))
+    put(img, ex + 2, 36, MR_L)
+    put(img, ex + 3, 35, MR)
+    # en el centro, la marca: el aro roto, el ojo y las tres espinas, al rojo
+    mx, my = FW // 2, 10
+    for y in range(0, FY0 - 1):
+        for x in range(mx - 13, mx + 14):
+            d = math.hypot(x - mx, (y - my) * 1.05)
+            ang = math.degrees(math.atan2(y - my, x - mx))
+            if 7.0 <= d <= 9.4 and not (-75 <= ang <= -48):
+                put(img, x, y, MR_L if d < 8.2 else MR)
+            elif 9.4 < d <= 10.6 and not (-75 <= ang <= -48):
+                put(img, x, y, MR_DD)
+    # el ojo
+    for y in range(my - 3, my + 4):
+        for x in range(mx - 6, mx + 7):
+            e = ((x - mx) / 6.2) ** 2 + ((y - my) / 3.3) ** 2
+            if e <= 1.0:
+                put(img, x, y, MR_D if e > 0.55 else MR)
+    for y in range(my - 2, my + 3):
+        for x in range(mx - 2, mx + 3):
+            if (x - mx) ** 2 + (y - my) ** 2 <= 4:
+                put(img, x, y, MR_H if (x - mx) ** 2 + (y - my) ** 2 <= 1 else MR_L)
+    # las tres espinas (abajo, a un lado y a otro)
+    for k, (ax, ay) in enumerate(((0, 1), (-0.87, -0.5), (0.87, -0.5))):
+        for t in range(10, 15):
+            x, y = int(round(mx + ax * t)), int(round(my + ay * t * 0.95))
+            put(img, x, y, MR_L if t < 13 else MR)
+            if t < 12:
+                put(img, x + (1 if ax >= 0 else -1), y, MR_D)
+    # brasas que le caen a la marca
+    for _ in range(7):
+        x = mx + rnd.randint(-9, 9)
+        y = rnd.randint(1, 16)
+        if img.getpixel((x, y))[3] == 0:
+            put(img, x, y, MR_L if rnd.random() < 0.5 else MR_H)
+    return img
+
+
+def relleno_aldric(k):
+    """El hierro al rojo que corre: brasas oscuras con vetas de fuego que pasan."""
+    n = noise2(311)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            t = 0.15 + 0.5 * mid + 0.45 * (n((x - k * 4) * 0.09, y * 0.7) - 0.5)
+            c = mix(MR_DD, MR, max(0.0, min(1.0, t * 1.4)))
+            veta = (x - k * 4 + int(3 * math.sin((x + y * 5) * 0.11))) % 29
+            if veta in (0, 1, 2) and 2 <= y <= 4:
+                c = mix(c, MR_L if veta != 1 else MR_H, 0.6)
+            if y == 0:
+                c = mix(c, MR_L, 0.2)
+            if y == 6:
+                c = mix(c, MR_DD, 0.7)
+            img.putpixel((x, y), c)
+    return img
+
+
+def esquirlas():
+    """Lo que cae al recibir dano: esquirlas de hierro y brasas."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = (["h.", "Hh", ".h"], [".r.", "rRr", ".r."], ["hH", "h."], ["r", "R", "r"])
+    col = {"h": HN_L, "H": HN_H, "r": MR, "R": MR_H}
+    for k, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, k * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 def hueco(a, b):
     n = noise2(113)
     img = Image.new("RGBA", (240, 7))
@@ -1433,6 +1580,7 @@ if __name__ == "__main__":
         "rectora": atlas(marco_rectora(), relleno_rectora, hueco("05060c", "10142a"), rastro("f2f6ff", "b8c6ff"), estrellitas()),
         "ballenero": atlas(marco_ballenero(), relleno_ballenero, hueco("030807", "0d1c19"), rastro("effcf8", "a9d8cc"), salpicaduras()),
         "pontifice": atlas(marco_pontifice(), relleno_pontifice, hueco("0a0405", "1e0c0d"), rastro("fff0e6", "e8b8a8"), gotas_sangre()),
+        "aldric": atlas(marco_aldric(), relleno_aldric, hueco("050505", "151417"), rastro("fff2ea", "e8b0a0"), esquirlas()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

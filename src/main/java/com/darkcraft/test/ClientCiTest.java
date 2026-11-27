@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 105 * 60 * 20;
+    private static final int LIMIT = 109 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -6023,6 +6023,8 @@ public final class ClientCiTest {
         t = altar(t);
         // el Cerco del Ancla y los marcados del Crater de Sangre (parte 7u)
         t = cerco(t);
+        // Aldric, el Primer Marcado, en lo alto del ancla del Cerco (parte 7v)
+        t = aldric(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -9814,6 +9816,374 @@ public final class ClientCiTest {
                 sp.clearFire();
                 sp.setHealth(sp.getMaxHealth());
                 comando(sp, "darkcraft cerco enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ Aldric, el Primer Marcado (parte 7v)
+
+    private static com.darkcraft.enemigos.Aldric aldricE() {
+        var e = com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.CERCO, com.darkcraft.morvain.MorvainEnemigos.aldric());
+        return e instanceof com.darkcraft.enemigos.Aldric b ? b : null;
+    }
+
+    /** Lo que deja Aldric en el cerco: sus reflejos (y los de los marcados). */
+    private static void limpiarAldric(ServerLevel lvl) {
+        int x = com.darkcraft.morvain.Cerco.CX, z = com.darkcraft.morvain.Cerco.CZ, y = com.darkcraft.morvain.Cerco.PISO;
+        var caja = new net.minecraft.world.phys.AABB(x - 60, y - 20, z - 60, x + 60, y + 40, z + 80);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Aldric.class, caja)) if (e.reflejo()) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Marcado.class, caja)) if (e.reflejo()) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Flecha.class, caja)) e.discard();
+    }
+
+    /** Los marcados del cerco que hay fuera: cuantos, cuantos rendidos y cuantos de rodillas. */
+    private static String marcadosCerco(ServerLevel lvl) {
+        int x = com.darkcraft.morvain.Cerco.CX, z = com.darkcraft.morvain.Cerco.CZ, y = com.darkcraft.morvain.Cerco.PISO;
+        var caja = new net.minecraft.world.phys.AABB(x - 60, y - 20, z - 60, x + 60, y + 40, z + 80);
+        int n = 0, rendidos = 0, rodillas = 0, presa = 0;
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Marcado.class, caja)) {
+            if (e.reflejo() || !e.isAlive()) continue;
+            n++;
+            if (e.rendido()) rendidos++;
+            if (e.postura() == com.darkcraft.enemigos.Enemigo.REZA) rodillas++;
+            if (e.getTarget() != null) presa++;
+        }
+        return "marcados " + n + " (rendidos " + rendidos + ", de rodillas " + rodillas + ", con presa " + presa + ")";
+    }
+
+    /**
+     * Un golpe de Aldric visto desde un lado: el en el patio, al sur del ancla, mirando al sur (quieto: solo hace lo que se le manda),
+     * el jugador delante, en supervivencia y aguantando, y la camara donde diga {@code desde} (relativo a el).
+     */
+    private static int golpeAldric(int t, String nombre, int accion, double dist, int[] capturas, String[] nombres, Vec3 desde, Vec3 mira) {
+        final int CX = com.darkcraft.morvain.Cerco.CX, CZ = com.darkcraft.morvain.Cerco.CZ, PISO = com.darkcraft.morvain.Cerco.PISO;
+        final double ex = CX + 0.5, ez = CZ + 17.5;
+        atTicks(t, "Aldric: " + nombre, m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                var e = aldricE();
+                if (e == null) return;
+                limpiarAldric(sp.serverLevel());
+                aPelear(sp, true);
+                e.quieta = true;
+                e.postura(com.darkcraft.enemigos.Enemigo.DE_PIE);
+                e.moveTo(ex, PISO, ez, 0f, 0f);
+                e.setDeltaMovement(Vec3.ZERO);
+                irMirando(sp, ex, PISO, ez + dist, ex, PISO + 2.6, ez, false);
+                e.setTarget(sp);
+                e.setYRot(0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                e.empezar(accion);
+                verDesdeServidor = new Vec3(ex + desde.x, PISO + desde.y, ez + desde.z);
+                miraServidor = new Vec3(ex + mira.x, PISO + mira.y, ez + mira.z);
+            });
+        });
+        atTicks(t + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        for (int i = 0; i < capturas.length; i++) {
+            final String cap = nombres[i];
+            atTicks(t + capturas[i], "captura: " + cap, m -> {
+                server(m, sp -> log("  " + cap + ": " + estadoE(aldricE()) + " | " + (aldricE() == null ? "" : aldricE().estado()) + " | jugador " + fpos(sp)
+                        + " vida " + Math.round(sp.getHealth()) + ", frenado " + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)
+                        + (sp.isOnFire() ? ", ardiendo" : "")));
+                shot(m, cap);
+            });
+        }
+        return t + capturas[capturas.length - 1];
+    }
+
+    /**
+     * Aldric, el Primer Marcado: de rodillas en lo alto del ancla, donde empieza la cadena; en supervivencia, en el patio: habla
+     * mientras se levanta (su barra y su musica), ruge al acabar la frase (los marcados del cerco se arrodillan, rendidos, y la cadena
+     * cierra la puerta) y salta desde lo alto (en el aire y al caer, con su onda); sus golpes (el cadenazo, el latigazo que arrastra, la
+     * estrella y su onda, el torbellino); a media vida le arde la marca (el estallido) y su reflejo repite el golpe; encadena (las
+     * marcas en el suelo y las cadenas que brotan); cae (de rodillas, mirando a la ciudadela; el cartel) y se deshace en sombra; los
+     * marcados descansan, la puerta se abre, y el bestiario. Al acabar vuelve todo como estaba.
+     */
+    private static int aldric(int T) {
+        final int CX = com.darkcraft.morvain.Cerco.CX, CZ = com.darkcraft.morvain.Cerco.CZ, PISO = com.darkcraft.morvain.Cerco.PISO;
+        final String SITIO = com.darkcraft.morvain.MorvainEnemigos.CERCO;
+        int t = T;
+        atTicks(t, "Aldric: de rodillas en lo alto del ancla", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                quitarMarcados(sp.serverLevel());
+                comando(sp, "darkcraft aldric volver");
+                irMirando(sp, CX + 3.5, PISO + 8.6, CZ + 8.5, CX + 0.5, PISO + 9.6, CZ + 3.5, true);
+            });
+        });
+        t += 300;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv427_aldric_reza");
+            server(m, sp -> log("  Aldric de rodillas: " + estadoE(aldricE()) + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoAldric(sp.server) + " | "
+                    + marcadosCerco(sp.serverLevel()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        // ---- en supervivencia, en el patio (al sureste del ancla, lejos de donde se le ven luego los golpes: los marcados que vengan a
+        // por el jugador se arrodillan alli): habla mientras se levanta, ruge al acabar (se arrodillan los marcados y la cadena cierra
+        // la puerta) y salta desde lo alto. Los cazadores de lo alto de las torres, fuera (sus flechas negras nublan la vista)
+        final int F = t;
+        final int dura = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Aldric.VOZ_BASE + 1);
+        atTicks(F, "Aldric: en supervivencia en el patio", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                var lista = com.darkcraft.morvain.MorvainEnemigos.cerco();
+                for (int i = 0; i < lista.size(); i++)
+                    if ("en_alto".equals(lista.get(i).grupo())) com.darkcraft.enemigos.Puestos.marcar(sp.server, SITIO, i, true);
+                aPelear(sp, true);
+                irMirando(sp, CX + 8.5, PISO, CZ + 15.5, CX + 0.5, PISO + 10.2, CZ + 3.5, false);
+                var e = aldricE();
+                if (e != null) e.setTarget(sp);
+            });
+        });
+        atTicks(F + 40, "captura: se levanta (y habla)", m -> {
+            server(m, sp -> log("  Aldric al verle: " + estadoE(aldricE()) + " | jugador " + fpos(sp) + " | " + marcadosCerco(sp.serverLevel())));
+            shot(m, "cliente_mv428_aldric_habla");
+        });
+        // en cuanto empieza a rugir, quieto (el salto se le manda)
+        atTicks(F + dura + 5, "Aldric: quieto tras el rugido", m -> server(m, sp -> {
+            var e = aldricE();
+            if (e != null) e.quieta = true;
+        }));
+        atTicks(F + dura + 16, "camara: el patio y el ancla", m -> {
+            server(m, sp -> {
+                sp.removeEffect(net.minecraft.world.effect.MobEffects.DARKNESS);
+                sp.removeEffect(net.minecraft.world.effect.MobEffects.BLINDNESS);
+            });
+            verDesde(m, new Vec3(CX - 12.5, PISO + 8, CZ + 27.5), new Vec3(CX + 0.5, PISO + 6, CZ + 6));
+        });
+        atTicks(F + dura + 28, "captura: ruge (los marcados se arrodillan)", m -> {
+            server(m, sp -> log("  Aldric ruge: " + estadoE(aldricE()) + " | " + (aldricE() == null ? "" : aldricE().estado()) + " | " + marcadosCerco(sp.serverLevel())
+                    + " | la puerta " + (com.darkcraft.morvain.Cerco.sellado(sp.serverLevel()) ? "cerrada" : "abierta") + " | jugador " + fpos(sp)));
+            log("  aldric: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv429_aldric_rugido");
+        });
+        atTicks(F + dura + 32, "camara: la puerta", m -> verDesde(m, new Vec3(CX + 2.5, PISO + 3.5, CZ + 25.5), new Vec3(CX + 0.5, PISO + 2.5, CZ + 34.5)));
+        atTicks(F + dura + 38, "captura: la cadena cierra la puerta", m -> {
+            server(m, sp -> log("  la puerta: " + com.darkcraft.morvain.MorvainEnemigos.estadoAldric(sp.server)));
+            shot(m, "cliente_mv430_aldric_puerta");
+        });
+        atTicks(F + dura + 44, "camara: el ancla desde el este", m -> {
+            server(m, sp -> {
+                sp.removeEffect(net.minecraft.world.effect.MobEffects.DARKNESS);
+                sp.removeEffect(net.minecraft.world.effect.MobEffects.BLINDNESS);
+            });
+            verDesde(m, new Vec3(CX + 15.5, PISO + 6.5, CZ + 16.5), new Vec3(CX + 1.5, PISO + 5, CZ + 10));
+        });
+        atTicks(F + dura + 50, "Aldric: salta desde lo alto", m -> server(m, sp -> {
+            var e = aldricE();
+            if (e == null) return;
+            e.setTarget(sp);
+            e.empezar(com.darkcraft.enemigos.AldricAnims.SALTO);
+            log("  Aldric salta: " + estadoE(e) + " | jugador " + fpos(sp));
+        }));
+        atTicks(F + dura + 75, "captura: en el aire", m -> {
+            server(m, sp -> log("  en el aire: " + estadoE(aldricE()) + " | " + (aldricE() == null ? "" : aldricE().estado())));
+            shot(m, "cliente_mv431_aldric_salto");
+        });
+        atTicks(F + dura + 87, "captura: cae (la onda)", m -> {
+            server(m, sp -> log("  cae del salto: " + estadoE(aldricE()) + " | " + (aldricE() == null ? "" : aldricE().estado()) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv432_aldric_salto_cae");
+        });
+        t = F + dura + 110;
+        // ---- sus golpes, de lado (quieto: solo lo que se le manda); la camara relativa a el, que mira al sur
+        t = golpeAldric(t, "el cadenazo", com.darkcraft.enemigos.AldricAnims.CADENAZO, 3.5, new int[]{20}, new String[]{"cliente_mv433_aldric_cadenazo"},
+                new Vec3(6.5, 2.6, 1.8), new Vec3(0, 1.9, 1.8)) + 30;
+        t = golpeAldric(t, "el latigazo", com.darkcraft.enemigos.AldricAnims.LATIGAZO, 6.5, new int[]{23}, new String[]{"cliente_mv434_aldric_latigazo"},
+                new Vec3(8.0, 3.0, 3.2), new Vec3(0, 1.6, 3.2)) + 30;
+        t = golpeAldric(t, "la estrella", com.darkcraft.enemigos.AldricAnims.ESTRELLA, 3.9, new int[]{26}, new String[]{"cliente_mv435_aldric_estrella"},
+                new Vec3(7.0, 3.0, 2.2), new Vec3(0, 1.4, 2.4)) + 30;
+        t = golpeAldric(t, "el torbellino", com.darkcraft.enemigos.AldricAnims.TORBELLINO, 3.0, new int[]{16}, new String[]{"cliente_mv436_aldric_torbellino"},
+                new Vec3(6.5, 2.8, 1.5), new Vec3(0, 1.7, 1.5)) + 40;
+        // ---- a media vida: le arde la marca (el estallido de brasas a su alrededor)
+        final int H = t;
+        final double ex = CX + 0.5, ez = CZ + 17.5;
+        atTicks(H, "Aldric: a media vida", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                var e = aldricE();
+                if (e == null) return;
+                limpiarAldric(sp.serverLevel());
+                aPelear(sp, true);
+                e.quieta = true;
+                e.moveTo(ex, PISO, ez, 0f, 0f);
+                e.setDeltaMovement(Vec3.ZERO);
+                e.yBodyRot = e.yHeadRot = 0f;
+                irMirando(sp, ex, PISO, ez + 3.2, ex, PISO + 2.4, ez, false);
+                e.setTarget(sp);
+                e.mediaVida();
+            });
+        });
+        atTicks(H + 2, "camara: de lado", m -> verDesde(m, new Vec3(ex + 7.5, PISO + 3.2, ez + 2.0), new Vec3(ex, PISO + 1.6, ez + 1.0)));
+        atTicks(H + 27, "captura: le arde la marca", m -> {
+            server(m, sp -> log("  le arde la marca: " + estadoE(aldricE()) + " | " + (aldricE() == null ? "" : aldricE().estado()) + " | jugador " + fpos(sp)
+                    + (sp.isOnFire() ? ", ardiendo" : "")));
+            shot(m, "cliente_mv437_aldric_marca");
+        });
+        t = H + 60;
+        // ---- el reflejo: repite el cadenazo un instante despues, desde donde lo dio (a el se le aparta para que se vea)
+        final int R = t;
+        atTicks(R, "Aldric: el cadenazo y su reflejo", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                var e = aldricE();
+                if (e == null) return;
+                limpiarAldric(sp.serverLevel());
+                aPelear(sp, true);
+                e.moveTo(ex, PISO, ez, 0f, 0f);
+                e.setDeltaMovement(Vec3.ZERO);
+                irMirando(sp, ex, PISO, ez + 3.5, ex, PISO + 2.4, ez, false);
+                e.setTarget(sp);
+                e.setYRot(0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                e.empezar(com.darkcraft.enemigos.AldricAnims.CADENAZO);
+            });
+        });
+        atTicks(R + 2, "camara: de lado", m -> verDesde(m, new Vec3(ex + 7.5, PISO + 3.0, ez + 2.0), new Vec3(ex + 1.0, PISO + 1.8, ez + 1.2)));
+        atTicks(R + 22, "Aldric se aparta (el reflejo se queda)", m -> server(m, sp -> {
+            var e = aldricE();
+            if (e != null) e.moveTo(ex - 3.5, PISO, ez - 1.0, 0f, 0f);
+        }));
+        atTicks(R + 30, "captura: el reflejo", m -> {
+            server(m, sp -> {
+                StringBuilder r = new StringBuilder();
+                for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Aldric.class, new net.minecraft.world.phys.AABB(ex - 12, PISO - 2, ez - 12, ex + 12, PISO + 8, ez + 14)))
+                    if (e.reflejo()) r.append(' ').append(estadoE(e)).append(';');
+                log("  el reflejo de Aldric:" + (r.length() == 0 ? " NINGUNO" : r) + " | " + (aldricE() == null ? "" : aldricE().estado()));
+            });
+            shot(m, "cliente_mv438_aldric_reflejo");
+        });
+        t = R + 50;
+        // ---- encadena: una marca bajo los pies del jugador y la cadena que brota (y le sujeta)
+        final int E = t;
+        atTicks(E, "Aldric: encadena", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                var e = aldricE();
+                if (e == null) return;
+                limpiarAldric(sp.serverLevel());
+                aPelear(sp, true);
+                e.moveTo(ex, PISO, ez, 0f, 0f);
+                e.setDeltaMovement(Vec3.ZERO);
+                irMirando(sp, ex, PISO, ez + 7.0, ex, PISO + 2.4, ez, false);
+                e.setTarget(sp);
+                e.setYRot(0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                e.empezar(com.darkcraft.enemigos.AldricAnims.ENCADENAR);
+            });
+        });
+        atTicks(E + 2, "camara: desde arriba, de lado", m -> verDesde(m, new Vec3(ex + 7.0, PISO + 5.5, ez + 4.5), new Vec3(ex, PISO + 0.5, ez + 5.5)));
+        atTicks(E + 31, "captura: las marcas", m -> {
+            server(m, sp -> log("  las marcas: " + (aldricE() == null ? "" : aldricE().estado()) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv439_aldric_marcas");
+        });
+        atTicks(E + 47, "captura: las cadenas", m -> {
+            server(m, sp -> log("  las cadenas: " + (aldricE() == null ? "" : aldricE().estado()) + " | jugador " + fpos(sp) + ", sujeto "
+                    + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)));
+            shot(m, "cliente_mv440_aldric_cadenas");
+        });
+        t = E + 70;
+        // ---- cae: de rodillas, mirando a la ciudadela (su ultima frase); el cartel; se deshace en sombra
+        final int C = t;
+        atTicks(C, "Aldric: cae", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var e = aldricE();
+                if (e == null) return;
+                limpiarAldric(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.setGameMode(GameType.CREATIVE);
+                log("  antes de caer Aldric: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "aldric") + " | " + e.estado());
+                e.quieta = true;
+                e.moveTo(ex, PISO, ez, 0f, 0f);
+                e.setYRot(0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                irMirando(sp, ex + 1.5, PISO, ez + 6.5, ex, PISO + 1.6, ez, false);
+                verDesdeServidor = new Vec3(e.getX() + 5.5, e.getY() + 2.6, e.getZ() + 4.0);
+                miraServidor = new Vec3(e.getX(), e.getY() + 1.3, e.getZ() + 0.6);
+                e.invulnerableTime = 0;
+                e.hurt(sp.damageSources().playerAttack(sp), 99999f);
+                log("  Aldric cae: vivo " + e.isAlive() + ", en paz " + com.darkcraft.morvain.Cerco.enPaz(sp.server));
+            });
+        });
+        atTicks(C + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 60, "captura: de rodillas, mirando a la ciudadela", m -> {
+            server(m, sp -> log("  Aldric de rodillas: la puerta " + (com.darkcraft.morvain.Cerco.sellado(sp.serverLevel()) ? "cerrada" : "abierta")));
+            shot(m, "cliente_mv441_aldric_cae");
+        });
+        atTicks(C + 92, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 114, "captura: JEFE ABATIDO", m -> {
+            log("  aldric: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  tras caer Aldric: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "aldric")
+                    + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoAldric(sp.server)));
+            shot(m, "cliente_mv442_aldric_abatido");
+        });
+        atTicks(C + 140, "camara de lado otra vez", m -> {
+            m.options.hideGui = true;
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 153, "captura: se deshace en sombra", m -> {
+            server(m, sp -> log("  Aldric se deshace: " + com.darkcraft.morvain.MorvainEnemigos.estadoAldric(sp.server)));
+            shot(m, "cliente_mv443_aldric_sombra");
+        });
+        // ---- en paz: los marcados del cerco (de rodillas y rendidos) descansan y la cadena de la puerta se rompe
+        atTicks(C + 200, "camara: el patio en paz", m -> verDesde(m, new Vec3(CX - 12.5, PISO + 8, CZ + 27.5), new Vec3(CX + 0.5, PISO + 5, CZ + 6)));
+        atTicks(C + 212, "captura: el cerco en paz", m -> {
+            server(m, sp -> log("  en paz: " + com.darkcraft.morvain.MorvainEnemigos.estadoAldric(sp.server) + " | " + marcadosCerco(sp.serverLevel())));
+            shot(m, "cliente_mv444_cerco_paz");
+        });
+        atTicks(C + 216, "camara: la puerta", m -> verDesde(m, new Vec3(CX + 2.5, PISO + 3.5, CZ + 25.5), new Vec3(CX + 0.5, PISO + 2.5, CZ + 34.5)));
+        atTicks(C + 222, "captura: la puerta abierta", m -> {
+            server(m, sp -> log("  la puerta: " + (com.darkcraft.morvain.Cerco.sellado(sp.serverLevel()) ? "cerrada" : "abierta")));
+            shot(m, "cliente_mv445_cerco_puerta_abierta");
+        });
+        t = C + 230;
+        atTicks(t, "el bestiario: Aldric", m -> {
+            enPrimeraPersona(m);
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("aldric")));
+        });
+        t += 18;
+        atTicks(t, "captura: Aldric en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv446_bestiario_aldric");
+        });
+        t += 4;
+        atTicks(t, "Aldric: fin (vuelve a rezar, los marcados como estaban, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                limpiarAldric(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                var e = aldricE();
+                if (e != null) e.quieta = false;
+                comando(sp, "darkcraft aldric volver");
+                comando(sp, "darkcraft cerco enemigos volver");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoAldric(sp.server));
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

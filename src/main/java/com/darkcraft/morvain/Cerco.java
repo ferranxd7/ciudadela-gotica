@@ -1,8 +1,10 @@
 package com.darkcraft.morvain;
 
 import com.darkcraft.DarkCraftMod;
+import com.darkcraft.enemigos.Aldric;
 import com.darkcraft.enemigos.Enemigo;
 import com.darkcraft.enemigos.Marcado;
+import com.darkcraft.enemigos.Puestos;
 import com.darkcraft.fortaleza.Perdidos;
 import com.darkcraft.gen.Canvas;
 import com.darkcraft.gen.Element;
@@ -12,8 +14,11 @@ import com.darkcraft.gen.TorreCupula;
 import com.darkcraft.pueblo.gen.Trozo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.AnvilBlock;
@@ -29,6 +34,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.phys.AABB;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -61,6 +67,8 @@ public final class Cerco {
     /** Lo allanado (radio) y lo que se funde con la ladera; la muralla (de dentro a fuera) y su alto. */
     static final double R_LLANO = 39, FUNDE = 10, R_MURO0 = 32.5, R_MURO1 = 34.5;
     static final int ALTO_MURO = 6, ALTO_TORRE = 10;
+    /** Hasta donde (del ancla) se arrodillan los marcados al rugido de Aldric (parte 7v): el patio, las torres y la puerta. */
+    public static final double R_RENDIR = R_LLANO + 3;
     /** La piramide del ancla (lo que no se toca): |u| y |v| hasta aqui. */
     static final int ANCLA = 11;
     /** Las torres de la muralla: {u, v}. Las dos de la puerta y las cuatro de las esquinas. */
@@ -651,6 +659,8 @@ public final class Cerco {
     private void ponerEsperas() {
         int R = Marcado.ROMPEDOR, C = Marcado.CABALLERO, Z = Marcado.CAZADOR;
         int Re = Enemigo.REZA, D = Enemigo.DE_PIE, Tu = Enemigo.TUMBADO;
+        // Aldric, el Primer Marcado (parte 7v): de rodillas en lo alto del ancla, donde empieza la cadena, de cara a la puerta
+        en(0, 0, PISO + 8, 3, SUR, Re, 0, Puestos.JEFE);
         // por el camino: de rodillas mirando a la cadena (al norte) y alguno caido junto a las estelas
         enCamino(R, 0.82, 0, NORTE, Re, "camino");
         enCamino(Z, 0.62, 1, NORTE, Re, "camino");
@@ -669,7 +679,6 @@ public final class Cerco {
         en(C, -9, PISO, 22, SUR, D, 5, "patio");
         en(C, 9, PISO, -22, ESTE, D, 5, "patio");
         en(C, 14, PISO, 19, OESTE, D, 0, "choza");
-        en(Z, 2, PISO + 8, 3, SUR, D, 0, "cima");
         // los cazadores de las torres de las esquinas del norte
         en(Z, -24, PISO + ALTO_TORRE, -24, giro(24, 24), D, 0, "en_alto");
         en(Z, 24, PISO + ALTO_TORRE, -24, giro(-24, 24), D, 0, "en_alto");
@@ -693,6 +702,135 @@ public final class Cerco {
         double[] p = punto(t);
         int u = (int) Math.round(p[0] + nx * k), v = (int) Math.round(p[1] + nz * k);
         esperas.add(new Espera(variante, x(u), pie(x(u), z(v)), z(v), giro, postura, 0, grupo));
+    }
+
+    // ------------------------------------------------------------------ Aldric: la cadena que cierra la puerta y la paz (parte 7v)
+
+    /** Lo que tarda en abrirse la puerta desde que cae Aldric (dice su ultima frase). */
+    public static final int ABRIR_TRAS = 120;
+    /** Para las pruebas: las veces que se ha cerrado y abierto la puerta, y los marcados que han descansado. */
+    public static int SELLADOS, ABIERTOS, DESCANSAN;
+    private static Aldric visto;
+    private static long reloj;
+
+    /** Si Aldric ha caido (y no ha vuelto): la cadena del sur queda libre y los marcados que seguian de rodillas descansan. */
+    public static boolean enPaz(net.minecraft.server.MinecraftServer srv) {
+        return Puestos.muerto(srv, MorvainEnemigos.CERCO, MorvainEnemigos.aldric());
+    }
+
+    /** Las celdas de la cadena que cierra la puerta: la cara de dentro (barrera) y la de fuera (las cadenas que se ven). */
+    static List<BlockPos> celdasSello(boolean fuera) {
+        List<BlockPos> l = new ArrayList<>();
+        int v = fuera ? 34 : 33;
+        for (int u = -2; u <= 2; u++)
+            for (int y = PISO; y <= PISO + 6; y++)
+                if (puerta(u, y, v)) l.add(new BlockPos(x(u), y, z(v)));
+        return l;
+    }
+
+    /** Si la puerta deberia estar cerrada ahora: Aldric peleando, o recien caido (aun habla). */
+    static boolean quiereCerrar(ServerLevel m) {
+        Enemigo e = Puestos.enemigo(MorvainEnemigos.CERCO, MorvainEnemigos.aldric());
+        if (e instanceof Aldric a && !a.isRemoved() && !a.reflejo()) visto = a;
+        Aldric a = visto;
+        if (a == null || a.isRemoved() || a.level() != m) {
+            visto = null;
+            return false;
+        }
+        if (a.isAlive()) return a.enPelea();
+        return a.deathTime < ABRIR_TRAS;
+    }
+
+    /** Si la puerta esta cerrada en el mundo (mira la celda de en medio de la cara de dentro). */
+    public static boolean sellado(ServerLevel m) {
+        return m.getBlockState(new BlockPos(x(0), PISO + 1, z(33))).is(Blocks.BARRIER);
+    }
+
+    /**
+     * Cada tick con alguien cerca (lo llama {@link Morvain#onTick}): la cadena cierra la puerta en cuanto empieza la pelea con
+     * Aldric (y antes saca hacia dentro a quien este en la puerta) y se rompe al acabar. Lo que esta cerrado se mira en el mundo:
+     * si el servidor se para a media pelea, al volver se abre solo.
+     */
+    public static void tick(ServerLevel m) {
+        BlockPos centro = new BlockPos(x(0), PISO, z(33));
+        if (!m.isLoaded(centro)) return;
+        long ahora = ++reloj;
+        boolean quiere = quiereCerrar(m), hay = sellado(m);
+        if (quiere && !hay) {
+            sacarDeLaPuerta(m);
+            for (BlockPos p : celdasSello(false)) {
+                BlockState st = m.getBlockState(p);
+                if (st.isAir() || st.canBeReplaced()) m.setBlock(p, Blocks.BARRIER.defaultBlockState(), 3);
+            }
+            for (BlockPos p : celdasSello(true)) {
+                BlockState st = m.getBlockState(p);
+                if (st.isAir() || st.canBeReplaced()) m.setBlock(p, cadena(Direction.Axis.Y), 3);
+            }
+            sonar(m, DarkCraftMod.SFX_ALDRIC_ENCADENAR.get(), 2.0f, 0.8f);
+            m.sendParticles(Marcado.SOMBRA, x(0) + 0.5, PISO + 2.5, z(34) + 0.5, 40, 1.2, 1.4, 0.3, 0.02);
+            m.sendParticles(Marcado.MARCA, x(0) + 0.5, PISO + 2.5, z(33) + 0.5, 30, 1.2, 1.4, 0.2, 0.05);
+            SELLADOS++;
+            DarkCraftMod.LOGGER.info("[DarkCraft] La cadena cierra la puerta del cerco");
+        } else if (!quiere && hay) abrir(m, true);
+        // mientras esta cerrada, chispas rojas por la cadena
+        if (hay && ahora % 5 == 0) m.sendParticles(Marcado.MARCA, x(0) + 0.5, PISO + 1.0 + m.random.nextDouble() * 4.0, z(33) + 0.6, 2, 1.0, 0.3, 0.1, 0.0);
+    }
+
+    /** La cadena de la puerta se rompe: quita la barrera y las cadenas (con su ruido, si {@code sonido}). */
+    public static void abrir(ServerLevel m, boolean sonido) {
+        int n = 0;
+        for (BlockPos p : celdasSello(false))
+            if (m.getBlockState(p).is(Blocks.BARRIER)) {
+                m.setBlock(p, Blocks.AIR.defaultBlockState(), 3);
+                n++;
+            }
+        for (BlockPos p : celdasSello(true))
+            if (m.getBlockState(p).is(Blocks.CHAIN)) m.setBlock(p, Blocks.AIR.defaultBlockState(), 3);
+        if (n == 0) return;
+        ABIERTOS++;
+        if (sonido) {
+            sonar(m, DarkCraftMod.SFX_SELLO_ROMPE.get(), 1.8f, 0.8f);
+            m.sendParticles(Marcado.SOMBRA, x(0) + 0.5, PISO + 2.5, z(34) + 0.5, 50, 1.2, 1.4, 0.3, 0.05);
+            m.sendParticles(ParticleTypes.SOUL, x(0) + 0.5, PISO + 2.5, z(34) + 0.5, 16, 1.0, 1.2, 0.3, 0.03);
+        }
+        DarkCraftMod.LOGGER.info("[DarkCraft] La cadena de la puerta del cerco se rompe");
+    }
+
+    /** Antes de cerrarse: quien este en el hueco de la puerta pasa al lado de dentro (al patio). */
+    private static void sacarDeLaPuerta(ServerLevel m) {
+        AABB caja = new AABB(x(-2) - 0.3, PISO - 0.5, z(33) - 0.3, x(2) + 1.3, PISO + 7, z(34) + 1.3);
+        for (net.minecraft.world.entity.Entity e : m.getEntities((net.minecraft.world.entity.Entity) null, caja,
+                q -> q instanceof net.minecraft.world.entity.LivingEntity && q.isAlive()))
+            e.teleportTo(e.getX(), e.getY(), z(32) + 0.4);
+    }
+
+    private static void sonar(ServerLevel m, net.minecraft.sounds.SoundEvent ev, float vol, float tono) {
+        for (ServerPlayer p : m.players())
+            if (p.distanceToSqr(x(0), PISO, z(33)) < 80 * 80)
+                p.connection.send(new net.minecraft.network.protocol.game.ClientboundSoundPacket(net.minecraft.core.Holder.direct(ev), SoundSource.BLOCKS,
+                        x(0) + 0.5, PISO + 2, z(33) + 0.5, vol, tono, m.random.nextLong()));
+    }
+
+    /**
+     * Cada segundo: con Aldric caido, los marcados del cerco que seguian de rodillas (los que golpeaban el ancla, los del camino) y
+     * los que se rindieron a su rugido descansan: se deshacen en sombra. Los de rodillas ya no vuelven; los que se rindieron, al
+     * descansar alguien en un santuario (como cualquier caido).
+     */
+    public static void paz(ServerLevel m) {
+        if (Puestos.sitio(MorvainEnemigos.CERCO) == null || !enPaz(m.getServer())) return;
+        List<Puestos.Puesto> puestos = MorvainEnemigos.cerco();
+        for (int i = 0; i < puestos.size(); i++) {
+            Puestos.Puesto p = puestos.get(i);
+            if (Puestos.JEFE.equals(p.grupo())) continue;
+            Enemigo e = Puestos.enemigo(MorvainEnemigos.CERCO, i);
+            if (!(e instanceof Marcado mk) || e.level() != m || mk.reflejo()) continue;
+            if (!(mk.postura() == Enemigo.REZA || mk.rendido()) || mk.getTarget() != null || mk.accion() != 0) continue;
+            m.sendParticles(Marcado.SOMBRA, mk.getX(), mk.getY() + 0.8, mk.getZ(), 30, 0.4, 0.6, 0.4, 0.02);
+            m.sendParticles(Marcado.MARCA, mk.getX(), mk.getY() + 1.1, mk.getZ(), 10, 0.3, 0.4, 0.3, 0.05);
+            mk.disolver();
+            if (p.postura() != Enemigo.REZA) Puestos.marcar(m.getServer(), MorvainEnemigos.CERCO, i, true);
+            DESCANSAN++;
+        }
     }
 
     // ------------------------------------------------------------------ para la prueba

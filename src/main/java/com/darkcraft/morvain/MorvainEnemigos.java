@@ -71,7 +71,7 @@ public final class MorvainEnemigos {
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
             ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
-            PONTIFICE = "pontifice";
+            PONTIFICE = "pontifice", ALDRIC = "aldric";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
@@ -211,8 +211,10 @@ public final class MorvainEnemigos {
             ALTAR_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? PONTIFICE : PENITENTE, e.variante(), e.x(), e.y(), e.z(), e.giro(),
                     e.postura(), e.ronda(), e.grupo()));
         // ---- el Cerco del Ancla (parte 7u): los marcados que apunta el plano
+        // (y Aldric, el Primer Marcado, en lo alto del ancla: el puesto 0, parte 7v)
         for (Cerco.Espera e : Cerco.get().esperas())
-            CERCO_P.add(new Puesto(MARCADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
+            CERCO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? ALDRIC : MARCADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
+                    e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -255,6 +257,11 @@ public final class MorvainEnemigos {
         return 0;
     }
 
+    /** El numero del puesto de Aldric, el Primer Marcado, en el sitio del Cerco. */
+    public static int aldric() {
+        return 0;
+    }
+
     /** Lo apunta el mod al arrancar. */
     public static void registrar() {
         Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
@@ -274,6 +281,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(PENITENTE, DarkCraftMod.PENITENTE);
         Puestos.tipo(MARCADO, DarkCraftMod.MARCADO);
         Puestos.tipo(PONTIFICE, DarkCraftMod.PONTIFICE);
+        Puestos.tipo(ALDRIC, DarkCraftMod.ALDRIC);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -304,7 +312,9 @@ public final class MorvainEnemigos {
         Puestos.registrar(GRIETA, GRIETA_P, Morvain::es, (l, p) -> p.postura() != REZA || !Altar.enPaz(l.getServer()));
         Puestos.registrar(ALTAR, ALTAR_P, Morvain::es,
                 (l, p) -> Puestos.JEFE.equals(p.grupo()) || p.postura() != REZA || !Altar.enPaz(l.getServer()));
-        Puestos.registrar(CERCO, CERCO_P, Morvain::es);
+        // los marcados que golpean el ancla de rodillas solo mientras vive Aldric (vencido, descansan: se deshacen en sombra)
+        Puestos.registrar(CERCO, CERCO_P, Morvain::es,
+                (l, p) -> Puestos.JEFE.equals(p.grupo()) || p.postura() != REZA || !Cerco.enPaz(l.getServer()));
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -330,6 +340,9 @@ public final class MorvainEnemigos {
             // y al caer el Pontifice la Tierra sin Fe descansa (lo hace Altar.paz cada segundo; aqui, el aviso)
             if (e instanceof com.darkcraft.enemigos.Pontifice && ALTAR.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] Anselmo, el Pontifice Sangrante, cae: la Tierra sin Fe descansa");
+            // y al caer Aldric los marcados del cerco descansan y la cadena del sur queda libre (lo hace Cerco.paz; aqui, el aviso)
+            if (e instanceof com.darkcraft.enemigos.Aldric && CERCO.equals(e.sitio()))
+                DarkCraftMod.LOGGER.info("[DarkCraft] Aldric, el Primer Marcado, cae: los marcados del cerco descansan y la cadena queda libre");
         });
     }
 
@@ -1386,6 +1399,58 @@ public final class MorvainEnemigos {
         int[] at = Altar.get().sitio("atril");
         if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(at[0], at[1], at[2])) && m.isLoaded(new net.minecraft.core.BlockPos(Altar.CX, Altar.PISO, Altar.CZ)))
             s += "; " + Altar.resumen(m);
+        return s;
+    }
+
+    /**
+     * {@code /darkcraft aldric [ir | vencer | volver | puerta [abrir]]} (parte 7v): como esta Aldric, llevar ante el (al patio, al
+     * pie de la escalera del ancla), vencerle, que vuelva (y los marcados del cerco como estaban) o abrir a mano la cadena de la
+     * puerta.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoAldric() {
+        return net.minecraft.commands.Commands.literal("aldric")
+                .executes(c -> decir(c, estadoAldric(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> {
+                    irCerco(c.getSource(), "patio");
+                    return decir(c, estadoAldric(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(CERCO, aldric());
+                    if (e instanceof com.darkcraft.enemigos.Aldric b) b.vencer();
+                    else {
+                        Puestos.marcar(srv, CERCO, aldric(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "aldric");
+                    }
+                    return decir(c, estadoAldric(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, CERCO, aldric(), false);
+                    // los marcados que golpeaban el ancla vuelven a su sitio en cuanto salgan
+                    Puestos.todos(srv, CERCO, false);
+                    return decir(c, estadoAldric(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("puerta").executes(c -> {
+                    var m = Morvain.nivel(c.getSource().getServer());
+                    return decir(c, "la puerta del cerco: " + (m != null && Cerco.sellado(m) ? "cerrada por la cadena" : "abierta"));
+                }).then(net.minecraft.commands.Commands.literal("abrir").executes(c -> {
+                    var m = Morvain.nivel(c.getSource().getServer());
+                    if (m != null) Cerco.abrir(m, true);
+                    return decir(c, "la cadena de la puerta, rota");
+                })));
+    }
+
+    /** Como esta Aldric (y su cerco, si esta cargado): para el comando y las pruebas. */
+    public static String estadoAldric(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(CERCO, aldric());
+        String s = "Aldric: " + (Cerco.enPaz(srv) ? "caido (los marcados del cerco descansan y la cadena queda libre)" : e == null ? "esperando (no ha salido)"
+                : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Aldric b) s += ", " + b.estado();
+        var m = Morvain.nivel(srv);
+        s += "; marcados del cerco: quedan " + Puestos.quedan(srv, CERCO) + " de " + CERCO_P.size() + " (fuera " + Puestos.fuera(CERCO) + "), descansan "
+                + Cerco.DESCANSAN + "; la puerta " + (m != null && Cerco.sellado(m) ? "cerrada" : "abierta") + " (se cierra " + Cerco.SELLADOS
+                + ", se abre " + Cerco.ABIERTOS + ")";
         return s;
     }
 
