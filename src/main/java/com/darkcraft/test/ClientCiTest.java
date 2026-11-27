@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 94 * 60 * 20;
+    private static final int LIMIT = 101 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -6019,6 +6019,8 @@ public final class ClientCiTest {
         t = costillar(t);
         // el Puente de la Grieta y los penitentes de la Tierra sin Fe (parte 7s)
         t = grieta(t);
+        // el Altar Profanado y Anselmo, el Pontifice Sangrante, el jefe de la Tierra sin Fe (parte 7t)
+        t = altar(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -9527,6 +9529,344 @@ public final class ClientCiTest {
      * embestida, el incensario, el humo y el cantico; uno postrado que se alza; la campana que los llama; uno que cae y se desangra;
      * el registro de la hospederia y el bestiario. Al acabar vuelven los penitentes.
      */
+    private static com.darkcraft.enemigos.Pontifice pontificeE() {
+        var e = com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.ALTAR, com.darkcraft.morvain.MorvainEnemigos.pontifice());
+        return e instanceof com.darkcraft.enemigos.Pontifice b ? b : null;
+    }
+
+    /** Lo que deja Anselmo en la basilica: los charcos y la procesion. */
+    private static void limpiarAltar(ServerLevel lvl) {
+        var caja = new net.minecraft.world.phys.AABB(com.darkcraft.morvain.Altar.CX - 50, com.darkcraft.morvain.Altar.PISO - 10, com.darkcraft.morvain.Altar.CZ - 55,
+                com.darkcraft.morvain.Altar.CX + 50, com.darkcraft.morvain.Altar.PISO + 40, com.darkcraft.morvain.Altar.CZ + 65);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.CharcoSangre.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Penitente.class, caja)) if (e.esEfimero()) e.discard();
+    }
+
+    /**
+     * Un golpe de Anselmo visto desde un lado: el en el crucero mirando al sur, hacia la puerta (quieto: solo hace lo que se le manda),
+     * el jugador delante, en supervivencia y aguantando, y la camara donde diga {@code desde} (relativo a el).
+     */
+    private static int golpePontifice(int t, String nombre, int accion, double dist, int[] capturas, String[] nombres, Vec3 desde, Vec3 mira) {
+        final int CX = com.darkcraft.morvain.Altar.CX, CZ = com.darkcraft.morvain.Altar.CZ, PISO = com.darkcraft.morvain.Altar.PISO;
+        final double ex = CX + 0.5, ez = CZ - 15.5;
+        atTicks(t, "Anselmo: " + nombre, m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                var e = pontificeE();
+                if (e == null) return;
+                limpiarAltar(sp.serverLevel());
+                aPelear(sp, true);
+                com.darkcraft.enemigos.Sangrado.limpiar(sp);
+                // la comunion: llega sangrando
+                if (accion == com.darkcraft.enemigos.PontificeAnims.COMUNION) com.darkcraft.enemigos.Sangrado.sumar(sp, 70f, e);
+                e.quieta = true;
+                e.postura(com.darkcraft.enemigos.Enemigo.DE_PIE);
+                e.moveTo(ex, PISO, ez, 0f, 0f);
+                e.setDeltaMovement(Vec3.ZERO);
+                irMirando(sp, ex, PISO, ez + dist, ex, PISO + 2.6, ez, false);
+                e.setTarget(sp);
+                e.setYRot(0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                e.empezar(accion);
+                verDesdeServidor = new Vec3(ex + desde.x, PISO + desde.y, ez + desde.z);
+                miraServidor = new Vec3(ex + mira.x, PISO + mira.y, ez + mira.z);
+            });
+        });
+        atTicks(t + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        for (int i = 0; i < capturas.length; i++) {
+            final String cap = nombres[i];
+            atTicks(t + capturas[i], "captura: " + cap, m -> {
+                server(m, sp -> log("  " + cap + ": " + estadoE(pontificeE()) + " | " + (pontificeE() == null ? "" : pontificeE().estado()) + " | jugador " + fpos(sp)
+                        + " vida " + Math.round(sp.getHealth()) + String.format(java.util.Locale.ROOT, " sangre %.0f", com.darkcraft.enemigos.Sangrado.nivel(sp))));
+                shot(m, cap);
+            });
+        }
+        return t + capturas[capturas.length - 1];
+    }
+
+    /**
+     * El Altar Profanado y Anselmo, el Pontifice Sangrante: desde su santuario, el atrio, la fachada con el roseton, entrar a pie en la
+     * nave (el cartel con el nombre, el logro y su aire), la nave hacia el altar, el crucero con las pilas, el presbiterio, la sacristia
+     * con el libro 29, el osario, el campanario y todo desde lo alto; Anselmo de rodillas; en supervivencia habla mientras se levanta y
+     * predica (su barra y su musica); sus golpes (el ferulazo, el barrido, la aspersion, la comunion, el juicio y sus columnas); a
+     * media vida se unge (la procesion y los charcos); cae (de rodillas, el caliz derramado, se deshace en sangre; el cartel), su
+     * sermon y el bestiario. Al acabar vuelve todo como estaba.
+     */
+    private static int altar(int T) {
+        final int CX = com.darkcraft.morvain.Altar.CX, CZ = com.darkcraft.morvain.Altar.CZ, PISO = com.darkcraft.morvain.Altar.PISO;
+        final String SITIO = com.darkcraft.morvain.MorvainEnemigos.ALTAR;
+        final var SA = com.darkcraft.morvain.SantuariosMorvain.porId("altar");
+        int t = T;
+        atTicks(t, "El Altar: desde su santuario", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft pontifice volver");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                irMirando(sp, SA.x() + 3.5, SA.y() + 4, SA.z() + 6.5, CX, PISO + 12, CZ + 10, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv370_altar_santuario");
+            server(m, sp -> log("  el altar: " + com.darkcraft.morvain.MorvainEnemigos.estadoPontifice(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "El Altar: el atrio y la fachada", m -> server(m, sp -> irMirando(sp, CX - 9.5, PISO + 3, CZ + 44.5, CX, PISO + 10, CZ + 30, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv371_altar_fachada"));
+        t += 10;
+        atTicks(t, "El Altar: el campanario y el campamento", m -> server(m, sp -> irMirando(sp, CX + 34.5, PISO + 6, CZ + 46.5, CX + 17, PISO + 14, CZ + 26, true)));
+        t += 60;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv372_altar_campanario"));
+        t += 10;
+        // ---- entrar a pie en la nave, en aventura: el cartel con el nombre, el logro y su aire (los penitentes, fuera; Anselmo lejos)
+        atTicks(t, "El Altar: entrar en la nave", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                for (int i = 0; i < com.darkcraft.morvain.MorvainEnemigos.altar().size(); i++)
+                    if (i != com.darkcraft.morvain.MorvainEnemigos.pontifice()) com.darkcraft.enemigos.Puestos.marcar(sp.server, SITIO, i, true);
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                sp.teleportTo(sp.serverLevel(), CX + 0.5, PISO, CZ + 33.5, 180f, 2f);
+            });
+        });
+        t += 30;
+        atTicks(t, "a pie hacia la puerta", m -> server(m, sp -> sp.teleportTo(sp.serverLevel(), CX + 1.5, PISO, CZ + 27.5, 180f, 2f)));
+        t += 70;
+        atTicks(t, "captura", m -> {
+            log("  sin fe: " + ClientMusic.sinFe());
+            shot(m, "cliente_mv373_altar_entrar");
+            server(m, sp -> log("  al entrar: lugar " + com.darkcraft.morvain.Morvain.lugar(sp) + ", logro altar " + com.darkcraft.story.Logros.tiene(sp, "altar")
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoPontifice(sp.server)));
+        });
+        t += 10;
+        atTicks(t, "El Altar: la nave hacia el altar", m -> {
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                irMirando(sp, CX + 0.5, PISO + 3.5, CZ + 26.5, CX + 0.5, PISO + 3, CZ - 22, true);
+            });
+        });
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv374_altar_nave"));
+        t += 10;
+        atTicks(t, "El Altar: el crucero y las pilas", m -> server(m, sp -> irMirando(sp, CX - 6.5, PISO + 4, CZ - 4.5, CX + 13, PISO + 1, CZ - 14, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv375_altar_crucero"));
+        t += 10;
+        atTicks(t, "Anselmo, de rodillas ante el altar", m -> server(m, sp -> irMirando(sp, CX + 4.5, PISO + 1.6, CZ - 13.5, CX + 0.5, PISO + 1.6, CZ - 17, true)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv376_pontifice_reza");
+            server(m, sp -> log("  Anselmo de rodillas: " + estadoE(pontificeE()) + " | " + (pontificeE() == null ? "" : pontificeE().estado())));
+        });
+        t += 10;
+        atTicks(t, "El Altar: el presbiterio y la cruz", m -> server(m, sp -> irMirando(sp, CX + 0.5, PISO + 4, CZ - 14.5, CX + 0.5, PISO + 5, CZ - 28, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv377_altar_presbiterio"));
+        t += 10;
+        atTicks(t, "El Altar: la sacristia", m -> server(m, sp -> irMirando(sp, CX + 19.5, PISO + 1.0, CZ - 13.5, CX + 21.5, PISO + 0.8, CZ - 17, true)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv378_altar_sacristia");
+            server(m, sp -> log("  la sacristia: " + com.darkcraft.morvain.Altar.resumen(sp.serverLevel()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 10;
+        atTicks(t, "El Altar: el osario", m -> server(m, sp -> irMirando(sp, CX - 19.5, PISO + 1.4, CZ - 13.5, CX - 21.5, PISO + 0.6, CZ - 18.0, true)));
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv379_altar_osario"));
+        t += 10;
+        atTicks(t, "El Altar: todo desde lo alto", m -> server(m, sp -> irMirando(sp, CX + 40.5, PISO + 42, CZ + 50.5, CX, PISO + 4, CZ, true)));
+        t += 90;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_mv380_altar_alto");
+            server(m, sp -> log("  desde lo alto: " + com.darkcraft.morvain.MorvainEnemigos.estadoPontifice(sp.server)));
+        });
+        t += 10;
+        // ---- en supervivencia, en la nave: habla mientras se levanta y predica al acabar (su barra y su musica)
+        final int F = t;
+        final int dura = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Pontifice.VOZ_BASE + 1);
+        atTicks(F, "Anselmo: en supervivencia en la nave", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                irMirando(sp, CX + 3.5, PISO, CZ - 8.5, CX + 0.5, PISO + 1.8, CZ - 17, false);
+                var e = pontificeE();
+                if (e != null) e.setTarget(sp);
+            });
+        });
+        atTicks(F + 40, "captura: se levanta (y habla)", m -> {
+            server(m, sp -> log("  Anselmo al verle: " + estadoE(pontificeE()) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv381_pontifice_habla");
+        });
+        atTicks(F + dura + 14, "captura: predica (su barra)", m -> {
+            server(m, sp -> log("  Anselmo predica: " + estadoE(pontificeE()) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())));
+            log("  pontifice: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv382_pontifice_sermon");
+        });
+        t = F + dura + 70;
+        // ---- sus golpes, de lado (quieto: solo lo que se le manda); la camara relativa a el, que mira al sur
+        t = golpePontifice(t, "el ferulazo", com.darkcraft.enemigos.PontificeAnims.FERULAZO, 3.6, new int[]{23}, new String[]{"cliente_mv383_pontifice_ferulazo"},
+                new Vec3(6.5, 2.4, 1.8), new Vec3(0, 1.8, 1.8)) + 30;
+        t = golpePontifice(t, "el barrido", com.darkcraft.enemigos.PontificeAnims.BARRIDO, 3.0, new int[]{21}, new String[]{"cliente_mv384_pontifice_barrido"},
+                new Vec3(6.0, 2.4, 1.4), new Vec3(0, 1.8, 1.4)) + 30;
+        t = golpePontifice(t, "la aspersion", com.darkcraft.enemigos.PontificeAnims.ASPERSION, 4.5, new int[]{20}, new String[]{"cliente_mv385_pontifice_aspersion"},
+                new Vec3(7.0, 2.8, 2.5), new Vec3(0, 1.6, 2.5)) + 30;
+        t = golpePontifice(t, "la comunion", com.darkcraft.enemigos.PontificeAnims.COMUNION, 7.0, new int[]{30}, new String[]{"cliente_mv386_pontifice_comunion"},
+                new Vec3(8.5, 3.5, 3.5), new Vec3(0, 3.0, 3.0)) + 40;
+        t = golpePontifice(t, "el juicio y la columna", com.darkcraft.enemigos.PontificeAnims.JUICIO, 8.0, new int[]{36, 50},
+                new String[]{"cliente_mv387_pontifice_juicio", "cliente_mv388_pontifice_columna"}, new Vec3(9.0, 4.0, 4.0), new Vec3(0, 1.6, 6.0)) + 40;
+        // ---- a media vida: se unge (el caliz por la cabeza), se alza la procesion de los canales y deja charcos por donde pisa
+        final int H = t;
+        atTicks(H, "Anselmo: a media vida", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                var e = pontificeE();
+                if (e == null) return;
+                limpiarAltar(sp.serverLevel());
+                aPelear(sp, true);
+                e.quieta = false;
+                e.moveTo(CX + 0.5, PISO, CZ - 15.5, 0f, 0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                irMirando(sp, CX + 2.5, PISO, CZ - 4.5, CX + 0.5, PISO + 2.0, CZ - 15.5, false);
+                e.setTarget(sp);
+                e.mediaVida();
+            });
+        });
+        atTicks(H + 2, "camara: de cerca, de lado", m -> verDesde(m, new Vec3(CX + 5.5, PISO + 3.4, CZ - 12.0), new Vec3(CX + 0.5, PISO + 3.2, CZ - 15.5)));
+        atTicks(H + 26, "captura: se unge", m -> {
+            server(m, sp -> log("  Anselmo se unge: " + (pontificeE() == null ? "" : pontificeE().estado()) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv389_pontifice_uncion");
+        });
+        atTicks(H + 30, "camara: la nave desde los pies", m -> verDesde(m, new Vec3(CX + 5.5, PISO + 7.0, CZ + 27.5), new Vec3(CX + 0.5, PISO + 1.0, CZ + 12.0)));
+        atTicks(H + 60, "captura: la procesion", m -> {
+            server(m, sp -> {
+                StringBuilder v = new StringBuilder();
+                var e = pontificeE();
+                if (e != null) for (var p : e.procesion())
+                    v.append(String.format(java.util.Locale.ROOT, " (%.1f, %.1f) %s;", p.getX() - CX, p.getZ() - CZ, estadoE(p)));
+                log("  la procesion:" + (v.length() == 0 ? " NADIE" : v) + " | " + (e == null ? "" : e.estado()));
+            });
+            log("  pontifice: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv390_pontifice_procesion");
+        });
+        atTicks(H + 140, "camara: donde anda", m -> server(m, sp -> {
+            var e = pontificeE();
+            if (e == null) return;
+            verDesdeServidor = new Vec3(e.getX() + 6.5, e.getY() + 5.5, e.getZ() + 1.5);
+            miraServidor = new Vec3(e.getX(), e.getY() + 0.2, e.getZ() - 0.5);
+        }));
+        atTicks(H + 142, "camara", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(H + 150, "captura: los charcos", m -> {
+            server(m, sp -> {
+                StringBuilder v = new StringBuilder();
+                for (var c : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.CharcoSangre.class, new net.minecraft.world.phys.AABB(CX - 40, PISO - 5, CZ - 40, CX + 40, PISO + 10, CZ + 40)))
+                    v.append(String.format(java.util.Locale.ROOT, " (%.1f, %.1f)", c.getX() - CX, c.getZ() - CZ));
+                log("  los charcos:" + (v.length() == 0 ? " NINGUNO" : v) + " | " + (pontificeE() == null ? "" : pontificeE().estado()) + " | jugador " + fpos(sp)
+                        + String.format(java.util.Locale.ROOT, " sangre %.0f", com.darkcraft.enemigos.Sangrado.nivel(sp)));
+            });
+            shot(m, "cliente_mv391_pontifice_charcos");
+        });
+        // ---- cae: de rodillas, el caliz se derrama (su ultima frase) y se deshace en sangre; el cartel
+        final int C = H + 170;
+        atTicks(C, "Anselmo: cae", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var e = pontificeE();
+                if (e == null) return;
+                limpiarAltar(sp.serverLevel());
+                sp.setGameMode(GameType.CREATIVE);
+                com.darkcraft.enemigos.Sangrado.limpiar(sp);
+                log("  antes de caer Anselmo: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "pontifice") + " | " + e.estado());
+                e.quieta = true;
+                e.moveTo(CX + 0.5, PISO, CZ - 15.5, 0f, 0f);
+                e.setYRot(0f);
+                e.yBodyRot = e.yHeadRot = 0f;
+                verDesdeServidor = new Vec3(e.getX() + 5.0, e.getY() + 2.4, e.getZ() + 4.5);
+                miraServidor = new Vec3(e.getX(), e.getY() + 1.2, e.getZ() + 0.6);
+                e.invulnerableTime = 0;
+                e.hurt(sp.damageSources().playerAttack(sp), 99999f);
+                log("  Anselmo cae: vivo " + e.isAlive() + ", en paz " + com.darkcraft.morvain.Altar.enPaz(sp.server));
+            });
+        });
+        atTicks(C + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 52, "captura: de rodillas, el caliz derramado", m -> shot(m, "cliente_mv392_pontifice_cae"));
+        atTicks(C + 131, "captura: se deshace en sangre", m -> {
+            server(m, sp -> log("  Anselmo se deshace: en paz " + com.darkcraft.morvain.Altar.enPaz(sp.server) + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoPontifice(sp.server)));
+            shot(m, "cliente_mv393_pontifice_sangre");
+        });
+        atTicks(C + 134, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 200, "captura: JEFE ABATIDO", m -> {
+            log("  pontifice: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  tras caer Anselmo: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "pontifice")
+                    + " | " + com.darkcraft.morvain.MorvainEnemigos.estadoPontifice(sp.server)));
+            shot(m, "cliente_mv394_pontifice_abatido");
+        });
+        t = C + 206;
+        atTicks(t, "El ultimo sermon de Anselmo", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(29));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mv395_libro_sermon"));
+        t += 6;
+        atTicks(t, "el bestiario: Anselmo", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("pontifice")));
+        });
+        t += 18;
+        atTicks(t, "captura: Anselmo en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv396_bestiario_pontifice");
+        });
+        t += 4;
+        atTicks(t, "Anselmo: fin (vuelve a rezar, los penitentes como estaban, vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                limpiarAltar(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                com.darkcraft.enemigos.Sangrado.limpiar(sp);
+                sp.setHealth(sp.getMaxHealth());
+                var e = pontificeE();
+                if (e != null) e.quieta = false;
+                comando(sp, "darkcraft pontifice volver");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                com.darkcraft.enemigos.Puestos.todos(sp.server, com.darkcraft.morvain.MorvainEnemigos.GRIETA, false);
+                log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoPontifice(sp.server));
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
     private static int grieta(int T) {
         final int CX = com.darkcraft.morvain.Grieta.CX, CZ = com.darkcraft.morvain.Grieta.CZ, PISO = com.darkcraft.morvain.Grieta.PISO;
         final int SANGRE = com.darkcraft.morvain.Grieta.SANGRE, SUELO = com.darkcraft.morvain.Grieta.SUELO;

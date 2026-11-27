@@ -54,6 +54,8 @@ final class Adorno {
         if (Costillar.cerca(x0, z0)) return;
         // ni en el Puente de la Grieta (parte 7s): sus matas, sus huesos y sus piedras los pone ella
         if (Grieta.cerca(x0, z0)) return;
+        // ni en el Altar Profanado (parte 7t): sus matas, sus huesos y sus piedras los pone el
+        if (Altar.cerca(x0, z0)) return;
         // en la Arboleda de los Ahorcados (parte 7g) solo setas y helechos: los arboles son los suyos
         if (Arboleda.cerca(x0, z0)) {
             hierba(nivel, c, r, 20, Blocks.BROWN_MUSHROOM.defaultBlockState(), Blocks.FERN.defaultBlockState());

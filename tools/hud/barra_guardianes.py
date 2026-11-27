@@ -37,8 +37,12 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   la cola de la Vieja que sale del agua (la aleta ancha, palida, con su muesca y el agua que le chorrea); relleno de mar
   verde oscuro con olas de espuma; gotas de agua y cristales de sal que caen al recibir dano.
 
+  Anselmo, el Pontifice Sangrante (parte 7t): la ferula tumbada (la vara de oro con sangre seca, la cruz de tres travesanos a
+  la derecha y el regaton a la izquierda; gotas de sangre que cuelgan) y en el centro la tiara de tres coronas, con la sangre
+  que le chorrea; relleno de sangre espesa que corre; gotas de sangre y chispas de oro que caen al recibir dano.
+
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
-abad_barra.png, condestable_barra.png, rectora_barra.png y ballenero_barra.png (256x128):
+abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png y pontifice_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -1237,6 +1241,157 @@ def salpicaduras():
     return img
 
 
+# ---------------------------------------------------------------- Anselmo, el Pontifice Sangrante (parte 7t)
+
+PO_DD, PO_D, PO, PO_L, PO_H = hexc("3a2a0c"), hexc("6b511b"), hexc("a07d28"), hexc("d2ae4a"), hexc("f6e19a")
+PS_DD, PS_D, PS, PS_L, PS_H = hexc("1e0405"), hexc("4a080c"), hexc("7c1218"), hexc("b0232a"), hexc("e0605a")
+PW_D, PW, PW_L = hexc("8f887a"), hexc("c8c0aa"), hexc("ece6d2")
+
+
+def marco_pontifice():
+    """La ferula tumbada: la vara de oro con sangre seca, a la derecha la cruz de tres travesanos (de pie: el mas corto, el
+    de fuera), a la izquierda el regaton; gotas de sangre que cuelgan de la vara; en el centro la tiara de tres coronas de oro,
+    la seda blanca manchada de la sangre que le chorrea desde la cruz de lo alto."""
+    rnd = random.Random(271)
+    n = noise2(83)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 4, FX1 + 3, FY0 - 4, FY1 + 3
+    rect(img, x0, y0, x1, y1, OUT)
+    # la vara de oro: brillo arriba, sombra abajo, sangre seca a manchas
+    for y in range(y0 + 1, y1):
+        for x in range(x0 + 1, x1):
+            v = n(x * 0.06, y * 0.7)
+            c = PO_D if v < 0.35 else PO if v < 0.78 else PO_L
+            if y == y0 + 1:
+                c = mix(c, PO_H, 0.45)
+            if y == y1 - 1:
+                c = mix(c, PO_DD, 0.5)
+            if n(x * 0.21 + 9, y * 0.4) > 0.8:
+                c = mix(c, PS_D, 0.75)
+            put(img, x, y, c)
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, PO_DD)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # los nudos de la vara (anillos mas anchos)
+    for xc in (x0 + 30, x1 - 34):
+        for y in range(y0 - 1, y1 + 2):
+            if FY0 - 1 <= y <= FY1:
+                continue
+            for k in range(4):
+                put(img, xc + k, y, PO_H if k == 1 else PO_L if k == 2 else PO)
+            put(img, xc - 1, y, OUT)
+            put(img, xc + 4, y, OUT)
+    # la cruz de tres travesanos (derecha): de pie sobre el final de la vara (pasan por detras del relleno), el de fuera el
+    # mas corto, y el remate de la vara
+    cy = (y0 + y1) // 2
+    for x in range(x1, FW - 1):
+        for y in range(cy - 1, cy + 2):
+            put(img, x, y, PO_L if y == cy - 1 else PO if y == cy else PO_D)
+    for xb, alto in ((x1 - 11, 13), (x1 - 6, 11), (x1 - 1, 9)):
+        for y in range(cy - alto, cy + alto + 1):
+            if FY0 - 1 <= y <= FY1:
+                continue
+            put(img, xb, y, PO_L)
+            put(img, xb + 1, y, PO)
+            put(img, xb + 2, y, PO_D)
+        for xx in (xb - 1, xb + 3):
+            for y in range(cy - alto, cy + alto + 1):
+                if not (FY0 - 1 <= y <= FY1) and not (y0 <= y <= y1):
+                    put(img, xx, y, OUT)
+        for xx in range(xb, xb + 3):
+            put(img, xx, cy - alto - 1, OUT)
+            put(img, xx, cy + alto + 1, OUT)
+        # la sangre que gotea de cada travesano
+        put(img, xb + 1, cy + alto + 2, PS_L)
+        put(img, xb + 1, cy + alto + 3, PS)
+    # el regaton (izquierda)
+    for x in range(1, x0 + 1):
+        for y in range(cy - 2, cy + 3):
+            put(img, x, y, PO_D if abs(y - cy) == 2 else PO)
+        put(img, x, cy - 3, OUT)
+        put(img, x, cy + 3, OUT)
+    # gotas de sangre que cuelgan de la vara
+    for _ in range(14):
+        x = rnd.randint(x0 + 6, x1 - 6)
+        if abs(x - FW // 2) < 18:
+            continue
+        largo = rnd.randint(1, 3)
+        for k in range(largo):
+            put(img, x, y1 + 1 + k, PS_L if k == largo - 1 else PS)
+    # en el centro: la tiara (tres pisos de seda que se estrechan, las tres coronas de oro, la bola y la cruz)
+    cx = FW // 2
+    pisos = ((14, 18, 9), (12, 13, 8), (10, 9, 7), (8, 5, 5))
+    for top, bottom, ancho in ((5, 9, 9), (10, 14, 10), (15, 19, 11)):
+        pass
+    capas = ((16, 20, 11), (11, 15, 9), (6, 10, 7), (3, 5, 5))
+    for ya, yb, w in capas:
+        for y in range(ya, yb + 1):
+            for dx in range(-w, w + 1):
+                c = PW if abs(dx) < w - 1 else PW_D
+                if dx < -w + 3:
+                    c = mix(c, PW_D, 0.4)
+                if dx > 2 and abs(dx) < w - 1:
+                    c = PW_L
+                put(img, cx + dx, y, c)
+        # la corona de oro del pie de cada piso, con sus flores y sus piedras
+        for dx in range(-w - 1, w + 2):
+            put(img, cx + dx, yb, PO_L if dx % 2 else PO)
+            put(img, cx + dx, yb - 1, PO if (dx % 4) else hexc("c41f33"))
+            if dx % 3 == 0:
+                put(img, cx + dx, yb - 2, PO_H)
+    # la bola y la cruz
+    for dx in (-1, 0, 1):
+        for y in (1, 2):
+            put(img, cx + dx, y, PO_L)
+    put(img, cx, 0, PO_H)
+    # la sangre que le chorrea a la tiara desde arriba
+    for gx, largo in ((cx - 4, 9), (cx + 3, 13), (cx - 8, 5), (cx + 7, 7), (cx, 4)):
+        for y in range(4, 4 + largo):
+            if img.getpixel((gx, y))[3]:
+                put(img, gx, y, PS_L if y == 3 + largo else PS)
+    # el contorno de la tiara
+    for y in range(0, 22):
+        for dx in range(-14, 15):
+            if img.getpixel((cx + dx, y))[3] == 0:
+                vecinos = [(cx + dx + a, y + b) for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1))]
+                if any(0 <= vx < FW and 0 <= vy < 40 and img.getpixel((vx, vy))[3] and img.getpixel((vx, vy))[:3] in (PW[:3], PW_D[:3], PW_L[:3], PO_L[:3], PO[:3], PO_H[:3])
+                       for vx, vy in vecinos) and y < FY0 - 1:
+                    put(img, cx + dx, y, OUT)
+    return img
+
+
+def relleno_pontifice(k):
+    """La sangre que corre, espesa, con vetas mas claras que pasan."""
+    n = noise2(191)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            t = 0.2 + 0.45 * mid + 0.4 * (n((x - k * 3) * 0.07, y * 0.6) - 0.5)
+            c = mix(PS_D, PS_L, max(0.0, min(1.0, t * 1.3)))
+            veta = (x - k * 3 + int(2 * math.sin((x + y * 3) * 0.13))) % 37
+            if veta in (0, 1) and 1 <= y <= 3:
+                c = mix(c, PS_H, 0.6 - 0.25 * veta)
+            if y == 0:
+                c = mix(c, PS_H, 0.25)
+            if y == 6:
+                c = mix(c, PS_DD, 0.6)
+            img.putpixel((x, y), c)
+    return img
+
+
+def gotas_sangre():
+    """Lo que cae al recibir dano: gotas de sangre y chispas de oro."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = ([".s.", "sSs", ".s."], ["s.", "S.", "s."], [".o.", "oOo", ".o."], ["s", "S", "S"])
+    col = {"s": PS, "S": PS_L, "o": PO, "O": PO_H}
+    for k, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, k * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 def hueco(a, b):
     n = noise2(113)
     img = Image.new("RGBA", (240, 7))
@@ -1277,6 +1432,7 @@ if __name__ == "__main__":
         "condestable": atlas(marco_condestable(), relleno_condestable, hueco("0a0605", "1c1210"), rastro("fff2e0", "f0b88a"), brasas()),
         "rectora": atlas(marco_rectora(), relleno_rectora, hueco("05060c", "10142a"), rastro("f2f6ff", "b8c6ff"), estrellitas()),
         "ballenero": atlas(marco_ballenero(), relleno_ballenero, hueco("030807", "0d1c19"), rastro("effcf8", "a9d8cc"), salpicaduras()),
+        "pontifice": atlas(marco_pontifice(), relleno_pontifice, hueco("0a0405", "1e0c0d"), rastro("fff0e6", "e8b8a8"), gotas_sangre()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

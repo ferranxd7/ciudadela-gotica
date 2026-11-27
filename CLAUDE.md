@@ -2594,6 +2594,109 @@ Altar de la Sangre"). Despues, el crater y la Sombra.
   (`mv365`), la campana que los llama (`mv366`), uno que cae y se desangra (`mv367`), el registro de la hospederia (`mv368`) y el
   bestiario (`mv369`). `LIMIT` 94 min (`lanzar.sh` 100 y 98 min, el paso 128, el trabajo 176).
 
+### Plan grande, parte 7t: Anselmo, el Pontifice Sangrante (el jefe de la Tierra sin Fe) y el Altar Profanado
+
+Respuestas 125 y 131 del plan; el octavo jefe de Morvain (el del libro 28: "se los lleva al noroeste, al Altar de la Sangre").
+Despues, el crater con la Sombra.
+- **El Altar Profanado** (`morvain/Altar`, en la Tierra sin Fe, a la puerta del santuario del Altar —(-1864, -1600), al sur; su tarima
+  no se toca: `SANT_R` 6—; `CX` -1864, `CZ` -1652, `SUELO` 114 y `PISO` 115; u = x - CX, v = z - CZ, el norte con v negativa; se dibuja
+  chunk a chunk al adornar y en su caja `Adorno` no pone nada; la tierra allanada u -33..33, v -37..47, se funde en 8). **La sangre es
+  agua**: en la Tierra sin Fe el agua es roja (el color de su bioma). De sur a norte: el **camino** del santuario, el **atrio**
+  enlosado con sus columnas rotas (y sus fustes caidos), la **fachada** (`FACHADA_V` 30: la puerta grande apuntada, las dos pequenas,
+  el **roseton** roto con su traceria y el hastial) y el **campanario** medio caido a su derecha (`TORRE_U` 15..20, `TORRE_V` 24..29, con
+  su campana); la **nave** sin techo (`NAVE_U` 11; se hundio: quedan las **arcadas** apuntadas sobre los pilares —`PILAR_U` 6, cada 5
+  de v 26 a -4—, cuatro arcos que la cruzaban, casi todos rotos, el triforio en los extremos, los contrafuertes y escombros), con los
+  **bancos** rotos en las naves de los lados, las vidrieras rotas de sus ventanas y el **canal de sangre** por el medio (losas de
+  piedra negra inundadas a ras del suelo, `canal`, de u = 0 y v -14 a 28); el **crucero** (`CRUCERO_V0` -19 a `CRUCERO_V1` -9, los
+  brazos hasta `BRAZO_U` 22): en cada brazo una **pila** de sangre (3 x 3 con su brocal, `PILA_U` 13, `PILA_V` -14; de ella baja otro
+  canal al del medio) y al fondo, tras un muro bajo con su puerta (`CUARTO_U` 18, en v -14), la **sacristia** al este (estanterias,
+  la mesa de los ornamentos, el arcon `chests/altar_bueno` y el **atril con el libro perdido 29** —"El ultimo sermon", de Anselmo;
+  `Perdidos.TOTAL` = 29—) y el **osario** al oeste (los huesos de los peregrinos amontonados contra las paredes, calaveras y velas
+  negras); y el **abside** (`ABSIDE_V` -20, radio 11,5, sus cinco ventanas altas) con el **presbiterio** alzado un escalon tras el
+  arco triunfal: el **altar de la sangre** (`ALTAR_V` -24: la pila del altar llena —un caldero con agua—, calaveras y velas rojas) y
+  detras la gran cruz rota con sus cadenas. Fuera: el **campamento** de los peregrinos al este (tiendas, la hoguera fria, barriles) y
+  sus **tumbas** al oeste (cruces de madera y montones de tierra). Botin: `chests/altar` (velas rojas, cuerda, cuero, huesos, polvo
+  de redstone, verruga, oro, papel, frutos, piedras de forja y la ceniza de la sangre) y `altar_bueno` (oro, frascos de experiencia,
+  amatista, una manzana de oro, piedras de forja hasta III, el talisman del vigor y los hechizos de curar y de bendicion). Sitios (`Altar.sitio`): `entrada`, `atrio`,
+  `puerta`, `nave`, `crucero`, `pontifice`, `altar`, `pila_este`, `pila_oeste`, `sacristia`, `atril`, `arcon`, `osario`,
+  `campanario`, `campamento`, `tumbas` y `alto` (solo para mirar). El Espejo: "El Altar Profanado" (`Altar.dentro`); logro `altar`
+  ("El altar tiene sed") al entrar en la basilica (`Altar.enNave`: la nave, el crucero y el abside, no los cuartos).
+- **Los puestos** (`MorvainEnemigos`, sitio `altar`, de `Altar.esperas`): Anselmo (puesto 0, grupo `Puestos.JEFE`, de rodillas ante el
+  altar en (0, -17), de espaldas a quien entra) y los penitentes: tres rezando en los bancos de atras de la nave (lejos de el: no le
+  despiertan) y un turiferario de pie junto a la puerta; dos de pie y uno de rodillas en el atrio; en el campamento uno postrado, uno
+  de rodillas y uno de ronda; dos en las tumbas y un turiferario que guarda el libro en la sacristia.
+- **Anselmo** (`enemigos/Pontifice`, entidad `darkcraft:pontifice`, 1,1 x 3,1; hereda de `Guardian`): el obispo que guiaba a los
+  peregrinos al crater a pedir perdon; la noche del cielo rojo la Sombra les contesto y el lo entendio como una orden: que dieran su
+  sangre. Modelo de `tools/enemigos/pontifice.py` (un viejo altisimo y enjuto, la piel cerea, la barba blanca y larga y los ojos con
+  luz roja; la **tiara** de tres coronas con su orbe y su cruz y las infulas; la muceta de armino con el broche, el palio, la capa
+  rota por detras, el alba larga y las mangas anchas; en la derecha la **ferula** de tres travesanos —la cruz papal— con su nudo y su
+  regaton y en la izquierda el **caliz** de oro lleno de sangre que luce; escala 1,45: `client/enemigos/PontificeModelo` —de rodillas
+  rezando mientras no esta de pie— y `PontificeRenderer`, con la luz de los ojos y de la sangre del caliz, que late y se apaga al
+  morir). 1100 de vida, golpe 12, armadura 5 (dureza 2), casi no se le empuja (0,9), **el fuego no le hace nada**. Espera **de
+  rodillas** (`REZA`, su `sfx.pontifice_rezo` de vez en cuando).
+- **La pelea** (solo con quien esta dentro de la basilica: `percibe` y `objetivoValido`; a los penitentes no les hace nada): al verle
+  dice la frase 1 mientras se levanta y al acabarla **predica** (el sermon, su "rugido": los penitentes de alrededor —24— se
+  enfervorizan, `animo` 0,25 240 ticks, y van a por su presa). De cerca el **ferulazo** (la alza y la estrella delante: 4,8, 50
+  grados) y el **barrido** (4,5, 160 grados): los travesanos **cortan** (hacen sangrar, `Sangrado`: 18, ungido 28); la **aspersion**
+  (de cerca o hasta 7: echa la sangre del caliz en abanico delante —`R_ASPERSION` 7,5, `ABANICO` 42 grados a cada lado, a la vista—:
+  x0,35 del golpe, **sangrar** 34 —ungido 44— y frena un poco); la **comunion** (si hay alguien sangrando —25 o mas— a menos de
+  `R_COMUNION` 14: alza el caliz por encima de la tiara; la sangre de cada uno que sangra vuela al caliz —le duele un poco, se le
+  quita la sangre— y **le cura** lo que llevaba, hasta 70 por cada uno; despues **bebe**: mejor no llegar sangrando) y el **juicio**
+  (de lejos —5 a 22— o, ungido, tambien de cerca: alza la ferula al cielo y la clava; bajo los pies de cada jugador —y de su presa—,
+  hasta 24, sale una **marca** —un circulo de polvo rojo que gira y gotea— y a los `MARCA_T` 22 ticks la **columna de sangre**: a
+  quien siga encima —`R_COLUMNA` 1,45— x0,85 del golpe, lo **lanza por el aire** y le hace sangrar 40; apartarse a tiempo). A **media
+  vida** no predica: la **uncion** (se vierte el caliz por la cabeza; la frase 2): desde entonces sangra —gotas que le caen de la tiara
+  y del alba— y deja **charcos de sangre** por donde pisa (`enemigos/CharcoSangre`, una nube de efecto de area: radio 1,8, 220 ticks;
+  cada 10 hace sangrar 9 a quien este en el —no a los enemigos— y frena; cada `CHARCO_CADA` 55 ticks, mas un poco), juzga mas a menudo
+  y con una marca mas cerca de cada uno, y de los canales de la nave se alza la **procesion** (`Altar.procesion`: diez sitios junto al
+  canal, de dos a cuatro penitentes —uno mas que los jugadores—, los mas lejos de los jugadores, postrados en la sangre que se alzan de
+  golpe; **efimeros**: sin puesto, se deshacen al acabar la pelea o a los 240 ticks). `Pontifice.mediaVida()`, `vencer()`, `quieta`
+  (pruebas) y contadores (`ferulazos`, `barridos`, `aspersiones` / `asperjados`, `comuniones` / `bebidos` / `curado`, `juicios` /
+  `marcadas` / `columnas` / `columnasQueDan`, `sermones` / `enfervoriza`, `alzados`, `charcos`; `CharcoSangre.SANGRAN`).
+- **Al caer** se queda de rodillas, el caliz se le cae y se derrama delante de el (la sangre se extiende), dice su ultima frase y se
+  **deshace en sangre** (`tickDeath` propio, 130 ticks: almas que suben y al final la sangre que revienta); lo demas lo reparte
+  `valdrenn/Guardianes`: el cartel de JEFE ABATIDO con 17000 ecos, la hazana `pontifice` ("Sin mas sangre", con su entrada del
+  diario) y el bestiario; deja tres piedras de forja III, dos II y la ceniza de la sangre. Y **la Tierra sin Fe descansa** (`Altar.paz`, cada
+  segundo desde `Morvain.onTick`): los penitentes que seguian **rezando de rodillas** (los `REZA` del Puente de la Grieta y del altar;
+  no los que pelean) se deshacen en sangre (`DESCANSAN`) y **ya no vuelven** (los sitios `grieta` y `altar` se registran con
+  `activo`).
+- **Voz** (ElevenLabs, `eleven_v4`, **"Supernal"** `J4Gklq1lvygedV6xCpKJ`, flow `lCcsSxKt2uupHxtewNEY`; 5 frases, tomas a salvo la a;
+  en `procesar.py` `voz_pontifice`: un poco mas grave, una segunda voz una quinta por encima muy baja y temblorosa —el coro que le
+  contesta—, un coro lento, algo de raspa y el eco largo de la nave de piedra): linea **14 + N** (`Voces.BASE_PONTIFICE`, `esPontifice`;
+  `habla_pontifice` en `rey_voces.json`; subtitulos `darkcraft.pontifice.voz.N`): 1 al empezar ("Arrodillate, hijo mio. El altar
+  tiene sed... y tu aun estas tan lleno."; no la repite en 4 min), 2 al ungirse ("¿Lo ves? Yo tambien doy la mia. Alzaos,
+  hermanos..."), 3 si cae su presa ("Ya esta. Ahora estas perdonado."), 4 la primera vez que bebe la sangre de alguien ("Tu sangre es
+  una oracion... y yo la oigo.") y 5 al caer ("Perdonadme... yo solo queria... que alguien contestara.").
+- **Barra** (`GuardianCliente`, estilo "sangre": letras de cera palida y gotas de sangre que caen; arte de
+  `tools/hud/barra_guardianes.py` "pontifice": la ferula de oro de punta a punta con la cruz de tres travesanos al final y la tiara en
+  medio; relleno de sangre). **Musica**: "The Descecrated Temple" de Insydnis (OpenGameArt, CC-BY 3.0, id `pontifice`, tema 40 de
+  `ClientMusic.boss`).
+- **El altar suena** (`ClientMusic.tickSinFe`): a menos de 70 del crucero, en vez del viento de la Tierra sin Fe,
+  `ambiente.altar` (el aire de la basilica: un coro lejano, goteo y el viento por los arcos).
+- Sonidos (ElevenLabs, flow `lCcsSxKt2uupHxtewNEY`, `TOMAS_SFX`): `pontifice_sermon` (4 y 1), `pontifice_ferula` (3 y 1),
+  `pontifice_golpe` (4 y 1), `pontifice_aspersion` (4 y 2), `pontifice_comunion` (4 y 1), `pontifice_bebe` (4 y 2), `pontifice_juicio`
+  (3 y 2), `pontifice_columna` (1 y 4), `pontifice_uncion` (4 y 1), `pontifice_procesion` (4 y 3), `pontifice_dolor` (4 y 3),
+  `pontifice_muerte` (1 y 4), `pontifice_rezo` (4 y 1) y `altar_ambiente` (3 y 1, `stream`).
+- Comandos `/darkcraft pontifice [ir | altar <sitio> | vencer | volver]` (sin mas: como esta; `volver` le pone otra vez de rodillas y
+  vuelven los penitentes que rezaban, aqui y en el puente).
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_altar carpeta`: la basilica, el atrio, el campamento y las tumbas con las
+  marcas de Anselmo (A0) y los penitentes (Pn); si se llega a pie desde la entrada a cada sitio (menos `alto`) y a cada uno de los que
+  esperan, que ninguno esta metido en un bloque, que todos tienen suelo y que el suelo de la nave y el crucero esta libre.
+- Pruebas: servidor, lineas `Morvain, el altar profanado: ...` (el atril con el libro 29, el arcon, la pila del altar, el canal con
+  su sangre, las pilas, la puerta, la campana, el suelo de la nave y del crucero; a pie desde la entrada; vistas `morvain_altar.png` y
+  `morvain_altar_nave.png`), `Morvain, el Pontifice: ...` (de rodillas; al verle habla, se levanta y predica; cada accion acaba),
+  `Morvain, los golpes del Pontifice a una presa: ...` (el ferulazo y el barrido que hacen sangrar, la aspersion, la comunion que bebe
+  y cura, el juicio con sus marcas y la columna que lanza), `Morvain, el Pontifice a media vida: ...` (se unge, la procesion, los
+  charcos que hacen sangrar), `Morvain, el Pontifice cae: ...` (se deshace en sangre, los penitentes que rezaban descansan y no
+  vuelven) y `Morvain, el Pontifice vuelve: ...`; cliente, tramo `altar()` despues de la grieta: desde el santuario (`cliente_mv370`),
+  la fachada (`mv371`), el campanario (`mv372`), entrar a pie con el cartel, el logro y su aire (`mv373`), la nave hacia el altar
+  (`mv374`), el crucero con las pilas (`mv375`), Anselmo de rodillas (`mv376`), el presbiterio (`mv377`), la sacristia (`mv378`), el
+  osario (`mv379`), todo desde lo alto (`mv380`); en supervivencia habla (`mv381`) y predica con su barra (`mv382`); sus golpes
+  (`mv383..mv388`: el ferulazo, el barrido, la aspersion, la comunion, el juicio con su marca y la columna), a media vida se unge
+  (`mv389`), la procesion (`mv390`), los charcos (`mv391`), cae de rodillas con el caliz derramado (`mv392`), se deshace en sangre
+  (`mv393`), el cartel (`mv394`), su ultimo sermon (`mv395`) y el bestiario (`mv396`). `LIMIT` 101 min (`lanzar.sh` 107 y 105 min, el
+  paso 135, el trabajo 183).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

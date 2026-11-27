@@ -12,7 +12,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
          22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain", 27: "morvain",
-         28: "morvain"}
+         28: "morvain", 29: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -424,6 +424,16 @@ LIBROS = {
    "Since the night of the red sky the pilgrims have not stopped coming. They come from the south, barefoot, to beg forgiveness of the crater. I give them bread and a straw bed, and in the morning I ring the bridge bell for each one who crosses. They used to cross singing.",
    "Today he arrived, at the head of the last procession: Anselm, who calls himself Pontiff. He says the sky took our faith and only blood can buy it back. The pilgrims listen to him with empty eyes. No one slept tonight: all one could hear was the lash.",
    "He leads them northwest, to the Altar of Blood, beyond the rifts, where the earth is reddest. They come back from there with their faces hooded and their backs laid open, and they no longer cross: they pray. If anyone reads this, do not ring the bell. They come.\n\nBrother Ulric"]),
+ },
+ 29: {
+  "es": ("El último sermón", "Anselmo, Pontífice de la Sangre", [
+   "Hermanos: fuimos al cráter a pedir perdón y nadie contestaba. Rezamos años al cielo vacío. Y la noche del cielo rojo, por fin, algo contestó. No dijo perdón. Dijo: dad.",
+   "Así que damos. La espalda, para que el cielo vea que no nos guardamos nada. La sangre, para el altar, que siempre tiene sed. Los que dudaron se fueron por el camino del sur; ya no los nombro. Los que se quedaron ya no tienen miedo: ya no tienen nada.",
+   "(con otra letra, temblorosa) La sangre no basta. Nunca basta. El altar se la bebe y la voz del cráter pide más. Si alguien lee esto: la voz no perdona. Cobra. Y lo que cobra se lo lleva al centro, al lago rojo, donde espera.\n\nAnselmo"]),
+  "en": ("The Last Sermon", "Anselm, Pontiff of Blood", [
+   "Brothers: we went to the crater to beg forgiveness and no one answered. For years we prayed to the empty sky. And on the night of the red sky, at last, something answered. It did not say forgiven. It said: give.",
+   "So we give. Our backs, so that the sky sees we keep nothing back. Our blood, for the altar, which is always thirsty. Those who doubted left by the southern road; I no longer name them. Those who stayed are no longer afraid: they no longer have anything.",
+   "(in another hand, shaking) Blood is not enough. It is never enough. The altar drinks it and the voice of the crater asks for more. If anyone reads this: the voice does not forgive. It collects. And what it collects it carries to the centre, to the red lake, where it waits.\n\nAnselm"]),
  },
 }
 

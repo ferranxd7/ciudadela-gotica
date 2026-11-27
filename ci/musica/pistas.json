@@ -224,5 +224,16 @@
     "aviso": "Music by Leonardo Paz (leohpaz, OpenGameArt, CC-BY 4.0)",
     "uso": "Brann, el Ballenero (el jefe de la Costa de los Huesos de Morvain)",
     "lufs": -16
+  },
+  {
+    "id": "pontifice",
+    "pagina": "https://opengameart.org/node/52272",
+    "busca": "desecrated",
+    "titulo": "The Descecrated Temple",
+    "autor": "Insydnis",
+    "licencia": "CC-BY 3.0",
+    "aviso": "Music by Insydnis (OpenGameArt, CC-BY 3.0)",
+    "uso": "Anselmo, el Pontifice Sangrante (el jefe de la Tierra sin Fe de Morvain)",
+    "lufs": -16
   }
 ]

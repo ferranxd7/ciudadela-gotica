@@ -225,6 +225,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la grieta en el chunk {}", c.getPos(), t);
         }
+        // el Altar Profanado, en la Tierra sin Fe, a la puerta del santuario del Altar, donde reza Anselmo (parte 7t)
+        try {
+            if (Altar.toca(c.getPos().x, c.getPos().z)) Altar.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el altar en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

@@ -4892,5 +4892,214 @@
         "stream": true
       }
     ]
+  },
+  "sfx.pontifice_sermon": {
+    "subtitle": "subtitles.darkcraft.sfx.pontifice_sermon",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pontifice_sermon_1"
+      },
+      {
+        "name": "darkcraft:sfx/pontifice_sermon_2"
+      }
+    ]
+  },
+  "sfx.pontifice_ferula": {
+    "subtitle": "subtitles.darkcraft.sfx.pontifice_ferula",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pontifice_ferula_1"
+      },
+      {
+        "name": "darkcraft:sfx/pontifice_ferula_2"
+      }
+    ]
+  },
+  "sfx.pontifice_golpe": {
+    "subtitle": "subtitles.darkcraft.sfx.pontifice_golpe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pontifice_golpe_1"
+      },
+      {
+        "name": "darkcraft:sfx/pontifice_golpe_2"
+      }
+    ]
+  },
+  "sfx.pontifice_aspersion": {
+    "subtitle": "subtitles.darkcraft.sfx.pontifice_aspersion",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pontifice_aspersion_1"
+      },
+      {
+        "name": "darkcraft:sfx/pontifice_aspersion_2"
+      }
+    ]
+  },
+  "sfx.pontifice_comunion": {
+    "subtitle": "subtitles.darkcraft.sfx.pontifice_comunion",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pontifice_comunion_1"
+      },
+      {
+        "name": "darkcraft:sfx/pontifice_comunion_2"
+      }
+    ]
+  },
+  "sfx.pontifice_bebe": {
+    "subtitle": "subtitles.darkcraft.sfx.pontifice_bebe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pontifice_bebe_1"
+      },
+      {
+        "name": "darkcraft:sfx/pontifice_bebe_2"
+      }
+    ]
+  },
+  "sfx.pontifice_juicio": {
+    "subtitle": "subtitles.darkcraft.sfx.pontifice_juicio",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pontifice_juicio_1"
+      },
+      {
+        "name": "darkcraft:sfx/pontifice_juicio_2"
+      }
+    ]
+  },
+  "sfx.pontifice_columna": {
+    "subtitle": "subtitles.darkcraft.sfx.pontifice_columna",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pontifice_columna_1"
+      },
+      {
+        "name": "darkcraft:sfx/pontifice_columna_2"
+      }
+    ]
+  },
+  "sfx.pontifice_uncion": {
+    "subtitle": "subtitles.darkcraft.sfx.pontifice_uncion",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pontifice_uncion_1"
+      },
+      {
+        "name": "darkcraft:sfx/pontifice_uncion_2"
+      }
+    ]
+  },
+  "sfx.pontifice_procesion": {
+    "subtitle": "subtitles.darkcraft.sfx.pontifice_procesion",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pontifice_procesion_1"
+      },
+      {
+        "name": "darkcraft:sfx/pontifice_procesion_2"
+      }
+    ]
+  },
+  "sfx.pontifice_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.pontifice_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pontifice_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/pontifice_dolor_2"
+      }
+    ]
+  },
+  "sfx.pontifice_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.pontifice_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pontifice_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/pontifice_muerte_2"
+      }
+    ]
+  },
+  "sfx.pontifice_rezo": {
+    "subtitle": "subtitles.darkcraft.sfx.pontifice_rezo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/pontifice_rezo_1"
+      },
+      {
+        "name": "darkcraft:sfx/pontifice_rezo_2"
+      }
+    ]
+  },
+  "ambiente.altar": {
+    "subtitle": "subtitles.darkcraft.ambiente.altar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/altar_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/altar_ambiente_2",
+        "stream": true
+      }
+    ]
+  },
+  "pontifice.voz.1": {
+    "subtitle": "subtitles.darkcraft.pontifice.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:pontifice/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "pontifice.voz.2": {
+    "subtitle": "subtitles.darkcraft.pontifice.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:pontifice/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "pontifice.voz.3": {
+    "subtitle": "subtitles.darkcraft.pontifice.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:pontifice/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "pontifice.voz.4": {
+    "subtitle": "subtitles.darkcraft.pontifice.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:pontifice/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "pontifice.voz.5": {
+    "subtitle": "subtitles.darkcraft.pontifice.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:pontifice/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "musica.pontifice": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/pontifice",
+        "stream": true
+      }
+    ]
   }
 }

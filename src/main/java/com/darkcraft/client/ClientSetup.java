@@ -78,6 +78,8 @@ public final class ClientSetup {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PENITENTE.get(), com.darkcraft.client.enemigos.PenitenteRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.RED.get(), ctx -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(ctx, 2.2f, false));
         // Brann, el Ballenero (parte 7r): el, su arpon con el cabo, el farol de aceite que lanza y la Vieja
+        // Anselmo, el Pontifice Sangrante (parte 7t)
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.PONTIFICE.get(), com.darkcraft.client.enemigos.PontificeRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.BALLENERO.get(), com.darkcraft.client.enemigos.BalleneroRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ARPON_BALLENERO.get(), com.darkcraft.client.enemigos.ArponBalleneroRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.FAROL_ACEITE.get(), ctx -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(ctx, 1.4f, true));
@@ -152,6 +154,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CondestableModelo.CAPA, com.darkcraft.client.enemigos.CondestableGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.RectoraModelo.CAPA, com.darkcraft.client.enemigos.RectoraGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.BalleneroModelo.CAPA, com.darkcraft.client.enemigos.BalleneroGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.PontificeModelo.CAPA, com.darkcraft.client.enemigos.PontificeGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.ViejaModelo.CAPA, com.darkcraft.client.enemigos.ViejaGeometria::crear);
     }
 }

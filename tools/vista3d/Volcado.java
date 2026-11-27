@@ -803,6 +803,41 @@ public class Volcado {
                 for (var o : v.esperas()) marcas.put((n == 0 ? "B" : "S") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
                 andarCostillar(lvl, v);
             }
+            case "morvain_altar" -> {
+                // el Altar Profanado (parte 7t): la basilica (la fachada con el roseton, el campanario, la nave sin techo con sus arcos,
+                // el canal de sangre, el crucero con las pilas, la sacristia con el libro 29, el osario y el presbiterio con el altar y
+                // la cruz rota), el atrio, el campamento y las tumbas (-Dcaja=x0,z0,x1,z1 para un trozo)
+                String[] k = System.getProperty("caja", com.darkcraft.morvain.Altar.X0 + "," + com.darkcraft.morvain.Altar.Z0 + ","
+                        + com.darkcraft.morvain.Altar.X1 + "," + com.darkcraft.morvain.Altar.Z1).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 50);
+                com.darkcraft.morvain.Altar v = com.darkcraft.morvain.Altar.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("El altar: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " que esperan; "
+                        + v.bancos + " bancos, " + v.velas + " velas, " + v.tumbas + " tumbas, " + v.tiendas + " tiendas, " + v.escombros
+                        + " escombros, " + v.arcos + " arcos; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas()) marcas.put((n == 0 ? "J" : "P") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarAltar(lvl, v);
+            }
             case "morvain_grieta" -> {
                 // el Puente de la Grieta (parte 7s): la grieta con su sangre, el puente con su espadana, la puerta del norte, el paso,
                 // el cementerio, el humilladero, la hospederia con el libro 28 y el campamento de los penitentes
@@ -1275,6 +1310,59 @@ public class Volcado {
             }
         System.out.println("Brann y los salobres: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan + ", sin suelo "
                 + sinSuelo + "; en la sala " + celdas + " celdas, con algo que estorba " + estorban);
+    }
+
+    /**
+     * El Altar Profanado (parte 7t): se llega a pie desde la entrada (el camino del santuario) a cada sitio (menos lo alto y la campana)
+     * y a cada penitente; ninguno metido en un bloque y todos con suelo; y lo que estorba en el suelo de la nave y el crucero (donde
+     * se pelea con Anselmo).
+     */
+    static void andarAltar(WorldGenLevel lvl, com.darkcraft.morvain.Altar v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+            BlockState s = MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+            return s.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || s.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                    || s.getBlock() instanceof net.minecraft.world.level.block.RedStoneWireBlock ? aire : s;
+        };
+        int[] e = v.sitio("entrada");
+        var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], com.darkcraft.morvain.Altar.X0, com.darkcraft.morvain.Altar.Z0,
+                com.darkcraft.morvain.Altar.X1, com.darkcraft.morvain.Altar.Z1, 4_000_000);
+        StringBuilder sb = new StringBuilder("a pie desde la entrada: " + z0.celdas() + " celdas;");
+        for (String s : v.sitios().keySet()) {
+            if (s.equals("alto")) continue;
+            int[] q = v.sitio(s);
+            sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+        }
+        System.out.println(sb);
+        int malos = 0, chocan = 0, sinSuelo = 0;
+        for (var o : v.esperas()) {
+            if (!z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                malos++;
+                System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z());
+            }
+            for (int dy = 0; dy < 2; dy++) {
+                BlockState st = mundo.en(o.x(), o.y() + dy, o.z());
+                if (choca(st)) {
+                    chocan++;
+                    System.out.println("  " + o.grupo() + " metido en un bloque: " + o.x() + "," + (o.y() + dy) + "," + o.z() + " " + st);
+                }
+            }
+            BlockState abajo = mundo.en(o.x(), o.y() - 1, o.z());
+            if (!choca(abajo)) {
+                sinSuelo++;
+                System.out.println("  " + o.grupo() + " sin suelo: " + o.x() + "," + o.y() + "," + o.z() + " " + abajo);
+            }
+        }
+        // la nave y el crucero, de pilar a pilar: lo que estorba a ras de suelo (sin contar los pilares)
+        int estorban = 0, celdas = 0;
+        int X = com.darkcraft.morvain.Altar.CX, Z = com.darkcraft.morvain.Altar.CZ, P = com.darkcraft.morvain.Altar.PISO;
+        for (int x = X - 5; x <= X + 5; x++)
+            for (int z = Z - 19; z <= Z + 22; z++) {
+                celdas++;
+                if (choca(mundo.en(x, P, z)) && choca(mundo.en(x, P + 1, z))) estorban++;
+            }
+        System.out.println("Anselmo y los penitentes: " + v.esperas().size() + ", a los que no se llega " + malos + ", metidos en un bloque " + chocan
+                + ", sin suelo " + sinSuelo + "; en la nave " + celdas + " celdas, con algo que estorba " + estorban);
     }
 
     /**

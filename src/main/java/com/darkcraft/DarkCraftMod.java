@@ -363,6 +363,23 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_PENITENTE_ALZARSE = sound("sfx.penitente_alzarse");
     public static final RegistryObject<SoundEvent> SFX_GRIETA_CAMPANA = sound("sfx.grieta_campana");
     public static final RegistryObject<SoundEvent> AMBIENTE_SINFE = sound("ambiente.sinfe");
+    // Anselmo, el Pontifice Sangrante (parte 7t): el sermon, la ferula que silba y el golpe de su cruz, la aspersion del caliz, la
+    // comunion (la sangre que vuela al caliz) y el trago, el juicio y la columna de sangre, la uncion, la procesion que se alza,
+    // el dolor, la muerte y su rezo de rodillas; y el aire del Altar Profanado
+    public static final RegistryObject<SoundEvent> SFX_PONTIFICE_SERMON = sound("sfx.pontifice_sermon");
+    public static final RegistryObject<SoundEvent> SFX_PONTIFICE_FERULA = sound("sfx.pontifice_ferula");
+    public static final RegistryObject<SoundEvent> SFX_PONTIFICE_GOLPE = sound("sfx.pontifice_golpe");
+    public static final RegistryObject<SoundEvent> SFX_PONTIFICE_ASPERSION = sound("sfx.pontifice_aspersion");
+    public static final RegistryObject<SoundEvent> SFX_PONTIFICE_COMUNION = sound("sfx.pontifice_comunion");
+    public static final RegistryObject<SoundEvent> SFX_PONTIFICE_BEBE = sound("sfx.pontifice_bebe");
+    public static final RegistryObject<SoundEvent> SFX_PONTIFICE_JUICIO = sound("sfx.pontifice_juicio");
+    public static final RegistryObject<SoundEvent> SFX_PONTIFICE_COLUMNA = sound("sfx.pontifice_columna");
+    public static final RegistryObject<SoundEvent> SFX_PONTIFICE_UNCION = sound("sfx.pontifice_uncion");
+    public static final RegistryObject<SoundEvent> SFX_PONTIFICE_PROCESION = sound("sfx.pontifice_procesion");
+    public static final RegistryObject<SoundEvent> SFX_PONTIFICE_DOLOR = sound("sfx.pontifice_dolor");
+    public static final RegistryObject<SoundEvent> SFX_PONTIFICE_MUERTE = sound("sfx.pontifice_muerte");
+    public static final RegistryObject<SoundEvent> SFX_PONTIFICE_REZO = sound("sfx.pontifice_rezo");
+    public static final RegistryObject<SoundEvent> AMBIENTE_ALTAR = sound("ambiente.altar");
     public static final RegistryObject<SoundEvent> SFX_CRIPTA = sound("sfx.cripta_abre");
     public static final RegistryObject<SoundEvent> SFX_BARCO = sound("sfx.barco_reparado");
     public static final RegistryObject<SoundEvent> AMBIENTE_BRUMAVELA = sound("ambiente.brumavela");
@@ -444,6 +461,7 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_CONDESTABLE = sound("musica.condestable");
     public static final RegistryObject<SoundEvent> MUSICA_RECTORA = sound("musica.rectora");
     public static final RegistryObject<SoundEvent> MUSICA_BALLENERO = sound("musica.ballenero");
+    public static final RegistryObject<SoundEvent> MUSICA_PONTIFICE = sound("musica.pontifice");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");
@@ -501,6 +519,10 @@ public class DarkCraftMod {
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] BALLENERO_VOZ = new RegistryObject[6];
 
+    /** Frases de Anselmo, el Pontifice Sangrante (1..5, parte 7t). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] PONTIFICE_VOZ = new RegistryObject[6];
+
     /** Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn): en estereo, suenan sin sitio. */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] SOMBRA_VOZ = new RegistryObject[10];
@@ -516,6 +538,7 @@ public class DarkCraftMod {
         for (int i = 1; i < CONDESTABLE_VOZ.length; i++) CONDESTABLE_VOZ[i] = sound("condestable.voz." + i);
         for (int i = 1; i < RECTORA_VOZ.length; i++) RECTORA_VOZ[i] = sound("rectora.voz." + i);
         for (int i = 1; i < BALLENERO_VOZ.length; i++) BALLENERO_VOZ[i] = sound("ballenero.voz." + i);
+        for (int i = 1; i < PONTIFICE_VOZ.length; i++) PONTIFICE_VOZ[i] = sound("pontifice.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -712,6 +735,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Penitente>> PENITENTE = ENTITIES.register("penitente",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Penitente>of(com.darkcraft.enemigos.Penitente::new, MobCategory.MONSTER)
                     .sized(0.65f, 1.95f).clientTrackingRange(8).build(MODID + ":penitente"));
+    // ---- Anselmo, el Pontifice Sangrante, el jefe de la Tierra sin Fe (parte 7t)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Pontifice>> PONTIFICE = ENTITIES.register("pontifice",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Pontifice>of(com.darkcraft.enemigos.Pontifice::new, MobCategory.MONSTER)
+                    .sized(1.1f, 3.1f).fireImmune().clientTrackingRange(10).build(MODID + ":pontifice"));
     // ---- Brann, el Ballenero, el jefe de la Costa de los Huesos (parte 7r): su arpon con su cabo, el farol de aceite y la Vieja
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Ballenero>> BALLENERO = ENTITIES.register("ballenero",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Ballenero>of(com.darkcraft.enemigos.Ballenero::new, MobCategory.MONSTER)
@@ -921,6 +948,7 @@ public class DarkCraftMod {
         e.put(SALOBRE.get(), com.darkcraft.enemigos.Salobre.atributos().build());
         e.put(BALLENERO.get(), com.darkcraft.enemigos.Ballenero.atributos().build());
         e.put(PENITENTE.get(), com.darkcraft.enemigos.Penitente.atributos().build());
+        e.put(PONTIFICE.get(), com.darkcraft.enemigos.Pontifice.atributos().build());
         e.put(AHOGADO.get(), com.darkcraft.enemigos.Ahogado.atributos().build());
         e.put(CAPITAN.get(), com.darkcraft.enemigos.Capitan.atributos().build());
         e.put(GUARDIA.get(), com.darkcraft.enemigos.Guardia.atributos().build());

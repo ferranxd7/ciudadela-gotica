@@ -67,10 +67,11 @@ public final class MorvainEnemigos {
     public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo",
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
             CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio",
-            PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta";
+            PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
-            ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente";
+            ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente",
+            PONTIFICE = "pontifice";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
@@ -80,7 +81,7 @@ public final class MorvainEnemigos {
             ARBOLEDA_P = new ArrayList<>(), PATIBULO_P = new ArrayList<>(), PILOTES_P = new ArrayList<>(), LAGUNA_P = new ArrayList<>(),
             BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>(), ERMITA_P = new ArrayList<>(), CUMBRE_P = new ArrayList<>(),
             CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>(),
-            PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>(), GRIETA_P = new ArrayList<>();
+            PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>(), GRIETA_P = new ArrayList<>(), ALTAR_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -204,6 +205,10 @@ public final class MorvainEnemigos {
         // ---- el Puente de la Grieta (parte 7s): los penitentes que apunta el plano
         for (Grieta.Espera e : Grieta.get().esperas())
             GRIETA_P.add(new Puesto(PENITENTE, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
+        // ---- el Altar Profanado (parte 7t): Anselmo ante el altar (el puesto 0) y los penitentes de la basilica y de alrededor
+        for (Altar.Espera e : Altar.get().esperas())
+            ALTAR_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? PONTIFICE : PENITENTE, e.variante(), e.x(), e.y(), e.z(), e.giro(),
+                    e.postura(), e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -241,6 +246,11 @@ public final class MorvainEnemigos {
         return 0;
     }
 
+    /** El numero del puesto de Anselmo, el Pontifice Sangrante, en el sitio del Altar. */
+    public static int pontifice() {
+        return 0;
+    }
+
     /** Lo apunta el mod al arrancar. */
     public static void registrar() {
         Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
@@ -258,6 +268,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(SALOBRE, DarkCraftMod.SALOBRE);
         Puestos.tipo(BALLENERO, DarkCraftMod.BALLENERO);
         Puestos.tipo(PENITENTE, DarkCraftMod.PENITENTE);
+        Puestos.tipo(PONTIFICE, DarkCraftMod.PONTIFICE);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -284,7 +295,10 @@ public final class MorvainEnemigos {
         Puestos.registrar(PUERTO, PUERTO_P, Morvain::es, (l, p) -> p.postura() != REZA || !Costillar.enPaz(l.getServer()));
         Puestos.registrar(COSTILLAR, COSTILLAR_P, Morvain::es,
                 (l, p) -> Puestos.JEFE.equals(p.grupo()) || p.postura() != REZA || !Costillar.enPaz(l.getServer()));
-        Puestos.registrar(GRIETA, GRIETA_P, Morvain::es);
+        // los penitentes que rezan de rodillas solo mientras vive Anselmo (vencido, la Tierra sin Fe descansa: se deshacen en sangre)
+        Puestos.registrar(GRIETA, GRIETA_P, Morvain::es, (l, p) -> p.postura() != REZA || !Altar.enPaz(l.getServer()));
+        Puestos.registrar(ALTAR, ALTAR_P, Morvain::es,
+                (l, p) -> Puestos.JEFE.equals(p.grupo()) || p.postura() != REZA || !Altar.enPaz(l.getServer()));
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -307,6 +321,9 @@ public final class MorvainEnemigos {
             // y al caer Brann vuelve la marea: los salobres que faenaban descansan (lo hace Costillar.paz cada segundo; aqui, el aviso)
             if (e instanceof com.darkcraft.enemigos.Ballenero && COSTILLAR.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] Brann, el Ballenero, cae: vuelve la marea a la Costa de los Huesos");
+            // y al caer el Pontifice la Tierra sin Fe descansa (lo hace Altar.paz cada segundo; aqui, el aviso)
+            if (e instanceof com.darkcraft.enemigos.Pontifice && ALTAR.equals(e.sitio()))
+                DarkCraftMod.LOGGER.info("[DarkCraft] Anselmo, el Pontifice Sangrante, cae: la Tierra sin Fe descansa");
         });
     }
 
@@ -378,6 +395,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> grieta() {
         preparar();
         return List.copyOf(GRIETA_P);
+    }
+
+    public static List<Puesto> altar() {
+        preparar();
+        return List.copyOf(ALTAR_P);
     }
 
     public static List<Puesto> puerto() {
@@ -1242,6 +1264,69 @@ public final class MorvainEnemigos {
     }
 
     /**
+     * {@code /darkcraft pontifice [ir | vencer | volver | altar <sitio>]} (parte 7t): como esta Anselmo, llevar ante el (a la puerta
+     * de la basilica), vencerle, que vuelva (y los penitentes que rezaban, como estaban) o ir a un sitio del altar.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoPontifice() {
+        return net.minecraft.commands.Commands.literal("pontifice")
+                .executes(c -> decir(c, estadoPontifice(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irAltar(c.getSource(), "puerta")))
+                .then(net.minecraft.commands.Commands.literal("altar")
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Altar.get().sitios().keySet(), b))
+                                .executes(c -> irAltar(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(ALTAR, pontifice());
+                    if (e instanceof com.darkcraft.enemigos.Pontifice b) b.vencer();
+                    else {
+                        Puestos.marcar(srv, ALTAR, pontifice(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "pontifice");
+                    }
+                    return decir(c, estadoPontifice(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, ALTAR, pontifice(), false);
+                    // los penitentes que rezaban en el puente y en el altar vuelven a su sitio en cuanto salgan
+                    Puestos.todos(srv, GRIETA, false);
+                    Puestos.todos(srv, ALTAR, false);
+                    return decir(c, estadoPontifice(srv));
+                }));
+    }
+
+    private static int irAltar(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Altar.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Altar.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando al altar; desde el presbiterio, hacia la puerta
+        int[] al = Altar.get().sitio("altar");
+        double tx = al[0], tz = al[2];
+        if (Math.hypot(tx - s[0], tz - s[2]) < 6) tz = Altar.CZ + 30;
+        float giro = (float) (Math.toDegrees(Math.atan2(tz - s[2], tx - s[0])) - 90.0);
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
+        return decir(src, estadoPontifice(src.getServer()));
+    }
+
+    /** Como esta Anselmo (y su altar, si esta cargado): para el comando y las pruebas. */
+    public static String estadoPontifice(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(ALTAR, pontifice());
+        String s = "el Pontifice: " + (Altar.enPaz(srv) ? "caido (la Tierra sin Fe descansa)" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Pontifice b) s += ", " + b.estado();
+        s += "; penitentes del altar: quedan " + Puestos.quedan(srv, ALTAR) + " de " + ALTAR_P.size() + " (fuera " + Puestos.fuera(ALTAR)
+                + "), descansan " + Altar.DESCANSAN;
+        var m = Morvain.nivel(srv);
+        int[] at = Altar.get().sitio("atril");
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(at[0], at[1], at[2])) && m.isLoaded(new net.minecraft.core.BlockPos(Altar.CX, Altar.PISO, Altar.CZ)))
+            s += "; " + Altar.resumen(m);
+        return s;
+    }
+
+    /**
      * {@code /darkcraft condestable [ir | vencer | volver | patio <sitio> | rastrillo [bajar | subir]]} (parte 7n): como esta el
      * Condestable, llevar ante el (a la puerta del patio), vencerle, que vuelva (y la capital como estaba), ir a un sitio del patio
      * o mover el rastrillo a mano.
@@ -1357,6 +1442,7 @@ public final class MorvainEnemigos {
         todos.addAll(PUERTO_P);
         todos.addAll(COSTILLAR_P);
         todos.addAll(GRIETA_P);
+        todos.addAll(ALTAR_P);
         for (Puesto p : todos) {
             if (Math.hypot(p.x() - Llegada.X, p.z() - Llegada.Z) < 18) cerca++;
             for (SantuariosMorvain.Sitio s : SantuariosMorvain.todos()) if (Math.hypot(p.x() - s.x(), p.z() - s.z()) < 14) cerca++;
@@ -1372,6 +1458,7 @@ public final class MorvainEnemigos {
                 + CUMBRE_P.size() + " en la cumbre, " + CAPITAL_P.size() + " en la puerta oeste de la capital, " + JURAMENTO_P.size()
                 + " en el patio del Juramento, " + ACADEMIA_P.size() + " en la academia espectral, " + OBSERVATORIO_P.size()
                 + " en el observatorio, " + PUERTO_P.size() + " en el puerto varado, " + COSTILLAR_P.size()
-                + " en el costillar, " + GRIETA_P.size() + " en el puente de la grieta; cerca del arco o de un santuario " + cerca;
+                + " en el costillar, " + GRIETA_P.size() + " en el puente de la grieta, " + ALTAR_P.size()
+                + " en el altar profanado; cerca del arco o de un santuario " + cerca;
     }
 }

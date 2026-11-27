@@ -327,6 +327,9 @@ public final class Morvain {
             if (srv.getTickCount() % 20 == 17) Costillar.paz(m);
             // el Puente de la Grieta (parte 7s): de vez en cuando su campana tañe sola
             if (srv.getTickCount() % 100 == 47) Grieta.campana(m);
+            // el Altar Profanado (parte 7t): con Anselmo caido la Tierra sin Fe descansa y los penitentes que rezaban de rodillas
+            // (alli y en el Puente de la Grieta) se deshacen en sangre; cada segundo
+            if (srv.getTickCount() % 20 == 13) Altar.paz(m);
         }
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
@@ -383,6 +386,10 @@ public final class Morvain {
                 com.darkcraft.story.Logros.dar(p, "grieta");
                 p.playNotifySound(DarkCraftMod.SFX_GRIETA_CAMPANA.get(), SoundSource.AMBIENT, 1.4f, 0.95f);
             }
+        // y quien entra en la basilica del Altar Profanado (parte 7t)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Altar.enNave(p.getX(), p.getZ()) && Math.abs(p.getY() - Altar.PISO) < 8)
+                com.darkcraft.story.Logros.dar(p, "altar");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -467,6 +474,8 @@ public final class Morvain {
         }
         // el Costillar de la Ballena, donde espera Brann (parte 7r)
         if (Costillar.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Costillar.PISO) < 40) return "darkcraft.morvain.lugar.costillar";
+        // el Altar Profanado, donde reza Anselmo (parte 7t)
+        if (Altar.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Altar.PISO) < 40) return "darkcraft.morvain.lugar.altar";
         // el Puente de la Grieta (parte 7s): tambien en el fondo de la grieta
         if (Grieta.dentro(p.getX(), p.getZ()) && p.getY() > Grieta.FONDO - 4 && p.getY() < Grieta.PISO + 40) return "darkcraft.morvain.lugar.grieta";
         // el Observatorio de la Rectora (parte 7p)

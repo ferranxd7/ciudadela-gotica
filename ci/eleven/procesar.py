@@ -81,6 +81,8 @@ TOMAS_RECTORA = {1: "a", 2: "b", 3: "a", 4: "a", 5: "a"}
 # Brann, el Ballenero (parte 7r; voz "Declan Graves", la del Verdugo, pero sin bajarla tanto): las tomas a, salvo la 1 (la
 # 1a acaba de hablar pegada al final del fichero: la b deja su cola)
 TOMAS_BALLENERO = {1: "b", 2: "a", 3: "a", 4: "a", 5: "a"}
+# Anselmo, el Pontifice Sangrante (parte 7t)
+TOMAS_PONTIFICE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -285,6 +287,11 @@ SFX = {
     "ballenero_arponazo": (1.8, 0.5, -13), "ballenero_cuchillo": (1.2, 0.4, -14), "ballenero_aceite": (4.0, 1.4, -14),
     "ballenero_vieja": (8.0, 2.5, -14), "ballenero_embestida": (5.0, 1.5, -13), "ballenero_dolor": (1.3, 0.4, -15),
     "ballenero_muerte": (7.0, 2.0, -15), "ballenero_espera": (7.0, 2.0, -22),
+    "pontifice_sermon": (4.5, 1.2, -14), "pontifice_ferula": (1.5, 0.4, -14), "pontifice_golpe": (2.2, 0.8, -13),
+    "pontifice_aspersion": (1.6, 0.5, -14), "pontifice_comunion": (3.2, 1.0, -15), "pontifice_bebe": (2.2, 0.5, -16),
+    "pontifice_juicio": (2.6, 0.6, -14), "pontifice_columna": (2.2, 0.8, -13), "pontifice_uncion": (3.2, 1.0, -14),
+    "pontifice_procesion": (4.2, 1.2, -15), "pontifice_dolor": (1.1, 0.3, -15), "pontifice_muerte": (4.5, 1.5, -15),
+    "pontifice_rezo": (5.0, 1.5, -22), "altar_ambiente": (20, 2, -25),
     "costillar_ambiente": (20.0, 2.0, -25),
     # los Penitentes de la Tierra sin Fe (parte 7s): el rezo entre dientes (el sonido de estar), el grito al ver a alguien, el
     # quejido, la muerte (cae y se desangra), el azote (el chasquido), la penitencia (se azota tres veces), la hemorragia (el
@@ -301,7 +308,8 @@ SFX = {
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
            "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0, "abad_ventisca": 1.5, "abad_rezo": 0.4,
            "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6, "academia_ambiente": 2.0, "erudito_susurro": 0.8,
-           "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0, "sinfe_ambiente": 2.0}
+           "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0, "sinfe_ambiente": 2.0,
+           "altar_ambiente": 2.0, "pontifice_rezo": 1.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
@@ -521,6 +529,16 @@ TOMAS_SFX = {
     "ballenero_grito": (4, 1), "ballenero_arpon": (3, 1), "ballenero_tiron": (4, 2), "ballenero_arponazo": (1, 4),
     "ballenero_cuchillo": (3, 2), "ballenero_aceite": (3, 4), "ballenero_vieja": (4, 1), "ballenero_embestida": (4, 1),
     "ballenero_dolor": (3, 4), "ballenero_muerte": (1, 3), "ballenero_espera": (4, 3), "costillar_ambiente": (3, 1),
+    # Anselmo: los dos sermones mas sostenidos (la 4 y la 1); las ferulas con el silbido mas limpio (la 3 y la 1); los dos
+    # golpes que mas aguantan (la 4 y la 1); las aspersiones mas llenas (la 4 y la 2); las comuniones con el coro (la 4 y la
+    # 1); los dos tragos (la 4 y la 2); los juicios mas graves (la 3 y la 2); las columnas que aguantan (la 1 y la 4); las
+    # unciones que vierten y luego jadean (la 4 y la 1); las procesiones con el cantico (la 4 y la 3); dos quejidos (la 4 y
+    # la 3); las muertes con el caliz (la 1 y la 4); los dos rezos mas graves (la 4 y la 1); y del aire del Altar, el que
+    # mas cambia (la 3) y el mas lleno (la 1)
+    "pontifice_sermon": (4, 1), "pontifice_ferula": (3, 1), "pontifice_golpe": (4, 1), "pontifice_aspersion": (4, 2),
+    "pontifice_comunion": (4, 1), "pontifice_bebe": (4, 2), "pontifice_juicio": (3, 2), "pontifice_columna": (1, 4),
+    "pontifice_uncion": (4, 1), "pontifice_procesion": (4, 3), "pontifice_dolor": (4, 3), "pontifice_muerte": (1, 4),
+    "pontifice_rezo": (4, 1), "altar_ambiente": (3, 1),
     # los penitentes: los dos rezos que se oyen de seguido desde el principio (la 2 y la 3); los dos gritos que empiezan en seguida (la
     # 1 y la 4); los quejidos cortos (la 2 y la 4); las muertes con el golpe al caer (la 4, la de mas graves, y la 1); los azotes que
     # chasquean nada mas empezar (la 4 y la 2); de la penitencia un solo azote con su jadeo (se salta hasta el primero: la 1 y la 2);
@@ -789,6 +807,28 @@ def voz_ballenero(src, dst):
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA + 0.1
+
+
+def voz_pontifice(src, dst):
+    """
+    Anselmo, el Pontifice Sangrante: un viejo fanatico que predica en una basilica sin techo. Un poco mas grave, una segunda
+    voz una quinta por encima muy baja y temblorosa (el coro que le contesta), un coro lento que la hace vibrar como un
+    salmo, algo de raspa en los gritos y el eco largo de la nave de piedra (largo, alto, con su cola).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=2[v1][v2];"
+        "[v1]asetrate=44100*0.95,aresample=44100,atempo=1.0526[baja];"
+        "[v2]asetrate=44100*1.5,aresample=44100,atempo=0.6667,highpass=f=1200,volume=0.10[alta];"
+        "[baja][alta]amix=inputs=2:weights=1 0.45:normalize=0,"
+        "chorus=0.6:0.85:38|55:0.22|0.18:0.30|0.26:1.6|1.1,"
+        "equalizer=f=180:t=q:w=1.0:g=2,equalizer=f=2600:t=q:w=1.2:g=1.5,highshelf=f=7500:g=-1.5,"
+        "asoftclip=type=tanh:threshold=0.8,"
+        "aecho=0.8:0.5:170|380|640|980:0.28|0.19|0.12|0.07,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.2
 
 
 def sonoridad(f):
@@ -1108,6 +1148,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO ballenero {n}: {e}")
+    # Anselmo, el Pontifice Sangrante (parte 7t)
+    pon = os.path.join(ASSETS, "sounds", "pontifice")
+    os.makedirs(pon, exist_ok=True)
+    dur_p, hab_p = {}, {}
+    for n, toma in sorted(TOMAS_PONTIFICE.items()):
+        src = os.path.join(MASTER, "pontifice", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(pon, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_pontifice(src, dst)
+            dur_p[n] = round(duracion(dst), 2)
+            hab_p[n] = round(min(h, dur_p[n]), 2)
+            print(f"pontifice {n:2d}: {dur_p[n]} s (habla hasta {hab_p[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO pontifice {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -1140,7 +1199,8 @@ def main():
                    "sombra": dur_s, "habla_sombra": hab_s, "molinera": dur_m, "habla_molinera": hab_m,
                    "verdugo": dur_v, "habla_verdugo": hab_v, "barquero": dur_b, "habla_barquero": hab_b,
                    "abad": dur_a, "habla_abad": hab_a, "condestable": dur_k, "habla_condestable": hab_k,
-                   "rectora": dur_r, "habla_rectora": hab_r, "ballenero": dur_w, "habla_ballenero": hab_w}, fh)
+                   "rectora": dur_r, "habla_rectora": hab_r, "ballenero": dur_w, "habla_ballenero": hab_w,
+                   "pontifice": dur_p, "habla_pontifice": hab_p}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

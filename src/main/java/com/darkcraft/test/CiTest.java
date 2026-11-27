@@ -741,6 +741,7 @@ public final class CiTest {
         puerto(server, m, log, out);
         costillar(server, m, log, out);
         grieta(server, m, log, out);
+        altar(server, m, log, out);
     }
 
     /**
@@ -2490,6 +2491,365 @@ public final class CiTest {
                 log.println("Morvain, el Ballenero vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoBallenero(server));
             } catch (Throwable t) {
                 log.println("Morvain, el Ballenero vuelve: ERROR " + t);
+            }
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    private static boolean tickAltar(ServerLevel m, net.minecraft.world.phys.AABB caja, java.util.List<net.minecraft.world.entity.Entity> quitar) {
+        boolean hay = false;
+        for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.CharcoSangre.class, caja)) {
+            if (e.isRemoved()) continue;
+            if (!quitar.contains(e)) quitar.add(e);
+            e.tickCount++;
+            e.tick();
+            hay = true;
+        }
+        return hay;
+    }
+
+    private static void limpiarAltar(ServerLevel m, net.minecraft.world.phys.AABB caja) {
+        for (var e : m.getEntitiesOfClass(com.darkcraft.enemigos.CharcoSangre.class, caja.inflate(10, 20, 10))) e.discard();
+    }
+
+    /**
+     * Parte 7t: el Altar Profanado (a pie desde el camino del santuario a todos sus sitios; el atril con el libro 29, el arcon, la
+     * pila del altar, el canal y las pilas de sangre, la puerta, la campana y el suelo de la nave libre) y Anselmo, el Pontifice
+     * Sangrante: de rodillas ante el altar con los penitentes de alrededor; al ver a alguien en la nave habla mientras se levanta y
+     * predica; cada accion acaba; sus golpes a una presa (el ferulazo y el barrido que hacen sangrar, la aspersion del caliz, la
+     * comunion que le cura con la sangre de quien sangra, el juicio con sus columnas de sangre); a media vida se unge: se alza la
+     * procesion y deja charcos de sangre; y al caer, los penitentes que rezaban de rodillas en el altar y en el Puente de la Grieta se
+     * deshacen y ya no vuelven. Al acabar, todo como estaba.
+     */
+    private static void altar(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.ALTAR, grieta = com.darkcraft.morvain.MorvainEnemigos.GRIETA;
+        var A = com.darkcraft.morvain.Altar.get();
+        final int CX = com.darkcraft.morvain.Altar.CX, CZ = com.darkcraft.morvain.Altar.CZ, PISO = com.darkcraft.morvain.Altar.PISO;
+        final net.minecraft.world.phys.AABB caja = new net.minecraft.world.phys.AABB(CX - 40, PISO - 6, CZ - 45, CX + 40, PISO + 30, CZ + 55);
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : A.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || st.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                        || st.getBlock() instanceof net.minecraft.world.level.block.RedStoneWireBlock ? aire : st;
+            };
+            int[] en = A.sitio("entrada");
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, en[0], en[1], en[2], com.darkcraft.morvain.Altar.X0, com.darkcraft.morvain.Altar.Z0,
+                    com.darkcraft.morvain.Altar.X1, com.darkcraft.morvain.Altar.Z1, 4_000_000);
+            StringBuilder no = new StringBuilder();
+            int llega = 0, sitios = 0;
+            for (var e : A.sitios().entrySet()) {
+                if (e.getKey().equals("alto")) continue;
+                sitios++;
+                int[] q = e.getValue();
+                if (zona.alcanza(q[0], q[1], q[2], 2)) llega++;
+                else no.append(' ').append(e.getKey());
+            }
+            int lejos = 0;
+            for (var o : A.esperas()) if (!zona.alcanza(o.x(), o.y(), o.z(), 2)) lejos++;
+            var sc = com.darkcraft.morvain.SantuariosMorvain.porId("altar");
+            log.println("Morvain, el altar profanado: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Altar.resumen(m) + "; bancos " + A.bancos
+                    + ", velas " + A.velas + ", tumbas " + A.tumbas + ", tiendas " + A.tiendas + ", escombros " + A.escombros + ", arcos " + A.arcos + "; santuario "
+                    + com.darkcraft.santuario.Santuarios.nombre(m, sc.pos()) + " (" + m.getBlockState(sc.pos()).getBlock().getDescriptionId() + ") a "
+                    + Math.round(Math.hypot(sc.x() - en[0], sc.z() - en[2])) + " de la entrada; a pie desde la entrada (" + zona.celdas() + " celdas) a " + llega
+                    + " de " + sitios + " sitios" + (no.length() == 0 ? "" : ", no a:" + no) + "; los que esperan a los que no se llega " + lejos + " de "
+                    + A.esperas().size() + "; lugar en la nave " + (com.darkcraft.morvain.Altar.dentro(CX, CZ) ? "altar" : "NO") + ", en la basilica "
+                    + com.darkcraft.morvain.Altar.enNave(CX + 0.5, CZ + 0.5) + ", en el santuario " + com.darkcraft.morvain.Altar.dentro(sc.x(), sc.z())
+                    + " (tiene que ser false)");
+            topView(m, CX, CZ + 4, 50, new File(out, "morvain_altar.png"));
+            topView(m, CX, CZ - 10, 22, new File(out, "morvain_altar_nave.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, el altar profanado: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] altar", t);
+        }
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        com.darkcraft.enemigos.Pontifice pt = null;
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            int suyos = 0, rodillas = 0, enSuelo = 0, chocan = 0;
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 6; k++)
+                for (var e : fuera) if (e.isAlive() && !(e instanceof com.darkcraft.enemigos.Pontifice)) e.tick();
+            for (var e : fuera) {
+                if (e instanceof com.darkcraft.enemigos.Pontifice x) pt = x;
+                else {
+                    suyos++;
+                    if (e.postura() == com.darkcraft.enemigos.Enemigo.REZA) rodillas++;
+                }
+                if (!m.noCollision(e)) chocan++;
+                if (!m.getBlockState(BlockPos.containing(e.getX(), e.getY() - 0.2, e.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+            }
+            if (pt == null) {
+                log.println("Morvain, el Pontifice: NO SALE");
+                return;
+            }
+            for (var e : fuera) if (e != pt) e.discard();
+            StringBuilder sb = new StringBuilder("Morvain, el Pontifice: en " + pt.blockPosition().toShortString() + " postura " + pt.postura() + " (1 de rodillas), giro "
+                    + Math.round(pt.getYRot()) + ", vida " + Math.round(pt.getMaxHealth()) + ", caja " + pt.getBbWidth() + " x " + pt.getBbHeight() + ", en la basilica "
+                    + com.darkcraft.morvain.Altar.enNave(pt.getX(), pt.getZ()) + ", musica " + pt.musica() + "; los suyos " + suyos + " (de rodillas " + rodillas
+                    + "); en su suelo " + enSuelo + " de " + fuera.size() + ", metidos en un bloque " + chocan + " (tiene que ser 0)");
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b7c9d1e-3f40-4b6c-8d8e-2f3a4b5c6dab"), "[DarkCraftCI12]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- le ve en la nave (a su espalda): habla mientras se levanta y predica al acabar
+            final double fxx = CX + 0.5 + 3, fyy = PISO, fzz = CZ - 6.5;
+            fp.moveTo(fxx, fyy, fzz, 180f, 0f);
+            fp.setOnGround(true);
+            pt.setTarget(fp);
+            int levanta = -1, predica = -1, ataca = -1, quien = 0;
+            for (int k = 0; k < 400; k++) {
+                pt.tickCount++;
+                pt.tick();
+                tickAltar(m, caja, quitar);
+                fp.moveTo(fxx, fyy, fzz, 180f, 0f);
+                fp.setHealth(fp.getMaxHealth());
+                com.darkcraft.enemigos.Sangrado.limpiar(fp);
+                int a = pt.accion();
+                if (levanta < 0 && a == com.darkcraft.enemigos.PontificeAnims.LEVANTARSE) levanta = k;
+                if (predica < 0 && a == com.darkcraft.enemigos.PontificeAnims.SERMON) predica = k;
+                if (predica >= 0 && ataca < 0 && a != 0 && a != com.darkcraft.enemigos.PontificeAnims.SERMON) {
+                    ataca = k;
+                    quien = a;
+                    break;
+                }
+            }
+            sb.append("; al verle: pelea ").append(pt.enPelea()).append(", se levanta en el tick ").append(levanta).append(", predica en el ").append(predica)
+                    .append(" (la frase 1 dura ").append(com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Pontifice.VOZ_BASE + 1)).append("), y luego ")
+                    .append(quien == 0 ? "nada" : com.darkcraft.enemigos.PontificeAnims.NOMBRES[quien]).append(" en el ").append(ataca)
+                    .append(String.format(java.util.Locale.ROOT, ", de pie %s a %.1f de su presa", pt.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE,
+                            Math.hypot(pt.getX() - fp.getX(), pt.getZ() - fp.getZ())));
+            // ---- cada accion acaba (sin presa y quieto: no elige ni predica por su cuenta)
+            pt.quieta = true;
+            pt.setTarget(null);
+            for (int k = 0; k < 120 && pt.accion() != 0; k++) {
+                pt.tickCount++;
+                pt.tick();
+                tickAltar(m, caja, quitar);
+            }
+            StringBuilder nn = new StringBuilder();
+            int vistas = 0;
+            for (int a = 1; a < com.darkcraft.enemigos.PontificeAnims.TICKS.length; a++) {
+                String nombre = com.darkcraft.enemigos.PontificeAnims.NOMBRES[a];
+                if (nombre.equals("morir") || nombre.equals("levantarse") || nombre.equals("uncion")) continue;
+                pt.moveTo(CX + 0.5, PISO, CZ - 10.5, 180f, 0f);
+                pt.empezar(a);
+                vistas++;
+                for (int k = 0; k < 160 && pt.accion() == a; k++) {
+                    pt.tickCount++;
+                    pt.tick();
+                    tickAltar(m, caja, quitar);
+                }
+                if (pt.accion() == a) nn.append(' ').append(nombre);
+            }
+            for (int k = 0; k < 60 && pt.marcasPendientes() > 0; k++) {
+                pt.tickCount++;
+                pt.tick();
+            }
+            limpiarAltar(m, caja);
+            sb.append("; de ").append(vistas).append(" acciones no acaban:").append(nn.length() == 0 ? " ninguna" : nn);
+            log.println(sb);
+            // ---- sus golpes a una presa (un aldeano quieto y duro) en el crucero: el mirando al sur, hacia la puerta
+            StringBuilder sg = new StringBuilder("Morvain, los golpes del Pontifice a una presa:");
+            final double x0 = CX + 0.5, y0 = PISO, z0 = CZ - 16.5;
+            var victima = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            if (victima != null) {
+                victima.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(900.0);
+                victima.setHealth(900f);
+                victima.setNoAi(true);
+                victima.moveTo(x0, y0, z0 + 3, 180f, 0f);
+                m.addFreshEntity(victima);
+                quitar.add(victima);
+                String[] golpes = {"ferulazo", "barrido", "aspersion", "comunion", "juicio"};
+                int[] acc = {com.darkcraft.enemigos.PontificeAnims.FERULAZO, com.darkcraft.enemigos.PontificeAnims.BARRIDO, com.darkcraft.enemigos.PontificeAnims.ASPERSION,
+                        com.darkcraft.enemigos.PontificeAnims.COMUNION, com.darkcraft.enemigos.PontificeAnims.JUICIO};
+                double[] lejos = {3.6, 3.0, 5.0, 8.0, 10.0};
+                int[] dura = {70, 70, 70, 100, 110};
+                for (int i = 0; i < golpes.length; i++) {
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    victima.hurtTime = 0;
+                    victima.removeAllEffects();
+                    com.darkcraft.enemigos.Sangrado.limpiar(victima);
+                    victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    victima.moveTo(x0, y0, z0 + lejos[i], 180f, 0f);
+                    victima.setOnGround(true);
+                    // la comunion: llega sangrando (y el, herido)
+                    if (acc[i] == com.darkcraft.enemigos.PontificeAnims.COMUNION) {
+                        com.darkcraft.enemigos.Sangrado.sumar(victima, 70f, pt);
+                        pt.setHealth(pt.getMaxHealth() * 0.7f);
+                    }
+                    int fer = pt.ferulazos(), bar = pt.barridos(), asp = pt.aspersiones(), asj = pt.asperjados(), com_ = pt.comuniones(), beb = pt.bebidos(),
+                            jui = pt.juicios(), mar = pt.marcadas(), col = pt.columnas(), cold = pt.columnasQueDan();
+                    float curado = pt.curado(), vidaAntes = pt.getHealth();
+                    pt.moveTo(x0, y0, z0, 0f, 0f);
+                    pt.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    pt.setTarget(victima);
+                    pt.setYRot(0f);
+                    pt.yBodyRot = pt.yHeadRot = 0f;
+                    pt.empezar(acc[i]);
+                    float antes = victima.getHealth();
+                    float sangre = 0;
+                    double alto = 0;
+                    for (int k = 0; k < dura[i]; k++) {
+                        boolean el = pt.accion() != 0 || pt.marcasPendientes() > 0;
+                        if (el) {
+                            pt.setTarget(victima);
+                            pt.tickCount++;
+                            pt.tick();
+                            pt.moveTo(x0, y0, z0, 0f, 0f);
+                        }
+                        tickAltar(m, caja, quitar);
+                        net.minecraft.world.phys.Vec3 dv = victima.getDeltaMovement();
+                        if (dv.lengthSqr() > 1e-4) {
+                            victima.move(net.minecraft.world.entity.MoverType.SELF, dv);
+                            victima.setDeltaMovement(dv.x * 0.55, victima.onGround() ? 0 : dv.y - 0.08, dv.z * 0.55);
+                        }
+                        alto = Math.max(alto, victima.getY() - y0);
+                        victima.invulnerableTime = 0;
+                        sangre = Math.max(sangre, com.darkcraft.enemigos.Sangrado.nivel(victima));
+                        if (!el && k > 2) break;
+                    }
+                    sg.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " a %.1f: -%.1f", lejos[i], antes - victima.getHealth()));
+                    switch (i) {
+                        case 0 -> sg.append(", ferulazos +").append(pt.ferulazos() - fer).append(String.format(java.util.Locale.ROOT, ", sangra %.0f", sangre));
+                        case 1 -> sg.append(", barridos +").append(pt.barridos() - bar).append(String.format(java.util.Locale.ROOT, ", sangra %.0f", sangre));
+                        case 2 -> sg.append(", aspersiones +").append(pt.aspersiones() - asp).append(" (dan a +").append(pt.asperjados() - asj)
+                                .append(String.format(java.util.Locale.ROOT, "), sangra %.0f", sangre));
+                        case 3 -> sg.append(", comuniones +").append(pt.comuniones() - com_).append(" (bebe de +").append(pt.bebidos() - beb)
+                                .append(String.format(java.util.Locale.ROOT, ", se cura %.0f: de %.0f a %.0f), a la presa le queda de sangre %.0f", pt.curado() - curado,
+                                        vidaAntes, pt.getHealth(), com.darkcraft.enemigos.Sangrado.nivel(victima)));
+                        case 4 -> sg.append(", juicios +").append(pt.juicios() - jui).append(" (marcas +").append(pt.marcadas() - mar).append(", columnas +")
+                                .append(pt.columnas() - col).append(", dan +").append(pt.columnasQueDan() - cold)
+                                .append(String.format(java.util.Locale.ROOT, ", la lanza %.1f arriba)", alto));
+                        default -> {
+                        }
+                    }
+                    sg.append(';');
+                    limpiarAltar(m, caja);
+                }
+                sg.append(" en total: ").append(pt.estado());
+            }
+            log.println(sg);
+            // ---- a media vida: se unge, se alza la procesion (de los canales de la nave) y deja charcos que hacen sangrar
+            StringBuilder sm = new StringBuilder("Morvain, el Pontifice a media vida:");
+            pt.quieta = false;
+            pt.setHealth(pt.getMaxHealth());
+            pt.moveTo(CX + 0.5, PISO, CZ - 12.5, 0f, 0f);
+            final double vx = CX + 0.5, vz = CZ - 4.5;
+            if (victima != null) {
+                victima.moveTo(vx, y0, vz, 180f, 0f);
+                pt.setTarget(victima);
+            }
+            int alz0 = pt.alzados(), ch0 = pt.charcos(), sang0 = com.darkcraft.enemigos.CharcoSangre.SANGRAN;
+            pt.mediaVida();
+            boolean unge = pt.accion() == com.darkcraft.enemigos.PontificeAnims.UNCION;
+            int ungido = -1;
+            for (int k = 0; k < 240; k++) {
+                if (victima != null) {
+                    // la presa pisa donde el pisa (los charcos)
+                    victima.moveTo(pt.getX(), y0, pt.getZ() + 1.2, 180f, 0f);
+                    victima.setOnGround(true);
+                    victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    if (pt.getTarget() == null) pt.setTarget(victima);
+                }
+                pt.tickCount++;
+                pt.tick();
+                pt.moveTo(CX + 0.5, PISO, CZ - 12.5, 0f, 0f);
+                pt.setOnGround(true);
+                tickAltar(m, caja, quitar);
+                if (ungido < 0 && pt.ungido()) ungido = k;
+            }
+            int enPie = 0, efimeros = 0, enSu = 0;
+            for (var p : pt.procesion()) {
+                quitar.add(p);
+                if (p.isAlive()) enPie++;
+                if (p.esEfimero()) efimeros++;
+                if (p.isAlive() && !m.getBlockState(BlockPos.containing(p.getX(), p.getY() - 0.2, p.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSu++;
+            }
+            sm.append(" segunda ").append(pt.segunda()).append(", se unge ").append(unge).append(" (ungido en el tick ").append(ungido).append("), la procesion +")
+                    .append(pt.alzados() - alz0).append(" (en pie ").append(enPie).append(", efimeros ").append(efimeros).append(", en su suelo ").append(enSu)
+                    .append("), charcos +").append(pt.charcos() - ch0).append(" (hacen sangrar +").append(com.darkcraft.enemigos.CharcoSangre.SANGRAN - sang0)
+                    .append("), mas deprisa ").append(pt.ungido()).append("; ").append(pt.estado());
+            for (var p : pt.procesion()) p.discard();
+            pt.quieta = true;
+            for (int k = 0; k < 160 && pt.accion() != 0; k++) {
+                pt.tickCount++;
+                pt.tick();
+            }
+            limpiarAltar(m, caja);
+            log.println(sm);
+            // ---- cae: de rodillas, el caliz se derrama, se deshace en sangre; la Tierra sin Fe descansa
+            com.darkcraft.enemigos.Puestos.todos(server, grieta, false);
+            java.util.List<com.darkcraft.enemigos.Enemigo> rezan = new java.util.ArrayList<>();
+            int deLaGrieta = 0;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, grieta))
+                if (com.darkcraft.morvain.MorvainEnemigos.grieta().get(e.puesto()).postura() == com.darkcraft.enemigos.Enemigo.REZA) {
+                    deLaGrieta++;
+                    rezan.add(e);
+                }
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio))
+                if (e != pt && com.darkcraft.morvain.MorvainEnemigos.altar().get(e.puesto()).postura() == com.darkcraft.enemigos.Enemigo.REZA) rezan.add(e);
+            int desc = com.darkcraft.morvain.Altar.DESCANSAN;
+            boolean pazAntes = com.darkcraft.morvain.Altar.enPaz(server);
+            pt.moveTo(CX + 0.5, PISO, CZ - 16.5, 180f, 0f);
+            pt.invulnerableTime = 0;
+            pt.hurt(m.damageSources().playerAttack(fp), 99999f);
+            boolean muere = !pt.isAlive();
+            int seVa = -1;
+            for (int fin = 0; fin < 260; fin++) {
+                if (!pt.isRemoved()) {
+                    pt.tickCount++;
+                    pt.tick();
+                }
+                if (seVa < 0 && pt.isRemoved()) {
+                    seVa = fin;
+                    break;
+                }
+            }
+            com.darkcraft.morvain.Altar.paz(m);
+            int descansan = 0;
+            for (var e : rezan) if (e.isRemoved()) descansan++;
+            int objetos = m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, pt.getBoundingBox().inflate(6)).size();
+            // despues: los que rezaban ya no vuelven (ni en la grieta ni aqui)
+            com.darkcraft.enemigos.Puestos.todos(server, grieta, false);
+            int salen = 0, vuelven = 0, vuelvenAqui = 0;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, grieta)) {
+                salen++;
+                if (com.darkcraft.morvain.MorvainEnemigos.grieta().get(e.puesto()).postura() == com.darkcraft.enemigos.Enemigo.REZA) vuelven++;
+            }
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio))
+                if (com.darkcraft.morvain.MorvainEnemigos.altar().get(e.puesto()).postura() == com.darkcraft.enemigos.Enemigo.REZA) vuelvenAqui++;
+            com.darkcraft.enemigos.Puestos.todos(server, grieta, false);
+            log.println("Morvain, el Pontifice cae: muere " + muere + " (en paz antes " + pazAntes + "); se deshace en sangre en " + seVa + "; vivo " + pt.isAlive()
+                    + ", objetos " + objetos + ", en paz " + com.darkcraft.morvain.Altar.enPaz(server) + "; de los " + rezan.size() + " penitentes que rezaban ("
+                    + deLaGrieta + " en la grieta) descansan " + descansan + " (deshechos +" + (com.darkcraft.morvain.Altar.DESCANSAN - desc)
+                    + "); despues en la grieta salen " + salen + " y de los que rezaban vuelven " + vuelven + ", y en el altar " + vuelvenAqui
+                    + " (tienen que ser 0); " + com.darkcraft.morvain.MorvainEnemigos.estadoPontifice(server));
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, pt.getBoundingBox().inflate(8))) it.discard();
+        } catch (Throwable t) {
+            log.println("Morvain, el Pontifice: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] pontifice", t);
+        } finally {
+            if (pt != null) pt.quieta = false;
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            limpiarAltar(m, caja);
+            // todo como antes: Anselmo de rodillas ante el altar y los penitentes que rezaban, en su sitio
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, com.darkcraft.morvain.MorvainEnemigos.pontifice(), false);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Puestos.todos(server, grieta, false);
+            try {
+                com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+                log.println("Morvain, el Pontifice vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoPontifice(server));
+            } catch (Throwable t) {
+                log.println("Morvain, el Pontifice vuelve: ERROR " + t);
             }
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
         }

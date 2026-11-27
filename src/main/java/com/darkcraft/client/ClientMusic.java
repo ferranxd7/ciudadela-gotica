@@ -139,9 +139,10 @@ public final class ClientMusic {
             case 37 -> DarkCraftMod.MUSICA_CONDESTABLE.get();
             case 38 -> DarkCraftMod.MUSICA_RECTORA.get();
             case 39 -> DarkCraftMod.MUSICA_BALLENERO.get();
+            case 40 -> DarkCraftMod.MUSICA_PONTIFICE.get();
             default -> DarkCraftMod.MUSICA_REY_3.get();
         };
-        boss = new Track(ev, phase == 21 ? "capitan" : phase == 31 ? "brandt" : phase == 32 ? "vareth" : phase == 33 ? "molinera" : phase == 34 ? "verdugo" : phase == 35 ? "barquero" : phase == 36 ? "abad" : phase == 37 ? "condestable" : phase == 38 ? "rectora" : phase == 39 ? "ballenero" : phase >= 11 ? "gavran" + (phase - 10) : "rey" + phase, true);
+        boss = new Track(ev, phase == 21 ? "capitan" : phase == 31 ? "brandt" : phase == 32 ? "vareth" : phase == 33 ? "molinera" : phase == 34 ? "verdugo" : phase == 35 ? "barquero" : phase == 36 ? "abad" : phase == 37 ? "condestable" : phase == 38 ? "rectora" : phase == 39 ? "ballenero" : phase == 40 ? "pontifice" : phase >= 11 ? "gavran" + (phase - 10) : "rey" + phase, true);
         bossTicks = 0;
         Minecraft.getInstance().getSoundManager().play(boss);
         boss.fadeTo(soft ? 0.3f : 0.85f, phase == 1 ? 3.0f : 2.2f);
@@ -405,18 +406,24 @@ public final class ClientMusic {
 
     private static Track sinFe;
     private static int sinFeTicks;
-    private static boolean enSinFe;
+    private static boolean enSinFe, enAltar, sinFeEsAltar;
 
     private static void tickSinFe(Minecraft mc) {
-        if (mc.player == null || mc.level == null) enSinFe = false;
-        else if (mc.player.tickCount % 20 == 17)
+        if (mc.player == null || mc.level == null) enSinFe = enAltar = false;
+        else if (mc.player.tickCount % 20 == 17) {
             enSinFe = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() > 40 && mc.player.getY() < 190
                     && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.SIN_FE;
+            // en el Altar Profanado (parte 7t), su aire: el viento por las vidrieras rotas, el goteo y un coro que no esta
+            enAltar = enSinFe && com.darkcraft.morvain.Altar.distancia(mc.player.getX(), mc.player.getZ()) < 70;
+        }
         boolean quiere = enSinFe && (boss == null || boss.dying()) && (story == null || story.dying()) && (viaje == null || viaje.dying());
+        // si cambia de uno a otro, el que sonaba se va despacio y entra el otro
+        if (quiere && sinFe != null && !sinFe.dying() && sinFeEsAltar != enAltar) sinFe.kill(2.5f);
         if (quiere) {
             if (sinFe == null || sinFe.dying() || !mc.getSoundManager().isActive(sinFe) && sinFeTicks > 20) {
                 if (sinFe != null && !sinFe.dying()) mc.getSoundManager().stop(sinFe);
-                sinFe = new Track(DarkCraftMod.AMBIENTE_SINFE.get(), "sinfe", false);
+                sinFeEsAltar = enAltar;
+                sinFe = new Track(enAltar ? DarkCraftMod.AMBIENTE_ALTAR.get() : DarkCraftMod.AMBIENTE_SINFE.get(), enAltar ? "altar" : "sinfe", false);
                 sinFeTicks = 0;
                 mc.getSoundManager().play(sinFe);
                 sinFe.fadeTo(0.85f, 2.5f);
@@ -431,7 +438,8 @@ public final class ClientMusic {
     /** Para la prueba de la CI: si suena el viento de la Tierra sin Fe. */
     public static String sinFe() {
         Minecraft mc = Minecraft.getInstance();
-        return sinFe == null ? "sin la tierra sin fe" : String.format("la tierra sin fe %.2f%s", sinFe.level(), mc.getSoundManager().isActive(sinFe) ? "" : " (parada)");
+        return sinFe == null ? "sin la tierra sin fe" : String.format("%s %.2f%s", sinFeEsAltar ? "el altar" : "la tierra sin fe", sinFe.level(),
+                mc.getSoundManager().isActive(sinFe) ? "" : " (parada)");
     }
 
     /** Para la prueba de la CI: si suena el viento de la costa. */

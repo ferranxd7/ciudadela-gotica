@@ -32,7 +32,8 @@ public final class Coleccion {
             "marchito_campana", "molinera", "ahorcado_garras", "ahorcado_soga", "verdugo", "podrido", "podrido_fatuo", "podrido_hinchado", "barquero",
             "helado_monje", "helado_penitente", "helado_peregrino", "abad", "calcinado_guardia", "calcinado_incendiario", "calcinado_ceniciento",
             "condestable", "erudito_aprendiz", "erudito_maestro", "erudito_custodio", "rectora", "salobre_redero", "salobre_bichero",
-            "salobre_salinero", "ballenero", "penitente_flagelante", "penitente_portador", "penitente_turiferario"};
+            "salobre_salinero", "ballenero", "penitente_flagelante", "penitente_portador", "penitente_turiferario",
+            "pontifice"};
 
     /** El objeto de una clave de la coleccion (los libros de la cronica, con su texto). */
     public static ItemStack objeto(String clave) {
@@ -159,6 +160,7 @@ public final class Coleccion {
                 case "condestable" -> DarkCraftMod.CONDESTABLE.get().create(lvl);
                 case "rectora" -> DarkCraftMod.RECTORA.get().create(lvl);
                 case "ballenero" -> DarkCraftMod.BALLENERO.get().create(lvl);
+                case "pontifice" -> DarkCraftMod.PONTIFICE.get().create(lvl);
                 case "corteza" -> DarkCraftMod.CORTEZA.get().create(lvl);
                 case "espectro_cortesano", "espectro_dama", "espectro_vigia" -> {
                     var s = DarkCraftMod.ESPECTRO.get().create(lvl);

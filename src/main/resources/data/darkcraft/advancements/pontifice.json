@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:altar",
+  "display": {
+    "icon": {
+      "item": "minecraft:golden_sword"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.pontifice.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.pontifice.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 500
+  }
+}
