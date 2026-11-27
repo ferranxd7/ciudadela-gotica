@@ -123,6 +123,7 @@ public final class ClientCiTest {
             gavranTick(mc);
             escTick(mc);
             dragonTick(mc);
+            esperaTick(mc);
             if (cineStart >= 0 && (ticks - cineStart) % 40 == 0 && ticks - cineStart < 20 * 90) {
                 log("  cinematica t=" + (ticks - cineStart) / 20 + " s: activa=" + ClientCine.active() + " voz=" + ClientCine.narrationPlaying()
                         + " musica=" + ClientMusic.debug());
@@ -6034,6 +6035,8 @@ public final class ClientCiTest {
         t = teatro(t);
         // el Nido de Ceniza y Vorthak, el Dragon de Ceniza (parte 7z)
         t = nido(t);
+        // la subida por la cadena del sur: las gargolas, el viento, la Sombra, el Descansillo, la Boca y el patio (parte 7aa)
+        t = cadena(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -10972,6 +10975,380 @@ public final class ClientCiTest {
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ la subida por la cadena del sur (parte 7aa)
+
+    /** Una captura que espera a que pase algo (lo que se ve en el cliente): pone la camara y saca la foto dos ticks despues. */
+    private record CapturaEspera(String nombre, java.util.function.Predicate<Minecraft> cuando, Consumer<Minecraft> camara,
+                                 java.util.function.Function<Minecraft, String> estado, int[] cuenta) {}
+
+    private static final List<CapturaEspera> CAPTURAS_ESPERA = new ArrayList<>();
+
+    /** Pone en cola una captura que espera (como mucho {@code espera} ticks) a que se cumpla {@code cuando}. */
+    private static void esperarA(String nombre, java.util.function.Predicate<Minecraft> cuando, Consumer<Minecraft> camara,
+                                 java.util.function.Function<Minecraft, String> estado, int espera) {
+        CAPTURAS_ESPERA.add(new CapturaEspera(nombre, cuando, camara, estado, new int[]{-1, ticks + espera}));
+    }
+
+    /** Cada tick: la primera captura que espera. */
+    private static void esperaTick(Minecraft mc) {
+        if (CAPTURAS_ESPERA.isEmpty()) return;
+        CapturaEspera c = CAPTURAS_ESPERA.get(0);
+        if (c.cuenta()[0] >= 0) {
+            c.camara().accept(mc);
+            if (ticks - c.cuenta()[0] >= 2) {
+                log("  " + c.nombre() + ": " + c.estado().apply(mc));
+                shot(mc, c.nombre());
+                CAPTURAS_ESPERA.remove(0);
+            }
+            return;
+        }
+        if (c.cuando().test(mc)) {
+            c.camara().accept(mc);
+            c.cuenta()[0] = ticks;
+        } else if (ticks > c.cuenta()[1]) {
+            log("  " + c.nombre() + ": NO LLEGO (" + c.estado().apply(mc) + ")");
+            CAPTURAS_ESPERA.remove(0);
+        }
+    }
+
+    /** La gargola mas cercana al jugador en el cliente (a 60 bloques), o null. */
+    private static com.darkcraft.enemigos.Gargola gargolaC(Minecraft mc) {
+        if (mc.level == null || mc.player == null) return null;
+        com.darkcraft.enemigos.Gargola mejor = null;
+        double d = 60 * 60;
+        for (var e : mc.level.getEntitiesOfClass(com.darkcraft.enemigos.Gargola.class, mc.player.getBoundingBox().inflate(60))) {
+            double dd = e.distanceToSqr(mc.player);
+            if (dd < d) {
+                d = dd;
+                mejor = e;
+            }
+        }
+        return mejor;
+    }
+
+    /** La gargola mas cercana al jugador en el servidor (a 60 bloques), o null. */
+    private static com.darkcraft.enemigos.Gargola gargolaE(ServerPlayer sp) {
+        com.darkcraft.enemigos.Gargola mejor = null;
+        double d = 60 * 60;
+        for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Gargola.class, sp.getBoundingBox().inflate(60), x -> x.isAlive())) {
+            double dd = e.distanceToSqr(sp);
+            if (dd < d) {
+                d = dd;
+                mejor = e;
+            }
+        }
+        return mejor;
+    }
+
+    private static String estadoGargolaC(Minecraft mc) {
+        var g = gargolaC(mc);
+        if (g == null) return "no se ve ninguna gargola";
+        int a = g.accionVista();
+        return String.format(java.util.Locale.ROOT, "gargola en el cliente: %.1f, %.1f, %.1f giro %.0f, %s, postura %d, accion %s (t %d), muerte %d, brillo %.2f | jugador a %.1f",
+                g.getX(), g.getY(), g.getZ(), g.getYRot(), g.vuela() ? "volando" : "en tierra", g.postura(),
+                com.darkcraft.enemigos.GargolaAnims.NOMBRES[Math.max(0, Math.min(a, com.darkcraft.enemigos.GargolaAnims.NOMBRES.length - 1))],
+                g.accionDesde < 0 ? -1 : g.tickCount - g.accionDesde, g.deathTime, com.darkcraft.client.enemigos.GargolaRenderer.brillo(g, 0f),
+                mc.player == null ? -1 : g.distanceTo(mc.player));
+    }
+
+    /** La accion que se ve de la gargola y cuanto lleva (-1 si ninguna). */
+    private static int tGargola(Minecraft mc, int accion) {
+        var g = gargolaC(mc);
+        return g != null && g.accionVista() == accion && g.accionDesde >= 0 ? g.tickCount - g.accionDesde : -1;
+    }
+
+    /** La camara de lado (al este, sobre el vacio) mirando a la gargola, un poco por encima. */
+    private static void camaraGargola(Minecraft mc, double lado, double alto) {
+        var g = gargolaC(mc);
+        if (g == null) return;
+        verDesde(mc, new Vec3(g.getX() + lado, g.getY() + alto, g.getZ() + 2.5), new Vec3(g.getX(), g.getY() + 1.0, g.getZ()));
+    }
+
+    private static String estadoCadena(ServerPlayer sp) {
+        var g = gargolaE(sp);
+        return fpos(sp) + " vida " + Math.round(sp.getHealth()) + " | " + com.darkcraft.morvain.Cadena.resumen(sp) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)
+                + " | " + (g == null ? "sin gargola" : g.estado()) + " | picados " + com.darkcraft.enemigos.Gargola.PICADOS + " (pillan "
+                + com.darkcraft.enemigos.Gargola.PICADOS_DAN + "), garras " + com.darkcraft.enemigos.Gargola.GARRAS_N + ", posadas " + com.darkcraft.enemigos.Gargola.POSADAS
+                + ", despiertas " + com.darkcraft.enemigos.Gargola.DESPIERTAS + ", caen " + com.darkcraft.enemigos.Gargola.CAEN;
+    }
+
+    /**
+     * La subida por la cadena del sur: el camino desde lo alto del ancla, la cadena de lado, una gargola de piedra en su pedestal,
+     * el Descansillo (su santuario y la choza) y el atril con el libro 34, la Boca desde fuera, la Garganta por dentro y el patio de
+     * la ciudadela desde la puerta de la torre; en supervivencia: la Sombra habla al pisar el camino (su subtitulo), una rafaga de
+     * viento de pie (empuja) y agachado (casi nada), la gargola despierta, vuela alrededor, se lanza en picado, lanza las garras, se
+     * posa y muere (cae hecha pedazos) y el bestiario; el corcel no viene; y caer de la cadena es la muerte.
+     */
+    private static int cadena(int T) {
+        final var S = com.darkcraft.morvain.Subida.get();
+        final String SITIO = com.darkcraft.morvain.MorvainEnemigos.CADENA;
+        int t = T;
+        atTicks(t, "Cadena: desde lo alto del ancla", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_ESPERA.clear();
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft cadena enemigos volver");
+                // (que no sople mientras se miran las vistas)
+                com.darkcraft.morvain.Cadena.calma(sp, 6000);
+                int[] q = S.sitio("inicio");
+                irMirando(sp, q[0] + 0.5, q[1], q[2] + 0.5, 0.5, q[1] + 14, q[2] - 40, false);
+            });
+        });
+        t += 300;
+        atTicks(t, "captura: el camino que sube por la cadena", m -> {
+            shot(m, "cliente_mv520_cadena_camino");
+            server(m, sp -> log("  el camino: " + com.darkcraft.morvain.MorvainEnemigos.estadoCadena(sp.createCommandSourceStack()) + " | sitio "
+                    + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 4;
+        atTicks(t, "Cadena: de lado, a media cadena", m -> server(m, sp -> {
+            int[] q = S.sitio("lado");
+            irMirando(sp, q[0] + 0.5, q[1], q[2] + 0.5, 0.5, S.pisa(470), 470, true);
+        }));
+        t += 260;
+        atTicks(t, "captura: la cadena de lado", m -> shot(m, "cliente_mv521_cadena_lado"));
+        t += 4;
+        atTicks(t, "Cadena: la gargola de piedra del primer rellano", m -> server(m, sp -> {
+            int[] p = S.pedestal(0, 0);
+            irMirando(sp, p[0] - 3.5, p[1] - 1, p[2] + 4.5, p[0] + 0.5, p[1] + 1.2, p[2] + 0.5, false);
+        }));
+        t += 120;
+        atTicks(t, "captura: la gargola de piedra", m -> {
+            shot(m, "cliente_mv522_gargola_piedra");
+            log("  la de piedra: " + estadoGargolaC(m));
+        });
+        t += 4;
+        atTicks(t, "Cadena: el Descansillo", m -> server(m, sp -> {
+            int[] d = S.sitio("descansillo"), sa = S.sitio("santuario");
+            irMirando(sp, 1.5, d[1] + 2.5, d[2] + 10.5, sa[0] + 0.5, d[1] + 1, d[2] - 2, false);
+        }));
+        t += 160;
+        atTicks(t, "captura: el Descansillo, su santuario y la choza", m -> {
+            shot(m, "cliente_mv523_descansillo");
+            server(m, sp -> log("  el Descansillo: " + com.darkcraft.morvain.Subida.resumen(sp.serverLevel()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)
+                    + " | logro descansillo " + com.darkcraft.story.Logros.tiene(sp, "descansillo")));
+        });
+        t += 4;
+        atTicks(t, "Cadena: la choza y el atril", m -> server(m, sp -> {
+            sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false));
+            int[] at = S.sitio("atril");
+            irMirando(sp, at[0] + 0.5, at[1], at[2] + 3.4, at[0] + 0.5, at[1] + 0.8, at[2] + 0.5, false);
+        }));
+        t += 40;
+        atTicks(t, "captura: el atril de la choza", m -> shot(m, "cliente_mv524_choza_atril"));
+        t += 4;
+        atTicks(t, "Cadena: la Boca desde fuera", m -> server(m, sp -> {
+            sp.removeAllEffects();
+            int[] q = S.sitio("lado_boca");
+            irMirando(sp, q[0] + 0.5, q[1], q[2] + 0.5, 0.5, S.pisa(com.darkcraft.morvain.Subida.Z_BOCA) + 4, com.darkcraft.morvain.Subida.Z_BOCA, true);
+        }));
+        t += 260;
+        atTicks(t, "captura: la Boca", m -> shot(m, "cliente_mv525_boca"));
+        t += 4;
+        atTicks(t, "Cadena: la Garganta por dentro", m -> server(m, sp -> {
+            int[] q = S.sitio("garganta");
+            irMirando(sp, q[0] + 0.5, q[1], q[2] + 3.5, 0.5, q[1] + 3, q[2] - 8, false);
+        }));
+        t += 60;
+        atTicks(t, "captura: la Garganta", m -> {
+            shot(m, "cliente_mv526_garganta");
+            server(m, sp -> log("  la garganta: sitio " + com.darkcraft.morvain.Morvain.lugar(sp) + " | " + ClientMusic.crater()));
+        });
+        t += 4;
+        atTicks(t, "Cadena: el patio desde la puerta de la torre", m -> server(m, sp -> {
+            int[] q = S.sitio("puerta");
+            irMirando(sp, q[0] + 0.5, q[1], q[2] + 1.5, 0.5, com.darkcraft.morvain.Subida.Y_TORRE + 30, 0.5, false);
+        }));
+        t += 80;
+        atTicks(t, "captura: el patio de la ciudadela", m -> {
+            shot(m, "cliente_mv527_patio");
+            server(m, sp -> log("  el patio: sitio " + com.darkcraft.morvain.Morvain.lugar(sp) + " | logro ciudadela " + com.darkcraft.story.Logros.tiene(sp, "ciudadela")));
+        });
+        t += 4;
+        // ---- en supervivencia: la Sombra al pisar el camino
+        atTicks(t, "Cadena: la Sombra al pisar el camino (en supervivencia)", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                comando(sp, "darkcraft cadena sombra olvidar");
+                aPelear(sp, true);
+                int[] q = S.sitio("inicio");
+                irMirando(sp, q[0] + 0.5, q[1], q[2] + 0.5, 0.5, q[1] + 6, q[2] - 30, false);
+                com.darkcraft.morvain.Cadena.calma(sp, 2000);
+            });
+        });
+        t += 70;
+        atTicks(t, "captura: la Sombra habla", m -> {
+            log("  la Sombra: ultima frase " + com.darkcraft.client.morvain.ClientCadena.ULTIMA + ", hablando " + com.darkcraft.client.morvain.ClientCadena.hablando()
+                    + " | " + ClientMusic.crater());
+            shot(m, "cliente_mv528_sombra_cadena");
+        });
+        t += 140;
+        // ---- una rafaga de pie y otra agachado, en medio del camino
+        atTicks(t, "Cadena: una rafaga de pie", m -> server(m, sp -> {
+            int[] q = S.sitio("medio");
+            irMirando(sp, q[0] + 0.5, q[1], q[2] + 0.5, 0.5, q[1] + 6, q[2] - 30, false);
+            com.darkcraft.morvain.Cadena.rafagaYa(sp);
+        }));
+        t += 34;
+        atTicks(t, "captura: la rafaga", m -> {
+            shot(m, "cliente_mv529_rafaga");
+            log("  la rafaga: sopla " + com.darkcraft.client.morvain.ClientCadena.sopla() + ", rafagas " + com.darkcraft.client.morvain.ClientCadena.RAFAGAS);
+        });
+        t += 60;
+        atTicks(t, "la rafaga, lo que ha movido", m -> server(m, sp -> {
+            log("  de pie la rafaga le mueve " + String.format(java.util.Locale.ROOT, "%.2f", com.darkcraft.client.morvain.ClientCadena.MOVIDO) + " bloques | " + estadoCadena(sp));
+            int[] q = S.sitio("medio");
+            irMirando(sp, q[0] + 0.5, q[1], q[2] + 0.5, 0.5, q[1] + 6, q[2] - 30, false);
+        }));
+        t += 10;
+        atTicks(t, "Cadena: una rafaga agachado", m -> {
+            m.options.keyShift.setDown(true);
+            server(m, sp -> com.darkcraft.morvain.Cadena.rafagaYa(sp));
+        });
+        t += 90;
+        atTicks(t, "la rafaga agachado, lo que ha movido", m -> {
+            m.options.keyShift.setDown(false);
+            log("  agachado la rafaga le mueve " + String.format(java.util.Locale.ROOT, "%.2f", com.darkcraft.client.morvain.ClientCadena.MOVIDO) + " bloques");
+            // el corcel no viene en la cadena
+            server(m, sp -> {
+                sp.getInventory().add(new ItemStack(DarkCraftMod.SILBATO_CORCEL.get()));
+                boolean viene = com.darkcraft.montura.Montura.llamar(sp);
+                log("  el corcel en la cadena: viene " + viene + " (tiene que ser false), corcel " + (com.darkcraft.montura.Montura.de(sp) != null));
+                com.darkcraft.morvain.Cadena.calma(sp, 6000);
+            });
+        });
+        t += 6;
+        // ---- la gargola: despierta, vuela, el picado, las garras, se posa y muere
+        atTicks(t, "Cadena: la gargola del primer rellano despierta", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                comando(sp, "darkcraft cadena enemigos volver");
+                // (los marcados de la cadena, fuera: aqui solo cuenta la gargola)
+                var lista = com.darkcraft.morvain.MorvainEnemigos.cadena();
+                for (int i = 0; i < lista.size(); i++)
+                    if (!com.darkcraft.morvain.MorvainEnemigos.GARGOLA_TIPO.equals(lista.get(i).tipo())) com.darkcraft.enemigos.Puestos.marcar(sp.server, SITIO, i, true);
+                aPelear(sp, true);
+                int[] r = S.sitio("rellano1"), p = S.pedestal(0, 0);
+                irMirando(sp, r[0] + 0.5, r[1], r[2] + 4.5, p[0] + 0.5, p[1] + 1, p[2] + 0.5, false);
+            });
+        });
+        esperarA("cliente_mv530_gargola_despierta", m -> tGargola(m, com.darkcraft.enemigos.GargolaAnims.DESPIERTA) >= 26, m -> camaraGargola(m, 6, 1.5),
+                ClientCiTest::estadoGargolaC, 500);
+        esperarA("cliente_mv531_gargola_vuela", m -> {
+            var g = gargolaC(m);
+            return g != null && g.vuela() && g.accionVista() == 0 && m.player != null && g.getY() > m.player.getY() + 2.5;
+        }, m -> {
+            var g = gargolaC(m);
+            if (g != null && m.player != null) verDesde(m, m.player.getEyePosition().add(0, 0.5, 3.5), g.position().add(0, 1, 0));
+        }, ClientCiTest::estadoGargolaC, 400);
+        t += 260;
+        atTicks(t, "Cadena: el picado", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            comando(sp, "darkcraft cadena gargola picado");
+        }));
+        esperarA("cliente_mv532_gargola_picado", m -> tGargola(m, com.darkcraft.enemigos.GargolaAnims.PICADO) >= 16, m -> camaraGargola(m, 9, 2),
+                ClientCiTest::estadoGargolaC, 200);
+        t += 90;
+        atTicks(t, "el picado, lo que hizo", m -> server(m, sp -> log("  tras el picado: " + estadoCadena(sp))));
+        t += 4;
+        atTicks(t, "Cadena: las garras", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            int[] r = S.sitio("rellano1");
+            sp.teleportTo(sp.serverLevel(), r[0] + 0.5, r[1], r[2] + 0.5, 180f, 0f);
+            comando(sp, "darkcraft cadena gargola garras");
+        }));
+        esperarA("cliente_mv533_gargola_garras", m -> tGargola(m, com.darkcraft.enemigos.GargolaAnims.GARRAS) >= 10, m -> camaraGargola(m, 7, 1),
+                ClientCiTest::estadoGargolaC, 220);
+        t += 120;
+        atTicks(t, "Cadena: se posa", m -> server(m, sp -> {
+            sp.setHealth(sp.getMaxHealth());
+            comando(sp, "darkcraft cadena gargola posarse");
+        }));
+        esperarA("cliente_mv534_gargola_posada", m -> {
+            var g = gargolaC(m);
+            return g != null && !g.vuela() && (g.accionVista() == 0 || tGargola(m, com.darkcraft.enemigos.GargolaAnims.ATERRIZA) >= 8);
+        }, m -> camaraGargola(m, 6, 1.5), ClientCiTest::estadoGargolaC, 220);
+        t += 140;
+        atTicks(t, "Cadena: la gargola muere en el aire", m -> server(m, sp -> {
+            comando(sp, "darkcraft cadena gargola vuelo");
+            var g = gargolaE(sp);
+            log("  antes de morir: " + estadoCadena(sp));
+            if (g != null) {
+                g.invulnerableTime = 0;
+                g.hurt(sp.damageSources().playerAttack(sp), 10000f);
+            }
+        }));
+        esperarA("cliente_mv535_gargola_cae", m -> {
+            var g = gargolaC(m);
+            return g != null && g.deathTime >= 16;
+        }, m -> camaraGargola(m, 8, 2), ClientCiTest::estadoGargolaC, 120);
+        t += 70;
+        atTicks(t, "el bestiario: la gargola", m -> {
+            CAPTURAS_ESPERA.clear();
+            enPrimeraPersona(m);
+            m.setScreen(null);
+            m.options.hideGui = false;
+            server(m, sp -> log("  al caer: " + estadoCadena(sp) + " | logro gargola " + com.darkcraft.story.Logros.tiene(sp, "gargola")));
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("gargola")));
+        });
+        t += 18;
+        atTicks(t, "captura: la gargola en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv536_bestiario_gargola");
+        });
+        t += 4;
+        // ---- caer de la cadena: la muerte
+        atTicks(t, "Cadena: caer de la cadena", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                comando(sp, "darkcraft cadena enemigos volver");
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                int[] q = S.sitio("medio");
+                // (al lado del camino, sobre el vacio, mas alla de los eslabones tumbados: cae)
+                irMirando(sp, q[0] + 15.5, q[1] + 1, q[2] + 0.5, 0.5, q[1] - 40, q[2] - 4, false);
+                log("  cae desde " + fpos(sp) + " (caidos " + com.darkcraft.morvain.Cadena.CAIDOS + ")");
+            });
+        });
+        t += 110;
+        atTicks(t, "captura: caer de la cadena", m -> {
+            server(m, sp -> log("  tras caer: " + fpos(sp) + (sp.isDeadOrDying() ? " (muerto)" : " (vivo)") + ", caidos " + com.darkcraft.morvain.Cadena.CAIDOS));
+            shot(m, "cliente_mv537_caida");
+        });
+        t += 30;
+        atTicks(t, "reaparecer", m -> {
+            if (m.player != null && m.player.isDeadOrDying()) m.player.respawn();
+            m.setScreen(null);
+        });
+        t += 60;
+        atTicks(t, "Cadena: fin (vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            m.options.keyShift.setDown(false);
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_ESPERA.clear();
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft cadena enemigos volver");
+                com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+                log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoCadena(sp.createCommandSourceStack()));
             });
         });
         return t + 30;

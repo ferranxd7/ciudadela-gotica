@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:cadena",
+  "display": {
+    "icon": {
+      "item": "minecraft:soul_campfire"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.descansillo.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.descansillo.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 30
+  }
+}

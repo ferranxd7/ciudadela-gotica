@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:boca",
+  "display": {
+    "icon": {
+      "item": "minecraft:crying_obsidian"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.ciudadela.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.ciudadela.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 60
+  }
+}

@@ -249,6 +249,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el nido de ceniza en el chunk {}", c.getPos(), t);
         }
+        // la subida por la cadena del sur: el camino de tablones, los rellanos, el Descansillo y la Boca (parte 7aa)
+        try {
+            if (Subida.toca(c.getPos().x, c.getPos().z)) Subida.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la subida por la cadena en el chunk {}", c.getPos(), t);
+        }
     }
 
     @Override

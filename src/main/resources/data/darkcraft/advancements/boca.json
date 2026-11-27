@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:descansillo",
+  "display": {
+    "icon": {
+      "item": "minecraft:pointed_dripstone"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.boca.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.boca.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 30
+  }
+}

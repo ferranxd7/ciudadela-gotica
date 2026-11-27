@@ -376,7 +376,7 @@ public final class Guion {
 
     private static void frase(int n) {
         ultimaFrase = n;
-        if (n > 0 && n < DarkCraftMod.SOMBRA_VOZ.length) suena(DarkCraftMod.SOMBRA_VOZ[n].get(), 1f);
+        if (n > 0 && n < DarkCraftMod.SOMBRA_VOZ.length && DarkCraftMod.SOMBRA_VOZ[n] != null) suena(DarkCraftMod.SOMBRA_VOZ[n].get(), 1f);
     }
 
     /** La ultima frase de la Sombra que ha empezado a sonar (para las pruebas). */

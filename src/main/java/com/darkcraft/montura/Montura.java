@@ -138,6 +138,12 @@ public final class Montura {
             aviso(sp, "darkcraft.corcel.montado", 0);
             return false;
         }
+        // por la cadena del sur no se sube a caballo (parte 7aa)
+        if (com.darkcraft.morvain.Subida.sobreCadena(sp.getX(), sp.getY(), sp.getZ()) || com.darkcraft.morvain.Subida.enBoca(sp.getX(), sp.getY(), sp.getZ())) {
+            aviso(sp, "darkcraft.corcel.cadena", 0);
+            silbido(sl, sp, 0.7f);
+            return false;
+        }
         int espera = espera(sp);
         if (espera > 0) {
             aviso(sp, "darkcraft.corcel.espera", (espera + 19) / 20);

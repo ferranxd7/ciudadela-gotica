@@ -67,11 +67,14 @@ public final class MorvainEnemigos {
     public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo",
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
             CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio",
-            PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar", CERCO = "cerco", TEATRO = "teatro", NIDO = "nido";
+            PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar", CERCO = "cerco", TEATRO = "teatro", NIDO = "nido",
+            CADENA = "cadena";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
             ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
-            PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon", DRAGON = "dragon";
+            PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon", DRAGON = "dragon", GARGOLA = "gargola";
+    /** El tipo de puesto de las gargolas (para las pruebas). */
+    public static final String GARGOLA_TIPO = GARGOLA;
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
@@ -82,7 +85,7 @@ public final class MorvainEnemigos {
             BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>(), ERMITA_P = new ArrayList<>(), CUMBRE_P = new ArrayList<>(),
             CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>(),
             PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>(), GRIETA_P = new ArrayList<>(), ALTAR_P = new ArrayList<>(),
-            CERCO_P = new ArrayList<>(), TEATRO_P = new ArrayList<>(), NIDO_P = new ArrayList<>();
+            CERCO_P = new ArrayList<>(), TEATRO_P = new ArrayList<>(), NIDO_P = new ArrayList<>(), CADENA_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -224,6 +227,11 @@ public final class MorvainEnemigos {
         for (Nido.Espera e : Nido.get().esperas())
             NIDO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? DRAGON : CALCINADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
                     e.ronda(), e.grupo()));
+        // ---- la subida por la cadena del sur (parte 7aa): los marcados que subieron y se quedaron en los rellanos y las gargolas
+        // (en sus pedestales, de piedra, o en ronda por el aire)
+        for (Subida.Espera e : Subida.get().esperas())
+            CADENA_P.add(new Puesto(GARGOLA.equals(e.tipo()) ? GARGOLA : MARCADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
+                    e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -303,6 +311,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(ALDRIC, DarkCraftMod.ALDRIC);
         Puestos.tipo(BUFON, DarkCraftMod.BUFON);
         Puestos.tipo(DRAGON, DarkCraftMod.DRAGON);
+        Puestos.tipo(GARGOLA, DarkCraftMod.GARGOLA);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -340,6 +349,8 @@ public final class MorvainEnemigos {
         Puestos.registrar(TEATRO, TEATRO_P, Morvain::es);
         // el Nido de Ceniza: los calcinados de la atalaya y del camino, y Vorthak sobre su oro
         Puestos.registrar(NIDO, NIDO_P, Morvain::es);
+        // la cadena del sur: los marcados de los rellanos y las gargolas
+        Puestos.registrar(CADENA, CADENA_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -465,6 +476,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> nido() {
         preparar();
         return List.copyOf(NIDO_P);
+    }
+
+    public static List<Puesto> cadena() {
+        preparar();
+        return List.copyOf(CADENA_P);
     }
 
     public static List<Puesto> puerto() {
@@ -1602,6 +1618,111 @@ public final class MorvainEnemigos {
         float giro = (float) (Math.toDegrees(Math.atan2(dz, dx)) - 90.0);
         sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
         return 1;
+    }
+
+    /**
+     * {@code /darkcraft cadena [ir <sitio> | enemigos [volver | fuera | sacar] | rafaga | sombra olvidar | gargola [vuelo | picado |
+     * garras | posarse | tierra]]} (parte 7aa): la subida por la cadena del sur: ir a uno de sus sitios, sus marcados y gargolas, una rafaga
+     * de viento ya, que la Sombra vuelva a hablar y lo que hace la gargola mas cercana.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoCadena() {
+        return net.minecraft.commands.Commands.literal("cadena")
+                .executes(c -> decir(c, estadoCadena(c.getSource())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irCadena(c.getSource(), "inicio"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Subida.get().sitios().keySet(), b))
+                                .executes(c -> irCadena(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoCadena(c.getSource())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), CADENA, false);
+                            return decir(c, "vuelven todos los de la cadena");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), CADENA, true);
+                            return decir(c, "fuera todos los de la cadena");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, CADENA).size();
+                            return decir(c, "fuera " + n);
+                        })))
+                .then(net.minecraft.commands.Commands.literal("rafaga").executes(c -> {
+                    var sp = c.getSource().getPlayerOrException();
+                    Cadena.rafaga(sp.serverLevel(), sp, sp.getRandom().nextBoolean() ? 1 : -1);
+                    return decir(c, "sopla una rafaga");
+                }))
+                .then(net.minecraft.commands.Commands.literal("sombra").then(net.minecraft.commands.Commands.literal("olvidar").executes(c -> {
+                    Cadena.olvidar(c.getSource().getPlayerOrException());
+                    return decir(c, "la Sombra volvera a hablar en la cadena");
+                })))
+                .then(net.minecraft.commands.Commands.literal("gargola")
+                        .executes(c -> decir(c, gargola(c.getSource(), "")))
+                        .then(net.minecraft.commands.Commands.literal("vuelo").executes(c -> decir(c, gargola(c.getSource(), "vuelo"))))
+                        .then(net.minecraft.commands.Commands.literal("tierra").executes(c -> decir(c, gargola(c.getSource(), "tierra"))))
+                        .then(net.minecraft.commands.Commands.literal("picado").executes(c -> decir(c, gargola(c.getSource(), "picado"))))
+                        .then(net.minecraft.commands.Commands.literal("garras").executes(c -> decir(c, gargola(c.getSource(), "garras"))))
+                        .then(net.minecraft.commands.Commands.literal("posarse").executes(c -> decir(c, gargola(c.getSource(), "posarse")))));
+    }
+
+    /** La gargola mas cercana (a 48 bloques): como esta, o que haga algo ya. */
+    private static String gargola(net.minecraft.commands.CommandSourceStack src, String que) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        var sp = src.getPlayerOrException();
+        com.darkcraft.enemigos.Gargola g = null;
+        double mejor = 48 * 48;
+        for (var e : sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Gargola.class, sp.getBoundingBox().inflate(48), x -> x.isAlive())) {
+            double d = e.distanceToSqr(sp);
+            if (d < mejor) {
+                mejor = d;
+                g = e;
+            }
+        }
+        if (g == null) return "no hay ninguna gargola a 48 bloques";
+        switch (que) {
+            case "vuelo" -> g.probarVuelo(true);
+            case "tierra" -> g.probarVuelo(false);
+            case "picado" -> {
+                g.setTarget(sp);
+                g.probarPicado();
+            }
+            case "garras" -> {
+                g.setTarget(sp);
+                g.probarGarras();
+            }
+            case "posarse" -> {
+                g.setTarget(sp);
+                if (!g.probarPosarse()) return "la gargola no encuentra donde posarse";
+            }
+            default -> {
+            }
+        }
+        return "gargola a " + Math.round(Math.sqrt(mejor)) + " bloques: " + g.estado();
+    }
+
+    private static int irCadena(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Subida.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Subida.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando cuesta arriba (al norte: a la ciudadela)
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, 180f, -8f);
+        return 1;
+    }
+
+    /** Cuantos de la cadena quedan, lo que hay (si esta cargado) y como va el jugador. */
+    public static String estadoCadena(net.minecraft.commands.CommandSourceStack src) {
+        var srv = src.getServer();
+        String s = "cadena del sur: quedan " + Puestos.quedan(srv, CADENA) + " de " + CADENA_P.size() + " (fuera " + Puestos.fuera(CADENA) + ")";
+        var m = Morvain.nivel(srv);
+        int[] at = Subida.get().sitio("atril"), bo = Subida.get().sitio("boca");
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(at[0], at[1], at[2])) && m.isLoaded(new net.minecraft.core.BlockPos(bo[0], bo[1], bo[2])))
+            s += "; " + Subida.resumen(m);
+        if (src.getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) s += "; " + Cadena.resumen(sp);
+        return s;
     }
 
     /** Cuantos calcinados del nido quedan y lo que hay (si esta cargado). */

@@ -53,19 +53,26 @@ public final class SantuariosMorvain {
             s("nido", Nido.CX + Nido.SANT_U, Nido.CZ + Nido.SANT_V),
     };
 
+    /**
+     * El de la Mitad de la Cadena (parte 7aa): en el Descansillo de la cadena del sur, colgado sobre el crater; lo escribe
+     * {@link Subida} con su corro de losas (no lleva tarima: no va en {@link #SITIOS}).
+     */
+    public static final Sitio CADENA = new Sitio("cadena", Subida.SANT_X, Subida.SANT_Z, Subida.santuarioY(), Region.CENTRO);
+
     /** El radio de la tarima y hasta donde se funde con el terreno. */
     static final int R = 4, MEZCLA = 10;
 
-    /** Todos, el del arco el primero. */
+    /** Todos, el del arco el primero (y el de la cadena el ultimo). */
     public static Sitio[] todos() {
         return TODOS;
     }
 
-    private static final Sitio[] TODOS = new Sitio[SITIOS.length + 1];
+    private static final Sitio[] TODOS = new Sitio[SITIOS.length + 2];
 
     static {
         TODOS[0] = UMBRAL;
         System.arraycopy(SITIOS, 0, TODOS, 1, SITIOS.length);
+        TODOS[TODOS.length - 1] = CADENA;
     }
 
     public static Sitio porId(String id) {

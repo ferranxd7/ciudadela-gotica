@@ -750,6 +750,8 @@ public final class CiTest {
         bufon(server, m, log, out);
         nido(server, m, log, out);
         dragon(server, m, log, out);
+        cadena(server, m, log, out);
+        gargolas(server, m, log, out);
     }
 
     /**
@@ -3737,6 +3739,277 @@ public final class CiTest {
         } finally {
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
         }
+    }
+
+    // ------------------------------------------------------------------ parte 7aa: la subida por la cadena del sur
+
+    /**
+     * Parte 7aa: la subida por la cadena del sur. Se levantan sus chunks; lo que hay ({@code Subida.resumen}: el atril con el libro
+     * 34, el arcon, el santuario, los tablones en su sitio, la boca abierta, la planta baja de la torre y la puerta al patio); a pie
+     * desde lo alto del ancla se llega a todos sus sitios (los huecos se saltan: aqui se ven con tablon); el santuario de la Mitad
+     * de la Cadena con su nombre y en la lista de los de Morvain; donde se esta en cada sitio (el camino, el Descansillo, la Boca, la
+     * ciudadela, y abajo en el Cerco ya no es la cadena); el corcel no viene en la cadena; y los de la cadena en su sitio: los
+     * marcados en su suelo, las gargolas de los pedestales de piedra (de rodillas, sin fisica) y las de ronda volando; ninguno
+     * metido en un bloque.
+     */
+    private static void cadena(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.CADENA;
+        var S = com.darkcraft.morvain.Subida.get();
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : S.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            var losa = net.minecraft.world.level.block.Blocks.DARK_OAK_SLAB.defaultBlockState();
+            // (los huecos se saltan: Andar no sabe saltar, asi que se ven como si tuvieran tablon)
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                if (st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || st.getBlock() instanceof net.minecraft.world.level.block.CandleBlock) return aire;
+                if (st.isAir() && x >= com.darkcraft.morvain.Subida.X0 && x <= com.darkcraft.morvain.Subida.X1 && S.hayCamino(z)) {
+                    double sup = S.superficie(z);
+                    int yb = sup == Math.floor(sup) ? (int) sup - 1 : (int) Math.floor(sup);
+                    if (y == yb) return losa;
+                }
+                return st;
+            };
+            StringBuilder sb = new StringBuilder("Morvain, la cadena del sur: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Subida.resumen(m));
+            int[] an = S.sitio("ancla");
+            var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, an[0], an[1], an[2], com.darkcraft.morvain.Subida.BX0, com.darkcraft.morvain.Subida.BZ0,
+                    com.darkcraft.morvain.Subida.BX1, com.darkcraft.morvain.Subida.BZ1, 8_000_000);
+            sb.append("; a pie desde lo alto del ancla (").append(zona.celdas()).append(" celdas):");
+            int faltan = 0;
+            for (var e : S.sitios().entrySet()) {
+                if (e.getKey().startsWith("lado")) continue;
+                int[] q = e.getValue();
+                boolean ok = zona.alcanza(q[0], q[1], q[2], 2);
+                if (!ok) faltan++;
+                sb.append(' ').append(e.getKey()).append(ok ? "+" : "-");
+            }
+            sb.append(" (sin llegar ").append(faltan).append(", tiene que ser 0)");
+            var st = com.darkcraft.morvain.SantuariosMorvain.porId("cadena");
+            sb.append("; santuario ").append(st == null ? "NO EN LA LISTA" : com.darkcraft.santuario.Santuarios.nombre(m, st.pos()) + " ("
+                    + m.getBlockState(st.pos()).getBlock().getDescriptionId() + " en " + st.pos().toShortString() + ")");
+            // donde se esta
+            int[] de = S.sitio("descansillo"), bo = S.sitio("boca"), pa = S.sitio("patio"), me = S.sitio("medio");
+            sb.append(String.format(java.util.Locale.ROOT, "; en el medio: camino %s, cadena %s; en el Descansillo %s; en la Boca %s; en el patio %s;"
+                            + " abajo en el Cerco (0,%d,840): sobre la cadena %s",
+                    com.darkcraft.morvain.Subida.enCamino(me[0] + 0.5, me[1], me[2] + 0.5), com.darkcraft.morvain.Subida.sobreCadena(me[0] + 0.5, me[1], me[2] + 0.5),
+                    com.darkcraft.morvain.Subida.enDescansillo(de[0] + 0.5, de[1], de[2] + 0.5), com.darkcraft.morvain.Subida.enBoca(bo[0] + 0.5, bo[1], bo[2] + 0.5),
+                    com.darkcraft.morvain.Subida.enCiudadela(pa[0] + 0.5, pa[1], pa[2] + 0.5), com.darkcraft.morvain.Cerco.PISO + 1,
+                    com.darkcraft.morvain.Subida.sobreCadena(0.5, com.darkcraft.morvain.Cerco.PISO + 1, 840.5)));
+            // el corcel no viene en la cadena
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07aa1"), "[DarkCraftCI17]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            fp.getInventory().add(new net.minecraft.world.item.ItemStack(DarkCraftMod.SILBATO_CORCEL.get()));
+            fp.moveTo(me[0] + 0.5, me[1], me[2] + 0.5, 180f, 0f);
+            boolean viene = com.darkcraft.montura.Montura.llamar(fp);
+            sb.append("; el corcel en la cadena viene ").append(viene).append(" (tiene que ser false)");
+            var c = com.darkcraft.montura.Montura.de(fp);
+            if (c != null) c.discard();
+            fp.getInventory().clearContent();
+            log.println(sb);
+            // ---- los de la cadena: en su sitio, en su suelo y ninguno metido en un bloque
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 8; k++)
+                for (var e : fuera) if (e.isAlive()) e.tick();
+            int marcados = 0, enSuelo = 0, chocan = 0, piedra = 0, vuelan = 0, gargolas = 0;
+            StringBuilder mal = new StringBuilder();
+            for (var e : fuera) {
+                if (e instanceof com.darkcraft.enemigos.Gargola g) {
+                    gargolas++;
+                    if (g.postura() == com.darkcraft.enemigos.Enemigo.REZA && g.noPhysics) piedra++;
+                    if (g.vuela()) vuelan++;
+                    if (!m.noCollision(g)) {
+                        chocan++;
+                        if (mal.length() < 300) mal.append(" gargola metida en un bloque en ").append(g.blockPosition().toShortString()).append(';');
+                    }
+                    continue;
+                }
+                marcados++;
+                if (!m.noCollision(e)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(e.blockPosition().toShortString()).append(';');
+                }
+                var abajo = m.getBlockState(BlockPos.containing(e.getX(), e.getY() - 0.2, e.getZ()));
+                if (!abajo.getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+                else if (mal.length() < 400) mal.append(" en el aire en ").append(e.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, los de la cadena: fuera " + fuera.size() + " de " + com.darkcraft.morvain.MorvainEnemigos.cadena().size() + " (marcados "
+                    + marcados + ", en su suelo " + enSuelo + "; gargolas " + gargolas + ": de piedra en su pedestal " + piedra + ", volando " + vuelan
+                    + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+        } catch (Throwable t) {
+            log.println("Morvain, la cadena del sur: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] cadena", t);
+        } finally {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /**
+     * Parte 7aa: la gargola. La del primer rellano, de piedra en su pedestal: no ve a quien llega agachado a diez bloques, si de
+     * pie, y no a veinte; despierta (se agrieta, grita) y alza el vuelo; en el aire da vueltas alrededor de su presa (por encima y a
+     * un lado), se lanza en picado (le pilla y la echa de lado), le lanza las garras y se posa en el camino; en tierra el zarpazo
+     * y el coletazo pegan y despega otra vez; muere en el aire: cae (con fisica) y se va.
+     */
+    private static void gargolas(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.CADENA;
+        var S = com.darkcraft.morvain.Subida.get();
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        StringBuilder sb = new StringBuilder("Morvain, la gargola:");
+        try {
+            for (long k : S.chunks()) m.getChunk((int) (k >> 32), (int) k);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            int[] r1 = S.sitio("rellano1");
+            com.darkcraft.enemigos.Gargola g = null;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) {
+                if (g == null && e instanceof com.darkcraft.enemigos.Gargola q && q.postura() == com.darkcraft.enemigos.Enemigo.REZA
+                        && Math.abs(q.getZ() - r1[2]) < 12) g = q;
+                else e.discard();
+            }
+            if (g == null) {
+                log.println("Morvain, la gargola: NO SALE");
+                return;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " en %s (postura %d, sin fisica %s, vida %.0f, golpe %.1f, armadura %d)", g.blockPosition().toShortString(),
+                    g.postura(), g.noPhysics, g.getMaxHealth(), g.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), g.getArmorValue()));
+            // ---- lo que ve de piedra
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07aa2"), "[DarkCraftCI18]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            String ve = "";
+            try {
+                java.lang.reflect.Method mt = com.darkcraft.enemigos.Gargola.class.getDeclaredMethod("percibe", net.minecraft.world.entity.LivingEntity.class);
+                mt.setAccessible(true);
+                double[][] pruebas = {{10, 1}, {10, 0}, {20, 0}};
+                for (double[] pr : pruebas) {
+                    // por el camino, cuesta abajo (al sur) desde la gargola
+                    int z = (int) Math.floor(g.getZ() + pr[0]);
+                    fp.moveTo(0.5, S.pisa(z), z + 0.5, 180f, 0f);
+                    fp.setPose(pr[1] > 0 ? net.minecraft.world.entity.Pose.CROUCHING : net.minecraft.world.entity.Pose.STANDING);
+                    ve += String.format(java.util.Locale.ROOT, " %s a %.0f: %s;", pr[1] > 0 ? "agachado" : "de pie", pr[0], mt.invoke(g, fp));
+                }
+                fp.setPose(net.minecraft.world.entity.Pose.STANDING);
+            } catch (Throwable t) {
+                ve = " ERROR " + t;
+            }
+            sb.append("; de piedra ve:").append(ve);
+            // ---- la presa: un aldeano con mucha vida en el camino, delante del rellano
+            var victima = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            if (victima == null) {
+                log.println(sb.append(" (sin presa)"));
+                return;
+            }
+            victima.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(2000.0);
+            victima.setHealth(2000f);
+            victima.setNoAi(true);
+            // (en el centro del rellano: llano)
+            final double vx = r1[0] + 0.5, vy = r1[1], vz = r1[2] + 0.5;
+            victima.moveTo(vx, vy, vz, 180f, 0f);
+            m.addFreshEntity(victima);
+            quitar.add(victima);
+            g.setTarget(victima);
+            int despierta = -1, vuela = -1;
+            for (int k = 0; k < 120 && vuela < 0; k++) {
+                pasoGargola(g, victima, vx, vy, vz);
+                if (despierta < 0 && g.accion() == com.darkcraft.enemigos.GargolaAnims.DESPIERTA) despierta = k;
+                if (vuela < 0 && g.vuela()) vuela = k;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, "; despierta en el tick %d, vuela en el %d (postura %d, sin fisica %s)", despierta, vuela, g.postura(), g.noPhysics));
+            // ---- en el aire: sus vueltas y sus ataques
+            int pic0 = com.darkcraft.enemigos.Gargola.PICADOS, dan0 = com.darkcraft.enemigos.Gargola.PICADOS_DAN, gar0 = com.darkcraft.enemigos.Gargola.GARRAS_N,
+                    pos0 = com.darkcraft.enemigos.Gargola.POSADAS, des0 = com.darkcraft.enemigos.Gargola.DESPEGUES;
+            double sumaD = 0, sumaH = 0, empujon = 0;
+            int nOrbita = 0, enBloque = 0;
+            float antes = victima.getHealth();
+            int posada = -1;
+            for (int k = 0; k < 900; k++) {
+                int dan = com.darkcraft.enemigos.Gargola.PICADOS_DAN;
+                pasoGargolaSin(g);
+                if (com.darkcraft.enemigos.Gargola.PICADOS_DAN > dan) empujon = Math.max(empujon, victima.getDeltaMovement().horizontalDistance());
+                victima.moveTo(vx, vy, vz, 180f, 0f);
+                victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                victima.setOnGround(true);
+                victima.invulnerableTime = 0;
+                if (g.vuela() && g.accion() == 0) {
+                    sumaD += Math.hypot(g.getX() - vx, g.getZ() - vz);
+                    sumaH += g.getY() - vy;
+                    nOrbita++;
+                }
+                if (g.vuela() && !m.noCollision(g, g.getBoundingBox().deflate(0.2))) enBloque++;
+                if (posada < 0 && !g.vuela() && g.isAlive() && k > 10) posada = k;
+                // posada: lo que decide en tierra lo decide su cabeza del juego (que aqui no siempre anda): vuelve a volar
+                if (!g.vuela() && g.accion() == 0 && k > 10) g.empezar(com.darkcraft.enemigos.GargolaAnims.DESPEGA);
+                if (com.darkcraft.enemigos.Gargola.PICADOS - pic0 >= 1 && com.darkcraft.enemigos.Gargola.GARRAS_N - gar0 >= 1 && posada >= 0) break;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, "; en el aire: a %.1f de su presa y %.1f por encima de media (%d ticks); picados %d (pillan %d, la echa %.2f por tick),"
+                            + " garras %d, se posa %d (en el tick %d), despegues %d; dentro de un bloque volando %d ticks (tiene que ser 0); a la presa le quita %.1f",
+                    nOrbita == 0 ? 0 : sumaD / nOrbita, nOrbita == 0 ? 0 : sumaH / nOrbita, nOrbita, com.darkcraft.enemigos.Gargola.PICADOS - pic0,
+                    com.darkcraft.enemigos.Gargola.PICADOS_DAN - dan0, empujon, com.darkcraft.enemigos.Gargola.GARRAS_N - gar0,
+                    com.darkcraft.enemigos.Gargola.POSADAS - pos0, posada, com.darkcraft.enemigos.Gargola.DESPEGUES - des0, enBloque, antes - victima.getHealth()));
+            // ---- en tierra: el zarpazo de frente y el coletazo por detras, y vuelve a volar
+            if (g.vuela()) g.probarVuelo(false);
+            for (int k = 0; k < 40 && g.accion() != 0; k++) pasoGargolaSin(g);
+            String[] golpes = {"zarpazo", "coletazo"};
+            int[] acc = {com.darkcraft.enemigos.GargolaAnims.ZARPAZO, com.darkcraft.enemigos.GargolaAnims.COLETAZO};
+            for (int i = 0; i < 2; i++) {
+                // (mirando al sur, en el rellano: la presa dos bloques delante o dos detras)
+                g.moveTo(vx, vy, vz - 1.0, 0f, 0f);
+                g.setYRot(0f);
+                g.yBodyRot = g.yHeadRot = 0f;
+                victima.setHealth(victima.getMaxHealth());
+                double px = vx, pz = i == 0 ? vz + 1.0 : vz - 3.0;
+                g.setTarget(victima);
+                g.empezar(acc[i]);
+                float a0 = victima.getHealth();
+                for (int k = 0; k < com.darkcraft.enemigos.GargolaAnims.TICKS[acc[i]] + 4 && g.accion() == acc[i]; k++) {
+                    pasoGargolaSin(g);
+                    victima.moveTo(px, vy, pz, 180f, 0f);
+                    victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    victima.invulnerableTime = 0;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, "; %s a %.1f: -%.1f", golpes[i], Math.hypot(px - g.getX(), pz - g.getZ()), a0 - victima.getHealth()));
+            }
+            int des1 = com.darkcraft.enemigos.Gargola.DESPEGUES;
+            g.empezar(com.darkcraft.enemigos.GargolaAnims.DESPEGA);
+            for (int k = 0; k < 30; k++) pasoGargolaSin(g);
+            sb.append("; despega otra vez ").append(g.vuela()).append(" (+").append(com.darkcraft.enemigos.Gargola.DESPEGUES - des1).append(')');
+            // ---- muere volando: cae y se va
+            double y0 = g.getY();
+            g.hurt(m.damageSources().genericKill(), 10000f);
+            boolean cayo = false;
+            int k;
+            for (k = 0; k < 120 && !g.isRemoved(); k++) {
+                g.tickCount++;
+                g.tick();
+                if (g.getY() < y0 - 0.5) cayo = true;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, "; muere: vivo %s, volando %s, con fisica %s, cae %s, se va en %d ticks", g.isAlive(), g.vuela(), !g.noPhysics, cayo, k));
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println(sb + " ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] gargola", t);
+        } finally {
+            for (var e : quitar) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    private static void pasoGargola(com.darkcraft.enemigos.Gargola g, net.minecraft.world.entity.LivingEntity presa, double px, double py, double pz) {
+        pasoGargolaSin(g);
+        presa.moveTo(px, py, pz, 180f, 0f);
+        presa.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+        presa.setOnGround(true);
+        presa.invulnerableTime = 0;
+    }
+
+    private static void pasoGargolaSin(com.darkcraft.enemigos.Gargola g) {
+        g.setOldPosAndRot();
+        g.tickCount++;
+        g.tick();
     }
 
     /** Hace andar lo que deja Vorthak (las bolas de fuego y las llamas del suelo) en la caja. */

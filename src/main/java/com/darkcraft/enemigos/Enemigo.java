@@ -178,6 +178,14 @@ public abstract class Enemigo extends Monster {
         return 1.0;
     }
 
+    /**
+     * Si se mueve andando: persigue, vuelve a su puesto y ronda con el camino del juego. Los que se mueven por su cuenta
+     * mientras vuelan (la gargola en el aire, parte 7aa), no: ni vuelven ni rondan andando ni persiguen.
+     */
+    protected boolean anda() {
+        return true;
+    }
+
     /** Cada tick de una accion (para el paso de la estocada, lo que suena, lo que lanza...). */
     protected void alAvanzar(int accion, int t) {
     }
@@ -482,7 +490,7 @@ public abstract class Enemigo extends Monster {
                     return;
                 }
             }
-            if (d > distanciaDeseada()) {
+            if (d > distanciaDeseada() && anda()) {
                 if (--camino <= 0) {
                     camino = 5 + random.nextInt(6);
                     getNavigation().moveTo(t, prisa());
@@ -507,7 +515,7 @@ public abstract class Enemigo extends Monster {
 
         @Override
         public boolean canUse() {
-            return getTarget() == null && accion() == 0 && postura() == DE_PIE && lejos();
+            return getTarget() == null && accion() == 0 && postura() == DE_PIE && anda() && lejos();
         }
 
         @Override
@@ -547,7 +555,7 @@ public abstract class Enemigo extends Monster {
 
         @Override
         public boolean canUse() {
-            if (ronda <= 0 || hogar == null || getTarget() != null || accion() != 0 || postura() != DE_PIE) return false;
+            if (ronda <= 0 || hogar == null || getTarget() != null || accion() != 0 || postura() != DE_PIE || !anda()) return false;
             if (espera > 0) {
                 espera--;
                 return false;
@@ -566,7 +574,7 @@ public abstract class Enemigo extends Monster {
 
         @Override
         public boolean canContinueToUse() {
-            return getTarget() == null && !getNavigation().isDone();
+            return getTarget() == null && anda() && !getNavigation().isDone();
         }
     }
 

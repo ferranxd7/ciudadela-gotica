@@ -291,6 +291,8 @@ public final class Morvain {
         }
         // los gigantes errantes (parte 7w): los que andan de memoria y los que estan fuera
         if (m != null) Gigantes.tick(m);
+        // la subida por la cadena del sur (parte 7aa): la Sombra, el viento, las caidas y el corcel que no sube
+        if (m != null) Cadena.tick(m);
         // el molino de la Molinera (parte 7f): la reja de su puerta y su crujido con el viento
         if (m != null && srv.getTickCount() % 100 == 13) Molino.crujir(m);
         // la arboleda (parte 7h): con el Verdugo vencido, las sogas de los colgados se quedan con el lazo vacio
@@ -509,6 +511,15 @@ public final class Morvain {
         if (Costillar.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Costillar.PISO) < 40) return "darkcraft.morvain.lugar.costillar";
         // el Altar Profanado, donde reza Anselmo (parte 7t)
         if (Altar.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Altar.PISO) < 40) return "darkcraft.morvain.lugar.altar";
+        // la subida por la cadena del sur (parte 7aa): la Boca y la Garganta, el Descansillo, la cadena y, arriba, la ciudadela
+        if (Cadena.cerca(p.getX(), p.getZ()) || Subida.enCiudadela(p.getX(), p.getY(), p.getZ())) {
+            if (Subida.enBoca(p.getX(), p.getY(), p.getZ())) return "darkcraft.morvain.lugar.boca";
+            if (Subida.enCiudadela(p.getX(), p.getY(), p.getZ())) return "darkcraft.morvain.lugar.ciudadela";
+            if (Subida.enCamino(p.getX(), p.getY(), p.getZ()) && Subida.enDescansillo(p.getX(), p.getY(), p.getZ()))
+                return "darkcraft.morvain.lugar.descansillo";
+            if (Subida.enCamino(p.getX(), p.getY(), p.getZ()) || Subida.enCadena(p.getX(), p.getY(), p.getZ()) && p.getY() > Subida.Y_ANCLA + 3)
+                return "darkcraft.morvain.lugar.cadena";
+        }
         if (Cerco.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Cerco.PISO) < 40) return "darkcraft.morvain.lugar.cerco";
         // el Teatro Hundido y, bajo la llanura, la Sala de las Mascaras de Pell (parte 7y)
         if (Teatro.enSala(p.getX(), p.getY(), p.getZ())) return "darkcraft.morvain.lugar.mascaras";
