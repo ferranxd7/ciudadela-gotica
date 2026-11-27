@@ -483,6 +483,7 @@ public final class Morvain {
     public static void onArranque(net.minecraftforge.event.server.ServerAboutToStartEvent e) {
         Subida.rehacer();
         Cerco.rehacer();
+        Homenaje.rehacer();
     }
 
     @SubscribeEvent

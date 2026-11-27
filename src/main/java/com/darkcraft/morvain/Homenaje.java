@@ -82,6 +82,11 @@ public final class Homenaje {
 
     private static Homenaje unico;
 
+    /** Que se vuelva a hacer el plano la proxima vez (con los bloques del mod ya registrados: ver {@link Subida#rehacer}). */
+    public static synchronized void rehacer() {
+        unico = null;
+    }
+
     public static synchronized Homenaje get() {
         if (unico == null) unico = new Homenaje();
         return unico;
