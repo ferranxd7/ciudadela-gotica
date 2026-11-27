@@ -10982,5 +10982,270 @@
     ]
    }
   }
+ },
+ "voz_sigrun": {
+  "voz": "Elariel X - Epic Ethereal Queen",
+  "voice_id": "ksryVoNAGZT8GxWCTiVm",
+  "flow": "JhLKcOKadUHHH8IC94uf",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7ap: Sigrun, la Guardiana del Paso (el duelo del Paso del Colmillo). Por frase, tomas a y b; se bajan como sigrun/voz_Na.mp3 y sigrun/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[firm] Halt. No one passes the Fang while I stand. [pause] [softer] ...You're not one of them. Marked... I can see it on you. [weary] I am Sigrun, Warden of the Pass. My oath holds me here... until someone strikes me down.",
+    "sesiones": [
+     "RXWpow3jWLlPg21RntjL",
+     "btnSwXtjS7dNFjVEMgeC"
+    ],
+    "generaciones": [
+     "gUUxeS9JNqTXE8WZW2C5",
+     "8nZVmSuzXESXuqnAFjQY"
+    ],
+    "duraciones": [
+     15.36,
+     15.36
+    ]
+   },
+   "2": {
+    "prompt": "[fierce] Then draw your blade. Fight me with everything you have... [intense] and don't you dare hold back.",
+    "sesiones": [
+     "W0bwksXQ2JjZCEC7suEE",
+     "pQzDFeyu7KIPrPVQv3BG"
+    ],
+    "generaciones": [
+     "3YTTmTI4JZCrUnJ1FpLd",
+     "IGJYr9CEYfnZPz9Ue5Ch"
+    ],
+    "duraciones": [
+     6.56,
+     6.24
+    ]
+   },
+   "3": {
+    "prompt": "[quiet, remembering] When the Capital burned, my captain sent us to hold this pass, so the people could flee to the monastery. We held it. Nine days. My brothers fell one by one... [firm] I swore no one would pass while I stood. [bitter laugh] I'm still standing.",
+    "sesiones": [
+     "W2x62hSsHCHK8vAvXLDw",
+     "qYuwEVZSRBYWOYpCuFPh"
+    ],
+    "generaciones": [
+     "ozT6zPujy2YdPaQLRY28",
+     "JsGv1qjjYJlykG65RdYL"
+    ],
+    "duraciones": [
+     17.04,
+     17.12
+    ]
+   },
+   "4": {
+    "prompt": "[cold] Then go back the way you came. The pass stays closed.",
+    "sesiones": [
+     "m9dbOFCZAnpfSn7OkDpA",
+     "yDLi6gso1O03fMH6NKln"
+    ],
+    "generaciones": [
+     "svqIWmOH6elJhJzffduR",
+     "w8f56jZCSSAoPxuUFl61"
+    ],
+    "duraciones": [
+     4.16,
+     4.16
+    ]
+   },
+   "5": {
+    "prompt": "[dry] You again. Have you found your courage?",
+    "sesiones": [
+     "HmdMxoZmA0RB34uSOVjC",
+     "c6YIeG8Dv2z27jDHlhdh"
+    ],
+    "generaciones": [
+     "0u3sepykuX0awipB5gXb",
+     "265FPvl2kSdl3Rrz41j5"
+    ],
+    "duraciones": [
+     3.2,
+     3.2
+    ]
+   },
+   "6": {
+    "prompt": "[breathing hard] Enough... enough. [pained] You've beaten me. The oath... is broken.",
+    "sesiones": [
+     "DWszPcyvB8rVMgA0HEaL",
+     "uNtproIGDQiE6W1zI1Wg"
+    ],
+    "generaciones": [
+     "duSCGFPMilp84emde3ro",
+     "84Rx9PZf3e5JgSU8Ght0"
+    ],
+    "duraciones": [
+     7.44,
+     7.36
+    ]
+   },
+   "7": {
+    "prompt": "[exhausted, relieved] Nine days and a lifetime... and you finally put me on my knees. My oath is fulfilled. [steady] Now finish it... or let me go. The choice is yours.",
+    "sesiones": [
+     "i1t0JCnXRPQR5wooPg1P",
+     "7gWSizLwieq1oa8uoiyR"
+    ],
+    "generaciones": [
+     "hx0wGBiFNCOjxaKqPbsc",
+     "w0q1qRa6Wd9lu0Q0cg1I"
+    ],
+    "duraciones": [
+     12.08,
+     11.92
+    ]
+   },
+   "8": {
+    "prompt": "[softly] Thank you. [whispering] Tell them... the pass held.",
+    "sesiones": [
+     "xotZQWYfDrTwZUzUBdCK",
+     "hZ08rXPsH2Issb0bZMCM"
+    ],
+    "generaciones": [
+     "TPl4hgXeU3khG6xNkbAS",
+     "E5CdIeLH9K3cOrpfuo1S"
+    ],
+    "duraciones": [
+     3.68,
+     3.52
+    ]
+   },
+   "9": {
+    "prompt": "[surprised, then warm] Let me go? [pause] Then I'll go down to the monastery and find their names. All nine of them. Take my shield. I won't need it where I'm going.",
+    "sesiones": [
+     "oOXjOhCxTOqzxvnXa5SP",
+     "geIrMgORIDqhkAodnxeu"
+    ],
+    "generaciones": [
+     "8pA7ADtuKgfjzTitvpyu",
+     "Cq53COEHeQaUPvlYsuVl"
+    ],
+    "duraciones": [
+     9.36,
+     9.04
+    ]
+   },
+   "10": {
+    "prompt": "[not unkind] You fell. There's no shame in that. When you're ready... I'll be here. I'm always here.",
+    "sesiones": [
+     "t7EmBsJqkZ6S8Z7lHwe7",
+     "iVxESq1ns4i36144Dknv"
+    ],
+    "generaciones": [
+     "3QepqyilamEZrpfQPvrB",
+     "gvt7WCCsm6qVAFxKpXMv"
+    ],
+    "duraciones": [
+     6.72,
+     6.96
+    ]
+   },
+   "11": {
+    "prompt": "[breathing hard, grinning] Good... Again!",
+    "sesiones": [
+     "bca6KL6fKDcGMWO55PJT",
+     "Uo2SBajhfElghr4b66kx"
+    ],
+    "generaciones": [
+     "veVlSfWHXsEhLbvKNvLY",
+     "FnTuYEQ8bUzIrnwtwRGE"
+    ],
+    "duraciones": [
+     2.8,
+     2.96
+    ]
+   }
+  }
+ },
+ "sfx_sigrun": {
+  "flow": "JhLKcOKadUHHH8IC94uf",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7ap: empieza el duelo, Sigrun se rinde de rodillas, Sigrun muere y Sigrun se va por la nieve. Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "duelo_empieza": {
+    "prompt": "A knight drawing a longsword from its scabbard with a bright ringing steel sound, followed by a single low war horn echoing through a snowy mountain pass, cold wind, cinematic dark fantasy, no music",
+    "sesiones": [
+     "IKCZ5dUn2C10I8iqfmEP",
+     "IcCWv4SrGdpOmWWnlcTd",
+     "w70DDdnSEBGklbxNIUVS",
+     "Jd4qFvEir3oOmeAqa92g"
+    ],
+    "generaciones": [
+     "qIbUwn41RmjO7ycBh6t3",
+     "NvX5hRWNrQSrSFgFwINZ",
+     "zoJXkvlLIl5trqdH3Jeb",
+     "5LoLNFSnNr9NyXMi0OL8"
+    ],
+    "duraciones": [
+     8.0,
+     12.0,
+     10.0,
+     8.0
+    ]
+   },
+   "sigrun_rinde": {
+    "prompt": "A heavily armored knight falling to one knee in deep snow, plate armor clanking, a sword dropped into the snow with a muffled thud, heavy tired breathing, cold mountain wind, cinematic dark fantasy, no music",
+    "sesiones": [
+     "Od2c6FmuP3lKms4E9fFb",
+     "MpkhsmKUdgKpK7RQ2yze",
+     "yJlnUFYIqBJD8tSX98qe",
+     "mUB4sN4WhmwD6lqhdKfT"
+    ],
+    "generaciones": [
+     "r7KIHZYjFJFSaahddKWX",
+     "Bapp1mcW43Lnv2tzuVlP",
+     "RBcfzYVlooYnncR958U5",
+     "U5OWneWMdoJSHUZgnum7"
+    ],
+    "duraciones": [
+     10.0,
+     10.0,
+     12.0,
+     15.0
+    ]
+   },
+   "sigrun_muere": {
+    "prompt": "A final soft exhale, plate armor settling as a body slumps into the snow, the wind rising and a distant monastery bell tolling once, sorrowful, cinematic dark fantasy, no music",
+    "sesiones": [
+     "yAzBlToszdL0SnimFjAs",
+     "KjImmQnebvjyRvYgrQhQ",
+     "mptyeinFIkNx9Q58cATw",
+     "U1bYfqzf7ygl6cLu3GIW"
+    ],
+    "generaciones": [
+     "oDNucfKj9Nog8gktD2sn",
+     "NUJzPgcZdZYbj8bfWMaA",
+     "AOHDyUksH9M80pYaJHHR",
+     "9TteBNIyjFSKCVpEwaR3"
+    ],
+    "duraciones": [
+     12.0,
+     15.0,
+     12.0,
+     10.0
+    ]
+   },
+   "sigrun_se_va": {
+    "prompt": "Slow armored footsteps crunching away through deep snow, chainmail and plates clinking softly, cold wind howling and slowly fading into the distance, cinematic dark fantasy, no music",
+    "sesiones": [
+     "QbI29VIzZ5rTD5IbHC4Q",
+     "AkBpaCSxzDALRBUKXz6D",
+     "szlYrVNL8WPeiXyyr0AP",
+     "Q1bfxWrRMZNvI8iyUo2v"
+    ],
+    "generaciones": [
+     "fnxkS9BHeLRypVGqXuEG",
+     "LOhGFD2OUOp4FNs6UCU9",
+     "b4HT4DV8jsjUXa8dr8OD",
+     "RiDzAkp1leU95Y1L6LXl"
+    ],
+    "duraciones": [
+     20.0,
+     25.0,
+     25.0,
+     20.0
+    ]
+   }
+  }
  }
 }
