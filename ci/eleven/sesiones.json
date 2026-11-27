@@ -10753,5 +10753,234 @@
     ]
    }
   }
+ },
+ "voz_corwen": {
+  "voz": "Arkadius - Old Storyteller",
+  "voice_id": "O4uxPTtvgxrA0QCLHI1J",
+  "flow": "5aWXscqwkLiHZubfdVBI",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7ao: Corwen, el farolero de los Pilotes (las balizas de la niebla). Por frase, tomas a y b; se bajan como corwen/voz_Na.mp3 y corwen/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[weary, friendly] Careful on those planks, they're rotten through. [chuckles softly] Not many come out this far into the fog. I'm Corwen. I was the lamplighter here. Every night I lit the three beacons of the marsh... so the boats could find their way home.",
+    "sesiones": [
+     "lI35EvH36pIPDq02WHuY",
+     "3R9I5IXhrwnNUtzgpUEM"
+    ],
+    "generaciones": [
+     "CWLAhhXHeYAv2DLUxA1p",
+     "TNpNAlNs8yUPEpl5fvP1"
+    ],
+    "duraciones": [
+     16.4,
+     15.44
+    ]
+   },
+   "2": {
+    "prompt": "[grateful] You'd do that for an old man? Here... my tinderbox. One beacon at the end of the jetty, one on the western islet, one by the drowned chapel. Light all three... [quietly] and listen for the bells.",
+    "sesiones": [
+     "b0SWDqohPSLBJRPte8Kr",
+     "IjJG8dO0u1Qe8u9EVFD3"
+    ],
+    "generaciones": [
+     "ybFWfyompBD7n6e0PtYQ",
+     "WhfbpTiPu41TyUpY2BtA"
+    ],
+    "duraciones": [
+     13.6,
+     13.76
+    ]
+   },
+   "3": {
+    "prompt": "[distant] The night the sky turned red, the fog came in thick as wool, and it smelled of blood. The boats were still out. [pause] I lit the first beacon... and the wind blew it out. My hands shook too much to light it again. [quietly] I heard their bells out there all night. Then nothing.",
+    "sesiones": [
+     "IJDfRcPdwkGj8kWJe0yh",
+     "4Peb6PDI2G83nmDCIMK9"
+    ],
+    "generaciones": [
+     "ILXmwQFky01U3tT1csSp",
+     "qAIPSAkJKxfQxiAouiKc"
+    ],
+    "duraciones": [
+     19.44,
+     20.64
+    ]
+   },
+   "4": {
+    "prompt": "[softly] Then I'll sit with the dark a while longer. [dry chuckle] It's good company, once you get used to it.",
+    "sesiones": [
+     "dH3kfomLYQnb2ftbr9R5",
+     "Kzfe7LoSYZR6v0yHCo9M"
+    ],
+    "generaciones": [
+     "K50CkAW6VLdML556Ddov",
+     "VNgEu4xN1va4klvL6bMm"
+    ],
+    "duraciones": [
+     6.48,
+     6.56
+    ]
+   },
+   "5": {
+    "prompt": "Still dark out there? The jetty, the western islet, the drowned chapel. [warning] And keep away from the ones floating in the water.",
+    "sesiones": [
+     "iUliKl8l5rkclykoIWyf",
+     "6ZTqD291SFi497sqhLqV"
+    ],
+    "generaciones": [
+     "75LzdqrK8eeK2BFPVFDR",
+     "O0rt7d4jyAHB6uRPNYSX"
+    ],
+    "duraciones": [
+     9.44,
+     9.28
+    ]
+   },
+   "6": {
+    "prompt": "You came back. [hopeful] Will you light them now?",
+    "sesiones": [
+     "Awg5PxwjPsZRt0nJHX8X",
+     "9tvByNbV4U7BzHWRGag8"
+    ],
+    "generaciones": [
+     "ZCeJfQeOo3P4uP4oQ6J1",
+     "BfiBWEbe3Bmx6kXRQpLC"
+    ],
+    "duraciones": [
+     3.04,
+     3.04
+    ]
+   },
+   "7": {
+    "prompt": "[in awe, voice breaking] I see them... three lights in the fog, just like before. [pause] Do you hear that? Bells. Boat bells. They're coming home. [uncertain] Should I... should I go down and meet them?",
+    "sesiones": [
+     "5HYS41O7bYfitrcYlljA",
+     "RFXFf6Q4MVwAfbrK7AMY"
+    ],
+    "generaciones": [
+     "EkbVRParNbdeuUnL2iMq",
+     "kU04lwLSArld5MV2b8wW"
+    ],
+    "duraciones": [
+     13.92,
+     14.16
+    ]
+   },
+   "8": {
+    "prompt": "[peaceful] Then I'll go down to the water. [warmly] Keep my lantern, friend. It never once lost its way in the fog.",
+    "sesiones": [
+     "z01PWcbksPU0iJv2dZvb",
+     "SGKKnU6UwHFFdqe477H4"
+    ],
+    "generaciones": [
+     "yKG2Phj274h61brJg6YY",
+     "s1d11U1KYtdnKu1lYvq4"
+    ],
+    "duraciones": [
+     6.72,
+     6.72
+    ]
+   },
+   "9": {
+    "prompt": "[resolute, then gentle] Aye, you're right. Someone has to keep the light, and I've kept it this long. Take my pole... my arms are too old for it now. Yours aren't.",
+    "sesiones": [
+     "ayyLGMLt0iokcPLsaUfM",
+     "fuKqIZMFH6tgbstXrEfh"
+    ],
+    "generaciones": [
+     "ST6VX2MEWvMkjZIxzUSF",
+     "cIBttuIBrlSRMPJxEalJ"
+    ],
+    "duraciones": [
+     11.04,
+     11.2
+    ]
+   },
+   "10": {
+    "prompt": "[content] Three lights, every night. I trim the wicks and I listen. [small laugh] Some nights I almost hear them laughing out there.",
+    "sesiones": [
+     "UKMM4OE5S9Ub6J0bUNyf",
+     "kNiO2tSApS7OYqLhJYZz"
+    ],
+    "generaciones": [
+     "6AKkkkpXswsspLJDeQ3D",
+     "gHMvge6A0CvLabFdeIh4"
+    ],
+    "duraciones": [
+     8.72,
+     8.64
+    ]
+   }
+  }
+ },
+ "sfx_corwen": {
+  "flow": "5aWXscqwkLiHZubfdVBI",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7ao: encender una baliza, las campanas de las barcas en la niebla y Corwen que se mete en el agua. Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "baliza_enciende": {
+    "prompt": "An old iron marsh lantern being lit with flint and tinder: the scrape of a flint striker, a burst of sparks, a soft whoosh as the oil wick catches and a gentle crackling flame, quiet foggy night, cinematic dark fantasy, no music",
+    "sesiones": [
+     "6Bpmp0S0esytPyPUkQl2",
+     "IQYcYD2LcpYycOac1HIm",
+     "SbZJzhrzf0Xa6YFSpTWT",
+     "1v2vld4d2IUPVSEdvgQa"
+    ],
+    "generaciones": [
+     "KrflP07hIy9WTSMPGQBb",
+     "1MkWyUvrfa5uQXBTtKel",
+     "pFC3V4YCXnLzQl0TkgSX",
+     "qC12o1ikKrh6r4ldlYH2"
+    ],
+    "duraciones": [
+     12.0,
+     12.0,
+     8.0,
+     12.0
+    ]
+   },
+   "campanas_niebla": {
+    "prompt": "Distant small boat bells ringing slowly across a foggy marsh at night, several bells answering each other from far away over still water, ghostly and hopeful, faint wind and lapping water, cinematic dark fantasy, no music",
+    "sesiones": [
+     "7kUyAwNtMXBrupGniV6e",
+     "YcYOqgDOS63A7kLaWskp",
+     "CkDLcIBwUJ5WGF3wteZL",
+     "Am49Cp1OrFC8YF7z7nrV"
+    ],
+    "generaciones": [
+     "4QDzVDDkcky7dG6yofMP",
+     "GN8ZqSGCb62tzzLdYLvo",
+     "ENVLCJKeli9rNZDBS1m0",
+     "o7XAtKe3DMmRUDy5K8pO"
+    ],
+    "duraciones": [
+     25.0,
+     25.0,
+     30.0,
+     25.0
+    ]
+   },
+   "corwen_se_va": {
+    "prompt": "An old man slowly wading into shallow marsh water at night, soft splashing steps, a lantern creaking on its pole, distant boat bells, everything fading into the fog with a gentle ghostly hush, cinematic dark fantasy, no music",
+    "sesiones": [
+     "FxdlxkCDfcoOk5yvvauK",
+     "Heh4azs8dDAFk522PaX6",
+     "x4mGUZJ9akLs8wavDiNC",
+     "vn8ydtA4EAzGt3IxjTUY"
+    ],
+    "generaciones": [
+     "TbLxxJ9wBcMFb5kLsusw",
+     "y3U3kBhAor15IybjsFqH",
+     "TELWYt2ze3i7OCDheHWR",
+     "dERdwr7iVhQg8kX8GTJO"
+    ],
+    "duraciones": [
+     25.0,
+     30.0,
+     25.0,
+     25.0
+    ]
+   }
+  }
  }
 }
