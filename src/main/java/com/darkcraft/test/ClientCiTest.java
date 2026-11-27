@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 109 * 60 * 20;
+    private static final int LIMIT = 114 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -6025,6 +6025,8 @@ public final class ClientCiTest {
         t = cerco(t);
         // Aldric, el Primer Marcado, en lo alto del ancla del Cerco (parte 7v)
         t = aldric(t);
+        // los gigantes errantes de Morvain (parte 7w)
+        t = gigantes(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -10190,6 +10192,295 @@ public final class ClientCiTest {
                 comando(sp, "darkcraft cerco enemigos volver");
                 com.darkcraft.enemigos.Puestos.todos(sp.server, SITIO, false);
                 log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoAldric(sp.server));
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ los gigantes errantes de Morvain (parte 7w)
+
+    private static com.darkcraft.enemigos.Gigante giganteE(int i) {
+        return com.darkcraft.morvain.Gigantes.fuera(i);
+    }
+
+    private static String estadoGigante(com.darkcraft.enemigos.Gigante g) {
+        if (g == null) return "(no esta fuera)";
+        return estadoE(g) + String.format(java.util.Locale.ROOT, ", vida %.0f/%.0f, en pelea %s, segunda %s, andando %s, lo andado %.0f, mazazos %d (de lleno %d, onda %d),"
+                        + " barridos %d, pisotones %d (onda %d), patadas %d, rocas %d, aturdidos %d", g.getHealth(), g.getMaxHealth(), g.enPelea(), g.segunda(), g.andando(),
+                g.s(), g.mazazos(), g.golpesMazazo(), g.ondasMazazo(), g.barridos(), g.pisotones(), g.ondasPisoton(), g.patadas(), g.rocas(), g.aturdidos());
+    }
+
+    /** La camara a {@code delante} por delante del gigante, {@code derecha} a su derecha y {@code alto} de alto, mirando a su pecho (en el servidor). */
+    private static void camaraGigante(com.darkcraft.enemigos.Gigante g, double delante, double derecha, double alto, double miraDelante, double miraAlto) {
+        Vec3 f = Vec3.directionFromRotation(0, g.getYRot());
+        verDesdeServidor = new Vec3(g.getX() + f.x * delante - f.z * derecha, g.getY() + alto, g.getZ() + f.z * delante + f.x * derecha);
+        miraServidor = new Vec3(g.getX() + f.x * miraDelante, g.getY() + miraAlto, g.getZ() + f.z * miraDelante);
+    }
+
+    /** Un golpe del gigante 0 (quieto: solo lo que se le manda), con la presa delante a {@code dist} y la camara de lado. */
+    private static int golpeGigante(int t, String nombre, int accion, double dist, int[] capturas, String[] nombres) {
+        atTicks(t, "gigante: " + nombre, m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var g = giganteE(0);
+                if (g == null) return;
+                aPelear(sp, true);
+                g.quieta = true;
+                Vec3 f = Vec3.directionFromRotation(0, g.getYRot());
+                double x = g.getX() + f.x * dist, z = g.getZ() + f.z * dist;
+                irMirando(sp, x, com.darkcraft.enemigos.Gigante.suelo(sp.serverLevel(), x, z, g.getY()), z, g.getX(), g.getY() + 5, g.getZ(), false);
+                g.setTarget(sp);
+                if (accion == com.darkcraft.enemigos.GiganteAnims.ATURDIDO) g.derribar();
+                else g.empezar(accion);
+                camaraGigante(g, Math.min(dist, 9) * 0.5, -16, 5.5, Math.min(dist, 9) * 0.5, 3.5);
+            });
+        });
+        atTicks(t + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        for (int i = 0; i < capturas.length; i++) {
+            final String cap = nombres[i];
+            atTicks(t + capturas[i], "captura: " + cap, m -> {
+                server(m, sp -> log("  " + cap + ": " + estadoGigante(giganteE(0)) + " | jugador " + fpos(sp) + " vida " + Math.round(sp.getHealth())
+                        + " | temblor " + String.format(java.util.Locale.ROOT, "%.2f", com.darkcraft.client.enemigos.GiganteCliente.temblor())));
+                shot(m, cap);
+            });
+        }
+        return t + capturas[capturas.length - 1];
+    }
+
+    /**
+     * Los gigantes errantes: cada uno por su vuelta (salen al acercarse alguien: Ogmund de frente y de lado, Ulfgar en la costa y
+     * Haldor junto a la Capital); en supervivencia ante Ogmund: habla (su barra, su musica y el subtitulo) y ruge al acabar; sus
+     * golpes de lado (el mazazo, el barrido, el pisoton, la roca en la mano y por el aire); sobre una rodilla; a media vida; cae (de
+     * rodillas, el cartel, de bruces) y su campana queda en el suelo: se toca; y el bestiario. Al acabar, otra vez en pie y sin la campana.
+     */
+    private static int gigantes(int T) {
+        int t = T;
+        String[] capturas = {"cliente_mv447_ogmund_llanuras", "cliente_mv449_ulfgar_costa", "cliente_mv450_haldor_capital"};
+        for (int i = 0; i < 3; i++) {
+            final int k = i;
+            atTicks(t, "gigante " + k + ": a su vuelta", m -> {
+                m.setScreen(null);
+                enPrimeraPersona(m);
+                m.options.hideGui = true;
+                com.darkcraft.client.ui.Carteles.callados = true;
+                server(m, sp -> {
+                    if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                    sp.setGameMode(GameType.CREATIVE);
+                    comando(sp, "darkcraft gigante " + k + " volver");
+                    double s = com.darkcraft.morvain.Gigantes.andado(sp.server, k);
+                    double[] p = com.darkcraft.morvain.RutasGigantes.punto(k, s + 34);
+                    double y = com.darkcraft.enemigos.Gigante.suelo(sp.serverLevel(), p[0], p[1], 100) + 3;
+                    double[] q = com.darkcraft.morvain.RutasGigantes.punto(k, s);
+                    irMirando(sp, p[0] + p[3] * 9, y, p[1] - p[2] * 9, q[0], y + 2, q[1], true);
+                    log("  gigante " + k + ": " + com.darkcraft.morvain.Gigantes.estado(sp.server) + " | jugador " + fpos(sp));
+                });
+            });
+            t += 240;
+            atTicks(t, "camara delante del gigante", m -> server(m, sp -> {
+                var g = giganteE(k);
+                if (g != null) camaraGigante(g, 24, 9, 4.5, 0, 4.2);
+                else verDesdeServidor = null;
+            }));
+            atTicks(t + 2, "camara", m -> {
+                if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+            });
+            t += 10;
+            atTicks(t, "captura", m -> {
+                server(m, sp -> log("  gigante " + k + " por su vuelta: " + estadoGigante(giganteE(k)) + " | " + com.darkcraft.morvain.Gigantes.estado(sp.server)
+                        + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+                shot(m, capturas[k]);
+            });
+            if (k == 0) {
+                atTicks(t + 4, "camara de lado", m -> server(m, sp -> {
+                    var g = giganteE(0);
+                    if (g != null) camaraGigante(g, 2, 17, 4.0, 1, 4.0);
+                }));
+                atTicks(t + 6, "camara", m -> {
+                    if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+                });
+                t += 40;
+                atTicks(t, "captura: andando, de lado", m -> {
+                    server(m, sp -> log("  Ogmund andando: " + estadoGigante(giganteE(0))));
+                    shot(m, "cliente_mv448_ogmund_andando");
+                });
+            }
+            t += 10;
+        }
+        // ---- en supervivencia ante Ogmund: habla (la barra, la musica, el subtitulo) y ruge al acabar
+        atTicks(t, "Ogmund: otra vez a su vuelta", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                comando(sp, "darkcraft gigante 0 volver");
+                double s = com.darkcraft.morvain.Gigantes.andado(sp.server, 0);
+                double[] p = com.darkcraft.morvain.RutasGigantes.punto(0, s + 24);
+                double y = com.darkcraft.enemigos.Gigante.suelo(sp.serverLevel(), p[0], p[1], 100);
+                double[] q = com.darkcraft.morvain.RutasGigantes.punto(0, s);
+                irMirando(sp, p[0], y + 2, p[1], q[0], y + 4, q[1], true);
+            });
+        });
+        t += 200;
+        final int F = t;
+        final int dura = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Gigante.VOZ_BASE + 1);
+        atTicks(F, "Ogmund: en supervivencia delante de el", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                var g = giganteE(0);
+                if (g == null) {
+                    log("  Ogmund: NO ESTA FUERA | " + com.darkcraft.morvain.Gigantes.estado(sp.server));
+                    return;
+                }
+                aPelear(sp, true);
+                Vec3 f = Vec3.directionFromRotation(0, g.getYRot());
+                double x = g.getX() + f.x * 13, z = g.getZ() + f.z * 13;
+                irMirando(sp, x, com.darkcraft.enemigos.Gigante.suelo(sp.serverLevel(), x, z, g.getY()), z, g.getX(), g.getY() + 5.5, g.getZ(), false);
+                g.setTarget(sp);
+            });
+        });
+        atTicks(F + 40, "captura: habla (la barra y el subtitulo)", m -> {
+            server(m, sp -> log("  Ogmund al verle: " + estadoGigante(giganteE(0)) + " | jugador " + fpos(sp)));
+            log("  gigante: musica " + ClientMusic.debug());
+            shot(m, "cliente_mv451_ogmund_habla");
+        });
+        atTicks(F + dura + 4, "Ogmund: camara de lado para el rugido", m -> server(m, sp -> {
+            var g = giganteE(0);
+            if (g != null) camaraGigante(g, 6, -15, 5.0, 4, 4.5);
+        }));
+        atTicks(F + dura + 6, "camara", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(F + dura + 22, "captura: ruge", m -> {
+            server(m, sp -> log("  Ogmund ruge: " + estadoGigante(giganteE(0)) + " | jugador " + fpos(sp)));
+            shot(m, "cliente_mv452_ogmund_rugido");
+        });
+        t = F + dura + 60;
+        // ---- sus golpes, de lado
+        t = golpeGigante(t, "el mazazo", com.darkcraft.enemigos.GiganteAnims.MAZAZO, 6.5, new int[]{32}, new String[]{"cliente_mv453_gigante_mazazo"}) + 50;
+        t = golpeGigante(t, "el barrido", com.darkcraft.enemigos.GiganteAnims.BARRIDO, 6.0, new int[]{27}, new String[]{"cliente_mv454_gigante_barrido"}) + 40;
+        t = golpeGigante(t, "el pisoton", com.darkcraft.enemigos.GiganteAnims.PISOTON, 2.6, new int[]{23}, new String[]{"cliente_mv455_gigante_pisoton"}) + 40;
+        t = golpeGigante(t, "la roca", com.darkcraft.enemigos.GiganteAnims.ROCA, 20.0, new int[]{34, 52},
+                new String[]{"cliente_mv456_gigante_roca_mano", "cliente_mv457_gigante_roca_vuela"}) + 50;
+        t = golpeGigante(t, "sobre una rodilla", com.darkcraft.enemigos.GiganteAnims.ATURDIDO, 7.0, new int[]{32}, new String[]{"cliente_mv458_gigante_rodilla"}) + 60;
+        // ---- a media vida: ruge otra vez
+        final int H = t;
+        atTicks(H, "Ogmund: a media vida", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                var g = giganteE(0);
+                if (g == null) return;
+                aPelear(sp, true);
+                Vec3 f = Vec3.directionFromRotation(0, g.getYRot());
+                double x = g.getX() + f.x * 12, z = g.getZ() + f.z * 12;
+                irMirando(sp, x, com.darkcraft.enemigos.Gigante.suelo(sp.serverLevel(), x, z, g.getY()), z, g.getX(), g.getY() + 5.5, g.getZ(), false);
+                g.setTarget(sp);
+                g.mediaVida();
+            });
+        });
+        atTicks(H + 30, "captura: a media vida", m -> {
+            server(m, sp -> log("  Ogmund a media vida: " + estadoGigante(giganteE(0))));
+            shot(m, "cliente_mv459_ogmund_media_vida");
+        });
+        // ---- cae: de rodillas (su ultima frase), el cartel, de bruces y su campana queda en el suelo
+        final int C = H + 140;
+        final Vec3[] cayo = new Vec3[2];
+        atTicks(C, "Ogmund: cae", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                var g = giganteE(0);
+                if (g == null) return;
+                sp.removeAllEffects();
+                sp.setGameMode(GameType.CREATIVE);
+                log("  antes de caer Ogmund: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "gigante_campana"));
+                g.quieta = true;
+                Vec3 f = Vec3.directionFromRotation(0, g.getYRot());
+                cayo[0] = g.position();
+                cayo[1] = f;
+                irMirando(sp, g.getX() + f.x * 14 - f.z * 6, g.getY() + 1, g.getZ() + f.z * 14 + f.x * 6, g.getX(), g.getY() + 3, g.getZ(), true);
+                camaraGigante(g, 7, -14, 4.5, 3, 2.6);
+                g.invulnerableTime = 0;
+                g.hurt(sp.damageSources().playerAttack(sp), 99999f);
+            });
+        });
+        atTicks(C + 2, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 60, "captura: de rodillas", m -> {
+            server(m, sp -> log("  Ogmund de rodillas: " + com.darkcraft.morvain.Gigantes.estado(sp.server)));
+            shot(m, "cliente_mv460_ogmund_rodillas");
+        });
+        atTicks(C + 96, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 116, "captura: JEFE ABATIDO", m -> {
+            log("  gigante: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  tras caer Ogmund: ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "gigante_campana")
+                    + " | " + com.darkcraft.morvain.Gigantes.estado(sp.server)));
+            shot(m, "cliente_mv461_ogmund_abatido");
+        });
+        atTicks(C + 140, "camara de lado otra vez", m -> {
+            m.options.hideGui = true;
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        atTicks(C + 162, "captura: de bruces", m -> shot(m, "cliente_mv462_ogmund_bruces"));
+        atTicks(C + 215, "camara: la campana en el suelo", m -> {
+            if (cayo[0] != null) {
+                Vec3 o = cayo[0], f = cayo[1];
+                Vec3 c = o.add(f.scale(6.5));
+                verDesde(m, c.add(f.scale(6)).add(-f.z * 4, 2.4, f.x * 4), c.add(0, 0.6, 0));
+            }
+        });
+        atTicks(C + 222, "captura: la campana", m -> {
+            server(m, sp -> log("  donde cayo: campana en " + com.darkcraft.morvain.Gigantes.campana(sp.server) + ", bloques " + com.darkcraft.morvain.Gigantes.ULTIMO.size()));
+            shot(m, "cliente_mv463_ogmund_campana");
+        });
+        atTicks(C + 226, "se toca la campana", m -> server(m, sp -> {
+            BlockPos b = com.darkcraft.morvain.Gigantes.campana(sp.server);
+            if (b == null) return;
+            int antes = com.darkcraft.morvain.Gigantes.TOQUES;
+            var st = sp.serverLevel().getBlockState(b);
+            var d = st.hasProperty(net.minecraft.world.level.block.BellBlock.FACING) ? st.getValue(net.minecraft.world.level.block.BellBlock.FACING)
+                    : net.minecraft.core.Direction.NORTH;
+            // de lado, por donde se toca (la campana de suelo solo suena si se le da por su cara)
+            Vec3 donde = Vec3.atCenterOf(b).add(d.getStepX() * 0.5, -0.2, d.getStepZ() * 0.5);
+            sp.gameMode.useItemOn(sp, sp.serverLevel(), ItemStack.EMPTY, net.minecraft.world.InteractionHand.MAIN_HAND,
+                    new net.minecraft.world.phys.BlockHitResult(donde, d, b, false));
+            log("  la campana: tocada " + (com.darkcraft.morvain.Gigantes.TOQUES - antes) + " | " + sp.serverLevel().getBlockState(b));
+        }));
+        atTicks(C + 232, "captura: la campana suena", m -> shot(m, "cliente_mv464_ogmund_campana_suena"));
+        t = C + 240;
+        atTicks(t, "el bestiario: Ogmund", m -> {
+            enPrimeraPersona(m);
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("gigante_campana")));
+        });
+        t += 18;
+        atTicks(t, "captura: Ogmund en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_mv465_bestiario_ogmund");
+        });
+        t += 4;
+        atTicks(t, "gigantes: fin (Ogmund otra vez en pie, sin la campana; vuelta al arco)", m -> {
+            m.setScreen(null);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                for (BlockPos b : com.darkcraft.morvain.Gigantes.ULTIMO)
+                    sp.serverLevel().setBlock(b, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft gigante 0 volver");
+                log("  al acabar: " + com.darkcraft.morvain.Gigantes.estado(sp.server));
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

@@ -33,7 +33,8 @@ public final class Coleccion {
             "helado_monje", "helado_penitente", "helado_peregrino", "abad", "calcinado_guardia", "calcinado_incendiario", "calcinado_ceniciento",
             "condestable", "erudito_aprendiz", "erudito_maestro", "erudito_custodio", "rectora", "salobre_redero", "salobre_bichero",
             "salobre_salinero", "ballenero", "penitente_flagelante", "penitente_portador", "penitente_turiferario",
-            "pontifice", "marcado_rompedor", "marcado_caballero", "marcado_cazador", "aldric"};
+            "pontifice", "marcado_rompedor", "marcado_caballero", "marcado_cazador", "aldric", "gigante_campana", "gigante_costilla",
+            "gigante_columna"};
 
     /** El objeto de una clave de la coleccion (los libros de la cronica, con su texto). */
     public static ItemStack objeto(String clave) {
@@ -168,6 +169,12 @@ public final class Coleccion {
                 case "ballenero" -> DarkCraftMod.BALLENERO.get().create(lvl);
                 case "pontifice" -> DarkCraftMod.PONTIFICE.get().create(lvl);
                 case "aldric" -> DarkCraftMod.ALDRIC.get().create(lvl);
+                case "gigante_campana", "gigante_costilla", "gigante_columna" -> {
+                    var k = DarkCraftMod.GIGANTE.get().create(lvl);
+                    if (k != null) k.variante(c.endsWith("costilla") ? com.darkcraft.enemigos.Gigante.ULFGAR
+                            : c.endsWith("columna") ? com.darkcraft.enemigos.Gigante.HALDOR : com.darkcraft.enemigos.Gigante.OGMUND);
+                    yield k;
+                }
                 case "corteza" -> DarkCraftMod.CORTEZA.get().create(lvl);
                 case "espectro_cortesano", "espectro_dama", "espectro_vigia" -> {
                     var s = DarkCraftMod.ESPECTRO.get().create(lvl);

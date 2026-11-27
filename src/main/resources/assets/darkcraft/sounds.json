@@ -5420,5 +5420,226 @@
         "stream": true
       }
     ]
+  },
+  "sfx.gigante_paso": {
+    "subtitle": "subtitles.darkcraft.sfx.gigante_paso",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gigante_paso_1"
+      },
+      {
+        "name": "darkcraft:sfx/gigante_paso_2"
+      }
+    ]
+  },
+  "sfx.gigante_rugido": {
+    "subtitle": "subtitles.darkcraft.sfx.gigante_rugido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gigante_rugido_1"
+      },
+      {
+        "name": "darkcraft:sfx/gigante_rugido_2"
+      }
+    ]
+  },
+  "sfx.gigante_mazazo": {
+    "subtitle": "subtitles.darkcraft.sfx.gigante_mazazo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gigante_mazazo_1"
+      },
+      {
+        "name": "darkcraft:sfx/gigante_mazazo_2"
+      }
+    ]
+  },
+  "sfx.gigante_barrido": {
+    "subtitle": "subtitles.darkcraft.sfx.gigante_barrido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gigante_barrido_1"
+      },
+      {
+        "name": "darkcraft:sfx/gigante_barrido_2"
+      }
+    ]
+  },
+  "sfx.gigante_pisoton": {
+    "subtitle": "subtitles.darkcraft.sfx.gigante_pisoton",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gigante_pisoton_1"
+      },
+      {
+        "name": "darkcraft:sfx/gigante_pisoton_2"
+      }
+    ]
+  },
+  "sfx.gigante_patada": {
+    "subtitle": "subtitles.darkcraft.sfx.gigante_patada",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gigante_patada_1"
+      },
+      {
+        "name": "darkcraft:sfx/gigante_patada_2"
+      }
+    ]
+  },
+  "sfx.gigante_arranca": {
+    "subtitle": "subtitles.darkcraft.sfx.gigante_arranca",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gigante_arranca_1"
+      },
+      {
+        "name": "darkcraft:sfx/gigante_arranca_2"
+      }
+    ]
+  },
+  "sfx.gigante_roca": {
+    "subtitle": "subtitles.darkcraft.sfx.gigante_roca",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gigante_roca_1"
+      },
+      {
+        "name": "darkcraft:sfx/gigante_roca_2"
+      }
+    ]
+  },
+  "sfx.gigante_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.gigante_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gigante_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/gigante_dolor_2"
+      }
+    ]
+  },
+  "sfx.gigante_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.gigante_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gigante_muerte_1"
+      },
+      {
+        "name": "darkcraft:sfx/gigante_muerte_2"
+      }
+    ]
+  },
+  "sfx.gigante_campana": {
+    "subtitle": "subtitles.darkcraft.sfx.gigante_campana",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gigante_campana_1"
+      },
+      {
+        "name": "darkcraft:sfx/gigante_campana_2"
+      }
+    ]
+  },
+  "sfx.gigante_cadena": {
+    "subtitle": "subtitles.darkcraft.sfx.gigante_cadena",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/gigante_cadena_1"
+      },
+      {
+        "name": "darkcraft:sfx/gigante_cadena_2"
+      }
+    ]
+  },
+  "gigante.voz.1": {
+    "subtitle": "subtitles.darkcraft.gigante.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gigante/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "gigante.voz.2": {
+    "subtitle": "subtitles.darkcraft.gigante.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gigante/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "gigante.voz.3": {
+    "subtitle": "subtitles.darkcraft.gigante.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gigante/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "gigante.voz.4": {
+    "subtitle": "subtitles.darkcraft.gigante.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gigante/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "gigante.voz.5": {
+    "subtitle": "subtitles.darkcraft.gigante.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gigante/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "gigante.voz.6": {
+    "subtitle": "subtitles.darkcraft.gigante.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gigante/voz_6",
+        "stream": false
+      }
+    ]
+  },
+  "gigante.voz.7": {
+    "subtitle": "subtitles.darkcraft.gigante.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gigante/voz_7",
+        "stream": false
+      }
+    ]
+  },
+  "gigante.voz.8": {
+    "subtitle": "subtitles.darkcraft.gigante.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gigante/voz_8",
+        "stream": false
+      }
+    ]
+  },
+  "gigante.voz.9": {
+    "subtitle": "subtitles.darkcraft.gigante.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:gigante/voz_9",
+        "stream": false
+      }
+    ]
+  },
+  "musica.gigante": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/gigante",
+        "stream": true
+      }
+    ]
   }
 }

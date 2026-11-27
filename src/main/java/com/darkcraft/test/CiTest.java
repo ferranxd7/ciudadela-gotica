@@ -744,6 +744,7 @@ public final class CiTest {
         altar(server, m, log, out);
         cerco(server, m, log, out);
         aldric(server, m, log, out);
+        gigantes(server, m, log, out);
     }
 
     /**
@@ -3246,6 +3247,265 @@ public final class CiTest {
             if (!quitar.contains(r)) quitar.add(r);
             r.tickCount++;
             r.tick();
+        }
+    }
+
+    /**
+     * Parte 7w: los gigantes errantes de Morvain. Sus vueltas (lo que miden, lo que suben, que no pisan agua y que van por su
+     * region); que andan de memoria sin nadie cerca; uno fuera: anda por su vuelta con los pies a ras de suelo; al verle, habla y
+     * ruge al acabar la frase; sus golpes a una presa (el mazazo donde cae y su onda, el barrido, el pisoton, la patada que lanza,
+     * la roca que arranca y tira); cae sobre una rodilla si se le pega mucho en poco tiempo (y entonces le entra mas); a media vida
+     * ruge; y al caer: de rodillas, de bruces, su arma queda en el suelo (la campana de Ogmund) y no vuelve. Al acabar, todo como
+     * estaba (sin el arma en el suelo y el gigante otra vez en pie).
+     */
+    private static void gigantes(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        com.darkcraft.enemigos.Gigante g = null;
+        final int I = com.darkcraft.enemigos.Gigante.OGMUND;
+        double s0 = com.darkcraft.morvain.Gigantes.andado(server, I);
+        try {
+            // ---- las vueltas
+            StringBuilder sb = new StringBuilder("Morvain, gigantes: vueltas");
+            com.darkcraft.morvain.Region[] suya = {com.darkcraft.morvain.Region.LLANURAS, com.darkcraft.morvain.Region.COSTA,
+                    com.darkcraft.morvain.Region.CAPITAL};
+            for (int i = 0; i < 3; i++) {
+                double largo = com.darkcraft.morvain.RutasGigantes.largo(i), sube = 0, antes = Double.NaN;
+                int agua = 0, fuera = 0, n = 0;
+                for (double s = 0; s < largo; s += 8) {
+                    double[] p = com.darkcraft.morvain.RutasGigantes.punto(i, s);
+                    var c = com.darkcraft.morvain.Terreno.columna(p[0], p[1]);
+                    n++;
+                    if (c.altura() < com.darkcraft.morvain.Terreno.AGUA + 0.5) agua++;
+                    if (c.region() != suya[i]) fuera++;
+                    if (!Double.isNaN(antes)) sube = Math.max(sube, Math.abs(c.altura() - antes) / 8);
+                    antes = c.altura();
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " | %s: %d bloques, pendiente max %.2f, agua %d de %d (tiene que ser 0), fuera de su region %d",
+                        com.darkcraft.enemigos.Gigante.TIPOS[i], Math.round(largo), sube, agua, n, fuera));
+            }
+            // ---- de memoria: sin nadie cerca andan solos (dos bloques por segundo)
+            for (int i = 0; i < 3; i++) com.darkcraft.morvain.Gigantes.recoger(i);
+            double[] antes = new double[3];
+            for (int i = 0; i < 3; i++) antes[i] = com.darkcraft.morvain.Gigantes.andado(server, i);
+            for (int k = 0; k < 20; k++) com.darkcraft.morvain.Gigantes.tick(m, true);
+            sb.append(" | de memoria en 10 s:");
+            for (int i = 0; i < 3; i++)
+                sb.append(String.format(java.util.Locale.ROOT, " %.1f", com.darkcraft.morvain.Gigantes.andado(server, i) - antes[i]));
+            sb.append(" (20 cada uno) | ").append(com.darkcraft.morvain.Gigantes.estado(server));
+            log.println(sb);
+            // ---- uno fuera, por su vuelta
+            com.darkcraft.morvain.Gigantes.revivir(server, I);
+            double s = com.darkcraft.morvain.Gigantes.andado(server, I);
+            double[] p = com.darkcraft.morvain.RutasGigantes.punto(I, s);
+            for (int cx = -4; cx <= 4; cx++)
+                for (int cz = -4; cz <= 4; cz++) m.getChunk(((int) Math.floor(p[0]) >> 4) + cx, ((int) Math.floor(p[1]) >> 4) + cz);
+            g = com.darkcraft.morvain.Gigantes.crear(m, I, s);
+            if (g == null) {
+                log.println("Morvain, gigante: NO SALE");
+                return;
+            }
+            quitar.add(g);
+            final com.darkcraft.enemigos.Gigante gg = g;
+            double x0 = g.getX(), z0 = g.getZ(), sueloMax = 0;
+            int pasos = 0;
+            for (int k = 0; k < 200; k++) {
+                g.tickCount++;
+                g.tick();
+                if (g.andando()) pasos++;
+                sueloMax = Math.max(sueloMax, Math.abs(g.getY() - com.darkcraft.enemigos.Gigante.suelo(m, g.getX(), g.getZ(), g.getY())));
+            }
+            double anda = Math.hypot(g.getX() - x0, g.getZ() - z0);
+            StringBuilder sg = new StringBuilder(String.format(java.util.Locale.ROOT, "Morvain, gigante %s: vida %.0f, golpe %.1f, armadura %d, caja %.1f x %.1f, "
+                            + "sin fisica %s; en 10 s anda %.1f bloques (unos 20), andando %d ticks, lejos de su vuelta %.1f, los pies a %.2f del suelo como mucho,"
+                            + " lo andado %.0f -> %.0f, musica %d, barra '%s'",
+                    g.tipo(), g.getMaxHealth(), g.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), g.getArmorValue(),
+                    g.getBbWidth(), g.getBbHeight(), g.noPhysics, anda, pasos, com.darkcraft.morvain.RutasGigantes.distancia(I, g.getX(), g.getZ()), sueloMax, s,
+                    g.s(), g.musica(), g.getDisplayName().getString()));
+            log.println(sg);
+            // ---- al ver a alguien: habla y ruge al acabar la frase
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("7d9e1f30-5b62-4d8e-8fa0-4b5c6d7e8fcd"), "[DarkCraftCI14]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            net.minecraft.world.phys.Vec3 f = net.minecraft.world.phys.Vec3.directionFromRotation(0, g.getYRot());
+            final double px = g.getX() + f.x * 14, pz = g.getZ() + f.z * 14;
+            final double py = com.darkcraft.enemigos.Gigante.suelo(m, px, pz, g.getY());
+            fp.moveTo(px, py, pz, 0f, 0f);
+            fp.setOnGround(true);
+            g.setTarget(fp);
+            int ruge = -1, primero = -1;
+            for (int k = 0; k < 260 && ruge < 0; k++) {
+                g.tickCount++;
+                g.tick();
+                fp.moveTo(px, py, pz, 0f, 0f);
+                fp.setHealth(fp.getMaxHealth());
+                if (g.accion() == com.darkcraft.enemigos.GiganteAnims.RUGIDO) ruge = k;
+            }
+            int dura = com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Gigante.VOZ_BASE + 1);
+            for (int k = 0; k < 70; k++) {
+                g.tickCount++;
+                g.tick();
+            }
+            log.println(String.format(java.util.Locale.ROOT, "Morvain, gigante al ver a alguien: en pelea %s, ruge en el tick %d (la frase dura %d), "
+                    + "a cuantos empuja el rugido %d, se le acerca: a %.1f", g.enPelea(), ruge, dura, g.empujados(), Math.hypot(g.getX() - px, g.getZ() - pz)));
+            // ---- sus golpes a una presa (quieto: solo lo que se le manda)
+            g.quieta = true;
+            var victima = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            StringBuilder sv = new StringBuilder("Morvain, los golpes del gigante a una presa:");
+            if (victima != null) {
+                victima.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(900.0);
+                victima.setHealth(900f);
+                victima.setNoAi(true);
+                victima.moveTo(px, py, pz, 0f, 0f);
+                m.addFreshEntity(victima);
+                quitar.add(victima);
+                String[] golpes = {"mazazo", "onda del mazazo", "barrido", "pisoton", "patada", "roca"};
+                int[] acc = {com.darkcraft.enemigos.GiganteAnims.MAZAZO, com.darkcraft.enemigos.GiganteAnims.MAZAZO, com.darkcraft.enemigos.GiganteAnims.BARRIDO,
+                        com.darkcraft.enemigos.GiganteAnims.PISOTON, com.darkcraft.enemigos.GiganteAnims.PATADA, com.darkcraft.enemigos.GiganteAnims.ROCA};
+                double[] lejos = {6.0, 9.6, 5.5, 2.6, 3.2, 20.0};
+                final double gx = g.getX(), gz = g.getZ();
+                for (int i = 0; i < golpes.length; i++) {
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    victima.hurtTime = 0;
+                    victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    double vx = gx, vz = gz + lejos[i];
+                    double vy = com.darkcraft.enemigos.Gigante.suelo(m, vx, vz, py);
+                    victima.moveTo(vx, vy, vz, 180f, 0f);
+                    victima.setOnGround(true);
+                    g.moveTo(gx, com.darkcraft.enemigos.Gigante.suelo(m, gx, gz, g.getY()), gz, 0f, 0f);
+                    g.setYRot(0f);
+                    g.yBodyRot = g.yHeadRot = 0f;
+                    g.setTarget(victima);
+                    int maz = g.golpesMazazo(), ond = g.ondasMazazo(), bar = g.barridos(), pis = g.ondasPisoton(), pat = g.patadas(), roc = g.rocas();
+                    int caen = com.darkcraft.enemigos.RocaGigante.CAEN, dan = com.darkcraft.enemigos.RocaGigante.DAN;
+                    g.empezar(acc[i]);
+                    float antesV = victima.getHealth();
+                    double alto = 0;
+                    com.darkcraft.enemigos.RocaGigante roca = null;
+                    double cae = -1;
+                    for (int k = 0; k < 140; k++) {
+                        if (g.accion() != 0) {
+                            g.setTarget(victima);
+                            g.tickCount++;
+                            g.tick();
+                        }
+                        victima.moveTo(vx, vy, vz, 180f, 0f);
+                        victima.setOnGround(true);
+                        victima.invulnerableTime = 0;
+                        if (i == 4) {
+                            alto = Math.max(alto, victima.getDeltaMovement().y);
+                            victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                        }
+                        if (roca == null)
+                            for (var r : m.getEntitiesOfClass(com.darkcraft.enemigos.RocaGigante.class, g.getBoundingBox().inflate(30))) {
+                                roca = r;
+                                quitar.add(r);
+                            }
+                        if (roca != null && !roca.isRemoved()) {
+                            roca.tick();
+                            if (roca.isRemoved()) cae = Math.hypot(roca.getX() - vx, roca.getZ() - vz);
+                        }
+                        if (g.accion() == 0 && (roca == null || roca.isRemoved()) && k > 4) break;
+                    }
+                    sv.append(String.format(java.util.Locale.ROOT, " | %s (a %.1f): le quita %.0f", golpes[i], lejos[i], antesV - victima.getHealth()));
+                    switch (i) {
+                        case 0 -> sv.append(", de lleno ").append(g.golpesMazazo() - maz);
+                        case 1 -> sv.append(", onda ").append(g.ondasMazazo() - ond);
+                        case 2 -> sv.append(", barridos ").append(g.barridos() - bar);
+                        case 3 -> sv.append(", onda del pie ").append(g.ondasPisoton() - pis);
+                        case 4 -> sv.append(String.format(java.util.Locale.ROOT, ", patadas %d, la lanza hacia arriba %.2f", g.patadas() - pat, alto));
+                        default -> sv.append(String.format(java.util.Locale.ROOT, ", rocas %d, caen %d, dan %d, cae a %.1f de la presa", g.rocas() - roc,
+                                com.darkcraft.enemigos.RocaGigante.CAEN - caen, com.darkcraft.enemigos.RocaGigante.DAN - dan, cae));
+                    }
+                }
+            }
+            log.println(sv);
+            // ---- se le pega mucho en poco tiempo: sobre una rodilla (y entonces le entra un 50 % mas)
+            g.setTarget(fp);
+            g.quieta = true;
+            for (int k = 0; k < 40 && g.accion() != 0; k++) {
+                g.tickCount++;
+                g.tick();
+            }
+            float v0 = g.getHealth();
+            int at0 = g.aturdidos();
+            for (int k = 0; k < 12 && g.aturdidos() == at0; k++) {
+                g.invulnerableTime = 0;
+                g.hurt(m.damageSources().playerAttack(fp), 18f);
+            }
+            boolean rodilla = g.accion() == com.darkcraft.enemigos.GiganteAnims.ATURDIDO;
+            float v1 = g.getHealth();
+            g.invulnerableTime = 0;
+            g.hurt(m.damageSources().playerAttack(fp), 20f);
+            float entra = v1 - g.getHealth();
+            log.println(String.format(java.util.Locale.ROOT, "Morvain, el gigante sobre una rodilla: tras %.0f de dano en un momento %s (aturdido %d), un golpe de 20 le quita %.1f"
+                    + " (con la armadura; de pie, menos)", v0 - v1, rodilla, g.aturdidos() - at0, entra));
+            for (int k = 0; k < 80; k++) {
+                g.tickCount++;
+                g.tick();
+            }
+            // ---- a media vida: ruge
+            g.mediaVida();
+            int rugeMedia = -1;
+            for (int k = 0; k < 60 && rugeMedia < 0; k++) {
+                g.tickCount++;
+                g.tick();
+                if (g.accion() == com.darkcraft.enemigos.GiganteAnims.RUGIDO) rugeMedia = k;
+            }
+            log.println("Morvain, el gigante a media vida: segunda " + g.segunda() + ", ruge en el tick " + rugeMedia);
+            // ---- cae: de rodillas, de bruces, su arma en el suelo; ya no vuelve
+            com.darkcraft.morvain.Gigantes.ULTIMO = new java.util.ArrayList<>();
+            int rep = com.darkcraft.valdrenn.Guardianes.repartosPendientes();
+            g.invulnerableTime = 0;
+            g.hurt(m.damageSources().playerAttack(fp), 99999f);
+            boolean muriendo = g.muriendo();
+            int k = 0;
+            for (; k < 260 && !g.isRemoved(); k++) {
+                g.tickCount++;
+                g.tick();
+            }
+            java.util.List<BlockPos> arma = com.darkcraft.morvain.Gigantes.ULTIMO;
+            int campana = 0;
+            for (BlockPos b : arma) if (m.getBlockState(b).is(net.minecraft.world.level.block.Blocks.BELL)) campana++;
+            log.println(String.format(java.util.Locale.ROOT, "Morvain, el gigante cae: muriendo %s, se deshace en %d ticks (la animacion dura %d), su arma en el suelo %d bloques"
+                            + " (campana %d), caido %s, repartos %d -> %d", muriendo, k, com.darkcraft.enemigos.GiganteAnims.TICKS[com.darkcraft.enemigos.GiganteAnims.MORIR],
+                    arma.size(), campana, com.darkcraft.morvain.Gigantes.muerto(server, I), rep, com.darkcraft.valdrenn.Guardianes.repartosPendientes()));
+            for (BlockPos b : arma) m.setBlock(b, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+            vistaGigantes(m, out);
+        } catch (Exception e) {
+            log.println("Morvain, gigantes: FALLO " + e);
+            e.printStackTrace(log);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.morvain.Gigantes.recoger(I);
+            com.darkcraft.morvain.Gigantes.revivir(server, I);
+            com.darkcraft.morvain.Gigantes.poner(server, I, s0);
+        }
+    }
+
+    /** El mapa de las tres vueltas (la region de cada punto) para verlas en las capturas de la prueba. */
+    private static void vistaGigantes(ServerLevel m, File out) {
+        try {
+            int w = 512;
+            var img = new java.awt.image.BufferedImage(w, w, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            double esc = 16000.0 / w;
+            for (int y = 0; y < w; y++)
+                for (int x = 0; x < w; x++) {
+                    double wx = -8000 + x * esc, wz = -8000 + y * esc;
+                    var c = com.darkcraft.morvain.Terreno.columna(wx, wz);
+                    int col = c.region().color;
+                    if (c.altura() < com.darkcraft.morvain.Terreno.AGUA) col = 0x1B2A33;
+                    img.setRGB(x, y, col);
+                }
+            for (int i = 0; i < 3; i++) {
+                double largo = com.darkcraft.morvain.RutasGigantes.largo(i);
+                for (double s = 0; s < largo; s += 4) {
+                    double[] p = com.darkcraft.morvain.RutasGigantes.punto(i, s);
+                    int x = (int) ((p[0] + 8000) / esc), y = (int) ((p[1] + 8000) / esc);
+                    if (x >= 0 && y >= 0 && x < w && y < w) img.setRGB(x, y, 0xFF2020);
+                }
+            }
+            javax.imageio.ImageIO.write(img, "png", new File(out, "morvain_gigantes.png"));
+        } catch (Exception ignored) {
         }
     }
 

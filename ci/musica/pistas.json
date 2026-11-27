@@ -246,5 +246,16 @@
     "aviso": "Music by ATMANAN (OpenGameArt, CC-BY 4.0)",
     "uso": "Aldric, el Primer Marcado (el jefe del Crater de Sangre de Morvain)",
     "lufs": -16
+  },
+  {
+    "id": "gigante",
+    "pagina": "https://opengameart.org/node/141315",
+    "busca": "stone_guardian_loop",
+    "titulo": "Stone Guardian",
+    "autor": "Ronhul Maggot",
+    "licencia": "CC-BY 4.0",
+    "aviso": "Music by Ronhul Maggot (OpenGameArt, CC-BY 4.0)",
+    "uso": "Los gigantes errantes de Morvain (Ogmund, Ulfgar y Haldor)",
+    "lufs": -16
   }
 ]

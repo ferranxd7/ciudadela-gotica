@@ -2858,6 +2858,101 @@ por la cadena a la ciudadela y la Sombra.
   (`mv441`), el cartel (`mv442`), se deshace en sombra (`mv443`), el cerco en paz (`mv444`), la puerta abierta (`mv445`) y el bestiario
   (`mv446`). `LIMIT` 109 min (`lanzar.sh` 115 y 113 min, el paso 143, el trabajo 191).
 
+### Plan grande, parte 7w: los gigantes errantes de Morvain
+
+Respuesta 132 del plan (los especiales: "dragon, jinete nocturno —solo de noche, en caminos—, gigantes errantes, jefes secretos tras
+muros ilusorios"); la primera tanda: los gigantes. Despues el jinete nocturno, los jefes secretos, el dragon y la subida por la cadena.
+- **Tres gigantes** (`enemigos/Gigante`, entidad `darkcraft:gigante`, 3,0 x 7,8, inmune al fuego, `noSave`, `clientTrackingRange` 16;
+  hereda de `Guardian`; variante = gigante = su vuelta): 0 **Ogmund, el de la Campana** (las Llanuras Palidas; la campana de su aldea,
+  que ya no existe, atada al cabo de una viga; dobla al andar), 1 **Ulfgar, el de las Costillas** (la Costa de los Huesos; pega con una
+  costilla de los suyos) y 2 **Haldor, el de la Columna** (junto a la Capital; una columna de marmol con su capitel; la piel se le va
+  volviendo piedra). `tipo()` / `logro()` = `gigante_campana`, `gigante_costilla`, `gigante_columna` (bestiario, nombre en la barra
+  —`variante(v)` le pone el nombre—, cartel y hazana). 2200 de vida, golpe 16, armadura 6 (dureza 4), no se le empuja; 12000 ecos.
+- **El modelo** (`tools/enemigos/gigante.py`): hecho **al doble de lo normal** (torso 24 x 30 x 14, brazos de 36, piernas de 28, cabeza
+  pequena y adelantada entre los hombros, el cogote de toro, la panza, los punos y los pies descalzos) y dibujado a 1,8 (unos ocho
+  bloques): asi la textura (256 x 512) tiene el detalle de los bloques. **Las armas largas van "tumbadas"**: una pieza hija de la mano
+  girada 90 grados con las cajas a lo largo de su Y (con las cajas a lo largo de Z, su zona de la textura se comia media hoja). **La
+  campana cuelga a plomo** donde se pide (`_campana` en la pose: un `posproceso` que le pone el giro que deja su +Y hacia abajo, sea cual
+  sea la pose del brazo; en el mazazo cae boca abajo contra el suelo; alzada, rigida). Piezas de cada uno en `OCULTAS` (y `roca_mano`, la
+  roca que arranca, en las tres: el modelo del juego la ensena entre que la arranca y la tira). Bucles `quieto`, `porte_campana` /
+  `porte_costilla` / `porte_columna` (los brazos con lo suyo: la viga al hombro con la campana a la espalda, la costilla a rastras, la
+  columna al hombro), `andar` (un paso cada 1,6 s de su animacion) y `listo`; acciones (`GiganteAnims`): mazazo (64 ticks, golpe 30),
+  barrido (48, 26), pisoton (40, 22), patada (32, 16), roca (64; la arranca en el 20 y la tira en el 42), rugido (56, 20), aturdido (60)
+  y morir (180: de rodillas en 1,6 s, habla, de bruces en 7,4 s). `generar.py` acepta `ZOOM_VARIANTES`, `ZOOM_TIRA` y `LADO_TIRA` del
+  modulo (las hojas de revision de algo de ocho bloques). `client/enemigos/GiganteModelo` (el paso al ritmo de lo andado:
+  `animateWalk` con escala `ESCALA_PASO` 2,5) y `GiganteRenderer` (1,8; los ojos se apagan al caer de bruces).
+- **Sin fisica** (`noPhysics`, sin gravedad, sin navegador ni metas del juego: `registerGoals` solo pone la de buscar presa): anda
+  derecho (`andarHacia`: gira como mucho 2 grados por tick por su vuelta y 3,5 en pelea; si tiene que girar mucho, casi en el sitio) y
+  los pies a ras de suelo (`pies` / `Gigante.suelo`: en Morvain lo mas alto del `Terreno` bajo las cuatro esquinas de sus pies —no los
+  arboles ni las ruinas—; en otro mundo, el mapa de alturas; como mucho 0,3 por tick). Se mueve antes de `super.aiStep` (asi el paso de
+  la animacion del juego, que se calcula en `travel`, cuenta lo andado). No se le empuja, no lo empuja el agua, no se guarda; la caja
+  para no dejar de dibujarse llega 8 bloques (el arma).
+- **Por donde van** (`morvain/RutasGigantes`: tres vueltas cerradas de puntos, 5400, 5249 y 4736 bloques, por tierra llana —pendiente
+  como mucho 0,09—, seca y lejos de los sitios; las eligio `tools/morvain/Rutas.java` con el `Terreno`, que tambien dibuja el mapa de
+  cada una) y **cuando estan** (`morvain/Gigantes`, desde `Morvain.onTick`; SavedData `darkcraft_gigantes`: lo andado de cada uno, si
+  ha caido y donde quedo la campana): cada uno anda su vuelta a `Gigante.PASO` (0,1 bloques por tick: dos por segundo) **aunque no le
+  vea nadie** ("de memoria", cada medio segundo); **sale** (la entidad) cuando un jugador de Morvain esta a `SALE` 112 de por donde va y
+  ese sitio procesa entidades (`isPositionEntityTicking`); se **recoge** (sin guardarse; sigue de memoria) cuando no queda nadie a
+  `SE_VA` 160 y no pelea. Por su vuelta va hacia un punto 14 bloques mas adelante (asi dobla las esquinas en curva); si su presa se aleja
+  de su vuelta mas de `CORREA` 48 (o el mas de 64), la deja y vuelve. **El que cae no vuelve nunca.**
+- **La pelea**: ve a quien tiene delante a 30 (`FOLLOW_RANGE`, como los demas: la mitad agachado). Al empezar dice su frase (no la
+  repite en 4 min) y se le acerca sin pegar hasta acabarla; al acabarla **ruge** (empuja a los de alrededor —7— y los deja sin fuerzas
+  3 s). A sus pies (menos de 4,4) el **pisoton** (alza la rodilla y pisa: la onda alrededor del pie, 4,6, a los de pie: x1,25 y los
+  levanta) o la **patada** (5,6, 110 grados, x0,9 y los lanza lejos y hacia arriba); a la distancia de su arma (3,2 a 8,6) el **mazazo**
+  (lo alza a dos manos y lo estrella delante, a 6 bloques y algo a su derecha: de lleno —2,6— x1,6; la **onda** —4,8— x0,7 a los de pie;
+  se queda clavado un momento) o el **barrido** (de su derecha a su izquierda, 9 bloques, 200 grados, x1,15; no llega al que esta
+  pegado a sus piernas); de lejos (11 a 40, a la vista) la **roca** (se agacha, la arranca del suelo con la izquierda y se la tira:
+  `enemigos/RocaGigante`, un `ThrowableItemProjectile` de 1,4 que vuela en arco —`tiro`: de 18 a 44 ticks segun lo lejos— y al caer
+  revienta: de lleno x1,4 y alrededor —`RADIO` 3,2— x0,75; la dibuja `RocaGiganteRenderer` con dos bloques de piedra que dan vueltas). Si
+  se le pega mucho en poco tiempo (el 7 % de su vida en 6 s) **cae sobre una rodilla** (aturdido 3 s, una vez cada 30 s: la cabeza a
+  tiro y **los golpes le entran un 50 % mas**). A media vida ruge otra vez y dice su frase 2. Pruebas: `quieta`, `parado`, `vencer()`,
+  `mediaVida()`, `derribar()` y contadores (`mazazos` / `golpesMazazo` / `ondasMazazo`, `barridos`, `pisotones` / `ondasPisoton`,
+  `patadas`, `rocas`, `aturdidos`, `empujados`; `RocaGigante.CAEN` / `DAN`).
+- **Al caer** (`die` → `Gigantes.caido`: ya no vuelve): de rodillas dice su ultima frase y cae de bruces (el golpe, el polvo); lo demas lo
+  reparte `valdrenn/Guardianes` (le llega por `Puestos.alCaer` como a cualquier guardian): el cartel de JEFE ABATIDO con sus ecos, la
+  hazana (`gigante_campana` "La campana dobla", `gigante_costilla` "Junto al mar", `gigante_columna` "Piedra a piedra", con su entrada
+  del diario) y el bestiario. **Donde cae queda su arma, de bloques** (`Gigantes.monumento`, solo en aire o lo que se aparta): la viga
+  (troncos de roble oscuro) y **una campana de verdad** (la de Ogmund: "tocala... por mi, una vez": quien la toca —`onCampana`— la oye
+  sonar por las Llanuras y apunta `campana_ogmund` en su diario), la costilla de Ulfgar (un arco de bloques de hueso hincado en la tierra)
+  o la columna de Haldor tumbada (cuarzo, con el capitel cincelado y un trozo partido).
+- **Lo que se nota en el cliente** (`client/enemigos/GiganteCliente`, sin paquetes): **los pasos** (cada vez que planta un pie —dos por
+  ciclo de su animacion de andar: cada `PASO` puntos del paso del juego—: suena el paso, el polvo del suelo bajo el pie y la camara
+  tiembla un poco, menos cuanto mas lejos) y **los golpes contra el suelo** (el mazazo, el pisoton, el rugido, la rodilla, las rodillas
+  y el cuerpo al morir) y la roca al reventar (`RocaGigante.AL_CAER`, desde `onClientRemoval`): la camara tiembla fuerte si se esta cerca.
+- **Voz** (ElevenLabs, `eleven_v4`, **"Mossbeard | The God of the Wild"** `bFrjFL4nlpeYNwNRhXxq`, flow `MO9WC12B0DMR0NNuRERt`; 9
+  frases, tomas a; en `procesar.py` `voz_gigante`: un 12 % mas grave, una segunda voz una octava por debajo, el pecho, algo de raspa y
+  el eco abierto del campo): linea **130 + 3 x gigante + N** (`Voces.BASE_GIGANTE`, `esGigante`, `gigante(linea)`; `habla_gigante` en
+  `rey_voces.json`; subtitulos `darkcraft.gigante.voz.1..9` con el nombre `darkcraft.gigante.nombre_corto.<gigante>`): Ogmund 1 "Pequeno...
+  no deberias estar aqui. La campana... dobla por ti.", 2 "Cada toque... es un nombre... ¡un nombre que no pude salvar!", 3 "Tocala...
+  por mi, pequeno. Tocala... una vez."; Ulfgar 4 "Estos huesos... eran mis hermanos. Y tu... caminas sobre ellos.", 5 "La Sombra se los
+  llevo a todos... ¡No te llevaras al ultimo!", 6 "Dejame... con ellos. Junto al mar... junto al mar."; Haldor 7 "Yo levante estas
+  murallas... piedra a piedra. Nada... entra.", 8 "¡El rey ya no esta! ¡La ciudad ya no esta! ¡Pero la piedra... RECUERDA!", 9
+  "Construye... algo mejor... pequeno." (1 al empezar, 2 a media vida, 3 al caer).
+- **Barra** (`GuardianCliente`: los `gigante_*` usan la misma, `gigante_barra.png`, letras de piedra clara; arte de
+  `tools/hud/barra_guardianes.py` "gigante": el dintel de sillares viejos con grietas y musgo, el munon de una columna y la punta
+  partida, y la cabeza de piedra de un gigante con los ojos cerrados —una rendija de luz—; relleno de tierra que corre; lascas y polvo
+  que caen). **Musica**: "Stone Guardian" de Ronhul Maggot (OpenGameArt, CC-BY 4.0, id `gigante`, la version en bucle; tema 42 de
+  `ClientMusic.boss`).
+- Sonidos (ElevenLabs, flow `lu5d15B0nhsALspXT3Bi`, `TOMAS_SFX`): `gigante_paso` (1 y 4), `gigante_rugido` (2 y 4), `gigante_mazazo`
+  (2 y 1), `gigante_barrido` (2 y 3), `gigante_pisoton` (4 y 1), `gigante_patada` (3 y 2), `gigante_arranca` (4 y 3), `gigante_roca`
+  (4 y 1), `gigante_dolor` (1 y 4), `gigante_muerte` (3 y 1), `gigante_campana` (1 y 4; la campana de Ogmund) y `gigante_cadena` (1 y
+  4; lo que cruje al andar).
+- Comandos `/darkcraft gigante [<0-2> [ir | aqui | vencer | derribar | volver]]` (sin mas: por donde va cada uno; `ir` lleva delante de
+  por donde va —asi sale—; `aqui` lo saca 16 bloques delante; `volver`: si habia caido ya no lo esta y el que estaba fuera sale de nuevo).
+- **Sin abrir el juego**: `tools/morvain/Rutas.java` (con `Ruido`, `Region`, `Terreno` y `RutasGigantes`) mide cada vuelta y la
+  dibuja; `python3 tools/enemigos/generar.py --solo gigante --vistas carpeta`.
+- Pruebas: servidor, lineas `Morvain, gigantes: vueltas ...` (lo que miden, la pendiente, sin agua, en su region; de memoria andan 20
+  bloques en 10 s), `Morvain, gigante gigante_campana: ...` (anda por su vuelta con los pies a ras de suelo), `Morvain, gigante al ver a
+  alguien: ...` (habla, ruge al acabar la frase, empuja), `Morvain, los golpes del gigante a una presa: ...` (el mazazo de lleno y su
+  onda, el barrido, el pisoton, la patada que lanza, la roca que cae junto a la presa), `Morvain, el gigante sobre una rodilla: ...`,
+  `Morvain, el gigante a media vida: ...` y `Morvain, el gigante cae: ...` (de bruces, su campana en el suelo, ya no vuelve; luego todo
+  como estaba) y la vista `morvain_gigantes.png` (las tres vueltas sobre el mapa); cliente, tramo `gigantes()` despues de Aldric: cada
+  uno por su vuelta (`cliente_mv447` Ogmund, `mv448` andando de lado, `mv449` Ulfgar, `mv450` Haldor), en supervivencia ante Ogmund habla
+  con su barra (`mv451`) y ruge (`mv452`); sus golpes de lado (`mv453` el mazazo, `mv454` el barrido, `mv455` el pisoton, `mv456` la roca
+  en la mano, `mv457` por el aire), sobre una rodilla (`mv458`), a media vida (`mv459`); cae de rodillas (`mv460`), el cartel (`mv461`),
+  de bruces (`mv462`), su campana en el suelo (`mv463`) y suena al tocarla (`mv464`); y el bestiario (`mv465`). `LIMIT` 114 min
+  (`lanzar.sh` 120 y 118 min, el paso 148, el trabajo 196).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

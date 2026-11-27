@@ -29,7 +29,7 @@ JAVA_CLI = os.path.join(REPO, "src/main/java/com/darkcraft/client/enemigos")
 JAVA_COM = os.path.join(REPO, "src/main/java/com/darkcraft/enemigos")
 HERRAMIENTA = "tools/enemigos/generar.py"
 
-PERSONAJES = ("hueco", "ahogado", "capitan", "guardia", "arquero", "perro", "espectro", "elite", "brandt", "corteza", "corcel", "marchito", "molinera", "ahorcado", "verdugo", "podrido", "barquero", "helado", "abad", "calcinado", "condestable", "erudito", "rectora", "salobre", "ballenero", "vieja", "penitente", "pontifice", "marcado", "aldric")
+PERSONAJES = ("hueco", "ahogado", "capitan", "guardia", "arquero", "perro", "espectro", "elite", "brandt", "corteza", "corcel", "marchito", "molinera", "ahorcado", "verdugo", "podrido", "barquero", "helado", "abad", "calcinado", "condestable", "erudito", "rectora", "salobre", "ballenero", "vieja", "penitente", "pontifice", "marcado", "aldric", "gigante")
 
 
 def clase(nombre):
@@ -82,7 +82,8 @@ def hojas(m, nombre, rig, texs, bucles, acciones, carpeta):
     for v, arma in enumerate(m.VARIANTES):
         t, b = texs[v]
         reposo = m.reposo(v, por_nombre) if hasattr(m, "reposo") else {}
-        tiles = [vista.render(rig, t.a, b.a, reposo, yaw=y, pitch=-8, size=(190, 290), zoom=100 / max(1.0, esc * 1.12 if esc > 1 else 1.0),
+        zv = getattr(m, "ZOOM_VARIANTES", None) or 100 / max(1.0, esc * 1.12 if esc > 1 else 1.0)
+        tiles = [vista.render(rig, t.a, b.a, reposo, yaw=y, pitch=-8, size=(190, 290), zoom=zv,
                               ocultas=m.OCULTAS[v], escala_modelo=esc, centro_y=cy)
                  for y in (0, 35, 90, 180, 250)]
         filas.append(np.concatenate(tiles, axis=1))
@@ -100,8 +101,9 @@ def hojas(m, nombre, rig, texs, bucles, acciones, carpeta):
         poses = [anim.sumar(*[x.muestra(tt) for x in bases], a.muestra(tt)) for tt in tiempos]
         etiquetas = [f"{tt:.2f}" + (" GOLPE" if int(round(tt * 20)) in a.golpes else "") for tt in tiempos]
         for sufijo, yaw in (("", 35), ("_lado", 270)):
-            lado = 230 if esc <= 1 else 300
-            im = vista.tira(rig, t.a, poses, b.a, yaw=yaw, pitch=-10, size=(lado, lado), zoom=56 if esc <= 1 else 62, etiquetas=etiquetas,
+            lado = getattr(m, "LADO_TIRA", None) or (230 if esc <= 1 else 300)
+            zt = getattr(m, "ZOOM_TIRA", None) or (56 if esc <= 1 else 62)
+            im = vista.tira(rig, t.a, poses, b.a, yaw=yaw, pitch=-10, size=(lado, lado), zoom=zt, etiquetas=etiquetas,
                             ocultas=m.OCULTAS[v], escala_modelo=esc, centro_y=cy)
             im.save(os.path.join(carpeta, f"{nombre}_{a.nombre}{sufijo}.png"))
 

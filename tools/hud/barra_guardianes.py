@@ -45,8 +45,13 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   a la izquierda y el eslabon roto que cuelga a la derecha, y en el centro la marca (el ojo en el aro roto con sus tres
   espinas) al rojo; relleno de hierro al rojo que corre; esquirlas de hierro y brasas que caen al recibir dano.
 
+  Los gigantes errantes de Morvain (parte 7w; los tres con la misma): el dintel de sillares viejos con grietas y musgo, el
+  munon de una columna a la izquierda y la punta partida a la derecha, y en el centro la cabeza de piedra de un gigante con
+  los ojos cerrados (una rendija de luz); relleno de tierra que corre; lascas de piedra y polvo que caen al recibir dano.
+
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
-abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png, pontifice_barra.png y aldric_barra.png (256x128):
+abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png, pontifice_barra.png, aldric_barra.png y
+gigante_barra.png (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -1539,6 +1544,145 @@ def esquirlas():
     return img
 
 
+# ---------------------------------------------------------------- los gigantes errantes (parte 7w)
+
+PI_DD, PI_D, PI, PI_L, PI_H = hexc("15130f"), hexc("2f2b24"), hexc("514a3e"), hexc("7d745f"), hexc("b0a58a")
+MUS_D, MUS = hexc("24301b"), hexc("3e5530")
+TI_DD, TI_D, TI, TI_L, TI_H = hexc("1c110a"), hexc("3c2615"), hexc("6b4a27"), hexc("9e7642"), hexc("d8b071")
+OJO_G = hexc("e6b45a")
+
+
+def marco_gigante():
+    """El dintel de los gigantes: una viga de sillares de piedra vieja (juntas, grietas y musgo) de punta a punta; a la izquierda
+    el munon de una columna rota, a la derecha la punta partida; en el centro la cabeza de piedra de un gigante (la frente baja,
+    las cejas, los ojos cerrados con una rendija de luz, la nariz y la barba tallada) que asoma por encima."""
+    rnd = random.Random(1201)
+    n = noise2(131)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 5, FX1 + 4, FY0 - 6, FY1 + 5
+
+    def piedra(x, y):
+        v = n(x * 0.22, y * 0.45)
+        c = PI_D if v < 0.28 else PI if v < 0.74 else PI_L
+        if n(x * 0.13 + 7, y * 0.3) > 0.8:
+            c = mix(c, MUS, 0.55)
+        return c
+
+    juntas = set(range(x0 + 19, x1 - 6, 23))
+    for y in range(y0, y1 + 1):
+        for x in range(x0, x1 + 1):
+            c = piedra(x, y)
+            if y == y0:
+                c = mix(c, PI_H, 0.5)
+            elif y == y0 + 1:
+                c = mix(c, PI_L, 0.3)
+            elif y == y1:
+                c = mix(c, PI_DD, 0.6)
+            if x in juntas:
+                c = mix(PI_DD, c, 0.25)
+            put(img, x, y, c)
+        put(img, x0 - 1, y, OUT)
+        put(img, x1 + 1, y, OUT)
+    for x in range(x0 - 1, x1 + 2):
+        put(img, x, y0 - 1, OUT)
+        put(img, x, y1 + 1, OUT)
+    # grietas
+    for _ in range(9):
+        x, y = rnd.randint(x0 + 4, x1 - 4), rnd.choice((y0 + 1, y1 - 1))
+        for k in range(rnd.randint(3, 6)):
+            put(img, x, y, PI_DD)
+            x += rnd.choice((-1, 0, 1))
+            y += 1 if y < (y0 + y1) / 2 else -1
+            if not (y0 < y < y1):
+                break
+    # musgo que cuelga por debajo
+    for x in range(x0 + 2, x1 - 2, 3):
+        if rnd.random() < 0.35:
+            for k in range(rnd.randint(1, 3)):
+                put(img, x, y1 + 1 + k, MUS if k == 0 else MUS_D)
+    # el hueco del relleno, limpio
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, OUT)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # el munon de la columna (izquierda) y la punta partida (derecha)
+    for y in range(y0 - 4, y1 + 5):
+        for x in range(0, x0):
+            if y < y0 - 4 + (x % 3):
+                continue
+            c = piedra(x, y)
+            if x % 3 == 1:
+                c = mix(c, PI_D, 0.45)                      # las estrias
+            put(img, x, y, c)
+    for x in range(x1 + 2, FW):
+        for y in range(y0 + (x - x1) // 2, y1 + 1 - (x - x1) // 3):
+            put(img, x, y, piedra(x, y))
+    # la cabeza de piedra del centro
+    mx, my = FW // 2, 9
+    for y in range(0, FY0 - 1):
+        for x in range(mx - 14, mx + 15):
+            dx, dy = (x - mx) / 13.5, (y - my) / 10.0
+            if dx * dx + dy * dy * 0.8 <= 1.0 or (y >= my and abs(x - mx) <= 12):
+                c = piedra(x, y)
+                put(img, x, y, c)
+    # contorno de la cabeza (mirando una copia: si no, el contorno se extiende solo)
+    antes = img.copy()
+    for y in range(0, FY0 - 1):
+        for x in range(mx - 15, mx + 16):
+            if antes.getpixel((x, y))[3] == 0 and any(0 <= x + a < FW and 0 <= y + b < 40 and antes.getpixel((x + a, y + b))[3] > 0
+                                                       for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                put(img, x, y, OUT)
+    # la frente y las cejas, los ojos cerrados (una rendija de luz), la nariz y la barba tallada
+    for x in range(mx - 9, mx + 10):
+        put(img, x, my - 1, PI_DD if abs(x - mx) > 1 else PI_D)
+        put(img, x, my - 2, PI_H if abs(x - mx) > 2 else PI_L)
+    for s_ in (-1, 1):
+        for k in range(2, 8):
+            put(img, mx + s_ * k, my + 1, OJO_G if 3 <= k <= 6 else PI_DD)
+            put(img, mx + s_ * k, my + 2, PI_DD if 2 <= k <= 7 else PI_D)
+    for y in range(my, my + 6):
+        put(img, mx, y, PI_L)
+        put(img, mx + 1, y, PI_D)
+    for x in range(mx - 2, mx + 3):
+        put(img, x, my + 6, PI_DD)
+    for x in range(mx - 8, mx + 9):
+        for y in range(my + 8, FY0 - 1):
+            if (x + y) % 3 == 0:
+                put(img, x, y, PI_D)
+    return img
+
+
+def relleno_gigante(k):
+    """La tierra que corre: vetas de ocre y polvo de piedra que pasan despacio."""
+    n = noise2(331)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            t = 0.2 + 0.5 * mid + 0.45 * (n((x - k * 3) * 0.08, y * 0.6) - 0.5)
+            c = mix(TI_DD, TI_L, max(0.0, min(1.0, t * 1.3)))
+            veta = (x - k * 3 + int(2 * math.sin((x + y * 7) * 0.09))) % 31
+            if veta in (0, 1) and 1 <= y <= 5:
+                c = mix(c, TI_H, 0.45)
+            if y == 0:
+                c = mix(c, TI_L, 0.25)
+            if y == 6:
+                c = mix(c, TI_DD, 0.7)
+            img.putpixel((x, y), c)
+    return img
+
+
+def piedrecitas():
+    """Lo que cae al recibir dano: lascas de piedra y polvo."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = (["pP", "Pp"], [".p.", "pPp", ".p."], ["P.", "pp"], ["t", "T", "t"])
+    col = {"p": PI_L, "P": PI_H, "t": TI_L, "T": TI_H}
+    for k, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, k * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 def hueco(a, b):
     n = noise2(113)
     img = Image.new("RGBA", (240, 7))
@@ -1581,6 +1725,7 @@ if __name__ == "__main__":
         "ballenero": atlas(marco_ballenero(), relleno_ballenero, hueco("030807", "0d1c19"), rastro("effcf8", "a9d8cc"), salpicaduras()),
         "pontifice": atlas(marco_pontifice(), relleno_pontifice, hueco("0a0405", "1e0c0d"), rastro("fff0e6", "e8b8a8"), gotas_sangre()),
         "aldric": atlas(marco_aldric(), relleno_aldric, hueco("050505", "151417"), rastro("fff2ea", "e8b0a0"), esquirlas()),
+        "gigante": atlas(marco_gigante(), relleno_gigante, hueco("0a0907", "1b1813"), rastro("fff6e6", "e0caa0"), piedrecitas()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

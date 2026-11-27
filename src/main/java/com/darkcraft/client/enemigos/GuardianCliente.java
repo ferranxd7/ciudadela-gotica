@@ -49,18 +49,19 @@ public final class GuardianCliente {
 
     /**
      * {@code nombre}: "brandt", "corteza", "molinera", "verdugo", "barquero", "abad", "condestable", "rectora", "ballenero",
-     * "pontifice" o "aldric" (el de la clave de su nombre).
+     * "pontifice", "aldric" o "gigante_*" (el de la clave de su nombre; los tres gigantes, con la misma barra).
      */
     public static void barra(CustomizeGuiOverlayEvent.BossEventProgress e, int ticks, String nombre) {
         if (!e.isCancelable()) return;
         if (!nombre.equals(actual)) {
             actual = nombre;
-            BARRA = new ResourceLocation(DarkCraftMod.MODID, "textures/gui/" + nombre + "_barra.png");
+            // (los tres gigantes errantes comparten su barra de piedra)
+            BARRA = new ResourceLocation(DarkCraftMod.MODID, "textures/gui/" + (nombre.startsWith("gigante") ? "gigante" : nombre) + "_barra.png");
             ultimo = ticks - 100;
         }
         boolean hojas = nombre.equals("corteza"), ceniza = nombre.equals("molinera"), soga = nombre.equals("verdugo"), agua = nombre.equals("barquero"),
                 nieve = nombre.equals("abad"), fuego = nombre.equals("condestable"), cielo = nombre.equals("rectora"), mar = nombre.equals("ballenero"),
-                sangre = nombre.equals("pontifice"), cadena = nombre.equals("aldric");
+                sangre = nombre.equals("pontifice"), cadena = nombre.equals("aldric"), piedra = nombre.startsWith("gigante");
         e.setCanceled(true);
         GuiGraphics g = e.getGuiGraphics();
         Minecraft mc = Minecraft.getInstance();
@@ -128,7 +129,7 @@ public final class GuardianCliente {
         g.pose().translate(-128, 0, 0);
         g.drawCenteredString(mc.font, Component.translatable("entity.darkcraft." + nombre), 128, -8,
                 hojas ? 0xFFB9F0C4 : ceniza ? 0xFFF2DDB8 : soga ? 0xFFE6D2B0 : agua ? 0xFFBFEAF2 : nieve ? 0xFFE4F4FF : fuego ? 0xFFFFD2A0 : cielo ? 0xFFDCE4FF
-                        : mar ? 0xFFCFEEE6 : sangre ? 0xFFF4CDBE : cadena ? 0xFFE6D8CC : 0xFFF0C8B8);
+                        : mar ? 0xFFCFEEE6 : sangre ? 0xFFF4CDBE : cadena ? 0xFFE6D8CC : piedra ? 0xFFE8E0CC : 0xFFF0C8B8);
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         // hueco, rastro y relleno (la bruma corre)
         g.blit(BARRA, 8, 19, 0, 80, 240, 7, 256, 128);
