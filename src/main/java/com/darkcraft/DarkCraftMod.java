@@ -168,6 +168,10 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_HECHIZO_BENDICION = sound("sfx.hechizo_bendicion");
     // el herrero y el mercader: el martillo en el yunque, mejorar un arma y comprar
     public static final RegistryObject<SoundEvent> SFX_HERRERO_GOLPE = sound("sfx.herrero_golpe");
+    /** La campana del peregrino (parte 7ag): al viento, tocada, y los peregrinos muertos que echan a andar. */
+    public static final RegistryObject<SoundEvent> SFX_CAMPANA_VIENTO = sound("sfx.campana_viento");
+    public static final RegistryObject<SoundEvent> SFX_CAMPANA_TOQUE = sound("sfx.campana_toque");
+    public static final RegistryObject<SoundEvent> SFX_PEREGRINOS = sound("sfx.peregrinos");
     public static final RegistryObject<SoundEvent> SFX_FORJA_MEJORA = sound("sfx.forja_mejora");
     public static final RegistryObject<SoundEvent> SFX_TIENDA_COMPRA = sound("sfx.tienda_compra");
     // las habilidades de las armas (cenizas de guerra) y ponerle una ceniza a un arma
@@ -1105,6 +1109,21 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.personajes.Mercader>> MERCADER = ENTITIES.register("mercader",
             () -> EntityType.Builder.<com.darkcraft.personajes.Mercader>of(com.darkcraft.personajes.Mercader::new, MobCategory.MISC)
                     .sized(0.7f, 1.95f).fireImmune().clientTrackingRange(10).build(MODID + ":mercader"));
+    /** Los que dan misiones (parte 7ag: Oswin, el peregrino ciego), la campana del peregrino que cuelga en la Arboleda y los peregrinos muertos. */
+    public static final RegistryObject<EntityType<com.darkcraft.personajes.Viajero>> VIAJERO = ENTITIES.register("viajero",
+            () -> EntityType.Builder.<com.darkcraft.personajes.Viajero>of(com.darkcraft.personajes.Viajero::new, MobCategory.MISC)
+                    .sized(0.7f, 1.95f).fireImmune().clientTrackingRange(10).build(MODID + ":viajero"));
+    public static final RegistryObject<EntityType<com.darkcraft.mision.Campana>> CAMPANA_ARBOL = ENTITIES.register("campana_arbol",
+            () -> EntityType.Builder.<com.darkcraft.mision.Campana>of(com.darkcraft.mision.Campana::new, MobCategory.MISC)
+                    .sized(0.5f, com.darkcraft.mision.Campana.ALTO).fireImmune().clientTrackingRange(8).updateInterval(20).build(MODID + ":campana_arbol"));
+    public static final RegistryObject<EntityType<com.darkcraft.mision.Peregrino>> PEREGRINO = ENTITIES.register("peregrino",
+            () -> EntityType.Builder.<com.darkcraft.mision.Peregrino>of(com.darkcraft.mision.Peregrino::new, MobCategory.MISC)
+                    .sized(0.6f, 1.8f).fireImmune().noSave().noSummon().clientTrackingRange(10).updateInterval(2).build(MODID + ":peregrino"));
+    /** La campana del peregrino (objeto clave) y, para quien se la queda, la de los difuntos (se toca: aparta a los muertos). */
+    public static final RegistryObject<Item> CAMPANA_PEREGRINO = ITEMS.register("campana_peregrino",
+            () -> new com.darkcraft.mision.CampanaPeregrino(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.RARE)));
+    public static final RegistryObject<Item> CAMPANA_DIFUNTOS = ITEMS.register("campana_difuntos",
+            () -> new com.darkcraft.mision.CampanaDifuntos(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC)));
     /** El martillo de Dorvan (solo para que lo lleve en la mano) y las piedras de forja (I, II y III: mejoran las armas). */
     public static final RegistryObject<Item> MARTILLO_HERRERO = ITEMS.register("martillo_herrero",
             () -> new Item(new Item.Properties().stacksTo(1)));
@@ -1240,6 +1259,8 @@ public class DarkCraftMod {
         e.put(GUIA.get(), com.darkcraft.personajes.Guia.atributos().build());
         e.put(HERRERO.get(), com.darkcraft.personajes.Herrero.atributos().build());
         e.put(MERCADER.get(), com.darkcraft.personajes.Mercader.atributos().build());
+        e.put(VIAJERO.get(), com.darkcraft.personajes.Viajero.atributos().build());
+        e.put(PEREGRINO.get(), com.darkcraft.mision.Peregrino.atributos().build());
     }
 
     private void setup(FMLCommonSetupEvent e) {

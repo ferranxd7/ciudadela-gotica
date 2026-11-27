@@ -601,6 +601,25 @@ def marca_santuario(encendido):
     return Lienzo(7, 9).sprite(SANTUARIO_MARCA, col)
 
 
+# ---------------------------------------------------------------- la marca de una mision en la brujula (parte 7ag)
+MISION_MARCA = [
+    "...k...",
+    "..kOk..",
+    ".kOYOk.",
+    ".kOYOk.",
+    ".kOOOk.",
+    "kOOOOOk",
+    "kkkkkkk",
+    "...W...",
+    "...k...",
+]
+
+
+def marca_mision():
+    """Una campanita de oro (7x9): adonde ir en la mision que se lleva (la campana de Oswin o Oswin)."""
+    return Lienzo(7, 9).sprite(MISION_MARCA, {"k": TINTA, "O": ORO[5], "Y": ORO[6], "W": "#fff6d8"})
+
+
 def montar():
     A = Atlas(256, 128)
     A.poner("emblema", emblema())
@@ -639,6 +658,7 @@ def montar():
     A.poner("corcel_icono", corcel_icono())
     A.poner("marca_santuario", marca_santuario(True))
     A.poner("marca_santuario_apagado", marca_santuario(False))
+    A.poner("marca_mision", marca_mision())
     A.L.guardar(os.path.join(GUI, "hud.png"))
     ruta = os.path.join(REPO, "src/main/java/com/darkcraft/client/ui/HudTex.java")
     os.makedirs(os.path.dirname(ruta), exist_ok=True)

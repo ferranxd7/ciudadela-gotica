@@ -78,6 +78,8 @@ public final class Comandos {
                 .then(com.darkcraft.morvain.CronicaMorvain.comando())
                 .then(com.darkcraft.morvain.Herrerias.comando())
                 .then(com.darkcraft.morvain.Ambulante.comando())
+                .then(com.darkcraft.mision.Misiones.comando())
+                .then(com.darkcraft.mision.Misiones.comandoOswin())
                 .then(com.darkcraft.morvain.Gigantes.comando())
                 .then(com.darkcraft.camino.Jinetes.comando())
                 .then(com.darkcraft.rol.Rol.comando())
@@ -174,6 +176,8 @@ public final class Comandos {
         src.sendSuccess(() -> linea(new Linea("/darkcraft cronica ", "/darkcraft cronica [ir <7-10> | poner | olvidar]", "cronica")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft herreros ", "/darkcraft herreros [ir <hagen|brenna|ulrik|tobin> | poner | olvidar]", "herreros")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft silas ", "/darkcraft silas [ir | mover <0-5>]", "silas")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft misiones ", "/darkcraft misiones [olvidar | marcar <n>]", "misiones")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft oswin ", "/darkcraft oswin [ir | campana | poner | olvidar]", "oswin")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ecos ", "/darkcraft ecos / ecos dar <n> / ecos quitar", "ecos")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft rol ", "/darkcraft rol clase [<nombre> | elegir | olvidar | ninguna] / santuario / frascos [<n>] / nivel [reiniciar] / atributo <nombre> <valor> / talisman <nombre> [poner <hueco>] / fruto <nombre> [<n>] / hechizo <nombre>|memorizar|olvidar|baston|sello / guia [olvidar] / herrero [olvidar] / mercader [olvidar] / mejora <0-9> / piedras / ceniza <nombre> [poner] | quitar / resistencias", "rol")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ayuda", "/darkcraft ayuda", "ayuda")), false);

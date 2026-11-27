@@ -1058,13 +1058,70 @@ def morvain_hermanas():
     return M
 
 
+def campana_peregrino():
+    """La campana del peregrino (parte 7ag, la mision de Oswin): el ocaso tras el Arbol de la Horca, de cuya rama cuelga la
+    campanita de oro de una soga; abajo, el camino del bosque muerto y, lejos, el peregrino ciego con su sombrero y su bordon."""
+    M = Mini()
+    M.degradado(["#0e0812", "#22101a", "#4a1a1c", "#7a3020", "#b05a22", "#d89434"], 0, 62)
+    M.elipse(100, 58, 10, 10, "#e8a43a")
+    M.elipse(100, 58, 7, 7, "#f6cc6a")
+    r = np.random.default_rng(97)
+    # el bosque muerto al fondo: troncos y ramas secas
+    for k in range(9):
+        x = 6 + k * 14 + int(r.integers(-3, 4))
+        alto = int(r.integers(14, 26))
+        M.poli([(x - 1, 64), (x + 2, 64), (x + 1, 64 - alto), (x, 64 - alto)], "#2a1a1a")
+        M.linea(x, 64 - alto + 4, x + int(r.integers(-5, 6)), 64 - alto - 2, "#2a1a1a")
+    M.degradado(["#241612", "#160e0c", "#0a0706"], 62, H)
+    # el camino que se va al fondo, entre las raices
+    M.poli([(52, 80), (84, 80), (74, 66), (66, 66)], "#3a2a1e")
+    M.poli([(58, 80), (78, 80), (72, 68), (68, 68)], "#4a3626")
+    fig = capa()
+    # el Arbol de la Horca: tronco grueso a la izquierda, raices al aire y la rama larga que se inclina sobre el camino
+    fig.poli([(4, 80), (26, 80), (24, 66), (21, 30), (18, 10), (12, 4), (8, 12), (10, 34), (8, 66)], "#1a100c")
+    fig.poli([(2, 80), (10, 72), (6, 80)], "#1a100c")
+    fig.poli([(24, 80), (34, 76), (30, 80)], "#1a100c")
+    fig.poli([(18, 22), (40, 18), (62, 20), (76, 26), (78, 29), (62, 24), (40, 23), (20, 28)], "#1a100c")
+    fig.poli([(14, 10), (4, 2), (6, 1), (16, 8)], "#1a100c")
+    fig.poli([(40, 19), (46, 8), (48, 9), (43, 20)], "#1a100c")
+    # la soga y otra soga con su lazo vacio
+    fig.linea(60, 24, 60, 37, "#4a3a2a")
+    fig.linea(40, 22, 40, 34, "#3a2e22")
+    fig.elipse(40, 36, 2.0, 2.4, "#3a2e22")
+    fig.elipse(40, 36, 1.0, 1.4, "#22140e")
+    # el peregrino, lejos al final del camino: sombrero de ala ancha y plana, la capa y el bordon mas alto que el
+    fig.poli([(70, 66), (73, 66), (72.5, 60), (70.5, 60)], "#120c10")
+    fig.rect(68, 59, 7, 1, "#120c10")
+    fig.rect(70, 58, 3, 1, "#120c10")
+    fig.linea(75, 66, 76, 55, "#2a1e16")
+    fig.elipse(76, 57, 0.8, 1.0, "#2a1e16")
+    pegar_con_tinta(M, fig)
+    # la campana de oro, colgando del cabo de la soga, con su badajo
+    for y, (x0, x1) in enumerate(((59, 61), (58, 62), (58, 62), (57, 63), (57, 63), (56, 64))):
+        for x in range(x0, x1 + 1):
+            M.px(x, 38 + y, ORO[5] if x < (x0 + x1) // 2 - 1 else ORO[4] if x <= (x0 + x1) // 2 else ORO[2])
+    M.px(59, 38, ORO[6]).px(58, 39, ORO[6]).px(58, 40, ORO[6])
+    M.hline(55, 44, 11, NEGRO)
+    for x in range(55, 66):
+        M.px(x, 43, ORO[3] if x % 2 else ORO[2])
+    M.px(60, 44, ORO[1]).px(60, 45, ORO[1])
+    # el brillo de la campana y las motas de ceniza
+    for dx, dy in ((-4, -2), (4, -1), (-5, 3), (5, 2), (0, -3)):
+        M.px(60 + dx, 41 + dy, mezcla(M.leer(60 + dx, 41 + dy), ORO[5], 0.5))
+    for _ in range(22):
+        x, y = int(r.integers(0, W)), int(r.integers(4, 66))
+        M.px(x, y, "#9a8a7a" if r.random() < 0.5 else "#6a5a52")
+    return M
+
+
 ESCENAS = [corona_rota, fuente, trono, catedral, juramento, portal, perdidos_valdrenn, perdidos_fortaleza, diario, acertijo,
-           perdidos_brumavela, perdidos_morvain, morvain_tierras, morvain_quedaron, morvain_marcado, morvain_hermanas]
+           perdidos_brumavela, perdidos_morvain, morvain_tierras, morvain_quedaron, morvain_marcado, morvain_hermanas,
+           campana_peregrino]
 
 
 def montar():
-    """Las miniaturas en un atlas de 512 x 320 (cuatro por fila, cuatro filas)."""
-    A = Lienzo(512, 320)
+    """Las miniaturas en un atlas de 512 x 400 (cuatro por fila; la quinta fila, las misiones de la parte 7ag)."""
+    A = Lienzo(512, 400)
     for i, f in enumerate(ESCENAS):
         m = f()
         A.pegar(m, (i % 4) * W, (i // 4) * H)
@@ -1078,5 +1135,5 @@ if __name__ == "__main__":
         d = sys.argv[sys.argv.index("--vista") + 1]
         os.makedirs(d, exist_ok=True)
         from PIL import Image
-        A.imagen().resize((512 * 3, 320 * 3), Image.NEAREST).save(os.path.join(d, "miniaturas.png"))
+        A.imagen().resize((512 * 3, 400 * 3), Image.NEAREST).save(os.path.join(d, "miniaturas.png"))
     print("miniaturas: hecho")

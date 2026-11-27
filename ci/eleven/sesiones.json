@@ -9737,5 +9737,258 @@
     ]
    }
   }
+ },
+ "voz_oswin": {
+  "voz": "Alden - Tired Old Man",
+  "voice_id": "S9V0fuqWOqX0i8Kb8ctu",
+  "flow": "P5ZsmqWbPOGerwlbHTeo",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7ag: Oswin, el peregrino ciego de la Encrucijada (la campana del peregrino). Por frase, tomas a y b; se bajan como oswin/voz_Na.mp3 y oswin/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[weary, hesitant] Who's there? [sniffs] Footsteps... and ash. You carry a flame, don't you? [gently] Forgive an old man, flame-bearer. I've lost my bell... and without it, the dead won't let me pass.",
+    "sesiones": [
+     "LFxO6Bmhbiw8YczvK6B5",
+     "tVMnP7FSmeVTOsLpcbNP"
+    ],
+    "generaciones": [
+     "xK60POamr8Ntp2m56XuS",
+     "p0eSIlvlC7CBf9VgIjNS"
+    ],
+    "duraciones": [
+     15.28,
+     14.96
+    ]
+   },
+   "2": {
+    "prompt": "[relieved, warm] Bless you. The hanged ones of the dead wood took it, far to the west. It hangs where the oldest tree bends over the road. [softly] Listen for it... when the wind passes, it still rings.",
+    "sesiones": [
+     "HPqENYazYQp0eR29j1sA",
+     "NekHtXj1gGbLM2rjicE4"
+    ],
+    "generaciones": [
+     "qI8juxgoT2dEU9VM55J8",
+     "RGaWGDQEd5Ek8ODnYMTt"
+    ],
+    "duraciones": [
+     12.32,
+     12.64
+    ]
+   },
+   "3": {
+    "prompt": "[a tired little laugh] A blind pilgrim owns very little. But I carry the rosary of my order... bone beads, worn smooth by forty years of prayer. Bring me the bell, and it's yours.",
+    "sesiones": [
+     "O61c4iBh1kzGBfSMkRKJ",
+     "rgbKMXtm5UBiSsuwYn3c"
+    ],
+    "generaciones": [
+     "yquHhXxsdqky7qW54HvG",
+     "7VRFj2hHVY4K32b9gTqP"
+    ],
+    "duraciones": [
+     13.6,
+     13.68
+    ]
+   },
+   "4": {
+    "prompt": "[quietly, without anger] Then go your way. The roads are long in these lands... [pause] and in the end, the bells toll for everyone.",
+    "sesiones": [
+     "0E5sGfvGN5F2L5RwLZEb",
+     "Hxnezo5EXN87g8bK2DI9"
+    ],
+    "generaciones": [
+     "KBqwF08pTPr5l06xkTOF",
+     "JkptfsbhS1L5nXvBkyOV"
+    ],
+    "duraciones": [
+     7.12,
+     6.88
+    ]
+   },
+   "5": {
+    "prompt": "[listening, disappointed] You came back... but I don't hear it. The dead wood lies to the west. Follow the road where the trees wear ropes.",
+    "sesiones": [
+     "ogIaBemHPKKCNyErzvgz",
+     "aeWCrD3pkr4vvjaQoSGv"
+    ],
+    "generaciones": [
+     "TlVrlhurtENm8ahWdAUC",
+     "BG4G5RYiBj7Z5u9tJEnZ"
+    ],
+    "duraciones": [
+     8.64,
+     8.48
+    ]
+   },
+   "6": {
+    "prompt": "[dry, tired] Ah. The one who walked past. [softer] Have you changed your mind, flame-bearer?",
+    "sesiones": [
+     "LlMWiERX4ZJ3om1gGDXZ",
+     "nJ7iO1LmCN55iJBrLcBt"
+    ],
+    "generaciones": [
+     "1SSDFKLxAu8HPBwSgJHr",
+     "UzI4oDrVchiTJNF2fJfg"
+    ],
+    "duraciones": [
+     6.0,
+     6.0
+    ]
+   },
+   "7": {
+    "prompt": "[startled, then trembling with joy] That sound... that's my bell! You found it. [pleading] Please... let me hold it.",
+    "sesiones": [
+     "HmNId4qvHnQTV4U4KK6D",
+     "xyA9Iub79ySBv1Tqmhu8"
+    ],
+    "generaciones": [
+     "5chYUYJSkaz8qJJQ4xfc",
+     "fP7CIKIN4iZK3m3JU38w"
+    ],
+    "duraciones": [
+     6.32,
+     6.56
+    ]
+   },
+   "8": {
+    "prompt": "[awed whisper] There. Do you hear them? The pilgrims... all of them, walking north at last. [warm] Take the rosary, flame-bearer. May the road be kind to you.",
+    "sesiones": [
+     "hg1FmBdb80UmpEl29KhJ",
+     "7mdlYC7ZbO34t7airTxi"
+    ],
+    "generaciones": [
+     "kUVmU3l5850nen1nL9u3",
+     "H23JzxFkgFDzGr2lywTe"
+    ],
+    "duraciones": [
+     10.8,
+     10.8
+    ]
+   },
+   "9": {
+    "prompt": "[moved] And you asked for nothing. Few do, in these lands. Take my order's alms as well. [gentle] The dead would want them spent on the living.",
+    "sesiones": [
+     "JQtf3mXxivAIFgCPsx99",
+     "ya26eXAIBWmVFfBlU4BM"
+    ],
+    "generaciones": [
+     "wEO0XMLxXqENohFIQkZN",
+     "YH7tmAueI1abqKXGvb6l"
+    ],
+    "duraciones": [
+     9.44,
+     9.12
+    ]
+   },
+   "10": {
+    "prompt": "[desperate] No... no, please! Without it, I... [bitter, broken] Then you're no better than the hanged ones. Keep it. [cold] And may the dead follow you, as they followed me.",
+    "sesiones": [
+     "eywAAWszSSxP3RiQy4KX",
+     "LDh1kDCIChJXkj7PPa7Y"
+    ],
+    "generaciones": [
+     "LUhw6V2qwkFOpml2qyUE",
+     "IdYUDqHkwQGFb8SyzewS"
+    ],
+    "duraciones": [
+     10.96,
+     10.4
+    ]
+   },
+   "11": {
+    "prompt": "[cold, distant] ...I have nothing more to say to you.",
+    "sesiones": [
+     "cYynNJc49aY6tpfiswPV",
+     "k9KJh9iqXmBVXn4wuNZ4"
+    ],
+    "generaciones": [
+     "faeYKL5BMXC2WkPh3Iaz",
+     "rEyscM0FN6B2AEp2jPMM"
+    ],
+    "duraciones": [
+     2.48,
+     2.4
+    ]
+   },
+   "12": {
+    "prompt": "[peaceful, smiling] I can still hear them walking. Thank you, flame-bearer. Go with the light.",
+    "sesiones": [
+     "CK7W94ObYt30RCF4wxOn",
+     "aJcLKqLXUeuN90QG0chO"
+    ],
+    "generaciones": [
+     "9PQPTK45FEceogU9wIZo",
+     "PG5UTATH1GGCiZNbXPlP"
+    ],
+    "duraciones": [
+     5.52,
+     5.44
+    ]
+   }
+  }
+ },
+ "sfx_campana": {
+  "flow": "P5ZsmqWbPOGerwlbHTeo",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7ag: la campana del peregrino (colgada al viento y tocada) y la procesion de los peregrinos muertos. Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "campana_viento": {
+    "prompt": "A small old bronze hand bell swaying on a rope in a cold wind, ringing softly two or three times with a long lonely metallic shimmer, eerie and distant, 3 seconds",
+    "sesiones": [
+     "MLMOeueGRBIQDKKIxpqa",
+     "X3FV9NrYLoyQDqdFUyiC",
+     "NUQD12zRnKWbFHU3G9sU",
+     "VZiiW1vlIVQccE2tnOYQ"
+    ],
+    "generaciones": [
+     "49c9NPA8M4Sob9pRlf51",
+     "AP6UBr6T1smzHmpGRsx0",
+     "4YaG30JVdjWGIL9gw98Z",
+     "68OeP3HNmguaP2paaqH5"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "campana_toque": {
+    "prompt": "Someone firmly ringing an old bronze hand bell three times, a clear piercing ring with a haunting echo that lingers, dark fantasy, 2.5 seconds",
+    "sesiones": [
+     "rvWN7vRBYLtrpNvZaKIQ",
+     "nZ4mXCfPE5vMwBHT07mb",
+     "c3q3a1SDevYNs10zQ1Xu",
+     "CVXE7jYx9FZ22yMmdHt5"
+    ],
+    "generaciones": [
+     "VzHJNGfF2bt3hTB0R25S",
+     "iWdtf5Z6AggtguU8vqJN",
+     "lsxPZUKryYVAGVvA7F0l",
+     "o2xuxu79lIeHl70Xlz9a"
+    ],
+    "duraciones": [
+     3.0,
+     2.48,
+     2.48,
+     5.0
+    ]
+   },
+   "peregrinos": {
+    "prompt": "A procession of ghostly pilgrims passing by: soft overlapping whispered prayers, slow shuffling footsteps on gravel and the faint clink of small bells, slowly fading away into the distance, ethereal and peaceful, 7 seconds",
+    "sesiones": [
+     "WruSAHUH61fJNPqLJFVM",
+     "DfilkEFVIqZL7unZVCZP"
+    ],
+    "generaciones": [
+     "Tk2jaKZxYpffnhXkwVtl",
+     "abedH9zIJOvslmnACXSr"
+    ],
+    "duraciones": [
+     7.0,
+     7.0
+    ]
+   }
+  }
  }
 }

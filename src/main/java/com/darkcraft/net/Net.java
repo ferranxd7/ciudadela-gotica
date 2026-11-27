@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "24";
+    private static final String V = "25";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -170,6 +170,8 @@ public final class Net {
                 .encoder(Final::write).decoder(Final::read).consumerMainThread(Final::handle).add();
         CH.messageBuilder(CreditosFin.class, id++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder((m, b) -> {}).decoder(b -> new CreditosFin()).consumerMainThread(CreditosFin::handle).add();
+        CH.messageBuilder(Misiones.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(Misiones::write).decoder(Misiones::read).consumerMainThread(Misiones::handle).add();
         CH.messageBuilder(Creditos.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(Creditos::write).decoder(Creditos::read).consumerMainThread(Creditos::handle).add();
     }
@@ -554,6 +556,32 @@ public final class Net {
 
         void handle(Supplier<NetworkEvent.Context> ctx) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.DialogoScreen.abrir(this));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** Una mision que conoce el jugador (parte 7ag): sus marcas y, si hay, el sitio al que ir ahora (x, y, z). */
+    public record MisionE(String id, int marcas, boolean hay, int x, int y, int z) {}
+
+    /** Las misiones que conoce el jugador (parte 7ag): al entrar, al cambiar de dimension y cuando cambia algo de ellas. */
+    public record Misiones(List<MisionE> lista) {
+        void write(FriendlyByteBuf b) {
+            b.writeCollection(lista, (bb, m) -> {
+                bb.writeUtf(m.id(), 32);
+                bb.writeVarInt(m.marcas());
+                bb.writeBoolean(m.hay());
+                bb.writeInt(m.x());
+                bb.writeInt(m.y());
+                bb.writeInt(m.z());
+            });
+        }
+
+        static Misiones read(FriendlyByteBuf b) {
+            return new Misiones(b.readList(bb -> new MisionE(bb.readUtf(32), bb.readVarInt(), bb.readBoolean(), bb.readInt(), bb.readInt(), bb.readInt())));
+        }
+
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.mision.ClientMisiones.recibir(this));
             ctx.get().setPacketHandled(true);
         }
     }
@@ -1097,6 +1125,8 @@ public final class Net {
         public static final int PIEZA = 8, BARCO = 9;
         /** Un fragmento del mapa de Morvain (la clave es el nombre de la region; n, cuantos van). */
         public static final int FRAGMENTO = 10;
+        /** Una mision (parte 7ag; la clave es su titulo): n 0 empieza, 1 cumplida, 2 acabada a su manera. */
+        public static final int MISION = 11;
 
         void write(FriendlyByteBuf b) {
             b.writeByte(tipo);

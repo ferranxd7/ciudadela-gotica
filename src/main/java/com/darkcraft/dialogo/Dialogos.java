@@ -18,21 +18,28 @@ public final class Dialogos {
 
     /**
      * Lo que puede pasar al acabar una frase o al elegir una respuesta: subir de nivel (la guia), la forja (el herrero),
-     * la tienda (el mercader), el silbato del corcel (la guia, en Morvain) o adonde ira Silas (parte 7af). Su nombre en minusculas
-     * es lo que manda el cliente ({@code Net.DialogoAccion}).
+     * la tienda (el mercader), el silbato del corcel (la guia, en Morvain), adonde ira Silas (parte 7af) o lo que se responde a quien
+     * da una mision (parte 7ag: aceptarla, preguntar que se gana, rechazarla, devolver lo que se busco o quedarselo). Su nombre en
+     * minusculas es lo que manda el cliente ({@code Net.DialogoAccion}).
      */
     public enum Accion {
-        NADA, NIVEL, FORJA, TIENDA, SILBATO, GOLPEAR, TOMAR, RUMBO;
+        NADA, NIVEL, FORJA, TIENDA, SILBATO, GOLPEAR, TOMAR, RUMBO, ACEPTAR, PRECIO, RECHAZAR, DEVOLVER, QUEDAR;
 
         public String id() {
             return name().toLowerCase(java.util.Locale.ROOT);
         }
     }
 
-    /** Fin de la conversacion; el menu de respuestas de cada personaje es el nodo 100. */
+    /**
+     * Fin de la conversacion; el menu de respuestas de cada personaje es el nodo 100 (los que tienen mas de uno, como quien da una
+     * mision, los siguen en el 101, 102...).
+     */
     public static final int FIN = 0, MENU = 100;
 
-    /** Una respuesta del menu: su texto, a que nodo lleva y, a veces, algo que pasa al elegirla (abrir la forja...). */
+    /**
+     * Una respuesta del menu: su texto, a que nodo lleva y, a veces, algo que pasa al elegirla (abrir la forja...). Si lleva accion y
+     * tambien a donde ir (las de las misiones), el servidor apunta lo elegido y la conversacion sigue por ahi.
+     */
     public record Respuesta(String clave, int destino, Accion accion) {}
 
     public record Nodo(int id, int voz, int siguiente, Accion accion, Respuesta[] respuestas) {
@@ -87,8 +94,18 @@ public final class Dialogos {
             return this;
         }
 
+        /** Una frase con otro numero de nodo que el de su voz (la misma frase seguida de otra cosa). */
+        Hacer frase(int id, int voz, int siguiente) {
+            nodos.put(id, new Nodo(id, voz, siguiente, Accion.NADA, null));
+            return this;
+        }
+
         Hacer menu(Respuesta... r) {
-            nodos.put(MENU, new Nodo(MENU, 0, FIN, Accion.NADA, r));
+            return menu(MENU, r);
+        }
+
+        Hacer menu(int id, Respuesta... r) {
+            nodos.put(id, new Nodo(id, 0, FIN, Accion.NADA, r));
             return this;
         }
 
@@ -106,6 +123,11 @@ public final class Dialogos {
     /** Una respuesta que hace algo al elegirla (y cierra la conversacion). */
     private static Respuesta r(String pj, String clave, Accion a) {
         return new Respuesta("darkcraft.dialogo." + pj + ".op." + clave, FIN, a);
+    }
+
+    /** Una respuesta que el servidor apunta (las de las misiones) y despues sigue por {@code destino}. */
+    private static Respuesta r(String pj, String clave, int destino, Accion a) {
+        return new Respuesta("darkcraft.dialogo." + pj + ".op." + clave, destino, a);
     }
 
     /**
@@ -175,6 +197,24 @@ public final class Dialogos {
     public static final Personaje SILAS = new Hacer("silas")
             .frase(1, MENU).frase(2, MENU).frase(5, MENU, Accion.RUMBO).frase(6, FIN)
             .menu(r("silas", "comprar", Accion.TIENDA), r("silas", "adonde", 5), r("silas", "adios", 6))
+            .hecho();
+
+    /**
+     * Oswin, el peregrino ciego de la Encrucijada (parte 7ag, la mision de la campana; {@code mision.Oswin}). La primera vez se
+     * presenta (1); si se le dejo con la palabra en la boca, 6. Su menu: buscarla (2, la mision empieza), que se gana (3, y otra vez
+     * el menu) o no (4). Con la mision en marcha y sin la campana, 5. Con la campana: 7 y el segundo menu, devolversela (8; si no se
+     * pregunto que se ganaba, 9 despues: las limosnas de su orden) o quedarsela (10); para lo segundo, el servidor empieza por el nodo
+     * 107 (la misma frase 7, con el menu 102). Despues, 12 (se la devolvio) o 11 (se la quedo).
+     */
+    public static final Personaje OSWIN = new Hacer("oswin")
+            .frase(1, MENU).frase(6, MENU).frase(3, MENU)
+            .frase(2, FIN).frase(4, FIN).frase(5, FIN)
+            .frase(7, MENU + 1).frase(107, 7, MENU + 2)
+            .frase(8, FIN).frase(108, 8, 9).frase(9, FIN)
+            .frase(10, FIN).frase(11, FIN).frase(12, FIN)
+            .menu(r("oswin", "buscar", 2, Accion.ACEPTAR), r("oswin", "precio", 3, Accion.PRECIO), r("oswin", "no", 4, Accion.RECHAZAR))
+            .menu(MENU + 1, r("oswin", "devolver", 8, Accion.DEVOLVER), r("oswin", "quedar", 10, Accion.QUEDAR))
+            .menu(MENU + 2, r("oswin", "devolver", 108, Accion.DEVOLVER), r("oswin", "quedar", 10, Accion.QUEDAR))
             .hecho();
 
     /**

@@ -3678,6 +3678,62 @@ Respuesta 95 del plan ("herrero en un refugio y VARIOS herreros por el mapa con 
   (`hr07`); los tres campamentos (`hr10`..`hr15`, de lejos y hablando); Silas (`hr20`), hablando (`hr21`), su tienda (`hr22`), una
   compra (`hr23`) y el aviso de adonde ira (`hr24`).
 
+### Plan grande, parte 7ag: la campana del peregrino (Oswin, la primera mision)
+
+Respuestas 95 ("personajes con misiones") y 117 ("a veces 2-3 respuestas que cambian la mision") del plan.
+- **Quien da las misiones** (`personajes/Viajero`, entidad `darkcraft:viajero`, `Quien` sincronizado y guardado: de momento
+  `OSWIN`): de pie, apoyado con las dos manos en su bordon. Modelo (`client/personajes/ViajeroRenderer`, capa `darkcraft:viajero`,
+  textura de 128 x 64 de `tools/personajes/oswin.py`): el de jugador de brazos anchos con el sombrero de peregrino (copa baja, ala
+  ancha y la concha delante), la esclavina, el zurron y el bordon con su calabaza (suelto, de pie delante de el); la cabeza gacha
+  (es ciego: escucha). Al devolverle la campana la alza con la derecha y la toca (`Viajero.tocar`, evento 61; la campana es el
+  mismo modelo que la del arbol).
+- **Oswin, el peregrino ciego** (`mision/Oswin`): junto a la Encrucijada de los Peregrinos (6 al oeste y 3 al norte del fuego,
+  de cara a el), con un mojon de piedra con musgo y un farol a su espalda. Se pone una vez (`Morvain.Datos` "oswin") cuando
+  alguien pasa a 56 con el chunk cargado y sus entidades al dia (si ya estaba, solo se apunta).
+- **La mision** (marcas en la ficha, `Ficha.mision(jugador, "oswin")`: CONOCIDA, ACEPTADA, RECHAZADA, PRECIO, TOMADA, DEVUELTA,
+  QUEDADA): se presenta (1: perdio su campana y los muertos no le dejan pasar) y su menu (nodo 100) tiene tres respuestas:
+  **buscarla** (2; `Accion.ACEPTAR`, cartel grande "Nueva mision"), **que se gana** (3: el rosario de su orden, y otra vez el menu)
+  o **no** (4). La vez siguiente: 6 (el que paso de largo) y el menu, o 5 (con la mision y sin la campana). Con la campana: 7 y el
+  segundo menu (101, o 102 si no pregunto que ganaba: el servidor empieza en el nodo 107): **devolversela** (8; el Rosario del
+  peregrino, `Talisman.Clase.PEREGRINO` —los frascos de vida curan un 25 % mas—; si no pregunto que ganaba, 9 y las limosnas de su
+  orden, 3000 ecos; los peregrinos muertos echan a andar; logro `campana_peregrino`, cartel "Mision cumplida") o **quedarsela**
+  (10; la campana pasa a ser la **Campana de los difuntos**, `mision/CampanaDifuntos`: se toca y los muertos a 9 bloques —no los
+  jefes— se apartan, torpes y debiles 6 s; vuelve a sonar a los 30 s; logro `campana_difuntos`). Despues, 12 o 11. **Las respuestas
+  con accion y destino** (`Dialogos.r(pj, clave, destino, accion)`): el cliente manda la accion y la conversacion sigue
+  (`DialogoScreen.elegir`); las que abren la forja o la tienda siguen igual. Nodos con otro numero que su voz: `frase(id, voz, sig)`;
+  mas de un menu: `menu(id, ...)`.
+- **La campana** (`mision/Campana`, entidad `darkcraft:campana_arbol`): cuelga del cabo de una soga nueva en la punta de la rama
+  este del Arbol de la Horca (`Arboleda`, soga de tipo `CAMPANA` en el paso 9 de la rama; `Arboleda.campana()`, sitios
+  `campana` y `ante_campana`), a dos bloques del suelo, entre dos ahorcados. Se pone una vez ("campana") con alguien a 48; si en
+  ese chunk no estuviera la soga, la pone hasta la rama. Suena con el viento cada 8-18 s con alguien a 40 (`sfx.campana_viento`) y
+  se mece (`CampanaRenderer`: modelo de cinco cajas y el badajo, textura de `tools/mision/campana.py`); golpearla la hace sonar.
+  **Se coge** con clic derecho o con la E (`ClientMisiones.campana`: "Pulsa [E] para coger la campana", `ClientRol.CAMPANA`): cada
+  jugador la suya (objeto clave `campana_peregrino`), tambien sin conocer a Oswin; a quien ya la lleva o acabo la mision su
+  cliente no se la dibuja ni la deja mirar (`Campana.oculta`).
+- **Los peregrinos muertos** (`mision/Peregrino`, no se guardan): cinco, al oeste de Oswin, andan rezando hacia el norte 250 ticks
+  por encima del suelo, medio transparentes y con luz propia (`PeregrinoRenderer`: el modelo de Oswin sin bordon, las manos juntas,
+  la piel palida de `oswin.py`), y se apagan; con `sfx.peregrinos`.
+- **Lo que sabe el cliente** (`mision/Misiones` → `Net.Misiones`: cada mision con sus marcas —mas `Oswin.LLEVA` si lleva la
+  campana— y adonde ir; al entrar, al cambiar de dimension, al cambiar algo y cada segundo si coge o suelta la campana; `Net.V` 25):
+  `client/mision/ClientMisiones`. **El diario**: la Historia del menu tiene arriba el apartado **Misiones** (las en marcha antes; a la
+  derecha la miniatura nueva de la quinta fila del atlas —`miniaturas.png` pasa a 512 x 400: la campana colgada del arbol al ocaso
+  con el peregrino al fondo del camino—, "Mision en marcha"/"acabada" y como va: `darkcraft.mision.oswin.<pendiente | buscar |
+  volver | encontrada | devuelta | quedada>`). **La brujula** marca adonde ir con una campanita de oro (`HudTex.MARCA_MISION`) y **el
+  mapa de la M**, con la campana de los iconos del espejo (`I_MISION` 40, `I_MISION_HECHA` 41) latiendo y, con el raton encima, la
+  mision y lo que toca.
+- **Voces** (ElevenLabs, `eleven_v4`, flow `P5ZsmqWbPOGerwlbHTeo`): Oswin **"Alden - Tired Old Man"** `S9V0fuqWOqX0i8Kb8ctu`, 12
+  frases (tomas a; `VOZ_OSWIN`: al aire libre, cerca). Efectos (`eleven_text_to_sound_v3`): `campana_viento` (1, 2 y 3),
+  `campana_toque` (1, 2 y 3), `peregrinos` (2 y 1).
+- Logros `campana_peregrino` ("La campana del peregrino") y `campana_difuntos` ("Por quien doblan"), con su entrada del diario.
+  Comandos `/darkcraft misiones [olvidar | marcar <n>]` y `/darkcraft oswin [ir | campana | poner | olvidar]`.
+- Pruebas: servidor, `misionOswin()` (linea `Morvain, la campana del peregrino: ...`: Oswin y la campana puestos —pisa, mira al
+  fuego, el mojon, la soga hasta la rama, la boca de la campana sobre el suelo—, el dialogo sin nodos que lleven a nada y los cuatro
+  caminos: con precio, sin precio —las limosnas—, quedarsela —el marchito lento y debil— y cogerla sin conocerle). Cliente, tramo
+  `oswin()` despues de `herreros()`: Oswin (`cliente_ow01`, `ow02`), hablar (`ow03`), el menu (`ow04`), el precio (`ow05`), el menu
+  otra vez (`ow06`), aceptar (`ow07`) y su cartel (`ow08`), la Historia (`ow09`), la brujula (`ow10`), el mapa (`ow11`), la campana en
+  el arbol (`ow12`, `ow13`) y cogida (`ow14`), con ella ante Oswin (`ow15`, `ow16`), devolverla (`ow17`), los peregrinos (`ow18`), el
+  cartel (`ow19`), la Historia (`ow20`), quedarsela (`ow21`, `ow22`) y la campana de los difuntos (`ow23`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

@@ -759,6 +759,7 @@ public final class CiTest {
         desenlace(server, m, log);
         cronicaMorvain(server, m, log);
         herrerosMorvain(server, m, log);
+        misionOswin(server, m, log);
     }
 
     /**
@@ -4860,6 +4861,158 @@ public final class CiTest {
      * forja con Hagen (+1), el barril con botin y el nombre del refugio; Silas: cada santuario de su ruta (donde se le pone, de pie),
      * que se va de donde no le toca, su tienda (lo que vende; lo comprado se apunta aparte del de Kerrick) y adonde ira.
      */
+    /**
+     * La campana del peregrino (parte 7ag): Oswin y su campana puestos una vez (Oswin de pie en el suelo y mirando al fuego, el mojon;
+     * la campana colgando del cabo de su soga, por encima del suelo), el dialogo (sus nodos y menus llevan a sitios que existen) y la
+     * mision con un jugador de mentira por sus cuatro caminos: con precio y devolverla (el rosario, sin limosnas), sin precio (las
+     * limosnas), quedarsela (la campana de los difuntos, que aparta a un muerto) y cogerla sin conocerle; rechazar y cambiar de idea;
+     * los peregrinos muertos que echan a andar; los logros.
+     */
+    private static void misionOswin(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        StringBuilder sb = new StringBuilder("Morvain, la campana del peregrino:");
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ae2"), "[DarkCraftCI24]"));
+        try {
+            BlockPos os = com.darkcraft.mision.Oswin.sitio();
+            for (int dx = -1; dx <= 1; dx++)
+                for (int dz = -1; dz <= 1; dz++) m.getChunk((os.getX() >> 4) + dx, (os.getZ() >> 4) + dz);
+            int[] cabo = com.darkcraft.mision.Oswin.cabo();
+            sb.append(" cabo de la soga ").append(cabo == null ? "NINGUNO" : cabo[0] + "," + cabo[1] + "," + cabo[2]);
+            if (cabo != null)
+                for (int dx = -1; dx <= 1; dx++)
+                    for (int dz = -1; dz <= 1; dz++) m.getChunk((cabo[0] >> 4) + dx, (cabo[2] >> 4) + dz);
+            com.darkcraft.mision.Oswin.olvidar(m);
+            var o = com.darkcraft.mision.Oswin.ponerOswin(m);
+            var c = com.darkcraft.mision.Oswin.ponerCampana(m);
+            if (o == null || c == null) sb.append(" | FALLO: oswin ").append(o != null).append(", campana ").append(c != null);
+            if (o != null) {
+                BlockPos pies = o.blockPosition(), f = com.darkcraft.mision.Oswin.fuego();
+                boolean pisa = !m.getBlockState(pies.below()).getCollisionShape(m, pies.below()).isEmpty();
+                double giro = Math.toDegrees(Math.atan2(f.getZ() - pies.getZ(), f.getX() - pies.getX())) - 90;
+                sb.append(String.format(java.util.Locale.ROOT, " | Oswin en %s, pisa %s, al fuego %.0f grados, el mojon %s y su farol %s",
+                        pies.toShortString(), pisa, net.minecraft.util.Mth.wrapDegrees(giro - o.getYRot()),
+                        m.getBlockState(pies.west()).getBlock().getDescriptionId().replace("block.minecraft.", ""),
+                        m.getBlockState(pies.west().above(2)).is(net.minecraft.world.level.block.Blocks.LANTERN)
+                                || m.getBlockState(pies.west().above(3)).is(net.minecraft.world.level.block.Blocks.LANTERN)));
+            }
+            if (c != null && cabo != null) {
+                BlockPos k = new BlockPos(cabo[0], cabo[1], cabo[2]);
+                int soga = 0;
+                BlockPos q = k;
+                while (soga < 16 && m.getBlockState(q).getBlock() instanceof com.darkcraft.morvain.SogaBlock) {
+                    soga++;
+                    q = q.above();
+                }
+                int suelo = m.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, cabo[0], cabo[2]);
+                sb.append(String.format(java.util.Locale.ROOT, " | la campana en %.1f %.2f %.1f, %d de soga hasta %s, su boca a %.2f del suelo",
+                        c.getX(), c.getY(), c.getZ(), soga, m.getBlockState(q).getBlock().getDescriptionId().replace("block.minecraft.", ""),
+                        c.getY() - suelo));
+            }
+            boolean otra = com.darkcraft.mision.Oswin.buscarOswin(m) == o && com.darkcraft.mision.Oswin.buscarCampana(m) == c;
+            sb.append(", se encuentran ").append(otra);
+            // ---- el dialogo: todos los nodos y respuestas llevan a algo que existe
+            var d = com.darkcraft.dialogo.Dialogos.de("oswin");
+            int malos = 0;
+            for (var n : d.nodos().values()) {
+                if (n.menu()) {
+                    for (var r : n.respuestas()) if (r.destino() != 0 && d.nodo(r.destino()) == null) malos++;
+                } else if (n.siguiente() != 0 && d.nodo(n.siguiente()) == null) malos++;
+            }
+            sb.append(" | dialogo: ").append(d.nodos().size()).append(" nodos, ").append(malos).append(" que llevan a nada");
+            // ---- 1) con precio: cogerla y devolverla
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            com.darkcraft.mision.Misiones.olvidar(fp, "oswin");
+            fp.moveTo(os.getX() + 2.5, os.getY(), os.getZ() + 0.5, 0f, 0f);
+            int n1 = com.darkcraft.mision.Oswin.inicio(fp), n2 = com.darkcraft.mision.Oswin.inicio(fp);
+            com.darkcraft.mision.Oswin.accion(fp, o, "rechazar");
+            int n3 = com.darkcraft.mision.Oswin.inicio(fp);
+            com.darkcraft.mision.Oswin.accion(fp, o, "precio");
+            com.darkcraft.mision.Oswin.accion(fp, o, "aceptar");
+            int n4 = com.darkcraft.mision.Oswin.inicio(fp);
+            BlockPos obj = com.darkcraft.mision.Oswin.objetivo(fp);
+            sb.append(String.format(java.util.Locale.ROOT, " | 1) empieza %d, %d; rechaza: %d; precio y acepta: %d (%s), ir a %s", n1, n2, n3, n4,
+                    com.darkcraft.mision.Misiones.resumen(fp), obj == null ? "-" : obj.toShortString()));
+            if (c != null) {
+                fp.moveTo(c.getX() + 1.5, c.getY() - 1, c.getZ(), 0f, 0f);
+                com.darkcraft.mision.Oswin.tomar(fp, c);
+                com.darkcraft.mision.Oswin.tomar(fp, c);
+            }
+            int campanas = fp.getInventory().countItem(DarkCraftMod.CAMPANA_PEREGRINO.get());
+            BlockPos obj2 = com.darkcraft.mision.Oswin.objetivo(fp);
+            fp.moveTo(os.getX() + 2.5, os.getY(), os.getZ() + 0.5, 0f, 0f);
+            int n5 = com.darkcraft.mision.Oswin.inicio(fp);
+            int ecos = com.darkcraft.rol.Ficha.ecos(fp);
+            int antes = m.getEntitiesOfClass(com.darkcraft.mision.Peregrino.class, new net.minecraft.world.phys.AABB(os).inflate(24)).size();
+            com.darkcraft.mision.Oswin.accion(fp, o, "devolver");
+            int pere = m.getEntitiesOfClass(com.darkcraft.mision.Peregrino.class, new net.minecraft.world.phys.AABB(os).inflate(24)).size() - antes;
+            sb.append(String.format(java.util.Locale.ROOT, " | cogida %d campana(s), ir a %s; con ella empieza %d; devuelta: %s, rosario %d, ecos +%d, logro %s, peregrinos %d, despues empieza %d",
+                    campanas, obj2 == null ? "-" : obj2.toShortString(), n5, com.darkcraft.mision.Misiones.resumen(fp),
+                    fp.getInventory().countItem(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.PEREGRINO).get()),
+                    com.darkcraft.rol.Ficha.ecos(fp) - ecos, com.darkcraft.story.Logros.tiene(fp, "campana_peregrino"), pere,
+                    com.darkcraft.mision.Oswin.inicio(fp)));
+            for (var pg : m.getEntitiesOfClass(com.darkcraft.mision.Peregrino.class, new net.minecraft.world.phys.AABB(os).inflate(24))) pg.discard();
+            // ---- 2) sin precio: las limosnas
+            com.darkcraft.mision.Misiones.olvidar(fp, "oswin");
+            com.darkcraft.mision.Oswin.inicio(fp);
+            com.darkcraft.mision.Oswin.accion(fp, o, "aceptar");
+            if (c != null) {
+                fp.moveTo(c.getX() + 1.5, c.getY() - 1, c.getZ(), 0f, 0f);
+                com.darkcraft.mision.Oswin.tomar(fp, c);
+            }
+            fp.moveTo(os.getX() + 2.5, os.getY(), os.getZ() + 0.5, 0f, 0f);
+            int n6 = com.darkcraft.mision.Oswin.inicio(fp);
+            ecos = com.darkcraft.rol.Ficha.ecos(fp);
+            com.darkcraft.mision.Oswin.accion(fp, o, "devolver");
+            sb.append(String.format(java.util.Locale.ROOT, " | 2) sin precio empieza %d; devuelta: ecos +%d", n6, com.darkcraft.rol.Ficha.ecos(fp) - ecos));
+            for (var pg : m.getEntitiesOfClass(com.darkcraft.mision.Peregrino.class, new net.minecraft.world.phys.AABB(os).inflate(24))) pg.discard();
+            // ---- 3) quedarsela: la campana de los difuntos, que aparta a un marchito
+            com.darkcraft.mision.Misiones.olvidar(fp, "oswin");
+            com.darkcraft.mision.Oswin.inicio(fp);
+            com.darkcraft.mision.Oswin.accion(fp, o, "aceptar");
+            if (c != null) {
+                fp.moveTo(c.getX() + 1.5, c.getY() - 1, c.getZ(), 0f, 0f);
+                com.darkcraft.mision.Oswin.tomar(fp, c);
+            }
+            fp.moveTo(os.getX() + 2.5, os.getY(), os.getZ() + 0.5, 0f, 0f);
+            com.darkcraft.mision.Oswin.inicio(fp);
+            com.darkcraft.mision.Oswin.accion(fp, o, "quedar");
+            int difuntos = fp.getInventory().countItem(DarkCraftMod.CAMPANA_DIFUNTOS.get());
+            String aparta = "-";
+            var mar = DarkCraftMod.MARCHITO.get().create(m);
+            if (mar != null) {
+                mar.moveTo(fp.getX() + 3, fp.getY(), fp.getZ(), 0f, 0f);
+                m.addFreshEntity(mar);
+                fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(DarkCraftMod.CAMPANA_DIFUNTOS.get()));
+                fp.getCooldowns().removeCooldown(DarkCraftMod.CAMPANA_DIFUNTOS.get());
+                DarkCraftMod.CAMPANA_DIFUNTOS.get().use(m, fp, net.minecraft.world.InteractionHand.MAIN_HAND);
+                aparta = "lento " + mar.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) + ", debil "
+                        + mar.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS) + ", espera " + fp.getCooldowns().isOnCooldown(DarkCraftMod.CAMPANA_DIFUNTOS.get());
+                mar.discard();
+                fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " | 3) quedada: %s, campana de los difuntos %d, logro %s, despues empieza %d; al tocarla, el marchito %s",
+                    com.darkcraft.mision.Misiones.resumen(fp), difuntos, com.darkcraft.story.Logros.tiene(fp, "campana_difuntos"),
+                    com.darkcraft.mision.Oswin.inicio(fp), aparta));
+            // ---- 4) cogerla sin conocerle
+            com.darkcraft.mision.Misiones.olvidar(fp, "oswin");
+            if (c != null) {
+                fp.moveTo(c.getX() + 1.5, c.getY() - 1, c.getZ(), 0f, 0f);
+                com.darkcraft.mision.Oswin.tomar(fp, c);
+            }
+            BlockPos obj3 = com.darkcraft.mision.Oswin.objetivo(fp);
+            fp.moveTo(os.getX() + 2.5, os.getY(), os.getZ() + 0.5, 0f, 0f);
+            sb.append(String.format(java.util.Locale.ROOT, " | 4) sin conocerle: %s, ir a %s, empieza %d", com.darkcraft.mision.Misiones.resumen(fp),
+                    obj3 == null ? "-" : obj3.toShortString(), com.darkcraft.mision.Oswin.inicio(fp)));
+            com.darkcraft.mision.Misiones.olvidar(fp, "oswin");
+            // ---- el talisman: el Rosario del peregrino existe y se puede llevar
+            sb.append(" | rosario: ").append(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.PEREGRINO).get().getDescriptionId());
+        } catch (Throwable t) {
+            sb.append(" ERROR ").append(t);
+            DarkCraftMod.LOGGER.error("[CI] la campana del peregrino", t);
+        }
+        log.println(sb);
+        log.flush();
+    }
+
     private static void herrerosMorvain(MinecraftServer server, ServerLevel m, PrintWriter log) {
         StringBuilder sb = new StringBuilder("Morvain, los herreros:");
         var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ae1"), "[DarkCraftCI23]"));

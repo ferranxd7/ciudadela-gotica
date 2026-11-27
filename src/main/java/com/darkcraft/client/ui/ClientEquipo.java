@@ -279,7 +279,7 @@ public final class ClientEquipo {
             if (it instanceof com.darkcraft.rol.Talisman) return TALISMANES;
             if (it instanceof com.darkcraft.hechizos.HechizoItem) return HECHIZOS;
             if (it instanceof com.darkcraft.hechizos.Catalizador) return ARMAS;
-            if (it instanceof com.darkcraft.rol.Fruto) return OBJETOS;
+            if (it instanceof com.darkcraft.rol.Fruto || it == DarkCraftMod.CAMPANA_DIFUNTOS.get()) return OBJETOS;
             Equipable eq = Equipable.get(st);
             if (it instanceof ArmorItem || it instanceof ElytraItem || (eq != null && eq.getEquipmentSlot().isArmor() && !(it instanceof ShieldItem)))
                 return ARMADURAS;
@@ -288,6 +288,7 @@ public final class ClientEquipo {
                 return ARMAS;
             if (it == DarkCraftMod.LLAVE_HUESO.get() || it == DarkCraftMod.LLAVE_ARBOL.get() || it == DarkCraftMod.AMULETO_HUESO.get()
                     || it == DarkCraftMod.LIBRO_ACERTIJO.get() || it == DarkCraftMod.MAPA.get() || it == DarkCraftMod.SILBATO_CORCEL.get()
+                    || it == DarkCraftMod.CAMPANA_PEREGRINO.get()
                     || it instanceof WrittenBookItem
                     || it instanceof MapItem || it == Items.WRITABLE_BOOK)
                 return CLAVE;

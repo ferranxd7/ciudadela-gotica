@@ -305,6 +305,8 @@ public final class Morvain {
         if (m != null && srv.getTickCount() % 20 == 19) {
             Herrerias.tick(m);
             Ambulante.tick(m);
+            // la mision de Oswin, el peregrino ciego (parte 7ag): el y su campana, una vez, cuando alguien pasa cerca
+            com.darkcraft.mision.Misiones.tick(m);
         }
         // el molino de la Molinera (parte 7f): la reja de su puerta y su crujido con el viento
         if (m != null && srv.getTickCount() % 100 == 13) Molino.crujir(m);
@@ -592,6 +594,19 @@ public final class Morvain {
     // ------------------------------------------------------------------ lo que se guarda
 
     /** Lo que ya se ha hecho una vez en Morvain (la guia del arco...). */
+    /** Si ya se hizo algo que se hace una vez en Morvain (para lo de fuera de este paquete: las misiones, parte 7ag). */
+    public static boolean hecho(MinecraftServer srv, String k) {
+        return Datos.get(srv).hecho(k);
+    }
+
+    public static void marcarHecho(MinecraftServer srv, String k) {
+        Datos.get(srv).marcar(k);
+    }
+
+    public static void olvidarHecho(MinecraftServer srv, String k) {
+        Datos.get(srv).quitar(k);
+    }
+
     public static final class Datos extends SavedData {
         public static final String ID = "darkcraft_morvain";
         final Set<String> hechos = new HashSet<>();

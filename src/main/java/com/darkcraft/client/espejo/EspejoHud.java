@@ -83,7 +83,9 @@ public final class EspejoHud {
             I_CANDADO = 30, I_PERGAMINO = 31, I_MAPA = 32, I_TROFEO = 33, I_BESTIA = 34, I_PUNTO = 35, I_FLECHA = 36,
             I_LIBRO = 14, I_PLUMA = 15, I_EQUIS = 21, I_PORTAL = 13, I_CASA = 11,
     /** Los de Morvain (parte 7d): un santuario, la ciudadela encadenada y una estela del mapa. */
-    I_SANTUARIO = 37, I_CIUDADELA = 38, I_ESTELA = 39;
+    I_SANTUARIO = 37, I_CIUDADELA = 38, I_ESTELA = 39,
+    /** La campana de una mision (parte 7ag): adonde ir, y la de una mision acabada (gris). */
+    I_MISION = 40, I_MISION_HECHA = 41;
 
     // ------------------------------------------------------------------ textura del mapa del espejo
 

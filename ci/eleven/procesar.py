@@ -131,10 +131,15 @@ VOZ_TOBIN = ("highpass=f=90,equalizer=f=3400:t=q:w=1.2:g=1,aecho=0.8:0.3:48:0.09
              "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=150,loudnorm=I=-16:TP=-1.5:LRA=9")
 TOMAS_SILAS = {n: "a" for n in range(1, 7)}
 VOZ_SILAS = VOZ_MERCADER
+# Oswin, el peregrino ciego de la Encrucijada (parte 7ag; voz "Alden - Tired Old Man", flow P5ZsmqWbPOGerwlbHTeo): al aire libre
+# junto al santuario, cerca y cansado, con un poco de aire de las llanuras
+TOMAS_OSWIN = {n: "a" for n in range(1, 13)}
+VOZ_OSWIN = ("highpass=f=70,equalizer=f=2600:t=q:w=1.2:g=1,aecho=0.8:0.22:38|92:0.06|0.03,"
+             "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=150,loudnorm=I=-16:TP=-1.5:LRA=9")
 # los personajes con dialogo: id -> (tomas, filtro)
 PERSONAJES = {"guia": (TOMAS_GUIA, VOZ_GUIA), "herrero": (TOMAS_HERRERO, VOZ_HERRERO), "mercader": (TOMAS_MERCADER, VOZ_MERCADER),
               "hagen": (TOMAS_HAGEN, VOZ_HAGEN), "brenna": (TOMAS_BRENNA, VOZ_BRENNA), "ulrik": (TOMAS_ULRIK, VOZ_ULRIK),
-              "tobin": (TOMAS_TOBIN, VOZ_TOBIN), "silas": (TOMAS_SILAS, VOZ_SILAS)}
+              "tobin": (TOMAS_TOBIN, VOZ_TOBIN), "silas": (TOMAS_SILAS, VOZ_SILAS), "oswin": (TOMAS_OSWIN, VOZ_OSWIN)}
 
 # efectos: nombre -> (segundos como mucho, fundido final en s, volumen integrado LUFS)
 SFX = {
@@ -428,6 +433,8 @@ SFX = {
     "sombra_caidos": (2.5, 0.8, -14), "sombra_dolor": (0.8, 0.2, -14), "sombra_cae": (4.0, 1.4, -12),
     "sombra_latido": (1.5, 0.5, -15), "puerta_aguja": (3.5, 1.0, -13), "aguja_ambiente": (20.0, 2.0, -24),
     "corazon_rompe": (3.0, 1.0, -12), "corazon_toma": (3.0, 1.0, -12),
+    # la campana del peregrino (parte 7ag)
+    "campana_viento": (3.0, 0.9, -19), "campana_toque": (3.0, 1.0, -15), "peregrinos": (7.0, 2.0, -18),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -761,6 +768,9 @@ TOMAS_SFX = {
     "sombra_manos": (3, 2), "sombra_lanzas": (3, 1), "sombra_giro": (3, 1), "sombra_niebla": (1, 3), "sombra_mirada_carga": (1, 2),
     "sombra_mirada": (1, 2), "sombra_grito": (4, 2), "sombra_caidos": (2, 4), "sombra_dolor": (1, 2), "sombra_cae": (4, 3),
     "sombra_latido": (3, 1), "puerta_aguja": (1, 3), "aguja_ambiente": (3, 4), "corazon_rompe": (4, 1), "corazon_toma": (3, 4),
+    # la campana del peregrino (parte 7ag): al viento las tres que suenan desde el principio (la 4 tarda), tocada las tres de 2,5-3 s
+    # (la 4 dura 5 s y satura) y los peregrinos las dos (la 2, algo mas fuerte, primero)
+    "campana_viento": (1, 2, 3), "campana_toque": (1, 2, 3), "peregrinos": (2, 1),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

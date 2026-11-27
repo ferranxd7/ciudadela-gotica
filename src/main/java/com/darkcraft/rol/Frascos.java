@@ -91,7 +91,8 @@ public final class Frascos {
         if (tipo == VIDA) {
             if (f.vida() <= 0) return;
             Ficha.frascos(sp, new Ficha.Frascos(f.vidaMax(), f.manaMax(), f.vida() - 1, f.mana(), f.mejora()));
-            sp.heal(Nivel.curaFrasco(sp.getMaxHealth(), f.mejora()));
+            // el Rosario del peregrino (parte 7ag): un 25 % mas
+            sp.heal(Nivel.curaFrasco(sp.getMaxHealth(), f.mejora()) * (Talismanes.lleva(sp, Talisman.Clase.PEREGRINO) ? 1.25f : 1f));
         } else {
             if (f.mana() <= 0) return;
             Ficha.frascos(sp, new Ficha.Frascos(f.vidaMax(), f.manaMax(), f.vida(), f.mana() - 1, f.mejora()));

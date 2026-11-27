@@ -840,6 +840,25 @@ public final class LibroScreen extends Screen {
                     hover.add(Component.translatable("darkcraft.viaje.clic").withStyle(ChatFormatting.GRAY));
                 }
             }
+            // adonde ir en las misiones (parte 7ag): la campana de oro, latiendo; con el raton encima, la mision y lo que toca
+            for (Net.MisionE mi : com.darkcraft.client.mision.ClientMisiones.LISTA) {
+                if (!mi.hay()) continue;
+                float x = sx(mi.x() + 0.5), y = sy(mi.z() + 0.5);
+                if (x < x0() - 20 || x > x1() + 20 || y < y0() - 20 || y > y1() + 20) continue;
+                float lat = 0.6f + 0.4f * (float) Math.sin(t * 4);
+                EspejoHud.suma();
+                RenderSystem.setShaderColor(1f, 0.78f, 0.3f, 0.75f * lat);
+                float r = l * 1.3f;
+                g.blit(EspejoHud.BRILLO, Math.round(x - r), Math.round(y - r), Math.round(r * 2), Math.round(r * 2), 0, 0, 64, 64, 64, 64);
+                EspejoHud.mezcla();
+                RenderSystem.setShaderColor(1, 1, 1, 1);
+                EspejoHud.icono(g, EspejoHud.I_MISION, x, y, l * 1.2f);
+                if (Math.abs(mx - x) <= l * 0.7f && Math.abs(my - y) <= l * 0.7f) {
+                    hover.add(Component.translatable("darkcraft.mision." + mi.id() + ".titulo").withStyle(ChatFormatting.GOLD));
+                    hover.add(Component.translatable("darkcraft.mision." + mi.id() + ".ir." + com.darkcraft.client.mision.ClientMisiones.estado(mi))
+                            .withStyle(ChatFormatting.GRAY));
+                }
+            }
         }
 
         private void confirmarViaje(GuiGraphics g, int mx, int my) {
