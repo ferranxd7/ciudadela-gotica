@@ -77,6 +77,9 @@ public class PiezaArmadura extends ArmorItem {
         if (alguna) l.add(r.withStyle(ChatFormatting.GRAY));
         l.add(Component.translatable("darkcraft.armadura.conjunto", Component.translatable("darkcraft.armadura." + conjunto.id))
                 .withStyle(ChatFormatting.DARK_GRAY));
+        if (conjunto.esDeJefe())
+            l.add(Component.translatable("darkcraft.armadura.jefe", Component.translatable("entity.darkcraft." + conjunto.jefe))
+                    .withStyle(ChatFormatting.DARK_PURPLE));
         l.add(Component.translatable("item.darkcraft." + conjunto.objeto(pieza) + ".desc").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         return l;
     }

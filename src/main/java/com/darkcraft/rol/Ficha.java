@@ -76,6 +76,19 @@ public final class Ficha {
         f.put("compras", d);
     }
 
+    /** Si ya se le dio un premio que se da una vez (clave libre; NBT {@code premios}; parte 7al: "armadura_<conjunto>"). */
+    public static boolean premio(Player p, String clave) {
+        return leer(p).getCompound("premios").getBoolean(clave);
+    }
+
+    public static void premio(Player p, String clave, boolean dado) {
+        CompoundTag f = abrir(p);
+        CompoundTag d = f.getCompound("premios");
+        if (dado) d.putBoolean(clave, true);
+        else d.remove(clave);
+        f.put("premios", d);
+    }
+
     // ------------------------------------------------------------------ ecos
 
     public static int ecos(Player p) {

@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:capitan",
+  "display": {
+    "icon": {
+      "item": "darkcraft:rey_yelmo"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.armadura_jefe.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.armadura_jefe.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 60
+  }
+}

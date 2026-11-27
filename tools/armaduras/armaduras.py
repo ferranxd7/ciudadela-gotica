@@ -1259,6 +1259,598 @@ def prisionero():
 
 # ---------------------------------------------------------------- generar
 
+# ---------------------------------------------------------------- los conjuntos de los jefes (parte 7al)
+
+AZUL_MARINO = ["#070b14", "#0c1322", "#121c31", "#1a2742", "#233454", "#2e4267"]
+ORO_VIEJO = ["#3d3010", "#5c491b", "#7f6728", "#a58736", "#c9a94b", "#e6c96e"]
+FAJA_ROJA = ["#2a0b0e", "#3f1117", "#561820", "#6e2129", "#872a33"]
+BOTA_NEGRA = ["#0b0a09", "#14120f", "#1d1a16", "#28241f", "#34302a"]
+CALZON = ["#101214", "#181b1e", "#212529", "#2b3035", "#363c42"]
+CAMISA = ["#3c3f39", "#4b4f48", "#61655c", "#797d71", "#929686"]
+ALGA = ["#14261b", "#1d3826", "#294d32", "#386540", "#4b7d50"]
+NEGRO_PLACA = ["#0b0c0e", "#141518", "#1d1f23", "#272a2f", "#33373d", "#454a52", "#5d636d"]
+CORTEZA = ["#110c08", "#1f1710", "#2e2218", "#46352a", "#5e4936", "#7a6248"]
+MUSGO = ["#1c2e14", "#2c461c", "#3f5e28", "#557a34", "#6e9644"]
+RAIZ = ["#2e2217", "#4c3927", "#6e563c", "#927452", "#b2946c"]
+VERDE_VIVO = ["#2a8a3a", "#4cc25a", "#8af08e", "#dcffd8"]
+ACERO_VIEJO = ["#0a0b0e", "#14161b", "#1f2228", "#2a2e35", "#394049", "#4e5761", "#6c7682"]
+CARMESI = ["#22060a", "#36090f", "#4c0e15", "#66141c", "#801c25", "#9c2630"]
+ARMINO = ["#8a8580", "#b0aca6", "#d2cfca", "#ecebe8"]
+
+
+@conjunto
+def capitan():
+    """
+    La ropa del Capitan (Edrik Maroll, el de Brumavela): el sombrero de tres picos azul marino con el galon de oro, la casaca
+    azul con los botones y las charreteras de oro, la camisa en el cuello, la faja roja y los faldones; guantes de cuero con
+    vuelta y calzones con botas altas de vuelta. Con algo de alga de cuando se hundio.
+    """
+    c = Conjunto("capitan")
+    # ---- yelmo: el tricornio (la copa, el ala y los tres picos levantados)
+    c.caja("yelmo", "head", -4, -10.5, -4, 8, 2, 8, "copa", 0.55)
+    c.caja("yelmo", "head", -6.5, -8.6, -6.5, 13, 1, 13, "ala")
+    c.caja("yelmo", "head", -6.5, -10.6, -5.5, 1, 2, 11, "pico_d")
+    c.caja("yelmo", "head", 5.5, -10.6, -5.5, 1, 2, 11, "pico_i")
+    c.caja("yelmo", "head", -5.5, -10.6, 5.5, 11, 2, 1, "pico_atras")
+    # ---- peto: la casaca
+    c.caja("peto", "body", -4, 0, -2, 8, 12, 4, "casaca", 0.5)
+    c.caja("peto", "body", -4, 7, -2, 8, 1, 4, "faja", 0.62)
+    c.caja("peto", "body", -4, 10, -2, 8, 4, 4, "faldones", 0.7)
+    c.lados("peto", "arm", -3, -2, -2, 4, 8, 4, "manga", 0.45)
+    c.lados("peto", "arm", -3.5, -2.7, -2.5, 5, 1, 5, "charretera", 0.15)
+    # ---- guantes
+    c.lados("guantes", "arm", -3, 6, -2, 4, 4, 4, "guante", 0.52)
+    c.lados("guantes", "arm", -3, 5, -2, 4, 2, 4, "vuelta", 0.82)
+    # ---- grebas: calzones y botas altas con vuelta
+    c.lados("grebas", "leg", -2, 0, -2, 4, 6, 4, "calzon", 0.42)
+    c.lados("grebas", "leg", -2, 6, -2, 4, 6, 4, "bota", 0.55)
+    c.lados("grebas", "leg", -2, 5, -2, 4, 2, 4, "vuelta_bota", 0.8)
+
+    fieltro = Pintor.tela(AZUL_MARINO, 41, pliegue=4, grano=0.06)
+    pano = Pintor.tela(AZUL_MARINO, 42, pliegue=3, grano=0.1)
+    cuero = Pintor.cuero(BOTA_NEGRA, 43, grano=0.25)
+    guante_c = Pintor.cuero(CUERO_PARDO, 44)
+    calzon = Pintor.tela(CALZON, 45, pliegue=3)
+
+    def alga(x, y, k):
+        return (x * 7 + y * 3 + k) % 11 == 0
+
+    def copa(cara, x, y, w, h):
+        if cara == "abajo":
+            return None
+        if cara != "arriba" and y == h - 1:
+            return tono(ORO_VIEJO, 0.6)                  # la cinta de la copa
+        return fieltro(cara, x, y, w, h)
+
+    def ala(cara, x, y, w, h):
+        if cara == "abajo":
+            return tono(AZUL_MARINO, 0.1)
+        if cara == "arriba":
+            if x in (0, w - 1) or y in (0, h - 1):
+                return tono(ORO_VIEJO, 0.7)
+            return fieltro(cara, x, y, w, h)
+        return tono(ORO_VIEJO, 0.55)
+
+    def pico(cara, x, y, w, h):
+        if cara == "abajo":
+            return None
+        if y == 0 or cara == "arriba":
+            return tono(ORO_VIEJO, 0.78 if x % 2 == 0 else 0.6)   # el galon de oro
+        return fieltro(cara, x, y, w, h)
+
+    def casaca(cara, x, y, w, h):
+        if cara == "arriba":
+            return None
+        if cara == "abajo":
+            return tono(AZUL_MARINO, 0.15)
+        v = pano(cara, x, y, w, h)
+        if cara == "frente":
+            if 3 <= x <= 4 and y <= 3:
+                return tono(CAMISA, 0.7 - 0.1 * y)       # la camisa en el cuello
+            if x in (2, 5) and y <= 6:
+                return tono(ORO_VIEJO, 0.55)             # las solapas con su galon
+            if x in (1, 6) and y in (2, 4, 9, 11):
+                return tono(ORO_VIEJO, 0.9)              # los botones
+            if alga(x, y, 1) and y > 8:
+                return tono(ALGA, 0.6)
+        if cara == "espalda" and x in (3, 4) and y > 8:
+            return tono(AZUL_MARINO, 0.1)                # la abertura de atras
+        if y == 0 and cara in ("der", "izq", "espalda"):
+            return tono(ORO_VIEJO, 0.45)
+        return v
+
+    def faja(cara, x, y, w, h):
+        if cara in ("arriba", "abajo"):
+            return None
+        if cara == "izq":
+            return tono(FAJA_ROJA, 0.9)                  # el nudo
+        return tono(FAJA_ROJA, 0.55 + (0.12 if x % 3 == 0 else 0))
+
+    def faldones(cara, x, y, w, h):
+        if cara in ("arriba", "abajo"):
+            return None if cara == "arriba" else tono(AZUL_MARINO, 0.12)
+        if cara in ("frente", "espalda") and x in (3, 4):
+            return None                                  # abiertos por delante y por detras
+        if y == h - 1:
+            return tono(ORO_VIEJO, 0.5)
+        if alga(x, y, 5):
+            return tono(ALGA, 0.5)
+        return pano(cara, x, y, w, h)
+
+    def manga(cara, x, y, w, h):
+        if cara in ("arriba", "abajo"):
+            return None if cara == "abajo" else pano(cara, x, y, w, h)
+        if y >= h - 2:
+            return tono(ORO_VIEJO, 0.5 if y == h - 2 else 0.68)   # la bocamanga
+        return pano(cara, x, y, w, h)
+
+    def charretera(cara, x, y, w, h):
+        if cara == "abajo":
+            return None
+        if cara == "arriba":
+            return tono(ORO_VIEJO, 0.85 if (x + y) % 2 == 0 else 0.65)
+        return tono(ORO_VIEJO, 0.7) if x % 2 == 0 else tono(ORO_VIEJO, 0.35)   # los flecos
+
+    def guante(cara, x, y, w, h):
+        if cara == "arriba":
+            return None
+        if y >= h - 1:
+            return tono(CUERO_PARDO, 0.25) if cara != "abajo" else tono(CUERO_PARDO, 0.15)
+        return guante_c(cara, x, y, w, h)
+
+    def vuelta(cara, x, y, w, h):
+        if cara in ("arriba", "abajo"):
+            return None
+        if y == 0:
+            return tono(ORO_VIEJO, 0.6)
+        return guante_c(cara, x, y, w, h)
+
+    def calzon_f(cara, x, y, w, h):
+        if cara == "arriba":
+            return None
+        return calzon(cara, x, y, w, h)
+
+    def bota(cara, x, y, w, h):
+        if cara == "arriba":
+            return None
+        if cara == "abajo":
+            return tono(BOTA_NEGRA, 0.05)
+        if y == h - 1:
+            return tono(BOTA_NEGRA, 0.12)                # la suela
+        if alga(x, y, 9) and y > 2:
+            return tono(ALGA, 0.45)
+        return cuero(cara, x, y, w, h)
+
+    def vuelta_bota(cara, x, y, w, h):
+        if cara in ("arriba", "abajo"):
+            return None
+        return cuero(cara, x, y, w, h) if y > 0 else tono(BOTA_NEGRA, 0.75)
+
+    m = {"copa": copa, "ala": ala, "pico_d": pico, "pico_i": pico, "pico_atras": pico, "casaca": sombra(casaca, 0.15),
+         "faja": faja, "faldones": faldones}
+    for n in ("d", "i"):
+        m.update({f"manga_{n}": manga, f"charretera_{n}": charretera, f"guante_{n}": guante, f"vuelta_{n}": vuelta,
+                  f"calzon_{n}": calzon_f, f"bota_{n}": bota, f"vuelta_bota_{n}": vuelta_bota})
+    c.mats = m
+    return c
+
+
+def _placa_fuerte(nombre, tonos, filo, semilla):
+    """Las piezas de placas de los jefes (Brandt, Gavran, el Rey): coraza, hombreras de dos lamas, brazales, guanteletes con
+    su puno, escarcela de lamas, quijotes, rodilleras y grebas. Devuelve el conjunto (sin el yelmo ni lo de cada uno)."""
+    c = Conjunto(nombre)
+    c.caja("peto", "body", -4, 0, -2, 8, 12, 4, "coraza", 0.72)
+    c.lados("peto", "arm", -4.2, -3.6, -3, 6, 4, 6, "hombrera", 0.3)
+    c.lados("peto", "arm", -4.0, 0.2, -2.8, 6, 2, 6, "hombrera2", 0.1)
+    c.lados("peto", "arm", -3, 2, -2, 4, 4, 4, "brazal", 0.5)
+    c.lados("guantes", "arm", -3, 5, -2, 4, 5, 4, "guantelete", 0.66)
+    c.lados("guantes", "arm", -3, 5, -2, 4, 1, 4, "puno", 0.96)
+    c.caja("grebas", "body", -4, 10, -2, 8, 3, 4, "escarcela", 0.86)
+    c.lados("grebas", "leg", -2, 0, -2, 4, 6, 4, "quijote", 0.56)
+    c.lados("grebas", "leg", -1.5, 4.5, -3.1, 3, 3, 1, "rodillera", 0.2)
+    c.lados("grebas", "leg", -2, 6, -2, 4, 6, 4, "greba", 0.6)
+
+    pl = Pintor.placa(tonos[1:7], semilla, rayas=17)
+    pl2 = Pintor.placa(tonos[0:6], semilla + 1)
+
+    def coraza(cara, x, y, w, h):
+        if cara == "arriba":
+            return None
+        col = pl(cara, x, y, w, h)
+        if cara in ("frente", "espalda") and y == 0:
+            return tono(filo, 0.6)
+        if cara in ("der", "izq") and y in (4, 8):
+            return tono(tonos, 0.2)
+        if y >= h - 2 and cara != "abajo":
+            return tono(tonos, 0.3 if y == h - 2 else 0.18)
+        return col
+
+    def hombrera(cara, x, y, w, h):
+        if cara == "abajo":
+            return tono(tonos, 0.1)
+        col = pl(cara, x, y, w, h)
+        if cara != "arriba" and y == h - 1:
+            return tono(filo, 0.55)                      # el filo de abajo
+        if cara != "arriba" and y == 1 and x % 2 == 1 and 0 < x < w - 1:
+            return tono(filo, 0.8)                       # los remaches
+        return col
+
+    def hombrera2(cara, x, y, w, h):
+        if cara in ("abajo", "arriba"):
+            return tono(tonos, 0.15) if cara == "abajo" else None
+        return pl2(cara, x, y, w, h) if y < h - 1 else tono(filo, 0.45)
+
+    def brazal(cara, x, y, w, h):
+        if cara in ("arriba", "abajo"):
+            return None
+        if y == h - 1:
+            return tono(tonos, 0.8)
+        return pl2(cara, x, y, w, h)
+
+    def guantelete(cara, x, y, w, h):
+        if cara == "arriba":
+            return None
+        if y >= 3:
+            if cara == "frente" and y == 3:
+                return tono(filo, 0.75 if x % 2 == 0 else 0.55)   # los nudillos
+            return tono(tonos, 0.6 if (y + x // 2) % 2 == 0 else 0.35) if cara != "abajo" else tono(tonos, 0.15)
+        return pl(cara, x, y, w, h)
+
+    def puno(cara, x, y, w, h):
+        if cara in ("arriba", "abajo"):
+            return None
+        return tono(filo, 0.7) if x % 3 == 1 else tono(tonos, 0.6 if x % 3 == 0 else 0.4)
+
+    def escarcela(cara, x, y, w, h):
+        if cara in ("arriba", "abajo"):
+            return None if cara == "arriba" else tono(tonos, 0.12)
+        if y == 0:
+            return tono(filo, 0.55 if not (cara == "frente" and x in (3, 4)) else 0.85)
+        if y == h - 1:
+            return tono(tonos, 0.28)
+        return pl2(cara, x, y, w, h)
+
+    def quijote(cara, x, y, w, h):
+        return None if cara == "arriba" else pl2(cara, x, y, w, h)
+
+    def rodillera(cara, x, y, w, h):
+        if cara == "frente" and (x, y) == (1, 1):
+            return tono(filo, 0.85)
+        return tono(filo, 0.5) if cara == "frente" and (x in (0, w - 1) or y in (0, h - 1)) else pl(cara, x, y, w, h)
+
+    def greba(cara, x, y, w, h):
+        if cara == "arriba":
+            return None
+        if cara == "frente" and x in (1, 2) and y < 4:
+            return tono(tonos, 0.8 if x == 1 else 0.6)
+        if y >= 4:
+            return tono(tonos, 0.42 if y == 4 else 0.32) if cara != "abajo" else tono(tonos, 0.08)
+        return pl(cara, x, y, w, h)
+
+    m = {"coraza": sombra(coraza, 0.15), "escarcela": escarcela}
+    for n in ("d", "i"):
+        m.update({f"hombrera_{n}": hombrera, f"hombrera2_{n}": hombrera2, f"brazal_{n}": brazal, f"guantelete_{n}": guantelete,
+                  f"puno_{n}": puno, f"quijote_{n}": quijote, f"rodillera_{n}": rodillera, f"greba_{n}": greba})
+    c.mats = m
+    return c, pl
+
+
+@conjunto
+def brandt():
+    """
+    La armadura de Ser Brandt, el Muro del Rey: placas negras gruesas con los filos de oro; el yelmo cerrado con su corona y sus
+    puas y la rendija roja; el tabardo rojo con la torre negra; hombreras enormes de dos lamas con un pincho; guanteletes con los
+    nudillos de oro; escarcela de lamas, rodilleras y grebas.
+    """
+    c, pl = _placa_fuerte("brandt", NEGRO_PLACA, ORO, 51)
+    c.caja("yelmo", "head", -4, -8, -4, 8, 8, 8, "yelmo", 0.8)
+    c.caja("yelmo", "head", -4, -9.6, -4, 8, 1, 8, "corona", 0.95)
+    for x, z in ((-3.5, -4.95), (-0.5, -4.95), (2.5, -4.95), (-4.95, -0.5), (3.95, -0.5), (-0.5, 3.95)):
+        c.caja("yelmo", "head", x, -12, z, 1, 2, 1, "pua")
+    c.caja("peto", "body", -3, 1, -3.1, 6, 10, 1, "tabardo", (0.05, 0.05, 0.0))
+    c.lados("peto", "arm", -2.5, -6.4, -0.5, 1, 2, 1, "pua_h")
+
+    rojo = Pintor.tela(ROJO, 52)
+    torre = [".T..T.", ".TTTT.", "..TT..", "..TT..", "..TT..", ".TTTT."]
+
+    def yelmo(cara, x, y, w, h):
+        if cara == "frente":
+            if y == 3 and 1 <= x <= 6:
+                return "#7a0b0b" if x in (2, 5) else "#080406"   # la rendija, con dos ojos rojos
+            if y == 2 and 1 <= x <= 6:
+                return tono(ORO, 0.55)
+            if x in (3, 4) and y > 4:
+                return tono(NEGRO_PLACA, 0.75 if x == 3 else 0.5)
+        if cara != "abajo" and y == h - 1:
+            return tono(ORO, 0.6) if x % 3 == 1 else tono(NEGRO_PLACA, 0.15)
+        return pl(cara, x, y, w, h)
+
+    def corona(cara, x, y, w, h):
+        if cara == "abajo":
+            return None
+        if cara == "arriba":
+            return None if 1 <= x <= w - 2 and 1 <= y <= h - 2 else tono(NEGRO_PLACA, 0.55)
+        return tono(ORO, 0.75) if x % 3 == 1 else tono(NEGRO_PLACA, 0.6 if x % 3 == 0 else 0.4)   # el aro de hierro con sus clavos
+
+    def pua(cara, x, y, w, h):
+        return tono(NEGRO_PLACA, 0.85 if y == 0 else 0.45)
+
+    def tabardo(cara, x, y, w, h):
+        if cara != "frente":
+            return None if cara in ("arriba", "abajo", "espalda") else tono(ROJO, 0.3)
+        if x in (0, w - 1) or y == h - 1:
+            return tono(ORO, 0.5)
+        if 2 <= y < 2 + len(torre) and torre[y - 2][x] == "T":
+            return tono(NEGRO_PLACA, 0.25)               # la torre negra
+        return rojo(cara, x, y, w, h)
+
+    c.mats.update({"yelmo": yelmo, "corona": corona, "pua": pua, "tabardo": tabardo, "pua_h_d": pua, "pua_h_i": pua})
+    return c
+
+
+@conjunto
+def vareth():
+    """
+    La armadura de corteza de Vareth, el escudero que se trago el arbol: placas de corteza con surcos, musgo y liquen; el yelmo de
+    corteza con dos astas de ramas y la rendija verde; el corazon verde en el pecho; hombreras de corteza con un brote; guanteletes
+    de corteza con tres garras de raiz; grebas de corteza con raices enroscadas.
+    """
+    c = Conjunto("vareth")
+    c.caja("yelmo", "head", -4, -8, -4, 8, 8, 8, "yelmo", 0.72)
+    for lado, s in LADOS:
+        a = c.hija("yelmo", f"rama1_{lado}", "head", (3.0 * s, -8.4, 0.5), (0, 0, 24 * s))
+        c.caja("yelmo", a, -0.5, -4, -0.5, 1, 4, 1, f"rama1_{lado}")
+        b = c.hija("yelmo", f"rama2_{lado}", a, (0, -4, 0), (0, 0, 32 * s))
+        c.caja("yelmo", b, -0.5, -3, -0.5, 1, 3, 1, f"rama2_{lado}")
+        t = c.hija("yelmo", f"rama3_{lado}", a, (0, -2.2, 0), (0, 0, -44 * s))
+        c.caja("yelmo", t, -0.5, -2, -0.5, 1, 2, 1, f"rama3_{lado}")
+    c.caja("peto", "body", -4, 0, -2, 8, 12, 4, "corteza", 0.62)
+    c.caja("peto", "body", -1.5, 3, -3.05, 3, 3, 1, "corazon")
+    c.lados("peto", "arm", -3.8, -3, -2.6, 5, 3, 5, "hombro", 0.25)
+    c.lados("peto", "arm", -3, 0, -2, 4, 5, 4, "brazo", 0.45)
+    c.lados("peto", "arm", -2.4, -5.0, -0.5, 1, 2, 1, "brote")
+    c.lados("guantes", "arm", -3, 5, -2, 4, 5, 4, "guante", 0.6)
+    for k, gx in enumerate((-2.8, -1.4, 0.0)):
+        c.lados("guantes", "arm", gx, 10.4, -1.9, 1, 2, 1, f"garra{k}")
+    c.caja("grebas", "body", -4, 10, -2, 8, 2, 4, "cinto", 0.8)
+    c.lados("grebas", "leg", -2, 0, -2, 4, 12, 4, "pierna", 0.5)
+    c.lados("grebas", "leg", -2, 4, -2, 4, 1, 4, "raiz_a", 0.72)
+    c.lados("grebas", "leg", -2, 9, -2, 4, 1, 4, "raiz_b", 0.74)
+
+    rr = ruido_t(61)
+
+    def corteza(cara, x, y, w, h, musgo_arriba=True):
+        if cara == "abajo":
+            return tono(CORTEZA, 0.1)
+        n = rr[(y * 3 + {"arriba": 1, "frente": 2, "der": 3, "izq": 4, "espalda": 5}.get(cara, 0) * 17) % 128, (x * 5 + 7) % 128]
+        v = 0.48 + (n - 0.5) * 0.3
+        if (x + (y // 3)) % 3 == 0:
+            v -= 0.22                                    # los surcos
+        if musgo_arriba and (cara == "arriba" or y <= 1) and n > 0.45:
+            return tono(MUSGO, 0.35 + n * 0.5)
+        if n > 0.93:
+            return tono(MUSGO, 0.75)                     # liquen
+        return tono(CORTEZA, v)
+
+    def yelmo(cara, x, y, w, h):
+        if cara == "frente" and y == 4 and 1 <= x <= 6:
+            return tono(VERDE_VIVO, 0.65 if x in (2, 5) else 0.0) if x in (2, 5) else "#0a0806"
+        return corteza(cara, x, y, w, h)
+
+    def rama(cara, x, y, w, h):
+        return tono(RAIZ, 0.55 if cara in ("frente", "der") else 0.35) if y < h - 1 or cara == "arriba" else tono(RAIZ, 0.3)
+
+    def corazon(cara, x, y, w, h):
+        if cara != "frente":
+            return tono(RAIZ, 0.3)
+        if (x, y) == (1, 1):
+            return tono(VERDE_VIVO, 0.99)
+        if x == 1 or y == 1:
+            return tono(VERDE_VIVO, 0.6)
+        return tono(RAIZ, 0.45)                          # las raices que lo sujetan
+
+    def hombro(cara, x, y, w, h):
+        if cara == "abajo":
+            return None
+        return corteza(cara, x, y, w, h)
+
+    def brazo(cara, x, y, w, h):
+        if cara in ("arriba", "abajo"):
+            return None
+        return corteza(cara, x, y, w, h, musgo_arriba=False)
+
+    def brote(cara, x, y, w, h):
+        return tono(MUSGO, 0.85 if y == 0 else 0.55)
+
+    def guante(cara, x, y, w, h):
+        if cara == "arriba":
+            return None
+        if y == 0 and cara != "abajo":
+            return tono(RAIZ, 0.55)
+        return corteza(cara, x, y, w, h, musgo_arriba=False)
+
+    def garra(cara, x, y, w, h):
+        return tono(RAIZ, 0.7 if y == 0 else 0.4)
+
+    def cinto(cara, x, y, w, h):
+        if cara in ("arriba", "abajo"):
+            return None
+        return tono(RAIZ, 0.5 if (x + y) % 2 == 0 else 0.35)
+
+    def pierna(cara, x, y, w, h):
+        if cara == "arriba":
+            return None
+        if y == h - 1 and cara != "abajo":
+            return tono(CORTEZA, 0.15)
+        return corteza(cara, x, y, w, h, musgo_arriba=y < 2)
+
+    def raiz(cara, x, y, w, h):
+        if cara in ("arriba", "abajo"):
+            return None
+        if (x + {"frente": 0, "der": 1, "espalda": 2, "izq": 3}[cara]) % 3 == 2:
+            return None                                  # la raiz enrosca con huecos
+        return tono(RAIZ, 0.62 if x % 2 == 0 else 0.45)
+
+    m = {"yelmo": yelmo, "corteza": sombra(lambda *a: corteza(*a), 0.12), "corazon": corazon, "cinto": cinto}
+    for lado, _ in LADOS:
+        for n in (1, 2, 3):
+            m[f"rama{n}_{lado}"] = rama
+    for n in ("d", "i"):
+        m.update({f"hombro_{n}": hombro, f"brazo_{n}": brazo, f"brote_{n}": brote, f"guante_{n}": guante, f"pierna_{n}": pierna,
+                  f"raiz_a_{n}": raiz, f"raiz_b_{n}": raiz})
+        for k in range(3):
+            m[f"garra{k}_{n}"] = garra
+    c.mats = m
+    return c
+
+
+@conjunto
+def gavran():
+    """
+    La armadura del Juramento, la de Ser Gavran: acero negro viejo con musgo y raices enroscadas, los filos de oro, el yelmo
+    cerrado con la rendija verde y una corona de espinas de raiz, el tabardo rojo oscuro; las placas de los jefes.
+    """
+    c, pl = _placa_fuerte("gavran", ACERO_VIEJO, ORO, 71)
+    c.caja("yelmo", "head", -4, -8, -4, 8, 8, 8, "yelmo", 0.76)
+    c.caja("yelmo", "head", -4, -9.3, -4, 8, 1, 8, "espinas", 0.92)
+    for x, z in ((-3.2, -4.9), (1.8, -4.9), (-4.9, 1.0), (3.9, -2.0), (-1.0, 3.9)):
+        c.caja("yelmo", "head", x, -10.8, z, 1, 1, 1, "espina")
+    c.caja("peto", "body", -2.5, 1, -3.1, 5, 11, 1, "tabardo", (0.05, 0.05, 0.0))
+    c.lados("grebas", "leg", -2, 7, -2, 4, 1, 4, "raiz", 0.8)
+
+    tela = Pintor.tela(CARMESI, 72)
+    rr = ruido_t(73)
+
+    def musgoso(f):
+        def g(cara, x, y, w, h):
+            col = f(cara, x, y, w, h)
+            if col is None:
+                return None
+            n = rr[(y * 7 + x * 3 + len(cara)) % 128, (x * 11 + y) % 128]
+            if cara in ("arriba", "frente", "der", "izq") and n > 0.9 and (x * 5 + y * 3) % 4 != 0:
+                return tono(MUSGO, 0.3 + (n - 0.9) * 4)
+            return col
+        return g
+
+    def yelmo(cara, x, y, w, h):
+        if cara == "frente":
+            if y == 3 and 1 <= x <= 6:
+                return tono(VERDE_VIVO, 0.6) if x in (2, 5) else "#060807"
+            if y == 2 and 1 <= x <= 6:
+                return tono(ORO, 0.5)
+        if cara != "abajo" and y == h - 1:
+            return tono(ORO, 0.55) if x % 3 == 1 else tono(ACERO_VIEJO, 0.15)
+        return pl(cara, x, y, w, h)
+
+    def espinas(cara, x, y, w, h):
+        if cara == "abajo":
+            return None
+        if cara == "arriba":
+            return None if 1 <= x <= w - 2 and 1 <= y <= h - 2 else tono(RAIZ, 0.45 if (x + y) % 2 else 0.3)
+        return tono(RAIZ, 0.5 if (x + y) % 2 else 0.32)
+
+    def espina(cara, x, y, w, h):
+        return tono(RAIZ, 0.7)
+
+    def tabardo(cara, x, y, w, h):
+        if cara != "frente":
+            return None if cara in ("arriba", "abajo", "espalda") else tono(CARMESI, 0.3)
+        if x in (0, w - 1) or y == h - 1:
+            return tono(ORO, 0.45)
+        if x == 2 and 2 <= y <= 7 or (y == 4 and 1 <= x <= 3):
+            return tono(ORO, 0.7)                        # la espada del juramento
+        return tela(cara, x, y, w, h)
+
+    def raiz(cara, x, y, w, h):
+        if cara in ("arriba", "abajo"):
+            return None
+        if (x + {"frente": 0, "der": 1, "espalda": 2, "izq": 3}[cara]) % 3 == 2:
+            return None
+        return tono(RAIZ, 0.55 if x % 2 == 0 else 0.4)
+
+    for k in list(c.mats):
+        c.mats[k] = musgoso(c.mats[k])
+    c.mats.update({"yelmo": musgoso(yelmo), "espinas": espinas, "espina": espina, "tabardo": tabardo, "raiz_d": raiz, "raiz_i": raiz})
+    return c
+
+
+@conjunto
+def rey():
+    """
+    La armadura del Rey Corvin: placas negras con los filos de oro, el yelmo con la corona de oro de ocho puntas y la rendija de
+    brasa, el manto de armino sobre los hombros, el tabardo carmesi con la corona y la capa carmesi a la espalda.
+    """
+    c, pl = _placa_fuerte("rey", NEGRO_PLACA, ORO, 81)
+    c.caja("yelmo", "head", -4, -8, -4, 8, 8, 8, "yelmo", 0.76)
+    c.caja("yelmo", "head", -4, -9.7, -4, 8, 1, 8, "aro", 0.92)
+    for x, z in ((-3.9, -4.95), (-0.5, -4.95), (2.9, -4.95), (-3.9, 3.95), (-0.5, 3.95), (2.9, 3.95), (-4.95, -0.5), (3.95, -0.5)):
+        c.caja("yelmo", "head", x, -11.8, z, 1, 2, 1, "punta")
+    c.caja("peto", "body", -3, 3, -3.1, 6, 8, 1, "tabardo", (0.05, 0.05, 0.0))
+    c.caja("peto", "body", -4.5, -0.5, -3.5, 9, 4, 7, "armino")
+    c.caja("peto", "body", -4.5, 0.8, 3.6, 9, 14, 1, "capa")
+
+    tela = Pintor.tela(CARMESI, 82)
+    corona = [".O..O.", ".OOOO.", ".OOOO."]
+
+    def yelmo(cara, x, y, w, h):
+        if cara == "frente":
+            if y == 3 and 1 <= x <= 6:
+                return "#ff7a1a" if x in (2, 5) else "#140604"   # la rendija, con brasas
+            if y == 2 and 1 <= x <= 6:
+                return tono(ORO, 0.6)
+            if x in (3, 4) and y > 4:
+                return tono(ORO, 0.55 if x == 3 else 0.4)
+        if cara != "abajo" and y == h - 1:
+            return tono(ORO, 0.7)
+        return pl(cara, x, y, w, h)
+
+    def aro(cara, x, y, w, h):
+        if cara == "abajo":
+            return None
+        if cara == "arriba":
+            return None if 1 <= x <= w - 2 and 1 <= y <= h - 2 else tono(ORO, 0.8)
+        if cara == "frente" and x in (3, 4):
+            return "#b81b22"                             # la piedra de la corona
+        return tono(ORO, 0.9 if x % 2 == 0 else 0.7)
+
+    def punta(cara, x, y, w, h):
+        return tono(ORO, 0.95 if y == 0 else 0.7)
+
+    def tabardo(cara, x, y, w, h):
+        if cara != "frente":
+            return None if cara in ("arriba", "abajo", "espalda") else tono(CARMESI, 0.3)
+        if x in (0, w - 1) or y == h - 1:
+            return tono(ORO, 0.55)
+        if 2 <= y <= 4:
+            ch = corona[y - 2][x]
+            if ch == "O":
+                return tono(ORO, 0.85)
+            if ch == "R":
+                return "#e0402a"
+        return tela(cara, x, y, w, h)
+
+    def armino(cara, x, y, w, h):
+        if cara == "abajo":
+            return tono(ARMINO, 0.3)
+        if cara == "arriba" and 2 <= x <= w - 3 and 1 <= y <= h - 2:
+            return None                                  # el hueco del cuello
+        if cara != "arriba" and y == h - 1:
+            return tono(ARMINO, 0.2 if x % 2 == 0 else 0.35)   # el borde del pelo, mas oscuro
+        return tono(ARMINO, 0.5 + 0.25 * ((x * 2 + y) % 3) / 2)
+
+    def capa(cara, x, y, w, h):
+        if cara in ("arriba",):
+            return None
+        if cara == "espalda" and y == h - 1 and x % 2 == 1:
+            return None                                  # el borde gastado
+        if cara in ("frente", "espalda") and x in (0, w - 1):
+            return tono(ORO, 0.5)
+        return tela(cara, x, y, w, h)
+
+    c.mats.update({"yelmo": yelmo, "aro": aro, "punta": punta, "tabardo": tabardo, "armino": armino, "capa": sombra(capa, 0.2)})
+    return c
+
+
 def textura(c):
     c.rig.empaquetar()
     t = Textura(c.rig)

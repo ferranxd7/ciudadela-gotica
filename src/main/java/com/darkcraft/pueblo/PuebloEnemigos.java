@@ -221,7 +221,7 @@ public final class PuebloEnemigos {
         }
     }
 
-    /** El cartel de JEFE ABATIDO, sus ecos, un frasco mas y el logro: a los que pelearon y a los que estaban al lado. */
+    /** El cartel de JEFE ABATIDO, sus ecos, un frasco mas, su ropa y el logro: a los que pelearon y a los que estaban al lado. */
     private static void repartir(MinecraftServer srv, Reparto r) {
         ServerLevel lvl = srv.overworld();
         for (ServerPlayer p : srv.getPlayerList().getPlayers()) {
@@ -231,6 +231,8 @@ public final class PuebloEnemigos {
             Logros.dar(p, "capitan");
             com.darkcraft.espejo.Espejo.bestia(p, "capitan");
             if (Frascos.otro(p)) Net.to(p, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.pueblo.frasco", 0));
+            // su ropa (parte 7al; una vez a cada uno)
+            com.darkcraft.armadura.Armaduras.premio(p, com.darkcraft.armadura.Conjunto.CAPITAN);
         }
         reja(lvl);
     }

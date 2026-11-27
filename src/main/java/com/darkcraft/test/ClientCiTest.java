@@ -3431,6 +3431,83 @@ public final class ClientCiTest {
         return t + 156;
     }
 
+    // ------------------------------------------------------------------ los conjuntos de los jefes (parte 7al)
+
+    /**
+     * Parte 7al: cada conjunto de jefe puesto, de frente en tercera persona (el Capitan, Ser Brandt, Vareth, el Rey Corvin y Ser
+     * Gavran), el Rey y el Capitan de espaldas (la capa y los faldones), el premio del Capitan (sus cuatro avisos de "conseguido";
+     * la segunda vez ya no da nada) y el menu con el equipo del Rey. Lineas {@code armadura 7al ...}.
+     */
+    private static int armaduras7al(int t0) {
+        base = 0;
+        int t = t0;
+        final String[] conjuntos = {"capitan", "brandt", "vareth", "rey", "gavran"};
+        atTicks(t, "Armaduras de jefe: tercera persona, de frente", m -> {
+            m.setScreen(null);
+            m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+            m.options.hideGui = true;
+            server(m, sp -> {
+                sp.setGameMode(GameType.SURVIVAL);
+                sp.getInventory().clearContent();
+                sp.connection.teleport(sp.getX(), sp.getY(), sp.getZ(), sp.getYRot(), 0f);
+            });
+        });
+        t += 4;
+        for (int i = 0; i < conjuntos.length; i++) {
+            final String c = conjuntos[i];
+            final int n = i + 1;
+            atTicks(t, "ponerse " + c, m -> server(m, sp -> comando(sp, "darkcraft armadura " + c + " poner")));
+            atTicks(t + 10, "captura: " + c, m -> {
+                shot(m, String.format(java.util.Locale.ROOT, "cliente_al%02d_%s", n, c));
+                server(m, sp -> log("  armadura 7al " + c + ": " + com.darkcraft.armadura.Armaduras.resumen(sp) + " | resiste "
+                        + java.util.Arrays.toString(com.darkcraft.rol.Resistencias.todas(sp)) + " | modelos horneados "
+                        + com.darkcraft.client.armadura.ModelosArmadura.horneados()));
+            });
+            t += 12;
+        }
+        atTicks(t, "el Rey, de espaldas", m -> {
+            m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            server(m, sp -> comando(sp, "darkcraft armadura rey poner"));
+        });
+        atTicks(t + 10, "captura: el Rey de espaldas", m -> shot(m, "cliente_al06_rey_espalda"));
+        atTicks(t + 12, "el Capitan, de espaldas", m -> server(m, sp -> comando(sp, "darkcraft armadura capitan poner")));
+        atTicks(t + 22, "captura: el Capitan de espaldas", m -> shot(m, "cliente_al07_capitan_espalda"));
+        atTicks(t + 24, "el premio del Capitan (dos veces)", m -> {
+            m.options.hideGui = false;
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                comando(sp, "darkcraft armadura quitar");
+                sp.getInventory().clearContent();
+                comando(sp, "darkcraft armadura jefes olvidar");
+                boolean a = com.darkcraft.armadura.Armaduras.premio(sp, com.darkcraft.armadura.Conjunto.CAPITAN);
+                boolean b = com.darkcraft.armadura.Armaduras.premio(sp, com.darkcraft.armadura.Conjunto.CAPITAN);
+                int n = 0;
+                for (int i = 0; i < sp.getInventory().getContainerSize(); i++)
+                    if (sp.getInventory().getItem(i).getItem() instanceof com.darkcraft.armadura.PiezaArmadura pa
+                            && pa.conjunto == com.darkcraft.armadura.Conjunto.CAPITAN) n++;
+                log("  armadura 7al premio del Capitan: primera " + a + ", segunda " + b + ", piezas en la bolsa " + n
+                        + " | logro armadura_jefe " + com.darkcraft.story.Logros.tiene(sp, "armadura_jefe"));
+            });
+        });
+        atTicks(t + 34, "captura: los avisos del premio", m -> shot(m, "cliente_al08_premio"));
+        atTicks(t + 40, "el menu: el equipo con el Rey", m -> {
+            server(m, sp -> comando(sp, "darkcraft armadura rey poner"));
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.EQUIPO);
+        });
+        atTicks(t + 50, "captura: el equipo del Rey", m -> shot(m, "cliente_al09_menu"));
+        atTicks(t + 52, "Fin de las armaduras de jefe", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                comando(sp, "darkcraft armadura quitar");
+                comando(sp, "darkcraft armadura jefes olvidar");
+                sp.getInventory().clearContent();
+                sp.setGameMode(GameType.CREATIVE);
+            });
+        });
+        return t + 58;
+    }
+
     // ------------------------------------------------------------------ el mundo de nubes (parte 3a)
 
     private static net.minecraft.world.entity.decoration.ArmorStand nubesMuneco;
@@ -5688,6 +5765,8 @@ public final class ClientCiTest {
         fin = armas7aj(fin);
         // los escudos pequeno, mediano y grande (parte 7ak)
         fin = escudos7ak(fin);
+        // los conjuntos de los jefes (parte 7al)
+        fin = armaduras7al(fin);
         fin = nubes(fin);
         fin = pueblo(fin);
         fin = enemigos(fin);

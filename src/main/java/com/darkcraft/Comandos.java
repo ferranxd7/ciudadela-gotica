@@ -183,6 +183,7 @@ public final class Comandos {
         src.sendSuccess(() -> linea(new Linea("/darkcraft oswin ", "/darkcraft oswin [ir | campana | poner | olvidar]", "oswin")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft hedda ", "/darkcraft hedda [ir | tam | poner | olvidar]", "hedda")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft armadura ", "/darkcraft armadura [<conjunto> [poner] | quitar]", "armadura")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft armadura jefes", "/darkcraft armadura jefes [olvidar]", "armadura_jefes")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft armas ", "/darkcraft armas [martillos | flechas | sangre <n> | frio <n> | limpiar]", "armas")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ecos ", "/darkcraft ecos / ecos dar <n> / ecos quitar", "ecos")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft rol ", "/darkcraft rol clase [<nombre> | elegir | olvidar | ninguna] / santuario / frascos [<n>] / nivel [reiniciar] / atributo <nombre> <valor> / talisman <nombre> [poner <hueco>] / fruto <nombre> [<n>] / hechizo <nombre>|memorizar|olvidar|baston|sello / guia [olvidar] / herrero [olvidar] / mercader [olvidar] / mejora <0-9> / piedras / ceniza <nombre> [poner] | quitar / resistencias", "rol")), false);
