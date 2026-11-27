@@ -6095,5 +6095,271 @@
     ]
    }
   }
+ },
+ "aldric": {
+  "flow": "i8PApavQwvirt3cERg4n",
+  "voz": "uVKHymY7OYMd6OailpG5",
+  "nombre_voz": "Frederick - Old Gnarly Narrator",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7v: Aldric, el Primer Marcado (el jefe del Crater de Sangre, en el Cerco del Ancla). Tomas a y b de cada frase como aldric/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[tired, low] Another one... with the mark. [sighs] Go back down, child. There is no rest up there.",
+    "sesiones": [
+     "3QDZshERc2aKee3v4Tik",
+     "uGFsBKgRo9yUIUcq7HMF"
+    ],
+    "generaciones": [
+     "jJZk6d2THzYeRewb3dJw",
+     "eMk4PwucbrtMvgjgW9Bg"
+    ]
+   },
+   "2": {
+    "texto": "[shouting, anguished] I climbed it too! I saw what waits at the top... [roaring] I will not let it have you!",
+    "sesiones": [
+     "zA98tUrTQH719GqDkVM4",
+     "t6tqKfP6gVKlBRFMzRji"
+    ],
+    "generaciones": [
+     "noSVkKF4aBuNi0CvkgM8",
+     "7dzJuZArvokpOpSOHRLS"
+    ]
+   },
+   "3": {
+    "texto": "[softly, sad] Rest now. Better here... than up there.",
+    "sesiones": [
+     "row4q1JJTf6H0q7MzlcM",
+     "v3tDU1KxQ41Corbj7HRX"
+    ],
+    "generaciones": [
+     "aJMdVeG10AAzgL4tlj3b",
+     "YlvEc31pKUKym2DbTHvS"
+    ]
+   },
+   "4": {
+    "texto": "[growling] The chain holds everything it touches.",
+    "sesiones": [
+     "PTPCRWsCcnsFEBNu1stz",
+     "V8Mw1MRCh8XMzHXNhYXY"
+    ],
+    "generaciones": [
+     "wucyNdXAEeD2fB9h1kXV",
+     "2665G26KAtZrdjU07g9C"
+    ]
+   },
+   "5": {
+    "texto": "[weak, dying, whispering] Go, then... climb. [breathes] And when it opens its mouth... do not answer.",
+    "sesiones": [
+     "b9voVWyn8CeAe56I0pmh",
+     "kXmUhkb9fMUJAm8incaY"
+    ],
+    "generaciones": [
+     "uMyMzu8iAAZbCsqpT6MU",
+     "Mod4weZ7Ew9zN9tCqZux"
+    ]
+   }
+  }
+ },
+ "sfx_aldric": {
+  "flow": "GnQ7JmflqS52oHTbj1uG",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7v: Aldric, el Primer Marcado (el cadenazo, el latigazo, la estrella de la cadena con su onda, el torbellino, el salto, las cadenas que brotan del suelo, la marca que arde, el rugido, dolor, muerte, el rezo y el arrastre de la cadena) y los rendidos del Cerco que se arrodillan (cerco_arrodillan). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "aldric_cadenazo": {
+    "prompt": "A huge rusted iron anchor chain swung overhead and slammed down onto a stone floor: heavy rattling whoosh of the links, then a crushing metal-on-stone impact with cracking rock, epic dark fantasy boss combat, cinematic, 2 seconds",
+    "sesiones": [
+     "RhXqXiwuyf5ZikYmku3O",
+     "yT6lFaLTkSVu140hBmpm",
+     "37852J3DnJ2lv1bJJ5IQ",
+     "dPQVLprbAukJGwzqUYJx"
+    ],
+    "generaciones": [
+     "D0PzlJaj5hYGHL4BLedu",
+     "VcZ9vFTKRF1eRasFcwFD",
+     "Zq6vvw1vgheQIzhkxX40",
+     "Gx2VZpLzSiLfN9D2vaDu"
+    ]
+   },
+   "aldric_latigazo": {
+    "prompt": "A long heavy iron chain lashed sideways like a whip: fast rattling whoosh of the links ending in a sharp metallic crack, dark fantasy combat, cinematic, 1.5 seconds",
+    "sesiones": [
+     "XzmO5gnGfC4ICA5mdggi",
+     "LmpK7ihrQqq2KU9x3Fqj",
+     "n14hnpXW62H6k3My5LYK",
+     "92YXH12hSJzCrWoW1Nob"
+    ],
+    "generaciones": [
+     "7uaY9FKeKV2BFW3KRc9V",
+     "zQ7CxkUMK5QcNcMuUOEB",
+     "6f9c2CmIfuYODLFmWMOk",
+     "9LzJbFdgS45Ql9dhR5C1"
+    ]
+   },
+   "aldric_estrella": {
+    "prompt": "A giant iron chain smashed into the ground sends out a shockwave: deep booming impact, rock cracking and splitting outward in a ring, rattling chain links and falling rubble, epic dark fantasy boss, cinematic, 2.5 seconds",
+    "sesiones": [
+     "umCM8fhieARh9gtldxWe",
+     "6Nnm0nwoCgcobqdOni7A",
+     "Qefy0asdEmbQksdjDl83",
+     "GoyiSm4yvQJlDKh4M0bM"
+    ],
+    "generaciones": [
+     "CXPMtG3U3nCvOffawPxR",
+     "3Je1T8fuPyroaWLqbIuY",
+     "JO3QVhq5A6ALKuFfiVlE",
+     "0gDzu72lYgLawhcJ9LJu"
+    ]
+   },
+   "aldric_torbellino": {
+    "prompt": "A giant armored warrior spins in place whirling a heavy iron chain around him: rhythmic deep whooshing passes of the chain, rattling links, speeding up and ending in a hard metallic snap, dark fantasy boss, cinematic, 2.5 seconds",
+    "sesiones": [
+     "35wF6W5md664AckQXr9m",
+     "2mSQnW8x1zmSQTtonXJE",
+     "N7P3yIymO772TDwMq8tv",
+     "8TgHpfLSqyjoQ99pV1Ok"
+    ],
+    "generaciones": [
+     "by0AI4f9VSQxA5AjBhT1",
+     "ry3UPt2hPH4oPK3xlDqk",
+     "gFxYo90McwCFaRepTM6V",
+     "6AxoGVj8ZLIegtW8Vpnw"
+    ]
+   },
+   "aldric_salto": {
+    "prompt": "A huge heavily armored old warrior lands from a great leap onto a stone courtyard: earth-shaking deep thud, armor plates clanking, chain links rattling, stones cracking and debris falling, epic dark fantasy boss, cinematic, 2 seconds",
+    "sesiones": [
+     "y1SS97fYBoBVGWnCcaLC",
+     "pPgpzcY7lgplILXSR7gN",
+     "Stpq9LsQn28qz7coQjVw",
+     "qjeAqhAt7aam2UdmAJJI"
+    ],
+    "generaciones": [
+     "S7HyfeTAi9AurkWCxnVC",
+     "VhAPtnBOCtjyqnxaHOOO",
+     "WTKBpKZoscMeodtxWI2y",
+     "w1f1XRMyumVcMgs6ssrn"
+    ]
+   },
+   "aldric_encadenar": {
+    "prompt": "Iron chains burst up out of cracked stone ground and wrap tightly around someone: grinding rock, rattling links shooting upward, then a hard metallic clank as they lock tight, dark fantasy magic trap, cinematic, 2.5 seconds",
+    "sesiones": [
+     "b7CLL9JPQyiqzcx9fIeS",
+     "v8bC4IQJfPKAOCHsxfmF",
+     "Zz089ZzkBljPvSWeFfBU",
+     "tRcbWpUV5QiBKS9llCAo"
+    ],
+    "generaciones": [
+     "FWZ2m8fu504JPhRIqsjx",
+     "HgeR4EuXsApUhylGOgHO",
+     "95mWnfhC9QgTSM05F6X7",
+     "KDkzQEnB6X87UKqZn6sp"
+    ]
+   },
+   "aldric_marca": {
+    "prompt": "A cursed burning brand on a giant warrior's chest ignites: a deep roaring whoosh of dark red fire, crackling embers, and a low otherworldly droning hum that swells and fades, dark fantasy boss power-up, cinematic, 3 seconds",
+    "sesiones": [
+     "hQ8UuYaXk50KjrOvkRCo",
+     "Hoz7SBYmkzbV0vlid4l5",
+     "fTKIOBGvbPX8zkEroq2s",
+     "ttRGU6m4dzIzUDLn1B33"
+    ],
+    "generaciones": [
+     "b2n79tCj5Hp7n4dNf7wV",
+     "vAaYrPPMlpfjT7oUtJov",
+     "KAWeQUuaIAmr9Pk0AEil",
+     "3e1dRWwwh0Skn3NEPK1U"
+    ]
+   },
+   "aldric_rugido": {
+    "prompt": "An enormous old armored warrior lets out a furious anguished roar, chains rattling and armor shaking, deep long echo off stone walls, epic dark fantasy boss, cinematic, 2.5 seconds",
+    "sesiones": [
+     "xN7tsK6g2UVaW2jnYgNE",
+     "l6tAFulTC0SPQCq7f0tI",
+     "02ZQfgKXTQDc3RPQz5IM",
+     "FioXRp6FkvRoInUqthdO"
+    ],
+    "generaciones": [
+     "49JrKH4klZZH3solPNlb",
+     "IhDfYyQBhdhuYlRoVFhv",
+     "BPVDQGjvIButB6AG8lTX",
+     "ex3Rk8CRZCORUb4IA0NR"
+    ]
+   },
+   "aldric_dolor": {
+    "prompt": "A big old armored warrior grunts in pain when hit: a short deep gravelly grunt with armor plates and chain links clanking, dark fantasy, 1 second",
+    "sesiones": [
+     "VmoxPBoZ0EZl5qY12CwB",
+     "eFZ8rweQ78vz1bBOJz1g",
+     "IvP5ABL0JpNy8KPNq8ek",
+     "rfElIiKIypjLwBSPbRhA"
+    ],
+    "generaciones": [
+     "UII3A5BbFNnaIhz4mEQN",
+     "ZpGeLCMC509v9wyuKWZq",
+     "gKBEyYwHXnCahqsZkLnp",
+     "Y6x9HvxbQWGix8Ik8G3H"
+    ]
+   },
+   "aldric_muerte": {
+    "prompt": "A giant old armored warrior falls slowly to his knees and dies: heavy armor and chains clattering onto stone, a long tired final exhale, then a soft dark whoosh as his body dissolves into shadow, epic dark fantasy boss death, cinematic, 4 seconds",
+    "sesiones": [
+     "ljjT7KkDMSZTqXT6e2cb",
+     "41794vbN2T08rnvRRuQq",
+     "E0K9UdqVltD0pX2X8i8y",
+     "YoGcw22jWeiPcNQojJNb"
+    ],
+    "generaciones": [
+     "BKBJbYB49xsD94xrdyt7",
+     "DrZPA5d63qPJiR3Ie8vN",
+     "CIP2KVfsNLYzAdlGu5F6",
+     "da7JBPQbtp5hT1PnuQUZ"
+    ]
+   },
+   "aldric_rezo": {
+    "prompt": "A tired old knight kneeling alone murmurs a low unintelligible prayer in a deep hoarse voice, with soft wind and a faint chain creak, echoing stone, dark fantasy ambience, 4 seconds",
+    "sesiones": [
+     "lEdtYBXvVAgj3wnNmPlI",
+     "FRejlyY3NUF50BYsTedl",
+     "K8uuLFjaVXlLukHe4ruM",
+     "7P4dnyWYTxRqA3DoGzyR"
+    ],
+    "generaciones": [
+     "nHFPpLUZlvUqseEscvef",
+     "R1GGOPd7UWCY4XIzTdYI",
+     "ptOLbVm0dhUXwKEwgoki",
+     "ROHUtMPkJhctX6f4GXoq"
+    ]
+   },
+   "aldric_arrastre": {
+    "prompt": "A heavy rusted iron chain dragged slowly across a stone floor behind a walking giant: grinding scraping links, rhythmic rattling and clinks, dark fantasy, 3 seconds",
+    "sesiones": [
+     "xZTEhKPRMaMnB1YUBBUr",
+     "9h1yKFWJ9OUEHfdi2r0S",
+     "4E4FBukvsFtvhnYW7EYj",
+     "snQzFC9g8E5YAkQ6yjTR"
+    ],
+    "generaciones": [
+     "bDjBk2NrtGSA1wXOH1ED",
+     "xIqHLHG31z6rlrXsJ0vi",
+     "a4K94IKrYSR1Um7Z3CAn",
+     "SQHl440VleUxa1nwPZxa"
+    ]
+   },
+   "cerco_arrodillan": {
+    "prompt": "Many armored warriors drop to their knees at the same time across a stone courtyard: a wave of armor plates and chains clattering, swords laid down on stone, a low sorrowful murmur, dark fantasy, cinematic, 3 seconds",
+    "sesiones": [
+     "hpJWEBt0WxsPzlbP5DwL",
+     "9RVzszrd4lXDlngPoFuC",
+     "z7QnhWifc350bhWYgO0l",
+     "a1Ktjiw3d7hh4ZpKrowe"
+    ],
+    "generaciones": [
+     "7hL0hj2tKvzDPRKkumgp",
+     "FBa76ob5DZhgu3bFPNJk",
+     "Iw4qKh9pUWK80EhdcH9a",
+     "6kOrGyTy358VNPG61rfo"
+    ]
+   }
+  }
  }
 }
