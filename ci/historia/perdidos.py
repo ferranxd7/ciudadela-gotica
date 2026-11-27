@@ -12,7 +12,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          12: "brumavela", 13: "brumavela", 14: "brumavela", 15: "brumavela", 16: "brumavela",
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
          22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain", 27: "morvain",
-         28: "morvain", 29: "morvain", 30: "morvain"}
+         28: "morvain", 29: "morvain", 30: "morvain", 31: "valdrenn", 32: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -455,6 +455,17 @@ LIBROS = {
    "(On the envelope, under the King's seal) To the Warden of the Bone Fortress. Let my herald carry it along the cloud road, and let him not stop until he reaches the stair.\n\n(Inside, in the King's hand) Warden: the queen has come back, and she is not herself. I made a bargain I should never have made.",
    "Whatever answered me waits on the other side of the door at the top of your tower. Close it and open it to no one: not to whoever wears my crown, not to whoever speaks with my voice. If another letter reaches you with my seal and another hand, burn it. If I myself climb up and knock, do not open.\n\nCorvin",
    "(On the back, in another hand, shaking) I did not arrive. Something caught me on the road that night, and ever since I ride and never arrive: every time I see the stair, the dawn comes. If anyone reads this, let them carry it. And tell them I rode every night.\n\nLucan"]),
+ },
+ # parte 7y: el programa de la ultima funcion del Teatro Real, en el atril de los bastidores del Teatro Hundido
+ 32: {
+  "es": ("El programa de la última función", "La compañía del Teatro Real de Morvain", [
+   "TEATRO REAL DE MORVAIN. Esta noche, ante Su Majestad y toda la corte: «La corona de papel», comedia en tres actos. Con Pell, bufón del Rey, en todos los papeles que nadie más quiso. Música de los tambores de la guardia. No se admiten espadas en la grada.",
+   "Primer acto: el rey que no sabía reír. Segundo acto: los tres Pell (que nadie sepa cuál es el bueno). Tercer acto: la puerta real, por la que sale el Rey...\n\n(Con otra tinta) Ensayado mil veces. El Rey ha prometido venir. El Rey siempre viene.",
+   "(Al dorso, con letra temblorosa) El cielo se puso rojo en mitad del segundo acto. Todos corrieron. Tapiaron la puerta real conmigo detrás, y la orquesta ardió. Sigo esperando para el tercer acto. Si alguien lee esto: la puerta no es de piedra. Nunca lo fue. Golpéala y entra.\n\nPell"]),
+  "en": ("The Playbill of the Last Performance", "The Company of the Royal Theater of Morvain", [
+   "ROYAL THEATER OF MORVAIN. Tonight, before His Majesty and the whole court: 'The Paper Crown', a comedy in three acts. With Pell, the King's jester, in every part no one else wanted. Music by the drums of the guard. No swords allowed in the stands.",
+   "Act one: the king who could not laugh. Act two: the three Pells (let no one know which one is real). Act three: the royal door, through which the King comes out...\n\n(In another ink) Rehearsed a thousand times. The King has promised to come. The King always comes.",
+   "(On the back, in a shaking hand) The sky turned red in the middle of the second act. Everyone ran. They bricked up the royal door with me behind it, and the orchestra burned. I am still waiting for the third act. If anyone reads this: the door is not made of stone. It never was. Strike it and come in.\n\nPell"]),
  },
 }
 

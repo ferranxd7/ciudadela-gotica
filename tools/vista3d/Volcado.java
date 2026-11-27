@@ -874,6 +874,44 @@ public class Volcado {
                 for (var o : v.esperas()) marcas.put((o.variante() == 0 ? "R" : o.variante() == 1 ? "C" : "Z") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
                 andarCerco(lvl, v, antes);
             }
+            case "morvain_teatro" -> {
+                // el Teatro Hundido (parte 7y): la grada, la orquesta, los pasos, el escenario con su muro, los bastidores, y bajo la
+                // llanura el pasillo de la puerta real, la Sala de las Mascaras y el camerino (-Dcaja=x0,z0,x1,z1 para un trozo;
+                // -Dabierto=true: los dos muros ilusorios abiertos)
+                String[] k = System.getProperty("caja", com.darkcraft.morvain.Teatro.X0 + "," + com.darkcraft.morvain.Teatro.Z0 + ","
+                        + com.darkcraft.morvain.Teatro.X1 + "," + (com.darkcraft.morvain.Teatro.Z1 + 10)).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 50);
+                com.darkcraft.morvain.Teatro v = com.darkcraft.morvain.Teatro.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("El teatro: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " que esperan; "
+                        + v.candilejas + " candilejas, " + v.columnas + " columnas, " + v.mascaras + " mascaras, " + v.espectadores + " espectadores, "
+                        + v.lamparas + " lamparas; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas()) marcas.put((n == 0 ? "B" : o.variante() == 0 ? "G" : o.variante() == 1 ? "I" : "C") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarTeatro(lvl, v);
+                if (Boolean.getBoolean("abierto"))
+                    for (String id : new String[]{com.darkcraft.morvain.Teatro.MURO_PUERTA, com.darkcraft.morvain.Teatro.MURO_TRONO})
+                        for (BlockPos q : com.darkcraft.morvain.Teatro.muro(id)) MUNDO.remove(q.asLong());
+            }
             case "morvain_grieta" -> {
                 // el Puente de la Grieta (parte 7s): la grieta con su sangre, el puente con su espadana, la puerta del norte, el paso,
                 // el cementerio, el humilladero, la hospederia con el libro 28 y el campamento de los penitentes
@@ -1407,6 +1445,58 @@ public class Volcado {
      * dispararte); ninguno metido en un bloque y todos con suelo; la escalera sube a lo alto del ancla; y el cerco no toca ni la
      * cadena (el hierro negro) ni la piramide del ancla (salvo la escalera), que son de la ciudadela.
      */
+    /**
+     * El Teatro Hundido (parte 7y): desde la entrada (el camino del santuario) se llega a pie a la grada, la orquesta, los pasos, el
+     * escenario y los bastidores; con la puerta real tapiada no se llega ni al pasillo ni a la sala; abierta, si (y a Pell); con el
+     * muro del trono abierto, al camerino. Cada uno de los de alli con suelo y sin estar metido en un bloque.
+     */
+    static void andarTeatro(WorldGenLevel lvl, com.darkcraft.morvain.Teatro v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        java.util.Set<Long> quitados = new java.util.HashSet<>();
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+            if (quitados.contains(BlockPos.asLong(x, y, z))) return aire;
+            BlockState s = MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+            return s.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || s.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                    ? aire : s;
+        };
+        int[] e = v.sitio("entrada");
+        int X0 = com.darkcraft.morvain.Teatro.X0, Z0 = com.darkcraft.morvain.Teatro.Z0, X1 = com.darkcraft.morvain.Teatro.X1, Z1 = com.darkcraft.morvain.Teatro.Z1 + 8;
+        for (int paso = 0; paso < 3; paso++) {
+            if (paso == 1) for (BlockPos q : com.darkcraft.morvain.Teatro.muro(com.darkcraft.morvain.Teatro.MURO_PUERTA)) quitados.add(q.asLong());
+            if (paso == 2) for (BlockPos q : com.darkcraft.morvain.Teatro.muro(com.darkcraft.morvain.Teatro.MURO_TRONO)) quitados.add(q.asLong());
+            var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], X0, Z0, X1, Z1, 6_000_000);
+            StringBuilder sb = new StringBuilder(paso == 0 ? "a pie, todo cerrado: " : paso == 1 ? "a pie, la puerta real abierta: " : "a pie, los dos muros abiertos: ");
+            sb.append(z0.celdas()).append(" celdas;");
+            for (String s : v.sitios().keySet()) {
+                if (s.equals("alto")) continue;
+                int[] q = v.sitio(s);
+                sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+            }
+            System.out.println(sb);
+            if (paso < 2) continue;
+            int malos = 0, chocan = 0, sinSuelo = 0;
+            for (var o : v.esperas()) {
+                if (!z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                    malos++;
+                    System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z());
+                }
+                for (int dy = 0; dy < 2; dy++) {
+                    BlockState st = mundo.en(o.x(), o.y() + dy, o.z());
+                    if (choca(st)) {
+                        chocan++;
+                        System.out.println("  " + o.grupo() + " metido en un bloque: " + o.x() + "," + (o.y() + dy) + "," + o.z() + " " + st);
+                    }
+                }
+                BlockState abajo = mundo.en(o.x(), o.y() - 1, o.z());
+                if (!choca(abajo)) {
+                    sinSuelo++;
+                    System.out.println("  " + o.grupo() + " sin suelo: " + o.x() + "," + o.y() + "," + o.z() + " " + abajo);
+                }
+            }
+            System.out.println("los del teatro: " + v.esperas().size() + ", sin llegar " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
+        }
+    }
+
     static void andarCerco(WorldGenLevel lvl, com.darkcraft.morvain.Cerco v, Map<Long, BlockState> antes) {
         BlockState aire = Blocks.AIR.defaultBlockState();
         com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {

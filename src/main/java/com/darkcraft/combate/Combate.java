@@ -107,6 +107,8 @@ public final class Combate {
         }
         // el muro falso de la Fortaleza de Hueso se deshace a golpes (en aventura no llega el clic de romper bloques)
         com.darkcraft.fortaleza.Trampas.golpe(sp);
+        // y los muros ilusorios de Morvain (parte 7y)
+        com.darkcraft.morvain.MurosIlusorios.golpe(sp);
         if (accion == Armas.HABILIDAD) {
             habilidad(sp, paso);
             return;

@@ -67,11 +67,11 @@ public final class MorvainEnemigos {
     public static final String VELMOR = "velmor", LLANURAS = "llanuras", MOLINO = "molino", ARBOLEDA = "arboleda", PATIBULO = "patibulo",
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
             CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio",
-            PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar", CERCO = "cerco";
+            PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar", CERCO = "cerco", TEATRO = "teatro";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
             ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
-            PONTIFICE = "pontifice", ALDRIC = "aldric";
+            PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon";
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
     private static final float SUR = 0f, OESTE = 90f, NORTE = 180f, ESTE = -90f;
     private static final int DE_PIE = Enemigo.DE_PIE, REZA = Enemigo.REZA, TUMBADO = Enemigo.TUMBADO;
@@ -82,7 +82,7 @@ public final class MorvainEnemigos {
             BARCA_P = new ArrayList<>(), MONASTERIO_P = new ArrayList<>(), ERMITA_P = new ArrayList<>(), CUMBRE_P = new ArrayList<>(),
             CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>(),
             PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>(), GRIETA_P = new ArrayList<>(), ALTAR_P = new ArrayList<>(),
-            CERCO_P = new ArrayList<>();
+            CERCO_P = new ArrayList<>(), TEATRO_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -215,6 +215,10 @@ public final class MorvainEnemigos {
         for (Cerco.Espera e : Cerco.get().esperas())
             CERCO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? ALDRIC : MARCADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
                     e.ronda(), e.grupo()));
+        // ---- el Teatro Hundido (parte 7y): Pell, el Bufon del Rey, en su sala (el puesto 0) y los calcinados del teatro
+        for (Teatro.Espera e : Teatro.get().esperas())
+            TEATRO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? BUFON : CALCINADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
+                    e.ronda(), e.grupo()));
     }
 
     /** El numero del puesto de la Molinera en el sitio del molino. */
@@ -262,6 +266,11 @@ public final class MorvainEnemigos {
         return 0;
     }
 
+    /** El numero del puesto de Pell, el Bufon del Rey, en el sitio del Teatro. */
+    public static int bufon() {
+        return 0;
+    }
+
     /** Lo apunta el mod al arrancar. */
     public static void registrar() {
         Puestos.tipo(MARCHITO, DarkCraftMod.MARCHITO);
@@ -282,6 +291,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(MARCADO, DarkCraftMod.MARCADO);
         Puestos.tipo(PONTIFICE, DarkCraftMod.PONTIFICE);
         Puestos.tipo(ALDRIC, DarkCraftMod.ALDRIC);
+        Puestos.tipo(BUFON, DarkCraftMod.BUFON);
         preparar();
         Puestos.registrar(VELMOR, VELMOR_P, Morvain::es);
         Puestos.registrar(LLANURAS, LLANURAS_P, Morvain::es);
@@ -315,6 +325,8 @@ public final class MorvainEnemigos {
         // los marcados que golpean el ancla de rodillas solo mientras vive Aldric (vencido, descansan: se deshacen en sombra)
         Puestos.registrar(CERCO, CERCO_P, Morvain::es,
                 (l, p) -> Puestos.JEFE.equals(p.grupo()) || p.postura() != REZA || !Cerco.enPaz(l.getServer()));
+        // el Teatro Hundido: los calcinados del teatro y Pell en su sala
+        Puestos.registrar(TEATRO, TEATRO_P, Morvain::es);
         // al caer la Molinera se abre la reja del molino
         Puestos.alCaer((e, quien) -> {
             if (e instanceof com.darkcraft.enemigos.Molinera && MOLINO.equals(e.sitio()) && e.level() instanceof net.minecraft.server.level.ServerLevel sl)
@@ -343,6 +355,9 @@ public final class MorvainEnemigos {
             // y al caer Aldric los marcados del cerco descansan y la cadena del sur queda libre (lo hace Cerco.paz; aqui, el aviso)
             if (e instanceof com.darkcraft.enemigos.Aldric && CERCO.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] Aldric, el Primer Marcado, cae: los marcados del cerco descansan y la cadena queda libre");
+            // y al caer Pell, el teatro vacio aplaude (lo hace su muerte; aqui, el aviso)
+            if (e instanceof com.darkcraft.enemigos.Bufon && TEATRO.equals(e.sitio()))
+                DarkCraftMod.LOGGER.info("[DarkCraft] Pell, el Bufon del Rey, cae: la ultima funcion se acaba");
         });
     }
 
@@ -424,6 +439,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> cerco() {
         preparar();
         return List.copyOf(CERCO_P);
+    }
+
+    public static List<Puesto> teatro() {
+        preparar();
+        return List.copyOf(TEATRO_P);
     }
 
     public static List<Puesto> puerto() {
@@ -1439,6 +1459,123 @@ public final class MorvainEnemigos {
                     if (m != null) Cerco.abrir(m, true);
                     return decir(c, "la cadena de la puerta, rota");
                 })));
+    }
+
+    /**
+     * {@code /darkcraft teatro [ir <sitio> | enemigos [volver | fuera | sacar] | muro <puerta | trono> [abrir | cerrar]]} (parte 7y):
+     * el Teatro Hundido: ir a uno de sus sitios, sus calcinados, y sus dos muros ilusorios.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoTeatro() {
+        return net.minecraft.commands.Commands.literal("teatro")
+                .executes(c -> decir(c, estadoTeatro(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irTeatro(c.getSource(), "entrada"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Teatro.get().sitios().keySet(), b))
+                                .executes(c -> irTeatro(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoTeatro(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), TEATRO, false);
+                            return decir(c, "vuelven todos los del teatro");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), TEATRO, true);
+                            return decir(c, "fuera todos los del teatro");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, TEATRO).size();
+                            return decir(c, "fuera " + n);
+                        })))
+                .then(net.minecraft.commands.Commands.literal("muro")
+                        .then(net.minecraft.commands.Commands.argument("cual", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(List.of("puerta", "trono"), b))
+                                .executes(c -> {
+                                    var m = Morvain.nivel(c.getSource().getServer());
+                                    return decir(c, m == null ? "Morvain no esta cargado" : MurosIlusorios.estado(m));
+                                })
+                                .then(net.minecraft.commands.Commands.literal("abrir").executes(c -> muroTeatro(c, true)))
+                                .then(net.minecraft.commands.Commands.literal("cerrar").executes(c -> muroTeatro(c, false)))));
+    }
+
+    private static int muroTeatro(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, boolean abrir) {
+        var m = Morvain.nivel(c.getSource().getServer());
+        if (m == null) return 0;
+        String cual = com.mojang.brigadier.arguments.StringArgumentType.getString(c, "cual");
+        String id = "trono".equals(cual) ? Teatro.MURO_TRONO : Teatro.MURO_PUERTA;
+        MurosIlusorios.Muro w = MurosIlusorios.muro(id);
+        if (abrir) MurosIlusorios.abrir(m, w, c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp ? sp : null);
+        else MurosIlusorios.cerrar(m, id);
+        return decir(c, MurosIlusorios.estado(m));
+    }
+
+    private static int irTeatro(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Teatro.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Teatro.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando al escenario (al norte); en la sala, al trono
+        float giro = 180f;
+        if ("entrada".equals(sitio) || "summa".equals(sitio)) giro = 180f;
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, giro, 5f);
+        return 1;
+    }
+
+    /** Cuantos calcinados del teatro quedan, como estan sus muros ilusorios y lo que hay (si esta cargado). */
+    public static String estadoTeatro(net.minecraft.server.MinecraftServer srv) {
+        String s = "teatro hundido: quedan " + Puestos.quedan(srv, TEATRO) + " de " + TEATRO_P.size() + " (fuera " + Puestos.fuera(TEATRO) + ")";
+        var m = Morvain.nivel(srv);
+        int[] at = Teatro.get().sitio("atril");
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(at[0], at[1], at[2])) && m.isLoaded(new net.minecraft.core.BlockPos(Teatro.CX, Teatro.SALA, Teatro.CZ + Teatro.SALA_V)))
+            s += "; " + Teatro.resumen(m) + "; muros: " + MurosIlusorios.estado(m);
+        return s;
+    }
+
+    /**
+     * {@code /darkcraft bufon [ir | vencer | volver | partir]} (parte 7y): como esta Pell, llevar ante el (a la entrada de su sala,
+     * con la puerta real abierta), vencerle, que vuelva o que se parta en tres ya.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoBufon() {
+        return net.minecraft.commands.Commands.literal("bufon")
+                .executes(c -> decir(c, estadoBufon(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> {
+                    var m = Morvain.nivel(c.getSource().getServer());
+                    if (m != null) MurosIlusorios.abrir(m, MurosIlusorios.muro(Teatro.MURO_PUERTA), null);
+                    irTeatro(c.getSource(), "sala");
+                    return decir(c, estadoBufon(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(TEATRO, bufon());
+                    if (e instanceof com.darkcraft.enemigos.Bufon b) b.vencer();
+                    else {
+                        Puestos.marcar(srv, TEATRO, bufon(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "bufon");
+                    }
+                    return decir(c, estadoBufon(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, TEATRO, bufon(), false);
+                    return decir(c, estadoBufon(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("partir").executes(c -> {
+                    Enemigo e = Puestos.enemigo(TEATRO, bufon());
+                    if (e instanceof com.darkcraft.enemigos.Bufon b) b.mediaVida();
+                    return decir(c, estadoBufon(c.getSource().getServer()));
+                }));
+    }
+
+    /** Como esta Pell: para el comando y las pruebas. */
+    public static String estadoBufon(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(TEATRO, bufon());
+        String s = "Pell: " + (Puestos.muerto(srv, TEATRO, bufon()) ? "caido" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Bufon b) s += ", " + b.estado();
+        return s;
     }
 
     /** Como esta Aldric (y su cerco, si esta cargado): para el comando y las pruebas. */

@@ -267,7 +267,7 @@ public final class Morvain {
     }
 
     /** Si hay alguien cerca del Patio del Juramento o del Observatorio (se mira cada segundo). */
-    private static boolean cercaJuramento, cercaObservatorio, cercaCerco;
+    private static boolean cercaJuramento, cercaObservatorio, cercaCerco, cercaTeatro;
 
     /** Al acabar cada tick, los que entraron en un portal; y cada segundo, con alguien cerca del arco, su remolino. */
     @SubscribeEvent
@@ -341,6 +341,16 @@ public final class Morvain {
             }
             if (cercaCerco) Cerco.tick(m);
             if (srv.getTickCount() % 20 == 9) Cerco.paz(m);
+            // el Teatro Hundido (parte 7y): sus muros ilusorios (lo abierto no vuelve) y, tras la puerta real tapiada, la risa
+            if (srv.getTickCount() % 20 == 5) {
+                cercaTeatro = false;
+                for (ServerPlayer p : m.players())
+                    if (Teatro.distancia(p.getX(), p.getZ()) < 110) cercaTeatro = true;
+                if (cercaTeatro) {
+                    MurosIlusorios.tick(m);
+                    Teatro.tick(m);
+                }
+            }
         }
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
@@ -405,6 +415,10 @@ public final class Morvain {
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Cerco.enCerco(p.getX(), p.getZ()) && Math.abs(p.getY() - Cerco.PISO) < 12)
                 com.darkcraft.story.Logros.dar(p, "cerco");
+        // y quien baja al Teatro Hundido (parte 7y)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Teatro.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Teatro.PISO) < 14)
+                com.darkcraft.story.Logros.dar(p, "teatro");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -492,6 +506,9 @@ public final class Morvain {
         // el Altar Profanado, donde reza Anselmo (parte 7t)
         if (Altar.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Altar.PISO) < 40) return "darkcraft.morvain.lugar.altar";
         if (Cerco.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Cerco.PISO) < 40) return "darkcraft.morvain.lugar.cerco";
+        // el Teatro Hundido y, bajo la llanura, la Sala de las Mascaras de Pell (parte 7y)
+        if (Teatro.enSala(p.getX(), p.getY(), p.getZ())) return "darkcraft.morvain.lugar.mascaras";
+        if (Teatro.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Teatro.PISO) < 30) return "darkcraft.morvain.lugar.teatro";
         // el Puente de la Grieta (parte 7s): tambien en el fondo de la grieta
         if (Grieta.dentro(p.getX(), p.getZ()) && p.getY() > Grieta.FONDO - 4 && p.getY() < Grieta.PISO + 40) return "darkcraft.morvain.lugar.grieta";
         // el Observatorio de la Rectora (parte 7p)

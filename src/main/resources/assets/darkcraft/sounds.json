@@ -5819,5 +5819,217 @@
         "stream": false
       }
     ]
+  },
+  "sfx.bufon_risa": {
+    "subtitle": "subtitles.darkcraft.sfx.bufon_risa",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/bufon_risa_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/bufon_risa_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.bufon_cascabeles": {
+    "subtitle": "subtitles.darkcraft.sfx.bufon_cascabeles",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/bufon_cascabeles_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "darkcraft:sfx/bufon_cascabeles_2",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "sfx.bufon_tajo": {
+    "subtitle": "subtitles.darkcraft.sfx.bufon_tajo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/bufon_tajo_1"
+      },
+      {
+        "name": "darkcraft:sfx/bufon_tajo_2"
+      }
+    ]
+  },
+  "sfx.bufon_cuchillos": {
+    "subtitle": "subtitles.darkcraft.sfx.bufon_cuchillos",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/bufon_cuchillos_1"
+      },
+      {
+        "name": "darkcraft:sfx/bufon_cuchillos_2"
+      }
+    ]
+  },
+  "sfx.bufon_malabar": {
+    "subtitle": "subtitles.darkcraft.sfx.bufon_malabar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/bufon_malabar_1"
+      },
+      {
+        "name": "darkcraft:sfx/bufon_malabar_2"
+      }
+    ]
+  },
+  "sfx.bufon_bola": {
+    "subtitle": "subtitles.darkcraft.sfx.bufon_bola",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/bufon_bola_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/bufon_bola_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.bufon_humo": {
+    "subtitle": "subtitles.darkcraft.sfx.bufon_humo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/bufon_humo_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/bufon_humo_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.bufon_ilusion": {
+    "subtitle": "subtitles.darkcraft.sfx.bufon_ilusion",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/bufon_ilusion_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/bufon_ilusion_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.bufon_pirueta": {
+    "subtitle": "subtitles.darkcraft.sfx.bufon_pirueta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/bufon_pirueta_1"
+      },
+      {
+        "name": "darkcraft:sfx/bufon_pirueta_2"
+      }
+    ]
+  },
+  "sfx.bufon_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.bufon_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/bufon_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/bufon_dolor_2"
+      }
+    ]
+  },
+  "sfx.bufon_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.bufon_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/bufon_muerte_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/bufon_muerte_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.muro_ilusorio": {
+    "subtitle": "subtitles.darkcraft.sfx.muro_ilusorio",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/muro_ilusorio_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/muro_ilusorio_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.teatro_aplauso": {
+    "subtitle": "subtitles.darkcraft.sfx.teatro_aplauso",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/teatro_aplauso_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/teatro_aplauso_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "bufon.voz.1": {
+    "subtitle": "subtitles.darkcraft.bufon.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:bufon/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "bufon.voz.2": {
+    "subtitle": "subtitles.darkcraft.bufon.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:bufon/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "bufon.voz.3": {
+    "subtitle": "subtitles.darkcraft.bufon.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:bufon/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "bufon.voz.4": {
+    "subtitle": "subtitles.darkcraft.bufon.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:bufon/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "bufon.voz.5": {
+    "subtitle": "subtitles.darkcraft.bufon.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:bufon/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "musica.bufon": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/bufon",
+        "stream": true
+      }
+    ]
   }
 }

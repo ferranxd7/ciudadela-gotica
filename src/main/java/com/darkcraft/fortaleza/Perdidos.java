@@ -34,9 +34,9 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class Perdidos {
     private Perdidos() {}
 
-    public static final int TOTAL = 31;
+    public static final int TOTAL = 32;
     /** Paginas de cada libro (las mismas en todos los idiomas; ver ci/historia/perdidos.py). */
-    private static final int[] PAGINAS = {0, 2, 2, 3, 2, 3, 2, 3, 2, 3, 3, 1, 3, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+    private static final int[] PAGINAS = {0, 2, 2, 3, 2, 3, 2, 3, 2, 3, 3, 1, 3, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
     /** Donde va cada libro de Valdrenn: el sitio del mapa (MapShapes). */
     private static final String[] SITIO = {null, "pueblo", "puerta_interior", "catedral", "jardin", "patio_armas"};
     public static final String TAG = "darkcraft_perdido";
@@ -85,12 +85,12 @@ public final class Perdidos {
     /** El jugador ha leido (o tiene) el libro n: se apunta en su Libro de la Sombra. */
     public static void encontrado(ServerPlayer p, int n) {
         if (n < 1 || n > TOTAL) return;
-        int antes = Espejo.perdidos(p);
-        if ((antes & (1 << n)) != 0) return;
-        int ahora = antes | (1 << n);
+        long antes = Espejo.perdidos(p);
+        if ((antes & (1L << n)) != 0) return;
+        long ahora = antes | (1L << n);
         Espejo.ponerPerdidos(p, ahora);
         Logros.dar(p, "libro_perdido");
-        if (Integer.bitCount(ahora >>> 1) >= TOTAL) Logros.dar(p, "libros_perdidos");
+        if (Long.bitCount(ahora >>> 1) >= TOTAL) Logros.dar(p, "libros_perdidos");
         p.displayClientMessage(Component.translatable("darkcraft.perdido.anotado",
                 Component.translatable("darkcraft.perdido." + n + ".titulo")).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC), true);
     }

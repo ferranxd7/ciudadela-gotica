@@ -746,6 +746,8 @@ public final class CiTest {
         cerco(server, m, log, out);
         aldric(server, m, log, out);
         gigantes(server, m, log, out);
+        teatro(server, m, log, out);
+        bufon(server, m, log, out);
     }
 
     /**
@@ -3242,6 +3244,413 @@ public final class CiTest {
     }
 
     /** Lo que deja Aldric (sus reflejos): un tick, a mano (la prueba no mueve el mundo). */
+    // ------------------------------------------------------------------ parte 7y: el Teatro Hundido y Pell, el Bufon del Rey
+
+    /**
+     * Parte 7y: el Teatro Hundido. Se levantan sus chunks; a pie desde la entrada (el camino del santuario del Teatro) se llega a la
+     * grada, la orquesta, el escenario, los pasos y los bastidores, pero no al pasillo ni a la sala con la puerta real tapiada;
+     * golpear el tapiado (un jugador mirandolo, como el combate) lo deshace (muro ilusorio): entonces se llega al pasillo, a la sala y
+     * a Pell; con el muro del trono deshecho, al camerino. Lo que hay (el atril con el libro 32, los arcones, la grada, el trono),
+     * el santuario con su nombre, los sitios con nombre del Espejo y los calcinados del teatro en su sitio. Al acabar, los muros
+     * cerrados otra vez (la prueba del cliente juega en este mundo).
+     */
+    private static void teatro(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.TEATRO;
+        var T = com.darkcraft.morvain.Teatro.get();
+        final int CX = com.darkcraft.morvain.Teatro.CX, CZ = com.darkcraft.morvain.Teatro.CZ;
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : T.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            com.darkcraft.morvain.MurosIlusorios.cerrar(m, com.darkcraft.morvain.Teatro.MURO_PUERTA);
+            com.darkcraft.morvain.MurosIlusorios.cerrar(m, com.darkcraft.morvain.Teatro.MURO_TRONO);
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || st.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                        ? aire : st;
+            };
+            int[] en = T.sitio("entrada");
+            StringBuilder sb = new StringBuilder("Morvain, el teatro hundido: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Teatro.resumen(m));
+            String[] fases = {"todo cerrado", "la puerta real abierta", "los dos muros abiertos"};
+            for (int fase = 0; fase < 3; fase++) {
+                if (fase == 1) {
+                    // un jugador ante el tapiado, mirandolo, golpea (lo que hace el combate)
+                    var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("7d9e1f30-5b62-4d8e-8fa0-4b5c6d7e8fcd"), "[DarkCraftCI14]"));
+                    int[] q = T.sitio("puerta");
+                    fp.moveTo(q[0] + 0.5, q[1], q[2] + 0.5, 180f, 0f);
+                    fp.setYHeadRot(180f);
+                    int ab0 = com.darkcraft.morvain.MurosIlusorios.ABIERTOS;
+                    com.darkcraft.morvain.MurosIlusorios.golpe(fp);
+                    sb.append("; golpe al tapiado: se abre +").append(com.darkcraft.morvain.MurosIlusorios.ABIERTOS - ab0).append(" (")
+                            .append(com.darkcraft.morvain.MurosIlusorios.estado(m)).append(')');
+                }
+                if (fase == 2) com.darkcraft.morvain.MurosIlusorios.abrir(m, com.darkcraft.morvain.MurosIlusorios.muro(com.darkcraft.morvain.Teatro.MURO_TRONO), null);
+                var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, en[0], en[1], en[2], com.darkcraft.morvain.Teatro.X0, com.darkcraft.morvain.Teatro.Z0,
+                        com.darkcraft.morvain.Teatro.X1, com.darkcraft.morvain.Teatro.Z1, 6_000_000);
+                sb.append("; a pie, ").append(fases[fase]).append(" (").append(zona.celdas()).append(" celdas):");
+                for (var e : T.sitios().entrySet()) {
+                    if (e.getKey().equals("alto")) continue;
+                    int[] q = e.getValue();
+                    sb.append(' ').append(e.getKey()).append(zona.alcanza(q[0], q[1], q[2], 2) ? "+" : "-");
+                }
+                if (fase == 2) {
+                    int lejos = 0;
+                    for (var o : T.esperas()) if (!zona.alcanza(o.x(), o.y(), o.z(), 2)) lejos++;
+                    sb.append("; de los ").append(T.esperas().size()).append(" del teatro, a los que no se llega ").append(lejos);
+                }
+            }
+            var st = com.darkcraft.morvain.SantuariosMorvain.porId("teatro");
+            int[] sala = T.sitio("pell"), orq = T.sitio("orquesta"), esc = T.sitio("escena");
+            sb.append("; santuario ").append(com.darkcraft.santuario.Santuarios.nombre(m, st.pos())).append(" (").append(m.getBlockState(st.pos()).getBlock().getDescriptionId())
+                    .append(") a ").append(Math.round(com.darkcraft.morvain.Teatro.distancia(st.x(), st.z()))).append(" de la orquesta; el sitio: orquesta ")
+                    .append(com.darkcraft.morvain.Teatro.dentro(orq[0] + 0.5, orq[2] + 0.5)).append(", sala ").append(com.darkcraft.morvain.Teatro.enSala(sala[0] + 0.5, sala[1], sala[2] + 0.5))
+                    .append(", el escenario no es la sala ").append(!com.darkcraft.morvain.Teatro.enSala(esc[0] + 0.5, esc[1], esc[2] + 0.5));
+            log.println(sb);
+            topView(m, CX, CZ - 10, 64, new File(out, "morvain_teatro.png"));
+            // ---- los calcinados del teatro: en su sitio, en su suelo y ninguno metido en un bloque
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 8; k++)
+                for (var e : fuera) if (e.isAlive() && !(e instanceof com.darkcraft.enemigos.Bufon)) e.tick();
+            int[] porVariante = new int[3];
+            int calcinados = 0, enSuelo = 0, chocan = 0, tumbados = 0, agazapados = 0, pell = 0;
+            StringBuilder mal = new StringBuilder();
+            for (var e : fuera) {
+                if (e instanceof com.darkcraft.enemigos.Bufon) {
+                    pell++;
+                    continue;
+                }
+                if (!(e instanceof com.darkcraft.enemigos.Calcinado c)) continue;
+                calcinados++;
+                porVariante[Math.max(0, Math.min(2, c.variante()))]++;
+                if (!m.noCollision(c)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(c.blockPosition().toShortString()).append(';');
+                }
+                if (c.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) tumbados++;
+                if (c.postura() == com.darkcraft.enemigos.Enemigo.REZA) agazapados++;
+                var abajo = m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ()));
+                if (!abajo.getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+                else if (mal.length() < 400) mal.append(" en el aire en ").append(c.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, los del teatro: fuera " + fuera.size() + " de " + com.darkcraft.morvain.MorvainEnemigos.teatro().size() + " (Pell " + pell
+                    + ", calcinados " + calcinados + ": guardia " + porVariante[0] + ", incendiarios " + porVariante[1] + ", cenicientos " + porVariante[2]
+                    + "; enterrados en la ceniza " + tumbados + ", agazapados " + agazapados + ", en su suelo " + enSuelo + "); metidos en un bloque " + chocan
+                    + " (tiene que ser 0)" + mal);
+        } catch (Throwable t) {
+            log.println("Morvain, el teatro hundido: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] teatro", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+        }
+    }
+
+    /** Hace andar lo que tira Pell (cuchillos, bolas, llamas) y sus ilusiones en la caja. */
+    private static void tickBufon(ServerLevel m, net.minecraft.world.phys.AABB caja, java.util.List<net.minecraft.world.entity.Entity> quitar) {
+        for (var e : m.getEntitiesOfClass(net.minecraft.world.entity.Entity.class, caja,
+                q -> q instanceof com.darkcraft.enemigos.ProyectilBufon || q instanceof com.darkcraft.enemigos.Cantaro.Llamas
+                        || q instanceof com.darkcraft.enemigos.Bufon b && b.ilusion())) {
+            if (e.isRemoved()) continue;
+            if (!quitar.contains(e)) quitar.add(e);
+            e.tickCount++;
+            e.tick();
+        }
+    }
+
+    /**
+     * Parte 7y: Pell, el Bufon del Rey, en la Sala de las Mascaras: de pie en medio de su sala (y en su suelo); al ver a alguien
+     * en su sala habla y hace la reverencia; cada accion acaba; sus golpes a una presa (el tajo doble, la pirueta, los tres
+     * cuchillos, los malabares con sus tres bolas de fuego que revientan, la bomba de humo que ciega y de la que sale por la espalda,
+     * la voltereta en la que no le entra nada); a media vida se parte en tres (dos ilusiones que se deshacen de un golpe, y pegarle
+     * a el deshace las que queden); y al caer se queda tumbado, el teatro aplaude, se deshace y no vuelve. Al acabar, todo como
+     * estaba.
+     */
+    private static void bufon(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.TEATRO;
+        var T = com.darkcraft.morvain.Teatro.get();
+        final int CX = com.darkcraft.morvain.Teatro.CX, CZ = com.darkcraft.morvain.Teatro.CZ, SALA = com.darkcraft.morvain.Teatro.SALA;
+        final int SV = com.darkcraft.morvain.Teatro.SALA_V;
+        final var caja = new net.minecraft.world.phys.AABB(CX - 20, SALA - 4, CZ + SV - 20, CX + 20, SALA + 14, CZ + SV + 20);
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        com.darkcraft.enemigos.Bufon pe = null;
+        try {
+            for (long k : T.chunks()) m.getChunk((int) (k >> 32), (int) k);
+            com.darkcraft.morvain.MurosIlusorios.abrir(m, com.darkcraft.morvain.MurosIlusorios.muro(com.darkcraft.morvain.Teatro.MURO_PUERTA), null);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) if (e instanceof com.darkcraft.enemigos.Bufon b && !b.ilusion()) pe = b;
+            if (pe == null) {
+                log.println("Morvain, Pell: NO SALE");
+                return;
+            }
+            final double px = CX + 0.5, py = SALA + 1, pz = CZ + SV + 0.5;
+            boolean enSuSuelo = !m.getBlockState(BlockPos.containing(pe.getX(), pe.getY() - 0.2, pe.getZ())).getCollisionShape(m, BlockPos.ZERO).isEmpty();
+            StringBuilder sb = new StringBuilder(String.format(java.util.Locale.ROOT, "Morvain, Pell: en %s postura %d (0 de pie), giro %d, vida %.0f, golpe %.1f,"
+                            + " armadura %d, caja %.1f x %.1f, en medio de su sala %s, en su suelo %s, metido en un bloque %s (tiene que ser false), musica %d",
+                    pe.blockPosition().toShortString(), pe.postura(), Math.round(pe.getYRot()), pe.getMaxHealth(),
+                    pe.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), pe.getArmorValue(), pe.getBbWidth(), pe.getBbHeight(),
+                    Math.hypot(pe.getX() - px, pe.getZ() - pz) < 2, enSuSuelo, !m.noCollision(pe), pe.musica()));
+            var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("8e0f2041-6c73-4e9f-90b1-5c6d7e8f90de"), "[DarkCraftCI15]"));
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- le ve entrar en su sala: habla y hace la reverencia (no ataca hasta acabar la frase)
+            final double fx = CX + 0.5, fy = SALA + 1, fz = CZ + SV + 9.5;
+            fp.moveTo(fx, fy, fz, 180f, 0f);
+            fp.setOnGround(true);
+            boolean percibe = false;
+            try {
+                java.lang.reflect.Method mt = com.darkcraft.enemigos.Bufon.class.getDeclaredMethod("percibe", net.minecraft.world.entity.LivingEntity.class);
+                mt.setAccessible(true);
+                percibe = (Boolean) mt.invoke(pe, fp);
+            } catch (Throwable ignored) {
+            }
+            pe.setTarget(fp);
+            int reverencia = -1, primerGolpe = -1;
+            for (int k = 0; k < 260; k++) {
+                pe.tickCount++;
+                pe.tick();
+                tickBufon(m, caja, quitar);
+                fp.moveTo(fx, fy, fz, 180f, 0f);
+                fp.setOnGround(true);
+                fp.setHealth(fp.getMaxHealth());
+                int a = pe.accion();
+                if (reverencia < 0 && a == com.darkcraft.enemigos.BufonAnims.REVERENCIA) reverencia = k;
+                if (primerGolpe < 0 && a != 0 && a != com.darkcraft.enemigos.BufonAnims.REVERENCIA && a != com.darkcraft.enemigos.BufonAnims.RISA) {
+                    primerGolpe = k;
+                    break;
+                }
+            }
+            sb.append("; le ve entrar ").append(percibe).append(": pelea ").append(pe.enPelea()).append(", la reverencia en el tick ").append(reverencia)
+                    .append(", el primer golpe en el ").append(primerGolpe).append(" (la frase 1 dura ").append(com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Bufon.VOZ_BASE + 1))
+                    .append(')');
+            // ---- cada accion acaba (sin presa y quieto)
+            pe.quieta = true;
+            pe.setTarget(null);
+            for (int k = 0; k < 120 && pe.accion() != 0; k++) {
+                pe.tickCount++;
+                pe.tick();
+                tickBufon(m, caja, quitar);
+            }
+            StringBuilder nn = new StringBuilder();
+            int vistas = 0;
+            for (int a = 1; a < com.darkcraft.enemigos.BufonAnims.TICKS.length; a++) {
+                String nombre = com.darkcraft.enemigos.BufonAnims.NOMBRES[a];
+                if (nombre.equals("morir")) continue;
+                pe.moveTo(px, py, pz, 0f, 0f);
+                pe.empezar(a);
+                vistas++;
+                for (int k = 0; k < 160 && pe.accion() == a; k++) {
+                    pe.tickCount++;
+                    pe.tick();
+                    tickBufon(m, caja, quitar);
+                }
+                if (pe.accion() == a) nn.append(' ').append(nombre);
+                // (lo que deja: las ilusiones y el humo)
+                for (int k = 0; k < 40 && (pe.accion() != 0 || pe.isInvisible()); k++) {
+                    pe.tickCount++;
+                    pe.tick();
+                }
+            }
+            for (var b : m.getEntitiesOfClass(com.darkcraft.enemigos.Bufon.class, caja, b -> b.ilusion())) b.discard();
+            pe.setInvisible(false);
+            sb.append("; de ").append(vistas).append(" acciones no acaban:").append(nn.length() == 0 ? " ninguna" : nn);
+            log.println(sb);
+            // ---- sus golpes a una presa (un aldeano quieto y duro) en su sala, delante de el (al sur)
+            StringBuilder sg = new StringBuilder("Morvain, los golpes de Pell a una presa:");
+            var victima = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+            if (victima != null) {
+                victima.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(900.0);
+                victima.setHealth(900f);
+                victima.setNoAi(true);
+                m.addFreshEntity(victima);
+                quitar.add(victima);
+                String[] golpes = {"tajo", "pirueta", "cuchillos", "malabares", "humo", "voltereta"};
+                int[] acc = {com.darkcraft.enemigos.BufonAnims.TAJO, com.darkcraft.enemigos.BufonAnims.PIRUETA, com.darkcraft.enemigos.BufonAnims.CUCHILLOS,
+                        com.darkcraft.enemigos.BufonAnims.MALABARES, com.darkcraft.enemigos.BufonAnims.HUMO, com.darkcraft.enemigos.BufonAnims.VOLTERETA};
+                double[] lejos = {2.4, 2.2, 8.0, 8.0, 2.6, 2.2};
+                int[] dura = {40, 40, 70, 110, 60, 50};
+                for (int i = 0; i < golpes.length; i++) {
+                    victima.setHealth(victima.getMaxHealth());
+                    victima.invulnerableTime = 0;
+                    victima.hurtTime = 0;
+                    victima.removeAllEffects();
+                    victima.clearFire();
+                    victima.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    victima.moveTo(px, py, pz + lejos[i], 180f, 0f);
+                    victima.setOnGround(true);
+                    int ta = pe.tajos(), pi = pe.piruetas(), cu = pe.cuchillos(), bo = pe.bolas(), hu = pe.humos(), ap = pe.apariciones(), vo = pe.volteretas(),
+                            es = pe.esquivados();
+                    int cd = com.darkcraft.enemigos.ProyectilBufon.CUCHILLOS_DAN, bd = com.darkcraft.enemigos.ProyectilBufon.BOLAS_DAN,
+                            br = com.darkcraft.enemigos.ProyectilBufon.BOLAS_REVIENTAN;
+                    pe.moveTo(px, py, pz, 0f, 0f);
+                    pe.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    pe.setTarget(victima);
+                    pe.setYRot(0f);
+                    pe.yBodyRot = pe.yHeadRot = 0f;
+                    pe.empezar(acc[i]);
+                    float antes = victima.getHealth();
+                    boolean esquiva = false, invisible = false;
+                    double lejosAlSalir = -1;
+                    for (int k = 0; k < dura[i]; k++) {
+                        boolean el = pe.accion() != 0 || pe.isInvisible();
+                        if (el) {
+                            pe.setTarget(victima);
+                            pe.tickCount++;
+                            pe.tick();
+                            // (el humo y la voltereta le llevan: no se le devuelve a su sitio)
+                            if (acc[i] != com.darkcraft.enemigos.BufonAnims.HUMO && acc[i] != com.darkcraft.enemigos.BufonAnims.VOLTERETA) pe.moveTo(px, py, pz, 0f, 0f);
+                        }
+                        if (pe.isInvisible()) invisible = true;
+                        if (acc[i] == com.darkcraft.enemigos.BufonAnims.HUMO && lejosAlSalir < 0 && pe.accion() == com.darkcraft.enemigos.BufonAnims.APARECE)
+                            lejosAlSalir = Math.hypot(pe.getX() - victima.getX(), pe.getZ() - victima.getZ());
+                        if (acc[i] == com.darkcraft.enemigos.BufonAnims.VOLTERETA && pe.accion() == com.darkcraft.enemigos.BufonAnims.VOLTERETA && k == 6) {
+                            pe.invulnerableTime = 0;
+                            esquiva = !pe.hurt(m.damageSources().playerAttack(fp), 5f);
+                        }
+                        tickBufon(m, caja, quitar);
+                        moverPresa(victima);
+                        victima.setOnGround(true);
+                        victima.invulnerableTime = 0;
+                        if (!el && k > 30) break;
+                    }
+                    sg.append(' ').append(golpes[i]).append(String.format(java.util.Locale.ROOT, " a %.1f: -%.1f", lejos[i], antes - victima.getHealth()));
+                    switch (i) {
+                        case 0 -> sg.append(", tajos +").append(pe.tajos() - ta);
+                        case 1 -> sg.append(", piruetas +").append(pe.piruetas() - pi);
+                        case 2 -> sg.append(", cuchillos +").append(pe.cuchillos() - cu).append(" (dan +").append(com.darkcraft.enemigos.ProyectilBufon.CUCHILLOS_DAN - cd).append(')');
+                        case 3 -> sg.append(", bolas +").append(pe.bolas() - bo).append(" (revientan +").append(com.darkcraft.enemigos.ProyectilBufon.BOLAS_REVIENTAN - br)
+                                .append(", dan de lleno +").append(com.darkcraft.enemigos.ProyectilBufon.BOLAS_DAN - bd).append(", la presa arde ").append(victima.getRemainingFireTicks() > 0)
+                                .append(')');
+                        case 4 -> sg.append(", humos +").append(pe.humos() - hu).append(" (se esfuma ").append(invisible).append(", sale +").append(pe.apariciones() - ap)
+                                .append(String.format(java.util.Locale.ROOT, " a %.1f de su presa)", lejosAlSalir));
+                        case 5 -> sg.append(", volteretas +").append(pe.volteretas() - vo).append(" (esquiva el golpe ").append(esquiva).append(", +")
+                                .append(pe.esquivados() - es).append(String.format(java.util.Locale.ROOT, "; queda a %.1f de su presa)",
+                                        Math.hypot(pe.getX() - victima.getX(), pe.getZ() - victima.getZ())));
+                        default -> {
+                        }
+                    }
+                    sg.append(';');
+                    pe.setInvisible(false);
+                }
+                // los cegados por el humo: un jugador a su lado
+                fp.moveTo(px + 1.2, py, pz + 1.2, 180f, 0f);
+                fp.removeAllEffects();
+                int ce = pe.cegados();
+                pe.moveTo(px, py, pz, 0f, 0f);
+                pe.setTarget(fp);
+                pe.empezar(com.darkcraft.enemigos.BufonAnims.HUMO);
+                for (int k = 0; k < 30 && (pe.accion() != 0 || pe.isInvisible()); k++) {
+                    pe.tickCount++;
+                    pe.tick();
+                    fp.moveTo(px + 1.2, py, pz + 1.2, 180f, 0f);
+                }
+                sg.append(" el humo ciega a un jugador a su lado +").append(pe.cegados() - ce).append(" (ciego ")
+                        .append(fp.hasEffect(net.minecraft.world.effect.MobEffects.BLINDNESS)).append(");");
+                fp.removeAllEffects();
+                pe.setInvisible(false);
+                sg.append(" en total: ").append(pe.estado());
+            }
+            log.println(sg);
+            // ---- a media vida se parte en tres: las ilusiones se deshacen de un golpe y pegarle a el deshace las que queden
+            StringBuilder sm = new StringBuilder("Morvain, Pell a media vida:");
+            pe.setHealth(pe.getMaxHealth());
+            pe.moveTo(px, py, pz, 0f, 0f);
+            if (victima != null) {
+                victima.moveTo(px, py, pz + 4, 180f, 0f);
+                pe.setTarget(victima);
+            }
+            pe.mediaVida();
+            boolean seParte = pe.accion() == com.darkcraft.enemigos.BufonAnims.ILUSION;
+            for (int k = 0; k < 40 && pe.accion() == com.darkcraft.enemigos.BufonAnims.ILUSION; k++) {
+                pe.tickCount++;
+                pe.tick();
+                tickBufon(m, caja, quitar);
+            }
+            var copias = new java.util.ArrayList<>(pe.ilusiones());
+            int nCopias = copias.size();
+            boolean iguales = true, sinBarra = true, noSeGuardan = true;
+            for (var c : copias) {
+                if (c.variante() != pe.variante()) iguales = false;
+                if (c.enPelea()) sinBarra = false;
+                if (c.shouldBeSaved()) noSeGuardan = false;
+            }
+            // a una se le pega: se deshace (y a el no le pasa nada)
+            boolean unaSeDeshace = false;
+            float vidaAntes = pe.getHealth();
+            if (!copias.isEmpty()) {
+                var c = copias.get(0);
+                c.hurt(m.damageSources().playerAttack(fp), 3f);
+                unaSeDeshace = c.isRemoved();
+            }
+            float trasCopia = pe.getHealth();
+            int quedanAntes = pe.ilusiones().size();
+            pe.invulnerableTime = 0;
+            pe.hurt(m.damageSources().playerAttack(fp), 6f);
+            int quedanDespues = pe.ilusiones().size();
+            sm.append(" segunda ").append(pe.segunda()).append(", se parte ").append(seParte).append(" (ilusiones ").append(nCopias)
+                    .append(", iguales a el ").append(iguales).append(", sin barra ").append(sinBarra).append(", no se guardan ").append(noSeGuardan)
+                    .append("); a una se le pega y se deshace ").append(unaSeDeshace).append(String.format(java.util.Locale.ROOT, " (a el no le quita: %.0f -> %.0f",
+                            vidaAntes, trasCopia)).append("); quedan ").append(quedanAntes)
+                    .append(" y al pegarle a el ").append(quedanDespues).append(" (tiene que ser 0); ").append(pe.estado());
+            log.println(sm);
+            for (var b : m.getEntitiesOfClass(com.darkcraft.enemigos.Bufon.class, caja, b -> b.ilusion())) b.discard();
+            // ---- cae: tumbado, el teatro aplaude, se deshace en confeti y no vuelve
+            pe.quieta = true;
+            for (int k = 0; k < 120 && pe.accion() != 0; k++) {
+                pe.tickCount++;
+                pe.tick();
+            }
+            pe.setTarget(fp);
+            pe.invulnerableTime = 0;
+            pe.hurt(m.damageSources().playerAttack(fp), 99999f);
+            boolean muere = !pe.isAlive();
+            int seVa = -1;
+            for (int fin = 0; fin < 400; fin++) {
+                if (!pe.isRemoved()) {
+                    pe.tickCount++;
+                    pe.tick();
+                }
+                if (seVa < 0 && pe.isRemoved()) {
+                    seVa = fin;
+                    break;
+                }
+            }
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, com.darkcraft.morvain.MorvainEnemigos.bufon(), true);
+            int objetos = m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, caja).size();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, com.darkcraft.morvain.MorvainEnemigos.bufon(), true);
+            boolean vuelve = false;
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) if (e instanceof com.darkcraft.enemigos.Bufon) vuelve = true;
+            log.println("Morvain, Pell cae: muere " + muere + ", se deshace en el tick " + seVa + " (la frase 5 dura " + com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Bufon.VOZ_BASE + 5)
+                    + "), objetos " + objetos + ", vuelve al descansar " + vuelve + " (tiene que ser false); " + com.darkcraft.morvain.MorvainEnemigos.estadoBufon(server));
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, caja)) it.discard();
+        } catch (Throwable t) {
+            log.println("Morvain, Pell: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] bufon", t);
+        } finally {
+            if (pe != null) pe.quieta = false;
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            for (var b : m.getEntitiesOfClass(com.darkcraft.enemigos.Bufon.class, caja, b -> b.ilusion())) b.discard();
+            // todo como antes: Pell en su sala, los calcinados en su sitio y los dos muros tapiados
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, com.darkcraft.morvain.MorvainEnemigos.bufon(), false);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            try {
+                com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+                log.println("Morvain, Pell vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoBufon(server));
+            } catch (Throwable t) {
+                log.println("Morvain, Pell vuelve: ERROR " + t);
+            }
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            com.darkcraft.morvain.MurosIlusorios.cerrar(m, com.darkcraft.morvain.Teatro.MURO_PUERTA);
+            com.darkcraft.morvain.MurosIlusorios.cerrar(m, com.darkcraft.morvain.Teatro.MURO_TRONO);
+        }
+    }
+
     private static void tickAldric(ServerLevel m, net.minecraft.world.phys.AABB caja, java.util.List<net.minecraft.world.entity.Entity> quitar) {
         for (var r : m.getEntitiesOfClass(com.darkcraft.enemigos.Aldric.class, caja)) {
             if (!r.reflejo() || r.isRemoved()) continue;

@@ -64,7 +64,7 @@ public final class Espejo {
     public static final String[] ORDEN_LOGROS = {"clase", "encontrar", "libro_sombra", "primera_marca", "capitulo1", "capitulo2",
             "brandt", "rey", "golpe_final", "capitulo3", "capitulo4", "vareth", "arbol", "gavran_guardia", "gavran_fase1", "gavran_corazon",
             "gavran_juicio", "gavran_fase2", "gavran", "capitulo5", "cartografo", "caballero", "caballeros_50", "capitan_elite", "emboscada", "fortaleza", "puente",
-            "puerta_hueso", "acertijo", "amuleto", "portal", "capitulo6", "morvain", "silbato", "corcel", "viaje", "fragmento", "mapa_morvain", "velmor", "marchito", "molinera", "arboleda", "ahorcado", "verdugo", "pilotes", "podrido", "barquero", "monasterio", "helado", "abad", "capital", "calcinado", "juramento", "condestable", "academia", "erudito", "observatorio", "rectora", "puerto", "salobre", "faro", "costillar", "ballenero", "grieta", "penitente", "altar", "pontifice", "cerco", "marcado", "aldric", "gigante_campana", "gigante_costilla", "gigante_columna", "jinete", "libro_perdido",
+            "puerta_hueso", "acertijo", "amuleto", "portal", "capitulo6", "morvain", "silbato", "corcel", "viaje", "fragmento", "mapa_morvain", "velmor", "marchito", "molinera", "arboleda", "ahorcado", "verdugo", "pilotes", "podrido", "barquero", "monasterio", "helado", "abad", "capital", "calcinado", "juramento", "condestable", "academia", "erudito", "observatorio", "rectora", "puerto", "salobre", "faro", "costillar", "ballenero", "grieta", "penitente", "altar", "pontifice", "cerco", "marcado", "aldric", "gigante_campana", "gigante_costilla", "gigante_columna", "jinete", "teatro", "bufon", "libro_perdido",
             "libros_perdidos"};
 
     /** Un sitio del mapa: id unico ("x,z:nombre"), tipo, icono, posicion, clave del nombre, radio para descubrirlo. */
@@ -125,13 +125,22 @@ public final class Espejo {
         return datos(p).getBoolean("activo");
     }
 
-    /** Libros perdidos encontrados (bit n = libro n). */
-    public static int perdidos(Player p) {
-        return datos(p).getInt("perdidos");
+    /**
+     * Libros perdidos encontrados (bit n = libro n). Desde el libro 32 (parte 7y) no caben en un int: se guardan en un long (lo de
+     * antes, un int, se lee sin el signo: el libro 31 era el bit de signo).
+     */
+    public static long perdidos(Player p) {
+        return perdidos(datos(p));
     }
 
-    public static void ponerPerdidos(ServerPlayer p, int v) {
-        datos(p).putInt("perdidos", v);
+    static long perdidos(CompoundTag d) {
+        Tag t = d.get("perdidos");
+        if (t instanceof net.minecraft.nbt.IntTag i) return i.getAsInt() & 0xFFFFFFFFL;
+        return d.getLong("perdidos");
+    }
+
+    public static void ponerPerdidos(ServerPlayer p, long v) {
+        datos(p).putLong("perdidos", v);
         SUCIOS.add(p.getUUID());
     }
 
@@ -562,7 +571,7 @@ public final class Espejo {
         }
         // aunque el espejo aun no haya despertado: el menu (R) ensena la historia, el diario y los logros
         Net.to(p, new Net.EspejoEstado(activo(p), aviso, leidos, new ArrayList<>(conjunto(d, "coleccion")),
-                new ArrayList<>(conjunto(d, "bestiario")), ls, lg, di, d.getInt("perdidos")));
+                new ArrayList<>(conjunto(d, "bestiario")), ls, lg, di, perdidos(d)));
     }
 
     private static String clave(net.minecraft.network.chat.Component c) {

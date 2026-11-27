@@ -114,9 +114,14 @@ public abstract class Guardian extends Enemigo {
     @Override
     public void setTarget(LivingEntity t) {
         super.setTarget(t);
-        if (t == null || level().isClientSide || !isAlive()) return;
+        if (t == null || level().isClientSide || !isAlive() || !empiezaPeleas()) return;
         if (t instanceof ServerPlayer p) rivales.add(p.getUUID());
         if (!enPelea()) empezarPelea();
+    }
+
+    /** Si al tener presa empieza la pelea (su barra, su musica): las ilusiones de Pell no (parte 7y). */
+    protected boolean empiezaPeleas() {
+        return true;
     }
 
     private void empezarPelea() {
