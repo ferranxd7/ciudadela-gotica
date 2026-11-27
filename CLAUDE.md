@@ -3952,7 +3952,8 @@ Respuesta 111 del plan (los conjuntos con modelo propio), segunda tanda: los de 
   Rey en la fila del medio (huecos 9, 11, 15 y 17) y la del Juramento a los lados del mandoble (2, 3, 5 y 6), sin pisar lo que ya
   habia.
 - **Logro** `armadura_jefe` ("Ropa de Muerto": ponerse entero el conjunto de un jefe; `Armaduras.onEquipo`, con
-  `LivingEquipmentChangeEvent`, que salta en el tick del jugador: los FakePlayer de las pruebas no lo tienen).
+  `LivingEquipmentChangeEvent`, que salta en el tick del jugador: los FakePlayer de las pruebas no lo tienen), con su entrada
+  del diario (`darkcraft.diario.armadura_jefe`: **cada logro necesita la suya**, el Espejo la apunta al darlo).
 - Comando `/darkcraft armadura jefes [olvidar]` (los que se le han dado ya; olvidarlos para probar otra vez).
 - Pruebas: servidor, `armaduras7al()` (linea `Armaduras de jefe 7al: ...`: cada uno con su jefe, su defensa, su dureza, su peso,
   su fuego y su veneno, entero; el premio del Capitan la primera vez si y la segunda no, Brandt y Vareth por su id, la guardia
