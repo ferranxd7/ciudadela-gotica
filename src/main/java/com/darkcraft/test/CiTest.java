@@ -756,6 +756,7 @@ public final class CiTest {
         centinelas(server, m, log, out);
         isolde(server, m, log, out);
         sombra(server, m, log, out);
+        desenlace(server, m, log);
     }
 
     /**
@@ -4786,6 +4787,102 @@ public final class CiTest {
             if (com.darkcraft.morvain.Aguja.sellado()) com.darkcraft.morvain.Aguja.sellar(m, false);
             com.darkcraft.morvain.Aguja.cerrar(m);
             com.darkcraft.fortaleza.CieloRojo.restaurar(server, cielo);
+        }
+    }
+
+    /**
+     * El final (parte 7ad): por donde empieza Maelis segun el final y si se vio la cinematica (18/22 tras verla, 17/21 sin verla; una
+     * vez), los creditos que acaban (a la capilla, delante de ella, y a los 30 ticks habla con el epilogo), lo que se manda del cielo y
+     * que la camara de cada plano de las dos cinematicas no se meta en nada (y que se vea lo que mira en la sala).
+     */
+    private static void desenlace(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        StringBuilder sb = new StringBuilder("Morvain, el final:");
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ad1"), "[DarkCraftCI22]"));
+        try {
+            var H = com.darkcraft.morvain.Homenaje.get();
+            for (long k : H.chunks()) m.getChunk((int) (k >> 32), (int) k);
+            final double y0 = com.darkcraft.morvain.Homenaje.pisa(com.darkcraft.morvain.Homenaje.AZOTEA);
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            com.darkcraft.morvain.Aguja.reiniciar(m);
+            com.darkcraft.morvain.Epilogo.olvidar(fp);
+            sb.append(" sin final: ").append(com.darkcraft.morvain.Epilogo.cual(server)).append(" (0)");
+            // ---- Maelis en la capilla y por donde empieza
+            var g = com.darkcraft.morvain.Epilogo.maelis(m, true);
+            if (g == null) {
+                log.println(sb.append("; Maelis NO ESTA en la capilla"));
+                return;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, "; Maelis en %.1f, %.1f, %.1f", g.getX(), g.getY(), g.getZ()));
+            int[][] casos = {{1, 1}, {1, 0}, {2, 1}, {2, 0}};
+            for (int[] c : casos) {
+                com.darkcraft.morvain.Epilogo.probar(fp, c[0]);
+                com.darkcraft.morvain.Epilogo.olvidar(fp);
+                if (c[1] == 1) com.darkcraft.rol.Ficha.dialogo(fp, com.darkcraft.morvain.Epilogo.FICHA, com.darkcraft.morvain.Epilogo.VIO);
+                int n1 = com.darkcraft.dialogo.Conversaciones.nodoGuia(fp, g), n2 = com.darkcraft.dialogo.Conversaciones.nodoGuia(fp, g);
+                sb.append(String.format(java.util.Locale.ROOT, "; %s, %s: empieza en %d (%s) y despues en %d (no el epilogo), cielo %d",
+                        c[0] == 1 ? "el alba" : "la nueva Sombra", c[1] == 1 ? "vio la cinematica" : "sin verla", n1,
+                        c[0] == 1 ? (c[1] == 1 ? "18" : "17") : (c[1] == 1 ? "22" : "21"), n2, com.darkcraft.morvain.Epilogo.cual(server)));
+            }
+            // ---- los creditos acaban: a la capilla y Maelis habla
+            com.darkcraft.morvain.Epilogo.probar(fp, 1);
+            com.darkcraft.morvain.Epilogo.olvidar(fp);
+            com.darkcraft.rol.Ficha.dialogo(fp, com.darkcraft.morvain.Epilogo.FICHA, com.darkcraft.morvain.Epilogo.VIO);
+            fp.moveTo(0.5, y0, 6.5, 180f, 0f);
+            com.darkcraft.morvain.Epilogo.PRUEBA.put(fp.getUUID(), fp);
+            int ll0 = com.darkcraft.morvain.Epilogo.LLEVADOS, ma0 = com.darkcraft.morvain.Epilogo.MAELIS, ep0 = com.darkcraft.morvain.Epilogo.EPILOGOS;
+            com.darkcraft.morvain.Epilogo.creditosFin(fp);
+            double[] cap = com.darkcraft.morvain.Epilogo.sitioCapilla();
+            // (al jugador de mentira no le mueve el teleporte: se le pone a mano donde se le lleva)
+            fp.moveTo(cap[0], cap[1], cap[2], (float) cap[3], (float) cap[4]);
+            sb.append(String.format(java.util.Locale.ROOT, "; al acabar los creditos: llevado %s, el sitio en la capilla %s (a %.1f de Maelis)",
+                    com.darkcraft.morvain.Epilogo.LLEVADOS > ll0, com.darkcraft.morvain.Homenaje.enCapilla(cap[0], cap[1] + 0.5, cap[2]), fp.distanceTo(g)));
+            int habla = -1;
+            for (int k = 0; k < 60 && habla < 0; k++) {
+                com.darkcraft.morvain.Epilogo.tick(server);
+                if (com.darkcraft.morvain.Epilogo.MAELIS > ma0) habla = k;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, "; Maelis habla en el tick %d (30), epilogo oido %s, su marca %d (2); el sitio %s esta libre %s",
+                    habla, com.darkcraft.morvain.Epilogo.EPILOGOS > ep0, com.darkcraft.rol.Ficha.dialogo(fp, com.darkcraft.morvain.Epilogo.FICHA),
+                    net.minecraft.core.BlockPos.containing(cap[0], cap[1], cap[2]).toShortString(),
+                    m.getBlockState(net.minecraft.core.BlockPos.containing(cap[0], cap[1], cap[2])).getCollisionShape(m, net.minecraft.core.BlockPos.containing(cap[0], cap[1], cap[2])).isEmpty()
+                            && m.getBlockState(net.minecraft.core.BlockPos.containing(cap[0], cap[1] + 1, cap[2])).getCollisionShape(m, net.minecraft.core.BlockPos.containing(cap[0], cap[1] + 1, cap[2])).isEmpty()));
+            log.println(sb);
+            // ---- la camara de las dos cinematicas
+            StringBuilder c = new StringBuilder("Morvain, el final, la camara:");
+            for (int id : new int[]{com.darkcraft.cine.Desenlace.ALBA, com.darkcraft.cine.Desenlace.SOMBRA}) {
+                var planos = com.darkcraft.cine.Desenlace.planos(id, new net.minecraft.world.phys.Vec3(0.5, y0 + 0.5, 0.5), new net.minecraft.world.phys.Vec3(0.5, y0, 6.5), y0);
+                c.append(id == com.darkcraft.cine.Desenlace.ALBA ? " el alba:" : " | la nueva Sombra:");
+                for (int i = 0; i < planos.size(); i++) {
+                    var sh = planos.get(i);
+                    int dentro = 0, tapado = 0, n = 24;
+                    String primero = "";
+                    for (int k = 0; k <= n; k++) {
+                        double[] a = sh.at(sh.t0 + (sh.t1 - sh.t0) * k / n);
+                        var q = net.minecraft.core.BlockPos.containing(a[0], a[1], a[2]);
+                        var st = m.getBlockState(q);
+                        if (!st.getCollisionShape(m, q).isEmpty() || !st.getFluidState().isEmpty()) {
+                            dentro++;
+                            if (primero.isEmpty()) primero = " [" + q.toShortString() + " " + net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(st.getBlock()).getPath() + "]";
+                        }
+                        if (i == 0) {
+                            var hit = m.clip(new net.minecraft.world.level.ClipContext(new net.minecraft.world.phys.Vec3(a[0], a[1], a[2]), new net.minecraft.world.phys.Vec3(a[3], a[4], a[5]),
+                                    net.minecraft.world.level.ClipContext.Block.VISUAL, net.minecraft.world.level.ClipContext.Fluid.NONE, null));
+                            if (hit.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) tapado++;
+                        }
+                    }
+                    double[] a0 = sh.at(sh.t0), a1 = sh.at(sh.t1);
+                    c.append(String.format(java.util.Locale.ROOT, " plano %d (%.1f-%.1f s, de %.0f,%.0f,%.0f a %.0f,%.0f,%.0f): metida %d%s%s", i + 1, sh.t0, sh.t1,
+                            a0[0], a0[1], a0[2], a1[0], a1[1], a1[2], dentro, primero, i == 0 ? ", tapada la vista " + tapado : ""));
+                }
+            }
+            log.println(c.append(" (metida 0 en todos)"));
+        } catch (Throwable t) {
+            log.println(sb + " ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] el final", t);
+        } finally {
+            com.darkcraft.morvain.Epilogo.PRUEBA.clear();
+            com.darkcraft.morvain.Epilogo.olvidar(fp);
+            com.darkcraft.morvain.Aguja.reiniciar(m);
         }
     }
 

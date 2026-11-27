@@ -893,6 +893,11 @@ public class Sombra extends Guardian {
         decir(golpeado ? 31 : 32, true);
     }
 
+    /** Quien eligio (o null). */
+    public java.util.UUID quienEligio() {
+        return quienEligio;
+    }
+
     /** Como acaba (0 aun no, 1 golpeado, 2 tomado). */
     public int finalElegido() {
         return final_;

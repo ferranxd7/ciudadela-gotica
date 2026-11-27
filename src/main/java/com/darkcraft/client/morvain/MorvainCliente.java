@@ -15,7 +15,8 @@ import net.minecraftforge.fml.common.Mod;
  * Lo que se ve en Morvain (parte 7a): siempre al caer la tarde (la hora la fija el tipo de dimension), sin las nubes de
  * Minecraft (la ciudadela y las cumbres asoman por encima de donde irian), el resplandor del ocaso dorado y algo rojo, y
  * nunca llueve (el tiempo de Morvain es el del mundo de las nubes: en el cliente se le quita). El color del cielo, de la
- * niebla y del agua (roja en la Tierra sin Fe y el crater) lo pone cada region con su bioma.
+ * niebla y del agua (roja en la Tierra sin Fe y el crater) lo pone cada region con su bioma. Despues del final (parte 7ad) cambia
+ * segun como acabo: {@link CieloFinal}.
  */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID, value = Dist.CLIENT)
 public final class MorvainCliente {
@@ -51,7 +52,15 @@ public final class MorvainCliente {
             ocaso[1] = 0.48F + f * 0.22F;
             ocaso[2] = 0.16F + f * 0.06F;
             ocaso[3] = a * a * 0.92F;
-            return ocaso;
+            // despues del final (parte 7ad): rosa y dorado con el alba, apagado con la nueva Sombra
+            return CieloFinal.ocaso(ocaso, pt);
+        }
+
+        /** La luz del cielo, despues del final (parte 7ad): mas viva con el alba, sin color con la nueva Sombra. */
+        @Override
+        public void adjustLightmapColors(net.minecraft.client.multiplayer.ClientLevel level, float pt, float skyDarken, float blockFlicker,
+                                         float skyLight, int px, int py, org.joml.Vector3f colors) {
+            CieloFinal.luz(pt, py, colors);
         }
     }
 

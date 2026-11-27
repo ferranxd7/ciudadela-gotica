@@ -44,7 +44,7 @@ public final class ClientCiTest {
     private ClientCiTest() {}
 
     public static final boolean ON = Boolean.getBoolean("darkcraft.ciClient");
-    private static final int LIMIT = 132 * 60 * 20;
+    private static final int LIMIT = 136 * 60 * 20;
 
     private static boolean loading, done;
     private static int ticks, inGame = -1, frames, fps;
@@ -11880,7 +11880,9 @@ public final class ClientCiTest {
      * (la tecla: el sello que se deshace), la Sombra colgada de sus cadenas en su sala; en supervivencia: despierta con su discurso (los
      * tirones y las cadenas que se rompen), ruge (su barra y su musica); los zarpazos, el giro, el latigazo de la cadena, las manos, las
      * lanzas y la niebla; a media vida la furia (mas ojos), la mirada (el rayo que barre), el grito y los caidos; se rinde: de rodillas y
-     * el corazon delante; hablar con el corazon (las respuestas); golpearlo (su ultima frase y se deshace); los logros y el bestiario.
+     * el corazon delante; hablar con el corazon (las respuestas); golpearlo (su ultima frase y se deshace); los logros y el bestiario. Y el
+     * final (parte 7ad): al deshacerse, la cinematica del alba, los creditos, el epilogo de Maelis en la capilla y el cielo del alba;
+     * despues, con el comando, el de la nueva Sombra (la cinematica, los creditos, el epilogo, el cielo gris y el fuego frio).
      */
     private static int aguja(int T) {
         final var H = com.darkcraft.morvain.Homenaje.get();
@@ -11899,6 +11901,7 @@ public final class ClientCiTest {
                 comando(sp, "darkcraft sombra volver");
                 comando(sp, "darkcraft aguja cerrar");
                 comando(sp, "darkcraft aguja olvidar");
+                comando(sp, "darkcraft final olvidar");
                 comando(sp, "darkcraft isolde vencer");
                 sp.setGameMode(GameType.ADVENTURE);
                 sp.removeAllEffects();
@@ -12073,18 +12076,29 @@ public final class ClientCiTest {
         atTicks(t, "Aguja: golpear el corazon", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
         esperarA("cliente_mv588_sombra_ultima_frase", m -> com.darkcraft.client.morvain.ClientCadena.hablando() == 31, m -> camaraSombra(m, 5, 2, 2.2),
                 ClientCiTest::estadoSombraC, 200);
-        esperarA("cliente_mv589_sombra_se_deshace", m -> {
-            var r = sombraC(m);
-            return r != null && r.deathTime >= 14;
-        }, m -> camaraSombra(m, 6, 3, 2.6), ClientCiTest::estadoSombraC, 400);
-        t += 260;
+        // ---- el final (parte 7ad): al deshacerse la Sombra empieza la cinematica del alba (la camara es la suya); las esperas cuentan
+        // desde el golpe (la Sombra muere unos 150 ticks despues y la cinematica dura unos 790)
+        final int alba = com.darkcraft.cine.Desenlace.ALBA;
+        esperarA("cliente_mv589_sombra_se_deshace", m -> enFinal(alba, 2.4f), m -> {}, ClientCiTest::estadoFinalC, 520);
+        esperarA("cliente_mv600_final_luz_sala", m -> enFinal(alba, 5.2f), m -> {}, ClientCiTest::estadoFinalC, 600);
+        esperarA("cliente_mv601_final_aguja", m -> enFinal(alba, 9.0f), m -> {}, ClientCiTest::estadoFinalC, 700);
+        esperarA("cliente_mv602_final_aguja_alba", m -> enFinal(alba, 15.0f), m -> {}, ClientCiTest::estadoFinalC, 800);
+        esperarA("cliente_mv603_final_isla_maelis", m -> enFinal(alba, 20.6f), m -> {}, ClientCiTest::estadoFinalC, 900);
+        esperarA("cliente_mv604_final_tierras", m -> enFinal(alba, 31.0f), m -> {}, ClientCiTest::estadoFinalC, 1100);
+        esperarA("cliente_mv605_final_luz", m -> enFinal(alba, 35.9f), m -> {}, ClientCiTest::estadoFinalC, 1200);
+        esperarA("cliente_mv606_creditos_alba", m -> creditos(m) != null && creditos(m).tiempo() >= 1.2f, m -> {}, ClientCiTest::estadoFinalC, 1400);
+        t += 1120;
+        t = creditosYEpilogo(t, 18, "alba", Y);
+        // ---- la sala de la aguja, despues (parte 7ac) y la Sombra en el bestiario
         atTicks(t, "Aguja: despues", m -> {
             CAPTURAS_ESPERA.clear();
             m.setScreen(null);
+            enPrimeraPersona(m);
+            m.setCameraEntity(m.player);
             server(m, sp -> {
                 log("  al caer: " + estadoAguja(sp) + " | logros sombra " + com.darkcraft.story.Logros.tiene(sp, "sombra") + ", alba "
-                        + com.darkcraft.story.Logros.tiene(sp, "alba") + ", aguja " + com.darkcraft.story.Logros.tiene(sp, "aguja") + " | "
-                        + com.darkcraft.fortaleza.CieloRojo.resumen(sp.server));
+                        + com.darkcraft.story.Logros.tiene(sp, "alba") + ", aguja " + com.darkcraft.story.Logros.tiene(sp, "aguja") + ", epilogo "
+                        + com.darkcraft.story.Logros.tiene(sp, "epilogo") + " | " + com.darkcraft.fortaleza.CieloRojo.resumen(sp.server));
                 irMirando(sp, 0.5, Y, 4.5, 0.5, Y + 8, -6.5, false);
             });
         });
@@ -12102,8 +12116,41 @@ public final class ClientCiTest {
             shot(m, "cliente_mv591_bestiario_sombra");
         });
         t += 4;
+        // ---- el otro final (parte 7ad): la nueva Sombra, con el comando (en la sala de la aguja)
+        final int nueva = com.darkcraft.cine.Desenlace.SOMBRA;
+        atTicks(t, "Final: la nueva Sombra", m -> {
+            m.setScreen(null);
+            CAPTURAS_ESPERA.clear();
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                comando(sp, "darkcraft final olvidar");
+                irMirando(sp, 0.5, Y, 6.5, 0.5, Y + 3, 0.5, false);
+                comando(sp, "darkcraft final sombra");
+                log("  " + com.darkcraft.morvain.Epilogo.resumen(sp));
+            });
+        });
+        esperarA("cliente_mv613_final_sombra_sala", m -> enFinal(nueva, 3.2f), m -> {}, ClientCiTest::estadoFinalC, 160);
+        esperarA("cliente_mv614_final_sombra_cielo", m -> enFinal(nueva, 14.0f), m -> {}, ClientCiTest::estadoFinalC, 400);
+        esperarA("cliente_mv615_final_sombra_isla", m -> enFinal(nueva, 20.4f), m -> {}, ClientCiTest::estadoFinalC, 520);
+        esperarA("cliente_mv616_final_sombra_ciudadela", m -> enFinal(nueva, 32.0f), m -> {}, ClientCiTest::estadoFinalC, 760);
+        esperarA("cliente_mv617_creditos_sombra", m -> creditos(m) != null && creditos(m).tiempo() >= 1.2f, m -> {}, ClientCiTest::estadoFinalC, 980);
+        t += 960;
+        t = creditosYEpilogo(t, 22, "sombra", Y);
+        // los fuegos frios: la Ultima Llama de cerca
+        atTicks(t, "Final: el fuego frio de la Ultima Llama", m -> {
+            int sy = com.darkcraft.morvain.Homenaje.pisa(com.darkcraft.morvain.Homenaje.CAPILLA);
+            verDesde(m, new Vec3(com.darkcraft.morvain.Homenaje.SANT_X + 2.6, sy + 1.7, com.darkcraft.morvain.Homenaje.SANT_Z + 2.4),
+                    new Vec3(com.darkcraft.morvain.Homenaje.SANT_X + 0.5, sy + 0.8, com.darkcraft.morvain.Homenaje.SANT_Z + 0.5));
+        });
+        t += 50;
+        atTicks(t, "captura: el fuego frio", m -> {
+            log("  " + estadoFinalC(m));
+            shot(m, "cliente_mv623_fuego_frio");
+        });
+        t += 4;
         atTicks(t, "Aguja: fin (todo como estaba; vuelta al arco)", m -> {
             m.setScreen(null);
+            m.setCameraEntity(m.player);
             enPrimeraPersona(m);
             m.options.hideGui = false;
             com.darkcraft.client.ui.Carteles.callados = true;
@@ -12111,17 +12158,104 @@ public final class ClientCiTest {
             server(m, sp -> {
                 sp.removeAllEffects();
                 sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft final olvidar");
                 comando(sp, "darkcraft sombra volver");
+                comando(sp, "darkcraft final deshacer");
                 comando(sp, "darkcraft aguja cerrar");
                 comando(sp, "darkcraft isolde volver");
                 if (cielo[0] != null) com.darkcraft.fortaleza.CieloRojo.restaurar(sp.server, cielo[0]);
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
-                log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoSombra(sp.server));
+                log("  al acabar: " + com.darkcraft.morvain.MorvainEnemigos.estadoSombra(sp.server) + " | " + com.darkcraft.morvain.Epilogo.resumen(sp));
             });
+            log("  en el cliente: " + estadoFinalC(m));
         });
         return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el final (parte 7ad)
+
+    /** Si se esta viendo la cinematica del final {@code id} y va por {@code t} segundos. */
+    private static boolean enFinal(int id, float t) {
+        return ClientCine.chapter() == id && ClientCine.time() >= t;
+    }
+
+    private static com.darkcraft.client.ui.CreditosScreen creditos(Minecraft m) {
+        return m.screen instanceof com.darkcraft.client.ui.CreditosScreen c ? c : null;
+    }
+
+    /** Si Maelis esta en la frase {@code nodo} y ya la ha escrito entera. */
+    private static boolean dialogoEn(Minecraft m, int nodo) {
+        return m.screen instanceof com.darkcraft.client.ui.DialogoScreen d && d.nodoActual() == nodo && d.escritaYa();
+    }
+
+    private static String estadoFinalC(Minecraft m) {
+        String p = m.screen == null ? "ninguna" : m.screen instanceof com.darkcraft.client.ui.CreditosScreen c ? c.resumen()
+                : m.screen instanceof com.darkcraft.client.ui.DialogoScreen d ? d.resumen() : m.screen.getClass().getSimpleName();
+        return String.format(java.util.Locale.ROOT, "cine %d (t %.1f) | %s | %s | Maelis %d | pantalla %s%s", ClientCine.chapter(), ClientCine.time(),
+                com.darkcraft.client.morvain.CieloFinal.resumen(), ClientMusic.final_(), com.darkcraft.client.Guion.ultimaGuia(), p,
+                m.player == null ? "" : String.format(java.util.Locale.ROOT, " | jugador %.1f, %.1f, %.1f", m.player.getX(), m.player.getY(), m.player.getZ()));
+    }
+
+    /**
+     * Los creditos (ya abiertos): a la mitad (la musica) y al final ("Gracias por jugar"); se cierran solos y Maelis habla en la capilla
+     * (su epilogo desde {@code primera}: 18-19-20 o 22-23), cada frase entera; despues el cielo de Morvain desde lo alto de la ciudadela.
+     */
+    private static int creditosYEpilogo(int T, int primera, String fin, int Y) {
+        int t = T;
+        atTicks(t, "Creditos (" + fin + "): a la mitad", m -> {
+            log("  " + estadoFinalC(m));
+            var c = creditos(m);
+            if (c != null) c.saltarA(0.45f);
+            else log("  FALLO: no estan los creditos");
+        });
+        esperarA("cliente_mv6" + (fin.equals("alba") ? "07" : "18") + "_creditos_" + fin + "_mitad", m -> creditos(m) != null, m -> {}, ClientCiTest::estadoFinalC, 40);
+        t += 30;
+        atTicks(t, "Creditos (" + fin + "): al final", m -> {
+            var c = creditos(m);
+            if (c != null) c.saltarA(1f);
+        });
+        esperarA("cliente_mv6" + (fin.equals("alba") ? "08" : "19") + "_creditos_" + fin + "_gracias", m -> creditos(m) != null, m -> {}, ClientCiTest::estadoFinalC, 40);
+        // (se cierran solos a los ~9 s; Maelis habla 30 ticks despues de llegar a la capilla)
+        int n = primera == 18 ? 3 : 2;
+        String[] caps = primera == 18 ? new String[]{"cliente_mv609_epilogo_18", "cliente_mv610_epilogo_19", "cliente_mv611_epilogo_20"}
+                : new String[]{"cliente_mv620_epilogo_22", "cliente_mv621_epilogo_23"};
+        esperarA(caps[0], m -> dialogoEn(m, primera), m -> {}, ClientCiTest::estadoFinalC, 640);
+        t += 420;
+        for (int i = 1; i < n; i++) {
+            final int nodo = primera + i;
+            atTicks(t, "Epilogo: la siguiente frase de Maelis", m -> dialogo(m, d -> {
+                if (d.escritaYa()) d.pulsarSeguir();
+                else {
+                    d.pulsarSeguir();
+                    d.pulsarSeguir();
+                }
+            }));
+            esperarA(caps[i], m -> dialogoEn(m, nodo), m -> {}, ClientCiTest::estadoFinalC, 260);
+            t += 200;
+        }
+        atTicks(t, "Epilogo: se acaba", m -> {
+            dialogo(m, d -> {
+                if (!d.escritaYa()) d.pulsarSeguir();
+                d.pulsarSeguir();
+            });
+            server(m, sp -> log("  tras el epilogo: " + com.darkcraft.morvain.Epilogo.resumen(sp) + " | logro epilogo " + com.darkcraft.story.Logros.tiene(sp, "epilogo")));
+        });
+        t += 10;
+        // el cielo de Morvain: hacia el oeste desde lo alto de la ciudadela (el sol, el horizonte)
+        atTicks(t, "Final (" + fin + "): el cielo", m -> {
+            m.setScreen(null);
+            verDesde(m, new Vec3(30, Y + 14, 60), new Vec3(-120, Y + 22, 40));
+        });
+        t += 40;
+        atTicks(t, "captura: el cielo de Morvain (" + fin + ")", m -> {
+            log("  " + estadoFinalC(m));
+            shot(m, fin.equals("alba") ? "cliente_mv612_cielo_alba" : "cliente_mv622_cielo_sombra");
+        });
+        t += 4;
+        atTicks(t, "Final (" + fin + "): la camara vuelve", m -> m.setCameraEntity(m.player));
+        return t + 4;
     }
 
     // ------------------------------------------------------------------ los gigantes errantes de Morvain (parte 7w)

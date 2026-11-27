@@ -2012,6 +2012,45 @@ public final class MorvainEnemigos {
                 }));
     }
 
+    /**
+     * El final (parte 7ad): sin mas, como esta; {@code alba} / {@code sombra} lo apuntan y ponen su cinematica (en la sala de la aguja;
+     * despues los creditos y Maelis); {@code creditos} abre los creditos del final que haya; {@code epilogo} lleva ante Maelis en la
+     * capilla y le hace hablar; {@code olvidar} hace que se vuelva a ver todo; {@code deshacer} quita el final del mundo.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoFinal() {
+        return net.minecraft.commands.Commands.literal("final")
+                .executes(c -> decir(c, c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp ? Epilogo.resumen(sp)
+                        : "final " + Aguja.final_(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("alba").executes(c -> finalProbar(c, 1)))
+                .then(net.minecraft.commands.Commands.literal("sombra").executes(c -> finalProbar(c, 2)))
+                .then(net.minecraft.commands.Commands.literal("creditos").executes(c -> {
+                    if (!(c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp)) return 0;
+                    int cual = Epilogo.cual(sp.server);
+                    com.darkcraft.net.Net.to(sp, new com.darkcraft.net.Net.Creditos(cual == 0 ? 1 : cual));
+                    return decir(c, Epilogo.resumen(sp));
+                }))
+                .then(net.minecraft.commands.Commands.literal("epilogo").executes(c -> {
+                    if (!(c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp)) return 0;
+                    com.darkcraft.rol.Ficha.dialogo(sp, Epilogo.FICHA, Epilogo.VIO);
+                    Epilogo.creditosFin(sp);
+                    return decir(c, Epilogo.resumen(sp));
+                }))
+                .then(net.minecraft.commands.Commands.literal("olvidar").executes(c -> {
+                    if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) Epilogo.olvidar(sp);
+                    return decir(c, c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp ? Epilogo.resumen(sp) : "olvidado");
+                }))
+                .then(net.minecraft.commands.Commands.literal("deshacer").executes(c -> {
+                    Epilogo.deshacer(c.getSource().getServer());
+                    return decir(c, "final " + Aguja.final_(c.getSource().getServer()));
+                }));
+    }
+
+    private static int finalProbar(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, int cual) {
+        if (!(c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp)) return 0;
+        Epilogo.probar(sp, cual);
+        return decir(c, Epilogo.resumen(sp));
+    }
+
     /** Como esta la reina Isolde: para el comando y las pruebas. */
     public static String estadoIsolde(net.minecraft.server.MinecraftServer srv) {
         Enemigo e = Puestos.enemigo(HOMENAJE, isolde());

@@ -331,6 +331,15 @@ public class DialogoScreen extends Screen {
                 + (voz != null && minecraft.getSoundManager().isActive(voz) ? " (sonando)" : "")));
     }
 
+    /** Para la prueba de la CI: el nodo en el que esta (-1 si ninguno) y si ya se ha escrito entera su frase. */
+    public int nodoActual() {
+        return nodo == null ? -1 : nodo.id();
+    }
+
+    public boolean escritaYa() {
+        return escrita();
+    }
+
     /** Para la prueba de la CI: pulsar [E]. */
     public void pulsarSeguir() {
         seguir();

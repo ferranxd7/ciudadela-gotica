@@ -623,6 +623,9 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_ISOLDE = sound("musica.isolde");
     public static final RegistryObject<SoundEvent> MUSICA_SOMBRA_1 = sound("musica.sombra1");
     public static final RegistryObject<SoundEvent> MUSICA_SOMBRA_2 = sound("musica.sombra2");
+    /** La musica del final (parte 7ad): la cinematica y los creditos del alba ("New Sunrise") y de la nueva Sombra. */
+    public static final RegistryObject<SoundEvent> MUSICA_FINAL_ALBA = sound("musica.final_alba");
+    public static final RegistryObject<SoundEvent> MUSICA_FINAL_SOMBRA = sound("musica.final_sombra");
     // la cinematica de inicio (parte 3d): el abismo bajo la voz de la Sombra, la caida, la Sombra que te atrapa, la marca
     // que arde y los latidos antes de abrir los ojos
     public static final RegistryObject<SoundEvent> SFX_INTRO_ABISMO = sound("sfx.intro_abismo");

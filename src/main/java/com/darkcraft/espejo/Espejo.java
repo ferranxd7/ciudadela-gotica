@@ -64,7 +64,7 @@ public final class Espejo {
     public static final String[] ORDEN_LOGROS = {"clase", "encontrar", "libro_sombra", "primera_marca", "capitulo1", "capitulo2",
             "brandt", "rey", "golpe_final", "capitulo3", "capitulo4", "vareth", "arbol", "gavran_guardia", "gavran_fase1", "gavran_corazon",
             "gavran_juicio", "gavran_fase2", "gavran", "capitulo5", "cartografo", "caballero", "caballeros_50", "capitan_elite", "emboscada", "fortaleza", "puente",
-            "puerta_hueso", "acertijo", "amuleto", "portal", "capitulo6", "morvain", "silbato", "corcel", "viaje", "fragmento", "mapa_morvain", "velmor", "marchito", "molinera", "arboleda", "ahorcado", "verdugo", "pilotes", "podrido", "barquero", "monasterio", "helado", "abad", "capital", "calcinado", "juramento", "condestable", "academia", "erudito", "observatorio", "rectora", "puerto", "salobre", "faro", "costillar", "ballenero", "grieta", "penitente", "altar", "pontifice", "cerco", "marcado", "aldric", "gigante_campana", "gigante_costilla", "gigante_columna", "jinete", "teatro", "bufon", "nido", "dragon", "cadena", "gargola", "descansillo", "boca", "ciudadela", "homenaje", "centinela", "ultima_llama", "isolde", "aguja", "sombra", "alba", "nueva_sombra", "libro_perdido",
+            "puerta_hueso", "acertijo", "amuleto", "portal", "capitulo6", "morvain", "silbato", "corcel", "viaje", "fragmento", "mapa_morvain", "velmor", "marchito", "molinera", "arboleda", "ahorcado", "verdugo", "pilotes", "podrido", "barquero", "monasterio", "helado", "abad", "capital", "calcinado", "juramento", "condestable", "academia", "erudito", "observatorio", "rectora", "puerto", "salobre", "faro", "costillar", "ballenero", "grieta", "penitente", "altar", "pontifice", "cerco", "marcado", "aldric", "gigante_campana", "gigante_costilla", "gigante_columna", "jinete", "teatro", "bufon", "nido", "dragon", "cadena", "gargola", "descansillo", "boca", "ciudadela", "homenaje", "centinela", "ultima_llama", "isolde", "aguja", "sombra", "alba", "nueva_sombra", "epilogo", "libro_perdido",
             "libros_perdidos"};
 
     /** Un sitio del mapa: id unico ("x,z:nombre"), tipo, icono, posicion, clave del nombre, radio para descubrirlo. */
@@ -292,7 +292,9 @@ public final class Espejo {
     }
 
     private static void logroHecho(ServerPlayer p, String id, boolean ahora) {
-        if (!id.equals(Logros.ENCONTRAR) && !id.equals("libro_sombra") && !id.equals("primera_marca")) diario(p, id);
+        // (el del epilogo de Maelis, parte 7ad: la entrada del final que haya: el alba o la nueva Sombra)
+        if (id.equals("epilogo")) diario(p, "epilogo_" + ("sombra".equals(com.darkcraft.morvain.Aguja.final_(p.server)) ? "sombra" : "alba"));
+        else if (!id.equals(Logros.ENCONTRAR) && !id.equals("libro_sombra") && !id.equals("primera_marca")) diario(p, id);
         if (id.equals(Logros.REY)) anadir(datos(p), "bestiario", "rey");
         if (id.equals(Logros.GAVRAN)) anadir(datos(p), "bestiario", "gavran");
     }
