@@ -9990,5 +9990,294 @@
     ]
    }
   }
+ },
+ "voz_hedda": {
+  "voz": "Harriet- Mature British Actress",
+  "voice_id": "aAsWcN5jdLdiYG7Hq0YL",
+  "flow": "qTrFGBVJb5W5tYckIrim",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7ah: Hedda, la madre de la Puerta Oeste (la bufanda roja). Por frase, tomas a y b; se bajan como hedda/voz_Na.mp3 y hedda/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[softly, a little startled] Oh... you're going to the gate, aren't you, child? [tender] My Tam keeps it. The night the sky turned red, they shut it... and he never came home. [hopeful, fragile] Would you look for him? He wears a red scarf. I knitted it myself.",
+    "sesiones": [
+     "fzmiDIZ52AMLzdmajvYr",
+     "jngL1ZTC4JplOqqaNBai"
+    ],
+    "generaciones": [
+     "amJAxe8vuxw09Di5lgxr",
+     "Eo0QtMVYzj0vVMZbVJTZ"
+    ],
+    "duraciones": [
+     14.0,
+     14.0
+    ]
+   },
+   "2": {
+    "prompt": "[relieved, her voice catching] Bless you, child. The guards kept a room above the arch, by the winch. [pleading] Bring me back something of his... anything at all.",
+    "sesiones": [
+     "yDwrozuRYJpU1IaQLmWl",
+     "lxp8QAlcxPZaoKm7pgTE"
+    ],
+    "generaciones": [
+     "lsazQj7sxuWVnq7IGu94",
+     "hdPm2LOTSAcjxm2ZohtQ"
+    ],
+    "duraciones": [
+     8.16,
+     8.16
+    ]
+   },
+   "3": {
+    "prompt": "[distant, haunted] The Constable had every gate shut, so the fire wouldn't spread. Folk ran for the West Gate... [shaky] I could hear them from the road. [whispering] My Tam was on watch that night.",
+    "sesiones": [
+     "53pGtdY0YWnZXxpY7Blv",
+     "ijMmpLV0DDn0Sf6E2wdi"
+    ],
+    "generaciones": [
+     "PWEbtC4zNLYvYTi0R1FE",
+     "O6fqvZZIXOSweNOS40dP"
+    ],
+    "duraciones": [
+     11.28,
+     11.2
+    ]
+   },
+   "4": {
+    "prompt": "[quietly, resigned] Then I'll keep waiting. [a tired little laugh] I've gotten good at it.",
+    "sesiones": [
+     "4bMViOgGXnBRAjdK8Pqx",
+     "hIVoAR2AYzpr2UeNCCyr"
+    ],
+    "generaciones": [
+     "cSyrLw161pB5xjCCsy3S",
+     "68HeogBSU640Orsbdw57"
+    ],
+    "duraciones": [
+     3.92,
+     4.16
+    ]
+   },
+   "5": {
+    "prompt": "[gently] The room above the arch, child. By the winch. [hopeful] Have you been up there yet?",
+    "sesiones": [
+     "xwBK6tEyIU6tqKCQTqKd",
+     "LmjdIyLmXQ23Vj9KBTXC"
+    ],
+    "generaciones": [
+     "tKGuTV4Rlrx0XHTgzVhU",
+     "EqJ0tpNKhLFaLBPKnD02"
+    ],
+    "duraciones": [
+     5.2,
+     5.28
+    ]
+   },
+   "6": {
+    "prompt": "[soft, hopeful] You came back. [pause] Will you look for my Tam now?",
+    "sesiones": [
+     "w7ZEzQob08yogvu4C0La",
+     "nDCQPyUDBSgNXSokLRPn"
+    ],
+    "generaciones": [
+     "zhyitDmHt7D6S4BRs7v3",
+     "Gm0Spxxrk2njhJYW7Bwd"
+    ],
+    "duraciones": [
+     3.84,
+     3.76
+    ]
+   },
+   "7": {
+    "prompt": "[gasps] That's... that's his scarf. [trembling] Where is he? [pause] No... [steadying herself] Tell me, child. How did my boy die?",
+    "sesiones": [
+     "NlltOEHjbbWI5hDsrcL4",
+     "MMvH5pGrIHgOAgf8eA1A"
+    ],
+    "generaciones": [
+     "z15VQ2sLQPqijUYMkbFu",
+     "373ofdewqwzLZ6vaVA9M"
+    ],
+    "duraciones": [
+     8.96,
+     9.28
+    ]
+   },
+   "8": {
+    "prompt": "[long silence, then hollow] ...Then he did as he was told. Like I taught him. [breaking] Oh, Tam... [quiet resolve] Someone has to close his eyes. I'll go to him.",
+    "sesiones": [
+     "vGL85WGcFi4f9JrLyp7k",
+     "C3omdrhvnA2A6vJSwoyQ"
+    ],
+    "generaciones": [
+     "1EoUsTVyzMBQizFB7c8k",
+     "c2Bl2YQoFFIMet5RiVrx"
+    ],
+    "duraciones": [
+     9.12,
+     9.2
+    ]
+   },
+   "9": {
+    "prompt": "[tired, gentle] Pull his spear out of that wheel, child. He's held it long enough.",
+    "sesiones": [
+     "kXqn3ldm6NwmdAriDXkJ",
+     "wXrRBLxpvSVcqWT8id3H"
+    ],
+    "generaciones": [
+     "S7ih3EmA0l0Ti6lcnOkp",
+     "Ib5AZZx1vPyolPrR2xso"
+    ],
+    "duraciones": [
+     4.72,
+     4.72
+    ]
+   },
+   "10": {
+    "prompt": "[a sob that turns into a laugh] I knew it. I knew my Tam. [tender] Give it here... [softly] There. Thank you, child. [peaceful, almost a whisper] I can stop waiting now.",
+    "sesiones": [
+     "amu1nad4rhCSriRXHUFm",
+     "yLUGCJ41Xh5qMlzc8UxU"
+    ],
+    "generaciones": [
+     "dt7mJog6pb1dveKS7qjF",
+     "pJU0rEK1qgqo4ZCPI9mS"
+    ],
+    "duraciones": [
+     11.04,
+     11.44
+    ]
+   },
+   "11": {
+    "prompt": "[a long breath, stubborn hope] Then he's still out there somewhere. [softly] I'll knit him another. The winters here are long.",
+    "sesiones": [
+     "hNmsXeD2oSEQvVOMuGCm",
+     "Ltcqo3yKrKwZpgsOKtKW"
+    ],
+    "generaciones": [
+     "bolMYXrLThxCSs7XrHpn",
+     "Mn9MHOcxAqJMdSgQP5aI"
+    ],
+    "duraciones": [
+     7.84,
+     7.92
+    ]
+   },
+   "12": {
+    "prompt": "[softly, not looking up] Any word of my Tam? [pause] No... Well. I'll keep knitting.",
+    "sesiones": [
+     "azDBXHOf9j0OIoRe5Ub9",
+     "SWRWeyxLmWrb3ojcNFvu"
+    ],
+    "generaciones": [
+     "co3FrkGBaVqEaZN9dap9",
+     "VJkTHOEweQkJrfIiqn9a"
+    ],
+    "duraciones": [
+     5.36,
+     5.68
+    ]
+   },
+   "13": {
+    "prompt": "[hushed] Go on, child. I'll stay with him now. [tender] He always got cold, my Tam.",
+    "sesiones": [
+     "YYGAuMkryIX8PNhuSRdT",
+     "iQRnGOH0QyLIcpO7TkXS"
+    ],
+    "generaciones": [
+     "HRbnyOGsrJylOCbvSaRB",
+     "Deagn1bPGvDu4P360J0t"
+    ],
+    "duraciones": [
+     5.6,
+     5.28
+    ]
+   },
+   "14": {
+    "prompt": "[sharp gasp] That scarf... I'd know my own stitches anywhere. That's my Tam's! [desperate] Where did you find it? [trembling] Tell me... how did my boy die?",
+    "sesiones": [
+     "FCIMfxDAZ67kP831stkl",
+     "PbdXKdBtUDh1PKXWOaGp"
+    ],
+    "generaciones": [
+     "SlTlCQy4hZna06tlrzi3",
+     "GcuVyc9IexG34pgFrL3r"
+    ],
+    "duraciones": [
+     10.56,
+     10.16
+    ]
+   }
+  }
+ },
+ "sfx_hedda": {
+  "flow": "qTrFGBVJb5W5tYckIrim",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7ah: las agujas de Hedda, su descanso y la lanza de Tam que se saca del torno. Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "agujas": {
+    "prompt": "Two wooden knitting needles clicking softly and steadily as an old woman knits, gentle wool rustle, close and intimate, quiet dusk ambience, no music, no voice",
+    "sesiones": [
+     "x8FZWxWNKlBVNgOOeHZa",
+     "9A7ngRLYIFErEmLMzKvb",
+     "2QNlQ9XEquVpSnA7pTZ8",
+     "C3Sthtl3OaQHmCYqPpRC"
+    ],
+    "generaciones": [
+     "EZxIvdn9dv2EQEjpg5Ag",
+     "7FuWGlI8Cs6BgINwU2Xz",
+     "AXlrNFzZrj2qsvfoKgBY",
+     "rEhDkXxOILs76bn4ZQRQ"
+    ],
+    "duraciones": [
+     15.0,
+     15.0,
+     15.0,
+     15.0
+    ]
+   },
+   "hedda_descansa": {
+    "prompt": "A soft ethereal release as a grieving ghost finds peace: a warm low choir-like swell, a gentle chime and a breath of wind fading into light, sad and beautiful, cinematic, no music melody, no voice",
+    "sesiones": [
+     "jFXY0z92x8rpQWrX5Umc",
+     "VkMohGyCcAsNXXKLgD2N",
+     "En0r92FEg4q4hG1DwLLL",
+     "X3IjtNAp3H5NqfrpJsL9"
+    ],
+    "generaciones": [
+     "e0Yod1vb7XFsJZvAuQOi",
+     "Yu165EDeWAJwRTosGHiw",
+     "I28eMsJSU2jHrVjgVmBP",
+     "cOsPR9YJxFeO1MegQxCQ"
+    ],
+    "duraciones": [
+     8.0,
+     5.0,
+     8.0,
+     8.0
+    ]
+   },
+   "lanza_sacar": {
+    "prompt": "Pulling an old iron spear free from a wooden winch wheel: dry wood creaks and splinters, the iron spearhead scrapes and jerks loose, a heavy chain rattles once, in a small stone room, close, no music",
+    "sesiones": [
+     "LZzhJVI3YIbijJtCffnf",
+     "OceR0j8p1kGfEgRwSMPB",
+     "mpGQLftKIWl9s6T1jb1K",
+     "wAtIJQqNduqeiLvpGTr8"
+    ],
+    "generaciones": [
+     "iMpE9PaSJhkvSQYKOXC2",
+     "VLEE8iIlmuHohHZf51H8",
+     "B8n9QGMTgRcXWyv9tGhq",
+     "sYC6apQRmzmrdv4WEBjN"
+    ],
+    "duraciones": [
+     7.0,
+     5.0,
+     6.0,
+     5.0
+    ]
+   }
+  }
  }
 }

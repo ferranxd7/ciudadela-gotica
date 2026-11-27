@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:morvain",
+  "display": {
+    "icon": {
+      "item": "darkcraft:talisman_bufanda"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.hedda_callar.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.hedda_callar.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 120
+  }
+}

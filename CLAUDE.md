@@ -3734,6 +3734,61 @@ Respuestas 95 ("personajes con misiones") y 117 ("a veces 2-3 respuestas que cam
   el arbol (`ow12`, `ow13`) y cogida (`ow14`), con ella ante Oswin (`ow15`, `ow16`), devolverla (`ow17`), los peregrinos (`ow18`), el
   cartel (`ow19`), la Historia (`ow20`), quedarsela (`ow21`, `ow22`) y la campana de los difuntos (`ow23`).
 
+### Plan grande, parte 7ah: la bufanda roja (Hedda, la madre de la Puerta Oeste)
+
+La segunda mision (respuestas 95 y 117 del plan), con tres finales y con **cada jugador viendo lo suyo**.
+- **Hedda** (`personajes/Viajero`, `Quien.HEDDA`; la entidad lleva ya una `variante` sincronizada y guardada): una vieja de luto
+  sentada en su taburete en el camino de la Puerta Oeste de la Capital (u -45, v 4: al sur del camino, entre el santuario y los carros
+  quemados), de cara a la puerta, tejiendo una bufanda roja, con su farol en el suelo al norte. Modelo (`ViajeroRenderer.ModeloHedda`,
+  capa `darkcraft:viajero_hedda`, textura de 128 x 64 de `tools/personajes/hedda.py`, con su retrato): el de brazos finos con el chal,
+  el faldon de la falda que cae de las rodillas, los zapatos, el taburete, el ovillo y, en las manos, las agujas y la labor roja; las
+  agujas van y vienen y se oyen de cerca (`sfx.agujas`, `ClientMisiones`). **`ViajeroRenderer` ya tiene un modelo por `Quien`** (los
+  dos heredan de `Base`, que lleva el `alfa` y lo que se baja respecto al suelo). La variante 1 es **Hedda de rodillas junto a su hijo**
+  en la sala de la guardia (u 0, v -1), la mano tendida hacia el, con la bufanda.
+- **Tam** (`mision/RestosTam`, entidad `darkcraft:restos_tam`; `client/mision/RestosRenderer`, textura de `tools/mision/tam.py`): un
+  esqueleto sentado en el suelo de la sala de la guardia, encima del arco de la Puerta Oeste (u -1, v 0), de espaldas al torno del
+  rastrillo (la piedra de afilar), con su capacete abollado, la sobreveste quemada de la guardia, la **bufanda roja** al cuello y su
+  **lanza atravesada en la rueda del torno**: nadie iba a subir la reja. Con clic derecho o la E (`ClientMisiones.restos`, "Pulsa [E]
+  para coger la bufanda" / "para sacar la lanza", `ClientRol.RESTOS`; si a la vez se mira a Hedda de rodillas, gana lo que se mira mas
+  de frente): la bufanda (objeto clave `bufanda_roja`, `mision/ObjetoMision`: su descripcion cuenta lo que se ve) o, tras la verdad,
+  la lanza (`Hedda.tomar`).
+- **La mision** (`mision/Hedda`, marcas CONOCIDA, ACEPTADA, RECHAZADA, NOCHE, TOMADA, VERDAD, MENTIRA, CALLADA, LANZA): se presenta (1)
+  y su menu: **buscarle** (2: la sala de encima del arco, junto al torno; cartel "Nueva mision"), **que paso aquella noche** (3: el
+  Condestable mando cerrar todas las puertas; otra vez el menu) o **no** (4). Despues, 6 (y el menu) o 5. Con la bufanda: 7 (o 14 si no la
+  conocia) y el segundo menu (101), que **acaba la mision de tres maneras**:
+  - **la verdad** ("Sostuvo la puerta cerrada. Por orden."; 8 y 9): se va a cerrarle los ojos; para quien se lo dijo, la del camino
+    se apaga y se la encuentra de rodillas junto a Tam (13); le pide que saque su lanza de la rueda: la **Lanza de la Puerta Oeste**
+    (`mision/LanzaTam`, `darkcraft:lanza_tam`: una lanza para el combate —`Armas.de`—, escala C/B con Fuerza y Destreza —`Escalado`—, 7
+    de ataque; arte de `tam.py`, en la mano mas larga como la alabarda); logro `hedda_verdad` ("Lo que hizo"). La mision se da por
+    acabada al sacar la lanza.
+  - **la mentira** ("Murio intentando abrirla."; 10): se pone la bufanda, deja de esperar y **se apaga en paz** (en el cliente de quien
+    se lo dijo: al cerrar la conversacion, 50 ticks con luz y almas y `sfx.hedda_descansa`); deja la **Bendicion de Hedda**
+    (`Talisman.Clase.MADRE`: un golpe que deja por debajo de un cuarto de la vida, sin matar, cura un 30 % en el tick siguiente, una vez
+    cada dos minutos; `Hedda.golpe` / `curar` desde `Misiones.onDano` y el tick del jugador); logro `hedda_mentira` ("Una mentira piadosa").
+  - **callar** ("No lo encontre."; 11): ella seguira tejiendo y esperando (despues, 12); la bufanda se queda contigo como la **Bufanda
+    de Tam** (`Talisman.Clase.BUFANDA`: cubrirse cuesta un 30 % menos de estamina —`Rol.guardia`— y el fuego hace un 20 % menos
+    —`Resistencias`—); logro `hedda_callar` ("Aun espera").
+- **Cada jugador ve lo suyo** (en un servidor con amigos el mundo es de todos): `Viajero.OCULTO` (lo pone `ClientMisiones`: la del
+  camino se deja de ver tras la verdad o la mentira; la de rodillas solo tras la verdad), `isPickable` y `ViajeroRenderer.shouldRender`
+  lo miran, `ClientPersonajes` no ofrece hablar con quien no se ve y el servidor no deja hablarle (`Misiones.visible`); la bufanda y la
+  lanza de Tam se dejan de dibujar para quien ya las cogio (`RestosTam.sinBufanda` / `sinLanza` / `nada`).
+- Se ponen una vez (`Morvain.Datos` "hedda", "tam" y "hedda_luto"; la de rodillas solo cuando llega a 40 alguien que le dijo la verdad).
+  **`Misiones` ya lleva las dos** (`TODAS`, lo mandado por jugador es un `long` con las dos huellas; `estado`, `acabada` y la
+  miniatura de cada una en `ClientMisiones`): la Historia del menu, la brujula y el mapa de la M las ensenan igual. Miniatura nueva
+  (`CodiceScreen.MIN_MISION_HEDDA` = 17: la Puerta Oeste al ocaso con el humo y la vieja en su taburete, la labor roja cayendo al suelo).
+- **Voces** (ElevenLabs, `eleven_v4`, flow `qTrFGBVJb5W5tYckIrim`): Hedda **"Harriet- Mature British Actress"**
+  `aAsWcN5jdLdiYG7Hq0YL`, 14 frases (tomas a; `VOZ_HEDDA`: al aire libre, cerca). Efectos: `agujas` (1 y 4), `hedda_descansa` (4 y 2),
+  `lanza_sacar` (1 y 2).
+- Comandos `/darkcraft hedda [ir | tam | poner | olvidar]` y `/darkcraft misiones hedda <n>` (sus marcas). Sin abrir el juego,
+  `tools/vista3d/vista.sh morvain_capital` marca donde va cada uno (Hd, Tm, Hl) y dice que hay debajo y alrededor.
+- Pruebas: servidor, `misionHedda()` (linea `Morvain, la bufanda roja: ...`: los tres puestos —pisa, mira a la puerta, el farol, el
+  torno a la espalda de Tam—, el dialogo sin nodos rotos y los cuatro caminos: la verdad —quien ve a quien, la de rodillas, la lanza y
+  sus letras—, la mentira —la bendicion salva una vez y espera—, callar —la resistencia al fuego— y coger la bufanda sin conocerla);
+  cliente, tramo `hedda()` despues de `oswin()`: Hedda de lejos y de cerca (`cliente_hd01`, `hd02`), hablar, el menu, aquella noche,
+  aceptar y su cartel (`hd03..hd07`), la Historia (`hd08`), la brujula (`hd09`), Tam en la sala (`hd10`, `hd11`) y la bufanda cogida
+  (`hd12`), volver con ella (`hd13`, `hd14`), la verdad (`hd15`), se va (`hd16`, `hd17`), de rodillas junto a Tam (`hd18`, `hd19`), la
+  lanza (`hd20`, `hd21`, `hd22` en la mano), la mentira y se apaga (`hd23..hd25`) y callar (`hd26`, `hd27`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

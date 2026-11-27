@@ -19,11 +19,12 @@ public final class Dialogos {
     /**
      * Lo que puede pasar al acabar una frase o al elegir una respuesta: subir de nivel (la guia), la forja (el herrero),
      * la tienda (el mercader), el silbato del corcel (la guia, en Morvain), adonde ira Silas (parte 7af) o lo que se responde a quien
-     * da una mision (parte 7ag: aceptarla, preguntar que se gana, rechazarla, devolver lo que se busco o quedarselo). Su nombre en
-     * minusculas es lo que manda el cliente ({@code Net.DialogoAccion}).
+     * da una mision (parte 7ag: aceptarla, preguntar que se gana —o, con Hedda, por aquella noche—, rechazarla, devolver lo que se
+     * busco o quedarselo; parte 7ah: decirle la verdad, mentirle o callar). Su nombre en minusculas es lo que manda el cliente
+     * ({@code Net.DialogoAccion}).
      */
     public enum Accion {
-        NADA, NIVEL, FORJA, TIENDA, SILBATO, GOLPEAR, TOMAR, RUMBO, ACEPTAR, PRECIO, RECHAZAR, DEVOLVER, QUEDAR;
+        NADA, NIVEL, FORJA, TIENDA, SILBATO, GOLPEAR, TOMAR, RUMBO, ACEPTAR, PRECIO, RECHAZAR, DEVOLVER, QUEDAR, VERDAD, MENTIRA, CALLAR;
 
         public String id() {
             return name().toLowerCase(java.util.Locale.ROOT);
@@ -215,6 +216,23 @@ public final class Dialogos {
             .menu(r("oswin", "buscar", 2, Accion.ACEPTAR), r("oswin", "precio", 3, Accion.PRECIO), r("oswin", "no", 4, Accion.RECHAZAR))
             .menu(MENU + 1, r("oswin", "devolver", 8, Accion.DEVOLVER), r("oswin", "quedar", 10, Accion.QUEDAR))
             .menu(MENU + 2, r("oswin", "devolver", 108, Accion.DEVOLVER), r("oswin", "quedar", 10, Accion.QUEDAR))
+            .hecho();
+
+    /**
+     * Hedda, la madre de la Puerta Oeste (parte 7ah, la mision de la bufanda roja; {@code mision.Hedda}). La primera vez se presenta
+     * (1); si se le dejo con la palabra en la boca, 6. Su menu: buscarle (2, la mision empieza), aquella noche (3, y otra vez el menu)
+     * o no (4). Con la mision en marcha y sin la bufanda, 5. Con la bufanda: 7 (o 14 si no la conocia) y el segundo menu, que acaba
+     * la mision: la verdad (8 y 9), la mentira (10) o callar (11). Despues de callar, 12; la Hedda de rodillas junto a Tam (la de quien
+     * le dijo la verdad), 13.
+     */
+    public static final Personaje HEDDA = new Hacer("hedda")
+            .frase(1, MENU).frase(6, MENU).frase(3, MENU)
+            .frase(2, FIN).frase(4, FIN).frase(5, FIN)
+            .frase(7, MENU + 1).frase(14, MENU + 1)
+            .frase(8, 9).frase(9, FIN).frase(10, FIN).frase(11, FIN)
+            .frase(12, FIN).frase(13, FIN)
+            .menu(r("hedda", "buscar", 2, Accion.ACEPTAR), r("hedda", "noche", 3, Accion.PRECIO), r("hedda", "no", 4, Accion.RECHAZAR))
+            .menu(MENU + 1, r("hedda", "verdad", 8, Accion.VERDAD), r("hedda", "mentira", 10, Accion.MENTIRA), r("hedda", "callar", 11, Accion.CALLAR))
             .hecho();
 
     /**

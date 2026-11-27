@@ -168,6 +168,8 @@ public final class Armas {
         if (MandobleJuramento.es(st)) return Tipo.MANDOBLE;
         if (EspadaRey.es(st)) return Tipo.ESPADA;
         if (st.is(DarkCraftMod.ALABARDA.get())) return Tipo.ALABARDA;
+        // la lanza de Tam (parte 7ah): una lanza, aunque no sea un tridente
+        if (st.is(DarkCraftMod.LANZA_TAM.get())) return Tipo.LANZA;
         if (st.getItem() instanceof TridentItem) return Tipo.LANZA;
         if (st.getItem() instanceof AxeItem) return Tipo.HACHA;
         if (st.getItem() instanceof SwordItem) {

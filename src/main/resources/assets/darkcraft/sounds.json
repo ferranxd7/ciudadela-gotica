@@ -7803,5 +7803,170 @@
         "attenuation_distance": 32
       }
     ]
+  },
+  "voz.hedda.1": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_1",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hedda.2": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_2",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hedda.3": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_3",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hedda.4": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_4",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hedda.5": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_5",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hedda.6": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_6",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hedda.7": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_7",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hedda.8": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_8",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hedda.9": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_9",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hedda.10": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_10",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hedda.11": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_11",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hedda.12": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_12",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hedda.13": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_13",
+        "stream": true
+      }
+    ]
+  },
+  "voz.hedda.14": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:hedda/voz_14",
+        "stream": true
+      }
+    ]
+  },
+  "sfx.agujas": {
+    "subtitle": "subtitles.darkcraft.sfx.agujas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/agujas_1",
+        "attenuation_distance": 12
+      },
+      {
+        "name": "darkcraft:sfx/agujas_2",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "sfx.hedda_descansa": {
+    "subtitle": "subtitles.darkcraft.sfx.hedda_descansa",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/hedda_descansa_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/hedda_descansa_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.lanza_sacar": {
+    "subtitle": "subtitles.darkcraft.sfx.lanza_sacar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/lanza_sacar_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/lanza_sacar_2",
+        "attenuation_distance": 20
+      }
+    ]
   }
 }

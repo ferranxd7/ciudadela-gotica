@@ -52,6 +52,8 @@ public final class Escalado {
         if (EspadaRey.es(st)) return d("CC-D-", 12, 12, 0, 10, 0);
         if (MandobleJuramento.es(st)) return d("B---D", 18, 10, 0, 0, 10);
         if (st.is(DarkCraftMod.ALABARDA.get())) return d("CC---", 14, 12, 0, 0, 0);
+        // la Lanza de la Puerta Oeste (parte 7ah): mejor que una lanza cualquiera con la Fuerza y la Destreza
+        if (st.is(DarkCraftMod.LANZA_TAM.get())) return d("CB---", 11, 13, 0, 0, 0);
         Armas.Tipo t = Armas.de(st);
         return t == null ? null : deTipo(t);
     }

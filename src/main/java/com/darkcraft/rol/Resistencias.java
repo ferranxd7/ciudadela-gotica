@@ -64,6 +64,8 @@ public final class Resistencias {
             default -> null;
         };
         if (tal != null && Talismanes.lleva(talismanes, tal)) queda *= 1f - (t == Tipo.FISICO ? 0.10f : 0.40f);
+        // la Bufanda de Tam (parte 7ah): la lana que no ardio
+        if (t == Tipo.FUEGO && Talismanes.lleva(talismanes, Talisman.Clase.BUFANDA)) queda *= 0.80f;
         MobEffect fruto = switch (t) {
             case FUEGO -> Efectos.BRASA.get();
             case HIELO -> Efectos.ESCARCHA.get();

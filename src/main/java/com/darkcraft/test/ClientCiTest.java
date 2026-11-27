@@ -6049,6 +6049,7 @@ public final class ClientCiTest {
         t = herreros(t);
         // la campana del peregrino: Oswin, el peregrino ciego, y su mision (parte 7ag)
         t = oswin(t);
+        t = hedda(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -12313,6 +12314,353 @@ public final class ClientCiTest {
                 sp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
                 com.darkcraft.mision.Misiones.olvidar(sp, "oswin");
             });
+        });
+        return t + 10;
+    }
+
+    // ------------------------------------------------------------------ la bufanda roja (parte 7ah)
+
+    private static void logHedda(Minecraft m, String que) {
+        StringBuilder cli = new StringBuilder();
+        for (var e : com.darkcraft.client.mision.ClientMisiones.LISTA)
+            cli.append(e.id()).append(' ').append(e.marcas()).append(" (").append(com.darkcraft.client.mision.ClientMisiones.estado(e)).append(')')
+                    .append(e.hay() ? " ir a " + e.x() + "," + e.z() : "").append("; ");
+        StringBuilder ve = new StringBuilder();
+        if (m.level != null && m.player != null)
+            for (var v : m.level.getEntitiesOfClass(com.darkcraft.personajes.Viajero.class, m.player.getBoundingBox().inflate(64)))
+                if (v.quien() == com.darkcraft.personajes.Viajero.Quien.HEDDA)
+                    ve.append("hedda").append(v.variante()).append(com.darkcraft.personajes.Viajero.OCULTO.test(v) ? " oculta" : " se ve")
+                            .append(String.format(java.util.Locale.ROOT, " (%.2f)", com.darkcraft.client.mision.ClientMisiones.alfa(v, 0f))).append(", ");
+        String dlg = m.screen instanceof com.darkcraft.client.ui.DialogoScreen d ? d.resumen() : m.screen == null ? "-" : m.screen.getClass().getSimpleName();
+        String rest = "tam: bufanda " + !com.darkcraft.mision.RestosTam.sinBufanda + ", lanza " + !com.darkcraft.mision.RestosTam.sinLanza + ", a mano "
+                + com.darkcraft.client.mision.ClientMisiones.restos + " (" + com.darkcraft.client.mision.ClientMisiones.restosQue + "), aviso "
+                + com.darkcraft.client.ui.ClientRol.aMano() + ", cartel " + com.darkcraft.client.ui.Carteles.resumen();
+        server(m, sp -> log("  hedda " + que + ": " + com.darkcraft.mision.Misiones.resumenHedda(sp) + " | cliente: " + cli + ve + " | " + dlg + " | " + rest));
+    }
+
+    /** Delante de Hedda (la del camino), mirandola a la cara, de pie. */
+    private static void anteHedda(ServerPlayer sp) {
+        ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+        var h = mv == null ? null : com.darkcraft.mision.Hedda.buscarHedda(mv, 0);
+        if (h == null) return;
+        Vec3 p = h.position();
+        sp.getAbilities().flying = false;
+        sp.onUpdateAbilities();
+        int y = mv.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) Math.floor(p.x + 2.4), (int) Math.floor(p.z + 0.2));
+        irMirando(sp, p.x + 2.4, y, p.z + 0.2, p.x, p.y + 0.95, p.z, false);
+        com.darkcraft.rol.Rol.sinCombate(sp);
+    }
+
+    /** En la sala de la guardia, dos bloques al este de Tam, mirandole. */
+    private static void anteTam(ServerPlayer sp) {
+        BlockPos t = com.darkcraft.mision.Hedda.tam();
+        sp.getAbilities().flying = false;
+        sp.onUpdateAbilities();
+        irMirando(sp, t.getX() + 2.5, t.getY(), t.getZ() + 0.5, t.getX() + 0.5, t.getY() + 0.5, t.getZ() + 0.5, false);
+        com.darkcraft.rol.Rol.sinCombate(sp);
+    }
+
+    /**
+     * La bufanda roja (parte 7ah): Hedda tejiendo en el camino de la Puerta Oeste (de lejos, de cerca), hablar con ella (su frase 1 y el
+     * menu de tres), preguntar por aquella noche (la 3; el menu otra vez), buscarle (la 2 y el cartel), el diario y la brujula; Tam en la
+     * sala de la guardia con su bufanda y su lanza en la rueda, coger la bufanda con la E; volver con ella (la 7 y el segundo menu: la
+     * verdad, la mentira o callar); la verdad (la 8, Hedda que se va, la de rodillas junto a su hijo, su frase 13 y sacar la lanza); otra
+     * vez, la mentira (la 10 y Hedda que se apaga en paz); y otra vez, callar (la 11; despues, la 12).
+     */
+    private static int hedda(int T) {
+        int t = T;
+        atTicks(t, "Hedda: al camino de la Puerta Oeste", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                if (mv == null) return;
+                sp.setGameMode(GameType.CREATIVE);
+                com.darkcraft.rol.Rol.sinCombate(sp);
+                com.darkcraft.mision.Misiones.olvidar(sp, "hedda");
+                com.darkcraft.mision.Hedda.olvidar(mv);
+                BlockPos h = com.darkcraft.mision.Hedda.sitio();
+                irMirando(sp, h.getX() + 8.5, h.getY() + 4, h.getZ() + 3.5, h.getX() + 0.5, h.getY() + 1, h.getZ() + 0.5, true);
+            });
+        });
+        t += 100;
+        atTicks(t, "Hedda: puesta", m -> server(m, sp -> {
+            comando(sp, "darkcraft hedda poner");
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            var h = mv == null ? null : com.darkcraft.mision.Hedda.buscarHedda(mv, 0);
+            log("  hedda: " + (h == null ? "FALLO: no esta" : "en " + h.blockPosition().toShortString()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp));
+            if (h != null) {
+                Vec3 p = h.position();
+                irMirando(sp, p.x + 6.5, p.y + 1.6, p.z + 3.5, p.x, p.y + 0.8, p.z, true);
+            }
+        }));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "de lejos");
+            shot(m, "cliente_hd01_hedda_camino");
+        });
+        t += 4;
+        atTicks(t, "Hedda: de cerca", m -> server(m, ClientCiTest::anteHedda));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "de cerca");
+            shot(m, "cliente_hd02_hedda_cerca");
+        });
+        t += 2;
+        atTicks(t, "la E: hablar con Hedda", m -> pulsar(m.options.keyInventory));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "se presenta");
+            shot(m, "cliente_hd03_hedda_habla");
+        });
+        t += 4;
+        atTicks(t, "E: el menu de Hedda", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "menu");
+            shot(m, "cliente_hd04_hedda_menu");
+        });
+        t += 4;
+        atTicks(t, "que paso aquella noche", m -> dialogo(m, d -> d.pulsarRespuesta(1)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "aquella noche");
+            shot(m, "cliente_hd05_hedda_noche");
+        });
+        t += 4;
+        atTicks(t, "E: otra vez el menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 6;
+        atTicks(t, "lo buscare", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "acepta");
+            shot(m, "cliente_hd06_hedda_acepta");
+        });
+        t += 4;
+        atTicks(t, "ESC: el cartel de la mision", m -> m.setScreen(null));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "nueva mision");
+            shot(m, "cliente_hd07_nueva_mision");
+        });
+        t += 80;
+        atTicks(t, "la Historia: la mision", m -> {
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.HISTORIA);
+            menuP(m, mm -> mm.probarHistoria(300));
+        });
+        t += 16;
+        atTicks(t, "captura", m -> {
+            menuP(m, mm -> log("  hedda, la historia: " + mm.resumen()));
+            shot(m, "cliente_hd08_historia_mision");
+        });
+        t += 4;
+        atTicks(t, "la brujula: mirando a la puerta (Tam)", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                BlockPos tm = com.darkcraft.mision.Hedda.tam();
+                irMirando(sp, sp.getX(), sp.getY(), sp.getZ(), tm.getX() + 0.5, sp.getY() + 1.6, tm.getZ() + 0.5, false);
+            });
+        });
+        t += 12;
+        atTicks(t, "captura", m -> shot(m, "cliente_hd09_brujula_puerta"));
+        t += 4;
+        // ---- Tam, en la sala de la guardia
+        atTicks(t, "Tam: a la sala de la guardia", m -> server(m, sp -> comando(sp, "darkcraft hedda tam")));
+        t += 80;
+        atTicks(t, "Tam: desde la sala", m -> server(m, sp -> {
+            BlockPos tm = com.darkcraft.mision.Hedda.tam();
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            var r = mv == null ? null : com.darkcraft.mision.Hedda.buscarTam(mv);
+            log("  hedda, Tam: " + (r == null ? "FALLO: no esta" : "en " + r.blockPosition().toShortString()) + " | jugador " + fpos(sp)
+                    + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp));
+            sp.getAbilities().flying = false;
+            sp.onUpdateAbilities();
+            irMirando(sp, tm.getX() + 4.5, tm.getY(), tm.getZ() + 0.5, tm.getX() + 0.0, tm.getY() + 0.5, tm.getZ() + 0.5, false);
+        }));
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_hd10_tam_sala"));
+        t += 4;
+        atTicks(t, "Tam: de cerca", m -> server(m, ClientCiTest::anteTam));
+        t += 24;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "ante Tam");
+            shot(m, "cliente_hd11_tam_cerca");
+        });
+        t += 2;
+        atTicks(t, "la E: coger la bufanda", m -> pulsar(m.options.keyInventory));
+        t += 24;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "bufanda cogida");
+            shot(m, "cliente_hd12_bufanda_cogida");
+        });
+        t += 4;
+        // ---- de vuelta con Hedda: la verdad
+        atTicks(t, "de vuelta con Hedda", m -> server(m, sp -> comando(sp, "darkcraft hedda ir")));
+        t += 80;
+        atTicks(t, "delante de Hedda", m -> server(m, ClientCiTest::anteHedda));
+        t += 20;
+        atTicks(t, "la E: hablar con Hedda (con la bufanda)", m -> pulsar(m.options.keyInventory));
+        t += 34;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "con la bufanda");
+            shot(m, "cliente_hd13_hedda_bufanda");
+        });
+        t += 4;
+        atTicks(t, "E: el segundo menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "la verdad, la mentira o callar");
+            shot(m, "cliente_hd14_hedda_menu_bufanda");
+        });
+        t += 4;
+        atTicks(t, "decirle la verdad", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "la verdad");
+            shot(m, "cliente_hd15_hedda_verdad");
+        });
+        t += 4;
+        atTicks(t, "ESC: se va", m -> m.setScreen(null));
+        t += 18;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "se va");
+            shot(m, "cliente_hd16_hedda_se_va");
+        });
+        t += 50;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "se ha ido");
+            shot(m, "cliente_hd17_hedda_se_ha_ido");
+        });
+        t += 4;
+        atTicks(t, "a la sala de la guardia: Hedda de rodillas", m -> server(m, sp -> comando(sp, "darkcraft hedda tam")));
+        t += 80;
+        atTicks(t, "desde la puerta de la sala", m -> server(m, sp -> {
+            BlockPos tm = com.darkcraft.mision.Hedda.tam();
+            sp.getAbilities().flying = false;
+            sp.onUpdateAbilities();
+            irMirando(sp, tm.getX() + 4.5, tm.getY(), tm.getZ() + 0.5, tm.getX() + 0.6, tm.getY() + 0.6, tm.getZ() - 0.1, false);
+        }));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "de rodillas");
+            shot(m, "cliente_hd18_hedda_rodillas");
+        });
+        t += 4;
+        atTicks(t, "hablar con ella", m -> server(m, sp -> {
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            var l = mv == null ? null : com.darkcraft.mision.Hedda.buscarHedda(mv, 1);
+            if (l == null) return;
+            Vec3 p = l.position();
+            irMirando(sp, p.x + 1.9, p.y, p.z - 0.9, p.x, p.y + 0.8, p.z, false);
+            com.darkcraft.rol.Rol.sinCombate(sp);
+        }));
+        t += 16;
+        atTicks(t, "la E", m -> pulsar(m.options.keyInventory));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "junto a Tam");
+            shot(m, "cliente_hd19_hedda_junto_a_tam");
+        });
+        t += 4;
+        atTicks(t, "ESC; ante Tam: la lanza", m -> {
+            m.setScreen(null);
+            server(m, ClientCiTest::anteTam);
+        });
+        t += 24;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "ante la lanza");
+            shot(m, "cliente_hd20_lanza");
+        });
+        t += 2;
+        atTicks(t, "la E: sacar la lanza", m -> pulsar(m.options.keyInventory));
+        t += 24;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "lanza sacada");
+            shot(m, "cliente_hd21_lanza_sacada");
+            server(m, sp -> log("  hedda: la lanza " + sp.getInventory().countItem(DarkCraftMod.LANZA_TAM.get()) + ", logro "
+                    + com.darkcraft.story.Logros.tiene(sp, "hedda_verdad")));
+        });
+        t += 4;
+        atTicks(t, "con la lanza en la mano", m -> server(m, sp -> {
+            sp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(DarkCraftMod.LANZA_TAM.get()));
+            sp.setGameMode(GameType.SURVIVAL);
+        }));
+        t += 16;
+        atTicks(t, "captura", m -> shot(m, "cliente_hd22_lanza_en_mano"));
+        t += 4;
+        // ---- otra vez: la mentira
+        atTicks(t, "otra vez, con la bufanda: la mentira", m -> server(m, sp -> {
+            sp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
+            sp.setGameMode(GameType.CREATIVE);
+            com.darkcraft.mision.Misiones.olvidar(sp, "hedda");
+            com.darkcraft.rol.Ficha.mision(sp, "hedda", com.darkcraft.mision.Hedda.CONOCIDA | com.darkcraft.mision.Hedda.ACEPTADA | com.darkcraft.mision.Hedda.TOMADA);
+            com.darkcraft.rol.Equipo.dar(sp, new net.minecraft.world.item.ItemStack(DarkCraftMod.BUFANDA_ROJA.get()));
+            com.darkcraft.mision.Misiones.enviar(sp);
+            comando(sp, "darkcraft hedda ir");
+        }));
+        t += 80;
+        atTicks(t, "delante de Hedda", m -> server(m, ClientCiTest::anteHedda));
+        t += 20;
+        atTicks(t, "la E", m -> pulsar(m.options.keyInventory));
+        t += 26;
+        atTicks(t, "E: el segundo menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "la mentira", m -> dialogo(m, d -> d.pulsarRespuesta(1)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "la mentira");
+            shot(m, "cliente_hd23_hedda_mentira");
+        });
+        t += 4;
+        atTicks(t, "ESC: se apaga en paz", m -> m.setScreen(null));
+        t += 22;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "se apaga");
+            shot(m, "cliente_hd24_hedda_descansa");
+        });
+        t += 50;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "ya no esta");
+            shot(m, "cliente_hd25_hedda_descanso");
+            server(m, sp -> log("  hedda: la bendicion " + sp.getInventory().countItem(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.MADRE).get())
+                    + ", logro " + com.darkcraft.story.Logros.tiene(sp, "hedda_mentira")));
+        });
+        t += 4;
+        // ---- otra vez: callar
+        atTicks(t, "otra vez, con la bufanda: callar", m -> server(m, sp -> {
+            com.darkcraft.mision.Misiones.olvidar(sp, "hedda");
+            com.darkcraft.rol.Ficha.mision(sp, "hedda", com.darkcraft.mision.Hedda.CONOCIDA | com.darkcraft.mision.Hedda.ACEPTADA | com.darkcraft.mision.Hedda.TOMADA);
+            com.darkcraft.rol.Equipo.dar(sp, new net.minecraft.world.item.ItemStack(DarkCraftMod.BUFANDA_ROJA.get()));
+            com.darkcraft.mision.Misiones.enviar(sp);
+            anteHedda(sp);
+        }));
+        t += 24;
+        atTicks(t, "la E", m -> pulsar(m.options.keyInventory));
+        t += 26;
+        atTicks(t, "E: el segundo menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "callar", m -> dialogo(m, d -> d.pulsarRespuesta(2)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "callar");
+            shot(m, "cliente_hd26_hedda_callar");
+        });
+        t += 4;
+        atTicks(t, "ESC y otra vez la E", m -> m.setScreen(null));
+        t += 40;
+        atTicks(t, "la E", m -> pulsar(m.options.keyInventory));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logHedda(m, "sigue esperando");
+            shot(m, "cliente_hd27_hedda_sigue_esperando");
+            server(m, sp -> log("  hedda: la Bufanda de Tam " + sp.getInventory().countItem(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.BUFANDA).get())
+                    + ", logro " + com.darkcraft.story.Logros.tiene(sp, "hedda_callar")));
+        });
+        t += 4;
+        atTicks(t, "fin de la bufanda roja", m -> {
+            m.setScreen(null);
+            server(m, sp -> com.darkcraft.mision.Misiones.olvidar(sp, "hedda"));
         });
         return t + 10;
     }

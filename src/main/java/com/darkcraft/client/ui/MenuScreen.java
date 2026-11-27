@@ -1339,7 +1339,7 @@ public class MenuScreen extends Screen {
             Net.MisionE mi = mision(id);
             int mini = id >= 1 && id <= com.darkcraft.story.Story.CHAPTERS ? CodiceScreen.miniaturaCapitulo(id)
                     : id > 100 && id < 200 ? CodiceScreen.miniaturaPerdido(id - 100)
-                    : mi != null ? CodiceScreen.MIN_MISION_OSWIN
+                    : mi != null ? com.darkcraft.client.mision.ClientMisiones.miniatura(mi)
                     : CodiceScreen.MIN_DIARIO;
             int y = y2 + 8;
             boolean conMini = w2 >= CodiceScreen.MINI_W + 2 * CodiceScreen.MINI_MARCO + 12 && h2 >= CodiceScreen.MINI_H + 90;
