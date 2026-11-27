@@ -3631,6 +3631,56 @@ Respuestas 61 y 126 del plan: los capitulos de Morvain los narra la guia de los 
   el titulo y `crCC_1..` un plano cada una, con el estado de la voz) y el cofre con el libro (`crCC_cofre`); la Historia del menu
   (`cr90`) y los capitulos 7 y 10 en el codice (`cr91`, `cr92`). `LIMIT` 144 min (`lanzar.sh` 150, el paso 178, el trabajo 226).
 
+### Plan grande, parte 7af: los herreros de Morvain y Silas, el mercader ambulante
+
+Respuesta 95 del plan ("herrero en un refugio y VARIOS herreros por el mapa con animacion currada golpeando el yunque";
+"mercaderes ambulantes"):
+- **Las herrerias** (`morvain/Herrerias`, escritas al generar el chunk, desde `MorvainGenerador`; las ve Distant Horizons). Cada
+  una en su marco (u, v) con la entrada hacia +v, girada a su `frente`; lo que se pisa en y + 1; el suelo se allana y se funde con
+  el de alrededor en `FUNDE` (7) bloques, solo si hay que cambiarlo; `Adorno` no pone arboles en sus chunks.
+  - El **Refugio de la Fragua** (`REFUGIO`, 20 al norte de la Encrucijada de los Peregrinos): casa de piedra con esquinas y viga de
+    roble oscuro, tejado de pizarra a dos aguas con un trozo hundido al noroeste (musgo y escombros debajo), chimenea de ladrillo
+    con una hoguera de senales en su hueco (el humo sale por arriba), alto horno y horno, el yunque de **Hagen**, la tina, la
+    piedra de afilar, el banco de herrero, pararrayos colgados como hojas, un yunque mellado, barriles (uno con botin:
+    `loot_tables/chests/refugio`), el petate, la mesa con su farol; fuera la lena, el abrevadero, el heno, dos farolas y el
+    camino. Entrar en el es el logro `refugio` (y su lugar en el mapa, `darkcraft.mapa.lugar.refugio`).
+  - Tres **campamentos** (tienda de lona sobre cuatro palos, fragua al aire, yunque, tina, piedra de afilar y lo de su sitio):
+    **Brenna** (`FARO`, entrada del Puerto Varado, al oeste del Faro de los Huesos: lona de vela, barca volcada, cadenas, huesos),
+    **Ulrik** (`COLMILLO`, al oeste del Paso del Colmillo: lona nevada, banco de troncos, pieles, lena) y **Tobin** (`CAPITAL`, al
+    norte de la Puerta de la Capital: lona roja de estandarte, cascotes, un carro de barriles, el estandarte de la ciudad).
+  - Los herreros se ponen una vez (`Morvain.Datos`), la primera vez que alguien pasa a menos de `CERCA` (56) con su chunk cargado.
+- **Los herreros** (`Herrero.Quien`: DORVAN, HAGEN, BRENNA, ULRIK, TOBIN; sincronizado, NBT `quien`): cada uno con su ritmo
+  (`ciclo`, `golpe`), su fuerza al golpear y su tamano (Ulrik 1,08, Tobin 0,92); cada `CADA_MIRA` (5) martillazos para y mira la
+  hoja (`mirando`). Pieles y retratos de `tools/personajes/herreros.py` (Hagen viejo y canoso con delantal de cuero, Brenna con
+  trenza y panuelo, Ulrik grande con barba trenzada y pieles, Tobin joven con gorro). Su forja es la de Dorvan (las mismas
+  mejoras y cenizas) con su nombre en el titulo (`darkcraft.forja.de`) y su voz.
+- **Silas** (`Mercader.Quien.SILAS`, `morvain/Ambulante`): va de santuario en santuario (`RUTA`: el Vado, los Juncos, la Puerta de
+  la Academia, el Costillar, el Mirador y los Ahorcados), `ESTANCIA` (48000 ticks, dos dias del mundo de las nubes: en Morvain la
+  hora no pasa) en cada uno; donde esta lo dice la hora del mundo (`donde`), solo se guarda un desfase para los comandos. Con alguien
+  a menos de 64 se le pone junto al fuego del santuario, al otro lado de la guia, mirando hacia fuera; los que esten en otro sitio
+  se van con una bocanada de humo en cuanto no hay nadie a 12 bloques. Lanza una moneda al aire de vez en cuando. Su tienda
+  (`Tienda.SILAS`, lo comprado con la clave `silas:`): piedras de forja II y III, frutos de tormenta, lunar, hueso y sombra,
+  flechas y lo raro (hechizos de esquirlas, lanza y rayo, la bendicion, talismanes del aliento, la mente y la codicia, cenizas de
+  paso, relampago y sangre; uno por jugador). "Adonde iras despues" (frase 5) acaba con un aviso del santuario siguiente
+  (`Accion.RUMBO`, `Ambulante.rumbo`).
+- **Las voces** (ElevenLabs, flow `axmpHbUFmXhAI6aMSFpC`, dos tomas cada frase, masters `ci/eleven/master/<id>/voz_N{a,b}.mp3`):
+  Hagen "Daniel - The Gruff Old British Wizard", Brenna "Emma - Wry, Gritty Hero", Ulrik "Bjorn The Viking", Tobin "Alfwyn -
+  Excitable & Squeaky" y Silas "Callum - Husky Trickster" (con la sala de Kerrick). Los herreros: 1 se presenta, 2 saluda, 3 al
+  abrir la forja, 4 al mejorar o poner una ceniza, 5 si falta algo, 6 su historia, 7 se despide, 8 al maximo; Hagen ademas la 9 (las
+  cenizas de guerra). Silas: 1 se presenta, 2 saluda, 3 al comprar, 4 si no llegan los ecos, 5 adonde ira, 6 se despide.
+  `procesar.py`: `TOMAS_*`/`VOZ_*` de cada uno. Subtitulos y respuestas en `ci/historia/rol.py` (ES/EN).
+- **Logros**: `refugio`, `hagen` (hablar con el), `herreros` (con los cuatro de Morvain: `Conversaciones.herrerosMorvain`), `silas`
+  y `silas_compra` (cada uno con su entrada del diario). Comandos `/darkcraft herreros [ir <quien> | poner | olvidar]` y
+  `/darkcraft silas [ir | mover <0-5>]` (sin mas: como estan).
+- **Sin abrir el juego**: `VOLCADO_OPTS="-Dsitio=hagen|brenna|ulrik|tobin" tools/vista3d/vista.sh morvain_herreria carpeta` (dice si
+  se llega a pie desde el santuario al herrero y delante del yunque).
+- Pruebas: servidor, `herrerosMorvain()` (`Morvain, los herreros: ...` —puestos una vez, cada herrero donde toca, mirando al yunque,
+  los fuegos, los dialogos, los logros, la forja de Hagen y el botin— y `Morvain, Silas: ...` —en cada santuario de la ruta, se va
+  si no le toca, la tienda con su clave, el rumbo—). Cliente, tramo `herreros()` despues de `cronica()`: el Refugio por fuera
+  (`cliente_hr01`), Hagen martilleando (`hr02`, `hr03`) y mirando (`hr04`), hablar con el (`hr05`), su menu (`hr06`) y su forja
+  (`hr07`); los tres campamentos (`hr10`..`hr15`, de lejos y hablando); Silas (`hr20`), hablando (`hr21`), su tienda (`hr22`), una
+  compra (`hr23`) y el aviso de adonde ira (`hr24`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

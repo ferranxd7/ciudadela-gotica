@@ -60,6 +60,11 @@ final class Adorno {
         // ni en el Teatro Hundido (parte 7y)
         if (Teatro.cerca(x0, z0)) return;
         if (Nido.cerca(x0, z0)) return;
+        // en las herrerias (parte 7af) solo la hierba (alrededor de su suelo allanado)
+        if (Herrerias.cerca(x0, z0)) {
+            hierba(nivel, c, r, 24, Blocks.GRASS.defaultBlockState(), Blocks.DEAD_BUSH.defaultBlockState());
+            return;
+        }
         // en la Arboleda de los Ahorcados (parte 7g) solo setas y helechos: los arboles son los suyos
         if (Arboleda.cerca(x0, z0)) {
             hierba(nivel, c, r, 20, Blocks.BROWN_MUSHROOM.defaultBlockState(), Blocks.FERN.defaultBlockState());

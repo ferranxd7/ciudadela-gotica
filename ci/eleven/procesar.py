@@ -112,8 +112,29 @@ SUSURROS_SOMBRA = {1: "b", 2: "b", 3: "b", 4: "a", 5: "b", 6: "a", 7: "a", 8: "a
                    25: "a", 26: "b", 27: "a", 28: "a", 29: "b", 30: "b", 31: "a", 32: "b", 33: "b"}
 # lo que resuena el eco de vacio tras la ultima palabra (s)
 COLA_SOMBRA = 3.4
+# los herreros de Morvain y Silas (parte 7af): Hagen ("Daniel - The Gruff Old British Wizard"), dentro de su refugio de
+# piedra, con el eco corto de la herreria como Dorvan; Brenna ("Emma - Wry, Gritty Hero") en la costa, casi seca y con aire;
+# Ulrik ("Bjorn The Viking") en el paso de la montana, con un eco largo y lejano; Tobin ("Alfwyn - Excitable & Squeaky") junto a
+# las murallas de la Capital, con el rebote corto del muro; Silas ("Callum - Husky Trickster"), como Kerrick, al aire libre
+TOMAS_HAGEN = {n: "a" for n in range(1, 10)}
+VOZ_HAGEN = ("highpass=f=60,equalizer=f=150:t=q:w=1.0:g=1.5,equalizer=f=2800:t=q:w=1.3:g=1,"
+             "aecho=0.8:0.38:30|67:0.13|0.07,acompressor=threshold=-21dB:ratio=2.5:attack=5:release=140,"
+             "loudnorm=I=-15:TP=-1.5:LRA=9")
+TOMAS_BRENNA = {n: "a" for n in range(1, 9)}
+VOZ_BRENNA = ("highpass=f=80,equalizer=f=3200:t=q:w=1.2:g=1.5,aecho=0.8:0.22:22:0.05,"
+              "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=150,loudnorm=I=-16:TP=-1.5:LRA=9")
+TOMAS_ULRIK = {n: "a" for n in range(1, 9)}
+VOZ_ULRIK = ("highpass=f=55,equalizer=f=130:t=q:w=1.0:g=2,aecho=0.8:0.35:110|260:0.10|0.05,"
+             "acompressor=threshold=-20dB:ratio=2.5:attack=5:release=140,loudnorm=I=-15:TP=-1.5:LRA=9")
+TOMAS_TOBIN = {n: "a" for n in range(1, 9)}
+VOZ_TOBIN = ("highpass=f=90,equalizer=f=3400:t=q:w=1.2:g=1,aecho=0.8:0.3:48:0.09,"
+             "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=150,loudnorm=I=-16:TP=-1.5:LRA=9")
+TOMAS_SILAS = {n: "a" for n in range(1, 7)}
+VOZ_SILAS = VOZ_MERCADER
 # los personajes con dialogo: id -> (tomas, filtro)
-PERSONAJES = {"guia": (TOMAS_GUIA, VOZ_GUIA), "herrero": (TOMAS_HERRERO, VOZ_HERRERO), "mercader": (TOMAS_MERCADER, VOZ_MERCADER)}
+PERSONAJES = {"guia": (TOMAS_GUIA, VOZ_GUIA), "herrero": (TOMAS_HERRERO, VOZ_HERRERO), "mercader": (TOMAS_MERCADER, VOZ_MERCADER),
+              "hagen": (TOMAS_HAGEN, VOZ_HAGEN), "brenna": (TOMAS_BRENNA, VOZ_BRENNA), "ulrik": (TOMAS_ULRIK, VOZ_ULRIK),
+              "tobin": (TOMAS_TOBIN, VOZ_TOBIN), "silas": (TOMAS_SILAS, VOZ_SILAS)}
 
 # efectos: nombre -> (segundos como mucho, fundido final en s, volumen integrado LUFS)
 SFX = {

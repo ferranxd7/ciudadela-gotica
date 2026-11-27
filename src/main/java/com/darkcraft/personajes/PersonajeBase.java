@@ -113,6 +113,12 @@ public abstract class PersonajeBase extends Mob {
         return false;
     }
 
+    /** Su nombre (el de su dialogo: Dorvan, Hagen, Silas...): todos los herreros son la misma entidad, y los mercaderes tambien. */
+    @Override
+    protected net.minecraft.network.chat.Component getTypeName() {
+        return net.minecraft.network.chat.Component.translatable("darkcraft.personaje." + dialogo());
+    }
+
     @Override
     protected void dropCustomDeathLoot(DamageSource s, int looting, boolean jugador) {
     }

@@ -18,11 +18,11 @@ public final class Dialogos {
 
     /**
      * Lo que puede pasar al acabar una frase o al elegir una respuesta: subir de nivel (la guia), la forja (el herrero),
-     * la tienda (el mercader) o el silbato del corcel (la guia, en Morvain). Su nombre en minusculas es lo que manda el
-     * cliente ({@code Net.DialogoAccion}).
+     * la tienda (el mercader), el silbato del corcel (la guia, en Morvain) o adonde ira Silas (parte 7af). Su nombre en minusculas
+     * es lo que manda el cliente ({@code Net.DialogoAccion}).
      */
     public enum Accion {
-        NADA, NIVEL, FORJA, TIENDA, SILBATO, GOLPEAR, TOMAR;
+        NADA, NIVEL, FORJA, TIENDA, SILBATO, GOLPEAR, TOMAR, RUMBO;
 
         public String id() {
             return name().toLowerCase(java.util.Locale.ROOT);
@@ -145,6 +145,36 @@ public final class Dialogos {
     public static final Personaje MERCADER = new Hacer("mercader")
             .frase(1, MENU).frase(2, MENU).frase(5, MENU).frase(6, FIN)
             .menu(r("mercader", "comprar", Accion.TIENDA), r("mercader", "aqui", 5), r("mercader", "adios", 6))
+            .hecho();
+
+    /**
+     * Hagen, el herrero del Refugio de la Fragua (parte 7af), junto a la Encrucijada de los Peregrinos. Como Dorvan: se presenta
+     * (1) y luego saluda (2); la forja le hace decir la 3 al abrir, la 4 al mejorar o poner una ceniza, la 5 si falta algo y la 8
+     * al maximo. El menu: mejorar, las cenizas de guerra (9), por que esta aqui (6) y despedirse (7).
+     */
+    public static final Personaje HAGEN = new Hacer("hagen")
+            .frase(1, MENU).frase(2, MENU).frase(6, MENU).frase(9, MENU).frase(7, FIN)
+            .menu(r("hagen", "mejorar", Accion.FORJA), r("hagen", "cenizas", 9), r("hagen", "refugio", 6), r("hagen", "adios", 7))
+            .hecho();
+
+    /** Los herreros de los campamentos de Morvain (parte 7af): Brenna, Ulrik y Tobin. Los mismos numeros que Hagen, sin la 9. */
+    private static Personaje campamento(String id) {
+        return new Hacer(id)
+                .frase(1, MENU).frase(2, MENU).frase(6, MENU).frase(7, FIN)
+                .menu(r(id, "mejorar", Accion.FORJA), r(id, "historia", 6), r(id, "adios", 7))
+                .hecho();
+    }
+
+    public static final Personaje BRENNA = campamento("brenna"), ULRIK = campamento("ulrik"), TOBIN = campamento("tobin");
+
+    /**
+     * Silas, el mercader ambulante de Morvain (parte 7af): se presenta (1) y luego saluda (2); la tienda le hace decir la 3 al
+     * comprar y la 4 si no llegan los ecos. El menu: la mercancia, adonde ira (5; al acabarla, un aviso con el santuario
+     * siguiente de su ruta: {@code morvain.Ambulante.rumbo}) y despedirse (6).
+     */
+    public static final Personaje SILAS = new Hacer("silas")
+            .frase(1, MENU).frase(2, MENU).frase(5, MENU, Accion.RUMBO).frase(6, FIN)
+            .menu(r("silas", "comprar", Accion.TIENDA), r("silas", "adonde", 5), r("silas", "adios", 6))
             .hecho();
 
     /**

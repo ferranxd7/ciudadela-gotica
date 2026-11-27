@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * La forja de Dorvan, con dos pestanas (arriba, en gotica; TAB o clic para cambiar):
+ * La forja de Dorvan (y la de cada herrero de Morvain, parte 7af: la misma con su voz y su nombre), con dos pestanas (arriba, en gotica; TAB o clic para cambiar):
  * <ul>
  * <li><b>Mejorar</b>: a la izquierda las armas y catalizadores que se llevan (con su mejora), a la derecha el elegido:
  * lo que pega ahora y con la siguiente mejora, las piedras y los ecos que pide (en rojo lo que falta).</li>
@@ -47,22 +47,29 @@ public class ForjaScreen extends Screen {
     }
 
     private final int entidad;
-    private final Bocadillo dorvan = new Bocadillo(Dialogos.HERRERO);
+    /** De quien es la forja ("herrero" Dorvan; en Morvain, parte 7af, "hagen", "brenna", "ulrik" o "tobin") y lo que dice. */
+    private final String quien;
+    private final Bocadillo dorvan;
     private final List<Integer> huecos = new ArrayList<>();
     /** En la pestana de cenizas: lo que se puede elegir (-1 = quitarle la suya; si no, el hueco de una ceniza). */
     private final List<Integer> opciones = new ArrayList<>();
     private int modo = MEJORAR, sel, arriba, opcion, t, esperando, destello = -100, destelloHueco = -1;
     private boolean saludo;
 
-    private ForjaScreen(int entidad) {
-        super(Component.translatable("darkcraft.forja.titulo"));
+    private ForjaScreen(int entidad, String quien) {
+        super("herrero".equals(quien) ? Component.translatable("darkcraft.forja.titulo")
+                : Component.translatable("darkcraft.forja.de", Component.translatable("darkcraft.personaje." + quien)));
         this.entidad = entidad;
+        this.quien = quien;
+        Dialogos.Personaje pj = Dialogos.de(quien);
+        this.dorvan = new Bocadillo(pj == null ? Dialogos.HERRERO : pj);
     }
 
     public static void abrir(Net.AbrirForja m) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
-        mc.setScreen(new ForjaScreen(m.entidad()));
+        String quien = mc.level != null && mc.level.getEntity(m.entidad()) instanceof com.darkcraft.personajes.Herrero h ? h.dialogo() : "herrero";
+        mc.setScreen(new ForjaScreen(m.entidad(), quien));
         Panel.abre();
     }
 
@@ -637,7 +644,7 @@ public class ForjaScreen extends Screen {
         return "forja " + (modo == MEJORAR ? "mejorar" : "cenizas") + " " + huecos.size() + " armas, elegida "
                 + (huecos.isEmpty() ? "-" : huecos.get(sel) + " " + st.getItem() + " +" + Forja.nivel(st) + " habilidad " + Habilidad.de(st))
                 + (modo == CENIZAS ? " opciones " + opciones + " elegida " + opcion : "")
-                + " | dorvan dice " + dorvan.numero() + (dorvan.hablando() ? " (sonando)" : "") + (esperando > 0 ? " (esperando)" : "");
+                + " | " + ("herrero".equals(quien) ? "dorvan" : quien) + " dice " + dorvan.numero() + (dorvan.hablando() ? " (sonando)" : "") + (esperando > 0 ? " (esperando)" : "");
     }
 
     /** Elige el hueco del inventario {@code hueco} (si esta en la lista). */

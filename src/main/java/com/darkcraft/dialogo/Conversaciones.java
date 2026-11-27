@@ -49,10 +49,13 @@ public final class Conversaciones {
         String logro = switch (d.id()) {
             case "herrero" -> "dorvan";
             case "mercader" -> "kerrick";
-            case "sombra" -> null;
+            // los de Morvain (parte 7af): Hagen y Silas, el suyo; los cuatro herreros, el de todos
+            case "hagen", "silas" -> d.id();
+            case "brenna", "ulrik", "tobin", "sombra" -> null;
             default -> "maelis";
         };
         if (logro != null) Logros.dar(sp, logro);
+        if (p instanceof Herrero h && h.quien().morvain() && herrerosMorvain(sp) == HERREROS_MORVAIN.length) Logros.dar(sp, "herreros");
         DarkCraftMod.LOGGER.info("[DarkCraft] {} habla con {} (nodo {})", sp.getGameProfile().getName(), d.id(), nodo);
     }
 
@@ -99,12 +102,27 @@ public final class Conversaciones {
         return nodo;
     }
 
+    /** Los herreros de Morvain (parte 7af). */
+    public static final String[] HERREROS_MORVAIN = {"hagen", "brenna", "ulrik", "tobin"};
+
+    /** Con cuantos de los herreros de Morvain ha hablado ya (para su logro). */
+    public static int herrerosMorvain(ServerPlayer sp) {
+        int n = 0;
+        for (String id : HERREROS_MORVAIN) if ((Ficha.dialogo(sp, id) & CONOCIDO) != 0) n++;
+        return n;
+    }
+
     /** Los demas: la primera vez se presentan (1) y luego saludan (2). */
     private static int inicio(ServerPlayer sp, String id) {
         int m = Ficha.dialogo(sp, id);
         if ((m & CONOCIDO) != 0) return 2;
         Ficha.dialogo(sp, id, m | CONOCIDO);
         return 1;
+    }
+
+    /** Para la prueba: por donde empezaria a hablar con ese personaje (y lo apunta, como al hablar con el). */
+    public static int nodoInicio(ServerPlayer sp, String id) {
+        return inicio(sp, id);
     }
 
     /** Lo que pide el cliente al acabar una frase o elegir una respuesta con accion. */
@@ -124,8 +142,11 @@ public final class Conversaciones {
             Net.to(sp, new Net.AbrirNivel());
         } else if ("forja".equals(accion) && e instanceof Herrero) {
             Net.to(sp, new Net.AbrirForja(entidad));
-        } else if ("tienda".equals(accion) && e instanceof Mercader) {
-            Net.to(sp, new Net.AbrirTienda(entidad, com.darkcraft.tienda.Tienda.comprados(sp)));
+        } else if ("tienda".equals(accion) && e instanceof Mercader m) {
+            Net.to(sp, new Net.AbrirTienda(entidad, com.darkcraft.tienda.Tienda.comprados(sp, m.dialogo())));
+        } else if ("rumbo".equals(accion) && e instanceof Mercader m && m.quien() == Mercader.Quien.SILAS) {
+            // adonde ira Silas despues (parte 7af)
+            com.darkcraft.morvain.Ambulante.rumbo(sp);
         } else if ("silbato".equals(accion) && e instanceof Guia) {
             darSilbato(sp);
         } else if (("golpear".equals(accion) || "tomar".equals(accion)) && e instanceof com.darkcraft.morvain.Corazon c) {
@@ -143,7 +164,7 @@ public final class Conversaciones {
         DarkCraftMod.LOGGER.info("[DarkCraft] {} recibe el silbato del corcel", sp.getGameProfile().getName());
     }
 
-    /** Para el comando y la prueba: olvida lo hablado con un personaje ("guia", "herrero", "mercader"). */
+    /** Para el comando y la prueba: olvida lo hablado con un personaje ("guia", "herrero", "mercader", "hagen", "silas"...). */
     public static void olvidar(ServerPlayer sp, String id) {
         Ficha.dialogo(sp, id, 0);
     }

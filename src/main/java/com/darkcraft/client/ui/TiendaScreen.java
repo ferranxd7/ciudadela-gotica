@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * La tienda de Kerrick: a la izquierda lo que vende (icono, nombre y precio; lo agotado, apagado), a la derecha lo
+ * La tienda de Kerrick (y la de Silas en Morvain, parte 7af: la misma con su mercancia y su voz): a la izquierda lo que vende (icono, nombre y precio; lo agotado, apagado), a la derecha lo
  * elegido (para que sirve, cuantas quedan, cuantas se llevan, cuantas comprar y el total) y los botones. Abajo, lo que
  * dice Kerrick ({@link Bocadillo}): al comprar, la frase 3 (no siempre); si no llegan los ecos, la 4. El servidor lo
  * comprueba todo ({@link Tienda#comprar}).
@@ -27,21 +27,41 @@ public class TiendaScreen extends Screen {
     private static final int CLARO = 0xFFEADBC4, ORO = 0xFFE2BF62, LUZ = 0xFFFFF2C4, APAGADO = 0xFFB8A888, ROJO = 0xFFE0564E;
 
     private final int entidad;
+    /** De quien es la tienda ("mercader" Kerrick, "silas" Silas, parte 7af), lo que vende y lo que dice. */
+    private final String quien;
+    private final List<Tienda.Oferta> lista;
     private final int[] comprados;
-    private final Bocadillo kerrick = new Bocadillo(Dialogos.MERCADER);
+    private final Bocadillo kerrick;
     private int sel, arriba, veces = 1, t, esperando, destello = -100, destelloFila = -1;
 
-    private TiendaScreen(int entidad, int[] comprados) {
-        super(Component.translatable("darkcraft.tienda.titulo"));
+    private TiendaScreen(int entidad, String quien, int[] comprados) {
+        super(titulo(quien));
         this.entidad = entidad;
-        this.comprados = new int[Tienda.KERRICK.size()];
+        this.quien = quien;
+        this.lista = Tienda.de(quien);
+        Dialogos.Personaje pj = Dialogos.de(quien);
+        this.kerrick = new Bocadillo(pj == null ? Dialogos.MERCADER : pj);
+        this.comprados = new int[lista.size()];
         System.arraycopy(comprados, 0, this.comprados, 0, Math.min(comprados.length, this.comprados.length));
+    }
+
+    /** "Mercancia de Kerrick" (la de siempre) o "Mercancia de Silas". */
+    private static Component titulo(String quien) {
+        if ("mercader".equals(quien)) return Component.translatable("darkcraft.tienda.titulo");
+        return Component.translatable("darkcraft.tienda.de", Component.translatable("darkcraft.personaje." + quien));
+    }
+
+    /** De quien es la entidad {@code id} (si no se ve, Kerrick). */
+    static String quien(int id) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level != null && mc.level.getEntity(id) instanceof com.darkcraft.personajes.Mercader m) return m.dialogo();
+        return "mercader";
     }
 
     public static void abrir(Net.AbrirTienda m) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
-        mc.setScreen(new TiendaScreen(m.entidad(), m.comprados()));
+        mc.setScreen(new TiendaScreen(m.entidad(), quien(m.entidad()), m.comprados()));
         Panel.abre();
     }
 
@@ -75,11 +95,11 @@ public class TiendaScreen extends Screen {
     // ------------------------------------------------------------------ comprar
 
     private Tienda.Oferta oferta() {
-        return Tienda.KERRICK.get(sel);
+        return lista.get(sel);
     }
 
     private int quedan(int i) {
-        return Tienda.quedan(Tienda.KERRICK.get(i), comprados[i]);
+        return Tienda.quedan(lista.get(i), comprados[i]);
     }
 
     private int maxVeces() {
@@ -152,7 +172,7 @@ public class TiendaScreen extends Screen {
 
     private int filaEn(double mx, double my) {
         if (mx < px() + 10 || mx >= px() + 10 + IZQ) return -1;
-        for (int i = arriba; i < Math.min(Tienda.KERRICK.size(), arriba + FILAS); i++) if (my >= filaY(i) && my < filaY(i) + FILA) return i;
+        for (int i = arriba; i < Math.min(lista.size(), arriba + FILAS); i++) if (my >= filaY(i) && my < filaY(i) + FILA) return i;
         return -1;
     }
 
@@ -211,7 +231,7 @@ public class TiendaScreen extends Screen {
         Pix.blanco();
         Panel.hueco(g, x + 10, y + LISTA_Y - 3, IZQ, FILAS * FILA + 6);
         int encima = filaEn(mx, my);
-        List<Tienda.Oferta> of = Tienda.KERRICK;
+        List<Tienda.Oferta> of = lista;
         for (int i = arriba; i < Math.min(of.size(), arriba + FILAS); i++) {
             int fy = filaY(i);
             Tienda.Oferta o = of.get(i);
@@ -331,7 +351,7 @@ public class TiendaScreen extends Screen {
     // ------------------------------------------------------------------ raton y teclado
 
     private void elegir(int i) {
-        int n = Mth.clamp(i, 0, Tienda.KERRICK.size() - 1);
+        int n = Mth.clamp(i, 0, lista.size() - 1);
         if (n != sel) {
             Panel.mueve();
             veces = 1;
@@ -413,7 +433,7 @@ public class TiendaScreen extends Screen {
     public String resumen() {
         Tienda.Oferta o = oferta();
         return "tienda elegida " + sel + " " + o.id() + " x" + veces + " (quedan " + (o.limitada() ? quedan(sel) : "sin limite") + ", comprados "
-                + java.util.Arrays.toString(comprados) + ") | kerrick dice " + kerrick.numero() + (kerrick.hablando() ? " (sonando)" : "")
+                + java.util.Arrays.toString(comprados) + ") | " + ("mercader".equals(quien) ? "kerrick" : quien) + " dice " + kerrick.numero() + (kerrick.hablando() ? " (sonando)" : "")
                 + (esperando > 0 ? " (esperando)" : "");
     }
 

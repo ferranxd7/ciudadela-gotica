@@ -917,6 +917,63 @@ public class Volcado {
                     for (String id : new String[]{com.darkcraft.morvain.Teatro.MURO_PUERTA, com.darkcraft.morvain.Teatro.MURO_TRONO})
                         for (BlockPos q : com.darkcraft.morvain.Teatro.muro(id)) MUNDO.remove(q.asLong());
             }
+            case "morvain_herreria" -> {
+                // una herreria de Morvain (parte 7af; -Dsitio=hagen|brenna|ulrik|tobin, por defecto el Refugio de la Fragua) con su
+                // santuario y lo que tenga alrededor (el Puerto Varado, la Puerta de la Capital); escribe si se llega a pie del
+                // santuario al herrero y al yunque
+                String id = System.getProperty("sitio", "hagen");
+                com.darkcraft.morvain.Herrerias.Sitio s = com.darkcraft.morvain.Herrerias.porId(id);
+                com.darkcraft.morvain.SantuariosMorvain.Sitio st = com.darkcraft.morvain.SantuariosMorvain.porId(s.santuario());
+                int[] k = s.caja();
+                int x0 = Math.min(k[0], st.x()) - 14, z0 = Math.min(k[1], st.z()) - 14, x1 = Math.max(k[2], st.x()) + 14, z1 = Math.max(k[3], st.z()) + 14;
+                com.darkcraft.morvain.Vista.volcar((x, y, z, b) -> lvl.setBlock(new BlockPos(x, y, z), b, 2), x0, z0, x1, z1, s.y() - 10);
+                if (s == com.darkcraft.morvain.Herrerias.FARO) {
+                    com.darkcraft.morvain.Varadero v = com.darkcraft.morvain.Varadero.get();
+                    for (long c : v.chunks()) {
+                        int cx = (int) (c >> 32), cz = (int) c;
+                        if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                        v.construir(lvl, cx, cz, RandomSource.create(c));
+                    }
+                }
+                if (s == com.darkcraft.morvain.Herrerias.CAPITAL) {
+                    com.darkcraft.morvain.Capital v = com.darkcraft.morvain.Capital.get();
+                    for (long c : v.chunks()) {
+                        int cx = (int) (c >> 32), cz = (int) c;
+                        if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                        v.construir(lvl, cx, cz, RandomSource.create(c));
+                    }
+                }
+                int hechos = 0;
+                for (long c : com.darkcraft.morvain.Herrerias.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    com.darkcraft.morvain.Herrerias.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                BlockPos h = s.herrero(), y = s.yunque();
+                marcas.put("herrero", new int[]{h.getX(), h.getY() + 1, h.getZ()});
+                marcas.put("yunque", new int[]{y.getX(), y.getY() + 1, y.getZ()});
+                marcas.put("santuario", new int[]{st.x(), st.y() + 2, st.z()});
+                System.out.println("La herreria de " + s.id() + ": " + com.darkcraft.morvain.Herrerias.BLOQUES.get(s.id()) + " bloques, " + hechos
+                        + " chunks; herrero " + h.toShortString() + " (" + MUNDO.getOrDefault(h.asLong(), Blocks.AIR.defaultBlockState()) + ", debajo "
+                        + MUNDO.getOrDefault(h.below().asLong(), Blocks.AIR.defaultBlockState()) + "), yunque " + MUNDO.getOrDefault(y.asLong(),
+                        Blocks.AIR.defaultBlockState()));
+                com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, yy, z) -> {
+                    BlockState b = MUNDO.getOrDefault(BlockPos.asLong(x, yy, z), Blocks.AIR.defaultBlockState());
+                    return b.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock ? Blocks.AIR.defaultBlockState() : b;
+                };
+                var anda = com.darkcraft.pueblo.gen.Andar.desde(mundo, st.x() + 3, st.y() + 1, st.z(), x0, z0, x1, z1, 2_000_000);
+                System.out.println("  a pie desde el santuario: " + anda.celdas() + " celdas; al herrero " + anda.alcanza(h.getX(), h.getY(), h.getZ(), 1.5)
+                        + ", delante del yunque " + anda.alcanza(s.pos(s.hu(), 1, s.hv() + 2).getX(), s.y() + 1, s.pos(s.hu(), 1, s.hv() + 2).getZ(), 1.5));
+            }
             case "morvain_nido" -> {
                 // el Nido de Ceniza (parte 7z): la repisa quemada con sus penascos, el tesoro, la Atalaya del Cuervo y el camino del
                 // santuario (-Dcaja=x0,z0,x1,z1 para un trozo)

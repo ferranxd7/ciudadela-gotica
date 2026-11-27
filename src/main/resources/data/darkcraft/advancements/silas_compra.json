@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:silas",
+  "display": {
+    "icon": {
+      "item": "minecraft:gold_ingot"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.silas_compra.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.silas_compra.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 30
+  }
+}

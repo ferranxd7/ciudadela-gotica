@@ -300,6 +300,12 @@ public final class Morvain {
         if (m != null) Aguja.tick(m);
         // la cronica de Morvain (parte 7ae): los cofres de los capitulos 7-10, una vez, al pasar alguien cerca
         if (m != null && srv.getTickCount() % 20 == 17) CronicaMorvain.tick(m);
+        // los herreros de Morvain (parte 7af): cada uno en su herreria, una vez, al pasar alguien cerca; y Silas, que va de
+        // santuario en santuario
+        if (m != null && srv.getTickCount() % 20 == 19) {
+            Herrerias.tick(m);
+            Ambulante.tick(m);
+        }
         // el molino de la Molinera (parte 7f): la reja de su puerta y su crujido con el viento
         if (m != null && srv.getTickCount() % 100 == 13) Molino.crujir(m);
         // la arboleda (parte 7h): con el Verdugo vencido, las sogas de los colgados se quedan con el lazo vacio
@@ -428,6 +434,10 @@ public final class Morvain {
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Teatro.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Teatro.PISO) < 14)
                 com.darkcraft.story.Logros.dar(p, "teatro");
+        // y quien entra en el Refugio de la Fragua (parte 7af)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Herrerias.enRefugio(p.getX(), p.getZ()) && Math.abs(p.getY() - Herrerias.REFUGIO.y()) < 8)
+                com.darkcraft.story.Logros.dar(p, "refugio");
         // y quien sube a la repisa del Nido de Ceniza (parte 7z)
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Nido.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Nido.PISO) < 14)
@@ -550,6 +560,8 @@ public final class Morvain {
         // el Teatro Hundido y, bajo la llanura, la Sala de las Mascaras de Pell (parte 7y)
         if (Teatro.enSala(p.getX(), p.getY(), p.getZ())) return "darkcraft.morvain.lugar.mascaras";
         if (Teatro.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Teatro.PISO) < 30) return "darkcraft.morvain.lugar.teatro";
+        // el Refugio de la Fragua, donde trabaja Hagen (parte 7af)
+        if (Herrerias.enRefugio(p.getX(), p.getZ()) && Math.abs(p.getY() - Herrerias.REFUGIO.y()) < 12) return "darkcraft.morvain.lugar.refugio";
         // el Nido de Ceniza y la Atalaya del Cuervo (parte 7z)
         if (Nido.enAtalaya(p.getX(), p.getY(), p.getZ())) return "darkcraft.morvain.lugar.atalaya";
         if (Nido.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Nido.PISO) < 40) return "darkcraft.morvain.lugar.nido";

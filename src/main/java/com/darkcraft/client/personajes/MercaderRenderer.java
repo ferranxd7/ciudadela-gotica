@@ -20,14 +20,18 @@ import net.minecraft.util.Mth;
  * Kerrick: el modelo de jugador de brazos finos con piezas de mas (textura de 128 x 64; mismas medidas que
  * {@code tools/personajes/mercader.py}): en la cabeza, el sombrero de ala ancha (copa y ala); en el cuerpo, la mochila
  * enorme, la manta enrollada encima, una olla colgando a la izquierda y un farol a la derecha. De pie, con los pulgares
- * en las correas, respirando y meciendose un poco.
+ * en las correas, respirando y meciendose un poco. Silas (parte 7af), con su piel, lanza su moneda al aire de vez en cuando.
  */
 public class MercaderRenderer extends LivingEntityRenderer<Mercader, MercaderRenderer.Modelo> {
     private static final ResourceLocation PIEL = new ResourceLocation(DarkCraftMod.MODID, "textures/entity/mercader.png");
+    /** Silas (parte 7af): las mismas piezas con su piel ({@code tools/personajes/silas.py}). */
+    private static final ResourceLocation PIEL_SILAS = new ResourceLocation(DarkCraftMod.MODID, "textures/entity/silas.png");
     public static final ModelLayerLocation CAPA = new ModelLayerLocation(new ResourceLocation(DarkCraftMod.MODID, "mercader"), "main");
 
     public MercaderRenderer(EntityRendererProvider.Context ctx) {
         super(ctx, new Modelo(ctx.bakeLayer(CAPA)), 0.55f);
+        // Silas lleva una moneda en la derecha
+        addLayer(new net.minecraft.client.renderer.entity.layers.ItemInHandLayer<>(this, ctx.getItemInHandRenderer()));
     }
 
     public static LayerDefinition crear() {
@@ -46,7 +50,7 @@ public class MercaderRenderer extends LivingEntityRenderer<Mercader, MercaderRen
 
     @Override
     public ResourceLocation getTextureLocation(Mercader m) {
-        return PIEL;
+        return m.quien() == Mercader.Quien.SILAS ? PIEL_SILAS : PIEL;
     }
 
     @Override
@@ -64,10 +68,21 @@ public class MercaderRenderer extends LivingEntityRenderer<Mercader, MercaderRen
             riding = false;
             super.setupAnim(m, 0f, 0f, edad, cabezaY, cabezaX);
             float respira = Mth.sin(edad * 0.065f) * 0.03f;
-            // los pulgares en las correas de la mochila
-            rightArm.xRot = -0.30f + respira;
-            rightArm.yRot = 0.05f;
-            rightArm.zRot = -0.12f;
+            // los pulgares en las correas de la mochila (Silas, la derecha delante del pecho, lanzando su moneda al aire de vez
+            // en cuando: sube y baja la mano y la recoge)
+            if (m.quien() == Mercader.Quien.SILAS) {
+                float c = (edad % 70f) / 70f;
+                float salto = c < 0.16f ? Mth.sin(c / 0.16f * Mth.PI) : 0f;
+                rightArm.xRot = -0.95f - 0.35f * salto + respira;
+                rightArm.yRot = -0.32f;
+                rightArm.zRot = 0.05f;
+                head.xRot = Mth.lerp(salto, head.xRot, -0.25f);
+                hat.copyFrom(head);
+            } else {
+                rightArm.xRot = -0.30f + respira;
+                rightArm.yRot = 0.05f;
+                rightArm.zRot = -0.12f;
+            }
             leftArm.xRot = -0.30f + respira;
             leftArm.yRot = -0.05f;
             leftArm.zRot = 0.12f;
