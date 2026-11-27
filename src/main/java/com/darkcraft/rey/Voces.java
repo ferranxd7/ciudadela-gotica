@@ -39,6 +39,9 @@ public final class Voces {
     public static final int BASE_PONTIFICE = 14;
     /** Las de Aldric, el Primer Marcado (parte 7v): 120 + N (1..5; despues de las de Gavran, 101..118). */
     public static final int BASE_ALDRIC = 120;
+    /** Las de los gigantes errantes de Morvain (parte 7w): 130 + 3 x gigante + N (N 1..3: Ogmund 131..133, Ulfgar 134..136,
+     * Haldor 137..139). */
+    public static final int BASE_GIGANTE = 130;
     /** Pausa entre dos frases seguidas (ticks): 0,3 s. */
     public static final int PAUSA = 6;
     /** Lo que se queda el subtitulo despues de acabar de hablar (ticks): 0,8 s. */
@@ -58,6 +61,7 @@ public final class Voces {
     private static final float[] BALLENERO = {0, 6.03f, 4.92f, 4.27f, 5.11f, 5.09f};
     private static final float[] PONTIFICE = {0, 6.5f, 5.5f, 3.0f, 4.0f, 5.5f};
     private static final float[] ALDRIC = {0, 7.0f, 5.4f, 3.6f, 3.9f, 6.6f};
+    private static final float[] GIGANTE = {0, 7.4f, 6.8f, 7.0f, 6.8f, 4.8f, 7.6f, 8.2f, 6.8f, 4.2f};
     // la Sombra en las cinematicas (1..6 la de inicio, 7..9 el viaje a Valdrenn)
     private static final float[] SOMBRA = {0, 2.26f, 4.23f, 3.56f, 6.57f, 5.44f, 3.17f, 6.06f, 5.98f, 4.63f};
 
@@ -75,6 +79,7 @@ public final class Voces {
                 leer(o, "habla_ballenero", BALLENERO);
                 leer(o, "habla_pontifice", PONTIFICE);
                 leer(o, "habla_aldric", ALDRIC);
+                leer(o, "habla_gigante", GIGANTE);
                 leer(o, "habla_sombra", SOMBRA);
                 if (o.has("habla")) {
                     leer(o, "habla", REY);
@@ -106,6 +111,16 @@ public final class Voces {
 
     public static boolean esAldric(int linea) {
         return linea > BASE_ALDRIC && linea < BASE_ALDRIC + 10;
+    }
+
+    /** Las de los gigantes (131..139). */
+    public static boolean esGigante(int linea) {
+        return linea > BASE_GIGANTE && linea < BASE_GIGANTE + 10;
+    }
+
+    /** De que gigante es una linea suya (0 Ogmund, 1 Ulfgar, 2 Haldor). */
+    public static int gigante(int linea) {
+        return Math.max(0, Math.min(2, (linea - BASE_GIGANTE - 1) / 3));
     }
 
     public static boolean esCapitan(int linea) {
@@ -149,6 +164,7 @@ public final class Voces {
      * el Barquero, 91..95 el Abad, 101..118 Gavran).
      */
     public static boolean valida(int linea) {
+        if (esGigante(linea)) return linea - BASE_GIGANTE < GIGANTE.length;
         if (esAldric(linea)) return linea - BASE_ALDRIC < ALDRIC.length;
         if (esCondestable(linea)) return linea - BASE_CONDESTABLE < CONDESTABLE.length;
         if (esRectora(linea)) return linea - BASE_RECTORA < RECTORA.length;
@@ -164,6 +180,10 @@ public final class Voces {
 
     /** Segundos que tarda en decir la frase (hasta que acaba de hablar). */
     public static float seg(int linea) {
+        if (esGigante(linea)) {
+            int n = linea - BASE_GIGANTE;
+            return n > 0 && n < GIGANTE.length ? GIGANTE[n] : 4f;
+        }
         if (esAldric(linea)) {
             int n = linea - BASE_ALDRIC;
             return n > 0 && n < ALDRIC.length ? ALDRIC[n] : 4f;

@@ -289,6 +289,8 @@ public final class Morvain {
                 }
             }
         }
+        // los gigantes errantes (parte 7w): los que andan de memoria y los que estan fuera
+        if (m != null) Gigantes.tick(m);
         // el molino de la Molinera (parte 7f): la reja de su puerta y su crujido con el viento
         if (m != null && srv.getTickCount() % 100 == 13) Molino.crujir(m);
         // la arboleda (parte 7h): con el Verdugo vencido, las sogas de los colgados se quedan con el lazo vacio

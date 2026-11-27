@@ -85,6 +85,8 @@ TOMAS_BALLENERO = {1: "b", 2: "a", 3: "a", 4: "a", 5: "a"}
 TOMAS_PONTIFICE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 # Aldric, el Primer Marcado (parte 7v): las dos tomas de cada frase salieron casi iguales; las a
 TOMAS_ALDRIC = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
+# los gigantes errantes de Morvain (parte 7w; "Mossbeard", flow de la parte): 1-3 Ogmund, 4-6 Ulfgar, 7-9 Haldor
+TOMAS_GIGANTE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a", 6: "a", 7: "a", 8: "a", 9: "a"}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -324,6 +326,13 @@ SFX = {
     "aldric_marca": (3.0, 1.0, -13), "aldric_rugido": (2.4, 0.6, -13), "aldric_dolor": (0.9, 0.3, -15),
     "aldric_muerte": (3.6, 1.2, -14), "aldric_rezo": (3.5, 1.0, -22), "aldric_arrastre": (2.8, 0.8, -18),
     "cerco_arrodillan": (2.6, 0.8, -15),
+    # los gigantes errantes (parte 7w): el paso (cada pie), el rugido, el mazazo contra el suelo, el arma que barre el aire, el
+    # pisoton, la patada, la roca que arranca del suelo y la que revienta al caer, el quejido, la muerte (de rodillas y de
+    # bruces), la campana de Ogmund (dobla al andar, con su cola larga) y lo que cruje de lo que llevan
+    "gigante_paso": (1.3, 0.5, -13), "gigante_rugido": (2.8, 0.8, -12), "gigante_mazazo": (2.3, 0.9, -11),
+    "gigante_barrido": (1.6, 0.5, -14), "gigante_pisoton": (1.9, 0.7, -11), "gigante_patada": (1.1, 0.4, -13),
+    "gigante_arranca": (2.2, 0.7, -14), "gigante_roca": (1.8, 0.7, -12), "gigante_dolor": (1.0, 0.3, -14),
+    "gigante_muerte": (4.6, 1.4, -13), "gigante_campana": (4.0, 1.6, -15), "gigante_cadena": (1.4, 0.5, -17),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -590,6 +599,14 @@ TOMAS_SFX = {
     "aldric_salto": (1, 3), "aldric_encadenar": (1, 4), "aldric_marca": (2, 4), "aldric_rugido": (2, 3),
     "aldric_dolor": (1, 4), "aldric_muerte": (4, 2), "aldric_rezo": (1, 2), "aldric_arrastre": (2, 4),
     "cerco_arrodillan": (3, 1),
+    # los gigantes: los pasos con mas graves y el golpe en seguida (la 1 y la 4), los rugidos mas largos y llenos (la 2 y la 4), los
+    # mazazos con mas graves (la 2 y la 1), los barridos con cuerpo (la 2 y la 3), los pisotones mas secos (la 4 y la 1), las
+    # patadas mas graves (la 3 y la 2), los arrancones mas fuertes (la 4 y la 3), las rocas con el golpe al principio (la 4 y la 1),
+    # los quejidos mas llenos (la 1 y la 4), las muertes con la caida mas larga (la 3 y la 1), las campanas con la cola mas larga
+    # (la 1 y la 4) y los crujidos que mas se oyen (la 1 y la 4)
+    "gigante_paso": (1, 4), "gigante_rugido": (2, 4), "gigante_mazazo": (2, 1), "gigante_barrido": (2, 3),
+    "gigante_pisoton": (4, 1), "gigante_patada": (3, 2), "gigante_arranca": (4, 3), "gigante_roca": (4, 1),
+    "gigante_dolor": (1, 4), "gigante_muerte": (3, 1), "gigante_campana": (1, 4), "gigante_cadena": (1, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -890,6 +907,27 @@ def voz_aldric(src, dst):
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA + 0.15
+
+
+def voz_gigante(src, dst):
+    """
+    Los gigantes errantes: la voz de un viejo enorme, mas grave (un 12 %), con una segunda voz una octava por debajo, sorda y
+    baja (el pecho de ocho bloques), los graves del pecho subidos, algo de raspa y el eco abierto del campo (lejos y espaciado:
+    rebota en el horizonte, no en una sala).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=2[v1][v2];"
+        "[v1]asetrate=44100*0.88,aresample=44100,atempo=1.1364[baja];"
+        "[v2]asetrate=44100*0.5,aresample=44100,atempo=2.0,lowpass=f=380,volume=0.24[honda];"
+        "[baja][honda]amix=inputs=2:weights=1 0.45:normalize=0,"
+        "equalizer=f=110:t=q:w=1.0:g=3,equalizer=f=1700:t=q:w=1.2:g=1.0,highshelf=f=6500:g=-3,"
+        "asoftclip=type=tanh:threshold=0.78,"
+        "aecho=0.85:0.45:320|760|1300:0.17|0.09|0.05,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=160,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.2
 
 
 def sonoridad(f):
@@ -1247,6 +1285,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO aldric {n}: {e}")
+    # los gigantes errantes de Morvain (parte 7w)
+    gig = os.path.join(ASSETS, "sounds", "gigante")
+    os.makedirs(gig, exist_ok=True)
+    dur_t, hab_t = {}, {}
+    for n, toma in sorted(TOMAS_GIGANTE.items()):
+        src = os.path.join(MASTER, "gigante", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(gig, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_gigante(src, dst)
+            dur_t[n] = round(duracion(dst), 2)
+            hab_t[n] = round(min(h, dur_t[n]), 2)
+            print(f"gigante {n:2d}: {dur_t[n]} s (habla hasta {hab_t[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO gigante {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -1280,7 +1337,8 @@ def main():
                    "verdugo": dur_v, "habla_verdugo": hab_v, "barquero": dur_b, "habla_barquero": hab_b,
                    "abad": dur_a, "habla_abad": hab_a, "condestable": dur_k, "habla_condestable": hab_k,
                    "rectora": dur_r, "habla_rectora": hab_r, "ballenero": dur_w, "habla_ballenero": hab_w,
-                   "pontifice": dur_p, "habla_pontifice": hab_p, "aldric": dur_l, "habla_aldric": hab_l}, fh)
+                   "pontifice": dur_p, "habla_pontifice": hab_p, "aldric": dur_l, "habla_aldric": hab_l,
+                   "gigante": dur_t, "habla_gigante": hab_t}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}
