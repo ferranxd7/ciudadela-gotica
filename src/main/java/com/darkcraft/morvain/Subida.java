@@ -101,6 +101,14 @@ public final class Subida {
 
     private static Subida unico;
 
+    /**
+     * Que se vuelva a hacer el plano la proxima vez: el primero se hace al construir el mod (los puestos de los de la cadena), antes de
+     * que esten registrados los bloques del mod, y el santuario y las gemas salian como sus sustitutos de las vistas (piedra iman...).
+     */
+    public static synchronized void rehacer() {
+        unico = null;
+    }
+
     public static synchronized Subida get() {
         if (unico == null) unico = new Subida();
         return unico;
@@ -999,7 +1007,8 @@ public final class Subida {
 
     /** Si (x, y, z) esta en la isla de la ciudadela (dentro de la muralla, sobre el patio). */
     public static boolean enCiudadela(double x, double y, double z) {
-        return Math.hypot(x, z) < Ciudadela.A && y > Ciudadela.TOP - 2 && y < Ciudadela.TOP + 120;
+        // (con la planta baja de las torres de la muralla: la del sur, por donde se entra, va hasta z = A + 7)
+        return Math.hypot(x, z) < Ciudadela.A + 8 && y > Ciudadela.TOP - 2 && y < Ciudadela.TOP + 120;
     }
 
     /** Lo que se pisa en z (para el viento y las caidas: la linea si no hay camino). */
@@ -1031,7 +1040,8 @@ public final class Subida {
             }
         }
         int[] bo = s.sitio("boca"), to = s.sitio("torre"), pu = s.sitio("puerta");
-        boolean boca = m.getBlockState(new BlockPos(bo[0], bo[1] + 1, Z_BOCA - 1)).isAir() && m.getBlockState(new BlockPos(0, bo[1] + 4, Z_BOCA - 2)).isAir();
+        boolean boca = m.getBlockState(new BlockPos(bo[0], bo[1], bo[2])).getCollisionShape(m, BlockPos.ZERO).isEmpty()
+                && m.getBlockState(new BlockPos(bo[0], bo[1] + 1, bo[2])).getCollisionShape(m, BlockPos.ZERO).isEmpty();
         boolean torre = m.getBlockState(new BlockPos(to[0], to[1], to[2])).isAir() && m.getBlockState(new BlockPos(to[0], to[1] + 1, to[2])).isAir();
         boolean puerta = m.getBlockState(new BlockPos(pu[0], pu[1], pu[2])).isAir() && m.getBlockState(new BlockPos(pu[0], pu[1] + 1, pu[2])).isAir();
         return "atril con el libro " + LIBRO + " " + (libro ? "SI" : "NO") + ", arcon " + (arcon ? "SI" : "NO") + ", santuario " + (santuario ? "SI" : "NO")

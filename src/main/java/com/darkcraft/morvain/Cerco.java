@@ -103,6 +103,11 @@ public final class Cerco {
 
     private static Cerco unico;
 
+    /** Que se vuelva a hacer el plano la proxima vez (con los bloques del mod ya registrados: ver {@link Subida#rehacer}). */
+    public static synchronized void rehacer() {
+        unico = null;
+    }
+
     public static synchronized Cerco get() {
         if (unico == null) unico = new Cerco();
         return unico;
