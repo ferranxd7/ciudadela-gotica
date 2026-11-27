@@ -39,7 +39,9 @@ public final class Talisman extends Item {
         /** +15 % de dano de los golpes del salto. */
         GARRA,
         /** +12 % de dano de los golpes fuertes (cargados). */
-        FURIA;
+        FURIA,
+        /** Los frascos de vida curan un 25 % mas (el Rosario del peregrino, de Oswin: parte 7ag). */
+        PEREGRINO;
 
         /** "vigor", "aliento"... (el objeto es darkcraft:talisman_ + esto). */
         public final String id = name().toLowerCase(java.util.Locale.ROOT);

@@ -6047,6 +6047,8 @@ public final class ClientCiTest {
         t = cronica(t);
         // los herreros de Morvain y Silas, el mercader ambulante (parte 7af)
         t = herreros(t);
+        // la campana del peregrino: Oswin, el peregrino ciego, y su mision (parte 7ag)
+        t = oswin(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -11993,6 +11995,326 @@ public final class ClientCiTest {
             m.setScreen(null);
         });
         return t + 20;
+    }
+
+    // ------------------------------------------------------------------ la campana del peregrino (parte 7ag)
+
+    private static void logMision(Minecraft m, String que) {
+        StringBuilder cli = new StringBuilder();
+        for (var e : com.darkcraft.client.mision.ClientMisiones.LISTA)
+            cli.append(e.id()).append(' ').append(e.marcas()).append(e.hay() ? " ir a " + e.x() + "," + e.z() : "").append("; ");
+        String dlg = m.screen instanceof com.darkcraft.client.ui.DialogoScreen d ? d.resumen() : m.screen == null ? "-" : m.screen.getClass().getSimpleName();
+        String rest = "campana oculta " + com.darkcraft.mision.Campana.oculta + ", a mano " + com.darkcraft.client.ui.ClientRol.aMano() + ", cartel "
+                + com.darkcraft.client.ui.Carteles.resumen();
+        server(m, sp -> log("  oswin " + que + ": " + com.darkcraft.mision.Misiones.resumen(sp) + " | cliente: " + cli + " | " + dlg + " | " + rest));
+    }
+
+    /**
+     * La campana del peregrino (parte 7ag): Oswin junto a la Encrucijada (de lejos, de cerca), hablar con el (su frase 1 y el menu de
+     * tres), preguntar que se gana (la 3; el menu otra vez con esa respuesta ya hecha), aceptarla (la 2 y el cartel de "Nueva mision"), el
+     * diario de la Historia, la marca en la brujula y en el mapa; la campana colgada del Arbol de la Horca, cogerla con la E; volver,
+     * devolversela (la 7, el segundo menu, la 8 con Oswin alzando la campana y los peregrinos muertos que echan a andar, el cartel de
+     * "Mision cumplida" y el diario); y otra vez, quedarsela (la 10, su cartel y tocar la campana de los difuntos junto a un marchito).
+     */
+    private static int oswin(int T) {
+        int t = T;
+        atTicks(t, "Oswin: a la Encrucijada de los Peregrinos", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                if (mv == null) return;
+                sp.setGameMode(GameType.CREATIVE);
+                com.darkcraft.rol.Rol.sinCombate(sp);
+                com.darkcraft.mision.Misiones.olvidar(sp, "oswin");
+                com.darkcraft.mision.Oswin.olvidar(mv);
+                BlockPos o = com.darkcraft.mision.Oswin.sitio();
+                irMirando(sp, o.getX() + 7.5, o.getY() + 3, o.getZ() + 6.5, o.getX() + 0.5, o.getY() + 1.2, o.getZ() + 0.5, true);
+            });
+        });
+        t += 100;
+        atTicks(t, "Oswin: puesto", m -> server(m, sp -> {
+            comando(sp, "darkcraft oswin poner");
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            var o = mv == null ? null : com.darkcraft.mision.Oswin.buscarOswin(mv);
+            log("  oswin: " + (o == null ? "FALLO: no esta" : "en " + o.blockPosition().toShortString()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp));
+            if (o != null) {
+                Vec3 p = o.position();
+                irMirando(sp, p.x + 6.5, p.y + 1.5, p.z + 5.5, p.x, p.y + 1.1, p.z, true);
+            }
+        }));
+        t += 40;
+        atTicks(t, "captura", m -> shot(m, "cliente_ow01_oswin_encrucijada"));
+        t += 4;
+        atTicks(t, "Oswin: de cerca (delante de el)", m -> server(m, sp -> {
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            var o = mv == null ? null : com.darkcraft.mision.Oswin.buscarOswin(mv);
+            if (o == null) return;
+            Vec3 p = o.position();
+            sp.getAbilities().flying = false;
+            irMirando(sp, p.x + 2.6, p.y, p.z + 0.3, p.x, p.y + 1.45, p.z, false);
+            com.darkcraft.rol.Rol.sinCombate(sp);
+        }));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logMision(m, "de cerca");
+            shot(m, "cliente_ow02_oswin_cerca");
+        });
+        t += 2;
+        atTicks(t, "la E: hablar con Oswin", m -> pulsar(m.options.keyInventory));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logMision(m, "se presenta");
+            shot(m, "cliente_ow03_oswin_habla");
+        });
+        t += 4;
+        atTicks(t, "E: el menu de Oswin", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            logMision(m, "menu");
+            shot(m, "cliente_ow04_oswin_menu");
+        });
+        t += 4;
+        atTicks(t, "que me daras a cambio", m -> dialogo(m, d -> d.pulsarRespuesta(1)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logMision(m, "el precio");
+            shot(m, "cliente_ow05_oswin_precio");
+        });
+        t += 4;
+        atTicks(t, "E: otra vez el menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            logMision(m, "menu otra vez");
+            shot(m, "cliente_ow06_oswin_menu_otra_vez");
+        });
+        t += 4;
+        atTicks(t, "buscare tu campana", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logMision(m, "acepta");
+            shot(m, "cliente_ow07_oswin_acepta");
+        });
+        t += 4;
+        atTicks(t, "ESC: el cartel de la mision", m -> m.setScreen(null));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logMision(m, "nueva mision");
+            shot(m, "cliente_ow08_nueva_mision");
+        });
+        t += 80;
+        atTicks(t, "la Historia: la mision", m -> {
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.HISTORIA);
+            menuP(m, mm -> mm.probarHistoria(300));
+        });
+        t += 16;
+        atTicks(t, "captura", m -> {
+            menuP(m, mm -> log("  oswin, la historia: " + mm.resumen()));
+            shot(m, "cliente_ow09_historia_mision");
+        });
+        t += 4;
+        atTicks(t, "la brujula: mirando al oeste (la campana)", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                int[] c = com.darkcraft.mision.Oswin.cabo();
+                if (c == null) return;
+                irMirando(sp, sp.getX(), sp.getY(), sp.getZ(), c[0] + 0.5, sp.getY() + 1.6, c[2] + 0.5, false);
+            });
+        });
+        t += 12;
+        atTicks(t, "captura", m -> shot(m, "cliente_ow10_brujula_campana"));
+        t += 4;
+        final com.darkcraft.client.espejo.LibroScreen[] libro = new com.darkcraft.client.espejo.LibroScreen[1];
+        atTicks(t, "el mapa: la marca de la campana", m -> {
+            com.darkcraft.client.espejo.LibroScreen.abrir();
+            if (m.screen instanceof com.darkcraft.client.espejo.LibroScreen l) {
+                libro[0] = l;
+                l.probarCentro(-3000, 4150, 0.11f);
+            }
+        });
+        t += 16;
+        atTicks(t, "captura", m -> shot(m, "cliente_ow11_mapa_campana"));
+        t += 4;
+        // ---- la campana del Arbol de la Horca
+        atTicks(t, "la campana: a la Arboleda de los Ahorcados", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                comando(sp, "darkcraft oswin campana");
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+            });
+        });
+        t += 100;
+        atTicks(t, "la campana: puesta y vista desde el camino", m -> server(m, sp -> {
+            comando(sp, "darkcraft oswin poner");
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            var c = mv == null ? null : com.darkcraft.mision.Oswin.buscarCampana(mv);
+            log("  oswin, la campana: " + (c == null ? "FALLO: no esta" : String.format(java.util.Locale.ROOT, "en %.1f %.2f %.1f", c.getX(), c.getY(), c.getZ()))
+                    + " | jugador " + fpos(sp) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp));
+            if (c == null) return;
+            Vec3 p = c.position();
+            irMirando(sp, p.x + 5.5, p.y - 1.4, p.z + 4.5, p.x, p.y + 0.3, p.z, true);
+        }));
+        t += 40;
+        atTicks(t, "captura", m -> shot(m, "cliente_ow12_campana_arbol"));
+        t += 4;
+        atTicks(t, "la campana: de cerca", m -> server(m, sp -> {
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            var c = mv == null ? null : com.darkcraft.mision.Oswin.buscarCampana(mv);
+            if (c == null) return;
+            Vec3 p = c.position();
+            int y = mv.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (int) Math.floor(p.x + 1.8), (int) Math.floor(p.z + 0.6));
+            irMirando(sp, p.x + 1.8, y, p.z + 0.6, p.x, p.y + 0.3, p.z, false);
+            c.sonar(false);
+        }));
+        t += 24;
+        atTicks(t, "captura", m -> {
+            logMision(m, "ante la campana");
+            shot(m, "cliente_ow13_campana_cerca");
+        });
+        t += 2;
+        atTicks(t, "la E: coger la campana", m -> pulsar(m.options.keyInventory));
+        t += 24;
+        atTicks(t, "captura", m -> {
+            logMision(m, "cogida");
+            shot(m, "cliente_ow14_campana_cogida");
+        });
+        t += 4;
+        // ---- devolversela
+        atTicks(t, "de vuelta con Oswin", m -> server(m, sp -> {
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            com.darkcraft.mision.Misiones.llevar(sp, mv, false);
+        }));
+        t += 80;
+        atTicks(t, "delante de Oswin", m -> server(m, sp -> {
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            var o = mv == null ? null : com.darkcraft.mision.Oswin.buscarOswin(mv);
+            if (o == null) return;
+            Vec3 p = o.position();
+            irMirando(sp, p.x + 2.6, p.y, p.z + 0.3, p.x, p.y + 1.45, p.z, false);
+            com.darkcraft.rol.Rol.sinCombate(sp);
+        }));
+        t += 20;
+        atTicks(t, "la E: hablar con Oswin (con la campana)", m -> pulsar(m.options.keyInventory));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logMision(m, "con la campana");
+            shot(m, "cliente_ow15_oswin_la_oye");
+        });
+        t += 4;
+        atTicks(t, "E: el segundo menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            logMision(m, "devolver o quedarsela");
+            shot(m, "cliente_ow16_oswin_menu_campana");
+        });
+        t += 4;
+        atTicks(t, "devolverle la campana", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        t += 26;
+        atTicks(t, "captura", m -> {
+            logMision(m, "la toca");
+            shot(m, "cliente_ow17_oswin_toca");
+        });
+        t += 4;
+        atTicks(t, "los peregrinos: desde detras", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                var o = mv == null ? null : com.darkcraft.mision.Oswin.buscarOswin(mv);
+                if (o == null) return;
+                Vec3 p = o.position();
+                irMirando(sp, p.x - 1.5, p.y + 2.2, p.z + 12.5, p.x - 4.5, p.y + 1.2, p.z - 2, true);
+                log("  peregrinos: " + mv.getEntitiesOfClass(com.darkcraft.mision.Peregrino.class, o.getBoundingBox().inflate(24)).size());
+            });
+        });
+        t += 50;
+        atTicks(t, "captura", m -> shot(m, "cliente_ow18_peregrinos"));
+        t += 60;
+        atTicks(t, "captura", m -> {
+            logMision(m, "devuelta");
+            shot(m, "cliente_ow19_mision_cumplida");
+        });
+        t += 4;
+        atTicks(t, "la Historia: la mision cumplida", m -> {
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.HISTORIA);
+            menuP(m, mm -> mm.probarHistoria(300));
+        });
+        t += 16;
+        atTicks(t, "captura", m -> {
+            menuP(m, mm -> log("  oswin, la historia: " + mm.resumen()));
+            shot(m, "cliente_ow20_historia_cumplida");
+            server(m, sp -> log("  oswin: rosario " + sp.getInventory().countItem(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.PEREGRINO).get())
+                    + ", logro " + com.darkcraft.story.Logros.tiene(sp, "campana_peregrino")));
+        });
+        t += 4;
+        // ---- otra vez: quedarsela
+        atTicks(t, "otra vez, con la campana: quedarsela", m -> {
+            m.setScreen(null);
+            server(m, sp -> {
+                com.darkcraft.mision.Misiones.olvidar(sp, "oswin");
+                com.darkcraft.rol.Ficha.mision(sp, "oswin", com.darkcraft.mision.Oswin.CONOCIDA | com.darkcraft.mision.Oswin.ACEPTADA | com.darkcraft.mision.Oswin.PRECIO
+                        | com.darkcraft.mision.Oswin.TOMADA);
+                com.darkcraft.rol.Equipo.dar(sp, new net.minecraft.world.item.ItemStack(DarkCraftMod.CAMPANA_PEREGRINO.get()));
+                com.darkcraft.mision.Misiones.enviar(sp);
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                var o = mv == null ? null : com.darkcraft.mision.Oswin.buscarOswin(mv);
+                if (o == null) return;
+                Vec3 p = o.position();
+                irMirando(sp, p.x + 2.6, p.y, p.z + 0.3, p.x, p.y + 1.45, p.z, false);
+                com.darkcraft.rol.Rol.sinCombate(sp);
+            });
+        });
+        t += 20;
+        atTicks(t, "la E", m -> pulsar(m.options.keyInventory));
+        t += 26;
+        atTicks(t, "E: el segundo menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "quedarte la campana", m -> dialogo(m, d -> d.pulsarRespuesta(1)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            logMision(m, "se la queda");
+            shot(m, "cliente_ow21_oswin_quedada");
+        });
+        t += 4;
+        atTicks(t, "ESC: el cartel", m -> m.setScreen(null));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logMision(m, "quedada");
+            shot(m, "cliente_ow22_mision_quedada");
+        });
+        t += 4;
+        atTicks(t, "la campana de los difuntos junto a un marchito", m -> server(m, sp -> {
+            ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+            if (mv == null) return;
+            var mar = DarkCraftMod.MARCHITO.get().create(mv);
+            if (mar != null) {
+                Vec3 d = sp.getLookAngle().multiply(1, 0, 1).normalize();
+                mar.moveTo(sp.getX() + d.x * 3, sp.getY(), sp.getZ() + d.z * 3, sp.getYRot() + 180f, 0f);
+                mar.addTag("darkcraft_ci_marchito");
+                mv.addFreshEntity(mar);
+            }
+            sp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(DarkCraftMod.CAMPANA_DIFUNTOS.get()));
+            sp.getCooldowns().removeCooldown(DarkCraftMod.CAMPANA_DIFUNTOS.get());
+            DarkCraftMod.CAMPANA_DIFUNTOS.get().use(mv, sp, net.minecraft.world.InteractionHand.MAIN_HAND);
+        }));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            shot(m, "cliente_ow23_campana_difuntos");
+            server(m, sp -> {
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                if (mv == null) return;
+                for (var e : mv.getEntitiesOfClass(com.darkcraft.enemigos.Marchito.class, sp.getBoundingBox().inflate(12))) {
+                    if (!e.getTags().contains("darkcraft_ci_marchito")) continue;
+                    log("  oswin, la campana de los difuntos: el marchito lento " + e.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)
+                            + ", debil " + e.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS) + ", a " + String.format(java.util.Locale.ROOT, "%.1f", e.distanceTo(sp)));
+                    e.discard();
+                }
+                sp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
+                com.darkcraft.mision.Misiones.olvidar(sp, "oswin");
+            });
+        });
+        return t + 10;
     }
 
     // ------------------------------------------------------------------ los herreros de Morvain y Silas (parte 7af)

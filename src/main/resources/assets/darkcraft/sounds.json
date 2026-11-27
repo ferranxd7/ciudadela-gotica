@@ -7648,5 +7648,160 @@
         "stream": true
       }
     ]
+  },
+  "voz.oswin.1": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:oswin/voz_1",
+        "stream": true
+      }
+    ]
+  },
+  "voz.oswin.2": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:oswin/voz_2",
+        "stream": true
+      }
+    ]
+  },
+  "voz.oswin.3": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:oswin/voz_3",
+        "stream": true
+      }
+    ]
+  },
+  "voz.oswin.4": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:oswin/voz_4",
+        "stream": true
+      }
+    ]
+  },
+  "voz.oswin.5": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:oswin/voz_5",
+        "stream": true
+      }
+    ]
+  },
+  "voz.oswin.6": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:oswin/voz_6",
+        "stream": true
+      }
+    ]
+  },
+  "voz.oswin.7": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:oswin/voz_7",
+        "stream": true
+      }
+    ]
+  },
+  "voz.oswin.8": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:oswin/voz_8",
+        "stream": true
+      }
+    ]
+  },
+  "voz.oswin.9": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:oswin/voz_9",
+        "stream": true
+      }
+    ]
+  },
+  "voz.oswin.10": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:oswin/voz_10",
+        "stream": true
+      }
+    ]
+  },
+  "voz.oswin.11": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:oswin/voz_11",
+        "stream": true
+      }
+    ]
+  },
+  "voz.oswin.12": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:oswin/voz_12",
+        "stream": true
+      }
+    ]
+  },
+  "sfx.campana_viento": {
+    "subtitle": "subtitles.darkcraft.sfx.campana_viento",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/campana_viento_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/campana_viento_2",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/campana_viento_3",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "sfx.campana_toque": {
+    "subtitle": "subtitles.darkcraft.sfx.campana_toque",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/campana_toque_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/campana_toque_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/campana_toque_3",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.peregrinos": {
+    "subtitle": "subtitles.darkcraft.sfx.peregrinos",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/peregrinos_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/peregrinos_2",
+        "attenuation_distance": 32
+      }
+    ]
   }
 }

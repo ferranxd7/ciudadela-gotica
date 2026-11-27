@@ -160,8 +160,13 @@ public class DialogoScreen extends Screen {
         Panel.acepta();
         Dialogos.Respuesta r = nodo.respuestas()[i];
         if (r.accion() != Dialogos.Accion.NADA) {
-            // la forja o la tienda: la abre el servidor (esta pantalla se queda hasta entonces)
             Net.CH.sendToServer(new Net.DialogoAccion(entidad, r.accion().id()));
+            // lo que se responde a quien da una mision (parte 7ag): el servidor lo apunta y la conversacion sigue
+            if (r.destino() != Dialogos.FIN) {
+                ir(r.destino());
+                return;
+            }
+            // la forja o la tienda: la abre el servidor (esta pantalla se queda hasta entonces)
             esperando = 30;
             return;
         }

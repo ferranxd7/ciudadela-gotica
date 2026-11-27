@@ -50,6 +50,19 @@ public final class Ficha {
         f.put("dialogos", d);
     }
 
+    /** Lo hecho en una mision (marcas de bits, cada mision las suyas; NBT {@code misiones}; parte 7ag). */
+    public static int mision(Player p, String id) {
+        return leer(p).getCompound("misiones").getInt(id);
+    }
+
+    public static void mision(Player p, String id, int marcas) {
+        CompoundTag f = abrir(p);
+        CompoundTag d = f.getCompound("misiones");
+        if (marcas == 0) d.remove(id);
+        else d.putInt(id, marcas);
+        f.put("misiones", d);
+    }
+
     /** Cuantas se han comprado de una cosa de la tienda (las que tienen limite; clave = el id del objeto). */
     public static int comprado(Player p, String clave) {
         return leer(p).getCompound("compras").getInt(clave);

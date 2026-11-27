@@ -44,14 +44,16 @@ public final class Conversaciones {
             Net.to(sp, new Net.Cartel(Net.Cartel.AVISO, "darkcraft.dialogo.combate", 0));
             return;
         }
-        int nodo = p instanceof Guia g ? inicioGuia(sp, g) : p instanceof com.darkcraft.morvain.Corazon ? com.darkcraft.morvain.Aguja.inicio(sp) : inicio(sp, d.id());
+        int nodo = p instanceof Guia g ? inicioGuia(sp, g) : p instanceof com.darkcraft.morvain.Corazon ? com.darkcraft.morvain.Aguja.inicio(sp)
+                // quien da una mision (parte 7ag): segun como la lleve
+                : p instanceof com.darkcraft.personajes.Viajero v ? com.darkcraft.mision.Misiones.inicio(sp, v) : inicio(sp, d.id());
         Net.to(sp, new Net.Dialogo(p.getId(), d.id(), nodo));
         String logro = switch (d.id()) {
             case "herrero" -> "dorvan";
             case "mercader" -> "kerrick";
             // los de Morvain (parte 7af): Hagen y Silas, el suyo; los cuatro herreros, el de todos
             case "hagen", "silas" -> d.id();
-            case "brenna", "ulrik", "tobin", "sombra" -> null;
+            case "brenna", "ulrik", "tobin", "sombra", "oswin" -> null;
             default -> "maelis";
         };
         if (logro != null) Logros.dar(sp, logro);
@@ -149,6 +151,9 @@ public final class Conversaciones {
             com.darkcraft.morvain.Ambulante.rumbo(sp);
         } else if ("silbato".equals(accion) && e instanceof Guia) {
             darSilbato(sp);
+        } else if (e instanceof com.darkcraft.personajes.Viajero v) {
+            // lo que se le responde a quien da una mision (parte 7ag)
+            com.darkcraft.mision.Misiones.accion(sp, v, accion);
         } else if (("golpear".equals(accion) || "tomar".equals(accion)) && e instanceof com.darkcraft.morvain.Corazon c) {
             // la respuesta a la Sombra (parte 7ac)
             com.darkcraft.morvain.Aguja.elegir(sp, c, "golpear".equals(accion));

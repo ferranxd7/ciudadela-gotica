@@ -408,6 +408,8 @@ public final class Hud {
             aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable(avisoCosa), null);
         else if (avisoQue == ClientRol.ESTELA)
             aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable("darkcraft.aviso.estela"), null);
+        else if (avisoQue == ClientRol.CAMPANA)
+            aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable("darkcraft.aviso.campana"), null);
         else if (avisoQue == ClientRol.PUERTA)
             aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable("darkcraft.aviso.puerta_aguja"), null);
         else
@@ -542,7 +544,16 @@ public final class Hud {
         if (obj != null) marca(g, HudTex.MARCA_OBJETIVO, cx, y + 3, medio, rumbo(obj[0] + 0.5 - px, obj[1] + 0.5 - pz) - yaw);
         if (ClientRol.hayEspada && mc.level.dimension().location().toString().equals(ClientRol.espadaDim))
             marca(g, HudTex.MARCA_ESPADA, cx, y + 1, medio, rumbo(ClientRol.ex - px, ClientRol.ez - pz) - yaw);
-        if (mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL) santuarios(g, cx, y, medio, px, pz, yaw);
+        if (mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL) {
+            santuarios(g, cx, y, medio, px, pz, yaw);
+            // adonde ir en las misiones (parte 7ag): una campanita de oro
+            for (com.darkcraft.net.Net.MisionE mi : com.darkcraft.client.mision.ClientMisiones.LISTA) {
+                if (!mi.hay()) continue;
+                double dx = mi.x() + 0.5 - px, dz = mi.z() + 0.5 - pz;
+                if (dx * dx + dz * dz < 16) continue;
+                marca(g, HudTex.MARCA_MISION, cx, y + 1, medio, rumbo(dx, dz) - yaw);
+            }
+        }
         Pix.blanco();
         Pix.t(g, HudTex.BRUJULA_AGUJA, cx - 4, y - 2);
     }

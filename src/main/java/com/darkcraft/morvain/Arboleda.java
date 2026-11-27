@@ -60,6 +60,8 @@ public final class Arboleda {
 
     /** Lo que cuelga de una soga. */
     static final int COLGADO = 0, LAZO = 1, CABO = 2;
+    /** La soga de la campana del peregrino (parte 7ag): baja hasta dos bloques por encima de lo que se pisa y de su cabo cuelga la campana. */
+    static final int CAMPANA = 3;
 
     // ------------------------------------------------------------------ el terreno (el de Morvain, sin tocar)
 
@@ -110,6 +112,8 @@ public final class Arboleda {
     public final int fy;
     /** Las sogas que hay (para la prueba). */
     public int sogas, lazos, cabos;
+    /** El cabo de la soga de la campana del peregrino (parte 7ag): {x, y, z} del ultimo bloque de soga (la campana cuelga debajo). */
+    private int[] campana;
 
     private Arboleda() {
         // ---- el patibulo (antes que nada: su altura la usan los puestos)
@@ -171,6 +175,11 @@ public final class Arboleda {
         // el Verdugo (parte 7h): de pie en el tablado, delante de la horca y de la trampilla; y donde se le ve desde el claro
         sitio("verdugo", PX, fy + 1, PZ + 1);
         sitio("ante_patibulo", PX, pie(PX, PZ + 17), PZ + 17);
+        // la campana del peregrino (parte 7ag): bajo ella, y donde se la ve (en el camino, al llegar al claro)
+        if (campana != null) {
+            sitio("campana", campana[0], pie(campana[0], campana[2]), campana[2]);
+            sitio("ante_campana", campana[0] + 3, pie(campana[0] + 3, campana[2] + 2), campana[2] + 2);
+        }
         elementos.sort(java.util.Comparator.comparingInt(e -> e.layer));
         for (Element e : elementos)
             for (int x = e.x0 >> 4; x <= e.x1 >> 4; x++)
@@ -245,6 +254,11 @@ public final class Arboleda {
 
     public Map<String, int[]> sitios() {
         return sitios;
+    }
+
+    /** Donde cuelga la campana del peregrino (parte 7ag): {x, y, z} del cabo de su soga; la campana, debajo. */
+    public int[] campana() {
+        return campana;
     }
 
     private void sitio(String nombre, int x, int y, int z) {
@@ -436,6 +450,12 @@ public final class Arboleda {
     /** Igual, sobre un suelo dado (el tablado del patibulo). */
     private void soga(Lista L, int x, int ytop, int z, Soga s, float giro, int suelo) {
         libre(x, z);
+        if (s.tipo == CAMPANA) {
+            int fondo = suelo + 2;
+            for (int y = ytop; y >= fondo; y--) L.soga(x, y, z, SogaBlock.Parte.CUERDA);
+            campana = new int[]{x, fondo, z};
+            return;
+        }
         if (s.tipo == COLGADO) {
             // el ahorcado cuelga con los pies a algo mas de un bloque del suelo: su soga de bloques acaba 4 por encima
             int fondo = suelo + 4;
@@ -494,7 +514,9 @@ public final class Arboleda {
         }
         // las ramas de las sogas (seis ahorcados: dos con soga)
         Rama[] ramas = {
-                new Rama(1, 0, 7, 9, new Soga(4, COLGADO, 0, Ahorcado.GARRAS), new Soga(6, LAZO, 3, 0), new Soga(8, COLGADO, 0, Ahorcado.SOGA)),
+                new Rama(1, 0, 7, 9, new Soga(4, COLGADO, 0, Ahorcado.GARRAS), new Soga(6, LAZO, 3, 0), new Soga(8, COLGADO, 0, Ahorcado.SOGA),
+                        // la campana del peregrino (parte 7ag): en la punta de la rama que se inclina sobre el camino
+                        new Soga(9, CAMPANA, 0, 0)),
                 new Rama(1, -1, 11, 6, new Soga(4, LAZO, 4, 0)),
                 new Rama(0, -1, 9, 10, new Soga(4, COLGADO, 0, Ahorcado.GARRAS), new Soga(7, CABO, 2, 0), new Soga(9, LAZO, 3, 0)),
                 new Rama(-1, 0, 8, 8, new Soga(3, LAZO, 2, 0), new Soga(6, COLGADO, 0, Ahorcado.SOGA)),

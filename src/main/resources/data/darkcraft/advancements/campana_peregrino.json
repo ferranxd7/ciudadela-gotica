@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:morvain",
+  "display": {
+    "icon": {
+      "item": "darkcraft:talisman_peregrino"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.campana_peregrino.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.campana_peregrino.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 120
+  }
+}

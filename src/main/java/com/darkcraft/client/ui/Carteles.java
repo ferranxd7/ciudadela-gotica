@@ -53,6 +53,9 @@ public final class Carteles {
             case Net.Cartel.BARCO -> COLA.add(new Cartel(Net.Cartel.BARCO, Component.translatable("darkcraft.cartel.barco"), Component.translatable(m.clave())));
             case Net.Cartel.FRAGMENTO -> COLA.add(new Cartel(Net.Cartel.PIEZA, Component.translatable(m.clave()),
                     Component.translatable("darkcraft.cartel.fragmento", m.n(), com.darkcraft.morvain.Fragmentos.ESTELAS.length)));
+            // una mision (parte 7ag): con el cartel grande, su titulo y "Nueva mision" o "Mision cumplida"
+            case Net.Cartel.MISION -> COLA.add(new Cartel(Net.Cartel.ZONA, Component.translatable(m.clave()),
+                    Component.translatable(m.n() == 0 ? "darkcraft.cartel.mision.nueva" : "darkcraft.cartel.mision.cumplida")));
             case Net.Cartel.AVISO -> {
                 // "clave|otra|..." : las de detras son los argumentos (traducidos) de la primera (adonde ira Silas, parte 7af)
                 String[] k = m.clave().split("\\|");

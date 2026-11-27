@@ -1181,8 +1181,14 @@ public class MenuScreen extends Screen {
 
     // ================================================================== HISTORIA
 
-    /** Una fila de la Historia: cabecera de apartado, o un libro (capitulo 1-6, libro perdido 101-111, diario 200; -1 nada). */
+    /**
+     * Una fila de la Historia: cabecera de apartado, o un libro (capitulo 1-10, libro perdido 101-199, diario 200), o una mision
+     * (300 + su numero en la lista de las que se conocen, parte 7ag); -1 nada.
+     */
     private record FilaH(int id, Component texto, boolean cabecera, boolean abierto) {}
+
+    /** Las filas de las misiones (parte 7ag) empiezan aqui. */
+    private static final int MISION = 300;
 
     private static final int FILA_H = 14, CABECERA_H = 18;
 
@@ -1210,6 +1216,15 @@ public class MenuScreen extends Screen {
             Net.EspejoEstado e = com.darkcraft.client.espejo.EspejoCliente.estado();
             int leidos = e == null ? 0 : e.leidos();
             long perdidos = e == null ? 0 : e.perdidos();
+            // las misiones (parte 7ag): las que se conocen, las primeras (las que estan en marcha antes)
+            List<Net.MisionE> mis = com.darkcraft.client.mision.ClientMisiones.LISTA;
+            if (!mis.isEmpty()) {
+                filas.add(new FilaH(0, Component.translatable("darkcraft.menu.historia.misiones"), true, true));
+                for (int pasada = 0; pasada < 2; pasada++)
+                    for (int i = 0; i < mis.size(); i++)
+                        if (com.darkcraft.client.mision.ClientMisiones.acabada(mis.get(i)) == (pasada == 1))
+                            filas.add(new FilaH(MISION + i, Component.translatable("darkcraft.mision." + mis.get(i).id() + ".titulo"), false, true));
+            }
             filas.add(new FilaH(0, Component.translatable("darkcraft.menu.historia.cronica"), true, true));
             // la cronica de Morvain (parte 7ae, capitulos 7-10, los cuenta Maelis): su apartado, desde que se abrio el portal
             boolean morvain = (leidos & (0xF << com.darkcraft.story.Story.MORVAIN | 1 << 6)) != 0;
@@ -1283,8 +1298,11 @@ public class MenuScreen extends Screen {
                     Pix.blanco();
                     Panel.fila(g, x - 2, fy - 2, w + 4);
                 }
+                Net.MisionE mi = mision(f.id());
                 int icono = f.id() >= 1 && f.id() <= com.darkcraft.story.Story.CHAPTERS ? (f.abierto() ? com.darkcraft.client.espejo.EspejoHud.I_PERGAMINO : com.darkcraft.client.espejo.EspejoHud.I_CANDADO)
-                        : f.id() > 100 && f.id() < 200 ? com.darkcraft.client.espejo.EspejoHud.I_LIBRO : f.id() == 200 ? com.darkcraft.client.espejo.EspejoHud.I_PLUMA : -1;
+                        : f.id() > 100 && f.id() < 200 ? com.darkcraft.client.espejo.EspejoHud.I_LIBRO : f.id() == 200 ? com.darkcraft.client.espejo.EspejoHud.I_PLUMA
+                        : mi != null ? (com.darkcraft.client.mision.ClientMisiones.acabada(mi) ? com.darkcraft.client.espejo.EspejoHud.I_MISION_HECHA
+                        : com.darkcraft.client.espejo.EspejoHud.I_MISION) : -1;
                 if (icono >= 0) {
                     Pix.mezcla();
                     com.darkcraft.client.espejo.EspejoHud.icono(g, icono, x + 5, fy + 5, 10);
@@ -1304,7 +1322,13 @@ public class MenuScreen extends Screen {
             return Component.literal(s + "...");
         }
 
-        /** El panel de la derecha: la miniatura, el titulo y como empieza (o el candado). */
+        /** La mision de una fila (o null). */
+        private Net.MisionE mision(int id) {
+            List<Net.MisionE> mis = com.darkcraft.client.mision.ClientMisiones.LISTA;
+            return id >= MISION && id - MISION < mis.size() ? mis.get(id - MISION) : null;
+        }
+
+        /** El panel de la derecha: la miniatura, el titulo y como empieza (o el candado); de una mision, como va. */
         private void detalle(GuiGraphics g, int x2) {
             int w2 = px + pw - 12 - x2, y2 = py + 8, h2 = ph - 16;
             if (w2 < 100 || sel < 0 || sel >= filas.size()) return;
@@ -1312,8 +1336,10 @@ public class MenuScreen extends Screen {
             Panel.hueco(g, x2, y2, w2, h2);
             FilaH f = filas.get(sel);
             int id = f.id();
+            Net.MisionE mi = mision(id);
             int mini = id >= 1 && id <= com.darkcraft.story.Story.CHAPTERS ? CodiceScreen.miniaturaCapitulo(id)
                     : id > 100 && id < 200 ? CodiceScreen.miniaturaPerdido(id - 100)
+                    : mi != null ? CodiceScreen.MIN_MISION_OSWIN
                     : CodiceScreen.MIN_DIARIO;
             int y = y2 + 8;
             boolean conMini = w2 >= CodiceScreen.MINI_W + 2 * CodiceScreen.MINI_MARCO + 12 && h2 >= CodiceScreen.MINI_H + 90;
@@ -1340,6 +1366,12 @@ public class MenuScreen extends Screen {
                 titulo = Component.translatable("darkcraft.perdido." + (id - 100) + ".titulo");
                 sub = Component.translatable("darkcraft.perdido." + (id - 100) + ".autor");
                 inicio = net.minecraft.client.resources.language.I18n.get("darkcraft.perdido." + (id - 100) + ".p1");
+            } else if (mi != null) {
+                // una mision (parte 7ag): su titulo, si esta en marcha o acabada y como va
+                String est = com.darkcraft.client.mision.ClientMisiones.estado(mi);
+                titulo = Component.translatable("darkcraft.mision." + mi.id() + ".titulo");
+                sub = Component.translatable(com.darkcraft.client.mision.ClientMisiones.acabada(mi) ? "darkcraft.mision.acabada" : "darkcraft.mision.en_marcha");
+                inicio = net.minecraft.client.resources.language.I18n.get("darkcraft.mision." + mi.id() + "." + est);
             } else {
                 titulo = Component.translatable("darkcraft.menu.historia.diario");
                 Net.EspejoEstado e = com.darkcraft.client.espejo.EspejoCliente.estado();
@@ -1385,7 +1417,8 @@ public class MenuScreen extends Screen {
         private void leerLibro() {
             if (sel < 0 || sel >= filas.size()) return;
             FilaH f = filas.get(sel);
-            if (!f.abierto() || f.id() <= 0) {
+            // (una mision no se abre en el codice: lo que hay que saber esta en el panel de la derecha)
+            if (!f.abierto() || f.id() <= 0 || f.id() >= MISION) {
                 Panel.nada();
                 return;
             }

@@ -680,11 +680,47 @@ I['estela'] = [
     "...kkkkkkkkkkk..",
     "................"]
 
+# la campana de una mision (parte 7ag): de bronce dorado con su badajo; apagada (gris) la de una mision acabada
+I['mision'] = [
+    "................",
+    ".......kk.......",
+    "......kbbk......",
+    "......kkkk......",
+    ".....kyYYyk.....",
+    "....kyYYyyyk....",
+    "....kyYyyyyk....",
+    "....kyYyyyyk....",
+    "...kyYyyyyyyk...",
+    "...kyYyyyyyyk...",
+    "..kyyyyyyyyyyk..",
+    ".kyyyyyyyyyyyyk.",
+    ".kooooooooooook.",
+    ".kkkkkkddkkkkkk.",
+    "......kddk......",
+    ".......kk......."]
+I['mision_hecha'] = [
+    "................",
+    ".......kk.......",
+    "......kddk......",
+    "......kkkk......",
+    ".....kgGGgk.....",
+    "....kgGGgggk....",
+    "....kgGggggk....",
+    "....kgGggggk....",
+    "...kgGgggggdk...",
+    "...kgGgggggdk...",
+    "..kggggggggddk..",
+    ".kggggggggggddk.",
+    ".kddddddddddddk.",
+    ".kkkkkkddkkkkkk.",
+    "......kddk......",
+    ".......kk......."]
+
 ORDEN = ['jugador', 'torre', 'catedral', 'arbol', 'fuente', 'cofre', 'cofre_leido', 'calavera', 'corona', 'espada',
          'puerta', 'casa', 'fortaleza', 'portal', 'libro', 'pluma',
          'm_bandera', 'm_estrella', 'm_casa', 'm_calavera', 'm_corazon', 'm_equis', 'm_diamante', 'm_ojo', 'm_pico',
          'm_cama', 'm_espadas', 'm_pregunta', 'sello', 'sello_gris', 'candado', 'pergamino',
-         'mapa', 'trofeo', 'bestia', 'punto', 'flecha', 'santuario_m', 'ciudadela', 'estela']
+         'mapa', 'trofeo', 'bestia', 'punto', 'flecha', 'santuario_m', 'ciudadela', 'estela', 'mision', 'mision_hecha']
 
 
 def main(salida):

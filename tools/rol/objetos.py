@@ -178,6 +178,8 @@ TALISMANES = {
     "codicia": ("redondo", "oro", ["...y...", "..yoy..", ".y.o.y.", "y..o..y", "...o...", "..yoy..", "......."]),
     "garra": ("escudo", "hierro", ["s..s..s", "s..s..s", "S..S..S", ".S.S.S.", ".s.s.s.", "..sss..", "......."]),
     "furia": ("cuadrado", "hierro", ["R.....R", "RR...RR", ".RRRRR.", ".RkRkR.", ".RRRRR.", "..RkR..", "...R..."]),
+    # el Rosario del peregrino (parte 7ag, de Oswin): cuentas de hueso en su vuelta y la crucecita
+    "peregrino": ("redondo", "bronce", ["..hHh..", ".h...h.", ".h...h.", "..hHh..", "...H...", "..HHH..", "...H..."]),
 }
 
 
