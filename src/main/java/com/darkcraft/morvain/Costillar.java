@@ -749,11 +749,16 @@ public final class Costillar {
                     }
                 }
             }
+        // (la sal suelta —capas de nieve— no estorba)
         int libre = 0;
         for (int u = -18; u <= 18; u += 3)
-            for (int v = -6; v <= 6; v += 3) if (m.getBlockState(new BlockPos(CX + u, PISO, CZ + v)).isAir()) libre++;
-        boolean craneo = m.getBlockState(new BlockPos(CX + 30, PISO + 8, CZ)).is(Blocks.BONE_BLOCK) || m.getBlockState(new BlockPos(CX + 30, PISO + 8, CZ)).is(Blocks.CALCITE)
-                || m.getBlockState(new BlockPos(CX + 30, PISO + 8, CZ)).is(Blocks.SMOOTH_SANDSTONE);
+            for (int v = -6; v <= 6; v += 3) {
+                BlockState q = m.getBlockState(new BlockPos(CX + u, PISO, CZ + v));
+                if (q.isAir() || q.is(Blocks.SNOW)) libre++;
+            }
+        // la cascara de la calavera por arriba (por dentro es hueca)
+        BlockState cr = m.getBlockState(new BlockPos(CX + 30, PISO + 9, CZ));
+        boolean craneo = cr.is(Blocks.BONE_BLOCK) || cr.is(Blocks.CALCITE) || cr.is(Blocks.SMOOTH_SANDSTONE);
         return "atril con el libro 27 " + (libro ? "SI" : "NO") + ", arcon " + (arcon ? "SI" : "NO") + ", espinazo " + (lomo ? "SI" : "NO")
                 + ", costillas en la arena " + pies + "/" + (2 * ((COSTILLA_U1 - COSTILLA_U0) / COSTILLA_PASO + 1)) + ", calavera " + (craneo ? "SI" : "NO")
                 + ", suelo de la sala libre " + libre + "/65";
