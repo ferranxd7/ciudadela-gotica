@@ -5410,5 +5410,237 @@
     ]
    }
   }
+ },
+ "sfx_penitente": {
+  "flow": "rA0LWiSNDaEcajA8osLQ",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7s: los Penitentes de la Tierra sin Fe (rezo, alerta, dolor, muerte, el azote, la penitencia, la hemorragia, la cruz contra el suelo, el arrastre de la cruz, el incensario, el humo del incienso, el cantico y alzarse), la campana del Puente de la Grieta y el viento de la Tierra sin Fe. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "penitente_rezo": {
+    "prompt": "A hooded flagellant pilgrim mutters a fervent prayer under his breath in a hoarse whisper, ragged wet breathing, a leather scourge creaking in his hand, faint chains clinking, cold stone reverb, dark fantasy, no music",
+    "sesiones": [
+     "2Yl4ivOhQR61xtHKuPuv",
+     "OPXUVhXE7l1xCBdc0YdL",
+     "BpROdmnyRVlTZkBkav8f",
+     "P0PjTgX9LWTrP17zf4s4"
+    ],
+    "generaciones": [
+     "UL0fP9Okq28JWYloBKjT",
+     "q2uRJDBPVnYAobS2hzYR",
+     "xXst1LN0dHLOOoYf9nCh",
+     "iWe3UTl2KDRUjzCG6iPF"
+    ]
+   },
+   "penitente_alerta": {
+    "prompt": "A fanatical hooded penitent spots an intruder and lets out a hoarse zealous shriek, half prayer half scream, chains rattling as he rises, dark fantasy enemy alert, no music",
+    "sesiones": [
+     "65s2zVB6M3hBDxAeBGDQ",
+     "ZBTEGIv8T3t04Bt9oLPq",
+     "jxOOq42MpBYaW0OVR9yH",
+     "REJ6jpHOO7PNbWt8kwWa"
+    ],
+    "generaciones": [
+     "JlNGLqQXUcq0zml8G62M",
+     "RDhaB1JsBkyErHfnKMZ0",
+     "hXA7njLznaAxiE8KNheQ",
+     "MpvNx9LzAquT9EqdxBZZ"
+    ]
+   },
+   "penitente_dolor": {
+    "prompt": "A hooded penitent grunts in pain, a short strangled moan that is almost ecstatic, wet ragged breath, dark fantasy enemy hurt, no music",
+    "sesiones": [
+     "PxKS5nOz10zTUVR1RrDl",
+     "KcKoaxUnhRfh1SF2gtYB",
+     "7Rd6RE6FLWubmDzvJAgd",
+     "iIhkrjfQi42h3SoxD1pi"
+    ],
+    "generaciones": [
+     "5dF3YDdfWzBZ3TbZ3WrA",
+     "IZdrTv5ZRhcYFWLQqJAo",
+     "O9S55e0ZLdozMN9o0nbz",
+     "U9azI12R1l43QAbpxii1"
+    ]
+   },
+   "penitente_muerte": {
+    "prompt": "A hooded flagellant collapses to his knees and falls face down, a long rattling final breath, blood dripping and splashing onto stone, a last muttered prayer fading away, dark fantasy enemy death, no music",
+    "sesiones": [
+     "SlQXixi8dnwrT5bqUA6t",
+     "g9NJWHkjqXBxr5Da8KUe",
+     "MmOtmJQq02O52DRtsivl",
+     "yEjgtPh7eZRqI4alaQrL"
+    ],
+    "generaciones": [
+     "4z25T8TeFeFMJYZ6KKSH",
+     "ecrOnP7mORF3S8G49nl7",
+     "aVWSTi095tnv0Oc5QqUM",
+     "uCDjXwePtX0mSk05bOac"
+    ]
+   },
+   "penitente_azote": {
+    "prompt": "The sharp crack of a knotted leather scourge with metal barbs whipping through the air and lashing flesh, a wet stinging impact, cinematic dark fantasy weapon hit, no music",
+    "sesiones": [
+     "vmP5e1OaoMayrmS90Gb5",
+     "GRBouycV0c4GSEVWbeNJ",
+     "YhsJ3AcM93KjJFShvfd9",
+     "NTIKPCyBdPhGpokUM4yR"
+    ],
+    "generaciones": [
+     "bq5YAm1Fnn9vmKiKUpQ2",
+     "XKylgvDKtczEThUxUlKf",
+     "j19A0XOkQ1SFVY7zkWxy",
+     "4Yyzieyqr94qbQY5pgGy"
+    ]
+   },
+   "penitente_penitencia": {
+    "prompt": "A penitent monk whips his own back three times with a knotted scourge, wet cracks of leather on flesh, pained ecstatic gasps between the lashes, dark fantasy, no music",
+    "sesiones": [
+     "bPZAJk6vgI2d3H5VJDiW",
+     "lpj9mBMXZuv38Mi6vzU7",
+     "AAHegBPxayFF7y0dYjv0",
+     "fEQdTJS5j9vFle3ROttb"
+    ],
+    "generaciones": [
+     "JP5YtOPlZ9rLD4ui7sAX",
+     "47QY8pivPVWJyCXmODyR",
+     "BGDxQj0iOplhwlkLau5h",
+     "jraubpHI9TzWQTInXvQr"
+    ]
+   },
+   "penitente_hemorragia": {
+    "prompt": "A sudden burst of gushing blood, a wet visceral splash and a heavy heartbeat thump, a cinematic bleeding status effect sting, dark fantasy game, no music",
+    "sesiones": [
+     "F0By9gYzRTGUHjL5IEE0",
+     "4Ho2gUuadJP4oaO9oDcO",
+     "NzR53kXBIBzXpFDdp5qo",
+     "yM3aH3FdRQFU4sh6WW7y"
+    ],
+    "generaciones": [
+     "TwfWBBD7vlhiYjFvTgTG",
+     "5xRuYUTV75mJ7lo28psD",
+     "1ZJaaTxsUHD1ZgH1flQE",
+     "0oNIMkeud42tAm9nCvRh"
+    ]
+   },
+   "penitente_cruz": {
+    "prompt": "A huge heavy wooden cross slammed down onto stone ground, a deep cracking thud, a low shockwave rumble and scattering debris, cinematic dark fantasy impact, no music",
+    "sesiones": [
+     "qynezvwbef279fVmPm51",
+     "bd9oisexh4VaTIj0JpJI",
+     "wXVqw1XbJ35i2h8Suuut",
+     "l3Z3NqfVcQ1Rg5FJQMLU"
+    ],
+    "generaciones": [
+     "XfPXZsm3SNWejPSwZs8G",
+     "xxIhGFFG28ATvaH5usg4",
+     "ITAJIWrwwEUCT1QDfG9C",
+     "CWk7LvVDmr4gh4YnbHzO"
+    ]
+   },
+   "penitente_arrastre": {
+    "prompt": "A heavy wooden cross dragged slowly across rough stone and gravel, scraping and grinding wood, slow heavy barefoot steps and labored breathing, dark fantasy, no music",
+    "sesiones": [
+     "7yuhFK5QioFCsAq1X12b",
+     "r3Kauuf5sH3YMGpoUxbm",
+     "RfgBFujiCFRbUJkKMaXw",
+     "cOUu9jIBUQdYs2bWjLwc"
+    ],
+    "generaciones": [
+     "SoXiez8Lv50zO2WCItrT",
+     "6mOFqj7xtgpqJgqtb03S",
+     "jAxRF7DWd1AdAqjJKGxW",
+     "f6Pfc4f0OGNr6T0TWRY5"
+    ]
+   },
+   "penitente_incensario": {
+    "prompt": "A heavy brass censer on chains swung in a wide fast arc, whooshing air, rattling chains and crackling burning embers, dark fantasy weapon swing, no music",
+    "sesiones": [
+     "chPnDMGYHaT9EMBhXlQq",
+     "NlhfZlF3ZNAWIpT6lqJC",
+     "Xp42MT5VeoKSnbAnBpX6",
+     "85CULBnnvsxOf5Q7Qmiv"
+    ],
+    "generaciones": [
+     "ZN7zxUNUX5Oy73HHHjDG",
+     "zecQcHYtJd4W4gu1uNEG",
+     "n9X4QZ4lO1dSo1kcvYSK",
+     "CaPQdYuYQSiZ55ePqrV2"
+    ]
+   },
+   "penitente_humo": {
+    "prompt": "A thick cloud of blood-red incense smoke billows out of a censer with a soft rushing hiss, embers crackling, a faint eerie breathy choir underneath, dark fantasy spell, no music",
+    "sesiones": [
+     "jFAzgT0yTw2Ooc5pSHHu",
+     "DTc0ReGXRyoBlb3jM6qW",
+     "wLpD2NsF4w9Cp0wAxrLQ",
+     "9PdSbvMkmfUpCVisP2bP"
+    ],
+    "generaciones": [
+     "gXFM9B09KAxcv4hhGDyk",
+     "ibBJUGxrlpEfi39Wx89a",
+     "rNtCKg6zEk3NBKgm9E2q",
+     "OCAAQRHnY466PFkRIkGX"
+    ]
+   },
+   "penitente_cantico": {
+    "prompt": "A small group of hooded penitents intone a slow mournful liturgical chant in unison, deep hoarse male voices, echoing in a vast stone nave, eerie and holy, dark fantasy, no instruments",
+    "sesiones": [
+     "BBNDu3spHV0siTrwW2ZO",
+     "fyWaDEOXMSUjrc2I1B8p",
+     "X0JBhWw6chZlHuSUqby7",
+     "at3iWmukjgG6Fz0Yqp31"
+    ],
+    "generaciones": [
+     "nymx41Ccq873nrG1A8w2",
+     "CUD0cMWH2gyDwNdCgIn5",
+     "qhV7fou1gZ1RQ7gfhPRD",
+     "qSd0A8gUFDuPotx2eXiQ"
+    ]
+   },
+   "penitente_alzarse": {
+    "prompt": "A prostrate penitent suddenly rises from the dusty ground, coarse robes rustling, chains rattling, a sharp gasp turning into a zealous hiss, dark fantasy enemy awakening, no music",
+    "sesiones": [
+     "VjDkdXPQjr5XwLlJBHEL",
+     "GqCer36jLvvEZMBm5Gol",
+     "0ACH4iUqmFst11FTKkx9",
+     "BU7RvNrohbCEqZhmrOgO"
+    ],
+    "generaciones": [
+     "YnmBhztNurLv4JN9f6iM",
+     "yW7xPmF72OpgWBvUsyRr",
+     "WpX9Xz03mfjkHCzna9Kn",
+     "dCbayclrHKSUrVKXwWW1"
+    ]
+   },
+   "grieta_campana": {
+    "prompt": "A single large old cracked bronze bell tolls slowly once, deep and mournful, with a long ringing decay echoing across a vast rocky chasm, dark fantasy, no music",
+    "sesiones": [
+     "GJinqbrX7PnGhPPT22QA",
+     "uhZ7vEZmRgjTkK4WTuhI",
+     "wFCyxKgFPzLgfSwTf4Pb",
+     "QtrRQiwg5xhmKuFg00HV"
+    ],
+    "generaciones": [
+     "GgbosZOWhwrXDhb5hSNz",
+     "w4zzdxRPazcsaXM0iZ2Z",
+     "bPhaqxh8QKe3EOe0tlNL",
+     "EZmRUaUZ5qekPlAIu4Hu"
+    ]
+   },
+   "sinfe_ambiente": {
+    "prompt": "Desolate hot wind blowing over a cracked red wasteland, dry dust and grit skittering, a distant low rumble rising from deep chasms, faint far-off moans carried by the wind, eerie dark fantasy ambience, no music",
+    "sesiones": [
+     "cyIAiwP35IZ62692xg0x",
+     "0M7s97hz4wSFur15rrfx",
+     "kLaDRCI3evb72Yray7NZ",
+     "6LS4mOOcVaoqls5TN2l4"
+    ],
+    "generaciones": [
+     "C3WRLcw4qk2xzKP16irN",
+     "0TTNSdsxzp4zf7hwx1Op",
+     "I4cwhELrCaAeGzkMORyr",
+     "7tAZkzwG8bkfJLUe8VwY"
+    ]
+   }
+  }
  }
 }
