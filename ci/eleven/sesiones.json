@@ -5642,5 +5642,286 @@
     ]
    }
   }
+ },
+ "pontifice": {
+  "flow": "lCcsSxKt2uupHxtewNEY",
+  "voz": "J4Gklq1lvygedV6xCpKJ",
+  "nombre_voz": "Supernal",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7t: Anselmo, el Pontifice Sangrante (el jefe de la Tierra sin Fe, en el Altar Profanado). Tomas a y b de cada frase como pontifice/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[old man, soft and reverent] Kneel, my child. [pause] The altar is thirsty... [whispering] and you are still so full.",
+    "sesiones": [
+     "mitJcCIzAnQIH9xRZKLX",
+     "3Nr65AALywtS0gzjKAX4"
+    ],
+    "generaciones": [
+     "Zo5fbYGC7kdEMAYBxr57",
+     "QQ6Qfx3jTZyvU6ofvuCN"
+    ]
+   },
+   "2": {
+    "texto": "[old man, ecstatic] Do you see? I give mine as well! [shouting] Rise, my brothers... rise, and walk with me!",
+    "sesiones": [
+     "XhZ7j6UQh7BtMW1T0L8z",
+     "RU551f1NIMJBhdeqYumR"
+    ],
+    "generaciones": [
+     "KASHTSa8cY99kDah8vjR",
+     "85rfZxTfZWHAYfYHFbnp"
+    ]
+   },
+   "3": {
+    "texto": "[old man, gently satisfied] There. [softly] Now you are forgiven.",
+    "sesiones": [
+     "4ArOoXiFE79WrmSSSpHM",
+     "jA8X4v3RDItJmoQN37hn"
+    ],
+    "generaciones": [
+     "kx2VFLgF5R5oTnyY6NJf",
+     "JXsQsfQNXzukoaVeODcX"
+    ]
+   },
+   "4": {
+    "texto": "[old man, hushed and rapturous] Your blood is a prayer... [whispering] and I hear it.",
+    "sesiones": [
+     "SqA4w9jIdVUlgIYbE5yW",
+     "D73r6xioaarLm7h2BQez"
+    ],
+    "generaciones": [
+     "PcA8PkxfVj3z4dBbYqYa",
+     "9RN4I76WYhtWlCOjBIUR"
+    ]
+   },
+   "5": {
+    "texto": "[old man, weak and dying] Forgive me... [gasping] I only wanted... [whispering] someone to answer.",
+    "sesiones": [
+     "2uMVl4IgNmS12L4wZoc3",
+     "ISaJdx3dToWdPPaC08BT"
+    ],
+    "generaciones": [
+     "t40SGsMoxotB8bNdLwYt",
+     "IxJgtUgrkSR7poC7qU9O"
+    ]
+   }
+  }
+ },
+ "sfx_pontifice": {
+  "flow": "lCcsSxKt2uupHxtewNEY",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7t: Anselmo, el Pontifice Sangrante (sermon, ferula, el golpe de la cruz, la aspersion del caliz, la comunion, beber, el juicio, la columna de sangre, la uncion, la procesion, dolor, muerte y su rezo) y el aire del Altar Profanado (altar_ambiente). Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "pontifice_sermon": {
+    "prompt": "Epic dark fantasy boss sermon: an old fanatical priest bellows a furious holy proclamation in a vast ruined cathedral while a deep chanting choir swells behind him, long stone reverb, cinematic, Dark Souls style, 4 seconds",
+    "sesiones": [
+     "ryvXFx4IFs1YJCQJ43w8",
+     "xLdxJrewIKbfeofZZcdB",
+     "pb9dgRlfxP903aQU7JhV",
+     "X2x5sDHnG2KXFQLRX4H9"
+    ],
+    "generaciones": [
+     "2dXkhYTkenIoCfVbM2GD",
+     "71pxxfMTZBAun30UeepN",
+     "EWeHciM1F863tErLD2RI",
+     "083dvEkV3IAwdR1Y0WeY"
+    ]
+   },
+   "pontifice_ferula": {
+    "prompt": "A heavy golden metal cross-staff swung fast through the air, deep whoosh with a ringing metallic tail, dark fantasy combat, cinematic, 1.5 seconds",
+    "sesiones": [
+     "ZDAbZHUWUI5acigah741",
+     "8p5daSFKpbxtSfbfJa8J",
+     "9DPFrBIqMsAk00NCLg44",
+     "Rgl9BsAbKvZdIoKRXnSG"
+    ],
+    "generaciones": [
+     "UA4WBgEE7b63ScWZPlbN",
+     "FT4P8T7HFZZwoF7sclWM",
+     "5kk15mWm1hGUKK5EA9E6",
+     "nKlB08XHZDTeQJyyAy4z"
+    ]
+   },
+   "pontifice_golpe": {
+    "prompt": "A heavy golden cross-staff smashes into a stone cathedral floor: deep booming impact, metal clang and cracking stone, short cathedral echo, epic dark fantasy, 2 seconds",
+    "sesiones": [
+     "aPcW1bMR90lHbD1t1QzI",
+     "VhFhIeWrnRsEIZg9HXKc",
+     "Msts61zz43mw7cnVHINs",
+     "UjXuqBbAxxD5UNQHpv0K"
+    ],
+    "generaciones": [
+     "Jc7CzxTG9g3hQskr5OBO",
+     "uZWbluRDQS6oob4TSBxd",
+     "450rz5c0XzrVWxfRw4ny",
+     "DQmzKQX19OR1U0PnViXz"
+    ]
+   },
+   "pontifice_aspersion": {
+    "prompt": "A golden chalice of thick blood flung forward in a wide arc: wet liquid whoosh and heavy splash spraying across stone, visceral, dark fantasy, 1.5 seconds",
+    "sesiones": [
+     "9z69GZbXbbymAvCKO1Qe",
+     "B1UAh4z4X8HV0xy2ZeJU",
+     "0b5yApDI00TBRHDYyjG4",
+     "ATfL2kvq7opI5TylQkVz"
+    ],
+    "generaciones": [
+     "wGTHSn3LZU8TMyaZVl2N",
+     "yhdSMeGq7D6e9F3uhExc",
+     "LUtckTlX1Ii8SmHxn81B",
+     "8jVWJqdMg71VGTHFBCvu"
+    ]
+   },
+   "pontifice_comunion": {
+    "prompt": "Streams of blood rushing through the air and pouring into a metal chalice, swirling liquid whoosh, an eerie low choir hum rising, dark ritual magic, cinematic, 3 seconds",
+    "sesiones": [
+     "LLTpMhVQkrsmR9cdoRPN",
+     "72RkvHewS7MaoQ5ptXTW",
+     "xWHHj1wmlfgiHeuCUePw",
+     "19zzz6ntA6XvNzHSZL8s"
+    ],
+    "generaciones": [
+     "79xKREasNEMvBdkPONjc",
+     "XCbuZdNpJIHGCmwKshg0",
+     "ajuZBAMjhOhYLUD9gv53",
+     "sxvIPJ0OSvDIYo03udGA"
+    ]
+   },
+   "pontifice_bebe": {
+    "prompt": "An old man drinking thick liquid from a metal chalice: three slow heavy gulps and a satisfied wet exhale, close, small stone room echo, 2 seconds",
+    "sesiones": [
+     "okxvBWZTsGJnckWmyEEK",
+     "1TV8RysTEteIuboiWCOM",
+     "w4Dl6KnknlIKt8ix1cKd",
+     "71HCbXukLU8oOG7Bwx1p"
+    ],
+    "generaciones": [
+     "Lp2j81Meb5G7BT8EPy39",
+     "7Dl1FNneubwHqSbOY77F",
+     "uK5viuPxFKtqitT8oWsd",
+     "dhfxqcCHx3N8Nac5QSWb"
+    ]
+   },
+   "pontifice_juicio": {
+    "prompt": "A holy staff raised to the sky: a rising unholy choral swell and a deep resonant tone building up to a hit, wet blood bubbling beneath, dark fantasy spell, cinematic, 2.5 seconds",
+    "sesiones": [
+     "ViQyOalfCon0HqkqkNjp",
+     "iFGrqXV4vQKHeBaL99ev",
+     "w5Y6TUkuYHjk9ulsBVQT",
+     "myC6hXRn99Tjz6FDALb8"
+    ],
+    "generaciones": [
+     "IYnd6QIEROuwUV9Lsbxb",
+     "DamBabaS0bxgfhrVriPT",
+     "5FQFzhgVqqbImaHWGJx9",
+     "p47Z07dQF1CR4N7DQGDr"
+    ]
+   },
+   "pontifice_columna": {
+    "prompt": "A geyser of blood erupting violently from a stone floor: wet explosive burst, splashing liquid raining down, low rumble, dark fantasy, cinematic, 2 seconds",
+    "sesiones": [
+     "7YgPYvdU8NvrhGfd4tcW",
+     "68GOQJFgubez4iClFHHt",
+     "9RrNrDoxhAM9rmPdmt3j",
+     "KX2yJXoOnDq6Txx3qDZY"
+    ],
+    "generaciones": [
+     "h1gU7x3MzgIfIqqfSAs0",
+     "YcnSrODpsfDS3IEqSPXP",
+     "FaGU6FWWOXShRnvdyACl",
+     "zh402v9oDIo0LIXOEaZM"
+    ]
+   },
+   "pontifice_uncion": {
+    "prompt": "Thick blood poured from a chalice over a man's head and splattering onto stone, followed by an ecstatic gasping breath, cathedral reverb, dark fantasy, 3 seconds",
+    "sesiones": [
+     "DbxtXQyuUdLe6XWz5n5E",
+     "N0iwHl2k8aRsoJS2vy7p",
+     "WVe4InKGBqlz3Rug7e9b",
+     "kkmyrwMxCbvI9aktPCJ6"
+    ],
+    "generaciones": [
+     "zfh6i9IbjcugD6tA8ESd",
+     "nPQ1cUO8prXA5dd3CDAu",
+     "SqYH6myllLKy5fuZe6cz",
+     "8BwocVX3eWIEvz793B8i"
+    ]
+   },
+   "pontifice_procesion": {
+    "prompt": "Hooded penitents rising out of channels of blood: wet squelching, chains rattling, and a mournful chant of many low voices beginning, ruined cathedral reverb, dark fantasy, 4 seconds",
+    "sesiones": [
+     "DF6eKbn99pHK5vyYC5sG",
+     "YvfK9AAkMbxvTiLn7Sww",
+     "6WtGXKdiCTleb510sg4X",
+     "qCHm5vdTFEXuMue8WyYb"
+    ],
+    "generaciones": [
+     "GEqh7XJQFuLCL9s32JkL",
+     "pTVqpua8Vp4FWlsrmm1X",
+     "LxSieo3SzdynDIhcx8ne",
+     "PY8pJRJPd2DAiY0H5mh7"
+    ]
+   },
+   "pontifice_dolor": {
+    "prompt": "An old man's pained groan: a short guttural grunt of pain, raspy, in a stone hall, 1 second",
+    "sesiones": [
+     "mSYOtBO3VfYLX9eYstuS",
+     "xrHyJRL6o4rxZA1M3pkt",
+     "6PfukLjzVc93zHvrFHR0",
+     "36DHumYAnLqcMHcvYst7"
+    ],
+    "generaciones": [
+     "7D4V1omvR7hazwKMalv0",
+     "nvL8aRDQ29kmTeCOs7ZJ",
+     "VJAf0TAzFVO6RE0H11sD",
+     "kUWkutJqeQNhcSZZwRR3"
+    ]
+   },
+   "pontifice_muerte": {
+    "prompt": "An old man's final dying exhale, then a golden chalice falls and clatters on a stone floor, blood spilling, long fading cathedral echo, 4 seconds",
+    "sesiones": [
+     "em9xVG1qBz5cuBaw5Nxw",
+     "6wfnrrxTR9XZyWu3xlip",
+     "BX4qQzr181M2QiqwciXG",
+     "hh9ygRLKQb39ohleaV6d"
+    ],
+    "generaciones": [
+     "qlPd0Ghlo5OIwMOou7Gk",
+     "Imgx4azObi9MJBTtL5Zr",
+     "NPXC9y2YMsbE0wREJ3k7",
+     "fN3RfUwxXXRYfNnbBJWW"
+    ]
+   },
+   "pontifice_rezo": {
+    "prompt": "An old man kneeling alone in an empty ruined cathedral, murmuring a prayer in a low whisper, faint echo, slow drips, 5 seconds",
+    "sesiones": [
+     "7QcOGhuFhJFDtxweNCB0",
+     "c2E0jePFh5AdoALRo1Tc",
+     "BEX1i4iFSDObXPx70rkc",
+     "ALfoq0kQCMcIt7S16S5s"
+    ],
+    "generaciones": [
+     "x60NZACx20CX6pbLmxkv",
+     "QJL6dZaVcAMSAaVEJqqd",
+     "lr6wMJszqT8VnMJyR5Pd",
+     "YjzPJnJL4fT7DlDxH4Gm"
+    ]
+   },
+   "altar_ambiente": {
+    "prompt": "Seamless ambient loop of a roofless ruined cathedral at dusk: cold wind moaning through broken stained glass windows, slow drips of thick liquid on stone, a very faint distant ghostly choir, a low ominous drone, 20 seconds",
+    "sesiones": [
+     "lEQpeG5QuRjsGVu4GT0k",
+     "OwylroOGlFhMIvcTLqFx",
+     "5gc4fHkUjHvb9qOQ6tgO",
+     "3Bws3qDWUvmPLvEuKEIq"
+    ],
+    "generaciones": [
+     "fBpQ54INu9iJLuj2gHXw",
+     "HtSa8rBKu75wusNs5G3Q",
+     "stHiLzFdcP6lCtPzCiQf",
+     "F5aIaVTrVqXqEf0PArNv"
+    ]
+   }
+  }
  }
 }
