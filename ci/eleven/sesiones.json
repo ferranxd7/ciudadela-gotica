@@ -6892,5 +6892,271 @@
     ]
    }
   }
+ },
+ "bufon": {
+  "flow": "ZE8N58Gx76xf2dc2HiBY",
+  "voz": "chQx45TGebwefgePtdqT",
+  "nombre_voz": "Matthew Schmitz - Creepy Liminal Entity",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7y: Pell, el Bufon del Rey (el jefe secreto del Teatro Hundido, tras el muro ilusorio). Tomas a y b de cada frase como bufon/voz_Na.mp3 / voz_Nb.mp3",
+  "lineas": {
+   "1": {
+    "texto": "[delighted] Oh! An audience! [giggles] No one has come to see me in a thousand years... [whispering] Will you laugh for Pell?",
+    "sesiones": [
+     "pIZh7O06xjMg1Y0YG4Fn",
+     "mNu9lNvYnn9gkl6hAkEW"
+    ],
+    "generaciones": [
+     "Fbw5MMEgcOKZQCJpWL2j",
+     "9nOK0hYaERc6YEiEnYkO"
+    ]
+   },
+   "2": {
+    "texto": "[laughing maniacally] Which one is Pell? Which one is real? [whispering] Even I forgot, long ago!",
+    "sesiones": [
+     "3mk9idL0db04WcAcneNT",
+     "8o3KzxGn9y0MPn5h2IWB"
+    ],
+    "generaciones": [
+     "CsfFMJxEaV3mJ22LHbyZ",
+     "qL6vnpMvBLs8DIk8YEkc"
+    ]
+   },
+   "3": {
+    "texto": "[mocking] The King laughed at all my jokes... [coldly] until the night the sky turned red.",
+    "sesiones": [
+     "UU9cJtmS05Xb9AqYBFU2",
+     "DJJnHSqVmHc6fnMIbgcL"
+    ],
+    "generaciones": [
+     "GXLLGBVQd8B7vBlGpttf",
+     "NFw1rMRwQJfYKATYQlyt"
+    ]
+   },
+   "4": {
+    "texto": "[playful] Hup! Catch!",
+    "sesiones": [
+     "AckyblpKYmfCpp3wmdmV",
+     "tts2llvY32pnOINZlWM5"
+    ],
+    "generaciones": [
+     "Fr91omLcZyghume8vTnT",
+     "u4zn8DxEvpoXLeONl2Ol"
+    ]
+   },
+   "5": {
+    "texto": "[weak, tender] Bravo... bravo... [sighs] The last act... and no one... applauds.",
+    "sesiones": [
+     "DnYPQZSqca6u7rvy8SJL",
+     "BAVDKvH6Y6Mq2V3jjahd"
+    ],
+    "generaciones": [
+     "e55kGNh66oOYM31niW0U",
+     "Jv1uMlQDHEn5AwUszF8X"
+    ]
+   }
+  }
+ },
+ "sfx_bufon": {
+  "flow": "XMf8CEcsVPO7sIucWQt0",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7y: el Bufon (risa, cascabeles, tajo doble, cuchillos, malabares, la bola de fuego, el humo, la ilusion, la pirueta, dolor y muerte), el muro ilusorio y el aplauso del teatro. Las 4 tomas de cada uno se bajan como NOMBRE_1..4",
+  "sonidos": {
+   "bufon_risa": {
+    "prompt": "A mad court jester laughing maniacally in an empty underground stone hall: a high-pitched giggling cackle that rises and echoes, playful and sinister, small bells jingling, dark fantasy horror, 3 seconds",
+    "sesiones": [
+     "qzbjgyBxz4YOLaGX6oGF",
+     "H9DPtnoWz7I00g5nypDY",
+     "lp0G7tvTKmYwnDTscJ9U",
+     "Yy4eAfh9uo445O0zhkOb"
+    ],
+    "generaciones": [
+     "Jdnx5rFQVI3FVX75nuMJ",
+     "wR0U9R58TCFlCNSUJZzq",
+     "EKAulPYYrB5XEz0vGK7p",
+     "DYVcvSLwXvlc5aycYykj"
+    ]
+   },
+   "bufon_cascabeles": {
+    "prompt": "A jester's hat full of small brass bells jingling as he skips and tumbles across a stone floor: light rhythmic jingles and soft quick footsteps, playful and eerie, 2 seconds",
+    "sesiones": [
+     "jv9qdmse6z2aofm2EUaP",
+     "OgjyQuAs1DSQSCZGwUe1",
+     "LRvFc1cd8RamTZbhMVLc",
+     "GNhN9eG0uu6HHabFmJ47"
+    ],
+    "generaciones": [
+     "QVrzVhvUCcQwpB6WRd2T",
+     "lF2I3klRVSQXfVLN7LKt",
+     "uK3TBIL9n6rMB04qu618",
+     "4dVnWi5Ec7SXz1DRhXLP"
+    ]
+   },
+   "bufon_tajo": {
+    "prompt": "Two quick dagger slashes crossing in the air: fast sharp metallic swishes, a thin ringing edge and a jingle of small bells, dark fantasy combat, 1 second",
+    "sesiones": [
+     "2RMKRBsjKQpEfKHjQbb4",
+     "HguI8McCI9Md7MI2VutL",
+     "cJYIhMsky9NCqlRfQpZh",
+     "zlvuup8oTB2NGYw3zPhW"
+    ],
+    "generaciones": [
+     "lRsNpmZb9z3BfAlJBPrF",
+     "jikC3a3KEPX4ryU6ryVf",
+     "ot5kZbs22KbjML3dRY11",
+     "IulKdUTMkJ2jjAAT2MdA"
+    ]
+   },
+   "bufon_cuchillos": {
+    "prompt": "Three throwing knives hurled one after another: quick whistling whooshes flying through the air, the last one thudding into wood, dark fantasy, 1 second",
+    "sesiones": [
+     "lesxvc7Uvd8Pt7LG17x0",
+     "zoHxMdL8BcbNlb6jcc21",
+     "GqTE0vrTk8yUT0dXB5lA",
+     "X6ifxm12bfGXfTTrL9hJ"
+    ],
+    "generaciones": [
+     "PUCgE7DuMqJ9DWG8HKaN",
+     "7oPh32Vykj1yEglFCJyQ",
+     "3Rdr5EDMBdPRUlWbsY62",
+     "6mJYjWgoOBqR8WFopn2H"
+    ]
+   },
+   "bufon_malabar": {
+    "prompt": "A jester juggling burning balls: rhythmic soft fire whooshes passing from hand to hand, crackling flames and a playful giggle, dark fantasy, 2 seconds",
+    "sesiones": [
+     "pZpvFCkUqm0PI3TnbmLP",
+     "Op8chC22uV75UnCUS7sW",
+     "n1gRleQyQ7LJL2ml826b",
+     "ivpu34Qmxd3g8dqLSILU"
+    ],
+    "generaciones": [
+     "QX8FhegrPwAs04qqlTBw",
+     "1ppPLhVTrYPO9ac56KMy",
+     "P1j7dXv6hiYB69cP6ZlR",
+     "QXIfEmdMb85Zu2ZujzIT"
+    ]
+   },
+   "bufon_bola": {
+    "prompt": "A small fireball smashing onto a stone floor and bursting into flames: a soft explosive whoomp, crackling fire and scattering embers, dark fantasy, 1.5 seconds",
+    "sesiones": [
+     "qDFBaJXszog9u6I5axXC",
+     "92weOQ4yaQPLzpZHcy91",
+     "IvLcr7fhhCfG9X2YmLKc",
+     "ureST1uCXEK2qoOCNuNz"
+    ],
+    "generaciones": [
+     "JbvdZl4elDn7RWhqEHV9",
+     "aidNN9mq7007LGAexvQs",
+     "VH3VcYKL90nJTeBxfYuG",
+     "zD7HR2KEiEPpxhpLjPRU"
+    ]
+   },
+   "bufon_humo": {
+    "prompt": "A magic smoke bomb popping: a quick puff and hiss of thick smoke, a whoosh of someone vanishing and a fading mischievous giggle, dark fantasy, 1.5 seconds",
+    "sesiones": [
+     "M9UVxK7We1OfYd5SA0na",
+     "cBwj7S1RvcFOClqdR4qE",
+     "Ed1LDg8ByDZUcxTAReiI",
+     "rxVZA6pqp3abt7XHBNGo"
+    ],
+    "generaciones": [
+     "GeIgMJdXogJlqsQZFP1f",
+     "WyqPCGEyQafPfkNzViTT",
+     "19RhzdZuiPv8bhyrUhE8",
+     "A2eKL82uRpOnFHvw2d5K"
+    ]
+   },
+   "bufon_ilusion": {
+    "prompt": "A magical illusion splitting one figure into three: a shimmering glassy chime, a mirror-like whoosh and eerie echoing whispers, dark fantasy, 2 seconds",
+    "sesiones": [
+     "W05vCkBczSNpBxK1VsE2",
+     "1EIrBcPmOCXetbpdquqz",
+     "v4k8cgisJOnrGUoWlfLV",
+     "UotnuNtGgnwWgChdenAI"
+    ],
+    "generaciones": [
+     "X4cxDctcypsIVov2JNTB",
+     "I4JklzRYgEsX7E3ClhEz",
+     "D729aPbFSihhIvjOiLzQ",
+     "Rv6mIfGwxFXswYxBU7FL"
+    ]
+   },
+   "bufon_pirueta": {
+    "prompt": "An acrobat spinning with two daggers: a fast whirling double whoosh with jingling bells and a light landing on stone, dark fantasy combat, 1 second",
+    "sesiones": [
+     "pjXtlpWToyr6WlyNn0i2",
+     "VCyfLUnZTLFRNQ1OTNwj",
+     "mrSxQqDuzl5PKi487LWL",
+     "xT60FDx4ISRJnYe863WA"
+    ],
+    "generaciones": [
+     "QXFNfuB3uCwYPDQaaYH5",
+     "8UI0DiyAtvQTeRFH96IJ",
+     "9gQyrt741LVcaCE0xfzb",
+     "6Z7omd06BJ0852lHdrYV"
+    ]
+   },
+   "bufon_dolor": {
+    "prompt": "A thin wiry court jester yelping in pain: a short high-pitched theatrical cry with a jingle of small bells, dark fantasy, 1 second",
+    "sesiones": [
+     "bANbq8aoHk83fsc5vUTi",
+     "q4sVHUnEKjjKQVsNqUgI",
+     "pyfCyJFoy6W4xq4gLmNu",
+     "2M2nNFuJ06x9fXuDtaPF"
+    ],
+    "generaciones": [
+     "Gc6fBU98IkQUd24VaDOo",
+     "R9CJdrtKpmEXT4FDdhwd",
+     "NUpfUfDyMlX9ICfeSakG",
+     "nECoPwMhNVg8pG8wwZ6X"
+    ]
+   },
+   "bufon_muerte": {
+    "prompt": "A dying court jester's last weak laugh fading into a long sigh, then his belled hat falling softly onto a stone floor with a final tiny jingle and silence, dark fantasy, sad, cinematic, 4 seconds",
+    "sesiones": [
+     "o39UGNu9wrFkvj4PsDuH",
+     "MePmth3u5mmEjNPzk7ry",
+     "ew2KGcbDgnPveYvnP5gI",
+     "vcZWM2A5lleVFeUbEZc0"
+    ],
+    "generaciones": [
+     "9CraBSwNyk35bViZRzSo",
+     "lWqNUeTSrccTfTwxIOtb",
+     "aMba3j9tdxniX2oBCTjt",
+     "oKjXUE6lBpkzYf2DHWhP"
+    ]
+   },
+   "muro_ilusorio": {
+    "prompt": "An illusory stone wall dissolving into ghostly mist: a deep magical hum, stones fading away with a soft crumbling hiss and a cold whispering wind revealing a hidden passage, dark fantasy, mysterious, 3 seconds",
+    "sesiones": [
+     "lhFNZaWKxpaVNE1XAbqk",
+     "LWGGYfttlmYIuwbT4oNw",
+     "keTGSB7EFJhdVT9iPEBi",
+     "lyBUHfuuKry6gJUTdOh3"
+    ],
+    "generaciones": [
+     "VaLUtEEU9g3i1cqV2dPn",
+     "B1KegIXhfSxqalLcQfLI",
+     "25QMQXyGB8I0xS38NcLg",
+     "69hZhEeWrlNCWw1f8Z9X"
+    ]
+   },
+   "teatro_aplauso": {
+    "prompt": "Faint ghostly applause echoing in an empty ancient underground theater: scattered clapping from an invisible audience that fades away into an eerie silence, distant reverb, dark fantasy horror, 3 seconds",
+    "sesiones": [
+     "noQk91rhIIQkkt5YQPrn",
+     "NJ8vVtgg8WgIvDzpKhx0",
+     "DallhD4Nno6eG16jJ3Tw",
+     "gdQq6SSdCyJPcvbDgof9"
+    ],
+    "generaciones": [
+     "QYd5HHF3iB49TmDOIBxI",
+     "38QTg4f3qQZyYCxOIsCD",
+     "IO0kdAh3eFsP9rwbsoCO",
+     "sHF7FQxbpprXHHhpHia9"
+    ]
+   }
+  }
  }
 }
