@@ -4433,12 +4433,14 @@ ARMADURAS_EN.update({
 ES.update({
     "advancements.darkcraft.armadura_jefe.title": "Ropa de Muerto",
     "advancements.darkcraft.armadura_jefe.description": "Ponte entero el conjunto de un jefe",
+    "darkcraft.diario.armadura_jefe": "Me vestí con la armadura de un jefe al que vencí. Pesa más de lo que debería: algo de él sigue dentro.",
     "darkcraft.armadura.jefe": "Se la ganaste a %s",
     "darkcraft.ayuda.armadura_jefes": "Los conjuntos de los jefes que ya se te han dado (y olvidarlos para probar otra vez)",
 })
 EN.update({
     "advancements.darkcraft.armadura_jefe.title": "Dead Man's Clothes",
     "advancements.darkcraft.armadura_jefe.description": "Wear a boss's full set",
+    "darkcraft.diario.armadura_jefe": "I put on the armor of a boss I defeated. It weighs more than it should: something of him is still inside.",
     "darkcraft.armadura.jefe": "Won from %s",
     "darkcraft.ayuda.armadura_jefes": "The boss sets you have already been given (and forget them to try again)",
 })
