@@ -423,6 +423,8 @@ public final class Hud {
             aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable("darkcraft.aviso.puerta_aguja"), null);
         else if (avisoQue == ClientRol.FAROL)
             aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable("darkcraft.aviso.farol"), null);
+        else if (avisoQue == ClientRol.BALIZA)
+            aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla, Component.translatable("darkcraft.aviso.baliza"), null);
         else
             aviso(mc, g, w, h - 80, avisoAlfa, antes, tecla,
                     Component.translatable(avisoEncendido ? "darkcraft.aviso.descansar" : "darkcraft.aviso.encender"), null);

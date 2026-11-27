@@ -44,6 +44,10 @@ import net.minecraft.world.entity.LivingEntity;
  * pescador, la trenza cobriza, los muslos y las espinillas con sus botas de goma (sentada), el noray de hierro en que se sienta y, en el
  * regazo, su farol de fuego frio (lo que luce va en otra capa con luz propia, {@link BrilloYlva}); mientras te lo ha prestado, las
  * manos en las rodillas.</li>
+ * <li><b>Corwen</b> ({@link ModeloCorwen}, {@code corwen.py}; parte 7ao): el de brazos anchos con el sombrero de hule (copa, ala ancha y
+ * faldon de atras), la barba blanca hasta el pecho, el chaqueton de hule, sentado en una caja de pescado; en la derecha la pertiga
+ * con el farol colgado del gancho (luce con las tres balizas encendidas, {@link BrilloCorwen}); si se quedo a guardar la luz, sin la
+ * pertiga y con el farol en el suelo a su lado.</li>
  * </ul>
  * A quien ya no le toca ver a uno no se le dibuja ({@link Viajero#OCULTO}); Hedda se apaga poco a poco cuando acaba su mision con la
  * verdad o la mentira ({@code ClientMisiones.alfa}).
@@ -51,9 +55,12 @@ import net.minecraft.world.entity.LivingEntity;
 public class ViajeroRenderer extends LivingEntityRenderer<Viajero, ViajeroRenderer.Base<Viajero>> {
     public static final ModelLayerLocation CAPA = new ModelLayerLocation(new ResourceLocation(DarkCraftMod.MODID, "viajero"), "main"),
             CAPA_HEDDA = new ModelLayerLocation(new ResourceLocation(DarkCraftMod.MODID, "viajero_hedda"), "main"),
-            CAPA_YLVA = new ModelLayerLocation(new ResourceLocation(DarkCraftMod.MODID, "viajero_ylva"), "main");
+            CAPA_YLVA = new ModelLayerLocation(new ResourceLocation(DarkCraftMod.MODID, "viajero_ylva"), "main"),
+            CAPA_CORWEN = new ModelLayerLocation(new ResourceLocation(DarkCraftMod.MODID, "viajero_corwen"), "main");
     /** Lo que luce de Ylva: el cristal de su farol. */
     public static final ResourceLocation BRILLO_YLVA = new ResourceLocation(DarkCraftMod.MODID, "textures/entity/ylva_brillo.png");
+    /** Lo que luce de Corwen: el cristal de su farol (con las tres balizas encendidas). */
+    public static final ResourceLocation BRILLO_CORWEN = new ResourceLocation(DarkCraftMod.MODID, "textures/entity/corwen_brillo.png");
     private static final ResourceLocation[] PIELES = new ResourceLocation[Viajero.Quien.values().length];
 
     static {
@@ -69,8 +76,10 @@ public class ViajeroRenderer extends LivingEntityRenderer<Viajero, ViajeroRender
         modelos[Viajero.Quien.OSWIN.ordinal()] = model;
         modelos[Viajero.Quien.HEDDA.ordinal()] = new ModeloHedda(ctx.bakeLayer(CAPA_HEDDA));
         modelos[Viajero.Quien.YLVA.ordinal()] = new ModeloYlva(ctx.bakeLayer(CAPA_YLVA));
+        modelos[Viajero.Quien.CORWEN.ordinal()] = new ModeloCorwen(ctx.bakeLayer(CAPA_CORWEN));
         addLayer(new Campanilla(this, new CampanaRenderer.Modelo(ctx.bakeLayer(CampanaRenderer.CAPA))));
         addLayer(new BrilloYlva(this));
+        addLayer(new BrilloCorwen(this));
     }
 
     /** Oswin: el de brazos anchos con el sombrero, la esclavina, el zurron y el bordon. */
@@ -137,6 +146,39 @@ public class ViajeroRenderer extends LivingEntityRenderer<Viajero, ViajeroRender
         raiz.addOrReplaceChild("poste", CubeListBuilder.create().texOffs(92, 24).addBox(-2.5f, 16f, -2.5f, 5, 6, 5), PartPose.ZERO);
         raiz.addOrReplaceChild("farol", CubeListBuilder.create().texOffs(64, 36).addBox(-2f, 5f, -9.5f, 4, 5, 4), PartPose.ZERO);
         raiz.addOrReplaceChild("asa", CubeListBuilder.create().texOffs(80, 36).addBox(-0.5f, 4f, -8f, 1, 1, 1), PartPose.ZERO);
+        return LayerDefinition.create(m, 128, 64);
+    }
+
+    /**
+     * Corwen (parte 7ao): el de brazos anchos con el sombrero de hule (la copa, el ala y el faldon de atras), la barba (delante de la
+     * cara, cae hasta el pecho) y el chaqueton (en el cuerpo, algo mas grande); sentado en la caja de pescado: los muslos hacia delante
+     * (con la textura de las piernas), las espinillas de la rodilla al suelo con las botas y la caja debajo. La pertiga de pie en el suelo
+     * a su derecha, un poco inclinada hacia fuera, con el gancho arriba y el farol colgado de su anilla; el farol del suelo (a su
+     * izquierda) solo cuando ya no tiene la pertiga. Medidas de {@code corwen.py}.
+     */
+    public static LayerDefinition crearCorwen() {
+        MeshDefinition m = PlayerModel.createMesh(CubeDeformation.NONE, false);
+        PartDefinition raiz = m.getRoot();
+        PartDefinition cabeza = raiz.getChild("head");
+        cabeza.addOrReplaceChild("copa", CubeListBuilder.create().texOffs(64, 0).addBox(-4.5f, -10.5f, -4.5f, 9, 3, 9), PartPose.ZERO);
+        cabeza.addOrReplaceChild("ala", CubeListBuilder.create().texOffs(64, 12).addBox(-5.5f, -7.5f, -5.5f, 11, 1, 12), PartPose.ZERO);
+        cabeza.addOrReplaceChild("cogote", CubeListBuilder.create().texOffs(100, 0).addBox(-4.5f, -6.5f, 5.5f, 9, 3, 1), PartPose.ZERO);
+        cabeza.addOrReplaceChild("barba", CubeListBuilder.create().texOffs(100, 4).addBox(-3f, -3f, -4.6f, 6, 5, 1), PartPose.ZERO);
+        raiz.getChild("body").addOrReplaceChild("abrigo", CubeListBuilder.create().texOffs(64, 25).addBox(-4.5f, -0.3f, -2.5f, 9, 12, 5,
+                new CubeDeformation(0.25f)), PartPose.ZERO);
+        raiz.addOrReplaceChild("muslo_d", CubeListBuilder.create().texOffs(0, 16).addBox(-2f, 0f, -2f, 4, 6, 4),
+                PartPose.offsetAndRotation(-1.9f, 12f, 0f, -Mth.HALF_PI, 0f, 0f));
+        raiz.addOrReplaceChild("muslo_i", CubeListBuilder.create().texOffs(16, 48).addBox(-2f, 0f, -2f, 4, 6, 4),
+                PartPose.offsetAndRotation(1.9f, 12f, 0f, -Mth.HALF_PI, 0f, 0f));
+        raiz.addOrReplaceChild("espinilla_d", CubeListBuilder.create().texOffs(92, 25).addBox(-3.9f, 14f, -7f, 4, 9, 4), PartPose.ZERO);
+        raiz.addOrReplaceChild("espinilla_i", CubeListBuilder.create().texOffs(92, 25).mirror().addBox(-0.1f, 14f, -7f, 4, 9, 4), PartPose.ZERO);
+        raiz.addOrReplaceChild("caja", CubeListBuilder.create().texOffs(64, 42).addBox(-5f, 12f, -2.5f, 10, 11, 8), PartPose.ZERO);
+        PartDefinition pertiga = raiz.addOrReplaceChild("pertiga", CubeListBuilder.create().texOffs(124, 0).addBox(-0.5f, -40f, -0.5f, 1, 40, 1),
+                PartPose.offsetAndRotation(-8f, 23f, -5.5f, 0.05f, 0f, -0.06f));
+        pertiga.addOrReplaceChild("gancho", CubeListBuilder.create().texOffs(100, 51).addBox(-0.5f, -41f, -3.5f, 1, 1, 4), PartPose.ZERO);
+        pertiga.addOrReplaceChild("asa", CubeListBuilder.create().texOffs(110, 51).addBox(-0.5f, -40f, -3.5f, 1, 2, 1), PartPose.ZERO);
+        pertiga.addOrReplaceChild("farol", CubeListBuilder.create().texOffs(100, 42).addBox(-2f, -38f, -5f, 4, 5, 4), PartPose.ZERO);
+        raiz.addOrReplaceChild("farol_suelo", CubeListBuilder.create().texOffs(100, 42).addBox(-2f, 0f, -2f, 4, 5, 4), PartPose.offset(8f, 18f, -2f));
         return LayerDefinition.create(m, 128, 64);
     }
 
@@ -377,6 +419,77 @@ public class ViajeroRenderer extends LivingEntityRenderer<Viajero, ViajeroRender
         }
     }
 
+    /**
+     * Corwen (parte 7ao). Sentado en su caja mirando la laguna (algo menos si mira a alguien), la cabeza un poco gacha y la espalda
+     * cargada; la derecha agarrada a la pertiga y la izquierda en la rodilla. Si se quedo a guardar la luz, sin pertiga: las dos manos en
+     * las rodillas y el farol en el suelo. Las piernas del modelo de jugador no se dibujan: van los muslos y las espinillas.
+     */
+    public static class ModeloCorwen extends Base<Viajero> {
+        private final ModelPart musloD, musloI, espinillaD, espinillaI, caja, farolSuelo;
+        final ModelPart pertiga;
+        /** Lo que luce ahora (el farol de la pertiga o el del suelo), para la capa del brillo. */
+        boolean luce;
+
+        public ModeloCorwen(ModelPart raiz) {
+            super(raiz, false);
+            musloD = raiz.getChild("muslo_d");
+            musloI = raiz.getChild("muslo_i");
+            espinillaD = raiz.getChild("espinilla_d");
+            espinillaI = raiz.getChild("espinilla_i");
+            caja = raiz.getChild("caja");
+            pertiga = raiz.getChild("pertiga");
+            farolSuelo = raiz.getChild("farol_suelo");
+        }
+
+        @Override
+        public float bajar(Viajero v) {
+            // la caja y las botas en el suelo (el modelo acaba un pixel mas abajo que el de un jugador)
+            return 0.0625f;
+        }
+
+        @Override
+        public void setupAnim(Viajero v, float paso, float rapidez, float edad, float cabezaY, float cabezaX) {
+            riding = false;
+            super.setupAnim(v, 0f, 0f, edad, cabezaY, cabezaX);
+            float respira = Mth.sin(edad * 0.05f) * 0.02f;
+            boolean conPertiga = !ClientMisiones.corwenSinPertiga;
+            if (conPertiga) {
+                // agarrado a la pertiga, que esta de pie a su derecha
+                rightArm.xRot = -0.675f + respira * 0.5f;
+                rightArm.yRot = 0f;
+                rightArm.zRot = 0.37f;
+            } else {
+                rightArm.xRot = -0.52f + respira;
+                rightArm.yRot = 0f;
+                rightArm.zRot = -0.33f;
+            }
+            // la izquierda en la rodilla
+            leftArm.xRot = -0.52f + respira;
+            leftArm.yRot = 0f;
+            leftArm.zRot = 0.33f;
+            head.xRot = head.xRot * 0.6f + 0.08f;
+            body.xRot = 0.12f;
+            pertiga.visible = conPertiga;
+            farolSuelo.visible = !conPertiga;
+            luce = ClientMisiones.corwenLuz;
+            capas();
+            rightLeg.visible = leftLeg.visible = rightPants.visible = leftPants.visible = false;
+        }
+
+        @Override
+        public void renderToBuffer(PoseStack ps, VertexConsumer vc, int luz, int capa, float r, float g, float b, float a) {
+            super.renderToBuffer(ps, vc, luz, capa, r, g, b, a * alfa);
+            float al = a * alfa;
+            musloD.render(ps, vc, luz, capa, r, g, b, al);
+            musloI.render(ps, vc, luz, capa, r, g, b, al);
+            espinillaD.render(ps, vc, luz, capa, r, g, b, al);
+            espinillaI.render(ps, vc, luz, capa, r, g, b, al);
+            caja.render(ps, vc, luz, capa, r, g, b, al);
+            if (pertiga.visible) pertiga.render(ps, vc, luz, capa, r, g, b, al);
+            if (farolSuelo.visible) farolSuelo.render(ps, vc, luz, capa, r, g, b, al);
+        }
+    }
+
     @Override
     public void render(Viajero v, float giro, float pt, PoseStack ps, MultiBufferSource buf, int luz) {
         if (Viajero.OCULTO.test(v)) return;
@@ -407,6 +520,26 @@ public class ViajeroRenderer extends LivingEntityRenderer<Viajero, ViajeroRender
                            float cabezaX) {
             if (v.quien() != Viajero.Quien.YLVA || !(getParentModel() instanceof ModeloYlva m) || !m.farol.visible) return;
             float k = (0.82f + 0.18f * Mth.sin(edad * 0.23f) * Mth.sin(edad * 0.11f + 1.3f)) * m.alfa;
+            m.renderToBuffer(ps, buf.getBuffer(TIPO), 0xF000F0, OverlayTexture.NO_OVERLAY, k, k, k, 1f);
+        }
+    }
+
+    /**
+     * Lo que luce de Corwen (parte 7ao): el modelo otra vez con la textura del brillo (solo el cristal del farol tiene algo) y luz propia,
+     * cuando estan las tres balizas encendidas; la llama tiembla y se apaga con el.
+     */
+    static final class BrilloCorwen extends RenderLayer<Viajero, Base<Viajero>> {
+        private static final RenderType TIPO = RenderType.eyes(BRILLO_CORWEN);
+
+        BrilloCorwen(RenderLayerParent<Viajero, Base<Viajero>> padre) {
+            super(padre);
+        }
+
+        @Override
+        public void render(PoseStack ps, MultiBufferSource buf, int luz, Viajero v, float paso, float rapidez, float pt, float edad, float cabezaY,
+                           float cabezaX) {
+            if (v.quien() != Viajero.Quien.CORWEN || !(getParentModel() instanceof ModeloCorwen m) || !m.luce) return;
+            float k = (0.8f + 0.2f * Mth.sin(edad * 0.31f) * Mth.sin(edad * 0.13f + 0.7f)) * m.alfa;
             m.renderToBuffer(ps, buf.getBuffer(TIPO), 0xF000F0, OverlayTexture.NO_OVERLAY, k, k, k, 1f);
         }
     }

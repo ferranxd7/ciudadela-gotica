@@ -2,7 +2,9 @@ package com.darkcraft.client.mision;
 
 import com.darkcraft.DarkCraftMod;
 import com.darkcraft.enemigos.Enemigo;
+import com.darkcraft.mision.Baliza;
 import com.darkcraft.mision.Campana;
+import com.darkcraft.mision.Corwen;
 import com.darkcraft.mision.FarolBrann;
 import com.darkcraft.mision.Hedda;
 import com.darkcraft.mision.Oswin;
@@ -33,7 +35,10 @@ import java.util.List;
  * su mision con la verdad o la mentira ({@link #alfa}), y sus agujas, que se oyen de cerca. Desde la parte 7an, Ylva: su farol en el
  * regazo (no lo tiene mientras te lo ha prestado: {@link #ylvaSinFarol}), los dos faroles de Brann ({@code FarolBrann}: el de la arena,
  * que se coge con la E —{@link #farol}—, y el del muelle, el de quien se lo dio), Ylva que descansa cuando le das el farol de su padre
- * y los enemigos que se ven a traves de las paredes con el Farol del ballenero ({@code Enemigo.BRILLA}).
+ * y los enemigos que se ven a traves de las paredes con el Farol del ballenero ({@code Enemigo.BRILLA}). Desde la parte 7ao, Corwen: las
+ * balizas que ve encendidas quien juega ({@code Baliza.ENCENDIDAS}, con sus llamitas), la que se tiene delante para encenderla con la
+ * E ({@link #baliza}), el farol de Corwen que luce con las tres encendidas ({@link #corwenLuz}), su pertiga (no la tiene si se quedo:
+ * {@link #corwenSinPertiga}) y Corwen que se pierde en la niebla cuando le dejas ir a recibir las barcas.
  */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID, value = Dist.CLIENT)
 public final class ClientMisiones {
@@ -41,7 +46,11 @@ public final class ClientMisiones {
 
     public static final List<Net.MisionE> LISTA = new ArrayList<>();
     /** La campana, Tam o el farol de Brann que se tienen delante para usarlos con la E (o -1). */
-    public static int campana = -1, restos = -1, farol = -1;
+    public static int campana = -1, restos = -1, farol = -1, baliza = -1;
+    /** Si el farol de Corwen luce (las tres balizas encendidas) y si ya no tiene su pertiga (se la dio a quien le pidio que se quedara). */
+    public static boolean corwenLuz, corwenSinPertiga;
+    /** Lo que tarda Corwen en perderse en la niebla (ticks). */
+    public static final int FUNDIDO_CORWEN = 90;
     /** Si Ylva le ha prestado su farol a quien juega (no lo tiene en el regazo). */
     public static boolean ylvaSinFarol;
     /** Si quien juega lleva el Farol del ballenero (ve brillar a los enemigos cercanos). */
@@ -66,6 +75,9 @@ public final class ClientMisiones {
     /** Ylva se va (descansa) al cerrar la conversacion en que se le da el farol de su padre: como la Hedda de la mentira. */
     private static boolean ylvaPendiente;
     private static int ylvaDesde = -1;
+    /** Corwen se va (baja al agua a recibir las barcas) al cerrar la conversacion en que se le deja ir. */
+    private static boolean corwenPendiente;
+    private static int corwenDesde = -1;
 
     private static boolean recibido;
     /** El reloj del cliente (ticks) y cuando empezo a apagarse Hedda (-1: no se esta yendo). */
@@ -75,7 +87,7 @@ public final class ClientMisiones {
     private static int agujas = 60;
 
     public static void recibir(Net.Misiones m) {
-        int antes = marcas(Hedda.ID), antesY = marcas(Ylva.ID);
+        int antes = marcas(Hedda.ID), antesY = marcas(Ylva.ID), antesC = marcas(Corwen.ID);
         boolean primera = !recibido;
         LISTA.clear();
         LISTA.addAll(m.lista());
@@ -103,6 +115,14 @@ public final class ClientMisiones {
             ylvaPendiente = false;
             ylvaDesde = -1;
         } else if (!primera && (antesY & Ylva.DADA) == 0) ylvaPendiente = true;
+        int c = marcas(Corwen.ID);
+        Baliza.ENCENDIDAS = (c & Corwen.ACABADA) != 0 ? 7 : (c / Corwen.B1) & 7;
+        corwenLuz = (c & Corwen.TODAS) == Corwen.TODAS;
+        corwenSinPertiga = (c & Corwen.QUEDA) != 0;
+        if ((c & Corwen.IDA) == 0) {
+            corwenPendiente = false;
+            corwenDesde = -1;
+        } else if (!primera && (antesC & Corwen.IDA) == 0) corwenPendiente = true;
     }
 
     public static Net.MisionE de(String id) {
@@ -121,6 +141,7 @@ public final class ClientMisiones {
         if (Oswin.ID.equals(e.id())) return (k & (Oswin.DEVUELTA | Oswin.QUEDADA)) != 0;
         if (Hedda.ID.equals(e.id())) return (k & (Hedda.MENTIRA | Hedda.CALLADA)) != 0 || (k & (Hedda.VERDAD | Hedda.LANZA)) == (Hedda.VERDAD | Hedda.LANZA);
         if (Ylva.ID.equals(e.id())) return (k & Ylva.ACABADA) != 0;
+        if (Corwen.ID.equals(e.id())) return (k & Corwen.ACABADA) != 0;
         return false;
     }
 
@@ -131,6 +152,17 @@ public final class ClientMisiones {
      */
     public static String estado(Net.MisionE e) {
         int k = e.marcas();
+        if (Corwen.ID.equals(e.id())) {
+            if ((k & Corwen.IDA) != 0) return "ida";
+            if ((k & Corwen.QUEDA) != 0) return "queda";
+            if ((k & Corwen.ACEPTADA) == 0) return "pendiente";
+            return switch (Corwen.encendidas(k)) {
+                case 0 -> "buscar";
+                case 1 -> "una";
+                case 2 -> "dos";
+                default -> "volver";
+            };
+        }
         if (Ylva.ID.equals(e.id())) {
             if ((k & Ylva.DADA) != 0) return "dada";
             if ((k & Ylva.QUEDADA) != 0) return "quedada";
@@ -156,6 +188,7 @@ public final class ClientMisiones {
 
     /** La miniatura del diario de cada mision ({@code CodiceScreen}). */
     public static int miniatura(Net.MisionE e) {
+        if (Corwen.ID.equals(e.id())) return com.darkcraft.client.ui.CodiceScreen.MIN_MISION_CORWEN;
         return Ylva.ID.equals(e.id()) ? com.darkcraft.client.ui.CodiceScreen.MIN_MISION_YLVA
                 : Hedda.ID.equals(e.id()) ? com.darkcraft.client.ui.CodiceScreen.MIN_MISION_HEDDA : com.darkcraft.client.ui.CodiceScreen.MIN_MISION_OSWIN;
     }
@@ -167,6 +200,11 @@ public final class ClientMisiones {
      * del camino, despues de la verdad o la mentira (cuando acaba de apagarse).
      */
     public static boolean oculto(Viajero v) {
+        if (v.quien() == Viajero.Quien.CORWEN) {
+            // a quien le dejo ir a recibir las barcas: se pierde en la niebla al cerrar la conversacion
+            if ((marcas(Corwen.ID) & Corwen.IDA) == 0) return false;
+            return !(corwenPendiente || (corwenDesde >= 0 && reloj - corwenDesde < FUNDIDO_CORWEN));
+        }
         if (v.quien() == Viajero.Quien.YLVA) {
             // a quien le dio el farol de su padre: descansa (se apaga al cerrar la conversacion)
             if ((marcas(Ylva.ID) & Ylva.DADA) == 0) return false;
@@ -181,6 +219,10 @@ public final class ClientMisiones {
 
     /** Lo que se ve de el (1, o menos mientras Hedda se apaga). */
     public static float alfa(Viajero v, float pt) {
+        if (v.quien() == Viajero.Quien.CORWEN) {
+            if (corwenPendiente || corwenDesde < 0) return 1f;
+            return Mth.clamp(1f - (reloj + pt - corwenDesde) / FUNDIDO_CORWEN, 0f, 1f);
+        }
         if (v.quien() == Viajero.Quien.YLVA) {
             if (ylvaPendiente || ylvaDesde < 0) return 1f;
             return Mth.clamp(1f - (reloj + pt - ylvaDesde) / FUNDIDO_YLVA, 0f, 1f);
@@ -196,9 +238,11 @@ public final class ClientMisiones {
         campana = -1;
         restos = -1;
         farol = -1;
+        baliza = -1;
         if (mc.player == null || mc.level == null) return;
         vigia = com.darkcraft.client.ui.ClientRol.lleva(com.darkcraft.rol.Talisman.Clase.BALLENERO);
         ylva(mc);
+        corwen(mc);
         Viajero hedda = heddaCerca(mc);
         // Hedda se va al cerrar la conversacion: se apaga (la mentira: en paz, con su luz y su sonido; la verdad: se va con su hijo)
         if (seVaPendiente && !(mc.screen instanceof com.darkcraft.client.ui.DialogoScreen)) {
@@ -251,6 +295,26 @@ public final class ClientMisiones {
             }
             restosQue = (marcas(Hedda.ID) & Hedda.VERDAD) != 0 ? LANZA : BUFANDA;
         }
+        // una baliza de los Pilotes que se pueda encender (parte 7ao): con la mision en marcha y apagada para quien juega; se mira el
+        // poste o el farol (a menos de 4 bloques)
+        int c = marcas(Corwen.ID);
+        if ((c & Corwen.ACEPTADA) != 0 && (c & Corwen.ACABADA) == 0) {
+            double mejor = Math.cos(Math.toRadians(24));
+            for (Baliza b : mc.level.getEntitiesOfClass(Baliza.class, mc.player.getBoundingBox().inflate(6))) {
+                if (b.encendida()) continue;
+                for (double h : new double[]{0.6, 1.3, Baliza.ALTO_FAROL}) {
+                    boolean arriba = h == Baliza.ALTO_FAROL;
+                    Vec3 d = new Vec3(arriba ? b.farolX() : b.getX(), b.getY() + h, arriba ? b.farolZ() : b.getZ()).subtract(ojo);
+                    double l = d.length();
+                    if (l > 4.0 || l < 1e-3) continue;
+                    double cos = d.dot(mira) / l + (l < 1.6 ? 0.1 : 0);
+                    if (cos > mejor) {
+                        mejor = cos;
+                        baliza = b.getId();
+                    }
+                }
+            }
+        }
         // el farol de Brann en la arena del Costillar (parte 7an), si aun no se cogio
         if (!FarolBrann.sinFarol) {
             double mejor = Math.cos(Math.toRadians(28));
@@ -294,6 +358,55 @@ public final class ClientMisiones {
                             0, 0.004, 0);
     }
 
+    /**
+     * Corwen (parte 7ao): se pierde en la niebla al cerrar la conversacion en que se le deja ir (sus pasos en el agua, el farol que cruje
+     * y las campanas lejos; salpicaduras y luces que suben); el farol de su pertiga (o el del suelo) echa alguna llamita con las tres
+     * balizas encendidas, y las balizas encendidas de quien juega tambien.
+     */
+    private static void corwen(Minecraft mc) {
+        Viajero cw = null;
+        for (Viajero v : mc.level.getEntitiesOfClass(Viajero.class, mc.player.getBoundingBox().inflate(48)))
+            if (v.quien() == Viajero.Quien.CORWEN) cw = v;
+        if (corwenPendiente && !(mc.screen instanceof com.darkcraft.client.ui.DialogoScreen)) {
+            corwenPendiente = false;
+            corwenDesde = reloj;
+            if (cw != null) mc.level.playLocalSound(cw.getX(), cw.getY() + 1, cw.getZ(), DarkCraftMod.SFX_CORWEN_SE_VA.get(), SoundSource.NEUTRAL, 1.2f, 1f, false);
+        }
+        var r = mc.level.random;
+        if (cw != null && corwenDesde >= 0 && reloj - corwenDesde < FUNDIDO_CORWEN)
+            for (int i = 0; i < 3; i++) {
+                double x = cw.getX() + (r.nextDouble() - 0.5) * 0.9, z = cw.getZ() + (r.nextDouble() - 0.5) * 0.9;
+                if (i == 0) mc.level.addParticle(ParticleTypes.SPLASH, x, cw.getY() + 0.1, z, 0, 0.1, 0);
+                else mc.level.addParticle(r.nextInt(3) == 0 ? ParticleTypes.FLAME : ParticleTypes.END_ROD, x, cw.getY() + 0.3 + r.nextDouble() * 1.4, z,
+                        0, 0.02 + r.nextDouble() * 0.03, 0);
+            }
+        // el farol de Corwen, encendido
+        if (cw != null && corwenLuz && !oculto(cw) && corwenDesde < 0 && reloj % 6 == 0 && r.nextInt(2) == 0) {
+            double s = Math.sin(Math.toRadians(cw.yBodyRot)), co = Math.cos(Math.toRadians(cw.yBodyRot));
+            double fx, fy, fz;
+            if (corwenSinPertiga) {
+                // en el suelo, a su izquierda
+                fx = cw.getX() + co * 0.5 - s * 0.12;
+                fz = cw.getZ() + s * 0.5 + co * 0.12;
+                fy = cw.getY() + 0.22;
+            } else {
+                // colgado de la pertiga, delante a su derecha
+                fx = cw.getX() - co * 0.5 - s * 0.55;
+                fz = cw.getZ() - s * 0.5 + co * 0.55;
+                fy = cw.getY() + 2.05;
+            }
+            mc.level.addParticle(ParticleTypes.SMALL_FLAME, fx + (r.nextDouble() - 0.5) * 0.06, fy, fz + (r.nextDouble() - 0.5) * 0.06, 0, 0.004, 0);
+        }
+        // las balizas encendidas de quien juega
+        if (Baliza.ENCENDIDAS != 0 && reloj % 5 == 0)
+            for (Baliza b : mc.level.getEntitiesOfClass(Baliza.class, mc.player.getBoundingBox().inflate(48)))
+                if (b.encendida() && r.nextInt(2) == 0) {
+                    double fx = b.farolX(), fz = b.farolZ(), fy = b.getY() + Baliza.ALTO_FAROL - 0.15;
+                    mc.level.addParticle(ParticleTypes.SMALL_FLAME, fx + (r.nextDouble() - 0.5) * 0.12, fy, fz + (r.nextDouble() - 0.5) * 0.12, 0, 0.006, 0);
+                    if (r.nextInt(5) == 0) mc.level.addParticle(ParticleTypes.SMOKE, fx, fy + 0.55, fz, 0, 0.02, 0);
+                }
+    }
+
     /** Con el Farol del ballenero, los enemigos vivos a {@link #VIGIA_R} bloques de quien juega brillan (se ven a traves de las paredes). */
     private static boolean brilla(Enemigo e) {
         if (!vigia || !e.isAlive()) return false;
@@ -323,10 +436,16 @@ public final class ClientMisiones {
         usar(mc, farol);
     }
 
+    /** La E con una baliza delante: se enciende (el servidor decide). */
+    public static void encenderBaliza(Minecraft mc) {
+        usar(mc, baliza);
+    }
+
     private static void usar(Minecraft mc, int id) {
         if (id < 0 || mc.level == null || mc.player == null || mc.gameMode == null) return;
         Entity e = mc.level.getEntity(id);
-        if (e instanceof Campana || e instanceof RestosTam || e instanceof FarolBrann) mc.gameMode.interact(mc.player, e, InteractionHand.MAIN_HAND);
+        if (e instanceof Campana || e instanceof RestosTam || e instanceof FarolBrann || e instanceof Baliza)
+            mc.gameMode.interact(mc.player, e, InteractionHand.MAIN_HAND);
     }
 
     @SubscribeEvent
@@ -335,12 +454,17 @@ public final class ClientMisiones {
         campana = -1;
         restos = -1;
         farol = -1;
+        baliza = -1;
         recibido = false;
         seVaPendiente = false;
         seVaDesde = -1;
         ylvaPendiente = false;
         ylvaDesde = -1;
         ylvaSinFarol = vigia = false;
+        corwenPendiente = false;
+        corwenDesde = -1;
+        corwenLuz = corwenSinPertiga = false;
+        Baliza.ENCENDIDAS = 0;
         Campana.oculta = false;
         RestosTam.sinBufanda = RestosTam.sinLanza = RestosTam.nada = false;
         FarolBrann.sinFarol = FarolBrann.enMuelle = false;

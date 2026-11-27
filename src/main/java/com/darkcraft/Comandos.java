@@ -82,6 +82,7 @@ public final class Comandos {
                 .then(com.darkcraft.mision.Misiones.comandoOswin())
                 .then(com.darkcraft.mision.Misiones.comandoHedda())
                 .then(com.darkcraft.mision.Misiones.comandoYlva())
+                .then(com.darkcraft.mision.Misiones.comandoCorwen())
                 .then(com.darkcraft.armadura.Armaduras.comando())
                 .then(com.darkcraft.armas.Arsenal.comando())
                 .then(com.darkcraft.morvain.Gigantes.comando())
@@ -180,10 +181,11 @@ public final class Comandos {
         src.sendSuccess(() -> linea(new Linea("/darkcraft cronica ", "/darkcraft cronica [ir <7-10> | poner | olvidar]", "cronica")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft herreros ", "/darkcraft herreros [ir <hagen|brenna|ulrik|tobin> | poner | olvidar]", "herreros")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft silas ", "/darkcraft silas [ir | mover <0-5>]", "silas")), false);
-        src.sendSuccess(() -> linea(new Linea("/darkcraft misiones ", "/darkcraft misiones [olvidar | marcar <n> | hedda <n> | ylva <n>]", "misiones")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft misiones ", "/darkcraft misiones [olvidar | marcar <n> | hedda <n> | ylva <n> | corwen <n>]", "misiones")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft oswin ", "/darkcraft oswin [ir | campana | poner | olvidar]", "oswin")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft hedda ", "/darkcraft hedda [ir | tam | poner | olvidar]", "hedda")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft ylva ", "/darkcraft ylva [ir | farol | poner | olvidar]", "ylva")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft corwen ", "/darkcraft corwen [ir | baliza <0-2> | poner | olvidar]", "corwen")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft armadura ", "/darkcraft armadura [<conjunto> [poner] | quitar]", "armadura")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft armadura jefes", "/darkcraft armadura jefes [olvidar]", "armadura_jefes")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft armadura mejora ", "/darkcraft armadura mejora <0-5>", "armadura_mejora")), false);

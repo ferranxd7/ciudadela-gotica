@@ -420,11 +420,19 @@ public abstract class Enemigo extends Monster {
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 8, true, false, this::percibe));
     }
 
+    /** Para las pruebas: si repararia ahora en ese jugador ({@link #percibe}). */
+    public boolean reparaEn(LivingEntity p) {
+        return percibe(p);
+    }
+
     /** Si repara en ese jugador: de pie, lo que tiene delante (agachado, la mitad de lejos y nunca por la espalda). */
     protected boolean percibe(LivingEntity p) {
         double d2 = distanceToSqr(p);
-        if (postura() == TUMBADO) return d2 < 3.6 * 3.6;
-        if (postura() == REZA) return d2 < (p.isCrouching() ? 3.0 * 3.0 : 6.0 * 6.0);
+        // el Farol de Corwen (parte 7ao): los que esperan tumbados o rezando reparan en quien lo lleva a la mitad de distancia
+        double k = (postura() == TUMBADO || postura() == REZA) && p instanceof net.minecraft.server.level.ServerPlayer sp
+                && com.darkcraft.rol.Talismanes.lleva(sp, com.darkcraft.rol.Talisman.Clase.FAROLERO) ? 0.5 : 1.0;
+        if (postura() == TUMBADO) return d2 < 3.6 * 3.6 * k * k;
+        if (postura() == REZA) return d2 < (p.isCrouching() ? 3.0 * 3.0 : 6.0 * 6.0) * k * k;
         double alc = getAttributeValue(Attributes.FOLLOW_RANGE) * (p.isCrouching() ? 0.5 : 1.0);
         if (d2 > alc * alc) return false;
         if (d2 < (p.isCrouching() ? 2.2 * 2.2 : 4.5 * 4.5)) return true;

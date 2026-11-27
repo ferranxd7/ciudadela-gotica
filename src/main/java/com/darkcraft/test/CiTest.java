@@ -762,6 +762,7 @@ public final class CiTest {
         misionOswin(server, m, log);
         misionHedda(server, m, log);
         misionYlva(server, m, log);
+        misionCorwen(server, m, log);
         armaduras(server, m, log);
         armas7aj(server, m, log);
         escudos7ak(server, m, log);
@@ -5869,6 +5870,150 @@ public final class CiTest {
         } catch (Throwable e) {
             sb.append(" ERROR ").append(e);
             DarkCraftMod.LOGGER.error("[CI] la luz del muelle", e);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+        }
+        log.println(sb);
+        log.flush();
+    }
+
+    /**
+     * Las balizas de la niebla (parte 7ao): Corwen y las tres balizas en su sitio (lo que pisan, hacia donde miran, que no haya nada
+     * encima), el dialogo, la mision entera de las dos maneras (que vaya a recibir las barcas o que se quede), encender cada baliza una
+     * vez y sin yesquero, el Farol de Corwen con los que esperan tumbados y la Pertiga del farolero (una lanza que a veces prende).
+     */
+    private static void misionCorwen(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        StringBuilder sb = new StringBuilder("Morvain, las balizas de la niebla:");
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ae5"), "[DarkCraftCI27]"));
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            BlockPos cs = com.darkcraft.mision.Corwen.sitio();
+            java.util.List<BlockPos> sitios = new java.util.ArrayList<>(java.util.List.of(cs));
+            for (int i = 0; i < 3; i++) sitios.add(com.darkcraft.mision.Corwen.baliza(i));
+            for (BlockPos p : sitios)
+                for (int dx = -1; dx <= 1; dx++)
+                    for (int dz = -1; dz <= 1; dz++) m.getChunk((p.getX() >> 4) + dx, (p.getZ() >> 4) + dz);
+            com.darkcraft.mision.Corwen.olvidar(m);
+            var c = com.darkcraft.mision.Corwen.ponerCorwen(m);
+            var b = new com.darkcraft.mision.Baliza[3];
+            for (int i = 0; i < 3; i++) b[i] = com.darkcraft.mision.Corwen.ponerBaliza(m, i);
+            if (c == null || b[0] == null || b[1] == null || b[2] == null) throw new IllegalStateException("sin Corwen o sin las balizas");
+            BlockPos pies = c.blockPosition(), mira = com.darkcraft.mision.Corwen.mira();
+            double giro = Math.toDegrees(Math.atan2(mira.getZ() - pies.getZ(), mira.getX() - pies.getX())) - 90;
+            sb.append(String.format(java.util.Locale.ROOT, " Corwen en %s, pisa %s, a la laguna %.0f grados (giro %.0f), libre %s",
+                    pies.toShortString(), m.getBlockState(pies.below()).getBlock().getDescriptionId().replace("block.minecraft.", ""),
+                    net.minecraft.util.Mth.wrapDegrees(giro - c.getYRot()), c.getYRot(),
+                    m.getBlockState(pies).getCollisionShape(m, pies).isEmpty() && m.getBlockState(pies.above()).getCollisionShape(m, pies.above()).isEmpty()));
+            for (int i = 0; i < 3; i++) {
+                BlockPos q = b[i].blockPosition();
+                int libres = 0;
+                for (int dy = 0; dy < 3; dy++) if (m.getBlockState(q.above(dy)).getCollisionShape(m, q.above(dy)).isEmpty()) libres++;
+                BlockPos farol = BlockPos.containing(b[i].farolX(), b[i].getY() + com.darkcraft.mision.Baliza.ALTO_FAROL, b[i].farolZ());
+                sb.append(String.format(java.util.Locale.ROOT, " | baliza %d en %s (%.2f), pisa %s, libre %d de 3, el farol sobre %s (%s), giro %.0f, la encuentra %s", i,
+                        q.toShortString(), b[i].getY(), m.getBlockState(q.below()).getBlock().getDescriptionId().replace("block.minecraft.", ""), libres,
+                        m.getBlockState(farol.below(2)).getBlock().getDescriptionId().replace("block.minecraft.", ""),
+                        m.getBlockState(farol).isAir() ? "aire" : m.getBlockState(farol).getBlock().getDescriptionId().replace("block.minecraft.", ""),
+                        b[i].getYRot(), com.darkcraft.mision.Corwen.buscarBaliza(m, i) == b[i]));
+            }
+            // ---- el dialogo: todos los nodos y respuestas llevan a algo que existe
+            var d = com.darkcraft.dialogo.Dialogos.de("corwen");
+            int malos = 0;
+            for (var n : d.nodos().values()) {
+                if (n.menu()) {
+                    for (var r : n.respuestas()) if (r.destino() != 0 && d.nodo(r.destino()) == null) malos++;
+                } else if (n.siguiente() != 0 && d.nodo(n.siguiente()) == null) malos++;
+            }
+            sb.append(" | dialogo: ").append(d.nodos().size()).append(" nodos, ").append(malos).append(" que llevan a nada");
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            // ---- sin la mision: la baliza no se enciende
+            com.darkcraft.mision.Misiones.olvidar(fp, "corwen");
+            fp.moveTo(b[0].getX() + 1.5, b[0].getY(), b[0].getZ() + 0.5, 90f, 0f);
+            com.darkcraft.mision.Corwen.encender(fp, b[0]);
+            sb.append(" | sin la mision: ").append(com.darkcraft.mision.Misiones.resumenCorwen(fp));
+            // ---- 1) aceptar, encender las tres y dejarle ir
+            fp.moveTo(cs.getX() - 1.5, c.getY(), cs.getZ() - 1.5, 0f, 0f);
+            int n1 = com.darkcraft.mision.Corwen.inicio(fp), n2 = com.darkcraft.mision.Corwen.inicio(fp);
+            com.darkcraft.mision.Corwen.accion(fp, c, "rechazar");
+            int n3 = com.darkcraft.mision.Corwen.inicio(fp);
+            com.darkcraft.mision.Corwen.accion(fp, c, "precio");
+            com.darkcraft.mision.Corwen.accion(fp, c, "aceptar");
+            com.darkcraft.mision.Corwen.accion(fp, c, "aceptar");
+            int yesqueros = fp.getInventory().countItem(DarkCraftMod.YESQUERO.get());
+            int n4 = com.darkcraft.mision.Corwen.inicio(fp);
+            BlockPos obj = com.darkcraft.mision.Corwen.objetivo(fp);
+            sb.append(String.format(java.util.Locale.ROOT, " | 1) empieza %d, %d; rechaza: %d; la noche y acepta (dos veces): %d yesquero(s), empieza %d (%s), ir a %s",
+                    n1, n2, n3, yesqueros, n4, com.darkcraft.mision.Misiones.resumenCorwen(fp), obj == null ? "-" : obj.toShortString()));
+            com.darkcraft.mision.Corwen.accion(fp, c, "devolver");
+            sb.append(" (dejarle ir antes de tiempo: ").append(com.darkcraft.mision.Misiones.resumenCorwen(fp)).append(')');
+            int antes = com.darkcraft.mision.Corwen.ENCENDIDAS;
+            StringBuilder orden = new StringBuilder();
+            for (int i = 0; i < 3; i++) {
+                // de pie junto al poste, del lado de tierra
+                float g = b[i].getYRot() * net.minecraft.util.Mth.DEG_TO_RAD;
+                fp.moveTo(b[i].getX() + net.minecraft.util.Mth.sin(g) * 1.5, b[i].getY(), b[i].getZ() - net.minecraft.util.Mth.cos(g) * 1.5, 0f, 0f);
+                com.darkcraft.mision.Corwen.encender(fp, b[i]);
+                if (i == 0) com.darkcraft.mision.Corwen.encender(fp, b[0]);
+                BlockPos o = com.darkcraft.mision.Corwen.objetivo(fp);
+                orden.append(' ').append(com.darkcraft.mision.Corwen.encendidas(com.darkcraft.mision.Corwen.marcas(fp))).append(" ir a ").append(o == null ? "-" : o.toShortString());
+            }
+            fp.moveTo(cs.getX() - 1.5, c.getY(), cs.getZ() - 1.5, 0f, 0f);
+            int n5 = com.darkcraft.mision.Corwen.inicio(fp);
+            boolean veAntes = com.darkcraft.mision.Misiones.visible(fp, c);
+            com.darkcraft.mision.Corwen.accion(fp, c, "devolver");
+            int farol = fp.getInventory().countItem(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.FAROLERO).get());
+            sb.append(String.format(java.util.Locale.ROOT, " | encendidas (+%d):%s; logro balizas %s; con las tres empieza %d; dejarle ir: %s, yesqueros %d, el Farol de Corwen %d,"
+                            + " logro %s, le ve antes %s y despues %s, ir a %s",
+                    com.darkcraft.mision.Corwen.ENCENDIDAS - antes, orden, com.darkcraft.story.Logros.tiene(fp, "balizas"), n5, com.darkcraft.mision.Misiones.resumenCorwen(fp),
+                    fp.getInventory().countItem(DarkCraftMod.YESQUERO.get()), farol, com.darkcraft.story.Logros.tiene(fp, "corwen_barcas"), veAntes,
+                    com.darkcraft.mision.Misiones.visible(fp, c), com.darkcraft.mision.Corwen.objetivo(fp) == null ? "-" : com.darkcraft.mision.Corwen.objetivo(fp).toShortString()));
+            // el Farol de Corwen: un podrido tumbado a 3 bloques repara en uno sin el y no en quien lo lleva (a 1,5 si)
+            var pod = DarkCraftMod.PODRIDO.get().create(m);
+            if (pod != null) {
+                pod.moveTo(fp.getX() + 3, fp.getY(), fp.getZ(), 0f, 0f);
+                pod.postura(com.darkcraft.enemigos.Enemigo.TUMBADO);
+                m.addFreshEntity(pod);
+                quitar.add(pod);
+                boolean sinT = pod.reparaEn(fp);
+                com.darkcraft.rol.Talismanes.ponerDirecto(fp, 0, new net.minecraft.world.item.ItemStack(DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.FAROLERO).get()));
+                boolean conT = pod.reparaEn(fp);
+                pod.moveTo(fp.getX() + 1.5, fp.getY(), fp.getZ(), 0f, 0f);
+                boolean cerca = pod.reparaEn(fp);
+                com.darkcraft.rol.Talismanes.ponerDirecto(fp, 0, net.minecraft.world.item.ItemStack.EMPTY);
+                sb.append(" | un podrido tumbado a 3: sin el farol repara ").append(sinT).append(", con el ").append(conT).append(" (a 1,5: ").append(cerca).append(')');
+            }
+            // ---- 2) que se quede: la pertiga
+            com.darkcraft.mision.Misiones.olvidar(fp, "corwen");
+            com.darkcraft.mision.Corwen.inicio(fp);
+            com.darkcraft.mision.Corwen.accion(fp, c, "aceptar");
+            for (int i = 0; i < 3; i++) {
+                fp.moveTo(b[i].getX(), b[i].getY(), b[i].getZ() + 1.0, 0f, 0f);
+                com.darkcraft.mision.Corwen.encender(fp, b[i]);
+            }
+            fp.moveTo(cs.getX() - 1.5, c.getY(), cs.getZ() - 1.5, 0f, 0f);
+            int n6 = com.darkcraft.mision.Corwen.inicio(fp);
+            com.darkcraft.mision.Corwen.accion(fp, c, "quedar");
+            var pertiga = new net.minecraft.world.item.ItemStack(DarkCraftMod.PERTIGA_FAROLERO.get());
+            var datos = com.darkcraft.combate.Escalado.de(pertiga);
+            sb.append(String.format(java.util.Locale.ROOT, " | 2) con las tres empieza %d; que se quede: %s, pertigas %d, yesqueros %d, logro %s, despues empieza %d, le ve %s;"
+                            + " la pertiga es %s, escala %s",
+                    n6, com.darkcraft.mision.Misiones.resumenCorwen(fp), fp.getInventory().countItem(DarkCraftMod.PERTIGA_FAROLERO.get()),
+                    fp.getInventory().countItem(DarkCraftMod.YESQUERO.get()), com.darkcraft.story.Logros.tiene(fp, "corwen_luz"), com.darkcraft.mision.Corwen.inicio(fp),
+                    com.darkcraft.mision.Misiones.visible(fp, c), com.darkcraft.combate.Armas.de(pertiga),
+                    datos == null ? "-" : datos.letras() + " " + java.util.Arrays.toString(datos.requisitos())));
+            // la pertiga prende: 200 golpes contra un podrido (uno de cada cuatro, mas o menos)
+            if (pod != null) {
+                int prendidos = com.darkcraft.mision.Pertiga.PRENDIDOS;
+                for (int k = 0; k < 200; k++) {
+                    pod.clearFire();
+                    pod.setHealth(pod.getMaxHealth());
+                    pertiga.getItem().hurtEnemy(pertiga, pod, fp);
+                }
+                sb.append(", de 200 golpes prenden ").append(com.darkcraft.mision.Pertiga.PRENDIDOS - prendidos);
+            }
+            com.darkcraft.mision.Misiones.olvidar(fp, "corwen");
+        } catch (Throwable e) {
+            sb.append(" ERROR ").append(e);
+            DarkCraftMod.LOGGER.error("[CI] las balizas de la niebla", e);
         } finally {
             for (var e : quitar) if (!e.isRemoved()) e.discard();
         }

@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:balizas",
+  "display": {
+    "icon": {
+      "item": "darkcraft:talisman_farolero"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.corwen_barcas.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.corwen_barcas.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 150
+  }
+}

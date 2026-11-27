@@ -1256,13 +1256,111 @@ def luz_muelle():
     return M
 
 
+def balizas_niebla():
+    """Las balizas de la niebla (parte 7ao, la mision de Corwen): la laguna de los Pilotes de noche, con bancos de niebla; las chozas
+    sobre sus pilotes y la torre de la capilla ahogada al fondo; dos balizas lejanas que arden en la niebla y, delante a la derecha, la
+    tercera en su islote con el farol ambar; en el agua, dos barcas fantasma con su farolillo que vuelven a casa; abajo a la izquierda,
+    Corwen en su caja al final de la pasarela, con la pertiga y su farol."""
+    M = Mini()
+    M.degradado(["#050807", "#0a100d", "#111a15", "#1a251e", "#26322a", "#33402f"], 0, 44)
+    M.estrellas(10, 223, y1=16)
+    r = np.random.default_rng(151)
+    # el agua negra de la laguna
+    M.degradado(["#1c2620", "#141c17", "#0e1410", "#090d0a", "#060806"], 44, H)
+    # las chozas de la aldea sobre sus pilotes, lejos a la izquierda, y la torre de la capilla ahogada a la derecha
+    lejos = capa()
+    for (x0, ancho, alto) in ((6, 12, 6), (22, 9, 5), (35, 13, 7)):
+        lejos.poli([(x0, 40), (x0 + ancho / 2, 40 - alto), (x0 + ancho, 40)], "#1a221c")
+        lejos.rect(x0 + 1, 40, ancho - 2, 3, "#1a221c")
+        for k in range(3):
+            lejos.rect(x0 + 1 + k * (ancho - 3) // 2, 43, 1, 3, "#1a221c")
+    lejos.rect(4, 44, 50, 1, "#1a221c")  # las pasarelas
+    lejos.rect(96, 24, 6, 20, "#1c241e")  # la torre de la capilla
+    lejos.poli([(95, 24), (99, 17), (103, 24)], "#1c241e")
+    lejos.poli([(102, 30), (114, 30), (114, 44), (102, 44)], "#1c241e")
+    M.pegar(lejos, 0, 0)
+    # bancos de niebla por encima del agua (y un poco sobre las chozas)
+    for y in range(26, 52):
+        k = max(0.0, 1 - abs(y - 41) / 11) * 0.55
+        for x in range(W):
+            onda = 0.5 + 0.5 * math.sin(x / 7.0 + y * 0.6)
+            M.px(x, y, mezcla(M.leer(x, y), "#5a6a5e", k * (0.55 + 0.45 * onda)))
+    # el agua: reflejos y alguna onda clara
+    for _ in range(40):
+        x, y = int(r.integers(0, W)), int(r.integers(48, H))
+        M.hline(x, y, int(r.integers(2, 6)), mezcla(M.leer(x, y), "#3a4a40", 0.5))
+    # dos barcas fantasma en la niebla, con su farolillo palido
+    for (bx, by) in ((58, 49), (76, 51)):
+        M.poli([(bx - 5, by), (bx + 5, by), (bx + 3, by + 2), (bx - 3, by + 2)], "#2a362e")
+        M.linea(bx, by, bx, by - 6, "#2a362e")
+        M.px(bx + 1, by - 6, "#e8e0a0")
+        for y in range(by - 9, by - 2):
+            for x in range(bx - 3, bx + 5):
+                d = math.hypot(x - bx - 1, y - by + 6)
+                if d < 3.5:
+                    M.px(x, y, mezcla(M.leer(x, y), "#c8c088", (1 - d / 3.5) * 0.35))
+    # las balizas: dos lejos (el muelle y el islote del oeste) y la de delante, en su islote con el arbol muerto
+    def halo(cx, cy, rr, fuerte):
+        for y in range(int(cy - rr), int(cy + rr) + 1):
+            for x in range(int(cx - rr), int(cx + rr) + 1):
+                d = math.hypot(x - cx, y - cy)
+                if d < rr and 0 <= x < W and 0 <= y < H:
+                    M.px(x, y, mezcla(M.leer(x, y), "#f09030", (1 - d / rr) ** 1.5 * fuerte))
+    for (bx, by, alto) in ((14, 41, 7), (44, 39, 6)):
+        M.linea(bx, by, bx, by + alto, "#0c100d")
+        M.hline(bx, by, 2, "#0c100d")
+        halo(bx + 2, by + 1, 6, 0.5)
+        M.px(bx + 2, by + 1, "#ffd070")
+        # su reflejo en el agua
+        for y in range(48, min(H, 48 + alto * 2)):
+            if y % 2 == 0:
+                M.px(bx + 2, y, mezcla(M.leer(bx + 2, y), "#f09030", 0.35))
+    fig = capa()
+    # el islote de delante a la derecha, con el arbol muerto
+    fig.poli([(84, 62), (126, 60), (128, 66), (82, 67)], "#101410")
+    fig.linea(112, 61, 113, 42, "#101410")
+    fig.linea(113, 46, 120, 40, "#101410")
+    fig.linea(113, 50, 106, 45, "#101410")
+    fig.linea(120, 40, 123, 41, "#101410")
+    # la baliza: el poste, el brazo y el farol colgado
+    fig.rect(94, 34, 2, 28, "#141814")
+    fig.rect(90, 34, 6, 2, "#141814")
+    fig.rect(89, 36, 1, 2, "#141814")
+    fig.rect(87, 38, 5, 1, "#141814")
+    fig.rect(87, 44, 5, 1, "#141814")
+    # Corwen en su caja al final de la pasarela, abajo a la izquierda: la caja, el chaqueton, el sombrero y la pertiga
+    fig.rect(0, 70, 30, 3, "#121612")  # la pasarela
+    fig.rect(13, 64, 8, 6, "#1a1612")  # la caja
+    fig.poli([(14, 64), (15, 56), (20, 56), (21, 64)], "#121812")  # el cuerpo
+    fig.elipse(17.5, 54, 2.0, 2.2, "#121812")  # la cabeza
+    fig.poli([(13.5, 52.5), (21.5, 52.5), (20.5, 51), (14.5, 51)], "#2a2410")  # el ala del sombrero
+    fig.poli([(19, 64), (25, 63), (25, 66), (19, 66)], "#121812")  # las piernas
+    fig.linea(25, 70, 27, 40, "#1e1a12")  # la pertiga
+    fig.linea(27, 40, 29, 40, "#3a2e16")
+    fig.rect(28, 41, 3, 3, "#141814")  # su farol
+    pegar_con_tinta(M, fig)
+    # el farol de la baliza, encendido, y su reflejo
+    M.rect(88, 39, 3, 5, "#f09030")
+    M.rect(89, 40, 1, 3, "#fff0b0")
+    halo(89.5, 41.5, 13, 0.55)
+    for y in range(67, H):
+        if y % 2:
+            M.hline(87, y, 4, mezcla(M.leer(87, y), "#f09030", 0.3))
+    # el farol de Corwen, encendido tambien
+    M.px(29, 42, "#ffc860")
+    halo(29.5, 42.5, 6, 0.4)
+    # la barba blanca de Corwen
+    M.px(18, 56, "#cecac2").px(17, 56, "#dedad2").px(17, 57, "#b0aca4")
+    return M
+
+
 ESCENAS = [corona_rota, fuente, trono, catedral, juramento, portal, perdidos_valdrenn, perdidos_fortaleza, diario, acertijo,
            perdidos_brumavela, perdidos_morvain, morvain_tierras, morvain_quedaron, morvain_marcado, morvain_hermanas,
-           campana_peregrino, bufanda_roja, luz_muelle]
+           campana_peregrino, bufanda_roja, luz_muelle, balizas_niebla]
 
 
 def montar():
-    """Las miniaturas en un atlas de 512 x 400 (cuatro por fila; la quinta fila, las misiones: 7ag, 7ah, 7an)."""
+    """Las miniaturas en un atlas de 512 x 400 (cuatro por fila; la quinta fila, las misiones: 7ag, 7ah, 7an, 7ao)."""
     A = Lienzo(512, 400)
     for i, f in enumerate(ESCENAS):
         m = f()

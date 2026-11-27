@@ -58,7 +58,13 @@ public final class Talisman extends Item {
          * El Farol del ballenero (parte 7an, a quien se queda el farol de Brann): la luz del vigia; los enemigos a 24 bloques se ven a
          * traves de las paredes (solo quien lo lleva: {@code Enemigo.BRILLA}, lo pone el cliente).
          */
-        BALLENERO;
+        BALLENERO,
+        /**
+         * El Farol de Corwen (parte 7ao, a quien le deja ir a recibir las barcas): su luz nunca se perdio en la niebla. Los enemigos que
+         * esperan tumbados, flotando o rezando no reparan en quien lo lleva hasta tenerlo casi encima ({@code Enemigo.percibe}: a la
+         * mitad de distancia).
+         */
+        FAROLERO;
 
         /** "vigor", "aliento"... (el objeto es darkcraft:talisman_ + esto). */
         public final String id = name().toLowerCase(java.util.Locale.ROOT);

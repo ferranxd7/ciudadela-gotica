@@ -250,6 +250,7 @@ public final class ClientRol {
                     else if (que == CAMPANA) com.darkcraft.client.mision.ClientMisiones.coger(mc);
                     else if (que == RESTOS) com.darkcraft.client.mision.ClientMisiones.cogerRestos(mc);
                     else if (que == FAROL) com.darkcraft.client.mision.ClientMisiones.cogerFarol(mc);
+                    else if (que == BALIZA) com.darkcraft.client.mision.ClientMisiones.encenderBaliza(mc);
                     else if (que == ESTELA && com.darkcraft.client.morvain.ClientMapa.aMano != null)
                         Net.CH.sendToServer(new Net.EstelaUsar(com.darkcraft.client.morvain.ClientMapa.aMano));
                     enfriamiento = 12;
@@ -284,7 +285,7 @@ public final class ClientRol {
     }
 
     /** Lo que el jugador tiene a mano para la tecla del aviso. */
-    public static final int NADA = 0, ESPADA = 1, SANTUARIO = 2, PERSONAJE = 3, COSA = 4, ESTELA = 5, PUERTA = 6, CAMPANA = 7, RESTOS = 8, FAROL = 9;
+    public static final int NADA = 0, ESPADA = 1, SANTUARIO = 2, PERSONAJE = 3, COSA = 4, ESTELA = 5, PUERTA = 6, CAMPANA = 7, RESTOS = 8, FAROL = 9, BALIZA = 10;
 
     public static int aMano() {
         if (juntoAEspada()) return ESPADA;
@@ -299,6 +300,8 @@ public final class ClientRol {
         if (com.darkcraft.client.mision.ClientMisiones.campana >= 0) return CAMPANA;
         // el farol de Brann, en la arena del Costillar (parte 7an)
         if (com.darkcraft.client.mision.ClientMisiones.farol >= 0) return FAROL;
+        // una baliza de los Pilotes que encender (parte 7ao)
+        if (com.darkcraft.client.mision.ClientMisiones.baliza >= 0) return BALIZA;
         return ClientPueblo.aMano >= 0 ? COSA : NADA;
     }
 

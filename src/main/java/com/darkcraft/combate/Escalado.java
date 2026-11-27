@@ -57,6 +57,8 @@ public final class Escalado {
         if (st.is(DarkCraftMod.ALABARDA.get())) return d("CC---", 14, 12, 0, 0, 0);
         // la Lanza de la Puerta Oeste (parte 7ah): mejor que una lanza cualquiera con la Fuerza y la Destreza
         if (st.is(DarkCraftMod.LANZA_TAM.get())) return d("CB---", 11, 13, 0, 0, 0);
+        // la Pertiga del farolero (parte 7ao): la luz que guarda escala con la Fe
+        if (st.is(DarkCraftMod.PERTIGA_FAROLERO.get())) return d("DC-C-", 10, 12, 0, 12, 0);
         // la maza de clerigo (parte 7aj): un martillo que escala tambien con la Fe
         if (st.is(DarkCraftMod.MAZA.get())) return d("CD-C-", 12, 8, 0, 12, 0);
         Armas.Tipo t = Armas.de(st);

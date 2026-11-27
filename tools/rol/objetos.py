@@ -188,6 +188,8 @@ TALISMANES = {
     "ylva": ("redondo", "plata", ["...k...", "..kkk..", ".kcCck.", ".kCSCk.", ".kcCck.", "..kkk..", "......."]),
     # el Farol del ballenero (parte 7an): el viejo farol de aceite de Brann, con su llama ambar, sobre bronce con sal
     "ballenero": ("escudo", "bronce", ["...k...", "..kkk..", ".kfFfk.", ".kFyFk.", ".kfFfk.", ".kkkkk.", "..s.s.."]),
+    # el Farol de Corwen (parte 7ao): el farol del farolero colgado de su gancho, con la llama ambar, sobre hierro negro
+    "farolero": ("redondo", "hierro", ["..qq...", "....q..", "..kqk..", ".kFeFk.", ".kEyEk.", ".kFeFk.", "..kkk.."]),
 }
 
 

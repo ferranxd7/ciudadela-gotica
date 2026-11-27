@@ -148,11 +148,16 @@ VOZ_HEDDA = ("highpass=f=85,equalizer=f=3000:t=q:w=1.2:g=1,aecho=0.8:0.2:44|101:
 TOMAS_YLVA = {n: "a" for n in range(1, 14)}
 VOZ_YLVA = ("highpass=f=80,equalizer=f=3100:t=q:w=1.2:g=1,aecho=0.8:0.18:34|81:0.06|0.03,"
             "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=150,loudnorm=I=-16:TP=-1.5:LRA=9")
+# Corwen, el farolero de los Pilotes (parte 7ao; voz "Arkadius - Old Storyteller", flow 5aWXscqwkLiHZubfdVBI): al aire libre en la
+# pasarela del santuario, la voz vieja y grave, con la niebla del pantano que se la come un poco (los agudos algo mas bajos)
+TOMAS_CORWEN = {n: "a" for n in range(1, 11)}
+VOZ_CORWEN = ("highpass=f=65,equalizer=f=160:t=q:w=1.0:g=1.5,highshelf=f=6000:g=-2,aecho=0.8:0.2:52|117:0.06|0.03,"
+              "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=150,loudnorm=I=-16:TP=-1.5:LRA=9")
 # los personajes con dialogo: id -> (tomas, filtro)
 PERSONAJES = {"guia": (TOMAS_GUIA, VOZ_GUIA), "herrero": (TOMAS_HERRERO, VOZ_HERRERO), "mercader": (TOMAS_MERCADER, VOZ_MERCADER),
               "hagen": (TOMAS_HAGEN, VOZ_HAGEN), "brenna": (TOMAS_BRENNA, VOZ_BRENNA), "ulrik": (TOMAS_ULRIK, VOZ_ULRIK),
               "tobin": (TOMAS_TOBIN, VOZ_TOBIN), "silas": (TOMAS_SILAS, VOZ_SILAS), "oswin": (TOMAS_OSWIN, VOZ_OSWIN),
-              "hedda": (TOMAS_HEDDA, VOZ_HEDDA), "ylva": (TOMAS_YLVA, VOZ_YLVA)}
+              "hedda": (TOMAS_HEDDA, VOZ_HEDDA), "ylva": (TOMAS_YLVA, VOZ_YLVA), "corwen": (TOMAS_CORWEN, VOZ_CORWEN)}
 
 # efectos: nombre -> (segundos como mucho, fundido final en s, volumen integrado LUFS)
 SFX = {
@@ -458,6 +463,9 @@ SFX = {
     # la luz del muelle (parte 7an): el farol de fuego frio, Brann que ve la luz (el canto de la Vieja y el mar que vuelve) y el
     # descanso de Ylva (el mar en calma y los dos faroles en su cadena)
     "farol_frio": (3.0, 1.0, -16), "brann_calma": (12.0, 3.5, -16), "ylva_descansa": (8.0, 2.5, -19),
+    # las balizas de la niebla (parte 7ao): el yesquero que prende una baliza, las campanas de las barcas que vuelven en la niebla y
+    # Corwen que se mete en el agua a recibirlas
+    "baliza_enciende": (3.0, 1.0, -16), "campanas_niebla": (12.0, 3.0, -18), "corwen_se_va": (10.0, 3.0, -19),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -804,6 +812,10 @@ TOMAS_SFX = {
     # la luz del muelle (parte 7an): del farol las dos claras con su chispazo y su zumbido (la 3 es casi todo graves); de Brann la 1
     # (el canto de la Vieja enseguida y luego la calma) y la 3; del descanso de Ylva la 1 (la que mas se oye) y la 3
     "farol_frio": (1, 4), "brann_calma": (1, 3), "ylva_descansa": (1, 3),
+    # las balizas de la niebla (parte 7ao): del yesquero la 3 y la 1 (el chispazo y la llama que prende; la 2 casi no se oye tras
+    # el golpe y la 4 satura); de las campanas la 2 (las campanas que mas se oyen a los 8 s) y la 4 (que suenan todo el rato); de
+    # Corwen en el agua la 4 y la 1 (los pasos en el agua desde el principio)
+    "baliza_enciende": (3, 1), "campanas_niebla": (2, 4), "corwen_se_va": (4, 1),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
