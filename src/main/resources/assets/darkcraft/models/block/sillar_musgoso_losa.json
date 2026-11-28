@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "darkcraft:block/sillar_musgoso",
+    "top": "darkcraft:block/sillar_musgoso",
+    "side": "darkcraft:block/sillar_musgoso"
+  }
+}

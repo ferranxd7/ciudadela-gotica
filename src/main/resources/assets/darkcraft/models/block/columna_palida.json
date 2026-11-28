@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "darkcraft:block/columna_palida_tapa",
+    "side": "darkcraft:block/columna_palida_lado"
+  }
+}

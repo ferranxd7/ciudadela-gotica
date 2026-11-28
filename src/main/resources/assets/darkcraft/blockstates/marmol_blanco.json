@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/marmol_blanco"
+      },
+      {
+        "model": "darkcraft:block/marmol_blanco_2"
+      },
+      {
+        "model": "darkcraft:block/marmol_blanco_3"
+      }
+    ]
+  }
+}

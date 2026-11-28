@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/sillar_oscuro_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/sillar_oscuro_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/sillar_oscuro"
+      },
+      {
+        "model": "darkcraft:block/sillar_oscuro_2"
+      },
+      {
+        "model": "darkcraft:block/sillar_oscuro_3"
+      }
+    ]
+  }
+}

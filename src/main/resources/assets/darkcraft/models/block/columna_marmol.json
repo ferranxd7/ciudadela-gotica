@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "darkcraft:block/columna_marmol_tapa",
+    "side": "darkcraft:block/columna_marmol_lado"
+  }
+}

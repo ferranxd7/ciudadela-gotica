@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/sillar_verdin"
+      },
+      {
+        "model": "darkcraft:block/sillar_verdin_2"
+      },
+      {
+        "model": "darkcraft:block/sillar_verdin_3"
+      }
+    ]
+  }
+}

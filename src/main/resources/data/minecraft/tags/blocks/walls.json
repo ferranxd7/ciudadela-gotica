@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "darkcraft:sillar_gris_muro",
+    "darkcraft:sillar_palido_muro",
+    "darkcraft:sillar_oscuro_muro",
+    "darkcraft:sillar_musgoso_muro",
+    "darkcraft:sillar_agrietado_muro",
+    "darkcraft:sillar_nevado_muro",
+    "darkcraft:sillar_verdin_muro",
+    "darkcraft:marmol_blanco_muro",
+    "darkcraft:marmol_negro_muro",
+    "darkcraft:sillar_rojo_muro",
+    "darkcraft:ladrillo_viejo_muro",
+    "darkcraft:ladrillo_oscuro_muro",
+    "darkcraft:adoquin_muro",
+    "darkcraft:enlosado_muro",
+    "darkcraft:piedra_tallada_muro",
+    "darkcraft:mamposteria_muro"
+  ]
+}

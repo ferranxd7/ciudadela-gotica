@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/enlosado"
+      },
+      {
+        "model": "darkcraft:block/enlosado_2"
+      },
+      {
+        "model": "darkcraft:block/enlosado_3"
+      }
+    ]
+  }
+}

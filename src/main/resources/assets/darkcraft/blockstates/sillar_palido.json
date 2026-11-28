@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/sillar_palido"
+      },
+      {
+        "model": "darkcraft:block/sillar_palido_2"
+      },
+      {
+        "model": "darkcraft:block/sillar_palido_3"
+      }
+    ]
+  }
+}

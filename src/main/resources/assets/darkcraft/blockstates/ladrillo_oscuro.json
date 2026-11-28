@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/ladrillo_oscuro"
+      },
+      {
+        "model": "darkcraft:block/ladrillo_oscuro_2"
+      },
+      {
+        "model": "darkcraft:block/ladrillo_oscuro_3"
+      }
+    ]
+  }
+}

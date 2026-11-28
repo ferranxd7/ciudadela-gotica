@@ -536,6 +536,13 @@ public final class CiTest {
                     log.println("La Garza Gris: ERROR al reiniciar " + t2);
                 }
             }
+            // ---- los bloques nuevos de la gran reforma (parte 8b): registrados, su botin, sus etiquetas y lo que sueltan
+            try {
+                bloques8b(server, lvl, log);
+            } catch (Throwable t) {
+                log.println("Bloques 8b: ERROR " + t);
+                DarkCraftMod.LOGGER.error("[CI] bloques 8b", t);
+            }
             // ---- Morvain, las Tierras Marchitas (parte 7a): la dimension, cada region, el Arco del Umbral y la ciudadela
             try {
                 morvain(server, log, out);
@@ -782,6 +789,42 @@ public final class CiTest {
      * mas; el yelmo puesto (hueco 39) tambien se mejora; lo que suman sus atributos (defensa y dureza), su ficha y su linea; lo
      * que resiste el conjunto entero a +0 y a +5; y que las armas siguen llegando a +9.
      */
+    /** Los bloques nuevos (parte 8b): cuantos hay, que cada uno tiene su botin, que escaleras, losas y muros estan en sus
+     *  etiquetas de Minecraft (asi se unen los muros) y que rotos con un pico sueltan lo suyo (la losa doble, dos). */
+    private static void bloques8b(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        int sinBotin = 0, malEtiqueta = 0, malSuelta = 0, n = 0;
+        java.util.List<String> malos = new java.util.ArrayList<>();
+        net.minecraft.world.item.ItemStack pico = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_PICKAXE);
+        net.minecraft.core.BlockPos pos = new net.minecraft.core.BlockPos(0, 300, 0);
+        for (String id : com.darkcraft.bloques.Bloques.ids()) {
+            n++;
+            net.minecraft.world.level.block.Block b = com.darkcraft.bloques.Bloques.de(id);
+            if (server.getLootData().getLootTable(b.getLootTable()) == net.minecraft.world.level.storage.loot.LootTable.EMPTY) {
+                sinBotin++;
+                if (malos.size() < 6) malos.add("sin botin " + id);
+            }
+            net.minecraft.world.level.block.state.BlockState st = b.defaultBlockState();
+            boolean etiq = !(id.endsWith("_muro") && !st.is(net.minecraft.tags.BlockTags.WALLS))
+                    && !(id.endsWith("_escalera") && !st.is(net.minecraft.tags.BlockTags.STAIRS))
+                    && !(id.endsWith("_losa") && !st.is(net.minecraft.tags.BlockTags.SLABS))
+                    && st.is(net.minecraft.tags.BlockTags.MINEABLE_WITH_PICKAXE);
+            if (!etiq) {
+                malEtiqueta++;
+                if (malos.size() < 6) malos.add("etiquetas " + id);
+            }
+            if (id.endsWith("_losa"))
+                st = st.setValue(net.minecraft.world.level.block.SlabBlock.TYPE, net.minecraft.world.level.block.state.properties.SlabType.DOUBLE);
+            java.util.List<net.minecraft.world.item.ItemStack> sale = net.minecraft.world.level.block.Block.getDrops(st, m, pos, null, null, pico);
+            int quiere = id.endsWith("_losa") ? 2 : 1;
+            if (sale.size() != 1 || sale.get(0).getItem() != b.asItem() || sale.get(0).getCount() != quiere) {
+                malSuelta++;
+                if (malos.size() < 6) malos.add("suelta " + id + " " + sale);
+            }
+        }
+        log.println("Bloques 8b: " + n + " bloques de " + com.darkcraft.bloques.CatalogoBloques.MATERIALES.length + " materiales; sin botin "
+                + sinBotin + ", etiquetas mal " + malEtiqueta + ", sueltan mal " + malSuelta + (malos.isEmpty() ? "" : " | " + malos));
+    }
+
     private static void armaduras7am(MinecraftServer server, ServerLevel m, PrintWriter log) {
         StringBuilder sb = new StringBuilder("Armaduras en la forja 7am:");
         var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07a1d"), "[DarkCraftCI29]"));

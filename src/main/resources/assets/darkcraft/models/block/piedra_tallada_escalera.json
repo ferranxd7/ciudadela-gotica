@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "darkcraft:block/piedra_tallada",
+    "top": "darkcraft:block/piedra_tallada",
+    "side": "darkcraft:block/piedra_tallada"
+  }
+}

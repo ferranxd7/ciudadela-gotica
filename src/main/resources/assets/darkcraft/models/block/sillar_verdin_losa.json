@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "darkcraft:block/sillar_verdin",
+    "top": "darkcraft:block/sillar_verdin",
+    "side": "darkcraft:block/sillar_verdin"
+  }
+}

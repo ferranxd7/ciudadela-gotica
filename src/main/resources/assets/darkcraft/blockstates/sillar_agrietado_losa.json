@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/sillar_agrietado_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/sillar_agrietado_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/sillar_agrietado"
+      },
+      {
+        "model": "darkcraft:block/sillar_agrietado_2"
+      },
+      {
+        "model": "darkcraft:block/sillar_agrietado_3"
+      }
+    ]
+  }
+}

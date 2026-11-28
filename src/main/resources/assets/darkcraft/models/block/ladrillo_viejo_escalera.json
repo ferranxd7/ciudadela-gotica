@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "darkcraft:block/ladrillo_viejo",
+    "top": "darkcraft:block/ladrillo_viejo",
+    "side": "darkcraft:block/ladrillo_viejo"
+  }
+}

@@ -1423,6 +1423,7 @@ public class DarkCraftMod {
         ITEMS.register(modBus);
         SOUNDS.register(modBus);
         BLOCKS.register(modBus);
+        com.darkcraft.bloques.Bloques.registrar(modBus);
         ENTITIES.register(modBus);
         com.darkcraft.rol.Efectos.registrar(modBus);
         com.darkcraft.world.Valdrenn.registrar(modBus);

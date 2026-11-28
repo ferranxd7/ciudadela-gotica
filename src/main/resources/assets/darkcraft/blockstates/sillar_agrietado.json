@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/sillar_agrietado"
+      },
+      {
+        "model": "darkcraft:block/sillar_agrietado_2"
+      },
+      {
+        "model": "darkcraft:block/sillar_agrietado_3"
+      }
+    ]
+  }
+}

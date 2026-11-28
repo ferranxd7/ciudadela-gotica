@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/sillar_nevado"
+      },
+      {
+        "model": "darkcraft:block/sillar_nevado_2"
+      },
+      {
+        "model": "darkcraft:block/sillar_nevado_3"
+      }
+    ]
+  }
+}

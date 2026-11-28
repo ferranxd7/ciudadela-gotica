@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/sillar_musgoso_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/sillar_musgoso_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/sillar_musgoso"
+      },
+      {
+        "model": "darkcraft:block/sillar_musgoso_2"
+      },
+      {
+        "model": "darkcraft:block/sillar_musgoso_3"
+      }
+    ]
+  }
+}

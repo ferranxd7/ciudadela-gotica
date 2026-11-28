@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/ladrillo_oscuro_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/ladrillo_oscuro_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/ladrillo_oscuro"
+      },
+      {
+        "model": "darkcraft:block/ladrillo_oscuro_2"
+      },
+      {
+        "model": "darkcraft:block/ladrillo_oscuro_3"
+      }
+    ]
+  }
+}

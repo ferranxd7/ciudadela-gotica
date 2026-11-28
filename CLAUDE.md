@@ -4643,6 +4643,44 @@ La primera de la reforma (`PLAN.md`, respuestas 5, 45, 80-88 y 92-93 del plan nu
   caballero y la cinematica de la Sombra (`ti09_nueva_intro`, la caida). Lineas con `estadoNuevaPartida` (pantalla,
   eleccion pendiente, mano, modo, dificultad, nombre del mundo).
 
+### Plan nuevo, parte 8b: los bloques nuevos, primera tanda (la piedra)
+
+Respuestas 45-48 del plan nuevo (cero bloques de Minecraft, todas las formas, texturas de 64 x 64). Las tandas que vienen
+(madera, tejados, tierra y roca del terreno, agua, metal, cristal, adornos...) siguen el mismo camino.
+- **Todo sale de `tools/bloques/bloques.py`** (`python3 tools/bloques/bloques.py [--vista carpeta]`): el catalogo
+  (`MATERIALES`: id, nombre en espanol e ingles, receta de la textura, formas, sonido —una constante de `SoundType`—,
+  color del mapa —de `MapColor`—, dureza, variantes) y lo escribe todo: las texturas (`textures/block/<id>[_2|_3].png`),
+  estados (los de escalera y muro iguales que los del juego: lo comprobe contra `stone_brick_stairs` y
+  `cobblestone_wall`), modelos de bloque y de objeto, el botin (`loot_tables/blocks`: se suelta a si mismo, la losa doble
+  dos), las etiquetas de Minecraft (`walls`, `stairs`, `slabs` de bloques y objetos y `mineable/pickaxe`: asi los muros se
+  unen entre si), los nombres (`ci/historia/bloques_nombres.py`, que `rol.py` mete en los idiomas) y
+  `bloques/CatalogoBloques.java`. **No tocar a mano nada de eso**: se cambia el script y se vuelve a pasar. `--vista`
+  dibuja hojas para revisar sin abrir el juego (un muro de 4 x 4 con las variantes al azar y un cubo en isometrica).
+- **Formas**: B bloque entero (`<id>`), E escalera (`<id>_escalera`), L losa (`<id>_losa`), M muro (`<id>_muro`), C columna
+  (`RotatedPillarBlock`, textura `_lado` y `_tapa`). **Variantes**: el bloque entero tiene 3 texturas y el estado las
+  elige al azar en cada sitio (lista de modelos); la losa doble igual. Para que casen entre si, cada receta recibe dos
+  semillas: la de su variante y la comun (`borde`): el ruido y la piedra que cruza el borde de cada hilada (o las semillas
+  de cantos cerca del borde) salen de la comun.
+- **El pintor** (`tools/bloques/pintor.py`): todo es un campo de luz que al final pasa por una rampa de colores con
+  tramado de Bayer (pixel art nitido). La luz siempre de arriba a la izquierda (`relieve` para relieves a escalones,
+  `luz_de` para los suaves). Piezas: `sillares` (hiladas, llagas, bisel, desconchones, filos gastados, picado, grietas
+  con su labio de luz y ramas, manchas), `ladrillos`, `cantos` (Voronoi sobre el toro), `losas`, `marmol` (vetas de grueso
+  parejo con la distancia a la linea del cero), `columna_lado` / `columna_tapa`, `tallado` (arqueria ciega gotica) y las
+  capas `musgo`, `escarcha`, `verdin` (en `bloques.py`: `capa` y `capa_bultos`, que pone bultitos, borde de luz y la
+  sombra que echan sobre la piedra).
+- **Primera tanda** (20 materiales, 68 bloques): sillar de granito, de caliza, de basalto, musgoso, agrietado, escarchado,
+  con verdin y de arenisca roja; marmol blanco (vetas grises) y negro (vetas de oro); ladrillo viejo y oscuro; adoquin,
+  enlosado, piedra tallada (arcos apuntados con trebol) y mamposteria, todos con escalera, losa y muro; y cuatro columnas
+  estriadas (granito, caliza, marmol y basalto).
+- **Java**: `bloques/Bloques` registra cada material del catalogo con sus formas (y su objeto) y la pestana del creativo
+  "Dark Craft · Bloques"; `Bloques.de(id)`, `ids()`, `formas(material)`, `cuantos()`. Lo registra `DarkCraftMod`
+  (`Bloques.registrar(modBus)`).
+- Pruebas: servidor, linea `Bloques 8b: ...` (botin, etiquetas y lo que suelta cada uno con un pico); cliente, tramo
+  `bloques8b()` justo despues del escaparate: un muestrario sobre las nubes a mediodia (un modulo por material: muro de
+  4 x 4, escaleras, losas, muros; las columnas de pie y tumbadas; suelo de enlosado), capturas `cliente_bq01..05` (de
+  cuatro en cuatro) y `bq06..08` de cerca, y la linea `bloques 8b (cliente): ...` (estados y objetos sin modelo y
+  texturas que no miden 64 x 64: tienen que ser 0).
+
 ## Compilar, probar y publicar
 
 - La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (sin mods de decoracion desde la 8a) y un cliente con capturas

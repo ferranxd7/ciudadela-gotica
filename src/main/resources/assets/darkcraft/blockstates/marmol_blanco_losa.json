@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/marmol_blanco_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/marmol_blanco_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/marmol_blanco"
+      },
+      {
+        "model": "darkcraft:block/marmol_blanco_2"
+      },
+      {
+        "model": "darkcraft:block/marmol_blanco_3"
+      }
+    ]
+  }
+}

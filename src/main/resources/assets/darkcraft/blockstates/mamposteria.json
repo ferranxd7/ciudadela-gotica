@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/mamposteria"
+      },
+      {
+        "model": "darkcraft:block/mamposteria_2"
+      },
+      {
+        "model": "darkcraft:block/mamposteria_3"
+      }
+    ]
+  }
+}

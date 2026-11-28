@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "bottom": "darkcraft:block/marmol_negro",
+    "top": "darkcraft:block/marmol_negro",
+    "side": "darkcraft:block/marmol_negro"
+  }
+}

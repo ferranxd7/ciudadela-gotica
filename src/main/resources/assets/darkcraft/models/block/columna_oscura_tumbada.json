@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column_horizontal",
+  "textures": {
+    "end": "darkcraft:block/columna_oscura_tapa",
+    "side": "darkcraft:block/columna_oscura_lado"
+  }
+}

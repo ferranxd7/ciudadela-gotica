@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "bottom": "darkcraft:block/sillar_palido",
+    "top": "darkcraft:block/sillar_palido",
+    "side": "darkcraft:block/sillar_palido"
+  }
+}

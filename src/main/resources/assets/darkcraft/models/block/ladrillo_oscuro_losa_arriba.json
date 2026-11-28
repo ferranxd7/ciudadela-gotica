@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "darkcraft:block/ladrillo_oscuro",
+    "top": "darkcraft:block/ladrillo_oscuro",
+    "side": "darkcraft:block/ladrillo_oscuro"
+  }
+}

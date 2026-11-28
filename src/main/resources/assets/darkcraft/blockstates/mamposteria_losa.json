@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/mamposteria_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/mamposteria_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/mamposteria"
+      },
+      {
+        "model": "darkcraft:block/mamposteria_2"
+      },
+      {
+        "model": "darkcraft:block/mamposteria_3"
+      }
+    ]
+  }
+}

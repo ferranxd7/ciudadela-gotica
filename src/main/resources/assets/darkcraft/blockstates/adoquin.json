@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/adoquin"
+      },
+      {
+        "model": "darkcraft:block/adoquin_2"
+      },
+      {
+        "model": "darkcraft:block/adoquin_3"
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/ladrillo_viejo"
+      },
+      {
+        "model": "darkcraft:block/ladrillo_viejo_2"
+      },
+      {
+        "model": "darkcraft:block/ladrillo_viejo_3"
+      }
+    ]
+  }
+}

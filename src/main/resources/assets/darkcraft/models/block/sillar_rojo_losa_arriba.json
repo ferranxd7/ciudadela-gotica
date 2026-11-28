@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "darkcraft:block/sillar_rojo",
+    "top": "darkcraft:block/sillar_rojo",
+    "side": "darkcraft:block/sillar_rojo"
+  }
+}

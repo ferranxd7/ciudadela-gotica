@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "darkcraft:sillar_gris_losa",
+    "darkcraft:sillar_palido_losa",
+    "darkcraft:sillar_oscuro_losa",
+    "darkcraft:sillar_musgoso_losa",
+    "darkcraft:sillar_agrietado_losa",
+    "darkcraft:sillar_nevado_losa",
+    "darkcraft:sillar_verdin_losa",
+    "darkcraft:marmol_blanco_losa",
+    "darkcraft:marmol_negro_losa",
+    "darkcraft:sillar_rojo_losa",
+    "darkcraft:ladrillo_viejo_losa",
+    "darkcraft:ladrillo_oscuro_losa",
+    "darkcraft:adoquin_losa",
+    "darkcraft:enlosado_losa",
+    "darkcraft:piedra_tallada_losa",
+    "darkcraft:mamposteria_losa"
+  ]
+}

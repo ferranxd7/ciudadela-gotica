@@ -5341,6 +5341,13 @@ SANTUARIOS_MORVAIN_EN_7AU = {"lazareto": "The Lazaretto"}
 ES.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_ES_7AU.items()})
 EN.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_EN_7AU.items()})
 
+# Los nombres de los bloques nuevos (parte 8b en adelante): los escribe tools/bloques/bloques.py.
+import bloques_nombres as _bloques  # noqa: E402
+
+ES.update(_bloques.ES)
+EN.update(_bloques.EN)
+
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

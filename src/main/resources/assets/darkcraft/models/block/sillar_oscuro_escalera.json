@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "darkcraft:block/sillar_oscuro",
+    "top": "darkcraft:block/sillar_oscuro",
+    "side": "darkcraft:block/sillar_oscuro"
+  }
+}

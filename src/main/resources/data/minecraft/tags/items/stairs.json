@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "darkcraft:sillar_gris_escalera",
+    "darkcraft:sillar_palido_escalera",
+    "darkcraft:sillar_oscuro_escalera",
+    "darkcraft:sillar_musgoso_escalera",
+    "darkcraft:sillar_agrietado_escalera",
+    "darkcraft:sillar_nevado_escalera",
+    "darkcraft:sillar_verdin_escalera",
+    "darkcraft:marmol_blanco_escalera",
+    "darkcraft:marmol_negro_escalera",
+    "darkcraft:sillar_rojo_escalera",
+    "darkcraft:ladrillo_viejo_escalera",
+    "darkcraft:ladrillo_oscuro_escalera",
+    "darkcraft:adoquin_escalera",
+    "darkcraft:enlosado_escalera",
+    "darkcraft:piedra_tallada_escalera",
+    "darkcraft:mamposteria_escalera"
+  ]
+}

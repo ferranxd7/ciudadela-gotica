@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/sillar_palido_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/sillar_palido_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/sillar_palido"
+      },
+      {
+        "model": "darkcraft:block/sillar_palido_2"
+      },
+      {
+        "model": "darkcraft:block/sillar_palido_3"
+      }
+    ]
+  }
+}

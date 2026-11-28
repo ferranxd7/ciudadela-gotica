@@ -3037,6 +3037,165 @@ public final class ClientCiTest {
         return t + 40;
     }
 
+    // ------------------------------------------------------------------ los bloques nuevos (parte 8b)
+
+    private static int mx, my, mz;
+
+    /**
+     * El muestrario de los bloques nuevos (parte 8b), sobre el mar de nubes junto al escaparate, a mediodia: un modulo por
+     * material en fila a lo largo de x (cada 7). Los de bloque entero: un muro de 4 x 4 (asi se ven las variantes al azar),
+     * delante dos escaleras, una losa abajo, otra colgada arriba y tres muros (uno sobre otro y uno pegado al muro); las
+     * columnas, tres de pie y dos tumbadas. Suelo de enlosado. Capturas {@code cliente_bq01..05} (de cuatro en cuatro) y
+     * {@code bq06..08} de cerca (musgo, marmol negro y la arqueria tallada). Lineas {@code bloques 8b ...}: lo registrado y,
+     * en el cliente, los estados sin modelo, los objetos sin modelo y las texturas que no miden 64 x 64.
+     */
+    private static int bloques8b(int t0) {
+        base = 0;
+        int t = t0;
+        atTicks(t, "Bloques 8b: el muestrario", m -> {
+            m.setScreen(null);
+            m.options.hideGui = true;
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                sp.setGameMode(GameType.CREATIVE);
+                ServerLevel lvl = sp.serverLevel();
+                mx = (int) Math.floor(ex) + 40;
+                my = 336;
+                mz = (int) Math.floor(ez) + 60;
+                lvl.setDayTime(6000);
+                lvl.setWeatherParameters(6000, 0, false, false);
+                int n = muestrario(lvl, mx, my, mz);
+                log("  bloques 8b: " + com.darkcraft.bloques.Bloques.cuantos() + " bloques de "
+                        + com.darkcraft.bloques.CatalogoBloques.MATERIALES.length + " materiales; puestos " + n + " en " + mx + "," + my + "," + mz);
+                sp.setInvisible(true);
+                sp.getAbilities().flying = true;
+                sp.onUpdateAbilities();
+                sp.teleportTo(lvl, mx + 12.5, my + 1.4, mz - 12.5, 0f, 9f);
+            });
+        });
+        t += 50;
+        atTicks(t, "Bloques 8b: los modelos y las texturas en el cliente", m -> log("  bloques 8b (cliente): " + modelosBloques(m)));
+        for (int g = 0; g < 5; g++) {
+            final int gg = g;
+            atTicks(t, "Bloques 8b: grupo " + (g + 1), m -> server(m, sp -> sp.teleportTo(sp.serverLevel(), mx + gg * 28 + 12.5, my + 1.4, mz - 12.5, 0f, 9f)));
+            atTicks(t + 30, "captura: bloques, grupo " + (g + 1), m -> shot(m, String.format(java.util.Locale.ROOT, "cliente_bq%02d_grupo", gg + 1)));
+            t += 34;
+        }
+        final int[] cerca = {3, 8, 14};
+        final String[] nombres = {"musgo", "marmol_negro", "tallada"};
+        for (int i = 0; i < cerca.length; i++) {
+            final int k = cerca[i], n = i + 6;
+            final String nom = nombres[i];
+            atTicks(t, "Bloques 8b: de cerca, " + nom, m -> server(m, sp -> sp.teleportTo(sp.serverLevel(), mx + k * 7 + 2.0, my + 1.15, mz - 0.6, 0f, 2f)));
+            atTicks(t + 24, "captura: de cerca, " + nom, m -> shot(m, String.format(java.util.Locale.ROOT, "cliente_bq%02d_%s", n, nom)));
+            t += 28;
+        }
+        atTicks(t, "Fin del muestrario", m -> {
+            m.options.hideGui = false;
+            server(m, sp -> {
+                sp.setInvisible(false);
+                sp.teleportTo(sp.serverLevel(), ex, ey - 5.0, ez, 0f, 0f);
+            });
+        });
+        return t + 10;
+    }
+
+    private static int muestrario(ServerLevel lvl, int x0, int y0, int z0) {
+        int n = 0;
+        net.minecraft.world.level.block.state.BlockState suelo = com.darkcraft.bloques.Bloques.de("enlosado").defaultBlockState();
+        java.util.List<BlockPos> muros = new java.util.ArrayList<>();
+        com.darkcraft.bloques.CatalogoBloques.Material[] mats = com.darkcraft.bloques.CatalogoBloques.MATERIALES;
+        for (int i = 0; i < mats.length; i++) {
+            String id = mats[i].id();
+            int x = x0 + i * 7;
+            for (int dx = -2; dx <= 5; dx++)
+                for (int dz = -3; dz <= 4; dz++) {
+                    lvl.setBlock(new BlockPos(x + dx, y0 - 1, z0 + dz), suelo, 2);
+                    n++;
+                }
+            net.minecraft.world.level.block.Block b = com.darkcraft.bloques.Bloques.de(id);
+            if (mats[i].formas().indexOf('C') >= 0) {
+                for (int y = 0; y < 4; y++)
+                    lvl.setBlock(new BlockPos(x + 1, y0 + y, z0 + 2), b.defaultBlockState(), 2);
+                net.minecraft.world.level.block.state.BlockState tumbada = b.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.RotatedPillarBlock.AXIS, net.minecraft.core.Direction.Axis.X);
+                lvl.setBlock(new BlockPos(x + 2, y0, z0), tumbada, 2);
+                lvl.setBlock(new BlockPos(x + 3, y0, z0), tumbada, 2);
+                n += 6;
+                continue;
+            }
+            for (int dx = 0; dx < 4; dx++)
+                for (int dy = 0; dy < 4; dy++) {
+                    lvl.setBlock(new BlockPos(x + dx, y0 + dy, z0 + 2), b.defaultBlockState(), 2);
+                    n++;
+                }
+            net.minecraft.world.level.block.Block e = com.darkcraft.bloques.Bloques.de(id + "_escalera");
+            net.minecraft.world.level.block.Block l = com.darkcraft.bloques.Bloques.de(id + "_losa");
+            net.minecraft.world.level.block.Block w = com.darkcraft.bloques.Bloques.de(id + "_muro");
+            if (e != null) {
+                net.minecraft.world.level.block.state.BlockState st = e.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.StairBlock.FACING, net.minecraft.core.Direction.SOUTH);
+                lvl.setBlock(new BlockPos(x, y0, z0), st, 2);
+                lvl.setBlock(new BlockPos(x + 1, y0, z0), st, 2);
+                lvl.setBlock(new BlockPos(x, y0, z0 + 1), b.defaultBlockState(), 2);
+                lvl.setBlock(new BlockPos(x + 1, y0, z0 + 1), b.defaultBlockState(), 2);
+                lvl.setBlock(new BlockPos(x, y0 + 1, z0 + 1), st, 2);
+                lvl.setBlock(new BlockPos(x + 1, y0 + 1, z0 + 1), st.setValue(net.minecraft.world.level.block.StairBlock.HALF,
+                        net.minecraft.world.level.block.state.properties.Half.TOP), 2);
+                n += 6;
+            }
+            if (l != null) {
+                lvl.setBlock(new BlockPos(x + 2, y0, z0), l.defaultBlockState(), 2);
+                lvl.setBlock(new BlockPos(x + 2, y0 + 2, z0 + 1), l.defaultBlockState().setValue(net.minecraft.world.level.block.SlabBlock.TYPE,
+                        net.minecraft.world.level.block.state.properties.SlabType.TOP), 2);
+                n += 2;
+            }
+            if (w != null) {
+                for (BlockPos p : new BlockPos[]{new BlockPos(x + 3, y0, z0), new BlockPos(x + 3, y0 + 1, z0), new BlockPos(x + 3, y0, z0 + 1)}) {
+                    lvl.setBlock(p, w.defaultBlockState(), 2);
+                    muros.add(p);
+                    n++;
+                }
+            }
+        }
+        // los muros se unen a lo que tienen al lado (como al ponerlos a mano)
+        for (BlockPos p : muros)
+            lvl.setBlock(p, net.minecraft.world.level.block.Block.updateFromNeighbourShapes(lvl.getBlockState(p), lvl, p), 2);
+        return n;
+    }
+
+    /** En el cliente: cuantos estados de los bloques nuevos no tienen modelo, cuantos objetos no lo tienen y cuantas texturas
+     *  no miden 64 x 64 (deberian ser cero las tres cosas). */
+    private static String modelosBloques(Minecraft m) {
+        net.minecraft.client.renderer.block.BlockModelShaper forma = m.getModelManager().getBlockModelShaper();
+        net.minecraft.client.resources.model.BakedModel falta = m.getModelManager().getMissingModel();
+        int estados = 0, sinModelo = 0, objetos = 0, objSinModelo = 0, de64 = 0, otras = 0;
+        java.util.List<String> malos = new java.util.ArrayList<>();
+        for (String id : com.darkcraft.bloques.Bloques.ids()) {
+            net.minecraft.world.level.block.Block b = com.darkcraft.bloques.Bloques.de(id);
+            for (net.minecraft.world.level.block.state.BlockState st : b.getStateDefinition().getPossibleStates()) {
+                estados++;
+                if (forma.getBlockModel(st) == falta) {
+                    sinModelo++;
+                    if (malos.size() < 6) malos.add(st.toString());
+                }
+            }
+            objetos++;
+            if (m.getItemRenderer().getItemModelShaper().getItemModel(b.asItem()) == falta) {
+                objSinModelo++;
+                if (malos.size() < 6) malos.add("objeto " + id);
+            }
+            net.minecraft.client.renderer.texture.SpriteContents c = forma.getParticleIcon(b.defaultBlockState()).contents();
+            if (c.width() == 64 && c.height() == 64) de64++;
+            else {
+                otras++;
+                if (malos.size() < 6) malos.add(id + " " + c.width() + "x" + c.height());
+            }
+        }
+        return estados + " estados, " + sinModelo + " sin modelo; " + objetos + " objetos, " + objSinModelo + " sin modelo; texturas de 64x64 "
+                + de64 + ", de otro tamano " + otras + (malos.isEmpty() ? "" : " | " + malos);
+    }
+
     // ------------------------------------------------------------------ los martillos y las flechas (parte 7aj)
 
     private static net.minecraft.world.entity.monster.Husk ajSangre, ajFrio, ajFuego;
@@ -5910,6 +6069,8 @@ public final class ClientCiTest {
             server(m, sp -> comando(sp, "darkcraft rol clase ninguna"));
         });
         int fin = escaparate();
+        // los bloques nuevos de la gran reforma (parte 8b): el muestrario
+        fin = bloques8b(fin);
         fin = armas(fin);
         fin = rol(fin);
         fin = santuarios(fin);

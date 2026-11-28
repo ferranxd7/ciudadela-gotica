@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/sillar_rojo"
+      },
+      {
+        "model": "darkcraft:block/sillar_rojo_2"
+      },
+      {
+        "model": "darkcraft:block/sillar_rojo_3"
+      }
+    ]
+  }
+}

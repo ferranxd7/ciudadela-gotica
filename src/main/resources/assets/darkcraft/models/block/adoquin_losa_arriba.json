@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "darkcraft:block/adoquin",
+    "top": "darkcraft:block/adoquin",
+    "side": "darkcraft:block/adoquin"
+  }
+}

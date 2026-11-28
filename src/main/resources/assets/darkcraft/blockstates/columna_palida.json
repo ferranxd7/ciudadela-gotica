@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "darkcraft:block/columna_palida"
+    },
+    "axis=z": {
+      "model": "darkcraft:block/columna_palida_tumbada",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "darkcraft:block/columna_palida_tumbada",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

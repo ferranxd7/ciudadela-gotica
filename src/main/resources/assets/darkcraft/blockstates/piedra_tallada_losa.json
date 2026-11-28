@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/piedra_tallada_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/piedra_tallada_losa_arriba"
+    },
+    "type=double": {
+      "model": "darkcraft:block/piedra_tallada"
+    }
+  }
+}

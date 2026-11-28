@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/enlosado_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/enlosado_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/enlosado"
+      },
+      {
+        "model": "darkcraft:block/enlosado_2"
+      },
+      {
+        "model": "darkcraft:block/enlosado_3"
+      }
+    ]
+  }
+}
