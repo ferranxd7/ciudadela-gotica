@@ -349,6 +349,8 @@ public final class Morvain {
             // el Altar Profanado (parte 7t): con Anselmo caido la Tierra sin Fe descansa y los penitentes que rezaban de rodillas
             // (alli y en el Puente de la Grieta) se deshacen en sangre; cada segundo
             if (srv.getTickCount() % 20 == 13) Altar.paz(m);
+            // las Minas de Hierro Negro (parte 7ar): con Hakon caido, el turno de noche descansa (cada segundo)
+            if (srv.getTickCount() % 20 == 11) Mina.paz(m);
             // el Cerco del Ancla (parte 7v): la cadena que cierra su puerta mientras se pelea con Aldric (cada tick con alguien cerca)
             // y, con Aldric caido, los marcados que seguian de rodillas descansan (cada segundo)
             if (srv.getTickCount() % 20 == 3) {

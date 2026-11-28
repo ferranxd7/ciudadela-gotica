@@ -99,6 +99,8 @@ TOMAS_BUFON = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 TOMAS_DRAGON = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 # la reina Isolde (parte 7ab; voz "Elariel X - Epic Ethereal Queen", flow dAtA9WXZ451rqHwQNb2f): las frases 1..6 (tomas a)
 TOMAS_ISOLDE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a", 6: "a"}
+# Hakon, el Capataz (parte 7ar): de la 2 la b (el "DIG!" rugido al final)
+TOMAS_CAPATAZ = {1: "a", 2: "b", 3: "a", 4: "a", 5: "a"}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -483,6 +485,11 @@ SFX = {
     "enterrado_dolor": (1.4, 0.4, -16), "enterrado_muerte": (4.5, 1.4, -16), "enterrado_pica": (1.2, 0.4, -15),
     "enterrado_mecha": (2.0, 0.5, -17), "enterrado_estallido": (5.0, 2.0, -12), "enterrado_almadena": (1.8, 0.6, -13),
     "enterrado_alzarse": (3.0, 0.8, -15), "mina_derrumbe": (5.0, 1.8, -12), "mina_cruje": (2.6, 0.8, -14),
+    # Hakon, el Capataz (parte 7ar)
+    "capataz_silbato": (5.0, 1.6, -13), "capataz_pico": (1.8, 0.6, -12), "capataz_veta": (3.0, 1.0, -13),
+    "capataz_temblor": (7.0, 2.0, -13), "capataz_roca": (2.4, 0.8, -14), "capataz_absorber": (5.0, 1.6, -13),
+    "capataz_embestida": (3.0, 1.0, -13), "capataz_dolor": (1.4, 0.4, -15), "capataz_muerte": (4.0, 1.4, -14),
+    "capataz_almas": (9.0, 3.0, -18),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -495,9 +502,10 @@ ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
-          "penitente_humo": 1.0, "penitente_alzarse": 2.3, "enterrado_alzarse": 0.5, "mina_cruje": 0.8}
+          "penitente_humo": 1.0, "penitente_alzarse": 2.3, "enterrado_alzarse": 0.5, "mina_cruje": 0.8,
+          "capataz_almas": 1.2}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
-GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca", "boca_latido", "sombra_latido"}
+GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca", "boca_latido", "sombra_latido", "capataz_temblor"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
 EXTRA = {"intro_marca": "highshelf=f=2500:g=8,"}
 # de estos se bajaron 4 tomas (NOMBRE_1..4.mp3): las elegidas salen como NOMBRE_1.ogg, NOMBRE_2.ogg...
@@ -846,6 +854,14 @@ TOMAS_SFX = {
     "mina_ambiente": (1, 3), "enterrado_gemido": (3, 4), "enterrado_alerta": (3, 2), "enterrado_dolor": (2, 4),
     "enterrado_muerte": (3, 4), "enterrado_pica": (2, 4, 1), "enterrado_mecha": (3, 1), "enterrado_estallido": (3, 4),
     "enterrado_almadena": (3, 1), "enterrado_alzarse": (3, 4), "mina_derrumbe": (4, 1), "mina_cruje": (1, 2),
+    # Hakon, el Capataz (parte 7ar; elegidas midiendo las tomas): del silbato la 4 y la 1 (los pitidos enseguida, la cola mas corta);
+    # del pico la 1 y la 4 (el golpe a los 0,5-0,7 s); de la veta la 1 (cristal y retumbo) y la 4 (mas cristal); del temblor la 1 (los
+    # dos golpes al principio y el retumbo que crece) y la 3; de la roca la 3 y la 1; de beberse la veta la 2 y la 4 (lo mas fuerte a
+    # los ~2 s, cuando se levanta); de la embestida la 3 y la 4; del dolor la 3, la 2 y la 1; de la muerte la 1 y la 4; de las almas la
+    # 2 y la 1 (las mas fuertes)
+    "capataz_silbato": (4, 1), "capataz_pico": (1, 4), "capataz_veta": (1, 4), "capataz_temblor": (1, 3), "capataz_roca": (3, 1),
+    "capataz_absorber": (2, 4), "capataz_embestida": (3, 4), "capataz_dolor": (3, 2, 1), "capataz_muerte": (1, 4),
+    "capataz_almas": (2, 1),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -1248,6 +1264,28 @@ def voz_isolde(src, dst):
         "highpass=f=90,equalizer=f=3600:t=q:w=1.2:g=2,highshelf=f=8000:g=-2,"
         "aecho=0.85:0.55:120|260|430:0.3|0.18|0.1,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=160,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.2
+
+
+def voz_capataz(src, dst):
+    """
+    Hakon, el Capataz: la voz (dura, de capataz) un poco mas grave, una segunda voz aun mas grave, retrasada y baja (la veta que le
+    habla por dentro), un rechinar de cristal por encima (los agudos con un eco cortisimo que resuena como un peine) y el eco de la
+    caverna (tres rebotes largos).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=3[v1][v2][v3];"
+        "[v1]asetrate=44100*0.95,aresample=44100,atempo=1.0526[baja];"
+        "[v2]asetrate=44100*0.84,aresample=44100,atempo=1.1905,adelay=40:all=1,lowpass=f=1200,volume=0.3[veta];"
+        "[v3]highpass=f=2800,aecho=0.8:0.7:3|7:0.6|0.45,volume=0.16[cristal];"
+        "[baja][veta][cristal]amix=inputs=3:weights=1 0.6 0.5:normalize=0,"
+        "equalizer=f=130:t=q:w=1.0:g=2.5,equalizer=f=1800:t=q:w=1.2:g=2,highshelf=f=7000:g=-2,"
+        "asoftclip=type=atan:threshold=0.85,"
+        "aecho=0.85:0.5:260|560|980:0.26|0.15|0.08,"
+        "acompressor=threshold=-19dB:ratio=3:attack=4:release=150,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA + 0.2
@@ -1758,6 +1796,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO isolde {n}: {e}")
+    # Hakon, el Capataz (parte 7ar)
+    cap = os.path.join(ASSETS, "sounds", "capataz")
+    os.makedirs(cap, exist_ok=True)
+    dur_h, hab_h = {}, {}
+    for n, toma in sorted(TOMAS_CAPATAZ.items()):
+        src = os.path.join(MASTER, "capataz", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(cap, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_capataz(src, dst)
+            dur_h[n] = round(duracion(dst), 2)
+            hab_h[n] = round(min(h, dur_h[n]), 2)
+            print(f"capataz {n:2d}: {dur_h[n]} s (habla hasta {hab_h[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO capataz {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -1802,7 +1859,7 @@ def main():
                    "pontifice": dur_p, "habla_pontifice": hab_p, "aldric": dur_l, "habla_aldric": hab_l,
                    "gigante": dur_t, "habla_gigante": hab_t, "jinete": dur_j, "habla_jinete": hab_j,
                    "bufon": dur_u, "habla_bufon": hab_u, "dragon": dur_d, "habla_dragon": hab_d,
-                   "isolde": dur_i, "habla_isolde": hab_i}, fh)
+                   "isolde": dur_i, "habla_isolde": hab_i, "capataz": dur_h, "habla_capataz": hab_h}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

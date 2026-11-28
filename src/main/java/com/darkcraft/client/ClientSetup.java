@@ -128,6 +128,8 @@ public final class ClientSetup {
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.HELADO.get(), com.darkcraft.client.enemigos.HeladoRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CALCINADO.get(), com.darkcraft.client.enemigos.CalcinadoRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ENTERRADO.get(), com.darkcraft.client.enemigos.EnterradoRenderer::new);
+        // Hakon, el Capataz (parte 7ar)
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CAPATAZ.get(), com.darkcraft.client.enemigos.CapatazRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CARTUCHO.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CANTARO.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ESQUIRLA.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
@@ -188,6 +190,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.HeladoModelo.CAPA, com.darkcraft.client.enemigos.HeladoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CalcinadoModelo.CAPA, com.darkcraft.client.enemigos.CalcinadoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.EnterradoModelo.CAPA, com.darkcraft.client.enemigos.EnterradoGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.CapatazModelo.CAPA, com.darkcraft.client.enemigos.CapatazGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.AhorcadoModelo.CAPA, com.darkcraft.client.enemigos.AhorcadoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.MolineraModelo.CAPA, com.darkcraft.client.enemigos.MolineraGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.VerdugoModelo.CAPA, com.darkcraft.client.enemigos.VerdugoGeometria::crear);

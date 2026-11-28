@@ -73,7 +73,7 @@ public final class MorvainEnemigos {
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
             ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
             PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon", DRAGON = "dragon", GARGOLA = "gargola", CENTINELA = "centinela",
-            ISOLDE = "isolde", ESPECTRO = "espectro", PERRO = "perro", SOMBRA = "sombra", ENTERRADO = "enterrado";
+            ISOLDE = "isolde", ESPECTRO = "espectro", PERRO = "perro", SOMBRA = "sombra", ENTERRADO = "enterrado", CAPATAZ = "capataz";
     /** El tipo de puesto de las gargolas (para las pruebas). */
     public static final String GARGOLA_TIPO = GARGOLA;
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
@@ -235,8 +235,10 @@ public final class MorvainEnemigos {
             CADENA_P.add(new Puesto(GARGOLA.equals(e.tipo()) ? GARGOLA : MARCADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
                     e.ronda(), e.grupo()));
         // ---- las Minas de Hierro Negro (parte 7aq): los enterrados que apunta el plano
+        // (y Hakon, el Capataz, picando el corazon de la veta en la Caverna del Filon: el puesto 0, parte 7ar)
         for (Mina.Espera e : Mina.get().esperas())
-            MINA_P.add(new Puesto(ENTERRADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
+            MINA_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? CAPATAZ : ENTERRADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
+                    e.ronda(), e.grupo()));
         // ---- la casa de la Sombra (parte 7ab): la reina Isolde en su trono (el puesto 0) y los de la torre del homenaje (los
         // centinelas, los espectros del archivo, los marcados de la prision y sus perros); el tipo de cada uno lo dice el plano
         for (Homenaje.Espera e : Homenaje.get().esperas())
@@ -281,6 +283,11 @@ public final class MorvainEnemigos {
         return 0;
     }
 
+    /** El numero del puesto de Hakon, el Capataz, en el sitio de la mina. */
+    public static int capataz() {
+        return 0;
+    }
+
     /** El numero del puesto de Anselmo, el Pontifice Sangrante, en el sitio del Altar. */
     public static int pontifice() {
         return 0;
@@ -318,6 +325,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(ABAD, DarkCraftMod.ABAD);
         Puestos.tipo(CALCINADO, DarkCraftMod.CALCINADO);
         Puestos.tipo(ENTERRADO, DarkCraftMod.ENTERRADO);
+        Puestos.tipo(CAPATAZ, DarkCraftMod.CAPATAZ);
         Puestos.tipo(CONDESTABLE, DarkCraftMod.CONDESTABLE);
         Puestos.tipo(ERUDITO, DarkCraftMod.ERUDITO);
         Puestos.tipo(RECTORA, DarkCraftMod.RECTORA);
@@ -374,8 +382,9 @@ public final class MorvainEnemigos {
         Puestos.registrar(NIDO, NIDO_P, Morvain::es);
         // la cadena del sur: los marcados de los rellanos y las gargolas
         Puestos.registrar(CADENA, CADENA_P, Morvain::es);
-        // las Minas de Hierro Negro: los enterrados de la corta y de los tres niveles
-        Puestos.registrar(MINA, MINA_P, Morvain::es);
+        // las Minas de Hierro Negro: los enterrados de la corta y de los tres niveles, y Hakon en la Caverna del Filon; vencido Hakon,
+        // el turno de noche descansa (lo hace Mina.paz cada segundo) y ya no vuelve
+        Puestos.registrar(MINA, MINA_P, Morvain::es, (l, p) -> Puestos.JEFE.equals(p.grupo()) || !Mina.enPaz(l.getServer()));
         // la torre del homenaje: los centinelas, los del archivo y la prision, y la reina en su trono
         Puestos.registrar(HOMENAJE, HOMENAJE_P, Morvain::es);
         // la aguja: la Sombra (cae una vez y no vuelve: es del grupo de los jefes)
@@ -402,6 +411,9 @@ public final class MorvainEnemigos {
             // y al caer Brann vuelve la marea: los salobres que faenaban descansan (lo hace Costillar.paz cada segundo; aqui, el aviso)
             if (e instanceof com.darkcraft.enemigos.Ballenero && COSTILLAR.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] Brann, el Ballenero, cae: vuelve la marea a la Costa de los Huesos");
+            // y al caer Hakon, el Capataz, el turno de noche de la mina descansa (lo hace Mina.paz cada segundo; aqui, el aviso)
+            if (e instanceof com.darkcraft.enemigos.Capataz && MINA.equals(e.sitio()))
+                DarkCraftMod.LOGGER.info("[DarkCraft] Hakon, el Capataz, cae: el turno de noche de la mina descansa");
             // y al caer el Pontifice la Tierra sin Fe descansa (lo hace Altar.paz cada segundo; aqui, el aviso)
             if (e instanceof com.darkcraft.enemigos.Pontifice && ALTAR.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] Anselmo, el Pontifice Sangrante, cae: la Tierra sin Fe descansa");
@@ -1444,6 +1456,62 @@ public final class MorvainEnemigos {
         if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(at[0], at[1], at[2])) && m.isLoaded(new net.minecraft.core.BlockPos(Costillar.CX, Costillar.PISO, Costillar.CZ)))
             s += "; " + Costillar.resumen(m);
         return s;
+    }
+
+    /**
+     * {@code /darkcraft capataz [ir | vencer | volver | media]} (parte 7ar): como esta Hakon, llevar ante la Caverna del Filon, vencerle,
+     * que vuelva (y los enterrados de la mina, como estaban) o que se beba la veta (media vida).
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoCapataz() {
+        return net.minecraft.commands.Commands.literal("capataz")
+                .executes(c -> decir(c, estadoCapataz(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irMina(c.getSource(), "filon")))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(MINA, capataz());
+                    if (e instanceof com.darkcraft.enemigos.Capataz b) b.vencer();
+                    else {
+                        Puestos.marcar(srv, MINA, capataz(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "capataz");
+                    }
+                    return decir(c, estadoCapataz(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("media").executes(c -> {
+                    if (Puestos.enemigo(MINA, capataz()) instanceof com.darkcraft.enemigos.Capataz b) b.mediaVida();
+                    return decir(c, estadoCapataz(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, MINA, capataz(), false);
+                    // los enterrados de la mina vuelven a su sitio en cuanto salgan
+                    Puestos.todos(srv, MINA, false);
+                    return decir(c, estadoCapataz(srv));
+                }))
+                // para las pruebas: que haga esa accion (y ninguna otra por su cuenta) contra quien lo pide
+                .then(net.minecraft.commands.Commands.literal("accion").then(net.minecraft.commands.Commands.argument("n",
+                                com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, com.darkcraft.enemigos.CapatazAnims.TICKS.length - 1))
+                        .executes(c -> {
+                            if (Puestos.enemigo(MINA, capataz()) instanceof com.darkcraft.enemigos.Capataz b) {
+                                b.quieta = true;
+                                if (b.postura() != Enemigo.DE_PIE) b.postura(Enemigo.DE_PIE);
+                                if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) b.setTarget(sp);
+                                b.empezar(com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "n"));
+                            }
+                            return decir(c, estadoCapataz(c.getSource().getServer()));
+                        })))
+                .then(net.minecraft.commands.Commands.literal("suelta").executes(c -> {
+                    if (Puestos.enemigo(MINA, capataz()) instanceof com.darkcraft.enemigos.Capataz b) b.quieta = false;
+                    return decir(c, estadoCapataz(c.getSource().getServer()));
+                }));
+    }
+
+    /** Como esta Hakon: para el comando y las pruebas. */
+    public static String estadoCapataz(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(MINA, capataz());
+        String s = "el Capataz: " + (Mina.enPaz(srv) ? "caido (el turno de noche descansa)" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Capataz b) s += ", " + b.estado();
+        return s + "; enterrados de la mina: quedan " + Puestos.quedan(srv, MINA) + " de " + MINA_P.size() + " (fuera " + Puestos.fuera(MINA)
+                + "), descansan " + Mina.DESCANSAN;
     }
 
     /**

@@ -74,12 +74,20 @@ public final class EfectosRaiz {
      */
     public static void carambano(ServerLevel sl, double x, double y, double z, float grueso, float largo, int espera, int cae) {
         BlockState st = (sl.random.nextBoolean() ? Blocks.PACKED_ICE : Blocks.BLUE_ICE).defaultBlockState();
+        cae(sl, st, x, y, z, CARAMBANO_ALTO, grueso, largo, espera, cae);
+    }
+
+    /**
+     * Lo mismo que el carambano, de otro bloque y desde otra altura (parte 7ar: las piedras que caen del techo de la Caverna del
+     * Filon cuando Hakon golpea el suelo): aparece {@code alto} bloques encima, cuelga {@code espera} ticks y cae en {@code cae}.
+     */
+    public static void cae(ServerLevel sl, BlockState st, double x, double y, double z, float alto, float grueso, float largo, int espera, int cae) {
         float giro = sl.random.nextFloat() * Mth.TWO_PI;
-        Matrix4f chico = forma(CARAMBANO_ALTO, giro, grueso * 0.2f, largo * 0.1f);
-        Matrix4f arriba = forma(CARAMBANO_ALTO, giro, grueso, largo);
+        Matrix4f chico = forma(alto, giro, grueso * 0.2f, largo * 0.1f);
+        Matrix4f arriba = forma(alto, giro, grueso, largo);
         Matrix4f abajo = forma(-0.35f, giro, grueso, largo);
         Matrix4f roto = forma(-0.35f, giro, grueso * 1.6f, 0.05f);
-        Display.BlockDisplay d = display(sl, st, x, y, z, chico, 3f, CARAMBANO_ALTO + largo + 2f);
+        Display.BlockDisplay d = display(sl, st, x, y, z, chico, 3f, alto + largo + 2f);
         if (d == null) return;
         PASOS.add(new Paso(d, tick + 1, arriba, 4, false));
         PASOS.add(new Paso(d, tick + 1 + espera, abajo, cae, false));

@@ -314,6 +314,17 @@
     "lufs": -16
   },
   {
+    "id": "capataz",
+    "pagina": "https://opengameart.org/content/duel-of-the-dungeons",
+    "busca": "duel_of_the_dungeons.wav",
+    "titulo": "Duel of the Dungeons",
+    "autor": "Umplix",
+    "licencia": "CC0",
+    "aviso": "Music by Umplix (OpenGameArt, CC0)",
+    "uso": "Hakon, el Capataz (la Caverna del Filón de las Minas de Hierro Negro de Morvain)",
+    "lufs": -16
+  },
+  {
     "id": "sombra1",
     "pagina": "https://opengameart.org/node/73591",
     "busca": "the_final_battle",

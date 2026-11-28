@@ -8730,5 +8730,192 @@
         "stream": true
       }
     ]
+  },
+  "sfx.capataz_silbato": {
+    "subtitle": "subtitles.darkcraft.sfx.capataz_silbato",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capataz_silbato_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "darkcraft:sfx/capataz_silbato_2",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "sfx.capataz_pico": {
+    "subtitle": "subtitles.darkcraft.sfx.capataz_pico",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capataz_pico_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/capataz_pico_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.capataz_veta": {
+    "subtitle": "subtitles.darkcraft.sfx.capataz_veta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capataz_veta_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/capataz_veta_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.capataz_temblor": {
+    "subtitle": "subtitles.darkcraft.sfx.capataz_temblor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capataz_temblor_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/capataz_temblor_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.capataz_roca": {
+    "subtitle": "subtitles.darkcraft.sfx.capataz_roca",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capataz_roca_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/capataz_roca_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.capataz_absorber": {
+    "subtitle": "subtitles.darkcraft.sfx.capataz_absorber",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capataz_absorber_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/capataz_absorber_2",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "sfx.capataz_embestida": {
+    "subtitle": "subtitles.darkcraft.sfx.capataz_embestida",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capataz_embestida_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/capataz_embestida_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.capataz_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.capataz_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capataz_dolor_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/capataz_dolor_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/capataz_dolor_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.capataz_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.capataz_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capataz_muerte_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/capataz_muerte_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.capataz_almas": {
+    "subtitle": "subtitles.darkcraft.sfx.capataz_almas",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/capataz_almas_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/capataz_almas_2",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "capataz.voz.1": {
+    "subtitle": "subtitles.darkcraft.capataz.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:capataz/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "capataz.voz.2": {
+    "subtitle": "subtitles.darkcraft.capataz.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:capataz/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "capataz.voz.3": {
+    "subtitle": "subtitles.darkcraft.capataz.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:capataz/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "capataz.voz.4": {
+    "subtitle": "subtitles.darkcraft.capataz.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:capataz/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "capataz.voz.5": {
+    "subtitle": "subtitles.darkcraft.capataz.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:capataz/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "musica.capataz": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/capataz",
+        "stream": true
+      }
+    ]
   }
 }
