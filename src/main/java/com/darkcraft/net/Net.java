@@ -1392,15 +1392,17 @@ public final class Net {
         }
     }
 
-    /** El Rey (lineas 1..13) o Ser Gavran (100 + linea) dice una frase (voz y subtitulo). */
+    /** El Rey (lineas 1..13) o Ser Gavran (100 + linea) dice una frase (voz y subtitulo).
+     *  La linea va como VarInt: con un byte con signo las de 128 en adelante (los gigantes, el jinete, el bufon,
+     *  el dragon, Isolde, el Capataz...) llegaban negativas y el cliente las tiraba. */
     public record ReyHabla(int entity, int linea) {
         void write(FriendlyByteBuf b) {
             b.writeVarInt(entity);
-            b.writeByte(linea);
+            b.writeVarInt(linea);
         }
 
         static ReyHabla read(FriendlyByteBuf b) {
-            return new ReyHabla(b.readVarInt(), b.readByte());
+            return new ReyHabla(b.readVarInt(), b.readVarInt());
         }
 
         void handle(Supplier<NetworkEvent.Context> ctx) {
