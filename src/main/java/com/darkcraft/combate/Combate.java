@@ -109,6 +109,8 @@ public final class Combate {
         com.darkcraft.fortaleza.Trampas.golpe(sp);
         // y los muros ilusorios de Morvain (parte 7y)
         com.darkcraft.morvain.MurosIlusorios.golpe(sp);
+        // y las calaveras de la corona de Fray Osmund (parte 7at): se rompen de un golpe
+        com.darkcraft.enemigos.CalaveraOsmund.golpe(sp);
         if (accion == Armas.HABILIDAD) {
             habilidad(sp, paso);
             return;

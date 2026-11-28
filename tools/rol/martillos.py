@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Los martillos (parte 7aj): textures/item/maza.png, martillo_guerra.png y gran_martillo.png (32 x 32); y el Pico del Capataz
-(parte 7ar, pico_capataz.png). Dibujados en
+Los martillos (parte 7aj): textures/item/maza.png, martillo_guerra.png y gran_martillo.png (32 x 32); el Pico del Capataz
+(parte 7ar, pico_capataz.png) y el Incensario del Sacristan (parte 7at, incensario_sacristan.png). Dibujados en
 diagonal como las armas del juego (el mango abajo a la izquierda, la cabeza arriba a la derecha): cada pixel se mira en
 las coordenadas del arma (u a lo largo del mango, desde el pomo; v de lado) y se le da el material de lo que cae ahi;
 luego el contorno de tinta. La luz viene de arriba a la izquierda (v negativa, mas clara).
@@ -153,8 +153,50 @@ def pico_capataz(u, v):
     return mango(u, v, 21.6, 1.0, 0.6, 6.8)
 
 
+BRONCE = [(40, 25, 12), (74, 48, 22), (114, 78, 34), (158, 114, 52), (200, 156, 80), (232, 196, 120)]
+BRASA = [(120, 34, 10), (206, 82, 24), (255, 160, 64), (255, 214, 140)]
+HUESO = [(112, 102, 80), (152, 142, 114), (190, 180, 150), (220, 212, 184)]
+
+
+def incensario_sacristan(u, v):
+    """El Incensario del Sacristan (parte 7at): el incensario de bronce de Fray Osmund, redondo, con sus agujeros (dentro arden las
+    brasas del polvo de hueso), la tapa en punta, la cadena de eslabones y, para cogerlo, un hueso con la anilla de bronce."""
+    # el cuerpo: una bola de bronce con una banda labrada y los agujeros (las brasas)
+    du = u - 23.6
+    if du * du + v * v <= 4.9 * 4.9:
+        r = math.sqrt(du * du + v * v)
+        if r <= 3.6 and (int(math.floor(u)) + int(math.floor(v + 10))) % 2 == 0 and abs(v) <= 3.0 and abs(du) <= 3.2:
+            return tono(BRASA, 0.75 - r * 0.12 + (0.15 if r < 1.6 else 0.0))
+        if abs(du) <= 0.5:
+            return tono(BRONCE, 0.85)                      # la banda labrada
+        luz = 0.62 - v * 0.07 - du * 0.03 + (0.18 if r < 2.0 and v < 0 else 0.0) - (0.25 if r > 4.2 else 0.0)
+        return tono(BRONCE, luz)
+    # la tapa en punta y su remate
+    if 28.3 <= u <= 31.2 and abs(v) <= (31.2 - u) * 0.75 + 0.4:
+        return tono(BRONCE, 0.7 - v * 0.1)
+    # la cadena: eslabones alternos (de frente, una anilla; de canto, una raya)
+    if 4.6 <= u < 18.9:
+        k = int((u - 4.6) / 1.6)
+        t = (u - 4.6) - k * 1.6
+        if k % 2 == 0:
+            if abs(v) <= 0.95 and (abs(v) >= 0.4 or t < 0.35 or t > 1.25):
+                return tono(BRONCE, 0.62 - v * 0.2)
+        elif abs(v) <= 0.45:
+            return tono(BRONCE, 0.45)
+        return None
+    # la anilla de bronce y el hueso para cogerlo (con sus cabezas)
+    if 3.2 <= u < 4.6 and abs(v) <= 1.3:
+        return tono(BRONCE, 0.7 - v * 0.15)
+    if -1.8 <= u < 3.2:
+        cabeza = u < -0.4 or u > 2.0
+        if abs(v) <= (1.6 if cabeza else 0.8):
+            return tono(HUESO, 0.7 - v * 0.2 - (0.15 if cabeza and abs(v) < 0.4 else 0.0))
+    return None
+
+
 ARMAS = {"maza": (maza, 45.0, (4.5, 27.5)), "martillo_guerra": (martillo_guerra, 45.0, (4.0, 28.0)),
-         "gran_martillo": (gran_martillo, 45.0, (4.3, 27.7)), "pico_capataz": (pico_capataz, 45.0, (4.4, 27.6))}
+         "gran_martillo": (gran_martillo, 45.0, (4.3, 27.7)), "pico_capataz": (pico_capataz, 45.0, (4.4, 27.6)),
+         "incensario_sacristan": (incensario_sacristan, 45.0, (4.0, 28.0))}
 
 
 def main():

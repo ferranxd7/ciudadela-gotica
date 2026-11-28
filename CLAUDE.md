@@ -4408,6 +4408,76 @@ Ensamblados. Fray Osmund bajo al relicario (el jefe de la 7at).
   monton con el aviso (`os38`), se rehace (`os39`), otro pisoteado con el golpe del combate (`os40`) y un coloso hecho polvo de un
   martillazo (`os41`); el libro de los huesos (`os42`) y el bestiario (`os43..os45`).
 
+### Plan grande, parte 7at: Fray Osmund, el Sacristan (el jefe del Osario de San Ulfo)
+
+El jefe de la mazmorra de la 7as (respuesta 131 del plan). Lore: cuando la Peste Gris lleno el camposanto, Fray Osmund desenterro a los
+cuarenta mil y ordeno sus huesos en la cripta, contados uno a uno; murio contando y le enterraron a los pies de San Ulfo. La noche del
+cielo rojo se levanto hecho de los huesos de muchos, con una aureola de huesos y calaveras a la espalda, y sigue contando en el Relicario.
+- **Fray Osmund** (`enemigos/Osmund`, un `Guardian`; entidad `darkcraft:osmund` 1,0 x 3,3, escala 1,5, no le hace nada el fuego; modelo de
+  `tools/enemigos/osmund.py`: capucha con pico, la mandibula, el capucho y el escapulario por detras, el cordon con el rosario y su
+  calavera, faldas y mangas de jirones, **la aureola** —un aro de diez huesos con cinco calaveras (`calavera_0..4`, se esconden mientras
+  estan fuera: `CORONA` sincronizado) y cuatro velas—, el incensario de bronce con su cadena en la derecha y la campanilla en la
+  izquierda; alzado, **el haz de huesos y craneos** que le sostiene (`sosten_*`); `client/enemigos/OsmundModelo` —`REZA` es CONTANDO,
+  alzado FLOTANDO; si no QUIETO + PORTE, LISTO en pelea y ANDAR— y `OsmundRenderer`, con el brillo que late). 1100 de vida, golpe 12,
+  armadura 6; ecos 16000. Es el **puesto 0** del osario (`Osario.esperas`, grupo `Puestos.JEFE`): de rodillas en (26, -105) de cara al
+  relicario de San Ulfo, **contando** (deja un hueso cada 2,4 s, con su chasquido). Solo repara en quien entra en el Relicario
+  (`Osario.enRelicario`) y se le acerca (12 bloques, si le ve); peleando alli, a los de fuera ni los mira.
+- **La pelea**: se levanta girandose hacia quien llega (`LEVANTARSE`) diciendo la 1 ("Treinta y nueve mil... novecientos... ¿Quien anda
+  ahi?...", una vez cada 4 min) y al acabarla **toca la campanilla** (`LLAMAR`, su rugido): de los siete montones de huesos del borde
+  (`Osario.muertos`, a 8,8 del centro) se levantan **sus muertos** (Ensamblados efimeros `TUMBADO`, sin puesto: dos y uno mas por cada
+  jugador de mas, como mucho 4 en pie; alzado, uno mas y un coloso si no le queda otro; se deshacen al acabar la pelea). Sus golpes
+  (`elegir`): **incensazo** (lo estrella delante: golpe, lentitud y una **nube de polvo de hueso** que arde 3 s —`nubes`, radio 2,3—: frena
+  y debilita), **giro** (lo voltea a su alrededor, 4,7 de radio: quema 3 s; si le rodean, mas), **la corona de calaveras** (se sueltan
+  las cinco calaveras de la aureola —`CalaveraOsmund`, un proyectil sin fisica que no se guarda—, le orbitan 2,5 s rozando a quien se le
+  acerca y vuelan una detras de otra hacia su presa torciendo un poco; se rompen al dar, contra la piedra, si cae su dueno o **de un
+  golpe**: `Combate.pedir` → `CalaveraOsmund.golpe`, las que esten a 3,5 delante; la aureola se rehace en cuanto no queda ninguna),
+  **el muro de huesos** (hunde las manos: tres lineas de huesos en abanico, cinco alzado, brotan cada 1,3 bloques hasta 13 —
+  `EfectosRaiz.estaca`— y lanzan por el aire) y **las guirnaldas** (alza los brazos —la 4, "¡Inclinad la cabeza... ante los muertos!", la
+  primera vez—: una marca bajo cada uno y alguna mas; 1,4 s despues cae de la cupula una guirnalda de huesos —`EfectosRaiz.cae`,
+  `sfx.guirnalda_cae` antes—: sal de la marca). Cuando cae su presa, la 3 ("Otro mas... calavera, costillas, femures... todo en orden").
+- **A media vida se alza** (`ALZARSE`, `alSegundaMitad`): los huesos del suelo suben hacia el y los muertos le sostienen en el aire
+  (`ALZADO` sincronizado: flota a 1,5 sobre el haz de huesos y se mueve el —`flotar`—; la lampara de la cupula cruje —`sfx.osmund_lampara`,
+  cada 18 s— y echa llamas); dice la 2 ("¡Hermanos! ¡Hermanas! ¡Levantaos!..."). Alzado: siete calaveras, cinco lineas de huesos, mas
+  guirnaldas, y si no le queda ningun muerto vuelve a tocar la campanilla.
+- **Cae** sin irse en humo: se le cae lo que le sostenia, de rodillas con el incensario en el suelo, la 5 ("He perdido la cuenta...
+  Perdonadme...") y **suben las almas de los cuarenta mil** (luces que salen del suelo del Relicario hacia la cupula, `sfx.osario_susurros`);
+  al final se deshace en huesos (`tickDeath`, 150 ticks). Deja el **Incensario del Sacristan**, 3 piedras de forja III, 2 de II y cenizas
+  del torbellino; el cartel de JEFE ABATIDO, la hazana `osmund` ("La cuenta perdida", desafio, 450 de experiencia) y el bestiario.
+  **Los muertos del osario descansan** (`Osario.paz`, cada segundo desde `Morvain`): con el caido, los Ensamblados que no pelean se
+  deshacen y no vuelven (`MorvainEnemigos`: sus puestos dejan de estar en uso con `Osario.enPaz`).
+- **El Incensario del Sacristan** (`armas/IncensarioSacristan`, un `Martillo` de tipo `MARTILLO`: sus golpes, romper la guardia y los
+  Ensamblados en polvo; escala C en Fuerza y B en Fe, `Escalado`; textura de `tools/rol/martillos.py`): cada golpe esparce polvo de hueso
+  que frena y al tercero seguido (sin pasar 7 s) **se avivan las brasas**: 5 de dano y 3 s de fuego a el y a los enemigos de alrededor
+  (2,4 bloques).
+- Barra propia (`barra_guardianes.py` `marco_osmund`: la cadena del incensario de punta a punta, el hueso con su anilla, el incensario
+  encendido y en medio su aureola con la calavera bajo la capucha; relleno de polvo de hueso con almas), musica "Death Is Just Another
+  Path" de Otto Halmen (CC-BY 3.0, id `osmund`, tema 51). Voz "Matthew Schmitz - Ancient Sage Dragon Wizard" (ElevenLabs,
+  `HAvvFKatz0uu0Fv55Riy`, `eleven_v4`, cinco frases, tomas a; filtro `voz_osmund` de `procesar.py`: un coro de susurros de los
+  cuarenta mil por debajo, aire de polvo y el eco de la boveda; `Voces.BASE_OSMUND` 190) y sonidos (flow `nIWx6e0Nel3Cf2CGpyWv`):
+  `osmund_incensario`, `giro`, `corona`, `calavera`, `muro`, `alzarse`, `llamar`, `dolor`, `muerte` y `lampara` (tomas en `TOMAS_SFX`).
+  Prompts y firmas en `herr` (fuera del repo).
+- **Arreglo de paso** (salio con la 7ar): `Net.ReyHabla` lleva la linea en VarInt; con un byte con signo las de 128 en adelante llegaban
+  negativas y el cliente las tiraba (no sonaban ni salian los subtitulos de los gigantes, el jinete, el bufon, el dragon, Isolde ni el
+  Capataz).
+- Comandos `/darkcraft osmund [ir | vencer | volver | media | accion <n> | suelta]` (`ir`: al Relicario; `volver` tambien devuelve a los
+  Ensamblados del osario; `accion`: que haga esa, quieto, contra quien lo pide; `suelta`: que vuelva a elegir el).
+- **Sin abrir el juego**: `python3 tools/enemigos/generar.py --solo osmund --vistas carpeta` (el modelo y sus animaciones);
+  `VOLCADO_OPTS="-Droca=true" bash tools/vista3d/vista.sh morvain_osario carpeta` (el sitio `osmund` y su puesto se pisan y se llega a pie).
+- Pruebas: servidor, `osmund()` despues de `osario()` (lineas `Morvain, Fray Osmund: ...` —su puesto, postura, giro, lo que pisa, los
+  montones de huesos y los sitios de los muertos libres, a quien repara (a 4 y a 5 en el Relicario si, desde el pasillo no)—, `... pelea:
+  ...` —se levanta y mira a la presa, la campanilla tras su frase, los muertos (efimeros, ninguno metido ni fuera del Relicario)—,
+  `Morvain, los golpes de Fray Osmund a una presa: ...` —incensazo (la nube frena y debilita), giro (quema), la corona (las calaveras
+  orbitan, vuelan y dan, una rota de un golpe), el muro (los huesos dan y lanzan) y las guirnaldas (caen y dan)—, `Morvain, Fray Osmund a
+  media vida: ...` —se alza, flota, siete calaveras, vuelve a llamar—, `Morvain, Fray Osmund cae: ...` —se deshace, el incensario y las
+  piedras en el suelo, los muertos del osario descansan— y `Morvain, el Incensario del Sacristan: ...` —maza C--B-, las brasas al
+  tercer golpe tambien al de al lado—; al acabar, `Morvain, Fray Osmund vuelve: ...`); cliente, tramo `osmund()` despues de `osario()`: el
+  Relicario con el de espaldas (`cliente_om01`), contando de cerca (`om02`) y sin vision nocturna (`om03`); en supervivencia: se levanta
+  (`om04`), su frase y su barra (`om05`), la campanilla (`om06`) y los muertos (`om07`); sus golpes con el comando (`om08..om19`:
+  incensazo y su nube, giro, la corona —`om13` orbitan, `om14` vuelan—, el muro —`om16` los huesos— y las guirnaldas —`om18` las marcas,
+  `om19` caen—); se alza (`om20`, `om21`), alzado en primera persona con su frase (`om22`) y la corona alzado (`om23`); cae (`om24` de
+  rodillas, `om25` las almas, `om26` se deshace), JEFE ABATIDO (`om27`), lo que deja (`om28`), el incensario en la mano (`om29`, lineas
+  `Fray Osmund: en la mano ...`) y el bestiario (`om30`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

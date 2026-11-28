@@ -9094,5 +9094,194 @@
         "stream": true
       }
     ]
+  },
+  "sfx.osmund_incensario": {
+    "subtitle": "subtitles.darkcraft.sfx.osmund_incensario",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/osmund_incensario_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/osmund_incensario_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.osmund_giro": {
+    "subtitle": "subtitles.darkcraft.sfx.osmund_giro",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/osmund_giro_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/osmund_giro_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.osmund_corona": {
+    "subtitle": "subtitles.darkcraft.sfx.osmund_corona",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/osmund_corona_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/osmund_corona_2",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "sfx.osmund_calavera": {
+    "subtitle": "subtitles.darkcraft.sfx.osmund_calavera",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/osmund_calavera_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/osmund_calavera_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.osmund_muro": {
+    "subtitle": "subtitles.darkcraft.sfx.osmund_muro",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/osmund_muro_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/osmund_muro_2",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "sfx.osmund_alzarse": {
+    "subtitle": "subtitles.darkcraft.sfx.osmund_alzarse",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/osmund_alzarse_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/osmund_alzarse_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.osmund_llamar": {
+    "subtitle": "subtitles.darkcraft.sfx.osmund_llamar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/osmund_llamar_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/osmund_llamar_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.osmund_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.osmund_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/osmund_dolor_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/osmund_dolor_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/osmund_dolor_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.osmund_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.osmund_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/osmund_muerte_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/osmund_muerte_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.osmund_lampara": {
+    "subtitle": "subtitles.darkcraft.sfx.osmund_lampara",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/osmund_lampara_1",
+        "attenuation_distance": 48,
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/osmund_lampara_2",
+        "attenuation_distance": 48,
+        "stream": true
+      }
+    ]
+  },
+  "osmund.voz.1": {
+    "subtitle": "subtitles.darkcraft.osmund.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:osmund/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "osmund.voz.2": {
+    "subtitle": "subtitles.darkcraft.osmund.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:osmund/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "osmund.voz.3": {
+    "subtitle": "subtitles.darkcraft.osmund.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:osmund/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "osmund.voz.4": {
+    "subtitle": "subtitles.darkcraft.osmund.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:osmund/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "osmund.voz.5": {
+    "subtitle": "subtitles.darkcraft.osmund.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:osmund/voz_5",
+        "stream": false
+      }
+    ]
+  },
+  "musica.osmund": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/osmund",
+        "stream": true
+      }
+    ]
   }
 }

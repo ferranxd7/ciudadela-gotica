@@ -356,6 +356,18 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_OSARIO_CAMPANA = sound("sfx.osario_campana");
     public static final RegistryObject<SoundEvent> SFX_OSARIO_SUSURROS = sound("sfx.osario_susurros");
     public static final RegistryObject<SoundEvent> AMBIENTE_OSARIO = sound("ambiente.osario");
+    // Fray Osmund, el Sacristan (parte 7at): el incensazo, el giro, la corona que se suelta, la calavera que vuela, el muro de huesos,
+    // alzarse, la campanilla, el dolor, la muerte y la lampara de la cupula
+    public static final RegistryObject<SoundEvent> SFX_OSMUND_INCENSARIO = sound("sfx.osmund_incensario");
+    public static final RegistryObject<SoundEvent> SFX_OSMUND_GIRO = sound("sfx.osmund_giro");
+    public static final RegistryObject<SoundEvent> SFX_OSMUND_CORONA = sound("sfx.osmund_corona");
+    public static final RegistryObject<SoundEvent> SFX_OSMUND_CALAVERA = sound("sfx.osmund_calavera");
+    public static final RegistryObject<SoundEvent> SFX_OSMUND_MURO = sound("sfx.osmund_muro");
+    public static final RegistryObject<SoundEvent> SFX_OSMUND_ALZARSE = sound("sfx.osmund_alzarse");
+    public static final RegistryObject<SoundEvent> SFX_OSMUND_LLAMAR = sound("sfx.osmund_llamar");
+    public static final RegistryObject<SoundEvent> SFX_OSMUND_DOLOR = sound("sfx.osmund_dolor");
+    public static final RegistryObject<SoundEvent> SFX_OSMUND_MUERTE = sound("sfx.osmund_muerte");
+    public static final RegistryObject<SoundEvent> SFX_OSMUND_LAMPARA = sound("sfx.osmund_lampara");
     // el Condestable del Juramento (parte 7n): el grito, el tajo del montante en llamas, el barrido, la embestida, el anillo de
     // fuego, el rastrillo que cae y el que se alza, el cuerno de la guardia, la espada al cielo, el dolor, la muerte y la espera
     public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_GRITO = sound("sfx.condestable_grito");
@@ -710,6 +722,8 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_SIGRUN = sound("musica.sigrun");
     /** Hakon, el Capataz, en la Caverna del Filon (parte 7ar): "Duel of the Dungeons" de Umplix. */
     public static final RegistryObject<SoundEvent> MUSICA_CAPATAZ = sound("musica.capataz");
+    /** Fray Osmund en el Relicario del Osario de San Ulfo (parte 7at): "Death Is Just Another Path" de Otto Halmen. */
+    public static final RegistryObject<SoundEvent> MUSICA_OSMUND = sound("musica.osmund");
     /** La musica del final (parte 7ad): la cinematica y los creditos del alba ("New Sunrise") y de la nueva Sombra. */
     public static final RegistryObject<SoundEvent> MUSICA_FINAL_ALBA = sound("musica.final_alba");
     public static final RegistryObject<SoundEvent> MUSICA_FINAL_SOMBRA = sound("musica.final_sombra");
@@ -794,6 +808,9 @@ public class DarkCraftMod {
     /** Frases de Hakon, el Capataz (1..5, parte 7ar). */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] CAPATAZ_VOZ = new RegistryObject[6];
+    /** Frases de Fray Osmund, el Sacristan (1..5, parte 7at). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] OSMUND_VOZ = new RegistryObject[6];
 
     /**
      * Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn, 21..23 la subida por la cadena del sur, 24 al
@@ -821,6 +838,7 @@ public class DarkCraftMod {
         for (int i = 1; i < DRAGON_VOZ.length; i++) DRAGON_VOZ[i] = sound("dragon.voz." + i);
         for (int i = 1; i < ISOLDE_VOZ.length; i++) ISOLDE_VOZ[i] = sound("isolde.voz." + i);
         for (int i = 1; i < CAPATAZ_VOZ.length; i++) CAPATAZ_VOZ[i] = sound("capataz.voz." + i);
+        for (int i = 1; i < OSMUND_VOZ.length; i++) OSMUND_VOZ[i] = sound("osmund.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) if (i < 10 || i > 20) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -1018,6 +1036,13 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Capataz>> CAPATAZ = ENTITIES.register("capataz",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Capataz>of(com.darkcraft.enemigos.Capataz::new, MobCategory.MONSTER)
                     .sized(1.2f, 3.2f).fireImmune().clientTrackingRange(10).build(MODID + ":capataz"));
+    // ---- Fray Osmund, el Sacristan, el jefe del Osario de San Ulfo (parte 7at), y las calaveras de su corona
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Osmund>> OSMUND = ENTITIES.register("osmund",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Osmund>of(com.darkcraft.enemigos.Osmund::new, MobCategory.MONSTER)
+                    .sized(1.0f, 3.3f).fireImmune().clientTrackingRange(10).build(MODID + ":osmund"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.CalaveraOsmund>> CALAVERA_OSMUND = ENTITIES.register("calavera_osmund",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.CalaveraOsmund>of(com.darkcraft.enemigos.CalaveraOsmund::new, MobCategory.MISC)
+                    .sized(0.5f, 0.5f).noSave().fireImmune().clientTrackingRange(8).updateInterval(1).build(MODID + ":calavera_osmund"));
     // ---- los eruditos de la Academia Espectral (parte 7o), su tintero y su orbe
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Erudito>> ERUDITO = ENTITIES.register("erudito",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Erudito>of(com.darkcraft.enemigos.Erudito::new, MobCategory.MONSTER)
@@ -1258,6 +1283,9 @@ public class DarkCraftMod {
     /** El pico de Hakon, el Capataz (parte 7ar: lo deja al caer): un gran martillo con la veta dentro. */
     public static final RegistryObject<Item> PICO_CAPATAZ = ITEMS.register("pico_capataz",
             () -> new com.darkcraft.armas.PicoCapataz(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
+    /** El incensario de Fray Osmund (parte 7at: lo deja al caer): una maza de Fe con las brasas del polvo de hueso dentro. */
+    public static final RegistryObject<Item> INCENSARIO_SACRISTAN = ITEMS.register("incensario_sacristan",
+            () -> new com.darkcraft.armas.IncensarioSacristan(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     /** El martillo de Dorvan (solo para que lo lleve en la mano) y las piedras de forja (I, II y III: mejoran las armas). */
     public static final RegistryObject<Item> MARTILLO_HERRERO = ITEMS.register("martillo_herrero",
             () -> new Item(new Item.Properties().stacksTo(1)));
@@ -1416,6 +1444,7 @@ public class DarkCraftMod {
         e.put(CALCINADO.get(), com.darkcraft.enemigos.Calcinado.atributos().build());
         e.put(ENTERRADO.get(), com.darkcraft.enemigos.Enterrado.atributos().build());
         e.put(CAPATAZ.get(), com.darkcraft.enemigos.Capataz.atributos().build());
+        e.put(OSMUND.get(), com.darkcraft.enemigos.Osmund.atributos().build());
         e.put(ENSAMBLADO.get(), com.darkcraft.enemigos.Ensamblado.atributos().build());
         e.put(CONDESTABLE.get(), com.darkcraft.enemigos.Condestable.atributos().build());
         e.put(RECTORA.get(), com.darkcraft.enemigos.Rectora.atributos().build());
@@ -1482,6 +1511,7 @@ public class DarkCraftMod {
             e.accept(PERTIGA_FAROLERO);
             e.accept(ESPADA_GUARDIANA);
             e.accept(PICO_CAPATAZ);
+            e.accept(INCENSARIO_SACRISTAN);
             e.accept(MAZA);
             e.accept(MARTILLO_GUERRA);
             e.accept(GRAN_MARTILLO);

@@ -325,6 +325,17 @@
     "lufs": -16
   },
   {
+    "id": "osmund",
+    "pagina": "https://opengameart.org/node/35383",
+    "busca": "death",
+    "titulo": "Death Is Just Another Path",
+    "autor": "Otto Halmén",
+    "licencia": "CC-BY 3.0",
+    "aviso": "Music by Otto Halmén (OpenGameArt, CC-BY 3.0)",
+    "uso": "Fray Osmund, el Sacristán (el Relicario del Osario de San Ulfo, en el Bosque Muerto de Morvain)",
+    "lufs": -16
+  },
+  {
     "id": "sombra1",
     "pagina": "https://opengameart.org/node/73591",
     "busca": "the_final_battle",

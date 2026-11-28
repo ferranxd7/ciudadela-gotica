@@ -74,7 +74,7 @@ public final class MorvainEnemigos {
             ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
             PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon", DRAGON = "dragon", GARGOLA = "gargola", CENTINELA = "centinela",
             ISOLDE = "isolde", ESPECTRO = "espectro", PERRO = "perro", SOMBRA = "sombra", ENTERRADO = "enterrado", CAPATAZ = "capataz",
-            ENSAMBLADO = "ensamblado";
+            ENSAMBLADO = "ensamblado", OSMUND = "osmund";
     /** El tipo de puesto de las gargolas (para las pruebas). */
     public static final String GARGOLA_TIPO = GARGOLA;
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
@@ -241,8 +241,10 @@ public final class MorvainEnemigos {
             MINA_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? CAPATAZ : ENTERRADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
                     e.ronda(), e.grupo()));
         // ---- el Osario de San Ulfo (parte 7as): los Ensamblados del camposanto, la capilla, la cripta y las catacumbas
+        // (y Fray Osmund, de rodillas ante el relicario de San Ulfo: el puesto 0, parte 7at)
         for (Osario.Espera e : Osario.get().esperas())
-            OSARIO_P.add(new Puesto(ENSAMBLADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
+            OSARIO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? OSMUND : ENSAMBLADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
+                    e.ronda(), e.grupo()));
         // ---- la casa de la Sombra (parte 7ab): la reina Isolde en su trono (el puesto 0) y los de la torre del homenaje (los
         // centinelas, los espectros del archivo, los marcados de la prision y sus perros); el tipo de cada uno lo dice el plano
         for (Homenaje.Espera e : Homenaje.get().esperas())
@@ -292,6 +294,11 @@ public final class MorvainEnemigos {
         return 0;
     }
 
+    /** El numero del puesto de Fray Osmund, el Sacristan, en el sitio del osario. */
+    public static int osmund() {
+        return 0;
+    }
+
     /** El numero del puesto de Anselmo, el Pontifice Sangrante, en el sitio del Altar. */
     public static int pontifice() {
         return 0;
@@ -331,6 +338,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(ENTERRADO, DarkCraftMod.ENTERRADO);
         Puestos.tipo(CAPATAZ, DarkCraftMod.CAPATAZ);
         Puestos.tipo(ENSAMBLADO, DarkCraftMod.ENSAMBLADO);
+        Puestos.tipo(OSMUND, DarkCraftMod.OSMUND);
         Puestos.tipo(CONDESTABLE, DarkCraftMod.CONDESTABLE);
         Puestos.tipo(ERUDITO, DarkCraftMod.ERUDITO);
         Puestos.tipo(RECTORA, DarkCraftMod.RECTORA);
@@ -391,7 +399,9 @@ public final class MorvainEnemigos {
         // el turno de noche descansa (lo hace Mina.paz cada segundo) y ya no vuelve
         Puestos.registrar(MINA, MINA_P, Morvain::es, (l, p) -> Puestos.JEFE.equals(p.grupo()) || !Mina.enPaz(l.getServer()));
         // el Osario de San Ulfo: los Ensamblados (caen, se deshacen y se rehacen; muertos de verdad, no vuelven hasta descansar)
-        Puestos.registrar(OSARIO, OSARIO_P, Morvain::es);
+        // (y Fray Osmund en el Relicario; vencido el, los muertos del osario descansan —lo hace Osario.paz cada segundo— y ya no
+        // vuelven)
+        Puestos.registrar(OSARIO, OSARIO_P, Morvain::es, (l, p) -> Puestos.JEFE.equals(p.grupo()) || !Osario.enPaz(l.getServer()));
         // la torre del homenaje: los centinelas, los del archivo y la prision, y la reina en su trono
         Puestos.registrar(HOMENAJE, HOMENAJE_P, Morvain::es);
         // la aguja: la Sombra (cae una vez y no vuelve: es del grupo de los jefes)
@@ -421,6 +431,9 @@ public final class MorvainEnemigos {
             // y al caer Hakon, el Capataz, el turno de noche de la mina descansa (lo hace Mina.paz cada segundo; aqui, el aviso)
             if (e instanceof com.darkcraft.enemigos.Capataz && MINA.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] Hakon, el Capataz, cae: el turno de noche de la mina descansa");
+            // y al caer Fray Osmund los muertos del osario descansan (lo hace Osario.paz cada segundo; aqui, el aviso)
+            if (e instanceof com.darkcraft.enemigos.Osmund && OSARIO.equals(e.sitio()))
+                DarkCraftMod.LOGGER.info("[DarkCraft] Fray Osmund, el Sacristan, cae: los muertos del osario descansan");
             // y al caer el Pontifice la Tierra sin Fe descansa (lo hace Altar.paz cada segundo; aqui, el aviso)
             if (e instanceof com.darkcraft.enemigos.Pontifice && ALTAR.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] Anselmo, el Pontifice Sangrante, cae: la Tierra sin Fe descansa");
@@ -1938,6 +1951,61 @@ public final class MorvainEnemigos {
     }
 
     /** Cuantos Ensamblados quedan y lo que hay en el osario (si esta cargado). */
+    /**
+     * {@code /darkcraft osmund [ir | vencer | volver | media | accion <n> | suelta]} (parte 7at): como esta Fray Osmund, llevar ante el
+     * Relicario, vencerle, que vuelva (y los Ensamblados del osario, como estaban), que se alce (media vida) o, para las pruebas, que
+     * haga una accion (y ninguna otra por su cuenta) contra quien lo pide.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoOsmund() {
+        return net.minecraft.commands.Commands.literal("osmund")
+                .executes(c -> decir(c, estadoOsmund(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irOsario(c.getSource(), "relicario")))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(OSARIO, osmund());
+                    if (e instanceof com.darkcraft.enemigos.Osmund b) b.vencer();
+                    else {
+                        Puestos.marcar(srv, OSARIO, osmund(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "osmund");
+                    }
+                    return decir(c, estadoOsmund(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("media").executes(c -> {
+                    if (Puestos.enemigo(OSARIO, osmund()) instanceof com.darkcraft.enemigos.Osmund b) b.mediaVida();
+                    return decir(c, estadoOsmund(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, OSARIO, osmund(), false);
+                    // los Ensamblados del osario vuelven a su sitio en cuanto salgan
+                    Puestos.todos(srv, OSARIO, false);
+                    return decir(c, estadoOsmund(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("accion").then(net.minecraft.commands.Commands.argument("n",
+                                com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, com.darkcraft.enemigos.OsmundAnims.TICKS.length - 1))
+                        .executes(c -> {
+                            if (Puestos.enemigo(OSARIO, osmund()) instanceof com.darkcraft.enemigos.Osmund b) {
+                                b.quieta = true;
+                                if (b.postura() != Enemigo.DE_PIE) b.postura(Enemigo.DE_PIE);
+                                if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) b.setTarget(sp);
+                                b.empezar(com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "n"));
+                            }
+                            return decir(c, estadoOsmund(c.getSource().getServer()));
+                        })))
+                .then(net.minecraft.commands.Commands.literal("suelta").executes(c -> {
+                    if (Puestos.enemigo(OSARIO, osmund()) instanceof com.darkcraft.enemigos.Osmund b) b.quieta = false;
+                    return decir(c, estadoOsmund(c.getSource().getServer()));
+                }));
+    }
+
+    public static String estadoOsmund(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(OSARIO, osmund());
+        String s = "Fray Osmund: " + (Osario.enPaz(srv) ? "caido (los muertos del osario descansan)" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Osmund b) s += ", " + b.estado();
+        return s + "; Ensamblados del osario: quedan " + Puestos.quedan(srv, OSARIO) + " de " + OSARIO_P.size() + " (fuera " + Puestos.fuera(OSARIO)
+                + "), descansan " + Osario.DESCANSAN;
+    }
+
     public static String estadoOsario(net.minecraft.server.MinecraftServer srv) {
         String s = "osario de San Ulfo: quedan " + Puestos.quedan(srv, OSARIO) + " de " + OSARIO_P.size() + " (fuera " + Puestos.fuera(OSARIO) + ")";
         var m = Morvain.nivel(srv);

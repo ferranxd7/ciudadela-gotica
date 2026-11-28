@@ -75,9 +75,12 @@ public final class Osario {
     static final int POZO_U0 = 23, POZO_U1 = 29, POZO_V0 = -72, POZO_V1 = -66;
     /** La escala del panteon (sube de la Sala del Pozo a su escotilla): contra la pared del sur, mirando al norte. */
     static final int ESCALA_U = 26, ESCALA_V = -57;
-    /** El Relicario: su centro y su radio. */
-    public static final int REL_U = 26, REL_V = -110;
+    /** El Relicario: su centro y su radio; donde espera Fray Osmund (parte 7at), de rodillas ante el relicario de San Ulfo. */
+    public static final int REL_U = 26, REL_V = -110, OSMUND_U = 26, OSMUND_V = -105;
     public static final double REL_R = 11.3;
+    /** Los montones de huesos del borde del Relicario (de ahi se levantan los muertos de Fray Osmund): grados y radio. */
+    static final int[] MONTONES = {0, 45, 135, 180, 225, 270, 315};
+    static final double R_MONTON = 10.2, R_MUERTO = 8.8;
     /** El santuario del Osario (en {@link SantuariosMorvain}): al sur de la puerta del camposanto. */
     public static final int SANT_U = 0, SANT_V = 42;
     public static final int X0 = CX - 50, X1 = CX + 52, Z0 = CZ - 124, Z1 = CZ + 60;
@@ -1194,6 +1197,16 @@ public final class Osario {
             put(REL_U + du, RELICARIO + 2, REL_V + dv, b(Blocks.POLISHED_BLACKSTONE_BRICKS));
             une(REL_U + du, RELICARIO + 3, REL_V + dv, b(Blocks.IRON_BARS));
         }
+        // los montones de huesos del borde (entre los pilares, menos en la entrada): de ahi se levantan los muertos de Fray Osmund
+        for (int a : MONTONES) {
+            double r = Math.toRadians(a);
+            int u = REL_U + (int) Math.round(R_MONTON * Math.cos(r)), v = REL_V + (int) Math.round(R_MONTON * Math.sin(r));
+            put(u, RELICARIO + 1, v, hueso(Direction.Axis.Y));
+            put(u, RELICARIO + 2, v, calavera((int) Math.round((a + 90) / 22.5) & 15));
+            int du = (int) Math.signum(Math.round(Math.sin(r) * 2)), dv = -(int) Math.signum(Math.round(Math.cos(r) * 2));
+            if (!macizo(u + du, RELICARIO + 1, v + dv)) put(u + du, RELICARIO + 1, v + dv, hueso(du != 0 ? Direction.Axis.X : Direction.Axis.Z));
+            calaveras++;
+        }
         // la lampara de la cupula, apagada (solo la cadena y su aro)
         int ty = cupula(0);
         for (int y = ty - 4; y < ty; y++) put(REL_U, y, REL_V, Mina.cadena(Direction.Axis.Y));
@@ -1495,6 +1508,7 @@ public final class Osario {
         sitio("panteon", 26, PISO, -52);
         sitio("pasillo_relicario", 26, RELICARIO + 1, -95);
         sitio("relicario", REL_U, RELICARIO + 1, REL_V + 7);
+        sitio("osmund", OSMUND_U, RELICARIO + 1, OSMUND_V);
         sitio("alto", 30, PISO + 40, 50);
     }
 
@@ -1503,6 +1517,9 @@ public final class Osario {
     private void ponerEsperas() {
         int P = Ensamblado.PORTACIRIOS, S = Ensamblado.SEPULTURERO, K = Ensamblado.COLOSO;
         int R = Enemigo.REZA, D = Enemigo.DE_PIE, T = Enemigo.TUMBADO;
+        // ---- el primero (puesto 0): Fray Osmund, de rodillas ante el relicario de San Ulfo, contando huesos, de espaldas a la
+        // entrada (parte 7at)
+        en(0, OSMUND_U, RELICARIO + 1, OSMUND_V, NORTE, R, 0, com.darkcraft.enemigos.Puestos.JEFE);
         // ---- el camposanto: los sepultureros cavando junto a las tumbas abiertas, dos montones entre las tumbas, el portacirios de
         // la puerta de la capilla y uno que ronda el camino
         for (int[] q : CAVAN) en(S, q[0] + 1, PISO, q[1] + 1, OESTE, R, 0, "camposanto");
@@ -1644,6 +1661,54 @@ public final class Osario {
         if (enNave(u, v) || u >= 5 && u <= 9 && v >= -6 && v <= -2) return "darkcraft.morvain.lugar.capilla_ulfo";
         if (u >= -23 && u <= 23 && v >= -27 && v <= 25) return "darkcraft.morvain.lugar.camposanto";
         return null;
+    }
+
+    // ------------------------------------------------------------------ Fray Osmund, el Sacristan (parte 7at)
+
+    /** Si (x, y, z) esta en el Relicario (donde pelea Fray Osmund). */
+    public static boolean enRelicario(double x, double y, double z) {
+        return enRelicario((int) Math.floor(x) - CX, y, (int) Math.floor(z) - CZ);
+    }
+
+    /** Donde se levantan los muertos cuando Fray Osmund toca la campanilla (delante de cada monton de huesos del borde): {x, z}. */
+    public static List<int[]> muertos() {
+        List<int[]> l = new ArrayList<>();
+        for (int a : MONTONES) {
+            double r = Math.toRadians(a);
+            l.add(new int[]{CX + REL_U + (int) Math.round(R_MUERTO * Math.cos(r)), CZ + REL_V + (int) Math.round(R_MUERTO * Math.sin(r))});
+        }
+        return l;
+    }
+
+    /** El aro de la lampara de la cupula del Relicario (en el mundo): {x, y, z} del centro. */
+    public static double[] lampara() {
+        return new double[]{x(REL_U) + 0.5, cupula(0) - 4.5, z(REL_V) + 0.5};
+    }
+
+    /** Si Fray Osmund ha caido (y no ha vuelto: es del grupo de los jefes). */
+    public static boolean enPaz(net.minecraft.server.MinecraftServer srv) {
+        return com.darkcraft.enemigos.Puestos.muerto(srv, MorvainEnemigos.OSARIO, MorvainEnemigos.osmund());
+    }
+
+    /** Para las pruebas: los Ensamblados que han descansado al caer Fray Osmund. */
+    public static int DESCANSAN;
+
+    /**
+     * Cada segundo: con Fray Osmund caido, los muertos del osario descansan: los Ensamblados que no estan peleando se deshacen (sube su
+     * alma) y ya no vuelven ({@code MorvainEnemigos}: sus puestos dejan de estar en uso).
+     */
+    public static void paz(ServerLevel m) {
+        if (com.darkcraft.enemigos.Puestos.sitio(MorvainEnemigos.OSARIO) == null || !enPaz(m.getServer())) return;
+        List<com.darkcraft.enemigos.Puestos.Puesto> ps = MorvainEnemigos.osario();
+        for (int i = 0; i < ps.size(); i++) {
+            if (com.darkcraft.enemigos.Puestos.JEFE.equals(ps.get(i).grupo())) continue;
+            Enemigo e = com.darkcraft.enemigos.Puestos.enemigo(MorvainEnemigos.OSARIO, i);
+            if (e == null || e.level() != m || e.getTarget() != null || e.accion() != 0) continue;
+            m.sendParticles(ParticleTypes.END_ROD, e.getX(), e.getY() + 1.2, e.getZ(), 0, 0, 1, 0, 0.08);
+            m.sendParticles(ParticleTypes.SOUL, e.getX(), e.getY() + 1.2, e.getZ(), 8, 0.3, 0.6, 0.3, 0.03);
+            e.disolver();
+            DESCANSAN++;
+        }
     }
 
     /** Si (x, y, z) esta abajo, en la cripta (para su logro y el aire del osario). */
