@@ -1,0 +1,43 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "corteza": "darkcraft:block/corteza_pino",
+    "corteza_h": "darkcraft:block/rama_pino_h",
+    "testa": "darkcraft:block/tronco_pino_tapa",
+    "particle": "darkcraft:block/corteza_pino"
+  },
+  "elements": [
+    {
+      "from": [
+        6,
+        6,
+        6
+      ],
+      "to": [
+        10,
+        10,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#corteza"
+        },
+        "south": {
+          "texture": "#corteza"
+        },
+        "east": {
+          "texture": "#corteza"
+        },
+        "west": {
+          "texture": "#corteza"
+        },
+        "up": {
+          "texture": "#corteza"
+        },
+        "down": {
+          "texture": "#corteza"
+        }
+      }
+    }
+  ]
+}

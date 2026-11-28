@@ -1,0 +1,106 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout_mipped",
+  "textures": {
+    "hojas": "darkcraft:block/hojas_ceniza",
+    "particle": "darkcraft:block/hojas_ceniza"
+  },
+  "elements": [
+    {
+      "from": [
+        3,
+        1,
+        3
+      ],
+      "to": [
+        13,
+        10,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hojas"
+        },
+        "south": {
+          "texture": "#hojas"
+        },
+        "east": {
+          "texture": "#hojas"
+        },
+        "west": {
+          "texture": "#hojas"
+        },
+        "up": {
+          "texture": "#hojas"
+        },
+        "down": {
+          "texture": "#hojas"
+        }
+      }
+    },
+    {
+      "from": [
+        1,
+        6,
+        1
+      ],
+      "to": [
+        10,
+        15,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hojas"
+        },
+        "south": {
+          "texture": "#hojas"
+        },
+        "east": {
+          "texture": "#hojas"
+        },
+        "west": {
+          "texture": "#hojas"
+        },
+        "up": {
+          "texture": "#hojas"
+        },
+        "down": {
+          "texture": "#hojas"
+        }
+      }
+    },
+    {
+      "from": [
+        8,
+        5,
+        7
+      ],
+      "to": [
+        15,
+        13,
+        15
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hojas"
+        },
+        "south": {
+          "texture": "#hojas"
+        },
+        "east": {
+          "texture": "#hojas"
+        },
+        "west": {
+          "texture": "#hojas"
+        },
+        "up": {
+          "texture": "#hojas"
+        },
+        "down": {
+          "texture": "#hojas"
+        }
+      }
+    }
+  ]
+}

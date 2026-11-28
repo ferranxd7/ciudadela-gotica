@@ -1,0 +1,51 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/racimo_ceniza"
+      },
+      {
+        "model": "darkcraft:block/racimo_ceniza",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_ceniza",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_ceniza",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/racimo_ceniza_2"
+      },
+      {
+        "model": "darkcraft:block/racimo_ceniza_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_ceniza_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_ceniza_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/racimo_ceniza_3"
+      },
+      {
+        "model": "darkcraft:block/racimo_ceniza_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_ceniza_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_ceniza_3",
+        "y": 270
+      }
+    ]
+  }
+}

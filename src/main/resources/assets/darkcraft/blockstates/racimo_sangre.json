@@ -1,0 +1,51 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/racimo_sangre"
+      },
+      {
+        "model": "darkcraft:block/racimo_sangre",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_sangre",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_sangre",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/racimo_sangre_2"
+      },
+      {
+        "model": "darkcraft:block/racimo_sangre_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_sangre_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_sangre_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/racimo_sangre_3"
+      },
+      {
+        "model": "darkcraft:block/racimo_sangre_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_sangre_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_sangre_3",
+        "y": 270
+      }
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/racimo_pino_nevado"
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_nevado",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_nevado",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_nevado",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_nevado_2"
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_nevado_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_nevado_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_nevado_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_nevado_3"
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_nevado_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_nevado_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_nevado_3",
+        "y": 270
+      }
+    ]
+  }
+}

@@ -4741,9 +4741,10 @@ Respuestas 45-48 del plan nuevo (cero bloques de Minecraft, todas las formas, te
 
 ### Plan nuevo, parte 8e: los bloques nuevos, cuarta tanda (los arboles)
 
-Las piezas de los arboles de tres tamanos (8-15, 20-40 y 60-100 bloques, "hechos de piezas"): los pequenos con troncos y
-ramas; los grandes con troncos gordos de corteza redondeados con escaleras, losas y muros, raices de escaleras y ramas
-gruesas de troncos tumbados. Los arboles en si (sus generadores) van con el clima y los efectos, despues de los bloques.
+Las piezas de los arboles de tres tamanos (8-15, 20-40 y 60-100 bloques, "hechos de piezas", respuestas 27 y 28: ramas de
+2 a 14 pixeles, raices y racimos de hojas): los pequenos con troncos y ramas; los grandes con troncos gordos de corteza
+redondeados con escaleras, losas y muros, raices de escaleras y ramas gruesas de troncos tumbados. Los arboles en si (sus
+generadores) van con el clima y los efectos, despues de los bloques.
 - **El pintor de los arboles** (`tools/bloques/arboles.py`). **Variantes que casan por todos los lados aunque lo de
   dentro cambie**: cada textura se pinta dos veces, con lo comun (semilla `borde`) y con lo suyo, y se mezclan con
   `_peso` (0 en los 2 pixeles de fuera, 1 desde 7 hacia dentro); lo que cae cerca de un borde se pinta en las dos y lo de
@@ -4757,30 +4758,40 @@ gruesas de troncos tumbados. Los arboles en si (sus generadores) van con el clim
   `agujas`: ramitas de pino en espina de pez; `nieve`: nieve en las agujas de encima de cada ramita); `testa()` (anillos,
   medula, una grieta y el aro de corteza), `hojarasca()`, `colgante()` (el de en medio se repite de arriba abajo; la
   `punta`, acaba) y `liana()`. La prueba de que casan: los 2 pixeles de cada borde son iguales en todas las variantes.
-- **Formas nuevas** (sin sufijo en el id, `SIN_SUFIJO`): R rama (`bloques/Rama`, un `PipeBlock` de 8 pixeles como la planta
-  de coro: el nudo del centro y un brazo por cada cara unida —el brazo se escribe mirando al norte y se gira, x 270 arriba
-  y x 90 abajo—; los lados del brazo llevan la corteza tumbada `rama_<sp>_h` para que la veta vaya a lo largo y la punta
-  la testa; se une a ramas, `minecraft:logs`, `minecraft:leaves` y caras firmes; `unida(nivel, pos)` da el estado ya
-  unido), O hojas (`bloques/Hojas`, un `LeavesBlock` que no se cae nunca: sin ticks ni cuenta de la distancia; `cube_all`
-  con `cutout_mipped` y tres variantes), G lo que cuelga (`bloques/Colgante`: cruz sin choque que se sostiene de lo de
-  arriba —cara firme, hojas, troncos u otro igual— y se cae si se lo quitan; `punta` = el de abajo del todo, con su
-  textura `_punta`), Y liana (`VineBlock` sin ticks al azar —no crece sola—, el modelo de la enredadera sin tinte) y A
-  alfombra (hojarasca: `CarpetBlock` con `noOcclusion` —si no, tapaba la cara de arriba del suelo y por los huecos se veia
-  el vacio—, cuatro giros). **Los troncos** son columnas (`C`) con `lado_de`: por los lados las variantes de su corteza
-  (un modelo por variante, girados al azar de pie) y la testa `tronco_<sp>_tapa` arriba y abajo.
-- **Cuarta tanda** (33 materiales, 51 bloques; ya son 113 materiales y 272 bloques): seis especies —roble, fresno palido
+- **Formas nuevas** (sin sufijo en el id, `SIN_SUFIJO`): R rama, Q ramita y U rama gruesa (`bloques/Rama`, un `PipeBlock`
+  de 8, 4 y 12 pixeles como la planta de coro, `GRUESOS`: el nudo del centro y un brazo por cada cara unida —el brazo se
+  escribe mirando al norte y se gira, x 270 arriba y x 90 abajo—; los lados del brazo llevan la corteza tumbada
+  `rama_<sp>_h` (la escribe la rama de 8 y la usan las tres) para que la veta vaya a lo largo, y la punta del brazo,
+  corteza: donde una gruesa se une a una mas fina queda un reborde de corteza; se une a ramas, `minecraft:logs`,
+  `minecraft:leaves` y caras firmes; `unida(nivel, pos)` da el estado ya unido), O hojas (`bloques/Hojas`, un
+  `LeavesBlock` que no se cae nunca: sin ticks ni cuenta de la distancia; `cube_all` con `cutout_mipped` y tres
+  variantes), K racimo de hojas (`bloques/Racimo`: tres modelos de tres o cuatro bultos de hojas de distinto tamano
+  —`RACIMOS`—, cada uno en cuatro giros, con la textura de sus hojas: para las puntas de las ramas y el borde de las copas,
+  que asi no se ven cuadradas), G lo que cuelga (`bloques/Colgante`: cruz sin choque que se sostiene de lo de arriba —cara
+  firme, hojas, troncos u otro igual— y se cae si se lo quitan; `punta` = el de abajo del todo, con su textura `_punta`),
+  Y liana (`VineBlock` sin ticks al azar —no crece sola—, el modelo de la enredadera sin tinte) y A alfombra (hojarasca:
+  `CarpetBlock` con `noOcclusion` —si no, tapaba la cara de arriba del suelo y por los huecos se veia el vacio—, cuatro
+  giros). **Los troncos** son columnas (`C`) con `lado_de`: por los lados las variantes de su corteza (un modelo por
+  variante, girados al azar de pie) y la testa `tronco_<sp>_tapa` arriba y abajo.
+- **Cuarta tanda** (52 materiales, 70 bloques; ya son 132 materiales y 291 bloques): seis especies —roble, fresno palido
   (`ceniza`), madera muerta (`muerto`, sin hojas), cipres musgoso (`pantano`, con musgo en la corteza), sanguino (`sangre`)
-  y pino negro (`pino`)— con su corteza (bloque, escalera, losa y muro), su tronco y su rama; hojas de roble, de roble
-  otonal, de fresno, de cipres, de sanguino, agujas de pino y agujas nevadas; musgo colgante y barba de viejo; liana y liana
-  seca; hojarasca de roble, de fresno, de sanguino y pinocha.
-- **Etiquetas**: `minecraft:logs` (troncos, cortezas enteras y ramas), `leaves`, `climbable` (lianas; solo de bloques) y
-  `mineable/axe` / `hoe`.
+  y pino negro (`pino`)— con su corteza (bloque, escalera, losa y muro), su tronco y sus ramas (ramita, rama y rama
+  gruesa); hojas y racimos de roble, de roble otonal, de fresno, de cipres, de sanguino, de pino y de pino nevado; musgo
+  colgante y barba de viejo; liana y liana seca; hojarasca de roble, de fresno, de sanguino y pinocha.
+- **Etiquetas**: `minecraft:logs` (troncos, cortezas enteras y ramas), `leaves` (hojas y racimos), `climbable` (lianas;
+  solo de bloques) y `mineable/axe` / `hoe`.
+- **Ver bloques sin abrir el juego** (`tools/bloques/ver_modelo.py`): un dibujante por software de los modelos de bloque
+  (lee los estados —`variants` y `multipart`—, los modelos con sus padres —los de Minecraft del `client-extra.jar`, solo
+  para dibujar—, los giros x / y de los estados, el giro de los elementos y de las texturas en cada cara, transparencia
+  y z-buffer): `Escena().poner(pos, "darkcraft:<id>", {propiedades})` y `dibujar(png)` en isometrica desde el sureste. Con
+  el se revisaron las ramas (la veta, los rebordes entre gruesos) y los racimos.
 - Pruebas: servidor, la linea `Bloques 8b: ...` de siempre; cliente, en el muestrario las ramas (de pie, un codo y brazos),
-  un monton de hojas, lo que cuelga de una viga, la liana por un muro y la hojarasca sobre tierra, y despues **seis
-  arboles de muestra** hechos a mano sobre un prado (`arbolesMuestra`: roble con liana y hojarasca, fresno, pino nevado
-  arriba con pinocha, cipres de tronco 2 x 2 con raices de escaleras, ramas, copa ancha y musgo y barba que cuelgan,
-  sanguino y uno muerto); capturas `cliente_bq01..29` (grupos), `bq30..45` de cerca (tambien el tronco, la corteza del
-  cipres, la rama, las hojas, el musgo y la liana) y `bq46..49` los arboles (tres vistas y una desde abajo del cipres).
+  un monton de hojas, racimos, lo que cuelga de una viga, la liana por un muro y la hojarasca sobre tierra, y despues
+  **seis arboles de muestra** hechos a mano sobre un prado (`arbolesMuestra`: roble con liana y hojarasca, fresno, pino
+  nevado arriba con racimos en las puntas y pinocha, cipres de tronco 2 x 2 con raices de escaleras, ramas, copa ancha y
+  musgo y barba que cuelgan, sanguino y uno muerto de ramas de tres gruesos; los redondos con ramas gruesa-rama-ramita y
+  racimos en el borde de la copa); capturas `cliente_bq01..33` (grupos), `bq34..49` de cerca (tambien el tronco, la corteza
+  del cipres, la rama, las hojas, el musgo y la liana) y `bq50..53` los arboles (tres vistas y una desde abajo del cipres).
 
 ## Compilar, probar y publicar
 

@@ -43,8 +43,9 @@ import java.util.function.Supplier;
  * losa ({@code _losa}), el muro ({@code _muro}), la valla ({@code _valla}), la cancela ({@code _cancela}), la puerta
  * ({@code _puerta}) y la trampilla ({@code _trampilla}); columnas y vigas son un bloque con eje ({@code RotatedPillarBlock});
  * las plantas ({@link Planta}), las capas de nieve ({@code SnowLayerBlock}), el hielo ({@code HalfTransparentBlock}) y, de
- * los arboles (parte 8e), las ramas ({@link Rama}), las hojas ({@link Hojas}), lo que cuelga ({@link Colgante}), las lianas
- * ({@code VineBlock}) y la hojarasca ({@code CarpetBlock}) van sin sufijo; los troncos son columnas.
+ * los arboles (parte 8e), las ramas de tres gruesos ({@link Rama}), las hojas ({@link Hojas}), los racimos ({@link Racimo}),
+ * lo que cuelga ({@link Colgante}), las lianas ({@code VineBlock}) y la hojarasca ({@code CarpetBlock}) van sin sufijo; los
+ * troncos son columnas.
  * Todos con su objeto y en la pestana del creativo "Dark Craft · Bloques".
  */
 public final class Bloques {
@@ -106,9 +107,18 @@ public final class Bloques {
                     .isViewBlocking((st, l, p) -> st.getValue(SnowLayerBlock.LAYERS) >= 8).pushReaction(PushReaction.DESTROY)));
             return;
         }
-        if (f.indexOf('R') >= 0) {
-            // una rama: palo de 8 pixeles que se une por sus seis caras
-            reg(ids, m.id(), () -> new Rama(props(m).forceSolidOff()));
+        if (f.equals("R") || f.equals("Q") || f.equals("U")) {
+            // una rama: palo de 8 pixeles (Q ramita de 4, U rama gruesa de 12) que se une por sus seis caras
+            float medio = f.equals("Q") ? 0.125F : f.equals("U") ? 0.375F : 0.25F;
+            reg(ids, m.id(), () -> new Rama(medio, props(m).forceSolidOff()));
+            return;
+        }
+        if (f.equals("K")) {
+            // un racimo de hojas: bultos de hojas (no un cubo)
+            reg(ids, m.id(), () -> new Racimo(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido()).strength(m.dureza())
+                    .noOcclusion().isValidSpawn((st, l, p, t) -> false).isSuffocating((st, l, p) -> false)
+                    .isViewBlocking((st, l, p) -> false).isRedstoneConductor((st, l, p) -> false).ignitedByLava()
+                    .pushReaction(PushReaction.DESTROY)));
             return;
         }
         if (f.indexOf('O') >= 0) {

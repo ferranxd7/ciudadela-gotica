@@ -1,0 +1,55 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "corteza": "darkcraft:block/corteza_sangre",
+    "corteza_h": "darkcraft:block/rama_sangre_h",
+    "testa": "darkcraft:block/tronco_sangre_tapa",
+    "particle": "darkcraft:block/corteza_sangre"
+  },
+  "elements": [
+    {
+      "from": [
+        6,
+        6,
+        0
+      ],
+      "to": [
+        10,
+        10,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#testa",
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ]
+        },
+        "south": {
+          "texture": "#testa",
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ]
+        },
+        "east": {
+          "texture": "#corteza_h"
+        },
+        "west": {
+          "texture": "#corteza_h"
+        },
+        "up": {
+          "texture": "#corteza"
+        },
+        "down": {
+          "texture": "#corteza"
+        }
+      }
+    }
+  ]
+}

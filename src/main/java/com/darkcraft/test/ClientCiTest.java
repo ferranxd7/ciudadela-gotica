@@ -3153,7 +3153,18 @@ public final class ClientCiTest {
                     }
                 continue;
             }
-            if (f.indexOf('R') >= 0) {
+            if (f.equals("K")) {
+                // racimos de hojas: una fila de cuatro y dos encima
+                for (int dx = 0; dx < 4; dx++) {
+                    lvl.setBlock(new BlockPos(x + dx, y0, z0 + 1), b.defaultBlockState(), 2);
+                    n++;
+                }
+                lvl.setBlock(new BlockPos(x + 1, y0 + 1, z0 + 1), b.defaultBlockState(), 2);
+                lvl.setBlock(new BlockPos(x + 2, y0 + 1, z0 + 2), b.defaultBlockState(), 2);
+                n += 2;
+                continue;
+            }
+            if (f.equals("R") || f.equals("Q") || f.equals("U")) {
                 // una rama: de pie (se une al suelo), un codo, dos brazos y un trozo de lado
                 BlockPos[] ps = {new BlockPos(x + 1, y0, z0 + 1), new BlockPos(x + 1, y0 + 1, z0 + 1), new BlockPos(x + 1, y0 + 2, z0 + 1),
                         new BlockPos(x + 2, y0 + 2, z0 + 1), new BlockPos(x + 3, y0 + 2, z0 + 1), new BlockPos(x + 3, y0 + 3, z0 + 1),
@@ -3354,6 +3365,19 @@ public final class ClientCiTest {
                 }
         }
         lvl.setBlock(new BlockPos(xp, y0 + radios.length, zp), bq("hojas_pino"), 2);
+        // racimos de agujas en las puntas de cada piso
+        for (int dy = 3; dy < radios.length; dy++) {
+            int r = radios[dy] + 1;
+            if (r < 2) continue;
+            for (net.minecraft.core.Direction d : new net.minecraft.core.Direction[]{net.minecraft.core.Direction.NORTH,
+                    net.minecraft.core.Direction.EAST, net.minecraft.core.Direction.SOUTH, net.minecraft.core.Direction.WEST}) {
+                BlockPos p = new BlockPos(xp, y0 + dy, zp).relative(d, r);
+                if (lvl.getBlockState(p).isAir()) {
+                    lvl.setBlock(p, bq("racimo_pino"), 2);
+                    n++;
+                }
+            }
+        }
         // la nieve en lo de arriba de cada columna de agujas
         for (int dx = -3; dx <= 3; dx++)
             for (int dz = -3; dz <= 3; dz++)
@@ -3415,11 +3439,14 @@ public final class ClientCiTest {
         // 6) muerto: tronco y ramas en zigzag, sin hojas
         int xm = x0 + 64, zm = z0 + 2;
         for (int dy = 0; dy < 7; dy++) lvl.setBlock(new BlockPos(xm, y0 + dy, zm), bq("tronco_muerto"), 2);
-        int[][] rm = {{1, 3, 0}, {2, 3, 0}, {2, 4, 0}, {3, 5, 0}, {-1, 5, 0}, {-2, 5, 0}, {-2, 6, 0}, {-3, 7, 0}, {0, 7, 0}, {0, 8, 0},
-                {1, 8, 0}, {0, 4, -1}, {0, 4, -2}, {0, 5, -2}, {0, 6, 1}, {0, 6, 2}, {0, 7, 2}};
+        // {dx, dy, dz, grueso: 0 ramita, 1 rama, 2 gruesa}
+        int[][] rm = {{1, 3, 0, 2}, {2, 3, 0, 1}, {2, 4, 0, 1}, {3, 5, 0, 0}, {3, 6, 0, 0}, {-1, 5, 0, 2}, {-2, 5, 0, 1}, {-2, 6, 0, 1},
+                {-3, 7, 0, 0}, {-3, 8, 0, 0}, {0, 7, 0, 1}, {0, 8, 0, 1}, {1, 8, 0, 0}, {1, 9, 0, 0}, {0, 4, -1, 1}, {0, 4, -2, 1},
+                {0, 5, -2, 0}, {0, 6, -2, 0}, {0, 6, 1, 1}, {0, 6, 2, 0}, {0, 7, 2, 0}};
+        String[] gruesos = {"ramita_muerto", "rama_muerto", "rama_gruesa_muerto"};
         for (int[] r : rm) {
             BlockPos p = new BlockPos(xm + r[0], y0 + r[1], zm + r[2]);
-            lvl.setBlock(p, bq("rama_muerto"), 2);
+            lvl.setBlock(p, bq(gruesos[r[3]]), 2);
             ramas.add(p);
         }
         for (BlockPos p : ramas) {
@@ -3439,24 +3466,28 @@ public final class ClientCiTest {
         for (int i = 0; i < 4; i++) {
             BlockPos a = new BlockPos(x, y0 + alto - 2 + (i % 2), z).relative(lados[i]);
             BlockPos b = a.relative(lados[i]).above();
-            lvl.setBlock(a, bq("rama_" + sp), 2);
+            lvl.setBlock(a, bq("rama_gruesa_" + sp), 2);
             lvl.setBlock(a.above(), bq("rama_" + sp), 2);
-            lvl.setBlock(b, bq("rama_" + sp), 2);
+            lvl.setBlock(b, bq("ramita_" + sp), 2);
             ramas.add(a);
             ramas.add(a.above());
             ramas.add(b);
         }
         int cy = y0 + alto + 1;
-        for (int dx = -r - 1; dx <= r + 1; dx++)
-            for (int dz = -r - 1; dz <= r + 1; dz++)
-                for (int dy = -r; dy <= r; dy++) {
+        for (int dx = -r - 2; dx <= r + 2; dx++)
+            for (int dz = -r - 2; dz <= r + 2; dz++)
+                for (int dy = -r - 1; dy <= r + 1; dy++) {
                     double d = (dx * dx + dz * dz) / (double) ((r + 0.7) * (r + 0.7)) + dy * dy / (double) (r * r);
-                    if (d > 1.0) continue;
-                    if (d > 0.7 && Math.floorMod(dx * 31 + dz * 17 + dy * 13, 7) == 0) continue;
                     BlockPos p = new BlockPos(x + dx, cy + dy, z + dz);
                     if (!lvl.getBlockState(p).isAir()) continue;
-                    lvl.setBlock(p, bq("hojas_" + sp), 2);
-                    n++;
+                    if (d <= 1.0 && !(d > 0.7 && Math.floorMod(dx * 31 + dz * 17 + dy * 13, 7) == 0)) {
+                        lvl.setBlock(p, bq("hojas_" + sp), 2);
+                        n++;
+                    } else if (d <= 1.45 && dy > -r && Math.floorMod(dx * 13 + dz * 29 + dy * 7, 3) == 0) {
+                        // el borde de la copa, con racimos (no un cubo)
+                        lvl.setBlock(p, bq("racimo_" + sp), 2);
+                        n++;
+                    }
                 }
         return n;
     }

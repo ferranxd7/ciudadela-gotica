@@ -13,13 +13,14 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 
 /**
- * Las ramas de los arboles nuevos (parte 8e): un palo de 8 pixeles de grueso (como la planta de coro) que se une por sus
- * seis caras a otras ramas, a troncos y cortezas ({@code minecraft:logs}), a hojas ({@code minecraft:leaves}) y a cualquier
- * cara firme de al lado. Los arboles las ponen con sus uniones ya puestas; al ponerlas a mano se unen solas.
+ * Las ramas de los arboles nuevos (parte 8e): un palo de 4, 8 o 12 pixeles de grueso (como la planta de coro) que se une
+ * por sus seis caras a otras ramas, a troncos y cortezas ({@code minecraft:logs}), a hojas ({@code minecraft:leaves}) y a
+ * cualquier cara firme de al lado. Los arboles las ponen con sus uniones ya puestas; al ponerlas a mano se unen solas.
  */
 public class Rama extends PipeBlock {
-    public Rama(Properties p) {
-        super(0.25F, p);
+    /** {@code medio}: la mitad del grueso en bloques (0,125 ramita de 4 pixeles, 0,25 rama de 8, 0,375 rama gruesa de 12). */
+    public Rama(float medio, Properties p) {
+        super(medio, p);
         registerDefaultState(stateDefinition.any().setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false)
                 .setValue(WEST, false).setValue(UP, false).setValue(DOWN, false));
     }

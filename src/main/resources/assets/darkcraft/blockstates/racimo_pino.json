@@ -1,0 +1,51 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/racimo_pino"
+      },
+      {
+        "model": "darkcraft:block/racimo_pino",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_pino",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_pino",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_2"
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_3"
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_pino_3",
+        "y": 270
+      }
+    ]
+  }
+}

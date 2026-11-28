@@ -1,0 +1,51 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/racimo_otono"
+      },
+      {
+        "model": "darkcraft:block/racimo_otono",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_otono",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_otono",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/racimo_otono_2"
+      },
+      {
+        "model": "darkcraft:block/racimo_otono_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_otono_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_otono_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/racimo_otono_3"
+      },
+      {
+        "model": "darkcraft:block/racimo_otono_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_otono_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_otono_3",
+        "y": 270
+      }
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/racimo_roble"
+      },
+      {
+        "model": "darkcraft:block/racimo_roble",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_roble",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_roble",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/racimo_roble_2"
+      },
+      {
+        "model": "darkcraft:block/racimo_roble_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_roble_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_roble_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/racimo_roble_3"
+      },
+      {
+        "model": "darkcraft:block/racimo_roble_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/racimo_roble_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/racimo_roble_3",
+        "y": 270
+      }
+    ]
+  }
+}

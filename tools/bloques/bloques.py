@@ -7,7 +7,8 @@ Uso:
 
 Cada material tiene sus formas: B bloque, E escalera, L losa, M muro, C columna (con lado y tapa; un tronco lleva por
 los lados las variantes de su corteza), V valla, P cancela (la puerta de la valla), D puerta, T trampilla; y sin sufijo
-en el id: X planta, N capas de nieve, H hielo, R rama, O hojas, G musgo que cuelga, Y liana y A alfombra (hojarasca).
+en el id: X planta, N capas de nieve, H hielo, R rama (Q ramita, U rama gruesa), O hojas, K racimo de hojas, G musgo que
+cuelga, Y liana y A alfombra (hojarasca).
 Los ids: <id>, <id>_escalera, <id>_losa, <id>_muro, <id>_valla, <id>_cancela, <id>_puerta, <id>_trampilla.
 """
 import json
@@ -586,11 +587,21 @@ def TRONCO(id, es, en, corteza, madera, rampa_c, mapa, semilla, base=0.55):
              lado_de=corteza, tapa=t_testa(madera, rampa_c, base), etiquetas=("logs",))
 
 
-def RAMA(id, es, en, corteza, mapa, semilla):
-    """Una rama: un palo de 8 pixeles de grueso que se une a lo que tiene alrededor por sus seis caras, con la corteza de
-    su arbol (la veta va a lo largo de cada brazo) y la testa en las puntas."""
-    return M(id, es, en, None, formas="R", sonido="WOOD", mapa=mapa, semilla=semilla, dureza=1.5, herramienta="axe",
+GRUESOS = {"Q": 2, "R": 4, "U": 6}   # medio grueso (en dieciseisavos) de cada forma de rama: 4, 8 y 12 pixeles
+
+
+def RAMA(id, es, en, corteza, mapa, semilla, forma="R"):
+    """Una rama: un palo (Q ramita de 4 pixeles, R rama de 8, U rama gruesa de 12) que se une a lo que tiene alrededor por
+    sus seis caras, con la corteza de su arbol (la veta va a lo largo de cada brazo) y la testa en las puntas."""
+    return M(id, es, en, None, formas=forma, sonido="WOOD", mapa=mapa, semilla=semilla, dureza=1.5, herramienta="axe",
              lado_de=corteza, etiquetas=("logs",))
+
+
+def RACIMO(id, es, en, hojas, mapa, semilla, sonido="AZALEA_LEAVES"):
+    """Un racimo de hojas: tres o cuatro bultos de hojas de distinto tamano (no un cubo) con la textura de sus hojas, para
+    las puntas de las ramas y el borde de las copas."""
+    return M(id, es, en, None, formas="K", sonido=sonido, mapa=mapa, semilla=semilla, dureza=0.2, herramienta="hoe",
+             lado_de=hojas, etiquetas=("leaves",))
 
 
 def HOJAS(id, es, en, receta, mapa, semilla, sonido="AZALEA_LEAVES"):
@@ -745,32 +756,61 @@ MATERIALES = [
     CORTEZA("corteza_roble", "Corteza de roble", "Oak Bark", "surcos", "c_roble", "COLOR_BROWN", 401, base=0.52),
     TRONCO("tronco_roble", "Tronco de roble", "Oak Log", "corteza_roble", "m_roble", "c_roble", "COLOR_BROWN", 402),
     RAMA("rama_roble", "Rama de roble", "Oak Branch", "corteza_roble", "COLOR_BROWN", 403),
+    RAMA("ramita_roble", "Ramita de roble", "Oak Twig", "corteza_roble", "COLOR_BROWN", 406, forma="Q"),
+    RAMA("rama_gruesa_roble", "Rama gruesa de roble", "Thick Oak Branch", "corteza_roble", "COLOR_BROWN", 407,
+         forma="U"),
     HOJAS("hojas_roble", "Hojas de roble", "Oak Leaves", t_hojas("o_roble"), "PLANT", 404),
+    RACIMO("racimo_roble", "Racimo de hojas de roble", "Oak Leaf Cluster", "hojas_roble", "PLANT", 408),
     HOJAS("hojas_otono", "Hojas de roble otonal", "Autumn Oak Leaves", t_hojas("o_otono"), "COLOR_ORANGE", 405),
+    RACIMO("racimo_otono", "Racimo de hojas otonales", "Autumn Leaf Cluster", "hojas_otono", "COLOR_ORANGE", 409),
     CORTEZA("corteza_ceniza", "Corteza de fresno palido", "Pale Ash Bark", "lisa", "c_ceniza", "QUARTZ", 411, base=0.62),
     TRONCO("tronco_ceniza", "Tronco de fresno palido", "Pale Ash Log", "corteza_ceniza", "m_ceniza", "c_ceniza", "QUARTZ", 412),
     RAMA("rama_ceniza", "Rama de fresno palido", "Pale Ash Branch", "corteza_ceniza", "QUARTZ", 413),
+    RAMA("ramita_ceniza", "Ramita de fresno palido", "Pale Ash Twig", "corteza_ceniza", "QUARTZ", 416, forma="Q"),
+    RAMA("rama_gruesa_ceniza", "Rama gruesa de fresno palido", "Thick Pale Ash Branch", "corteza_ceniza", "QUARTZ", 417,
+         forma="U"),
     HOJAS("hojas_ceniza", "Hojas de fresno palido", "Pale Ash Leaves", t_hojas("o_ceniza"), "SAND", 414),
+    RACIMO("racimo_ceniza", "Racimo de hojas de fresno", "Pale Ash Leaf Cluster", "hojas_ceniza", "SAND", 418),
     CORTEZA("corteza_muerto", "Madera muerta", "Deadwood", "seca", "c_muerto", "COLOR_LIGHT_GRAY", 421, base=0.55),
     TRONCO("tronco_muerto", "Tronco muerto", "Dead Log", "corteza_muerto", "m_gris", "c_muerto", "COLOR_LIGHT_GRAY", 422),
     RAMA("rama_muerto", "Rama muerta", "Dead Branch", "corteza_muerto", "COLOR_LIGHT_GRAY", 423),
+    RAMA("ramita_muerto", "Ramita muerta", "Dead Twig", "corteza_muerto", "COLOR_LIGHT_GRAY", 426, forma="Q"),
+    RAMA("rama_gruesa_muerto", "Rama gruesa muerta", "Thick Dead Branch", "corteza_muerto", "COLOR_LIGHT_GRAY", 427,
+         forma="U"),
     CORTEZA("corteza_pantano", "Corteza de cipres musgoso", "Mossy Cypress Bark", "musgosa", "c_pantano", "COLOR_GREEN", 431,
             base=0.55, musgo=0.42),
     TRONCO("tronco_pantano", "Tronco de cipres musgoso", "Mossy Cypress Log", "corteza_pantano", "m_podrida", "c_pantano",
            "COLOR_GREEN", 432),
     RAMA("rama_pantano", "Rama de cipres musgoso", "Mossy Cypress Branch", "corteza_pantano", "COLOR_GREEN", 433),
+    RAMA("ramita_pantano", "Ramita de cipres musgoso", "Mossy Cypress Twig", "corteza_pantano", "COLOR_GREEN", 436,
+         forma="Q"),
+    RAMA("rama_gruesa_pantano", "Rama gruesa de cipres musgoso", "Thick Mossy Cypress Branch", "corteza_pantano",
+         "COLOR_GREEN", 437, forma="U"),
     HOJAS("hojas_pantano", "Hojas de cipres musgoso", "Mossy Cypress Leaves", t_hojas("o_pantano"), "COLOR_GREEN", 434),
+    RACIMO("racimo_pantano", "Racimo de hojas de cipres", "Mossy Cypress Leaf Cluster", "hojas_pantano", "COLOR_GREEN",
+           438),
     CORTEZA("corteza_sangre", "Corteza de sanguino", "Bloodwood Bark", "surcos", "c_sangre", "COLOR_RED", 441, base=0.55),
     TRONCO("tronco_sangre", "Tronco de sanguino", "Bloodwood Log", "corteza_sangre", "m_caoba", "c_sangre", "COLOR_RED", 442),
     RAMA("rama_sangre", "Rama de sanguino", "Bloodwood Branch", "corteza_sangre", "COLOR_RED", 443),
+    RAMA("ramita_sangre", "Ramita de sanguino", "Bloodwood Twig", "corteza_sangre", "COLOR_RED", 446, forma="Q"),
+    RAMA("rama_gruesa_sangre", "Rama gruesa de sanguino", "Thick Bloodwood Branch", "corteza_sangre", "COLOR_RED", 447,
+         forma="U"),
     HOJAS("hojas_sangre", "Hojas de sanguino", "Bloodwood Leaves", t_hojas("o_sangre"), "COLOR_RED", 444),
+    RACIMO("racimo_sangre", "Racimo de hojas de sanguino", "Bloodwood Leaf Cluster", "hojas_sangre", "COLOR_RED", 448),
     CORTEZA("corteza_pino", "Corteza de pino negro", "Black Pine Bark", "placas", "c_pino", "PODZOL", 451, base=0.55),
     TRONCO("tronco_pino", "Tronco de pino negro", "Black Pine Log", "corteza_pino", "m_pino", "c_pino", "PODZOL", 452),
     RAMA("rama_pino", "Rama de pino negro", "Black Pine Branch", "corteza_pino", "PODZOL", 453),
+    RAMA("ramita_pino", "Ramita de pino negro", "Black Pine Twig", "corteza_pino", "PODZOL", 456, forma="Q"),
+    RAMA("rama_gruesa_pino", "Rama gruesa de pino negro", "Thick Black Pine Branch", "corteza_pino", "PODZOL", 457,
+         forma="U"),
     HOJAS("hojas_pino", "Agujas de pino negro", "Black Pine Needles", t_hojas("o_pino", agujas=True, huecos=0.40, cuantas=300),
           "COLOR_GREEN", 454, sonido="GRASS"),
+    RACIMO("racimo_pino", "Racimo de agujas de pino", "Black Pine Needle Cluster", "hojas_pino", "COLOR_GREEN", 458,
+           sonido="GRASS"),
     HOJAS("hojas_pino_nevado", "Agujas nevadas", "Snowy Pine Needles",
           t_hojas("o_pino", agujas=True, huecos=0.40, cuantas=300, nevada=True), "SNOW", 455, sonido="GRASS"),
+    RACIMO("racimo_pino_nevado", "Racimo de agujas nevadas", "Snowy Pine Needle Cluster", "hojas_pino_nevado", "SNOW", 459,
+           sonido="GRASS"),
     COLGANTE("musgo_colgante", "Musgo colgante", "Hanging Moss", "colgante", "COLOR_GREEN", 461),
     COLGANTE("barba_gris", "Barba de viejo", "Old Man's Beard", "barba", "COLOR_LIGHT_GRAY", 462),
     LIANA("liana", "Liana", "Liana", t_liana("t_liana", "p_verde"), "PLANT", 463),
@@ -787,9 +827,9 @@ POR_ID = {m["id"]: m for m in MATERIALES}
 
 FORMAS = {"B": "", "E": "_escalera", "L": "_losa", "M": "_muro", "V": "_valla", "P": "_cancela", "D": "_puerta",
           "T": "_trampilla"}
-# las formas que son el material entero (sin sufijo en el id): columna, planta, capas de nieve, hielo, rama, hojas,
-# musgo que cuelga, liana y alfombra (hojarasca)
-SIN_SUFIJO = ("C", "X", "N", "H", "R", "O", "G", "Y", "A")
+# las formas que son el material entero (sin sufijo en el id): columna, planta, capas de nieve, hielo, ramas (de 8, 4 y
+# 12 pixeles), hojas, racimo, musgo que cuelga, liana y alfombra (hojarasca)
+SIN_SUFIJO = ("C", "X", "N", "H", "R", "Q", "U", "O", "K", "G", "Y", "A")
 NOMBRE_FORMA_ES = {"B": "{}", "E": "Escalera de {}", "L": "Losa de {}", "M": "Muro de {}", "V": "Valla de {}",
                    "P": "Cancela de {}", "D": "Puerta de {}", "T": "Trampilla de {}"}
 NOMBRE_FORMA_EN = {"B": "{}", "E": "{} Stairs", "L": "{} Slab", "M": "{} Wall", "V": "{} Fence", "P": "{} Fence Gate",
@@ -821,11 +861,14 @@ def texturas(m):
             out = {m["id"] + "_tapa": P.imagen(m["tapa"](s + 1))}
         else:
             out = {m["id"] + "_lado": P.imagen(m["lado"](s)), m["id"] + "_tapa": P.imagen(m["tapa"](s + 1))}
-    elif "R" in m["formas"]:
-        # la corteza de su arbol tumbada (la veta de lado, para los lados de los brazos)
+    elif m["formas"] == "R":
+        # la corteza de su arbol tumbada (la veta de lado, para los lados de los brazos; la usan tambien la ramita y la
+        # rama gruesa de su especie)
         c = POR_ID[m["lado_de"]]
         rgb = c["receta"](c["semilla"], c["semilla"])
         out = {m["id"] + "_h": _img(np.ascontiguousarray(np.rot90(rgb)))}
+    elif m["formas"] in ("Q", "U", "K"):
+        out = {}
     elif "N" not in m["formas"]:
         for v, n in enumerate(nombres(m)):
             r = m["receta"](s + 1000 * v, s)
@@ -1020,28 +1063,62 @@ def escribir_tronco(m):
     return [bid]
 
 
-def escribir_rama(m):
+# los bultos de cada modelo de racimo (en dieciseisavos)
+RACIMOS = [
+    [[2, 3, 2, 12, 12, 12], [6, 7, 5, 15, 15, 14], [1, 1, 7, 9, 9, 15], [7, 1, 1, 14, 7, 8]],
+    [[3, 1, 3, 13, 10, 13], [1, 6, 1, 10, 15, 10], [8, 5, 7, 15, 13, 15]],
+    [[4, 4, 1, 14, 13, 10], [1, 2, 6, 10, 11, 15], [6, 8, 6, 13, 15, 13], [9, 1, 9, 15, 6, 15]],
+]
+
+
+def escribir_racimo(m):
+    """Un racimo de hojas: tres modelos de bultos (cada uno en cuatro giros), con la textura de sus hojas."""
+    bid = m["id"]
+    h = POR_ID[m["lado_de"]]
+    tex = f"darkcraft:block/{h['id']}"
+    mb = os.path.join(ASSETS, "models", "block")
+    estados = []
+    for i, bultos in enumerate(RACIMOS):
+        nm = bid if i == 0 else f"{bid}_{i + 1}"
+        elementos = [{"from": b[:3], "to": b[3:], "faces": {c: {"texture": "#hojas"} for c in
+                                                             ("north", "south", "east", "west", "up", "down")}}
+                     for b in bultos]
+        j(os.path.join(mb, nm + ".json"), {"parent": "minecraft:block/block", "render_type": "minecraft:cutout_mipped",
+                                          "textures": {"hojas": tex, "particle": tex}, "elements": elementos})
+        for giro in (0, 90, 180, 270):
+            e = {"model": f"darkcraft:block/{nm}"}
+            if giro:
+                e["y"] = giro
+            estados.append(e)
+    j(os.path.join(ASSETS, "blockstates", bid + ".json"), {"variants": {"": estados}})
+    j(os.path.join(ASSETS, "models", "item", bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
+    return [bid]
+
+
+def escribir_rama(m, g=4):
     """Una rama (como la planta de coro): el nudo del centro (8 x 8 x 8) siempre y un brazo hacia cada cara unida. El brazo
     se escribe mirando al norte y se gira; sus lados de la izquierda y la derecha llevan la corteza tumbada (la veta a lo
-    largo del brazo), arriba y abajo la de siempre, y en la punta la testa del tronco de su arbol."""
+    largo del brazo) y arriba y abajo la de siempre; la testa del tronco de su arbol solo en el modelo del inventario."""
     bid = m["id"]
     sp = m["lado_de"][len("corteza_"):]
-    t = {"corteza": f"darkcraft:block/{m['lado_de']}", "corteza_h": f"darkcraft:block/{bid}_h",
+    t = {"corteza": f"darkcraft:block/{m['lado_de']}", "corteza_h": f"darkcraft:block/rama_{sp}_h",
          "testa": f"darkcraft:block/tronco_{sp}_tapa", "particle": f"darkcraft:block/{m['lado_de']}"}
     mb = os.path.join(ASSETS, "models", "block")
+    a, b = 8 - g, 8 + g
     caras_centro = {c: {"texture": "#corteza"} for c in ("north", "south", "east", "west", "up", "down")}
     j(os.path.join(mb, bid + "_centro.json"), {"parent": "minecraft:block/block", "textures": t,
-                                               "elements": [{"from": [4, 4, 4], "to": [12, 12, 12], "faces": caras_centro}]})
-    brazo = {"north": {"texture": "#testa", "uv": [4, 4, 12, 12], "cullface": "north"},
+                                               "elements": [{"from": [a, a, a], "to": [b, b, b], "faces": caras_centro}]})
+    # (la punta del brazo con corteza: solo se ve donde la rama se une a otra mas fina o a hojas: un reborde de corteza)
+    brazo = {"north": {"texture": "#corteza", "uv": [a, a, b, b], "cullface": "north"},
              "east": {"texture": "#corteza_h"}, "west": {"texture": "#corteza_h"},
              "up": {"texture": "#corteza"}, "down": {"texture": "#corteza"}}
     j(os.path.join(mb, bid + "_brazo.json"), {"parent": "minecraft:block/block", "textures": t,
-                                              "elements": [{"from": [4, 4, 0], "to": [12, 12, 4], "faces": brazo}]})
-    inv = {"north": {"texture": "#testa", "uv": [4, 4, 12, 12]}, "south": {"texture": "#testa", "uv": [4, 4, 12, 12]},
+                                              "elements": [{"from": [a, a, 0], "to": [b, b, a], "faces": brazo}]})
+    inv = {"north": {"texture": "#testa", "uv": [a, a, b, b]}, "south": {"texture": "#testa", "uv": [a, a, b, b]},
            "east": {"texture": "#corteza_h"}, "west": {"texture": "#corteza_h"},
            "up": {"texture": "#corteza"}, "down": {"texture": "#corteza"}}
     j(os.path.join(mb, bid + "_inventario.json"), {"parent": "minecraft:block/block", "textures": t,
-                                                   "elements": [{"from": [4, 4, 0], "to": [12, 12, 16], "faces": inv}]})
+                                                   "elements": [{"from": [a, a, 0], "to": [b, b, 16], "faces": inv}]})
     partes = [{"apply": {"model": f"darkcraft:block/{bid}_centro"}}]
     for lado, rot in (("north", {}), ("east", {"y": 90}), ("south", {"y": 180}), ("west", {"y": 270}), ("up", {"x": 270}),
                       ("down", {"x": 90})):
@@ -1060,8 +1137,10 @@ def escribir_material(m):
     ids = []
     if "C" in m["formas"] and m.get("lado_de"):
         return escribir_tronco(m)
-    if "R" in m["formas"]:
-        return escribir_rama(m)
+    if m["formas"] in GRUESOS:
+        return escribir_rama(m, GRUESOS[m["formas"]])
+    if m["formas"] == "K":
+        return escribir_racimo(m)
     if "O" in m["formas"]:
         modelos = []
         for n in nombres(m):
@@ -1275,7 +1354,7 @@ def etiquetas():
                 tags["wooden_trapdoors"].append(bid)
             elif f == "B" and "V" in m["formas"]:
                 tags["planks"].append(bid)
-            if f in ("B", "H", "N", "C", "R", "O", "Y"):
+            if f in ("B", "H", "N", "C", "R", "Q", "U", "O", "K", "Y"):
                 for e in m.get("etiquetas", ()):
                     tags[e].append(bid)
     t = os.path.join(DATA, "minecraft", "tags", "blocks")
@@ -1384,6 +1463,8 @@ def vista(carpeta, desde=0):
         elif "C" in m["formas"]:
             lado, tapa = tx[m["id"] + "_lado"], tx[m["id"] + "_tapa"]
             lista = [lado]
+        elif m["formas"] in ("Q", "U", "K"):
+            continue
         elif "R" in m["formas"]:
             lado = tapa = tx[m["id"] + "_h"]
             lista = [lado]
