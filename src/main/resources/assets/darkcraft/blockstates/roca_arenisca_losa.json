@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/roca_arenisca_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/roca_arenisca_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/roca_arenisca"
+      },
+      {
+        "model": "darkcraft:block/roca_arenisca_2"
+      },
+      {
+        "model": "darkcraft:block/roca_arenisca_3"
+      },
+      {
+        "model": "darkcraft:block/roca_arenisca_4"
+      }
+    ]
+  }
+}

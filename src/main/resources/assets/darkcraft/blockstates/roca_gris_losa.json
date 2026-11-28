@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/roca_gris_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/roca_gris_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/roca_gris"
+      },
+      {
+        "model": "darkcraft:block/roca_gris_2"
+      },
+      {
+        "model": "darkcraft:block/roca_gris_3"
+      },
+      {
+        "model": "darkcraft:block/roca_gris_4"
+      }
+    ]
+  }
+}

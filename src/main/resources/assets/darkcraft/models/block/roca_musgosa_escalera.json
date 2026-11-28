@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "darkcraft:block/roca_musgosa",
+    "top": "darkcraft:block/roca_musgosa",
+    "side": "darkcraft:block/roca_musgosa"
+  }
+}

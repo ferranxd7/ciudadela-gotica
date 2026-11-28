@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "darkcraft:block/roca_oscura",
+    "top": "darkcraft:block/roca_oscura",
+    "side": "darkcraft:block/roca_oscura"
+  }
+}

@@ -17,6 +17,14 @@
     "darkcraft:enlosado_muro",
     "darkcraft:piedra_tallada_muro",
     "darkcraft:mamposteria_muro",
-    "darkcraft:enlucido_muro"
+    "darkcraft:enlucido_muro",
+    "darkcraft:roca_gris_muro",
+    "darkcraft:roca_oscura_muro",
+    "darkcraft:roca_caliza_muro",
+    "darkcraft:roca_pizarra_muro",
+    "darkcraft:roca_arenisca_muro",
+    "darkcraft:roca_toba_muro",
+    "darkcraft:roca_musgosa_muro",
+    "darkcraft:pedregal_muro"
   ]
 }

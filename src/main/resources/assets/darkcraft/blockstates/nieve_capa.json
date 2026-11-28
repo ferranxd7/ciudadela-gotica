@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "layers=1": {
+      "model": "darkcraft:block/nieve_capa_2"
+    },
+    "layers=2": {
+      "model": "darkcraft:block/nieve_capa_4"
+    },
+    "layers=3": {
+      "model": "darkcraft:block/nieve_capa_6"
+    },
+    "layers=4": {
+      "model": "darkcraft:block/nieve_capa_8"
+    },
+    "layers=5": {
+      "model": "darkcraft:block/nieve_capa_10"
+    },
+    "layers=6": {
+      "model": "darkcraft:block/nieve_capa_12"
+    },
+    "layers=7": {
+      "model": "darkcraft:block/nieve_capa_14"
+    },
+    "layers=8": {
+      "model": "darkcraft:block/nieve"
+    }
+  }
+}

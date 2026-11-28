@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/roca_pizarra_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/roca_pizarra_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/roca_pizarra"
+      },
+      {
+        "model": "darkcraft:block/roca_pizarra_2"
+      },
+      {
+        "model": "darkcraft:block/roca_pizarra_3"
+      },
+      {
+        "model": "darkcraft:block/roca_pizarra_4"
+      }
+    ]
+  }
+}

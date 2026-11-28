@@ -1,0 +1,72 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/tierra_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/tierra_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/tierra"
+      },
+      {
+        "model": "darkcraft:block/tierra",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/tierra",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/tierra",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/tierra_2"
+      },
+      {
+        "model": "darkcraft:block/tierra_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/tierra_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/tierra_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/tierra_3"
+      },
+      {
+        "model": "darkcraft:block/tierra_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/tierra_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/tierra_3",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/tierra_4"
+      },
+      {
+        "model": "darkcraft:block/tierra_4",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/tierra_4",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/tierra_4",
+        "y": 270
+      }
+    ]
+  }
+}

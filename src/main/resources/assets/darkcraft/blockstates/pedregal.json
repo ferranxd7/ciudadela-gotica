@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/pedregal"
+      },
+      {
+        "model": "darkcraft:block/pedregal_2"
+      },
+      {
+        "model": "darkcraft:block/pedregal_3"
+      },
+      {
+        "model": "darkcraft:block/pedregal_4"
+      }
+    ]
+  }
+}

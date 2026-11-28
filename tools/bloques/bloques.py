@@ -20,6 +20,7 @@ from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pintor as P  # noqa: E402
 import madera as W  # noqa: E402
+import terreno as T  # noqa: E402
 
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RES = os.path.join(RAIZ, "src", "main", "resources")
@@ -82,6 +83,45 @@ R = {
     "teja": ["#200b06", "#2e1009", "#3d150c", "#4c1b0f", "#5b2112", "#6b2816", "#7a2f1a", "#8a371f", "#994026", "#a84a2e",
              "#b65537"],
     "liquen": ["#6e6a4c", "#7f7a57", "#908a62", "#a29b6e"],
+    # terreno (parte 8d)
+    "tierra": ["#130d09", "#1c140e", "#261b13", "#302218", "#3a2a1e", "#453224", "#503b2a", "#5c4431", "#684e38", "#755841"],
+    "tierra_seca": ["#2c2319", "#3a2f22", "#48392b", "#574535", "#665140", "#755e4b", "#846b57", "#937963", "#a2876f"],
+    "barro_t": ["#0e0b08", "#16110c", "#1e1810", "#271f15", "#30261a", "#3a2e20", "#443626", "#4f3f2d", "#a08f78"],
+    "turba": ["#0b0a07", "#12100b", "#19160f", "#211d14", "#2a2419", "#332b1e", "#3d3324", "#473b2a"],
+    "ceniza": ["#2a2826", "#3a3734", "#4b4743", "#5c5853", "#6e6964", "#807a75", "#928c86", "#a59f99", "#b8b2ab", "#cbc5be"],
+    "grava": ["#121110", "#1e1c1a", "#2b2825", "#383430", "#46413c", "#544e48", "#625b54", "#716962", "#80776f", "#90867d"],
+    "arena": ["#4a4232", "#5c523e", "#6f634b", "#827458", "#958666", "#a69774", "#b6a783", "#c5b692", "#d3c4a2"],
+    "arena_gris": ["#2d2c2a", "#3c3a37", "#4b4945", "#5b5853", "#6b6862", "#7c7872", "#8d8983", "#9e9a94"],
+    "arena_negra": ["#08080a", "#0f0f12", "#17171b", "#1f1f24", "#28282e", "#323239", "#3c3c44", "#47474f"],
+    "nieve": ["#7c8796", "#8d98a6", "#9fa9b6", "#b1bac5", "#c3cbd4", "#d4dbe2", "#e3e8ee", "#f0f3f6", "#fafcfd"],
+    "hielo": ["#3f5f7a", "#4d6f8b", "#5c809c", "#6c91ad", "#7ea2bc", "#91b3ca", "#a6c4d7", "#bbd4e3", "#d1e4ee", "#e8f2f7"],
+    "musgo_s": ["#141c0c", "#1c2711", "#243216", "#2d3e1b", "#364a21", "#405727", "#4b642e", "#567136", "#62803f"],
+    "h_palida": ["#2a2a1a", "#3a3923", "#4b492d", "#5c5a37", "#6d6a42", "#7e7b4d", "#8f8b59", "#a09c66", "#b1ac74", "#c1bc83"],
+    "h_verde": ["#0d1a0c", "#132411", "#1a2f16", "#213a1b", "#294621", "#315227", "#3a5f2e", "#446c35", "#4e793d", "#598745"],
+    "h_marchita": ["#1d190e", "#2a2413", "#372f19", "#453a1f", "#534526", "#61512d", "#6f5d35", "#7e6a3e", "#8c7747"],
+    "h_pantano": ["#10140b", "#171c0f", "#1f2514", "#272e19", "#30381e", "#3a4224", "#444c2a", "#4f5731", "#5a6238"],
+    "roca": ["#1a1918", "#252422", "#312f2c", "#3d3a37", "#4a4642", "#57534e", "#64605a", "#726d67", "#807a74", "#8f8982",
+             "#9e9790"],
+    "roca_oscura": ["#09090b", "#111114", "#19191d", "#222226", "#2b2b30", "#35353a", "#3f3f45", "#4a4a51", "#56565d"],
+    "caliza_n": ["#3c362d", "#4d463b", "#5f564a", "#71675a", "#83786a", "#95897a", "#a69a8b", "#b7ab9c", "#c7bcad", "#d6ccbe"],
+    "pizarra_n": ["#0e1012", "#16191c", "#1f2226", "#282c31", "#32363c", "#3c4148", "#474c54", "#525861", "#5e646e"],
+    "arenisca_n": ["#2f170e", "#3f2014", "#50291a", "#623321", "#743d28", "#86482f", "#985437", "#a96040", "#b96d4a", "#c87b55"],
+    "toba": ["#1e1a17", "#2b2622", "#38322d", "#463f39", "#544c45", "#635a52", "#72685f", "#81776d"],
+    # plantas
+    "p_palida": ["#3a3620", "#545030", "#6e6941", "#888252", "#a29b64", "#bab278", "#cfc78d"],
+    "p_verde": ["#13240f", "#1d3416", "#28451e", "#345627", "#406830", "#4d7a3a", "#5a8c45"],
+    "p_marchita": ["#2a2010", "#3d2f18", "#504020", "#64502a", "#786134", "#8b723f", "#9e844b"],
+    "p_helecho": ["#10200e", "#183015", "#21411d", "#2b5226", "#36642f", "#42763a", "#4f8946"],
+    "p_seco": ["#1f1712", "#2e231a", "#3d2f23", "#4d3c2d", "#5e4a38", "#6f5944", "#816950"],
+    "f_blanca": ["#8c8a86", "#b4b1ab", "#d6d3cc", "#f0eee8"],
+    "f_roja": ["#3e0a0a", "#6b1212", "#981c1a", "#c42e26"],
+    "f_azul": ["#1e2a4e", "#2e4274", "#4762a0", "#6a8cc8"],
+    "f_centro": ["#6b5a1c", "#a8902e", "#d8c048"],
+    "hongo_rojo": ["#2a0907", "#4a120d", "#6b1c14", "#8e281c", "#b03826", "#c95436"],
+    "hongo_palido": ["#4e463c", "#6a6052", "#877b6a", "#a49783", "#c0b49e"],
+    "pie_hongo": ["#5a5248", "#7a7064", "#9a8f81", "#bab0a1"],
+    "junco": ["#1a2410", "#263318", "#334320", "#41542a", "#4f6534", "#5e763f"],
+    "espiga": ["#1e120a", "#2e1c10", "#3f2716", "#51331e"],
 }
 RAMPAS = {k: P.Rampa(v) for k, v in R.items()}
 
@@ -334,6 +374,74 @@ def t_tejamanil(s, b):
     return con_junta(W.tejamanil(s, borde=b), "m_gris")
 
 
+# ------------------------------------------------------------------ el terreno (parte 8d)
+
+def t_suelo(funcion, rampa, tramado=0.6, **kw):
+    return lambda s, b: RAMPAS[rampa].pintar(funcion(s, **kw).v, tramado)
+
+
+def t_arena(rampa):
+    return lambda s, b: RAMPAS[rampa].pintar(T.arena(s, borde=b).v, 0.6)
+
+
+def t_grava(s, b):
+    return RAMPAS["grava"].pintar(T.grava(s, borde=b).v, 0.6)
+
+
+def t_ceniza(s, b):
+    L = T.ceniza(s)
+    rgb = RAMPAS["ceniza"].pintar(L.v, 0.6)
+    brasa = np.array([150.0, 52.0, 20.0])
+    return np.where(L.brasas[..., None], brasa, rgb)
+
+
+def t_hielo(s, b):
+    L = T.hielo(s)
+    rgb = RAMPAS["hielo"].pintar(L.v, 0.4)
+    return np.dstack([rgb, L.alfa])
+
+
+def t_hierba(rampa, base=0.42, tierra="tierra", nevada=False):
+    """Las dos caras de un bloque de hierba: arriba (briznas o nieve) y el lado (tierra con el fleco)."""
+    def f(s, b):
+        if nevada:
+            arriba = RAMPAS["nieve"].pintar(T.nieve(s).v, 0.6)
+        else:
+            arriba = RAMPAS[rampa].pintar(T.hierba_arriba(s, base=base).v, 0.5)
+        tl = T.tierra(s + 3)
+        G, mascara = T.hierba_lado(s, b, tl, base=0.62 if nevada else 0.55)
+        lado_t = RAMPAS[tierra].pintar(tl.v, 0.6)
+        lado_h = RAMPAS["nieve" if nevada else rampa].pintar(G.v, 0.5)
+        lado = np.where(mascara[..., None], lado_h, lado_t)
+        return {"arriba": arriba, "lado": lado}
+    return f
+
+
+def t_roca(rampa, **kw):
+    return lambda s, b: con_junta(T.roca(s, borde=b, **kw), rampa)
+
+
+def t_roca_musgosa(s, b):
+    L = T.roca(s, borde=b, base=0.5)
+    rgb = con_junta(L, "roca")
+    m = np.clip((0.65 * P.ruido(b + 81, base=4, octavas=4) + 0.35 * P.ruido(s + 82, base=16, octavas=2) - 0.5) * 6, 0, 1)
+    return capa_bultos(rgb, "musgo", m, s, base=0.42)
+
+
+def t_pizarra_n(s, b):
+    return RAMPAS["pizarra_n"].pintar(T.pizarra_natural(s, borde=b).v, 0.6)
+
+
+def t_pedregal(s, b):
+    L = P.cantos(s, cuantos=18, junta=1.2, redondez=5.0, varia=0.12, base=0.5, borde=b)
+    return con_junta(L, "roca", "tierra")
+
+
+def t_planta(funcion, *rampas, **kw):
+    """Una planta (con transparencia): rgba de 64 x 64."""
+    return lambda s, b: funcion(s, *[RAMPAS[r] for r in rampas], **kw)
+
+
 # ------------------------------------------------------------------ el catalogo
 
 def M(id, es, en, receta, formas="BELM", sonido="STONE", mapa="STONE", semilla=None, variantes=3, dureza=1.5,
@@ -351,6 +459,32 @@ def MADERA(id, es, en, rampa, mapa, juego, madera, semilla, base=0.55, formas="B
     return M(id, es, en, t_tablas(rampa, base=base, **kw), formas=formas, sonido="WOOD", mapa=mapa, semilla=semilla,
              dureza=2.0, herramienta="axe", juego=juego, madera=madera,
              extra=extra_madera(rampa, base=base, puerta="D" in formas, trampilla="T" in formas))
+
+
+def SUELO(id, es, en, receta, mapa, sonido, semilla, herramienta="shovel", girar=True, **kw):
+    """Un suelo: bloque y losa (para suavizar el terreno), cuatro variantes (giradas al azar, si no tiene nada que siga de
+    un bloque al otro)."""
+    return M(id, es, en, receta, formas="BL", sonido=sonido, mapa=mapa, semilla=semilla, dureza=0.6, herramienta=herramienta,
+             variantes=4, girar=girar, **kw)
+
+
+def HIERBA(id, es, en, receta, mapa, semilla, sonido="GRASS"):
+    """Un bloque de hierba: arriba, lado (con el fleco) y abajo la tierra; bloque y losa."""
+    return M(id, es, en, receta, formas="BL", sonido=sonido, mapa=mapa, semilla=semilla, dureza=0.6, herramienta="shovel",
+             variantes=4, girar=True, caras=True, abajo="tierra" if id != "hierba_pantano" else "turba",
+             etiquetas=("dirt",))
+
+
+def ROCA(id, es, en, receta, mapa, sonido, semilla, dureza=1.5):
+    """Roca natural: bloque, escalera, losa y muro; cuatro variantes que casan entre si (no se giran: los estratos y las
+    caras siguen de un bloque al otro)."""
+    return M(id, es, en, receta, formas="BELM", sonido=sonido, mapa=mapa, semilla=semilla, dureza=dureza, variantes=4)
+
+
+def PLANTA(id, es, en, receta, semilla, mapa="PLANT", sonido="GRASS"):
+    """Una planta en cruz (con transparencia), sin choque."""
+    return M(id, es, en, receta, formas="X", sonido=sonido, mapa=mapa, semilla=semilla, dureza=0.0, herramienta="hoe",
+             variantes=1)
 
 
 def VIGA(id, es, en, rampa, mapa, semilla, base=0.55):
@@ -426,6 +560,57 @@ MATERIALES = [
       mapa="COLOR_GREEN", semilla=234),
     M("tejado_tejamanil", "Tejado de tejamanil", "Wooden Shingle Roof", t_tejamanil, formas="BEL", sonido="WOOD",
       mapa="COLOR_GRAY", semilla=235, herramienta="axe"),
+    # ---- parte 8d: el terreno
+    SUELO("tierra", "Tierra", "Soil", t_suelo(T.tierra, "tierra"), "DIRT", "GRAVEL", 301, etiquetas=("dirt",)),
+    SUELO("tierra_seca", "Tierra cuarteada", "Cracked Earth", lambda s, b: RAMPAS["tierra_seca"].pintar(T.tierra_seca(s, borde=b).v, 0.6),
+          "DIRT", "GRAVEL", 302, etiquetas=("dirt",), girar=False),
+    SUELO("barro", "Barro", "Mud", t_suelo(T.barro, "barro_t"), "COLOR_BROWN", "MUD", 303, etiquetas=("dirt",)),
+    SUELO("turba", "Turba", "Peat", t_suelo(T.turba, "turba"), "COLOR_BROWN", "MUD", 304, etiquetas=("dirt",)),
+    SUELO("ceniza", "Ceniza", "Ash", t_ceniza, "COLOR_LIGHT_GRAY", "SAND", 305, etiquetas=("sand",)),
+    SUELO("grava", "Grava", "Gravel", t_grava, "STONE", "GRAVEL", 306),
+    SUELO("arena_palida", "Arena palida", "Pale Sand", t_arena("arena"), "SAND", "SAND", 307, etiquetas=("sand",), girar=False),
+    SUELO("arena_gris", "Arena gris", "Grey Sand", t_arena("arena_gris"), "COLOR_GRAY", "SAND", 308, etiquetas=("sand",),
+          girar=False),
+    SUELO("arena_negra", "Arena negra", "Black Sand", t_arena("arena_negra"), "COLOR_BLACK", "SAND", 309, etiquetas=("sand",),
+          girar=False),
+    SUELO("nieve", "Nieve", "Snow", t_suelo(T.nieve, "nieve"), "SNOW", "SNOW", 310, etiquetas=("snow",)),
+    SUELO("musgo", "Manto de musgo", "Moss Mat", t_suelo(T.musgo_suelo, "musgo_s"), "COLOR_GREEN", "MOSS", 311,
+          herramienta="hoe", etiquetas=("dirt",)),
+    M("nieve_capa", "Capa de nieve", "Snow Layer", None, formas="N", sonido="SNOW", mapa="SNOW", semilla=312,
+      herramienta="shovel", textura="nieve"),
+    M("hielo", "Hielo", "Ice", t_hielo, formas="H", sonido="GLASS", mapa="ICE", semilla=313, dureza=0.5, variantes=2,
+      girar=True, etiquetas=("ice",)),
+    HIERBA("hierba_palida", "Hierba palida", "Pale Grass", t_hierba("h_palida", base=0.46), "SAND", 321),
+    HIERBA("hierba_verde", "Hierba verde", "Green Grass", t_hierba("h_verde"), "GRASS", 322),
+    HIERBA("hierba_marchita", "Hierba marchita", "Withered Grass", t_hierba("h_marchita"), "COLOR_BROWN", 323),
+    HIERBA("hierba_pantano", "Hierba de pantano", "Swamp Grass", t_hierba("h_pantano", tierra="turba"), "COLOR_GREEN", 324),
+    HIERBA("hierba_nevada", "Hierba nevada", "Snowy Grass", t_hierba("nieve", nevada=True), "SNOW", 325, sonido="SNOW"),
+    ROCA("roca_gris", "Roca gris", "Grey Rock", t_roca("roca", base=0.52), "STONE", "STONE", 331),
+    ROCA("roca_oscura", "Roca oscura", "Dark Rock", t_roca("roca_oscura", base=0.5, poros=0.4), "COLOR_BLACK", "BASALT", 332,
+         dureza=2.0),
+    ROCA("roca_caliza", "Roca caliza", "Limestone Rock", t_roca("caliza_n", base=0.58, estratos=0.05), "SAND", "TUFF", 333),
+    ROCA("roca_pizarra", "Roca de pizarra", "Slate Rock", t_pizarra_n, "COLOR_GRAY", "DEEPSLATE", 334, dureza=2.0),
+    ROCA("roca_arenisca", "Roca arenisca", "Sandstone Rock", t_roca("arenisca_n", base=0.55, estratos=0.06), "COLOR_ORANGE",
+         "STONE", 335),
+    ROCA("roca_toba", "Toba volcanica", "Volcanic Tuff", t_roca("toba", base=0.5, poros=1.0, grietas=0.2), "COLOR_BROWN",
+         "TUFF", 336),
+    ROCA("roca_musgosa", "Roca musgosa", "Mossy Rock", t_roca_musgosa, "COLOR_GREEN", "STONE", 337),
+    ROCA("pedregal", "Pedregal", "Scree", t_pedregal, "STONE", "STONE", 338),
+    PLANTA("hierba_alta_palida", "Hierba alta palida", "Tall Pale Grass", t_planta(T.hierba_alta, "p_palida"), 341),
+    PLANTA("hierba_alta_verde", "Hierba alta verde", "Tall Green Grass", t_planta(T.hierba_alta, "p_verde"), 342),
+    PLANTA("hierba_alta_marchita", "Hierba alta marchita", "Tall Withered Grass", t_planta(T.hierba_alta, "p_marchita"), 343),
+    PLANTA("helecho", "Helecho", "Fern", t_planta(T.helecho, "p_helecho"), 344),
+    PLANTA("matorral_seco", "Matorral seco", "Dry Shrub", t_planta(T.matorral, "p_seco"), 345, mapa="COLOR_BROWN"),
+    PLANTA("flores_ceniza", "Flores de ceniza", "Ash Flowers", t_planta(T.flores, "p_palida", "f_blanca", "f_centro"), 346),
+    PLANTA("flores_sangre", "Flores de sangre", "Blood Flowers", t_planta(T.flores, "p_marchita", "f_roja", "f_centro"), 347,
+           mapa="COLOR_RED"),
+    PLANTA("flores_azules", "Flores de escarcha", "Frost Flowers", t_planta(T.flores, "p_verde", "f_azul", "f_centro"), 348,
+           mapa="COLOR_BLUE"),
+    PLANTA("hongos_rojos", "Hongos rojos", "Red Toadstools", t_planta(T.hongos, "hongo_rojo", "pie_hongo"), 349,
+           mapa="COLOR_RED", sonido="FUNGUS"),
+    PLANTA("hongos_palidos", "Hongos palidos", "Pale Toadstools", t_planta(T.hongos, "hongo_palido", "pie_hongo"), 350,
+           mapa="SAND", sonido="FUNGUS"),
+    PLANTA("juncos", "Juncos", "Reeds", t_planta(T.juncos, "junco", "espiga"), 351),
 ]
 
 FORMAS = {"B": "", "E": "_escalera", "L": "_losa", "M": "_muro", "V": "_valla", "P": "_cancela", "D": "_puerta",
@@ -452,10 +637,26 @@ def texturas(m):
     s = m["semilla"]
     if "C" in m["formas"]:
         return {m["id"] + "_lado": P.imagen(m["lado"](s)), m["id"] + "_tapa": P.imagen(m["tapa"](s + 1))}
-    out = {n: P.imagen(m["receta"](s + 1000 * v, s)) for v, n in enumerate(nombres(m))}
+    if "N" in m["formas"]:
+        return {}
+    out = {}
+    for v, n in enumerate(nombres(m)):
+        r = m["receta"](s + 1000 * v, s)
+        if isinstance(r, dict):
+            for cara, rgb in r.items():
+                out[n + "_" + cara] = _img(rgb)
+        else:
+            out[n] = _img(r)
     if m.get("extra"):
         out.update(m["extra"](m))
     return out
+
+
+def _img(r):
+    """rgb (alto, ancho, 3) o rgba (alto, ancho, 4) a imagen."""
+    if r.shape[2] == 4:
+        return P.imagen(r[..., :3], r[..., 3])
+    return P.imagen(r)
 
 
 # ------------------------------------------------------------------ JSON del juego
@@ -561,6 +762,39 @@ def estado_trampilla(id):
     return {"variants": v}
 
 
+def losa_caras(t, y0):
+    """Una losa de hierba (abajo o arriba): el lado coge la MITAD DE ARRIBA de su textura (asi se ve el fleco)."""
+    lados = {c: {"uv": [0, 0, 16, 8], "texture": "#side", "cullface": c} for c in ("north", "south", "west", "east")}
+    caras = dict(lados)
+    caras["up"] = {"uv": [0, 0, 16, 16], "texture": "#top"} if y0 == 0 else {"uv": [0, 0, 16, 16], "texture": "#top", "cullface": "up"}
+    caras["down"] = {"uv": [0, 0, 16, 16], "texture": "#bottom", "cullface": "down"} if y0 == 0 else {"uv": [0, 0, 16, 16], "texture": "#bottom"}
+    return {"parent": "minecraft:block/block", "textures": dict(t, particle=t["side"]),
+            "elements": [{"from": [0, y0, 0], "to": [16, y0 + 8, 16], "faces": caras}]}
+
+
+def escribir_capa(m):
+    """Las capas de nieve (1-8): la textura del material `textura`; la de 8 es el bloque entero."""
+    bid = m["id"]
+    tex = f"darkcraft:block/{m['textura']}"
+    mb = os.path.join(ASSETS, "models", "block")
+    v = {}
+    for capas in range(1, 9):
+        h = capas * 2
+        if capas == 8:
+            v["layers=8"] = {"model": f"darkcraft:block/{m['textura']}"}
+            continue
+        lados = {c: {"uv": [0, 16 - h, 16, 16], "texture": "#texture", "cullface": c} for c in ("north", "south", "west", "east")}
+        caras = dict(lados, up={"uv": [0, 0, 16, 16], "texture": "#texture"},
+                     down={"uv": [0, 0, 16, 16], "texture": "#texture", "cullface": "down"})
+        j(os.path.join(mb, f"{bid}_{h}.json"), {"parent": "minecraft:block/thin_block" if capas == 1 else "minecraft:block/block",
+                                               "textures": {"particle": tex, "texture": tex},
+                                               "elements": [{"from": [0, 0, 0], "to": [16, h, 16], "faces": caras}]})
+        v[f"layers={capas}"] = {"model": f"darkcraft:block/{bid}_{h}"}
+    j(os.path.join(ASSETS, "blockstates", bid + ".json"), {"variants": v})
+    j(os.path.join(ASSETS, "models", "item", bid + ".json"), {"parent": f"darkcraft:block/{bid}_2"})
+    return [bid]
+
+
 def escribir_material(m):
     bid = m["id"]
     tex = f"darkcraft:block/{bid}"
@@ -578,11 +812,35 @@ def escribir_material(m):
             "axis=x": {"model": f"darkcraft:block/{bid}_tumbada", "x": 90, "y": 90}}})
         j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
         return [bid]
+    if "N" in m["formas"]:
+        return escribir_capa(m)
+    if "X" in m["formas"]:
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/cross", "textures": {"cross": tex},
+                                           "render_type": "minecraft:cutout"})
+        j(os.path.join(bs, bid + ".json"), {"variants": {"": {"model": f"darkcraft:block/{bid}"}}})
+        j(os.path.join(mi, bid + ".json"), {"parent": "minecraft:item/generated", "textures": {"layer0": tex}})
+        return [bid]
     pesos = m.get("pesos")
-    enteros = [dict({"model": f"darkcraft:block/{n}"}, **({"weight": pesos[i]} if pesos else {})) for i, n in enumerate(nombres(m))]
-    if "B" in m["formas"]:
+    enteros = []
+    for i, n in enumerate(nombres(m)):
+        for giro in ((0, 90, 180, 270) if m.get("girar") else (0,)):
+            e = {"model": f"darkcraft:block/{n}"}
+            if giro:
+                e["y"] = giro
+            if pesos:
+                e["weight"] = pesos[i]
+            enteros.append(e)
+    if "B" in m["formas"] or "H" in m["formas"]:
         for n in nombres(m):
-            j(os.path.join(mb, n + ".json"), {"parent": "minecraft:block/cube_all", "textures": {"all": f"darkcraft:block/{n}"}})
+            if m.get("caras"):
+                mod = {"parent": "minecraft:block/cube_bottom_top", "textures": {
+                    "top": f"darkcraft:block/{n}_arriba", "side": f"darkcraft:block/{n}_lado",
+                    "bottom": f"darkcraft:block/{m['abajo']}"}}
+            else:
+                mod = {"parent": "minecraft:block/cube_all", "textures": {"all": f"darkcraft:block/{n}"}}
+            if "H" in m["formas"]:
+                mod["render_type"] = "minecraft:translucent"
+            j(os.path.join(mb, n + ".json"), mod)
         j(os.path.join(bs, bid + ".json"), {"variants": {"": enteros if len(enteros) > 1 else enteros[0]}})
         j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
         ids.append(bid)
@@ -595,7 +853,18 @@ def escribir_material(m):
         j(os.path.join(bs, e + ".json"), estado_escalera(f"darkcraft:block/{e}"))
         j(os.path.join(mi, e + ".json"), {"parent": f"darkcraft:block/{e}"})
         ids.append(e)
-    if "L" in m["formas"]:
+    if "L" in m["formas"] and m.get("caras"):
+        l = bid + "_losa"
+        t = {"top": tex + "_arriba", "side": tex + "_lado", "bottom": f"darkcraft:block/{m['abajo']}"}
+        j(os.path.join(mb, l + ".json"), losa_caras(t, 0))
+        j(os.path.join(mb, l + "_arriba.json"), losa_caras(t, 8))
+        j(os.path.join(bs, l + ".json"), {"variants": {
+            "type=bottom": {"model": f"darkcraft:block/{l}"},
+            "type=top": {"model": f"darkcraft:block/{l}_arriba"},
+            "type=double": enteros if len(enteros) > 1 else enteros[0]}})
+        j(os.path.join(mi, l + ".json"), {"parent": f"darkcraft:block/{l}"})
+        ids.append(l)
+    elif "L" in m["formas"]:
         l = bid + "_losa"
         t = {"bottom": tex, "top": tex, "side": tex}
         j(os.path.join(mb, l + ".json"), {"parent": "minecraft:block/slab", "textures": t})
@@ -681,12 +950,13 @@ def etiquetas():
     """Las etiquetas de Minecraft que necesitan: los muros se unen entre si y las vallas de madera tambien (`fences` y
     `wooden_fences`); escaleras, losas, puertas y trampillas (las de madera, en las suyas); y con que se rompen."""
     tags = {k: [] for k in ("walls", "stairs", "slabs", "fences", "wooden_fences", "fence_gates", "doors", "wooden_doors",
-                            "trapdoors", "wooden_trapdoors", "wooden_stairs", "wooden_slabs", "planks", "pickaxe", "axe")}
+                            "trapdoors", "wooden_trapdoors", "wooden_stairs", "wooden_slabs", "planks", "pickaxe", "axe",
+                            "shovel", "hoe", "dirt", "sand", "snow", "ice")}
     for m in MATERIALES:
         b = "darkcraft:" + m["id"]
         madera = m["herramienta"] == "axe"
         for f in m["formas"]:
-            bid = b + ("" if f == "C" else FORMAS[f])
+            bid = b + ("" if f in ("C", "X", "N", "H") else FORMAS[f])
             tags[m["herramienta"]].append(bid)
             if f == "E":
                 tags["stairs"].append(bid)
@@ -711,10 +981,13 @@ def etiquetas():
                 tags["wooden_trapdoors"].append(bid)
             elif f == "B" and "V" in m["formas"]:
                 tags["planks"].append(bid)
+            if f in ("B", "H", "N"):
+                for e in m.get("etiquetas", ()):
+                    tags[e].append(bid)
     t = os.path.join(DATA, "minecraft", "tags", "blocks")
     ti = os.path.join(DATA, "minecraft", "tags", "items")
     for k, v in tags.items():
-        if k in ("pickaxe", "axe"):
+        if k in ("pickaxe", "axe", "shovel", "hoe"):
             j(os.path.join(t, "mineable", k + ".json"), {"replace": False, "values": v})
             continue
         j(os.path.join(t, k + ".json"), {"replace": False, "values": v})
@@ -725,7 +998,7 @@ def textos():
     es, en = {}, {}
     for m in MATERIALES:
         for f in m["formas"]:
-            if f == "C":
+            if f in ("C", "X", "N", "H"):
                 es["block.darkcraft." + m["id"]] = m["es"]
                 en["block.darkcraft." + m["id"]] = m["en"]
                 continue
@@ -804,17 +1077,31 @@ def vista(carpeta, desde=0):
     os.makedirs(carpeta, exist_ok=True)
     tarjetas = []
     for m in MATERIALES[desde:]:
+        if "N" in m["formas"]:
+            continue
         tx = texturas(m)
         if "C" in m["formas"]:
             lado, tapa = tx[m["id"] + "_lado"], tx[m["id"] + "_tapa"]
+            lista = [lado]
+        elif m.get("caras"):
+            lado, tapa = tx[m["id"] + "_lado"], tx[m["id"] + "_arriba"]
+            lista = [tx[n + "_arriba"] for n in nombres(m)]
+        elif "X" in m["formas"]:
+            fondo = Image.new("RGBA", (64, 64), (52, 48, 44, 255))
+            fondo.alpha_composite(tx[m["id"]])
+            lado = tapa = fondo
+            lista = [fondo]
         else:
             lado = tapa = tx[m["id"]]
+            lista = [tx[n] for n in nombres(m)]
         rng = np.random.default_rng(7)
-        lista = [tx[n] for n in (nombres(m) if "C" not in m["formas"] else [m["id"] + "_lado"])]
         rep = Image.new("RGBA", (256, 256))
         for a in range(4):
             for b in range(4):
-                rep.paste(lista[int(rng.integers(0, len(lista)))], (a * 64, b * 64))
+                pieza = lista[int(rng.integers(0, len(lista)))]
+                if m.get("girar"):
+                    pieza = pieza.rotate(90 * int(rng.integers(0, 4)))
+                rep.paste(pieza, (a * 64, b * 64))
         cb = cubo(tapa, lado, s=2)
         extra = []
         if m["id"] + "_puerta_abajo" in tx:

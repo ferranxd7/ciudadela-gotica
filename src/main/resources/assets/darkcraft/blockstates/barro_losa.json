@@ -1,0 +1,72 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/barro_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/barro_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/barro"
+      },
+      {
+        "model": "darkcraft:block/barro",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/barro",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/barro",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/barro_2"
+      },
+      {
+        "model": "darkcraft:block/barro_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/barro_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/barro_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/barro_3"
+      },
+      {
+        "model": "darkcraft:block/barro_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/barro_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/barro_3",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/barro_4"
+      },
+      {
+        "model": "darkcraft:block/barro_4",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/barro_4",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/barro_4",
+        "y": 270
+      }
+    ]
+  }
+}

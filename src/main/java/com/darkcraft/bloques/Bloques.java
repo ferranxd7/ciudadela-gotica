@@ -12,13 +12,16 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.HalfTransparentBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -36,7 +39,9 @@ import java.util.function.Supplier;
  * {@code tools/bloques/bloques.py} junto con sus texturas de 64 x 64, estados, modelos, botin, etiquetas y nombres) con
  * todas sus formas: el bloque entero ({@code <id>}, con variantes de textura al azar), la escalera ({@code _escalera}), la
  * losa ({@code _losa}), el muro ({@code _muro}), la valla ({@code _valla}), la cancela ({@code _cancela}), la puerta
- * ({@code _puerta}) y la trampilla ({@code _trampilla}); columnas y vigas son un bloque con eje ({@code RotatedPillarBlock}).
+ * ({@code _puerta}) y la trampilla ({@code _trampilla}); columnas y vigas son un bloque con eje ({@code RotatedPillarBlock});
+ * las plantas ({@link Planta}), las capas de nieve ({@code SnowLayerBlock}) y el hielo ({@code HalfTransparentBlock}) van
+ * sin sufijo.
  * Todos con su objeto y en la pestana del creativo "Dark Craft · Bloques".
  */
 public final class Bloques {
@@ -82,6 +87,27 @@ public final class Bloques {
         FORMAS.put(m.id(), ids);
         if (f.indexOf('C') >= 0) {
             reg(ids, m.id(), () -> new RotatedPillarBlock(props(m)));
+            return;
+        }
+        if (f.indexOf('X') >= 0) {
+            // una planta: cruz sin choque, se rompe al instante, se mueve un poco en cada sitio
+            reg(ids, m.id(), () -> new Planta(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido()).replaceable()
+                    .noCollission().instabreak().offsetType(BlockBehaviour.OffsetType.XZ).ignitedByLava()
+                    .pushReaction(PushReaction.DESTROY)));
+            return;
+        }
+        if (f.indexOf('N') >= 0) {
+            // capas de nieve (1-8), como las del juego
+            reg(ids, m.id(), () -> new SnowLayerBlock(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido())
+                    .replaceable().forceSolidOff().randomTicks().strength(0.1F)
+                    .isViewBlocking((st, l, p) -> st.getValue(SnowLayerBlock.LAYERS) >= 8).pushReaction(PushReaction.DESTROY)));
+            return;
+        }
+        if (f.indexOf('H') >= 0) {
+            // hielo: translucido y resbaladizo (no se derrite en agua: es un bloque como otro)
+            reg(ids, m.id(), () -> new HalfTransparentBlock(props(m).friction(0.98F).noOcclusion()
+                    .isValidSpawn((st, l, p, t) -> false).isRedstoneConductor((st, l, p) -> false)
+                    .isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false)));
             return;
         }
         RegistryObject<Block> base = reg(ids, m.id(), () -> new Block(props(m)));

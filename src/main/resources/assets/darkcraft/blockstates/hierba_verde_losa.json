@@ -1,0 +1,72 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/hierba_verde_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/hierba_verde_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/hierba_verde"
+      },
+      {
+        "model": "darkcraft:block/hierba_verde",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_verde",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_verde",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_verde_2"
+      },
+      {
+        "model": "darkcraft:block/hierba_verde_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_verde_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_verde_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_verde_3"
+      },
+      {
+        "model": "darkcraft:block/hierba_verde_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_verde_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_verde_3",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_verde_4"
+      },
+      {
+        "model": "darkcraft:block/hierba_verde_4",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_verde_4",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_verde_4",
+        "y": 270
+      }
+    ]
+  }
+}

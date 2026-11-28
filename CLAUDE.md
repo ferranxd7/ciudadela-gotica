@@ -4709,6 +4709,36 @@ Respuestas 45-48 del plan nuevo (cero bloques de Minecraft, todas las formas, te
   una trampilla en el suelo y otra abierta como postigo; capturas `cliente_bq01..11` (de cuatro en cuatro) y
   `bq12..17` de cerca (musgo, marmol negro, tallada, la puerta de roble, el entramado en aspa y el tejado de escamas).
 
+### Plan nuevo, parte 8d: los bloques nuevos, tercera tanda (el terreno)
+
+- **El pintor del terreno** (`tools/bloques/terreno.py`): en el terreno hay muchisimos bloques iguales seguidos, asi que
+  nada de formas grandes dentro de un bloque (se veria la cuadricula): detalle de 4-16 pixeles. `tierra` (terrones,
+  raices, piedrecitas que nunca cruzan el borde), `tierra_seca` (placas cuarteadas; las de cerca del borde, comunes),
+  `barro` (charquitos que brillan), `turba` (fibras), `ceniza` (carbonillas y brasas apagadas), `grava`, `arena` (ondas del
+  viento de la semilla comun: siguen de un bloque al otro), `nieve`, `hielo` (con transparencia), `musgo_suelo`,
+  `hierba_arriba` (matas y claros, briznas con la punta clara) y `hierba_lado` (la tierra con el fleco de hierba que
+  cuelga; el largo del fleco en cada columna es comun a las variantes: casa con el bloque de al lado), `roca` (bultos
+  suaves con costuras apenas marcadas y algunas grietas, manchas grandes, estratos, poros), `pizarra_natural` (capas
+  finas onduladas) y las plantas con transparencia (`hierba_alta`, `helecho`, `matorral`, `flores`, `hongos`, `juncos`).
+- **Formas nuevas**: X planta (`bloques/Planta`, un `BushBlock`: cruz con `render_type` cutout, sin choque, se rompe al
+  instante, se mueve un poco en cada sitio; se pone sobre tierra, arena o cualquier cara firme), N capas de nieve
+  (`SnowLayerBlock`, ocho alturas con la textura de `nieve`; la de 8 es el bloque entero) y H hielo
+  (`HalfTransparentBlock`, translucido y resbaladizo). Los bloques de hierba (`caras`) son `cube_bottom_top`: arriba
+  `<variante>_arriba`, el lado `<variante>_lado` y abajo la tierra; sus losas tienen modelo propio (`losa_caras`: el lado
+  coge la mitad de ARRIBA de la textura, asi se ve el fleco). **Variantes giradas** (`girar`): cada variante en cuatro
+  giros al azar (`y` 0/90/180/270), salvo lo que tiene que seguir de un bloque a otro (arenas, tierra cuarteada, roca).
+- **Etiquetas**: `minecraft:dirt` (tierras, turba, musgo y hierbas), `sand` (arenas y ceniza), `snow`, `ice`,
+  `mineable/shovel` y `mineable/hoe` (plantas y musgo).
+- **Tercera tanda** (37 materiales, 77 bloques; ya son 80 materiales y 221 bloques): tierra, tierra cuarteada, barro,
+  turba, ceniza, grava, arena palida, gris y negra, nieve y manto de musgo (bloque y losa), la capa de nieve, el hielo,
+  cinco hierbas (palida, verde, marchita, de pantano y nevada; bloque y losa), ocho rocas (gris, oscura, caliza, pizarra,
+  arenisca, toba, musgosa y pedregal; bloque, escalera, losa y muro) y once plantas (hierba alta palida, verde y marchita,
+  helecho, matorral seco, flores de ceniza, de sangre y de escarcha, hongos rojos y palidos, juncos).
+- Pruebas: servidor, la linea `Bloques 8b: ...` (tambien pala y azada); cliente, en el muestrario las plantas en un
+  parche de 4 x 3 sobre hierba, las ocho alturas de la nieve y los suelos tambien de suelo delante; capturas
+  `cliente_bq01..20` (de cuatro en cuatro) y `bq21..30` de cerca (las de antes y la hierba, la roca, las flores y los hongos,
+  mirando hacia abajo).
+
 ## Compilar, probar y publicar
 
 - La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (sin mods de decoracion desde la 8a) y un cliente con capturas

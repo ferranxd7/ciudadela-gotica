@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/tierra_seca_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/tierra_seca_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/tierra_seca"
+      },
+      {
+        "model": "darkcraft:block/tierra_seca_2"
+      },
+      {
+        "model": "darkcraft:block/tierra_seca_3"
+      },
+      {
+        "model": "darkcraft:block/tierra_seca_4"
+      }
+    ]
+  }
+}

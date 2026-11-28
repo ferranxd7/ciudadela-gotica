@@ -1,0 +1,72 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/hierba_palida_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/hierba_palida_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/hierba_palida"
+      },
+      {
+        "model": "darkcraft:block/hierba_palida",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_palida",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_palida",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_palida_2"
+      },
+      {
+        "model": "darkcraft:block/hierba_palida_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_palida_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_palida_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_palida_3"
+      },
+      {
+        "model": "darkcraft:block/hierba_palida_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_palida_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_palida_3",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_palida_4"
+      },
+      {
+        "model": "darkcraft:block/hierba_palida_4",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_palida_4",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_palida_4",
+        "y": 270
+      }
+    ]
+  }
+}

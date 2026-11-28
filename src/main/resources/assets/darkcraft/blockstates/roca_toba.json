@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/roca_toba"
+      },
+      {
+        "model": "darkcraft:block/roca_toba_2"
+      },
+      {
+        "model": "darkcraft:block/roca_toba_3"
+      },
+      {
+        "model": "darkcraft:block/roca_toba_4"
+      }
+    ]
+  }
+}

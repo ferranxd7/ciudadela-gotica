@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "darkcraft:block/barro",
+    "top": "darkcraft:block/barro",
+    "side": "darkcraft:block/barro"
+  }
+}

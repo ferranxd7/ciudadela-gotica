@@ -1,0 +1,66 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/hierba_pantano"
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano_2"
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano_3"
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano_3",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano_4"
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano_4",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano_4",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_pantano_4",
+        "y": 270
+      }
+    ]
+  }
+}

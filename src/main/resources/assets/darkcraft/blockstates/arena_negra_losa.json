@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/arena_negra_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/arena_negra_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/arena_negra"
+      },
+      {
+        "model": "darkcraft:block/arena_negra_2"
+      },
+      {
+        "model": "darkcraft:block/arena_negra_3"
+      },
+      {
+        "model": "darkcraft:block/arena_negra_4"
+      }
+    ]
+  }
+}

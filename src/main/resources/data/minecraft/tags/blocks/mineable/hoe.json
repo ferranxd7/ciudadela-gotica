@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "darkcraft:musgo",
+    "darkcraft:musgo_losa",
+    "darkcraft:hierba_alta_palida",
+    "darkcraft:hierba_alta_verde",
+    "darkcraft:hierba_alta_marchita",
+    "darkcraft:helecho",
+    "darkcraft:matorral_seco",
+    "darkcraft:flores_ceniza",
+    "darkcraft:flores_sangre",
+    "darkcraft:flores_azules",
+    "darkcraft:hongos_rojos",
+    "darkcraft:hongos_palidos",
+    "darkcraft:juncos"
+  ]
+}

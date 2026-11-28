@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/roca_oscura_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/roca_oscura_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/roca_oscura"
+      },
+      {
+        "model": "darkcraft:block/roca_oscura_2"
+      },
+      {
+        "model": "darkcraft:block/roca_oscura_3"
+      },
+      {
+        "model": "darkcraft:block/roca_oscura_4"
+      }
+    ]
+  }
+}

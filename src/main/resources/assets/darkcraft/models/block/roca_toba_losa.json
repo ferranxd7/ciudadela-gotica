@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "darkcraft:block/roca_toba",
+    "top": "darkcraft:block/roca_toba",
+    "side": "darkcraft:block/roca_toba"
+  }
+}

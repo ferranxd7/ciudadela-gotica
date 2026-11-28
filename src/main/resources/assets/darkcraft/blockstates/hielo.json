@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/hielo"
+      },
+      {
+        "model": "darkcraft:block/hielo",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hielo",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hielo",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hielo_2"
+      },
+      {
+        "model": "darkcraft:block/hielo_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hielo_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hielo_2",
+        "y": 270
+      }
+    ]
+  }
+}

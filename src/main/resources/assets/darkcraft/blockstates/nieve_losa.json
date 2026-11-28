@@ -1,0 +1,72 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/nieve_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/nieve_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/nieve"
+      },
+      {
+        "model": "darkcraft:block/nieve",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/nieve",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/nieve",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/nieve_2"
+      },
+      {
+        "model": "darkcraft:block/nieve_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/nieve_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/nieve_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/nieve_3"
+      },
+      {
+        "model": "darkcraft:block/nieve_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/nieve_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/nieve_3",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/nieve_4"
+      },
+      {
+        "model": "darkcraft:block/nieve_4",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/nieve_4",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/nieve_4",
+        "y": 270
+      }
+    ]
+  }
+}

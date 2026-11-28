@@ -1,0 +1,66 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/grava"
+      },
+      {
+        "model": "darkcraft:block/grava",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/grava",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/grava",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/grava_2"
+      },
+      {
+        "model": "darkcraft:block/grava_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/grava_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/grava_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/grava_3"
+      },
+      {
+        "model": "darkcraft:block/grava_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/grava_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/grava_3",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/grava_4"
+      },
+      {
+        "model": "darkcraft:block/grava_4",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/grava_4",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/grava_4",
+        "y": 270
+      }
+    ]
+  }
+}

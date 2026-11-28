@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "darkcraft:block/roca_arenisca",
+    "top": "darkcraft:block/roca_arenisca",
+    "side": "darkcraft:block/roca_arenisca"
+  }
+}

@@ -789,7 +789,7 @@ public final class CiTest {
      * mas; el yelmo puesto (hueco 39) tambien se mejora; lo que suman sus atributos (defensa y dureza), su ficha y su linea; lo
      * que resiste el conjunto entero a +0 y a +5; y que las armas siguen llegando a +9.
      */
-    /** Los bloques nuevos (partes 8b y 8c): cuantos hay, que cada uno tiene su botin, que escaleras, losas, muros, vallas,
+    /** Los bloques nuevos (partes 8b, 8c y 8d): cuantos hay, que cada uno tiene su botin, que escaleras, losas, muros, vallas,
      *  cancelas, puertas y trampillas estan en sus etiquetas de Minecraft (asi se unen muros y vallas) y que rotos con un
      *  pico sueltan lo suyo (la losa doble, dos; la puerta, una por su mitad de abajo). */
     private static void bloques8b(MinecraftServer server, ServerLevel m, PrintWriter log) {
@@ -812,7 +812,8 @@ public final class CiTest {
                     && !(id.endsWith("_cancela") && !st.is(net.minecraft.tags.BlockTags.FENCE_GATES))
                     && !(id.endsWith("_puerta") && !st.is(net.minecraft.tags.BlockTags.DOORS))
                     && !(id.endsWith("_trampilla") && !st.is(net.minecraft.tags.BlockTags.TRAPDOORS))
-                    && (st.is(net.minecraft.tags.BlockTags.MINEABLE_WITH_PICKAXE) || st.is(net.minecraft.tags.BlockTags.MINEABLE_WITH_AXE));
+                    && (st.is(net.minecraft.tags.BlockTags.MINEABLE_WITH_PICKAXE) || st.is(net.minecraft.tags.BlockTags.MINEABLE_WITH_AXE)
+                    || st.is(net.minecraft.tags.BlockTags.MINEABLE_WITH_SHOVEL) || st.is(net.minecraft.tags.BlockTags.MINEABLE_WITH_HOE));
             if (!etiq) {
                 malEtiqueta++;
                 if (malos.size() < 6) malos.add("etiquetas " + id);

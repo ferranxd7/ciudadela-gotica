@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/roca_caliza"
+      },
+      {
+        "model": "darkcraft:block/roca_caliza_2"
+      },
+      {
+        "model": "darkcraft:block/roca_caliza_3"
+      },
+      {
+        "model": "darkcraft:block/roca_caliza_4"
+      }
+    ]
+  }
+}

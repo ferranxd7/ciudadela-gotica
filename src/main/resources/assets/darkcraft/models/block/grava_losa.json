@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "darkcraft:block/grava",
+    "top": "darkcraft:block/grava",
+    "side": "darkcraft:block/grava"
+  }
+}

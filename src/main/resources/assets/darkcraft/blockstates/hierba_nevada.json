@@ -1,0 +1,66 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/hierba_nevada"
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada_2"
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada_3"
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada_3",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada_4"
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada_4",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada_4",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_nevada_4",
+        "y": 270
+      }
+    ]
+  }
+}

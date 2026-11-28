@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/arena_palida_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/arena_palida_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/arena_palida"
+      },
+      {
+        "model": "darkcraft:block/arena_palida_2"
+      },
+      {
+        "model": "darkcraft:block/arena_palida_3"
+      },
+      {
+        "model": "darkcraft:block/arena_palida_4"
+      }
+    ]
+  }
+}

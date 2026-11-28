@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "darkcraft:block/juncos"
+  },
+  "render_type": "minecraft:cutout"
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "darkcraft:block/hierba_alta_marchita"
+  },
+  "render_type": "minecraft:cutout"
+}

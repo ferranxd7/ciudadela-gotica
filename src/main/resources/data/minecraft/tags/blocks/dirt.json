@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "darkcraft:tierra",
+    "darkcraft:tierra_seca",
+    "darkcraft:barro",
+    "darkcraft:turba",
+    "darkcraft:musgo",
+    "darkcraft:hierba_palida",
+    "darkcraft:hierba_verde",
+    "darkcraft:hierba_marchita",
+    "darkcraft:hierba_pantano",
+    "darkcraft:hierba_nevada"
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/turba"
+      },
+      {
+        "model": "darkcraft:block/turba",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/turba",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/turba",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/turba_2"
+      },
+      {
+        "model": "darkcraft:block/turba_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/turba_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/turba_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/turba_3"
+      },
+      {
+        "model": "darkcraft:block/turba_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/turba_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/turba_3",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/turba_4"
+      },
+      {
+        "model": "darkcraft:block/turba_4",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/turba_4",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/turba_4",
+        "y": 270
+      }
+    ]
+  }
+}

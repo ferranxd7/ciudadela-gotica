@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/tierra_seca"
+      },
+      {
+        "model": "darkcraft:block/tierra_seca_2"
+      },
+      {
+        "model": "darkcraft:block/tierra_seca_3"
+      },
+      {
+        "model": "darkcraft:block/tierra_seca_4"
+      }
+    ]
+  }
+}

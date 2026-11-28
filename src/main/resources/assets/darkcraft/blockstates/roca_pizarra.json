@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/roca_pizarra"
+      },
+      {
+        "model": "darkcraft:block/roca_pizarra_2"
+      },
+      {
+        "model": "darkcraft:block/roca_pizarra_3"
+      },
+      {
+        "model": "darkcraft:block/roca_pizarra_4"
+      }
+    ]
+  }
+}

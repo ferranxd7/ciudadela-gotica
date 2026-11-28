@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/arena_palida"
+      },
+      {
+        "model": "darkcraft:block/arena_palida_2"
+      },
+      {
+        "model": "darkcraft:block/arena_palida_3"
+      },
+      {
+        "model": "darkcraft:block/arena_palida_4"
+      }
+    ]
+  }
+}

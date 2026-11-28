@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/roca_musgosa_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/roca_musgosa_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/roca_musgosa"
+      },
+      {
+        "model": "darkcraft:block/roca_musgosa_2"
+      },
+      {
+        "model": "darkcraft:block/roca_musgosa_3"
+      },
+      {
+        "model": "darkcraft:block/roca_musgosa_4"
+      }
+    ]
+  }
+}

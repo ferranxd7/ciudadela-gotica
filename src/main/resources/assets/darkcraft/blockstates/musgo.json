@@ -1,0 +1,66 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/musgo"
+      },
+      {
+        "model": "darkcraft:block/musgo",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/musgo",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/musgo",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/musgo_2"
+      },
+      {
+        "model": "darkcraft:block/musgo_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/musgo_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/musgo_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/musgo_3"
+      },
+      {
+        "model": "darkcraft:block/musgo_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/musgo_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/musgo_3",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/musgo_4"
+      },
+      {
+        "model": "darkcraft:block/musgo_4",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/musgo_4",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/musgo_4",
+        "y": 270
+      }
+    ]
+  }
+}

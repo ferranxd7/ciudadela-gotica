@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/arena_negra"
+      },
+      {
+        "model": "darkcraft:block/arena_negra_2"
+      },
+      {
+        "model": "darkcraft:block/arena_negra_3"
+      },
+      {
+        "model": "darkcraft:block/arena_negra_4"
+      }
+    ]
+  }
+}

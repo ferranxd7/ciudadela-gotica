@@ -1,0 +1,66 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/ceniza"
+      },
+      {
+        "model": "darkcraft:block/ceniza",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/ceniza",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/ceniza",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/ceniza_2"
+      },
+      {
+        "model": "darkcraft:block/ceniza_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/ceniza_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/ceniza_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/ceniza_3"
+      },
+      {
+        "model": "darkcraft:block/ceniza_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/ceniza_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/ceniza_3",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/ceniza_4"
+      },
+      {
+        "model": "darkcraft:block/ceniza_4",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/ceniza_4",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/ceniza_4",
+        "y": 270
+      }
+    ]
+  }
+}

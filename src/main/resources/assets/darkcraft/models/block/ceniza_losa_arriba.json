@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "darkcraft:block/ceniza",
+    "top": "darkcraft:block/ceniza",
+    "side": "darkcraft:block/ceniza"
+  }
+}

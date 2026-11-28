@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/roca_caliza_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/roca_caliza_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/roca_caliza"
+      },
+      {
+        "model": "darkcraft:block/roca_caliza_2"
+      },
+      {
+        "model": "darkcraft:block/roca_caliza_3"
+      },
+      {
+        "model": "darkcraft:block/roca_caliza_4"
+      }
+    ]
+  }
+}

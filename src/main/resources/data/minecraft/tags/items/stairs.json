@@ -29,6 +29,14 @@
     "darkcraft:tejado_escamas_escalera",
     "darkcraft:tejado_barro_escalera",
     "darkcraft:tejado_musgo_escalera",
-    "darkcraft:tejado_tejamanil_escalera"
+    "darkcraft:tejado_tejamanil_escalera",
+    "darkcraft:roca_gris_escalera",
+    "darkcraft:roca_oscura_escalera",
+    "darkcraft:roca_caliza_escalera",
+    "darkcraft:roca_pizarra_escalera",
+    "darkcraft:roca_arenisca_escalera",
+    "darkcraft:roca_toba_escalera",
+    "darkcraft:roca_musgosa_escalera",
+    "darkcraft:pedregal_escalera"
   ]
 }

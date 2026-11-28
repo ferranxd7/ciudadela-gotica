@@ -3082,12 +3082,23 @@ public final class ClientCiTest {
             atTicks(t + 30, "captura: bloques, grupo " + (g + 1), m -> shot(m, String.format(java.util.Locale.ROOT, "cliente_bq%02d_grupo", gg + 1)));
             t += 34;
         }
-        final int[] cerca = {3, 8, 14, 21, 32, 39};
-        final String[] nombres = {"musgo", "marmol_negro", "tallada", "roble_puerta", "entramado_cruz", "tejado_escamas"};
+        final String[] cercaIds = {"sillar_musgoso", "marmol_negro", "piedra_tallada", "madera_roble", "entramado_cruz",
+                "tejado_escamas", "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos"};
+        final String[] nombres = {"musgo", "marmol_negro", "tallada", "roble_puerta", "entramado_cruz", "tejado_escamas",
+                "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos"};
+        final int[] cerca = new int[cercaIds.length];
+        final float[] cabeceo = new float[cercaIds.length];
+        for (int i = 0; i < cercaIds.length; i++) {
+            for (int k = 0; k < com.darkcraft.bloques.CatalogoBloques.MATERIALES.length; k++)
+                if (com.darkcraft.bloques.CatalogoBloques.MATERIALES[k].id().equals(cercaIds[i])) cerca[i] = k;
+            cabeceo[i] = cercaIds[i].startsWith("hierba") || cercaIds[i].startsWith("flores") || cercaIds[i].startsWith("hongos") ? 32f : 2f;
+        }
         for (int i = 0; i < cerca.length; i++) {
             final int k = cerca[i], n = i + 6;
             final String nom = nombres[i];
-            atTicks(t, "Bloques 8b: de cerca, " + nom, m -> server(m, sp -> sp.teleportTo(sp.serverLevel(), mx + k * 7 + 2.0, my + 1.15, mz - 0.6, 0f, 2f)));
+            final float pitch = cabeceo[i];
+            atTicks(t, "Bloques 8b: de cerca, " + nom, m -> server(m, sp -> sp.teleportTo(sp.serverLevel(), mx + k * 7 + 2.0,
+                    my + (pitch > 10 ? 1.6 : 1.15), mz - (pitch > 10 ? 2.2 : 0.6), 0f, pitch)));
             atTicks(t + 24, "captura: de cerca, " + nom, m -> shot(m, String.format(java.util.Locale.ROOT, "cliente_bq%02d_%s", n + grupos - 5, nom)));
             t += 28;
         }
@@ -3116,6 +3127,32 @@ public final class ClientCiTest {
                     n++;
                 }
             net.minecraft.world.level.block.Block b = com.darkcraft.bloques.Bloques.de(id);
+            if (f.indexOf('X') >= 0) {
+                // una planta: un parche de 4 x 3 sobre hierba
+                net.minecraft.world.level.block.state.BlockState hierba = com.darkcraft.bloques.Bloques.de("hierba_verde").defaultBlockState();
+                for (int dx = 0; dx < 4; dx++)
+                    for (int dz = 0; dz < 3; dz++) {
+                        lvl.setBlock(new BlockPos(x + dx, y0 - 1, z0 + dz), hierba, 2);
+                        lvl.setBlock(new BlockPos(x + dx, y0, z0 + dz), b.defaultBlockState(), 2);
+                        n++;
+                    }
+                continue;
+            }
+            if (f.indexOf('N') >= 0) {
+                // las ocho alturas de la capa de nieve
+                for (int k = 0; k < 8; k++) {
+                    lvl.setBlock(new BlockPos(x + k % 4, y0, z0 + k / 4), b.defaultBlockState()
+                            .setValue(net.minecraft.world.level.block.SnowLayerBlock.LAYERS, k + 1), 2);
+                    n++;
+                }
+                continue;
+            }
+            if (f.equals("BL")) {
+                // un suelo: tambien de suelo delante del muro (asi se ve la cara de arriba)
+                for (int dx = -1; dx <= 4; dx++)
+                    for (int dz = -3; dz <= 1; dz++)
+                        lvl.setBlock(new BlockPos(x + dx, y0 - 1, z0 + dz), b.defaultBlockState(), 2);
+            }
             if (f.indexOf('C') >= 0) {
                 for (int y = 0; y < 4; y++)
                     lvl.setBlock(new BlockPos(x + 1, y0 + y, z0 + 2), b.defaultBlockState(), 2);

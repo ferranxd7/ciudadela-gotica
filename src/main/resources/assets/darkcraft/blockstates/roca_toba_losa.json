@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/roca_toba_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/roca_toba_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/roca_toba"
+      },
+      {
+        "model": "darkcraft:block/roca_toba_2"
+      },
+      {
+        "model": "darkcraft:block/roca_toba_3"
+      },
+      {
+        "model": "darkcraft:block/roca_toba_4"
+      }
+    ]
+  }
+}

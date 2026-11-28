@@ -1,0 +1,72 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/hierba_marchita_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/hierba_marchita_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/hierba_marchita"
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita_2"
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita_3"
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita_3",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita_4"
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita_4",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita_4",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hierba_marchita_4",
+        "y": 270
+      }
+    ]
+  }
+}
