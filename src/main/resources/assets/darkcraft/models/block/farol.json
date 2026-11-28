@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "metal": "darkcraft:block/hierro_negro",
+    "metal": "darkcraft:block/planchas_hierro",
     "cera": "darkcraft:block/cera_blanca",
     "mecha": "darkcraft:block/cera_negra",
     "llama": "darkcraft:block/llamita_natural",
     "cadena": "darkcraft:block/cadena_hierro",
-    "particle": "darkcraft:block/hierro_negro"
+    "particle": "darkcraft:block/planchas_hierro"
   },
   "elements": [
     {

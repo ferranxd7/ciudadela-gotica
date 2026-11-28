@@ -1026,7 +1026,8 @@ MATERIALES = [
               "COLOR_RED", 473),
     HOJARASCA("pinocha", "Pinocha", "Pine Needle Litter", t_hojarasca("pinocha", agujas=True), "PODZOL", 474, sonido="GRASS"),
     # ---- parte 8f: el metal y el vidrio
-    METAL("hierro_negro", "Hierro negro", "Black Iron", t_planchas("hierro_n"), "COLOR_BLACK", 501),
+    # (no "hierro_negro": ese id ya es el bloque del marco del portal de la fortaleza, parte 5e-1)
+    METAL("planchas_hierro", "Planchas de hierro negro", "Black Iron Plates", t_planchas("hierro_n"), "COLOR_BLACK", 501),
     METAL("hierro_remachado", "Hierro remachado", "Riveted Iron", t_planchas("hierro_n", cols=1, filas=2), "COLOR_BLACK", 502),
     METAL("hierro_oxidado", "Hierro oxidado", "Rusted Iron", t_planchas("hierro_n", base=0.48, capa="oxido"),
           "TERRACOTTA_ORANGE", 503),
@@ -1074,11 +1075,11 @@ MATERIALES = [
     VELA("vela_blanca", "Velas blancas", "White Candles", "blanca", 621),
     VELA("vela_negra", "Velas negras", "Black Candles", "negra", 622),
     VELA("vela_roja", "Velas rojas", "Red Candles", "roja", 623),
-    CANDELABRO("candelabro", "Candelabro de hierro", "Iron Candelabrum", "c", "hierro_negro", "cadena_hierro", "COLOR_BLACK", 631),
+    CANDELABRO("candelabro", "Candelabro de hierro", "Iron Candelabrum", "c", "planchas_hierro", "cadena_hierro", "COLOR_BLACK", 631),
     CANDELABRO("candelabro_oro", "Candelabro dorado", "Gilded Candelabrum", "c", "oro_gastado", "cadena_oro", "GOLD", 632),
-    CANDELABRO("aplique", "Aplique de hierro", "Iron Wall Sconce", "p", "hierro_negro", "cadena_hierro", "COLOR_BLACK", 633),
+    CANDELABRO("aplique", "Aplique de hierro", "Iron Wall Sconce", "p", "planchas_hierro", "cadena_hierro", "COLOR_BLACK", 633),
     CANDELABRO("aplique_oro", "Aplique dorado", "Gilded Wall Sconce", "p", "oro_gastado", "cadena_oro", "GOLD", 634),
-    CANDELABRO("arana", "Araña de hierro", "Iron Chandelier", "a", "hierro_negro", "cadena_hierro", "COLOR_BLACK", 635),
+    CANDELABRO("arana", "Araña de hierro", "Iron Chandelier", "a", "planchas_hierro", "cadena_hierro", "COLOR_BLACK", 635),
     CANDELABRO("arana_oro", "Araña dorada", "Gilded Chandelier", "a", "oro_gastado", "cadena_oro", "GOLD", 636),
     FAROL("farol", "Farol", "Lantern", "natural", 641),
     FAROL("farol_almas", "Farol de almas", "Soul Lantern", "almas", 642),
@@ -1419,8 +1420,8 @@ def escribir_luz(m):
                                            "textures": {"layer0": f"darkcraft:block/fuego_{c}_0"}})
         return [bid]
     if f == "s":
-        t = {"hierro": "darkcraft:block/hierro_negro", "brasas": f"darkcraft:block/brasas_{c}",
-             "fuego": f"darkcraft:block/fuego_{c}_0", "particle": "darkcraft:block/hierro_negro"}
+        t = {"hierro": "darkcraft:block/planchas_hierro", "brasas": f"darkcraft:block/brasas_{c}",
+             "fuego": f"darkcraft:block/fuego_{c}_0", "particle": "darkcraft:block/planchas_hierro"}
         els = [_caja(a, b, "#hierro") for a, b in (
             ((2, 0, 2), (4, 9, 4)), ((12, 0, 2), (14, 9, 4)), ((2, 0, 12), (4, 9, 14)), ((12, 0, 12), (14, 9, 14)),
             ((2, 9, 2), (14, 10, 14)), ((1, 9, 1), (15, 13, 2)), ((1, 9, 14), (15, 13, 15)), ((1, 9, 2), (2, 13, 14)),
@@ -1455,9 +1456,9 @@ def escribir_luz(m):
         j(os.path.join(bs, bid + ".json"), {"variants": v})
         j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}_1"})
         return [bid]
-    t = {"metal": f"darkcraft:block/{m.get('metal', 'hierro_negro')}", "cera": "darkcraft:block/cera_blanca",
+    t = {"metal": f"darkcraft:block/{m.get('metal', 'planchas_hierro')}", "cera": "darkcraft:block/cera_blanca",
          "mecha": "darkcraft:block/cera_negra", "llama": llamita, "cadena": f"darkcraft:block/{m.get('cadena', 'cadena_hierro')}",
-         "particle": f"darkcraft:block/{m.get('metal', 'hierro_negro')}"}
+         "particle": f"darkcraft:block/{m.get('metal', 'planchas_hierro')}"}
     if f == "c":
         els = [_caja(a, b, "#metal") for a, b in (
             ((5, 0, 5), (11, 1, 11)), ((6, 1, 6), (10, 2, 10)), ((7, 2, 7), (9, 11, 9)), ((6.5, 6, 6.5), (9.5, 7, 9.5)),
@@ -2226,8 +2227,32 @@ def vista(carpeta, desde=0):
     print("hojas en", carpeta)
 
 
+def choques():
+    """Los ids del catalogo que ya usa otro bloque u objeto del mod (registrado fuera del paquete `bloques`): en la 8f
+    "hierro_negro" chocaba con el bloque del marco del portal (parte 5e-1) y el juego no arrancaba."""
+    import re
+    usados = set()
+    raiz_java = os.path.join(RAIZ, "src", "main", "java")
+    for d, _, fs in os.walk(raiz_java):
+        if d.endswith(os.sep + "bloques"):
+            continue
+        for f in fs:
+            if f.endswith(".java"):
+                with open(os.path.join(d, f), encoding="utf-8") as fh:
+                    usados |= set(re.findall(r'register\("([a-z0-9_]+)"', fh.read()))
+    nuestros = set()
+    for m in MATERIALES:
+        for f in m["formas"]:
+            bid = m["id"] + ("" if f in SIN_SUFIJO else FORMAS[f])
+            nuestros |= {bid, bid + "_pared"} if f == "t" else {bid}
+    return sorted(nuestros & usados)
+
+
 def main():
     args = sys.argv[1:]
+    malos = choques()
+    if malos:
+        sys.exit(f"estos ids ya los usa otra cosa del mod: {malos}")
     tdir = os.path.join(ASSETS, "textures", "block")
     os.makedirs(tdir, exist_ok=True)
     ids = []

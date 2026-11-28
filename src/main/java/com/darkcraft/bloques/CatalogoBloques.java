@@ -148,7 +148,7 @@ public final class CatalogoBloques {
             new Material("hojarasca_ceniza", "A", SoundType.AZALEA_LEAVES, MapColor.SAND, 0.1F, BlockSetType.STONE, WoodType.OAK, false),
             new Material("hojarasca_sangre", "A", SoundType.AZALEA_LEAVES, MapColor.COLOR_RED, 0.1F, BlockSetType.STONE, WoodType.OAK, false),
             new Material("pinocha", "A", SoundType.GRASS, MapColor.PODZOL, 0.1F, BlockSetType.STONE, WoodType.OAK, false),
-            new Material("hierro_negro", "BELM", SoundType.METAL, MapColor.COLOR_BLACK, 4.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("planchas_hierro", "BELM", SoundType.METAL, MapColor.COLOR_BLACK, 4.0F, BlockSetType.STONE, WoodType.OAK, true),
             new Material("hierro_remachado", "BELM", SoundType.METAL, MapColor.COLOR_BLACK, 4.0F, BlockSetType.STONE, WoodType.OAK, true),
             new Material("hierro_oxidado", "BELM", SoundType.METAL, MapColor.TERRACOTTA_ORANGE, 4.0F, BlockSetType.STONE, WoodType.OAK, true),
             new Material("oro_gastado", "BELM", SoundType.METAL, MapColor.GOLD, 4.0F, BlockSetType.STONE, WoodType.OAK, true),

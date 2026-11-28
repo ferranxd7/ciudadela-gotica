@@ -5,7 +5,7 @@
         "up": "true"
       },
       "apply": {
-        "model": "darkcraft:block/hierro_negro_muro_poste"
+        "model": "darkcraft:block/planchas_hierro_muro_poste"
       }
     },
     {
@@ -13,7 +13,7 @@
         "north": "low"
       },
       "apply": {
-        "model": "darkcraft:block/hierro_negro_muro_lado",
+        "model": "darkcraft:block/planchas_hierro_muro_lado",
         "uvlock": true
       }
     },
@@ -22,7 +22,7 @@
         "north": "tall"
       },
       "apply": {
-        "model": "darkcraft:block/hierro_negro_muro_lado_alto",
+        "model": "darkcraft:block/planchas_hierro_muro_lado_alto",
         "uvlock": true
       }
     },
@@ -31,7 +31,7 @@
         "east": "low"
       },
       "apply": {
-        "model": "darkcraft:block/hierro_negro_muro_lado",
+        "model": "darkcraft:block/planchas_hierro_muro_lado",
         "uvlock": true,
         "y": 90
       }
@@ -41,7 +41,7 @@
         "east": "tall"
       },
       "apply": {
-        "model": "darkcraft:block/hierro_negro_muro_lado_alto",
+        "model": "darkcraft:block/planchas_hierro_muro_lado_alto",
         "uvlock": true,
         "y": 90
       }
@@ -51,7 +51,7 @@
         "south": "low"
       },
       "apply": {
-        "model": "darkcraft:block/hierro_negro_muro_lado",
+        "model": "darkcraft:block/planchas_hierro_muro_lado",
         "uvlock": true,
         "y": 180
       }
@@ -61,7 +61,7 @@
         "south": "tall"
       },
       "apply": {
-        "model": "darkcraft:block/hierro_negro_muro_lado_alto",
+        "model": "darkcraft:block/planchas_hierro_muro_lado_alto",
         "uvlock": true,
         "y": 180
       }
@@ -71,7 +71,7 @@
         "west": "low"
       },
       "apply": {
-        "model": "darkcraft:block/hierro_negro_muro_lado",
+        "model": "darkcraft:block/planchas_hierro_muro_lado",
         "uvlock": true,
         "y": 270
       }
@@ -81,7 +81,7 @@
         "west": "tall"
       },
       "apply": {
-        "model": "darkcraft:block/hierro_negro_muro_lado_alto",
+        "model": "darkcraft:block/planchas_hierro_muro_lado_alto",
         "uvlock": true,
         "y": 270
       }

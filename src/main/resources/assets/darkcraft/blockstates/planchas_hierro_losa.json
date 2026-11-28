@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/planchas_hierro_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/planchas_hierro_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/planchas_hierro"
+      },
+      {
+        "model": "darkcraft:block/planchas_hierro_2"
+      },
+      {
+        "model": "darkcraft:block/planchas_hierro_3"
+      }
+    ]
+  }
+}

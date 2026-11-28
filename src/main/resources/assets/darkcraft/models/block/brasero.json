@@ -1,10 +1,10 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "hierro": "darkcraft:block/hierro_negro",
+    "hierro": "darkcraft:block/planchas_hierro",
     "brasas": "darkcraft:block/brasas_natural",
     "fuego": "darkcraft:block/fuego_natural_0",
-    "particle": "darkcraft:block/hierro_negro"
+    "particle": "darkcraft:block/planchas_hierro"
   },
   "elements": [
     {

@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "darkcraft:block/hierro_negro",
-    "top": "darkcraft:block/hierro_negro",
-    "side": "darkcraft:block/hierro_negro"
-  }
-}

@@ -7,7 +7,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "darkcraft:hierro_negro_losa",
+          "name": "darkcraft:planchas_hierro_losa",
           "functions": [
             {
               "function": "minecraft:set_count",
@@ -16,7 +16,7 @@
               "conditions": [
                 {
                   "condition": "minecraft:block_state_property",
-                  "block": "darkcraft:hierro_negro_losa",
+                  "block": "darkcraft:planchas_hierro_losa",
                   "properties": {
                     "type": "double"
                   }
@@ -31,5 +31,5 @@
       ]
     }
   ],
-  "random_sequence": "darkcraft:blocks/hierro_negro_losa"
+  "random_sequence": "darkcraft:blocks/planchas_hierro_losa"
 }

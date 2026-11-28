@@ -1,15 +1,7 @@
 {
   "variants": {
-    "": [
-      {
-        "model": "darkcraft:block/hierro_negro"
-      },
-      {
-        "model": "darkcraft:block/hierro_negro_2"
-      },
-      {
-        "model": "darkcraft:block/hierro_negro_3"
-      }
-    ]
+    "": {
+      "model": "darkcraft:block/hierro_negro"
+    }
   }
 }

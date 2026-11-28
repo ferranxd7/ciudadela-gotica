@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "darkcraft:block/planchas_hierro_2"
+  }
+}

@@ -4812,7 +4812,10 @@ generadores) van con el clima y los efectos, despues de los bloques.
   J su panel (`<id>_panel`, un `IronBarsBlock` con los modelos `template_glass_pane_*` del juego y el canto
   `<id>_borde`), I reja (`IronBarsBlock` con los modelos `iron_bars_*` del juego y nuestra textura en `bars` y `edge`) y Z
   cadena (`ChainBlock` con el modelo `chain` del juego). Los metales son bloque, escalera, losa y muro (con pico).
-- **Quinta tanda** (20 materiales, 46 bloques; ya son 152 materiales y 337 bloques): hierro negro, hierro remachado,
+- **Quinta tanda** (20 materiales, 46 bloques; ya son 152 materiales y 337 bloques): planchas de hierro negro (id
+  `planchas_hierro`: **`hierro_negro` ya es el bloque del marco del portal** de la parte 5e-1; en la build de la 8f chocaban
+  y el juego no arrancaba —"One of more entry values did not copy to the correct id"—; desde entonces `bloques.py` mira
+  antes de escribir nada que ningun id del catalogo lo use otra cosa del mod, `choques()`), hierro remachado,
   hierro oxidado, oro gastado, oro labrado y bronce con verdin; barrotes de hierro negro, reja forjada y barrotes
   oxidados; cadenas de hierro negro, dorada y oxidada; vidrio viejo, sucio y emplomado y vidrieras roja, azul, ambar,
   verde y violeta (bloque y panel).
