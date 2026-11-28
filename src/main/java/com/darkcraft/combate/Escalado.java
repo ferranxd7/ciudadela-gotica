@@ -61,6 +61,8 @@ public final class Escalado {
         if (st.is(DarkCraftMod.PERTIGA_FAROLERO.get())) return d("DC-C-", 10, 12, 0, 12, 0);
         // la Espada de la Guardiana (parte 7ap): la de una duelista, mejor con la Destreza; el juramento, algo con la Fe
         if (st.is(DarkCraftMod.ESPADA_GUARDIANA.get())) return d("CB-E-", 12, 14, 0, 10, 0);
+        // el Pico del Capataz (parte 7ar): un gran martillo de Fuerza, algo de Destreza
+        if (st.is(DarkCraftMod.PICO_CAPATAZ.get())) return d("BD---", 20, 10, 0, 0, 0);
         // la maza de clerigo (parte 7aj): un martillo que escala tambien con la Fe
         if (st.is(DarkCraftMod.MAZA.get())) return d("CD-C-", 12, 8, 0, 12, 0);
         Armas.Tipo t = Armas.de(st);

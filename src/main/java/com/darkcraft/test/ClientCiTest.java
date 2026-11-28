@@ -6705,6 +6705,8 @@ public final class ClientCiTest {
         t = sigrun(t);
         // las Minas de Hierro Negro y los enterrados (parte 7aq)
         t = mina(t);
+        // Hakon, el Capataz, en la Caverna del Filon (parte 7ar)
+        t = capataz(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -14871,6 +14873,342 @@ public final class ClientCiTest {
             });
         });
         return t + 30;
+    }
+
+    // ------------------------------------------------------------------ Hakon, el Capataz (parte 7ar)
+
+    /** Hakon en el cliente (a 80 bloques), o null. */
+    private static com.darkcraft.enemigos.Capataz capatazC(Minecraft mc) {
+        if (mc.level == null || mc.player == null) return null;
+        for (var e : mc.level.getEntitiesOfClass(com.darkcraft.enemigos.Capataz.class, mc.player.getBoundingBox().inflate(80))) return e;
+        return null;
+    }
+
+    /** Hakon en el servidor (si ha salido de su puesto), o null. */
+    private static com.darkcraft.enemigos.Capataz capatazE() {
+        return com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.MINA, com.darkcraft.morvain.MorvainEnemigos.capataz())
+                instanceof com.darkcraft.enemigos.Capataz c ? c : null;
+    }
+
+    /** La accion que se ve de Hakon y cuanto lleva (-1 si no es esa). */
+    private static int tCapataz(Minecraft mc, int accion) {
+        var r = capatazC(mc);
+        return r != null && r.accionVista() == accion && r.accionDesde >= 0 ? r.tickCount - r.accionDesde : -1;
+    }
+
+    private static String estadoCapatazC(Minecraft mc) {
+        var r = capatazC(mc);
+        if (r == null) return "no se ve a Hakon | voz " + com.darkcraft.client.rey.ReyCliente.subtitulo() + " | cartel " + com.darkcraft.client.ui.Carteles.resumen();
+        int a = r.accionVista();
+        return String.format(java.util.Locale.ROOT, "Hakon en el cliente: %.1f, %.1f, %.1f giro %.0f, postura %d, accion %s (t %d), muerte %d, %s, %s | voz %s | musica %s"
+                        + " | cartel %s | jugador a %.1f", r.getX(), r.getY(), r.getZ(), r.getYRot(), r.postura(),
+                com.darkcraft.enemigos.CapatazAnims.NOMBRES[Math.max(0, Math.min(a, com.darkcraft.enemigos.CapatazAnims.NOMBRES.length - 1))],
+                r.accionDesde < 0 ? -1 : r.tickCount - r.accionDesde, r.deathTime, r.enPelea() ? "peleando" : "sin pelea", r.veta() ? "con la veta" : "sin la veta",
+                com.darkcraft.client.rey.ReyCliente.subtitulo(), ClientMusic.debug(), com.darkcraft.client.ui.Carteles.resumen(), mc.player == null ? -1 : r.distanceTo(mc.player));
+    }
+
+    /** Hakon y lo de alrededor en el servidor (para las lineas del informe). */
+    private static String estadoCapatazS(ServerPlayer sp) {
+        var c = capatazE();
+        return com.darkcraft.morvain.MorvainEnemigos.estadoCapataz(sp.server) + " | " + (c == null ? "no ha salido" : estadoE(c)) + " | jugador " + fpos(sp) + " vida "
+                + Math.round(sp.getHealth()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp) + " | turno cerca "
+                + sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Enterrado.class, sp.getBoundingBox().inflate(32), e -> e.sitio() == null || e.sitio().isEmpty()).size();
+    }
+
+    /**
+     * La camara en la caverna, desde donde Hakon hace sus golpes (en medio, mirando al sur): (dx al este, dy sobre el suelo, dz al sur)
+     * mirando a (mx, my, mz).
+     */
+    private static void camaraFilon(Minecraft mc, double dx, double dy, double dz, double mx, double my, double mz) {
+        final int CX = com.darkcraft.morvain.Mina.CX, CZ = com.darkcraft.morvain.Mina.CZ, N3 = com.darkcraft.morvain.Mina.N3;
+        verDesde(mc, new Vec3(CX + 0.5 + dx, N3 + 1 + dy, CZ - 198.5 + dz), new Vec3(CX + 0.5 + mx, N3 + 1 + my, CZ - 198.5 + mz));
+    }
+
+    /** La camara del jugador, sin el HUD (la vista en primera persona tal cual). */
+    private static void primeraSinHud(Minecraft m) {
+        m.setCameraEntity(m.player);
+        m.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+        m.options.hideGui = true;
+    }
+
+    /**
+     * Hakon en medio de la caverna mirando al sur y el jugador delante (a {@code dist}, sano), sin los del turno: y que haga esa
+     * accion ({@code /darkcraft capataz accion}; 0: nada, -1: que se beba la veta, {@code media}).
+     */
+    private static void capatazHaz(ServerPlayer sp, int accion, double dist) {
+        final int CX = com.darkcraft.morvain.Mina.CX, CZ = com.darkcraft.morvain.Mina.CZ, N3 = com.darkcraft.morvain.Mina.N3;
+        ServerLevel lvl = sp.serverLevel();
+        quitarEnterrados(lvl);
+        var c = capatazE();
+        if (c == null) {
+            log("  Hakon: FALLO, no esta fuera");
+            return;
+        }
+        double y = com.darkcraft.enemigos.Puestos.suelo(lvl, CX, N3 + 3, CZ - 199);
+        c.moveTo(CX + 0.5, y, CZ - 198.5, 0f, 0f);
+        c.setYRot(0f);
+        c.yBodyRot = c.yHeadRot = 0f;
+        c.setDeltaMovement(Vec3.ZERO);
+        double py = com.darkcraft.enemigos.Puestos.suelo(lvl, CX, N3 + 3, (int) Math.floor(CZ - 198.5 + dist));
+        irMirando(sp, CX + 0.5, py, CZ - 198.5 + dist, CX + 0.5, y + 2.6, CZ - 198.5, false);
+        sp.setHealth(sp.getMaxHealth());
+        sp.removeEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+        sp.clearFire();
+        if (accion > 0) comando(sp, "darkcraft capataz accion " + accion);
+        else if (accion < 0) comando(sp, "darkcraft capataz media");
+    }
+
+    /**
+     * Hakon, el Capataz (parte 7ar): la Caverna del Filon con el picando el corazon de la veta (de lejos, de cerca en el golpe del pico,
+     * y la veta sin vision nocturna); en supervivencia, al entrar: se vuelve, su frase (su barra, su musica), silba y sale el turno de los
+     * escombros; sus golpes (pedidos con el comando, con la camara de lado): picotazo, barrido, embestida, la veta (los cristales que
+     * brotan), los barrenos (en el farol, en el aire y su estallido) y el derrumbe (las marcas y las piedras del techo); a media vida se
+     * bebe la veta (su frase 2, luce y vuelve a llamar al turno) y el picotazo con la veta; cae (de rodillas, las cuarenta lamparas que
+     * suben, se deshace en polvo), el cartel de JEFE ABATIDO, lo que deja, el Pico del Capataz en la mano y el turno de noche que
+     * descansa; el bestiario. Al acabar vuelve todo (Hakon y los enterrados).
+     */
+    private static int capataz(int T) {
+        final int CX = com.darkcraft.morvain.Mina.CX, CZ = com.darkcraft.morvain.Mina.CZ, N3 = com.darkcraft.morvain.Mina.N3;
+        int t = T;
+        atTicks(t, "Hakon: a la Caverna del Filon", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_ESPERA.clear();
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                sp.removeAllEffects();
+                quitarEnterrados(sp.serverLevel());
+                comando(sp, "darkcraft capataz volver");
+                verDeNoche(sp);
+                irMirando(sp, CX + 0.5, N3 + 6, CZ - 182.5, CX + 0.5, N3 + 2, CZ - 206, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura: la Caverna del Filon", m -> {
+            server(m, sp -> log("  Hakon, en su puesto: " + estadoCapatazS(sp)));
+            log("  Hakon, en su puesto (cliente): " + estadoCapatazC(m));
+            shot(m, "cliente_ca01_caverna_filon");
+        });
+        t += 4;
+        atTicks(t, "Hakon: de cerca, picando", m -> server(m, sp -> irMirando(sp, CX + 5.5, N3 + 2.4, CZ - 201.0, CX + 0.5, N3 + 3.4, CZ - 205.5, true)));
+        t += 30;
+        // (el golpe del pico en la roca: las chispas salen en el tick 24 de cada 36)
+        esperarA("cliente_ca02_hakon_picando", m -> {
+            var r = capatazC(m);
+            return r != null && r.postura() == com.darkcraft.enemigos.Enemigo.REZA && r.tickCount % 36 == 22;
+        }, ClientCiTest::primeraSinHud, ClientCiTest::estadoCapatazC, 80);
+        t += 60;
+        atTicks(t, "Hakon: el corazon de la veta, sin vision nocturna", m -> server(m, sp -> {
+            sp.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+            irMirando(sp, CX - 4.5, N3 + 2.2, CZ - 202.5, CX + 1.0, N3 + 3.0, CZ - 207.5, true);
+        }));
+        t += 30;
+        atTicks(t, "captura: el corazon de la veta", m -> {
+            primeraSinHud(m);
+            shot(m, "cliente_ca03_corazon_veta");
+        });
+        t += 4;
+        // ---- en supervivencia, a siete bloques en la caverna: se vuelve, dice su frase, silba y sale el turno
+        int S = t;
+        atTicks(S, "Hakon: en supervivencia, en la caverna", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                verDeNoche(sp);
+                double py = com.darkcraft.enemigos.Puestos.suelo(sp.serverLevel(), CX, N3 + 3, CZ - 197);
+                irMirando(sp, CX + 0.5, py, CZ - 196.5, CX + 0.5, N3 + 3.4, CZ - 203.5, false);
+            });
+        });
+        esperarA("cliente_ca04_se_vuelve", m -> tCapataz(m, com.darkcraft.enemigos.CapatazAnims.VOLVERSE) >= 14, ClientCiTest::enPrimeraPersona,
+                ClientCiTest::estadoCapatazC, 200);
+        esperarA("cliente_ca05_su_frase_barra", m -> {
+            var r = capatazC(m);
+            return r != null && r.enPelea() && r.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE && tCapataz(m, com.darkcraft.enemigos.CapatazAnims.VOLVERSE) < 0
+                    && com.darkcraft.client.rey.ReyCliente.subtitulo().startsWith((com.darkcraft.enemigos.Capataz.VOZ_BASE + 1) + " ");
+        }, ClientCiTest::enPrimeraPersona, ClientCiTest::estadoCapatazC, 200);
+        esperarA("cliente_ca06_silbato", m -> tCapataz(m, com.darkcraft.enemigos.CapatazAnims.SILBATO) >= 12, m -> {
+            var r = capatazC(m);
+            if (r == null) return;
+            Vec3 f = Vec3.directionFromRotation(0, r.yBodyRot);
+            verDesde(m, new Vec3(r.getX() + f.x * 4.6 - f.z * 2.2, r.getY() + 2.6, r.getZ() + f.z * 4.6 + f.x * 2.2), new Vec3(r.getX(), r.getY() + 3.4, r.getZ()));
+        }, ClientCiTest::estadoCapatazC, 320);
+        esperarA("cliente_ca07_sale_el_turno", m -> tCapataz(m, com.darkcraft.enemigos.CapatazAnims.SILBATO) >= 38, m -> {
+            if (m.player != null) verDesde(m, m.player.getEyePosition().add(9, 5, 10), m.player.position().add(0, 0, -5));
+        }, ClientCiTest::estadoCapatazC, 360);
+        t = S + 330;
+        atTicks(t - 4, "Hakon: tras el silbato", m -> server(m, sp -> log("  Hakon, tras el silbato: " + estadoCapatazS(sp))));
+        // ---- sus golpes, pedidos con el comando: {accion, distancia, tick 1, tick 2 (-1 sin ella), camara dx, dy, dz, mira dz, my, espera}
+        double[][] golpes = {
+                {com.darkcraft.enemigos.CapatazAnims.PICOTAZO, 2.8, 15, 23, 6.0, 2.2, 1.4, 1.4, 2.2, 70},
+                {com.darkcraft.enemigos.CapatazAnims.BARRIDO, 2.8, 9, 15, 5.0, 2.6, 5.4, 1.0, 1.6, 60},
+                {com.darkcraft.enemigos.CapatazAnims.EMBESTIDA, 6.5, 7, 13, 8.5, 2.6, 3.2, 3.2, 1.6, 70},
+                {com.darkcraft.enemigos.CapatazAnims.VETA, 7.0, 23, 36, 8.0, 4.6, 4.2, 4.6, 0.8, 80},
+                {com.darkcraft.enemigos.CapatazAnims.BARRENOS, 9.0, 14, 29, 10.0, 3.8, 4.5, 4.5, 2.2, 130},
+                {com.darkcraft.enemigos.CapatazAnims.DERRUMBE, 5.0, 40, 55, 10.0, 2.2, 3.0, 4.0, 4.2, 110}};
+        String[][] nombres = {{"ca08_picotazo_arriba", "ca09_picotazo"}, {"ca10_barrido_atras", "ca11_barrido"}, {"ca12_embestida", "ca13_embestida_golpe"},
+                {"ca14_veta_golpe", "ca15_veta_cristales"}, {"ca16_barrenos_mechas", "ca17_barrenos_aire"}, {"ca19_derrumbe_marcas", "ca20_derrumbe_piedras"}};
+        for (int i = 0; i < golpes.length; i++) {
+            final double[] g = golpes[i];
+            final int acc = (int) g[0];
+            final String n1 = "cliente_" + nombres[i][0], n2 = "cliente_" + nombres[i][1];
+            atTicks(t, "Hakon: " + com.darkcraft.enemigos.CapatazAnims.NOMBRES[acc], m -> {
+                m.options.hideGui = true;
+                server(m, sp -> capatazHaz(sp, acc, g[1]));
+            });
+            Consumer<Minecraft> cam = m -> camaraFilon(m, g[4], g[5], g[6], 0, g[8], g[7]);
+            esperarA(n1, m -> tCapataz(m, acc) >= (int) g[2], cam, ClientCiTest::estadoCapatazC, 120);
+            esperarA(n2, m -> tCapataz(m, acc) >= (int) g[3], cam, ClientCiTest::estadoCapatazC, 120);
+            if (acc == com.darkcraft.enemigos.CapatazAnims.BARRENOS) {
+                // los cartuchos revientan (vuelan un segundo y la mecha dura 1,6 s)
+                atTicks(t + 78, "captura: revientan los cartuchos", m -> {
+                    camaraFilon(m, g[4], g[5], g[6], 0, g[8], g[7]);
+                    server(m, sp -> log("  Hakon, los barrenos: " + estadoCapatazS(sp) + " | " + estadoEnterrados()));
+                    shot(m, "cliente_ca18_barrenos_revientan");
+                });
+            }
+            t += (int) g[9];
+            atTicks(t - 2, "Hakon: tras " + com.darkcraft.enemigos.CapatazAnims.NOMBRES[acc], m -> server(m, sp -> log("  Hakon, tras "
+                    + com.darkcraft.enemigos.CapatazAnims.NOMBRES[acc] + ": " + estadoCapatazS(sp))));
+        }
+        // ---- a media vida: se bebe la veta (de frente y a un lado), con su frase
+        atTicks(t, "Hakon: a media vida", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> capatazHaz(sp, -1, 5.0));
+        });
+        Consumer<Minecraft> camVeta = m -> camaraFilon(m, 4.6, 2.4, 5.2, 0, 2.0, 0.4);
+        esperarA("cliente_ca21_bebe_la_veta", m -> tCapataz(m, com.darkcraft.enemigos.CapatazAnims.ABSORBER) >= 28, camVeta, ClientCiTest::estadoCapatazC, 120);
+        esperarA("cliente_ca22_veta_bebida", m -> tCapataz(m, com.darkcraft.enemigos.CapatazAnims.ABSORBER) >= 48, camVeta, ClientCiTest::estadoCapatazC, 120);
+        t += 76;
+        atTicks(t, "captura: con la veta (en primera persona, su frase)", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> log("  Hakon, con la veta: " + estadoCapatazS(sp)));
+            log("  Hakon, con la veta (cliente): " + estadoCapatazC(m));
+            shot(m, "cliente_ca23_con_la_veta");
+        });
+        t += 6;
+        atTicks(t, "Hakon: el picotazo con la veta", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> capatazHaz(sp, com.darkcraft.enemigos.CapatazAnims.PICOTAZO, 3.0));
+        });
+        esperarA("cliente_ca24_picotazo_veta", m -> tCapataz(m, com.darkcraft.enemigos.CapatazAnims.PICOTAZO) >= 26, m -> camaraFilon(m, 5.0, 2.6, 4.8, 0, 1.2, 2.4),
+                ClientCiTest::estadoCapatazC, 120);
+        t += 70;
+        // ---- cae: de rodillas, su ultima frase, las cuarenta lamparas, se deshace; el cartel, lo que deja y el pico
+        final int C = t;
+        atTicks(C, "Hakon: cae", m -> {
+            com.darkcraft.client.ui.Carteles.callados = true;
+            m.options.hideGui = true;
+            server(m, sp -> {
+                capatazHaz(sp, 0, 5.0);
+                log("  Hakon, antes de caer: " + estadoCapatazS(sp) + " | ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "capataz"));
+                comando(sp, "darkcraft capataz vencer");
+            });
+        });
+        esperarA("cliente_ca25_de_rodillas", m -> {
+            var r = capatazC(m);
+            return r != null && r.deathTime >= 34;
+        }, m -> camaraFilon(m, 4.2, 2.2, 4.6, 0, 1.6, 0), ClientCiTest::estadoCapatazC, 100);
+        esperarA("cliente_ca26_las_lamparas", m -> {
+            var r = capatazC(m);
+            return r != null && r.deathTime >= 84;
+        }, m -> camaraFilon(m, 9.0, 3.0, 11.0, 0, 5.0, -2.0), ClientCiTest::estadoCapatazC, 140);
+        esperarA("cliente_ca27_se_deshace", m -> {
+            var r = capatazC(m);
+            return r != null && r.deathTime >= 147;
+        }, m -> camaraFilon(m, 4.0, 2.4, 4.8, 0, 1.6, 0), ClientCiTest::estadoCapatazC, 200);
+        atTicks(C + 175, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 178, "captura: JEFE ABATIDO", m -> {
+            log("  Hakon: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  Hakon, tras caer: " + estadoCapatazS(sp) + " | ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro "
+                    + com.darkcraft.story.Logros.tiene(sp, "capataz")));
+            shot(m, "cliente_ca28_jefe_abatido");
+        });
+        atTicks(C + 182, "lo que deja, en el suelo", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                StringBuilder sb = new StringBuilder();
+                Vec3 donde = null;
+                for (var it : sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, sp.getBoundingBox().inflate(24))) {
+                    sb.append(it.getItem().getCount()).append(' ').append(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(it.getItem().getItem())).append("; ");
+                    if (it.getItem().is(DarkCraftMod.PICO_CAPATAZ.get())) donde = it.position();
+                }
+                log("  Hakon, lo que deja: " + sb + "| el pico en " + (donde == null ? "NINGUN SITIO" : String.format(java.util.Locale.ROOT, "%.1f, %.1f, %.1f", donde.x, donde.y, donde.z)));
+                Vec3 q = donde == null ? new Vec3(CX + 0.5, N3 + 1, CZ - 198.5) : donde;
+                irMirando(sp, q.x + 2.2, q.y + 0.2, q.z + 2.6, q.x, q.y, q.z, false);
+            });
+        });
+        atTicks(C + 200, "captura: lo que deja", m -> {
+            primeraSinHud(m);
+            shot(m, "cliente_ca29_lo_que_deja");
+        });
+        atTicks(C + 204, "el Pico del Capataz en la mano", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                for (var it : sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, sp.getBoundingBox().inflate(24))) it.discard();
+                sp.setGameMode(GameType.CREATIVE);
+                sp.getInventory().setItem(0, new ItemStack(DarkCraftMod.PICO_CAPATAZ.get()));
+                sp.getInventory().selected = 0;
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
+                double py = com.darkcraft.enemigos.Puestos.suelo(sp.serverLevel(), CX, N3 + 3, CZ - 196);
+                irMirando(sp, CX + 0.5, py, CZ - 195.5, CX + 0.5, py + 1.6, CZ - 189.5, false);
+            });
+        });
+        atTicks(C + 214, "tercera persona", m -> {
+            m.options.hideGui = true;
+            m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+        });
+        atTicks(C + 234, "captura: el pico en la mano", m -> {
+            if (m.player != null) {
+                ItemStack st = m.player.getMainHandItem();
+                java.util.List<net.minecraft.network.chat.Component> tip = new java.util.ArrayList<>();
+                st.getItem().appendHoverText(st, m.level, tip, net.minecraft.world.item.TooltipFlag.NORMAL);
+                StringBuilder sb = new StringBuilder();
+                for (var c : tip) sb.append(c.getString()).append(" / ");
+                var esc = com.darkcraft.combate.Escalado.de(st);
+                log("  Hakon: en la mano " + st.getHoverName().getString() + " (" + com.darkcraft.combate.Armas.de(st) + ", escala " + (esc == null ? "-" : esc.letras())
+                        + ") | " + sb);
+            }
+            shot(m, "cliente_ca30_pico_en_la_mano");
+        });
+        atTicks(C + 238, "el bestiario: Hakon", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("capataz")));
+        });
+        atTicks(C + 256, "captura: Hakon en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_ca31_bestiario_capataz");
+        });
+        atTicks(C + 262, "Hakon: fin (vuelven el y los enterrados)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_ESPERA.clear();
+            server(m, sp -> {
+                log("  Hakon, al acabar: " + estadoCapatazS(sp) + " | en paz " + com.darkcraft.morvain.Mina.enPaz(sp.server));
+                quitarEnterrados(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                sp.getInventory().setItem(0, ItemStack.EMPTY);
+                comando(sp, "darkcraft capataz volver");
+                comando(sp, "darkcraft mina enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+                log("  Hakon, vuelto: " + com.darkcraft.morvain.MorvainEnemigos.estadoCapataz(sp.server));
+            });
+        });
+        return C + 292;
     }
 
     // ------------------------------------------------------------------ los herreros de Morvain y Silas (parte 7af)

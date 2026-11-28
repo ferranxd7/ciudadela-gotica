@@ -327,6 +327,18 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_ENTERRADO_ALZARSE = sound("sfx.enterrado_alzarse");
     public static final RegistryObject<SoundEvent> SFX_MINA_DERRUMBE = sound("sfx.mina_derrumbe");
     public static final RegistryObject<SoundEvent> SFX_MINA_CRUJE = sound("sfx.mina_cruje");
+    // Hakon, el Capataz (parte 7ar): su silbato, el pico, la veta que brota, el temblor y la roca que cae, beberse la veta, la
+    // embestida, el dolor, la muerte y las almas de las cuarenta lamparas
+    public static final RegistryObject<SoundEvent> SFX_CAPATAZ_SILBATO = sound("sfx.capataz_silbato");
+    public static final RegistryObject<SoundEvent> SFX_CAPATAZ_PICO = sound("sfx.capataz_pico");
+    public static final RegistryObject<SoundEvent> SFX_CAPATAZ_VETA = sound("sfx.capataz_veta");
+    public static final RegistryObject<SoundEvent> SFX_CAPATAZ_TEMBLOR = sound("sfx.capataz_temblor");
+    public static final RegistryObject<SoundEvent> SFX_CAPATAZ_ROCA = sound("sfx.capataz_roca");
+    public static final RegistryObject<SoundEvent> SFX_CAPATAZ_ABSORBER = sound("sfx.capataz_absorber");
+    public static final RegistryObject<SoundEvent> SFX_CAPATAZ_EMBESTIDA = sound("sfx.capataz_embestida");
+    public static final RegistryObject<SoundEvent> SFX_CAPATAZ_DOLOR = sound("sfx.capataz_dolor");
+    public static final RegistryObject<SoundEvent> SFX_CAPATAZ_MUERTE = sound("sfx.capataz_muerte");
+    public static final RegistryObject<SoundEvent> SFX_CAPATAZ_ALMAS = sound("sfx.capataz_almas");
     public static final RegistryObject<SoundEvent> AMBIENTE_MINA = sound("ambiente.mina");
     // el Condestable del Juramento (parte 7n): el grito, el tajo del montante en llamas, el barrido, la embestida, el anillo de
     // fuego, el rastrillo que cae y el que se alza, el cuerno de la guardia, la espada al cielo, el dolor, la muerte y la espera
@@ -680,6 +692,8 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_SOMBRA_2 = sound("musica.sombra2");
     /** El duelo con Sigrun en el Paso del Colmillo (parte 7ap): "Final Confrontation" de tcarisland. */
     public static final RegistryObject<SoundEvent> MUSICA_SIGRUN = sound("musica.sigrun");
+    /** Hakon, el Capataz, en la Caverna del Filon (parte 7ar): "Duel of the Dungeons" de Umplix. */
+    public static final RegistryObject<SoundEvent> MUSICA_CAPATAZ = sound("musica.capataz");
     /** La musica del final (parte 7ad): la cinematica y los creditos del alba ("New Sunrise") y de la nueva Sombra. */
     public static final RegistryObject<SoundEvent> MUSICA_FINAL_ALBA = sound("musica.final_alba");
     public static final RegistryObject<SoundEvent> MUSICA_FINAL_SOMBRA = sound("musica.final_sombra");
@@ -761,6 +775,9 @@ public class DarkCraftMod {
     /** Frases de la reina Isolde (1..6, parte 7ab). */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] ISOLDE_VOZ = new RegistryObject[7];
+    /** Frases de Hakon, el Capataz (1..5, parte 7ar). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] CAPATAZ_VOZ = new RegistryObject[6];
 
     /**
      * Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn, 21..23 la subida por la cadena del sur, 24 al
@@ -787,6 +804,7 @@ public class DarkCraftMod {
         for (int i = 1; i < BUFON_VOZ.length; i++) BUFON_VOZ[i] = sound("bufon.voz." + i);
         for (int i = 1; i < DRAGON_VOZ.length; i++) DRAGON_VOZ[i] = sound("dragon.voz." + i);
         for (int i = 1; i < ISOLDE_VOZ.length; i++) ISOLDE_VOZ[i] = sound("isolde.voz." + i);
+        for (int i = 1; i < CAPATAZ_VOZ.length; i++) CAPATAZ_VOZ[i] = sound("capataz.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) if (i < 10 || i > 20) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -976,6 +994,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Cartucho>> CARTUCHO = ENTITIES.register("cartucho",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Cartucho>of(com.darkcraft.enemigos.Cartucho::new, MobCategory.MISC)
                     .sized(0.3f, 0.3f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":cartucho"));
+    // ---- Hakon, el Capataz, el jefe de las Minas de Hierro Negro (parte 7ar)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Capataz>> CAPATAZ = ENTITIES.register("capataz",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Capataz>of(com.darkcraft.enemigos.Capataz::new, MobCategory.MONSTER)
+                    .sized(1.2f, 3.2f).fireImmune().clientTrackingRange(10).build(MODID + ":capataz"));
     // ---- los eruditos de la Academia Espectral (parte 7o), su tintero y su orbe
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Erudito>> ERUDITO = ENTITIES.register("erudito",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Erudito>of(com.darkcraft.enemigos.Erudito::new, MobCategory.MONSTER)
@@ -1213,6 +1235,9 @@ public class DarkCraftMod {
     /** La espada larga de Sigrun (parte 7ap: para quien acaba con ella); su escudo es uno de {@link #ESCUDOS} (el de la Guardiana). */
     public static final RegistryObject<Item> ESPADA_GUARDIANA = ITEMS.register("espada_guardiana",
             () -> new com.darkcraft.mision.EspadaGuardiana(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
+    /** El pico de Hakon, el Capataz (parte 7ar: lo deja al caer): un gran martillo con la veta dentro. */
+    public static final RegistryObject<Item> PICO_CAPATAZ = ITEMS.register("pico_capataz",
+            () -> new com.darkcraft.armas.PicoCapataz(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     /** El martillo de Dorvan (solo para que lo lleve en la mano) y las piedras de forja (I, II y III: mejoran las armas). */
     public static final RegistryObject<Item> MARTILLO_HERRERO = ITEMS.register("martillo_herrero",
             () -> new Item(new Item.Properties().stacksTo(1)));
@@ -1370,6 +1395,7 @@ public class DarkCraftMod {
         e.put(ABAD.get(), com.darkcraft.enemigos.Abad.atributos().build());
         e.put(CALCINADO.get(), com.darkcraft.enemigos.Calcinado.atributos().build());
         e.put(ENTERRADO.get(), com.darkcraft.enemigos.Enterrado.atributos().build());
+        e.put(CAPATAZ.get(), com.darkcraft.enemigos.Capataz.atributos().build());
         e.put(CONDESTABLE.get(), com.darkcraft.enemigos.Condestable.atributos().build());
         e.put(RECTORA.get(), com.darkcraft.enemigos.Rectora.atributos().build());
         e.put(ERUDITO.get(), com.darkcraft.enemigos.Erudito.atributos().build());
@@ -1434,6 +1460,7 @@ public class DarkCraftMod {
             e.accept(LANZA_TAM);
             e.accept(PERTIGA_FAROLERO);
             e.accept(ESPADA_GUARDIANA);
+            e.accept(PICO_CAPATAZ);
             e.accept(MAZA);
             e.accept(MARTILLO_GUERRA);
             e.accept(GRAN_MARTILLO);

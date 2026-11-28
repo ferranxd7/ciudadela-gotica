@@ -67,6 +67,7 @@ public final class Comandos {
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoAldric())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoTeatro())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoMina())
+                .then(com.darkcraft.morvain.MorvainEnemigos.comandoCapataz())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoBufon())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoNido())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoCadena())
@@ -172,6 +173,7 @@ public final class Comandos {
         src.sendSuccess(() -> linea(new Linea("/darkcraft jinete ", "/darkcraft jinete [ir | aqui | vencer | derribar | volver | noche | dia]", "jinete")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft teatro ", "/darkcraft teatro [ir <sitio> | enemigos [volver | fuera | sacar] | muro <puerta | trono> [abrir | cerrar]]", "teatro")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft mina ", "/darkcraft mina [ir <sitio> | enemigos [volver | fuera | sacar] | derrumbe [<n>] | escotilla [abrir | cerrar] | muro [abrir | cerrar]]", "mina")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft capataz ", "/darkcraft capataz [ir | vencer | volver | media | accion <n> | suelta]", "capataz")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft bufon ", "/darkcraft bufon [ir | vencer | volver | partir]", "bufon")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft nido ", "/darkcraft nido [ir <sitio> | enemigos [volver | fuera | sacar]]", "nido")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft cadena ", "/darkcraft cadena [ir <sitio> | enemigos [volver | fuera | sacar] | rafaga | sombra olvidar | gargola [vuelo | tierra | picado | garras | posarse]]", "cadena")), false);
