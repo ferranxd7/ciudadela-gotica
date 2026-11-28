@@ -13234,5 +13234,306 @@
     ]
    }
   }
+ },
+ "sfx_fuerte": {
+  "flow": "t58TdUvsC9LgcURTJwcX",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7aw: el Fuerte de la Marca y la Guarnicion sin Relevo (los Insomnes: el murmullo, la alerta, el dolor y la muerte; el cuerno y la campana de rebato; el virote, su impacto y la recarga de la ballesta; el escudo de torre, el mazazo; el puente levadizo, el rastrillo y el viento en las almenas). Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "insomne_murmullo": {
+    "prompt": "A gaunt sleepless undead soldier on night watch, hoarse ragged breathing and a low exhausted mumble with no words, chainmail and old leather creaking, short, outdoor dusk wind, no music",
+    "sesiones": [
+     "RJwgjHk4yaCPR9P2wSe2",
+     "10Q5pDuVP3IQhkCMmb38",
+     "9fsScLOoCvZD8edyW9ps",
+     "8L2ylXC3zFBtxDQeUZzh"
+    ],
+    "generaciones": [
+     "NcdCwjMStGWQ6MlZsH3N",
+     "pbxS2ptBr241ERG68vyt",
+     "MEU3NuWBfkdQki32tSEG",
+     "zJVMSDXHvcgMDVjzbikc"
+    ],
+    "duraciones": [
+     12.0,
+     15.0,
+     15.0,
+     15.0
+    ]
+   },
+   "insomne_alerta": {
+    "prompt": "A haggard armored sentry snapping awake and shouting a hoarse cracked cry of alarm, chainmail rattling as he raises his weapon, short, no music",
+    "sesiones": [
+     "C1bLhG4JrfWBu57paNkK",
+     "yoBCRNfL9xrsnUADyndo",
+     "tBX7LKQ7DDoDKDZ2G9F4",
+     "2aJ6gTPa9ekE3MzuIkHT"
+    ],
+    "generaciones": [
+     "N05221Rs6Bn609ohH3iW",
+     "7wBuc2LJZR1vVsdaDGPS",
+     "P9bch5qggataN1teaFj9",
+     "Hqx34sdvyp2s20EKtghA"
+    ],
+    "duraciones": [
+     4.0,
+     5.0,
+     4.0,
+     4.0
+    ]
+   },
+   "insomne_dolor": {
+    "prompt": "A pained grunt of an exhausted armored soldier taking a blow, dented armor clanking and mail rattling, short, no music",
+    "sesiones": [
+     "3D1SpFTE3MGmVaYXtxuU",
+     "7gFdtIer9lFT1OUfW1zr",
+     "mKp0O5ahqmeANzw3DEsw",
+     "ojnkDjvdLjAd4jqVS9ub"
+    ],
+    "generaciones": [
+     "kiNTRV7GDhpXlAZQvR11",
+     "ey7CLkftUyNQaJBoa4za",
+     "ZkKSf5lThFTpKAFLgaQn",
+     "5orT4JCXYAkdmSUaPXQr"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     2.0,
+     2.0
+    ]
+   },
+   "insomne_muerte": {
+    "prompt": "An old armored soldier collapsing, a long trembling sigh of relief as if finally falling asleep, armor and a spear clattering onto stone, no music",
+    "sesiones": [
+     "0GkdSVKBWO67a5KKBMDl",
+     "4EDuEHWcQeP1iL3lSTjF",
+     "RHYkeaRzuYFY38AwgDuj",
+     "eSwJ6LMg9naP0zahPtwK"
+    ],
+    "generaciones": [
+     "Exb5NUKjKNbn4PRFeI17",
+     "7wuwl0AxNz0CZQL80IGA",
+     "f3u2bALPpUYilgMvmPNC",
+     "SEVjLpziaJym7II5DRww"
+    ],
+    "duraciones": [
+     6.0,
+     7.0,
+     7.0,
+     7.0
+    ]
+   },
+   "cuerno_rebato": {
+    "prompt": "A battered old war horn blown long and urgently from a fortress wall at dusk, a deep hoarse brassy alarm call echoing across an empty plain, no music",
+    "sesiones": [
+     "cIKcaGSLnJ6d1jRqUZWe",
+     "tFOqFogcGSA5GeD8XBlc",
+     "SpipvWTnUsgdxnDHhvgQ",
+     "RYmPKobwqf8mwoXiHa69"
+    ],
+    "generaciones": [
+     "aHQk4OuEicKnmVdsdqYz",
+     "4OLcTh6B4mkWIUchfCI9",
+     "8YMIKJQPf8P1vn6lqmZ7",
+     "SO6MkGFeSTLH9Uxid38p"
+    ],
+    "duraciones": [
+     8.0,
+     8.0,
+     8.0,
+     8.0
+    ]
+   },
+   "campana_rebato": {
+    "prompt": "A cracked iron alarm bell rung frantically from a fortress bell tower, fast urgent clanging with a rattling rope, echoing over the walls, no music",
+    "sesiones": [
+     "NRRuhmc5dYvHKHHoiUf8",
+     "VIKPSA1s2qFEg7HrCc6W",
+     "rMBrhPIiCxJ7rJt2jRi8",
+     "yF7ZGrl1poWFMN9XV0Gq"
+    ],
+    "generaciones": [
+     "9z2U8b3MVv7VRDZyrrmK",
+     "6U1JXY3IOc6Ly0sZBZYW",
+     "HCqn6WoOeYzfyvMx9uOk",
+     "3GLYa8JQaBF3ZZtQu3h2"
+    ],
+    "duraciones": [
+     10.0,
+     10.0,
+     10.0,
+     10.0
+    ]
+   },
+   "virote_dispara": {
+    "prompt": "A heavy steel arbalest firing a thick bolt, a loud string snap, a deep wooden thunk and a short whoosh, no music",
+    "sesiones": [
+     "oZEXPzFRjVuwJXehp3Pv",
+     "N6vrwkXixZGsHvzovbv9",
+     "fYwfsUirlsPTDntJkIyK",
+     "g7ULnCKls0lS8t6uHnsb"
+    ],
+    "generaciones": [
+     "Nlfko4JG3wja7pPg6dtF",
+     "GG8UpvmSjnG7CiFhTXsS",
+     "Sy7mKgHKg53w2PlD2JfN",
+     "98XzNsXci4IYL6Apci9e"
+    ],
+    "duraciones": [
+     4.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "virote_impacto": {
+    "prompt": "A heavy crossbow bolt slamming hard into a wooden shield and armor, a deep splintering thud with a metallic crack, short, no music",
+    "sesiones": [
+     "d2EsURReHx1iiu6Yy2Ps",
+     "B8B4ntnKlhxE5cXlsBDQ",
+     "vaSrxtv7PGwYmWI18jkE",
+     "mtOQI2useC7nAXzrVnUi"
+    ],
+    "generaciones": [
+     "WXXZNN4MEJRHKXZvUXwo",
+     "PgybzWKfk6c6vRwpGyUw",
+     "GzsnuN1IchguQbK40LiD",
+     "XvFWciSco9pOy8S7o7QP"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "ballesta_recarga": {
+    "prompt": "A crossbow cranequin windlass being cranked to draw a heavy steel bow, ratcheting gears clicking steadily, the string creaking tight, ends with a click, no music",
+    "sesiones": [
+     "Seoe96dYnSgwmYiaMf4y",
+     "hpTCgEQtWBq3r0aVMHp2",
+     "UqKmvDGN88uOtcmAJcwT",
+     "UwIOqFFLhNRsZS0Lh9BD"
+    ],
+    "generaciones": [
+     "rHBKt49dGEQJKifDx67b",
+     "5YKCvBLHcjsyMPUX6uK0",
+     "RnR4ZtHlmjM1WJyn99Qn",
+     "ZJf9xETEajaVcG3wdlAd"
+    ],
+    "duraciones": [
+     8.0,
+     7.0,
+     8.0,
+     10.0
+    ]
+   },
+   "escudo_torre": {
+    "prompt": "A huge wooden tower shield with an iron rim blocking a heavy blow, a deep booming wooden thud and a ringing iron clang, short, no music",
+    "sesiones": [
+     "YDlh5Uo3CgX28O1vi4mA",
+     "4PlOd5J36Dl6cMzFwSG6",
+     "MC0bD3xOZyMHalycrp2A",
+     "wE6LgXuo7L8PFus6igaK"
+    ],
+    "generaciones": [
+     "8lxvLjnUX330XfcYh15s",
+     "2LPMgy4QmgRg9Atkcm7q",
+     "VOEh4YBv8DCpsM2NOrQM",
+     "PIcJnITOwTOf7rQutlYr"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "mazazo": {
+    "prompt": "A flanged iron mace smashing down onto armor and stone, a heavy brutal crunch with metal ringing, short, no music",
+    "sesiones": [
+     "gCwQLbOr5QexdiU8Uc8v",
+     "wybJs1Vb6tgXGm0aJrpA",
+     "Ruj3UUzukQeEz0AKPzR6",
+     "aOP8yDk6Lp3Uy1HvxlOf"
+    ],
+    "generaciones": [
+     "2ypN39bwkxz9TT5XsMYa",
+     "i3lAjZN7luqDa0XySmUY",
+     "CsfPSOa3JkX4WKItwvI0",
+     "St5S0mq9LfFgnJr8PPqZ"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "puente_levadizo": {
+    "prompt": "A massive wooden drawbridge being lowered on iron chains, a winch creaking, chains rattling through a pulley, heavy timber groaning, ending with a deep heavy thud as it lands, no music",
+    "sesiones": [
+     "sEMN4wB8dgYHgQiLLQwZ",
+     "krYaXeIs1PQEDnATEl01",
+     "rdDJT0a62Kq7zR84bars",
+     "vKZdbcthucyL9awkZs6W"
+    ],
+    "generaciones": [
+     "e5LLhGjuUqSqdo3tN0LV",
+     "h680xpQjRY3Ym8BhxuyG",
+     "creVLlR5s70VChHINIgc",
+     "MqwO4jDLgCj0Mu2Vzt9S"
+    ],
+    "duraciones": [
+     12.0,
+     10.0,
+     12.0,
+     12.0
+    ]
+   },
+   "rastrillo": {
+    "prompt": "An old iron portcullis being hauled upward, chains clanking over a winch, rusted metal grinding and scraping against stone grooves, no music",
+    "sesiones": [
+     "DhZxxJz0E0ZHHaubEa5Z",
+     "Ecnf7eaRtOpllwWGid9y",
+     "sdrR4CkqZBgSPhxAWUeQ",
+     "w1TLt4oDkwHLJomvZCQB"
+    ],
+    "generaciones": [
+     "VvYCjE4TQcO8WKhcYpnS",
+     "fa2IV5Ye5P9sLe70Yw0F",
+     "qOhIh44JEOHSAYPu0iRY",
+     "OzM7X7aBNbwn0Q78HMM5"
+    ],
+    "duraciones": [
+     8.0,
+     8.0,
+     8.0,
+     8.0
+    ]
+   },
+   "fuerte_ambiente": {
+    "prompt": "Wind howling over the empty battlements of an abandoned fortress at dusk, tattered banners flapping, old timbers creaking, a distant crow, steady seamless loop, no music",
+    "sesiones": [
+     "vC1lsp8jv9c5QGTXAeDR",
+     "bIGqjoDK7j0qN5lfOkjK",
+     "v9kqWLmTO7JUZrmRZECa",
+     "k6ZukHE2kjQsjqmMOBae"
+    ],
+    "generaciones": [
+     "8YyiidEySJ7F9D07sV1r",
+     "5gsCueLGXj8v7O01Rwca",
+     "ODrDAAroMnnlpj3i5E8i",
+     "Wbt3Qp3YpBr8k0bYlYMD"
+    ],
+    "duraciones": [
+     30.0,
+     30.0,
+     30.0,
+     30.0
+    ]
+   }
+  }
  }
 }
