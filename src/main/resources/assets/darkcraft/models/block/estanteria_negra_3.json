@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "darkcraft:block/madera_negra",
+    "side": "darkcraft:block/estanteria_negra_3"
+  }
+}

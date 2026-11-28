@@ -3085,11 +3085,11 @@ public final class ClientCiTest {
         final String[] cercaIds = {"sillar_musgoso", "marmol_negro", "piedra_tallada", "madera_roble", "entramado_cruz",
                 "tejado_escamas", "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos", "tronco_roble", "corteza_pantano",
                 "rama_roble", "hojas_roble", "musgo_colgante", "liana", "oro_labrado", "barrotes", "vidriera_roja", "brasero_almas",
-                "candelabro", "farol"};
+                "candelabro", "farol", "silla_roble", "estanteria_roble", "libros"};
         final String[] nombres = {"musgo", "marmol_negro", "tallada", "roble_puerta", "entramado_cruz", "tejado_escamas",
                 "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos", "tronco_roble", "corteza_pantano", "rama_roble",
                 "hojas_roble", "musgo_colgante", "liana", "oro_labrado", "barrotes", "vidriera_roja", "brasero_almas", "candelabro",
-                "farol"};
+                "farol", "silla_roble", "estanteria_roble", "libros"};
         final int[] cerca = new int[cercaIds.length];
         final float[] cabeceo = new float[cercaIds.length];
         for (int i = 0; i < cercaIds.length; i++) {
@@ -3178,6 +3178,27 @@ public final class ClientCiTest {
             }
             if (f.length() == 1 && "fsvcpalt".indexOf(f.charAt(0)) >= 0) {
                 n += luces(lvl, f, id, b, x, y0, z0);
+                continue;
+            }
+            if (f.length() == 1 && "mhbkoejir".indexOf(f.charAt(0)) >= 0) {
+                // los muebles (parte 8h): las pilas de una a cuatro, las estanterias en un muro de 4 x 2 y los demas tres veces
+                // (dos mirando al norte y uno al este)
+                if (f.equals("i")) {
+                    for (int k = 0; k < 4; k++)
+                        lvl.setBlock(new BlockPos(x + k, y0, z0 + 1), b.defaultBlockState().setValue(com.darkcraft.bloques.Pila.CUANTOS, k + 1), 2);
+                    n += 4;
+                } else if (f.equals("e")) {
+                    for (int dx = 0; dx < 4; dx++)
+                        for (int dy = 0; dy < 2; dy++) lvl.setBlock(new BlockPos(x + dx, y0 + dy, z0 + 2), b.defaultBlockState(), 2);
+                    n += 8;
+                } else {
+                    net.minecraft.world.level.block.state.BlockState st = b.defaultBlockState();
+                    lvl.setBlock(new BlockPos(x + 1, y0, z0 + 1), st, 2);
+                    lvl.setBlock(new BlockPos(x + 2, y0, z0 + 1), st, 2);
+                    lvl.setBlock(new BlockPos(x + 1, y0, z0 - 1), st.setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING,
+                            net.minecraft.core.Direction.EAST), 2);
+                    n += 3;
+                }
                 continue;
             }
             if (f.indexOf('W') >= 0) {

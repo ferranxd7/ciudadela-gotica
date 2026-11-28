@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/estanteria_roble"
+      },
+      {
+        "model": "darkcraft:block/estanteria_roble_2"
+      },
+      {
+        "model": "darkcraft:block/estanteria_roble_3"
+      }
+    ]
+  }
+}

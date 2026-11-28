@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "darkcraft:block/banco_roble"
+    },
+    "facing=east": {
+      "model": "darkcraft:block/banco_roble",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "darkcraft:block/banco_roble",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "darkcraft:block/banco_roble",
+      "y": 270
+    }
+  }
+}

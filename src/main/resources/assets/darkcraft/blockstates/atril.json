@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "darkcraft:block/atril"
+    },
+    "facing=east": {
+      "model": "darkcraft:block/atril",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "darkcraft:block/atril",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "darkcraft:block/atril",
+      "y": 270
+    }
+  }
+}

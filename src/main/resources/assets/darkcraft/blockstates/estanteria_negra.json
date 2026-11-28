@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/estanteria_negra"
+      },
+      {
+        "model": "darkcraft:block/estanteria_negra_2"
+      },
+      {
+        "model": "darkcraft:block/estanteria_negra_3"
+      }
+    ]
+  }
+}

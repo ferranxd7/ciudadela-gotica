@@ -1,0 +1,91 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "lino": "darkcraft:block/lino",
+    "paja": "darkcraft:block/paja",
+    "particle": "darkcraft:block/paja"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        1
+      ],
+      "to": [
+        16,
+        4,
+        15
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lino"
+        },
+        "south": {
+          "texture": "#lino"
+        },
+        "east": {
+          "texture": "#lino"
+        },
+        "west": {
+          "texture": "#lino"
+        },
+        "up": {
+          "texture": "#lino"
+        },
+        "down": {
+          "texture": "#lino"
+        }
+      }
+    },
+    {
+      "from": [
+        1,
+        4,
+        10.5
+      ],
+      "to": [
+        15,
+        6,
+        14.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lino"
+        },
+        "south": {
+          "texture": "#lino"
+        },
+        "east": {
+          "texture": "#lino"
+        },
+        "west": {
+          "texture": "#lino"
+        },
+        "up": {
+          "texture": "#lino"
+        },
+        "down": {
+          "texture": "#lino"
+        }
+      }
+    },
+    {
+      "from": [
+        1,
+        3.9,
+        2
+      ],
+      "to": [
+        15,
+        4.1,
+        9
+      ],
+      "faces": {
+        "up": {
+          "texture": "#paja"
+        }
+      }
+    }
+  ]
+}

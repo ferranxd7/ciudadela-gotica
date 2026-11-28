@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "darkcraft:block/alacena_caoba",
+    "side": "darkcraft:block/madera_caoba",
+    "top": "darkcraft:block/madera_caoba"
+  }
+}

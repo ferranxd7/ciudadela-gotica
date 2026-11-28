@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "cuantos=1": {
+      "model": "darkcraft:block/libros_1"
+    },
+    "cuantos=2": {
+      "model": "darkcraft:block/libros_2"
+    },
+    "cuantos=3": {
+      "model": "darkcraft:block/libros_3"
+    },
+    "cuantos=4": {
+      "model": "darkcraft:block/libros_4"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "darkcraft:block/silla_caoba"
+    },
+    "facing=east": {
+      "model": "darkcraft:block/silla_caoba",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "darkcraft:block/silla_caoba",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "darkcraft:block/silla_caoba",
+      "y": 270
+    }
+  }
+}

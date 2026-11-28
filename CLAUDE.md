@@ -4860,7 +4860,30 @@ en la llama, las chispas y el resplandor; nunca las particulas de Minecraft.
   en el muestrario `luces(...)` pone cada luz donde se ve (el fuego en el suelo, las velas de una a cuatro, los apliques y la
   antorcha de pared en un muro, las aranas y el farol colgados de una viga, una arana de una cadena); capturas
   `cliente_bq01..45` (grupos), `bq46..67` de cerca (tambien el brasero de almas, el candelabro y el farol), `bq68..72` las
-  luces de noche y `bq73..76` los arboles.
+  luces de noche y `bq73..76` los arboles (desde la 8h los numeros cambian: ver la 8h).
+
+### Plan nuevo, parte 8h: los bloques nuevos, septima tanda (los muebles)
+
+Respuestas 40, 42 y 47 del plan: "muebles con modelo propio", "todo amueblado". Solo decorado (los contenedores, con su
+pantalla, van aparte).
+- **El pintor de los muebles** (`tools/bloques/muebles.py`): `libros()` (el lado de una estanteria: baldas y costados de
+  madera y dos filas de lomos de colores apagados con bandas doradas y algun titulo, alguno inclinado; `vacia`: pocos libros,
+  polvo y telaranas; `polvo`: todo polvoriento), `barril_lado()` / `barril_tapa()` (duelas y aros de hierro; la tapa en un
+  circulo), `caja()` (marco, riostra en diagonal, esquinas de hierro), `paja()`, `lino()`, `alacena()` (marco, dos puertas
+  de cuarterones, bisagras y tiradores) y `libro_tapa()` / `libro_hojas()`. `sueltas_muebles()`: las tres estanterias de
+  cada madera, los frentes de las alacenas y lo demas.
+- **Formas nuevas** (minusculas, sin sufijo; modelos caja a caja con las tablas de la parte 8c): m mesa, h silla, b banco,
+  k taburete, o alacena (`orientable` con su frente), e estanteria (`cube_column` con tres variantes de libros), j jergon
+  de paja, i pila de libros (`bloques/Pila`, de una a cuatro como las velas, propiedad `cuantos`) y r atril (con un libro
+  abierto). `bloques/Mueble`: la forma de cada uno (`Mueble.forma`) y, si mira a un lado (silla, banco, alacena, jergon,
+  atril), mira a quien lo pone; las formas se escriben mirando al norte y se giran como el modelo (`Mueble.girar`). Los
+  barriles son columnas (`C`, tumbados tambien) y las cajas bloques.
+- **Septima tanda** (27 materiales, 27 bloques; ya son 206 materiales y 393 bloques): mesa, silla, banco, taburete, alacena
+  y estanteria de roble viejo, madera negra y caoba; estanteria medio vacia y polvorienta, barril y barril viejo, caja de
+  madera y caja vieja, jergon de paja, pila de libros y atril.
+- Pruebas: servidor, la linea `Bloques 8b: ...` de siempre; cliente, en el muestrario los muebles tres veces (dos mirando al
+  norte y uno al este), las estanterias en un muro y las pilas de una a cuatro; capturas `cliente_bq01..52` (grupos),
+  `bq53..77` de cerca (tambien la silla, la estanteria y los libros), `bq78..82` las luces de noche y `bq83..86` los arboles.
 
 ## Compilar, probar y publicar
 

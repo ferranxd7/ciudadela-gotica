@@ -26,6 +26,7 @@ import terreno as T  # noqa: E402
 import arboles as A  # noqa: E402
 import metal as Me  # noqa: E402
 import fuego as F  # noqa: E402
+import muebles as Mu  # noqa: E402
 
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RES = os.path.join(RAIZ, "src", "main", "resources")
@@ -681,6 +682,35 @@ def ANTORCHA(id, es, en, color, semilla):
              variantes=1, color=color)
 
 
+# ------------------------------------------------------------------ los muebles (parte 8h)
+
+MADERAS_MUEBLE = {"roble": ("madera_roble", "m_roble"), "negra": ("madera_negra", "m_negra"), "caoba": ("madera_caoba", "m_caoba")}
+
+
+def sueltas_muebles():
+    """Las texturas de los muebles que no salen de un material: las estanterias (tres de cada madera), los frentes de las
+    alacenas, la paja y el lino del jergon y las tapas y hojas de los libros."""
+    out = {}
+    for i, (k, (tex, rp)) in enumerate(MADERAS_MUEBLE.items()):
+        for v in range(3):
+            out[f"estanteria_{k}" + ("" if v == 0 else f"_{v + 1}")] = Mu.libros(800 + 10 * i + v, RAMPAS[rp])
+        out[f"alacena_{k}"] = Mu.alacena(830 + i, RAMPAS[rp], RAMPAS["hierro_n"])
+    out["estanteria_vacia"] = Mu.libros(840, RAMPAS["m_roble"], vacia=True)
+    out["estanteria_polvo"] = Mu.libros(841, RAMPAS["m_gris"], polvo=True)
+    out["paja"] = Mu.paja(842)
+    out["lino"] = Mu.lino(843, RAMPAS["cera_blanca"])
+    out["libro_tapa"] = Mu.libro_tapa(844)
+    out["libro_hojas"] = Mu.libro_hojas(845)
+    return out
+
+
+def MUEBLE(id, es, en, forma, madera, semilla, mapa="WOOD"):
+    """Un mueble de una madera (`roble`, `negra`, `caoba`): m mesa, h silla, b banco, k taburete, o alacena, e
+    estanteria; o de los de una sola: j jergon, i pila de libros, r atril."""
+    return M(id, es, en, None, formas=forma, sonido="WOOD", mapa=mapa, semilla=semilla, dureza=2.0, herramienta="axe",
+             variantes=1, madera_mueble=madera)
+
+
 # ------------------------------------------------------------------ el catalogo
 
 def M(id, es, en, receta, formas="BELM", sonido="STONE", mapa="STONE", semilla=None, variantes=3, dureza=1.5,
@@ -1053,7 +1083,40 @@ MATERIALES = [
     FAROL("farol", "Farol", "Lantern", "natural", 641),
     FAROL("farol_almas", "Farol de almas", "Soul Lantern", "almas", 642),
     ANTORCHA("antorcha", "Antorcha", "Torch", "natural", 651),
-    ANTORCHA("antorcha_almas", "Antorcha de almas", "Soul Torch", "almas", 652),
+    ANTORCHA("antorcha_almas", "Antorcha de almas", "Soul Torch", "almas", 652),    # ---- parte 8h: los muebles
+    MUEBLE("mesa_roble", "Mesa de roble viejo", "Old Oak Table", "m", "roble", 701, mapa="WOOD"),
+    MUEBLE("silla_roble", "Silla de roble viejo", "Old Oak Chair", "h", "roble", 702, mapa="WOOD"),
+    MUEBLE("banco_roble", "Banco de roble viejo", "Old Oak Bench", "b", "roble", 703, mapa="WOOD"),
+    MUEBLE("taburete_roble", "Taburete de roble viejo", "Old Oak Stool", "k", "roble", 704, mapa="WOOD"),
+    MUEBLE("alacena_roble", "Alacena de roble viejo", "Old Oak Cupboard", "o", "roble", 705, mapa="WOOD"),
+    MUEBLE("estanteria_roble", "Estantería de roble viejo", "Old Oak Bookshelf", "e", "roble", 706, mapa="WOOD"),
+    MUEBLE("mesa_negra", "Mesa de madera negra", "Blackwood Table", "m", "negra", 707, mapa="COLOR_BLACK"),
+    MUEBLE("silla_negra", "Silla de madera negra", "Blackwood Chair", "h", "negra", 708, mapa="COLOR_BLACK"),
+    MUEBLE("banco_negra", "Banco de madera negra", "Blackwood Bench", "b", "negra", 709, mapa="COLOR_BLACK"),
+    MUEBLE("taburete_negra", "Taburete de madera negra", "Blackwood Stool", "k", "negra", 710, mapa="COLOR_BLACK"),
+    MUEBLE("alacena_negra", "Alacena de madera negra", "Blackwood Cupboard", "o", "negra", 711, mapa="COLOR_BLACK"),
+    MUEBLE("estanteria_negra", "Estantería de madera negra", "Blackwood Bookshelf", "e", "negra", 712, mapa="COLOR_BLACK"),
+    MUEBLE("mesa_caoba", "Mesa de caoba", "Mahogany Table", "m", "caoba", 713, mapa="COLOR_RED"),
+    MUEBLE("silla_caoba", "Silla de caoba", "Mahogany Chair", "h", "caoba", 714, mapa="COLOR_RED"),
+    MUEBLE("banco_caoba", "Banco de caoba", "Mahogany Bench", "b", "caoba", 715, mapa="COLOR_RED"),
+    MUEBLE("taburete_caoba", "Taburete de caoba", "Mahogany Stool", "k", "caoba", 716, mapa="COLOR_RED"),
+    MUEBLE("alacena_caoba", "Alacena de caoba", "Mahogany Cupboard", "o", "caoba", 717, mapa="COLOR_RED"),
+    MUEBLE("estanteria_caoba", "Estantería de caoba", "Mahogany Bookshelf", "e", "caoba", 718, mapa="COLOR_RED"),
+    MUEBLE("estanteria_vacia", "Estantería medio vacía", "Half-Empty Bookshelf", "e", "roble", 731),
+    MUEBLE("estanteria_polvo", "Estantería polvorienta", "Dusty Bookshelf", "e", "gris", 732, mapa="COLOR_GRAY"),
+    M("barril", "Barril", "Barrel", None, formas="C", sonido="WOOD", mapa="WOOD", semilla=733, dureza=2.0, herramienta="axe",
+      lado=lambda s: Mu.barril_lado(s, RAMPAS["m_roble"], RAMPAS["hierro_n"]),
+      tapa=lambda s: Mu.barril_tapa(s, RAMPAS["m_roble"], RAMPAS["hierro_n"])),
+    M("barril_viejo", "Barril viejo", "Old Barrel", None, formas="C", sonido="WOOD", mapa="COLOR_GRAY", semilla=734, dureza=2.0,
+      herramienta="axe", lado=lambda s: Mu.barril_lado(s, RAMPAS["m_gris"], RAMPAS["oxido"]),
+      tapa=lambda s: Mu.barril_tapa(s, RAMPAS["m_gris"], RAMPAS["oxido"])),
+    M("caja", "Caja de madera", "Wooden Crate", lambda s, b: Mu.caja(s, RAMPAS["m_roble"], RAMPAS["hierro_n"]), formas="B",
+      sonido="WOOD", mapa="WOOD", semilla=735, dureza=2.0, herramienta="axe", variantes=1),
+    M("caja_vieja", "Caja vieja", "Old Crate", lambda s, b: Mu.caja(s, RAMPAS["m_gris"], RAMPAS["oxido"]), formas="B",
+      sonido="WOOD", mapa="COLOR_GRAY", semilla=736, dureza=2.0, herramienta="axe", variantes=1),
+    MUEBLE("jergon", "Jergón de paja", "Straw Pallet", "j", "roble", 737, mapa="SAND"),
+    MUEBLE("libros", "Pila de libros", "Pile of Books", "i", "roble", 738, mapa="COLOR_RED"),
+    MUEBLE("atril", "Atril de roble viejo", "Old Oak Lectern", "r", "roble", 739),
 ]
 POR_ID = {m["id"]: m for m in MATERIALES}
 
@@ -1061,8 +1124,10 @@ FORMAS = {"B": "", "E": "_escalera", "L": "_losa", "M": "_muro", "V": "_valla", 
           "T": "_trampilla", "J": "_panel"}
 # las formas que son el material entero (sin sufijo en el id): columna, planta, capas de nieve, hielo, ramas (de 8, 4 y
 # 12 pixeles), hojas, racimo, musgo que cuelga, liana, alfombra (hojarasca), vidrio, reja y cadena; y las luces (parte
-# 8g): f fuego, s brasero, v velas, c candelabro, p aplique, a arana, l farol y t antorcha (con su `_pared`)
-SIN_SUFIJO = ("C", "X", "N", "H", "R", "Q", "U", "O", "K", "G", "Y", "A", "W", "I", "Z", "f", "s", "v", "c", "p", "a", "l", "t")
+# 8g): f fuego, s brasero, v velas, c candelabro, p aplique, a arana, l farol y t antorcha (con su `_pared`); y los muebles
+# (parte 8h): m mesa, h silla, b banco, k taburete, o alacena, e estanteria, j jergon, i pila de libros y r atril
+SIN_SUFIJO = ("C", "X", "N", "H", "R", "Q", "U", "O", "K", "G", "Y", "A", "W", "I", "Z", "f", "s", "v", "c", "p", "a", "l", "t",
+              "m", "h", "b", "k", "o", "e", "j", "i", "r")
 NOMBRE_FORMA_ES = {"B": "{}", "E": "Escalera de {}", "L": "Losa de {}", "M": "Muro de {}", "V": "Valla de {}",
                    "P": "Cancela de {}", "D": "Puerta de {}", "T": "Trampilla de {}", "J": "Panel de {}"}
 NOMBRE_FORMA_EN = {"B": "{}", "E": "{} Stairs", "L": "{} Slab", "M": "{} Wall", "V": "{} Fence", "P": "{} Fence Gate",
@@ -1107,7 +1172,7 @@ def texturas(m):
         for k in range(2):
             out[f"fuego_{c}_{k}"] = _img(F.llamas(s + 37 * k, RAMPAS["f_" + c]))
             ANIM[f"fuego_{c}_{k}"] = 1
-    elif m["formas"] in ("s", "v", "c", "p", "a", "l", "t"):
+    elif m["formas"] in ("s", "v", "c", "p", "a", "l", "t", "m", "h", "b", "k", "o", "e", "j", "i", "r"):
         out = {}
     elif "N" not in m["formas"]:
         for v, n in enumerate(nombres(m)):
@@ -1484,6 +1549,113 @@ def escribir_luz(m):
     raise ValueError(f)
 
 
+def _girado(bid, modelo, facing_y=None):
+    """El estado de un mueble que mira a un lado (el modelo mira al norte)."""
+    giro = facing_y or {"north": 0, "east": 90, "south": 180, "west": 270}
+    return {"variants": {f"facing={d}": dict({"model": modelo}, **({"y": y} if y else {})) for d, y in giro.items()}}
+
+
+# las pilas de libros: cada libro (desde, hasta, giro en y, franja de la tapa)
+LIBROS = [((4, 0, 3), (12, 2, 13), 0, 0), ((5, 2, 4), (11, 4, 12), 22.5, 1), ((4, 4, 3), (12, 6, 13), 0, 2),
+          ((6, 6, 5), (10, 8, 11), -22.5, 3)]
+
+
+def escribir_mueble(m):
+    """Los muebles de la parte 8h, caja a caja (las texturas de madera son las tablas de la parte 8c)."""
+    bid, f = m["id"], m["formas"]
+    bs = os.path.join(ASSETS, "blockstates")
+    mb = os.path.join(ASSETS, "models", "block")
+    mi = os.path.join(ASSETS, "models", "item")
+    k = m.get("madera_mueble", "roble")
+    tex_madera = f"darkcraft:block/{MADERAS_MUEBLE.get(k, ('madera_gris', ''))[0]}"
+    t = {"madera": tex_madera, "particle": tex_madera}
+
+    def modelo(nombre, els, textos=None):
+        j(os.path.join(mb, nombre + ".json"), {"parent": "minecraft:block/block", "textures": textos or t, "elements": els})
+
+    if f == "m":
+        els = [_caja(a, b, "#madera") for a, b in (
+            ((0, 13, 0), (16, 16, 16)), ((1, 0, 1), (3, 13, 3)), ((13, 0, 1), (15, 13, 3)), ((1, 0, 13), (3, 13, 15)),
+            ((13, 0, 13), (15, 13, 15)), ((3, 11, 1.5), (13, 13, 2.5)), ((3, 11, 13.5), (13, 13, 14.5)),
+            ((1.5, 11, 3), (2.5, 13, 13)), ((13.5, 11, 3), (14.5, 13, 13)))]
+        modelo(bid, els)
+        j(os.path.join(bs, bid + ".json"), {"variants": {"": {"model": f"darkcraft:block/{bid}"}}})
+    elif f == "h":
+        els = [_caja(a, b, "#madera") for a, b in (
+            ((3, 7, 3), (13, 9, 13)), ((3, 0, 3), (5, 7, 5)), ((11, 0, 3), (13, 7, 5)), ((3, 0, 11), (5, 7, 13)),
+            ((11, 0, 11), (13, 7, 13)), ((3, 9, 11), (5, 22, 13)), ((11, 9, 11), (13, 22, 13)),
+            ((5, 12, 11.5), (11, 14, 12.5)), ((5, 16, 11.5), (11, 18, 12.5)), ((4.5, 20, 11), (11.5, 22, 13)),
+            ((5, 2, 3.5), (11, 3, 4.5)))]
+        modelo(bid, els)
+        j(os.path.join(bs, bid + ".json"), _girado(bid, f"darkcraft:block/{bid}"))
+    elif f == "b":
+        els = [_caja(a, b, "#madera") for a, b in (
+            ((0, 6, 4), (16, 8, 12)), ((2, 0, 5), (4, 6, 11)), ((12, 0, 5), (14, 6, 11)), ((1.5, 0, 4.5), (4.5, 1, 11.5)),
+            ((11.5, 0, 4.5), (14.5, 1, 11.5)), ((4, 2, 7), (12, 3, 9)))]
+        modelo(bid, els)
+        j(os.path.join(bs, bid + ".json"), _girado(bid, f"darkcraft:block/{bid}"))
+    elif f == "k":
+        els = [_caja(a, b, "#madera") for a, b in (
+            ((4, 8, 4), (12, 10, 12)), ((4.5, 0, 4.5), (6, 8, 6)), ((10, 0, 4.5), (11.5, 8, 6)), ((4.5, 0, 10), (6, 8, 11.5)),
+            ((10, 0, 10), (11.5, 8, 11.5)), ((6, 3, 5), (10, 4, 5.5)), ((6, 3, 10.5), (10, 4, 11)))]
+        modelo(bid, els)
+        j(os.path.join(bs, bid + ".json"), {"variants": {"": {"model": f"darkcraft:block/{bid}"}}})
+    elif f == "o":
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/orientable", "textures": {
+            "front": f"darkcraft:block/alacena_{k}", "side": tex_madera, "top": tex_madera}})
+        j(os.path.join(bs, bid + ".json"), _girado(bid, f"darkcraft:block/{bid}"))
+    elif f == "e":
+        lados = ["estanteria_vacia"] if bid == "estanteria_vacia" else ["estanteria_polvo"] if bid == "estanteria_polvo" else \
+            [f"estanteria_{k}", f"estanteria_{k}_2", f"estanteria_{k}_3"]
+        estados = []
+        for i, lado in enumerate(lados):
+            nm = bid if i == 0 else f"{bid}_{i + 1}"
+            j(os.path.join(mb, nm + ".json"), {"parent": "minecraft:block/cube_column",
+                                              "textures": {"end": tex_madera, "side": f"darkcraft:block/{lado}"}})
+            estados.append({"model": f"darkcraft:block/{nm}"})
+        j(os.path.join(bs, bid + ".json"), {"variants": {"": estados if len(estados) > 1 else estados[0]}})
+    elif f == "j":
+        tl = {"lino": "darkcraft:block/lino", "paja": "darkcraft:block/paja", "particle": "darkcraft:block/paja"}
+        els = [_caja((0, 0, 1), (16, 4, 15), "#lino"), _caja((1, 4, 10.5), (15, 6, 14.5), "#lino")]
+        els.append(_caja((1, 3.9, 2), (15, 4.1, 9), "#paja", caras=("up",)))
+        modelo(bid, els, tl)
+        j(os.path.join(bs, bid + ".json"), _girado(bid, f"darkcraft:block/{bid}"))
+    elif f == "i":
+        tl = {"tapa": "darkcraft:block/libro_tapa", "hojas": "darkcraft:block/libro_hojas", "particle": "darkcraft:block/libro_tapa"}
+        v = {}
+        for cuantos in range(1, 5):
+            els = []
+            for (a, b, giro, franja) in LIBROS[:cuantos]:
+                uv = [0, 4 * franja, 16, 4 * franja + 4]
+                e = {"from": list(a), "to": list(b), "faces": {
+                    "up": {"texture": "#tapa", "uv": [0, 4 * franja, 16, 4 * franja + 4]},
+                    "down": {"texture": "#tapa", "uv": [0, 4 * franja, 16, 4 * franja + 4]},
+                    "west": {"texture": "#tapa", "uv": uv}, "east": {"texture": "#hojas"},
+                    "north": {"texture": "#hojas"}, "south": {"texture": "#hojas"}}}
+                if giro:
+                    e["rotation"] = {"origin": [8, a[1] + 1, 8], "axis": "y", "angle": giro}
+                els.append(e)
+            modelo(f"{bid}_{cuantos}", els, tl)
+            v[f"cuantos={cuantos}"] = {"model": f"darkcraft:block/{bid}_{cuantos}"}
+        j(os.path.join(bs, bid + ".json"), {"variants": v})
+        j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}_2"})
+        return [bid]
+    elif f == "r":
+        tl = dict(t, hojas="darkcraft:block/libro_hojas", tapa="darkcraft:block/libro_tapa")
+        rot = {"origin": [8, 13, 8], "axis": "x", "angle": -22.5}
+        els = [_caja(a, b, "#madera") for a, b in (((3, 0, 3), (13, 2, 13)), ((6, 2, 6), (10, 12, 10)), ((5, 11, 5), (11, 12, 11)))]
+        els.append(_caja((2, 12, 3), (14, 13.5, 13), "#madera", rot=rot))
+        els.append(_caja((1.5, 13.5, 2.5), (14.5, 14.5, 3.5), "#madera", rot=rot))
+        libro = _caja((3, 13.5, 4), (13, 14.5, 12), "#hojas", rot=rot)
+        libro["faces"]["up"] = {"texture": "#hojas", "uv": [0, 0, 16, 8]}
+        els.append(libro)
+        els.append(_caja((7.75, 14.5, 4), (8.25, 14.6, 12), "#tapa", caras=("up",), rot=rot))
+        modelo(bid, els, tl)
+        j(os.path.join(bs, bid + ".json"), _girado(bid, f"darkcraft:block/{bid}"))
+    j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
+    return [bid]
+
+
 def escribir_vidrio(m):
     """Vidrio: el bloque (translucido) y, si lleva J, su panel (como el panel de vidrio del juego: poste, lados y sin
     lado, con el canto `<id>_borde`)."""
@@ -1645,6 +1817,8 @@ def escribir_material(m):
         return escribir_tronco(m)
     if m["formas"] in ("f", "s", "v", "c", "p", "a", "l", "t"):
         return escribir_luz(m)
+    if m["formas"] in ("m", "h", "b", "k", "o", "e", "j", "i", "r"):
+        return escribir_mueble(m)
     if "W" in m["formas"]:
         return escribir_vidrio(m)
     if m["formas"] == "I":
@@ -2070,7 +2244,7 @@ def main():
         img.save(os.path.join(tdir, nombre + ".png"))
         if nombre in ANIM:
             j(os.path.join(tdir, nombre + ".png.mcmeta"), {"animation": {"frametime": ANIM[nombre]}})
-    for nombre, img in sueltas().items():
+    for nombre, img in list(sueltas().items()) + list(sueltas_muebles().items()):
         guardar(nombre, img)
     particulas_json()
     for m in MATERIALES:

@@ -1,0 +1,262 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "madera": "darkcraft:block/madera_roble",
+    "particle": "darkcraft:block/madera_roble",
+    "hojas": "darkcraft:block/libro_hojas",
+    "tapa": "darkcraft:block/libro_tapa"
+  },
+  "elements": [
+    {
+      "from": [
+        3,
+        0,
+        3
+      ],
+      "to": [
+        13,
+        2,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        2,
+        6
+      ],
+      "to": [
+        10,
+        12,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        11,
+        5
+      ],
+      "to": [
+        11,
+        12,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        12,
+        3
+      ],
+      "to": [
+        14,
+        13.5,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          13,
+          8
+        ],
+        "axis": "x",
+        "angle": -22.5
+      }
+    },
+    {
+      "from": [
+        1.5,
+        13.5,
+        2.5
+      ],
+      "to": [
+        14.5,
+        14.5,
+        3.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          13,
+          8
+        ],
+        "axis": "x",
+        "angle": -22.5
+      }
+    },
+    {
+      "from": [
+        3,
+        13.5,
+        4
+      ],
+      "to": [
+        13,
+        14.5,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hojas"
+        },
+        "south": {
+          "texture": "#hojas"
+        },
+        "east": {
+          "texture": "#hojas"
+        },
+        "west": {
+          "texture": "#hojas"
+        },
+        "up": {
+          "texture": "#hojas",
+          "uv": [
+            0,
+            0,
+            16,
+            8
+          ]
+        },
+        "down": {
+          "texture": "#hojas"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          13,
+          8
+        ],
+        "axis": "x",
+        "angle": -22.5
+      }
+    },
+    {
+      "from": [
+        7.75,
+        14.5,
+        4
+      ],
+      "to": [
+        8.25,
+        14.6,
+        12
+      ],
+      "faces": {
+        "up": {
+          "texture": "#tapa"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          13,
+          8
+        ],
+        "axis": "x",
+        "angle": -22.5
+      }
+    }
+  ]
+}

@@ -175,6 +175,21 @@ public final class Bloques {
             altaLuz(m, ids);
             return;
         }
+        if (f.length() == 1 && "mhbkoejir".indexOf(f.charAt(0)) >= 0) {
+            // los muebles (parte 8h): con su forma; silla, banco, alacena, jergon y atril miran a quien los pone
+            BlockBehaviour.Properties pm = BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido()).strength(m.dureza())
+                    .ignitedByLava().instrument(NoteBlockInstrument.BASS);
+            switch (f) {
+                case "i" -> reg(ids, m.id(), () -> new Pila(pm.noOcclusion().pushReaction(PushReaction.DESTROY)));
+                case "e" -> reg(ids, m.id(), () -> new Block(pm));
+                default -> {
+                    boolean girado = "hbojr".indexOf(f.charAt(0)) >= 0;
+                    boolean lleno = f.equals("o");
+                    reg(ids, m.id(), () -> new Mueble(lleno ? pm : pm.noOcclusion(), Mueble.forma(f), girado));
+                }
+            }
+            return;
+        }
         if (f.indexOf('W') >= 0) {
             // vidrio: el bloque translucido y, con J, su panel
             reg(ids, m.id(), () -> new GlassBlock(vidrio(m)));

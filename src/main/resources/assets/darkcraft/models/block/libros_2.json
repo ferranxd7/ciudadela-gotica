@@ -1,0 +1,119 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "tapa": "darkcraft:block/libro_tapa",
+    "hojas": "darkcraft:block/libro_hojas",
+    "particle": "darkcraft:block/libro_tapa"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        0,
+        3
+      ],
+      "to": [
+        12,
+        2,
+        13
+      ],
+      "faces": {
+        "up": {
+          "texture": "#tapa",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "down": {
+          "texture": "#tapa",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "west": {
+          "texture": "#tapa",
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ]
+        },
+        "east": {
+          "texture": "#hojas"
+        },
+        "north": {
+          "texture": "#hojas"
+        },
+        "south": {
+          "texture": "#hojas"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        2,
+        4
+      ],
+      "to": [
+        11,
+        4,
+        12
+      ],
+      "faces": {
+        "up": {
+          "texture": "#tapa",
+          "uv": [
+            0,
+            4,
+            16,
+            8
+          ]
+        },
+        "down": {
+          "texture": "#tapa",
+          "uv": [
+            0,
+            4,
+            16,
+            8
+          ]
+        },
+        "west": {
+          "texture": "#tapa",
+          "uv": [
+            0,
+            4,
+            16,
+            8
+          ]
+        },
+        "east": {
+          "texture": "#hojas"
+        },
+        "north": {
+          "texture": "#hojas"
+        },
+        "south": {
+          "texture": "#hojas"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          3,
+          8
+        ],
+        "axis": "y",
+        "angle": 22.5
+      }
+    }
+  ]
+}

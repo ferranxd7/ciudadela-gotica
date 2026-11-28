@@ -1,0 +1,361 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "madera": "darkcraft:block/madera_caoba",
+    "particle": "darkcraft:block/madera_caoba"
+  },
+  "elements": [
+    {
+      "from": [
+        3,
+        7,
+        3
+      ],
+      "to": [
+        13,
+        9,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        0,
+        3
+      ],
+      "to": [
+        5,
+        7,
+        5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    },
+    {
+      "from": [
+        11,
+        0,
+        3
+      ],
+      "to": [
+        13,
+        7,
+        5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        0,
+        11
+      ],
+      "to": [
+        5,
+        7,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    },
+    {
+      "from": [
+        11,
+        0,
+        11
+      ],
+      "to": [
+        13,
+        7,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        9,
+        11
+      ],
+      "to": [
+        5,
+        22,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    },
+    {
+      "from": [
+        11,
+        9,
+        11
+      ],
+      "to": [
+        13,
+        22,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        12,
+        11.5
+      ],
+      "to": [
+        11,
+        14,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        16,
+        11.5
+      ],
+      "to": [
+        11,
+        18,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    },
+    {
+      "from": [
+        4.5,
+        20,
+        11
+      ],
+      "to": [
+        11.5,
+        22,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        2,
+        3.5
+      ],
+      "to": [
+        11,
+        3,
+        4.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#madera"
+        },
+        "south": {
+          "texture": "#madera"
+        },
+        "east": {
+          "texture": "#madera"
+        },
+        "west": {
+          "texture": "#madera"
+        },
+        "up": {
+          "texture": "#madera"
+        },
+        "down": {
+          "texture": "#madera"
+        }
+      }
+    }
+  ]
+}

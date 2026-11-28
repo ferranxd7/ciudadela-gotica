@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/estanteria_caoba"
+      },
+      {
+        "model": "darkcraft:block/estanteria_caoba_2"
+      },
+      {
+        "model": "darkcraft:block/estanteria_caoba_3"
+      }
+    ]
+  }
+}
