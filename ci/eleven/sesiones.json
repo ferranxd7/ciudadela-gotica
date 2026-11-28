@@ -11750,5 +11750,306 @@
     ]
    }
   }
+ },
+ "voz_capataz": {
+  "voz": "Rob - Tough, Calloused, British",
+  "voice_id": "2ajXGJNYBR0iNHpS4VZb",
+  "flow": "M2NdlS8Pm3d3AaLHd6Tg",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7ar: Hakon, el Capataz de las Minas de Hierro Negro (el jefe de la Caverna del Filon). Por frase, tomas a y b; se bajan como capataz/voz_Na.mp3 y capataz/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[gruff, suspicious] Who's there? [growing angry] The shift isn't over... [shouting] Back to the vein! Everyone, back to work!",
+    "sesiones": [
+     "ymFYkmw9Pjoc9p6VrzR3",
+     "uVCZU0VV5YHMlTXtD9mR"
+    ],
+    "generaciones": [
+     "sy2mjji5LbqnJM7JQbfT",
+     "os0VXnViYz9MADLHJ5yO"
+    ],
+    "duraciones": [
+     5.44,
+     5.52
+    ]
+   },
+   "2": {
+    "prompt": "[growling, possessed] The vein... [shouting] it's mine! It always was! [roaring] Dig, you dogs... DIG!",
+    "sesiones": [
+     "uOxSYNTGQ6PDeYHYJlZz",
+     "IbGZboM026jGxH0jnPmt"
+    ],
+    "generaciones": [
+     "OH2Oikc74Bdx3IIV0NmS",
+     "tgWmT3w0ia7uVx8xUOa2"
+    ],
+    "duraciones": [
+     6.4,
+     7.68
+    ]
+   },
+   "3": {
+    "prompt": "[cold, grim] Another one for the shaft. [low] Forty lamps went down... forty-one, now.",
+    "sesiones": [
+     "NvDToK6ooeUW0jfkb8vH",
+     "VbqiXDXBClKR41wgaAir"
+    ],
+    "generaciones": [
+     "MbuqO78qf2u8K4TyKOXE",
+     "UWYHwboLIznVTRwSSYhr"
+    ],
+    "duraciones": [
+     6.16,
+     6.0
+    ]
+   },
+   "4": {
+    "prompt": "[shouting] Light the charges! [roaring] Blow the wall!",
+    "sesiones": [
+     "q6S2p9UiYtKb2PjP0OA2",
+     "NmW8lxOvC5f4xozsBWtr"
+    ],
+    "generaciones": [
+     "B5cyQLUdlPA7ZXTUz8lD",
+     "6O26KjNpKwTKgKP3VHCa"
+    ],
+    "duraciones": [
+     3.2,
+     3.2
+    ]
+   },
+   "5": {
+    "prompt": "[weak, fading, in awe] The lamps... I can see the lamps... going up... [whispering] Let them... go home.",
+    "sesiones": [
+     "5sEAXURZFkXagPsEYi72",
+     "QMwtASUYRrNZDfuCkdYp"
+    ],
+    "generaciones": [
+     "LMQHyM3ERNNxskst8BkN",
+     "grx6Ot6JCLfwr7duoeIr"
+    ],
+    "duraciones": [
+     6.64,
+     6.56
+    ]
+   }
+  }
+ },
+ "sfx_capataz": {
+  "flow": "M2NdlS8Pm3d3AaLHd6Tg",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7ar: Hakon, el Capataz (el silbato, el pico, la veta de cristales, el temblor, la roca que cae, beberse la veta, la embestida, el dolor, la muerte y las almas de las cuarenta lamparas). Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "capataz_silbato": {
+    "prompt": "An old brass mining foreman's whistle blown hard in three long shrill blasts, echoing down endless stone mine tunnels, cavernous reverb, eerie distant echoes answering, dark fantasy, no music",
+    "sesiones": [
+     "h1jQ29O5r1zWEP3l9LCF",
+     "k0TzjJYNhrEDh3KhdNhQ",
+     "6JqIqRHwz39djswurfkz",
+     "icbfYXrkq7J5swsYYK9D"
+    ],
+    "generaciones": [
+     "BeAp4JEZNkwbetj03TQ9",
+     "su4u8eBnmFbBwGX1zrnu",
+     "B7n3cs0ji6d64IBOjN2C",
+     "oHJ4oIcnIKdgHecxLu2I"
+    ],
+    "duraciones": [
+     10.0,
+     12.0,
+     8.0,
+     8.0
+    ]
+   },
+   "capataz_pico": {
+    "prompt": "A huge two-headed iron pickaxe swung with a heavy whoosh and slammed into a rock floor, massive deep impact, stone cracking and gravel spraying, cavern reverb, epic cinematic dark fantasy, no music",
+    "sesiones": [
+     "WbWICkfaNjEHCAiAfjGH",
+     "rJDFms6cW2KjDz23cIN9",
+     "dU8ywzd4VO8xKC2l714i",
+     "b9TibYvbHHblmfLKBNcz"
+    ],
+    "generaciones": [
+     "rnbIJRKur4ll2ArgIRlk",
+     "N4JVTBaUVfoiuZ60atX3",
+     "TpTTB1ix91JyWVIZ3c65",
+     "Sr0jq955FOCplEi7eQNz"
+    ],
+    "duraciones": [
+     4.0,
+     4.0,
+     4.0,
+     4.0
+    ]
+   },
+   "capataz_veta": {
+    "prompt": "A line of sharp red crystals erupting violently from a stone floor one after another, crystalline cracking and shattering, glassy ringing, deep rumbling underneath, cavern reverb, epic dark fantasy, no music",
+    "sesiones": [
+     "GQHCnzdF1IbHM77WUYZn",
+     "JRQBLG1FVVECa4nsgJNN",
+     "QJKcTaZuKGWo0yyLJgpC",
+     "X6E7TOk5F0j3b4fDobVz"
+    ],
+    "generaciones": [
+     "YBdwwsY41tcBO5AwRIw6",
+     "ChK2aFfcHFuhftzi21dy",
+     "32xStgs4rfyKSNfuwKvP",
+     "63dxrjw6WHt4m84Heatf"
+    ],
+    "duraciones": [
+     6.0,
+     5.0,
+     6.0,
+     6.0
+    ]
+   },
+   "capataz_temblor": {
+    "prompt": "Two heavy pickaxe blows into the ground followed by an entire underground cavern shaking, deep earthquake rumble, creaking groaning rock, pebbles and dust trickling from the ceiling, epic, no music",
+    "sesiones": [
+     "kCjOgwB7daRIwIshKCGu",
+     "XaIu19Q2KtL6bNwXppMk",
+     "eM7HiSH3Z2EbJpeNNKFh",
+     "CNzSE4IfD8CAlNT224m6"
+    ],
+    "generaciones": [
+     "iVoQMTl10F4yPrTi2TNh",
+     "hCMokkIOtxbpeGqbRTrV",
+     "lKascqDO0iY6mql6aNFs",
+     "CwzkvJud2icO9148eA9M"
+    ],
+    "duraciones": [
+     12.0,
+     12.0,
+     12.0,
+     12.0
+    ]
+   },
+   "capataz_roca": {
+    "prompt": "A single heavy boulder falling from a high cave ceiling and smashing onto a stone floor, deep crunching impact, debris scattering, cavern reverb, no music",
+    "sesiones": [
+     "vLES22X1H9Or1h4m99JH",
+     "SVaNgZfAg5YulRWsENPH",
+     "gucBubn5OlCX7ldXtss4",
+     "6dipH2HEy0duV6eUnxNt"
+    ],
+    "generaciones": [
+     "VIOJPA6WIlBgLDli6jXf",
+     "WeTgIblcDrDFveoHS1Ir",
+     "FRvJvrES213iWpsizkR1",
+     "8Qawl0kl2j3GbWmpJ3vF"
+    ],
+    "duraciones": [
+     6.0,
+     5.0,
+     5.0,
+     4.0
+    ]
+   },
+   "capataz_absorber": {
+    "prompt": "A huge glowing crystal vein being drained of its power, a deep resonant crystalline hum rising and swelling, energy pulsing and throbbing, stone groaning, ominous dark fantasy power-up ending in a deep boom, no music",
+    "sesiones": [
+     "r65UT6Rxmu0lY2BiB7FS",
+     "dr6YblGMnHml0TUnd10F",
+     "c2k1eWx6p1OTQL4uv8z9",
+     "tkP7sWbXdcdn8scypzwP"
+    ],
+    "generaciones": [
+     "qoCZpZukKM7JYFMvvaVT",
+     "yCwAW3NlaCVyhXawMJfX",
+     "1XUwPEyW5vwIH50fCAyI",
+     "LXGQWl1CHPTLDSHPbAe7"
+    ],
+    "duraciones": [
+     12.0,
+     12.0,
+     15.0,
+     12.0
+    ]
+   },
+   "capataz_embestida": {
+    "prompt": "A huge brute charging with heavy pounding boots on stone and slamming into something with a crystal encrusted shoulder, crunching crystalline impact, cavern reverb, no voice, no music",
+    "sesiones": [
+     "RrGBtKAug6P7uSKNPMhe",
+     "qKU9JvzRlEMSYPLU9FtD",
+     "IXl8bXkXT1iv8ApGGRSd",
+     "d6TQ5DPDS0k2ZZpk1SiD"
+    ],
+    "generaciones": [
+     "Ilo72Ph50FEMLqKFCEQE",
+     "Lr5OTqnAdjqNqZpPtq2d",
+     "IlOGYfomZVPx6tvGWT4c",
+     "6Ml1Yogi2yLyhwmKMV3L"
+    ],
+    "duraciones": [
+     10.0,
+     12.0,
+     6.0,
+     8.0
+    ]
+   },
+   "capataz_dolor": {
+    "prompt": "A big gruff old man grunting in pain, one short deep hoarse growl, with a faint crystalline crack, close, no music",
+    "sesiones": [
+     "347BIhTBDk1KQD44jejq",
+     "GkIXo67ZqGapS2Sr2a2Q",
+     "JeAk78gxClmcVjqoSzSP",
+     "DnZqUMrTUjcPm8gl4I93"
+    ],
+    "generaciones": [
+     "drfyDcP31x03YYBildFZ",
+     "E9C2lSpMWFuqgpO7Tx8Z",
+     "t2YF8cm29d2jy6ahNZXX",
+     "mlGevnW8Qfv2qJpV35NF"
+    ],
+    "duraciones": [
+     2.0,
+     2.0,
+     2.0,
+     2.0
+    ]
+   },
+   "capataz_muerte": {
+    "prompt": "A huge old miner falling heavily to his knees with a long dying exhale, a heavy iron pickaxe dropping and clanging on stone, an old lantern's glass cracking as its flame goes out, cavern reverb, no music",
+    "sesiones": [
+     "OSN98dlee8D5GDVABM33",
+     "iqUoKqx3yQDPun2TBycr",
+     "ZoN71aN5WRdACm2uqx36",
+     "ymjq5BLouOu8NyT4Oa4V"
+    ],
+    "generaciones": [
+     "o4vBJA7XeBG1huDlsQv8",
+     "TztrUmhfh8EdBNHXs071",
+     "xpDcS2cguf5WioA6p2Xc",
+     "9FdQQsKsFlVtHSUoLO9z"
+    ],
+    "duraciones": [
+     8.0,
+     8.0,
+     7.0,
+     8.0
+    ]
+   },
+   "capataz_almas": {
+    "prompt": "Many small ghostly lights rising slowly upward through a deep cave, soft ethereal shimmering whoosh, faint distant sighs of relief, gentle glassy chimes like little lanterns, peaceful release, reverberant, no music",
+    "sesiones": [
+     "VKL1RfyTC6E0BR4TpTfJ",
+     "oqTgvaZPkZWa4s857C0G",
+     "BirhGN3QTwEUBiDZSpeS",
+     "pxo5EhnQTOf1e9cyCCBs"
+    ],
+    "generaciones": [
+     "7X0udGCQlZ6Bcv9ivPq1",
+     "8ziKDQV0bVn2QcWlMckd",
+     "Gitz0QAWgTYkAnhDRzxs",
+     "6ap00jieO6WvJNltbHPG"
+    ],
+    "duraciones": [
+     15.0,
+     15.0,
+     15.0,
+     15.0
+    ]
+   }
+  }
  }
 }
