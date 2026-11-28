@@ -340,6 +340,22 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_CAPATAZ_MUERTE = sound("sfx.capataz_muerte");
     public static final RegistryObject<SoundEvent> SFX_CAPATAZ_ALMAS = sound("sfx.capataz_almas");
     public static final RegistryObject<SoundEvent> AMBIENTE_MINA = sound("ambiente.mina");
+    // el Osario de San Ulfo y los Ensamblados (parte 7as): el traqueteo de los huesos, la alerta de muchas voces, el dolor,
+    // deshacerse, rehacerse y volverse polvo; el barrido del portacirios, el coloso que arrastra y aplasta, la guirnalda de
+    // calaveras que cae, la campana rota del campanario, los susurros de la capilla de los huesos y el aire de la cripta
+    public static final RegistryObject<SoundEvent> SFX_ENSAMBLADO_TRAQUETEO = sound("sfx.ensamblado_traqueteo");
+    public static final RegistryObject<SoundEvent> SFX_ENSAMBLADO_ALERTA = sound("sfx.ensamblado_alerta");
+    public static final RegistryObject<SoundEvent> SFX_ENSAMBLADO_DOLOR = sound("sfx.ensamblado_dolor");
+    public static final RegistryObject<SoundEvent> SFX_ENSAMBLADO_DESHACE = sound("sfx.ensamblado_deshace");
+    public static final RegistryObject<SoundEvent> SFX_ENSAMBLADO_REHACE = sound("sfx.ensamblado_rehace");
+    public static final RegistryObject<SoundEvent> SFX_ENSAMBLADO_POLVO = sound("sfx.ensamblado_polvo");
+    public static final RegistryObject<SoundEvent> SFX_PORTACIRIOS_BARRIDO = sound("sfx.portacirios_barrido");
+    public static final RegistryObject<SoundEvent> SFX_MONTON_ARRASTRE = sound("sfx.monton_arrastre");
+    public static final RegistryObject<SoundEvent> SFX_MONTON_GOLPE = sound("sfx.monton_golpe");
+    public static final RegistryObject<SoundEvent> SFX_GUIRNALDA_CAE = sound("sfx.guirnalda_cae");
+    public static final RegistryObject<SoundEvent> SFX_OSARIO_CAMPANA = sound("sfx.osario_campana");
+    public static final RegistryObject<SoundEvent> SFX_OSARIO_SUSURROS = sound("sfx.osario_susurros");
+    public static final RegistryObject<SoundEvent> AMBIENTE_OSARIO = sound("ambiente.osario");
     // el Condestable del Juramento (parte 7n): el grito, el tajo del montante en llamas, el barrido, la embestida, el anillo de
     // fuego, el rastrillo que cae y el que se alza, el cuerno de la guardia, la espada al cielo, el dolor, la muerte y la espera
     public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_GRITO = sound("sfx.condestable_grito");
@@ -994,6 +1010,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Cartucho>> CARTUCHO = ENTITIES.register("cartucho",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Cartucho>of(com.darkcraft.enemigos.Cartucho::new, MobCategory.MISC)
                     .sized(0.3f, 0.3f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":cartucho"));
+    // ---- los ensamblados del Osario de San Ulfo (parte 7as)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Ensamblado>> ENSAMBLADO = ENTITIES.register("ensamblado",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Ensamblado>of(com.darkcraft.enemigos.Ensamblado::new, MobCategory.MONSTER)
+                    .sized(0.7f, 2.0f).clientTrackingRange(8).build(MODID + ":ensamblado"));
     // ---- Hakon, el Capataz, el jefe de las Minas de Hierro Negro (parte 7ar)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Capataz>> CAPATAZ = ENTITIES.register("capataz",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Capataz>of(com.darkcraft.enemigos.Capataz::new, MobCategory.MONSTER)
@@ -1396,6 +1416,7 @@ public class DarkCraftMod {
         e.put(CALCINADO.get(), com.darkcraft.enemigos.Calcinado.atributos().build());
         e.put(ENTERRADO.get(), com.darkcraft.enemigos.Enterrado.atributos().build());
         e.put(CAPATAZ.get(), com.darkcraft.enemigos.Capataz.atributos().build());
+        e.put(ENSAMBLADO.get(), com.darkcraft.enemigos.Ensamblado.atributos().build());
         e.put(CONDESTABLE.get(), com.darkcraft.enemigos.Condestable.atributos().build());
         e.put(RECTORA.get(), com.darkcraft.enemigos.Rectora.atributos().build());
         e.put(ERUDITO.get(), com.darkcraft.enemigos.Erudito.atributos().build());

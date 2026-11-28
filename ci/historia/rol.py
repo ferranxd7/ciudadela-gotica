@@ -5083,6 +5083,88 @@ SANTUARIOS_MORVAIN_EN_7AQ = {"bocamina": "The Mine Mouth"}
 ES.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_ES_7AQ.items()})
 EN.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_EN_7AQ.items()})
 
+# ---- parte 7as: el Osario de San Ulfo (los Ensamblados)
+ES.update({
+    "entity.darkcraft.ensamblado": "Ensamblado",
+    "darkcraft.bestiario.ensamblado_portacirios": "Ensamblado portacirios",
+    "darkcraft.bestiario.ensamblado_sepulturero": "Ensamblado sepulturero",
+    "darkcraft.bestiario.ensamblado_coloso": "Coloso de huesos",
+    "darkcraft.bestiario.ensamblado_portacirios.desc": "Los Ensamblados son los cuarenta mil del Osario de San Ulfo, levantados la noche del cielo rojo, pero mezclados: la calavera de uno, los brazos de otro, las costillas de un tercero. El portacirios lleva un candelabro de huesos con las velas encendidas: el candelazo y el barrido prenden fuego. Cuando cae, se deshace en un montón de huesos y a los cinco segundos se vuelve a armar, con media vida. Para que no se rehaga, golpea el montón antes de que se levante, o mátalo con fuego o con un martillo.",
+    "darkcraft.bestiario.ensamblado_sepulturero.desc": "Los sepultureros siguen cavando en el camposanto con las palas de Fray Osmund. El paletazo llega lejos y, si estás a unos pasos, te echan tierra a los ojos: te ciega un momento y te frena. Como todos los Ensamblados, al caer se deshacen en huesos y se rehacen al poco si nadie pisa el montón; el fuego y los martillos los dejan en polvo.",
+    "darkcraft.bestiario.ensamblado_coloso.desc": "Fray Osmund juntó en uno solo los huesos que no sabía de quién eran: el coloso, el doble de alto que un hombre, con una maza hecha de un fémur de gigante. Es lento y aguanta mucho. El mazazo hace temblar el suelo alrededor (salta o rueda) y, si te pegas a él, da un pisotón. También se rehace al caer: no te alejes del montón.",
+    "subtitles.darkcraft.sfx.ensamblado_traqueteo": "Traquetean unos huesos",
+    "subtitles.darkcraft.sfx.ensamblado_alerta": "Un Ensamblado despierta",
+    "subtitles.darkcraft.sfx.ensamblado_dolor": "Crujen unos huesos",
+    "subtitles.darkcraft.sfx.ensamblado_deshace": "Un Ensamblado se deshace",
+    "subtitles.darkcraft.sfx.ensamblado_rehace": "Los huesos se vuelven a armar",
+    "subtitles.darkcraft.sfx.ensamblado_polvo": "Unos huesos se hacen polvo",
+    "subtitles.darkcraft.sfx.portacirios_barrido": "Barre un candelabro en llamas",
+    "subtitles.darkcraft.sfx.monton_arrastre": "Se arrastran unos huesos",
+    "subtitles.darkcraft.sfx.monton_golpe": "Golpe de maza de hueso",
+    "subtitles.darkcraft.sfx.guirnalda_cae": "Cae una guirnalda de calaveras",
+    "subtitles.darkcraft.sfx.osario_campana": "Tañe una campana rota",
+    "subtitles.darkcraft.sfx.osario_susurros": "Susurran los huesos",
+    "subtitles.darkcraft.ambiente.osario": "Corre el aire de la cripta",
+    "darkcraft.morvain.lugar.camposanto": "El Camposanto de San Ulfo",
+    "darkcraft.morvain.lugar.capilla_ulfo": "La Capilla de San Ulfo",
+    "darkcraft.morvain.lugar.osario": "El Osario de San Ulfo",
+    "darkcraft.morvain.lugar.capilla_huesos": "La Capilla de los Huesos",
+    "darkcraft.morvain.lugar.pozo_huesos": "El Pozo de los Huesos",
+    "darkcraft.morvain.lugar.taller_sacristan": "El Taller del Sacristán",
+    "darkcraft.morvain.lugar.relicario": "El Relicario",
+    "darkcraft.osario.pisotea": "Los huesos se mueven: golpea el montón antes de que se levante.",
+    "darkcraft.osario.escotilla_cerrada": "La trampilla del panteón está cerrada por debajo.",
+    "advancements.darkcraft.osario.title": "Cuarenta mil",
+    "advancements.darkcraft.osario.description": "Baja a la cripta del Osario de San Ulfo",
+    "advancements.darkcraft.ensamblado.title": "Polvo eres",
+    "advancements.darkcraft.ensamblado.description": "Deja en polvo a un Ensamblado",
+    "darkcraft.diario.osario": "En el Bosque Muerto, en un otero entre árboles sin hojas, está el camposanto de San Ulfo: tumbas abiertas, cruces de palo y una capilla sin tejado con su campana rota. Detrás del altar baja la escalera de la cripta. Ochenta años antes del cielo rojo, la Peste Gris llenó el camposanto, y Fray Osmund, el sacristán, desenterró a los cuarenta mil y guardó sus huesos abajo, en orden. Abajo hay una capilla hecha de huesos.",
+    "darkcraft.diario.ensamblado": "Los Ensamblados no se mueren a la primera: se deshacen en un montón de huesos y al poco se vuelven a armar. Hay que golpear los huesos antes de que se levanten, o quemarlos, o romperlos con un martillo. Entonces sí: polvo.",
+    "darkcraft.ayuda.osario": "El Osario de San Ulfo: ir a uno de sus sitios, sus Ensamblados, abrir o cerrar la escotilla del panteón o el muro de los priores, tocar la campana rota o sacar un Ensamblado (y deshacer o rehacer el más cercano)",
+})
+EN.update({
+    "entity.darkcraft.ensamblado": "Assembled One",
+    "darkcraft.bestiario.ensamblado_portacirios": "Assembled Candlebearer",
+    "darkcraft.bestiario.ensamblado_sepulturero": "Assembled Gravedigger",
+    "darkcraft.bestiario.ensamblado_coloso": "Bone Colossus",
+    "darkcraft.bestiario.ensamblado_portacirios.desc": "The Assembled Ones are the forty thousand of the Ossuary of Saint Ulf, raised on the night of the red sky, but mixed up: one man's skull, another's arms, a third one's ribs. The candlebearer carries a candelabrum of bones with its candles lit: its strike and its sweep set you on fire. When it falls, it comes apart into a heap of bones and five seconds later it puts itself back together, with half its health. To stop it rising again, strike the heap before it gets up, or kill it with fire or with a hammer.",
+    "darkcraft.bestiario.ensamblado_sepulturero.desc": "The gravediggers are still digging in the churchyard with Brother Osmund's shovels. The shovel blow reaches far and, if you are a few steps away, they throw earth in your eyes: it blinds you for a moment and slows you down. Like every Assembled One, when they fall they come apart into bones and soon rise again if no one crushes the heap; fire and hammers turn them to dust.",
+    "darkcraft.bestiario.ensamblado_coloso.desc": "Brother Osmund put together in a single body the bones he could not match to anyone: the colossus, twice as tall as a man, with a mace made from a giant's thighbone. It is slow and very hard to bring down. Its mace blow makes the ground shake around it (jump or roll) and, if you stay too close, it stomps. It also rises again after falling: do not stray from the heap.",
+    "subtitles.darkcraft.sfx.ensamblado_traqueteo": "Bones rattle",
+    "subtitles.darkcraft.sfx.ensamblado_alerta": "An Assembled One wakes",
+    "subtitles.darkcraft.sfx.ensamblado_dolor": "Bones crack",
+    "subtitles.darkcraft.sfx.ensamblado_deshace": "An Assembled One falls apart",
+    "subtitles.darkcraft.sfx.ensamblado_rehace": "The bones pull themselves together",
+    "subtitles.darkcraft.sfx.ensamblado_polvo": "Bones crumble to dust",
+    "subtitles.darkcraft.sfx.portacirios_barrido": "A burning candelabrum sweeps",
+    "subtitles.darkcraft.sfx.monton_arrastre": "Bones drag across the floor",
+    "subtitles.darkcraft.sfx.monton_golpe": "A bone mace slams down",
+    "subtitles.darkcraft.sfx.guirnalda_cae": "A garland of skulls falls",
+    "subtitles.darkcraft.sfx.osario_campana": "A cracked bell tolls",
+    "subtitles.darkcraft.sfx.osario_susurros": "The bones whisper",
+    "subtitles.darkcraft.ambiente.osario": "The crypt air stirs",
+    "darkcraft.morvain.lugar.camposanto": "Saint Ulf's Churchyard",
+    "darkcraft.morvain.lugar.capilla_ulfo": "The Chapel of Saint Ulf",
+    "darkcraft.morvain.lugar.osario": "The Ossuary of Saint Ulf",
+    "darkcraft.morvain.lugar.capilla_huesos": "The Chapel of Bones",
+    "darkcraft.morvain.lugar.pozo_huesos": "The Well of Bones",
+    "darkcraft.morvain.lugar.taller_sacristan": "The Sacristan's Workshop",
+    "darkcraft.morvain.lugar.relicario": "The Reliquary",
+    "darkcraft.osario.pisotea": "The bones are moving: strike the heap before it rises.",
+    "darkcraft.osario.escotilla_cerrada": "The tomb's trapdoor is locked from below.",
+    "advancements.darkcraft.osario.title": "Forty Thousand",
+    "advancements.darkcraft.osario.description": "Go down into the crypt of the Ossuary of Saint Ulf",
+    "advancements.darkcraft.ensamblado.title": "Dust Thou Art",
+    "advancements.darkcraft.ensamblado.description": "Turn an Assembled One to dust",
+    "darkcraft.diario.osario": "In the Dead Forest, on a knoll among leafless trees, lies the churchyard of Saint Ulf: open graves, wooden crosses and a roofless chapel with its cracked bell. Behind the altar, the stairs go down into the crypt. Eighty years before the red sky, the Grey Plague filled the churchyard, and Brother Osmund, the sacristan, dug up the forty thousand and kept their bones below, in order. Down there is a chapel made of bones.",
+    "darkcraft.diario.ensamblado": "The Assembled Ones do not die the first time: they come apart into a heap of bones and soon put themselves back together. You have to strike the bones before they rise, or burn them, or smash them with a hammer. Then, yes: dust.",
+    "darkcraft.ayuda.osario": "The Ossuary of Saint Ulf: go to one of its places, its Assembled Ones, open or close the tomb's trapdoor or the priors' wall, ring the cracked bell or bring out an Assembled One (and undo or rebuild the nearest one)",
+})
+SANTUARIOS_MORVAIN_ES_7AS = {"osario": "El Camposanto de San Ulfo"}
+SANTUARIOS_MORVAIN_EN_7AS = {"osario": "Saint Ulf's Churchyard"}
+ES.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_ES_7AS.items()})
+EN.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_EN_7AS.items()})
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

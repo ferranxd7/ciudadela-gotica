@@ -53,6 +53,8 @@ public final class SantuariosMorvain {
             s("nido", Nido.CX + Nido.SANT_U, Nido.CZ + Nido.SANT_V),
             // el de la Bocamina (parte 7aq): a la altura de la explanada del campamento (no a la del terreno, que se allana)
             new Sitio("bocamina", Mina.CX + Mina.SANT_U, Mina.CZ + Mina.SANT_V, Mina.SUELO, Region.MONTANAS),
+            // el del Osario de San Ulfo (parte 7as): a la altura del otero allanado del camposanto
+            new Sitio("osario", Osario.CX + Osario.SANT_U, Osario.CZ + Osario.SANT_V, Osario.SUELO, Region.BOSQUE),
     };
 
     /**
