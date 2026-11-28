@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/fuego_almas_0"
+      },
+      {
+        "model": "darkcraft:block/fuego_almas_1"
+      }
+    ]
+  }
+}

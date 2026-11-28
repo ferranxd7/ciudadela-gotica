@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "hanging=false,waterlogged=false": {
+      "model": "darkcraft:block/farol"
+    },
+    "hanging=false,waterlogged=true": {
+      "model": "darkcraft:block/farol"
+    },
+    "hanging=true,waterlogged=false": {
+      "model": "darkcraft:block/farol_colgado"
+    },
+    "hanging=true,waterlogged=true": {
+      "model": "darkcraft:block/farol_colgado"
+    }
+  }
+}

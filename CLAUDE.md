@@ -4819,7 +4819,48 @@ generadores) van con el clima y los efectos, despues de los bloques.
 - Pruebas: servidor, la linea `Bloques 8b: ...` de siempre; cliente, en el muestrario el vidrio (muro de 4 x 3 y dos
   filas de paneles unidos delante), las rejas (4 x 2 unidas y un poste suelto) y las cadenas (dos colgando de una viga y
   una tendida entre dos postes); capturas `cliente_bq01..38` (grupos), `bq39..57` de cerca (tambien el oro labrado, los
-  barrotes y la vidriera roja) y `bq58..61` los arboles.
+  barrotes y la vidriera roja) y `bq58..61` los arboles (desde la 8g los numeros cambian: ver la 8g).
+
+### Plan nuevo, parte 8g: los bloques nuevos, sexta tanda (las luces y el fuego propio)
+
+Respuestas 35 y 70 del plan: fuegos de seis colores (azul de almas, verde de veneno, morado arcano, rojo de sangre, dorado
+sagrado, blanco de escarcha) mas el natural, "mas realista (llamas suaves con resplandor)"; la luz no tiene color: el color va
+en la llama, las chispas y el resplandor; nunca las particulas de Minecraft.
+- **El pintor del fuego** (`tools/bloques/fuego.py`): `llamas()` (32 fotogramas de 64 x 64 que se repiten sin salto: el
+  ruido se repite de arriba abajo y sube un numero entero de vueltas en toda la animacion, cada lengua parpadea un numero
+  entero de veces; un cuerpo de fuego abajo con su borde que ondea, tres lenguas grandes y tres pequenas que ondean,
+  erosion con ruido y chispas que suben), `llamita()` (la llama sola de las velas, faroles y antorchas: una gota con la
+  punta que oscila, 16 fotogramas), `brasas()` (carbones con grietas que brillan del color del fuego), `cera()`, `palo()`
+  y `trapo()` (la antorcha), y los dibujos de las particulas (`sprite_llama`, `sprite_chispa`, `sprite_humo`, 16 x 16).
+  **Texturas animadas**: `bloques.py` apunta en `ANIM` las que son tiras de fotogramas y escribe su `.png.mcmeta`
+  (`frametime` 1 el fuego, 2 las llamitas); **texturas sueltas** (`sueltas()`: las que comparten varios bloques y las de
+  `textures/particle`) y `particulas_json()` (los `particles/<nombre>.json`).
+- **Las particulas propias** (`bloques/Fuegos`: el registro de `llama_<color>` y `chispa_<color>` de los siete colores y
+  `humo`; `color(id)` saca el color del id —lo que va tras el ultimo "_"— y `avivar(...)` es lo que sale de un fuego en un
+  tick: llamas, alguna chispa, humo y, de vez en cuando, el chisporroteo `sfx.santuario_fuego` flojo) y en el cliente
+  `client/bloques/ParticulasFuego` (la llama sube, se encoge y se apaga a plena luz; la chispa sube deprisa y parpadea; el
+  humo crece y se deshace).
+- **Formas nuevas** (letras minusculas, sin sufijo): f fuego (`bloques/Fuego`: en el suelo sobre una cara firme, no se
+  extiende ni se apaga, quema 1,5 a quien lo pisa sin el fuego de Minecraft encima; el modelo `template_fire_floor` del juego
+  con dos animaciones al azar), s brasero (`Brasero`: cuatro patas, el cuenco de hierro negro, las brasas y cuatro planos de
+  fuego inclinados), v velas (`Vela`: de una a cuatro como las del juego, propiedad `velas`, 3 de luz cada una), c
+  candelabro de pie (tres velas, los brazos de lado a lado de quien lo pone), p aplique de pared (`Candelabro.PARED`: mira
+  hacia donde sale de la pared), a arana (`Arana`: ocho velas y sus cadenas; cuelga de un techo o de una cadena), l farol
+  (`LanternBlock` con modelo propio: de pie y colgado) y t antorcha (`Antorcha` y `Antorcha.Pared`, con el objeto de las
+  antorchas del juego, `StandingAndWallBlockItem`; la de pared, `<id>_pared`, no tiene objeto propio y suelta la antorcha).
+  Las llamas de velas, candelabros, faroles y antorchas van en el modelo (dos planos con la `llamita` animada) y los
+  modelos se escriben caja a caja (`_caja`, `_llama`, `_vela`, `VELAS`). La pestana del creativo no pone dos veces el
+  mismo objeto.
+- **Sexta tanda** (27 materiales, 29 bloques; ya son 179 materiales y 366 bloques): el fuego de los siete colores
+  (`fuego`, `fuego_almas`, `_veneno`, `_arcano`, `_sangre`, `_sagrado`, `_escarcha`), sus braseros, velas blancas, negras y
+  rojas, candelabro de hierro y dorado, aplique de hierro y dorado, arana de hierro y dorada, farol y farol de almas,
+  antorcha y antorcha de almas.
+- **Los nombres en espanol llevan sus tildes** (Mármol, Adoquín, Mampostería, ciprés, fresno pálido, otoñal, Araña...).
+- Pruebas: servidor, la linea `Bloques 8b: ...` de siempre (la antorcha de pared tambien: su botin es la antorcha); cliente,
+  en el muestrario `luces(...)` pone cada luz donde se ve (el fuego en el suelo, las velas de una a cuatro, los apliques y la
+  antorcha de pared en un muro, las aranas y el farol colgados de una viga, una arana de una cadena); capturas
+  `cliente_bq01..45` (grupos), `bq46..67` de cerca (tambien el brasero de almas, el candelabro y el farol), `bq68..72` las
+  luces de noche y `bq73..76` los arboles.
 
 ## Compilar, probar y publicar
 

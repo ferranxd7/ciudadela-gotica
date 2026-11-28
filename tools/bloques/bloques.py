@@ -25,6 +25,7 @@ import madera as W  # noqa: E402
 import terreno as T  # noqa: E402
 import arboles as A  # noqa: E402
 import metal as Me  # noqa: E402
+import fuego as F  # noqa: E402
 
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RES = os.path.join(RAIZ, "src", "main", "resources")
@@ -165,6 +166,18 @@ R = {
     "v_azul": ["#06103a", "#0a1a58", "#102778", "#183696", "#2447b0", "#355ac6", "#4a70d8"],
     "v_verde": ["#06280e", "#0a3a16", "#104f1f", "#18652a", "#227b36", "#2f9244", "#40a855"],
     "v_violeta": ["#22063a", "#320a54", "#441070", "#58188c", "#6c24a6", "#8135bc", "#9649ce"],
+    # el fuego de siete colores (parte 8g) y las velas
+    "f_natural": ["#3a0a02", "#6a1504", "#9a2606", "#c73d08", "#e85c0c", "#f8821a", "#ffa832", "#ffc957", "#ffe48a", "#fff6cf"],
+    "f_almas": ["#06123a", "#0a2466", "#123a94", "#1d58bd", "#2f7ad8", "#4a9de8", "#6fbff2", "#9adcf8", "#c8f0fc", "#f0fcff"],
+    "f_veneno": ["#0b2a06", "#14460a", "#1f6410", "#2c8418", "#3ca322", "#55c032", "#7ad84c", "#a6ec76", "#d2f8b0", "#f4fee8"],
+    "f_arcano": ["#22063a", "#3a0a62", "#55128c", "#7420b4", "#9334d2", "#ae52e6", "#c678f2", "#dca2f8", "#eecbfc", "#faf0ff"],
+    "f_sangre": ["#2a0204", "#4c0408", "#70080e", "#960e16", "#b81a1e", "#d42e26", "#e84a36", "#f47456", "#fca48a", "#ffd8cc"],
+    "f_sagrado": ["#4a2a04", "#7a4806", "#a8680a", "#cf8a10", "#eaaa1e", "#f8c63a", "#ffdc62", "#ffec96", "#fff6c8", "#fffcf0"],
+    "f_escarcha": ["#1a2a3a", "#2a4458", "#3e6078", "#58809a", "#78a2b8", "#9cc2d2", "#bedbe6", "#dcedf3", "#f0f8fb", "#ffffff"],
+    "cera_blanca": ["#6e6656", "#8a8270", "#a69e8a", "#c0b9a4", "#d6d0bc", "#e8e3d2", "#f4f1e6"],
+    "cera_negra": ["#08080a", "#111114", "#1a1a1f", "#24242a", "#2f2f36", "#3b3b43", "#484851"],
+    "cera_roja": ["#2a0606", "#460a0a", "#621010", "#7e1816", "#98221e", "#b02e28", "#c43c34"],
+    "trapo": ["#0a0806", "#14100b", "#1e1810", "#2a2116", "#372b1d", "#453624"],
 }
 RAMPAS = {k: P.Rampa(v) for k, v in R.items()}
 
@@ -593,6 +606,81 @@ def t_vidriera(principal, acento, claro):
     return f
 
 
+# ------------------------------------------------------------------ las luces y el fuego (parte 8g)
+
+COLORES = ("natural", "almas", "veneno", "arcano", "sangre", "sagrado", "escarcha")
+ANIM = {}   # texturas animadas: nombre -> ticks por fotograma (se escribe su .mcmeta)
+
+
+def _fuego_id(base, color):
+    return base if color == "natural" else f"{base}_{color}"
+
+
+def sueltas():
+    """Las texturas que no son de un material (las comparten varios): las llamitas, las brasas, la cera, el palo y el
+    trapo de las antorchas, y los dibujos de las particulas (llama, chispa y humo; en textures/particle)."""
+    out = {}
+    for c in ("natural", "almas"):
+        out[f"llamita_{c}"] = F.llamita(700 + COLORES.index(c), RAMPAS["f_" + c])
+        ANIM[f"llamita_{c}"] = 2
+    for i, c in enumerate(COLORES):
+        out[f"brasas_{c}"] = F.brasas(720 + i, RAMPAS["f_" + c])
+        for k in range(4):
+            out[f"particle/llama_{c}_{k}"] = F.sprite_llama(740 + i, RAMPAS["f_" + c], k)
+        for k in range(2):
+            out[f"particle/chispa_{c}_{k}"] = F.sprite_chispa(RAMPAS["f_" + c], k)
+    for k in range(4):
+        out[f"particle/humo_{k}"] = F.sprite_humo(760, k)
+    for cera in ("blanca", "negra", "roja"):
+        out[f"cera_{cera}"] = F.cera(770 + len(cera), RAMPAS["cera_" + cera])
+    out["antorcha_palo"] = F.palo(780, RAMPAS["m_roble"])
+    out["antorcha_trapo"] = F.trapo(781, RAMPAS["trapo"])
+    return out
+
+
+def particulas_json():
+    """Los ficheros de las particulas (assets/darkcraft/particles): que dibujos usa cada una."""
+    d = os.path.join(ASSETS, "particles")
+    for c in COLORES:
+        j(os.path.join(d, f"llama_{c}.json"), {"textures": [f"darkcraft:llama_{c}_{k}" for k in range(4)]})
+        j(os.path.join(d, f"chispa_{c}.json"), {"textures": [f"darkcraft:chispa_{c}_{k}" for k in range(2)]})
+    j(os.path.join(d, "humo.json"), {"textures": [f"darkcraft:humo_{k}" for k in range(4)]})
+
+
+def FUEGO(color, es, en, mapa, semilla):
+    """El fuego de un color: el bloque de fuego (en el suelo, como el del juego: cuatro planos que se inclinan hacia
+    dentro), con dos animaciones al azar."""
+    return M(_fuego_id("fuego", color), es, en, None, formas="f", sonido="WOOL", mapa=mapa, semilla=semilla, dureza=0.0,
+             variantes=1, color=color)
+
+
+def BRASERO(color, es, en, mapa, semilla):
+    return M(_fuego_id("brasero", color), es, en, None, formas="s", sonido="METAL", mapa=mapa, semilla=semilla, dureza=3.0,
+             variantes=1, color=color)
+
+
+def VELA(id, es, en, cera, semilla):
+    return M(id, es, en, None, formas="v", sonido="CANDLE", mapa="SAND", semilla=semilla, dureza=0.1, herramienta="hoe",
+             variantes=1, cera=cera, color="natural")
+
+
+def CANDELABRO(id, es, en, forma, metal, cadena, mapa, semilla):
+    """Un candelabro: `c` de pie (tres velas), `p` de pared (una) o `a` arana (colgada, ocho velas y cadenas)."""
+    return M(id, es, en, None, formas=forma, sonido="METAL", mapa=mapa, semilla=semilla, dureza=2.0, variantes=1,
+             metal=metal, cadena=cadena, color="natural")
+
+
+def FAROL(id, es, en, color, semilla):
+    return M(id, es, en, None, formas="l", sonido="LANTERN", mapa="METAL", semilla=semilla, dureza=2.0, variantes=1,
+             color=color)
+
+
+def ANTORCHA(id, es, en, color, semilla):
+    """Una antorcha de pie y de pared (`<id>_pared`, sin objeto: la pone el objeto de la antorcha contra una pared)."""
+    return M(id, es, en, None, formas="t", sonido="WOOD", mapa="WOOD", semilla=semilla, dureza=0.0, herramienta="axe",
+             variantes=1, color=color)
+
+
 # ------------------------------------------------------------------ el catalogo
 
 def M(id, es, en, receta, formas="BELM", sonido="STONE", mapa="STONE", semilla=None, variantes=3, dureza=1.5,
@@ -725,21 +813,21 @@ MATERIALES = [
     M("sillar_musgoso", "Sillar musgoso", "Mossy Ashlar", t_sillar_musgoso, sonido="STONE", mapa="COLOR_GREEN", semilla=104),
     M("sillar_agrietado", "Sillar agrietado", "Cracked Ashlar", t_sillar_agrietado, sonido="STONE", mapa="STONE", semilla=105),
     M("sillar_nevado", "Sillar escarchado", "Frosted Ashlar", t_sillar_nevado, sonido="STONE", mapa="ICE", semilla=106),
-    M("sillar_verdin", "Sillar con verdin", "Slimed Ashlar", t_sillar_verdin, sonido="MUD_BRICKS", mapa="COLOR_GREEN", semilla=107),
-    M("marmol_blanco", "Marmol blanco", "White Marble", t_marmol_blanco, sonido="CALCITE", mapa="QUARTZ", semilla=108),
-    M("marmol_negro", "Marmol negro", "Black Marble", t_marmol_negro, sonido="POLISHED_DEEPSLATE", mapa="COLOR_BLACK", semilla=109, dureza=2.0),
+    M("sillar_verdin", "Sillar con verdín", "Slimed Ashlar", t_sillar_verdin, sonido="MUD_BRICKS", mapa="COLOR_GREEN", semilla=107),
+    M("marmol_blanco", "Mármol blanco", "White Marble", t_marmol_blanco, sonido="CALCITE", mapa="QUARTZ", semilla=108),
+    M("marmol_negro", "Mármol negro", "Black Marble", t_marmol_negro, sonido="POLISHED_DEEPSLATE", mapa="COLOR_BLACK", semilla=109, dureza=2.0),
     M("sillar_rojo", "Sillar de arenisca roja", "Red Sandstone Ashlar", t_sillar_rojo, sonido="STONE", mapa="COLOR_RED", semilla=110),
     M("ladrillo_viejo", "Ladrillo viejo", "Old Brick", t_ladrillo_viejo, sonido="MUD_BRICKS", mapa="COLOR_RED", semilla=111),
     M("ladrillo_oscuro", "Ladrillo oscuro", "Dark Brick", t_ladrillo_oscuro, sonido="NETHER_BRICKS", mapa="COLOR_BROWN", semilla=112),
-    M("adoquin", "Adoquin", "Cobbled Paving", t_adoquin, sonido="STONE", mapa="STONE", semilla=113),
+    M("adoquin", "Adoquín", "Cobbled Paving", t_adoquin, sonido="STONE", mapa="STONE", semilla=113),
     M("enlosado", "Enlosado", "Flagstones", t_enlosado, sonido="STONE", mapa="STONE", semilla=114),
     M("piedra_tallada", "Piedra tallada", "Carved Stone", t_piedra_tallada, sonido="STONE", mapa="SAND", semilla=115, variantes=1),
-    M("mamposteria", "Mamposteria", "Rubble Masonry", t_mamposteria, sonido="STONE", mapa="STONE", semilla=116),
+    M("mamposteria", "Mampostería", "Rubble Masonry", t_mamposteria, sonido="STONE", mapa="STONE", semilla=116),
     M("columna_gris", "Columna de granito", "Granite Column", None, formas="C", sonido="STONE", mapa="STONE", semilla=121,
       lado=t_col_lado("granito", 0.58), tapa=t_col_tapa("granito", 0.58)),
     M("columna_palida", "Columna de caliza", "Limestone Column", None, formas="C", sonido="STONE", mapa="SAND", semilla=122,
       lado=t_col_lado("caliza", 0.62), tapa=t_col_tapa("caliza", 0.62)),
-    M("columna_marmol", "Columna de marmol", "Marble Column", None, formas="C", sonido="CALCITE", mapa="QUARTZ", semilla=123,
+    M("columna_marmol", "Columna de mármol", "Marble Column", None, formas="C", sonido="CALCITE", mapa="QUARTZ", semilla=123,
       lado=t_col_lado("marmol", 0.66), tapa=t_col_tapa("marmol", 0.66)),
     M("columna_oscura", "Columna de basalto", "Basalt Column", None, formas="C", sonido="DEEPSLATE_BRICKS", mapa="COLOR_BLACK",
       semilla=124, lado=t_col_lado("basalto", 0.58), tapa=t_col_tapa("basalto", 0.58)),
@@ -771,7 +859,7 @@ MATERIALES = [
     M("entramado_poste", "Entramado con poste", "Posted Timber Frame", t_entramado("poste"), formas="B", sonido="WOOD",
       mapa="TERRACOTTA_WHITE", semilla=225, herramienta="axe",
       pesos=[4, 4, 1]),
-    M("entramado_travesano", "Entramado con travesano", "Railed Timber Frame", t_entramado("travesano"), formas="B",
+    M("entramado_travesano", "Entramado con travesaño", "Railed Timber Frame", t_entramado("travesano"), formas="B",
       sonido="WOOD", mapa="TERRACOTTA_WHITE", semilla=226, herramienta="axe",
       pesos=[4, 4, 1]),
     M("enlucido", "Enlucido", "Plaster", t_enlucido, formas="BELM", sonido="STONE", mapa="TERRACOTTA_WHITE", semilla=227,
@@ -794,7 +882,7 @@ MATERIALES = [
     SUELO("turba", "Turba", "Peat", t_suelo(T.turba, "turba"), "COLOR_BROWN", "MUD", 304, etiquetas=("dirt",)),
     SUELO("ceniza", "Ceniza", "Ash", t_ceniza, "COLOR_LIGHT_GRAY", "SAND", 305, etiquetas=("sand",)),
     SUELO("grava", "Grava", "Gravel", t_grava, "STONE", "GRAVEL", 306),
-    SUELO("arena_palida", "Arena palida", "Pale Sand", t_arena("arena"), "SAND", "SAND", 307, etiquetas=("sand",), girar=False),
+    SUELO("arena_palida", "Arena pálida", "Pale Sand", t_arena("arena"), "SAND", "SAND", 307, etiquetas=("sand",), girar=False),
     SUELO("arena_gris", "Arena gris", "Grey Sand", t_arena("arena_gris"), "COLOR_GRAY", "SAND", 308, etiquetas=("sand",),
           girar=False),
     SUELO("arena_negra", "Arena negra", "Black Sand", t_arena("arena_negra"), "COLOR_BLACK", "SAND", 309, etiquetas=("sand",),
@@ -806,7 +894,7 @@ MATERIALES = [
       herramienta="shovel", textura="nieve"),
     M("hielo", "Hielo", "Ice", t_hielo, formas="H", sonido="GLASS", mapa="ICE", semilla=313, dureza=0.5, variantes=2,
       girar=True, etiquetas=("ice",)),
-    HIERBA("hierba_palida", "Hierba palida", "Pale Grass", t_hierba("h_palida", base=0.46), "SAND", 321),
+    HIERBA("hierba_palida", "Hierba pálida", "Pale Grass", t_hierba("h_palida", base=0.46), "SAND", 321),
     HIERBA("hierba_verde", "Hierba verde", "Green Grass", t_hierba("h_verde"), "GRASS", 322),
     HIERBA("hierba_marchita", "Hierba marchita", "Withered Grass", t_hierba("h_marchita"), "COLOR_BROWN", 323),
     HIERBA("hierba_pantano", "Hierba de pantano", "Swamp Grass", t_hierba("h_pantano", tierra="turba"), "COLOR_GREEN", 324),
@@ -818,11 +906,11 @@ MATERIALES = [
     ROCA("roca_pizarra", "Roca de pizarra", "Slate Rock", t_pizarra_n, "COLOR_GRAY", "DEEPSLATE", 334, dureza=2.0),
     ROCA("roca_arenisca", "Roca arenisca", "Sandstone Rock", t_roca("arenisca_n", base=0.55, estratos=0.06), "COLOR_ORANGE",
          "STONE", 335),
-    ROCA("roca_toba", "Toba volcanica", "Volcanic Tuff", t_roca("toba", base=0.5, poros=1.0, grietas=0.2), "COLOR_BROWN",
+    ROCA("roca_toba", "Toba volcánica", "Volcanic Tuff", t_roca("toba", base=0.5, poros=1.0, grietas=0.2), "COLOR_BROWN",
          "TUFF", 336),
     ROCA("roca_musgosa", "Roca musgosa", "Mossy Rock", t_roca_musgosa, "COLOR_GREEN", "STONE", 337),
     ROCA("pedregal", "Pedregal", "Scree", t_pedregal, "STONE", "STONE", 338),
-    PLANTA("hierba_alta_palida", "Hierba alta palida", "Tall Pale Grass", t_planta(T.hierba_alta, "p_palida"), 341),
+    PLANTA("hierba_alta_palida", "Hierba alta pálida", "Tall Pale Grass", t_planta(T.hierba_alta, "p_palida"), 341),
     PLANTA("hierba_alta_verde", "Hierba alta verde", "Tall Green Grass", t_planta(T.hierba_alta, "p_verde"), 342),
     PLANTA("hierba_alta_marchita", "Hierba alta marchita", "Tall Withered Grass", t_planta(T.hierba_alta, "p_marchita"), 343),
     PLANTA("helecho", "Helecho", "Fern", t_planta(T.helecho, "p_helecho"), 344),
@@ -834,7 +922,7 @@ MATERIALES = [
            mapa="COLOR_BLUE"),
     PLANTA("hongos_rojos", "Hongos rojos", "Red Toadstools", t_planta(T.hongos, "hongo_rojo", "pie_hongo"), 349,
            mapa="COLOR_RED", sonido="FUNGUS"),
-    PLANTA("hongos_palidos", "Hongos palidos", "Pale Toadstools", t_planta(T.hongos, "hongo_palido", "pie_hongo"), 350,
+    PLANTA("hongos_palidos", "Hongos pálidos", "Pale Toadstools", t_planta(T.hongos, "hongo_palido", "pie_hongo"), 350,
            mapa="SAND", sonido="FUNGUS"),
     PLANTA("juncos", "Juncos", "Reeds", t_planta(T.juncos, "junco", "espiga"), 351),
     # ---- parte 8e: los arboles (cortezas, troncos, ramas, hojas, musgo que cuelga, lianas y hojarasca)
@@ -846,15 +934,15 @@ MATERIALES = [
          forma="U"),
     HOJAS("hojas_roble", "Hojas de roble", "Oak Leaves", t_hojas("o_roble"), "PLANT", 404),
     RACIMO("racimo_roble", "Racimo de hojas de roble", "Oak Leaf Cluster", "hojas_roble", "PLANT", 408),
-    HOJAS("hojas_otono", "Hojas de roble otonal", "Autumn Oak Leaves", t_hojas("o_otono"), "COLOR_ORANGE", 405),
-    RACIMO("racimo_otono", "Racimo de hojas otonales", "Autumn Leaf Cluster", "hojas_otono", "COLOR_ORANGE", 409),
-    CORTEZA("corteza_ceniza", "Corteza de fresno palido", "Pale Ash Bark", "lisa", "c_ceniza", "QUARTZ", 411, base=0.62),
-    TRONCO("tronco_ceniza", "Tronco de fresno palido", "Pale Ash Log", "corteza_ceniza", "m_ceniza", "c_ceniza", "QUARTZ", 412),
-    RAMA("rama_ceniza", "Rama de fresno palido", "Pale Ash Branch", "corteza_ceniza", "QUARTZ", 413),
-    RAMA("ramita_ceniza", "Ramita de fresno palido", "Pale Ash Twig", "corteza_ceniza", "QUARTZ", 416, forma="Q"),
-    RAMA("rama_gruesa_ceniza", "Rama gruesa de fresno palido", "Thick Pale Ash Branch", "corteza_ceniza", "QUARTZ", 417,
+    HOJAS("hojas_otono", "Hojas de roble otoñal", "Autumn Oak Leaves", t_hojas("o_otono"), "COLOR_ORANGE", 405),
+    RACIMO("racimo_otono", "Racimo de hojas otoñales", "Autumn Leaf Cluster", "hojas_otono", "COLOR_ORANGE", 409),
+    CORTEZA("corteza_ceniza", "Corteza de fresno pálido", "Pale Ash Bark", "lisa", "c_ceniza", "QUARTZ", 411, base=0.62),
+    TRONCO("tronco_ceniza", "Tronco de fresno pálido", "Pale Ash Log", "corteza_ceniza", "m_ceniza", "c_ceniza", "QUARTZ", 412),
+    RAMA("rama_ceniza", "Rama de fresno pálido", "Pale Ash Branch", "corteza_ceniza", "QUARTZ", 413),
+    RAMA("ramita_ceniza", "Ramita de fresno pálido", "Pale Ash Twig", "corteza_ceniza", "QUARTZ", 416, forma="Q"),
+    RAMA("rama_gruesa_ceniza", "Rama gruesa de fresno pálido", "Thick Pale Ash Branch", "corteza_ceniza", "QUARTZ", 417,
          forma="U"),
-    HOJAS("hojas_ceniza", "Hojas de fresno palido", "Pale Ash Leaves", t_hojas("o_ceniza"), "SAND", 414),
+    HOJAS("hojas_ceniza", "Hojas de fresno pálido", "Pale Ash Leaves", t_hojas("o_ceniza"), "SAND", 414),
     RACIMO("racimo_ceniza", "Racimo de hojas de fresno", "Pale Ash Leaf Cluster", "hojas_ceniza", "SAND", 418),
     CORTEZA("corteza_muerto", "Madera muerta", "Deadwood", "seca", "c_muerto", "COLOR_LIGHT_GRAY", 421, base=0.55),
     TRONCO("tronco_muerto", "Tronco muerto", "Dead Log", "corteza_muerto", "m_gris", "c_muerto", "COLOR_LIGHT_GRAY", 422),
@@ -862,17 +950,17 @@ MATERIALES = [
     RAMA("ramita_muerto", "Ramita muerta", "Dead Twig", "corteza_muerto", "COLOR_LIGHT_GRAY", 426, forma="Q"),
     RAMA("rama_gruesa_muerto", "Rama gruesa muerta", "Thick Dead Branch", "corteza_muerto", "COLOR_LIGHT_GRAY", 427,
          forma="U"),
-    CORTEZA("corteza_pantano", "Corteza de cipres musgoso", "Mossy Cypress Bark", "musgosa", "c_pantano", "COLOR_GREEN", 431,
+    CORTEZA("corteza_pantano", "Corteza de ciprés musgoso", "Mossy Cypress Bark", "musgosa", "c_pantano", "COLOR_GREEN", 431,
             base=0.55, musgo=0.42),
-    TRONCO("tronco_pantano", "Tronco de cipres musgoso", "Mossy Cypress Log", "corteza_pantano", "m_podrida", "c_pantano",
+    TRONCO("tronco_pantano", "Tronco de ciprés musgoso", "Mossy Cypress Log", "corteza_pantano", "m_podrida", "c_pantano",
            "COLOR_GREEN", 432),
-    RAMA("rama_pantano", "Rama de cipres musgoso", "Mossy Cypress Branch", "corteza_pantano", "COLOR_GREEN", 433),
-    RAMA("ramita_pantano", "Ramita de cipres musgoso", "Mossy Cypress Twig", "corteza_pantano", "COLOR_GREEN", 436,
+    RAMA("rama_pantano", "Rama de ciprés musgoso", "Mossy Cypress Branch", "corteza_pantano", "COLOR_GREEN", 433),
+    RAMA("ramita_pantano", "Ramita de ciprés musgoso", "Mossy Cypress Twig", "corteza_pantano", "COLOR_GREEN", 436,
          forma="Q"),
-    RAMA("rama_gruesa_pantano", "Rama gruesa de cipres musgoso", "Thick Mossy Cypress Branch", "corteza_pantano",
+    RAMA("rama_gruesa_pantano", "Rama gruesa de ciprés musgoso", "Thick Mossy Cypress Branch", "corteza_pantano",
          "COLOR_GREEN", 437, forma="U"),
-    HOJAS("hojas_pantano", "Hojas de cipres musgoso", "Mossy Cypress Leaves", t_hojas("o_pantano"), "COLOR_GREEN", 434),
-    RACIMO("racimo_pantano", "Racimo de hojas de cipres", "Mossy Cypress Leaf Cluster", "hojas_pantano", "COLOR_GREEN",
+    HOJAS("hojas_pantano", "Hojas de ciprés musgoso", "Mossy Cypress Leaves", t_hojas("o_pantano"), "COLOR_GREEN", 434),
+    RACIMO("racimo_pantano", "Racimo de hojas de ciprés", "Mossy Cypress Leaf Cluster", "hojas_pantano", "COLOR_GREEN",
            438),
     CORTEZA("corteza_sangre", "Corteza de sanguino", "Bloodwood Bark", "surcos", "c_sangre", "COLOR_RED", 441, base=0.55),
     TRONCO("tronco_sangre", "Tronco de sanguino", "Bloodwood Log", "corteza_sangre", "m_caoba", "c_sangre", "COLOR_RED", 442),
@@ -914,7 +1002,7 @@ MATERIALES = [
           "TERRACOTTA_ORANGE", 503),
     METAL("oro_gastado", "Oro gastado", "Worn Gold", t_planchas("oro", base=0.55, remaches=False, oro=True), "GOLD", 504),
     METAL("oro_labrado", "Oro labrado", "Engraved Gold", t_labrado("oro"), "GOLD", 505, variantes=1),
-    METAL("bronce", "Bronce con verdin", "Verdigris Bronze", t_planchas("bronce", capa="verdin_b", cuanto=0.38),
+    METAL("bronce", "Bronce con verdín", "Verdigris Bronze", t_planchas("bronce", capa="verdin_b", cuanto=0.38),
           "TERRACOTTA_CYAN", 506, sonido="COPPER"),
     REJA("barrotes", "Barrotes de hierro negro", "Black Iron Bars", t_reja("hierro_n"), "COLOR_BLACK", 511),
     REJA("reja_forjada", "Reja forjada", "Wrought Grille", t_reja("hierro_n", forjada=True), "COLOR_BLACK", 512),
@@ -932,20 +1020,49 @@ MATERIALES = [
     VIDRIO("vidriera_roja", "Vidriera roja", "Red Stained Glass", t_vidriera("v_rojo", "v_oro", "v_blanco"), "COLOR_RED", 534),
     VIDRIO("vidriera_azul", "Vidriera azul", "Blue Stained Glass", t_vidriera("v_azul", "v_rojo", "v_blanco"), "COLOR_BLUE",
            535),
-    VIDRIO("vidriera_ambar", "Vidriera ambar", "Amber Stained Glass", t_vidriera("v_oro", "v_verde", "v_blanco"),
+    VIDRIO("vidriera_ambar", "Vidriera ámbar", "Amber Stained Glass", t_vidriera("v_oro", "v_verde", "v_blanco"),
            "COLOR_ORANGE", 536),
     VIDRIO("vidriera_verde", "Vidriera verde", "Green Stained Glass", t_vidriera("v_verde", "v_oro", "v_blanco"),
            "COLOR_GREEN", 537),
     VIDRIO("vidriera_violeta", "Vidriera violeta", "Violet Stained Glass", t_vidriera("v_violeta", "v_oro", "v_azul"),
            "COLOR_PURPLE", 538),
+    # ---- parte 8g: las luces y el fuego
+    FUEGO("natural", "Fuego", "Fire", "COLOR_ORANGE", 601),
+    FUEGO("almas", "Fuego de almas", "Soul Fire", "COLOR_LIGHT_BLUE", 602),
+    FUEGO("veneno", "Fuego de veneno", "Poison Fire", "COLOR_LIGHT_GREEN", 603),
+    FUEGO("arcano", "Fuego arcano", "Arcane Fire", "COLOR_MAGENTA", 604),
+    FUEGO("sangre", "Fuego de sangre", "Blood Fire", "COLOR_RED", 605),
+    FUEGO("sagrado", "Fuego sagrado", "Holy Fire", "GOLD", 606),
+    FUEGO("escarcha", "Fuego de escarcha", "Frost Fire", "SNOW", 607),
+    BRASERO("natural", "Brasero", "Brazier", "COLOR_ORANGE", 611),
+    BRASERO("almas", "Brasero de almas", "Soul Brazier", "COLOR_LIGHT_BLUE", 612),
+    BRASERO("veneno", "Brasero de veneno", "Poison Brazier", "COLOR_LIGHT_GREEN", 613),
+    BRASERO("arcano", "Brasero arcano", "Arcane Brazier", "COLOR_MAGENTA", 614),
+    BRASERO("sangre", "Brasero de sangre", "Blood Brazier", "COLOR_RED", 615),
+    BRASERO("sagrado", "Brasero sagrado", "Holy Brazier", "GOLD", 616),
+    BRASERO("escarcha", "Brasero de escarcha", "Frost Brazier", "SNOW", 617),
+    VELA("vela_blanca", "Velas blancas", "White Candles", "blanca", 621),
+    VELA("vela_negra", "Velas negras", "Black Candles", "negra", 622),
+    VELA("vela_roja", "Velas rojas", "Red Candles", "roja", 623),
+    CANDELABRO("candelabro", "Candelabro de hierro", "Iron Candelabrum", "c", "hierro_negro", "cadena_hierro", "COLOR_BLACK", 631),
+    CANDELABRO("candelabro_oro", "Candelabro dorado", "Gilded Candelabrum", "c", "oro_gastado", "cadena_oro", "GOLD", 632),
+    CANDELABRO("aplique", "Aplique de hierro", "Iron Wall Sconce", "p", "hierro_negro", "cadena_hierro", "COLOR_BLACK", 633),
+    CANDELABRO("aplique_oro", "Aplique dorado", "Gilded Wall Sconce", "p", "oro_gastado", "cadena_oro", "GOLD", 634),
+    CANDELABRO("arana", "Araña de hierro", "Iron Chandelier", "a", "hierro_negro", "cadena_hierro", "COLOR_BLACK", 635),
+    CANDELABRO("arana_oro", "Araña dorada", "Gilded Chandelier", "a", "oro_gastado", "cadena_oro", "GOLD", 636),
+    FAROL("farol", "Farol", "Lantern", "natural", 641),
+    FAROL("farol_almas", "Farol de almas", "Soul Lantern", "almas", 642),
+    ANTORCHA("antorcha", "Antorcha", "Torch", "natural", 651),
+    ANTORCHA("antorcha_almas", "Antorcha de almas", "Soul Torch", "almas", 652),
 ]
 POR_ID = {m["id"]: m for m in MATERIALES}
 
 FORMAS = {"B": "", "E": "_escalera", "L": "_losa", "M": "_muro", "V": "_valla", "P": "_cancela", "D": "_puerta",
           "T": "_trampilla", "J": "_panel"}
 # las formas que son el material entero (sin sufijo en el id): columna, planta, capas de nieve, hielo, ramas (de 8, 4 y
-# 12 pixeles), hojas, racimo, musgo que cuelga, liana, alfombra (hojarasca), vidrio, reja y cadena
-SIN_SUFIJO = ("C", "X", "N", "H", "R", "Q", "U", "O", "K", "G", "Y", "A", "W", "I", "Z")
+# 12 pixeles), hojas, racimo, musgo que cuelga, liana, alfombra (hojarasca), vidrio, reja y cadena; y las luces (parte
+# 8g): f fuego, s brasero, v velas, c candelabro, p aplique, a arana, l farol y t antorcha (con su `_pared`)
+SIN_SUFIJO = ("C", "X", "N", "H", "R", "Q", "U", "O", "K", "G", "Y", "A", "W", "I", "Z", "f", "s", "v", "c", "p", "a", "l", "t")
 NOMBRE_FORMA_ES = {"B": "{}", "E": "Escalera de {}", "L": "Losa de {}", "M": "Muro de {}", "V": "Valla de {}",
                    "P": "Cancela de {}", "D": "Puerta de {}", "T": "Trampilla de {}", "J": "Panel de {}"}
 NOMBRE_FORMA_EN = {"B": "{}", "E": "{} Stairs", "L": "{} Slab", "M": "{} Wall", "V": "{} Fence", "P": "{} Fence Gate",
@@ -984,6 +1101,13 @@ def texturas(m):
         rgb = c["receta"](c["semilla"], c["semilla"])
         out = {m["id"] + "_h": _img(np.ascontiguousarray(np.rot90(rgb)))}
     elif m["formas"] in ("Q", "U", "K"):
+        out = {}
+    elif m["formas"] == "f":
+        c = m["color"]
+        for k in range(2):
+            out[f"fuego_{c}_{k}"] = _img(F.llamas(s + 37 * k, RAMPAS["f_" + c]))
+            ANIM[f"fuego_{c}_{k}"] = 1
+    elif m["formas"] in ("s", "v", "c", "p", "a", "l", "t"):
         out = {}
     elif "N" not in m["formas"]:
         for v, n in enumerate(nombres(m)):
@@ -1158,6 +1282,208 @@ def estado_liana(modelo):
     return {"multipart": partes}
 
 
+def _caja(a, b, tex, caras=("north", "south", "east", "west", "up", "down"), uv=None, rot=None, sombra=True):
+    """Un elemento de modelo: una caja de `a` a `b` con la misma textura en las caras dadas."""
+    e = {"from": list(a), "to": list(b), "faces": {}}
+    for c in caras:
+        f = {"texture": tex}
+        if uv:
+            f["uv"] = uv
+        e["faces"][c] = f
+    if rot:
+        e["rotation"] = rot
+    if not sombra:
+        e["shade"] = False
+    return e
+
+
+def _llama(cx, y0, cz, ancho, alto, tex="#llama", cruzada=True, rot=None):
+    """Una llama: dos planos que se cruzan (en diagonal, o en cruz si `cruzada` es falso), con la textura entera."""
+    out = []
+    w = ancho / 2
+    if cruzada:
+        for ang in (45, -45):
+            out.append({"from": [cx - w, y0, cz], "to": [cx + w, y0 + alto, cz], "shade": False,
+                        "rotation": {"origin": [cx, y0, cz], "axis": "y", "angle": ang},
+                        "faces": {"north": {"uv": [0, 0, 16, 16], "texture": tex}, "south": {"uv": [0, 0, 16, 16], "texture": tex}}})
+    else:
+        a = {"from": [cx - w, y0, cz], "to": [cx + w, y0 + alto, cz], "shade": False,
+             "faces": {"north": {"uv": [0, 0, 16, 16], "texture": tex}, "south": {"uv": [0, 0, 16, 16], "texture": tex}}}
+        b = {"from": [cx, y0, cz - w], "to": [cx, y0 + alto, cz + w], "shade": False,
+             "faces": {"east": {"uv": [0, 0, 16, 16], "texture": tex}, "west": {"uv": [0, 0, 16, 16], "texture": tex}}}
+        if rot:
+            a["rotation"] = dict(rot)
+            b["rotation"] = dict(rot)
+        out += [a, b]
+    return out
+
+
+def _vela(x, z, alto, y0=0.0, grueso=2.0):
+    """Una vela de pie en (x, z) (la esquina), con su mecha y su llama."""
+    g = grueso
+    els = [_caja((x, y0, z), (x + g, y0 + alto, z + g), "#cera", uv=[0, 0, g, alto])]
+    els.append(_caja((x + g / 2 - 0.25, y0 + alto, z + g / 2 - 0.25), (x + g / 2 + 0.25, y0 + alto + 1, z + g / 2 + 0.25),
+                     "#mecha", caras=("north", "south", "east", "west")))
+    els += _llama(x + g / 2, y0 + alto + 0.3, z + g / 2, 3.0, 4.5)
+    return els
+
+
+# las velas de cada cuenta (como las del juego): esquina x, z y alto
+VELAS = {1: [(7, 7, 7)], 2: [(5, 7, 7), (9, 6, 5)], 3: [(7, 4, 7), (4, 9, 5), (10, 9, 6)],
+         4: [(4, 4, 7), (10, 4, 6), (4, 10, 5), (10, 10, 8)]}
+
+
+def escribir_luz(m):
+    """Las luces de la parte 8g: fuego, brasero, velas, candelabros (de pie, de pared y arana), farol y antorcha. Modelos
+    escritos caja a caja; la llama de las velas, faroles y antorchas es la `llamita` animada (de su color) en dos planos
+    cruzados."""
+    bid, f = m["id"], m["formas"]
+    bs = os.path.join(ASSETS, "blockstates")
+    mb = os.path.join(ASSETS, "models", "block")
+    mi = os.path.join(ASSETS, "models", "item")
+    c = m.get("color", "natural")
+    llamita = f"darkcraft:block/llamita_{'almas' if c == 'almas' else 'natural'}"
+    if f == "f":
+        for k in range(2):
+            j(os.path.join(mb, f"{bid}_{k}.json"), {"parent": "minecraft:block/template_fire_floor",
+                                                    "textures": {"fire": f"darkcraft:block/fuego_{c}_{k}"},
+                                                    "render_type": "minecraft:cutout"})
+        j(os.path.join(bs, bid + ".json"), {"variants": {"": [{"model": f"darkcraft:block/{bid}_0"},
+                                                              {"model": f"darkcraft:block/{bid}_1"}]}})
+        j(os.path.join(mi, bid + ".json"), {"parent": "minecraft:item/generated",
+                                           "textures": {"layer0": f"darkcraft:block/fuego_{c}_0"}})
+        return [bid]
+    if f == "s":
+        t = {"hierro": "darkcraft:block/hierro_negro", "brasas": f"darkcraft:block/brasas_{c}",
+             "fuego": f"darkcraft:block/fuego_{c}_0", "particle": "darkcraft:block/hierro_negro"}
+        els = [_caja(a, b, "#hierro") for a, b in (
+            ((2, 0, 2), (4, 9, 4)), ((12, 0, 2), (14, 9, 4)), ((2, 0, 12), (4, 9, 14)), ((12, 0, 12), (14, 9, 14)),
+            ((2, 9, 2), (14, 10, 14)), ((1, 9, 1), (15, 13, 2)), ((1, 9, 14), (15, 13, 15)), ((1, 9, 2), (2, 13, 14)),
+            ((14, 9, 2), (15, 13, 14)), ((3, 3, 3), (13, 4, 4)), ((3, 3, 12), (13, 4, 13)))]
+        els.append(_caja((2, 10, 2), (14, 12, 14), "#brasas", caras=("up",)))
+        # el fuego: cuatro planos que se inclinan hacia dentro (como el fuego del juego), dentro del cuenco
+        for (eje, pos, ang, cara) in (("x", 9.5, -22.5, "south"), ("x", 6.5, 22.5, "north"),
+                                      ("z", 9.5, -22.5, "west"), ("z", 6.5, 22.5, "east")):
+            if eje == "x":
+                e = {"from": [2, 11.5, pos], "to": [14, 27.5, pos]}
+            else:
+                e = {"from": [pos, 11.5, 2], "to": [pos, 27.5, 14]}
+            e.update({"rotation": {"origin": [8, 11.5, 8], "axis": eje, "angle": ang, "rescale": True}, "shade": False,
+                      "faces": {cara: {"uv": [0, 0, 16, 16], "texture": "#fuego"}}})
+            els.append(e)
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/block", "textures": t, "elements": els,
+                                           "render_type": "minecraft:cutout"})
+        j(os.path.join(bs, bid + ".json"), {"variants": {"": {"model": f"darkcraft:block/{bid}"}}})
+        j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
+        return [bid]
+    if f == "v":
+        t = {"cera": f"darkcraft:block/cera_{m['cera']}", "mecha": "darkcraft:block/cera_negra", "llama": llamita,
+             "particle": f"darkcraft:block/cera_{m['cera']}"}
+        v = {}
+        for k, velas in VELAS.items():
+            els = []
+            for (x, z, h) in velas:
+                els += _vela(x, z, h)
+            j(os.path.join(mb, f"{bid}_{k}.json"), {"parent": "minecraft:block/block", "textures": t, "elements": els,
+                                                    "render_type": "minecraft:cutout"})
+            v[f"velas={k}"] = {"model": f"darkcraft:block/{bid}_{k}"}
+        j(os.path.join(bs, bid + ".json"), {"variants": v})
+        j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}_1"})
+        return [bid]
+    t = {"metal": f"darkcraft:block/{m.get('metal', 'hierro_negro')}", "cera": "darkcraft:block/cera_blanca",
+         "mecha": "darkcraft:block/cera_negra", "llama": llamita, "cadena": f"darkcraft:block/{m.get('cadena', 'cadena_hierro')}",
+         "particle": f"darkcraft:block/{m.get('metal', 'hierro_negro')}"}
+    if f == "c":
+        els = [_caja(a, b, "#metal") for a, b in (
+            ((5, 0, 5), (11, 1, 11)), ((6, 1, 6), (10, 2, 10)), ((7, 2, 7), (9, 11, 9)), ((6.5, 6, 6.5), (9.5, 7, 9.5)),
+            ((2, 10, 7.5), (14, 11, 8.5)), ((1.5, 11, 7), (3.5, 12, 9)), ((12.5, 11, 7), (14.5, 12, 9)), ((6.5, 11, 6.5), (9.5, 12, 9.5)))]
+        els += _vela(1.75, 7.25, 4, y0=12, grueso=1.5) + _vela(12.75, 7.25, 4, y0=12, grueso=1.5) + _vela(7.25, 7.25, 5, y0=12, grueso=1.5)
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/block", "textures": t, "elements": els,
+                                           "render_type": "minecraft:cutout"})
+        giro = {"north": 0, "east": 90, "south": 180, "west": 270}
+        j(os.path.join(bs, bid + ".json"), {"variants": {f"facing={d}": dict({"model": f"darkcraft:block/{bid}"}, **({"y": y} if y else {}))
+                                                         for d, y in giro.items()}})
+        j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
+        return [bid]
+    if f == "p":
+        # mirando al norte: la placa contra la pared del sur (z 16)
+        els = [_caja(a, b, "#metal") for a, b in (
+            ((6, 3, 15), (10, 11, 16)), ((7.5, 5, 10), (8.5, 6, 15)), ((7.5, 5, 10), (8.5, 7, 11)), ((6, 7, 8.5), (10, 8, 12.5)))]
+        els += _vela(7.25, 9.75, 5, y0=8, grueso=1.5)
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/block", "textures": t, "elements": els,
+                                           "render_type": "minecraft:cutout"})
+        giro = {"north": 0, "east": 90, "south": 180, "west": 270}
+        j(os.path.join(bs, bid + ".json"), {"variants": {f"facing={d}": dict({"model": f"darkcraft:block/{bid}"}, **({"y": y} if y else {}))
+                                                         for d, y in giro.items()}})
+        j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
+        return [bid]
+    if f == "a":
+        els = [_caja(a, b, "#metal") for a, b in (
+            ((2, 4, 2), (14, 5, 3)), ((2, 4, 13), (14, 5, 14)), ((2, 4, 3), (3, 5, 13)), ((13, 4, 3), (14, 5, 13)),
+            ((3, 4, 7.5), (13, 5, 8.5)), ((7.5, 4, 3), (8.5, 5, 13)), ((7, 3, 7), (9, 6, 9)))]
+        for (x, z) in ((2.25, 2.25), (12.25, 2.25), (2.25, 12.25), (12.25, 12.25), (7.25, 2.25), (7.25, 12.25),
+                       (2.25, 7.25), (12.25, 7.25)):
+            els += _vela(x, z, 3, y0=5, grueso=1.5)
+        # las cadenas: dos planos cruzados del centro al techo (como la cadena del juego)
+        for ang in (45, -45):
+            els.append({"from": [6.5, 6, 8], "to": [9.5, 16, 8], "shade": False,
+                        "rotation": {"origin": [8, 8, 8], "axis": "y", "angle": ang},
+                        "faces": {"north": {"uv": [3, 0, 0, 10], "texture": "#cadena"}, "south": {"uv": [0, 0, 3, 10], "texture": "#cadena"}}})
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/block", "textures": t, "elements": els,
+                                           "render_type": "minecraft:cutout"})
+        j(os.path.join(bs, bid + ".json"), {"variants": {"": {"model": f"darkcraft:block/{bid}"}}})
+        j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
+        return [bid]
+    if f == "l":
+        def farol(dy):
+            els = [_caja(a, b, "#metal") for a, b in (
+                ((5, dy, 5), (11, dy + 1, 11)), ((5, dy + 1, 5), (6, dy + 7, 6)), ((10, dy + 1, 5), (11, dy + 7, 6)),
+                ((5, dy + 1, 10), (6, dy + 7, 11)), ((10, dy + 1, 10), (11, dy + 7, 11)), ((5, dy + 7, 5), (11, dy + 8, 11)),
+                ((6, dy + 8, 6), (10, dy + 9, 10)), ((7, dy + 9, 7), (9, dy + 10, 9)),
+                ((7.5, dy + 1, 5), (8.5, dy + 7, 5.5)), ((7.5, dy + 1, 10.5), (8.5, dy + 7, 11)),
+                ((5, dy + 1, 7.5), (5.5, dy + 7, 8.5)), ((10.5, dy + 1, 7.5), (11, dy + 7, 8.5)))]
+            els.append(_caja((7, dy + 1, 7), (9, dy + 3, 9), "#cera"))
+            els += _llama(8, dy + 3, 8, 3.5, 4.5)
+            return els
+        t["cera"] = "darkcraft:block/cera_blanca"
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/block", "textures": t, "elements": farol(0),
+                                           "render_type": "minecraft:cutout"})
+        colgado = farol(1)
+        for ang in (45, -45):
+            colgado.append({"from": [6.5, 11, 8], "to": [9.5, 16, 8], "shade": False,
+                            "rotation": {"origin": [8, 8, 8], "axis": "y", "angle": ang},
+                            "faces": {"north": {"uv": [3, 0, 0, 5], "texture": "#cadena"}, "south": {"uv": [0, 0, 3, 5], "texture": "#cadena"}}})
+        j(os.path.join(mb, bid + "_colgado.json"), {"parent": "minecraft:block/block", "textures": t, "elements": colgado,
+                                                    "render_type": "minecraft:cutout"})
+        v = {}
+        for colg in ("false", "true"):
+            for agua in ("false", "true"):
+                v[f"hanging={colg},waterlogged={agua}"] = {"model": f"darkcraft:block/{bid}" + ("_colgado" if colg == "true" else "")}
+        j(os.path.join(bs, bid + ".json"), {"variants": v})
+        j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
+        return [bid]
+    if f == "t":
+        t = {"palo": "darkcraft:block/antorcha_palo", "trapo": "darkcraft:block/antorcha_trapo", "llama": llamita,
+             "particle": "darkcraft:block/antorcha_palo"}
+        de_pie = [_caja((7, 0, 7), (9, 9, 9), "#palo"), _caja((6.5, 8, 6.5), (9.5, 11, 9.5), "#trapo")]
+        de_pie += _llama(8, 10.5, 8, 5, 7, cruzada=False)
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/block", "textures": t, "elements": de_pie,
+                                           "render_type": "minecraft:cutout", "ambientocclusion": False})
+        # de pared (mirando al este: pegada a la pared del oeste, inclinada hacia fuera como la del juego)
+        rot = {"origin": [0, 3.5, 8], "axis": "z", "angle": -22.5}
+        pared = [_caja((-1, 3.5, 7), (1, 12.5, 9), "#palo", rot=rot), _caja((-1.5, 11.5, 6.5), (1.5, 14.5, 9.5), "#trapo", rot=rot)]
+        pared += _llama(0, 14, 8, 5, 7, cruzada=False, rot=rot)
+        j(os.path.join(mb, bid + "_pared.json"), {"parent": "minecraft:block/block", "textures": t, "elements": pared,
+                                                  "render_type": "minecraft:cutout", "ambientocclusion": False})
+        j(os.path.join(bs, bid + ".json"), {"variants": {"": {"model": f"darkcraft:block/{bid}"}}})
+        giro = {"east": 0, "south": 90, "west": 180, "north": 270}
+        j(os.path.join(bs, bid + "_pared.json"), {"variants": {
+            f"facing={d}": dict({"model": f"darkcraft:block/{bid}_pared"}, **({"y": y} if y else {})) for d, y in giro.items()}})
+        j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
+        return [bid, bid + "_pared"]
+    raise ValueError(f)
+
+
 def escribir_vidrio(m):
     """Vidrio: el bloque (translucido) y, si lleva J, su panel (como el panel de vidrio del juego: poste, lados y sin
     lado, con el canto `<id>_borde`)."""
@@ -1317,6 +1643,8 @@ def escribir_material(m):
     ids = []
     if "C" in m["formas"] and m.get("lado_de"):
         return escribir_tronco(m)
+    if m["formas"] in ("f", "s", "v", "c", "p", "a", "l", "t"):
+        return escribir_luz(m)
     if "W" in m["formas"]:
         return escribir_vidrio(m)
     if m["formas"] == "I":
@@ -1498,7 +1826,10 @@ def botin(ids):
     """Lo que suelta cada bloque al romperlo (en supervivencia): el mismo; la losa doble, dos."""
     d = os.path.join(DATA, "darkcraft", "loot_tables", "blocks")
     for bid in ids:
-        entrada = {"type": "minecraft:item", "name": "darkcraft:" + bid}
+        suelta = bid
+        if bid.endswith("_pared") and bid[:-6] in POR_ID and POR_ID[bid[:-6]]["formas"] == "t":
+            suelta = bid[:-6]   # la antorcha de pared no tiene objeto: suelta la antorcha
+        entrada = {"type": "minecraft:item", "name": "darkcraft:" + suelta}
         if bid.endswith("_losa"):
             entrada["functions"] = [{"function": "minecraft:set_count", "count": 2, "add": False, "conditions": [
                 {"condition": "minecraft:block_state_property", "block": "darkcraft:" + bid, "properties": {"type": "double"}}]},
@@ -1524,6 +1855,8 @@ def etiquetas():
         for f in m["formas"]:
             bid = b + ("" if f in SIN_SUFIJO else FORMAS[f])
             tags[m["herramienta"]].append(bid)
+            if f == "t":
+                tags[m["herramienta"]].append(bid + "_pared")
             if f == "E":
                 tags["stairs"].append(bid)
                 if madera:
@@ -1569,6 +1902,9 @@ def textos():
             if f in SIN_SUFIJO:
                 es["block.darkcraft." + m["id"]] = m["es"]
                 en["block.darkcraft." + m["id"]] = m["en"]
+                if f == "t":
+                    es["block.darkcraft." + m["id"] + "_pared"] = m["es"]
+                    en["block.darkcraft." + m["id"] + "_pared"] = m["en"]
                 continue
             bid = m["id"] + FORMAS[f]
             es["block.darkcraft." + bid] = NOMBRE_FORMA_ES[f].format(m["es"] if f == "B" else minus(m["es"]))
@@ -1721,14 +2057,25 @@ def main():
     tdir = os.path.join(ASSETS, "textures", "block")
     os.makedirs(tdir, exist_ok=True)
     ids = []
+
+    def guardar(nombre, img):
+        if not hasattr(img, "save"):
+            img = _img(img)
+        for pre, carpeta in (("item/", "item"), ("particle/", "particle")):
+            if nombre.startswith(pre):
+                d = os.path.join(ASSETS, "textures", carpeta)
+                os.makedirs(d, exist_ok=True)
+                img.save(os.path.join(d, nombre[len(pre):] + ".png"))
+                return
+        img.save(os.path.join(tdir, nombre + ".png"))
+        if nombre in ANIM:
+            j(os.path.join(tdir, nombre + ".png.mcmeta"), {"animation": {"frametime": ANIM[nombre]}})
+    for nombre, img in sueltas().items():
+        guardar(nombre, img)
+    particulas_json()
     for m in MATERIALES:
         for nombre, img in texturas(m).items():
-            if nombre.startswith("item/"):
-                idir = os.path.join(ASSETS, "textures", "item")
-                os.makedirs(idir, exist_ok=True)
-                img.save(os.path.join(idir, nombre[5:] + ".png"))
-            else:
-                img.save(os.path.join(tdir, nombre + ".png"))
+            guardar(nombre, img)
         ids += escribir_material(m)
     botin(ids)
     etiquetas()

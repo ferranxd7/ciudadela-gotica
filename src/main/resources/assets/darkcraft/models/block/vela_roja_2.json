@@ -1,0 +1,368 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "cera": "darkcraft:block/cera_roja",
+    "mecha": "darkcraft:block/cera_negra",
+    "llama": "darkcraft:block/llamita_natural",
+    "particle": "darkcraft:block/cera_roja"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        0.0,
+        7
+      ],
+      "to": [
+        7.0,
+        7.0,
+        9.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cera",
+          "uv": [
+            0,
+            0,
+            2.0,
+            7
+          ]
+        },
+        "south": {
+          "texture": "#cera",
+          "uv": [
+            0,
+            0,
+            2.0,
+            7
+          ]
+        },
+        "east": {
+          "texture": "#cera",
+          "uv": [
+            0,
+            0,
+            2.0,
+            7
+          ]
+        },
+        "west": {
+          "texture": "#cera",
+          "uv": [
+            0,
+            0,
+            2.0,
+            7
+          ]
+        },
+        "up": {
+          "texture": "#cera",
+          "uv": [
+            0,
+            0,
+            2.0,
+            7
+          ]
+        },
+        "down": {
+          "texture": "#cera",
+          "uv": [
+            0,
+            0,
+            2.0,
+            7
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        5.75,
+        7.0,
+        7.75
+      ],
+      "to": [
+        6.25,
+        8.0,
+        8.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#mecha"
+        },
+        "south": {
+          "texture": "#mecha"
+        },
+        "east": {
+          "texture": "#mecha"
+        },
+        "west": {
+          "texture": "#mecha"
+        }
+      }
+    },
+    {
+      "from": [
+        4.5,
+        7.3,
+        8.0
+      ],
+      "to": [
+        7.5,
+        11.8,
+        8.0
+      ],
+      "shade": false,
+      "rotation": {
+        "origin": [
+          6.0,
+          7.3,
+          8.0
+        ],
+        "axis": "y",
+        "angle": 45
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#llama"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#llama"
+        }
+      }
+    },
+    {
+      "from": [
+        4.5,
+        7.3,
+        8.0
+      ],
+      "to": [
+        7.5,
+        11.8,
+        8.0
+      ],
+      "shade": false,
+      "rotation": {
+        "origin": [
+          6.0,
+          7.3,
+          8.0
+        ],
+        "axis": "y",
+        "angle": -45
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#llama"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#llama"
+        }
+      }
+    },
+    {
+      "from": [
+        9,
+        0.0,
+        6
+      ],
+      "to": [
+        11.0,
+        5.0,
+        8.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cera",
+          "uv": [
+            0,
+            0,
+            2.0,
+            5
+          ]
+        },
+        "south": {
+          "texture": "#cera",
+          "uv": [
+            0,
+            0,
+            2.0,
+            5
+          ]
+        },
+        "east": {
+          "texture": "#cera",
+          "uv": [
+            0,
+            0,
+            2.0,
+            5
+          ]
+        },
+        "west": {
+          "texture": "#cera",
+          "uv": [
+            0,
+            0,
+            2.0,
+            5
+          ]
+        },
+        "up": {
+          "texture": "#cera",
+          "uv": [
+            0,
+            0,
+            2.0,
+            5
+          ]
+        },
+        "down": {
+          "texture": "#cera",
+          "uv": [
+            0,
+            0,
+            2.0,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        9.75,
+        5.0,
+        6.75
+      ],
+      "to": [
+        10.25,
+        6.0,
+        7.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#mecha"
+        },
+        "south": {
+          "texture": "#mecha"
+        },
+        "east": {
+          "texture": "#mecha"
+        },
+        "west": {
+          "texture": "#mecha"
+        }
+      }
+    },
+    {
+      "from": [
+        8.5,
+        5.3,
+        7.0
+      ],
+      "to": [
+        11.5,
+        9.8,
+        7.0
+      ],
+      "shade": false,
+      "rotation": {
+        "origin": [
+          10.0,
+          5.3,
+          7.0
+        ],
+        "axis": "y",
+        "angle": 45
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#llama"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#llama"
+        }
+      }
+    },
+    {
+      "from": [
+        8.5,
+        5.3,
+        7.0
+      ],
+      "to": [
+        11.5,
+        9.8,
+        7.0
+      ],
+      "shade": false,
+      "rotation": {
+        "origin": [
+          10.0,
+          5.3,
+          7.0
+        ],
+        "axis": "y",
+        "angle": -45
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#llama"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#llama"
+        }
+      }
+    }
+  ],
+  "render_type": "minecraft:cutout"
+}

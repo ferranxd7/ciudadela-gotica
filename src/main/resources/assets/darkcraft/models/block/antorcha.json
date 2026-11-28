@@ -1,0 +1,143 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "palo": "darkcraft:block/antorcha_palo",
+    "trapo": "darkcraft:block/antorcha_trapo",
+    "llama": "darkcraft:block/llamita_natural",
+    "particle": "darkcraft:block/antorcha_palo"
+  },
+  "elements": [
+    {
+      "from": [
+        7,
+        0,
+        7
+      ],
+      "to": [
+        9,
+        9,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#palo"
+        },
+        "south": {
+          "texture": "#palo"
+        },
+        "east": {
+          "texture": "#palo"
+        },
+        "west": {
+          "texture": "#palo"
+        },
+        "up": {
+          "texture": "#palo"
+        },
+        "down": {
+          "texture": "#palo"
+        }
+      }
+    },
+    {
+      "from": [
+        6.5,
+        8,
+        6.5
+      ],
+      "to": [
+        9.5,
+        11,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#trapo"
+        },
+        "south": {
+          "texture": "#trapo"
+        },
+        "east": {
+          "texture": "#trapo"
+        },
+        "west": {
+          "texture": "#trapo"
+        },
+        "up": {
+          "texture": "#trapo"
+        },
+        "down": {
+          "texture": "#trapo"
+        }
+      }
+    },
+    {
+      "from": [
+        5.5,
+        10.5,
+        8
+      ],
+      "to": [
+        10.5,
+        17.5,
+        8
+      ],
+      "shade": false,
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#llama"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#llama"
+        }
+      }
+    },
+    {
+      "from": [
+        8,
+        10.5,
+        5.5
+      ],
+      "to": [
+        8,
+        17.5,
+        10.5
+      ],
+      "shade": false,
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#llama"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#llama"
+        }
+      }
+    }
+  ],
+  "render_type": "minecraft:cutout",
+  "ambientocclusion": false
+}

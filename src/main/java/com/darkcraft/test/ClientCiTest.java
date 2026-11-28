@@ -3084,10 +3084,12 @@ public final class ClientCiTest {
         }
         final String[] cercaIds = {"sillar_musgoso", "marmol_negro", "piedra_tallada", "madera_roble", "entramado_cruz",
                 "tejado_escamas", "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos", "tronco_roble", "corteza_pantano",
-                "rama_roble", "hojas_roble", "musgo_colgante", "liana", "oro_labrado", "barrotes", "vidriera_roja"};
+                "rama_roble", "hojas_roble", "musgo_colgante", "liana", "oro_labrado", "barrotes", "vidriera_roja", "brasero_almas",
+                "candelabro", "farol"};
         final String[] nombres = {"musgo", "marmol_negro", "tallada", "roble_puerta", "entramado_cruz", "tejado_escamas",
                 "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos", "tronco_roble", "corteza_pantano", "rama_roble",
-                "hojas_roble", "musgo_colgante", "liana", "oro_labrado", "barrotes", "vidriera_roja"};
+                "hojas_roble", "musgo_colgante", "liana", "oro_labrado", "barrotes", "vidriera_roja", "brasero_almas", "candelabro",
+                "farol"};
         final int[] cerca = new int[cercaIds.length];
         final float[] cabeceo = new float[cercaIds.length];
         for (int i = 0; i < cercaIds.length; i++) {
@@ -3104,13 +3106,34 @@ public final class ClientCiTest {
             atTicks(t + 24, "captura: de cerca, " + nom, m -> shot(m, String.format(java.util.Locale.ROOT, "cliente_bq%02d_%s", n + grupos - 5, nom)));
             t += 28;
         }
+        // las luces de noche (parte 8g): el fuego de los siete colores y los braseros, y las velas, candelabros, aranas, faroles
+        // y antorchas
+        int luz0 = 0;
+        for (int k = 0; k < com.darkcraft.bloques.CatalogoBloques.MATERIALES.length; k++)
+            if (com.darkcraft.bloques.CatalogoBloques.MATERIALES[k].id().equals("fuego")) luz0 = k;
+        final int kLuz = luz0;
+        final int nNoche = grupos + cercaIds.length + 1;
+        // (27 materiales de luces, 7 bloques cada uno: cinco capturas las cubren)
+        final double[] centros = {21.5, 63.5, 105.5, 147.5, 182.5};
+        atTicks(t, "Bloques 8g: de noche", m -> server(m, sp -> sp.serverLevel().setDayTime(18000)));
+        for (int i = 0; i < centros.length; i++) {
+            final double cx = centros[i];
+            final int n = nNoche + i;
+            atTicks(t, "Bloques 8g: las luces de noche, " + (i + 1), m -> server(m, sp -> sp.teleportTo(sp.serverLevel(),
+                    mx + kLuz * 7 + cx, my + 4.0, mz - 16.5, 0f, 12f)));
+            atTicks(t + 40, "captura: las luces de noche, " + (i + 1), m -> shot(m, String.format(java.util.Locale.ROOT,
+                    "cliente_bq%02d_luces_noche", n)));
+            t += 44;
+        }
+        atTicks(t, "Bloques 8g: de dia otra vez", m -> server(m, sp -> sp.serverLevel().setDayTime(6000)));
+        t += 4;
         // los arboles de muestra (parte 8e): tres capturas desde el sur y una desde abajo
         final double[][] vistasArboles = {{12.5, 7.0, -17.0, 0f, 14f}, {44.5, 7.0, -18.0, 0f, 14f}, {62.5, 6.0, -12.0, 0f, 12f},
                 {41.5, 1.6, -2.5, 45f, -40f}};
         final String[] nombresArboles = {"arboles_1", "arboles_2", "arboles_3", "arboles_desde_abajo"};
         for (int i = 0; i < vistasArboles.length; i++) {
             final double[] v = vistasArboles[i];
-            final int n = grupos + cercaIds.length + 1 + i;
+            final int n = grupos + cercaIds.length + 6 + i;
             final String nom = nombresArboles[i];
             atTicks(t, "Bloques 8e: " + nom, m -> server(m, sp -> sp.teleportTo(sp.serverLevel(), arbolesX + v[0], my + v[1],
                     mz + v[2], (float) v[3], (float) v[4])));
@@ -3151,6 +3174,10 @@ public final class ClientCiTest {
                         lvl.setBlock(new BlockPos(x + dx, y0, z0 + dz), b.defaultBlockState(), 2);
                         n++;
                     }
+                continue;
+            }
+            if (f.length() == 1 && "fsvcpalt".indexOf(f.charAt(0)) >= 0) {
+                n += luces(lvl, f, id, b, x, y0, z0);
                 continue;
             }
             if (f.indexOf('W') >= 0) {
@@ -3367,6 +3394,67 @@ public final class ClientCiTest {
             lvl.setBlock(p, net.minecraft.world.level.block.Block.updateFromNeighbourShapes(lvl.getBlockState(p), lvl, p), 2);
         arbolesX = x0 + mats.length * 7 + 8;
         n += arbolesMuestra(lvl, arbolesX, y0, z0);
+        return n;
+    }
+
+    /** Las luces de la parte 8g en el muestrario: el fuego en el suelo, braseros, velas de una a cuatro, candelabros, apliques
+     *  en un muro, aranas colgadas de una viga (una de una cadena), faroles de pie y colgados y antorchas de pie y de pared. */
+    private static int luces(ServerLevel lvl, String f, String id, net.minecraft.world.level.block.Block b, int x, int y0, int z0) {
+        int n = 0;
+        net.minecraft.world.level.block.state.BlockState sillar = bq("sillar_gris");
+        java.util.function.BiConsumer<BlockPos, net.minecraft.world.level.block.state.BlockState> poner = (p, st) -> lvl.setBlock(p, st, 2);
+        switch (f) {
+            case "f" -> {
+                for (int dx = 0; dx < 3; dx++) poner.accept(new BlockPos(x + dx, y0, z0 + 1), b.defaultBlockState());
+                n += 3;
+            }
+            case "s" -> {
+                poner.accept(new BlockPos(x + 1, y0, z0 + 1), b.defaultBlockState());
+                poner.accept(new BlockPos(x + 3, y0, z0), b.defaultBlockState());
+                n += 2;
+            }
+            case "v" -> {
+                for (int k = 0; k < 4; k++)
+                    poner.accept(new BlockPos(x + k, y0, z0 + 1), b.defaultBlockState().setValue(com.darkcraft.bloques.Vela.VELAS, k + 1));
+                n += 4;
+            }
+            case "c" -> {
+                poner.accept(new BlockPos(x + 1, y0, z0 + 1), b.defaultBlockState());
+                poner.accept(new BlockPos(x + 3, y0, z0), b.defaultBlockState().setValue(
+                        net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, net.minecraft.core.Direction.EAST));
+                n += 2;
+            }
+            case "p", "t" -> {
+                for (int dx = 0; dx < 4; dx++)
+                    for (int dy = 0; dy < 3; dy++) poner.accept(new BlockPos(x + dx, y0 + dy, z0 + 2), sillar);
+                if (f.equals("p")) {
+                    net.minecraft.world.level.block.state.BlockState ap = b.defaultBlockState().setValue(
+                            net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, net.minecraft.core.Direction.NORTH);
+                    poner.accept(new BlockPos(x + 1, y0 + 1, z0 + 1), ap);
+                    poner.accept(new BlockPos(x + 2, y0 + 2, z0 + 1), ap);
+                } else {
+                    poner.accept(new BlockPos(x + 1, y0, z0 + 1), b.defaultBlockState());
+                    poner.accept(new BlockPos(x + 2, y0 + 1, z0 + 1), com.darkcraft.bloques.Bloques.de(id + "_pared").defaultBlockState()
+                            .setValue(net.minecraft.world.level.block.WallTorchBlock.FACING, net.minecraft.core.Direction.NORTH));
+                }
+                n += 14;
+            }
+            case "a", "l" -> {
+                for (int dx = 0; dx < 4; dx++) poner.accept(new BlockPos(x + dx, y0 + 3, z0 + 1), sillar);
+                if (f.equals("a")) {
+                    poner.accept(new BlockPos(x + 1, y0 + 2, z0 + 1), b.defaultBlockState());
+                    poner.accept(new BlockPos(x + 3, y0 + 2, z0 + 1), bq("cadena_hierro"));
+                    poner.accept(new BlockPos(x + 3, y0 + 1, z0 + 1), b.defaultBlockState());
+                } else {
+                    poner.accept(new BlockPos(x + 1, y0, z0 + 1), b.defaultBlockState());
+                    poner.accept(new BlockPos(x + 2, y0 + 2, z0 + 1), b.defaultBlockState()
+                            .setValue(net.minecraft.world.level.block.LanternBlock.HANGING, true));
+                }
+                n += 7;
+            }
+            default -> {
+            }
+        }
         return n;
     }
 

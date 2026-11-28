@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/fuego_veneno_0"
+      },
+      {
+        "model": "darkcraft:block/fuego_veneno_1"
+      }
+    ]
+  }
+}

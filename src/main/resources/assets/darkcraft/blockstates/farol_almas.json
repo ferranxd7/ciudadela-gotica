@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "hanging=false,waterlogged=false": {
+      "model": "darkcraft:block/farol_almas"
+    },
+    "hanging=false,waterlogged=true": {
+      "model": "darkcraft:block/farol_almas"
+    },
+    "hanging=true,waterlogged=false": {
+      "model": "darkcraft:block/farol_almas_colgado"
+    },
+    "hanging=true,waterlogged=true": {
+      "model": "darkcraft:block/farol_almas_colgado"
+    }
+  }
+}

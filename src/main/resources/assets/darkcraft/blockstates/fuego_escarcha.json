@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/fuego_escarcha_0"
+      },
+      {
+        "model": "darkcraft:block/fuego_escarcha_1"
+      }
+    ]
+  }
+}

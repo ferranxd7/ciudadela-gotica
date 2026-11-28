@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "darkcraft:block/aplique_oro"
+    },
+    "facing=east": {
+      "model": "darkcraft:block/aplique_oro",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "darkcraft:block/aplique_oro",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "darkcraft:block/aplique_oro",
+      "y": 270
+    }
+  }
+}

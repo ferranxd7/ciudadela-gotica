@@ -8,6 +8,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.StandingAndWallBlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CarpetBlock;
 import net.minecraft.world.level.block.ChainBlock;
@@ -17,15 +18,19 @@ import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.HalfTransparentBlock;
 import net.minecraft.world.level.block.IronBarsBlock;
+import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -34,9 +39,11 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -72,11 +79,17 @@ public final class Bloques {
             .title(Component.translatable("itemGroup.darkcraft.bloques"))
             .icon(() -> new ItemStack(TODOS.values().iterator().next().get()))
             .displayItems((p, out) -> {
-                for (RegistryObject<Block> b : TODOS.values()) out.accept(b.get());
+                // (la antorcha de pared no tiene objeto: su objeto es el de la antorcha; no se pone dos veces)
+                Set<Item> puestos = new HashSet<>();
+                for (RegistryObject<Block> b : TODOS.values()) {
+                    Item it = b.get().asItem();
+                    if (it != net.minecraft.world.item.Items.AIR && puestos.add(it)) out.accept(it);
+                }
             })
             .build());
 
     public static void registrar(IEventBus bus) {
+        Fuegos.registrar(bus);
         BLOQUES.register(bus);
         OBJETOS.register(bus);
         PESTANAS.register(bus);
@@ -158,6 +171,10 @@ public final class Bloques {
                     .strength(m.dureza()).noOcclusion().ignitedByLava().pushReaction(PushReaction.DESTROY)));
             return;
         }
+        if (f.length() == 1 && "fsvcpalt".indexOf(f.charAt(0)) >= 0) {
+            altaLuz(m, ids);
+            return;
+        }
         if (f.indexOf('W') >= 0) {
             // vidrio: el bloque translucido y, con J, su panel
             reg(ids, m.id(), () -> new GlassBlock(vidrio(m)));
@@ -192,6 +209,41 @@ public final class Bloques {
         if (f.indexOf('D') >= 0) regPuerta(ids, m.id() + "_puerta", () -> new DoorBlock(props(m).noOcclusion(), m.juego()));
         if (f.indexOf('T') >= 0) reg(ids, m.id() + "_trampilla", () -> new TrapDoorBlock(props(m).noOcclusion()
                 .isValidSpawn((st, l, p, t) -> false), m.juego()));
+    }
+
+    /** Las luces y el fuego (parte 8g): f fuego, s brasero, v velas, c candelabro, p aplique, a arana, l farol y t antorcha
+     *  (de pie y de pared). */
+    private static void altaLuz(CatalogoBloques.Material m, List<String> ids) {
+        String color = Fuegos.color(m.id());
+        switch (m.formas()) {
+            case "f" -> reg(ids, m.id(), () -> new Fuego(BlockBehaviour.Properties.of().mapColor(m.mapa()).replaceable()
+                    .noCollission().instabreak().lightLevel(st -> 15).sound(m.sonido()).pushReaction(PushReaction.DESTROY), color));
+            case "s" -> reg(ids, m.id(), () -> new Brasero(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido())
+                    .strength(m.dureza(), 6.0F).lightLevel(st -> 15).noOcclusion(), color));
+            case "v" -> reg(ids, m.id(), () -> new Vela(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido())
+                    .strength(m.dureza()).noOcclusion().lightLevel(Vela::luz).pushReaction(PushReaction.DESTROY)));
+            case "c", "p" -> reg(ids, m.id(), () -> new Candelabro(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido())
+                    .strength(m.dureza()).noOcclusion().lightLevel(st -> m.formas().equals("c") ? 12 : 9)
+                    .pushReaction(PushReaction.DESTROY), m.formas().equals("c") ? Candelabro.PIE : Candelabro.PARED));
+            case "a" -> reg(ids, m.id(), () -> new Arana(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido())
+                    .strength(m.dureza()).noOcclusion().lightLevel(st -> 15).pushReaction(PushReaction.DESTROY)));
+            case "l" -> reg(ids, m.id(), () -> new LanternBlock(BlockBehaviour.Properties.of().mapColor(MapColor.METAL)
+                    .forceSolidOn().strength(3.5F).sound(SoundType.LANTERN).lightLevel(st -> color.equals("almas") ? 12 : 15)
+                    .noOcclusion().pushReaction(PushReaction.DESTROY)));
+            case "t" -> {
+                int luz = color.equals("almas") ? 10 : 14;
+                RegistryObject<Block> pie = BLOQUES.register(m.id(), () -> new Antorcha(BlockBehaviour.Properties.of()
+                        .noCollission().instabreak().lightLevel(st -> luz).sound(SoundType.WOOD).pushReaction(PushReaction.DESTROY), color));
+                RegistryObject<Block> pared = BLOQUES.register(m.id() + "_pared", () -> new Antorcha.Pared(BlockBehaviour.Properties.of()
+                        .noCollission().instabreak().lightLevel(st -> luz).sound(SoundType.WOOD).pushReaction(PushReaction.DESTROY), color));
+                OBJETOS.register(m.id(), () -> new StandingAndWallBlockItem(pie.get(), pared.get(), new Item.Properties(), Direction.DOWN));
+                TODOS.put(m.id(), pie);
+                TODOS.put(m.id() + "_pared", pared);
+                ids.add(m.id());
+                ids.add(m.id() + "_pared");
+            }
+            default -> throw new IllegalArgumentException(m.formas());
+        }
     }
 
     private static RegistryObject<Block> reg(List<String> ids, String id, Supplier<Block> s) {

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "velas=1": {
+      "model": "darkcraft:block/vela_blanca_1"
+    },
+    "velas=2": {
+      "model": "darkcraft:block/vela_blanca_2"
+    },
+    "velas=3": {
+      "model": "darkcraft:block/vela_blanca_3"
+    },
+    "velas=4": {
+      "model": "darkcraft:block/vela_blanca_4"
+    }
+  }
+}

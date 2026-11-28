@@ -108,6 +108,10 @@
     "darkcraft:tronco_pino",
     "darkcraft:rama_pino",
     "darkcraft:ramita_pino",
-    "darkcraft:rama_gruesa_pino"
+    "darkcraft:rama_gruesa_pino",
+    "darkcraft:antorcha",
+    "darkcraft:antorcha_pared",
+    "darkcraft:antorcha_almas",
+    "darkcraft:antorcha_almas_pared"
   ]
 }

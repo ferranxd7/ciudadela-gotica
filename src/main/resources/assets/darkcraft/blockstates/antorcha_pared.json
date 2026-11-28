@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "darkcraft:block/antorcha_pared"
+    },
+    "facing=south": {
+      "model": "darkcraft:block/antorcha_pared",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "darkcraft:block/antorcha_pared",
+      "y": 180
+    },
+    "facing=north": {
+      "model": "darkcraft:block/antorcha_pared",
+      "y": 270
+    }
+  }
+}
