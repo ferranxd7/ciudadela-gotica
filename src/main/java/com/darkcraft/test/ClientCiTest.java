@@ -6711,6 +6711,8 @@ public final class ClientCiTest {
         t = osario(t);
         // Fray Osmund, el Sacristan, en el Relicario (parte 7at)
         t = osmund(t);
+        // el Lazareto de Maese Galen y los Destilados (parte 7au)
+        t = lazareto(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -15271,6 +15273,415 @@ public final class ClientCiTest {
                 comando(sp, "darkcraft osario muro cerrar");
                 comando(sp, "darkcraft osario escotilla cerrar");
                 comando(sp, "darkcraft osario enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el Lazareto de Maese Galen y los Destilados (parte 7au)
+
+    private static final com.darkcraft.enemigos.Destilado[] DESTILADOS = new com.darkcraft.enemigos.Destilado[3];
+
+    private static com.darkcraft.enemigos.Destilado destiladoNuevo(ServerLevel lvl, int variante, double x, double y, double z, float giro) {
+        var a = DarkCraftMod.DESTILADO.get().create(lvl);
+        if (a == null) return null;
+        a.variante(variante);
+        a.moveTo(x, y, z, giro, 0f);
+        a.yBodyRot = a.yHeadRot = giro;
+        lvl.addFreshEntity(a);
+        return a;
+    }
+
+    private static void quitarDestilados(ServerLevel lvl) {
+        for (int i = 0; i < DESTILADOS.length; i++) {
+            if (DESTILADOS[i] != null && !DESTILADOS[i].isRemoved()) DESTILADOS[i].discard();
+            DESTILADOS[i] = null;
+        }
+        if (lvl == null) return;
+        var caja = new net.minecraft.world.phys.AABB(com.darkcraft.morvain.Lazareto.X0, 40, com.darkcraft.morvain.Lazareto.Z0, com.darkcraft.morvain.Lazareto.X1, 200,
+                com.darkcraft.morvain.Lazareto.Z1);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Destilado.class, caja, q -> q.sitio() == null || q.sitio().isEmpty())) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.Charco.class, caja)) e.discard();
+    }
+
+    private static String estadoDestilados() {
+        StringBuilder sb = new StringBuilder();
+        for (var a : DESTILADOS) sb.append(a == null ? "-" : a.isRemoved() ? "quitado" : a.estado() + " " + estadoE(a)).append(" | ");
+        return sb + String.format(java.util.Locale.ROOT, "frascos %d (revientan %d, dan %d, queman %d, corroen %d, curan %d), escupitajos %d, saltos %d, embestidas %d,"
+                        + " derrames %d, elixires %d, cubas rotas %d", com.darkcraft.enemigos.Destilado.FRASCOS, com.darkcraft.enemigos.Frasco.REVIENTAN,
+                com.darkcraft.enemigos.Frasco.DAN, com.darkcraft.enemigos.Frasco.QUEMAN, com.darkcraft.enemigos.Frasco.CORROEN, com.darkcraft.enemigos.Frasco.CURAN,
+                com.darkcraft.enemigos.Destilado.ESCUPITAJOS, com.darkcraft.enemigos.Destilado.SALTOS, com.darkcraft.enemigos.Destilado.EMBESTIDAS,
+                com.darkcraft.enemigos.Destilado.DERRAMES, com.darkcraft.enemigos.Destilado.ELIXIRES, com.darkcraft.enemigos.Destilado.CUBAS);
+    }
+
+    /** Lo del lazareto en una captura: el sitio, el aire de la torre (del cliente), el logro y el atanor. */
+    private static void logLazareto(Minecraft m, String que) {
+        String musica = ClientMusic.lazareto();
+        server(m, sp -> log("  lazareto, " + que + ": sitio " + com.darkcraft.morvain.Morvain.lugar(sp) + " | " + musica + " | logros lazareto "
+                + com.darkcraft.story.Logros.tiene(sp, "lazareto") + ", atanor " + com.darkcraft.story.Logros.tiene(sp, "atanor") + " | atanor "
+                + (com.darkcraft.morvain.Lazareto.encendido(sp.serverLevel()) ? "encendido" : "apagado") + " | " + fpos(sp)));
+    }
+
+    /** Un sitio del lazareto (u, y, v del marco del lazareto) visto desde otro: en creativo, volando. */
+    private static int vistaLazareto(int t, String nombre, double u, double y, double v, double mu, double my, double mv, int espera, boolean deNoche) {
+        final int CX = com.darkcraft.morvain.Lazareto.CX, CZ = com.darkcraft.morvain.Lazareto.CZ;
+        atTicks(t, "El lazareto: " + nombre, m -> server(m, sp -> {
+            sp.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+            sp.removeEffect(net.minecraft.world.effect.MobEffects.LEVITATION);
+            if (deNoche) sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+            irMirando(sp, CX + u, y, CZ + v, CX + mu, my, CZ + mv, true);
+        }));
+        t += espera;
+        final String cap = "cliente_" + nombre;
+        atTicks(t, "captura: " + nombre, m -> {
+            logLazareto(m, nombre);
+            shot(m, cap);
+        });
+        return t + 4;
+    }
+
+    /**
+     * Un golpe de un Destilado visto de lado, en la calzada: el Destilado en (x, z) mirando al sur, el jugador delante (al sur) y la
+     * camara al este. {@code frasco} (de {@link com.darkcraft.enemigos.Frasco}): lo que lanza el mancebo (-1: nada).
+     */
+    private static int golpeDestilado(int t, String nombre, int variante, int accion, int frasco, double dist, int captura, double ex, double ey, double ez) {
+        atTicks(t, "El lazareto: " + nombre, m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarDestilados(lvl);
+                aPelear(sp, true);
+                DESTILADOS[0] = destiladoNuevo(lvl, variante, ex, ey, ez, 0f);
+                irMirando(sp, ex, ey, ez + dist, ex, ey + 1.4, ez, false);
+                var a = DESTILADOS[0];
+                if (a == null) return;
+                a.setTarget(sp);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                if (frasco >= 0) a.proximoFrasco(frasco, sp);
+                a.empezar(accion);
+                boolean grande = variante == com.darkcraft.enemigos.Destilado.CUBA;
+                double lejos = Math.max(dist, 2.5);
+                verDesdeServidor = new Vec3(ex + (grande ? 6.4 : 3.6 + lejos * 0.45), ey + (grande ? 3.0 : 2.4), ez + lejos * 0.5 + 0.8);
+                miraServidor = new Vec3(ex, ey + (grande ? 1.6 : 1.2), ez + lejos * 0.5);
+            });
+        });
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += captura - 2;
+        final String cap = "cliente_" + nombre;
+        atTicks(t, "captura: " + nombre, m -> {
+            server(m, sp -> log("  " + nombre + ": " + estadoDestilados() + " | jugador vida " + Math.round(sp.getHealth()) + ", frenado "
+                    + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) + ", envenenado " + sp.hasEffect(net.minecraft.world.effect.MobEffects.POISON)
+                    + ", ardiendo " + sp.isOnFire() + ", frascos en el aire " + sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class,
+                    sp.getBoundingBox().inflate(16)).size() + ", charcos " + sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Frasco.Charco.class,
+                    sp.getBoundingBox().inflate(16)).size() + String.format(java.util.Locale.ROOT, " en %.1f, %.1f, %.1f", sp.getX(), sp.getY(), sp.getZ())));
+            shot(m, cap);
+        });
+        return t;
+    }
+
+    /**
+     * El Lazareto de Maese Galen (parte 7au): desde el santuario de la orilla, la calzada, el islote (las tumbas, el embarcadero), cada
+     * planta de la torre por dentro (el vestibulo, el sotano del atanor y su palanca, la sala de los enfermos, la escalera hundida, el
+     * herbolario, la biblioteca y el atril, el laboratorio, la Sala del Elixir y su cupula), el tejado y la torre de lejos. En aventura:
+     * la palanca del sotano (clic del cliente) enciende el atanor; el tiro del pozo sube al jugador; un golpe a las estanterias del oeste de
+     * la biblioteca abre el muro ilusorio (y la celda de Galen); entrar a pie (el logro, el sitio y el aire de la torre). En supervivencia,
+     * en la calzada: los frascos de fuego y de acido, el mortero, el zarpazo, el salto, el escupitajo, el punetazo, la embestida y el
+     * derrame de la cuba, el elixir verde que cura a uno de los suyos y la cuba que revienta; el libro de Galen y el bestiario.
+     */
+    private static int lazareto(int T) {
+        final int CX = com.darkcraft.morvain.Lazareto.CX, CZ = com.darkcraft.morvain.Lazareto.CZ, PS = com.darkcraft.morvain.Lazareto.PS;
+        final int ISLA = com.darkcraft.morvain.Lazareto.ISLA, AGUA = com.darkcraft.morvain.Lazareto.AGUA, P5 = com.darkcraft.morvain.Lazareto.P5;
+        final int TEJADO = com.darkcraft.morvain.Lazareto.TEJADO, TX = com.darkcraft.morvain.Lazareto.TX;
+        final int P0 = com.darkcraft.morvain.Lazareto.piso(0), P1 = com.darkcraft.morvain.Lazareto.piso(1), P2 = com.darkcraft.morvain.Lazareto.piso(2),
+                P3 = com.darkcraft.morvain.Lazareto.piso(3), P4 = com.darkcraft.morvain.Lazareto.piso(4);
+        final var SA = com.darkcraft.morvain.SantuariosMorvain.porId("lazareto");
+        int t = T;
+        atTicks(t, "El lazareto: desde el santuario", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft lazareto muro cerrar");
+                comando(sp, "darkcraft lazareto atanor apagar");
+                comando(sp, "darkcraft lazareto enemigos volver");
+                irMirando(sp, SA.x() + 6.5, SA.y() + 6, SA.z() + 7.5, CX, ISLA + 22, CZ, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura: el lazareto desde el santuario", m -> {
+            shot(m, "cliente_lz01_santuario");
+            server(m, sp -> log("  el lazareto: " + com.darkcraft.morvain.MorvainEnemigos.estadoLazareto(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 6;
+        t = vistaLazareto(t, "lz02_calzada", 0.5, AGUA + 3.6, 30, 0, ISLA + 3, 12, 60, false);
+        t = vistaLazareto(t, "lz03_islote", -30, ISLA + 22, 30, 0, ISLA, 0, 50, false);
+        t = vistaLazareto(t, "lz04_tumbas", 4.5, ISLA + 3, 24.5, 11, ISLA, 14, 40, false);
+        t = vistaLazareto(t, "lz05_embarcadero", -24.5, AGUA + 5, 8.5, -32, AGUA, 0, 40, false);
+        t = vistaLazareto(t, "lz06_vestibulo", 0.5, P0 + 2.5, 8.5, 0, P0 + 1.5, -6, 40, true);
+        t = vistaLazareto(t, "lz07_sotano", 6.5, PS + 3, 6.5, 0, PS + 1.5, 0, 40, true);
+        t = vistaLazareto(t, "lz08_palanca", 1.5, PS + 2.4, -8.5, 1, PS + 2, -5, 40, true);
+        t = vistaLazareto(t, "lz09_enfermeria", -6.5, P1 + 3, 6.5, 5, P1 + 0.5, -3, 40, true);
+        t = vistaLazareto(t, "lz10_escalera_hundida", TX + 1.5, P1 + 2, 1.5, TX, P2 + 4, -1, 40, true);
+        t = vistaLazareto(t, "lz11_herbolario", 6.5, P2 + 3, 6.5, -5, P2 + 1, -3, 40, true);
+        t = vistaLazareto(t, "lz12_biblioteca", 5.5, P3 + 3, 5.5, -8, P3 + 2, 0, 40, true);
+        t = vistaLazareto(t, "lz13_atril", -2.5, P3 + 2.4, 2.5, com.darkcraft.morvain.Lazareto.ATRIL_U, P3 + 1.5, com.darkcraft.morvain.Lazareto.ATRIL_V, 40, true);
+        t = vistaLazareto(t, "lz14_laboratorio", 6.5, P4 + 3, -6.5, -5, P4 + 1, 4, 40, true);
+        t = vistaLazareto(t, "lz15_elixir", 0.5, P5 + 3, 7.5, 0, P5 + 3, 0, 40, true);
+        t = vistaLazareto(t, "lz16_cupula", 0.5, P5 + 2, 4.5, 0, TEJADO + 8, 0, 40, true);
+        t = vistaLazareto(t, "lz17_tejado", 12.5, TEJADO + 10, 12.5, 0, TEJADO + 4, 0, 40, false);
+        t = vistaLazareto(t, "lz18_torre_lejos", 60, ISLA + 50, 60, 0, ISLA + 30, 0, 60, false);
+        // ---- en aventura: la palanca del sotano enciende el atanor (el clic del cliente)
+        final BlockPos pal = com.darkcraft.morvain.Lazareto.palanca();
+        atTicks(t, "El lazareto: ante la palanca del sotano, en aventura", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+                comando(sp, "darkcraft lazareto enemigos fuera");
+                irMirando(sp, pal.getX() + 0.5, PS + 1, pal.getZ() - 1.6, pal.getX() + 0.5, pal.getY() + 0.3, pal.getZ() + 0.5, false);
+            });
+        });
+        t += 30;
+        atTicks(t, "captura: la palanca y el atanor apagado", m -> {
+            logLazareto(m, "ante la palanca");
+            shot(m, "cliente_lz19_palanca");
+        });
+        t += 4;
+        atTicks(t, "El lazareto: clic en la palanca", m -> {
+            if (m.gameMode != null && m.player != null)
+                m.gameMode.useItemOn(m.player, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(pal), Direction.NORTH, pal, false));
+        });
+        t += 24;
+        atTicks(t, "El lazareto: el atanor encendido, desde la puerta del horno", m -> server(m, sp -> {
+            log("  tras la palanca: " + com.darkcraft.morvain.Lazareto.resumen(sp.serverLevel()) + " | logro atanor " + com.darkcraft.story.Logros.tiene(sp, "atanor"));
+            // si el clic no llego, a mano (para que la prueba siga)
+            if (!com.darkcraft.morvain.Lazareto.encendido(sp.serverLevel())) {
+                comando(sp, "darkcraft lazareto atanor encender");
+                log("  (encendido con el comando)");
+            }
+            irMirando(sp, CX + 0.5, PS + 1, CZ - 4.5, CX + 0.5, PS + 1.5, CZ + 0.5, false);
+        }));
+        t += 16;
+        atTicks(t, "captura: el atanor encendido", m -> {
+            logLazareto(m, "el atanor encendido");
+            server(m, sp -> log("  cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+            shot(m, "cliente_lz20_atanor_encendido");
+        });
+        t += 4;
+        // ---- el tiro: sobre la parrilla, en el pozo, sube (aventura, sin volar)
+        atTicks(t, "El lazareto: en el pozo, sobre la parrilla", m -> server(m, sp -> {
+            sp.removeAllEffects();
+            sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+            irMirando(sp, CX + 0.5, PS + 1.1, CZ + 0.5, CX + 0.5, PS + 30, CZ + 3.5, false);
+        }));
+        t += 40;
+        atTicks(t, "captura: sube por el tiro", m -> {
+            server(m, sp -> log("  en el tiro: " + fpos(sp) + ", levitando " + sp.hasEffect(net.minecraft.world.effect.MobEffects.LEVITATION) + ", suben "
+                    + com.darkcraft.morvain.Lazareto.SUBEN));
+            shot(m, "cliente_lz21_tiro_sube");
+        });
+        t += 80;
+        atTicks(t, "captura: arriba en el tiro", m -> {
+            server(m, sp -> log("  arriba en el tiro: " + fpos(sp) + " (la biblioteca en " + P3 + ", el laboratorio en " + P4 + "), levitando "
+                    + sp.hasEffect(net.minecraft.world.effect.MobEffects.LEVITATION)));
+            shot(m, "cliente_lz22_tiro_arriba");
+        });
+        t += 4;
+        // ---- en la biblioteca: un golpe a las estanterias del oeste (el ataque del combate) y la celda de Galen
+        atTicks(t, "El lazareto: ante las estanterias del oeste, en aventura", m -> server(m, sp -> {
+            sp.removeAllEffects();
+            sp.setHealth(sp.getMaxHealth());
+            sp.getInventory().selected = 0;
+            sp.getInventory().items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+            sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
+            sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+            irMirando(sp, CX - 7.3, P3 + 1, CZ + 0.5, CX - 9.5, P3 + 2.2, CZ + 0.5, false);
+        }));
+        t += 30;
+        atTicks(t, "El lazareto: un golpe a las estanterias", m -> server(m, sp -> {
+            com.darkcraft.combate.Combate.pedir(sp, com.darkcraft.combate.Armas.LIGERO, 0, false, 0);
+            log("  tras el golpe: " + com.darkcraft.morvain.MurosIlusorios.estado(sp.serverLevel()));
+        }));
+        t += 6;
+        atTicks(t, "captura: el muro se deshace", m -> shot(m, "cliente_lz23_muro_biblioteca"));
+        t += 10;
+        atTicks(t, "El lazareto: creativo otra vez", m -> server(m, sp -> {
+            sp.setGameMode(GameType.CREATIVE);
+            // si el golpe no llego, a mano (para que la prueba siga)
+            if (!com.darkcraft.morvain.MurosIlusorios.estado(sp.serverLevel()).contains(com.darkcraft.morvain.Lazareto.MURO_CELDA + " 0/")) {
+                comando(sp, "darkcraft lazareto muro abrir");
+                log("  (muro abierto con el comando)");
+            }
+        }));
+        t += 2;
+        t = vistaLazareto(t, "lz24_celda", -10.5, P3 + 2.4, 0.5, -15, P3 + 1, 0, 40, true);
+        // ---- entrar a pie, en aventura: el cartel del sitio, el logro y el aire de la torre
+        atTicks(t, "El lazareto: entrar a pie", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                int[] c = com.darkcraft.morvain.Lazareto.get().sitio("vestibulo");
+                sp.teleportTo(sp.serverLevel(), c[0] + 0.5, c[1], c[2] + 0.5, 180f, 0f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura: en el vestibulo", m -> {
+            logLazareto(m, "en el vestibulo");
+            server(m, sp -> log("  cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+            shot(m, "cliente_lz25_en_el_vestibulo");
+        });
+        t += 4;
+        // ---- en supervivencia, en la calzada: los golpes de los Destilados, de lado
+        final double ex = CX + 0.5, ey = AGUA + 2, ez = CZ + 29.5;
+        atTicks(t, "El lazareto: a pelear (supervivencia, en la calzada)", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> comando(sp, "darkcraft lazareto enemigos fuera"));
+        });
+        t += 4;
+        final int M = com.darkcraft.enemigos.Destilado.MANCEBO, E = com.darkcraft.enemigos.Destilado.ENFERMO, C = com.darkcraft.enemigos.Destilado.CUBA;
+        t = golpeDestilado(t, "lz26_frasco_fuego_vuela", M, com.darkcraft.enemigos.DestiladoAnims.FRASCO, com.darkcraft.enemigos.Frasco.FUEGO, 7.0, 24, ex, ey, ez);
+        t += 14;
+        atTicks(t, "captura: el frasco de fuego revienta", m -> {
+            server(m, sp -> log("  el fuego: " + estadoDestilados() + " | ardiendo " + sp.isOnFire()));
+            shot(m, "cliente_lz27_frasco_fuego");
+        });
+        t += 30;
+        t = golpeDestilado(t, "lz28_frasco_acido", M, com.darkcraft.enemigos.DestiladoAnims.FRASCO, com.darkcraft.enemigos.Frasco.ACIDO, 7.0, 40, ex, ey, ez) + 30;
+        t = golpeDestilado(t, "lz29_mortero", M, com.darkcraft.enemigos.DestiladoAnims.MORTERO, -1, 2.4, 16, ex, ey, ez) + 30;
+        t = golpeDestilado(t, "lz30_zarpazo", E, com.darkcraft.enemigos.DestiladoAnims.ZARPAZO, -1, 2.2, 11, ex, ey, ez) + 30;
+        t = golpeDestilado(t, "lz31_abalanzarse", E, com.darkcraft.enemigos.DestiladoAnims.ABALANZARSE, -1, 4.2, 17, ex, ey, ez) + 30;
+        t = golpeDestilado(t, "lz32_escupitajo", E, com.darkcraft.enemigos.DestiladoAnims.ESCUPITAJO, -1, 6.0, 19, ex, ey, ez) + 30;
+        t = golpeDestilado(t, "lz33_punetazo", C, com.darkcraft.enemigos.DestiladoAnims.PUNETAZO, -1, 2.6, 15, ex, ey, ez) + 30;
+        t = golpeDestilado(t, "lz34_embestida", C, com.darkcraft.enemigos.DestiladoAnims.EMBESTIDA, -1, 7.0, 13, ex, ey, ez) + 30;
+        t = golpeDestilado(t, "lz35_derrame", C, com.darkcraft.enemigos.DestiladoAnims.DERRAME, -1, 2.8, 21, ex, ey, ez) + 30;
+        // ---- el elixir verde: el mancebo se lo lanza a un enfermo herido que tiene delante
+        atTicks(t, "El lazareto: el elixir verde", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarDestilados(lvl);
+                aPelear(sp, true);
+                DESTILADOS[0] = destiladoNuevo(lvl, M, ex, ey, ez, 0f);
+                DESTILADOS[1] = destiladoNuevo(lvl, E, ex, ey, ez + 4.0, 0f);
+                irMirando(sp, ex, ey, ez + 8.0, ex, ey + 1.2, ez + 2, false);
+                var a = DESTILADOS[0];
+                var h = DESTILADOS[1];
+                if (a == null || h == null) return;
+                h.setNoAi(true);
+                h.setHealth(h.getMaxHealth() * 0.3f);
+                a.setTarget(sp);
+                a.proximoFrasco(com.darkcraft.enemigos.Frasco.CURA, h);
+                a.empezar(com.darkcraft.enemigos.DestiladoAnims.FRASCO);
+                verDesdeServidor = new Vec3(ex + 6.0, ey + 2.6, ez + 3.0);
+                miraServidor = new Vec3(ex, ey + 1.0, ez + 2.4);
+            });
+        });
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += 32;
+        atTicks(t, "captura: el elixir cura al enfermo", m -> {
+            server(m, sp -> log("  el elixir: " + estadoDestilados()));
+            shot(m, "cliente_lz36_elixir");
+        });
+        t += 30;
+        // ---- la cuba cae y le revienta la cuba: el charco verde
+        atTicks(t, "El lazareto: una cuba cae", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            quitarDestilados(lvl);
+            aPelear(sp, true);
+            DESTILADOS[0] = destiladoNuevo(lvl, C, ex, ey, ez, 0f);
+            DESTILADOS[1] = destiladoNuevo(lvl, E, ex + 1.6, ey, ez + 1.0, 0f);
+            if (DESTILADOS[0] != null) DESTILADOS[0].setNoAi(true);
+            if (DESTILADOS[1] != null) {
+                DESTILADOS[1].setNoAi(true);
+                DESTILADOS[1].setHealth(DESTILADOS[1].getMaxHealth() * 0.3f);
+            }
+            irMirando(sp, ex + 3.5, ey, ez + 5.5, ex, ey + 1.4, ez, false);
+        }));
+        t += 16;
+        atTicks(t, "El lazareto: le pega", m -> server(m, sp -> {
+            var a = DESTILADOS[0];
+            if (a == null) return;
+            a.invulnerableTime = 0;
+            a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+        }));
+        t += 6;
+        atTicks(t, "captura: revienta la cuba", m -> {
+            server(m, sp -> log("  revienta la cuba: " + estadoDestilados()));
+            shot(m, "cliente_lz37_cuba_revienta");
+        });
+        t += 40;
+        atTicks(t, "captura: el charco verde", m -> {
+            server(m, sp -> log("  el charco: " + estadoDestilados() + " | logro destilado " + com.darkcraft.story.Logros.tiene(sp, "destilado")));
+            shot(m, "cliente_lz38_charco_verde");
+        });
+        t += 30;
+        atTicks(t, "El lazareto: sin destilados (para el libro y el bestiario)", m -> server(m, sp -> {
+            quitarDestilados(sp.serverLevel());
+            sp.removeAllEffects();
+            sp.clearFire();
+            sp.setHealth(sp.getMaxHealth());
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        t += 6;
+        atTicks(t, "El lazareto: el libro de Galen", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(com.darkcraft.morvain.Lazareto.LIBRO));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_lz39_libro_galen"));
+        t += 6;
+        String[] bestias = {"destilado_mancebo", "destilado_enfermo", "destilado_cuba"};
+        for (int i = 0; i < bestias.length; i++) {
+            final String b = bestias[i];
+            final int n = 40 + i;
+            atTicks(t, "el bestiario: " + b, m -> {
+                m.setScreen(null);
+                m.options.hideGui = false;
+                com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+                menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf(b)));
+            });
+            t += 18;
+            atTicks(t, "captura: " + b + " en el bestiario", m -> {
+                menuP(m, mm -> log("  " + mm.resumen()));
+                shot(m, "cliente_lz" + n + "_bestiario_" + b.replace("destilado_", ""));
+            });
+            t += 4;
+        }
+        atTicks(t, "fin del Lazareto (vuelven los destilados, el muro cerrado y el atanor apagado)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                quitarDestilados(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                sp.getInventory().setItem(0, ItemStack.EMPTY);
+                comando(sp, "darkcraft lazareto muro cerrar");
+                comando(sp, "darkcraft lazareto atanor apagar");
+                comando(sp, "darkcraft lazareto enemigos volver");
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

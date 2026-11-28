@@ -506,6 +506,14 @@ SFX = {
     "osmund_calavera": (2.6, 0.8, -14), "osmund_muro": (4.0, 1.2, -13), "osmund_alzarse": (6.0, 2.0, -13),
     "osmund_llamar": (6.0, 1.8, -13), "osmund_dolor": (1.6, 0.5, -15), "osmund_muerte": (8.0, 3.0, -14),
     "osmund_lampara": (20.0, 2.5, -21),
+    # el Lazareto de Maese Galen (parte 7au): los Destilados (el gemido, la alerta, el dolor, la muerte), el frasco que vuela y como
+    # revienta (fuego, acido, el que cura), el punetazo de la cuba, su derrame y su rotura, el atanor que se enciende, el tiro de la
+    # chimenea (30 s, se relanza cada 28 y se solapa) y el aire de la torre (en bucle)
+    "destilado_gemido": (4.0, 1.0, -19), "destilado_alerta": (2.0, 0.5, -15), "destilado_dolor": (1.4, 0.4, -16),
+    "destilado_muerte": (4.5, 1.4, -16), "frasco_lanzar": (1.0, 0.3, -17), "frasco_fuego": (3.0, 1.0, -13),
+    "frasco_acido": (2.6, 0.8, -15), "frasco_cura": (2.4, 0.8, -16), "cuba_golpe": (1.4, 0.5, -13), "cuba_derrame": (4.0, 1.4, -13),
+    "cuba_rompe": (4.0, 1.4, -12), "atanor_enciende": (10.0, 3.0, -12), "atanor_tiro": (30.0, 2.0, -18),
+    "lazareto_ambiente": (20.0, 2.0, -24),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -515,14 +523,15 @@ ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0
            "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0, "mina_ambiente": 2.0,
            "aldric_rezo": 1.0, "aldric_arrastre": 0.3, "jinete_galope": 0.3, "dragon_aleteo": 0.3, "dragon_respira": 0.6,
            "cadena_ambiente": 2.0, "isolde_tarareo": 1.2, "homenaje_ambiente": 2.0, "aguja_ambiente": 2.0, "sombra_mirada": 0.15,
-           "osario_ambiente": 2.0, "osario_susurros": 1.5, "osmund_lampara": 1.5}
+           "osario_ambiente": 2.0, "osario_susurros": 1.5, "osmund_lampara": 1.5, "atanor_tiro": 2.0, "lazareto_ambiente": 2.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
           "penitente_humo": 1.0, "penitente_alzarse": 2.3, "enterrado_alzarse": 0.5, "mina_cruje": 0.8,
           "capataz_almas": 1.2, "ensamblado_dolor": 0.45, "ensamblado_deshace": 0.4, "ensamblado_rehace": 0.9, "ensamblado_polvo": 0.3,
           "portacirios_barrido": 0.2, "monton_golpe": 0.25, "osmund_incensario": 0.45, "osmund_giro": 2.5, "osmund_corona": 0.9,
-          "osmund_muro": 0.4, "osmund_dolor": 0.3, "osmund_muerte": 0.6}
+          "osmund_muro": 0.4, "osmund_dolor": 0.3, "osmund_muerte": 0.6, "destilado_gemido": 0.4, "destilado_dolor": 0.15,
+          "destilado_muerte": 0.3, "frasco_acido": 0.35, "cuba_golpe": 0.15}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
 GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca", "boca_latido", "sombra_latido", "capataz_temblor"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
@@ -897,6 +906,15 @@ TOMAS_SFX = {
     # lampara la 2 (pareja) y la 4 (mas cadena)
     "osmund_incensario": (1, 2), "osmund_giro": (3, 2), "osmund_corona": (1, 2), "osmund_calavera": (3, 4), "osmund_muro": (4, 1),
     "osmund_alzarse": (4, 2), "osmund_llamar": (4, 3), "osmund_dolor": (1, 3, 2), "osmund_muerte": (1, 2), "osmund_lampara": (2, 4),
+    # el Lazareto (parte 7au; elegidas midiendo las tomas): del gemido la 3 (la mas gorgoteante) y la 2 (desde el 0,4); de la alerta la
+    # 1 y la 3 (lo fuerte enseguida); del dolor la 2 y la 1 (las demas casi no se oyen o llegan tarde); de la muerte la 1 y la 3; del
+    # frasco que vuela la 3 y la 1 (las mas cortas); del de fuego la 1 (el cristal y las llamas) y la 2 (la llamarada grave al segundo);
+    # del de acido la 1 y la 3 (desde el 0,35); del que cura la 3 y la 2 (las unicas que se oyen bien); del punetazo de la cuba la 1 (la
+    # de mas graves) y la 3; del derrame la 3 y la 2 (el golpe de liquido enseguida); de la rotura la 2 (la mas fuerte y grave) y la 3;
+    # del atanor la 2 (la llamarada enseguida) y la 1; del tiro la 4 y la 2 (las mas llenas); del aire la 4 y la 3 (el cristal)
+    "destilado_gemido": (3, 2), "destilado_alerta": (1, 3), "destilado_dolor": (2, 1), "destilado_muerte": (1, 3),
+    "frasco_lanzar": (3, 1), "frasco_fuego": (1, 2), "frasco_acido": (1, 3), "frasco_cura": (3, 2), "cuba_golpe": (1, 3),
+    "cuba_derrame": (3, 2), "cuba_rompe": (2, 3), "atanor_enciende": (2, 1), "atanor_tiro": (4, 2), "lazareto_ambiente": (4, 3),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

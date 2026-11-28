@@ -13,7 +13,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
          22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain", 27: "morvain",
          28: "morvain", 29: "morvain", 30: "morvain", 31: "valdrenn", 32: "morvain", 33: "morvain", 34: "morvain",
-         35: "morvain", 36: "morvain", 37: "morvain"}
+         35: "morvain", 36: "morvain", 37: "morvain", 38: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -512,6 +512,17 @@ LIBROS = {
    "Fourth year of the Grey Plague. The churchyard takes no one else: the dead wait in carts at the gate. The prior has given me the key to the crypt and one order: make room. I will dig up the old ones and keep their bones below, in order and with respect.",
    "I have lost count of the names; not of the bones. Forty thousand. Skulls in rows, thighbones in sheaves, ribs in garlands. I made a lamp from every bone of the body, so that it lights them all at once. Some nights the chapel counts along with me.",
    "On the night of the red sky they rose. But I had sorted them by bones, not by men: each one took whatever lay nearest. If you find them undone, crush the bones or bring them fire. I am going down to the reliquary. Someone has to keep counting.\n\nBrother Osmund"]),
+ },
+ # parte 7au: las notas de Maese Galen, el fisico, en el atril de la biblioteca del Lazareto (el Pantano Podrido)
+ 38: {
+  "es": ("Notas de Maese Galen", "Galen, físico y destilador", [
+   "La Academia me echó por abrir a los muertos para ver qué los había matado. La Peste Gris no les dejó secretos: les dejó cristal. Me he traído a los enfermos en barca a mi torre de la laguna. Aquí nadie viene a mirar, y el agua negra del pantano destila como ninguna.",
+   "Prueba cuarenta y uno: el destilado de su propia sangre con el agua negra. Las bubas dejan de crecer y se vuelven de cristal verde. No mueren. Tampoco sanan. Los mancebos lo beben para no enfermar y ya no se quitan las máscaras; dicen que les arde la cara. A los más fuertes los hago cuba viva: el elixir madura mejor dentro de un cuerpo caliente.",
+   "La noche del cielo rojo hirvieron todos los alambiques a la vez. Los oigo gemir en las salas. El tiro del atanor sube hasta mi sala del elixir: si alguien enciende el horno, el aire caliente le llevará arriba. No subas. Estoy a punto de terminarlo. Una gota más y curará a todos. Una gota más.\n\nG."]),
+  "en": ("Notes of Master Galen", "Galen, physician and distiller", [
+   "The Academy cast me out for opening the dead to see what had killed them. The Grey Plague left them no secrets: it left them glass. I have brought the sick by boat to my tower in the lagoon. No one comes here to look, and the black water of the marsh distils like no other.",
+   "Trial forty-one: a distillate of their own blood with the black water. The boils stop growing and turn to green glass. They do not die. Nor do they heal. The apprentices drink it so as not to fall ill, and now they never take off their masks; they say their faces burn. The strongest I make into living vats: the elixir ripens better inside a warm body.",
+   "On the night of the red sky every alembic boiled at once. I hear them moaning in the halls. The furnace draught rises all the way to my elixir chamber: if someone lights the athanor, the hot air will carry them up. Do not come up. I am about to finish it. One more drop and it will cure them all. One more drop.\n\nG."]),
  },
  35: {
   "es": ("El diario de la reina Isolde", "Isolde, reina de Valdrenn", [

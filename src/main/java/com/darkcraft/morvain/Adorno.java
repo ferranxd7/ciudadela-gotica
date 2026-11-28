@@ -64,6 +64,8 @@ final class Adorno {
         if (Nido.cerca(x0, z0)) return;
         // ni en el Osario de San Ulfo (parte 7as): los arboles muertos de alrededor los pone el
         if (Osario.cerca(x0, z0)) return;
+        // ni en la laguna del Lazareto (parte 7au): los arboles muertos del islote los pone el
+        if (Lazareto.cerca(x0, z0)) return;
         // en las herrerias (parte 7af) solo la hierba (alrededor de su suelo allanado)
         if (Herrerias.cerca(x0, z0)) {
             hierba(nivel, c, r, 24, Blocks.GRASS.defaultBlockState(), Blocks.DEAD_BUSH.defaultBlockState());

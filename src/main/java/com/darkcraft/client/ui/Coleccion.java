@@ -32,7 +32,7 @@ public final class Coleccion {
             "marchito_campana", "molinera", "ahorcado_garras", "ahorcado_soga", "verdugo", "podrido", "podrido_fatuo", "podrido_hinchado", "barquero",
             "helado_monje", "helado_penitente", "helado_peregrino", "abad", "sigrun", "calcinado_guardia", "calcinado_incendiario", "calcinado_ceniciento",
             "enterrado_picador", "enterrado_barrenero", "enterrado_cargador", "capataz", "ensamblado_portacirios", "ensamblado_sepulturero",
-            "ensamblado_coloso", "osmund", "condestable", "erudito_aprendiz", "erudito_maestro", "erudito_custodio", "rectora", "salobre_redero", "salobre_bichero",
+            "ensamblado_coloso", "osmund", "destilado_mancebo", "destilado_enfermo", "destilado_cuba", "condestable", "erudito_aprendiz", "erudito_maestro", "erudito_custodio", "rectora", "salobre_redero", "salobre_bichero",
             "salobre_salinero", "ballenero", "penitente_flagelante", "penitente_portador", "penitente_turiferario",
             "pontifice", "marcado_rompedor", "marcado_caballero", "marcado_cazador", "aldric", "gigante_campana", "gigante_costilla",
             "gigante_columna", "jinete", "bufon", "dragon", "gargola", "centinela_espadon", "centinela_alabarda", "isolde", "sombra"};
@@ -64,7 +64,8 @@ public final class Coleccion {
             case "hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon", "marchito_guadana", "marchito_farol",
                  "marchito_campana", "ahorcado_garras", "ahorcado_soga", "podrido_fatuo", "podrido_hinchado", "helado_monje", "helado_penitente",
                  "helado_peregrino", "calcinado_guardia", "calcinado_incendiario", "calcinado_ceniciento", "enterrado_picador", "enterrado_barrenero",
-                 "enterrado_cargador", "ensamblado_portacirios", "ensamblado_sepulturero", "ensamblado_coloso", "erudito_aprendiz", "erudito_maestro",
+                 "enterrado_cargador", "ensamblado_portacirios", "ensamblado_sepulturero", "ensamblado_coloso", "destilado_mancebo", "destilado_enfermo",
+                 "destilado_cuba", "erudito_aprendiz", "erudito_maestro",
                  "erudito_custodio", "salobre_redero", "salobre_bichero", "salobre_salinero", "penitente_flagelante", "penitente_portador",
                  "penitente_turiferario", "marcado_rompedor", "marcado_caballero", "marcado_cazador", "centinela_espadon",
                  "centinela_alabarda" -> "darkcraft.bestiario." + c;
@@ -141,6 +142,12 @@ public final class Coleccion {
                     var k = DarkCraftMod.ENSAMBLADO.get().create(lvl);
                     if (k != null) k.variante(c.endsWith("sepulturero") ? com.darkcraft.enemigos.Ensamblado.SEPULTURERO
                             : c.endsWith("coloso") ? com.darkcraft.enemigos.Ensamblado.COLOSO : com.darkcraft.enemigos.Ensamblado.PORTACIRIOS);
+                    yield k;
+                }
+                case "destilado_mancebo", "destilado_enfermo", "destilado_cuba" -> {
+                    var k = DarkCraftMod.DESTILADO.get().create(lvl);
+                    if (k != null) k.variante(c.endsWith("enfermo") ? com.darkcraft.enemigos.Destilado.ENFERMO
+                            : c.endsWith("cuba") ? com.darkcraft.enemigos.Destilado.CUBA : com.darkcraft.enemigos.Destilado.MANCEBO);
                     yield k;
                 }
                 case "marcado_rompedor", "marcado_caballero", "marcado_cazador" -> {

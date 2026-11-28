@@ -68,13 +68,13 @@ public final class MorvainEnemigos {
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
             CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio",
             PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar", CERCO = "cerco", TEATRO = "teatro", NIDO = "nido",
-            CADENA = "cadena", HOMENAJE = "homenaje", AGUJA = "aguja", MINA = "mina", OSARIO = "osario";
+            CADENA = "cadena", HOMENAJE = "homenaje", AGUJA = "aguja", MINA = "mina", OSARIO = "osario", LAZARETO = "lazareto";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
             ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
             PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon", DRAGON = "dragon", GARGOLA = "gargola", CENTINELA = "centinela",
             ISOLDE = "isolde", ESPECTRO = "espectro", PERRO = "perro", SOMBRA = "sombra", ENTERRADO = "enterrado", CAPATAZ = "capataz",
-            ENSAMBLADO = "ensamblado", OSMUND = "osmund";
+            ENSAMBLADO = "ensamblado", OSMUND = "osmund", DESTILADO = "destilado";
     /** El tipo de puesto de las gargolas (para las pruebas). */
     public static final String GARGOLA_TIPO = GARGOLA;
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
@@ -88,7 +88,8 @@ public final class MorvainEnemigos {
             CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>(),
             PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>(), GRIETA_P = new ArrayList<>(), ALTAR_P = new ArrayList<>(),
             CERCO_P = new ArrayList<>(), TEATRO_P = new ArrayList<>(), NIDO_P = new ArrayList<>(), CADENA_P = new ArrayList<>(),
-            HOMENAJE_P = new ArrayList<>(), AGUJA_P = new ArrayList<>(), MINA_P = new ArrayList<>(), OSARIO_P = new ArrayList<>();
+            HOMENAJE_P = new ArrayList<>(), AGUJA_P = new ArrayList<>(), MINA_P = new ArrayList<>(), OSARIO_P = new ArrayList<>(),
+            LAZARETO_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -245,6 +246,9 @@ public final class MorvainEnemigos {
         for (Osario.Espera e : Osario.get().esperas())
             OSARIO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? OSMUND : ENSAMBLADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
                     e.ronda(), e.grupo()));
+        // ---- el Lazareto de Maese Galen (parte 7au): los Destilados del islote y de cada planta de la torre
+        for (Lazareto.Espera e : Lazareto.get().esperas())
+            LAZARETO_P.add(new Puesto(DESTILADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
         // ---- la casa de la Sombra (parte 7ab): la reina Isolde en su trono (el puesto 0) y los de la torre del homenaje (los
         // centinelas, los espectros del archivo, los marcados de la prision y sus perros); el tipo de cada uno lo dice el plano
         for (Homenaje.Espera e : Homenaje.get().esperas())
@@ -339,6 +343,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(CAPATAZ, DarkCraftMod.CAPATAZ);
         Puestos.tipo(ENSAMBLADO, DarkCraftMod.ENSAMBLADO);
         Puestos.tipo(OSMUND, DarkCraftMod.OSMUND);
+        Puestos.tipo(DESTILADO, DarkCraftMod.DESTILADO);
         Puestos.tipo(CONDESTABLE, DarkCraftMod.CONDESTABLE);
         Puestos.tipo(ERUDITO, DarkCraftMod.ERUDITO);
         Puestos.tipo(RECTORA, DarkCraftMod.RECTORA);
@@ -402,6 +407,8 @@ public final class MorvainEnemigos {
         // (y Fray Osmund en el Relicario; vencido el, los muertos del osario descansan —lo hace Osario.paz cada segundo— y ya no
         // vuelven)
         Puestos.registrar(OSARIO, OSARIO_P, Morvain::es, (l, p) -> Puestos.JEFE.equals(p.grupo()) || !Osario.enPaz(l.getServer()));
+        // el Lazareto: los Destilados (los que caen no vuelven hasta descansar o morir)
+        Puestos.registrar(LAZARETO, LAZARETO_P, Morvain::es);
         // la torre del homenaje: los centinelas, los del archivo y la prision, y la reina en su trono
         Puestos.registrar(HOMENAJE, HOMENAJE_P, Morvain::es);
         // la aguja: la Sombra (cae una vez y no vuelve: es del grupo de los jefes)
@@ -548,6 +555,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> osario() {
         preparar();
         return List.copyOf(OSARIO_P);
+    }
+
+    public static List<Puesto> lazareto() {
+        preparar();
+        return List.copyOf(LAZARETO_P);
     }
 
     public static List<Puesto> nido() {
@@ -1891,6 +1903,106 @@ public final class MorvainEnemigos {
                             e.rehacerYa();
                             return decir(c, "se rehace: " + e.estado());
                         })));
+    }
+
+    /**
+     * {@code /darkcraft lazareto [ir <sitio> | enemigos [volver | fuera | sacar] | atanor [encender | apagar] | muro [abrir | cerrar] |
+     * destilado <mancebo | enfermo | cuba>]} (parte 7au): el Lazareto de Maese Galen: ir a uno de sus sitios, sus Destilados, encender o
+     * apagar el atanor del sotano (el tiro del pozo), el muro ilusorio de la biblioteca y sacar un Destilado delante.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoLazareto() {
+        return net.minecraft.commands.Commands.literal("lazareto")
+                .executes(c -> decir(c, estadoLazareto(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irLazareto(c.getSource(), "entrada"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Lazareto.get().sitios().keySet(), b))
+                                .executes(c -> irLazareto(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoLazareto(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), LAZARETO, false);
+                            return decir(c, "vuelven todos los del lazareto");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), LAZARETO, true);
+                            return decir(c, "fuera todos los del lazareto");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, LAZARETO).size();
+                            return decir(c, "fuera " + n);
+                        })))
+                .then(net.minecraft.commands.Commands.literal("atanor")
+                        .executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            return decir(c, m == null ? "Morvain no esta cargado" : Lazareto.resumen(m));
+                        })
+                        .then(net.minecraft.commands.Commands.literal("encender").executes(c -> atanor(c, true)))
+                        .then(net.minecraft.commands.Commands.literal("apagar").executes(c -> atanor(c, false))))
+                .then(net.minecraft.commands.Commands.literal("muro")
+                        .executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            return decir(c, m == null ? "Morvain no esta cargado" : MurosIlusorios.estado(m));
+                        })
+                        .then(net.minecraft.commands.Commands.literal("abrir").executes(c -> muroLazareto(c, true)))
+                        .then(net.minecraft.commands.Commands.literal("cerrar").executes(c -> muroLazareto(c, false))))
+                .then(net.minecraft.commands.Commands.literal("destilado")
+                        .then(net.minecraft.commands.Commands.literal("mancebo").executes(c -> sacarDestilado(c, com.darkcraft.enemigos.Destilado.MANCEBO)))
+                        .then(net.minecraft.commands.Commands.literal("enfermo").executes(c -> sacarDestilado(c, com.darkcraft.enemigos.Destilado.ENFERMO)))
+                        .then(net.minecraft.commands.Commands.literal("cuba").executes(c -> sacarDestilado(c, com.darkcraft.enemigos.Destilado.CUBA))));
+    }
+
+    /** Saca un Destilado de esa variante cuatro bloques delante de quien lo pide (no es de ningun puesto: no vuelve). */
+    private static int sacarDestilado(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, int variante)
+            throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = c.getSource().getPlayerOrException();
+        com.darkcraft.enemigos.Destilado e = DarkCraftMod.DESTILADO.get().create(sp.serverLevel());
+        if (e == null) return 0;
+        net.minecraft.world.phys.Vec3 v = sp.position().add(sp.getLookAngle().multiply(1, 0, 1).normalize().scale(4));
+        e.moveTo(v.x, sp.getY(), v.z, sp.getYRot() + 180f, 0f);
+        e.variante(variante);
+        sp.serverLevel().addFreshEntity(e);
+        return decir(c, "sale un Destilado (" + e.estado() + ")");
+    }
+
+    private static int atanor(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, boolean si) {
+        var m = Morvain.nivel(c.getSource().getServer());
+        if (m == null) return 0;
+        Lazareto.encender(m, si);
+        return decir(c, Lazareto.resumen(m));
+    }
+
+    private static int muroLazareto(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, boolean abrir) {
+        var m = Morvain.nivel(c.getSource().getServer());
+        if (m == null) return 0;
+        MurosIlusorios.Muro w = MurosIlusorios.muro(Lazareto.MURO_CELDA);
+        if (abrir) MurosIlusorios.abrir(m, w, c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp ? sp : null);
+        else MurosIlusorios.cerrar(m, Lazareto.MURO_CELDA);
+        return decir(c, MurosIlusorios.estado(m));
+    }
+
+    private static int irLazareto(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Lazareto.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Lazareto.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando hacia la torre (al norte)
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, 180f, 5f);
+        return 1;
+    }
+
+    /** Cuantos Destilados quedan y lo que hay en el lazareto (si esta cargado). */
+    public static String estadoLazareto(net.minecraft.server.MinecraftServer srv) {
+        var m = Morvain.nivel(srv);
+        String s = "lazareto de Maese Galen: quedan " + Puestos.quedan(srv, LAZARETO) + " de " + LAZARETO_P.size() + " (fuera " + Puestos.fuera(LAZARETO) + ")";
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(Lazareto.CX, Lazareto.PS, Lazareto.CZ))
+                && m.isLoaded(new net.minecraft.core.BlockPos(Lazareto.CX, Lazareto.AGUA, Lazareto.CZ + 30)))
+            s += "; " + Lazareto.resumen(m) + "; muros: " + MurosIlusorios.estado(m);
+        return s;
     }
 
     private static com.darkcraft.enemigos.Ensamblado ensambladoCerca(net.minecraft.commands.CommandSourceStack src) {

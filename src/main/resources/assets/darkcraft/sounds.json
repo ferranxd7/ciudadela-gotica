@@ -9283,5 +9283,191 @@
         "stream": true
       }
     ]
+  },
+  "sfx.destilado_gemido": {
+    "subtitle": "subtitles.darkcraft.sfx.destilado_gemido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/destilado_gemido_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "darkcraft:sfx/destilado_gemido_2",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "sfx.destilado_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.destilado_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/destilado_alerta_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/destilado_alerta_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.destilado_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.destilado_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/destilado_dolor_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/destilado_dolor_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "sfx.destilado_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.destilado_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/destilado_muerte_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/destilado_muerte_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.frasco_lanzar": {
+    "subtitle": "subtitles.darkcraft.sfx.frasco_lanzar",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/frasco_lanzar_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "darkcraft:sfx/frasco_lanzar_2",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "sfx.frasco_fuego": {
+    "subtitle": "subtitles.darkcraft.sfx.frasco_fuego",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/frasco_fuego_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/frasco_fuego_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.frasco_acido": {
+    "subtitle": "subtitles.darkcraft.sfx.frasco_acido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/frasco_acido_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/frasco_acido_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "sfx.frasco_cura": {
+    "subtitle": "subtitles.darkcraft.sfx.frasco_cura",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/frasco_cura_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/frasco_cura_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "sfx.cuba_golpe": {
+    "subtitle": "subtitles.darkcraft.sfx.cuba_golpe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/cuba_golpe_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/cuba_golpe_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.cuba_derrame": {
+    "subtitle": "subtitles.darkcraft.sfx.cuba_derrame",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/cuba_derrame_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "darkcraft:sfx/cuba_derrame_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "sfx.cuba_rompe": {
+    "subtitle": "subtitles.darkcraft.sfx.cuba_rompe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/cuba_rompe_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/cuba_rompe_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.atanor_enciende": {
+    "subtitle": "subtitles.darkcraft.sfx.atanor_enciende",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/atanor_enciende_1",
+        "attenuation_distance": 64,
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/atanor_enciende_2",
+        "attenuation_distance": 64,
+        "stream": true
+      }
+    ]
+  },
+  "sfx.atanor_tiro": {
+    "subtitle": "subtitles.darkcraft.sfx.atanor_tiro",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/atanor_tiro_1",
+        "attenuation_distance": 40,
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/atanor_tiro_2",
+        "attenuation_distance": 40,
+        "stream": true
+      }
+    ]
+  },
+  "ambiente.lazareto": {
+    "subtitle": "subtitles.darkcraft.ambiente.lazareto",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/lazareto_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/lazareto_ambiente_2",
+        "stream": true
+      }
+    ]
   }
 }

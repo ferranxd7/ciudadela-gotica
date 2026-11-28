@@ -55,6 +55,8 @@ public final class SantuariosMorvain {
             new Sitio("bocamina", Mina.CX + Mina.SANT_U, Mina.CZ + Mina.SANT_V, Mina.SUELO, Region.MONTANAS),
             // el del Osario de San Ulfo (parte 7as): a la altura del otero allanado del camposanto
             new Sitio("osario", Osario.CX + Osario.SANT_U, Osario.CZ + Osario.SANT_V, Osario.SUELO, Region.BOSQUE),
+            // el del Lazareto de Maese Galen (parte 7au): en la orilla del sur de la laguna, al final de la calzada
+            s("lazareto", Lazareto.CX + Lazareto.SANT_U, Lazareto.CZ + Lazareto.SANT_V),
     };
 
     /**
