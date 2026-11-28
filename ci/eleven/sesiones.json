@@ -11491,5 +11491,264 @@
     ]
    }
   }
+ },
+ "sfx_minas": {
+  "flow": "xNmkJ8r14RHNDw47r42f",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7aq: las Minas de Hierro Negro de Morvain (ambiente de la mina, los Enterrados: gemido, alerta, dolor, muerte, picotazo, mecha, estallido del cartucho, almadena, alzarse del escombro; derrumbe y crujido de las vigas). Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "mina_ambiente": {
+    "prompt": "Ambience of a deep abandoned mine, 30 seconds: water dripping slowly into puddles, distant faint pickaxe strikes echoing through empty galleries, old timber supports creaking, a low draft of wind moaning through vertical shafts, an occasional far-off rumble of settling rock, dark, lonely and eerie, seamless background ambience, cinematic dark fantasy, no music",
+    "sesiones": [
+     "PSY16DZNEtgFEIVC0Kys",
+     "QuECv3icLGVaw9VNAkcK",
+     "zCim334krGm4UGwplKH6",
+     "vYhSczeQ14XLQrY8mS3D"
+    ],
+    "generaciones": [
+     "kpMfbtVf1xf44IYgubiM",
+     "YfpXeIQbKNDMz0CzLqTB",
+     "7QMOYfL2CItOlyMFLj2y",
+     "LrhKKnRvmCUsMrvVdnmv"
+    ],
+    "duraciones": [
+     30.0,
+     30.0,
+     30.0,
+     30.0
+    ]
+   },
+   "enterrado_gemido": {
+    "prompt": "A desiccated undead miner groaning in a dark mine tunnel: a dry, raspy, dust-choked moan from a throat full of rock dust, slow and mournful, short stone tunnel echo, cinematic dark fantasy horror, no music",
+    "sesiones": [
+     "6KvJjijvuJ5fv7apgV6S",
+     "V74H2XlDInmBnDIrhwas",
+     "vyfnCPC95xqLDXZJ7Stb",
+     "AnM9Idlslom33jt9qh9Y"
+    ],
+    "generaciones": [
+     "E2K5ZrzJc97nB7y57V21",
+     "UPbYJDyOmUwO7I0081Ak",
+     "13X3rvis463zQFjDKP8C",
+     "xfaQEwRi4yfKSbAbcTxr"
+    ],
+    "duraciones": [
+     4.0,
+     4.0,
+     5.0,
+     4.0
+    ]
+   },
+   "enterrado_alerta": {
+    "prompt": "An undead miner suddenly hearing something in the dark: a sharp hoarse intake of breath turning into a rasping, choking growl, dust in the throat, short mine tunnel echo, cinematic dark fantasy horror, no music",
+    "sesiones": [
+     "APJ7J8dWHa8vyxhSTbfq",
+     "1inSCvNKYDDeBlsN9EdN",
+     "XCMofFXC8TFnFzXo0PbT",
+     "vUK1efOXHGBjXFZwBAws"
+    ],
+    "generaciones": [
+     "sQAxvHD7Y7oOZKhjkOuP",
+     "vuaWclWtlj0jjXw72Zf2",
+     "9cXM8TbN82OH947EdLAH",
+     "aiuu4BkA5If8yqptl7AI"
+    ],
+    "duraciones": [
+     6.0,
+     5.0,
+     5.0,
+     6.0
+    ]
+   },
+   "enterrado_dolor": {
+    "prompt": "A dried-out undead miner struck by a weapon: a short pained rasp and grunt, dry skin cracking, a puff of dust, cinematic dark fantasy, no music",
+    "sesiones": [
+     "6LPqXBhl98f8tb5OxvDT",
+     "nbFqg0pOulzaca3lYizP",
+     "4q6BDfceztBBMux3yC8e",
+     "5ygVbVYBPfLmlBcOO1Xl"
+    ],
+    "generaciones": [
+     "fYt5l4I81eNWx0LmFWv1",
+     "NUXuvca1swZ9GvERW8kk",
+     "3F8Pf97lTMfh86MCzkbz",
+     "maP0paCwiGTm6Y8JIRzv"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "enterrado_muerte": {
+    "prompt": "An undead miner collapsing and crumbling into dust and gravel: a last dry wheeze, the body falling apart, stones and gravel spilling and sliding, a cloud of dust settling, stone cave echo, cinematic dark fantasy, no music",
+    "sesiones": [
+     "pvQ7btmNkfnrovqM7wzD",
+     "j8MlOc4JZCFf5fgWzXpI",
+     "FY3Pfkuqouli8DBIM33o",
+     "zqfwxDsy9RU1A0Qj6a9p"
+    ],
+    "generaciones": [
+     "V1POjMimDYDSvhSxJddQ",
+     "vyvOmrWWjkr5dtcu1q51",
+     "EWjaMBqhThA3HLkQtLun",
+     "wh236ALNu5Vj433GzEYq"
+    ],
+    "duraciones": [
+     8.0,
+     8.0,
+     6.0,
+     8.0
+    ]
+   },
+   "enterrado_pica": {
+    "prompt": "A single heavy iron pickaxe strike against solid rock in an underground mine tunnel: a sharp metallic clink and crack, small rock chips falling, short stone echo, isolated single hit, cinematic, no music",
+    "sesiones": [
+     "JuMsqjcSuUNVpTI4ptpf",
+     "AX6I64dJm9TsRWZ1HnQn",
+     "Ivfle1IdYtF55zUrkHZG",
+     "axPFaqBiJNk8gq1gcPyo"
+    ],
+    "generaciones": [
+     "DKgLNzssPr1HbtrHx0Ea",
+     "FV04AvBDej41HFOdfQ5Z",
+     "0j63Tw6YuIJsz7axMz7e",
+     "Xrw3nICy0h71hSQUnuzS"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "enterrado_mecha": {
+    "prompt": "A black powder fuse being lit and burning: a quick scratch of a match, then the hissing, sputtering sizzle of a burning fuse for about two seconds with small sparks crackling, in a quiet stone tunnel, cinematic, no music",
+    "sesiones": [
+     "xjWpJI1MH69WG6nKU5r8",
+     "YDgZ0RQLFbGpMdiyADsV",
+     "kS9KyreneL5DuwFg066B",
+     "3GBwqG84bFTRJhID70Sd"
+    ],
+    "generaciones": [
+     "lS7ekmO2NHSOx8BECsZH",
+     "mbn2WeiuWxT9FXxpXk48",
+     "XWA3QamPXkEpyRnsgqlp",
+     "uavzn38fIKX0sld1GsxJ"
+    ],
+    "duraciones": [
+     4.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "enterrado_estallido": {
+    "prompt": "A black powder blasting charge exploding inside a narrow mine tunnel: a sharp deep boom, rocks and gravel blasted against stone walls, debris raining down, a long rumbling echo through the galleries, cinematic dark fantasy, no music",
+    "sesiones": [
+     "WyIdVlod4R3HlPNWpuv9",
+     "FlqUOi3jsyld5bFSyNDR",
+     "Y8Y76eINNOsrTqKN1XMg",
+     "aJnPLEe0laglqHgtxbnf"
+    ],
+    "generaciones": [
+     "InFMhrUXP8pxP3uoI8U3",
+     "UWTWk40cu2iSFomULB7e",
+     "0Xp153tlI53PhhcCXtkL",
+     "nedAIQeqp3Vkvs2WM0gJ"
+    ],
+    "duraciones": [
+     12.0,
+     12.0,
+     12.0,
+     12.0
+    ]
+   },
+   "enterrado_almadena": {
+    "prompt": "A huge iron sledgehammer slamming down onto a stone floor inside a mine tunnel: a heavy deep thud and crack of breaking rock, the ground shaking, gravel scattering, short heavy stone echo, isolated single impact, cinematic dark fantasy, no music",
+    "sesiones": [
+     "jfU5m2yyf8YoduNB2fZc",
+     "d4d1hyfx3PUZ1goePpXq",
+     "OLdYnoActPf8SfQRVSRV",
+     "WmsmYDEcCwfTRdhrrGMY"
+    ],
+    "generaciones": [
+     "synZPStjrpmC0XnbpUAa",
+     "OPC6ofEXFoBOrCV8VWp7",
+     "uF4kUBkTSsuHE3e1WZhT",
+     "h4dSKXdA9JK0yKkYAoaA"
+    ],
+    "duraciones": [
+     5.0,
+     4.0,
+     4.0,
+     4.0
+    ]
+   },
+   "enterrado_alzarse": {
+    "prompt": "An undead miner clawing its way up out of a pile of rubble and gravel: rocks shifting and sliding off its body, dust pouring, dry joints creaking and cracking, a low raspy breath as it stands up, stone tunnel echo, cinematic dark fantasy horror, no music",
+    "sesiones": [
+     "XNF9fFL0ZtC23CGxQ2re",
+     "tkbTCbZPUqOvcoUQUWI1",
+     "mf4DgjCt3uG5ZABFHOAH",
+     "xh8XhwdzbzHWCEc5hFG2"
+    ],
+    "generaciones": [
+     "cl3lymac49otgyZlXEPm",
+     "b8uqGGnBQYWEnpxUVb0J",
+     "AdwV165urztZiMtx2NbM",
+     "Nephi9Y4rhOgcDQlRTyO"
+    ],
+    "duraciones": [
+     12.0,
+     12.0,
+     12.0,
+     12.0
+    ]
+   },
+   "mina_derrumbe": {
+    "prompt": "A mine tunnel cave-in: old timber supports cracking and snapping, then a roaring collapse of heavy rocks and earth crashing down, gravel and dust pouring for a few seconds, a deep rumble fading away through the empty galleries, cinematic, no music",
+    "sesiones": [
+     "XSiBZkOdfd9t9KSbgXTE",
+     "hi54V7J920ACBsPlYJSM",
+     "3AgtsxjTZGogOnEDCFL4",
+     "8AEqJrY1W18zGyZRzUp0"
+    ],
+    "generaciones": [
+     "Pfz2btLhcjsNF3bGv6bW",
+     "1Wcy5aPy90E4D5JZI6CH",
+     "8lVrWIhoxLTwySV5TrES",
+     "ICrmm6p9NWCzIklOETrY"
+    ],
+    "duraciones": [
+     12.0,
+     15.0,
+     15.0,
+     15.0
+    ]
+   },
+   "mina_cruje": {
+    "prompt": "Old wooden mine supports creaking and groaning under the weight of the rock above, small pebbles and dust trickling down from the ceiling, a low ominous rumble deep in the stone, a warning before a cave-in, cinematic, no music",
+    "sesiones": [
+     "bh38RREFSqWUIIVcpV45",
+     "qd6sKC0mMDHrJeIOXT5Y",
+     "npFOGdcS8hBLlKTDIDD1",
+     "Rs3PUwtaWYisoaHaKNtt"
+    ],
+    "generaciones": [
+     "Nd2r2KxJMuynEk1uU18T",
+     "nfCj3Rq4zCmCg1l3ACyR",
+     "DaFo24aCJNxx0XW0sbIf",
+     "KFzbFY4fDs3GV7olQd6P"
+    ],
+    "duraciones": [
+     15.0,
+     15.0,
+     15.0,
+     15.0
+    ]
+   }
+  }
  }
 }
