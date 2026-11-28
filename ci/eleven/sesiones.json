@@ -12331,5 +12331,306 @@
     ]
    }
   }
+ },
+ "voz_osmund": {
+  "voz": "Matthew Schmitz - Ancient Sage Dragon Wizard",
+  "voice_id": "HAvvFKatz0uu0Fv55Riy",
+  "flow": "nIWx6e0Nel3Cf2CGpyWv",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7at: Fray Osmund, el Sacristan del Osario de San Ulfo (el jefe del Relicario). Por frase, tomas a y b; se bajan como osmund/voz_Na.mp3 y osmund/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[whispering, counting to himself] Thirty-nine thousand... nine hundred... [pause] [raspy, suspicious] Who is there? [cold, venomous] You walk upon the counted. [slow, menacing] Lie down... and be counted too.",
+    "sesiones": [
+     "WFNf8N8aXgah0xZ1S7Ay",
+     "YG6sTBSPblG9130CTypA"
+    ],
+    "generaciones": [
+     "NC3tspcYOffmRbClntfa",
+     "mLhp4D4Sio0jYawqAmeP"
+    ],
+    "duraciones": [
+     10.72,
+     10.8
+    ]
+   },
+   "2": {
+    "prompt": "[shouting, fanatical] Brothers! Sisters! Rise! [roaring] Hold me up... as I held every one of you!",
+    "sesiones": [
+     "DJiw8yrLmGz9hDcW7m58",
+     "GPWA1mLn69u4FV58BNL8"
+    ],
+    "generaciones": [
+     "soWhrBhqskRPvNlrXTSZ",
+     "HZ7tWrz5ttDSKIbLgdfS"
+    ],
+    "duraciones": [
+     6.64,
+     6.48
+    ]
+   },
+   "3": {
+    "prompt": "[whispering, pleased] Another one... [slowly, savoring] skull, ribs, thighbones... [softly] all in order. Always in order.",
+    "sesiones": [
+     "R3ZO8E5Mndh3cDMQMTrN",
+     "Os1GNxqBtq9H0OmQAkwI"
+    ],
+    "generaciones": [
+     "zh8Ck7NnuZzLe3Tk8kTA",
+     "8BS2GBZIWQue1lljMuQV"
+    ],
+    "duraciones": [
+     8.16,
+     8.4
+    ]
+   },
+   "4": {
+    "prompt": "[angry, commanding] Bow your heads... [shouting] before the dead!",
+    "sesiones": [
+     "4siYFTzHGrgdAcFf6SVC",
+     "TuH79y5xi9VVjxVBPH3L"
+    ],
+    "generaciones": [
+     "8q1iTxZJnXjW80QNyGnx",
+     "iXKVbma9c9XyGZMBQmTV"
+    ],
+    "duraciones": [
+     3.12,
+     3.12
+    ]
+   },
+   "5": {
+    "prompt": "[weak, trembling, frightened] I have lost the count... [sorrowful] Forgive me... [fading, whispering] I have lost... the count...",
+    "sesiones": [
+     "kNeRlQAxeMp7SEr9dj8Z",
+     "yMy2GeCBMubG2VD2tnAq"
+    ],
+    "generaciones": [
+     "qdU8BSjDnJv7u2Y5jjZh",
+     "G8vT3n7IIO9He8LetfXK"
+    ],
+    "duraciones": [
+     6.16,
+     6.0
+    ]
+   }
+  }
+ },
+ "sfx_osmund": {
+  "flow": "nIWx6e0Nel3Cf2CGpyWv",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7at: Fray Osmund (el incensario, el giro, la corona de calaveras, la calavera que vuela, el muro de huesos, alzarse, llamar a los huesos con la campanilla, el dolor, la muerte y la lampara de huesos). Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "osmund_incensario": {
+    "prompt": "A heavy iron censer on a long chain swung hard through the air, chain jangling, a cloud of burning bone dust whooshing out, crypt reverb, short, no voice, no music",
+    "sesiones": [
+     "ColQE4RnveVtNZgc3GTV",
+     "BbDLrpj8hu9j12XgTbVF",
+     "iB5vFSToVylZmOwJKybV",
+     "ZS09XmgqFmGjZaGDFpWv"
+    ],
+    "generaciones": [
+     "W516rfrGLabhgUFqg8o5",
+     "HTvLpdejWzxQuVotdQ2v",
+     "uVTEJPJJhWLiEoSHE68O",
+     "eAb55ObPb7xOHWO3NBtd"
+    ],
+    "duraciones": [
+     4.0,
+     4.0,
+     4.0,
+     4.0
+    ]
+   },
+   "osmund_giro": {
+    "prompt": "A censer on a long chain whirled in a full fast circle around a person, rising whoosh and rattling chain, embers hissing and spraying, crypt reverb, short, no voice, no music",
+    "sesiones": [
+     "880vX57XKSBgtjDuQnmP",
+     "nnbLqv5snqzAnDAmOWCO",
+     "clinVi17vNxDkiu4PP8U",
+     "HQMB9hXVkFuv8EfaA2kV"
+    ],
+    "generaciones": [
+     "9Ev0F6A1hIjvybIURzKj",
+     "ux4RphtbrQAMohD3dDfv",
+     "W7xQzBkYhxNf4Hy45zhp",
+     "H8vXcU8cthIiCMDgocV8"
+    ],
+    "duraciones": [
+     5.0,
+     5.0,
+     5.0,
+     5.0
+    ]
+   },
+   "osmund_corona": {
+    "prompt": "A ring of skulls tearing loose from a halo of bones and beginning to orbit in the air, hollow rattling hum, ghostly whispers circling around, eerie, crypt reverb, no music",
+    "sesiones": [
+     "Ao39LKfAEuyFb8Bo7mzU",
+     "FA1a9ZqLQD65f2xYO48I",
+     "kkVN0ZieMxEaMAeyVIwc",
+     "2E0kYqnldWNuB8Klv9H5"
+    ],
+    "generaciones": [
+     "hNcHJM92CFX70RnxZ033",
+     "xAT6qfsAQwaJ3IdxAXrP",
+     "jyxq04r8bN9wuu59BgeQ",
+     "2xZM5824FhUXofBfpUGe"
+    ],
+    "duraciones": [
+     12.0,
+     8.0,
+     8.0,
+     10.0
+    ]
+   },
+   "osmund_calavera": {
+    "prompt": "A flying skull shrieking through the air like a wailing ghost, then shattering into bone shards on impact against stone, crypt reverb, short, no music",
+    "sesiones": [
+     "o07k7B528NlmPhijsAR5",
+     "x3zFbWxy7TCAhVfNqaxn",
+     "7Hdi3zDTOsvewuWuSLgw",
+     "Bu6gesgKsc2lYg4MDy18"
+    ],
+    "generaciones": [
+     "IFJZOs3SJPIBSiwVle5h",
+     "1Hqatxln3hyfqy7uFiKw",
+     "JBQPkSgFvP9AwPLn5PWY",
+     "2ABXLKYoZ5K7CWMu1KuG"
+    ],
+    "duraciones": [
+     5.0,
+     4.0,
+     4.0,
+     5.0
+    ]
+   },
+   "osmund_muro": {
+    "prompt": "A wall of bones erupting violently out of a stone floor, bones cracking, snapping and grinding as they push upward, rumble, crypt reverb, no music",
+    "sesiones": [
+     "5deaxzfMBOLWm3ILGCCJ",
+     "vT1FX6vCuEyG1AY6ljhL",
+     "il99z8HYtw3gr3BItD1z",
+     "ybGMCdKtcZUKfvOmy1HT"
+    ],
+    "generaciones": [
+     "dyIa6SG4zSJ7ckJwOR9A",
+     "zY42B7mqwen5q8tSmf2B",
+     "vYFN94apJazJkLwkT96p",
+     "IjkNv3qRSE7fMezmJT0D"
+    ],
+    "duraciones": [
+     6.0,
+     6.0,
+     6.0,
+     6.0
+    ]
+   },
+   "osmund_alzarse": {
+    "prompt": "An old undead monk rising into the air as thousands of bones lift from the floor around him, a swelling choir of whispers and creaking rattling bones, ominous and holy, crypt reverb, no music",
+    "sesiones": [
+     "YfRLGKnEwRY3Eu48NTwO",
+     "5cOfqmGkmHGcXhOq4Olq",
+     "Q8eHYAXVSLeRmgu63ue3",
+     "q8DwowbcUZG8DNcQwtIV"
+    ],
+    "generaciones": [
+     "8wBTZ771FMSO5kXFIzcK",
+     "IYmsVXSb27noUFkZjF2w",
+     "ypNhTx884m2mtHB7noUR",
+     "2yDYM2qvoMyVo3YrSUds"
+    ],
+    "duraciones": [
+     12.0,
+     15.0,
+     15.0,
+     15.0
+    ]
+   },
+   "osmund_llamar": {
+    "prompt": "A cracked hand bell rung slowly three times in a stone crypt, followed by piles of bones stirring and rattling awake all around, eerie, reverb, no music",
+    "sesiones": [
+     "N1PXyo2xo8jjkZLTnKEe",
+     "wHMT977NNhmoQdVZ7nbq",
+     "McpyBumkdInnZHE9hUbW",
+     "YvZ5FiZieTxwTQ5VKtpp"
+    ],
+    "generaciones": [
+     "0l1myrj75Y9p92ubVD8r",
+     "Vad0m3A8J8aK1A3ciHGi",
+     "w9PR2r6H2zBknwwv0oz1",
+     "gOjq3OyIwnjLvJMwoUue"
+    ],
+    "duraciones": [
+     12.0,
+     15.0,
+     15.0,
+     12.0
+    ]
+   },
+   "osmund_dolor": {
+    "prompt": "A frail old undead man's pained rasping groan, dry and hoarse, with bones creaking, short, crypt reverb, no music",
+    "sesiones": [
+     "Ey2eA0XTHKlT1vZgPpdG",
+     "5TVFviXqPXWEgbSX24SQ",
+     "dhG6O8Rzmvx1YUKHA5sa",
+     "PdN0TsMuecCQy0pxgu9R"
+    ],
+    "generaciones": [
+     "PP6hQIu9jYGy6tfN9Z5E",
+     "c3abK4CJWX7v1BkNXuS7",
+     "3OBPBd34kzOdoTQAN0A5",
+     "68sNu2dx4PJF8G13y8TD"
+    ],
+    "duraciones": [
+     4.0,
+     3.0,
+     3.0,
+     4.0
+    ]
+   },
+   "osmund_muerte": {
+    "prompt": "An undead old monk made of bones collapsing, his body crumbling into dust and clattering bones, a long hollow exhale, then thousands of faint whispers slowly fading into silence, crypt reverb, no music",
+    "sesiones": [
+     "IfUPD5xx1MrYZG0IKBRE",
+     "bjp1v9sBYYvAjBNjZTfl",
+     "7xZUT7p8dCR36evbrSIk",
+     "zc3SCL2qZqyY1486cY5n"
+    ],
+    "generaciones": [
+     "vscEgwjwUIy1M0Mh9w36",
+     "8okrimaCe7i6DSyiIf61",
+     "ycgiWGRngjEFeAfi23mn",
+     "KXrRPcYpOGT5ydZOWSfU"
+    ],
+    "duraciones": [
+     10.0,
+     12.0,
+     12.0,
+     12.0
+    ]
+   },
+   "osmund_lampara": {
+    "prompt": "A great chandelier made of bones and skulls swaying on old chains high above, creaking chains, bones clacking together, candles guttering, ominous, cathedral crypt reverb, no music",
+    "sesiones": [
+     "XDjOhD2jx8549ZsXHqIr",
+     "GfZiDwLUgBaulCLdl8eV",
+     "yN66zTHckJOxvAKBIQqG",
+     "54GTlfQlGhsnKsBx2vgx"
+    ],
+    "generaciones": [
+     "Ited4PqwSMVdq7rKNZnp",
+     "XIC9u4tuG9pQg8y7In9S",
+     "Xciqlt1x8e14lXR5x7HF",
+     "HLYHRgYCmOXF9xwZxP02"
+    ],
+    "duraciones": [
+     20.0,
+     25.0,
+     25.0,
+     20.0
+    ]
+   }
+  }
  }
 }
