@@ -12933,5 +12933,306 @@
     ]
    }
   }
+ },
+ "voz_galen": {
+  "voz": "Blackwood - Posh British Villain",
+  "voice_id": "agL69Vji082CshT65Tcy",
+  "flow": "sd89J8Hvoo0CnP4BuWLO",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7av: Maese Galen, el fisico del Lazareto (el jefe de la Sala del Elixir). Por frase, tomas a y b; se bajan como galen/voz_Na.mp3 y galen/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[softly, kindly] Another patient... [pause] [curious] No. You are not sick. [coldly] Not yet. [gently, menacing] Sit down, sit down. The elixir is almost ready.",
+    "sesiones": [
+     "Uwp9F3gi7Kl8nAqwpe0f",
+     "3Y4dAYeYpW5FycYkhtog"
+    ],
+    "generaciones": [
+     "z9txiFybtpWqfKpADhPB",
+     "TnmMY9w784cqaj7vuHs3"
+    ],
+    "duraciones": [
+     9.76,
+     10.0
+    ]
+   },
+   "2": {
+    "prompt": "[frantic, desperate] One more drop! [shouting] I only needed ONE MORE DROP! [laughing madly] Then I shall drink it myself!",
+    "sesiones": [
+     "Z4gj34PyUjejolpKXryF",
+     "IuF43cBZLLZCaiOMBySX"
+    ],
+    "generaciones": [
+     "yrlVA4XxHkwBpeQQvcVp",
+     "Lw3mUEAxk93scMWr6iIQ"
+    ],
+    "duraciones": [
+     6.56,
+     6.64
+    ]
+   },
+   "3": {
+    "prompt": "[calm, clinical] Hold still. [softly, pleased] Your blood will make... a fine distillate.",
+    "sesiones": [
+     "dpZs7UkBLzFRPtVIZkU3",
+     "Ek1WDHI847JGZUteXLxx"
+    ],
+    "generaciones": [
+     "zovMtVC2bosXxMOnyAwD",
+     "0VpHfRpuvdjwzsAdQRl0"
+    ],
+    "duraciones": [
+     4.88,
+     4.8
+    ]
+   },
+   "4": {
+    "prompt": "[soothing, mocking] Breathe deeply... [whispering] it is good for the lungs.",
+    "sesiones": [
+     "UOQO6ulvqXXKVnunXmzm",
+     "jJYPVR2vOq9Fc5xSDvRc"
+    ],
+    "generaciones": [
+     "7hl0wuNymg2zbtnaF3dZ",
+     "FIpix9ljWx0l3KZ1IVJP"
+    ],
+    "duraciones": [
+     3.84,
+     3.92
+    ]
+   },
+   "5": {
+    "prompt": "[weak, choking] It cured... nothing... [sorrowful, breaking] I only wanted them... to live...",
+    "sesiones": [
+     "Hi6Hdzr2lUMcUYAMSlNj",
+     "1OoNOMf5XazttcxnJAxO"
+    ],
+    "generaciones": [
+     "Zo2meGoeYu5JDUND5Rhi",
+     "POcZBI3AnJtUD7FGEclA"
+    ],
+    "duraciones": [
+     5.52,
+     5.6
+    ]
+   }
+  }
+ },
+ "sfx_galen": {
+  "flow": "sd89J8Hvoo0CnP4BuWLO",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7av: Maese Galen (la jeringa, el bisturi, el vapor de las rejillas, la lluvia de frascos, beberse el elixir, el estallido de cristal, arrancarse los tubos, el dolor, la muerte y el gran alambique). Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "galen_jeringa": {
+    "prompt": "A huge brass and glass syringe stabbing forward, a sharp metallic thrust followed by a wet hiss of thick liquid being injected, short, no music",
+    "sesiones": [
+     "kJGtM8mBhWV0cstNhyVf",
+     "pc0uD4e726PgqiPqsfT8",
+     "kDhaB6Fp0aWD1wdtUKt1",
+     "UgXIatJBZPRPRGTXAN9c"
+    ],
+    "generaciones": [
+     "EXaR9SElXkXszjBzV8YR",
+     "AxOHoDSuLpoH0jGUQany",
+     "oR4cVDlHcDoILomc2IAq",
+     "eKq1uA8CMDlsrYqIkFDY"
+    ],
+    "duraciones": [
+     4.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "galen_bisturi": {
+    "prompt": "A long surgical blade slashing through the air twice, quick sharp metallic swishes with a thin cold ring, short, no music",
+    "sesiones": [
+     "Ie7mAoflU7yUWDXHFQZK",
+     "FWjLSq5TbuTqcs1pi1th",
+     "wodGv9iT3xUvlxiaWYJk",
+     "k7jPD2Hfp6ggbAQlyESy"
+    ],
+    "generaciones": [
+     "yw3GS5gB3hfmKMHvB9zQ",
+     "tuYLtvPuVTrj8pW9hvBJ",
+     "H6rSZYDxbK9gXP8E04MJ",
+     "j71noYQ8Hfuq1HJvXohp"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "galen_vapor": {
+    "prompt": "Scalding steam erupting violently from an iron floor grate, a loud pressurized hiss and roar of hot vapor, short, stone room reverb, no music",
+    "sesiones": [
+     "EfdVdufcIhx0wyN9IgtI",
+     "Kgud39io22z2CWt8EFan",
+     "C2whmE4qOUz0aNcJNQO2",
+     "Iois4yauDw2jSBPHDPZY"
+    ],
+    "generaciones": [
+     "Bl9V3TPPkpMORuMfvFrG",
+     "DINhCbBvM30dKPJuxApn",
+     "cn4gYGYLcVT7X3WouLyG",
+     "4Q2Nlh9ylCgy21xPr4DH"
+    ],
+    "duraciones": [
+     5.0,
+     5.0,
+     5.0,
+     5.0
+    ]
+   },
+   "galen_frascos": {
+    "prompt": "A rack of glass flasks rattling and clinking as several are hurled at once, a flurry of glassy whooshes, short, no music",
+    "sesiones": [
+     "DFbYSpk0wkltT8NR3Gua",
+     "S75uOwMdNJrx0EXmuAyo",
+     "Hs6Vl4zfSu6cNH9RHQzV",
+     "MG77vM7VvitCQeRXvQD9"
+    ],
+    "generaciones": [
+     "zczGEA0rsW4zWnioxuRa",
+     "rSkz3BJkJCh74Bz5C0YF",
+     "ha6UhqiPKpNuwh8PDbKi",
+     "jKYxoA81R740R2zLXGZt"
+    ],
+    "duraciones": [
+     4.0,
+     4.0,
+     3.0,
+     4.0
+    ]
+   },
+   "galen_beber": {
+    "prompt": "An old man desperately gulping a bubbling potion from a huge glass vessel, loud swallowing and glass clinking, then a monstrous transforming groan with crackling glass growing over skin, no music",
+    "sesiones": [
+     "upRxHtOsISO9VPL2FmoF",
+     "0CmLhMpRG79PsB5iCNd8",
+     "Lo847vfwYTj4Nc1oFovs",
+     "92X0HLHhrNZYGgM5bPHN"
+    ],
+    "generaciones": [
+     "VoJoxwtNGY0f1JnnCgI9",
+     "uT5VyrM8Sj9gxRwJWu3l",
+     "YMmhHfMAn13Co2Tv6tq3",
+     "77tSsBqwycQD0gAUiQAv"
+    ],
+    "duraciones": [
+     12.0,
+     8.0,
+     12.0,
+     10.0
+    ]
+   },
+   "galen_estallido": {
+    "prompt": "Dozens of glass shards bursting outward explosively from a body, a sharp crystalline explosion with shards tinkling and scattering across stone, no music",
+    "sesiones": [
+     "mg8YJye5NvNCRmK5uQ3f",
+     "cdfzxNDB035gA4QtnrZ0",
+     "X2eV0zduwmN8NunaP5qw",
+     "ZsjZtVNeJuIvRm6w7Vwt"
+    ],
+    "generaciones": [
+     "xnmigBQFR42eZW2Jwy0B",
+     "D0Rm1KjnPaS6WcFMpO6l",
+     "sdlsZt1ExtQIpXCtih0D",
+     "vnGPjNEwmswAqs0hAVlI"
+    ],
+    "duraciones": [
+     5.0,
+     4.0,
+     5.0,
+     4.0
+    ]
+   },
+   "galen_tubos": {
+    "prompt": "Glass and rubber tubes being ripped out of flesh, wet tearing, liquid splashing and hissing on hot copper, short, no music",
+    "sesiones": [
+     "uXzVVBmz6ZQdJZem2RHQ",
+     "ImozyQi41fKCBP82weiH",
+     "tmYWUUe2hNOgZrQc8XPS",
+     "CCaQohOa8kvbrcDVZv8X"
+    ],
+    "generaciones": [
+     "h4qJTnYb5FEQchBKKVse",
+     "E8hxOMEDt7ZMsE4nI5zL",
+     "hSKbMsIHpweHUgOB2TPY",
+     "nL2Tz5sfPcRrqxvgcsD3"
+    ],
+    "duraciones": [
+     5.0,
+     4.0,
+     4.0,
+     4.0
+    ]
+   },
+   "galen_dolor": {
+    "prompt": "A pained wheezing groan of a frail old physician, with glass bottles clinking on his body, short, stone room reverb, no music",
+    "sesiones": [
+     "2FV8aVrUtox9HLX2QW7b",
+     "8izQwdjHuzdxdqpnCYGv",
+     "jQYx00tzjgzamkp5SEQK",
+     "fdJbZvEQXEvd109OXwrD"
+    ],
+    "generaciones": [
+     "4BqMBr8GJfd5nDU9djPm",
+     "LNEO5DNZjkkI5uv4jqVz",
+     "2QsaO7KwiwGA5laQgux5",
+     "ZS3qzW25avpugPiWUmF5"
+    ],
+    "duraciones": [
+     4.0,
+     4.0,
+     3.0,
+     4.0
+    ]
+   },
+   "galen_muerte": {
+    "prompt": "A frail mad alchemist collapsing to the floor, glass vessels shattering around him, the violent bubbling of a great alembic slowly dying down to silence, a last rattling breath, no music",
+    "sesiones": [
+     "l2CEPPvq4D2UsPnuYjef",
+     "it4wlFM7ENAarKFRJXaq",
+     "LDzZLUV0RfImsTcUBGNT",
+     "GnC7zfdTFpfmWJp7g3xL"
+    ],
+    "generaciones": [
+     "yqt4ebNZEs4MQuPSg6iJ",
+     "WYM1vlAq8ruCUWHAbENc",
+     "udXLDgss23zOvWb0S3jl",
+     "nOh1sN7vFvDAWigqqbxR"
+    ],
+    "duraciones": [
+     15.0,
+     12.0,
+     15.0,
+     12.0
+    ]
+   },
+   "galen_alambique": {
+    "prompt": "A huge copper and glass alembic boiling violently, deep glugging bubbles, hissing steam and rattling glass, steady seamless loop, no music",
+    "sesiones": [
+     "HC9pq6fEWxVtvCqwGUNW",
+     "DDJSDMSzzMWjFhcjrlDJ",
+     "Ie77iroYnCDWP7BhLiOO",
+     "N4Qn1uZoFZs3XFUyJzmv"
+    ],
+    "generaciones": [
+     "qSieR4xJmpnEgSlIpi0c",
+     "pFua3CNW8FCyAiFmzwvG",
+     "91JHH75mToSDMsqrUJEy",
+     "jJjWisj9IZtQdqMX0lwb"
+    ],
+    "duraciones": [
+     25.0,
+     30.0,
+     30.0,
+     30.0
+    ]
+   }
+  }
  }
 }
