@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "punta=false": {
+      "model": "darkcraft:block/raices_colgantes"
+    },
+    "punta=true": {
+      "model": "darkcraft:block/raices_colgantes_punta"
+    }
+  }
+}

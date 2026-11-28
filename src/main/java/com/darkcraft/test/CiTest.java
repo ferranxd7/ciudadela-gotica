@@ -793,7 +793,7 @@ public final class CiTest {
      *  cancelas, puertas y trampillas estan en sus etiquetas de Minecraft (asi se unen muros y vallas) y que rotos con un
      *  pico sueltan lo suyo (la losa doble, dos; la puerta, una por su mitad de abajo). */
     private static void bloques8b(MinecraftServer server, ServerLevel m, PrintWriter log) {
-        int sinBotin = 0, malEtiqueta = 0, malSuelta = 0, n = 0;
+        int sinBotin = 0, malEtiqueta = 0, malSuelta = 0, n = 0, rompibles = 0, conBotin = 0;
         java.util.List<String> malos = new java.util.ArrayList<>();
         net.minecraft.world.item.ItemStack pico = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_PICKAXE);
         net.minecraft.core.BlockPos pos = new net.minecraft.core.BlockPos(0, 300, 0);
@@ -818,6 +818,20 @@ public final class CiTest {
                 malEtiqueta++;
                 if (malos.size() < 6) malos.add("etiquetas " + id);
             }
+            if (b instanceof com.darkcraft.bloques.Rompible) {
+                // lo que se rompe (parte 8k): su botin es al azar (muchas veces nada) y nunca se suelta a si mismo
+                rompibles++;
+                for (int k = 0; k < 40; k++) {
+                    java.util.List<net.minecraft.world.item.ItemStack> sale = net.minecraft.world.level.block.Block.getDrops(st, m, pos, null, null, pico);
+                    if (!sale.isEmpty()) conBotin++;
+                    for (net.minecraft.world.item.ItemStack it : sale)
+                        if (it.getItem() == b.asItem()) {
+                            malSuelta++;
+                            if (malos.size() < 6) malos.add("se suelta a si mismo " + id);
+                        }
+                }
+                continue;
+            }
             if (id.endsWith("_losa"))
                 st = st.setValue(net.minecraft.world.level.block.SlabBlock.TYPE, net.minecraft.world.level.block.state.properties.SlabType.DOUBLE);
             java.util.List<net.minecraft.world.item.ItemStack> sale = net.minecraft.world.level.block.Block.getDrops(st, m, pos, null, null, pico);
@@ -828,7 +842,8 @@ public final class CiTest {
             }
         }
         log.println("Bloques 8b: " + n + " bloques de " + com.darkcraft.bloques.CatalogoBloques.MATERIALES.length + " materiales; sin botin "
-                + sinBotin + ", etiquetas mal " + malEtiqueta + ", sueltan mal " + malSuelta + (malos.isEmpty() ? "" : " | " + malos));
+                + sinBotin + ", etiquetas mal " + malEtiqueta + ", sueltan mal " + malSuelta + "; rompibles " + rompibles + " (de "
+                + rompibles * 40 + " roturas, con botin " + conBotin + ")" + (malos.isEmpty() ? "" : " | " + malos));
     }
 
     private static void armaduras7am(MinecraftServer server, ServerLevel m, PrintWriter log) {

@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=up": {
+      "model": "darkcraft:block/cristal_violeta"
+    },
+    "facing=down": {
+      "model": "darkcraft:block/cristal_violeta",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "darkcraft:block/cristal_violeta",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "darkcraft:block/cristal_violeta",
+      "x": 90,
+      "y": 180
+    },
+    "facing=west": {
+      "model": "darkcraft:block/cristal_violeta",
+      "x": 90,
+      "y": 270
+    },
+    "facing=east": {
+      "model": "darkcraft:block/cristal_violeta",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

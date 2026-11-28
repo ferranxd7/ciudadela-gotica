@@ -29,6 +29,7 @@ import fuego as F  # noqa: E402
 import muebles as Mu  # noqa: E402
 import decoracion as De  # noqa: E402
 import agua as Ag  # noqa: E402
+import vivos as Vi  # noqa: E402
 
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RES = os.path.join(RAIZ, "src", "main", "resources")
@@ -188,6 +189,13 @@ R = {
     "t_verde": ["#0a2214", "#12341e", "#1c4a2a", "#286238", "#347a46"],
     "t_gris": ["#2b2d29", "#3b3e39", "#4c4f49", "#5d605a", "#6f726b"],
     "hueso": ["#3e3528", "#5a4e3c", "#776a52", "#958769", "#b0a280", "#c8bb98", "#ddd2b2"],
+    # lo vivo y lo que se rompe (parte 8k)
+    "carne": ["#2a0608", "#4a0c10", "#6c1418", "#8c2026", "#a8343a", "#c04c50", "#d46a6a", "#e48c88"],
+    "venas": ["#1a0204", "#30060a", "#4a0c12", "#62141c"],
+    "raiz": ["#120a06", "#1e120a", "#2c1b0f", "#3c2614", "#4e321a", "#624021", "#784f2a", "#8e6036", "#a37446"],
+    "raiz_colgante": ["#140d08", "#1f150c", "#2b1d11", "#382616", "#46301c", "#553a22"],
+    "barro_cocido": ["#3a1a0c", "#552612", "#70341a", "#8a4424", "#a2562e", "#b86a3c", "#c8804e"],
+    "cristal_blanco": ["#5a6470", "#7a8692", "#9aa6b2", "#bcc6d0", "#dce4ea", "#f4f8fb"],
 }
 RAMPAS = {k: P.Rampa(v) for k, v in R.items()}
 
@@ -655,6 +663,7 @@ def particulas_json():
         j(os.path.join(d, f"llama_{c}.json"), {"textures": [f"darkcraft:llama_{c}_{k}" for k in range(4)]})
         j(os.path.join(d, f"chispa_{c}.json"), {"textures": [f"darkcraft:chispa_{c}_{k}" for k in range(2)]})
     j(os.path.join(d, "humo.json"), {"textures": [f"darkcraft:humo_{k}" for k in range(4)]})
+    j(os.path.join(d, "gota_sangre.json"), {"textures": ["darkcraft:gota_sangre"]})
 
 
 def FUEGO(color, es, en, mapa, semilla):
@@ -752,6 +761,142 @@ def DECO(id, es, en, forma, semilla, mapa="STONE", sonido="STONE", herramienta="
     piedra, y ataud, z gargola, S busto y F jaula colgante."""
     return M(id, es, en, None, formas=forma, sonido=sonido, mapa=mapa, semilla=semilla, dureza=dureza, herramienta=herramienta,
              variantes=1, **kw)
+
+
+# ------------------------------------------------------------------ lo vivo y lo que se rompe (parte 8k)
+# (ya no quedan letras: estas formas son cifras) 1 raices vivas, 2 pared con ojos, 3 carne, 4 racimo de cristal, 5 roca con
+# vetas de cristal, 6 piedra sangrante, 7 charco de sangre y 8 lo que se rompe (jarrones y urnas)
+
+VIVOS = ("1", "2", "3", "4", "5", "6", "7", "8")
+CRISTALES = {"azul": "f_almas", "violeta": "f_arcano", "rojo": "f_sangre", "blanco": "cristal_blanco"}
+ROMPIBLES = {"jarron": ("barro_cocido", "t_negro"), "jarron_grande": ("barro_cocido", "t_rojo"), "urna_huesos": ("hueso", "t_negro")}
+
+
+def sueltas_vivos():
+    """Las texturas de lo vivo (las animadas, con su .mcmeta) y de lo que se rompe."""
+    out = {}
+    out["raices_vivas"] = Vi.raices(961, RAMPAS["raiz"], RAMPAS["tierra"])
+    ANIM["raices_vivas"] = 3
+    out["ojos"] = Vi.ojos(962)
+    ANIM["ojos"] = 2
+    out["carne"] = Vi.carne(963, RAMPAS["carne"], RAMPAS["venas"])
+    ANIM["carne"] = 3
+    for i, (k, rp) in enumerate(CRISTALES.items()):
+        out[f"cristal_{k}"] = Vi.cristal(964 + i, RAMPAS[rp])
+    out["vetas_cristal"] = Vi.vetas(970, RAMPAS["f_arcano"])
+    out["sangre"] = Vi.sangre(971)
+    out["charco_sangre"] = Vi.charco(972)
+    ANIM["charco_sangre"] = 4
+    for i, (k, (rp, banda)) in enumerate(ROMPIBLES.items()):
+        out[k + "_barro"] = Vi.barro_cocido(980 + i, RAMPAS[rp], RAMPAS[banda])
+    gota = Ag.gota("fall")
+    gota[..., 0] = np.where(gota[..., 3] > 0, 150, 0)
+    gota[..., 1] = np.where(gota[..., 3] > 0, 14, 0)
+    gota[..., 2] = np.where(gota[..., 3] > 0, 12, 0)
+    out["particle/gota_sangre"] = gota
+    return out
+
+
+def VIVO(id, es, en, forma, semilla, mapa="COLOR_RED", sonido="STONE", herramienta="pickaxe", dureza=1.5, **kw):
+    return M(id, es, en, None, formas=forma, sonido=sonido, mapa=mapa, semilla=semilla, dureza=dureza, herramienta=herramienta,
+             variantes=1, **kw)
+
+
+def escribir_vivo(m):
+    """Lo vivo: cubos animados, cubos con encima un dibujo que brilla (los ojos, las vetas, la sangre), racimos de cristal
+    (planos en cruz que brillan), el charco y los jarrones (que se rompen a golpes)."""
+    bid, f = m["id"], m["formas"]
+    bs = os.path.join(ASSETS, "blockstates")
+    mb = os.path.join(ASSETS, "models", "block")
+    mi = os.path.join(ASSETS, "models", "item")
+    B_ = "darkcraft:block/"
+    caras = ("down", "up", "north", "south", "west", "east")
+
+    def cubo_con_brillo(base, encima, brilla=True, donde=caras):
+        el_base = {"from": [0, 0, 0], "to": [16, 16, 16], "faces": {c: {"uv": [0, 0, 16, 16], "texture": "#base", "cullface": c}
+                                                                 for c in caras}}
+        el_enc = {"from": [0, 0, 0], "to": [16, 16, 16], "faces": {c: {"uv": [0, 0, 16, 16], "texture": "#encima", "cullface": c}
+                                                                for c in donde}}
+        if brilla:
+            el_enc["shade"] = False
+            el_enc["forge_data"] = {"block_light": 15, "sky_light": 15, "ambient_occlusion": False}
+        return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
+                "textures": {"particle": B_ + base, "base": B_ + base, "encima": B_ + encima}, "elements": [el_base, el_enc]}
+
+    if f in ("1", "3"):
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/cube_all", "textures": {"all": B_ + bid}})
+    elif f == "2":
+        j(os.path.join(mb, bid + ".json"), cubo_con_brillo("sillar_oscuro", "ojos"))
+    elif f == "5":
+        j(os.path.join(mb, bid + ".json"), cubo_con_brillo("roca_oscura", "vetas_cristal"))
+    elif f == "6":
+        j(os.path.join(mb, bid + ".json"), cubo_con_brillo("sillar_gris", "sangre", brilla=False, donde=caras[2:]))
+    elif f == "4":
+        # planos en cruz, cada uno con un trozo del dibujo sin estirarlo (todo el alto; de ancho, lo que toca)
+        k = m["cristal"]
+        els = []
+        for (cx, cz, ancho, alto, ang, corre) in ((8, 8, 9, 14, 45, 0), (8, 8, 9, 12, -45, 1.5), (4.5, 11, 5, 8, 45, -2.5),
+                                                   (11.5, 5, 5, 9, -45, 2.5), (5, 5, 4, 6, -45, -3), (11, 11, 4, 7, 45, 3)):
+            wu = min(16.0, ancho * 16.0 / alto)
+            u0 = min(16.0 - wu, max(0.0, 8 - wu / 2 + corre))
+            uv = [round(u0, 2), 0, round(u0 + wu, 2), 16]
+            els.append({"from": [cx - ancho / 2, 0, cz], "to": [cx + ancho / 2, alto, cz], "shade": False,
+                        "rotation": {"origin": [cx, 0, cz], "axis": "y", "angle": ang},
+                        "forge_data": {"block_light": 15, "sky_light": 15, "ambient_occlusion": False},
+                        "faces": {"north": {"uv": uv, "texture": "#cristal"},
+                                  "south": {"uv": uv, "texture": "#cristal"}}})
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/block", "render_type": "minecraft:cutout",
+                                           "textures": {"cristal": B_ + f"cristal_{k}", "particle": B_ + f"cristal_{k}"},
+                                           "elements": els})
+    elif f == "7":
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/carpet", "render_type": "minecraft:cutout",
+                                           "textures": {"wool": B_ + "charco_sangre", "particle": B_ + "charco_sangre"}})
+    elif f == "8":
+        t = {"barro": B_ + bid + "_barro", "particle": B_ + bid + "_barro"}
+        if bid == "jarron":
+            perfil = [(0, 1, 4), (1, 7, 5), (7, 9, 4), (9, 10, 2.5), (10, 11, 3)]
+        elif bid == "jarron_grande":
+            perfil = [(0, 1, 3), (1, 4, 5), (4, 11, 6), (11, 13, 4.5), (13, 15, 2.5), (15, 16, 3.5)]
+        else:
+            perfil = [(0, 1, 3.5), (1, 8, 5), (8, 9, 4), (9, 10, 4.5), (10, 11, 2)]
+        els = [_caja((8 - r, y0, 8 - r), (8 + r, y1, 8 + r), "#barro") for (y0, y1, r) in perfil]
+        # las asas del anfora
+        if bid == "jarron_grande":
+            els += [_caja((1.5, 9, 7.5), (2.5, 14, 8.5), "#barro"), _caja((13.5, 9, 7.5), (14.5, 14, 8.5), "#barro"),
+                    _caja((2, 13.5, 7.5), (5.5, 14.5, 8.5), "#barro"), _caja((10.5, 13.5, 7.5), (14, 14.5, 8.5), "#barro")]
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/block", "textures": t, "elements": els})
+    if f == "4":
+        # como el racimo de amatista del juego: crece hacia donde mira (arriba, abajo o a un lado)
+        mod = f"darkcraft:block/{bid}"
+        j(os.path.join(bs, bid + ".json"), {"variants": {
+            "facing=up": {"model": mod}, "facing=down": {"model": mod, "x": 180},
+            "facing=north": {"model": mod, "x": 90}, "facing=south": {"model": mod, "x": 90, "y": 180},
+            "facing=west": {"model": mod, "x": 90, "y": 270}, "facing=east": {"model": mod, "x": 90, "y": 90}}})
+    elif f == "7":
+        j(os.path.join(bs, bid + ".json"), {"variants": {"": [dict({"model": f"darkcraft:block/{bid}"}, **({"y": g} if g else {}))
+                                                              for g in (0, 90, 180, 270)]}})
+    else:
+        j(os.path.join(bs, bid + ".json"), {"variants": {"": {"model": f"darkcraft:block/{bid}"}}})
+    if f == "4":
+        j(os.path.join(mi, bid + ".json"), {"parent": "minecraft:item/generated", "textures": {"layer0": B_ + f"cristal_{m['cristal']}"}})
+    else:
+        j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
+    return [bid]
+
+
+def botin_rompibles():
+    """Lo que sueltan los jarrones y las urnas al romperse: muchas veces nada; flechas, un fruto o, rara vez, una piedra de
+    forja."""
+    d = os.path.join(DATA, "darkcraft", "loot_tables", "blocks")
+    frutos = ["brasa", "ceniza", "escarcha", "hueso", "lunar", "pluma", "sombra", "tormenta"]
+    for bid in ROMPIBLES:
+        entradas = [{"type": "minecraft:empty", "weight": 55},
+                    {"type": "minecraft:item", "name": "minecraft:arrow", "weight": 25,
+                     "functions": [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 1, "max": 4}}]}]
+        entradas += [{"type": "minecraft:item", "name": f"darkcraft:fruto_{fr}", "weight": 2} for fr in frutos]
+        entradas.append({"type": "minecraft:item", "name": "darkcraft:piedra_forja_1", "weight": 4})
+        j(os.path.join(d, bid + ".json"), {"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0, "entries": entradas}],
+                                          "random_sequence": "darkcraft:blocks/" + bid})
 
 
 # ------------------------------------------------------------------ el catalogo
@@ -1195,6 +1340,25 @@ MATERIALES = [
     DECO("gargola_piedra", "Gárgola de piedra", "Stone Gargoyle", "z", 837, mapa="COLOR_BLACK", dureza=3.0),
     DECO("busto", "Busto de mármol", "Marble Bust", "S", 838, mapa="QUARTZ", sonido="CALCITE", dureza=2.0),
     DECO("jaula", "Jaula colgante", "Hanging Cage", "F", 839, mapa="COLOR_BLACK", sonido="CHAIN", dureza=3.0),
+    # ---- parte 8k: lo vivo y lo que se rompe
+    VIVO("raices_vivas", "Raíces vivas", "Living Roots", "1", 851, mapa="COLOR_BROWN", sonido="ROOTS", herramienta="axe"),
+    COLGANTE("raices_colgantes", "Raíces colgantes", "Hanging Roots", "raiz_colgante", "COLOR_BROWN", 852),
+    VIVO("pared_ojos", "Pared con ojos", "Wall of Eyes", "2", 853, mapa="COLOR_BLACK", sonido="DEEPSLATE_BRICKS", dureza=2.0),
+    VIVO("carne", "Carne viva", "Living Flesh", "3", 854, sonido="SLIME_BLOCK", herramienta="hoe", dureza=1.0),
+    VIVO("cristal_azul", "Cristal azul", "Blue Crystal Cluster", "4", 855, mapa="COLOR_LIGHT_BLUE", sonido="AMETHYST_CLUSTER",
+         cristal="azul"),
+    VIVO("cristal_violeta", "Cristal violeta", "Violet Crystal Cluster", "4", 856, mapa="COLOR_PURPLE",
+         sonido="AMETHYST_CLUSTER", cristal="violeta"),
+    VIVO("cristal_rojo", "Cristal rojo", "Red Crystal Cluster", "4", 857, sonido="AMETHYST_CLUSTER", cristal="rojo"),
+    VIVO("cristal_blanco", "Cristal blanco", "White Crystal Cluster", "4", 858, mapa="SNOW", sonido="AMETHYST_CLUSTER",
+         cristal="blanco"),
+    VIVO("roca_cristal", "Roca con vetas de cristal", "Crystal-Veined Rock", "5", 859, mapa="COLOR_BLACK", sonido="AMETHYST",
+         dureza=2.0),
+    VIVO("piedra_sangrante", "Piedra sangrante", "Bleeding Stone", "6", 860, sonido="STONE", dureza=1.5),
+    VIVO("charco_sangre", "Charco de sangre", "Pool of Blood", "7", 861, sonido="SLIME_BLOCK", herramienta="hoe", dureza=0.1),
+    VIVO("jarron", "Jarrón", "Clay Pot", "8", 862, mapa="TERRACOTTA_ORANGE", sonido="DECORATED_POT", dureza=0.5),
+    VIVO("jarron_grande", "Ánfora", "Amphora", "8", 863, mapa="TERRACOTTA_ORANGE", sonido="DECORATED_POT", dureza=0.5),
+    VIVO("urna_huesos", "Urna de huesos", "Bone Urn", "8", 864, mapa="SAND", sonido="DECORATED_POT", dureza=0.5),
 ]
 POR_ID = {m["id"]: m for m in MATERIALES}
 
@@ -1207,7 +1371,8 @@ FORMAS = {"B": "", "E": "_escalera", "L": "_losa", "M": "_muro", "V": "_valla", 
 # decoracion (parte 8i): d estandarte, g tapiz, n calavera, q monton de huesos, u telarana, w lapida, x cruz de piedra,
 # y ataud, z gargola, S busto y F jaula colgante
 SIN_SUFIJO = ("C", "X", "N", "H", "R", "Q", "U", "O", "K", "G", "Y", "A", "W", "I", "Z", "f", "s", "v", "c", "p", "a", "l", "t",
-              "m", "h", "b", "k", "o", "e", "j", "i", "r", "d", "g", "n", "q", "u", "w", "x", "y", "z", "S", "F")
+              "m", "h", "b", "k", "o", "e", "j", "i", "r", "d", "g", "n", "q", "u", "w", "x", "y", "z", "S", "F",
+              "1", "2", "3", "4", "5", "6", "7", "8")
 NOMBRE_FORMA_ES = {"B": "{}", "E": "Escalera de {}", "L": "Losa de {}", "M": "Muro de {}", "V": "Valla de {}",
                    "P": "Cancela de {}", "D": "Puerta de {}", "T": "Trampilla de {}", "J": "Panel de {}"}
 NOMBRE_FORMA_EN = {"B": "{}", "E": "{} Stairs", "L": "{} Slab", "M": "{} Wall", "V": "{} Fence", "P": "{} Fence Gate",
@@ -1252,7 +1417,7 @@ def texturas(m):
         for k in range(2):
             out[f"fuego_{c}_{k}"] = _img(F.llamas(s + 37 * k, RAMPAS["f_" + c]))
             ANIM[f"fuego_{c}_{k}"] = 1
-    elif m["formas"] in ("s", "v", "c", "p", "a", "l", "t", "m", "h", "b", "k", "o", "e", "j", "i", "r") + DECORACION:
+    elif m["formas"] in ("s", "v", "c", "p", "a", "l", "t", "m", "h", "b", "k", "o", "e", "j", "i", "r") + DECORACION + VIVOS:
         out = {}
     elif m["receta"] is None and "N" not in m["formas"]:
         out = {}   # (sus texturas son de las sueltas: las alfombras de la parte 8i)
@@ -2035,6 +2200,8 @@ def escribir_material(m):
         return escribir_mueble(m)
     if m["formas"] in DECORACION:
         return escribir_deco(m)
+    if m["formas"] in VIVOS:
+        return escribir_vivo(m)
     if "W" in m["formas"]:
         return escribir_vidrio(m)
     if m["formas"] == "I":
@@ -2509,7 +2676,8 @@ def main():
         img.save(os.path.join(tdir, nombre + ".png"))
         if nombre in ANIM:
             j(os.path.join(tdir, nombre + ".png.mcmeta"), {"animation": {"frametime": ANIM[nombre]}})
-    for nombre, img in list(sueltas().items()) + list(sueltas_muebles().items()) + list(sueltas_decoracion().items()):
+    for nombre, img in (list(sueltas().items()) + list(sueltas_muebles().items()) + list(sueltas_decoracion().items())
+                        + list(sueltas_vivos().items())):
         guardar(nombre, img)
     particulas_json()
     agua()
@@ -2518,6 +2686,7 @@ def main():
             guardar(nombre, img)
         ids += escribir_material(m)
     botin(ids)
+    botin_rompibles()
     etiquetas()
     textos()
     java()

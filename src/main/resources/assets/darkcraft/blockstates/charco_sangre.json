@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/charco_sangre"
+      },
+      {
+        "model": "darkcraft:block/charco_sangre",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/charco_sangre",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/charco_sangre",
+        "y": 270
+      }
+    ]
+  }
+}

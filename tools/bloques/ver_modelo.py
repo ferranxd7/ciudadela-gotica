@@ -229,7 +229,8 @@ class Escena:
         ti = np.clip((v / 16 * h).astype(int), 0, h - 1)
         tj = np.clip((u / 16 * w).astype(int), 0, w - 1)
         col = tex[ti, tj]
-        ver = dentro & (col[..., 3] > 0.1) & (d > zb[miny:maxy + 1, minx:maxx + 1])
+        # (a igual hondura gana lo que se dibuja despues: los dibujos de encima de un modelo, como en el juego)
+        ver = dentro & (col[..., 3] > 0.1) & (d >= zb[miny:maxy + 1, minx:maxx + 1] - 1e-4)
         zona = img[miny:maxy + 1, minx:maxx + 1]
         zona[ver] = col[ver][:, :3] * luz
         zb[miny:maxy + 1, minx:maxx + 1][ver] = d[ver]

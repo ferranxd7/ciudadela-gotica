@@ -9,6 +9,7 @@ import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.StandingAndWallBlockItem;
+import net.minecraft.world.level.block.AmethystClusterBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CarpetBlock;
 import net.minecraft.world.level.block.ChainBlock;
@@ -57,7 +58,9 @@ import java.util.function.Supplier;
  * los arboles (parte 8e), las ramas de tres gruesos ({@link Rama}), las hojas ({@link Hojas}), los racimos ({@link Racimo}),
  * lo que cuelga ({@link Colgante}), las lianas ({@code VineBlock}) y la hojarasca ({@code CarpetBlock}), y del metal y el
  * vidrio (parte 8f) el vidrio ({@code GlassBlock}; su panel, {@code _panel}, un {@code IronBarsBlock}), las rejas
- * ({@code IronBarsBlock}) y las cadenas ({@code ChainBlock}) van sin sufijo; los troncos son columnas.
+ * ({@code IronBarsBlock}) y las cadenas ({@code ChainBlock}), y de lo vivo (parte 8k) los racimos de cristal
+ * ({@code AmethystClusterBlock}), la piedra sangrante ({@link Sangrante}), el charco ({@code CarpetBlock}) y lo que se rompe
+ * ({@link Rompible}) van sin sufijo; los troncos son columnas.
  * Todos con su objeto y en la pestana del creativo "Dark Craft · Bloques".
  */
 public final class Bloques {
@@ -201,6 +204,25 @@ public final class Bloques {
                     boolean lleno = f.equals("o");
                     reg(ids, m.id(), () -> new Mueble(lleno ? pm : pm.noOcclusion(), Mueble.forma(f), girado));
                 }
+            }
+            return;
+        }
+        if (f.length() == 1 && "12345678".indexOf(f.charAt(0)) >= 0) {
+            // lo vivo y lo que se rompe (parte 8k): 1 raices vivas, 2 pared con ojos (que brillan un poco), 3 carne, 4 racimos de
+            // cristal (como los de amatista: crecen hacia donde se ponen; dan luz), 5 roca con vetas de cristal, 6 piedra
+            // sangrante (gotea), 7 charco de sangre y 8 jarrones, anforas y urnas (se rompen de un golpe o un flechazo)
+            switch (f) {
+                case "2" -> reg(ids, m.id(), () -> new Block(props(m).lightLevel(st -> 4)));
+                case "4" -> reg(ids, m.id(), () -> new AmethystClusterBlock(7, 3, BlockBehaviour.Properties.of().mapColor(m.mapa())
+                        .sound(m.sonido()).forceSolidOn().noOcclusion().strength(m.dureza()).lightLevel(st -> 10)
+                        .requiresCorrectToolForDrops().pushReaction(PushReaction.DESTROY)));
+                case "5" -> reg(ids, m.id(), () -> new Block(props(m).lightLevel(st -> 6)));
+                case "6" -> reg(ids, m.id(), () -> new Sangrante(props(m)));
+                case "7" -> reg(ids, m.id(), () -> new CarpetBlock(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido())
+                        .strength(m.dureza()).noOcclusion().noCollission().pushReaction(PushReaction.DESTROY)));
+                case "8" -> reg(ids, m.id(), () -> new Rompible(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido())
+                        .instabreak().noOcclusion().pushReaction(PushReaction.DESTROY), Rompible.forma(m.id())));
+                default -> reg(ids, m.id(), () -> new Block(props(m)));
             }
             return;
         }

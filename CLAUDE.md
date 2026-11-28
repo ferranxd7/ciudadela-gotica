@@ -4930,6 +4930,36 @@ Morvain ya tenia su color de agua; el mundo de las nubes y la fortaleza pasan de
 - Pruebas: cliente, un estanque de 3 de hondo con borde de sillar y una cascada que cae de una columna (junto a los
   arboles de muestra), capturas `cliente_bq95_agua` y `bq96_agua_dentro`.
 
+### Plan nuevo, parte 8k: los bloques nuevos, novena tanda (lo vivo y lo que se rompe)
+
+Respuestas 26 y 31 del plan. Pinta `tools/bloques/vivos.py`; ya no quedan letras para las formas, asi que estas son cifras
+(`VIVOS` en `bloques.py`, `escribir_vivo`, `sueltas_vivos`, `botin_rompibles`):
+- `1` **raices vivas** (`raices_vivas`, cubo animado: raices como tubos con luz y sombra sobre tierra que se retuercen
+  despacio, 16 fotogramas), `3` **carne viva** (`carne`, celdas que laten, 16 fotogramas) y, con la forma `G` de lo que
+  cuelga, `raices_colgantes`.
+- `2` **pared con ojos** (`pared_ojos`: sillar oscuro y encima, en otro elemento del mismo tamano con `forge_data` a plena
+  luz, los ojos —miran a un lado, al centro, al otro y parpadean, 32 fotogramas—; luz 4), `5` **roca con vetas de cristal**
+  (`roca_cristal`, roca oscura y vetas violetas que brillan; luz 6) y `6` **piedra sangrante** (`piedra_sangrante`: sillar
+  gris con regueros de sangre solo en los lados; la clase `Sangrante` suelta gotas —particula `gota_sangre` de `Fuegos`, en
+  el cliente `ParticulasFuego.Gota`: cuelga, engorda, cae y se deshace en el suelo— por el borde de abajo de sus caras
+  libres y por debajo).
+- `4` **racimos de cristal** `cristal_azul/violeta/rojo/blanco`: `AmethystClusterBlock` del juego (crecen hacia la cara en
+  que se ponen: estado `facing` girado como el de la amatista; luz 10); el modelo son seis planos en cruz a plena luz que
+  ensenan cada uno un trozo del dibujo sin estirarlo (todo el alto; de ancho, `ancho * 16 / alto`), y el dibujo son
+  prismas con tres caras, punta, filo y borde oscuro (el objeto es el dibujo entero).
+- `7` **charco de sangre** (`charco_sangre`: `CarpetBlock` sin choque, `cutout`, mancha irregular con gotas sueltas y un
+  brillo que se mueve, 8 fotogramas).
+- `8` **lo que se rompe**: `jarron`, `jarron_grande` (anfora con asas) y `urna_huesos`, clase `Rompible`: se rompen al
+  instante, de un golpe de arma (`Rompible.golpe(sp)` en `Combate.pedir`, junto a los muros falsos: en aventura no llega
+  el clic de romper bloques) o de cualquier proyectil (`onProjectileHit`), y sueltan su botin propio (`botin_rompibles`):
+  55 nada, 25 de 1 a 4 flechas, 2 cada uno de los ocho frutos y 4 una `piedra_forja_1`; nunca a si mismos.
+- Herramientas: `ver_modelo.py` ahora deja ganar, a igual hondura, lo que se dibuja despues (los dibujos de encima de un
+  modelo, como en el juego).
+- Pruebas: servidor, la linea `Bloques 8b` cuenta los rompibles (40 roturas de cada uno: ninguna los suelta a ellos
+  mismos; `con botin` es al azar); cliente, el muestrario los pone (cristales en el suelo, en un muro y colgando; charcos
+  en el suelo; jarrones en fila y sobre un pedestal) y hay cinco capturas de cerca mas (`raices_vivas`, `pared_ojos`,
+  `cristal_violeta`, `piedra_sangrante`, `jarron_grande`).
+
 ## Compilar, probar y publicar
 
 - La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (sin mods de decoracion desde la 8a) y un cliente con capturas

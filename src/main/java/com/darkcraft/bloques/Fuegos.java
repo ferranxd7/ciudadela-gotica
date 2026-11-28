@@ -28,6 +28,8 @@ public final class Fuegos {
     public static final Map<String, RegistryObject<SimpleParticleType>> LLAMAS = new LinkedHashMap<>();
     public static final Map<String, RegistryObject<SimpleParticleType>> CHISPAS = new LinkedHashMap<>();
     public static final RegistryObject<SimpleParticleType> HUMO = PARTICULAS.register("humo", () -> new SimpleParticleType(false));
+    /** La gota de sangre que cae de la piedra sangrante (parte 8k). */
+    public static final RegistryObject<SimpleParticleType> GOTA_SANGRE = PARTICULAS.register("gota_sangre", () -> new SimpleParticleType(false));
 
     static {
         for (String c : COLORES) {

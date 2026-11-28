@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/carpet",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "wool": "darkcraft:block/charco_sangre",
+    "particle": "darkcraft:block/charco_sangre"
+  }
+}

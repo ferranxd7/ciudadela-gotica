@@ -242,6 +242,20 @@ public final class CatalogoBloques {
             new Material("ataud", "y", SoundType.WOOD, MapColor.COLOR_BLACK, 2.0F, BlockSetType.STONE, WoodType.OAK, false),
             new Material("gargola_piedra", "z", SoundType.STONE, MapColor.COLOR_BLACK, 3.0F, BlockSetType.STONE, WoodType.OAK, true),
             new Material("busto", "S", SoundType.CALCITE, MapColor.QUARTZ, 2.0F, BlockSetType.STONE, WoodType.OAK, true),
-            new Material("jaula", "F", SoundType.CHAIN, MapColor.COLOR_BLACK, 3.0F, BlockSetType.STONE, WoodType.OAK, true)
+            new Material("jaula", "F", SoundType.CHAIN, MapColor.COLOR_BLACK, 3.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("raices_vivas", "1", SoundType.ROOTS, MapColor.COLOR_BROWN, 1.5F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("raices_colgantes", "G", SoundType.HANGING_ROOTS, MapColor.COLOR_BROWN, 0.0F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("pared_ojos", "2", SoundType.DEEPSLATE_BRICKS, MapColor.COLOR_BLACK, 2.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("carne", "3", SoundType.SLIME_BLOCK, MapColor.COLOR_RED, 1.0F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("cristal_azul", "4", SoundType.AMETHYST_CLUSTER, MapColor.COLOR_LIGHT_BLUE, 1.5F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("cristal_violeta", "4", SoundType.AMETHYST_CLUSTER, MapColor.COLOR_PURPLE, 1.5F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("cristal_rojo", "4", SoundType.AMETHYST_CLUSTER, MapColor.COLOR_RED, 1.5F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("cristal_blanco", "4", SoundType.AMETHYST_CLUSTER, MapColor.SNOW, 1.5F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("roca_cristal", "5", SoundType.AMETHYST, MapColor.COLOR_BLACK, 2.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("piedra_sangrante", "6", SoundType.STONE, MapColor.COLOR_RED, 1.5F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("charco_sangre", "7", SoundType.SLIME_BLOCK, MapColor.COLOR_RED, 0.1F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("jarron", "8", SoundType.DECORATED_POT, MapColor.TERRACOTTA_ORANGE, 0.5F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("jarron_grande", "8", SoundType.DECORATED_POT, MapColor.TERRACOTTA_ORANGE, 0.5F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("urna_huesos", "8", SoundType.DECORATED_POT, MapColor.SAND, 0.5F, BlockSetType.STONE, WoodType.OAK, true)
     };
 }

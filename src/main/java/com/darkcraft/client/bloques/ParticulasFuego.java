@@ -15,7 +15,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 /**
  * Las particulas del fuego propio (parte 8g), en el cliente: la llama (sube, se encoge y se apaga, a plena luz), la chispa
- * (sube deprisa y parpadea) y el humo (sube despacio, crece y se deshace). Los dibujos son los de
+ * (sube deprisa y parpadea) y el humo (sube despacio, crece y se deshace); y la gota de sangre (parte 8k). Los dibujos son los de
  * {@code textures/particle} (de {@code tools/bloques/fuego.py}).
  */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -31,6 +31,50 @@ public final class ParticulasFuego {
         for (RegistryObject<SimpleParticleType> r : Fuegos.CHISPAS.values())
             e.registerSpriteSet(r.get(), s -> (t, l, x, y, z, dx, dy, dz) -> new Chispa(l, x, y, z, dx, dy, dz, s));
         e.registerSpriteSet(Fuegos.HUMO.get(), s -> (t, l, x, y, z, dx, dy, dz) -> new Humo(l, x, y, z, dx, dy, dz, s));
+        e.registerSpriteSet(Fuegos.GOTA_SANGRE.get(), s -> (t, l, x, y, z, dx, dy, dz) -> new Gota(l, x, y, z, s));
+    }
+
+    /** La gota de sangre (parte 8k): cuelga un momento y engorda, cae y se deshace al tocar el suelo. */
+    static final class Gota extends TextureSheetParticle {
+        private int colgada;
+
+        Gota(ClientLevel l, double x, double y, double z, SpriteSet s) {
+            super(l, x, y, z);
+            this.xd = 0;
+            this.yd = 0;
+            this.zd = 0;
+            this.lifetime = 90;
+            this.colgada = 12 + random.nextInt(24);
+            this.quadSize = 0.035F;
+            this.gravity = 0.0F;
+            this.hasPhysics = true;
+            pickSprite(s);
+        }
+
+        @Override
+        public void tick() {
+            xo = x;
+            yo = y;
+            zo = z;
+            if (age++ >= lifetime) {
+                remove();
+                return;
+            }
+            if (colgada > 0) {
+                colgada--;
+                quadSize = Math.min(0.065F, quadSize + 0.0012F);
+                return;
+            }
+            yd -= 0.035;
+            move(xd, yd, zd);
+            yd *= 0.98;
+            if (onGround) remove();
+        }
+
+        @Override
+        public ParticleRenderType getRenderType() {
+            return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+        }
     }
 
     /** Lo comun: la velocidad que se le da (el juego la cambia al azar en su constructor). */

@@ -111,6 +111,8 @@ public final class Combate {
         com.darkcraft.morvain.MurosIlusorios.golpe(sp);
         // y las calaveras de la corona de Fray Osmund (parte 7at): se rompen de un golpe
         com.darkcraft.enemigos.CalaveraOsmund.golpe(sp);
+        // y los jarrones, anforas y urnas (parte 8k): se rompen de un golpe y sueltan lo que llevan
+        com.darkcraft.bloques.Rompible.golpe(sp);
         if (accion == Armas.HABILIDAD) {
             habilidad(sp, paso);
             return;

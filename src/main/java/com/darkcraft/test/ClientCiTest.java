@@ -3085,17 +3085,20 @@ public final class ClientCiTest {
         final String[] cercaIds = {"sillar_musgoso", "marmol_negro", "piedra_tallada", "madera_roble", "entramado_cruz",
                 "tejado_escamas", "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos", "tronco_roble", "corteza_pantano",
                 "rama_roble", "hojas_roble", "musgo_colgante", "liana", "oro_labrado", "barrotes", "vidriera_roja", "brasero_almas",
-                "candelabro", "farol", "silla_roble", "estanteria_roble", "libros", "estandarte_valdrenn", "gargola_piedra", "ataud"};
+                "candelabro", "farol", "silla_roble", "estanteria_roble", "libros", "estandarte_valdrenn", "gargola_piedra", "ataud",
+                "raices_vivas", "pared_ojos", "cristal_violeta", "piedra_sangrante", "jarron_grande"};
         final String[] nombres = {"musgo", "marmol_negro", "tallada", "roble_puerta", "entramado_cruz", "tejado_escamas",
                 "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos", "tronco_roble", "corteza_pantano", "rama_roble",
                 "hojas_roble", "musgo_colgante", "liana", "oro_labrado", "barrotes", "vidriera_roja", "brasero_almas", "candelabro",
-                "farol", "silla_roble", "estanteria_roble", "libros", "estandarte_valdrenn", "gargola_piedra", "ataud"};
+                "farol", "silla_roble", "estanteria_roble", "libros", "estandarte_valdrenn", "gargola_piedra", "ataud",
+                "raices_vivas", "pared_ojos", "cristal_violeta", "piedra_sangrante", "jarron_grande"};
         final int[] cerca = new int[cercaIds.length];
         final float[] cabeceo = new float[cercaIds.length];
         for (int i = 0; i < cercaIds.length; i++) {
             for (int k = 0; k < com.darkcraft.bloques.CatalogoBloques.MATERIALES.length; k++)
                 if (com.darkcraft.bloques.CatalogoBloques.MATERIALES[k].id().equals(cercaIds[i])) cerca[i] = k;
-            cabeceo[i] = cercaIds[i].startsWith("hierba") || cercaIds[i].startsWith("flores") || cercaIds[i].startsWith("hongos") ? 32f : 2f;
+            cabeceo[i] = cercaIds[i].startsWith("hierba") || cercaIds[i].startsWith("flores") || cercaIds[i].startsWith("hongos")
+                    || cercaIds[i].startsWith("cristal") || cercaIds[i].startsWith("jarron") ? 32f : 2f;
         }
         for (int i = 0; i < cerca.length; i++) {
             final int k = cerca[i], n = i + 6;
@@ -3224,6 +3227,33 @@ public final class ClientCiTest {
                     lvl.setBlock(new BlockPos(x + 1, y0, z0 - 1), st.setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING,
                             net.minecraft.core.Direction.EAST), 2);
                     n += 3;
+                }
+                continue;
+            }
+            if (f.length() == 1 && "478".indexOf(f.charAt(0)) >= 0) {
+                // lo vivo que no es un bloque entero (parte 8k): los cristales en el suelo, en un muro y colgando de una viga; el
+                // charco de sangre en el suelo; los jarrones, tres en fila y uno sobre un pedestal
+                if (f.equals("4")) {
+                    for (int dx = 0; dx < 4; dx++) {
+                        for (int dy = 0; dy < 3; dy++) lvl.setBlock(new BlockPos(x + dx, y0 + dy, z0 + 2), bq("sillar_gris"), 2);
+                        lvl.setBlock(new BlockPos(x + dx, y0 + 3, z0 + 1), bq("sillar_gris"), 2);
+                    }
+                    net.minecraft.world.level.block.state.properties.DirectionProperty hacia = net.minecraft.world.level.block.AmethystClusterBlock.FACING;
+                    lvl.setBlock(new BlockPos(x, y0, z0), b.defaultBlockState().setValue(hacia, net.minecraft.core.Direction.UP), 2);
+                    lvl.setBlock(new BlockPos(x + 2, y0, z0), b.defaultBlockState().setValue(hacia, net.minecraft.core.Direction.UP), 2);
+                    lvl.setBlock(new BlockPos(x + 1, y0 + 1, z0 + 1), b.defaultBlockState().setValue(hacia, net.minecraft.core.Direction.NORTH), 2);
+                    lvl.setBlock(new BlockPos(x + 3, y0 + 1, z0 + 1), b.defaultBlockState().setValue(hacia, net.minecraft.core.Direction.NORTH), 2);
+                    lvl.setBlock(new BlockPos(x + 2, y0 + 2, z0 + 1), b.defaultBlockState().setValue(hacia, net.minecraft.core.Direction.DOWN), 2);
+                    n += 5;
+                } else if (f.equals("7")) {
+                    int[][] ps = {{0, 0}, {1, 0}, {1, 1}, {2, 1}, {3, 0}, {0, 2}};
+                    for (int[] q : ps) lvl.setBlock(new BlockPos(x + q[0], y0, z0 + q[1]), b.defaultBlockState(), 2);
+                    n += ps.length;
+                } else {
+                    for (int dx = 1; dx < 4; dx++) lvl.setBlock(new BlockPos(x + dx, y0, z0 + 1), b.defaultBlockState(), 2);
+                    lvl.setBlock(new BlockPos(x, y0, z0 + 2), bq("sillar_gris"), 2);
+                    lvl.setBlock(new BlockPos(x, y0 + 1, z0 + 2), b.defaultBlockState(), 2);
+                    n += 5;
                 }
                 continue;
             }
