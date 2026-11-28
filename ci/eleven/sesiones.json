@@ -12051,5 +12051,285 @@
     ]
    }
   }
+ },
+ "sfx_osario": {
+  "flow": "AjCJ26g3xjDGQMxHS2Sh",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7as: el Osario de San Ulfo y los Ensamblados (el aire de la cripta, el traqueteo, la alerta, el dolor, deshacerse, rehacerse, volverse polvo, el barrido del portacirios, el monton que rueda y aplasta, la guirnalda que cae, la campana rota y los susurros de la capilla). Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "osario_ambiente": {
+    "prompt": "Deep underground ossuary crypt ambience: a slow cold draft through narrow stone passages, distant water dripping into a still pool, very faint hollow bone rattles and clicks echoing far away, a barely audible whispering murmur, oppressive silence, reverberant, seamless loop, dark fantasy, no music",
+    "sesiones": [
+     "L5wAeMcJSyepxSn2LL7F",
+     "XqWTwUqWkEfu6OiKX7LZ",
+     "UgirO4fHv77Rzxfu8yL7",
+     "4AyuBprSBJKmwDHgYhOG"
+    ],
+    "generaciones": [
+     "3UzVV5KZvIUdO1LsNe7o",
+     "1uOOGRkp06NlfpE3DeaP",
+     "PBLH69AMMX7PHxTwxylV",
+     "BnZUKqqBdnIUMhreX5cC"
+    ],
+    "duraciones": [
+     30.0,
+     30.0,
+     25.0,
+     30.0
+    ]
+   },
+   "ensamblado_traqueteo": {
+    "prompt": "A walking skeleton made of mismatched bones rattling and clicking softly as it shifts its weight, dry bones knocking together, joints creaking, hollow crypt reverb, short, no voice, no music",
+    "sesiones": [
+     "biY1RXOqj3tkev0WpNy6",
+     "vG5GTr3HN99qgPtvUWmx",
+     "0YhuQy2ooLVCtby5MYF2",
+     "b68E8bGhWR5NC66lil8E"
+    ],
+    "generaciones": [
+     "XoxnPtesn21U1My7OwYy",
+     "HtMyVXffa2UpN5XCdsR0",
+     "StIKzvbLi9UigzP0t66X",
+     "2Y44mGrNSEKMZ2jUVlKn"
+    ],
+    "duraciones": [
+     5.0,
+     5.0,
+     5.0,
+     5.0
+    ]
+   },
+   "ensamblado_alerta": {
+    "prompt": "Several hollow dry voices gasping at once from a single undead skeleton, an eerie layered rasping inhale like many dead people waking together, bones snapping to attention, crypt reverb, horror, short, no music",
+    "sesiones": [
+     "Y7FgommoomQF2B8jkeME",
+     "fffqYaP948Blr8P63pQz",
+     "Y2qFyMjRlFFfggxKNGjp",
+     "Jc0uWuiTtGjQvUP0e0Cg"
+    ],
+    "generaciones": [
+     "eJqWbGLWFiCmlDW6iXpD",
+     "OGW35Jt3KSaQCOdgea7z",
+     "VcmwWy19ZNxhkKD0YOfY",
+     "VVs0q6YQcPYuyzxh8be8"
+    ],
+    "duraciones": [
+     4.0,
+     5.0,
+     5.0,
+     4.0
+    ]
+   },
+   "ensamblado_dolor": {
+    "prompt": "Dry old bones cracking and splintering from a heavy hit, a short hollow rasping groan from an undead skeleton, crypt reverb, short, no music",
+    "sesiones": [
+     "kYuujhho0ako3ZN2Ve28",
+     "P2Zml88z01koCmo7EG5b",
+     "4VBw1c9zqN3mUrlUa4IP",
+     "AJ2WH9fZxVbxtdAgk6Tq"
+    ],
+    "generaciones": [
+     "9NTJTxO90NUDWgZOGSO0",
+     "EkR5VV6Kgii7NxxCKAhI",
+     "5FU9z5xqllYWH9VKgJUr",
+     "yRCkId3iKCZHnq4XslDX"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     4.0
+    ]
+   },
+   "ensamblado_deshace": {
+    "prompt": "A skeleton collapsing into a pile of loose bones clattering onto a stone floor, skulls rolling and knocking, dry rattling slowly settling, crypt reverb, no music",
+    "sesiones": [
+     "8B4NAxEymVGgrnaPHo4t",
+     "q8DFEpnVX42WA0Owc5nY",
+     "DKppIgBDuj0N5rr3zyYk",
+     "2L1hDV2YsXkebXv5syWO"
+    ],
+    "generaciones": [
+     "cc28UtWz7pcoCkSh4WI3",
+     "Bfk3pXlg3qQGpjag0uK3",
+     "4NdKtuOkc71f36jHYrrM",
+     "DVOrFXTMcmPTVlWKSBA7"
+    ],
+    "duraciones": [
+     6.0,
+     5.0,
+     5.0,
+     6.0
+    ]
+   },
+   "ensamblado_rehace": {
+    "prompt": "A pile of loose bones on a stone floor starting to twitch, then sliding and scraping back together, clicking and snapping into place one by one faster and faster, ending in a final hollow crack as a skeleton stands up again, eerie, crypt reverb, no music",
+    "sesiones": [
+     "fqG1hHWWieThUZQZcFAb",
+     "LkCNqQqrTIS1aRaBSs6N",
+     "Q4DL7Q1vLw79d3fUZ0Vj",
+     "Dv7m95Ls1K2MOl0n7MHq"
+    ],
+    "generaciones": [
+     "P1a8t2BZRcDMrLhlzSnM",
+     "FMPIezacy8jrD777sHjS",
+     "T9PhE1AFG1QyMgSONH9H",
+     "X1ywy6W0SsHXWx0A9zxY"
+    ],
+    "duraciones": [
+     10.0,
+     10.0,
+     8.0,
+     12.0
+    ]
+   },
+   "ensamblado_polvo": {
+    "prompt": "Brittle old bones crushed and ground into dust under a heavy hammer blow, crumbling powdery crunch, a faint ghostly sigh of relief fading away, crypt reverb, no music",
+    "sesiones": [
+     "g4cjkqZQ5zJJ9busfB7E",
+     "Sv1MmnSVB5T2JRmPgAiv",
+     "awR16DIuMrYYQXVF85j9",
+     "AuHvfrurIa5tGpLI9oc7"
+    ],
+    "generaciones": [
+     "TsCQip9lqJ3jOrtWokl5",
+     "KbTbHT2LXV06RQa5PLmd",
+     "knyWdghGxYlHkVt6awto",
+     "ev68Gyghb6mFuR0REVtB"
+    ],
+    "duraciones": [
+     4.0,
+     4.0,
+     4.0,
+     5.0
+    ]
+   },
+   "portacirios_barrido": {
+    "prompt": "A heavy candelabrum made of bones with burning candles swung hard through the air, deep whoosh of flames and spattering hot wax, rattling bones, crypt reverb, short, no music",
+    "sesiones": [
+     "hKCk5aiNmGFW0ICEKSJR",
+     "1knllt6ucixIfljg21rG",
+     "b1NyYbp90UMEd6yVIO9w",
+     "sNBoxn5jRkweQVxUSpmA"
+    ],
+    "generaciones": [
+     "hk16q6Ozf8px2OurHRsy",
+     "vy7o47VsI7krt905uK4b",
+     "F6RoGLzhOW6StCkv8any",
+     "qxzWO6sS18NEtgbRO95x"
+    ],
+    "duraciones": [
+     4.0,
+     4.0,
+     4.0,
+     3.0
+    ]
+   },
+   "monton_arrastre": {
+    "prompt": "A massive heap of bones and skulls dragging and rolling heavily across a stone crypt floor, grinding clattering rumble, bones spilling, crypt reverb, no music",
+    "sesiones": [
+     "i6LEhqxWqxh7LeKMuli7",
+     "EloGiKc9ACwyMEcJnOXX",
+     "03Nwe9nJsOTb8lPPbAR9",
+     "0Qw57AOKCmZ5dEGEDDiY"
+    ],
+    "generaciones": [
+     "cckWjXJnxewCXDBS1zjb",
+     "xji53tAp7Sp0kOk4meIW",
+     "moi6wuRbqqKvzp7e7JdI",
+     "ZzgDo0gn3O855U2Y8GwE"
+    ],
+    "duraciones": [
+     8.0,
+     8.0,
+     8.0,
+     12.0
+    ]
+   },
+   "monton_golpe": {
+    "prompt": "A massive mass of fused bones slamming down onto a stone floor, deep crunching impact, bones scattering and skulls bouncing away, dust, crypt reverb, short, no music",
+    "sesiones": [
+     "c4rffx7ZDPYm91W43o6n",
+     "1wrhoHzNqKoXZuBliIWM",
+     "9d94F6qj8RlRX8xYmcGj",
+     "FRNTSjlEp2eZcUebcVn0"
+    ],
+    "generaciones": [
+     "QETeaucecIAYnQxzdlyb",
+     "lEzYmyT1ToWNC13cc1uN",
+     "n3EQlydfb8Af1icCJM0t",
+     "Q1MN1P0PqoI1I80ddfsx"
+    ],
+    "duraciones": [
+     4.0,
+     3.0,
+     4.0,
+     4.0
+    ]
+   },
+   "guirnalda_cae": {
+    "prompt": "A long garland of skulls and bones strung on old chains dropping from a high vaulted ceiling, rattling cascade of bones, chains jangling, ending in a sharp whipping lash, crypt reverb, no music",
+    "sesiones": [
+     "XideJra5eVpGYXWV3TcK",
+     "GdzdzJ7OXikej8d3XXyh",
+     "kqfpTQy10ktajeAyx1Zw",
+     "YmsXT5GvgEi7ynUhkE7V"
+    ],
+    "generaciones": [
+     "TsCKmk0CwL0LPR6PSRPc",
+     "JBQztFfQWJd2SrCPehs8",
+     "3aVhI21HhF91IaRKZk7t",
+     "kZ1pxJxngymTLMbGU83I"
+    ],
+    "duraciones": [
+     7.0,
+     6.0,
+     6.0,
+     6.0
+    ]
+   },
+   "osario_campana": {
+    "prompt": "A single toll of an old cracked chapel bell in a ruined bell tower, dull broken clang with a buzzing rattle, long fading echo over a silent dead forest, eerie, no music",
+    "sesiones": [
+     "ukZHLwLJeYvOj9BU7xDV",
+     "Da1eqKxXh7uP9MeoaUje",
+     "IoaAt1AThY6xBZEsPMSU",
+     "EihdRnYlwKwW0xjvNXqd"
+    ],
+    "generaciones": [
+     "9jf40ydiGTn3bar3dgEX",
+     "27A4I0eTw1If5SnSklzS",
+     "J4MrRyKLlUS1kbqnC0bX",
+     "xJ1by2FOLVbJnZVUpFQp"
+    ],
+    "duraciones": [
+     8.0,
+     8.0,
+     8.0,
+     8.0
+    ]
+   },
+   "osario_susurros": {
+    "prompt": "A chorus of thousands of faint whispering voices rising from the walls of a chapel built of bones, overlapping murmurs counting names and praying, swelling softly and then fading away, ethereal, reverberant, horror, no music",
+    "sesiones": [
+     "C80c501hI4ubvrMqgUCk",
+     "uM1dH20BHnuHrkL6pe3t",
+     "zEytuWmDjhzLC5divg9A",
+     "XANa8phZqygHwyWtMoFT"
+    ],
+    "generaciones": [
+     "YnWMN3bYxD9hLQOfG0o8",
+     "mgXwGAmx1rXBTnY75XFp",
+     "scmdcCz88k5YCLCtSwVN",
+     "3GUzbCDZdgAE4hN8Ezmx"
+    ],
+    "duraciones": [
+     15.0,
+     20.0,
+     20.0,
+     25.0
+    ]
+   }
+  }
  }
 }
