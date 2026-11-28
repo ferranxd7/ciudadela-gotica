@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/corteza_muerto_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/corteza_muerto_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/corteza_muerto"
+      },
+      {
+        "model": "darkcraft:block/corteza_muerto_2"
+      },
+      {
+        "model": "darkcraft:block/corteza_muerto_3"
+      }
+    ]
+  }
+}

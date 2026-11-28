@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/hojas_pino_nevado"
+      },
+      {
+        "model": "darkcraft:block/hojas_pino_nevado_2"
+      },
+      {
+        "model": "darkcraft:block/hojas_pino_nevado_3"
+      }
+    ]
+  }
+}

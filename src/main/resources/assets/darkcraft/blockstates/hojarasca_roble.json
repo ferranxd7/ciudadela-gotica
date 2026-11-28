@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/hojarasca_roble"
+      },
+      {
+        "model": "darkcraft:block/hojarasca_roble",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hojarasca_roble",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hojarasca_roble",
+        "y": 270
+      }
+    ]
+  }
+}

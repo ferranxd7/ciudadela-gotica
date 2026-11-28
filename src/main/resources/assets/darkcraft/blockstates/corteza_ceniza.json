@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/corteza_ceniza"
+      },
+      {
+        "model": "darkcraft:block/corteza_ceniza_2"
+      },
+      {
+        "model": "darkcraft:block/corteza_ceniza_3"
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/hojas_pantano"
+      },
+      {
+        "model": "darkcraft:block/hojas_pantano_2"
+      },
+      {
+        "model": "darkcraft:block/hojas_pantano_3"
+      }
+    ]
+  }
+}

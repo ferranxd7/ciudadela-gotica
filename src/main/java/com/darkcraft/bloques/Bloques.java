@@ -9,6 +9,7 @@ import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CarpetBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
+import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
@@ -40,8 +42,9 @@ import java.util.function.Supplier;
  * todas sus formas: el bloque entero ({@code <id>}, con variantes de textura al azar), la escalera ({@code _escalera}), la
  * losa ({@code _losa}), el muro ({@code _muro}), la valla ({@code _valla}), la cancela ({@code _cancela}), la puerta
  * ({@code _puerta}) y la trampilla ({@code _trampilla}); columnas y vigas son un bloque con eje ({@code RotatedPillarBlock});
- * las plantas ({@link Planta}), las capas de nieve ({@code SnowLayerBlock}) y el hielo ({@code HalfTransparentBlock}) van
- * sin sufijo.
+ * las plantas ({@link Planta}), las capas de nieve ({@code SnowLayerBlock}), el hielo ({@code HalfTransparentBlock}) y, de
+ * los arboles (parte 8e), las ramas ({@link Rama}), las hojas ({@link Hojas}), lo que cuelga ({@link Colgante}), las lianas
+ * ({@code VineBlock}) y la hojarasca ({@code CarpetBlock}) van sin sufijo; los troncos son columnas.
  * Todos con su objeto y en la pestana del creativo "Dark Craft · Bloques".
  */
 public final class Bloques {
@@ -101,6 +104,37 @@ public final class Bloques {
             reg(ids, m.id(), () -> new SnowLayerBlock(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido())
                     .replaceable().forceSolidOff().randomTicks().strength(0.1F)
                     .isViewBlocking((st, l, p) -> st.getValue(SnowLayerBlock.LAYERS) >= 8).pushReaction(PushReaction.DESTROY)));
+            return;
+        }
+        if (f.indexOf('R') >= 0) {
+            // una rama: palo de 8 pixeles que se une por sus seis caras
+            reg(ids, m.id(), () -> new Rama(props(m).forceSolidOff()));
+            return;
+        }
+        if (f.indexOf('O') >= 0) {
+            // hojas: con huecos, no tapan la vista, no se caen
+            reg(ids, m.id(), () -> new Hojas(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido()).strength(m.dureza())
+                    .noOcclusion().isValidSpawn((st, l, p, t) -> false).isSuffocating((st, l, p) -> false)
+                    .isViewBlocking((st, l, p) -> false).isRedstoneConductor((st, l, p) -> false).ignitedByLava()
+                    .pushReaction(PushReaction.DESTROY)));
+            return;
+        }
+        if (f.indexOf('G') >= 0) {
+            // lo que cuelga: cruz sin choque que se sostiene de lo de arriba
+            reg(ids, m.id(), () -> new Colgante(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido()).replaceable()
+                    .noCollission().instabreak().ignitedByLava().pushReaction(PushReaction.DESTROY)));
+            return;
+        }
+        if (f.indexOf('Y') >= 0) {
+            // una liana: como la enredadera (sin ticks al azar: no crece sola)
+            reg(ids, m.id(), () -> new VineBlock(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido()).replaceable()
+                    .noCollission().strength(m.dureza()).ignitedByLava().pushReaction(PushReaction.DESTROY)));
+            return;
+        }
+        if (f.indexOf('A') >= 0) {
+            // hojarasca: una alfombra de un pixel con huecos (no tapa la cara de arriba del suelo)
+            reg(ids, m.id(), () -> new CarpetBlock(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido())
+                    .strength(m.dureza()).noOcclusion().ignitedByLava().pushReaction(PushReaction.DESTROY)));
             return;
         }
         if (f.indexOf('H') >= 0) {

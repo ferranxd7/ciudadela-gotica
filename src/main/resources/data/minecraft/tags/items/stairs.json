@@ -37,6 +37,12 @@
     "darkcraft:roca_arenisca_escalera",
     "darkcraft:roca_toba_escalera",
     "darkcraft:roca_musgosa_escalera",
-    "darkcraft:pedregal_escalera"
+    "darkcraft:pedregal_escalera",
+    "darkcraft:corteza_roble_escalera",
+    "darkcraft:corteza_ceniza_escalera",
+    "darkcraft:corteza_muerto_escalera",
+    "darkcraft:corteza_pantano_escalera",
+    "darkcraft:corteza_sangre_escalera",
+    "darkcraft:corteza_pino_escalera"
   ]
 }

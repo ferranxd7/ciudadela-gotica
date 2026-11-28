@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/corteza_ceniza_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/corteza_ceniza_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/corteza_ceniza"
+      },
+      {
+        "model": "darkcraft:block/corteza_ceniza_2"
+      },
+      {
+        "model": "darkcraft:block/corteza_ceniza_3"
+      }
+    ]
+  }
+}

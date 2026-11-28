@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/hojarasca_ceniza"
+      },
+      {
+        "model": "darkcraft:block/hojarasca_ceniza",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/hojarasca_ceniza",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/hojarasca_ceniza",
+        "y": 270
+      }
+    ]
+  }
+}

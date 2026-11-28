@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/corteza_pantano_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/corteza_pantano_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/corteza_pantano"
+      },
+      {
+        "model": "darkcraft:block/corteza_pantano_2"
+      },
+      {
+        "model": "darkcraft:block/corteza_pantano_3"
+      }
+    ]
+  }
+}

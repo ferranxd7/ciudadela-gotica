@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "darkcraft:block/tronco_ceniza_tapa",
+    "side": "darkcraft:block/corteza_ceniza_2"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/hojas_ceniza"
+      },
+      {
+        "model": "darkcraft:block/hojas_ceniza_2"
+      },
+      {
+        "model": "darkcraft:block/hojas_ceniza_3"
+      }
+    ]
+  }
+}

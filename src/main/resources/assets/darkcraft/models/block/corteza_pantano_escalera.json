@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "darkcraft:block/corteza_pantano",
+    "top": "darkcraft:block/corteza_pantano",
+    "side": "darkcraft:block/corteza_pantano"
+  }
+}

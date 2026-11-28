@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "punta=false": {
+      "model": "darkcraft:block/barba_gris"
+    },
+    "punta=true": {
+      "model": "darkcraft:block/barba_gris_punta"
+    }
+  }
+}

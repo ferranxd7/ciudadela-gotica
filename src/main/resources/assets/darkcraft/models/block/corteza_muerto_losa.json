@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "darkcraft:block/corteza_muerto",
+    "top": "darkcraft:block/corteza_muerto",
+    "side": "darkcraft:block/corteza_muerto"
+  }
+}

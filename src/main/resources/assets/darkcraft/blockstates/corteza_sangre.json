@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/corteza_sangre"
+      },
+      {
+        "model": "darkcraft:block/corteza_sangre_2"
+      },
+      {
+        "model": "darkcraft:block/corteza_sangre_3"
+      }
+    ]
+  }
+}

@@ -8,6 +8,12 @@
     "darkcraft:madera_podrida_losa",
     "darkcraft:madera_quemada_losa",
     "darkcraft:madera_caoba_losa",
-    "darkcraft:tejado_tejamanil_losa"
+    "darkcraft:tejado_tejamanil_losa",
+    "darkcraft:corteza_roble_losa",
+    "darkcraft:corteza_ceniza_losa",
+    "darkcraft:corteza_muerto_losa",
+    "darkcraft:corteza_pantano_losa",
+    "darkcraft:corteza_sangre_losa",
+    "darkcraft:corteza_pino_losa"
   ]
 }

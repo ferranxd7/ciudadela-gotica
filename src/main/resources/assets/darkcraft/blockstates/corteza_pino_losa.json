@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/corteza_pino_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/corteza_pino_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/corteza_pino"
+      },
+      {
+        "model": "darkcraft:block/corteza_pino_2"
+      },
+      {
+        "model": "darkcraft:block/corteza_pino_3"
+      }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "darkcraft:block/hojas_pino"
+  },
+  "render_type": "minecraft:cutout_mipped"
+}

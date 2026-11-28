@@ -1,0 +1,43 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "corteza": "darkcraft:block/corteza_muerto",
+    "corteza_h": "darkcraft:block/rama_muerto_h",
+    "testa": "darkcraft:block/tronco_muerto_tapa",
+    "particle": "darkcraft:block/corteza_muerto"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        4,
+        4
+      ],
+      "to": [
+        12,
+        12,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#corteza"
+        },
+        "south": {
+          "texture": "#corteza"
+        },
+        "east": {
+          "texture": "#corteza"
+        },
+        "west": {
+          "texture": "#corteza"
+        },
+        "up": {
+          "texture": "#corteza"
+        },
+        "down": {
+          "texture": "#corteza"
+        }
+      }
+    }
+  ]
+}

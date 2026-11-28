@@ -1,0 +1,82 @@
+{
+  "variants": {
+    "axis=y": [
+      {
+        "model": "darkcraft:block/tronco_muerto"
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto_2"
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto_2",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto_2",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto_2",
+        "y": 270
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto_3"
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto_3",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto_3",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto_3",
+        "y": 270
+      }
+    ],
+    "axis=z": [
+      {
+        "model": "darkcraft:block/tronco_muerto_tumbado",
+        "x": 90
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto_2_tumbado",
+        "x": 90
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto_3_tumbado",
+        "x": 90
+      }
+    ],
+    "axis=x": [
+      {
+        "model": "darkcraft:block/tronco_muerto_tumbado",
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto_2_tumbado",
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/tronco_muerto_3_tumbado",
+        "x": 90,
+        "y": 90
+      }
+    ]
+  }
+}

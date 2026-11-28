@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/carpet",
+  "textures": {
+    "wool": "darkcraft:block/pinocha"
+  },
+  "render_type": "minecraft:cutout"
+}

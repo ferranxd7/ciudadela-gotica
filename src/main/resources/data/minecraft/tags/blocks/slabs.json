@@ -53,6 +53,12 @@
     "darkcraft:roca_arenisca_losa",
     "darkcraft:roca_toba_losa",
     "darkcraft:roca_musgosa_losa",
-    "darkcraft:pedregal_losa"
+    "darkcraft:pedregal_losa",
+    "darkcraft:corteza_roble_losa",
+    "darkcraft:corteza_ceniza_losa",
+    "darkcraft:corteza_muerto_losa",
+    "darkcraft:corteza_pantano_losa",
+    "darkcraft:corteza_sangre_losa",
+    "darkcraft:corteza_pino_losa"
   ]
 }

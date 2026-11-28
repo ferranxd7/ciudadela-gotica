@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "punta=false": {
+      "model": "darkcraft:block/musgo_colgante"
+    },
+    "punta=true": {
+      "model": "darkcraft:block/musgo_colgante_punta"
+    }
+  }
+}

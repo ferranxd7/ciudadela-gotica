@@ -4739,6 +4739,49 @@ Respuestas 45-48 del plan nuevo (cero bloques de Minecraft, todas las formas, te
   `cliente_bq01..20` (de cuatro en cuatro) y `bq21..30` de cerca (las de antes y la hierba, la roca, las flores y los hongos,
   mirando hacia abajo).
 
+### Plan nuevo, parte 8e: los bloques nuevos, cuarta tanda (los arboles)
+
+Las piezas de los arboles de tres tamanos (8-15, 20-40 y 60-100 bloques, "hechos de piezas"): los pequenos con troncos y
+ramas; los grandes con troncos gordos de corteza redondeados con escaleras, losas y muros, raices de escaleras y ramas
+gruesas de troncos tumbados. Los arboles en si (sus generadores) van con el clima y los efectos, despues de los bloques.
+- **El pintor de los arboles** (`tools/bloques/arboles.py`). **Variantes que casan por todos los lados aunque lo de
+  dentro cambie**: cada textura se pinta dos veces, con lo comun (semilla `borde`) y con lo suyo, y se mezclan con
+  `_peso` (0 en los 2 pixeles de fuera, 1 desde 7 hacia dentro); lo que cae cerca de un borde se pinta en las dos y lo de
+  la variante solo dentro. Asi `corteza()`: `surcos` (`_Red`: surcos que bajan de arriba abajo con su vaiven comun; los de
+  dentro serpentean ademas a su manera en cada variante —un vaiven que vale 0 arriba y abajo— y llevan puentes en
+  diagonal, la red de rombos del roble; `_cuerpo`: fondo del surco oscuro, laderas con luz y meseta con vetas), `musgosa`,
+  `placas` (pino: celdas de Voronoi estiradas, las semillas de la banda de los bordes comunes), `seca` (madera muerta
+  gris con grano y rajas) y `lisa` (fresno palido: lenticelas comunes en los bordes); `hojas()` (el ruido de los huecos
+  comun en los bordes; las hojas cuyo centro cae cerca de un borde salen de la semilla comun y las de la variante nunca
+  tocan los 2 pixeles de fuera; tres capas de hojas sobre la sombra de dentro, cada racimo con la luz de su ladera;
+  `agujas`: ramitas de pino en espina de pez; `nieve`: nieve en las agujas de encima de cada ramita); `testa()` (anillos,
+  medula, una grieta y el aro de corteza), `hojarasca()`, `colgante()` (el de en medio se repite de arriba abajo; la
+  `punta`, acaba) y `liana()`. La prueba de que casan: los 2 pixeles de cada borde son iguales en todas las variantes.
+- **Formas nuevas** (sin sufijo en el id, `SIN_SUFIJO`): R rama (`bloques/Rama`, un `PipeBlock` de 8 pixeles como la planta
+  de coro: el nudo del centro y un brazo por cada cara unida —el brazo se escribe mirando al norte y se gira, x 270 arriba
+  y x 90 abajo—; los lados del brazo llevan la corteza tumbada `rama_<sp>_h` para que la veta vaya a lo largo y la punta
+  la testa; se une a ramas, `minecraft:logs`, `minecraft:leaves` y caras firmes; `unida(nivel, pos)` da el estado ya
+  unido), O hojas (`bloques/Hojas`, un `LeavesBlock` que no se cae nunca: sin ticks ni cuenta de la distancia; `cube_all`
+  con `cutout_mipped` y tres variantes), G lo que cuelga (`bloques/Colgante`: cruz sin choque que se sostiene de lo de
+  arriba —cara firme, hojas, troncos u otro igual— y se cae si se lo quitan; `punta` = el de abajo del todo, con su
+  textura `_punta`), Y liana (`VineBlock` sin ticks al azar —no crece sola—, el modelo de la enredadera sin tinte) y A
+  alfombra (hojarasca: `CarpetBlock` con `noOcclusion` —si no, tapaba la cara de arriba del suelo y por los huecos se veia
+  el vacio—, cuatro giros). **Los troncos** son columnas (`C`) con `lado_de`: por los lados las variantes de su corteza
+  (un modelo por variante, girados al azar de pie) y la testa `tronco_<sp>_tapa` arriba y abajo.
+- **Cuarta tanda** (33 materiales, 51 bloques; ya son 113 materiales y 272 bloques): seis especies —roble, fresno palido
+  (`ceniza`), madera muerta (`muerto`, sin hojas), cipres musgoso (`pantano`, con musgo en la corteza), sanguino (`sangre`)
+  y pino negro (`pino`)— con su corteza (bloque, escalera, losa y muro), su tronco y su rama; hojas de roble, de roble
+  otonal, de fresno, de cipres, de sanguino, agujas de pino y agujas nevadas; musgo colgante y barba de viejo; liana y liana
+  seca; hojarasca de roble, de fresno, de sanguino y pinocha.
+- **Etiquetas**: `minecraft:logs` (troncos, cortezas enteras y ramas), `leaves`, `climbable` (lianas; solo de bloques) y
+  `mineable/axe` / `hoe`.
+- Pruebas: servidor, la linea `Bloques 8b: ...` de siempre; cliente, en el muestrario las ramas (de pie, un codo y brazos),
+  un monton de hojas, lo que cuelga de una viga, la liana por un muro y la hojarasca sobre tierra, y despues **seis
+  arboles de muestra** hechos a mano sobre un prado (`arbolesMuestra`: roble con liana y hojarasca, fresno, pino nevado
+  arriba con pinocha, cipres de tronco 2 x 2 con raices de escaleras, ramas, copa ancha y musgo y barba que cuelgan,
+  sanguino y uno muerto); capturas `cliente_bq01..29` (grupos), `bq30..45` de cerca (tambien el tronco, la corteza del
+  cipres, la rama, las hojas, el musgo y la liana) y `bq46..49` los arboles (tres vistas y una desde abajo del cipres).
+
 ## Compilar, probar y publicar
 
 - La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (sin mods de decoracion desde la 8a) y un cliente con capturas

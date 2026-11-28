@@ -3039,7 +3039,7 @@ public final class ClientCiTest {
 
     // ------------------------------------------------------------------ los bloques nuevos (parte 8b)
 
-    private static int mx, my, mz;
+    private static int mx, my, mz, arbolesX;
 
     /**
      * El muestrario de los bloques nuevos (parte 8b), sobre el mar de nubes junto al escaparate, a mediodia: un modulo por
@@ -3083,9 +3083,11 @@ public final class ClientCiTest {
             t += 34;
         }
         final String[] cercaIds = {"sillar_musgoso", "marmol_negro", "piedra_tallada", "madera_roble", "entramado_cruz",
-                "tejado_escamas", "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos"};
+                "tejado_escamas", "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos", "tronco_roble", "corteza_pantano",
+                "rama_roble", "hojas_roble", "musgo_colgante", "liana"};
         final String[] nombres = {"musgo", "marmol_negro", "tallada", "roble_puerta", "entramado_cruz", "tejado_escamas",
-                "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos"};
+                "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos", "tronco_roble", "corteza_pantano", "rama_roble",
+                "hojas_roble", "musgo_colgante", "liana"};
         final int[] cerca = new int[cercaIds.length];
         final float[] cabeceo = new float[cercaIds.length];
         for (int i = 0; i < cercaIds.length; i++) {
@@ -3101,6 +3103,19 @@ public final class ClientCiTest {
                     my + (pitch > 10 ? 1.6 : 1.15), mz - (pitch > 10 ? 2.2 : 0.6), 0f, pitch)));
             atTicks(t + 24, "captura: de cerca, " + nom, m -> shot(m, String.format(java.util.Locale.ROOT, "cliente_bq%02d_%s", n + grupos - 5, nom)));
             t += 28;
+        }
+        // los arboles de muestra (parte 8e): tres capturas desde el sur y una desde abajo
+        final double[][] vistasArboles = {{12.5, 7.0, -17.0, 0f, 14f}, {44.5, 7.0, -18.0, 0f, 14f}, {62.5, 6.0, -12.0, 0f, 12f},
+                {41.5, 1.6, -2.5, 45f, -40f}};
+        final String[] nombresArboles = {"arboles_1", "arboles_2", "arboles_3", "arboles_desde_abajo"};
+        for (int i = 0; i < vistasArboles.length; i++) {
+            final double[] v = vistasArboles[i];
+            final int n = grupos + cercaIds.length + 1 + i;
+            final String nom = nombresArboles[i];
+            atTicks(t, "Bloques 8e: " + nom, m -> server(m, sp -> sp.teleportTo(sp.serverLevel(), arbolesX + v[0], my + v[1],
+                    mz + v[2], (float) v[3], (float) v[4])));
+            atTicks(t + 30, "captura: " + nom, m -> shot(m, String.format(java.util.Locale.ROOT, "cliente_bq%02d_%s", n, nom)));
+            t += 34;
         }
         atTicks(t, "Fin del muestrario", m -> {
             m.options.hideGui = false;
@@ -3133,6 +3148,65 @@ public final class ClientCiTest {
                 for (int dx = 0; dx < 4; dx++)
                     for (int dz = 0; dz < 3; dz++) {
                         lvl.setBlock(new BlockPos(x + dx, y0 - 1, z0 + dz), hierba, 2);
+                        lvl.setBlock(new BlockPos(x + dx, y0, z0 + dz), b.defaultBlockState(), 2);
+                        n++;
+                    }
+                continue;
+            }
+            if (f.indexOf('R') >= 0) {
+                // una rama: de pie (se une al suelo), un codo, dos brazos y un trozo de lado
+                BlockPos[] ps = {new BlockPos(x + 1, y0, z0 + 1), new BlockPos(x + 1, y0 + 1, z0 + 1), new BlockPos(x + 1, y0 + 2, z0 + 1),
+                        new BlockPos(x + 2, y0 + 2, z0 + 1), new BlockPos(x + 3, y0 + 2, z0 + 1), new BlockPos(x + 3, y0 + 3, z0 + 1),
+                        new BlockPos(x + 1, y0 + 2, z0), new BlockPos(x, y0 + 1, z0 + 1), new BlockPos(x + 3, y0, z0 - 1)};
+                for (BlockPos p : ps) lvl.setBlock(p, b.defaultBlockState(), 2);
+                for (BlockPos p : ps) lvl.setBlock(p, ((com.darkcraft.bloques.Rama) b).unida(lvl, p), 2);
+                n += ps.length;
+                continue;
+            }
+            if (f.indexOf('O') >= 0) {
+                // hojas: un monton de 4 x 3 x 2
+                for (int dx = 0; dx < 4; dx++)
+                    for (int dy = 0; dy < 3; dy++)
+                        for (int dz = 1; dz < 3; dz++) {
+                            if (dy == 2 && (dx == 0 || dx == 3)) continue;
+                            lvl.setBlock(new BlockPos(x + dx, y0 + dy, z0 + dz), b.defaultBlockState()
+                                    .setValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true), 2);
+                            n++;
+                        }
+                continue;
+            }
+            if (f.indexOf('G') >= 0) {
+                // lo que cuelga: de una viga de enlosado, de uno a tres de largo
+                int[] largos = {1, 3, 2, 3};
+                for (int dx = 0; dx < 4; dx++) {
+                    lvl.setBlock(new BlockPos(x + dx, y0 + 3, z0 + 1), suelo, 2);
+                    for (int k = 0; k < largos[dx]; k++) {
+                        lvl.setBlock(new BlockPos(x + dx, y0 + 2 - k, z0 + 1), b.defaultBlockState()
+                                .setValue(com.darkcraft.bloques.Colgante.PUNTA, k == largos[dx] - 1), 2);
+                        n++;
+                    }
+                }
+                continue;
+            }
+            if (f.indexOf('Y') >= 0) {
+                // una liana: por la cara de delante de un muro de sillar (con huecos)
+                net.minecraft.world.level.block.state.BlockState muro = com.darkcraft.bloques.Bloques.de("sillar_gris").defaultBlockState();
+                for (int dx = 0; dx < 4; dx++)
+                    for (int dy = 0; dy < 4; dy++) {
+                        lvl.setBlock(new BlockPos(x + dx, y0 + dy, z0 + 2), muro, 2);
+                        if ((dx == 0 && dy == 3) || (dx == 3 && dy >= 2)) continue;
+                        lvl.setBlock(new BlockPos(x + dx, y0 + dy, z0 + 1), b.defaultBlockState()
+                                .setValue(net.minecraft.world.level.block.VineBlock.SOUTH, true), 2);
+                        n++;
+                    }
+                continue;
+            }
+            if (f.indexOf('A') >= 0) {
+                // hojarasca: sobre tierra, 4 x 3
+                net.minecraft.world.level.block.state.BlockState tierra = com.darkcraft.bloques.Bloques.de("tierra").defaultBlockState();
+                for (int dx = 0; dx < 4; dx++)
+                    for (int dz = 0; dz < 3; dz++) {
+                        lvl.setBlock(new BlockPos(x + dx, y0 - 1, z0 + dz), tierra, 2);
                         lvl.setBlock(new BlockPos(x + dx, y0, z0 + dz), b.defaultBlockState(), 2);
                         n++;
                     }
@@ -3235,6 +3309,169 @@ public final class ClientCiTest {
         // los muros y las vallas se unen a lo que tienen al lado (como al ponerlos a mano)
         for (BlockPos p : unir)
             lvl.setBlock(p, net.minecraft.world.level.block.Block.updateFromNeighbourShapes(lvl.getBlockState(p), lvl, p), 2);
+        arbolesX = x0 + mats.length * 7 + 8;
+        n += arbolesMuestra(lvl, arbolesX, y0, z0);
+        return n;
+    }
+
+    private static net.minecraft.world.level.block.state.BlockState bq(String id) {
+        return com.darkcraft.bloques.Bloques.de(id).defaultBlockState();
+    }
+
+    /** Seis arboles pequenos hechos a mano con las piezas de la parte 8e, sobre un prado: roble (con liana y hojarasca),
+     *  fresno palido, pino negro (nevado arriba, con pinocha), cipres musgoso (tronco de 2 x 2 de corteza, raices de
+     *  escaleras, ramas, musgo y barba que cuelgan), sanguino y uno muerto. */
+    private static int arbolesMuestra(ServerLevel lvl, int x0, int y0, int z0) {
+        int n = 0;
+        net.minecraft.world.level.block.state.BlockState hierba = bq("hierba_verde");
+        for (int dx = -6; dx <= 78; dx++)
+            for (int dz = -8; dz <= 10; dz++) {
+                lvl.setBlock(new BlockPos(x0 + dx, y0 - 1, z0 + dz), hierba, 2);
+                for (int dy = 0; dy < 16; dy++) lvl.setBlock(new BlockPos(x0 + dx, y0 + dy, z0 + dz), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+            }
+        java.util.List<BlockPos> ramas = new java.util.ArrayList<>();
+        // 1) roble
+        n += redondo(lvl, x0, y0, z0 + 2, "roble", 6, 3, ramas);
+        for (int dy = 0; dy < 3; dy++)
+            lvl.setBlock(new BlockPos(x0, y0 + dy, z0 + 1), bq("liana").setValue(net.minecraft.world.level.block.VineBlock.SOUTH, true), 2);
+        n += alfombra(lvl, x0, y0, z0 + 2, "hojarasca_roble", 4);
+        // 2) fresno palido
+        n += redondo(lvl, x0 + 12, y0, z0 + 2, "ceniza", 7, 3, ramas);
+        n += alfombra(lvl, x0 + 12, y0, z0 + 2, "hojarasca_ceniza", 3);
+        // 3) pino negro
+        int xp = x0 + 24, zp = z0 + 2;
+        for (int dy = 0; dy < 10; dy++) lvl.setBlock(new BlockPos(xp, y0 + dy, zp), bq("tronco_pino"), 2);
+        int[] radios = {0, 0, 0, 3, 3, 2, 3, 2, 2, 1, 1, 0};
+        for (int dy = 3; dy < radios.length; dy++) {
+            int r = radios[dy];
+            for (int dx = -r; dx <= r; dx++)
+                for (int dz = -r; dz <= r; dz++) {
+                    if (dx * dx + dz * dz > r * r + r) continue;
+                    BlockPos p = new BlockPos(xp + dx, y0 + dy, zp + dz);
+                    if (!lvl.getBlockState(p).isAir()) continue;
+                    lvl.setBlock(p, bq("hojas_pino"), 2);
+                    n++;
+                }
+        }
+        lvl.setBlock(new BlockPos(xp, y0 + radios.length, zp), bq("hojas_pino"), 2);
+        // la nieve en lo de arriba de cada columna de agujas
+        for (int dx = -3; dx <= 3; dx++)
+            for (int dz = -3; dz <= 3; dz++)
+                for (int dy = radios.length + 1; dy >= 3; dy--) {
+                    BlockPos p = new BlockPos(xp + dx, y0 + dy, zp + dz);
+                    if (lvl.getBlockState(p).is(com.darkcraft.bloques.Bloques.de("hojas_pino"))) {
+                        lvl.setBlock(p, bq("hojas_pino_nevado"), 2);
+                        break;
+                    }
+                }
+        n += alfombra(lvl, xp, y0, zp, "pinocha", 4);
+        // 4) cipres musgoso: tronco de 2 x 2, raices, ramas, copa ancha y lo que cuelga
+        int xc = x0 + 37, zc = z0 + 1;
+        for (int dy = 0; dy < 8; dy++)
+            for (int a = 0; a < 2; a++)
+                for (int b = 0; b < 2; b++) lvl.setBlock(new BlockPos(xc + a, y0 + dy, zc + b), bq("corteza_pantano"), 2);
+        net.minecraft.world.level.block.state.BlockState raiz = bq("corteza_pantano_escalera");
+        for (int a = 0; a < 2; a++) {
+            lvl.setBlock(new BlockPos(xc + a, y0, zc - 1), raiz.setValue(net.minecraft.world.level.block.StairBlock.FACING, net.minecraft.core.Direction.SOUTH), 2);
+            lvl.setBlock(new BlockPos(xc + a, y0, zc + 2), raiz.setValue(net.minecraft.world.level.block.StairBlock.FACING, net.minecraft.core.Direction.NORTH), 2);
+            lvl.setBlock(new BlockPos(xc - 1, y0, zc + a), raiz.setValue(net.minecraft.world.level.block.StairBlock.FACING, net.minecraft.core.Direction.EAST), 2);
+            lvl.setBlock(new BlockPos(xc + 2, y0, zc + a), raiz.setValue(net.minecraft.world.level.block.StairBlock.FACING, net.minecraft.core.Direction.WEST), 2);
+        }
+        lvl.setBlock(new BlockPos(xc - 2, y0, zc), bq("corteza_pantano_losa"), 2);
+        lvl.setBlock(new BlockPos(xc + 3, y0, zc + 1), bq("corteza_pantano_losa"), 2);
+        for (int k = 1; k <= 3; k++) {
+            lvl.setBlock(new BlockPos(xc - k, y0 + 6, zc), bq("tronco_pantano").setValue(net.minecraft.world.level.block.RotatedPillarBlock.AXIS, net.minecraft.core.Direction.Axis.X), 2);
+            BlockPos r = new BlockPos(xc + 1 + k, y0 + 5 + (k > 1 ? 1 : 0), zc + 1);
+            lvl.setBlock(r, bq("rama_pantano"), 2);
+            ramas.add(r);
+        }
+        for (int dx = -5; dx <= 6; dx++)
+            for (int dz = -4; dz <= 5; dz++)
+                for (int dy = 7; dy <= 10; dy++) {
+                    double ex = (dx - 0.5) / 5.5, ez = (dz - 0.5) / 4.6, ey = (dy - 8.6) / 1.9;
+                    if (ex * ex + ez * ez + ey * ey > 1.0) continue;
+                    BlockPos p = new BlockPos(xc + dx, y0 + dy, zc + dz);
+                    if (!lvl.getBlockState(p).isAir()) continue;
+                    lvl.setBlock(p, bq("hojas_pantano"), 2);
+                    n++;
+                }
+        int[][] cuelgan = {{-4, 0, 3}, {-2, -3, 4}, {3, -2, 2}, {5, 2, 3}, {0, 4, 4}, {-3, 3, 2}, {4, -1, 3}, {2, 4, 2}};
+        for (int i = 0; i < cuelgan.length; i++) {
+            int cx = xc + cuelgan[i][0], cz = zc + cuelgan[i][1];
+            int arriba = y0 + 10;
+            while (arriba > y0 + 6 && lvl.getBlockState(new BlockPos(cx, arriba, cz)).isAir()) arriba--;
+            for (int k = 1; k <= cuelgan[i][2]; k++) {
+                BlockPos p = new BlockPos(cx, arriba - k, cz);
+                if (!lvl.getBlockState(p).isAir()) break;
+                lvl.setBlock(p, bq(i % 3 == 2 ? "barba_gris" : "musgo_colgante").setValue(com.darkcraft.bloques.Colgante.PUNTA, k == cuelgan[i][2]), 2);
+                n++;
+            }
+        }
+        for (int dy = 1; dy < 5; dy++)
+            lvl.setBlock(new BlockPos(xc, y0 + dy, zc - 1), bq("liana").setValue(net.minecraft.world.level.block.VineBlock.SOUTH, true), 2);
+        // 5) sanguino
+        n += redondo(lvl, x0 + 52, y0, z0 + 2, "sangre", 5, 3, ramas);
+        n += alfombra(lvl, x0 + 52, y0, z0 + 2, "hojarasca_sangre", 3);
+        // 6) muerto: tronco y ramas en zigzag, sin hojas
+        int xm = x0 + 64, zm = z0 + 2;
+        for (int dy = 0; dy < 7; dy++) lvl.setBlock(new BlockPos(xm, y0 + dy, zm), bq("tronco_muerto"), 2);
+        int[][] rm = {{1, 3, 0}, {2, 3, 0}, {2, 4, 0}, {3, 5, 0}, {-1, 5, 0}, {-2, 5, 0}, {-2, 6, 0}, {-3, 7, 0}, {0, 7, 0}, {0, 8, 0},
+                {1, 8, 0}, {0, 4, -1}, {0, 4, -2}, {0, 5, -2}, {0, 6, 1}, {0, 6, 2}, {0, 7, 2}};
+        for (int[] r : rm) {
+            BlockPos p = new BlockPos(xm + r[0], y0 + r[1], zm + r[2]);
+            lvl.setBlock(p, bq("rama_muerto"), 2);
+            ramas.add(p);
+        }
+        for (BlockPos p : ramas) {
+            com.darkcraft.bloques.Rama rama = (com.darkcraft.bloques.Rama) lvl.getBlockState(p).getBlock();
+            lvl.setBlock(p, rama.unida(lvl, p), 2);
+            n++;
+        }
+        return n;
+    }
+
+    /** Un arbol de copa redonda de una especie (tronco, cuatro ramas en cruz y la copa con huecos al azar fijo). */
+    private static int redondo(ServerLevel lvl, int x, int y0, int z, String sp, int alto, int r, java.util.List<BlockPos> ramas) {
+        int n = 0;
+        for (int dy = 0; dy < alto; dy++) lvl.setBlock(new BlockPos(x, y0 + dy, z), bq("tronco_" + sp), 2);
+        net.minecraft.core.Direction[] lados = {net.minecraft.core.Direction.NORTH, net.minecraft.core.Direction.EAST,
+                net.minecraft.core.Direction.SOUTH, net.minecraft.core.Direction.WEST};
+        for (int i = 0; i < 4; i++) {
+            BlockPos a = new BlockPos(x, y0 + alto - 2 + (i % 2), z).relative(lados[i]);
+            BlockPos b = a.relative(lados[i]).above();
+            lvl.setBlock(a, bq("rama_" + sp), 2);
+            lvl.setBlock(a.above(), bq("rama_" + sp), 2);
+            lvl.setBlock(b, bq("rama_" + sp), 2);
+            ramas.add(a);
+            ramas.add(a.above());
+            ramas.add(b);
+        }
+        int cy = y0 + alto + 1;
+        for (int dx = -r - 1; dx <= r + 1; dx++)
+            for (int dz = -r - 1; dz <= r + 1; dz++)
+                for (int dy = -r; dy <= r; dy++) {
+                    double d = (dx * dx + dz * dz) / (double) ((r + 0.7) * (r + 0.7)) + dy * dy / (double) (r * r);
+                    if (d > 1.0) continue;
+                    if (d > 0.7 && Math.floorMod(dx * 31 + dz * 17 + dy * 13, 7) == 0) continue;
+                    BlockPos p = new BlockPos(x + dx, cy + dy, z + dz);
+                    if (!lvl.getBlockState(p).isAir()) continue;
+                    lvl.setBlock(p, bq("hojas_" + sp), 2);
+                    n++;
+                }
+        return n;
+    }
+
+    /** Hojarasca alrededor de un tronco (no en todos los sitios). */
+    private static int alfombra(ServerLevel lvl, int x, int y0, int z, String id, int r) {
+        int n = 0;
+        for (int dx = -r; dx <= r; dx++)
+            for (int dz = -r; dz <= r; dz++) {
+                if (dx * dx + dz * dz > r * r || Math.floorMod(dx * 7 + dz * 11, 5) == 0) continue;
+                BlockPos p = new BlockPos(x + dx, y0, z + dz);
+                if (!lvl.getBlockState(p).isAir()) continue;
+                lvl.setBlock(p, bq(id), 2);
+                n++;
+            }
         return n;
     }
 

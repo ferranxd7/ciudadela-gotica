@@ -1,0 +1,23 @@
+{
+  "replace": false,
+  "values": [
+    "darkcraft:corteza_roble",
+    "darkcraft:tronco_roble",
+    "darkcraft:rama_roble",
+    "darkcraft:corteza_ceniza",
+    "darkcraft:tronco_ceniza",
+    "darkcraft:rama_ceniza",
+    "darkcraft:corteza_muerto",
+    "darkcraft:tronco_muerto",
+    "darkcraft:rama_muerto",
+    "darkcraft:corteza_pantano",
+    "darkcraft:tronco_pantano",
+    "darkcraft:rama_pantano",
+    "darkcraft:corteza_sangre",
+    "darkcraft:tronco_sangre",
+    "darkcraft:rama_sangre",
+    "darkcraft:corteza_pino",
+    "darkcraft:tronco_pino",
+    "darkcraft:rama_pino"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/hojas_otono"
+      },
+      {
+        "model": "darkcraft:block/hojas_otono_2"
+      },
+      {
+        "model": "darkcraft:block/hojas_otono_3"
+      }
+    ]
+  }
+}

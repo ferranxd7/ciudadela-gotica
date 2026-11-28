@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "bottom": "darkcraft:block/corteza_pino",
+    "top": "darkcraft:block/corteza_pino",
+    "side": "darkcraft:block/corteza_pino"
+  }
+}

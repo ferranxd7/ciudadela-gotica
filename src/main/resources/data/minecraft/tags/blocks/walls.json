@@ -25,6 +25,12 @@
     "darkcraft:roca_arenisca_muro",
     "darkcraft:roca_toba_muro",
     "darkcraft:roca_musgosa_muro",
-    "darkcraft:pedregal_muro"
+    "darkcraft:pedregal_muro",
+    "darkcraft:corteza_roble_muro",
+    "darkcraft:corteza_ceniza_muro",
+    "darkcraft:corteza_muerto_muro",
+    "darkcraft:corteza_pantano_muro",
+    "darkcraft:corteza_sangre_muro",
+    "darkcraft:corteza_pino_muro"
   ]
 }

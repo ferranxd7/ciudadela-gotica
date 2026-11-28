@@ -8,6 +8,12 @@
     "darkcraft:madera_podrida_escalera",
     "darkcraft:madera_quemada_escalera",
     "darkcraft:madera_caoba_escalera",
-    "darkcraft:tejado_tejamanil_escalera"
+    "darkcraft:tejado_tejamanil_escalera",
+    "darkcraft:corteza_roble_escalera",
+    "darkcraft:corteza_ceniza_escalera",
+    "darkcraft:corteza_muerto_escalera",
+    "darkcraft:corteza_pantano_escalera",
+    "darkcraft:corteza_sangre_escalera",
+    "darkcraft:corteza_pino_escalera"
   ]
 }

@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/hojas_sangre"
+      },
+      {
+        "model": "darkcraft:block/hojas_sangre_2"
+      },
+      {
+        "model": "darkcraft:block/hojas_sangre_3"
+      }
+    ]
+  }
+}
