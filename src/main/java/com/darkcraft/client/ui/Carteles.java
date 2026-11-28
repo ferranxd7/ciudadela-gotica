@@ -56,6 +56,17 @@ public final class Carteles {
             // una mision (parte 7ag): con el cartel grande, su titulo y "Nueva mision" o "Mision cumplida"
             case Net.Cartel.MISION -> COLA.add(new Cartel(Net.Cartel.ZONA, Component.translatable(m.clave()),
                     Component.translatable(m.n() == 0 ? "darkcraft.cartel.mision.nueva" : "darkcraft.cartel.mision.cumplida")));
+            // un personaje que dice una frase en el mundo (parte 7ap): su voz y su caja con el retrato abajo en el centro
+            case Net.Cartel.VOZ -> {
+                com.darkcraft.dialogo.Dialogos.Personaje pj = com.darkcraft.dialogo.Dialogos.de(m.clave());
+                if (pj == null) break;
+                if (voz != null) voz.parar();
+                voz = new Bocadillo(pj);
+                voz.decir(m.n());
+                vozInicio = ClientRol.ticks;
+                vozDura = Math.max(60, Math.round(Math.max(1f, com.darkcraft.dialogo.Dialogos.habla(pj.id(), m.n())) * 20f) + 50);
+                VOCES_DICHAS++;
+            }
             case Net.Cartel.AVISO -> {
                 // "clave|otra|..." : las de detras son los argumentos (traducidos) de la primera (adonde ira Silas, parte 7af)
                 String[] k = m.clave().split("\\|");
@@ -82,6 +93,17 @@ public final class Carteles {
 
     /** Un sitio de dentro de una zona (solo existe en el cliente: el servidor manda ZONA y aqui se decide). */
     public static final int LUGAR = 5;
+
+    /** Lo que dice un personaje en el mundo (parte 7ap), desde cuando y lo que dura su caja (ticks). */
+    private static Bocadillo voz;
+    private static int vozInicio, vozDura;
+    /** Para la prueba de la CI: las frases dichas en el mundo que han llegado. */
+    public static int VOCES_DICHAS;
+
+    /** Para la prueba de la CI: la frase que se esta diciendo en el mundo (o -1). */
+    public static int vozNumero() {
+        return voz == null ? -1 : voz.numero();
+    }
 
     /** El aviso corto que se esta viendo (o null) y desde cuando. */
     private static Component aviso;
@@ -113,6 +135,13 @@ public final class Carteles {
 
     /** Lo llama {@link ClientRol} en cada tick del cliente. */
     static void tick(Minecraft mc) {
+        if (voz != null) {
+            voz.tick();
+            if (ClientRol.ticks - vozInicio > vozDura || ClientRol.ticks < vozInicio) {
+                voz.parar();
+                voz = null;
+            }
+        }
         if (aviso != null && (ClientRol.ticks - avisoInicio > AVISO_DURA || ClientRol.ticks < avisoInicio)) aviso = null;
         if (actual != null && ClientRol.ticks - inicio > dura(actual.tipo())) actual = null;
         if (actual == null && !COLA.isEmpty() && mc.screen == null && mc.player != null && mc.player.isAlive() && !ClientCine.active()
@@ -127,6 +156,8 @@ public final class Carteles {
         COLA.clear();
         actual = null;
         aviso = null;
+        if (voz != null) voz.parar();
+        voz = null;
     }
 
     /** El cartel que se esta viendo (para la prueba de la CI). */
@@ -140,6 +171,15 @@ public final class Carteles {
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
         if (aviso != null && mc.screen == null && !ClientCine.active()) dibujarAviso(g, mc.font, w, h, aviso, ClientRol.ticks - avisoInicio + pt);
+        // lo que dice un personaje en el mundo: abajo en el centro, entre la cruz y los ecos (se apaga al final)
+        if (voz != null && !ClientCine.active()) {
+            float edad = ClientRol.ticks - vozInicio + pt;
+            float a = Mth.clamp(Math.min(edad / 6f, (vozDura - edad) / 14f), 0f, 1f);
+            if (a > 0.03f) {
+                int bw = Math.min(380, w - 150), bx = (w - bw) / 2, by = h - Bocadillo.ALTO - 44;
+                voz.render(g, mc.font, bx, by, bw, pt, a);
+            }
+        }
         if (actual == null) return;
         dibujar(g, mc.font, w, h, actual.tipo(), actual.titulo(), actual.sub(), ClientRol.ticks - inicio + pt, dura(actual.tipo()));
     }

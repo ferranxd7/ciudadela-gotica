@@ -763,6 +763,7 @@ public final class CiTest {
         misionHedda(server, m, log);
         misionYlva(server, m, log);
         misionCorwen(server, m, log);
+        misionSigrun(server, m, log);
         armaduras(server, m, log);
         armas7aj(server, m, log);
         escudos7ak(server, m, log);
@@ -6014,6 +6015,237 @@ public final class CiTest {
         } catch (Throwable e) {
             sb.append(" ERROR ").append(e);
             DarkCraftMod.LOGGER.error("[CI] las balizas de la niebla", e);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+        }
+        log.println(sb);
+        log.flush();
+    }
+
+    /**
+     * El duelo del Paso del Colmillo (parte 7ap): Sigrun y las nueve espadas en su sitio (lo que pisa, hacia donde mira, que no haya nada
+     * encima; las espadas en el suelo); el dialogo; en paz no repara en nadie, no se le hace dano y pegarle es aceptar el duelo; el duelo
+     * (desenvaina; sus golpes a una presa delante; el escudo de frente y no de espaldas; a media vida el grito, su frase y sus dos golpes
+     * nuevos); se rinde en vez de morir y lo que reparte; los dos finales (dejarla marchar: se levanta, saluda, se va paso arriba sin el
+     * escudo, se deshace y vuelve a su puesto; acabar con ella: cae, se deshace y vuelve), lo que da cada uno, y que a quien acabo ya no le
+     * habla, ni le pega, ni repara en el; la espada (una espada que escala y suma frio) y el escudo.
+     */
+    private static void misionSigrun(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        StringBuilder sb = new StringBuilder("Morvain, el duelo del Paso del Colmillo:");
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ae6"), "[DarkCraftCI30]"));
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        try {
+            BlockPos ps = com.darkcraft.mision.Duelo.sitio();
+            for (int dx = -2; dx <= 2; dx++)
+                for (int dz = -2; dz <= 2; dz++) m.getChunk((ps.getX() >> 4) + dx, (ps.getZ() >> 4) + dz);
+            com.darkcraft.mision.Duelo.olvidar(m);
+            var s = com.darkcraft.mision.Duelo.poner(m);
+            com.darkcraft.mision.Duelo.ponerEspadas(m);
+            if (s == null) throw new IllegalStateException("sin Sigrun");
+            BlockPos pies = s.blockPosition();
+            sb.append(String.format(java.util.Locale.ROOT, " Sigrun en %s (sitio %s), pisa %s, giro %.0f, libre %s, %.1f x %.1f, vida %.0f, golpe %.1f, armadura %d; %s; region %s",
+                    pies.toShortString(), ps.toShortString(), m.getBlockState(pies.below()).getBlock().getDescriptionId().replace("block.minecraft.", ""), s.getYRot(),
+                    m.noCollision(s), s.getBbWidth(), s.getBbHeight(), s.getMaxHealth(), s.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE),
+                    s.getArmorValue(), s.resumen(), com.darkcraft.morvain.Terreno.columna(ps.getX(), ps.getZ()).region()));
+            var esp = com.darkcraft.mision.Duelo.espadas(m);
+            StringBuilder ee = new StringBuilder();
+            for (var d : esp) {
+                BlockPos q = d.blockPosition();
+                ee.append(String.format(java.util.Locale.ROOT, " %.1f/%s", d.getY() - q.getY(), m.getBlockState(q.below()).isAir() ? "AIRE" : "suelo"));
+            }
+            sb.append(" | espadas ").append(esp.size()).append(" (altura sobre su bloque y lo de debajo:").append(ee).append(')');
+            // ---- el dialogo: todos los nodos y respuestas llevan a algo que existe
+            var d = com.darkcraft.dialogo.Dialogos.de("sigrun");
+            int malos = 0;
+            for (var n : d.nodos().values()) {
+                if (n.menu()) {
+                    for (var r : n.respuestas()) if (r.destino() != 0 && d.nodo(r.destino()) == null) malos++;
+                } else if (n.siguiente() != 0 && d.nodo(n.siguiente()) == null) malos++;
+            }
+            sb.append(" | dialogo: ").append(d.nodos().size()).append(" nodos, ").append(malos).append(" que llevan a nada");
+            // ---- en paz
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            com.darkcraft.mision.Misiones.olvidar(fp, "sigrun");
+            com.darkcraft.rol.Rol.sinCombate(fp);
+            fp.moveTo(s.getX(), s.getY(), s.getZ() + 3.5, 180f, 0f);
+            boolean repara = s.reparaEn(fp);
+            int n1 = com.darkcraft.mision.Duelo.inicio(fp, s), n2 = com.darkcraft.mision.Duelo.inicio(fp, s);
+            com.darkcraft.mision.Duelo.accion(fp, s, "rechazar");
+            com.darkcraft.mision.Duelo.accion(fp, s, "precio");
+            sb.append(String.format(java.util.Locale.ROOT, " | en paz: repara en el %s; empieza %d y %d; rechaza y pregunta: %s, ir a %s", repara, n1, n2,
+                    com.darkcraft.mision.Duelo.resumen(fp), com.darkcraft.mision.Duelo.objetivo(fp) == null ? "-" : com.darkcraft.mision.Duelo.objetivo(fp).toShortString()));
+            // ---- el duelo: lo acepta; desenvaina
+            com.darkcraft.mision.Duelo.accion(fp, s, "duelo");
+            sb.append(String.format(java.util.Locale.ROOT, " | acepta: %s, en pelea %s, retador %s, %s", com.darkcraft.mision.Duelo.resumen(fp), s.enPelea(),
+                    fp.getUUID().equals(s.retador()), s.resumen()));
+            for (int k = 0; k < 60 && s.accion() != 0; k++) pasoE(s, null, 0, 0, 0);
+            sb.append(" (desenvaina y queda ").append(s.clavada() ? "CON LA ESPADA CLAVADA" : "en guardia").append(')');
+            // sus golpes a una presa delante (a la distancia de cada uno)
+            final var sg = s;
+            final double sx = s.getX(), sy = s.getY(), sz = s.getZ();
+            var v = victima(m, sx, sy, sz + 2.4, 180f, quitar);
+            if (v != null) {
+                s.setTarget(v);
+                java.util.function.BiFunction<Integer, Double, Float> golpe = (accion, dist) -> {
+                    sg.moveTo(sx, sy, sz, 0f, 0f);
+                    sg.setYRot(0f);
+                    sg.yBodyRot = sg.yHeadRot = 0f;
+                    v.setHealth(v.getMaxHealth());
+                    v.moveTo(sx, sy, sz + dist, 180f, 0f);
+                    sg.empezar(accion);
+                    for (int j = 0; j < com.darkcraft.enemigos.SigrunAnims.TICKS[accion] + 2 && sg.accion() == accion; j++) pasoE(sg, v, sx, sy, sz + dist);
+                    return v.getMaxHealth() - v.getHealth();
+                };
+                sb.append(" | golpes:");
+                int[][] prueba = {{com.darkcraft.enemigos.SigrunAnims.TAJO, 24}, {com.darkcraft.enemigos.SigrunAnims.COMBO, 22},
+                        {com.darkcraft.enemigos.SigrunAnims.ESCUDAZO, 20}, {com.darkcraft.enemigos.SigrunAnims.ESTOCADA, 60},
+                        {com.darkcraft.enemigos.SigrunAnims.GIRO, 24}, {com.darkcraft.enemigos.SigrunAnims.SALTO, 55}};
+                for (int[] g : prueba)
+                    sb.append(String.format(java.util.Locale.ROOT, " %s -%.1f;", com.darkcraft.enemigos.SigrunAnims.NOMBRES[g[0]], golpe.apply(g[0], g[1] / 10.0)));
+                // a quien no pelea con ella (un jugador que no es su presa ni su rival), no le pega
+                var otro = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ae7"), "[DarkCraftCI31]"));
+                otro.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+                otro.setHealth(otro.getMaxHealth());
+                otro.moveTo(sx, sy, sz + 2.0, 180f, 0f);
+                v.moveTo(sx + 40, sy, sz, 0f, 0f);
+                s.moveTo(sx, sy, sz, 0f, 0f);
+                s.empezar(com.darkcraft.enemigos.SigrunAnims.TAJO);
+                for (int j = 0; j < 30 && s.accion() != 0; j++) {
+                    s.moveTo(sx, sy, sz, 0f, 0f);
+                    pasoE(s, null, 0, 0, 0);
+                    otro.moveTo(sx, sy, sz + 2.0, 180f, 0f);
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " a otro jugador que mira: -%.1f;", otro.getMaxHealth() - otro.getHealth()));
+                v.discard();
+                s.setTarget(fp);
+            }
+            // el escudo: diez golpes de frente sin atacar (para casi todos) y diez por la espalda (ninguno)
+            s.moveTo(sx, sy, sz, 0f, 0f);
+            s.setYRot(0f);
+            s.yBodyRot = s.yHeadRot = 0f;
+            s.cortarAccion();
+            s.setHealth(s.getMaxHealth());
+            int b0 = com.darkcraft.enemigos.Sigrun.BLOQUEOS;
+            float h0 = s.getHealth();
+            fp.moveTo(sx, sy, sz + 2.0, 180f, 0f);
+            for (int k = 0; k < 10; k++) {
+                s.cortarAccion();
+                s.invulnerableTime = 0;
+                s.hurt(fp.damageSources().playerAttack(fp), 10f);
+            }
+            int deFrente = com.darkcraft.enemigos.Sigrun.BLOQUEOS - b0;
+            float quitaFrente = h0 - s.getHealth();
+            b0 = com.darkcraft.enemigos.Sigrun.BLOQUEOS;
+            h0 = s.getHealth();
+            fp.moveTo(sx, sy, sz - 2.0, 0f, 0f);
+            for (int k = 0; k < 10; k++) {
+                s.cortarAccion();
+                s.invulnerableTime = 0;
+                s.hurt(fp.damageSources().playerAttack(fp), 10f);
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " | el escudo: de frente para %d de 10 (le quitan %.1f), por la espalda %d (le quitan %.1f)", deFrente, quitaFrente,
+                    com.darkcraft.enemigos.Sigrun.BLOQUEOS - b0, h0 - s.getHealth()));
+            // a media vida: el grito y su frase
+            s.cortarAccion();
+            int dichas0 = com.darkcraft.mision.Duelo.DICHAS;
+            s.setHealth(s.getMaxHealth() * 0.49f);
+            int grita = -1;
+            fp.moveTo(sx, sy, sz + 3.0, 180f, 0f);
+            for (int k = 0; k < 40 && grita < 0; k++) {
+                pasoE(s, null, 0, 0, 0);
+                if (s.accion() == com.darkcraft.enemigos.SigrunAnims.GRITO) grita = k;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " | a media vida: segunda %s, grita en el tick %d, frases dichas +%d", s.segunda(), grita, com.darkcraft.mision.Duelo.DICHAS - dichas0));
+            for (int k = 0; k < 60 && s.accion() != 0; k++) pasoE(s, null, 0, 0, 0);
+            // ---- se rinde en vez de morir
+            int r0 = com.darkcraft.enemigos.Sigrun.RENDICIONES;
+            int ecos0 = com.darkcraft.rol.Ficha.ecos(fp), piedras0 = fp.getInventory().countItem(DarkCraftMod.PIEDRA_FORJA_2.get());
+            fp.moveTo(sx, sy, sz - 2.0, 0f, 0f);
+            s.cortarAccion();
+            s.invulnerableTime = 0;
+            s.hurt(fp.damageSources().playerAttack(fp), s.getMaxHealth() * 4f);
+            sb.append(String.format(java.util.Locale.ROOT, " | un golpe de muerte: viva %s, se rinde +%d, %s; %s; ecos +%d, piedras II +%d, hazana %s",
+                    s.isAlive(), com.darkcraft.enemigos.Sigrun.RENDICIONES - r0, s.resumen(), com.darkcraft.mision.Duelo.resumen(fp), com.darkcraft.rol.Ficha.ecos(fp) - ecos0,
+                    fp.getInventory().countItem(DarkCraftMod.PIEDRA_FORJA_2.get()) - piedras0, com.darkcraft.story.Logros.tiene(fp, "sigrun")));
+            for (int k = 0; k < 50 && s.accion() != 0; k++) pasoE(s, null, 0, 0, 0);
+            s.invulnerableTime = 0;
+            boolean danoRendida = s.hurt(fp.damageSources().playerAttack(fp), 10f);
+            var otro2 = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ae8"), "[DarkCraftCI32]"));
+            com.darkcraft.mision.Misiones.olvidar(otro2, "sigrun");
+            sb.append(String.format(java.util.Locale.ROOT, "; de rodillas: le hacen dano %s, quien la vencio empieza por %d, otro por %d", danoRendida,
+                    com.darkcraft.mision.Duelo.inicio(fp, s), com.darkcraft.mision.Duelo.inicio(otro2, s)));
+            // ---- 1) dejarla marchar
+            fp.moveTo(s.getX(), s.getY(), s.getZ() + 2.5, 180f, 0f);
+            com.darkcraft.mision.Duelo.accion(fp, s, "soltar");
+            int escudos = fp.getInventory().countItem(DarkCraftMod.ESCUDOS.get(com.darkcraft.armas.Escudo.Tamano.GUARDIANA).get());
+            String tras = s.resumen();
+            boolean saluda = false, funde = false;
+            double lejos = 0;
+            int k;
+            for (k = 0; k < 600 && s.modo() != com.darkcraft.enemigos.Sigrun.PAZ; k++) {
+                pasoE(s, null, 0, 0, 0);
+                if (s.accion() == com.darkcraft.enemigos.SigrunAnims.SALUDO) saluda = true;
+                if (s.funde()) funde = true;
+                lejos = Math.max(lejos, Math.sqrt(s.hogar().distToCenterSqr(s.getX(), s.getY(), s.getZ())));
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " | 1) dejarla marchar: %s, escudos %d, logro %s; %s; saluda %s, se aleja %.1f, se deshace %s, vuelve a su puesto en %d ticks: %s",
+                    com.darkcraft.mision.Duelo.resumen(fp), escudos, com.darkcraft.story.Logros.tiene(fp, "sigrun_nombres"), tras, saluda, lejos, funde, k, s.resumen()));
+            // a quien acabo: no le habla, no le hace dano, no repara en el
+            s.invulnerableTime = 0;
+            boolean dano = s.hurt(fp.damageSources().playerAttack(fp), 10f);
+            sb.append(String.format(java.util.Locale.ROOT, "; despues: empieza %d, le hace dano %s, repara en el %s, ir a %s, modo %d", com.darkcraft.mision.Duelo.inicio(fp, s), dano,
+                    s.reparaEn(fp), com.darkcraft.mision.Duelo.objetivo(fp) == null ? "-" : "ALGO", s.modo()));
+            // ---- 2) acabar con ella: pegarle en paz es aceptar el duelo
+            com.darkcraft.mision.Misiones.olvidar(fp, "sigrun");
+            fp.moveTo(s.getX(), s.getY(), s.getZ() + 2.0, 180f, 0f);
+            s.invulnerableTime = 0;
+            float hp = s.getHealth();
+            boolean danoPaz = s.hurt(fp.damageSources().playerAttack(fp), 10f);
+            sb.append(String.format(java.util.Locale.ROOT, " | 2) pegarle en paz: dano %s (%.0f), %s, %s", danoPaz, hp - s.getHealth(), s.resumen(), com.darkcraft.mision.Duelo.resumen(fp)));
+            for (k = 0; k < 60 && s.accion() != 0; k++) pasoE(s, null, 0, 0, 0);
+            fp.moveTo(s.getX(), s.getY(), s.getZ() - 2.0, 0f, 0f);
+            s.cortarAccion();
+            s.invulnerableTime = 0;
+            s.hurt(fp.damageSources().playerAttack(fp), s.getMaxHealth() * 4f);
+            for (k = 0; k < 50 && s.accion() != 0; k++) pasoE(s, null, 0, 0, 0);
+            com.darkcraft.mision.Duelo.accion(fp, s, "rematar");
+            int espadas = fp.getInventory().countItem(DarkCraftMod.ESPADA_GUARDIANA.get());
+            tras = s.resumen();
+            boolean cae = false;
+            funde = false;
+            for (k = 0; k < 400 && s.modo() != com.darkcraft.enemigos.Sigrun.PAZ; k++) {
+                pasoE(s, null, 0, 0, 0);
+                if (s.accion() == com.darkcraft.enemigos.SigrunAnims.CAER) cae = true;
+                if (s.funde()) funde = true;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, "; rendida y rematada: %s, espadas %d, logro %s; %s; cae %s, se deshace %s, vuelve en %d ticks: %s",
+                    com.darkcraft.mision.Duelo.resumen(fp), espadas, com.darkcraft.story.Logros.tiene(fp, "sigrun_paso"), tras, cae, funde, k, s.resumen()));
+            // ---- la espada y el escudo
+            var espada = new net.minecraft.world.item.ItemStack(DarkCraftMod.ESPADA_GUARDIANA.get());
+            var datos = com.darkcraft.combate.Escalado.de(espada);
+            var t = com.darkcraft.armas.Escudo.Tamano.GUARDIANA;
+            String frio = "-";
+            var pod = DarkCraftMod.PODRIDO.get().create(m);
+            if (pod != null) {
+                pod.moveTo(sx + 6, sy, sz, 0f, 0f);
+                m.addFreshEntity(pod);
+                quitar.add(pod);
+                int c0 = com.darkcraft.enemigos.Congelacion.CONGELACIONES;
+                StringBuilder fr = new StringBuilder();
+                for (int j = 0; j < 5; j++) {
+                    pod.setHealth(pod.getMaxHealth());
+                    espada.getItem().hurtEnemy(espada, pod, fp);
+                    fr.append(String.format(java.util.Locale.ROOT, " %.0f", com.darkcraft.enemigos.Congelacion.nivel(pod)));
+                }
+                frio = "frio" + fr + ", congela +" + (com.darkcraft.enemigos.Congelacion.CONGELACIONES - c0);
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " | la espada: %s, escala %s %s, %s; el escudo: para %.0f%%, estamina x%.2f, peso %.1f, parada %d ticks",
+                    com.darkcraft.combate.Armas.de(espada), datos == null ? "-" : datos.letras(), datos == null ? "-" : java.util.Arrays.toString(datos.requisitos()), frio,
+                    t.para * 100, t.estamina, t.peso, t.parada));
+            com.darkcraft.mision.Misiones.olvidar(fp, "sigrun");
+        } catch (Throwable e) {
+            sb.append(" ERROR ").append(e);
+            DarkCraftMod.LOGGER.error("[CI] el duelo del Paso del Colmillo", e);
         } finally {
             for (var e : quitar) if (!e.isRemoved()) e.discard();
         }

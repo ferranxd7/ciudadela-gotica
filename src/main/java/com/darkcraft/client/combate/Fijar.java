@@ -92,6 +92,8 @@ public final class Fijar {
     private static boolean valido(LocalPlayer p, LivingEntity e) {
         return e != p && e.isAlive() && !e.isInvisible() && !e.isSpectator() && !(e instanceof ArmorStand) && !(e instanceof Player)
                 && !(e instanceof AbstractVillager) && !(e instanceof com.darkcraft.montura.Corcel) && !(e instanceof com.darkcraft.personajes.PersonajeBase)
+                // Sigrun (parte 7ap): solo en su duelo (y si a quien juega aun le toca verla)
+                && !(e instanceof com.darkcraft.enemigos.Sigrun sg && (sg.modo() != com.darkcraft.enemigos.Sigrun.DUELO || com.darkcraft.enemigos.Sigrun.OCULTA.test(sg)))
                 && (e instanceof Enemy || e instanceof Mob);
     }
 

@@ -48,6 +48,7 @@ public final class EscudoCliente {
         e.registerLayerDefinition(CAPAS[Escudo.Tamano.PEQUENO.ordinal()], RodelaGeometria::crear);
         e.registerLayerDefinition(CAPAS[Escudo.Tamano.MEDIANO.ordinal()], EscudoCaballeroGeometria::crear);
         e.registerLayerDefinition(CAPAS[Escudo.Tamano.GRANDE.ordinal()], PavesGeometria::crear);
+        e.registerLayerDefinition(CAPAS[Escudo.Tamano.GUARDIANA.ordinal()], EscudoGuardianaGeometria::crear);
     }
 
     /** Al recargar los recursos se vuelven a hornear. */

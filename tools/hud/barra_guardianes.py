@@ -69,13 +69,18 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   caen por debajo; relleno de seda carmesi con pliegues que corren y un hilo de plata; petalos negros y rojos, lagrimas y chispas
   de plata que caen meciendose al recibir dano.
 
+  Sigrun, la Guardiana del Paso (parte 7ap): su espada larga tumbada de punta a punta (la hoja escarchada con nieve encima y
+  carambanos, la empunadura de cuero con la guarda a la izquierda, la punta a la derecha) y en el centro su escudo de lagrima azul con
+  el colmillo blanco; relleno de ventisca sobre el azul de noche; copos y esquirlas que caen al recibir dano.
+
   La Sombra sin Nombre (parte 7ac): sus cadenas de hierro negro de punta a punta, rotas por tres sitios (las puntas al rojo), y en
   el centro la capucha sin cara (la oscuridad y dos ojos rojos) con la corona rota de Corvin flotando encima; relleno de oscuridad
   con venas rojas que laten; jirones de sombra y chispas rojas que suben al recibir dano.
 
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
 abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png, pontifice_barra.png, aldric_barra.png,
-gigante_barra.png, jinete_barra.png, bufon_barra.png, dragon_barra.png, isolde_barra.png y sombra_barra.png (256x128):
+gigante_barra.png, jinete_barra.png, bufon_barra.png, dragon_barra.png, isolde_barra.png, sombra_barra.png y sigrun_barra.png
+(256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
   v 80      hueco (240 x 7)        v 88  rastro del ultimo dano (240 x 7)
@@ -2493,6 +2498,132 @@ def jirones():
     return img
 
 
+# ---------------------------------------------------------------- Sigrun, la Guardiana del Paso (parte 7ap)
+
+S_DD, S_D, S, S_L, S_H = hexc("15191e"), hexc("2c333b"), hexc("4d5863"), hexc("8794a0"), hexc("cfdae2")
+N_DD, N_D, N, N_L = hexc("070c18"), hexc("101b33"), hexc("1d3058"), hexc("34508a")
+W_D, W, W_H = hexc("aeb8c2"), hexc("e3e8ee"), hexc("ffffff")
+C_D, C, C_L = hexc("2a1a10"), hexc("4a2f1c"), hexc("6e4a2e")
+
+
+def marco_sigrun():
+    """Su espada larga tumbada de punta a punta: la hoja de acero con escarcha (el vaceo por el medio y la nieve encima), la
+    empunadura a la izquierda (el puno de cuero, la guarda y el pomo) y la punta a la derecha; carambanos pequenos colgando, y en
+    el centro su escudo de lagrima azul con el colmillo blanco y el cerco de acero escarchado."""
+    rnd = random.Random(717)
+    n = noise2(719)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 4, FX1 + 1, FY0 - 4, FY1 + 3
+    rect(img, x0, y0, x1, y1, OUT)
+    # la hoja: acero con vetas a lo largo, luz arriba, escarcha a trozos y el filo de arriba claro
+    for y in range(y0 + 1, y1):
+        for x in range(x0 + 1, x1):
+            v = n(x * 0.06, y * 0.8)
+            c = S_D if v < 0.36 else S if v < 0.8 else S_L
+            if y == y0 + 1:
+                c = mix(c, S_H, 0.55)
+            if y == y1 - 1:
+                c = mix(c, S_DD, 0.5)
+            if n(x * 0.3 + 60, y * 0.9) > 0.84:
+                c = mix(c, Q_H, 0.55)
+            put(img, x, y, c)
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, S_DD)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # nieve encima de la hoja, a montoncitos
+    for x in range(x0 + 2, x1 - 2):
+        if n(x * 0.21, 3.3) > 0.55:
+            put(img, x, y0 - 1, W if n(x * 0.5, 7.1) > 0.4 else W_D)
+            put(img, x, y0, W_H)
+    # la punta (a la derecha): se estrecha hasta la punta
+    for x in range(x1, FW):
+        k = x - x1
+        semi = (y1 - y0) / 2 - k * 0.9
+        cy = (y0 + y1) / 2
+        for y in range(y0, y1 + 1):
+            d = abs(y - cy)
+            if d <= semi:
+                put(img, x, y, S_L if y < cy else S_D)
+            elif d <= semi + 1:
+                put(img, x, y, OUT)
+    # la empunadura (a la izquierda): el pomo, la guarda de canto (alta, de acero) y el arranque del puno de cuero
+    cy = (y0 + y1) // 2
+    for y in range(y0 - 5, y1 + 6):
+        put(img, 0, y, OUT)
+        put(img, 1, y, S_L)
+        put(img, 2, y, S if (y - y0) % 5 else S_H)
+        put(img, 3, y, S_D)
+        put(img, 4, y, OUT)
+    for x in range(0, 5):
+        put(img, x, y0 - 6, OUT)
+        put(img, x, y1 + 6, OUT)
+    for y in (y0 - 5, y1 + 5):
+        put(img, 2, y, Q_H)
+    put(img, 2, cy, C_L)
+    put(img, 2, cy + 1, C)
+    # los carambanos pequenos que cuelgan de la hoja
+    for xx in (x0 + 30, x0 + 46, x0 + 74, x1 - 80, x1 - 58, x1 - 36):
+        largo = rnd.randint(2, 5)
+        for i in range(largo):
+            put(img, xx, y1 + 1 + i, Q_H if i < 2 else Q_L)
+            if i == 0:
+                put(img, xx + 1, y1 + 1, Q_L)
+        put(img, xx - 1, y1 + 1, OUT)
+    # en el centro: el escudo de lagrima (de y 0 a 22): azul de noche, el cerco de acero con escarcha y el colmillo blanco
+    cx = FW // 2
+    def semi(y):
+        return 8 if y < 12 else max(0, int(8 - (y - 11) * 0.85))
+    for y in range(0, 23):
+        a = semi(y)
+        for dx in range(-a - 1, a + 2):
+            put(img, cx + dx, y, OUT)
+    put(img, cx, 23, OUT)
+    for y in range(1, 22):
+        a = semi(y) - 1
+        if a < 0:
+            continue
+        for dx in range(-a, a + 1):
+            borde = abs(dx) >= a - 0 or y == 1
+            if borde:
+                c = S_L if dx < 0 else S
+                if (dx + y) % 4 == 0:
+                    c = Q_H
+            else:
+                t = n((cx + dx) * 0.2, y * 0.2)
+                c = N_D if t < 0.35 else N if t < 0.8 else N_L
+                if dx < -a // 2 and y < 8:
+                    c = mix(c, N_L, 0.4)
+            put(img, cx + dx, y, c)
+    # el colmillo blanco
+    fang = ["WWWWW", ".WWWW", ".WWWW", "..WWW", "..WW.", "...W."]
+    for fy, fila in enumerate(fang):
+        for fx, ch in enumerate(fila):
+            if ch == "W":
+                put(img, cx - 3 + fx, 6 + fy, W_H if fx < 2 else W)
+    return img
+
+
+def relleno_sigrun(k):
+    """La ventisca que corre sobre el azul de noche: rachas de nieve blanca y copos que pasan."""
+    n = noise2(733)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            t = 0.3 + 0.4 * mid + 0.4 * (n((x - k * 4) * 0.07, y * 0.45) - 0.5)
+            c = mix(N_D, N_L, max(0.0, min(1.0, t * 1.3)))
+            racha = (x - k * 4 + int(3 * math.sin((x + y * 5) * 0.11))) % 23
+            if racha in (0, 1, 2) and 1 <= y <= 5:
+                c = mix(c, W, 0.55 - 0.15 * abs(racha - 1))
+            if y == 0:
+                c = mix(c, W_D, 0.4)
+            if y == 6:
+                c = mix(c, N_DD, 0.6)
+            if (x * 17 + y * 7 - k * 29) % 71 == 0 and 1 <= y <= 5:
+                c = W_H
+            img.putpixel((x, y), c)
+    return img
+
+
 def hueco(a, b):
     n = noise2(113)
     img = Image.new("RGBA", (240, 7))
@@ -2541,6 +2672,7 @@ if __name__ == "__main__":
         "dragon": atlas(marco_dragon(), relleno_dragon, hueco("070505", "180e0b"), rastro("fff2e0", "f0b080"), ascuas_dragon()),
         "isolde": atlas(marco_isolde(), relleno_isolde, hueco("060407", "140d16"), rastro("fff0f2", "e8b0bc"), petalos()),
         "sombra": atlas(marco_sombra(), relleno_sombra, hueco("030204", "0e0a12"), rastro("ffe8e8", "e8a0a0"), jirones()),
+        "sigrun": atlas(marco_sigrun(), relleno_sigrun, hueco("04070c", "0e1626"), rastro("f6fbff", "c8d8ea"), copos()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

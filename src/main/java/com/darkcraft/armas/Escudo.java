@@ -39,7 +39,12 @@ public class Escudo extends ShieldItem {
         /** El escudo de caballero: lo para todo. */
         MEDIANO("escudo_caballero", 1.0f, 1.0f, 4.5f, 0),
         /** El paves: lo para todo y cuesta casi la mitad, pero pesa 9. */
-        GRANDE("paves", 1.0f, 0.55f, 9.0f, 0);
+        GRANDE("paves", 1.0f, 0.55f, 9.0f, 0),
+        /**
+         * El escudo de la Guardiana (parte 7ap, el de Sigrun, para quien la deja marchar): lo para todo, cansa algo menos que el de
+         * caballero y, alzado a tiempo, para el golpe como la rodela (en los primeros 6 ticks).
+         */
+        GUARDIANA("escudo_guardiana", 1.0f, 0.8f, 4.0f, 6);
 
         public final String id;
         /** Lo que para de cada golpe (0..1), lo que cuesta cubrirse (por lo que cuesta con el escudo del juego) y lo que pesa. */
@@ -84,8 +89,9 @@ public class Escudo extends ShieldItem {
         tip.add(Component.translatable("item.darkcraft." + tamano.id + ".desc").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         tip.add(Component.translatable("darkcraft.escudo.para", Math.round(tamano.para * 100), Math.round(tamano.estamina * 100),
                 String.format(Locale.ROOT, "%.1f", tamano.peso)).withStyle(ChatFormatting.GOLD));
-        if (tamano.parada > 0) tip.add(Component.translatable("darkcraft.escudo.parada").withStyle(ChatFormatting.YELLOW));
+        if (tamano.parada > 0 && tamano != Tamano.GUARDIANA) tip.add(Component.translatable("darkcraft.escudo.parada").withStyle(ChatFormatting.YELLOW));
         if (tamano == Tamano.GRANDE) tip.add(Component.translatable("darkcraft.escudo.paves").withStyle(ChatFormatting.YELLOW));
+        if (tamano == Tamano.GUARDIANA) tip.add(Component.translatable("darkcraft.escudo.guardiana").withStyle(ChatFormatting.AQUA));
     }
 
     @Override

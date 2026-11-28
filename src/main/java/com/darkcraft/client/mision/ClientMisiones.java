@@ -5,6 +5,7 @@ import com.darkcraft.enemigos.Enemigo;
 import com.darkcraft.mision.Baliza;
 import com.darkcraft.mision.Campana;
 import com.darkcraft.mision.Corwen;
+import com.darkcraft.mision.Duelo;
 import com.darkcraft.mision.FarolBrann;
 import com.darkcraft.mision.Hedda;
 import com.darkcraft.mision.Oswin;
@@ -70,7 +71,12 @@ public final class ClientMisiones {
     static {
         Viajero.OCULTO = ClientMisiones::oculto;
         Enemigo.BRILLA = ClientMisiones::brilla;
+        com.darkcraft.enemigos.Sigrun.OCULTA = ClientMisiones::sigrunOculta;
     }
+
+    /** Sigrun (parte 7ap): quien juega acaba de acabar su duelo (la ve caer o marcharse hasta que se deshace en nieve). */
+    private static boolean sigrunPropio;
+    private static int sigrunDesde = -1;
 
     /** Ylva se va (descansa) al cerrar la conversacion en que se le da el farol de su padre: como la Hedda de la mentira. */
     private static boolean ylvaPendiente;
@@ -87,7 +93,7 @@ public final class ClientMisiones {
     private static int agujas = 60;
 
     public static void recibir(Net.Misiones m) {
-        int antes = marcas(Hedda.ID), antesY = marcas(Ylva.ID), antesC = marcas(Corwen.ID);
+        int antes = marcas(Hedda.ID), antesY = marcas(Ylva.ID), antesC = marcas(Corwen.ID), antesS = marcas(Duelo.ID);
         boolean primera = !recibido;
         LISTA.clear();
         LISTA.addAll(m.lista());
@@ -115,6 +121,14 @@ public final class ClientMisiones {
             ylvaPendiente = false;
             ylvaDesde = -1;
         } else if (!primera && (antesY & Ylva.DADA) == 0) ylvaPendiente = true;
+        int sg = marcas(Duelo.ID);
+        if ((sg & Duelo.ACABADA) == 0) {
+            sigrunPropio = false;
+            sigrunDesde = -1;
+        } else if (!primera && (antesS & Duelo.ACABADA) == 0) {
+            sigrunPropio = true;
+            sigrunDesde = reloj;
+        }
         int c = marcas(Corwen.ID);
         Baliza.ENCENDIDAS = (c & Corwen.ACABADA) != 0 ? 7 : (c / Corwen.B1) & 7;
         corwenLuz = (c & Corwen.TODAS) == Corwen.TODAS;
@@ -142,6 +156,7 @@ public final class ClientMisiones {
         if (Hedda.ID.equals(e.id())) return (k & (Hedda.MENTIRA | Hedda.CALLADA)) != 0 || (k & (Hedda.VERDAD | Hedda.LANZA)) == (Hedda.VERDAD | Hedda.LANZA);
         if (Ylva.ID.equals(e.id())) return (k & Ylva.ACABADA) != 0;
         if (Corwen.ID.equals(e.id())) return (k & Corwen.ACABADA) != 0;
+        if (Duelo.ID.equals(e.id())) return (k & Duelo.ACABADA) != 0;
         return false;
     }
 
@@ -152,6 +167,14 @@ public final class ClientMisiones {
      */
     public static String estado(Net.MisionE e) {
         int k = e.marcas();
+        if (Duelo.ID.equals(e.id())) {
+            if ((k & Duelo.REMATADA) != 0) return "rematada";
+            if ((k & Duelo.LIBRE) != 0) return "libre";
+            if ((k & Duelo.VENCIDA) != 0) return "vencida";
+            if ((k & Duelo.CAIDO) != 0) return "caido";
+            if ((k & Duelo.ACEPTADA) != 0) return "duelo";
+            return "pendiente";
+        }
         if (Corwen.ID.equals(e.id())) {
             if ((k & Corwen.IDA) != 0) return "ida";
             if ((k & Corwen.QUEDA) != 0) return "queda";
@@ -188,6 +211,7 @@ public final class ClientMisiones {
 
     /** La miniatura del diario de cada mision ({@code CodiceScreen}). */
     public static int miniatura(Net.MisionE e) {
+        if (Duelo.ID.equals(e.id())) return com.darkcraft.client.ui.CodiceScreen.MIN_MISION_SIGRUN;
         if (Corwen.ID.equals(e.id())) return com.darkcraft.client.ui.CodiceScreen.MIN_MISION_CORWEN;
         return Ylva.ID.equals(e.id()) ? com.darkcraft.client.ui.CodiceScreen.MIN_MISION_YLVA
                 : Hedda.ID.equals(e.id()) ? com.darkcraft.client.ui.CodiceScreen.MIN_MISION_HEDDA : com.darkcraft.client.ui.CodiceScreen.MIN_MISION_OSWIN;
@@ -217,6 +241,25 @@ public final class ClientMisiones {
         return !(seVaPendiente || (seVaDesde >= 0 && reloj - seVaDesde < FUNDIDO));
     }
 
+    /**
+     * Si a quien juega ya no le toca ver a Sigrun (parte 7ap): acabo su duelo; quien lo acaba de acabar la sigue viendo caer o
+     * marcharse (de rodillas, tendida o yendose) hasta que se deshace en nieve.
+     */
+    public static boolean sigrunOculta(com.darkcraft.enemigos.Sigrun s) {
+        // (la del bestiario no esta en el mundo: esa siempre se ve)
+        if ((marcas(Duelo.ID) & Duelo.ACABADA) == 0 || !s.isAddedToWorld()) return false;
+        int m = s.modo();
+        return !(sigrunPropio && (m == com.darkcraft.enemigos.Sigrun.RENDIDA || m == com.darkcraft.enemigos.Sigrun.CAIDA || m == com.darkcraft.enemigos.Sigrun.MARCHA));
+    }
+
+    /** Si a quien juega le toca hablar ahora con Sigrun: en paz en su puesto (sin haber acabado su duelo) o, de rodillas, si la vencio. */
+    public static boolean sigrunHabla(com.darkcraft.enemigos.Sigrun s) {
+        int k = marcas(Duelo.ID);
+        if ((k & Duelo.ACABADA) != 0 || !s.isAlive() || s.funde()) return false;
+        if (s.modo() == com.darkcraft.enemigos.Sigrun.RENDIDA) return (k & Duelo.VENCIDA) != 0 && s.accionVista() == 0;
+        return s.modo() == com.darkcraft.enemigos.Sigrun.PAZ && s.clavada() && s.accionVista() == 0;
+    }
+
     /** Lo que se ve de el (1, o menos mientras Hedda se apaga). */
     public static float alfa(Viajero v, float pt) {
         if (v.quien() == Viajero.Quien.CORWEN) {
@@ -243,6 +286,13 @@ public final class ClientMisiones {
         vigia = com.darkcraft.client.ui.ClientRol.lleva(com.darkcraft.rol.Talisman.Clase.BALLENERO);
         ylva(mc);
         corwen(mc);
+        // quien acaba de acabar su duelo con Sigrun deja de verla cuando vuelve a su puesto (o pasado un buen rato)
+        if (sigrunPropio && reloj - sigrunDesde > 40) {
+            boolean enPaz = reloj - sigrunDesde > 2400;
+            for (com.darkcraft.enemigos.Sigrun g : mc.level.getEntitiesOfClass(com.darkcraft.enemigos.Sigrun.class, mc.player.getBoundingBox().inflate(96)))
+                if (g.modo() == com.darkcraft.enemigos.Sigrun.PAZ || g.modo() == com.darkcraft.enemigos.Sigrun.DUELO) enPaz = true;
+            if (enPaz) sigrunPropio = false;
+        }
         Viajero hedda = heddaCerca(mc);
         // Hedda se va al cerrar la conversacion: se apaga (la mentira: en paz, con su luz y su sonido; la verdad: se va con su hijo)
         if (seVaPendiente && !(mc.screen instanceof com.darkcraft.client.ui.DialogoScreen)) {
@@ -464,6 +514,8 @@ public final class ClientMisiones {
         corwenPendiente = false;
         corwenDesde = -1;
         corwenLuz = corwenSinPertiga = false;
+        sigrunPropio = false;
+        sigrunDesde = -1;
         Baliza.ENCENDIDAS = 0;
         Campana.oculta = false;
         RestosTam.sinBufanda = RestosTam.sinLanza = RestosTam.nada = false;

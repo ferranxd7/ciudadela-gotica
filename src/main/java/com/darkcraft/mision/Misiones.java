@@ -28,14 +28,15 @@ import java.util.UUID;
  * Las misiones de Morvain (parte 7ag, respuestas 95 y 117 del plan): quien las da ({@code personajes.Viajero}), lo que cada jugador
  * lleva hecho de cada una (en su ficha, {@code Ficha.mision}: marcas de bits) y lo que sabe su cliente (la lista de las que conoce,
  * con adonde ir ahora: el diario de la Historia, la brujula y el mapa). {@link Oswin}, la campana del peregrino (7ag), {@link Hedda},
- * la bufanda roja (7ah), {@link Ylva}, la luz del muelle (7an), y {@link Corwen}, las balizas de la niebla (7ao).
+ * la bufanda roja (7ah), {@link Ylva}, la luz del muelle (7an), {@link Corwen}, las balizas de la niebla (7ao), y {@link Duelo}, el duelo
+ * del Paso del Colmillo con Sigrun (7ap).
  */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID)
 public final class Misiones {
     private Misiones() {}
 
     /** Todas, en el orden del menu. */
-    public static final String[] TODAS = {Oswin.ID, Hedda.ID, Ylva.ID, Corwen.ID};
+    public static final String[] TODAS = {Oswin.ID, Hedda.ID, Ylva.ID, Corwen.ID, Duelo.ID};
 
     /** Lo ultimo que se le mando a cada uno (si cambia —coge o suelta la campana o la bufanda—, se le vuelve a mandar). */
     private static final Map<UUID, Long> MANDADO = new HashMap<>();
@@ -46,6 +47,7 @@ public final class Misiones {
         Hedda.tick(m);
         Ylva.tick(m);
         Corwen.tick(m);
+        Duelo.tick(m);
         for (ServerPlayer p : m.players()) {
             Long antes = MANDADO.get(p.getUUID());
             if (antes == null || antes != huella(p)) enviar(p);
@@ -58,7 +60,7 @@ public final class Misiones {
      */
     private static long huella(ServerPlayer p) {
         long h = (oswin(p) & 0x1FFFFFL) | ((heda(p) & 0x1FFFFFL) << 21) | ((ylva(p) & 0x1FFFFFL) << 42);
-        return h ^ ((Corwen.marcas(p) + 1L) * 0x9E3779B97F4A7C15L);
+        return h ^ ((Corwen.marcas(p) + 1L) * 0x9E3779B97F4A7C15L) ^ ((Duelo.marcas(p) + 1L) * 0xC2B2AE3D27D4EB4FL);
     }
 
     private static int oswin(ServerPlayer p) {
@@ -84,6 +86,8 @@ public final class Misiones {
         if (y != 0) l.add(entrada(Ylva.ID, y, Ylva.objetivo(p)));
         int c = Corwen.marcas(p);
         if (c != 0) l.add(entrada(Corwen.ID, c, Corwen.objetivo(p)));
+        int d = Duelo.marcas(p);
+        if (d != 0) l.add(entrada(Duelo.ID, d, Duelo.objetivo(p)));
         Net.to(p, new Net.Misiones(l));
         MANDADO.put(p.getUUID(), huella(p));
     }
@@ -166,7 +170,8 @@ public final class Misiones {
         b.append(" ]").append(Oswin.lleva(sp) ? " lleva la campana" : "");
         BlockPos o = Oswin.objetivo(sp);
         if (o != null) b.append(", ir a ").append(o.toShortString());
-        return b.append("; ").append(resumenHedda(sp)).append("; ").append(resumenYlva(sp)).append("; ").append(resumenCorwen(sp)).toString();
+        return b.append("; ").append(resumenHedda(sp)).append("; ").append(resumenYlva(sp)).append("; ").append(resumenCorwen(sp))
+                .append("; ").append(Duelo.resumen(sp)).toString();
     }
 
     /** Como va la de Corwen. */
@@ -217,6 +222,8 @@ public final class Misiones {
                 DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.YLVA).get(), DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.BALLENERO).get())
                 : Corwen.ID.equals(id) ? java.util.List.of(DarkCraftMod.YESQUERO.get(), DarkCraftMod.PERTIGA_FAROLERO.get(),
                 DarkCraftMod.TALISMANES.get(com.darkcraft.rol.Talisman.Clase.FAROLERO).get())
+                : Duelo.ID.equals(id) ? java.util.List.of(DarkCraftMod.ESPADA_GUARDIANA.get(),
+                DarkCraftMod.ESCUDOS.get(com.darkcraft.armas.Escudo.Tamano.GUARDIANA).get())
                 : java.util.List.of();
         for (int i = 0; i < inv.getContainerSize(); i++)
             if (fuera.contains(inv.getItem(i).getItem())) inv.setItem(i, net.minecraft.world.item.ItemStack.EMPTY);
@@ -263,7 +270,76 @@ public final class Misiones {
                     Ficha.mision(sp, Corwen.ID, IntegerArgumentType.getInteger(c, "n"));
                     enviar(sp);
                     return decir(c.getSource(), resumenCorwen(sp));
+                })))
+                .then(Commands.literal("sigrun").then(Commands.argument("n", IntegerArgumentType.integer(0, 255)).executes(c -> {
+                    ServerPlayer sp = c.getSource().getPlayerOrException();
+                    Ficha.mision(sp, Duelo.ID, IntegerArgumentType.getInteger(c, "n"));
+                    enviar(sp);
+                    return decir(c.getSource(), Duelo.resumen(sp));
                 })));
+    }
+
+    /**
+     * /darkcraft sigrun [ir | poner | olvidar | duelo | media | rendir | rematar | soltar | volver | accion &lt;n&gt;] (sin mas: donde esta y
+     * como esta; con su duelo y lo que le toca a quien lo pide).
+     */
+    public static LiteralArgumentBuilder<CommandSourceStack> comandoSigrun() {
+        return Commands.literal("sigrun")
+                .executes(c -> {
+                    ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    com.darkcraft.enemigos.Sigrun g = Duelo.buscar(m);
+                    String b = "Sigrun " + Duelo.sitio().toShortString() + (Morvain.hecho(m.getServer(), "sigrun") ? " (puesta)" : "")
+                            + (g == null ? " (no esta cargada)" : ": " + g.resumen()) + ", espadas " + Duelo.espadas(m).size()
+                            + (Morvain.hecho(m.getServer(), "sigrun_espadas") ? " (puestas)" : "");
+                    if (c.getSource().getEntity() instanceof ServerPlayer sp) b += "; " + Duelo.resumen(sp);
+                    return decir(c.getSource(), b);
+                })
+                .then(Commands.literal("ir").executes(c -> {
+                    ServerPlayer sp = c.getSource().getPlayerOrException();
+                    ServerLevel m = Morvain.nivel(sp.server);
+                    if (m == null) return 0;
+                    Duelo.llevar(sp, m);
+                    return decir(c.getSource(), Duelo.resumen(sp));
+                }))
+                .then(Commands.literal("poner").executes(c -> {
+                    ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    if (Duelo.buscar(m) == null) Duelo.poner(m);
+                    if (Duelo.espadas(m).isEmpty()) Duelo.ponerEspadas(m);
+                    return decir(c.getSource(), "Sigrun y las nueve espadas puestas");
+                }))
+                .then(Commands.literal("olvidar").executes(c -> {
+                    ServerLevel m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    Duelo.olvidar(m);
+                    return decir(c.getSource(), "Sigrun y las espadas quitadas");
+                }))
+                .then(Commands.literal("duelo").executes(c -> conSigrun(c.getSource(), (sp, g) -> Duelo.aceptar(sp, g))))
+                .then(Commands.literal("media").executes(c -> conSigrun(c.getSource(), (sp, g) -> g.setHealth(g.getMaxHealth() * 0.49f))))
+                .then(Commands.literal("rendir").executes(c -> conSigrun(c.getSource(), (sp, g) -> {
+                    if (g.modo() != com.darkcraft.enemigos.Sigrun.DUELO) return;
+                    g.invulnerableTime = 0;
+                    g.hurt(sp.damageSources().playerAttack(sp), g.getMaxHealth() * 4f);
+                })))
+                .then(Commands.literal("rematar").executes(c -> conSigrun(c.getSource(), (sp, g) -> Duelo.rematar(sp, g))))
+                .then(Commands.literal("soltar").executes(c -> conSigrun(c.getSource(), (sp, g) -> Duelo.soltar(sp, g))))
+                .then(Commands.literal("volver").executes(c -> conSigrun(c.getSource(), (sp, g) -> g.volverAlPuesto())))
+                .then(Commands.literal("accion").then(Commands.argument("n", IntegerArgumentType.integer(1, com.darkcraft.enemigos.SigrunAnims.TICKS.length - 1))
+                        .executes(c -> conSigrun(c.getSource(), (sp, g) -> g.empezar(IntegerArgumentType.getInteger(c, "n"))))));
+    }
+
+    private static int conSigrun(CommandSourceStack src, java.util.function.BiConsumer<ServerPlayer, com.darkcraft.enemigos.Sigrun> f) {
+        try {
+            ServerPlayer sp = src.getPlayerOrException();
+            ServerLevel m = Morvain.nivel(sp.server);
+            com.darkcraft.enemigos.Sigrun g = m == null ? null : Duelo.buscar(m);
+            if (g == null) return decir(src, "Sigrun no esta cargada (/darkcraft sigrun ir)");
+            f.accept(sp, g);
+            return decir(src, g.resumen() + "; " + Duelo.resumen(sp));
+        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+            return 0;
+        }
     }
 
     /** /darkcraft corwen [ir | baliza &lt;0-2&gt; | poner | olvidar] (sin mas: donde estan Corwen y las balizas). */

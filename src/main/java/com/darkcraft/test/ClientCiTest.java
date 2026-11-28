@@ -6701,6 +6701,8 @@ public final class ClientCiTest {
         t = ylva(t);
         // las balizas de la niebla: Corwen, el farolero de los Pilotes (parte 7ao)
         t = corwen(t);
+        // el duelo del Paso del Colmillo: Sigrun, la Guardiana del Paso (parte 7ap)
+        t = sigrun(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -13975,6 +13977,410 @@ public final class ClientCiTest {
             server(m, sp -> {
                 sp.getInventory().setItem(0, net.minecraft.world.item.ItemStack.EMPTY);
                 com.darkcraft.mision.Misiones.olvidar(sp, "corwen");
+            });
+        });
+        return t + 10;
+    }
+
+    // ------------------------------------------------------------------ el duelo del Paso del Colmillo (parte 7ap)
+
+    /** Sigrun en el cliente (a 96 bloques del jugador), o null. */
+    private static com.darkcraft.enemigos.Sigrun sigrunC(Minecraft mc) {
+        if (mc.level == null || mc.player == null) return null;
+        for (var e : mc.level.getEntitiesOfClass(com.darkcraft.enemigos.Sigrun.class, mc.player.getBoundingBox().inflate(96))) return e;
+        return null;
+    }
+
+    /** Sigrun en el servidor (si esta cargada), o null. */
+    private static com.darkcraft.enemigos.Sigrun sigrunE(ServerPlayer sp) {
+        ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+        return mv == null ? null : com.darkcraft.mision.Duelo.buscar(mv);
+    }
+
+    /** La accion que se ve de Sigrun y cuanto lleva (-1 si no es esa). */
+    private static int tSigrun(Minecraft mc, int accion) {
+        var r = sigrunC(mc);
+        return r != null && r.accionVista() == accion && r.accionDesde >= 0 ? r.tickCount - r.accionDesde : -1;
+    }
+
+    private static String estadoSigrunC(Minecraft mc) {
+        var r = sigrunC(mc);
+        if (r == null) return "no se ve a Sigrun";
+        int a = r.accionVista();
+        return String.format(java.util.Locale.ROOT, "Sigrun en el cliente: %.1f, %.1f, %.1f giro %.0f, modo %d, %s, accion %s (t %d), alfa %.2f, %s, se le habla %s, a mano %d | voz %d | %s | jugador a %.1f",
+                r.getX(), r.getY(), r.getZ(), r.getYRot(), r.modo(), r.clavada() ? "espada clavada" : "espada en la mano",
+                com.darkcraft.enemigos.SigrunAnims.NOMBRES[Math.max(0, Math.min(a, com.darkcraft.enemigos.SigrunAnims.NOMBRES.length - 1))],
+                r.accionDesde < 0 ? -1 : r.tickCount - r.accionDesde, r.alfa(0f), com.darkcraft.enemigos.Sigrun.OCULTA.test(r) ? "OCULTA" : "se ve",
+                com.darkcraft.client.mision.ClientMisiones.sigrunHabla(r), com.darkcraft.client.personajes.ClientPersonajes.aMano,
+                com.darkcraft.client.ui.Carteles.vozNumero(), com.darkcraft.client.ui.Carteles.resumen(), mc.player == null ? -1 : r.distanceTo(mc.player));
+    }
+
+    /** La camara libre delante de Sigrun ({@code delante}), a un lado ({@code lado}) y a una altura, mirandola. */
+    private static void camaraSigrun(Minecraft mc, double delante, double lado, double alto) {
+        var r = sigrunC(mc);
+        if (r == null) return;
+        Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
+        verDesde(mc, new Vec3(r.getX() + f.x * delante - f.z * lado, r.getY() + alto, r.getZ() + f.z * delante + f.x * lado), new Vec3(r.getX(), r.getY() + 1.2, r.getZ()));
+    }
+
+    /** Delante de Sigrun (a 2,6 bloques, hacia donde mira), mirandole a la cara (de rodillas, mas abajo). */
+    private static void anteSigrun(ServerPlayer sp) {
+        var g = sigrunE(sp);
+        if (g == null) return;
+        Vec3 p = g.position(), d = Vec3.directionFromRotation(0, g.getYRot());
+        double cara = g.modo() == com.darkcraft.enemigos.Sigrun.RENDIDA ? 1.1 : 1.85;
+        irMirando(sp, p.x + d.x * 2.6, p.y, p.z + d.z * 2.6, p.x, p.y + cara, p.z, false);
+        com.darkcraft.rol.Rol.sinCombate(sp);
+    }
+
+    private static void logSigrun(Minecraft m, String que) {
+        StringBuilder cli = new StringBuilder();
+        for (var e : com.darkcraft.client.mision.ClientMisiones.LISTA)
+            if (e.id().equals("sigrun"))
+                cli.append(e.marcas()).append(" (").append(com.darkcraft.client.mision.ClientMisiones.estado(e)).append(')')
+                        .append(e.hay() ? " ir a " + e.x() + "," + e.z() : "").append("; ");
+        String dlg = m.screen instanceof com.darkcraft.client.ui.DialogoScreen d ? d.resumen() : m.screen == null ? "-" : m.screen.getClass().getSimpleName();
+        String est = estadoSigrunC(m);
+        server(m, sp -> {
+            var g = sigrunE(sp);
+            log("  sigrun " + que + ": " + com.darkcraft.mision.Duelo.resumen(sp) + " | servidor: " + (g == null ? "no esta" : g.resumen()) + " | cliente: " + cli + est + " | " + dlg);
+        });
+    }
+
+    /** Pide a Sigrun una accion (con el comando de la prueba) con el jugador delante, sano. */
+    private static void sigrunHaz(ServerPlayer sp, int accion) {
+        sp.setHealth(sp.getMaxHealth());
+        comando(sp, "darkcraft sigrun accion " + accion);
+    }
+
+    /**
+     * El duelo del Paso del Colmillo (parte 7ap): Sigrun en el paso con la espada clavada y las nueve espadas detras (de lejos y de
+     * frente); hablar con ella (la 1 y el menu), por que sigue aqui (la 3), aceptar el duelo (la 2) y desenvainar; el duelo con su barra y
+     * su musica; sus golpes (tajo, tanda, escudazo, estocada, el escudo), a media vida el grito con su frase, el giro y el salto; la frase
+     * de cuando se cae; se rinde de rodillas (el cartel de JEFE ABATIDO); de rodillas (la 7 y el menu), dejarla marchar (la 9: se levanta,
+     * saluda, se va sin el escudo y se deshace en nieve; despues ya no se la ve); otra vez, acabar con ella (la 8: cae, tendida con la
+     * espada en el pecho, se deshace); la espada y el escudo en las manos; la mision en la Historia.
+     */
+    private static int sigrun(int T) {
+        int t = T;
+        atTicks(t, "Sigrun: al Paso del Colmillo", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                ServerLevel mv = com.darkcraft.morvain.Morvain.nivel(sp.server);
+                if (mv == null) return;
+                sp.setGameMode(GameType.CREATIVE);
+                com.darkcraft.rol.Rol.sinCombate(sp);
+                com.darkcraft.mision.Misiones.olvidar(sp, "sigrun");
+                BlockPos s = com.darkcraft.mision.Duelo.sitio();
+                irMirando(sp, s.getX() + 10.5, s.getY() + 6, s.getZ() + 16.5, s.getX() + 0.5, s.getY() + 1, s.getZ() + 0.5, true);
+            });
+        });
+        t += 140;
+        atTicks(t, "Sigrun: puesta", m -> server(m, sp -> {
+            comando(sp, "darkcraft sigrun olvidar");
+            comando(sp, "darkcraft sigrun poner");
+            var g = sigrunE(sp);
+            log("  sigrun: " + (g == null ? "FALLO: no esta" : "en " + g.blockPosition().toShortString() + String.format(java.util.Locale.ROOT, " giro %.0f", g.getYRot()))
+                    + ", espadas " + com.darkcraft.mision.Duelo.espadas(com.darkcraft.morvain.Morvain.nivel(sp.server)).size() + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp));
+            // de lejos, desde el sureste: ella, las nueve espadas detras y el paso
+            if (g != null) irMirando(sp, g.getX() + 7.5, g.getY() + 3.2, g.getZ() + 11.5, g.getX(), g.getY() + 0.8, g.getZ() - 3, true);
+        }));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logSigrun(m, "en su puesto");
+            shot(m, "cliente_sg01_paso_colmillo");
+        });
+        t += 4;
+        atTicks(t, "Sigrun: de frente", m -> server(m, sp -> {
+            var g = sigrunE(sp);
+            if (g == null) return;
+            Vec3 p = g.position(), d = Vec3.directionFromRotation(0, g.getYRot());
+            irMirando(sp, p.x + d.x * 3.4 + d.z * 1.1, p.y + 0.2, p.z + d.z * 3.4 - d.x * 1.1, p.x, p.y + 1.55, p.z, true);
+        }));
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logSigrun(m, "de frente");
+            shot(m, "cliente_sg02_sigrun_de_frente");
+        });
+        t += 4;
+        // ---- hablar con ella (en supervivencia, con resistencia: el duelo es de verdad)
+        atTicks(t, "Sigrun: delante, en supervivencia", m -> server(m, sp -> {
+            aPelear(sp, true);
+            anteSigrun(sp);
+        }));
+        t += 24;
+        atTicks(t, "la E: hablar con Sigrun", m -> pulsar(m.options.keyInventory));
+        t += 34;
+        atTicks(t, "captura", m -> {
+            logSigrun(m, "se presenta");
+            shot(m, "cliente_sg03_sigrun_habla");
+        });
+        t += 4;
+        atTicks(t, "E: el menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            logSigrun(m, "menu");
+            shot(m, "cliente_sg04_sigrun_menu");
+        });
+        t += 4;
+        atTicks(t, "por que sigues aqui", m -> dialogo(m, d -> d.pulsarRespuesta(1)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            logSigrun(m, "nueve dias");
+            shot(m, "cliente_sg05_sigrun_nueve_dias");
+        });
+        t += 4;
+        atTicks(t, "E: otra vez el menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 6;
+        atTicks(t, "acepto tu duelo", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logSigrun(m, "entonces desenvaina");
+            shot(m, "cliente_sg06_sigrun_desenvaina_frase");
+        });
+        t += 4;
+        atTicks(t, "E: empieza el duelo", m -> dialogo(m, d -> {
+            d.pulsarSeguir();
+            d.pulsarSeguir();
+        }));
+        esperarA("cliente_sg07_desenvaina", m -> tSigrun(m, com.darkcraft.enemigos.SigrunAnims.DESENVAINAR) >= 25, m -> camaraSigrun(m, 4.2, 2.4, 1.8),
+                ClientCiTest::estadoSigrunC, 120);
+        t += 70;
+        atTicks(t, "captura: el duelo, con su barra", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> sp.setHealth(sp.getMaxHealth()));
+            logSigrun(m, "en duelo");
+            shot(m, "cliente_sg08_duelo_barra");
+        });
+        t += 4;
+        // ---- sus golpes (pedidos con el comando, con el jugador delante)
+        int[][] golpes = {{com.darkcraft.enemigos.SigrunAnims.TAJO, 14}, {com.darkcraft.enemigos.SigrunAnims.COMBO, 23},
+                {com.darkcraft.enemigos.SigrunAnims.ESCUDAZO, 11}, {com.darkcraft.enemigos.SigrunAnims.ESTOCADA, 17},
+                {com.darkcraft.enemigos.SigrunAnims.BLOQUEA, 3}};
+        String[] nombresG = {"tajo", "tanda", "escudazo", "estocada", "escudo"};
+        double[][] camaras = {{4.0, 3.0, 1.8}, {4.0, -3.0, 1.8}, {3.6, 3.4, 1.6}, {4.6, -3.6, 1.6}, {3.4, 2.0, 1.7}};
+        for (int i = 0; i < golpes.length; i++) {
+            final int acc = golpes[i][0], cuando = golpes[i][1];
+            final double[] cm = camaras[i];
+            atTicks(t, "Sigrun: " + nombresG[i], m -> {
+                enPrimeraPersona(m);
+                server(m, sp -> {
+                    anteSigrun(sp);
+                    sigrunHaz(sp, acc);
+                });
+            });
+            esperarA("cliente_sg" + String.format(java.util.Locale.ROOT, "%02d", 9 + i) + "_" + nombresG[i], m -> tSigrun(m, acc) >= cuando,
+                    m -> camaraSigrun(m, cm[0], cm[1], cm[2]), ClientCiTest::estadoSigrunC, 120);
+            t += 70;
+        }
+        // ---- a media vida: el grito y su frase ("Bien... ¡otra vez!")
+        atTicks(t, "Sigrun: a media vida", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                anteSigrun(sp);
+                sp.setHealth(sp.getMaxHealth());
+                comando(sp, "darkcraft sigrun media");
+            });
+        });
+        esperarA("cliente_sg14_grito", m -> tSigrun(m, com.darkcraft.enemigos.SigrunAnims.GRITO) >= 12, m -> camaraSigrun(m, 4.4, 2.6, 1.9),
+                ClientCiTest::estadoSigrunC, 140);
+        t += 80;
+        int[][] nuevos = {{com.darkcraft.enemigos.SigrunAnims.GIRO, 15}, {com.darkcraft.enemigos.SigrunAnims.SALTO, 18}};
+        String[] nombresN = {"giro", "salto"};
+        for (int i = 0; i < nuevos.length; i++) {
+            final int acc = nuevos[i][0], cuando = nuevos[i][1];
+            final boolean salto = acc == com.darkcraft.enemigos.SigrunAnims.SALTO;
+            atTicks(t, "Sigrun: " + nombresN[i], m -> {
+                enPrimeraPersona(m);
+                server(m, sp -> {
+                    var g = sigrunE(sp);
+                    if (g != null && salto) {
+                        // de lejos: salta hacia el
+                        Vec3 p = g.position(), d = Vec3.directionFromRotation(0, g.getYRot());
+                        irMirando(sp, p.x + d.x * 6.5, p.y, p.z + d.z * 6.5, p.x, p.y + 1.6, p.z, false);
+                    } else anteSigrun(sp);
+                    sigrunHaz(sp, acc);
+                });
+            });
+            esperarA("cliente_sg" + (15 + i) + "_" + nombresN[i], m -> tSigrun(m, acc) >= cuando, m -> camaraSigrun(m, salto ? 2.0 : 4.2, salto ? 6.5 : -3.2, 1.6),
+                    ClientCiTest::estadoSigrunC, 120);
+            t += 80;
+        }
+        // la frase de cuando se cae en el duelo (dicha a quien esta cerca)
+        atTicks(t, "Sigrun: has caido (la frase)", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                var g = sigrunE(sp);
+                if (g != null) com.darkcraft.mision.Duelo.decir(g, sp.serverLevel(), 10, 48);
+            });
+        });
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logSigrun(m, "has caido");
+            shot(m, "cliente_sg17_has_caido");
+        });
+        t += 4;
+        // ---- se rinde de rodillas
+        atTicks(t, "Sigrun: se rinde", m -> server(m, sp -> {
+            anteSigrun(sp);
+            sp.setHealth(sp.getMaxHealth());
+            comando(sp, "darkcraft sigrun rendir");
+        }));
+        esperarA("cliente_sg18_se_rinde", m -> tSigrun(m, com.darkcraft.enemigos.SigrunAnims.RENDIRSE) >= 40, m -> camaraSigrun(m, 3.8, 2.6, 1.5),
+                ClientCiTest::estadoSigrunC, 140);
+        t += 90;
+        atTicks(t, "de rodillas: delante", m -> {
+            enPrimeraPersona(m);
+            server(m, ClientCiTest::anteSigrun);
+        });
+        t += 20;
+        atTicks(t, "la E: hablar con ella de rodillas", m -> pulsar(m.options.keyInventory));
+        t += 34;
+        atTicks(t, "captura", m -> {
+            logSigrun(m, "de rodillas");
+            shot(m, "cliente_sg19_de_rodillas_habla");
+        });
+        t += 4;
+        atTicks(t, "E: acabar o dejarla marchar", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "captura", m -> {
+            logSigrun(m, "tu eliges");
+            shot(m, "cliente_sg20_tu_eliges");
+        });
+        t += 4;
+        // ---- 1) dejarla marchar
+        atTicks(t, "vete, eres libre", m -> dialogo(m, d -> d.pulsarRespuesta(1)));
+        t += 50;
+        atTicks(t, "captura", m -> {
+            logSigrun(m, "los nueve nombres");
+            shot(m, "cliente_sg21_toma_mi_escudo");
+        });
+        t += 4;
+        atTicks(t, "E: se va", m -> dialogo(m, d -> {
+            d.pulsarSeguir();
+            d.pulsarSeguir();
+        }));
+        esperarA("cliente_sg22_saludo", m -> tSigrun(m, com.darkcraft.enemigos.SigrunAnims.SALUDO) >= 22, m -> camaraSigrun(m, 3.4, -2.2, 1.6),
+                ClientCiTest::estadoSigrunC, 160);
+        t += 130;
+        atTicks(t, "captura: se va paso arriba", m -> {
+            enPrimeraPersona(m);
+            logSigrun(m, "se va");
+            shot(m, "cliente_sg23_se_va");
+        });
+        t += 4;
+        esperarA("cliente_sg24_se_deshace", m -> {
+            var r = sigrunC(m);
+            return r != null && r.funde() && r.alfa(0f) < 0.7f;
+        }, m -> {
+            if (m.player != null) verDesde(m, m.player.getEyePosition().add(0, 1.0, 0), sigrunC(m) == null ? m.player.position() : sigrunC(m).position().add(0, 1, 0));
+        }, ClientCiTest::estadoSigrunC, 300);
+        t += 220;
+        atTicks(t, "captura: ya no esta", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                BlockPos s = com.darkcraft.mision.Duelo.sitio();
+                irMirando(sp, s.getX() + 0.5, s.getY(), s.getZ() + 6.5, s.getX() + 0.5, s.getY() + 1.4, s.getZ() + 0.5, false);
+                log("  sigrun: el escudo " + sp.getInventory().countItem(DarkCraftMod.ESCUDOS.get(com.darkcraft.armas.Escudo.Tamano.GUARDIANA).get())
+                        + ", logros " + com.darkcraft.story.Logros.tiene(sp, "sigrun") + " / " + com.darkcraft.story.Logros.tiene(sp, "sigrun_nombres"));
+            });
+        });
+        t += 30;
+        atTicks(t, "captura", m -> {
+            logSigrun(m, "ya no la ve");
+            shot(m, "cliente_sg25_ya_no_esta");
+        });
+        t += 4;
+        // ---- 2) otra vez (ya vencida): acabar con ella
+        atTicks(t, "otra vez, ya vencida: acabar con ella", m -> server(m, sp -> {
+            com.darkcraft.mision.Misiones.olvidar(sp, "sigrun");
+            com.darkcraft.rol.Ficha.mision(sp, "sigrun", com.darkcraft.mision.Duelo.CONOCIDA | com.darkcraft.mision.Duelo.ACEPTADA | com.darkcraft.mision.Duelo.VENCIDA);
+            com.darkcraft.mision.Misiones.enviar(sp);
+            anteSigrun(sp);
+        }));
+        t += 30;
+        atTicks(t, "la E (se arrodilla)", m -> pulsar(m.options.keyInventory));
+        t += 50;
+        atTicks(t, "E: el menu", m -> dialogo(m, ClientCiTest::alMenu));
+        t += 10;
+        atTicks(t, "acabare contigo", m -> dialogo(m, d -> d.pulsarRespuesta(0)));
+        t += 40;
+        atTicks(t, "captura", m -> {
+            logSigrun(m, "diles que el paso resistio");
+            shot(m, "cliente_sg26_el_paso_resistio");
+        });
+        t += 4;
+        atTicks(t, "E: cae", m -> dialogo(m, d -> {
+            d.pulsarSeguir();
+            d.pulsarSeguir();
+        }));
+        esperarA("cliente_sg27_cae", m -> tSigrun(m, com.darkcraft.enemigos.SigrunAnims.CAER) >= 26, m -> camaraSigrun(m, 3.0, 2.8, 1.8),
+                ClientCiTest::estadoSigrunC, 120);
+        t += 90;
+        atTicks(t, "captura: tendida en la nieve", m -> {
+            var r = sigrunC(m);
+            if (r != null) {
+                Vec3 f = Vec3.directionFromRotation(0, r.getYRot());
+                verDesde(m, new Vec3(r.getX() + f.x * 1.2 - f.z * 2.6, r.getY() + 2.4, r.getZ() + f.z * 1.2 + f.x * 2.6), new Vec3(r.getX() - f.x * 0.6, r.getY() + 0.2, r.getZ() - f.z * 0.6));
+            }
+            logSigrun(m, "tendida");
+            shot(m, "cliente_sg28_tendida");
+        });
+        t += 4;
+        esperarA("cliente_sg29_nieve_se_la_lleva", m -> {
+            var r = sigrunC(m);
+            return r != null && r.funde() && r.alfa(0f) < 0.6f;
+        }, m -> {
+            var r = sigrunC(m);
+            if (r != null) verDesde(m, new Vec3(r.getX() + 2.0, r.getY() + 2.2, r.getZ() + 2.0), r.position());
+        }, ClientCiTest::estadoSigrunC, 200);
+        t += 150;
+        // ---- la espada y el escudo en las manos (en tercera persona, de frente)
+        atTicks(t, "la espada y el escudo", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                log("  sigrun: la espada " + sp.getInventory().countItem(DarkCraftMod.ESPADA_GUARDIANA.get()) + ", logro " + com.darkcraft.story.Logros.tiene(sp, "sigrun_paso"));
+                sp.getInventory().setItem(0, new ItemStack(DarkCraftMod.ESPADA_GUARDIANA.get()));
+                sp.getInventory().selected = 0;
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
+                sp.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND, new ItemStack(DarkCraftMod.ESCUDOS.get(com.darkcraft.armas.Escudo.Tamano.GUARDIANA).get()));
+                BlockPos s = com.darkcraft.mision.Duelo.sitio();
+                irMirando(sp, s.getX() + 0.5, s.getY(), s.getZ() + 6.5, s.getX() + 0.5, s.getY() + 1.6, s.getZ() + 12.5, false);
+            });
+        });
+        t += 10;
+        atTicks(t, "tercera persona", m -> m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT));
+        t += 20;
+        atTicks(t, "captura", m -> {
+            log("  sigrun: en la mano " + (m.player == null ? "-" : m.player.getMainHandItem().getItem() + " (" + com.darkcraft.combate.Armas.de(m.player.getMainHandItem())
+                    + ") y " + m.player.getOffhandItem().getItem()));
+            shot(m, "cliente_sg30_espada_escudo");
+        });
+        t += 4;
+        atTicks(t, "la Historia: la mision", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.HISTORIA);
+            menuP(m, mm -> mm.probarHistoria(300));
+        });
+        t += 16;
+        atTicks(t, "captura", m -> {
+            menuP(m, mm -> log("  sigrun, la historia: " + mm.resumen()));
+            shot(m, "cliente_sg31_historia_mision");
+        });
+        t += 4;
+        atTicks(t, "fin del duelo del Paso del Colmillo", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                sp.getInventory().setItem(0, ItemStack.EMPTY);
+                sp.setItemInHand(net.minecraft.world.InteractionHand.OFF_HAND, ItemStack.EMPTY);
+                sp.removeAllEffects();
+                com.darkcraft.mision.Misiones.olvidar(sp, "sigrun");
+                comando(sp, "darkcraft sigrun volver");
+                sp.setGameMode(GameType.CREATIVE);
             });
         });
         return t + 10;

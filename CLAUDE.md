@@ -4108,6 +4108,78 @@ La cuarta mision (respuestas 95 y 117 del plan), en la Aldea de los Pilotes del 
   encendido, `cw17`, `cw18`), dejarle ir y se pierde en la niebla (`cw19..cw21`), otra vez que se quede (`cw22`, `cw23`) y la pertiga en
   la mano (`cw24`). Lineas `corwen ...`.
 
+### Plan grande, parte 7ap: el duelo del Paso del Colmillo (Sigrun, la Guardiana del Paso)
+
+La quinta mision (respuestas 95 y 117 del plan), en las Montanas Nevadas: un enemigo con el que se habla y que pelea en duelo.
+- **Sigrun** (`enemigos/Sigrun`, un `Guardian`; entidad `darkcraft:sigrun` 0,7 x 2,2): la ultima de los diez que el capitan de la Capital
+  mando a guardar el Paso del Colmillo para que la gente huyera al monasterio; sus nueve hermanos cayeron y ella juro que nadie pasaria
+  mientras siguiera en pie. De pie en el paso (`mision/Duelo.X/Z` = -3132, -3622: 34 bloques al norte del santuario del Paso del
+  Colmillo, mirando al sur, por donde se llega), con la espada clavada en la nieve delante; detras, en arco, **las nueve espadas de sus
+  hermanos** (espadas de hierro en `item_display` clavadas en la nieve, etiqueta `darkcraft_sigrun_espada`; `Duelo.ponerEspadas`, una
+  vez: "sigrun_espadas"). Se pone una vez ("sigrun") y, si faltara con su sitio cargado 3 s, otra (nunca dos); se guarda con el mundo y
+  al cargarse vuelve a su puesto en paz. Modelo de `tools/enemigos/sigrun.py` (escala 1,05: coraza y cota, tabardo azul de noche con el
+  colmillo blanco, manto de lobo con nieve y capa rota, yelmo abierto con nasal, la trenza blanca, espada larga y escudo de lagrima;
+  ojos azul claro en la capa de brillo); `client/enemigos/SigrunModelo` (segun `modo`: QUIETO con la espada clavada, PORTE + ANDAR,
+  LISTO en duelo, RODILLAS rendida, CAIDA tendida; marchandose sin el escudo) y `SigrunRenderer` (translucido solo al deshacerse en
+  nieve o aparecer: `Sigrun.alfa`). 900 de vida, golpe 12,5, armadura 12; ecos 9000.
+- **Lo que hace** (`Sigrun.modo`, sincronizado; con `CLAVADA` y `FUNDE`): **PAZ** (no repara en nadie —`percibe`—; no se le hace dano;
+  **pegarle es aceptar el duelo**, salvo en creativo o a quien ya la vencio), **DUELO** (desenvaina —`DESENVAINAR`, `sfx.duelo_empieza`—;
+  solo persigue y pega a sus rivales —quien acepto y quien le pega: `esRival`; los demas miran sin que les llegue nada—; su vida es la de
+  un duelo —`paraGrupo(1)`—), **RENDIDA**, **CAIDA** y **MARCHA**. En duelo: el **escudo** (de frente a 70 grados, sin atacar: para el 70 %
+  de los golpes, deja pasar el 25 % —un martillo, la mitad— y las flechas nada; `BLOQUEA`; dos seguidos en 2,5 s y contesta con un
+  escudazo), **tajo** de arriba abajo, la **tanda** (fuera, dentro y a fondo), **escudazo** (frena), **estocada** de lejos (cruza 3
+  bloques); a media vida el **grito** (golpea dos veces el escudo; dice "Bien... ¡otra vez!", la 11) y suma el **giro** (la vuelta
+  entera) y el **salto** (vuela hasta 9 bloques hacia su presa, sin torcerse, y cae con la espada en la nieve). Sonidos de su esfuerzo,
+  su dolor y el salto. Barra propia (`tools/hud/barra_guardianes.py` `marco_sigrun`: su espada larga tumbada con escarcha y carambanos y
+  el escudo con el colmillo en medio; relleno de ventisca sobre azul de noche; copos al recibir dano), musica "Final Confrontation" de
+  tcarisland (CC-BY 4.0, id `sigrun`, tema 49).
+- **No muere**: lo que la dejaria por debajo del 8 % (`Sigrun.setHealth`) la deja ahi y **se rinde** de rodillas (`RENDIRSE`, "Basta...
+  Me has vencido. El juramento... se ha roto", la 6, `sfx.sigrun_rinde`): a cada uno de los que peleaban (`vencedores`) el cartel de JEFE
+  ABATIDO con sus ecos, la hazana `sigrun`, el bestiario y dos piedras de forja II (`Duelo.vencida`). De rodillas no se le hace dano;
+  sin ninguno de sus vencedores a 48 bloques en 1 min, se levanta y vuelve a su puesto. Quien la vencio y vuelve a hablarle en paz la
+  pone de rodillas otra vez (`arrodillar`). Si cae alguien en su duelo, "Has caido. No hay verguenza en eso... Siempre estoy aqui" (la
+  10) y cuando ya no queda nadie vuelve a su puesto a clavar la espada (`PLANTAR`).
+- **Las frases en el mundo** (6, 10 y 11): `Net.Cartel.VOZ` (12; la clave, el personaje de `Dialogos`; n, la frase) → `Carteles`: su
+  voz y un `Bocadillo` (retrato, nombre y el texto al ritmo de la voz) abajo en el centro, que entra y sale apagandose
+  (`Bocadillo.render(..., mas)`).
+- **El dialogo** (`Dialogos.SIGRUN`; `Conversaciones.hablar/accion` y `ClientPersonajes` la aceptan aunque no es un `PersonajeBase`; clic
+  derecho en paz o rendida; `Duelo.inicio`): la primera vez 1 ("Alto. Nadie cruza el Colmillo..."), despues 5 ("Tu otra vez. ¿Has
+  encontrado el valor?"); su menu: **el duelo** (2, y al acabarla empieza: `Accion.DUELO`; cartel "Nueva mision"), **por que sigues
+  aqui** (3: los nueve dias) o **no** (4). Rendida, 7 ("...Ahora acaba conmigo... o dejame marchar. Tu eliges") y el segundo menu:
+  - **acabare contigo** (8: "Gracias. Diles... que el paso resistio"; al acabarla, `Accion.REMATAR`): se le escurre la espada, queda
+    tendida en la nieve con ella en el pecho (`CAER`, `sfx.sigrun_muere`), se deshace en nieve; **su espada**, la **Espada de la
+    Guardiana** (`mision/EspadaGuardiana`, `darkcraft:espada_guardiana`, epica: una espada —`Armas.de`— que escala C/B/-/E con 12/14/-/10
+    —`Escalado.de`— y cada golpe suma 22 de frio: al quinto congela, `Congelacion`); logro `sigrun_paso` ("El paso resistio").
+  - **vete, eres libre** (9: "...bajare al monasterio a buscar sus nombres. Los nueve. Toma mi escudo"; `Accion.SOLTAR`): se levanta,
+    saluda con la espada a quien se lo dijo (`SALUDO`) y se va paso arriba sin el escudo (`sfx.sigrun_se_va`) hasta perderse en la nieve;
+    **su escudo**, el **Escudo de la Guardiana** (`Escudo.Tamano.GUARDIANA`, `escudo_guardiana`, epico: lo para todo, cubrirse cuesta el
+    80 % y, alzado a tiempo, para el golpe como la rodela —6 ticks—; pesa 4; modelo en `tools/escudos/escudos.py` `guardiana`: de lagrima,
+    azul de noche con el colmillo blanco y el filo con escarcha); logro `sigrun_nombres` ("Los nueve nombres").
+  Lo que se elige vale para todos los que la vencieron y estan cerca (`Duelo.afectados`). Despues **vuelve a su puesto para los demas**
+  (`volverAlPuesto`; cada uno su duelo y su final): a quien ya acabo el suyo no le toca verla (`Sigrun.OCULTA` en el cliente,
+  `ClientMisiones.sigrunOculta`: la ve caer o marcharse hasta que se deshace), ni le habla, ni le pega, ni ve su barra
+  (`Guardian.veBarra`), ni oye su musica, ni la puede fijar (`Fijar`).
+- **La mision** (`mision/Duelo`, marcas CONOCIDA, ACEPTADA, RECHAZADA, HISTORIA, CAIDO, VENCIDA, REMATADA, LIBRE): estados del diario
+  `darkcraft.mision.sigrun.<pendiente | duelo | caido | vencida | rematada | libre>` (y `.ir.*`); la brujula lleva a su puesto mientras no
+  se acaba. Miniatura nueva (`CodiceScreen.MIN_MISION_SIGRUN` = 20; el atlas pasa a 512 x 480: `miniaturas.py` `duelo_paso`: el paso
+  entre dos paredes de roca al anochecer con el pico del Colmillo y el sol rojo, Sigrun con la espada clavada y su escudo, las nueve
+  espadas detras y quien llega). Retrato para el dialogo: `tools/personajes/sigrun.py`.
+- **Voz** (ElevenLabs, `eleven_v4`): **"Kaisa - Strong and authoritative"** `2Yg0KQ858zsEJOsoPmT2` (la de Elariel X ya es la de la reina
+  Isolde; las tomas a/b con ella se quedan sin usar), flow `JhLKcOKadUHHH8IC94uf`, 11 frases (tomas c; `VOZ_SIGRUN`: firme, con un poco de
+  eco de montana). Efectos: `duelo_empieza` (2 y 3), `sigrun_rinde` (2 y 1), `sigrun_muere` (1 y 2), `sigrun_se_va` (4 y 1),
+  `sigrun_esfuerzo` (1 y 2), `sigrun_dolor` (1, 2 y 4), `sigrun_salto` (1 y 4). En los creditos, con su voz.
+- Comandos `/darkcraft sigrun [ir | poner | olvidar | duelo | media | rendir | rematar | soltar | volver | accion <n>]` y
+  `/darkcraft misiones sigrun <n>`.
+- Pruebas: servidor, `misionSigrun()` (linea `Morvain, el duelo del Paso del Colmillo: ...`: ella y las espadas en su sitio, el dialogo
+  sin nodos rotos, en paz no repara ni se le hace dano, aceptar y desenvainar, sus golpes a una presa —y a otro jugador que mira, nada—, el
+  escudo de frente y por la espalda, a media vida, un golpe de muerte la rinde con lo que reparte, de rodillas, dejarla marchar —saluda,
+  se aleja, se deshace y vuelve en paz— y despues no le habla ni le pega, pegarle en paz acepta el duelo, rematarla —cae, se deshace y
+  vuelve—, la espada —frio que congela al quinto— y el escudo); cliente, tramo `sigrun()` despues de `corwen()`: el paso y de frente
+  (`cliente_sg01`, `sg02`), hablar, el menu, los nueve dias, aceptar (`sg03..sg06`), desenvaina y el duelo con su barra (`sg07`, `sg08`),
+  sus golpes (`sg09..sg13`), el grito con su frase (`sg14`), el giro y el salto (`sg15`, `sg16`), la frase de cuando se cae (`sg17`), se
+  rinde (`sg18`), de rodillas y su menu (`sg19`, `sg20`), dejarla marchar (`sg21..sg24`) y ya no se la ve (`sg25`); otra vez, acabar con
+  ella (`sg26..sg29`); la espada y el escudo en las manos (`sg30`) y la mision en la Historia (`sg31`). Lineas `sigrun ...`.
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

@@ -87,10 +87,16 @@ public final class Bocadillo {
     }
 
     public void render(GuiGraphics g, Font font, int x, int y, int w, float pt) {
+        render(g, font, x, y, w, pt, 1f);
+    }
+
+    /** Con lo que se ve de toda la caja ({@code mas}: la que dice un personaje en el mundo entra y sale apagandose). */
+    public void render(GuiGraphics g, Font font, int x, int y, int w, float pt, float mas) {
         if (numero < 0) return;
         // ya callado un rato: mas apagado
         float apaga = Mth.clamp((edad + pt - dura - 80f) / 30f, 0f, 1f);
-        float alfa = 1f - 0.45f * apaga;
+        float alfa = (1f - 0.45f * apaga) * mas;
+        if (alfa < 0.02f) return;
         Pix.color(1f, 1f, 1f, alfa);
         Panel.losa(g, x, y, w, ALTO);
         Panel.hueco(g, x + 6, y + 5, 34, 34);

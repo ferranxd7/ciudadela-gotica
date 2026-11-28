@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:sigrun",
+  "display": {
+    "icon": {
+      "item": "darkcraft:espada_guardiana"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.sigrun_paso.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.sigrun_paso.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 150
+  }
+}

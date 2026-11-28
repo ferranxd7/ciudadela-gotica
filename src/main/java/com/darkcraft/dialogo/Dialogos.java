@@ -24,7 +24,9 @@ public final class Dialogos {
      * ({@code Net.DialogoAccion}).
      */
     public enum Accion {
-        NADA, NIVEL, FORJA, TIENDA, SILBATO, GOLPEAR, TOMAR, RUMBO, ACEPTAR, PRECIO, RECHAZAR, DEVOLVER, QUEDAR, VERDAD, MENTIRA, CALLAR;
+        NADA, NIVEL, FORJA, TIENDA, SILBATO, GOLPEAR, TOMAR, RUMBO, ACEPTAR, PRECIO, RECHAZAR, DEVOLVER, QUEDAR, VERDAD, MENTIRA, CALLAR,
+        /** Con Sigrun (parte 7ap): empezar el duelo (al acabar su frase 2), acabar con ella (al acabar la 8) o dejarla marchar (la 9). */
+        DUELO, REMATAR, SOLTAR;
 
         public String id() {
             return name().toLowerCase(java.util.Locale.ROOT);
@@ -264,6 +266,23 @@ public final class Dialogos {
             .frase(8, FIN).frase(9, FIN).frase(10, FIN)
             .menu(r("corwen", "buscar", 2, Accion.ACEPTAR), r("corwen", "noche", 3, Accion.PRECIO), r("corwen", "no", 4, Accion.RECHAZAR))
             .menu(MENU + 1, r("corwen", "ir", 8, Accion.DEVOLVER), r("corwen", "quedar", 9, Accion.QUEDAR))
+            .hecho();
+
+    /**
+     * Sigrun, la Guardiana del Paso (parte 7ap, el duelo del Paso del Colmillo; {@code mision.Duelo}): no es de los personajes de siempre
+     * (es un enemigo con el que se habla). La primera vez se presenta (1); las demas, 5. Su menu: el duelo (2; al acabarla empieza el
+     * duelo: {@link Accion#DUELO}), por que sigue aqui (3, y otra vez el menu) o no (4). Rendida, de rodillas, 7 y el segundo menu (101):
+     * acabar con ella (8; al acabarla, cae: {@link Accion#REMATAR}) o dejarla marchar (9; al acabarla se va: {@link Accion#SOLTAR}). Las
+     * frases 6 (se rinde), 10 (has caido) y 11 (a media vida) las dice en el mundo, en el duelo ({@code Net.Cartel.VOZ}).
+     */
+    public static final Personaje SIGRUN = new Hacer("sigrun")
+            .frase(1, MENU).frase(5, MENU).frase(3, MENU)
+            .frase(2, FIN, Accion.DUELO).frase(4, FIN)
+            .frase(7, MENU + 1)
+            .frase(8, FIN, Accion.REMATAR).frase(9, FIN, Accion.SOLTAR)
+            .frase(6, FIN).frase(10, FIN).frase(11, FIN)
+            .menu(r("sigrun", "duelo", 2), r("sigrun", "porque", 3, Accion.PRECIO), r("sigrun", "no", 4, Accion.RECHAZAR))
+            .menu(MENU + 1, r("sigrun", "rematar", 8), r("sigrun", "soltar", 9))
             .hecho();
 
     /**

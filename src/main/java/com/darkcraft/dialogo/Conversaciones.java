@@ -33,6 +33,8 @@ public final class Conversaciones {
     public static void hablar(ServerPlayer sp, int entidad) {
         Entity e = sp.level().getEntity(entidad);
         if (e instanceof PersonajeBase p) hablar(sp, p);
+        // Sigrun, la Guardiana del Paso (parte 7ap): un enemigo con el que se habla
+        else if (e instanceof com.darkcraft.enemigos.Sigrun s) com.darkcraft.mision.Duelo.hablar(sp, s);
     }
 
     public static void hablar(ServerPlayer sp, PersonajeBase p) {
@@ -132,6 +134,11 @@ public final class Conversaciones {
     /** Lo que pide el cliente al acabar una frase o elegir una respuesta con accion. */
     public static void accion(ServerPlayer sp, int entidad, String accion) {
         Entity e = sp.level().getEntity(entidad);
+        // lo que se le responde a Sigrun (parte 7ap): el duelo, acabar con ella o dejarla marchar
+        if (e instanceof com.darkcraft.enemigos.Sigrun s) {
+            if (sp.distanceToSqr(e) <= (ALCANCE + 3) * (ALCANCE + 3)) com.darkcraft.mision.Duelo.accion(sp, s, accion);
+            return;
+        }
         if (!(e instanceof PersonajeBase) || sp.distanceToSqr(e) > (ALCANCE + 3) * (ALCANCE + 3)) return;
         if ("nivel".equals(accion) && e instanceof Guia g) {
             BlockPos s = g.santuario();

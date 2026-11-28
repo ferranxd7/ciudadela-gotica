@@ -303,6 +303,17 @@
     "lufs": -16
   },
   {
+    "id": "sigrun",
+    "pagina": "https://opengameart.org/node/165847",
+    "busca": "final_confrontation",
+    "titulo": "Final Confrontation",
+    "autor": "tcarisland",
+    "licencia": "CC-BY 4.0",
+    "aviso": "Music by tcarisland (OpenGameArt, CC-BY 4.0)",
+    "uso": "Sigrun, la Guardiana del Paso (el duelo del Paso del Colmillo, en las Montañas Nevadas de Morvain)",
+    "lufs": -16
+  },
+  {
     "id": "sombra1",
     "pagina": "https://opengameart.org/node/73591",
     "busca": "the_final_battle",
