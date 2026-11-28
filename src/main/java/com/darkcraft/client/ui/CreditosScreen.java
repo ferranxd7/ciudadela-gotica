@@ -52,7 +52,7 @@ public class CreditosScreen extends Screen {
             {"jinete", "Zane - Deep Dramatic Late Night Voice"},
             {"dragon", "Malvoryx The Monster"},
             {"isolde", "Elariel X - Epic Ethereal Queen"},
-            {"sigrun", "Kaisa - Strong and authoritative"}};
+            {"sigrun", "Kaisa - Strong and authoritative"}, {"capataz", "Rob - Tough, Calloused, British"}};
     /** Los mods que van dentro y el shader (con su licencia o su autor). */
     private static final String[][] MODS = {
             {"Distant Horizons", "LGPL-3.0"}, {"Oculus", "LGPL-3.0"}, {"Embeddium", "LGPL-3.0"},

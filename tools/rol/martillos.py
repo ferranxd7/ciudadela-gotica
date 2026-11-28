@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Los martillos (parte 7aj): textures/item/maza.png, martillo_guerra.png y gran_martillo.png (32 x 32). Dibujados en
+Los martillos (parte 7aj): textures/item/maza.png, martillo_guerra.png y gran_martillo.png (32 x 32); y el Pico del Capataz
+(parte 7ar, pico_capataz.png). Dibujados en
 diagonal como las armas del juego (el mango abajo a la izquierda, la cabeza arriba a la derecha): cada pixel se mira en
 las coordenadas del arma (u a lo largo del mango, desde el pomo; v de lado) y se le da el material de lo que cae ahi;
 luego el contorno de tinta. La luz viene de arriba a la izquierda (v negativa, mas clara).
@@ -125,8 +126,35 @@ def gran_martillo(u, v):
     return mango(u, v, 19.0, 1.35, 1.0, 9.0)
 
 
+NEGRO = [(16, 15, 18), (28, 27, 32), (44, 42, 50), (64, 62, 72), (92, 90, 102)]
+VETA = [(96, 16, 12), (150, 30, 18), (204, 54, 30), (240, 110, 64), (255, 182, 130)]
+
+
+def pico_capataz(u, v):
+    """El Pico del Capataz (parte 7ar): un pico doble de hierro negro, curvado hacia el mango en las puntas, con la veta roja
+    incrustada a lo largo; el ojo de hierro donde entra el mango, el mango largo con aros de hierro, el puno de cuero y el regaton."""
+    av = abs(v)
+    if av <= 10.0:
+        centro = 24.2 - 0.045 * v * v                     # las puntas se curvan hacia el pomo
+        grueso = 2.4 - 0.2 * av                            # y se afinan
+        if av <= 1.7 and 21.6 <= u <= 26.8:
+            return tono(HIERRO, 0.62 - v * 0.08 + (0.15 if u > 26.0 else 0.0))   # el ojo
+        if grueso > 0.35 and abs(u - centro) <= grueso:
+            if 2.2 <= av <= 8.2 and abs(u - centro) <= 0.55:
+                return tono(VETA, 0.55 + 0.35 * (1 - av / 8.2) + (0.1 if int(av * 2) % 3 == 0 else 0.0))   # la veta incrustada
+            luz = 0.5 - (u - centro) * 0.12 - v * 0.02 + (0.22 if u - centro > grueso - 0.8 else 0.0)
+            return tono(NEGRO, luz)
+    if 26.8 < u <= 28.2 and abs(v) <= 0.9:
+        return tono(HIERRO, 0.7)                           # la punta del ojo
+    if (9.0 <= u <= 9.9 or 15.5 <= u <= 16.4) and abs(v) <= 1.2:
+        return tono(HIERRO, 0.66 - v * 0.2)               # los aros del mango
+    if -1.6 <= u < 0.5 and abs(v) <= 1.3:
+        return tono(HIERRO, 0.55 - v * 0.2)               # el regaton
+    return mango(u, v, 21.6, 1.0, 0.6, 6.8)
+
+
 ARMAS = {"maza": (maza, 45.0, (4.5, 27.5)), "martillo_guerra": (martillo_guerra, 45.0, (4.0, 28.0)),
-         "gran_martillo": (gran_martillo, 45.0, (4.3, 27.7))}
+         "gran_martillo": (gran_martillo, 45.0, (4.3, 27.7)), "pico_capataz": (pico_capataz, 45.0, (4.4, 27.6))}
 
 
 def main():

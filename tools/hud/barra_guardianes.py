@@ -73,13 +73,19 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   carambanos, la empunadura de cuero con la guarda a la izquierda, la punta a la derecha) y en el centro su escudo de lagrima azul con
   el colmillo blanco; relleno de ventisca sobre el azul de noche; copos y esquirlas que caen al recibir dano.
 
+  Hakon, el Capataz (parte 7ar): su pico tumbado de punta a punta (el mango con aros de hierro, el puno de cuero y el regaton a la
+  izquierda, la cabeza del pico doble de hierro negro con la veta roja a la derecha) con cristales de la veta que le crecen y, en el
+  centro, su casco de hierro con el candil encendido; relleno de la veta roja que corre por la roca negra; piedrecitas y esquirlas de
+  cristal rojo que caen al recibir dano.
+
   La Sombra sin Nombre (parte 7ac): sus cadenas de hierro negro de punta a punta, rotas por tres sitios (las puntas al rojo), y en
   el centro la capucha sin cara (la oscuridad y dos ojos rojos) con la corona rota de Corvin flotando encima; relleno de oscuridad
   con venas rojas que laten; jirones de sombra y chispas rojas que suben al recibir dano.
 
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
 abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png, pontifice_barra.png, aldric_barra.png,
-gigante_barra.png, jinete_barra.png, bufon_barra.png, dragon_barra.png, isolde_barra.png, sombra_barra.png y sigrun_barra.png
+gigante_barra.png, jinete_barra.png, bufon_barra.png, dragon_barra.png, isolde_barra.png, sombra_barra.png, sigrun_barra.png y
+capataz_barra.png
 (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
@@ -2624,6 +2630,164 @@ def relleno_sigrun(k):
     return img
 
 
+# ---------------------------------------------------------------- Hakon, el Capataz (parte 7ar)
+
+CM_DD, CM_D, CM, CM_L = hexc("1a110a"), hexc("2e1f12"), hexc("47321d"), hexc("66492b")      # el mango
+CC_D, CC, CC_L = hexc("2a170c"), hexc("43281a"), hexc("5e3a24")                            # el cuero del puno
+CN_DD, CN_D, CN, CN_L, CN_H = hexc("08080a"), hexc("15151a"), hexc("26262d"), hexc("3d3d47"), hexc("626270")   # hierro negro
+CV_DD, CV_D, CV, CV_L, CV_H = hexc("3a0705"), hexc("7a120b"), hexc("b8230f"), hexc("ef5a2c"), hexc("ffb27a")  # la veta
+CL_D, CL, CL_L = hexc("6b4a12"), hexc("b8892a"), hexc("ecc860")                            # el laton del candil
+CR_D, CR, CR_L = hexc("26252a"), hexc("3a3940"), hexc("57555e")                            # la roca
+
+
+def marco_capataz():
+    """El pico del capataz tumbado de punta a punta: el mango de madera con aros de hierro, el puno de cuero y el regaton a la
+    izquierda y, a la derecha, la cabeza del pico doble de hierro negro con la veta roja incrustada; cristales rojos de la veta que le
+    crecen por encima; en el centro el casco de hierro del capataz con su candil encendido (la llama roja)."""
+    rnd = random.Random(1717)
+    n = noise2(1719)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 4, FX1 - 6, FY0 - 3, FY1 + 2
+    rect(img, x0, y0, x1, y1, OUT)
+    # el mango: madera con la veta a lo largo, luz arriba
+    for y in range(y0 + 1, y1):
+        for x in range(x0 + 1, x1):
+            v = n(x * 0.05, y * 0.9)
+            c = CM_D if v < 0.35 else CM if v < 0.8 else CM_L
+            if y == y0 + 1:
+                c = mix(c, CM_L, 0.5)
+            if y == y1 - 1:
+                c = mix(c, CM_DD, 0.6)
+            put(img, x, y, c)
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, CM_DD)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # los aros de hierro del mango
+    for xx in (x0 + 40, x0 + 82, x1 - 82, x1 - 40):
+        for y in range(y0 - 1, y1 + 2):
+            put(img, xx - 1, y, OUT)
+            put(img, xx, y, CN_L if y < (y0 + y1) // 2 else CN)
+            put(img, xx + 1, y, CN_D)
+            put(img, xx + 2, y, OUT)
+    # el puno de cuero y el regaton (a la izquierda)
+    for x in range(0, x0 + 18):
+        for y in range(y0 - 1, y1 + 2):
+            if x < 5:
+                c = CN_L if y < (y0 + y1) // 2 else CN_D
+            else:
+                c = CC_L if (x + y) % 4 == 0 else CC if (x // 2) % 2 == 0 else CC_D
+            put(img, x, y, c)
+        put(img, x, y0 - 2, OUT)
+        put(img, x, y1 + 2, OUT)
+    for y in range(y0 - 2, y1 + 3):
+        put(img, 0, y, OUT)
+    # la cabeza del pico (a la derecha): de canto, alta, de hierro negro, con las puntas curvadas hacia el mango y la veta
+    hx = x1 + 1
+    for y in range(0, 40):
+        d = abs(y - (y0 + y1) / 2)
+        ancho = 6 - int(d * 0.22)
+        cx = hx + 2 - int(0.012 * d * d * 3)
+        if ancho <= 0 or d > 19:
+            continue
+        for x in range(cx - ancho // 2 - 1, cx + ancho // 2 + 2):
+            put(img, x, y, OUT)
+        for x in range(cx - ancho // 2, cx + ancho // 2 + 1):
+            c = CN if x < cx else CN_D
+            if x == cx - ancho // 2:
+                c = CN_L
+            if x == cx and 4 < d < 15:
+                c = CV_L if (y % 3) else CV_H                  # la veta incrustada
+            put(img, x, y, c)
+    # el ojo de hierro donde entra el mango
+    for y in range(y0 - 2, y1 + 3):
+        for x in range(hx - 4, hx):
+            put(img, x, y, CN_L if y < (y0 + y1) // 2 else CN)
+        put(img, hx - 5, y, OUT)
+    # cristales rojos de la veta que crecen sobre el mango (y alguno por debajo)
+    for xx, alto, arriba in ((x0 + 22, 6, True), (x0 + 27, 4, True), (x0 + 58, 5, True), (x0 + 63, 3, True), (x1 - 62, 6, True),
+                             (x1 - 57, 4, True), (x1 - 24, 5, True), (x0 + 100, 3, False), (x1 - 100, 3, False)):
+        for i in range(alto):
+            yy = y0 - 1 - i if arriba else y1 + 1 + i
+            semi = 1 if i < alto - 2 else 0
+            for dx in range(-semi - 1, semi + 2):
+                put(img, xx + dx, yy, OUT)
+        for i in range(alto):
+            yy = y0 - 1 - i if arriba else y1 + 1 + i
+            semi = 1 if i < alto - 2 else 0
+            for dx in range(-semi, semi + 1):
+                put(img, xx + dx, yy, CV_H if i >= alto - 1 else (CV_L if dx <= 0 else CV))
+    # en el centro: el casco del capataz (de frente) con el ala, la cresta y el candil con su llama roja
+    cx = FW // 2
+    for y in range(4, 24):
+        semi = 9 if y >= 9 else 9 - (9 - y) // 2
+        if y >= 20:
+            semi = 12
+        for dx in range(-semi - 1, semi + 2):
+            put(img, cx + dx, y, OUT)
+    for y in range(5, 23):
+        semi = 8 if y >= 9 else 8 - (9 - y) // 2
+        if y >= 20:
+            semi = 11
+        for dx in range(-semi, semi + 1):
+            t = n((cx + dx) * 0.25, y * 0.25)
+            c = CN_D if t < 0.35 else CN if t < 0.8 else CN_L
+            if dx < -semi // 2 and y < 14:
+                c = mix(c, CN_H, 0.35)
+            if y >= 20:
+                c = CN_L if y == 20 else CN_D                  # el ala
+            if dx == 0 and y < 20:
+                c = CN_H if y % 2 else CN_L                    # la cresta
+            put(img, cx + dx, y, c)
+    # el candil: la cajita de laton y la llama roja encima
+    for y in range(9, 16):
+        for dx in range(-3, 4):
+            put(img, cx + dx, y, OUT)
+    for y in range(10, 15):
+        for dx in range(-2, 3):
+            put(img, cx + dx, y, CL if (dx + y) % 3 else CL_L)
+    for y, semi, c in ((4, 0, CV_H), (5, 1, CV_L), (6, 1, CV_L), (7, 1, CV), (8, 2, CV)):
+        for dx in range(-semi, semi + 1):
+            put(img, cx + dx, y, c if dx != 0 else CV_H)
+    put(img, cx, 3, CV_D)
+    return img
+
+
+def relleno_capataz(k):
+    """La veta que corre por la roca negra: vetas rojas al rojo que pasan entre la piedra y algun destello."""
+    n = noise2(1733)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            t = 0.2 + 0.45 * mid + 0.45 * (n((x - k * 3) * 0.08, y * 0.6) - 0.5)
+            c = mix(CV_DD, CV_D, max(0.0, min(1.0, t * 1.3)))
+            veta = (x - k * 3 + int(2.5 * math.sin((x + y * 7) * 0.13))) % 19
+            if veta in (0, 1) and 1 <= y <= 5:
+                c = mix(c, CV_L if veta == 0 else CV, 0.7)
+            if n(x * 0.21 + 40, y * 0.8) > 0.86:
+                c = mix(c, CR_L, 0.6)                          # la roca negra entre la veta
+            if (x * 13 + y * 5 - k * 23) % 67 == 0 and 2 <= y <= 4:
+                c = CV_H
+            if y == 0:
+                c = mix(c, CV_L, 0.25)
+            if y == 6:
+                c = mix(c, CV_DD, 0.6)
+            img.putpixel((x, y), c)
+    return img
+
+
+def cascajo_veta():
+    """Lo que cae al recibir dano: piedrecitas de la mina y esquirlas de cristal rojo."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = (["pP", "Pp"], [".v.", "vVv", ".v."], ["P.", "pp"], ["v", "V", "v"])
+    col = {"p": CR_L, "P": CR, "v": CV_L, "V": CV_H}
+    for k, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, k * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 def hueco(a, b):
     n = noise2(113)
     img = Image.new("RGBA", (240, 7))
@@ -2673,6 +2837,7 @@ if __name__ == "__main__":
         "isolde": atlas(marco_isolde(), relleno_isolde, hueco("060407", "140d16"), rastro("fff0f2", "e8b0bc"), petalos()),
         "sombra": atlas(marco_sombra(), relleno_sombra, hueco("030204", "0e0a12"), rastro("ffe8e8", "e8a0a0"), jirones()),
         "sigrun": atlas(marco_sigrun(), relleno_sigrun, hueco("04070c", "0e1626"), rastro("f6fbff", "c8d8ea"), copos()),
+        "capataz": atlas(marco_capataz(), relleno_capataz, hueco("070505", "17100d"), rastro("fff0e6", "f0b49a"), cascajo_veta()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

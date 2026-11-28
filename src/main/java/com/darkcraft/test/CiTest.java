@@ -765,6 +765,7 @@ public final class CiTest {
         misionCorwen(server, m, log);
         misionSigrun(server, m, log);
         minas(server, m, log, out);
+        capataz(server, m, log);
         armaduras(server, m, log);
         armas7aj(server, m, log);
         escudos7ak(server, m, log);
@@ -6720,6 +6721,244 @@ public final class CiTest {
             for (var e : quitar) if (!e.isRemoved()) e.discard();
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
             com.darkcraft.morvain.Mina.rearmar();
+        }
+        log.flush();
+    }
+
+    /**
+     * Parte 7ar: Hakon, el Capataz. En su puesto (el 0 de la mina: picando el corazon de la veta en la Caverna del Filon, de cara al
+     * norte), el corazon de la veta y lo que se movio de la caverna; a quien repara (dentro de la caverna y cerca; fuera, nadie); la
+     * pelea: se vuelve y silba (el turno sale de los escombros); sus golpes a una presa (picotazo, barrido, embestida, la veta en linea,
+     * los barrenos, el derrumbe con sus piedras), el pico que engancha el escudo; a media vida se bebe la veta; al caer, lo que deja y
+     * el turno de noche que descansa (y no vuelve); el Pico del Capataz (la veta que revienta al cuarto golpe). Al acabar, todo como
+     * estaba (Hakon y los enterrados vuelven).
+     */
+    private static void capataz(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.MINA;
+        final int CX = com.darkcraft.morvain.Mina.CX, CZ = com.darkcraft.morvain.Mina.CZ, N3 = com.darkcraft.morvain.Mina.N3;
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07aab"), "[DarkCraftCI32]"));
+        int jefe = com.darkcraft.morvain.MorvainEnemigos.capataz();
+        try {
+            var A = com.darkcraft.morvain.Mina.get();
+            for (long k : A.chunks()) m.getChunk((int) (k >> 32), (int) k);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarGrupo(m, sitio, g -> g.equals(com.darkcraft.enemigos.Puestos.JEFE));
+            com.darkcraft.enemigos.Capataz c = null;
+            for (var e : fuera) if (e instanceof com.darkcraft.enemigos.Capataz x) c = x;
+            if (c == null) {
+                log.println("Morvain, Hakon el Capataz: NO SALE (" + fuera.size() + " del grupo de los jefes)");
+                return;
+            }
+            for (int k = 0; k < 6; k++) pasoE(c, null, 0, 0, 0);
+            int[] q = A.sitio("capataz");
+            // el corazon de la veta: lo que hay delante de el (a 2-7 bloques, al norte)
+            int gemas = 0, veta = 0;
+            for (int u = -4; u <= 5; u++)
+                for (int v = -212; v <= -205; v++)
+                    for (int y = N3; y <= N3 + 6; y++) {
+                        var st = m.getBlockState(new BlockPos(CX + u, y, CZ + v));
+                        if (st.is(DarkCraftMod.GEMA_ROJA.get())) gemas++;
+                        else if (st.is(net.minecraft.world.level.block.Blocks.DEEPSLATE_REDSTONE_ORE) || st.is(net.minecraft.world.level.block.Blocks.CRYING_OBSIDIAN)
+                                || st.is(net.minecraft.world.level.block.Blocks.MAGMA_BLOCK)) veta++;
+                    }
+            var abajo = m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ()));
+            boolean arcon = m.getBlockState(new BlockPos(CX - 15, N3 + 1, CZ - 196)).is(net.minecraft.world.level.block.Blocks.CHEST);
+            StringBuilder sb = new StringBuilder(String.format(java.util.Locale.ROOT, "Morvain, Hakon el Capataz: en %s (sitio %d, %d, %d), postura %d (1 picando), giro %.0f, pisa %s,"
+                            + " libre %s, caja %.1f x %.1f, vida %.0f, golpe %.1f, armadura %d, en la caverna %s; el corazon de la veta: gemas %d, veta %d; el arcon de la"
+                            + " caverna, movido al oeste %s; lugar %s", c.blockPosition().toShortString(), q[0], q[1], q[2], c.postura(), c.getYRot(),
+                    abajo.getBlock().getDescriptionId().replace("block.minecraft.", ""), m.noCollision(c), c.getBbWidth(), c.getBbHeight(), c.getMaxHealth(),
+                    c.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), c.getArmorValue(),
+                    com.darkcraft.morvain.Mina.enFilon(c.getX(), c.getY(), c.getZ()), gemas, veta, arcon, com.darkcraft.morvain.Mina.lugar(c.getX(), c.getY(), c.getZ())));
+            // ---- a quien repara: dentro de la caverna y cerca (de pie, en supervivencia); de lejos o desde la galeria, no
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            double[][] donde = {{0.5, -196.5}, {0.5, -189.5}, {0.5, -176.5}};
+            String[] como = {"a 7 en la caverna", "a 14 en la caverna", "en la galeria de entrada"};
+            sb.append("; repara en:");
+            for (int i = 0; i < donde.length; i++) {
+                double fy = com.darkcraft.enemigos.Puestos.suelo(m, CX + (int) Math.floor(donde[i][0]), N3 + 3, CZ + (int) Math.floor(donde[i][1]));
+                fp.moveTo(CX + donde[i][0], fy, CZ + donde[i][1], 180f, 0f);
+                sb.append(' ').append(como[i]).append(' ').append(c.reparaEn(fp)).append(i < donde.length - 1 ? "," : "");
+            }
+            log.println(sb);
+            // ---- la pelea: una presa en la caverna (un aldeano al sur); se vuelve, dice su frase y silba: sale el turno
+            double gx = CX + 0.5, gz = CZ - 197.5;
+            double gy = com.darkcraft.enemigos.Puestos.suelo(m, CX, N3 + 3, CZ - 198);
+            var presa = victima(m, gx, gy, gz, 180f, quitar);
+            if (presa == null) return;
+            presa.setInvulnerable(true);
+            c.setTarget(presa);
+            sb = new StringBuilder("Morvain, Hakon el Capataz pelea:");
+            int volverse = -1, silbato = -1;
+            float giroTras = Float.NaN;
+            for (int k = 0; k < 260; k++) {
+                pasoE(c, presa, gx, gy, gz);
+                if (volverse < 0 && c.accion() == com.darkcraft.enemigos.CapatazAnims.VOLVERSE) volverse = k;
+                if (volverse >= 0 && Float.isNaN(giroTras) && c.accion() != com.darkcraft.enemigos.CapatazAnims.VOLVERSE) giroTras = c.getYRot();
+                if (silbato < 0 && c.accion() == com.darkcraft.enemigos.CapatazAnims.SILBATO) silbato = k;
+                if (silbato >= 0 && k > silbato + 30) break;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " en pelea %s, se vuelve en el tick %d (al acabar mira a %.0f; la presa, al sur: 0), silba en el %d (la frase 1"
+                            + " dura %d), el turno: llamados %d, en pie %d (", c.enPelea(), volverse, giroTras, silbato,
+                    com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Capataz.VOZ_BASE + 1), c.llamados(), c.suyos()));
+            for (var e : c.turno()) {
+                sb.append(e.tipo().replace("enterrado_", "")).append(" en ").append(e.blockPosition().toShortString()).append(' ')
+                        .append(e.esEfimero() ? "efimero" : "NO EFIMERO").append(m.noCollision(e) ? "" : " METIDO").append("; ");
+                quitar.add(e);
+            }
+            sb.append(")");
+            log.println(sb);
+            // ---- sus golpes a una presa delante (al sur), cada uno solo: que no elija otro
+            c.quieta = true;
+            for (var e : c.turno()) e.discard();
+            sb = new StringBuilder("Morvain, los golpes del Capataz a una presa:");
+            String[] nombres = {"picotazo", "barrido", "embestida", "veta", "barrenos", "derrumbe"};
+            int[] acciones = {com.darkcraft.enemigos.CapatazAnims.PICOTAZO, com.darkcraft.enemigos.CapatazAnims.BARRIDO, com.darkcraft.enemigos.CapatazAnims.EMBESTIDA,
+                    com.darkcraft.enemigos.CapatazAnims.VETA, com.darkcraft.enemigos.CapatazAnims.BARRENOS, com.darkcraft.enemigos.CapatazAnims.DERRUMBE};
+            double[] dist = {3.0, 3.0, 6.5, 7.0, 9.0, 5.0};
+            int[] dura = {44, 36, 36, 70, 150, 110};
+            presa.setInvulnerable(false);
+            for (int i = 0; i < nombres.length; i++) {
+                double hy = com.darkcraft.enemigos.Puestos.suelo(m, CX, N3 + 3, CZ - 192);
+                c.moveTo(CX + 0.5, hy, CZ - 191.5, 0f, 0f);
+                c.setYRot(0f);
+                c.yBodyRot = c.yHeadRot = 0f;
+                c.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                double py = com.darkcraft.enemigos.Puestos.suelo(m, CX, N3 + 3, (int) Math.floor(CZ - 191.5 + dist[i]));
+                presa.moveTo(CX + 0.5, py, CZ - 191.5 + dist[i], 180f, 0f);
+                presa.setHealth(presa.getMaxHealth());
+                presa.removeAllEffects();
+                presa.invulnerableTime = 0;
+                c.setTarget(presa);
+                int pt = c.picotazos(), br = c.barridos(), em = c.embestidas(), ve = c.vetas(), cr = c.cristalesQueDan(), ba = c.barrenos(), ca = c.cartuchos(),
+                        de = c.derrumbes(), ro = c.rocas(), rd = c.rocasQueDan();
+                int rev = com.darkcraft.enemigos.Cartucho.REVIENTAN;
+                float vida = presa.getHealth();
+                boolean frenada = false, acabo = false, sube = false;
+                c.empezar(acciones[i]);
+                for (int k = 0; k < dura[i]; k++) {
+                    c.tickCount++;
+                    c.tick();
+                    if (c.accion() == 0) acabo = true;
+                    // (acabado: que se quede quieto y siga contando lo que cae)
+                    if (acabo) c.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    for (var t : m.getEntitiesOfClass(com.darkcraft.enemigos.Cartucho.class, new net.minecraft.world.phys.AABB(CX - 24, N3 - 4, CZ - 214, CX + 24, N3 + 20, CZ - 170))) {
+                        if (t.isRemoved()) continue;
+                        if (!quitar.contains(t)) quitar.add(t);
+                        t.tickCount++;
+                        t.tick();
+                    }
+                    net.minecraft.world.phys.Vec3 dv = presa.getDeltaMovement();
+                    if (dv.y > 0.5) sube = true;
+                    presa.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    presa.invulnerableTime = 0;
+                    frenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                }
+                String extra = switch (nombres[i]) {
+                    case "picotazo" -> " (+" + (c.picotazos() - pt) + ")";
+                    case "barrido" -> " (+" + (c.barridos() - br) + ")";
+                    case "embestida" -> " (+" + (c.embestidas() - em) + ")";
+                    case "veta" -> " (vetas +" + (c.vetas() - ve) + ", cristales que dan +" + (c.cristalesQueDan() - cr) + ", lanza por el aire " + sube + ")";
+                    case "barrenos" -> " (+" + (c.barrenos() - ba) + ", cartuchos +" + (c.cartuchos() - ca) + ", revientan +" + (com.darkcraft.enemigos.Cartucho.REVIENTAN - rev) + ")";
+                    case "derrumbe" -> " (+" + (c.derrumbes() - de) + ", piedras +" + (c.rocas() - ro) + ", dan +" + (c.rocasQueDan() - rd) + ", frenada " + frenada + ")";
+                    default -> "";
+                };
+                sb.append(String.format(java.util.Locale.ROOT, " %s a %.1f: la presa -%.1f%s, acaba %s;", nombres[i], dist[i], vida - presa.getHealth(), extra, acabo));
+                for (var t : m.getEntitiesOfClass(com.darkcraft.enemigos.Cartucho.class, new net.minecraft.world.phys.AABB(CX - 30, N3 - 6, CZ - 220, CX + 30, N3 + 24, CZ - 160)))
+                    t.discard();
+            }
+            // el pico engancha el escudo
+            var cubierto = new net.minecraftforge.common.util.FakePlayer(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07aac"), "[DarkCraftCI33]")) {
+                @Override
+                public boolean isBlocking() {
+                    return true;
+                }
+            };
+            cubierto.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            int g0 = c.guardias();
+            boolean entra = c.engancha(cubierto);
+            sb.append(String.format(java.util.Locale.ROOT, " el picotazo contra quien se cubre: guardias rotas +%d, el golpe entra %s", c.guardias() - g0, entra));
+            log.println(sb);
+            // ---- a media vida: se bebe la veta
+            sb = new StringBuilder("Morvain, el Capataz a media vida:");
+            int ll = c.llamados();
+            c.mediaVida();
+            boolean bebe = false;
+            for (int k = 0; k < 70; k++) {
+                pasoE(c, presa, presa.getX(), presa.getY(), presa.getZ());
+                if (c.accion() == com.darkcraft.enemigos.CapatazAnims.ABSORBER) bebe = true;
+                if (bebe && c.accion() == 0) break;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " segunda %s, se bebe la veta (la accion) %s, con la veta %s, vuelve a llamar al turno +%d (en pie %d), %s",
+                    c.segunda(), bebe, c.veta(), c.llamados() - ll, c.suyos(), c.estado()));
+            for (var e : c.turno()) quitar.add(e);
+            log.println(sb);
+            // ---- cae: de rodillas, su frase, las lamparas, se deshace; lo que deja; el turno de noche descansa y no vuelve
+            sb = new StringBuilder("Morvain, el Capataz cae:");
+            var deMina = com.darkcraft.enemigos.Puestos.sacarGrupo(m, sitio, g -> !g.equals(com.darkcraft.enemigos.Puestos.JEFE));
+            for (var e : deMina) quitar.add(e);
+            int desc0 = com.darkcraft.morvain.Mina.DESCANSAN;
+            boolean pazAntes = com.darkcraft.morvain.Mina.enPaz(server);
+            c.vencer();
+            int seVa = -1;
+            for (int k = 0; k < 260 && !c.isRemoved(); k++) {
+                pasoE(c, null, 0, 0, 0);
+                if (c.isRemoved()) seVa = k;
+            }
+            int picos = 0, piedras3 = 0;
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(CX - 20, N3 - 4, CZ - 214, CX + 20, N3 + 16, CZ - 175))) {
+                if (it.getItem().is(DarkCraftMod.PICO_CAPATAZ.get())) picos += it.getItem().getCount();
+                if (it.getItem().is(DarkCraftMod.PIEDRA_FORJA_3.get())) piedras3 += it.getItem().getCount();
+                quitar.add(it);
+            }
+            boolean paz = com.darkcraft.morvain.Mina.enPaz(server);
+            com.darkcraft.morvain.Mina.paz(m);
+            int quedanFuera = 0;
+            for (var e : deMina) if (e.isAlive() && !e.isRemoved()) quedanFuera++;
+            sb.append(String.format(java.util.Locale.ROOT, " muere %s (en paz antes %s); se deshace en %d ticks; deja el pico %d y piedras III %d; el turno de noche descansa %s:"
+                            + " de %d enterrados fuera se deshacen +%d (quedan %d); %s", !c.isAlive(), pazAntes, seVa, picos, piedras3, paz, deMina.size(),
+                    com.darkcraft.morvain.Mina.DESCANSAN - desc0, quedanFuera, com.darkcraft.morvain.MorvainEnemigos.estadoCapataz(server)));
+            log.println(sb);
+            // ---- el Pico del Capataz: un gran martillo; la veta revienta al cuarto golpe (a el y a los enemigos de alrededor)
+            sb = new StringBuilder("Morvain, el Pico del Capataz:");
+            var pico = new net.minecraft.world.item.ItemStack(DarkCraftMod.PICO_CAPATAZ.get());
+            var esc = com.darkcraft.combate.Escalado.de(pico);
+            sb.append(" tipo ").append(com.darkcraft.combate.Armas.de(pico)).append(", escala ").append(esc == null ? "-" : esc.letras()).append(", ataque ")
+                    .append(String.format(java.util.Locale.ROOT, "%.1f", com.darkcraft.combate.Escalado.base(pico)));
+            var b1 = DarkCraftMod.ENTERRADO.get().create(m);
+            var b2 = DarkCraftMod.ENTERRADO.get().create(m);
+            if (b1 != null && b2 != null) {
+                double by = com.darkcraft.enemigos.Puestos.suelo(m, CX, N3 + 3, CZ - 190);
+                b1.moveTo(CX + 0.5, by, CZ - 189.5, 0f, 0f);
+                b2.moveTo(CX + 2.0, by, CZ - 189.5, 0f, 0f);
+                b1.setNoAi(true);
+                b2.setNoAi(true);
+                m.addFreshEntity(b1);
+                m.addFreshEntity(b2);
+                quitar.add(b1);
+                quitar.add(b2);
+                float v1 = b1.getHealth(), v2 = b2.getHealth();
+                int est0 = com.darkcraft.armas.PicoCapataz.ESTALLIDOS;
+                StringBuilder golpes = new StringBuilder();
+                for (int k = 0; k < 4; k++) golpes.append(com.darkcraft.armas.PicoCapataz.veta(b1, fp) ? "R" : ".");
+                sb.append(String.format(java.util.Locale.ROOT, "; cuatro golpes seguidos %s (revienta +%d): el golpeado -%.1f, el de al lado -%.1f", golpes,
+                        com.darkcraft.armas.PicoCapataz.ESTALLIDOS - est0, v1 - b1.getHealth(), v2 - b2.getHealth()));
+            }
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println("Morvain, Hakon el Capataz: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] capataz", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            var e = com.darkcraft.enemigos.Puestos.enemigo(sitio, jefe);
+            if (e != null) e.discard();
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, jefe, false);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            try {
+                log.println("Morvain, el Capataz vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoCapataz(server) + "; en paz " + com.darkcraft.morvain.Mina.enPaz(server));
+            } catch (Throwable t) {
+                log.println("Morvain, el Capataz vuelve: ERROR " + t);
+            }
         }
         log.flush();
     }

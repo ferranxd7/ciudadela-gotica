@@ -4261,6 +4261,63 @@ el turno de noche (cuarenta lamparas) se quedo abajo. Al cuarto dia se empezo a 
   agachado junto a uno (`mn35`, lineas `le oye ...`); un techo roto que cruje y cae (`mn36`, `mn37`); uno que se deshace (`mn38`); el
   libro de turnos (`mn39`) y el bestiario (`mn40..mn42`).
 
+### Plan grande, parte 7ar: Hakon, el Capataz (el jefe de las Minas de Hierro Negro)
+
+El jefe de la mazmorra de la 7aq (respuesta 131 del plan). Lore: Hakon era el capataz del turno de noche; abrio el nivel tres, donde la
+veta roja sangra, y mando volar la pared tras la que se oian voces. La noche del cielo rojo se quedo abajo con la veta metida dentro
+(cristales rojos le salen del hombro, del brazo y del pecho) y sigue picando su corazon.
+- **Hakon** (`enemigos/Capataz`, un `Guardian`; entidad `darkcraft:capataz` 1,2 x 3,2, escala 1,5; modelo de `tools/enemigos/capataz.py`:
+  casco con candil, barba, faldon, cinturon con silbato y llaves, el farol a la izquierda, el pico doble de hierro negro con la veta en
+  la cabeza y la veta de cristal en el brazo izquierdo, el antebrazo y el torso, con brillo; `client/enemigos/CapatazModelo` —`REZA` es
+  PICANDO; si no QUIETO + PORTE, LISTO en pelea y ANDAR— y `CapatazRenderer`, que late rojo y mas con la veta bebida). 1000 de vida,
+  golpe 12, armadura 8; ecos 15000. Es el **puesto 0** de la mina (`Mina.esperas`, grupo `Puestos.JEFE`: no vuelve al descansar):
+  picando de cara al norte el **corazon de la veta** (`Mina.corazonVeta`: un elipsoide de gema roja encendida, mena de redstone, obsidiana
+  llorosa, magma y piedra negra al fondo de la Caverna del Filon; el arcon de la caverna paso al oeste y los andamios a los lados). Solo
+  repara en quien entra en la caverna (`Mina.enFilon`) y se le acerca (12 bloques, si le ve); peleando alli, a los de fuera ni los
+  mira (no se le saca de la caverna).
+- **La pelea**: se vuelve (`VOLVERSE`, girando entero hacia quien llega) diciendo la 1 ("¿Quien anda ahi? El turno no ha acabado... ¡A la
+  veta!", una vez cada 4 min) y **toca el silbato** (`SILBATO`): de los escombros de los bordes (`Mina.turno`, lejos de los jugadores)
+  salen **los del turno** (enterrados efimeros, `TUMBADO`: dos, y uno mas por cada jugador de mas, como mucho 4 en pie; se
+  deshacen al acabar la pelea). Sus golpes (`elegir`): **picotazo** (si lo paras con el escudo, **el pico lo engancha**: 5 s sin escudo y entra entero —`pilla`),
+  **barrido** muy abierto, **embestida** con el hombro de cristal (cruza 7 bloques), **la veta** (clava el pico y los cristales brotan en
+  linea hacia ti cada 1,3 bloques hasta 14 —`lineaDeVeta`; lanzan por el aire; apartate de lado), **los barrenos** (enciende las mechas en
+  el farol y lanza tres `Cartucho` en abanico; dice la 4, "¡Prended las mechas!") y **el derrumbe** (golpea el suelo dos veces: una marca
+  bajo cada uno y algunas al azar; 1,3 s despues cae la piedra del techo —`EfectosRaiz.cae`—: dano y lentitud). Cuando cae su presa,
+  la 3 ("Otro mas para el pozo...").
+- **A media vida se bebe la veta** (`ABSORBER`; `alSegundaMitad`): clava la mano de cristal en el suelo, la veta le corre por el brazo y
+  se levanta con ella dentro (`VETA` sincronizado: luce, va mas deprisa, del picotazo brotan cristales, la veta abre un anillo, cinco
+  cartuchos, mas derrumbes y vuelve a llamar al turno, con un cargador); dice la 2 ("La veta... ¡es mia!").
+- **Cae** sin irse en humo: de rodillas apoyado en el pico, su farol se apaga, dice la 5 ("Las lamparas... veo las lamparas... suben...
+  Dejadlos... volver a casa") y **suben las cuarenta lamparas** (luces que salen del suelo de la caverna, `sfx.capataz_almas`); al final se
+  deshace en polvo y la veta se rompe (`tickDeath`, 150 ticks). Deja el **Pico del Capataz**, 3 piedras de forja III, 2 de II y cenizas de
+  llamas; el cartel de JEFE ABATIDO, la hazana `capataz` ("El ultimo turno", desafio, 400 de experiencia) y el bestiario (`Guardianes`).
+  **El turno de noche descansa** (`Mina.paz`, cada segundo desde `Morvain`): con Hakon caido, los enterrados de la mina que no pelean se
+  deshacen (sube su lampara) y no vuelven (`MorvainEnemigos`: sus puestos dejan de estar en uso con `Mina.enPaz`).
+- **El Pico del Capataz** (`armas/PicoCapataz`, un `Martillo` de tipo `GRAN_MARTILLO`: sus golpes y romper la guardia; escala B en Fuerza
+  y D en Destreza, `Escalado`; textura de `tools/rol/martillos.py`): cada golpe deja cristal en quien lo recibe y al cuarto seguido (sin
+  pasar 8 s) **revienta**: 7 de dano a el y a los enemigos de alrededor (2,6 bloques) con cristales que brotan.
+- Barra propia (`barra_guardianes.py` `marco_capataz`: el pico tumbado con la veta y cascajo; relleno de veta roja), musica "Duel of the
+  Dungeons" de Umplix (CC0, id `capataz`, tema 50). Voz "Rob - Tough, Calloused, British" (ElevenLabs, `eleven_v4`, cinco frases, filtro
+  `voz_capataz` de `procesar.py`: la voz grave de la veta por debajo y un brillo de cristal; `Voces.BASE_CAPATAZ` 180) y sonidos (flow
+  `M2NdlS8Pm3d3AaLHd6Tg`): `capataz_silbato`, `pico`, `veta`, `temblor`, `roca`, `absorber`, `embestida`, `dolor`, `muerte` y `almas`
+  (tomas en `TOMAS_SFX`). Prompts y firmas en `herr` (fuera del repo).
+- Comandos `/darkcraft capataz [ir | vencer | volver | media | accion <n> | suelta]` (`accion`: que haga esa, quieto, contra quien lo
+  pide; `suelta`: que vuelva a elegir el).
+- **Sin abrir el juego**: `python3 tools/enemigos/generar.py --solo capataz --vistas carpeta` (el modelo y sus animaciones);
+  `VOLCADO_OPTS="-Droca=true" bash tools/vista3d/vista.sh morvain_mina carpeta` (el sitio `capataz` y su puesto se pisan y se llega a pie).
+- Pruebas: servidor, `capataz()` despues de `minas()` (lineas `Morvain, Hakon el Capataz: ...` —su puesto, postura, giro, lo que pisa, el
+  corazon de la veta, el arcon movido, a quien repara (a 7 en la caverna si, a 14 no, desde la galeria no)—, `... pelea: ...` —se vuelve y
+  mira a la presa, silba tras su frase, el turno (efimeros, ninguno metido)—, `Morvain, los golpes del Capataz a una presa: ...` —cada golpe
+  solo: picotazo, barrido, embestida, la veta (y los cristales que lanzan), los barrenos (los cartuchos revientan), el derrumbe (las
+  piedras dan y frenan) y el escudo enganchado—, `Morvain, el Capataz a media vida: ...`, `Morvain, el Capataz cae: ...` —se deshace, el
+  pico y las piedras en el suelo, el turno de noche descansa— y `Morvain, el Pico del Capataz: ...` —gran martillo BD, revienta al cuarto
+  golpe tambien al de al lado—; al acabar, `Morvain, el Capataz vuelve: ...`); cliente, tramo `capataz()` despues de `mina()`: la caverna
+  (`cliente_ca01`), picando de cerca en el golpe (`ca02`), el corazon de la veta sin vision nocturna (`ca03`); en supervivencia: se vuelve
+  (`ca04`), su frase y su barra (`ca05`), el silbato (`ca06`) y el turno que sale (`ca07`); sus golpes con el comando (`ca08..ca20`:
+  picotazo, barrido, embestida, la veta, los barrenos —`ca18` revientan— y el derrumbe); se bebe la veta (`ca21`, `ca22`), con la veta en
+  primera persona (`ca23`), el picotazo con la veta (`ca24`); cae (`ca25` de rodillas, `ca26` las lamparas, `ca27` se deshace), JEFE
+  ABATIDO (`ca28`), lo que deja (`ca29`), el pico en la mano (`ca30`, lineas `Hakon: en la mano ...`) y el bestiario (`ca31`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

@@ -877,8 +877,10 @@ public final class Mina {
         // ---- el enganche del nivel 1: la jaula de mirar y un farol
         put(14, N1 + 4, -84, farol(true, true));
         put(14, N1 + 5, -84, cadena(Direction.Axis.Y));
-        // ---- el filon: andamios contra la pared del norte, faroles y la vagoneta volcada
-        for (int u = -8; u <= 8; u += 4) {
+        // ---- el filon: andamios contra la pared del norte, faroles y la vagoneta volcada (parte 7ar: en el medio no, que alli pica
+        // Hakon el corazon de la veta)
+        for (int u = -12; u <= 12; u += 4) {
+            if (Math.abs(u) < 8) continue;
             int v = -206 + Math.abs(u) / 4;
             for (int y = N3 + 1; y <= N3 + 6; y++) put(u, y, v, tronco(Blocks.SPRUCE_LOG, Direction.Axis.Y));
             for (int du = -2; du <= 2; du++) if (!macizo(u + du, N3 + 4, v + 1)) put(u + du, N3 + 4, v + 1, b(Blocks.SPRUCE_PLANKS));
@@ -889,6 +891,26 @@ public final class Mina {
         put(-4, N3 + 1, -191, b(Blocks.RAW_IRON_BLOCK));
         put(5, N3 + 1, -185, b(Blocks.COBBLED_DEEPSLATE));
         put(6, N3 + 1, -186, losa(Blocks.COBBLED_DEEPSLATE_SLAB, SlabType.BOTTOM));
+        corazonVeta();
+    }
+
+    /** El corazon de la veta (parte 7ar): donde la veta roja baja hasta el suelo en la pared del norte, un bulto de cristal que asoma. */
+    public static final double CORAZON_U = 0.5, CORAZON_V = -208.5;
+
+    private void corazonVeta() {
+        double cy = N3 + 2.6;
+        for (int u = -4; u <= 5; u++)
+            for (int v = -212; v <= -205; v++)
+                for (int y = N3; y <= N3 + 6; y++) {
+                    double d = Math.sqrt(Math.pow((u - CORAZON_U) / 3.6, 2) + Math.pow((y - cy) / 3.0, 2) + Math.pow((v - CORAZON_V) / 2.4, 2));
+                    if (d > 1) continue;
+                    // lo de dentro, cristal; la costra, mineral rojo, obsidiana que llora, magma (no en el suelo) y alguna gema
+                    int p = Hash.pct(x(u), y, z(v), SEMILLA + 41);
+                    BlockState st = d < 0.55 ? com.darkcraft.gen.TorreCupula.gema(true)
+                            : p < 34 ? b(Blocks.DEEPSLATE_REDSTONE_ORE) : p < 54 ? b(Blocks.CRYING_OBSIDIAN)
+                            : p < 72 && y > N3 + 1 ? b(Blocks.MAGMA_BLOCK) : p < 88 ? com.darkcraft.gen.TorreCupula.gema(true) : b(Blocks.BLACKSTONE);
+                    put(u, y, v, st);
+                }
     }
 
     /**
@@ -1238,7 +1260,7 @@ public final class Mina {
         trozo(-36, N1 + 1, -67, c -> c.barrel(x(-36), N1 + 1, z(-67), Direction.UP, BOTIN));
         trozo(34, N1 + 1, -69, c -> c.chest(x(34), N1 + 1, z(-69), Direction.WEST, BOTIN));
         trozo(18, N2 + 1, -106, c -> c.chest(x(18), N2 + 1, z(-106), Direction.EAST, BOTIN_BUENO));
-        trozo(4, N3 + 1, -200, c -> c.chest(x(4), N3 + 1, z(-200), Direction.SOUTH, BOTIN));
+        trozo(-15, N3 + 1, -196, c -> c.chest(x(-15), N3 + 1, z(-196), Direction.EAST, BOTIN));
     }
 
     private void trozo(int u, int y, int v, Trozo.Obra o) {
@@ -1285,6 +1307,7 @@ public final class Mina {
         sitio("enganche2", 24, N2 + 1, -85);
         sitio("pozo_veta", 0, N2 + 1, -170);
         sitio("filon", 0, N3 + 1, -190);
+        sitio("capataz", 0, N3 + 1, -204);
         sitio("castillete", 19, PISO, -80);
         sitio("escotilla", ESCALA_U, PISO, ESCALA_V);
         sitio("alto", 30, PISO + 40, 60);
@@ -1295,6 +1318,8 @@ public final class Mina {
     private void ponerEsperas() {
         int P = com.darkcraft.enemigos.Enterrado.PICADOR, B = com.darkcraft.enemigos.Enterrado.BARRENERO, C = com.darkcraft.enemigos.Enterrado.CARGADOR;
         int R = Enemigo.REZA, D = Enemigo.DE_PIE, T = Enemigo.TUMBADO;
+        // ---- el primero (puesto 0): Hakon, el Capataz, picando el corazon de la veta en la Caverna del Filon (parte 7ar)
+        en(0, 0, N3 + 1, -204, NORTE, R, 0, Puestos.JEFE);
         // ---- la corta: picando en los escalones, un barrenero arriba, el de la bocamina y uno enterrado en el fondo
         en(P, 6, BANCO1 + 1, -51, NORTE, R, 0, "corta");
         en(P, -22, BANCO2 + 1, -30, OESTE, R, 0, "corta");
@@ -1333,6 +1358,48 @@ public final class Mina {
 
     private void en(int variante, int u, int y, int v, float giro, int postura, int ronda, String grupo) {
         esperas.add(new Espera(variante, x(u), y, z(v), giro, postura, ronda, grupo));
+    }
+
+    // ------------------------------------------------------------------ Hakon, el Capataz (parte 7ar)
+
+    /** Si (x, y, z) esta en la Caverna del Filon (donde pelea Hakon). */
+    public static boolean enFilon(double x, double y, double z) {
+        double u = x - CX, v = z - CZ;
+        return y > N3 - 2 && y < N3 + 22 && Math.hypot(u / FILON_A, (v - FILON_V) / FILON_B) < 1.06;
+    }
+
+    /** Los escombros de los bordes de la caverna de los que salen los del turno cuando Hakon toca el silbato: {x, z}. */
+    public static List<int[]> turno() {
+        int[][] uv = {{-14, -190}, {14, -190}, {-12, -200}, {12, -199}, {-8, -184}, {8, -184}};
+        List<int[]> l = new ArrayList<>();
+        for (int[] q : uv) l.add(new int[]{CX + q[0], CZ + q[1]});
+        return l;
+    }
+
+    /** Si Hakon ha caido (y no ha vuelto: es del grupo de los jefes). */
+    public static boolean enPaz(net.minecraft.server.MinecraftServer srv) {
+        return Puestos.muerto(srv, MorvainEnemigos.MINA, MorvainEnemigos.capataz());
+    }
+
+    /** Para las pruebas: los enterrados que han descansado al caer Hakon. */
+    public static int DESCANSAN;
+
+    /**
+     * Cada segundo: con Hakon caido, el turno de noche descansa: los enterrados de la mina que no estan peleando se deshacen (sube su
+     * lampara) y ya no vuelven ({@code MorvainEnemigos}: sus puestos dejan de estar en uso).
+     */
+    public static void paz(ServerLevel m) {
+        if (Puestos.sitio(MorvainEnemigos.MINA) == null || !enPaz(m.getServer())) return;
+        List<Puestos.Puesto> ps = MorvainEnemigos.mina();
+        for (int i = 0; i < ps.size(); i++) {
+            if (Puestos.JEFE.equals(ps.get(i).grupo())) continue;
+            Enemigo e = Puestos.enemigo(MorvainEnemigos.MINA, i);
+            if (e == null || e.level() != m || e.getTarget() != null || e.accion() != 0) continue;
+            m.sendParticles(ParticleTypes.END_ROD, e.getX(), e.getY() + 1.2, e.getZ(), 0, 0, 1, 0, 0.08);
+            m.sendParticles(ParticleTypes.SOUL, e.getX(), e.getY() + 1.2, e.getZ(), 8, 0.3, 0.6, 0.3, 0.03);
+            e.disolver();
+            DESCANSAN++;
+        }
     }
 
     // ------------------------------------------------------------------ lo que pasa: los derrumbes
