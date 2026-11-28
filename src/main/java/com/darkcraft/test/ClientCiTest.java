@@ -6715,6 +6715,8 @@ public final class ClientCiTest {
         t = lazareto(t);
         // Maese Galen, el Fisico, en la Sala del Elixir (parte 7av)
         t = galen(t);
+        // el Fuerte de la Marca y los Insomnes (parte 7aw)
+        t = fuerte(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -15696,6 +15698,456 @@ public final class ClientCiTest {
                 comando(sp, "darkcraft lazareto muro cerrar");
                 comando(sp, "darkcraft lazareto atanor apagar");
                 comando(sp, "darkcraft lazareto enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el Fuerte de la Marca y los Insomnes (parte 7aw)
+
+    private static final com.darkcraft.enemigos.Insomne[] INSOMNES = new com.darkcraft.enemigos.Insomne[3];
+
+    private static com.darkcraft.enemigos.Insomne insomneNuevo(ServerLevel lvl, int variante, double x, double y, double z, float giro) {
+        var a = DarkCraftMod.INSOMNE.get().create(lvl);
+        if (a == null) return null;
+        a.variante(variante);
+        a.moveTo(x, y, z, giro, 0f);
+        a.yBodyRot = a.yHeadRot = giro;
+        lvl.addFreshEntity(a);
+        return a;
+    }
+
+    private static void quitarInsomnes(ServerLevel lvl) {
+        for (int i = 0; i < INSOMNES.length; i++) {
+            if (INSOMNES[i] != null && !INSOMNES[i].isRemoved()) INSOMNES[i].discard();
+            INSOMNES[i] = null;
+        }
+        if (lvl == null) return;
+        var caja = new net.minecraft.world.phys.AABB(com.darkcraft.morvain.Fuerte.X0, 40, com.darkcraft.morvain.Fuerte.Z0, com.darkcraft.morvain.Fuerte.X1, 200,
+                com.darkcraft.morvain.Fuerte.Z1);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Insomne.class, caja, q -> q.sitio() == null || q.sitio().isEmpty())) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Virote.class, caja)) e.discard();
+    }
+
+    private static String estadoInsomnes() {
+        StringBuilder sb = new StringBuilder();
+        for (var a : INSOMNES) sb.append(a == null ? "-" : a.isRemoved() ? "quitado" : a.estado() + " " + estadoE(a)).append(" | ");
+        return sb + String.format(java.util.Locale.ROOT, "cuernos %d (enteros %d, cortados %d), rebatos %d (acuden %d), virotes %d (dan %d), recargas %d, golpes parados %d,"
+                        + " guardias rotas %d, cargas %d", com.darkcraft.enemigos.Insomne.CUERNOS, com.darkcraft.enemigos.Insomne.CUERNOS_ENTEROS,
+                com.darkcraft.enemigos.Insomne.CUERNOS_CORTADOS, com.darkcraft.morvain.Fuerte.REBATOS, com.darkcraft.morvain.Fuerte.ACUDEN,
+                com.darkcraft.enemigos.Insomne.VIROTES, com.darkcraft.enemigos.Virote.DAN, com.darkcraft.enemigos.Insomne.RECARGAS, com.darkcraft.enemigos.Insomne.BLOQUEOS,
+                com.darkcraft.enemigos.Insomne.ROTAS, com.darkcraft.enemigos.Insomne.CARGAS);
+    }
+
+    /** Lo del fuerte en una captura: el sitio, el viento de las almenas (del cliente), los logros, el puente y el rastrillo. */
+    private static void logFuerte(Minecraft m, String que) {
+        String musica = ClientMusic.fuerte();
+        server(m, sp -> log("  fuerte, " + que + ": sitio " + com.darkcraft.morvain.Morvain.lugar(sp) + " | " + musica + " | logros fuerte "
+                + com.darkcraft.story.Logros.tiene(sp, "fuerte") + ", rastrillo " + com.darkcraft.story.Logros.tiene(sp, "rastrillo") + ", insomne "
+                + com.darkcraft.story.Logros.tiene(sp, "insomne") + " | " + com.darkcraft.morvain.Fuerte.resumen(sp.serverLevel()) + " | " + fpos(sp)));
+    }
+
+    /** Un sitio del fuerte (u, y, v del marco del fuerte) visto desde otro: en creativo, volando. */
+    private static int vistaFuerte(int t, String nombre, double u, double y, double v, double mu, double my, double mv, int espera, boolean deNoche) {
+        final int CX = com.darkcraft.morvain.Fuerte.CX, CZ = com.darkcraft.morvain.Fuerte.CZ;
+        atTicks(t, "El fuerte: " + nombre, m -> server(m, sp -> {
+            sp.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+            if (deNoche) sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+            irMirando(sp, CX + u, y, CZ + v, CX + mu, my, CZ + mv, true);
+        }));
+        t += espera;
+        final String cap = "cliente_" + nombre;
+        atTicks(t, "captura: " + nombre, m -> {
+            logFuerte(m, nombre);
+            shot(m, cap);
+        });
+        return t + 4;
+    }
+
+    /**
+     * Un golpe de un Insomne visto de lado, en el patio: el Insomne en (x, z) mirando al sur, el jugador delante (al sur) y la camara al
+     * este.
+     */
+    private static int golpeInsomne(int t, String nombre, int variante, int accion, double dist, int captura, double ex, double ey, double ez) {
+        atTicks(t, "El fuerte: " + nombre, m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarInsomnes(lvl);
+                com.darkcraft.morvain.Fuerte.sinRebato();
+                aPelear(sp, true);
+                INSOMNES[0] = insomneNuevo(lvl, variante, ex, ey, ez, 0f);
+                irMirando(sp, ex, ey, ez + dist, ex, ey + 1.4, ez, false);
+                var a = INSOMNES[0];
+                if (a == null) return;
+                a.sinEsperas();
+                a.setTarget(sp);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(accion);
+                boolean grande = variante == com.darkcraft.enemigos.Insomne.ESCUDERO;
+                double lejos = Math.max(dist, 2.5);
+                verDesdeServidor = new Vec3(ex + (grande ? 4.6 : 3.6) + lejos * 0.45, ey + (grande ? 2.6 : 2.3), ez + lejos * 0.5 + 0.8);
+                miraServidor = new Vec3(ex, ey + 1.2, ez + lejos * 0.5);
+            });
+        });
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += captura - 2;
+        final String cap = "cliente_" + nombre;
+        atTicks(t, "captura: " + nombre, m -> {
+            server(m, sp -> log("  " + nombre + ": " + estadoInsomnes() + " | jugador vida " + Math.round(sp.getHealth()) + ", frenado "
+                    + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) + ", virotes en el aire "
+                    + sp.serverLevel().getEntitiesOfClass(com.darkcraft.enemigos.Virote.class, sp.getBoundingBox().inflate(16)).size()
+                    + String.format(java.util.Locale.ROOT, " en %.1f, %.1f, %.1f", sp.getX(), sp.getY(), sp.getZ())));
+            shot(m, cap);
+        });
+        return t;
+    }
+
+    /**
+     * El Fuerte de la Marca (parte 7aw): desde el santuario del camino; el campamento quemado y la fosa; el puente alzado con la barricada,
+     * el ariete y la guardia de fuera; los escombros del foso, el foso y la poterna; el tunel, las mazmorras y el almacen; la sala de
+     * armas del homenaje, la Sala del Castellano y la azotea; el patio, el cuartel, el comedor, la capilla, las cuadras y el campanario; el
+     * adarve, la sala del torno y lo alto de una torre. En aventura: un golpe al muro del sur de las mazmorras (la sala de la paga), la
+     * palanca del torno (clic del cliente: el rastrillo sube y el puente baja; el logro) y entrar a pie (el logro, el sitio y el viento). En
+     * supervivencia, en el patio: el cuerno que toca a rebato (el aviso y la campana) y el que se corta de un golpe; la estocada, el
+     * barrido, el virote, la recarga, el culatazo, el escudo que para un golpe, el mazazo, el escudazo y la carga; uno que cae dormido;
+     * el registro de la puerta y el bestiario.
+     */
+    private static int fuerte(int T) {
+        final int CX = com.darkcraft.morvain.Fuerte.CX, CZ = com.darkcraft.morvain.Fuerte.CZ, SUELO = com.darkcraft.morvain.Fuerte.SUELO,
+                FOSO = com.darkcraft.morvain.Fuerte.FOSO, A = com.darkcraft.morvain.Fuerte.A, TT = com.darkcraft.morvain.Fuerte.T,
+                P1 = com.darkcraft.morvain.Fuerte.P1, AZ = com.darkcraft.morvain.Fuerte.AZOTEA;
+        final var SA = com.darkcraft.morvain.SantuariosMorvain.porId("fuerte");
+        int t = T;
+        atTicks(t, "El fuerte: desde el santuario", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft fuerte muro cerrar");
+                comando(sp, "darkcraft fuerte puente alzar");
+                comando(sp, "darkcraft fuerte rebato parar");
+                comando(sp, "darkcraft fuerte enemigos volver");
+                irMirando(sp, SA.x() + 4.5, SA.y() + 7, SA.z() + 6.5, CX, SUELO + 10, CZ, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura: el fuerte desde el santuario", m -> {
+            shot(m, "cliente_fu01_santuario");
+            server(m, sp -> log("  el fuerte: " + com.darkcraft.morvain.MorvainEnemigos.estadoFuerte(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 6;
+        t = vistaFuerte(t, "fu02_campamento", 14.5, SUELO + 4, 82.5, -8, SUELO - 6, 64, 60, false);
+        t = vistaFuerte(t, "fu03_fosa", 22.5, SUELO + 2, 80.5, 16, SUELO - 8, 72, 40, false);
+        t = vistaFuerte(t, "fu04_puente_alzado", 4.5, SUELO + 5, 50.5, 0, SUELO + 5, 28, 50, false);
+        t = vistaFuerte(t, "fu05_escombros", -8.5, SUELO + 5, 42.5, -19, FOSO + 2, 32, 40, false);
+        t = vistaFuerte(t, "fu06_foso", -31.5, FOSO + 5, 22.5, -31, FOSO + 2, -18, 40, false);
+        t = vistaFuerte(t, "fu07_poterna", -38.5, FOSO + 3, -21.5, -31, FOSO + 1.5, -26.5, 40, false);
+        t = vistaFuerte(t, "fu08_tunel", -23.5, FOSO + 2.2, -22.5, -12, FOSO + 1.5, -22, 40, true);
+        t = vistaFuerte(t, "fu09_mazmorras", -3.5, FOSO + 2.4, -14.5, -4, FOSO + 1.5, -22, 40, true);
+        t = vistaFuerte(t, "fu10_almacen", 0.5, FOSO + 3, -16.5, 6, FOSO + 1, -22, 40, true);
+        t = vistaFuerte(t, "fu11_sala_armas", 4.5, SUELO + 4, -9.5, -6, SUELO + 3, -20, 40, true);
+        t = vistaFuerte(t, "fu12_castellano", 0.5, P1 + 3, -9.5, 0, P1 + 2, -22, 40, true);
+        t = vistaFuerte(t, "fu13_azotea", 7.5, AZ + 5, -7.5, -6, AZ + 2, -22, 40, false);
+        t = vistaFuerte(t, "fu14_patio", -12.5, SUELO + 14, 22.5, 6, SUELO + 2, -6, 50, false);
+        t = vistaFuerte(t, "fu15_cuartel", -17.5, SUELO + 2.5, 8.5, -22, SUELO + 1, -8, 40, true);
+        t = vistaFuerte(t, "fu16_comedor", 23.5, SUELO + 2.5, 5.5, 19, SUELO + 1, -8, 40, true);
+        t = vistaFuerte(t, "fu17_capilla", 18.5, SUELO + 2.5, -14.5, 18, SUELO + 2, -21, 40, true);
+        t = vistaFuerte(t, "fu18_cuadras", 13.5, SUELO + 3, 12.5, 23, SUELO + 1, 19, 40, false);
+        t = vistaFuerte(t, "fu19_campanario", -9.5, SUELO + 13, -13.5, -15, SUELO + 17, -22, 40, false);
+        t = vistaFuerte(t, "fu20_adarve", -21.5, A + 2.6, 26.5, -8, A + 2, 27, 40, false);
+        t = vistaFuerte(t, "fu21_torno", 5.5, A + 2.6, 24.5, -5, A + 1.5, 20, 40, true);
+        t = vistaFuerte(t, "fu22_torre_so", -26.5, TT + 2.6, 26.5, -45, SUELO - 2, 45, 40, false);
+        // ---- en aventura: un golpe al muro del sur de las mazmorras (la sala de la paga)
+        atTicks(t, "El fuerte: ante el muro de las mazmorras, en aventura", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setHealth(sp.getMaxHealth());
+                sp.setGameMode(GameType.ADVENTURE);
+                comando(sp, "darkcraft fuerte enemigos fuera");
+                sp.getInventory().selected = 0;
+                sp.getInventory().items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
+                sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+                irMirando(sp, CX - 3.0, FOSO + 1, CZ - 10.3, CX - 3.0, FOSO + 2.2, CZ - 7.5, false);
+            });
+        });
+        t += 30;
+        atTicks(t, "El fuerte: un golpe al muro", m -> server(m, sp -> {
+            com.darkcraft.combate.Combate.pedir(sp, com.darkcraft.combate.Armas.LIGERO, 0, false, 0);
+            log("  tras el golpe: " + com.darkcraft.morvain.MurosIlusorios.estado(sp.serverLevel()));
+        }));
+        t += 6;
+        atTicks(t, "captura: el muro se deshace", m -> shot(m, "cliente_fu23_muro_paga"));
+        t += 10;
+        atTicks(t, "El fuerte: el muro, si no se abrio", m -> server(m, sp -> {
+            if (!com.darkcraft.morvain.MurosIlusorios.estado(sp.serverLevel()).contains(com.darkcraft.morvain.Fuerte.MURO_PAGA + " 0/")) {
+                comando(sp, "darkcraft fuerte muro abrir");
+                log("  (muro abierto con el comando)");
+            }
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        t += 2;
+        t = vistaFuerte(t, "fu24_paga", -3.5, FOSO + 2.4, -6.5, -6, FOSO + 1, -2, 40, true);
+        // ---- en aventura: la palanca del torno (el clic del cliente): sube el rastrillo y baja el puente
+        final BlockPos pal = com.darkcraft.morvain.Fuerte.palanca();
+        atTicks(t, "El fuerte: ante la palanca del torno, en aventura", m -> server(m, sp -> {
+            sp.removeAllEffects();
+            sp.setGameMode(GameType.ADVENTURE);
+            sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+            irMirando(sp, pal.getX() + 0.5, A + 1, pal.getZ() + 1.6, pal.getX() + 0.5, pal.getY() + 0.3, pal.getZ() + 0.5, false);
+        }));
+        t += 30;
+        atTicks(t, "captura: la palanca del torno", m -> {
+            logFuerte(m, "ante la palanca");
+            shot(m, "cliente_fu25_palanca");
+        });
+        t += 4;
+        atTicks(t, "El fuerte: clic en la palanca", m -> {
+            if (m.gameMode != null && m.player != null)
+                m.gameMode.useItemOn(m.player, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(pal), Direction.SOUTH, pal, false));
+        });
+        t += 20;
+        atTicks(t, "El fuerte: tras la palanca, al paso de la puerta", m -> server(m, sp -> {
+            log("  tras la palanca: " + com.darkcraft.morvain.Fuerte.resumen(sp.serverLevel()) + " | logro rastrillo " + com.darkcraft.story.Logros.tiene(sp, "rastrillo")
+                    + " | cartel " + com.darkcraft.client.ui.Carteles.resumen());
+            // si el clic no llego, a mano (para que la prueba siga)
+            if (com.darkcraft.morvain.Fuerte.BAJADAS == 0 && !com.darkcraft.morvain.Fuerte.puenteBajado(sp.serverLevel())) {
+                comando(sp, "darkcraft fuerte puente bajar");
+                log("  (puente bajado con el comando)");
+            }
+            sp.setGameMode(GameType.CREATIVE);
+            irMirando(sp, CX + 0.5, SUELO + 2, CZ + 21.5, CX + 0.5, SUELO + 3, CZ + 29.5, true);
+        }));
+        t += 36;
+        atTicks(t, "captura: sube el rastrillo", m -> {
+            logFuerte(m, "sube el rastrillo");
+            shot(m, "cliente_fu26_rastrillo");
+        });
+        t += 4;
+        atTicks(t, "El fuerte: desde la berma", m -> server(m, sp -> irMirando(sp, CX + 6.5, SUELO + 4, CZ + 44.5, CX + 0.5, SUELO + 2, CZ + 30, true)));
+        t += 40;
+        atTicks(t, "captura: baja el puente", m -> {
+            logFuerte(m, "baja el puente");
+            shot(m, "cliente_fu27_puente_bajando");
+        });
+        t += 90;
+        atTicks(t, "captura: el puente bajado", m -> {
+            logFuerte(m, "el puente bajado");
+            shot(m, "cliente_fu28_puente_bajado");
+        });
+        t += 4;
+        // ---- entrar a pie, en aventura: el cartel del sitio, el logro y el viento de las almenas
+        atTicks(t, "El fuerte: entrar a pie por la puerta", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                int[] c = com.darkcraft.morvain.Fuerte.get().sitio("puerta");
+                sp.teleportTo(sp.serverLevel(), c[0] + 0.5, c[1], c[2] + 0.5, 180f, 0f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura: en el patio", m -> {
+            logFuerte(m, "en el patio");
+            server(m, sp -> log("  cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+            shot(m, "cliente_fu29_en_el_patio");
+        });
+        t += 4;
+        // ---- en supervivencia, en el patio: los golpes de los Insomnes, de lado
+        final double ex = CX + 8.5, ey = SUELO + 1, ez = CZ + 4.5;
+        final int C = com.darkcraft.enemigos.Insomne.CENTINELA, B = com.darkcraft.enemigos.Insomne.BALLESTERO, E = com.darkcraft.enemigos.Insomne.ESCUDERO;
+        atTicks(t, "El fuerte: a pelear (supervivencia, en el patio)", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> comando(sp, "darkcraft fuerte enemigos fuera"));
+        });
+        t += 4;
+        // el cuerno entero: toca a rebato (el aviso, la campana y uno que acude)
+        atTicks(t, "El fuerte: el cuerno", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarInsomnes(lvl);
+                com.darkcraft.morvain.Fuerte.sinRebato();
+                aPelear(sp, true);
+                INSOMNES[0] = insomneNuevo(lvl, C, ex, ey, ez, 0f);
+                INSOMNES[1] = insomneNuevo(lvl, E, ex - 5, ey, ez + 1, -90f);
+                irMirando(sp, ex, ey, ez + 6.0, ex, ey + 1.4, ez, false);
+                var a = INSOMNES[0];
+                if (a == null) return;
+                a.sinEsperas();
+                a.setTarget(sp);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(com.darkcraft.enemigos.InsomneAnims.CUERNO);
+                verDesdeServidor = new Vec3(ex + 5.0, ey + 2.4, ez + 3.4);
+                miraServidor = new Vec3(ex - 1, ey + 1.4, ez + 2);
+            });
+        });
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += 18;
+        atTicks(t, "captura: toca el cuerno", m -> {
+            server(m, sp -> log("  el cuerno: " + estadoInsomnes()));
+            shot(m, "cliente_fu30_cuerno");
+        });
+        t += 24;
+        atTicks(t, "captura: tocan a rebato", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> log("  a rebato: " + estadoInsomnes() + " | rebato " + com.darkcraft.morvain.Fuerte.rebatoActivo(sp.serverLevel()) + " | cartel "
+                    + com.darkcraft.client.ui.Carteles.resumen()));
+            shot(m, "cliente_fu31_rebato");
+        });
+        t += 20;
+        // el cuerno cortado: le pega antes de que acabe
+        atTicks(t, "El fuerte: el cuerno cortado", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarInsomnes(lvl);
+                com.darkcraft.morvain.Fuerte.sinRebato();
+                aPelear(sp, true);
+                INSOMNES[0] = insomneNuevo(lvl, C, ex, ey, ez, 0f);
+                irMirando(sp, ex, ey, ez + 2.2, ex, ey + 1.4, ez, false);
+                var a = INSOMNES[0];
+                if (a == null) return;
+                a.sinEsperas();
+                a.setTarget(sp);
+                a.empezar(com.darkcraft.enemigos.InsomneAnims.CUERNO);
+            });
+        });
+        t += 12;
+        atTicks(t, "El fuerte: le pega", m -> server(m, sp -> {
+            var a = INSOMNES[0];
+            if (a == null) return;
+            a.invulnerableTime = 0;
+            a.hurt(sp.damageSources().playerAttack(sp), 2f);
+        }));
+        t += 6;
+        atTicks(t, "captura: el cuerno cortado", m -> {
+            server(m, sp -> log("  el cuerno cortado: " + estadoInsomnes() + " | rebato " + com.darkcraft.morvain.Fuerte.rebatoActivo(sp.serverLevel())));
+            shot(m, "cliente_fu32_cuerno_cortado");
+        });
+        t += 20;
+        t = golpeInsomne(t, "fu33_estocada", C, com.darkcraft.enemigos.InsomneAnims.ESTOCADA, 3.2, 12, ex, ey, ez) + 30;
+        t = golpeInsomne(t, "fu34_barrido", C, com.darkcraft.enemigos.InsomneAnims.BARRIDO, 2.6, 14, ex, ey, ez) + 30;
+        t = golpeInsomne(t, "fu35_disparo", B, com.darkcraft.enemigos.InsomneAnims.DISPARO, 9.0, 15, ex, ey, ez) + 30;
+        t = golpeInsomne(t, "fu36_recarga", B, com.darkcraft.enemigos.InsomneAnims.RECARGA, 6.0, 24, ex, ey, ez) + 30;
+        t = golpeInsomne(t, "fu37_culatazo", B, com.darkcraft.enemigos.InsomneAnims.CULATAZO, 2.0, 10, ex, ey, ez) + 30;
+        t = golpeInsomne(t, "fu38_mazazo", E, com.darkcraft.enemigos.InsomneAnims.MAZAZO, 2.5, 17, ex, ey, ez) + 30;
+        t = golpeInsomne(t, "fu39_escudazo", E, com.darkcraft.enemigos.InsomneAnims.ESCUDAZO, 2.2, 11, ex, ey, ez) + 30;
+        t = golpeInsomne(t, "fu40_carga", E, com.darkcraft.enemigos.InsomneAnims.CARGA, 8.0, 18, ex, ey, ez) + 30;
+        // el escudo de torre para un golpe de frente
+        atTicks(t, "El fuerte: un golpe al escudo", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarInsomnes(lvl);
+                aPelear(sp, true);
+                INSOMNES[0] = insomneNuevo(lvl, E, ex, ey, ez, 0f);
+                irMirando(sp, ex, ey, ez + 2.2, ex, ey + 1.4, ez, false);
+            });
+        });
+        t += 10;
+        atTicks(t, "El fuerte: le pega de frente", m -> server(m, sp -> {
+            var a = INSOMNES[0];
+            if (a == null) return;
+            a.yBodyRot = 0f;
+            a.invulnerableTime = 0;
+            float antes = a.getHealth();
+            a.hurt(sp.damageSources().playerAttack(sp), 6f);
+            log("  el escudo: -" + (antes - a.getHealth()) + " | " + estadoInsomnes());
+        }));
+        t += 4;
+        atTicks(t, "captura: para el golpe", m -> shot(m, "cliente_fu41_escudo"));
+        t += 24;
+        // uno que cae: por fin duerme
+        atTicks(t, "El fuerte: un Insomne cae", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            quitarInsomnes(lvl);
+            aPelear(sp, true);
+            INSOMNES[0] = insomneNuevo(lvl, C, ex, ey, ez, 0f);
+            if (INSOMNES[0] != null) INSOMNES[0].setNoAi(true);
+            irMirando(sp, ex + 3.5, ey, ez + 4.5, ex, ey + 1.0, ez, false);
+        }));
+        t += 10;
+        atTicks(t, "El fuerte: le pega", m -> server(m, sp -> {
+            var a = INSOMNES[0];
+            if (a == null) return;
+            a.invulnerableTime = 0;
+            a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+        }));
+        t += 34;
+        atTicks(t, "captura: por fin duerme", m -> {
+            server(m, sp -> log("  cae: " + estadoInsomnes() + " | logro insomne " + com.darkcraft.story.Logros.tiene(sp, "insomne")));
+            shot(m, "cliente_fu42_duerme");
+        });
+        t += 30;
+        atTicks(t, "El fuerte: sin Insomnes (para el libro y el bestiario)", m -> server(m, sp -> {
+            quitarInsomnes(sp.serverLevel());
+            com.darkcraft.morvain.Fuerte.sinRebato();
+            sp.removeAllEffects();
+            sp.setHealth(sp.getMaxHealth());
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        t += 6;
+        atTicks(t, "El fuerte: el registro de la puerta", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(com.darkcraft.morvain.Fuerte.LIBRO));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_fu43_libro_registro"));
+        t += 6;
+        String[] bestias = {"insomne_centinela", "insomne_ballestero", "insomne_escudero"};
+        for (int i = 0; i < bestias.length; i++) {
+            final String b = bestias[i];
+            final int n = 44 + i;
+            atTicks(t, "el bestiario: " + b, m -> {
+                m.setScreen(null);
+                m.options.hideGui = false;
+                com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+                menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf(b)));
+            });
+            t += 18;
+            atTicks(t, "captura: " + b + " en el bestiario", m -> {
+                menuP(m, mm -> log("  " + mm.resumen()));
+                shot(m, "cliente_fu" + n + "_bestiario_" + b.replace("insomne_", ""));
+            });
+            t += 4;
+        }
+        atTicks(t, "fin del Fuerte (el puente alzado, el muro cerrado y vuelven los Insomnes)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                quitarInsomnes(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                sp.getInventory().setItem(0, ItemStack.EMPTY);
+                comando(sp, "darkcraft fuerte muro cerrar");
+                comando(sp, "darkcraft fuerte puente alzar");
+                comando(sp, "darkcraft fuerte rebato parar");
+                comando(sp, "darkcraft fuerte enemigos volver");
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);

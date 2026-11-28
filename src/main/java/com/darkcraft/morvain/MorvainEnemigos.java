@@ -68,13 +68,13 @@ public final class MorvainEnemigos {
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
             CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio",
             PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar", CERCO = "cerco", TEATRO = "teatro", NIDO = "nido",
-            CADENA = "cadena", HOMENAJE = "homenaje", AGUJA = "aguja", MINA = "mina", OSARIO = "osario", LAZARETO = "lazareto";
+            CADENA = "cadena", HOMENAJE = "homenaje", AGUJA = "aguja", MINA = "mina", OSARIO = "osario", LAZARETO = "lazareto", FUERTE = "fuerte";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
             ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
             PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon", DRAGON = "dragon", GARGOLA = "gargola", CENTINELA = "centinela",
             ISOLDE = "isolde", ESPECTRO = "espectro", PERRO = "perro", SOMBRA = "sombra", ENTERRADO = "enterrado", CAPATAZ = "capataz",
-            ENSAMBLADO = "ensamblado", OSMUND = "osmund", DESTILADO = "destilado", GALEN = "galen";
+            ENSAMBLADO = "ensamblado", OSMUND = "osmund", DESTILADO = "destilado", GALEN = "galen", INSOMNE = "insomne";
     /** El tipo de puesto de las gargolas (para las pruebas). */
     public static final String GARGOLA_TIPO = GARGOLA;
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
@@ -89,7 +89,7 @@ public final class MorvainEnemigos {
             PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>(), GRIETA_P = new ArrayList<>(), ALTAR_P = new ArrayList<>(),
             CERCO_P = new ArrayList<>(), TEATRO_P = new ArrayList<>(), NIDO_P = new ArrayList<>(), CADENA_P = new ArrayList<>(),
             HOMENAJE_P = new ArrayList<>(), AGUJA_P = new ArrayList<>(), MINA_P = new ArrayList<>(), OSARIO_P = new ArrayList<>(),
-            LAZARETO_P = new ArrayList<>();
+            LAZARETO_P = new ArrayList<>(), FUERTE_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -250,6 +250,9 @@ public final class MorvainEnemigos {
         for (Lazareto.Espera e : Lazareto.get().esperas())
             LAZARETO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? GALEN : DESTILADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
                     e.ronda(), e.grupo()));
+        // ---- el Fuerte de la Marca (parte 7aw): los Insomnes de las almenas, las torres, el foso, las mazmorras, el homenaje y el patio
+        for (Fuerte.Espera e : Fuerte.get().esperas())
+            FUERTE_P.add(new Puesto(INSOMNE, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
         // ---- la casa de la Sombra (parte 7ab): la reina Isolde en su trono (el puesto 0) y los de la torre del homenaje (los
         // centinelas, los espectros del archivo, los marcados de la prision y sus perros); el tipo de cada uno lo dice el plano
         for (Homenaje.Espera e : Homenaje.get().esperas())
@@ -351,6 +354,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(OSMUND, DarkCraftMod.OSMUND);
         Puestos.tipo(DESTILADO, DarkCraftMod.DESTILADO);
         Puestos.tipo(GALEN, DarkCraftMod.GALEN);
+        Puestos.tipo(INSOMNE, DarkCraftMod.INSOMNE);
         Puestos.tipo(CONDESTABLE, DarkCraftMod.CONDESTABLE);
         Puestos.tipo(ERUDITO, DarkCraftMod.ERUDITO);
         Puestos.tipo(RECTORA, DarkCraftMod.RECTORA);
@@ -417,6 +421,8 @@ public final class MorvainEnemigos {
         // el Lazareto: los Destilados (los que caen no vuelven hasta descansar o morir)
         // (y Maese Galen en la Sala del Elixir; vencido el, los Destilados descansan —lo hace Lazareto.paz cada segundo— y ya no vuelven)
         Puestos.registrar(LAZARETO, LAZARETO_P, Morvain::es, (l, p) -> Puestos.JEFE.equals(p.grupo()) || !Lazareto.enPaz(l.getServer()));
+        // el Fuerte de la Marca: los Insomnes (los que caen no vuelven hasta descansar o morir)
+        Puestos.registrar(FUERTE, FUERTE_P, Morvain::es);
         // la torre del homenaje: los centinelas, los del archivo y la prision, y la reina en su trono
         Puestos.registrar(HOMENAJE, HOMENAJE_P, Morvain::es);
         // la aguja: la Sombra (cae una vez y no vuelve: es del grupo de los jefes)
@@ -571,6 +577,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> lazareto() {
         preparar();
         return List.copyOf(LAZARETO_P);
+    }
+
+    public static List<Puesto> fuerte() {
+        preparar();
+        return List.copyOf(FUERTE_P);
     }
 
     public static List<Puesto> nido() {
@@ -1962,6 +1973,118 @@ public final class MorvainEnemigos {
                         .then(net.minecraft.commands.Commands.literal("mancebo").executes(c -> sacarDestilado(c, com.darkcraft.enemigos.Destilado.MANCEBO)))
                         .then(net.minecraft.commands.Commands.literal("enfermo").executes(c -> sacarDestilado(c, com.darkcraft.enemigos.Destilado.ENFERMO)))
                         .then(net.minecraft.commands.Commands.literal("cuba").executes(c -> sacarDestilado(c, com.darkcraft.enemigos.Destilado.CUBA))));
+    }
+
+    /**
+     * {@code /darkcraft fuerte [ir <sitio> | enemigos [volver | fuera | sacar] | puente [bajar | alzar] | muro [abrir | cerrar] |
+     * rebato [parar] | insomne <centinela | ballestero | escudero>]} (parte 7aw): el Fuerte de la Marca: ir a uno de sus sitios, sus
+     * Insomnes, bajar o alzar el puente levadizo (y el rastrillo), el muro ilusorio de la sala de la paga, tocar a rebato y sacar un
+     * Insomne delante.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoFuerte() {
+        return net.minecraft.commands.Commands.literal("fuerte")
+                .executes(c -> decir(c, estadoFuerte(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irFuerte(c.getSource(), "entrada"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Fuerte.get().sitios().keySet(), b))
+                                .executes(c -> irFuerte(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoFuerte(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), FUERTE, false);
+                            return decir(c, "vuelven todos los del fuerte");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), FUERTE, true);
+                            return decir(c, "fuera todos los del fuerte");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, FUERTE).size();
+                            return decir(c, "fuera " + n);
+                        })))
+                .then(net.minecraft.commands.Commands.literal("puente")
+                        .executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            return decir(c, m == null ? "Morvain no esta cargado" : Fuerte.resumen(m));
+                        })
+                        .then(net.minecraft.commands.Commands.literal("bajar").executes(c -> puenteFuerte(c, true)))
+                        .then(net.minecraft.commands.Commands.literal("alzar").executes(c -> puenteFuerte(c, false))))
+                .then(net.minecraft.commands.Commands.literal("muro")
+                        .executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            return decir(c, m == null ? "Morvain no esta cargado" : MurosIlusorios.estado(m));
+                        })
+                        .then(net.minecraft.commands.Commands.literal("abrir").executes(c -> muroFuerte(c, true)))
+                        .then(net.minecraft.commands.Commands.literal("cerrar").executes(c -> muroFuerte(c, false))))
+                .then(net.minecraft.commands.Commands.literal("rebato")
+                        .executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            Fuerte.rebato(m, c.getSource().getEntity() instanceof net.minecraft.world.entity.LivingEntity le ? le : null, null);
+                            return decir(c, "tocan a rebato (" + Fuerte.ACUDEN + " han acudido en total)");
+                        })
+                        .then(net.minecraft.commands.Commands.literal("parar").executes(c -> {
+                            Fuerte.sinRebato();
+                            return decir(c, "ya no tocan a rebato");
+                        })))
+                .then(net.minecraft.commands.Commands.literal("insomne")
+                        .then(net.minecraft.commands.Commands.literal("centinela").executes(c -> sacarInsomne(c, com.darkcraft.enemigos.Insomne.CENTINELA)))
+                        .then(net.minecraft.commands.Commands.literal("ballestero").executes(c -> sacarInsomne(c, com.darkcraft.enemigos.Insomne.BALLESTERO)))
+                        .then(net.minecraft.commands.Commands.literal("escudero").executes(c -> sacarInsomne(c, com.darkcraft.enemigos.Insomne.ESCUDERO))));
+    }
+
+    /** Saca un Insomne de esa variante cuatro bloques delante de quien lo pide (no es de ningun puesto: no vuelve). */
+    private static int sacarInsomne(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, int variante)
+            throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = c.getSource().getPlayerOrException();
+        com.darkcraft.enemigos.Insomne e = DarkCraftMod.INSOMNE.get().create(sp.serverLevel());
+        if (e == null) return 0;
+        net.minecraft.world.phys.Vec3 v = sp.position().add(sp.getLookAngle().multiply(1, 0, 1).normalize().scale(4));
+        e.moveTo(v.x, sp.getY(), v.z, sp.getYRot() + 180f, 0f);
+        e.variante(variante);
+        sp.serverLevel().addFreshEntity(e);
+        return decir(c, "sale un Insomne (" + e.estado() + ")");
+    }
+
+    private static int puenteFuerte(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, boolean bajar) {
+        var m = Morvain.nivel(c.getSource().getServer());
+        if (m == null) return 0;
+        if (bajar) Fuerte.bajarPuente(m, true);
+        else Fuerte.alzarPuente(m);
+        return decir(c, Fuerte.resumen(m));
+    }
+
+    private static int muroFuerte(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, boolean abrir) {
+        var m = Morvain.nivel(c.getSource().getServer());
+        if (m == null) return 0;
+        MurosIlusorios.Muro w = MurosIlusorios.muro(Fuerte.MURO_PAGA);
+        if (abrir) MurosIlusorios.abrir(m, w, c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp ? sp : null);
+        else MurosIlusorios.cerrar(m, Fuerte.MURO_PAGA);
+        return decir(c, MurosIlusorios.estado(m));
+    }
+
+    private static int irFuerte(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Fuerte.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Fuerte.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando hacia el fuerte (al norte)
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, 180f, 5f);
+        return 1;
+    }
+
+    /** Cuantos Insomnes quedan y lo que hay en el fuerte (si esta cargado). */
+    public static String estadoFuerte(net.minecraft.server.MinecraftServer srv) {
+        var m = Morvain.nivel(srv);
+        String s = "Fuerte de la Marca: quedan " + Puestos.quedan(srv, FUERTE) + " de " + FUERTE_P.size() + " (fuera " + Puestos.fuera(FUERTE) + ")";
+        if (m != null && m.isLoaded(Fuerte.palanca()) && m.isLoaded(new net.minecraft.core.BlockPos(Fuerte.CX, Fuerte.SUELO, Fuerte.CZ - 20)))
+            s += "; " + Fuerte.resumen(m) + "; muros: " + MurosIlusorios.estado(m);
+        return s;
     }
 
     /** Saca un Destilado de esa variante cuatro bloques delante de quien lo pide (no es de ningun puesto: no vuelve). */

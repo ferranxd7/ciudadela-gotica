@@ -267,7 +267,7 @@ public final class Morvain {
     }
 
     /** Si hay alguien cerca del Patio del Juramento o del Observatorio (se mira cada segundo). */
-    private static boolean cercaJuramento, cercaObservatorio, cercaCerco, cercaTeatro, cercaMina, cercaOsario, cercaLazareto;
+    private static boolean cercaJuramento, cercaObservatorio, cercaCerco, cercaTeatro, cercaMina, cercaOsario, cercaLazareto, cercaFuerte;
 
     /** Al acabar cada tick, los que entraron en un portal; y cada segundo, con alguien cerca del arco, su remolino. */
     @SubscribeEvent
@@ -403,6 +403,15 @@ public final class Morvain {
                 if (cercaLazareto) MurosIlusorios.tick(m);
             }
             if (cercaLazareto) Lazareto.tick(m);
+            // el Fuerte de la Marca (parte 7aw): el muro ilusorio de la sala de la paga, la palanca del torno (el puente levadizo y el
+            // rastrillo) y la campana mientras tocan a rebato
+            if (srv.getTickCount() % 20 == 2) {
+                cercaFuerte = false;
+                for (ServerPlayer p : m.players())
+                    if (Fuerte.distancia(p.getX(), p.getZ()) < 150) cercaFuerte = true;
+                if (cercaFuerte) MurosIlusorios.tick(m);
+            }
+            if (cercaFuerte) Fuerte.tick(m);
         }
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
@@ -488,6 +497,9 @@ public final class Morvain {
         // y quien entra en la torre del Lazareto (parte 7au)
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Lazareto.dentro(p.getX(), p.getY(), p.getZ())) com.darkcraft.story.Logros.dar(p, "lazareto");
+        // y quien entra en el Fuerte de la Marca (parte 7aw)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Fuerte.dentro(p.getX(), p.getY(), p.getZ())) com.darkcraft.story.Logros.dar(p, "fuerte");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -643,6 +655,11 @@ public final class Morvain {
         // el Osario de San Ulfo: el camposanto, la capilla, la cripta, la Capilla de los Huesos, el pozo, el taller y el relicario (7as)
         if (Math.abs(p.getX() - Osario.CX) < 60 && p.getZ() < Osario.CZ + 62 && p.getZ() > Osario.CZ - 126) {
             String k = Osario.lugar(p.getX(), p.getY(), p.getZ());
+            if (k != null) return k;
+        }
+        // el Fuerte de la Marca: el campamento, el foso, el patio, el adarve, la sala del torno, el homenaje y las mazmorras (parte 7aw)
+        if (Fuerte.distancia(p.getX(), p.getZ()) < 60 || Math.abs(p.getX() - Fuerte.CX) < 44 && p.getZ() > Fuerte.CZ && p.getZ() < Fuerte.CZ + 98) {
+            String k = Fuerte.lugar(p.getX(), p.getY(), p.getZ());
             if (k != null) return k;
         }
         // el Lazareto de Maese Galen: la laguna y el islote, el sotano del atanor y cada planta de la torre (parte 7au)

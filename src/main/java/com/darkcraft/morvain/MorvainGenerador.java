@@ -261,6 +261,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el lazareto en el chunk {}", c.getPos(), t);
         }
+        // el Fuerte de la Marca, en las Llanuras Palidas: el monticulo, el foso, las murallas y el campamento quemado (parte 7aw)
+        try {
+            if (Fuerte.toca(c.getPos().x, c.getPos().z)) Fuerte.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el fuerte en el chunk {}", c.getPos(), t);
+        }
         // el Nido de Ceniza, en una repisa de las Montanas Nevadas, donde duerme Vorthak (parte 7z)
         try {
             if (Nido.toca(c.getPos().x, c.getPos().z)) Nido.chunk(nivel, c);

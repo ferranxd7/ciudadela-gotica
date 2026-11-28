@@ -395,6 +395,22 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_GALEN_DOLOR = sound("sfx.galen_dolor");
     public static final RegistryObject<SoundEvent> SFX_GALEN_MUERTE = sound("sfx.galen_muerte");
     public static final RegistryObject<SoundEvent> SFX_GALEN_ALAMBIQUE = sound("sfx.galen_alambique");
+    // el Fuerte de la Marca (parte 7aw): los Insomnes, el cuerno y la campana de rebato, el virote y la ballesta, el escudo de torre, el
+    // mazazo, el puente levadizo, el rastrillo y el viento en las almenas
+    public static final RegistryObject<SoundEvent> SFX_INSOMNE_MURMULLO = sound("sfx.insomne_murmullo");
+    public static final RegistryObject<SoundEvent> SFX_INSOMNE_ALERTA = sound("sfx.insomne_alerta");
+    public static final RegistryObject<SoundEvent> SFX_INSOMNE_DOLOR = sound("sfx.insomne_dolor");
+    public static final RegistryObject<SoundEvent> SFX_INSOMNE_MUERTE = sound("sfx.insomne_muerte");
+    public static final RegistryObject<SoundEvent> SFX_CUERNO_REBATO = sound("sfx.cuerno_rebato");
+    public static final RegistryObject<SoundEvent> SFX_CAMPANA_REBATO = sound("sfx.campana_rebato");
+    public static final RegistryObject<SoundEvent> SFX_VIROTE_DISPARA = sound("sfx.virote_dispara");
+    public static final RegistryObject<SoundEvent> SFX_VIROTE_IMPACTO = sound("sfx.virote_impacto");
+    public static final RegistryObject<SoundEvent> SFX_BALLESTA_RECARGA = sound("sfx.ballesta_recarga");
+    public static final RegistryObject<SoundEvent> SFX_ESCUDO_TORRE = sound("sfx.escudo_torre");
+    public static final RegistryObject<SoundEvent> SFX_MAZAZO = sound("sfx.mazazo");
+    public static final RegistryObject<SoundEvent> SFX_PUENTE_LEVADIZO = sound("sfx.puente_levadizo");
+    public static final RegistryObject<SoundEvent> SFX_RASTRILLO = sound("sfx.rastrillo");
+    public static final RegistryObject<SoundEvent> AMBIENTE_FUERTE = sound("ambiente.fuerte");
     // el Condestable del Juramento (parte 7n): el grito, el tajo del montante en llamas, el barrido, la embestida, el anillo de
     // fuego, el rastrillo que cae y el que se alza, el cuerno de la guardia, la espada al cielo, el dolor, la muerte y la espera
     public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_GRITO = sound("sfx.condestable_grito");
@@ -1076,6 +1092,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Galen>> GALEN = ENTITIES.register("galen",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Galen>of(com.darkcraft.enemigos.Galen::new, MobCategory.MONSTER)
                     .sized(0.9f, 3.0f).fireImmune().clientTrackingRange(10).build(MODID + ":galen"));
+    // ---- los Insomnes, la guarnicion del Fuerte de la Marca (parte 7aw)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Insomne>> INSOMNE = ENTITIES.register("insomne",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Insomne>of(com.darkcraft.enemigos.Insomne::new, MobCategory.MONSTER)
+                    .sized(0.7f, 2.0f).clientTrackingRange(10).build(MODID + ":insomne"));
     // ---- Hakon, el Capataz, el jefe de las Minas de Hierro Negro (parte 7ar)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Capataz>> CAPATAZ = ENTITIES.register("capataz",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Capataz>of(com.darkcraft.enemigos.Capataz::new, MobCategory.MONSTER)
@@ -1495,6 +1515,7 @@ public class DarkCraftMod {
         e.put(ENSAMBLADO.get(), com.darkcraft.enemigos.Ensamblado.atributos().build());
         e.put(DESTILADO.get(), com.darkcraft.enemigos.Destilado.atributos().build());
         e.put(GALEN.get(), com.darkcraft.enemigos.Galen.atributos().build());
+        e.put(INSOMNE.get(), com.darkcraft.enemigos.Insomne.atributos().build());
         e.put(CONDESTABLE.get(), com.darkcraft.enemigos.Condestable.atributos().build());
         e.put(RECTORA.get(), com.darkcraft.enemigos.Rectora.atributos().build());
         e.put(ERUDITO.get(), com.darkcraft.enemigos.Erudito.atributos().build());

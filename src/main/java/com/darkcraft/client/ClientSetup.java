@@ -139,6 +139,8 @@ public final class ClientSetup {
         // los destilados del Lazareto y sus frascos (parte 7au)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.DESTILADO.get(), com.darkcraft.client.enemigos.DestiladoRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.FRASCO_DESTILADO.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
+        // los Insomnes del Fuerte de la Marca (parte 7aw)
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.INSOMNE.get(), com.darkcraft.client.enemigos.InsomneRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CARTUCHO.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CANTARO.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ESQUIRLA.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
@@ -204,6 +206,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.OsmundModelo.CAPA, com.darkcraft.client.enemigos.OsmundGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.GalenModelo.CAPA, com.darkcraft.client.enemigos.GalenGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.DestiladoModelo.CAPA, com.darkcraft.client.enemigos.DestiladoGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.InsomneModelo.CAPA, com.darkcraft.client.enemigos.InsomneGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.AhorcadoModelo.CAPA, com.darkcraft.client.enemigos.AhorcadoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.MolineraModelo.CAPA, com.darkcraft.client.enemigos.MolineraGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.VerdugoModelo.CAPA, com.darkcraft.client.enemigos.VerdugoGeometria::crear);

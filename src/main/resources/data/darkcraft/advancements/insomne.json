@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:morvain",
+  "display": {
+    "icon": {
+      "item": "minecraft:crossbow"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.insomne.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.insomne.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 30
+  }
+}

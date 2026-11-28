@@ -13,7 +13,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
          22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain", 27: "morvain",
          28: "morvain", 29: "morvain", 30: "morvain", 31: "valdrenn", 32: "morvain", 33: "morvain", 34: "morvain",
-         35: "morvain", 36: "morvain", 37: "morvain", 38: "morvain"}
+         35: "morvain", 36: "morvain", 37: "morvain", 38: "morvain", 39: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -523,6 +523,17 @@ LIBROS = {
    "The Academy cast me out for opening the dead to see what had killed them. The Grey Plague left them no secrets: it left them glass. I have brought the sick by boat to my tower in the lagoon. No one comes here to look, and the black water of the marsh distils like no other.",
    "Trial forty-one: a distillate of their own blood with the black water. The boils stop growing and turn to green glass. They do not die. Nor do they heal. The apprentices drink it so as not to fall ill, and now they never take off their masks; they say their faces burn. The strongest I make into living vats: the elixir ripens better inside a warm body.",
    "On the night of the red sky every alembic boiled at once. I hear them moaning in the halls. The furnace draught rises all the way to my elixir chamber: if someone lights the athanor, the hot air will carry them up. Do not come up. I am about to finish it. One more drop and it will cure them all. One more drop.\n\nG."]),
+ },
+ # parte 7aw: el registro de la puerta del Fuerte de la Marca, en el atril de la sala del torno
+ 39: {
+  "es": ("El registro de la puerta", "Sargento Bertil, de guardia en la puerta", [
+   "Día 12 de la Peste. A la hora nona llegan por el camino del sur unos cuatrocientos: familias de Ardal y de los molinos, carros, ganado flaco. Piden asilo. El castellano manda alzar el puente y bajar el rastrillo. Nadie abre. Orden escrita: la peste no entra en la Marca.",
+   "Día 15. Han acampado al pie del glacis. Los niños lloran toda la noche. Un hombre bajó al foso y gritó mi nombre: era mi primo. No contesté. Día 19: han hecho un ariete con el eje de un carro. El castellano ha dado la orden. Ballesteros a las almenas, fuego a las tiendas.",
+   "Día 20. Ya no se oye nada abajo. El castellano no baja de su sala. Día 21: el cielo se ha vuelto rojo. Nadie ha venido a relevar la guardia. Seguiremos en nuestros puestos hasta que nos releven. No pienso cerrar los ojos. Si los cierro, los veo.\n\nB."]),
+  "en": ("The Gate Register", "Sergeant Bertil, of the gate watch", [
+   "Day 12 of the Plague. At the ninth hour some four hundred come up the south road: families from Ardal and the mills, carts, thin cattle. They ask for shelter. The castellan orders the bridge raised and the portcullis lowered. No one opens. Written order: the plague shall not enter the March.",
+   "Day 15. They have camped at the foot of the glacis. The children cry all night. A man climbed down into the moat and shouted my name: it was my cousin. I did not answer. Day 19: they have made a ram from a cart axle. The castellan has given the order. Crossbows to the battlements, fire to the tents.",
+   "Day 20. Nothing can be heard below anymore. The castellan does not leave his hall. Day 21: the sky has turned red. No one has come to relieve the watch. We will keep our posts until we are relieved. I will not close my eyes. If I close them, I see them.\n\nB."]),
  },
  35: {
   "es": ("El diario de la reina Isolde", "Isolde, reina de Valdrenn", [

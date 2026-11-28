@@ -57,6 +57,8 @@ public final class SantuariosMorvain {
             new Sitio("osario", Osario.CX + Osario.SANT_U, Osario.CZ + Osario.SANT_V, Osario.SUELO, Region.BOSQUE),
             // el del Lazareto de Maese Galen (parte 7au): en la orilla del sur de la laguna, al final de la calzada
             s("lazareto", Lazareto.CX + Lazareto.SANT_U, Lazareto.CZ + Lazareto.SANT_V),
+            // el del Fuerte de la Marca (parte 7aw): al sur del campamento quemado, al final del camino
+            s("fuerte", Fuerte.CX + Fuerte.SANT_U, Fuerte.CZ + Fuerte.SANT_V),
     };
 
     /**

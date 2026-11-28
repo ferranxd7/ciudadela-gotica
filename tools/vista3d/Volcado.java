@@ -1238,6 +1238,51 @@ public class Volcado {
                 if (Boolean.getBoolean("abierto"))
                     for (BlockPos q : com.darkcraft.morvain.Lazareto.muro(com.darkcraft.morvain.Lazareto.MURO_CELDA)) MUNDO.remove(q.asLong());
             }
+            case "morvain_fuerte" -> {
+                // el Fuerte de la Marca (parte 7aw): el monticulo, el foso, las murallas, el patio, el homenaje, las mazmorras y el
+                // campamento quemado (-Dcaja=x0,z0,x1,z1 para un trozo; -Droca=true: la roca de debajo; -Dabierto=true: el muro de la paga
+                // abierto; -Dbajado=true: el puente bajado y el rastrillo alzado)
+                String[] k = System.getProperty("caja", com.darkcraft.morvain.Fuerte.X0 + "," + com.darkcraft.morvain.Fuerte.Z0 + ","
+                        + com.darkcraft.morvain.Fuerte.X1 + "," + com.darkcraft.morvain.Fuerte.Z1).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 50);
+                if (Boolean.getBoolean("roca"))
+                    for (int x = x0; x <= x1; x++)
+                        for (int z = z0; z <= z1; z++) {
+                            int top = (int) Math.floor(com.darkcraft.morvain.Terreno.columna(x, z).altura());
+                            for (int y = 50; y < Math.min(top - 6, com.darkcraft.morvain.Fuerte.FOSO - 6); y++)
+                                lvl.setBlock(new BlockPos(x, y, z), Blocks.STONE.defaultBlockState(), 2);
+                        }
+                com.darkcraft.morvain.Fuerte v = com.darkcraft.morvain.Fuerte.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("El fuerte: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " que esperan; "
+                        + v.almenas + " almenas, " + v.jergones + " jergones, " + v.tiendas + " tiendas, " + v.carros + " carros, " + v.huesos + " huesos, "
+                        + v.faroles + " faroles, " + v.bancos + " bancos; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas()) marcas.put((o.variante() == 0 ? "C" : o.variante() == 1 ? "B" : "E") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarFuerte(lvl, v);
+                if (Boolean.getBoolean("abierto"))
+                    for (BlockPos q : com.darkcraft.morvain.Fuerte.muro(com.darkcraft.morvain.Fuerte.MURO_PAGA)) MUNDO.remove(q.asLong());
+                if (Boolean.getBoolean("bajado")) bajarPuenteFuerte(true);
+            }
             case "morvain_grieta" -> {
                 // el Puente de la Grieta (parte 7s): la grieta con su sangre, el puente con su espadana, la puerta del norte, el paso,
                 // el cementerio, el humilladero, la hospederia con el libro 28 y el campamento de los penitentes
@@ -2388,6 +2433,102 @@ public class Volcado {
                 }
             }
             System.out.println("los del lazareto: " + v.esperas().size() + ", sin llegar " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
+        }
+    }
+
+    /** En el mundo de mentira: el puente del Fuerte bajado y el rastrillo alzado (o al reves). */
+    static void bajarPuenteFuerte(boolean bajar) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        for (int f = 0; f <= 3; f++) for (BlockPos p : com.darkcraft.morvain.Fuerte.puente(f)) MUNDO.remove(p.asLong());
+        for (BlockPos p : com.darkcraft.morvain.Fuerte.puente(bajar ? 3 : 0)) MUNDO.put(p.asLong(), Blocks.DARK_OAK_PLANKS.defaultBlockState());
+        int X = com.darkcraft.morvain.Fuerte.CX, Z = com.darkcraft.morvain.Fuerte.CZ, S = com.darkcraft.morvain.Fuerte.SUELO;
+        for (int u = -com.darkcraft.morvain.Fuerte.PASO; u <= com.darkcraft.morvain.Fuerte.PASO; u++)
+            for (int y = S + 1; y <= S + 12; y++) {
+                boolean hay = bajar ? y >= S + 7 : y <= S + 6;
+                long q = BlockPos.asLong(X + u, y, Z + com.darkcraft.morvain.Fuerte.RV);
+                if (hay) MUNDO.put(q, Blocks.IRON_BARS.defaultBlockState());
+                else MUNDO.remove(q);
+            }
+    }
+
+    /**
+     * El Fuerte de la Marca (parte 7aw): a que se llega a pie desde la entrada (el camino del santuario) con el puente alzado (por los
+     * escombros del foso, la poterna, el tunel y las mazmorras), con el muro de la paga abierto y con el puente bajado; y si cada Insomne
+     * se pisa, se llega y no esta metido en un bloque (el escudero, tres de alto).
+     */
+    static void andarFuerte(WorldGenLevel lvl, com.darkcraft.morvain.Fuerte v) {
+        BlockState aire = Blocks.AIR.defaultBlockState();
+        java.util.Set<Long> quitados = new java.util.HashSet<>();
+        int X = com.darkcraft.morvain.Fuerte.CX, Z = com.darkcraft.morvain.Fuerte.CZ;
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+            if (quitados.contains(BlockPos.asLong(x, y, z))) return aire;
+            BlockState s = MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+            return s.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || s.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                    || s.getBlock() instanceof net.minecraft.world.level.block.SkullBlock || s.getBlock() instanceof net.minecraft.world.level.block.WallSkullBlock
+                    || s.getBlock() instanceof net.minecraft.world.level.block.WebBlock || s.getBlock() instanceof net.minecraft.world.level.block.BushBlock
+                    || s.getBlock() instanceof net.minecraft.world.level.block.BannerBlock || s.getBlock() instanceof net.minecraft.world.level.block.WallBannerBlock ? aire : s;
+        };
+        int[] e = v.sitio("entrada");
+        {
+            // sin la poterna (tapada) y con el puente alzado no se entra: ni por la muralla ni por las torres
+            int[] pa = v.sitio("patio"), pt = v.sitio("torno");
+            var zt = com.darkcraft.pueblo.gen.Andar.desde((x, y, zz) -> {
+                if (x >= X - 33 && x <= X - 30 && zz >= Z - 27 && zz <= Z - 26 && y >= com.darkcraft.morvain.Fuerte.FOSO + 1
+                        && y <= com.darkcraft.morvain.Fuerte.FOSO + 2) return Blocks.BEDROCK.defaultBlockState();
+                return mundo.en(x, y, zz);
+            }, e[0], e[1], e[2], com.darkcraft.morvain.Fuerte.X0, com.darkcraft.morvain.Fuerte.Z0, com.darkcraft.morvain.Fuerte.X1,
+                    com.darkcraft.morvain.Fuerte.Z1, 12_000_000);
+            System.out.println("con la poterna tapada y el puente alzado: patio " + zt.alcanza(pa[0], pa[1], pa[2], 2) + ", torno " + zt.alcanza(pt[0], pt[1], pt[2], 2)
+                    + " (los dos tienen que ser false)");
+        }
+        for (int paso = 0; paso < 3; paso++) {
+            if (paso == 1) for (BlockPos q : com.darkcraft.morvain.Fuerte.muro(com.darkcraft.morvain.Fuerte.MURO_PAGA)) quitados.add(q.asLong());
+            if (paso == 2) bajarPuenteFuerte(true);
+            var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], com.darkcraft.morvain.Fuerte.X0, com.darkcraft.morvain.Fuerte.Z0,
+                    com.darkcraft.morvain.Fuerte.X1, com.darkcraft.morvain.Fuerte.Z1, 12_000_000);
+            StringBuilder sb = new StringBuilder(paso == 0 ? "a pie, el puente alzado: " : paso == 1 ? "a pie, y el muro de la paga abierto: "
+                    : "a pie, y el puente bajado: ");
+            sb.append(z0.celdas()).append(" celdas;");
+            for (String s : v.sitios().keySet()) {
+                int[] q = v.sitio(s);
+                sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+            }
+            System.out.println(sb);
+            if (paso == 2) {
+                // por la puerta: del estribo al patio, sin pasar por el foso
+                int[] pu = v.sitio("puente"), pa = v.sitio("patio");
+                var z1 = com.darkcraft.pueblo.gen.Andar.desde((x, y, zz) -> {
+                    int mm = Math.max(Math.abs(x - X), Math.abs(zz - Z));
+                    if (mm >= com.darkcraft.morvain.Fuerte.FOSO0 && mm <= com.darkcraft.morvain.Fuerte.FOSO1 && y <= com.darkcraft.morvain.Fuerte.FOSO + 2)
+                        return Blocks.BEDROCK.defaultBlockState();
+                    return mundo.en(x, y, zz);
+                }, pu[0], pu[1], pu[2], X - 40, Z - 40, X + 40, Z + 45, 4_000_000);
+                System.out.println("por la puerta (sin bajar al foso): del puente al patio " + z1.alcanza(pa[0], pa[1], pa[2], 2));
+                bajarPuenteFuerte(false);
+            }
+            if (paso != 1) continue;
+            int malos = 0, chocan = 0, sinSuelo = 0;
+            for (var o : v.esperas()) {
+                if (!z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                    malos++;
+                    System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z() + " (u " + (o.x() - X) + ", v " + (o.z() - Z) + ")");
+                }
+                int alto = o.variante() == 2 ? 3 : 2;
+                for (int dy = 0; dy < alto; dy++) {
+                    BlockState st = mundo.en(o.x(), o.y() + dy, o.z());
+                    if (choca(st)) {
+                        chocan++;
+                        System.out.println("  " + o.grupo() + " metido en un bloque: " + o.x() + "," + (o.y() + dy) + "," + o.z() + " (u " + (o.x() - X) + ", v "
+                                + (o.z() - Z) + ") " + st);
+                    }
+                }
+                BlockState abajo = mundo.en(o.x(), o.y() - 1, o.z());
+                if (!choca(abajo)) {
+                    sinSuelo++;
+                    System.out.println("  " + o.grupo() + " sin suelo: " + o.x() + "," + o.y() + "," + o.z() + " (u " + (o.x() - X) + ", v " + (o.z() - Z) + ") " + abajo);
+                }
+            }
+            System.out.println("los del fuerte: " + v.esperas().size() + ", sin llegar " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
         }
     }
 

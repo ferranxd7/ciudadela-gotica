@@ -4635,6 +4635,109 @@ Elixir, esperando la ultima gota.
   lado); antes del primer golpe de los Ensamblados el jugador ya esta en la Capilla de los Huesos 3 s (`os30` salia sin los trozos
   hechos: se veia el cielo); y el portacirios rehecho se remata antes del bestiario (`os43` salia `???`).
 
+### Plan grande, parte 7aw: el Fuerte de la Marca y los Insomnes
+
+Respuesta 131 del plan ("fuertes y campamentos"). Lore: la noche en que la Peste Gris vacio los pueblos de la llanura, los que huian
+llegaron a la puerta del Fuerte de la Marca pidiendo asilo; el castellano mando alzar el puente y que nadie abriera (libro perdido 39,
+"El registro de la puerta", del sargento Bertil). Acamparon al pie del glacis y, cuando quisieron derribar la puerta con un ariete, la
+guarnicion quemo el campamento desde las almenas. Luego llego el cielo rojo y nadie vino a relevar a la guardia: los Insomnes siguen en
+sus puestos con los ojos abiertos. El jefe, el castellano en la Sala del Castellano de la torre del homenaje, llega en la 7ax.
+- **El fuerte** (`morvain/Fuerte`, en (2250, 3560), en las Llanuras Palidas; u = x - CX, v = z - CZ, **m = max(|u|, |v|)**; hecho como el
+  lazareto: `Obra` columna a columna, un `Mina.Plano` y `Trozo`s; `Adorno` no pone nada en sus chunks —`AX0..AZ1`—):
+  - el **monticulo** allanado a `SUELO` 78 (el patio, m <= `PATIO` 25), la **muralla** (m 26..28: el adarve en `A` 88 —se pisa en 89—, el
+    parapeto con merlones y huecos de almena cada tres —`almena(u, v)`—, aspilleras ciegas), cuatro **torres redondas** (`TORRES`,
+    `RTO` 5,5 / `RTI` 3,5: sala de abajo, sala del adarve, azotea en `T` 94 con parapeto y brasero; escala de mano en la esquina de fuera;
+    puerta diagonal al patio y puertas al adarve), el **foso seco** (m 29..35, el fondo en `FOSO` 72, con los huesos de los que
+    intentaron cruzarlo), la **contraescarpa** de piedra (m 36), la **berma** (m 36..40 a 78) y el **glacis** que baja al llano (0,7 por
+    bloque); el camino del santuario sube por una **rampa** de medias losas (`rampaMedia`, `rampaTope`);
+  - al sur, el **cuerpo de la puerta** (|u| <= 8, v 18..28, azotea en 94): el paso de cinco (u -2..2), el **rastrillo** de barrotes en
+    `RV` 27 (bajado; al alzarse sube a una ranura en la piedra), el **puente levadizo** alzado (de pie contra la cara de fuera en `PV0` 29;
+    bajado, el tablero sobre el foso hasta la berma: `puente(fase)` 0 alzado, 1 y 2 cayendo, 3 bajado) y encima la **sala del torno**
+    (el tambor, las ruedas, las cadenas, el pilar con la **palanca** —`palanca()`—, el atril con el **libro 39**, la mesa del registro);
+    se sube del patio por una escala de mano (puerta en la cara de dentro) o por el adarve (puertas a los lados);
+  - la **torre del homenaje** al norte (|u| <= 9, v -25..-7, muros de dos): el **sotano** (`FOSO`), la **sala de armas** (`P0` 78), la
+    **Sala del Castellano** (`P1` 86, nueve de alto: el sitial, la alfombra roja, los braseros, la mesa del mapa, estandartes; el jefe de la
+    7ax) y la **azotea** (`AZOTEA` 96) con el mastil y la bandera de la Marca (lana amarilla y negra); escaleras de piedra pegadas a los
+    muros (las dos acaban a la altura del suelo de arriba: nada de escalon de un bloque entero) y escala de mano a la azotea;
+  - **las mazmorras** bajo el homenaje: tres celdas con reja (una abierta), el almacen, el cuerpo de guardia y la escalera a la sala de
+    armas; tras un **muro ilusorio** (`MURO_PAGA` "fuerte_paga", las dos capas del muro del sur, `bloqueMuro` = la piedra del fuerte) la
+    **sala de la paga** (la soldada que nunca se repartio: el arcon `chests/fuerte_bueno`);
+  - **la poterna**: en la cara del oeste de la torre del noroeste, a la altura del foso (su sala de abajo y la escala), y el **tunel** en
+    ele hasta las mazmorras;
+  - el patio: el **campanario de rebato** (`CAMP_U/V`, la campana colgada en `CAMP_Y`), el **cuartel** (jergones de alfombra: **sin
+    camas**), el **comedor** con la cocina y su chimenea, la **capilla**, las **cuadras** y la **fragua**, el **pozo**, el **fundibulo**, la
+    **horca**, monigotes de entrenar, braseros, dos **escaleras al adarve** (la del suroeste y la del noreste) y los caminos;
+  - fuera, al sur, el **campamento quemado** de los refugiados (`TIENDAS`, `CARROS` —uno volcado; en el otro un cofre—, el suelo quemado,
+    la **fosa**), la **barricada** de la guarnicion en lo alto de la berma, el **ariete** abandonado ante el estribo y los **escombros**
+    del suroeste (u -21..-15: la contraescarpa se vino abajo; `escombro(u, v)`), por donde se baja al foso; el santuario nuevo **"El
+    Fuerte de la Marca"** (`SantuariosMorvain`, id `fuerte`) al final del camino (v 100).
+- **Entrar**: con el puente alzado y el rastrillo bajado, la unica entrada es **bajar al foso por los escombros, rodear hasta la poterna
+  de la torre del noroeste, el tunel y las mazmorras** y subir a la sala de armas del homenaje. **La palanca del torno** (`Fuerte.tick` cada
+  tick con alguien a 150; `revisarPalanca` cada medio segundo) **sube el rastrillo** fila a fila y **baja el puente** en tres golpes
+  (`empezarBajada` / `bajada`: el rastrillo en los ticks 8..48, el puente a los 60, 110 y 160; `sfx.puente_levadizo` y `sfx.rastrillo`, el
+  aviso `darkcraft.fuerte.puente` y el logro **`rastrillo`** a quien este a 24 de la palanca): **se queda abierto** (lo dicen los bloques;
+  si se corta a medias, la palanca bajada lo vuelve a empezar). `bajarPuente(m, yaMismo)` / `alzarPuente(m)` (comando y pruebas).
+- **El rebato** (`Fuerte.rebato`): un centinela que toca el cuerno entero (`Insomne.CUERNO_CORTA`) hace sonar la **campana** del campanario
+  (`sfx.campana_rebato`, otra vez cada 7,5 s durante 45 s: `REBATO`, `CAMPANADA`) y **acuden** los Insomnes de alrededor (a 48 bloques, los
+  doce mas cercanos que no esten peleando; con animo +15 %); mientras dura persiguen de punta a punta del fuerte (`Insomne.correa` 80) y a
+  los jugadores de alrededor les sale el aviso `darkcraft.fuerte.rebato`. `rebatoActivo(l)`, `sinRebato()`.
+- **Los Insomnes** (`enemigos/Insomne`, entidad `darkcraft:insomne` 0,7 x 2,0; modelo de `tools/enemigos/insomne.py`: la cara gris con los
+  ojos de par en par —las pupilas en la capa de brillo, que se apaga al morir: por fin duerme—, el tabardo ocre de la Marca con la torre
+  negra; bestiario `insomne_centinela`, `_ballestero`, `_escudero`). 30 de vida, golpe 5, armadura 4.
+  - **centinela** (0): capacete y almofar, lanza con banderola y el cuerno a la cadera (`InsomneModelo`: en la mano mientras toca).
+    **Estocada** (3,9) y **barrido** a las rodillas; nada mas ver a alguien (`recienVisto`), si no tocan ya a rebato y no ha tocado en
+    un minuto, el **cuerno** (`CUERNO`, 2 s: el cuerno suena en el tick 9 y el rebato en el 30): **si un jugador le pega antes, se corta**
+    (`cortarCuerno`: el sonido calla con `ClientboundStopSoundPacket`).
+  - **ballestero** (1, -15 % de vida, -2 de armadura, ve 16 mas lejos): ballesta de torno, el paves a la espalda, carcaj y el torno a la
+    cadera. **Disparo** (`DISPARO`, apunta y no gira los tres ultimos ticks: se esquiva de lado) de un **virote** (`enemigos/Virote`, una
+    `Flecha` —pasa entre los suyos— con su propio tipo de dano `darkcraft:virote`, en `#minecraft:bypasses_shield` y `#minecraft:is_projectile`:
+    **el escudo no lo para**; 9 de dano, empuja, frena un segundo; se ve como una flecha critica), y queda **descargada** (`CARGADA`,
+    sincronizado: el virote de la ballesta no se ve) hasta la **recarga** (2,4 s, de punta al suelo con el pie en el estribo: el momento
+    de llegar a el). De cerca, **culatazo**. En lo alto de las murallas y las torres (`Fuerte.enLoAlto`) no baja: se gira y tira; en el
+    resto se queda a nueve. Los de las almenas van **en el hueco de la almena** (de pie en el parapeto, `A + 2`), nunca en el adarve.
+    Espera sentado contra el muro (`TUMBADO`).
+  - **escudero** (2, escala `GRANDE` 1,12: vida +60 %, armadura +6, no se le empuja, mas lento, golpe +30 %): bacinete cerrado (las pupilas
+    por la rendija), peto, hombreras, **escudo de torre** y maza de pestanas. **De frente, sin atacar, el escudo deja pasar el 10 %**
+    (`ESCUDO`; las flechas, nada; suena `sfx.escudo_torre` y hace `BLOQUEA`); por un lado, la espalda o mientras golpea, todo; **un martillo
+    le rompe la guardia** (`Martillo.rompe`: entra entero y se queda aturdido). **Mazazo**, **escudazo** (empuja y frena; tras parar dos
+    golpes contesta con uno) y **carga** (de 4,5 a 10 bloques, cada 6 s). Espera apoyado en el escudo (`REZA`).
+  Dejan piedra de forja I (7 %; el escudero II el 10 %) y el ballestero alguna flecha. Logro **`insomne`** ("Por fin duermen") al primero.
+- **Los de alli** (`MorvainEnemigos`, sitio `fuerte`, 36; `Fuerte.esperas`): ballesteros en las almenas de las cuatro murallas y en lo alto
+  de la puerta y de tres torres, dos centinelas de ronda por el adarve, la guardia que se quedo fuera en la barricada (dos centinelas y un
+  escudero), dos en el foso (al pie de los escombros y junto a la poterna), la torre del noroeste, el tunel, las mazmorras, la sala de armas,
+  el patio (el pozo, el campanario, la puerta, la horca, la fragua), el cuartel, el comedor, la capilla y la sala del torno.
+- Logros **`fuerte`** ("Sin relevo": entrar en el fuerte —`Fuerte.dentro`—), **`rastrillo`** ("Puerta franca") e **`insomne`**, con su
+  entrada del diario. El Espejo (`Fuerte.lugar`): el Fuerte de la Marca, el Campamento Quemado, el Foso, el Patio de Armas, el Adarve, la
+  Sala del Torno, la Torre del Homenaje, la Sala del Castellano, las Mazmorras y la Sala de la Paga. En el fuerte y al pie de sus murallas
+  suena **el viento de las almenas** (`ambiente.fuerte`, `ClientMusic.tickFuerte`). Cofres `chests/fuerte` (flechas, pan, pepitas, frutos,
+  piedras I, flechas de fuego; alguna piedra II, ballesta o escudo) y `fuerte_bueno` (oro, esmeraldas, piedras II y una III o un talisman
+  —porteador, hueso— o una ceniza —parada, estocada—). Muerte por virote: `death.attack.darkcraft.virote`.
+- Sonidos (ElevenLabs, flow `t58TdUvsC9LgcURTJwcX`, tomas en `TOMAS_SFX`): `insomne_murmullo`, `_alerta`, `_dolor`, `_muerte`, `cuerno_rebato`,
+  `campana_rebato`, `virote_dispara`, `virote_impacto`, `ballesta_recarga`, `escudo_torre`, `mazazo`, `puente_levadizo`, `rastrillo` y
+  `fuerte_ambiente` (el viento, en bucle). Prompts y firmas en `herr` (fuera del repo).
+- Comandos `/darkcraft fuerte [ir <sitio> | enemigos [volver | fuera | sacar] | puente [bajar | alzar] | muro [abrir | cerrar] |
+  rebato [parar] | insomne <centinela | ballestero | escudero>]`.
+- **Sin abrir el juego**: `VOLCADO_OPTS="-Droca=true" bash tools/vista3d/vista.sh morvain_fuerte carpeta` (`-Dcaja=...`, `-Dabierto=true`,
+  `-Dbajado=true`; marcas C, B y E de los puestos): con la poterna tapada no se entra (ni al patio ni al torno), a donde se llega a pie desde
+  el camino con el puente alzado (a todo menos a la paga), con el muro abierto (todo) y con el puente bajado (y de la berma al patio por la
+  puerta sin bajar al foso); cada uno de los 36 se pisa, se llega y no esta metido en un bloque (el escudero, tres de alto). Los Insomnes:
+  `python3 tools/enemigos/generar.py --solo insomne --vistas carpeta`.
+- Pruebas: servidor, `fuerte()` despues de `galen()` (lineas `Morvain, el Fuerte de la Marca: ...` —lo que hay, el santuario, sin la poterna
+  no se entra, a pie con el puente alzado, la palanca del torno (la usa un jugador; el rastrillo y el puente a medias y al acabar) y por la
+  puerta sin bajar al foso, el muro de la paga de un golpe, el nombre de cada sitio—, `Morvain, los Insomnes: ...` —en su sitio, en su suelo,
+  ninguno metido en un bloque—, `... en accion: ...` —los que esperan se levantan (vigilando, apoyado, sentado), cada accion acaba—,
+  `... contra una presa: ...` —estocada, barrido, culatazo, virote (salta el escudo), mazazo, escudazo y carga que frenan—,
+  `Morvain, el cuerno de los Insomnes: ...` —entero toca a rebato y acuden; cortado de un golpe, no— y `Morvain, el escudo de torre del
+  escudero: ...` —de frente casi nada, la flecha nada, por la espalda todo, el martillo rompe la guardia; la ballesta descargada y
+  recargada—); cliente, tramo `fuerte()` despues de `galen()`: desde el santuario (`cliente_fu01`), el campamento, la fosa, el puente
+  alzado, los escombros, el foso, la poterna, el tunel, las mazmorras, el almacen, la sala de armas, la Sala del Castellano, la azotea, el
+  patio, el cuartel, el comedor, la capilla, las cuadras, el campanario, el adarve, la sala del torno y lo alto de una torre
+  (`fu02..fu22`); en aventura el muro de la paga de un golpe (`fu23`, `fu24`), la palanca del torno con el clic del cliente (`fu25`), el
+  rastrillo que sube (`fu26`), el puente cayendo y bajado (`fu27`, `fu28`) y entrar a pie (`fu29`: el logro, el sitio, el viento); en
+  supervivencia, en el patio: el cuerno y el rebato (`fu30`, `fu31`, lineas `a rebato: ...`), el cuerno cortado (`fu32`), estocada, barrido,
+  disparo, recarga, culatazo, mazazo, escudazo y carga (`fu33..fu40`), el escudo que para (`fu41`) y uno que cae dormido (`fu42`); el
+  registro de la puerta (`fu43`) y el bestiario (`fu44..fu46`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

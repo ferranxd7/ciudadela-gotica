@@ -440,6 +440,39 @@ public final class ClientMusic {
         }
     }
 
+    // ------------------------------------------------------------------ el Fuerte de la Marca (parte 7aw): el viento en las almenas
+
+    private static Track fuerte;
+    private static int fuerteTicks;
+    private static boolean enFuerte;
+
+    private static void tickFuerte(Minecraft mc) {
+        if (mc.player == null || mc.level == null) enFuerte = false;
+        else if (mc.player.tickCount % 20 == 15)
+            enFuerte = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL
+                    && com.darkcraft.morvain.Fuerte.enFuerte(mc.player.getX(), mc.player.getY(), mc.player.getZ());
+        boolean quiere = enFuerte && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
+        if (quiere) {
+            if (fuerte == null || fuerte.dying() || !mc.getSoundManager().isActive(fuerte) && fuerteTicks > 20) {
+                if (fuerte != null && !fuerte.dying()) mc.getSoundManager().stop(fuerte);
+                fuerte = new Track(DarkCraftMod.AMBIENTE_FUERTE.get(), "fuerte", false);
+                fuerteTicks = 0;
+                mc.getSoundManager().play(fuerte);
+                fuerte.fadeTo(0.8f, 2.5f);
+            }
+        } else if (fuerte != null && !fuerte.dying()) fuerte.kill(3.0f);
+        if (fuerte != null) {
+            fuerteTicks++;
+            if (fuerte.dying() && !mc.getSoundManager().isActive(fuerte) && fuerteTicks > 20) fuerte = null;
+        }
+    }
+
+    /** Para la prueba de la CI: si suena el viento del fuerte. */
+    public static String fuerte() {
+        Minecraft mc = Minecraft.getInstance();
+        return fuerte == null ? "sin el viento del fuerte" : String.format("el viento del fuerte %.2f%s", fuerte.level(), mc.getSoundManager().isActive(fuerte) ? "" : " (parado)");
+    }
+
     // ------------------------------------------------------------------ la academia (parte 7o): viento en la meseta y susurros
 
     private static Track academia;
@@ -799,6 +832,8 @@ public final class ClientMusic {
         if (osario != null && !osario.dying()) any = true;
         tickLazareto(mc);
         if (lazareto != null && !lazareto.dying()) any = true;
+        tickFuerte(mc);
+        if (fuerte != null && !fuerte.dying()) any = true;
         tickAcademia(mc);
         if (academia != null && !academia.dying()) any = true;
         tickCosta(mc);

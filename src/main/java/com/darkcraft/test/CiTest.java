@@ -770,6 +770,7 @@ public final class CiTest {
         osmund(server, m, log);
         lazareto(server, m, log, out);
         galen(server, m, log);
+        fuerte(server, m, log, out);
         armaduras(server, m, log);
         armas7aj(server, m, log);
         escudos7ak(server, m, log);
@@ -7457,6 +7458,403 @@ public final class CiTest {
             for (var e : quitar) if (!e.isRemoved()) e.discard();
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
             for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
+        }
+    }
+
+    /**
+     * Parte 7aw: el Fuerte de la Marca y los Insomnes. Lo que hay (el puente alzado, el rastrillo bajado, la palanca, el atril con el libro
+     * 39, el muro de la paga, la campana, la poterna, el foso), el santuario, a donde se llega a pie desde el camino del santuario con el
+     * puente alzado (por los escombros del foso, la poterna, el tunel y las mazmorras: a todo menos a la sala de la paga) y sin la poterna
+     * (no se entra: ni por las murallas ni por las torres), la palanca del torno (la usa un jugador: el rastrillo sube y el puente baja; luego
+     * se entra por la puerta sin bajar al foso) y el muro de la paga (un golpe); el nombre de cada sitio. Los Insomnes: en su sitio, en su
+     * suelo, ninguno metido en un bloque; los que esperan se levantan; cada accion acaba; contra una presa (la estocada, el barrido, el
+     * culatazo, el mazazo, el escudazo y la carga que frenan, el virote que da y salta el escudo); el cuerno entero toca a rebato (suena la
+     * campana y acuden los de alrededor) y cortado no; el escudo de torre (de frente casi nada, la flecha nada, por la espalda todo, un
+     * martillo rompe la guardia) y la ballesta que se vuelve a cargar.
+     */
+    private static void fuerte(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.FUERTE;
+        var F = com.darkcraft.morvain.Fuerte.get();
+        final int CX = com.darkcraft.morvain.Fuerte.CX, CZ = com.darkcraft.morvain.Fuerte.CZ, SUELO = com.darkcraft.morvain.Fuerte.SUELO,
+                FOSO = com.darkcraft.morvain.Fuerte.FOSO, A = com.darkcraft.morvain.Fuerte.A;
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07ab0"), "[DarkCraftCI37]"));
+        // ---------------------------------------------------------------- el fuerte: lo que hay y a donde se llega
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : F.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            com.darkcraft.morvain.Fuerte.alzarPuente(m);
+            com.darkcraft.morvain.Fuerte.sinRebato();
+            com.darkcraft.morvain.MurosIlusorios.cerrar(m, com.darkcraft.morvain.Fuerte.MURO_PAGA);
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            final boolean[] sinPoterna = {false}, sinFoso = {false};
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                int mm = Math.max(Math.abs(x - CX), Math.abs(z - CZ));
+                if (sinPoterna[0] && x >= CX - 33 && x <= CX - 30 && z >= CZ - 27 && z <= CZ - 26 && y >= FOSO + 1 && y <= FOSO + 2)
+                    return net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState();
+                if (sinFoso[0] && mm >= com.darkcraft.morvain.Fuerte.FOSO0 && mm <= com.darkcraft.morvain.Fuerte.FOSO1 && y <= FOSO + 2)
+                    return net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState();
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || st.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                        || st.getBlock() instanceof net.minecraft.world.level.block.SkullBlock || st.getBlock() instanceof net.minecraft.world.level.block.WallSkullBlock
+                        || st.getBlock() instanceof net.minecraft.world.level.block.WebBlock || st.getBlock() instanceof net.minecraft.world.level.block.BushBlock
+                        || st.getBlock() instanceof net.minecraft.world.level.block.BannerBlock || st.getBlock() instanceof net.minecraft.world.level.block.WallBannerBlock ? aire : st;
+            };
+            int[] en = F.sitio("entrada");
+            StringBuilder sb = new StringBuilder("Morvain, el Fuerte de la Marca: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Fuerte.resumen(m));
+            var st = com.darkcraft.morvain.SantuariosMorvain.porId("fuerte");
+            sb.append("; santuario ").append(com.darkcraft.santuario.Santuarios.nombre(m, st.pos())).append(" (").append(m.getBlockState(st.pos()).getBlock().getDescriptionId())
+                    .append(") a ").append(Math.round(Math.hypot(st.x() - CX, st.z() - CZ))).append(" del patio");
+            sb.append("; ").append(F.almenas).append(" almenas, ").append(F.jergones).append(" jergones, ").append(F.tiendas).append(" tiendas, ").append(F.carros)
+                    .append(" carros, ").append(F.huesos).append(" huesos, ").append(F.faroles).append(" faroles");
+            {
+                sinPoterna[0] = true;
+                var zt = com.darkcraft.pueblo.gen.Andar.desde(mundo, en[0], en[1], en[2], com.darkcraft.morvain.Fuerte.X0, com.darkcraft.morvain.Fuerte.Z0,
+                        com.darkcraft.morvain.Fuerte.X1, com.darkcraft.morvain.Fuerte.Z1, 8_000_000);
+                int[] pa = F.sitio("patio"), pt = F.sitio("torno");
+                sb.append("; con la poterna tapada y el puente alzado se llega al patio ").append(zt.alcanza(pa[0], pa[1], pa[2], 2)).append(" y al torno ")
+                        .append(zt.alcanza(pt[0], pt[1], pt[2], 2)).append(" (tienen que ser false)");
+                sinPoterna[0] = false;
+            }
+            for (int fase = 0; fase < 3; fase++) {
+                if (fase == 1) {
+                    // un jugador baja la palanca del torno (delante de ella, mirando al norte): sube el rastrillo y baja el puente
+                    BlockPos pal = com.darkcraft.morvain.Fuerte.palanca();
+                    fp.moveTo(pal.getX() + 0.5, A + 1, pal.getZ() + 1.6, 180f, 20f);
+                    var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pal), net.minecraft.core.Direction.SOUTH, pal, false);
+                    m.getBlockState(pal).use(m, fp, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+                    int b0 = com.darkcraft.morvain.Fuerte.BAJADAS;
+                    com.darkcraft.morvain.Fuerte.revisarPalanca(m);
+                    String medio = "";
+                    for (int k = 0; k < 175; k++) {
+                        com.darkcraft.morvain.Fuerte.tick(m);
+                        if (k == 80) medio = com.darkcraft.morvain.Fuerte.resumen(m);
+                    }
+                    sb.append("; la palanca del torno: bajadas +").append(com.darkcraft.morvain.Fuerte.BAJADAS - b0).append(", a medias (").append(medio)
+                            .append("), al acabar (").append(com.darkcraft.morvain.Fuerte.resumen(m)).append(")");
+                    sinFoso[0] = true;
+                    int[] pu = F.sitio("puente"), pa = F.sitio("patio");
+                    var zp = com.darkcraft.pueblo.gen.Andar.desde(mundo, pu[0], pu[1], pu[2], CX - 40, CZ - 40, CX + 40, CZ + 45, 4_000_000);
+                    sb.append("; por la puerta, sin bajar al foso, del puente al patio ").append(zp.alcanza(pa[0], pa[1], pa[2], 2));
+                    sinFoso[0] = false;
+                }
+                if (fase == 2) {
+                    // un jugador en las mazmorras, ante el muro del sur, golpea (lo que hace el combate)
+                    fp.moveTo(CX - 3.0, FOSO + 1, CZ - 10.3, 0f, 0f);
+                    fp.setYHeadRot(0f);
+                    int ab0 = com.darkcraft.morvain.MurosIlusorios.ABIERTOS;
+                    com.darkcraft.morvain.MurosIlusorios.golpe(fp);
+                    sb.append("; un golpe al muro del sur de las mazmorras: se abre +").append(com.darkcraft.morvain.MurosIlusorios.ABIERTOS - ab0)
+                            .append(" (").append(com.darkcraft.morvain.MurosIlusorios.estado(m)).append(')');
+                }
+                var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, en[0], en[1], en[2], com.darkcraft.morvain.Fuerte.X0, com.darkcraft.morvain.Fuerte.Z0,
+                        com.darkcraft.morvain.Fuerte.X1, com.darkcraft.morvain.Fuerte.Z1, 8_000_000);
+                sb.append("; a pie, ").append(fase == 0 ? "el puente alzado" : fase == 1 ? "el puente bajado" : "y el muro de la paga abierto").append(" (")
+                        .append(zona.celdas()).append(" celdas):");
+                for (var e : F.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    sb.append(' ').append(e.getKey()).append(zona.alcanza(q[0], q[1], q[2], 2) ? "+" : "-");
+                }
+                if (fase == 2) {
+                    int lejos = 0;
+                    for (var o : F.esperas()) if (!zona.alcanza(o.x(), o.y(), o.z(), 2)) lejos++;
+                    sb.append("; de los ").append(F.esperas().size()).append(" del fuerte, a los que no se llega ").append(lejos);
+                }
+            }
+            sb.append("; el sitio:");
+            for (String s2 : new String[]{"entrada", "campamento", "puente", "foso", "poterna", "tunel", "mazmorras", "paga", "homenaje", "castellano", "patio",
+                    "adarve", "torno", "torre_so"}) {
+                int[] q = F.sitio(s2);
+                String l = com.darkcraft.morvain.Fuerte.lugar(q[0] + 0.5, q[1], q[2] + 0.5);
+                sb.append(' ').append(s2).append(' ').append(l == null ? "-" : l.replace("darkcraft.morvain.lugar.", ""));
+            }
+            log.println(sb);
+            topView(m, CX, CZ + 22, 72, new File(out, "morvain_fuerte.png"));
+            topView(m, CX, CZ, 30, new File(out, "morvain_fuerte_patio.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, el Fuerte de la Marca: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] fuerte", t);
+        } finally {
+            com.darkcraft.morvain.Fuerte.alzarPuente(m);
+            com.darkcraft.morvain.MurosIlusorios.cerrar(m, com.darkcraft.morvain.Fuerte.MURO_PAGA);
+            fp.removeAllEffects();
+        }
+        // ---------------------------------------------------------------- los Insomnes
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 10; k++)
+                for (var e : fuera) if (e.isAlive()) e.tick();
+            int reza = 0, sentados = 0, dePie = 0, enSuelo = 0, chocan = 0;
+            int[] porVariante = new int[3];
+            StringBuilder mal = new StringBuilder();
+            com.darkcraft.enemigos.Insomne[] despiertan = new com.darkcraft.enemigos.Insomne[3];
+            for (var e : fuera) {
+                if (!(e instanceof com.darkcraft.enemigos.Insomne c)) continue;
+                porVariante[Math.max(0, Math.min(2, c.variante()))]++;
+                if (!m.noCollision(c)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(c.blockPosition().toShortString()).append(';');
+                }
+                if (c.postura() == com.darkcraft.enemigos.Enemigo.REZA) {
+                    reza++;
+                    int i = c.variante() == com.darkcraft.enemigos.Insomne.ESCUDERO ? 1 : 0;
+                    if (despiertan[i] == null) despiertan[i] = c;
+                } else if (c.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) {
+                    sentados++;
+                    if (despiertan[2] == null) despiertan[2] = c;
+                } else dePie++;
+                var abajo = m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ()));
+                if (!abajo.getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+                else if (mal.length() < 400) mal.append(' ').append(c.tipo()).append(" en el aire en ").append(c.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, los Insomnes: fuera " + fuera.size() + " de " + com.darkcraft.morvain.MorvainEnemigos.fuerte().size() + " (centinelas "
+                    + porVariante[0] + ", ballesteros " + porVariante[1] + ", escuderos " + porVariante[2] + "): de guardia " + reza + ", sentados " + sentados
+                    + ", de pie " + dePie + " (en su suelo " + enSuelo + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+            // ---- los que esperan se levantan (una presa a su lado)
+            StringBuilder sb = new StringBuilder("Morvain, los Insomnes en accion:");
+            String[] como = {"vigilando", "apoyado en el escudo", "sentado"};
+            for (int i = 0; i < 3; i++) {
+                var c = despiertan[i];
+                if (c == null) {
+                    sb.append(" NO HAY NINGUNO ").append(como[i]).append(';');
+                    continue;
+                }
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (presa == null) continue;
+                presa.moveTo(c.getX() + 1.2, c.getY(), c.getZ() + 0.4, 0f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(presa);
+                quitar.add(presa);
+                c.setTarget(presa);
+                int sale = -1, accion = 0;
+                for (int k = 0; k < 90; k++) {
+                    c.tickCount++;
+                    c.tick();
+                    int a = c.accion();
+                    if (sale < 0 && a != 0) {
+                        sale = k;
+                        accion = a;
+                    }
+                    if (sale >= 0 && a == 0) break;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " el %s %s (en %s) %s en el tick %d y queda de pie %s;", c.tipo().replace("insomne_", ""), como[i],
+                        c.blockPosition().toShortString(), accion == 0 ? "NO SE MUEVE" : com.darkcraft.enemigos.InsomneAnims.NOMBRES[accion], sale,
+                        c.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE));
+                c.setTarget(null);
+                presa.discard();
+            }
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
+            // ---- en el patio (mirando al sur): uno de cada, cada accion acaba
+            final double gx = CX + 8.5, gy = SUELO + 1, gz = CZ + 4.5;
+            for (int v2 = 0; v2 < 3; v2++) {
+                var a = DarkCraftMod.INSOMNE.get().create(m);
+                if (a == null) continue;
+                a.variante(v2);
+                a.moveTo(gx, gy, gz, 0f, 0f);
+                m.addFreshEntity(a);
+                quitar.add(a);
+                StringBuilder no = new StringBuilder();
+                for (int ac = 1; ac < com.darkcraft.enemigos.InsomneAnims.TICKS.length; ac++) {
+                    String nombre = com.darkcraft.enemigos.InsomneAnims.NOMBRES[ac];
+                    if (nombre.equals("morir") || nombre.equals("cuerno")) continue;
+                    a.empezar(ac);
+                    for (int k = 0; k < 90 && a.accion() == ac; k++) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    if (a.accion() == ac) no.append(' ').append(nombre);
+                    for (int k = 0; k < 6; k++) a.tick();
+                    a.postura(com.darkcraft.enemigos.Enemigo.DE_PIE);
+                    a.moveTo(gx, gy, gz, 0f, 0f);
+                }
+                sb.append(' ').append(a.tipo().replace("insomne_", "")).append(String.format(java.util.Locale.ROOT, " (vida %.0f, golpe %.1f, armadura %d, caja %.2f x %.2f)",
+                        a.getMaxHealth(), a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), a.getArmorValue(), a.getBbWidth(),
+                        a.getBbHeight())).append(": acciones que no acaban").append(no.length() == 0 ? " ninguna" : no).append(';');
+                a.discard();
+            }
+            net.minecraft.world.phys.AABB zonaPruebas = new net.minecraft.world.phys.AABB(gx - 24, gy - 8, gz - 24, gx + 24, gy + 16, gz + 30);
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Virote.class, zonaPruebas)) f.discard();
+            log.println(sb);
+            // ---- contra una presa (un aldeano quieto delante, al sur)
+            sb = new StringBuilder("Morvain, los Insomnes contra una presa:");
+            int C = com.darkcraft.enemigos.Insomne.CENTINELA, B = com.darkcraft.enemigos.Insomne.BALLESTERO, E = com.darkcraft.enemigos.Insomne.ESCUDERO;
+            String[] nombres = {"estocada", "barrido", "culatazo", "virote", "mazazo", "escudazo", "carga"};
+            int[] acciones = {com.darkcraft.enemigos.InsomneAnims.ESTOCADA, com.darkcraft.enemigos.InsomneAnims.BARRIDO, com.darkcraft.enemigos.InsomneAnims.CULATAZO,
+                    com.darkcraft.enemigos.InsomneAnims.DISPARO, com.darkcraft.enemigos.InsomneAnims.MAZAZO, com.darkcraft.enemigos.InsomneAnims.ESCUDAZO,
+                    com.darkcraft.enemigos.InsomneAnims.CARGA};
+            int[] variantes = {C, C, B, B, E, E, E};
+            double[] lejos = {3.2, 2.6, 2.0, 10.0, 2.5, 2.2, 7.0};
+            int[] duran = {40, 40, 40, 60, 40, 40, 50};
+            int vir0 = com.darkcraft.enemigos.Insomne.VIROTES, dan0 = com.darkcraft.enemigos.Virote.DAN, car0 = com.darkcraft.enemigos.Insomne.CARGAS,
+                    maz0 = com.darkcraft.enemigos.Insomne.MAZAZOS;
+            for (int i = 0; i < nombres.length; i++) {
+                var a = DarkCraftMod.INSOMNE.get().create(m);
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (a == null || presa == null) continue;
+                a.variante(variantes[i]);
+                a.moveTo(gx, gy, gz, 0f, 0f);
+                presa.moveTo(gx, gy, gz + lejos[i], 180f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(a);
+                m.addFreshEntity(presa);
+                quitar.add(a);
+                quitar.add(presa);
+                a.setTarget(presa);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.sinEsperas();
+                a.empezar(acciones[i]);
+                float vida = presa.getHealth();
+                double z0 = a.getZ();
+                boolean frenada = false, acabo = false;
+                for (int k = 0; k < duran[i]; k++) {
+                    if (!a.isRemoved() && !acabo) {
+                        a.tickCount++;
+                        a.tick();
+                        if (a.accion() == 0) acabo = true;
+                    }
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Virote.class, zonaPruebas)) {
+                        if (!quitar.contains(f)) quitar.add(f);
+                        f.tick();
+                    }
+                    presa.invulnerableTime = 0;
+                    frenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " %s (%s) a %.1f: la presa -%.1f", nombres[i], a.tipo().replace("insomne_", ""), lejos[i],
+                        vida - presa.getHealth()));
+                if (i >= 5) sb.append(", frenada ").append(frenada);
+                if (i == 3) sb.append(", cargada despues ").append(a.cargada());
+                if (i == 6) sb.append(String.format(java.util.Locale.ROOT, ", avanza %.1f", a.getZ() - z0));
+                sb.append(';');
+                presa.discard();
+                a.discard();
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Virote.class, zonaPruebas)) f.discard();
+            }
+            var srcVirote = new net.minecraft.world.damagesource.DamageSource(m.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.DAMAGE_TYPE)
+                    .getHolderOrThrow(com.darkcraft.enemigos.Virote.TIPO));
+            sb.append(String.format(java.util.Locale.ROOT, " virotes +%d (dan +%d, el ultimo %.1f; salta el escudo %s, es de proyectil %s), cargas +%d, mazazos que dan +%d",
+                    com.darkcraft.enemigos.Insomne.VIROTES - vir0, com.darkcraft.enemigos.Virote.DAN - dan0, com.darkcraft.enemigos.Virote.ULTIMO,
+                    srcVirote.is(net.minecraft.tags.DamageTypeTags.BYPASSES_SHIELD), srcVirote.is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE),
+                    com.darkcraft.enemigos.Insomne.CARGAS - car0, com.darkcraft.enemigos.Insomne.MAZAZOS - maz0));
+            log.println(sb);
+            // ---- el cuerno: entero toca a rebato (la campana y los de alrededor acuden); cortado (un golpe antes de acabar), no
+            sb = new StringBuilder("Morvain, el cuerno de los Insomnes:");
+            int reb0 = com.darkcraft.morvain.Fuerte.REBATOS, acu0 = com.darkcraft.morvain.Fuerte.ACUDEN, cor0 = com.darkcraft.enemigos.Insomne.CUERNOS_CORTADOS,
+                    ent0 = com.darkcraft.enemigos.Insomne.CUERNOS_ENTEROS;
+            // (la presa es un jugador: a los que acuden solo les vale un jugador o su propia presa)
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            for (int caso = 0; caso < 2; caso++) {
+                com.darkcraft.morvain.Fuerte.sinRebato();
+                var a = DarkCraftMod.INSOMNE.get().create(m);
+                var presa = fp;
+                var otro1 = DarkCraftMod.INSOMNE.get().create(m);
+                var otro2 = DarkCraftMod.INSOMNE.get().create(m);
+                if (a == null || otro1 == null || otro2 == null) continue;
+                a.variante(C);
+                otro1.variante(E);
+                otro2.variante(B);
+                a.moveTo(gx, gy, gz, 0f, 0f);
+                presa.moveTo(gx, gy, gz + 6.0, 180f, 0f);
+                otro1.moveTo(gx - 6, gy, gz + 2, 90f, 0f);
+                otro2.moveTo(gx - 6, gy, gz - 2, 90f, 0f);
+                for (var e : new net.minecraft.world.entity.Entity[]{a, otro1, otro2}) {
+                    m.addFreshEntity(e);
+                    quitar.add(e);
+                }
+                a.setTarget(presa);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(com.darkcraft.enemigos.InsomneAnims.CUERNO);
+                for (int k = 0; k < 44; k++) {
+                    if (caso == 1 && k == 12) {
+                        fp.moveTo(gx, gy, gz + 2.0, 180f, 0f);
+                        a.invulnerableTime = 0;
+                        a.hurt(m.damageSources().playerAttack(fp), 2f);
+                    }
+                    a.tickCount++;
+                    a.tick();
+                }
+                sb.append(caso == 0 ? " entero:" : " cortado de un golpe:").append(" rebato ").append(com.darkcraft.morvain.Fuerte.rebatoActivo(m))
+                        .append(", acuden ").append(otro1.getTarget() == presa).append('/').append(otro2.getTarget() == presa).append(';');
+                for (var e : new net.minecraft.world.entity.Entity[]{a, otro1, otro2}) e.discard();
+            }
+            com.darkcraft.morvain.Fuerte.sinRebato();
+            sb.append(" rebatos +").append(com.darkcraft.morvain.Fuerte.REBATOS - reb0).append(", acuden +").append(com.darkcraft.morvain.Fuerte.ACUDEN - acu0)
+                    .append(", cuernos enteros +").append(com.darkcraft.enemigos.Insomne.CUERNOS_ENTEROS - ent0).append(", cortados +")
+                    .append(com.darkcraft.enemigos.Insomne.CUERNOS_CORTADOS - cor0);
+            log.println(sb);
+            // ---- el escudo de torre: de frente casi nada; la flecha, nada; por la espalda, todo; un martillo rompe la guardia
+            sb = new StringBuilder("Morvain, el escudo de torre del escudero:");
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            int blo0 = com.darkcraft.enemigos.Insomne.BLOQUEOS, rot0 = com.darkcraft.enemigos.Insomne.ROTAS;
+            String[] golpes = {"de frente", "una flecha de frente", "por la espalda", "con un martillo de frente"};
+            for (int caso = 0; caso < golpes.length; caso++) {
+                var a = DarkCraftMod.INSOMNE.get().create(m);
+                if (a == null) continue;
+                a.variante(E);
+                a.moveTo(gx, gy, gz, 0f, 0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                m.addFreshEntity(a);
+                quitar.add(a);
+                for (int k = 0; k < 3; k++) a.tick();
+                a.yBodyRot = 0f;
+                float antes = a.getHealth();
+                boolean detras = caso == 2;
+                fp.moveTo(gx, gy, gz + (detras ? -2.0 : 2.0), detras ? 0f : 180f, 0f);
+                fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, caso == 3 ? new net.minecraft.world.item.ItemStack(DarkCraftMod.MARTILLO_GUERRA.get())
+                        : new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                a.invulnerableTime = 0;
+                if (caso == 1) {
+                    var fl = new net.minecraft.world.entity.projectile.Arrow(m, fp);
+                    fl.setPos(gx, gy + 1.2, gz + 2.0);
+                    a.hurt(m.damageSources().arrow(fl, fp), 6f);
+                } else a.hurt(m.damageSources().playerAttack(fp), 6f);
+                sb.append(String.format(java.util.Locale.ROOT, " %s: -%.1f%s;", golpes[caso], antes - a.getHealth(), caso == 3 ? ", aturdido " + a.aturdido() : ""));
+                a.discard();
+            }
+            fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
+            sb.append(" golpes parados +").append(com.darkcraft.enemigos.Insomne.BLOQUEOS - blo0).append(", guardias rotas +").append(com.darkcraft.enemigos.Insomne.ROTAS - rot0);
+            // ---- la ballesta: tras disparar no esta cargada; la recarga la deja cargada
+            var bl = DarkCraftMod.INSOMNE.get().create(m);
+            if (bl != null) {
+                bl.variante(B);
+                bl.moveTo(gx, gy, gz, 0f, 0f);
+                m.addFreshEntity(bl);
+                quitar.add(bl);
+                int rec0 = com.darkcraft.enemigos.Insomne.RECARGAS;
+                bl.empezar(com.darkcraft.enemigos.InsomneAnims.DISPARO);
+                for (int k = 0; k < 24; k++) {
+                    bl.tickCount++;
+                    bl.tick();
+                }
+                boolean tras = bl.cargada();
+                bl.empezar(com.darkcraft.enemigos.InsomneAnims.RECARGA);
+                for (int k = 0; k < 54; k++) {
+                    bl.tickCount++;
+                    bl.tick();
+                }
+                sb.append("; la ballesta: cargada tras disparar ").append(tras).append(", tras la recarga ").append(bl.cargada()).append(" (recargas +")
+                        .append(com.darkcraft.enemigos.Insomne.RECARGAS - rec0).append(')');
+                bl.discard();
+            }
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Virote.class, zonaPruebas)) f.discard();
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println("Morvain, los Insomnes: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] insomnes", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            com.darkcraft.morvain.Fuerte.sinRebato();
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
+            fp.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
         }
     }
 

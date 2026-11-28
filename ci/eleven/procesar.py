@@ -523,6 +523,14 @@ SFX = {
     "galen_jeringa": (2.4, 0.7, -13), "galen_bisturi": (1.6, 0.5, -14), "galen_vapor": (3.0, 1.2, -13), "galen_frascos": (2.6, 0.8, -15),
     "galen_beber": (12.0, 2.0, -14), "galen_estallido": (3.0, 1.0, -12), "galen_tubos": (2.0, 0.6, -13), "galen_dolor": (1.6, 0.5, -15),
     "galen_muerte": (9.0, 3.0, -14), "galen_alambique": (10.0, 1.5, -20),
+    # el Fuerte de la Marca (parte 7aw): los Insomnes (el murmullo, la alerta, el dolor, la muerte), el cuerno de rebato, la campana de
+    # rebato (se relanza cada 6 s mientras dura el rebato), el virote (el disparo, el impacto) y la recarga de la ballesta, el escudo de
+    # torre, el mazazo, el puente levadizo que baja, el rastrillo que sube y el viento en las almenas (en bucle)
+    "insomne_murmullo": (4.0, 1.0, -20), "insomne_alerta": (1.8, 0.5, -15), "insomne_dolor": (1.0, 0.3, -16),
+    "insomne_muerte": (3.6, 1.2, -16), "cuerno_rebato": (4.5, 1.2, -12), "campana_rebato": (7.5, 1.5, -13),
+    "virote_dispara": (1.2, 0.3, -14), "virote_impacto": (1.0, 0.3, -14), "ballesta_recarga": (2.6, 0.5, -18),
+    "escudo_torre": (1.0, 0.3, -13), "mazazo": (1.2, 0.4, -12), "puente_levadizo": (9.0, 1.5, -13), "rastrillo": (6.0, 1.5, -14),
+    "fuerte_ambiente": (20.0, 2.0, -24),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -533,7 +541,7 @@ ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0
            "aldric_rezo": 1.0, "aldric_arrastre": 0.3, "jinete_galope": 0.3, "dragon_aleteo": 0.3, "dragon_respira": 0.6,
            "cadena_ambiente": 2.0, "isolde_tarareo": 1.2, "homenaje_ambiente": 2.0, "aguja_ambiente": 2.0, "sombra_mirada": 0.15,
            "osario_ambiente": 2.0, "osario_susurros": 1.5, "osmund_lampara": 1.5, "atanor_tiro": 2.0, "lazareto_ambiente": 2.0,
-           "galen_alambique": 1.0}
+           "galen_alambique": 1.0, "fuerte_ambiente": 2.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
@@ -542,7 +550,9 @@ INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "eru
           "portacirios_barrido": 0.2, "monton_golpe": 0.25, "osmund_incensario": 0.45, "osmund_giro": 2.5, "osmund_corona": 0.9,
           "osmund_muro": 0.4, "osmund_dolor": 0.3, "osmund_muerte": 0.6, "destilado_gemido": 0.4, "destilado_dolor": 0.15,
           "destilado_muerte": 0.3, "frasco_acido": 0.35, "cuba_golpe": 0.15, "galen_bisturi": 0.5, "galen_dolor": 0.45, "galen_muerte": 0.3,
-          "galen_tubos": 0.2, "galen_estallido": 0.3}
+          "galen_tubos": 0.2, "galen_estallido": 0.3, "insomne_murmullo": 0.7, "insomne_alerta": 0.3, "insomne_dolor": 0.7,
+          "insomne_muerte": 0.4, "cuerno_rebato": 0.45, "campana_rebato": 0.25, "ballesta_recarga": 0.35, "mazazo": 0.25,
+          "puente_levadizo": 0.1, "rastrillo": 0.5}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
 GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca", "boca_latido", "sombra_latido", "capataz_temblor"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
@@ -933,6 +943,14 @@ TOMAS_SFX = {
     # burbujas graves) y la 4
     "galen_jeringa": (3, 1), "galen_bisturi": (3, 2), "galen_vapor": (1, 4), "galen_frascos": (3, 1), "galen_beber": (1, 3),
     "galen_estallido": (3, 1), "galen_tubos": (1, 2), "galen_dolor": (1, 3), "galen_muerte": (3, 1), "galen_alambique": (2, 4),
+    # el Fuerte de la Marca (parte 7aw; elegidas midiendo las tomas: las mas fuertes y seguidas): del murmullo la 3 y la 2 (las de
+    # menos cortes); de la alerta la 2 y la 3; del dolor la 4 y la 2; de la muerte la 1 y la 4; del cuerno la 4 (la mas fuerte) y la 3;
+    # de la campana la 1 y la 2; del disparo la 4 (el chasquido enseguida) y la 1; del impacto la 1 y la 3; de la recarga la 1 y la 3;
+    # del escudo la 4 y la 3; del mazazo la 1 y la 2; del puente la 1 y la 3 (la 2 casi no se oye); del rastrillo la 1 y la 4; del
+    # viento la 2 y la 3
+    "insomne_murmullo": (3, 2), "insomne_alerta": (2, 3), "insomne_dolor": (4, 2), "insomne_muerte": (1, 4), "cuerno_rebato": (4, 3),
+    "campana_rebato": (1, 2), "virote_dispara": (4, 1), "virote_impacto": (1, 3), "ballesta_recarga": (1, 3), "escudo_torre": (4, 3),
+    "mazazo": (1, 2), "puente_levadizo": (1, 3), "rastrillo": (1, 4), "fuerte_ambiente": (2, 3),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
