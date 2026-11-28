@@ -147,6 +147,26 @@ public final class CatalogoBloques {
             new Material("hojarasca_roble", "A", SoundType.AZALEA_LEAVES, MapColor.COLOR_ORANGE, 0.1F, BlockSetType.STONE, WoodType.OAK, false),
             new Material("hojarasca_ceniza", "A", SoundType.AZALEA_LEAVES, MapColor.SAND, 0.1F, BlockSetType.STONE, WoodType.OAK, false),
             new Material("hojarasca_sangre", "A", SoundType.AZALEA_LEAVES, MapColor.COLOR_RED, 0.1F, BlockSetType.STONE, WoodType.OAK, false),
-            new Material("pinocha", "A", SoundType.GRASS, MapColor.PODZOL, 0.1F, BlockSetType.STONE, WoodType.OAK, false)
+            new Material("pinocha", "A", SoundType.GRASS, MapColor.PODZOL, 0.1F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("hierro_negro", "BELM", SoundType.METAL, MapColor.COLOR_BLACK, 4.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("hierro_remachado", "BELM", SoundType.METAL, MapColor.COLOR_BLACK, 4.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("hierro_oxidado", "BELM", SoundType.METAL, MapColor.TERRACOTTA_ORANGE, 4.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("oro_gastado", "BELM", SoundType.METAL, MapColor.GOLD, 4.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("oro_labrado", "BELM", SoundType.METAL, MapColor.GOLD, 4.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("bronce", "BELM", SoundType.COPPER, MapColor.TERRACOTTA_CYAN, 4.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("barrotes", "I", SoundType.METAL, MapColor.COLOR_BLACK, 5.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("reja_forjada", "I", SoundType.METAL, MapColor.COLOR_BLACK, 5.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("reja_oxidada", "I", SoundType.METAL, MapColor.TERRACOTTA_ORANGE, 5.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("cadena_hierro", "Z", SoundType.CHAIN, MapColor.COLOR_BLACK, 5.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("cadena_oro", "Z", SoundType.CHAIN, MapColor.GOLD, 5.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("cadena_oxidada", "Z", SoundType.CHAIN, MapColor.TERRACOTTA_ORANGE, 5.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("vidrio_viejo", "WJ", SoundType.GLASS, MapColor.NONE, 0.3F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("vidrio_sucio", "WJ", SoundType.GLASS, MapColor.NONE, 0.3F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("vidrio_emplomado", "WJ", SoundType.GLASS, MapColor.NONE, 0.3F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("vidriera_roja", "WJ", SoundType.GLASS, MapColor.COLOR_RED, 0.3F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("vidriera_azul", "WJ", SoundType.GLASS, MapColor.COLOR_BLUE, 0.3F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("vidriera_ambar", "WJ", SoundType.GLASS, MapColor.COLOR_ORANGE, 0.3F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("vidriera_verde", "WJ", SoundType.GLASS, MapColor.COLOR_GREEN, 0.3F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("vidriera_violeta", "WJ", SoundType.GLASS, MapColor.COLOR_PURPLE, 0.3F, BlockSetType.STONE, WoodType.OAK, true)
     };
 }

@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/oro_gastado"
+      },
+      {
+        "model": "darkcraft:block/oro_gastado_2"
+      },
+      {
+        "model": "darkcraft:block/oro_gastado_3"
+      }
+    ]
+  }
+}

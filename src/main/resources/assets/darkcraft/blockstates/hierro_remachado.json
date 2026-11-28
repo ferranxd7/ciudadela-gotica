@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/hierro_remachado"
+      },
+      {
+        "model": "darkcraft:block/hierro_remachado_2"
+      },
+      {
+        "model": "darkcraft:block/hierro_remachado_3"
+      }
+    ]
+  }
+}

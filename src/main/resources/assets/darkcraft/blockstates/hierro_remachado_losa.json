@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/hierro_remachado_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/hierro_remachado_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/hierro_remachado"
+      },
+      {
+        "model": "darkcraft:block/hierro_remachado_2"
+      },
+      {
+        "model": "darkcraft:block/hierro_remachado_3"
+      }
+    ]
+  }
+}

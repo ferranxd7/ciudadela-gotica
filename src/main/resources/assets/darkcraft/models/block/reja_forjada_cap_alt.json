@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/iron_bars_cap_alt",
+  "textures": {
+    "bars": "darkcraft:block/reja_forjada",
+    "edge": "darkcraft:block/reja_forjada",
+    "particle": "darkcraft:block/reja_forjada"
+  },
+  "render_type": "minecraft:cutout_mipped"
+}

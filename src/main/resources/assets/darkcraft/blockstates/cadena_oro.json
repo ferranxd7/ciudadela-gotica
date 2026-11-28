@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "darkcraft:block/cadena_oro",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "darkcraft:block/cadena_oro"
+    },
+    "axis=z": {
+      "model": "darkcraft:block/cadena_oro",
+      "x": 90
+    }
+  }
+}

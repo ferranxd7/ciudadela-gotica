@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/bronce"
+      },
+      {
+        "model": "darkcraft:block/bronce_2"
+      },
+      {
+        "model": "darkcraft:block/bronce_3"
+      }
+    ]
+  }
+}

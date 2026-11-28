@@ -10,10 +10,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CarpetBlock;
+import net.minecraft.world.level.block.ChainBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.HalfTransparentBlock;
+import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
@@ -44,8 +47,9 @@ import java.util.function.Supplier;
  * ({@code _puerta}) y la trampilla ({@code _trampilla}); columnas y vigas son un bloque con eje ({@code RotatedPillarBlock});
  * las plantas ({@link Planta}), las capas de nieve ({@code SnowLayerBlock}), el hielo ({@code HalfTransparentBlock}) y, de
  * los arboles (parte 8e), las ramas de tres gruesos ({@link Rama}), las hojas ({@link Hojas}), los racimos ({@link Racimo}),
- * lo que cuelga ({@link Colgante}), las lianas ({@code VineBlock}) y la hojarasca ({@code CarpetBlock}) van sin sufijo; los
- * troncos son columnas.
+ * lo que cuelga ({@link Colgante}), las lianas ({@code VineBlock}) y la hojarasca ({@code CarpetBlock}), y del metal y el
+ * vidrio (parte 8f) el vidrio ({@code GlassBlock}; su panel, {@code _panel}, un {@code IronBarsBlock}), las rejas
+ * ({@code IronBarsBlock}) y las cadenas ({@code ChainBlock}) van sin sufijo; los troncos son columnas.
  * Todos con su objeto y en la pestana del creativo "Dark Craft · Bloques".
  */
 public final class Bloques {
@@ -83,6 +87,13 @@ public final class Bloques {
                 .strength(m.dureza(), m.pico() ? 6.0F : 3.0F);
         return m.pico() ? p.requiresCorrectToolForDrops().instrument(NoteBlockInstrument.BASEDRUM)
                 : p.instrument(NoteBlockInstrument.BASS).ignitedByLava();
+    }
+
+    /** Lo del vidrio (bloque y panel): no tapa la luz ni la vista, no ahoga, no salen bichos. */
+    private static BlockBehaviour.Properties vidrio(CatalogoBloques.Material m) {
+        return BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido()).strength(m.dureza())
+                .instrument(NoteBlockInstrument.HAT).noOcclusion().isValidSpawn((st, l, p, t) -> false)
+                .isRedstoneConductor((st, l, p) -> false).isSuffocating((st, l, p) -> false).isViewBlocking((st, l, p) -> false);
     }
 
     private static void alta(CatalogoBloques.Material m) {
@@ -145,6 +156,24 @@ public final class Bloques {
             // hojarasca: una alfombra de un pixel con huecos (no tapa la cara de arriba del suelo)
             reg(ids, m.id(), () -> new CarpetBlock(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido())
                     .strength(m.dureza()).noOcclusion().ignitedByLava().pushReaction(PushReaction.DESTROY)));
+            return;
+        }
+        if (f.indexOf('W') >= 0) {
+            // vidrio: el bloque translucido y, con J, su panel
+            reg(ids, m.id(), () -> new GlassBlock(vidrio(m)));
+            if (f.indexOf('J') >= 0) reg(ids, m.id() + "_panel", () -> new IronBarsBlock(vidrio(m)));
+            return;
+        }
+        if (f.equals("I")) {
+            // una reja: barrotes que se unen como los del juego
+            reg(ids, m.id(), () -> new IronBarsBlock(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido())
+                    .requiresCorrectToolForDrops().strength(m.dureza(), 6.0F).noOcclusion()));
+            return;
+        }
+        if (f.equals("Z")) {
+            // una cadena (con eje)
+            reg(ids, m.id(), () -> new ChainBlock(BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido()).forceSolidOn()
+                    .requiresCorrectToolForDrops().strength(m.dureza(), 6.0F).noOcclusion()));
             return;
         }
         if (f.indexOf('H') >= 0) {

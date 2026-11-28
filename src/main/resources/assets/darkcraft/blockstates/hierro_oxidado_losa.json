@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/hierro_oxidado_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/hierro_oxidado_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/hierro_oxidado"
+      },
+      {
+        "model": "darkcraft:block/hierro_oxidado_2"
+      },
+      {
+        "model": "darkcraft:block/hierro_oxidado_3"
+      }
+    ]
+  }
+}

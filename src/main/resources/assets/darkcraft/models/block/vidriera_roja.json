@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "darkcraft:block/vidriera_roja"
+  },
+  "render_type": "minecraft:translucent"
+}

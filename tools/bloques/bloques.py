@@ -24,6 +24,7 @@ import pintor as P  # noqa: E402
 import madera as W  # noqa: E402
 import terreno as T  # noqa: E402
 import arboles as A  # noqa: E402
+import metal as Me  # noqa: E402
 
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RES = os.path.join(RAIZ, "src", "main", "resources")
@@ -150,6 +151,20 @@ R = {
     "t_liana": ["#141a0c", "#1d2611", "#263217", "#30401d"],
     "t_liana_seca": ["#1a120c", "#261b12", "#332419", "#402e20"],
     "pinocha": ["#2a160b", "#3c2010", "#4f2b16", "#62371c", "#754423", "#88512b"],
+    # metal y vidrio (parte 8f)
+    "hierro_n": ["#08090b", "#101216", "#181b20", "#21252b", "#2b3037", "#363b43", "#424851", "#4f565f", "#5e656e", "#6e757e",
+                 "#80878f"],
+    "oxido": ["#2a1206", "#3e1a08", "#55230b", "#6c2e0f", "#843a14", "#9a4719", "#ad5620", "#bd6629"],
+    "oro": ["#2b1d08", "#40290b", "#57380f", "#6e4913", "#875b18", "#a06f1e", "#b98526", "#cf9b30", "#e2b13f", "#f0c652",
+            "#f8db74"],
+    "bronce": ["#180f09", "#24180e", "#322113", "#412b18", "#50361e", "#604124", "#704d2b", "#815a33", "#92673c"],
+    "verdin_b": ["#2d4a3e", "#3a5e4f", "#4a7362", "#5b8875", "#6d9d89", "#82b29d", "#98c5b1"],
+    "v_rojo": ["#3a0608", "#560a0c", "#741012", "#921818", "#ad2420", "#c4352a", "#d64b37"],
+    "v_oro": ["#5a3006", "#7d460a", "#a05f10", "#c27a18", "#dc9626", "#eeb33c"],
+    "v_blanco": ["#8a8f86", "#a8aca2", "#c4c7bd", "#dcdfd6"],
+    "v_azul": ["#06103a", "#0a1a58", "#102778", "#183696", "#2447b0", "#355ac6", "#4a70d8"],
+    "v_verde": ["#06280e", "#0a3a16", "#104f1f", "#18652a", "#227b36", "#2f9244", "#40a855"],
+    "v_violeta": ["#22063a", "#320a54", "#441070", "#58188c", "#6c24a6", "#8135bc", "#9649ce"],
 }
 RAMPAS = {k: P.Rampa(v) for k, v in R.items()}
 
@@ -528,6 +543,56 @@ def t_hojarasca(*rampas, agujas=False):
                                     cuantas=260 if agujas else 150)
 
 
+# ------------------------------------------------------------------ el metal y el vidrio (parte 8f)
+
+def t_planchas(rampa, cols=2, filas=2, base=0.5, remaches=True, capa=None, cuanto=0.45, oro=False):
+    """Planchas de metal; `capa`: la rampa del oxido o del verdin que lleva encima (manchas, juntas y chorretones);
+    `oro`: el oro gastado (deslustrado en los huecos del ruido)."""
+    def f(s, b):
+        L = Me.planchas(s, cols, filas, base=base, remaches=remaches)
+        v = L.v - (0.12 * (P.ruido(s + 9, base=4, octavas=3) < 0.35) if oro else 0)
+        rgb = RAMPAS[rampa].pintar(v, 0.6)
+        if capa:
+            m = Me.oxido(L, s, cuanto)
+            encima = RAMPAS[capa].pintar(np.clip(0.3 + 0.5 * m + 0.2 * (L.v - 0.5), 0, 1), 0.6)
+            rgb = np.where(P.dura(m, 0.8)[..., None], encima, rgb)
+        return rgb
+    return f
+
+
+def t_labrado(rampa):
+    return lambda s, b: RAMPAS[rampa].pintar(Me.labrado(s), 0.5)
+
+
+def t_reja(rampa, **kw):
+    kw = dict(kw)
+    if "oxido_rampa" in kw:
+        kw["oxido_rampa"] = RAMPAS[kw["oxido_rampa"]]
+    return lambda s, b: Me.barrotes(s, RAMPAS[rampa], **kw)
+
+
+def t_cadena(rampa):
+    return lambda s, b: {"": Me.cadena(s, RAMPAS[rampa]), "item/": Me.cadena_objeto(s, RAMPAS[rampa])}
+
+
+def t_vidrio(color, alfa, tipo, borde):
+    """Vidrio: la textura y la del canto del panel (`borde`: (r, g, b, a))."""
+    def f(s, b):
+        canto = np.zeros((64, 64, 4))
+        canto[:] = borde
+        canto[..., :3] *= (0.9 + 0.2 * P.ruido(s + 5, base=16, octavas=1))[..., None]
+        return {"": Me.vidrio(s, color, alfa, tipo), "borde": canto}
+    return f
+
+
+def t_vidriera(principal, acento, claro):
+    def f(s, b):
+        canto = np.zeros((64, 64, 4))
+        canto[:] = (34, 33, 36, 255)
+        return {"": Me.vidriera(s, RAMPAS[principal], RAMPAS[acento], RAMPAS[claro]), "borde": canto}
+    return f
+
+
 # ------------------------------------------------------------------ el catalogo
 
 def M(id, es, en, receta, formas="BELM", sonido="STONE", mapa="STONE", semilla=None, variantes=3, dureza=1.5,
@@ -626,6 +691,26 @@ def HOJARASCA(id, es, en, receta, mapa, semilla, sonido="AZALEA_LEAVES"):
     """Hojas caidas: una alfombra de un pixel con huecos (se ve el suelo de debajo)."""
     return M(id, es, en, receta, formas="A", sonido=sonido, mapa=mapa, semilla=semilla, dureza=0.1, herramienta="hoe",
              variantes=1)
+
+
+def METAL(id, es, en, receta, mapa, semilla, sonido="METAL", variantes=3):
+    """Un metal: bloque, escalera, losa y muro (con pico)."""
+    return M(id, es, en, receta, formas="BELM", sonido=sonido, mapa=mapa, semilla=semilla, dureza=4.0, variantes=variantes)
+
+
+def REJA(id, es, en, receta, mapa, semilla):
+    """Una reja: barrotes que se unen a los de al lado y a las caras firmes (como los barrotes del juego)."""
+    return M(id, es, en, receta, formas="I", sonido="METAL", mapa=mapa, semilla=semilla, dureza=5.0, variantes=1)
+
+
+def CADENA(id, es, en, receta, mapa, semilla):
+    """Una cadena (con eje: de pie, o tumbada a lo largo o a lo ancho)."""
+    return M(id, es, en, receta, formas="Z", sonido="CHAIN", mapa=mapa, semilla=semilla, dureza=5.0, variantes=1)
+
+
+def VIDRIO(id, es, en, receta, mapa, semilla):
+    """Vidrio: el bloque (translucido; entre dos iguales no se ve la cara de en medio) y su panel."""
+    return M(id, es, en, receta, formas="WJ", sonido="GLASS", mapa=mapa, semilla=semilla, dureza=0.3, variantes=1)
 
 
 def VIGA(id, es, en, rampa, mapa, semilla, base=0.55):
@@ -822,18 +907,49 @@ MATERIALES = [
     HOJARASCA("hojarasca_sangre", "Hojarasca de sanguino", "Bloodwood Leaf Litter", t_hojarasca("o_sangre", "p_marchita"),
               "COLOR_RED", 473),
     HOJARASCA("pinocha", "Pinocha", "Pine Needle Litter", t_hojarasca("pinocha", agujas=True), "PODZOL", 474, sonido="GRASS"),
+    # ---- parte 8f: el metal y el vidrio
+    METAL("hierro_negro", "Hierro negro", "Black Iron", t_planchas("hierro_n"), "COLOR_BLACK", 501),
+    METAL("hierro_remachado", "Hierro remachado", "Riveted Iron", t_planchas("hierro_n", cols=1, filas=2), "COLOR_BLACK", 502),
+    METAL("hierro_oxidado", "Hierro oxidado", "Rusted Iron", t_planchas("hierro_n", base=0.48, capa="oxido"),
+          "TERRACOTTA_ORANGE", 503),
+    METAL("oro_gastado", "Oro gastado", "Worn Gold", t_planchas("oro", base=0.55, remaches=False, oro=True), "GOLD", 504),
+    METAL("oro_labrado", "Oro labrado", "Engraved Gold", t_labrado("oro"), "GOLD", 505, variantes=1),
+    METAL("bronce", "Bronce con verdin", "Verdigris Bronze", t_planchas("bronce", capa="verdin_b", cuanto=0.38),
+          "TERRACOTTA_CYAN", 506, sonido="COPPER"),
+    REJA("barrotes", "Barrotes de hierro negro", "Black Iron Bars", t_reja("hierro_n"), "COLOR_BLACK", 511),
+    REJA("reja_forjada", "Reja forjada", "Wrought Grille", t_reja("hierro_n", forjada=True), "COLOR_BLACK", 512),
+    REJA("reja_oxidada", "Barrotes oxidados", "Rusted Bars", t_reja("hierro_n", oxido_rampa="oxido"), "TERRACOTTA_ORANGE",
+         513),
+    CADENA("cadena_hierro", "Cadena de hierro negro", "Black Iron Chain", t_cadena("hierro_n"), "COLOR_BLACK", 521),
+    CADENA("cadena_oro", "Cadena dorada", "Gilded Chain", t_cadena("oro"), "GOLD", 522),
+    CADENA("cadena_oxidada", "Cadena oxidada", "Rusted Chain", t_cadena("oxido"), "TERRACOTTA_ORANGE", 523),
+    VIDRIO("vidrio_viejo", "Vidrio viejo", "Old Glass", t_vidrio((150, 175, 160), 0.38, "viejo", (130, 160, 145, 210)),
+           "NONE", 531),
+    VIDRIO("vidrio_sucio", "Vidrio sucio", "Grimy Glass", t_vidrio((140, 150, 135), 0.45, "sucio", (95, 98, 85, 230)),
+           "NONE", 532),
+    VIDRIO("vidrio_emplomado", "Vidrio emplomado", "Leaded Glass", t_vidrio((175, 190, 180), 0.40, "emplomado",
+                                                                          (40, 40, 44, 255)), "NONE", 533),
+    VIDRIO("vidriera_roja", "Vidriera roja", "Red Stained Glass", t_vidriera("v_rojo", "v_oro", "v_blanco"), "COLOR_RED", 534),
+    VIDRIO("vidriera_azul", "Vidriera azul", "Blue Stained Glass", t_vidriera("v_azul", "v_rojo", "v_blanco"), "COLOR_BLUE",
+           535),
+    VIDRIO("vidriera_ambar", "Vidriera ambar", "Amber Stained Glass", t_vidriera("v_oro", "v_verde", "v_blanco"),
+           "COLOR_ORANGE", 536),
+    VIDRIO("vidriera_verde", "Vidriera verde", "Green Stained Glass", t_vidriera("v_verde", "v_oro", "v_blanco"),
+           "COLOR_GREEN", 537),
+    VIDRIO("vidriera_violeta", "Vidriera violeta", "Violet Stained Glass", t_vidriera("v_violeta", "v_oro", "v_azul"),
+           "COLOR_PURPLE", 538),
 ]
 POR_ID = {m["id"]: m for m in MATERIALES}
 
 FORMAS = {"B": "", "E": "_escalera", "L": "_losa", "M": "_muro", "V": "_valla", "P": "_cancela", "D": "_puerta",
-          "T": "_trampilla"}
+          "T": "_trampilla", "J": "_panel"}
 # las formas que son el material entero (sin sufijo en el id): columna, planta, capas de nieve, hielo, ramas (de 8, 4 y
-# 12 pixeles), hojas, racimo, musgo que cuelga, liana y alfombra (hojarasca)
-SIN_SUFIJO = ("C", "X", "N", "H", "R", "Q", "U", "O", "K", "G", "Y", "A")
+# 12 pixeles), hojas, racimo, musgo que cuelga, liana, alfombra (hojarasca), vidrio, reja y cadena
+SIN_SUFIJO = ("C", "X", "N", "H", "R", "Q", "U", "O", "K", "G", "Y", "A", "W", "I", "Z")
 NOMBRE_FORMA_ES = {"B": "{}", "E": "Escalera de {}", "L": "Losa de {}", "M": "Muro de {}", "V": "Valla de {}",
-                   "P": "Cancela de {}", "D": "Puerta de {}", "T": "Trampilla de {}"}
+                   "P": "Cancela de {}", "D": "Puerta de {}", "T": "Trampilla de {}", "J": "Panel de {}"}
 NOMBRE_FORMA_EN = {"B": "{}", "E": "{} Stairs", "L": "{} Slab", "M": "{} Wall", "V": "{} Fence", "P": "{} Fence Gate",
-                   "D": "{} Door", "T": "{} Trapdoor"}
+                   "D": "{} Door", "T": "{} Trapdoor", "J": "{} Pane"}
 
 
 def minus(es):
@@ -874,7 +990,10 @@ def texturas(m):
             r = m["receta"](s + 1000 * v, s)
             if isinstance(r, dict):
                 for cara, rgb in r.items():
-                    out[n + ("_" + cara if cara else "")] = _img(rgb)
+                    if cara.startswith("item/"):
+                        out["item/" + n + cara[5:]] = _img(rgb)
+                    else:
+                        out[n + ("_" + cara if cara else "")] = _img(rgb)
             else:
                 out[n] = _img(r)
         if m.get("extra"):
@@ -1039,6 +1158,67 @@ def estado_liana(modelo):
     return {"multipart": partes}
 
 
+def escribir_vidrio(m):
+    """Vidrio: el bloque (translucido) y, si lleva J, su panel (como el panel de vidrio del juego: poste, lados y sin
+    lado, con el canto `<id>_borde`)."""
+    bid = m["id"]
+    tex = f"darkcraft:block/{bid}"
+    bs = os.path.join(ASSETS, "blockstates")
+    mb = os.path.join(ASSETS, "models", "block")
+    mi = os.path.join(ASSETS, "models", "item")
+    j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/cube_all", "textures": {"all": tex},
+                                       "render_type": "minecraft:translucent"})
+    j(os.path.join(bs, bid + ".json"), {"variants": {"": {"model": f"darkcraft:block/{bid}"}}})
+    j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
+    ids = [bid]
+    if "J" in m["formas"]:
+        p = bid + "_panel"
+        t = {"pane": tex, "edge": tex + "_borde"}
+        for suf in ("post", "side", "side_alt", "noside", "noside_alt"):
+            j(os.path.join(mb, f"{p}_{suf}.json"), {"parent": f"minecraft:block/template_glass_pane_{suf}", "textures": t,
+                                                     "render_type": "minecraft:translucent"})
+        md = lambda suf: f"darkcraft:block/{p}_{suf}"
+        j(os.path.join(bs, p + ".json"), {"multipart": [
+            {"apply": {"model": md("post")}},
+            {"when": {"north": "true"}, "apply": {"model": md("side")}},
+            {"when": {"east": "true"}, "apply": {"model": md("side"), "y": 90}},
+            {"when": {"south": "true"}, "apply": {"model": md("side_alt")}},
+            {"when": {"west": "true"}, "apply": {"model": md("side_alt"), "y": 90}},
+            {"when": {"north": "false"}, "apply": {"model": md("noside")}},
+            {"when": {"east": "false"}, "apply": {"model": md("noside_alt")}},
+            {"when": {"south": "false"}, "apply": {"model": md("noside_alt"), "y": 90}},
+            {"when": {"west": "false"}, "apply": {"model": md("noside"), "y": 270}}]})
+        j(os.path.join(mi, p + ".json"), {"parent": "minecraft:item/generated", "textures": {"layer0": tex}})
+        ids.append(p)
+    return ids
+
+
+def escribir_reja(m):
+    """Una reja: los modelos de los barrotes del juego con nuestra textura (barras en las columnas 2-3, 7-8 y 12-13)."""
+    bid = m["id"]
+    tex = f"darkcraft:block/{bid}"
+    mb = os.path.join(ASSETS, "models", "block")
+    for suf in ("post_ends", "post", "cap", "cap_alt", "side", "side_alt"):
+        j(os.path.join(mb, f"{bid}_{suf}.json"), {"parent": f"minecraft:block/iron_bars_{suf}",
+                                                   "textures": {"bars": tex, "edge": tex, "particle": tex},
+                                                   "render_type": "minecraft:cutout_mipped"})
+    md = lambda suf: f"darkcraft:block/{bid}_{suf}"
+    nada = {"east": "false", "north": "false", "south": "false", "west": "false"}
+    j(os.path.join(ASSETS, "blockstates", bid + ".json"), {"multipart": [
+        {"apply": {"model": md("post_ends")}},
+        {"when": dict(nada), "apply": {"model": md("post")}},
+        {"when": dict(nada, north="true"), "apply": {"model": md("cap")}},
+        {"when": dict(nada, east="true"), "apply": {"model": md("cap"), "y": 90}},
+        {"when": dict(nada, south="true"), "apply": {"model": md("cap_alt")}},
+        {"when": dict(nada, west="true"), "apply": {"model": md("cap_alt"), "y": 90}},
+        {"when": {"north": "true"}, "apply": {"model": md("side")}},
+        {"when": {"east": "true"}, "apply": {"model": md("side"), "y": 90}},
+        {"when": {"south": "true"}, "apply": {"model": md("side_alt")}},
+        {"when": {"west": "true"}, "apply": {"model": md("side_alt"), "y": 90}}]})
+    j(os.path.join(ASSETS, "models", "item", bid + ".json"), {"parent": "minecraft:item/generated", "textures": {"layer0": tex}})
+    return [bid]
+
+
 def escribir_tronco(m):
     """Un tronco con eje: un modelo por cada variante de su corteza (de pie, girado al azar; tumbado)."""
     bid = m["id"]
@@ -1137,6 +1317,19 @@ def escribir_material(m):
     ids = []
     if "C" in m["formas"] and m.get("lado_de"):
         return escribir_tronco(m)
+    if "W" in m["formas"]:
+        return escribir_vidrio(m)
+    if m["formas"] == "I":
+        return escribir_reja(m)
+    if m["formas"] == "Z":
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/chain", "textures": {"all": tex, "particle": tex},
+                                           "render_type": "minecraft:cutout"})
+        j(os.path.join(bs, bid + ".json"), {"variants": {
+            "axis=x": {"model": f"darkcraft:block/{bid}", "x": 90, "y": 90},
+            "axis=y": {"model": f"darkcraft:block/{bid}"},
+            "axis=z": {"model": f"darkcraft:block/{bid}", "x": 90}}})
+        j(os.path.join(mi, bid + ".json"), {"parent": "minecraft:item/generated", "textures": {"layer0": f"darkcraft:item/{bid}"}})
+        return [bid]
     if m["formas"] in GRUESOS:
         return escribir_rama(m, GRUESOS[m["formas"]])
     if m["formas"] == "K":
@@ -1471,10 +1664,12 @@ def vista(carpeta, desde=0):
         elif m.get("caras"):
             lado, tapa = tx[m["id"] + "_lado"], tx[m["id"] + "_arriba"]
             lista = [tx[n + "_arriba"] for n in nombres(m)]
-        elif any(f in m["formas"] for f in "XOGYA"):
-            color = (96, 124, 160, 255) if any(f in m["formas"] for f in "OGY") else (52, 48, 44, 255)
+        elif any(f in m["formas"] for f in "XOGYAWIZ"):
+            color = (96, 124, 160, 255) if any(f in m["formas"] for f in "OGYWIZ") else (52, 48, 44, 255)
             lista = []
             for nombre in sorted(tx):
+                if nombre.startswith("item/") or nombre.endswith("_borde"):
+                    continue
                 fondo = Image.new("RGBA", (64, 64), color)
                 fondo.alpha_composite(tx[nombre])
                 lista.append(fondo)

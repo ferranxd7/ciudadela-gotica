@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/chain",
+  "textures": {
+    "all": "darkcraft:block/cadena_oxidada",
+    "particle": "darkcraft:block/cadena_oxidada"
+  },
+  "render_type": "minecraft:cutout"
+}

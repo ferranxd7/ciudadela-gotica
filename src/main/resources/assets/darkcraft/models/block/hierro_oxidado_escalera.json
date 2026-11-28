@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "darkcraft:block/hierro_oxidado",
+    "top": "darkcraft:block/hierro_oxidado",
+    "side": "darkcraft:block/hierro_oxidado"
+  }
+}

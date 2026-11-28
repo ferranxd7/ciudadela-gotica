@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "darkcraft:block/oro_gastado",
+    "top": "darkcraft:block/oro_gastado",
+    "side": "darkcraft:block/oro_gastado"
+  }
+}

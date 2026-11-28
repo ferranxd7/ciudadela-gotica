@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/iron_bars_side",
+  "textures": {
+    "bars": "darkcraft:block/barrotes",
+    "edge": "darkcraft:block/barrotes",
+    "particle": "darkcraft:block/barrotes"
+  },
+  "render_type": "minecraft:cutout_mipped"
+}

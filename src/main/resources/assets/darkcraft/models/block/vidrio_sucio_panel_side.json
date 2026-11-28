@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/template_glass_pane_side",
+  "textures": {
+    "pane": "darkcraft:block/vidrio_sucio",
+    "edge": "darkcraft:block/vidrio_sucio_borde"
+  },
+  "render_type": "minecraft:translucent"
+}

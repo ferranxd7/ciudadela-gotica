@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "darkcraft:block/cadena_oxidada",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "darkcraft:block/cadena_oxidada"
+    },
+    "axis=z": {
+      "model": "darkcraft:block/cadena_oxidada",
+      "x": 90
+    }
+  }
+}

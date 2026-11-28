@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/iron_bars_cap",
+  "textures": {
+    "bars": "darkcraft:block/reja_oxidada",
+    "edge": "darkcraft:block/reja_oxidada",
+    "particle": "darkcraft:block/reja_oxidada"
+  },
+  "render_type": "minecraft:cutout_mipped"
+}

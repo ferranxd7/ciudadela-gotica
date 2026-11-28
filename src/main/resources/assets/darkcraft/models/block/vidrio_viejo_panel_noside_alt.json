@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/template_glass_pane_noside_alt",
+  "textures": {
+    "pane": "darkcraft:block/vidrio_viejo",
+    "edge": "darkcraft:block/vidrio_viejo_borde"
+  },
+  "render_type": "minecraft:translucent"
+}

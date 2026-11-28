@@ -3084,10 +3084,10 @@ public final class ClientCiTest {
         }
         final String[] cercaIds = {"sillar_musgoso", "marmol_negro", "piedra_tallada", "madera_roble", "entramado_cruz",
                 "tejado_escamas", "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos", "tronco_roble", "corteza_pantano",
-                "rama_roble", "hojas_roble", "musgo_colgante", "liana"};
+                "rama_roble", "hojas_roble", "musgo_colgante", "liana", "oro_labrado", "barrotes", "vidriera_roja"};
         final String[] nombres = {"musgo", "marmol_negro", "tallada", "roble_puerta", "entramado_cruz", "tejado_escamas",
                 "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos", "tronco_roble", "corteza_pantano", "rama_roble",
-                "hojas_roble", "musgo_colgante", "liana"};
+                "hojas_roble", "musgo_colgante", "liana", "oro_labrado", "barrotes", "vidriera_roja"};
         final int[] cerca = new int[cercaIds.length];
         final float[] cabeceo = new float[cercaIds.length];
         for (int i = 0; i < cercaIds.length; i++) {
@@ -3151,6 +3151,51 @@ public final class ClientCiTest {
                         lvl.setBlock(new BlockPos(x + dx, y0, z0 + dz), b.defaultBlockState(), 2);
                         n++;
                     }
+                continue;
+            }
+            if (f.indexOf('W') >= 0) {
+                // vidrio: un muro de 4 x 3 y, delante, dos filas de paneles (se unen entre si)
+                for (int dx = 0; dx < 4; dx++)
+                    for (int dy = 0; dy < 3; dy++) {
+                        lvl.setBlock(new BlockPos(x + dx, y0 + dy, z0 + 2), b.defaultBlockState(), 2);
+                        n++;
+                    }
+                net.minecraft.world.level.block.Block panel = com.darkcraft.bloques.Bloques.de(id + "_panel");
+                if (panel != null)
+                    for (int dx = 0; dx < 4; dx++)
+                        for (int dy = 0; dy < 2; dy++) {
+                            BlockPos p = new BlockPos(x + dx, y0 + dy, z0);
+                            lvl.setBlock(p, panel.defaultBlockState(), 2);
+                            unir.add(p);
+                            n++;
+                        }
+                continue;
+            }
+            if (f.equals("I")) {
+                // una reja: cuatro de ancho y dos de alto, y un poste suelto
+                for (int dx = 0; dx < 4; dx++)
+                    for (int dy = 0; dy < 2; dy++) {
+                        BlockPos p = new BlockPos(x + dx, y0 + dy, z0 + 1);
+                        lvl.setBlock(p, b.defaultBlockState(), 2);
+                        unir.add(p);
+                        n++;
+                    }
+                lvl.setBlock(new BlockPos(x + 1, y0, z0 - 1), b.defaultBlockState(), 2);
+                n++;
+                continue;
+            }
+            if (f.equals("Z")) {
+                // cadenas: dos colgando de una viga y una tendida entre dos postes
+                for (int dx = 0; dx < 4; dx++) lvl.setBlock(new BlockPos(x + dx, y0 + 3, z0 + 1), suelo, 2);
+                for (int k = 0; k < 3; k++) lvl.setBlock(new BlockPos(x + 1, y0 + 2 - k, z0 + 1), b.defaultBlockState(), 2);
+                for (int k = 0; k < 2; k++) lvl.setBlock(new BlockPos(x + 2, y0 + 2 - k, z0 + 1), b.defaultBlockState(), 2);
+                lvl.setBlock(new BlockPos(x, y0, z0 - 1), suelo, 2);
+                lvl.setBlock(new BlockPos(x + 3, y0, z0 - 1), suelo, 2);
+                net.minecraft.world.level.block.state.BlockState tendida = b.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.RotatedPillarBlock.AXIS, net.minecraft.core.Direction.Axis.X);
+                lvl.setBlock(new BlockPos(x + 1, y0, z0 - 1), tendida, 2);
+                lvl.setBlock(new BlockPos(x + 2, y0, z0 - 1), tendida, 2);
+                n += 7;
                 continue;
             }
             if (f.equals("K")) {

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/oro_labrado_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/oro_labrado_losa_arriba"
+    },
+    "type=double": {
+      "model": "darkcraft:block/oro_labrado"
+    }
+  }
+}

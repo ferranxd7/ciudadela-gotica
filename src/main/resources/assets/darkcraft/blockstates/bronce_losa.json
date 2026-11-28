@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/bronce_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/bronce_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/bronce"
+      },
+      {
+        "model": "darkcraft:block/bronce_2"
+      },
+      {
+        "model": "darkcraft:block/bronce_3"
+      }
+    ]
+  }
+}

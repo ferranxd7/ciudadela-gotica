@@ -4791,7 +4791,35 @@ generadores) van con el clima y los efectos, despues de los bloques.
   nevado arriba con racimos en las puntas y pinocha, cipres de tronco 2 x 2 con raices de escaleras, ramas, copa ancha y
   musgo y barba que cuelgan, sanguino y uno muerto de ramas de tres gruesos; los redondos con ramas gruesa-rama-ramita y
   racimos en el borde de la copa); capturas `cliente_bq01..33` (grupos), `bq34..49` de cerca (tambien el tronco, la corteza
-  del cipres, la rama, las hojas, el musgo y la liana) y `bq50..53` los arboles (tres vistas y una desde abajo del cipres).
+  del cipres, la rama, las hojas, el musgo y la liana) y `bq50..53` los arboles (tres vistas y una desde abajo del cipres)
+  (desde la 8f los numeros cambian: ver la 8f).
+
+### Plan nuevo, parte 8f: los bloques nuevos, quinta tanda (el metal y el vidrio)
+
+- **El pintor del metal y del vidrio** (`tools/bloques/metal.py`): `planchas()` (cuadricula fija de planchas con la junta
+  en la fila y la columna 0: todo borde de bloque es una junta, asi las variantes no tienen que casar; bisel, remaches en
+  las esquinas y en medio de los lados largos, abolladuras de martillo, rayas y un brillo en diagonal), `oxido()` (la
+  mascara del oxido o del verdin: manchas, las juntas y chorretones que bajan de los remaches), `labrado()` (oro labrado:
+  marco, cuadrifolio con su boton, hojitas en las esquinas, fondo punteado), `barrotes()` (tres barras redondas en las
+  columnas 8-15, 28-35 y 48-55 —las de los barrotes del juego escaladas— y dos travesanos con remaches; `forjada`:
+  volutas; con oxido: comidos), `cadena()` (en el plano de las columnas 0-11 los eslabones de frente y en el de las 12-23
+  los de canto, alternando: el modelo de la cadena del juego usa esas columnas) y `cadena_objeto()` (su dibujo para el
+  inventario, `textures/item/<id>.png`), `vidrio()` (`viejo`: verdoso, ondas y burbujas; `sucio`: mugre y grietas;
+  `emplomado`: rombos de plomo de 32 x 32) y `vidriera()` (un cuadrifolio de plomo por bloque, cuartos de circulo en las
+  esquinas que con los bloques de al lado hacen otro circulo, media linea de plomo en cada borde, piezas de colores de
+  tres rampas: principal, acento y claro).
+- **Formas nuevas**: W vidrio (`GlassBlock`, `cube_all` translucido; entre dos iguales no se dibuja la cara de en medio),
+  J su panel (`<id>_panel`, un `IronBarsBlock` con los modelos `template_glass_pane_*` del juego y el canto
+  `<id>_borde`), I reja (`IronBarsBlock` con los modelos `iron_bars_*` del juego y nuestra textura en `bars` y `edge`) y Z
+  cadena (`ChainBlock` con el modelo `chain` del juego). Los metales son bloque, escalera, losa y muro (con pico).
+- **Quinta tanda** (20 materiales, 46 bloques; ya son 152 materiales y 337 bloques): hierro negro, hierro remachado,
+  hierro oxidado, oro gastado, oro labrado y bronce con verdin; barrotes de hierro negro, reja forjada y barrotes
+  oxidados; cadenas de hierro negro, dorada y oxidada; vidrio viejo, sucio y emplomado y vidrieras roja, azul, ambar,
+  verde y violeta (bloque y panel).
+- Pruebas: servidor, la linea `Bloques 8b: ...` de siempre; cliente, en el muestrario el vidrio (muro de 4 x 3 y dos
+  filas de paneles unidos delante), las rejas (4 x 2 unidas y un poste suelto) y las cadenas (dos colgando de una viga y
+  una tendida entre dos postes); capturas `cliente_bq01..38` (grupos), `bq39..57` de cerca (tambien el oro labrado, los
+  barrotes y la vidriera roja) y `bq58..61` los arboles.
 
 ## Compilar, probar y publicar
 

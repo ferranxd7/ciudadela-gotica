@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/hierro_oxidado"
+      },
+      {
+        "model": "darkcraft:block/hierro_oxidado_2"
+      },
+      {
+        "model": "darkcraft:block/hierro_oxidado_3"
+      }
+    ]
+  }
+}
