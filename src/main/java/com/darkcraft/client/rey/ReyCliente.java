@@ -266,13 +266,14 @@ public final class ReyCliente {
                 aldric = com.darkcraft.rey.Voces.esAldric(linea), gigante = com.darkcraft.rey.Voces.esGigante(linea),
                 jinete = com.darkcraft.rey.Voces.esJinete(linea), bufon = com.darkcraft.rey.Voces.esBufon(linea),
                 dragon = com.darkcraft.rey.Voces.esDragon(linea), isolde = com.darkcraft.rey.Voces.esIsolde(linea),
-                capataz = com.darkcraft.rey.Voces.esCapataz(linea), osmund = com.darkcraft.rey.Voces.esOsmund(linea);
-        int n = osmund ? linea - com.darkcraft.rey.Voces.BASE_OSMUND : capataz ? linea - com.darkcraft.rey.Voces.BASE_CAPATAZ : isolde ? linea - com.darkcraft.rey.Voces.BASE_ISOLDE : dragon ? linea - com.darkcraft.rey.Voces.BASE_DRAGON : bufon ? linea - com.darkcraft.rey.Voces.BASE_BUFON : jinete ? linea - com.darkcraft.rey.Voces.BASE_JINETE : gigante ? linea - com.darkcraft.rey.Voces.BASE_GIGANTE : aldric ? linea - com.darkcraft.rey.Voces.BASE_ALDRIC : gavran ? linea - com.darkcraft.rey.Voces.BASE_GAVRAN : capitan ? linea - com.darkcraft.rey.Voces.BASE_CAPITAN
+                capataz = com.darkcraft.rey.Voces.esCapataz(linea), osmund = com.darkcraft.rey.Voces.esOsmund(linea),
+                galen = com.darkcraft.rey.Voces.esGalen(linea);
+        int n = galen ? linea - com.darkcraft.rey.Voces.BASE_GALEN : osmund ? linea - com.darkcraft.rey.Voces.BASE_OSMUND : capataz ? linea - com.darkcraft.rey.Voces.BASE_CAPATAZ : isolde ? linea - com.darkcraft.rey.Voces.BASE_ISOLDE : dragon ? linea - com.darkcraft.rey.Voces.BASE_DRAGON : bufon ? linea - com.darkcraft.rey.Voces.BASE_BUFON : jinete ? linea - com.darkcraft.rey.Voces.BASE_JINETE : gigante ? linea - com.darkcraft.rey.Voces.BASE_GIGANTE : aldric ? linea - com.darkcraft.rey.Voces.BASE_ALDRIC : gavran ? linea - com.darkcraft.rey.Voces.BASE_GAVRAN : capitan ? linea - com.darkcraft.rey.Voces.BASE_CAPITAN
                 : molinera ? linea - com.darkcraft.rey.Voces.BASE_MOLINERA : verdugo ? linea - com.darkcraft.rey.Voces.BASE_VERDUGO
                 : barquero ? linea - com.darkcraft.rey.Voces.BASE_BARQUERO : abad ? linea - com.darkcraft.rey.Voces.BASE_ABAD
                 : condestable ? linea - com.darkcraft.rey.Voces.BASE_CONDESTABLE : rectora ? linea - com.darkcraft.rey.Voces.BASE_RECTORA
                 : ballenero ? linea - com.darkcraft.rey.Voces.BASE_BALLENERO : pontifice ? linea - com.darkcraft.rey.Voces.BASE_PONTIFICE : linea;
-        var tabla = osmund ? DarkCraftMod.OSMUND_VOZ : capataz ? DarkCraftMod.CAPATAZ_VOZ : isolde ? DarkCraftMod.ISOLDE_VOZ : dragon ? DarkCraftMod.DRAGON_VOZ : bufon ? DarkCraftMod.BUFON_VOZ : jinete ? DarkCraftMod.JINETE_VOZ : gigante ? DarkCraftMod.GIGANTE_VOZ : aldric ? DarkCraftMod.ALDRIC_VOZ : gavran ? DarkCraftMod.GAVRAN_VOZ : capitan ? DarkCraftMod.CAPITAN_VOZ : molinera ? DarkCraftMod.MOLINERA_VOZ
+        var tabla = galen ? DarkCraftMod.GALEN_VOZ : osmund ? DarkCraftMod.OSMUND_VOZ : capataz ? DarkCraftMod.CAPATAZ_VOZ : isolde ? DarkCraftMod.ISOLDE_VOZ : dragon ? DarkCraftMod.DRAGON_VOZ : bufon ? DarkCraftMod.BUFON_VOZ : jinete ? DarkCraftMod.JINETE_VOZ : gigante ? DarkCraftMod.GIGANTE_VOZ : aldric ? DarkCraftMod.ALDRIC_VOZ : gavran ? DarkCraftMod.GAVRAN_VOZ : capitan ? DarkCraftMod.CAPITAN_VOZ : molinera ? DarkCraftMod.MOLINERA_VOZ
                 : verdugo ? DarkCraftMod.VERDUGO_VOZ : barquero ? DarkCraftMod.BARQUERO_VOZ : abad ? DarkCraftMod.ABAD_VOZ
                 : condestable ? DarkCraftMod.CONDESTABLE_VOZ : rectora ? DarkCraftMod.RECTORA_VOZ : ballenero ? DarkCraftMod.BALLENERO_VOZ
                 : pontifice ? DarkCraftMod.PONTIFICE_VOZ : DarkCraftMod.REY_VOZ;
@@ -384,20 +385,22 @@ public final class ReyCliente {
         boolean aldric = com.darkcraft.rey.Voces.esAldric(subLinea), gigante = com.darkcraft.rey.Voces.esGigante(subLinea),
                 jinete = com.darkcraft.rey.Voces.esJinete(subLinea), bufon = com.darkcraft.rey.Voces.esBufon(subLinea),
                 dragon = com.darkcraft.rey.Voces.esDragon(subLinea), isolde = com.darkcraft.rey.Voces.esIsolde(subLinea),
-                capataz = com.darkcraft.rey.Voces.esCapataz(subLinea), osmund = com.darkcraft.rey.Voces.esOsmund(subLinea);
-        boolean gavran = !aldric && !gigante && !jinete && !bufon && !dragon && !isolde && !capataz && !osmund && subLinea > com.darkcraft.gavran.Gavran.VOZ_BASE, capitan = com.darkcraft.rey.Voces.esCapitan(subLinea),
+                capataz = com.darkcraft.rey.Voces.esCapataz(subLinea), osmund = com.darkcraft.rey.Voces.esOsmund(subLinea),
+                galen = com.darkcraft.rey.Voces.esGalen(subLinea);
+        boolean gavran = !aldric && !gigante && !jinete && !bufon && !dragon && !isolde && !capataz && !osmund && !galen && subLinea > com.darkcraft.gavran.Gavran.VOZ_BASE, capitan = com.darkcraft.rey.Voces.esCapitan(subLinea),
                 molinera = com.darkcraft.rey.Voces.esMolinera(subLinea), verdugo = com.darkcraft.rey.Voces.esVerdugo(subLinea),
                 barquero = com.darkcraft.rey.Voces.esBarquero(subLinea), abad = com.darkcraft.rey.Voces.esAbad(subLinea),
                 condestable = com.darkcraft.rey.Voces.esCondestable(subLinea), rectora = com.darkcraft.rey.Voces.esRectora(subLinea),
                 ballenero = com.darkcraft.rey.Voces.esBallenero(subLinea), pontifice = com.darkcraft.rey.Voces.esPontifice(subLinea);
-        Component name = Component.translatable(osmund ? "darkcraft.osmund.nombre_corto" : capataz ? "darkcraft.capataz.nombre_corto" : isolde ? "darkcraft.isolde.nombre_corto" : dragon ? "darkcraft.dragon.nombre_corto" : bufon ? "darkcraft.bufon.nombre_corto" : jinete ? "darkcraft.jinete.nombre_corto"
+        Component name = Component.translatable(galen ? "darkcraft.galen.nombre_corto" : osmund ? "darkcraft.osmund.nombre_corto" : capataz ? "darkcraft.capataz.nombre_corto" : isolde ? "darkcraft.isolde.nombre_corto" : dragon ? "darkcraft.dragon.nombre_corto" : bufon ? "darkcraft.bufon.nombre_corto" : jinete ? "darkcraft.jinete.nombre_corto"
                 : gigante ? "darkcraft.gigante.nombre_corto." + com.darkcraft.rey.Voces.gigante(subLinea)
                 : aldric ? "darkcraft.aldric.nombre_corto" : gavran ? "darkcraft.gavran.nombre_corto" : capitan ? "darkcraft.capitan.nombre_corto"
                 : molinera ? "darkcraft.molinera.nombre_corto" : verdugo ? "darkcraft.verdugo.nombre_corto"
                 : barquero ? "darkcraft.barquero.nombre_corto" : abad ? "darkcraft.abad.nombre_corto"
                 : condestable ? "darkcraft.condestable.nombre_corto" : rectora ? "darkcraft.rectora.nombre_corto"
                 : ballenero ? "darkcraft.ballenero.nombre_corto" : pontifice ? "darkcraft.pontifice.nombre_corto" : "darkcraft.rey.nombre_corto");
-        Component line = Component.translatable(osmund ? "darkcraft.osmund.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_OSMUND)
+        Component line = Component.translatable(galen ? "darkcraft.galen.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_GALEN)
+                : osmund ? "darkcraft.osmund.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_OSMUND)
                 : capataz ? "darkcraft.capataz.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_CAPATAZ)
                 : isolde ? "darkcraft.isolde.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_ISOLDE)
                 : dragon ? "darkcraft.dragon.voz." + (subLinea - com.darkcraft.rey.Voces.BASE_DRAGON)
@@ -465,7 +468,8 @@ public final class ReyCliente {
                 || tc.getKey().equals("entity.darkcraft.jinete") || tc.getKey().equals("entity.darkcraft.bufon")
                 || tc.getKey().equals("entity.darkcraft.dragon") || tc.getKey().equals("entity.darkcraft.isolde")
                 || tc.getKey().equals("entity.darkcraft.sombra") || tc.getKey().equals("entity.darkcraft.sigrun")
-                || tc.getKey().equals("entity.darkcraft.capataz") || tc.getKey().equals("entity.darkcraft.osmund")) {
+                || tc.getKey().equals("entity.darkcraft.capataz") || tc.getKey().equals("entity.darkcraft.osmund")
+                || tc.getKey().equals("entity.darkcraft.galen")) {
             com.darkcraft.client.enemigos.GuardianCliente.barra(e, ticks, tc.getKey().substring("entity.darkcraft.".length()));
             return;
         }

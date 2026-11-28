@@ -95,6 +95,10 @@ public final class Lazareto {
     public static final int ATRIL_U = -5, ATRIL_V = 2;
     /** La palanca del atanor (en el sotano, a la derecha de la puerta del horno) y el centro de la parrilla. */
     public static final int PALANCA_U = 1, PALANCA_V = -5;
+    /** Donde espera Maese Galen (parte 7av): en la Sala del Elixir, al oeste del gran alambique, de cara a el (destilando). */
+    public static final int GALEN_U = -4, GALEN_V = 0;
+    /** El gran alambique de la Sala del Elixir: su radio (la base de cobre). */
+    public static final double R_ALAMBIQUE = 2.6;
     /** Los angulos (grados, de u hacia v) de las ventanas de cada planta. */
     static final double[] VENTANAS = {22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5};
     /** Escalones por vuelta de la escalera de caracol (una vuelta, una planta: los descansillos quedan siempre al oeste). */
@@ -1208,6 +1212,7 @@ public final class Lazareto {
         sitio("celda", -13, piso(3) + 1, 0);
         sitio("laboratorio", 0, piso(4) + 1, 6);
         sitio("elixir", 0, P5 + 1, 6);
+        sitio("galen", GALEN_U, P5 + 1, GALEN_V);
         sitio("tejado", 0, TEJADO + 1, 9);
         sitio("huerto", 0, ISLA + 1, -16);
         sitio("tumbas", 10, ISLA + 1, 17);
@@ -1219,6 +1224,8 @@ public final class Lazareto {
     private void ponerEsperas() {
         int M = Destilado.MANCEBO, E = Destilado.ENFERMO, C = Destilado.CUBA;
         int R = Enemigo.REZA, D = Enemigo.DE_PIE, T = Enemigo.TUMBADO;
+        // ---- el primero (puesto 0): Maese Galen, en la Sala del Elixir, de cara al gran alambique, destilando (parte 7av)
+        en(0, GALEN_U, P5 + 1, GALEN_V, ESTE, R, 0, com.darkcraft.enemigos.Puestos.JEFE);
         // ---- el islote: la cuba de la puerta, uno en el huerto, dos en las tumbas y el mancebo del embarcadero
         en(C, 0, ISLA + 1, 15, SUR, D, 0, "islote");
         en(E, -3, ISLA + 1, -17, SUR, D, 4, "islote");
@@ -1434,6 +1441,46 @@ public final class Lazareto {
         }
         if (borde(u, v) < R_LAGUNA + 4 && y > AGUA - 4 && y < TEJADO + 12) return "darkcraft.morvain.lugar.lazareto";
         return null;
+    }
+
+    // ------------------------------------------------------------------ Maese Galen, en la Sala del Elixir (parte 7av)
+
+    /** Si (x, y, z) esta en la Sala del Elixir (donde pelea Maese Galen): dentro del muro, del suelo de la sala a lo alto de la cupula. */
+    public static boolean enElixir(double x, double y, double z) {
+        return Math.hypot(x - CX - 0.5, z - CZ - 0.5) < RI + 0.2 && y > P5 - 0.5 && y < TEJADO + RD + 1;
+    }
+
+    /** El gran alambique de la Sala del Elixir (en el mundo): {x, y, z} del centro de su base (y: lo que se pisa de la sala). */
+    public static double[] alambique() {
+        return new double[]{x(0) + 0.5, P5 + 1, z(0) + 0.5};
+    }
+
+    /** Si Maese Galen ha caido (y no ha vuelto: es del grupo de los jefes). */
+    public static boolean enPaz(net.minecraft.server.MinecraftServer srv) {
+        return com.darkcraft.enemigos.Puestos.muerto(srv, MorvainEnemigos.LAZARETO, MorvainEnemigos.galen());
+    }
+
+    /** Para las pruebas: los Destilados que han descansado al caer Maese Galen. */
+    public static int DESCANSAN;
+
+    /**
+     * Cada segundo: con Maese Galen caido, los Destilados descansan: los que no estan peleando se apagan (el cristal se les deshace y
+     * sube su alma) y ya no vuelven ({@code MorvainEnemigos}: sus puestos dejan de estar en uso).
+     */
+    public static void paz(ServerLevel m) {
+        if (com.darkcraft.enemigos.Puestos.sitio(MorvainEnemigos.LAZARETO) == null || !enPaz(m.getServer())) return;
+        List<com.darkcraft.enemigos.Puestos.Puesto> ps = MorvainEnemigos.lazareto();
+        for (int i = 0; i < ps.size(); i++) {
+            if (com.darkcraft.enemigos.Puestos.JEFE.equals(ps.get(i).grupo())) continue;
+            Enemigo e = com.darkcraft.enemigos.Puestos.enemigo(MorvainEnemigos.LAZARETO, i);
+            if (e == null || e.level() != m || e.getTarget() != null || e.accion() != 0) continue;
+            m.sendParticles(ParticleTypes.END_ROD, e.getX(), e.getY() + 1.2, e.getZ(), 0, 0, 1, 0, 0.08);
+            m.sendParticles(ParticleTypes.SOUL, e.getX(), e.getY() + 1.2, e.getZ(), 8, 0.3, 0.6, 0.3, 0.03);
+            m.sendParticles(new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK, Blocks.LIME_STAINED_GLASS.defaultBlockState()),
+                    e.getX(), e.getY() + 1.0, e.getZ(), 12, 0.3, 0.6, 0.3, 0.05);
+            e.disolver();
+            DESCANSAN++;
+        }
     }
 
     /** Si (x, y, z) esta dentro de la torre (para el aire de la torre y el logro). */

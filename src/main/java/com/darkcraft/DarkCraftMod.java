@@ -383,6 +383,18 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_ATANOR_ENCIENDE = sound("sfx.atanor_enciende");
     public static final RegistryObject<SoundEvent> SFX_ATANOR_TIRO = sound("sfx.atanor_tiro");
     public static final RegistryObject<SoundEvent> AMBIENTE_LAZARETO = sound("ambiente.lazareto");
+    // Maese Galen, el fisico del Lazareto (parte 7av): la jeringa, el bisturi, el vapor que sale del suelo, la lluvia de frascos,
+    // beberse el elixir, el estallido de cristal, arrancarse los tubos, el dolor, la muerte y el gran alambique que hierve
+    public static final RegistryObject<SoundEvent> SFX_GALEN_JERINGA = sound("sfx.galen_jeringa");
+    public static final RegistryObject<SoundEvent> SFX_GALEN_BISTURI = sound("sfx.galen_bisturi");
+    public static final RegistryObject<SoundEvent> SFX_GALEN_VAPOR = sound("sfx.galen_vapor");
+    public static final RegistryObject<SoundEvent> SFX_GALEN_FRASCOS = sound("sfx.galen_frascos");
+    public static final RegistryObject<SoundEvent> SFX_GALEN_BEBER = sound("sfx.galen_beber");
+    public static final RegistryObject<SoundEvent> SFX_GALEN_ESTALLIDO = sound("sfx.galen_estallido");
+    public static final RegistryObject<SoundEvent> SFX_GALEN_TUBOS = sound("sfx.galen_tubos");
+    public static final RegistryObject<SoundEvent> SFX_GALEN_DOLOR = sound("sfx.galen_dolor");
+    public static final RegistryObject<SoundEvent> SFX_GALEN_MUERTE = sound("sfx.galen_muerte");
+    public static final RegistryObject<SoundEvent> SFX_GALEN_ALAMBIQUE = sound("sfx.galen_alambique");
     // el Condestable del Juramento (parte 7n): el grito, el tajo del montante en llamas, el barrido, la embestida, el anillo de
     // fuego, el rastrillo que cae y el que se alza, el cuerno de la guardia, la espada al cielo, el dolor, la muerte y la espera
     public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_GRITO = sound("sfx.condestable_grito");
@@ -739,6 +751,8 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_CAPATAZ = sound("musica.capataz");
     /** Fray Osmund en el Relicario del Osario de San Ulfo (parte 7at): "Death Is Just Another Path" de Otto Halmen. */
     public static final RegistryObject<SoundEvent> MUSICA_OSMUND = sound("musica.osmund");
+    /** Maese Galen en la Sala del Elixir del Lazareto (parte 7av): "Land of Misdeeds" de Jonathan Shaw. */
+    public static final RegistryObject<SoundEvent> MUSICA_GALEN = sound("musica.galen");
     /** La musica del final (parte 7ad): la cinematica y los creditos del alba ("New Sunrise") y de la nueva Sombra. */
     public static final RegistryObject<SoundEvent> MUSICA_FINAL_ALBA = sound("musica.final_alba");
     public static final RegistryObject<SoundEvent> MUSICA_FINAL_SOMBRA = sound("musica.final_sombra");
@@ -826,6 +840,9 @@ public class DarkCraftMod {
     /** Frases de Fray Osmund, el Sacristan (1..5, parte 7at). */
     @SuppressWarnings("unchecked")
     public static final RegistryObject<SoundEvent>[] OSMUND_VOZ = new RegistryObject[6];
+    /** Frases de Maese Galen, el fisico del Lazareto (1..5, parte 7av). */
+    @SuppressWarnings("unchecked")
+    public static final RegistryObject<SoundEvent>[] GALEN_VOZ = new RegistryObject[6];
 
     /**
      * Frases de la Sombra (1..6 la cinematica de inicio, 7..9 el viaje a Valdrenn, 21..23 la subida por la cadena del sur, 24 al
@@ -854,6 +871,7 @@ public class DarkCraftMod {
         for (int i = 1; i < ISOLDE_VOZ.length; i++) ISOLDE_VOZ[i] = sound("isolde.voz." + i);
         for (int i = 1; i < CAPATAZ_VOZ.length; i++) CAPATAZ_VOZ[i] = sound("capataz.voz." + i);
         for (int i = 1; i < OSMUND_VOZ.length; i++) OSMUND_VOZ[i] = sound("osmund.voz." + i);
+        for (int i = 1; i < GALEN_VOZ.length; i++) GALEN_VOZ[i] = sound("galen.voz." + i);
         for (int i = 1; i < SOMBRA_VOZ.length; i++) if (i < 10 || i > 20) SOMBRA_VOZ[i] = sound("sombra.voz." + i);
     }
 
@@ -1054,6 +1072,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Frasco>> FRASCO_DESTILADO = ENTITIES.register("frasco_destilado",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Frasco>of(com.darkcraft.enemigos.Frasco::new, MobCategory.MISC)
                     .sized(0.3f, 0.3f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":frasco_destilado"));
+    // ---- Maese Galen, el fisico del Lazareto, el jefe de la Sala del Elixir (parte 7av)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Galen>> GALEN = ENTITIES.register("galen",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Galen>of(com.darkcraft.enemigos.Galen::new, MobCategory.MONSTER)
+                    .sized(0.9f, 3.0f).fireImmune().clientTrackingRange(10).build(MODID + ":galen"));
     // ---- Hakon, el Capataz, el jefe de las Minas de Hierro Negro (parte 7ar)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Capataz>> CAPATAZ = ENTITIES.register("capataz",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Capataz>of(com.darkcraft.enemigos.Capataz::new, MobCategory.MONSTER)
@@ -1308,6 +1330,9 @@ public class DarkCraftMod {
     /** El incensario de Fray Osmund (parte 7at: lo deja al caer): una maza de Fe con las brasas del polvo de hueso dentro. */
     public static final RegistryObject<Item> INCENSARIO_SACRISTAN = ITEMS.register("incensario_sacristan",
             () -> new com.darkcraft.armas.IncensarioSacristan(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
+    /** La jeringa de Maese Galen (parte 7av: la deja al caer): una lanza de Arcano que envenena y, al tercer golpe, cura a quien la lleva. */
+    public static final RegistryObject<Item> JERINGA_FISICO = ITEMS.register("jeringa_fisico",
+            () -> new com.darkcraft.armas.JeringaFisico(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     /** El martillo de Dorvan (solo para que lo lleve en la mano) y las piedras de forja (I, II y III: mejoran las armas). */
     public static final RegistryObject<Item> MARTILLO_HERRERO = ITEMS.register("martillo_herrero",
             () -> new Item(new Item.Properties().stacksTo(1)));
@@ -1469,6 +1494,7 @@ public class DarkCraftMod {
         e.put(OSMUND.get(), com.darkcraft.enemigos.Osmund.atributos().build());
         e.put(ENSAMBLADO.get(), com.darkcraft.enemigos.Ensamblado.atributos().build());
         e.put(DESTILADO.get(), com.darkcraft.enemigos.Destilado.atributos().build());
+        e.put(GALEN.get(), com.darkcraft.enemigos.Galen.atributos().build());
         e.put(CONDESTABLE.get(), com.darkcraft.enemigos.Condestable.atributos().build());
         e.put(RECTORA.get(), com.darkcraft.enemigos.Rectora.atributos().build());
         e.put(ERUDITO.get(), com.darkcraft.enemigos.Erudito.atributos().build());
@@ -1535,6 +1561,7 @@ public class DarkCraftMod {
             e.accept(ESPADA_GUARDIANA);
             e.accept(PICO_CAPATAZ);
             e.accept(INCENSARIO_SACRISTAN);
+            e.accept(JERINGA_FISICO);
             e.accept(MAZA);
             e.accept(MARTILLO_GUERRA);
             e.accept(GRAN_MARTILLO);

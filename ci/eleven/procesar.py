@@ -103,6 +103,8 @@ TOMAS_ISOLDE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a", 6: "a"}
 TOMAS_CAPATAZ = {1: "a", 2: "b", 3: "a", 4: "a", 5: "a"}
 # Fray Osmund, el Sacristan (parte 7at; voz "Matthew Schmitz - Ancient Sage Dragon Wizard", flow nIWx6e0Nel3Cf2CGpyWv): las tomas a
 TOMAS_OSMUND = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
+# Maese Galen, el fisico del Lazareto (parte 7av): "Blackwood - Posh British Villain", la 5 de la toma b (la mas llena)
+TOMAS_GALEN = {1: "a", 2: "a", 3: "a", 4: "a", 5: "b"}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -514,6 +516,13 @@ SFX = {
     "frasco_acido": (2.6, 0.8, -15), "frasco_cura": (2.4, 0.8, -16), "cuba_golpe": (1.4, 0.5, -13), "cuba_derrame": (4.0, 1.4, -13),
     "cuba_rompe": (4.0, 1.4, -12), "atanor_enciende": (10.0, 3.0, -12), "atanor_tiro": (30.0, 2.0, -18),
     "lazareto_ambiente": (20.0, 2.0, -24),
+    # Maese Galen, el fisico del Lazareto (parte 7av): la jeringa, el bisturi, el vapor que sale del suelo, la lluvia de frascos, beberse
+    # el elixir (los tragos y el gemido de cuando le brota el cristal), el estallido de cristal, arrancarse los tubos, el dolor, la muerte
+    # (los cristales que se rompen y el gran alambique que deja de hervir) y el gran alambique hirviendo (10 s, se relanza cada 9 y se
+    # solapa)
+    "galen_jeringa": (2.4, 0.7, -13), "galen_bisturi": (1.6, 0.5, -14), "galen_vapor": (3.0, 1.2, -13), "galen_frascos": (2.6, 0.8, -15),
+    "galen_beber": (12.0, 2.0, -14), "galen_estallido": (3.0, 1.0, -12), "galen_tubos": (2.0, 0.6, -13), "galen_dolor": (1.6, 0.5, -15),
+    "galen_muerte": (9.0, 3.0, -14), "galen_alambique": (10.0, 1.5, -20),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -523,7 +532,8 @@ ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0
            "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0, "mina_ambiente": 2.0,
            "aldric_rezo": 1.0, "aldric_arrastre": 0.3, "jinete_galope": 0.3, "dragon_aleteo": 0.3, "dragon_respira": 0.6,
            "cadena_ambiente": 2.0, "isolde_tarareo": 1.2, "homenaje_ambiente": 2.0, "aguja_ambiente": 2.0, "sombra_mirada": 0.15,
-           "osario_ambiente": 2.0, "osario_susurros": 1.5, "osmund_lampara": 1.5, "atanor_tiro": 2.0, "lazareto_ambiente": 2.0}
+           "osario_ambiente": 2.0, "osario_susurros": 1.5, "osmund_lampara": 1.5, "atanor_tiro": 2.0, "lazareto_ambiente": 2.0,
+           "galen_alambique": 1.0}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
@@ -531,7 +541,8 @@ INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "eru
           "capataz_almas": 1.2, "ensamblado_dolor": 0.45, "ensamblado_deshace": 0.4, "ensamblado_rehace": 0.9, "ensamblado_polvo": 0.3,
           "portacirios_barrido": 0.2, "monton_golpe": 0.25, "osmund_incensario": 0.45, "osmund_giro": 2.5, "osmund_corona": 0.9,
           "osmund_muro": 0.4, "osmund_dolor": 0.3, "osmund_muerte": 0.6, "destilado_gemido": 0.4, "destilado_dolor": 0.15,
-          "destilado_muerte": 0.3, "frasco_acido": 0.35, "cuba_golpe": 0.15}
+          "destilado_muerte": 0.3, "frasco_acido": 0.35, "cuba_golpe": 0.15, "galen_bisturi": 0.5, "galen_dolor": 0.45, "galen_muerte": 0.3,
+          "galen_tubos": 0.2, "galen_estallido": 0.3}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
 GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca", "boca_latido", "sombra_latido", "capataz_temblor"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
@@ -915,6 +926,13 @@ TOMAS_SFX = {
     "destilado_gemido": (3, 2), "destilado_alerta": (1, 3), "destilado_dolor": (2, 1), "destilado_muerte": (1, 3),
     "frasco_lanzar": (3, 1), "frasco_fuego": (1, 2), "frasco_acido": (1, 3), "frasco_cura": (3, 2), "cuba_golpe": (1, 3),
     "cuba_derrame": (3, 2), "cuba_rompe": (2, 3), "atanor_enciende": (2, 1), "atanor_tiro": (4, 2), "lazareto_ambiente": (4, 3),
+    # Maese Galen (parte 7av; elegidas midiendo las tomas): de la jeringa la 3 (el siseo del liquido al final) y la 1; del bisturi la 3 (la
+    # mas fuerte) y la 2 (desde el 0,5); del vapor la 1 (fuerte desde el principio) y la 4; de los frascos la 3 (la mas llena) y la 1; de
+    # beber la 1 y la 3 (los tragos y el gemido entre el 5 y el 9); del estallido la 3 (la mas larga) y la 1; de los tubos la 1 y la 2 (las
+    # otras casi no se oyen); del dolor la 1 y la 3; de la muerte la 3 (el derrumbe y los cristales) y la 1; del gran alambique la 2 (las
+    # burbujas graves) y la 4
+    "galen_jeringa": (3, 1), "galen_bisturi": (3, 2), "galen_vapor": (1, 4), "galen_frascos": (3, 1), "galen_beber": (1, 3),
+    "galen_estallido": (3, 1), "galen_tubos": (1, 2), "galen_dolor": (1, 3), "galen_muerte": (3, 1), "galen_alambique": (2, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -1339,6 +1357,27 @@ def voz_osmund(src, dst):
         "equalizer=f=220:t=q:w=1.0:g=-1.5,equalizer=f=2500:t=q:w=1.2:g=2,"
         "aecho=0.8:0.55:320|700|1150:0.3|0.18|0.1,"
         "acompressor=threshold=-20dB:ratio=3:attack=5:release=160,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.2
+
+
+def voz_galen(src, dst):
+    """
+    Maese Galen, el fisico del Lazareto: la voz (fina, de villano educado) un pelo mas grave; una segunda voz un poco mas aguda y
+    retrasada, solo de medios (como si le hablara el elixir de dentro), un brillo de cristal en los agudos (un eco cortisimo que
+    resuena como un vaso) y el eco de la Sala del Elixir bajo su cupula de cristal (tres rebotes medios).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=3[v1][v2][v3];"
+        "[v1]asetrate=44100*0.97,aresample=44100,atempo=1.0309[base];"
+        "[v2]asetrate=44100*1.06,aresample=44100,atempo=0.9434,adelay=25:all=1,highpass=f=900,lowpass=f=5000,volume=0.18[elixir];"
+        "[v3]highpass=f=2600,aecho=0.8:0.7:6|13:0.5|0.35,volume=0.12[vidrio];"
+        "[base][elixir][vidrio]amix=inputs=3:weights=1 0.6 0.5:normalize=0,"
+        "equalizer=f=180:t=q:w=1.0:g=-1,equalizer=f=3200:t=q:w=1.2:g=2,"
+        "aecho=0.8:0.5:180|420|760:0.28|0.16|0.08,"
+        "acompressor=threshold=-20dB:ratio=3:attack=5:release=150,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA + 0.2
@@ -1909,6 +1948,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO osmund {n}: {e}")
+    # Maese Galen, el fisico del Lazareto (parte 7av)
+    gal = os.path.join(ASSETS, "sounds", "galen")
+    os.makedirs(gal, exist_ok=True)
+    dur_ga, hab_ga = {}, {}
+    for n, toma in sorted(TOMAS_GALEN.items()):
+        src = os.path.join(MASTER, "galen", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(gal, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_galen(src, dst)
+            dur_ga[n] = round(duracion(dst), 2)
+            hab_ga[n] = round(min(h, dur_ga[n]), 2)
+            print(f"galen {n:2d}: {dur_ga[n]} s (habla hasta {hab_ga[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO galen {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -1954,7 +2012,7 @@ def main():
                    "gigante": dur_t, "habla_gigante": hab_t, "jinete": dur_j, "habla_jinete": hab_j,
                    "bufon": dur_u, "habla_bufon": hab_u, "dragon": dur_d, "habla_dragon": hab_d,
                    "isolde": dur_i, "habla_isolde": hab_i, "capataz": dur_h, "habla_capataz": hab_h,
-                   "osmund": dur_o, "habla_osmund": hab_o}, fh)
+                   "osmund": dur_o, "habla_osmund": hab_o, "galen": dur_ga, "habla_galen": hab_ga}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

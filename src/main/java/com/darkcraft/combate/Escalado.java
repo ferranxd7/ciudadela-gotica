@@ -63,6 +63,8 @@ public final class Escalado {
         if (st.is(DarkCraftMod.ESPADA_GUARDIANA.get())) return d("CB-E-", 12, 14, 0, 10, 0);
         // el Pico del Capataz (parte 7ar): un gran martillo de Fuerza, algo de Destreza
         if (st.is(DarkCraftMod.PICO_CAPATAZ.get())) return d("BD---", 20, 10, 0, 0, 0);
+        // la Jeringa del Fisico (parte 7av): una lanza de Arcano, algo de Destreza
+        if (st.is(DarkCraftMod.JERINGA_FISICO.get())) return d("EC--B", 8, 12, 0, 0, 16);
         // el Incensario del Sacristan (parte 7at): una maza de Fe, algo de Fuerza
         if (st.is(DarkCraftMod.INCENSARIO_SACRISTAN.get())) return d("C--B-", 12, 0, 0, 16, 0);
         // la maza de clerigo (parte 7aj): un martillo que escala tambien con la Fe

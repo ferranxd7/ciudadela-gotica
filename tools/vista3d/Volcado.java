@@ -2371,7 +2371,8 @@ public class Volcado {
                     malos++;
                     System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z() + " (u " + (o.x() - X) + ", v " + (o.z() - Z) + ")");
                 }
-                int alto = o.variante() == 2 ? 3 : 2;
+                // (la cuba mide tres de alto; Maese Galen, el puesto de los jefes, tres y algo)
+                int alto = com.darkcraft.enemigos.Puestos.JEFE.equals(o.grupo()) ? 4 : o.variante() == 2 ? 3 : 2;
                 for (int dy = 0; dy < alto; dy++) {
                     BlockState st = mundo.en(o.x(), o.y() + dy, o.z());
                     if (choca(st)) {

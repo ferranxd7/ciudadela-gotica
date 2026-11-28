@@ -189,6 +189,8 @@ public final class Armas {
         if (st.is(DarkCraftMod.LANZA_TAM.get())) return Tipo.LANZA;
         // la Pertiga del farolero (parte 7ao): tambien una lanza
         if (st.is(DarkCraftMod.PERTIGA_FAROLERO.get())) return Tipo.LANZA;
+        // la Jeringa del Fisico (parte 7av): tambien una lanza (sus estocadas)
+        if (st.is(DarkCraftMod.JERINGA_FISICO.get())) return Tipo.LANZA;
         if (st.getItem() instanceof TridentItem) return Tipo.LANZA;
         // los martillos (parte 7aj): la maza, el martillo de guerra y el gran martillo
         if (st.getItem() instanceof com.darkcraft.armas.Martillo mt) return mt.tipo;

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Los martillos (parte 7aj): textures/item/maza.png, martillo_guerra.png y gran_martillo.png (32 x 32); el Pico del Capataz
-(parte 7ar, pico_capataz.png) y el Incensario del Sacristan (parte 7at, incensario_sacristan.png). Dibujados en
+(parte 7ar, pico_capataz.png), el Incensario del Sacristan (parte 7at, incensario_sacristan.png) y la Jeringa del Fisico (parte 7av,
+jeringa_fisico.png; una lanza, pero se dibuja igual). Dibujados en
 diagonal como las armas del juego (el mango abajo a la izquierda, la cabeza arriba a la derecha): cada pixel se mira en
 las coordenadas del arma (u a lo largo del mango, desde el pomo; v de lado) y se le da el material de lo que cae ahi;
 luego el contorno de tinta. La luz viene de arriba a la izquierda (v negativa, mas clara).
@@ -194,9 +195,45 @@ def incensario_sacristan(u, v):
     return None
 
 
+ELIXIR = [(15, 61, 30), (26, 106, 50), (42, 154, 72), (70, 200, 102), (127, 240, 154)]
+VIDRIO = [(120, 150, 134), (169, 210, 187), (214, 239, 224)]
+
+
+def jeringa_fisico(u, v):
+    """La Jeringa del Fisico (parte 7av): la jeringa enorme de laton y cristal de Maese Galen: el disco del embolo, el vastago, las
+    aletas, el cristal con el elixir verde dentro (y sus rayas de medida), la punta de laton y la aguja larga."""
+    a = abs(v)
+    # el disco del embolo (donde se apoya el pulgar)
+    if -1.2 <= u < 0.6 and a <= 2.4:
+        return tono(LATON, 0.75 - v * 0.08)
+    # el vastago
+    if 0.6 <= u < 6.0 and a <= 0.6:
+        return tono(ACERO, 0.6 - v * 0.2)
+    # las aletas para los dedos
+    if 6.0 <= u < 7.3 and a <= 3.1:
+        return tono(LATON, 0.62 - v * 0.08 - (0.2 if a > 2.5 else 0.0))
+    # el cristal: los montantes de laton a los lados, el elixir dentro (con la luz arriba) y las rayas de medida
+    if 7.3 <= u < 20.0 and a <= 2.2:
+        if a > 1.55:
+            return tono(LATON, 0.55 - v * 0.1)
+        if u > 8.4 and int(u) % 3 == 0 and v > 0.2:
+            return VIDRIO[2] + (255,)
+        if u < 8.6:
+            return VIDRIO[1] + (255,)                          # lo de arriba, sin elixir (el embolo empuja)
+        luz = 0.55 - v * 0.18 + (0.25 if v < -0.7 else 0.0)
+        return tono(ELIXIR, luz)
+    # la punta de laton
+    if 20.0 <= u < 21.8 and a <= max(0.7, 2.2 - (u - 20.0) * 0.8):
+        return tono(LATON, 0.7 - v * 0.12)
+    # la aguja
+    if 21.8 <= u < 31.4 and a <= 0.55:
+        return tono(ACERO, 0.85 - v * 0.2 - (0.1 if u > 30 else 0.0))
+    return None
+
+
 ARMAS = {"maza": (maza, 45.0, (4.5, 27.5)), "martillo_guerra": (martillo_guerra, 45.0, (4.0, 28.0)),
          "gran_martillo": (gran_martillo, 45.0, (4.3, 27.7)), "pico_capataz": (pico_capataz, 45.0, (4.4, 27.6)),
-         "incensario_sacristan": (incensario_sacristan, 45.0, (4.0, 28.0))}
+         "incensario_sacristan": (incensario_sacristan, 45.0, (4.0, 28.0)), "jeringa_fisico": (jeringa_fisico, 45.0, (4.2, 27.8))}
 
 
 def main():

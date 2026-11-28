@@ -769,6 +769,7 @@ public final class CiTest {
         osario(server, m, log, out);
         osmund(server, m, log);
         lazareto(server, m, log, out);
+        galen(server, m, log);
         armaduras(server, m, log);
         armas7aj(server, m, log);
         escudos7ak(server, m, log);
@@ -7467,6 +7468,265 @@ public final class CiTest {
      * se alza (flota sobre los muertos, vuelve a llamarlos y su corona trae siete), cae (lo que deja; los muertos del osario
      * descansan) y su incensario (las brasas al tercer golpe).
      */
+    /**
+     * Parte 7av: Maese Galen, el fisico del Lazareto (el jefe de la Sala del Elixir). Su puesto (el 0 del lazareto) y a quien repara
+     * (en la sala, si le ve; al otro lado del gran alambique o fuera de la sala, no); la pelea (se vuelve diciendo su frase y al acabarla
+     * se prepara); sus golpes a una presa en la calzada (la jeringa envenena y le devuelve vida, el bisturi deja sangrando, la lluvia de
+     * frascos revienta y deja sus charcos, el vapor sale de la marca y lanza por el aire, el estallido aparta); a media vida se arranca
+     * los tubos y se bebe el elixir (bebido: cinco frascos); el gran alambique ventea a quien se le arrima; cae (se rompe en cristal, deja
+     * su jeringa y las piedras, los Destilados descansan) y la Jeringa del Fisico (lanza; al tercer golpe seguido cura a quien la lleva).
+     */
+    private static void galen(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.LAZARETO;
+        final int CX = com.darkcraft.morvain.Lazareto.CX, CZ = com.darkcraft.morvain.Lazareto.CZ, P5 = com.darkcraft.morvain.Lazareto.P5;
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07aaf"), "[DarkCraftCI36]"));
+        int jefe = com.darkcraft.morvain.MorvainEnemigos.galen();
+        net.minecraft.world.phys.AABB todo = new net.minecraft.world.phys.AABB(CX - 70, 50, CZ - 70, CX + 70, 150, CZ + 80);
+        try {
+            var A = com.darkcraft.morvain.Lazareto.get();
+            for (long k : A.chunks()) m.getChunk((int) (k >> 32), (int) k);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarGrupo(m, sitio, g -> g.equals(com.darkcraft.enemigos.Puestos.JEFE));
+            com.darkcraft.enemigos.Galen c = null;
+            for (var e : fuera) if (e instanceof com.darkcraft.enemigos.Galen x) c = x;
+            if (c == null) {
+                log.println("Morvain, Maese Galen: NO SALE (" + fuera.size() + " del grupo de los jefes)");
+                return;
+            }
+            for (int k = 0; k < 6; k++) pasoE(c, null, 0, 0, 0);
+            int[] q = A.sitio("galen");
+            var abajo = m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ()));
+            boolean alambique = m.getBlockState(new BlockPos(CX, P5 + 3, CZ)).is(net.minecraft.world.level.block.Blocks.LIME_STAINED_GLASS)
+                    && m.getBlockState(new BlockPos(CX, P5 + 1, CZ)).getBlock().getDescriptionId().contains("copper");
+            StringBuilder sb = new StringBuilder(String.format(java.util.Locale.ROOT, "Morvain, Maese Galen: en %s (sitio %d, %d, %d), postura %d (1 destilando), giro %.0f,"
+                            + " pisa %s, libre %s, caja %.1f x %.1f, vida %.0f, golpe %.1f, armadura %d, en la Sala del Elixir %s, el gran alambique %s; lugar %s",
+                    c.blockPosition().toShortString(), q[0], q[1], q[2], c.postura(), c.getYRot(), abajo.getBlock().getDescriptionId().replace("block.minecraft.", ""),
+                    m.noCollision(c), c.getBbWidth(), c.getBbHeight(), c.getMaxHealth(), c.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE),
+                    c.getArmorValue(), c.enSala(), alambique ? "SI" : "NO", com.darkcraft.morvain.Lazareto.lugar(c.getX(), c.getY(), c.getZ())));
+            // ---- a quien repara: en la sala, a la vista (al sur); al otro lado del gran alambique (el cristal tapa) o abajo, en el laboratorio, no
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            double[][] donde = {{-3.5, P5 + 1, 5.5}, {5.5, P5 + 1, 0.5}, {-4.5, com.darkcraft.morvain.Lazareto.piso(4) + 1, 3.5}};
+            String[] como = {"a 5 en la sala", "al otro lado del alambique", "abajo, en el laboratorio"};
+            sb.append("; repara en:");
+            for (int i = 0; i < donde.length; i++) {
+                fp.moveTo(CX + donde[i][0], donde[i][1], CZ + donde[i][2], 0f, 0f);
+                sb.append(' ').append(como[i]).append(' ').append(c.reparaEn(fp)).append(i < donde.length - 1 ? "," : "");
+            }
+            log.println(sb);
+            // ---- la pelea: una presa en la sala, al sur; se vuelve hacia ella, su frase y se prepara (su rugido)
+            double gx = CX - 3.5, gy = P5 + 1, gz = CZ + 4.5;
+            var presa = victima(m, gx, gy, gz, 180f, quitar);
+            if (presa == null) return;
+            presa.setInvulnerable(true);
+            c.setTarget(presa);
+            sb = new StringBuilder("Morvain, Maese Galen pelea:");
+            int vuelve = -1, prepara = -1;
+            float giroTras = Float.NaN;
+            for (int k = 0; k < 340; k++) {
+                pasoE(c, presa, gx, gy, gz);
+                if (vuelve < 0 && c.accion() == com.darkcraft.enemigos.GalenAnims.VOLVERSE) vuelve = k;
+                if (vuelve >= 0 && Float.isNaN(giroTras) && c.accion() != com.darkcraft.enemigos.GalenAnims.VOLVERSE) giroTras = c.getYRot();
+                if (prepara < 0 && c.accion() == com.darkcraft.enemigos.GalenAnims.PREPARAR) prepara = k;
+                if (prepara >= 0 && k > prepara + 44) break;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " en pelea %s, se vuelve en el tick %d (al acabar mira a %.0f; la presa, al sur: 0), se prepara en el %d"
+                    + " (la frase 1 dura %d); %s", c.enPelea(), vuelve, giroTras, prepara, com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Galen.VOZ_BASE + 1), c.estado()));
+            log.println(sb);
+            // ---- sus golpes a una presa en la sala (al oeste del alambique, mirando al sur), cada uno solo: que no elija otro
+            c.quieta = true;
+            presa.setInvulnerable(false);
+            final double ox = CX - 3.5, oy = P5 + 1, oz = CZ - 3.5;
+            net.minecraft.world.phys.AABB zona = new net.minecraft.world.phys.AABB(ox - 20, oy - 8, oz - 20, ox + 20, oy + 16, oz + 30);
+            sb = new StringBuilder("Morvain, los golpes de Maese Galen a una presa:");
+            String[] nombres = {"jeringa", "bisturi", "frascos", "vapor", "estallido"};
+            int[] acciones = {com.darkcraft.enemigos.GalenAnims.JERINGA, com.darkcraft.enemigos.GalenAnims.BISTURI, com.darkcraft.enemigos.GalenAnims.FRASCOS,
+                    com.darkcraft.enemigos.GalenAnims.VAPOR, com.darkcraft.enemigos.GalenAnims.ESTALLIDO};
+            double[] dist = {3.6, 2.2, 8.0, 4.0, 2.5};
+            int[] dura = {50, 46, 100, 80, 50};
+            c.setHealth(c.getMaxHealth() * 0.8f);
+            for (int i = 0; i < nombres.length; i++) {
+                c.moveTo(ox, oy, oz, 0f, 0f);
+                c.setYRot(0f);
+                c.yBodyRot = c.yHeadRot = 0f;
+                c.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                double pz = oz + dist[i];
+                presa.moveTo(ox, oy, pz, 180f, 0f);
+                presa.setHealth(presa.getMaxHealth());
+                presa.removeAllEffects();
+                presa.clearFire();
+                com.darkcraft.enemigos.Sangrado.limpiar(presa);
+                presa.invulnerableTime = 0;
+                c.setTarget(presa);
+                int je = c.jeringazos(), en = c.envenenados(), bi = c.bisturis(), ll = c.lluvias(), fr = c.frascosLanzados(), va = c.vapores(), co = c.columnas(),
+                        cd = c.columnasQueDan(), es = c.estallidos(), ed = c.estallidosQueDan();
+                int rev = com.darkcraft.enemigos.Frasco.REVIENTAN, que = com.darkcraft.enemigos.Frasco.QUEMAN, cor = com.darkcraft.enemigos.Frasco.CORROEN;
+                float dr = c.drenado();
+                float vida = presa.getHealth();
+                boolean envenenada = false, sube = false, apartada = false, acabo = false, ardiendo = false, frenada = false;
+                float sangre = 0f;
+                int charcos = 0;
+                c.empezar(acciones[i]);
+                for (int k = 0; k < dura[i]; k++) {
+                    c.tickCount++;
+                    c.tick();
+                    if (c.accion() == 0) acabo = true;
+                    if (acabo) c.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class, zona)) {
+                        if (!quitar.contains(f)) quitar.add(f);
+                        f.tick();
+                    }
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.Charco.class, zona)) {
+                        if (!quitar.contains(f)) {
+                            quitar.add(f);
+                            charcos++;
+                        }
+                        f.tick();
+                    }
+                    net.minecraft.world.phys.Vec3 dv = presa.getDeltaMovement();
+                    if (dv.y > 0.4) sube = true;
+                    if (Math.hypot(dv.x, dv.z) > 0.5) apartada = true;
+                    presa.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    presa.moveTo(ox, oy, pz, 180f, 0f);
+                    presa.invulnerableTime = 0;
+                    envenenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.POISON);
+                    frenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                    ardiendo |= presa.isOnFire();
+                    sangre = Math.max(sangre, com.darkcraft.enemigos.Sangrado.nivel(presa));
+                }
+                String extra = switch (nombres[i]) {
+                    case "jeringa" -> String.format(java.util.Locale.ROOT, " (+%d, envenenada %s, le devuelve %.1f de vida)", c.jeringazos() - je, envenenada, c.drenado() - dr);
+                    case "bisturi" -> " (tajos que dan +" + (c.bisturis() - bi) + ", sangrando " + Math.round(sangre) + ")";
+                    case "frascos" -> " (lluvias +" + (c.lluvias() - ll) + ", frascos +" + (c.frascosLanzados() - fr) + ", revientan +"
+                            + (com.darkcraft.enemigos.Frasco.REVIENTAN - rev) + ", charcos +" + charcos + ", queman +" + (com.darkcraft.enemigos.Frasco.QUEMAN - que)
+                            + ", corroen +" + (com.darkcraft.enemigos.Frasco.CORROEN - cor) + ", ardiendo " + ardiendo + ")";
+                    case "vapor" -> " (+" + (c.vapores() - va) + ", columnas +" + (c.columnas() - co) + ", dan +" + (c.columnasQueDan() - cd) + ", lanza por el aire "
+                            + sube + ", frenada " + frenada + ")";
+                    case "estallido" -> " (+" + (c.estallidos() - es) + ", dan +" + (c.estallidosQueDan() - ed) + ", apartada " + apartada + ", sangrando "
+                            + Math.round(sangre) + ")";
+                    default -> "";
+                };
+                sb.append(String.format(java.util.Locale.ROOT, " %s a %.1f: la presa -%.1f%s, acaba %s;", nombres[i], dist[i], vida - presa.getHealth(), extra, acabo));
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class, zona)) f.discard();
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.Charco.class, zona)) f.discard();
+            }
+            log.println(sb);
+            // ---- a media vida: se arranca los tubos y se bebe el elixir (bebido); despues, cinco frascos
+            sb = new StringBuilder("Morvain, Maese Galen a media vida:");
+            c.moveTo(ox, oy, oz, 0f, 0f);
+            presa.moveTo(ox, oy, oz + 8.0, 180f, 0f);
+            c.setTarget(presa);
+            int be0 = c.bebidas();
+            c.mediaVida();
+            boolean bebe = false;
+            int arranca = -1, cristal = -1;
+            for (int k = 0; k < 120; k++) {
+                pasoE(c, presa, ox, oy, oz + 8.0);
+                if (c.accion() == com.darkcraft.enemigos.GalenAnims.BEBER) bebe = true;
+                if (arranca < 0 && c.arrancados()) arranca = k;
+                if (cristal < 0 && c.bebido()) cristal = k;
+                if (bebe && c.accion() == 0 && k > 96) break;
+            }
+            int fr0 = c.frascosLanzados();
+            c.moveTo(ox, oy, oz, 0f, 0f);
+            c.setYRot(0f);
+            c.yBodyRot = c.yHeadRot = 0f;
+            c.empezar(com.darkcraft.enemigos.GalenAnims.FRASCOS);
+            for (int k = 0; k < 40; k++) pasoE(c, presa, ox, oy, oz + 8.0);
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class, zona)) f.discard();
+            sb.append(String.format(java.util.Locale.ROOT, " segunda %s, se bebe el elixir (la accion) %s, se arranca los tubos en el tick %d, le brota el cristal en el %d,"
+                            + " bebido %s (+%d), sin tubos %s, la lluvia bebido +%d frascos; %s", c.segunda(), bebe, arranca, cristal, c.bebido(), c.bebidas() - be0,
+                    c.arrancados(), c.frascosLanzados() - fr0, c.estado()));
+            log.println(sb);
+            // ---- el gran alambique (bebido, en la sala): suelta vapor por la base a quien se le arrima
+            sb = new StringBuilder("Morvain, el gran alambique de Maese Galen:");
+            double ax = CX - 2.5, az = CZ + 0.5;
+            c.moveTo(CX - 4.5, P5 + 1, CZ + 3.5, 0f, 0f);
+            presa.moveTo(ax, P5 + 1, az, 90f, 0f);
+            c.setTarget(presa);
+            int ve0 = c.venteos(), vd0 = c.venteosQueDan();
+            float vidaV = presa.getHealth();
+            boolean apartadaV = false;
+            presa.invulnerableTime = 0;
+            c.ventearYa();
+            for (int k = 0; k < 12; k++) {
+                c.tickCount++;
+                c.tick();
+                net.minecraft.world.phys.Vec3 dv = presa.getDeltaMovement();
+                if (Math.hypot(dv.x, dv.z) > 0.4) apartadaV = true;
+                presa.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                presa.moveTo(ax, P5 + 1, az, 90f, 0f);
+                presa.invulnerableTime = 0;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " en la sala %s, ventea +%d, da +%d (la presa -%.1f, apartada %s)", c.enSala(), c.venteos() - ve0,
+                    c.venteosQueDan() - vd0, vidaV - presa.getHealth(), apartadaV));
+            log.println(sb);
+            // ---- cae: se rompe en cristal; lo que deja; los Destilados descansan y no vuelven
+            sb = new StringBuilder("Morvain, Maese Galen cae:");
+            var delLazareto = com.darkcraft.enemigos.Puestos.sacarGrupo(m, sitio, g -> !g.equals(com.darkcraft.enemigos.Puestos.JEFE));
+            for (var e : delLazareto) quitar.add(e);
+            int desc0 = com.darkcraft.morvain.Lazareto.DESCANSAN;
+            boolean pazAntes = com.darkcraft.morvain.Lazareto.enPaz(server);
+            c.vencer();
+            int seVa = -1;
+            for (int k = 0; k < 260 && !c.isRemoved(); k++) {
+                pasoE(c, null, 0, 0, 0);
+                if (c.isRemoved()) seVa = k;
+            }
+            int jeringas = 0, piedras3 = 0;
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, todo)) {
+                if (it.getItem().is(DarkCraftMod.JERINGA_FISICO.get())) jeringas += it.getItem().getCount();
+                if (it.getItem().is(DarkCraftMod.PIEDRA_FORJA_3.get())) piedras3 += it.getItem().getCount();
+                quitar.add(it);
+            }
+            boolean paz = com.darkcraft.morvain.Lazareto.enPaz(server);
+            com.darkcraft.morvain.Lazareto.paz(m);
+            int quedanFuera = 0;
+            for (var e : delLazareto) if (e.isAlive() && !e.isRemoved()) quedanFuera++;
+            sb.append(String.format(java.util.Locale.ROOT, " muere %s (en paz antes %s); se rompe en %d ticks; deja la jeringa %d y piedras III %d; los Destilados"
+                            + " descansan %s: de %d fuera se apagan +%d (quedan %d); %s", !c.isAlive(), pazAntes, seVa, jeringas, piedras3, paz, delLazareto.size(),
+                    com.darkcraft.morvain.Lazareto.DESCANSAN - desc0, quedanFuera, com.darkcraft.morvain.MorvainEnemigos.estadoGalen(server)));
+            log.println(sb);
+            // ---- la Jeringa del Fisico: una lanza de Arcano; cada golpe envenena y al tercero seguido cura a quien la lleva
+            sb = new StringBuilder("Morvain, la Jeringa del Fisico:");
+            var jer = new net.minecraft.world.item.ItemStack(DarkCraftMod.JERINGA_FISICO.get());
+            var esc = com.darkcraft.combate.Escalado.de(jer);
+            sb.append(" tipo ").append(com.darkcraft.combate.Armas.de(jer)).append(", escala ").append(esc == null ? "-" : esc.letras()).append(", ataque ")
+                    .append(String.format(java.util.Locale.ROOT, "%.1f", com.darkcraft.combate.Escalado.base(jer)));
+            var d1 = victima(m, ox, oy, oz + 3, 180f, quitar);
+            if (d1 != null) {
+                d1.removeAllEffects();
+                fp.moveTo(ox, oy, oz, 0f, 0f);
+                fp.setHealth(8f);
+                int cu0 = com.darkcraft.armas.JeringaFisico.CURAS;
+                StringBuilder golpes = new StringBuilder();
+                for (int k = 0; k < 3; k++) golpes.append(com.darkcraft.armas.JeringaFisico.pinchar(d1, fp) ? "C" : ".");
+                sb.append(String.format(java.util.Locale.ROOT, "; tres golpes seguidos %s (cura +%d): el pinchado envenenado %s, quien la lleva de 8,0 a %.1f",
+                        golpes, com.darkcraft.armas.JeringaFisico.CURAS - cu0, d1.hasEffect(net.minecraft.world.effect.MobEffects.POISON), fp.getHealth()));
+            }
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println("Morvain, Maese Galen: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] galen", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class, todo)) f.discard();
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.Charco.class, todo)) f.discard();
+            var e = com.darkcraft.enemigos.Puestos.enemigo(sitio, jefe);
+            if (e != null) e.discard();
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, jefe, false);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            fp.setHealth(fp.getMaxHealth());
+            try {
+                log.println("Morvain, Maese Galen vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoGalen(server) + "; en paz "
+                        + com.darkcraft.morvain.Lazareto.enPaz(server));
+            } catch (Throwable t) {
+                log.println("Morvain, Maese Galen vuelve: ERROR " + t);
+            }
+        }
+        log.flush();
+    }
+
     private static void osmund(MinecraftServer server, ServerLevel m, PrintWriter log) {
         String sitio = com.darkcraft.morvain.MorvainEnemigos.OSARIO;
         final int CX = com.darkcraft.morvain.Osario.CX, CZ = com.darkcraft.morvain.Osario.CZ, R = com.darkcraft.morvain.Osario.RELICARIO;

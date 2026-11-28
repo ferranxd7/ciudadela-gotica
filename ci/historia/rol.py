@@ -5319,6 +5319,68 @@ SANTUARIOS_MORVAIN_EN_7AU = {"lazareto": "The Lazaretto"}
 ES.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_ES_7AU.items()})
 EN.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_EN_7AU.items()})
 
+# ---- parte 7av: Maese Galen, el físico del Lazareto (el jefe de la Sala del Elixir)
+ES.update({
+    "entity.darkcraft.galen": "Maese Galen, el Físico",
+    "darkcraft.galen.nombre_corto": "Maese Galen",
+    "subtitles.darkcraft.galen.voz": "Habla Maese Galen",
+    "darkcraft.galen.voz.1": "Otro paciente... No. Tú no estás enfermo. Todavía no. Siéntate, siéntate. El elixir está casi listo.",
+    "darkcraft.galen.voz.2": "¡Una gota más! ¡Solo necesitaba UNA GOTA MÁS! ¡Me lo beberé yo mismo!",
+    "darkcraft.galen.voz.3": "Quieto. Tu sangre dará... un buen destilado.",
+    "darkcraft.galen.voz.4": "Respira hondo... es bueno para los pulmones.",
+    "darkcraft.galen.voz.5": "No curaba... nada... Solo quería... que vivieran...",
+    "subtitles.darkcraft.sfx.galen_jeringa": "Se clava una jeringa",
+    "subtitles.darkcraft.sfx.galen_bisturi": "Silba un bisturí",
+    "subtitles.darkcraft.sfx.galen_vapor": "Revienta un chorro de vapor",
+    "subtitles.darkcraft.sfx.galen_frascos": "Tintinean los frascos",
+    "subtitles.darkcraft.sfx.galen_beber": "El físico se bebe el elixir",
+    "subtitles.darkcraft.sfx.galen_estallido": "Estalla el cristal",
+    "subtitles.darkcraft.sfx.galen_tubos": "Se arranca los tubos",
+    "subtitles.darkcraft.sfx.galen_dolor": "Gime el físico",
+    "subtitles.darkcraft.sfx.galen_muerte": "Cae el físico",
+    "subtitles.darkcraft.sfx.galen_alambique": "Hierve el gran alambique",
+    "darkcraft.bestiario.galen": "Maese Galen, el Físico",
+    "darkcraft.bestiario.galen.desc": "El físico que la Academia echó por abrir a los muertos. Cuando la Peste Gris llegó al Pantano Podrido se llevó a los enfermos a su torre de la laguna y buscó el elixir que los curase; lo que destilaba no curaba, les cambiaba. La noche del cielo rojo se conectó a su alambique y sigue destilando en la Sala del Elixir. Se lanza a fondo con la jeringa (envenena y le devuelve vida), corta con el bisturí (te deja sangrando), lanza frascos de fuego y de ácido que llueven a tu alrededor y gira la llave de su alambique: donde se marca el suelo sale vapor hirviendo, sal de la marca. A media vida se arranca los tubos y se bebe el elixir: le brota el cristal por todo el cuerpo, va más deprisa, revienta cristal a su alrededor y el gran alambique suelta vapor a quien se le arrima.",
+    "item.darkcraft.jeringa_fisico": "Jeringa del Físico",
+    "item.darkcraft.jeringa_fisico.desc": "La jeringa enorme de latón y cristal de Maese Galen. En el fondo aún queda un poco del elixir verde.",
+    "item.darkcraft.jeringa_fisico.sangre": "Cada golpe envenena; al tercero seguido al mismo enemigo, la jeringa se llena de su sangre y te devuelve vida.",
+    "advancements.darkcraft.galen.title": "La última gota",
+    "advancements.darkcraft.galen.description": "Vence a Maese Galen, el Físico, en la Sala del Elixir",
+    "darkcraft.diario.galen": "En la Sala del Elixir, bajo la cúpula de cristal verde, Maese Galen seguía destilando junto a su gran alambique, conectado a él. Solo le faltaba una gota. Cuando se la bebió, el cristal le brotó por todo el cuerpo. Cuando cayó, tendió la mano al alambique, que dejó de hervir, y dijo que solo quería que vivieran. Los Destilados de la torre se quedaron quietos por fin.",
+    "darkcraft.creditos.pj.galen": "Maese Galen, el Físico",
+    "darkcraft.ayuda.galen": "Maese Galen, el Físico: cómo está, llevarte a la Sala del Elixir, vencerle, que vuelva, que se beba el elixir, que haga una acción o que vuelva a elegir él",
+})
+EN.update({
+    "entity.darkcraft.galen": "Master Galen, the Physician",
+    "darkcraft.galen.nombre_corto": "Master Galen",
+    "subtitles.darkcraft.galen.voz": "Master Galen speaks",
+    "darkcraft.galen.voz.1": "Another patient... No. You are not sick. Not yet. Sit down, sit down. The elixir is almost ready.",
+    "darkcraft.galen.voz.2": "One more drop! I only needed ONE MORE DROP! Then I shall drink it myself!",
+    "darkcraft.galen.voz.3": "Hold still. Your blood will make... a fine distillate.",
+    "darkcraft.galen.voz.4": "Breathe deeply... it is good for the lungs.",
+    "darkcraft.galen.voz.5": "It cured... nothing... I only wanted them... to live...",
+    "subtitles.darkcraft.sfx.galen_jeringa": "A syringe stabs",
+    "subtitles.darkcraft.sfx.galen_bisturi": "A scalpel hisses",
+    "subtitles.darkcraft.sfx.galen_vapor": "Steam bursts out",
+    "subtitles.darkcraft.sfx.galen_frascos": "Flasks clink",
+    "subtitles.darkcraft.sfx.galen_beber": "The physician drinks the elixir",
+    "subtitles.darkcraft.sfx.galen_estallido": "Glass bursts",
+    "subtitles.darkcraft.sfx.galen_tubos": "Tubes are torn out",
+    "subtitles.darkcraft.sfx.galen_dolor": "The physician groans",
+    "subtitles.darkcraft.sfx.galen_muerte": "The physician falls",
+    "subtitles.darkcraft.sfx.galen_alambique": "The great alembic boils",
+    "darkcraft.bestiario.galen": "Master Galen, the Physician",
+    "darkcraft.bestiario.galen.desc": "The physician the Academy cast out for opening up the dead. When the Grey Plague reached the Rotting Marsh he brought the sick to his tower in the lagoon and sought the elixir that would cure them; what he distilled did not cure, it changed them. On the night of the red sky he connected himself to his alembic, and he is still distilling in the Elixir Chamber. He lunges with his syringe (it poisons and gives him back health), cuts with his scalpel (it leaves you bleeding), throws flasks of fire and acid that rain down around you and turns the valve of his alembic: where the floor is marked, scalding steam bursts out, so step off the mark. At half health he tears out his tubes and drinks the elixir: glass sprouts all over his body, he moves faster, glass bursts around him and the great alembic vents steam at anyone who comes close.",
+    "item.darkcraft.jeringa_fisico": "Physician's Syringe",
+    "item.darkcraft.jeringa_fisico.desc": "Master Galen's enormous syringe of brass and glass. A little of the green elixir is still left at the bottom.",
+    "item.darkcraft.jeringa_fisico.sangre": "Each strike poisons; the third in a row on the same enemy fills the syringe with its blood and gives you back health.",
+    "advancements.darkcraft.galen.title": "The Last Drop",
+    "advancements.darkcraft.galen.description": "Defeat Master Galen, the Physician, in the Elixir Chamber",
+    "darkcraft.diario.galen": "In the Elixir Chamber, beneath the dome of green glass, Master Galen was still distilling beside his great alembic, connected to it. He only needed one more drop. When he drank it, glass sprouted all over his body. When he fell, he reached out to the alembic, which stopped boiling, and said he only wanted them to live. The Distilled of the tower finally lay still.",
+    "darkcraft.creditos.pj.galen": "Master Galen, the Physician",
+    "darkcraft.ayuda.galen": "Master Galen, the Physician: how he is, take you to the Elixir Chamber, defeat him, bring him back, make him drink the elixir, make him do an action or let him choose again",
+})
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

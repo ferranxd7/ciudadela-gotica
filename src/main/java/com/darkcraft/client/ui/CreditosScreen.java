@@ -53,7 +53,7 @@ public class CreditosScreen extends Screen {
             {"dragon", "Malvoryx The Monster"},
             {"isolde", "Elariel X - Epic Ethereal Queen"},
             {"sigrun", "Kaisa - Strong and authoritative"}, {"capataz", "Rob - Tough, Calloused, British"},
-            {"osmund", "Matthew Schmitz - Ancient Sage Dragon Wizard"}};
+            {"osmund", "Matthew Schmitz - Ancient Sage Dragon Wizard"}, {"galen", "Blackwood - Posh British Villain"}};
     /** Los mods que van dentro y el shader (con su licencia o su autor). */
     private static final String[][] MODS = {
             {"Distant Horizons", "LGPL-3.0"}, {"Oculus", "LGPL-3.0"}, {"Embeddium", "LGPL-3.0"},

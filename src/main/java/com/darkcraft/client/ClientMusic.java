@@ -151,9 +151,10 @@ public final class ClientMusic {
             case 49 -> DarkCraftMod.MUSICA_SIGRUN.get();
             case 50 -> DarkCraftMod.MUSICA_CAPATAZ.get();
             case 51 -> DarkCraftMod.MUSICA_OSMUND.get();
+            case 52 -> DarkCraftMod.MUSICA_GALEN.get();
             default -> DarkCraftMod.MUSICA_REY_3.get();
         };
-        boss = new Track(ev, phase == 21 ? "capitan" : phase == 31 ? "brandt" : phase == 32 ? "vareth" : phase == 33 ? "molinera" : phase == 34 ? "verdugo" : phase == 35 ? "barquero" : phase == 36 ? "abad" : phase == 37 ? "condestable" : phase == 38 ? "rectora" : phase == 39 ? "ballenero" : phase == 40 ? "pontifice" : phase == 41 ? "aldric" : phase == 42 ? "gigante" : phase == 43 ? "jinete" : phase == 44 ? "bufon" : phase == 45 ? "dragon" : phase == 46 ? "isolde" : phase == 47 ? "sombra1" : phase == 48 ? "sombra2" : phase == 49 ? "sigrun" : phase == 50 ? "capataz" : phase == 51 ? "osmund" : phase >= 11 ? "gavran" + (phase - 10) : "rey" + phase, true);
+        boss = new Track(ev, phase == 21 ? "capitan" : phase == 31 ? "brandt" : phase == 32 ? "vareth" : phase == 33 ? "molinera" : phase == 34 ? "verdugo" : phase == 35 ? "barquero" : phase == 36 ? "abad" : phase == 37 ? "condestable" : phase == 38 ? "rectora" : phase == 39 ? "ballenero" : phase == 40 ? "pontifice" : phase == 41 ? "aldric" : phase == 42 ? "gigante" : phase == 43 ? "jinete" : phase == 44 ? "bufon" : phase == 45 ? "dragon" : phase == 46 ? "isolde" : phase == 47 ? "sombra1" : phase == 48 ? "sombra2" : phase == 49 ? "sigrun" : phase == 50 ? "capataz" : phase == 51 ? "osmund" : phase == 52 ? "galen" : phase >= 11 ? "gavran" + (phase - 10) : "rey" + phase, true);
         bossTicks = 0;
         Minecraft.getInstance().getSoundManager().play(boss);
         boss.fadeTo(soft ? 0.3f : 0.85f, phase == 1 ? 3.0f : 2.2f);

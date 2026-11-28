@@ -4570,6 +4570,71 @@ jefe, Maese Galen fundido con su gran alambique en la Sala del Elixir, llega en 
   (`lz29..lz35`), el elixir verde (`lz36`) y la cuba que revienta y su charco (`lz37`, `lz38`); el libro de Galen (`lz39`) y el bestiario
   (`lz40..lz42`).
 
+### Plan grande, parte 7av: Maese Galen, el Fisico (el jefe del Lazareto)
+
+El jefe de la mazmorra de la 7au. Lore: cuando la Peste Gris llego al Pantano Podrido, Maese Galen se llevo a los enfermos a su torre de
+la laguna y les dio a beber lo que destilaba (libro perdido 38): no curaba, les cambiaba (los Destilados). La noche del cielo rojo
+hirvieron los alambiques y el se conecto al alambique que lleva a la espalda; sigue destilando junto al gran alambique de la Sala del
+Elixir, esperando la ultima gota.
+- **Maese Galen** (`enemigos/Galen`, un `Guardian`; entidad `darkcraft:galen` 0,9 x 3,0, escala 1,35, no le hace nada el fuego; modelo
+  de `tools/enemigos/galen.py`: gafas redondas, el mandil de cuero con sus correas, el cinto con viales y el zurron, la mascara de pico
+  colgada de un cordel, faldones y mangas; **a la espalda su alambique** de cobre y cristal con el elixir dentro y **los tubos** que le
+  entran por el cuello; la jeringa grande de laton y cristal en la derecha, el bisturi en la izquierda y el frasco grande del cinto;
+  dos variantes: `galen` y `bebido` —el cristal verde le brota por la espalda, los hombros, el brazo y la cabeza—; `ARRANCADOS`
+  sincronizado: los tubos rotos; `client/enemigos/GalenModelo` —`REZA` es DESTILANDO; si no QUIETO + PORTE, LISTO en pelea y ANDAR,
+  bebido mas deprisa— y `GalenRenderer`, con el brillo del elixir que late y se apaga al morir). 1150 de vida, golpe 11, armadura 4;
+  ecos 17000. Es el **puesto 0** del lazareto (`Lazareto.esperas`, grupo `Puestos.JEFE`; sitio `galen`): al oeste del gran alambique
+  (-4, 0) de cara a el, **destilando**. Solo repara en quien entra en la Sala del Elixir (`Lazareto.enElixir`) y se le acerca (13
+  bloques, si le ve: el cristal del alambique tapa); peleando alli, a los de fuera ni los mira.
+- **La pelea**: se vuelve hacia quien llega (`VOLVERSE`) diciendo la 1 ("Another patient... No. You are not sick. Not yet...", una vez
+  cada 4 min) y al acabarla **se prepara** (`PREPARAR`, su rugido: alza la jeringa, dos golpecitos y el chorrito). Sus golpes
+  (`elegir`): **la jeringa** (la echa atras y se lanza a fondo, 4,4 de alcance: veneno 5 s y le devuelve 8 de vida —12 bebido—),
+  **el bisturi** (dos tajos: cada uno suma sangrado, `Sangrado`), **la lluvia de frascos** (tres `Frasco` de fuego o de acido, uno a su
+  presa y los demas alrededor —sus charcos—; bebido, cinco) y **el vapor** (gira la llave de su alambique —la 4, "Breathe deeply...",
+  la primera vez—: una marca bajo cada uno y alguna mas; a los 26 ticks una **columna de vapor** hirviendo, 1,5 de radio: dano, lentitud
+  y lanza por el aire). Cuando cae su presa, la 3 ("Hold still. Your blood will make... a fine distillate.").
+- **A media vida se bebe el elixir** (`BEBER`, `alSegundaMitad`): la 2 ("One more drop! I only needed ONE MORE DROP!..."), se arranca
+  los tubos del cuello (salta el elixir), se bebe el frasco grande, lo tira y **le brota el cristal** (variante `BEBIDO`): va mas
+  deprisa, cinco frascos, mas marcas de vapor (otra al lado de cada uno), **el estallido** (se encoge y el cristal le revienta por fuera:
+  4,2 de radio, dano, sangrado y aparta; si le rodean, mas) y **el gran alambique ventea** por la base cada 5 s (silba y humea un segundo
+  antes: a quien este a 3,9 del centro, 4,5 de dano y le aparta). Mientras pelea en la sala, el gran alambique hierve (`sfx.galen_alambique`).
+- **Cae** sin irse en humo: de rodillas tendiendo la mano al gran alambique, que deja de hervir, la 5 ("It cured... nothing... I only
+  wanted them... to live..."), al suelo y **se rompe en cristal verde** (`tickDeath`, 160 ticks). Deja la **Jeringa del Fisico**, 3
+  piedras de forja III, 2 de II y cenizas de sangre; el cartel de JEFE ABATIDO, la hazana `galen` ("La ultima gota", desafio, 450 de
+  experiencia) y el bestiario. **Los Destilados descansan** (`Lazareto.paz`, cada segundo desde `Morvain`): con el caido, los que no
+  pelean se deshacen y no vuelven (`MorvainEnemigos`: sus puestos dejan de estar en uso con `Lazareto.enPaz`).
+- **La Jeringa del Fisico** (`armas/JeringaFisico`, una espada de hierro de tipo `LANZA`: sus estocadas; escala E en Fuerza, C en
+  Destreza y B en Arcano, `Escalado`; textura de `tools/rol/martillos.py`): cada golpe envenena 3 s y al tercero seguido al mismo (sin
+  pasar 7 s) **le saca la sangre**: cura a quien la lleva 2 y un 6 % de su vida.
+- Barra propia (`barra_guardianes.py` `marco_galen`: una jeringa de punta a punta, en medio el frasco con sus gafas; relleno de elixir
+  con gotas de cristal), musica "Land of Misdeeds" de Jonathan Shaw (CC-BY 3.0, id `galen`, tema 52). Voz "Blackwood - Posh British
+  Villain" (ElevenLabs, `agL69Vji082CshT65Tcy`, `eleven_v4`, cinco frases, tomas a —la 5, b—; filtro `voz_galen` de `procesar.py`: un
+  pelo mas grave, una segunda voz del elixir por debajo, un brillo de vidrio y el eco de la cupula; `Voces.BASE_GALEN` 200) y sonidos
+  (flow `sd89J8Hvoo0CnP4BuWLO`): `galen_jeringa`, `bisturi`, `vapor`, `frascos`, `beber`, `estallido`, `tubos`, `dolor`, `muerte` y
+  `alambique` (un bucle; tomas en `TOMAS_SFX`). Prompts y firmas en `herr` (fuera del repo).
+- Comandos `/darkcraft galen [ir | vencer | volver | media | accion <n> | suelta]` (`ir`: a la Sala del Elixir; `volver` tambien devuelve a
+  los Destilados del lazareto; `accion`: que haga esa, quieto, contra quien lo pide; `suelta`: que vuelva a elegir el).
+- **Sin abrir el juego**: `python3 tools/enemigos/generar.py --solo galen --vistas carpeta` (el modelo y sus animaciones);
+  `VOLCADO_OPTS="-Droca=true" bash tools/vista3d/vista.sh morvain_lazareto carpeta` (el sitio `galen` y su puesto se pisan y se llega a
+  pie con el atanor encendido; los jefes con cuatro de alto).
+- Pruebas: servidor, `galen()` despues de `lazareto()` (lineas `Morvain, Maese Galen: ...` —su puesto, postura, giro, lo que pisa, el gran
+  alambique, a quien repara (a 5 en la sala si; al otro lado del alambique o abajo, en el laboratorio, no)—, `... pelea: ...` —se vuelve
+  y mira a la presa, se prepara tras su frase—, `Morvain, los golpes de Maese Galen a una presa: ...` —la jeringa (envenena, le devuelve
+  vida), el bisturi (sangrado), la lluvia (los frascos revientan, sus charcos), el vapor (columnas que dan y lanzan) y el estallido—,
+  `Morvain, Maese Galen a media vida: ...` —se bebe el elixir, sin tubos, el cristal, cinco frascos—, `Morvain, el gran alambique de
+  Maese Galen: ...` —ventea y aparta—, `Morvain, Maese Galen cae: ...` —se rompe, la jeringa y las piedras en el suelo, los Destilados
+  descansan— y `Morvain, la Jeringa del Fisico: ...` —lanza EC--B, la cura al tercer golpe—; al acabar, `Morvain, Maese Galen vuelve:
+  ...`); cliente, tramo `galen()` despues de `lazareto()`: la Sala del Elixir con el destilando (`cliente_ga01`), de cerca (`ga02`) y sin
+  vision nocturna (`ga03`); en supervivencia: se vuelve (`ga04`), su frase y su barra (`ga05`) y se prepara (`ga06`); sus golpes con el
+  comando (`ga07..ga15`: la jeringa y el veneno, el bisturi, la lluvia —`ga11` los frascos en el aire, `ga12` los charcos— y el vapor
+  —`ga13` la llave, `ga14` las marcas, `ga15` las columnas—); se bebe el elixir (`ga16` los tubos, `ga17` bebe, `ga18` el cristal),
+  bebido en primera persona con su frase (`ga19`), el estallido (`ga20`) y el gran alambique que ventea (`ga21`); cae (`ga22` de
+  rodillas, `ga23` en el suelo, `ga24` las ultimas gotas, `ga25` se rompe), JEFE ABATIDO (`ga26`), lo que deja (`ga27`), la jeringa en la
+  mano (`ga28`, lineas `Maese Galen: en la mano ...`) y el bestiario (`ga29`).
+- **Arreglos de las pruebas del osario (7as)**: `os14_altar_craneos` tenia la camara dentro del coloso que guarda el altar (ahora de
+  lado); antes del primer golpe de los Ensamblados el jugador ya esta en la Capilla de los Huesos 3 s (`os30` salia sin los trozos
+  hechos: se veia el cielo); y el portacirios rehecho se remata antes del bestiario (`os43` salia `???`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

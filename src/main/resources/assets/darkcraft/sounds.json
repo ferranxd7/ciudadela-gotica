@@ -9469,5 +9469,194 @@
         "stream": true
       }
     ]
+  },
+  "sfx.galen_jeringa": {
+    "subtitle": "subtitles.darkcraft.sfx.galen_jeringa",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/galen_jeringa_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/galen_jeringa_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.galen_bisturi": {
+    "subtitle": "subtitles.darkcraft.sfx.galen_bisturi",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/galen_bisturi_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/galen_bisturi_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.galen_vapor": {
+    "subtitle": "subtitles.darkcraft.sfx.galen_vapor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/galen_vapor_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/galen_vapor_2",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "sfx.galen_frascos": {
+    "subtitle": "subtitles.darkcraft.sfx.galen_frascos",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/galen_frascos_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/galen_frascos_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.galen_beber": {
+    "subtitle": "subtitles.darkcraft.sfx.galen_beber",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/galen_beber_1",
+        "attenuation_distance": 48,
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/galen_beber_2",
+        "attenuation_distance": 48,
+        "stream": true
+      }
+    ]
+  },
+  "sfx.galen_estallido": {
+    "subtitle": "subtitles.darkcraft.sfx.galen_estallido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/galen_estallido_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "darkcraft:sfx/galen_estallido_2",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "sfx.galen_tubos": {
+    "subtitle": "subtitles.darkcraft.sfx.galen_tubos",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/galen_tubos_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/galen_tubos_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.galen_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.galen_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/galen_dolor_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/galen_dolor_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.galen_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.galen_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/galen_muerte_1",
+        "attenuation_distance": 48,
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/galen_muerte_2",
+        "attenuation_distance": 48,
+        "stream": true
+      }
+    ]
+  },
+  "sfx.galen_alambique": {
+    "subtitle": "subtitles.darkcraft.sfx.galen_alambique",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/galen_alambique_1",
+        "attenuation_distance": 40,
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/galen_alambique_2",
+        "attenuation_distance": 40,
+        "stream": true
+      }
+    ]
+  },
+  "musica.galen": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/galen",
+        "stream": true
+      }
+    ]
+  },
+  "galen.voz.1": {
+    "subtitle": "subtitles.darkcraft.galen.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:galen/voz_1",
+        "stream": false
+      }
+    ]
+  },
+  "galen.voz.2": {
+    "subtitle": "subtitles.darkcraft.galen.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:galen/voz_2",
+        "stream": false
+      }
+    ]
+  },
+  "galen.voz.3": {
+    "subtitle": "subtitles.darkcraft.galen.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:galen/voz_3",
+        "stream": false
+      }
+    ]
+  },
+  "galen.voz.4": {
+    "subtitle": "subtitles.darkcraft.galen.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:galen/voz_4",
+        "stream": false
+      }
+    ]
+  },
+  "galen.voz.5": {
+    "subtitle": "subtitles.darkcraft.galen.voz",
+    "sounds": [
+      {
+        "name": "darkcraft:galen/voz_5",
+        "stream": false
+      }
+    ]
   }
 }

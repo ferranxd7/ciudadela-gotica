@@ -6713,6 +6713,8 @@ public final class ClientCiTest {
         t = osmund(t);
         // el Lazareto de Maese Galen y los Destilados (parte 7au)
         t = lazareto(t);
+        // Maese Galen, el Fisico, en la Sala del Elixir (parte 7av)
+        t = galen(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -15031,7 +15033,8 @@ public final class ClientCiTest {
         t = vistaOsario(t, "os11_bajada_huesos", 0.5, C1 + 2.2, -49.5, 0.5, C2 + 2, -64, 40, true);
         t = vistaOsario(t, "os12_capilla_huesos", 0.5, C2 + 3.5, -61.5, 0.5, C2 + 3, -81, 60, true);
         t = vistaOsario(t, "os13_lampara", 4.5, C2 + 3.6, -66.5, 0.5, C2 + 8, -70.5, 40, true);
-        t = vistaOsario(t, "os14_altar_craneos", 0.5, C2 + 2.4, -75.5, 0.5, C2 + 4.5, -81, 40, true);
+        // (de lado: delante del altar, en v -76, espera el coloso)
+        t = vistaOsario(t, "os14_altar_craneos", 3.5, C2 + 2.6, -72.5, 0.5, C2 + 3.6, -81, 40, true);
         t = vistaOsario(t, "os15_escudo", -6, C2 + 3, -66.5, -6, C2 + 5.5, -60, 40, true);
         t = vistaOsario(t, "os16_huesos_sin_vision", 0.5, C2 + 3.5, -61.5, 0.5, C2 + 3, -81, 30, false);
         t = vistaOsario(t, "os17_catacumbas", -12.5, C2 + 2.2, -70.5, -34, C2 + 1.5, -70.5, 40, true);
@@ -15118,9 +15121,13 @@ public final class ClientCiTest {
         atTicks(t, "El osario: a pelear (supervivencia, en la Capilla de los Huesos)", m -> {
             m.options.hideGui = false;
             com.darkcraft.client.ui.Carteles.callados = true;
-            server(m, sp -> comando(sp, "darkcraft osario enemigos fuera"));
+            server(m, sp -> {
+                comando(sp, "darkcraft osario enemigos fuera");
+                // ya en la capilla (de la cripta hay un salto: que se hagan los trozos antes del primer golpe)
+                irMirando(sp, ex + 2.5, ey, ez + 4.0, ex, ey + 1.0, ez, false);
+            });
         });
-        t += 4;
+        t += 60;
         final int P = com.darkcraft.enemigos.Ensamblado.PORTACIRIOS, S = com.darkcraft.enemigos.Ensamblado.SEPULTURERO, K = com.darkcraft.enemigos.Ensamblado.COLOSO;
         t = golpeEnsamblado(t, "os30_candelazo", P, com.darkcraft.enemigos.EnsambladoAnims.CANDELAZO, 2.4, 20, ex, ey, ez) + 30;
         t = golpeEnsamblado(t, "os31_barrido_cirio", P, com.darkcraft.enemigos.EnsambladoAnims.BARRIDO_CIRIO, 2.2, 14, ex, ey, ez) + 30;
@@ -15170,6 +15177,13 @@ public final class ClientCiTest {
         // ---- otro: cae y se pisotea el monton (el golpe del combate) antes de que se levante
         atTicks(t, "El osario: un sepulturero cae", m -> server(m, sp -> {
             ServerLevel lvl = sp.serverLevel();
+            // el portacirios rehecho ya no se rehace: un golpe y es polvo (y se apunta en el bestiario)
+            var p0 = ENSAMBLADOS[0];
+            if (p0 != null && p0.isAlive()) {
+                p0.invulnerableTime = 0;
+                p0.hurt(sp.damageSources().playerAttack(sp), 9999f);
+                log("  el portacirios rehecho, rematado: " + (p0.isAlive() ? "SIGUE" : "polvo") + " | " + estadoEnsamblados());
+            }
             quitarEnsamblados(lvl);
             aPelearOsario(sp);
             ENSAMBLADOS[0] = ensambladoNuevo(lvl, S, ex, ey, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
@@ -16424,6 +16438,407 @@ public final class ClientCiTest {
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
                 log("  Fray Osmund, vuelto: " + com.darkcraft.morvain.MorvainEnemigos.estadoOsmund(sp.server));
+            });
+        });
+        return C + 292;
+    }
+
+    // ------------------------------------------------------------------ Maese Galen, el Fisico (parte 7av)
+
+    /** Maese Galen en el cliente (a 80 bloques), o null. */
+    private static com.darkcraft.enemigos.Galen galenC(Minecraft mc) {
+        if (mc.level == null || mc.player == null) return null;
+        for (var e : mc.level.getEntitiesOfClass(com.darkcraft.enemigos.Galen.class, mc.player.getBoundingBox().inflate(80))) return e;
+        return null;
+    }
+
+    /** Maese Galen en el servidor (si ha salido de su puesto), o null. */
+    private static com.darkcraft.enemigos.Galen galenE() {
+        return com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.LAZARETO, com.darkcraft.morvain.MorvainEnemigos.galen())
+                instanceof com.darkcraft.enemigos.Galen c ? c : null;
+    }
+
+    /** La accion que se ve de Maese Galen y cuanto lleva (-1 si no es esa). */
+    private static int tGalen(Minecraft mc, int accion) {
+        var r = galenC(mc);
+        return r != null && r.accionVista() == accion && r.accionDesde >= 0 ? r.tickCount - r.accionDesde : -1;
+    }
+
+    private static String estadoGalenC(Minecraft mc) {
+        var r = galenC(mc);
+        if (r == null) return "no se ve a Maese Galen | voz " + com.darkcraft.client.rey.ReyCliente.subtitulo() + " | cartel " + com.darkcraft.client.ui.Carteles.resumen();
+        int a = r.accionVista();
+        var caja = r.getBoundingBox().inflate(24);
+        int frascos = mc.level.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class, caja).size();
+        int charcos = mc.level.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.Charco.class, caja).size();
+        return String.format(java.util.Locale.ROOT, "Galen en el cliente: %.1f, %.1f, %.1f giro %.0f, postura %d, accion %s (t %d), muerte %d, %s, %s, %s, frascos %d,"
+                        + " charcos %d | voz %s | musica %s | cartel %s | jugador a %.1f", r.getX(), r.getY(), r.getZ(), r.getYRot(), r.postura(),
+                com.darkcraft.enemigos.GalenAnims.NOMBRES[Math.max(0, Math.min(a, com.darkcraft.enemigos.GalenAnims.NOMBRES.length - 1))],
+                r.accionDesde < 0 ? -1 : r.tickCount - r.accionDesde, r.deathTime, r.enPelea() ? "peleando" : "sin pelea", r.bebido() ? "bebido" : "sin beber",
+                r.arrancados() ? "sin tubos" : "con sus tubos", frascos, charcos, com.darkcraft.client.rey.ReyCliente.subtitulo(), ClientMusic.debug(),
+                com.darkcraft.client.ui.Carteles.resumen(), mc.player == null ? -1 : r.distanceTo(mc.player));
+    }
+
+    /** Maese Galen y lo de alrededor en el servidor (para las lineas del informe). */
+    private static String estadoGalenS(ServerPlayer sp) {
+        var c = galenE();
+        ServerLevel lvl = sp.serverLevel();
+        var caja = (c != null ? c : sp).getBoundingBox().inflate(24);
+        int frascos = lvl.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class, caja).size();
+        int charcos = lvl.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.Charco.class, caja).size();
+        return com.darkcraft.morvain.MorvainEnemigos.estadoGalen(sp.server) + " | " + (c == null ? "no ha salido" : estadoE(c)) + " | jugador " + fpos(sp) + " vida "
+                + Math.round(sp.getHealth()) + String.format(java.util.Locale.ROOT, " (envenenado %s, frenado %s, ardiendo %s, sangrando %.0f)",
+                sp.hasEffect(net.minecraft.world.effect.MobEffects.POISON), sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN), sp.isOnFire(),
+                com.darkcraft.enemigos.Sangrado.nivel(sp)) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp) + " | frascos " + frascos + ", charcos " + charcos;
+    }
+
+    /** La camara en la Sala del Elixir: (u, dy, v) del marco del lazareto (dy sobre lo que se pisa en la sala) mirando a (mu, my, mv). */
+    private static void camaraElixir(Minecraft mc, double u, double dy, double v, double mu, double my, double mv) {
+        final int CX = com.darkcraft.morvain.Lazareto.CX, CZ = com.darkcraft.morvain.Lazareto.CZ, Y = com.darkcraft.morvain.Lazareto.P5 + 1;
+        verDesde(mc, new Vec3(CX + u, Y + dy, CZ + v), new Vec3(CX + mu, Y + my, CZ + mv));
+    }
+
+    /** En el lazareto solo Maese Galen: los Destilados de los puestos, por caidos (que no suban a la pelea). */
+    private static void soloGalen(net.minecraft.server.MinecraftServer srv) {
+        int n = com.darkcraft.morvain.MorvainEnemigos.lazareto().size(), jefe = com.darkcraft.morvain.MorvainEnemigos.galen();
+        for (int i = 0; i < n; i++) com.darkcraft.enemigos.Puestos.marcar(srv, com.darkcraft.morvain.MorvainEnemigos.LAZARETO, i, i != jefe);
+    }
+
+    /** Donde hace Maese Galen sus golpes en la prueba (u, v del marco del lazareto): en la sala, al suroeste del gran alambique. */
+    private static final double GALEN_GU = -3.5, GALEN_GV = -3.5;
+
+    /**
+     * Maese Galen en su sitio de los golpes mirando al sur y el jugador delante (a {@code dist}, sano), sin Destilados ni frascos: y que
+     * haga esa accion ({@code /darkcraft galen accion}; 0: nada, -1: a media vida, {@code media}: se bebe el elixir).
+     */
+    private static void galenHaz(ServerPlayer sp, int accion, double dist) {
+        final int CX = com.darkcraft.morvain.Lazareto.CX, CZ = com.darkcraft.morvain.Lazareto.CZ, Y = com.darkcraft.morvain.Lazareto.P5 + 1;
+        quitarDestilados(sp.serverLevel());
+        var c = galenE();
+        if (c == null) {
+            log("  Maese Galen: FALLO, no esta fuera");
+            return;
+        }
+        double x = CX + GALEN_GU, z = CZ + GALEN_GV;
+        c.moveTo(x, Y, z, 0f, 0f);
+        c.setYRot(0f);
+        c.yBodyRot = c.yHeadRot = 0f;
+        c.setDeltaMovement(Vec3.ZERO);
+        irMirando(sp, x, Y, z + dist, x, Y + 2.4, z, false);
+        sp.setHealth(sp.getMaxHealth());
+        sp.removeEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+        sp.removeEffect(net.minecraft.world.effect.MobEffects.POISON);
+        com.darkcraft.enemigos.Sangrado.limpiar(sp);
+        sp.clearFire();
+        if (accion > 0) comando(sp, "darkcraft galen accion " + accion);
+        else if (accion < 0) comando(sp, "darkcraft galen media");
+    }
+
+    /**
+     * Maese Galen, el Fisico (parte 7av): la Sala del Elixir bajo la cupula verde, con el de pie ante el gran alambique destilando (de
+     * lejos, de cerca y sin vision nocturna); en supervivencia, al entrar: se vuelve, su frase (su barra, su musica) y prepara la jeringa;
+     * sus golpes (pedidos con el comando, la camara por delante o de lado): la jeringa (y el veneno), el bisturi, la lluvia de frascos (y
+     * sus charcos de fuego y de acido), el vapor (la llave, las marcas del suelo y las columnas); a media vida se arranca los tubos y se
+     * bebe el elixir (le brota el cristal; su frase 2), el estallido de cristal y el gran alambique que ventea por la base; cae (de
+     * rodillas, al suelo, se rompe en cristal verde), el cartel de JEFE ABATIDO, lo que deja, la Jeringa del Fisico en la mano y el
+     * bestiario. Al acabar vuelve todo (el y los Destilados del lazareto).
+     */
+    private static int galen(int T) {
+        final int CX = com.darkcraft.morvain.Lazareto.CX, CZ = com.darkcraft.morvain.Lazareto.CZ, P5 = com.darkcraft.morvain.Lazareto.P5;
+        final double GU = GALEN_GU, GV = GALEN_GV;
+        int t = T;
+        atTicks(t, "Maese Galen: a la Sala del Elixir", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_ESPERA.clear();
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                sp.removeAllEffects();
+                quitarDestilados(sp.serverLevel());
+                comando(sp, "darkcraft galen volver");
+                soloGalen(sp.server);
+                verDeNoche(sp);
+                // al sur de la sala, en alto: el, el gran alambique a su derecha y la cupula
+                irMirando(sp, CX - 1.5, P5 + 3.4, CZ + 8.0, CX - 3.5, P5 + 2.6, CZ + 0.5, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura: la Sala del Elixir", m -> {
+            server(m, sp -> log("  Maese Galen, en su puesto: " + estadoGalenS(sp)));
+            log("  Maese Galen, en su puesto (cliente): " + estadoGalenC(m));
+            primeraSinHud(m);
+            shot(m, "cliente_ga01_sala_elixir");
+        });
+        t += 4;
+        // de cerca, destilando: por delante, entre el y el gran alambique, un poco al norte
+        atTicks(t, "Maese Galen: de cerca, destilando", m -> server(m, sp -> irMirando(sp, CX - 1.0, P5 + 1.6, CZ - 3.0, CX - 3.5, P5 + 2.6, CZ + 0.5, true)));
+        t += 30;
+        esperarA("cliente_ga02_destilando", m -> {
+            var r = galenC(m);
+            return r != null && r.postura() == com.darkcraft.enemigos.Enemigo.REZA;
+        }, ClientCiTest::primeraSinHud, ClientCiTest::estadoGalenC, 80);
+        t += 60;
+        atTicks(t, "Maese Galen: la sala, sin vision nocturna", m -> server(m, sp -> {
+            sp.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+            irMirando(sp, CX - 1.5, P5 + 3.4, CZ + 8.0, CX - 3.5, P5 + 2.6, CZ + 0.5, true);
+        }));
+        t += 30;
+        atTicks(t, "captura: la sala sin vision nocturna", m -> {
+            primeraSinHud(m);
+            shot(m, "cliente_ga03_sin_vision");
+        });
+        t += 4;
+        // ---- en supervivencia, en la sala a cinco bloques (al sur): se vuelve, dice su frase y prepara la jeringa
+        int S = t;
+        atTicks(S, "Maese Galen: en supervivencia, en la Sala del Elixir", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                verDeNoche(sp);
+                irMirando(sp, CX - 3.5, P5 + 1, CZ + 5.5, CX - 3.5, P5 + 2.4, CZ + 0.5, false);
+            });
+        });
+        esperarA("cliente_ga04_se_vuelve", m -> tGalen(m, com.darkcraft.enemigos.GalenAnims.VOLVERSE) >= 12, ClientCiTest::enPrimeraPersona,
+                ClientCiTest::estadoGalenC, 200);
+        esperarA("cliente_ga05_su_frase_barra", m -> {
+            var r = galenC(m);
+            return r != null && r.enPelea() && r.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE && tGalen(m, com.darkcraft.enemigos.GalenAnims.VOLVERSE) < 0
+                    && com.darkcraft.client.rey.ReyCliente.subtitulo().startsWith((com.darkcraft.enemigos.Galen.VOZ_BASE + 1) + " ");
+        }, ClientCiTest::enPrimeraPersona, ClientCiTest::estadoGalenC, 240);
+        // prepara la jeringa (el chorrito por la aguja), de lado: al sureste de el
+        esperarA("cliente_ga06_preparar", m -> tGalen(m, com.darkcraft.enemigos.GalenAnims.PREPARAR) >= 30,
+                m -> camaraElixir(m, -1.0, 2.2, 4.0, -3.5, 2.4, 0.5), ClientCiTest::estadoGalenC, 420);
+        t = S + 330;
+        atTicks(t - 4, "Maese Galen: tras prepararse", m -> server(m, sp -> log("  Maese Galen, tras prepararse: " + estadoGalenS(sp))));
+        // ---- sus golpes, pedidos con el comando: {accion, distancia, tick 1, tick 2 (-1: sin ella), espera}; la camara por delante, detras
+        // del jugador y un poco al este (por encima de su hombro)
+        int[][] golpes = {
+                {com.darkcraft.enemigos.GalenAnims.JERINGA, 36, 21, 32, 52},
+                {com.darkcraft.enemigos.GalenAnims.BISTURI, 22, 11, 19, 48},
+                {com.darkcraft.enemigos.GalenAnims.FRASCOS, 80, 23, -1, 96},
+                {com.darkcraft.enemigos.GalenAnims.VAPOR, 50, 12, -1, 84}};
+        String[][] nombres = {{"ga07_jeringa", "ga08_jeringa_veneno"}, {"ga09_bisturi", "ga10_bisturi_2"}, {"ga11_frascos_lanza", ""}, {"ga13_vapor_llave", ""}};
+        for (int i = 0; i < golpes.length; i++) {
+            final int[] g = golpes[i];
+            final int acc = g[0];
+            final double dist = g[1] / 10.0;
+            final String n1 = "cliente_" + nombres[i][0], n2 = "cliente_" + nombres[i][1];
+            final int T0 = t;
+            atTicks(t, "Maese Galen: " + com.darkcraft.enemigos.GalenAnims.NOMBRES[acc], m -> {
+                m.options.hideGui = true;
+                server(m, sp -> galenHaz(sp, acc, dist));
+            });
+            Consumer<Minecraft> cam = acc == com.darkcraft.enemigos.GalenAnims.FRASCOS
+                    // la lluvia, de lado (desde el oeste): el, los frascos en el aire y el jugador
+                    ? m -> camaraElixir(m, GU - 3.6, 3.0, GV + 4.0, GU + 0.4, 1.8, GV + 4.0)
+                    : m -> camaraElixir(m, GU + 1.2, 2.9, GV + dist + 3.2, GU + 0.2, 1.9, GV);
+            esperarA(n1, m -> tGalen(m, acc) >= g[2], cam, ClientCiTest::estadoGalenC, 120);
+            if (g[3] >= 0) esperarA(n2, m -> tGalen(m, acc) >= g[3], cam, ClientCiTest::estadoGalenC, 120);
+            if (acc == com.darkcraft.enemigos.GalenAnims.FRASCOS) {
+                // los charcos de fuego y de acido alrededor del jugador, desde lo alto (al noroeste)
+                Consumer<Minecraft> camAlto = m -> camaraElixir(m, GU - 3.0, 6.4, GV + 3.0, GU, 0.2, GV + dist);
+                atTicks(T0 + 50, "la camara: los charcos", camAlto);
+                atTicks(T0 + 54, "captura: los charcos", m -> {
+                    camAlto.accept(m);
+                    log("  cliente_ga12_frascos_charcos: " + estadoGalenC(m));
+                    server(m, sp -> log("  Maese Galen, la lluvia de frascos: " + estadoGalenS(sp)));
+                    shot(m, "cliente_ga12_frascos_charcos");
+                });
+            }
+            if (acc == com.darkcraft.enemigos.GalenAnims.VAPOR) {
+                // las marcas del suelo (en el tick 17) y, 26 ticks despues, las columnas: de lado y en alto (al oeste)
+                Consumer<Minecraft> camAlto = m -> camaraElixir(m, GU - 3.4, 4.6, GV + 6.5, GU + 0.3, 0.6, GV + 3.0);
+                atTicks(T0 + 28, "la camara: el vapor", camAlto);
+                atTicks(T0 + 32, "captura: las marcas", m -> {
+                    camAlto.accept(m);
+                    log("  cliente_ga14_vapor_marcas: " + estadoGalenC(m));
+                    shot(m, "cliente_ga14_vapor_marcas");
+                });
+                atTicks(T0 + 47, "captura: las columnas de vapor", m -> {
+                    camAlto.accept(m);
+                    log("  cliente_ga15_vapor_columnas: " + estadoGalenC(m));
+                    server(m, sp -> log("  Maese Galen, el vapor: " + estadoGalenS(sp)));
+                    shot(m, "cliente_ga15_vapor_columnas");
+                });
+            }
+            t += g[4];
+            atTicks(t - 2, "Maese Galen: tras " + com.darkcraft.enemigos.GalenAnims.NOMBRES[acc], m -> server(m, sp -> log("  Maese Galen, tras "
+                    + com.darkcraft.enemigos.GalenAnims.NOMBRES[acc] + ": " + estadoGalenS(sp))));
+        }
+        // ---- a media vida: se arranca los tubos del cuello y se bebe el elixir (su frase 2); le brota el cristal
+        atTicks(t, "Maese Galen: a media vida", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                var caja = new net.minecraft.world.phys.AABB(CX - 12, P5 - 2, CZ - 12, CX + 12, P5 + 12, CZ + 12);
+                for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class, caja)) e.discard();
+                for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.Charco.class, caja)) e.discard();
+                galenHaz(sp, -1, 5.0);
+            });
+        });
+        Consumer<Minecraft> camBebe = m -> camaraElixir(m, GU + 1.4, 2.6, GV + 3.2, GU, 2.4, GV);
+        esperarA("cliente_ga16_tubos", m -> tGalen(m, com.darkcraft.enemigos.GalenAnims.BEBER) >= 16, camBebe, ClientCiTest::estadoGalenC, 120);
+        esperarA("cliente_ga17_bebe", m -> tGalen(m, com.darkcraft.enemigos.GalenAnims.BEBER) >= 52, camBebe, ClientCiTest::estadoGalenC, 140);
+        esperarA("cliente_ga18_bebido", m -> tGalen(m, com.darkcraft.enemigos.GalenAnims.BEBER) >= 80, camBebe, ClientCiTest::estadoGalenC, 160);
+        t += 98;
+        atTicks(t, "captura: bebido (en primera persona, su frase y la barra)", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> log("  Maese Galen, bebido: " + estadoGalenS(sp)));
+            log("  Maese Galen, bebido (cliente): " + estadoGalenC(m));
+            shot(m, "cliente_ga19_bebido_frase");
+        });
+        t += 6;
+        // ---- bebido: el estallido de cristal, por delante
+        atTicks(t, "Maese Galen: el estallido", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> galenHaz(sp, com.darkcraft.enemigos.GalenAnims.ESTALLIDO, 2.5));
+        });
+        esperarA("cliente_ga20_estallido", m -> tGalen(m, com.darkcraft.enemigos.GalenAnims.ESTALLIDO) >= 26,
+                m -> camaraElixir(m, GU + 1.0, 3.2, GV + 5.6, GU, 1.6, GV), ClientCiTest::estadoGalenC, 120);
+        t += 50;
+        // ---- el gran alambique ventea por la base (bebido, peleando): el jugador arrimado; desde lo alto, al suroeste
+        atTicks(t, "Maese Galen: el gran alambique, arrimado", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                galenHaz(sp, 0, 6.0);
+                irMirando(sp, CX - 2.5, P5 + 1, CZ + 0.5, CX + 0.5, P5 + 3.0, CZ + 0.5, false);
+            });
+        });
+        Consumer<Minecraft> camVenteo = m -> camaraElixir(m, -5.5, 3.6, 5.5, 0.5, 1.0, 0.5);
+        atTicks(t + 4, "la camara: el alambique", camVenteo);
+        atTicks(t + 10, "Maese Galen: que ventee ya", m -> server(m, sp -> {
+            var c = galenE();
+            if (c != null) c.ventearYa();
+        }));
+        atTicks(t + 14, "captura: el alambique ventea", m -> {
+            camVenteo.accept(m);
+            log("  cliente_ga21_alambique_ventea: " + estadoGalenC(m));
+            server(m, sp -> log("  Maese Galen, el gran alambique: " + estadoGalenS(sp)));
+            shot(m, "cliente_ga21_alambique_ventea");
+        });
+        t += 30;
+        // ---- cae: de rodillas (la mano hacia el alambique), al suelo y se rompe en cristal verde; el cartel, lo que deja
+        final int C = t;
+        atTicks(C, "Maese Galen: cae", m -> {
+            com.darkcraft.client.ui.Carteles.callados = true;
+            m.options.hideGui = true;
+            server(m, sp -> {
+                galenHaz(sp, 0, 6.0);
+                log("  Maese Galen, antes de caer: " + estadoGalenS(sp) + " | ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro "
+                        + com.darkcraft.story.Logros.tiene(sp, "galen"));
+                comando(sp, "darkcraft galen vencer");
+            });
+        });
+        Consumer<Minecraft> camCae = m -> camaraElixir(m, GU - 2.8, 2.4, GV + 3.4, GU, 1.0, GV + 0.8);
+        esperarA("cliente_ga22_cae_rodillas", m -> {
+            var r = galenC(m);
+            return r != null && r.deathTime >= 28;
+        }, camCae, ClientCiTest::estadoGalenC, 100);
+        esperarA("cliente_ga23_cae_suelo", m -> {
+            var r = galenC(m);
+            return r != null && r.deathTime >= 92;
+        }, camCae, ClientCiTest::estadoGalenC, 160);
+        esperarA("cliente_ga24_ultimas_gotas", m -> {
+            var r = galenC(m);
+            return r != null && r.deathTime >= 150;
+        }, camCae, ClientCiTest::estadoGalenC, 220);
+        // se rompe en el tick 158 de su muerte (y se va en el 160): en cuanto llega o se ha ido
+        esperarA("cliente_ga25_se_rompe", m -> {
+            var r = galenC(m);
+            return r == null || r.deathTime >= 159;
+        }, camCae, ClientCiTest::estadoGalenC, 230);
+        atTicks(C + 175, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 178, "captura: JEFE ABATIDO", m -> {
+            log("  Maese Galen: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  Maese Galen, tras caer: " + estadoGalenS(sp) + " | ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro "
+                    + com.darkcraft.story.Logros.tiene(sp, "galen") + " | en paz " + com.darkcraft.morvain.Lazareto.enPaz(sp.server)));
+            shot(m, "cliente_ga26_jefe_abatido");
+        });
+        atTicks(C + 182, "lo que deja, en el suelo", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                StringBuilder sb = new StringBuilder();
+                Vec3 donde = null;
+                for (var it : sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, sp.getBoundingBox().inflate(24))) {
+                    sb.append(it.getItem().getCount()).append(' ').append(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(it.getItem().getItem())).append("; ");
+                    if (it.getItem().is(DarkCraftMod.JERINGA_FISICO.get())) donde = it.position();
+                }
+                log("  Maese Galen, lo que deja: " + sb + "| la jeringa en " + (donde == null ? "NINGUN SITIO"
+                        : String.format(java.util.Locale.ROOT, "%.1f, %.1f, %.1f", donde.x, donde.y, donde.z)));
+                Vec3 q = donde == null ? new Vec3(CX + GU, P5 + 1, CZ + GV) : donde;
+                irMirando(sp, q.x - 2.0, q.y + 0.2, q.z + 0.6, q.x, q.y, q.z, false);
+            });
+        });
+        atTicks(C + 200, "captura: lo que deja", m -> {
+            primeraSinHud(m);
+            shot(m, "cliente_ga27_lo_que_deja");
+        });
+        atTicks(C + 204, "la Jeringa del Fisico en la mano", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                for (var it : sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, sp.getBoundingBox().inflate(24))) it.discard();
+                sp.setGameMode(GameType.CREATIVE);
+                sp.getInventory().setItem(0, new ItemStack(DarkCraftMod.JERINGA_FISICO.get()));
+                sp.getInventory().selected = 0;
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
+                irMirando(sp, CX - 3.5, P5 + 1, CZ + 2.0, CX - 3.5, P5 + 2.6, CZ + 8.0, false);
+            });
+        });
+        atTicks(C + 214, "tercera persona", m -> {
+            m.options.hideGui = true;
+            m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+        });
+        atTicks(C + 234, "captura: la jeringa en la mano", m -> {
+            if (m.player != null) {
+                ItemStack st = m.player.getMainHandItem();
+                java.util.List<net.minecraft.network.chat.Component> tip = new java.util.ArrayList<>();
+                st.getItem().appendHoverText(st, m.level, tip, net.minecraft.world.item.TooltipFlag.NORMAL);
+                StringBuilder sb = new StringBuilder();
+                for (var c : tip) sb.append(c.getString()).append(" / ");
+                var esc = com.darkcraft.combate.Escalado.de(st);
+                log("  Maese Galen: en la mano " + st.getHoverName().getString() + " (" + com.darkcraft.combate.Armas.de(st) + ", escala " + (esc == null ? "-" : esc.letras())
+                        + ") | " + sb);
+            }
+            shot(m, "cliente_ga28_jeringa_en_la_mano");
+        });
+        atTicks(C + 238, "el bestiario: Maese Galen", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("galen")));
+        });
+        atTicks(C + 256, "captura: Maese Galen en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_ga29_bestiario_galen");
+        });
+        atTicks(C + 262, "Maese Galen: fin (vuelven el y los Destilados del lazareto)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_ESPERA.clear();
+            server(m, sp -> {
+                log("  Maese Galen, al acabar: " + estadoGalenS(sp) + " | en paz " + com.darkcraft.morvain.Lazareto.enPaz(sp.server));
+                quitarDestilados(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                com.darkcraft.enemigos.Sangrado.limpiar(sp);
+                sp.setHealth(sp.getMaxHealth());
+                sp.getInventory().setItem(0, ItemStack.EMPTY);
+                comando(sp, "darkcraft galen volver");
+                comando(sp, "darkcraft lazareto enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+                log("  Maese Galen, vuelto: " + com.darkcraft.morvain.MorvainEnemigos.estadoGalen(sp.server));
             });
         });
         return C + 292;

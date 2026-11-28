@@ -74,7 +74,7 @@ public final class MorvainEnemigos {
             ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
             PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon", DRAGON = "dragon", GARGOLA = "gargola", CENTINELA = "centinela",
             ISOLDE = "isolde", ESPECTRO = "espectro", PERRO = "perro", SOMBRA = "sombra", ENTERRADO = "enterrado", CAPATAZ = "capataz",
-            ENSAMBLADO = "ensamblado", OSMUND = "osmund", DESTILADO = "destilado";
+            ENSAMBLADO = "ensamblado", OSMUND = "osmund", DESTILADO = "destilado", GALEN = "galen";
     /** El tipo de puesto de las gargolas (para las pruebas). */
     public static final String GARGOLA_TIPO = GARGOLA;
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
@@ -248,7 +248,8 @@ public final class MorvainEnemigos {
                     e.ronda(), e.grupo()));
         // ---- el Lazareto de Maese Galen (parte 7au): los Destilados del islote y de cada planta de la torre
         for (Lazareto.Espera e : Lazareto.get().esperas())
-            LAZARETO_P.add(new Puesto(DESTILADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
+            LAZARETO_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? GALEN : DESTILADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
+                    e.ronda(), e.grupo()));
         // ---- la casa de la Sombra (parte 7ab): la reina Isolde en su trono (el puesto 0) y los de la torre del homenaje (los
         // centinelas, los espectros del archivo, los marcados de la prision y sus perros); el tipo de cada uno lo dice el plano
         for (Homenaje.Espera e : Homenaje.get().esperas())
@@ -303,6 +304,11 @@ public final class MorvainEnemigos {
         return 0;
     }
 
+    /** El numero del puesto de Maese Galen en el sitio del lazareto. */
+    public static int galen() {
+        return 0;
+    }
+
     /** El numero del puesto de Anselmo, el Pontifice Sangrante, en el sitio del Altar. */
     public static int pontifice() {
         return 0;
@@ -344,6 +350,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(ENSAMBLADO, DarkCraftMod.ENSAMBLADO);
         Puestos.tipo(OSMUND, DarkCraftMod.OSMUND);
         Puestos.tipo(DESTILADO, DarkCraftMod.DESTILADO);
+        Puestos.tipo(GALEN, DarkCraftMod.GALEN);
         Puestos.tipo(CONDESTABLE, DarkCraftMod.CONDESTABLE);
         Puestos.tipo(ERUDITO, DarkCraftMod.ERUDITO);
         Puestos.tipo(RECTORA, DarkCraftMod.RECTORA);
@@ -408,7 +415,8 @@ public final class MorvainEnemigos {
         // vuelven)
         Puestos.registrar(OSARIO, OSARIO_P, Morvain::es, (l, p) -> Puestos.JEFE.equals(p.grupo()) || !Osario.enPaz(l.getServer()));
         // el Lazareto: los Destilados (los que caen no vuelven hasta descansar o morir)
-        Puestos.registrar(LAZARETO, LAZARETO_P, Morvain::es);
+        // (y Maese Galen en la Sala del Elixir; vencido el, los Destilados descansan —lo hace Lazareto.paz cada segundo— y ya no vuelven)
+        Puestos.registrar(LAZARETO, LAZARETO_P, Morvain::es, (l, p) -> Puestos.JEFE.equals(p.grupo()) || !Lazareto.enPaz(l.getServer()));
         // la torre del homenaje: los centinelas, los del archivo y la prision, y la reina en su trono
         Puestos.registrar(HOMENAJE, HOMENAJE_P, Morvain::es);
         // la aguja: la Sombra (cae una vez y no vuelve: es del grupo de los jefes)
@@ -438,6 +446,9 @@ public final class MorvainEnemigos {
             // y al caer Hakon, el Capataz, el turno de noche de la mina descansa (lo hace Mina.paz cada segundo; aqui, el aviso)
             if (e instanceof com.darkcraft.enemigos.Capataz && MINA.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] Hakon, el Capataz, cae: el turno de noche de la mina descansa");
+            // y al caer Maese Galen los Destilados del lazareto descansan (lo hace Lazareto.paz cada segundo; aqui, el aviso)
+            if (e instanceof com.darkcraft.enemigos.Galen && LAZARETO.equals(e.sitio()))
+                DarkCraftMod.LOGGER.info("[DarkCraft] Maese Galen cae: los Destilados del lazareto descansan");
             // y al caer Fray Osmund los muertos del osario descansan (lo hace Osario.paz cada segundo; aqui, el aviso)
             if (e instanceof com.darkcraft.enemigos.Osmund && OSARIO.equals(e.sitio()))
                 DarkCraftMod.LOGGER.info("[DarkCraft] Fray Osmund, el Sacristan, cae: los muertos del osario descansan");
@@ -1993,6 +2004,61 @@ public final class MorvainEnemigos {
         // mirando hacia la torre (al norte)
         sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, 180f, 5f);
         return 1;
+    }
+
+    /**
+     * {@code /darkcraft galen [ir | vencer | volver | media | accion <n> | suelta]} (parte 7av): como esta Maese Galen, llevar a la Sala
+     * del Elixir, vencerle, que vuelva (y los Destilados del lazareto, como estaban), que se beba el elixir (media vida) o, para las
+     * pruebas, que haga una accion (y ninguna otra por su cuenta) contra quien lo pide.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoGalen() {
+        return net.minecraft.commands.Commands.literal("galen")
+                .executes(c -> decir(c, estadoGalen(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irLazareto(c.getSource(), "elixir")))
+                .then(net.minecraft.commands.Commands.literal("vencer").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Enemigo e = Puestos.enemigo(LAZARETO, galen());
+                    if (e instanceof com.darkcraft.enemigos.Galen b) b.vencer();
+                    else {
+                        Puestos.marcar(srv, LAZARETO, galen(), true);
+                        if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) com.darkcraft.story.Logros.dar(sp, "galen");
+                    }
+                    return decir(c, estadoGalen(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("media").executes(c -> {
+                    if (Puestos.enemigo(LAZARETO, galen()) instanceof com.darkcraft.enemigos.Galen b) b.mediaVida();
+                    return decir(c, estadoGalen(c.getSource().getServer()));
+                }))
+                .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                    var srv = c.getSource().getServer();
+                    Puestos.marcar(srv, LAZARETO, galen(), false);
+                    // los Destilados del lazareto vuelven a su sitio en cuanto salgan
+                    Puestos.todos(srv, LAZARETO, false);
+                    return decir(c, estadoGalen(srv));
+                }))
+                .then(net.minecraft.commands.Commands.literal("accion").then(net.minecraft.commands.Commands.argument("n",
+                                com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, com.darkcraft.enemigos.GalenAnims.TICKS.length - 1))
+                        .executes(c -> {
+                            if (Puestos.enemigo(LAZARETO, galen()) instanceof com.darkcraft.enemigos.Galen b) {
+                                b.quieta = true;
+                                if (b.postura() != Enemigo.DE_PIE) b.postura(Enemigo.DE_PIE);
+                                if (c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) b.setTarget(sp);
+                                b.empezar(com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "n"));
+                            }
+                            return decir(c, estadoGalen(c.getSource().getServer()));
+                        })))
+                .then(net.minecraft.commands.Commands.literal("suelta").executes(c -> {
+                    if (Puestos.enemigo(LAZARETO, galen()) instanceof com.darkcraft.enemigos.Galen b) b.quieta = false;
+                    return decir(c, estadoGalen(c.getSource().getServer()));
+                }));
+    }
+
+    public static String estadoGalen(net.minecraft.server.MinecraftServer srv) {
+        Enemigo e = Puestos.enemigo(LAZARETO, galen());
+        String s = "Maese Galen: " + (Lazareto.enPaz(srv) ? "caido (los Destilados descansan)" : e == null ? "esperando (no ha salido)" : "fuera");
+        if (e instanceof com.darkcraft.enemigos.Galen b) s += ", " + b.estado();
+        return s + "; Destilados del lazareto: quedan " + Puestos.quedan(srv, LAZARETO) + " de " + LAZARETO_P.size() + " (fuera " + Puestos.fuera(LAZARETO)
+                + "), descansan " + Lazareto.DESCANSAN;
     }
 
     /** Cuantos Destilados quedan y lo que hay en el lazareto (si esta cargado). */

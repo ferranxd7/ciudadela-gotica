@@ -336,6 +336,17 @@
     "lufs": -16
   },
   {
+    "id": "galen",
+    "pagina": "https://opengameart.org/node/116392",
+    "busca": "misdeeds",
+    "titulo": "Land of Misdeeds",
+    "autor": "Jonathan Shaw",
+    "licencia": "CC-BY 3.0",
+    "aviso": "\"Land of Misdeeds\" Composed by Jonathan Shaw (www.jshaw.co.uk)",
+    "uso": "Maese Galen, el físico del Lazareto (la Sala del Elixir del Lazareto, en el Pantano Podrido de Morvain)",
+    "lufs": -16
+  },
+  {
     "id": "sombra1",
     "pagina": "https://opengameart.org/node/73591",
     "busca": "the_final_battle",

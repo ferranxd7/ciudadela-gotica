@@ -134,6 +134,8 @@ public final class ClientSetup {
         // Fray Osmund y las calaveras de su corona (parte 7at)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.OSMUND.get(), com.darkcraft.client.enemigos.OsmundRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CALAVERA_OSMUND.get(), com.darkcraft.client.enemigos.CalaveraOsmundRenderer::new);
+        // Maese Galen, el fisico del Lazareto (parte 7av)
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.GALEN.get(), com.darkcraft.client.enemigos.GalenRenderer::new);
         // los destilados del Lazareto y sus frascos (parte 7au)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.DESTILADO.get(), com.darkcraft.client.enemigos.DestiladoRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.FRASCO_DESTILADO.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
@@ -200,6 +202,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.EnsambladoModelo.CAPA, com.darkcraft.client.enemigos.EnsambladoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CapatazModelo.CAPA, com.darkcraft.client.enemigos.CapatazGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.OsmundModelo.CAPA, com.darkcraft.client.enemigos.OsmundGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.GalenModelo.CAPA, com.darkcraft.client.enemigos.GalenGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.DestiladoModelo.CAPA, com.darkcraft.client.enemigos.DestiladoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.AhorcadoModelo.CAPA, com.darkcraft.client.enemigos.AhorcadoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.MolineraModelo.CAPA, com.darkcraft.client.enemigos.MolineraGeometria::crear);

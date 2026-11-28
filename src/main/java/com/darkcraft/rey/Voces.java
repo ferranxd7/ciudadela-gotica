@@ -54,6 +54,8 @@ public final class Voces {
     public static final int BASE_CAPATAZ = 180;
     /** Las de Fray Osmund, el Sacristan del Osario de San Ulfo (parte 7at): 190 + N (1..5). */
     public static final int BASE_OSMUND = 190;
+    /** Las de Maese Galen, el fisico del Lazareto (parte 7av): 200 + N (1..5). */
+    public static final int BASE_GALEN = 200;
     /** Pausa entre dos frases seguidas (ticks): 0,3 s. */
     public static final int PAUSA = 6;
     /** Lo que se queda el subtitulo despues de acabar de hablar (ticks): 0,8 s. */
@@ -81,6 +83,7 @@ public final class Voces {
     private static final float[] ISOLDE = {0, 8.98f, 2.33f, 4.6f, 3.42f, 3.74f, 4.74f};
     private static final float[] CAPATAZ = {0, 5.48f, 7.67f, 5.96f, 3.23f, 6.46f};
     private static final float[] OSMUND = {0, 10.72f, 6.64f, 8.16f, 3.12f, 6.16f};
+    private static final float[] GALEN = {0, 9.81f, 6.75f, 4.89f, 3.82f, 5.57f};
     // la Sombra en las cinematicas (1..6 la de inicio, 7..9 el viaje a Valdrenn), en la cadena del sur (21..23, parte 7aa), al
     // entrar en la torre del homenaje (24, parte 7ab) y en la aguja (25..33, parte 7ac: ante la puerta, al despertar, a media vida, si
     // cae su presa, al llamar a los caidos, al rendirse, golpeado o tomado su corazon, y al despertar otra vez); las 10..20 son las del
@@ -109,6 +112,7 @@ public final class Voces {
                 leer(o, "habla_isolde", ISOLDE);
                 leer(o, "habla_capataz", CAPATAZ);
                 leer(o, "habla_osmund", OSMUND);
+                leer(o, "habla_galen", GALEN);
                 leer(o, "habla_sombra", SOMBRA);
                 if (o.has("habla")) {
                     leer(o, "habla", REY);
@@ -177,6 +181,11 @@ public final class Voces {
         return linea > BASE_OSMUND && linea < BASE_OSMUND + 10;
     }
 
+    /** Las de Maese Galen, el fisico del Lazareto (201..205). */
+    public static boolean esGalen(int linea) {
+        return linea > BASE_GALEN && linea < BASE_GALEN + 10;
+    }
+
     /** De que gigante es una linea suya (0 Ogmund, 1 Ulfgar, 2 Haldor). */
     public static int gigante(int linea) {
         return Math.max(0, Math.min(2, (linea - BASE_GIGANTE - 1) / 3));
@@ -219,7 +228,7 @@ public final class Voces {
     }
 
     /**
-     * Si la linea existe (1..13 el Rey, 181..185 el Capataz, 191..195 Fray Osmund, 121..125 Aldric, 21..25 el Condestable, 31..35 la Rectora, 15..19 el Pontifice, 41..45 el Capitan, 51..55 el Ballenero, 61..65 la Molinera, 71..75 el Verdugo, 81..85
+     * Si la linea existe (1..13 el Rey, 181..185 el Capataz, 191..195 Fray Osmund, 201..205 Maese Galen, 121..125 Aldric, 21..25 el Condestable, 31..35 la Rectora, 15..19 el Pontifice, 41..45 el Capitan, 51..55 el Ballenero, 61..65 la Molinera, 71..75 el Verdugo, 81..85
      * el Barquero, 91..95 el Abad, 101..118 Gavran).
      */
     public static boolean valida(int linea) {
@@ -229,6 +238,7 @@ public final class Voces {
         if (esIsolde(linea)) return linea - BASE_ISOLDE < ISOLDE.length;
         if (esCapataz(linea)) return linea - BASE_CAPATAZ < CAPATAZ.length;
         if (esOsmund(linea)) return linea - BASE_OSMUND < OSMUND.length;
+        if (esGalen(linea)) return linea - BASE_GALEN < GALEN.length;
         if (esGigante(linea)) return linea - BASE_GIGANTE < GIGANTE.length;
         if (esAldric(linea)) return linea - BASE_ALDRIC < ALDRIC.length;
         if (esCondestable(linea)) return linea - BASE_CONDESTABLE < CONDESTABLE.length;
@@ -268,6 +278,10 @@ public final class Voces {
         if (esOsmund(linea)) {
             int n = linea - BASE_OSMUND;
             return n > 0 && n < OSMUND.length ? OSMUND[n] : 4f;
+        }
+        if (esGalen(linea)) {
+            int n = linea - BASE_GALEN;
+            return n > 0 && n < GALEN.length ? GALEN[n] : 4f;
         }
         if (esGigante(linea)) {
             int n = linea - BASE_GIGANTE;
@@ -349,6 +363,10 @@ public final class Voces {
         }
         if (esOsmund(linea)) {
             int n = linea - BASE_OSMUND;
+            return n == 3 || n == 4;
+        }
+        if (esGalen(linea)) {
+            int n = linea - BASE_GALEN;
             return n == 3 || n == 4;
         }
         if (esBufon(linea)) {

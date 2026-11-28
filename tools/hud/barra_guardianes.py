@@ -83,6 +83,10 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   su aureola de huesos con cinco calaveras y cuatro velas y, dentro, su calavera bajo la capucha con las almas en las cuencas;
   relleno de polvo de hueso que corre con almas azules; esquirlas de hueso, una calaverita y chispas de almas al recibir dano.
 
+  Maese Galen, el fisico del Lazareto (parte 7av): la barra es su jeringa (el cristal con el marco de laton y las rayas de medida,
+  el disco del embolo a la izquierda y la aguja a la derecha) y en el centro la redoma de su alambique con el elixir verde, el
+  cuello de cobre y los tubos, y delante sus gafas redondas; relleno de elixir verde con burbujas; esquirlas de cristal y gotas.
+
   La Sombra sin Nombre (parte 7ac): sus cadenas de hierro negro de punta a punta, rotas por tres sitios (las puntas al rojo), y en
   el centro la capucha sin cara (la oscuridad y dos ojos rojos) con la corona rota de Corvin flotando encima; relleno de oscuridad
   con venas rojas que laten; jirones de sombra y chispas rojas que suben al recibir dano.
@@ -90,7 +94,7 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
 abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png, pontifice_barra.png, aldric_barra.png,
 gigante_barra.png, jinete_barra.png, bufon_barra.png, dragon_barra.png, isolde_barra.png, sombra_barra.png, sigrun_barra.png,
-capataz_barra.png y osmund_barra.png
+capataz_barra.png, osmund_barra.png y galen_barra.png
 (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
@@ -2953,6 +2957,146 @@ def huesos_almas():
     return img
 
 
+# ---------------------------------------------------------------- Maese Galen, el fisico del Lazareto (parte 7av)
+
+CU_DD, CU_D, CU, CU_L, CU_H = hexc("2a120a"), hexc("5a2c16"), hexc("8a4624"), hexc("b8693a"), hexc("e6a070")
+LT_D, LT, LT_L, LT_H = hexc("4a3512"), hexc("8a6c33"), hexc("c49a4e"), hexc("f0d68a")
+VI_D, VI, VI_H = hexc("3e5a4c"), hexc("a9d2bb"), hexc("e6f7ee")
+EL_DD, EL_D, EL, EL_L, EL_H = hexc("0b2a14"), hexc("1a6a32"), hexc("2a9a48"), hexc("46c866"), hexc("b8ffcc")
+AC_D, AC, AC_H = hexc("4a4e56"), hexc("9aa0aa"), hexc("e0e4ea")
+
+
+def marco_galen():
+    """La barra es su jeringa: el cristal con el marco de laton y las rayas de medida de punta a punta (dentro, el elixir: la vida), a
+    la izquierda el disco del embolo y su vastago y a la derecha la punta de laton y la aguja; en el centro la redoma de su alambique,
+    con el elixir verde, el cuello de cobre y los dos tubos que bajan a los lados, y delante sus gafas redondas de cristal verde."""
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 3, FX1 + 2, FY0 - 3, FY1 + 2
+    ym = (y0 + y1) // 2
+    # el cristal de la jeringa: el marco de laton arriba y abajo (con las rayas de medida) y el borde del cristal
+    for x in range(x0, x1 + 1):
+        for y in range(y0 - 1, y1 + 2):
+            put(img, x, y, OUT)
+        for y in range(y0, y1 + 1):
+            if y == y0:
+                c = LT_H if (x - x0) % 12 == 0 else LT_L
+            elif y == y0 + 1:
+                c = LT
+            elif y == y1:
+                c = LT_D
+            elif y == y1 - 1:
+                c = LT
+            else:
+                c = VI_D
+            put(img, x, y, c)
+        if (x - x0) % 12 == 0 and x0 < x < x1:
+            put(img, x, y0 + 2, LT_H)                          # las rayas de medida
+            if (x - x0) % 48 == 0:
+                put(img, x, y1 - 2, LT_H)
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, VI)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # a la izquierda: las aletas, el vastago y el disco del embolo
+    for y in range(y0 - 4, y1 + 5):
+        for x in range(x0 - 3, x0 + 1):
+            put(img, x, y, OUT)
+    for y in range(y0 - 3, y1 + 4):
+        for x in range(x0 - 2, x0):
+            put(img, x, y, LT_L if y < ym else LT)
+    for x in range(0, x0 - 2):
+        for y in range(ym - 2, ym + 3):
+            put(img, x, y, OUT)
+        for y in range(ym - 1, ym + 2):
+            put(img, x, y, AC_H if y == ym - 1 else AC)
+    for y in range(ym - 7, ym + 8):
+        for x in range(0, 3):
+            put(img, x, y, OUT if x == 2 or y in (ym - 7, ym + 7) else LT_L if y < ym else LT)
+    # a la derecha: la punta de laton (se estrecha) y la aguja
+    for k, semi in enumerate((7, 6, 5, 4, 3, 2)):
+        x = x1 + 1 + k
+        for y in range(ym - semi - 1, ym + semi + 2):
+            put(img, x, y, OUT)
+        for y in range(ym - semi, ym + semi + 1):
+            put(img, x, y, LT_L if y < ym else LT if y < ym + semi else LT_D)
+    for x in range(x1 + 7, FW):
+        put(img, x, ym - 1, OUT)
+        put(img, x, ym + 1, OUT)
+        put(img, x, ym, AC_H if x < FW - 1 else AC)
+    # en el centro: la redoma de su alambique (cristal, el elixir abajo y sus burbujas), el cuello de cobre y los dos tubos
+    ax, ay, ar = FW // 2, 15, 10.0
+    for y in range(0, 32):
+        for x in range(ax - 13, ax + 14):
+            if math.hypot(x - ax, y - ay) <= ar + 1:
+                put(img, x, y, OUT)
+    for y in range(0, 32):
+        for x in range(ax - 13, ax + 14):
+            d = math.hypot(x - ax, y - ay)
+            if d > ar:
+                continue
+            if d > ar - 1.1:
+                c = VI_H if (x - ax) + (y - ay) < -4 else VI
+            elif y > ay - 2:
+                c = EL_L if y < ay + 1 else EL if d < ar - 3 else EL_D
+                if (x * 7 + y * 3) % 11 == 0:
+                    c = EL_H                                   # una burbuja
+            else:
+                c = VI_D if (x + y) % 5 else VI
+            put(img, x, y, c)
+    for y in range(0, int(ay - ar) + 2):
+        for x in range(ax - 3, ax + 4):
+            put(img, x, y, OUT if x in (ax - 3, ax + 3) else CU_L if x < ax else CU)
+    for x in range(ax - 4, ax + 5):
+        put(img, x, 0, CU_H)
+    for lado in (-1, 1):
+        for k in range(9):
+            tx, ty = ax + lado * (5 + k), 2 + k // 2
+            put(img, tx, ty - 1, OUT)
+            put(img, tx, ty + 1, OUT)
+            put(img, tx, ty, CU_D)
+    # delante: las gafas redondas (cristal verde con su brillo) y el puente
+    for gx in (ax - 5, ax + 5):
+        for y in range(ay - 4, ay + 5):
+            for x in range(gx - 4, gx + 5):
+                d = math.hypot(x - gx, y - ay)
+                if d <= 4.0:
+                    put(img, x, y, OUT if d > 3.2 else LT_L if d > 2.4 else EL_H if (x - gx) + (y - ay) < -1 else EL_L)
+    for x in range(ax - 1, ax + 2):
+        put(img, x, ay - 1, LT_L)
+    return img
+
+
+def relleno_galen(k):
+    """El elixir verde que corre por la jeringa, con burbujas que suben y una raya de luz arriba."""
+    n = noise2(1811)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            t = 0.3 + 0.4 * mid + 0.4 * (n((x - k * 3) * 0.08, y * 0.6) - 0.5)
+            c = mix(EL_D, EL_L, max(0.0, min(1.0, t * 1.2)))
+            burbuja = (x - k * 2 + int(3.0 * math.sin((x + y * 7) * 0.13))) % 23
+            if burbuja == 0 and 1 <= y <= 5:
+                c = mix(c, EL_H, 0.7)
+            if y == 0:
+                c = mix(c, EL_H, 0.4)
+            if y == 6:
+                c = mix(c, EL_DD, 0.5)
+            img.putpixel((x, y), c)
+    return img
+
+
+def cristales_gotas():
+    """Lo que cae al recibir dano: esquirlas de cristal verde y gotas del elixir."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = (["vV", ".v"], [".e.", "eEe", ".e."], ["V", "v", "V"], ["e", "E"])
+    col = {"v": VI, "V": VI_H, "e": EL, "E": EL_H}
+    for k, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, k * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 def hueco(a, b):
     n = noise2(113)
     img = Image.new("RGBA", (240, 7))
@@ -3004,6 +3148,7 @@ if __name__ == "__main__":
         "sigrun": atlas(marco_sigrun(), relleno_sigrun, hueco("04070c", "0e1626"), rastro("f6fbff", "c8d8ea"), copos()),
         "capataz": atlas(marco_capataz(), relleno_capataz, hueco("070505", "17100d"), rastro("fff0e6", "f0b49a"), cascajo_veta()),
         "osmund": atlas(marco_osmund(), relleno_osmund, hueco("060606", "15130f"), rastro("f6f2e8", "c8d8e6"), huesos_almas()),
+        "galen": atlas(marco_galen(), relleno_galen, hueco("030805", "0c1a10"), rastro("f0fff4", "b0e8c0"), cristales_gotas()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))
