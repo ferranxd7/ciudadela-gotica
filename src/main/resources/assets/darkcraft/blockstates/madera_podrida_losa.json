@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/madera_podrida_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/madera_podrida_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/madera_podrida"
+      },
+      {
+        "model": "darkcraft:block/madera_podrida_2"
+      },
+      {
+        "model": "darkcraft:block/madera_podrida_3"
+      }
+    ]
+  }
+}

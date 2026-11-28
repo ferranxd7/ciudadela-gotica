@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/enlucido_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/enlucido_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/enlucido",
+        "weight": 4
+      },
+      {
+        "model": "darkcraft:block/enlucido_2",
+        "weight": 4
+      },
+      {
+        "model": "darkcraft:block/enlucido_3",
+        "weight": 1
+      }
+    ]
+  }
+}

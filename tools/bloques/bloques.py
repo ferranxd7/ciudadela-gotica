@@ -5,8 +5,9 @@ Uso:
     python3 tools/bloques/bloques.py            # escribe texturas, JSON, CatalogoBloques.java y ci/historia/bloques.py
     python3 tools/bloques/bloques.py --vista /tmp/vb   # ademas, hojas para revisar (cada textura repetida y un cubo)
 
-Cada material tiene sus formas: B bloque, E escalera, L losa, M muro, C columna (con lado y tapa). Los ids:
-<id> (o <id> la columna), <id>_escalera, <id>_losa, <id>_muro.
+Cada material tiene sus formas: B bloque, E escalera, L losa, M muro, C columna (con lado y tapa), V valla, P cancela
+(la puerta de la valla), D puerta, T trampilla. Los ids: <id> (o <id> la columna), <id>_escalera, <id>_losa, <id>_muro,
+<id>_valla, <id>_cancela, <id>_puerta, <id>_trampilla.
 """
 import json
 import os
@@ -18,6 +19,7 @@ from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pintor as P  # noqa: E402
+import madera as W  # noqa: E402
 
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RES = os.path.join(RAIZ, "src", "main", "resources")
@@ -62,6 +64,24 @@ R = {
     "cal": ["#4a453d", "#5d574d", "#716a5e", "#857d6f", "#999181", "#ada593", "#bfb7a5"],
     "tierra": ["#1d1610", "#272016", "#31291d", "#3c3324", "#473d2c"],
     "junta_oscura": ["#0e0c0c", "#161313", "#1f1b1b", "#282323"],
+    # maderas (parte 8c)
+    "m_negra": ["#08070a", "#0f0c0b", "#17120f", "#1f1813", "#271f18", "#30261d", "#3a2e23", "#453629", "#513f30", "#5d4837"],
+    "m_roble": ["#1a0f08", "#24160c", "#2f1d10", "#3b2514", "#472d19", "#54361e", "#613f24", "#6e492a", "#7c5331", "#8a5e39",
+                "#986942"],
+    "m_gris": ["#151413", "#1f1d1b", "#2a2724", "#36322e", "#423d38", "#4e4842", "#5b544d", "#686058", "#766d64", "#847a70",
+               "#93887d"],
+    "m_ceniza": ["#2e2924", "#3c362f", "#4b443b", "#5a5247", "#6a6154", "#7a7061", "#8a806f", "#9b907e", "#aca08e",
+                 "#bdb19f", "#cdc2b0"],
+    "m_podrida": ["#0c0d08", "#13140c", "#1b1b11", "#232315", "#2c2b1a", "#35331f", "#3f3c25", "#49452b", "#544f31", "#5f5938"],
+    "m_quemada": ["#040404", "#090808", "#0f0d0c", "#161311", "#1d1916", "#251f1b", "#2e2620", "#382e26"],
+    "m_caoba": ["#150605", "#200a07", "#2b0f0a", "#36140d", "#421a10", "#4f2014", "#5c2718", "#692e1c", "#773521", "#853d26"],
+    "hierro": ["#0b0b0d", "#141417", "#1e1e22", "#29292e", "#35353b", "#424249", "#505058", "#5f5f68", "#707079"],
+    "enlucido": ["#5b564c", "#6a6458", "#797265", "#888172", "#978f80", "#a69e8e", "#b4ac9c", "#c2baaa", "#cec7b8", "#d9d3c5"],
+    "pizarra": ["#0b0c0f", "#121418", "#1a1d22", "#22262c", "#2b3037", "#353a42", "#3f454e", "#4a505a", "#565d67", "#626974"],
+    "pizarra_azul": ["#0a0c12", "#10141c", "#171c26", "#1f2531", "#272e3c", "#303848", "#3a4254", "#454d60", "#50596c"],
+    "teja": ["#200b06", "#2e1009", "#3d150c", "#4c1b0f", "#5b2112", "#6b2816", "#7a2f1a", "#8a371f", "#994026", "#a84a2e",
+             "#b65537"],
+    "liquen": ["#6e6a4c", "#7f7a57", "#908a62", "#a29b6e"],
 }
 RAMPAS = {k: P.Rampa(v) for k, v in R.items()}
 
@@ -202,12 +222,140 @@ def t_col_tapa(rampa, base):
     return lambda s: RAMPAS[rampa].pintar(P.columna_tapa(s, base=base).v, 0.5)
 
 
+# ------------------------------------------------------------------ la madera, los entramados y los tejados (parte 8c)
+
+def t_tablas(rampa, **kw):
+    """Tablones del material (las variantes casan por `borde`)."""
+    return lambda s, b: RAMPAS[rampa].pintar(W.tablones(s, borde=b, **kw).v, 0.6)
+
+
+def t_viga_lado(rampa, base=0.55):
+    return lambda s: RAMPAS[rampa].pintar(W.viga_lado(s, base=base).v, 0.6)
+
+
+def t_viga_tapa(rampa, base=0.55):
+    return lambda s: RAMPAS[rampa].pintar(W.viga_tapa(s, base=base).v, 0.6)
+
+
+def _herraje(rgb, hierro, s, hueco=None):
+    """Pinta el hierro (con su filo de luz arriba y su sombra abajo, y los remaches) sobre la madera; el hueco, transparente."""
+    h = hierro.astype(float)
+    luz = 0.42 + 0.30 * np.clip(P.relieve(h), -1, 1) + 0.10 * (P.ruido(s + 51, base=16, octavas=2) - 0.5)
+    rem = W.remaches(hierro)
+    luz = np.where(rem, 0.95, luz)
+    luz = np.where(np.roll(rem, -1, axis=0) | np.roll(rem, -1, axis=1), np.maximum(luz - 0.25, 0.1), luz)
+    met = RAMPAS["hierro"].pintar(np.clip(luz, 0, 1), 0.5)
+    sombra = (~hierro) & np.roll(hierro, 1, axis=0)
+    rgb = np.where(sombra[..., None], rgb * 0.72, rgb)
+    rgb = np.where(hierro[..., None], met, rgb)
+    alfa = None
+    if hueco is not None:
+        alfa = np.where(hueco, 0, 255)
+    return rgb, alfa
+
+
+def extra_madera(rampa, base=0.55, puerta=True, trampilla=True):
+    """Las texturas de la puerta (abajo, arriba y su dibujo de objeto) y de la trampilla de una madera."""
+    def f(m):
+        s = m["semilla"] + 500
+        out = {}
+        if puerta:
+            mitades = W.puerta(s, base=base)
+            imgs = []
+            for nombre, (L, hierro, hueco) in zip(("_puerta_abajo", "_puerta_arriba"), mitades):
+                rgb = RAMPAS[rampa].pintar(L.v, 0.6)
+                rgb, alfa = _herraje(rgb, hierro, s, hueco if hueco.any() else None)
+                img = P.imagen(rgb, alfa)
+                out[m["id"] + nombre] = img
+                imgs.append(img)
+            # el objeto: la puerta entera reducida a la mitad, en el centro de 64 x 64
+            entera = Image.new("RGBA", (64, 128))
+            entera.paste(imgs[1], (0, 0))
+            entera.paste(imgs[0], (0, 64))
+            peq = entera.resize((32, 64), Image.BOX)
+            obj = Image.new("RGBA", (64, 64))
+            obj.paste(peq, (16, 0))
+            out["item/" + m["id"] + "_puerta"] = obj
+        if trampilla:
+            L, hierro = W.trampilla(s + 7, base=base)
+            rgb = RAMPAS[rampa].pintar(L.v, 0.6)
+            rgb, _ = _herraje(rgb, hierro, s + 7)
+            out[m["id"] + "_trampilla"] = P.imagen(rgb)
+        return out
+    return f
+
+
+def t_entramado(figura, viga="m_negra"):
+    def f(s, b):
+        E, V, mascara = W.entramado(s, figura, ladrillo=1.0 if (s - b) // 1000 == 2 else 0.0)
+        cal = RAMPAS["enlucido"].pintar(E.v, 0.6)
+        if E.ladrillo.any():
+            lad = con_junta(P.ladrillos(s + 5, alto=4, anchos=(7, 9)), "ladrillo", "cal")
+            cal = np.where(E.ladrillo[..., None], lad, cal)
+        madera = RAMPAS[viga].pintar(V.v, 0.6)
+        return np.where(mascara[..., None], madera, cal)
+    return f
+
+
+def t_enlucido(s, b):
+    # solo la tercera variante (la rara: pesos 4, 4, 1) deja ver el ladrillo
+    E = W.enlucido(s, ladrillo=1.0 if (s - b) // 1000 == 2 else 0.0)
+    cal = RAMPAS["enlucido"].pintar(E.v, 0.6)
+    if E.ladrillo.any():
+        lad = con_junta(P.ladrillos(s + 5, alto=4, anchos=(7, 9)), "ladrillo", "cal")
+        cal = np.where(E.ladrillo[..., None], lad, cal)
+    return cal
+
+
+def t_pizarra(s, b):
+    return con_junta(W.pizarra(s, borde=b), "pizarra")
+
+
+def t_escamas(s, b):
+    return con_junta(W.pizarra(s, alto=8, anchos=(8, 8), escamas=True, base=0.52, borde=b), "pizarra_azul")
+
+
+def t_barro(s, b):
+    L = W.barro(s, borde=b)
+    rgb = con_junta(L, "teja")
+    lq = np.clip((P.ruido(s + 61, base=16, octavas=2) - 0.80) * 6, 0, 1)
+    return capa(rgb, "liquen", lq, 0.3 + 0.5 * P.ruido(s + 62, base=16, octavas=2))
+
+
+def t_barro_musgo(s, b):
+    L = W.barro(s, borde=b)
+    rgb = con_junta(L, "teja")
+    abajo = np.tile(((np.arange(64) % 16) >= 9).astype(float)[:, None], (1, 64))
+    m = 0.55 * P.ruido(b + 63, base=4, octavas=4) + 0.25 * P.ruido(s + 64, base=16, octavas=2) + 0.25 * L.canal + 0.15 * abajo
+    return capa_bultos(rgb, "musgo", np.clip((m - 0.62) * 6, 0, 1), s, base=0.42)
+
+
+def t_tejamanil(s, b):
+    return con_junta(W.tejamanil(s, borde=b), "m_gris")
+
+
 # ------------------------------------------------------------------ el catalogo
 
-def M(id, es, en, receta, formas="BELM", sonido="STONE", mapa="STONE", semilla=None, variantes=3, dureza=1.5, **kw):
-    """Un material. sonido: una constante de SoundType; mapa: una de MapColor (las comprueba el compilador de Java)."""
+def M(id, es, en, receta, formas="BELM", sonido="STONE", mapa="STONE", semilla=None, variantes=3, dureza=1.5,
+      herramienta="pickaxe", juego="STONE", madera="OAK", extra=None, **kw):
+    """Un material. sonido: una constante de SoundType; mapa: una de MapColor; juego: una de BlockSetType (puertas y
+    trampillas); madera: una de WoodType (cancelas) —las comprueba el compilador de Java—; herramienta: pickaxe o axe;
+    extra(m): texturas de mas (puerta, trampilla; las que empiezan por "item/" van a las de los objetos)."""
     return dict(id=id, es=es, en=en, receta=receta, formas=formas, sonido=sonido, mapa=mapa,
-                semilla=semilla or zlib.crc32(id.encode()) % 10000, variantes=variantes, dureza=dureza, **kw)
+                semilla=semilla or zlib.crc32(id.encode()) % 10000, variantes=variantes, dureza=dureza,
+                herramienta=herramienta, juego=juego, madera=madera, extra=extra, **kw)
+
+
+def MADERA(id, es, en, rampa, mapa, juego, madera, semilla, base=0.55, formas="BELVPDT", **kw):
+    """Una madera: tablones (con escalera, losa, valla, cancela, puerta y trampilla)."""
+    return M(id, es, en, t_tablas(rampa, base=base, **kw), formas=formas, sonido="WOOD", mapa=mapa, semilla=semilla,
+             dureza=2.0, herramienta="axe", juego=juego, madera=madera,
+             extra=extra_madera(rampa, base=base, puerta="D" in formas, trampilla="T" in formas))
+
+
+def VIGA(id, es, en, rampa, mapa, semilla, base=0.55):
+    return M(id, es, en, None, formas="C", sonido="WOOD", mapa=mapa, semilla=semilla, dureza=2.0, herramienta="axe",
+             lado=t_viga_lado(rampa, base), tapa=t_viga_tapa(rampa, base))
 
 
 MATERIALES = [
@@ -235,11 +383,57 @@ MATERIALES = [
       lado=t_col_lado("marmol", 0.66), tapa=t_col_tapa("marmol", 0.66)),
     M("columna_oscura", "Columna de basalto", "Basalt Column", None, formas="C", sonido="DEEPSLATE_BRICKS", mapa="COLOR_BLACK",
       semilla=124, lado=t_col_lado("basalto", 0.58), tapa=t_col_tapa("basalto", 0.58)),
+    # ---- parte 8c: la madera, los entramados y los tejados
+    MADERA("madera_negra", "Madera negra", "Blackwood", "m_negra", "COLOR_BLACK", "DARK_OAK", "DARK_OAK", 201, base=0.58),
+    MADERA("madera_roble", "Roble viejo", "Old Oak", "m_roble", "WOOD", "OAK", "OAK", 202),
+    MADERA("madera_gris", "Madera gris", "Greywood", "m_gris", "COLOR_GRAY", "SPRUCE", "SPRUCE", 203, nudos=0.6),
+    MADERA("madera_ceniza", "Madera de ceniza", "Ashwood", "m_ceniza", "SAND", "BIRCH", "BIRCH", 204, nudos=0.3),
+    MADERA("madera_podrida", "Madera podrida", "Rotten Wood", "m_podrida", "COLOR_GREEN", "MANGROVE", "MANGROVE", 205,
+           agujeros=0.5, base=0.6),
+    MADERA("madera_quemada", "Madera carbonizada", "Charred Wood", "m_quemada", "COLOR_BLACK", "CRIMSON", "CRIMSON", 206,
+           cuarteado=1.0, base=0.62, clavos=False, formas="BELVP"),
+    MADERA("madera_caoba", "Caoba", "Mahogany", "m_caoba", "COLOR_RED", "JUNGLE", "JUNGLE", 207, base=0.6),
+    VIGA("viga_negra", "Viga de madera negra", "Blackwood Beam", "m_negra", "COLOR_BLACK", 211, base=0.58),
+    VIGA("viga_roble", "Viga de roble viejo", "Old Oak Beam", "m_roble", "WOOD", 212),
+    VIGA("viga_gris", "Viga de madera gris", "Greywood Beam", "m_gris", "COLOR_GRAY", 213),
+    VIGA("viga_podrida", "Viga podrida", "Rotten Beam", "m_podrida", "COLOR_GREEN", 214, base=0.6),
+    M("entramado", "Entramado", "Timber Frame", t_entramado("marco"), formas="B", sonido="WOOD", mapa="TERRACOTTA_WHITE",
+      semilla=221, herramienta="axe", pesos=[4, 4, 1]),
+    M("entramado_cruz", "Entramado en aspa", "Crossed Timber Frame", t_entramado("cruz"), formas="B", sonido="WOOD",
+      mapa="TERRACOTTA_WHITE", semilla=222, herramienta="axe",
+      pesos=[4, 4, 1]),
+    M("entramado_diagonal", "Entramado en diagonal", "Diagonal Timber Frame", t_entramado("diagonal"), formas="B",
+      sonido="WOOD", mapa="TERRACOTTA_WHITE", semilla=223, herramienta="axe",
+      pesos=[4, 4, 1]),
+    M("entramado_contra", "Entramado en contradiagonal", "Counter-Diagonal Timber Frame", t_entramado("contra"), formas="B",
+      sonido="WOOD", mapa="TERRACOTTA_WHITE", semilla=224, herramienta="axe",
+      pesos=[4, 4, 1]),
+    M("entramado_poste", "Entramado con poste", "Posted Timber Frame", t_entramado("poste"), formas="B", sonido="WOOD",
+      mapa="TERRACOTTA_WHITE", semilla=225, herramienta="axe",
+      pesos=[4, 4, 1]),
+    M("entramado_travesano", "Entramado con travesano", "Railed Timber Frame", t_entramado("travesano"), formas="B",
+      sonido="WOOD", mapa="TERRACOTTA_WHITE", semilla=226, herramienta="axe",
+      pesos=[4, 4, 1]),
+    M("enlucido", "Enlucido", "Plaster", t_enlucido, formas="BELM", sonido="STONE", mapa="TERRACOTTA_WHITE", semilla=227,
+      pesos=[4, 4, 1]),
+    M("tejado_pizarra", "Tejado de pizarra", "Slate Roof", t_pizarra, formas="BEL", sonido="DEEPSLATE_TILES",
+      mapa="COLOR_GRAY", semilla=231),
+    M("tejado_escamas", "Tejado de escamas", "Scaled Slate Roof", t_escamas, formas="BEL", sonido="DEEPSLATE_TILES",
+      mapa="COLOR_BLUE", semilla=232),
+    M("tejado_barro", "Tejado de barro", "Clay Tile Roof", t_barro, formas="BEL", sonido="STONE", mapa="TERRACOTTA_RED",
+      semilla=233),
+    M("tejado_musgo", "Tejado de barro musgoso", "Mossy Clay Tile Roof", t_barro_musgo, formas="BEL", sonido="STONE",
+      mapa="COLOR_GREEN", semilla=234),
+    M("tejado_tejamanil", "Tejado de tejamanil", "Wooden Shingle Roof", t_tejamanil, formas="BEL", sonido="WOOD",
+      mapa="COLOR_GRAY", semilla=235, herramienta="axe"),
 ]
 
-FORMAS = {"B": "", "E": "_escalera", "L": "_losa", "M": "_muro"}
-NOMBRE_FORMA_ES = {"B": "{}", "E": "Escalera de {}", "L": "Losa de {}", "M": "Muro de {}"}
-NOMBRE_FORMA_EN = {"B": "{}", "E": "{} Stairs", "L": "{} Slab", "M": "{} Wall"}
+FORMAS = {"B": "", "E": "_escalera", "L": "_losa", "M": "_muro", "V": "_valla", "P": "_cancela", "D": "_puerta",
+          "T": "_trampilla"}
+NOMBRE_FORMA_ES = {"B": "{}", "E": "Escalera de {}", "L": "Losa de {}", "M": "Muro de {}", "V": "Valla de {}",
+                   "P": "Cancela de {}", "D": "Puerta de {}", "T": "Trampilla de {}"}
+NOMBRE_FORMA_EN = {"B": "{}", "E": "{} Stairs", "L": "{} Slab", "M": "{} Wall", "V": "{} Fence", "P": "{} Fence Gate",
+                   "D": "{} Door", "T": "{} Trapdoor"}
 
 
 def minus(es):
@@ -258,7 +452,10 @@ def texturas(m):
     s = m["semilla"]
     if "C" in m["formas"]:
         return {m["id"] + "_lado": P.imagen(m["lado"](s)), m["id"] + "_tapa": P.imagen(m["tapa"](s + 1))}
-    return {n: P.imagen(m["receta"](s + 1000 * v, s)) for v, n in enumerate(nombres(m))}
+    out = {n: P.imagen(m["receta"](s + 1000 * v, s)) for v, n in enumerate(nombres(m))}
+    if m.get("extra"):
+        out.update(m["extra"](m))
+    return out
 
 
 # ------------------------------------------------------------------ JSON del juego
@@ -305,6 +502,65 @@ def estado_muro(id):
     return {"multipart": partes}
 
 
+def estado_valla(id):
+    partes = [{"apply": {"model": f"darkcraft:block/{id}_poste"}}]
+    for lado, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270)):
+        a = {"model": f"darkcraft:block/{id}_lado", "uvlock": True}
+        if y:
+            a["y"] = y
+        partes.append({"when": {lado: "true"}, "apply": a})
+    return {"multipart": partes}
+
+
+def estado_cancela(id):
+    giro = {"south": 0, "west": 90, "north": 180, "east": 270}
+    v = {}
+    for facing, y in giro.items():
+        for en_muro in ("false", "true"):
+            for abierta in ("false", "true"):
+                md = f"darkcraft:block/{id}" + ("_muro" if en_muro == "true" else "") + ("_abierta" if abierta == "true" else "")
+                e = {"model": md, "uvlock": True}
+                if y:
+                    e["y"] = y
+                v[f"facing={facing},in_wall={en_muro},open={abierta}"] = e
+    return {"variants": v}
+
+
+def estado_puerta(id):
+    giro = {"east": 0, "south": 90, "west": 180, "north": 270}
+    v = {}
+    for facing, y in giro.items():
+        for half, mitad in (("lower", "abajo"), ("upper", "arriba")):
+            for hinge, lado in (("left", "izq"), ("right", "der")):
+                for abierta in ("false", "true"):
+                    md = f"darkcraft:block/{id}_{mitad}_{lado}" + ("_abierta" if abierta == "true" else "")
+                    yy = y
+                    if abierta == "true":
+                        yy = y + (90 if hinge == "left" else 270)
+                    yy %= 360
+                    e = {"model": md}
+                    if yy:
+                        e["y"] = yy
+                    v[f"facing={facing},half={half},hinge={hinge},open={abierta}"] = e
+    return {"variants": v}
+
+
+def estado_trampilla(id):
+    giro = {"north": 0, "east": 90, "south": 180, "west": 270}
+    v = {}
+    for facing, y in giro.items():
+        for half, mitad in (("bottom", "abajo"), ("top", "arriba")):
+            for abierta in ("false", "true"):
+                if abierta == "true":
+                    e = {"model": f"darkcraft:block/{id}_abierta"}
+                    if y:
+                        e["y"] = y
+                else:
+                    e = {"model": f"darkcraft:block/{id}_{mitad}"}
+                v[f"facing={facing},half={half},open={abierta}"] = e
+    return {"variants": v}
+
+
 def escribir_material(m):
     bid = m["id"]
     tex = f"darkcraft:block/{bid}"
@@ -322,7 +578,8 @@ def escribir_material(m):
             "axis=x": {"model": f"darkcraft:block/{bid}_tumbada", "x": 90, "y": 90}}})
         j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
         return [bid]
-    enteros = [{"model": f"darkcraft:block/{n}"} for n in nombres(m)]
+    pesos = m.get("pesos")
+    enteros = [dict({"model": f"darkcraft:block/{n}"}, **({"weight": pesos[i]} if pesos else {})) for i, n in enumerate(nombres(m))]
     if "B" in m["formas"]:
         for n in nombres(m):
             j(os.path.join(mb, n + ".json"), {"parent": "minecraft:block/cube_all", "textures": {"all": f"darkcraft:block/{n}"}})
@@ -359,6 +616,46 @@ def escribir_material(m):
         j(os.path.join(bs, w + ".json"), estado_muro(w))
         j(os.path.join(mi, w + ".json"), {"parent": f"darkcraft:block/{w}_inventario"})
         ids.append(w)
+    if "V" in m["formas"]:
+        v = bid + "_valla"
+        t = {"texture": tex}
+        j(os.path.join(mb, v + "_poste.json"), {"parent": "minecraft:block/fence_post", "textures": t})
+        j(os.path.join(mb, v + "_lado.json"), {"parent": "minecraft:block/fence_side", "textures": t})
+        j(os.path.join(mb, v + "_inventario.json"), {"parent": "minecraft:block/fence_inventory", "textures": t})
+        j(os.path.join(bs, v + ".json"), estado_valla(v))
+        j(os.path.join(mi, v + ".json"), {"parent": f"darkcraft:block/{v}_inventario"})
+        ids.append(v)
+    if "P" in m["formas"]:
+        c = bid + "_cancela"
+        t = {"texture": tex}
+        for suf, padre in (("", "template_fence_gate"), ("_abierta", "template_fence_gate_open"),
+                           ("_muro", "template_fence_gate_wall"), ("_muro_abierta", "template_fence_gate_wall_open")):
+            j(os.path.join(mb, c + suf + ".json"), {"parent": "minecraft:block/" + padre, "textures": t})
+        j(os.path.join(bs, c + ".json"), estado_cancela(c))
+        j(os.path.join(mi, c + ".json"), {"parent": f"darkcraft:block/{c}"})
+        ids.append(c)
+    if "D" in m["formas"]:
+        d = bid + "_puerta"
+        t = {"bottom": tex + "_puerta_abajo", "top": tex + "_puerta_arriba"}
+        for mitad, en in (("abajo", "bottom"), ("arriba", "top")):
+            for lado, en_l in (("izq", "left"), ("der", "right")):
+                for suf in ("", "_abierta"):
+                    padre = f"minecraft:block/door_{en}_{en_l}" + ("_open" if suf else "")
+                    j(os.path.join(mb, f"{d}_{mitad}_{lado}{suf}.json"), {"parent": padre, "textures": t,
+                                                                          "render_type": "minecraft:cutout"})
+        j(os.path.join(bs, d + ".json"), estado_puerta(d))
+        j(os.path.join(mi, d + ".json"), {"parent": "minecraft:item/generated", "textures": {"layer0": f"darkcraft:item/{d}"}})
+        ids.append(d)
+    if "T" in m["formas"]:
+        tr = bid + "_trampilla"
+        t = {"texture": tex + "_trampilla"}
+        for suf, padre in (("_abajo", "template_trapdoor_bottom"), ("_arriba", "template_trapdoor_top"),
+                           ("_abierta", "template_trapdoor_open")):
+            j(os.path.join(mb, tr + suf + ".json"), {"parent": "minecraft:block/" + padre, "textures": t,
+                                                     "render_type": "minecraft:cutout"})
+        j(os.path.join(bs, tr + ".json"), estado_trampilla(tr))
+        j(os.path.join(mi, tr + ".json"), {"parent": f"darkcraft:block/{tr}_abajo"})
+        ids.append(tr)
     return ids
 
 
@@ -371,6 +668,9 @@ def botin(ids):
             entrada["functions"] = [{"function": "minecraft:set_count", "count": 2, "add": False, "conditions": [
                 {"condition": "minecraft:block_state_property", "block": "darkcraft:" + bid, "properties": {"type": "double"}}]},
                 {"function": "minecraft:explosion_decay"}]
+        if bid.endswith("_puerta"):
+            entrada["conditions"] = [{"condition": "minecraft:block_state_property", "block": "darkcraft:" + bid,
+                                      "properties": {"half": "lower"}}]
         pool = {"rolls": 1, "bonus_rolls": 0, "entries": [entrada]}
         if not bid.endswith("_losa"):
             pool["conditions"] = [{"condition": "minecraft:survives_explosion"}]
@@ -378,30 +678,47 @@ def botin(ids):
 
 
 def etiquetas():
-    """Las etiquetas de Minecraft que necesitan (los muros se unen entre si; escaleras y losas; con pico se rompen)."""
-    muros, escaleras, losas, todos = [], [], [], []
+    """Las etiquetas de Minecraft que necesitan: los muros se unen entre si y las vallas de madera tambien (`fences` y
+    `wooden_fences`); escaleras, losas, puertas y trampillas (las de madera, en las suyas); y con que se rompen."""
+    tags = {k: [] for k in ("walls", "stairs", "slabs", "fences", "wooden_fences", "fence_gates", "doors", "wooden_doors",
+                            "trapdoors", "wooden_trapdoors", "wooden_stairs", "wooden_slabs", "planks", "pickaxe", "axe")}
     for m in MATERIALES:
         b = "darkcraft:" + m["id"]
-        if "B" in m["formas"] or "C" in m["formas"]:
-            todos.append(b)
-        if "E" in m["formas"]:
-            escaleras.append(b + "_escalera")
-            todos.append(b + "_escalera")
-        if "L" in m["formas"]:
-            losas.append(b + "_losa")
-            todos.append(b + "_losa")
-        if "M" in m["formas"]:
-            muros.append(b + "_muro")
-            todos.append(b + "_muro")
+        madera = m["herramienta"] == "axe"
+        for f in m["formas"]:
+            bid = b + ("" if f == "C" else FORMAS[f])
+            tags[m["herramienta"]].append(bid)
+            if f == "E":
+                tags["stairs"].append(bid)
+                if madera:
+                    tags["wooden_stairs"].append(bid)
+            elif f == "L":
+                tags["slabs"].append(bid)
+                if madera:
+                    tags["wooden_slabs"].append(bid)
+            elif f == "M":
+                tags["walls"].append(bid)
+            elif f == "V":
+                tags["fences"].append(bid)
+                tags["wooden_fences"].append(bid)
+            elif f == "P":
+                tags["fence_gates"].append(bid)
+            elif f == "D":
+                tags["doors"].append(bid)
+                tags["wooden_doors"].append(bid)
+            elif f == "T":
+                tags["trapdoors"].append(bid)
+                tags["wooden_trapdoors"].append(bid)
+            elif f == "B" and "V" in m["formas"]:
+                tags["planks"].append(bid)
     t = os.path.join(DATA, "minecraft", "tags", "blocks")
-    j(os.path.join(t, "walls.json"), {"replace": False, "values": muros})
-    j(os.path.join(t, "stairs.json"), {"replace": False, "values": escaleras})
-    j(os.path.join(t, "slabs.json"), {"replace": False, "values": losas})
-    j(os.path.join(t, "mineable", "pickaxe.json"), {"replace": False, "values": todos})
     ti = os.path.join(DATA, "minecraft", "tags", "items")
-    j(os.path.join(ti, "walls.json"), {"replace": False, "values": muros})
-    j(os.path.join(ti, "stairs.json"), {"replace": False, "values": escaleras})
-    j(os.path.join(ti, "slabs.json"), {"replace": False, "values": losas})
+    for k, v in tags.items():
+        if k in ("pickaxe", "axe"):
+            j(os.path.join(t, "mineable", k + ".json"), {"replace": False, "values": v})
+            continue
+        j(os.path.join(t, k + ".json"), {"replace": False, "values": v})
+        j(os.path.join(ti, k + ".json"), {"replace": False, "values": v})
 
 
 def textos():
@@ -426,19 +743,24 @@ def textos():
 def java():
     filas = []
     for m in MATERIALES:
-        filas.append(f'            new Material("{m["id"]}", "{m["formas"]}", SoundType.{m["sonido"]}, MapColor.{m["mapa"]}, {m["dureza"]}F)')
+        filas.append(f'            new Material("{m["id"]}", "{m["formas"]}", SoundType.{m["sonido"]}, MapColor.{m["mapa"]}, {m["dureza"]}F, '
+                     f'BlockSetType.{m["juego"]}, WoodType.{m["madera"]}, {"true" if m["herramienta"] == "pickaxe" else "false"})')
     src = """package com.darkcraft.bloques;
 
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 
 /** GENERADO por tools/bloques/bloques.py: no tocar a mano. Los materiales de los bloques nuevos y sus formas. */
 public final class CatalogoBloques {
     private CatalogoBloques() {}
 
-    /** Un material: su id, sus formas (B bloque, E escalera, L losa, M muro, C columna), su sonido, su color en el mapa y lo
-     *  que cuesta romperlo. */
-    public record Material(String id, String formas, SoundType sonido, MapColor mapa, float dureza) {}
+    /** Un material: su id, sus formas (B bloque, E escalera, L losa, M muro, C columna, V valla, P cancela, D puerta,
+     *  T trampilla), su sonido, su color en el mapa, lo que cuesta romperlo, los sonidos de sus puertas y trampillas
+     *  (juego) y de su cancela (madera) y si hace falta un pico para que suelte algo (la piedra; la madera, no). */
+    public record Material(String id, String formas, SoundType sonido, MapColor mapa, float dureza, BlockSetType juego,
+                           WoodType madera, boolean pico) {}
 
     public static final Material[] MATERIALES = {
 """ + ",\n".join(filas) + """
@@ -476,16 +798,17 @@ def cubo(top, side, s=2):
     return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), "RGB")
 
 
-def vista(carpeta):
+def vista(carpeta, desde=0):
+    """Hojas para revisar (de cuatro en cuatro materiales, desde el numero `desde` del catalogo): un muro de 4 x 4 con las
+    variantes al azar, el cubo y, si tiene, la puerta entera y la trampilla."""
     os.makedirs(carpeta, exist_ok=True)
     tarjetas = []
-    for m in MATERIALES:
+    for m in MATERIALES[desde:]:
         tx = texturas(m)
         if "C" in m["formas"]:
             lado, tapa = tx[m["id"] + "_lado"], tx[m["id"] + "_tapa"]
         else:
             lado = tapa = tx[m["id"]]
-        # un muro de 4 x 4 bloques con las variantes al azar (como en el juego) y el cubo
         rng = np.random.default_rng(7)
         lista = [tx[n] for n in (nombres(m) if "C" not in m["formas"] else [m["id"] + "_lado"])]
         rep = Image.new("RGBA", (256, 256))
@@ -493,15 +816,28 @@ def vista(carpeta):
             for b in range(4):
                 rep.paste(lista[int(rng.integers(0, len(lista)))], (a * 64, b * 64))
         cb = cubo(tapa, lado, s=2)
-        t = Image.new("RGB", (256 + cb.size[0] + 8, max(256, cb.size[1])), (30, 30, 30))
+        extra = []
+        if m["id"] + "_puerta_abajo" in tx:
+            pu = Image.new("RGBA", (64, 128), (30, 30, 30, 255))
+            pu.alpha_composite(tx[m["id"] + "_puerta_arriba"], (0, 0))
+            pu.alpha_composite(tx[m["id"] + "_puerta_abajo"], (0, 64))
+            extra.append(pu.resize((128, 256), Image.NEAREST))
+        if m["id"] + "_trampilla" in tx:
+            extra.append(tx[m["id"] + "_trampilla"].resize((128, 128), Image.NEAREST))
+        ancho = 256 + 8 + cb.size[0] + sum(e.size[0] + 8 for e in extra)
+        t = Image.new("RGB", (ancho, 256), (30, 30, 30))
         t.paste(rep.convert("RGB"), (0, 0))
         t.paste(cb, (264, 0))
+        x = 264 + cb.size[0] + 8
+        for e in extra:
+            t.paste(e.convert("RGB"), (x, 0))
+            x += e.size[0] + 8
         tarjetas.append((m["id"], t))
     for i in range(0, len(tarjetas), 4):
         grupo = tarjetas[i:i + 4]
-        H = sum(t.size[1] + 4 for _, t in grupo)
-        W = max(t.size[0] for _, t in grupo)
-        hoja = Image.new("RGB", (W, H), (20, 20, 20))
+        alto = sum(t.size[1] + 4 for _, t in grupo)
+        ancho = max(t.size[0] for _, t in grupo)
+        hoja = Image.new("RGB", (ancho, alto), (20, 20, 20))
         y = 0
         for _, t in grupo:
             hoja.paste(t, (0, y))
@@ -517,7 +853,12 @@ def main():
     ids = []
     for m in MATERIALES:
         for nombre, img in texturas(m).items():
-            img.save(os.path.join(tdir, nombre + ".png"))
+            if nombre.startswith("item/"):
+                idir = os.path.join(ASSETS, "textures", "item")
+                os.makedirs(idir, exist_ok=True)
+                img.save(os.path.join(idir, nombre[5:] + ".png"))
+            else:
+                img.save(os.path.join(tdir, nombre + ".png"))
         ids += escribir_material(m)
     botin(ids)
     etiquetas()
@@ -525,7 +866,7 @@ def main():
     java()
     print(f"{len(MATERIALES)} materiales, {len(ids)} bloques")
     if "--vista" in args:
-        vista(args[args.index("--vista") + 1])
+        vista(args[args.index("--vista") + 1], int(args[args.index("--desde") + 1]) if "--desde" in args else 0)
 
 
 if __name__ == "__main__":

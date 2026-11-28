@@ -16,6 +16,19 @@
     "darkcraft:adoquin_losa",
     "darkcraft:enlosado_losa",
     "darkcraft:piedra_tallada_losa",
-    "darkcraft:mamposteria_losa"
+    "darkcraft:mamposteria_losa",
+    "darkcraft:madera_negra_losa",
+    "darkcraft:madera_roble_losa",
+    "darkcraft:madera_gris_losa",
+    "darkcraft:madera_ceniza_losa",
+    "darkcraft:madera_podrida_losa",
+    "darkcraft:madera_quemada_losa",
+    "darkcraft:madera_caoba_losa",
+    "darkcraft:enlucido_losa",
+    "darkcraft:tejado_pizarra_losa",
+    "darkcraft:tejado_escamas_losa",
+    "darkcraft:tejado_barro_losa",
+    "darkcraft:tejado_musgo_losa",
+    "darkcraft:tejado_tejamanil_losa"
   ]
 }

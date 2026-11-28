@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_trapdoor_top",
+  "textures": {
+    "texture": "darkcraft:block/madera_podrida_trampilla"
+  },
+  "render_type": "minecraft:cutout"
+}

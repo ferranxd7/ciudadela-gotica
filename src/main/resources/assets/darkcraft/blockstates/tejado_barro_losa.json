@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/tejado_barro_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/tejado_barro_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/tejado_barro"
+      },
+      {
+        "model": "darkcraft:block/tejado_barro_2"
+      },
+      {
+        "model": "darkcraft:block/tejado_barro_3"
+      }
+    ]
+  }
+}

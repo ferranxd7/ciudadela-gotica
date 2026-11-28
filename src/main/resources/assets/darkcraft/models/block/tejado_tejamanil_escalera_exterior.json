@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "darkcraft:block/tejado_tejamanil",
+    "top": "darkcraft:block/tejado_tejamanil",
+    "side": "darkcraft:block/tejado_tejamanil"
+  }
+}

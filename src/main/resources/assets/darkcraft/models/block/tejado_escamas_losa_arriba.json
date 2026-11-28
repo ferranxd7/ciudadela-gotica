@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "darkcraft:block/tejado_escamas",
+    "top": "darkcraft:block/tejado_escamas",
+    "side": "darkcraft:block/tejado_escamas"
+  }
+}

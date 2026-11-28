@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/madera_quemada_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/madera_quemada_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/madera_quemada"
+      },
+      {
+        "model": "darkcraft:block/madera_quemada_2"
+      },
+      {
+        "model": "darkcraft:block/madera_quemada_3"
+      }
+    ]
+  }
+}

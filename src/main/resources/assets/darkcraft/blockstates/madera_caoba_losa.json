@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/madera_caoba_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/madera_caoba_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/madera_caoba"
+      },
+      {
+        "model": "darkcraft:block/madera_caoba_2"
+      },
+      {
+        "model": "darkcraft:block/madera_caoba_3"
+      }
+    ]
+  }
+}

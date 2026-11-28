@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "darkcraft:madera_negra_escalera",
+    "darkcraft:madera_roble_escalera",
+    "darkcraft:madera_gris_escalera",
+    "darkcraft:madera_ceniza_escalera",
+    "darkcraft:madera_podrida_escalera",
+    "darkcraft:madera_quemada_escalera",
+    "darkcraft:madera_caoba_escalera",
+    "darkcraft:tejado_tejamanil_escalera"
+  ]
+}

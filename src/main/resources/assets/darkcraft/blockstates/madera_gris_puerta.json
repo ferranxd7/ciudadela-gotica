@@ -1,0 +1,124 @@
+{
+  "variants": {
+    "facing=east,half=lower,hinge=left,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_izq"
+    },
+    "facing=east,half=lower,hinge=left,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_izq_abierta",
+      "y": 90
+    },
+    "facing=east,half=lower,hinge=right,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_der"
+    },
+    "facing=east,half=lower,hinge=right,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_der_abierta",
+      "y": 270
+    },
+    "facing=east,half=upper,hinge=left,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_izq"
+    },
+    "facing=east,half=upper,hinge=left,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_izq_abierta",
+      "y": 90
+    },
+    "facing=east,half=upper,hinge=right,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_der"
+    },
+    "facing=east,half=upper,hinge=right,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_der_abierta",
+      "y": 270
+    },
+    "facing=south,half=lower,hinge=left,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_izq",
+      "y": 90
+    },
+    "facing=south,half=lower,hinge=left,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_izq_abierta",
+      "y": 180
+    },
+    "facing=south,half=lower,hinge=right,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_der",
+      "y": 90
+    },
+    "facing=south,half=lower,hinge=right,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_der_abierta"
+    },
+    "facing=south,half=upper,hinge=left,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_izq",
+      "y": 90
+    },
+    "facing=south,half=upper,hinge=left,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_izq_abierta",
+      "y": 180
+    },
+    "facing=south,half=upper,hinge=right,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_der",
+      "y": 90
+    },
+    "facing=south,half=upper,hinge=right,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_der_abierta"
+    },
+    "facing=west,half=lower,hinge=left,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_izq",
+      "y": 180
+    },
+    "facing=west,half=lower,hinge=left,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_izq_abierta",
+      "y": 270
+    },
+    "facing=west,half=lower,hinge=right,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_der",
+      "y": 180
+    },
+    "facing=west,half=lower,hinge=right,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_der_abierta",
+      "y": 90
+    },
+    "facing=west,half=upper,hinge=left,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_izq",
+      "y": 180
+    },
+    "facing=west,half=upper,hinge=left,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_izq_abierta",
+      "y": 270
+    },
+    "facing=west,half=upper,hinge=right,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_der",
+      "y": 180
+    },
+    "facing=west,half=upper,hinge=right,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_der_abierta",
+      "y": 90
+    },
+    "facing=north,half=lower,hinge=left,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_izq",
+      "y": 270
+    },
+    "facing=north,half=lower,hinge=left,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_izq_abierta"
+    },
+    "facing=north,half=lower,hinge=right,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_der",
+      "y": 270
+    },
+    "facing=north,half=lower,hinge=right,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_abajo_der_abierta",
+      "y": 180
+    },
+    "facing=north,half=upper,hinge=left,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_izq",
+      "y": 270
+    },
+    "facing=north,half=upper,hinge=left,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_izq_abierta"
+    },
+    "facing=north,half=upper,hinge=right,open=false": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_der",
+      "y": 270
+    },
+    "facing=north,half=upper,hinge=right,open=true": {
+      "model": "darkcraft:block/madera_gris_puerta_arriba_der_abierta",
+      "y": 180
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/tejado_tejamanil_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/tejado_tejamanil_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/tejado_tejamanil"
+      },
+      {
+        "model": "darkcraft:block/tejado_tejamanil_2"
+      },
+      {
+        "model": "darkcraft:block/tejado_tejamanil_3"
+      }
+    ]
+  }
+}

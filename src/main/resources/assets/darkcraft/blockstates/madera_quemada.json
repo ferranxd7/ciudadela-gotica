@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/madera_quemada"
+      },
+      {
+        "model": "darkcraft:block/madera_quemada_2"
+      },
+      {
+        "model": "darkcraft:block/madera_quemada_3"
+      }
+    ]
+  }
+}

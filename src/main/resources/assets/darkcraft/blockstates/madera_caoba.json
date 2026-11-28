@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/madera_caoba"
+      },
+      {
+        "model": "darkcraft:block/madera_caoba_2"
+      },
+      {
+        "model": "darkcraft:block/madera_caoba_3"
+      }
+    ]
+  }
+}

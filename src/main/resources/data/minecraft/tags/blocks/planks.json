@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "darkcraft:madera_negra",
+    "darkcraft:madera_roble",
+    "darkcraft:madera_gris",
+    "darkcraft:madera_ceniza",
+    "darkcraft:madera_podrida",
+    "darkcraft:madera_quemada",
+    "darkcraft:madera_caoba"
+  ]
+}

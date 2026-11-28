@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/door_bottom_left_open",
+  "textures": {
+    "bottom": "darkcraft:block/madera_gris_puerta_abajo",
+    "top": "darkcraft:block/madera_gris_puerta_arriba"
+  },
+  "render_type": "minecraft:cutout"
+}

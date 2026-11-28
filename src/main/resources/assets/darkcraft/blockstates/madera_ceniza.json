@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/madera_ceniza"
+      },
+      {
+        "model": "darkcraft:block/madera_ceniza_2"
+      },
+      {
+        "model": "darkcraft:block/madera_ceniza_3"
+      }
+    ]
+  }
+}

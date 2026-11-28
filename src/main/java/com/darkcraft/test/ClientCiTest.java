@@ -3075,19 +3075,20 @@ public final class ClientCiTest {
         });
         t += 50;
         atTicks(t, "Bloques 8b: los modelos y las texturas en el cliente", m -> log("  bloques 8b (cliente): " + modelosBloques(m)));
-        for (int g = 0; g < 5; g++) {
+        int grupos = (com.darkcraft.bloques.CatalogoBloques.MATERIALES.length + 3) / 4;
+        for (int g = 0; g < grupos; g++) {
             final int gg = g;
             atTicks(t, "Bloques 8b: grupo " + (g + 1), m -> server(m, sp -> sp.teleportTo(sp.serverLevel(), mx + gg * 28 + 12.5, my + 1.4, mz - 12.5, 0f, 9f)));
             atTicks(t + 30, "captura: bloques, grupo " + (g + 1), m -> shot(m, String.format(java.util.Locale.ROOT, "cliente_bq%02d_grupo", gg + 1)));
             t += 34;
         }
-        final int[] cerca = {3, 8, 14};
-        final String[] nombres = {"musgo", "marmol_negro", "tallada"};
+        final int[] cerca = {3, 8, 14, 21, 32, 39};
+        final String[] nombres = {"musgo", "marmol_negro", "tallada", "roble_puerta", "entramado_cruz", "tejado_escamas"};
         for (int i = 0; i < cerca.length; i++) {
             final int k = cerca[i], n = i + 6;
             final String nom = nombres[i];
             atTicks(t, "Bloques 8b: de cerca, " + nom, m -> server(m, sp -> sp.teleportTo(sp.serverLevel(), mx + k * 7 + 2.0, my + 1.15, mz - 0.6, 0f, 2f)));
-            atTicks(t + 24, "captura: de cerca, " + nom, m -> shot(m, String.format(java.util.Locale.ROOT, "cliente_bq%02d_%s", n, nom)));
+            atTicks(t + 24, "captura: de cerca, " + nom, m -> shot(m, String.format(java.util.Locale.ROOT, "cliente_bq%02d_%s", n + grupos - 5, nom)));
             t += 28;
         }
         atTicks(t, "Fin del muestrario", m -> {
@@ -3103,18 +3104,19 @@ public final class ClientCiTest {
     private static int muestrario(ServerLevel lvl, int x0, int y0, int z0) {
         int n = 0;
         net.minecraft.world.level.block.state.BlockState suelo = com.darkcraft.bloques.Bloques.de("enlosado").defaultBlockState();
-        java.util.List<BlockPos> muros = new java.util.ArrayList<>();
+        java.util.List<BlockPos> unir = new java.util.ArrayList<>();
         com.darkcraft.bloques.CatalogoBloques.Material[] mats = com.darkcraft.bloques.CatalogoBloques.MATERIALES;
         for (int i = 0; i < mats.length; i++) {
             String id = mats[i].id();
+            String f = mats[i].formas();
             int x = x0 + i * 7;
             for (int dx = -2; dx <= 5; dx++)
-                for (int dz = -3; dz <= 4; dz++) {
+                for (int dz = -4; dz <= 4; dz++) {
                     lvl.setBlock(new BlockPos(x + dx, y0 - 1, z0 + dz), suelo, 2);
                     n++;
                 }
             net.minecraft.world.level.block.Block b = com.darkcraft.bloques.Bloques.de(id);
-            if (mats[i].formas().indexOf('C') >= 0) {
+            if (f.indexOf('C') >= 0) {
                 for (int y = 0; y < 4; y++)
                     lvl.setBlock(new BlockPos(x + 1, y0 + y, z0 + 2), b.defaultBlockState(), 2);
                 net.minecraft.world.level.block.state.BlockState tumbada = b.defaultBlockState()
@@ -3132,6 +3134,10 @@ public final class ClientCiTest {
             net.minecraft.world.level.block.Block e = com.darkcraft.bloques.Bloques.de(id + "_escalera");
             net.minecraft.world.level.block.Block l = com.darkcraft.bloques.Bloques.de(id + "_losa");
             net.minecraft.world.level.block.Block w = com.darkcraft.bloques.Bloques.de(id + "_muro");
+            net.minecraft.world.level.block.Block v = com.darkcraft.bloques.Bloques.de(id + "_valla");
+            net.minecraft.world.level.block.Block c = com.darkcraft.bloques.Bloques.de(id + "_cancela");
+            net.minecraft.world.level.block.Block d = com.darkcraft.bloques.Bloques.de(id + "_puerta");
+            net.minecraft.world.level.block.Block t = com.darkcraft.bloques.Bloques.de(id + "_trampilla");
             if (e != null) {
                 net.minecraft.world.level.block.state.BlockState st = e.defaultBlockState()
                         .setValue(net.minecraft.world.level.block.StairBlock.FACING, net.minecraft.core.Direction.SOUTH);
@@ -3150,16 +3156,47 @@ public final class ClientCiTest {
                         net.minecraft.world.level.block.state.properties.SlabType.TOP), 2);
                 n += 2;
             }
-            if (w != null) {
+            net.minecraft.world.level.block.Block poste = w != null ? w : v;
+            if (poste != null) {
                 for (BlockPos p : new BlockPos[]{new BlockPos(x + 3, y0, z0), new BlockPos(x + 3, y0 + 1, z0), new BlockPos(x + 3, y0, z0 + 1)}) {
-                    lvl.setBlock(p, w.defaultBlockState(), 2);
-                    muros.add(p);
+                    lvl.setBlock(p, poste.defaultBlockState(), 2);
+                    unir.add(p);
                     n++;
                 }
             }
+            if (v != null) {
+                // una valla delante con su cancela en medio
+                for (int dx = 0; dx < 4; dx++) {
+                    BlockPos p = new BlockPos(x + dx, y0, z0 - 2);
+                    if (dx == 1 && c != null)
+                        lvl.setBlock(p, c.defaultBlockState().setValue(net.minecraft.world.level.block.FenceGateBlock.FACING,
+                                net.minecraft.core.Direction.NORTH), 2);
+                    else
+                        lvl.setBlock(p, v.defaultBlockState(), 2);
+                    unir.add(p);
+                    n++;
+                }
+            }
+            if (d != null) {
+                net.minecraft.world.level.block.state.BlockState abajo = d.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.DoorBlock.FACING, net.minecraft.core.Direction.SOUTH)
+                        .setValue(net.minecraft.world.level.block.DoorBlock.HALF, net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER);
+                lvl.setBlock(new BlockPos(x + 2, y0 + 1, z0 + 2), abajo, 2);
+                lvl.setBlock(new BlockPos(x + 2, y0 + 2, z0 + 2), abajo.setValue(net.minecraft.world.level.block.DoorBlock.HALF,
+                        net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER), 2);
+                n += 2;
+            }
+            if (t != null) {
+                // una cerrada en el suelo y otra abierta en el muro, como un postigo
+                lvl.setBlock(new BlockPos(x + 3, y0, z0 - 1), t.defaultBlockState(), 2);
+                lvl.setBlock(new BlockPos(x + 3, y0 + 2, z0 + 1), t.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.TrapDoorBlock.FACING, net.minecraft.core.Direction.NORTH)
+                        .setValue(net.minecraft.world.level.block.TrapDoorBlock.OPEN, true), 2);
+                n += 2;
+            }
         }
-        // los muros se unen a lo que tienen al lado (como al ponerlos a mano)
-        for (BlockPos p : muros)
+        // los muros y las vallas se unen a lo que tienen al lado (como al ponerlos a mano)
+        for (BlockPos p : unir)
             lvl.setBlock(p, net.minecraft.world.level.block.Block.updateFromNeighbourShapes(lvl.getBlockState(p), lvl, p), 2);
         return n;
     }

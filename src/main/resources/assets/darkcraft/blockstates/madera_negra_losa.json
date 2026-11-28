@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "darkcraft:block/madera_negra_losa"
+    },
+    "type=top": {
+      "model": "darkcraft:block/madera_negra_losa_arriba"
+    },
+    "type=double": [
+      {
+        "model": "darkcraft:block/madera_negra"
+      },
+      {
+        "model": "darkcraft:block/madera_negra_2"
+      },
+      {
+        "model": "darkcraft:block/madera_negra_3"
+      }
+    ]
+  }
+}

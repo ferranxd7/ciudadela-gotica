@@ -4681,6 +4681,34 @@ Respuestas 45-48 del plan nuevo (cero bloques de Minecraft, todas las formas, te
   cuatro en cuatro) y `bq06..08` de cerca, y la linea `bloques 8b (cliente): ...` (estados y objetos sin modelo y
   texturas que no miden 64 x 64: tienen que ser 0).
 
+### Plan nuevo, parte 8c: los bloques nuevos, segunda tanda (madera, entramados y tejados)
+
+- **Formas nuevas** (`tools/bloques/bloques.py`, estados comprobados contra los del juego: `oak_door`, `oak_trapdoor`,
+  `oak_fence`, `oak_fence_gate`): V valla (`_valla`, `FenceBlock`), P cancela (`_cancela`, `FenceGateBlock` con el
+  `WoodType` del material), D puerta (`_puerta`, `DoorBlock` + `DoubleHighBlockItem`; texturas `_puerta_abajo` y
+  `_puerta_arriba` con ventanuco de rejas transparente —modelos con `render_type` cutout— y su dibujo de objeto en
+  `textures/item/<id>_puerta.png`; solo suelta la mitad de abajo) y T trampilla (`_trampilla`, `TrapDoorBlock`). Puertas y
+  trampillas suenan con el `BlockSetType` del material. Las vallas van en `fences` y `wooden_fences` (asi se unen), las
+  cancelas en `fence_gates`, etc.; la madera se rompe con hacha (`mineable/axe`) y suelta sin herramienta; la piedra
+  necesita pico (`Material.pico`).
+- **El pintor de la madera** (`tools/bloques/madera.py`): `ruido_estirado` (vetas), `tablones` (tablas de 16 con vetas,
+  juntas, testas con clavos, nudos; `agujeros` para la podrida, `cuarteado` para la carbonizada), `viga_lado` /
+  `viga_tapa` (veta a lo largo, fendas, aristas; anillos y grietas en la testa), `enlucido` (cal con manchas, grietas,
+  chorretones y a veces un desconchado con el ladrillo), `entramado` (vigas de 4 en cada borde —con el bloque de al lado
+  hacen una de 8— y la figura: `marco`, `cruz`, `diagonal`, `contra`, `poste`, `travesano`), `pizarra` (hiladas con
+  sombra; `escamas`: canto redondo), `barro` (teja arabe: canales y cobijas), `tejamanil`, `puerta` y `trampilla`
+  (tablas en vertical con bandas de hierro remachadas, aldaba y ventanuco).
+- **Variantes con peso** (`pesos` en el catalogo → `weight` en el estado): el enlucido y los entramados tienen la tercera
+  variante (la del ladrillo a la vista) con peso 1 contra 4 y 4.
+- **Segunda tanda** (23 materiales, 76 bloques; ya son 43 y 144): siete maderas —negra, roble viejo, gris, de ceniza,
+  podrida, carbonizada (sin puerta ni trampilla) y caoba— con bloque, escalera, losa, valla, cancela, puerta y
+  trampilla; cuatro vigas (negra, roble, gris, podrida); seis entramados; el enlucido (bloque, escalera, losa, muro); y
+  cinco tejados (pizarra, escamas, barro, barro musgoso, tejamanil) con bloque, escalera y losa.
+- Pruebas: servidor, la misma linea `Bloques 8b: ...` (ahora tambien vallas, cancelas, puertas y trampillas en sus
+  etiquetas y el hacha); cliente, el muestrario lleva tambien la valla con su cancela delante, la puerta en el muro y
+  una trampilla en el suelo y otra abierta como postigo; capturas `cliente_bq01..11` (de cuatro en cuatro) y
+  `bq12..17` de cerca (musgo, marmol negro, tallada, la puerta de roble, el entramado en aspa y el tejado de escamas).
+
 ## Compilar, probar y publicar
 
 - La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (sin mods de decoracion desde la 8a) y un cliente con capturas

@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/enlucido",
+        "weight": 4
+      },
+      {
+        "model": "darkcraft:block/enlucido_2",
+        "weight": 4
+      },
+      {
+        "model": "darkcraft:block/enlucido_3",
+        "weight": 1
+      }
+    ]
+  }
+}

@@ -68,6 +68,22 @@
     "darkcraft:columna_gris",
     "darkcraft:columna_palida",
     "darkcraft:columna_marmol",
-    "darkcraft:columna_oscura"
+    "darkcraft:columna_oscura",
+    "darkcraft:enlucido",
+    "darkcraft:enlucido_escalera",
+    "darkcraft:enlucido_losa",
+    "darkcraft:enlucido_muro",
+    "darkcraft:tejado_pizarra",
+    "darkcraft:tejado_pizarra_escalera",
+    "darkcraft:tejado_pizarra_losa",
+    "darkcraft:tejado_escamas",
+    "darkcraft:tejado_escamas_escalera",
+    "darkcraft:tejado_escamas_losa",
+    "darkcraft:tejado_barro",
+    "darkcraft:tejado_barro_escalera",
+    "darkcraft:tejado_barro_losa",
+    "darkcraft:tejado_musgo",
+    "darkcraft:tejado_musgo_escalera",
+    "darkcraft:tejado_musgo_losa"
   ]
 }

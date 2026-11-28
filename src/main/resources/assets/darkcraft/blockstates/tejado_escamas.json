@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/tejado_escamas"
+      },
+      {
+        "model": "darkcraft:block/tejado_escamas_2"
+      },
+      {
+        "model": "darkcraft:block/tejado_escamas_3"
+      }
+    ]
+  }
+}

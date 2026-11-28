@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/tejado_barro"
+      },
+      {
+        "model": "darkcraft:block/tejado_barro_2"
+      },
+      {
+        "model": "darkcraft:block/tejado_barro_3"
+      }
+    ]
+  }
+}

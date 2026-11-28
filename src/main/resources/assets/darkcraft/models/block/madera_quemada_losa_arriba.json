@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "darkcraft:block/madera_quemada",
+    "top": "darkcraft:block/madera_quemada",
+    "side": "darkcraft:block/madera_quemada"
+  }
+}

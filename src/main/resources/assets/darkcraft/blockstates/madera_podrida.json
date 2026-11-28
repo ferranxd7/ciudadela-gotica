@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/madera_podrida"
+      },
+      {
+        "model": "darkcraft:block/madera_podrida_2"
+      },
+      {
+        "model": "darkcraft:block/madera_podrida_3"
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "darkcraft:madera_negra_puerta",
+    "darkcraft:madera_roble_puerta",
+    "darkcraft:madera_gris_puerta",
+    "darkcraft:madera_ceniza_puerta",
+    "darkcraft:madera_podrida_puerta",
+    "darkcraft:madera_caoba_puerta"
+  ]
+}

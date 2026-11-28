@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "darkcraft:madera_negra_trampilla",
+    "darkcraft:madera_roble_trampilla",
+    "darkcraft:madera_gris_trampilla",
+    "darkcraft:madera_ceniza_trampilla",
+    "darkcraft:madera_podrida_trampilla",
+    "darkcraft:madera_caoba_trampilla"
+  ]
+}

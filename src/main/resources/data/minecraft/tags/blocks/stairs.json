@@ -16,6 +16,19 @@
     "darkcraft:adoquin_escalera",
     "darkcraft:enlosado_escalera",
     "darkcraft:piedra_tallada_escalera",
-    "darkcraft:mamposteria_escalera"
+    "darkcraft:mamposteria_escalera",
+    "darkcraft:madera_negra_escalera",
+    "darkcraft:madera_roble_escalera",
+    "darkcraft:madera_gris_escalera",
+    "darkcraft:madera_ceniza_escalera",
+    "darkcraft:madera_podrida_escalera",
+    "darkcraft:madera_quemada_escalera",
+    "darkcraft:madera_caoba_escalera",
+    "darkcraft:enlucido_escalera",
+    "darkcraft:tejado_pizarra_escalera",
+    "darkcraft:tejado_escamas_escalera",
+    "darkcraft:tejado_barro_escalera",
+    "darkcraft:tejado_musgo_escalera",
+    "darkcraft:tejado_tejamanil_escalera"
   ]
 }

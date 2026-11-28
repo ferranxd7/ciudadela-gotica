@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "darkcraft:block/viga_negra"
+    },
+    "axis=z": {
+      "model": "darkcraft:block/viga_negra_tumbada",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "darkcraft:block/viga_negra_tumbada",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

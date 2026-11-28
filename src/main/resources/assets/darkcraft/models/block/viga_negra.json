@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "darkcraft:block/viga_negra_tapa",
+    "side": "darkcraft:block/viga_negra_lado"
+  }
+}

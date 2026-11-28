@@ -1,0 +1,58 @@
+{
+  "variants": {
+    "facing=north,half=bottom,open=false": {
+      "model": "darkcraft:block/madera_podrida_trampilla_abajo"
+    },
+    "facing=north,half=bottom,open=true": {
+      "model": "darkcraft:block/madera_podrida_trampilla_abierta"
+    },
+    "facing=north,half=top,open=false": {
+      "model": "darkcraft:block/madera_podrida_trampilla_arriba"
+    },
+    "facing=north,half=top,open=true": {
+      "model": "darkcraft:block/madera_podrida_trampilla_abierta"
+    },
+    "facing=east,half=bottom,open=false": {
+      "model": "darkcraft:block/madera_podrida_trampilla_abajo"
+    },
+    "facing=east,half=bottom,open=true": {
+      "model": "darkcraft:block/madera_podrida_trampilla_abierta",
+      "y": 90
+    },
+    "facing=east,half=top,open=false": {
+      "model": "darkcraft:block/madera_podrida_trampilla_arriba"
+    },
+    "facing=east,half=top,open=true": {
+      "model": "darkcraft:block/madera_podrida_trampilla_abierta",
+      "y": 90
+    },
+    "facing=south,half=bottom,open=false": {
+      "model": "darkcraft:block/madera_podrida_trampilla_abajo"
+    },
+    "facing=south,half=bottom,open=true": {
+      "model": "darkcraft:block/madera_podrida_trampilla_abierta",
+      "y": 180
+    },
+    "facing=south,half=top,open=false": {
+      "model": "darkcraft:block/madera_podrida_trampilla_arriba"
+    },
+    "facing=south,half=top,open=true": {
+      "model": "darkcraft:block/madera_podrida_trampilla_abierta",
+      "y": 180
+    },
+    "facing=west,half=bottom,open=false": {
+      "model": "darkcraft:block/madera_podrida_trampilla_abajo"
+    },
+    "facing=west,half=bottom,open=true": {
+      "model": "darkcraft:block/madera_podrida_trampilla_abierta",
+      "y": 270
+    },
+    "facing=west,half=top,open=false": {
+      "model": "darkcraft:block/madera_podrida_trampilla_arriba"
+    },
+    "facing=west,half=top,open=true": {
+      "model": "darkcraft:block/madera_podrida_trampilla_abierta",
+      "y": 270
+    }
+  }
+}

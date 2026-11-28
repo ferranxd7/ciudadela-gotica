@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/entramado_contra",
+        "weight": 4
+      },
+      {
+        "model": "darkcraft:block/entramado_contra_2",
+        "weight": 4
+      },
+      {
+        "model": "darkcraft:block/entramado_contra_3",
+        "weight": 1
+      }
+    ]
+  }
+}

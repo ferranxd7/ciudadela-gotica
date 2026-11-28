@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/madera_roble"
+      },
+      {
+        "model": "darkcraft:block/madera_roble_2"
+      },
+      {
+        "model": "darkcraft:block/madera_roble_3"
+      }
+    ]
+  }
+}

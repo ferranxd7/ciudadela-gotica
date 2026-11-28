@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/entramado_cruz",
+        "weight": 4
+      },
+      {
+        "model": "darkcraft:block/entramado_cruz_2",
+        "weight": 4
+      },
+      {
+        "model": "darkcraft:block/entramado_cruz_3",
+        "weight": 1
+      }
+    ]
+  }
+}

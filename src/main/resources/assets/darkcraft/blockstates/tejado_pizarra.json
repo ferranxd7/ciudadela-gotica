@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/tejado_pizarra"
+      },
+      {
+        "model": "darkcraft:block/tejado_pizarra_2"
+      },
+      {
+        "model": "darkcraft:block/tejado_pizarra_3"
+      }
+    ]
+  }
+}

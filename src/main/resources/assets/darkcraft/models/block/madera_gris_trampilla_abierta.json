@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_trapdoor_open",
+  "textures": {
+    "texture": "darkcraft:block/madera_gris_trampilla"
+  },
+  "render_type": "minecraft:cutout"
+}

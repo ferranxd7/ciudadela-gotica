@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "darkcraft:block/madera_ceniza",
+    "top": "darkcraft:block/madera_ceniza",
+    "side": "darkcraft:block/madera_ceniza"
+  }
+}
