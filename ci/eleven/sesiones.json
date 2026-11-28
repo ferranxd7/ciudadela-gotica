@@ -13535,5 +13535,285 @@
     ]
    }
   }
+ },
+ "voz_castellano": {
+  "voz": "Lord Griff - Epic Fantasy & whispers",
+  "voice_id": "A48Y4xFQ2YpCgXhLXguK",
+  "flow": "ZTBuBh3BMVgnjZ8DYrTm",
+  "modelo": "eleven_v4",
+  "nota": "Parte 7ax: Ser Gerolt, el Castellano del Fuerte de la Marca (el jefe de la Sala del Castellano). Por frase, tomas a y b; se bajan como castellano/voz_Na.mp3 y castellano/voz_Nb.mp3",
+  "frases": {
+   "1": {
+    "prompt": "[stern, cold] Halt. [slowly] The gate stays shut. [low, firm] No one enters the March... [pause] and no one leaves it.",
+    "sesiones": [
+     "VsUrzrPrpcHysf7yMjEu",
+     "OdA108UR4ud142f6vYTM"
+    ],
+    "generaciones": [
+     "vGokdXm0u2gMhBPeXKz7",
+     "Y5Hflqa3ZBrVDdGr7F8E"
+    ],
+    "duraciones": [
+     7.52,
+     7.12
+    ]
+   },
+   "2": {
+    "prompt": "[shouting, furious] Sound the alarm! Burn them! [roaring] BURN THEM ALL! [breathing heavily, bitter] ...The plague will not cross my walls.",
+    "sesiones": [
+     "KjnTx0WLuyEQRb3uqi2k",
+     "Up3Qy8wbpCNtZJC1CBpu"
+    ],
+    "generaciones": [
+     "LG1T1ynntIpzsLm9HXuF",
+     "0UjjKFkcfKOTomjS8OgT"
+    ],
+    "duraciones": [
+     7.76,
+     7.76
+    ]
+   },
+   "3": {
+    "prompt": "[tired, grim] Another one at the gate. [quietly] Another one turned away.",
+    "sesiones": [
+     "xfYnvNY1vz2de41VSXX8",
+     "DRfvCMSH2PYLBY8DJU7Y"
+    ],
+    "generaciones": [
+     "Bc3NpOcbOX6rRJwUY0Ce",
+     "gamkUNA9MC5WQJDAFrrb"
+    ],
+    "duraciones": [
+     4.08,
+     4.32
+    ]
+   },
+   "4": {
+    "prompt": "[commanding, shouting] The pitch! Bring the pitch! [fierce] Light the torches!",
+    "sesiones": [
+     "sqvlxAObjX4EiULB1dkm",
+     "5uTyDVemr6qAOLHLJGbG"
+    ],
+    "generaciones": [
+     "4QnWDiRRjj94mC8V4MDx",
+     "v6O9aLpLbkeHta5BBd06"
+    ],
+    "duraciones": [
+     3.44,
+     3.52
+    ]
+   },
+   "5": {
+    "prompt": "[weak, breaking, remorseful] Open the gate... [whispering] let them in... [sobbing softly] I can still hear the children...",
+    "sesiones": [
+     "HxRq80LRjKYBmzHYWSeQ",
+     "tHVO5paCfnSYwiuOW6nD"
+    ],
+    "generaciones": [
+     "1n4PXcZQQNzTlp7Cok1b",
+     "nlt3t62dz9DKU3rb9Uis"
+    ],
+    "duraciones": [
+     5.76,
+     5.28
+    ]
+   }
+  }
+ },
+ "sfx_castellano": {
+  "flow": "ZTBuBh3BMVgnjZ8DYrTm",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7ax: Ser Gerolt, el Castellano (el tajo de la espada, la antorcha, la olla de brea, el grito, la espada que arde, la lluvia de pavesas, el dolor, la muerte y los Insomnes que por fin descansan). Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "castellano_tajo": {
+    "prompt": "A heavy longsword swung in a brutal overhead arc and slammed into stone, a deep metallic whoosh, armor plates clanking, a sharp crunch of impact, short, no music",
+    "sesiones": [
+     "KRcikdyKEOj9quWAkBsY",
+     "5kc8qpZq25HvPrSRdLpI",
+     "8cEXJaPidwUTKJs3BsUI",
+     "Ec9O6ZalmI48rlakWpmh"
+    ],
+    "generaciones": [
+     "N8HZZUg0Ut8EfUtlKF3s",
+     "C8A33VSEZVJMNlMq4qNf",
+     "xynGoq6PFbn5C6I4JRdV",
+     "lF5nuTvyau9e4x62kSDD"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "castellano_antorcha": {
+    "prompt": "A burning torch swung hard through the air, a roaring whoosh of flame with crackling sparks trailing behind, short, no music",
+    "sesiones": [
+     "0jFMAy0yCCcXW5ygcHhK",
+     "UWLj9KUXJp3b8hEQSqEz",
+     "4IVblaCaceAhHDSBwGoy",
+     "a3KpYdCRwvk3CigpAohY"
+    ],
+    "generaciones": [
+     "hHdKhPeGejO5TQwk03YH",
+     "tZwwZrl2MwGIJDPGTlYE",
+     "1hnzj1w85Bmj33xQDSSv",
+     "7eKSHBmMuEMUAq23bKyU"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "castellano_brea": {
+    "prompt": "A clay pot of boiling pitch shattering on a stone floor and bursting into roaring flames, sticky tar splattering and sizzling, no music",
+    "sesiones": [
+     "xqHp8Ez5IFTBnHY5v9KT",
+     "J7AlxGuUTS51ikkvQJye",
+     "nJDhy0RCu1Ss9MXnkxCu",
+     "FloPZgSta63qGVwic1El"
+    ],
+    "generaciones": [
+     "wNdgkLWEFdp9R4wl8cCE",
+     "ED95PSTmve6xnO7IrOOo",
+     "rXOKZBTQUnDZFqnSoSJM",
+     "1NWRxXhtSq9rn0SsGvno"
+    ],
+    "duraciones": [
+     5.0,
+     8.0,
+     6.0,
+     8.0
+    ]
+   },
+   "castellano_grito": {
+    "prompt": "An old armored knight commander bellowing a furious wordless battle cry in a stone hall, deep and hoarse, echoing, plate armor rattling, no music",
+    "sesiones": [
+     "ChF3vd3vaGru36XjGmFi",
+     "Mmkz2mlKdtivUxR7HuUW",
+     "RowtGtvUaMBDlaMKF4CG",
+     "SQ4JK2QChn3ERyroEhd7"
+    ],
+    "generaciones": [
+     "N7D42tcaFDdug055QPxB",
+     "jBM5kktN883x4Ft9qURH",
+     "zKz5Q2Zg1FB5y1ucRjTd",
+     "Ot5JpD6cce4wQvciymT2"
+    ],
+    "duraciones": [
+     5.0,
+     4.0,
+     5.0,
+     5.0
+    ]
+   },
+   "castellano_arde": {
+    "prompt": "A steel sword blade thrust into a burning brazier and catching fire with a sudden roaring whoosh, flames crackling along the blade, no music",
+    "sesiones": [
+     "odFcypHcafnvtLZasx7W",
+     "6BzbClXlEjZHIr6zOVMG",
+     "U6UZ3EyFceZqLTgQvaOT",
+     "E6pBsJUuc9yPg15Kw67E"
+    ],
+    "generaciones": [
+     "jb3TKa6jvycR2MWlvRyn",
+     "YootKYL6hxQB6piZtXOx",
+     "50xg61Njt9AN0pE8VadZ",
+     "zLkf7YTKu9HMFeYXC542"
+    ],
+    "duraciones": [
+     6.0,
+     6.0,
+     6.0,
+     6.0
+    ]
+   },
+   "castellano_pavesas": {
+    "prompt": "A shower of burning embers and ash raining down from a high ceiling, crackling sparks and soft fiery hisses hitting a stone floor, a low hot wind, no music",
+    "sesiones": [
+     "4FzPK7l8xa1ouVY5InBY",
+     "aLU2UKF3pFxomy7tQDXo",
+     "glPfRv49YGjHOxOcvzvY",
+     "BkMx0lxNqUKEZmU7rCGJ"
+    ],
+    "generaciones": [
+     "KDDKrnXr9c7Yplkm6qSu",
+     "4xAAfMGhkiGfCwRTgIVU",
+     "EhwbYYSHlSoas6l9O8S1",
+     "VqfxnGV2OJDyRpoaeTCd"
+    ],
+    "duraciones": [
+     15.0,
+     15.0,
+     15.0,
+     20.0
+    ]
+   },
+   "castellano_dolor": {
+    "prompt": "An old armored knight grunting in pain from a heavy blow, plate armor rattling, short, no music",
+    "sesiones": [
+     "NBR4EySedI9NOkFlWdW5",
+     "grcHV95BeXP6XxCHO46P",
+     "wfLA2huFbCoW5DxVYaof",
+     "MCt1gphjZWFss3C2daG4"
+    ],
+    "generaciones": [
+     "eZEnQpCA7SiK8MILdjei",
+     "aNwlWSwy7Z9TOEe7g5Ae",
+     "EUyyUlPOTrmVx6b85Utq",
+     "KBNMhOQ5fMYiiILQLH6J"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "castellano_muerte": {
+    "prompt": "An old armored knight sinking to his knees and collapsing, heavy plate armor crashing onto a stone floor, a sword clattering, a long shaky final breath, no music",
+    "sesiones": [
+     "HZIhLJIBhgBfqSUdDaJq",
+     "7pYVHB6zG7bPtWL2jpVW",
+     "urETN6sBZI5m9RggCAMw",
+     "OtjUFWvWoIrci9k44314"
+    ],
+    "generaciones": [
+     "7qCTmPGy1eSk22VKR5bo",
+     "VT19m2NZzGI5MfNH8heb",
+     "vxuRfawe4lpkCl2FV3E6",
+     "NJlIWTGAbKxfmr3PASEi"
+    ],
+    "duraciones": [
+     10.0,
+     6.0,
+     8.0,
+     8.0
+    ]
+   },
+   "insomnes_descansan": {
+    "prompt": "A single deep distant bell toll fading out over a quiet fortress at dusk, many weary soldiers sighing softly in relief as armor settles and weapons are laid down, peaceful and sad, no music",
+    "sesiones": [
+     "bMbsTYbgliNdiHoiULcY",
+     "4gLrqBQxZ99DF7eQlucr",
+     "lZXh8BwFuKz66RdnXvzv",
+     "mJQcJC28y6Lm3hQyBN5y"
+    ],
+    "generaciones": [
+     "zgyLEPwiI74ATVTPr98U",
+     "nDArnMGHfO2r069DMvXk",
+     "nsHp35OtBLiOvayLEuFd",
+     "ALcY8rna2NONKVsL0uHq"
+    ],
+    "duraciones": [
+     15.0,
+     15.0,
+     15.0,
+     15.0
+    ]
+   }
+  }
  }
 }
