@@ -59,6 +59,8 @@ final class Adorno {
         if (Cerco.cerca(x0, z0)) return;
         // ni en el Teatro Hundido (parte 7y)
         if (Teatro.cerca(x0, z0)) return;
+        // ni en las Minas de Hierro Negro (parte 7aq)
+        if (Mina.cerca(x0, z0)) return;
         if (Nido.cerca(x0, z0)) return;
         // en las herrerias (parte 7af) solo la hierba (alrededor de su suelo allanado)
         if (Herrerias.cerca(x0, z0)) {

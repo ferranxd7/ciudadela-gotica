@@ -4949,6 +4949,82 @@ EN.update({
     "darkcraft.ayuda.misiones": "Quests: how they stand, forget them or set Oswin's, Hedda's, Ylva's, Corwen's or Sigrun's",
 })
 
+# ---- parte 7aq: las Minas de Hierro Negro (los Enterrados)
+ES.update({
+    "entity.darkcraft.enterrado": "Enterrado",
+    "entity.darkcraft.cartucho": "Cartucho de barreno",
+    "darkcraft.bestiario.enterrado_picador": "Picador enterrado",
+    "darkcraft.bestiario.enterrado_barrenero": "Barrenero enterrado",
+    "darkcraft.bestiario.enterrado_cargador": "Cargador enterrado",
+    "darkcraft.bestiario.enterrado_picador.desc": "El turno de noche de las Minas de Hierro Negro estaba abajo cuando el cielo se puso rojo y la montaña tembló. Nadie subió. Siguen picando, grises del polvo de hierro, con el candil encendido en la frente. Tienen los ojos blancos de polvo: no ven, oyen. Corre y te oirán de lejos; agáchate y podrás pasar a su lado. El picotazo baja de arriba abajo y engancha el escudo: si lo paras, te rompe la guardia. Mejor apártate. Las flechas apenas les entran; los martillos, sí.",
+    "darkcraft.bestiario.enterrado_barrenero.desc": "Los barreneros abrían las galerías con pólvora. Ahora lanzan sus cartuchos a lo que oyen: el cartucho cae, la mecha chisporrotea un momento y revienta. Aléjate antes de que llegue la llama a la pólvora; a los suyos tampoco los perdona. De cerca golpean con la mecha encendida. Al morir, a veces se les prende el morral: si lo oyes chisporrotear, aparta.",
+    "darkcraft.bestiario.enterrado_cargador.desc": "Los cargadores subían el mineral en el cuévano, a la espalda. Son enormes y lentos, y cargan con una almádena. El almadenazo hace temblar el suelo: salta o rueda para librarte de la onda. También barren muy abierto y embisten con el hombro. Un golpe fuerte cerca de un techo roto lo echa abajo; debajo puede quedar cualquiera, también ellos.",
+    "subtitles.darkcraft.sfx.enterrado_gemido": "Gime un minero",
+    "subtitles.darkcraft.sfx.enterrado_alerta": "Un minero ha oído algo",
+    "subtitles.darkcraft.sfx.enterrado_dolor": "Se queja un minero",
+    "subtitles.darkcraft.sfx.enterrado_muerte": "Un minero se deshace en polvo",
+    "subtitles.darkcraft.sfx.enterrado_pica": "Pican la roca",
+    "subtitles.darkcraft.sfx.enterrado_mecha": "Chisporrotea una mecha",
+    "subtitles.darkcraft.sfx.enterrado_estallido": "Revienta un cartucho",
+    "subtitles.darkcraft.sfx.enterrado_almadena": "Una almádena golpea el suelo",
+    "subtitles.darkcraft.sfx.enterrado_alzarse": "Algo sale de los escombros",
+    "subtitles.darkcraft.sfx.mina_derrumbe": "Se hunde el techo",
+    "subtitles.darkcraft.sfx.mina_cruje": "Cruje el techo",
+    "subtitles.darkcraft.ambiente.mina": "Gotea la mina",
+    "darkcraft.morvain.lugar.minas": "Las Minas de Hierro Negro",
+    "darkcraft.morvain.lugar.corta": "La Corta",
+    "darkcraft.morvain.lugar.lago": "La Gruta del Agua Negra",
+    "darkcraft.morvain.lugar.filon": "La Caverna del Filón",
+    "darkcraft.mina.escotilla_cerrada": "La escotilla está cerrada por debajo.",
+    "darkcraft.morvain.cama": "En Morvain no se puede dormir.",
+    "advancements.darkcraft.minas.title": "El turno de noche",
+    "advancements.darkcraft.minas.description": "Baja a las Minas de Hierro Negro",
+    "advancements.darkcraft.enterrado.title": "Ciegos en la oscuridad",
+    "advancements.darkcraft.enterrado.description": "Vence a un enterrado",
+    "darkcraft.diario.minas": "Al pie de las Montañas Nevadas, mirando a la Tierra sin Fe, están las Minas de Hierro Negro: un tajo abierto en escalones, un castillete con su rueda sobre el pozo y, en el fondo, la bocamina. De su hierro se forjaron las cadenas que sujetan la ciudadela. En la lampistería, la pared de los ganchos de los faroles está casi vacía.",
+    "darkcraft.diario.enterrado": "Los enterrados son el turno de noche de las minas. No ven: oyen. Los picadores pican la roca y te rompen la guardia con el pico, los barreneros lanzan cartuchos que revientan al poco de caer y los cargadores hacen temblar el suelo con la almádena. Si no corres, no te oyen.",
+    "darkcraft.ayuda.mina": "Las Minas de Hierro Negro: ir a uno de sus sitios, sus enterrados, hacer caer un techo roto, abrir o cerrar la escotilla del castillete o el muro de la capilla",
+})
+EN.update({
+    "entity.darkcraft.enterrado": "Buried One",
+    "entity.darkcraft.cartucho": "Blasting Charge",
+    "darkcraft.bestiario.enterrado_picador": "Buried Pickman",
+    "darkcraft.bestiario.enterrado_barrenero": "Buried Blaster",
+    "darkcraft.bestiario.enterrado_cargador": "Buried Hauler",
+    "darkcraft.bestiario.enterrado_picador.desc": "The night shift of the Black Iron Mines was below when the sky turned red and the mountain shook. No one came up. They are still digging, grey with iron dust, the lamp still lit on their brow. Their eyes are white with dust: they cannot see, they hear. Run and they will hear you from afar; crouch and you can walk right past them. The pick blow comes down from above and hooks your shield: if you block it, your guard breaks. Better to step aside. Arrows barely get in; hammers do.",
+    "darkcraft.bestiario.enterrado_barrenero.desc": "The blasters opened the galleries with powder. Now they throw their charges at whatever they hear: the charge lands, the fuse sputters for a moment and it bursts. Get away before the flame reaches the powder; it does not spare their own either. Up close they strike with the lit fuse. When they die, their satchel sometimes catches: if you hear it sputter, step back.",
+    "darkcraft.bestiario.enterrado_cargador.desc": "The haulers carried the ore up in baskets on their backs. They are huge and slow, and they carry a sledgehammer. The sledge blow makes the ground shake: jump or roll to escape the shockwave. They also sweep wide and charge with the shoulder. A heavy blow near a broken ceiling brings it down; anyone can be caught under it, them too.",
+    "subtitles.darkcraft.sfx.enterrado_gemido": "A miner groans",
+    "subtitles.darkcraft.sfx.enterrado_alerta": "A miner heard something",
+    "subtitles.darkcraft.sfx.enterrado_dolor": "A miner moans",
+    "subtitles.darkcraft.sfx.enterrado_muerte": "A miner crumbles to dust",
+    "subtitles.darkcraft.sfx.enterrado_pica": "Picks strike rock",
+    "subtitles.darkcraft.sfx.enterrado_mecha": "A fuse sputters",
+    "subtitles.darkcraft.sfx.enterrado_estallido": "A blasting charge bursts",
+    "subtitles.darkcraft.sfx.enterrado_almadena": "A sledgehammer strikes the ground",
+    "subtitles.darkcraft.sfx.enterrado_alzarse": "Something rises from the rubble",
+    "subtitles.darkcraft.sfx.mina_derrumbe": "The ceiling caves in",
+    "subtitles.darkcraft.sfx.mina_cruje": "The ceiling creaks",
+    "subtitles.darkcraft.ambiente.mina": "The mine drips",
+    "darkcraft.morvain.lugar.minas": "The Black Iron Mines",
+    "darkcraft.morvain.lugar.corta": "The Open Pit",
+    "darkcraft.morvain.lugar.lago": "The Black Water Grotto",
+    "darkcraft.morvain.lugar.filon": "The Cavern of the Lode",
+    "darkcraft.mina.escotilla_cerrada": "The hatch is locked from below.",
+    "darkcraft.morvain.cama": "There is no sleeping in Morvain.",
+    "advancements.darkcraft.minas.title": "The Night Shift",
+    "advancements.darkcraft.minas.description": "Go down into the Black Iron Mines",
+    "advancements.darkcraft.enterrado.title": "Blind in the Dark",
+    "advancements.darkcraft.enterrado.description": "Defeat a Buried One",
+    "darkcraft.diario.minas": "At the foot of the Snowy Mountains, facing the Faithless Land, lie the Black Iron Mines: an open pit cut in steps, a headframe with its wheel above the shaft and, at the bottom, the mine mouth. The chains that hold the citadel were forged from their iron. In the lamp room, the wall of lamp hooks is almost empty.",
+    "darkcraft.diario.enterrado": "The Buried Ones are the night shift of the mines. They cannot see: they hear. The pickmen dig at the rock and break your guard with the pick, the blasters throw charges that burst soon after landing and the haulers make the ground shake with the sledgehammer. If you don't run, they don't hear you.",
+    "darkcraft.ayuda.mina": "The Black Iron Mines: go to one of its places, its Buried Ones, bring down a broken ceiling, open or close the headframe hatch or the chapel wall",
+})
+SANTUARIOS_MORVAIN_ES_7AQ = {"bocamina": "La Bocamina"}
+SANTUARIOS_MORVAIN_EN_7AQ = {"bocamina": "The Mine Mouth"}
+ES.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_ES_7AQ.items()})
+EN.update({f"darkcraft.santuario.morvain_{k}": v for k, v in SANTUARIOS_MORVAIN_EN_7AQ.items()})
+
 def claves(idioma):
     """Las claves de idioma de la interfaz nueva: en espanol para 'es'; en ingles para todos los demas (de momento)."""
     return dict(ES if idioma == "es" else EN)

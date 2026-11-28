@@ -139,7 +139,8 @@ public final class Corwen {
         m.getChunk(p.getX() >> 4, p.getZ() >> 4);
         double y = sueloEn(m, p);
         // los juncos y la hierba de alrededor (los juncos suben hasta tres)
-        despejar(m, new BlockPos(p.getX(), (int) Math.floor(y), p.getZ()), 0, 3);
+        // de dos alrededor, que las cañas de la orilla no la tapen al acercarse (y uno mas abajo, por si el suelo baja)
+        despejar(m, new BlockPos(p.getX(), (int) Math.floor(y) - 1, p.getZ()), 2, 4);
         Baliza b = DarkCraftMod.BALIZA.get().create(m);
         if (b == null) return null;
         b.variante(i);

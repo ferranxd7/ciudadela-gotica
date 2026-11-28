@@ -307,7 +307,9 @@ public final class ClientMusic {
         if (mc.player == null || mc.level == null) enMontana = false;
         else if (mc.player.tickCount % 20 == 13)
             enMontana = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() > 150
-                    && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.MONTANAS;
+                    && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.MONTANAS
+                    // bajo tierra, en las Minas de Hierro Negro, no llega la ventisca (parte 7aq)
+                    && !(com.darkcraft.morvain.Mina.dentro(mc.player.getX(), mc.player.getY(), mc.player.getZ()) && mc.player.getY() < com.darkcraft.morvain.Mina.FONDO + 4);
         boolean quiere = enMontana && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
         if (quiere) {
             if (montana == null || montana.dying() || !mc.getSoundManager().isActive(montana) && montanaTicks > 20) {
@@ -348,6 +350,34 @@ public final class ClientMusic {
         if (capital != null) {
             capitalTicks++;
             if (capital.dying() && !mc.getSoundManager().isActive(capital) && capitalTicks > 20) capital = null;
+        }
+    }
+
+    // ------------------------------------------------------------------ las Minas de Hierro Negro (parte 7aq): gotas, crujidos y picos lejos
+
+    private static Track mina;
+    private static int minaTicks;
+    private static boolean enMina;
+
+    private static void tickMina(Minecraft mc) {
+        if (mc.player == null || mc.level == null) enMina = false;
+        else if (mc.player.tickCount % 20 == 11)
+            enMina = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL
+                    && com.darkcraft.morvain.Mina.dentro(mc.player.getX(), mc.player.getY(), mc.player.getZ())
+                    && mc.player.getY() < com.darkcraft.morvain.Mina.FONDO + 4;
+        boolean quiere = enMina && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
+        if (quiere) {
+            if (mina == null || mina.dying() || !mc.getSoundManager().isActive(mina) && minaTicks > 20) {
+                if (mina != null && !mina.dying()) mc.getSoundManager().stop(mina);
+                mina = new Track(DarkCraftMod.AMBIENTE_MINA.get(), "mina", false);
+                minaTicks = 0;
+                mc.getSoundManager().play(mina);
+                mina.fadeTo(0.85f, 2.5f);
+            }
+        } else if (mina != null && !mina.dying()) mina.kill(3.0f);
+        if (mina != null) {
+            minaTicks++;
+            if (mina.dying() && !mc.getSoundManager().isActive(mina) && minaTicks > 20) mina = null;
         }
     }
 
@@ -524,6 +554,12 @@ public final class ClientMusic {
         return capital == null ? "sin las ruinas" : String.format("las ruinas %.2f%s", capital.level(), mc.getSoundManager().isActive(capital) ? "" : " (paradas)");
     }
 
+    /** Para la prueba de la CI: si suena el aire de la mina. */
+    public static String mina() {
+        Minecraft mc = Minecraft.getInstance();
+        return mina == null ? "sin el aire de la mina" : String.format("el aire de la mina %.2f%s", mina.level(), mc.getSoundManager().isActive(mina) ? "" : " (parado)");
+    }
+
     /** Para la prueba de la CI: si suena la ventisca. */
     public static String montana() {
         Minecraft mc = Minecraft.getInstance();
@@ -687,6 +723,8 @@ public final class ClientMusic {
         if (montana != null && !montana.dying()) any = true;
         tickCapital(mc);
         if (capital != null && !capital.dying()) any = true;
+        tickMina(mc);
+        if (mina != null && !mina.dying()) any = true;
         tickAcademia(mc);
         if (academia != null && !academia.dying()) any = true;
         tickCosta(mc);

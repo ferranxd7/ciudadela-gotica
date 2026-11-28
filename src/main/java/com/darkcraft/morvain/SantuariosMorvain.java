@@ -51,6 +51,8 @@ public final class SantuariosMorvain {
             s("grieta", 24, 2181), s("altar", -1864, -1600), s("mirador", 2120, -480),
             s("ancla_sur", 50, 1080), s("teatro", Teatro.CX, Teatro.CZ + Teatro.SANT_V),
             s("nido", Nido.CX + Nido.SANT_U, Nido.CZ + Nido.SANT_V),
+            // el de la Bocamina (parte 7aq): a la altura de la explanada del campamento (no a la del terreno, que se allana)
+            new Sitio("bocamina", Mina.CX + Mina.SANT_U, Mina.CZ + Mina.SANT_V, Mina.SUELO, Region.MONTANAS),
     };
 
     /**

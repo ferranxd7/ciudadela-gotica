@@ -315,6 +315,19 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_CALCINADO_FUEGO = sound("sfx.calcinado_fuego");
     public static final RegistryObject<SoundEvent> SFX_CALCINADO_CENIZA = sound("sfx.calcinado_ceniza");
     public static final RegistryObject<SoundEvent> AMBIENTE_CAPITAL = sound("ambiente.capital");
+    // ---- los enterrados de las Minas de Hierro Negro y la mina (parte 7aq)
+    public static final RegistryObject<SoundEvent> SFX_ENTERRADO_GEMIDO = sound("sfx.enterrado_gemido");
+    public static final RegistryObject<SoundEvent> SFX_ENTERRADO_ALERTA = sound("sfx.enterrado_alerta");
+    public static final RegistryObject<SoundEvent> SFX_ENTERRADO_DOLOR = sound("sfx.enterrado_dolor");
+    public static final RegistryObject<SoundEvent> SFX_ENTERRADO_MUERTE = sound("sfx.enterrado_muerte");
+    public static final RegistryObject<SoundEvent> SFX_ENTERRADO_PICA = sound("sfx.enterrado_pica");
+    public static final RegistryObject<SoundEvent> SFX_ENTERRADO_MECHA = sound("sfx.enterrado_mecha");
+    public static final RegistryObject<SoundEvent> SFX_ENTERRADO_ESTALLIDO = sound("sfx.enterrado_estallido");
+    public static final RegistryObject<SoundEvent> SFX_ENTERRADO_ALMADENA = sound("sfx.enterrado_almadena");
+    public static final RegistryObject<SoundEvent> SFX_ENTERRADO_ALZARSE = sound("sfx.enterrado_alzarse");
+    public static final RegistryObject<SoundEvent> SFX_MINA_DERRUMBE = sound("sfx.mina_derrumbe");
+    public static final RegistryObject<SoundEvent> SFX_MINA_CRUJE = sound("sfx.mina_cruje");
+    public static final RegistryObject<SoundEvent> AMBIENTE_MINA = sound("ambiente.mina");
     // el Condestable del Juramento (parte 7n): el grito, el tajo del montante en llamas, el barrido, la embestida, el anillo de
     // fuego, el rastrillo que cae y el que se alza, el cuerno de la guardia, la espada al cielo, el dolor, la muerte y la espera
     public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_GRITO = sound("sfx.condestable_grito");
@@ -956,6 +969,13 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Cantaro>> CANTARO = ENTITIES.register("cantaro",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Cantaro>of(com.darkcraft.enemigos.Cantaro::new, MobCategory.MISC)
                     .sized(0.4f, 0.4f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":cantaro"));
+    // ---- los enterrados de las Minas de Hierro Negro y el cartucho que lanzan los barreneros (parte 7aq)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Enterrado>> ENTERRADO = ENTITIES.register("enterrado",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Enterrado>of(com.darkcraft.enemigos.Enterrado::new, MobCategory.MONSTER)
+                    .sized(0.7f, 2.0f).clientTrackingRange(8).build(MODID + ":enterrado"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Cartucho>> CARTUCHO = ENTITIES.register("cartucho",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Cartucho>of(com.darkcraft.enemigos.Cartucho::new, MobCategory.MISC)
+                    .sized(0.3f, 0.3f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":cartucho"));
     // ---- los eruditos de la Academia Espectral (parte 7o), su tintero y su orbe
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Erudito>> ERUDITO = ENTITIES.register("erudito",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Erudito>of(com.darkcraft.enemigos.Erudito::new, MobCategory.MONSTER)
@@ -1349,6 +1369,7 @@ public class DarkCraftMod {
         e.put(HELADO.get(), com.darkcraft.enemigos.Helado.atributos().build());
         e.put(ABAD.get(), com.darkcraft.enemigos.Abad.atributos().build());
         e.put(CALCINADO.get(), com.darkcraft.enemigos.Calcinado.atributos().build());
+        e.put(ENTERRADO.get(), com.darkcraft.enemigos.Enterrado.atributos().build());
         e.put(CONDESTABLE.get(), com.darkcraft.enemigos.Condestable.atributos().build());
         e.put(RECTORA.get(), com.darkcraft.enemigos.Rectora.atributos().build());
         e.put(ERUDITO.get(), com.darkcraft.enemigos.Erudito.atributos().build());
