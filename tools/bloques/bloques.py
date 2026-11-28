@@ -28,6 +28,7 @@ import metal as Me  # noqa: E402
 import fuego as F  # noqa: E402
 import muebles as Mu  # noqa: E402
 import decoracion as De  # noqa: E402
+import agua as Ag  # noqa: E402
 
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RES = os.path.join(RAIZ, "src", "main", "resources")
@@ -2441,6 +2442,31 @@ def vista(carpeta, desde=0):
     print("hojas en", carpeta)
 
 
+def agua():
+    """El agua propia (parte 8j): las texturas del agua del juego (y de sus burbujas, salpicaduras y gotas) cambiadas por las
+    del mod, en assets/minecraft (el bloque sigue siendo el agua del juego: se puede anegar todo y el terreno sigue igual)."""
+    mc = os.path.join(RES, "assets", "minecraft", "textures")
+    out = {
+        ("block", "water_still"): (Ag.quieta(951), 2),
+        ("block", "water_flow"): (Ag.fluye(952), 1),
+        ("block", "water_overlay"): (Ag.encima(953), None),
+        ("misc", "underwater"): (Ag.debajo(954), None),
+        ("particle", "bubble"): (Ag.burbuja(), None),
+    }
+    for k in range(5):
+        out[("particle", f"bubble_pop_{k}")] = (Ag.burbuja_rota(k), None)
+    for k in range(4):
+        out[("particle", f"splash_{k}")] = (Ag.salpicadura(k), None)
+    for t in ("hang", "fall", "land"):
+        out[("particle", f"drip_{t}")] = (Ag.gota(t), None)
+    for (carpeta, nombre), (img, frametime) in out.items():
+        d = os.path.join(mc, carpeta)
+        os.makedirs(d, exist_ok=True)
+        _img(img).save(os.path.join(d, nombre + ".png"))
+        if frametime:
+            j(os.path.join(d, nombre + ".png.mcmeta"), {"animation": {"frametime": frametime}})
+
+
 def choques():
     """Los ids del catalogo que ya usa otro bloque u objeto del mod (registrado fuera del paquete `bloques`): en la 8f
     "hierro_negro" chocaba con el bloque del marco del portal (parte 5e-1) y el juego no arrancaba."""
@@ -2486,6 +2512,7 @@ def main():
     for nombre, img in list(sueltas().items()) + list(sueltas_muebles().items()) + list(sueltas_decoracion().items()):
         guardar(nombre, img)
     particulas_json()
+    agua()
     for m in MATERIALES:
         for nombre, img in texturas(m).items():
             guardar(nombre, img)

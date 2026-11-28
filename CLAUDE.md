@@ -4911,7 +4911,24 @@ Respuesta 40 del plan ("estandartes y tapices, estatuas, gargolas, ataudes, hues
   definidas, de 64 de ancho y fotogramas de 64), elementos en rango y con angulos validos y el botin de cada bloque.
 - Pruebas: servidor, la linea `Bloques 8b: ...` de siempre; cliente, en el muestrario los estandartes y tapices colgados de
   un muro, la jaula de una viga y lo demas dos veces; capturas `cliente_bq01..57` (grupos), `bq58..85` de cerca (tambien el
-  estandarte de Valdrenn, la gargola y el ataud), `bq86..90` las luces de noche y `bq91..94` los arboles.
+  estandarte de Valdrenn, la gargola y el ataud), `bq86..90` las luces de noche y `bq91..94` los arboles (y desde la 8j,
+  `bq95` el estanque y `bq96` dentro del agua).
+
+### Plan nuevo, parte 8j: el agua propia
+
+Respuesta 39 del plan ("agua propia: color por region, mas oscura, espuma"). **El agua sigue siendo el agua del juego** (asi
+se puede anegar cualquier bloque —escaleras, losas, vallas: el `waterlogged` del juego solo vale con su agua—, nadar,
+ahogarse y el terreno de Morvain siguen igual), **pero se ve la del mod**: `tools/bloques/agua.py` escribe en
+`assets/minecraft/textures` sus texturas (`bloques.py` → `agua()`): `water_still` (32 fotogramas de 64 x 64: ondas que se
+cruzan como causticas —lineas claras donde la suma de ondas vale lo mismo— y brillos de espuma que van y vienen; las ondas
+avanzan un numero entero de vueltas en la animacion), `water_flow` (32 fotogramas de 128 x 128: vetas que bajan 4 pixeles
+por fotograma y chorros de espuma; el juego usa la mitad, como su textura de 32 para la de 16), `water_overlay`,
+`misc/underwater` (las manchas de luz bajo el agua) y los dibujos de las particulas del agua (`bubble`, `bubble_pop_0..4`,
+`splash_0..3`, `drip_hang/fall/land`, 16 x 16). En gris y mas oscura que la del juego: **el bioma la tine** (cada region de
+Morvain ya tenia su color de agua; el mundo de las nubes y la fortaleza pasan del azul del juego a uno oscuro, `0x2f4f6e` y
+`0x2a3f55`).
+- Pruebas: cliente, un estanque de 3 de hondo con borde de sillar y una cascada que cae de una columna (junto a los
+  arboles de muestra), capturas `cliente_bq95_agua` y `bq96_agua_dentro`.
 
 ## Compilar, probar y publicar
 

@@ -3129,8 +3129,8 @@ public final class ClientCiTest {
         t += 4;
         // los arboles de muestra (parte 8e): tres capturas desde el sur y una desde abajo
         final double[][] vistasArboles = {{12.5, 7.0, -17.0, 0f, 14f}, {44.5, 7.0, -18.0, 0f, 14f}, {62.5, 6.0, -12.0, 0f, 12f},
-                {41.5, 1.6, -2.5, 45f, -40f}};
-        final String[] nombresArboles = {"arboles_1", "arboles_2", "arboles_3", "arboles_desde_abajo"};
+                {41.5, 1.6, -2.5, 45f, -40f}, {66.5, 5.0, -12.0, -47f, 25f}, {73.5, 1.0, -4.5, 0f, 5f}};
+        final String[] nombresArboles = {"arboles_1", "arboles_2", "arboles_3", "arboles_desde_abajo", "agua", "agua_dentro"};
         for (int i = 0; i < vistasArboles.length; i++) {
             final double[] v = vistasArboles[i];
             final int n = grupos + cercaIds.length + 6 + i;
@@ -3634,6 +3634,20 @@ public final class ClientCiTest {
             lvl.setBlock(p, rama.unida(lvl, p), 2);
             n++;
         }
+        // 7) el agua (parte 8j): un estanque de 3 de hondo con su borde de sillar y una cascada que cae de una columna
+        int ax = x0 + 70, az = z0 - 7;
+        net.minecraft.world.level.block.state.BlockState sillar = bq("sillar_gris");
+        for (int dx = 0; dx < 8; dx++)
+            for (int dz = 0; dz < 6; dz++)
+                for (int dy = 0; dy < 3; dy++) {
+                    boolean borde = dx == 0 || dx == 7 || dz == 0 || dz == 5;
+                    lvl.setBlock(new BlockPos(ax + dx, y0 + dy, az + dz), borde ? sillar : net.minecraft.world.level.block.Blocks.WATER.defaultBlockState(), 2);
+                    n++;
+                }
+        // una columna dentro del estanque con la fuente de la cascada arriba (con la bandera 3: el agua corre y cae al
+        // estanque por los cuatro lados)
+        for (int dy = 0; dy < 6; dy++) lvl.setBlock(new BlockPos(ax + 5, y0 + dy, az + 2), sillar, 2);
+        lvl.setBlock(new BlockPos(ax + 5, y0 + 6, az + 2), net.minecraft.world.level.block.Blocks.WATER.defaultBlockState(), 3);
         return n;
     }
 
