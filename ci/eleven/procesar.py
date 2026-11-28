@@ -490,6 +490,14 @@ SFX = {
     "capataz_temblor": (7.0, 2.0, -13), "capataz_roca": (2.4, 0.8, -14), "capataz_absorber": (5.0, 1.6, -13),
     "capataz_embestida": (3.0, 1.0, -13), "capataz_dolor": (1.4, 0.4, -15), "capataz_muerte": (4.0, 1.4, -14),
     "capataz_almas": (9.0, 3.0, -18),
+    # el Osario de San Ulfo (parte 7as): el aire de la cripta (en bucle), los Ensamblados (el traqueteo, la alerta, el dolor, se deshacen,
+    # se rehacen, el polvo), el barrido del portacirios, el monton que se arrastra y el golpe de la maza, la guirnalda que cae (parte
+    # 7at), la campana rota y los susurros de la Capilla de los Huesos
+    "osario_ambiente": (20.0, 2.0, -24), "ensamblado_traqueteo": (2.5, 0.8, -19), "ensamblado_alerta": (2.4, 0.6, -15),
+    "ensamblado_dolor": (1.4, 0.4, -16), "ensamblado_deshace": (4.0, 1.2, -15), "ensamblado_rehace": (3.0, 0.8, -14),
+    "ensamblado_polvo": (3.0, 1.0, -15), "portacirios_barrido": (1.8, 0.6, -14), "monton_arrastre": (3.0, 1.0, -17),
+    "monton_golpe": (1.6, 0.5, -13), "guirnalda_cae": (5.0, 1.0, -15), "osario_campana": (7.5, 3.0, -14),
+    "osario_susurros": (12.0, 3.0, -20),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -498,12 +506,14 @@ ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0
            "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0, "sinfe_ambiente": 2.0,
            "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0, "mina_ambiente": 2.0,
            "aldric_rezo": 1.0, "aldric_arrastre": 0.3, "jinete_galope": 0.3, "dragon_aleteo": 0.3, "dragon_respira": 0.6,
-           "cadena_ambiente": 2.0, "isolde_tarareo": 1.2, "homenaje_ambiente": 2.0, "aguja_ambiente": 2.0, "sombra_mirada": 0.15}
+           "cadena_ambiente": 2.0, "isolde_tarareo": 1.2, "homenaje_ambiente": 2.0, "aguja_ambiente": 2.0, "sombra_mirada": 0.15,
+           "osario_ambiente": 2.0, "osario_susurros": 1.5}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
           "penitente_humo": 1.0, "penitente_alzarse": 2.3, "enterrado_alzarse": 0.5, "mina_cruje": 0.8,
-          "capataz_almas": 1.2}
+          "capataz_almas": 1.2, "ensamblado_dolor": 0.45, "ensamblado_deshace": 0.4, "ensamblado_rehace": 0.9, "ensamblado_polvo": 0.3,
+          "portacirios_barrido": 0.2, "monton_golpe": 0.25}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
 GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca", "boca_latido", "sombra_latido", "capataz_temblor"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
@@ -862,6 +872,15 @@ TOMAS_SFX = {
     "capataz_silbato": (4, 1), "capataz_pico": (1, 4), "capataz_veta": (1, 4), "capataz_temblor": (1, 3), "capataz_roca": (3, 1),
     "capataz_absorber": (2, 4), "capataz_embestida": (3, 4), "capataz_dolor": (3, 2, 1), "capataz_muerte": (1, 4),
     "capataz_almas": (2, 1),
+    # el Osario (parte 7as; elegidas midiendo las tomas): del aire la 1 (el goteo y los huesos lejos) y la 2 (mas grave); del traqueteo
+    # la 2 y la 3 (el ruido de huesos enseguida); de la alerta la 2 y la 1 (el jadeo enseguida); del dolor la 3, la 1 y la 2 (desde el
+    # segundo 0,45); de deshacerse la 4 y la 2 (las mas fuertes); de rehacerse la 4 y la 2 (desde el 0,9: el crujido final a los ~2 s,
+    # cuando acaba de levantarse); del polvo la 1 y la 4; del barrido la 1 y la 3 (la llamarada enseguida); del arrastre la 2 y la 3;
+    # del golpe la 1, la 2 y la 4; de la guirnalda la 2 y la 3; de la campana la 4 (la mas fuerte) y la 3 (la mas larga); de los
+    # susurros la 2 y la 4 (los mas fuertes)
+    "osario_ambiente": (1, 2), "ensamblado_traqueteo": (2, 3), "ensamblado_alerta": (2, 1), "ensamblado_dolor": (3, 1, 2),
+    "ensamblado_deshace": (4, 2), "ensamblado_rehace": (4, 2), "ensamblado_polvo": (1, 4), "portacirios_barrido": (1, 3),
+    "monton_arrastre": (2, 3), "monton_golpe": (1, 2, 4), "guirnalda_cae": (2, 3), "osario_campana": (4, 3), "osario_susurros": (2, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

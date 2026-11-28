@@ -766,6 +766,7 @@ public final class CiTest {
         misionSigrun(server, m, log);
         minas(server, m, log, out);
         capataz(server, m, log);
+        osario(server, m, log, out);
         armaduras(server, m, log);
         armas7aj(server, m, log);
         escudos7ak(server, m, log);
@@ -6733,6 +6734,348 @@ public final class CiTest {
      * el turno de noche que descansa (y no vuelve); el Pico del Capataz (la veta que revienta al cuarto golpe). Al acabar, todo como
      * estaba (Hakon y los enterrados vuelven).
      */
+    /**
+     * El Osario de San Ulfo (parte 7as): el camposanto, la capilla y la cripta (lo que hay, a donde se llega a pie, el muro de los
+     * priores, la escotilla del panteon, la campana y el nombre de cada sitio); los Ensamblados de sus puestos (cuantos, como esperan,
+     * en su suelo y sin meterse en un bloque), como se levantan, que todas sus acciones acaban, sus golpes contra una presa y lo suyo:
+     * se deshacen al caer y se rehacen (una vez) salvo que se pisotee el monton, se les queme o se les rompa con un martillo.
+     */
+    private static void osario(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.OSARIO;
+        var A = com.darkcraft.morvain.Osario.get();
+        final int CX = com.darkcraft.morvain.Osario.CX, CZ = com.darkcraft.morvain.Osario.CZ, C2 = com.darkcraft.morvain.Osario.C2;
+        final int SUELO = com.darkcraft.morvain.Osario.SUELO;
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07aac"), "[DarkCraftCI33]"));
+        // ---------------------------------------------------------------- el osario: lo que hay y a donde se llega
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : A.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            com.darkcraft.morvain.MurosIlusorios.cerrar(m, com.darkcraft.morvain.Osario.MURO_PRIORES);
+            com.darkcraft.morvain.Osario.escotilla(m, false);
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            int[] esc = {CX + 26, SUELO, CZ - 57};
+            final boolean[] escalaArriba = {false};
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                // la escotilla abierta sobre la escala hace de escalera (asi sube el juego); Andar no lo sabe
+                if (escalaArriba[0] && x == esc[0] && y == esc[1] && z == esc[2])
+                    return net.minecraft.world.level.block.Blocks.LADDER.defaultBlockState()
+                            .setValue(net.minecraft.world.level.block.LadderBlock.FACING, net.minecraft.core.Direction.NORTH);
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || st.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                        || st.getBlock() instanceof net.minecraft.world.level.block.SkullBlock || st.getBlock() instanceof net.minecraft.world.level.block.WallSkullBlock
+                        || st.getBlock() instanceof net.minecraft.world.level.block.WebBlock || st.getBlock() instanceof net.minecraft.world.level.block.BushBlock ? aire : st;
+            };
+            int[] en = A.sitio("entrada");
+            StringBuilder sb = new StringBuilder("Morvain, el osario de San Ulfo: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Osario.resumen(m));
+            var st = com.darkcraft.morvain.SantuariosMorvain.porId("osario");
+            sb.append("; santuario ").append(com.darkcraft.santuario.Santuarios.nombre(m, st.pos())).append(" (").append(m.getBlockState(st.pos()).getBlock().getDescriptionId())
+                    .append(") a ").append(Math.round(com.darkcraft.morvain.Osario.distancia(st.x(), st.z()))).append(" del camposanto");
+            sb.append("; ").append(A.tumbas).append(" tumbas (").append(A.abiertas).append(" abiertas), ").append(A.nichos).append(" nichos, ").append(A.calaveras)
+                    .append(" calaveras, ").append(A.velas).append(" velas, ").append(A.arboles).append(" arboles");
+            for (int fase = 0; fase < 2; fase++) {
+                if (fase == 1) {
+                    // un jugador al fondo del pasillo de los priores, mirando al muro (al sur), golpea (lo que hace el combate)
+                    fp.moveTo(CX - 27.5, C2 + 1, CZ - 59.3, 0f, 0f);
+                    fp.setYHeadRot(0f);
+                    int ab0 = com.darkcraft.morvain.MurosIlusorios.ABIERTOS;
+                    com.darkcraft.morvain.MurosIlusorios.golpe(fp);
+                    sb.append("; un golpe al muro de los priores: se abre +").append(com.darkcraft.morvain.MurosIlusorios.ABIERTOS - ab0)
+                            .append(" (").append(com.darkcraft.morvain.MurosIlusorios.estado(m)).append(')');
+                }
+                var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, en[0], en[1], en[2], com.darkcraft.morvain.Osario.X0, com.darkcraft.morvain.Osario.Z0,
+                        com.darkcraft.morvain.Osario.X1, com.darkcraft.morvain.Osario.Z1, 8_000_000);
+                sb.append("; a pie, ").append(fase == 0 ? "todo cerrado" : "con el muro abierto").append(" (").append(zona.celdas()).append(" celdas):");
+                for (var e : A.sitios().entrySet()) {
+                    if (e.getKey().equals("alto")) continue;
+                    int[] q = e.getValue();
+                    sb.append(' ').append(e.getKey()).append(zona.alcanza(q[0], q[1], q[2], 2) ? "+" : "-");
+                }
+                if (fase == 1) {
+                    int lejos = 0;
+                    for (var o : A.esperas()) if (!zona.alcanza(o.x(), o.y(), o.z(), 2)) lejos++;
+                    sb.append("; de los ").append(A.esperas().size()).append(" del osario, a los que no se llega ").append(lejos);
+                }
+            }
+            // ---- la escotilla del panteon: la palanca de debajo (la usa un jugador colgado de la escala) la abre y la cierra
+            BlockPos pal = new BlockPos(esc[0] + 1, SUELO - 1, esc[2]);
+            fp.moveTo(esc[0] + 0.5, SUELO - 2, esc[2] + 0.5, -90f, -30f);
+            var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pal), net.minecraft.core.Direction.WEST, pal, false);
+            m.getBlockState(pal).use(m, fp, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+            boolean abre = com.darkcraft.morvain.Osario.escotillaAbierta(m);
+            m.getBlockState(pal).use(m, fp, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+            boolean cierra = !com.darkcraft.morvain.Osario.escotillaAbierta(m);
+            sb.append("; la escotilla: la palanca de debajo la abre ").append(abre).append(" y la cierra ").append(cierra);
+            // por la chimenea del panteon (solo su caja: la Sala del Pozo, la escala y el panteon)
+            int[] abajo = A.sitio("escala"), pan = A.sitio("panteon");
+            for (int fase = 0; fase < 2; fase++) {
+                escalaArriba[0] = fase == 1;
+                var sube = com.darkcraft.pueblo.gen.Andar.desde(mundo, abajo[0], abajo[1], abajo[2], CX + 16, CZ - 82, CX + 36, CZ - 44, 600_000);
+                var baja = com.darkcraft.pueblo.gen.Andar.desde(mundo, pan[0], pan[1], pan[2], CX + 16, CZ - 82, CX + 36, CZ - 44, 600_000);
+                sb.append(fase == 0 ? "; por la chimenea del panteon, cerrada: " : ", abierta: ").append("de la Sala del Pozo al panteon ")
+                        .append(sube.alcanza(pan[0], pan[1], pan[2], 1.5)).append(", del panteon a la sala ").append(baja.alcanza(abajo[0], abajo[1], abajo[2], 1.5));
+            }
+            escalaArriba[0] = false;
+            // la campana rota
+            int c0 = com.darkcraft.morvain.Osario.CAMPANADAS;
+            com.darkcraft.morvain.Osario.tocar(m);
+            sb.append("; la campana tane +").append(com.darkcraft.morvain.Osario.CAMPANADAS - c0);
+            sb.append("; el sitio:");
+            for (String s2 : new String[]{"entrada", "puerta", "capilla", "campanario", "cripta", "huesos", "catacumbas", "taller", "pozo", "fondo_pozo", "relicario"}) {
+                int[] q = A.sitio(s2);
+                String l = com.darkcraft.morvain.Osario.lugar(q[0] + 0.5, q[1], q[2] + 0.5);
+                sb.append(' ').append(s2).append(' ').append(l == null ? "-" : l.replace("darkcraft.morvain.lugar.", ""));
+            }
+            log.println(sb);
+            topView(m, CX, CZ - 30, 100, new File(out, "morvain_osario.png"));
+            topView(m, CX, CZ, 32, new File(out, "morvain_osario_camposanto.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, el osario de San Ulfo: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] osario", t);
+        } finally {
+            com.darkcraft.morvain.MurosIlusorios.cerrar(m, com.darkcraft.morvain.Osario.MURO_PRIORES);
+            com.darkcraft.morvain.Osario.escotilla(m, false);
+        }
+        // ---------------------------------------------------------------- los ensamblados
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 10; k++)
+                for (var e : fuera) if (e.isAlive()) e.tick();
+            int reza = 0, tumbados = 0, dePie = 0, enSuelo = 0, chocan = 0;
+            int[] porVariante = new int[3];
+            StringBuilder mal = new StringBuilder();
+            com.darkcraft.enemigos.Ensamblado[] despiertan = new com.darkcraft.enemigos.Ensamblado[3];
+            for (var e : fuera) {
+                if (!(e instanceof com.darkcraft.enemigos.Ensamblado c)) continue;
+                porVariante[Math.max(0, Math.min(2, c.variante()))]++;
+                if (!m.noCollision(c)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(c.blockPosition().toShortString()).append(';');
+                }
+                if (c.postura() == com.darkcraft.enemigos.Enemigo.REZA) {
+                    reza++;
+                    int i = c.variante() == com.darkcraft.enemigos.Ensamblado.SEPULTURERO ? 1 : 0;
+                    if (despiertan[i] == null) despiertan[i] = c;
+                } else if (c.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) {
+                    tumbados++;
+                    if (despiertan[2] == null) despiertan[2] = c;
+                } else dePie++;
+                var abajo = m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ()));
+                if (!abajo.getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+                else if (mal.length() < 400) mal.append(' ').append(c.tipo()).append(" en el aire en ").append(c.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, los ensamblados: fuera " + fuera.size() + " de " + com.darkcraft.morvain.MorvainEnemigos.osario().size() + " (portacirios "
+                    + porVariante[0] + ", sepultureros " + porVariante[1] + ", colosos " + porVariante[2] + "): rezando o cavando " + reza + ", hechos un monton "
+                    + tumbados + ", de pie " + dePie + " (en su suelo " + enSuelo + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+            // ---- los que esperan se levantan (una presa a su lado)
+            StringBuilder sb = new StringBuilder("Morvain, los ensamblados en accion:");
+            String[] como = {"rezando", "cavando", "hecho un monton"};
+            for (int i = 0; i < 3; i++) {
+                var c = despiertan[i];
+                if (c == null) {
+                    sb.append(" NO HAY NINGUNO ").append(como[i]).append(';');
+                    continue;
+                }
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (presa == null) continue;
+                presa.moveTo(c.getX() + 1.2, c.getY(), c.getZ() + 0.4, 0f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(presa);
+                quitar.add(presa);
+                c.setTarget(presa);
+                int sale = -1, accion = 0;
+                for (int k = 0; k < 90; k++) {
+                    c.tickCount++;
+                    c.tick();
+                    int a = c.accion();
+                    if (sale < 0 && a != 0) {
+                        sale = k;
+                        accion = a;
+                    }
+                    if (sale >= 0 && a == 0) break;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " el %s %s (en %s) %s en el tick %d y queda de pie %s;", c.tipo().replace("ensamblado_", ""), como[i],
+                        c.blockPosition().toShortString(), accion == 0 ? "NO SE MUEVE" : com.darkcraft.enemigos.EnsambladoAnims.NOMBRES[accion], sale,
+                        c.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE));
+                c.setTarget(null);
+                presa.discard();
+            }
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
+            // ---- en medio de la Capilla de los Huesos (de cara al sur): uno de cada, cada accion acaba
+            final double gx = CX + 0.5, gy = C2 + 1, gz = CZ - 70.5;
+            for (int v2 = 0; v2 < 3; v2++) {
+                var a = DarkCraftMod.ENSAMBLADO.get().create(m);
+                if (a == null) continue;
+                a.variante(v2);
+                a.moveTo(gx - 5 + v2 * 5, gy, gz, 0f, 0f);
+                m.addFreshEntity(a);
+                quitar.add(a);
+                StringBuilder no = new StringBuilder();
+                for (int ac = 1; ac < com.darkcraft.enemigos.EnsambladoAnims.TICKS.length; ac++) {
+                    String nombre = com.darkcraft.enemigos.EnsambladoAnims.NOMBRES[ac];
+                    if (nombre.equals("morir")) continue;
+                    a.empezar(ac);
+                    for (int k = 0; k < 90 && a.accion() == ac; k++) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    if (a.accion() == ac) no.append(' ').append(nombre);
+                    for (int k = 0; k < 6; k++) a.tick();
+                    a.postura(com.darkcraft.enemigos.Enemigo.DE_PIE);
+                    a.moveTo(gx - 5 + v2 * 5, gy, gz, 0f, 0f);
+                }
+                sb.append(' ').append(a.tipo().replace("ensamblado_", "")).append(String.format(java.util.Locale.ROOT, " (vida %.0f, golpe %.1f, armadura %d, caja %.2f x %.2f)",
+                        a.getMaxHealth(), a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), a.getArmorValue(), a.getBbWidth(),
+                        a.getBbHeight())).append(": acciones que no acaban").append(no.length() == 0 ? " ninguna" : no).append(';');
+                a.discard();
+            }
+            log.println(sb);
+            // ---- contra una presa (un aldeano quieto delante, al sur; la onda y el pisoton, a un lado)
+            sb = new StringBuilder("Morvain, los ensamblados contra una presa:");
+            int P = com.darkcraft.enemigos.Ensamblado.PORTACIRIOS, S = com.darkcraft.enemigos.Ensamblado.SEPULTURERO, K = com.darkcraft.enemigos.Ensamblado.COLOSO;
+            String[] nombres = {"candelazo", "barrido del cirio", "palada", "tierra a los ojos", "mazazo", "la onda del mazazo", "barrido de la maza", "pisoton"};
+            int[] acciones = {com.darkcraft.enemigos.EnsambladoAnims.CANDELAZO, com.darkcraft.enemigos.EnsambladoAnims.BARRIDO_CIRIO,
+                    com.darkcraft.enemigos.EnsambladoAnims.PALADA, com.darkcraft.enemigos.EnsambladoAnims.TIERRA, com.darkcraft.enemigos.EnsambladoAnims.MAZAZO,
+                    com.darkcraft.enemigos.EnsambladoAnims.MAZAZO, com.darkcraft.enemigos.EnsambladoAnims.BARRIDO_MAZA, com.darkcraft.enemigos.EnsambladoAnims.PISOTON};
+            int[] variantes = {P, P, S, S, K, K, K, K};
+            // donde esta la presa: {de lado, delante}
+            double[][] donde = {{0, 2.4}, {0, 2.2}, {0, 2.4}, {0, 4.0}, {0, 2.8}, {2.6, 2.4}, {0, 3.0}, {1.2, 1.4}};
+            int dura = 60;
+            int quem = com.darkcraft.enemigos.Ensamblado.QUEMADOS, cie = com.darkcraft.enemigos.Ensamblado.CIEGOS, ond = com.darkcraft.enemigos.Ensamblado.ONDAS,
+                    pis = com.darkcraft.enemigos.Ensamblado.PISOTONES;
+            final double hx = CX + 0.5, hz = CZ - 76.5;
+            for (int i = 0; i < nombres.length; i++) {
+                var a = DarkCraftMod.ENSAMBLADO.get().create(m);
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (a == null || presa == null) continue;
+                a.variante(variantes[i]);
+                a.moveTo(hx, gy, hz, 0f, 0f);
+                presa.moveTo(hx + donde[i][0], gy, hz + donde[i][1], 180f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(a);
+                m.addFreshEntity(presa);
+                quitar.add(a);
+                quitar.add(presa);
+                a.setTarget(presa);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(acciones[i]);
+                float vida = presa.getHealth();
+                boolean frenada = false, ardiendo = false, ciega = false, acabo = false;
+                for (int k = 0; k < dura; k++) {
+                    if (!a.isRemoved() && !acabo) {
+                        a.tickCount++;
+                        a.tick();
+                        if (a.accion() == 0) acabo = true;
+                    }
+                    net.minecraft.world.phys.Vec3 dv = presa.getDeltaMovement();
+                    if (dv.lengthSqr() > 1e-4) {
+                        presa.move(net.minecraft.world.entity.MoverType.SELF, dv);
+                        presa.setDeltaMovement(dv.x * 0.55, presa.onGround() ? 0 : dv.y - 0.08, dv.z * 0.55);
+                    }
+                    if (Math.abs(presa.getY() - gy) < 0.05) presa.setOnGround(true);
+                    presa.invulnerableTime = 0;
+                    frenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                    ciega |= presa.hasEffect(net.minecraft.world.effect.MobEffects.BLINDNESS);
+                    ardiendo |= presa.isOnFire();
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " %s (%s) a %.1f: la presa -%.1f", nombres[i], a.tipo().replace("ensamblado_", ""),
+                        Math.hypot(donde[i][0], donde[i][1]), vida - presa.getHealth()));
+                if (i <= 1) sb.append(", ardiendo ").append(ardiendo);
+                if (i == 3) sb.append(", ciega ").append(ciega).append(", frenada ").append(frenada);
+                if (i >= 4 && i != 6) sb.append(", frenada ").append(frenada);
+                sb.append(';');
+                presa.clearFire();
+                presa.discard();
+                a.discard();
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " quemados +%d, cegados +%d, ondas +%d, pisotones +%d", com.darkcraft.enemigos.Ensamblado.QUEMADOS - quem,
+                    com.darkcraft.enemigos.Ensamblado.CIEGOS - cie, com.darkcraft.enemigos.Ensamblado.ONDAS - ond, com.darkcraft.enemigos.Ensamblado.PISOTONES - pis));
+            log.println(sb);
+            // ---- lo suyo: caen hechos un monton y se rehacen (una vez) si nadie los pisa; el monton pisado, el fuego y el martillo, polvo
+            sb = new StringBuilder("Morvain, los ensamblados se rehacen:");
+            int desh0 = com.darkcraft.enemigos.Ensamblado.DESHECHOS, reh0 = com.darkcraft.enemigos.Ensamblado.REHECHOS, pol0 = com.darkcraft.enemigos.Ensamblado.POLVO,
+                    pis0 = com.darkcraft.enemigos.Ensamblado.POLVO_PISOTEADO, mar0 = com.darkcraft.enemigos.Ensamblado.POLVO_MARTILLO,
+                    fue0 = com.darkcraft.enemigos.Ensamblado.POLVO_FUEGO;
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+            for (int caso = 0; caso < 4; caso++) {
+                var a = DarkCraftMod.ENSAMBLADO.get().create(m);
+                if (a == null) continue;
+                a.variante(caso == 1 ? K : P);
+                a.moveTo(hx + (caso - 1.5) * 3, gy, hz + 3, 0f, 0f);
+                m.addFreshEntity(a);
+                quitar.add(a);
+                fp.moveTo(a.getX(), gy, a.getZ() - 2, 0f, 0f);
+                for (int k = 0; k < 3; k++) {
+                    a.tickCount++;
+                    a.tick();
+                }
+                String nombre = caso == 0 ? "a espada (y se deja)" : caso == 1 ? "el coloso a espada (y se pisa el monton)" : caso == 2 ? "con fuego" : "con un martillo";
+                if (caso == 2) a.hurt(m.damageSources().inFire(), 1000f);
+                else {
+                    if (caso == 3) fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(DarkCraftMod.MARTILLO_GUERRA.get()));
+                    a.invulnerableTime = 0;
+                    a.hurt(m.damageSources().playerAttack(fp), 1000f);
+                    fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+                }
+                sb.append(' ').append(nombre).append(": ").append(a.isAlive() ? (a.deshecho() ? "hecho un monton" : "EN PIE") : "polvo");
+                if (caso == 0 && a.isAlive() && a.deshecho()) {
+                    // nadie lo pisa: a los cinco segundos se rehace con media vida y se levanta
+                    int t = 0;
+                    while (a.deshecho() && t < com.darkcraft.enemigos.Ensamblado.DESHECHO + 10) {
+                        a.tickCount++;
+                        a.tick();
+                        t++;
+                    }
+                    for (int k = 0; k < 50 && a.accion() != 0; k++) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    sb.append(String.format(java.util.Locale.ROOT, ", se rehace en %d ticks con %.0f de %.0f, de pie %s", t, a.getHealth(), a.getMaxHealth(),
+                            a.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE));
+                    // la segunda vez ya no se rehace
+                    a.invulnerableTime = 0;
+                    a.hurt(m.damageSources().playerAttack(fp), 1000f);
+                    sb.append(", la segunda vez: ").append(a.isAlive() ? (a.deshecho() ? "OTRA VEZ un monton" : "EN PIE") : "polvo");
+                }
+                if (caso == 1 && a.isAlive() && a.deshecho()) {
+                    // el monton se pisa (cualquier golpe de un jugador): polvo
+                    for (int k = 0; k < 20; k++) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    a.invulnerableTime = 0;
+                    a.hurt(m.damageSources().playerAttack(fp), 1f);
+                    sb.append(", se pisa el monton: ").append(a.isAlive() ? "SIGUE" : "polvo");
+                }
+                sb.append(';');
+                for (int k = 0; k < 40 && !a.isRemoved(); k++) a.tick();
+                a.discard();
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " deshechos +%d, rehechos +%d, polvo +%d (pisoteados +%d, con martillo +%d, con fuego +%d)",
+                    com.darkcraft.enemigos.Ensamblado.DESHECHOS - desh0, com.darkcraft.enemigos.Ensamblado.REHECHOS - reh0, com.darkcraft.enemigos.Ensamblado.POLVO - pol0,
+                    com.darkcraft.enemigos.Ensamblado.POLVO_PISOTEADO - pis0, com.darkcraft.enemigos.Ensamblado.POLVO_MARTILLO - mar0,
+                    com.darkcraft.enemigos.Ensamblado.POLVO_FUEGO - fue0));
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println("Morvain, los ensamblados: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] ensamblados", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
+        }
+    }
+
     private static void capataz(MinecraftServer server, ServerLevel m, PrintWriter log) {
         String sitio = com.darkcraft.morvain.MorvainEnemigos.MINA;
         final int CX = com.darkcraft.morvain.Mina.CX, CZ = com.darkcraft.morvain.Mina.CZ, N3 = com.darkcraft.morvain.Mina.N3;

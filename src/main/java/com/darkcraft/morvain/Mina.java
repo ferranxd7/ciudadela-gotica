@@ -1560,7 +1560,9 @@ public final class Mina {
     public static String lugar(double x, double y, double z) {
         if (!dentro(x, y, z)) return null;
         int v = (int) Math.floor(z) - CZ;
-        if (y >= FONDO - 1 && nivelCorta((int) Math.floor(x) - CX, v) > 0) return "darkcraft.morvain.lugar.corta";
+        // en la corta solo si se esta en su escalon (o por encima): bajo el escalon ya es la galeria (la del rey pasa por debajo)
+        int k = nivelCorta((int) Math.floor(x) - CX, v);
+        if (k > 0 && y >= altoCorta(k) - 1) return "darkcraft.morvain.lugar.corta";
         if (y < N3 + 22 && v < -176) return "darkcraft.morvain.lugar.filon";
         if (y < N2 + 14 && Math.hypot(((int) Math.floor(x) - CX) / LAGO_A, (v - LAGO_V) / LAGO_B) < 1.05) return "darkcraft.morvain.lugar.lago";
         return "darkcraft.morvain.lugar.minas";

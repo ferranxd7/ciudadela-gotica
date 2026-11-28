@@ -249,6 +249,12 @@ public class MorvainGenerador extends ChunkGenerator {
         } catch (Throwable t) {
             DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar la mina en el chunk {}", c.getPos(), t);
         }
+        // el Osario de San Ulfo, en el Bosque Muerto: el camposanto, la capilla y la cripta de los huesos (parte 7as)
+        try {
+            if (Osario.toca(c.getPos().x, c.getPos().z)) Osario.chunk(nivel, c);
+        } catch (Throwable t) {
+            DarkCraftMod.LOGGER.error("Morvain: no se pudo levantar el osario en el chunk {}", c.getPos(), t);
+        }
         // el Nido de Ceniza, en una repisa de las Montanas Nevadas, donde duerme Vorthak (parte 7z)
         try {
             if (Nido.toca(c.getPos().x, c.getPos().z)) Nido.chunk(nivel, c);

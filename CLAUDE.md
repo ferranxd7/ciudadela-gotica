@@ -4318,6 +4318,96 @@ veta roja sangra, y mando volar la pared tras la que se oian voces. La noche del
   primera persona (`ca23`), el picotazo con la veta (`ca24`); cae (`ca25` de rodillas, `ca26` las lamparas, `ca27` se deshace), JEFE
   ABATIDO (`ca28`), lo que deja (`ca29`), el pico en la mano (`ca30`, lineas `Hakon: en la mano ...`) y el bestiario (`ca31`).
 
+### Plan grande, parte 7as: el Osario de San Ulfo y los Ensamblados
+
+Respuesta 131 del plan ("criptas de huesos"), la segunda mazmorra. Lore: ochenta anos antes del cielo rojo la Peste Gris lleno el
+camposanto de San Ulfo; Fray Osmund, el sacristan, desenterro a los cuarenta mil y guardo sus huesos en la cripta, en orden (los craneos
+en filas, los femures en haces, una lampara con todos los huesos del cuerpo). La noche del cielo rojo se levantaron mezclados: los
+Ensamblados. Fray Osmund bajo al relicario (el jefe de la 7at).
+- **El osario** (`morvain/Osario`, en (-3860, 4500), en el Bosque Muerto; u = x - CX, v = z - CZ, el norte —v negativa— es donde baja
+  la cripta; hecho como la mina: `Obra` columna a columna —el otero allanado a `SUELO` 98—, un `Mina.Plano` que forra los huecos de
+  piedra, huesos o pizarra —`forro`— y `Trozo`s; `Adorno` no pone nada en sus chunks —`AX0..AZ1`, de -244 a -239 y de 277 a 284— y los
+  arboles muertos de alrededor, sus helechos y setas los pone el, `bosque()`):
+  - arriba, el **Camposanto de San Ulfo**: la tapia rota (un trozo caido al norte, por donde se vuelve del panteon), la puerta de las
+    calaveras con su farol, 104 tumbas en cuatro campos (lapidas, cruces de palo, obeliscos con vela o calavera y **tumbas abiertas**
+    con los huesos en el fondo; al noroeste el **de los pobres**, casi todo cruces y abiertas), arboles muertos y el camino al santuario;
+  - la **Capilla de San Ulfo**: la nave sin tejado (vigas, un trozo del faldon, una viga caida), bancos rotos, ventanas con y sin
+    barrotes, contrafuertes, el muro del oeste caido a media nave, el altar con su calavera y velas, el **abside** con la cruz de palo
+    y, detras del altar, **la boca de la cripta** con su baranda; el **campanario** (u 5..9) con la escala, la **campana rota** (tañe
+    sola de vez en cuando con alguien a 140: `Osario.campana`; `sfx.osario_campana`) y un arcon arriba;
+  - abajo (`C1` 88), la **Cripta de los Hermanos**: el pasillo de boveda apuntada con dos filas de **nichos** (calaveras, huesos, velas,
+    telaranas, lapidas), cuatro capillas (un altar, un sepulcro, la de los huesos y la del arcon) y faroles de almas;
+  - la **Capilla de los Huesos** (`C2` 78, u -9..9, v -61..-81; `techoHuesos`): la boveda de huesos con sus costillas, dos filas de
+    calaveras en las paredes, **la gran lampara de huesos** colgada en medio (la cruz de huesos con velas encima y calaveras colgando),
+    las **guirnaldas de calaveras** (dos a lo largo y dos de lado a lado), las **cuatro piramides de huesos** de las esquinas con su
+    verja, el **altar de craneos** con la **cruz de huesos** sobre pizarra y el **escudo de huesos** (cuartelado, con su corona de varas
+    de luz); sus dos salidas (`VX` -71);
+  - al oeste, **las catacumbas** (el pasillo de nichos), el **Taller del Sacristan** (la mesa de los huesos a medio ordenar, la muela, la
+    olla, el banco, las pilas de femures y craneos, las estanterias con calaveras, el jergon de paja —sin cama: revientan en Morvain— y
+    el atril con el **libro perdido 37**, "El libro de los huesos" de Fray Osmund), la **cripta de los priores** tras un **muro
+    ilusorio** (`MURO_PRIORES`, al fondo del ramal del sur: tres sepulcros y el arcon `chests/osario_bueno`) y el **osario menor** (los
+    huesos sin ordenar, a montones);
+  - al este, la **Sala del Pozo** (vigas con cadenas): el **Pozo de los Huesos** (doce de hondo, paredes de huesos con calaveras, su
+    escala y un arcon en el fondo), la **chimenea del panteon** (`ESCALA_U/V`: la escala sube a la **escotilla de hierro** del
+    **panteon**, fuera de la tapia al noreste; solo se abre con la palanca de debajo —`Osario.escotilla`—: el atajo) y, al norte, el
+    pasillo que baja al **Relicario** (`RELICARIO` 74: cupula, ocho pilares, el relicario de San Ulfo con su arca de cristal; la sala
+    de Fray Osmund, que llega en la 7at).
+  Santuario nuevo "El Camposanto de San Ulfo" (`SantuariosMorvain`, id `osario`, 42 al sur de la puerta, a la altura del otero).
+  Logros `osario` ("Cuarenta mil": bajar a la cripta) y `ensamblado` ("Polvo eres": dejar en polvo a uno), con su entrada del diario.
+  El Espejo (`Osario.lugar`): el Camposanto, la Capilla de San Ulfo, el Osario, la Capilla de los Huesos, el Pozo de los Huesos, el
+  Taller del Sacristan y el Relicario. Abajo suena **el aire de la cripta** (`ambiente.osario`, `ClientMusic.tickOsario`) y en la Capilla
+  de los Huesos, a veces, **los susurros** (`Osario.susurros`). Cofres `chests/osario` (huesos, velas, frutos de hueso y de brasa, flechas
+  de fuego, piedras) y `osario_bueno` (con un martillo, el talisman del hueso, la ceniza de las llamas o el de la sombra).
+- **Los Ensamblados** (`enemigos/Ensamblado`, entidad `darkcraft:ensamblado` 0,7 x 2,0; modelo de `tools/enemigos/ensamblado.py`: huesos
+  de muchos —la calavera de uno, las costillas de otro—, con llamas de alma en las cuencas; bestiario `ensamblado_portacirios`,
+  `_sepulturero`, `_coloso`). 30 de vida, golpe 5,5, armadura 3. **Se rehacen**: lo que les dejaria muertos les deja hechos **un
+  monton de huesos** (`DESHACERSE`; el aviso `darkcraft.osario.pisotea` la primera vez) y a los 5 s (`DESHECHO`) se vuelven a armar
+  (`REHACERSE`, con media vida; una sola vez). El monton no recibe dano de nada salvo de un golpe de alguien (**pisotearlo**: polvo) o lo
+  que acaba del todo; **el fuego** (o morir ardiendo), **las explosiones** y **los martillos** (`armas/Martillo` en la mano de quien
+  pega) los dejan en polvo a la primera (`definitivo`).
+  - **portacirios** (0): un candelabro de huesos con tres velas encendidas (las llamas en el cliente): **candelazo** y **barrido** que
+    prenden fuego. Espera rezando (`REZA`).
+  - **sepulturero** (1, +15 % vida): la pala de Fray Osmund: **palada** y, de 3,2 a 5,5 bloques, **tierra a los ojos** (abanico de 70
+    grados: ceguera 2,5 s, lentitud y algo de dano; cada 5 s). Espera **cavando** (`REZA`: la animacion `CAVANDO`).
+  - **coloso** (2, escala 1,6: vida x3,2, armadura +5, casi no se le empuja, mas lento, golpe +35 %): la maza de un femur de gigante:
+    **mazazo** (la onda a 3 delante, radio 3: a quien este de pie; frena), **barrido de la maza** y, si te pegas a el, **pisoton**
+    (la onda alrededor, radio 3,4; cada 6 s).
+  Cualquiera puede esperar **hecho un monton** (`TUMBADO`: se rehace al llegar alguien). Dejan piedra de forja I (7 %; el coloso, II
+  el 10 %) y huesos.
+- **Los de alli** (`MorvainEnemigos`, sitio `osario`, 33; `Osario.esperas`): el camposanto (los tres sepultureros cavando junto a sus
+  tumbas abiertas —`CAVAN`—, dos montones, el de la puerta de la capilla y uno de ronda), la capilla (rezando ante el altar y en los
+  bancos), la cripta, la Capilla de los Huesos (el coloso del altar, dos rezando a las piramides y dos montones), las catacumbas, el
+  taller, el osario menor (otro coloso), la Sala del Pozo (el sepulturero del fondo y el coloso que guarda el paso al Relicario) y el
+  pasillo del Relicario.
+- Sonidos (ElevenLabs, flow `AjCJ26g3xjDGQMxHS2Sh`, tomas en `TOMAS_SFX` elegidas midiendo): `osario_ambiente` (1 y 2, en bucle),
+  `ensamblado_traqueteo` (2 y 3), `_alerta` (2 y 1), `_dolor` (3, 1 y 2), `_deshace` (4 y 2), `_rehace` (4 y 2, desde el 0,9),
+  `_polvo` (1 y 4), `portacirios_barrido` (1 y 3), `monton_arrastre` (2 y 3: los huesos que se arrastran antes de rehacerse),
+  `monton_golpe` (1, 2 y 4: el mazazo), `guirnalda_cae` (2 y 3; para la 7at), `osario_campana` (4 y 3) y `osario_susurros` (2 y 4).
+- Comandos `/darkcraft osario [ir <sitio> | enemigos [volver | fuera | sacar] | escotilla [abrir | cerrar] | muro [abrir | cerrar] |
+  campana | ensamblado <portacirios | sepulturero | coloso | tumbar | rehacer>]`.
+- **Sin abrir el juego**: `VOLCADO_OPTS="-Droca=true" bash tools/vista3d/vista.sh morvain_osario carpeta` (`-Dcaja=x0,z0,x1,z1` un
+  trozo; `-Dabierto=true` el muro abierto; marcas P, S y K de los puestos): a que se llega a pie desde la entrada con todo cerrado y con
+  el muro de los priores abierto (todos los sitios; los priores solo con el muro abierto) y si cada uno de los 33 se pisa, se llega y no
+  esta metido en un bloque (los colosos, cuatro de alto). Los Ensamblados: `python3 tools/enemigos/generar.py --solo ensamblado
+  --vistas carpeta`.
+- Arreglo de paso: `Mina.lugar` decia "La Corta" dentro de la Galeria del Rey (bajo el escalon de la corta): ahora solo si se esta en
+  el escalon o por encima.
+- Pruebas: servidor, `osario()` despues de `capataz()` (lineas `Morvain, el osario de San Ulfo: ...` —lo que hay (`Osario.resumen`),
+  el santuario, a pie con todo cerrado y con el muro abierto de un golpe, la palanca que abre y cierra la escotilla, por la chimenea
+  solo con ella abierta, la campana, el nombre de cada sitio—, `Morvain, los ensamblados: ...` —en su sitio, en su suelo, ninguno
+  metido en un bloque—, `... en accion: ...` —los que esperan se levantan (el monton se rehace), cada accion acaba—, `... contra una
+  presa: ...` —candelazo y barrido que queman, palada, la tierra que ciega, mazazo y su onda, barrido de la maza, pisoton— y `Morvain,
+  los ensamblados se rehacen: ...` —a espada se deshace y se rehace con media vida y la segunda vez es polvo; el coloso pisoteado,
+  polvo; con fuego y con martillo, polvo a la primera—); cliente, tramo `osario()` despues de `capataz()`: desde el santuario
+  (`cliente_os01`), el camposanto, el de los pobres, la capilla, la nave, el abside, el campanario, la escalera de la cripta, los
+  hermanos y una capilla, la bajada, la Capilla de los Huesos (de lejos, la lampara, el altar, el escudo y sin vision nocturna), las
+  catacumbas y el taller (`os02..os18`); en aventura un golpe al muro de los priores (`os19`) y su cripta (`os20`); el osario menor, la
+  Sala del Pozo y su fondo (`os21..os23`); la palanca de la escotilla (`os24`, `os25` abierta desde abajo), el panteon, el relicario y
+  todo desde lo alto (`os26..os28`); entrar a pie (`os29`: el logro, el sitio, el aire); en supervivencia, en la Capilla de los Huesos:
+  candelazo, barrido del cirio, palada, tierra, mazazo, barrido de la maza y pisoton (`os30..os36`); uno que se deshace (`os37`), el
+  monton con el aviso (`os38`), se rehace (`os39`), otro pisoteado con el golpe del combate (`os40`) y un coloso hecho polvo de un
+  martillazo (`os41`); el libro de los huesos (`os42`) y el bestiario (`os43..os45`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

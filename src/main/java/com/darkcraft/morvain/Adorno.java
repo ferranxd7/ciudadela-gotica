@@ -62,6 +62,8 @@ final class Adorno {
         // ni en las Minas de Hierro Negro (parte 7aq)
         if (Mina.cerca(x0, z0)) return;
         if (Nido.cerca(x0, z0)) return;
+        // ni en el Osario de San Ulfo (parte 7as): los arboles muertos de alrededor los pone el
+        if (Osario.cerca(x0, z0)) return;
         // en las herrerias (parte 7af) solo la hierba (alrededor de su suelo allanado)
         if (Herrerias.cerca(x0, z0)) {
             hierba(nivel, c, r, 24, Blocks.GRASS.defaultBlockState(), Blocks.DEAD_BUSH.defaultBlockState());

@@ -382,6 +382,33 @@ public final class ClientMusic {
         }
     }
 
+    // ------------------------------------------------------------------ el Osario de San Ulfo (parte 7as): el aire de la cripta
+
+    private static Track osario;
+    private static int osarioTicks;
+    private static boolean enOsario;
+
+    private static void tickOsario(Minecraft mc) {
+        if (mc.player == null || mc.level == null) enOsario = false;
+        else if (mc.player.tickCount % 20 == 17)
+            enOsario = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL
+                    && com.darkcraft.morvain.Osario.dentro(mc.player.getX(), mc.player.getY(), mc.player.getZ());
+        boolean quiere = enOsario && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
+        if (quiere) {
+            if (osario == null || osario.dying() || !mc.getSoundManager().isActive(osario) && osarioTicks > 20) {
+                if (osario != null && !osario.dying()) mc.getSoundManager().stop(osario);
+                osario = new Track(DarkCraftMod.AMBIENTE_OSARIO.get(), "osario", false);
+                osarioTicks = 0;
+                mc.getSoundManager().play(osario);
+                osario.fadeTo(0.85f, 2.5f);
+            }
+        } else if (osario != null && !osario.dying()) osario.kill(3.0f);
+        if (osario != null) {
+            osarioTicks++;
+            if (osario.dying() && !mc.getSoundManager().isActive(osario) && osarioTicks > 20) osario = null;
+        }
+    }
+
     // ------------------------------------------------------------------ la academia (parte 7o): viento en la meseta y susurros
 
     private static Track academia;
@@ -555,6 +582,12 @@ public final class ClientMusic {
         return capital == null ? "sin las ruinas" : String.format("las ruinas %.2f%s", capital.level(), mc.getSoundManager().isActive(capital) ? "" : " (paradas)");
     }
 
+    /** Para la prueba de la CI: si suena el aire del osario. */
+    public static String osario() {
+        Minecraft mc = Minecraft.getInstance();
+        return osario == null ? "sin el aire del osario" : String.format("el aire del osario %.2f%s", osario.level(), mc.getSoundManager().isActive(osario) ? "" : " (parado)");
+    }
+
     /** Para la prueba de la CI: si suena el aire de la mina. */
     public static String mina() {
         Minecraft mc = Minecraft.getInstance();
@@ -726,6 +759,8 @@ public final class ClientMusic {
         if (capital != null && !capital.dying()) any = true;
         tickMina(mc);
         if (mina != null && !mina.dying()) any = true;
+        tickOsario(mc);
+        if (osario != null && !osario.dying()) any = true;
         tickAcademia(mc);
         if (academia != null && !academia.dying()) any = true;
         tickCosta(mc);
