@@ -267,7 +267,7 @@ public final class Morvain {
     }
 
     /** Si hay alguien cerca del Patio del Juramento o del Observatorio (se mira cada segundo). */
-    private static boolean cercaJuramento, cercaObservatorio, cercaCerco, cercaTeatro, cercaMina, cercaOsario;
+    private static boolean cercaJuramento, cercaObservatorio, cercaCerco, cercaTeatro, cercaMina, cercaOsario, cercaLazareto;
 
     /** Al acabar cada tick, los que entraron en un portal; y cada segundo, con alguien cerca del arco, su remolino. */
     @SubscribeEvent
@@ -392,6 +392,15 @@ public final class Morvain {
             }
             if (cercaOsario && srv.getTickCount() % 100 == 53) Osario.campana(m);
             if (cercaOsario && srv.getTickCount() % 80 == 29) Osario.susurros(m);
+            // el Lazareto de Maese Galen (parte 7au): el muro ilusorio de la biblioteca (lo abierto no vuelve) y el atanor (cada tick con
+            // alguien cerca: la palanca que lo enciende y el tiro del pozo que sube)
+            if (srv.getTickCount() % 20 == 1) {
+                cercaLazareto = false;
+                for (ServerPlayer p : m.players())
+                    if (Lazareto.distancia(p.getX(), p.getZ()) < 140) cercaLazareto = true;
+                if (cercaLazareto) MurosIlusorios.tick(m);
+            }
+            if (cercaLazareto) Lazareto.tick(m);
         }
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
@@ -474,6 +483,9 @@ public final class Morvain {
         // y quien baja a la cripta del Osario de San Ulfo (parte 7as)
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Osario.dentro(p.getX(), p.getY(), p.getZ())) com.darkcraft.story.Logros.dar(p, "osario");
+        // y quien entra en la torre del Lazareto (parte 7au)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Lazareto.dentro(p.getX(), p.getY(), p.getZ())) com.darkcraft.story.Logros.dar(p, "lazareto");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -629,6 +641,11 @@ public final class Morvain {
         // el Osario de San Ulfo: el camposanto, la capilla, la cripta, la Capilla de los Huesos, el pozo, el taller y el relicario (7as)
         if (Math.abs(p.getX() - Osario.CX) < 60 && p.getZ() < Osario.CZ + 62 && p.getZ() > Osario.CZ - 126) {
             String k = Osario.lugar(p.getX(), p.getY(), p.getZ());
+            if (k != null) return k;
+        }
+        // el Lazareto de Maese Galen: la laguna y el islote, el sotano del atanor y cada planta de la torre (parte 7au)
+        if (Math.abs(p.getX() - Lazareto.CX) < 60 && Math.abs(p.getZ() - Lazareto.CZ) < 60) {
+            String k = Lazareto.lugar(p.getX(), p.getY(), p.getZ());
             if (k != null) return k;
         }
         // el Refugio de la Fragua, donde trabaja Hagen (parte 7af)

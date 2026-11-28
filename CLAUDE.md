@@ -4478,6 +4478,98 @@ cielo rojo se levanto hecho de los huesos de muchos, con una aureola de huesos y
   rodillas, `om25` las almas, `om26` se deshace), JEFE ABATIDO (`om27`), lo que deja (`om28`), el incensario en la mano (`om29`, lineas
   `Fray Osmund: en la mano ...`) y el bestiario (`om30`).
 
+### Plan grande, parte 7au: el Lazareto de Maese Galen y los Destilados
+
+Respuesta 131 del plan ("torres de mago"), la tercera mazmorra. Lore: cuando la Peste Gris llego al Pantano Podrido, Maese Galen, el fisico y
+destilador al que la Academia echo por abrir a los muertos, se llevo a los enfermos en barca a su torre de la laguna y les dio a beber lo que
+destilaba de su sangre y del agua negra: las bubas se hicieron de cristal verde y no murieron. Sus mancebos lo bebian para no enfermar (la
+mascara de pico se les pego a la cara) y a los mas fuertes los uso de cuba viva. La noche del cielo rojo hirvieron todos los alambiques. El
+jefe, Maese Galen fundido con su gran alambique en la Sala del Elixir, llega en la 7av.
+- **El lazareto** (`morvain/Lazareto`, en (-4600, 1500), en el sur del Pantano Podrido, llano a 64-65; u = x - CX, v = z - CZ; hecho como el
+  osario: `Obra` columna a columna, un `Mina.Plano` y `Trozo`s; `Adorno` no pone nada en sus chunks —`AX0..AZ1`, +-58—):
+  - la **laguna** cavada en el pantano (`R_LAGUNA` 46, el borde ondulado; agua hasta `AGUA` 63, fondo de barro, arcilla y raices) con el
+    **islote** (`R_ISLA` 22, suelo a `ISLA` 66): la **calzada** de sillares desde la orilla del sur (v 17..52, muretes y faroles en los bordes),
+    el **huerto de simples** muerto al norte, las **tumbas de los enfermos** al sureste, tres arboles muertos y el **embarcadero roto** al
+    oeste con la **barca hundida**; el santuario nuevo **"El Lazareto"** (`SantuariosMorvain`, id `lazareto`) en la orilla del sur (v 62);
+  - la **torre** redonda (`RT` 11,5, muros de dos, de piedra oscura con bandas de cobre en cada planta, almenas) de siete plantas de `ALTO` 10,
+    con la **torreta de la escalera** al este (`TX` 13: escalera de caracol de una vuelta por planta, los descansillos al oeste, tejado conico
+    con su punta de cobre y pararrayos) y una puerta de arco al sur:
+    - el **sotano del atanor** (`PS` 56): el horno de ladrillo alrededor de la parrilla del pozo (rejas de hierro sobre hogueras de senales
+      apagadas encima de paja), con su puerta al norte, mirillas con barrotes y la **corona** de piedra del nether; la **palanca** a la derecha
+      de la puerta (`PALANCA_U/V`), la cisterna al oeste, el carbon, barriles y tubos de cobre;
+    - la planta baja, el **vestibulo de los frascos** (estanterias de tarros, bancos, camillas, el mostrador del mancebo con su atril);
+    - 1, la **sala de los enfermos** (ocho camillas —losas de abeto con sabana, **sin camas**: revientan en Morvain—, cortinas de cristal
+      blanco, calderos);
+    - 2, el **herbolario** (secaderos de hojas de azalea —persistentes—, raices colgadas, sacos, barriles, la muela);
+    - 3, la **biblioteca** (estanterias de cuatro de alto contra el muro, el anillo de dentro, la mesa de lectura, la alfombra roja, el atril
+      con el **libro perdido 38**, "Notas de Maese Galen") y, tras las dos estanterias del oeste en v = 0, un **muro ilusorio**
+      (`MURO_CELDA`): el paso por el muro a la **celda de Galen**, colgada sobre mensulas, con el arcon `chests/lazareto_bueno`;
+    - 4, el **laboratorio** (mesas, alambiques, hornos encendidos, la mesa de disecciones, lo derramado);
+    - 5, la **Sala del Elixir** bajo la **cupula** de cristal verde con nervios de cobre (`RD` 8,5): el gran alambique sobre el pozo, su vara
+      hasta la cupula, cuatro hogueras de almas, el sillon de Galen y sus atriles (la sala del jefe de la 7av).
+    En el centro, el **pozo del tiro** (`RP` 2,5) atraviesa los suelos del sotano al laboratorio (en cada planta, una barandilla de barrotes con
+    una cancela al norte); la Sala del Elixir lo tapa.
+  - **La escalera esta hundida entre la planta 1 y la 2** (`hundido`): para subir hay que **encender el atanor** con la palanca del sotano
+    (`Lazareto.revisarPalanca`: las hogueras se encienden, el fuego de la corona, `sfx.atanor_enciende`, el aviso `darkcraft.lazareto.atanor` y
+    el logro `atanor`; encendido se queda: lo dicen las hogueras) y subir por **el tiro** (`Lazareto.tiro`, cada tick desde `Morvain` con
+    alguien a 140: en el pozo, levitacion de nivel VI —unos seis bloques por segundo—; agachado, caida lenta; al salir, cae despacio; humo,
+    pavesas y `sfx.atanor_tiro` cada 28 s). A quien llega al ultimo escalon con el atanor apagado, el aviso `darkcraft.lazareto.hundida`.
+  - Logros `lazareto` ("Cuarentena": entrar en la torre), `atanor` ("Tiro de chimenea") y `destilado` ("Mal remedio"), con su entrada del
+    diario. El Espejo (`Lazareto.lugar`): el Lazareto, el Sotano del Atanor, el Vestibulo de los Frascos, la Sala de los Enfermos, el
+    Herbolario, la Biblioteca de Galen, el Laboratorio y la Sala del Elixir. Dentro de la torre suena **el aire de la torre**
+    (`ambiente.lazareto`, `ClientMusic.tickLazareto`; ahi no suena el del pantano). Cofres `chests/lazareto` (frascos vacios, papel, frutos de
+    ceniza —curan el veneno—, piedras, flechas de fuego) y `lazareto_bueno` (con el hechizo de curar, el talisman de la mente, la ceniza de
+    escarcha o el del aliento).
+- **Los Destilados** (`enemigos/Destilado`, entidad `darkcraft:destilado` 0,7 x 2,0; modelo de `tools/enemigos/destilado.py`; bestiario
+  `destilado_mancebo`, `_enfermo`, `_cuba`). 28 de vida, golpe 5, armadura 2. Lo que lanzan es `enemigos/Frasco` (`darkcraft:frasco_destilado`,
+  un `ThrowableItemProjectile` que se ve como un frasco arrojadizo de su color —una pocion con `CustomPotionColor`— o una bola de baba; no da a
+  los enemigos) y sus charcos, `Frasco.Charco` (la nube del juego sin efectos: `FUEGO` quema, `ACIDO` corroe —dano magico, frena y gasta un
+  punto de cada pieza de armadura cada medio segundo—, `CURA` cura a los destilados).
+  - **mancebo** (0, +2 de armadura): la mascara de pico con lentes de cristal verde (lucen), el sombrero, el abrigo encerado con su capelina, el
+    cinto de frascos, la mano de mortero y un frasco en la izquierda. De 3,6 a 16 bloques **lanza frascos** en arco (`FRASCO`: de fuego o de
+    acido, cada 3 s) y, si uno de los suyos a la vista tiene menos del 60 % de vida, le lanza **el elixir verde** (cada 6 s: cura 6 y un cuarto
+    de su vida a los destilados a 3,2 y deja un charco que cura). De cerca, **mortero** de arriba abajo y **de lado**. Se queda a 6,5 de su
+    presa. Espera inclinado sobre su mesa, **moliendo** (`REZA`).
+  - **enfermo** (1, -15 % de vida, +12 % de paso, mas rapido): la piel gris, la bata, las vendas y las **bubas de cristal verde** (lucen).
+    **Zarpazo** (envenena), **se abalanza** desde 2,8-5,5 bloques (cada 4 s; salta y las garras le alcanzan en el aire; envenena y frena) y
+    **escupe** lo que lleva dentro (de 3,5 a 9 bloques, cada 5 s; envenena). Espera sentado en el suelo, **encogido** (`REZA`), o **tendido**
+    boca arriba como un enfermo mas (`TUMBADO`).
+  - **cuba** (2, escala 1,5: vida x3,4, armadura +4, casi no se le empuja, mas lento, golpe +40 %): la **cuba de cristal** a la espalda con el
+    destilado verde (luce), los tubos que le entran por los hombros, el mandil, los guantes y las gafas. **Punetazo**, **embestida** (de 4,5 a
+    10 bloques, cada 6 s) y **derrame** (cada 8 s: se inclina, la cuba le vierte el acido por delante —un abanico de 70 grados hasta 5: dano
+    magico y lentitud— y deja tres charcos de acido en linea). **Al morir le revienta la cuba** (`Destilado.romperCuba`: cristal, el destilado
+    por el suelo y un charco verde de 2,8 que dura 9 s y **cura a los destilados** que lo pisen; el modelo esconde el liquido de dentro).
+    Espera de pie, **jadeando** (`REZA`).
+  Dejan piedra de forja I (7 %; la cuba, II el 12 %) y algun frasco vacio.
+- **Los de alli** (`MorvainEnemigos`, sitio `lazareto`, 30; `Lazareto.esperas`): el islote (la cuba de la puerta, uno en el huerto, dos en las
+  tumbas, el mancebo del embarcadero), el vestibulo (los que esperan turno, uno tendido, el mancebo tras el mostrador), el sotano (la cuba que
+  guarda la palanca, un mancebo, dos enfermos), la sala de los enfermos (tendidos junto a las camillas, el mancebo que los atiende, una
+  cuba), el herbolario, la biblioteca (dos leyendo), el laboratorio (dos mancebos a sus mesas, la cuba, el de la mesa de disecciones) y el
+  tejado.
+- Sonidos (ElevenLabs, flow `xKz2eX6iGZyUELWdiZwe`, tomas en `TOMAS_SFX` elegidas midiendo): `destilado_gemido` (3 y 2), `_alerta` (1 y 3),
+  `_dolor` (2 y 1), `_muerte` (1 y 3), `frasco_lanzar` (3 y 1), `frasco_fuego` (1 y 2), `frasco_acido` (1 y 3), `frasco_cura` (3 y 2),
+  `cuba_golpe` (1 y 3), `cuba_derrame` (3 y 2), `cuba_rompe` (2 y 3), `atanor_enciende` (2 y 1), `atanor_tiro` (4 y 2: 30 s, se relanza cada 28)
+  y `lazareto_ambiente` (4 y 3, en bucle). Prompts y firmas en `herr` (fuera del repo).
+- Comandos `/darkcraft lazareto [ir <sitio> | enemigos [volver | fuera | sacar] | atanor [encender | apagar] | muro [abrir | cerrar] |
+  destilado <mancebo | enfermo | cuba>]`.
+- **Sin abrir el juego**: `VOLCADO_OPTS="-Droca=true" bash tools/vista3d/vista.sh morvain_lazareto carpeta` (`-Dcaja=...`, `-Dabierto=true`;
+  marcas M, E y C de los puestos): a que se llega a pie desde la entrada con el atanor apagado (hasta la sala de los enfermos), encendido (el
+  tiro cuenta como una escala de mano en el pozo: todo menos la celda) y con el muro abierto (todo), y si cada uno de los 30 se pisa, se llega
+  y no esta metido en un bloque (las cubas, tres de alto). Los Destilados: `python3 tools/enemigos/generar.py --solo destilado --vistas carpeta`.
+- Pruebas: servidor, `lazareto()` despues de `osmund()` (lineas `Morvain, el lazareto de Maese Galen: ...` —lo que hay, el santuario, a pie con
+  el atanor apagado, encendido con la palanca (la usa un jugador) y con el muro abierto de un golpe, el tiro (sube, agachado baja despacio, al
+  salir cae despacio) y el nombre de cada sitio—, `Morvain, los destilados: ...` —en su sitio, en su suelo, ninguno metido en un bloque—,
+  `... en accion: ...` —los que esperan se levantan (moliendo, encogido, tendido), cada accion acaba—, `... contra una presa: ...` —mortero, de
+  lado, zarpazo y salto que envenenan, escupitajo, punetazo, embestida, derrame y sus charcos, los frascos de fuego (arde) y de acido (frena y
+  gasta el peto)— y `Morvain, los destilados se curan: ...` —el elixir que se le manda, el que elige el y la cuba que revienta—); cliente, tramo
+  `lazareto()` despues de `osmund()`: desde el santuario (`cliente_lz01`), la calzada, el islote, las tumbas, el embarcadero, cada planta por
+  dentro, la escalera hundida, el atril, la Sala del Elixir y su cupula, el tejado y la torre de lejos (`lz02..lz18`); en aventura la palanca
+  (`lz19`, `lz20` el atanor encendido con su aviso), el tiro (`lz21`, `lz22`, lineas `en el tiro: ...`), un golpe a las estanterias de la
+  biblioteca (`lz23`) y la celda (`lz24`); entrar a pie (`lz25`: el logro, el sitio, el aire); en supervivencia, en la calzada: el frasco de
+  fuego volando y reventando (`lz26`, `lz27`), el de acido (`lz28`), mortero, zarpazo, salto, escupitajo, punetazo, embestida y derrame
+  (`lz29..lz35`), el elixir verde (`lz36`) y la cuba que revienta y su charco (`lz37`, `lz38`); el libro de Galen (`lz39`) y el bestiario
+  (`lz40..lz42`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:

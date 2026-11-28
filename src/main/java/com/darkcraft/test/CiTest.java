@@ -768,6 +768,7 @@ public final class CiTest {
         capataz(server, m, log);
         osario(server, m, log, out);
         osmund(server, m, log);
+        lazareto(server, m, log, out);
         armaduras(server, m, log);
         armas7aj(server, m, log);
         escudos7ak(server, m, log);
@@ -7072,6 +7073,387 @@ public final class CiTest {
         } finally {
             for (var e : quitar) if (!e.isRemoved()) e.discard();
             fp.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
+        }
+    }
+
+    /**
+     * Parte 7au: el Lazareto de Maese Galen y los Destilados. Lo que hay ({@code Lazareto.resumen}), el santuario, a donde se llega a pie
+     * (con el atanor apagado, hasta la sala de los enfermos: la escalera esta hundida; encendido con la palanca del sotano, por el tiro del
+     * pozo hasta arriba; con el muro de la biblioteca abierto de un golpe, a la celda de Galen), el tiro (sube; agachado, baja despacio; al
+     * salir, cae despacio) y el nombre de cada sitio. Los Destilados en su sitio y en su suelo, los que esperan se levantan, cada accion
+     * acaba y, contra una presa, el mortero, el zarpazo y el salto que envenenan, el escupitajo, el punetazo, la embestida, el derrame y
+     * sus charcos, los frascos de fuego y de acido (la armadura se gasta), el elixir verde que cura a uno de los suyos (tambien eligiendolo
+     * el) y la cuba que revienta al caer (su charco cura a los de alrededor).
+     */
+    private static void lazareto(MinecraftServer server, ServerLevel m, PrintWriter log, File out) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.LAZARETO;
+        var L = com.darkcraft.morvain.Lazareto.get();
+        final int CX = com.darkcraft.morvain.Lazareto.CX, CZ = com.darkcraft.morvain.Lazareto.CZ, PS = com.darkcraft.morvain.Lazareto.PS;
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07aad"), "[DarkCraftCI34]"));
+        // ---------------------------------------------------------------- el lazareto: lo que hay y a donde se llega
+        try {
+            long t0 = System.currentTimeMillis();
+            int nch = 0;
+            for (long k : L.chunks()) {
+                m.getChunk((int) (k >> 32), (int) k);
+                nch++;
+            }
+            long ms = System.currentTimeMillis() - t0;
+            com.darkcraft.morvain.Lazareto.encender(m, false);
+            com.darkcraft.morvain.MurosIlusorios.cerrar(m, com.darkcraft.morvain.Lazareto.MURO_CELDA);
+            var aire = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            final boolean[] tiro = {false};
+            com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+                var st = m.getBlockState(new BlockPos(x, y, z));
+                // con el atanor encendido, el pozo hace de escala de mano (el tiro sube; Andar no lo sabe)
+                if (tiro[0] && com.darkcraft.morvain.Lazareto.enTiro(x + 0.5, y, z + 0.5) && y > PS
+                        && (st.isAir() || st.getBlock() instanceof net.minecraft.world.level.block.TrapDoorBlock))
+                    return net.minecraft.world.level.block.Blocks.LADDER.defaultBlockState();
+                return st.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || st.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                        || st.getBlock() instanceof net.minecraft.world.level.block.SkullBlock || st.getBlock() instanceof net.minecraft.world.level.block.WallSkullBlock
+                        || st.getBlock() instanceof net.minecraft.world.level.block.WebBlock || st.getBlock() instanceof net.minecraft.world.level.block.BushBlock ? aire : st;
+            };
+            int[] en = L.sitio("entrada");
+            StringBuilder sb = new StringBuilder("Morvain, el lazareto de Maese Galen: " + nch + " chunks en " + ms + " ms; " + com.darkcraft.morvain.Lazareto.resumen(m));
+            var st = com.darkcraft.morvain.SantuariosMorvain.porId("lazareto");
+            sb.append("; santuario ").append(com.darkcraft.santuario.Santuarios.nombre(m, st.pos())).append(" (").append(m.getBlockState(st.pos()).getBlock().getDescriptionId())
+                    .append(") a ").append(Math.round(com.darkcraft.morvain.Lazareto.distancia(st.x(), st.z()))).append(" de la torre");
+            sb.append("; ").append(L.camillas).append(" camillas, ").append(L.estanterias).append(" estanterias, ").append(L.alambiques).append(" alambiques, ")
+                    .append(L.tumbas).append(" tumbas, ").append(L.ventanas).append(" ventanas, ").append(L.arboles).append(" arboles");
+            for (int fase = 0; fase < 3; fase++) {
+                if (fase == 1) {
+                    // un jugador baja la palanca del sotano (delante de ella, mirando al sur): el atanor se enciende
+                    BlockPos pal = com.darkcraft.morvain.Lazareto.palanca();
+                    fp.moveTo(pal.getX() + 0.5, PS + 1, pal.getZ() - 0.6, 0f, 20f);
+                    var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pal), net.minecraft.core.Direction.NORTH, pal, false);
+                    m.getBlockState(pal).use(m, fp, net.minecraft.world.InteractionHand.MAIN_HAND, hit);
+                    int e0 = com.darkcraft.morvain.Lazareto.ENCENDIDOS;
+                    boolean enc = com.darkcraft.morvain.Lazareto.revisarPalanca(m);
+                    sb.append("; la palanca del sotano enciende el atanor ").append(enc).append(" (+").append(com.darkcraft.morvain.Lazareto.ENCENDIDOS - e0).append("): ")
+                            .append(com.darkcraft.morvain.Lazareto.resumen(m));
+                    tiro[0] = enc;
+                }
+                if (fase == 2) {
+                    // un jugador en la biblioteca, delante de las estanterias del oeste, golpea (lo que hace el combate)
+                    fp.moveTo(CX - 7.3, com.darkcraft.morvain.Lazareto.piso(3) + 1, CZ + 0.5, 90f, 0f);
+                    fp.setYHeadRot(90f);
+                    int ab0 = com.darkcraft.morvain.MurosIlusorios.ABIERTOS;
+                    com.darkcraft.morvain.MurosIlusorios.golpe(fp);
+                    sb.append("; un golpe a las estanterias del oeste: se abre +").append(com.darkcraft.morvain.MurosIlusorios.ABIERTOS - ab0)
+                            .append(" (").append(com.darkcraft.morvain.MurosIlusorios.estado(m)).append(')');
+                }
+                var zona = com.darkcraft.pueblo.gen.Andar.desde(mundo, en[0], en[1], en[2], com.darkcraft.morvain.Lazareto.X0, com.darkcraft.morvain.Lazareto.Z0,
+                        com.darkcraft.morvain.Lazareto.X1, com.darkcraft.morvain.Lazareto.Z1, 8_000_000);
+                sb.append("; a pie, ").append(fase == 0 ? "el atanor apagado" : fase == 1 ? "el atanor encendido" : "con el muro abierto").append(" (")
+                        .append(zona.celdas()).append(" celdas):");
+                for (var e : L.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    sb.append(' ').append(e.getKey()).append(zona.alcanza(q[0], q[1], q[2], 2) ? "+" : "-");
+                }
+                if (fase == 2) {
+                    int lejos = 0;
+                    for (var o : L.esperas()) if (!zona.alcanza(o.x(), o.y(), o.z(), 2)) lejos++;
+                    sb.append("; de los ").append(L.esperas().size()).append(" del lazareto, a los que no se llega ").append(lejos);
+                }
+            }
+            // ---- el tiro: en el pozo (sobre la parrilla) sube; agachado, baja despacio; al salir del pozo, cae despacio
+            boolean lit = com.darkcraft.morvain.Lazareto.encendido(m);
+            fp.removeAllEffects();
+            fp.moveTo(CX + 0.5, PS + 1, CZ + 0.5, 0f, 0f);
+            com.darkcraft.morvain.Lazareto.tiro(fp, lit);
+            boolean sube = fp.hasEffect(net.minecraft.world.effect.MobEffects.LEVITATION);
+            fp.setShiftKeyDown(true);
+            com.darkcraft.morvain.Lazareto.tiro(fp, lit);
+            boolean baja = fp.hasEffect(net.minecraft.world.effect.MobEffects.SLOW_FALLING) && !fp.hasEffect(net.minecraft.world.effect.MobEffects.LEVITATION);
+            fp.setShiftKeyDown(false);
+            fp.removeAllEffects();
+            com.darkcraft.morvain.Lazareto.tiro(fp, lit);
+            fp.moveTo(CX + 6.5, com.darkcraft.morvain.Lazareto.piso(4) + 1, CZ + 0.5, 0f, 0f);
+            com.darkcraft.morvain.Lazareto.tiro(fp, lit);
+            boolean sale = fp.hasEffect(net.minecraft.world.effect.MobEffects.SLOW_FALLING) && !fp.hasEffect(net.minecraft.world.effect.MobEffects.LEVITATION);
+            fp.removeAllEffects();
+            sb.append("; el tiro: en el pozo sube ").append(sube).append(", agachado baja despacio ").append(baja).append(", al salir cae despacio ").append(sale);
+            sb.append("; el sitio:");
+            for (String s2 : new String[]{"entrada", "isla", "vestibulo", "atanor", "enfermeria", "herbolario", "biblioteca", "celda", "laboratorio", "elixir", "tejado"}) {
+                int[] q = L.sitio(s2);
+                String l = com.darkcraft.morvain.Lazareto.lugar(q[0] + 0.5, q[1], q[2] + 0.5);
+                sb.append(' ').append(s2).append(' ').append(l == null ? "-" : l.replace("darkcraft.morvain.lugar.", ""));
+            }
+            log.println(sb);
+            topView(m, CX, CZ + 7, 70, new File(out, "morvain_lazareto.png"));
+            topView(m, CX, CZ, 18, new File(out, "morvain_lazareto_torre.png"));
+        } catch (Throwable t) {
+            log.println("Morvain, el lazareto de Maese Galen: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] lazareto", t);
+        } finally {
+            com.darkcraft.morvain.Lazareto.encender(m, false);
+            com.darkcraft.morvain.MurosIlusorios.cerrar(m, com.darkcraft.morvain.Lazareto.MURO_CELDA);
+            fp.removeAllEffects();
+        }
+        // ---------------------------------------------------------------- los destilados
+        try {
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio);
+            for (int k = 0; k < 10; k++)
+                for (var e : fuera) if (e.isAlive()) e.tick();
+            int reza = 0, tumbados = 0, dePie = 0, enSuelo = 0, chocan = 0;
+            int[] porVariante = new int[3];
+            StringBuilder mal = new StringBuilder();
+            com.darkcraft.enemigos.Destilado[] despiertan = new com.darkcraft.enemigos.Destilado[3];
+            for (var e : fuera) {
+                if (!(e instanceof com.darkcraft.enemigos.Destilado c)) continue;
+                porVariante[Math.max(0, Math.min(2, c.variante()))]++;
+                if (!m.noCollision(c)) {
+                    chocan++;
+                    if (mal.length() < 300) mal.append(" metido en un bloque en ").append(c.blockPosition().toShortString()).append(';');
+                }
+                if (c.postura() == com.darkcraft.enemigos.Enemigo.REZA) {
+                    reza++;
+                    int i = c.variante() == com.darkcraft.enemigos.Destilado.ENFERMO ? 1 : 0;
+                    if (despiertan[i] == null) despiertan[i] = c;
+                } else if (c.postura() == com.darkcraft.enemigos.Enemigo.TUMBADO) {
+                    tumbados++;
+                    if (despiertan[2] == null) despiertan[2] = c;
+                } else dePie++;
+                var abajo = m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ()));
+                if (!abajo.getCollisionShape(m, BlockPos.ZERO).isEmpty()) enSuelo++;
+                else if (mal.length() < 400) mal.append(' ').append(c.tipo()).append(" en el aire en ").append(c.blockPosition().toShortString()).append(';');
+            }
+            log.println("Morvain, los destilados: fuera " + fuera.size() + " de " + com.darkcraft.morvain.MorvainEnemigos.lazareto().size() + " (mancebos "
+                    + porVariante[0] + ", enfermos " + porVariante[1] + ", cubas " + porVariante[2] + "): esperando " + reza + ", tendidos " + tumbados + ", de pie "
+                    + dePie + " (en su suelo " + enSuelo + "); metidos en un bloque " + chocan + " (tiene que ser 0)" + mal);
+            // ---- los que esperan se levantan (una presa a su lado)
+            StringBuilder sb = new StringBuilder("Morvain, los destilados en accion:");
+            String[] como = {"moliendo", "encogido", "tendido"};
+            for (int i = 0; i < 3; i++) {
+                var c = despiertan[i];
+                if (c == null) {
+                    sb.append(" NO HAY NINGUNO ").append(como[i]).append(';');
+                    continue;
+                }
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (presa == null) continue;
+                presa.moveTo(c.getX() + 1.2, c.getY(), c.getZ() + 0.4, 0f, 0f);
+                presa.setNoAi(true);
+                m.addFreshEntity(presa);
+                quitar.add(presa);
+                c.setTarget(presa);
+                int sale = -1, accion = 0;
+                for (int k = 0; k < 90; k++) {
+                    c.tickCount++;
+                    c.tick();
+                    int a = c.accion();
+                    if (sale < 0 && a != 0) {
+                        sale = k;
+                        accion = a;
+                    }
+                    if (sale >= 0 && a == 0) break;
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " el %s %s (en %s) %s en el tick %d y queda de pie %s;", c.tipo().replace("destilado_", ""), como[i],
+                        c.blockPosition().toShortString(), accion == 0 ? "NO SE MUEVE" : com.darkcraft.enemigos.DestiladoAnims.NOMBRES[accion], sale,
+                        c.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE));
+                c.setTarget(null);
+                presa.discard();
+            }
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
+            // ---- en la calzada (mirando al sur): uno de cada, cada accion acaba
+            int[] cz0 = L.sitio("calzada");
+            final double gx = cz0[0] + 0.5, gy = cz0[1], gz = cz0[2] - 4.5;
+            for (int v2 = 0; v2 < 3; v2++) {
+                var a = DarkCraftMod.DESTILADO.get().create(m);
+                if (a == null) continue;
+                a.variante(v2);
+                a.moveTo(gx, gy, gz + v2 * 5, 0f, 0f);
+                m.addFreshEntity(a);
+                quitar.add(a);
+                StringBuilder no = new StringBuilder();
+                for (int ac = 1; ac < com.darkcraft.enemigos.DestiladoAnims.TICKS.length; ac++) {
+                    String nombre = com.darkcraft.enemigos.DestiladoAnims.NOMBRES[ac];
+                    if (nombre.equals("morir")) continue;
+                    a.empezar(ac);
+                    for (int k = 0; k < 90 && a.accion() == ac; k++) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    if (a.accion() == ac) no.append(' ').append(nombre);
+                    for (int k = 0; k < 6; k++) a.tick();
+                    a.postura(com.darkcraft.enemigos.Enemigo.DE_PIE);
+                    a.moveTo(gx, gy, gz + v2 * 5, 0f, 0f);
+                }
+                sb.append(' ').append(a.tipo().replace("destilado_", "")).append(String.format(java.util.Locale.ROOT, " (vida %.0f, golpe %.1f, armadura %d, caja %.2f x %.2f)",
+                        a.getMaxHealth(), a.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), a.getArmorValue(), a.getBbWidth(),
+                        a.getBbHeight())).append(": acciones que no acaban").append(no.length() == 0 ? " ninguna" : no).append(';');
+                a.discard();
+            }
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class, new net.minecraft.world.phys.AABB(gx - 30, gy - 10, gz - 30, gx + 30, gy + 20, gz + 40))) f.discard();
+            for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.Charco.class, new net.minecraft.world.phys.AABB(gx - 30, gy - 10, gz - 30, gx + 30, gy + 20, gz + 40)))
+                f.discard();
+            log.println(sb);
+            // ---- contra una presa (un aldeano quieto delante, al sur, en la calzada)
+            sb = new StringBuilder("Morvain, los destilados contra una presa:");
+            int M = com.darkcraft.enemigos.Destilado.MANCEBO, E = com.darkcraft.enemigos.Destilado.ENFERMO, C = com.darkcraft.enemigos.Destilado.CUBA;
+            String[] nombres = {"mortero", "mortero de lado", "zarpazo", "se abalanza", "escupitajo", "punetazo", "embestida", "derrame", "frasco de fuego",
+                    "frasco de acido"};
+            int[] acciones = {com.darkcraft.enemigos.DestiladoAnims.MORTERO, com.darkcraft.enemigos.DestiladoAnims.MORTERO_BARRIDO,
+                    com.darkcraft.enemigos.DestiladoAnims.ZARPAZO, com.darkcraft.enemigos.DestiladoAnims.ABALANZARSE,
+                    com.darkcraft.enemigos.DestiladoAnims.ESCUPITAJO, com.darkcraft.enemigos.DestiladoAnims.PUNETAZO,
+                    com.darkcraft.enemigos.DestiladoAnims.EMBESTIDA, com.darkcraft.enemigos.DestiladoAnims.DERRAME, com.darkcraft.enemigos.DestiladoAnims.FRASCO,
+                    com.darkcraft.enemigos.DestiladoAnims.FRASCO};
+            int[] variantes = {M, M, E, E, E, C, C, C, M, M};
+            double[] lejos = {2.4, 2.2, 2.2, 4.2, 6.0, 2.6, 6.5, 2.6, 8.0, 8.0};
+            int[] duran = {40, 40, 40, 50, 70, 40, 50, 60, 90, 90};
+            int fr0 = com.darkcraft.enemigos.Destilado.FRASCOS, es0 = com.darkcraft.enemigos.Destilado.ESCUPITAJOS, sal0 = com.darkcraft.enemigos.Destilado.SALTOS,
+                    emb0 = com.darkcraft.enemigos.Destilado.EMBESTIDAS, der0 = com.darkcraft.enemigos.Destilado.DERRAMES, ven0 = com.darkcraft.enemigos.Destilado.ENVENENADOS,
+                    rev0 = com.darkcraft.enemigos.Frasco.REVIENTAN, dan0 = com.darkcraft.enemigos.Frasco.DAN, que0 = com.darkcraft.enemigos.Frasco.QUEMAN,
+                    cor0 = com.darkcraft.enemigos.Frasco.CORROEN, arm0 = com.darkcraft.enemigos.Frasco.ARMADURA;
+            final double hx = gx, hz = gz;
+            net.minecraft.world.phys.AABB zonaPruebas = new net.minecraft.world.phys.AABB(hx - 20, gy - 8, hz - 20, hx + 20, gy + 16, hz + 30);
+            for (int i = 0; i < nombres.length; i++) {
+                var a = DarkCraftMod.DESTILADO.get().create(m);
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (a == null || presa == null) continue;
+                a.variante(variantes[i]);
+                a.moveTo(hx, gy, hz, 0f, 0f);
+                presa.moveTo(hx, gy, hz + lejos[i], 180f, 0f);
+                presa.setNoAi(true);
+                if (i == 9) presa.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_CHESTPLATE));
+                m.addFreshEntity(a);
+                m.addFreshEntity(presa);
+                quitar.add(a);
+                quitar.add(presa);
+                a.setTarget(presa);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                if (i == 8) a.proximoFrasco(com.darkcraft.enemigos.Frasco.FUEGO, presa);
+                if (i == 9) a.proximoFrasco(com.darkcraft.enemigos.Frasco.ACIDO, presa);
+                a.empezar(acciones[i]);
+                float vida = presa.getHealth();
+                double x0 = a.getZ();
+                boolean frenada = false, ardiendo = false, envenenada = false, acabo = false;
+                int charcos = 0;
+                for (int k = 0; k < duran[i]; k++) {
+                    if (!a.isRemoved() && !acabo) {
+                        a.tickCount++;
+                        a.tick();
+                        if (a.accion() == 0) acabo = true;
+                    }
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class, zonaPruebas)) {
+                        if (!quitar.contains(f)) quitar.add(f);
+                        f.tick();
+                    }
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.Charco.class, zonaPruebas)) {
+                        if (!quitar.contains(f)) {
+                            quitar.add(f);
+                            charcos++;
+                        }
+                        f.tick();
+                    }
+                    presa.invulnerableTime = 0;
+                    frenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                    envenenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.POISON);
+                    ardiendo |= presa.isOnFire();
+                }
+                sb.append(String.format(java.util.Locale.ROOT, " %s (%s) a %.1f: la presa -%.1f", nombres[i], a.tipo().replace("destilado_", ""), lejos[i],
+                        vida - presa.getHealth()));
+                if (i == 2 || i == 3 || i == 4) sb.append(", envenenada ").append(envenenada);
+                if (i == 3) sb.append(String.format(java.util.Locale.ROOT, ", salta %.1f", a.getZ() - x0));
+                if (i == 6) sb.append(String.format(java.util.Locale.ROOT, ", avanza %.1f", a.getZ() - x0));
+                if (i >= 5 && i <= 7 || i == 9) sb.append(", frenada ").append(frenada);
+                if (i == 7 || i >= 8) sb.append(", charcos ").append(charcos);
+                if (i == 8) sb.append(", ardiendo ").append(ardiendo);
+                if (i == 9) {
+                    var peto = presa.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST);
+                    sb.append(", el peto gastado ").append(peto.getDamageValue());
+                }
+                sb.append(';');
+                presa.clearFire();
+                presa.discard();
+                a.discard();
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class, zonaPruebas)) f.discard();
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.Charco.class, zonaPruebas)) f.discard();
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " frascos +%d (revientan +%d, dan +%d, el fuego quema +%d, el acido corroe +%d y gasta la armadura +%d), "
+                            + "escupitajos +%d, saltos +%d, embestidas +%d, derrames +%d, envenenados +%d",
+                    com.darkcraft.enemigos.Destilado.FRASCOS - fr0, com.darkcraft.enemigos.Frasco.REVIENTAN - rev0, com.darkcraft.enemigos.Frasco.DAN - dan0,
+                    com.darkcraft.enemigos.Frasco.QUEMAN - que0, com.darkcraft.enemigos.Frasco.CORROEN - cor0, com.darkcraft.enemigos.Frasco.ARMADURA - arm0,
+                    com.darkcraft.enemigos.Destilado.ESCUPITAJOS - es0, com.darkcraft.enemigos.Destilado.SALTOS - sal0,
+                    com.darkcraft.enemigos.Destilado.EMBESTIDAS - emb0, com.darkcraft.enemigos.Destilado.DERRAMES - der0,
+                    com.darkcraft.enemigos.Destilado.ENVENENADOS - ven0));
+            log.println(sb);
+            // ---- el elixir verde y la cuba que revienta
+            sb = new StringBuilder("Morvain, los destilados se curan:");
+            int eli0 = com.darkcraft.enemigos.Destilado.ELIXIRES, cur0 = com.darkcraft.enemigos.Frasco.CURAN, cub0 = com.darkcraft.enemigos.Destilado.CUBAS;
+            for (int caso = 0; caso < 3; caso++) {
+                // caso 0: se le manda lanzar el elixir; caso 1: lo elige el (su presa lejos, uno de los suyos herido); caso 2: la cuba cae
+                var a = DarkCraftMod.DESTILADO.get().create(m);
+                var herido = DarkCraftMod.DESTILADO.get().create(m);
+                var presa = net.minecraft.world.entity.EntityType.VILLAGER.create(m);
+                if (a == null || herido == null || presa == null) continue;
+                a.variante(caso == 2 ? C : M);
+                herido.variante(E);
+                a.moveTo(hx, gy, hz, 0f, 0f);
+                herido.moveTo(hx, gy, hz + (caso == 2 ? 1.6 : 5.0), 180f, 0f);
+                presa.moveTo(hx, gy, hz + 9.0, 180f, 0f);
+                presa.setNoAi(true);
+                herido.setNoAi(true);
+                m.addFreshEntity(a);
+                m.addFreshEntity(herido);
+                m.addFreshEntity(presa);
+                quitar.add(a);
+                quitar.add(herido);
+                quitar.add(presa);
+                herido.setHealth(herido.getMaxHealth() * 0.3f);
+                float antes = herido.getHealth();
+                boolean lanzo = false;
+                if (caso == 0) {
+                    a.setTarget(presa);
+                    a.proximoFrasco(com.darkcraft.enemigos.Frasco.CURA, herido);
+                    a.empezar(com.darkcraft.enemigos.DestiladoAnims.FRASCO);
+                } else if (caso == 1) {
+                    a.sinEsperas();
+                    a.setTarget(presa);
+                } else {
+                    fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+                    a.invulnerableTime = 0;
+                    a.hurt(m.damageSources().playerAttack(fp), 10000f);
+                }
+                int e1 = com.darkcraft.enemigos.Destilado.ELIXIRES;
+                for (int k = 0; k < 90; k++) {
+                    if (!a.isRemoved()) {
+                        a.tickCount++;
+                        a.tick();
+                    }
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class, zonaPruebas)) {
+                        if (!quitar.contains(f)) quitar.add(f);
+                        f.tick();
+                    }
+                    for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.Charco.class, zonaPruebas)) {
+                        if (!quitar.contains(f)) quitar.add(f);
+                        f.tick();
+                    }
+                    lanzo |= com.darkcraft.enemigos.Destilado.ELIXIRES > e1;
+                }
+                String que = caso == 0 ? "el elixir que se le manda" : caso == 1 ? "el elixir que elige el" : "la cuba que revienta";
+                sb.append(String.format(java.util.Locale.ROOT, " %s: el herido de %.0f a %.0f (de %.0f)%s;", que, antes, herido.getHealth(), herido.getMaxHealth(),
+                        caso == 1 ? ", lo lanza " + lanzo : caso == 2 ? ", la cuba muerta " + !a.isAlive() : ""));
+                a.discard();
+                herido.discard();
+                presa.discard();
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.class, zonaPruebas)) f.discard();
+                for (var f : m.getEntitiesOfClass(com.darkcraft.enemigos.Frasco.Charco.class, zonaPruebas)) f.discard();
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " elixires +%d, curas +%d, cubas rotas +%d", com.darkcraft.enemigos.Destilado.ELIXIRES - eli0,
+                    com.darkcraft.enemigos.Frasco.CURAN - cur0, com.darkcraft.enemigos.Destilado.CUBAS - cub0));
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println("Morvain, los destilados: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] destilados", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
             for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
         }

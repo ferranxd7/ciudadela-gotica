@@ -1195,6 +1195,49 @@ public class Volcado {
                 if (Boolean.getBoolean("abierto"))
                     for (BlockPos q : com.darkcraft.morvain.Osario.muro(com.darkcraft.morvain.Osario.MURO_PRIORES)) MUNDO.remove(q.asLong());
             }
+            case "morvain_lazareto" -> {
+                // el Lazareto de Maese Galen (parte 7au): la laguna, el islote, la calzada y la torre por dentro (-Dcaja=x0,z0,x1,z1 para
+                // un trozo; -Droca=true: la roca de debajo; -Dabierto=true: el muro de la celda abierto)
+                String[] k = System.getProperty("caja", com.darkcraft.morvain.Lazareto.X0 + "," + com.darkcraft.morvain.Lazareto.Z0 + ","
+                        + com.darkcraft.morvain.Lazareto.X1 + "," + com.darkcraft.morvain.Lazareto.Z1).split(",");
+                int x0 = Integer.parseInt(k[0]), z0 = Integer.parseInt(k[1]), x1 = Integer.parseInt(k[2]), z1 = Integer.parseInt(k[3]);
+                com.darkcraft.morvain.Vista.volcar((x, y, z, st) -> lvl.setBlock(new BlockPos(x, y, z), st, 2), x0, z0, x1, z1, 40);
+                if (Boolean.getBoolean("roca"))
+                    for (int x = x0; x <= x1; x++)
+                        for (int z = z0; z <= z1; z++) {
+                            int top = (int) Math.floor(com.darkcraft.morvain.Terreno.columna(x, z).altura());
+                            for (int y = 40; y < Math.min(top - 6, com.darkcraft.morvain.Lazareto.PS - 6); y++)
+                                lvl.setBlock(new BlockPos(x, y, z), Blocks.STONE.defaultBlockState(), 2);
+                        }
+                com.darkcraft.morvain.Lazareto v = com.darkcraft.morvain.Lazareto.get();
+                int hechos = 0;
+                for (long c : v.chunks()) {
+                    int cx = (int) (c >> 32), cz = (int) c;
+                    if ((cx << 4) + 15 < x0 || (cx << 4) > x1 || (cz << 4) + 15 < z0 || (cz << 4) > z1) continue;
+                    v.construir(lvl, cx, cz, RandomSource.create(c));
+                    hechos++;
+                }
+                MUNDO.keySet().removeIf(q -> {
+                    int x = BlockPos.getX(q), z = BlockPos.getZ(q);
+                    return x < x0 || x > x1 || z < z0 || z > z1;
+                });
+                minX = Math.max(minX, x0);
+                maxX = Math.min(maxX, x1);
+                minZ = Math.max(minZ, z0);
+                maxZ = Math.min(maxZ, z1);
+                System.out.println("El lazareto: " + v.elementos().size() + " piezas, " + hechos + " chunks; " + v.esperas().size() + " que esperan; "
+                        + v.camillas + " camillas, " + v.estanterias + " estanterias, " + v.alambiques + " alambiques, " + v.tumbas + " tumbas, "
+                        + v.ventanas + " ventanas, " + v.arboles + " arboles, " + v.velas + " velas; sitios " + v.sitios().keySet());
+                for (var e : v.sitios().entrySet()) {
+                    int[] q = e.getValue();
+                    if (q[0] >= x0 && q[0] <= x1 && q[2] >= z0 && q[2] <= z1) marcas.put(e.getKey(), new int[]{q[0], q[1] + 1, q[2]});
+                }
+                int n = 0;
+                for (var o : v.esperas()) marcas.put((o.variante() == 0 ? "M" : o.variante() == 1 ? "E" : "C") + (n++), new int[]{o.x(), o.y() + 1, o.z()});
+                andarLazareto(lvl, v);
+                if (Boolean.getBoolean("abierto"))
+                    for (BlockPos q : com.darkcraft.morvain.Lazareto.muro(com.darkcraft.morvain.Lazareto.MURO_CELDA)) MUNDO.remove(q.asLong());
+            }
             case "morvain_grieta" -> {
                 // el Puente de la Grieta (parte 7s): la grieta con su sangre, el puente con su espadana, la puerta del norte, el paso,
                 // el cementerio, el humilladero, la hospederia con el libro 28 y el campamento de los penitentes
@@ -2284,6 +2327,66 @@ public class Volcado {
                 }
             }
             System.out.println("los del osario: " + v.esperas().size() + ", sin llegar " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
+        }
+    }
+
+    /**
+     * El Lazareto (parte 7au): a que se llega a pie desde la entrada (la orilla del sur) con el atanor apagado (hasta la sala de los
+     * enfermos: la escalera esta hundida entre la planta 1 y la 2), con el atanor encendido (el tiro del pozo: se cuenta como una escala de
+     * mano en el pozo, de la parrilla al techo de la planta 4) y con el muro de la celda abierto; y si cada destilado se pisa, se llega y no
+     * esta metido en un bloque (las cubas, tres de alto).
+     */
+    static void andarLazareto(WorldGenLevel lvl, com.darkcraft.morvain.Lazareto v) {
+        BlockState aire = Blocks.AIR.defaultBlockState(), escala = Blocks.LADDER.defaultBlockState();
+        java.util.Set<Long> quitados = new java.util.HashSet<>();
+        boolean[] tiro = {false};
+        int X = com.darkcraft.morvain.Lazareto.CX, Z = com.darkcraft.morvain.Lazareto.CZ;
+        com.darkcraft.pueblo.gen.Andar.Mundo mundo = (x, y, z) -> {
+            if (quitados.contains(BlockPos.asLong(x, y, z))) return aire;
+            BlockState s = MUNDO.getOrDefault(BlockPos.asLong(x, y, z), aire);
+            if (tiro[0] && com.darkcraft.morvain.Lazareto.enTiro(x + 0.5, y, z + 0.5) && y > com.darkcraft.morvain.Lazareto.PS
+                    && (s.isAir() || s.getBlock() instanceof net.minecraft.world.level.block.TrapDoorBlock)) return escala;
+            return s.getBlock() instanceof net.minecraft.world.level.block.CarpetBlock || s.getBlock() instanceof net.minecraft.world.level.block.CandleBlock
+                    || s.getBlock() instanceof net.minecraft.world.level.block.SkullBlock || s.getBlock() instanceof net.minecraft.world.level.block.WallSkullBlock
+                    || s.getBlock() instanceof net.minecraft.world.level.block.WebBlock || s.getBlock() instanceof net.minecraft.world.level.block.BushBlock ? aire : s;
+        };
+        int[] e = v.sitio("entrada");
+        for (int paso = 0; paso < 3; paso++) {
+            tiro[0] = paso >= 1;
+            if (paso == 2) for (BlockPos q : com.darkcraft.morvain.Lazareto.muro(com.darkcraft.morvain.Lazareto.MURO_CELDA)) quitados.add(q.asLong());
+            var z0 = com.darkcraft.pueblo.gen.Andar.desde(mundo, e[0], e[1], e[2], com.darkcraft.morvain.Lazareto.X0, com.darkcraft.morvain.Lazareto.Z0,
+                    com.darkcraft.morvain.Lazareto.X1, com.darkcraft.morvain.Lazareto.Z1, 8_000_000);
+            StringBuilder sb = new StringBuilder(paso == 0 ? "a pie, el atanor apagado: " : paso == 1 ? "a pie, el atanor encendido: "
+                    : "a pie, encendido y el muro de la celda abierto: ");
+            sb.append(z0.celdas()).append(" celdas;");
+            for (String s : v.sitios().keySet()) {
+                int[] q = v.sitio(s);
+                sb.append(' ').append(s).append(' ').append(z0.alcanza(q[0], q[1], q[2], 2));
+            }
+            System.out.println(sb);
+            if (paso < 2) continue;
+            int malos = 0, chocan = 0, sinSuelo = 0;
+            for (var o : v.esperas()) {
+                if (!z0.alcanza(o.x(), o.y(), o.z(), 2.0)) {
+                    malos++;
+                    System.out.println("  " + o.grupo() + " sin llegar a pie: " + o.x() + "," + o.y() + "," + o.z() + " (u " + (o.x() - X) + ", v " + (o.z() - Z) + ")");
+                }
+                int alto = o.variante() == 2 ? 3 : 2;
+                for (int dy = 0; dy < alto; dy++) {
+                    BlockState st = mundo.en(o.x(), o.y() + dy, o.z());
+                    if (choca(st)) {
+                        chocan++;
+                        System.out.println("  " + o.grupo() + " metido en un bloque: " + o.x() + "," + (o.y() + dy) + "," + o.z() + " (u " + (o.x() - X) + ", v "
+                                + (o.z() - Z) + ") " + st);
+                    }
+                }
+                BlockState abajo = mundo.en(o.x(), o.y() - 1, o.z());
+                if (!choca(abajo)) {
+                    sinSuelo++;
+                    System.out.println("  " + o.grupo() + " sin suelo: " + o.x() + "," + o.y() + "," + o.z() + " (u " + (o.x() - X) + ", v " + (o.z() - Z) + ") " + abajo);
+                }
+            }
+            System.out.println("los del lazareto: " + v.esperas().size() + ", sin llegar " + malos + ", metidos en un bloque " + chocan + ", sin suelo " + sinSuelo);
         }
     }
 

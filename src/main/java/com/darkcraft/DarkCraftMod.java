@@ -368,6 +368,21 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_OSMUND_DOLOR = sound("sfx.osmund_dolor");
     public static final RegistryObject<SoundEvent> SFX_OSMUND_MUERTE = sound("sfx.osmund_muerte");
     public static final RegistryObject<SoundEvent> SFX_OSMUND_LAMPARA = sound("sfx.osmund_lampara");
+    // el Lazareto de Maese Galen (parte 7au): los Destilados, los frascos, la cuba, el atanor, el tiro de la chimenea y el aire de la torre
+    public static final RegistryObject<SoundEvent> SFX_DESTILADO_GEMIDO = sound("sfx.destilado_gemido");
+    public static final RegistryObject<SoundEvent> SFX_DESTILADO_ALERTA = sound("sfx.destilado_alerta");
+    public static final RegistryObject<SoundEvent> SFX_DESTILADO_DOLOR = sound("sfx.destilado_dolor");
+    public static final RegistryObject<SoundEvent> SFX_DESTILADO_MUERTE = sound("sfx.destilado_muerte");
+    public static final RegistryObject<SoundEvent> SFX_FRASCO_LANZAR = sound("sfx.frasco_lanzar");
+    public static final RegistryObject<SoundEvent> SFX_FRASCO_FUEGO = sound("sfx.frasco_fuego");
+    public static final RegistryObject<SoundEvent> SFX_FRASCO_ACIDO = sound("sfx.frasco_acido");
+    public static final RegistryObject<SoundEvent> SFX_FRASCO_CURA = sound("sfx.frasco_cura");
+    public static final RegistryObject<SoundEvent> SFX_CUBA_GOLPE = sound("sfx.cuba_golpe");
+    public static final RegistryObject<SoundEvent> SFX_CUBA_DERRAME = sound("sfx.cuba_derrame");
+    public static final RegistryObject<SoundEvent> SFX_CUBA_ROMPE = sound("sfx.cuba_rompe");
+    public static final RegistryObject<SoundEvent> SFX_ATANOR_ENCIENDE = sound("sfx.atanor_enciende");
+    public static final RegistryObject<SoundEvent> SFX_ATANOR_TIRO = sound("sfx.atanor_tiro");
+    public static final RegistryObject<SoundEvent> AMBIENTE_LAZARETO = sound("ambiente.lazareto");
     // el Condestable del Juramento (parte 7n): el grito, el tajo del montante en llamas, el barrido, la embestida, el anillo de
     // fuego, el rastrillo que cae y el que se alza, el cuerno de la guardia, la espada al cielo, el dolor, la muerte y la espera
     public static final RegistryObject<SoundEvent> SFX_CONDESTABLE_GRITO = sound("sfx.condestable_grito");
@@ -1032,6 +1047,13 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Ensamblado>> ENSAMBLADO = ENTITIES.register("ensamblado",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Ensamblado>of(com.darkcraft.enemigos.Ensamblado::new, MobCategory.MONSTER)
                     .sized(0.7f, 2.0f).clientTrackingRange(8).build(MODID + ":ensamblado"));
+    // ---- los destilados del Lazareto de Maese Galen y los frascos que lanzan los mancebos (parte 7au)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Destilado>> DESTILADO = ENTITIES.register("destilado",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Destilado>of(com.darkcraft.enemigos.Destilado::new, MobCategory.MONSTER)
+                    .sized(0.7f, 2.0f).clientTrackingRange(8).build(MODID + ":destilado"));
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Frasco>> FRASCO_DESTILADO = ENTITIES.register("frasco_destilado",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Frasco>of(com.darkcraft.enemigos.Frasco::new, MobCategory.MISC)
+                    .sized(0.3f, 0.3f).noSave().clientTrackingRange(8).updateInterval(1).build(MODID + ":frasco_destilado"));
     // ---- Hakon, el Capataz, el jefe de las Minas de Hierro Negro (parte 7ar)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Capataz>> CAPATAZ = ENTITIES.register("capataz",
             () -> EntityType.Builder.<com.darkcraft.enemigos.Capataz>of(com.darkcraft.enemigos.Capataz::new, MobCategory.MONSTER)
@@ -1446,6 +1468,7 @@ public class DarkCraftMod {
         e.put(CAPATAZ.get(), com.darkcraft.enemigos.Capataz.atributos().build());
         e.put(OSMUND.get(), com.darkcraft.enemigos.Osmund.atributos().build());
         e.put(ENSAMBLADO.get(), com.darkcraft.enemigos.Ensamblado.atributos().build());
+        e.put(DESTILADO.get(), com.darkcraft.enemigos.Destilado.atributos().build());
         e.put(CONDESTABLE.get(), com.darkcraft.enemigos.Condestable.atributos().build());
         e.put(RECTORA.get(), com.darkcraft.enemigos.Rectora.atributos().build());
         e.put(ERUDITO.get(), com.darkcraft.enemigos.Erudito.atributos().build());

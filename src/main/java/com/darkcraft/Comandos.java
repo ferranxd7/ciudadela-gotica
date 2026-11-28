@@ -69,6 +69,7 @@ public final class Comandos {
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoMina())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoCapataz())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoOsario())
+                .then(com.darkcraft.morvain.MorvainEnemigos.comandoLazareto())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoOsmund())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoBufon())
                 .then(com.darkcraft.morvain.MorvainEnemigos.comandoNido())
@@ -177,6 +178,7 @@ public final class Comandos {
         src.sendSuccess(() -> linea(new Linea("/darkcraft mina ", "/darkcraft mina [ir <sitio> | enemigos [volver | fuera | sacar] | derrumbe [<n>] | escotilla [abrir | cerrar] | muro [abrir | cerrar]]", "mina")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft capataz ", "/darkcraft capataz [ir | vencer | volver | media | accion <n> | suelta]", "capataz")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft osario ", "/darkcraft osario [ir <sitio> | enemigos [volver | fuera | sacar] | escotilla [abrir | cerrar] | muro [abrir | cerrar] | campana | ensamblado <portacirios | sepulturero | coloso | tumbar | rehacer>]", "osario")), false);
+        src.sendSuccess(() -> linea(new Linea("/darkcraft lazareto ", "/darkcraft lazareto [ir <sitio> | enemigos [volver | fuera | sacar] | atanor [encender | apagar] | muro [abrir | cerrar] | destilado <mancebo | enfermo | cuba>]", "lazareto")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft osmund ", "/darkcraft osmund [ir | vencer | volver | media | accion <n> | suelta]", "osmund")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft bufon ", "/darkcraft bufon [ir | vencer | volver | partir]", "bufon")), false);
         src.sendSuccess(() -> linea(new Linea("/darkcraft nido ", "/darkcraft nido [ir <sitio> | enemigos [volver | fuera | sacar]]", "nido")), false);

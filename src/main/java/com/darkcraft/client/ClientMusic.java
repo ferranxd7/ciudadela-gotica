@@ -282,7 +282,9 @@ public final class ClientMusic {
         if (mc.player == null || mc.level == null) enPantano = false;
         else if (mc.player.tickCount % 20 == 11)
             enPantano = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL && mc.player.getY() < 120
-                    && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.PANTANO;
+                    && com.darkcraft.morvain.Terreno.region(mc.player.getX(), mc.player.getZ()) == com.darkcraft.morvain.Region.PANTANO
+                    // dentro de la torre del Lazareto suena su aire (parte 7au)
+                    && !com.darkcraft.morvain.Lazareto.dentro(mc.player.getX(), mc.player.getY(), mc.player.getZ());
         boolean quiere = enPantano && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
         if (quiere) {
             if (pantano == null || pantano.dying() || !mc.getSoundManager().isActive(pantano) && pantanoTicks > 20) {
@@ -407,6 +409,33 @@ public final class ClientMusic {
         if (osario != null) {
             osarioTicks++;
             if (osario.dying() && !mc.getSoundManager().isActive(osario) && osarioTicks > 20) osario = null;
+        }
+    }
+
+    // ------------------------------------------------------------------ el Lazareto de Maese Galen (parte 7au): el aire de la torre
+
+    private static Track lazareto;
+    private static int lazaretoTicks;
+    private static boolean enLazareto;
+
+    private static void tickLazareto(Minecraft mc) {
+        if (mc.player == null || mc.level == null) enLazareto = false;
+        else if (mc.player.tickCount % 20 == 13)
+            enLazareto = mc.level.dimension() == com.darkcraft.morvain.Morvain.NIVEL
+                    && com.darkcraft.morvain.Lazareto.dentro(mc.player.getX(), mc.player.getY(), mc.player.getZ());
+        boolean quiere = enLazareto && (boss == null || boss.dying()) && (story == null || story.dying()) && sinFinal() && (viaje == null || viaje.dying());
+        if (quiere) {
+            if (lazareto == null || lazareto.dying() || !mc.getSoundManager().isActive(lazareto) && lazaretoTicks > 20) {
+                if (lazareto != null && !lazareto.dying()) mc.getSoundManager().stop(lazareto);
+                lazareto = new Track(DarkCraftMod.AMBIENTE_LAZARETO.get(), "lazareto", false);
+                lazaretoTicks = 0;
+                mc.getSoundManager().play(lazareto);
+                lazareto.fadeTo(0.85f, 2.5f);
+            }
+        } else if (lazareto != null && !lazareto.dying()) lazareto.kill(3.0f);
+        if (lazareto != null) {
+            lazaretoTicks++;
+            if (lazareto.dying() && !mc.getSoundManager().isActive(lazareto) && lazaretoTicks > 20) lazareto = null;
         }
     }
 
@@ -590,6 +619,11 @@ public final class ClientMusic {
     }
 
     /** Para la prueba de la CI: si suena el aire de la mina. */
+    public static String lazareto() {
+        Minecraft mc = Minecraft.getInstance();
+        return lazareto == null ? "sin el aire del lazareto" : String.format("el aire del lazareto %.2f%s", lazareto.level(), mc.getSoundManager().isActive(lazareto) ? "" : " (parado)");
+    }
+
     public static String mina() {
         Minecraft mc = Minecraft.getInstance();
         return mina == null ? "sin el aire de la mina" : String.format("el aire de la mina %.2f%s", mina.level(), mc.getSoundManager().isActive(mina) ? "" : " (parado)");
@@ -762,6 +796,8 @@ public final class ClientMusic {
         if (mina != null && !mina.dying()) any = true;
         tickOsario(mc);
         if (osario != null && !osario.dying()) any = true;
+        tickLazareto(mc);
+        if (lazareto != null && !lazareto.dying()) any = true;
         tickAcademia(mc);
         if (academia != null && !academia.dying()) any = true;
         tickCosta(mc);

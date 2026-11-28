@@ -134,6 +134,9 @@ public final class ClientSetup {
         // Fray Osmund y las calaveras de su corona (parte 7at)
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.OSMUND.get(), com.darkcraft.client.enemigos.OsmundRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CALAVERA_OSMUND.get(), com.darkcraft.client.enemigos.CalaveraOsmundRenderer::new);
+        // los destilados del Lazareto y sus frascos (parte 7au)
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.DESTILADO.get(), com.darkcraft.client.enemigos.DestiladoRenderer::new);
+        e.registerEntityRenderer(com.darkcraft.DarkCraftMod.FRASCO_DESTILADO.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CARTUCHO.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.CANTARO.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         e.registerEntityRenderer(com.darkcraft.DarkCraftMod.ESQUIRLA.get(), net.minecraft.client.renderer.entity.NoopRenderer::new);
@@ -197,6 +200,7 @@ public final class ClientSetup {
         e.registerLayerDefinition(com.darkcraft.client.enemigos.EnsambladoModelo.CAPA, com.darkcraft.client.enemigos.EnsambladoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.CapatazModelo.CAPA, com.darkcraft.client.enemigos.CapatazGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.OsmundModelo.CAPA, com.darkcraft.client.enemigos.OsmundGeometria::crear);
+        e.registerLayerDefinition(com.darkcraft.client.enemigos.DestiladoModelo.CAPA, com.darkcraft.client.enemigos.DestiladoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.AhorcadoModelo.CAPA, com.darkcraft.client.enemigos.AhorcadoGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.MolineraModelo.CAPA, com.darkcraft.client.enemigos.MolineraGeometria::crear);
         e.registerLayerDefinition(com.darkcraft.client.enemigos.VerdugoModelo.CAPA, com.darkcraft.client.enemigos.VerdugoGeometria::crear);

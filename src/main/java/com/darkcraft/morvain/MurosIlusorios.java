@@ -38,7 +38,8 @@ import java.util.Set;
  * clic izquierdo) y quedan abiertos para siempre (SavedData {@code darkcraft_muros}: los que se han abierto; si un chunk vuelve
  * a tener sus bloques, se quitan al pasar alguien). Abrir uno da el logro {@code secreto}. Los dos del Teatro Hundido (la puerta
  * real tapiada del muro de la escena y el de detras del trono de Pell), el de detras del altar de la capilla de los mineros, en
- * las Minas de Hierro Negro (parte 7aq), y el del fondo del pasillo de los priores, en las catacumbas del Osario (parte 7as).
+ * las Minas de Hierro Negro (parte 7aq), el del fondo del pasillo de los priores, en las catacumbas del Osario (parte 7as), y el de
+ * las estanterias del oeste de la biblioteca del Lazareto (parte 7au: detras, la celda de Maese Galen).
  */
 @Mod.EventBusSubscriber(modid = DarkCraftMod.MODID)
 public final class MurosIlusorios {
@@ -62,6 +63,7 @@ public final class MurosIlusorios {
             l.add(new Muro(Teatro.MURO_TRONO, Teatro.muro(Teatro.MURO_TRONO)));
             l.add(new Muro(Mina.MURO_CAPILLA, Mina.muro(Mina.MURO_CAPILLA)));
             l.add(new Muro(Osario.MURO_PRIORES, Osario.muro(Osario.MURO_PRIORES)));
+            l.add(new Muro(Lazareto.MURO_CELDA, Lazareto.muro(Lazareto.MURO_CELDA)));
             Map<Long, Muro> m = new HashMap<>();
             for (Muro w : l) for (BlockPos p : w.celdas()) m.put(p.asLong(), w);
             todos = l;
@@ -85,6 +87,7 @@ public final class MurosIlusorios {
     static net.minecraft.world.level.block.state.BlockState bloque(Muro w, BlockPos p) {
         if (w.id().startsWith("mina")) return Mina.bloqueMuro(w.id(), p);
         if (w.id().startsWith("osario")) return Osario.bloqueMuro(w.id(), p);
+        if (w.id().startsWith("lazareto")) return Lazareto.bloqueMuro(w.id(), p);
         return Teatro.bloqueMuro(w.id(), p);
     }
 
