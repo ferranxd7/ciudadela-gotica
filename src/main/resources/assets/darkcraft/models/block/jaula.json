@@ -1,0 +1,395 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "barras": "darkcraft:block/barrotes",
+    "hierro": "darkcraft:block/planchas_hierro",
+    "cadena": "darkcraft:block/cadena_hierro",
+    "hueso": "darkcraft:block/hueso",
+    "cara": "darkcraft:block/calavera_cara",
+    "particle": "darkcraft:block/planchas_hierro"
+  },
+  "elements": [
+    {
+      "from": [
+        3,
+        0.5,
+        3
+      ],
+      "to": [
+        13,
+        1.5,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hierro"
+        },
+        "south": {
+          "texture": "#hierro"
+        },
+        "east": {
+          "texture": "#hierro"
+        },
+        "west": {
+          "texture": "#hierro"
+        },
+        "up": {
+          "texture": "#hierro"
+        },
+        "down": {
+          "texture": "#hierro"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        13,
+        3
+      ],
+      "to": [
+        13,
+        14,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hierro"
+        },
+        "south": {
+          "texture": "#hierro"
+        },
+        "east": {
+          "texture": "#hierro"
+        },
+        "west": {
+          "texture": "#hierro"
+        },
+        "up": {
+          "texture": "#hierro"
+        },
+        "down": {
+          "texture": "#hierro"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        14,
+        5
+      ],
+      "to": [
+        11,
+        15,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hierro"
+        },
+        "south": {
+          "texture": "#hierro"
+        },
+        "east": {
+          "texture": "#hierro"
+        },
+        "west": {
+          "texture": "#hierro"
+        },
+        "up": {
+          "texture": "#hierro"
+        },
+        "down": {
+          "texture": "#hierro"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        1.5,
+        3
+      ],
+      "to": [
+        13,
+        13,
+        3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#barras",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#barras",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        1.5,
+        13
+      ],
+      "to": [
+        13,
+        13,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#barras",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#barras",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        1.5,
+        3
+      ],
+      "to": [
+        3,
+        13,
+        13
+      ],
+      "faces": {
+        "east": {
+          "texture": "#barras",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#barras",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        13,
+        1.5,
+        3
+      ],
+      "to": [
+        13,
+        13,
+        13
+      ],
+      "faces": {
+        "east": {
+          "texture": "#barras",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#barras",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        6.5,
+        15,
+        8
+      ],
+      "to": [
+        9.5,
+        16,
+        8
+      ],
+      "shade": false,
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            3,
+            0,
+            0,
+            1
+          ],
+          "texture": "#cadena"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            3,
+            1
+          ],
+          "texture": "#cadena"
+        }
+      }
+    },
+    {
+      "from": [
+        6.5,
+        15,
+        8
+      ],
+      "to": [
+        9.5,
+        16,
+        8
+      ],
+      "shade": false,
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": -45
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            3,
+            0,
+            0,
+            1
+          ],
+          "texture": "#cadena"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            3,
+            1
+          ],
+          "texture": "#cadena"
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        1.5,
+        6
+      ],
+      "to": [
+        9,
+        4.5,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cara"
+        },
+        "south": {
+          "texture": "#hueso"
+        },
+        "east": {
+          "texture": "#hueso"
+        },
+        "west": {
+          "texture": "#hueso"
+        },
+        "up": {
+          "texture": "#hueso"
+        },
+        "down": {
+          "texture": "#hueso"
+        }
+      }
+    },
+    {
+      "from": [
+        8,
+        1.5,
+        9
+      ],
+      "to": [
+        12,
+        2.5,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hueso"
+        },
+        "south": {
+          "texture": "#hueso"
+        },
+        "east": {
+          "texture": "#hueso"
+        },
+        "west": {
+          "texture": "#hueso"
+        },
+        "up": {
+          "texture": "#hueso"
+        },
+        "down": {
+          "texture": "#hueso"
+        }
+      },
+      "rotation": {
+        "origin": [
+          10,
+          2,
+          9.5
+        ],
+        "axis": "y",
+        "angle": 22.5
+      }
+    }
+  ],
+  "render_type": "minecraft:cutout"
+}

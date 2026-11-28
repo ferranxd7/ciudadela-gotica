@@ -1,0 +1,97 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "hueso": "darkcraft:block/hueso",
+    "cara": "darkcraft:block/calavera_cara",
+    "particle": "darkcraft:block/hueso"
+  },
+  "elements": [
+    {
+      "from": [
+        4.5,
+        1.5,
+        5
+      ],
+      "to": [
+        11.5,
+        7.5,
+        11.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cara"
+        },
+        "south": {
+          "texture": "#hueso"
+        },
+        "east": {
+          "texture": "#hueso"
+        },
+        "west": {
+          "texture": "#hueso"
+        },
+        "up": {
+          "texture": "#hueso"
+        },
+        "down": {
+          "texture": "#hueso"
+        }
+      }
+    },
+    {
+      "from": [
+        5.5,
+        0,
+        5.2
+      ],
+      "to": [
+        10.5,
+        1.5,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hueso"
+        },
+        "south": {
+          "texture": "#hueso"
+        },
+        "east": {
+          "texture": "#hueso"
+        },
+        "west": {
+          "texture": "#hueso"
+        },
+        "up": {
+          "texture": "#hueso"
+        },
+        "down": {
+          "texture": "#hueso"
+        }
+      }
+    },
+    {
+      "from": [
+        5.5,
+        0,
+        5
+      ],
+      "to": [
+        10.5,
+        1.5,
+        5.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cara",
+          "uv": [
+            3,
+            13,
+            13,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

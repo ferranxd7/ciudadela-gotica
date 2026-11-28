@@ -1,0 +1,150 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "piedra": "darkcraft:block/lapida",
+    "base": "darkcraft:block/sillar_gris",
+    "particle": "darkcraft:block/lapida"
+  },
+  "elements": [
+    {
+      "from": [
+        2,
+        0,
+        6
+      ],
+      "to": [
+        14,
+        1.5,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#base"
+        },
+        "south": {
+          "texture": "#base"
+        },
+        "east": {
+          "texture": "#base"
+        },
+        "west": {
+          "texture": "#base"
+        },
+        "up": {
+          "texture": "#base"
+        },
+        "down": {
+          "texture": "#base"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        1.5,
+        7
+      ],
+      "to": [
+        13,
+        12,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#piedra",
+          "uv": [
+            2,
+            4,
+            14,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#piedra",
+          "uv": [
+            2,
+            4,
+            14,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#piedra"
+        },
+        "west": {
+          "texture": "#piedra"
+        },
+        "up": {
+          "texture": "#piedra"
+        },
+        "down": {
+          "texture": "#piedra"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        12,
+        7
+      ],
+      "to": [
+        12,
+        13,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#piedra"
+        },
+        "south": {
+          "texture": "#piedra"
+        },
+        "east": {
+          "texture": "#piedra"
+        },
+        "west": {
+          "texture": "#piedra"
+        },
+        "up": {
+          "texture": "#piedra"
+        },
+        "down": {
+          "texture": "#piedra"
+        }
+      }
+    },
+    {
+      "from": [
+        5.5,
+        13,
+        7
+      ],
+      "to": [
+        10.5,
+        14,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#piedra"
+        },
+        "south": {
+          "texture": "#piedra"
+        },
+        "east": {
+          "texture": "#piedra"
+        },
+        "west": {
+          "texture": "#piedra"
+        },
+        "up": {
+          "texture": "#piedra"
+        },
+        "down": {
+          "texture": "#piedra"
+        }
+      }
+    }
+  ]
+}

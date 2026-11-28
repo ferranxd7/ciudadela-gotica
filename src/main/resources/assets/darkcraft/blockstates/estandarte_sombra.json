@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "darkcraft:block/estandarte_sombra"
+    },
+    "facing=east": {
+      "model": "darkcraft:block/estandarte_sombra",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "darkcraft:block/estandarte_sombra",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "darkcraft:block/estandarte_sombra",
+      "y": 270
+    }
+  }
+}

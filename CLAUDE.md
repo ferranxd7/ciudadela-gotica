@@ -4886,7 +4886,32 @@ pantalla, van aparte).
   madera y caja vieja, jergon de paja, pila de libros y atril.
 - Pruebas: servidor, la linea `Bloques 8b: ...` de siempre; cliente, en el muestrario los muebles tres veces (dos mirando al
   norte y uno al este), las estanterias en un muro y las pilas de una a cuatro; capturas `cliente_bq01..52` (grupos),
-  `bq53..77` de cerca (tambien la silla, la estanteria y los libros), `bq78..82` las luces de noche y `bq83..86` los arboles.
+  `bq53..77` de cerca (tambien la silla, la estanteria y los libros), `bq78..82` las luces de noche y `bq83..86` los arboles
+  (desde la 8i los numeros cambian: ver la 8i).
+
+### Plan nuevo, parte 8i: los bloques nuevos, octava tanda (la decoracion)
+
+Respuesta 40 del plan ("estandartes y tapices, estatuas, gargolas, ataudes, huesos y calaveras").
+- **El pintor de la decoracion** (`tools/bloques/decoracion.py`): `estandarte()` (un pano de dos bloques de alto —devuelve la
+  mitad de arriba y la de abajo—: campo con pliegues, cenefa, emblema —corona, ojo, llama, calavera— y cola de golondrina;
+  `roto`: desgarrado), `tapiz()` (damasco que se repite), `alfombra()` (rombos con ribetes que se repiten), `hueso()`,
+  `calavera_cara()`, `telarana()` y `lapida()` (cruz grabada, lineas de letras y liquen). `sueltas_decoracion()`.
+- **Formas nuevas** (sin sufijo; `DECORACION`): d estandarte (cuelga de una barra en lo alto del bloque y el pano baja hasta
+  el bloque de debajo —el modelo llega a y -16—; se cuelga de la pared contra la que se pone), g tapiz (un panel contra la
+  pared que con los de al lado hace un tapiz grande), n calavera, q monton de huesos, u telarana (`WebBlock`: frena como la
+  del juego), w lapida, x cruz de piedra, y ataud (de pie, dos bloques de alto de modelo), z gargola (agazapada, alas y ojos
+  rojos), S busto de marmol y F jaula colgante (con una calavera dentro; cuelga como la arana). Las alfombras son la forma A
+  de la hojarasca (con textura opaca). `Mueble` tiene ademas `pared` (estandartes y tapices: miran hacia fuera de la pared
+  contra la que se ponen y se caen si se la quitan); `Arana` acepta otra forma (la jaula).
+- **Octava tanda** (21 materiales, 21 bloques; ya son 227 materiales y 414 bloques): estandartes de Valdrenn, de la Sombra,
+  de las almas, del hueso y desgarrado; tapices carmesi, verde, azul y negro; alfombras roja, azul y raida; calavera, monton
+  de huesos, telarana, lapida, cruz de piedra, ataud, gargola de piedra (`gargola_piedra`: `gargola` ya es un enemigo),
+  busto de marmol y jaula colgante.
+- **Revisar sin el juego** (`tools/bloques/validar.py`): cada estado con sus modelos, cada modelo con sus texturas (todas
+  definidas, de 64 de ancho y fotogramas de 64), elementos en rango y con angulos validos y el botin de cada bloque.
+- Pruebas: servidor, la linea `Bloques 8b: ...` de siempre; cliente, en el muestrario los estandartes y tapices colgados de
+  un muro, la jaula de una viga y lo demas dos veces; capturas `cliente_bq01..57` (grupos), `bq58..85` de cerca (tambien el
+  estandarte de Valdrenn, la gargola y el ataud), `bq86..90` las luces de noche y `bq91..94` los arboles.
 
 ## Compilar, probar y publicar
 

@@ -27,6 +27,7 @@ import arboles as A  # noqa: E402
 import metal as Me  # noqa: E402
 import fuego as F  # noqa: E402
 import muebles as Mu  # noqa: E402
+import decoracion as De  # noqa: E402
 
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RES = os.path.join(RAIZ, "src", "main", "resources")
@@ -179,6 +180,13 @@ R = {
     "cera_negra": ["#08080a", "#111114", "#1a1a1f", "#24242a", "#2f2f36", "#3b3b43", "#484851"],
     "cera_roja": ["#2a0606", "#460a0a", "#621010", "#7e1816", "#98221e", "#b02e28", "#c43c34"],
     "trapo": ["#0a0806", "#14100b", "#1e1810", "#2a2116", "#372b1d", "#453624"],
+    # telas y hueso (parte 8i)
+    "t_rojo": ["#2a0606", "#460a0a", "#621010", "#7e1816", "#98221e", "#b02e28", "#c43c34"],
+    "t_negro": ["#08080a", "#111114", "#1a1a1f", "#24242a", "#2f2f36", "#3b3b43"],
+    "t_azul": ["#06103a", "#0a1a58", "#102778", "#183696", "#2447b0", "#355ac6"],
+    "t_verde": ["#0a2214", "#12341e", "#1c4a2a", "#286238", "#347a46"],
+    "t_gris": ["#2b2d29", "#3b3e39", "#4c4f49", "#5d605a", "#6f726b"],
+    "hueso": ["#3e3528", "#5a4e3c", "#776a52", "#958769", "#b0a280", "#c8bb98", "#ddd2b2"],
 }
 RAMPAS = {k: P.Rampa(v) for k, v in R.items()}
 
@@ -711,6 +719,40 @@ def MUEBLE(id, es, en, forma, madera, semilla, mapa="WOOD"):
              variantes=1, madera_mueble=madera)
 
 
+# ------------------------------------------------------------------ la decoracion (parte 8i)
+
+ESTANDARTES = {"valdrenn": ("t_rojo", "oro", "oro", "corona", False), "sombra": ("t_negro", "t_rojo", "t_rojo", "ojo", False),
+               "almas": ("t_azul", "v_blanco", "v_blanco", "llama", False), "hueso": ("hueso", "t_negro", "t_negro", "calavera", False),
+               "roto": ("t_gris", "t_negro", "t_negro", "corona", True)}
+TAPICES = {"rojo": ("t_rojo", "oro"), "verde": ("t_verde", "oro"), "azul": ("t_azul", "v_blanco"), "negro": ("t_negro", "t_rojo")}
+ALFOMBRAS = {"roja": ("t_rojo", "t_azul", "oro"), "azul": ("t_azul", "t_rojo", "v_blanco"), "raida": ("t_gris", "t_rojo", "hueso")}
+
+
+def sueltas_decoracion():
+    """Las texturas de la decoracion: los panos de los estandartes (mitad de arriba y de abajo), los tapices, las alfombras,
+    el hueso, la cara de la calavera, la telarana y la lapida."""
+    out = {}
+    for i, (k, (campo, cen, emb, tipo, roto)) in enumerate(ESTANDARTES.items()):
+        a, b = De.estandarte(900 + i, RAMPAS[campo], RAMPAS[cen], RAMPAS[emb], tipo, roto)
+        out[f"estandarte_{k}_arriba"], out[f"estandarte_{k}_abajo"] = a, b
+    for i, (k, (fondo, dib)) in enumerate(TAPICES.items()):
+        out[f"tapiz_{k}"] = De.tapiz(910 + i, RAMPAS[fondo], RAMPAS[dib])
+    for i, (k, (fondo, dib, rib)) in enumerate(ALFOMBRAS.items()):
+        out[f"alfombra_{k}"] = De.alfombra(920 + i, RAMPAS[fondo], RAMPAS[dib], RAMPAS[rib])
+    out["hueso"] = De.hueso(930, RAMPAS["hueso"])
+    out["calavera_cara"] = De.calavera_cara(931, RAMPAS["hueso"])
+    out["telarana"] = De.telarana(932)
+    out["lapida"] = De.lapida(933, RAMPAS["granito"], RAMPAS["liquen"])
+    return out
+
+
+def DECO(id, es, en, forma, semilla, mapa="STONE", sonido="STONE", herramienta="pickaxe", dureza=1.5, **kw):
+    """Una pieza de decoracion: d estandarte, g tapiz, n calavera, q monton de huesos, u telarana, w lapida, x cruz de
+    piedra, y ataud, z gargola, S busto y F jaula colgante."""
+    return M(id, es, en, None, formas=forma, sonido=sonido, mapa=mapa, semilla=semilla, dureza=dureza, herramienta=herramienta,
+             variantes=1, **kw)
+
+
 # ------------------------------------------------------------------ el catalogo
 
 def M(id, es, en, receta, formas="BELM", sonido="STONE", mapa="STONE", semilla=None, variantes=3, dureza=1.5,
@@ -1118,6 +1160,40 @@ MATERIALES = [
     MUEBLE("jergon", "Jergón de paja", "Straw Pallet", "j", "roble", 737, mapa="SAND"),
     MUEBLE("libros", "Pila de libros", "Pile of Books", "i", "roble", 738, mapa="COLOR_RED"),
     MUEBLE("atril", "Atril de roble viejo", "Old Oak Lectern", "r", "roble", 739),
+    # ---- parte 8i: la decoracion
+    DECO("estandarte_valdrenn", "Estandarte de Valdrenn", "Valdrenn Banner", "d", 801, mapa="COLOR_RED", sonido="WOOL",
+         herramienta="axe", dureza=1.0, diseno="valdrenn"),
+    DECO("estandarte_sombra", "Estandarte de la Sombra", "Banner of the Shadow", "d", 802, mapa="COLOR_BLACK", sonido="WOOL",
+         herramienta="axe", dureza=1.0, diseno="sombra"),
+    DECO("estandarte_almas", "Estandarte de las almas", "Soul Banner", "d", 803, mapa="COLOR_BLUE", sonido="WOOL",
+         herramienta="axe", dureza=1.0, diseno="almas"),
+    DECO("estandarte_hueso", "Estandarte del hueso", "Bone Banner", "d", 804, mapa="SAND", sonido="WOOL", herramienta="axe",
+         dureza=1.0, diseno="hueso"),
+    DECO("estandarte_roto", "Estandarte desgarrado", "Tattered Banner", "d", 805, mapa="COLOR_GRAY", sonido="WOOL",
+         herramienta="axe", dureza=1.0, diseno="roto"),
+    DECO("tapiz_rojo", "Tapiz carmesí", "Crimson Tapestry", "g", 811, mapa="COLOR_RED", sonido="WOOL", herramienta="axe",
+         dureza=0.8, diseno="rojo"),
+    DECO("tapiz_verde", "Tapiz verde", "Green Tapestry", "g", 812, mapa="COLOR_GREEN", sonido="WOOL", herramienta="axe",
+         dureza=0.8, diseno="verde"),
+    DECO("tapiz_azul", "Tapiz azul", "Blue Tapestry", "g", 813, mapa="COLOR_BLUE", sonido="WOOL", herramienta="axe",
+         dureza=0.8, diseno="azul"),
+    DECO("tapiz_negro", "Tapiz negro", "Black Tapestry", "g", 814, mapa="COLOR_BLACK", sonido="WOOL", herramienta="axe",
+         dureza=0.8, diseno="negro"),
+    M("alfombra_roja", "Alfombra roja", "Red Carpet", None, formas="A", sonido="WOOL", mapa="COLOR_RED", semilla=821, dureza=0.1,
+      herramienta="hoe", variantes=1, textura="alfombra_roja"),
+    M("alfombra_azul", "Alfombra azul", "Blue Carpet", None, formas="A", sonido="WOOL", mapa="COLOR_BLUE", semilla=822, dureza=0.1,
+      herramienta="hoe", variantes=1, textura="alfombra_azul"),
+    M("alfombra_raida", "Alfombra raída", "Worn Carpet", None, formas="A", sonido="WOOL", mapa="COLOR_GRAY", semilla=823,
+      dureza=0.1, herramienta="hoe", variantes=1, textura="alfombra_raida"),
+    DECO("calavera", "Calavera", "Skull", "n", 831, mapa="SAND", sonido="BONE_BLOCK", dureza=1.0),
+    DECO("monton_huesos", "Montón de huesos", "Pile of Bones", "q", 832, mapa="SAND", sonido="BONE_BLOCK", dureza=1.0),
+    DECO("telarana", "Telaraña", "Cobweb", "u", 833, mapa="WOOL", sonido="WOOL", herramienta="hoe", dureza=4.0),
+    DECO("lapida", "Lápida", "Gravestone", "w", 834, dureza=2.0),
+    DECO("cruz_piedra", "Cruz de piedra", "Stone Cross", "x", 835, dureza=2.0),
+    DECO("ataud", "Ataúd", "Coffin", "y", 836, mapa="COLOR_BLACK", sonido="WOOD", herramienta="axe", dureza=2.0),
+    DECO("gargola_piedra", "Gárgola de piedra", "Stone Gargoyle", "z", 837, mapa="COLOR_BLACK", dureza=3.0),
+    DECO("busto", "Busto de mármol", "Marble Bust", "S", 838, mapa="QUARTZ", sonido="CALCITE", dureza=2.0),
+    DECO("jaula", "Jaula colgante", "Hanging Cage", "F", 839, mapa="COLOR_BLACK", sonido="CHAIN", dureza=3.0),
 ]
 POR_ID = {m["id"]: m for m in MATERIALES}
 
@@ -1126,9 +1202,11 @@ FORMAS = {"B": "", "E": "_escalera", "L": "_losa", "M": "_muro", "V": "_valla", 
 # las formas que son el material entero (sin sufijo en el id): columna, planta, capas de nieve, hielo, ramas (de 8, 4 y
 # 12 pixeles), hojas, racimo, musgo que cuelga, liana, alfombra (hojarasca), vidrio, reja y cadena; y las luces (parte
 # 8g): f fuego, s brasero, v velas, c candelabro, p aplique, a arana, l farol y t antorcha (con su `_pared`); y los muebles
-# (parte 8h): m mesa, h silla, b banco, k taburete, o alacena, e estanteria, j jergon, i pila de libros y r atril
+# (parte 8h): m mesa, h silla, b banco, k taburete, o alacena, e estanteria, j jergon, i pila de libros y r atril; y la
+# decoracion (parte 8i): d estandarte, g tapiz, n calavera, q monton de huesos, u telarana, w lapida, x cruz de piedra,
+# y ataud, z gargola, S busto y F jaula colgante
 SIN_SUFIJO = ("C", "X", "N", "H", "R", "Q", "U", "O", "K", "G", "Y", "A", "W", "I", "Z", "f", "s", "v", "c", "p", "a", "l", "t",
-              "m", "h", "b", "k", "o", "e", "j", "i", "r")
+              "m", "h", "b", "k", "o", "e", "j", "i", "r", "d", "g", "n", "q", "u", "w", "x", "y", "z", "S", "F")
 NOMBRE_FORMA_ES = {"B": "{}", "E": "Escalera de {}", "L": "Losa de {}", "M": "Muro de {}", "V": "Valla de {}",
                    "P": "Cancela de {}", "D": "Puerta de {}", "T": "Trampilla de {}", "J": "Panel de {}"}
 NOMBRE_FORMA_EN = {"B": "{}", "E": "{} Stairs", "L": "{} Slab", "M": "{} Wall", "V": "{} Fence", "P": "{} Fence Gate",
@@ -1173,8 +1251,10 @@ def texturas(m):
         for k in range(2):
             out[f"fuego_{c}_{k}"] = _img(F.llamas(s + 37 * k, RAMPAS["f_" + c]))
             ANIM[f"fuego_{c}_{k}"] = 1
-    elif m["formas"] in ("s", "v", "c", "p", "a", "l", "t", "m", "h", "b", "k", "o", "e", "j", "i", "r"):
+    elif m["formas"] in ("s", "v", "c", "p", "a", "l", "t", "m", "h", "b", "k", "o", "e", "j", "i", "r") + DECORACION:
         out = {}
+    elif m["receta"] is None and "N" not in m["formas"]:
+        out = {}   # (sus texturas son de las sueltas: las alfombras de la parte 8i)
     elif "N" not in m["formas"]:
         for v, n in enumerate(nombres(m)):
             r = m["receta"](s + 1000 * v, s)
@@ -1657,6 +1737,138 @@ def escribir_mueble(m):
     return [bid]
 
 
+DECORACION = ("d", "g", "n", "q", "u", "w", "x", "y", "z", "S", "F")
+
+
+def escribir_deco(m):
+    """La decoracion de la parte 8i, caja a caja (lo que mira a un lado se escribe mirando al norte)."""
+    bid, f = m["id"], m["formas"]
+    bs = os.path.join(ASSETS, "blockstates")
+    mb = os.path.join(ASSETS, "models", "block")
+    mi = os.path.join(ASSETS, "models", "item")
+    B_ = "darkcraft:block/"
+    girado = True
+
+    def modelo(els, t, render="minecraft:cutout"):
+        d = {"parent": "minecraft:block/block", "textures": t, "elements": els}
+        if render:
+            d["render_type"] = render
+        j(os.path.join(mb, bid + ".json"), d)
+
+    if f == "d":
+        k = m["diseno"]
+        t = {"arriba": B_ + f"estandarte_{k}_arriba", "abajo": B_ + f"estandarte_{k}_abajo", "barra": B_ + "madera_negra",
+             "metal": B_ + "oro_gastado", "particle": B_ + f"estandarte_{k}_arriba"}
+        els = [_caja((0.5, 14, 13.5), (15.5, 15, 14.5), "#barra"), _caja((-0.5, 13.5, 13), (1, 15.5, 15), "#metal"),
+               _caja((15, 13.5, 13), (16.5, 15.5, 15), "#metal"), _caja((7.5, 14.5, 14.5), (8.5, 16, 16), "#barra")]
+        for (y0, y1, tex, uv) in ((0, 14, "#arriba", [0, 2, 16, 16]), (-16, 0, "#abajo", [0, 0, 16, 16])):
+            els.append({"from": [1, y0, 14.2], "to": [15, y1, 14.2], "shade": True,
+                        "faces": {"north": {"uv": uv, "texture": tex}, "south": {"uv": [uv[2], uv[1], uv[0], uv[3]], "texture": tex}}})
+        modelo(els, t)
+    elif f == "g":
+        k = m["diseno"]
+        t = {"tapiz": B_ + f"tapiz_{k}", "particle": B_ + f"tapiz_{k}"}
+        els = [{"from": [0, 0, 15.2], "to": [16, 16, 16], "faces": {
+            "north": {"texture": "#tapiz"}, "up": {"texture": "#tapiz", "uv": [0, 0, 16, 1]},
+            "down": {"texture": "#tapiz", "uv": [0, 15, 16, 16]}, "east": {"texture": "#tapiz", "uv": [0, 0, 1, 16]},
+            "west": {"texture": "#tapiz", "uv": [15, 0, 16, 16]}}}]
+        modelo(els, t, None)
+    elif f == "n":
+        t = {"hueso": B_ + "hueso", "cara": B_ + "calavera_cara", "particle": B_ + "hueso"}
+        craneo = _caja((4.5, 1.5, 5), (11.5, 7.5, 11.5), "#hueso")
+        craneo["faces"]["north"] = {"texture": "#cara"}
+        els = [craneo, _caja((5.5, 0, 5.2), (10.5, 1.5, 9.5), "#hueso")]
+        mand = _caja((5.5, 0, 5), (10.5, 1.5, 5.6), "#cara", caras=("north",), uv=[3, 13, 13, 16])
+        els.append(mand)
+        modelo(els, t, None)
+    elif f == "q":
+        girado = False
+        t = {"hueso": B_ + "hueso", "cara": B_ + "calavera_cara", "particle": B_ + "hueso"}
+        els = []
+        for (a, b, ang) in (((2, 0, 4), (13, 1.2, 5.2), 22.5), ((3, 0, 10), (14, 1.2, 11.2), -22.5), ((7, 1, 2), (8.2, 2.2, 14), 45),
+                            ((4, 1.2, 6), (12, 2.4, 7.2), -45), ((2, 0, 7), (10, 1, 8), 0), ((9, 0.5, 3), (10.2, 1.7, 12), 22.5)):
+            e = _caja(a, b, "#hueso")
+            if ang:
+                e["rotation"] = {"origin": [8, a[1], 8], "axis": "y", "angle": ang}
+            els.append(e)
+            # las cabezas del hueso (un nudo en cada punta)
+        cr = _caja((9, 0, 8.5), (13, 3.6, 12.5), "#hueso")
+        cr["faces"]["north"] = {"texture": "#cara"}
+        cr["rotation"] = {"origin": [11, 0, 10.5], "axis": "y", "angle": 22.5}
+        els.append(cr)
+        modelo(els, t, None)
+    elif f == "u":
+        girado = False
+        j(os.path.join(mb, bid + ".json"), {"parent": "minecraft:block/cross", "textures": {"cross": B_ + "telarana"},
+                                           "render_type": "minecraft:cutout"})
+    elif f in ("w", "x"):
+        t = {"piedra": B_ + "lapida", "base": B_ + "sillar_gris", "particle": B_ + "lapida"}
+        if f == "w":
+            els = [_caja((2, 0, 6), (14, 1.5, 10), "#base"), _caja((3, 1.5, 7), (13, 12, 9), "#piedra"),
+                   _caja((4, 12, 7), (12, 13, 9), "#piedra"), _caja((5.5, 13, 7), (10.5, 14, 9), "#piedra")]
+            els[1]["faces"]["north"] = {"texture": "#piedra", "uv": [2, 4, 14, 16]}
+            els[1]["faces"]["south"] = {"texture": "#piedra", "uv": [2, 4, 14, 16]}
+        else:
+            els = [_caja((4, 0, 5), (12, 1.5, 11), "#base"), _caja((6.5, 1.5, 7), (9.5, 16, 9), "#piedra"),
+                   _caja((3, 9, 7), (13, 12, 9), "#piedra"), _caja((5, 13, 6.5), (11, 14, 9.5), "#piedra", caras=("up", "down"))]
+        modelo(els, t, None)
+    elif f == "y":
+        t = {"madera": B_ + "madera_negra", "hierro": B_ + "planchas_hierro", "particle": B_ + "madera_negra"}
+        els = [_caja((3.5, 0, 10), (12.5, 18, 15), "#madera"), _caja((2.5, 18, 10), (13.5, 26, 15), "#madera"),
+               _caja((4, 26, 10), (12, 30, 15), "#madera"), _caja((7, 6, 9.5), (9, 24, 10), "#hierro"),
+               _caja((4.5, 17, 9.5), (11.5, 19, 10), "#hierro")]
+        for (a, b) in (((3, 4, 9.6), (4.5, 5.5, 10)), ((11.5, 4, 9.6), (13, 5.5, 10)), ((2, 22, 9.6), (3.5, 23.5, 10)),
+                       ((12.5, 22, 9.6), (14, 23.5, 10))):
+            els.append(_caja(a, b, "#hierro"))
+        modelo(els, t, None)
+    elif f == "z":
+        t = {"piedra": B_ + "roca_oscura", "ojo": B_ + "brasas_sangre", "particle": B_ + "roca_oscura"}
+        els = [_caja((3, 0, 5), (13, 2, 15), "#piedra"), _caja((4, 2, 5.5), (6.5, 6.5, 9), "#piedra"),
+               _caja((9.5, 2, 5.5), (12, 6.5, 9), "#piedra"),
+               _caja((5, 3, 8), (11, 11, 14.5), "#piedra", rot={"origin": [8, 3, 11], "axis": "x", "angle": 22.5}),
+               _caja((5.5, 8, 3), (10.5, 13, 8), "#piedra"), _caja((6.5, 8, 2), (9.5, 10.5, 3), "#piedra"),
+               _caja((6, 13, 5), (7, 15, 6), "#piedra"), _caja((9, 13, 5), (10, 15, 6), "#piedra"),
+               _caja((1.5, 6, 10), (5, 15, 14), "#piedra", rot={"origin": [5, 6, 12], "axis": "z", "angle": 22.5}),
+               _caja((11, 6, 10), (14.5, 15, 14), "#piedra", rot={"origin": [11, 6, 12], "axis": "z", "angle": -22.5}),
+               _caja((6.2, 11, 2.95), (7.4, 12, 3), "#ojo", caras=("north",)), _caja((8.6, 11, 2.95), (9.8, 12, 3), "#ojo", caras=("north",))]
+        modelo(els, t, None)
+    elif f == "S":
+        t = {"marmol": B_ + "marmol_blanco", "base": B_ + "marmol_negro", "particle": B_ + "marmol_blanco"}
+        els = [_caja((4, 0, 4), (12, 1.5, 12), "#base"), _caja((5, 1.5, 5), (11, 5, 11), "#base"), _caja((4.5, 5, 4.5), (11.5, 6, 11.5), "#base"),
+               _caja((3, 6, 5.5), (13, 10, 10.5), "#marmol"), _caja((7, 10, 7), (9, 11, 9), "#marmol"),
+               _caja((5.5, 11, 5.5), (10.5, 16, 10.5), "#marmol"), _caja((7.5, 12.5, 5), (8.5, 14, 5.5), "#marmol")]
+        modelo(els, t, None)
+    elif f == "F":
+        girado = False
+        t = {"barras": B_ + "barrotes", "hierro": B_ + "planchas_hierro", "cadena": B_ + "cadena_hierro", "hueso": B_ + "hueso",
+             "cara": B_ + "calavera_cara", "particle": B_ + "planchas_hierro"}
+        els = [_caja((3, 0.5, 3), (13, 1.5, 13), "#hierro"), _caja((3, 13, 3), (13, 14, 13), "#hierro"),
+               _caja((5, 14, 5), (11, 15, 11), "#hierro")]
+        for (a, b, caras) in (((3, 1.5, 3), (13, 13, 3), ("north", "south")), ((3, 1.5, 13), (13, 13, 13), ("north", "south")),
+                              ((3, 1.5, 3), (3, 13, 13), ("east", "west")), ((13, 1.5, 3), (13, 13, 13), ("east", "west"))):
+            els.append({"from": list(a), "to": list(b), "faces": {c: {"texture": "#barras", "uv": [0, 0, 16, 16]} for c in caras}})
+        for ang in (45, -45):
+            els.append({"from": [6.5, 15, 8], "to": [9.5, 16, 8], "shade": False,
+                        "rotation": {"origin": [8, 8, 8], "axis": "y", "angle": ang},
+                        "faces": {"north": {"uv": [3, 0, 0, 1], "texture": "#cadena"}, "south": {"uv": [0, 0, 3, 1], "texture": "#cadena"}}})
+        cr = _caja((6, 1.5, 6), (9, 4.5, 9), "#hueso")
+        cr["faces"]["north"] = {"texture": "#cara"}
+        els.append(cr)
+        els.append(_caja((8, 1.5, 9), (12, 2.5, 10), "#hueso", rot={"origin": [10, 2, 9.5], "axis": "y", "angle": 22.5}))
+        modelo(els, t)
+    if girado:
+        j(os.path.join(bs, bid + ".json"), _girado(bid, f"darkcraft:block/{bid}"))
+    else:
+        j(os.path.join(bs, bid + ".json"), {"variants": {"": {"model": f"darkcraft:block/{bid}"}}})
+    if f == "u":
+        j(os.path.join(mi, bid + ".json"), {"parent": "minecraft:item/generated", "textures": {"layer0": B_ + "telarana"}})
+    elif f == "d":
+        j(os.path.join(mi, bid + ".json"), {"parent": "minecraft:item/generated", "textures": {"layer0": B_ + f"estandarte_{m['diseno']}_arriba"}})
+    else:
+        j(os.path.join(mi, bid + ".json"), {"parent": f"darkcraft:block/{bid}"})
+    return [bid]
+
+
 def escribir_vidrio(m):
     """Vidrio: el bloque (translucido) y, si lleva J, su panel (como el panel de vidrio del juego: poste, lados y sin
     lado, con el canto `<id>_borde`)."""
@@ -1820,6 +2032,8 @@ def escribir_material(m):
         return escribir_luz(m)
     if m["formas"] in ("m", "h", "b", "k", "o", "e", "j", "i", "r"):
         return escribir_mueble(m)
+    if m["formas"] in DECORACION:
+        return escribir_deco(m)
     if "W" in m["formas"]:
         return escribir_vidrio(m)
     if m["formas"] == "I":
@@ -2269,7 +2483,7 @@ def main():
         img.save(os.path.join(tdir, nombre + ".png"))
         if nombre in ANIM:
             j(os.path.join(tdir, nombre + ".png.mcmeta"), {"animation": {"frametime": ANIM[nombre]}})
-    for nombre, img in list(sueltas().items()) + list(sueltas_muebles().items()):
+    for nombre, img in list(sueltas().items()) + list(sueltas_muebles().items()) + list(sueltas_decoracion().items()):
         guardar(nombre, img)
     particulas_json()
     for m in MATERIALES:

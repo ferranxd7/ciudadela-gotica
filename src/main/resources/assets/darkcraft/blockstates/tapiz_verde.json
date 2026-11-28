@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "darkcraft:block/tapiz_verde"
+    },
+    "facing=east": {
+      "model": "darkcraft:block/tapiz_verde",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "darkcraft:block/tapiz_verde",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "darkcraft:block/tapiz_verde",
+      "y": 270
+    }
+  }
+}

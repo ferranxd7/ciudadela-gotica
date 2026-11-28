@@ -3085,11 +3085,11 @@ public final class ClientCiTest {
         final String[] cercaIds = {"sillar_musgoso", "marmol_negro", "piedra_tallada", "madera_roble", "entramado_cruz",
                 "tejado_escamas", "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos", "tronco_roble", "corteza_pantano",
                 "rama_roble", "hojas_roble", "musgo_colgante", "liana", "oro_labrado", "barrotes", "vidriera_roja", "brasero_almas",
-                "candelabro", "farol", "silla_roble", "estanteria_roble", "libros"};
+                "candelabro", "farol", "silla_roble", "estanteria_roble", "libros", "estandarte_valdrenn", "gargola_piedra", "ataud"};
         final String[] nombres = {"musgo", "marmol_negro", "tallada", "roble_puerta", "entramado_cruz", "tejado_escamas",
                 "hierba_verde", "roca_gris", "flores_sangre", "hongos_rojos", "tronco_roble", "corteza_pantano", "rama_roble",
                 "hojas_roble", "musgo_colgante", "liana", "oro_labrado", "barrotes", "vidriera_roja", "brasero_almas", "candelabro",
-                "farol", "silla_roble", "estanteria_roble", "libros"};
+                "farol", "silla_roble", "estanteria_roble", "libros", "estandarte_valdrenn", "gargola_piedra", "ataud"};
         final int[] cerca = new int[cercaIds.length];
         final float[] cabeceo = new float[cercaIds.length];
         for (int i = 0; i < cercaIds.length; i++) {
@@ -3178,6 +3178,32 @@ public final class ClientCiTest {
             }
             if (f.length() == 1 && "fsvcpalt".indexOf(f.charAt(0)) >= 0) {
                 n += luces(lvl, f, id, b, x, y0, z0);
+                continue;
+            }
+            if (f.length() == 1 && "dgnqwxyzSuF".indexOf(f.charAt(0)) >= 0) {
+                // la decoracion (parte 8i): estandartes y tapices colgados de un muro, la jaula de una viga y lo demas dos veces
+                if (f.equals("d") || f.equals("g")) {
+                    for (int dx = 0; dx < 4; dx++)
+                        for (int dy = 0; dy < 4; dy++) lvl.setBlock(new BlockPos(x + dx, y0 + dy, z0 + 2), bq("sillar_gris"), 2);
+                    net.minecraft.world.level.block.state.BlockState st = b.defaultBlockState().setValue(
+                            net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, net.minecraft.core.Direction.NORTH);
+                    if (f.equals("d")) {
+                        lvl.setBlock(new BlockPos(x + 1, y0 + 3, z0 + 1), st, 2);
+                    } else {
+                        for (int dx = 1; dx < 3; dx++)
+                            for (int dy = 1; dy < 3; dy++) lvl.setBlock(new BlockPos(x + dx, y0 + dy, z0 + 1), st, 2);
+                    }
+                    n += 20;
+                } else if (f.equals("F")) {
+                    for (int dx = 0; dx < 4; dx++) lvl.setBlock(new BlockPos(x + dx, y0 + 3, z0 + 1), bq("sillar_gris"), 2);
+                    lvl.setBlock(new BlockPos(x + 1, y0 + 2, z0 + 1), b.defaultBlockState(), 2);
+                    n += 5;
+                } else {
+                    lvl.setBlock(new BlockPos(x + 1, y0, z0 + 1), b.defaultBlockState(), 2);
+                    lvl.setBlock(new BlockPos(x + 2, y0, z0 + 1), b.defaultBlockState().setValue(
+                            net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, net.minecraft.core.Direction.EAST), 2);
+                    n += 2;
+                }
                 continue;
             }
             if (f.length() == 1 && "mhbkoejir".indexOf(f.charAt(0)) >= 0) {

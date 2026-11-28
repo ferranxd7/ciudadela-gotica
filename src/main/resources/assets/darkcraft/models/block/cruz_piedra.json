@@ -1,0 +1,126 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "piedra": "darkcraft:block/lapida",
+    "base": "darkcraft:block/sillar_gris",
+    "particle": "darkcraft:block/lapida"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        0,
+        5
+      ],
+      "to": [
+        12,
+        1.5,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#base"
+        },
+        "south": {
+          "texture": "#base"
+        },
+        "east": {
+          "texture": "#base"
+        },
+        "west": {
+          "texture": "#base"
+        },
+        "up": {
+          "texture": "#base"
+        },
+        "down": {
+          "texture": "#base"
+        }
+      }
+    },
+    {
+      "from": [
+        6.5,
+        1.5,
+        7
+      ],
+      "to": [
+        9.5,
+        16,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#piedra"
+        },
+        "south": {
+          "texture": "#piedra"
+        },
+        "east": {
+          "texture": "#piedra"
+        },
+        "west": {
+          "texture": "#piedra"
+        },
+        "up": {
+          "texture": "#piedra"
+        },
+        "down": {
+          "texture": "#piedra"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        9,
+        7
+      ],
+      "to": [
+        13,
+        12,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#piedra"
+        },
+        "south": {
+          "texture": "#piedra"
+        },
+        "east": {
+          "texture": "#piedra"
+        },
+        "west": {
+          "texture": "#piedra"
+        },
+        "up": {
+          "texture": "#piedra"
+        },
+        "down": {
+          "texture": "#piedra"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        13,
+        6.5
+      ],
+      "to": [
+        11,
+        14,
+        9.5
+      ],
+      "faces": {
+        "up": {
+          "texture": "#piedra"
+        },
+        "down": {
+          "texture": "#piedra"
+        }
+      }
+    }
+  ]
+}

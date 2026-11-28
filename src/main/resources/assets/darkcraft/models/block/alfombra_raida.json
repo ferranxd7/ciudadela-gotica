@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/carpet",
+  "textures": {
+    "wool": "darkcraft:block/alfombra_raida"
+  },
+  "render_type": "minecraft:cutout"
+}

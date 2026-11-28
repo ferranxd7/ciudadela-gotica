@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "darkcraft:block/gargola_piedra"
+    },
+    "facing=east": {
+      "model": "darkcraft:block/gargola_piedra",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "darkcraft:block/gargola_piedra",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "darkcraft:block/gargola_piedra",
+      "y": 270
+    }
+  }
+}

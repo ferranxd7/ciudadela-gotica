@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "darkcraft:block/busto"
+    },
+    "facing=east": {
+      "model": "darkcraft:block/busto",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "darkcraft:block/busto",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "darkcraft:block/busto",
+      "y": 270
+    }
+  }
+}

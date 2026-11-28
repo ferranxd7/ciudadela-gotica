@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/alfombra_raida"
+      },
+      {
+        "model": "darkcraft:block/alfombra_raida",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/alfombra_raida",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/alfombra_raida",
+        "y": 270
+      }
+    ]
+  }
+}

@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.WallBlock;
+import net.minecraft.world.level.block.WebBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
@@ -173,6 +174,19 @@ public final class Bloques {
         }
         if (f.length() == 1 && "fsvcpalt".indexOf(f.charAt(0)) >= 0) {
             altaLuz(m, ids);
+            return;
+        }
+        if (f.length() == 1 && "dgnqwxyzSuF".indexOf(f.charAt(0)) >= 0) {
+            // la decoracion (parte 8i)
+            BlockBehaviour.Properties pd = BlockBehaviour.Properties.of().mapColor(m.mapa()).sound(m.sonido()).strength(m.dureza())
+                    .noOcclusion();
+            switch (f) {
+                case "u" -> reg(ids, m.id(), () -> new WebBlock(pd.forceSolidOn().noCollission()
+                        .pushReaction(PushReaction.DESTROY)));
+                case "F" -> reg(ids, m.id(), () -> new Arana(pd.pushReaction(PushReaction.DESTROY), Mueble.forma("F")));
+                case "d", "g" -> reg(ids, m.id(), () -> new Mueble(pd.noCollission().ignitedByLava(), Mueble.forma(f), true, true));
+                default -> reg(ids, m.id(), () -> new Mueble(pd, Mueble.forma(f), !f.equals("q")));
+            }
             return;
         }
         if (f.length() == 1 && "mhbkoejir".indexOf(f.charAt(0)) >= 0) {

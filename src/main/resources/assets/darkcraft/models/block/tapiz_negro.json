@@ -1,0 +1,62 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "tapiz": "darkcraft:block/tapiz_negro",
+    "particle": "darkcraft:block/tapiz_negro"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        15.2
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tapiz"
+        },
+        "up": {
+          "texture": "#tapiz",
+          "uv": [
+            0,
+            0,
+            16,
+            1
+          ]
+        },
+        "down": {
+          "texture": "#tapiz",
+          "uv": [
+            0,
+            15,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#tapiz",
+          "uv": [
+            0,
+            0,
+            1,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#tapiz",
+          "uv": [
+            15,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

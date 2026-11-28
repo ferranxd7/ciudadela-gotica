@@ -221,6 +221,27 @@ public final class CatalogoBloques {
             new Material("caja_vieja", "B", SoundType.WOOD, MapColor.COLOR_GRAY, 2.0F, BlockSetType.STONE, WoodType.OAK, false),
             new Material("jergon", "j", SoundType.WOOD, MapColor.SAND, 2.0F, BlockSetType.STONE, WoodType.OAK, false),
             new Material("libros", "i", SoundType.WOOD, MapColor.COLOR_RED, 2.0F, BlockSetType.STONE, WoodType.OAK, false),
-            new Material("atril", "r", SoundType.WOOD, MapColor.WOOD, 2.0F, BlockSetType.STONE, WoodType.OAK, false)
+            new Material("atril", "r", SoundType.WOOD, MapColor.WOOD, 2.0F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("estandarte_valdrenn", "d", SoundType.WOOL, MapColor.COLOR_RED, 1.0F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("estandarte_sombra", "d", SoundType.WOOL, MapColor.COLOR_BLACK, 1.0F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("estandarte_almas", "d", SoundType.WOOL, MapColor.COLOR_BLUE, 1.0F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("estandarte_hueso", "d", SoundType.WOOL, MapColor.SAND, 1.0F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("estandarte_roto", "d", SoundType.WOOL, MapColor.COLOR_GRAY, 1.0F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("tapiz_rojo", "g", SoundType.WOOL, MapColor.COLOR_RED, 0.8F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("tapiz_verde", "g", SoundType.WOOL, MapColor.COLOR_GREEN, 0.8F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("tapiz_azul", "g", SoundType.WOOL, MapColor.COLOR_BLUE, 0.8F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("tapiz_negro", "g", SoundType.WOOL, MapColor.COLOR_BLACK, 0.8F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("alfombra_roja", "A", SoundType.WOOL, MapColor.COLOR_RED, 0.1F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("alfombra_azul", "A", SoundType.WOOL, MapColor.COLOR_BLUE, 0.1F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("alfombra_raida", "A", SoundType.WOOL, MapColor.COLOR_GRAY, 0.1F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("calavera", "n", SoundType.BONE_BLOCK, MapColor.SAND, 1.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("monton_huesos", "q", SoundType.BONE_BLOCK, MapColor.SAND, 1.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("telarana", "u", SoundType.WOOL, MapColor.WOOL, 4.0F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("lapida", "w", SoundType.STONE, MapColor.STONE, 2.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("cruz_piedra", "x", SoundType.STONE, MapColor.STONE, 2.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("ataud", "y", SoundType.WOOD, MapColor.COLOR_BLACK, 2.0F, BlockSetType.STONE, WoodType.OAK, false),
+            new Material("gargola_piedra", "z", SoundType.STONE, MapColor.COLOR_BLACK, 3.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("busto", "S", SoundType.CALCITE, MapColor.QUARTZ, 2.0F, BlockSetType.STONE, WoodType.OAK, true),
+            new Material("jaula", "F", SoundType.CHAIN, MapColor.COLOR_BLACK, 3.0F, BlockSetType.STONE, WoodType.OAK, true)
     };
 }

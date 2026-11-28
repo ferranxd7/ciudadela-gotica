@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "darkcraft:block/alfombra_roja"
+      },
+      {
+        "model": "darkcraft:block/alfombra_roja",
+        "y": 90
+      },
+      {
+        "model": "darkcraft:block/alfombra_roja",
+        "y": 180
+      },
+      {
+        "model": "darkcraft:block/alfombra_roja",
+        "y": 270
+      }
+    ]
+  }
+}
