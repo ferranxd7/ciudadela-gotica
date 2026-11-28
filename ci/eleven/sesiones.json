@@ -12632,5 +12632,306 @@
     ]
    }
   }
+ },
+ "sfx_lazareto": {
+  "flow": "xKz2eX6iGZyUELWdiZwe",
+  "modelo": "eleven_text_to_sound_v3",
+  "nota": "Parte 7au: el Lazareto de Maese Galen y los Destilados (el gemido, la alerta, el dolor y la muerte de los destilados, el frasco que vuela, el de fuego, el de acido y el que cura, el golpe de la cuba, su derrame y su rotura, el atanor que se enciende, el tiro de la chimenea y el aire de la torre). Las tomas se bajan como NOMBRE_1..N",
+  "sonidos": {
+   "destilado_gemido": {
+    "prompt": "A diseased creature whose grey skin is covered in glass growths moaning wetly and gurgling, faint glassy clinks and liquid bubbling inside its body, eerie, stone tower reverb, short, no music",
+    "sesiones": [
+     "PyxOnFhtZ1CxiCSJzqVE",
+     "UvPcDJYPPHiPG5UwMVNU",
+     "5YvnsCffnCqmB7RjL0KJ",
+     "xwBD6IkctH3W6DWNv2g6"
+    ],
+    "generaciones": [
+     "tOlRcqk8RIc1hJubbxac",
+     "4G2zsgRM1KYxPSVBY6vq",
+     "x5DnkSWA6hBE0QpQqaC9",
+     "4pZcYxiHGq1410zrgEAj"
+    ],
+    "duraciones": [
+     8.0,
+     5.0,
+     5.0,
+     5.0
+    ]
+   },
+   "destilado_alerta": {
+    "prompt": "A deformed alchemical creature suddenly shrieking in alarm, a gurgling choking screech, glass shards on its body rattling, horror, short, stone room reverb, no music",
+    "sesiones": [
+     "LH4DCpJUdsAItpio1b4F",
+     "r4h4Yfr2KKuw1MZDFPQJ",
+     "u6p0gjzpFHpqMleWKh4D",
+     "PGtLbxkhDeEEnjtVbRyN"
+    ],
+    "generaciones": [
+     "qISoSuw1OtzGBiXinUDi",
+     "1xxSnAJsAZCWwhrjFTXL",
+     "RqTg4GJxs71UyvVF2PKr",
+     "EG8u1AcQPzkp1ElZzZTj"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     4.0
+    ]
+   },
+   "destilado_dolor": {
+    "prompt": "A pained choking groan of a mutated creature, glass cracking on its body and a small splash of liquid, short, stone room reverb, no music",
+    "sesiones": [
+     "APk65ilY1c4tXwfzoBGd",
+     "PXD02sQPWcFWi6nxSqsX",
+     "AOlkn0zEtW3X0iwDAHmz",
+     "MMaFh4pE2mMbDAx3vmKl"
+    ],
+    "generaciones": [
+     "47XsSgDKqi5EYwOEJsp8",
+     "sTa5jcra58fHq8OKl3qY",
+     "IHwIw9zylvbTX9Zw04uq",
+     "XKvu5gvCz6MtUGpZkdSk"
+    ],
+    "duraciones": [
+     4.0,
+     4.0,
+     4.0,
+     4.0
+    ]
+   },
+   "destilado_muerte": {
+    "prompt": "A mutated alchemical creature collapsing and dying, the glass growths on its body shattering, liquid spilling and hissing on stone, a last gurgling breath, stone room reverb, no music",
+    "sesiones": [
+     "grtEsMojCwmI2cx4cSyv",
+     "tE41vUtjTyIWRqJy1Vyt",
+     "dXkh2lIv5wDkyAJBkp7K",
+     "TQDmXOXx3zFyHN8ses66"
+    ],
+    "generaciones": [
+     "wOmAm8j2EjFoYKwuAqh6",
+     "ktgsbxb4IRGRfbb16zik",
+     "pq6iJosGdnx88WYpF42s",
+     "ONSyjyiziRACgW3gYONA"
+    ],
+    "duraciones": [
+     10.0,
+     12.0,
+     8.0,
+     8.0
+    ]
+   },
+   "frasco_lanzar": {
+    "prompt": "A small glass flask full of liquid thrown hard through the air, a quick whoosh with the liquid sloshing inside and a glassy rattle, short, no music",
+    "sesiones": [
+     "ZwPVul4DjDjCdqdFJpRl",
+     "v2PrvEQwj1Xa7hSEFyJG",
+     "CqzvbUYuoMNkFsrUpBAh",
+     "TufLsbD91YsaVTAVxAKp"
+    ],
+    "generaciones": [
+     "ixgfL1xC5yxcqNNAOevM",
+     "OYSE3OgQ3rHfPRKfUHEz",
+     "284UdB6XvV1zzli5CYva",
+     "oSXWaHhAGFNJGq8q0uNC"
+    ],
+    "duraciones": [
+     2.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "frasco_fuego": {
+    "prompt": "A glass flask shattering on a stone floor and bursting into flames, a sharp glass break followed by a whoomp of fire and crackling flames, short, no music",
+    "sesiones": [
+     "GNAzkpnUoWrTox6ZlGQz",
+     "oeZUK1RuhWU42bO9MFh1",
+     "lKrXc5hjuq7s0AklND8M",
+     "Ac8LqJrmmIjGqf7H6NoZ"
+    ],
+    "generaciones": [
+     "gc1n5MCCRgfnBzFki2aL",
+     "gDeS1CwRl3jZSpolpkFm",
+     "fQ03xnO7lePfbxZgYSKI",
+     "B9C0GJTutK57xsSC4oyz"
+    ],
+    "duraciones": [
+     5.0,
+     4.0,
+     4.0,
+     5.0
+    ]
+   },
+   "frasco_acido": {
+    "prompt": "A glass flask shattering on stone and green acid spilling out, sizzling and fizzing, a bubbling corrosive hiss with thin smoke, short, no music",
+    "sesiones": [
+     "3Yd9CmOUf1IyC0pwjK6x",
+     "Au0D448XyeHiYF35igyB",
+     "tlElLmCv6zptTeB74BiH",
+     "ECpr79VDLAx7fQ0tPGQU"
+    ],
+    "generaciones": [
+     "jut1UzbYIyx4fBfGfSeb",
+     "OnhYAp5PQSjDqKw4yK5y",
+     "LiFZn9V1IbzKCGwVPXsS",
+     "DarG6jwgZNXX0iasosCE"
+    ],
+    "duraciones": [
+     4.0,
+     5.0,
+     4.0,
+     5.0
+    ]
+   },
+   "frasco_cura": {
+    "prompt": "A small glass vial breaking softly and a glowing healing elixir bubbling and shimmering, a gentle magical chime and soft fizz, short, no music",
+    "sesiones": [
+     "OZJ32iuIDIGVKgkTXDsM",
+     "yJnLttqDbRjvrJw5oJqX",
+     "ORwxm5h15olrj60kpqaw",
+     "t0U8WkpwRC30xi5Jr0e1"
+    ],
+    "generaciones": [
+     "71leGK2TuSZhqdequPKe",
+     "y5UfCngGQmO1ZVOP3iKL",
+     "ttyX03kTD1BeYlG4owE1",
+     "xlclnGRrVf5xvNpSyIi9"
+    ],
+    "duraciones": [
+     5.0,
+     4.0,
+     4.0,
+     4.0
+    ]
+   },
+   "cuba_golpe": {
+    "prompt": "A huge mutated brute punching with a heavy fist, a deep thudding impact, the large glass tank of liquid strapped to its back sloshing violently, short, no music",
+    "sesiones": [
+     "scrv8TjcnM7waJFNMA4N",
+     "ejGLCgxt6qaPgFrTxZeH",
+     "7Nd3kpXIRxz4XkzJisQq",
+     "TCW0tUtlwIXIZLd8307H"
+    ],
+    "generaciones": [
+     "ai0hKRXuSUP7dNZbmkNH",
+     "SZLU1ATQqyAm4G3aNzL7",
+     "2NJhK1Tdo9EOjlGAiYDb",
+     "jRslcge5XayZzoNA8OWJ"
+    ],
+    "duraciones": [
+     3.0,
+     3.0,
+     3.0,
+     3.0
+    ]
+   },
+   "cuba_derrame": {
+    "prompt": "A large glass vat tipping over and pouring a heavy wave of thick liquid across a stone floor, a big splash then sizzling, bubbling and steaming acid, no music",
+    "sesiones": [
+     "RgkKZUuBV2Cv51TB2UEl",
+     "zImbKyFZ6pqWpQZHa6i2",
+     "0OTDrgt6rjTzn1szuvoo",
+     "3U5pDLHM11TkcIm625Hp"
+    ],
+    "generaciones": [
+     "UeIY9e6Qreu4yFkcfQGs",
+     "LyFtzQhAofEruzcuiF0M",
+     "pQsOePDJrUQNWBUaaz8Q",
+     "qeYcokCHUNYEDd8y44iT"
+    ],
+    "duraciones": [
+     12.0,
+     12.0,
+     8.0,
+     8.0
+    ]
+   },
+   "cuba_rompe": {
+    "prompt": "A big thick glass tank shattering explosively, liquid gushing out in a torrent and splashing over a stone floor, heavy glass shards falling and tinkling, no music",
+    "sesiones": [
+     "k8kYnM2pxq0XDMhSqa4z",
+     "cRtV4t8kvsi9XMdjZhtZ",
+     "y45Ilnb0CJCUBNR5SDxo",
+     "7MB87do4HLWmhfhGdnBn"
+    ],
+    "generaciones": [
+     "9bBg4Ypeiii4WzA2veAZ",
+     "3JnXWVq3ARAdU0OEjcOR",
+     "cudWHkIm4zI1LFpAXt9t",
+     "DwE4ayCOkAjRzFlogSGX"
+    ],
+    "duraciones": [
+     8.0,
+     8.0,
+     7.0,
+     7.0
+    ]
+   },
+   "atanor_enciende": {
+    "prompt": "A huge old alchemical furnace igniting in a stone cellar: a rusty iron valve squealing open, gas rushing, a deep whoomp of fire catching, then a rising roar of flames being sucked up a tall stone chimney, no music",
+    "sesiones": [
+     "3MmNoGTDm6mWrUPggooD",
+     "1Y9TqDOfECWl1drd3JyN",
+     "jIa6RidgQrtpnd8ufeYQ",
+     "jKnl9n31Sb4l2pmbHRyA"
+    ],
+    "generaciones": [
+     "1PhxRym7pJkmG1SJ9KuI",
+     "RKTAJ1pPxQxrvgNQbcNI",
+     "y68N7ZVdA1apZ0Zq6RQ0",
+     "AVSp0X2CKb1QBJXKl0ja"
+    ],
+    "duraciones": [
+     12.0,
+     12.0,
+     15.0,
+     12.0
+    ]
+   },
+   "atanor_tiro": {
+    "prompt": "A continuous roaring updraft of hot air rushing up a tall hollow stone shaft, a deep fire rumble far below and wind howling upward past the listener, steady, seamless loop, no music",
+    "sesiones": [
+     "NEMhniNMvpOXT2ed8yQc",
+     "FByoUoigHjzRg5dowAEb",
+     "e1UhUGVbTJO0NjE06TDd",
+     "f6m0T3j7yy1gf4hEbXBz"
+    ],
+    "generaciones": [
+     "Q0mOp9Xe0WpTjVqmc21f",
+     "f4dKhDPKkSUFIhTqAoeU",
+     "cOrRFRxBQzIBk0frtXKg",
+     "cvzfdZTZO3yG7ptbge4A"
+    ],
+    "duraciones": [
+     30.0,
+     30.0,
+     30.0,
+     30.0
+    ]
+   },
+   "lazareto_ambiente": {
+    "prompt": "Ambience inside an abandoned alchemist's plague tower: glass alembics softly bubbling, liquids dripping, glassware faintly clinking, old wood creaking, distant muffled coughs and moans echoing in stone halls, eerie and quiet, reverberant, seamless loop, dark fantasy, no music",
+    "sesiones": [
+     "SDCvEOOBjzBDuuiOZVq3",
+     "HkMHkJ2Ot7CdPfAU5fia",
+     "O6BPSBZDKMr55NkTX52g",
+     "KWct3B5fy3d3sSprODH2"
+    ],
+    "generaciones": [
+     "RughtHyro9k0GtPuxgC6",
+     "HxgWljMINS81F7kTACtc",
+     "DC4iGmNJ1A7qC6KZP9LW",
+     "TRU9bigX1QPfTnac1rnM"
+    ],
+    "duraciones": [
+     25.0,
+     30.0,
+     30.0,
+     25.0
+    ]
+   }
+  }
  }
 }
