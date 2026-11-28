@@ -39,9 +39,48 @@ public class ClaseScreen extends Screen {
 
     public static void abrir(boolean forzada) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null) return;
+        if (mc.player == null || mc.level == null || cargando(mc.screen) || mc.getOverlay() != null) {
+            // llega mientras el juego aun carga el mundo: se abre en cuanto este (tick)
+            if (forzada) pendienteForzada = true;
+            return;
+        }
+        pendienteForzada = false;
         mc.setScreen(new ClaseScreen(forzada));
         Panel.abre();
+    }
+
+    /** Una eleccion forzada que llego mientras se cargaba el mundo (o que se cerro sin elegir): se abre en cuanto se pueda. */
+    private static boolean pendienteForzada;
+
+    /** El servidor ya ha puesto la clase (Net.ClaseHecha): fuera la eleccion forzada, abierta o pendiente. */
+    public static void hecha() {
+        pendienteForzada = false;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof ClaseScreen c && c.forzada) {
+            c.enviada = true;
+            mc.setScreen(null);
+        }
+    }
+
+    /** Para las pruebas: si hay una eleccion forzada esperando a abrirse. */
+    public static boolean pendiente() {
+        return pendienteForzada;
+    }
+
+    private static boolean cargando(Screen s) {
+        return s instanceof net.minecraft.client.gui.screens.ReceivingLevelScreen || s instanceof net.minecraft.client.gui.screens.LevelLoadingScreen
+                || s instanceof net.minecraft.client.gui.screens.ProgressScreen || s instanceof net.minecraft.client.gui.screens.GenericDirtMessageScreen
+                || s instanceof net.minecraft.client.gui.screens.ConnectScreen;
+    }
+
+    /** Cada tick del cliente (ClientRol): la eleccion pendiente, en cuanto el mundo este cargado y no haya otra pantalla. */
+    public static void tick(Minecraft mc) {
+        if (!pendienteForzada) return;
+        if (mc.level == null || mc.player == null) {
+            if (mc.level == null && !cargando(mc.screen)) pendienteForzada = false;
+            return;
+        }
+        if (mc.screen == null && mc.getOverlay() == null) abrir(true);
     }
 
     public ClaseScreen(boolean forzada) {
@@ -352,6 +391,13 @@ public class ClaseScreen extends Screen {
     private void mover(int d) {
         sel = Math.floorMod(sel + d, CLASES.length);
         Panel.mueve();
+    }
+
+    @Override
+    public void removed() {
+        super.removed();
+        // la forzada no se puede cerrar: si otra pantalla la quita sin haber elegido, vuelve en cuanto se pueda
+        if (forzada && !enviada) pendienteForzada = true;
     }
 
     private void empezar() {

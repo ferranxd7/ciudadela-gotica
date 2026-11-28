@@ -234,6 +234,7 @@ public final class ClientRol {
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent e) {
         Minecraft mc = Minecraft.getInstance();
+        if (e.phase == TickEvent.Phase.END) ClaseScreen.tick(mc);
         if (e.phase == TickEvent.Phase.START) {
             // con un aviso de "Pulsa [E]..." delante (la espada de luz, un santuario), la tecla del inventario hace eso
             // (y no abre el inventario)

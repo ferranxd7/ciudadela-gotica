@@ -5667,7 +5667,63 @@ public final class ClientCiTest {
             m.setScreen(tituloAbierto);
         });
         atTicks(t + 330, "de vuelta al titulo", m -> logTitulo(m, "vuelta"));
-        return t + 340;
+        // ---- la nueva partida propia (parte 8a): solo el nombre del mapa y la dificultad; se crea un mundo nuevo y, dentro,
+        // tiene que salir la eleccion de clase (hasta la build 228 no salia: Clase no estaba en el bus de eventos) y, al
+        // elegir, la cinematica de la Sombra
+        atTicks(t + 340, "la nueva partida (desde el titulo)", m -> m.setScreen(new com.darkcraft.client.ui.NuevaPartidaScreen(tituloAbierto)));
+        atTicks(t + 360, "captura: la nueva partida", m -> {
+            if (m.screen instanceof com.darkcraft.client.ui.NuevaPartidaScreen n) log("  " + n.resumen());
+            else log("  no esta la nueva partida: " + (m.screen == null ? "ninguna" : m.screen.getClass().getName()));
+            shot(m, "cliente_ti06_nueva_partida");
+        });
+        atTicks(t + 362, "la dificultad: dificil", m -> {
+            if (m.screen instanceof com.darkcraft.client.ui.NuevaPartidaScreen n) n.probarDificultad(1);
+        });
+        atTicks(t + 366, "captura: dificil", m -> {
+            if (m.screen instanceof com.darkcraft.client.ui.NuevaPartidaScreen n) log("  " + n.resumen());
+            shot(m, "cliente_ti07_nueva_dificil");
+        });
+        atTicks(t + 368, "la crea de dificultad normal y entra", m -> {
+            if (m.screen instanceof com.darkcraft.client.ui.NuevaPartidaScreen n) {
+                n.probarDificultad(-1);
+                n.probarNombre("Prueba de la clase");
+                n.probarEmpezar();
+                log("  " + n.resumen());
+            } else log("  no esta la nueva partida para empezar");
+        });
+        final int[] cine = {-1, 0};
+        esperarA("cliente_ti08_nueva_clase", m -> m.level != null && m.player != null && m.screen instanceof com.darkcraft.client.ui.ClaseScreen, m -> {
+        }, ClientCiTest::estadoNuevaPartida, 5400);
+        // elegir el caballero y empezar: la cinematica de la Sombra (la caida, a los 13 s); la espera cuenta desde que se pide
+        // la partida (como la de antes): crear el mundo puede tardar
+        esperarA("cliente_ti09_nueva_intro", m -> {
+            if (cine[1] == 0 && m.screen instanceof com.darkcraft.client.ui.ClaseScreen c) {
+                c.probarElegir("caballero");
+                c.probarEmpezar();
+                cine[1] = 1;
+                log("  elige el caballero en el mundo nuevo");
+            }
+            if (cine[0] < 0 && ClientCine.active()) cine[0] = ticks;
+            return cine[0] >= 0 && ticks - cine[0] >= 260;
+        }, m -> {
+        }, ClientCiTest::estadoNuevaPartida, 6300);
+        return t + 340 + 6600;
+    }
+
+    /** En el mundo nuevo de la prueba de la nueva partida: la pantalla, si la eleccion esta pendiente y lo que lleva. */
+    private static String estadoNuevaPartida(Minecraft m) {
+        StringBuilder b = new StringBuilder("pantalla " + (m.screen == null ? "ninguna" : m.screen.getClass().getSimpleName()));
+        if (m.screen instanceof com.darkcraft.client.ui.ClaseScreen c) b.append(" (").append(c.resumen()).append(")");
+        b.append(" | eleccion pendiente ").append(com.darkcraft.client.ui.ClaseScreen.pendiente()).append(" | cinematica ").append(ClientCine.active());
+        if (m.player != null) {
+            b.append(" | jugador ").append(m.player.getScoreboardName()).append(" en ").append(String.format(java.util.Locale.ROOT, "%.1f %.1f %.1f",
+                    m.player.getX(), m.player.getY(), m.player.getZ())).append(", mano ").append(m.player.getMainHandItem().getHoverName().getString())
+                    .append(", modo ").append(m.gameMode == null ? "?" : m.gameMode.getPlayerMode().getName());
+            if (m.level != null) b.append(", dificultad ").append(m.level.getDifficulty().getKey());
+        }
+        MinecraftServer srv = m.getSingleplayerServer();
+        if (srv != null) b.append(" | mundo '").append(srv.getWorldData().getLevelName()).append("'");
+        return b.toString();
     }
 
     private static int pausa(int t0) {

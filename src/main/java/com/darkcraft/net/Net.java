@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class Net {
     private Net() {}
 
-    private static final String V = "26";
+    private static final String V = "27";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(DarkCraftMod.MODID, "main"),
             () -> V, V::equals, V::equals);
 
@@ -177,6 +177,9 @@ public final class Net {
         // las flechas de sangre y de escarcha (parte 7aj): lo sumado de sangrado y de congelacion
         CH.messageBuilder(Acumula.class, id++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(Acumula::write).decoder(Acumula::read).consumerMainThread(Acumula::handle).add();
+        // la clase ya esta puesta (elegida, o "sin clase" por un comando): fuera la eleccion forzada (parte 8a)
+        CH.messageBuilder(ClaseHecha.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder((m, b) -> {}).decoder(b -> new ClaseHecha()).consumerMainThread(ClaseHecha::handle).add();
     }
 
     // ------------------------------------------------------------------ el sangrado y la congelacion (parte 7aj)
@@ -518,6 +521,14 @@ public final class Net {
 
         void handle(Supplier<NetworkEvent.Context> ctx) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.ClaseScreen.abrir(forzada));
+            ctx.get().setPacketHandled(true);
+        }
+    }
+
+    /** El servidor ya ha puesto la clase del jugador: la eleccion forzada que hubiera abierta o pendiente se quita (parte 8a). */
+    public record ClaseHecha() {
+        void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.darkcraft.client.ui.ClaseScreen.hecha());
             ctx.get().setPacketHandled(true);
         }
     }

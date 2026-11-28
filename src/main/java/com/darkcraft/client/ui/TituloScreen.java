@@ -6,7 +6,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.multiplayer.SafetyScreen;
-import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -78,7 +77,7 @@ public class TituloScreen extends Screen {
         opciones.clear();
         if (ultima != null) opciones.add(new Opcion("darkcraft.titulo.continuar", this::continuar, true));
         opciones.add(new Opcion("darkcraft.titulo.partidas", () -> minecraft.setScreen(new PartidasScreen(this)), true));
-        opciones.add(new Opcion("darkcraft.titulo.nueva", () -> CreateWorldScreen.openFresh(minecraft, this), true));
+        opciones.add(new Opcion("darkcraft.titulo.nueva", () -> minecraft.setScreen(new NuevaPartidaScreen(this)), true));
         boolean multi = minecraft.allowsMultiplayer();
         opciones.add(new Opcion("darkcraft.titulo.multijugador", () -> minecraft.setScreen(minecraft.options.skipMultiplayerWarning
                 ? new JoinMultiplayerScreen(this) : new SafetyScreen(this)), multi));

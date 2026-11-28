@@ -1,4 +1,4 @@
-"""Crea el modpack .mrpack (Modrinth) con Forge, Dark Craft y todos los mods de decoracion.
+"""Crea el modpack .mrpack (Modrinth) con Forge y Dark Craft (sin mods de decoracion desde la parte 8a).
 
 Uso: python3 ci/make_mrpack.py mrpack_files.json darkcraft.jar salida.mrpack version_forge [shader.json]
 Dark Craft va dentro (con Distant Horizons, Oculus y Embeddium en su jar); el shader (Complementary) se anade como un

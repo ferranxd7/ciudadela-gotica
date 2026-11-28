@@ -96,7 +96,7 @@ def convertir(origen, destino, lufs, corte=0):
               + (f"atrim=0:{corte},afade=t=out:st={corte - 4}:d=4," if corte > 8 else "")
               + f"loudnorm=I={lufs}:TP=-1.5:LRA=11")
     cmd = ["ffmpeg", "-y", "-v", "error", "-i", origen, "-vn", "-af", filtro, "-ar", "44100", "-ac", "2",
-           "-c:a", "libvorbis", "-q:a", "3", destino]
+           "-c:a", "libvorbis", "-q:a", "8", destino]
     r = subprocess.run(cmd, capture_output=True, text=True)
     return r.returncode == 0, r.stderr[-800:]
 

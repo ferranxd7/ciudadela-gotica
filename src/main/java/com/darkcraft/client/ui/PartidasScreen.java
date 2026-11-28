@@ -5,7 +5,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.FaviconTexture;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -286,7 +285,7 @@ public class PartidasScreen extends Screen {
             case 0 -> jugar();
             case 1 -> {
                 Panel.acepta();
-                CreateWorldScreen.openFresh(minecraft, this);
+                minecraft.setScreen(new NuevaPartidaScreen(this));
             }
             case 2 -> borrar();
             case 3 -> {

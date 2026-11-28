@@ -11,10 +11,6 @@ permissions:
 
 env:
   FORGE: 1.20.1-47.3.0
-  MODS: >-
-    macaws-furniture macaws-roofs macaws-windows macaws-lights-and-lamps macaws-paths-and-pavings
-    macaws-bridges macaws-fences-and-walls macaws-doors macaws-trapdoors macaws-stairs
-    handcrafted supplementaries another-furniture biomes-o-plenty
 
 jobs:
   build:
@@ -107,17 +103,12 @@ jobs:
           echo "eula=true" > srv/eula.txt
           printf "level-seed=ciudadela\nonline-mode=false\nspawn-protection=0\nmax-tick-time=-1\nview-distance=4\nsimulation-distance=4\n" > srv/server.properties
 
-      - name: Prueba con mods de decoracion
+      - name: El modpack y el instalador (solo Dark Craft y el shader; sin mods de decoracion desde la parte 8a)
         run: |
-          python3 ci/download_mods.py srv/mods $MODS || true
-          cp out/../srv/mods_descargados.txt out/ 2>/dev/null || cp srv/mods_descargados.txt out/ || true
-          cp build/libs/darkcraft-*.jar srv/mods/
+          echo "[]" > srv/mrpack_files.json
           python3 ci/make_mrpack.py srv/mrpack_files.json build/libs/darkcraft-0.1.0.jar out/DarkCraft-modpack.mrpack "${FORGE#1.20.1-}" out/shader.json
           python3 ci/instalador.py srv/mrpack_files.json out/shader.json out/instalar_mods.bat || true
           echo "-Xmx6G -Ddarkcraft.ciTest=true" > srv/user_jvm_args.txt
-          (cd srv && timeout 50m ./run.sh nogui 2>&1 | tee ../out/server_mods.log) || true
-          mkdir -p out/mods && cp -r srv/ci-out/* out/mods/ 2>/dev/null || true
-          grep -nE "Error construyendo|Exception|\[CI\]" out/server_mods.log | head -300 > out/mods/errores.txt || true
 
       - name: Prueba sin mods (solo vanilla)
         run: |
@@ -173,10 +164,10 @@ jobs:
           for f in build/libs/*.jar out/*.jar build.log out/*.txt out/*.log out/capturas.zip out/audios.zip out/audio_cliente.ogg out/*.mrpack out/instalar_mods.bat; do [ -s "$f" ] && files+=("$f"); done
           # si es un reintento, la version que dejo el intento fallido anterior se sustituye
           gh release delete "build-${{ github.run_number }}" --yes >/dev/null 2>&1 || true
-          if ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null && [ "$PUBLICAR" = "si" ]; then
+          if ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/vanilla_informe.txt 2>/dev/null && [ "$PUBLICAR" = "si" ]; then
             { echo "Version automatica ${{ github.run_number }}. Se instala con instalar_mods.bat (en esta pagina)."; echo; echo '```'; cat out/creditos_mods.txt 2>/dev/null; echo '```'; } > out/notas.md
             gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Dark Craft - Build ${{ github.run_number }}" --notes-file out/notas.md --latest
-          elif ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/mods_informe.txt 2>/dev/null; then
+          elif ls build/libs/*.jar >/dev/null 2>&1 && grep -q "^OK" out/vanilla_informe.txt 2>/dev/null; then
             gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }} (en desarrollo)" --notes "Version de pruebas: no es la que se instala" --prerelease --latest=false
           else
             gh release create "build-${{ github.run_number }}" "${files[@]}" --title "Build ${{ github.run_number }} (fallida)" --notes "Compilacion o prueba fallida" --prerelease --latest=false

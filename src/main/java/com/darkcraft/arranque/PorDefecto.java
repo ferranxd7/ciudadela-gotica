@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 /**
  * Lo que Dark Craft deja puesto la PRIMERA vez que arranca en un cliente (parte 6): la lejania de Distant Horizons a
- * 256 chunks (sin su actualizador automatico: DH va dentro del jar) y los shaders de Oculus encendidos con
+ * 192 chunks (256 hasta la parte 8a) (sin su actualizador automatico: DH va dentro del jar) y los shaders de Oculus encendidos con
  * Complementary Unbound si el instalador lo ha bajado a {@code shaderpacks/}.
  *
  * <p>Se hace una sola vez por instalacion (lo apunta en {@code config/darkcraft-arranque.properties}): si luego el
@@ -27,8 +27,8 @@ import java.util.regex.Pattern;
 public final class PorDefecto {
     private PorDefecto() {}
 
-    /** La lejania de Distant Horizons por defecto (respuesta 82 del plan). */
-    public static final int LEJANIA = 256;
+    /** La lejania de Distant Horizons por defecto (respuesta 82 del plan; 88 del plan nuevo: "menos de 256"). */
+    public static final int LEJANIA = 192;
     public static final String MARCA = "darkcraft-arranque.properties";
     static final String DH = "DistantHorizons.toml";
     static final String OCULUS = "oculus.properties";
@@ -39,9 +39,10 @@ public final class PorDefecto {
      * NONE: con NON_COLLIDING, el de DH, el mar de nubes —que no tiene choque— no salia en la lejania); 2 = ademas, la
      * lejania se genera solo con chunks de verdad ({@code generatorPlan} CHUNKS_ONLY): la "superficie aproximada" de DH
      * sale del ruido de los generadores de Minecraft, y los de Dark Craft (el mar de nubes, Morvain) no lo tienen: daba un
-     * mar plano a la altura 63 y, encima, trozos de terreno de verdad como mesetas flotantes.
+     * mar plano a la altura 63 y, encima, trozos de terreno de verdad como mesetas flotantes; 3 = la lejania a 192 (el
+     * usuario la queria por debajo de 256: parte 8a).
      */
-    static final int DH_VERSION = 2;
+    static final int DH_VERSION = 3;
 
     /** Lo minimo para DH: el resto lo rellena el al arrancar (y respeta estos valores). */
     static final String DH_MINIMO = String.join("\n",

@@ -6,8 +6,9 @@ nubes, la Fortaleza de Hueso y el portal de la Sombra.
 ## Instalación
 1. En TLauncher instala y abre una vez la versión **Forge 1.20.1** (47.x).
 2. Baja `instalar_mods.bat` de la [última release](https://github.com/ferranxd7/ciudadela-gotica/releases/latest) y
-   ábrelo: pone Dark Craft, los mods de decoración y los shaders (Complementary) en tu `.minecraft`.
-3. Sube la memoria de TLauncher a **8 GB o más**: la lejanía de Distant Horizons (256 chunks) y los shaders la necesitan.
+   ábrelo: pone Dark Craft y los shaders (Complementary) en tu `.minecraft` (los mods que tuvieras los guarda en
+   `mods_antiguos`; ya no hacen falta mods de decoración).
+3. Sube la memoria de TLauncher a **8 GB o más**: la lejanía de Distant Horizons (192 chunks) y los shaders la necesitan.
 4. **Crea una partida nueva.**
 
 Con amigos: un **servidor dedicado** de Forge 1.20.1 con el mismo `darkcraft-0.1.0.jar` en su carpeta `mods` (Oculus,

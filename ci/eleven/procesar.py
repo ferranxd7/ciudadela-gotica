@@ -27,6 +27,9 @@ import subprocess
 import sys
 import tempfile
 
+# calidad de Vorbis de todo lo que sale (voces y efectos): 8 (~256 kbps en estereo) desde la parte 8a; antes 6
+CALIDAD = "8"
+
 AQUI = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(AQUI, "..", ".."))
 MASTER = os.path.join(AQUI, "master")
@@ -963,7 +966,7 @@ COLA = 0.10
 
 def voz_normal(src, dst):
     pre, _, hablado = recorte(src)
-    ff(["-i", src, "-af", pre + VOZ, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-af", pre + VOZ, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA
 
 
@@ -983,13 +986,13 @@ def voz_monstruo(src, dst, fuego, desfase):
         "acompressor=threshold=-18dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
     ff(["-i", src, "-i", fuego, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1",
-        "-c:a", "libvorbis", "-q:a", "6", dst])
+        "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado * ESTIRA_MONSTRUO + COLA
 
 
 def voz_gavran(src, dst):
     pre, _, hablado = recorte(src)
-    ff(["-i", src, "-af", pre + VOZ_GAVRAN, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-af", pre + VOZ_GAVRAN, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA
 
 
@@ -1010,7 +1013,7 @@ def voz_arbol(src, dst, madera, desfase):
         "acompressor=threshold=-18dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
     ff(["-i", src, "-i", madera, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1",
-        "-c:a", "libvorbis", "-q:a", "6", dst])
+        "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado * ESTIRA_ARBOL + COLA
 
 
@@ -1027,7 +1030,7 @@ def voz_capitan(src, dst):
         "aecho=0.8:0.5:60|135|220:0.20|0.12|0.06,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA
 
 
@@ -1046,7 +1049,7 @@ def voz_molinera(src, dst):
         "aecho=0.8:0.35:240|520:0.16|0.08,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA
 
 
@@ -1066,7 +1069,7 @@ def voz_verdugo(src, dst):
         "aecho=0.8:0.3:70|160|310:0.16|0.10|0.05,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA
 
 
@@ -1085,7 +1088,7 @@ def voz_barquero(src, dst):
         "aecho=0.8:0.35:120|260|480:0.20|0.12|0.07,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.1
 
 
@@ -1105,7 +1108,7 @@ def voz_abad(src, dst):
         "aecho=0.8:0.4:110|250|430|680:0.22|0.15|0.10|0.06,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.15
 
 
@@ -1126,7 +1129,7 @@ def voz_condestable(src, dst):
         "aecho=0.8:0.35:80|190|340:0.2|0.12|0.06,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.1
 
 
@@ -1147,7 +1150,7 @@ def voz_rectora(src, dst):
         "aecho=0.8:0.45:150|330|570|880:0.26|0.18|0.11|0.06,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.15
 
 
@@ -1170,7 +1173,7 @@ def voz_ballenero(src, dst):
         "aecho=0.85:0.4:21|37|120|260:0.20|0.14|0.12|0.06,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.1
 
 
@@ -1192,7 +1195,7 @@ def voz_pontifice(src, dst):
         "aecho=0.8:0.5:170|380|640|980:0.28|0.19|0.12|0.07,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.2
 
 
@@ -1213,7 +1216,7 @@ def voz_aldric(src, dst):
         "aecho=0.85:0.4:230|520|910:0.20|0.11|0.06,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=140,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.15
 
 
@@ -1234,7 +1237,7 @@ def voz_gigante(src, dst):
         "aecho=0.85:0.45:320|760|1300:0.17|0.09|0.05,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=160,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.2
 
 
@@ -1257,7 +1260,7 @@ def voz_jinete(src, dst):
         "aecho=0.85:0.5:280|640|1100:0.2|0.12|0.07,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=150,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.2
 
 
@@ -1279,7 +1282,7 @@ def voz_dragon(src, dst):
         "aecho=0.85:0.5:420|900:0.22|0.1,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=160,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.2
 
 
@@ -1299,7 +1302,7 @@ def voz_bufon(src, dst):
         "aecho=0.85:0.45:90|210|380:0.25|0.15|0.08,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=150,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.2
 
 
@@ -1318,7 +1321,7 @@ def voz_isolde(src, dst):
         "aecho=0.85:0.55:120|260|430:0.3|0.18|0.1,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=160,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.2
 
 
@@ -1340,7 +1343,7 @@ def voz_osmund(src, dst):
         "aecho=0.8:0.55:320|700|1150:0.3|0.18|0.1,"
         "acompressor=threshold=-20dB:ratio=3:attack=5:release=160,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.2
 
 
@@ -1362,7 +1365,7 @@ def voz_capataz(src, dst):
         "aecho=0.85:0.5:260|560|980:0.26|0.15|0.08,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=150,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
-    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA + 0.2
 
 
@@ -1418,7 +1421,7 @@ def voz_sombra(src, sus, dst, lufs=-15.0):
             f"afade=t=out:st={d - 0.9:.2f}:d=0.9[out]", "-map", "[out]", "-ar", "44100", "-ac", "2", "-c:a", "pcm_s24le", mezcla])
         i, _ = sonoridad(mezcla)
         ff(["-i", mezcla, "-af", f"volume={lufs - i:.2f}dB,alimiter=level_in=1:level_out=1:limit=0.84:attack=4:release=60:level=false",
-            "-ar", "44100", "-ac", "2", "-c:a", "libvorbis", "-q:a", "6", dst])
+            "-ar", "44100", "-ac", "2", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
     return hablado + COLA
 
 
@@ -1460,7 +1463,7 @@ def capitulo6():
         grafo += (f"amix=inputs={len(partes)}:normalize=0:duration=longest,"
                   "alimiter=level_in=1:level_out=1:limit=0.9:attack=4:release=80:level=false[out]")
         os.makedirs(os.path.dirname(ogg), exist_ok=True)
-        ff(args + ["-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "2", "-c:a", "libvorbis", "-q:a", "6", ogg])
+        ff(args + ["-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "2", "-c:a", "libvorbis", "-q:a", CALIDAD, ogg])
     dur = duracion(ogg)
     os.makedirs(os.path.dirname(jsn), exist_ok=True)
     with open(jsn, "w") as fh:
@@ -1515,13 +1518,28 @@ def capitulo_guia(cap):
         grafo += (f"amix=inputs={len(partes)}:normalize=0:duration=longest,"
                   "alimiter=level_in=1:level_out=1:limit=0.9:attack=4:release=80:level=false[out]")
         os.makedirs(os.path.dirname(ogg), exist_ok=True)
-        ff(args + ["-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "2", "-c:a", "libvorbis", "-q:a", "6", ogg])
+        ff(args + ["-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "2", "-c:a", "libvorbis", "-q:a", CALIDAD, ogg])
     dur = duracion(ogg)
     os.makedirs(os.path.dirname(jsn), exist_ok=True)
     with open(jsn, "w") as fh:
         json.dump({"voz": "guia", "audio": True, "duracion": round(max(dur, lineas[-1][1] + 1.0), 3), "lineas": lineas}, fh)
     print(f"capitulo {cap}: {len(lineas)} frases, {dur:.1f} s")
     return True
+
+
+# los efectos que suenan sin sitio (los de la interfaz, los carteles y las cinematicas): salen en estereo, con toda su
+# anchura (los que suenan en un sitio del mundo tienen que ser mono: si no, el juego no los coloca) (parte 8a)
+ESTEREO = {"has_muerto", "jefe_abatido", "zona_descubierta", "ecos_recuperados", "ecos_ganados", "menu_abre", "menu_mueve",
+           "menu_acepta", "menu_cancela", "codice_abre", "codice_cierra", "codice_pagina", "espejo_despierta", "fijar",
+           "libro_abre", "logro", "pluma", "intro_abismo", "intro_caida", "intro_atrapa", "intro_marca", "intro_latido",
+           "cielo_remolino", "cielo_rojo", "barco_vuelo"}
+
+
+def canales(dst):
+    """1 (mono) salvo los efectos de ESTEREO (por el nombre del fichero que sale: nombre_N.ogg)."""
+    nombre = os.path.basename(dst).rsplit(".", 1)[0]
+    base = re.sub(r"_\d+$", "", nombre)
+    return "2" if base in ESTEREO else "1"
 
 
 def efecto(src, dst, maxs, fade, lufs, entrada=0.0, graves=False, extra="", inicio=0.0):
@@ -1534,9 +1552,9 @@ def efecto(src, dst, maxs, fade, lufs, entrada=0.0, graves=False, extra="", inic
         grafo = ("[0:a]aresample=44100,asplit=3[a][b][c];[b]asetrate=44100*2,aresample=44100,atempo=0.5,volume=0.9[o1];"
                  "[c]asetrate=44100*3,aresample=44100,atempo=0.5,atempo=0.666667,volume=0.5[o2];"
                  "[a][o1][o2]amix=inputs=3:normalize=0,asoftclip=type=tanh:threshold=0.8," + filtro + "[out]")
-        ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+        ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", canales(dst), "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
         return
-    ff(["-i", src, "-af", filtro, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    ff(["-i", src, "-af", filtro, "-ar", "44100", "-ac", canales(dst), "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
 
 
 def main():
@@ -1971,7 +1989,7 @@ def main():
                 continue
             try:
                 pre, _, hablado = recorte(src)
-                ff(["-i", src, "-af", pre + filtro, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+                ff(["-i", src, "-af", pre + filtro, "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", CALIDAD, dst])
                 voces[pj][str(n)] = round(min(hablado + COLA, duracion(dst)), 2)
                 print(f"{pj} {n:2d}: {duracion(dst):.2f} s (habla hasta {voces[pj][str(n)]})")
             except Exception as e:  # noqa: BLE001

@@ -1,5 +1,6 @@
-"""Escribe instalar_mods.bat (Windows, fin de linea CRLF): los mods de decoracion que ha probado la CI, Dark Craft
-(de la ultima release: lleva dentro Distant Horizons, Oculus y Embeddium) y el shader Complementary en shaderpacks/.
+"""Escribe instalar_mods.bat (Windows, fin de linea CRLF): Dark Craft (de la ultima release: lleva dentro Distant
+Horizons, Oculus y Embeddium) y el shader en shaderpacks/. Desde la parte 8a ya no hay mods de decoracion (la lista
+llega vacia); los mods que hubiera en la carpeta se mueven a mods_antiguos.
 
 Uso: python3 ci/instalador.py mrpack_files.json shader.json salida.bat
 """
@@ -66,4 +67,4 @@ lineas += [
 ]
 with open(out, "w", encoding="utf-8", newline="\r\n") as f:
     f.write("\n".join(lineas) + "\n")
-print(f"instalador: {len(mods)} mods de decoracion + Dark Craft" + (f" + {shader['fichero']}" if shader else "") + f" -> {out}")
+print(f"instalador: {len(mods)} mods de mas + Dark Craft" + (f" + {shader['fichero']}" if shader else "") + f" -> {out}")

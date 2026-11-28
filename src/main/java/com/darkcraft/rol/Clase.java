@@ -27,7 +27,11 @@ import java.util.Locale;
  * suma - 79), lo que llevan puesto y en las manos, los hechizos memorizados y como se reparten los frascos. Al entrar por
  * primera vez en un mundo se elige en {@code ClaseScreen}; se guarda en la ficha ({@link Ficha#clase}). Los jugadores que
  * ya tenian partida no la eligen (se quedan sin clase).
+ *
+ * <p>Ojo (parte 8a): hasta la build 228 esta clase NO estaba en el bus de eventos (le faltaba la anotacion) y
+ * {@link #onEntrar} no llegaba nunca: nadie elegia clase al empezar ni veia la cinematica de la Sombra.
  */
+@Mod.EventBusSubscriber(modid = DarkCraftMod.MODID)
 public enum Clase {
     CABALLERO(new int[]{15, 10, 11, 14, 13, 9, 9, 7}, 3, 1),
     VAGABUNDO(new int[]{12, 11, 13, 12, 15, 9, 8, 8}, 3, 1),
@@ -176,7 +180,7 @@ public enum Clase {
         Memoria.forzar(sp, new ArrayList<>(k.hechizos()));
         Ficha.Frascos f = Ficha.frascos(sp);
         Ficha.frascos(sp, new Ficha.Frascos(c.frascosVida, c.frascosMana, c.frascosVida, c.frascosMana, f.mejora()));
-        Ficha.clase(sp, c.id);
+        poner(sp, c.id);
         Rol.aplicar(sp);
         sp.setHealth(sp.getMaxHealth());
         com.darkcraft.armas.Combos.llenar(sp);
@@ -193,10 +197,38 @@ public enum Clase {
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onEntrar(PlayerEvent.PlayerLoggedInEvent e) {
         if (!(e.getEntity() instanceof ServerPlayer sp) || !pendiente(sp)) return;
+        // en creativo (o espectador) no se pregunta aun: al pasar a jugar de verdad (onModo)
+        if (sp.isCreative() || sp.isSpectator()) return;
+        if (!nuevo(sp)) {
+            poner(sp, SIN_CLASE);
+            return;
+        }
+        Net.to(sp, new Net.AbrirClase(true));
+    }
+
+    /** Pone la clase en la ficha; si ya tiene una (o "sin clase"), el cliente quita la eleccion forzada que tuviera. */
+    static void poner(ServerPlayer sp, String id) {
+        Ficha.clase(sp, id);
+        if (id != null && !id.isEmpty()) Net.to(sp, new Net.ClaseHecha());
+    }
+
+    /** Si es nuevo de verdad en este mundo (poco jugado, nivel 1 y sin ecos): a los demas no se les vacia el inventario. */
+    static boolean nuevo(ServerPlayer sp) {
         int jugado = sp.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME));
-        boolean nuevo = jugado < 20 * 60 && Ficha.nivel(sp) <= 1 && Ficha.ecos(sp) == 0;
-        if (!nuevo || sp.isCreative() || sp.isSpectator()) {
-            Ficha.clase(sp, SIN_CLASE);
+        return jugado < 20 * 60 * 10 && Ficha.nivel(sp) <= 1 && Ficha.ecos(sp) == 0;
+    }
+
+    /** Quien entro en creativo sin clase y pasa a jugar (supervivencia o aventura): ahora si elige (si sigue siendo nuevo). */
+    @SubscribeEvent
+    public static void onModo(PlayerEvent.PlayerChangeGameModeEvent e) {
+        if (!(e.getEntity() instanceof ServerPlayer sp) || !pendiente(sp)) return;
+        boolean antes = e.getCurrentGameMode() == net.minecraft.world.level.GameType.CREATIVE
+                || e.getCurrentGameMode() == net.minecraft.world.level.GameType.SPECTATOR;
+        boolean ahora = e.getNewGameMode() == net.minecraft.world.level.GameType.SURVIVAL
+                || e.getNewGameMode() == net.minecraft.world.level.GameType.ADVENTURE;
+        if (!antes || !ahora) return;
+        if (!nuevo(sp)) {
+            poner(sp, SIN_CLASE);
             return;
         }
         Net.to(sp, new Net.AbrirClase(true));
@@ -240,7 +272,7 @@ public enum Clase {
             return 1;
         }));
         c.then(Commands.literal("ninguna").executes(x -> {
-            Ficha.clase(x.getSource().getPlayerOrException(), SIN_CLASE);
+            poner(x.getSource().getPlayerOrException(), SIN_CLASE);
             return 1;
         }));
         for (Clase k : values())

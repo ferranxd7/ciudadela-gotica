@@ -1,3 +1,171 @@
+# EL PLAN NUEVO (28-11-2026): la gran reforma (parte 8) — MANDA SOBRE LO DE ABAJO
+
+El 28-11-2026 el usuario probo el mod (build 226) y pidio **rehacerlo casi todo**: un mapa "como Dios manda" (montanas
+colosales, escaleras kilometricas, castillos en las cimas, llanuras con cosas, una isla con lagos, rios y cascadas del
+cielo; estilo Terralith / Tectonic pero del mod), hierba con efectos al pasar, lluvia y nieve realistas, arboles "con mas
+pixeles" (no cubos), **mas de 200 bloques propios** estilo Dark Souls / Elden Ring (fuera los mods de decoracion; Valdrenn,
+la Fortaleza de Hueso y Brumavela con bloques del mod), estructuras enormes con muchos enemigos (ciudades, pueblos,
+catacumbas, castillos, la universidad de magia, el pantano), **jefes rehechos** "que sean personas" con animaciones muy
+curradas y fuego propio (no el de Minecraft), hadas y fuegos de colores, y **cadenas de objetos** para entrar a cada jefe
+(como las piezas del barco, pero mas largas). Fallos que vio: no le salio la pantalla de la clase (ni arma ni cinematica)
+y los sonidos y la musica con poco detalle. Despues de la reforma se sigue con lo que quedaba (parte 7 y traducciones).
+Contesto 95 preguntas (abajo, tal cual; en blanco = lo decido yo).
+
+## Hoja de ruta de la reforma (parte 8, cada sub-parte publicada con `[publicar]`)
+
+1. **8a, arreglos urgentes**: la pantalla de la clase sale siempre al empezar; **Nueva partida propia** (solo el nombre
+   del mapa y la dificultad, sin modos de juego); sonidos y musica con mas detalle; el instalador sin los mods de
+   decoracion; la lejania de Distant Horizons por debajo de 256.
+2. **Los bloques nuevos** (mas de 200, texturas de 64 x 64, todas las formas de cada material, cero bloques de Minecraft),
+   por tandas: piedras y sillares de cada region; maderas, tejas, hierro negro y oro, vidrieras; decoracion (velas,
+   candelabros, cadenas, estandartes, tapices, estatuas, gargolas, ataudes, libros, muebles con modelo); el terreno (tierra,
+   hierbas que se doblan, flores, musgo, arena, nieve que se acumula, hielo, roca de cada region) y el **agua propia**;
+   bloques vivos, contenedores (arcones, atriles, puertas, escaleras) y cosas que se rompen.
+3. **El clima y los efectos**: lluvia, nieve, tormentas, niebla, viento con cosas que vuelan, fuegos de seis colores
+   realistas, hadas, espiritus, cuervos, luciernagas, arboles con caras, estatuas que lloran. **Los arboles por piezas**.
+4. **El terreno nuevo de Morvain** (isla de 24.000, doce regiones con sus zonas, montanas de 1.500-2.000, escaleras
+   talladas, rios con canones, lagos, islas flotantes con cascadas, cuevas enormes, algo cada 50 bloques en las llanuras) y
+   **el mundo de las nubes con los bloques nuevos** (mismo diseno, mas detalle, todo amueblado).
+5. **Region a region**, empezando por las Llanuras Palidas como muestra (que el usuario la vea y corrija): estructuras
+   (castillos del tamano de Valdrenn, ciudades, pueblos, catacumbas, monasterios, torres de mago, puentes, presas,
+   coliseos, carceles; todo amueblado, ~80 enemigos, atajos y secretos), sus enemigos rehechos, su jefe rehecho (mucho mas
+   detalle, fases, cinematica y muro de niebla, arena enorme), la cadena de ~10 pasos para llegar a el, mas de cinco
+   misiones secundarias y las criaturas nuevas. Mas de 30 jefes en total.
+6. **Sonido**: musica propia orquestal con coros (ElevenLabs: hace falta el conector completo,
+   https://api.elevenlabs.io/v1/mcp), ambiente por zona, pasos segun el suelo. **Shader** de licencia abierta adaptado a
+   los bloques del mod.
+7. Despues, lo que quedaba del plan de abajo (mazmorras que falten, jefes secretos, traducciones).
+
+## Las 95 preguntas y sus respuestas (28-11-2026)
+
+A. Lo que se rehace y en que orden
+1. Que se rehace -> **Morvain y el mundo de las nubes** (Brumavela, Valdrenn, la Fortaleza de Hueso y el camino).
+2. Los sistemas (rol, combate, menus, HUD, santuarios, frascos, corcel, forja, clases, dialogos) -> **se quedan, pero mejorados**.
+3. Lo hecho sin publicar (7av Maese Galen, 7aw el Fuerte, 7ax el Castellano) -> **guardarlo y rehacerlo** con lo nuevo.
+4. Como publicar durante la obra -> **por partes** (aunque Morvain quede a medias un tiempo).
+5. -> **Solo mundos nuevos**.
+6. Orden (bloques, mapa, estructuras, pueblos y castillos, jefes) -> en blanco (decido yo: el de la hoja de ruta).
+7. Region de muestra primero -> en blanco (decido yo: las Llanuras Palidas).
+8. Personajes y misiones de ahora (Maelis, Oswin, Hedda, Ylva, Corwen, Sigrun, herreros, Silas) -> en blanco (se quedan y se mejoran).
+9. Duracion del juego -> **80-120 horas**.
+10. Que pesa mas -> **el detalle**.
+
+B. El mapa de Morvain
+11. Tamano -> **24.000 x 24.000**.
+12. Forma -> **una gran isla**, costa irregular y mar alrededor.
+13. "No recta" -> **los bordes del mapa**.
+14. Altura de las montanas -> **de 1.500 a 2.000 bloques**.
+15. Escaleras kilometricas -> **talladas en la roca** (cuantas y a donde: decido yo).
+16. En las llanuras -> **ruinas, torres de vigia, carros y caravanas, estatuas, campamentos, molinos, rocas grandes,
+    arboles sueltos y flores**, **algo cada 50 bloques**.
+17. Rios -> **anchos y hondos, canones, puentes de piedra, molinos y cascadas**.
+18. Lagos enormes -> **de tres a cinco**.
+19. Cascadas del cielo -> **de islas flotantes y de la ciudadela encadenada**.
+20. "Menos seco" -> **mezcla de zonas verdes y vivas con lo marchito**.
+21. Regiones -> las nueve de ahora **mas un bosque vivo, un gran lago y un desierto de ceniza**.
+22. Zonas dentro de cada region (valles, mesetas, gargantas, prados) como Terralith -> **si**.
+23. Bajo tierra -> **cuevas enormes ya** (cavernas, lagos y raices gigantes).
+24. Dia y noche y clima por region -> en blanco (decido yo).
+
+C. Hierba, arboles, clima y efectos
+25. La hierba -> **se dobla y se aplasta al pasar, y suena**.
+26. Que se mueva con el viento -> **si** (sin shaders, texturas animadas).
+27. Arboles -> **de los tres tamanos**: normales (8-15), grandes (20-40) y gigantes (60-100).
+28. Arboles con piezas propias (ramas de 2 a 14 px que se curvan, raices, racimos de hojas) -> **asi vale**.
+29. Texturas del mod -> **64 x 64**.
+30. Lluvia -> **salpicaduras, charcos y niebla**.
+31. Nieve -> **copos de varios tamanos, ventiscas, se acumula en suelo y tejados, huellas**.
+32. Tormentas -> **montanas, pantano y Tierra sin Fe**.
+33. Niebla -> **solo en el pantano y los valles**.
+34. Viento visible -> **hojas, ceniza, polvo y petalos**.
+35. Fuegos de colores -> **los seis**: azul (almas), verde (veneno), morado (magia), rojo (sangre), dorado (sagrado),
+    blanco (escarcha). La luz no tiene color: el color va en la llama, las chispas y el resplandor.
+36. Las hadas -> **luces de ambiente y guias** (el aspecto lo decido yo).
+37. Mas fantasia oscura -> **espiritus que vagan, cuervos, luciernagas, arboles con caras, estatuas que lloran**.
+
+D. Los bloques nuevos
+38. Bloques de Minecraft -> **cero** (solo lo que no se puede quitar).
+39. Agua -> **propia** (color por region, mas oscura, espuma).
+40. Que no puede faltar -> **todo**: sillares y piedras, columnas y molduras, gargolas, tejas, vidrieras, maderas viejas,
+    hierro negro y oro gastado, huesos y calaveras, velas y candelabros, cadenas, estandartes y tapices, estatuas,
+    ataudes, libros y estanterias, muebles.
+41. Formas de cada material (escaleras, losas, muros, columnas, arcos, cornisas) -> **si, todas**.
+42. Muebles -> **con modelo propio**.
+43. Cosas que se rompen en combate y sueltan objetos -> **si**.
+44. Bloques "vivos" -> **todos**: raices que se mueven, ojos en las paredes, carne, cristales que brillan, sangre que gotea.
+45. Instalador -> **solo Dark Craft y el shader** (fuera los mods de decoracion).
+46. Valdrenn, la Fortaleza de Hueso y Brumavela -> **mismo diseno con los bloques nuevos y mas detalle**.
+47. Interiores -> **todo amueblado**.
+
+E. Estructuras y ciudades
+48. Castillo grande -> **como Valdrenn** (~450 bloques).
+49. Estilo -> en blanco (gotico europeo, Stormveil / Leyndell).
+50. Castillos grandes en Morvain -> **de 6 a 10**.
+51. Ciudades ademas de la Capital -> **una o dos**, con **calles y plazas, mercado, catedral, puerto, alcantarillas,
+    barrios ricos y pobres**.
+52. Pueblos -> **dos o tres por region**.
+53. Casas -> **entramado, piedra, tejados de tejas, chimeneas, balcones y sotanos**.
+54. Catacumbas -> **varias plantas, laberintos, trampas y osarios**.
+55. La universidad de magia (tal cual): "Como la de elden ring una gran escuela situada en un estilo pantano pero con agua
+    cristalina pero que se pueda andar normal situada en medio de ese sitio en una montaña muy alta pero sin pasarse unos
+    200 bloques o algo asi estilo capilla con universidad."
+56. El pantano (tal cual): "Arboles que lo flipas de distintos tamaños que cueste mas andar por ahi con muchos detalles de
+    musgo y demas."
+57. Otras estructuras -> **monasterios, torres de mago, puentes enormes, presas, coliseos y carceles**.
+58. Ruinas y entero -> **casi todo entero**.
+59. Atajos que se abren -> **si**.
+60. Enemigos en una estructura grande -> **unos 80**.
+61. Secretos (muros ilusorios, cofres, llaves, pasadizos) -> **en todas**.
+
+F. Jefes y enemigos
+62. "Que sean personas" -> **estilo Minecraft con muchisimo mas detalle** (dedos, pelo, telas, placas de armadura,
+    texturas de mas resolucion).
+63. Tamano -> **segun el jefe**.
+64. Animaciones -> **mas fluidas y rapidas, capa y pelo que se mueven, respiracion, golpes que se ven venir**.
+65. Fases -> **se transforma y cambia la arena**.
+66. -> **cinematica de entrada y muro de niebla** para cada jefe.
+67. Arenas enormes pensadas para la pelea -> **si**.
+68. Los jefes de ahora -> **rehacerlos todos**; en total **mas de 30**.
+69. Los enemigos normales -> **se rehacen todos**.
+70. Fuego propio -> **mas realista** (llamas suaves con resplandor).
+71. Criaturas nuevas -> **bestias, golems, aranas gigantes y arboles vivos**.
+72. Espiritus que se invocan para ayudar -> **si**.
+73. Dificultad -> **igual**.
+
+G. Misiones y objetos para entrar en las zonas
+74. Cadena de objetos -> **para cada jefe**, de **unos 10 pasos**.
+75. Tipos de pasos -> **objetos escondidos, puzles, personajes que piden cosas y llaves de otros jefes**.
+76. Misiones secundarias -> **mas de cinco por region**.
+77. Pestana de misiones -> **no**: se descubre sin ayuda.
+78. Marcas de objetivos -> **sin marcas**.
+79. Recompensas -> **armas unicas, armaduras, hechizos, talismanes y cenizas**.
+
+H. Sonido y musica
+80. Que se oye peor -> **musica, voces y efectos**: "No se escuchan mal del todo pero sube un poco el detalle de los sonidos."
+81. -> **altavoces** (volumenes sin decir).
+82. Musica -> **propia con ElevenLabs** (conector completo), **orquestal con coros**.
+83. Al explorar -> **silencio con sonidos de ambiente**.
+84. Ambiente por zona y pasos segun el suelo -> **si**.
+85. Las voces -> **le gustan**.
+86. Mas calidad aunque el mod pese mas -> **si**.
+
+I. Distant Horizons, shaders y su PC
+87. PC -> **RTX 5060 Ti 16 GB, Ryzen 5 5600X, 32 GB DDR4 3200**.
+88. Lejania -> **menos de 256 chunks**.
+89. Shader -> **buscar otro de licencia abierta** que se pueda adaptar al mod.
+90. -> **juega solo** (lo del servidor dedicado sigue valiendo).
+91. -> **no le importa que el mundo tarde en generarse**.
+
+J. Lo que probo
+92. Empezo **en supervivencia** y **no vio la cinematica** (no le salio la pantalla de la clase).
+93. (tal cual) "Nada en las manos me aparecía como se tuviera la espada. / Mira quiero que no dejes lo de supervivencia y
+    eso quiero que lo quites todo y quiero poder poner la dificultad y el nombre del mapa." -> **Nueva partida propia**:
+    solo el nombre del mapa y la dificultad; nada de modos de juego.
+94. -> nada mas.
+95. Parecido a -> **Liurnia, Caelid y Anor Londo**.
+
+---
+
 # Dark Craft — el plan grande (24-11-2026)
 
 Lo que pidio el usuario el 24-11-2026 y sus respuestas a 138 preguntas. **Es la referencia de diseno**: antes de

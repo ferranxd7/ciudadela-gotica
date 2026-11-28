@@ -53,6 +53,9 @@ public final class Pantallas {
         // el titulo y la lista de mundos (parte 2f-2)
         if (s.getClass() == TitleScreen.class) return new TituloScreen();
         if (s.getClass() == SelectWorldScreen.class) return new PartidasScreen(anterior(s, SelectWorldScreen.class));
+        // la de crear mundo de Minecraft (modos, trucos, tipos de mundo): la nueva partida propia (parte 8a)
+        if (s.getClass() == net.minecraft.client.gui.screens.worldselection.CreateWorldScreen.class)
+            return new NuevaPartidaScreen(anterior(s, net.minecraft.client.gui.screens.worldselection.CreateWorldScreen.class));
         // los progresos (la L): la pestana de logros del menu
         if (s instanceof AdvancementsScreen && Minecraft.getInstance().player != null) {
             Panel.abre();

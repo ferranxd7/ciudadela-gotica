@@ -54,7 +54,7 @@ if ok:
           "aecho=0.8:0.5:90|180|320:0.3|0.18|0.1,lowpass=f=7500,loudnorm=I=-15:TP=-1.5")
     os.makedirs(os.path.dirname(OGG), exist_ok=True)
     r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", f"narr_tmp/todo{CAP}.wav", "-af", fx, "-ac", "1", "-ar", "44100",
-                        "-c:a", "libvorbis", "-q:a", "5", OGG], capture_output=True)
+                        "-c:a", "libvorbis", "-q:a", "7", OGG], capture_output=True)
     if r.returncode != 0:
         print("FALLO ffmpeg", r.stderr.decode()[-300:])
         ok = False

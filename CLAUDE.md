@@ -32,6 +32,19 @@ Mod de Forge 1.20.1 (Java 17, mappings oficiales). El usuario habla español, ju
    repositorio de GitHub sigue llamándose `ferranxd7/ciudadela-gotica` (no tocar esa URL en el instalador).
 6. El usuario quiere las cosas **por partes y publicadas** (cada parte con `[publicar]`).
 
+## EL PLAN NUEVO (28-11-2026): la gran reforma (parte 8) — leer el principio de `PLAN.md`
+
+El usuario pidio rehacer Morvain y el mundo de las nubes (95 preguntas y respuestas y la hoja de ruta al principio de
+`PLAN.md`; manda sobre el plan grande de abajo donde choquen). Reglas nuevas:
+- **Cero bloques de Minecraft** en lo que se haga nuevo (terreno, agua, estructuras, decoracion): bloques del mod con
+  texturas de **64 x 64** y todas las formas de cada material. Valdrenn, la Fortaleza de Hueso y Brumavela, mismo diseno
+  con los bloques nuevos. **Fuera los mods de decoracion** (el instalador solo pone Dark Craft y el shader).
+- Jefes y enemigos **rehechos** (mas de 30 jefes; mucho mas detalle, telas y pelo que se mueven, fases, cinematica de
+  entrada y muro de niebla); fuego y efectos propios, nunca las particulas de Minecraft.
+- Misiones **sin marcas** ni pestana de misiones; cada jefe con una cadena de ~10 pasos.
+- Al explorar, **silencio con sonidos de ambiente** (la musica, en los jefes); sonido de mas calidad.
+- Las partes 7av, 7aw y 7ax (hechas, sin publicar: ramas `parte-7av`, `parte-7aw`, `parte-7ax`) se guardan para rehacerlas.
+
 ## EL PLAN GRANDE (24-11-2026): Dark Craft pasa a ser una aventura completa — leer `PLAN.md`
 
 El usuario respondio 138 preguntas; estan todas en **`PLAN.md`** (leer el apartado de la parte que toque antes de
@@ -4594,9 +4607,45 @@ Respuestas 69-80 y 121-124 de `PLAN.md`. Idea de como partirla (cada una publica
   (Valdrenn dificil: 4a la guardia, 4b perros y espectros, 4c capitanes de elite, emboscadas y la torre del arbol por
   dentro, y 4d los dos guardianes, hechas arriba). Despues, la **parte 5** de `PLAN.md`.
 
+### Plan nuevo, parte 8a: arreglos urgentes (la clase, la nueva partida, el sonido, sin mods de decoracion)
+
+La primera de la reforma (`PLAN.md`, respuestas 5, 45, 80-88 y 92-93 del plan nuevo).
+- **La eleccion de clase no salia nunca**: `rol/Clase` no estaba en el bus de eventos (le faltaba
+  `@Mod.EventBusSubscriber`) y `onEntrar` no llegaba: nadie elegia clase, no tenia su equipo ni veia la cinematica de
+  la Sombra (la prueba del cliente entra en creativo y no lo pillaba). Ahora: al entrar, quien no tiene clase y es
+  nuevo de verdad (menos de 10 min jugados, nivel 1, sin ecos) recibe `Net.AbrirClase(true)`; en creativo no se le
+  pregunta hasta que pasa a jugar (`onModo`, `PlayerChangeGameModeEvent` de creativo o espectador a supervivencia o
+  aventura). En el cliente, si llega con la pantalla de carga delante (`ReceivingLevelScreen`, `LevelLoadingScreen`...),
+  queda pendiente y `ClaseScreen.tick` (desde `ClientRol.onTick`) la abre en cuanto no hay pantalla; si otra pantalla
+  quita la forzada sin haber elegido (`removed`), vuelve a quedar pendiente. Cuando el servidor pone la clase
+  (`Clase.poner`: elegida, o "sin clase" por no ser nuevo o por el comando `ninguna`) manda `Net.ClaseHecha` y el cliente
+  quita la forzada abierta o pendiente (`ClaseScreen.hecha`; `Net.V` = "27"). En la prueba del cliente el jugador entra
+  en supervivencia (el mundo es el del servidor de la prueba): le sale y el paso del segundo 3,5 la quita con `ninguna`.
+- **Nueva partida propia** (`client/ui/NuevaPartidaScreen`, desde el titulo, las partidas y `Pantallas` en lugar de
+  `CreateWorldScreen`): solo el **nombre del mapa** (por defecto "Tierras de la Sombra") y la **dificultad** (facil,
+  normal, dificil, con lo que quiere decir cada una); nada de modos de juego, trucos ni tipos de mundo. Crea el mundo con
+  `WorldOpenFlows.createFreshLevel` (carpeta `FileUtil.findAvailableName`, `GameType.ADVENTURE`, sin trucos, reglas por
+  defecto, `WorldDataConfiguration.DEFAULT`, semilla al azar, `WorldPresets::createNormalWorldDimensions` —el preset
+  normal es el mundo de nubes—). Teclado: Intro empieza, ESC vuelve, flechas arriba/abajo o TAB entre el nombre y la
+  dificultad, izquierda/derecha la cambian. Textos `darkcraft.nueva.*` (rol.py).
+- **Sonido con mas detalle**: todo lo de `ci/eleven/procesar.py` sale en Vorbis calidad 8 (`CALIDAD`; antes 6), la
+  musica (`ci/musica/bajar.py`) en calidad 8 (antes 3) y la narracion de Piper en 7 (antes 5; la voz y sus efectos, igual).
+  Los efectos que suenan sin sitio (interfaz, carteles, cinematicas: `ESTEREO` en `procesar.py`) salen en estereo; los
+  del mundo siguen en mono (si no, el juego no los coloca). El jar pasa de ~170 MB a ~270 MB.
+- **Fuera los mods de decoracion**: la CI ya no los baja ni prueba el servidor con ellos (el paso "Prueba con mods de
+  decoracion" ya no esta: ~50 min menos); el modpack y `instalar_mods.bat` llevan solo Dark Craft y el shader (el
+  instalador sigue moviendo los mods que hubiera a `mods_antiguos`). La release se da por buena con
+  `out/vanilla_informe.txt` (antes `mods_informe.txt`).
+- **La lejania de Distant Horizons por defecto, 192** (`PorDefecto.LEJANIA`; `DH_VERSION` 3: se pone una vez tambien en
+  las instalaciones de antes).
+- Pruebas: cliente, al final del tramo `titulo()`: la nueva partida (`cliente_ti06_nueva_partida`, `ti07_nueva_dificil`),
+  crea el mundo "Prueba de la clase" y, dentro, tiene que salir la eleccion de clase (`ti08_nueva_clase`); elige el
+  caballero y la cinematica de la Sombra (`ti09_nueva_intro`, la caida). Lineas con `estadoNuevaPartida` (pantalla,
+  eleccion pendiente, mano, modo, dificultad, nombre del mundo).
+
 ## Compilar, probar y publicar
 
-- La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (con y sin mods) y un cliente con capturas
+- La CI (`.github/workflows/build.yml`) compila, prueba un servidor real (sin mods de decoracion desde la 8a) y un cliente con capturas
   y audio grabado, y sube una release `build-N`. Con `[publicar]` en el mensaje del commit es la *latest* (la que
   instala el usuario); sin él es "en desarrollo". Un commit vacío no lanza la CI (por los `paths-ignore` del
   workflow): para publicar tiene que cambiar algún fichero.
