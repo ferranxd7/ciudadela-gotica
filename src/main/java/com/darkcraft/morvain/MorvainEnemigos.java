@@ -68,12 +68,12 @@ public final class MorvainEnemigos {
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
             CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio",
             PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar", CERCO = "cerco", TEATRO = "teatro", NIDO = "nido",
-            CADENA = "cadena", HOMENAJE = "homenaje", AGUJA = "aguja";
+            CADENA = "cadena", HOMENAJE = "homenaje", AGUJA = "aguja", MINA = "mina";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
             ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
             PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon", DRAGON = "dragon", GARGOLA = "gargola", CENTINELA = "centinela",
-            ISOLDE = "isolde", ESPECTRO = "espectro", PERRO = "perro", SOMBRA = "sombra";
+            ISOLDE = "isolde", ESPECTRO = "espectro", PERRO = "perro", SOMBRA = "sombra", ENTERRADO = "enterrado";
     /** El tipo de puesto de las gargolas (para las pruebas). */
     public static final String GARGOLA_TIPO = GARGOLA;
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
@@ -87,7 +87,7 @@ public final class MorvainEnemigos {
             CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>(),
             PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>(), GRIETA_P = new ArrayList<>(), ALTAR_P = new ArrayList<>(),
             CERCO_P = new ArrayList<>(), TEATRO_P = new ArrayList<>(), NIDO_P = new ArrayList<>(), CADENA_P = new ArrayList<>(),
-            HOMENAJE_P = new ArrayList<>(), AGUJA_P = new ArrayList<>();
+            HOMENAJE_P = new ArrayList<>(), AGUJA_P = new ArrayList<>(), MINA_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -234,6 +234,9 @@ public final class MorvainEnemigos {
         for (Subida.Espera e : Subida.get().esperas())
             CADENA_P.add(new Puesto(GARGOLA.equals(e.tipo()) ? GARGOLA : MARCADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
                     e.ronda(), e.grupo()));
+        // ---- las Minas de Hierro Negro (parte 7aq): los enterrados que apunta el plano
+        for (Mina.Espera e : Mina.get().esperas())
+            MINA_P.add(new Puesto(ENTERRADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
         // ---- la casa de la Sombra (parte 7ab): la reina Isolde en su trono (el puesto 0) y los de la torre del homenaje (los
         // centinelas, los espectros del archivo, los marcados de la prision y sus perros); el tipo de cada uno lo dice el plano
         for (Homenaje.Espera e : Homenaje.get().esperas())
@@ -314,6 +317,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(HELADO, DarkCraftMod.HELADO);
         Puestos.tipo(ABAD, DarkCraftMod.ABAD);
         Puestos.tipo(CALCINADO, DarkCraftMod.CALCINADO);
+        Puestos.tipo(ENTERRADO, DarkCraftMod.ENTERRADO);
         Puestos.tipo(CONDESTABLE, DarkCraftMod.CONDESTABLE);
         Puestos.tipo(ERUDITO, DarkCraftMod.ERUDITO);
         Puestos.tipo(RECTORA, DarkCraftMod.RECTORA);
@@ -370,6 +374,8 @@ public final class MorvainEnemigos {
         Puestos.registrar(NIDO, NIDO_P, Morvain::es);
         // la cadena del sur: los marcados de los rellanos y las gargolas
         Puestos.registrar(CADENA, CADENA_P, Morvain::es);
+        // las Minas de Hierro Negro: los enterrados de la corta y de los tres niveles
+        Puestos.registrar(MINA, MINA_P, Morvain::es);
         // la torre del homenaje: los centinelas, los del archivo y la prision, y la reina en su trono
         Puestos.registrar(HOMENAJE, HOMENAJE_P, Morvain::es);
         // la aguja: la Sombra (cae una vez y no vuelve: es del grupo de los jefes)
@@ -500,6 +506,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> teatro() {
         preparar();
         return List.copyOf(TEATRO_P);
+    }
+
+    public static List<Puesto> mina() {
+        preparar();
+        return List.copyOf(MINA_P);
     }
 
     public static List<Puesto> nido() {
@@ -1608,6 +1619,117 @@ public final class MorvainEnemigos {
         int[] at = Teatro.get().sitio("atril");
         if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(at[0], at[1], at[2])) && m.isLoaded(new net.minecraft.core.BlockPos(Teatro.CX, Teatro.SALA, Teatro.CZ + Teatro.SALA_V)))
             s += "; " + Teatro.resumen(m) + "; muros: " + MurosIlusorios.estado(m);
+        return s;
+    }
+
+    /**
+     * {@code /darkcraft mina [ir <sitio> | enemigos [volver | fuera | sacar] | derrumbe [<n>] | escotilla [abrir | cerrar] |
+     * muro [abrir | cerrar]]} (parte 7aq): las Minas de Hierro Negro: ir a uno de sus sitios, sus enterrados, hacer caer un techo
+     * roto, la escotilla del castillete y el muro ilusorio de la capilla.
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoMina() {
+        return net.minecraft.commands.Commands.literal("mina")
+                .executes(c -> decir(c, estadoMina(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irMina(c.getSource(), "entrada"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Mina.get().sitios().keySet(), b))
+                                .executes(c -> irMina(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoMina(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), MINA, false);
+                            return decir(c, "vuelven todos los de la mina");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), MINA, true);
+                            return decir(c, "fuera todos los de la mina");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, MINA).size();
+                            return decir(c, "fuera " + n);
+                        })))
+                .then(net.minecraft.commands.Commands.literal("derrumbe")
+                        .executes(c -> derrumbeMina(c, -1))
+                        .then(net.minecraft.commands.Commands.argument("n", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 20))
+                                .executes(c -> derrumbeMina(c, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "n")))))
+                .then(net.minecraft.commands.Commands.literal("escotilla")
+                        .executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            return decir(c, m == null ? "Morvain no esta cargado" : Mina.resumen(m));
+                        })
+                        .then(net.minecraft.commands.Commands.literal("abrir").executes(c -> escotillaMina(c, true)))
+                        .then(net.minecraft.commands.Commands.literal("cerrar").executes(c -> escotillaMina(c, false))))
+                .then(net.minecraft.commands.Commands.literal("muro")
+                        .executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            return decir(c, m == null ? "Morvain no esta cargado" : MurosIlusorios.estado(m));
+                        })
+                        .then(net.minecraft.commands.Commands.literal("abrir").executes(c -> muroMina(c, true)))
+                        .then(net.minecraft.commands.Commands.literal("cerrar").executes(c -> muroMina(c, false))));
+    }
+
+    private static int muroMina(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, boolean abrir) {
+        var m = Morvain.nivel(c.getSource().getServer());
+        if (m == null) return 0;
+        MurosIlusorios.Muro w = MurosIlusorios.muro(Mina.MURO_CAPILLA);
+        if (abrir) MurosIlusorios.abrir(m, w, c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp ? sp : null);
+        else MurosIlusorios.cerrar(m, Mina.MURO_CAPILLA);
+        return decir(c, MurosIlusorios.estado(m));
+    }
+
+    /** Abre o cierra la escotilla del castillete (la palanca de debajo y la trampilla). */
+    private static int escotillaMina(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, boolean abrir) {
+        var m = Morvain.nivel(c.getSource().getServer());
+        if (m == null) return 0;
+        Mina.escotilla(m, abrir);
+        return decir(c, Mina.resumen(m));
+    }
+
+    /** Hace caer un techo roto (el n, o el mas cercano a quien lo pide). */
+    private static int derrumbeMina(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, int n) {
+        var m = Morvain.nivel(c.getSource().getServer());
+        if (m == null) return 0;
+        List<int[]> d = Mina.get().derrumbes();
+        if (n < 0) {
+            net.minecraft.world.phys.Vec3 q = c.getSource().getPosition();
+            double mejor = Double.MAX_VALUE;
+            for (int i = 0; i < d.size(); i++) {
+                double e = q.distanceToSqr(d.get(i)[0] + 0.5, d.get(i)[1], d.get(i)[2] + 0.5);
+                if (e < mejor) {
+                    mejor = e;
+                    n = i;
+                }
+            }
+        }
+        if (n < 0 || n >= d.size()) return decir(c, "no hay techo roto " + n + " (hay " + d.size() + ")");
+        Mina.rearmar();
+        int[] t = d.get(n);
+        Mina.temblor(m, t[0] + 0.5, t[1] - 2, t[2] + 0.5);
+        return decir(c, "cae el techo roto " + n + " en " + t[0] + "," + t[1] + "," + t[2]);
+    }
+
+    private static int irMina(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Mina.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Mina.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando hacia dentro de la mina (al norte)
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, 180f, 5f);
+        return 1;
+    }
+
+    /** Cuantos enterrados quedan y lo que hay en la mina (si esta cargada). */
+    public static String estadoMina(net.minecraft.server.MinecraftServer srv) {
+        String s = "minas de hierro negro: quedan " + Puestos.quedan(srv, MINA) + " de " + MINA_P.size() + " (fuera " + Puestos.fuera(MINA) + ")";
+        var m = Morvain.nivel(srv);
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(Mina.CX + 19, Mina.SUELO, Mina.CZ - 86))
+                && m.isLoaded(new net.minecraft.core.BlockPos(Mina.CX + 41, Mina.N2, Mina.CZ - 126)))
+            s += "; " + Mina.resumen(m) + "; muros: " + MurosIlusorios.estado(m);
         return s;
     }
 

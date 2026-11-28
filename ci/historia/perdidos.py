@@ -13,7 +13,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
          22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain", 27: "morvain",
          28: "morvain", 29: "morvain", 30: "morvain", 31: "valdrenn", 32: "morvain", 33: "morvain", 34: "morvain",
-         35: "morvain"}
+         35: "morvain", 36: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -491,6 +491,17 @@ LIBROS = {
    "Day twenty. No one wants to go up. No one wants to go down. The mark burns when we look up, and burns more when we look down. Tonight I dreamed of the Maw: there is no door, only teeth. If you make it this far, rest by the fire. Then decide for yourself whether you run.\n\nIvo"]),
  },
  # parte 7ab: el diario de la reina Isolde (la de verdad, en los ratos en que era ella), en el atril del archivo de la torre del homenaje
+ # parte 7aq: el libro de turnos de las Minas de Hierro Negro, en el atril de la oficina del capataz (en el campamento)
+ 36: {
+  "es": ("El libro de turnos", "Gil, escribiente de las Minas del Rey", [
+   "Turno de día: cuarenta y dos lámparas bajan, cuarenta y dos suben. Turno de noche: cuarenta bajan. El rey pide más hierro negro para las cadenas, siempre más. El capataz Hakon dice que la veta buena está más abajo, donde la roca está caliente. Abrimos un nivel nuevo.",
+   "Los del nivel tres dicen que la veta sangra: el mineral sale rojo y húmedo, y los candiles se apagan solos. Hakon ha prohibido hablar de ello. Ayer un barrenero oyó voces detrás de la pared y Hakon le mandó volarla. Detrás había más veta. Y algo que respiraba.",
+   "La noche del cielo rojo la montaña tembló y se hundió la Galería del Rey. El turno de noche estaba abajo: cuarenta lámparas, cuarenta ganchos vacíos en la lampistería. Al cuarto día se empezó a oír picar ahí abajo. Si lees esto: no corras en las galerías. No ven. Oyen.\n\nGil"]),
+  "en": ("The Shift Ledger", "Gil, clerk of the King's Mines", [
+   "Day shift: forty-two lamps go down, forty-two come up. Night shift: forty go down. The king wants more black iron for the chains, always more. Hakon the foreman says the good vein lies deeper, where the rock is warm. We have opened a new level.",
+   "The men on level three say the vein bleeds: the ore comes out red and wet, and the lamps go out by themselves. Hakon has forbidden any talk of it. Yesterday a blaster heard voices behind the wall and Hakon told him to blow it open. Behind it there was more vein. And something breathing.",
+   "On the night of the red sky the mountain shook and the King's Gallery caved in. The night shift was below: forty lamps, forty empty hooks in the lamp room. On the fourth day we began to hear picking down there. If you read this: do not run in the galleries. They cannot see. They hear.\n\nGil"]),
+ },
  35: {
   "es": ("El diario de la reina Isolde", "Isolde, reina de Valdrenn", [
    "Corvin me trajo de vuelta. Recuerdo la fuente del patio, el ruido del agua, y luego nada. Desperté en una cama que no era la mía y él lloraba. Me pregunto por qué ya no oigo la fuente. Me pregunto por qué nunca tengo hambre.",

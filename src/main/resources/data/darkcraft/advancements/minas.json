@@ -1,0 +1,26 @@
+{
+  "parent": "darkcraft:morvain",
+  "display": {
+    "icon": {
+      "item": "minecraft:iron_pickaxe"
+    },
+    "title": {
+      "translate": "advancements.darkcraft.minas.title"
+    },
+    "description": {
+      "translate": "advancements.darkcraft.minas.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "logro": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 30
+  }
+}

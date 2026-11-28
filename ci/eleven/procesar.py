@@ -477,19 +477,25 @@ SFX = {
     # aliento con la campana del monasterio a lo lejos, sus pasos en la nieve al irse, su esfuerzo y su dolor y el salto que cae
     "duelo_empieza": (8.0, 2.0, -15), "sigrun_rinde": (9.0, 2.0, -18), "sigrun_muere": (11.0, 3.0, -18), "sigrun_se_va": (16.0, 4.0, -20),
     "sigrun_esfuerzo": (0.6, 0.15, -17), "sigrun_dolor": (0.8, 0.2, -16), "sigrun_salto": (2.0, 0.6, -14),
+    # las Minas de Hierro Negro (parte 7aq): el aire de la mina (en bucle), los Enterrados (gemido, alerta, dolor, muerte, el
+    # picotazo, la mecha que prende, el cartucho que revienta, el almadenazo y alzarse del escombro), el techo que cruje y el derrumbe
+    "mina_ambiente": (20.0, 2.0, -24), "enterrado_gemido": (4.0, 1.0, -19), "enterrado_alerta": (2.4, 0.6, -15),
+    "enterrado_dolor": (1.4, 0.4, -16), "enterrado_muerte": (4.5, 1.4, -16), "enterrado_pica": (1.2, 0.4, -15),
+    "enterrado_mecha": (2.0, 0.5, -17), "enterrado_estallido": (5.0, 2.0, -12), "enterrado_almadena": (1.8, 0.6, -13),
+    "enterrado_alzarse": (3.0, 0.8, -15), "mina_derrumbe": (5.0, 1.8, -12), "mina_cruje": (2.6, 0.8, -14),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
            "barco_vuelo": 3.0, "molino_viento": 1.0, "montana_ambiente": 2.0, "abad_ventisca": 1.5, "abad_rezo": 0.4,
            "capital_ambiente": 2.0, "calcinado_fuego": 0.25, "condestable_espera": 0.6, "academia_ambiente": 2.0, "erudito_susurro": 0.8,
            "rectora_espera": 1.0, "costa_ambiente": 2.0, "ballenero_espera": 1.0, "costillar_ambiente": 2.0, "sinfe_ambiente": 2.0,
-           "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0,
+           "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0, "mina_ambiente": 2.0,
            "aldric_rezo": 1.0, "aldric_arrastre": 0.3, "jinete_galope": 0.3, "dragon_aleteo": 0.3, "dragon_respira": 0.6,
            "cadena_ambiente": 2.0, "isolde_tarareo": 1.2, "homenaje_ambiente": 2.0, "aguja_ambiente": 2.0, "sombra_mirada": 0.15}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
-          "penitente_humo": 1.0, "penitente_alzarse": 2.3}
+          "penitente_humo": 1.0, "penitente_alzarse": 2.3, "enterrado_alzarse": 0.5, "mina_cruje": 0.8}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
 GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca", "boca_latido", "sombra_latido"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
@@ -832,6 +838,14 @@ TOMAS_SFX = {
     # 1 y la 2 (la 3 aguda, la 4 un siseo); del dolor la 1, la 2 y la 4; del salto la 1 y la 4 (el golpe enseguida)
     "duelo_empieza": (2, 3), "sigrun_rinde": (2, 1), "sigrun_muere": (1, 2), "sigrun_se_va": (4, 1),
     "sigrun_esfuerzo": (1, 2), "sigrun_dolor": (1, 2, 4), "sigrun_salto": (1, 4),
+    # las minas (parte 7aq): del aire la 1 (el goteo, la madera y el retumbo, parejo) y la 3 (mas goteo); del gemido la 3 y la 4; de la
+    # alerta la 3 y la 2 (el respingo enseguida); del dolor la 2 y la 4 (un solo quejido; la 1 y la 3 son dos); de la muerte la 3 y la 4
+    # (el cascajo con graves); del picotazo la 2, la 4 y la 1 (un golpe seco y corto); de la mecha la 3 y la 1 (el fosforo y el siseo
+    # seguido); del estallido la 3 y la 4 (el golpe enseguida); del almadenazo la 3 y la 1 (las de mas graves); de alzarse la 3 y la 4
+    # (el cascajo que resbala desde el principio); del derrumbe la 4 y la 1; del crujido la 1 (la madera, desde el segundo 0,8) y la 2
+    "mina_ambiente": (1, 3), "enterrado_gemido": (3, 4), "enterrado_alerta": (3, 2), "enterrado_dolor": (2, 4),
+    "enterrado_muerte": (3, 4), "enterrado_pica": (2, 4, 1), "enterrado_mecha": (3, 1), "enterrado_estallido": (3, 4),
+    "enterrado_almadena": (3, 1), "enterrado_alzarse": (3, 4), "mina_derrumbe": (4, 1), "mina_cruje": (1, 2),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

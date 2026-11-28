@@ -4183,6 +4183,84 @@ La quinta mision (respuestas 95 y 117 del plan), en las Montanas Nevadas: un ene
   rinde (`sg18`), de rodillas y su menu (`sg19`, `sg20`), dejarla marchar (`sg21..sg24`) y ya no se la ve (`sg25`); otra vez, acabar con
   ella (`sg26..sg29`); la espada y el escudo en las manos (`sg30`) y la mision en la Historia (`sg31`). Lineas `sigrun ...`.
 
+### Plan grande, parte 7aq: las Minas de Hierro Negro y los Enterrados
+
+Respuesta 131 del plan ("mazmorras: ... minas y tuneles"), la primera mazmorra de verdad. Lore: de su hierro negro se forjaron las
+espadas del Juramento y las cadenas que sujetan la ciudadela; la noche del cielo rojo la montana temblo, se hundio la Galeria del Rey y
+el turno de noche (cuarenta lamparas) se quedo abajo. Al cuarto dia se empezo a oir picar. El capataz era Hakon (el jefe de la 7ar).
+- **La mina** (`morvain/Mina`, en (600, -3440), al pie de las Montanas Nevadas mirando a la Tierra sin Fe; u = x - CX, v = z - CZ, el norte
+  —v negativa— es la montana; se dibuja chunk a chunk al generar, `Mina.chunk` desde `MorvainGenerador`, con sus `Element` —`Obra`
+  columna a columna y un `Plano` de celdas que forra de roca todo hueco: `forrar`— y `Trozo`s para cofres y atril; `Adorno` no pone nada
+  en su caja):
+  - el **campamento** (la explanada a `SUELO` 189, allanada): la oficina del capataz (el atril con el **libro perdido 36**, "El libro
+    de turnos" de Gil, el escribiente), la lampisteria (la pared de los ganchos de los faroles: casi todos vacios), la fragua, el barracon
+    hundido, la casa de maquinas junto al castillete, farolas, el camino al santuario y la valla del borde de la corta con huecos;
+  - **la Corta**: el tajo abierto en tres escalones de seis (`BANCO1`, `BANCO2`, `FONDO` = 171) con vetas de hierro negro, la escalera
+    de tablones en zigzag del suroeste (tres tramos de seis escalones sobre postes) y los railes de la escombrera con su vagoneta; en el
+    fondo, al norte, la **bocamina** (dos postes gordos, dintel doble y tejadillo);
+  - **nivel 1** (`N1` = 171): la Galeria del Rey (entibada con marcos, railes y faroles), el polvorin, el comedor, el frente del este,
+    las traviesas, el enganche del pozo maestro (tras unos barrotes), el **hundimiento** al fondo y la rampa al nivel 2;
+  - **nivel 2** (`N2` = 151): la **Gruta del Agua Negra** (el lago, la pasarela de tablones y un islote), la galeria del este, las
+    literas, la **capilla de los mineros** (detras del altar un **muro ilusorio**, `MURO_CAPILLA`, y el **escondido** con el arcon
+    `chests/mina_bueno`) y el **enganche de abajo**: la escala del pozo maestro sube hasta la boca, bajo el **castillete**, donde la
+    **escotilla de hierro** solo se abre desde dentro (la **palanca** de debajo, colgada del tablon de al lado: `Mina.escotilla`); el
+    atajo de vuelta al campamento (tocada por arriba: "La escotilla esta cerrada por debajo", `Morvain.onCama`);
+  - **nivel 3** (`N3` = 131): por el pozo de la veta, la **Caverna del Filon** (la veta roja, andamios, la vagoneta volcada y un arcon).
+  **Siete techos rotos** (`derrumbes`: escombro, tierra y raices colgando; de vez en cuando sueltan polvo, la pista): quien pasa por
+  debajo (supervivencia o aventura) o un temblor cerca (un cartucho que revienta, un almadenazo: `Mina.temblor`) los hace **crujir** y
+  1,1 s despues (`AVISO`) se **vienen abajo**: 8 de dano en radio 1,9 a todo lo que haya debajo (tambien a los enterrados) y lentitud;
+  no vuelven a caer en 30 s (`ESPERA_DERRUMBE`). Santuario nuevo "La Bocamina" (`SantuariosMorvain`, id `bocamina`, 40 al sur, a la altura
+  de la explanada). Logros `minas` ("El turno de noche": bajar a la corta o a las galerias) y `enterrado` ("Ciegos en la oscuridad"),
+  con su entrada del diario. El Espejo: "La Corta", "Las Minas de Hierro Negro", "La Gruta del Agua Negra" y "La Caverna del Filon"
+  (`Mina.lugar`). Bajo tierra suena **el aire de la mina** (`ambiente.mina`, `ClientMusic.tickMina`; la ventisca de la montana no
+  llega). Cofres `chests/mina` y `mina_bueno`. Arreglo de paso: **las camas revientan en Morvain** (el tipo de dimension no deja
+  dormir): `Morvain.onCama` cancela el clic con un aviso.
+- **Los Enterrados** (`enemigos/Enterrado`, entidad `darkcraft:enterrado` 0,7 x 2,0; bestiario `enterrado_picador/barrenero/cargador`):
+  secos y grises del polvo de hierro, **ciegos: oyen** (`percibe`: quien corre se oye a 16, quien anda a 8, quieto a 3,2, agachado a
+  2,4 —sin espalda—; los que esperan, a la mitad; con roca de por medio solo quien corre y de mas cerca; dar un golpe, como andar).
+  32 de vida, golpe 6, armadura 4. **La costra**: las flechas les entran a medias y los martillos un 30 % mas. Al morir se deshacen en
+  polvo y grava.
+  - **picador** (0): gorro con el candil encendido y el pico. **Picotazo** de arriba abajo (si lo paras con el escudo, el pico lo
+    engancha: rompe la guardia —5 s— y entra entero) y **barrido**. Espera **picando la roca** (`REZA`: se le oye antes de verle).
+  - **barrenero** (1, vida x0,8 y -2 de armadura): de 4,5 a 14 bloques **lanza un cartucho** (`enemigos/Cartucho`, `darkcraft:cartucho`:
+    vuela en arco con la mecha, cae y a los 1,6 s revienta —radio 2,8, dano 10, empuja—; **tambien a los suyos**; en el agua se apaga;
+    si da en alguien, cae a sus pies) y de cerca el **mechazo** (quema). Al morir, la mitad de las veces se le prende **el morral**
+    (otro cartucho, mas corto y mas flojo). Espera agazapado.
+  - **cargador** (2, escala 1,3, vida x2,3, armadura +4, casi no se le empuja, mas lento): el cuevano lleno de mineral a la espalda y la
+    almadena. **Almadenazo** (la onda a 2,9 delante, radio 3: a quien este de pie —salta o rueda—; frena), **barrido** muy abierto y
+    **embestida** (cruza 5 bloques). Espera sentado.
+  Cualquiera puede esperar **en los escombros** (`TUMBADO`: sale al llegar alguien). Modelo de `tools/enemigos/enterrado.py`.
+- **Los de alli** (`MorvainEnemigos`, sitio `mina`, 30; `Mina.esperas`): la corta (picando en los escalones, barreneros, el del fondo en
+  los escombros), el nivel 1 (la galeria, el polvorin, el comedor, las traviesas, el frente, uno en los escombros del hundimiento), el
+  nivel 2 (el pie de la rampa, el lago y el islote, la galeria del este, las literas, la capilla, el enganche) y el que guarda el paso
+  a la Caverna del Filon.
+- Sonidos (ElevenLabs, flow `xNmkJ8r14RHNDw47r42f`, `TOMAS_SFX` elegidas midiendo las tomas): `mina_ambiente` (1 y 3, en bucle),
+  `enterrado_gemido` (3 y 4), `enterrado_alerta` (3 y 2), `enterrado_dolor` (2 y 4), `enterrado_muerte` (3 y 4), `enterrado_pica` (2, 4 y
+  1), `enterrado_mecha` (3 y 1), `enterrado_estallido` (3 y 4), `enterrado_almadena` (3 y 1), `enterrado_alzarse` (3 y 4, desde el 0,5),
+  `mina_derrumbe` (4 y 1) y `mina_cruje` (1 y 2, desde el 0,8). Prompts y firmas en `herr` (fuera del repo).
+- Comandos `/darkcraft mina [ir <sitio> | enemigos [volver | fuera | sacar] | derrumbe [<n>] | escotilla [abrir | cerrar] | muro [abrir |
+  cerrar]]`.
+- **Sin abrir el juego**: `tools/vista3d/vista.sh morvain_mina carpeta` (`VOLCADO_OPTS="-Droca=true"` pone la roca bajo el terreno para
+  ver el forro de las galerias en los cortes; `-Dcaja=x0,z0,x1,z1` un trozo; `-Dabierto=true` el muro abierto): escribe a que se llega a
+  pie desde la entrada con todo cerrado y con el muro de la capilla abierto (todos los sitios; el escondido solo con el muro abierto) y
+  si cada uno de los 30 se pisa, se llega y no esta metido en un bloque. Los enterrados: `python3 tools/enemigos/generar.py --solo
+  enterrado --vistas carpeta`.
+- Pruebas: servidor, `minas()` (lineas `Morvain, las minas de hierro negro: ...` —lo que hay (`Mina.resumen`), el santuario, a pie con
+  todo cerrado y con el muro abierto de un golpe, la palanca que abre y cierra la escotilla, por el pozo maestro solo con ella abierta,
+  el nombre de cada sitio—, `Morvain, los enterrados: ...` —en su sitio, en su suelo, ninguno metido en un bloque—, `... en accion: ...`
+  —los que esperan se levantan, cada accion acaba—, `... oyen y no ven: ...`, `... contra una presa: ...` —picotazo, barrido, mechazo, el
+  cartucho que revienta tambien a un enterrado de al lado, almadenazo y su onda, la embestida, el pico que engancha el escudo, la costra,
+  el morral— y `Morvain, los techos rotos de la mina: ...` —un cartucho al lado lo avisa y se viene abajo—; `Mina.avisados` y
+  `Mina.caerYa`: el mundo no avanza mientras corre la prueba); cliente, tramo `mina()` despues de `sigrun()`: el campamento desde el
+  santuario (`cliente_mn01`), la corta, la escalera, la bocamina, la Galeria del Rey, el polvorin, el comedor, el hundimiento, la rampa,
+  la gruta con y sin vision nocturna, las literas y la capilla (`mn02..mn13`); en aventura un golpe al muro (`mn14`) y el escondido
+  (`mn15`); el enganche y la escala (`mn16`), la palanca con un clic (`mn17`, `mn18` la escotilla abierta desde abajo, `mn19` el
+  castillete), el filon y todo desde lo alto (`mn20`, `mn21`); entrar a pie (`mn22`: el logro, el sitio, el aire de la mina); en el
+  fondo de la corta: picando (`mn23`), picotazo y barrido (`mn24`, `mn25`), el escudo enganchado (`mn26`), el cartucho en el aire, en el
+  suelo y su estallido (`mn27..mn29`), mechazo, almadenazo y embestida (`mn30..mn32`), uno que sale de los escombros (`mn33`, `mn34`),
+  agachado junto a uno (`mn35`, lineas `le oye ...`); un techo roto que cruje y cae (`mn36`, `mn37`); uno que se deshace (`mn38`); el
+  libro de turnos (`mn39`) y el bestiario (`mn40..mn42`).
+
 ### Lo anterior: parte 5 (torre nueva, camino de nubes y portal) — por sub-partes
 
 Respuestas 3, 4, 27-68 y 81 de `PLAN.md`:
