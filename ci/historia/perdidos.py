@@ -13,7 +13,7 @@ DONDE = {1: "valdrenn", 2: "valdrenn", 3: "valdrenn", 4: "valdrenn", 5: "valdren
          17: "fortaleza", 18: "morvain", 19: "morvain", 20: "morvain", 21: "morvain",
          22: "morvain", 23: "morvain", 24: "morvain", 25: "morvain", 26: "morvain", 27: "morvain",
          28: "morvain", 29: "morvain", 30: "morvain", 31: "valdrenn", 32: "morvain", 33: "morvain", 34: "morvain",
-         35: "morvain", 36: "morvain"}
+         35: "morvain", 36: "morvain", 37: "morvain"}
 
 # libro -> idioma -> (titulo, autor, [paginas])
 LIBROS = {
@@ -501,6 +501,17 @@ LIBROS = {
    "Day shift: forty-two lamps go down, forty-two come up. Night shift: forty go down. The king wants more black iron for the chains, always more. Hakon the foreman says the good vein lies deeper, where the rock is warm. We have opened a new level.",
    "The men on level three say the vein bleeds: the ore comes out red and wet, and the lamps go out by themselves. Hakon has forbidden any talk of it. Yesterday a blaster heard voices behind the wall and Hakon told him to blow it open. Behind it there was more vein. And something breathing.",
    "On the night of the red sky the mountain shook and the King's Gallery caved in. The night shift was below: forty lamps, forty empty hooks in the lamp room. On the fourth day we began to hear picking down there. If you read this: do not run in the galleries. They cannot see. They hear.\n\nGil"]),
+ },
+ # parte 7as: el libro de los huesos de Fray Osmund, el sacristan, en el atril de su taller (el Osario de San Ulfo)
+ 37: {
+  "es": ("El libro de los huesos", "Fray Osmund, sacristán de San Ulfo", [
+   "Año cuarto de la Peste Gris. El camposanto ya no admite a nadie: los muertos esperan en carros a la puerta. El prior me ha dado la llave de la cripta y una orden: haz sitio. Desenterraré a los viejos y guardaré sus huesos abajo, con orden y con respeto.",
+   "He perdido la cuenta de los nombres; no la de los huesos. Cuarenta mil. Los cráneos en filas, los fémures en haces, las costillas en guirnaldas. He hecho una lámpara con todos los huesos del cuerpo, para que alumbre a todos a la vez. Algunas noches la capilla cuenta conmigo.",
+   "La noche del cielo rojo se levantaron. Pero yo los había ordenado por huesos, no por hombres: cada uno cogió lo que tenía más cerca. Si los ves deshechos, pisa los huesos o llévales fuego. Yo bajo al relicario. Alguien tiene que seguir contando.\n\nFray Osmund"]),
+  "en": ("The Book of Bones", "Brother Osmund, sacristan of Saint Ulf", [
+   "Fourth year of the Grey Plague. The churchyard takes no one else: the dead wait in carts at the gate. The prior has given me the key to the crypt and one order: make room. I will dig up the old ones and keep their bones below, in order and with respect.",
+   "I have lost count of the names; not of the bones. Forty thousand. Skulls in rows, thighbones in sheaves, ribs in garlands. I made a lamp from every bone of the body, so that it lights them all at once. Some nights the chapel counts along with me.",
+   "On the night of the red sky they rose. But I had sorted them by bones, not by men: each one took whatever lay nearest. If you find them undone, crush the bones or bring them fire. I am going down to the reliquary. Someone has to keep counting.\n\nBrother Osmund"]),
  },
  35: {
   "es": ("El diario de la reina Isolde", "Isolde, reina de Valdrenn", [

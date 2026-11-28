@@ -68,12 +68,13 @@ public final class MorvainEnemigos {
             PILOTES = "pilotes", LAGUNA = "laguna", BARCA = "barca", MONASTERIO = "monasterio", ERMITA = "ermita", CUMBRE = "cumbre",
             CAPITAL = "capital", JURAMENTO = "juramento", ACADEMIA = "academia", OBSERVATORIO = "observatorio",
             PUERTO = "puerto", COSTILLAR = "costillar", GRIETA = "grieta", ALTAR = "altar", CERCO = "cerco", TEATRO = "teatro", NIDO = "nido",
-            CADENA = "cadena", HOMENAJE = "homenaje", AGUJA = "aguja", MINA = "mina";
+            CADENA = "cadena", HOMENAJE = "homenaje", AGUJA = "aguja", MINA = "mina", OSARIO = "osario";
     static final String MARCHITO = "marchito", MOLINERA = "molinera", AHORCADO = "ahorcado", VERDUGO = "verdugo", PODRIDO = "podrido",
             BARQUERO = "barquero", HELADO = "helado", ABAD = "abad", CALCINADO = "calcinado", CONDESTABLE = "condestable",
             ERUDITO = "erudito", RECTORA = "rectora", SALOBRE = "salobre", BALLENERO = "ballenero", PENITENTE = "penitente", MARCADO = "marcado",
             PONTIFICE = "pontifice", ALDRIC = "aldric", BUFON = "bufon", DRAGON = "dragon", GARGOLA = "gargola", CENTINELA = "centinela",
-            ISOLDE = "isolde", ESPECTRO = "espectro", PERRO = "perro", SOMBRA = "sombra", ENTERRADO = "enterrado", CAPATAZ = "capataz";
+            ISOLDE = "isolde", ESPECTRO = "espectro", PERRO = "perro", SOMBRA = "sombra", ENTERRADO = "enterrado", CAPATAZ = "capataz",
+            ENSAMBLADO = "ensamblado";
     /** El tipo de puesto de las gargolas (para las pruebas). */
     public static final String GARGOLA_TIPO = GARGOLA;
     // hacia donde miran (el giro de Minecraft: 0 = sur, 90 = oeste, 180 = norte, -90 = este)
@@ -87,7 +88,7 @@ public final class MorvainEnemigos {
             CAPITAL_P = new ArrayList<>(), JURAMENTO_P = new ArrayList<>(), ACADEMIA_P = new ArrayList<>(), OBSERVATORIO_P = new ArrayList<>(),
             PUERTO_P = new ArrayList<>(), COSTILLAR_P = new ArrayList<>(), GRIETA_P = new ArrayList<>(), ALTAR_P = new ArrayList<>(),
             CERCO_P = new ArrayList<>(), TEATRO_P = new ArrayList<>(), NIDO_P = new ArrayList<>(), CADENA_P = new ArrayList<>(),
-            HOMENAJE_P = new ArrayList<>(), AGUJA_P = new ArrayList<>(), MINA_P = new ArrayList<>();
+            HOMENAJE_P = new ArrayList<>(), AGUJA_P = new ArrayList<>(), MINA_P = new ArrayList<>(), OSARIO_P = new ArrayList<>();
 
     /** Uno fuera, de pie en el suelo de Morvain. */
     private static void fuera(List<Puesto> l, int variante, int x, int z, float giro, int postura, int ronda, String grupo) {
@@ -239,6 +240,9 @@ public final class MorvainEnemigos {
         for (Mina.Espera e : Mina.get().esperas())
             MINA_P.add(new Puesto(Puestos.JEFE.equals(e.grupo()) ? CAPATAZ : ENTERRADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(),
                     e.ronda(), e.grupo()));
+        // ---- el Osario de San Ulfo (parte 7as): los Ensamblados del camposanto, la capilla, la cripta y las catacumbas
+        for (Osario.Espera e : Osario.get().esperas())
+            OSARIO_P.add(new Puesto(ENSAMBLADO, e.variante(), e.x(), e.y(), e.z(), e.giro(), e.postura(), e.ronda(), e.grupo()));
         // ---- la casa de la Sombra (parte 7ab): la reina Isolde en su trono (el puesto 0) y los de la torre del homenaje (los
         // centinelas, los espectros del archivo, los marcados de la prision y sus perros); el tipo de cada uno lo dice el plano
         for (Homenaje.Espera e : Homenaje.get().esperas())
@@ -326,6 +330,7 @@ public final class MorvainEnemigos {
         Puestos.tipo(CALCINADO, DarkCraftMod.CALCINADO);
         Puestos.tipo(ENTERRADO, DarkCraftMod.ENTERRADO);
         Puestos.tipo(CAPATAZ, DarkCraftMod.CAPATAZ);
+        Puestos.tipo(ENSAMBLADO, DarkCraftMod.ENSAMBLADO);
         Puestos.tipo(CONDESTABLE, DarkCraftMod.CONDESTABLE);
         Puestos.tipo(ERUDITO, DarkCraftMod.ERUDITO);
         Puestos.tipo(RECTORA, DarkCraftMod.RECTORA);
@@ -385,6 +390,8 @@ public final class MorvainEnemigos {
         // las Minas de Hierro Negro: los enterrados de la corta y de los tres niveles, y Hakon en la Caverna del Filon; vencido Hakon,
         // el turno de noche descansa (lo hace Mina.paz cada segundo) y ya no vuelve
         Puestos.registrar(MINA, MINA_P, Morvain::es, (l, p) -> Puestos.JEFE.equals(p.grupo()) || !Mina.enPaz(l.getServer()));
+        // el Osario de San Ulfo: los Ensamblados (caen, se deshacen y se rehacen; muertos de verdad, no vuelven hasta descansar)
+        Puestos.registrar(OSARIO, OSARIO_P, Morvain::es);
         // la torre del homenaje: los centinelas, los del archivo y la prision, y la reina en su trono
         Puestos.registrar(HOMENAJE, HOMENAJE_P, Morvain::es);
         // la aguja: la Sombra (cae una vez y no vuelve: es del grupo de los jefes)
@@ -523,6 +530,11 @@ public final class MorvainEnemigos {
     public static List<Puesto> mina() {
         preparar();
         return List.copyOf(MINA_P);
+    }
+
+    public static List<Puesto> osario() {
+        preparar();
+        return List.copyOf(OSARIO_P);
     }
 
     public static List<Puesto> nido() {
@@ -1798,6 +1810,141 @@ public final class MorvainEnemigos {
         if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(Mina.CX + 19, Mina.SUELO, Mina.CZ - 86))
                 && m.isLoaded(new net.minecraft.core.BlockPos(Mina.CX + 41, Mina.N2, Mina.CZ - 126)))
             s += "; " + Mina.resumen(m) + "; muros: " + MurosIlusorios.estado(m);
+        return s;
+    }
+
+    /**
+     * {@code /darkcraft osario [ir <sitio> | enemigos [volver | fuera | sacar] | escotilla [abrir | cerrar] | muro [abrir | cerrar] |
+     * campana | ensamblado <portacirios | sepulturero | coloso | tumbar | rehacer>]} (parte 7as): el Osario de San Ulfo: ir a uno de
+     * sus sitios, sus Ensamblados, la escotilla del panteon, el muro ilusorio de los priores, la campana rota y sacar un Ensamblado
+     * delante (o deshacer o rehacer el mas cercano).
+     */
+    public static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> comandoOsario() {
+        return net.minecraft.commands.Commands.literal("osario")
+                .executes(c -> decir(c, estadoOsario(c.getSource().getServer())))
+                .then(net.minecraft.commands.Commands.literal("ir").executes(c -> irOsario(c.getSource(), "entrada"))
+                        .then(net.minecraft.commands.Commands.argument("sitio", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(Osario.get().sitios().keySet(), b))
+                                .executes(c -> irOsario(c.getSource(), com.mojang.brigadier.arguments.StringArgumentType.getString(c, "sitio")))))
+                .then(net.minecraft.commands.Commands.literal("enemigos")
+                        .executes(c -> decir(c, estadoOsario(c.getSource().getServer())))
+                        .then(net.minecraft.commands.Commands.literal("volver").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), OSARIO, false);
+                            return decir(c, "vuelven todos los del osario");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("fuera").executes(c -> {
+                            Puestos.todos(c.getSource().getServer(), OSARIO, true);
+                            return decir(c, "fuera todos los del osario");
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("sacar").executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            if (m == null) return 0;
+                            int n = Puestos.sacarTodos(m, OSARIO).size();
+                            return decir(c, "fuera " + n);
+                        })))
+                .then(net.minecraft.commands.Commands.literal("escotilla")
+                        .executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            return decir(c, m == null ? "Morvain no esta cargado" : Osario.resumen(m));
+                        })
+                        .then(net.minecraft.commands.Commands.literal("abrir").executes(c -> escotillaOsario(c, true)))
+                        .then(net.minecraft.commands.Commands.literal("cerrar").executes(c -> escotillaOsario(c, false))))
+                .then(net.minecraft.commands.Commands.literal("muro")
+                        .executes(c -> {
+                            var m = Morvain.nivel(c.getSource().getServer());
+                            return decir(c, m == null ? "Morvain no esta cargado" : MurosIlusorios.estado(m));
+                        })
+                        .then(net.minecraft.commands.Commands.literal("abrir").executes(c -> muroOsario(c, true)))
+                        .then(net.minecraft.commands.Commands.literal("cerrar").executes(c -> muroOsario(c, false))))
+                .then(net.minecraft.commands.Commands.literal("campana").executes(c -> {
+                    var m = Morvain.nivel(c.getSource().getServer());
+                    if (m == null) return 0;
+                    Osario.tocar(m);
+                    return decir(c, "tane la campana rota (" + Osario.CAMPANADAS + ")");
+                }))
+                .then(net.minecraft.commands.Commands.literal("ensamblado")
+                        .then(net.minecraft.commands.Commands.literal("portacirios").executes(c -> sacarEnsamblado(c, com.darkcraft.enemigos.Ensamblado.PORTACIRIOS)))
+                        .then(net.minecraft.commands.Commands.literal("sepulturero").executes(c -> sacarEnsamblado(c, com.darkcraft.enemigos.Ensamblado.SEPULTURERO)))
+                        .then(net.minecraft.commands.Commands.literal("coloso").executes(c -> sacarEnsamblado(c, com.darkcraft.enemigos.Ensamblado.COLOSO)))
+                        .then(net.minecraft.commands.Commands.literal("tumbar").executes(c -> {
+                            com.darkcraft.enemigos.Ensamblado e = ensambladoCerca(c.getSource());
+                            if (e == null) return decir(c, "no hay ningun Ensamblado a 16 bloques");
+                            e.tumbarYa();
+                            return decir(c, "se deshace: " + e.estado());
+                        }))
+                        .then(net.minecraft.commands.Commands.literal("rehacer").executes(c -> {
+                            com.darkcraft.enemigos.Ensamblado e = ensambladoCerca(c.getSource());
+                            if (e == null) return decir(c, "no hay ningun Ensamblado a 16 bloques");
+                            e.rehacerYa();
+                            return decir(c, "se rehace: " + e.estado());
+                        })));
+    }
+
+    private static com.darkcraft.enemigos.Ensamblado ensambladoCerca(net.minecraft.commands.CommandSourceStack src) {
+        com.darkcraft.enemigos.Ensamblado mejor = null;
+        double d = 16 * 16;
+        for (com.darkcraft.enemigos.Ensamblado e : src.getLevel().getEntitiesOfClass(com.darkcraft.enemigos.Ensamblado.class,
+                new net.minecraft.world.phys.AABB(src.getPosition(), src.getPosition()).inflate(16))) {
+            double dd = e.distanceToSqr(src.getPosition());
+            if (dd < d) {
+                d = dd;
+                mejor = e;
+            }
+        }
+        return mejor;
+    }
+
+    /** Saca un Ensamblado de esa variante cuatro bloques delante de quien lo pide (no es de ningun puesto: no vuelve). */
+    private static int sacarEnsamblado(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, int variante)
+            throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = c.getSource().getPlayerOrException();
+        com.darkcraft.enemigos.Ensamblado e = DarkCraftMod.ENSAMBLADO.get().create(sp.serverLevel());
+        if (e == null) return 0;
+        net.minecraft.world.phys.Vec3 v = sp.position().add(sp.getLookAngle().multiply(1, 0, 1).normalize().scale(4));
+        e.moveTo(v.x, sp.getY(), v.z, sp.getYRot() + 180f, 0f);
+        e.variante(variante);
+        sp.serverLevel().addFreshEntity(e);
+        return decir(c, "sale un Ensamblado (" + e.estado() + ")");
+    }
+
+    private static int muroOsario(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, boolean abrir) {
+        var m = Morvain.nivel(c.getSource().getServer());
+        if (m == null) return 0;
+        MurosIlusorios.Muro w = MurosIlusorios.muro(Osario.MURO_PRIORES);
+        if (abrir) MurosIlusorios.abrir(m, w, c.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer sp ? sp : null);
+        else MurosIlusorios.cerrar(m, Osario.MURO_PRIORES);
+        return decir(c, MurosIlusorios.estado(m));
+    }
+
+    /** Abre o cierra la escotilla del panteon (la palanca de debajo y la trampilla). */
+    private static int escotillaOsario(com.mojang.brigadier.context.CommandContext<net.minecraft.commands.CommandSourceStack> c, boolean abrir) {
+        var m = Morvain.nivel(c.getSource().getServer());
+        if (m == null) return 0;
+        Osario.escotilla(m, abrir);
+        return decir(c, Osario.resumen(m));
+    }
+
+    private static int irOsario(net.minecraft.commands.CommandSourceStack src, String sitio) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer sp = src.getPlayerOrException();
+        int[] s = Osario.get().sitio(sitio);
+        net.minecraft.server.level.ServerLevel m = Morvain.nivel(src.getServer());
+        if (s == null || m == null) {
+            src.sendFailure(net.minecraft.network.chat.Component.literal("no hay sitio " + sitio + " (" + Osario.get().sitios().keySet() + ")"));
+            return 0;
+        }
+        // mirando hacia dentro del osario (al norte)
+        sp.teleportTo(m, s[0] + 0.5, s[1] + 0.05, s[2] + 0.5, 180f, 5f);
+        return 1;
+    }
+
+    /** Cuantos Ensamblados quedan y lo que hay en el osario (si esta cargado). */
+    public static String estadoOsario(net.minecraft.server.MinecraftServer srv) {
+        String s = "osario de San Ulfo: quedan " + Puestos.quedan(srv, OSARIO) + " de " + OSARIO_P.size() + " (fuera " + Puestos.fuera(OSARIO) + ")";
+        var m = Morvain.nivel(srv);
+        if (m != null && m.isLoaded(new net.minecraft.core.BlockPos(Osario.CX + 26, Osario.SUELO, Osario.CZ - 57))
+                && m.isLoaded(new net.minecraft.core.BlockPos(Osario.CX - 20, Osario.C2, Osario.CZ - 97))
+                && m.isLoaded(Osario.campana()))
+            s += "; " + Osario.resumen(m) + "; muros: " + MurosIlusorios.estado(m);
         return s;
     }
 

@@ -267,7 +267,7 @@ public final class Morvain {
     }
 
     /** Si hay alguien cerca del Patio del Juramento o del Observatorio (se mira cada segundo). */
-    private static boolean cercaJuramento, cercaObservatorio, cercaCerco, cercaTeatro, cercaMina;
+    private static boolean cercaJuramento, cercaObservatorio, cercaCerco, cercaTeatro, cercaMina, cercaOsario;
 
     /** Al acabar cada tick, los que entraron en un portal; y cada segundo, con alguien cerca del arco, su remolino. */
     @SubscribeEvent
@@ -380,6 +380,16 @@ public final class Morvain {
                 if (antes && !cercaMina) Mina.rearmar();
             }
             if (cercaMina) Mina.tick(m);
+            // el Osario de San Ulfo (parte 7as): el muro ilusorio de los priores (lo abierto no vuelve), la campana rota que tañe sola
+            // y los susurros de la Capilla de los Huesos
+            if (srv.getTickCount() % 20 == 19) {
+                cercaOsario = false;
+                for (ServerPlayer p : m.players())
+                    if (Osario.distancia(p.getX(), p.getZ()) < 200) cercaOsario = true;
+                if (cercaOsario) MurosIlusorios.tick(m);
+            }
+            if (cercaOsario && srv.getTickCount() % 100 == 53) Osario.campana(m);
+            if (cercaOsario && srv.getTickCount() % 80 == 29) Osario.susurros(m);
         }
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
@@ -459,6 +469,9 @@ public final class Morvain {
         // y quien baja a las Minas de Hierro Negro: a la corta o a sus galerias (parte 7aq)
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Mina.dentro(p.getX(), p.getY(), p.getZ())) com.darkcraft.story.Logros.dar(p, "minas");
+        // y quien baja a la cripta del Osario de San Ulfo (parte 7as)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Osario.dentro(p.getX(), p.getY(), p.getZ())) com.darkcraft.story.Logros.dar(p, "osario");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -517,6 +530,11 @@ public final class Morvain {
                         .withStyle(net.minecraft.ChatFormatting.GRAY, net.minecraft.ChatFormatting.ITALIC), true);
             return;
         }
+        if (Osario.escotilla(e.getPos()) && st.is(net.minecraft.world.level.block.Blocks.IRON_TRAPDOOR)
+                && !st.getValue(net.minecraft.world.level.block.TrapDoorBlock.OPEN) && p.getY() > e.getPos().getY()
+                && e.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND)
+            p.displayClientMessage(net.minecraft.network.chat.Component.translatable("darkcraft.osario.escotilla_cerrada")
+                    .withStyle(net.minecraft.ChatFormatting.GRAY, net.minecraft.ChatFormatting.ITALIC), true);
         if (Mina.escotilla(e.getPos()) && st.is(net.minecraft.world.level.block.Blocks.IRON_TRAPDOOR)
                 && !st.getValue(net.minecraft.world.level.block.TrapDoorBlock.OPEN) && p.getY() > e.getPos().getY()
                 && e.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND)
@@ -604,6 +622,11 @@ public final class Morvain {
         // las Minas de Hierro Negro: la corta, las galerias, la Gruta del Agua Negra y la Caverna del Filon (parte 7aq)
         if (Math.abs(p.getX() - Mina.CX) < 70 && p.getZ() < Mina.CZ + 10 && p.getZ() > Mina.CZ - 220) {
             String k = Mina.lugar(p.getX(), p.getY(), p.getZ());
+            if (k != null) return k;
+        }
+        // el Osario de San Ulfo: el camposanto, la capilla, la cripta, la Capilla de los Huesos, el pozo, el taller y el relicario (7as)
+        if (Math.abs(p.getX() - Osario.CX) < 60 && p.getZ() < Osario.CZ + 62 && p.getZ() > Osario.CZ - 126) {
+            String k = Osario.lugar(p.getX(), p.getY(), p.getZ());
             if (k != null) return k;
         }
         // el Refugio de la Fragua, donde trabaja Hagen (parte 7af)

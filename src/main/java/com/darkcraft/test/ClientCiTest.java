@@ -6707,6 +6707,8 @@ public final class ClientCiTest {
         t = mina(t);
         // Hakon, el Capataz, en la Caverna del Filon (parte 7ar)
         t = capataz(t);
+        // el Osario de San Ulfo y los Ensamblados (parte 7as)
+        t = osario(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -14867,6 +14869,406 @@ public final class ClientCiTest {
                 comando(sp, "darkcraft mina muro cerrar");
                 comando(sp, "darkcraft mina escotilla cerrar");
                 comando(sp, "darkcraft mina enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
+    }
+
+    // ------------------------------------------------------------------ el Osario de San Ulfo y los Ensamblados (parte 7as)
+
+    private static final com.darkcraft.enemigos.Ensamblado[] ENSAMBLADOS = new com.darkcraft.enemigos.Ensamblado[3];
+
+    private static com.darkcraft.enemigos.Ensamblado ensambladoNuevo(ServerLevel lvl, int variante, double x, double y, double z, float giro, int postura) {
+        var a = DarkCraftMod.ENSAMBLADO.get().create(lvl);
+        if (a == null) return null;
+        a.variante(variante);
+        a.moveTo(x, y, z, giro, 0f);
+        a.yBodyRot = a.yHeadRot = giro;
+        if (postura != com.darkcraft.enemigos.Enemigo.DE_PIE) a.asignar("", -1, a.blockPosition(), giro, postura, 0);
+        lvl.addFreshEntity(a);
+        return a;
+    }
+
+    private static void quitarEnsamblados(ServerLevel lvl) {
+        for (int i = 0; i < ENSAMBLADOS.length; i++) {
+            if (ENSAMBLADOS[i] != null && !ENSAMBLADOS[i].isRemoved()) ENSAMBLADOS[i].discard();
+            ENSAMBLADOS[i] = null;
+        }
+        if (lvl == null) return;
+        var caja = new net.minecraft.world.phys.AABB(com.darkcraft.morvain.Osario.X0, 40, com.darkcraft.morvain.Osario.Z0, com.darkcraft.morvain.Osario.X1, 200,
+                com.darkcraft.morvain.Osario.Z1);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Ensamblado.class, caja, q -> q.sitio() == null || q.sitio().isEmpty())) e.discard();
+    }
+
+    private static String estadoEnsamblados() {
+        StringBuilder sb = new StringBuilder();
+        for (var a : ENSAMBLADOS) sb.append(a == null ? "-" : a.isRemoved() ? "quitado" : a.estado() + " " + estadoE(a)).append(" | ");
+        return sb + String.format(java.util.Locale.ROOT, "deshechos %d, rehechos %d, polvo %d (pisoteados %d, martillo %d, fuego %d), quemados %d, cegados %d, ondas %d,"
+                        + " pisotones %d", com.darkcraft.enemigos.Ensamblado.DESHECHOS, com.darkcraft.enemigos.Ensamblado.REHECHOS, com.darkcraft.enemigos.Ensamblado.POLVO,
+                com.darkcraft.enemigos.Ensamblado.POLVO_PISOTEADO, com.darkcraft.enemigos.Ensamblado.POLVO_MARTILLO, com.darkcraft.enemigos.Ensamblado.POLVO_FUEGO,
+                com.darkcraft.enemigos.Ensamblado.QUEMADOS, com.darkcraft.enemigos.Ensamblado.CIEGOS, com.darkcraft.enemigos.Ensamblado.ONDAS,
+                com.darkcraft.enemigos.Ensamblado.PISOTONES);
+    }
+
+    /** Lo del osario en una captura: el sitio, el aire del osario (del cliente), el logro y la escotilla. */
+    private static void logOsario(Minecraft m, String que) {
+        String musica = ClientMusic.osario();
+        server(m, sp -> log("  osario, " + que + ": sitio " + com.darkcraft.morvain.Morvain.lugar(sp) + " | " + musica + " | logro osario "
+                + com.darkcraft.story.Logros.tiene(sp, "osario") + " | " + fpos(sp)));
+    }
+
+    /** Un sitio del osario (u, y, v del marco del osario) visto desde otro: en creativo, volando. */
+    private static int vistaOsario(int t, String nombre, double u, double y, double v, double mu, double my, double mv, int espera, boolean deNoche) {
+        final int CX = com.darkcraft.morvain.Osario.CX, CZ = com.darkcraft.morvain.Osario.CZ;
+        atTicks(t, "El osario: " + nombre, m -> server(m, sp -> {
+            sp.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+            if (deNoche) sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+            irMirando(sp, CX + u, y, CZ + v, CX + mu, my, CZ + mv, true);
+        }));
+        t += espera;
+        final String cap = "cliente_" + nombre;
+        atTicks(t, "captura: " + nombre, m -> {
+            logOsario(m, nombre);
+            shot(m, cap);
+        });
+        return t + 4;
+    }
+
+    /** A pelear en la Capilla de los Huesos: en supervivencia, con la espada, aguantando y con vision nocturna (para verlo). */
+    private static void aPelearOsario(ServerPlayer sp) {
+        aPelear(sp, true);
+        sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+    }
+
+    /** Un golpe de un Ensamblado visto de lado: el Ensamblado en (x, z) mirando al sur, el jugador delante (al sur) y la camara al este. */
+    private static int golpeEnsamblado(int t, String nombre, int variante, int accion, double dist, int captura, double ex, double ey, double ez) {
+        atTicks(t, "El osario: " + nombre, m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarEnsamblados(lvl);
+                aPelearOsario(sp);
+                ENSAMBLADOS[0] = ensambladoNuevo(lvl, variante, ex, ey, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+                irMirando(sp, ex, ey, ez + dist, ex, ey + 1.4, ez, false);
+                var a = ENSAMBLADOS[0];
+                if (a == null) return;
+                a.setTarget(sp);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(accion);
+                boolean grande = variante == com.darkcraft.enemigos.Ensamblado.COLOSO;
+                verDesdeServidor = new Vec3(ex + (grande ? 6.4 : 4.6), ey + (grande ? 3.0 : 2.4), ez + dist * 0.5 + 0.8);
+                miraServidor = new Vec3(ex, ey + (grande ? 1.6 : 1.2), ez + dist * 0.5);
+            });
+        });
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += captura - 2;
+        final String cap = "cliente_" + nombre;
+        atTicks(t, "captura: " + nombre, m -> {
+            server(m, sp -> log("  " + nombre + ": " + estadoEnsamblados() + " | jugador vida " + Math.round(sp.getHealth()) + ", frenado "
+                    + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) + ", ciego " + sp.hasEffect(net.minecraft.world.effect.MobEffects.BLINDNESS)
+                    + ", ardiendo " + sp.isOnFire() + String.format(java.util.Locale.ROOT, " en %.1f, %.1f, %.1f", sp.getX(), sp.getY(), sp.getZ())));
+            shot(m, cap);
+        });
+        return t;
+    }
+
+    /**
+     * El Osario de San Ulfo (parte 7as): desde el santuario, el camposanto (los sepultureros cavando junto a las tumbas abiertas), el de
+     * los pobres, la capilla y su campanario (la campana), la nave, el abside y la boca de la cripta; la Cripta de los Hermanos y una de
+     * sus capillas, la bajada a la Capilla de los Huesos (de lejos, la lampara, el altar de craneos, el escudo y sin vision nocturna), las
+     * catacumbas, el taller del sacristan, en aventura un golpe al muro de los priores (y su cripta), el osario menor, la Sala del Pozo y
+     * su fondo, la palanca de la escotilla del panteon (desde abajo) y el panteon, el relicario y todo desde lo alto; entrar a pie (el
+     * logro y el aire del osario). En supervivencia, en la Capilla de los Huesos: los golpes de los tres Ensamblados (candelazo, barrido
+     * del cirio, palada, la tierra a los ojos, mazazo, barrido de la maza y pisoton); uno que cae y se deshace, el monton (el aviso), que
+     * se rehace, otro que se pisotea y uno que se hace polvo con un martillo; el libro de los huesos y el bestiario. Al acabar vuelve todo.
+     */
+    private static int osario(int T) {
+        final int CX = com.darkcraft.morvain.Osario.CX, CZ = com.darkcraft.morvain.Osario.CZ, PISO = com.darkcraft.morvain.Osario.PISO;
+        final int SUELO = com.darkcraft.morvain.Osario.SUELO, C1 = com.darkcraft.morvain.Osario.C1, C2 = com.darkcraft.morvain.Osario.C2;
+        final int POZO = com.darkcraft.morvain.Osario.POZO, REL = com.darkcraft.morvain.Osario.RELICARIO;
+        final var SA = com.darkcraft.morvain.SantuariosMorvain.porId("osario");
+        int t = T;
+        atTicks(t, "El osario: desde el santuario", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft osario muro cerrar");
+                comando(sp, "darkcraft osario escotilla cerrar");
+                comando(sp, "darkcraft osario enemigos volver");
+                irMirando(sp, SA.x() + 8.5, SA.y() + 7, SA.z() + 9.5, CX, SUELO + 4, CZ - 6, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura: el osario desde el santuario", m -> {
+            shot(m, "cliente_os01_santuario");
+            server(m, sp -> log("  el osario: " + com.darkcraft.morvain.MorvainEnemigos.estadoOsario(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 6;
+        t = vistaOsario(t, "os02_camposanto", -2.5, PISO + 3.5, 21.5, -13, PISO, 9, 60, false);
+        t = vistaOsario(t, "os03_pobres", -5.5, PISO + 3, -3.5, -17, PISO, -17, 40, false);
+        t = vistaOsario(t, "os04_capilla", 15.5, PISO + 5, 13.5, 2, PISO + 5, -9, 40, false);
+        t = vistaOsario(t, "os05_nave", 0.5, PISO + 1.6, -2.5, 0.5, PISO + 1.2, -18, 40, true);
+        t = vistaOsario(t, "os06_abside", 2.5, PISO + 2.6, -16.5, 0.5, PISO - 2, -21, 40, true);
+        t = vistaOsario(t, "os07_campanario", 8.5, PISO + 13.3, -2.6, 7, PISO + 14.6, -4.4, 40, true);
+        t = vistaOsario(t, "os08_escalera_cripta", 0.5, PISO + 0.4, -18.6, 0.5, C1 + 1, -30, 40, true);
+        t = vistaOsario(t, "os09_hermanos", 0.5, C1 + 2, -29.5, 0.5, C1 + 2, -50, 50, true);
+        t = vistaOsario(t, "os10_capilla_hermanos", 1.5, C1 + 2, -36.5, -5, C1 + 1.5, -36, 40, true);
+        t = vistaOsario(t, "os11_bajada_huesos", 0.5, C1 + 2.2, -49.5, 0.5, C2 + 2, -64, 40, true);
+        t = vistaOsario(t, "os12_capilla_huesos", 0.5, C2 + 3.5, -61.5, 0.5, C2 + 3, -81, 60, true);
+        t = vistaOsario(t, "os13_lampara", 4.5, C2 + 3.6, -66.5, 0.5, C2 + 8, -70.5, 40, true);
+        t = vistaOsario(t, "os14_altar_craneos", 0.5, C2 + 2.4, -75.5, 0.5, C2 + 4.5, -81, 40, true);
+        t = vistaOsario(t, "os15_escudo", -6, C2 + 3, -66.5, -6, C2 + 5.5, -60, 40, true);
+        t = vistaOsario(t, "os16_huesos_sin_vision", 0.5, C2 + 3.5, -61.5, 0.5, C2 + 3, -81, 30, false);
+        t = vistaOsario(t, "os17_catacumbas", -12.5, C2 + 2.2, -70.5, -34, C2 + 1.5, -70.5, 40, true);
+        t = vistaOsario(t, "os18_taller", -14.5, C2 + 2.8, -87.5, -22, C2 + 1, -95, 40, true);
+        // ---- en aventura: un golpe al muro del fondo del pasillo de los priores (el ataque del combate) y su cripta
+        atTicks(t, "El osario: ante el muro de los priores, en aventura", m -> server(m, sp -> {
+            sp.setGameMode(GameType.ADVENTURE);
+            sp.setHealth(sp.getMaxHealth());
+            sp.getInventory().selected = 0;
+            sp.getInventory().items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+            sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
+            sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+            comando(sp, "darkcraft osario enemigos fuera");
+            irMirando(sp, CX - 27.5, C2 + 1, CZ - 59.3, CX - 27.5, C2 + 2.6, CZ - 57.5, false);
+        }));
+        t += 30;
+        atTicks(t, "El osario: un golpe al muro (el ataque del combate)", m -> server(m, sp -> {
+            com.darkcraft.combate.Combate.pedir(sp, com.darkcraft.combate.Armas.LIGERO, 0, false, 0);
+            log("  tras el golpe: " + com.darkcraft.morvain.MurosIlusorios.estado(sp.serverLevel()) + "; logro secreto=" + com.darkcraft.story.Logros.tiene(sp, "secreto"));
+        }));
+        t += 6;
+        atTicks(t, "captura: el muro se deshace", m -> shot(m, "cliente_os19_muro_priores"));
+        t += 10;
+        atTicks(t, "El osario: creativo otra vez", m -> server(m, sp -> sp.setGameMode(GameType.CREATIVE)));
+        t += 2;
+        t = vistaOsario(t, "os20_priores", -27.5, C2 + 2.5, -57.5, -28, C2 + 1, -48, 40, true);
+        t = vistaOsario(t, "os21_osario_menor", -35.5, C2 + 3, -70.5, -45, C2 + 1, -68, 40, true);
+        t = vistaOsario(t, "os22_sala_pozo", 19.5, C2 + 4, -58.5, 27, C2 - 2, -70, 40, true);
+        t = vistaOsario(t, "os23_fondo_pozo", 26.5, C2 + 2.5, -73.6, 26.5, POZO + 1, -68, 40, true);
+        // ---- la palanca de debajo de la escotilla del panteon: en lo alto de la escala, la mano en la palanca (el clic del cliente)
+        atTicks(t, "El osario: en lo alto de la escala, la palanca", m -> server(m, sp -> {
+            sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+            irMirando(sp, CX + 26.5, SUELO - 2.9, CZ - 57 + 0.38, CX + 27.5, SUELO - 0.6, CZ - 56.5, true);
+        }));
+        t += 40;
+        atTicks(t, "captura: la palanca y la escotilla cerrada", m -> {
+            server(m, sp -> log("  bajo la escotilla: " + com.darkcraft.morvain.Osario.resumen(sp.serverLevel())));
+            shot(m, "cliente_os24_escala_panteon");
+        });
+        t += 4;
+        atTicks(t, "El osario: clic en la palanca", m -> {
+            BlockPos pal = new BlockPos(CX + 27, SUELO - 1, CZ - 57);
+            if (m.gameMode != null && m.player != null)
+                m.gameMode.useItemOn(m.player, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(pal), Direction.WEST, pal, false));
+        });
+        t += 10;
+        atTicks(t, "El osario: mirando arriba, por la escotilla", m -> server(m, sp -> {
+            log("  tras la palanca: " + com.darkcraft.morvain.Osario.resumen(sp.serverLevel()));
+            irMirando(sp, CX + 26.5, SUELO - 3.2, CZ - 57 + 0.2, CX + 26.5, SUELO + 6, CZ - 56.2, true);
+        }));
+        t += 20;
+        atTicks(t, "captura: la escotilla abierta desde abajo", m -> shot(m, "cliente_os25_escotilla_abierta"));
+        t += 4;
+        t = vistaOsario(t, "os26_panteon", 32.5, PISO + 3, -45.5, 26, PISO + 2, -57, 40, false);
+        t = vistaOsario(t, "os27_relicario", 26.5, REL + 3, -98.5, 26, REL + 2, -112, 50, true);
+        t = vistaOsario(t, "os28_osario_alto", 42.5, PISO + 45, 58.5, 0, PISO, -30, 90, false);
+        // ---- la campana rota (el comando la hace tañer) y entrar a pie, en aventura: el cartel, el logro y el aire del osario
+        atTicks(t, "El osario: la campana", m -> server(m, sp -> {
+            comando(sp, "darkcraft osario campana");
+            log("  la campana: tañe " + com.darkcraft.morvain.Osario.CAMPANADAS);
+        }));
+        t += 4;
+        atTicks(t, "El osario: entrar a pie en la cripta", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                int[] c = com.darkcraft.morvain.Osario.get().sitio("cripta");
+                sp.teleportTo(sp.serverLevel(), c[0] + 0.5, c[1], c[2] + 0.5, 180f, 0f);
+            });
+        });
+        t += 80;
+        atTicks(t, "captura: en la cripta", m -> {
+            logOsario(m, "en la cripta");
+            server(m, sp -> log("  cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+            shot(m, "cliente_os29_en_la_cripta");
+        });
+        t += 4;
+        // ---- en supervivencia, en la Capilla de los Huesos: los golpes de los Ensamblados, de lado
+        final double ex = CX + 0.5, ey = C2 + 1, ez = CZ - 76.5;
+        atTicks(t, "El osario: a pelear (supervivencia, en la Capilla de los Huesos)", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> comando(sp, "darkcraft osario enemigos fuera"));
+        });
+        t += 4;
+        final int P = com.darkcraft.enemigos.Ensamblado.PORTACIRIOS, S = com.darkcraft.enemigos.Ensamblado.SEPULTURERO, K = com.darkcraft.enemigos.Ensamblado.COLOSO;
+        t = golpeEnsamblado(t, "os30_candelazo", P, com.darkcraft.enemigos.EnsambladoAnims.CANDELAZO, 2.4, 20, ex, ey, ez) + 30;
+        t = golpeEnsamblado(t, "os31_barrido_cirio", P, com.darkcraft.enemigos.EnsambladoAnims.BARRIDO_CIRIO, 2.2, 14, ex, ey, ez) + 30;
+        t = golpeEnsamblado(t, "os32_palada", S, com.darkcraft.enemigos.EnsambladoAnims.PALADA, 2.4, 17, ex, ey, ez) + 30;
+        t = golpeEnsamblado(t, "os33_tierra", S, com.darkcraft.enemigos.EnsambladoAnims.TIERRA, 4.0, 18, ex, ey, ez) + 30;
+        t = golpeEnsamblado(t, "os34_mazazo", K, com.darkcraft.enemigos.EnsambladoAnims.MAZAZO, 2.8, 25, ex, ey, ez) + 30;
+        t = golpeEnsamblado(t, "os35_barrido_maza", K, com.darkcraft.enemigos.EnsambladoAnims.BARRIDO_MAZA, 3.0, 19, ex, ey, ez) + 30;
+        t = golpeEnsamblado(t, "os36_pisoton", K, com.darkcraft.enemigos.EnsambladoAnims.PISOTON, 1.6, 17, ex, ey, ez) + 30;
+        // ---- uno que cae: se deshace, el monton (el aviso de pisarlo) y se rehace
+        atTicks(t, "El osario: un portacirios cae", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarEnsamblados(lvl);
+                aPelearOsario(sp);
+                ENSAMBLADOS[0] = ensambladoNuevo(lvl, P, ex, ey, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+                if (ENSAMBLADOS[0] != null) ENSAMBLADOS[0].setNoAi(true);
+                irMirando(sp, ex + 2.5, ey, ez + 4.0, ex, ey + 0.6, ez, false);
+            });
+        });
+        t += 20;
+        atTicks(t, "El osario: le pega", m -> server(m, sp -> {
+            var a = ENSAMBLADOS[0];
+            if (a == null) return;
+            a.invulnerableTime = 0;
+            a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+            a.setDeltaMovement(Vec3.ZERO);
+        }));
+        t += 12;
+        atTicks(t, "captura: se deshace", m -> {
+            server(m, sp -> log("  se deshace: " + estadoEnsamblados()));
+            shot(m, "cliente_os37_se_deshace");
+        });
+        t += 30;
+        atTicks(t, "captura: el monton", m -> {
+            server(m, sp -> log("  el monton: " + estadoEnsamblados() + " | cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+            shot(m, "cliente_os38_monton");
+        });
+        t += 4;
+        atTicks(t, "El osario: se rehace ya", m -> server(m, sp -> comando(sp, "darkcraft osario ensamblado rehacer")));
+        t += 22;
+        atTicks(t, "captura: se rehace", m -> {
+            server(m, sp -> log("  se rehace: " + estadoEnsamblados()));
+            shot(m, "cliente_os39_se_rehace");
+        });
+        t += 30;
+        // ---- otro: cae y se pisotea el monton (el golpe del combate) antes de que se levante
+        atTicks(t, "El osario: un sepulturero cae", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            quitarEnsamblados(lvl);
+            aPelearOsario(sp);
+            ENSAMBLADOS[0] = ensambladoNuevo(lvl, S, ex, ey, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+            if (ENSAMBLADOS[0] != null) ENSAMBLADOS[0].setNoAi(true);
+            irMirando(sp, ex, ey, ez + 1.9, ex, ey + 0.3, ez, false);
+        }));
+        t += 10;
+        atTicks(t, "El osario: le tumba", m -> server(m, sp -> {
+            var a = ENSAMBLADOS[0];
+            if (a == null) return;
+            a.invulnerableTime = 0;
+            a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+        }));
+        t += 30;
+        atTicks(t, "El osario: pisotea el monton (el ataque del combate)", m -> server(m, sp -> {
+            sp.getCooldowns().removeCooldown(net.minecraft.world.item.Items.IRON_SWORD);
+            com.darkcraft.combate.Combate.pedir(sp, com.darkcraft.combate.Armas.LIGERO, 0, false, 0);
+        }));
+        t += 12;
+        atTicks(t, "captura: el monton pisoteado", m -> {
+            server(m, sp -> {
+                var a = ENSAMBLADOS[0];
+                String como = a == null ? "no hay" : a.isAlive() ? "SIGUE (" + a.estado() + ")" : "polvo";
+                // si el golpe del combate no llego, a mano (para que la prueba siga)
+                if (a != null && a.isAlive()) {
+                    a.invulnerableTime = 0;
+                    a.hurt(sp.damageSources().playerAttack(sp), 2f);
+                    como += ", a mano: " + (a.isAlive() ? "SIGUE" : "polvo");
+                }
+                log("  pisoteado: " + como + " | " + estadoEnsamblados());
+            });
+            shot(m, "cliente_os40_pisoteado");
+        });
+        t += 40;
+        // ---- y uno que se hace polvo de una vez: con un martillo
+        atTicks(t, "El osario: un coloso y un martillo", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            quitarEnsamblados(lvl);
+            aPelearOsario(sp);
+            sp.getInventory().items.set(0, new ItemStack(DarkCraftMod.MARTILLO_GUERRA.get()));
+            ENSAMBLADOS[0] = ensambladoNuevo(lvl, K, ex, ey, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+            if (ENSAMBLADOS[0] != null) ENSAMBLADOS[0].setNoAi(true);
+            irMirando(sp, ex + 3.0, ey, ez + 4.5, ex, ey + 1.4, ez, false);
+        }));
+        t += 16;
+        atTicks(t, "El osario: el martillazo", m -> server(m, sp -> {
+            var a = ENSAMBLADOS[0];
+            if (a == null) return;
+            a.invulnerableTime = 0;
+            a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+        }));
+        t += 26;
+        atTicks(t, "captura: polvo de un martillazo", m -> {
+            server(m, sp -> log("  el martillo: " + estadoEnsamblados() + " | logro ensamblado " + com.darkcraft.story.Logros.tiene(sp, "ensamblado")));
+            shot(m, "cliente_os41_martillo");
+        });
+        t += 30;
+        atTicks(t, "El osario: sin ensamblados (para el libro y el bestiario)", m -> server(m, sp -> {
+            quitarEnsamblados(sp.serverLevel());
+            sp.removeAllEffects();
+            sp.clearFire();
+            sp.setHealth(sp.getMaxHealth());
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        t += 6;
+        atTicks(t, "El osario: el libro de los huesos", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(com.darkcraft.morvain.Osario.LIBRO));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_os42_libro_huesos"));
+        t += 6;
+        String[] bestias = {"ensamblado_portacirios", "ensamblado_sepulturero", "ensamblado_coloso"};
+        for (int i = 0; i < bestias.length; i++) {
+            final String b = bestias[i];
+            final int n = 43 + i;
+            atTicks(t, "el bestiario: " + b, m -> {
+                m.setScreen(null);
+                m.options.hideGui = false;
+                com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+                menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf(b)));
+            });
+            t += 18;
+            atTicks(t, "captura: " + b + " en el bestiario", m -> {
+                menuP(m, mm -> log("  " + mm.resumen()));
+                shot(m, "cliente_os" + n + "_bestiario_" + b.replace("ensamblado_", ""));
+            });
+            t += 4;
+        }
+        atTicks(t, "fin del Osario de San Ulfo (vuelven los ensamblados, el muro y la escotilla cerrados)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                quitarEnsamblados(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                sp.getInventory().setItem(0, ItemStack.EMPTY);
+                comando(sp, "darkcraft osario muro cerrar");
+                comando(sp, "darkcraft osario escotilla cerrar");
+                comando(sp, "darkcraft osario enemigos volver");
                 sp.setGameMode(GameType.CREATIVE);
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
