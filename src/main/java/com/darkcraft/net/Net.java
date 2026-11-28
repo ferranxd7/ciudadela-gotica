@@ -1162,6 +1162,11 @@ public final class Net {
         public static final int FRAGMENTO = 10;
         /** Una mision (parte 7ag; la clave es su titulo): n 0 empieza, 1 cumplida, 2 acabada a su manera. */
         public static final int MISION = 11;
+        /**
+         * Un personaje dice una frase en el mundo, fuera de una conversacion (parte 7ap: Sigrun en su duelo): la clave es el personaje de
+         * {@code Dialogos} y n la frase (su voz, su retrato y el texto al ritmo de la voz, abajo en el centro).
+         */
+        public static final int VOZ = 12;
 
         void write(FriendlyByteBuf b) {
             b.writeByte(tipo);

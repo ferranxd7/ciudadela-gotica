@@ -153,11 +153,18 @@ VOZ_YLVA = ("highpass=f=80,equalizer=f=3100:t=q:w=1.2:g=1,aecho=0.8:0.18:34|81:0
 TOMAS_CORWEN = {n: "a" for n in range(1, 11)}
 VOZ_CORWEN = ("highpass=f=65,equalizer=f=160:t=q:w=1.0:g=1.5,highshelf=f=6000:g=-2,aecho=0.8:0.2:52|117:0.06|0.03,"
               "acompressor=threshold=-22dB:ratio=2.2:attack=6:release=150,loudnorm=I=-16:TP=-1.5:LRA=9")
+# Sigrun, la Guardiana del Paso (parte 7ap; voz "Kaisa - Strong and authoritative", flow JhLKcOKadUHHH8IC94uf: tomas c y d; las a y b
+# son de "Elariel X", la voz de la reina Isolde, y no se usan): al aire libre en el Paso del Colmillo, con la nieve y la roca de las dos
+# laderas que le devuelven un eco corto; la voz algo mas recia (menos aire arriba)
+TOMAS_SIGRUN = {n: "c" for n in range(1, 12)}
+VOZ_SIGRUN = ("highpass=f=90,equalizer=f=220:t=q:w=1.0:g=1.2,highshelf=f=7000:g=-1.5,aecho=0.8:0.22:61|143:0.07|0.04,"
+              "acompressor=threshold=-21dB:ratio=2.4:attack=5:release=140,loudnorm=I=-16:TP=-1.5:LRA=9")
 # los personajes con dialogo: id -> (tomas, filtro)
 PERSONAJES = {"guia": (TOMAS_GUIA, VOZ_GUIA), "herrero": (TOMAS_HERRERO, VOZ_HERRERO), "mercader": (TOMAS_MERCADER, VOZ_MERCADER),
               "hagen": (TOMAS_HAGEN, VOZ_HAGEN), "brenna": (TOMAS_BRENNA, VOZ_BRENNA), "ulrik": (TOMAS_ULRIK, VOZ_ULRIK),
               "tobin": (TOMAS_TOBIN, VOZ_TOBIN), "silas": (TOMAS_SILAS, VOZ_SILAS), "oswin": (TOMAS_OSWIN, VOZ_OSWIN),
-              "hedda": (TOMAS_HEDDA, VOZ_HEDDA), "ylva": (TOMAS_YLVA, VOZ_YLVA), "corwen": (TOMAS_CORWEN, VOZ_CORWEN)}
+              "hedda": (TOMAS_HEDDA, VOZ_HEDDA), "ylva": (TOMAS_YLVA, VOZ_YLVA), "corwen": (TOMAS_CORWEN, VOZ_CORWEN),
+              "sigrun": (TOMAS_SIGRUN, VOZ_SIGRUN)}
 
 # efectos: nombre -> (segundos como mucho, fundido final en s, volumen integrado LUFS)
 SFX = {
@@ -466,6 +473,10 @@ SFX = {
     # las balizas de la niebla (parte 7ao): el yesquero que prende una baliza, las campanas de las barcas que vuelven en la niebla y
     # Corwen que se mete en el agua a recibirlas
     "baliza_enciende": (3.0, 1.0, -16), "campanas_niebla": (12.0, 3.0, -18), "corwen_se_va": (10.0, 3.0, -19),
+    # el duelo del Paso del Colmillo (parte 7ap): la espada que sale de la nieve y el cuerno, Sigrun que se rinde de rodillas, su ultimo
+    # aliento con la campana del monasterio a lo lejos, sus pasos en la nieve al irse, su esfuerzo y su dolor y el salto que cae
+    "duelo_empieza": (8.0, 2.0, -15), "sigrun_rinde": (9.0, 2.0, -18), "sigrun_muere": (11.0, 3.0, -18), "sigrun_se_va": (16.0, 4.0, -20),
+    "sigrun_esfuerzo": (0.6, 0.15, -17), "sigrun_dolor": (0.8, 0.2, -16), "sigrun_salto": (2.0, 0.6, -14),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -816,6 +827,11 @@ TOMAS_SFX = {
     # el golpe y la 4 satura); de las campanas la 2 (las campanas que mas se oyen a los 8 s) y la 4 (que suenan todo el rato); de
     # Corwen en el agua la 4 y la 1 (los pasos en el agua desde el principio)
     "baliza_enciende": (3, 1), "campanas_niebla": (2, 4), "corwen_se_va": (4, 1),
+    # el duelo del Paso (parte 7ap): de la espada y el cuerno la 2 (el filo enseguida y el cuerno a los 4 s) y la 3; de la rendicion la 2
+    # y la 1; de la muerte la 1 (la campana grave a los 4 s, larga) y la 2; de los pasos la 4 y la 1 (se van apagando); del esfuerzo la
+    # 1 y la 2 (la 3 aguda, la 4 un siseo); del dolor la 1, la 2 y la 4; del salto la 1 y la 4 (el golpe enseguida)
+    "duelo_empieza": (2, 3), "sigrun_rinde": (2, 1), "sigrun_muere": (1, 2), "sigrun_se_va": (4, 1),
+    "sigrun_esfuerzo": (1, 2), "sigrun_dolor": (1, 2, 4), "sigrun_salto": (1, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",

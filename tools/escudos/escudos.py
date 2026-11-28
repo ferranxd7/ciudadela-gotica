@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Los escudos (parte 7ak, respuesta 109 del plan: "escudos pequeno, mediano y grande"): la Rodela de Hierro (pequena y redonda), el
-Escudo de Caballero (mediano, de punta, con la corona de Valdrenn) y el Paves de la Guardia (grande, hasta el suelo). Cada uno es un
+Escudo de Caballero (mediano, de punta, con la corona de Valdrenn) y el Paves de la Guardia (grande, hasta el suelo); y desde la
+parte 7ap el Escudo de la Guardiana (el de Sigrun: de lagrima, azul de noche con el colmillo blanco y el filo con escarcha). Cada uno es un
 modelo de cajas como el escudo de Minecraft (una placa de un pixel de grueso por delante, en z -2..-1, y el asa por detras, en el
 mismo sitio que la del juego: asi le valen las posturas de la mano y del bloqueo del escudo del juego). Sale:
 
@@ -277,7 +278,70 @@ def paves():
     return esc
 
 
-ESCUDOS = (rodela, caballero, paves)
+# ---------------------------------------------------------------- el escudo de la Guardiana (parte 7ap: el de Sigrun)
+
+AZUL = [hexa(c) for c in ("#050912", "#0b1426", "#13213e", "#1d3058", "#2a4172", "#3a558e")]
+ESCARCHA = hexa("#e4f2fa")
+COLMILLO = [
+    "XXXXXXX",
+    "XXXXXXX",
+    ".XXXXXX",
+    ".XXXXXX",
+    "..XXXXX",
+    "..XXXX.",
+    "...XXX.",
+    "...XX..",
+    "....X..",
+]
+
+
+def guardiana():
+    """El escudo de lagrima de Sigrun: el campo azul de noche, el colmillo blanco del paso y el filo de acero con escarcha."""
+    esc = Escudo("escudo_guardiana", "EscudoGuardianaGeometria")
+    r = ruido(71)
+    filas = [(-11, 2, -6, 6), (2, 5, -5, 5), (5, 8, -4, 4), (8, 10, -3, 3), (10, 11, -2, 2), (11, 12, -1, 1)]
+    cw = len(COLMILLO[0])
+
+    def frente(x, y):
+        b = esc.borde(x, y, 2)
+        cx, cy = x + 0.5, y + 0.5
+        if b == 1:
+            # el filo de acero, con la escarcha pegada a trozos
+            if r[(y + 11) % 64, (x * 5 + 9) % 64] > 0.8:
+                return ESCARCHA
+            return tono(ACERO, 0.6 + 0.2 * (-cx - cy) / 18.0 + (0.12 if y == -11 else 0))
+        if b == 2:
+            return tono(AZUL, 0.15)
+        # el colmillo blanco, en el centro y algo alto
+        ox, oy = x + cw // 2, y + 6
+        if 0 <= oy < len(COLMILLO) and 0 <= ox < cw and COLMILLO[oy][ox] == "X":
+            luz = 0.92 if ox < cw // 2 else 0.78
+            return tono([hexa("#9aa6b2"), hexa("#cfd8e0"), hexa("#eef2f6"), hexa("#ffffff")], luz)
+        # el campo azul de noche, con la luz de arriba a la izquierda y la escarcha que se pega abajo
+        v = 0.5 + 0.22 * (-cx - cy) / 22.0 + (r[(y + 11) % 64, (x + 6) % 64] - 0.5) * 0.08
+        if x == -3:
+            v += 0.1
+        if y > 6 and r[(y * 3) % 64, (x + 30) % 64] > 0.9:
+            return mezcla(tono(AZUL, v), ESCARCHA, 0.6)
+        return tono(AZUL, v)
+
+    def canto(cara, x, y, w, h):
+        return tono(ACERO, 0.66 if cara in ("arriba", "der") else 0.4)
+
+    losas(esc, filas, frente, canto, madera_atras(semilla=13))
+
+    # el umbo pequeno de acero sobre el colmillo y su remate
+    def umbo(cara, x, y, w, h):
+        if cara == "frente":
+            return tono(ACERO, 0.74 if (x, y) == (0, 0) else 0.55)
+        return tono(ACERO, 0.66 if cara in ("arriba", "der") else 0.38)
+
+    esc.caja(-1, -10, -3, 2, 2, 1, umbo, mat="umbo")
+    asa(esc)
+    return esc
+
+
+ESCUDOS = (rodela, caballero, paves, guardiana)
 
 
 # ---------------------------------------------------------------- los modelos de objeto (los del escudo del juego, a su tamano)
@@ -314,7 +378,7 @@ def modelos(ident, escala_gui, escala_mano):
     return normal, cubierto
 
 
-ESCALAS = {"rodela": (0.8, 1.25), "escudo_caballero": (0.65, 1.25), "paves": (0.54, 1.12)}
+ESCALAS = {"rodela": (0.8, 1.25), "escudo_caballero": (0.65, 1.25), "paves": (0.54, 1.12), "escudo_guardiana": (0.65, 1.25)}
 
 
 def main():

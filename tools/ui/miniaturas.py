@@ -1354,14 +1354,89 @@ def balizas_niebla():
     return M
 
 
+def duelo_paso():
+    """El duelo del Paso del Colmillo (parte 7ap, Sigrun): el paso entre dos paredes de roca al anochecer, el cielo de pizarra con el
+    ultimo sol rojo detras del pico del Colmillo; la nieve que cae; en medio del paso Sigrun, de pie con su espada clavada delante,
+    el escudo azul con el colmillo blanco y la trenza blanca al viento; detras, en arco, las nueve espadas de sus hermanos clavadas
+    en la nieve; y abajo a la izquierda quien llega, de espaldas, subiendo hacia ella."""
+    M = Mini()
+    M.degradado(["#0c0f18", "#141a28", "#1e2638", "#2e3346", "#4a3a44", "#7a3a30", "#a8502a"], 0, 50)
+    r = np.random.default_rng(717)
+    # el Colmillo: un pico afilado y curvo al fondo, contra el sol que se pone; y su nieve
+    M.poli([(52, 50), (66, 6), (69, 4), (70, 10), (78, 50)], "#262c38")
+    M.poli([(64, 14), (66, 6), (69, 4), (70, 10), (68, 16)], "#cfd8e2")
+    for y in range(30, 50):
+        for x in range(40, 90):
+            d = math.hypot(x - 64, (y - 50) * 1.6)
+            if d < 26 and sum(M.leer(x, y)[:3]) > 120:
+                M.px(x, y, mezcla(M.leer(x, y), "#e0703a", (1 - d / 26) * 0.4))
+    # las paredes del paso: roca oscura a los dos lados, con filos de nieve
+    izq = [(0, 18), (14, 22), (26, 34), (38, 46), (44, 58), (40, H), (0, H)]
+    der = [(W, 12), (112, 20), (100, 30), (92, 44), (86, 58), (90, H), (W, H)]
+    M.poli(izq, "#161a22")
+    M.poli(der, "#141820")
+    for (pts, lado) in ((izq, 1), (der, -1)):
+        for (a, b) in zip(pts[:4], pts[1:5]):
+            M.linea(a[0], a[1], b[0], b[1], "#d8e2ea")
+            M.linea(a[0], a[1] + 1, b[0], b[1] + 1, "#8a98a8")
+    # el suelo nevado del paso, que sube hacia ella
+    M.poli([(40, 58), (88, 58), (104, H), (24, H)], "#c8d4de")
+    M.degradado(["#9aa8b6", "#b8c6d2", "#d2dce4", "#e6eef4"], 58, H, 30, 98)
+    for y in range(58, H):
+        for x in range(0, W):
+            if not (40 - (y - 58) * 0.8 <= x <= 88 + (y - 58) * 0.8):
+                continue
+            if r.random() < 0.06:
+                M.px(x, y, "#f6fafc")
+    fig = capa()
+    # las nueve espadas en arco detras de ella (las de sus hermanos), con su sombra en la nieve
+    for k in range(9):
+        a = math.radians(-70 + k * 17.5)
+        sx = 64 + math.sin(a) * 18
+        sy = 57 - math.cos(a) * 3.5
+        fig.linea(sx, sy, sx + (0.5 if k % 2 else -0.5), sy - 6, "#2a3038")
+        fig.hline(int(sx) - 1, int(sy) - 5, 3, "#2a3038")
+    # Sigrun: las piernas, el faldon, el cuerpo con el manto de piel, la cabeza con el yelmo y su punta
+    fig.poli([(61, 59), (63, 59), (63, 52), (61, 52)], "#1a1e26")
+    fig.poli([(65, 59), (67, 59), (67, 52), (65, 52)], "#1a1e26")
+    fig.poli([(59, 53), (69, 53), (68, 45), (60, 45)], "#20304e")
+    fig.poli([(58, 45), (70, 45), (69, 41), (59, 41)], "#3a3e44")
+    fig.elipse(64, 38.5, 2.6, 2.8, "#5a646e")
+    fig.poli([(63, 35.5), (64, 33), (65, 35.5)], "#5a646e")
+    # la espada clavada delante, las manos sobre el pomo
+    fig.linea(64, 46, 64, 59, "#8a96a2")
+    fig.hline(62, 47, 5, "#8a96a2")
+    # el escudo de lagrima en su brazo izquierdo (a la derecha de la miniatura)
+    fig.poli([(69, 43), (74, 43), (74, 49), (71.5, 54), (69, 49)], "#1d3058")
+    # quien llega: de espaldas, abajo a la izquierda, subiendo por la nieve
+    fig.poli([(30, H), (36, H), (36, 70), (30, 70)], "#0e1016")
+    fig.poli([(28, 70), (38, 70), (37, 62), (29, 62)], "#12141a")
+    fig.elipse(33, 59.5, 2.4, 2.6, "#12141a")
+    fig.linea(38, 66, 42, 74, "#3a4048")
+    pegar_con_tinta(M, fig)
+    # lo que brilla y se ve encima de la tinta: el colmillo blanco del escudo, el filo del escudo y la trenza blanca
+    for (x, y) in ((71, 45), (72, 45), (71, 46), (72, 46), (72, 47), (72, 48)):
+        M.px(x, y, "#f4f8fc")
+    M.px(69, 43, "#a8b4c0").px(74, 43, "#a8b4c0")
+    for (x, y) in ((62, 39), (61, 40), (60, 41), (59, 42), (58, 43), (58, 44)):
+        M.px(x, y, "#e8ecf0")
+    # los ojos azul claro
+    M.px(63, 38, "#8fd8ff").px(65, 38, "#8fd8ff")
+    # la nieve que cae
+    for _ in range(70):
+        x, y = int(r.integers(0, W)), int(r.integers(0, H))
+        M.px(x, y, "#ffffff" if r.random() < 0.55 else "#b8c6d2")
+    return M
+
+
 ESCENAS = [corona_rota, fuente, trono, catedral, juramento, portal, perdidos_valdrenn, perdidos_fortaleza, diario, acertijo,
            perdidos_brumavela, perdidos_morvain, morvain_tierras, morvain_quedaron, morvain_marcado, morvain_hermanas,
-           campana_peregrino, bufanda_roja, luz_muelle, balizas_niebla]
+           campana_peregrino, bufanda_roja, luz_muelle, balizas_niebla, duelo_paso]
 
 
 def montar():
-    """Las miniaturas en un atlas de 512 x 400 (cuatro por fila; la quinta fila, las misiones: 7ag, 7ah, 7an, 7ao)."""
-    A = Lienzo(512, 400)
+    """Las miniaturas en un atlas de 512 x 480 (cuatro por fila; la quinta y la sexta fila, las misiones: 7ag, 7ah, 7an, 7ao y 7ap)."""
+    A = Lienzo(512, 480)
     for i, f in enumerate(ESCENAS):
         m = f()
         A.pegar(m, (i % 4) * W, (i // 4) * H)
@@ -1375,5 +1450,6 @@ if __name__ == "__main__":
         d = sys.argv[sys.argv.index("--vista") + 1]
         os.makedirs(d, exist_ok=True)
         from PIL import Image
-        A.imagen().resize((512 * 3, 400 * 3), Image.NEAREST).save(os.path.join(d, "miniaturas.png"))
+        A.imagen().resize((512 * 3, 480 * 3), Image.NEAREST).save(os.path.join(d, "miniaturas.png"))
+        A.imagen().crop((0, 400, 128, 480)).resize((128 * 5, 80 * 5), Image.NEAREST).save(os.path.join(d, "duelo_paso.png"))
     print("miniaturas: hecho")

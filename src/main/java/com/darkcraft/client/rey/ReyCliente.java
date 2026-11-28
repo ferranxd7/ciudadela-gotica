@@ -460,7 +460,7 @@ public final class ReyCliente {
                 || tc.getKey().equals("entity.darkcraft.aldric") || tc.getKey().startsWith("entity.darkcraft.gigante_")
                 || tc.getKey().equals("entity.darkcraft.jinete") || tc.getKey().equals("entity.darkcraft.bufon")
                 || tc.getKey().equals("entity.darkcraft.dragon") || tc.getKey().equals("entity.darkcraft.isolde")
-                || tc.getKey().equals("entity.darkcraft.sombra")) {
+                || tc.getKey().equals("entity.darkcraft.sombra") || tc.getKey().equals("entity.darkcraft.sigrun")) {
             com.darkcraft.client.enemigos.GuardianCliente.barra(e, ticks, tc.getKey().substring("entity.darkcraft.".length()));
             return;
         }
@@ -831,7 +831,8 @@ public final class ReyCliente {
             // los guardianes de Valdrenn (temas 31 y 32)
             if (fase == 0)
                 for (Entity en : mc.level.entitiesForRendering())
-                    if (en instanceof com.darkcraft.enemigos.Guardian gu && gu.isAlive() && gu.enPelea() && gu.distanceToSqr(mc.player) < 72 * 72) {
+                    if (en instanceof com.darkcraft.enemigos.Guardian gu && gu.isAlive() && gu.enPelea() && gu.distanceToSqr(mc.player) < 72 * 72
+                            && !(gu instanceof com.darkcraft.enemigos.Sigrun sg && com.darkcraft.enemigos.Sigrun.OCULTA.test(sg))) {
                         fase = gu.musica();
                         suave = false;
                         break;

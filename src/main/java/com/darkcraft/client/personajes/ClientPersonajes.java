@@ -34,5 +34,19 @@ public final class ClientPersonajes {
                 ClientPersonajes.cos = cos;
             }
         }
+        // Sigrun, la Guardiana del Paso (parte 7ap): se le habla en paz en su puesto y, de rodillas, quien la vencio
+        for (com.darkcraft.enemigos.Sigrun g : mc.level.getEntitiesOfClass(com.darkcraft.enemigos.Sigrun.class, mc.player.getBoundingBox().inflate(Conversaciones.ALCANCE + 1))) {
+            if (!com.darkcraft.client.mision.ClientMisiones.sigrunHabla(g)) continue;
+            Vec3 c = g.position().add(0, g.getBbHeight() * (g.modo() == com.darkcraft.enemigos.Sigrun.RENDIDA ? 0.4 : 0.58), 0).subtract(ojo);
+            double d = c.length();
+            if (d > Conversaciones.ALCANCE || d < 1e-3) continue;
+            double cos = c.dot(mira) / d;
+            if (d < 1.8) cos += 0.08;
+            if (cos > mejor) {
+                mejor = cos;
+                aMano = g.getId();
+                ClientPersonajes.cos = cos;
+            }
+        }
     }
 }

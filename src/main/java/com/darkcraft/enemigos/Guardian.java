@@ -99,6 +99,11 @@ public abstract class Guardian extends Enemigo {
         return true;
     }
 
+    /** Si ese jugador ve su barra mientras pelea (a quien ya acabo su duelo con Sigrun no le toca verla: parte 7ap). */
+    protected boolean veBarra(ServerPlayer p) {
+        return true;
+    }
+
     @Override
     protected double correa() {
         return 40.0;
@@ -178,7 +183,7 @@ public abstract class Guardian extends Enemigo {
         }
         if (tickCount % 10 == 0) {
             for (ServerPlayer p : sl.players()) {
-                boolean cerca = enPelea() && p.isAlive() && !p.isSpectator() && p.distanceToSqr(this) < 48 * 48;
+                boolean cerca = enPelea() && p.isAlive() && !p.isSpectator() && p.distanceToSqr(this) < 48 * 48 && veBarra(p);
                 if (cerca) barra.addPlayer(p);
                 else barra.removePlayer(p);
             }

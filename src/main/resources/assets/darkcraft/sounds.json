@@ -8362,5 +8362,215 @@
         "stream": true
       }
     ]
+  },
+  "voz.sigrun.1": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:sigrun/voz_1",
+        "stream": true
+      }
+    ]
+  },
+  "voz.sigrun.2": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:sigrun/voz_2",
+        "stream": true
+      }
+    ]
+  },
+  "voz.sigrun.3": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:sigrun/voz_3",
+        "stream": true
+      }
+    ]
+  },
+  "voz.sigrun.4": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:sigrun/voz_4",
+        "stream": true
+      }
+    ]
+  },
+  "voz.sigrun.5": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:sigrun/voz_5",
+        "stream": true
+      }
+    ]
+  },
+  "voz.sigrun.6": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:sigrun/voz_6",
+        "stream": true
+      }
+    ]
+  },
+  "voz.sigrun.7": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:sigrun/voz_7",
+        "stream": true
+      }
+    ]
+  },
+  "voz.sigrun.8": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:sigrun/voz_8",
+        "stream": true
+      }
+    ]
+  },
+  "voz.sigrun.9": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:sigrun/voz_9",
+        "stream": true
+      }
+    ]
+  },
+  "voz.sigrun.10": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:sigrun/voz_10",
+        "stream": true
+      }
+    ]
+  },
+  "voz.sigrun.11": {
+    "category": "voice",
+    "sounds": [
+      {
+        "name": "darkcraft:sigrun/voz_11",
+        "stream": true
+      }
+    ]
+  },
+  "sfx.duelo_empieza": {
+    "subtitle": "subtitles.darkcraft.sfx.duelo_empieza",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/duelo_empieza_1",
+        "attenuation_distance": 40,
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/duelo_empieza_2",
+        "attenuation_distance": 40,
+        "stream": true
+      }
+    ]
+  },
+  "sfx.sigrun_rinde": {
+    "subtitle": "subtitles.darkcraft.sfx.sigrun_rinde",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sigrun_rinde_1",
+        "attenuation_distance": 32,
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/sigrun_rinde_2",
+        "attenuation_distance": 32,
+        "stream": true
+      }
+    ]
+  },
+  "sfx.sigrun_muere": {
+    "subtitle": "subtitles.darkcraft.sfx.sigrun_muere",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sigrun_muere_1",
+        "attenuation_distance": 48,
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/sigrun_muere_2",
+        "attenuation_distance": 48,
+        "stream": true
+      }
+    ]
+  },
+  "sfx.sigrun_se_va": {
+    "subtitle": "subtitles.darkcraft.sfx.sigrun_se_va",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sigrun_se_va_1",
+        "attenuation_distance": 32,
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/sigrun_se_va_2",
+        "attenuation_distance": 32,
+        "stream": true
+      }
+    ]
+  },
+  "sfx.sigrun_esfuerzo": {
+    "subtitle": "subtitles.darkcraft.sfx.sigrun_esfuerzo",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sigrun_esfuerzo_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/sigrun_esfuerzo_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "sfx.sigrun_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.sigrun_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sigrun_dolor_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/sigrun_dolor_2",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/sigrun_dolor_3",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "sfx.sigrun_salto": {
+    "subtitle": "subtitles.darkcraft.sfx.sigrun_salto",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/sigrun_salto_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/sigrun_salto_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "musica.sigrun": {
+    "sounds": [
+      {
+        "name": "darkcraft:musica/sigrun",
+        "stream": true
+      }
+    ]
   }
 }

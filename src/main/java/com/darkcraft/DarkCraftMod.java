@@ -185,6 +185,17 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> SFX_BALIZA_ENCIENDE = sound("sfx.baliza_enciende");
     public static final RegistryObject<SoundEvent> SFX_CAMPANAS_NIEBLA = sound("sfx.campanas_niebla");
     public static final RegistryObject<SoundEvent> SFX_CORWEN_SE_VA = sound("sfx.corwen_se_va");
+    /**
+     * El duelo del Paso del Colmillo (parte 7ap): el duelo que empieza, Sigrun que se rinde, que cae, que se va por la nieve, su
+     * esfuerzo en cada golpe, su dolor y el salto que cae en la nieve.
+     */
+    public static final RegistryObject<SoundEvent> SFX_DUELO_EMPIEZA = sound("sfx.duelo_empieza");
+    public static final RegistryObject<SoundEvent> SFX_SIGRUN_RINDE = sound("sfx.sigrun_rinde");
+    public static final RegistryObject<SoundEvent> SFX_SIGRUN_MUERE = sound("sfx.sigrun_muere");
+    public static final RegistryObject<SoundEvent> SFX_SIGRUN_SE_VA = sound("sfx.sigrun_se_va");
+    public static final RegistryObject<SoundEvent> SFX_SIGRUN_ESFUERZO = sound("sfx.sigrun_esfuerzo");
+    public static final RegistryObject<SoundEvent> SFX_SIGRUN_DOLOR = sound("sfx.sigrun_dolor");
+    public static final RegistryObject<SoundEvent> SFX_SIGRUN_SALTO = sound("sfx.sigrun_salto");
     /** Ponerse una pieza de armadura (parte 7ai): de placas, de malla, de cuero y pieles o de tela. */
     public static final RegistryObject<SoundEvent> SFX_ARMADURA_PLACAS = sound("sfx.armadura_placas");
     public static final RegistryObject<SoundEvent> SFX_ARMADURA_MALLA = sound("sfx.armadura_malla");
@@ -654,6 +665,8 @@ public class DarkCraftMod {
     public static final RegistryObject<SoundEvent> MUSICA_ISOLDE = sound("musica.isolde");
     public static final RegistryObject<SoundEvent> MUSICA_SOMBRA_1 = sound("musica.sombra1");
     public static final RegistryObject<SoundEvent> MUSICA_SOMBRA_2 = sound("musica.sombra2");
+    /** El duelo con Sigrun en el Paso del Colmillo (parte 7ap): "Final Confrontation" de tcarisland. */
+    public static final RegistryObject<SoundEvent> MUSICA_SIGRUN = sound("musica.sigrun");
     /** La musica del final (parte 7ad): la cinematica y los creditos del alba ("New Sunrise") y de la nueva Sombra. */
     public static final RegistryObject<SoundEvent> MUSICA_FINAL_ALBA = sound("musica.final_alba");
     public static final RegistryObject<SoundEvent> MUSICA_FINAL_SOMBRA = sound("musica.final_sombra");
@@ -1022,6 +1035,10 @@ public class DarkCraftMod {
     public static final RegistryObject<EntityType<com.darkcraft.morvain.Corazon>> CORAZON_SOMBRA = ENTITIES.register("corazon_sombra",
             () -> EntityType.Builder.<com.darkcraft.morvain.Corazon>of(com.darkcraft.morvain.Corazon::new, MobCategory.MISC)
                     .sized(0.8f, 0.9f).fireImmune().noSave().clientTrackingRange(10).build(MODID + ":corazon_sombra"));
+    // ---- Sigrun, la Guardiana del Paso del Colmillo (parte 7ap): el duelo de las Montanas Nevadas (se habla con ella; no muere)
+    public static final RegistryObject<EntityType<com.darkcraft.enemigos.Sigrun>> SIGRUN = ENTITIES.register("sigrun",
+            () -> EntityType.Builder.<com.darkcraft.enemigos.Sigrun>of(com.darkcraft.enemigos.Sigrun::new, MobCategory.MONSTER)
+                    .sized(0.7f, 2.2f).clientTrackingRange(10).updateInterval(1).build(MODID + ":sigrun"));
     // ---- Ser Lucan, el Jinete Nocturno del camino de nubes (parte 7x): el caballo y su jinete, una sola entidad (va deprisa:
     // la posicion se manda cada tick para que el galope se vea suave)
     public static final RegistryObject<EntityType<com.darkcraft.enemigos.Jinete>> JINETE = ENTITIES.register("jinete",
@@ -1173,6 +1190,9 @@ public class DarkCraftMod {
             () -> new com.darkcraft.mision.ObjetoMision("yesquero", new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.RARE)));
     public static final RegistryObject<Item> PERTIGA_FAROLERO = ITEMS.register("pertiga_farolero",
             () -> new com.darkcraft.mision.Pertiga(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
+    /** La espada larga de Sigrun (parte 7ap: para quien acaba con ella); su escudo es uno de {@link #ESCUDOS} (el de la Guardiana). */
+    public static final RegistryObject<Item> ESPADA_GUARDIANA = ITEMS.register("espada_guardiana",
+            () -> new com.darkcraft.mision.EspadaGuardiana(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     /** El martillo de Dorvan (solo para que lo lleve en la mano) y las piedras de forja (I, II y III: mejoran las armas). */
     public static final RegistryObject<Item> MARTILLO_HERRERO = ITEMS.register("martillo_herrero",
             () -> new Item(new Item.Properties().stacksTo(1)));
@@ -1226,7 +1246,7 @@ public class DarkCraftMod {
     static {
         for (com.darkcraft.armas.Escudo.Tamano t : com.darkcraft.armas.Escudo.Tamano.values())
             ESCUDOS.put(t, ITEMS.register(t.id, () -> new com.darkcraft.armas.Escudo(t, new Item.Properties().stacksTo(1)
-                    .rarity(t == com.darkcraft.armas.Escudo.Tamano.GRANDE ? Rarity.UNCOMMON : Rarity.COMMON))));
+                    .rarity(t == com.darkcraft.armas.Escudo.Tamano.GUARDIANA ? Rarity.EPIC : t == com.darkcraft.armas.Escudo.Tamano.GRANDE ? Rarity.UNCOMMON : Rarity.COMMON))));
     }
 
     public static final RegistryObject<EntityType<com.darkcraft.armas.FlechaEspecial>> FLECHA_ESPECIAL = ENTITIES.register("flecha_especial",
@@ -1344,6 +1364,7 @@ public class DarkCraftMod {
         e.put(GARGOLA.get(), com.darkcraft.enemigos.Gargola.atributos().build());
         e.put(CENTINELA.get(), com.darkcraft.enemigos.Centinela.atributos().build());
         e.put(ISOLDE.get(), com.darkcraft.enemigos.Isolde.atributos().build());
+        e.put(SIGRUN.get(), com.darkcraft.enemigos.Sigrun.atributos().build());
         e.put(SOMBRA.get(), com.darkcraft.enemigos.Sombra.atributos().build());
         e.put(CORAZON_SOMBRA.get(), com.darkcraft.morvain.Corazon.atributos().build());
         e.put(MARCADO.get(), com.darkcraft.enemigos.Marcado.atributos().build());
@@ -1391,6 +1412,7 @@ public class DarkCraftMod {
             e.accept(ALABARDA);
             e.accept(LANZA_TAM);
             e.accept(PERTIGA_FAROLERO);
+            e.accept(ESPADA_GUARDIANA);
             e.accept(MAZA);
             e.accept(MARTILLO_GUERRA);
             e.accept(GRAN_MARTILLO);

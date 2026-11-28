@@ -29,7 +29,7 @@ JAVA_CLI = os.path.join(REPO, "src/main/java/com/darkcraft/client/enemigos")
 JAVA_COM = os.path.join(REPO, "src/main/java/com/darkcraft/enemigos")
 HERRAMIENTA = "tools/enemigos/generar.py"
 
-PERSONAJES = ("hueco", "ahogado", "capitan", "guardia", "arquero", "perro", "espectro", "elite", "brandt", "corteza", "corcel", "marchito", "molinera", "ahorcado", "verdugo", "podrido", "barquero", "helado", "abad", "calcinado", "condestable", "erudito", "rectora", "salobre", "ballenero", "vieja", "penitente", "pontifice", "marcado", "aldric", "gigante", "jinete", "bufon", "dragon", "gargola", "centinela", "isolde", "sombra")
+PERSONAJES = ("hueco", "ahogado", "capitan", "guardia", "arquero", "perro", "espectro", "elite", "brandt", "corteza", "corcel", "marchito", "molinera", "ahorcado", "verdugo", "podrido", "barquero", "helado", "abad", "calcinado", "condestable", "erudito", "rectora", "salobre", "ballenero", "vieja", "penitente", "pontifice", "marcado", "aldric", "gigante", "jinete", "bufon", "dragon", "gargola", "centinela", "isolde", "sombra", "sigrun")
 
 
 def clase(nombre):
