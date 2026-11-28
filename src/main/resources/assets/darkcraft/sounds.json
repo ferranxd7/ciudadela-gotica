@@ -8572,5 +8572,163 @@
         "stream": true
       }
     ]
+  },
+  "sfx.enterrado_gemido": {
+    "subtitle": "subtitles.darkcraft.sfx.enterrado_gemido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/enterrado_gemido_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/enterrado_gemido_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "sfx.enterrado_alerta": {
+    "subtitle": "subtitles.darkcraft.sfx.enterrado_alerta",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/enterrado_alerta_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/enterrado_alerta_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.enterrado_dolor": {
+    "subtitle": "subtitles.darkcraft.sfx.enterrado_dolor",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/enterrado_dolor_1"
+      },
+      {
+        "name": "darkcraft:sfx/enterrado_dolor_2"
+      }
+    ]
+  },
+  "sfx.enterrado_muerte": {
+    "subtitle": "subtitles.darkcraft.sfx.enterrado_muerte",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/enterrado_muerte_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/enterrado_muerte_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "sfx.enterrado_pica": {
+    "subtitle": "subtitles.darkcraft.sfx.enterrado_pica",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/enterrado_pica_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/enterrado_pica_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/enterrado_pica_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.enterrado_mecha": {
+    "subtitle": "subtitles.darkcraft.sfx.enterrado_mecha",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/enterrado_mecha_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "darkcraft:sfx/enterrado_mecha_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "sfx.enterrado_estallido": {
+    "subtitle": "subtitles.darkcraft.sfx.enterrado_estallido",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/enterrado_estallido_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/enterrado_estallido_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.enterrado_almadena": {
+    "subtitle": "subtitles.darkcraft.sfx.enterrado_almadena",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/enterrado_almadena_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "darkcraft:sfx/enterrado_almadena_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "sfx.enterrado_alzarse": {
+    "subtitle": "subtitles.darkcraft.sfx.enterrado_alzarse",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/enterrado_alzarse_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/enterrado_alzarse_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "sfx.mina_derrumbe": {
+    "subtitle": "subtitles.darkcraft.sfx.mina_derrumbe",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/mina_derrumbe_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "darkcraft:sfx/mina_derrumbe_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "sfx.mina_cruje": {
+    "subtitle": "subtitles.darkcraft.sfx.mina_cruje",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/mina_cruje_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "darkcraft:sfx/mina_cruje_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "ambiente.mina": {
+    "subtitle": "subtitles.darkcraft.ambiente.mina",
+    "sounds": [
+      {
+        "name": "darkcraft:sfx/mina_ambiente_1",
+        "stream": true
+      },
+      {
+        "name": "darkcraft:sfx/mina_ambiente_2",
+        "stream": true
+      }
+    ]
   }
 }

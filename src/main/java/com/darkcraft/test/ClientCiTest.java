@@ -6703,6 +6703,8 @@ public final class ClientCiTest {
         t = corwen(t);
         // el duelo del Paso del Colmillo: Sigrun, la Guardiana del Paso (parte 7ap)
         t = sigrun(t);
+        // las Minas de Hierro Negro y los enterrados (parte 7aq)
+        t = mina(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -14384,6 +14386,491 @@ public final class ClientCiTest {
             });
         });
         return t + 10;
+    }
+
+    // ------------------------------------------------------------------ las Minas de Hierro Negro y los enterrados (parte 7aq)
+
+    private static final com.darkcraft.enemigos.Enterrado[] ENTERRADOS = new com.darkcraft.enemigos.Enterrado[3];
+
+    private static com.darkcraft.enemigos.Enterrado enterradoNuevo(ServerLevel lvl, int variante, double x, double y, double z, float giro, int postura) {
+        var a = DarkCraftMod.ENTERRADO.get().create(lvl);
+        if (a == null) return null;
+        a.variante(variante);
+        a.moveTo(x, y, z, giro, 0f);
+        a.yBodyRot = a.yHeadRot = giro;
+        if (postura != com.darkcraft.enemigos.Enemigo.DE_PIE) a.asignar("", -1, a.blockPosition(), giro, postura, 0);
+        lvl.addFreshEntity(a);
+        return a;
+    }
+
+    private static void quitarEnterrados(ServerLevel lvl) {
+        for (int i = 0; i < ENTERRADOS.length; i++) {
+            if (ENTERRADOS[i] != null && !ENTERRADOS[i].isRemoved()) ENTERRADOS[i].discard();
+            ENTERRADOS[i] = null;
+        }
+        if (lvl == null) return;
+        var caja = new net.minecraft.world.phys.AABB(com.darkcraft.morvain.Mina.X0, 80, com.darkcraft.morvain.Mina.Z0, com.darkcraft.morvain.Mina.X1, 260,
+                com.darkcraft.morvain.Mina.Z1);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Cartucho.class, caja)) e.discard();
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.Enterrado.class, caja, q -> q.sitio() == null || q.sitio().isEmpty())) e.discard();
+    }
+
+    private static String estadoEnterrados() {
+        StringBuilder sb = new StringBuilder();
+        for (var a : ENTERRADOS) sb.append(a == null ? "-" : estadoE(a)).append(" | ");
+        return sb + String.format(java.util.Locale.ROOT, "cartuchos %d (caen %d, revientan %d, dan %d, a enterrados %d), guardias rotas %d, ondas %d, embestidas %d,"
+                        + " se levantan %d, morrales %d, derrumbes %d (pillan %d)",
+                com.darkcraft.enemigos.Enterrado.CARTUCHOS, com.darkcraft.enemigos.Cartucho.CAEN, com.darkcraft.enemigos.Cartucho.REVIENTAN,
+                com.darkcraft.enemigos.Cartucho.DAN, com.darkcraft.enemigos.Cartucho.DAN_ENTERRADOS, com.darkcraft.enemigos.Enterrado.GUARDIAS,
+                com.darkcraft.enemigos.Enterrado.ONDAS, com.darkcraft.enemigos.Enterrado.EMBESTIDAS, com.darkcraft.enemigos.Enterrado.ALZADOS,
+                com.darkcraft.enemigos.Enterrado.MORRALES, com.darkcraft.morvain.Mina.DERRUMBES, com.darkcraft.morvain.Mina.DERRUMBE_DAN);
+    }
+
+    /** Lo de la mina en una captura: el sitio, el aire de la mina y la ventisca (del cliente), los logros y la escotilla. */
+    private static void logMina(Minecraft m, String que) {
+        String musica = ClientMusic.mina() + ", " + ClientMusic.montana();
+        server(m, sp -> log("  mina, " + que + ": sitio " + com.darkcraft.morvain.Morvain.lugar(sp) + " | " + musica + " | logro minas "
+                + com.darkcraft.story.Logros.tiene(sp, "minas") + " | " + fpos(sp)));
+    }
+
+    /** Un sitio de la mina (u, dy, v del marco de la mina) visto desde otro: en creativo, volando. */
+    private static int vistaMina(int t, String nombre, double u, double y, double v, double mu, double my, double mv, int espera, boolean deNoche) {
+        final int CX = com.darkcraft.morvain.Mina.CX, CZ = com.darkcraft.morvain.Mina.CZ;
+        atTicks(t, "La mina: " + nombre, m -> server(m, sp -> {
+            sp.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+            if (deNoche) sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+            irMirando(sp, CX + u, y, CZ + v, CX + mu, my, CZ + mv, true);
+        }));
+        t += espera;
+        final String cap = "cliente_" + nombre;
+        atTicks(t, "captura: " + nombre, m -> {
+            logMina(m, nombre);
+            shot(m, cap);
+        });
+        return t + 4;
+    }
+
+    /** Un golpe de un enterrado visto de lado: el enterrado en (x, z) mirando al sur, el jugador delante (al sur) y la camara al este. */
+    private static int golpeEnterrado(int t, String nombre, int variante, int accion, double dist, int captura, double ex, double ey, double ez) {
+        atTicks(t, "La mina: " + nombre, m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarEnterrados(lvl);
+                aPelear(sp, true);
+                ENTERRADOS[0] = enterradoNuevo(lvl, variante, ex, ey, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+                irMirando(sp, ex, ey, ez + dist, ex, ey + 1.4, ez, false);
+                var a = ENTERRADOS[0];
+                if (a == null) return;
+                a.setTarget(sp);
+                a.setYRot(0f);
+                a.yBodyRot = a.yHeadRot = 0f;
+                a.empezar(accion);
+                verDesdeServidor = new Vec3(ex + 4.6 + (variante == com.darkcraft.enemigos.Enterrado.CARGADOR ? 1.0 : 0), ey + 2.4, ez + dist * 0.5 + 0.8);
+                miraServidor = new Vec3(ex, ey + 1.2, ez + dist * 0.5);
+            });
+        });
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += captura - 2;
+        final String cap = "cliente_" + nombre;
+        atTicks(t, "captura: " + nombre, m -> {
+            server(m, sp -> log("  " + nombre + ": " + estadoEnterrados() + " | jugador vida " + Math.round(sp.getHealth()) + ", frenado "
+                    + sp.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN) + ", ardiendo " + sp.isOnFire()
+                    + String.format(java.util.Locale.ROOT, " en %.1f, %.1f, %.1f", sp.getX(), sp.getY(), sp.getZ())));
+            shot(m, cap);
+        });
+        return t;
+    }
+
+    /**
+     * Las Minas de Hierro Negro (parte 7aq): desde el santuario de la Bocamina, la corta desde el borde, la bocamina, la Galeria del
+     * Rey, el polvorin, el comedor, el hundimiento, la rampa, la Gruta del Agua Negra (con y sin vision nocturna), las literas, la
+     * capilla y, en aventura, un golpe al muro de detras del altar (el escondido); el enganche de abajo y la escala, la palanca que
+     * abre la escotilla (desde abajo y el castillete desde fuera), la Caverna del Filon y todo desde lo alto; entrar a pie en la
+     * corta (el logro, el sitio) y bajar a las galerias (el aire de la mina). En supervivencia, en el fondo de la corta: un picador
+     * picando, el picotazo, el barrido, el pico que engancha el escudo, el cartucho (en el aire, en el suelo y su estallido), el
+     * mechazo, el almadenazo y la embestida, uno que sale de los escombros, agachado junto a uno (no te oye) y corriendo (te oye);
+     * un techo roto que cruje y se viene abajo; uno que cae y se deshace; el libro de turnos y el bestiario. Al acabar vuelve todo
+     * (los enterrados, el muro y la escotilla cerrados).
+     */
+    private static int mina(int T) {
+        final int CX = com.darkcraft.morvain.Mina.CX, CZ = com.darkcraft.morvain.Mina.CZ, PISO = com.darkcraft.morvain.Mina.PISO;
+        final int FONDO = com.darkcraft.morvain.Mina.FONDO, N1 = com.darkcraft.morvain.Mina.N1, N2 = com.darkcraft.morvain.Mina.N2, N3 = com.darkcraft.morvain.Mina.N3;
+        final int SUELO = com.darkcraft.morvain.Mina.SUELO;
+        final var SA = com.darkcraft.morvain.SantuariosMorvain.porId("bocamina");
+        final var A = com.darkcraft.morvain.Mina.get();
+        int t = T;
+        atTicks(t, "La mina: desde el santuario de la Bocamina", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                comando(sp, "darkcraft mina muro cerrar");
+                comando(sp, "darkcraft mina escotilla cerrar");
+                comando(sp, "darkcraft mina enemigos volver");
+                irMirando(sp, SA.x() + 9.5, SA.y() + 7, SA.z() + 8.5, CX + 4, SUELO + 2, CZ - 34, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura: la mina desde el santuario", m -> {
+            shot(m, "cliente_mn01_bocamina_santuario");
+            server(m, sp -> log("  la mina: " + com.darkcraft.morvain.MorvainEnemigos.estadoMina(sp.server) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp)));
+        });
+        t += 6;
+        t = vistaMina(t, "mn02_corta_borde", -4.5, PISO + 5, 1.5, 4, FONDO, -36, 70, false);
+        t = vistaMina(t, "mn03_corta_escalera", 6.5, PISO + 1, -4.5, -12, FONDO + 4, -16, 40, false);
+        t = vistaMina(t, "mn04_bocamina", 0.5, FONDO + 2.8, -32.5, 0.5, N1 + 3, -45, 40, false);
+        t = vistaMina(t, "mn05_galeria_rey", 0.5, N1 + 2.5, -48.5, 0.5, N1 + 2, -76, 60, true);
+        t = vistaMina(t, "mn06_polvorin", -26.5, N1 + 2.4, -62.5, -36, N1 + 1.2, -62.5, 40, true);
+        t = vistaMina(t, "mn07_comedor", 23.5, N1 + 2.4, -61.5, 33, N1 + 1.2, -62.5, 40, true);
+        t = vistaMina(t, "mn08_hundimiento", 0.5, N1 + 2.6, -78.5, 0.5, N1 + 2, -94, 40, true);
+        t = vistaMina(t, "mn09_rampa", -30.5, N1 + 2.8, -95.5, -30.5, N1 - 4, -114, 50, true);
+        t = vistaMina(t, "mn10_gruta_agua_negra", -24.5, N2 + 4.5, -145.5, 4, N2, -151, 70, true);
+        t = vistaMina(t, "mn11_gruta_sin_vision", -24.5, N2 + 4.5, -145.5, 4, N2, -151, 20, false);
+        t = vistaMina(t, "mn12_literas", 38.5, N2 + 2.4, -120.5, 47, N2 + 1.2, -120.5, 50, true);
+        t = vistaMina(t, "mn13_capilla", 32.5, N2 + 2.4, -106.5, 23, N2 + 2, -106.5, 40, true);
+        // ---- en aventura: un golpe al muro de detras del altar (el ataque del combate) y el escondido
+        atTicks(t, "La mina: ante el altar, en aventura", m -> server(m, sp -> {
+            sp.setGameMode(GameType.ADVENTURE);
+            sp.setHealth(sp.getMaxHealth());
+            sp.getInventory().selected = 0;
+            sp.getInventory().items.set(0, new ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+            sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
+            comando(sp, "darkcraft mina enemigos fuera");
+            irMirando(sp, CX + 27.5, N2 + 1, CZ - 105.5, CX + 24, N2 + 2.6, CZ - 105.5, false);
+        }));
+        t += 30;
+        atTicks(t, "La mina: un golpe al muro (el ataque del combate)", m -> server(m, sp -> {
+            com.darkcraft.combate.Combate.pedir(sp, com.darkcraft.combate.Armas.LIGERO, 0, false, 0);
+            log("  tras el golpe: " + com.darkcraft.morvain.MurosIlusorios.estado(sp.serverLevel()) + "; logro secreto=" + com.darkcraft.story.Logros.tiene(sp, "secreto"));
+        }));
+        t += 6;
+        atTicks(t, "captura: el muro se deshace", m -> shot(m, "cliente_mn14_muro_capilla"));
+        t += 10;
+        atTicks(t, "La mina: creativo otra vez", m -> server(m, sp -> sp.setGameMode(GameType.CREATIVE)));
+        t += 2;
+        t = vistaMina(t, "mn15_escondido", 23.5, N2 + 2.4, -106.5, 17, N2 + 1, -106.5, 40, true);
+        t = vistaMina(t, "mn16_enganche_escala", 24.5, N2 + 2.4, -83.5, 19, N2 + 7, -86, 40, true);
+        // ---- la palanca de debajo de la escotilla: en la escala, la mano en la palanca (el clic del cliente)
+        atTicks(t, "La mina: en lo alto de la escala, la palanca", m -> server(m, sp -> {
+            sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+            int[] e = A.sitio("escotilla");
+            irMirando(sp, e[0] + 0.5, SUELO - 2.9, e[2] + 0.62, e[0] + 1.5, SUELO - 0.6, e[2] + 0.5, true);
+        }));
+        t += 40;
+        atTicks(t, "captura: la palanca y la escotilla cerrada", m -> {
+            server(m, sp -> log("  bajo la escotilla: " + com.darkcraft.morvain.Mina.resumen(sp.serverLevel())));
+            shot(m, "cliente_mn17_escotilla_cerrada");
+        });
+        t += 4;
+        atTicks(t, "La mina: clic en la palanca", m -> {
+            int[] e = A.sitio("escotilla");
+            BlockPos pal = new BlockPos(e[0] + 1, SUELO - 1, e[2]);
+            if (m.gameMode != null && m.player != null)
+                m.gameMode.useItemOn(m.player, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(pal), Direction.WEST, pal, false));
+        });
+        t += 10;
+        atTicks(t, "La mina: mirando arriba, por la escotilla", m -> server(m, sp -> {
+            log("  tras la palanca: " + com.darkcraft.morvain.Mina.resumen(sp.serverLevel()));
+            int[] e = A.sitio("escotilla");
+            irMirando(sp, e[0] + 0.5, SUELO - 3.2, e[2] + 1.4, e[0] + 0.5, SUELO + 6, e[2] + 0.2, true);
+        }));
+        t += 20;
+        atTicks(t, "captura: la escotilla abierta desde abajo", m -> shot(m, "cliente_mn18_escotilla_abierta"));
+        t += 4;
+        t = vistaMina(t, "mn19_castillete", 12.5, PISO + 5, -72.5, 19, PISO, -86, 40, false);
+        t = vistaMina(t, "mn20_caverna_filon", -9.5, N3 + 4, -183.5, 2, N3 + 3, -201, 70, true);
+        t = vistaMina(t, "mn21_mina_alto", 34.5, PISO + 44, 62.5, 0, FONDO, -50, 90, false);
+        // ---- entrar a pie, en aventura: el cartel con el nombre, el logro y el aire de la mina
+        atTicks(t, "La mina: entrar a pie en la corta", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = false;
+            server(m, sp -> {
+                sp.removeAllEffects();
+                sp.setGameMode(GameType.ADVENTURE);
+                sp.getAbilities().flying = false;
+                sp.onUpdateAbilities();
+                int[] b = A.sitio("banco1");
+                sp.teleportTo(sp.serverLevel(), b[0] + 0.5, b[1], b[2] + 0.5, 180f, 10f);
+            });
+        });
+        t += 60;
+        atTicks(t, "captura: en la corta", m -> {
+            logMina(m, "en la corta");
+            server(m, sp -> log("  cartel " + com.darkcraft.client.ui.Carteles.resumen()));
+            shot(m, "cliente_mn22_en_la_corta");
+        });
+        t += 4;
+        atTicks(t, "La mina: en la galeria", m -> server(m, sp -> {
+            int[] g = A.sitio("galeria");
+            sp.teleportTo(sp.serverLevel(), g[0] + 0.5, g[1], g[2] + 0.5, 180f, 0f);
+        }));
+        t += 80;
+        atTicks(t, "captura: en la galeria (el aire de la mina)", m -> logMina(m, "en la galeria"));
+        t += 4;
+        // ---- en supervivencia, en el fondo de la corta: los golpes de los enterrados, de lado
+        final double ex = CX + 0.5, ey = FONDO + 1, ez = CZ - 24.5;
+        atTicks(t, "La mina: a pelear (supervivencia, en el fondo de la corta)", m -> {
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> comando(sp, "darkcraft mina enemigos fuera"));
+        });
+        t += 4;
+        // un picador picando la pared del oeste del fondo, de cerca
+        atTicks(t, "La mina: un picador picando", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarEnterrados(lvl);
+                sp.setGameMode(GameType.CREATIVE);
+                ENTERRADOS[0] = enterradoNuevo(lvl, com.darkcraft.enemigos.Enterrado.PICADOR, ex - 18, ey, ez, 90f, com.darkcraft.enemigos.Enemigo.REZA);
+                irMirando(sp, ex - 15.2, ey + 1.0, ez + 2.6, ex - 18.6, ey + 1.3, ez, true);
+            });
+        });
+        t += 41;
+        atTicks(t, "captura: picando", m -> {
+            server(m, sp -> log("  picando: " + estadoEnterrados()));
+            shot(m, "cliente_mn23_picando");
+        });
+        t += 4;
+        final int P = com.darkcraft.enemigos.Enterrado.PICADOR, B = com.darkcraft.enemigos.Enterrado.BARRENERO, C = com.darkcraft.enemigos.Enterrado.CARGADOR;
+        t = golpeEnterrado(t, "mn24_picotazo", P, com.darkcraft.enemigos.EnterradoAnims.PICOTAZO, 2.4, 21, ex, ey, ez) + 30;
+        t = golpeEnterrado(t, "mn25_barrido", P, com.darkcraft.enemigos.EnterradoAnims.BARRIDO, 2.2, 13, ex, ey, ez) + 30;
+        // el pico engancha el escudo: el jugador cubierto (un escudo en la izquierda) y el picotazo
+        atTicks(t, "La mina: cubierto con el escudo", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarEnterrados(lvl);
+                aPelear(sp, true);
+                sp.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(net.minecraft.world.item.Items.SHIELD));
+                irMirando(sp, ex, ey, ez + 2.4, ex, ey + 1.4, ez, false);
+                sp.startUsingItem(InteractionHand.OFF_HAND);
+                ENTERRADOS[0] = enterradoNuevo(lvl, P, ex, ey, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+            });
+        });
+        t += 12;
+        atTicks(t, "La mina: el picotazo contra el escudo", m -> server(m, sp -> {
+            var a = ENTERRADOS[0];
+            if (!sp.isUsingItem()) sp.startUsingItem(InteractionHand.OFF_HAND);
+            log("  cubierto: " + sp.isBlocking());
+            if (a == null) return;
+            a.setTarget(sp);
+            a.setYRot(0f);
+            a.yBodyRot = a.yHeadRot = 0f;
+            a.empezar(com.darkcraft.enemigos.EnterradoAnims.PICOTAZO);
+            verDesdeServidor = new Vec3(ex + 4.6, ey + 2.4, ez + 2.0);
+            miraServidor = new Vec3(ex, ey + 1.2, ez + 1.2);
+        }));
+        t += 2;
+        atTicks(t, "camara de lado", m -> {
+            if (verDesdeServidor != null) verDesde(m, verDesdeServidor, miraServidor);
+        });
+        t += 20;
+        atTicks(t, "captura: el pico engancha el escudo", m -> {
+            server(m, sp -> log("  el escudo: " + estadoEnterrados() + " | cubierto " + sp.isBlocking() + ", escudo en espera "
+                    + sp.getCooldowns().isOnCooldown(net.minecraft.world.item.Items.SHIELD) + ", vida " + Math.round(sp.getHealth())));
+            shot(m, "cliente_mn26_escudo_enganchado");
+        });
+        t += 30;
+        atTicks(t, "La mina: sin escudo", m -> server(m, sp -> {
+            sp.stopUsingItem();
+            sp.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+        }));
+        t += 2;
+        // el cartucho: en el aire (el barrenero lo lanza al jugador, a 8)
+        t = golpeEnterrado(t, "mn27_cartucho_lanza", B, com.darkcraft.enemigos.EnterradoAnims.LANZAR, 8.0, 21, ex, ey, ez) + 4;
+        atTicks(t, "La mina: el jugador se aparta", m -> server(m, sp -> irMirando(sp, ex + 6, ey, ez + 12, ex, ey + 0.4, ez + 8, false)));
+        t += 80;
+        // un cartucho a sus pies: la mecha en el suelo y el estallido (el del morral: revienta a los 26 ticks de caer)
+        atTicks(t, "La mina: un cartucho en el suelo", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarEnterrados(lvl);
+                aPelear(sp, true);
+                irMirando(sp, ex + 5.5, ey, ez + 5.5, ex, ey + 0.2, ez, false);
+                var c = new com.darkcraft.enemigos.Cartucho(lvl, sp);
+                c.morral(ex, ey + 0.1, ez);
+                lvl.addFreshEntity(c);
+                ENTERRADOS[1] = enterradoNuevo(lvl, C, ex - 1.6, ey, ez - 0.8, 160f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+                if (ENTERRADOS[1] != null) ENTERRADOS[1].setNoAi(true);
+            });
+        });
+        t += 12;
+        atTicks(t, "captura: la mecha", m -> {
+            server(m, sp -> log("  la mecha: " + estadoEnterrados()));
+            shot(m, "cliente_mn28_cartucho_mecha");
+        });
+        t += 19;
+        atTicks(t, "captura: el estallido", m -> {
+            server(m, sp -> log("  el estallido: " + estadoEnterrados() + " | vida del jugador " + Math.round(sp.getHealth())));
+            shot(m, "cliente_mn29_cartucho_estallido");
+        });
+        t += 30;
+        t = golpeEnterrado(t, "mn30_mechazo", B, com.darkcraft.enemigos.EnterradoAnims.MECHAZO, 2.0, 11, ex, ey, ez) + 30;
+        t = golpeEnterrado(t, "mn31_almadenazo", C, com.darkcraft.enemigos.EnterradoAnims.ALMADENAZO, 2.6, 27, ex, ey, ez) + 30;
+        t = golpeEnterrado(t, "mn32_embestida", C, com.darkcraft.enemigos.EnterradoAnims.EMBESTIDA, 6.5, 11, ex, ey, ez) + 30;
+        // uno en los escombros que sale al llegar el jugador
+        atTicks(t, "La mina: uno en los escombros", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarEnterrados(lvl);
+                sp.removeAllEffects();
+                aPelear(sp, true);
+                ENTERRADOS[1] = enterradoNuevo(lvl, P, ex, ey, ez, 0f, com.darkcraft.enemigos.Enemigo.TUMBADO);
+                irMirando(sp, ex, ey, ez + 6.0, ex, ey + 0.3, ez, false);
+            });
+        });
+        t += 8;
+        atTicks(t, "captura: en los escombros", m -> {
+            server(m, sp -> log("  en los escombros: " + estadoEnterrados()));
+            shot(m, "cliente_mn33_escombros");
+        });
+        t += 4;
+        atTicks(t, "La mina: el jugador se acerca", m -> server(m, sp -> {
+            irMirando(sp, ex, ey, ez + 2.4, ex, ey + 1.0, ez, false);
+            if (ENTERRADOS[1] != null) ENTERRADOS[1].setTarget(sp);
+        }));
+        t += 22;
+        atTicks(t, "captura: sale de los escombros", m -> {
+            server(m, sp -> log("  sale: " + estadoEnterrados()));
+            shot(m, "cliente_mn34_sale_escombros");
+        });
+        t += 30;
+        // agachado junto a un picador de pie no te oye; de pie y corriendo, si (el oido del servidor, con el jugador de verdad)
+        atTicks(t, "La mina: agachado junto a un picador", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            quitarEnterrados(lvl);
+            sp.removeAllEffects();
+            aPelear(sp, true);
+            ENTERRADOS[0] = enterradoNuevo(lvl, P, ex, ey, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+            if (ENTERRADOS[0] != null) ENTERRADOS[0].setNoAi(true);
+            irMirando(sp, ex + 3.2, ey, ez + 0.5, ex, ey + 1.0, ez, false);
+        }));
+        t += 6;
+        atTicks(t, "La mina: agacharse", m -> m.options.keyShift.setDown(true));
+        t += 10;
+        atTicks(t, "captura: agachado", m -> {
+            server(m, sp -> log("  agachado a 3,2: le oye " + (ENTERRADOS[0] != null && ENTERRADOS[0].reparaEn(sp)) + " (agachado " + sp.isCrouching() + ")"));
+            m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            shot(m, "cliente_mn35_agachado");
+        });
+        t += 4;
+        atTicks(t, "La mina: de pie", m -> {
+            m.options.keyShift.setDown(false);
+            m.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+        });
+        t += 10;
+        atTicks(t, "La mina: de pie, quieto", m -> server(m, sp -> log("  de pie y quieto a 3,2: le oye " + (ENTERRADOS[0] != null && ENTERRADOS[0].reparaEn(sp))
+                + " (agachado " + sp.isCrouching() + ")")));
+        t += 4;
+        // ---- un techo roto de la Galeria del Rey que cruje y se viene abajo (el comando lo hace temblar)
+        atTicks(t, "La mina: bajo un techo roto", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                ServerLevel lvl = sp.serverLevel();
+                quitarEnterrados(lvl);
+                sp.setGameMode(GameType.CREATIVE);
+                sp.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20 * 60, 0, false, false, false));
+                int[] d = A.derrumbes().get(0);
+                irMirando(sp, d[0] + 0.5, N1 + 1.2, d[2] + 6.5, d[0] + 0.5, N1 + 3.5, d[2] + 0.5, true);
+            });
+        });
+        t += 50;
+        atTicks(t, "La mina: tiembla", m -> server(m, sp -> comando(sp, "darkcraft mina derrumbe 0")));
+        t += 6;
+        atTicks(t, "captura: el techo cruje", m -> {
+            server(m, sp -> log("  cruje: avisados " + com.darkcraft.morvain.Mina.avisados() + ", " + estadoEnterrados()));
+            shot(m, "cliente_mn36_techo_cruje");
+        });
+        t += 20;
+        atTicks(t, "captura: se viene abajo", m -> {
+            server(m, sp -> log("  cae: avisados " + com.darkcraft.morvain.Mina.avisados() + ", " + estadoEnterrados()));
+            shot(m, "cliente_mn37_techo_cae");
+        });
+        t += 10;
+        // ---- uno que cae y se deshace en polvo (en el fondo de la corta)
+        atTicks(t, "La mina: un cargador cae", m -> server(m, sp -> {
+            ServerLevel lvl = sp.serverLevel();
+            sp.removeAllEffects();
+            aPelear(sp, true);
+            ENTERRADOS[0] = enterradoNuevo(lvl, C, ex, ey, ez, 0f, com.darkcraft.enemigos.Enemigo.DE_PIE);
+            irMirando(sp, ex + 3.5, ey, ez + 4.5, ex, ey + 1.0, ez, false);
+        }));
+        t += 20;
+        atTicks(t, "La mina: le pega", m -> server(m, sp -> {
+            var a = ENTERRADOS[0];
+            if (a == null) return;
+            a.hurt(sp.damageSources().playerAttack(sp), 9999f);
+            a.setDeltaMovement(Vec3.ZERO);
+        }));
+        t += 37;
+        atTicks(t, "captura: se deshace en polvo", m -> {
+            server(m, sp -> log("  cae: " + estadoEnterrados() + " | logro enterrado " + com.darkcraft.story.Logros.tiene(sp, "enterrado")));
+            shot(m, "cliente_mn38_se_deshace");
+        });
+        t += 30;
+        atTicks(t, "La mina: sin enterrados (para el libro y el bestiario)", m -> server(m, sp -> {
+            quitarEnterrados(sp.serverLevel());
+            sp.removeAllEffects();
+            sp.clearFire();
+            sp.setHealth(sp.getMaxHealth());
+            sp.setGameMode(GameType.CREATIVE);
+        }));
+        t += 6;
+        atTicks(t, "La mina: el libro de turnos", m -> {
+            enPrimeraPersona(m);
+            com.darkcraft.client.ui.CodiceScreen.abrir(com.darkcraft.client.ui.CodiceScreen.perdido(com.darkcraft.morvain.Mina.LIBRO));
+        });
+        t += 30;
+        atTicks(t, "captura", m -> shot(m, "cliente_mn39_libro_turnos"));
+        t += 6;
+        String[] bestias = {"enterrado_picador", "enterrado_barrenero", "enterrado_cargador"};
+        for (int i = 0; i < bestias.length; i++) {
+            final String b = bestias[i];
+            final int n = 40 + i;
+            atTicks(t, "el bestiario: " + b, m -> {
+                m.setScreen(null);
+                m.options.hideGui = false;
+                com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+                menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf(b)));
+            });
+            t += 18;
+            atTicks(t, "captura: " + b + " en el bestiario", m -> {
+                menuP(m, mm -> log("  " + mm.resumen()));
+                shot(m, "cliente_mn" + n + "_bestiario_" + b.replace("enterrado_", ""));
+            });
+            t += 4;
+        }
+        atTicks(t, "fin de las Minas de Hierro Negro (vuelven los enterrados, el muro y la escotilla cerrados)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            server(m, sp -> {
+                quitarEnterrados(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                sp.getInventory().setItem(0, ItemStack.EMPTY);
+                comando(sp, "darkcraft mina muro cerrar");
+                comando(sp, "darkcraft mina escotilla cerrar");
+                comando(sp, "darkcraft mina enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+            });
+        });
+        return t + 30;
     }
 
     // ------------------------------------------------------------------ los herreros de Morvain y Silas (parte 7af)

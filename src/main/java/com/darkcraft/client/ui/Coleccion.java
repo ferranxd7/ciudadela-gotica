@@ -31,7 +31,7 @@ public final class Coleccion {
             "espectro_dama", "espectro_vigia", "capitan_elite", "brandt", "corteza", "rey", "gavran", "marchito_guadana", "marchito_farol",
             "marchito_campana", "molinera", "ahorcado_garras", "ahorcado_soga", "verdugo", "podrido", "podrido_fatuo", "podrido_hinchado", "barquero",
             "helado_monje", "helado_penitente", "helado_peregrino", "abad", "sigrun", "calcinado_guardia", "calcinado_incendiario", "calcinado_ceniciento",
-            "condestable", "erudito_aprendiz", "erudito_maestro", "erudito_custodio", "rectora", "salobre_redero", "salobre_bichero",
+            "enterrado_picador", "enterrado_barrenero", "enterrado_cargador", "condestable", "erudito_aprendiz", "erudito_maestro", "erudito_custodio", "rectora", "salobre_redero", "salobre_bichero",
             "salobre_salinero", "ballenero", "penitente_flagelante", "penitente_portador", "penitente_turiferario",
             "pontifice", "marcado_rompedor", "marcado_caballero", "marcado_cazador", "aldric", "gigante_campana", "gigante_costilla",
             "gigante_columna", "jinete", "bufon", "dragon", "gargola", "centinela_espadon", "centinela_alabarda", "isolde", "sombra"};
@@ -62,7 +62,8 @@ public final class Coleccion {
             case "escudero" -> "darkcraft.gavran.escudero";
             case "hueco_horca", "hueco_hoz", "hueco_antorcha", "ahogado_sable", "ahogado_arpon", "marchito_guadana", "marchito_farol",
                  "marchito_campana", "ahorcado_garras", "ahorcado_soga", "podrido_fatuo", "podrido_hinchado", "helado_monje", "helado_penitente",
-                 "helado_peregrino", "calcinado_guardia", "calcinado_incendiario", "calcinado_ceniciento", "erudito_aprendiz", "erudito_maestro",
+                 "helado_peregrino", "calcinado_guardia", "calcinado_incendiario", "calcinado_ceniciento", "enterrado_picador", "enterrado_barrenero",
+                 "enterrado_cargador", "erudito_aprendiz", "erudito_maestro",
                  "erudito_custodio", "salobre_redero", "salobre_bichero", "salobre_salinero", "penitente_flagelante", "penitente_portador",
                  "penitente_turiferario", "marcado_rompedor", "marcado_caballero", "marcado_cazador", "centinela_espadon",
                  "centinela_alabarda" -> "darkcraft.bestiario." + c;
@@ -127,6 +128,12 @@ public final class Coleccion {
                     var k = DarkCraftMod.CALCINADO.get().create(lvl);
                     if (k != null) k.variante(c.endsWith("incendiario") ? com.darkcraft.enemigos.Calcinado.INCENDIARIO
                             : c.endsWith("ceniciento") ? com.darkcraft.enemigos.Calcinado.CENICIENTO : com.darkcraft.enemigos.Calcinado.GUARDIA);
+                    yield k;
+                }
+                case "enterrado_picador", "enterrado_barrenero", "enterrado_cargador" -> {
+                    var k = DarkCraftMod.ENTERRADO.get().create(lvl);
+                    if (k != null) k.variante(c.endsWith("barrenero") ? com.darkcraft.enemigos.Enterrado.BARRENERO
+                            : c.endsWith("cargador") ? com.darkcraft.enemigos.Enterrado.CARGADOR : com.darkcraft.enemigos.Enterrado.PICADOR);
                     yield k;
                 }
                 case "marcado_rompedor", "marcado_caballero", "marcado_cazador" -> {

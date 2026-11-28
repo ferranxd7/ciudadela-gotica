@@ -267,7 +267,7 @@ public final class Morvain {
     }
 
     /** Si hay alguien cerca del Patio del Juramento o del Observatorio (se mira cada segundo). */
-    private static boolean cercaJuramento, cercaObservatorio, cercaCerco, cercaTeatro;
+    private static boolean cercaJuramento, cercaObservatorio, cercaCerco, cercaTeatro, cercaMina;
 
     /** Al acabar cada tick, los que entraron en un portal; y cada segundo, con alguien cerca del arco, su remolino. */
     @SubscribeEvent
@@ -368,6 +368,16 @@ public final class Morvain {
                     Teatro.tick(m);
                 }
             }
+            // las Minas de Hierro Negro (parte 7aq): los techos rotos (cada tick, con alguien cerca) y el muro ilusorio de la capilla
+            if (srv.getTickCount() % 20 == 15) {
+                boolean antes = cercaMina;
+                cercaMina = false;
+                for (ServerPlayer p : m.players())
+                    if (Mina.distancia(p.getX(), p.getZ()) < 230) cercaMina = true;
+                if (cercaMina) MurosIlusorios.tick(m);
+                if (antes && !cercaMina) Mina.rearmar();
+            }
+            if (cercaMina) Mina.tick(m);
         }
         if (m == null || srv.getTickCount() % 20 != 7) return;
         for (ServerPlayer p : m.players())
@@ -444,6 +454,9 @@ public final class Morvain {
         for (ServerPlayer p : m.players())
             if (!p.isSpectator() && Nido.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Nido.PISO) < 14)
                 com.darkcraft.story.Logros.dar(p, "nido");
+        // y quien baja a las Minas de Hierro Negro: a la corta o a sus galerias (parte 7aq)
+        for (ServerPlayer p : m.players())
+            if (!p.isSpectator() && Mina.dentro(p.getX(), p.getY(), p.getZ())) com.darkcraft.story.Logros.dar(p, "minas");
     }
 
     // ------------------------------------------------------------------ morir en Morvain
@@ -483,6 +496,30 @@ public final class Morvain {
         if (Math.abs(e.getPos().getX() - Grieta.CX) > 4 || Math.abs(e.getPos().getZ() - Grieta.CZ) > 4) return;
         if (!m.getBlockState(e.getPos()).is(net.minecraft.world.level.block.Blocks.BELL)) return;
         Grieta.llamar(m, p);
+    }
+
+    /**
+     * En Morvain no se duerme (el tipo de dimension no deja: una cama que se usa revienta y quema lo de alrededor, como en el Nether).
+     * El clic en una cama no hace nada (un aviso); y la escotilla del castillete de la mina, tocada por arriba, dice que esta cerrada
+     * por debajo (parte 7aq).
+     */
+    @SubscribeEvent
+    public static void onCama(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock e) {
+        if (e.getLevel().isClientSide() || !(e.getEntity() instanceof ServerPlayer p) || p.level().dimension() != NIVEL) return;
+        var st = p.level().getBlockState(e.getPos());
+        if (st.getBlock() instanceof net.minecraft.world.level.block.BedBlock) {
+            e.setCanceled(true);
+            e.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+            if (e.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND)
+                p.displayClientMessage(net.minecraft.network.chat.Component.translatable("darkcraft.morvain.cama")
+                        .withStyle(net.minecraft.ChatFormatting.GRAY, net.minecraft.ChatFormatting.ITALIC), true);
+            return;
+        }
+        if (Mina.escotilla(e.getPos()) && st.is(net.minecraft.world.level.block.Blocks.IRON_TRAPDOOR)
+                && !st.getValue(net.minecraft.world.level.block.TrapDoorBlock.OPEN) && p.getY() > e.getPos().getY()
+                && e.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND)
+            p.displayClientMessage(net.minecraft.network.chat.Component.translatable("darkcraft.mina.escotilla_cerrada")
+                    .withStyle(net.minecraft.ChatFormatting.GRAY, net.minecraft.ChatFormatting.ITALIC), true);
     }
 
     @SubscribeEvent
@@ -562,6 +599,11 @@ public final class Morvain {
         // el Teatro Hundido y, bajo la llanura, la Sala de las Mascaras de Pell (parte 7y)
         if (Teatro.enSala(p.getX(), p.getY(), p.getZ())) return "darkcraft.morvain.lugar.mascaras";
         if (Teatro.dentro(p.getX(), p.getZ()) && Math.abs(p.getY() - Teatro.PISO) < 30) return "darkcraft.morvain.lugar.teatro";
+        // las Minas de Hierro Negro: la corta, las galerias, la Gruta del Agua Negra y la Caverna del Filon (parte 7aq)
+        if (Math.abs(p.getX() - Mina.CX) < 70 && p.getZ() < Mina.CZ + 10 && p.getZ() > Mina.CZ - 220) {
+            String k = Mina.lugar(p.getX(), p.getY(), p.getZ());
+            if (k != null) return k;
+        }
         // el Refugio de la Fragua, donde trabaja Hagen (parte 7af)
         if (Herrerias.enRefugio(p.getX(), p.getZ()) && Math.abs(p.getY() - Herrerias.REFUGIO.y()) < 12) return "darkcraft.morvain.lugar.refugio";
         // el Nido de Ceniza y la Atalaya del Cuervo (parte 7z)
