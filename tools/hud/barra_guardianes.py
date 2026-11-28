@@ -78,14 +78,19 @@ la misma disposicion que la del Capitan (la dibuja client/enemigos/GuardianClien
   centro, su casco de hierro con el candil encendido; relleno de la veta roja que corre por la roca negra; piedrecitas y esquirlas de
   cristal rojo que caen al recibir dano.
 
+  Fray Osmund, el Sacristan (parte 7at): la cadena de su incensario tendida de punta a punta (eslabones de bronce de frente y de
+  canto), el hueso con su anilla por donde se coge a la izquierda y el incensario redondo con sus brasas a la derecha; en el centro
+  su aureola de huesos con cinco calaveras y cuatro velas y, dentro, su calavera bajo la capucha con las almas en las cuencas;
+  relleno de polvo de hueso que corre con almas azules; esquirlas de hueso, una calaverita y chispas de almas al recibir dano.
+
   La Sombra sin Nombre (parte 7ac): sus cadenas de hierro negro de punta a punta, rotas por tres sitios (las puntas al rojo), y en
   el centro la capucha sin cara (la oscuridad y dos ojos rojos) con la corona rota de Corvin flotando encima; relleno de oscuridad
   con venas rojas que laten; jirones de sombra y chispas rojas que suben al recibir dano.
 
 Salen textures/gui/brandt_barra.png, corteza_barra.png, molinera_barra.png, verdugo_barra.png, barquero_barra.png,
 abad_barra.png, condestable_barra.png, rectora_barra.png, ballenero_barra.png, pontifice_barra.png, aldric_barra.png,
-gigante_barra.png, jinete_barra.png, bufon_barra.png, dragon_barra.png, isolde_barra.png, sombra_barra.png, sigrun_barra.png y
-capataz_barra.png
+gigante_barra.png, jinete_barra.png, bufon_barra.png, dragon_barra.png, isolde_barra.png, sombra_barra.png, sigrun_barra.png,
+capataz_barra.png y osmund_barra.png
 (256x128):
   v 0..39   marco (el relleno va en x 8..247, y 19..25)
   v 48..79  relleno, 4 cuadros de 8 px (240 x 7)
@@ -2788,6 +2793,166 @@ def cascajo_veta():
     return img
 
 
+# ---------------------------------------------------------------- Fray Osmund, el Sacristan (parte 7at)
+
+CB_DD, CB_D, CB, CB_L, CB_H = hexc("1f150a"), hexc("3a2810"), hexc("6e4c1e"), hexc("a07632"), hexc("d6b060")
+HU_DD, HU_D, HU, HU_L, HU_H = hexc("3e382c"), hexc("6d6450"), hexc("9a9078"), hexc("c4b994"), hexc("e6dcbc")
+AL_D, AL, AL_H = hexc("2a6a9c"), hexc("4fb4f0"), hexc("b6ecff")
+HB_D, HB, HB_L = hexc("16110d"), hexc("2c2219"), hexc("45362a")
+BR, BR_H = hexc("e0641e"), hexc("ffc27a")
+
+
+def marco_osmund():
+    """La cadena del incensario tendida de punta a punta (eslabones de bronce, uno de frente y otro de canto), a la izquierda el hueso
+    con su anilla por donde se coge y a la derecha el incensario de bronce con sus agujeros encendidos; en el centro su aureola de
+    huesos con las cinco calaveras y cuatro velas, y dentro la calavera de su cara bajo la capucha, con las almas en las cuencas."""
+    n = noise2(1747)
+    img = Image.new("RGBA", (FW, 40), (0, 0, 0, 0))
+    x0, x1, y0, y1 = FX0 - 4, FX1 - 8, FY0 - 3, FY1 + 2
+    ym = (y0 + y1) // 2
+    # la cadena: eslabones de frente (un aro con su hueco) y de canto (una barra), alternos
+    for x in range(x0, x1 + 1):
+        k, t = divmod(x - x0, 9)
+        for y in range(y0 - 1, y1 + 2):
+            put(img, x, y, OUT)
+        for y in range(y0, y1 + 1):
+            if k % 2 == 0:
+                borde = t in (0, 8) or y in (y0, y1)
+                c = CB_L if y < ym else CB if y < y1 - 1 else CB_D
+                if not borde and 1 < t < 7 and y0 + 2 < y < y1 - 2:
+                    c = CB_DD                                  # el hueco del aro (se ve oscuro)
+                if t == 0 or y == y0:
+                    c = mix(c, CB_H, 0.5)
+            else:
+                c = CB if y0 + 3 <= y <= y1 - 3 else OUT       # de canto: una barra mas fina
+                if y == y0 + 3:
+                    c = CB_H
+            put(img, x, y, c)
+    rect(img, FX0 - 1, FY0 - 1, FX1, FY1, CB_DD)
+    rect(img, FX0, FY0, FX1 - 1, FY1 - 1, (0, 0, 0, 0))
+    # a la izquierda: la anilla de bronce y el hueso para cogerlo (con sus dos cabezas)
+    for x in range(0, x0 + 2):
+        for y in range(y0 - 2, y1 + 3):
+            put(img, x, y, OUT)
+    for x in range(1, x0 + 1):
+        cabeza = x < 4 or x > x0 - 4
+        semi = 6 if cabeza else 3
+        for y in range(ym - semi, ym + semi + 1):
+            t = n(x * 0.4, y * 0.4)
+            c = HU_L if y < ym - 1 else HU if y < ym + 2 else HU_D
+            if t > 0.8:
+                c = mix(c, HU_H, 0.5)
+            put(img, x, y, c)
+    # a la derecha: el incensario de bronce, redondo, con sus agujeros encendidos y la tapa en punta
+    cx, cy, r = x1 + 7, ym, 9.5
+    for y in range(0, 40):
+        for x in range(cx - 12, min(FW, cx + 13)):
+            d = math.hypot(x - cx, y - cy)
+            if d <= r + 1:
+                put(img, x, y, OUT)
+    for y in range(0, 40):
+        for x in range(cx - 12, min(FW, cx + 13)):
+            d = math.hypot(x - cx, y - cy)
+            if d > r:
+                continue
+            c = CB_L if (x - cx) + (y - cy) < -3 else CB if d < r - 1.5 else CB_D
+            if abs(y - cy) <= 0.5:
+                c = CB_H                                       # la banda labrada
+            if d < r - 2 and (x + y) % 3 == 0 and abs(y - cy) > 1:
+                c = BR_H if d < 4 else BR                      # los agujeros, con las brasas
+            put(img, x, y, c)
+    for i, (y, semi) in enumerate(((cy - 13, 0), (cy - 12, 1), (cy - 11, 1), (cy - 10, 2))):
+        for dx in range(-semi - 1, semi + 2):
+            put(img, cx + dx, y, OUT)
+        for dx in range(-semi, semi + 1):
+            put(img, cx + dx, y, CB_H if dx <= 0 else CB_L)
+    # en el centro: la aureola de huesos
+    ax, ay, ar = FW // 2, 14, 11.0
+    for y in range(0, 32):
+        for x in range(ax - 14, ax + 15):
+            d = math.hypot(x - ax, y - ay)
+            if ar - 2.2 <= d <= ar + 1.2:
+                put(img, x, y, OUT)
+    for y in range(0, 32):
+        for x in range(ax - 14, ax + 15):
+            d = math.hypot(x - ax, y - ay)
+            if ar - 1.2 <= d <= ar + 0.2:
+                a = math.atan2(y - ay, x - ax)
+                put(img, x, y, HU_L if math.sin(a * 5) > 0 else HU)
+    # dentro: la capucha y la calavera, con las almas en las cuencas
+    for y in range(6, 23):
+        semi = 4 if y < 8 else 6
+        for dx in range(-semi - 1, semi + 2):
+            put(img, ax + dx, y, OUT)
+        for dx in range(-semi, semi + 1):
+            put(img, ax + dx, y, HB_L if dx < -semi + 2 else HB if dx < semi - 1 else HB_D)
+    cara = ["..HhhH..", ".HHHHHh.", "HoaHHaoH", "HooHHooH", "hHHnnHHh", ".hHnnHh.", ".DdDdDd.", "..dDdD.."]
+    col = {"H": HU_L, "h": HU, "o": OUT, "a": AL_H, "n": OUT, "D": HU_H, "d": HU_D}
+    for j, fila in enumerate(cara):
+        for i, ch in enumerate(fila):
+            if ch != ".":
+                put(img, ax - 4 + i, 10 + j, col[ch])
+    # las cinco calaveras del aro (mirando adelante) y las cuatro velas encendidas
+    for grados in (0, 72, 144, 216, 288):
+        a = math.radians(grados)
+        sx, sy = int(round(ax + ar * math.sin(a))), int(round(ay - ar * math.cos(a)))
+        for dy in range(-3, 3):
+            for dx in range(-3, 3):
+                put(img, sx + dx, sy + dy, OUT)
+        for dy in range(-2, 2):
+            for dx in range(-2, 2):
+                put(img, sx + dx, sy + dy, HU_L if dy < 0 else HU)
+        put(img, sx - 2, sy - 1, OUT)
+        put(img, sx + 1, sy - 1, OUT)
+        put(img, sx - 2, sy - 1, AL)
+        put(img, sx + 1, sy - 1, AL)
+    for grados in (36, 108, 252, 324):
+        a = math.radians(grados)
+        vx, vy = int(round(ax + (ar + 1.5) * math.sin(a))), int(round(ay - (ar + 1.5) * math.cos(a)))
+        for dy in range(-5, 1):
+            put(img, vx - 1, vy + dy, OUT)
+            put(img, vx + 1, vy + dy, OUT)
+        for dy in range(-4, 1):
+            put(img, vx, vy + dy, HU_H if dy > -3 else BR_H if dy == -4 else BR)
+        put(img, vx, vy - 5, BR)
+    return img
+
+
+def relleno_osmund(k):
+    """El polvo de hueso que corre, palido, con almas azules que pasan."""
+    n = noise2(1759)
+    img = Image.new("RGBA", (240, 7))
+    for x in range(240):
+        for y in range(7):
+            mid = 1 - abs(y - 3) / 3.5
+            t = 0.25 + 0.45 * mid + 0.45 * (n((x - k * 3) * 0.09, y * 0.6) - 0.5)
+            c = mix(HU_D, HU_L, max(0.0, min(1.0, t * 1.2)))
+            if n(x * 0.23 + 40, y * 0.8) > 0.84:
+                c = mix(c, HU_DD, 0.5)                         # una mota oscura
+            alma = (x - k * 4 + int(2.0 * math.sin((x + y * 5) * 0.17))) % 29
+            if alma in (0, 1) and 2 <= y <= 4:
+                c = mix(c, AL_H if alma == 0 else AL, 0.75)
+            if y == 0:
+                c = mix(c, HU_H, 0.3)
+            if y == 6:
+                c = mix(c, HU_DD, 0.5)
+            img.putpixel((x, y), c)
+    return img
+
+
+def huesos_almas():
+    """Lo que cae al recibir dano: esquirlas de hueso, una calaverita y chispas de almas."""
+    img = Image.new("RGBA", (32, 8), (0, 0, 0, 0))
+    formas = (["hH", ".h"], [".a.", "aAa", ".a."], ["HhH", "hoh"], ["H", "h", "H"])
+    col = {"h": HU, "H": HU_H, "a": AL, "A": AL_H, "o": OUT}
+    for k, f in enumerate(formas):
+        for y, fila in enumerate(f):
+            for x, ch in enumerate(fila):
+                if ch != ".":
+                    put(img, k * 8 + 2 + x, 2 + y, col[ch])
+    return img
+
+
 def hueco(a, b):
     n = noise2(113)
     img = Image.new("RGBA", (240, 7))
@@ -2838,6 +3003,7 @@ if __name__ == "__main__":
         "sombra": atlas(marco_sombra(), relleno_sombra, hueco("030204", "0e0a12"), rastro("ffe8e8", "e8a0a0"), jirones()),
         "sigrun": atlas(marco_sigrun(), relleno_sigrun, hueco("04070c", "0e1626"), rastro("f6fbff", "c8d8ea"), copos()),
         "capataz": atlas(marco_capataz(), relleno_capataz, hueco("070505", "17100d"), rastro("fff0e6", "f0b49a"), cascajo_veta()),
+        "osmund": atlas(marco_osmund(), relleno_osmund, hueco("060606", "15130f"), rastro("f6f2e8", "c8d8e6"), huesos_almas()),
     }
     for nombre, b in barras.items():
         b.save(os.path.join(GUI, f"{nombre}_barra.png"))

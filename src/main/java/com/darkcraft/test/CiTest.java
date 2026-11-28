@@ -767,6 +767,7 @@ public final class CiTest {
         minas(server, m, log, out);
         capataz(server, m, log);
         osario(server, m, log, out);
+        osmund(server, m, log);
         armaduras(server, m, log);
         armas7aj(server, m, log);
         escudos7ak(server, m, log);
@@ -7074,6 +7075,268 @@ public final class CiTest {
             com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
             for (var e : com.darkcraft.enemigos.Puestos.sacarTodos(m, sitio)) e.discard();
         }
+    }
+
+    /**
+     * Parte 7at: Fray Osmund, el Sacristan, en el Relicario del Osario. Su puesto (de rodillas ante el relicario, contando), a quien
+     * repara (dentro del Relicario si; desde el pasillo no), la pelea (se levanta, su frase, la campanilla y los muertos que se
+     * levantan de los montones), sus golpes contra una presa (el incensazo y su nube, el giro que quema, la corona —las calaveras
+     * orbitan, vuelan y se rompen; un golpe de un jugador rompe la que tenga delante—, el muro de huesos y las guirnaldas), a media vida
+     * se alza (flota sobre los muertos, vuelve a llamarlos y su corona trae siete), cae (lo que deja; los muertos del osario
+     * descansan) y su incensario (las brasas al tercer golpe).
+     */
+    private static void osmund(MinecraftServer server, ServerLevel m, PrintWriter log) {
+        String sitio = com.darkcraft.morvain.MorvainEnemigos.OSARIO;
+        final int CX = com.darkcraft.morvain.Osario.CX, CZ = com.darkcraft.morvain.Osario.CZ, R = com.darkcraft.morvain.Osario.RELICARIO;
+        java.util.List<net.minecraft.world.entity.Entity> quitar = new java.util.ArrayList<>();
+        var fp = net.minecraftforge.common.util.FakePlayerFactory.get(m, new com.mojang.authlib.GameProfile(java.util.UUID.fromString("5b1da0aa-cade-4a50-8a11-0c0ffee07aae"), "[DarkCraftCI35]"));
+        int jefe = com.darkcraft.morvain.MorvainEnemigos.osmund();
+        try {
+            var A = com.darkcraft.morvain.Osario.get();
+            for (long k : A.chunks()) m.getChunk((int) (k >> 32), (int) k);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            var fuera = com.darkcraft.enemigos.Puestos.sacarGrupo(m, sitio, g -> g.equals(com.darkcraft.enemigos.Puestos.JEFE));
+            com.darkcraft.enemigos.Osmund c = null;
+            for (var e : fuera) if (e instanceof com.darkcraft.enemigos.Osmund x) c = x;
+            if (c == null) {
+                log.println("Morvain, Fray Osmund: NO SALE (" + fuera.size() + " del grupo de los jefes)");
+                return;
+            }
+            for (int k = 0; k < 6; k++) pasoE(c, null, 0, 0, 0);
+            int[] q = A.sitio("osmund");
+            // los montones de huesos del borde y si caben los muertos delante de cada uno
+            int huesos = 0, libres = 0;
+            for (int u = 14; u <= 38; u++)
+                for (int v = -122; v <= -98; v++) {
+                    double r = Math.hypot(u - com.darkcraft.morvain.Osario.REL_U, v - com.darkcraft.morvain.Osario.REL_V);
+                    if (r > 9.4 && r < 11.4 && m.getBlockState(new BlockPos(CX + u, R + 1, CZ + v)).is(net.minecraft.world.level.block.Blocks.BONE_BLOCK)) huesos++;
+                }
+            for (int[] mu : com.darkcraft.morvain.Osario.muertos()) {
+                BlockPos b = new BlockPos(mu[0], R + 1, mu[1]);
+                if (m.getBlockState(b).isAir() && m.getBlockState(b.above()).isAir() && !m.getBlockState(b.below()).isAir()) libres++;
+            }
+            var abajo = m.getBlockState(BlockPos.containing(c.getX(), c.getY() - 0.2, c.getZ()));
+            StringBuilder sb = new StringBuilder(String.format(java.util.Locale.ROOT, "Morvain, Fray Osmund: en %s (sitio %d, %d, %d), postura %d (1 contando), giro %.0f, pisa %s,"
+                            + " libre %s, caja %.1f x %.1f, vida %.0f, golpe %.1f, armadura %d, en el relicario %s; montones de huesos (bloques) %d, sitios de los muertos"
+                            + " libres %d de %d; lugar %s", c.blockPosition().toShortString(), q[0], q[1], q[2], c.postura(), c.getYRot(),
+                    abajo.getBlock().getDescriptionId().replace("block.minecraft.", ""), m.noCollision(c), c.getBbWidth(), c.getBbHeight(), c.getMaxHealth(),
+                    c.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE), c.getArmorValue(),
+                    com.darkcraft.morvain.Osario.enRelicario(c.getX(), c.getY(), c.getZ()), huesos, libres, com.darkcraft.morvain.Osario.muertos().size(),
+                    com.darkcraft.morvain.Osario.lugar(c.getX(), c.getY(), c.getZ())));
+            // ---- a quien repara: dentro del Relicario y cerca (en supervivencia); desde el pasillo, no
+            fp.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            double[][] donde = {{26.5, -100.5}, {31.5, -104.5}, {26.5, -93.5}};
+            String[] como = {"a 4 en el relicario", "a 5 de lado", "en el pasillo"};
+            sb.append("; repara en:");
+            for (int i = 0; i < donde.length; i++) {
+                double fy = com.darkcraft.enemigos.Puestos.suelo(m, CX + (int) Math.floor(donde[i][0]), R + 3, CZ + (int) Math.floor(donde[i][1]));
+                fp.moveTo(CX + donde[i][0], fy, CZ + donde[i][1], 180f, 0f);
+                sb.append(' ').append(como[i]).append(' ').append(c.reparaEn(fp)).append(i < donde.length - 1 ? "," : "");
+            }
+            log.println(sb);
+            // ---- la pelea: una presa en el Relicario (un aldeano al sur, junto a la entrada); se levanta, su frase y la campanilla
+            double gx = CX + 26.5, gz = CZ - 100.5;
+            double gy = com.darkcraft.enemigos.Puestos.suelo(m, CX + 26, R + 3, CZ - 101);
+            var presa = victima(m, gx, gy, gz, 180f, quitar);
+            if (presa == null) return;
+            presa.setInvulnerable(true);
+            c.setTarget(presa);
+            sb = new StringBuilder("Morvain, Fray Osmund pelea:");
+            int levanta = -1, campanilla = -1;
+            float giroTras = Float.NaN;
+            for (int k = 0; k < 340; k++) {
+                pasoE(c, presa, gx, gy, gz);
+                if (levanta < 0 && c.accion() == com.darkcraft.enemigos.OsmundAnims.LEVANTARSE) levanta = k;
+                if (levanta >= 0 && Float.isNaN(giroTras) && c.accion() != com.darkcraft.enemigos.OsmundAnims.LEVANTARSE) giroTras = c.getYRot();
+                if (campanilla < 0 && c.accion() == com.darkcraft.enemigos.OsmundAnims.LLAMAR) campanilla = k;
+                if (campanilla >= 0 && k > campanilla + 40) break;
+            }
+            sb.append(String.format(java.util.Locale.ROOT, " en pelea %s, se levanta en el tick %d (al acabar mira a %.0f; la presa, al sur: 0), la campanilla en el %d"
+                            + " (la frase 1 dura %d), los muertos: llamados %d, en pie %d (", c.enPelea(), levanta, giroTras, campanilla,
+                    com.darkcraft.rey.Voces.ticks(com.darkcraft.enemigos.Osmund.VOZ_BASE + 1), c.llamados(), c.suyos()));
+            for (var e : c.muertos()) {
+                sb.append(e.tipo().replace("ensamblado_", "")).append(" en ").append(e.blockPosition().toShortString()).append(' ')
+                        .append(e.esEfimero() ? "efimero" : "NO EFIMERO").append(m.noCollision(e) ? "" : " METIDO")
+                        .append(com.darkcraft.morvain.Osario.enRelicario(e.getX(), e.getY(), e.getZ()) ? "" : " FUERA").append("; ");
+                quitar.add(e);
+            }
+            sb.append(")");
+            log.println(sb);
+            // ---- sus golpes a una presa delante (al este), cada uno solo: que no elija otro
+            c.quieta = true;
+            for (var e : c.muertos()) e.discard();
+            sb = new StringBuilder("Morvain, los golpes de Fray Osmund a una presa:");
+            String[] nombres = {"incensazo", "giro", "corona", "muro", "guirnaldas"};
+            int[] acciones = {com.darkcraft.enemigos.OsmundAnims.INCENSAZO, com.darkcraft.enemigos.OsmundAnims.GIRO, com.darkcraft.enemigos.OsmundAnims.CORONA,
+                    com.darkcraft.enemigos.OsmundAnims.MURO, com.darkcraft.enemigos.OsmundAnims.GUIRNALDAS};
+            double[] dist = {3.0, 3.0, 6.0, 7.0, 5.0};
+            int[] dura = {50, 46, 160, 76, 80};
+            presa.setInvulnerable(false);
+            final double ox = CX + 17.5, oz = CZ - 104.5;
+            final double oy = com.darkcraft.enemigos.Puestos.suelo(m, CX + 17, R + 3, CZ - 105);
+            for (int i = 0; i < nombres.length; i++) {
+                c.moveTo(ox, oy, oz, -90f, 0f);
+                c.setYRot(-90f);
+                c.yBodyRot = c.yHeadRot = -90f;
+                c.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                double px = ox + dist[i];
+                double py = com.darkcraft.enemigos.Puestos.suelo(m, (int) Math.floor(px), R + 3, CZ - 105);
+                presa.moveTo(px, py, oz, 90f, 0f);
+                presa.setHealth(presa.getMaxHealth());
+                presa.removeAllEffects();
+                presa.clearFire();
+                presa.invulnerableTime = 0;
+                c.setTarget(presa);
+                int in = c.incensazos(), nu = c.nubesQueDan(), gi = c.giros(), co = c.coronas(), su = c.sueltas(), mu = c.muros(), hd = c.huesosQueDan(),
+                        gu = c.guirnaldas(), ca = c.caidas(), cd = c.caidasQueDan();
+                int la = com.darkcraft.enemigos.CalaveraOsmund.LANZADAS, da = com.darkcraft.enemigos.CalaveraOsmund.DAN, ro = com.darkcraft.enemigos.CalaveraOsmund.ROZAN,
+                        rm = com.darkcraft.enemigos.CalaveraOsmund.ROMPEN, rt = com.darkcraft.enemigos.CalaveraOsmund.ROTAS;
+                float vida = presa.getHealth();
+                boolean frenada = false, debil = false, ardiendo = false, acabo = false, sube = false, sinCorona = false, rotaAGolpe = false;
+                c.empezar(acciones[i]);
+                for (int k = 0; k < dura[i]; k++) {
+                    c.tickCount++;
+                    c.tick();
+                    if (c.accion() == 0) acabo = true;
+                    if (acabo) c.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    if (c.corona()) sinCorona = true;
+                    var cals = m.getEntitiesOfClass(com.darkcraft.enemigos.CalaveraOsmund.class, new net.minecraft.world.phys.AABB(CX + 4, R - 4, CZ - 124, CX + 48, R + 16, CZ - 92));
+                    for (var t : cals) {
+                        if (t.isRemoved()) continue;
+                        if (!quitar.contains(t)) quitar.add(t);
+                        t.tickCount++;
+                        t.tick();
+                    }
+                    // un jugador que golpea a una calavera que tiene delante (orbitando) la rompe
+                    if (acciones[i] == com.darkcraft.enemigos.OsmundAnims.CORONA && k == 40 && !cals.isEmpty()) {
+                        var t = cals.get(0);
+                        fp.moveTo(t.getX() + 2.0, t.getY() - 1.3, t.getZ(), 90f, 0f);
+                        fp.setYRot(90f);
+                        fp.setXRot(0f);
+                        fp.setYHeadRot(90f);
+                        rotaAGolpe = com.darkcraft.enemigos.CalaveraOsmund.golpe(fp) > 0;
+                    }
+                    net.minecraft.world.phys.Vec3 dv = presa.getDeltaMovement();
+                    if (dv.y > 0.4) sube = true;
+                    presa.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+                    presa.moveTo(px, py, oz, 90f, 0f);
+                    presa.invulnerableTime = 0;
+                    frenada |= presa.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+                    debil |= presa.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS);
+                    ardiendo |= presa.isOnFire();
+                }
+                String extra = switch (nombres[i]) {
+                    case "incensazo" -> " (+" + (c.incensazos() - in) + ", la nube frena +" + (c.nubesQueDan() - nu) + ", frenada " + frenada + ", debil " + debil + ")";
+                    case "giro" -> " (+" + (c.giros() - gi) + ", ardiendo " + ardiendo + ")";
+                    case "corona" -> " (+" + (c.coronas() - co) + ", calaveras +" + (c.sueltas() - su) + ", sin ellas en el aro " + sinCorona + ", vuelan +"
+                            + (com.darkcraft.enemigos.CalaveraOsmund.LANZADAS - la) + ", dan +" + (com.darkcraft.enemigos.CalaveraOsmund.DAN - da) + ", rozan +"
+                            + (com.darkcraft.enemigos.CalaveraOsmund.ROZAN - ro) + ", se rompen +" + (com.darkcraft.enemigos.CalaveraOsmund.ROMPEN - rm)
+                            + ", rota de un golpe " + rotaAGolpe + " (+" + (com.darkcraft.enemigos.CalaveraOsmund.ROTAS - rt) + "), quedan fuera " + c.calaverasFuera()
+                            + ", el aro otra vez " + !c.corona() + ")";
+                    case "muro" -> " (+" + (c.muros() - mu) + ", huesos que dan +" + (c.huesosQueDan() - hd) + ", lanza por el aire " + sube + ")";
+                    case "guirnaldas" -> " (+" + (c.guirnaldas() - gu) + ", caen +" + (c.caidas() - ca) + ", dan +" + (c.caidasQueDan() - cd) + ", frenada " + frenada + ")";
+                    default -> "";
+                };
+                sb.append(String.format(java.util.Locale.ROOT, " %s a %.1f: la presa -%.1f%s, acaba %s;", nombres[i], dist[i], vida - presa.getHealth(), extra, acabo));
+                for (var t : m.getEntitiesOfClass(com.darkcraft.enemigos.CalaveraOsmund.class, new net.minecraft.world.phys.AABB(CX - 10, R - 10, CZ - 140, CX + 60, R + 30, CZ - 80)))
+                    t.discard();
+            }
+            log.println(sb);
+            // ---- a media vida: se alza (flota sobre los muertos), vuelve a llamarlos y su corona trae siete
+            sb = new StringBuilder("Morvain, Fray Osmund a media vida:");
+            c.moveTo(ox, oy, oz, -90f, 0f);
+            presa.moveTo(ox + 5, oy, oz, 90f, 0f);
+            c.setTarget(presa);
+            int ll = c.llamados(), su0 = c.sueltas();
+            c.mediaVida();
+            boolean alza = false;
+            double altura = 0;
+            for (int k = 0; k < 120; k++) {
+                pasoE(c, presa, presa.getX(), presa.getY(), presa.getZ());
+                if (c.accion() == com.darkcraft.enemigos.OsmundAnims.ALZARSE) alza = true;
+                if (alza && c.accion() == 0 && k > 70) break;
+            }
+            altura = c.getY() - oy;
+            c.empezar(com.darkcraft.enemigos.OsmundAnims.CORONA);
+            for (int k = 0; k < 24; k++) pasoE(c, presa, presa.getX(), presa.getY(), presa.getZ());
+            for (var t : c.muertos()) quitar.add(t);
+            sb.append(String.format(java.util.Locale.ROOT, " segunda %s, se alza (la accion) %s, alzado %s, flota a %.2f del suelo, sin gravedad %s, vuelve a llamar a los"
+                            + " muertos +%d (en pie %d), la corona alzado +%d calaveras; %s", c.segunda(), alza, c.alzado(), altura, c.isNoGravity(), c.llamados() - ll,
+                    c.suyos(), c.sueltas() - su0, c.estado()));
+            for (var t : m.getEntitiesOfClass(com.darkcraft.enemigos.CalaveraOsmund.class, new net.minecraft.world.phys.AABB(CX - 10, R - 10, CZ - 140, CX + 60, R + 30, CZ - 80)))
+                t.discard();
+            log.println(sb);
+            // ---- cae: de rodillas, su frase, las almas, se deshace; lo que deja; los muertos del osario descansan y no vuelven
+            sb = new StringBuilder("Morvain, Fray Osmund cae:");
+            var delOsario = com.darkcraft.enemigos.Puestos.sacarGrupo(m, sitio, g -> !g.equals(com.darkcraft.enemigos.Puestos.JEFE));
+            for (var e : delOsario) quitar.add(e);
+            int desc0 = com.darkcraft.morvain.Osario.DESCANSAN;
+            boolean pazAntes = com.darkcraft.morvain.Osario.enPaz(server);
+            c.vencer();
+            int seVa = -1;
+            for (int k = 0; k < 260 && !c.isRemoved(); k++) {
+                pasoE(c, null, 0, 0, 0);
+                if (c.isRemoved()) seVa = k;
+            }
+            int incensarios = 0, piedras3 = 0;
+            for (var it : m.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(CX + 2, R - 4, CZ - 126, CX + 50, R + 16, CZ - 90))) {
+                if (it.getItem().is(DarkCraftMod.INCENSARIO_SACRISTAN.get())) incensarios += it.getItem().getCount();
+                if (it.getItem().is(DarkCraftMod.PIEDRA_FORJA_3.get())) piedras3 += it.getItem().getCount();
+                quitar.add(it);
+            }
+            boolean paz = com.darkcraft.morvain.Osario.enPaz(server);
+            com.darkcraft.morvain.Osario.paz(m);
+            int quedanFuera = 0;
+            for (var e : delOsario) if (e.isAlive() && !e.isRemoved()) quedanFuera++;
+            sb.append(String.format(java.util.Locale.ROOT, " muere %s (en paz antes %s); se deshace en %d ticks; deja el incensario %d y piedras III %d; los muertos del"
+                            + " osario descansan %s: de %d Ensamblados fuera se deshacen +%d (quedan %d); %s", !c.isAlive(), pazAntes, seVa, incensarios, piedras3, paz,
+                    delOsario.size(), com.darkcraft.morvain.Osario.DESCANSAN - desc0, quedanFuera, com.darkcraft.morvain.MorvainEnemigos.estadoOsmund(server)));
+            log.println(sb);
+            // ---- el Incensario del Sacristan: una maza de Fe; al tercer golpe seguido las brasas prenden (a el y a los de alrededor)
+            sb = new StringBuilder("Morvain, el Incensario del Sacristan:");
+            var inc = new net.minecraft.world.item.ItemStack(DarkCraftMod.INCENSARIO_SACRISTAN.get());
+            var esc = com.darkcraft.combate.Escalado.de(inc);
+            sb.append(" tipo ").append(com.darkcraft.combate.Armas.de(inc)).append(", escala ").append(esc == null ? "-" : esc.letras()).append(", ataque ")
+                    .append(String.format(java.util.Locale.ROOT, "%.1f", com.darkcraft.combate.Escalado.base(inc)));
+            var b1 = DarkCraftMod.ENSAMBLADO.get().create(m);
+            var b2 = DarkCraftMod.ENSAMBLADO.get().create(m);
+            if (b1 != null && b2 != null) {
+                b1.moveTo(ox + 4, oy, oz, 0f, 0f);
+                b2.moveTo(ox + 5.5, oy, oz, 0f, 0f);
+                b1.setNoAi(true);
+                b2.setNoAi(true);
+                m.addFreshEntity(b1);
+                m.addFreshEntity(b2);
+                quitar.add(b1);
+                quitar.add(b2);
+                float v1 = b1.getHealth(), v2 = b2.getHealth();
+                int av0 = com.darkcraft.armas.IncensarioSacristan.AVIVADAS;
+                StringBuilder golpes = new StringBuilder();
+                for (int k = 0; k < 3; k++) golpes.append(com.darkcraft.armas.IncensarioSacristan.brasa(b1, fp) ? "B" : ".");
+                sb.append(String.format(java.util.Locale.ROOT, "; tres golpes seguidos %s (se avivan +%d): el golpeado -%.1f (ardiendo %s, frenado %s), el de al lado -%.1f"
+                                + " (ardiendo %s)", golpes, com.darkcraft.armas.IncensarioSacristan.AVIVADAS - av0, v1 - b1.getHealth(), b1.isOnFire(),
+                        b1.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN), v2 - b2.getHealth(), b2.isOnFire()));
+            }
+            log.println(sb);
+        } catch (Throwable t) {
+            log.println("Morvain, Fray Osmund: ERROR " + t);
+            DarkCraftMod.LOGGER.error("[CI] osmund", t);
+        } finally {
+            for (var e : quitar) if (!e.isRemoved()) e.discard();
+            for (var t : m.getEntitiesOfClass(com.darkcraft.enemigos.CalaveraOsmund.class, new net.minecraft.world.phys.AABB(CX - 10, R - 10, CZ - 140, CX + 60, R + 30, CZ - 80)))
+                t.discard();
+            var e = com.darkcraft.enemigos.Puestos.enemigo(sitio, jefe);
+            if (e != null) e.discard();
+            com.darkcraft.enemigos.Puestos.marcar(server, sitio, jefe, false);
+            com.darkcraft.enemigos.Puestos.todos(server, sitio, false);
+            try {
+                log.println("Morvain, Fray Osmund vuelve: " + com.darkcraft.morvain.MorvainEnemigos.estadoOsmund(server) + "; en paz "
+                        + com.darkcraft.morvain.Osario.enPaz(server));
+            } catch (Throwable t) {
+                log.println("Morvain, Fray Osmund vuelve: ERROR " + t);
+            }
+        }
+        log.flush();
     }
 
     private static void capataz(MinecraftServer server, ServerLevel m, PrintWriter log) {

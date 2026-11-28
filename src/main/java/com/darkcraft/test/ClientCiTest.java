@@ -6709,6 +6709,8 @@ public final class ClientCiTest {
         t = capataz(t);
         // el Osario de San Ulfo y los Ensamblados (parte 7as)
         t = osario(t);
+        // Fray Osmund, el Sacristan, en el Relicario (parte 7at)
+        t = osmund(t);
         // vistas fijas: {x, y, z, mira x, y, z}; nombre y espera (ticks) de cada una
         final int[] ll = com.darkcraft.morvain.Vista.llegada();
         final double[][] v = {
@@ -15608,6 +15610,409 @@ public final class ClientCiTest {
                 var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
                 sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
                 log("  Hakon, vuelto: " + com.darkcraft.morvain.MorvainEnemigos.estadoCapataz(sp.server));
+            });
+        });
+        return C + 292;
+    }
+
+    // ------------------------------------------------------------------ Fray Osmund, el Sacristan (parte 7at)
+
+    /** Fray Osmund en el cliente (a 80 bloques), o null. */
+    private static com.darkcraft.enemigos.Osmund osmundC(Minecraft mc) {
+        if (mc.level == null || mc.player == null) return null;
+        for (var e : mc.level.getEntitiesOfClass(com.darkcraft.enemigos.Osmund.class, mc.player.getBoundingBox().inflate(80))) return e;
+        return null;
+    }
+
+    /** Fray Osmund en el servidor (si ha salido de su puesto), o null. */
+    private static com.darkcraft.enemigos.Osmund osmundE() {
+        return com.darkcraft.enemigos.Puestos.enemigo(com.darkcraft.morvain.MorvainEnemigos.OSARIO, com.darkcraft.morvain.MorvainEnemigos.osmund())
+                instanceof com.darkcraft.enemigos.Osmund c ? c : null;
+    }
+
+    /** La accion que se ve de Fray Osmund y cuanto lleva (-1 si no es esa). */
+    private static int tOsmund(Minecraft mc, int accion) {
+        var r = osmundC(mc);
+        return r != null && r.accionVista() == accion && r.accionDesde >= 0 ? r.tickCount - r.accionDesde : -1;
+    }
+
+    private static String estadoOsmundC(Minecraft mc) {
+        var r = osmundC(mc);
+        if (r == null) return "no se ve a Fray Osmund | voz " + com.darkcraft.client.rey.ReyCliente.subtitulo() + " | cartel " + com.darkcraft.client.ui.Carteles.resumen();
+        int a = r.accionVista();
+        var caja = r.getBoundingBox().inflate(24);
+        int cal = mc.level.getEntitiesOfClass(com.darkcraft.enemigos.CalaveraOsmund.class, caja).size();
+        int vuelan = mc.level.getEntitiesOfClass(com.darkcraft.enemigos.CalaveraOsmund.class, caja, com.darkcraft.enemigos.CalaveraOsmund::vuela).size();
+        return String.format(java.util.Locale.ROOT, "Osmund en el cliente: %.1f, %.1f, %.1f giro %.0f, postura %d, accion %s (t %d), muerte %d, %s, %s, %s, calaveras %d"
+                        + " (vuelan %d) | voz %s | musica %s | cartel %s | jugador a %.1f", r.getX(), r.getY(), r.getZ(), r.getYRot(), r.postura(),
+                com.darkcraft.enemigos.OsmundAnims.NOMBRES[Math.max(0, Math.min(a, com.darkcraft.enemigos.OsmundAnims.NOMBRES.length - 1))],
+                r.accionDesde < 0 ? -1 : r.tickCount - r.accionDesde, r.deathTime, r.enPelea() ? "peleando" : "sin pelea", r.alzado() ? "alzado" : "en el suelo",
+                r.corona() ? "la corona fuera" : "la corona en la aureola", cal, vuelan, com.darkcraft.client.rey.ReyCliente.subtitulo(), ClientMusic.debug(),
+                com.darkcraft.client.ui.Carteles.resumen(), mc.player == null ? -1 : r.distanceTo(mc.player));
+    }
+
+    /** Fray Osmund y lo de alrededor en el servidor (para las lineas del informe). */
+    private static String estadoOsmundS(ServerPlayer sp) {
+        var c = osmundE();
+        ServerLevel lvl = sp.serverLevel();
+        var caja = (c != null ? c : sp).getBoundingBox().inflate(24);
+        int muertos = lvl.getEntitiesOfClass(com.darkcraft.enemigos.Ensamblado.class, caja, e -> e.sitio() == null || e.sitio().isEmpty()).size();
+        int cal = lvl.getEntitiesOfClass(com.darkcraft.enemigos.CalaveraOsmund.class, caja).size();
+        return com.darkcraft.morvain.MorvainEnemigos.estadoOsmund(sp.server) + " | " + (c == null ? "no ha salido" : estadoE(c)) + " | jugador " + fpos(sp) + " vida "
+                + Math.round(sp.getHealth()) + " | sitio " + com.darkcraft.morvain.Morvain.lugar(sp) + " | muertos cerca " + muertos + " | calaveras " + cal
+                + String.format(java.util.Locale.ROOT, " (lanzadas %d, dan %d, rozan %d, rompen %d, rotas %d)", com.darkcraft.enemigos.CalaveraOsmund.LANZADAS,
+                com.darkcraft.enemigos.CalaveraOsmund.DAN, com.darkcraft.enemigos.CalaveraOsmund.ROZAN, com.darkcraft.enemigos.CalaveraOsmund.ROMPEN,
+                com.darkcraft.enemigos.CalaveraOsmund.ROTAS);
+    }
+
+    /** La camara en el Relicario: (u, dy, v) del marco del osario (dy sobre el suelo del Relicario) mirando a (mu, my, mv). */
+    private static void camaraRelicario(Minecraft mc, double u, double dy, double v, double mu, double my, double mv) {
+        final int CX = com.darkcraft.morvain.Osario.CX, CZ = com.darkcraft.morvain.Osario.CZ, R = com.darkcraft.morvain.Osario.RELICARIO + 1;
+        verDesde(mc, new Vec3(CX + u, R + dy, CZ + v), new Vec3(CX + mu, R + my, CZ + mv));
+    }
+
+    /** Las calaveras de la corona de Fray Osmund que queden por ahi, fuera. */
+    private static void quitarCalaveras(ServerLevel lvl) {
+        var caja = new net.minecraft.world.phys.AABB(com.darkcraft.morvain.Osario.X0, 40, com.darkcraft.morvain.Osario.Z0, com.darkcraft.morvain.Osario.X1, 200,
+                com.darkcraft.morvain.Osario.Z1);
+        for (var e : lvl.getEntitiesOfClass(com.darkcraft.enemigos.CalaveraOsmund.class, caja)) e.discard();
+    }
+
+    /** En el osario solo Fray Osmund: los Ensamblados de los puestos, por caidos (el del pasillo del Relicario se meteria en la pelea). */
+    private static void soloOsmund(net.minecraft.server.MinecraftServer srv) {
+        int n = com.darkcraft.morvain.MorvainEnemigos.osario().size(), jefe = com.darkcraft.morvain.MorvainEnemigos.osmund();
+        for (int i = 0; i < n; i++) com.darkcraft.enemigos.Puestos.marcar(srv, com.darkcraft.morvain.MorvainEnemigos.OSARIO, i, i != jefe);
+    }
+
+    /** Donde hace Fray Osmund sus golpes en la prueba (u, v del marco del osario): en el Relicario, en la cuerda de v -104,5, entre los pilares. */
+    private static final double OSMUND_GU = 18.5, OSMUND_GV = -104.5;
+
+    /**
+     * Fray Osmund en su sitio de los golpes mirando al este y el jugador delante (a {@code dist}, sano), sin muertos ni calaveras: y que
+     * haga esa accion ({@code /darkcraft osmund accion}; 0: nada, -1: a media vida, {@code media}: se alza).
+     */
+    private static void osmundHaz(ServerPlayer sp, int accion, double dist) {
+        final int CX = com.darkcraft.morvain.Osario.CX, CZ = com.darkcraft.morvain.Osario.CZ, R = com.darkcraft.morvain.Osario.RELICARIO;
+        ServerLevel lvl = sp.serverLevel();
+        quitarEnsamblados(lvl);
+        quitarCalaveras(lvl);
+        var c = osmundE();
+        if (c == null) {
+            log("  Fray Osmund: FALLO, no esta fuera");
+            return;
+        }
+        double x = CX + OSMUND_GU, z = CZ + OSMUND_GV;
+        double y = com.darkcraft.enemigos.Puestos.suelo(lvl, (int) Math.floor(x), R + 3, (int) Math.floor(z));
+        c.moveTo(x, y + (c.alzado() ? com.darkcraft.enemigos.Osmund.ALTURA : 0), z, -90f, 0f);
+        c.setYRot(-90f);
+        c.yBodyRot = c.yHeadRot = -90f;
+        c.setDeltaMovement(Vec3.ZERO);
+        double px = x + dist;
+        double py = com.darkcraft.enemigos.Puestos.suelo(lvl, (int) Math.floor(px), R + 3, (int) Math.floor(z));
+        irMirando(sp, px, py, z, x, y + 2.4, z, false);
+        sp.setHealth(sp.getMaxHealth());
+        sp.removeEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN);
+        sp.removeEffect(net.minecraft.world.effect.MobEffects.WEAKNESS);
+        sp.clearFire();
+        if (accion > 0) comando(sp, "darkcraft osmund accion " + accion);
+        else if (accion < 0) comando(sp, "darkcraft osmund media");
+    }
+
+    /**
+     * Fray Osmund, el Sacristan (parte 7at): el Relicario con el de rodillas contando huesos ante el arca de San Ulfo (de espaldas, con su
+     * aureola de calaveras y velas; de cerca, contando; sin vision nocturna); en supervivencia, al entrar: se levanta y se vuelve, su frase
+     * (su barra, su musica), la campanilla y los muertos que se levantan de los montones de huesos; sus golpes (pedidos con el comando, la
+     * camara por delante): el incensazo y su nube, el giro, la corona de calaveras (la aureola, las que orbitan y las que vuelan), el muro
+     * de huesos y las guirnaldas (las marcas del suelo y las que caen); a media vida se alza (su frase 2, flota sobre un haz de huesos) y
+     * la corona alzado; cae (de rodillas, las almas que suben, se deshace en huesos), el cartel de JEFE ABATIDO, lo que deja, el
+     * Incensario del Sacristan en la mano y el bestiario. Al acabar vuelve todo (el y los Ensamblados del osario).
+     */
+    private static int osmund(int T) {
+        final int CX = com.darkcraft.morvain.Osario.CX, CZ = com.darkcraft.morvain.Osario.CZ, R = com.darkcraft.morvain.Osario.RELICARIO;
+        final double GU = OSMUND_GU, GV = OSMUND_GV;
+        int t = T;
+        atTicks(t, "Fray Osmund: al Relicario", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = true;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_ESPERA.clear();
+            server(m, sp -> {
+                if (sp.level().dimension() != com.darkcraft.morvain.Morvain.NIVEL) return;
+                sp.setGameMode(GameType.CREATIVE);
+                sp.removeAllEffects();
+                quitarEnsamblados(sp.serverLevel());
+                quitarCalaveras(sp.serverLevel());
+                comando(sp, "darkcraft osmund volver");
+                soloOsmund(sp.server);
+                verDeNoche(sp);
+                irMirando(sp, CX + 26.5, R + 1.0, CZ - 97.5, CX + 26.5, R + 2.4, CZ - 108, true);
+            });
+        });
+        t += 320;
+        atTicks(t, "captura: el Relicario", m -> {
+            server(m, sp -> log("  Fray Osmund, en su puesto: " + estadoOsmundS(sp)));
+            log("  Fray Osmund, en su puesto (cliente): " + estadoOsmundC(m));
+            primeraSinHud(m);
+            shot(m, "cliente_om01_relicario");
+        });
+        t += 4;
+        // de cerca, contando: por delante y a un lado (entre el y el arca); deja un hueso cada 48 ticks
+        atTicks(t, "Fray Osmund: de cerca, contando", m -> server(m, sp -> irMirando(sp, CX + 23.5, R + 1.0, CZ - 106.5, CX + 26.5, R + 2.0, CZ - 104.5, true)));
+        t += 30;
+        esperarA("cliente_om02_contando", m -> {
+            var r = osmundC(m);
+            return r != null && r.postura() == com.darkcraft.enemigos.Enemigo.REZA && r.tickCount % 48 == 44;
+        }, ClientCiTest::primeraSinHud, ClientCiTest::estadoOsmundC, 80);
+        t += 60;
+        atTicks(t, "Fray Osmund: el Relicario, sin vision nocturna", m -> server(m, sp -> {
+            sp.removeEffect(net.minecraft.world.effect.MobEffects.NIGHT_VISION);
+            irMirando(sp, CX + 26.5, R + 1.4, CZ - 99.0, CX + 26.5, R + 2.6, CZ - 110, true);
+        }));
+        t += 30;
+        atTicks(t, "captura: el Relicario sin vision nocturna", m -> {
+            primeraSinHud(m);
+            shot(m, "cliente_om03_sin_vision");
+        });
+        t += 4;
+        // ---- en supervivencia, en el Relicario a cuatro bloques de su espalda: se levanta, dice su frase, toca la campanilla y los muertos
+        int S = t;
+        atTicks(S, "Fray Osmund: en supervivencia, en el Relicario", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            server(m, sp -> {
+                aPelear(sp, true);
+                verDeNoche(sp);
+                double py = com.darkcraft.enemigos.Puestos.suelo(sp.serverLevel(), CX + 26, R + 3, CZ - 101);
+                irMirando(sp, CX + 26.5, py, CZ - 100.5, CX + 26.5, R + 2.4, CZ - 104.5, false);
+            });
+        });
+        esperarA("cliente_om04_se_levanta", m -> tOsmund(m, com.darkcraft.enemigos.OsmundAnims.LEVANTARSE) >= 14, ClientCiTest::enPrimeraPersona,
+                ClientCiTest::estadoOsmundC, 200);
+        esperarA("cliente_om05_su_frase_barra", m -> {
+            var r = osmundC(m);
+            return r != null && r.enPelea() && r.postura() == com.darkcraft.enemigos.Enemigo.DE_PIE && tOsmund(m, com.darkcraft.enemigos.OsmundAnims.LEVANTARSE) < 0
+                    && com.darkcraft.client.rey.ReyCliente.subtitulo().startsWith((com.darkcraft.enemigos.Osmund.VOZ_BASE + 1) + " ");
+        }, ClientCiTest::enPrimeraPersona, ClientCiTest::estadoOsmundC, 240);
+        // la campanilla, de lado (al oeste del jugador, entre el pilar y el); los muertos, desde lo alto de la entrada
+        esperarA("cliente_om06_campanilla", m -> tOsmund(m, com.darkcraft.enemigos.OsmundAnims.LLAMAR) >= 12,
+                m -> camaraRelicario(m, 24.0, 2.4, -101.0, 26.5, 2.4, -104.5), ClientCiTest::estadoOsmundC, 420);
+        esperarA("cliente_om07_los_muertos", m -> tOsmund(m, com.darkcraft.enemigos.OsmundAnims.LLAMAR) >= 44,
+                m -> camaraRelicario(m, 26.5, 5.6, -99.6, 26.0, 0.4, -110.0), ClientCiTest::estadoOsmundC, 440);
+        t = S + 330;
+        atTicks(t - 4, "Fray Osmund: tras la campanilla", m -> server(m, sp -> log("  Fray Osmund, tras la campanilla: " + estadoOsmundS(sp))));
+        // ---- sus golpes, pedidos con el comando: {accion, distancia, tick 1, tick 2 (-1: sin ella), espera}; la camara por delante, detras
+        // del jugador y un poco al sur (por encima de su hombro)
+        int[][] golpes = {
+                {com.darkcraft.enemigos.OsmundAnims.INCENSAZO, 30, 16, 25, 64},
+                {com.darkcraft.enemigos.OsmundAnims.GIRO, 30, 12, 21, 60},
+                {com.darkcraft.enemigos.OsmundAnims.CORONA, 60, 14, -1, 112},
+                {com.darkcraft.enemigos.OsmundAnims.MURO, 70, 22, -1, 84},
+                {com.darkcraft.enemigos.OsmundAnims.GUIRNALDAS, 50, 17, -1, 80}};
+        String[][] nombres = {{"om08_incensazo_arriba", "om09_incensazo_nube"}, {"om10_giro", "om11_giro_brasas"}, {"om12_corona_aureola", ""},
+                {"om15_muro", ""}, {"om17_guirnaldas_brazos", ""}};
+        for (int i = 0; i < golpes.length; i++) {
+            final int[] g = golpes[i];
+            final int acc = g[0];
+            final double dist = g[1] / 10.0;
+            final String n1 = "cliente_" + nombres[i][0], n2 = "cliente_" + nombres[i][1];
+            final int T0 = t;
+            atTicks(t, "Fray Osmund: " + com.darkcraft.enemigos.OsmundAnims.NOMBRES[acc], m -> {
+                m.options.hideGui = true;
+                server(m, sp -> osmundHaz(sp, acc, dist));
+            });
+            Consumer<Minecraft> cam = m -> camaraRelicario(m, GU + dist + 3.8, 2.9, GV + 0.9, GU + 0.3, 1.9, GV);
+            esperarA(n1, m -> tOsmund(m, acc) >= g[2], cam, ClientCiTest::estadoOsmundC, 120);
+            if (g[3] >= 0) esperarA(n2, m -> tOsmund(m, acc) >= g[3], cam, ClientCiTest::estadoOsmundC, 120);
+            if (acc == com.darkcraft.enemigos.OsmundAnims.CORONA) {
+                // las calaveras: salen en el tick 18, orbitan y vuelan a los 50 (una cada 8)
+                Consumer<Minecraft> camLado = m -> camaraRelicario(m, GU + dist + 3.0, 3.2, GV + 1.4, GU + dist * 0.5, 2.0, GV);
+                atTicks(T0 + 40, "la camara: la corona", camLado);
+                atTicks(T0 + 42, "captura: las calaveras orbitan", m -> {
+                    camLado.accept(m);
+                    log("  cliente_om13_corona_orbita: " + estadoOsmundC(m));
+                    server(m, sp -> log("  Fray Osmund, la corona: " + estadoOsmundS(sp)));
+                    shot(m, "cliente_om13_corona_orbita");
+                });
+                atTicks(T0 + 76, "captura: las calaveras vuelan", m -> {
+                    camLado.accept(m);
+                    log("  cliente_om14_corona_vuela: " + estadoOsmundC(m));
+                    shot(m, "cliente_om14_corona_vuela");
+                });
+            }
+            if (acc == com.darkcraft.enemigos.OsmundAnims.MURO) {
+                // los huesos brotan en linea desde el tick 24 (cada 2 ticks uno mas lejos): desde lo alto, por detras del jugador
+                Consumer<Minecraft> camAlto = m -> camaraRelicario(m, GU + dist + 2.6, 4.6, GV + 1.0, GU + 2.5, 0.6, GV);
+                atTicks(T0 + 40, "la camara: el muro", camAlto);
+                atTicks(T0 + 42, "captura: el muro de huesos", m -> {
+                    camAlto.accept(m);
+                    log("  cliente_om16_muro_huesos: " + estadoOsmundC(m));
+                    server(m, sp -> log("  Fray Osmund, el muro: " + estadoOsmundS(sp)));
+                    shot(m, "cliente_om16_muro_huesos");
+                });
+            }
+            if (acc == com.darkcraft.enemigos.OsmundAnims.GUIRNALDAS) {
+                // las marcas del suelo en el tick 20 y la guirnalda que cae del techo 28 ticks despues
+                Consumer<Minecraft> camAlto = m -> camaraRelicario(m, GU + dist + 3.4, 4.4, GV + 1.2, GU + dist - 0.5, 1.0, GV);
+                atTicks(T0 + 34, "la camara: las guirnaldas", camAlto);
+                atTicks(T0 + 36, "captura: las marcas", m -> {
+                    camAlto.accept(m);
+                    log("  cliente_om18_guirnaldas_marcas: " + estadoOsmundC(m));
+                    shot(m, "cliente_om18_guirnaldas_marcas");
+                });
+                atTicks(T0 + 50, "captura: la guirnalda cae", m -> {
+                    camAlto.accept(m);
+                    log("  cliente_om19_guirnaldas_caen: " + estadoOsmundC(m));
+                    server(m, sp -> log("  Fray Osmund, las guirnaldas: " + estadoOsmundS(sp)));
+                    shot(m, "cliente_om19_guirnaldas_caen");
+                });
+            }
+            t += g[4];
+            atTicks(t - 2, "Fray Osmund: tras " + com.darkcraft.enemigos.OsmundAnims.NOMBRES[acc], m -> server(m, sp -> log("  Fray Osmund, tras "
+                    + com.darkcraft.enemigos.OsmundAnims.NOMBRES[acc] + ": " + estadoOsmundS(sp))));
+        }
+        // ---- a media vida: se alza (su frase 2, los huesos que suben, flota sobre el haz de huesos)
+        atTicks(t, "Fray Osmund: a media vida", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> osmundHaz(sp, -1, 5.0));
+        });
+        Consumer<Minecraft> camAlza = m -> camaraRelicario(m, GU + 8.8, 3.0, GV + 0.9, GU + 0.3, 2.6, GV);
+        esperarA("cliente_om20_alzarse", m -> tOsmund(m, com.darkcraft.enemigos.OsmundAnims.ALZARSE) >= 18, camAlza, ClientCiTest::estadoOsmundC, 120);
+        esperarA("cliente_om21_alzado", m -> tOsmund(m, com.darkcraft.enemigos.OsmundAnims.ALZARSE) >= 48, camAlza, ClientCiTest::estadoOsmundC, 120);
+        t += 80;
+        atTicks(t, "captura: alzado (en primera persona, su frase y la barra)", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> log("  Fray Osmund, alzado: " + estadoOsmundS(sp)));
+            log("  Fray Osmund, alzado (cliente): " + estadoOsmundC(m));
+            shot(m, "cliente_om22_alzado_frase");
+        });
+        t += 6;
+        atTicks(t, "Fray Osmund: la corona, alzado", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> osmundHaz(sp, com.darkcraft.enemigos.OsmundAnims.CORONA, 6.0));
+        });
+        final int TC = t;
+        Consumer<Minecraft> camCorona = m -> camaraRelicario(m, GU + 9.0, 3.4, GV + 1.4, GU + 1.5, 3.2, GV);
+        atTicks(TC + 40, "la camara: la corona alzado", camCorona);
+        atTicks(TC + 44, "captura: la corona, alzado", m -> {
+            camCorona.accept(m);
+            log("  cliente_om23_corona_alzado: " + estadoOsmundC(m));
+            server(m, sp -> log("  Fray Osmund, la corona alzado: " + estadoOsmundS(sp)));
+            shot(m, "cliente_om23_corona_alzado");
+        });
+        t += 60;
+        // ---- cae: de rodillas (se le cae lo que le sostenia), su ultima frase, las almas que suben, se deshace; el cartel, lo que deja
+        final int C = t;
+        atTicks(C, "Fray Osmund: cae", m -> {
+            com.darkcraft.client.ui.Carteles.callados = true;
+            m.options.hideGui = true;
+            server(m, sp -> {
+                osmundHaz(sp, 0, 7.0);
+                log("  Fray Osmund, antes de caer: " + estadoOsmundS(sp) + " | ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro "
+                        + com.darkcraft.story.Logros.tiene(sp, "osmund"));
+                comando(sp, "darkcraft osmund vencer");
+            });
+        });
+        esperarA("cliente_om24_de_rodillas", m -> {
+            var r = osmundC(m);
+            return r != null && r.deathTime >= 34;
+        }, m -> camaraRelicario(m, GU + 5.0, 2.4, GV + 0.6, GU + 0.3, 1.3, GV), ClientCiTest::estadoOsmundC, 100);
+        esperarA("cliente_om25_las_almas", m -> {
+            var r = osmundC(m);
+            return r != null && r.deathTime >= 96;
+        }, m -> camaraRelicario(m, 27.5, 5.6, -100.8, 21.5, 2.6, -108.0), ClientCiTest::estadoOsmundC, 160);
+        esperarA("cliente_om26_se_deshace", m -> {
+            var r = osmundC(m);
+            return r != null && r.deathTime >= 147;
+        }, m -> camaraRelicario(m, GU + 4.4, 2.4, GV + 0.6, GU + 0.3, 1.4, GV), ClientCiTest::estadoOsmundC, 220);
+        atTicks(C + 175, "el cartel", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+        });
+        atTicks(C + 178, "captura: JEFE ABATIDO", m -> {
+            log("  Fray Osmund: cartel " + com.darkcraft.client.ui.Carteles.resumen() + " | musica " + ClientMusic.debug());
+            server(m, sp -> log("  Fray Osmund, tras caer: " + estadoOsmundS(sp) + " | ecos " + com.darkcraft.rol.Ficha.ecos(sp) + ", logro "
+                    + com.darkcraft.story.Logros.tiene(sp, "osmund") + " | en paz " + com.darkcraft.morvain.Osario.enPaz(sp.server)));
+            shot(m, "cliente_om27_jefe_abatido");
+        });
+        atTicks(C + 182, "lo que deja, en el suelo", m -> {
+            m.options.hideGui = true;
+            server(m, sp -> {
+                StringBuilder sb = new StringBuilder();
+                Vec3 donde = null;
+                for (var it : sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, sp.getBoundingBox().inflate(24))) {
+                    sb.append(it.getItem().getCount()).append(' ').append(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(it.getItem().getItem())).append("; ");
+                    if (it.getItem().is(DarkCraftMod.INCENSARIO_SACRISTAN.get())) donde = it.position();
+                }
+                log("  Fray Osmund, lo que deja: " + sb + "| el incensario en " + (donde == null ? "NINGUN SITIO"
+                        : String.format(java.util.Locale.ROOT, "%.1f, %.1f, %.1f", donde.x, donde.y, donde.z)));
+                Vec3 q = donde == null ? new Vec3(CX + GU, R + 1, CZ + GV) : donde;
+                irMirando(sp, q.x + 2.0, q.y + 0.2, q.z + 0.6, q.x, q.y, q.z, false);
+            });
+        });
+        atTicks(C + 200, "captura: lo que deja", m -> {
+            primeraSinHud(m);
+            shot(m, "cliente_om28_lo_que_deja");
+        });
+        atTicks(C + 204, "el Incensario del Sacristan en la mano", m -> {
+            enPrimeraPersona(m);
+            server(m, sp -> {
+                for (var it : sp.serverLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, sp.getBoundingBox().inflate(24))) it.discard();
+                sp.setGameMode(GameType.CREATIVE);
+                sp.getInventory().setItem(0, new ItemStack(DarkCraftMod.INCENSARIO_SACRISTAN.get()));
+                sp.getInventory().selected = 0;
+                sp.connection.send(new net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket(0));
+                double py = com.darkcraft.enemigos.Puestos.suelo(sp.serverLevel(), CX + 26, R + 3, CZ - 103);
+                irMirando(sp, CX + 26.5, py, CZ - 102.5, CX + 26.5, py + 1.6, CZ - 96.5, false);
+            });
+        });
+        atTicks(C + 214, "tercera persona", m -> {
+            m.options.hideGui = true;
+            m.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+        });
+        atTicks(C + 234, "captura: el incensario en la mano", m -> {
+            if (m.player != null) {
+                ItemStack st = m.player.getMainHandItem();
+                java.util.List<net.minecraft.network.chat.Component> tip = new java.util.ArrayList<>();
+                st.getItem().appendHoverText(st, m.level, tip, net.minecraft.world.item.TooltipFlag.NORMAL);
+                StringBuilder sb = new StringBuilder();
+                for (var c : tip) sb.append(c.getString()).append(" / ");
+                var esc = com.darkcraft.combate.Escalado.de(st);
+                log("  Fray Osmund: en la mano " + st.getHoverName().getString() + " (" + com.darkcraft.combate.Armas.de(st) + ", escala " + (esc == null ? "-" : esc.letras())
+                        + ") | " + sb);
+            }
+            shot(m, "cliente_om29_incensario_en_la_mano");
+        });
+        atTicks(C + 238, "el bestiario: Fray Osmund", m -> {
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.MenuScreen.abrir(com.darkcraft.client.ui.MenuScreen.LOGROS);
+            menuP(m, mm -> mm.probarLogros(2, java.util.Arrays.asList(com.darkcraft.client.ui.Coleccion.BESTIARIO).indexOf("osmund")));
+        });
+        atTicks(C + 256, "captura: Fray Osmund en el bestiario", m -> {
+            menuP(m, mm -> log("  " + mm.resumen()));
+            shot(m, "cliente_om30_bestiario_osmund");
+        });
+        atTicks(C + 262, "Fray Osmund: fin (vuelven el y los Ensamblados del osario)", m -> {
+            m.setScreen(null);
+            enPrimeraPersona(m);
+            m.options.hideGui = false;
+            com.darkcraft.client.ui.Carteles.callados = true;
+            CAPTURAS_ESPERA.clear();
+            server(m, sp -> {
+                log("  Fray Osmund, al acabar: " + estadoOsmundS(sp) + " | en paz " + com.darkcraft.morvain.Osario.enPaz(sp.server));
+                quitarEnsamblados(sp.serverLevel());
+                quitarCalaveras(sp.serverLevel());
+                sp.removeAllEffects();
+                sp.clearFire();
+                sp.setHealth(sp.getMaxHealth());
+                sp.getInventory().setItem(0, ItemStack.EMPTY);
+                comando(sp, "darkcraft osmund volver");
+                comando(sp, "darkcraft osario enemigos volver");
+                sp.setGameMode(GameType.CREATIVE);
+                var u = com.darkcraft.morvain.SantuariosMorvain.UMBRAL;
+                sp.teleportTo(com.darkcraft.morvain.Morvain.nivel(sp.server), u.x() + 0.5, u.y() + 1, u.z() + 10.5, 180f, 0f);
+                log("  Fray Osmund, vuelto: " + com.darkcraft.morvain.MorvainEnemigos.estadoOsmund(sp.server));
             });
         });
         return C + 292;

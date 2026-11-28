@@ -101,6 +101,8 @@ TOMAS_DRAGON = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 TOMAS_ISOLDE = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a", 6: "a"}
 # Hakon, el Capataz (parte 7ar): de la 2 la b (el "DIG!" rugido al final)
 TOMAS_CAPATAZ = {1: "a", 2: "b", 3: "a", 4: "a", 5: "a"}
+# Fray Osmund, el Sacristan (parte 7at; voz "Matthew Schmitz - Ancient Sage Dragon Wizard", flow nIWx6e0Nel3Cf2CGpyWv): las tomas a
+TOMAS_OSMUND = {1: "a", 2: "a", 3: "a", 4: "a", 5: "a"}
 # la Sombra (voz "Grav - Deep, Dark & Sinister", la mas grave de las tres que se probaron: unos 75 Hz): de cada frase,
 # la toma de la voz y la toma susurrada que va por debajo. Las 1-6 son la cinematica de inicio; las 7-9, el viaje a
 # Valdrenn. Se eligen las que dicen la frase seguida (la 1a y la 2a se paran a media palabra) y los susurros con menos voz
@@ -498,6 +500,12 @@ SFX = {
     "ensamblado_polvo": (3.0, 1.0, -15), "portacirios_barrido": (1.8, 0.6, -14), "monton_arrastre": (3.0, 1.0, -17),
     "monton_golpe": (1.6, 0.5, -13), "guirnalda_cae": (5.0, 1.0, -15), "osario_campana": (7.5, 3.0, -14),
     "osario_susurros": (12.0, 3.0, -20),
+    # Fray Osmund, el Sacristan (parte 7at): el incensazo, el giro, la corona que se suelta, la calavera que vuela, el muro de huesos,
+    # alzarse, la campanilla (tres toques y los huesos que se despiertan), el dolor, la muerte y la lampara de la cupula (cruje)
+    "osmund_incensario": (2.4, 0.8, -12), "osmund_giro": (2.6, 0.8, -13), "osmund_corona": (5.0, 1.6, -15),
+    "osmund_calavera": (2.6, 0.8, -14), "osmund_muro": (4.0, 1.2, -13), "osmund_alzarse": (6.0, 2.0, -13),
+    "osmund_llamar": (6.0, 1.8, -13), "osmund_dolor": (1.6, 0.5, -15), "osmund_muerte": (8.0, 3.0, -14),
+    "osmund_lampara": (20.0, 2.5, -21),
 }
 # los que suenan en bucle (se relanzan antes de acabar y se solapan): entran poco a poco (segundos de fundido de entrada)
 ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0.8, "espada_luz": 0.5, "brumavela_viento": 2.5, "intro_abismo": 3.0, "intro_caida": 0.5,
@@ -507,13 +515,14 @@ ENTRADA = {"pantano_ambiente": 2.0, "arboleda_viento": 1.6, "santuario_fuego": 0
            "altar_ambiente": 2.0, "pontifice_rezo": 1.0, "crater_ambiente": 2.0, "mina_ambiente": 2.0,
            "aldric_rezo": 1.0, "aldric_arrastre": 0.3, "jinete_galope": 0.3, "dragon_aleteo": 0.3, "dragon_respira": 0.6,
            "cadena_ambiente": 2.0, "isolde_tarareo": 1.2, "homenaje_ambiente": 2.0, "aguja_ambiente": 2.0, "sombra_mirada": 0.15,
-           "osario_ambiente": 2.0, "osario_susurros": 1.5}
+           "osario_ambiente": 2.0, "osario_susurros": 1.5, "osmund_lampara": 1.5}
 # los que no se cogen desde el principio de la toma: segundos que se saltan (aqui, hasta poco antes del golpe gordo)
 INICIO = {"barco_atraca": 3.8, "barquero_remo": 0.8, "erudito_tinta": 0.55, "erudito_alzarse": 0.8, "erudito_susurro": 0.7,
           "salobre_alzarse": 4.2, "ballenero_tiron": 1.1, "ballenero_cuchillo": 0.4, "penitente_penitencia": 0.5, "penitente_incensario": 0.6,
           "penitente_humo": 1.0, "penitente_alzarse": 2.3, "enterrado_alzarse": 0.5, "mina_cruje": 0.8,
           "capataz_almas": 1.2, "ensamblado_dolor": 0.45, "ensamblado_deshace": 0.4, "ensamblado_rehace": 0.9, "ensamblado_polvo": 0.3,
-          "portacirios_barrido": 0.2, "monton_golpe": 0.25}
+          "portacirios_barrido": 0.2, "monton_golpe": 0.25, "osmund_incensario": 0.45, "osmund_giro": 2.5, "osmund_corona": 0.9,
+          "osmund_muro": 0.4, "osmund_dolor": 0.3, "osmund_muerte": 0.6}
 # casi todo por debajo de 100 Hz (en unos altavoces pequenos no sonarian): se les suman la octava y la quinta de encima
 GRAVES = {"intro_atrapa", "intro_latido", "barco_atraca", "boca_latido", "sombra_latido", "capataz_temblor"}
 # un filtro mas antes de igualar el volumen (aqui, que se oiga el chisporroteo de la marca y no solo el zumbido)
@@ -881,6 +890,13 @@ TOMAS_SFX = {
     "osario_ambiente": (1, 2), "ensamblado_traqueteo": (2, 3), "ensamblado_alerta": (2, 1), "ensamblado_dolor": (3, 1, 2),
     "ensamblado_deshace": (4, 2), "ensamblado_rehace": (4, 2), "ensamblado_polvo": (1, 4), "portacirios_barrido": (1, 3),
     "monton_arrastre": (2, 3), "monton_golpe": (1, 2, 4), "guirnalda_cae": (2, 3), "osario_campana": (4, 3), "osario_susurros": (2, 4),
+    # Fray Osmund (parte 7at; elegidas midiendo las tomas): del incensario la 1 y la 2 (el golpe a los 0,7 y 1,0 s: desde el 0,45); del
+    # giro la 3 y la 2 (las mas fuertes; desde el 2,5, lo gordo del remolino al segundo); de la corona la 1 y la 2 (desde el 0,9); de la
+    # calavera la 3 y la 4 (el chillido enseguida); del muro la 4 y la 1; de alzarse la 4 y la 2 (las mas fuertes, sin silencio al
+    # principio); de la campanilla la 4 y la 3; del dolor la 1, la 3 y la 2; de la muerte la 1 (el derrumbe fuerte) y la 2; de la
+    # lampara la 2 (pareja) y la 4 (mas cadena)
+    "osmund_incensario": (1, 2), "osmund_giro": (3, 2), "osmund_corona": (1, 2), "osmund_calavera": (3, 4), "osmund_muro": (4, 1),
+    "osmund_alzarse": (4, 2), "osmund_llamar": (4, 3), "osmund_dolor": (1, 3, 2), "osmund_muerte": (1, 2), "osmund_lampara": (2, 4),
 }
 # efectos con una sola toma (_1)
 UNA_TOMA = {k for k in SFX if k.startswith("gavran_")} | {"arbol_despierta", "hojas_cortantes", "raices_atrapan", "espinas",
@@ -1283,6 +1299,28 @@ def voz_isolde(src, dst):
         "highpass=f=90,equalizer=f=3600:t=q:w=1.2:g=2,highshelf=f=8000:g=-2,"
         "aecho=0.85:0.55:120|260|430:0.3|0.18|0.1,"
         "acompressor=threshold=-19dB:ratio=3:attack=4:release=160,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
+    )
+    ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
+    return hablado + COLA + 0.2
+
+
+def voz_osmund(src, dst):
+    """
+    Fray Osmund, el Sacristan: la voz de viejo un pelo mas grave; por debajo, los cuarenta mil (dos copias de la misma voz, una mas
+    aguda y otra mas grave, retrasadas, sin graves ni agudos: un coro de susurros), un aire de polvo en los agudos y el eco de la
+    boveda de piedra del Relicario (tres rebotes largos).
+    """
+    pre, _, hablado = recorte(src)
+    grafo = (
+        "[0:a]aresample=44100," + pre + "asplit=4[v1][v2][v3][v4];"
+        "[v1]asetrate=44100*0.97,aresample=44100,atempo=1.0309[base];"
+        "[v2]asetrate=44100*1.12,aresample=44100,atempo=0.8929,adelay=70:all=1,highpass=f=700,lowpass=f=4500,volume=0.16[s1];"
+        "[v3]asetrate=44100*0.86,aresample=44100,atempo=1.1628,adelay=130:all=1,highpass=f=200,lowpass=f=1600,volume=0.2[s2];"
+        "[v4]highpass=f=3200,aecho=0.8:0.6:45|90:0.4|0.3,volume=0.1[aire];"
+        "[base][s1][s2][aire]amix=inputs=4:weights=1 0.6 0.6 0.5:normalize=0,"
+        "equalizer=f=220:t=q:w=1.0:g=-1.5,equalizer=f=2500:t=q:w=1.2:g=2,"
+        "aecho=0.8:0.55:320|700|1150:0.3|0.18|0.1,"
+        "acompressor=threshold=-20dB:ratio=3:attack=5:release=160,loudnorm=I=-14:TP=-1.5:LRA=9[out]"
     )
     ff(["-i", src, "-filter_complex", grafo, "-map", "[out]", "-ar", "44100", "-ac", "1", "-c:a", "libvorbis", "-q:a", "6", dst])
     return hablado + COLA + 0.2
@@ -1834,6 +1872,25 @@ def main():
         except Exception as e:  # noqa: BLE001
             fallos += 1
             print(f"FALLO capataz {n}: {e}")
+    # Fray Osmund, el Sacristan (parte 7at)
+    osm = os.path.join(ASSETS, "sounds", "osmund")
+    os.makedirs(osm, exist_ok=True)
+    dur_o, hab_o = {}, {}
+    for n, toma in sorted(TOMAS_OSMUND.items()):
+        src = os.path.join(MASTER, "osmund", f"voz_{n}{toma}.mp3")
+        dst = os.path.join(osm, f"voz_{n}.ogg")
+        if not os.path.exists(src):
+            print("falta", src)
+            fallos += 1
+            continue
+        try:
+            h = voz_osmund(src, dst)
+            dur_o[n] = round(duracion(dst), 2)
+            hab_o[n] = round(min(h, dur_o[n]), 2)
+            print(f"osmund {n:2d}: {dur_o[n]} s (habla hasta {hab_o[n]})")
+        except Exception as e:  # noqa: BLE001
+            fallos += 1
+            print(f"FALLO osmund {n}: {e}")
     # la Sombra
     som = os.path.join(ASSETS, "sounds", "sombra")
     os.makedirs(som, exist_ok=True)
@@ -1878,7 +1935,8 @@ def main():
                    "pontifice": dur_p, "habla_pontifice": hab_p, "aldric": dur_l, "habla_aldric": hab_l,
                    "gigante": dur_t, "habla_gigante": hab_t, "jinete": dur_j, "habla_jinete": hab_j,
                    "bufon": dur_u, "habla_bufon": hab_u, "dragon": dur_d, "habla_dragon": hab_d,
-                   "isolde": dur_i, "habla_isolde": hab_i, "capataz": dur_h, "habla_capataz": hab_h}, fh)
+                   "isolde": dur_i, "habla_isolde": hab_i, "capataz": dur_h, "habla_capataz": hab_h,
+                   "osmund": dur_o, "habla_osmund": hab_o}, fh)
     # los personajes con dialogo: voz_N.ogg y lo que tardan en decir cada frase (voces.json, para que el texto del
     # dialogo se escriba a su ritmo)
     voces = {}

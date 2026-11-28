@@ -351,6 +351,8 @@ public final class Morvain {
             if (srv.getTickCount() % 20 == 13) Altar.paz(m);
             // las Minas de Hierro Negro (parte 7ar): con Hakon caido, el turno de noche descansa (cada segundo)
             if (srv.getTickCount() % 20 == 11) Mina.paz(m);
+            // el Osario de San Ulfo (parte 7at): con Fray Osmund caido, los muertos del osario descansan (cada segundo)
+            if (srv.getTickCount() % 20 == 17) Osario.paz(m);
             // el Cerco del Ancla (parte 7v): la cadena que cierra su puerta mientras se pelea con Aldric (cada tick con alguien cerca)
             // y, con Aldric caido, los marcados que seguian de rodillas descansan (cada segundo)
             if (srv.getTickCount() % 20 == 3) {
